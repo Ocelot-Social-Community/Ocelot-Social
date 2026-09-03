@@ -11,6 +11,7 @@ import { setImmediate as tick } from 'node:timers/promises'
 
 import type { BrandingRouterDeps } from './routes'
 import type { Request, Response } from 'express'
+import { describe, beforeEach, test, expect } from 'vitest'
 import type { Mock, MockedFunction } from 'vitest'
 
 vi.mock('node:fs', () => ({ createReadStream: vi.fn() }))
@@ -29,18 +30,16 @@ const { brandingRouter } = await import('./routes')
 // filesystem and every fixture-based expectation failed. Passing the fakes in removes the question.
 // The id guard is NOT faked — routes.ts keeps importing the real one, so a tightening of
 // BRAND_ID_PATTERN is exercised here instead of being shadowed by a stub.
-const mockDiscover = vi.fn<(...args: unknown[]) => unknown>() as MockedFunction<
-  BrandingRouterDeps['discoverArchives']
->
-const mockDefaultMarker = vi.fn<(...args: unknown[]) => unknown>() as MockedFunction<
-  BrandingRouterDeps['readDefaultMarker']
->
+const mockDiscover = vi.fn<BrandingRouterDeps['discoverArchives']>()
+const mockDefaultMarker = vi.fn<BrandingRouterDeps['readDefaultMarker']>()
 const deps: BrandingRouterDeps = {
   discoverArchives: mockDiscover,
   readDefaultMarker: mockDefaultMarker,
 }
-const mockStat = stat as Mock<(...args: unknown[]) => Promise<unknown>>
-const mockCreateReadStream = createReadStream as Mock<(...args: unknown[]) => unknown>
+// Cast, not vi.mocked(stat): the real signature is overloaded (Stats vs BigIntStats) and the
+// fixture only needs the two fields the route reads.
+const mockStat = stat as unknown as Mock<(...args: unknown[]) => Promise<unknown>>
+const mockCreateReadStream = createReadStream as unknown as Mock<(...args: unknown[]) => unknown>
 
 const ARCHIVE = {
   id: 'stage',
@@ -83,14 +82,18 @@ function makeRes(): MockRes {
     },
     configurable: true,
   })
-  res.status = vi.fn(function status(this: MockRes, code: number) {
+  vi.spyOn(res, 'status').mockImplementation(function status(this: MockRes, code: number) {
     this.statusCode = code
     return this
   })
-  res.setHeader = vi.fn(function setHeader(this: MockRes, k: string, v: string) {
+  vi.spyOn(res, 'setHeader').mockImplementation(function setHeader(
+    this: MockRes,
+    k: string,
+    v: string,
+  ) {
     this.headers[k.toLowerCase()] = v
   })
-  res.json = vi.fn(function json(this: MockRes, value: unknown) {
+  vi.spyOn(res, 'json').mockImplementation(function json(this: MockRes, value: unknown) {
     this.body = JSON.stringify(value)
     return this
   })
@@ -136,7 +139,7 @@ describe('branding/routes', () => {
     // A deployment may set $OCELOT_BRANDING_ASSETS_DIR, so a router that defaulted
     // to it would serve archives here — and every assertion about a vanilla deployment would depend on
     // where the suite happens to run. The dir is an argument; the env is read once in server.ts.
-    it('ignores an ambient $OCELOT_BRANDING_ASSETS_DIR', async () => {
+    test('ignores an ambient $OCELOT_BRANDING_ASSETS_DIR', async () => {
       // eslint-disable-next-line n/no-process-env -- the ambient environment IS what this pins
       process.env.OCELOT_BRANDING_ASSETS_DIR = '/app/deployment/configurations'
 
@@ -144,6 +147,7 @@ describe('branding/routes', () => {
 
       expect(parseManifest(res.body)).toEqual({ default: '', brands: [] })
       expect(mockDiscover).not.toHaveBeenCalled()
+
       // eslint-disable-next-line n/no-process-env -- see above
       delete process.env.OCELOT_BRANDING_ASSETS_DIR
     })
@@ -151,14 +155,14 @@ describe('branding/routes', () => {
     // A vanilla backend has no brands; that is an ANSWER, not a missing endpoint. Falling through
     // reaches the GraphQL middleware mounted at '/' (server.ts), which logs the poll as a malformed
     // operation — and the webapp reads the resulting HTTP 400 as a failed sync and retries forever.
-    it('answers an empty manifest instead of falling through to the GraphQL handler', async () => {
+    test('answers an empty manifest instead of falling through to the GraphQL handler', async () => {
       const { res, next } = await call(brandingRouter(undefined, deps), '/manifest.json')
 
       expect(parseManifest(res.body)).toEqual({ default: '', brands: [] })
       expect(next).not.toHaveBeenCalled()
     })
 
-    it('answers 404 for an archive instead of falling through', async () => {
+    test('answers 404 for an archive instead of falling through', async () => {
       const { res, next } = await call(brandingRouter(undefined, deps), '/archives/stage')
 
       expect(res.statusCode).toBe(404)
@@ -168,7 +172,7 @@ describe('branding/routes', () => {
 
   // The injected fakes cover every other test, so the DEFAULTS — what production actually runs with —
   // would otherwise never be exercised: a wrong import there would ship unnoticed.
-  it('falls back to the real disk readers when none are injected', async () => {
+  test('falls back to the real disk readers when none are injected', async () => {
     const { res, next } = await call(brandingRouter('/does-not-exist'), '/manifest.json')
 
     // The real readers on a directory that is not there: no brands, no marker, and no throw.
@@ -178,7 +182,7 @@ describe('branding/routes', () => {
   })
 
   // A broken assets dir must degrade to "unknown brand", never to a 500.
-  it('answers 404 when discovery throws while resolving an archive', async () => {
+  test('answers 404 when discovery throws while resolving an archive', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     mockDiscover.mockImplementation(() => {
       throw new Error('EACCES')
@@ -191,12 +195,13 @@ describe('branding/routes', () => {
       expect.stringContaining('cannot read /brands'),
       expect.anything(),
     )
+
     warn.mockRestore()
   })
 
   // Same reason: nothing under /branding may reach the GraphQL handler behind it.
   describe('unknown paths under the mount', () => {
-    it.each(['/nope', '/archives', '/manifest.json/extra'])(
+    test.each(['/nope', '/archives', '/manifest.json/extra'])(
       'answers 404 for %p rather than handing it on',
       async (path) => {
         const { res, next } = await call(brandingRouter('/brands', deps), path)
@@ -207,8 +212,8 @@ describe('branding/routes', () => {
     )
   })
 
-  describe('GET /manifest.json', () => {
-    it('lists the discovered archives without leaking their file paths', async () => {
+  describe('gET /manifest.json', () => {
+    test('lists the discovered archives without leaking their file paths', async () => {
       const { res } = await call(brandingRouter('/brands', deps), '/manifest.json')
 
       expect(parseManifest(res.body)).toEqual({
@@ -221,7 +226,7 @@ describe('branding/routes', () => {
 
     // Without this a client holds every archive and still renders vanilla, because its brand
     // resolution ends at the DEFAULT marker.
-    it('carries the baked default so a client knows which brand to activate', async () => {
+    test('carries the baked default so a client knows which brand to activate', async () => {
       mockDefaultMarker.mockReturnValue('stage')
 
       const { res } = await call(brandingRouter('/brands', deps), '/manifest.json')
@@ -230,7 +235,7 @@ describe('branding/routes', () => {
       expect(mockDefaultMarker).toHaveBeenCalledWith('/brands')
     })
 
-    it('reports an empty default for a vanilla deployment with archives but no marker', async () => {
+    test('reports an empty default for a vanilla deployment with archives but no marker', async () => {
       mockDefaultMarker.mockReturnValue('')
 
       const { res } = await call(brandingRouter('/brands', deps), '/manifest.json')
@@ -241,7 +246,7 @@ describe('branding/routes', () => {
       })
     })
 
-    it('still lists the brands when the marker cannot be read', async () => {
+    test('still lists the brands when the marker cannot be read', async () => {
       mockDefaultMarker.mockImplementation(() => {
         throw new Error('EACCES')
       })
@@ -252,7 +257,7 @@ describe('branding/routes', () => {
       expect(parseManifest(res.body).brands).toHaveLength(1)
     })
 
-    it('answers 503 in the SAME shape when the assets dir cannot be read', async () => {
+    test('answers 503 in the SAME shape when the assets dir cannot be read', async () => {
       mockDiscover.mockImplementation(() => {
         throw new Error('EACCES')
       })
@@ -262,12 +267,13 @@ describe('branding/routes', () => {
 
       expect(res.statusCode).toBe(503)
       expect(parseManifest(res.body)).toEqual({ default: '', brands: [] })
+
       warn.mockRestore()
     })
   })
 
-  describe('GET /archives/:id', () => {
-    it('streams the archive of a known brand', async () => {
+  describe('gET /archives/:id', () => {
+    test('streams the archive of a known brand', async () => {
       mockCreateReadStream.mockReturnValue(Readable.from(['tar-bytes']))
 
       const { res } = await call(brandingRouter('/brands', deps), '/archives/stage')
@@ -281,7 +287,7 @@ describe('branding/routes', () => {
 
     // A download nobody finishes must not pin the file descriptor: `.pipe()` only unpipes when the
     // destination dies, so the read stream would stay open — one leaked fd per aborted request.
-    it('tears the file stream down when the client aborts mid-transfer', async () => {
+    test('tears the file stream down when the client aborts mid-transfer', async () => {
       // Never ends on its own, so the transfer is still in flight when the client goes away.
       const source = new Readable({ read() {} })
       source.push('first-chunk')
@@ -295,7 +301,7 @@ describe('branding/routes', () => {
       expect(source.destroyed).toBe(true)
     })
 
-    it('aborts the response when the read fails after the headers are out', async () => {
+    test('aborts the response when the read fails after the headers are out', async () => {
       const source = new Readable({
         read() {
           this.destroy(new Error('EIO'))
@@ -312,7 +318,7 @@ describe('branding/routes', () => {
       expect(res.body).not.toBe('')
     })
 
-    it('accepts the .tar.gz suffix the archives are named with', async () => {
+    test('accepts the .tar.gz suffix the archives are named with', async () => {
       mockCreateReadStream.mockReturnValue(Readable.from(['tar-bytes']))
 
       const { res } = await call(brandingRouter('/brands', deps), '/archives/stage.tar.gz')
@@ -325,7 +331,7 @@ describe('branding/routes', () => {
     // Brand ids may contain dots (this network runs `stage.ocelot.social`), so one that ends in
     // `.tar.gz` is a legitimate id — and must beat the convenience alias, which would otherwise hand
     // out a DIFFERENT brand's archive under its name.
-    it('prefers a brand whose id itself ends in .tar.gz over the suffix alias', async () => {
+    test('prefers a brand whose id itself ends in .tar.gz over the suffix alias', async () => {
       const literal = { ...ARCHIVE, id: 'stage.tar.gz', file: '/brands/literal.tar.gz' }
       mockDiscover.mockReturnValue(
         new Map([
@@ -343,7 +349,7 @@ describe('branding/routes', () => {
       expect(res.headers.etag).toBe('W/"stage.tar.gz-4096-1700000000123"')
     })
 
-    it('answers 304 when the client already has that exact archive', async () => {
+    test('answers 304 when the client already has that exact archive', async () => {
       const { res } = await call(brandingRouter('/brands', deps), '/archives/stage', {
         'if-none-match': 'W/"stage-4096-1700000000123"',
       })
@@ -352,7 +358,7 @@ describe('branding/routes', () => {
       expect(mockCreateReadStream).not.toHaveBeenCalled()
     })
 
-    it('re-transfers when the archive changed without a version bump', async () => {
+    test('re-transfers when the archive changed without a version bump', async () => {
       mockStat.mockResolvedValue({ size: 5000, mtimeMs: 1_700_000_999_000 })
       mockCreateReadStream.mockReturnValue(Readable.from(['tar-bytes']))
 
@@ -361,10 +367,10 @@ describe('branding/routes', () => {
       })
 
       expect(res.statusCode).not.toBe(304)
-      expect(mockCreateReadStream).toHaveBeenCalled()
+      expect(mockCreateReadStream).toHaveBeenCalledWith()
     })
 
-    it('answers 404 for a brand that is not deployed', async () => {
+    test('answers 404 for a brand that is not deployed', async () => {
       const { res } = await call(brandingRouter('/brands', deps), '/archives/unknown')
 
       expect(res.statusCode).toBe(404)
@@ -374,7 +380,7 @@ describe('branding/routes', () => {
     // A traversal attempt never even matches `/archives/:id` (`:id` stops at a slash), so it falls
     // through unhandled; the others reach the handler and are rejected there. Either way the contract
     // that matters holds: no caller-supplied string ever reaches the filesystem.
-    it.each(['../../etc/passwd', 'a%2Fb', 'has space', '.', '..'])(
+    test.each(['../../etc/passwd', 'a%2Fb', 'has space', '.', '..'])(
       'never reaches the disk for the malformed id %p',
       async (id) => {
         const { res } = await call(brandingRouter('/brands', deps), `/archives/${id}`)
@@ -385,7 +391,7 @@ describe('branding/routes', () => {
       },
     )
 
-    it('answers 404 when the discovered file vanished between listing and read', async () => {
+    test('answers 404 when the discovered file vanished between listing and read', async () => {
       mockStat.mockRejectedValue(new Error('ENOENT'))
 
       const { res } = await call(brandingRouter('/brands', deps), '/archives/stage')
@@ -394,7 +400,7 @@ describe('branding/routes', () => {
       expect(mockCreateReadStream).not.toHaveBeenCalled()
     })
 
-    it('sends only headers for HEAD', async () => {
+    test('sends only headers for HEAD', async () => {
       const { res } = await call(brandingRouter('/brands', deps), '/archives/stage', {}, 'HEAD')
 
       expect(res.headers.etag).toBe('W/"stage-4096-1700000000123"')

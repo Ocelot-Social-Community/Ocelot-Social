@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, describe, beforeEach, afterEach, it, expect } from 'vitest'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
@@ -282,6 +284,7 @@ describe('mentions in groups', () => {
 
     it('sends a notification to the no member', async () => {
       authenticatedUser = await noMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -309,6 +312,7 @@ describe('mentions in groups', () => {
 
     it('sends a notification to the group member', async () => {
       authenticatedUser = await groupMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -392,6 +396,7 @@ describe('mentions in groups', () => {
 
     it('sends NO notification to the no member', async () => {
       authenticatedUser = await noMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -410,6 +415,7 @@ describe('mentions in groups', () => {
 
     it('sends NO notification to the pending member', async () => {
       authenticatedUser = await pendingMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -428,6 +434,7 @@ describe('mentions in groups', () => {
 
     it('sends a notification to the group member', async () => {
       authenticatedUser = await groupMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -499,6 +506,7 @@ describe('mentions in groups', () => {
 
     it('sends NO notification to the no member', async () => {
       authenticatedUser = await noMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -517,6 +525,7 @@ describe('mentions in groups', () => {
 
     it('sends NO notification to the pending member', async () => {
       authenticatedUser = await pendingMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -535,6 +544,7 @@ describe('mentions in groups', () => {
 
     it('sends a notification to the group member', async () => {
       authenticatedUser = await groupMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -618,6 +628,7 @@ describe('mentions in groups', () => {
 
       it('sends a notification to the no member', async () => {
         authenticatedUser = await noMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -645,6 +656,7 @@ describe('mentions in groups', () => {
 
       it('sends a notification to the group member', async () => {
         authenticatedUser = await groupMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -715,6 +727,7 @@ describe('mentions in groups', () => {
 
       it('sends NO notification to the no member', async () => {
         authenticatedUser = await noMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -733,6 +746,7 @@ describe('mentions in groups', () => {
 
       it('sends NO notification to the pending member', async () => {
         authenticatedUser = await pendingMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -751,6 +765,7 @@ describe('mentions in groups', () => {
 
       it('sends a notification to the group member', async () => {
         authenticatedUser = await groupMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -815,6 +830,7 @@ describe('mentions in groups', () => {
 
       it('sends NO notification to the no member', async () => {
         authenticatedUser = await noMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -833,6 +849,7 @@ describe('mentions in groups', () => {
 
       it('sends NO notification to the pending member', async () => {
         authenticatedUser = await pendingMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -851,6 +868,7 @@ describe('mentions in groups', () => {
 
       it('sends a notification to the group member', async () => {
         authenticatedUser = await groupMember.toJson()
+
         await expect(
           query({
             query: notifications,

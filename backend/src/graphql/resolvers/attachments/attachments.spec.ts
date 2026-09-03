@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable vitest/no-conditional-expect */
+
 import { Readable } from 'node:stream'
 
 import { S3Client } from '@aws-sdk/client-s3'
@@ -13,6 +13,7 @@ import type { ApolloTestSetup } from '@root/test/helpers'
 import type { S3Config } from '@src/config'
 import type { Context } from '@src/context'
 import type { ReadStream } from 'node:fs'
+import { beforeAll, afterAll, afterEach, describe, beforeEach, test, expect } from 'vitest'
 import type { Mock } from 'vitest'
 
 const s3SendMock = vi.fn()
@@ -38,7 +39,7 @@ const UploadMock = {
   },
 }
 
-;(Upload as unknown as Mock).mockImplementation(() => UploadMock)
+vi.mocked(Upload).mockImplementation(() => UploadMock)
 
 const config: S3Config = {
   AWS_ACCESS_KEY_ID: 'AWS_ACCESS_KEY_ID',
@@ -82,11 +83,13 @@ afterEach(async () => {
 
 describe('delete Attachment', () => {
   const { del: deleteAttachment } = attachments(config)
+
   describe('given a resource with an attachment', () => {
     let user
     let chatPartner
     let file: { id: string }
     let message: { id: string }
+
     beforeEach(async () => {
       const u = await Factory.build('user')
       user = await u.toJson()
@@ -133,14 +136,16 @@ describe('delete Attachment', () => {
       })
     })
 
-    it('deletes `File` node', async () => {
+    test('deletes `File` node', async () => {
       await expect(database.neode.all('File')).resolves.toHaveLength(1)
+
       await deleteAttachment(message, 'ATTACHMENT')
+
       await expect(database.neode.all('File')).resolves.toHaveLength(0)
     })
 
     describe('given a transaction parameter', () => {
-      it('executes cypher statements within the transaction', async () => {
+      test('executes cypher statements within the transaction', async () => {
         const session = database.driver.session()
         let someString: string
         try {
@@ -155,12 +160,14 @@ describe('delete Attachment', () => {
         } finally {
           await session.close()
         }
+
         await expect(database.neode.all('File')).resolves.toHaveLength(0)
-        expect(someString).toEqual('Hello')
+        expect(someString).toBe('Hello')
       })
 
-      it('rolls back the transaction in case of errors', async () => {
+      test('rolls back the transaction in case of errors', async () => {
         await expect(database.neode.all('File')).resolves.toHaveLength(1)
+
         const session = database.driver.session()
         try {
           await session.writeTransaction(async (transaction) => {
@@ -186,6 +193,7 @@ describe('add Attachment', () => {
   const { add: addAttachment } = attachments(config)
   let fileInput: FileInput
   let post: { id: string }
+
   beforeEach(() => {
     fileInput = {
       name: 'The name of the new attachment',
@@ -223,7 +231,7 @@ describe('add Attachment', () => {
         post = await p.toJson()
       })
 
-      it('returns new file', async () => {
+      test('returns new file', async () => {
         await expect(addAttachment(post, 'ATTACHMENT', fileInput)).resolves.toMatchObject({
           updatedAt: expect.any(String),
           createdAt: expect.any(String),
@@ -233,13 +241,15 @@ describe('add Attachment', () => {
         })
       })
 
-      it('creates `:File` node', async () => {
+      test('creates `:File` node', async () => {
         await expect(database.neode.all('File')).resolves.toHaveLength(0)
+
         await addAttachment(post, 'ATTACHMENT', fileInput)
+
         await expect(database.neode.all('File')).resolves.toHaveLength(1)
       })
 
-      it('connects resource with image via given image type', async () => {
+      test('connects resource with image via given image type', async () => {
         await addAttachment(post, 'ATTACHMENT', fileInput)
         const result = await database.neode.cypher(
           `MATCH(p:Post {id: "p99"})-[:ATTACHMENT]->(f:File) RETURN f,p`,
@@ -250,13 +260,15 @@ describe('add Attachment', () => {
         // wants to know that both are there.
         const hydratedPost = database.neode.hydrateFirst(result, 'p', database.neode.model('Post'))
         const file = database.neode.hydrateFirst(result, 'f', database.neode.model('File'))
-        expect(hydratedPost).toBeTruthy()
-        expect(file).toBeTruthy()
+
+        expect(hydratedPost).toBe(true)
+        expect(file).toBe(true)
       })
 
-      it('sets metadata', async () => {
+      test('sets metadata', async () => {
         await addAttachment(post, 'ATTACHMENT', fileInput)
         const file = await database.neode.first('File', {}, undefined)
+
         await expect(file.toJson()).resolves.toMatchObject({
           name: 'The name of the new attachment',
           type: 'application/any',
@@ -267,7 +279,7 @@ describe('add Attachment', () => {
       })
 
       describe('given a transaction parameter', () => {
-        it('executes cypher statements within the transaction', async () => {
+        test('executes cypher statements within the transaction', async () => {
           const session = database.driver.session()
           try {
             await session.writeTransaction(async (transaction) => {
@@ -297,12 +309,13 @@ describe('add Attachment', () => {
             { name: 'This name text gets overwritten' },
             undefined,
           )
+
           await expect(file.toJson()).resolves.toMatchObject({
             name: 'This name text gets overwritten',
           })
         })
 
-        it('rolls back the transaction in case of errors', async () => {
+        test('rolls back the transaction in case of errors', async () => {
           const session = database.driver.session()
           try {
             await session.writeTransaction(async (transaction) => {
@@ -325,9 +338,10 @@ describe('add Attachment', () => {
   })
 
   describe('without image.upload', () => {
-    it('throws UserInputError', async () => {
+    test('throws UserInputError', async () => {
       const p = await Factory.build('post', { id: 'p99' }, { image: null })
       post = await p.toJson()
+
       await expect(addAttachment(post, 'ATTACHMENT', fileInput)).rejects.toEqual(
         new UserInputError('Cannot find attachment for given resource'),
       )

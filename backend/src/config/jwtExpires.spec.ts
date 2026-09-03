@@ -3,6 +3,7 @@
    analysis and misses these), so `import { verify }` type-checks and then throws at load.
    Reaching through the default import is the only form that works at runtime. */
 import jwt from 'jsonwebtoken'
+import { describe, expect, it } from 'vitest'
 
 import { isValidJwtExpires, resolveJwtExpires } from './jwtExpires'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
@@ -22,7 +23,7 @@ const lifetimeOf = (expires: JwtExpires): number => {
   return (payload?.exp ?? 0) - (payload?.iat ?? 0)
 }
 
-describe('isValidJwtExpires', () => {
+describe(isValidJwtExpires, () => {
   it.each(['2y', '10 hours', '1.5h', '30m', '600s', '86400000'])(
     'accepts the ms timespan %s',
     (value) => {
@@ -61,7 +62,7 @@ describe('isValidJwtExpires', () => {
   })
 })
 
-describe('resolveJwtExpires', () => {
+describe(resolveJwtExpires, () => {
   it('keeps a parseable lifetime', () => {
     expect(resolveJwtExpires('10 hours', FALLBACK)).toBe('10 hours')
   })
@@ -95,6 +96,7 @@ describe('the resolved value against jsonwebtoken itself', () => {
         algorithm: 'HS256',
         expiresIn: resolveJwtExpires(value, FALLBACK),
       })
+
       expect(() => verify(token, 'secret', { algorithms: ['HS256'] })).not.toThrow()
       expect(lifetimeOf(resolveJwtExpires(value, FALLBACK))).toBeGreaterThan(0)
     },
@@ -102,6 +104,7 @@ describe('the resolved value against jsonwebtoken itself', () => {
 
   it('shows the failure being prevented: an unresolved sub-second value expires instantly', () => {
     const token = sign({}, 'secret', { algorithm: 'HS256', expiresIn: '600' })
+
     expect(() => verify(token, 'secret', { algorithms: ['HS256'] })).toThrow('jwt expired')
   })
 
@@ -110,6 +113,7 @@ describe('the resolved value against jsonwebtoken itself', () => {
     // what the old `env.JWT_EXPIRES || default` did for any non-empty string.
     const signRaw = (value: string) =>
       sign({}, 'secret', { algorithm: 'HS256', expiresIn: value as JwtExpires })
+
     expect(() => signRaw('foo')).toThrow(/expiresIn/)
     expect(() => signRaw('')).toThrow(/expiresIn/)
   })

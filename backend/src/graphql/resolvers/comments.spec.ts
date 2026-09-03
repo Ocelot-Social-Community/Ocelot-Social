@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateComment from '@graphql/queries/comments/CreateComment.gql'
 import DeleteComment from '@graphql/queries/comments/DeleteComment.gql'
@@ -86,7 +88,7 @@ const setupPostAndComment = async () => {
   }
 }
 
-describe('Comment query', () => {
+describe('comment query', () => {
   // The default ordering is a deliberate behaviour change: neo4j-graphql-js emitted no
   // ORDER BY without an explicit `orderBy`, so the order was whatever the database returned.
   // Paging over an unordered result is unstable by definition, hence a fixed default —
@@ -142,7 +144,7 @@ describe('Comment query', () => {
   })
 })
 
-describe('CreateComment', () => {
+describe('createComment', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       variables = {
@@ -151,6 +153,7 @@ describe('CreateComment', () => {
         content: "I'm not authorized to comment",
       }
       const { errors } = await mutate({ mutation: CreateComment, variables })
+
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -201,19 +204,21 @@ describe('CreateComment', () => {
           },
         ]
         const { errors } = await mutate({ mutation: CreateComment, variables })
+
         expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
   })
 })
 
-describe('UpdateComment', () => {
+describe('updateComment', () => {
   describe('given a post and a comment', () => {
     beforeEach(setupPostAndComment)
 
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const { errors } = await mutate({ mutation: updateComment, variables })
+
         expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -226,6 +231,7 @@ describe('UpdateComment', () => {
 
       it('throws authorization error', async () => {
         const { errors } = await mutate({ mutation: updateComment, variables })
+
         expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -240,6 +246,7 @@ describe('UpdateComment', () => {
           data: { UpdateComment: { id: 'c456', content: 'The comment is updated' } },
           errors: undefined,
         }
+
         await expect(mutate({ mutation: updateComment, variables })).resolves.toMatchObject(
           expected,
         )
@@ -256,6 +263,7 @@ describe('UpdateComment', () => {
           },
           errors: undefined,
         }
+
         await expect(mutate({ mutation: updateComment, variables })).resolves.toMatchObject(
           expected,
         )
@@ -266,9 +274,10 @@ describe('UpdateComment', () => {
         const {
           data: { UpdateComment },
         } = (await mutate({ mutation: updateComment, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
-        expect(newlyCreatedComment.updatedAt).toBeTruthy()
+
+        expect(newlyCreatedComment.updatedAt).toBe(true)
         expect(Date.parse(newlyCreatedComment.updatedAt)).toEqual(expect.any(Number))
-        expect(UpdateComment.updatedAt).toBeTruthy()
+        expect(UpdateComment.updatedAt).toBe(true)
         expect(Date.parse(UpdateComment.updatedAt)).toEqual(expect.any(Number))
         expect(newlyCreatedComment.updatedAt).not.toEqual(UpdateComment.updatedAt)
       })
@@ -280,6 +289,7 @@ describe('UpdateComment', () => {
 
         it('returns null', async () => {
           const { data, errors } = await mutate({ mutation: updateComment, variables })
+
           expect(data).toMatchObject({ UpdateComment: null })
           expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
         })
@@ -288,13 +298,14 @@ describe('UpdateComment', () => {
   })
 })
 
-describe('DeleteComment', () => {
+describe('deleteComment', () => {
   describe('given a post and a comment', () => {
     beforeEach(setupPostAndComment)
 
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const result = await mutate({ mutation: DeleteComment, variables })
+
         expect(result.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -307,6 +318,7 @@ describe('DeleteComment', () => {
 
       it('throws authorization error', async () => {
         const { errors } = await mutate({ mutation: DeleteComment, variables })
+
         expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -325,6 +337,7 @@ describe('DeleteComment', () => {
             content: 'UNAVAILABLE',
           },
         }
+
         expect(data).toMatchObject(expected)
       })
     })

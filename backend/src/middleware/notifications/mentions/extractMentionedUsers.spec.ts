@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import extractMentionedUsers from './extractMentionedUsers'
 
 const contentWithMentions =
@@ -9,7 +11,7 @@ const contentWithPlainLinks =
 const contentWithDuplicateIds =
   'One more mention to <a data-mention-id="you" class="mention" href="/profile/you"> @al-capone </a> and again: <a data-mention-id="you" class="mention" href="/profile/you"> @al-capone </a> and again <a data-mention-id="you" class="mention" href="/profile/you"> @al-capone </a>'
 
-describe('extractMentionedUsers', () => {
+describe(extractMentionedUsers, () => {
   describe('content undefined', () => {
     it('returns empty array', () => {
       expect(extractMentionedUsers()).toEqual([])

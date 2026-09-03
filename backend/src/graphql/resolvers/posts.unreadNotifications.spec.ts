@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import postWithUnreadNotifications from '@graphql/queries/posts/PostUnreadNotifications.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -41,7 +43,7 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('Post.unreadNotificationByCurrentUser / unreadCommentNotificationsByCurrentUser', () => {
+describe('post.unreadNotificationByCurrentUser / unreadCommentNotificationsByCurrentUser', () => {
   beforeEach(async () => {
     author = await Factory.build('user', { id: 'author' })
     user = await Factory.build('user', { id: 'you' })
@@ -109,8 +111,11 @@ describe('Post.unreadNotificationByCurrentUser / unreadCommentNotificationsByCur
         query: postWithUnreadNotifications,
         variables: { id: 'p-target' },
       })
+
       expect(response.errors).toBeUndefined()
+
       const post = response.data?.Post[0]
+
       expect(post.unreadNotificationByCurrentUser).toBeNull()
       expect(post.unreadCommentNotificationsByCurrentUser).toEqual([])
     })
@@ -126,6 +131,7 @@ describe('Post.unreadNotificationByCurrentUser / unreadCommentNotificationsByCur
         query: postWithUnreadNotifications,
         variables: { id: 'p-target' },
       })
+
       expect(response.errors).toBeUndefined()
       expect(response.data?.Post[0].unreadNotificationByCurrentUser).toMatchObject({
         read: false,
@@ -139,8 +145,11 @@ describe('Post.unreadNotificationByCurrentUser / unreadCommentNotificationsByCur
         query: postWithUnreadNotifications,
         variables: { id: 'p-target' },
       })
+
       expect(response.errors).toBeUndefined()
+
       const list = response.data?.Post[0].unreadCommentNotificationsByCurrentUser
+
       expect(list).toHaveLength(1)
       expect(list[0]).toMatchObject({
         read: false,
@@ -157,6 +166,7 @@ describe('Post.unreadNotificationByCurrentUser / unreadCommentNotificationsByCur
       const list = response.data?.Post[0].unreadCommentNotificationsByCurrentUser as Array<{
         from: { id: string }
       }>
+
       expect(list.map((n) => n.from.id)).not.toContain('c-neighbor')
     })
   })
@@ -171,6 +181,7 @@ describe('Post.unreadNotificationByCurrentUser / unreadCommentNotificationsByCur
         query: postWithUnreadNotifications,
         variables: { id: 'p-target' },
       })
+
       expect(response.errors).toBeUndefined()
       expect(response.data?.Post[0].unreadNotificationByCurrentUser).toBeNull()
     })
@@ -180,6 +191,7 @@ describe('Post.unreadNotificationByCurrentUser / unreadCommentNotificationsByCur
         query: postWithUnreadNotifications,
         variables: { id: 'p-target' },
       })
+
       expect(response.data?.Post[0].unreadCommentNotificationsByCurrentUser).toEqual([])
     })
   })

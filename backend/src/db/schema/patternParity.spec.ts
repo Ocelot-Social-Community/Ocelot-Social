@@ -1,3 +1,5 @@
+import { afterAll, describe, expect } from 'vitest'
+
 import { closeDriver, getDriver } from '@db/neo4j'
 import { cypherString } from '@db/schema/derive/audit'
 import { EMAIL, FOLLOWABLE_URL, ISO_DATE_TIME, SLUG } from '@db/schema/entities/patterns'
@@ -237,6 +239,7 @@ describe('every declared pattern reads the same in ajv and in Cypher', () => {
           // comparison below trivially "false === false" — and so would an injection point that
           // lands outside the class under test, which is why `variantsOf` declares where it goes.
           const { value: sample } = placed(marked)
+
           expect({ sample, ajv: inJavaScript.test(sample) }).toEqual({ sample, ajv: true })
           expect({ sample, cypher: await matchesInJava(transaction, sample, pattern) }).toEqual({
             sample,

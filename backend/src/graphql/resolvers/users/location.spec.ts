@@ -9,6 +9,7 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, test, expect } from 'vitest'
 import type { MockInstance } from 'vitest'
 
 let variables
@@ -188,7 +189,7 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('Location Service', () => {
+describe('location Service', () => {
   // Authentication
   // TODO: unify, externalize, simplify, wtf?
   beforeEach(async () => {
@@ -198,27 +199,30 @@ describe('Location Service', () => {
     authenticatedUser = await user.toJson()
   })
 
-  it('passes proximity to the Mapbox URL when provided', async () => {
+  test('passes proximity to the Mapbox URL when provided', async () => {
     variables = { place: 'Berlin', lang: 'en', proximity: '10.0,53.55' }
     await query({ query: queryLocations, variables })
     const calledUrl = fetchSpy.mock.calls[0][0] as string
+
     expect(calledUrl).toContain(`proximity=${encodeURIComponent(variables.proximity as string)}`)
   })
 
-  it('encodes place names with umlauts exactly once in the Mapbox URL', async () => {
+  test('encodes place names with umlauts exactly once in the Mapbox URL', async () => {
     variables = { place: 'Köln', lang: 'en' }
     await query({ query: queryLocations, variables })
     const calledUrl = fetchSpy.mock.calls[0][0] as string
+
     expect(calledUrl).toContain(encodeURIComponent('Köln')) // 'K%C3%B6ln'
     expect(calledUrl).not.toContain(encodeURIComponent(encodeURIComponent('Köln'))) // not 'K%25C3%25B6ln'
   })
 
-  it('query Location existing', async () => {
+  test('query Location existing', async () => {
     variables = {
       place: 'Berlin',
       lang: 'en',
     }
     const result = await query({ query: queryLocations, variables })
+
     expect(result.data.queryLocations).toEqual(
       expect.arrayContaining([
         {
@@ -255,12 +259,13 @@ describe('Location Service', () => {
     )
   })
 
-  it('query Location existing in different language', async () => {
+  test('query Location existing in different language', async () => {
     variables = {
       place: 'Berlin',
       lang: 'de',
     }
     const result = await query({ query: queryLocations, variables })
+
     expect(result.data.queryLocations).toEqual([
       {
         id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
@@ -295,16 +300,17 @@ describe('Location Service', () => {
     ])
   })
 
-  it('query Location not existing', async () => {
+  test('query Location not existing', async () => {
     variables = {
       place: 'GbHtsd4sdHa',
       lang: 'en',
     }
     const result = await query({ query: queryLocations, variables })
+
     expect(result.data.queryLocations).toEqual([])
   })
 
-  it('reverse-geocodes a "lng,lat" search string by trying types one at a time', async () => {
+  test('reverse-geocodes a "lng,lat" search string by trying types one at a time', async () => {
     fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
       const path = decodeURIComponent(url)
@@ -330,13 +336,15 @@ describe('Location Service', () => {
       { id: 'poi.hagenbeck', place_name: 'Tierpark Hagenbeck', lat: 53.551, lng: 9.993 },
     ])
     expect(fetchSpy).toHaveBeenCalledTimes(2)
+
     const calledUrls = fetchSpy.mock.calls.map(([input]) => input as string)
+
     expect(calledUrls[0]).toContain('types=address')
     expect(calledUrls[0]).toContain('limit=1')
     expect(calledUrls[1]).toContain('types=poi')
   })
 
-  it('prefers an address match over a country match, regardless of the requested type order', async () => {
+  test('prefers an address match over a country match, regardless of the requested type order', async () => {
     fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
       const path = decodeURIComponent(url)
@@ -375,11 +383,13 @@ describe('Location Service', () => {
     expect(result.data.queryLocations).toEqual([
       { id: 'address.example', place_name: 'Musterstraße 1, Hamburg', lat: 53.551, lng: 9.993 },
     ])
+
     const calledUrls = fetchSpy.mock.calls.map(([input]) => input as string)
+
     expect(calledUrls[0]).toContain('types=address')
   })
 
-  it.each(['postcode', 'district', 'locality', 'neighborhood'])(
+  test.each(['postcode', 'district', 'locality', 'neighborhood'])(
     'reverse-geocodes with an explicitly requested "%s" type instead of always returning []',
     async (type) => {
       fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
@@ -410,7 +420,7 @@ describe('Location Service', () => {
     },
   )
 
-  it('returns an empty array when reverse geocoding finds no match for any type', async () => {
+  test('returns an empty array when reverse geocoding finds no match for any type', async () => {
     variables = { place: '0.0,0.0', lang: 'en', types: 'address,poi' }
     const result = await query({ query: queryLocations, variables })
 
@@ -418,18 +428,19 @@ describe('Location Service', () => {
     expect(fetchSpy).toHaveBeenCalledTimes(2)
   })
 
-  it('query Location without a place name given', async () => {
+  test('query Location without a place name given', async () => {
     variables = {
       place: '',
       lang: 'en',
     }
     const result = await query({ query: queryLocations, variables })
+
     expect(result.data.queryLocations).toEqual([])
   })
 })
 
 describe('userMiddleware', () => {
-  describe('UpdateUser', () => {
+  describe('updateUser', () => {
     beforeEach(async () => {
       const user = await Factory.build('user', {
         id: 'updating-user',
@@ -437,7 +448,7 @@ describe('userMiddleware', () => {
       authenticatedUser = await user.toJson()
     })
 
-    it('creates a Location node with localized city/state/country names', async () => {
+    test('creates a Location node with localized city/state/country names', async () => {
       variables = {
         ...variables,
         id: 'updating-user',
@@ -449,6 +460,7 @@ describe('userMiddleware', () => {
         `MATCH (city:Location)-[:IS_IN]->(district:Location)-[:IS_IN]->(state:Location)-[:IS_IN]->(country:Location) return city {.*}, state {.*}, country {.*}`,
         {},
       )
+
       expect(
         locations.records.map((record) => {
           return {

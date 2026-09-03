@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import VerifyNonce from '@graphql/queries/auth/VerifyNonce.gql'
 import AddEmailAddress from '@graphql/queries/users/AddEmailAddress.gql'
@@ -48,7 +50,7 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('AddEmailAddress', () => {
+describe('addEmailAddress', () => {
   beforeEach(() => {
     variables = { ...variables, email: 'new-email@example.org' }
   })
@@ -114,6 +116,7 @@ describe('AddEmailAddress', () => {
           'e',
           database.neode.model('UnverifiedEmailAddress'),
         )
+
         await expect(email?.toJson()).resolves.toMatchObject({
           email: 'new-email@example.org',
           nonce: expect.any(String),
@@ -126,6 +129,7 @@ describe('AddEmailAddress', () => {
             createdAt: '2019-09-24T14:00:01.565Z',
             email: 'new-email@example.org',
           })
+
           await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({
             data: {
               AddEmailAddress: {
@@ -141,6 +145,7 @@ describe('AddEmailAddress', () => {
       describe('but if another user owns an `EmailAddress` already with that email', () => {
         it('does not throw UserInputError', async () => {
           await Factory.build('user', {}, { email: 'new-email@example.org' })
+
           await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({
             data: {
               AddEmailAddress: {
@@ -157,7 +162,7 @@ describe('AddEmailAddress', () => {
   })
 })
 
-describe('VerifyEmailAddress', () => {
+describe('verifyEmailAddress', () => {
   beforeEach(() => {
     variables = { ...variables, email: 'to-be-verified@example.org', nonce: '12345' }
   })
@@ -192,6 +197,7 @@ describe('VerifyEmailAddress', () => {
 
     describe('given a `UnverifiedEmailAddress`', () => {
       let emailAddress
+
       beforeEach(async () => {
         emailAddress = await Factory.build('unverifiedEmailAddress', {
           nonce: '12345',
@@ -206,6 +212,7 @@ describe('VerifyEmailAddress', () => {
       describe('given invalid nonce', () => {
         it('throws UserInputError', async () => {
           variables.nonce = 'asdfgh'
+
           await expect(mutate({ mutation: VerifyEmailAddress, variables })).resolves.toMatchObject({
             data: { VerifyEmailAddress: null },
             errors: [{ message: 'Invalid nonce or no email address found.' }],
@@ -263,6 +270,7 @@ describe('VerifyEmailAddress', () => {
               'e',
               database.neode.model('EmailAddress'),
             )
+
             await expect(email?.toJson()).resolves.toMatchObject({
               email: 'to-be-verified@example.org',
             })
@@ -279,12 +287,15 @@ describe('VerifyEmailAddress', () => {
               'e',
               database.neode.model('EmailAddress'),
             )
+
             await expect(email?.toJson()).resolves.toMatchObject({
               email: 'user@example.org',
             })
+
             await mutate({ mutation: VerifyEmailAddress, variables })
             result = await database.neode.cypher(cypherStatement, {})
             email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
+
             // `false` was neode's way of saying "no such node"; the fixture API answers null.
             expect(email).toBeNull()
           })
@@ -300,17 +311,20 @@ describe('VerifyEmailAddress', () => {
               'e',
               database.neode.model('EmailAddress'),
             )
+
             await expect(email?.toJson()).resolves.toMatchObject({
               email: 'user@example.org',
             })
+
             await mutate({ mutation: VerifyEmailAddress, variables })
             result = await database.neode.cypher(cypherStatement, {})
             email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
+
             // `false` was neode's way of saying "no such node"; the fixture API answers null.
             expect(email).toBeNull()
           })
 
-          describe('Edge case: In the meantime someone created an `EmailAddress` node with the given email belonging to a user', () => {
+          describe('edge case: In the meantime someone created an `EmailAddress` node with the given email belonging to a user', () => {
             beforeEach(async () => {
               await Factory.build('user', { id: '568' }, { email: 'to-be-verified@example.org' })
             })
@@ -325,7 +339,7 @@ describe('VerifyEmailAddress', () => {
             })
           })
 
-          describe('Edge case: We have an abandoned `EmailAddress` node with the given email', () => {
+          describe('edge case: We have an abandoned `EmailAddress` node with the given email', () => {
             beforeEach(async () => {
               await Factory.build('emailAddress', { email: 'to-be-verified@example.org' })
             })
@@ -344,6 +358,7 @@ describe('VerifyEmailAddress', () => {
                 'e',
                 database.neode.model('EmailAddress'),
               )
+
               await expect(email?.toJson()).resolves.toMatchObject({
                 email: 'to-be-verified@example.org',
               })
@@ -355,7 +370,7 @@ describe('VerifyEmailAddress', () => {
   })
 })
 
-describe('VerifyNonce', () => {
+describe('verifyNonce', () => {
   beforeEach(async () => {
     await Factory.build('emailAddress', {
       nonce: '12345',
@@ -370,6 +385,7 @@ describe('VerifyNonce', () => {
       email: 'to-be-verified@example.org',
       nonce: '12345',
     }
+
     await expect(query({ query: VerifyNonce, variables })).resolves.toMatchObject({
       data: { VerifyNonce: true },
     })
@@ -380,6 +396,7 @@ describe('VerifyNonce', () => {
       email: 'to-be-verified@example.org',
       nonce: '---',
     }
+
     await expect(query({ query: VerifyNonce, variables })).resolves.toMatchObject({
       data: { VerifyNonce: false },
     })

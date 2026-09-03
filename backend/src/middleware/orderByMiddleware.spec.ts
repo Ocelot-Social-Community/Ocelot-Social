@@ -1,3 +1,5 @@
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import { cleanDatabase } from '@db/factories'
 import Post from '@graphql/queries/posts/Post.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -39,8 +41,8 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('Query', () => {
-  describe('Post', () => {
+describe('query', () => {
+  describe('post', () => {
     describe('orderBy', () => {
       it('createdAt descending is default', async () => {
         await expect(query({ query: Post })).resolves.toMatchObject({

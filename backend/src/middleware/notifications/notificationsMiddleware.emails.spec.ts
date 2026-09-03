@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, describe, beforeEach, afterEach, it, expect } from 'vitest'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
@@ -167,6 +169,7 @@ describe('emails sent for notifications', () => {
 
         it('sends 3 notifications', async () => {
           authenticatedUser = await groupMember.toJson()
+
           await expect(
             query({
               query: notifications,
@@ -249,6 +252,7 @@ describe('emails sent for notifications', () => {
 
         it('sends 3 notifications', async () => {
           authenticatedUser = await groupMember.toJson()
+
           await expect(
             query({
               query: notifications,
@@ -332,6 +336,7 @@ describe('emails sent for notifications', () => {
 
         it('sends 3 notifications', async () => {
           authenticatedUser = await groupMember.toJson()
+
           await expect(
             query({
               query: notifications,
@@ -410,6 +415,7 @@ describe('emails sent for notifications', () => {
 
         it('sends 3 notifications', async () => {
           authenticatedUser = await groupMember.toJson()
+
           await expect(
             query({
               query: notifications,
@@ -516,6 +522,7 @@ describe('emails sent for notifications', () => {
 
         it('sends 2 notifications', async () => {
           authenticatedUser = await groupMember.toJson()
+
           await expect(
             query({
               query: notifications,
@@ -609,6 +616,7 @@ describe('emails sent for notifications', () => {
 
         it('sends 2 notifications', async () => {
           authenticatedUser = await groupMember.toJson()
+
           await expect(
             query({
               query: notifications,
@@ -697,6 +705,7 @@ describe('emails sent for notifications', () => {
 
         it('sends 2 notifications', async () => {
           authenticatedUser = await groupMember.toJson()
+
           await expect(
             query({
               query: notifications,

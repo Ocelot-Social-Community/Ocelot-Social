@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
+import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect } from 'vitest'
+
 import { cleanDatabase } from '@db/factories'
 import mutedUsers from '@graphql/queries/interactions/mutedUsers.gql'
 import muteUser from '@graphql/queries/interactions/muteUser.gql'
@@ -54,6 +56,7 @@ describe('mutedUsers', () => {
 
     it('throws permission error', async () => {
       const result = await query({ query: mutedUsers })
+
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
@@ -104,6 +107,7 @@ describe('muteUser', () => {
 
     it('throws permission error', async () => {
       const result = await muteAction({ id: 'u2' })
+
       expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -156,6 +160,7 @@ describe('muteUser', () => {
 
       it('unfollows the user', async () => {
         await currentUser.relateTo(mutedUser, 'following')
+
         await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
           data: {
             User: expect.arrayContaining([
@@ -163,7 +168,9 @@ describe('muteUser', () => {
             ]),
           },
         })
+
         await muteAction({ id: 'u2' })
+
         await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
           data: {
             User: expect.arrayContaining([
@@ -307,6 +314,7 @@ describe('muteUser', () => {
                   variables: { orderBy: 'createdAt_asc' },
                 })
                 const postIds = result.data?.Post.map((p) => p.id)
+
                 expect(postIds).not.toContain('p23')
               })
             })
@@ -320,6 +328,7 @@ describe('muteUser', () => {
 
           // eslint-disable-next-line vitest/expect-expect
           it('both posts are in the newsfeed', bothPostsAreInTheNewsfeed)
+
           describe('but if the current user mutes the other user', () => {
             beforeEach(async () => {
               await currentUser.relateTo(mutedUser, 'muted')
@@ -365,6 +374,7 @@ describe('unmuteUser', () => {
 
     it('throws permission error', async () => {
       const result = await unmuteAction({ id: 'u2' })
+
       expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -435,6 +445,7 @@ describe('unmuteUser', () => {
         describe('unmuting twice', () => {
           it('has no effect', async () => {
             await unmuteAction({ id: 'u2' })
+
             await expect(unmuteAction({ id: 'u2' })).resolves.toEqual(
               expect.objectContaining({
                 data: {

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
 import { DEFAULT_ROLES } from '@src/role'
@@ -84,6 +86,7 @@ describe('admin user search — e-mail filter is gated by user.email.readAny', (
       query: searchQuery,
       variables: { search: 'target-secret@' },
     })
+
     expect(errors).toBeUndefined()
     // Without user.email.readAny the e-mail term is not searchable → no leak.
     expect(data.User).toEqual([])
@@ -95,6 +98,7 @@ describe('admin user search — e-mail filter is gated by user.email.readAny', (
       query: searchQuery,
       variables: { search: 'Target' },
     })
+
     expect(errors).toBeUndefined()
     expect(data.User.map((u: { name: string }) => u.name)).toEqual(['Target'])
   })

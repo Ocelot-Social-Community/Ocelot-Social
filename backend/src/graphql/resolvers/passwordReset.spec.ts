@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import login from '@graphql/queries/auth/login.gql'
 import requestPasswordReset from '@graphql/queries/auth/requestPasswordReset.gql'
@@ -83,6 +85,7 @@ describe('passwordReset', () => {
         it('creates no node', async () => {
           await mutate({ mutation: requestPasswordReset, variables })
           const resets = await getAllPasswordResets()
+
           expect(resets).toHaveLength(0)
         })
       })
@@ -102,9 +105,12 @@ describe('passwordReset', () => {
 
         it('creates node with label `PasswordReset`', async () => {
           let resets = await getAllPasswordResets()
+
           expect(resets).toHaveLength(0)
+
           await mutate({ mutation: requestPasswordReset, variables })
           resets = await getAllPasswordResets()
+
           expect(resets).toHaveLength(1)
         })
 
@@ -123,6 +129,7 @@ describe('passwordReset', () => {
             const resets = await getAllPasswordResets()
             const [reset] = resets
             const { nonce } = reset.properties
+
             expect(nonce).toHaveLength(customLength)
           } finally {
             setBranding(original)
@@ -139,6 +146,7 @@ describe('resetPassword', () => {
     const { email = 'user@example.org', issuedAt = new Date(), nonce = '12345' } = options
     await createPasswordReset({ driver: database.driver, email, issuedAt, nonce })
   }
+
   beforeEach(() => {
     variables = { ...variables, newPassword: 'supersecret' }
   })
@@ -161,6 +169,7 @@ describe('resetPassword', () => {
       it('resolves to false', async () => {
         await setup()
         variables = { ...variables, email: 'non-existent@example.org', nonce: '12345' }
+
         await expect(mutate({ mutation: resetPassword, variables })).resolves.toMatchObject({
           data: { resetPassword: false },
         })
@@ -179,6 +188,7 @@ describe('resetPassword', () => {
 
         it('resolves to false', async () => {
           await setup()
+
           await expect(mutate({ mutation: resetPassword, variables })).resolves.toMatchObject({
             data: { resetPassword: false },
           })
@@ -209,12 +219,14 @@ describe('resetPassword', () => {
             const requests = await getAllPasswordResets()
             const [request] = requests
             const { usedAt } = request.properties
-            expect(usedAt).not.toBeFalsy()
+
+            expect(usedAt).not.toBe(false)
           })
 
           it('updates password of the user', async () => {
             await mutate({ mutation: resetPassword, variables })
             variables = { ...variables, email: 'user@example.org', password: 'supersecret' }
+
             await expect(mutate({ mutation: login, variables })).resolves.toMatchObject({
               data: { login: expect.any(String) },
             })
@@ -239,6 +251,7 @@ describe('resetPassword', () => {
             const requests = await getAllPasswordResets()
             const [request] = requests
             const { usedAt } = request.properties
+
             expect(usedAt).toBeUndefined()
           })
         })

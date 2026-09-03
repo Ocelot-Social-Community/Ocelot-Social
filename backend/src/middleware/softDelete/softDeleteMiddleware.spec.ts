@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { beforeAll, afterAll, describe, beforeEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import Post from '@graphql/queries/posts/Post.gql'
 import User from '@graphql/queries/users/User.gql'
@@ -221,18 +223,21 @@ describe('softDeleteMiddleware', () => {
         authenticatedUser = await moderator.toJson()
       })
 
-      describe('User', () => {
+      describe('user', () => {
         beforeEach(beforeUser)
 
         it('displays name', () => {
-          expect(subject.name).toEqual('Offensive Name')
+          expect(subject.name).toBe('Offensive Name')
         })
+
         it('displays slug', () => {
-          expect(subject.slug).toEqual('offensive-name')
+          expect(subject.slug).toBe('offensive-name')
         })
+
         it('displays about', () => {
-          expect(subject.about).toEqual('This self description is very offensive')
+          expect(subject.about).toBe('This self description is very offensive')
         })
+
         it('displays avatar', () => {
           expect(subject.avatar).toEqual({
             url: expect.stringMatching('http://localhost/some/offensive/avatar.jpg'),
@@ -240,18 +245,21 @@ describe('softDeleteMiddleware', () => {
         })
       })
 
-      describe('Post', () => {
+      describe('post', () => {
         beforeEach(beforePost)
 
         it('displays title', () => {
-          expect(subject.title).toEqual('Disabled post')
+          expect(subject.title).toBe('Disabled post')
         })
+
         it('displays slug', () => {
-          expect(subject.slug).toEqual('disabled-post')
+          expect(subject.slug).toBe('disabled-post')
         })
+
         it('displays content', () => {
-          expect(subject.content).toEqual('This is an offensive post content')
+          expect(subject.content).toBe('This is an offensive post content')
         })
+
         it('displays image', () => {
           expect(subject.image).toEqual({
             url: expect.stringMatching('http://localhost/some/offensive/image.jpg'),
@@ -259,11 +267,11 @@ describe('softDeleteMiddleware', () => {
         })
       })
 
-      describe('Comment', () => {
+      describe('comment', () => {
         beforeEach(beforeComment)
 
         it('displays content', () => {
-          expect(subject.content).toEqual('Disabled comment')
+          expect(subject.content).toBe('Disabled comment')
         })
       })
     })
@@ -273,52 +281,58 @@ describe('softDeleteMiddleware', () => {
         authenticatedUser = await user.toJson()
       })
 
-      describe('User', () => {
+      describe('user', () => {
         beforeEach(beforeUser)
 
         it('obfuscates name', () => {
-          expect(subject.name).toEqual('UNAVAILABLE')
+          expect(subject.name).toBe('UNAVAILABLE')
         })
+
         it('obfuscates slug', () => {
-          expect(subject.slug).toEqual('UNAVAILABLE')
+          expect(subject.slug).toBe('UNAVAILABLE')
         })
+
         it('obfuscates about', () => {
-          expect(subject.about).toEqual('UNAVAILABLE')
+          expect(subject.about).toBe('UNAVAILABLE')
         })
+
         it('obfuscates avatar', () => {
-          expect(subject.avatar).toEqual(null)
+          expect(subject.avatar).toBeNull()
         })
       })
 
-      describe('Post', () => {
+      describe('post', () => {
         beforeEach(beforePost)
 
         it('obfuscates title', () => {
-          expect(subject.title).toEqual('UNAVAILABLE')
+          expect(subject.title).toBe('UNAVAILABLE')
         })
+
         it('obfuscates slug', () => {
-          expect(subject.slug).toEqual('UNAVAILABLE')
+          expect(subject.slug).toBe('UNAVAILABLE')
         })
+
         it('obfuscates content', () => {
-          expect(subject.content).toEqual('UNAVAILABLE')
+          expect(subject.content).toBe('UNAVAILABLE')
         })
+
         it('obfuscates image', () => {
-          expect(subject.image).toEqual(null)
+          expect(subject.image).toBeNull()
         })
       })
 
-      describe('Comment', () => {
+      describe('comment', () => {
         beforeEach(beforeComment)
 
         it('obfuscates content', () => {
-          expect(subject.content).toEqual('UNAVAILABLE')
+          expect(subject.content).toBe('UNAVAILABLE')
         })
       })
     })
   })
 
-  describe('Query', () => {
-    describe('Post', () => {
+  describe('query', () => {
+    describe('post', () => {
       describe('as user', () => {
         beforeEach(async () => {
           authenticatedUser = await user.toJson()
@@ -326,6 +340,7 @@ describe('softDeleteMiddleware', () => {
 
         it('hides deleted or disabled posts', async () => {
           const expected = { data: { Post: [{ title: 'Publicly visible post' }] } }
+
           await expect(query({ query: Post })).resolves.toMatchObject(expected)
         })
       })
@@ -338,6 +353,7 @@ describe('softDeleteMiddleware', () => {
         it('shows disabled but hides deleted posts', async () => {
           const { data } = await query({ query: Post })
           const { Post: PostData } = data
+
           expect(PostData).toEqual(
             expect.arrayContaining([
               expect.objectContaining({ title: 'Disabled post' }),
@@ -362,6 +378,7 @@ describe('softDeleteMiddleware', () => {
             const {
               Post: [{ comments }],
             } = data
+
             expect(comments).toEqual(expect.arrayContaining(expected))
           })
         })
@@ -380,6 +397,7 @@ describe('softDeleteMiddleware', () => {
             const {
               Post: [{ comments }],
             } = data
+
             expect(comments).toEqual(expect.arrayContaining(expected))
           })
         })

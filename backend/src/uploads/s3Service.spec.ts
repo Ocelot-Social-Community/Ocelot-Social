@@ -2,6 +2,7 @@ import { Readable } from 'node:stream'
 
 import type { S3Config } from '@config/index'
 import type { FileUpload } from 'graphql-upload'
+import { describe, beforeEach, test, expect } from 'vitest'
 import type { Mock } from 'vitest'
 
 // `function`, not an arrow: these stand in for CLASSES and the code under test calls them with
@@ -33,9 +34,7 @@ const { s3Service } = await import('./s3Service')
 interface UploadInput {
   params: { Bucket: string; Key: string; ContentType: string; Body: unknown }
 }
-const uploadMock = Upload as unknown as Mock<
-  (input: UploadInput) => { done: () => Promise<{ Location: string }> }
->
+const uploadMock = vi.mocked(Upload)
 
 // `Upload` is mocked, so the stream is only handed over as `Body` and never consumed.
 // It is still a real readable stream so the mock honours the `Body` contract.
@@ -69,10 +68,11 @@ describe('s3Service', () => {
       })
     })
 
-    it('hands the file to the s3 client library as a readable `Body`', async () => {
+    test('hands the file to the s3 client library as a readable `Body`', async () => {
       const service = s3Service(config, 'ocelot-social')
       await service.uploadFile(input)
       const { params } = uploadMock.mock.calls[0][0]
+
       expect(params).toMatchObject({
         Bucket: 'AWS_BUCKET',
         Key: 'ocelot-social/unique-filename.jpg',
@@ -82,9 +82,10 @@ describe('s3Service', () => {
     })
 
     describe('if the S3 service returns a valid URL as a `Location`', () => {
-      it('returns the `Location` that was returned by the s3 client library', async () => {
+      test('returns the `Location` that was returned by the s3 client library', async () => {
         const service = s3Service(config, 'ocelot-social')
-        await expect(service.uploadFile(input)).resolves.toEqual(
+
+        await expect(service.uploadFile(input)).resolves.toBe(
           'http://your-objectstorage.com/bucket/ocelot-social/unique-filename.jpg',
         )
       })
@@ -99,9 +100,10 @@ describe('s3Service', () => {
         })
       })
 
-      it('adds `https:` as protocol', async () => {
+      test('adds `https:` as protocol', async () => {
         const service = s3Service(config, 'ocelot-social')
-        await expect(service.uploadFile(input)).resolves.toEqual(
+
+        await expect(service.uploadFile(input)).resolves.toBe(
           'https://your-objectstorage.com/bucket/ocelot-social/unique-filename.jpg',
         )
       })

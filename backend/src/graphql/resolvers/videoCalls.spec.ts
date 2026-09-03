@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, beforeEach, afterAll, describe, it, expect } from 'vitest'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { RoleDefinition } from '@src/role'
@@ -133,6 +135,7 @@ describe('videoCallConfig', () => {
   it('reports enabled=false when LiveKit is not configured', async () => {
     livekitConfig = {}
     const { data, errors } = await query({ query: VideoCallConfig })
+
     expect(errors).toBeUndefined()
     expect(data.videoCallConfig.enabled).toBe(false)
   })
@@ -140,6 +143,7 @@ describe('videoCallConfig', () => {
   it('reports enabled=true when LiveKit is configured', async () => {
     livekitConfig = ENABLED_LIVEKIT
     const { data, errors } = await query({ query: VideoCallConfig })
+
     expect(errors).toBeUndefined()
     expect(data.videoCallConfig.enabled).toBe(true)
   })
@@ -157,6 +161,7 @@ describe('videoCallParticipantCount', () => {
       query: VideoCallParticipantCount,
       variables: { groupId: 'pub-1' },
     })
+
     expect(errors?.[0].message).toMatch(/disabled/i)
   })
 
@@ -172,6 +177,7 @@ describe('videoCallParticipantCount', () => {
       query: VideoCallParticipantCount,
       variables: { groupId: 'pub-1' },
     })
+
     expect(errors?.[0].message).toMatch(/not a member/i)
   })
 
@@ -190,6 +196,7 @@ describe('videoCallParticipantCount', () => {
       query: VideoCallParticipantCount,
       variables: { groupId: 'cl-1' },
     })
+
     expect(errors).toBeUndefined()
     expect(data.videoCallParticipantCount).toBe(2)
   })
@@ -207,6 +214,7 @@ describe('videoCallParticipantCount', () => {
       query: VideoCallParticipantCount,
       variables: { groupId: 'pub-1' },
     })
+
     expect(errors).toBeUndefined()
     expect(data.videoCallParticipantCount).toBe(3)
     expect(listParticipantsMock).toHaveBeenCalledWith('group-pub-1')
@@ -227,6 +235,7 @@ describe('videoCallParticipantCount', () => {
       query: VideoCallParticipantCount,
       variables: { groupId: 'pub-1' },
     })
+
     expect(errors).toBeUndefined()
     expect(data.videoCallParticipantCount).toBe(0)
   })
@@ -246,6 +255,7 @@ describe('videoCallParticipantCount', () => {
       query: VideoCallParticipantCount,
       variables: { groupId: 'pub-1' },
     })
+
     // The error must originate from our LiveKit listParticipants call, not
     // from an unrelated path (auth/feature-flag/group-type). Assert on the
     // underlying TwirpError message + an empty data payload so we never
@@ -254,7 +264,7 @@ describe('videoCallParticipantCount', () => {
     expect(errors?.[0].message).toMatch(/upstream boom/i)
     // No participant count was returned — the field failed instead of
     // silently degrading to 0.
-    expect(data?.videoCallParticipantCount).toBeFalsy()
+    expect(data?.videoCallParticipantCount).toBe(false)
     expect(listParticipantsMock).toHaveBeenCalledWith('group-pub-1')
   })
 })
@@ -271,6 +281,7 @@ describe('joinGroupVideoCall', () => {
       mutation: JoinGroupVideoCall,
       variables: { groupId: 'pub-1' },
     })
+
     expect(errors?.[0].message).toMatch(/disabled/i)
   })
 
@@ -286,6 +297,7 @@ describe('joinGroupVideoCall', () => {
       mutation: JoinGroupVideoCall,
       variables: { groupId: 'pub-1' },
     })
+
     expect(errors?.[0].message).toMatch(/not a member/i)
   })
 
@@ -303,6 +315,7 @@ describe('joinGroupVideoCall', () => {
       mutation: JoinGroupVideoCall,
       variables: { groupId: 'h-1' },
     })
+
     expect(errors?.[0].message).toMatch(/may not start a video call/i)
   })
 
@@ -321,6 +334,7 @@ describe('joinGroupVideoCall', () => {
       mutation: JoinGroupVideoCall,
       variables: { groupId: 'h-1' },
     })
+
     expect(errors).toBeUndefined()
     expect(data.joinGroupVideoCall.roomName).toBe('group-h-1')
     expect(data.joinGroupVideoCall.token).toContain('member-1')
@@ -341,6 +355,7 @@ describe('joinGroupVideoCall', () => {
       mutation: JoinGroupVideoCall,
       variables: { groupId: 'pub-1' },
     })
+
     expect(errors?.[0].message).toMatch(/may not start a video call/i)
   })
 
@@ -357,6 +372,7 @@ describe('joinGroupVideoCall', () => {
       mutation: JoinGroupVideoCall,
       variables: { groupId: 'h-1' },
     })
+
     expect(errors).toBeUndefined()
     expect(data.joinGroupVideoCall.roomName).toBe('group-h-1')
   })
@@ -376,6 +392,7 @@ describe('joinGroupVideoCall', () => {
       mutation: JoinGroupVideoCall,
       variables: { groupId: 'cl-1' },
     })
+
     expect(errors?.[0].message).toMatch(/may not start a video call/i)
   })
 
@@ -392,6 +409,7 @@ describe('joinGroupVideoCall', () => {
       mutation: JoinGroupVideoCall,
       variables: { groupId: 'cl-1' },
     })
+
     expect(errors).toBeUndefined()
     expect(data.joinGroupVideoCall.roomName).toBe('group-cl-1')
   })
@@ -408,10 +426,11 @@ describe('joinGroupVideoCall', () => {
       mutation: JoinGroupVideoCall,
       variables: { groupId: 'pub-1' },
     })
+
     expect(errors).toBeUndefined()
     expect(data.joinGroupVideoCall.url).toBe('wss://livekit.example.test')
     expect(data.joinGroupVideoCall.roomName).toBe('group-pub-1')
-    expect(typeof data.joinGroupVideoCall.token).toBe('string')
+    expect(data.joinGroupVideoCall.token).toBeTypeOf('string')
     expect(data.joinGroupVideoCall.token).toContain('member-1')
     expect(data.joinGroupVideoCall.token).toContain('group-pub-1')
   })

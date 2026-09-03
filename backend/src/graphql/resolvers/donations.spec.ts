@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, describe, beforeEach, afterEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import Donations from '@graphql/queries/donations/Donations.gql'
 import updateDonations from '@graphql/queries/donations/UpdateDonations.gql'
@@ -35,6 +37,7 @@ afterAll(async () => {
 
 describe('donations', () => {
   let currentUser, newlyCreatedDonations
+
   beforeAll(async () => {
     await cleanDatabase()
     authenticatedUser = null
@@ -59,6 +62,7 @@ describe('donations', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
+
         await expect(query({ query: Donations, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -91,6 +95,7 @@ describe('donations', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
+
         await expect(mutate({ mutation: updateDonations, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -153,9 +158,10 @@ describe('donations', () => {
           const {
             data: { UpdateDonations },
           } = await mutate({ mutation: updateDonations, variables })
-          expect(newlyCreatedDonations.updatedAt).toBeTruthy()
+
+          expect(newlyCreatedDonations.updatedAt).toBe(true)
           expect(Date.parse(newlyCreatedDonations.updatedAt)).toEqual(expect.any(Number))
-          expect(UpdateDonations.updatedAt).toBeTruthy()
+          expect(UpdateDonations.updatedAt).toBe(true)
           expect(Date.parse(UpdateDonations.updatedAt)).toEqual(expect.any(Number))
           expect(newlyCreatedDonations.updatedAt).not.toEqual(UpdateDonations.updatedAt)
         })

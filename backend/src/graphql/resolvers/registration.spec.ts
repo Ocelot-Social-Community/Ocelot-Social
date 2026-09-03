@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-use-before-define */
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import Signup from '@graphql/queries/auth/Signup.gql'
 import SignupVerification from '@graphql/queries/auth/SignupVerification.gql'
@@ -43,7 +45,7 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('Signup', () => {
+describe('signup', () => {
   beforeEach(() => {
     variables = { ...variables, email: 'someuser@example.org', locale: 'de' }
   })
@@ -94,7 +96,8 @@ describe('Signup', () => {
             undefined,
           )
           const emailAddressJson = await emailAddress.toJson()
-          expect(emailAddressJson.createdAt).toBeTruthy()
+
+          expect(emailAddressJson.createdAt).toBe(true)
           expect(Date.parse(emailAddressJson.createdAt as string)).toEqual(expect.any(Number))
         })
 
@@ -106,11 +109,13 @@ describe('Signup', () => {
             undefined,
           )
           const emailAddressJson = await emailAddress.toJson()
+
           expect(emailAddressJson.nonce).toEqual(expect.any(String))
         })
 
         describe('if the email already exists', () => {
           let emailAddress
+
           beforeEach(async () => {
             emailAddress = await Factory.build('emailAddress', {
               email: 'someuser@example.org',
@@ -155,7 +160,7 @@ describe('Signup', () => {
   })
 })
 
-describe('SignupVerification', () => {
+describe('signupVerification', () => {
   describe('given valid password and email', () => {
     beforeEach(() => {
       variables = {
@@ -174,7 +179,7 @@ describe('SignupVerification', () => {
         authenticatedUser = null
       })
 
-      describe('EmailAddress exists, but is already related to a user account', () => {
+      describe('emailAddress exists, but is already related to a user account', () => {
         beforeEach(async () => {
           const { email, nonce } = variables
           const [emailAddress, user] = await Promise.all([
@@ -230,6 +235,7 @@ describe('SignupVerification', () => {
             await database.write({ query: `MATCH (r:Role {id: 'user'}) DETACH DELETE r` })
 
             const { data, errors } = await mutate({ mutation: SignupVerification, variables })
+
             // Assert the specific baseline-role failure (not just any error) and that
             // the mutation yielded no account — otherwise an unrelated error would let
             // this test pass and mask a regression.
@@ -244,6 +250,7 @@ describe('SignupVerification', () => {
               `MATCH (u:User {name: $name}) RETURN u`,
               { name: 'John Doe' },
             )
+
             expect(records).toHaveLength(0)
           })
 
@@ -254,6 +261,7 @@ describe('SignupVerification', () => {
               { email: 'john@example.org' },
               undefined,
             )
+
             await expect(email.toJson()).resolves.toEqual(
               expect.objectContaining({
                 verifiedAt: expect.any(String),
@@ -268,6 +276,7 @@ describe('SignupVerification', () => {
               `
             await mutate({ mutation: SignupVerification, variables })
             const { records: emails } = await database.neode.cypher(cypher, { name: 'John Doe' })
+
             expect(emails).toHaveLength(1)
           })
 
@@ -275,6 +284,7 @@ describe('SignupVerification', () => {
             variables = { ...variables, about: 'Find this description in the user profile' }
             await mutate({ mutation: SignupVerification, variables })
             const user = await database.neode.first('User', { name: 'John Doe' }, undefined)
+
             await expect(user.toJson()).resolves.toMatchObject({
               about: 'Find this description in the user profile',
             })
@@ -282,6 +292,7 @@ describe('SignupVerification', () => {
 
           it('allowing the about field to be an empty string', async () => {
             variables = { ...variables, about: '' }
+
             await expect(
               mutate({ mutation: SignupVerification, variables }),
             ).resolves.toMatchObject({
@@ -300,6 +311,7 @@ describe('SignupVerification', () => {
               `
             await mutate({ mutation: SignupVerification, variables })
             const { records: emails } = await database.neode.cypher(cypher, { name: 'John Doe' })
+
             expect(emails).toHaveLength(1)
           })
 
@@ -329,6 +341,7 @@ describe('SignupVerification', () => {
 
           it('rejects if version of terms and conditions is missing', async () => {
             variables = { ...variables, termsAndConditionsAgreedVersion: null }
+
             await expect(
               mutate({ mutation: SignupVerification, variables }),
             ).resolves.toMatchObject({
@@ -343,6 +356,7 @@ describe('SignupVerification', () => {
 
           it('rejects if version of terms and conditions has wrong format', async () => {
             variables = { ...variables, termsAndConditionsAgreedVersion: 'invalid version format' }
+
             await expect(
               mutate({ mutation: SignupVerification, variables }),
             ).resolves.toMatchObject({

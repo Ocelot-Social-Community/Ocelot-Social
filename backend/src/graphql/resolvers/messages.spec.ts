@@ -9,6 +9,7 @@
 import { Readable } from 'node:stream'
 
 import { Upload } from 'graphql-upload/public/index.js'
+import { beforeAll, beforeEach, afterAll, describe, it, expect } from 'vitest'
 
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
@@ -54,7 +55,7 @@ afterAll(async () => {
   database.neode.close()
 })
 
-describe('Message', () => {
+describe('message', () => {
   let roomId: string
 
   beforeEach(async () => {
@@ -178,6 +179,7 @@ describe('Message', () => {
           describe('room is updated as well', () => {
             it('has last message set', async () => {
               const result = await query({ query: Room })
+
               await expect(result).toMatchObject({
                 errors: undefined,
                 data: {
@@ -206,6 +208,7 @@ describe('Message', () => {
           describe('unread count for other user', () => {
             it('has unread count = 2', async () => {
               authenticatedUser = await otherChattingUser.toJson()
+
               await expect(query({ query: Room })).resolves.toMatchObject({
                 errors: undefined,
                 data: {
@@ -251,6 +254,7 @@ describe('Message', () => {
             encoding: '7bit',
             mimetype: 'image/png',
           })
+
           it('returns the message', async () => {
             await expect(
               mutate({
@@ -433,6 +437,7 @@ describe('Message', () => {
               roomId,
             },
           })
+
           expect(result).toMatchObject({
             errors: undefined,
             data: {
@@ -644,6 +649,7 @@ describe('Message', () => {
 
     describe('authenticated', () => {
       const messageIds: string[] = []
+
       beforeEach(async () => {
         authenticatedUser = await chattingUser.toJson()
         const result = await mutate({
@@ -710,6 +716,7 @@ describe('Message', () => {
             messageIds,
           },
         })
+
         await expect(
           query({
             query: Message,
@@ -736,6 +743,7 @@ describe('Message', () => {
           variables: { messageIds },
         })
         const roomUpdatedCalls = pubsubSpy.mock.calls.filter(([event]) => event === 'ROOM_UPDATED')
+
         expect(roomUpdatedCalls).toHaveLength(1)
         expect(roomUpdatedCalls[0][1]).toMatchObject({
           userId: 'other-chatting-user',
@@ -758,6 +766,7 @@ describe('Message', () => {
                 ?.chatMessageStatusUpdated?.status === 'seen',
           )
           .map(([, payload]) => payload)
+
         expect(seenPayloads).toHaveLength(1)
         expect(seenPayloads[0]).toMatchObject({
           authorId: 'chatting-user',
@@ -786,14 +795,17 @@ describe('Message', () => {
         query: Message,
         variables: { roomId: testRoomId, beforeIndex: 2 },
       })
+
       expect(result.errors).toBeUndefined()
+
       const indexIds: number[] = result.data.Message.map((m: { indexId: number }) => m.indexId)
+
       expect(indexIds.every((id: number) => id < 2)).toBe(true)
     })
   })
 
   describe('subscription filters', () => {
-    describe('chatMessageAddedFilter', () => {
+    describe(chatMessageAddedFilter, () => {
       it('returns true for recipient and marks as distributed', async () => {
         const mockSession = {
           writeTransaction: vi
@@ -810,8 +822,9 @@ describe('Message', () => {
           { userId: 'recipient', chatMessageAdded: { id: 'm1' } },
           filterContext,
         )
+
         expect(result).toBe(true)
-        expect(mockSession.writeTransaction).toHaveBeenCalled()
+        expect(mockSession.writeTransaction).toHaveBeenCalledWith()
         expect(filterContext.pubsub.publish).toHaveBeenCalledWith(
           'CHAT_MESSAGE_STATUS_UPDATED',
           expect.objectContaining({
@@ -825,6 +838,7 @@ describe('Message', () => {
           { userId: 'other', chatMessageAdded: { id: 'm1' } },
           { user: { id: 'me' } },
         )
+
         expect(result).toBe(false)
       })
 
@@ -834,12 +848,13 @@ describe('Message', () => {
           { userId: 'me', chatMessageAdded: {} },
           { user: { id: 'me' }, driver: { session: () => mockSession } },
         )
+
         expect(result).toBe(true)
         expect(mockSession.writeTransaction).not.toHaveBeenCalled()
       })
     })
 
-    describe('chatMessageStatusUpdatedFilter', () => {
+    describe(chatMessageStatusUpdatedFilter, () => {
       it('returns true when authorId matches', () => {
         expect(chatMessageStatusUpdatedFilter({ authorId: 'u1' }, { user: { id: 'u1' } })).toBe(
           true,
@@ -864,6 +879,7 @@ describe('Message', () => {
         mutation: CreateMessage,
         variables: { userId: 'chatting-user', content: 'test' },
       })
+
       expect(result.errors).toBeDefined()
       expect(result.errors?.[0].message).toContain('Cannot create a room with self')
     })
@@ -873,6 +889,7 @@ describe('Message', () => {
         mutation: CreateMessage,
         variables: { content: 'test' },
       })
+
       expect(result.errors).toBeDefined()
       expect(result.errors?.[0].message).toContain('Either roomId or userId must be provided')
     })
@@ -882,12 +899,13 @@ describe('Message', () => {
         mutation: CreateMessage,
         variables: { userId: 'other-chatting-user', content: '' },
       })
+
       expect(result.errors).toBeDefined()
       expect(result.errors?.[0].message).toContain('Message must have content or files')
     })
   })
 
-  describe('File field resolvers', () => {
+  describe('file field resolvers', () => {
     it('returns extension when present', () => {
       expect(resolvers.File.extension({ extension: 'jpg' })).toBe('jpg')
     })

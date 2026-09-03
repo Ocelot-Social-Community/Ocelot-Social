@@ -1,8 +1,11 @@
+import { describe, it, expect } from 'vitest'
+
 import { withTimeout } from './utils'
 
-describe('withTimeout', () => {
+describe(withTimeout, () => {
   it('resolves with the inner promise value when it settles before the timeout', async () => {
     const value = await withTimeout(Promise.resolve(42), 1000, 'fast')
+
     expect(value).toBe(42)
   })
 
@@ -16,6 +19,7 @@ describe('withTimeout', () => {
         timer.unref()
       }
     })
+
     await expect(withTimeout(slow, 20, 'slow')).rejects.toThrow('slow timed out after 20ms')
   })
 
@@ -24,10 +28,13 @@ describe('withTimeout', () => {
     const clearSpy = vi.spyOn(global, 'clearTimeout')
     try {
       const value = await withTimeout(Promise.resolve('done'), 60_000, 'fast')
+
       expect(value).toBe('done')
+
       const ourTimer = setSpy.mock.results[setSpy.mock.results.length - 1].value as ReturnType<
         typeof setTimeout
       >
+
       expect(clearSpy).toHaveBeenCalledWith(ourTimer)
     } finally {
       setSpy.mockRestore()
@@ -42,9 +49,11 @@ describe('withTimeout', () => {
       await expect(withTimeout(Promise.reject(new Error('boom')), 60_000, 'fast')).rejects.toThrow(
         'boom',
       )
+
       const ourTimer = setSpy.mock.results[setSpy.mock.results.length - 1].value as ReturnType<
         typeof setTimeout
       >
+
       expect(clearSpy).toHaveBeenCalledWith(ourTimer)
     } finally {
       setSpy.mockRestore()

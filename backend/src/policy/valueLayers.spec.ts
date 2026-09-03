@@ -1,11 +1,14 @@
+import { describe, it, expect } from 'vitest'
+
 import { createInMemoryPolicyService, policyValueLayers } from './index'
 
 // Driven through a real in-memory PolicyService so the effective/default folding is
 // exercised exactly as in production; the same helper feeds both the policyConfig resolver
 // and systemConfigStatus, which is why the encoding lives in one place.
-describe('policyValueLayers', () => {
-  it('JSON-encodes all three layers of a boolean key with no override', () => {
+describe(policyValueLayers, () => {
+  it('jSON-encodes all three layers of a boolean key with no override', () => {
     const policy = createInMemoryPolicyService({}, {})
+
     expect(policyValueLayers(policy, 'apiKeysEnabled')).toEqual({
       effective: 'false',
       softwareDefault: 'false',
@@ -13,8 +16,9 @@ describe('policyValueLayers', () => {
     })
   })
 
-  it('JSON-encodes an integer key as a number literal', () => {
+  it('jSON-encodes an integer key as a number literal', () => {
     const policy = createInMemoryPolicyService({}, {})
+
     expect(policyValueLayers(policy, 'maxPinnedPosts')).toEqual({
       effective: '1',
       softwareDefault: '1',
@@ -30,6 +34,7 @@ describe('policyValueLayers', () => {
       { API_KEYS_ENABLED: 'true' },
     )
     const layers = policyValueLayers(policy, 'apiKeysEnabled')
+
     expect(layers.effective).toBe('false')
     expect(layers.configuredDefault).toBe('true')
     // The software default is the schema baseline, independent of the env seed.

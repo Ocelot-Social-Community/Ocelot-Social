@@ -2,6 +2,8 @@
 // input — the object-injection lint is a false positive here.
 /* eslint-disable security/detect-object-injection */
 
+import { describe, it, expect } from 'vitest'
+
 import { ENV_SPEC_BY_NAME } from './envRegistry'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
@@ -21,13 +23,16 @@ interface LoadedConfig {
 // (a) Structural guard: the admin "software default" column (envRegistry) must surface
 // exactly the canonical value, so nobody can re-inline a diverging literal. Every key in
 // the map is an env var present in the registry; its display string is String(value).
-describe('SOFTWARE_DEFAULTS ↔ envRegistry display', () => {
+describe('sOFTWARE_DEFAULTS ↔ envRegistry display', () => {
   it('surfaces each canonical default as the registry display string', () => {
     for (const [name, value] of Object.entries(SOFTWARE_DEFAULTS)) {
       const spec = ENV_SPEC_BY_NAME[name]
+
       expect(spec).toBeDefined()
+
       // Lists are surfaced as a JSON array ([] / ["a","b"]); scalars via String().
       const expected = Array.isArray(value) ? JSON.stringify(value) : String(value)
+
       expect(spec.softwareDefault).toBe(expected)
     }
   })
@@ -38,7 +43,7 @@ describe('SOFTWARE_DEFAULTS ↔ envRegistry display', () => {
 // their default in comparison / NODE_ENV logic (`!== 'false'`, `=== 'true'`, or a
 // NODE_ENV branch), separate from the map — so a flipped comparison would silently disagree
 // with what the admin sees. This asserts config's actual unset-default matches the map.
-describe('SOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', () => {
+describe('sOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', () => {
   // config/index.ts refuses to load unless the hard-required vars are present, so supply
   // dummies. The flags under test are deliberately ABSENT, so config yields their defaults.
   const REQUIRED: Record<string, string> = {
@@ -73,6 +78,7 @@ describe('SOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', 
   it('defaults SMTP ignoreTLS / secure / rejectUnauthorized to the map values', async () => {
     const { nodemailerTransportOptions } = await loadConfigWithFlagsUnset()
     const tls = nodemailerTransportOptions.tls as { rejectUnauthorized: boolean }
+
     expect(nodemailerTransportOptions.ignoreTLS).toBe(SOFTWARE_DEFAULTS.SMTP_IGNORE_TLS)
     expect(nodemailerTransportOptions.secure).toBe(SOFTWARE_DEFAULTS.SMTP_SECURE)
     expect(tls.rejectUnauthorized).toBe(SOFTWARE_DEFAULTS.SMTP_REJECT_UNAUTHORIZED)
@@ -80,6 +86,7 @@ describe('SOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', 
 
   it('defaults PRODUCTION_DB_CLEAN_ALLOW to the map value', async () => {
     const { default: CONFIG } = await loadConfigWithFlagsUnset()
+
     expect(CONFIG.PRODUCTION_DB_CLEAN_ALLOW).toBe(SOFTWARE_DEFAULTS.PRODUCTION_DB_CLEAN_ALLOW)
   })
 
@@ -88,12 +95,14 @@ describe('SOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', 
     // production), so it is guarded as falsy rather than strictly `false`; the map records
     // its off baseline (false) as the single display source.
     const { default: CONFIG } = await loadConfigWithFlagsUnset()
-    expect(CONFIG.DEBUG).toBeFalsy()
+
+    expect(CONFIG.DEBUG).toBe(false)
     expect(SOFTWARE_DEFAULTS.DEBUG).toBe(false)
   })
 
   it('defaults DISABLED_MIDDLEWARES to the empty list', async () => {
     const { default: CONFIG } = await loadConfigWithFlagsUnset()
+
     expect(CONFIG.DISABLED_MIDDLEWARES).toEqual(SOFTWARE_DEFAULTS.DISABLED_MIDDLEWARES)
   })
 })

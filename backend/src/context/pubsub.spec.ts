@@ -1,3 +1,5 @@
+import { beforeEach, describe, it, expect } from 'vitest'
+
 import type { RedisOptions } from 'ioredis'
 
 interface MockRedisConfig {
@@ -65,6 +67,7 @@ beforeEach(() => {
 describe('without Redis configured', () => {
   it('falls back to the in-process PubSub', async () => {
     const { pubsub, PubSub, RedisPubSub } = await load()
+
     expect(pubsub()).toBeInstanceOf(PubSub)
     expect(RedisPubSub).not.toHaveBeenCalled()
   })
@@ -79,6 +82,7 @@ describe('without Redis configured', () => {
       configureRedis()
       unset()
       const { pubsub, PubSub, RedisPubSub } = await load()
+
       expect(pubsub()).toBeInstanceOf(PubSub)
       expect(RedisPubSub).not.toHaveBeenCalled()
     },
@@ -86,6 +90,7 @@ describe('without Redis configured', () => {
 
   it('memoises, so publishers and subscribers share one instance', async () => {
     const { pubsub } = await load()
+
     expect(pubsub()).toBe(pubsub())
   })
 })
@@ -96,16 +101,20 @@ describe('with Redis configured', () => {
   it('gives RedisPubSub a dedicated publisher and subscriber', async () => {
     const { pubsub, Redis, RedisPubSub } = await load()
     pubsub()
+
     // Two clients, not one: a connection in subscriber mode cannot publish.
     expect(Redis).toHaveBeenCalledTimes(2)
     expect(RedisPubSub).toHaveBeenCalledTimes(1)
+
     const { publisher, subscriber } = (RedisPubSub.mock.calls[0] as [Record<string, unknown>])[0]
+
     expect(publisher).not.toBe(subscriber)
   })
 
   it('passes host, port and password through', async () => {
     const { pubsub, Redis } = await load()
     pubsub()
+
     expect(redisOptions(Redis)).toMatchObject({
       host: 'redis.example.test',
       port: 6379,
@@ -117,6 +126,7 @@ describe('with Redis configured', () => {
     const { pubsub, Redis } = await load()
     pubsub()
     const { retryStrategy } = redisOptions(Redis)
+
     expect(retryStrategy).toBeDefined()
     expect(retryStrategy?.(1)).toBe(50)
     expect(retryStrategy?.(10)).toBe(500)
@@ -126,6 +136,7 @@ describe('with Redis configured', () => {
 
   it('memoises across calls', async () => {
     const { pubsub, RedisPubSub } = await load()
+
     expect(pubsub()).toBe(pubsub())
     expect(RedisPubSub).toHaveBeenCalledTimes(1)
   })

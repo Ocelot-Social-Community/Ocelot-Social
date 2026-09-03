@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
@@ -149,6 +151,7 @@ describe('notifications for users that observe a post', () => {
 
     it('sends notification to the author', async () => {
       authenticatedUser = await postAuthor.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -211,6 +214,7 @@ describe('notifications for users that observe a post', () => {
 
       it('sends notification to the author', async () => {
         authenticatedUser = await postAuthor.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -243,6 +247,7 @@ describe('notifications for users that observe a post', () => {
 
       it('sends notification to first commenter', async () => {
         authenticatedUser = await firstCommenter.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -338,6 +343,7 @@ describe('notifications for users that observe a post', () => {
 
       it('sends no new notification to first commenter', async () => {
         authenticatedUser = await firstCommenter.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -362,6 +368,7 @@ describe('notifications for users that observe a post', () => {
 
       it('sends notification to second commenter', async () => {
         authenticatedUser = await secondCommenter.toJson()
+
         await expect(
           query({
             query: notifications,

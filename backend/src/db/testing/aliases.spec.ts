@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest'
+
 import { branchesOf } from '@db/schema/derive/rules'
 import { relationships } from '@db/schema/relationships'
 
@@ -38,7 +40,7 @@ describe('the alias table against the declaration', () => {
   )
 })
 
-describe('resolveAlias', () => {
+describe(resolveAlias, () => {
   it('resolves a declared alias', () => {
     expect(resolveAlias('User', 'following')).toEqual({ type: 'FOLLOWS', direction: 'out' })
   })

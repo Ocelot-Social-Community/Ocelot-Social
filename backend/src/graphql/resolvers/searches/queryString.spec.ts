@@ -1,9 +1,11 @@
+import { describe, it, expect } from 'vitest'
+
 import { queryString, escapeSpecialCharacters, normalizeWhitespace } from './queryString'
 
-describe('queryString', () => {
+describe(queryString, () => {
   describe('special characters', () => {
     it('does escaping correctly', () => {
-      expect(escapeSpecialCharacters('+ - && || ! ( ) { } [ ] ^ " ~ * ? : \\ / ')).toEqual(
+      expect(escapeSpecialCharacters('+ - && || ! ( ) { } [ ] ^ " ~ * ? : \\ / ')).toBe(
         '\\+ \\- \\&\\& \\|\\| \\! \\( \\) \\{ \\} \\[ \\] \\^ \\" \\~ \\* \\? \\: \\\\ \\/ ',
       )
     })
@@ -11,7 +13,7 @@ describe('queryString', () => {
 
   describe('whitespace', () => {
     it('normalizes correctly', () => {
-      expect(normalizeWhitespace(' a \t \n b \n   ')).toEqual('a b')
+      expect(normalizeWhitespace(' a \t \n b \n   ')).toBe('a b')
     })
   })
 

@@ -1,3 +1,5 @@
+import { describe, beforeEach, it, expect } from 'vitest'
+
 import CONFIG from '@config/index'
 
 CONFIG.SUPPORT_EMAIL = 'devops@ocelot.social'
@@ -20,7 +22,7 @@ describe('sendResetPasswordMail', () => {
     name: 'Jenny Rostock',
   }
 
-  describe('English', () => {
+  describe('english', () => {
     beforeEach(() => {
       data.locale = 'en'
     })
@@ -30,7 +32,7 @@ describe('sendResetPasswordMail', () => {
     })
   })
 
-  describe('German', () => {
+  describe('german', () => {
     beforeEach(() => {
       data.locale = 'de'
     })

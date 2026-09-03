@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { allPermissionKeys } from '@src/permission'
 
 import { DEFAULT_ROLES } from './defaults'
@@ -18,7 +20,7 @@ const BASELINE = [
   'apiKey.create',
 ]
 
-describe('RoleService', () => {
+describe(RoleService, () => {
   describe('permissionsForRole (single-role resolution)', () => {
     const svc = createInMemoryRoleService()
 
@@ -34,8 +36,10 @@ describe('RoleService', () => {
 
     it('returns the self-contained moderator set (baseline + content.moderate + badge.manage)', () => {
       const perms = svc.permissionsForRole(MODERATOR_ROLE)
+
       expect(perms.has('content.moderate')).toBe(true)
       expect(perms.has('badge.manage')).toBe(true)
+
       for (const baseline of BASELINE) {
         expect(perms.has(baseline as never)).toBe(true)
       }
@@ -43,10 +47,12 @@ describe('RoleService', () => {
 
     it('returns the self-contained admin set (baseline + moderation + admin extras)', () => {
       const perms = svc.permissionsForRole(ADMIN_ROLE)
+
       expect(perms.has('content.moderate')).toBe(true)
       expect(perms.has('role.manage')).toBe(true)
       expect(perms.has('policy.manage')).toBe(true)
       expect(perms.has('badge.manage')).toBe(true)
+
       for (const baseline of BASELINE) {
         expect(perms.has(baseline as never)).toBe(true)
       }
@@ -62,6 +68,7 @@ describe('RoleService', () => {
 
     it('returns roles broadest-first (owner, then by permission count)', () => {
       const names = svc.allRoles().map((role) => role.name)
+
       expect(names).toEqual([OWNER_ROLE, ADMIN_ROLE, MODERATOR_ROLE, USER_ROLE])
     })
 
@@ -86,6 +93,7 @@ describe('RoleService', () => {
         timestamp: 't',
       }
       svc.applyExternalChange(event)
+
       expect(svc.getRole('editor')?.permissions).toEqual(['post.create'])
     })
 
@@ -97,6 +105,7 @@ describe('RoleService', () => {
         actor: 'u1',
         timestamp: 't',
       })
+
       expect(svc.getRole(MODERATOR_ROLE)).toBeUndefined()
     })
 
@@ -114,6 +123,7 @@ describe('RoleService', () => {
         actor: 'u1',
         timestamp: 't',
       })
+
       expect(svc.getRole(MODERATOR_ROLE)).toBeUndefined()
       expect(svc.getRole('staff')?.permissions).toEqual(['content.moderate'])
     })
@@ -231,7 +241,9 @@ describe('RoleService', () => {
         name: 'badge-setter',
         actor: 'admin-1',
       })
+
       const event = published[published.length - 1]?.payload.roleChanged
+
       expect(event?.name).toBe('badge-setter')
       expect(event?.definition?.permissions).toEqual(['badge.manage'])
     })
@@ -244,7 +256,9 @@ describe('RoleService', () => {
       await svc.deleteRole('temp', 'admin-1')
 
       expect(svc.getRole('temp')).toBeUndefined()
+
       const event = published[published.length - 1]?.payload.roleChanged
+
       expect(event).toMatchObject({ name: 'temp', definition: null, actor: 'admin-1' })
     })
 
@@ -265,8 +279,10 @@ describe('RoleService', () => {
         newName: 'badge-setter',
         actor: 'a-1',
       })
+
       // Broadcast carries the previous name so peers drop the stale key.
       const event = published[published.length - 1]?.payload.roleChanged
+
       expect(event).toMatchObject({
         name: 'badge-setter',
         previousName: 'temp',
@@ -288,7 +304,9 @@ describe('RoleService', () => {
         write: async () => Promise.resolve({ records: [] }),
       } as unknown as DbArg
       const svc = new RoleService(fakeDb)
+
       await expect(svc.init()).rejects.toThrow(/mandatory role node\(s\) missing after seeding/)
+
       warn.mockRestore()
     })
 
@@ -311,6 +329,7 @@ describe('RoleService', () => {
       await svc.init()
 
       const seeded = writes.map((w) => w.variables?.name)
+
       expect(seeded).toEqual(
         expect.arrayContaining([OWNER_ROLE, ADMIN_ROLE, MODERATOR_ROLE, USER_ROLE]),
       )
@@ -343,6 +362,7 @@ describe('RoleService', () => {
         actor: 'x',
         timestamp: 't',
       })
+
       expect(svc.getRole('ghost')).toBeDefined()
 
       await svc.reload()
@@ -366,7 +386,9 @@ describe('RoleService', () => {
         write: async () => Promise.resolve({ records: [] }),
       } as unknown as DbArg
       const svc = new RoleService(fakeDb)
+
       await expect(svc.reload()).rejects.toThrow(/mandatory role node\(s\) missing after seeding/)
+
       warn.mockRestore()
     })
 
@@ -437,10 +459,12 @@ describe('RoleService', () => {
       await svc.init()
 
       const seeded = writes.map((w) => w.variables?.name)
+
       expect(seeded).toEqual([USER_ROLE]) // only the missing mandatory role
       expect(seeded).not.toContain(ADMIN_ROLE)
       expect(seeded).not.toContain(MODERATOR_ROLE)
       expect(warn).toHaveBeenCalledWith(expect.stringContaining(USER_ROLE))
+
       warn.mockRestore()
     })
   })

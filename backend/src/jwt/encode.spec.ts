@@ -4,6 +4,7 @@
    Reaching through the default import is the only form that works at runtime. */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import jwt from 'jsonwebtoken'
+import { describe, beforeEach, it, expect } from 'vitest'
 
 import { TEST_CONFIG } from '@root/test/helpers'
 
@@ -17,8 +18,9 @@ const config = {
 }
 const context = { config }
 
-describe('encode', () => {
+describe(encode, () => {
   let payload
+
   beforeEach(() => {
     payload = {
       name: 'Some body',
@@ -29,8 +31,11 @@ describe('encode', () => {
 
   it('encodes a valided JWT bearer token', () => {
     const token = encode(context)(payload)
+
     expect(token.split('.')).toHaveLength(3)
+
     const decoded = jwt.verify(token, context.config.JWT_SECRET)
+
     expect(decoded).toEqual({
       name: 'Some body',
       slug: 'some-body',
@@ -54,6 +59,7 @@ describe('encode', () => {
 
     it('does not encode sensitive data', () => {
       const token = encode(context)(payload)
+
       expect(payload).toEqual({
         email: 'none-of-your-business@example.org',
         password: 'topsecret',
@@ -61,7 +67,9 @@ describe('encode', () => {
         slug: 'some-body',
         id: 'some-id',
       })
+
       const decoded = jwt.verify(token, context.config.JWT_SECRET)
+
       expect(decoded).toEqual({
         name: 'Some body',
         slug: 'some-body',

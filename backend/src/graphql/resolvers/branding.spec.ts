@@ -4,6 +4,7 @@ import { PolicyValidationError } from '@src/policy'
 import brandingResolver from './branding'
 
 import type { Context } from '@src/context'
+import { describe, beforeEach, test, expect } from 'vitest'
 import type { Mock } from 'vitest'
 
 describe('branding resolvers', () => {
@@ -27,37 +28,39 @@ describe('branding resolvers', () => {
   })
 
   describe('setActiveBranding', () => {
-    it('persists the id (branding.manage path) and echoes it back', async () => {
+    test('persists the id (branding.manage path) and echoes it back', async () => {
       await expect(call('setActiveBranding', { id: 'yunite' })).resolves.toBe('yunite')
       expect(set).toHaveBeenCalledWith('activeBranding', 'yunite', 'u1')
     })
 
-    it('maps a PolicyValidationError to a UserInputError', async () => {
-      set.mockImplementation(async () => Promise.reject(new PolicyValidationError('bad')))
+    test('maps a PolicyValidationError to a UserInputError', async () => {
+      set.mockRejectedValue(new PolicyValidationError('bad'))
+
       await expect(call('setActiveBranding', { id: 'x' })).rejects.toThrow(UserInputError)
     })
   })
 
   describe('setBrandingComposition', () => {
-    it('accepts the empty string (clears all per-slot overrides)', async () => {
+    test('accepts the empty string (clears all per-slot overrides)', async () => {
       await expect(call('setBrandingComposition', { composition: '' })).resolves.toBe('')
       expect(set).toHaveBeenCalledWith('brandingComposition', '', 'u1')
     })
 
-    it('accepts a JSON object and persists it verbatim', async () => {
+    test('accepts a JSON object and persists it verbatim', async () => {
       const json = JSON.stringify({ theme: 'acme/dark', identity: 'mybrand' })
+
       await expect(call('setBrandingComposition', { composition: json })).resolves.toBe(json)
       expect(set).toHaveBeenCalledWith('brandingComposition', json, 'u1')
     })
 
-    it('rejects malformed JSON without persisting', async () => {
+    test('rejects malformed JSON without persisting', async () => {
       await expect(call('setBrandingComposition', { composition: '{bad' })).rejects.toThrow(
         UserInputError,
       )
       expect(set).not.toHaveBeenCalled()
     })
 
-    it('rejects a non-object JSON value (array / scalar)', async () => {
+    test('rejects a non-object JSON value (array / scalar)', async () => {
       await expect(call('setBrandingComposition', { composition: '[]' })).rejects.toThrow(
         UserInputError,
       )

@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
@@ -166,6 +168,7 @@ describe('following users notifications', () => {
 
     it('sends notification to the first follower', async () => {
       authenticatedUser = await firstFollower.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -190,6 +193,7 @@ describe('following users notifications', () => {
 
     it('sends notification to the second follower', async () => {
       authenticatedUser = await secondFollower.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -214,6 +218,7 @@ describe('following users notifications', () => {
 
     it('sends notification to the email-less follower', async () => {
       authenticatedUser = await emaillessFollower.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -293,6 +298,7 @@ describe('following users notifications', () => {
 
     it('sends a notification to the first follower', async () => {
       authenticatedUser = await firstFollower.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -364,6 +370,7 @@ describe('following users notifications', () => {
 
     it('sends NO notification to the first follower', async () => {
       authenticatedUser = await firstFollower.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -435,6 +442,7 @@ describe('following users notifications', () => {
 
     it('sends NO notification to the first follower', async () => {
       authenticatedUser = await firstFollower.toJson()
+
       await expect(
         query({
           query: notifications,

@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, test, expect } from 'vitest'
 import type { Mock } from 'vitest'
 
 // vitest has no `isolateModulesAsync`: resetting the registry before the dynamic import does the
@@ -88,25 +89,27 @@ beforeEach(() => {
 })
 
 describe('default', () => {
-  it('registers the 15 default middlewares', async () => {
+  test('registers the 15 default middlewares', async () => {
     await isolateModules(async () => {
       const { getCapturedMiddlewares } = await loadModule()
+
       expect(getCapturedMiddlewares()).toHaveLength(15)
     })
   })
 
-  it('calls brandingMiddlewares', async () => {
+  test('calls brandingMiddlewares', async () => {
     await isolateModules(async () => {
       const { mod } = await loadModule()
 
       const { default: brandingMiddlewares } =
         (await import('./branding/brandingMiddlewares')) as unknown as { default: Mock }
       mod.default({})
+
       expect(brandingMiddlewares).toHaveBeenCalledTimes(1)
     })
   })
 
-  it('filters out disabled middlewares', async () => {
+  test('filters out disabled middlewares', async () => {
     await isolateModules(async () => {
       const sentryMarker = { __test: 'sentry' }
       const xssMarker = { __test: 'xss' }
@@ -119,10 +122,12 @@ describe('default', () => {
       })
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
       const middlewares = getCapturedMiddlewares()
+
       expect(middlewares).toHaveLength(13)
       expect(middlewares).not.toContain(sentryMarker)
       expect(middlewares).not.toContain(xssMarker)
       expect(consoleSpy).toHaveBeenCalledWith('Warning: Disabled "sentry, xss" middleware.')
+
       consoleSpy.mockRestore()
     })
   })
@@ -130,12 +135,13 @@ describe('default', () => {
 
 describe('addMiddleware', () => {
   describe('append', () => {
-    it('adds middleware at the end', async () => {
+    test('adds middleware at the end', async () => {
       await isolateModules(async () => {
         const { mod, getCapturedMiddlewares } = await loadModule()
         const m = { __test: 'appended' }
         mod.addMiddleware({ name: 'test-append', middleware: m, position: 'append' })
         const middlewares = getCapturedMiddlewares()
+
         expect(middlewares).toHaveLength(16)
         expect(middlewares[15]).toBe(m)
       })
@@ -143,12 +149,13 @@ describe('addMiddleware', () => {
   })
 
   describe('prepend', () => {
-    it('adds middleware at the beginning', async () => {
+    test('adds middleware at the beginning', async () => {
       await isolateModules(async () => {
         const { mod, getCapturedMiddlewares } = await loadModule()
         const m = { __test: 'prepended' }
         mod.addMiddleware({ name: 'test-prepend', middleware: m, position: 'prepend' })
         const middlewares = getCapturedMiddlewares()
+
         expect(middlewares).toHaveLength(16)
         expect(middlewares[0]).toBe(m)
       })
@@ -156,7 +163,7 @@ describe('addMiddleware', () => {
   })
 
   describe('before', () => {
-    it('inserts middleware directly before the named anchor', async () => {
+    test('inserts middleware directly before the named anchor', async () => {
       await isolateModules(async () => {
         const sentryMarker = { __test: 'sentry' }
         const permissionsMarker = { __test: 'permissions' }
@@ -186,7 +193,7 @@ describe('addMiddleware', () => {
   })
 
   describe('after', () => {
-    it('inserts middleware directly after the named anchor', async () => {
+    test('inserts middleware directly after the named anchor', async () => {
       await isolateModules(async () => {
         const sentryMarker = { __test: 'sentry' }
         const permissionsMarker = { __test: 'permissions' }
@@ -216,9 +223,10 @@ describe('addMiddleware', () => {
   })
 
   describe('unknown anchor', () => {
-    it('throws when "before" anchor does not exist', async () => {
+    test('throws when "before" anchor does not exist', async () => {
       await isolateModules(async () => {
         const { mod } = await loadModule()
+
         expect(() => {
           mod.addMiddleware({
             name: 'failure',
@@ -229,9 +237,10 @@ describe('addMiddleware', () => {
       })
     })
 
-    it('throws when "after" anchor does not exist', async () => {
+    test('throws when "after" anchor does not exist', async () => {
       await isolateModules(async () => {
         const { mod } = await loadModule()
+
         expect(() => {
           mod.addMiddleware({
             name: 'failure',

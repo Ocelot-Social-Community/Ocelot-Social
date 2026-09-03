@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { beforeEach, describe, it, expect } from 'vitest'
+
 const mockConfig: {
   LIVEKIT_ENABLED: boolean
   LIVEKIT_URL?: string
@@ -75,9 +77,9 @@ function makeApp() {
 
 function makeRes() {
   const res: any = { headersSent: false }
-  res.status = vi.fn(() => res)
-  res.send = vi.fn(() => res)
-  res.end = vi.fn(() => res)
+  vi.spyOn(res, 'status').mockImplementation(() => res)
+  vi.spyOn(res, 'send').mockImplementation(() => res)
+  vi.spyOn(res, 'end').mockImplementation(() => res)
   return res
 }
 
@@ -114,7 +116,7 @@ beforeEach(() => {
   mockConfig.LIVEKIT_API_SECRET = undefined
   mockReceive.mockReset()
   mockWebhookReceiverCtor.mockReset()
-  mockPublish.mockReset().mockImplementation(async () => Promise.resolve(undefined))
+  mockPublish.mockReset().mockResolvedValue(undefined)
   mockGetCount.mockReset().mockResolvedValue(0)
   mockLogger.info.mockReset()
   mockLogger.warn.mockReset()
@@ -124,6 +126,7 @@ beforeEach(() => {
 describe('registerLiveKitWebhook', () => {
   it('does nothing when LiveKit is disabled', () => {
     const { app } = registerAndCapture()
+
     expect(app.post).not.toHaveBeenCalled()
     expect(mockLogger.info).not.toHaveBeenCalled()
   })
@@ -133,12 +136,14 @@ describe('registerLiveKitWebhook', () => {
     mockConfig.LIVEKIT_URL = 'wss://lk.example.test'
     // missing API key/secret
     const { app } = registerAndCapture()
+
     expect(app.post).not.toHaveBeenCalled()
   })
 
   it('registers the webhook route once LiveKit is configured', () => {
     setEnabledConfig()
     const { app } = registerAndCapture()
+
     expect(app.post).toHaveBeenCalledTimes(1)
     expect(app.post.mock.calls[0][0]).toBe('/livekit/webhook')
     expect(mockWebhookReceiverCtor).toHaveBeenCalledWith('key', 'secret')
@@ -147,6 +152,7 @@ describe('registerLiveKitWebhook', () => {
 
   describe('webhook handler', () => {
     let handler: CapturedHandler
+
     beforeEach(() => {
       setEnabledConfig()
       handler = registerAndCapture().handler
@@ -157,6 +163,7 @@ describe('registerLiveKitWebhook', () => {
       const res = makeRes()
       handler(req, res)
       await flushPromises()
+
       expect(res.status).toHaveBeenCalledWith(401)
       expect(res.send).toHaveBeenCalledWith('Missing Authorization header')
       expect(mockReceive).not.toHaveBeenCalled()
@@ -167,6 +174,7 @@ describe('registerLiveKitWebhook', () => {
       const res = makeRes()
       handler(req, res)
       await flushPromises()
+
       expect(res.status).toHaveBeenCalledWith(400)
       expect(res.send).toHaveBeenCalledWith('Missing body')
     })
@@ -177,9 +185,10 @@ describe('registerLiveKitWebhook', () => {
       const res = makeRes()
       handler(req, res)
       await flushPromises()
+
       expect(res.status).toHaveBeenCalledWith(401)
       expect(res.send).toHaveBeenCalledWith('Invalid signature')
-      expect(mockLogger.warn).toHaveBeenCalled()
+      expect(mockLogger.warn).toHaveBeenCalledWith()
     })
 
     it('returns 204 and ignores events for rooms outside the group- namespace', async () => {
@@ -191,8 +200,9 @@ describe('registerLiveKitWebhook', () => {
       const res = makeRes()
       handler(req, res)
       await flushPromises()
+
       expect(res.status).toHaveBeenCalledWith(204)
-      expect(res.end).toHaveBeenCalled()
+      expect(res.end).toHaveBeenCalledWith()
       expect(mockPublish).not.toHaveBeenCalled()
     })
 
@@ -202,6 +212,7 @@ describe('registerLiveKitWebhook', () => {
       const res = makeRes()
       handler(req, res)
       await flushPromises()
+
       expect(res.status).toHaveBeenCalledWith(204)
       expect(mockPublish).not.toHaveBeenCalled()
     })
@@ -216,6 +227,7 @@ describe('registerLiveKitWebhook', () => {
       const res = makeRes()
       handler(req, res)
       await flushPromises()
+
       expect(mockGetCount).toHaveBeenCalledWith(
         {
           LIVEKIT_URL: 'wss://lk.example.test',
@@ -243,6 +255,7 @@ describe('registerLiveKitWebhook', () => {
         const res = makeRes()
         handler(req, res)
         await flushPromises()
+
         expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
           groupId: 'xyz',
           count: 1,
@@ -259,6 +272,7 @@ describe('registerLiveKitWebhook', () => {
       const res = makeRes()
       handler(req, res)
       await flushPromises()
+
       expect(mockGetCount).not.toHaveBeenCalled()
       expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
         groupId: 'finished',
@@ -276,6 +290,7 @@ describe('registerLiveKitWebhook', () => {
       const res = makeRes()
       handler(req, res)
       await flushPromises()
+
       expect(mockPublish).not.toHaveBeenCalled()
       expect(mockGetCount).not.toHaveBeenCalled()
       expect(res.status).toHaveBeenCalledWith(204)
@@ -291,6 +306,7 @@ describe('registerLiveKitWebhook', () => {
       const res = makeRes()
       handler(req, res)
       await flushPromises()
+
       expect(mockLogger.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to publish'),
         expect.any(Error),
@@ -308,12 +324,13 @@ describe('registerLiveKitWebhook', () => {
       const res = makeRes()
       handler(req, res)
       await flushPromises()
+
       expect(mockLogger.error).toHaveBeenCalledWith(
         expect.stringContaining('Unexpected LiveKit webhook handler error'),
         expect.any(Error),
       )
       expect(res.status).toHaveBeenCalledWith(500)
-      expect(res.end).toHaveBeenCalled()
+      expect(res.end).toHaveBeenCalledWith()
     })
 
     it('does not write a second response when headers were already sent', async () => {
@@ -327,12 +344,12 @@ describe('registerLiveKitWebhook', () => {
       res.headersSent = true
       handler(req, res)
       await flushPromises()
+
       expect(res.status).not.toHaveBeenCalled()
-      expect(mockLogger.error).toHaveBeenCalled()
+      expect(mockLogger.error).toHaveBeenCalledWith()
     })
   })
 })
 
 // No imports left after the vitest switch — without this the file is a script, not a
 // module: its top-level consts would collide across specs and `await` would be illegal.
-export {}

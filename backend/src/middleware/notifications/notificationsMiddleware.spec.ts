@@ -6,6 +6,7 @@
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, test, expect } from 'vitest'
 import type { Mock } from 'vitest'
 
 const sendChatMessageMailMock: (notification) => void = vi.fn()
@@ -176,8 +177,9 @@ describe('notifications', () => {
             )
           })
 
-          it('sends me a notification and email', async () => {
+          test('sends me a notification and email', async () => {
             await createCommentOnPostAction()
+
             await expect(
               query({
                 query: notifications,
@@ -218,9 +220,10 @@ describe('notifications', () => {
           })
 
           describe('if I have disabled `emailNotificationsCommentOnObservedPost`', () => {
-            it('sends me a notification but no email', async () => {
+            test('sends me a notification but no email', async () => {
               await notifiedUser.update({ emailNotificationsCommentOnObservedPost: false })
               await createCommentOnPostAction()
+
               await expect(
                 query({
                   query: notifications,
@@ -256,7 +259,7 @@ describe('notifications', () => {
           })
 
           describe('if I have blocked the comment author', () => {
-            it('sends me no notification', async () => {
+            test('sends me no notification', async () => {
               await notifiedUser.relateTo(commentAuthor, 'blocked')
               await createCommentOnPostAction()
               const expected = expect.objectContaining({
@@ -276,7 +279,7 @@ describe('notifications', () => {
           })
 
           describe('if I have muted the comment author', () => {
-            it('sends me no notification', async () => {
+            test('sends me no notification', async () => {
               await notifiedUser.relateTo(commentAuthor, 'muted')
               await createCommentOnPostAction()
               const expected = expect.objectContaining({
@@ -302,7 +305,7 @@ describe('notifications', () => {
             commentAuthor = notifiedUser
           })
 
-          it('sends me no notification', async () => {
+          test('sends me no notification', async () => {
             await createCommentOnPostAction()
             const expected = expect.objectContaining({
               data: { notifications: [] },
@@ -345,10 +348,11 @@ describe('notifications', () => {
             'Hey <a class="mention" data-mention-id="you" href="/profile/you/al-capone">@al-capone</a> how do you do?'
         })
 
-        it('sends me a notification and email', async () => {
+        test('sends me a notification and email', async () => {
           await createPostAction()
           const expectedContent =
             'Hey <a class="mention" data-mention-id="you" href="/profile/you/al-capone" target="_blank">@al-capone</a> how do you do?'
+
           await expect(
             query({
               query: notifications,
@@ -387,11 +391,12 @@ describe('notifications', () => {
         })
 
         describe('if I have disabled `emailNotificationsMention`', () => {
-          it('sends me a notification but no email', async () => {
+          test('sends me a notification but no email', async () => {
             await notifiedUser.update({ emailNotificationsMention: false })
             await createPostAction()
             const expectedContent =
               'Hey <a class="mention" data-mention-id="you" href="/profile/you/al-capone" target="_blank">@al-capone</a> how do you do?'
+
             await expect(
               query({
                 query: notifications,
@@ -424,8 +429,9 @@ describe('notifications', () => {
           })
         })
 
-        it('publishes `NOTIFICATION_ADDED` to me', async () => {
+        test('publishes `NOTIFICATION_ADDED` to me', async () => {
           await createPostAction()
+
           expect(pubsubSpy).toHaveBeenCalledWith(
             'NOTIFICATION_ADDED',
             expect.objectContaining({
@@ -469,7 +475,7 @@ describe('notifications', () => {
             authenticatedUser = await notifiedUser.toJson()
           }
 
-          it('creates no duplicate notification for the same resource', async () => {
+          test('creates no duplicate notification for the same resource', async () => {
             const expectedUpdatedContent =
               '<br>One more mention to<br><a data-mention-id="you" class="mention" href="/profile/you" target="_blank"><br>@al-capone<br></a><br>and again:<br><a data-mention-id="you" class="mention" href="/profile/you" target="_blank"><br>@al-capone<br></a><br>and again<br><a data-mention-id="you" class="mention" href="/profile/you" target="_blank"><br>@al-capone<br></a><br>'
             await createPostAction()
@@ -492,6 +498,7 @@ describe('notifications', () => {
                 ],
               },
             })
+
             await expect(
               query({
                 query: notifications,
@@ -505,7 +512,7 @@ describe('notifications', () => {
 
           describe('if the notification was marked as read earlier', () => {
             describe('but the next mention happens after the notification was marked as read', () => {
-              it('sets the `read` attribute to false again', async () => {
+              test('sets the `read` attribute to false again', async () => {
                 await createPostAction()
                 await mutate({ mutation: markAsRead, variables: { id: 'p47' } })
                 const {
@@ -530,11 +537,12 @@ describe('notifications', () => {
                     read: false,
                   },
                 })
-                expect(readBefore).toEqual(true)
-                expect(readAfter).toEqual(false)
+
+                expect(readBefore).toBe(true)
+                expect(readAfter).toBe(false)
               })
 
-              it('does not update the `createdAt` attribute', async () => {
+              test('does not update the `createdAt` attribute', async () => {
                 await createPostAction()
                 await mutate({ mutation: markAsRead, variables: { id: 'p47' } })
                 const {
@@ -559,9 +567,10 @@ describe('notifications', () => {
                     read: false,
                   },
                 })
-                expect(createdAtBefore).toBeTruthy()
+
+                expect(createdAtBefore).toBe(true)
                 expect(Date.parse(createdAtBefore)).toEqual(expect.any(Number))
-                expect(createdAtAfter).toBeTruthy()
+                expect(createdAtAfter).toBe(true)
                 expect(Date.parse(createdAtAfter)).toEqual(expect.any(Number))
                 expect(createdAtBefore).toEqual(createdAtAfter)
               })
@@ -574,7 +583,7 @@ describe('notifications', () => {
             await postAuthor.relateTo(notifiedUser, 'blocked')
           })
 
-          it('sends no notification', async () => {
+          test('sends no notification', async () => {
             await createPostAction()
             const expected = expect.objectContaining({
               data: { notifications: [] },
@@ -591,8 +600,9 @@ describe('notifications', () => {
             ).resolves.toEqual(expected)
           })
 
-          it('does not publish `NOTIFICATION_ADDED`', async () => {
+          test('does not publish `NOTIFICATION_ADDED`', async () => {
             await createPostAction()
+
             expect(pubsubSpy).not.toHaveBeenCalled()
           })
         })
@@ -602,7 +612,7 @@ describe('notifications', () => {
             await postAuthor.relateTo(notifiedUser, 'muted')
           })
 
-          it('sends me a notification', async () => {
+          test('sends me a notification', async () => {
             await createPostAction()
             const expected = expect.objectContaining({
               data: {
@@ -635,9 +645,10 @@ describe('notifications', () => {
             ).resolves.toEqual(expected)
           })
 
-          it('publishes `NOTIFICATION_ADDED`', async () => {
+          test('publishes `NOTIFICATION_ADDED`', async () => {
             await createPostAction()
-            expect(pubsubSpy).toHaveBeenCalled()
+
+            expect(pubsubSpy).toHaveBeenCalledWith()
           })
         })
       })
@@ -648,7 +659,7 @@ describe('notifications', () => {
           postContent = 'Content of post where I get mentioned in a comment.'
         })
 
-        describe('I am not blocked at all', () => {
+        describe('i am not blocked at all', () => {
           beforeEach(async () => {
             commentContent =
               'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.'
@@ -666,7 +677,7 @@ describe('notifications', () => {
             )
           })
 
-          it('sends only one notification with reason mentioned_in_comment', async () => {
+          test('sends only one notification with reason mentioned_in_comment', async () => {
             postAuthor = await Factory.build(
               'user',
               {
@@ -716,7 +727,8 @@ describe('notifications', () => {
             postContent = 'Content of post where I get mentioned in a comment.'
             postAuthor = notifiedUser
           })
-          it('sends only one notification with reason commented_on_post, no notification with reason mentioned_in_comment', async () => {
+
+          test('sends only one notification with reason commented_on_post, no notification with reason mentioned_in_comment', async () => {
             await createCommentOnPostAction()
             const expected = {
               data: {
@@ -768,8 +780,9 @@ describe('notifications', () => {
             )
           })
 
-          it('sends no notification', async () => {
+          test('sends no notification', async () => {
             await createCommentOnPostAction()
+
             await expect(
               query({
                 query: notifications,
@@ -784,8 +797,9 @@ describe('notifications', () => {
             })
           })
 
-          it('does not publish `NOTIFICATION_ADDED` to authenticated user', async () => {
+          test('does not publish `NOTIFICATION_ADDED` to authenticated user', async () => {
             await createCommentOnPostAction()
+
             expect(pubsubSpy).toHaveBeenCalledWith(
               'NOTIFICATION_ADDED',
               expect.objectContaining({
@@ -820,8 +834,9 @@ describe('notifications', () => {
             )
           })
 
-          it('sends me a notification', async () => {
+          test('sends me a notification', async () => {
             await createCommentOnPostAction()
+
             await expect(
               query({
                 query: notifications,
@@ -852,8 +867,9 @@ describe('notifications', () => {
             })
           })
 
-          it('publishes `NOTIFICATION_ADDED` to authenticated user and me', async () => {
+          test('publishes `NOTIFICATION_ADDED` to authenticated user and me', async () => {
             await createCommentOnPostAction()
+
             expect(pubsubSpy).toHaveBeenCalledWith(
               'NOTIFICATION_ADDED',
               expect.objectContaining({
@@ -913,11 +929,11 @@ describe('notifications', () => {
 
       // Reset mocks after init message to avoid contamination
       pubsubSpy.mockClear()
-      ;(sendChatMessageMailMock as Mock).mockClear()
+      vi.mocked(sendChatMessageMailMock).mockClear()
     })
 
     describe('if the chatReceiver is online', () => {
-      it('publishes subscriptions but sends no email', async () => {
+      test('publishes subscriptions but sends no email', async () => {
         isUserOnlineMock = vi.fn().mockReturnValue(true)
 
         await mutate({
@@ -952,7 +968,7 @@ describe('notifications', () => {
     })
 
     describe('if the chatReceiver is offline', () => {
-      it('publishes subscriptions and sends an email', async () => {
+      test('publishes subscriptions and sends an email', async () => {
         isUserOnlineMock = vi.fn().mockReturnValue(false)
 
         await mutate({
@@ -1000,7 +1016,7 @@ describe('notifications', () => {
     })
 
     describe('if the chatReceiver has blocked chatSender', () => {
-      it('publishes no subscriptions and sends no email', async () => {
+      test('publishes no subscriptions and sends no email', async () => {
         isUserOnlineMock = vi.fn().mockReturnValue(false)
         await chatReceiver.relateTo(chatSender, 'blocked')
 
@@ -1020,7 +1036,7 @@ describe('notifications', () => {
     })
 
     describe('if the chatReceiver has muted chatSender', () => {
-      it('publishes no subscriptions and sends no email', async () => {
+      test('publishes no subscriptions and sends no email', async () => {
         isUserOnlineMock = vi.fn().mockReturnValue(false)
         await chatReceiver.relateTo(chatSender, 'muted')
 
@@ -1040,7 +1056,7 @@ describe('notifications', () => {
     })
 
     describe('if the chatReceiver has disabled `emailNotificationsChatMessage`', () => {
-      it('publishes subscriptions but sends no email', async () => {
+      test('publishes subscriptions but sends no email', async () => {
         isUserOnlineMock = vi.fn().mockReturnValue(false)
         await chatReceiver.update({ emailNotificationsChatMessage: false })
 
@@ -1104,11 +1120,11 @@ describe('notifications', () => {
         groupRoomId = createRoomResult.data.CreateGroupRoom.id
 
         pubsubSpy.mockClear()
-        ;(sendChatMessageMailMock as Mock).mockClear()
+        vi.mocked(sendChatMessageMailMock).mockClear()
       })
 
       describe('if the chatReceiver has muted the group', () => {
-        it('publishes subscriptions but sends no email', async () => {
+        test('publishes subscriptions but sends no email', async () => {
           isUserOnlineMock = vi.fn().mockReturnValue(false)
           authenticatedUser = await chatReceiver.toJson()
           await mutate({
@@ -1137,7 +1153,7 @@ describe('notifications', () => {
       })
 
       describe('if the chatReceiver has not muted the group', () => {
-        it('publishes subscriptions and sends an email', async () => {
+        test('publishes subscriptions and sends an email', async () => {
           isUserOnlineMock = vi.fn().mockReturnValue(false)
 
           await mutate({
@@ -1207,8 +1223,9 @@ describe('notifications', () => {
         vi.clearAllMocks()
       })
 
-      it('sends the group owner a notification and email', async () => {
+      test('sends the group owner a notification and email', async () => {
         await joinGroupAction()
+
         await expect(
           query({
             query: notifications,
@@ -1249,9 +1266,10 @@ describe('notifications', () => {
       })
 
       describe('if the group owner has disabled `emailNotificationsGroupMemberJoined`', () => {
-        it('sends the group owner a notification but no email', async () => {
+        test('sends the group owner a notification but no email', async () => {
           await groupOwner.update({ emailNotificationsGroupMemberJoined: false })
           await joinGroupAction()
+
           await expect(
             query({
               query: notifications,
@@ -1312,8 +1330,9 @@ describe('notifications', () => {
         })
       })
 
-      it('sends the group owner two notifications and emails', async () => {
+      test('sends the group owner two notifications and emails', async () => {
         await leaveGroupAction()
+
         await expect(
           query({
             query: notifications,
@@ -1373,9 +1392,10 @@ describe('notifications', () => {
       })
 
       describe('if the group owner has disabled `emailNotificationsGroupMemberLeft`', () => {
-        it('sends the group owner two notification but only only one email', async () => {
+        test('sends the group owner two notification but only only one email', async () => {
           await groupOwner.update({ emailNotificationsGroupMemberLeft: false })
           await leaveGroupAction()
+
           await expect(
             query({
               query: notifications,
@@ -1451,8 +1471,9 @@ describe('notifications', () => {
         vi.clearAllMocks()
       })
 
-      it('sends the group member a notification and email', async () => {
+      test('sends the group member a notification and email', async () => {
         await changeGroupMemberRoleAction()
+
         await expect(
           query({
             query: notifications,
@@ -1493,9 +1514,10 @@ describe('notifications', () => {
       })
 
       describe('if the group member has disabled `emailNotificationsGroupMemberRoleChanged`', () => {
-        it('sends the group member a notification but no email', async () => {
+        test('sends the group member a notification but no email', async () => {
           notifiedUser.update({ emailNotificationsGroupMemberRoleChanged: false })
           await changeGroupMemberRoleAction()
+
           await expect(
             query({
               query: notifications,
@@ -1557,8 +1579,9 @@ describe('notifications', () => {
         vi.clearAllMocks()
       })
 
-      it('sends the previous group member a notification and email', async () => {
+      test('sends the previous group member a notification and email', async () => {
         await removeUserFromGroupAction()
+
         await expect(
           query({
             query: notifications,
@@ -1599,9 +1622,10 @@ describe('notifications', () => {
       })
 
       describe('if the previous group member has disabled `emailNotificationsGroupMemberRemoved`', () => {
-        it('sends the previous group member a notification but no email', async () => {
+        test('sends the previous group member a notification but no email', async () => {
           notifiedUser.update({ emailNotificationsGroupMemberRemoved: false })
           await removeUserFromGroupAction()
+
           await expect(
             query({
               query: notifications,

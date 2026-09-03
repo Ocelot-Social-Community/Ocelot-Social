@@ -5,6 +5,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
+import { beforeAll, afterAll, afterEach, describe, it, expect, beforeEach } from 'vitest'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
 
 // `vi.mock` IS hoisted, so the order of these lines does not decide what they see — the factory
@@ -77,7 +79,7 @@ const babyLovesCatEmbedResponse = new Response(
   }),
 )
 
-describe('Query', () => {
+describe('query', () => {
   describe('embedProviders', () => {
     // Public and unauthenticated (the shield lists it next to `embed`): the settings page reads the
     // list this way since the backend stopped serving public/providers.json over HTTP.
@@ -86,8 +88,11 @@ describe('Query', () => {
         errors?: unknown
         data?: { embedProviders: Array<{ name: string; url: string }> }
       }
+
       expect(result.errors).toBeUndefined()
+
       const providers = result.data?.embedProviders ?? []
+
       // The curated list this instance actually matches against, not the full oembed.com registry.
       expect(providers).toContainEqual({ name: 'YouTube', url: 'https://www.youtube.com/' })
       expect(providers).toContainEqual({ name: 'Vimeo', url: 'https://vimeo.com/' })
@@ -109,8 +114,8 @@ describe('Query', () => {
     describe('given a video link', () => {
       beforeEach(() => {
         mockedFetch
-          .mockReturnValueOnce(Promise.resolve(new Response('')))
-          .mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify({}))))
+          .mockResolvedValueOnce(new Response(''))
+          .mockResolvedValueOnce(new Response(JSON.stringify({})))
         variables = { url: 'https://www.w3schools.com/html/mov_bbb.mp4' }
       })
 
@@ -141,8 +146,8 @@ describe('Query', () => {
     describe('given a Facebook link', () => {
       beforeEach(() => {
         mockedFetch
-          .mockReturnValueOnce(Promise.resolve(new Response(HumanConnectionOrg)))
-          .mockReturnValueOnce(Promise.resolve(new Response('invalid json')))
+          .mockResolvedValueOnce(new Response(HumanConnectionOrg))
+          .mockResolvedValueOnce(new Response('invalid json'))
         variables = { url: 'https://www.facebook.com/HumanConnectionOrg/' }
       })
 
@@ -175,8 +180,8 @@ describe('Query', () => {
     describe('given a Github link', () => {
       beforeEach(() => {
         mockedFetch
-          .mockReturnValueOnce(Promise.resolve(new Response(pr3934)))
-          .mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify({}))))
+          .mockResolvedValueOnce(new Response(pr3934))
+          .mockResolvedValueOnce(new Response(JSON.stringify({})))
         variables = { url: 'https://github.com/Human-Connection/Human-Connection/pull/960' }
       })
 
@@ -209,8 +214,8 @@ Have all the information for the brand in separate config files. Set these defau
     describe('given a youtube link', () => {
       beforeEach(() => {
         mockedFetch
-          .mockReturnValueOnce(Promise.resolve(new Response(babyLovesCat)))
-          .mockReturnValueOnce(Promise.resolve(babyLovesCatEmbedResponse))
+          .mockResolvedValueOnce(new Response(babyLovesCat))
+          .mockResolvedValueOnce(babyLovesCatEmbedResponse)
         variables = { url: 'https://www.youtube.com/watch?v=qkdXAtO40Fo&t=18s' }
       })
 

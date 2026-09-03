@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { parse } from 'graphql'
+import { expect, beforeAll, afterAll, describe, it } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -39,7 +40,9 @@ const page = async (offset: number): Promise<string[]> => {
     query: pagedQuery,
     variables: { first: PAGE_SIZE, offset },
   })
+
   expect(errors).toBeUndefined()
+
   const posts = (data?.Post ?? []) as { id: string }[]
   return posts.map((post) => post.id)
 }
@@ -91,6 +94,6 @@ describe('paging over tied sort values', () => {
   it('returns the same page twice in a row', async () => {
     // A partial order may also be unstable BETWEEN requests, which makes "load more" skip
     // rows the reader has not seen yet.
-    expect(await page(2)).toEqual(await page(2))
+    await expect(page(2)).resolves.toEqual(await page(2))
   }, 120000)
 })

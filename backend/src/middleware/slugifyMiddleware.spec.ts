@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import SignupVerification from '@graphql/queries/auth/SignupVerification.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
@@ -67,7 +69,7 @@ afterEach(async () => {
 })
 
 describe('slugifyMiddleware', () => {
-  describe('CreateGroup', () => {
+  describe('createGroup', () => {
     beforeEach(() => {
       variables = {
         ...variables,
@@ -199,7 +201,7 @@ describe('slugifyMiddleware', () => {
     })
   })
 
-  describe('UpdateGroup', () => {
+  describe('updateGroup', () => {
     let createGroupResult
 
     beforeEach(async () => {
@@ -306,7 +308,7 @@ describe('slugifyMiddleware', () => {
     })
   })
 
-  describe('CreatePost', () => {
+  describe('createPost', () => {
     beforeEach(() => {
       variables = {
         ...variables,
@@ -434,7 +436,7 @@ describe('slugifyMiddleware', () => {
     })
   })
 
-  describe('UpdatePost', () => {
+  describe('updatePost', () => {
     let createPostResult
 
     beforeEach(async () => {
@@ -501,6 +503,7 @@ describe('slugifyMiddleware', () => {
           content: 'Some edited content',
         }
         await mutate({ mutation: UpdatePost, variables: editVariables })
+
         await expect(
           mutate({ mutation: UpdatePost, variables: editVariables }),
         ).resolves.toMatchObject({
@@ -573,7 +576,7 @@ describe('slugifyMiddleware', () => {
     })
   })
 
-  describe('SignupVerification', () => {
+  describe('signupVerification', () => {
     beforeEach(() => {
       variables = {
         ...variables,

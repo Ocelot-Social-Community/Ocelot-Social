@@ -1,6 +1,8 @@
 // Unit tests for the visibility primitive — the single mechanism shared by the
 // `policy` query resolver and the policyChanged subscription filter.
 
+import { describe, it, expect } from 'vitest'
+
 import {
   allKeys,
   audiencesFor,
@@ -38,6 +40,7 @@ describe('policy visibility', () => {
     it('returns a copy — mutating it does not alter the shared schema', () => {
       const audiences = audiencesFor('apiKeysEnabled')
       audiences.push('public') // would widen visibility if it were the shared ref
+
       expect(audiencesFor('apiKeysEnabled')).toEqual(['authenticated'])
       // canView must stay unaffected: an anonymous viewer still cannot see it.
       expect(canView('apiKeysEnabled', null)).toBe(false)
@@ -133,6 +136,7 @@ describe('policy visibility', () => {
     it('gates an explicit perm:<key> on exactly that permission', async () => {
       await withMockedSchema((schema) => {
         const viewer = (permissions: string[]) => ({ authenticated: true, permissions })
+
         expect(schema.canView('badgeGatedKey' as never, viewer(['badge.manage']))).toBe(true)
         // a different held permission must NOT unlock it
         expect(schema.canView('badgeGatedKey' as never, viewer(['policy.manage']))).toBe(false)
@@ -203,7 +207,7 @@ describe('policy visibility', () => {
   })
 })
 
-describe('categoryFor', () => {
+describe(categoryFor, () => {
   it('returns each key’s declared admin-config category', () => {
     expect(categoryFor('publicRegistration')).toBe('registration')
     expect(categoryFor('inviteLinkLimit')).toBe('registration')
@@ -221,7 +225,7 @@ describe('categoryFor', () => {
   })
 })
 
-describe('requiresPolicyFor', () => {
+describe(requiresPolicyFor, () => {
   it('returns the declared policy→policy dependencies (empty for most keys)', () => {
     expect(requiresPolicyFor('showGroupButtonInHeader')).toEqual(['groupsEnabled'])
     expect(requiresPolicyFor('groupsEnabled')).toEqual([])
@@ -231,6 +235,7 @@ describe('requiresPolicyFor', () => {
   it('returns a fresh copy — a caller mutating it cannot alter the shared schema', () => {
     const deps = requiresPolicyFor('showGroupButtonInHeader')
     deps.push('groupsEnabled')
+
     expect(requiresPolicyFor('showGroupButtonInHeader')).toEqual(['groupsEnabled'])
   })
 
@@ -245,6 +250,7 @@ describe('requiresPolicyFor', () => {
         expect(allKeys()).toContain(dep)
         expect(typeFor(key)).toBe('boolean')
         expect(typeFor(dep)).toBe('boolean')
+
         // Every audience that can see the dependent must also see the dependency.
         for (const audience of keyAudiences) {
           expect(audiencesFor(dep)).toContain(audience)

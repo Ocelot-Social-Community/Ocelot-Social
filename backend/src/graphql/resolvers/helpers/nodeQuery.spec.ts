@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { parse } from 'graphql'
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -42,7 +43,7 @@ afterAll(async () => {
   setup.database.neode.close()
 })
 
-describe('Tag filter', () => {
+describe('tag filter', () => {
   it('applies the implemented operator', async () => {
     const { data, errors } = await setup.query({
       query: tagQuery,
@@ -73,7 +74,7 @@ describe('Tag filter', () => {
     })
 
     expect(errors?.[0].message).toContain('use either `id` or `id_in`, not both')
-    expect(data?.Tag).toBeFalsy()
+    expect(data?.Tag).toBe(false)
   })
 
   it.each([
@@ -106,12 +107,12 @@ describe('Tag filter', () => {
       // without touching the database. What must never happen is the quiet outcome: no
       // error, and every tag returned as though no filter had been passed.
       expect(errors?.[0].message).toMatch(/is not defined by type|Unsupported Tag filter/)
-      expect(data?.Tag).toBeFalsy()
+      expect(data?.Tag).toBe(false)
     },
   )
 })
 
-describe('Tag paging', () => {
+describe('tag paging', () => {
   const pagedQuery = parse(`
     query ($first: Int, $offset: Int) {
       Tag(first: $first, offset: $offset) {

@@ -7,6 +7,8 @@
 // combination can only arise when the two are read at DIFFERENT times — which is what a module-scope
 // read of `branding` does. Snapshot tests cannot catch it: they run unbranded, where the default IS
 // the expected value.
+import { describe, afterEach, beforeEach, it, expect } from 'vitest'
+
 import CONFIG from '@config/index'
 import { setBranding, brandingDefaults } from '@src/branding'
 
@@ -55,18 +57,18 @@ describe('branding in rendered mails', () => {
     })
 
     it('renders the brand organisation name', async () => {
-      expect(await render()).toContain('Acme Network')
+      await expect(render()).resolves.toContain('Acme Network')
     })
   })
 
   // A brand injected AFTER this module was imported must still reach the mail. Reading `branding`
   // into a plain property at module scope passes every other test in this folder and fails this one.
   it('picks up a brand set after import rather than freezing the value', async () => {
-    expect(await render()).toContain('/img/custom/logo-squared.svg') // vanilla first
+    await expect(render()).resolves.toContain('/img/custom/logo-squared.svg') // vanilla first
 
     setBranding(BRAND)
 
-    expect(await render()).toContain('/branding/acme/assets/logo-squared.svg')
+    await expect(render()).resolves.toContain('/branding/acme/assets/logo-squared.svg')
   })
 
   it('falls back to the framework defaults when no brand is set', async () => {
@@ -82,9 +84,11 @@ describe('branding in rendered mails', () => {
     const original = defaultParams.SUPPORT_EMAIL
 
     defaultParams.SUPPORT_EMAIL = 'support@example.org'
+
     expect(defaultParams.SUPPORT_EMAIL).toBe('support@example.org')
 
     delete defaultParams.SUPPORT_EMAIL
+
     expect(defaultParams.SUPPORT_EMAIL).toBeUndefined()
 
     defaultParams.SUPPORT_EMAIL = original

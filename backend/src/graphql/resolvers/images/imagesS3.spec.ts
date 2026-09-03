@@ -7,6 +7,8 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { Readable } from 'node:stream'
 
+import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect } from 'vitest'
+
 import type { ImageInput } from './images'
 import type { S3Config } from '@src/config'
 import type { FileUpload } from 'graphql-upload'
@@ -84,8 +86,10 @@ afterEach(async () => {
 
 describe('deleteImage', () => {
   const { deleteImage } = images(config)
+
   describe('given a resource with an image', () => {
     let user: { id: string }
+
     beforeEach(async () => {
       const u = await Factory.build(
         'user',
@@ -102,13 +106,16 @@ describe('deleteImage', () => {
 
     it('deletes `Image` node', async () => {
       await expect(neode.all('Image')).resolves.toHaveLength(1)
+
       await deleteImage(user, 'AVATAR_IMAGE')
+
       await expect(neode.all('Image')).resolves.toHaveLength(0)
     })
 
     it('calls deleteCallback', async () => {
       await deleteImage(user, 'AVATAR_IMAGE')
-      expect(mockDeleteObjectCommand).toHaveBeenCalled()
+
+      expect(mockDeleteObjectCommand).toHaveBeenCalledWith()
     })
 
     describe('given a transaction parameter', () => {
@@ -127,12 +134,14 @@ describe('deleteImage', () => {
         } finally {
           await session.close()
         }
+
         await expect(neode.all('Image')).resolves.toHaveLength(0)
-        expect(someString).toEqual('Hello')
+        expect(someString).toBe('Hello')
       })
 
       it('rolls back the transaction in case of errors', async () => {
         await expect(neode.all('Image')).resolves.toHaveLength(1)
+
         const session = driver.session()
         try {
           await session.writeTransaction(async (transaction) => {
@@ -158,6 +167,7 @@ describe('mergeImage', () => {
   const { mergeImage } = images(config)
   let imageInput: ImageInput
   let post: { id: string }
+
   beforeEach(() => {
     imageInput = {
       alt: 'A description of the new image',
@@ -202,12 +212,15 @@ describe('mergeImage', () => {
 
       it('calls upload callback', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
-        expect(mockUpload).toHaveBeenCalled()
+
+        expect(mockUpload).toHaveBeenCalledWith()
       })
 
       it('creates `:Image` node', async () => {
         await expect(neode.all('Image')).resolves.toHaveLength(0)
+
         await mergeImage(post, 'HERO_IMAGE', imageInput)
+
         await expect(neode.all('Image')).resolves.toHaveLength(1)
       })
 
@@ -218,6 +231,7 @@ describe('mergeImage', () => {
         const upload = await imageInput.upload
         upload.filename = '/path/to/awkward?/ file-location/?foo- bar-avatar.jpg'
         imageInput.upload = Promise.resolve(upload)
+
         await expect(mergeImage(post, 'HERO_IMAGE', imageInput)).resolves.toMatchObject({
           url: expect.stringMatching(
             new RegExp(`^http://your-objectstorage.com/bucket/original/${uuid}-foo-bar-avatar.jpg`),
@@ -235,13 +249,15 @@ describe('mergeImage', () => {
         // gone, and this test only wants to know that both are there.
         const hydratedPost = neode.hydrateFirst(result, 'p', neode.model('Post'))
         const image = neode.hydrateFirst(result, 'i', neode.model('Image'))
-        expect(hydratedPost).toBeTruthy()
-        expect(image).toBeTruthy()
+
+        expect(hydratedPost).toBe(true)
+        expect(image).toBe(true)
       })
 
       it('sets metadata', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
         const image = await neode.first('Image', {}, undefined)
+
         await expect(image.toJson()).resolves.toMatchObject({
           alt: 'A description of the new image',
           createdAt: expect.any(String),
@@ -274,6 +290,7 @@ describe('mergeImage', () => {
             { alt: 'This alt text gets overwritten' },
             undefined,
           )
+
           await expect(image.toJson()).resolves.toMatchObject({
             alt: 'This alt text gets overwritten',
           })
@@ -310,19 +327,25 @@ describe('mergeImage', () => {
 
         it('calls deleteCallback', async () => {
           await mergeImage(post, 'HERO_IMAGE', imageInput)
-          expect(mockDeleteObjectCommand).toHaveBeenCalled()
+
+          expect(mockDeleteObjectCommand).toHaveBeenCalledWith()
         })
 
         it('calls Upload', async () => {
           await mergeImage(post, 'HERO_IMAGE', imageInput)
-          expect(mockUpload).toHaveBeenCalled()
+
+          expect(mockUpload).toHaveBeenCalledWith()
         })
 
         it('updates metadata of existing image node', async () => {
           await expect(neode.all('Image')).resolves.toHaveLength(1)
+
           await mergeImage(post, 'HERO_IMAGE', imageInput)
+
           await expect(neode.all('Image')).resolves.toHaveLength(1)
+
           const image = await neode.first('Image', {}, undefined)
+
           await expect(image.toJson()).resolves.toMatchObject({
             alt: 'A description of the new image',
             createdAt: expect.any(String),
@@ -340,6 +363,7 @@ describe('mergeImage', () => {
     it('throws UserInputError', async () => {
       const p = await Factory.build('post', { id: 'p99' }, { image: null })
       post = await p.toJson()
+
       await expect(mergeImage(post, 'HERO_IMAGE', imageInput)).rejects.toEqual(
         new UserInputError('Cannot find image for given resource'),
       )
@@ -371,17 +395,20 @@ describe('mergeImage', () => {
 
       it('does not call deleteCallback', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
+
         expect(mockDeleteObjectCommand).not.toHaveBeenCalled()
       })
 
       it('does not call Upload', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
+
         expect(mockUpload).not.toHaveBeenCalled()
       })
 
       it('updates metadata', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
         const images = await neode.all('Image')
+
         expect(images).toHaveLength(1)
         await expect(images[0].toJson()).resolves.toMatchObject({
           createdAt: expect.any(String),

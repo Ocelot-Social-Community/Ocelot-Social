@@ -1,3 +1,5 @@
+import { describe, beforeEach, it, expect } from 'vitest'
+
 import CONFIG from '@config/index'
 
 CONFIG.SUPPORT_EMAIL = 'devops@ocelot.social'
@@ -10,7 +12,7 @@ const { sendNotificationMail } = await import('./sendEmail')
 describe('sendNotificationMail', () => {
   let locale = 'en'
 
-  describe('English', () => {
+  describe('english', () => {
     beforeEach(() => {
       locale = 'en'
     })
@@ -245,7 +247,7 @@ describe('sendNotificationMail', () => {
     })
   })
 
-  describe('German', () => {
+  describe('german', () => {
     beforeEach(() => {
       locale = 'de'
     })

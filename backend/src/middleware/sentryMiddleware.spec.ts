@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, test, expect } from 'vitest'
 import type { Mock } from 'vitest'
 
 vi.mock('@sentry/node', () => ({
@@ -11,11 +12,14 @@ vi.mock('@sentry/node', () => ({
 const { init, withScope, captureException } = await import('@sentry/node')
 const { createSentryMiddleware } = await import('./sentryMiddleware')
 
-const initMock = init as Mock
+const initMock = vi.mocked(init)
 // Signature stated: the tests configure this one with mockImplementation, and
 // `Mock<UnknownFunction>` accepts no implementation under @jest/globals.
+// Cast rather than vi.mocked(withScope): Sentry's real signature is
+// `(scope, callback) => unknown`, while the middleware only ever calls the single-argument form
+// — typing the stub to what is actually used keeps the implementations below honest.
 const withScopeMock = withScope as unknown as Mock<(run: (scope: unknown) => void) => void>
-const captureExceptionMock = captureException as Mock
+const captureExceptionMock = vi.mocked(captureException)
 
 beforeEach(() => {
   initMock.mockReset()
@@ -25,12 +29,13 @@ beforeEach(() => {
 
 describe('createSentryMiddleware', () => {
   describe('without a DSN', () => {
-    it('does not call Sentry.init', () => {
+    test('does not call Sentry.init', () => {
       createSentryMiddleware({})
+
       expect(initMock).not.toHaveBeenCalled()
     })
 
-    it('returns a passthrough middleware that forwards arguments to resolve', async () => {
+    test('returns a passthrough middleware that forwards arguments to resolve', async () => {
       const middleware = createSentryMiddleware({})
       const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue('result')
       const root = { r: 1 }
@@ -43,7 +48,7 @@ describe('createSentryMiddleware', () => {
       expect(withScopeMock).not.toHaveBeenCalled()
     })
 
-    it('propagates errors from resolve without capturing them', async () => {
+    test('propagates errors from resolve without capturing them', async () => {
       const middleware = createSentryMiddleware({})
       const error = new Error('boom')
       const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockRejectedValue(error)
@@ -54,7 +59,7 @@ describe('createSentryMiddleware', () => {
   })
 
   describe('with a DSN', () => {
-    it('initializes Sentry with the provided options', () => {
+    test('initializes Sentry with the provided options', () => {
       createSentryMiddleware({
         dsn: 'https://example@sentry.io/1',
         release: 'abc123',
@@ -68,7 +73,7 @@ describe('createSentryMiddleware', () => {
       })
     })
 
-    it('forwards successful resolver results without reporting', async () => {
+    test('forwards successful resolver results without reporting', async () => {
       const middleware = createSentryMiddleware({ dsn: 'x' })
       const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue('ok')
 
@@ -77,7 +82,7 @@ describe('createSentryMiddleware', () => {
       expect(captureExceptionMock).not.toHaveBeenCalled()
     })
 
-    it('captures errors with user and request metadata, then rethrows', async () => {
+    test('captures errors with user and request metadata, then rethrows', async () => {
       const middleware = createSentryMiddleware({ dsn: 'x' })
       const error = new Error('boom')
       const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockRejectedValue(error)
@@ -106,7 +111,7 @@ describe('createSentryMiddleware', () => {
       expect(captureExceptionMock).toHaveBeenCalledWith(error)
     })
 
-    it('handles missing user and request metadata gracefully', async () => {
+    test('handles missing user and request metadata gracefully', async () => {
       const middleware = createSentryMiddleware({ dsn: 'x' })
       const error = new Error('boom')
       const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockRejectedValue(error)

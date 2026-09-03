@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { parse } from 'graphql'
+import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import User from '@graphql/queries/users/User.gql'
@@ -49,7 +50,7 @@ afterEach(async () => {
 })
 
 describe('resolvers', () => {
-  describe('Location', () => {
+  describe('location', () => {
     describe('name(lang)', () => {
       beforeEach(async () => {
         const Hamburg = await Factory.build('location', {
@@ -222,6 +223,7 @@ describe('distanceToMe', () => {
       it('returns 0', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await user.toJson()
+
         await expect(
           query({ query: User, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({
@@ -243,6 +245,7 @@ describe('distanceToMe', () => {
       it('returns 0', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await myPlaceUser.toJson()
+
         await expect(
           query({ query: User, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({
@@ -264,6 +267,7 @@ describe('distanceToMe', () => {
       it('returns a number', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await otherPlaceUser.toJson()
+
         await expect(
           query({ query: User, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({
@@ -285,6 +289,7 @@ describe('distanceToMe', () => {
       it('returns null', async () => {
         authenticatedUser = await noCordsPlaceUser.toJson()
         const targetUser = await myPlaceUser.toJson()
+
         await expect(
           query({ query: User, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({
@@ -306,6 +311,7 @@ describe('distanceToMe', () => {
       it('returns null', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await noCordsPlaceUser.toJson()
+
         await expect(
           query({ query: User, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({
@@ -327,6 +333,7 @@ describe('distanceToMe', () => {
       it('returns null location', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await noPlaceUser.toJson()
+
         await expect(
           query({ query: User, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({

@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
@@ -38,7 +40,7 @@ afterAll(async () => {
   database.neode.close()
 })
 
-describe('Room', () => {
+describe('room', () => {
   let roomId: string
 
   beforeAll(async () => {
@@ -137,6 +139,7 @@ describe('Room', () => {
             },
           })
           roomId = result.data.CreateMessage.room.id
+
           expect(result).toMatchObject({
             errors: undefined,
             data: {
@@ -161,6 +164,7 @@ describe('Room', () => {
               content: 'another message',
             },
           })
+
           expect(result).toMatchObject({
             errors: undefined,
             data: {
@@ -197,6 +201,7 @@ describe('Room', () => {
 
         it('returns the room', async () => {
           const result = await query({ query: Room })
+
           expect(result).toMatchObject({
             errors: undefined,
             data: {
@@ -235,6 +240,7 @@ describe('Room', () => {
 
         it('returns the room', async () => {
           const result = await query({ query: Room })
+
           expect(result).toMatchObject({
             errors: undefined,
             data: {
@@ -288,6 +294,7 @@ describe('Room', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
+
         await expect(
           query({
             query: UnreadRooms,
@@ -335,6 +342,7 @@ describe('Room', () => {
       describe('as chatting user', () => {
         it('has 0 unread rooms', async () => {
           authenticatedUser = await chattingUser.toJson()
+
           await expect(
             query({
               query: UnreadRooms,
@@ -350,6 +358,7 @@ describe('Room', () => {
       describe('as other chatting user', () => {
         it('has 1 unread rooms', async () => {
           authenticatedUser = await otherChattingUser.toJson()
+
           await expect(
             query({
               query: UnreadRooms,
@@ -364,6 +373,7 @@ describe('Room', () => {
         it('when chattingUser is blocked has 0 unread rooms', async () => {
           authenticatedUser = await otherChattingUser.toJson()
           await otherChattingUser.relateTo(chattingUser, 'blocked')
+
           await expect(
             query({
               query: UnreadRooms,
@@ -378,6 +388,7 @@ describe('Room', () => {
         it('when chattingUser is muted has 0 unread rooms', async () => {
           authenticatedUser = await otherChattingUser.toJson()
           await otherChattingUser.relateTo(chattingUser, 'muted')
+
           await expect(
             query({
               query: UnreadRooms,
@@ -393,6 +404,7 @@ describe('Room', () => {
       describe('as not chatting user', () => {
         it('has 2 unread rooms', async () => {
           authenticatedUser = await notChattingUser.toJson()
+
           await expect(
             query({
               query: UnreadRooms,
@@ -536,12 +548,12 @@ describe('Room', () => {
 
     describe('as chatter of room', () => {
       it('returns the room', async () => {
-        expect(
-          await query({
+        await expect(
+          query({
             query: Room,
             variables: { first: 2, offset: 0, id: result.data.Room[0].id },
           }),
-        ).toMatchObject({
+        ).resolves.toMatchObject({
           errors: undefined,
           data: {
             Room: [
@@ -563,12 +575,13 @@ describe('Room', () => {
 
         it('returns no room', async () => {
           authenticatedUser = await notChattingUser.toJson()
-          expect(
-            await query({
+
+          await expect(
+            query({
               query: Room,
               variables: { first: 2, offset: 0, id: result.data.Room[0].id },
             }),
-          ).toMatchObject({
+          ).resolves.toMatchObject({
             errors: undefined,
             data: {
               Room: [],
@@ -589,6 +602,7 @@ describe('Room', () => {
         query: Room,
         variables: { userId: 'other-chatting-user' },
       })
+
       expect(result).toMatchObject({
         errors: undefined,
         data: {
@@ -610,6 +624,7 @@ describe('Room', () => {
         query: Room,
         variables: { userId: 'non-existent-user' },
       })
+
       expect(result).toMatchObject({
         errors: undefined,
         data: {
@@ -646,12 +661,13 @@ describe('Room', () => {
       authenticatedUser = await chattingUser.toJson()
     })
 
-    describe('CreateGroupRoom', () => {
+    describe('createGroupRoom', () => {
       it('creates a group room', async () => {
         const result = await mutate({
           mutation: CreateGroupRoom,
           variables: { groupId: 'test-group' },
         })
+
         expect(result).toMatchObject({
           errors: undefined,
           data: {
@@ -665,6 +681,7 @@ describe('Room', () => {
             }),
           },
         })
+
         groupRoomId = result.data.CreateGroupRoom.id
       })
 
@@ -673,6 +690,7 @@ describe('Room', () => {
           mutation: CreateGroupRoom,
           variables: { groupId: 'test-group' },
         })
+
         expect(result.data.CreateGroupRoom.id).toBe(groupRoomId)
       })
 
@@ -682,7 +700,9 @@ describe('Room', () => {
           mutation: CreateGroupRoom,
           variables: { groupId: 'test-group' },
         })
+
         expect(result.errors).toBeDefined()
+
         authenticatedUser = await chattingUser.toJson()
       })
     })
@@ -693,6 +713,7 @@ describe('Room', () => {
           query: Room,
           variables: { groupId: 'test-group' },
         })
+
         expect(result).toMatchObject({
           errors: undefined,
           data: {
@@ -711,6 +732,7 @@ describe('Room', () => {
           query: Room,
           variables: { groupId: 'non-existent' },
         })
+
         expect(result).toMatchObject({
           errors: undefined,
           data: {
@@ -722,7 +744,7 @@ describe('Room', () => {
   })
 })
 
-describe('roomUpdatedFilter', () => {
+describe(roomUpdatedFilter, () => {
   it('returns true when payload userId matches context user', () => {
     expect(roomUpdatedFilter({ userId: 'u1' }, {}, { user: { id: 'u1' } })).toBe(true)
   })

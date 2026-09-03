@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import {
   blockingGateFor,
   isGateOpen,
@@ -17,7 +19,7 @@ const ctx = (open: PermissionGate[] = []): GateContext => ({
 })
 
 describe('permission gates', () => {
-  describe('isGateOpen', () => {
+  describe(isGateOpen, () => {
     it('follows the backing policy effective value', () => {
       expect(isGateOpen('videoConference', ctx(['videoConference']))).toBe(true)
       expect(isGateOpen('videoConference', ctx([]))).toBe(false)
@@ -27,6 +29,7 @@ describe('permission gates', () => {
 
     it('reads exactly the gate key', () => {
       const getEffective = vi.fn((key: PermissionGate) => key === 'videoConference')
+
       expect(isGateOpen('videoConference', { policy: { getEffective } })).toBe(true)
       expect(getEffective).toHaveBeenCalledWith('videoConference')
     })
@@ -36,9 +39,10 @@ describe('permission gates', () => {
     })
   })
 
-  describe('isPermissionAvailable', () => {
+  describe(isPermissionAvailable, () => {
     it('ungated permissions are always available', () => {
       const closed = ctx() // every gate closed
+
       expect(isPermissionAvailable('post.create', closed)).toBe(true)
       expect(isPermissionAvailable('role.manage', closed)).toBe(true)
     })
@@ -74,7 +78,7 @@ describe('permission gates', () => {
     })
   })
 
-  describe('blockingGateFor', () => {
+  describe(blockingGateFor, () => {
     it('is null for an ungated permission and for a fully-open gated one', () => {
       expect(blockingGateFor('post.create', ctx())).toBeNull()
       expect(
@@ -95,7 +99,7 @@ describe('permission gates', () => {
     })
   })
 
-  describe('isPermissionGatePolicyKey', () => {
+  describe(isPermissionGatePolicyKey, () => {
     it('flags both gate policy keys', () => {
       expect(isPermissionGatePolicyKey('apiKeysEnabled')).toBe(true)
       expect(isPermissionGatePolicyKey('videoConference')).toBe(true)

@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { User } from '@db/schema/index'
 
 import { TestNode } from './node'
@@ -7,7 +9,7 @@ import { TestNode } from './node'
 
 const node = (properties: Record<string, unknown>) => new TestNode(User, properties, 1)
 
-describe('TestNode.get', () => {
+describe('testNode.get', () => {
   it('reads a property the node carries', () => {
     expect(node({ slug: 'peter-pan' }).get('slug')).toBe('peter-pan')
   })
@@ -18,6 +20,7 @@ describe('TestNode.get', () => {
 
   it('keeps a stored falsy value distinguishable from an absent one', () => {
     const user = node({ deleted: false, about: null, name: '' })
+
     expect(user.get('deleted')).toBe(false)
     expect(user.get('about')).toBeNull()
     expect(user.get('name')).toBe('')
@@ -33,16 +36,17 @@ describe('TestNode.get', () => {
   )
 })
 
-describe('TestNode.properties', () => {
+describe('testNode.properties', () => {
   it('hands back a copy, so a caller cannot edit the handle', () => {
     const user = node({ slug: 'peter-pan' })
     const copy = user.properties()
     copy.slug = 'someone-else'
+
     expect(user.get('slug')).toBe('peter-pan')
   })
 })
 
-describe('TestNode.update', () => {
+describe('testNode.update', () => {
   // A valid User, so a rejection below is about the patch and not about the node it starts from.
   const stored = {
     id: 'u1',

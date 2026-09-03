@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 const mockConfig: {
   LIVEKIT_ENABLED: boolean
   LIVEKIT_URL?: string
@@ -93,6 +95,7 @@ afterEach(() => {
 describe('startLiveKitPoller', () => {
   it('does nothing when LiveKit is disabled', () => {
     startLiveKitPoller()
+
     expect(mockRoomServiceCtor).not.toHaveBeenCalled()
     expect(mockLogger.info).not.toHaveBeenCalled()
   })
@@ -102,12 +105,14 @@ describe('startLiveKitPoller', () => {
     mockConfig.LIVEKIT_URL = 'wss://lk.example.test'
     // missing key/secret
     startLiveKitPoller()
+
     expect(mockRoomServiceCtor).not.toHaveBeenCalled()
   })
 
   it('creates a RoomServiceClient with http url and starts the timers', () => {
     setEnabled()
     startLiveKitPoller()
+
     expect(mockRoomServiceCtor).toHaveBeenCalledWith('https://lk.example.test', 'key', 'secret')
     expect(mockLogger.info).toHaveBeenCalledWith(expect.stringContaining('LiveKit poller starting'))
   })
@@ -116,6 +121,7 @@ describe('startLiveKitPoller', () => {
     setEnabled()
     startLiveKitPoller()
     startLiveKitPoller()
+
     expect(mockRoomServiceCtor).toHaveBeenCalledTimes(1)
   })
 
@@ -125,6 +131,7 @@ describe('startLiveKitPoller', () => {
     mockConfig.LIVEKIT_API_KEY = 'k'
     mockConfig.LIVEKIT_API_SECRET = 's'
     startLiveKitPoller()
+
     expect(mockRoomServiceCtor).toHaveBeenCalledWith('http://plain.test', 'k', 's')
   })
 
@@ -134,6 +141,7 @@ describe('startLiveKitPoller', () => {
     mockConfig.LIVEKIT_API_KEY = 'k'
     mockConfig.LIVEKIT_API_SECRET = 's'
     startLiveKitPoller()
+
     expect(mockRoomServiceCtor).toHaveBeenCalledWith('https://already.test', 'k', 's')
   })
 })
@@ -173,6 +181,7 @@ describe('poll tick', () => {
       { name: 'group-b', numParticipants: 0 },
     ])
     await vi.advanceTimersByTimeAsync(15_000)
+
     expect(mockPublish).not.toHaveBeenCalled()
   })
 
@@ -184,6 +193,7 @@ describe('poll tick', () => {
 
     mockListRooms.mockResolvedValueOnce([])
     await vi.advanceTimersByTimeAsync(15_000)
+
     expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
       groupId: 'a',
       count: 0,
@@ -193,6 +203,7 @@ describe('poll tick', () => {
     mockPublish.mockClear()
     mockListRooms.mockResolvedValueOnce([])
     await vi.advanceTimersByTimeAsync(15_000)
+
     expect(mockPublish).not.toHaveBeenCalled()
   })
 
@@ -204,6 +215,7 @@ describe('poll tick', () => {
 
     mockListRooms.mockResolvedValueOnce([])
     await vi.advanceTimersByTimeAsync(15_000)
+
     expect(mockPublish).not.toHaveBeenCalled()
   })
 
@@ -211,6 +223,7 @@ describe('poll tick', () => {
     mockListRooms.mockResolvedValueOnce([{ name: 'group-a' }])
     startLiveKitPoller()
     await vi.advanceTimersByTimeAsync(5_000)
+
     expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
       groupId: 'a',
       count: 0,
@@ -224,6 +237,7 @@ describe('poll tick', () => {
     await vi.advanceTimersByTimeAsync(15_000)
     await vi.advanceTimersByTimeAsync(15_000)
     await vi.advanceTimersByTimeAsync(15_000)
+
     expect(mockListRooms).toHaveBeenCalledTimes(4)
     // First 3 failures logged, 4th suppressed
     expect(mockLogger.warn).toHaveBeenCalledTimes(3)
@@ -233,6 +247,7 @@ describe('poll tick', () => {
     mockListRooms.mockRejectedValueOnce(new Error('boom1'))
     startLiveKitPoller()
     await vi.advanceTimersByTimeAsync(5_000)
+
     expect(mockLogger.warn).toHaveBeenCalledTimes(1)
     expect(mockLogger.warn.mock.calls[0][0]).toContain('#1')
 
@@ -244,6 +259,7 @@ describe('poll tick', () => {
     // Should be back to "#1" after the success reset
     const calls = mockLogger.warn.mock.calls
     const lastWarn = calls[calls.length - 1]
+
     expect(lastWarn[0]).toContain('#1')
   })
 
@@ -253,6 +269,7 @@ describe('poll tick', () => {
     mockPublish.mockRejectedValueOnce(new Error('pubsub down'))
     startLiveKitPoller()
     await vi.advanceTimersByTimeAsync(5_000)
+
     expect(mockLogger.warn).toHaveBeenCalledWith('LiveKit poll tick failed:', 'pubsub down')
   })
 })
@@ -263,6 +280,7 @@ describe('stopLiveKitPoller', () => {
     startLiveKitPoller()
     stopLiveKitPoller()
     await vi.advanceTimersByTimeAsync(5_000)
+
     expect(mockListRooms).not.toHaveBeenCalled()
   })
 
@@ -273,6 +291,7 @@ describe('stopLiveKitPoller', () => {
     mockListRooms.mockClear()
     stopLiveKitPoller()
     await vi.advanceTimersByTimeAsync(60_000)
+
     expect(mockListRooms).not.toHaveBeenCalled()
   })
 
@@ -285,4 +304,3 @@ describe('stopLiveKitPoller', () => {
 
 // No imports left after the vitest switch — without this the file is a script, not a
 // module: its top-level consts would collide across specs and `await` would be illegal.
-export {}

@@ -1,123 +1,121 @@
+import { describe, it, expect } from 'vitest'
+
 import findProvider from './findProvider'
 
-describe('Vimeo', () => {
+describe('vimeo', () => {
   it('matches `https://vimeo.com/showcase/2098620/video/4082288`', () => {
-    expect(findProvider('https://vimeo.com/showcase/2098620/video/4082288')).toEqual(
+    expect(findProvider('https://vimeo.com/showcase/2098620/video/4082288')).toBe(
       'https://vimeo.com/api/oembed.json',
     )
   })
 })
 
-describe('D.Tube', () => {
+describe('d.Tube', () => {
   it('matches `https://d.tube/v/alexshumsky/q4D-hIOjknY`', () => {
-    expect(findProvider('https://d.tube/v/alexshumsky/q4D-hIOjknY')).toEqual(
+    expect(findProvider('https://d.tube/v/alexshumsky/q4D-hIOjknY')).toBe(
       'https://api.d.tube/oembed',
     )
   })
 })
 
-describe('GIPHY', () => {
+describe('gIPHY', () => {
   it('matches `https://giphy.com/gifs/KRB0DCpSFQeT6/html5`', () => {
-    expect(findProvider('https://giphy.com/gifs/KRB0DCpSFQeT6/html5')).toEqual(
+    expect(findProvider('https://giphy.com/gifs/KRB0DCpSFQeT6/html5')).toBe(
       'https://giphy.com/services/oembed',
     )
   })
 })
 
-describe('Flicker', () => {
+describe('flicker', () => {
   it('matches `https://flic.kr/p/VT2HCQ`', () => {
-    expect(findProvider('https://flic.kr/p/VT2HCQ')).toEqual(
-      'https://www.flickr.com/services/oembed/',
-    )
+    expect(findProvider('https://flic.kr/p/VT2HCQ')).toBe('https://www.flickr.com/services/oembed/')
   })
 })
 
-describe('Codepen', () => {
+describe('codepen', () => {
   it('matches `https://codepen.io/goodkatz/pen/LYPGxQz`', () => {
-    expect(findProvider('https://codepen.io/goodkatz/pen/LYPGxQz')).toEqual(
+    expect(findProvider('https://codepen.io/goodkatz/pen/LYPGxQz')).toBe(
       'http://codepen.io/api/oembed',
     )
   })
 })
 
-describe('Meetup', () => {
+describe('meetup', () => {
   it('matches `https://www.meetup.com/de-DE/spielego/events/ctdplqyzmbfc/`', () => {
-    expect(findProvider('https://www.meetup.com/de-DE/spielego/events/ctdplqyzmbfc/')).toEqual(
+    expect(findProvider('https://www.meetup.com/de-DE/spielego/events/ctdplqyzmbfc/')).toBe(
       'https://api.meetup.com/oembed',
     )
   })
 })
 
-describe('Mixcloud', () => {
+describe('mixcloud', () => {
   it('matches `https://www.mixcloud.com/diffrent/giraffecast025/`', () => {
-    expect(findProvider('https://www.mixcloud.com/diffrent/giraffecast025/')).toEqual(
+    expect(findProvider('https://www.mixcloud.com/diffrent/giraffecast025/')).toBe(
       'https://www.mixcloud.com/oembed/',
     )
   })
 })
 
-describe('Reddit', () => {
+describe('reddit', () => {
   it('matches `https://www.reddit.com/r/LivestreamFail/comments/d6a2ge/greek_banned/`', () => {
     expect(
       findProvider('https://www.reddit.com/r/LivestreamFail/comments/d6a2ge/greek_banned/'),
-    ).toEqual('https://www.reddit.com/oembed')
+    ).toBe('https://www.reddit.com/oembed')
   })
 })
 
-describe('Slideshare', () => {
+describe('slideshare', () => {
   it('matches `https://www.slideshare.net/ma6/lets-build-an-airport-how-to-estimate-large-scale-projects`', () => {
     expect(
       findProvider(
         'https://www.slideshare.net/ma6/lets-build-an-airport-how-to-estimate-large-scale-projects',
       ),
-    ).toEqual('http://www.slideshare.net/api/oembed/2')
+    ).toBe('http://www.slideshare.net/api/oembed/2')
   })
 })
 
-describe('Soundcloud', () => {
+describe('soundcloud', () => {
   it('matches `https://soundcloud.com/placid-records/zangenhand-live-altes-wettb-ro`', () => {
     expect(
       findProvider('https://soundcloud.com/placid-records/zangenhand-live-altes-wettb-ro'),
-    ).toEqual('https://soundcloud.com/oembed')
+    ).toBe('https://soundcloud.com/oembed')
   })
 })
 
-describe('Twitch', () => {
+describe('twitch', () => {
   it('matches `https://www.twitch.tv/gtimetv`', () => {
-    expect(findProvider('https://www.twitch.tv/gtimetv')).toEqual('https://api.twitch.tv/v4/oembed')
+    expect(findProvider('https://www.twitch.tv/gtimetv')).toBe('https://api.twitch.tv/v4/oembed')
   })
 })
 
-describe('Twitter', () => {
+describe('twitter', () => {
   it('matches `https://twitter.com/kenfm/status/1168682881524232194`', () => {
-    expect(findProvider('https://twitter.com/kenfm/status/1168682881524232194')).toEqual(
+    expect(findProvider('https://twitter.com/kenfm/status/1168682881524232194')).toBe(
       'https://publish.twitter.com/oembed',
     )
   })
 })
 
-describe('Facebook', () => {
+describe('facebook', () => {
   it('matches `https://www.facebook.com/FacebookDeutschland/videos/1960353927603280/`', () => {
     expect(
       findProvider('https://www.facebook.com/FacebookDeutschland/videos/1960353927603280/'),
-    ).toEqual('https://www.facebook.com/plugins/post/oembed.json')
+    ).toBe('https://www.facebook.com/plugins/post/oembed.json')
   })
 })
 
-describe('Youtube', () => {
+describe('youtube', () => {
   it('matches `https://www.youtube.com/watch?v=qkdXAtO40Fo`', () => {
-    expect(findProvider('https://www.youtube.com/watch?v=qkdXAtO40Fo')).toEqual(
+    expect(findProvider('https://www.youtube.com/watch?v=qkdXAtO40Fo')).toBe(
       'https://www.youtube.com/oembed',
     )
   })
 
   it('matches `https://youtu.be/qkdXAtO40Fo`', () => {
-    expect(findProvider(`https://youtu.be/qkdXAtO40Fo`)).toEqual('https://www.youtube.com/oembed')
+    expect(findProvider(`https://youtu.be/qkdXAtO40Fo`)).toBe('https://www.youtube.com/oembed')
   })
 
   it('matches `https://youtu.be/qkdXAtO40Fo?t=41`', () => {
-    expect(findProvider(`https://youtu.be/qkdXAtO40Fo?t=41`)).toEqual(
-      'https://www.youtube.com/oembed',
-    )
+    expect(findProvider(`https://youtu.be/qkdXAtO40Fo?t=41`)).toBe('https://www.youtube.com/oembed')
   })
 })

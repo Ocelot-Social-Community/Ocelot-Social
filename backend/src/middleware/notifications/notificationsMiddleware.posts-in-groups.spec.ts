@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, describe, beforeEach, afterEach, it, expect } from 'vitest'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
@@ -202,6 +204,7 @@ describe('notify group members of new posts in group', () => {
 
     it('sends NO notification to the pending group member', async () => {
       authenticatedUser = await pendingMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -220,6 +223,7 @@ describe('notify group members of new posts in group', () => {
 
     it('sends notification to the group member', async () => {
       authenticatedUser = await groupMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -325,6 +329,7 @@ describe('notify group members of new posts in group', () => {
             },
           })
           authenticatedUser = await groupMember.toJson()
+
           await expect(
             query({
               query: notifications,
@@ -376,6 +381,7 @@ describe('notify group members of new posts in group', () => {
 
       it('sends no notification to the user', async () => {
         authenticatedUser = await groupMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -417,6 +423,7 @@ describe('notify group members of new posts in group', () => {
 
       it('sends no notification to the user', async () => {
         authenticatedUser = await groupMember.toJson()
+
         await expect(
           query({
             query: notifications,

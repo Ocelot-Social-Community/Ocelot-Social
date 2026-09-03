@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import { closeDriver, getDriver } from '@db/neo4j'
 import resolvers from '@graphql/resolvers'
@@ -194,11 +196,12 @@ describe('forField', () => {
         .load('x')
 
     await Promise.all([load('A.one'), load('B.two')])
+
     expect(seen.sort()).toEqual(['A.one', 'B.two'])
   })
 })
 
-describe('Room.unreadCount', () => {
+describe('room.unreadCount', () => {
   it('counts unseen messages per room, including rooms with none', async () => {
     await expect(unreadCountFor(rooms, reader)).resolves.toEqual([2, 1, 0, 0])
   })

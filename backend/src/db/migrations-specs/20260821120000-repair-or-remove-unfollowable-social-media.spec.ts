@@ -1,4 +1,6 @@
 // ESM has no automock: unstable_mockModule requires an explicit factory.
+import { describe, expect, it, beforeEach, afterEach } from 'vitest'
+
 vi.mock('@db/neo4j', () => ({ getDriver: vi.fn() }))
 
 // Imported after the mock registrations, not above them: `unstable_mockModule`
@@ -169,6 +171,7 @@ describe('repair', () => {
     // result against the stored value to decide whether to write at all.
     for (const url of ['mastodon.social/@user', 'someone@example.org', 'mailto:a@b.org?x=1']) {
       const once = repair(url)
+
       expect(once).not.toBeNull()
       expect(repair(once as string)).toBe(once)
     }
@@ -279,6 +282,7 @@ describe('up', () => {
     // names nothing. The order is the promise.
     const removal = events.indexOf('write s2')
     const naming = events.findIndex((event) => event.includes('example.org/pub'))
+
     expect(naming).toBeGreaterThanOrEqual(0)
     expect(naming).toBeLessThan(removal)
   })
@@ -287,6 +291,7 @@ describe('up', () => {
     // The quieter half of the same problem: `SET s.url = $url` overwrites the only copy.
     const write = events.indexOf('write s1')
     const naming = events.findIndex((event) => event.includes('mailto:a@example.org'))
+
     expect(naming).toBeGreaterThanOrEqual(0)
     expect(naming).toBeLessThan(write)
   })
@@ -295,6 +300,7 @@ describe('up', () => {
     // Logging the old value redacted and the new one raw put the token in the log anyway, by
     // the other half of the same line.
     const line = events.find((event) => event.includes('example.org/x'))
+
     expect(line).toBeDefined()
     expect(line).not.toContain('token=abc')
     expect(line).toContain('https://example.org/x (query removed)')
@@ -305,6 +311,7 @@ describe('up', () => {
     // password or someone else's address into it would leave the migration undoing itself —
     // removing the value from the public profile and keeping it somewhere less guarded.
     const log = events.filter((event) => event.startsWith('log ')).join('\n')
+
     expect(log).not.toContain('secret')
     expect(log).not.toContain('evil@example.tld')
     // Still enough to act on: the owner and the link they lost.
@@ -324,4 +331,3 @@ describe('up', () => {
 
 // No imports left after the vitest switch — without this the file is a script, not a
 // module: its top-level consts would collide across specs and `await` would be illegal.
-export {}

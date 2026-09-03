@@ -5,6 +5,7 @@
 
 import { resolve } from 'node:path'
 
+import { describe, beforeEach, afterEach, test, expect } from 'vitest'
 import type { Mock, MockInstance } from 'vitest'
 
 // vitest has no `isolateModulesAsync`: resetting the registry before the dynamic import does the
@@ -78,9 +79,10 @@ describe('branding bootstrap', () => {
 
   // No env needed to find archives (the search path defaults), but a brand still has to be ACTIVE —
   // pinned by $OCELOT_ACTIVE_BRANDING or named by a DEFAULT marker. Neither → vanilla, silently.
-  it('does nothing when no brand is active', async () => {
+  test('does nothing when no brand is active', async () => {
     const discoverArchives = vi.fn()
     const { setBranding } = await loadBootstrap({ discoverArchives })
+
     expect(discoverArchives).not.toHaveBeenCalled()
     expect(setBranding).not.toHaveBeenCalled()
     expect(warnSpy).not.toHaveBeenCalled()
@@ -90,7 +92,7 @@ describe('branding bootstrap', () => {
   // handover to discoverArchives untested — the mocks ignore their argument, so passing it the raw
   // (unset) env instead of the resolved path would still return an archive here while finding nothing
   // in production.
-  it('activates the brand a DEFAULT marker names without any env set', async () => {
+  test('activates the brand a DEFAULT marker names without any env set', async () => {
     const CONVENTIONAL = [
       resolve('deployment/configurations'),
       resolve('../deployment/configurations'),
@@ -104,12 +106,13 @@ describe('branding bootstrap', () => {
       discoverArchives,
       readArchiveConfig: vi.fn(() => config),
     })
+
     expect(readDefaultMarker).toHaveBeenCalledWith(CONVENTIONAL)
     expect(discoverArchives).toHaveBeenCalledWith(CONVENTIONAL)
     expect(setBranding).toHaveBeenCalledWith(config)
   })
 
-  it('injects the composed config when the active archive resolves', async () => {
+  test('injects the composed config when the active archive resolves', async () => {
     process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
     process.env.OCELOT_ACTIVE_BRANDING = 'acme'
     const archive = { file: '/assets/acme.tar.gz', schemaVersion: '0.0.1' }
@@ -118,12 +121,13 @@ describe('branding bootstrap', () => {
       discoverArchives: vi.fn(() => new Map([['acme', archive]])),
       readArchiveConfig: vi.fn(() => config),
     })
+
     expect(setBranding).toHaveBeenCalledWith(config)
     expect(warnSpy).not.toHaveBeenCalled()
     expect(errorSpy).not.toHaveBeenCalled()
   })
 
-  it('overlays the brand e-mail files from the archive', async () => {
+  test('overlays the brand e-mail files from the archive', async () => {
     process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
     process.env.OCELOT_ACTIVE_BRANDING = 'acme'
     const archive = { file: '/assets/acme.tar.gz', schemaVersion: '0.0.1' }
@@ -136,6 +140,7 @@ describe('branding bootstrap', () => {
     const calls = overlayBrandRuntimeFiles.mock.calls as Array<
       [Map<string, Buffer>, { emailsDir: string }]
     >
+
     expect(calls).toHaveLength(1)
     expect(calls[0][0]).toBe(files)
     // The RESOLVED path, not a substring: bootstrap derives it from its own location, and this spec
@@ -145,17 +150,18 @@ describe('branding bootstrap', () => {
     expect(calls[0][1].emailsDir).toBe(resolve(import.meta.dirname, '..', 'emails'))
   })
 
-  it('warns and keeps defaults when the active brand is not found', async () => {
+  test('warns and keeps defaults when the active brand is not found', async () => {
     process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
     process.env.OCELOT_ACTIVE_BRANDING = 'missing'
     const { setBranding } = await loadBootstrap({
       discoverArchives: vi.fn(() => new Map()), // does not contain 'missing'
     })
+
     expect(setBranding).not.toHaveBeenCalled()
     expect(warnSpy).toHaveBeenCalledWith(expect.stringMatching(/not found/))
   })
 
-  it('warns and keeps defaults when the archive has no readable config', async () => {
+  test('warns and keeps defaults when the archive has no readable config', async () => {
     process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
     process.env.OCELOT_ACTIVE_BRANDING = 'acme'
     const archive = { file: '/assets/acme.tar.gz', schemaVersion: '0.0.1' }
@@ -163,11 +169,12 @@ describe('branding bootstrap', () => {
       discoverArchives: vi.fn(() => new Map([['acme', archive]])),
       readArchiveConfig: vi.fn(() => null),
     })
+
     expect(setBranding).not.toHaveBeenCalled()
     expect(warnSpy).toHaveBeenCalledWith(expect.stringMatching(/no readable config/))
   })
 
-  it('warns on a schema-incompatible archive but still injects the config', async () => {
+  test('warns on a schema-incompatible archive but still injects the config', async () => {
     process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
     process.env.OCELOT_ACTIVE_BRANDING = 'acme'
     const archive = { file: '/assets/acme.tar.gz', schemaVersion: '9.9.9' }
@@ -177,11 +184,12 @@ describe('branding bootstrap', () => {
       readArchiveConfig: vi.fn(() => config),
       checkSchemaCompat: vi.fn(() => 'archive-newer'),
     })
+
     expect(setBranding).toHaveBeenCalledWith(config)
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('schema mismatch'))
   })
 
-  it('logs an error (never throws) when discovery fails', async () => {
+  test('logs an error (never throws) when discovery fails', async () => {
     process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
     process.env.OCELOT_ACTIVE_BRANDING = 'acme'
     const { setBranding } = await loadBootstrap({
@@ -189,6 +197,7 @@ describe('branding bootstrap', () => {
         throw new Error('boom')
       }),
     })
+
     expect(setBranding).not.toHaveBeenCalled()
     expect(errorSpy).toHaveBeenCalledWith(
       expect.stringMatching(/failed to load active brand/),

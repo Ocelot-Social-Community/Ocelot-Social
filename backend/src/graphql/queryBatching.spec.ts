@@ -9,6 +9,8 @@
 /* eslint-disable security/detect-object-injection */
 /* eslint-disable @typescript-eslint/require-await */
 
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
 
@@ -184,7 +186,7 @@ afterAll(async () => {
 // message. A field present on some rows but not others would not be batched any worse, yet
 // could still shift the count, because a loader that no row triggers is never flushed at
 // all. Keep new fixtures uniform, or compare with the per-row ceiling below instead.
-describe('Cypher round trips', () => {
+describe('cypher round trips', () => {
   it('stay constant as the feed grows', async () => {
     const one = await countRoundTrips(FEED_QUERY, { first: 1 })
     const many = await countRoundTrips(FEED_QUERY, { first: 12 })
@@ -242,6 +244,7 @@ describe('Cypher round trips', () => {
     expect(rows).toBe(12)
 
     const withDuplicates = idBatches.filter((ids) => new Set(ids).size !== ids.length)
+
     expect(withDuplicates).toEqual([])
     // Guard the probe: no batches at all would satisfy the assertion vacuously.
     expect(idBatches.length).toBeGreaterThan(0)

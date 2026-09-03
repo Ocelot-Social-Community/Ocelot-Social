@@ -1,3 +1,5 @@
+import { describe, beforeEach, it, expect } from 'vitest'
+
 import CONFIG from '@config/index'
 
 CONFIG.SUPPORT_EMAIL = 'devops@ocelot.social'
@@ -23,7 +25,7 @@ describe('sendRegistrationMail', () => {
   }
 
   describe('with invite code', () => {
-    describe('English', () => {
+    describe('english', () => {
       beforeEach(() => {
         data.locale = 'en'
         data.inviteCode = 'welcome'
@@ -34,7 +36,7 @@ describe('sendRegistrationMail', () => {
       })
     })
 
-    describe('German', () => {
+    describe('german', () => {
       beforeEach(() => {
         data.locale = 'de'
         data.inviteCode = 'welcome'
@@ -47,7 +49,7 @@ describe('sendRegistrationMail', () => {
   })
 
   describe('without invite code', () => {
-    describe('English', () => {
+    describe('english', () => {
       beforeEach(() => {
         data.locale = 'en'
         delete data.inviteCode
@@ -58,7 +60,7 @@ describe('sendRegistrationMail', () => {
       })
     })
 
-    describe('German', () => {
+    describe('german', () => {
       beforeEach(() => {
         data.locale = 'de'
         delete data.inviteCode

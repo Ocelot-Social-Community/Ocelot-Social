@@ -1,6 +1,8 @@
+import { describe, beforeEach, it, expect } from 'vitest'
+
 import { sendResetPasswordMail, defaultParams } from './sendEmail'
 
-describe('sendResetPasswordMail', () => {
+describe(sendResetPasswordMail, () => {
   const data: {
     email: string
     nonce: string
@@ -18,7 +20,7 @@ describe('sendResetPasswordMail', () => {
       defaultParams.SUPPORT_EMAIL = 'support@example.org'
     })
 
-    describe('English', () => {
+    describe('english', () => {
       beforeEach(() => {
         data.locale = 'en'
       })
@@ -28,7 +30,7 @@ describe('sendResetPasswordMail', () => {
       })
     })
 
-    describe('German', () => {
+    describe('german', () => {
       beforeEach(() => {
         data.locale = 'de'
       })
@@ -44,7 +46,7 @@ describe('sendResetPasswordMail', () => {
       delete defaultParams.SUPPORT_EMAIL
     })
 
-    describe('English', () => {
+    describe('english', () => {
       beforeEach(() => {
         data.locale = 'en'
       })
@@ -54,7 +56,7 @@ describe('sendResetPasswordMail', () => {
       })
     })
 
-    describe('German', () => {
+    describe('german', () => {
       beforeEach(() => {
         data.locale = 'de'
       })

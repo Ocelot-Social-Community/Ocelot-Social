@@ -21,6 +21,7 @@ import { PERMISSIONS_CHANGED_CHANNEL, RoleService } from '@src/role'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import { describe, beforeAll, afterAll, beforeEach, test, expect } from 'vitest'
 import type { Mock } from 'vitest'
 
 let authenticatedUser: Context['user']
@@ -92,42 +93,46 @@ describe('role management', () => {
       pubsubMock.publish.mockClear()
     })
 
-    it('does not broadcast on createRole (a brand-new role has no holders yet)', async () => {
+    test('does not broadcast on createRole (a brand-new role has no holders yet)', async () => {
       await mutate({
         mutation: CREATE_ROLE,
         variables: { name: 'fresh-role', permissions: [] },
       })
+
       expect(pubsubMock?.publish).not.toHaveBeenCalled()
     })
 
-    it('broadcasts on updateRole (a role permission set changed)', async () => {
+    test('broadcasts on updateRole (a role permission set changed)', async () => {
       await mutate({
         mutation: UPDATE_ROLE,
         variables: { name: 'broadcast-role', permissions: ['post.pin'] },
       })
+
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
         permissionsChanged: { roleName: 'broadcast-role', previousRoleName: null },
       })
     })
 
-    it('broadcasts on renameRole with BOTH the new and the previous name (selection can follow)', async () => {
+    test('broadcasts on renameRole with BOTH the new and the previous name (selection can follow)', async () => {
       await mutate({
         mutation: RENAME_ROLE,
         variables: { name: 'broadcast-role', newName: 'broadcast-renamed' },
       })
+
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
         permissionsChanged: { roleName: 'broadcast-renamed', previousRoleName: 'broadcast-role' },
       })
     })
 
-    it('broadcasts on deleteRole (former holders fall back to baseline)', async () => {
+    test('broadcasts on deleteRole (former holders fall back to baseline)', async () => {
       await mutate({ mutation: DELETE_ROLE, variables: { name: 'broadcast-role' } })
+
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
         permissionsChanged: { roleName: 'broadcast-role', previousRoleName: null },
       })
     })
 
-    it('broadcasts on setUserRole (the target user permissions changed)', async () => {
+    test('broadcasts on setUserRole (the target user permissions changed)', async () => {
       await Factory.build(
         'user',
         { id: 'member-x', role: 'user' },
@@ -137,12 +142,13 @@ describe('role management', () => {
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-x', roleName: 'broadcast-role' },
       })
+
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
         permissionsChanged: { roleName: 'broadcast-role', previousRoleName: null },
       })
     })
 
-    it('does not fail the already-committed mutation when publish throws synchronously', async () => {
+    test('does not fail the already-committed mutation when publish throws synchronously', async () => {
       // pubsub.publish is typed void | Promise<void>, so it may throw SYNCHRONOUSLY.
       // The DB write has already committed by the time we broadcast — a synchronous
       // throw must be swallowed, not surfaced as a mutation error. Guards the try-wrap
@@ -155,6 +161,7 @@ describe('role management', () => {
         mutation: UPDATE_ROLE,
         variables: { name: 'broadcast-role', permissions: ['post.pin'] },
       })
+
       expect(errors).toBeUndefined()
       expect(data?.updateRole).toMatchObject({
         name: 'broadcast-role',
@@ -164,7 +171,7 @@ describe('role management', () => {
   })
 
   describe('authorization (role.manage)', () => {
-    it('denies permissionCatalog to a plain user', async () => {
+    test('denies permissionCatalog to a plain user', async () => {
       const user = await Factory.build(
         'user',
         { id: 'u', role: 'user' },
@@ -172,22 +179,26 @@ describe('role management', () => {
       )
       authenticatedUser = await user.toJson()
       const { data, errors } = await query({ query: PERMISSION_CATALOG })
-      expect(data).toEqual(null)
+
+      expect(data).toBeNull()
       expect(errors).toEqual([expect.objectContaining({ message: 'Not Authorized!' })])
     })
 
-    it('allows permissionCatalog for an admin, carrying gates without erroring on ungated keys', async () => {
+    test('allows permissionCatalog for an admin, carrying gates without erroring on ungated keys', async () => {
       await asAdmin()
       const { data, errors } = await query({ query: PERMISSION_CATALOG })
+
       // Regression guard: an ungated permission's gatedBy must serialise as null, not
       // undefined (a resolver returning undefined for a nullable field is a GraphQL error).
       expect(errors).toBeUndefined()
+
       const catalog = data.permissionCatalog as Array<{
         key: string
         gatedBy: string | null
         available: boolean
       }>
       const byKey = new Map(catalog.map((p) => [p.key, p] as const))
+
       expect(byKey.get('post.create')).toMatchObject({ gatedBy: null, available: true })
       // gatedBy is now the first CURRENTLY-CLOSED gate (the actionable one). videoConference
       // is effectively off here (no LiveKit env), so it is the gate surfaced for the group
@@ -197,27 +208,29 @@ describe('role management', () => {
       // groupsEnabled defaults on (no env requirement), so group creation is available and
       // has no blocking gate — the group gate is open.
       expect(byKey.get('group.create_public')).toMatchObject({ gatedBy: null, available: true })
+
       // available is a non-null boolean for every entry.
       for (const entry of catalog) {
-        expect(typeof entry.available).toBe('boolean')
+        expect(entry.available).toBeTypeOf('boolean')
       }
     })
   })
 
   describe('resyncCaches', () => {
-    it('is allowed without auth outside production and resyncs the caches', async () => {
+    test('is allowed without auth outside production and resyncs the caches', async () => {
       // NODE_ENV=test → not production → the shield's isNotProduction branch permits it
       // (so db:reset / e2e can trigger a resync when no users exist). The resolver
       // reloads the role + policy caches from the DB and returns true.
       authenticatedUser = null
       const { data, errors } = await mutate({ mutation: RESYNC_CACHES })
+
       expect(errors).toBeUndefined()
       expect(data.resyncCaches).toBe(true)
     })
   })
 
   describe('myPermissions', () => {
-    it('returns the baseline for a member', async () => {
+    test('returns the baseline for a member', async () => {
       const user = await Factory.build(
         'user',
         { id: 'u', role: 'user' },
@@ -226,6 +239,7 @@ describe('role management', () => {
       authenticatedUser = await user.toJson()
       const { data } = await query({ query: MY_PERMISSIONS })
       const keys = data.myPermissions.map((p: { key: string }) => p.key)
+
       expect(keys).toEqual(
         expect.arrayContaining([
           'post.create',
@@ -238,10 +252,11 @@ describe('role management', () => {
       expect(keys).not.toContain('role.manage')
     })
 
-    it('includes admin permissions for an admin, each carrying its catalog group', async () => {
+    test('includes admin permissions for an admin, each carrying its catalog group', async () => {
       await asAdmin()
       const { data } = await query({ query: MY_PERMISSIONS })
       const keys = data.myPermissions.map((p: { key: string }) => p.key)
+
       expect(keys).toEqual(expect.arrayContaining(['role.manage', 'content.moderate']))
       // Every entry carries its group, so the webapp can gate areas by group.
       expect(data.myPermissions).toEqual(
@@ -254,9 +269,10 @@ describe('role management', () => {
   })
 
   describe('roles query', () => {
-    it('lists the seeded roles', async () => {
+    test('lists the seeded roles', async () => {
       await asAdmin()
       const { data, errors } = await query({ query: ROLES })
+
       expect(errors).toBeUndefined()
       expect(data.roles.map((r: { name: string }) => r.name)).toEqual([
         'owner',
@@ -266,7 +282,7 @@ describe('role management', () => {
       ])
     })
 
-    it('counts members by their single HAS_ROLE edge', async () => {
+    test('counts members by their single HAS_ROLE edge', async () => {
       await Factory.build('user', { id: 'm', role: 'user' }, { email: 'm@e.org', password: '1234' })
       await asAdmin() // admin-id, admin edge
       const { data } = await query({ query: ROLES })
@@ -274,6 +290,7 @@ describe('role management', () => {
       const byName: Record<string, number> = Object.fromEntries(
         roleList.map((r) => [r.name, r.memberCount]),
       )
+
       expect(byName.user).toBeGreaterThanOrEqual(1) // the baseline member
       expect(byName.admin).toBeGreaterThanOrEqual(1) // the admin, via its edge
     })
@@ -282,7 +299,7 @@ describe('role management', () => {
   describe('createRole', () => {
     beforeEach(asAdmin)
 
-    it('creates a role, sanitising unknown permissions', async () => {
+    test('creates a role, sanitising unknown permissions', async () => {
       const { data, errors } = await mutate({
         mutation: CREATE_ROLE,
         variables: {
@@ -290,6 +307,7 @@ describe('role management', () => {
           permissions: ['badge.manage', 'ghost.perm'],
         },
       })
+
       expect(errors).toBeUndefined()
       expect(data.createRole).toMatchObject({
         name: 'badge-setter',
@@ -299,19 +317,21 @@ describe('role management', () => {
       })
     })
 
-    it('rejects a duplicate role name', async () => {
+    test('rejects a duplicate role name', async () => {
       const { errors } = await mutate({
         mutation: CREATE_ROLE,
         variables: { name: 'admin', permissions: [] },
       })
+
       expect(errors?.[0].message).toMatch(/already exists/)
     })
 
-    it('rejects an invalid role name', async () => {
+    test('rejects an invalid role name', async () => {
       const { errors } = await mutate({
         mutation: CREATE_ROLE,
         variables: { name: 'has spaces!', permissions: [] },
       })
+
       expect(errors?.[0].message).toMatch(/Invalid role name/)
     })
   })
@@ -319,7 +339,7 @@ describe('role management', () => {
   describe('updateRole', () => {
     beforeEach(asAdmin)
 
-    it('updates a role’s permissions, sanitising unknown ones', async () => {
+    test('updates a role’s permissions, sanitising unknown ones', async () => {
       await mutate({
         mutation: CREATE_ROLE,
         variables: { name: 'badge-setter', permissions: ['badge.manage'] },
@@ -328,6 +348,7 @@ describe('role management', () => {
         mutation: UPDATE_ROLE,
         variables: { name: 'badge-setter', permissions: ['content.moderate', 'ghost.perm'] },
       })
+
       expect(errors).toBeUndefined()
       expect(data.updateRole).toMatchObject({
         name: 'badge-setter',
@@ -337,7 +358,7 @@ describe('role management', () => {
       })
     })
 
-    it('reports the member count of the updated role', async () => {
+    test('reports the member count of the updated role', async () => {
       await Factory.build(
         'user',
         { id: 'holder', role: 'user' },
@@ -352,29 +373,32 @@ describe('role management', () => {
         mutation: UPDATE_ROLE,
         variables: { name: 'held', permissions: ['badge.manage'] },
       })
+
       expect(errors).toBeUndefined()
       expect(data.updateRole.memberCount).toBe(1)
     })
 
-    it('rejects updating an unknown role', async () => {
+    test('rejects updating an unknown role', async () => {
       const { errors } = await mutate({
         mutation: UPDATE_ROLE,
         variables: { name: 'does-not-exist', permissions: [] },
       })
+
       expect(errors?.[0].message).toMatch(/Unknown role/)
     })
 
-    it('forbids editing the protected owner role (RoleValidationError → Forbidden)', async () => {
+    test('forbids editing the protected owner role (RoleValidationError → Forbidden)', async () => {
       const { errors } = await mutate({
         mutation: UPDATE_ROLE,
         variables: { name: 'owner', permissions: [] },
       })
+
       expect(errors?.[0].message).toMatch(/protected/)
     })
   })
 
   describe('userRoles', () => {
-    it('returns the role(s) assigned to a user via their HAS_ROLE edge', async () => {
+    test('returns the role(s) assigned to a user via their HAS_ROLE edge', async () => {
       await Factory.build(
         'user',
         { id: 'target', role: 'user' },
@@ -386,13 +410,14 @@ describe('role management', () => {
         variables: { userId: 'target', roleName: 'moderator' },
       })
       const { data, errors } = await query({ query: USER_ROLES, variables: { userId: 'target' } })
+
       expect(errors).toBeUndefined()
       expect(data.userRoles).toEqual([
         expect.objectContaining({ name: 'moderator', protected: false }),
       ])
     })
 
-    it('returns an empty list for a user without a role edge', async () => {
+    test('returns an empty list for a user without a role edge', async () => {
       await Factory.build(
         'user',
         { id: 'edgeless', role: 'user' },
@@ -405,6 +430,7 @@ describe('role management', () => {
       })
       await asAdmin()
       const { data, errors } = await query({ query: USER_ROLES, variables: { userId: 'edgeless' } })
+
       expect(errors).toBeUndefined()
       expect(data.userRoles).toEqual([])
     })
@@ -413,27 +439,30 @@ describe('role management', () => {
   describe('deleteRole guards', () => {
     beforeEach(asAdmin)
 
-    it('refuses to delete the protected owner role', async () => {
+    test('refuses to delete the protected owner role', async () => {
       const { errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'owner' } })
+
       expect(errors?.[0].message).toMatch(/protected/)
     })
 
-    it('refuses to delete the baseline user role', async () => {
+    test('refuses to delete the baseline user role', async () => {
       const { errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'user' } })
+
       expect(errors?.[0].message).toMatch(/baseline/)
     })
 
-    it('deletes a custom role that no user holds', async () => {
+    test('deletes a custom role that no user holds', async () => {
       await mutate({
         mutation: CREATE_ROLE,
         variables: { name: 'temp', permissions: [] },
       })
       const { data, errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'temp' } })
+
       expect(errors).toBeUndefined()
       expect(data.deleteRole).toBe('temp')
     })
 
-    it('refuses to delete a role that is still assigned to a user', async () => {
+    test('refuses to delete a role that is still assigned to a user', async () => {
       await Factory.build(
         'user',
         { id: 'holder', role: 'user' },
@@ -445,6 +474,7 @@ describe('role management', () => {
       })
       await mutate({ mutation: SET_USER_ROLE, variables: { userId: 'holder', roleName: 'held' } })
       const { errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'held' } })
+
       expect(errors?.[0].message).toMatch(/assigned/)
     })
   })
@@ -452,7 +482,7 @@ describe('role management', () => {
   describe('renameRole', () => {
     beforeEach(asAdmin)
 
-    it('renames a custom role, preserving its permissions and its members', async () => {
+    test('renames a custom role, preserving its permissions and its members', async () => {
       await Factory.build(
         'user',
         { id: 'member-1', role: 'user' },
@@ -479,60 +509,69 @@ describe('role management', () => {
         permissions: ['post.pin'],
         memberCount: 1,
       })
+
       // The old name is gone and the member now reports the new role name.
       const { data: rolesData } = await query({ query: ROLES })
+
       expect(rolesData.roles.map((role: { name: string }) => role.name)).toContain('content-lead')
       expect(rolesData.roles.map((role: { name: string }) => role.name)).not.toContain('editor')
+
       const { data: userData } = await query({
         query: USER_INFO,
         variables: { id: 'member-1' },
       })
+
       expect(userData.User[0].roleName).toBe('content-lead')
     })
 
-    it('forbids renaming the protected owner role', async () => {
+    test('forbids renaming the protected owner role', async () => {
       const { errors } = await mutate({
         mutation: RENAME_ROLE,
         variables: { name: 'owner', newName: 'boss' },
       })
+
       expect(errors?.[0].message).toMatch(/protected/)
     })
 
-    it('forbids renaming the mandatory user role', async () => {
+    test('forbids renaming the mandatory user role', async () => {
       const { errors } = await mutate({
         mutation: RENAME_ROLE,
         variables: { name: 'user', newName: 'member' },
       })
+
       expect(errors?.[0].message).toMatch(/mandatory/)
     })
 
-    it('rejects renaming an unknown role', async () => {
+    test('rejects renaming an unknown role', async () => {
       const { errors } = await mutate({
         mutation: RENAME_ROLE,
         variables: { name: 'nope', newName: 'whatever' },
       })
+
       expect(errors?.[0].message).toMatch(/Unknown role/)
     })
 
-    it('rejects renaming onto an existing role name', async () => {
+    test('rejects renaming onto an existing role name', async () => {
       await mutate({ mutation: CREATE_ROLE, variables: { name: 'editor', permissions: [] } })
       const { errors } = await mutate({
         mutation: RENAME_ROLE,
         variables: { name: 'editor', newName: 'admin' },
       })
+
       expect(errors?.[0].message).toMatch(/already exists/)
     })
 
-    it('rejects an invalid new role name', async () => {
+    test('rejects an invalid new role name', async () => {
       await mutate({ mutation: CREATE_ROLE, variables: { name: 'editor', permissions: [] } })
       const { errors } = await mutate({
         mutation: RENAME_ROLE,
         variables: { name: 'editor', newName: 'Not Valid!' },
       })
+
       expect(errors?.[0].message).toMatch(/Invalid role name/)
     })
 
-    it('maps a uniqueness-constraint race on the write to a stable conflict error', async () => {
+    test('maps a uniqueness-constraint race on the write to a stable conflict error', async () => {
       await mutate({ mutation: CREATE_ROLE, variables: { name: 'editor', permissions: [] } })
       // Lose the race: the pre-check passes (the target name is free), then the write
       // throws the Neo4j uniqueness violation a concurrent rename would cause.
@@ -544,6 +583,7 @@ describe('role management', () => {
         mutation: RENAME_ROLE,
         variables: { name: 'editor', newName: 'reviewer' },
       })
+
       expect(errors?.[0].message).toMatch(/already exists/)
     })
   })
@@ -562,7 +602,7 @@ describe('role management', () => {
       )
     })
 
-    it('sets the single role and reflects it in roleName', async () => {
+    test('sets the single role and reflects it in roleName', async () => {
       await asAdmin()
       await mutate({
         mutation: CREATE_ROLE,
@@ -575,12 +615,15 @@ describe('role management', () => {
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-id', roleName: 'badge-setter' },
       })
+
       expect(errors).toBeUndefined()
+
       const user = await readUser('member-id')
+
       expect(user.roleName).toBe('badge-setter')
     })
 
-    it('replaces the previous role rather than accumulating', async () => {
+    test('replaces the previous role rather than accumulating', async () => {
       await asAdmin()
       await mutate({
         mutation: SET_USER_ROLE,
@@ -591,43 +634,49 @@ describe('role management', () => {
         variables: { userId: 'member-id', roleName: 'admin' },
       })
       const user = await readUser('member-id')
+
       expect(user.roleName).toBe('admin')
     })
 
-    it('rejects an unknown role name', async () => {
+    test('rejects an unknown role name', async () => {
       await asAdmin()
       const { errors } = await mutate({
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-id', roleName: 'no-such-role' },
       })
+
       expect(errors?.[0].message).toMatch(/Unknown role/)
     })
 
-    it('forbids a (non-owner) admin from assigning the owner role', async () => {
+    test('forbids a (non-owner) admin from assigning the owner role', async () => {
       await asAdmin()
       const { errors } = await mutate({
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-id', roleName: 'owner' },
       })
+
       expect(errors?.[0].message).toMatch(/owner/)
     })
 
-    it('lets an owner assign owner, but refuses demoting the last owner', async () => {
+    test('lets an owner assign owner, but refuses demoting the last owner', async () => {
       authenticatedUser = { id: 'owner-actor', roleName: 'owner' } as unknown as Context['user']
       const assigned = await mutate({
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-id', roleName: 'owner' },
       })
+
       expect(assigned.errors).toBeUndefined()
+
       // member is now the only owner → demoting them must be refused
       const { errors } = await mutate({
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-id', roleName: 'user' },
       })
+
       expect(errors?.[0].message).toMatch(/last owner/)
     })
 
-    it('forbids a (non-owner) admin from changing an owner’s role', async () => {
+    test('forbids a (non-owner) admin from changing an owner’s role', async () => {
       // an owner first makes member-id an owner
       authenticatedUser = { id: 'owner-actor', roleName: 'owner' } as unknown as Context['user']
       await mutate({
@@ -640,12 +689,13 @@ describe('role management', () => {
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-id', roleName: 'user' },
       })
+
       expect(errors?.[0].message).toMatch(/owner/)
     })
   })
 
-  describe('User admin search (roleName / search)', () => {
-    it('filters users by their single role', async () => {
+  describe('user admin search (roleName / search)', () => {
+    test('filters users by their single role', async () => {
       await Factory.build(
         'user',
         { id: 'mod1', role: 'moderator' },
@@ -656,13 +706,16 @@ describe('role management', () => {
         query: SEARCH,
         variables: { roleName: 'moderator' },
       })
+
       expect(errors).toBeUndefined()
+
       const ids = data.User.map((u) => u.id)
+
       expect(ids).toContain('mod1')
       expect(ids).not.toContain('admin-id')
     })
 
-    it('combines the role filter with a text search', async () => {
+    test('combines the role filter with a text search', async () => {
       await Factory.build(
         'user',
         { id: 'mod-anna', name: 'Anna', role: 'moderator' },
@@ -678,13 +731,16 @@ describe('role management', () => {
         query: SEARCH,
         variables: { roleName: 'moderator', search: 'ann' },
       })
+
       expect(errors).toBeUndefined()
+
       const ids = data.User.map((u) => u.id)
+
       expect(ids).toContain('mod-anna')
       expect(ids).not.toContain('mod-bob')
     })
 
-    it('forbids the admin search without role.manage', async () => {
+    test('forbids the admin search without role.manage', async () => {
       const plain = await Factory.build(
         'user',
         { id: 'plain', role: 'user' },
@@ -692,6 +748,7 @@ describe('role management', () => {
       )
       authenticatedUser = await plain.toJson()
       const { errors } = await query({ query: SEARCH, variables: { roleName: 'admin' } })
+
       expect(errors?.[0].message).toMatch(/Not Authorized/)
     })
   })

@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import userData from '@graphql/queries/users/userData.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -102,6 +104,7 @@ describe('resolvers/userData', () => {
 
   describe('try to request data of another user', () => {
     variables = { id: 'o-user' }
+
     it('returns the data of the authenticated user', async () => {
       await expect(query({ query: userData, variables })).resolves.toMatchObject({
         data: {

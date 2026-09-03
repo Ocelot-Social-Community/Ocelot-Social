@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { beforeEach, beforeAll, afterAll, describe, afterEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import Signup from '@graphql/queries/auth/Signup.gql'
 import User from '@graphql/queries/users/User.gql'
@@ -119,6 +121,7 @@ describe('authorization', () => {
 
           it("exposes the owner's email address", async () => {
             variables = { name: 'Owner' }
+
             await expect(query({ query: UserEmail, variables })).resolves.toMatchObject({
               data: { User: [{ email: 'owner@example.org' }] },
               errors: undefined,
@@ -163,6 +166,7 @@ describe('authorization', () => {
 
           it("exposes the owner's email address", async () => {
             variables = { name: 'Owner' }
+
             await expect(query({ query: UserEmail, variables })).resolves.toMatchObject({
               data: { User: [{ email: 'owner@example.org' }] },
               errors: undefined,
