@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { User } from '@db/schema/index'
 
 import { TestNode } from './node'
@@ -18,6 +20,7 @@ describe('TestNode.get', () => {
 
   it('keeps a stored falsy value distinguishable from an absent one', () => {
     const user = node({ deleted: false, about: null, name: '' })
+
     expect(user.get('deleted')).toBe(false)
     expect(user.get('about')).toBeNull()
     expect(user.get('name')).toBe('')
@@ -38,6 +41,7 @@ describe('TestNode.properties', () => {
     const user = node({ slug: 'peter-pan' })
     const copy = user.properties()
     copy.slug = 'someone-else'
+
     expect(user.get('slug')).toBe('peter-pan')
   })
 })

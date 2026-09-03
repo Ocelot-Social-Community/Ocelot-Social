@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { describe, beforeEach, it, expect } from 'vitest'
+
 import { isUserOnline } from './isUserOnline'
 
 let user
 
-describe('isUserOnline', () => {
+describe(isUserOnline, () => {
   beforeEach(() => {
     user = {
       lastActiveAt: null,
@@ -11,15 +13,19 @@ describe('isUserOnline', () => {
       lastOnlineStatus: null,
     }
   })
+
   describe('user has lastOnlineStatus `online`', () => {
     it('returns true if he was active within the last 90 seconds', () => {
       user.lastOnlineStatus = 'online'
       user.lastActiveAt = new Date()
+
       expect(isUserOnline(user)).toBe(true)
     })
+
     it('returns false if he was not active within the last 90 seconds', () => {
       user.lastOnlineStatus = 'online'
       user.lastActiveAt = new Date().getTime() - 90001
+
       expect(isUserOnline(user)).toBe(false)
     })
   })
@@ -28,11 +34,14 @@ describe('isUserOnline', () => {
     it('returns true if he went away less then 180 seconds ago', () => {
       user.lastOnlineStatus = 'away'
       user.awaySince = new Date()
+
       expect(isUserOnline(user)).toBe(true)
     })
+
     it('returns false if he went away more then 180 seconds ago', () => {
       user.lastOnlineStatus = 'away'
       user.awaySince = new Date().getTime() - 180001
+
       expect(isUserOnline(user)).toBe(false)
     })
   })

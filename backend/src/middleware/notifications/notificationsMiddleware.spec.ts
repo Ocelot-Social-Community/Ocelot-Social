@@ -4,14 +4,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { jest } from '@jest/globals'
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
-const sendChatMessageMailMock: (notification) => void = jest.fn()
-const sendNotificationMailMock: (notification) => void = jest.fn()
-jest.unstable_mockModule('@src/emails/sendEmail', () => ({
+const sendChatMessageMailMock: (notification) => void = vi.fn()
+const sendNotificationMailMock: (notification) => void = vi.fn()
+vi.mock('@src/emails/sendEmail', () => ({
   sendChatMessageMail: (notification) => {
     sendChatMessageMailMock(notification)
   },
@@ -23,20 +23,20 @@ jest.unstable_mockModule('@src/emails/sendEmail', () => ({
   // registration/verification mails in transitively). Under CommonJS a missing key was
   // simply undefined and only mattered if it was called. The stubs below carry no
   // behaviour — only the two above are asserted on.
-  defaultParams: jest.fn(),
-  sendRegistrationMail: jest.fn(),
-  sendEmailVerification: jest.fn(),
-  sendResetPasswordMail: jest.fn(),
-  sendWrongEmail: jest.fn(),
+  defaultParams: vi.fn(),
+  sendRegistrationMail: vi.fn(),
+  sendEmailVerification: vi.fn(),
+  sendResetPasswordMail: vi.fn(),
+  sendWrongEmail: vi.fn(),
 }))
 
-let isUserOnlineMock = jest.fn()
-jest.unstable_mockModule('../helpers/isUserOnline', () => ({
-  isUserOnline: () => isUserOnlineMock(),
+let isUserOnlineMock = vi.fn<() => boolean>()
+vi.mock('../helpers/isUserOnline', () => ({
+  isUserOnline: (): boolean => isUserOnlineMock(),
 }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { default: pubsubContext } = await import('@context/pubsub')
 const { default: Factory, cleanDatabase } = await import('@db/factories')
 const { default: CreateComment } = await import('@graphql/queries/comments/CreateComment.gql')
@@ -57,7 +57,7 @@ const { default: UpdatePost } = await import('@graphql/queries/posts/UpdatePost.
 const { createApolloTestSetup } = await import('@root/test/helpers')
 
 const pubsub = pubsubContext()
-const pubsubSpy = jest.spyOn(pubsub, 'publish')
+const pubsubSpy = vi.spyOn(pubsub, 'publish')
 
 let notifiedUser
 let authenticatedUser: Context['user']
@@ -161,7 +161,7 @@ describe('notifications', () => {
 
         describe('commenter is not me', () => {
           beforeEach(async () => {
-            jest.clearAllMocks()
+            vi.clearAllMocks()
             commentContent = 'Commenters comment.'
             commentAuthor = await Factory.build(
               'user',
@@ -179,6 +179,7 @@ describe('notifications', () => {
 
           it('sends me a notification and email', async () => {
             await createCommentOnPostAction()
+
             await expect(
               query({
                 query: notifications,
@@ -222,6 +223,7 @@ describe('notifications', () => {
             it('sends me a notification but no email', async () => {
               await notifiedUser.update({ emailNotificationsCommentOnObservedPost: false })
               await createCommentOnPostAction()
+
               await expect(
                 query({
                   query: notifications,
@@ -323,7 +325,7 @@ describe('notifications', () => {
       })
 
       beforeEach(async () => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         postAuthor = await Factory.build(
           'user',
           {
@@ -350,6 +352,7 @@ describe('notifications', () => {
           await createPostAction()
           const expectedContent =
             'Hey <a class="mention" data-mention-id="you" href="/profile/you/al-capone" target="_blank">@al-capone</a> how do you do?'
+
           await expect(
             query({
               query: notifications,
@@ -393,6 +396,7 @@ describe('notifications', () => {
             await createPostAction()
             const expectedContent =
               'Hey <a class="mention" data-mention-id="you" href="/profile/you/al-capone" target="_blank">@al-capone</a> how do you do?'
+
             await expect(
               query({
                 query: notifications,
@@ -427,6 +431,7 @@ describe('notifications', () => {
 
         it('publishes `NOTIFICATION_ADDED` to me', async () => {
           await createPostAction()
+
           expect(pubsubSpy).toHaveBeenCalledWith(
             'NOTIFICATION_ADDED',
             expect.objectContaining({
@@ -493,6 +498,7 @@ describe('notifications', () => {
                 ],
               },
             })
+
             await expect(
               query({
                 query: notifications,
@@ -531,6 +537,7 @@ describe('notifications', () => {
                     read: false,
                   },
                 })
+
                 expect(readBefore).toEqual(true)
                 expect(readAfter).toEqual(false)
               })
@@ -560,6 +567,7 @@ describe('notifications', () => {
                     read: false,
                   },
                 })
+
                 expect(createdAtBefore).toBeTruthy()
                 expect(Date.parse(createdAtBefore)).toEqual(expect.any(Number))
                 expect(createdAtAfter).toBeTruthy()
@@ -594,6 +602,7 @@ describe('notifications', () => {
 
           it('does not publish `NOTIFICATION_ADDED`', async () => {
             await createPostAction()
+
             expect(pubsubSpy).not.toHaveBeenCalled()
           })
         })
@@ -638,6 +647,7 @@ describe('notifications', () => {
 
           it('publishes `NOTIFICATION_ADDED`', async () => {
             await createPostAction()
+
             expect(pubsubSpy).toHaveBeenCalled()
           })
         })
@@ -717,6 +727,7 @@ describe('notifications', () => {
             postContent = 'Content of post where I get mentioned in a comment.'
             postAuthor = notifiedUser
           })
+
           it('sends only one notification with reason commented_on_post, no notification with reason mentioned_in_comment', async () => {
             await createCommentOnPostAction()
             const expected = {
@@ -771,6 +782,7 @@ describe('notifications', () => {
 
           it('sends no notification', async () => {
             await createCommentOnPostAction()
+
             await expect(
               query({
                 query: notifications,
@@ -787,6 +799,7 @@ describe('notifications', () => {
 
           it('does not publish `NOTIFICATION_ADDED` to authenticated user', async () => {
             await createCommentOnPostAction()
+
             expect(pubsubSpy).toHaveBeenCalledWith(
               'NOTIFICATION_ADDED',
               expect.objectContaining({
@@ -823,6 +836,7 @@ describe('notifications', () => {
 
           it('sends me a notification', async () => {
             await createCommentOnPostAction()
+
             await expect(
               query({
                 query: notifications,
@@ -855,6 +869,7 @@ describe('notifications', () => {
 
           it('publishes `NOTIFICATION_ADDED` to authenticated user and me', async () => {
             await createCommentOnPostAction()
+
             expect(pubsubSpy).toHaveBeenCalledWith(
               'NOTIFICATION_ADDED',
               expect.objectContaining({
@@ -879,8 +894,8 @@ describe('notifications', () => {
     let roomId
 
     beforeEach(async () => {
-      jest.clearAllMocks()
-      isUserOnlineMock = jest.fn().mockReturnValue(false)
+      vi.clearAllMocks()
+      isUserOnlineMock = vi.fn().mockReturnValue(false)
 
       chatSender = await Factory.build(
         'user',
@@ -914,12 +929,12 @@ describe('notifications', () => {
 
       // Reset mocks after init message to avoid contamination
       pubsubSpy.mockClear()
-      ;(sendChatMessageMailMock as jest.Mock).mockClear()
+      vi.mocked(sendChatMessageMailMock).mockClear()
     })
 
     describe('if the chatReceiver is online', () => {
       it('publishes subscriptions but sends no email', async () => {
-        isUserOnlineMock = jest.fn().mockReturnValue(true)
+        isUserOnlineMock = vi.fn().mockReturnValue(true)
 
         await mutate({
           mutation: CreateMessage,
@@ -954,7 +969,7 @@ describe('notifications', () => {
 
     describe('if the chatReceiver is offline', () => {
       it('publishes subscriptions and sends an email', async () => {
-        isUserOnlineMock = jest.fn().mockReturnValue(false)
+        isUserOnlineMock = vi.fn().mockReturnValue(false)
 
         await mutate({
           mutation: CreateMessage,
@@ -1002,7 +1017,7 @@ describe('notifications', () => {
 
     describe('if the chatReceiver has blocked chatSender', () => {
       it('publishes no subscriptions and sends no email', async () => {
-        isUserOnlineMock = jest.fn().mockReturnValue(false)
+        isUserOnlineMock = vi.fn().mockReturnValue(false)
         await chatReceiver.relateTo(chatSender, 'blocked')
 
         await mutate({
@@ -1022,7 +1037,7 @@ describe('notifications', () => {
 
     describe('if the chatReceiver has muted chatSender', () => {
       it('publishes no subscriptions and sends no email', async () => {
-        isUserOnlineMock = jest.fn().mockReturnValue(false)
+        isUserOnlineMock = vi.fn().mockReturnValue(false)
         await chatReceiver.relateTo(chatSender, 'muted')
 
         await mutate({
@@ -1042,7 +1057,7 @@ describe('notifications', () => {
 
     describe('if the chatReceiver has disabled `emailNotificationsChatMessage`', () => {
       it('publishes subscriptions but sends no email', async () => {
-        isUserOnlineMock = jest.fn().mockReturnValue(false)
+        isUserOnlineMock = vi.fn().mockReturnValue(false)
         await chatReceiver.update({ emailNotificationsChatMessage: false })
 
         await mutate({
@@ -1105,12 +1120,12 @@ describe('notifications', () => {
         groupRoomId = createRoomResult.data.CreateGroupRoom.id
 
         pubsubSpy.mockClear()
-        ;(sendChatMessageMailMock as jest.Mock).mockClear()
+        vi.mocked(sendChatMessageMailMock).mockClear()
       })
 
       describe('if the chatReceiver has muted the group', () => {
         it('publishes subscriptions but sends no email', async () => {
-          isUserOnlineMock = jest.fn().mockReturnValue(false)
+          isUserOnlineMock = vi.fn().mockReturnValue(false)
           authenticatedUser = await chatReceiver.toJson()
           await mutate({
             mutation: muteGroup,
@@ -1139,7 +1154,7 @@ describe('notifications', () => {
 
       describe('if the chatReceiver has not muted the group', () => {
         it('publishes subscriptions and sends an email', async () => {
-          isUserOnlineMock = jest.fn().mockReturnValue(false)
+          isUserOnlineMock = vi.fn().mockReturnValue(false)
 
           await mutate({
             mutation: CreateMessage,
@@ -1205,11 +1220,12 @@ describe('notifications', () => {
       }
 
       beforeEach(async () => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
       })
 
       it('sends the group owner a notification and email', async () => {
         await joinGroupAction()
+
         await expect(
           query({
             query: notifications,
@@ -1253,6 +1269,7 @@ describe('notifications', () => {
         it('sends the group owner a notification but no email', async () => {
           await groupOwner.update({ emailNotificationsGroupMemberJoined: false })
           await joinGroupAction()
+
           await expect(
             query({
               query: notifications,
@@ -1302,7 +1319,7 @@ describe('notifications', () => {
       }
 
       beforeEach(async () => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         authenticatedUser = await notifiedUser.toJson()
         await mutate({
           mutation: JoinGroup,
@@ -1315,6 +1332,7 @@ describe('notifications', () => {
 
       it('sends the group owner two notifications and emails', async () => {
         await leaveGroupAction()
+
         await expect(
           query({
             query: notifications,
@@ -1377,6 +1395,7 @@ describe('notifications', () => {
         it('sends the group owner two notification but only only one email', async () => {
           await groupOwner.update({ emailNotificationsGroupMemberLeft: false })
           await leaveGroupAction()
+
           await expect(
             query({
               query: notifications,
@@ -1449,11 +1468,12 @@ describe('notifications', () => {
           },
         })
         // Clear after because the above generates a notification not related
-        jest.clearAllMocks()
+        vi.clearAllMocks()
       })
 
       it('sends the group member a notification and email', async () => {
         await changeGroupMemberRoleAction()
+
         await expect(
           query({
             query: notifications,
@@ -1497,6 +1517,7 @@ describe('notifications', () => {
         it('sends the group member a notification but no email', async () => {
           notifiedUser.update({ emailNotificationsGroupMemberRoleChanged: false })
           await changeGroupMemberRoleAction()
+
           await expect(
             query({
               query: notifications,
@@ -1555,11 +1576,12 @@ describe('notifications', () => {
           },
         })
         // Clear after because the above generates a notification not related
-        jest.clearAllMocks()
+        vi.clearAllMocks()
       })
 
       it('sends the previous group member a notification and email', async () => {
         await removeUserFromGroupAction()
+
         await expect(
           query({
             query: notifications,
@@ -1603,6 +1625,7 @@ describe('notifications', () => {
         it('sends the previous group member a notification but no email', async () => {
           notifiedUser.update({ emailNotificationsGroupMemberRemoved: false })
           await removeUserFromGroupAction()
+
           await expect(
             query({
               query: notifications,

@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest'
+
 import { entities, Post, relationships, Role, User } from '@db/schema/index'
 
 import { auditFor, auditQueryFor, auditsFor } from './audit'
@@ -21,12 +23,14 @@ describe('the enforced/audited partition', () => {
     for (const rule of RULES) {
       const enforced = statementFor(rule, profile) !== null
       const audited = auditFor(rule, profile) !== null
+
       expect({ rule, enforced, audited }).toMatchObject({ enforced: !audited, audited: !enforced })
     }
   })
 
   it('shifts rules from audited to enforced as the backend gains capability', () => {
     const audited = PROFILES.map((profile) => auditsFor(RULES, profile).length)
+
     expect(audited).toEqual([...audited].sort((a, b) => b - a))
     // Memgraph enforces strictly more of the same declaration than Neo4j Community does.
     expect(audited[audited.length - 1]).toBeLessThan(audited[0])
@@ -223,6 +227,7 @@ describe('generated queries', () => {
 describe('coverage of the pilot registry', () => {
   it.each([User.label, Role.label, Post.label])('produces node audits for %s', (label) => {
     const violations = auditsFor(RULES, 'neo4j-community').map((query) => query.violation)
+
     expect(violations.some((violation) => violation.startsWith(`${label}.`))).toBe(true)
   })
 
@@ -235,6 +240,7 @@ describe('coverage of the pilot registry', () => {
 
   it('gives every audit a stable, unique identifier', () => {
     const violations = auditsFor(RULES, 'neo4j-community').map((query) => query.violation)
+
     expect(new Set(violations).size).toBe(violations.length)
   })
 })

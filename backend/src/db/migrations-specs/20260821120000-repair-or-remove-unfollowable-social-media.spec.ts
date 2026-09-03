@@ -1,9 +1,10 @@
-import { jest } from '@jest/globals'
-// ESM has no automock: unstable_mockModule requires an explicit factory.
-jest.unstable_mockModule('@db/neo4j', () => ({ getDriver: jest.fn() }))
+// ESM has no automock: `vi.mock` requires an explicit factory.
+import { describe, expect, it, beforeEach, afterEach } from 'vitest'
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+vi.mock('@db/neo4j', () => ({ getDriver: vi.fn() }))
+
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { forLog, repair, up } =
   await import('@db/migrations/20260821120000-repair-or-remove-unfollowable-social-media')
 const { getDriver } = await import('@db/neo4j')
@@ -14,7 +15,7 @@ const { getDriver } = await import('@db/neo4j')
 //
 // NOT beside its subject, which is the convention everywhere else in this repository, because
 // `node-migrate` requires EVERY entry that `readdir` returns for --migrations-dir. A spec left
-// in there is loaded by the runner, `describe` is not defined outside jest, and `db:migrate up`
+// in there is loaded by the runner, `describe` is not defined outside it, and `db:migrate up`
 // dies before it reaches the first real migration — in the init container, on every deploy.
 // Measured, not assumed: `yarn db:migrate list` reproduces it, and a `__tests__/` subdirectory
 // does not help, because the loader `require`s the directory entry too. The only fix is to be
@@ -170,6 +171,7 @@ describe('repair', () => {
     // result against the stored value to decide whether to write at all.
     for (const url of ['mastodon.social/@user', 'someone@example.org', 'mailto:a@b.org?x=1']) {
       const once = repair(url)
+
       expect(once).not.toBeNull()
       expect(repair(once as string)).toBe(once)
     }
@@ -263,15 +265,15 @@ describe('up', () => {
         ),
       close: async () => Promise.resolve(),
     }
-    jest.mocked(getDriver).mockReturnValue({ session: () => session } as never)
-    jest.spyOn(console, 'log').mockImplementation((line: string) => {
+    vi.mocked(getDriver).mockReturnValue({ session: () => session } as never)
+    vi.spyOn(console, 'log').mockImplementation((line: string) => {
       events.push(`log ${line.trim()}`)
     })
     await up(undefined)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('names a url before the write that destroys it', () => {
@@ -280,6 +282,7 @@ describe('up', () => {
     // names nothing. The order is the promise.
     const removal = events.indexOf('write s2')
     const naming = events.findIndex((event) => event.includes('example.org/pub'))
+
     expect(naming).toBeGreaterThanOrEqual(0)
     expect(naming).toBeLessThan(removal)
   })
@@ -288,6 +291,7 @@ describe('up', () => {
     // The quieter half of the same problem: `SET s.url = $url` overwrites the only copy.
     const write = events.indexOf('write s1')
     const naming = events.findIndex((event) => event.includes('mailto:a@example.org'))
+
     expect(naming).toBeGreaterThanOrEqual(0)
     expect(naming).toBeLessThan(write)
   })
@@ -296,6 +300,7 @@ describe('up', () => {
     // Logging the old value redacted and the new one raw put the token in the log anyway, by
     // the other half of the same line.
     const line = events.find((event) => event.includes('example.org/x'))
+
     expect(line).toBeDefined()
     expect(line).not.toContain('token=abc')
     expect(line).toContain('https://example.org/x (query removed)')
@@ -306,6 +311,7 @@ describe('up', () => {
     // password or someone else's address into it would leave the migration undoing itself —
     // removing the value from the public profile and keeping it somewhere less guarded.
     const log = events.filter((event) => event.startsWith('log ')).join('\n')
+
     expect(log).not.toContain('secret')
     expect(log).not.toContain('evil@example.tld')
     // Still enough to act on: the owner and the link they lost.
@@ -322,3 +328,6 @@ describe('up', () => {
     expect(events[0]).toBe('log SocialMedia urls: 3 checked, 2 to repair, 1 to remove')
   })
 })
+
+// No imports left after the vitest switch — without this the file is a script, not a
+// module: its top-level consts would collide across specs and `await` would be illegal.

@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable jest/expect-expect */
+/* eslint-disable vitest/expect-expect */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { createHash } from 'node:crypto'
 import { setTimeout as delay } from 'node:timers/promises'
+
+import { beforeAll, afterAll, afterEach, describe, expect, beforeEach, it } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
@@ -40,7 +42,7 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('decode', () => {
+describe(decode, () => {
   let authorizationHeader: string | undefined | null
   const returnsNull = async () => {
     await expect(decode(context)(authorizationHeader)).resolves.toBeNull()
@@ -94,6 +96,7 @@ describe('decode', () => {
           return tx.run(`MATCH (k:ApiKey { id: 'ak1' }) RETURN k.lastUsedAt AS lastUsedAt`)
         })
         await session.close()
+
         expect(result.records[0].get('lastUsedAt')).toBeTruthy()
       })
     })
@@ -262,6 +265,7 @@ describe('decode', () => {
     describe('and corresponding user in the database', () => {
       let user
       let validAuthorizationHeader: string
+
       beforeEach(async () => {
         user = await Factory.build(
           'user',
@@ -292,9 +296,12 @@ describe('decode', () => {
 
       it('does not set `lastActiveAt`', async () => {
         let user = await neode.first('User', { id: 'u3' }, undefined)
+
         await expect(user.toJson()).resolves.not.toHaveProperty('lastActiveAt')
+
         await decode(context)(validAuthorizationHeader)
         user = await neode.first('User', { id: 'u3' }, undefined)
+
         await expect(user.toJson()).resolves.not.toHaveProperty('lastActiveAt')
       })
 
@@ -305,11 +312,14 @@ describe('decode', () => {
 
           lastActiveAt: '2019-10-03T23:33:08.598Z',
         })
+
         await expect(user.toJson()).resolves.toMatchObject({
           lastActiveAt: '2019-10-03T23:33:08.598Z',
         })
+
         await decode(context)(validAuthorizationHeader)
         user = await neode.first('User', { id: 'u3' }, undefined)
+
         await expect(user.toJson()).resolves.toMatchObject({
           lastActiveAt: '2019-10-03T23:33:08.598Z',
         })

@@ -6,6 +6,8 @@
 // the id-uniqueness encoding) is verified end-to-end. PolicyService.spec.ts
 // mocks this module; here we run it for real.
 
+import { beforeEach, afterAll, describe, it, expect } from 'vitest'
+
 import databaseContext from '@context/database'
 import { cleanDatabase } from '@db/factories'
 
@@ -48,6 +50,7 @@ describe('writeSetting / readAllSettings', () => {
     await writeSetting(db, 'branding', 'logo', 'url', 'admin-1')
 
     const policy = await readAllSettings(db, POLICY_NAMESPACE)
+
     expect(policy).toEqual({ publicRegistration: true })
   })
 
@@ -56,12 +59,14 @@ describe('writeSetting / readAllSettings', () => {
     await writeSetting(db, POLICY_NAMESPACE, 'publicRegistration', true, 'admin-2')
 
     const settings = await readAllSettings(db, POLICY_NAMESPACE)
+
     expect(settings).toEqual({ publicRegistration: true })
 
     const result = await db.query({
       query: `MATCH (s:Setting {namespace: $namespace, key: $key}) RETURN count(s) AS n`,
       variables: { namespace: POLICY_NAMESPACE, key: 'publicRegistration' },
     })
+
     expect(result.records[0].get('n').toNumber()).toBe(1)
   })
 
@@ -72,6 +77,7 @@ describe('writeSetting / readAllSettings', () => {
       query: `MATCH (s:Setting {namespace: $namespace, key: $key}) RETURN s.id AS id`,
       variables: { namespace: POLICY_NAMESPACE, key: 'publicRegistration' },
     })
+
     expect(result.records[0].get('id')).toBe('policy.publicRegistration')
   })
 
@@ -84,6 +90,7 @@ describe('writeSetting / readAllSettings', () => {
     })
 
     const settings = await readAllSettings(db, POLICY_NAMESPACE)
+
     expect(settings).toEqual({ publicRegistration: true }) // 'broken' silently skipped
   })
 
@@ -92,13 +99,14 @@ describe('writeSetting / readAllSettings', () => {
   })
 })
 
-describe('readLastChange', () => {
+describe(readLastChange, () => {
   it('returns null when nothing has been written', async () => {
     expect(await readLastChange(db, POLICY_NAMESPACE)).toBeNull()
   })
 
   it('ignores system writes (actor "system:*")', async () => {
     await writeSetting(db, POLICY_NAMESPACE, 'publicRegistration', true, 'system:seed')
+
     expect(await readLastChange(db, POLICY_NAMESPACE)).toBeNull()
   })
 
@@ -107,17 +115,22 @@ describe('readLastChange', () => {
     await writeSetting(db, POLICY_NAMESPACE, 'inviteRegistration', true, 'admin-7')
 
     const last = await readLastChange(db, POLICY_NAMESPACE)
+
     expect(last?.actor).toBe('admin-7')
     expect(typeof last?.timestamp).toBe('string')
   })
 })
 
-describe('deleteSetting', () => {
+describe(deleteSetting, () => {
   it('removes the setting node', async () => {
     await writeSetting(db, POLICY_NAMESPACE, 'publicRegistration', true, 'admin-1')
-    expect(await readAllSettings(db, POLICY_NAMESPACE)).toEqual({ publicRegistration: true })
+
+    await expect(readAllSettings(db, POLICY_NAMESPACE)).resolves.toEqual({
+      publicRegistration: true,
+    })
 
     await deleteSetting(db, POLICY_NAMESPACE, 'publicRegistration')
+
     expect(await readAllSettings(db, POLICY_NAMESPACE)).toEqual({})
   })
 

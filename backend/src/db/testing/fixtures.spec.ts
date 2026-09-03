@@ -1,3 +1,5 @@
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
+
 import { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
 
@@ -47,6 +49,7 @@ describe('fixtures.first', () => {
 
   it('still matches when every condition holds', async () => {
     const user = await fixtures.first('User', { id: 'gone', deleted: true, name: 'Gone' })
+
     expect(user.get('id')).toBe('gone')
   })
 
@@ -79,6 +82,7 @@ describe('TestNode.update against a real node', () => {
     // properties — what is checked is the stored node with the patch applied.
     const node = await fixtures.first('User', { id: 'live' })
     await node.update({ deleted: true })
+
     expect(node.get('deleted')).toBe(true)
     expect(node.get('name')).toBe('Live')
   })
@@ -99,6 +103,7 @@ describe('TestNode.update against a real node', () => {
     )
     const node = await fixtures.first('User', { id: 'doomed' })
     await run(`MATCH (n:User {id: 'doomed'}) DETACH DELETE n`)
+
     await expect(node.update({ name: 'Renamed' })).rejects.toThrow('the node does not exist')
   })
 
@@ -115,6 +120,7 @@ describe('TestNode.update against a real node', () => {
     )
     const node = await fixtures.first('User', { id: 'arrow' })
     await run(`MATCH (n:User {id: 'arrow'}) DETACH DELETE n`)
+
     await expect(node.relateTo(node, alias)).rejects.toThrow(arrow)
   })
 
@@ -132,6 +138,7 @@ describe('TestNode.update against a real node', () => {
     )
     const a = await fixtures.first('User', { id: 'edge-a' })
     const b = await fixtures.first('User', { id: 'edge-b' })
+
     await expect(a.relateTo(b, 'following', { createdAtd: now })).rejects.toThrow(
       '[:FOLLOWS] declares no property createdAtd',
     )
@@ -146,6 +153,7 @@ describe('TestNode.update against a real node', () => {
     // written: the query stores the normalised patch, not the raw one.
     const node = await fixtures.first('User', { id: 'live' })
     await node.update({ slug: 'Peter Pan' })
+
     expect(node.get('slug')).toBe('peter-pan')
   })
 
@@ -155,6 +163,7 @@ describe('TestNode.update against a real node', () => {
     await run(`MATCH (n:User {id: 'gone'}) SET n.myRole = 'owner'`)
     const node = await fixtures.first('User', { id: 'gone' })
     await node.update({ name: 'Gone Away' })
+
     expect(node.get('name')).toBe('Gone Away')
     expect(node.get('myRole')).toBe('owner')
   })

@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { jest } from '@jest/globals'
+
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
-const sendNotificationMailMock: (notification) => void = jest.fn()
-jest.unstable_mockModule('@src/emails/sendEmail', () => ({
+const sendNotificationMailMock: (notification) => void = vi.fn()
+vi.mock('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => {
     sendNotificationMailMock(notification)
   },
@@ -16,16 +17,16 @@ jest.unstable_mockModule('@src/emails/sendEmail', () => ({
   // registration/verification mails in transitively). Under CommonJS a missing key was
   // simply undefined and only mattered if it was called. The stubs below carry no
   // behaviour — only the two above are asserted on.
-  defaultParams: jest.fn(),
-  sendChatMessageMail: jest.fn(),
-  sendRegistrationMail: jest.fn(),
-  sendEmailVerification: jest.fn(),
-  sendResetPasswordMail: jest.fn(),
-  sendWrongEmail: jest.fn(),
+  defaultParams: vi.fn(),
+  sendChatMessageMail: vi.fn(),
+  sendRegistrationMail: vi.fn(),
+  sendEmailVerification: vi.fn(),
+  sendResetPasswordMail: vi.fn(),
+  sendWrongEmail: vi.fn(),
 }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { default: Factory, cleanDatabase } = await import('@db/factories')
 const { default: CreateGroup } = await import('@graphql/queries/groups/CreateGroup.gql')
 const { default: followUser } = await import('@graphql/queries/interactions/followUser.gql')
@@ -135,7 +136,7 @@ describe('following users notifications', () => {
       mutation: followUser,
       variables: { id: 'post-author' },
     })
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('the followed user writes a post', () => {
@@ -167,6 +168,7 @@ describe('following users notifications', () => {
 
     it('sends notification to the first follower', async () => {
       authenticatedUser = await firstFollower.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -191,6 +193,7 @@ describe('following users notifications', () => {
 
     it('sends notification to the second follower', async () => {
       authenticatedUser = await secondFollower.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -215,6 +218,7 @@ describe('following users notifications', () => {
 
     it('sends notification to the email-less follower', async () => {
       authenticatedUser = await emaillessFollower.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -294,6 +298,7 @@ describe('following users notifications', () => {
 
     it('sends a notification to the first follower', async () => {
       authenticatedUser = await firstFollower.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -365,6 +370,7 @@ describe('following users notifications', () => {
 
     it('sends NO notification to the first follower', async () => {
       authenticatedUser = await firstFollower.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -436,6 +442,7 @@ describe('following users notifications', () => {
 
     it('sends NO notification to the first follower', async () => {
       authenticatedUser = await firstFollower.toJson()
+
       await expect(
         query({
           query: notifications,

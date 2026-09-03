@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`sendResetPasswordMail with support English renders correctly 1`] = `
+exports[`sendResetPasswordMail > with support > English > renders correctly 1`] = `
 {
   "attachments": [],
   "from": {
@@ -146,7 +146,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendResetPasswordMail with support German renders correctly 1`] = `
+exports[`sendResetPasswordMail > with support > German > renders correctly 1`] = `
 {
   "attachments": [],
   "from": {
@@ -293,7 +293,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendResetPasswordMail without support English renders correctly 1`] = `
+exports[`sendResetPasswordMail > without support > English > renders correctly 1`] = `
 {
   "attachments": [],
   "from": {
@@ -433,7 +433,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendResetPasswordMail without support German renders correctly 1`] = `
+exports[`sendResetPasswordMail > without support > German > renders correctly 1`] = `
 {
   "attachments": [],
   "from": {

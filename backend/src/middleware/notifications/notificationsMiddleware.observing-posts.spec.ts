@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { jest } from '@jest/globals'
+
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
-const sendNotificationMailMock: (notification) => void = jest.fn()
-jest.unstable_mockModule('@src/emails/sendEmail', () => ({
+const sendNotificationMailMock: (notification) => void = vi.fn()
+vi.mock('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => {
     sendNotificationMailMock(notification)
   },
@@ -16,16 +17,16 @@ jest.unstable_mockModule('@src/emails/sendEmail', () => ({
   // registration/verification mails in transitively). Under CommonJS a missing key was
   // simply undefined and only mattered if it was called. The stubs below carry no
   // behaviour — only the two above are asserted on.
-  defaultParams: jest.fn(),
-  sendChatMessageMail: jest.fn(),
-  sendRegistrationMail: jest.fn(),
-  sendEmailVerification: jest.fn(),
-  sendResetPasswordMail: jest.fn(),
-  sendWrongEmail: jest.fn(),
+  defaultParams: vi.fn(),
+  sendChatMessageMail: vi.fn(),
+  sendRegistrationMail: vi.fn(),
+  sendEmailVerification: vi.fn(),
+  sendResetPasswordMail: vi.fn(),
+  sendWrongEmail: vi.fn(),
 }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { default: Factory, cleanDatabase } = await import('@db/factories')
 const { default: CreateComment } = await import('@graphql/queries/comments/CreateComment.gql')
 const { default: notifications } = await import('@graphql/queries/notifications/notifications.gql')
@@ -150,6 +151,7 @@ describe('notifications for users that observe a post', () => {
 
     it('sends notification to the author', async () => {
       authenticatedUser = await postAuthor.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -184,7 +186,7 @@ describe('notifications for users that observe a post', () => {
 
     describe('second comment on post', () => {
       beforeAll(async () => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         authenticatedUser = await secondCommenter.toJson()
         await mutate({
           mutation: CreateComment,
@@ -212,6 +214,7 @@ describe('notifications for users that observe a post', () => {
 
       it('sends notification to the author', async () => {
         authenticatedUser = await postAuthor.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -244,6 +247,7 @@ describe('notifications for users that observe a post', () => {
 
       it('sends notification to first commenter', async () => {
         authenticatedUser = await firstCommenter.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -285,7 +289,7 @@ describe('notifications for users that observe a post', () => {
 
     describe('first commenter unfollows the post and post author comments post', () => {
       beforeAll(async () => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         authenticatedUser = await firstCommenter.toJson()
         await mutate({
           mutation: toggleObservePost,
@@ -339,6 +343,7 @@ describe('notifications for users that observe a post', () => {
 
       it('sends no new notification to first commenter', async () => {
         authenticatedUser = await firstCommenter.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -363,6 +368,7 @@ describe('notifications for users that observe a post', () => {
 
       it('sends notification to second commenter', async () => {
         authenticatedUser = await secondCommenter.toJson()
+
         await expect(
           query({
             query: notifications,

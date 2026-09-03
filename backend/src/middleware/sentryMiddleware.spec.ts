@@ -1,21 +1,26 @@
-import { jest } from '@jest/globals'
+import { beforeEach, describe, it, expect } from 'vitest'
 
-jest.unstable_mockModule('@sentry/node', () => ({
-  init: jest.fn(),
-  withScope: jest.fn(),
-  captureException: jest.fn(),
+import type { Mock } from 'vitest'
+
+vi.mock('@sentry/node', () => ({
+  init: vi.fn(),
+  withScope: vi.fn(),
+  captureException: vi.fn(),
 }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { init, withScope, captureException } = await import('@sentry/node')
 const { createSentryMiddleware } = await import('./sentryMiddleware')
 
-const initMock = init as jest.Mock
-// Signature stated: the tests configure this one with mockImplementation, and
-// `Mock<UnknownFunction>` accepts no implementation under @jest/globals.
-const withScopeMock = withScope as unknown as jest.Mock<(run: (scope: unknown) => void) => void>
-const captureExceptionMock = captureException as jest.Mock
+const initMock = vi.mocked(init)
+// Signature stated: the tests configure this one with mockImplementation, and a bare `vi.fn()`
+// would type its argument as `any` instead of checking it against the real callback.
+// Cast rather than vi.mocked(withScope): Sentry's real signature is
+// `(scope, callback) => unknown`, while the middleware only ever calls the single-argument form
+// — typing the stub to what is actually used keeps the implementations below honest.
+const withScopeMock = withScope as unknown as Mock<(run: (scope: unknown) => void) => void>
+const captureExceptionMock = vi.mocked(captureException)
 
 beforeEach(() => {
   initMock.mockReset()
@@ -27,14 +32,13 @@ describe('createSentryMiddleware', () => {
   describe('without a DSN', () => {
     it('does not call Sentry.init', () => {
       createSentryMiddleware({})
+
       expect(initMock).not.toHaveBeenCalled()
     })
 
     it('returns a passthrough middleware that forwards arguments to resolve', async () => {
       const middleware = createSentryMiddleware({})
-      const resolve = jest
-        .fn<(...args: unknown[]) => Promise<unknown>>()
-        .mockResolvedValue('result')
+      const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue('result')
       const root = { r: 1 }
       const args = { a: 1 }
       const context = { c: 1 }
@@ -48,7 +52,7 @@ describe('createSentryMiddleware', () => {
     it('propagates errors from resolve without capturing them', async () => {
       const middleware = createSentryMiddleware({})
       const error = new Error('boom')
-      const resolve = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockRejectedValue(error)
+      const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockRejectedValue(error)
 
       await expect(middleware(resolve, {}, {}, {}, {})).rejects.toBe(error)
       expect(captureExceptionMock).not.toHaveBeenCalled()
@@ -72,7 +76,7 @@ describe('createSentryMiddleware', () => {
 
     it('forwards successful resolver results without reporting', async () => {
       const middleware = createSentryMiddleware({ dsn: 'x' })
-      const resolve = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue('ok')
+      const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue('ok')
 
       await expect(middleware(resolve, {}, {}, {}, {})).resolves.toBe('ok')
       expect(withScopeMock).not.toHaveBeenCalled()
@@ -82,7 +86,7 @@ describe('createSentryMiddleware', () => {
     it('captures errors with user and request metadata, then rethrows', async () => {
       const middleware = createSentryMiddleware({ dsn: 'x' })
       const error = new Error('boom')
-      const resolve = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockRejectedValue(error)
+      const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockRejectedValue(error)
       const context = {
         user: { id: 'user-42' },
         req: {
@@ -92,8 +96,8 @@ describe('createSentryMiddleware', () => {
       }
 
       const scope = {
-        setUser: jest.fn<(...args: unknown[]) => void>(),
-        setExtra: jest.fn<(...args: unknown[]) => void>(),
+        setUser: vi.fn<(...args: unknown[]) => void>(),
+        setExtra: vi.fn<(...args: unknown[]) => void>(),
       }
       withScopeMock.mockImplementation((run: (s: typeof scope) => void) => {
         run(scope)
@@ -111,11 +115,11 @@ describe('createSentryMiddleware', () => {
     it('handles missing user and request metadata gracefully', async () => {
       const middleware = createSentryMiddleware({ dsn: 'x' })
       const error = new Error('boom')
-      const resolve = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockRejectedValue(error)
+      const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockRejectedValue(error)
 
       const scope = {
-        setUser: jest.fn(),
-        setExtra: jest.fn(),
+        setUser: vi.fn(),
+        setExtra: vi.fn(),
       }
       withScopeMock.mockImplementation((run: (s: typeof scope) => void) => {
         run(scope)
