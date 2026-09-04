@@ -360,8 +360,8 @@ describe('distanceToMe', () => {
 // reporting a distance to somewhere the viewer never asked about.
 describe('Location.distanceToMe', () => {
   it('refuses a parent it cannot identify', async () => {
-    await expect(
-      locationsResolvers.Location.distanceToMe({}, {}, null, null),
-    ).rejects.toThrow('Can not identify selected Location!')
+    await expect(locationsResolvers.Location.distanceToMe({}, {}, null, null)).rejects.toThrow(
+      'Can not identify selected Location!',
+    )
   })
 })

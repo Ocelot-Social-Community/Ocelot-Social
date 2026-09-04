@@ -10,6 +10,8 @@
 //
 // The contexts below are deliberately incomplete — no driver, no database. A resolver that got
 // past its guard fails loudly here instead of quietly writing somewhere.
+import { setImmediate } from 'node:timers/promises'
+
 import { describe, it, expect } from 'vitest'
 
 import apiKeysResolvers from './apiKeys'
@@ -81,9 +83,10 @@ describe(publishPermissionsChanged, () => {
     expect(() => {
       publishPermissionsChanged(context, 'moderator')
     }).not.toThrow()
+
     // Let the rejected promise settle: an unhandled rejection here would fail the run, which is
     // exactly what the `.catch` prevents in production.
-    await new Promise((resolve) => setImmediate(resolve))
+    await setImmediate()
 
     expect(publish).toHaveBeenCalledTimes(1)
   })

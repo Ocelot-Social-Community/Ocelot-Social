@@ -1046,7 +1046,10 @@ describe('UpdatePost', () => {
         variables: { id: newlyCreatedPost.id },
       })
 
-      const { errors } = await mutate({ mutation: UpdatePost, variables: { ...variables, image: null } })
+      const { errors } = await mutate({
+        mutation: UpdatePost,
+        variables: { ...variables, image: null },
+      })
 
       expect(errors).toBeUndefined()
 

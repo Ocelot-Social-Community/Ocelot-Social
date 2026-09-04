@@ -58,6 +58,25 @@ describe('chatMiddleware', () => {
     expect(resolved.users[0]._id).toBe('u1')
   })
 
+  // The room's OWN `_id` is not what the chat front end needs on a preview line — it renders the
+  // last message from the room list without fetching it again, and keys that entry by `_id` too.
+  // The room resolver hands `lastMessage` back as the raw node, which carries only `id`, so a room
+  // that has been written in must get the alias pushed one level down as well.
+  it('adds the _id alias to the last message of a room that has one', async () => {
+    const room = { id: 'r1', users: [{ id: 'u1' }], lastMessage: { id: 'm1' } }
+    const resolve = vi.fn().mockResolvedValue(room)
+
+    const resolved = (await chatMiddleware.Query.Room(
+      resolve,
+      null,
+      {},
+      emptyContext(),
+      noInfo,
+    )) as { lastMessage: { _id?: string } }
+
+    expect(resolved.lastMessage._id).toBe('m1')
+  })
+
   // Room is nullable in the schema, and the room queries answer `[]` or null for a room the
   // viewer does not chat in. Walking that answer for `_id` aliases would throw on the one code
   // path that is reached by an unauthorised lookup.
