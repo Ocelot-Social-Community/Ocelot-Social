@@ -97,9 +97,24 @@ describe('AddEmailAddress', () => {
       })
 
       it('throws UserInputError', async () => {
-        const { errors } = await mutate({ mutation: AddEmailAddress, variables })
+        await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({
+          data: { AddEmailAddress: null },
+          errors: [{ message: 'User not found.' }],
+        })
+      })
 
-        expect(errors?.[0]).toHaveProperty('message', 'User not found.')
+      // The message alone would also be satisfied by a resolver that wrote the node and THEN
+      // failed — and this label carries no uniqueness constraint, so a stray node is not caught
+      // later either: it would sit there unattached, and the address could still be verified
+      // through it. The absence of the node IS the claim the comment above makes.
+      it('writes no `UnverifiedEmailAddress` node', async () => {
+        await mutate({ mutation: AddEmailAddress, variables })
+        const result = await database.neode.cypher(
+          `MATCH (e:UnverifiedEmailAddress { email: "new-email@example.org" }) RETURN e`,
+          {},
+        )
+
+        expect(result.records).toHaveLength(0)
       })
     })
 
