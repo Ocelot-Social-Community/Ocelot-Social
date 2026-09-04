@@ -30,6 +30,7 @@ interface LoadMocks {
   readDefaultMarker?: Mock
   setBranding?: Mock
   checkSchemaCompat?: Mock
+  describeSchemaCompat?: Mock
 }
 
 const ORIGINAL_ENV = process.env
@@ -40,7 +41,7 @@ async function loadBootstrap(mocks: LoadMocks) {
   vi.doMock(BRANDING, () => ({
     setBranding,
     checkSchemaCompat: mocks.checkSchemaCompat ?? vi.fn(() => 'ok'),
-    describeSchemaCompat: vi.fn(() => 'schema mismatch'),
+    describeSchemaCompat: mocks.describeSchemaCompat ?? vi.fn(() => 'schema mismatch'),
   }))
   vi.doMock(DISCOVER, () => ({
     discoverArchives: mocks.discoverArchives ?? vi.fn(() => new Map()),
@@ -188,6 +189,25 @@ describe('branding bootstrap', () => {
 
     expect(setBranding).toHaveBeenCalledWith(config)
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('schema mismatch'))
+  })
+
+  // `unknown` is also "not ok", and describeSchemaCompat has nothing actionable to say about it —
+  // it returns null. The warning still goes out (an unreadable schema version is worth seeing in
+  // the log), and the `?? ''` is what keeps it from reading "[branding] null".
+  it('warns without a description when the archive schema version cannot be judged', async () => {
+    process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
+    process.env.OCELOT_ACTIVE_BRANDING = 'acme'
+    const archive = { file: '/assets/acme.tar.gz', schemaVersion: null }
+    const config = { metadata: { applicationName: 'Acme' } }
+    const { setBranding } = await loadBootstrap({
+      discoverArchives: vi.fn(() => new Map([['acme', archive]])),
+      readArchiveConfig: vi.fn(() => config),
+      checkSchemaCompat: vi.fn(() => 'unknown'),
+      describeSchemaCompat: vi.fn(() => null),
+    })
+
+    expect(setBranding).toHaveBeenCalledWith(config)
+    expect(warnSpy).toHaveBeenCalledWith('[branding] ')
   })
 
   it('logs an error (never throws) when discovery fails', async () => {

@@ -190,6 +190,29 @@ describe('poll tick', () => {
     setEnabled()
   })
 
+  // A tick can still be in flight when the process shuts down: stopLiveKitPoller clears the
+  // handles and drops the client, but a callback the event loop had already picked up runs
+  // anyway. Without the client check it would call listRooms on null and take the shutdown down
+  // with an unhandled rejection. Captured through a stubbed setInterval because a cleared timer
+  // is exactly what fake timers will not fire.
+  it('does nothing when it fires after the poller was stopped', async () => {
+    let tick: (() => void) | undefined
+    vi.stubGlobal(
+      'setInterval',
+      vi.fn((callback: () => void) => {
+        tick = callback
+        return 2
+      }),
+    )
+    startLiveKitPoller()
+    stopLiveKitPoller()
+
+    tick?.()
+    await vi.advanceTimersByTimeAsync(0)
+
+    expect(mockListRooms).not.toHaveBeenCalled()
+  })
+
   it('publishes participant counts only for group- rooms and only on change', async () => {
     mockListRooms.mockResolvedValueOnce([
       { name: 'group-a', numParticipants: 2 },

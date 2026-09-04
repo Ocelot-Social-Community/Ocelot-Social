@@ -13,6 +13,35 @@ import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { NetworkPolicy } from '@src/policy'
 
+// SignupVerification.gql is the document the WEBAPP sends, and it passes neither `inviteCode`
+// nor `locationName`. Both are part of the mutation the schema declares (and the signup form does
+// send them), so the two arguments need a document of their own here.
+const SignupVerificationWithExtras = `
+  mutation (
+    $password: String!
+    $email: String!
+    $name: String!
+    $nonce: String!
+    $termsAndConditionsAgreedVersion: String!
+    $locale: String
+    $inviteCode: String
+    $locationName: String
+  ) {
+    SignupVerification(
+      email: $email
+      password: $password
+      name: $name
+      nonce: $nonce
+      termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
+      locale: $locale
+      inviteCode: $inviteCode
+      locationName: $locationName
+    ) {
+      id
+    }
+  }
+`
+
 let variables
 
 let authenticatedUser: Context['user']
@@ -85,6 +114,23 @@ describe('Signup', () => {
           data: { Signup: { email: 'someuser@example.org' } },
           errors: undefined,
         })
+      })
+
+      // Nothing above this resolver checks the address: `email: String!` only pins the type, and
+      // existingEmailAddress just normalises and looks it up. The node declaration is the only
+      // validation there is, and it runs BEFORE the write — an address that cannot receive the
+      // verification nonce must not leave an EmailAddress node behind for it.
+      it('refuses an address that is not one, and writes nothing', async () => {
+        const { errors } = await mutate({
+          mutation: Signup,
+          variables: { ...variables, email: 'not-an-address' },
+        })
+
+        expect(errors?.[0].message).toContain('email')
+        const { records } = await database.query({
+          query: `MATCH (email:EmailAddress { email: 'not-an-address' }) RETURN count(email) AS count`,
+        })
+        expect(records[0].get('count').toNumber()).toBe(0)
       })
 
       describe('creates a EmailAddress node', () => {
@@ -225,6 +271,60 @@ describe('SignupVerification', () => {
                   id: expect.any(String),
                 }),
               },
+            })
+          })
+
+          // The signup form submits an empty string for a location the user did not fill in, and
+          // that is NOT a location named "". createOrUpdateLocations distinguishes the two by
+          // reference: `undefined` means "leave it alone", `null` means "clear it", and only ''
+          // arrives from the client — so without the normalisation every signup without a
+          // location would forward '' to Mapbox and fail as an invalid locationName.
+          it('accepts an empty locationName as "no location"', async () => {
+            const { data, errors } = await mutate({
+              mutation: SignupVerificationWithExtras,
+              variables: { ...variables, locationName: '' },
+            })
+
+            expect(errors).toBeUndefined()
+            expect(data.SignupVerification).toEqual(expect.objectContaining({ id: expect.any(String) }))
+
+            const { records } = await database.query({
+              query: `MATCH (user:User { id: $id })
+                      RETURN size([(user)-[:IS_IN]->(:Location) | 1]) AS locations`,
+              variables: { id: data.SignupVerification.id },
+            })
+            expect(records[0].get('locations').toNumber()).toBe(0)
+          })
+
+          // The one caller that passes `newUser = true` to redeemInviteCode. Redeeming on signup
+          // is what links the fresh account to whoever invited it — the mutual FOLLOWS and the
+          // INVITED edge that the invite statistics count. Redeeming the same link from an
+          // ALREADY registered account deliberately does none of that.
+          it('redeems the invite code the account signed up with', async () => {
+            const host = await Factory.build('user', { id: 'invite-host', name: 'Invite Host' })
+            await database.write({
+              query: `MATCH (host:User { id: 'invite-host' })
+                      MERGE (host)-[:GENERATED]->(:InviteCode { code: 'SIGNUP' })`,
+            })
+            void host
+
+            const { data, errors } = await mutate({
+              mutation: SignupVerificationWithExtras,
+              variables: { ...variables, inviteCode: 'SIGNUP' },
+            })
+
+            expect(errors).toBeUndefined()
+            const { records } = await database.query({
+              query: `MATCH (host:User { id: 'invite-host' }), (user:User { id: $id })
+                      RETURN exists((host)-[:INVITED]->(user)) AS invited,
+                             exists((user)-[:REDEEMED]->(:InviteCode { code: 'SIGNUP' })) AS redeemed,
+                             exists((user)-[:FOLLOWS]->(host)) AS follows`,
+              variables: { id: data.SignupVerification.id },
+            })
+            expect(records[0].toObject()).toEqual({
+              invited: true,
+              redeemed: true,
+              follows: true,
             })
           })
 

@@ -5,7 +5,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-import isEmpty from 'lodash/isEmpty.js'
 import { v4 as uuid } from 'uuid'
 
 import { UserInputError } from '@graphql/errors'
@@ -68,13 +67,12 @@ const NOTIFIED_COMMENTS_FOR_POST_CYPHER = `
   ${NOTIFICATION_PROJECTION_SUFFIX}
 `
 
+// Both wrappers used to branch on `isEmpty(params.filter)` and build `{ OR: [pinned, {}] }` for
+// the empty case. That branch was redundant twice over: spreading an empty (or absent) filter
+// produces exactly `{}` anyway, so the two arms were the same value — and by the time either runs,
+// filterInvisiblePosts has already put `invisibleTo` into the filter, so it is never empty.
 const maintainPinnedPosts = (params) => {
-  const pinnedPostFilter = { pinned: true }
-  if (isEmpty(params.filter)) {
-    params.filter = { OR: [pinnedPostFilter, {}] }
-  } else {
-    params.filter = { OR: [pinnedPostFilter, { ...params.filter }] }
-  }
+  params.filter = { OR: [{ pinned: true }, { ...params.filter }] }
   return params
 }
 
@@ -84,11 +82,7 @@ const maintainGroupPinnedPosts = (params) => {
     return params
   }
   const pinnedPostFilter = { groupPinned: true, group: params.filter.group }
-  if (isEmpty(params.filter)) {
-    params.filter = { OR: [pinnedPostFilter, {}] }
-  } else {
-    params.filter = { OR: [pinnedPostFilter, { ...params.filter }] }
-  }
+  params.filter = { OR: [pinnedPostFilter, { ...params.filter }] }
   return params
 }
 
@@ -149,6 +143,12 @@ const commentOrderClause = (orderBy: unknown): string =>
 // localise. postFilterToCypher translates the tree they build.
 const queryPosts = async (params, context: Context) => {
   const { where, params: whereParams } = postFilterToCypher(params)
+  // Never actually empty on either path into this helper: filterInvisiblePosts always writes
+  // `invisibleTo` into the filter, even for an anonymous viewer, so postFilterToCypher always has
+  // at least that one condition to translate. Kept as a guard rather than inlined because an
+  // unconditional `WHERE` with nothing behind it is a Cypher syntax error, not an empty filter.
+  /* v8 ignore next -- unreachable: filterInvisiblePosts guarantees at least one condition */
+  const whereClause = where ? `WHERE ${where}` : ''
   const paging = pagingClause(params)
   const session = context.driver.session()
   try {
@@ -156,7 +156,7 @@ const queryPosts = async (params, context: Context) => {
       const result = await transaction.run(
         `
           MATCH (post:Post)
-          ${where ? `WHERE ${where}` : ''}
+          ${whereClause}
           RETURN post { .* } AS post
           ORDER BY ${postOrderClause(params.orderBy)}
           ${paging.clause}

@@ -119,6 +119,29 @@ describe('Comment query', () => {
     ])
   })
 
+  // The scalar arguments (content, createdAt, updatedAt beside id) are equality matches the
+  // schema advertises. They are built into the WHERE clause from a fixed list of field names, and
+  // an argument that is silently dropped instead WIDENS the result set the caller believes to be
+  // narrowed — the same failure mode the filter guard below exists for.
+  it('constrains the query by a top-level equality argument', async () => {
+    await setupPostAndComment()
+    authenticatedUser = await commentAuthor.toJson()
+    await database.write({
+      query: `
+        MATCH (post:Post { id: 'p1' })
+        CREATE (:Comment { id: 'needle', content: 'find me', createdAt: '2020-01-01T00:00:00.000Z' })-[:COMMENTS]->(post)
+        CREATE (:Comment { id: 'haystack', content: 'not me', createdAt: '2020-01-02T00:00:00.000Z' })-[:COMMENTS]->(post)
+      `,
+    })
+
+    const { data, errors } = await query({
+      query: '{ Comment(content: "find me") { id } }',
+    })
+
+    expect(errors).toBeUndefined()
+    expect((data.Comment as { id: string }[]).map((comment) => comment.id)).toEqual(['needle'])
+  })
+
   it('honours an explicit orderBy', async () => {
     await setupPostAndComment()
     authenticatedUser = await commentAuthor.toJson()

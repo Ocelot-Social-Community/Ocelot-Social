@@ -152,6 +152,21 @@ describe('follow', () => {
     })
   })
 
+  // Neither mutation may act on a user that is not there. MERGE/MATCH against an id that binds
+  // nothing writes nothing, so returning a user object would report a follow that did not happen —
+  // and both mutations return the OTHER user, which is exactly the value a client would cache.
+  describe.each([
+    ['followUser', followUser],
+    ['unfollowUser', unfollowUser],
+  ])('%s', (name, mutation) => {
+    it('returns null for a user that does not exist', async () => {
+      const { data, errors } = await mutate({ mutation, variables: { id: 'no-such-user' } })
+
+      expect(errors).toBeUndefined()
+      expect(data[name]).toBeNull()
+    })
+  })
+
   describe('unfollow user', () => {
     beforeEach(async () => {
       variables = { id: user2.id }
@@ -167,6 +182,16 @@ describe('follow', () => {
           errors: [{ message: 'Not Authorized!' }],
         })
       })
+    })
+
+    // The mirror of "i can`t follow myself" above. Unfollowing yourself is not merely
+    // pointless: it would DELETE a FOLLOWS edge selected by `(:User {id: me})-[:FOLLOWS]->(me)`,
+    // and the guard is the only thing keeping that pattern from being evaluated at all.
+    it('i can`t unfollow myself', async () => {
+      const { data, errors } = await mutate({ mutation: unfollowUser, variables: { id: user1.id } })
+
+      expect(errors).toBeUndefined()
+      expect(data.unfollowUser).toBeNull()
     })
 
     it('i can unfollow a user', async () => {

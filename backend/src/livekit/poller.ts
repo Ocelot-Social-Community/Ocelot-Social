@@ -93,6 +93,10 @@ const pollOnce = async () => {
       }
       if (lastCount > 0) {
         const groupId = groupIdFromRoomName(roomName)
+        // Always a group id here: only names that already yielded one are recorded in
+        // lastSeenCounts (the loop above `continue`s on a falsy groupId), so the same name cannot
+        // fail to parse on the way out.
+        /* v8 ignore next -- unreachable: lastSeenCounts only holds names with a parsable group id */
         if (groupId) {
           await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count: 0 })
         }

@@ -78,6 +78,19 @@ describe('donations', () => {
         authenticatedUser = await currentUser.toJson()
       })
 
+      // There is exactly one Donations node, created by a seed/migration. Before it exists — a
+      // fresh instance, or one whose seed has not run — the query has to answer `null`, which the
+      // schema allows; returning `undefined` for it would surface as an internal error instead of
+      // the "donations not configured" state the front end already handles.
+      it('returns null while no Donations node exists', async () => {
+        await database.write({ query: 'MATCH (donations:Donations) DETACH DELETE donations' })
+
+        await expect(query({ query: Donations, variables })).resolves.toMatchObject({
+          data: { Donations: null },
+          errors: undefined,
+        })
+      })
+
       it('returns the current Donations info', async () => {
         await expect(query({ query: Donations, variables })).resolves.toMatchObject({
           data: { Donations: { showDonations: true, goal: 15000, progress: 7000 } },
@@ -144,6 +157,18 @@ describe('donations', () => {
             role: 'admin',
           })
           authenticatedUser = await currentUser.toJson()
+        })
+
+        // Same nullable contract as the query: an admin who opens the donations form on an
+        // instance whose Donations node was never seeded must get `null`, not a crash — the
+        // mutation MATCHes the node and writes nothing when there is none.
+        it('returns null while no Donations node exists', async () => {
+          await database.write({ query: 'MATCH (donations:Donations) DETACH DELETE donations' })
+
+          await expect(mutate({ mutation: updateDonations, variables })).resolves.toMatchObject({
+            data: { UpdateDonations: null },
+            errors: undefined,
+          })
         })
 
         it('updates Donations info', async () => {
