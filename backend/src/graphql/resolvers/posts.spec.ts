@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable vitest/no-commented-out-tests */
+import { parse } from 'graphql'
 import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
 
 import Factory, { assignRoleEdge, cleanDatabase } from '@db/factories'
@@ -58,6 +59,18 @@ afterAll(() => {
 
 const categoryIds = ['cat9', 'cat4', 'cat15']
 let variables
+
+// CreatePost.gql does not pass an image, so the create mutation's image branch has no
+// document to travel through. This variant supplies one, which keeps that branch tested
+// through the real schema (input coercion, transaction, rollback) rather than by calling
+// the resolver by hand.
+const CreatePostWithImage = parse(`
+  mutation CreatePostWithImage($title: String!, $content: String!, $image: ImageInput) {
+    CreatePost(title: $title, content: $content, image: $image) {
+      id
+    }
+  }
+`)
 
 beforeEach(async () => {
   policy = { ...defaultPolicy }
@@ -423,6 +436,46 @@ describe('CreatePost', () => {
     it('has label "Article" as default', async () => {
       await expect(mutate({ mutation: CreatePost, variables })).resolves.toMatchObject({
         data: { CreatePost: { postType: ['Article'] } },
+      })
+    })
+
+    describe('with image metadata but no uploaded file', () => {
+      it('reports the missing file and rolls the post back', async () => {
+        // The image is merged INSIDE the create transaction. mergeImage refuses metadata for
+        // an image that does not exist yet, and because that throw happens inside the
+        // transaction the post has to go with it: a post left behind by a failed create is
+        // invisible to its author (no response ever carried its id) but shows up in the feed.
+        const { errors } = await mutate({
+          mutation: CreatePostWithImage,
+          variables: {
+            title: 'I am a title',
+            content: 'Some content',
+            image: { alt: 'metadata without a file' },
+          },
+        })
+
+        expect(errors?.[0]).toHaveProperty('message', 'Cannot find image for given resource')
+
+        await expect(query({ query: Post, variables: {} })).resolves.toMatchObject({
+          data: { Post: [] },
+        })
+      })
+
+      it('does not mistake the failure for a duplicate slug', async () => {
+        // The catch around the create translates exactly ONE driver error code into a user
+        // error ("slug already exists"). Anything else must keep its own message — telling an
+        // author their title is taken when the real problem is a missing file sends them
+        // renaming a post that would never have been saved either way.
+        const { errors } = await mutate({
+          mutation: CreatePostWithImage,
+          variables: {
+            title: 'I am a title',
+            content: 'Some content',
+            image: { alt: 'metadata without a file' },
+          },
+        })
+
+        expect(errors?.[0].message).not.toMatch(/slug already exists/)
       })
     })
 
@@ -982,6 +1035,18 @@ describe('UpdatePost', () => {
       expect(newlyCreatedPost.updatedAt).not.toEqual(UpdatePostData.updatedAt)
     })
 
+    it('reports image metadata sent for a post that has no image', async () => {
+      // Same one-code translation as on create: only the uniqueness violation becomes
+      // "slug already exists". A missing image must not be reported as a title clash, or the
+      // author edits the one thing that was never wrong.
+      const { errors } = await mutate({
+        mutation: UpdatePost,
+        variables: { ...variables, image: { alt: 'metadata without a file' } },
+      })
+
+      expect(errors?.[0]).toHaveProperty('message', 'Cannot find image for given resource')
+    })
+
     describe('no new category ids provided for update', () => {
       it('resolves and keeps current categories', async () => {
         const expected = {
@@ -1359,6 +1424,16 @@ describe('push posts', () => {
         },
       })
     })
+
+    it('reports a post id that matches nothing', async () => {
+      // The write MATCHes the post, so a stale id (a post deleted while the moderation list
+      // was open) simply updates nothing. Without the row check the mutation would answer
+      // with `undefined` for a field the schema declares as a Post — a null the client reads
+      // as "pushed, nothing to show".
+      const { errors } = await mutate({ mutation: pushPost, variables: { id: 'no-such-post' } })
+
+      expect(errors?.[0]).toHaveProperty('message', 'Could not find Post')
+    })
   })
 })
 
@@ -1501,6 +1576,14 @@ describe('unpush posts', () => {
           ],
         },
       })
+    })
+
+    it('reports a post id that matches nothing', async () => {
+      authenticatedUser = await admin.toJson()
+
+      const { errors } = await mutate({ mutation: unpushPost, variables: { id: 'no-such-post' } })
+
+      expect(errors?.[0]).toHaveProperty('message', 'Could not find Post')
     })
   })
 })
