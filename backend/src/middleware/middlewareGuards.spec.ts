@@ -11,8 +11,13 @@ import hashtagsMiddleware from './hashtags/hashtagsMiddleware'
 import softDeleteMiddleware from './softDelete/softDeleteMiddleware'
 
 import type { Context } from '@src/context'
+import type { GraphQLResolveInfo } from 'graphql'
 
 const emptyContext = () => ({}) as unknown as Context
+
+// The middlewares under test never look at `info`; typing it away here keeps each call site free
+// of a cast that would say nothing.
+const noInfo = null as unknown as GraphQLResolveInfo
 
 describe('hashtagsMiddleware', () => {
   // updateHashtagsOfPost keys on `post.id`. Without the guard a mutation that produced nothing
@@ -26,7 +31,7 @@ describe('hashtagsMiddleware', () => {
       null,
       { content: 'a post with a #hashtag' },
       emptyContext(),
-      null,
+      noInfo,
     )
 
     expect(result).toBeNull()
@@ -47,7 +52,7 @@ describe('chatMiddleware', () => {
       null,
       {},
       emptyContext(),
-      null,
+      noInfo,
     )) as [{ users: { _id?: string }[] }]
 
     expect(resolved.users[0]._id).toBe('u1')
@@ -60,7 +65,7 @@ describe('chatMiddleware', () => {
     const resolve = vi.fn().mockResolvedValue(null)
 
     await expect(
-      chatMiddleware.Query.Room(resolve, null, {}, emptyContext(), null),
+      chatMiddleware.Query.Room(resolve, null, {}, emptyContext(), noInfo),
     ).resolves.toBeNull()
   })
 })
@@ -72,7 +77,7 @@ describe('softDeleteMiddleware', () => {
   it.each([true, false])('leaves an explicit deleted=%s argument alone', async (deleted) => {
     const resolve = vi.fn().mockResolvedValue(null)
 
-    await softDeleteMiddleware.Mutation(resolve, null, { deleted }, emptyContext(), null)
+    await softDeleteMiddleware.Mutation(resolve, null, { deleted }, emptyContext(), noInfo)
 
     expect(resolve.mock.calls[0][1]).toMatchObject({ deleted, disabled: false })
   })
@@ -80,7 +85,7 @@ describe('softDeleteMiddleware', () => {
   it('defaults a missing deleted argument to false', async () => {
     const resolve = vi.fn().mockResolvedValue(null)
 
-    await softDeleteMiddleware.Mutation(resolve, null, {}, emptyContext(), null)
+    await softDeleteMiddleware.Mutation(resolve, null, {}, emptyContext(), noInfo)
 
     expect(resolve.mock.calls[0][1]).toMatchObject({ deleted: false, disabled: false })
   })

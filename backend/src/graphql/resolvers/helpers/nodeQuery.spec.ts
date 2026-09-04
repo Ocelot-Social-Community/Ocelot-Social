@@ -10,6 +10,7 @@ import { createApolloTestSetup } from '@root/test/helpers'
 import { nodeQuery } from './nodeQuery'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
 // What the Tag query does with the filter operators its schema advertises.
 //

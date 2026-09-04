@@ -12,6 +12,7 @@ import { describe, it, expect, vi } from 'vitest'
 import notificationsMiddleware from './notificationsMiddleware'
 
 import type { Context } from '@src/context'
+import type { GraphQLResolveInfo } from 'graphql'
 
 const contextWithSpy = () => {
   const publish = vi.fn()
@@ -22,6 +23,9 @@ const contextWithSpy = () => {
     context: { pubsub: { publish }, driver: { session: vi.fn() } } as unknown as Context,
   }
 }
+
+// The handlers never look at `info`; typing it away here keeps each call site free of a cast.
+const noInfo = null as unknown as GraphQLResolveInfo
 
 describe.each([
   ['JoinGroup', { groupId: 'g1', userId: 'u1' }],
@@ -42,7 +46,7 @@ describe.each([
       null,
       args,
       context,
-      null,
+      noInfo,
     )
 
     expect(result).toBeNull()
