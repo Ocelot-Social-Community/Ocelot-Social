@@ -100,25 +100,26 @@ export default defineConfig({
         'src/**/*.d.ts',
         'src/graphql/gql-register.ts',
       ],
-      // All four metrics, not just lines. `lines` alone left branch coverage completely
-      // unguarded, and that is where the gap actually is — 306 uncovered branches against 224
-      // uncovered lines. A file could lose half its error paths without the gate noticing, as
-      // long as those paths sit on lines some happy-path test already walks.
+      // All four metrics at 100 — what a full run measures (4422 statements, 2162 branches, 982
+      // functions). This replaces the earlier "floor with headroom" setting (96/96/90/96.4):
+      // headroom is only useful while a gap exists, and once the gap is closed the same slack
+      // just lets it reopen silently — a few hundred lines of error handling could go without
+      // the gate saying anything.
       //
-      // Each value sits below a MEASURED full-suite run with real headroom, not on it: a
-      // threshold set at the current number turns any line executed only on some timings into a
-      // red build. The measured run was lines 96.27 / statements 96.35 / branches 90.38 /
-      // functions 96.76, and it is a FLOOR — one spec file (embeds) failed locally for want of
-      // network, so CI reads at or above it.
+      // `branches` is the one that carries the weight, and the one a happy-path test cannot
+      // fake: a file can shed its whole error handling while `lines` stays put, because those
+      // paths sit on lines some other test already walks.
       //
-      // `branches` is the one that matters most here and the one that was missing entirely until
-      // recently: it sat at 86.25% while lines already read 94.84%, i.e. a file could shed its
-      // whole error handling unnoticed as long as some happy-path test walked those lines.
+      // The consequence, and the point: a genuinely unreachable line now has to be marked
+      // `/* v8 ignore next -- <why> */` AT THE SITE rather than disappearing into the slack.
+      // Every such marker in src/ names the invariant that makes it unreachable (a shield rule,
+      // a schema non-null, a drift test), so the claim is reviewable — and when the invariant
+      // goes, the marker is what points at the code that now needs a test.
       thresholds: {
-        lines: 96,
-        statements: 96,
-        branches: 90,
-        functions: 96.4,
+        lines: 100,
+        statements: 100,
+        branches: 100,
+        functions: 100,
       },
     },
   },
