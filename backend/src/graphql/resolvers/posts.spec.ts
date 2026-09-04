@@ -1035,6 +1035,30 @@ describe('UpdatePost', () => {
       expect(newlyCreatedPost.updatedAt).not.toEqual(UpdatePostData.updatedAt)
     })
 
+    // An explicit `null` image is "remove the picture", and it is a different input from omitting
+    // the field: omitted means "leave it alone". Sending the wrong one of the two either keeps a
+    // picture the author asked to remove, or drops one they never touched.
+    it('removes the hero image when it is explicitly set to null', async () => {
+      await database.write({
+        query: `MATCH (post:Post { id: $id })
+                MERGE (post)-[:HERO_IMAGE]->(:Image { url: '/uploads/hero.jpg' })
+                RETURN post { .id }`,
+        variables: { id: newlyCreatedPost.id },
+      })
+
+      const { errors } = await mutate({ mutation: UpdatePost, variables: { ...variables, image: null } })
+
+      expect(errors).toBeUndefined()
+
+      const { records } = await database.query({
+        query: `MATCH (post:Post { id: $id })
+                RETURN size([(post)-[:HERO_IMAGE]->(:Image) | 1]) AS images`,
+        variables: { id: newlyCreatedPost.id },
+      })
+
+      expect(records[0].get('images').toNumber()).toBe(0)
+    })
+
     it('reports image metadata sent for a post that has no image', async () => {
       // Same one-code translation as on create: only the uniqueness violation becomes
       // "slug already exists". A missing image must not be reported as a title clash, or the
