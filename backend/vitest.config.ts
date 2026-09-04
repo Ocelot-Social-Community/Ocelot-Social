@@ -71,10 +71,20 @@ export default defineConfig({
       },
     },
     include: ['src/**/*.{spec,test}.ts'],
-    // Was `jest.setTimeout(10000)` in test/setup.ts, whose only content that was — so that file
-    // is gone. The reason is unchanged: metascraper parsing in the embeds specs runs close to
-    // the default limit.
-    testTimeout: 10000,
+    // Inherited from `jest.setTimeout(10000)` in test/setup.ts (whose only content that was, so
+    // the file is gone). The value has been raised because 10000 was not a limit any more, it was
+    // the measurement: "embeds > given a youtube link" costs 10.6–10.8s on a developer machine
+    // (measured over three runs), i.e. the suite passed or failed on which side of 10s the
+    // machine happened to land that minute. metascraper parses a full page snapshot through
+    // thirteen rules including language detection — that is the cost, not a hang.
+    //
+    // A timeout has to sit ABOVE the measured cost with headroom, the same way the coverage
+    // thresholds sit at the measured value: too tight and it reports load rather than defects.
+    // 30s is ~3x the slowest test and still short enough that a genuinely hung test fails the
+    // run quickly. Overridable for a slow CI runner or a debugging session without editing this
+    // file — raising it there must not require a commit.
+    // eslint-disable-next-line n/no-process-env
+    testTimeout: Number(process.env.VITEST_TEST_TIMEOUT ?? 30000),
     // The suite talks to one shared Neo4j and the specs clean it between cases, so they cannot
     // run concurrently — this is the equivalent of Jest's `--runInBand`, which the `test` script
     // passed for exactly that reason.
