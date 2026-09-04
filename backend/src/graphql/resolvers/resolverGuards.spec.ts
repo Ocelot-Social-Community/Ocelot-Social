@@ -14,6 +14,8 @@ import { setImmediate } from 'node:timers/promises'
 
 import { describe, it, expect } from 'vitest'
 
+import { RoleValidationError } from '@src/role'
+
 import apiKeysResolvers from './apiKeys'
 import badgesResolvers from './badges'
 import emailsResolvers from './emails'
@@ -106,6 +108,29 @@ describe('error translation', () => {
     await expect(
       rolesResolvers.Mutation.createRole(null, { name: 'curator', permissions: [] }, context),
     ).rejects.toBe(failure)
+  })
+
+  // The counterpart: RoleService's own refusals are the admin's fault, not the server's, and must
+  // arrive as FORBIDDEN with the service's wording. Both of createRole's own guards (name format,
+  // name already taken) fire before upsertRole, so this mapping is unreachable through the schema
+  // today — it is what keeps a validation rule ADDED to RoleService later from surfacing as a 500.
+  it('createRole reports a role validation failure as forbidden', async () => {
+    const context = {
+      role: {
+        getRole: () => undefined,
+        upsertRole: vi
+          .fn()
+          .mockRejectedValue(new RoleValidationError('Cannot create or flag a protected role.')),
+      },
+      user: { id: 'admin-id' },
+    } as unknown as Context
+
+    await expect(
+      rolesResolvers.Mutation.createRole(null, { name: 'curator', permissions: [] }, context),
+    ).rejects.toMatchObject({
+      message: 'Cannot create or flag a protected role.',
+      extensions: { code: 'FORBIDDEN' },
+    })
   })
 
   it('VerifyEmailAddress reports a transient database failure as itself', async () => {

@@ -198,4 +198,28 @@ describe('statistics', () => {
       })
     })
   })
+
+  // apoc.meta.stats() reports only labels that EXIST — on a network with nothing in it the `User`
+  // and `EmailAddress` entries are absent from the map rather than zero. Without the `?? 0` every
+  // counter read off them is NaN, and the two that are DIFFERENCES (users minus deleted, emails
+  // minus users) stay NaN. A freshly installed network is exactly when an admin opens this page
+  // for the first time.
+  describe('on a network with no data at all', () => {
+    beforeEach(async () => {
+      await cleanDatabase()
+      // A LITERAL viewer with no User node of its own — the one way to ask this question, since
+      // any admin stored in the database would put `User` (and its `EmailAddress`) straight back
+      // into apoc's label map. The harness honours a literal roleName for exactly this case.
+      authenticatedUser = { id: 'nobody', roleName: 'admin' } as Context['user']
+    })
+
+    it('reports zeros rather than NaN', async () => {
+      await expect(query({ query: statistics })).resolves.toMatchObject({
+        data: {
+          statistics: { users: 0, usersDeleted: 0, emails: 0, invites: 0, posts: 0, reports: 0 },
+        },
+        errors: undefined,
+      })
+    })
+  })
 })

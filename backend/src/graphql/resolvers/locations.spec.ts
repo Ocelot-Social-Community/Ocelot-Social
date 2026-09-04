@@ -360,7 +360,11 @@ describe('distanceToMe', () => {
 // reporting a distance to somewhere the viewer never asked about.
 describe('Location.distanceToMe', () => {
   it('refuses a parent it cannot identify', async () => {
-    await expect(locationsResolvers.Location.distanceToMe({}, {}, null, null)).rejects.toThrow(
+    // No driver on the context on purpose: the guard runs before the session is opened, so a
+    // resolver that got past it fails loudly here rather than querying with a null id.
+    const noContext = {} as unknown as Context
+
+    await expect(locationsResolvers.Location.distanceToMe({}, {}, noContext, null)).rejects.toThrow(
       'Can not identify selected Location!',
     )
   })

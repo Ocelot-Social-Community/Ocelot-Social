@@ -63,9 +63,15 @@ export interface PolicyLike {
 }
 
 // A var missing from the registry is treated as a secret (never leak its value) and
-// bucketed under 'general'.
-const specFor = (name: string): EnvVarSpec =>
-  ENV_SPEC_BY_NAME[name] ?? { name, secret: true, category: 'general', softwareDefault: null }
+// bucketed under 'general'. Only ever called with `requiresEnv` names, and systemConfig.spec.ts
+// asserts every one of those is registered — so the fallback is unreachable by construction and
+// exists as the secret-hygiene floor for the moment that assertion is broken.
+const specFor = (name: string): EnvVarSpec => {
+  /* v8 ignore next -- unreachable: guarded by the requiresEnv/registry drift test */
+  return (
+    ENV_SPEC_BY_NAME[name] ?? { name, secret: true, category: 'general', softwareDefault: null }
+  )
+}
 
 // One row per recognised env var, merging static registry metadata with the live
 // policy overlay. Rows are returned in the global category display order (categoryRank,

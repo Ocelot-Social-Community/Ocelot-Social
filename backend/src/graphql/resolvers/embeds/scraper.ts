@@ -96,6 +96,12 @@ export default async function scrape(url) {
     }
   })
 
+  // Dead since fetchResource started stamping `sources: ['resource']` on every answer: `meta` is
+  // the merge target and always carries that key, so `output` is never empty and the URL that
+  // scraped to nothing now returns a bare link rather than NOT_FOUND. Kept because no client asks
+  // for this code and removing it would be a silent API change; it is a deletion candidate, not a
+  // coverage gap.
+  /* v8 ignore next 3 -- unreachable: `sources` makes the merged output non-empty by construction */
   if (isEmpty(output)) {
     throw new GraphQLError('Not found', { extensions: { code: 'NOT_FOUND' } })
   }

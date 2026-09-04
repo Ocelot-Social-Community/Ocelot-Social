@@ -269,6 +269,29 @@ describe('branding/routes', () => {
 
       warn.mockRestore()
     })
+
+    // server.ts hands the router a SEARCH PATH, not a single root — so the production shape of
+    // this log line lists several directories. It is the only diagnostic an operator gets for an
+    // unreadable brand mount, and naming one root out of three would send them to the wrong one.
+    it('names every root of a search path in the warning', async () => {
+      mockDiscover.mockImplementation(() => {
+        throw new Error('EACCES')
+      })
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
+      const { res } = await call(
+        brandingRouter(['/brands/custom', '/brands/baked'], deps),
+        '/manifest.json',
+      )
+
+      expect(res.statusCode).toBe(503)
+      expect(warn).toHaveBeenCalledWith(
+        '[branding] cannot read /brands/custom, /brands/baked:',
+        expect.any(Error),
+      )
+
+      warn.mockRestore()
+    })
   })
 
   describe('GET /archives/:id', () => {
