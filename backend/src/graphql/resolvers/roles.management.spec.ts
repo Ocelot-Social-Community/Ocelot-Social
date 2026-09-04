@@ -26,6 +26,7 @@ import rolesResolvers, { publishPermissionsChanged } from './roles'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { GraphQLFormattedError } from 'graphql'
 import type { Mock } from 'vitest'
 
 let authenticatedUser: Context['user']
@@ -54,6 +55,20 @@ const asAdmin = async () => {
   )
   authenticatedUser = await admin.toJson()
 }
+
+// The "a failure must keep its own identity" cases below inject a rejection into the role service
+// and then check that the resolver did NOT relabel it — as a permission problem, as a name
+// conflict, or as a TypeError from its own error handler.
+//
+// Each of them pins the error COUNT before saying anything about the error, and then says it
+// positively. Asserting only `errors?.[0].extensions?.code).not.toBe('FORBIDDEN')` cannot carry
+// the claim: on a mutation that unexpectedly SUCCEEDED, `errors` is undefined, the optional chain
+// short-circuits to undefined, and the assertion passes having checked nothing. Matching the
+// injected failure itself also rules out every wrong mapping at once, instead of one at a time.
+const INJECTED_FAILURE = {
+  message: 'database is down',
+  extensions: { code: 'INTERNAL_SERVER_ERROR' },
+} satisfies Partial<GraphQLFormattedError>
 
 describe('role management', () => {
   beforeAll(async () => {
@@ -350,7 +365,8 @@ describe('role management', () => {
         variables: { name: 'doomed', permissions: [] },
       })
 
-      expect(errors?.[0].extensions?.code).not.toBe('FORBIDDEN')
+      expect(errors).toHaveLength(1)
+      expect(errors?.[0]).toMatchObject(INJECTED_FAILURE)
     })
   })
 
@@ -422,7 +438,8 @@ describe('role management', () => {
         variables: { name: 'editor', permissions: [] },
       })
 
-      expect(errors?.[0].extensions?.code).not.toBe('FORBIDDEN')
+      expect(errors).toHaveLength(1)
+      expect(errors?.[0]).toMatchObject(INJECTED_FAILURE)
     })
   })
 
@@ -559,7 +576,8 @@ describe('role management', () => {
       vi.spyOn(roleService, 'deleteRole').mockRejectedValueOnce(new Error('database is down'))
       const { errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'temp' } })
 
-      expect(errors?.[0].extensions?.code).not.toBe('FORBIDDEN')
+      expect(errors).toHaveLength(1)
+      expect(errors?.[0]).toMatchObject(INJECTED_FAILURE)
     })
   })
 
@@ -700,8 +718,10 @@ describe('role management', () => {
         variables: { name: 'editor', newName: 'reviewer' },
       })
 
-      expect(errors?.[0].message).not.toMatch(/already exists/)
-      expect(errors?.[0].extensions?.code).not.toBe('FORBIDDEN')
+      // The exact message is the assertion: had the conflict mapping fired, this would read
+      // "Role 'reviewer' already exists" instead.
+      expect(errors).toHaveLength(1)
+      expect(errors?.[0]).toMatchObject(INJECTED_FAILURE)
     })
 
     it('does not crash when the failure is not an Error object', async () => {
@@ -715,8 +735,12 @@ describe('role management', () => {
         variables: { name: 'editor', newName: 'reviewer' },
       })
 
-      expect(errors?.[0].message).not.toMatch(/in' operator/)
-      expect(errors?.[0].message).not.toMatch(/already exists/)
+      // Not INJECTED_FAILURE: the surfaced message is graphql's own wrapper for a non-Error
+      // rejection ("Unexpected error value: …"), which is not wording this codebase owns. What
+      // matters is that the thrown VALUE is still in it — had `'code' in err` run on the string,
+      // this would be a TypeError about the `in` operator and the real failure would be gone.
+      expect(errors).toHaveLength(1)
+      expect(errors?.[0].message).toContain('database is down')
     })
   })
 
