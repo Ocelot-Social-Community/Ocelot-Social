@@ -308,10 +308,12 @@ jobs:
         run: docker compose exec -T backend npm run db:schema:check
 
       # `--coverage` stays ON per shard: the coverage data is what gets embedded in the blob and
-      # merged later. The THRESHOLD is what has to be off (`test:shard` passes
-      # --coverage.thresholds.lines=0) — a shard runs a quarter of the specs against the whole of
-      # `src/**/*.ts`, so the 94.3% gate would fail every shard by construction. It is enforced
-      # once, on the merged total, in the job below.
+      # merged later. The THRESHOLDS are what have to be off — ALL FOUR of them (`test:shard`
+      # zeroes lines, statements, branches AND functions). A shard runs a quarter of the specs
+      # against the whole of `src/**/*.ts`, so every gate in vitest.config.ts fails on a shard by
+      # construction; vitest has no single switch for "no thresholds", each metric has to be
+      # zeroed by name, and one left standing reds the shard on its own. They are enforced once,
+      # on the merged total, in the job below.
       #
       # The blob goes to a directory of its OWN, not into `coverage/` next to the reports:
       # `--merge-reports=<dir>` parses EVERY file in the directory it is given as a blob, and
@@ -333,8 +335,9 @@ jobs:
           if-no-files-found: error
 
   # The coverage gate. No shard can hold it on its own — each one exercises a quarter of the specs
-  # against the whole of `src/**/*.ts` — so the 94.3% line threshold from vitest.config.ts is
-  # checked here, once, on the merged total. This is the job to make a required status check;
+  # against the whole of `src/**/*.ts` — so the thresholds from vitest.config.ts (lines,
+  # statements, branches, functions) are checked here, once, on the merged total. This is the job
+  # to make a required status check;
   # the shards individually only prove that their own slice passed.
   #
   # Verified before adopting this: merged coverage is IDENTICAL to a single unsharded run, down to
