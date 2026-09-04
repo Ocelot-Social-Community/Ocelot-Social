@@ -7,11 +7,15 @@ import Factory, { cleanDatabase } from '@db/factories'
 import Signup from '@graphql/queries/auth/Signup.gql'
 import User from '@graphql/queries/users/User.gql'
 import UserEmail from '@graphql/queries/users/UserEmail.gql'
+import schema from '@graphql/schema'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import { groupCreatePermissionForType } from './permissionsMiddleware'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { NetworkPolicy } from '@src/policy'
+import type { GraphQLEnumType } from 'graphql'
 
 let variables
 let owner, anotherRegularUser, administrator, moderator
@@ -311,5 +315,35 @@ describe('authorization', () => {
         })
       })
     })
+  })
+})
+
+// Group creation is gated per TYPE, and the mapping from GroupType to permission is a hand-written
+// switch. Its `default` arm exists for one situation only: a group type added to the schema and
+// forgotten here — which must refuse creation rather than allow it unguarded. The enum currently
+// has no such value, so the arm is unreachable through a request; asserting it against the LIVE
+// schema enum is what turns it from an untested fallback into a checked invariant.
+describe(groupCreatePermissionForType, () => {
+  const groupTypes = (schema.getType('GroupType') as GraphQLEnumType)
+    .getValues()
+    .map((value) => value.name)
+
+  it('covers every group type the schema offers', () => {
+    expect(groupTypes.length).toBeGreaterThan(0)
+    expect(
+      groupTypes.filter((groupType) => groupCreatePermissionForType(groupType) === null),
+    ).toEqual([])
+  })
+
+  it('maps each group type to its own permission', () => {
+    // Distinct per type — a mapping that collapsed two types onto one permission would let a
+    // member who may only create public groups create hidden ones.
+    const permissions = groupTypes.map(groupCreatePermissionForType)
+
+    expect(new Set(permissions).size).toBe(groupTypes.length)
+  })
+
+  it('refuses a group type it does not know', () => {
+    expect(groupCreatePermissionForType('federated')).toBeNull()
   })
 })

@@ -8,9 +8,11 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { Readable } from 'node:stream'
 
+import { PubSub } from 'graphql-subscriptions'
 import { Upload } from 'graphql-upload/public/index.js'
 import { beforeAll, beforeEach, afterAll, describe, it, expect } from 'vitest'
 
+import { CHAT_MESSAGE_ADDED, CHAT_MESSAGE_STATUS_UPDATED } from '@constants/subscriptions'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
@@ -866,6 +868,75 @@ describe('Message', () => {
           false,
         )
       })
+    })
+  })
+
+  // The two filters above are unit-tested in isolation, which says nothing about whether each
+  // subscription is actually ATTACHED to them — or to the right channel. A subscription wired to
+  // the wrong constant silently never fires; one wired without its filter delivers every user's
+  // chat message to every open socket. Both halves are only observable together, so these drive a
+  // real PubSub end to end.
+  describe('subscription wiring', () => {
+    // chatMessageAddedFilter marks the delivered message as distributed, which needs a session.
+    const recipientContext = (bus: PubSub) => ({
+      user: { id: 'me' },
+      pubsub: bus,
+      driver: {
+        session: () => ({
+          writeTransaction: vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([]),
+          close: vi.fn(),
+        }),
+      },
+    })
+
+    it('delivers a chat message addressed to the subscriber and drops the others', async () => {
+      const bus = new PubSub()
+      const iterator = resolvers.Subscription.chatMessageAdded.subscribe(
+        null,
+        {},
+        recipientContext(bus),
+        null,
+      )
+      const delivered = iterator.next()
+
+      await bus.publish(CHAT_MESSAGE_ADDED, {
+        userId: 'somebody-else',
+        chatMessageAdded: { id: 'not-for-me' },
+      })
+      await bus.publish(CHAT_MESSAGE_ADDED, {
+        userId: 'me',
+        chatMessageAdded: { id: 'for-me' },
+      })
+
+      expect((await delivered).value).toMatchObject({ chatMessageAdded: { id: 'for-me' } })
+
+      await iterator.return?.()
+    })
+
+    it('delivers a status update only to the author of the message', async () => {
+      const bus = new PubSub()
+      const iterator = resolvers.Subscription.chatMessageStatusUpdated.subscribe(
+        null,
+        {},
+        { user: { id: 'me' }, pubsub: bus },
+        null,
+      )
+      const delivered = iterator.next()
+
+      await bus.publish(CHAT_MESSAGE_STATUS_UPDATED, {
+        authorId: 'somebody-else',
+        chatMessageStatusUpdated: { roomId: 'r1', messageIds: ['x'], status: 'distributed' },
+      })
+      await bus.publish(CHAT_MESSAGE_STATUS_UPDATED, {
+        authorId: 'me',
+        chatMessageStatusUpdated: { roomId: 'r2', messageIds: ['y'], status: 'distributed' },
+      })
+
+      expect((await delivered).value).toMatchObject({
+        chatMessageStatusUpdated: { roomId: 'r2' },
+      })
+
+      await iterator.return?.()
     })
   })
 

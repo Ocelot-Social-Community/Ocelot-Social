@@ -246,5 +246,46 @@ describe('groups feature gate (groupsEnabled)', () => {
       expect(result.errors).toBeUndefined()
       expect(result.data!.UnreadRooms).toBe(0)
     })
+
+    // The other half of the gate, and the one that would go unnoticed: everything above passes
+    // just as well if the gate blocked chat OUTRIGHT. Direct messages have nothing to do with
+    // groups and must keep working while the feature is off — the room resolvers decide that per
+    // room, by asking whether the room belongs to a group at all.
+    describe('and a direct message room between the same two users', () => {
+      let dmRoomId: string
+
+      beforeEach(async () => {
+        // Created while the feature is still on only for symmetry with the group room above —
+        // a DM does not depend on the flag in either direction.
+        policyOverride = { categoriesActive: false }
+        authenticatedUser = ownerAuth
+        const message = await mutate({
+          mutation: CreateMessage,
+          variables: { userId: 'group-member', content: 'hello directly' },
+        })
+        dmRoomId = message.data!.CreateMessage.room.id
+        policyOverride = { groupsEnabled: false, categoriesActive: false }
+      })
+
+      it('still serves the direct message room', async () => {
+        authenticatedUser = ownerAuth
+        const result = await query({ query: RoomQuery, variables: { id: dmRoomId } })
+
+        expect(result.errors).toBeUndefined()
+        expect((result.data!.Room as Array<{ id: string }>).map((room) => room.id)).toEqual([
+          dmRoomId,
+        ])
+      })
+
+      it('still serves the messages in the direct message room', async () => {
+        authenticatedUser = ownerAuth
+        const result = await query({ query: MessageQuery, variables: { roomId: dmRoomId } })
+
+        expect(result.errors).toBeUndefined()
+        expect((result.data!.Message as Array<{ content: string }>).map((m) => m.content)).toEqual([
+          'hello directly',
+        ])
+      })
+    })
   })
 })
