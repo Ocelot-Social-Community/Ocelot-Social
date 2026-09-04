@@ -545,7 +545,16 @@ describe(createOrUpdateLocations, () => {
 
     // One request per type, none skipped: giving up after the first empty answer would refuse
     // every pin that sits on a POI or a place but not on an addressed building.
-    expect(fetchSpy).toHaveBeenCalledTimes(3)
+    //
+    // The TYPES, not just the count — three calls is equally true of a loop that asked for
+    // `address` three times. The order is load-bearing too: `place` matches almost any
+    // coordinate on Earth, so asking it before `address` would resolve a pin dropped on a
+    // building to the surrounding city and silently discard the precise result.
+    const requestedTypes = fetchSpy.mock.calls.map(([input]) =>
+      new URL(input as string).searchParams.get('types'),
+    )
+
+    expect(requestedTypes).toEqual(['address', 'poi', 'place'])
   })
 
   // The forward-geocoding counterpart: free text Mapbox knows nothing about. Accepting it would
