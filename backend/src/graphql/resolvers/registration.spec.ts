@@ -320,18 +320,25 @@ describe('SignupVerification', () => {
 
             expect(errors).toBeUndefined()
 
+            // BOTH follow directions, because the resolver writes both (inviteCodes.ts MERGEs
+            // user→host and host→user) and "mutual" is the whole point: the invitee lands on a
+            // populated feed, the host sees the account they brought in. Asserting one direction
+            // would let the other silently go missing — and a half-followed pair looks fine from
+            // whichever side happens to be checked first.
             const { records } = await database.query({
               query: `MATCH (host:User { id: 'invite-host' }), (user:User { id: $id })
                       RETURN exists((host)-[:INVITED]->(user)) AS invited,
                              exists((user)-[:REDEEMED]->(:InviteCode { code: 'SIGNUP' })) AS redeemed,
-                             exists((user)-[:FOLLOWS]->(host)) AS follows`,
+                             exists((user)-[:FOLLOWS]->(host)) AS followsHost,
+                             exists((host)-[:FOLLOWS]->(user)) AS followedByHost`,
               variables: { id: data.SignupVerification.id },
             })
 
             expect(records[0].toObject()).toEqual({
               invited: true,
               redeemed: true,
-              follows: true,
+              followsHost: true,
+              followedByHost: true,
             })
           })
 
