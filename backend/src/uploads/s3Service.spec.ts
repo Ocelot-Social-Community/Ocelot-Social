@@ -14,19 +14,21 @@ const { sendMock } = vi.hoisted(() => ({ sendMock: vi.fn() }))
 // `function`, not an arrow: these stand in for CLASSES and the code under test calls them with
 // `new`. Vitest constructs the mock's implementation via Reflect.construct, and an arrow function
 // is not a constructor — Jest got away with arrows because it applied the implementation instead.
-vi.mock('@aws-sdk/client-s3', () => {
-  return {
-    S3Client: vi.fn().mockImplementation(function () {
-      return { send: sendMock }
-    }),
-    ObjectCannedACL: { public_read: 'public_read' },
-    // Mirrors the real command shape (`command.input`) so a test can tell from what reached
-    // `send()` alone which command was built and with which parameters.
-    DeleteObjectCommand: vi.fn().mockImplementation(function (input: unknown) {
-      return { input }
-    }),
-  }
-})
+// Only the two CLASSES are replaced; everything else stays the real module. That is what keeps
+// the SDK's own constants out of this file — the mock previously restated `ObjectCannedACL` as
+// `{ public_read: 'public_read' }` while the SDK's actual value is `'public-read'`, so the ACL
+// assertion below was checking a string that S3 has never received.
+vi.mock('@aws-sdk/client-s3', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  S3Client: vi.fn().mockImplementation(function () {
+    return { send: sendMock }
+  }),
+  // Mirrors the real command shape (`command.input`) so a test can tell from what reached
+  // `send()` alone which command was built and with which parameters.
+  DeleteObjectCommand: vi.fn().mockImplementation(function (input: unknown) {
+    return { input }
+  }),
+}))
 
 vi.mock('@aws-sdk/lib-storage', () => {
   return {
@@ -104,8 +106,11 @@ describe('s3Service', () => {
       const service = s3Service(config, 'ocelot-social')
       await service.uploadFile(input)
 
+      // The literal wire values, not the SDK constant — asserting `ObjectCannedACL.public_read`
+      // against a service that passes `ObjectCannedACL.public_read` would hold no matter what
+      // that constant became. 'public-read' is what S3 itself has to receive.
       expect(uploadMock.mock.calls[0][0].params).toMatchObject({
-        ACL: 'public_read',
+        ACL: 'public-read',
         CacheControl: 'public, max-age=604800',
       })
     })
