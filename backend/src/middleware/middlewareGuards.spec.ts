@@ -26,7 +26,7 @@ describe('hashtagsMiddleware', () => {
   it('touches no hashtags when the mutation produced no post', async () => {
     const resolve = vi.fn().mockResolvedValue(null)
 
-    const result = await hashtagsMiddleware.Mutation.CreatePost(
+    const result: unknown = await hashtagsMiddleware.Mutation.CreatePost(
       resolve,
       null,
       { content: 'a post with a #hashtag' },

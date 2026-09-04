@@ -127,9 +127,11 @@ describe('Signup', () => {
         })
 
         expect(errors?.[0].message).toContain('email')
+
         const { records } = await database.query({
           query: `MATCH (email:EmailAddress { email: 'not-an-address' }) RETURN count(email) AS count`,
         })
+
         expect(records[0].get('count').toNumber()).toBe(0)
       })
 
@@ -286,13 +288,16 @@ describe('SignupVerification', () => {
             })
 
             expect(errors).toBeUndefined()
-            expect(data.SignupVerification).toEqual(expect.objectContaining({ id: expect.any(String) }))
+            expect(data.SignupVerification).toEqual(
+              expect.objectContaining({ id: expect.any(String) }),
+            )
 
             const { records } = await database.query({
               query: `MATCH (user:User { id: $id })
                       RETURN size([(user)-[:IS_IN]->(:Location) | 1]) AS locations`,
               variables: { id: data.SignupVerification.id },
             })
+
             expect(records[0].get('locations').toNumber()).toBe(0)
           })
 
@@ -314,6 +319,7 @@ describe('SignupVerification', () => {
             })
 
             expect(errors).toBeUndefined()
+
             const { records } = await database.query({
               query: `MATCH (host:User { id: 'invite-host' }), (user:User { id: $id })
                       RETURN exists((host)-[:INVITED]->(user)) AS invited,
@@ -321,6 +327,7 @@ describe('SignupVerification', () => {
                              exists((user)-[:FOLLOWS]->(host)) AS follows`,
               variables: { id: data.SignupVerification.id },
             })
+
             expect(records[0].toObject()).toEqual({
               invited: true,
               redeemed: true,

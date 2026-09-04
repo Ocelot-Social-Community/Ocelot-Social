@@ -163,7 +163,7 @@ describe('follow', () => {
       const { data, errors } = await mutate({ mutation, variables: { id: 'no-such-user' } })
 
       expect(errors).toBeUndefined()
-      expect(data[name]).toBeNull()
+      expect(data).toEqual({ [name]: null })
     })
   })
 

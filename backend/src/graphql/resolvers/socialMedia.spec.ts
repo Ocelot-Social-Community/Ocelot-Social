@@ -250,8 +250,11 @@ describe('SocialMedia', () => {
       // The same declaration check CreateSocialMedia runs, on the update path — a link that was
       // valid when it was added must not become invalid by editing it. Separate code in the
       // resolver, so the create-side test above says nothing about this one.
-      it.each(['', 'not a url'])('rejects %o as the new url', async (url) => {
-        const result = await socialMediaAction(user, UpdateSocialMedia, { ...variables, url })
+      it.each(['', 'not a url'])('rejects %o as the new url', async (invalidUrl) => {
+        const result = await socialMediaAction(user, UpdateSocialMedia, {
+          ...variables,
+          url: invalidUrl,
+        })
 
         expect(result.errors![0].message).toContain('url')
       })
@@ -364,10 +367,14 @@ describe('SocialMedia', () => {
 // deleting something that is already gone is the desired end state, not an error.
 describe('DeleteSocialMedia for a node that is not there', () => {
   it('resolves to null rather than failing', async () => {
-    const context = { database } as unknown as Context
+    const databaseOnlyContext = { database } as unknown as Context
 
     await expect(
-      socialMediaResolvers.Mutation.DeleteSocialMedia(null, { id: 'never-existed' }, context),
+      socialMediaResolvers.Mutation.DeleteSocialMedia(
+        null,
+        { id: 'never-existed' },
+        databaseOnlyContext,
+      ),
     ).resolves.toBeNull()
   })
 })

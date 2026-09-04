@@ -176,7 +176,7 @@ const commentLike = nodeQuery({
 // would hide a regression that moved the check below the query.
 const contextWithoutDriver = () => ({}) as unknown as Context
 
-describe('nodeQuery', () => {
+describe(nodeQuery, () => {
   it('refuses a filter key it has no handler for, naming the label and the key', async () => {
     await expect(
       commentLike({ filter: { content_contains: 'anything' } }, contextWithoutDriver()),

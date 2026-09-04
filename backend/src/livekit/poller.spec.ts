@@ -199,8 +199,9 @@ describe('poll tick', () => {
     let tick: (() => void) | undefined
     vi.stubGlobal(
       'setInterval',
-      vi.fn((callback: () => void) => {
-        tick = callback
+
+      vi.fn((handler: () => void) => {
+        tick = handler
         return 2
       }),
     )

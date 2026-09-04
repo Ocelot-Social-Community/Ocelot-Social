@@ -87,6 +87,22 @@ describe('AddEmailAddress', () => {
       })
     })
 
+    // The viewer is authenticated by JWT, which outlives the account: an admin can delete a user
+    // while that user still holds a valid token. MERGE off a MATCH that binds nothing writes no
+    // node at all — so the mutation must say so instead of returning an EmailAddress the request
+    // never created.
+    describe('the authenticated account no longer exists', () => {
+      beforeEach(() => {
+        authenticatedUser = { id: 'ghost-user' } as Context['user']
+      })
+
+      it('throws UserInputError', async () => {
+        const { errors } = await mutate({ mutation: AddEmailAddress, variables })
+
+        expect(errors?.[0]).toHaveProperty('message', 'User not found.')
+      })
+    })
+
     describe('email attribute is a valid email', () => {
       it('creates a new unverified `EmailAddress` node', async () => {
         await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({

@@ -8,6 +8,8 @@ import Factory, { cleanDatabase } from '@db/factories'
 import User from '@graphql/queries/users/User.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
+import locationsResolvers from './locations'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
@@ -348,5 +350,18 @@ describe('distanceToMe', () => {
         })
       })
     })
+  })
+})
+
+// distanceToMe is the ONE Location field that is not a @cypher projection: it runs its own query
+// keyed on `parent.id`. Every Location the schema hands it has one — a parent without an id can
+// only come from a projection that did not select it (or a Location built in code). Refusing is
+// what stops `MATCH (location:Location {id: null})` from binding an arbitrary Location and
+// reporting a distance to somewhere the viewer never asked about.
+describe('Location.distanceToMe', () => {
+  it('refuses a parent it cannot identify', async () => {
+    await expect(
+      locationsResolvers.Location.distanceToMe({}, {}, null, null),
+    ).rejects.toThrow('Can not identify selected Location!')
   })
 })

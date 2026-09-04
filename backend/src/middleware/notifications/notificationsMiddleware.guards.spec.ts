@@ -41,13 +41,9 @@ describe.each([
     const { publish, context } = contextWithSpy()
     const resolve = vi.fn().mockResolvedValue(null)
 
-    const result = await notificationsMiddleware.Mutation[mutation](
-      resolve,
-      null,
-      args,
-      context,
-      noInfo,
-    )
+    // eslint-disable-next-line security/detect-object-injection -- key from the literal table above
+    const handler = notificationsMiddleware.Mutation[mutation]
+    const result: unknown = await handler(resolve, null, args, context, noInfo)
 
     expect(result).toBeNull()
     expect(resolve).toHaveBeenCalledTimes(1)
