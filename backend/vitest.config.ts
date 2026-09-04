@@ -30,6 +30,42 @@ const graphqlPlugin = (): Plugin => ({
   },
 })
 
+// Default for `testTimeout`; see the comment at its use site for how the number was arrived at.
+const DEFAULT_TEST_TIMEOUT = 30_000
+
+// The VITEST_TEST_TIMEOUT override, validated rather than passed through `Number()`.
+//
+// `Number()` maps every typo onto a value vitest accepts silently, and BOTH of them defeat the
+// timeout rather than adjusting it (verified against @vitest/runner's `withTimeout`, which reads
+// `if (timeout <= 0 || timeout === Infinity) return fn`):
+//
+//   VITEST_TEST_TIMEOUT=30s  → NaN → not <= 0, so a timer IS armed, with NaN → Node clamps that
+//                              to 1ms → every async test fails instantly, for no visible reason
+//   VITEST_TEST_TIMEOUT=     → 0   → the guard is removed ENTIRELY → a genuinely hung test hangs
+//                              the run forever, which is the one thing this setting exists to stop
+//
+// `??` does not catch either: it only tests for null/undefined, so an empty variable — the shape
+// an unset shell variable takes in most CI templates — sails straight through as 0.
+//
+// Refused loudly instead of quietly falling back to the default. The override is typed by a human
+// at the moment they run the suite; a silent fallback is indistinguishable from it having worked,
+// so they would go on believing the longer timeout was in effect while it never was.
+const resolveTestTimeout = (): number => {
+  // eslint-disable-next-line n/no-process-env
+  const raw = process.env.VITEST_TEST_TIMEOUT
+  if (raw === undefined) {
+    return DEFAULT_TEST_TIMEOUT
+  }
+  const parsed = Number(raw)
+  // isFinite rejects NaN and both infinities; `<= 0` rejects the disable-the-guard values.
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    throw new Error(
+      `VITEST_TEST_TIMEOUT must be a positive number of milliseconds, got ${JSON.stringify(raw)}`,
+    )
+  }
+  return parsed
+}
+
 export default defineConfig({
   plugins: [graphqlPlugin()],
   resolve: {
@@ -83,8 +119,7 @@ export default defineConfig({
     // 30s is ~3x the slowest test and still short enough that a genuinely hung test fails the
     // run quickly. Overridable for a slow CI runner or a debugging session without editing this
     // file — raising it there must not require a commit.
-    // eslint-disable-next-line n/no-process-env
-    testTimeout: Number(process.env.VITEST_TEST_TIMEOUT ?? 30000),
+    testTimeout: resolveTestTimeout(),
     // The suite talks to one shared Neo4j and the specs clean it between cases, so they cannot
     // run concurrently — this is the equivalent of Jest's `--runInBand`, which the `test` script
     // passed for exactly that reason.
