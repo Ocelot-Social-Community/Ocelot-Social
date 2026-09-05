@@ -45,7 +45,7 @@
   "dependencies": {
     "@apollo/server": "^4.11.3",
     "@aws-sdk/client-s3": "^3.1120.0",
-    "@aws-sdk/lib-storage": "^3.1113.0",
+    "@aws-sdk/lib-storage": "^3.1124.0",
     "@graphql-tools/load-files": "^7.0.0",
     "@graphql-tools/merge": "^9.2.3",
     "@graphql-tools/schema": "^10.0.0",
