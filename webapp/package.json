@@ -125,7 +125,7 @@
     "style-loader": "~0.23.1",
     "vue-loader": "^15.11.1",
     "vue-svg-loader": "~0.16.0",
-    "webpack": "4.47.0"
+    "webpack": "5.110.3"
   },
   "overrides": {
     "graphql": "$graphql",
