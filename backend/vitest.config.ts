@@ -1,10 +1,16 @@
 import { readFileSync } from 'node:fs'
+import { posix, relative, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { parse } from 'graphql'
 import { defineConfig } from 'vitest/config'
 
 import type { Plugin } from 'vite'
+import type { TestUserConfig } from 'vitest/config'
+
+// The reporter list as vitest types it — spelled out so the `['github-actions', { … }]` entry
+// below is checked against the tuple form the option object needs, not widened to a bare string.
+type Reporters = NonNullable<TestUserConfig['reporters']>
 
 // `.gql` documents are imported as modules by the specs (and by db/seed). Vite has no idea what
 // that extension is, so it gets a transform of its own — the direct replacement for the Jest
@@ -66,6 +72,41 @@ const resolveTestTimeout = (): number => {
   return parsed
 }
 
+// GitHub attaches an `::error` annotation to a diff line only when its `file=` is relative to the
+// WORKSPACE root. Vitest reports the absolute path of the running process, and in CI that process
+// lives inside the backend container, where this file is `/app/src/…` — a path the workspace has
+// never heard of, so the annotation would show up in the run summary detached from any file.
+//
+// Rewritten to `backend/src/…` here. Relative-to-cwd plus the `backend/` prefix is correct for
+// BOTH shapes this can run in, because either way the suite is started from the backend directory:
+// in the container cwd is `/app` (→ `src/…`), on a runner without the container it is
+// `<workspace>/backend` (→ `src/…` as well). Separators are forced to POSIX because GitHub parses
+// the annotation path that way regardless of the runner OS.
+const toWorkspacePath = (file: string): string =>
+  posix.join('backend', relative(process.cwd(), file).split(sep).join(posix.sep))
+
+// Assembled here rather than passed per-script as `--reporter` flags, for one blunt reason: the
+// github-actions reporter needs an OPTION (onWritePath above) and a CLI flag cannot carry one.
+// A `--reporter` on the command line also REPLACES this list wholesale rather than adding to it,
+// so the two cannot be mixed — everything lives here, switched by environment.
+const reporters: Reporters = [
+  // Always on. Without it a failing run prints nothing usable: `blob` alone emits a single
+  // "blob report written to …" line whatever the outcome, which is how a red shard used to end at
+  // `Error: Process completed with exit code 1` with no indication of which test failed.
+  'default',
+  // The machine-readable report `test:merge` consumes via `--merge-reports`. Only in shard mode —
+  // set by the `test:shard` script, which is the only caller that produces one.
+  // eslint-disable-next-line n/no-process-env
+  ...(process.env.VITEST_BLOB_REPORT === 'true' ? ['blob'] : []),
+  // Inline annotations on the pull request. Vitest adds this reporter itself when it detects
+  // Actions, but only while the reporter list is untouched — naming any reporter explicitly (as
+  // this file does) opts out of that, so it is named explicitly too.
+  // eslint-disable-next-line n/no-process-env
+  ...(process.env.GITHUB_ACTIONS === 'true'
+    ? ([['github-actions', { onWritePath: toWorkspacePath }]] satisfies Reporters)
+    : []),
+]
+
 export default defineConfig({
   plugins: [graphqlPlugin()],
   resolve: {
@@ -107,6 +148,7 @@ export default defineConfig({
       },
     },
     include: ['src/**/*.{spec,test}.ts'],
+    reporters,
     // Inherited from `jest.setTimeout(10000)` in test/setup.ts (whose only content that was, so
     // the file is gone). The value has been raised because 10000 was not a limit any more, it was
     // the measurement: "embeds > given a youtube link" costs 10.6–10.8s on a developer machine

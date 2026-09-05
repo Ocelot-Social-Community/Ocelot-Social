@@ -318,6 +318,18 @@ jobs:
       # The blob goes to a directory of its OWN, not into `coverage/` next to the reports:
       # `--merge-reports=<dir>` parses EVERY file in the directory it is given as a blob, and
       # chokes on the first one that is not (verified — it fails with a JSON SyntaxError).
+      #
+      # What makes a RED shard readable lives in vitest.config.ts, not here: `test:shard` only sets
+      # VITEST_BLOB_REPORT=true and the config assembles `default` + `blob` (+ `github-actions`
+      # when it sees Actions). It used to pass `--reporter=blob` on the command line, and that
+      # REPLACES the default reporter instead of adding to it — the blob reporter prints exactly
+      # one line ("blob report written to …") whatever the outcome, so a failing shard ended at
+      # `Error: Process completed with exit code 1` without naming a single test, and the only way
+      # to find out was to re-run the suite locally. Reporters cannot be split across the two
+      # places: any `--reporter` flag discards the configured list wholesale.
+      #
+      # Verified that the extra reporters do not corrupt the blob — one written by a FAILING run
+      # with all three still merges, and the merge job re-reports the failure from it.
       - name: backend | Unit test (shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
         run: |
           docker compose exec -T backend npm run test:shard -- \
