@@ -48,7 +48,7 @@
     "graphql-tag": "2.12.7",
     "intersection-observer": "^0.12.2",
     "linkify-it": "~5.0.2",
-    "livekit-client": "^2.22.0",
+    "livekit-client": "^2.22.2",
     "lodash": "4.17.21",
     "mapbox-gl": "1.13.3",
     "nuxt-dropzone": "^1.0.4",
