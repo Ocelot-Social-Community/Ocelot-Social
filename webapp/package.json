@@ -45,7 +45,7 @@
     "date-fns": "2.22.1",
     "dotenv": "8.2.0",
     "graphql": "14.7.0",
-    "graphql-tag": "2.10.1",
+    "graphql-tag": "2.12.7",
     "intersection-observer": "^0.12.2",
     "linkify-it": "~5.0.2",
     "livekit-client": "^2.22.0",
