@@ -724,23 +724,34 @@ describe('role management', () => {
       expect(errors?.[0]).toMatchObject(INJECTED_FAILURE)
     })
 
+    // A rejection can carry any value. `'code' in err` throws a TypeError on a primitive, so the
+    // conflict check must gate on `err instanceof Error` first — otherwise the original failure is
+    // replaced by a TypeError from the error handler itself.
+    //
+    // Driven against the resolver DIRECTLY, not through a mutation, because what a non-Error
+    // rejection looks like from the outside depends on the environment. graphql-shield runs with
+    // `allowExternalErrors` and, whenever `debug` is off, RETURNS the thrown value as the field
+    // value instead of rethrowing it (graphql-shield/cjs/generator.js:42-48). graphql-js turns a
+    // returned Error back into an error, but a returned STRING it tries to complete as a `Role!`,
+    // which fails on the non-null `name`. `debug` is `!!CONFIG.DEBUG`, so the very same assertion
+    // reads "Unexpected error value: database is down" against a local .env with DEBUG=true and
+    // "Cannot return null for non-nullable field Role.name." in the CI container, where
+    // docker-compose.test.yml sets DEBUG= — measured both ways. The resolver's own contract is
+    // the part that is stable, and the part this test is about.
     it('does not crash when the failure is not an Error object', async () => {
-      await mutate({ mutation: CREATE_ROLE, variables: { name: 'editor', permissions: [] } })
-      // A rejection can carry any value. `'code' in err` throws a TypeError on a
-      // primitive, so the conflict check must gate on `err instanceof Error` first —
-      // otherwise the original failure is masked by a TypeError from the error handler.
-      vi.spyOn(roleService, 'renameRole').mockRejectedValueOnce('database is down')
-      const { errors } = await mutate({
-        mutation: RENAME_ROLE,
-        variables: { name: 'editor', newName: 'reviewer' },
-      })
+      const failure = 'database is down'
+      const context = {
+        role: {
+          getRole: (name: string) =>
+            name === 'editor' ? { name: 'editor', protected: false, permissions: [] } : undefined,
+          renameRole: vi.fn().mockRejectedValue(failure),
+        },
+        user: { id: 'admin-id' },
+      } as unknown as Context
 
-      // Not INJECTED_FAILURE: the surfaced message is graphql's own wrapper for a non-Error
-      // rejection ("Unexpected error value: …"), which is not wording this codebase owns. What
-      // matters is that the thrown VALUE is still in it — had `'code' in err` run on the string,
-      // this would be a TypeError about the `in` operator and the real failure would be gone.
-      expect(errors).toHaveLength(1)
-      expect(errors?.[0].message).toContain('database is down')
+      await expect(
+        rolesResolvers.Mutation.renameRole(null, { name: 'editor', newName: 'reviewer' }, context),
+      ).rejects.toBe(failure)
     })
   })
 
