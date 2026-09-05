@@ -123,7 +123,7 @@
     "storybook": "7.6.24",
     "storybook-design-token": "^3.3.0",
     "style-loader": "~0.23.1",
-    "vue-loader": "^15.11.1",
+    "vue-loader": "^17.4.2",
     "vue-svg-loader": "~0.16.0",
     "webpack": "4.47.0"
   },
