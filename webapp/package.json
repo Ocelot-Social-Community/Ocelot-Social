@@ -103,7 +103,7 @@
     "babel-loader": "~8.1.0",
     "babel-plugin-require-context-hook": "^1.0.0",
     "core-js": "~2.6.10",
-    "css-loader": "^4.2.0",
+    "css-loader": "^7.1.5",
     "eslint": "^10.9.1",
     "eslint-config-prettier": "~10.1.8",
     "eslint-plugin-jest": "^29.16.6",
