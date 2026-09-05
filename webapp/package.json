@@ -40,7 +40,7 @@
     "apollo-client": "~2.6.10",
     "async-validator": "^4.2.5",
     "cookie-universal-nuxt": "~2.2.2",
-    "cropperjs": "^1.6.2",
+    "cropperjs": "^2.2.0",
     "cross-env": "~10.1.0",
     "date-fns": "2.22.1",
     "dotenv": "17.4.2",
