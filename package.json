@@ -57,7 +57,7 @@
     "vuepress": "2.0.0-rc.18",
     "vuepress-plugin-search-pro": "2.0.0-rc.59",
     "vuepress-theme-hope": "2.0.0-rc.59",
-    "webpack": "^5.109.2"
+    "webpack": "^5.110.3"
   },
   "resolutions": {
     "set-value": "^2.0.1",
