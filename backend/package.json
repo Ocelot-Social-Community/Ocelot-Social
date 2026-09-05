@@ -95,7 +95,7 @@
     "minimatch": "^10.2.6",
     "mustache": "^4.2.0",
     "neo4j-driver": "^4.4.11",
-    "node-fetch": "^2.7.0",
+    "node-fetch": "^3.3.2",
     "nodemailer": "^9.0.5",
     "nodemailer-html-to-text": "^3.2.0",
     "preview-email": "^3.3.0",
