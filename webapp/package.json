@@ -43,7 +43,7 @@
     "cropperjs": "^1.6.2",
     "cross-env": "~10.1.0",
     "date-fns": "2.22.1",
-    "dotenv": "8.2.0",
+    "dotenv": "17.4.2",
     "graphql": "14.7.0",
     "graphql-tag": "2.12.7",
     "intersection-observer": "^0.12.2",
