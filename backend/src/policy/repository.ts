@@ -30,11 +30,11 @@ export async function readAllSettings(
     const rawValue = record.get('value') as string
     try {
       out[key] = JSON.parse(rawValue)
-    } catch (error) {
-      // Skip malformed JSON (bootstrap will reseed); rethrow anything unexpected.
-      if (!(error instanceof SyntaxError)) {
-        throw error
-      }
+      // eslint-disable-next-line no-catch-all/no-catch-all -- JSON.parse throws SyntaxError only
+    } catch {
+      // Skip malformed JSON; bootstrap reseeds the key. There used to be an `instanceof
+      // SyntaxError` rethrow here for "anything unexpected" — JSON.parse has no other failure
+      // mode, so that arm could not run.
     }
   }
   return out

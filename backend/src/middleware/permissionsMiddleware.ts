@@ -69,7 +69,10 @@ const hasPermission = (permission: PermissionKey) =>
 
 // Flat per-group-type creation rights (mirrors videoCall.create_*): creating a group
 // of a given type needs exactly that type's permission, independent of the others.
-const groupCreatePermissionForType = (groupType: string): PermissionKey | null => {
+// Exported for the drift test in permissionsMiddleware.spec.ts, which asserts that EVERY value of
+// the GroupType enum still maps to a permission. That is what the `default` below is for: a
+// fourth group type added to the schema and not to this switch must be refused, not created.
+export const groupCreatePermissionForType = (groupType: string): PermissionKey | null => {
   switch (groupType) {
     case 'public':
       return 'group.create_public'
@@ -480,7 +483,10 @@ const effectivePermissionsOfUser = async (
             RETURN coalesce(r.name, 'user') AS roleName`,
     variables: { userId },
   })
-  const roleName = (result.records[0]?.get('roleName') as string | undefined) ?? 'user'
+  // Exactly one row, always: an OPTIONAL MATCH that finds nothing still returns a row with a null
+  // `r`, and the coalesce turns that into 'user'. No JS-side fallback needed — the two that used
+  // to be here could not run.
+  const roleName = result.records[0].get('roleName') as string
   return context.role.permissionsForRole(roleName)
 }
 
@@ -492,6 +498,10 @@ const effectivePermissionsOfUser = async (
 // separately via hasPermission(); this rule only enforces the relative ranking.
 const canActOnTargetUser = rule({ cache: 'no_cache' })(async (_parent, args, context: Context) => {
   const targetId = args.id as string | undefined
+  // Fail closed. Every mutation this rule is attached to today declares `id: ID!`, so the schema
+  // makes this unreachable — it is here so that attaching the rule to a mutation whose target
+  // argument is named differently DENIES rather than silently skipping the hierarchy check.
+  /* v8 ignore next 3 -- unreachable while every guarded mutation declares a non-null id */
   if (!targetId) {
     return false
   }
@@ -509,6 +519,9 @@ const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
   context: Context,
 ) => {
   const resourceId = args.resourceId as string | undefined
+  // Same fail-closed guard as canActOnTargetUser: `review(resourceId: ID!)` makes it unreachable
+  // through the schema, and it stays so a differently-named argument denies instead of passing.
+  /* v8 ignore next 3 -- unreachable while review declares a non-null resourceId */
   if (!resourceId) {
     return false
   }
@@ -534,9 +547,9 @@ const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
   if (!(row.get('isUser') as boolean)) {
     return true
   }
-  const targetPermissions = context.role.permissionsForRole(
-    (row.get('roleName') as string | undefined) ?? 'user',
-  )
+  // coalesce() in the statement above already guarantees a name, same as in
+  // effectivePermissionsOfUser.
+  const targetPermissions = context.role.permissionsForRole(row.get('roleName') as string)
   return dominates(context.effectivePermissions, targetPermissions)
 })
 

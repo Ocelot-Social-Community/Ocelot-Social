@@ -1,7 +1,7 @@
 // Unit tests for the visibility primitive — the single mechanism shared by the
 // `policy` query resolver and the policyChanged subscription filter.
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, afterEach } from 'vitest'
 
 import {
   allKeys,
@@ -223,6 +223,33 @@ describe(categoryFor, () => {
       expect(categoryFor(key)).toEqual(expect.any(String))
     }
   })
+
+  // `category` is optional in the JSON schema (Ajv only enum-checks it when present), so a
+  // newly added key can ship without one. The guard above proves no shipped key does; this
+  // proves the accessor actually REFUSES such a key instead of returning undefined, which
+  // would drop it into a phantom group in the admin config tab. Only reachable against an
+  // injected schema.
+  describe('a key without a declared category', () => {
+    afterEach(() => {
+      vi.doUnmock('./policy.schema.json')
+      vi.resetModules()
+    })
+
+    it('is rejected when its category is read', async () => {
+      vi.resetModules()
+      vi.doMock('./policy.schema.json', () => ({
+        default: {
+          type: 'object',
+          properties: { uncategorised: { type: 'boolean', default: false } },
+        },
+      }))
+      const schema = await import('./schema')
+
+      expect(() => schema.categoryFor('uncategorised' as never)).toThrow(
+        /key "uncategorised" is missing a "category"/,
+      )
+    })
+  })
 })
 
 describe(requiresPolicyFor, () => {
@@ -276,6 +303,19 @@ describe(requiresPolicyFor, () => {
       }))
       await import('./schema')
     }
+
+    it('accepts a dependency declared AFTER its dependent (no false cycle)', async () => {
+      // Property order is authoring order, not dependency order: "b" is first reached
+      // through "a" and coloured BLACK, so the outer DFS loop must skip it. A detector
+      // that re-visited it — or read "already seen" as GREY — would reject a perfectly
+      // valid schema and take the whole backend down at boot.
+      await expect(
+        loadWith({
+          a: { type: 'boolean', default: false, requiresPolicy: ['b'] },
+          b: { type: 'boolean', default: false },
+        })(),
+      ).resolves.toBeUndefined()
+    })
 
     it('throws on a requiresPolicy cycle', async () => {
       await expect(

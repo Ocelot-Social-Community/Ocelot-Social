@@ -12,6 +12,8 @@ import DeleteSocialMedia from '@graphql/queries/users/DeleteSocialMedia.gql'
 import UpdateSocialMedia from '@graphql/queries/users/UpdateSocialMedia.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
+import socialMediaResolvers from './socialMedia'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { NetworkPolicy } from '@src/policy'
@@ -245,6 +247,18 @@ describe('SocialMedia', () => {
         expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
       })
 
+      // The same declaration check CreateSocialMedia runs, on the update path — a link that was
+      // valid when it was added must not become invalid by editing it. Separate code in the
+      // resolver, so the create-side test above says nothing about this one.
+      it.each(['', 'not a url'])('rejects %o as the new url', async (invalidUrl) => {
+        const result = await socialMediaAction(user, UpdateSocialMedia, {
+          ...variables,
+          url: invalidUrl,
+        })
+
+        expect(result.errors![0].message).toContain('url')
+      })
+
       it('denies updating when the socialMediaEnabled policy is off', async () => {
         policyOverride = { socialMediaEnabled: false }
         const result = await socialMediaAction(user, UpdateSocialMedia, variables)
@@ -344,5 +358,23 @@ describe('SocialMedia', () => {
 
       expect(result.data!.User[0].socialMedia).toEqual([])
     })
+  })
+})
+
+// isMySocialMedia resolves the owner from the node itself, so a request for an id that has no
+// node is denied before the resolver runs — the resolver's own "no such node" answer is only
+// reachable from here. It matters because DeleteSocialMedia is declared nullable ON PURPOSE:
+// deleting something that is already gone is the desired end state, not an error.
+describe('DeleteSocialMedia for a node that is not there', () => {
+  it('resolves to null rather than failing', async () => {
+    const databaseOnlyContext = { database } as unknown as Context
+
+    await expect(
+      socialMediaResolvers.Mutation.DeleteSocialMedia(
+        null,
+        { id: 'never-existed' },
+        databaseOnlyContext,
+      ),
+    ).resolves.toBeNull()
   })
 })

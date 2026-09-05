@@ -258,6 +258,28 @@ describe('notifications', () => {
             })
           })
 
+          // An account created through registration carries none of the nine `emailNotifications*`
+          // properties — only the FACTORY writes them (see createUserNode in db/factories.ts,
+          // and writerParity.spec.ts, which pins that divergence). So "not stored" is the state
+          // every real account is in until it saves its notification settings once, and it has to
+          // mean opted IN: reading it as "off" would silently mute e-mail for every new user.
+          describe('if the setting was never stored, as on a freshly registered account', () => {
+            it('sends me the email anyway', async () => {
+              await database.write({
+                query: `MATCH (user:User { id: $id })
+                        REMOVE user.emailNotificationsCommentOnObservedPost
+                        RETURN user { .id }`,
+                variables: { id: 'you' },
+              })
+              await createCommentOnPostAction()
+
+              expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+              expect(sendNotificationMailMock).toHaveBeenCalledWith(
+                expect.objectContaining({ reason: 'commented_on_post' }),
+              )
+            })
+          })
+
           describe('if I have blocked the comment author', () => {
             it('sends me no notification', async () => {
               await notifiedUser.relateTo(commentAuthor, 'blocked')

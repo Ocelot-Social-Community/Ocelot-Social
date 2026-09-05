@@ -1,6 +1,6 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { afterEach, beforeEach, describe, it, expect } from 'vitest'
 
-import type { Mock } from 'vitest'
+import type { Mock, MockInstance } from 'vitest'
 
 vi.mock('@sentry/node', () => ({
   init: vi.fn(),
@@ -133,5 +133,75 @@ describe('createSentryMiddleware', () => {
       expect(scope.setExtra).toHaveBeenCalledWith('user-agent', undefined)
       expect(captureExceptionMock).toHaveBeenCalledWith(error)
     })
+  })
+})
+
+describe('the exported middleware instance', () => {
+  interface MockSentryConfig {
+    SENTRY_DSN_BACKEND?: string
+    COMMIT?: string
+    NODE_ENV?: string
+    TEST?: boolean
+  }
+
+  // The instance is built while the module evaluates, so the only way to observe how CONFIG is
+  // wired into it is to re-evaluate the module against a replaced config.
+  const loadWithConfig = async (config: MockSentryConfig) => {
+    vi.resetModules()
+    vi.doMock('@config/index', () => ({ default: config }))
+    return import('./sentryMiddleware')
+  }
+
+  let logSpy: MockInstance<typeof console.log>
+
+  beforeEach(() => {
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    logSpy.mockRestore()
+    vi.doUnmock('@config/index')
+    vi.resetModules()
+  })
+
+  it('reports errors against the deployed commit and environment', async () => {
+    await loadWithConfig({
+      SENTRY_DSN_BACKEND: 'https://example@sentry.io/2',
+      COMMIT: 'deadbeef',
+      NODE_ENV: 'production',
+      TEST: false,
+    })
+
+    // Release and environment are what makes an incoming event attributable to a deployment;
+    // mixing up which CONFIG key feeds which would file every production error under the wrong
+    // release without any visible symptom.
+    expect(initMock).toHaveBeenCalledWith({
+      dsn: 'https://example@sentry.io/2',
+      release: 'deadbeef',
+      environment: 'production',
+    })
+    expect(logSpy).not.toHaveBeenCalled()
+  })
+
+  // A missing DSN means no error reporting at all. Nothing else in the system fails when it is
+  // forgotten, so this line is the single signal an operator gets — and it must reach the log
+  // even though the middleware itself keeps working.
+  it('warns on startup when no DSN is configured', async () => {
+    const { default: middleware } = await loadWithConfig({ TEST: false })
+
+    expect(logSpy).toHaveBeenCalledWith('Warning: Sentry middleware inactive.')
+    expect(initMock).not.toHaveBeenCalled()
+
+    const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue('ok')
+
+    await expect(middleware(resolve, {}, {}, {}, {})).resolves.toBe('ok')
+  })
+
+  // Every test run would otherwise print the warning once per worker, for a DSN that is absent
+  // on purpose.
+  it('stays quiet about the missing DSN while testing', async () => {
+    await loadWithConfig({ TEST: true })
+
+    expect(logSpy).not.toHaveBeenCalled()
   })
 })

@@ -364,6 +364,30 @@ describe('generatePersonalInviteCode', () => {
       })
     })
 
+    // Codes are six random characters, so collisions are rare but not impossible — and the
+    // MERGE below would silently hand the second user the FIRST user's still-valid code,
+    // letting them invite people in someone else's name. Forced here by pinning Math.random
+    // so the first generated code is one that already exists.
+    it('generates another code when the first one is already taken', async () => {
+      await database.write({
+        query: `MATCH (user:User { id: 'inviting-user' })
+                MERGE (user)-[:GENERATED]->(:InviteCode { code: '000000' })`,
+      })
+      // Six draws per code (branding.registration.inviteCodeLength). 0 → '0', so the first
+      // attempt reproduces the code above; 0.99 → 35 → 'Z' for every draw after that.
+      let draw = 0
+      const random = vi.spyOn(Math, 'random').mockImplementation(() => (draw++ < 6 ? 0 : 0.99))
+
+      try {
+        const { data, errors } = await mutate({ mutation: generatePersonalInviteCode })
+
+        expect(errors).toBeUndefined()
+        expect(data.generatePersonalInviteCode.code).toBe('ZZZZZZ')
+      } finally {
+        random.mockRestore()
+      }
+    })
+
     it('returns a new invite code with comment', async () => {
       await expect(
         mutate({ mutation: generatePersonalInviteCode, variables: { comment: 'some text' } }),
@@ -575,6 +599,29 @@ describe('generateGroupInviteCode', () => {
   describe('as authenticated member', () => {
     beforeEach(async () => {
       authenticatedUser = await invitingUser.toJson()
+    })
+
+    // Same collision retry as generatePersonalInviteCode — a separate loop in the resolver, so a
+    // fix applied to only one of them would leave this one handing out a taken code.
+    it('generates another code when the first one is already taken', async () => {
+      await database.write({
+        query: `MATCH (user:User { id: 'inviting-user' })
+                MERGE (user)-[:GENERATED]->(:InviteCode { code: '000000' })`,
+      })
+      let draw = 0
+      const random = vi.spyOn(Math, 'random').mockImplementation(() => (draw++ < 6 ? 0 : 0.99))
+
+      try {
+        const { data, errors } = await mutate({
+          mutation: generateGroupInviteCode,
+          variables: { groupId: 'public-group' },
+        })
+
+        expect(errors).toBeUndefined()
+        expect(data.generateGroupInviteCode.code).toBe('ZZZZZZ')
+      } finally {
+        random.mockRestore()
+      }
     })
 
     it('returns a new group invite code', async () => {

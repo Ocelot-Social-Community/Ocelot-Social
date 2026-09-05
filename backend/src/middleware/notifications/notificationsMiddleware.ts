@@ -514,7 +514,11 @@ const handleCreateMessage: IMiddlewareResolver = async (
       const recipientUser = recipient.user
       const { email } = recipient
 
-      // send subscriptions
+      // send subscriptions.
+      // The falsy side cannot happen from here: `recipients` comes from a query that MATCHes the
+      // same room, so a room whose properties are gone has no recipients and this loop does not
+      // run at all. Kept because getRoomProperties is nullable by contract.
+      /* v8 ignore next -- unreachable: no recipients exist for a room that has no properties */
       if (roomProperties) {
         void context.pubsub.publish(ROOM_UPDATED, {
           roomUpdated: roomProperties,

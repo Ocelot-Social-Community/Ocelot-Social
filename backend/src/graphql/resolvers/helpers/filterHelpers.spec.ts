@@ -162,6 +162,35 @@ describe('filterPostsOfMyGroups', () => {
       expect(result.data?.Post).toHaveLength(0)
     })
   })
+
+  // An anonymous visitor can send `postsInMyGroups: true` — the flag is a plain filter field, not
+  // an authenticated one. Resolving `inGroupsOf` to null instead of `undefined` is what makes the
+  // Cypher operator match nothing; leaving it undefined would drop the condition from the query
+  // and serve every group post to a visitor who is in no group at all.
+  describe('for an anonymous visitor', () => {
+    it('returns nothing rather than everything', async () => {
+      const author = await Factory.build('user', { id: 'anon-author', name: 'Author' })
+      authenticatedUser = await author.toJson()
+      await mutate({
+        mutation: CreatePost,
+        variables: {
+          id: 'anon-visible-post',
+          title: 'A regular post',
+          content: 'Some content here for the post',
+          postType: 'Article',
+        },
+      })
+      authenticatedUser = null
+
+      const result = await query({
+        query: Post,
+        variables: { filter: { postsInMyGroups: true } },
+      })
+
+      expect(result.errors).toBeUndefined()
+      expect(result.data?.Post).toHaveLength(0)
+    })
+  })
 })
 
 describe('filterInvisiblePosts', () => {

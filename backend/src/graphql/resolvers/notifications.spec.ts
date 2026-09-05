@@ -4,8 +4,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
+import { PubSub } from 'graphql-subscriptions'
 import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
 
+import { NOTIFICATION_ADDED } from '@constants/subscriptions'
 import Factory, { cleanDatabase } from '@db/factories'
 import markAllAsRead from '@graphql/queries/notifications/markAllAsRead.gql'
 import markAsRead from '@graphql/queries/notifications/markAsRead.gql'
@@ -14,6 +16,8 @@ import notifications from '@graphql/queries/notifications/notifications.gql'
 import notificationsPaginated from '@graphql/queries/notifications/notificationsPaginated.gql'
 import DeletePost from '@graphql/queries/posts/DeletePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import notificationsResolvers from './notifications'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -595,5 +599,34 @@ describe('given some notifications', () => {
         })
       })
     })
+  })
+})
+
+// A notification is addressed to exactly one person, and the channel is shared by everyone with an
+// open socket. The filter is what keeps the two apart — without it, every connected client would
+// receive every notification in the network, including the content of posts and comments they
+// cannot see. Driven through a real PubSub because the channel name and the filter only fail
+// together: a subscription attached to the wrong constant simply never fires, silently.
+describe('Subscription.notificationAdded', () => {
+  it('delivers only the notifications addressed to the subscriber', async () => {
+    const pubsub = new PubSub()
+    const iterator = notificationsResolvers.Subscription.notificationAdded.subscribe(
+      null,
+      {},
+      { user: { id: 'me' }, pubsub },
+      null,
+    )
+    const delivered = iterator.next()
+
+    await pubsub.publish(NOTIFICATION_ADDED, {
+      notificationAdded: { id: 'n-other', to: { id: 'somebody-else' } },
+    })
+    await pubsub.publish(NOTIFICATION_ADDED, {
+      notificationAdded: { id: 'n-mine', to: { id: 'me' } },
+    })
+
+    expect((await delivered).value).toMatchObject({ notificationAdded: { id: 'n-mine' } })
+
+    await iterator.return?.()
   })
 })

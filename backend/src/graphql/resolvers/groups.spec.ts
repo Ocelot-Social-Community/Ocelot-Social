@@ -4368,6 +4368,414 @@ describe('in mode', () => {
         expect(groups[0].id).toBe('group-beta')
       })
     })
+
+    describe('CreateGroup with an empty locationName', () => {
+      // The webapp sends '' when the user clears the location field. '' has to be turned
+      // into null, otherwise the geocoder middleware would try to resolve an empty place
+      // name and the group would end up with a bogus locationName.
+      it('creates the group without a location', async () => {
+        authenticatedUser = await user.toJson()
+
+        await expect(
+          mutate({
+            mutation: CreateGroup,
+            variables: {
+              id: 'no-location-group',
+              name: 'Group Without Location',
+              about: 'No location at all',
+              description: 'Some description' + descriptionAdditional100,
+              groupType: 'public',
+              actionRadius: 'global',
+              categoryIds: ['cat9'],
+              locationName: '',
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            CreateGroup: {
+              id: 'no-location-group',
+              locationName: null,
+              location: null,
+            },
+          },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('GroupCount without any groups', () => {
+      // The count is parsed from a Cypher string; an empty network must answer 0 and not
+      // leak NaN/null into the API.
+      it('returns 0', async () => {
+        authenticatedUser = await user.toJson()
+
+        await expect(query({ query: GroupCount })).resolves.toMatchObject({
+          data: { GroupCount: 0 },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('Group pagination', () => {
+      const GroupPage =
+        'query GroupPage($first: Int, $offset: Int) { Group(first: $first, offset: $offset) { id } }'
+
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+        for (const [id, name] of [
+          ['page-group-1', 'Page Group One'],
+          ['page-group-2', 'Page Group Two'],
+          ['page-group-3', 'Page Group Three'],
+        ]) {
+          await mutate({
+            mutation: CreateGroup,
+            variables: {
+              id,
+              name,
+              about: 'Paging test group',
+              description: 'Some description' + descriptionAdditional100,
+              groupType: 'public',
+              actionRadius: 'global',
+              categoryIds: ['cat9'],
+            },
+          })
+        }
+        // Groups created within the same millisecond share a createdAt, which would make
+        // the page contents arbitrary. Pin distinct timestamps so the expected split is
+        // the only correct answer.
+        await database.write({
+          query: `
+            MATCH (g1:Group { id: 'page-group-1' }) SET g1.createdAt = '2020-01-03T00:00:00.000Z'
+            WITH g1
+            MATCH (g2:Group { id: 'page-group-2' }) SET g2.createdAt = '2020-01-02T00:00:00.000Z'
+            WITH g2
+            MATCH (g3:Group { id: 'page-group-3' }) SET g3.createdAt = '2020-01-01T00:00:00.000Z'
+          `,
+        })
+      })
+
+      // SKIP/LIMIT is only appended when BOTH first and offset are given; a regression that
+      // drops the clause returns the full list on every page instead of failing loudly.
+      it('splits the groups into pages ordered by createdAt descending', async () => {
+        const firstPage = await query({ query: GroupPage, variables: { first: 2, offset: 0 } })
+        const secondPage = await query({ query: GroupPage, variables: { first: 2, offset: 2 } })
+
+        expect((firstPage.data.Group as Array<{ id: string }>).map((group) => group.id)).toEqual([
+          'page-group-1',
+          'page-group-2',
+        ])
+        expect((secondPage.data.Group as Array<{ id: string }>).map((group) => group.id)).toEqual([
+          'page-group-3',
+        ])
+      })
+    })
+
+    describe('UpdateGroup avatar', () => {
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'avatar-group',
+            name: 'Avatar Group',
+            about: 'A group without an avatar',
+            description: 'Some description' + descriptionAdditional100,
+            groupType: 'public',
+            actionRadius: 'global',
+            categoryIds: ['cat9'],
+          },
+        })
+      })
+
+      // Avatar metadata (alt text, sensitivity …) can only be merged onto an image that
+      // already exists. Sending metadata for a group that has no avatar must be rejected
+      // instead of silently doing nothing — the client would otherwise believe it saved.
+      it('rejects avatar metadata for a group that has no avatar yet', async () => {
+        const { errors } = await mutate({
+          mutation: UpdateGroup,
+          variables: { id: 'avatar-group', avatar: { alt: 'A group avatar' } },
+        })
+
+        expect(errors?.[0]).toHaveProperty('message', 'Cannot find image for given resource')
+      })
+    })
+
+    // The following blocks drive resolvers directly. Their guards sit BEHIND the
+    // permissionsMiddleware shield, which already rejects the corresponding requests — so they
+    // are only reachable either through a race (the membership vanishes between shield check
+    // and write) or if the shield rule is ever loosened. Driving the resolver directly is the
+    // only way to pin the fail-closed behaviour down.
+    describe('resolvers without an authenticated user', () => {
+      const anonymousContext = () =>
+        ({
+          driver: database.driver,
+          database,
+          user: null,
+          policy: createInMemoryPolicyService({ categoriesActive: false }),
+        }) as unknown as Context
+
+      const anonymousCalls: Array<[string, (context: Context) => Promise<void>]> = [
+        [
+          'Query.Group',
+          async (context) => {
+            await groupsResolver.Query.Group(null, {}, context, null)
+          },
+        ],
+        [
+          // Also proves the CreateGroup catch block only translates the slug constraint
+          // violation and rethrows every other error untouched.
+          'Mutation.CreateGroup',
+          async (context) => {
+            await groupsResolver.Mutation.CreateGroup(
+              null,
+              {
+                name: 'Anonymous Group',
+                description: 'Some description' + descriptionAdditional100,
+                groupType: 'public',
+                actionRadius: 'global',
+              },
+              context,
+              null,
+            )
+          },
+        ],
+        [
+          'Mutation.UpdateGroup',
+          async (context) => {
+            await groupsResolver.Mutation.UpdateGroup(null, { id: 'any-group' }, context, null)
+          },
+        ],
+        [
+          'Mutation.muteGroup',
+          async (context) => {
+            await groupsResolver.Mutation.muteGroup(null, { groupId: 'any-group' }, context, null)
+          },
+        ],
+        [
+          'Mutation.unmuteGroup',
+          async (context) => {
+            await groupsResolver.Mutation.unmuteGroup(null, { groupId: 'any-group' }, context, null)
+          },
+        ],
+        [
+          'Mutation.setGroupMembershipVisibility',
+          async (context) => {
+            await groupsResolver.Mutation.setGroupMembershipVisibility(
+              null,
+              { groupId: 'any-group', showOnProfile: true },
+              context,
+              null,
+            )
+          },
+        ],
+      ]
+
+      // Without the guard these resolvers would run their Cypher with an undefined user id
+      // (or crash on `context.user.id`) — writing/reading as "nobody" instead of refusing.
+      it.each(anonymousCalls)(
+        '%s throws instead of acting for an unknown user',
+        async (_name, call) => {
+          await expect(call(anonymousContext())).rejects.toThrow('Missing authenticated user.')
+        },
+      )
+    })
+
+    describe('GroupMembers seen by a viewer without a user', () => {
+      beforeEach(async () => {
+        await Factory.build(
+          'user',
+          { id: 'anon-pending-user', name: 'Anon Pending User' },
+          { email: 'anon-pending-user@example.org', password: '1234' },
+        )
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'anon-members-group',
+            name: 'Anon Members Group',
+            about: 'A public group',
+            description: 'Some description' + descriptionAdditional100,
+            groupType: 'public',
+            actionRadius: 'global',
+            categoryIds: ['cat9'],
+          },
+        })
+        await mutate({
+          mutation: JoinGroup,
+          variables: { groupId: 'anon-members-group', userId: 'anon-pending-user' },
+        })
+        await mutate({
+          mutation: ChangeGroupMemberRole,
+          variables: {
+            groupId: 'anon-members-group',
+            userId: 'anon-pending-user',
+            roleInGroup: 'pending',
+          },
+        })
+      })
+
+      // A context without a user must degrade to the non-member query (public list only,
+      // pending join requests hidden) rather than crashing on `context.user.id` or — worse —
+      // falling into the member branch that also returns pending requests.
+      it('returns only the publicly visible members', async () => {
+        const context = { driver: database.driver, user: null } as unknown as Context
+
+        const members = (await groupsResolver.Query.GroupMembers(
+          null,
+          { id: 'anon-members-group' },
+          context,
+          null,
+        )) as Array<{ user: { id: string } }>
+
+        expect(members.map((member) => member.user.id)).toEqual(['current-user'])
+      })
+    })
+
+    describe('setGroupMembershipVisibility for a pending membership', () => {
+      beforeEach(async () => {
+        await Factory.build(
+          'user',
+          { id: 'visibility-pending-user', name: 'Visibility Pending User' },
+          { email: 'visibility-pending-user@example.org', password: '1234' },
+        )
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'visibility-closed-group',
+            name: 'Visibility Closed Group',
+            about: 'A closed group',
+            description: 'Some description' + descriptionAdditional100,
+            groupType: 'closed',
+            actionRadius: 'global',
+            categoryIds: ['cat9'],
+          },
+        })
+        await mutate({
+          mutation: JoinGroup,
+          variables: { groupId: 'visibility-closed-group', userId: 'visibility-pending-user' },
+        })
+      })
+
+      // A pending join request is not a membership: it must not be publishable on a profile.
+      // The resolver's own WHERE clause is what enforces that, independently of the shield.
+      it('refuses to make an unapproved join request visible', async () => {
+        const context = {
+          driver: database.driver,
+          user: { id: 'visibility-pending-user' },
+        } as unknown as Context
+
+        await expect(
+          groupsResolver.Mutation.setGroupMembershipVisibility(
+            null,
+            { groupId: 'visibility-closed-group', showOnProfile: true },
+            context,
+            null,
+          ),
+        ).rejects.toThrow('User is not a member of this group')
+      })
+    })
+
+    describe('LeaveGroup for a user who is not a member', () => {
+      beforeEach(async () => {
+        await Factory.build(
+          'user',
+          { id: 'never-joined-user', name: 'Never Joined User' },
+          { email: 'never-joined-user@example.org', password: '1234' },
+        )
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'leave-group-target',
+            name: 'Leave Group Target',
+            about: 'A public group',
+            description: 'Some description' + descriptionAdditional100,
+            groupType: 'public',
+            actionRadius: 'global',
+            categoryIds: ['cat9'],
+          },
+        })
+      })
+
+      // The shield verifies the membership in a separate transaction; if it is gone by the
+      // time the mutation runs, deleting nothing must surface as an error instead of
+      // reporting a successful leave for a membership that never existed.
+      it('reports that the user is not a member', async () => {
+        const context = { driver: database.driver } as unknown as Context
+
+        await expect(
+          groupsResolver.Mutation.LeaveGroup(
+            null,
+            { groupId: 'leave-group-target', userId: 'never-joined-user' },
+            context,
+            null,
+          ),
+        ).rejects.toThrow('User is not a member of this group')
+      })
+    })
+
+    describe('Group field resolvers without a parent id', () => {
+      const fieldResolverCalls: Array<[string, (context: Context) => Promise<void>]> = [
+        [
+          'myRole',
+          async (context) => {
+            await groupsResolver.Group.myRole({}, null, context, null)
+          },
+        ],
+        [
+          'inviteCodes',
+          async (context) => {
+            await groupsResolver.Group.inviteCodes({}, null, context, null)
+          },
+        ],
+        [
+          'postsCount',
+          async (context) => {
+            await groupsResolver.Group.postsCount({}, null, context, null)
+          },
+        ],
+        [
+          'currentlyPinnedPostsCount',
+          async (context) => {
+            await groupsResolver.Group.currentlyPinnedPostsCount({}, null, context, null)
+          },
+        ],
+      ]
+
+      // With a parent that carries no id the Cypher would match on `id: null`, i.e. answer
+      // confidently for "no group" (no role, zero posts). The guard turns that silent wrong
+      // answer into a visible error.
+      it.each(fieldResolverCalls)('%s throws for a parent without an id', async (_name, call) => {
+        const context = { database, user: { id: 'current-user' } } as unknown as Context
+
+        await expect(call(context)).rejects.toThrow('Can not identify selected Group!')
+      })
+    })
+
+    describe('Group.membersCount', () => {
+      // The count is expensive per group. When the caller already resolved it, the resolver
+      // must reuse it instead of firing one extra query per group in a list (N+1). A driver
+      // that explodes on use is the only way to prove no query happens.
+      it('reuses a precomputed count without querying the database', async () => {
+        const context = {
+          driver: {
+            session: () => {
+              throw new Error('membersCount must not open a session when the count is known')
+            },
+          },
+        } as unknown as Context
+
+        await expect(
+          groupsResolver.Group.membersCount(
+            { id: 'some-group', membersCount: 42 },
+            null,
+            context,
+            null,
+          ),
+        ).resolves.toBe(42)
+      })
+    })
   })
 })
 
@@ -4434,6 +4842,30 @@ describe('Subscription.groupShowMembersChanged filter', () => {
 
     await iterator.return?.()
   })
+
+  // An unauthenticated socket must never be served group events: the shield does not cover
+  // Subscriptions, so this filter is the only thing standing between an anonymous websocket
+  // and a stream of group activity.
+  it('drops events for an unauthenticated subscriber', async () => {
+    const pubsub = new PubSub()
+    const policy = createInMemoryPolicyService({ groupsEnabled: true })
+    const context = { pubsub, policy, user: null } as unknown as Context
+    const iterator = groupsResolver.Subscription.groupShowMembersChanged.subscribe(
+      null,
+      { groupId: 'g1' },
+      context,
+      null,
+    )
+    const next = iterator.next()
+    // Matches on groupId and the feature is on, so only the missing user can drop it.
+    await pubsub.publish(GROUP_SHOW_MEMBERS_CHANGED, {
+      groupShowMembersChanged: { groupId: 'g1' },
+    })
+
+    expect(await deliveredWithin(next)).toBe('pending')
+
+    await iterator.return?.()
+  })
 })
 
 describe('Subscription.groupMembershipVisibilityChanged filter', () => {
@@ -4470,6 +4902,29 @@ describe('Subscription.groupMembershipVisibilityChanged filter', () => {
     )
     const next = iterator.next()
     // Matches on userId, so only the feature gate can drop it.
+    await pubsub.publish(GROUP_MEMBERSHIP_VISIBILITY_CHANGED, {
+      groupMembershipVisibilityChanged: { userId: 'u2' },
+    })
+
+    expect(await deliveredWithin(next)).toBe('pending')
+
+    await iterator.return?.()
+  })
+
+  // See groupShowMembersChanged: an anonymous socket must not learn about other users'
+  // membership changes.
+  it('drops events for an unauthenticated subscriber', async () => {
+    const pubsub = new PubSub()
+    const policy = createInMemoryPolicyService({ groupsEnabled: true })
+    const context = { pubsub, policy, user: null } as unknown as Context
+    const iterator = groupsResolver.Subscription.groupMembershipVisibilityChanged.subscribe(
+      null,
+      { userId: 'u2' },
+      context,
+      null,
+    )
+    const next = iterator.next()
+    // Matches on userId and the feature is on, so only the missing user can drop it.
     await pubsub.publish(GROUP_MEMBERSHIP_VISIBILITY_CHANGED, {
       groupMembershipVisibilityChanged: { userId: 'u2' },
     })

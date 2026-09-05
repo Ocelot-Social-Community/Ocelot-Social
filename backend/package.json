@@ -17,7 +17,7 @@
     "docs:api": "npm run schema:print && spectaql spectaql.yml",
     "lint": "eslint --max-warnings 0 .",
     "test": "cross-env NODE_ENV=test vitest run --coverage",
-    "test:shard": "cross-env NODE_ENV=test vitest run --reporter=blob --coverage --coverage.thresholds.lines=0",
+    "test:shard": "cross-env NODE_ENV=test VITEST_BLOB_REPORT=true vitest run --coverage --coverage.thresholds.lines=0 --coverage.thresholds.statements=0 --coverage.thresholds.branches=0 --coverage.thresholds.functions=0",
     "test:merge": "cross-env NODE_ENV=test vitest --merge-reports=coverage/blobs --coverage",
     "test:schema-contract": "cross-env NODE_ENV=test vitest run --coverage=false src/graphql/webappQueries.spec.ts src/graphql/webappPostFilters.spec.ts",
     "db:schema:check": "tsx src/db/schema/run-audit.ts check",

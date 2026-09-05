@@ -192,6 +192,22 @@ describe('delete Attachment', () => {
       })
     })
   })
+
+  // Deleting a message deletes its attachment unconditionally — most messages have none, so the
+  // empty match is the COMMON case, not an edge one. Without the guard the object-storage call
+  // would run on `undefined.url`, and it sits after the node delete: the Cypher would already
+  // have committed by the time it threw.
+  describe('given a resource without an attachment', () => {
+    it('deletes nothing and leaves object storage alone', async () => {
+      s3SendMock.mockClear()
+
+      await expect(
+        deleteAttachment({ id: 'no-such-resource' }, 'ATTACHMENT'),
+      ).resolves.toBeUndefined()
+
+      expect(s3SendMock).not.toHaveBeenCalled()
+    })
+  })
 })
 
 describe('add Attachment', () => {
@@ -281,6 +297,21 @@ describe('add Attachment', () => {
           updatedAt: expect.any(String),
           url: expect.any(String),
         })
+      })
+
+      // extension and duration are both OPTIONAL and both spread in conditionally, because
+      // `SET file += $file` with an explicit null would write the null onto the node rather than
+      // leave the property out. A media attachment supplies both — the case the player needs, and
+      // the only one that exercises the other side of those two conditions.
+      it('stores the optional extension and duration when the upload carries them', async () => {
+        const file = await addAttachment(post, 'ATTACHMENT', {
+          ...fileInput,
+          extension: 'mp3',
+          duration: 42,
+        })
+
+        expect(file).toMatchObject({ extension: 'mp3' })
+        expect(Number(file.duration)).toBe(42)
       })
 
       describe('given a transaction parameter', () => {

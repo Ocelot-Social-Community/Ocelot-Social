@@ -401,6 +401,28 @@ describe('UpdateUser', () => {
       })
     })
 
+    // The avatar is merged INSIDE the same write transaction as the property update, so it is the
+    // one input to this mutation that can touch storage. Metadata without an upload is the shape
+    // the profile editor sends when only the alt text changed: the existing file has to survive
+    // it, and the property update has to land in the same commit.
+    it('updates avatar metadata without replacing the stored file', async () => {
+      const stored = await database.query({
+        query: 'MATCH (:User { id: "u47" })-[:AVATAR_IMAGE]->(image:Image) RETURN image.url AS url',
+      })
+      const url = stored.records[0].get('url') as string
+
+      const { data, errors } = await mutate({
+        mutation: UpdateUser,
+        variables: { ...variables, avatar: { alt: 'A new description' } },
+      })
+
+      expect(errors).toBeUndefined()
+      expect(data.UpdateUser).toMatchObject({
+        name: 'John Doughnut',
+        avatar: { alt: 'A new description', url },
+      })
+    })
+
     it('rejects if version of terms and conditions has wrong format', async () => {
       variables = {
         ...variables,
@@ -783,6 +805,49 @@ describe('emailNotificationSettings', () => {
         })
       })
     })
+
+    // The nine `emailNotifications*` properties are what a FACTORY user carries; an account that
+    // went through registration has none of them (see the comment on createUserNode in
+    // db/factories.ts — the divergence is deliberate and pinned by writerParity.spec.ts). So the
+    // `?? true` fallback in the resolver is not a defensive leftover: it is the path every real,
+    // newly registered account takes until it saves its notification settings once. Stripping the
+    // properties reproduces exactly that node shape.
+    describe('for an account that never stored the settings', () => {
+      it('reports every setting as enabled', async () => {
+        authenticatedUser = await user.toJson()
+        await database.write({
+          query: `
+            MATCH (user:User { id: $id })
+            REMOVE user.emailNotificationsCommentOnObservedPost,
+                   user.emailNotificationsMention,
+                   user.emailNotificationsFollowingUsers,
+                   user.emailNotificationsPostInGroup,
+                   user.emailNotificationsChatMessage,
+                   user.emailNotificationsGroupMemberJoined,
+                   user.emailNotificationsGroupMemberLeft,
+                   user.emailNotificationsGroupMemberRemoved,
+                   user.emailNotificationsGroupMemberRoleChanged
+            RETURN user { .id }`,
+          variables: { id: authenticatedUser?.id },
+        })
+
+        const { data, errors } = await query({
+          query: UserEmailNotificationSettings,
+          variables: { id: authenticatedUser?.id },
+        })
+
+        expect(errors).toBeUndefined()
+
+        // Flattened: the assertion is about the DEFAULT, and it has to hold for all nine —
+        // naming them individually would only repeat the resolver's own structure.
+        const values = data.User[0].emailNotificationSettings.flatMap(
+          (group) => group.settings as { name: string; value: boolean }[],
+        )
+
+        expect(values).toHaveLength(9)
+        expect(values.every(({ value }) => value === true)).toBe(true)
+      })
+    })
   })
 
   describe('mutate the field', () => {
@@ -947,6 +1012,29 @@ describe('save category settings', () => {
             },
           })
         })
+      })
+    })
+
+    // An EMPTY list is not "deselect everything" — the front end sends it for the default, where
+    // every category is active. The resolver expresses that by writing no NOT_INTERESTED_IN edge
+    // at all, which only reads correctly if the delete above it still ran: an empty list has to
+    // CLEAR a previous narrowing rather than leave it in place.
+    describe('an empty selection', () => {
+      beforeEach(async () => {
+        await mutate({
+          mutation: saveCategorySettings,
+          variables: { activeCategories: ['cat1', 'cat3', 'cat5'] },
+        })
+      })
+
+      it('resets the user to all categories being active', async () => {
+        await expect(
+          mutate({ mutation: saveCategorySettings, variables: { activeCategories: [] } }),
+        ).resolves.toMatchObject({ data: { saveCategorySettings: true } })
+
+        const { data } = await query({ query: userQuery, variables: { id: authenticatedUser?.id } })
+
+        expect(data.User[0].activeCategories).toHaveLength(categories.length)
       })
     })
 

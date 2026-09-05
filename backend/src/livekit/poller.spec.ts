@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { EventEmitter, once } from 'node:events'
+
 import { beforeEach, afterEach, describe, it, expect } from 'vitest'
 
 const mockConfig: {
@@ -88,7 +90,9 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  // Stop first: it still needs the (possibly stubbed) clearTimeout/clearInterval.
   stopLiveKitPoller()
+  vi.unstubAllGlobals()
   vi.useRealTimers()
 })
 
@@ -144,11 +148,70 @@ describe('startLiveKitPoller', () => {
 
     expect(mockRoomServiceCtor).toHaveBeenCalledWith('https://already.test', 'k', 's')
   })
+
+  it('survives timer implementations whose handles have no unref', () => {
+    // Node hands back Timeout objects, but shimmed/browser-shaped timer APIs
+    // return plain numeric ids. Without the `typeof handle.unref === 'function'`
+    // guards, server startup would die with "unref is not a function".
+    const clearedTimeouts: unknown[] = []
+    const clearedIntervals: unknown[] = []
+    vi.stubGlobal(
+      'setTimeout',
+      vi.fn(() => 1),
+    )
+    vi.stubGlobal(
+      'setInterval',
+      vi.fn(() => 2),
+    )
+    vi.stubGlobal(
+      'clearTimeout',
+      vi.fn((handle: unknown) => clearedTimeouts.push(handle)),
+    )
+    vi.stubGlobal(
+      'clearInterval',
+      vi.fn((handle: unknown) => clearedIntervals.push(handle)),
+    )
+    setEnabled()
+
+    expect(() => {
+      startLiveKitPoller()
+    }).not.toThrow()
+
+    // Both handles must still be tracked, otherwise shutdown would leak them.
+    stopLiveKitPoller()
+
+    expect(clearedTimeouts).toEqual([1])
+    expect(clearedIntervals).toEqual([2])
+  })
 })
 
 describe('poll tick', () => {
   beforeEach(() => {
     setEnabled()
+  })
+
+  // A tick can still be in flight when the process shuts down: stopLiveKitPoller clears the
+  // handles and drops the client, but a callback the event loop had already picked up runs
+  // anyway. Without the client check it would call listRooms on null and take the shutdown down
+  // with an unhandled rejection. Captured through a stubbed setInterval because a cleared timer
+  // is exactly what fake timers will not fire.
+  it('does nothing when it fires after the poller was stopped', async () => {
+    let tick: (() => void) | undefined
+    vi.stubGlobal(
+      'setInterval',
+
+      vi.fn((handler: () => void) => {
+        tick = handler
+        return 2
+      }),
+    )
+    startLiveKitPoller()
+    stopLiveKitPoller()
+
+    tick?.()
+    await vi.advanceTimersByTimeAsync(0)
+
+    expect(mockListRooms).not.toHaveBeenCalled()
   })
 
   it('publishes participant counts only for group- rooms and only on change', async () => {
@@ -271,6 +334,95 @@ describe('poll tick', () => {
     await vi.advanceTimersByTimeAsync(5_000)
 
     expect(mockLogger.warn).toHaveBeenCalledWith('LiveKit poll tick failed:', 'pubsub down')
+  })
+
+  it('logs non-Error rejections from listRooms without crashing', async () => {
+    // Rejections that aren't Errors (SDK/fetch layers occasionally reject with a
+    // string or a plain object) must not blow up the `err.message` read, or the
+    // failure counter would never advance and the poller would spam forever.
+    mockListRooms.mockRejectedValueOnce('lk exploded')
+    startLiveKitPoller()
+    await vi.advanceTimersByTimeAsync(5_000)
+
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('LiveKit poll failed (#1)'),
+      'lk exploded',
+    )
+  })
+
+  it('logs non-Error rejections escaping pollOnce without crashing', async () => {
+    mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 1 }])
+    mockPublish.mockRejectedValueOnce('pubsub exploded')
+    startLiveKitPoller()
+    await vi.advanceTimersByTimeAsync(5_000)
+
+    expect(mockLogger.warn).toHaveBeenCalledWith('LiveKit poll tick failed:', 'pubsub exploded')
+  })
+
+  it('skips rooms whose name yields no group id and keeps processing the rest', async () => {
+    // A room literally named "group-" passes the prefix check but has an empty
+    // id — publishing it would push a subscription event for group "" and abort
+    // the loop before the healthy rooms behind it are handled.
+    mockListRooms.mockResolvedValueOnce([
+      { name: 'group-', numParticipants: 4 },
+      { name: 'group-b', numParticipants: 1 },
+    ])
+    startLiveKitPoller()
+    await vi.advanceTimersByTimeAsync(5_000)
+
+    expect(mockPublish).toHaveBeenCalledTimes(1)
+    expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+      groupId: 'b',
+      count: 1,
+    })
+
+    // The malformed room was never remembered, so its disappearance must not
+    // produce a trailing zero event either.
+    mockPublish.mockClear()
+    mockListRooms.mockResolvedValueOnce([])
+    await vi.advanceTimersByTimeAsync(15_000)
+
+    expect(mockPublish).toHaveBeenCalledTimes(1)
+    expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+      groupId: 'b',
+      count: 0,
+    })
+  })
+
+  it('skips a tick while the previous one is still in flight', async () => {
+    // listRooms is guarded by an 8s timeout, but the publish step is not — a
+    // stalled pubsub is what can make a tick outlive the 15s interval. Without
+    // the re-entrancy guard the next tick would fire another listRooms request
+    // and pile requests up for as long as pubsub hangs.
+    // An event gate instead of a hand-rolled deferred: it settles on a
+    // microtask, so the stall stays under our control and free of real waiting.
+    const publishGate = new EventEmitter()
+    mockPublish.mockImplementationOnce(async () => {
+      await once(publishGate, 'release')
+    })
+    mockListRooms.mockResolvedValue([{ name: 'group-a', numParticipants: 1 }])
+    startLiveKitPoller()
+    await vi.advanceTimersByTimeAsync(5_000)
+
+    expect(mockListRooms).toHaveBeenCalledTimes(1)
+
+    await vi.advanceTimersByTimeAsync(15_000)
+
+    expect(mockListRooms).toHaveBeenCalledTimes(1)
+
+    // Once the stuck publish settles, polling resumes on the next interval.
+    publishGate.emit('release')
+    await vi.advanceTimersByTimeAsync(15_000)
+
+    expect(mockListRooms).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not touch LiveKit on a tick after the feature was switched off', async () => {
+    startLiveKitPoller()
+    mockConfig.LIVEKIT_ENABLED = false
+    await vi.advanceTimersByTimeAsync(5_000)
+
+    expect(mockListRooms).not.toHaveBeenCalled()
   })
 })
 

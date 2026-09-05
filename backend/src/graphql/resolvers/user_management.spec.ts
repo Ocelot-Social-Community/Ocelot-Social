@@ -381,6 +381,23 @@ describe('change password', () => {
       })
     })
 
+    // DeleteUser sets `encryptedPassword = null` when blacking out an account. bcrypt.compare
+    // against a null hash throws rather than returning false, so without the guard above it this
+    // would surface as an internal server error instead of the same refusal every other wrong
+    // password gets — and an error that differs by account state is an oracle.
+    describe('an account whose password was cleared', () => {
+      beforeEach(async () => {
+        await database.write({
+          query: `MATCH (user:User { id: 'u3' }) SET user.encryptedPassword = null RETURN user { .id }`,
+        })
+        variables = { ...variables, oldPassword: '1234', newPassword: '12345' }
+      })
+
+      it('responds with the same "Old password is not correct" as any wrong password', async () => {
+        await respondsWith({ errors: [{ message: 'Old password is not correct' }] })
+      })
+    })
+
     describe('correct password', () => {
       beforeEach(() => {
         variables = {

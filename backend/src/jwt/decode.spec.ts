@@ -6,6 +6,7 @@
 import { createHash } from 'node:crypto'
 import { setTimeout as delay } from 'node:timers/promises'
 
+import { sign } from 'jsonwebtoken'
 import { beforeAll, afterAll, afterEach, describe, expect, beforeEach, it } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
@@ -98,6 +99,49 @@ describe(decode, () => {
         await session.close()
 
         expect(result.records[0].get('lastUsedAt')).toBeTruthy()
+      })
+
+      // lastUsedAt is bookkeeping, fired and NOT awaited — the caller is already holding the
+      // decoded user by the time it runs. Without the `.catch` its rejection would surface as an
+      // unhandled promise rejection from a request that had otherwise succeeded, which under
+      // Node's default is process-fatal: a hiccup on a write nobody waits for would take the
+      // backend down and log the failure against whatever request happened to be in flight.
+      it('authenticates the key even when the lastUsedAt write fails', async () => {
+        // decodeApiKey opens the read session first and the update session second; only the
+        // latter is replaced, so the lookup itself still runs against the real database.
+        let sessions = 0
+        const openSession = driver.session.bind(driver)
+        const sessionSpy = vi.spyOn(driver, 'session').mockImplementation((...args) => {
+          sessions += 1
+          if (sessions === 2) {
+            return {
+              writeTransaction: async () => Promise.reject(new Error('write conflict')),
+              close: async () => Promise.resolve(),
+            } as unknown as ReturnType<typeof driver.session>
+          }
+          return openSession(...args)
+        })
+
+        try {
+          await expect(decode(context)('Bearer oak_testkey123')).resolves.toMatchObject({
+            id: 'api-user',
+            authMethod: 'apiKey',
+          })
+
+          // Let the rejected best-effort promise settle inside the test, where an unhandled
+          // rejection fails the run — the same signal it would give in production.
+          await delay(100)
+        } finally {
+          sessionSpy.mockRestore()
+        }
+
+        const session = driver.session()
+        const result = await session.readTransaction(async (tx) => {
+          return tx.run(`MATCH (k:ApiKey { id: 'ak1' }) RETURN k.lastUsedAt AS lastUsedAt`)
+        })
+        await session.close()
+
+        expect(result.records[0].get('lastUsedAt')).toBeNull()
       })
     })
 
@@ -256,6 +300,19 @@ describe(decode, () => {
   describe('given malformed JWT Bearer token', () => {
     beforeEach(() => {
       authorizationHeader = 'blah'
+    })
+
+    it('returns null', returnsNull)
+  })
+
+  // A token that VERIFIES — right secret, right algorithm — but names no subject. jwt.verify is
+  // happy with it (`sub` is an optional registered claim), so the rejection has to come from the
+  // subject read: without the `?? null` the id stays undefined and the lookup runs as
+  // `MATCH (user:User {id: undefined})`, which the driver rejects rather than answering "no user".
+  describe('given a valid JWT Bearer token without a subject', () => {
+    beforeEach(async () => {
+      await Factory.build('user', { id: 'u4', name: 'No Subject', slug: 'no-subject' })
+      authorizationHeader = `Bearer ${sign({}, config.JWT_SECRET, { algorithm: 'HS256' })}`
     })
 
     it('returns null', returnsNull)

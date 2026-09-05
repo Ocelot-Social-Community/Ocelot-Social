@@ -495,6 +495,17 @@ describe('admin operations', () => {
       expect(entry.revokedCount).toBe(1)
     })
 
+    // Both arguments are optional in the schema, and the admin UI's first render sends neither.
+    // The defaults are what stop that request from becoming `SKIP null LIMIT null`, which Neo4j
+    // rejects outright — so an unpaged call has to work, not just a paged one.
+    it('serves an unpaged request with its own defaults', async () => {
+      authenticatedUser = await adminUser.toJson()
+      const { data, errors } = await query({ query: apiKeyUsers, variables: {} })
+
+      expect(errors).toBeUndefined()
+      expect(data.apiKeyUsers.length).toBeGreaterThanOrEqual(1)
+    })
+
     it('supports pagination', async () => {
       authenticatedUser = await adminUser.toJson()
       const { data } = await query({ query: apiKeyUsers, variables: { first: 1, offset: 0 } })

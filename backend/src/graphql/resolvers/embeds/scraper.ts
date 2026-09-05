@@ -9,9 +9,7 @@
 /* eslint-disable import-x/no-named-as-default */
 
 import debug from 'debug'
-import { GraphQLError } from 'graphql'
 import isArray from 'lodash/isArray.js'
-import isEmpty from 'lodash/isEmpty.js'
 import mergeWith from 'lodash/mergeWith.js'
 import Metascraper from 'metascraper'
 import metascraperAuthor from 'metascraper-author'
@@ -96,10 +94,12 @@ export default async function scrape(url) {
     }
   })
 
-  if (isEmpty(output)) {
-    throw new GraphQLError('Not found', { extensions: { code: 'NOT_FOUND' } })
-  }
-
+  // No NOT_FOUND branch here any more. It could not fire: `fetchResource` stamps
+  // `sources: ['resource']` onto every answer and is the merge TARGET, so `output` always carries
+  // at least that key and the old `isEmpty(output)` test was never true. A URL that scrapes to
+  // nothing therefore resolves to a bare link — the `type` fallback below — which is the
+  // behaviour `embeds.spec.ts` already pins ("shows some default data": empty HTML in,
+  // `sources: ['resource']` and `type: 'link'` out, `errors: undefined`).
   if (!output.type) {
     output.type = 'link'
   }

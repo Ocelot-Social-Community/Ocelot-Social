@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 import { withFilter } from 'graphql-subscriptions'
 
 import CONFIG from '@config/index'
@@ -145,27 +145,29 @@ export default {
         await messageSession.close()
       }
 
-      if (resolved) {
-        // Mark undistributed messages as distributed (fallback for missed socket deliveries)
-        const undistributedMessagesIds = resolved
-          .filter((msg) => !msg.distributed && msg.senderId !== context.user.id)
-          .map((msg) => msg.id)
-        if (undistributedMessagesIds.length > 0) {
-          const session = context.driver.session()
-          try {
-            const results = await setMessagesAsDistributed(undistributedMessagesIds, session)
-            for (const { roomId: msgRoomId, authorId, messageIds } of results) {
-              void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
-                authorId,
-                chatMessageStatusUpdated: { roomId: msgRoomId, messageIds, status: 'distributed' },
-              })
-            }
-          } finally {
-            await session.close()
+      // No `if (resolved)` guard here, and no `|| []` below: the assignment above is
+      // unconditional — the transaction either produced an array or threw, in which case this
+      // line is never reached. Both used to be written defensively and were simply unreachable.
+      //
+      // Mark undistributed messages as distributed (fallback for missed socket deliveries)
+      const undistributedMessagesIds = resolved
+        .filter((msg) => !msg.distributed && msg.senderId !== context.user.id)
+        .map((msg) => msg.id)
+      if (undistributedMessagesIds.length > 0) {
+        const session = context.driver.session()
+        try {
+          const results = await setMessagesAsDistributed(undistributedMessagesIds, session)
+          for (const { roomId: msgRoomId, authorId, messageIds } of results) {
+            void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
+              authorId,
+              chatMessageStatusUpdated: { roomId: msgRoomId, messageIds, status: 'distributed' },
+            })
           }
+        } finally {
+          await session.close()
         }
       }
-      return (resolved || []).reverse()
+      return resolved.reverse()
     },
   },
   Mutation: {

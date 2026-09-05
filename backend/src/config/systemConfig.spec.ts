@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest'
 
-import { createInMemoryPolicyService } from '@src/policy'
+import { allKeys, createInMemoryPolicyService, requiresEnvFor } from '@src/policy'
 
 import { categoryRank } from './categories'
-import { ENV_REGISTRY } from './envRegistry'
+import { ENV_REGISTRY, ENV_SPEC_BY_NAME } from './envRegistry'
 import { systemConfigStatus } from './systemConfig'
 
 import type { NetworkPolicy } from '@src/policy'
@@ -218,6 +218,44 @@ describe(systemConfigStatus, () => {
       expect(secret.envValue).toBeNull()
       expect(secret.state).toBe('missing')
       expect(secret.blocking).toBe(true)
+    })
+
+    // Guards specFor()'s "unknown var ⇒ secret, category general" fallback by making it
+    // unreachable: the only names it is ever called with come from requiresEnv. Declaring a
+    // requirement the registry does not know would otherwise be a silent misclassification —
+    // the var would show up on the config tab as a secret in the wrong group, with no error
+    // anywhere. Cheaper to fail here than to notice it in the admin UI.
+    it('declares every hard-requirement env var in the env registry', () => {
+      const required = allKeys().flatMap((key) => requiresEnvFor(key))
+
+      expect(required.length).toBeGreaterThan(0)
+      expect(required.filter((name) => !(name in ENV_SPEC_BY_NAME))).toEqual([])
+    })
+  })
+
+  // The policy service holds the env it was constructed with (process.env at boot); the
+  // resolver passes the LIVE process.env. Normally the same map, but they are two reads, and a
+  // var unset after boot makes them disagree — envState still says 'set' while the value is
+  // gone. The value columns must then read as "no value" rather than leaking an `undefined`
+  // into a field the schema types `String`.
+  describe('env that no longer matches the state the policy service booted with', () => {
+    const bootedWith = (env: Record<string, string | undefined>) =>
+      createInMemoryPolicyService({}, env)
+
+    it('em-dashes a hard-requirement value that has since disappeared', () => {
+      const policy = bootedWith({ LIVEKIT_URL: 'wss://lk.example.org' })
+      const row = systemConfigStatus({}, policy).find((entry) => entry.envKey === 'LIVEKIT_URL')
+
+      expect(row?.state).toBe('set')
+      expect(row?.envValue).toBeNull()
+    })
+
+    it('em-dashes a plain infrastructure value that has since disappeared', () => {
+      const policy = bootedWith({ SMTP_HOST: 'mail.example.org' })
+      const row = systemConfigStatus({}, policy).find((entry) => entry.envKey === 'SMTP_HOST')
+
+      expect(row?.state).toBe('set')
+      expect(row?.envValue).toBeNull()
     })
   })
 

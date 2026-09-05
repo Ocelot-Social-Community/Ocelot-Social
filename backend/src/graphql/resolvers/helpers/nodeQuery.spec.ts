@@ -7,7 +7,10 @@ import { beforeAll, afterAll, describe, it, expect } from 'vitest'
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
 
+import { nodeQuery } from './nodeQuery'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
 // What the Tag query does with the filter operators its schema advertises.
 //
@@ -154,5 +157,36 @@ describe('Tag paging', () => {
     const { errors } = await run(variables)
 
     expect(errors?.[0].message).toContain(`Argument "${argument}" must not be negative`)
+  })
+})
+
+// The drift guard, reached directly. Every `_<Label>Filter` input currently offers exactly the
+// keys FILTER_HANDLERS implements, so no query can produce an unsupported one — which is why it
+// is worth executing from here: its whole purpose is the day someone widens one of those inputs
+// and not this helper. Ignoring an unimplemented filter would return MORE rows than the caller
+// asked for, served as if the filter had been applied.
+const commentLike = nodeQuery({
+  label: 'Comment',
+  equalityFields: ['id', 'content'],
+  orderingEnum: '_CommentOrdering',
+  defaultOrder: { field: 'createdAt', direction: 'ASC' },
+})
+
+// Deliberately empty: the guard has to reject BEFORE a session is opened. A context with a driver
+// would hide a regression that moved the check below the query.
+const contextWithoutDriver = () => ({}) as unknown as Context
+
+describe(nodeQuery, () => {
+  it('refuses a filter key it has no handler for, naming the label and the key', async () => {
+    await expect(
+      commentLike({ filter: { content_contains: 'anything' } }, contextWithoutDriver()),
+    ).rejects.toThrow('Unsupported Comment filter: content_contains.')
+  })
+
+  it('names every unsupported key at once', async () => {
+    // One round trip for the client instead of one error per attempt.
+    await expect(
+      commentLike({ filter: { first_key: 1, second_key: 2 } }, contextWithoutDriver()),
+    ).rejects.toThrow('Unsupported Comment filter: first_key, second_key.')
   })
 })

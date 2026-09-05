@@ -231,6 +231,27 @@ describe('pin groupPosts', () => {
     })
   })
 
+  describe('maxGroupPinnedPosts is 0', () => {
+    beforeEach(async () => {
+      policy = { maxGroupPinnedPosts: 0 }
+      authenticatedUser = await publicUser.toJson()
+    })
+
+    it('refuses to pin at all, for the group owner too', async () => {
+      // 0 switches group pinning off network-wide. The shield still lets the group owner
+      // through — it only knows about the group role — so this policy check is the only thing
+      // enforcing the network setting. It also has to come BEFORE the counting branch, which
+      // would otherwise answer a disabled feature with "unpin a post first" and send the
+      // owner looking for a pinned post that cannot exist.
+      await expect(
+        mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
+      ).resolves.toMatchObject({
+        errors: [{ message: 'Pinned posts are not allowed!' }],
+        data: { pinGroupPost: null },
+      })
+    })
+  })
+
   describe('maxGroupPinnedPosts is 1', () => {
     beforeEach(async () => {
       policy = { maxGroupPinnedPosts: 1 }

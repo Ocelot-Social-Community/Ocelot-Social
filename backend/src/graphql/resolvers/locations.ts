@@ -2,8 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/return-await */
-import { UserInputError } from '@graphql/errors'
 
 import cypherFields from './helpers/cypherField'
 import { queryLocations } from './users/location'
@@ -67,12 +65,13 @@ export default {
     },
   },
   Query: {
-    queryLocations: async (_object, args, context: Context, _resolveInfo) => {
-      try {
-        return queryLocations(args, context)
-      } catch (e) {
-        throw new UserInputError(e.message)
-      }
-    },
+    // No try/catch translating failures into UserInputError any more. It could not run: this
+    // RETURNED the promise instead of awaiting it, so a rejection from the async
+    // queryLocations passed straight by the catch. And what it would have caught is not client
+    // input either — with `place: String!` and `lang: String!` pinned by the schema, the only
+    // failures left are a Mapbox outage or the 3s request timeout, which are internal errors and
+    // must not be reported to the client as "your input was wrong".
+    queryLocations: async (_object, args, context: Context, _resolveInfo) =>
+      queryLocations(args, context),
   },
 }

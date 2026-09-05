@@ -39,6 +39,17 @@ describe('branding resolvers', () => {
 
       await expect(call('setActiveBranding', { id: 'x' })).rejects.toThrow(UserInputError)
     })
+
+    // Only a validation failure is the caller's fault. An infrastructure failure (the Neo4j
+    // write, the Redis broadcast) must keep its own identity: relabelling it as a UserInputError
+    // would report a 4xx-style "bad input" to an admin who supplied a perfectly valid brand id,
+    // and Sentry's resolver middleware would stop treating it as an incident.
+    it('rethrows a non-validation failure unchanged', async () => {
+      const outage = new Error('Neo4j write failed')
+      set.mockRejectedValue(outage)
+
+      await expect(call('setActiveBranding', { id: 'x' })).rejects.toBe(outage)
+    })
   })
 
   describe('setBrandingComposition', () => {
@@ -69,6 +80,42 @@ describe('branding resolvers', () => {
         UserInputError,
       )
       expect(set).not.toHaveBeenCalled()
+    })
+
+    // The composition passes the resolver's own JSON check but can still be refused by the
+    // policy schema (unknown key, wrong type). That rejection describes the admin's input, so it
+    // has to reach them as one instead of as an opaque server error.
+    it('maps a PolicyValidationError to a UserInputError', async () => {
+      set.mockRejectedValue(new PolicyValidationError('unknown policy key'))
+
+      await expect(call('setBrandingComposition', { composition: '{}' })).rejects.toThrow(
+        UserInputError,
+      )
+    })
+
+    it('rethrows a non-validation failure unchanged', async () => {
+      const outage = new Error('Redis publish failed')
+      set.mockRejectedValue(outage)
+
+      await expect(call('setBrandingComposition', { composition: '{}' })).rejects.toBe(outage)
+    })
+  })
+
+  // Both mutations are behind `branding.manage`, so an unauthenticated caller cannot normally
+  // reach them — but the actor is written into the policy audit trail, and `user?.id` would
+  // record a literal `undefined` there if the context ever arrives without a user (an internal
+  // caller, a shield rule relaxed later). 'unknown' keeps that entry readable.
+  describe('audit actor without an authenticated user', () => {
+    beforeEach(() => {
+      context = { policy: { set } } as unknown as Context
+    })
+
+    it('records "unknown" as the actor', async () => {
+      await call('setActiveBranding', { id: 'yunite' })
+      await call('setBrandingComposition', { composition: '' })
+
+      expect(set).toHaveBeenCalledWith('activeBranding', 'yunite', 'unknown')
+      expect(set).toHaveBeenCalledWith('brandingComposition', '', 'unknown')
     })
   })
 })

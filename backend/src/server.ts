@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable import-x/no-named-as-default-member */
@@ -114,17 +114,10 @@ const createServer = async (options?: CreateServerOptions) => {
     // file uploads, which Apollo Server 4 blocks by default as a CSRF vector. The webapp relies on
     // JWT/cookie authentication and CORS configuration for request validation instead.
     csrfPrevention: false,
-    formatError: (formattedError, error) => {
-      if (formattedError.message === 'ERROR_VALIDATION') {
-        return {
-          ...formattedError,
-          message: String(
-            (error as any).originalError?.details?.map((d) => d.message) ?? formattedError.message,
-          ),
-        }
-      }
-      return formattedError
-    },
+    // No `formatError`: the one it used to carry unwrapped neode's Joi validation errors, whose
+    // `originalError.details` it flattened into the 'ERROR_VALIDATION' placeholder message. neode
+    // is gone (see src/db/schema), nothing throws that message any more and nothing attaches
+    // `.details` to an error, so the hook had become an identity function on every code path.
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
       {

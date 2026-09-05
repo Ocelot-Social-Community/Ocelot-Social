@@ -87,6 +87,37 @@ describe('AddEmailAddress', () => {
       })
     })
 
+    // The viewer is authenticated by JWT, which outlives the account: an admin can delete a user
+    // while that user still holds a valid token. MERGE off a MATCH that binds nothing writes no
+    // node at all — so the mutation must say so instead of returning an EmailAddress the request
+    // never created.
+    describe('the authenticated account no longer exists', () => {
+      beforeEach(() => {
+        authenticatedUser = { id: 'ghost-user' } as Context['user']
+      })
+
+      it('throws UserInputError', async () => {
+        await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({
+          data: { AddEmailAddress: null },
+          errors: [{ message: 'User not found.' }],
+        })
+      })
+
+      // The message alone would also be satisfied by a resolver that wrote the node and THEN
+      // failed — and this label carries no uniqueness constraint, so a stray node is not caught
+      // later either: it would sit there unattached, and the address could still be verified
+      // through it. The absence of the node IS the claim the comment above makes.
+      it('writes no `UnverifiedEmailAddress` node', async () => {
+        await mutate({ mutation: AddEmailAddress, variables })
+        const result = await database.neode.cypher(
+          `MATCH (e:UnverifiedEmailAddress { email: "new-email@example.org" }) RETURN e`,
+          {},
+        )
+
+        expect(result.records).toHaveLength(0)
+      })
+    })
+
     describe('email attribute is a valid email', () => {
       it('creates a new unverified `EmailAddress` node', async () => {
         await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({

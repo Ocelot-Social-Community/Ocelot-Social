@@ -11,6 +11,8 @@ import review from '@graphql/queries/moderation/review.gql'
 import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
+import { validateNotifyUsers } from './validationMiddleware'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
@@ -310,5 +312,37 @@ describe('validateReview', () => {
         errors: [{ message: 'Username must be at least 3 character long!' }],
       })
     })
+  })
+})
+
+// validateNotifyUsers is called by the notification helpers, not by a resolver, and every call
+// site passes a literal pair — so the schema cannot produce a mismatch and these two rules only
+// ever run against constants. They are what stops a notification from being filed under a reason
+// that does not describe it: the reason is what the client renders ("X mentioned you in a post"),
+// so a Comment notification labelled `mentioned_in_post` would link the reader to the wrong node
+// type entirely.
+describe(validateNotifyUsers, () => {
+  it.each([
+    ['Post', 'mentioned_in_post'],
+    ['Comment', 'mentioned_in_comment'],
+    ['Comment', 'commented_on_post'],
+  ])('accepts %s / %s', async (label, reason) => {
+    await expect(validateNotifyUsers(label, reason)).resolves.toBeUndefined()
+  })
+
+  it('rejects a reason that is not in the catalogue at all', async () => {
+    await expect(validateNotifyUsers('Post', 'invented_reason')).rejects.toThrow(
+      'Notification reason is not allowed!',
+    )
+  })
+
+  // Both halves of the pairing rule: a known reason on the wrong label.
+  it.each([
+    ['Post', 'mentioned_in_comment'],
+    ['Comment', 'mentioned_in_post'],
+  ])('rejects the known reason %s / %s as a mismatch', async (label, reason) => {
+    await expect(validateNotifyUsers(label, reason)).rejects.toThrow(
+      'Notification does not fit the reason!',
+    )
   })
 })

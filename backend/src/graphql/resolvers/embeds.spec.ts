@@ -21,6 +21,7 @@ const { default: fetch, Response } = await import('node-fetch')
 const { default: embed } = await import('@graphql/queries/embed.gql')
 const { default: embedProviders } = await import('@graphql/queries/embedProviders.gql')
 const { createApolloTestSetup } = await import('@root/test/helpers')
+const { default: embedsResolvers } = await import('./embeds')
 const mockedFetch = vi.mocked(fetch)
 
 let query: ApolloTestSetup['query']
@@ -243,5 +244,18 @@ Have all the information for the brand in separate config files. Set these defau
         })
       })
     })
+  })
+})
+
+// `Embed.sources` is a non-null LIST, and the scraper only sets it when at least one source
+// contributed. GraphQL's default resolver would answer `null` for the missing key and fail the
+// whole Embed — a link preview that came back with nothing to say must degrade to `[]`, not take
+// the query down with it.
+describe('Embed.sources', () => {
+  it.each([
+    ['a scrape that reported no sources', {}, []],
+    ['a scrape that reported some', { sources: ['oembed'] }, ['oembed']],
+  ])('resolves %s', async (_name, parent, expected) => {
+    await expect(embedsResolvers.Embed.sources(parent, {}, null, null)).resolves.toEqual(expected)
   })
 })

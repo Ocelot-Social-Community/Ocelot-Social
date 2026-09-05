@@ -308,14 +308,28 @@ jobs:
         run: docker compose exec -T backend npm run db:schema:check
 
       # `--coverage` stays ON per shard: the coverage data is what gets embedded in the blob and
-      # merged later. The THRESHOLD is what has to be off (`test:shard` passes
-      # --coverage.thresholds.lines=0) — a shard runs a quarter of the specs against the whole of
-      # `src/**/*.ts`, so the 94.3% gate would fail every shard by construction. It is enforced
-      # once, on the merged total, in the job below.
+      # merged later. The THRESHOLDS are what have to be off — ALL FOUR of them (`test:shard`
+      # zeroes lines, statements, branches AND functions). A shard runs a quarter of the specs
+      # against the whole of `src/**/*.ts`, so every gate in vitest.config.ts fails on a shard by
+      # construction; vitest has no single switch for "no thresholds", each metric has to be
+      # zeroed by name, and one left standing reds the shard on its own. They are enforced once,
+      # on the merged total, in the job below.
       #
       # The blob goes to a directory of its OWN, not into `coverage/` next to the reports:
       # `--merge-reports=<dir>` parses EVERY file in the directory it is given as a blob, and
       # chokes on the first one that is not (verified — it fails with a JSON SyntaxError).
+      #
+      # What makes a RED shard readable lives in vitest.config.ts, not here: `test:shard` only sets
+      # VITEST_BLOB_REPORT=true and the config assembles `default` + `blob` (+ `github-actions`
+      # when it sees Actions). It used to pass `--reporter=blob` on the command line, and that
+      # REPLACES the default reporter instead of adding to it — the blob reporter prints exactly
+      # one line ("blob report written to …") whatever the outcome, so a failing shard ended at
+      # `Error: Process completed with exit code 1` without naming a single test, and the only way
+      # to find out was to re-run the suite locally. Reporters cannot be split across the two
+      # places: any `--reporter` flag discards the configured list wholesale.
+      #
+      # Verified that the extra reporters do not corrupt the blob — one written by a FAILING run
+      # with all three still merges, and the merge job re-reports the failure from it.
       - name: backend | Unit test (shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
         run: |
           docker compose exec -T backend npm run test:shard -- \
@@ -333,8 +347,9 @@ jobs:
           if-no-files-found: error
 
   # The coverage gate. No shard can hold it on its own — each one exercises a quarter of the specs
-  # against the whole of `src/**/*.ts` — so the 94.3% line threshold from vitest.config.ts is
-  # checked here, once, on the merged total. This is the job to make a required status check;
+  # against the whole of `src/**/*.ts` — so the thresholds from vitest.config.ts (lines,
+  # statements, branches, functions) are checked here, once, on the merged total. This is the job
+  # to make a required status check;
   # the shards individually only prove that their own slice passed.
   #
   # Verified before adopting this: merged coverage is IDENTICAL to a single unsharded run, down to
@@ -411,4 +426,22 @@ jobs:
         run: |
           docker compose -f docker-compose.yml -f docker-compose.test.yml \
             run --rm --no-deps -T backend npm run test:merge
+
+      # `if: always()` so the report survives a FAILED threshold check — that is precisely when
+      # someone needs to look at it. The step above exits non-zero when coverage drops below the
+      # gate, and without this the numbers explaining why would be discarded with the runner.
+      #
+      # coverage-final.json carries the per-line detail (see the reporter note in
+      # vitest.config.ts); the summary is kept alongside it because it is the file
+      # vitest-coverage-report-action and similar tools read.
+      - name: backend | Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: backend-coverage-report
+          path: |
+            coverage/coverage-final.json
+            coverage/coverage-summary.json
+          retention-days: 7
+          if-no-files-found: warn
 

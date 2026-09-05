@@ -39,6 +39,7 @@ export default {
         // missing report surfaces there with a specific message rather than as a null
         // here. `?? null` only covers the negligible race where the report is closed
         // between validation and this write.
+        /* v8 ignore next -- the race described above; validateReview rejects every other case */
         return reviewed ?? null
       } finally {
         await session.close()
