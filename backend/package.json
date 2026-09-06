@@ -96,7 +96,7 @@
     "mustache": "^4.2.0",
     "neo4j-driver": "^4.4.11",
     "node-fetch": "^2.7.0",
-    "nodemailer": "^9.0.5",
+    "nodemailer": "^9.1.1",
     "nodemailer-html-to-text": "^3.2.0",
     "preview-email": "^3.4.0",
     "pug": "^3.0.4",
