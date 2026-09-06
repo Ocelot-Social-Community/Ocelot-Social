@@ -106,7 +106,7 @@
     "publint": "^0.3.23",
     "size-limit": "^13.0.3",
     "storybook": "^10.5.7",
-    "tailwind-csstree": "^0.3.3",
+    "tailwind-csstree": "^0.4.0",
     "tailwindcss": "^4.2.4",
     "tsx": "^4.23.11",
     "typescript": "^5.9.3",
