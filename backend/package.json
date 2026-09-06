@@ -128,7 +128,7 @@
     "prettier": "^3.9.6",
     "rosie": "^2.1.1",
     "spectaql": "^3.0.9",
-    "tsc-alias": "^1.9.2",
+    "tsc-alias": "^1.9.4",
     "tsx": "^4.23.13",
     "typescript": "^5.8.3",
     "vitest": "^4.1.11"
