@@ -1,3 +1,5 @@
+import { ApolloLink } from 'apollo-link'
+
 import apolloConfig from './apollo-config.js'
 
 const context = ({ cookies = {}, $config = {}, env = {} } = {}) => ({
@@ -49,6 +51,15 @@ describe('apollo client config', () => {
     expect(config.getAuth()).toBe('')
     cookies['a-token'] = 'later-jwt'
     expect(config.getAuth()).toBe('Bearer later-jwt')
+  })
+
+  it('installs the GraphQL-response link WITHOUT replacing the http link', () => {
+    // `defaultHttpLink` is deliberately left at its default: vue-cli-plugin-apollo then combines the
+    // two as `from([link, httpLink])`, which is what makes ours a wrapper rather than the transport.
+    // Turning it off here would leave the client with no terminating link at all.
+    const config = apolloConfig(context())
+    expect(config.link).toBeInstanceOf(ApolloLink)
+    expect(config.defaultHttpLink).toBeUndefined()
   })
 
   it('routes browser HTTP through the /api proxy and subscriptions to the configured WEBSOCKETS_URI', () => {
