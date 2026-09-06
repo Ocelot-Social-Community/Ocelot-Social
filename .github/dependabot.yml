@@ -185,6 +185,14 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
   groups:
+    # `@size-limit/*` pins its `size-limit` peer to an exact version, so a pull request that moves
+    # only one of the two can never install — `npm ci` fails with ERESOLVE. They have to arrive
+    # together.
+    size-limit:
+      applies-to: version-updates
+      patterns:
+        - "size-limit"
+        - "@size-limit/*"
     vue:
       applies-to: version-updates
       patterns:
