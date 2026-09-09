@@ -119,6 +119,33 @@ describe(createServer, () => {
       expect(body.errors).toBeUndefined()
       expect(body.data?.embedProviders?.length).toBeGreaterThan(0)
     })
+
+    // Apollo Server 5 turned `status400ForVariableCoercionErrors` on by default, where 4 left it
+    // off and answered 200. That default is DELIBERATELY kept — asserted here because it is a
+    // contract with the webapp, not an implementation detail: apollo-link-http-common rejects every
+    // response with a status >= 300 before it looks at the body, so the webapp needs its own link
+    // to keep these visible as GraphQL errors (webapp/plugins/apollo-config/graphqlResponseLink.js).
+    // Without both halves a mistyped variable reads as "server unreachable" in the UI.
+    it('answers a variable coercion error with 400 and a GraphQL error body', async () => {
+      const response = await fetch(running.httpUrl, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          // The variable is USED, so the document itself validates and the request fails during
+          // coercion rather than during validation (which answered 400 in Apollo Server 4 too).
+          query: 'query ($id: ID!) { User(id: $id) { id } }',
+          variables: { id: { not: 'an id' } },
+        }),
+      })
+
+      expect(response.status).toBe(400)
+
+      const body = (await response.json()) as {
+        errors?: { message: string; extensions?: { code?: string } }[]
+      }
+
+      expect(body.errors?.[0].extensions?.code).toBe('BAD_USER_INPUT')
+    })
   })
 
   // The injected-context branch, which is the one test/helpers.ts uses throughout the suite.
