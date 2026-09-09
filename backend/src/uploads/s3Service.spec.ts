@@ -9,7 +9,16 @@ import type { Mock } from 'vitest'
 // Hoisted because `vi.mock`'s factory runs before the module body. One shared `send` for every
 // constructed client is not a shortcut: the service caches a single S3Client for the whole
 // process, so there is only ever one instance to stand in for.
-const { sendMock } = vi.hoisted(() => ({ sendMock: vi.fn() }))
+//
+// `s3ClientConstructions` is a plain array rather than a reading of `S3Client.mock.calls`, because
+// the claim under test spans the whole FILE — the client is built once per process, so whichever
+// test runs first is the one that triggers the construction. Vitest clears mock call records
+// before every test (the v5 default), which would erase exactly that evidence; an array of our own
+// is not a mock and survives.
+const { sendMock, s3ClientConstructions } = vi.hoisted(() => ({
+  sendMock: vi.fn(),
+  s3ClientConstructions: [] as unknown[],
+}))
 
 // `function`, not an arrow: these stand in for CLASSES and the code under test calls them with
 // `new`. Vitest constructs the mock's implementation via Reflect.construct, and an arrow function
@@ -20,7 +29,8 @@ const { sendMock } = vi.hoisted(() => ({ sendMock: vi.fn() }))
 // assertion below was checking a string that S3 has never received.
 vi.mock('@aws-sdk/client-s3', async (importOriginal) => ({
   ...(await importOriginal<object>()),
-  S3Client: vi.fn().mockImplementation(function () {
+  S3Client: vi.fn().mockImplementation(function (options: unknown) {
+    s3ClientConstructions.push(options)
     return { send: sendMock }
   }),
   // Mirrors the real command shape (`command.input`) so a test can tell from what reached
@@ -38,7 +48,7 @@ vi.mock('@aws-sdk/lib-storage', () => {
 
 // Dynamic imports: `vi.mock` above is hoisted, so these resolve to the mocked modules.
 const { Upload } = await import('@aws-sdk/lib-storage')
-const { S3Client, DeleteObjectCommand } = await import('@aws-sdk/client-s3')
+const { DeleteObjectCommand } = await import('@aws-sdk/client-s3')
 const { s3Service } = await import('./s3Service')
 
 // Cast, not vi.mocked(Upload): the real signature is a constructor taking the full SDK
@@ -201,8 +211,8 @@ describe('s3Service', () => {
       s3Service(config, 'ocelot-social')
       s3Service(config, 'other-prefix')
 
-      expect(vi.mocked(S3Client)).toHaveBeenCalledTimes(1)
-      expect(vi.mocked(S3Client).mock.calls[0][0]).toMatchObject({
+      expect(s3ClientConstructions).toHaveLength(1)
+      expect(s3ClientConstructions[0]).toMatchObject({
         credentials: {
           accessKeyId: 'AWS_ACCESS_KEY_ID',
           secretAccessKey: 'AWS_SECRET_ACCESS_KEY',
