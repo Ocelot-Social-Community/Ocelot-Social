@@ -42,7 +42,8 @@ const DEFAULT_TEST_TIMEOUT = 30_000
 // The VITEST_TEST_TIMEOUT override, validated rather than passed through `Number()`.
 //
 // `Number()` maps every typo onto a value vitest accepts silently, and BOTH of them defeat the
-// timeout rather than adjusting it (verified against @vitest/runner's `withTimeout`, which reads
+// timeout rather than adjusting it (verified against the runner's `withTimeout` — inlined into
+// `vitest` as of v5, previously the `@vitest/runner` package — which reads
 // `if (timeout <= 0 || timeout === Infinity) return fn`):
 //
 //   VITEST_TEST_TIMEOUT=30s  → NaN → not <= 0, so a timer IS armed, with NaN → Node clamps that

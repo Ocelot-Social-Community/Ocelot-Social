@@ -68,6 +68,29 @@ updates:
       applies-to: version-updates
       patterns:
         - "metascraper*"
+    # `vitest` pins `@vitest/coverage-v8` to an exact version in its peerDependencies, so a pull
+    # request moving only one of the two can never install — `npm ci` fails with ERESOLVE before a
+    # single test runs. They have to arrive together. (Same reasoning as the `size-limit` group
+    # under /packages/ui.)
+    vitest:
+      applies-to: version-updates
+      patterns:
+        - "vitest*"
+        - "@vitest*"
+    # `applies-to` defaults to version-updates, so the group above does NOT cover security updates
+    # — those would arrive one package per pull request and hit the same ERESOLVE. Hence the
+    # duplicate below.
+    #
+    # It only half closes the gap, and knowingly so: a security group bundles the dependencies that
+    # are THEMSELVES vulnerable, not everything matching the patterns. An advisory against `vitest`
+    # alone (the likely shape — they land on the runner and the browser API, not on the coverage
+    # provider) still produces a single-package pull request that cannot install. There is no
+    # Dependabot-side answer to that one; it fails in CI and gets the second package added by hand.
+    vitest-security:
+      applies-to: security-updates
+      patterns:
+        - "vitest*"
+        - "@vitest*"
 
 # webapp
 - package-ecosystem: docker
@@ -161,6 +184,14 @@ updates:
       patterns:
         - "vitest*"
         - "@vitest*"
+    # See the `vitest-security` note under /backend: `applies-to` defaults to version-updates, so
+    # the group above leaves security updates ungrouped, and `vitest` pins `@vitest/coverage-v8`
+    # to an exact peer version.
+    vitest-security:
+      applies-to: security-updates
+      patterns:
+        - "vitest*"
+        - "@vitest*"
     tailwind:
       applies-to: version-updates
       patterns:
@@ -193,6 +224,13 @@ updates:
       patterns:
         - "size-limit"
         - "@size-limit/*"
+    # See the `vitest-security` note under /backend: `applies-to` defaults to version-updates, so
+    # the group above leaves security updates ungrouped and the exact peer pin bites again.
+    size-limit-security:
+      applies-to: security-updates
+      patterns:
+        - "size-limit"
+        - "@size-limit/*"
     storybook:
       applies-to: version-updates
       patterns:
@@ -221,6 +259,14 @@ updates:
         - "vitest*"
     vitest:
       applies-to: version-updates
+      patterns:
+        - "vitest*"
+        - "@vitest*"
+    # See the `vitest-security` note under /backend. No `vite-security` counterpart is needed: the
+    # `vite` group above exists to keep a release train together, not because anything in it pins
+    # an exact peer, so a lone security update there installs fine.
+    vitest-security:
+      applies-to: security-updates
       patterns:
         - "vitest*"
         - "@vitest*"
