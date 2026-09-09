@@ -9,10 +9,10 @@ Feature: Admin sets donations info settings
       | user  | user@example.org  | abcd     | user  | User-Chad | user  | 0.0.4                           |
       | admin | admin@example.org | 1234     | admin | Admin-Man | admin | 0.0.4                           |
     Given the following "posts" are in the database:
-      | id | title                       | pinned | createdAt  |
-      | p1 | Some other post             |        | 2020-01-21 |
-      | p2 | Houston we have a problem   | x      | 2020-01-20 |
-      | p3 | Yet another post            |        | 2020-01-19 |
+      | id | title                       | pinned | createdAt                |
+      | p1 | Some other post             |        | 2020-01-21T00:00:00.000Z |
+      | p2 | Houston we have a problem   | x      | 2020-01-20T00:00:00.000Z |
+      | p3 | Yet another post            |        | 2020-01-19T00:00:00.000Z |
     Given the following "donations" are in the database:
       | id | showDonations | goal    | progress   |
       | d1 | x             | 15000.0 | 7000.0     |

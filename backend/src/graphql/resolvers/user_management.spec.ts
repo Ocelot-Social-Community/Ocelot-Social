@@ -1,3 +1,7 @@
+/* eslint-disable import-x/no-named-as-default-member -- jsonwebtoken is CommonJS: the named
+   exports its types advertise do not exist for Node's ESM loader (it derives them by static
+   analysis and misses these), so `import { verify }` type-checks and then throws at load.
+   Reaching through the default import is the only form that works at runtime. */
 /* eslint-disable @typescript-eslint/require-await */
 
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -5,11 +9,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable jest/unbound-method */
+
 /* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable jest/expect-expect */
+/* eslint-disable vitest/expect-expect */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { verify } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
+import { beforeAll, afterAll, beforeEach, afterEach, describe, expect, it } from 'vitest'
 
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
@@ -23,7 +28,6 @@ import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 
-const jwt = { verify }
 let variables, req, user
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
@@ -42,9 +46,12 @@ const disable = async (id) => {
     }),
     reportAgainstUser.relateTo(user, 'belongsTo'),
   ])
-  const disableVariables = { resourceId: user.id, disable: true, closed: false }
+  const disableVariables = { resourceId: user.get('id'), disable: true, closed: false }
   await Promise.all([
-    reportAgainstUser.relateTo(moderator, 'reviewed', disableVariables),
+    reportAgainstUser.relateTo(moderator, 'reviewed', {
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
+    }),
     user.update({ disabled: true, updatedAt: new Date().toISOString() }),
   ])
 }
@@ -200,6 +207,7 @@ describe('currentUser', () => {
 
           it('returns only the saved active categories', async () => {
             const result = await query({ query: currentUser, variables })
+
             expect(result.data?.currentUser.activeCategories).toHaveLength(4)
             expect(result.data?.currentUser.activeCategories).toContain('cat1')
             expect(result.data?.currentUser.activeCategories).toContain('cat3')
@@ -346,6 +354,7 @@ describe('change password', () => {
       const userBearerToken = encode(context)({ id: 'u3' })
       req = { headers: { authorization: `Bearer ${userBearerToken}` } }
     })
+
     describe('old password === new password', () => {
       beforeEach(() => {
         variables = { ...variables, oldPassword: '1234', newPassword: '1234' }
@@ -368,6 +377,23 @@ describe('change password', () => {
       })
 
       it('responds with "Old password isn\'t valid"', async () => {
+        await respondsWith({ errors: [{ message: 'Old password is not correct' }] })
+      })
+    })
+
+    // DeleteUser sets `encryptedPassword = null` when blacking out an account. bcrypt.compare
+    // against a null hash throws rather than returning false, so without the guard above it this
+    // would surface as an internal server error instead of the same refusal every other wrong
+    // password gets — and an error that differs by account state is an oracle.
+    describe('an account whose password was cleared', () => {
+      beforeEach(async () => {
+        await database.write({
+          query: `MATCH (user:User { id: 'u3' }) SET user.encryptedPassword = null RETURN user { .id }`,
+        })
+        variables = { ...variables, oldPassword: '1234', newPassword: '12345' }
+      })
+
+      it('responds with the same "Old password is not correct" as any wrong password', async () => {
         await respondsWith({ errors: [{ message: 'Old password is not correct' }] })
       })
     })

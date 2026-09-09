@@ -1,32 +1,36 @@
+/* eslint-disable vitest/no-conditional-expect -- the assertions below verify that nothing
+   was deleted when the transaction rolled back, which is only observable in the catch. */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable jest/no-conditional-expect */
+
 import { Readable } from 'node:stream'
 
 import { S3Client } from '@aws-sdk/client-s3'
-import { Upload } from '@aws-sdk/lib-storage'
-
-import Factory, { cleanDatabase } from '@db/factories'
-import { UserInputError } from '@graphql/errors'
-import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
-
-import { attachments } from './attachments'
+import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect } from 'vitest'
 
 import type { FileInput } from './attachments'
-import type File from '@db/models/File'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { S3Config } from '@src/config'
 import type { Context } from '@src/context'
 import type { ReadStream } from 'node:fs'
 
-const s3SendMock = jest.fn()
-jest.spyOn(S3Client.prototype, 'send').mockImplementation(s3SendMock)
+const s3SendMock = vi.fn()
+vi.spyOn(S3Client.prototype, 'send').mockImplementation(s3SendMock)
 
-jest.mock('@aws-sdk/lib-storage')
+// ESM has no automock: `vi.mock` requires an explicit factory.
+vi.mock('@aws-sdk/lib-storage', () => ({ Upload: vi.fn() }))
+
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
+const { Upload } = await import('@aws-sdk/lib-storage')
+const { default: Factory, cleanDatabase } = await import('@db/factories')
+const { UserInputError } = await import('@graphql/errors')
+const { default: CreateMessage } = await import('@graphql/queries/messaging/CreateMessage.gql')
+const { createApolloTestSetup } = await import('@root/test/helpers')
+const { attachments } = await import('./attachments')
 
 const UploadMock = {
   done: () => {
@@ -36,7 +40,11 @@ const UploadMock = {
   },
 }
 
-;(Upload as unknown as jest.Mock).mockImplementation(() => UploadMock)
+// `function`, not an arrow: the service calls `new Upload(...)` and vitest constructs the
+// implementation with Reflect.construct, which arrows do not support.
+vi.mocked(Upload).mockImplementation(function () {
+  return UploadMock
+})
 
 const config: S3Config = {
   AWS_ACCESS_KEY_ID: 'AWS_ACCESS_KEY_ID',
@@ -69,7 +77,7 @@ afterAll(async () => {
   database.neode.close()
 })
 
-/*  uploadCallback = jest.fn(
+/*  uploadCallback = vi.fn(
     ({ uniqueFilename }) => `http://your-objectstorage.com/bucket/${uniqueFilename}`,
   )
 */
@@ -80,11 +88,13 @@ afterEach(async () => {
 
 describe('delete Attachment', () => {
   const { del: deleteAttachment } = attachments(config)
+
   describe('given a resource with an attachment', () => {
     let user
     let chatPartner
     let file: { id: string }
     let message: { id: string }
+
     beforeEach(async () => {
       const u = await Factory.build('user')
       user = await u.toJson()
@@ -133,7 +143,9 @@ describe('delete Attachment', () => {
 
     it('deletes `File` node', async () => {
       await expect(database.neode.all('File')).resolves.toHaveLength(1)
+
       await deleteAttachment(message, 'ATTACHMENT')
+
       await expect(database.neode.all('File')).resolves.toHaveLength(0)
     })
 
@@ -153,12 +165,14 @@ describe('delete Attachment', () => {
         } finally {
           await session.close()
         }
+
         await expect(database.neode.all('File')).resolves.toHaveLength(0)
         expect(someString).toEqual('Hello')
       })
 
       it('rolls back the transaction in case of errors', async () => {
         await expect(database.neode.all('File')).resolves.toHaveLength(1)
+
         const session = database.driver.session()
         try {
           await session.writeTransaction(async (transaction) => {
@@ -178,12 +192,29 @@ describe('delete Attachment', () => {
       })
     })
   })
+
+  // Deleting a message deletes its attachment unconditionally — most messages have none, so the
+  // empty match is the COMMON case, not an edge one. Without the guard the object-storage call
+  // would run on `undefined.url`, and it sits after the node delete: the Cypher would already
+  // have committed by the time it threw.
+  describe('given a resource without an attachment', () => {
+    it('deletes nothing and leaves object storage alone', async () => {
+      s3SendMock.mockClear()
+
+      await expect(
+        deleteAttachment({ id: 'no-such-resource' }, 'ATTACHMENT'),
+      ).resolves.toBeUndefined()
+
+      expect(s3SendMock).not.toHaveBeenCalled()
+    })
+  })
 })
 
 describe('add Attachment', () => {
   const { add: addAttachment } = attachments(config)
   let fileInput: FileInput
   let post: { id: string }
+
   beforeEach(() => {
     fileInput = {
       name: 'The name of the new attachment',
@@ -233,7 +264,9 @@ describe('add Attachment', () => {
 
       it('creates `:File` node', async () => {
         await expect(database.neode.all('File')).resolves.toHaveLength(0)
+
         await addAttachment(post, 'ATTACHMENT', fileInput)
+
         await expect(database.neode.all('File')).resolves.toHaveLength(1)
       })
 
@@ -243,17 +276,20 @@ describe('add Attachment', () => {
           `MATCH(p:Post {id: "p99"})-[:ATTACHMENT]->(f:File) RETURN f,p`,
           {},
         )
-        post = database.neode
-          .hydrateFirst<{ id: string }>(result, 'p', database.neode.model('Post'))
-          .properties()
+        // Assigned to locals rather than to the shared `post`: hydrateFirst answers null when
+        // the node is gone, which is what other tests in this file assert, and this one only
+        // wants to know that both are there.
+        const hydratedPost = database.neode.hydrateFirst(result, 'p', database.neode.model('Post'))
         const file = database.neode.hydrateFirst(result, 'f', database.neode.model('File'))
-        expect(post).toBeTruthy()
+
+        expect(hydratedPost).toBeTruthy()
         expect(file).toBeTruthy()
       })
 
       it('sets metadata', async () => {
         await addAttachment(post, 'ATTACHMENT', fileInput)
-        const file = await database.neode.first<typeof File>('File', {}, undefined)
+        const file = await database.neode.first('File', {}, undefined)
+
         await expect(file.toJson()).resolves.toMatchObject({
           name: 'The name of the new attachment',
           type: 'application/any',
@@ -261,6 +297,21 @@ describe('add Attachment', () => {
           updatedAt: expect.any(String),
           url: expect.any(String),
         })
+      })
+
+      // extension and duration are both OPTIONAL and both spread in conditionally, because
+      // `SET file += $file` with an explicit null would write the null onto the node rather than
+      // leave the property out. A media attachment supplies both — the case the player needs, and
+      // the only one that exercises the other side of those two conditions.
+      it('stores the optional extension and duration when the upload carries them', async () => {
+        const file = await addAttachment(post, 'ATTACHMENT', {
+          ...fileInput,
+          extension: 'mp3',
+          duration: 42,
+        })
+
+        expect(file).toMatchObject({ extension: 'mp3' })
+        expect(Number(file.duration)).toBe(42)
       })
 
       describe('given a transaction parameter', () => {
@@ -289,11 +340,12 @@ describe('add Attachment', () => {
           } finally {
             await session.close()
           }
-          const file = await database.neode.first<typeof File>(
+          const file = await database.neode.first(
             'File',
             { name: 'This name text gets overwritten' },
             undefined,
           )
+
           await expect(file.toJson()).resolves.toMatchObject({
             name: 'This name text gets overwritten',
           })
@@ -325,6 +377,7 @@ describe('add Attachment', () => {
     it('throws UserInputError', async () => {
       const p = await Factory.build('post', { id: 'p99' }, { image: null })
       post = await p.toJson()
+
       await expect(addAttachment(post, 'ATTACHMENT', fileInput)).rejects.toEqual(
         new UserInputError('Cannot find attachment for given resource'),
       )

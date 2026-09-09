@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { beforeAll, afterAll, describe, beforeEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import Post from '@graphql/queries/posts/Post.gql'
 import User from '@graphql/queries/users/User.gql'
@@ -176,16 +177,19 @@ beforeAll(async () => {
   }
 
   await Promise.all([
-    reportAgainstTroll.relateTo(moderator, 'reviewed', { ...disableVariables, resourceId: 'u2' }),
+    reportAgainstTroll.relateTo(moderator, 'reviewed', {
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
+    }),
     troll.update({ disabled: true, updatedAt: new Date().toISOString() }),
     reportAgainstTrollingPost.relateTo(moderator, 'reviewed', {
-      ...disableVariables,
-      resourceId: 'p2',
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
     }),
     trollingPost.update({ disabled: true, updatedAt: new Date().toISOString() }),
     reportAgainstTrollingComment.relateTo(moderator, 'reviewed', {
-      ...disableVariables,
-      resourceId: 'c1',
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
     }),
     trollingComment.update({ disabled: true, updatedAt: new Date().toISOString() }),
   ])
@@ -225,13 +229,16 @@ describe('softDeleteMiddleware', () => {
         it('displays name', () => {
           expect(subject.name).toEqual('Offensive Name')
         })
+
         it('displays slug', () => {
           expect(subject.slug).toEqual('offensive-name')
         })
+
         it('displays about', () => {
           expect(subject.about).toEqual('This self description is very offensive')
         })
-        it('displays avatar', async () => {
+
+        it('displays avatar', () => {
           expect(subject.avatar).toEqual({
             url: expect.stringMatching('http://localhost/some/offensive/avatar.jpg'),
           })
@@ -244,12 +251,15 @@ describe('softDeleteMiddleware', () => {
         it('displays title', () => {
           expect(subject.title).toEqual('Disabled post')
         })
+
         it('displays slug', () => {
           expect(subject.slug).toEqual('disabled-post')
         })
+
         it('displays content', () => {
           expect(subject.content).toEqual('This is an offensive post content')
         })
+
         it('displays image', () => {
           expect(subject.image).toEqual({
             url: expect.stringMatching('http://localhost/some/offensive/image.jpg'),
@@ -277,12 +287,15 @@ describe('softDeleteMiddleware', () => {
         it('obfuscates name', () => {
           expect(subject.name).toEqual('UNAVAILABLE')
         })
+
         it('obfuscates slug', () => {
           expect(subject.slug).toEqual('UNAVAILABLE')
         })
+
         it('obfuscates about', () => {
           expect(subject.about).toEqual('UNAVAILABLE')
         })
+
         it('obfuscates avatar', () => {
           expect(subject.avatar).toEqual(null)
         })
@@ -294,12 +307,15 @@ describe('softDeleteMiddleware', () => {
         it('obfuscates title', () => {
           expect(subject.title).toEqual('UNAVAILABLE')
         })
+
         it('obfuscates slug', () => {
           expect(subject.slug).toEqual('UNAVAILABLE')
         })
+
         it('obfuscates content', () => {
           expect(subject.content).toEqual('UNAVAILABLE')
         })
+
         it('obfuscates image', () => {
           expect(subject.image).toEqual(null)
         })
@@ -324,6 +340,7 @@ describe('softDeleteMiddleware', () => {
 
         it('hides deleted or disabled posts', async () => {
           const expected = { data: { Post: [{ title: 'Publicly visible post' }] } }
+
           await expect(query({ query: Post })).resolves.toMatchObject(expected)
         })
       })
@@ -336,6 +353,7 @@ describe('softDeleteMiddleware', () => {
         it('shows disabled but hides deleted posts', async () => {
           const { data } = await query({ query: Post })
           const { Post: PostData } = data
+
           expect(PostData).toEqual(
             expect.arrayContaining([
               expect.objectContaining({ title: 'Disabled post' }),
@@ -360,6 +378,7 @@ describe('softDeleteMiddleware', () => {
             const {
               Post: [{ comments }],
             } = data
+
             expect(comments).toEqual(expect.arrayContaining(expected))
           })
         })
@@ -378,6 +397,7 @@ describe('softDeleteMiddleware', () => {
             const {
               Post: [{ comments }],
             } = data
+
             expect(comments).toEqual(expect.arrayContaining(expected))
           })
         })

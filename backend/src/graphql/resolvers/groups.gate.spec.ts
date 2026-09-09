@@ -9,6 +9,8 @@
 // group surface — the Group query, group search, and the create/join/update/leave
 // mutations — is rejected, and that a profile's groups field folds to []. Kept separate so
 // the huge groups.spec's shared `policy` object stays untouched.
+import { beforeAll, afterAll, describe, beforeEach, afterEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
 import groupQuery from '@graphql/queries/groups/Group.gql'
@@ -102,10 +104,12 @@ describe('groups feature gate (groupsEnabled)', () => {
   describe('while groupsEnabled is on (default)', () => {
     it('serves the Group query and the profile groups list', async () => {
       const group = await query({ query: groupQuery, variables: { id: 'g1' } })
+
       expect(group.errors).toBeUndefined()
       expect(group.data!.Group[0]).toMatchObject({ id: 'g1', name: 'Group One' })
 
       const profile = await query({ query: UserGroups, variables: { id: 'group-owner' } })
+
       expect(profile.data!.User[0].groups.map((g: { id: string }) => g.id)).toContain('g1')
     })
   })
@@ -117,11 +121,13 @@ describe('groups feature gate (groupsEnabled)', () => {
 
     it('denies the Group query', async () => {
       const result = await query({ query: groupQuery, variables: { id: 'g1' } })
+
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
     it('denies searching groups', async () => {
       const result = await query({ query: searchGroupsQuery, variables: { query: 'Group' } })
+
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
@@ -130,6 +136,7 @@ describe('groups feature gate (groupsEnabled)', () => {
         mutation: CreateGroup,
         variables: createGroupVariables('g2', 'Group Two'),
       })
+
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
@@ -138,6 +145,7 @@ describe('groups feature gate (groupsEnabled)', () => {
         mutation: JoinGroup,
         variables: { groupId: 'g1', userId: 'group-owner' },
       })
+
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
@@ -146,6 +154,7 @@ describe('groups feature gate (groupsEnabled)', () => {
         mutation: UpdateGroup,
         variables: { id: 'g1', name: 'Renamed' },
       })
+
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
@@ -154,11 +163,13 @@ describe('groups feature gate (groupsEnabled)', () => {
         mutation: LeaveGroup,
         variables: { groupId: 'g1', userId: 'group-owner' },
       })
+
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
     it('serves the profile but folds its groups field to an empty list', async () => {
       const profile = await query({ query: UserGroups, variables: { id: 'group-owner' } })
+
       expect(profile.errors).toBeUndefined()
       expect(profile.data!.User[0].groups).toEqual([])
     })
@@ -192,6 +203,7 @@ describe('groups feature gate (groupsEnabled)', () => {
     it('drops the group room from the chat room list (DMs would remain)', async () => {
       authenticatedUser = ownerAuth
       const result = await query({ query: RoomQuery, variables: {} })
+
       expect(result.errors).toBeUndefined()
       expect((result.data!.Room as Array<{ id: string }>).map((r) => r.id)).not.toContain(roomId)
     })
@@ -199,6 +211,7 @@ describe('groups feature gate (groupsEnabled)', () => {
     it('does not fetch the group room by groupId', async () => {
       authenticatedUser = ownerAuth
       const result = await query({ query: RoomQuery, variables: { groupId: 'g1' } })
+
       expect(result.errors).toBeUndefined()
       expect(result.data!.Room).toEqual([])
     })
@@ -206,6 +219,7 @@ describe('groups feature gate (groupsEnabled)', () => {
     it('does not fetch the group room by its (known/cached) room id', async () => {
       authenticatedUser = ownerAuth
       const result = await query({ query: RoomQuery, variables: { id: roomId } })
+
       expect(result.errors).toBeUndefined()
       expect(result.data!.Room).toEqual([])
     })
@@ -213,6 +227,7 @@ describe('groups feature gate (groupsEnabled)', () => {
     it('serves no messages for the group room', async () => {
       authenticatedUser = ownerAuth
       const result = await query({ query: MessageQuery, variables: { roomId } })
+
       expect(result.errors).toBeUndefined()
       expect(result.data!.Message).toEqual([])
     })
@@ -220,14 +235,57 @@ describe('groups feature gate (groupsEnabled)', () => {
     it('blocks posting into the group room', async () => {
       authenticatedUser = ownerAuth
       const result = await mutate({ mutation: CreateMessage, variables: { roomId, content: 'no' } })
+
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
     it('excludes the group room from the unread-rooms count', async () => {
       authenticatedUser = { id: 'group-member' } as Context['user']
       const result = await query({ query: UnreadRooms })
+
       expect(result.errors).toBeUndefined()
       expect(result.data!.UnreadRooms).toBe(0)
+    })
+
+    // The other half of the gate, and the one that would go unnoticed: everything above passes
+    // just as well if the gate blocked chat OUTRIGHT. Direct messages have nothing to do with
+    // groups and must keep working while the feature is off — the room resolvers decide that per
+    // room, by asking whether the room belongs to a group at all.
+    describe('and a direct message room between the same two users', () => {
+      let dmRoomId: string
+
+      beforeEach(async () => {
+        // Created while the feature is still on only for symmetry with the group room above —
+        // a DM does not depend on the flag in either direction.
+        policyOverride = { categoriesActive: false }
+        authenticatedUser = ownerAuth
+        const message = await mutate({
+          mutation: CreateMessage,
+          variables: { userId: 'group-member', content: 'hello directly' },
+        })
+        dmRoomId = message.data!.CreateMessage.room.id
+        policyOverride = { groupsEnabled: false, categoriesActive: false }
+      })
+
+      it('still serves the direct message room', async () => {
+        authenticatedUser = ownerAuth
+        const result = await query({ query: RoomQuery, variables: { id: dmRoomId } })
+
+        expect(result.errors).toBeUndefined()
+        expect((result.data!.Room as Array<{ id: string }>).map((room) => room.id)).toEqual([
+          dmRoomId,
+        ])
+      })
+
+      it('still serves the messages in the direct message room', async () => {
+        authenticatedUser = ownerAuth
+        const result = await query({ query: MessageQuery, variables: { roomId: dmRoomId } })
+
+        expect(result.errors).toBeUndefined()
+        expect((result.data!.Message as Array<{ content: string }>).map((m) => m.content)).toEqual([
+          'hello directly',
+        ])
+      })
     })
   })
 })

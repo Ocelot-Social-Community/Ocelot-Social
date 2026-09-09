@@ -9,7 +9,6 @@ query Group($isMember: Boolean, $id: ID, $slug: String) {
     deleted
     about
     description
-    descriptionExcerpt
     groupType
     actionRadius
     categories {

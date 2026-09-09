@@ -200,7 +200,7 @@ jobs:
           # Trusted publishing needs npm >= 11.5.1, whose own floor is Node >= 22.14.0. npm is
           # taken from Node's bundle here, and that is the tighter of the two constraints: Node 22
           # LTS ships npm 10.9.x to this day, and the first Node bundling >= 11.5.1 is 24.5.0. The
-          # version pinned in .tool-versions (25.5.0) brings npm 11.8.0. Below that, OIDC drops out
+          # version pinned in .tool-versions (26.8.1) brings npm 11.19.0. Below that, OIDC drops out
           # silently unless a step installs a newer npm explicitly.
           node-version-file: 'packages/ui/.tool-versions'
           # Still required without a token: it writes the .npmrc that points npm at the public

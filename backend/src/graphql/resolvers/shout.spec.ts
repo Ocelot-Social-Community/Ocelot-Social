@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { describe, beforeAll, afterAll, beforeEach, afterEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import shout from '@graphql/queries/emotions/shout.gql'
 import unshout from '@graphql/queries/emotions/unshout.gql'
@@ -80,11 +82,13 @@ describe('shout and unshout posts', () => {
       it('throws authorization error', async () => {
         variables = { id: 'post-to-shout-id' }
         authenticatedUser = null
+
         await expect(mutate({ mutation: shout, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
+
     describe('authenticated', () => {
       beforeEach(async () => {
         authenticatedUser = await currentUser.toJson()
@@ -113,6 +117,7 @@ describe('shout and unshout posts', () => {
 
       it("can shout another user's post", async () => {
         variables = { id: 'another-user-post-id' }
+
         await expect(mutate({ mutation: shout, variables })).resolves.toMatchObject({
           data: { shout: true },
         })
@@ -135,11 +140,13 @@ describe('shout and unshout posts', () => {
         const relationshipProperties = relation.records.map(
           (record) => record.get('relationship').properties.createdAt,
         )
+
         expect(relationshipProperties[0]).toEqual(expect.any(String))
       })
 
       it('can not shout my own post', async () => {
         variables = { id: 'current-user-post-id' }
+
         await expect(mutate({ mutation: shout, variables })).resolves.toMatchObject({
           data: { shout: false },
         })
@@ -150,11 +157,13 @@ describe('shout and unshout posts', () => {
       })
     })
   })
+
   describe('unshout', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
         variables = { id: 'post-to-shout-id' }
+
         await expect(mutate({ mutation: unshout, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -182,6 +191,7 @@ describe('shout and unshout posts', () => {
 
       it("can unshout another user's post", async () => {
         variables = { id: 'posted-by-another-user' }
+
         await expect(mutate({ mutation: unshout, variables })).resolves.toMatchObject({
           data: { unshout: true },
         })

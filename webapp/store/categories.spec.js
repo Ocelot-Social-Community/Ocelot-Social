@@ -74,17 +74,17 @@ describe('categories store', () => {
       })
 
       it('calls apollo', () => {
-        expect(queryMock).toBeCalledWith({
+        expect(queryMock).toHaveBeenCalledWith({
           query: CategoryQuery(),
         })
       })
 
       it('commits SET_CATEGORIES', () => {
-        expect(commit).toBeCalledWith('SET_CATEGORIES', ['cat1', 'cat2', 'cat3'])
+        expect(commit).toHaveBeenCalledWith('SET_CATEGORIES', ['cat1', 'cat2', 'cat3'])
       })
 
       it('commits SET_INIZIALIZED', () => {
-        expect(commit).toBeCalledWith('SET_INIZIALIZED')
+        expect(commit).toHaveBeenCalledWith('SET_INIZIALIZED')
       })
     })
   })

@@ -166,20 +166,50 @@ export default {
     this.editor.destroy()
   },
   methods: {
-    openSuggestionList({ items, query, range, command, virtualNode }, suggestionType) {
+    // Anchors the suggestion popup and shows it.
+    //
+    // tiptap's Suggestions plugin hands us a `virtualNode` built from the decoration span it wraps
+    // around the typed "@"/"#". It looks that span up with a `document.querySelector` inside its own
+    // `update()`, and since prosemirror-view 1.42 that runs BEFORE the decoration reaches the DOM —
+    // so on the keystroke that OPENS the list, `virtualNode` is null (measured: the plugin searches
+    // for id "00s5p" while the document still holds no `[data-decoration-id]` at all). Handing that
+    // null to `tippy()` is what produced "this.menu.show is not a function": for anything that is
+    // not an element tippy returns a list of instances — an empty one — instead of an instance.
+    //
+    // So when the plugin comes up empty we look the same span up ourselves one tick later, once
+    // prosemirror has written it. Every following keystroke still takes the plugin's shortcut.
+    showSuggestionMenu(virtualNode, view) {
+      const display = (anchor) =>
+        this.$refs.contextMenu.displayContextMenu(anchor, this.$refs.suggestions.$el)
+      if (virtualNode) {
+        display(virtualNode)
+        return
+      }
+      this.$nextTick(() => {
+        // `suggestionRange` is cleared by closeSuggestionList: without this check a list that was
+        // dismissed within the same tick (Escape, or a keystroke that ends the match) would still
+        // pop open here.
+        if (!this.suggestionRange) return
+        const decoration = view && view.dom.querySelector('[data-decoration-id]')
+        if (decoration) {
+          display(decoration)
+        }
+      })
+    },
+    openSuggestionList({ items, query, range, command, virtualNode, view }, suggestionType) {
       this.suggestionType = suggestionType
       this.query = this.sanitizeQuery(query)
       this.filteredItems = items
       this.suggestionRange = range
-      this.$refs.contextMenu.displayContextMenu(virtualNode, this.$refs.suggestions.$el)
+      this.showSuggestionMenu(virtualNode, view)
       this.insertMentionOrHashtag = command
     },
-    updateSuggestionList({ items, query, range, virtualNode }) {
+    updateSuggestionList({ items, query, range, virtualNode, view }) {
       this.query = this.sanitizeQuery(query)
       this.filteredItems = items
       this.suggestionRange = range
       this.navigatedItemIndex = 0
-      this.$refs.contextMenu.displayContextMenu(virtualNode, this.$refs.suggestions.$el)
+      this.showSuggestionMenu(virtualNode, view)
     },
     closeSuggestionList() {
       this.suggestionType = ''

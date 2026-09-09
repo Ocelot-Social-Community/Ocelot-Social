@@ -32,7 +32,7 @@ jobs:
     name: Detect File Changes
     runs-on: ubuntu-latest
     outputs:
-      branding: ${{ steps.changes.outputs.branding }}
+      branding-inputs: ${{ steps.changes.outputs.branding-inputs }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -48,7 +48,7 @@ jobs:
 
   build:
     name: Build
-    if: needs.files-changed.outputs.branding == 'true'
+    if: needs.files-changed.outputs.branding-inputs == 'true'
     needs: files-changed
     runs-on: ubuntu-latest
 

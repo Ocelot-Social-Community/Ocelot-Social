@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
+import { describe, beforeEach, afterAll, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
 
@@ -58,12 +60,14 @@ describe('role-edge helpers (DB)', () => {
 
   it('seeds the default role nodes', async () => {
     await ensureUserRoleEdges()
+
     expect(await roleNodeExists('owner')).toBe(true)
     expect(await roleNodeExists('user')).toBe(true)
   })
 
   it('gives every (edgeless) user a HAS_ROLE edge matching their legacy tier', async () => {
     await ensureUserRoleEdges()
+
     expect(await rolesOf('a')).toEqual(['admin'])
     expect(await rolesOf('m')).toEqual(['moderator'])
     expect(await rolesOf('u')).toEqual(['user'])
@@ -72,19 +76,22 @@ describe('role-edge helpers (DB)', () => {
   it('is idempotent — re-running adds no duplicate edges', async () => {
     await ensureUserRoleEdges()
     await ensureUserRoleEdges()
+
     expect(await rolesOf('a')).toEqual(['admin'])
   })
 
-  describe('promoteToOwner', () => {
+  describe(promoteToOwner, () => {
     it('promotes a user found by email, replacing their previous role', async () => {
       await ensureUserRoleEdges() // 'u' now holds the user edge
       const result = await promoteToOwner('u@e.org')
+
       expect(result?.id).toBe('u')
       expect(await rolesOf('u')).toEqual(['owner']) // single edge, replaced
     })
 
     it('promotes a user found by id (seeds roles itself, no prior edge needed)', async () => {
       const result = await promoteToOwner('a')
+
       expect(result?.id).toBe('a')
       expect(await rolesOf('a')).toEqual(['owner'])
     })
@@ -98,6 +105,7 @@ describe('role-edge helpers (DB)', () => {
         { email: 's@e.org', password: '1' },
       )
       const result = await promoteToOwner('slug-user')
+
       expect(result?.id).toBe('s')
       expect(await rolesOf('s')).toEqual(['owner'])
     })
@@ -156,6 +164,7 @@ describe('role-edge helpers (DB)', () => {
         { id: 'o', role: 'admin' },
         { email: 'o@e.org', password: '1', roleName: 'owner' },
       )
+
       expect(await rolesOf('o')).toEqual(['owner']) // owner edge, not the admin tier
     })
   })

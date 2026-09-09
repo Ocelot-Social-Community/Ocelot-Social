@@ -4,11 +4,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
+import { beforeAll, afterAll, describe, beforeEach, afterEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateSocialMedia from '@graphql/queries/users/CreateSocialMedia.gql'
 import DeleteSocialMedia from '@graphql/queries/users/DeleteSocialMedia.gql'
 import UpdateSocialMedia from '@graphql/queries/users/UpdateSocialMedia.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import socialMediaResolvers from './socialMedia'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -136,8 +140,11 @@ describe('SocialMedia', () => {
         variables = { url: '' }
         const result = await socialMediaAction(user, CreateSocialMedia, variables)
 
+        // Wording is ours now, not Joi's: the rule moved from db/models/SocialMedia.ts into
+        // db/schema/entities/SocialMedia.ts, where the audit can check stored nodes against it
+        // too. What is asserted is the behaviour — an empty url is refused as user input.
         expect(result.errors![0].message).toEqual(
-          expect.stringContaining('"url" is not allowed to be empty'),
+          expect.stringContaining('must NOT have fewer than 1 characters'),
         )
       })
 
@@ -145,14 +152,13 @@ describe('SocialMedia', () => {
         variables = { url: 'not-a-url' }
         const result = await socialMediaAction(user, CreateSocialMedia, variables)
 
-        expect(result.errors![0].message).toEqual(
-          expect.stringContaining('"url" must be a valid uri'),
-        )
+        expect(result.errors![0].message).toEqual(expect.stringContaining('must match pattern'))
       })
 
       it('denies creating social media when the socialMediaEnabled policy is off', async () => {
         policyOverride = { socialMediaEnabled: false }
         const result = await socialMediaAction(user, CreateSocialMedia, variables)
+
         expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
       })
 
@@ -171,6 +177,7 @@ describe('SocialMedia', () => {
           },
         ]
         const result = await socialMediaAction(user, CreateSocialMedia, variables)
+
         expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -178,6 +185,7 @@ describe('SocialMedia', () => {
     describe('ownedBy', () => {
       it('resolves', async () => {
         const user = someUser
+
         await expect(socialMediaAction(user, CreateSocialMedia, variables)).resolves.toMatchObject({
           data: {
             CreateSocialMedia: { url, ownedBy: { name: 'Kalle Blomqvist' } },
@@ -237,6 +245,18 @@ describe('SocialMedia', () => {
         const result = await socialMediaAction(user, UpdateSocialMedia, variables)
 
         expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
+      })
+
+      // The same declaration check CreateSocialMedia runs, on the update path — a link that was
+      // valid when it was added must not become invalid by editing it. Separate code in the
+      // resolver, so the create-side test above says nothing about this one.
+      it.each(['', 'not a url'])('rejects %o as the new url', async (invalidUrl) => {
+        const result = await socialMediaAction(user, UpdateSocialMedia, {
+          ...variables,
+          url: invalidUrl,
+        })
+
+        expect(result.errors![0].message).toContain('url')
       })
 
       it('denies updating when the socialMediaEnabled policy is off', async () => {
@@ -338,5 +358,23 @@ describe('SocialMedia', () => {
 
       expect(result.data!.User[0].socialMedia).toEqual([])
     })
+  })
+})
+
+// isMySocialMedia resolves the owner from the node itself, so a request for an id that has no
+// node is denied before the resolver runs — the resolver's own "no such node" answer is only
+// reachable from here. It matters because DeleteSocialMedia is declared nullable ON PURPOSE:
+// deleting something that is already gone is the desired end state, not an error.
+describe('DeleteSocialMedia for a node that is not there', () => {
+  it('resolves to null rather than failing', async () => {
+    const databaseOnlyContext = { database } as unknown as Context
+
+    await expect(
+      socialMediaResolvers.Mutation.DeleteSocialMedia(
+        null,
+        { id: 'never-existed' },
+        databaseOnlyContext,
+      ),
+    ).resolves.toBeNull()
   })
 })

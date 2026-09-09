@@ -412,9 +412,6 @@ type Group {
 
   """Full group description (rich text)."""
   description: String!
-
-  """Plain-text excerpt of the description, for previews."""
-  descriptionExcerpt: String!
   disabled: Boolean
   groupType: GroupType!
   id: ID!

@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, describe, beforeEach, afterEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import Donations from '@graphql/queries/donations/Donations.gql'
 import updateDonations from '@graphql/queries/donations/UpdateDonations.gql'
@@ -35,6 +37,7 @@ afterAll(async () => {
 
 describe('donations', () => {
   let currentUser, newlyCreatedDonations
+
   beforeAll(async () => {
     await cleanDatabase()
     authenticatedUser = null
@@ -59,6 +62,7 @@ describe('donations', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
+
         await expect(query({ query: Donations, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -72,6 +76,19 @@ describe('donations', () => {
           role: 'user',
         })
         authenticatedUser = await currentUser.toJson()
+      })
+
+      // There is exactly one Donations node, created by a seed/migration. Before it exists — a
+      // fresh instance, or one whose seed has not run — the query has to answer `null`, which the
+      // schema allows; returning `undefined` for it would surface as an internal error instead of
+      // the "donations not configured" state the front end already handles.
+      it('returns null while no Donations node exists', async () => {
+        await database.write({ query: 'MATCH (donations:Donations) DETACH DELETE donations' })
+
+        await expect(query({ query: Donations, variables })).resolves.toMatchObject({
+          data: { Donations: null },
+          errors: undefined,
+        })
       })
 
       it('returns the current Donations info', async () => {
@@ -91,6 +108,7 @@ describe('donations', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
+
         await expect(mutate({ mutation: updateDonations, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -141,6 +159,18 @@ describe('donations', () => {
           authenticatedUser = await currentUser.toJson()
         })
 
+        // Same nullable contract as the query: an admin who opens the donations form on an
+        // instance whose Donations node was never seeded must get `null`, not a crash — the
+        // mutation MATCHes the node and writes nothing when there is none.
+        it('returns null while no Donations node exists', async () => {
+          await database.write({ query: 'MATCH (donations:Donations) DETACH DELETE donations' })
+
+          await expect(mutate({ mutation: updateDonations, variables })).resolves.toMatchObject({
+            data: { UpdateDonations: null },
+            errors: undefined,
+          })
+        })
+
         it('updates Donations info', async () => {
           await expect(mutate({ mutation: updateDonations, variables })).resolves.toMatchObject({
             data: { UpdateDonations: { showDonations: false, goal: 20000, progress: 3000 } },
@@ -153,6 +183,7 @@ describe('donations', () => {
           const {
             data: { UpdateDonations },
           } = await mutate({ mutation: updateDonations, variables })
+
           expect(newlyCreatedDonations.updatedAt).toBeTruthy()
           expect(Date.parse(newlyCreatedDonations.updatedAt)).toEqual(expect.any(Number))
           expect(UpdateDonations.updatedAt).toBeTruthy()

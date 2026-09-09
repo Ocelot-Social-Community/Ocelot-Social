@@ -99,7 +99,7 @@ describe('CategoriesFilter.vue', () => {
     //     wrapper = await Wrapper()
     //     const saveButton = wrapper.find('.categories-filter .item-save-topics button')
     //     saveButton.trigger('click')
-    //     expect(apolloMutationMock).toBeCalled()
+    //     expect(apolloMutationMock).toHaveBeenCalled()
     //   })
     // })
   })

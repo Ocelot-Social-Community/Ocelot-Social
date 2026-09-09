@@ -104,11 +104,11 @@ describe('Login.vue', () => {
         })
 
         it('calls i18n.set', () => {
-          expect(i18nSetMock).toBeCalledWith('en')
+          expect(i18nSetMock).toHaveBeenCalledWith('en')
         })
 
         it('call router push to registration page', () => {
-          expect(routerPushMock).toBeCalledWith({
+          expect(routerPushMock).toHaveBeenCalledWith({
             name: 'registration',
             query: {
               inviteCode: 'ABCDEF',
@@ -125,11 +125,11 @@ describe('Login.vue', () => {
         })
 
         it('calls i18n.set', () => {
-          expect(i18nSetMock).toBeCalledWith('en')
+          expect(i18nSetMock).toHaveBeenCalledWith('en')
         })
 
         it('call router push to registration page', () => {
-          expect(routerReplaceMock).toBeCalledWith('/')
+          expect(routerReplaceMock).toHaveBeenCalledWith('/')
         })
       })
     })

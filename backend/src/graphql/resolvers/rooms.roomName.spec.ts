@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { parse } from 'graphql'
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
@@ -55,12 +56,17 @@ afterAll(async () => {
 describe('Room.roomName', () => {
   it('is the same from the list projection and from the statement', async () => {
     const list = await setup.query({ query: listQuery })
+
     expect(list.errors).toBeUndefined()
+
     const rooms = (list.data?.Room ?? []) as { id: string; roomName: string }[]
+
     expect(rooms).toHaveLength(1)
 
     const single = await setup.query({ query: singleQuery, variables: { id: rooms[0].id } })
+
     expect(single.errors).toBeUndefined()
+
     const [fromStatement] = (single.data?.Room ?? []) as { roomName: string }[]
 
     // The list projects; the single-room query does not and resolves through cypherFields.

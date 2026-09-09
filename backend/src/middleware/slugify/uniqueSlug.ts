@@ -2,6 +2,13 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import slugify from 'slugify'
 
+// `slugify.extend`, not a named `extend` import — the reverse of what this file did under
+// CommonJS. slugify's TYPES declare `extend` as a named export, but the package itself is CJS
+// with a single `module.exports = slugify`, and Node's ESM loader derives named exports from a
+// CJS module by static analysis. It cannot see `extend`, so `import { extend }` type-checks and
+// then throws at load: "does not provide an export named 'extend'". The default import is the
+// whole module.exports and always has it.
+// eslint-disable-next-line import-x/no-named-as-default-member -- see above: no named export exists at runtime
 slugify.extend({ Ä: 'AE', ä: 'ae', Ö: 'OE', ö: 'oe', Ü: 'UE', ü: 'ue', ß: 'ss' })
 
 // The single slug builder: the User/Group/Post models validate slugs against

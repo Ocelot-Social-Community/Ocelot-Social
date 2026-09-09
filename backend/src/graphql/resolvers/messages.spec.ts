@@ -8,8 +8,11 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { Readable } from 'node:stream'
 
-import { Upload } from 'graphql-upload/public/index'
+import { PubSub } from 'graphql-subscriptions'
+import { Upload } from 'graphql-upload/public/index.js'
+import { beforeAll, beforeEach, afterAll, describe, it, expect } from 'vitest'
 
+import { CHAT_MESSAGE_ADDED, CHAT_MESSAGE_STATUS_UPDATED } from '@constants/subscriptions'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
@@ -32,7 +35,7 @@ let server: ApolloTestSetup['server']
 let chattingUser, otherChattingUser, notChattingUser
 
 const pubsub = pubsubContext()
-const pubsubSpy = jest.spyOn(pubsub, 'publish')
+const pubsubSpy = vi.spyOn(pubsub, 'publish')
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -76,7 +79,7 @@ describe('Message', () => {
 
   describe('create message', () => {
     beforeEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     describe('unauthenticated', () => {
@@ -178,6 +181,7 @@ describe('Message', () => {
           describe('room is updated as well', () => {
             it('has last message set', async () => {
               const result = await query({ query: Room })
+
               await expect(result).toMatchObject({
                 errors: undefined,
                 data: {
@@ -206,6 +210,7 @@ describe('Message', () => {
           describe('unread count for other user', () => {
             it('has unread count = 2', async () => {
               authenticatedUser = await otherChattingUser.toJson()
+
               await expect(query({ query: Room })).resolves.toMatchObject({
                 errors: undefined,
                 data: {
@@ -251,6 +256,7 @@ describe('Message', () => {
             encoding: '7bit',
             mimetype: 'image/png',
           })
+
           it('returns the message', async () => {
             await expect(
               mutate({
@@ -433,6 +439,7 @@ describe('Message', () => {
               roomId,
             },
           })
+
           expect(result).toMatchObject({
             errors: undefined,
             data: {
@@ -644,6 +651,7 @@ describe('Message', () => {
 
     describe('authenticated', () => {
       const messageIds: string[] = []
+
       beforeEach(async () => {
         authenticatedUser = await chattingUser.toJson()
         const result = await mutate({
@@ -710,6 +718,7 @@ describe('Message', () => {
             messageIds,
           },
         })
+
         await expect(
           query({
             query: Message,
@@ -736,6 +745,7 @@ describe('Message', () => {
           variables: { messageIds },
         })
         const roomUpdatedCalls = pubsubSpy.mock.calls.filter(([event]) => event === 'ROOM_UPDATED')
+
         expect(roomUpdatedCalls).toHaveLength(1)
         expect(roomUpdatedCalls[0][1]).toMatchObject({
           userId: 'other-chatting-user',
@@ -753,9 +763,12 @@ describe('Message', () => {
           .filter(
             ([event, payload]) =>
               event === 'CHAT_MESSAGE_STATUS_UPDATED' &&
-              payload?.chatMessageStatusUpdated?.status === 'seen',
+              // the spy now carries publish()'s real signature, whose payload is untyped
+              (payload as { chatMessageStatusUpdated?: { status?: string } })
+                ?.chatMessageStatusUpdated?.status === 'seen',
           )
           .map(([, payload]) => payload)
+
         expect(seenPayloads).toHaveLength(1)
         expect(seenPayloads[0]).toMatchObject({
           authorId: 'chatting-user',
@@ -784,30 +797,34 @@ describe('Message', () => {
         query: Message,
         variables: { roomId: testRoomId, beforeIndex: 2 },
       })
+
       expect(result.errors).toBeUndefined()
+
       const indexIds: number[] = result.data.Message.map((m: { indexId: number }) => m.indexId)
+
       expect(indexIds.every((id: number) => id < 2)).toBe(true)
     })
   })
 
   describe('subscription filters', () => {
-    describe('chatMessageAddedFilter', () => {
+    describe(chatMessageAddedFilter, () => {
       it('returns true for recipient and marks as distributed', async () => {
         const mockSession = {
-          writeTransaction: jest
-            .fn()
+          writeTransaction: vi
+            .fn<(...args: unknown[]) => Promise<unknown>>()
             .mockResolvedValue([{ roomId: 'r1', authorId: 'a1', messageIds: ['m1'] }]),
-          close: jest.fn(),
+          close: vi.fn(),
         }
         const filterContext = {
           user: { id: 'recipient' },
           driver: { session: () => mockSession },
-          pubsub: { publish: jest.fn() },
+          pubsub: { publish: vi.fn() },
         }
         const result = await chatMessageAddedFilter(
           { userId: 'recipient', chatMessageAdded: { id: 'm1' } },
           filterContext,
         )
+
         expect(result).toBe(true)
         expect(mockSession.writeTransaction).toHaveBeenCalled()
         expect(filterContext.pubsub.publish).toHaveBeenCalledWith(
@@ -823,21 +840,23 @@ describe('Message', () => {
           { userId: 'other', chatMessageAdded: { id: 'm1' } },
           { user: { id: 'me' } },
         )
+
         expect(result).toBe(false)
       })
 
       it('skips distributed marking when no message id', async () => {
-        const mockSession = { writeTransaction: jest.fn(), close: jest.fn() }
+        const mockSession = { writeTransaction: vi.fn(), close: vi.fn() }
         const result = await chatMessageAddedFilter(
           { userId: 'me', chatMessageAdded: {} },
           { user: { id: 'me' }, driver: { session: () => mockSession } },
         )
+
         expect(result).toBe(true)
         expect(mockSession.writeTransaction).not.toHaveBeenCalled()
       })
     })
 
-    describe('chatMessageStatusUpdatedFilter', () => {
+    describe(chatMessageStatusUpdatedFilter, () => {
       it('returns true when authorId matches', () => {
         expect(chatMessageStatusUpdatedFilter({ authorId: 'u1' }, { user: { id: 'u1' } })).toBe(
           true,
@@ -852,6 +871,75 @@ describe('Message', () => {
     })
   })
 
+  // The two filters above are unit-tested in isolation, which says nothing about whether each
+  // subscription is actually ATTACHED to them — or to the right channel. A subscription wired to
+  // the wrong constant silently never fires; one wired without its filter delivers every user's
+  // chat message to every open socket. Both halves are only observable together, so these drive a
+  // real PubSub end to end.
+  describe('subscription wiring', () => {
+    // chatMessageAddedFilter marks the delivered message as distributed, which needs a session.
+    const recipientContext = (bus: PubSub) => ({
+      user: { id: 'me' },
+      pubsub: bus,
+      driver: {
+        session: () => ({
+          writeTransaction: vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([]),
+          close: vi.fn(),
+        }),
+      },
+    })
+
+    it('delivers a chat message addressed to the subscriber and drops the others', async () => {
+      const bus = new PubSub()
+      const iterator = resolvers.Subscription.chatMessageAdded.subscribe(
+        null,
+        {},
+        recipientContext(bus),
+        null,
+      )
+      const delivered = iterator.next()
+
+      await bus.publish(CHAT_MESSAGE_ADDED, {
+        userId: 'somebody-else',
+        chatMessageAdded: { id: 'not-for-me' },
+      })
+      await bus.publish(CHAT_MESSAGE_ADDED, {
+        userId: 'me',
+        chatMessageAdded: { id: 'for-me' },
+      })
+
+      expect((await delivered).value).toMatchObject({ chatMessageAdded: { id: 'for-me' } })
+
+      await iterator.return?.()
+    })
+
+    it('delivers a status update only to the author of the message', async () => {
+      const bus = new PubSub()
+      const iterator = resolvers.Subscription.chatMessageStatusUpdated.subscribe(
+        null,
+        {},
+        { user: { id: 'me' }, pubsub: bus },
+        null,
+      )
+      const delivered = iterator.next()
+
+      await bus.publish(CHAT_MESSAGE_STATUS_UPDATED, {
+        authorId: 'somebody-else',
+        chatMessageStatusUpdated: { roomId: 'r1', messageIds: ['x'], status: 'distributed' },
+      })
+      await bus.publish(CHAT_MESSAGE_STATUS_UPDATED, {
+        authorId: 'me',
+        chatMessageStatusUpdated: { roomId: 'r2', messageIds: ['y'], status: 'distributed' },
+      })
+
+      expect((await delivered).value).toMatchObject({
+        chatMessageStatusUpdated: { roomId: 'r2' },
+      })
+
+      await iterator.return?.()
+    })
+  })
+
   describe('create message validation', () => {
     beforeAll(async () => {
       authenticatedUser = await chattingUser.toJson()
@@ -862,6 +950,7 @@ describe('Message', () => {
         mutation: CreateMessage,
         variables: { userId: 'chatting-user', content: 'test' },
       })
+
       expect(result.errors).toBeDefined()
       expect(result.errors?.[0].message).toContain('Cannot create a room with self')
     })
@@ -871,6 +960,7 @@ describe('Message', () => {
         mutation: CreateMessage,
         variables: { content: 'test' },
       })
+
       expect(result.errors).toBeDefined()
       expect(result.errors?.[0].message).toContain('Either roomId or userId must be provided')
     })
@@ -880,6 +970,7 @@ describe('Message', () => {
         mutation: CreateMessage,
         variables: { userId: 'other-chatting-user', content: '' },
       })
+
       expect(result.errors).toBeDefined()
       expect(result.errors?.[0].message).toContain('Message must have content or files')
     })

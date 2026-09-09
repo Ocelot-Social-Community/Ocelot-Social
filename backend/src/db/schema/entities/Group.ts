@@ -16,7 +16,6 @@ export const Group = defineEntity({
     slug: { type: 'string', pattern: SLUG },
     about: { type: ['string', 'null'] },
     description: { type: 'string' },
-    descriptionExcerpt: { type: ['string', 'null'] },
     groupType: { type: 'string', enum: ['public', 'closed', 'hidden'] },
     actionRadius: { type: 'string' },
     locationName: { type: ['string', 'null'] },

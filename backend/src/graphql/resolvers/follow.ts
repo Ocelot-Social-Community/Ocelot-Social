@@ -1,46 +1,60 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { getNeode } from '@db/neo4j'
+import type { Context } from '@src/context'
 
-const neode = getNeode()
+// Both mutations return the OTHER user, as the schema declares — following someone tells you
+// about them, not about yourself.
+//
+// The old note here said neode "doesn't provide an easy method for retrieving or removing
+// relationships" and that pure Cypher "looks cleaner IMO". Both halves have now been acted on.
 
 export default {
   Mutation: {
-    followUser: async (_object, params, context, _resolveInfo) => {
+    followUser: async (
+      _object,
+      params: { id: string },
+      context: Context,
+      _resolveInfo,
+    ): Promise<unknown> => {
       const { id: followedUserId } = params
-      const { user: currentUser } = context
-
-      if (currentUser.id === followedUserId) {
+      if (!context.user || context.user.id === followedUserId) {
         return null
       }
-
-      const [user, followedUser] = await Promise.all([
-        neode.find('User', currentUser.id),
-        neode.find('User', followedUserId),
-      ])
-      await user.relateTo(followedUser, 'following')
-      return followedUser.toJson()
+      // `createdAt` on the edge came from the FOLLOWS property default in db/models/User.ts;
+      // db/schema/relationships.ts requires it, so it is written here. ON CREATE, so that
+      // following someone twice does not move the date.
+      const result = await context.database.write({
+        query: `
+          MATCH (user:User {id: $currentUserId}), (followedUser:User {id: $followedUserId})
+          MERGE (user)-[follows:FOLLOWS]->(followedUser)
+          ON CREATE SET follows.createdAt = toString(datetime())
+          RETURN followedUser {.*}
+        `,
+        variables: { currentUserId: context.user.id, followedUserId },
+      })
+      return result.records[0]?.get('followedUser') ?? null
     },
 
-    unfollowUser: async (_object, params, context, _resolveInfo) => {
+    unfollowUser: async (
+      _object,
+      params: { id: string },
+      context: Context,
+      _resolveInfo,
+    ): Promise<unknown> => {
       const { id: followedUserId } = params
-      const { user: currentUser } = context
-
-      /*
-       * Note: Neode doesn't provide an easy method for retrieving or removing relationships.
-       * It's suggested to use query builder feature (https://github.com/adam-cowley/neode/issues/67)
-       * However, pure cypher query looks cleaner IMO
-       */
-      await neode.writeCypher(
-        `MATCH (user:User {id: $currentUser.id})-[relation:FOLLOWS]->(followedUser:User {id: $followedUserId})
-          DELETE relation
-          RETURN COUNT(relation) > 0 as isFollowed`,
-        { followedUserId, currentUser },
-      )
-
-      const followedUser = await neode.find('User', followedUserId)
-      return followedUser.toJson()
+      if (!context.user || context.user.id === followedUserId) {
+        return null
+      }
+      // OPTIONAL MATCH on the edge: unfollowing someone you do not follow is a no-op that
+      // still returns the user, which is what the previous two-statement version did.
+      const result = await context.database.write({
+        query: `
+          MATCH (followedUser:User {id: $followedUserId})
+          OPTIONAL MATCH (:User {id: $currentUserId})-[follows:FOLLOWS]->(followedUser)
+          DELETE follows
+          RETURN followedUser {.*}
+        `,
+        variables: { currentUserId: context.user.id, followedUserId },
+      })
+      return result.records[0]?.get('followedUser') ?? null
     },
   },
 }

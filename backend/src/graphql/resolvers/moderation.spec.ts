@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { describe, beforeAll, afterAll, beforeEach, afterEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import review from '@graphql/queries/moderation/review.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -155,6 +157,7 @@ describe('moderate resources', () => {
         const cypher =
           'MATCH (:Report)<-[review:REVIEWED]-(moderator:User {id: "moderator-id"}) RETURN review'
         const reviews = await database.neode.cypher(cypher, {})
+
         expect(reviews.records).toHaveLength(1)
       })
 
@@ -169,6 +172,7 @@ describe('moderate resources', () => {
             variables: { ...enableVariables, resourceId: 'should-i-be-disabled' },
           }),
         ])
+
         expect(firstReview.data.review.updatedAt).toBeTruthy()
         expect(Date.parse(firstReview.data.review.updatedAt)).toEqual(expect.any(Number))
         expect(secondReview.data.review.updatedAt).toBeTruthy()
@@ -272,6 +276,7 @@ describe('moderate resources', () => {
             ...disableVariables,
             closed: true,
           }
+
           await expect(
             mutate({ mutation: review, variables: closeReportVariables }),
           ).resolves.toMatchObject({
@@ -352,6 +357,7 @@ describe('moderate resources', () => {
             ...disableVariables,
             closed: true,
           }
+
           await expect(
             mutate({ mutation: review, variables: closeReportVariables }),
           ).resolves.toMatchObject({
@@ -428,6 +434,7 @@ describe('moderate resources', () => {
             ...disableVariables,
             closed: true,
           }
+
           await expect(
             mutate({ mutation: review, variables: closeReportVariables }),
           ).resolves.toMatchObject({
@@ -451,6 +458,7 @@ describe('moderate resources', () => {
           ...enableVariables,
           resourceId: 'post-id',
         }
+
         await expect(
           mutate({ mutation: review, variables: enableVariables }),
         ).resolves.toMatchObject({
@@ -470,6 +478,7 @@ describe('moderate resources', () => {
             ...enableVariables,
             resourceId: 'post-id',
           }
+
           await expect(
             mutate({ mutation: review, variables: enableVariables }),
           ).resolves.toMatchObject({
@@ -499,8 +508,8 @@ describe('moderate resources', () => {
             ])
             await Promise.all([
               reportAgainstTrollingComment.relateTo(moderator, 'reviewed', {
-                ...disableVariables,
-                resourceId: 'comment-id',
+                disable: disableVariables.disable,
+                closed: disableVariables.closed,
               }),
               trollingComment.update({ disabled: true, updatedAt: new Date().toISOString() }),
             ])
@@ -564,8 +573,8 @@ describe('moderate resources', () => {
             ])
             await Promise.all([
               reportAgainstTrollingPost.relateTo(moderator, 'reviewed', {
-                ...disableVariables,
-                resourceId: 'comment-id',
+                disable: disableVariables.disable,
+                closed: disableVariables.closed,
               }),
               trollingPost.update({ disabled: true, updatedAt: new Date().toISOString() }),
             ])
@@ -628,8 +637,8 @@ describe('moderate resources', () => {
             ])
             await Promise.all([
               reportAgainstTroll.relateTo(moderator, 'reviewed', {
-                ...disableVariables,
-                resourceId: 'comment-id',
+                disable: disableVariables.disable,
+                closed: disableVariables.closed,
               }),
               troll.update({ disabled: true, updatedAt: new Date().toISOString() }),
             ])

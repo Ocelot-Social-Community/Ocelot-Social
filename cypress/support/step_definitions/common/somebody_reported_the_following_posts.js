@@ -1,7 +1,6 @@
 import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 import './../../commands'
 import './../../factories'
-import 'cypress-network-idle'
 
 defineStep('somebody reported the following posts:', table => {
   const reportIdRegex = /^[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}$/
@@ -37,6 +36,8 @@ defineStep('somebody reported the following posts:', table => {
           .should('have.nested.property', 'data.fileReport.reportId')
           .and('match', reportIdRegex)
       })
-      cy.waitForNetworkIdle(2000)
+      // No cy.waitForNetworkIdle() here: the two cy.wait('@postToLocalhost') above already
+      // synchronise on this row's mutation and assert its response, and the idle wait watched
+      // GET only — so it added a flat 2 s per table row and observed nothing.
   })
 })

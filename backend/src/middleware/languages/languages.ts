@@ -7,7 +7,7 @@ import LanguageDetect from 'languagedetect'
 
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 
-import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
+import type { IMiddlewareResolver } from 'graphql-middleware/types'
 
 const setPostLanguage = (text, defaultLanguage) => {
   const lngDetector = new LanguageDetect()

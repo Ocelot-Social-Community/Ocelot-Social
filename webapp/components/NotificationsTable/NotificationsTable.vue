@@ -74,7 +74,7 @@
                   {{
                     $filters.truncate(
                       $filters.removeHtml(notification.from.content) ||
-                        $filters.removeHtml(notification.from.descriptionExcerpt),
+                        $filters.removeHtml(notification.from.description),
                       isComment(notification.from) ? 180 : 120,
                     )
                   }}

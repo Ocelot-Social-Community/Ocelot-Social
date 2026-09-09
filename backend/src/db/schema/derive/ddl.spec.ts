@@ -1,3 +1,5 @@
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+
 import { Post, Role, User } from '@db/schema/index'
 import { defineEntity } from '@db/schema/types'
 
@@ -15,7 +17,7 @@ const statements = (entity: Parameters<typeof rulesForEntity>[0], profile: Backe
     .map((rule) => statementFor(rule, profile))
     .filter((statement): statement is string => statement !== null)
 
-describe('statementFor', () => {
+describe(statementFor, () => {
   describe('neo4j-community', () => {
     it('emits uniqueness constraints and nothing else', () => {
       expect(statements(User, 'neo4j-community')).toEqual([
@@ -60,6 +62,7 @@ describe('statementFor', () => {
   describe('memgraph', () => {
     it('emits existence and data type constraints in memgraph dialect', () => {
       const emitted = statements(Role, 'memgraph')
+
       expect(emitted).toContainEqual('CREATE CONSTRAINT ON (n:Role) ASSERT EXISTS (n.id)')
       expect(emitted).toContainEqual('CREATE CONSTRAINT ON (n:Role) ASSERT n.id IS TYPED STRING')
       expect(emitted).toContainEqual(
@@ -83,6 +86,7 @@ describe('statementFor', () => {
         properties: { value: { type: 'number' } },
         required: [],
       })
+
       expect(statements(Measured, 'memgraph')).toEqual([])
     })
 
@@ -92,6 +96,7 @@ describe('statementFor', () => {
         properties: { value: { type: ['string', 'integer'] } },
         required: [],
       })
+
       expect(statements(Widened, 'memgraph')).toEqual([])
     })
   })
@@ -122,9 +127,10 @@ describe('statementFor', () => {
   })
 })
 
-describe('indexStatementsFor', () => {
+describe(indexStatementsFor, () => {
   it('emits the 4.4 procedure form for fulltext indices', () => {
     const { statements: emitted } = indexStatementsFor(Post, 'neo4j-community')
+
     expect(emitted).toContainEqual(
       'CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title","content"])',
     )
@@ -142,6 +148,7 @@ describe('indexStatementsFor', () => {
   // A dropped index would read as "covered" while search silently degrades. It is reported.
   it('reports fulltext indices as unsupported on memgraph rather than approximating them', () => {
     const { statements: emitted, unsupported } = indexStatementsFor(Post, 'memgraph')
+
     expect(emitted).not.toContainEqual(expect.stringContaining('fulltext'))
     expect(unsupported).toEqual(['fulltext index post_fulltext_search on Post(title, content)'])
   })
@@ -150,6 +157,7 @@ describe('indexStatementsFor', () => {
 describe('every profile', () => {
   it('produces syntactically distinct DDL for the same declaration', () => {
     const perProfile = PROFILES.map((profile) => statements(User, profile).length)
+
     // community < enterprise < memgraph: more capability, more enforcement, same declaration.
     expect(perProfile).toEqual([...perProfile].sort((a, b) => a - b))
     expect(new Set(perProfile).size).toBeGreaterThan(1)
@@ -160,6 +168,7 @@ describe('every profile', () => {
       const emitted = allRules([User, Role, Post], [])
         .map((rule) => statementFor(rule, profile))
         .filter((statement): statement is string => statement !== null)
+
       expect(emitted).not.toContainEqual('')
       expect(new Set(emitted).size).toBe(emitted.length)
     }
@@ -194,6 +203,7 @@ describe('a capability the table denies is not emitted', () => {
     const rule = rulesForEntity(User).find(
       (entry) => entry.kind === 'unique' && entry.properties.join() === 'id',
     )
+
     expect(rule).toBeDefined()
     expect(auditFor(rule as Rule, WITHOUT_UNIQUE)).not.toBeNull()
   })

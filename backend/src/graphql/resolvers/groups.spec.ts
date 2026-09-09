@@ -1,4 +1,3 @@
-/// <reference types="jest" />
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -6,10 +5,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable jest/no-commented-out-tests */
+/* eslint-disable vitest/no-commented-out-tests */
 import { setImmediate as scheduleMacrotask } from 'node:timers/promises'
 
 import { PubSub } from 'graphql-subscriptions'
+import { beforeAll, afterAll, describe, beforeEach, afterEach, it, expect } from 'vitest'
 
 import {
   GROUP_MEMBERSHIP_VISIBILITY_CHANGED,
@@ -325,6 +325,7 @@ describe('in mode', () => {
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await mutate({ mutation: CreateGroup, variables })
+
           expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
@@ -342,7 +343,6 @@ describe('in mode', () => {
                 slug: 'the-group',
                 about: 'We will change the world!',
                 description: 'Some description' + descriptionAdditional100,
-                descriptionExcerpt: 'Some description' + descriptionAdditional100,
                 groupType: 'public',
                 actionRadius: 'regional',
                 locationName: 'Hamburg, Germany',
@@ -386,6 +386,7 @@ describe('in mode', () => {
                       '<a href="https://domain.org/0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789">0</a>',
                   },
                 })
+
                 expect(errors?.[0]).toHaveProperty('message', 'Description too short!')
               })
             })
@@ -425,6 +426,7 @@ describe('in mode', () => {
                   mutation: CreateGroup,
                   variables: { ...variables, categoryIds: null },
                 })
+
                 expect(errors?.[0]).toHaveProperty('message', 'Too few categories!')
               })
             })
@@ -435,6 +437,7 @@ describe('in mode', () => {
                   mutation: CreateGroup,
                   variables: { ...variables, categoryIds: [] },
                 })
+
                 expect(errors?.[0]).toHaveProperty('message', 'Too few categories!')
               })
             })
@@ -446,6 +449,7 @@ describe('in mode', () => {
                 mutation: CreateGroup,
                 variables: { ...variables, categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'] },
               })
+
               expect(errors?.[0]).toHaveProperty('message', 'Too many categories!')
             })
           })
@@ -500,6 +504,7 @@ describe('in mode', () => {
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await query({ query: groupQuery, variables: {} })
+
           expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
@@ -616,15 +621,16 @@ describe('in mode', () => {
         describe('query groups', () => {
           describe('in general finds only listed groups – no hidden groups where user is none or pending member', () => {
             describe('without any filters', () => {
-              it('finds all listed groups – including the set descriptionExcerpts and locations', async () => {
+              it('finds all listed groups – including the set descriptions and locations', async () => {
                 const result = await query({ query: groupQuery, variables: {} })
+
                 expect(result).toMatchObject({
                   data: {
                     Group: expect.arrayContaining([
                       expect.objectContaining({
                         id: 'my-group',
                         slug: 'the-best-group',
-                        descriptionExcerpt: 'Some description' + descriptionAdditional100,
+                        description: 'Some description' + descriptionAdditional100,
                         locationName: 'Hamburg, Germany',
                         location: expect.objectContaining({
                           name: 'Hamburg',
@@ -634,7 +640,7 @@ describe('in mode', () => {
                       expect.objectContaining({
                         id: 'others-group',
                         slug: 'uninteresting-group',
-                        descriptionExcerpt: 'We love it like it is!?' + descriptionAdditional100,
+                        description: 'We love it like it is!?' + descriptionAdditional100,
                         locationName: null,
                         location: null,
                         myRole: null,
@@ -642,7 +648,7 @@ describe('in mode', () => {
                       expect.objectContaining({
                         id: 'third-hidden-group',
                         slug: 'third-investigative-journalism-group',
-                        descriptionExcerpt: 'We research …' + descriptionAdditional100,
+                        description: 'We research …' + descriptionAdditional100,
                         myRole: 'usual',
                         locationName: null,
                         location: null,
@@ -691,6 +697,7 @@ describe('in mode', () => {
               describe("id = 'my-group'", () => {
                 it('finds only the listed group with this id', async () => {
                   const result = await query({ query: groupQuery, variables: { id: 'my-group' } })
+
                   expect(result).toMatchObject({
                     data: {
                       Group: [
@@ -713,6 +720,7 @@ describe('in mode', () => {
                     query: groupQuery,
                     variables: { id: 'third-hidden-group' },
                   })
+
                   expect(result).toMatchObject({
                     data: {
                       Group: expect.arrayContaining([
@@ -735,6 +743,7 @@ describe('in mode', () => {
                     query: groupQuery,
                     variables: { id: 'second-hidden-group' },
                   })
+
                   expect(result.data?.Group.length).toBe(0)
                 })
               })
@@ -745,6 +754,7 @@ describe('in mode', () => {
                     query: groupQuery,
                     variables: { id: 'hidden-group' },
                   })
+
                   expect(result.data?.Group.length).toBe(0)
                 })
               })
@@ -757,6 +767,7 @@ describe('in mode', () => {
                     query: groupQuery,
                     variables: { slug: 'the-best-group' },
                   })
+
                   expect(result).toMatchObject({
                     data: {
                       Group: [
@@ -779,6 +790,7 @@ describe('in mode', () => {
                     query: groupQuery,
                     variables: { slug: 'third-investigative-journalism-group' },
                   })
+
                   expect(result).toMatchObject({
                     data: {
                       Group: expect.arrayContaining([
@@ -801,6 +813,7 @@ describe('in mode', () => {
                     query: groupQuery,
                     variables: { slug: 'second-investigative-journalism-group' },
                   })
+
                   expect(result.data?.Group.length).toBe(0)
                 })
               })
@@ -811,6 +824,7 @@ describe('in mode', () => {
                     query: groupQuery,
                     variables: { slug: 'investigative-journalism-group' },
                   })
+
                   expect(result.data?.Group.length).toBe(0)
                 })
               })
@@ -819,6 +833,7 @@ describe('in mode', () => {
             describe('isMember = true', () => {
               it('finds only listed groups where user is member', async () => {
                 const result = await query({ query: groupQuery, variables: { isMember: true } })
+
                 expect(result).toMatchObject({
                   data: {
                     Group: expect.arrayContaining([
@@ -843,6 +858,7 @@ describe('in mode', () => {
             describe('isMember = false', () => {
               it('finds only listed groups where user is not(!) member', async () => {
                 const result = await query({ query: groupQuery, variables: { isMember: false } })
+
                 expect(result).toMatchObject({
                   data: {
                     Group: expect.arrayContaining([
@@ -881,6 +897,7 @@ describe('in mode', () => {
               userId: 'current-user',
             },
           })
+
           expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
@@ -1078,6 +1095,7 @@ describe('in mode', () => {
                   userId: 'owner-of-closed-group',
                 },
               })
+
               expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
             })
           })
@@ -1128,6 +1146,7 @@ describe('in mode', () => {
             id: 'not-existing-group',
           }
           const { errors } = await query({ query: groupMembersQuery, variables })
+
           expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
@@ -1303,6 +1322,7 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables,
                 })
+
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
@@ -1348,6 +1368,7 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables,
                 })
+
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
@@ -1393,6 +1414,7 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables,
                 })
+
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
@@ -1448,6 +1470,7 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables,
                 })
+
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
@@ -1479,6 +1502,7 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables: { ...variables, includePending: true },
                 })
+
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
@@ -1512,6 +1536,7 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables,
                 })
+
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
@@ -1543,6 +1568,7 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables: { ...variables, includePending: true },
                 })
+
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
@@ -1573,6 +1599,7 @@ describe('in mode', () => {
 
               it('throws authorization error', async () => {
                 const { errors } = await query({ query: groupMembersQuery, variables })
+
                 expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
@@ -1584,6 +1611,7 @@ describe('in mode', () => {
 
               it('throws authorization error', async () => {
                 const { errors } = await query({ query: groupMembersQuery, variables })
+
                 expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
@@ -1613,6 +1641,7 @@ describe('in mode', () => {
 
               it('can see non-pending members with showOnProfile=true', async () => {
                 const result = await query({ query: groupMembersQuery, variables })
+
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
@@ -1681,6 +1710,7 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables,
                 })
+
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
@@ -1721,6 +1751,7 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables: { ...variables, nameFilter: 'Hidden' },
                 })
+
                 expect(result.data?.GroupMembers).toHaveLength(1)
                 expect(result.data?.GroupMembers[0]).toMatchObject({
                   user: expect.objectContaining({ id: 'owner-of-hidden-group' }),
@@ -1732,12 +1763,14 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables: { ...variables, nameFilter: 'Cl' },
                 })
+
                 expect(result.data?.GroupMembers).toHaveLength(3)
               })
 
               it('returns members ordered: owner first, then admin, then usual', async () => {
                 const result = await query({ query: groupMembersQuery, variables })
                 const members = result.data?.GroupMembers
+
                 expect(members[0]).toMatchObject({
                   user: expect.objectContaining({ id: 'owner-of-hidden-group' }),
                   membership: expect.objectContaining({ role: 'owner' }),
@@ -1757,6 +1790,7 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables: { ...variables, includePending: true },
                 })
+
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
@@ -1794,6 +1828,7 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables,
                 })
+
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
@@ -1833,6 +1868,7 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables: { ...variables, includePending: true },
                 })
+
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
@@ -1870,6 +1906,7 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables,
                 })
+
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
@@ -1909,6 +1946,7 @@ describe('in mode', () => {
                   query: groupMembersQuery,
                   variables: { ...variables, includePending: true },
                 })
+
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
@@ -1943,6 +1981,7 @@ describe('in mode', () => {
 
               it('throws authorization error', async () => {
                 const { errors } = await query({ query: groupMembersQuery, variables })
+
                 expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
@@ -1954,6 +1993,7 @@ describe('in mode', () => {
 
               it('throws authorization error', async () => {
                 const { errors } = await query({ query: groupMembersQuery, variables })
+
                 expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
@@ -1968,6 +2008,7 @@ describe('in mode', () => {
 
             it('counts only non-pending members', async () => {
               const result = await query({ query: groupQuery, variables: { id: 'public-group' } })
+
               expect(result.data?.Group[0]).toMatchObject({ id: 'public-group', membersCount: 3 })
             })
           })
@@ -1979,6 +2020,7 @@ describe('in mode', () => {
 
             it('counts only non-pending members', async () => {
               const result = await query({ query: groupQuery, variables: { id: 'closed-group' } })
+
               expect(result.data?.Group[0]).toMatchObject({ id: 'closed-group', membersCount: 2 })
             })
           })
@@ -1990,6 +2032,7 @@ describe('in mode', () => {
 
             it('counts only non-pending members', async () => {
               const result = await query({ query: groupQuery, variables: { id: 'hidden-group' } })
+
               expect(result.data?.Group[0]).toMatchObject({ id: 'hidden-group', membersCount: 3 })
             })
           })
@@ -2016,6 +2059,7 @@ describe('in mode', () => {
               roleInGroup: 'pending',
             },
           })
+
           expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
@@ -2078,6 +2122,7 @@ describe('in mode', () => {
                     })
                     const { createdAt, updatedAt }: { createdAt: string; updatedAt: string } =
                       result.data.ChangeGroupMemberRole.membership
+
                     expect(new Date(updatedAt).getTime()).toBeGreaterThanOrEqual(
                       new Date(createdAt).getTime(),
                     )
@@ -2192,6 +2237,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2218,6 +2264,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2271,6 +2318,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2294,6 +2342,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2317,6 +2366,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2379,6 +2429,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2402,6 +2453,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2419,6 +2471,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2442,6 +2495,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2459,6 +2513,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2482,6 +2537,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2499,6 +2555,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2597,6 +2654,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2614,6 +2672,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2637,6 +2696,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2654,6 +2714,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2677,6 +2738,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2694,6 +2756,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2792,6 +2855,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2815,6 +2879,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2838,6 +2903,7 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
@@ -2902,6 +2968,7 @@ describe('in mode', () => {
               userId: 'current-user',
             },
           })
+
           expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
@@ -2932,8 +2999,13 @@ describe('in mode', () => {
             describe('left by "pending-member-user"', () => {
               it('has "null" as membership role, was in the group, and left the group', async () => {
                 authenticatedUser = await ownerMemberUser.toJson()
-                expect(await memberInGroup('pending-member-user', 'closed-group')).toBe(true)
+
+                await expect(memberInGroup('pending-member-user', 'closed-group')).resolves.toBe(
+                  true,
+                )
+
                 authenticatedUser = await pendingMemberUser.toJson()
+
                 await expect(
                   mutate({
                     mutation: LeaveGroup,
@@ -2953,16 +3025,23 @@ describe('in mode', () => {
                   },
                   errors: undefined,
                 })
+
                 authenticatedUser = await ownerMemberUser.toJson()
-                expect(await memberInGroup('pending-member-user', 'closed-group')).toBe(false)
+
+                await expect(memberInGroup('pending-member-user', 'closed-group')).resolves.toBe(
+                  false,
+                )
               })
             })
 
             describe('left by "usual-member-user"', () => {
               it('has "null" as membership role, was in the group, and left the group', async () => {
                 authenticatedUser = await ownerMemberUser.toJson()
+
                 expect(await memberInGroup('usual-member-user', 'closed-group')).toBe(true)
+
                 authenticatedUser = await usualMemberUser.toJson()
+
                 await expect(
                   mutate({
                     mutation: LeaveGroup,
@@ -2982,16 +3061,23 @@ describe('in mode', () => {
                   },
                   errors: undefined,
                 })
+
                 authenticatedUser = await ownerMemberUser.toJson()
-                expect(await memberInGroup('usual-member-user', 'closed-group')).toBe(false)
+
+                await expect(memberInGroup('usual-member-user', 'closed-group')).resolves.toBe(
+                  false,
+                )
               })
             })
 
             describe('left by "admin-member-user"', () => {
               it('has "null" as membership role, was in the group, and left the group', async () => {
                 authenticatedUser = await ownerMemberUser.toJson()
+
                 expect(await memberInGroup('admin-member-user', 'closed-group')).toBe(true)
+
                 authenticatedUser = await adminMemberUser.toJson()
+
                 await expect(
                   mutate({
                     mutation: LeaveGroup,
@@ -3011,8 +3097,12 @@ describe('in mode', () => {
                   },
                   errors: undefined,
                 })
+
                 authenticatedUser = await ownerMemberUser.toJson()
-                expect(await memberInGroup('admin-member-user', 'closed-group')).toBe(false)
+
+                await expect(memberInGroup('admin-member-user', 'closed-group')).resolves.toBe(
+                  false,
+                )
               })
             })
 
@@ -3026,6 +3116,7 @@ describe('in mode', () => {
                     userId: 'owner-member-user',
                   },
                 })
+
                 expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
@@ -3040,6 +3131,7 @@ describe('in mode', () => {
                     userId: 'second-owner-member-user',
                   },
                 })
+
                 expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
@@ -3054,6 +3146,7 @@ describe('in mode', () => {
                     userId: 'none-member-user',
                   },
                 })
+
                 expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
@@ -3068,6 +3161,7 @@ describe('in mode', () => {
                     userId: 'usual-member-user',
                   },
                 })
+
                 expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
@@ -3082,6 +3176,7 @@ describe('in mode', () => {
                     userId: 'admin-member-user',
                   },
                 })
+
                 expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
@@ -3108,6 +3203,7 @@ describe('in mode', () => {
               slug: 'my-best-group',
             },
           })
+
           expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
@@ -3203,8 +3299,6 @@ describe('in mode', () => {
                       slug: 'the-best-group', // changing the slug is tested in the slugifyMiddleware
                       about: 'We will change the land!',
                       description: 'Some country relevant description' + descriptionAdditional100,
-                      descriptionExcerpt:
-                        'Some country relevant description' + descriptionAdditional100,
                       actionRadius: 'national',
                       // avatar, // test this as result
                       myRole: 'owner',
@@ -3355,6 +3449,7 @@ describe('in mode', () => {
                           '<a href="https://domain.org/0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789">0</a>',
                       },
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Description too short!')
                   })
                 })
@@ -3398,6 +3493,7 @@ describe('in mode', () => {
                         categoryIds: [],
                       },
                     })
+
                     expect(errors?.[0]).toHaveProperty('message', 'Too few categories!')
                   })
                 })
@@ -3412,6 +3508,7 @@ describe('in mode', () => {
                       categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'],
                     },
                   })
+
                   expect(errors?.[0]).toHaveProperty('message', 'Too many categories!')
                 })
               })
@@ -3486,11 +3583,13 @@ describe('in mode', () => {
               authenticatedUser = await noMemberUser.toJson()
               const result = await query({ query: Post })
               const postIds = result.data?.Post.map((p: { id: string }) => p.id) ?? []
+
               expect(postIds).not.toContain('group-type-test-post')
             })
 
             it('can change groupType from hidden back to public', async () => {
               authenticatedUser = await user.toJson()
+
               await expect(
                 mutate({
                   mutation: UpdateGroup,
@@ -3508,6 +3607,7 @@ describe('in mode', () => {
               authenticatedUser = await noMemberUser.toJson()
               const result = await query({ query: Post })
               const postIds = result.data?.Post.map((p: { id: string }) => p.id) ?? []
+
               expect(postIds).toContain('group-type-test-post')
             })
 
@@ -3517,6 +3617,7 @@ describe('in mode', () => {
                 mutation: UpdateGroup,
                 variables: { id: 'my-group', groupType: 'hidden' },
               })
+
               expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
             })
 
@@ -3526,6 +3627,7 @@ describe('in mode', () => {
                 mutation: UpdateGroup,
                 variables: { id: 'my-group', groupType: 'hidden' },
               })
+
               expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
             })
 
@@ -3535,6 +3637,7 @@ describe('in mode', () => {
                 mutation: UpdateGroup,
                 variables: { id: 'my-group', groupType: 'hidden' },
               })
+
               expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
             })
           })
@@ -3553,6 +3656,7 @@ describe('in mode', () => {
                   categoryIds: ['cat4', 'cat27'],
                 },
               })
+
               expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
             })
           })
@@ -3571,6 +3675,7 @@ describe('in mode', () => {
                   categoryIds: ['cat4', 'cat27'],
                 },
               })
+
               expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
             })
           })
@@ -3612,6 +3717,7 @@ describe('in mode', () => {
       describe('as usual member', () => {
         it('throws an error', async () => {
           authenticatedUser = await usualMemberUser.toJson()
+
           await expect(
             mutate({
               mutation: RemoveUserFromGroup,
@@ -3691,6 +3797,7 @@ describe('in mode', () => {
 
         it('throws an error', async () => {
           authenticatedUser = await usualMemberUser.toJson()
+
           await expect(
             mutate({
               mutation: RemoveUserFromGroup,
@@ -3799,6 +3906,7 @@ describe('in mode', () => {
 
       it('returns count of all visible groups when isMember is not set', async () => {
         const result = await query({ query: GroupCount })
+
         expect(result).toMatchObject({
           data: { GroupCount: 1 },
           errors: undefined,
@@ -3807,6 +3915,7 @@ describe('in mode', () => {
 
       it('returns count of groups the user is a member of', async () => {
         const result = await query({ query: GroupCount, variables: { isMember: true } })
+
         expect(result).toMatchObject({
           data: { GroupCount: 1 },
           errors: undefined,
@@ -3850,6 +3959,7 @@ describe('in mode', () => {
 
       it('unmutes a group', async () => {
         await mutate({ mutation: muteGroupMutation, variables: { groupId } })
+
         await expect(
           mutate({ mutation: unmuteGroupMutation, variables: { groupId } }),
         ).resolves.toMatchObject({
@@ -3865,6 +3975,7 @@ describe('in mode', () => {
 
       it('muteGroup throws for unauthenticated user', async () => {
         authenticatedUser = null
+
         await expect(
           mutate({ mutation: muteGroupMutation, variables: { groupId } }),
         ).resolves.toMatchObject({
@@ -3874,6 +3985,7 @@ describe('in mode', () => {
 
       it('unmuteGroup throws for unauthenticated user', async () => {
         authenticatedUser = null
+
         await expect(
           mutate({ mutation: unmuteGroupMutation, variables: { groupId } }),
         ).resolves.toMatchObject({
@@ -3921,6 +4033,7 @@ describe('in mode', () => {
 
       it('throws for unauthenticated user', async () => {
         authenticatedUser = null
+
         await expect(
           mutate({
             mutation: SetGroupMembershipVisibility,
@@ -4042,6 +4155,7 @@ describe('in mode', () => {
         const group = result.data?.User?.[0]?.groups?.find(
           (g: { id: string }) => g.id === 'posts-count-group',
         )
+
         expect(group).toBeDefined()
         expect(group.postsCount).toBe(0)
       })
@@ -4074,6 +4188,7 @@ describe('in mode', () => {
         const group = result.data?.User?.[0]?.groups?.find(
           (g: { id: string }) => g.id === 'posts-count-group',
         )
+
         expect(group).toBeDefined()
         expect(group.postsCount).toBe(2)
       })
@@ -4132,6 +4247,7 @@ describe('in mode', () => {
         })
         const groups: Array<{ id: string; myRole: string | null }> =
           result.data?.User?.[0]?.groups ?? []
+
         expect(groups).toHaveLength(2)
         // shared group must come first
         expect(groups[0].id).toBe('group-shared')
@@ -4149,6 +4265,7 @@ describe('in mode', () => {
         const groups: Array<{ id: string; myRole: string | null }> =
           result.data?.User?.[0]?.groups ?? []
         const notShared = groups.find((g) => g.id === 'group-not-shared')
+
         expect(notShared?.myRole).toBeNull()
       })
     })
@@ -4183,6 +4300,7 @@ describe('in mode', () => {
           variables: { id: 'current-user', first: 10, offset: 0, nameFilter: '' },
         })
         const groups: Array<{ id: string }> = result.data?.User?.[0]?.groups ?? []
+
         expect(groups).toHaveLength(3)
       })
 
@@ -4192,6 +4310,7 @@ describe('in mode', () => {
           variables: { id: 'current-user', first: 10, offset: 0, nameFilter: 'alp' },
         })
         const groups: Array<{ id: string }> = result.data?.User?.[0]?.groups ?? []
+
         expect(groups).toHaveLength(1)
         expect(groups[0].id).toBe('group-alpha')
       })
@@ -4202,6 +4321,7 @@ describe('in mode', () => {
           variables: { id: 'current-user', first: 10, offset: 0, nameFilter: 'Group' },
         })
         const groups: Array<{ id: string }> = result.data?.User?.[0]?.groups ?? []
+
         expect(groups).toHaveLength(3)
       })
 
@@ -4211,6 +4331,7 @@ describe('in mode', () => {
           variables: { id: 'current-user', first: 10, offset: 0, nameFilter: 'XYZ' },
         })
         const groups: Array<{ id: string }> = result.data?.User?.[0]?.groups ?? []
+
         expect(groups).toHaveLength(0)
       })
 
@@ -4226,6 +4347,7 @@ describe('in mode', () => {
           variables: { id: 'current-user', first: 10, offset: 0, nameFilter: '' },
         })
         const groups: Array<{ id: string }> = result.data?.User?.[0]?.groups ?? []
+
         expect(groups).toHaveLength(3)
       })
 
@@ -4241,8 +4363,417 @@ describe('in mode', () => {
           variables: { id: 'current-user', first: 10, offset: 0, nameFilter: 'bet' },
         })
         const groups: Array<{ id: string }> = result.data?.User?.[0]?.groups ?? []
+
         expect(groups).toHaveLength(1)
         expect(groups[0].id).toBe('group-beta')
+      })
+    })
+
+    describe('CreateGroup with an empty locationName', () => {
+      // The webapp sends '' when the user clears the location field. '' has to be turned
+      // into null, otherwise the geocoder middleware would try to resolve an empty place
+      // name and the group would end up with a bogus locationName.
+      it('creates the group without a location', async () => {
+        authenticatedUser = await user.toJson()
+
+        await expect(
+          mutate({
+            mutation: CreateGroup,
+            variables: {
+              id: 'no-location-group',
+              name: 'Group Without Location',
+              about: 'No location at all',
+              description: 'Some description' + descriptionAdditional100,
+              groupType: 'public',
+              actionRadius: 'global',
+              categoryIds: ['cat9'],
+              locationName: '',
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            CreateGroup: {
+              id: 'no-location-group',
+              locationName: null,
+              location: null,
+            },
+          },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('GroupCount without any groups', () => {
+      // The count is parsed from a Cypher string; an empty network must answer 0 and not
+      // leak NaN/null into the API.
+      it('returns 0', async () => {
+        authenticatedUser = await user.toJson()
+
+        await expect(query({ query: GroupCount })).resolves.toMatchObject({
+          data: { GroupCount: 0 },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('Group pagination', () => {
+      const GroupPage =
+        'query GroupPage($first: Int, $offset: Int) { Group(first: $first, offset: $offset) { id } }'
+
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+        for (const [id, name] of [
+          ['page-group-1', 'Page Group One'],
+          ['page-group-2', 'Page Group Two'],
+          ['page-group-3', 'Page Group Three'],
+        ]) {
+          await mutate({
+            mutation: CreateGroup,
+            variables: {
+              id,
+              name,
+              about: 'Paging test group',
+              description: 'Some description' + descriptionAdditional100,
+              groupType: 'public',
+              actionRadius: 'global',
+              categoryIds: ['cat9'],
+            },
+          })
+        }
+        // Groups created within the same millisecond share a createdAt, which would make
+        // the page contents arbitrary. Pin distinct timestamps so the expected split is
+        // the only correct answer.
+        await database.write({
+          query: `
+            MATCH (g1:Group { id: 'page-group-1' }) SET g1.createdAt = '2020-01-03T00:00:00.000Z'
+            WITH g1
+            MATCH (g2:Group { id: 'page-group-2' }) SET g2.createdAt = '2020-01-02T00:00:00.000Z'
+            WITH g2
+            MATCH (g3:Group { id: 'page-group-3' }) SET g3.createdAt = '2020-01-01T00:00:00.000Z'
+          `,
+        })
+      })
+
+      // SKIP/LIMIT is only appended when BOTH first and offset are given; a regression that
+      // drops the clause returns the full list on every page instead of failing loudly.
+      it('splits the groups into pages ordered by createdAt descending', async () => {
+        const firstPage = await query({ query: GroupPage, variables: { first: 2, offset: 0 } })
+        const secondPage = await query({ query: GroupPage, variables: { first: 2, offset: 2 } })
+
+        expect((firstPage.data.Group as Array<{ id: string }>).map((group) => group.id)).toEqual([
+          'page-group-1',
+          'page-group-2',
+        ])
+        expect((secondPage.data.Group as Array<{ id: string }>).map((group) => group.id)).toEqual([
+          'page-group-3',
+        ])
+      })
+    })
+
+    describe('UpdateGroup avatar', () => {
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'avatar-group',
+            name: 'Avatar Group',
+            about: 'A group without an avatar',
+            description: 'Some description' + descriptionAdditional100,
+            groupType: 'public',
+            actionRadius: 'global',
+            categoryIds: ['cat9'],
+          },
+        })
+      })
+
+      // Avatar metadata (alt text, sensitivity …) can only be merged onto an image that
+      // already exists. Sending metadata for a group that has no avatar must be rejected
+      // instead of silently doing nothing — the client would otherwise believe it saved.
+      it('rejects avatar metadata for a group that has no avatar yet', async () => {
+        const { errors } = await mutate({
+          mutation: UpdateGroup,
+          variables: { id: 'avatar-group', avatar: { alt: 'A group avatar' } },
+        })
+
+        expect(errors?.[0]).toHaveProperty('message', 'Cannot find image for given resource')
+      })
+    })
+
+    // The following blocks drive resolvers directly. Their guards sit BEHIND the
+    // permissionsMiddleware shield, which already rejects the corresponding requests — so they
+    // are only reachable either through a race (the membership vanishes between shield check
+    // and write) or if the shield rule is ever loosened. Driving the resolver directly is the
+    // only way to pin the fail-closed behaviour down.
+    describe('resolvers without an authenticated user', () => {
+      const anonymousContext = () =>
+        ({
+          driver: database.driver,
+          database,
+          user: null,
+          policy: createInMemoryPolicyService({ categoriesActive: false }),
+        }) as unknown as Context
+
+      const anonymousCalls: Array<[string, (context: Context) => Promise<void>]> = [
+        [
+          'Query.Group',
+          async (context) => {
+            await groupsResolver.Query.Group(null, {}, context, null)
+          },
+        ],
+        [
+          // Also proves the CreateGroup catch block only translates the slug constraint
+          // violation and rethrows every other error untouched.
+          'Mutation.CreateGroup',
+          async (context) => {
+            await groupsResolver.Mutation.CreateGroup(
+              null,
+              {
+                name: 'Anonymous Group',
+                description: 'Some description' + descriptionAdditional100,
+                groupType: 'public',
+                actionRadius: 'global',
+              },
+              context,
+              null,
+            )
+          },
+        ],
+        [
+          'Mutation.UpdateGroup',
+          async (context) => {
+            await groupsResolver.Mutation.UpdateGroup(null, { id: 'any-group' }, context, null)
+          },
+        ],
+        [
+          'Mutation.muteGroup',
+          async (context) => {
+            await groupsResolver.Mutation.muteGroup(null, { groupId: 'any-group' }, context, null)
+          },
+        ],
+        [
+          'Mutation.unmuteGroup',
+          async (context) => {
+            await groupsResolver.Mutation.unmuteGroup(null, { groupId: 'any-group' }, context, null)
+          },
+        ],
+        [
+          'Mutation.setGroupMembershipVisibility',
+          async (context) => {
+            await groupsResolver.Mutation.setGroupMembershipVisibility(
+              null,
+              { groupId: 'any-group', showOnProfile: true },
+              context,
+              null,
+            )
+          },
+        ],
+      ]
+
+      // Without the guard these resolvers would run their Cypher with an undefined user id
+      // (or crash on `context.user.id`) — writing/reading as "nobody" instead of refusing.
+      it.each(anonymousCalls)(
+        '%s throws instead of acting for an unknown user',
+        async (_name, call) => {
+          await expect(call(anonymousContext())).rejects.toThrow('Missing authenticated user.')
+        },
+      )
+    })
+
+    describe('GroupMembers seen by a viewer without a user', () => {
+      beforeEach(async () => {
+        await Factory.build(
+          'user',
+          { id: 'anon-pending-user', name: 'Anon Pending User' },
+          { email: 'anon-pending-user@example.org', password: '1234' },
+        )
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'anon-members-group',
+            name: 'Anon Members Group',
+            about: 'A public group',
+            description: 'Some description' + descriptionAdditional100,
+            groupType: 'public',
+            actionRadius: 'global',
+            categoryIds: ['cat9'],
+          },
+        })
+        await mutate({
+          mutation: JoinGroup,
+          variables: { groupId: 'anon-members-group', userId: 'anon-pending-user' },
+        })
+        await mutate({
+          mutation: ChangeGroupMemberRole,
+          variables: {
+            groupId: 'anon-members-group',
+            userId: 'anon-pending-user',
+            roleInGroup: 'pending',
+          },
+        })
+      })
+
+      // A context without a user must degrade to the non-member query (public list only,
+      // pending join requests hidden) rather than crashing on `context.user.id` or — worse —
+      // falling into the member branch that also returns pending requests.
+      it('returns only the publicly visible members', async () => {
+        const context = { driver: database.driver, user: null } as unknown as Context
+
+        const members = (await groupsResolver.Query.GroupMembers(
+          null,
+          { id: 'anon-members-group' },
+          context,
+          null,
+        )) as Array<{ user: { id: string } }>
+
+        expect(members.map((member) => member.user.id)).toEqual(['current-user'])
+      })
+    })
+
+    describe('setGroupMembershipVisibility for a pending membership', () => {
+      beforeEach(async () => {
+        await Factory.build(
+          'user',
+          { id: 'visibility-pending-user', name: 'Visibility Pending User' },
+          { email: 'visibility-pending-user@example.org', password: '1234' },
+        )
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'visibility-closed-group',
+            name: 'Visibility Closed Group',
+            about: 'A closed group',
+            description: 'Some description' + descriptionAdditional100,
+            groupType: 'closed',
+            actionRadius: 'global',
+            categoryIds: ['cat9'],
+          },
+        })
+        await mutate({
+          mutation: JoinGroup,
+          variables: { groupId: 'visibility-closed-group', userId: 'visibility-pending-user' },
+        })
+      })
+
+      // A pending join request is not a membership: it must not be publishable on a profile.
+      // The resolver's own WHERE clause is what enforces that, independently of the shield.
+      it('refuses to make an unapproved join request visible', async () => {
+        const context = {
+          driver: database.driver,
+          user: { id: 'visibility-pending-user' },
+        } as unknown as Context
+
+        await expect(
+          groupsResolver.Mutation.setGroupMembershipVisibility(
+            null,
+            { groupId: 'visibility-closed-group', showOnProfile: true },
+            context,
+            null,
+          ),
+        ).rejects.toThrow('User is not a member of this group')
+      })
+    })
+
+    describe('LeaveGroup for a user who is not a member', () => {
+      beforeEach(async () => {
+        await Factory.build(
+          'user',
+          { id: 'never-joined-user', name: 'Never Joined User' },
+          { email: 'never-joined-user@example.org', password: '1234' },
+        )
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'leave-group-target',
+            name: 'Leave Group Target',
+            about: 'A public group',
+            description: 'Some description' + descriptionAdditional100,
+            groupType: 'public',
+            actionRadius: 'global',
+            categoryIds: ['cat9'],
+          },
+        })
+      })
+
+      // The shield verifies the membership in a separate transaction; if it is gone by the
+      // time the mutation runs, deleting nothing must surface as an error instead of
+      // reporting a successful leave for a membership that never existed.
+      it('reports that the user is not a member', async () => {
+        const context = { driver: database.driver } as unknown as Context
+
+        await expect(
+          groupsResolver.Mutation.LeaveGroup(
+            null,
+            { groupId: 'leave-group-target', userId: 'never-joined-user' },
+            context,
+            null,
+          ),
+        ).rejects.toThrow('User is not a member of this group')
+      })
+    })
+
+    describe('Group field resolvers without a parent id', () => {
+      const fieldResolverCalls: Array<[string, (context: Context) => Promise<void>]> = [
+        [
+          'myRole',
+          async (context) => {
+            await groupsResolver.Group.myRole({}, null, context, null)
+          },
+        ],
+        [
+          'inviteCodes',
+          async (context) => {
+            await groupsResolver.Group.inviteCodes({}, null, context, null)
+          },
+        ],
+        [
+          'postsCount',
+          async (context) => {
+            await groupsResolver.Group.postsCount({}, null, context, null)
+          },
+        ],
+        [
+          'currentlyPinnedPostsCount',
+          async (context) => {
+            await groupsResolver.Group.currentlyPinnedPostsCount({}, null, context, null)
+          },
+        ],
+      ]
+
+      // With a parent that carries no id the Cypher would match on `id: null`, i.e. answer
+      // confidently for "no group" (no role, zero posts). The guard turns that silent wrong
+      // answer into a visible error.
+      it.each(fieldResolverCalls)('%s throws for a parent without an id', async (_name, call) => {
+        const context = { database, user: { id: 'current-user' } } as unknown as Context
+
+        await expect(call(context)).rejects.toThrow('Can not identify selected Group!')
+      })
+    })
+
+    describe('Group.membersCount', () => {
+      // The count is expensive per group. When the caller already resolved it, the resolver
+      // must reuse it instead of firing one extra query per group in a list (N+1). A driver
+      // that explodes on use is the only way to prove no query happens.
+      it('reuses a precomputed count without querying the database', async () => {
+        const context = {
+          driver: {
+            session: () => {
+              throw new Error('membersCount must not open a session when the count is known')
+            },
+          },
+        } as unknown as Context
+
+        await expect(
+          groupsResolver.Group.membersCount(
+            { id: 'some-group', membersCount: 42 },
+            null,
+            context,
+            null,
+          ),
+        ).resolves.toBe(42)
       })
     })
   })
@@ -4285,7 +4816,9 @@ describe('Subscription.groupShowMembersChanged filter', () => {
       groupShowMembersChanged: { groupId: 'g1' },
     })
     const { value } = await next
+
     expect(value).toEqual({ groupShowMembersChanged: { groupId: 'g1' } })
+
     await iterator.return?.()
   })
 
@@ -4304,7 +4837,33 @@ describe('Subscription.groupShowMembersChanged filter', () => {
     await pubsub.publish(GROUP_SHOW_MEMBERS_CHANGED, {
       groupShowMembersChanged: { groupId: 'g1' },
     })
+
     expect(await deliveredWithin(next)).toBe('pending')
+
+    await iterator.return?.()
+  })
+
+  // An unauthenticated socket must never be served group events: the shield does not cover
+  // Subscriptions, so this filter is the only thing standing between an anonymous websocket
+  // and a stream of group activity.
+  it('drops events for an unauthenticated subscriber', async () => {
+    const pubsub = new PubSub()
+    const policy = createInMemoryPolicyService({ groupsEnabled: true })
+    const context = { pubsub, policy, user: null } as unknown as Context
+    const iterator = groupsResolver.Subscription.groupShowMembersChanged.subscribe(
+      null,
+      { groupId: 'g1' },
+      context,
+      null,
+    )
+    const next = iterator.next()
+    // Matches on groupId and the feature is on, so only the missing user can drop it.
+    await pubsub.publish(GROUP_SHOW_MEMBERS_CHANGED, {
+      groupShowMembersChanged: { groupId: 'g1' },
+    })
+
+    expect(await deliveredWithin(next)).toBe('pending')
+
     await iterator.return?.()
   })
 })
@@ -4325,7 +4884,9 @@ describe('Subscription.groupMembershipVisibilityChanged filter', () => {
       groupMembershipVisibilityChanged: { userId: 'u2' },
     })
     const { value } = await next
+
     expect(value).toEqual({ groupMembershipVisibilityChanged: { userId: 'u2' } })
+
     await iterator.return?.()
   })
 
@@ -4344,7 +4905,32 @@ describe('Subscription.groupMembershipVisibilityChanged filter', () => {
     await pubsub.publish(GROUP_MEMBERSHIP_VISIBILITY_CHANGED, {
       groupMembershipVisibilityChanged: { userId: 'u2' },
     })
+
     expect(await deliveredWithin(next)).toBe('pending')
+
+    await iterator.return?.()
+  })
+
+  // See groupShowMembersChanged: an anonymous socket must not learn about other users'
+  // membership changes.
+  it('drops events for an unauthenticated subscriber', async () => {
+    const pubsub = new PubSub()
+    const policy = createInMemoryPolicyService({ groupsEnabled: true })
+    const context = { pubsub, policy, user: null } as unknown as Context
+    const iterator = groupsResolver.Subscription.groupMembershipVisibilityChanged.subscribe(
+      null,
+      { userId: 'u2' },
+      context,
+      null,
+    )
+    const next = iterator.next()
+    // Matches on userId and the feature is on, so only the missing user can drop it.
+    await pubsub.publish(GROUP_MEMBERSHIP_VISIBILITY_CHANGED, {
+      groupMembershipVisibilityChanged: { userId: 'u2' },
+    })
+
+    expect(await deliveredWithin(next)).toBe('pending')
+
     await iterator.return?.()
   })
 })

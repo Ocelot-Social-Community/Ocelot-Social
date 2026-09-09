@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs'
 
+import { describe, it, expect } from 'vitest'
+
 import { buildSchemaSdl, schemaSdlFile } from './print-schema'
 
 // Guards the PUBLIC API surface. `schema.graphql` is committed, so every change to it

@@ -8,7 +8,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { cleanHtml } from './helpers/cleanHtml'
 
-import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
+import type { IMiddlewareResolver } from 'graphql-middleware/types'
 
 /**
  * iterate through all fields and replace it with the callback result
@@ -17,10 +17,10 @@ import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
  * @property fieldName String
  * @property callback Function
  */
+// No `Array.isArray(fields)` guard any more: `fields` is the module-level literal below, and the
+// only other caller is this function's own recursion, which passes the same value straight through
+// — there is no call site that could hand it anything else.
 const walkRecursive = (data, fields, fieldName, callback, _key?) => {
-  if (!Array.isArray(fields)) {
-    throw new Error('please provide an fields array for the walkRecursive helper')
-  }
   const fieldDef = fields.find((f) => f.field === _key)
   if (data && typeof data === 'string' && fieldDef) {
     if (!fieldDef.excludes?.includes(fieldName)) {
@@ -46,7 +46,6 @@ const fields = [
 
   { field: 'reasonDescription' },
   { field: 'description', excludes: ['embed'] },
-  { field: 'descriptionExcerpt' },
 ]
 
 const mutationXss: IMiddlewareResolver = async (resolve, root, args, context, info) => {

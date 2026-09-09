@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -51,6 +53,7 @@ describe('languagesMiddleware', () => {
       ...variables,
       content: 'Jeder sollte vor seiner eigenen Tür kehren.',
     }
+
     await expect(
       mutate({
         mutation: CreatePost,
@@ -70,6 +73,7 @@ describe('languagesMiddleware', () => {
       ...variables,
       content: 'A journey of a thousand miles begins with a single step.',
     }
+
     await expect(
       mutate({
         mutation: CreatePost,
@@ -89,6 +93,7 @@ describe('languagesMiddleware', () => {
       ...variables,
       content: 'A caballo regalado, no le mires el diente.',
     }
+
     await expect(
       mutate({
         mutation: CreatePost,
@@ -109,6 +114,7 @@ describe('languagesMiddleware', () => {
       content:
         '<strong>Jeder</strong> <strike>sollte</strike> <strong>vor</strong> <span>seiner</span> eigenen <blockquote>Tür</blockquote> kehren.',
     }
+
     await expect(
       mutate({
         mutation: CreatePost,
@@ -129,6 +135,7 @@ describe('languagesMiddleware', () => {
         ...variables,
         content: '',
       }
+
       await expect(
         mutate({
           mutation: CreatePost,

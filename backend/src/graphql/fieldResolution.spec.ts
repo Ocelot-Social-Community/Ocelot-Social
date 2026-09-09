@@ -7,6 +7,8 @@
 // Indexing PROBES / registry maps by a type or field name read from the schema. The keys
 // come from our own .gql files, not from request data, so this is not an injection sink.
 /* eslint-disable security/detect-object-injection */
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
+
 import { createLoaders } from '@context/loaders'
 import Factory, { cleanDatabase } from '@db/factories'
 import {
@@ -329,7 +331,7 @@ describe('@cypher / @relation field resolution', () => {
 
     const nonNullPayloadFields = payloadTypes.flatMap((typeName) => {
       const fields = workList[typeName]
-      // Named explicitly, because this runs while jest is COLLECTING tests: an unguarded
+      // Named explicitly, because this runs while the runner is COLLECTING tests: an unguarded
       // `undefined.filter` here aborts the whole file with a message that mentions neither
       // the type nor the registry, and the other 200-odd cases never get to run.
       if (!fields) {
@@ -346,6 +348,7 @@ describe('@cypher / @relation field resolution', () => {
 
     it.each(nonNullPayloadFields)('%s.%s has an explicit field resolver', (typeName, fieldName) => {
       const typeResolvers = (resolvers as Record<string, Record<string, unknown>>)[typeName]
+
       expect(typeResolvers?.[fieldName]).toBeInstanceOf(Function)
     })
   })
@@ -487,6 +490,7 @@ describe('@cypher / @relation field resolution', () => {
         const { data, errors } = await setup.query({
           query: probe.operation(buildSelection([field], probe.overrides)),
         })
+
         expect(errors).toBeUndefined()
 
         const instances = probe.extract(data ?? {}) as Record<string, unknown>[]
@@ -512,6 +516,7 @@ describe('@cypher / @relation field resolution', () => {
         expect(errors).toBeUndefined()
 
         const instances = probe.extract(data ?? {}) as Record<string, unknown>[]
+
         expect(instances.length).toBeGreaterThan(0)
 
         // Every selected field must come back as a key. A non-null field that resolves to
@@ -519,6 +524,7 @@ describe('@cypher / @relation field resolution', () => {
         // nullable field whose resolver vanished, which would otherwise pass silently.
         const returnedKeys = Object.keys(instances[0])
         const missing = fields.map((f) => f.name).filter((name) => !returnedKeys.includes(name))
+
         expect(missing).toEqual([])
       })
 

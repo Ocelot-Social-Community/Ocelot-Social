@@ -1,9 +1,8 @@
 # syntax=docker/dockerfile:1
 #
 # Static documentation site: the VuePress handbook with the embedded GraphQL API
-# reference (SpectaQL) at /api, served by nginx. Multi-stage so each tool runs on
-# the Node version it needs (the backend toolchain needs Node 25; VuePress builds
-# on Node 20), then only the static output ships.
+# reference (SpectaQL) at /api, served by nginx. Multi-stage so the backend
+# toolchain and VuePress each get a clean tree, then only the static output ships.
 #
 # The VuePress deps are declared in the repo-root package.json: VuePress resolves
 # `vuepress`/`vuepress-theme-hope` (config imports + its CLI) relative to the source
@@ -12,14 +11,27 @@
 #
 # Build context is the repo root; see .vuepress/Dockerfile.dockerignore.
 
+# 0) The backend's `@ocelot-social/branding` is a `file:../packages/branding` dependency, so the
+#    package has to exist at that path BEFORE the install below — src/graphql imports it, which is
+#    what schema:print loads. Building it here is not new caution: the previous version installed
+#    the backend with only ./backend/ in the tree, so the dependency pointed at nothing.
+FROM node:26-bookworm-slim AS branding
+WORKDIR /app
+COPY packages/branding/package.json packages/branding/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY packages/branding/. .
+RUN npm run build
+
 # 1) Generate the GraphQL API reference on the backend's Node (schema:print + SpectaQL).
 FROM node:26-bookworm-slim AS apidocs
 WORKDIR /repo
-COPY backend/package.json backend/yarn.lock ./backend/
-RUN cd backend && yarn install --frozen-lockfile --ignore-scripts
+COPY --from=branding /app/ ./packages/branding/
+# `.npmrc` carries install-links=true; without it `npm ci` rejects this lockfile outright (exit 1).
+COPY backend/package.json backend/package-lock.json backend/.npmrc ./backend/
+RUN cd backend && npm ci --ignore-scripts --no-audit --no-fund
 COPY backend/ ./backend/
 RUN cd backend \
-    && yarn run schema:print \
+    && npm run schema:print \
     && ./node_modules/.bin/spectaql --target-dir /api spectaql.yml
 
 # 2) Build the VuePress site (Node 20), embedding the API reference at /api.

@@ -2,7 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable jest/expect-expect */
+/* eslint-disable vitest/expect-expect */
+import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect } from 'vitest'
+
 import { cleanDatabase } from '@db/factories'
 import blockedUsers from '@graphql/queries/interactions/blockedUsers.gql'
 import blockUser from '@graphql/queries/interactions/blockUser.gql'
@@ -157,10 +159,13 @@ describe('blockUser', () => {
 
       it('unfollows the user when blocking', async () => {
         await currentUser.relateTo(blockedUser, 'following')
+
         await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
           data: { User: [{ id: 'u2', isBlocked: false, followedByCurrentUser: true }] },
         })
+
         await mutate({ mutation: blockUser, variables: { id: 'u2' } })
+
         await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
           data: { User: [{ id: 'u2', isBlocked: true, followedByCurrentUser: false }] },
         })
@@ -318,6 +323,7 @@ describe('blockUser', () => {
                 })
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 const postIds = result.data?.Post.map((p) => p.id)
+
                 expect(postIds).not.toContain('p23')
               })
             })
@@ -330,6 +336,7 @@ describe('blockUser', () => {
           })
 
           it('both posts are in the newsfeed', bothPostsAreInTheNewsfeed)
+
           describe('but if the current user blocks the other user', () => {
             beforeEach(async () => {
               await currentUser.relateTo(blockedUser, 'blocked')
@@ -451,6 +458,7 @@ describe('unblockUser', () => {
         describe('unblocking twice', () => {
           it('throws an error on second unblock', async () => {
             await mutate({ mutation: unblockUser, variables: { id: 'u2' } })
+
             await expect(
               mutate({ mutation: unblockUser, variables: { id: 'u2' } }),
             ).resolves.toMatchObject({

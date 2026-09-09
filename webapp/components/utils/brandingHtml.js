@@ -11,7 +11,6 @@ export async function fetchBrandingHtml(src) {
   // out of the CLIENT bundle — a compound guard like `typeof process !== 'undefined' && …` is not
   // recognised, so webpack would try to bundle 'fs' for the browser and fail.
   if (process.server) {
-    // eslint-disable-next-line global-require, import/no-unresolved
     const {
       discoverArchives,
       readArchive,

@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`badge settings with badges more badges available selecting an empty slot shows list with available badges 1`] = `
 <div>

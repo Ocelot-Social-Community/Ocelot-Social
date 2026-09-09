@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { dominates } from './dominance'
 
 import type { PermissionKey } from '@src/permission'

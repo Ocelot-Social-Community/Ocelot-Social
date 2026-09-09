@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, describe, beforeEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import currentUser from '@graphql/queries/auth/currentUser.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
@@ -57,6 +59,7 @@ afterAll(() => {
 
 describe('validateInviteCode', () => {
   let invitingUser, user
+
   beforeEach(async () => {
     await cleanDatabase()
     invitingUser = await Factory.build('user', {
@@ -138,6 +141,7 @@ describe('validateInviteCode', () => {
       },
     )
   })
+
   describe('as unauthenticated user', () => {
     beforeEach(() => {
       authenticatedUser = null
@@ -308,6 +312,7 @@ describe('validateInviteCode', () => {
 
 describe('generatePersonalInviteCode', () => {
   let invitingUser
+
   beforeEach(async () => {
     await cleanDatabase()
     invitingUser = await Factory.build('user', {
@@ -316,6 +321,7 @@ describe('generatePersonalInviteCode', () => {
       name: 'Inviting User',
     })
   })
+
   describe('as unauthenticated user', () => {
     beforeEach(() => {
       authenticatedUser = null
@@ -358,6 +364,30 @@ describe('generatePersonalInviteCode', () => {
       })
     })
 
+    // Codes are six random characters, so collisions are rare but not impossible — and the
+    // MERGE below would silently hand the second user the FIRST user's still-valid code,
+    // letting them invite people in someone else's name. Forced here by pinning Math.random
+    // so the first generated code is one that already exists.
+    it('generates another code when the first one is already taken', async () => {
+      await database.write({
+        query: `MATCH (user:User { id: 'inviting-user' })
+                MERGE (user)-[:GENERATED]->(:InviteCode { code: '000000' })`,
+      })
+      // Six draws per code (branding.registration.inviteCodeLength). 0 → '0', so the first
+      // attempt reproduces the code above; 0.99 → 35 → 'Z' for every draw after that.
+      let draw = 0
+      const random = vi.spyOn(Math, 'random').mockImplementation(() => (draw++ < 6 ? 0 : 0.99))
+
+      try {
+        const { data, errors } = await mutate({ mutation: generatePersonalInviteCode })
+
+        expect(errors).toBeUndefined()
+        expect(data.generatePersonalInviteCode.code).toBe('ZZZZZZ')
+      } finally {
+        random.mockRestore()
+      }
+    })
+
     it('returns a new invite code with comment', async () => {
       await expect(
         mutate({ mutation: generatePersonalInviteCode, variables: { comment: 'some text' } }),
@@ -387,6 +417,7 @@ describe('generatePersonalInviteCode', () => {
     it('returns a new invite code with expireDate', async () => {
       const date = new Date()
       date.setFullYear(date.getFullYear() + 1)
+
       await expect(
         mutate({
           mutation: generatePersonalInviteCode,
@@ -418,6 +449,7 @@ describe('generatePersonalInviteCode', () => {
     it('returns a new invalid invite code with expireDate in the past', async () => {
       const date = new Date()
       date.setFullYear(date.getFullYear() - 1)
+
       await expect(
         mutate({
           mutation: generatePersonalInviteCode,
@@ -450,10 +482,12 @@ describe('generatePersonalInviteCode', () => {
       let lastCode
       for (let i = 0; i < INVITE_CODES_PERSONAL_PER_USER; i++) {
         lastCode = await mutate({ mutation: generatePersonalInviteCode })
+
         expect(lastCode).toMatchObject({
           errors: undefined,
         })
       }
+
       await expect(mutate({ mutation: generatePersonalInviteCode })).resolves.toMatchObject({
         errors: [
           {
@@ -461,10 +495,12 @@ describe('generatePersonalInviteCode', () => {
           },
         ],
       })
+
       await mutate({
         mutation: invalidateInviteCode,
         variables: { code: lastCode.data.generatePersonalInviteCode.code },
       })
+
       await expect(mutate({ mutation: generatePersonalInviteCode })).resolves.toMatchObject({
         errors: undefined,
       })
@@ -474,6 +510,7 @@ describe('generatePersonalInviteCode', () => {
 
 describe('generateGroupInviteCode', () => {
   let invitingUser, notMemberUser, pendingMemberUser
+
   beforeEach(async () => {
     await cleanDatabase()
     invitingUser = await Factory.build('user', {
@@ -558,9 +595,33 @@ describe('generateGroupInviteCode', () => {
       })
     })
   })
+
   describe('as authenticated member', () => {
     beforeEach(async () => {
       authenticatedUser = await invitingUser.toJson()
+    })
+
+    // Same collision retry as generatePersonalInviteCode — a separate loop in the resolver, so a
+    // fix applied to only one of them would leave this one handing out a taken code.
+    it('generates another code when the first one is already taken', async () => {
+      await database.write({
+        query: `MATCH (user:User { id: 'inviting-user' })
+                MERGE (user)-[:GENERATED]->(:InviteCode { code: '000000' })`,
+      })
+      let draw = 0
+      const random = vi.spyOn(Math, 'random').mockImplementation(() => (draw++ < 6 ? 0 : 0.99))
+
+      try {
+        const { data, errors } = await mutate({
+          mutation: generateGroupInviteCode,
+          variables: { groupId: 'public-group' },
+        })
+
+        expect(errors).toBeUndefined()
+        expect(data.generateGroupInviteCode.code).toBe('ZZZZZZ')
+      } finally {
+        random.mockRestore()
+      }
     })
 
     it('returns a new group invite code', async () => {
@@ -633,6 +694,7 @@ describe('generateGroupInviteCode', () => {
     it('returns a new group invite code with expireDate', async () => {
       const date = new Date()
       date.setFullYear(date.getFullYear() + 1)
+
       await expect(
         mutate({
           mutation: generateGroupInviteCode,
@@ -670,6 +732,7 @@ describe('generateGroupInviteCode', () => {
     it('returns a new invalid group invite code with expireDate in the past', async () => {
       const date = new Date()
       date.setFullYear(date.getFullYear() - 1)
+
       await expect(
         mutate({
           mutation: generateGroupInviteCode,
@@ -711,10 +774,12 @@ describe('generateGroupInviteCode', () => {
           mutation: generateGroupInviteCode,
           variables: { groupId: 'public-group' },
         })
+
         expect(lastCode).toMatchObject({
           errors: undefined,
         })
       }
+
       await expect(
         mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'public-group' } }),
       ).resolves.toMatchObject({
@@ -724,10 +789,12 @@ describe('generateGroupInviteCode', () => {
           },
         ],
       })
+
       await mutate({
         mutation: invalidateInviteCode,
         variables: { code: lastCode.data.generateGroupInviteCode.code },
       })
+
       await expect(
         mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'public-group' } }),
       ).resolves.toMatchObject({
@@ -744,6 +811,7 @@ describe('generateGroupInviteCode', () => {
     it('throws authorization error', async () => {
       const date = new Date()
       date.setFullYear(date.getFullYear() - 1)
+
       await expect(
         mutate({
           mutation: generateGroupInviteCode,
@@ -777,6 +845,7 @@ describe('generateGroupInviteCode', () => {
 
 describe('invalidateInviteCode', () => {
   let invitingUser, otherUser
+
   beforeEach(async () => {
     await cleanDatabase()
     invitingUser = await Factory.build('user', {
@@ -873,6 +942,7 @@ describe('invalidateInviteCode', () => {
 
 describe('redeemInviteCode', () => {
   let invitingUser, otherUser
+
   beforeEach(async () => {
     await cleanDatabase()
     invitingUser = await Factory.build('user', {
@@ -986,7 +1056,9 @@ describe('redeemInviteCode', () => {
         },
         errors: undefined,
       })
+
       authenticatedUser = await invitingUser.toJson()
+
       await expect(query({ query: currentUser })).resolves.toMatchObject({
         data: {
           currentUser: {
@@ -1024,7 +1096,9 @@ describe('redeemInviteCode', () => {
         },
         errors: undefined,
       })
+
       authenticatedUser = await invitingUser.toJson()
+
       await expect(query({ query: Group })).resolves.toMatchObject({
         data: {
           Group: expect.arrayContaining([
@@ -1051,7 +1125,9 @@ describe('redeemInviteCode', () => {
         },
         errors: undefined,
       })
+
       authenticatedUser = await invitingUser.toJson()
+
       await expect(
         query({ query: GroupMembers, variables: { id: 'hidden-group', includePending: true } }),
       ).resolves.toMatchObject({

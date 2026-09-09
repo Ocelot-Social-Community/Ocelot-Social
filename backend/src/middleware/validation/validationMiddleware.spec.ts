@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateComment from '@graphql/queries/comments/CreateComment.gql'
 import UpdateComment from '@graphql/queries/comments/UpdateComment.gql'
@@ -8,6 +10,8 @@ import fileReport from '@graphql/queries/moderation/fileReport.gql'
 import review from '@graphql/queries/moderation/review.gql'
 import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import { validateNotifyUsers } from './validationMiddleware'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -99,6 +103,7 @@ afterEach(async () => {
 
 describe('validateCreateComment', () => {
   let createCommentVariables
+
   beforeEach(async () => {
     createCommentVariables = {
       postId: 'whatever',
@@ -109,6 +114,7 @@ describe('validateCreateComment', () => {
 
   it('throws an error if content is empty', async () => {
     createCommentVariables = { ...createCommentVariables, postId: 'post-4-commenting' }
+
     await expect(
       mutate({ mutation: CreateComment, variables: createCommentVariables }),
     ).resolves.toMatchObject({
@@ -119,6 +125,7 @@ describe('validateCreateComment', () => {
 
   it('sanitizes content and throws an error if not longer than 1 character', async () => {
     createCommentVariables = { postId: 'post-4-commenting', content: '<a></a>' }
+
     await expect(
       mutate({ mutation: CreateComment, variables: createCommentVariables }),
     ).resolves.toMatchObject({
@@ -133,6 +140,7 @@ describe('validateCreateComment', () => {
       postId: 'non-existent-post',
       content: 'valid content',
     }
+
     await expect(
       mutate({ mutation: CreateComment, variables: createCommentVariables }),
     ).resolves.toMatchObject({
@@ -143,6 +151,7 @@ describe('validateCreateComment', () => {
 
   describe('validateUpdateComment', () => {
     let updateCommentVariables
+
     beforeEach(async () => {
       await Factory.build(
         'comment',
@@ -162,6 +171,7 @@ describe('validateCreateComment', () => {
 
     it('throws an error if content is empty', async () => {
       updateCommentVariables = { ...updateCommentVariables, id: 'comment-id' }
+
       await expect(
         mutate({ mutation: UpdateComment, variables: updateCommentVariables }),
       ).resolves.toMatchObject({
@@ -172,6 +182,7 @@ describe('validateCreateComment', () => {
 
     it('sanitizes content and throws an error if not longer than 1 character', async () => {
       updateCommentVariables = { id: 'comment-id', content: '<a></a>' }
+
       await expect(
         mutate({ mutation: UpdateComment, variables: updateCommentVariables }),
       ).resolves.toMatchObject({
@@ -186,6 +197,7 @@ describe('validateReport', () => {
   it('throws an error if a user tries to report themself', async () => {
     authenticatedUser = await reportingUser.toJson()
     reportVariables = { ...reportVariables, resourceId: 'reporting-user' }
+
     await expect(
       mutate({ mutation: fileReport, variables: reportVariables }),
     ).resolves.toMatchObject({
@@ -210,6 +222,7 @@ describe('validateReview', () => {
 
   it('throws an error if a user tries to review a report against them', async () => {
     disableVariables = { ...disableVariables, resourceId: 'moderating-user' }
+
     await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
       errors: [{ message: 'You cannot review yourself!' }],
@@ -218,6 +231,7 @@ describe('validateReview', () => {
 
   it('throws an error for invaild resource', async () => {
     disableVariables = { ...disableVariables, resourceId: 'non-existent-resource' }
+
     await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
       errors: [{ message: 'Resource not found or is not a Post|Comment|User!' }],
@@ -226,6 +240,7 @@ describe('validateReview', () => {
 
   it('throws an error if no report exists', async () => {
     disableVariables = { ...disableVariables, resourceId: 'offensive-post' }
+
     await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
       errors: [{ message: 'Before starting the review process, please report the Post!' }],
@@ -242,6 +257,7 @@ describe('validateReview', () => {
       reportAgainstOffensivePost.relateTo(offensivePost, 'belongsTo'),
     ])
     disableVariables = { ...disableVariables, resourceId: 'offensive-post' }
+
     await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
       errors: [{ message: 'You cannot review your own Post!' }],
@@ -258,6 +274,7 @@ describe('validateReview', () => {
         ...disableVariables,
         resourceId: 'tag-id',
       }
+
       await expect(
         mutate({ mutation: review, variables: disableVariables }),
       ).resolves.toMatchObject({
@@ -289,10 +306,43 @@ describe('validateReview', () => {
         ...variables,
         name: '  ',
       }
+
       await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
         data: { UpdateUser: null },
         errors: [{ message: 'Username must be at least 3 character long!' }],
       })
     })
+  })
+})
+
+// validateNotifyUsers is called by the notification helpers, not by a resolver, and every call
+// site passes a literal pair — so the schema cannot produce a mismatch and these two rules only
+// ever run against constants. They are what stops a notification from being filed under a reason
+// that does not describe it: the reason is what the client renders ("X mentioned you in a post"),
+// so a Comment notification labelled `mentioned_in_post` would link the reader to the wrong node
+// type entirely.
+describe(validateNotifyUsers, () => {
+  it.each([
+    ['Post', 'mentioned_in_post'],
+    ['Comment', 'mentioned_in_comment'],
+    ['Comment', 'commented_on_post'],
+  ])('accepts %s / %s', async (label, reason) => {
+    await expect(validateNotifyUsers(label, reason)).resolves.toBeUndefined()
+  })
+
+  it('rejects a reason that is not in the catalogue at all', async () => {
+    await expect(validateNotifyUsers('Post', 'invented_reason')).rejects.toThrow(
+      'Notification reason is not allowed!',
+    )
+  })
+
+  // Both halves of the pairing rule: a known reason on the wrong label.
+  it.each([
+    ['Post', 'mentioned_in_comment'],
+    ['Comment', 'mentioned_in_post'],
+  ])('rejects the known reason %s / %s as a mismatch', async (label, reason) => {
+    await expect(validateNotifyUsers(label, reason)).rejects.toThrow(
+      'Notification does not fit the reason!',
+    )
   })
 })

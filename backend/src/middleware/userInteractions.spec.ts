@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import Post from '@graphql/queries/posts/Post.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -59,6 +61,7 @@ describe('middleware/userInteractions', () => {
 
     it('changes clickedCount when queried with ID', async () => {
       variables = { id: post.get('id') }
+
       await expect(query({ query: Post, variables })).resolves.toMatchObject({
         data: {
           Post: expect.arrayContaining([
@@ -84,6 +87,7 @@ describe('middleware/userInteractions', () => {
 
     it('changes clickedCount when another user queries the post', async () => {
       authenticatedUser = await bUser.toJson()
+
       await expect(query({ query: Post, variables })).resolves.toMatchObject({
         data: {
           Post: expect.arrayContaining([

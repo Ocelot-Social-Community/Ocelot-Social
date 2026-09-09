@@ -10,6 +10,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { buildSchema, Kind, parse, Source, validate } from 'graphql'
+import { describe, it, expect } from 'vitest'
 
 import { buildSchemaSdl } from './print-schema'
 
@@ -28,7 +29,7 @@ import { buildSchemaSdl } from './print-schema'
 // Kept in the backend on purpose: the schema lives here, so a schema change and its
 // verification stay in one commit.
 
-const WEBAPP_ROOT = path.resolve(__dirname, '../../../webapp')
+const WEBAPP_ROOT = path.resolve(import.meta.dirname, '../../../webapp')
 const SEARCH_DIRS = ['graphql', 'components', 'pages', 'store', 'mixins', 'composables']
 
 /**

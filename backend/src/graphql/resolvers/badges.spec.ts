@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
+import { beforeAll, afterAll, describe, afterEach, it, expect, beforeEach } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import Badge from '@graphql/queries/badges/Badge.gql'
 import revokeBadge from '@graphql/queries/badges/revokeBadge.gql'
@@ -60,6 +62,7 @@ describe('Badge query', () => {
         icon: `/img/badges/${id}.svg`,
       })
     }
+
     await expect(query({ query: Badge })).resolves.toMatchObject({
       data: {
         Badge: [
@@ -135,6 +138,7 @@ describe('Badges', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
+
         await expect(mutate({ mutation: setVerificationBadge, variables })).resolves.toMatchObject({
           data: { setVerificationBadge: null },
           errors: [{ message: 'Not Authorized!' }],
@@ -244,6 +248,7 @@ describe('Badges', () => {
           },
           errors: undefined,
         }
+
         await expect(mutate({ mutation: setVerificationBadge, variables })).resolves.toMatchObject(
           expected,
         )
@@ -273,6 +278,7 @@ describe('Badges', () => {
             badgeId: 'verification_moderator',
           },
         })
+
         await expect(
           mutate({
             mutation: setVerificationBadge,
@@ -308,6 +314,7 @@ describe('Badges', () => {
           mutation: setVerificationBadge,
           variables,
         })
+
         await expect(
           mutate({
             mutation: setVerificationBadge,
@@ -330,6 +337,7 @@ describe('Badges', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
+
         await expect(mutate({ mutation: rewardTrophyBadge, variables })).resolves.toMatchObject({
           data: { rewardTrophyBadge: null },
           errors: [{ message: 'Not Authorized!' }],
@@ -468,6 +476,7 @@ describe('Badges', () => {
             badgeId: 'trophy_racoon',
           },
         })
+
         await expect(
           mutate({
             mutation: rewardTrophyBadge,
@@ -547,6 +556,7 @@ describe('Badges', () => {
           },
         })
         authenticatedUser = await administrator.toJson()
+
         await expect(
           mutate({
             mutation: rewardTrophyBadge,
@@ -619,6 +629,7 @@ describe('Badges', () => {
           },
         })
         authenticatedUser = await administrator.toJson()
+
         await expect(
           mutate({
             mutation: rewardTrophyBadge,
@@ -682,6 +693,7 @@ describe('Badges', () => {
             },
           })
         }
+
         await expect(
           mutate({
             mutation: rewardTrophyBadge,
@@ -737,6 +749,7 @@ describe('Badges', () => {
           mutation: rewardTrophyBadge,
           variables,
         })
+
         await expect(
           mutate({
             mutation: rewardTrophyBadge,
@@ -788,6 +801,7 @@ describe('Badges', () => {
           mutation: rewardTrophyBadge,
           variables,
         })
+
         await expect(
           mutate({
             mutation: rewardTrophyBadge,
@@ -902,6 +916,7 @@ describe('Badges', () => {
           },
           errors: undefined,
         }
+
         await expect(
           query({ query: User, variables: { id: 'regular-user-id' } }),
         ).resolves.toMatchObject(expected)
@@ -911,6 +926,7 @@ describe('Badges', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
+
         await expect(mutate({ mutation: revokeBadge, variables })).resolves.toMatchObject({
           data: { revokeBadge: null },
           errors: [{ message: 'Not Authorized!' }],
@@ -1003,6 +1019,7 @@ describe('Badges', () => {
 
       it('does not crash when revoking multiple times', async () => {
         await mutate({ mutation: revokeBadge, variables })
+
         await expect(mutate({ mutation: revokeBadge, variables })).resolves.toMatchObject({
           data: {
             revokeBadge: {
@@ -1120,6 +1137,7 @@ describe('Badges', () => {
             userId: 'regular-user-id',
           },
         })
+
         await expect(
           mutate({
             mutation: revokeBadge,

@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { User } from '@db/schema/index'
 
 import { normalised, timestamp, withDefaults } from './defaults'
@@ -5,7 +7,7 @@ import { normalised, timestamp, withDefaults } from './defaults'
 // No database: the point of this helper is what it guarantees in-process, and a round trip
 // would hide it — two writes 40ms apart differ even with `new Date()`.
 
-describe('timestamp', () => {
+describe(timestamp, () => {
   const stamps = Array.from({ length: 200 }, () => timestamp())
 
   it('hands out a distinct value every time', () => {
@@ -31,7 +33,7 @@ describe('timestamp', () => {
   })
 })
 
-describe('normalised', () => {
+describe(normalised, () => {
   it('drops an undefined value, so a default can still apply', () => {
     // A spread copies the key either way: `{ ...defaults, ...{ name: undefined } }` overwrites
     // the default with nothing, and `Factory.build('user', { name: someVar })` with an unset
@@ -51,7 +53,7 @@ describe('normalised', () => {
   })
 })
 
-describe('withDefaults', () => {
+describe(withDefaults, () => {
   it('fills in the default for a property passed as undefined', () => {
     expect(withDefaults(User, { name: undefined }).name).toBe('Test User')
   })

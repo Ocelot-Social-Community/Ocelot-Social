@@ -1,22 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable jest/expect-expect */
+/* eslint-disable vitest/expect-expect */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { createHash } from 'node:crypto'
 import { setTimeout as delay } from 'node:timers/promises'
 
+import { sign } from 'jsonwebtoken'
+import { beforeAll, afterAll, afterEach, describe, expect, beforeEach, it } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver, getNeode } from '@db/neo4j'
+import { getDriver } from '@db/neo4j'
+import { fixtures } from '@db/testing/fixtures'
 import { TEST_CONFIG } from '@root/test/helpers'
 
 import { decode } from './decode'
 import { encode } from './encode'
 
-import type User from '@db/models/User'
-
 const driver = getDriver()
-const neode = getNeode()
+// The fixture API, not neode: a neode node cannot be related to a fixture handle, and this
+// file mixes the two.
+const neode = fixtures
 const config = {
   JWT_SECRET: 'supersecret',
   JWT_EXPIRES: TEST_CONFIG.JWT_EXPIRES,
@@ -39,7 +43,7 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('decode', () => {
+describe(decode, () => {
   let authorizationHeader: string | undefined | null
   const returnsNull = async () => {
     await expect(decode(context)(authorizationHeader)).resolves.toBeNull()
@@ -93,7 +97,51 @@ describe('decode', () => {
           return tx.run(`MATCH (k:ApiKey { id: 'ak1' }) RETURN k.lastUsedAt AS lastUsedAt`)
         })
         await session.close()
+
         expect(result.records[0].get('lastUsedAt')).toBeTruthy()
+      })
+
+      // lastUsedAt is bookkeeping, fired and NOT awaited — the caller is already holding the
+      // decoded user by the time it runs. Without the `.catch` its rejection would surface as an
+      // unhandled promise rejection from a request that had otherwise succeeded, which under
+      // Node's default is process-fatal: a hiccup on a write nobody waits for would take the
+      // backend down and log the failure against whatever request happened to be in flight.
+      it('authenticates the key even when the lastUsedAt write fails', async () => {
+        // decodeApiKey opens the read session first and the update session second; only the
+        // latter is replaced, so the lookup itself still runs against the real database.
+        let sessions = 0
+        const openSession = driver.session.bind(driver)
+        const sessionSpy = vi.spyOn(driver, 'session').mockImplementation((...args) => {
+          sessions += 1
+          if (sessions === 2) {
+            return {
+              writeTransaction: async () => Promise.reject(new Error('write conflict')),
+              close: async () => Promise.resolve(),
+            } as unknown as ReturnType<typeof driver.session>
+          }
+          return openSession(...args)
+        })
+
+        try {
+          await expect(decode(context)('Bearer oak_testkey123')).resolves.toMatchObject({
+            id: 'api-user',
+            authMethod: 'apiKey',
+          })
+
+          // Let the rejected best-effort promise settle inside the test, where an unhandled
+          // rejection fails the run — the same signal it would give in production.
+          await delay(100)
+        } finally {
+          sessionSpy.mockRestore()
+        }
+
+        const session = driver.session()
+        const result = await session.readTransaction(async (tx) => {
+          return tx.run(`MATCH (k:ApiKey { id: 'ak1' }) RETURN k.lastUsedAt AS lastUsedAt`)
+        })
+        await session.close()
+
+        expect(result.records[0].get('lastUsedAt')).toBeNull()
       })
     })
 
@@ -257,10 +305,24 @@ describe('decode', () => {
     it('returns null', returnsNull)
   })
 
+  // A token that VERIFIES — right secret, right algorithm — but names no subject. jwt.verify is
+  // happy with it (`sub` is an optional registered claim), so the rejection has to come from the
+  // subject read: without the `?? null` the id stays undefined and the lookup runs as
+  // `MATCH (user:User {id: undefined})`, which the driver rejects rather than answering "no user".
+  describe('given a valid JWT Bearer token without a subject', () => {
+    beforeEach(async () => {
+      await Factory.build('user', { id: 'u4', name: 'No Subject', slug: 'no-subject' })
+      authorizationHeader = `Bearer ${sign({}, config.JWT_SECRET, { algorithm: 'HS256' })}`
+    })
+
+    it('returns null', returnsNull)
+  })
+
   describe('given valid JWT Bearer token', () => {
     describe('and corresponding user in the database', () => {
       let user
       let validAuthorizationHeader: string
+
       beforeEach(async () => {
         user = await Factory.build(
           'user',
@@ -290,26 +352,31 @@ describe('decode', () => {
       })
 
       it('does not set `lastActiveAt`', async () => {
-        let user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
+        let user = await neode.first('User', { id: 'u3' }, undefined)
+
         await expect(user.toJson()).resolves.not.toHaveProperty('lastActiveAt')
+
         await decode(context)(validAuthorizationHeader)
-        user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
+        user = await neode.first('User', { id: 'u3' }, undefined)
+
         await expect(user.toJson()).resolves.not.toHaveProperty('lastActiveAt')
       })
 
       it('does not touch `lastActiveAt` on authenticated requests', async () => {
         let user = await neode.first('User', { id: 'u3' }, undefined)
         await user.update({
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          updatedAt: new Date().toISOString() as any,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          lastActiveAt: '2019-10-03T23:33:08.598Z' as any,
+          updatedAt: new Date().toISOString(),
+
+          lastActiveAt: '2019-10-03T23:33:08.598Z',
         })
+
         await expect(user.toJson()).resolves.toMatchObject({
           lastActiveAt: '2019-10-03T23:33:08.598Z',
         })
+
         await decode(context)(validAuthorizationHeader)
-        user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
+        user = await neode.first('User', { id: 'u3' }, undefined)
+
         await expect(user.toJson()).resolves.toMatchObject({
           lastActiveAt: '2019-10-03T23:33:08.598Z',
         })

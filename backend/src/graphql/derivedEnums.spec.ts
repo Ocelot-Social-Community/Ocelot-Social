@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { ENV_CATEGORIES } from '@src/config/categories'
 import { allKeys } from '@src/policy/schema'
 
@@ -20,7 +22,7 @@ describe('derivedEnumSDLs', () => {
   })
 })
 
-describe('enumSDL', () => {
+describe(enumSDL, () => {
   it('builds an enum from valid GraphQL names', () => {
     expect(enumSDL('X', ['fooBar', '_x', 'a1'])).toBe('enum X { fooBar _x a1 }')
   })

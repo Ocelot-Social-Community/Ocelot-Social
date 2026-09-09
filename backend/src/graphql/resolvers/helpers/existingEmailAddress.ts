@@ -6,7 +6,7 @@
 import normalizeEmail from './normalizeEmail'
 
 export default async function alreadyExistingMail({ args, context }) {
-  args.email = normalizeEmail(args.email)
+  args.email = normalizeEmail(args.email as string)
   const session = context.driver.session()
   try {
     const result = await session.readTransaction(async (transaction) => {

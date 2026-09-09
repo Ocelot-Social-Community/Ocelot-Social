@@ -1,6 +1,8 @@
+import { describe, it, expect } from 'vitest'
+
 import { byCreationDate } from './userData'
 
-describe('byCreationDate', () => {
+describe(byCreationDate, () => {
   it('returns -1 when a was created before b', () => {
     expect(byCreationDate({ createdAt: '2024-01-01' }, { createdAt: '2024-02-01' })).toBe(-1)
   })
@@ -20,6 +22,7 @@ describe('byCreationDate', () => {
       { id: 'b', createdAt: '2024-02-01' },
     ]
     items.sort(byCreationDate)
+
     expect(items.map((i) => i.id)).toEqual(['a', 'b', 'c'])
   })
 })

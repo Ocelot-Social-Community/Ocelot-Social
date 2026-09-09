@@ -2,10 +2,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { parse } from 'graphql'
+import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import User from '@graphql/queries/users/User.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import locationsResolvers from './locations'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -222,6 +225,7 @@ describe('distanceToMe', () => {
       it('returns 0', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await user.toJson()
+
         await expect(
           query({ query: User, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({
@@ -243,6 +247,7 @@ describe('distanceToMe', () => {
       it('returns 0', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await myPlaceUser.toJson()
+
         await expect(
           query({ query: User, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({
@@ -264,6 +269,7 @@ describe('distanceToMe', () => {
       it('returns a number', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await otherPlaceUser.toJson()
+
         await expect(
           query({ query: User, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({
@@ -285,6 +291,7 @@ describe('distanceToMe', () => {
       it('returns null', async () => {
         authenticatedUser = await noCordsPlaceUser.toJson()
         const targetUser = await myPlaceUser.toJson()
+
         await expect(
           query({ query: User, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({
@@ -306,6 +313,7 @@ describe('distanceToMe', () => {
       it('returns null', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await noCordsPlaceUser.toJson()
+
         await expect(
           query({ query: User, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({
@@ -327,6 +335,7 @@ describe('distanceToMe', () => {
       it('returns null location', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await noPlaceUser.toJson()
+
         await expect(
           query({ query: User, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({
@@ -341,5 +350,22 @@ describe('distanceToMe', () => {
         })
       })
     })
+  })
+})
+
+// distanceToMe is the ONE Location field that is not a @cypher projection: it runs its own query
+// keyed on `parent.id`. Every Location the schema hands it has one — a parent without an id can
+// only come from a projection that did not select it (or a Location built in code). Refusing is
+// what stops `MATCH (location:Location {id: null})` from binding an arbitrary Location and
+// reporting a distance to somewhere the viewer never asked about.
+describe('Location.distanceToMe', () => {
+  it('refuses a parent it cannot identify', async () => {
+    // No driver on the context on purpose: the guard runs before the session is opened, so a
+    // resolver that got past it fails loudly here rather than querying with a null id.
+    const noContext = {} as unknown as Context
+
+    await expect(locationsResolvers.Location.distanceToMe({}, {}, noContext, null)).rejects.toThrow(
+      'Can not identify selected Location!',
+    )
   })
 })

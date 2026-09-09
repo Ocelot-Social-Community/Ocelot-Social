@@ -7,6 +7,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { buildSchema, Kind } from 'graphql'
+import { describe, it, expect } from 'vitest'
 
 import { buildSchemaSdl } from './print-schema'
 import { postFilterToCypher } from './resolvers/helpers/postFilter'
@@ -41,7 +42,7 @@ import type { InputObjectTypeDefinitionNode } from 'graphql'
 // filter had. One reader with a documented blind spot is a reader that will be surprised
 // again.
 
-const WEBAPP_ROOT = path.resolve(__dirname, '../../../webapp')
+const WEBAPP_ROOT = path.resolve(import.meta.dirname, '../../../webapp')
 const SEARCH_DIRS = ['graphql', 'components', 'pages', 'store', 'mixins', 'composables']
 
 const OPERATOR_SUFFIX =
@@ -271,6 +272,7 @@ describe('post filters used by the webapp', () => {
     // (`EXISTS { (post)-[:IS_IN]->() }`) whose flag picks the clause rather than appearing
     // in it. Expressed as a minimum rather than an `if`, so the assertion always runs.
     const boundValuesExpected = VALUE_LESS_FILTERS.has(key) ? 0 : 1
+
     expect(Object.keys(params).length).toBeGreaterThanOrEqual(boundValuesExpected)
   })
 })

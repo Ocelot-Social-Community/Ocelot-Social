@@ -1,6 +1,6 @@
 import { storiesOf } from '@storybook/vue'
 import SearchableInput from './SearchableInput.vue'
-import helpers from '~/storybook/helpers'
+import helpers, { FIXTURE_AVATAR_URL } from '~/storybook/helpers'
 
 helpers.init()
 
@@ -76,36 +76,28 @@ export const searchResults = [
   {
     id: 'u1',
     __typename: 'User',
-    avatar: helpers.avatarImage(
-      'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
-    ),
+    avatar: helpers.avatarImage(FIXTURE_AVATAR_URL),
     name: 'Peter Lustig',
     slug: 'peter-lustig',
   },
   {
     id: 'cdbca762-0632-4564-b646-415a0c42d8b8',
     __typename: 'User',
-    avatar: helpers.avatarImage(
-      'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
-    ),
+    avatar: helpers.avatarImage(FIXTURE_AVATAR_URL),
     name: 'Herbert Schultz',
     slug: 'herbert-schultz',
   },
   {
     id: 'u2',
     __typename: 'User',
-    avatar: helpers.avatarImage(
-      'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
-    ),
+    avatar: helpers.avatarImage(FIXTURE_AVATAR_URL),
     name: 'Bob der Baumeister',
     slug: 'bob-der-baumeister',
   },
   {
     id: '7b654f72-f4da-4315-8bed-39de0859754b',
     __typename: 'User',
-    avatar: helpers.avatarImage(
-      'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
-    ),
+    avatar: helpers.avatarImage(FIXTURE_AVATAR_URL),
     name: 'Tonya Mohr',
     slug: 'tonya-mohr',
   },

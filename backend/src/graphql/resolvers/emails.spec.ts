@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import VerifyNonce from '@graphql/queries/auth/VerifyNonce.gql'
 import AddEmailAddress from '@graphql/queries/users/AddEmailAddress.gql'
@@ -85,6 +87,37 @@ describe('AddEmailAddress', () => {
       })
     })
 
+    // The viewer is authenticated by JWT, which outlives the account: an admin can delete a user
+    // while that user still holds a valid token. MERGE off a MATCH that binds nothing writes no
+    // node at all — so the mutation must say so instead of returning an EmailAddress the request
+    // never created.
+    describe('the authenticated account no longer exists', () => {
+      beforeEach(() => {
+        authenticatedUser = { id: 'ghost-user' } as Context['user']
+      })
+
+      it('throws UserInputError', async () => {
+        await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({
+          data: { AddEmailAddress: null },
+          errors: [{ message: 'User not found.' }],
+        })
+      })
+
+      // The message alone would also be satisfied by a resolver that wrote the node and THEN
+      // failed — and this label carries no uniqueness constraint, so a stray node is not caught
+      // later either: it would sit there unattached, and the address could still be verified
+      // through it. The absence of the node IS the claim the comment above makes.
+      it('writes no `UnverifiedEmailAddress` node', async () => {
+        await mutate({ mutation: AddEmailAddress, variables })
+        const result = await database.neode.cypher(
+          `MATCH (e:UnverifiedEmailAddress { email: "new-email@example.org" }) RETURN e`,
+          {},
+        )
+
+        expect(result.records).toHaveLength(0)
+      })
+    })
+
     describe('email attribute is a valid email', () => {
       it('creates a new unverified `EmailAddress` node', async () => {
         await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({
@@ -114,7 +147,8 @@ describe('AddEmailAddress', () => {
           'e',
           database.neode.model('UnverifiedEmailAddress'),
         )
-        await expect(email.toJson()).resolves.toMatchObject({
+
+        await expect(email?.toJson()).resolves.toMatchObject({
           email: 'new-email@example.org',
           nonce: expect.any(String),
         })
@@ -126,6 +160,7 @@ describe('AddEmailAddress', () => {
             createdAt: '2019-09-24T14:00:01.565Z',
             email: 'new-email@example.org',
           })
+
           await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({
             data: {
               AddEmailAddress: {
@@ -141,6 +176,7 @@ describe('AddEmailAddress', () => {
       describe('but if another user owns an `EmailAddress` already with that email', () => {
         it('does not throw UserInputError', async () => {
           await Factory.build('user', {}, { email: 'new-email@example.org' })
+
           await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({
             data: {
               AddEmailAddress: {
@@ -192,10 +228,13 @@ describe('VerifyEmailAddress', () => {
 
     describe('given a `UnverifiedEmailAddress`', () => {
       let emailAddress
+
       beforeEach(async () => {
         emailAddress = await Factory.build('unverifiedEmailAddress', {
           nonce: '12345',
-          verifiedAt: null,
+          // `verifiedAt: null` used to be here. UnverifiedEmailAddress has no such property —
+          // neode dropped the key, and writing null to Neo4j removes a property anyway, so it
+          // never reached a node either way.
           createdAt: new Date().toISOString(),
           email: 'to-be-verified@example.org',
         })
@@ -204,6 +243,7 @@ describe('VerifyEmailAddress', () => {
       describe('given invalid nonce', () => {
         it('throws UserInputError', async () => {
           variables.nonce = 'asdfgh'
+
           await expect(mutate({ mutation: VerifyEmailAddress, variables })).resolves.toMatchObject({
             data: { VerifyEmailAddress: null },
             errors: [{ message: 'Invalid nonce or no email address found.' }],
@@ -261,7 +301,8 @@ describe('VerifyEmailAddress', () => {
               'e',
               database.neode.model('EmailAddress'),
             )
-            await expect(email.toJson()).resolves.toMatchObject({
+
+            await expect(email?.toJson()).resolves.toMatchObject({
               email: 'to-be-verified@example.org',
             })
           })
@@ -277,13 +318,17 @@ describe('VerifyEmailAddress', () => {
               'e',
               database.neode.model('EmailAddress'),
             )
-            await expect(email.toJson()).resolves.toMatchObject({
+
+            await expect(email?.toJson()).resolves.toMatchObject({
               email: 'user@example.org',
             })
+
             await mutate({ mutation: VerifyEmailAddress, variables })
             result = await database.neode.cypher(cypherStatement, {})
             email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
-            expect(email).toBe(false)
+
+            // `false` was neode's way of saying "no such node"; the fixture API answers null.
+            expect(email).toBeNull()
           })
 
           it('removes previous `EmailAddress` node', async () => {
@@ -297,13 +342,17 @@ describe('VerifyEmailAddress', () => {
               'e',
               database.neode.model('EmailAddress'),
             )
-            await expect(email.toJson()).resolves.toMatchObject({
+
+            await expect(email?.toJson()).resolves.toMatchObject({
               email: 'user@example.org',
             })
+
             await mutate({ mutation: VerifyEmailAddress, variables })
             result = await database.neode.cypher(cypherStatement, {})
             email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
-            expect(email).toBe(false)
+
+            // `false` was neode's way of saying "no such node"; the fixture API answers null.
+            expect(email).toBeNull()
           })
 
           describe('Edge case: In the meantime someone created an `EmailAddress` node with the given email belonging to a user', () => {
@@ -340,7 +389,8 @@ describe('VerifyEmailAddress', () => {
                 'e',
                 database.neode.model('EmailAddress'),
               )
-              await expect(email.toJson()).resolves.toMatchObject({
+
+              await expect(email?.toJson()).resolves.toMatchObject({
                 email: 'to-be-verified@example.org',
               })
             })
@@ -366,6 +416,7 @@ describe('VerifyNonce', () => {
       email: 'to-be-verified@example.org',
       nonce: '12345',
     }
+
     await expect(query({ query: VerifyNonce, variables })).resolves.toMatchObject({
       data: { VerifyNonce: true },
     })
@@ -376,6 +427,7 @@ describe('VerifyNonce', () => {
       email: 'to-be-verified@example.org',
       nonce: '---',
     }
+
     await expect(query({ query: VerifyNonce, variables })).resolves.toMatchObject({
       data: { VerifyNonce: false },
     })

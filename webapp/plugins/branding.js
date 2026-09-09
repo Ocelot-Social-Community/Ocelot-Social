@@ -185,7 +185,6 @@ export default async (context) => {
   if (process.server) {
     // Package subpath (server-only, uses node:fs + node:zlib) required here, inside the bare
     // `process.server` guard, so Nuxt's DefinePlugin folds it out of the client bundle.
-    // eslint-disable-next-line global-require, import/no-unresolved
     const discover = require('@ocelot-social/branding/dist/discover.js')
     try {
       // From privateRuntimeConfig (evaluated at server START), NOT from process.env: the latter is

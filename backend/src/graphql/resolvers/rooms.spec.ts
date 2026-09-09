@@ -2,6 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { PubSub } from 'graphql-subscriptions'
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
+
+import { ROOM_UPDATED } from '@constants/subscriptions'
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
@@ -9,7 +13,7 @@ import Room from '@graphql/queries/messaging/Room.gql'
 import UnreadRooms from '@graphql/queries/messaging/UnreadRooms.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-import { roomUpdatedFilter } from './rooms'
+import roomsResolvers, { roomUpdatedFilter } from './rooms'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -137,6 +141,7 @@ describe('Room', () => {
             },
           })
           roomId = result.data.CreateMessage.room.id
+
           expect(result).toMatchObject({
             errors: undefined,
             data: {
@@ -161,6 +166,7 @@ describe('Room', () => {
               content: 'another message',
             },
           })
+
           expect(result).toMatchObject({
             errors: undefined,
             data: {
@@ -197,6 +203,7 @@ describe('Room', () => {
 
         it('returns the room', async () => {
           const result = await query({ query: Room })
+
           expect(result).toMatchObject({
             errors: undefined,
             data: {
@@ -235,6 +242,7 @@ describe('Room', () => {
 
         it('returns the room', async () => {
           const result = await query({ query: Room })
+
           expect(result).toMatchObject({
             errors: undefined,
             data: {
@@ -288,6 +296,7 @@ describe('Room', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
+
         await expect(
           query({
             query: UnreadRooms,
@@ -335,6 +344,7 @@ describe('Room', () => {
       describe('as chatting user', () => {
         it('has 0 unread rooms', async () => {
           authenticatedUser = await chattingUser.toJson()
+
           await expect(
             query({
               query: UnreadRooms,
@@ -350,6 +360,7 @@ describe('Room', () => {
       describe('as other chatting user', () => {
         it('has 1 unread rooms', async () => {
           authenticatedUser = await otherChattingUser.toJson()
+
           await expect(
             query({
               query: UnreadRooms,
@@ -364,6 +375,7 @@ describe('Room', () => {
         it('when chattingUser is blocked has 0 unread rooms', async () => {
           authenticatedUser = await otherChattingUser.toJson()
           await otherChattingUser.relateTo(chattingUser, 'blocked')
+
           await expect(
             query({
               query: UnreadRooms,
@@ -378,6 +390,7 @@ describe('Room', () => {
         it('when chattingUser is muted has 0 unread rooms', async () => {
           authenticatedUser = await otherChattingUser.toJson()
           await otherChattingUser.relateTo(chattingUser, 'muted')
+
           await expect(
             query({
               query: UnreadRooms,
@@ -393,6 +406,7 @@ describe('Room', () => {
       describe('as not chatting user', () => {
         it('has 2 unread rooms', async () => {
           authenticatedUser = await notChattingUser.toJson()
+
           await expect(
             query({
               query: UnreadRooms,
@@ -524,6 +538,42 @@ describe('Room', () => {
       })
       // Note: offset-based pagination removed in favor of cursor-based (before parameter)
     })
+
+    // `before` IS the cursor — the chat list pages by handing back the sortDate of the oldest
+    // room it already has. Without the condition every "load more" would re-serve page one, and
+    // the client would append the same rooms forever.
+    it('pages backwards from a `before` cursor', async () => {
+      const firstPage = await query({ query: Room, variables: { first: 1 } })
+      const cursor = firstPage.data.Room[0].lastMessageAt as string
+
+      const secondPage = await query({ query: Room, variables: { first: 10, before: cursor } })
+
+      expect(secondPage.errors).toBeUndefined()
+
+      const dates = secondPage.data.Room.map(
+        (room: { lastMessageAt: string }) => room.lastMessageAt,
+      )
+
+      expect(dates.length).toBeGreaterThan(0)
+      expect(dates.every((date: string) => date < cursor)).toBe(true)
+    })
+
+    // The chat list's search box. It matches on the room NAME, which for a direct message is the
+    // other participant's name — a room the current user does not chat in must not surface
+    // through it, so the filter is added to the same authorised match rather than applied after.
+    it('filters the room list by a search term, case-insensitively', async () => {
+      const searchRooms = `
+        query ($search: String) {
+          Room(first: 10, search: $search) { roomName }
+        }`
+
+      const result = await query({ query: searchRooms, variables: { search: 'second' } })
+
+      expect(result.errors).toBeUndefined()
+      expect(result.data.Room.map((room: { roomName: string }) => room.roomName)).toEqual([
+        'Second Chatting User',
+      ])
+    })
   })
 
   describe('query single room', () => {
@@ -536,12 +586,12 @@ describe('Room', () => {
 
     describe('as chatter of room', () => {
       it('returns the room', async () => {
-        expect(
-          await query({
+        await expect(
+          query({
             query: Room,
             variables: { first: 2, offset: 0, id: result.data.Room[0].id },
           }),
-        ).toMatchObject({
+        ).resolves.toMatchObject({
           errors: undefined,
           data: {
             Room: [
@@ -563,12 +613,13 @@ describe('Room', () => {
 
         it('returns no room', async () => {
           authenticatedUser = await notChattingUser.toJson()
-          expect(
-            await query({
+
+          await expect(
+            query({
               query: Room,
               variables: { first: 2, offset: 0, id: result.data.Room[0].id },
             }),
-          ).toMatchObject({
+          ).resolves.toMatchObject({
             errors: undefined,
             data: {
               Room: [],
@@ -589,6 +640,7 @@ describe('Room', () => {
         query: Room,
         variables: { userId: 'other-chatting-user' },
       })
+
       expect(result).toMatchObject({
         errors: undefined,
         data: {
@@ -610,6 +662,7 @@ describe('Room', () => {
         query: Room,
         variables: { userId: 'non-existent-user' },
       })
+
       expect(result).toMatchObject({
         errors: undefined,
         data: {
@@ -652,6 +705,7 @@ describe('Room', () => {
           mutation: CreateGroupRoom,
           variables: { groupId: 'test-group' },
         })
+
         expect(result).toMatchObject({
           errors: undefined,
           data: {
@@ -665,6 +719,7 @@ describe('Room', () => {
             }),
           },
         })
+
         groupRoomId = result.data.CreateGroupRoom.id
       })
 
@@ -673,6 +728,7 @@ describe('Room', () => {
           mutation: CreateGroupRoom,
           variables: { groupId: 'test-group' },
         })
+
         expect(result.data.CreateGroupRoom.id).toBe(groupRoomId)
       })
 
@@ -682,7 +738,9 @@ describe('Room', () => {
           mutation: CreateGroupRoom,
           variables: { groupId: 'test-group' },
         })
+
         expect(result.errors).toBeDefined()
+
         authenticatedUser = await chattingUser.toJson()
       })
     })
@@ -693,6 +751,7 @@ describe('Room', () => {
           query: Room,
           variables: { groupId: 'test-group' },
         })
+
         expect(result).toMatchObject({
           errors: undefined,
           data: {
@@ -711,6 +770,7 @@ describe('Room', () => {
           query: Room,
           variables: { groupId: 'non-existent' },
         })
+
         expect(result).toMatchObject({
           errors: undefined,
           data: {
@@ -722,7 +782,7 @@ describe('Room', () => {
   })
 })
 
-describe('roomUpdatedFilter', () => {
+describe(roomUpdatedFilter, () => {
   it('returns true when payload userId matches context user', () => {
     expect(roomUpdatedFilter({ userId: 'u1' }, {}, { user: { id: 'u1' } })).toBe(true)
   })
@@ -733,5 +793,42 @@ describe('roomUpdatedFilter', () => {
 
   it('returns false when context user is null', () => {
     expect(roomUpdatedFilter({ userId: 'u1' }, {}, { user: null })).toBe(false)
+  })
+})
+
+// The filter above says nothing about whether roomUpdated is attached to it, or to the right
+// channel. A subscription wired to the wrong constant never fires (and nothing fails); one wired
+// without the filter pushes every user's room updates into every open socket.
+describe('Subscription.roomUpdated', () => {
+  it('delivers only the room updates addressed to the subscriber', async () => {
+    const pubsub = new PubSub()
+    const iterator = roomsResolvers.Subscription.roomUpdated.subscribe(
+      null,
+      {},
+      { user: { id: 'u1' }, pubsub },
+      null,
+    )
+    const delivered = iterator.next()
+
+    await pubsub.publish(ROOM_UPDATED, { userId: 'u2', roomUpdated: { id: 'not-mine' } })
+    await pubsub.publish(ROOM_UPDATED, { userId: 'u1', roomUpdated: { id: 'mine' } })
+
+    expect((await delivered).value).toMatchObject({ roomUpdated: { id: 'mine' } })
+
+    await iterator.return?.()
+  })
+})
+
+// Room.roomId is non-null in the schema, and Room nodes do not carry a `roomId` property — so
+// every payload that did NOT come from the Room query (a roomUpdated subscription push, above)
+// depends on this fallback. Returning undefined for a non-null field takes the whole payload
+// down with it.
+describe('Room.roomId', () => {
+  it.each([
+    ['a payload that already carries roomId', { roomId: 'from-payload' }, 'from-payload'],
+    ['a Room node, which only has id', { id: 'from-node' }, 'from-node'],
+    ['a parent with neither', {}, null],
+  ])('resolves %s', (_name, parent, expected) => {
+    expect(roomsResolvers.Room.roomId(parent)).toBe(expected)
   })
 })

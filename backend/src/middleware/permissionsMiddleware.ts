@@ -5,23 +5,43 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-import { rule, shield, deny, allow, or, and } from 'graphql-shield'
+import { createRequire } from 'node:module'
 
 import CONFIG from '@config/index'
-import { getNeode } from '@db/neo4j'
 import { AuthenticationError } from '@graphql/errors'
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { isPermissionAvailable } from '@src/permission'
 import { dominates } from '@src/role'
 
-import type SocialMedia from '@db/models/SocialMedia'
 import type { Context } from '@src/context'
 import type { PermissionKey } from '@src/permission'
+import type {
+  allow as Allow,
+  and as And,
+  deny as Deny,
+  or as Or,
+  rule as Rule,
+  shield as Shield,
+} from 'graphql-shield'
+
+// Loaded through createRequire because graphql-shield 7.6.5's ESM build is broken: `esm/rules.js`
+// does `import { isUndefined } from 'util'`, and Node's `util` ESM namespace has no such export
+// (it is a deprecated CommonJS-only property), so importing the package the normal way throws at
+// load. Its `exports` map offers no subpath, so the working CJS build cannot be addressed
+// directly either. The type import below still comes from the package's own declarations, so
+// this costs no type safety — only the illusion that the package supports ESM.
+// Revisit when graphql-shield ships a fixed ESM build.
+const { rule, shield, deny, allow, or, and } = createRequire(import.meta.url)('graphql-shield') as {
+  rule: typeof Rule
+  shield: typeof Shield
+  deny: typeof Deny
+  allow: typeof Allow
+  or: typeof Or
+  and: typeof And
+}
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true
-
-const neode = getNeode()
 
 const isAuthenticated = rule({
   cache: 'contextual',
@@ -49,7 +69,10 @@ const hasPermission = (permission: PermissionKey) =>
 
 // Flat per-group-type creation rights (mirrors videoCall.create_*): creating a group
 // of a given type needs exactly that type's permission, independent of the others.
-const groupCreatePermissionForType = (groupType: string): PermissionKey | null => {
+// Exported for the drift test in permissionsMiddleware.spec.ts, which asserts that EVERY value of
+// the GroupType enum still maps to a permission. That is what the `default` below is for: a
+// fourth group type added to the schema and not to this switch must be refused, not created.
+export const groupCreatePermissionForType = (groupType: string): PermissionKey | null => {
   switch (groupType) {
     case 'public':
       return 'group.create_public'
@@ -119,21 +142,22 @@ const isMyOwn = rule({
 
 const isMySocialMedia = rule({
   cache: 'no_cache',
-})(async (_, args, { user }: Context) => {
-  // We need a User
+})(async (_, args, context: Context) => {
+  const { user } = context
   if (!user) {
     return false
   }
-  const socialMedia = await neode.find<typeof SocialMedia>('SocialMedia', args.id)
-  // Did we find a social media node?
-  if (!socialMedia) {
-    return false
-  }
-  const socialMediaJson = await socialMedia.toJson() // whats this for?
-
-  // Is it my social media entry?
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (socialMediaJson.ownedBy as any).node.id === user.id
+  // One question, one query: does an OWNED_BY edge run from this entry to the viewer? The
+  // neode version loaded the node, serialised it with its eager `ownedBy` relation and then
+  // compared an id out of that — three round trips for a boolean.
+  const result = await context.database.query({
+    query: `
+      MATCH (socialMedia:SocialMedia {id: $id})-[:OWNED_BY]->(owner:User {id: $userId})
+      RETURN count(owner) > 0 AS isMine
+    `,
+    variables: { id: args.id, userId: user.id },
+  })
+  return Boolean(result.records[0]?.get('isMine'))
 })
 
 const isAllowedToChangeGroupSettings = rule({
@@ -459,7 +483,10 @@ const effectivePermissionsOfUser = async (
             RETURN coalesce(r.name, 'user') AS roleName`,
     variables: { userId },
   })
-  const roleName = (result.records[0]?.get('roleName') as string | undefined) ?? 'user'
+  // Exactly one row, always: an OPTIONAL MATCH that finds nothing still returns a row with a null
+  // `r`, and the coalesce turns that into 'user'. No JS-side fallback needed — the two that used
+  // to be here could not run.
+  const roleName = result.records[0].get('roleName') as string
   return context.role.permissionsForRole(roleName)
 }
 
@@ -471,6 +498,10 @@ const effectivePermissionsOfUser = async (
 // separately via hasPermission(); this rule only enforces the relative ranking.
 const canActOnTargetUser = rule({ cache: 'no_cache' })(async (_parent, args, context: Context) => {
   const targetId = args.id as string | undefined
+  // Fail closed. Every mutation this rule is attached to today declares `id: ID!`, so the schema
+  // makes this unreachable — it is here so that attaching the rule to a mutation whose target
+  // argument is named differently DENIES rather than silently skipping the hierarchy check.
+  /* v8 ignore next 3 -- unreachable while every guarded mutation declares a non-null id */
   if (!targetId) {
     return false
   }
@@ -488,6 +519,9 @@ const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
   context: Context,
 ) => {
   const resourceId = args.resourceId as string | undefined
+  // Same fail-closed guard as canActOnTargetUser: `review(resourceId: ID!)` makes it unreachable
+  // through the schema, and it stays so a differently-named argument denies instead of passing.
+  /* v8 ignore next 3 -- unreachable while review declares a non-null resourceId */
   if (!resourceId) {
     return false
   }
@@ -513,9 +547,9 @@ const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
   if (!(row.get('isUser') as boolean)) {
     return true
   }
-  const targetPermissions = context.role.permissionsForRole(
-    (row.get('roleName') as string | undefined) ?? 'user',
-  )
+  // coalesce() in the statement above already guarantees a name, same as in
+  // effectivePermissionsOfUser.
+  const targetPermissions = context.role.permissionsForRole(row.get('roleName') as string)
   return dominates(context.effectivePermissions, targetPermissions)
 })
 

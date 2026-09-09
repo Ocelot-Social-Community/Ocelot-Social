@@ -1,3 +1,5 @@
+import { describe, beforeEach, afterAll, it, expect } from 'vitest'
+
 import { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
 
@@ -55,6 +57,7 @@ describe('migration: single-role-edges', () => {
 
   it('gives every user exactly one role edge matching their tier', async () => {
     await up(noop)
+
     expect(await rolesOf('admin-id')).toEqual(['admin'])
     expect(await rolesOf('mod-id')).toEqual(['moderator'])
     expect(await rolesOf('member-id')).toEqual(['user']) // baseline gets an explicit edge
@@ -62,12 +65,14 @@ describe('migration: single-role-edges', () => {
 
   it('collapses multiple edges to a single deterministic role', async () => {
     await up(noop)
+
     // owner-first then alphabetical → admin wins over moderator
     expect(await rolesOf('multi-id')).toEqual(['admin'])
   })
 
   it('drops the legacy user.role property', async () => {
     await up(noop)
+
     expect(await legacyRole('admin-id')).toBeNull()
     expect(await legacyRole('member-id')).toBeNull()
   })

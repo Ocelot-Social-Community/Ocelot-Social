@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import type { Context } from '@src/context'
-import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
+import type { IMiddlewareResolver } from 'graphql-middleware/types'
 
 // Moderators (anyone holding content.moderate) may see disabled content; everyone
 // else has it filtered/obfuscated. Resolved from the per-request permission set.

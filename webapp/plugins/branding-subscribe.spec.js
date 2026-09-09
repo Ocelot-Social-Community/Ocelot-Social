@@ -1,4 +1,9 @@
 import brandingSubscribe from './branding-subscribe.js'
+import { reloadPage } from '~/utils/reloadPage'
+
+// The reload is asserted through its module seam: jsdom 26 makes `window.location` non-configurable
+// with a read-only `reload`, so stubbing the global is no longer possible (see utils/reloadPage.js).
+jest.mock('~/utils/reloadPage', () => ({ reloadPage: jest.fn() }))
 
 // Drive the plugin: it registers a store watcher whose getter returns a combined signature of
 // activeBranding + brandingComposition; we capture the callback and invoke it with signatures (built
@@ -22,15 +27,11 @@ function setup(brandingId, brandingComposition = '') {
 }
 
 describe('plugins/branding-subscribe', () => {
-  let reload
+  const reload = reloadPage
 
   beforeEach(() => {
     window.sessionStorage.clear()
-    reload = jest.fn()
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      value: { reload },
-    })
+    reload.mockClear()
   })
 
   it('does nothing while the policy snapshot is still loading (undefined)', () => {
@@ -135,12 +136,11 @@ function setupGetter(brandingId, brandingComposition = '') {
 }
 
 describe('plugins/branding-subscribe (base normalisation)', () => {
-  let reload
+  const reload = reloadPage
 
   beforeEach(() => {
     window.sessionStorage.clear()
-    reload = jest.fn()
-    Object.defineProperty(window, 'location', { configurable: true, value: { reload } })
+    reload.mockClear()
   })
 
   // '@default' is how an explicit "no branding" is stored; the server reports the RESOLVED base ('').

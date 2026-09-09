@@ -106,8 +106,9 @@ export default {
         return reportsTransactionResponse.records.map((record) => record.get('report'))
       })
       try {
-        const reports = await reportsReadTxPromise
-        return reports || []
+        // `records.map(...)` is always an array, so the `|| []` that used to stand here could
+        // not run — an empty result set is already `[]`.
+        return await reportsReadTxPromise
       } finally {
         await session.close()
       }

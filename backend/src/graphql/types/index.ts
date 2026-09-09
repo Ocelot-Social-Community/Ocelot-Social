@@ -14,6 +14,6 @@ import { derivedEnumSDLs } from '@src/graphql/derivedEnums'
 import type { DocumentNode } from 'graphql'
 
 // eslint-disable-next-line n/no-sync
-const typeDefs = loadFilesSync<DocumentNode>(path.join(__dirname, './**/*.gql'))
+const typeDefs = loadFilesSync<DocumentNode>(path.join(import.meta.dirname, './**/*.gql'))
 
 export default mergeTypeDefs([...typeDefs, ...derivedEnumSDLs])

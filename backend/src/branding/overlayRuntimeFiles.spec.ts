@@ -12,9 +12,11 @@ import {
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 
+import { describe, beforeEach, afterEach, it, expect } from 'vitest'
+
 import { overlayBrandRuntimeFiles } from './overlayRuntimeFiles'
 
-describe('overlayBrandRuntimeFiles', () => {
+describe(overlayBrandRuntimeFiles, () => {
   let root: string
   let emailsDir: string
 
@@ -35,6 +37,7 @@ describe('overlayBrandRuntimeFiles', () => {
 
   it('overlays e-mail templates (replacing the default)', () => {
     run([['emails/templates/registration/html.pug', 'p brand registration']])
+
     expect(readFileSync(path.join(emailsDir, 'templates/registration/html.pug'), 'utf8')).toBe(
       'p brand registration',
     )
@@ -51,6 +54,7 @@ describe('overlayBrandRuntimeFiles', () => {
     const merged = JSON.parse(
       readFileSync(path.join(emailsDir, 'locales/en.json'), 'utf8'),
     ) as unknown
+
     expect(merged).toEqual({ greeting: { hello: 'Welcome', bye: 'Bye' }, keep: 'z', extra: 'x' })
   })
 
@@ -59,6 +63,7 @@ describe('overlayBrandRuntimeFiles', () => {
       ['emails/templates/../../evil.pug', 'x'],
       ['emails/locales/../../evil.json', '{}'],
     ])
+
     expect(existsSync(path.join(root, 'evil.pug'))).toBe(false)
     expect(existsSync(path.join(root, 'evil.json'))).toBe(false)
     expect(existsSync(path.join(root, 'emails/evil.pug'))).toBe(false)
@@ -69,6 +74,7 @@ describe('overlayBrandRuntimeFiles', () => {
     const written = JSON.parse(
       readFileSync(path.join(emailsDir, 'locales/eo.json'), 'utf8'),
     ) as unknown
+
     expect(written).toEqual({ greeting: 'Saluton' })
   })
 
@@ -76,6 +82,7 @@ describe('overlayBrandRuntimeFiles', () => {
     const target = path.join(emailsDir, 'locales/en.json')
     writeFileSync(target, JSON.stringify({ greeting: 'Hi' }))
     run([['emails/locales/en.json', '{ not json']])
+
     // Clobbering the default with a broken file would take every e-mail down; skipping keeps the
     // instance sending in its own language, just without the brand's overrides.
     expect(JSON.parse(readFileSync(target, 'utf8')) as unknown).toEqual({ greeting: 'Hi' })
@@ -92,6 +99,7 @@ describe('overlayBrandRuntimeFiles', () => {
       ['public/img/badges/legacy.svg', 'x'],
       ['manifest.json', '{}'],
     ])
+
     expect(readdirSync(root)).toEqual(['emails'])
     expect(readdirSync(emailsDir).sort()).toEqual(['locales', 'templates'])
     expect(readdirSync(path.join(emailsDir, 'templates'))).toEqual([])

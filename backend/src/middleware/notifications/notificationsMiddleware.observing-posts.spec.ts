@@ -1,22 +1,38 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import Factory, { cleanDatabase } from '@db/factories'
-import CreateComment from '@graphql/queries/comments/CreateComment.gql'
-import notifications from '@graphql/queries/notifications/notifications.gql'
-import CreatePost from '@graphql/queries/posts/CreatePost.gql'
-import toggleObservePost from '@graphql/queries/posts/toggleObservePost.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
+
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
-const sendNotificationMailMock: (notification) => void = jest.fn()
-jest.mock('@src/emails/sendEmail', () => ({
+const sendNotificationMailMock: (notification) => void = vi.fn()
+vi.mock('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => {
     sendNotificationMailMock(notification)
   },
+  // ESM links the whole namespace: every named export ANY importer in the graph reaches
+  // for must exist here, or the module fails to link (loginMiddleware pulls the
+  // registration/verification mails in transitively). Under CommonJS a missing key was
+  // simply undefined and only mattered if it was called. The stubs below carry no
+  // behaviour — only the two above are asserted on.
+  defaultParams: vi.fn(),
+  sendChatMessageMail: vi.fn(),
+  sendRegistrationMail: vi.fn(),
+  sendEmailVerification: vi.fn(),
+  sendResetPasswordMail: vi.fn(),
+  sendWrongEmail: vi.fn(),
 }))
+
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
+const { default: Factory, cleanDatabase } = await import('@db/factories')
+const { default: CreateComment } = await import('@graphql/queries/comments/CreateComment.gql')
+const { default: notifications } = await import('@graphql/queries/notifications/notifications.gql')
+const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
+const { default: toggleObservePost } = await import('@graphql/queries/posts/toggleObservePost.gql')
+const { createApolloTestSetup } = await import('@root/test/helpers')
 
 let authenticatedUser: Context['user']
 const policy = { categoriesActive: false }
@@ -135,6 +151,7 @@ describe('notifications for users that observe a post', () => {
 
     it('sends notification to the author', async () => {
       authenticatedUser = await postAuthor.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -169,7 +186,7 @@ describe('notifications for users that observe a post', () => {
 
     describe('second comment on post', () => {
       beforeAll(async () => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         authenticatedUser = await secondCommenter.toJson()
         await mutate({
           mutation: CreateComment,
@@ -197,6 +214,7 @@ describe('notifications for users that observe a post', () => {
 
       it('sends notification to the author', async () => {
         authenticatedUser = await postAuthor.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -229,6 +247,7 @@ describe('notifications for users that observe a post', () => {
 
       it('sends notification to first commenter', async () => {
         authenticatedUser = await firstCommenter.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -270,7 +289,7 @@ describe('notifications for users that observe a post', () => {
 
     describe('first commenter unfollows the post and post author comments post', () => {
       beforeAll(async () => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         authenticatedUser = await firstCommenter.toJson()
         await mutate({
           mutation: toggleObservePost,
@@ -324,6 +343,7 @@ describe('notifications for users that observe a post', () => {
 
       it('sends no new notification to first commenter', async () => {
         authenticatedUser = await firstCommenter.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -348,6 +368,7 @@ describe('notifications for users that observe a post', () => {
 
       it('sends notification to second commenter', async () => {
         authenticatedUser = await secondCommenter.toJson()
+
         await expect(
           query({
             query: notifications,

@@ -7,7 +7,7 @@ if [ "$BRANCH" != "master" ]; then
 fi
 
 CURRENT_VERSION=$(cat package.json  | jq -r .version)
-PUBLISHED_VERSION=$(yarn info @human-connection/styleguide version --silent)
+PUBLISHED_VERSION=$(npm view @human-connection/styleguide version)
 
 if [ "$CURRENT_VERSION" == "$PUBLISHED_VERSION" ]; then
   exit 1

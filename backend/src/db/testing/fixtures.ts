@@ -67,7 +67,7 @@ export interface FixtureApi {
    * tell a read from a write, and the caller that names the wrong door gets a failure — an
    * `ON CREATE SET` sent through a read transaction does not warn, it errors. Routing is the
    * only thing the split would buy, and it buys nothing here: this runs against a single
-   * instance in jest and in the Cypress support process, never against a cluster with read
+   * instance in the test runner and in the Cypress support process, never against a cluster with read
    * replicas.
    *
    * Where the distinction does matter, it is already made: `context.database` exposes `query`

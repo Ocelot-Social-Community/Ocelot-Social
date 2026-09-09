@@ -27,9 +27,9 @@
     }
   },
   "scripts": {
-    "db:seed": "cd backend && yarn run db:seed",
-    "db:reset": "cd backend && yarn run db:reset",
-    "docs:api": "cd backend && yarn run schema:print && ./node_modules/.bin/spectaql --target-dir ../.vuepress/public/api spectaql.yml",
+    "db:seed": "cd backend && npm run db:seed",
+    "db:reset": "cd backend && npm run db:reset",
+    "docs:api": "cd backend && npm run schema:print && ./node_modules/.bin/spectaql --target-dir ../.vuepress/public/api spectaql.yml",
     "docs:build": "NODE_OPTIONS=--openssl-legacy-provider vuepress build .",
     "docs:dev": "NODE_OPTIONS=--openssl-legacy-provider vuepress dev .",
     "cypress:run": "cypress run --e2e --browser electron --config-file ./cypress/cypress.config.js",
@@ -45,19 +45,19 @@
     "@cypress/webpack-preprocessor": "^7.1.2",
     "@vuepress/bundler-vite": "2.0.0-rc.18",
     "auto-changelog": "^2.6.0",
-    "cypress": "^15.21.0",
+    "cypress": "^15.21.1",
     "cypress-network-idle": "^2.0.1",
     "date-fns": "^3.6.0",
     "dotenv": "^17.3.1",
-    "graphql-request": "^2.0.0",
+    "graphql-request": "^7.4.0",
     "mock-socket": "^9.0.3",
-    "multiple-cucumber-html-reporter": "^4.2.0",
+    "multiple-cucumber-html-reporter": "^4.3.0",
     "node-polyfill-webpack-plugin": "^4.1.0",
-    "sass-embedded": "^1.102.0",
+    "sass-embedded": "^1.103.1",
     "vuepress": "2.0.0-rc.18",
     "vuepress-plugin-search-pro": "2.0.0-rc.59",
     "vuepress-theme-hope": "2.0.0-rc.59",
-    "webpack": "^5.109.2"
+    "webpack": "^5.110.3"
   },
   "resolutions": {
     "set-value": "^2.0.1",

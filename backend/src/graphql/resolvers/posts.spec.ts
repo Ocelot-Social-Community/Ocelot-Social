@@ -3,7 +3,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable jest/no-commented-out-tests */
+/* eslint-disable vitest/no-commented-out-tests */
+import { parse } from 'graphql'
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { assignRoleEdge, cleanDatabase } from '@db/factories'
 import AddPostEmotions from '@graphql/queries/emotions/AddPostEmotions.gql'
 import PostsEmotionsByCurrentUser from '@graphql/queries/emotions/PostsEmotionsByCurrentUser.gql'
@@ -57,6 +60,18 @@ afterAll(() => {
 const categoryIds = ['cat9', 'cat4', 'cat15']
 let variables
 
+// CreatePost.gql does not pass an image, so the create mutation's image branch has no
+// document to travel through. This variant supplies one, which keeps that branch tested
+// through the real schema (input coercion, transaction, rollback) rather than by calling
+// the resolver by hand.
+const CreatePostWithImage = parse(`
+  mutation CreatePostWithImage($title: String!, $content: String!, $image: ImageInput) {
+    CreatePost(title: $title, content: $content, image: $image) {
+      id
+    }
+  }
+`)
+
 beforeEach(async () => {
   policy = { ...defaultPolicy }
   variables = {}
@@ -103,6 +118,7 @@ afterEach(async () => {
 describe('Post', () => {
   describe('can be filtered', () => {
     let followedUser, happyPost, cryPost
+
     beforeEach(async () => {
       ;[followedUser] = await Promise.all([
         Factory.build(
@@ -136,6 +152,7 @@ describe('Post', () => {
     describe('no filter', () => {
       it('returns all posts', async () => {
         variables = { filter: {} }
+
         await expect(query({ query: Post, variables })).resolves.toMatchObject({
           data: {
             Post: expect.arrayContaining([
@@ -189,6 +206,7 @@ describe('Post', () => {
         }
         await user.relateTo(happyPost, 'emoted', { emotion: 'happy' })
         variables = { ...variables, filter: { emotions_some: { emotion_in: ['happy'] } } }
+
         await expect(query({ query: Post, variables })).resolves.toMatchObject(expected)
       })
 
@@ -212,6 +230,7 @@ describe('Post', () => {
         await user.relateTo(happyPost, 'emoted', { emotion: 'happy' })
         await user.relateTo(cryPost, 'emoted', { emotion: 'cry' })
         variables = { ...variables, filter: { emotions_some: { emotion_in: ['happy', 'cry'] } } }
+
         await expect(query({ query: Post, variables })).resolves.toMatchObject({
           data: {
             Post: expect.arrayContaining([
@@ -233,6 +252,7 @@ describe('Post', () => {
     it('by followed-by', async () => {
       await user.relateTo(followedUser, 'following')
       variables = { filter: { author: { followedBy_some: { id: 'current-user' } } } }
+
       await expect(query({ query: Post, variables })).resolves.toMatchObject({
         data: {
           Post: [
@@ -297,6 +317,7 @@ describe('Post', () => {
       }
       const { data } = await query({ query: Post, variables })
       const ids = data?.Post.map((post: { id: string }) => post.id)
+
       expect(ids).toEqual(
         expect.arrayContaining([
           'future-event',
@@ -313,6 +334,7 @@ describe('Post', () => {
       variables = {
         filter: { postType_in: ['Event'], eventStart_gte: 'not-a-date' },
       }
+
       await expect(query({ query: Post, variables })).resolves.toMatchObject({
         errors: [{ message: 'eventStart_gte is invalid' }],
       })
@@ -327,6 +349,7 @@ describe('Post', () => {
       }
       const { data } = await query({ query: Post, variables })
       const ids = data?.Post.map((post: { id: string }) => post.id)
+
       // Only 'future-event' satisfies both sides: it's named in the client's
       // OR *and* passes the date filter. 'ended-event' is named in the OR
       // but excluded by the date filter. Any other non-past event (e.g.
@@ -340,6 +363,7 @@ describe('Post', () => {
       variables = { filter: { postType_in: ['Event'] } }
       const { data } = await query({ query: Post, variables })
       const ids = data?.Post.map((post: { id: string }) => post.id)
+
       expect(ids).toEqual(
         expect.arrayContaining([
           'future-event',
@@ -368,6 +392,7 @@ describe('CreatePost', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: CreatePost, variables })
+
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -382,6 +407,7 @@ describe('CreatePost', () => {
         data: { CreatePost: { title: 'I am a title', content: 'Some content' } },
         errors: undefined,
       }
+
       await expect(mutate({ mutation: CreatePost, variables })).resolves.toMatchObject(expected)
     })
 
@@ -397,17 +423,59 @@ describe('CreatePost', () => {
         },
         errors: undefined,
       }
+
       await expect(mutate({ mutation: CreatePost, variables })).resolves.toMatchObject(expected)
     })
 
     it('`disabled` and `deleted` default to `false`', async () => {
       const expected = { data: { CreatePost: { disabled: false, deleted: false } } }
+
       await expect(mutate({ mutation: CreatePost, variables })).resolves.toMatchObject(expected)
     })
 
     it('has label "Article" as default', async () => {
       await expect(mutate({ mutation: CreatePost, variables })).resolves.toMatchObject({
         data: { CreatePost: { postType: ['Article'] } },
+      })
+    })
+
+    describe('with image metadata but no uploaded file', () => {
+      it('reports the missing file and rolls the post back', async () => {
+        // The image is merged INSIDE the create transaction. mergeImage refuses metadata for
+        // an image that does not exist yet, and because that throw happens inside the
+        // transaction the post has to go with it: a post left behind by a failed create is
+        // invisible to its author (no response ever carried its id) but shows up in the feed.
+        const { errors } = await mutate({
+          mutation: CreatePostWithImage,
+          variables: {
+            title: 'I am a title',
+            content: 'Some content',
+            image: { alt: 'metadata without a file' },
+          },
+        })
+
+        expect(errors?.[0]).toHaveProperty('message', 'Cannot find image for given resource')
+
+        await expect(query({ query: Post, variables: {} })).resolves.toMatchObject({
+          data: { Post: [] },
+        })
+      })
+
+      it('does not mistake the failure for a duplicate slug', async () => {
+        // The catch around the create translates exactly ONE driver error code into a user
+        // error ("slug already exists"). Anything else must keep its own message — telling an
+        // author their title is taken when the real problem is a missing file sends them
+        // renaming a post that would never have been saved either way.
+        const { errors } = await mutate({
+          mutation: CreatePostWithImage,
+          variables: {
+            title: 'I am a title',
+            content: 'Some content',
+            image: { alt: 'metadata without a file' },
+          },
+        })
+
+        expect(errors?.[0].message).not.toMatch(/slug already exists/)
       })
     })
 
@@ -478,6 +546,7 @@ describe('CreatePost', () => {
         it('throws an error', async () => {
           const now = new Date()
           const eventStart = new Date(now.getFullYear(), now.getMonth() - 1).toISOString()
+
           await expect(
             mutate({
               mutation: CreatePost,
@@ -502,6 +571,7 @@ describe('CreatePost', () => {
       describe('with event start date in the past', () => {
         it('is accepted', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: CreatePost,
@@ -523,6 +593,7 @@ describe('CreatePost', () => {
       describe('with valid start date and invalid end date', () => {
         it('throws an error', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: CreatePost,
@@ -549,6 +620,7 @@ describe('CreatePost', () => {
         it('throws an error', async () => {
           const now = new Date()
           const eventEnd = new Date(now.getFullYear(), now.getMonth() + 2).toISOString()
+
           await expect(
             mutate({
               mutation: CreatePost,
@@ -574,6 +646,7 @@ describe('CreatePost', () => {
       describe('with valid start date and end date before start date', () => {
         it('throws an error', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: CreatePost,
@@ -599,6 +672,7 @@ describe('CreatePost', () => {
       describe('with valid start date and valid end date', () => {
         it('creates the event', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: CreatePost,
@@ -628,6 +702,7 @@ describe('CreatePost', () => {
       describe('with valid start date and event is online', () => {
         it('creates the event', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: CreatePost,
@@ -656,6 +731,7 @@ describe('CreatePost', () => {
       describe('event location name is given but event venue is missing', () => {
         it('throws an error', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: CreatePost,
@@ -681,6 +757,7 @@ describe('CreatePost', () => {
       describe('event location coordinates are out of range', () => {
         it('rejects an out-of-range latitude before any reverse-geocoding happens', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: CreatePost,
@@ -707,6 +784,7 @@ describe('CreatePost', () => {
 
         it('rejects an out-of-range longitude before any reverse-geocoding happens', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: CreatePost,
@@ -733,6 +811,7 @@ describe('CreatePost', () => {
 
         it('rejects lat given without lng, instead of silently discarding it', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: CreatePost,
@@ -760,6 +839,7 @@ describe('CreatePost', () => {
       describe('valid event input without location', () => {
         it('has label "Event" set', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: CreatePost,
@@ -787,6 +867,7 @@ describe('CreatePost', () => {
       describe('valid event input with location name', () => {
         it('has label "Event" set', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: CreatePost,
@@ -821,6 +902,7 @@ describe('CreatePost', () => {
       describe('valid event input with location name and precise coordinates (e.g. a dropped map pin)', () => {
         it('reverse-geocodes the coordinates instead of forward-geocoding the name text, keeping the exact picked point', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: CreatePost,
@@ -871,6 +953,7 @@ describe('CreatePost', () => {
 
 describe('UpdatePost', () => {
   let author, newlyCreatedPost
+
   beforeEach(async () => {
     author = await Factory.build('user', { slug: 'the-author' })
     authenticatedUser = await author.toJson()
@@ -893,6 +976,7 @@ describe('UpdatePost', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       authenticatedUser = null
+
       await expect(mutate({ mutation: UpdatePost, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
         data: { UpdatePost: null },
@@ -907,6 +991,7 @@ describe('UpdatePost', () => {
 
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: UpdatePost, variables })
+
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -921,6 +1006,7 @@ describe('UpdatePost', () => {
         data: { UpdatePost: { id: newlyCreatedPost.id, content: 'New content' } },
         errors: undefined,
       }
+
       await expect(mutate({ mutation: UpdatePost, variables })).resolves.toMatchObject(expected)
     })
 
@@ -935,6 +1021,7 @@ describe('UpdatePost', () => {
         },
         errors: undefined,
       }
+
       await expect(mutate({ mutation: UpdatePost, variables })).resolves.toMatchObject(expected)
     })
 
@@ -942,9 +1029,49 @@ describe('UpdatePost', () => {
       const {
         data: { UpdatePost: UpdatePostData },
       } = (await mutate({ mutation: UpdatePost, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+
       expect(UpdatePostData.updatedAt).toBeTruthy()
       expect(Date.parse(UpdatePostData.updatedAt)).toEqual(expect.any(Number))
       expect(newlyCreatedPost.updatedAt).not.toEqual(UpdatePostData.updatedAt)
+    })
+
+    // An explicit `null` image is "remove the picture", and it is a different input from omitting
+    // the field: omitted means "leave it alone". Sending the wrong one of the two either keeps a
+    // picture the author asked to remove, or drops one they never touched.
+    it('removes the hero image when it is explicitly set to null', async () => {
+      await database.write({
+        query: `MATCH (post:Post { id: $id })
+                MERGE (post)-[:HERO_IMAGE]->(:Image { url: '/uploads/hero.jpg' })
+                RETURN post { .id }`,
+        variables: { id: newlyCreatedPost.id },
+      })
+
+      const { errors } = await mutate({
+        mutation: UpdatePost,
+        variables: { ...variables, image: null },
+      })
+
+      expect(errors).toBeUndefined()
+
+      const { records } = await database.query({
+        query: `MATCH (post:Post { id: $id })
+                RETURN size([(post)-[:HERO_IMAGE]->(:Image) | 1]) AS images`,
+        variables: { id: newlyCreatedPost.id },
+      })
+
+      expect(records[0].get('images').toNumber()).toBe(0)
+    })
+
+    it('reports image metadata sent for a post that has no image', async () => {
+      // Same one-code translation as on create: only the uniqueness violation becomes
+      // "slug already exists". A missing image must not be reported as a title clash, or the
+      // author edits the one thing that was never wrong.
+      const { errors } = await mutate({
+        mutation: UpdatePost,
+        variables: { ...variables, image: { alt: 'metadata without a file' } },
+      })
+
+      expect(errors?.[0]).toHaveProperty('message', 'Cannot find image for given resource')
     })
 
     describe('no new category ids provided for update', () => {
@@ -958,6 +1085,7 @@ describe('UpdatePost', () => {
           },
           errors: undefined,
         }
+
         await expect(mutate({ mutation: UpdatePost, variables })).resolves.toMatchObject(expected)
       })
     })
@@ -977,6 +1105,7 @@ describe('UpdatePost', () => {
           },
           errors: undefined,
         }
+
         await expect(mutate({ mutation: UpdatePost, variables })).resolves.toMatchObject(expected)
       })
     })
@@ -1025,6 +1154,7 @@ describe('UpdatePost', () => {
       describe('with event start date in the past', () => {
         it('is accepted', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: UpdatePost,
@@ -1046,6 +1176,7 @@ describe('UpdatePost', () => {
       describe('event location name is given but event venue is missing', () => {
         it('throws an error', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: UpdatePost,
@@ -1071,6 +1202,7 @@ describe('UpdatePost', () => {
       describe('valid event input without location name', () => {
         it('has label "Event" set', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: UpdatePost,
@@ -1097,6 +1229,7 @@ describe('UpdatePost', () => {
       describe('valid event input with location name', () => {
         it('has label "Event" set', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: UpdatePost,
@@ -1131,6 +1264,7 @@ describe('UpdatePost', () => {
       describe('valid event input with location name and precise coordinates (e.g. a dropped map pin)', () => {
         it('reverse-geocodes the coordinates instead of forward-geocoding the name text, keeping the exact picked point', async () => {
           const now = new Date()
+
           await expect(
             mutate({
               mutation: UpdatePost,
@@ -1181,6 +1315,7 @@ describe('UpdatePost', () => {
 
 describe('push posts', () => {
   let author
+
   beforeEach(async () => {
     author = await Factory.build('user', { slug: 'the-author' })
     await Factory.build(
@@ -1218,6 +1353,7 @@ describe('push posts', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       authenticatedUser = null
+
       await expect(
         mutate({ mutation: pushPost, variables: { id: 'pSecond' } }),
       ).resolves.toMatchObject({
@@ -1240,6 +1376,7 @@ describe('push posts', () => {
 
   describe('moderators', () => {
     let moderator
+
     beforeEach(async () => {
       moderator = await assignRoleEdge(user, 'moderator')
       authenticatedUser = await moderator.toJson()
@@ -1257,6 +1394,7 @@ describe('push posts', () => {
 
   describe('admins', () => {
     let admin
+
     beforeEach(async () => {
       admin = await Factory.build('user', {
         id: 'admin',
@@ -1313,12 +1451,23 @@ describe('push posts', () => {
         },
       })
     })
+
+    it('reports a post id that matches nothing', async () => {
+      // The write MATCHes the post, so a stale id (a post deleted while the moderation list
+      // was open) simply updates nothing. Without the row check the mutation would answer
+      // with `undefined` for a field the schema declares as a Post — a null the client reads
+      // as "pushed, nothing to show".
+      const { errors } = await mutate({ mutation: pushPost, variables: { id: 'no-such-post' } })
+
+      expect(errors?.[0]).toHaveProperty('message', 'Could not find Post')
+    })
   })
 })
 
 describe('unpush posts', () => {
   let author
   let admin
+
   beforeEach(async () => {
     author = await Factory.build('user', { slug: 'the-author' })
     await Factory.build(
@@ -1363,6 +1512,7 @@ describe('unpush posts', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       authenticatedUser = null
+
       await expect(
         mutate({ mutation: unpushPost, variables: { id: 'pSecond' } }),
       ).resolves.toMatchObject({
@@ -1375,6 +1525,7 @@ describe('unpush posts', () => {
   describe('ordinary users', () => {
     it('throws authorization error', async () => {
       authenticatedUser = await user.toJson()
+
       await expect(
         mutate({ mutation: unpushPost, variables: { id: 'pSecond' } }),
       ).resolves.toMatchObject({
@@ -1386,6 +1537,7 @@ describe('unpush posts', () => {
 
   describe('moderators', () => {
     let moderator
+
     beforeEach(async () => {
       moderator = await assignRoleEdge(user, 'moderator')
       authenticatedUser = await moderator.toJson()
@@ -1404,6 +1556,7 @@ describe('unpush posts', () => {
   describe('admins', () => {
     it('cancels the push of the post and puts it in the original order', async () => {
       authenticatedUser = await admin.toJson()
+
       await expect(
         query({ query: Post, variables: { orderBy: ['sortDate_desc'] } }),
       ).resolves.toMatchObject({
@@ -1451,11 +1604,20 @@ describe('unpush posts', () => {
         },
       })
     })
+
+    it('reports a post id that matches nothing', async () => {
+      authenticatedUser = await admin.toJson()
+
+      const { errors } = await mutate({ mutation: unpushPost, variables: { id: 'no-such-post' } })
+
+      expect(errors?.[0]).toHaveProperty('message', 'Could not find Post')
+    })
   })
 })
 
 describe('pin posts', () => {
   let author
+
   beforeEach(async () => {
     author = await Factory.build('user', { slug: 'the-author' })
     await Factory.build(
@@ -1478,6 +1640,7 @@ describe('pin posts', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       authenticatedUser = null
+
       await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
         data: { pinPost: null },
@@ -1496,6 +1659,7 @@ describe('pin posts', () => {
 
   describe('moderators', () => {
     let moderator
+
     beforeEach(async () => {
       moderator = await assignRoleEdge(user, 'moderator')
       authenticatedUser = await moderator.toJson()
@@ -1511,6 +1675,7 @@ describe('pin posts', () => {
 
   describe('admins', () => {
     let admin
+
     beforeEach(async () => {
       admin = await user.update({
         name: 'Admin',
@@ -1594,6 +1759,7 @@ describe('pin posts', () => {
             },
             errors: undefined,
           }
+
           await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject(expected)
         })
 
@@ -1603,12 +1769,14 @@ describe('pin posts', () => {
             data: { pinPost: { pinned: true } },
             errors: undefined,
           }
+
           await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject(expected)
         })
       })
 
       describe('post created by another admin', () => {
         let otherAdmin
+
         beforeEach(async () => {
           otherAdmin = await Factory.build('user', {
             role: 'admin',
@@ -1675,6 +1843,7 @@ describe('pin posts', () => {
 
       describe('pinned post already exists', () => {
         let pinnedPost
+
         beforeEach(async () => {
           await Factory.build(
             'post',
@@ -1691,10 +1860,13 @@ describe('pin posts', () => {
         it('removes previous `pinned` attribute', async () => {
           const cypher = 'MATCH (post:Post) WHERE post.pinned IS NOT NULL RETURN post'
           pinnedPost = await database.neode.cypher(cypher, {})
+
           expect(pinnedPost.records).toHaveLength(1)
+
           variables = { ...variables, id: 'only-pinned-post' }
           await mutate({ mutation: pinPost, variables })
           pinnedPost = await database.neode.cypher(cypher, {})
+
           expect(pinnedPost.records).toHaveLength(1)
         })
 
@@ -1705,6 +1877,7 @@ describe('pin posts', () => {
             `MATCH (:User)-[pinned:PINNED]->(post:Post) RETURN post, pinned`,
             {},
           )
+
           expect(pinnedPost.records).toHaveLength(1)
         })
       })
@@ -2105,6 +2278,7 @@ describe('pin posts', () => {
 
 describe('unpin posts', () => {
   let pinnedPost
+
   beforeEach(async () => {
     pinnedPost = await Factory.build('post', { id: 'post-to-be-unpinned' })
     variables = {
@@ -2115,6 +2289,7 @@ describe('unpin posts', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       authenticatedUser = null
+
       await expect(mutate({ mutation: unpinPost, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
         data: { unpinPost: null },
@@ -2133,6 +2308,7 @@ describe('unpin posts', () => {
 
   describe('moderators cannot unpin posts', () => {
     let moderator
+
     beforeEach(async () => {
       moderator = await assignRoleEdge(user, 'moderator')
       authenticatedUser = await moderator.toJson()
@@ -2148,6 +2324,7 @@ describe('unpin posts', () => {
 
   describe('admin can unpin posts', () => {
     let admin
+
     beforeEach(async () => {
       admin = await user.update({
         name: 'Admin',
@@ -2184,6 +2361,7 @@ describe('unpin posts', () => {
         },
         errors: undefined,
       }
+
       await expect(mutate({ mutation: unpinPost, variables })).resolves.toMatchObject(expected)
     })
   })
@@ -2215,6 +2393,7 @@ describe('DeletePost', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: DeletePost, variables })
+
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -2226,6 +2405,7 @@ describe('DeletePost', () => {
 
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: DeletePost, variables })
+
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -2247,6 +2427,7 @@ describe('DeletePost', () => {
           },
         },
       }
+
       await expect(mutate({ mutation: DeletePost, variables })).resolves.toMatchObject(expected)
     })
 
@@ -2281,6 +2462,7 @@ describe('DeletePost', () => {
             },
           },
         }
+
         await expect(mutate({ mutation: DeletePost, variables })).resolves.toMatchObject(expected)
       })
     })
@@ -2347,6 +2529,7 @@ describe('emotions', () => {
             },
           },
         }
+
         await expect(mutate({ mutation: AddPostEmotions, variables })).resolves.toEqual(
           expect.objectContaining(expected),
         )
@@ -2364,6 +2547,7 @@ describe('emotions', () => {
         }
         await mutate({ mutation: AddPostEmotions, variables })
         await mutate({ mutation: AddPostEmotions, variables })
+
         await expect(
           query({ query: Post, variables: postsEmotionsQueryVariables }),
         ).resolves.toMatchObject(expected)
@@ -2385,6 +2569,7 @@ describe('emotions', () => {
         await mutate({ mutation: AddPostEmotions, variables })
         variables = { ...variables, data: { emotion: 'surprised' } }
         await mutate({ mutation: AddPostEmotions, variables })
+
         await expect(
           query({ query: Post, variables: postsEmotionsQueryVariables }),
         ).resolves.toMatchObject(expected)
@@ -2406,6 +2591,7 @@ describe('emotions', () => {
             },
           },
         }
+
         await expect(mutate({ mutation: AddPostEmotions, variables })).resolves.toEqual(
           expect.objectContaining(expected),
         )
@@ -2415,6 +2601,7 @@ describe('emotions', () => {
 
   describe('RemovePostEmotions', () => {
     let removePostEmotionsVariables, postsEmotionsQueryVariables
+
     beforeEach(async () => {
       await author.relateTo(postToEmote, 'emoted', { emotion: 'happy' })
       await user.relateTo(postToEmote, 'emoted', { emotion: 'cry' })
@@ -2436,6 +2623,7 @@ describe('emotions', () => {
           mutation: RemovePostEmotions,
           variables: removePostEmotionsVariables,
         })
+
         expect(removePostEmotions.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -2451,6 +2639,7 @@ describe('emotions', () => {
             mutation: RemovePostEmotions,
             variables: removePostEmotionsVariables,
           })
+
           expect(removePostEmotions).toEqual(
             expect.objectContaining({ data: { RemovePostEmotions: null } }),
           )
@@ -2472,6 +2661,7 @@ describe('emotions', () => {
               },
             },
           }
+
           await expect(
             mutate({
               mutation: RemovePostEmotions,
@@ -2489,6 +2679,7 @@ describe('emotions', () => {
             mutation: RemovePostEmotions,
             variables: removePostEmotionsVariables,
           })
+
           await expect(
             query({ query: Post, variables: postsEmotionsQueryVariables }),
           ).resolves.toMatchObject(expectedResponse)
@@ -2514,6 +2705,7 @@ describe('emotions', () => {
     describe('PostsEmotionsCountByEmotion', () => {
       it("returns a post's emotions count", async () => {
         const expectedResponse = { data: { PostsEmotionsCountByEmotion: 1 } }
+
         await expect(
           query({
             query: PostsEmotionsCountByEmotion,
@@ -2531,6 +2723,7 @@ describe('emotions', () => {
 
         it("returns a currentUser's emotions on a post", async () => {
           const expectedResponse = { data: { PostsEmotionsByCurrentUser: ['cry'] } }
+
           await expect(
             query({
               query: PostsEmotionsByCurrentUser,

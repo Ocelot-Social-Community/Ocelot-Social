@@ -209,16 +209,16 @@ Prepare database once before you start by running the following command in a sec
 
 ```bash
 # in main folder while docker compose is up
-$ docker compose exec backend yarn run db:migrate init
-$ docker compose exec backend yarn run db:migrate up
+$ docker compose exec backend npm run db:migrate -- init
+$ docker compose exec backend npm run db:migrate -- up
 ```
 
 Then clear and seed database by running the following command as well in the second terminal:
 
 ```bash
 # in main folder while docker compose is up
-$ docker compose exec backend yarn run db:reset
-$ docker compose exec backend yarn run db:seed
+$ docker compose exec backend npm run db:reset
+$ docker compose exec backend npm run db:seed
 ```
 
 For a closer description see [backend](./backend/README.md).  
@@ -243,15 +243,15 @@ Please run the following commands before you push:
 
 ```bash
 # in folder backend/
-$ yarn lint --fix
-$ yarn test
+$ npm run lint -- --fix
+$ npm test
 ```
 
 ```bash
 # in folder webapp/
-$ yarn lint --fix
-$ yarn locales --fix
-$ yarn test
+$ npm run lint -- --fix
+$ npm run locales -- --fix
+$ npm test
 ```
 
 Check out our [contribution guideline](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/CONTRIBUTING.md), too!

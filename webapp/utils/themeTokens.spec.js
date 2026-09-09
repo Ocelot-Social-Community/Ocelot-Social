@@ -1,29 +1,18 @@
+/**
+ * Runs in the plain `node` environment on purpose: these helpers guard their DOM access with
+ * `typeof document === 'undefined'` (the SSR branch), and without a global `document` that branch is
+ * simply the default here. The suite never needs a real DOM — every test passes its own document /
+ * element stand-in — and jsdom 26 no longer allows deleting the global to reach the branch from the
+ * jsdom environment. Verified by removing the guards from the source: the "no document" tests fail.
+ *
+ * @jest-environment node
+ */
 import {
   discoverThemeTokens,
   effectiveThemeValue,
   groupThemeTokens,
   summarizeStylesheet,
 } from './themeTokens.js'
-
-/**
- * Runs `fn` with no global `document`, which is the only way to reach the SSR branch of these helpers:
- * jest-environment-jsdom always provides one, so passing `null` merely falls through to the real
- * `document` and the assertion then holds for the wrong reason — an empty `styleSheets` list, or
- * whatever `getComputedStyle` returns for an unknown property. Verified by deleting the
- * `typeof document === 'undefined'` guard from the source: both "no document" tests stayed green.
- *
- * The guards use `typeof document`, not a bare reference, precisely so this stays a ReferenceError-free
- * check once the global is gone.
- */
-function withoutDocument(fn) {
-  const descriptor = Object.getOwnPropertyDescriptor(global, 'document')
-  delete global.document
-  try {
-    fn()
-  } finally {
-    Object.defineProperty(global, 'document', descriptor)
-  }
-}
 
 // Minimal CSSOM stand-ins: a rule exposes `selectorText`, and `style` is both iterable over its
 // property names and answers getPropertyValue — the two things the collector touches.
@@ -98,9 +87,7 @@ describe('discoverThemeTokens', () => {
   })
 
   it('returns an empty map when there is no document (SSR)', () => {
-    withoutDocument(() => {
-      expect(discoverThemeTokens(null)).toEqual({})
-    })
+    expect(discoverThemeTokens(null)).toEqual({})
   })
 
   it('tolerates a document without styleSheets', () => {
@@ -126,9 +113,7 @@ describe('effectiveThemeValue', () => {
   })
 
   it('is safe without a document', () => {
-    withoutDocument(() => {
-      expect(effectiveThemeValue('x', null)).toBe('')
-    })
+    expect(effectiveThemeValue('x', null)).toBe('')
   })
 
   it('is safe where getComputedStyle does not exist', () => {

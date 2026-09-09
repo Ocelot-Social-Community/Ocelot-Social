@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import SignupVerification from '@graphql/queries/auth/SignupVerification.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
@@ -501,6 +503,7 @@ describe('slugifyMiddleware', () => {
           content: 'Some edited content',
         }
         await mutate({ mutation: UpdatePost, variables: editVariables })
+
         await expect(
           mutate({ mutation: UpdatePost, variables: editVariables }),
         ).resolves.toMatchObject({

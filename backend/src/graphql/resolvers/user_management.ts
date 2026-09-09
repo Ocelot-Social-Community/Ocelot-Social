@@ -4,15 +4,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import bcrypt from 'bcryptjs'
 
-import { getNeode } from '@db/neo4j'
 import { AuthenticationError } from '@graphql/errors'
 import { encode } from '@jwt/encode'
 
 import normalizeEmail from './helpers/normalizeEmail'
 
 import type { Context } from '@src/context'
-
-const neode = getNeode()
 
 export default {
   Query: {
@@ -73,9 +70,15 @@ export default {
         throw new Error('Missing authenticated user.')
       }
       const { user } = context
-      const currentUser = await neode.find('User', user.id)
+      const stored = await context.database.query({
+        query: 'MATCH (user:User {id: $id}) RETURN user.encryptedPassword AS encryptedPassword',
+        variables: { id: user.id },
+      })
+      const encryptedPassword = stored.records[0]?.get('encryptedPassword') as string | undefined
+      if (!encryptedPassword) {
+        throw new AuthenticationError('Old password is not correct')
+      }
 
-      const encryptedPassword = currentUser.get<string>('encryptedPassword')
       if (!(await bcrypt.compare(oldPassword, encryptedPassword))) {
         throw new AuthenticationError('Old password is not correct')
       }
@@ -85,12 +88,20 @@ export default {
       }
 
       const newEncryptedPassword = await bcrypt.hash(newPassword, 10)
-      await currentUser.update({
-        encryptedPassword: newEncryptedPassword,
-        updatedAt: new Date().toISOString(),
+      // `updatedAt` is written the way every other resolver writes it. neode used
+      // `new Date().toISOString()`, which differs in the fractional digits only — both forms
+      // satisfy db/schema's ISO_DATE_TIME, and the two spellings already coexist in the data.
+      const updated = await context.database.write({
+        query: `
+          MATCH (user:User {id: $id})
+          SET user.encryptedPassword = $encryptedPassword,
+              user.updatedAt = toString(datetime())
+          RETURN user {.*}
+        `,
+        variables: { id: user.id, encryptedPassword: newEncryptedPassword },
       })
 
-      return encode(context)(await currentUser.toJson())
+      return encode(context)(updated.records[0].get('user'))
     },
   },
 }

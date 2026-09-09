@@ -10,6 +10,13 @@ import layout from './layout.vue'
 import locales from '~/locales/index.js'
 import '~/plugins/v-tooltip'
 
+// Local stand-ins for the photos the stories used to pull off the public internet. Served by
+// Storybook from storybook/fixtures/ (see main.js staticDirs) — committed, byte-identical on every
+// machine, and available with the network switched off.
+export const FIXTURE_AVATAR_URL = '/storybook-fixtures/avatar.png'
+export const FIXTURE_POST_IMAGE_URL = '/storybook-fixtures/post-image.png'
+export const FIXTURE_EMBED_PREVIEW_URL = '/storybook-fixtures/embed-preview.png'
+
 const helpers = {
   // Populated by story files before mount (e.g. FollowList.story.js), keyed by the fake userId each
   // story uses: { [userId]: [{ id, name, slug, ... }, ...] }. Read by the $apollo mock's
@@ -107,7 +114,10 @@ const helpers = {
           return {
             data: {
               embed: {
-                image: 'https://i.ytimg.com/vi/ptCcgLM-p8k/maxresdefault_live.jpg',
+                // Local, like every other image a story renders: the Editor and CommentCard
+                // visual tests screenshot this preview, so a youtube thumbnail url would tie
+                // those baselines to i.ytimg.com being reachable.
+                image: FIXTURE_EMBED_PREVIEW_URL,
                 title: 'Video Titel',
                 description: 'Video Description',
                 url: 'https://www.youtube.com/watch?v=qkdXAtO40Fo',
@@ -205,8 +215,20 @@ const helpers = {
   // image.w320/w640/w1024 — a bare `{ url }` fixture renders `srcset="undefined 320w, ..."`, which
   // the browser prefers over `src` and then 404s. None of the fixed test images below are served in
   // multiple sizes, so every breakpoint just points at the same url.
-  avatarImage(url) {
+  //
+  // Always pass one of the local FIXTURE_* urls below, never a url on someone else's server: the
+  // visual regression suite screenshots these stories, so a remote image makes a green run depend
+  // on that host being up. That is not hypothetical — picsum.photos returning 522 collapsed
+  // PostTeaser's "with image" story to the no-image layout (940px → 350px) and failed CI, and the
+  // s3.amazonaws.com/uifaces avatars used here before had been 403 for so long that the baselines
+  // silently recorded the initials fallback instead of an avatar. visual-test-helpers.js now blocks
+  // outbound requests during a screenshot run so a reintroduced remote url fails loudly.
+  responsiveImage(url) {
     return { url, w320: url, w640: url, w1024: url }
+  },
+  // Long-standing name for the same thing, kept because most stories build an avatar with it.
+  avatarImage(url) {
+    return helpers.responsiveImage(url)
   },
   fakeUser(n) {
     return new Array(n || 1).fill(0).map(() => {

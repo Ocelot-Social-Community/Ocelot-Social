@@ -1,5 +1,6 @@
 # Scoped ignore for the documentation image build (build context = repo root).
-# Keep .md sources, .vuepress/, and backend/ (for schema:print + SpectaQL); drop
+# Keep .md sources, .vuepress/, backend/ and packages/branding/ (for schema:print
+# + SpectaQL — the backend imports the branding package); drop
 # the heavy build artifacts and installed deps so the context stays small.
 **/node_modules
 .git
@@ -23,3 +24,9 @@ release
 # VuePress markdown). Keeps the local build in parity with CI, which only has
 # committed files.
 docu
+# …but docu/gitbook/ holds the SCREENSHOTS the published pages embed, and vite fails
+# hard on a missing asset rather than warning: "Could not load
+# /repo/docu/gitbook/graphql-playground.png (imported by …/backend/index.html.vue)".
+# Eight images across backend/, cypress/ and webapp/ READMEs resolve here; the folder
+# contains no markdown, so nothing WIP comes back in with them. 4.5 MB of the 21 MB.
+!docu/gitbook

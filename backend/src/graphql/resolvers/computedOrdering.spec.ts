@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { parse } from 'graphql'
+import { expect, beforeAll, afterAll, describe, it } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -43,7 +44,9 @@ const categoryQuery = parse(`
 
 const orderedIds = async (query: ReturnType<typeof parse>, orderBy: string, root: string) => {
   const { data, errors } = await setup.query({ query, variables: { orderBy: [orderBy] } })
+
   expect(errors).toBeUndefined()
+
   // eslint-disable-next-line security/detect-object-injection -- root is a literal from this file
   const nodes = (data?.[root] ?? []) as { id: string }[]
   return nodes.map((node) => node.id)

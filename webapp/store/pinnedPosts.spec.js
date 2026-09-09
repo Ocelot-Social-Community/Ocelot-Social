@@ -93,17 +93,17 @@ describe('pinned post store', () => {
       })
 
       it('calls apollo', () => {
-        expect(queryMock).toBeCalledWith({
+        expect(queryMock).toHaveBeenCalledWith({
           query: postsPinnedCountsQuery(),
         })
       })
 
       it('commits setCurrentlyPinnedPosts', () => {
-        expect(commit).toBeCalledWith('setCurrentlyPinnedPosts', 2)
+        expect(commit).toHaveBeenCalledWith('setCurrentlyPinnedPosts', 2)
       })
 
       it('commits setLoaded', () => {
-        expect(commit).toBeCalledWith('setLoaded')
+        expect(commit).toHaveBeenCalledWith('setLoaded')
       })
     })
   })

@@ -2,27 +2,20 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import Factory, { cleanDatabase } from '@db/factories'
-import SignupVerification from '@graphql/queries/auth/SignupVerification.gql'
-import CreateComment from '@graphql/queries/comments/CreateComment.gql'
-import shout from '@graphql/queries/emotions/shout.gql'
-import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
-import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
-import LeaveGroup from '@graphql/queries/groups/LeaveGroup.gql'
-import CreatePost from '@graphql/queries/posts/CreatePost.gql'
-import Post from '@graphql/queries/posts/Post.gql'
-import profilePagePosts from '@graphql/queries/posts/profilePagePosts.gql'
-import searchPosts from '@graphql/queries/posts/searchPosts.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
+
+import { beforeAll, afterAll, describe, it, expect, beforeEach } from 'vitest'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 // Keep the full resolved branding (config/index.ts reads branding.metadata.* transitively);
 // only tighten the group description minimum for this suite.
-jest.mock('@src/branding', () => {
+// Loaded up front: the mock factory below is synchronous and cannot await `vi.importActual`.
+const actualBranding = await import('@ocelot-social/branding')
+
+vi.mock('@src/branding', () => {
   // @src/branding re-exports the package's NAMED `branding` (per-domain getters), not a default.
-  const actual = jest.requireActual('@ocelot-social/branding')
+  const actual = actualBranding
   return {
     __esModule: true,
     branding: {
@@ -34,6 +27,22 @@ jest.mock('@src/branding', () => {
     getBranding: actual.getBranding,
   }
 })
+
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
+const { default: Factory, cleanDatabase } = await import('@db/factories')
+const { default: SignupVerification } = await import('@graphql/queries/auth/SignupVerification.gql')
+const { default: CreateComment } = await import('@graphql/queries/comments/CreateComment.gql')
+const { default: shout } = await import('@graphql/queries/emotions/shout.gql')
+const { default: ChangeGroupMemberRole } =
+  await import('@graphql/queries/groups/ChangeGroupMemberRole.gql')
+const { default: CreateGroup } = await import('@graphql/queries/groups/CreateGroup.gql')
+const { default: LeaveGroup } = await import('@graphql/queries/groups/LeaveGroup.gql')
+const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
+const { default: Post } = await import('@graphql/queries/posts/Post.gql')
+const { default: profilePagePosts } = await import('@graphql/queries/posts/profilePagePosts.gql')
+const { default: searchPosts } = await import('@graphql/queries/posts/searchPosts.gql')
+const { createApolloTestSetup } = await import('@root/test/helpers')
 
 let anyUser
 let allGroupsUser
@@ -812,6 +821,7 @@ describe('Posts in Groups', () => {
 
         it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: Post, variables: {} })
+
           expect(result.data?.Post).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
@@ -842,6 +852,7 @@ describe('Posts in Groups', () => {
 
         it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: Post, variables: {} })
+
           expect(result.data?.Post).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
@@ -872,6 +883,7 @@ describe('Posts in Groups', () => {
 
         it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: Post, variables: {} })
+
           expect(result.data?.Post).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
@@ -902,6 +914,7 @@ describe('Posts in Groups', () => {
 
         it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: Post, variables: {} })
+
           expect(result.data?.Post).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
@@ -932,6 +945,7 @@ describe('Posts in Groups', () => {
 
         it('shows all posts', async () => {
           const result = await query({ query: Post, variables: {} })
+
           expect(result.data?.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
@@ -976,6 +990,7 @@ describe('Posts in Groups', () => {
 
         it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: profilePagePosts, variables: {} })
+
           expect(result.data?.profilePagePosts).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
@@ -1004,6 +1019,7 @@ describe('Posts in Groups', () => {
 
         it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: profilePagePosts, variables: {} })
+
           expect(result.data?.profilePagePosts).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
@@ -1032,6 +1048,7 @@ describe('Posts in Groups', () => {
 
         it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: profilePagePosts, variables: {} })
+
           expect(result.data?.profilePagePosts).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
@@ -1060,6 +1077,7 @@ describe('Posts in Groups', () => {
 
         it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: profilePagePosts, variables: {} })
+
           expect(result.data?.profilePagePosts).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
@@ -1088,6 +1106,7 @@ describe('Posts in Groups', () => {
 
         it('shows all posts', async () => {
           const result = await query({ query: profilePagePosts, variables: {} })
+
           expect(result.data?.profilePagePosts).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
@@ -1149,6 +1168,7 @@ describe('Posts in Groups', () => {
             query: userProfileCounts,
             variables: { id: 'all-groups-user' },
           })
+
           expect(authorResult).toMatchObject({
             data: {
               User: [
@@ -1162,10 +1182,12 @@ describe('Posts in Groups', () => {
             },
             errors: undefined,
           })
+
           const shouterResult = await query({
             query: userProfileCounts,
             variables: { id: 'public-user' },
           })
+
           expect(shouterResult).toMatchObject({
             data: {
               User: [
@@ -1187,6 +1209,7 @@ describe('Posts in Groups', () => {
             query: userProfileCounts,
             variables: { id: 'all-groups-user' },
           })
+
           expect(authorResult).toMatchObject({
             data: {
               User: [
@@ -1200,10 +1223,12 @@ describe('Posts in Groups', () => {
             },
             errors: undefined,
           })
+
           const shouterResult = await query({
             query: userProfileCounts,
             variables: { id: 'public-user' },
           })
+
           expect(shouterResult).toMatchObject({
             data: {
               User: [
@@ -1225,6 +1250,7 @@ describe('Posts in Groups', () => {
             query: userProfileCounts,
             variables: { id: 'all-groups-user' },
           })
+
           expect(authorResult).toMatchObject({
             data: {
               User: [
@@ -1238,10 +1264,12 @@ describe('Posts in Groups', () => {
             },
             errors: undefined,
           })
+
           const shouterResult = await query({
             query: userProfileCounts,
             variables: { id: 'public-user' },
           })
+
           expect(shouterResult).toMatchObject({
             data: {
               User: [
@@ -1269,6 +1297,7 @@ describe('Posts in Groups', () => {
               firstPosts: 25,
             },
           })
+
           expect(result.data?.searchPosts.posts).toHaveLength(0)
           expect(result).toMatchObject({
             data: {
@@ -1295,6 +1324,7 @@ describe('Posts in Groups', () => {
               firstPosts: 25,
             },
           })
+
           expect(result.data?.searchPosts.posts).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
@@ -1332,6 +1362,7 @@ describe('Posts in Groups', () => {
               firstPosts: 25,
             },
           })
+
           expect(result.data?.searchPosts.posts).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
@@ -1369,6 +1400,7 @@ describe('Posts in Groups', () => {
               firstPosts: 25,
             },
           })
+
           expect(result.data?.searchPosts.posts).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
@@ -1406,6 +1438,7 @@ describe('Posts in Groups', () => {
               firstPosts: 25,
             },
           })
+
           expect(result.data?.searchPosts.posts).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
@@ -1459,6 +1492,7 @@ describe('Posts in Groups', () => {
 
         it('shows the posts of the closed group', async () => {
           const result = await query({ query: Post, variables: {} })
+
           expect(result.data?.Post).toHaveLength(3)
           expect(result).toMatchObject({
             data: {
@@ -1504,6 +1538,7 @@ describe('Posts in Groups', () => {
 
         it('shows all the posts', async () => {
           const result = await query({ query: Post, variables: {} })
+
           expect(result.data?.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
@@ -1557,6 +1592,7 @@ describe('Posts in Groups', () => {
 
         it('does not show the posts of the closed group anymore', async () => {
           const result = await query({ query: Post, variables: {} })
+
           expect(result.data?.Post).toHaveLength(3)
           expect(result).toMatchObject({
             data: {
@@ -1602,6 +1638,7 @@ describe('Posts in Groups', () => {
 
         it('shows only the public posts', async () => {
           const result = await query({ query: Post, variables: {} })
+
           expect(result.data?.Post).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
@@ -1641,6 +1678,7 @@ describe('Posts in Groups', () => {
 
         it('still shows the posts of the public group', async () => {
           const result = await query({ query: Post, variables: {} })
+
           expect(result.data?.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
@@ -1690,6 +1728,7 @@ describe('Posts in Groups', () => {
 
         it('stil shows the posts of the closed group', async () => {
           const result = await query({ query: Post, variables: {} })
+
           expect(result.data?.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
@@ -1739,6 +1778,7 @@ describe('Posts in Groups', () => {
 
         it('still shows the post of the hidden group', async () => {
           const result = await query({ query: Post, variables: {} })
+
           expect(result.data?.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
@@ -1792,6 +1832,7 @@ describe('Posts in Groups', () => {
 
         it('shows the posts of the closed group', async () => {
           const result = await query({ query: Post, variables: {} })
+
           expect(result.data?.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
@@ -1843,6 +1884,7 @@ describe('Posts in Groups', () => {
 
         it('shows all posts', async () => {
           const result = await query({ query: Post, variables: {} })
+
           expect(result.data?.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
@@ -1890,6 +1932,7 @@ describe('Posts in Groups', () => {
             query: Post,
             variables: { filter: { postsInMyGroups: true } },
           })
+
           expect(result.data?.Post).toHaveLength(0)
           expect(result).toMatchObject({
             data: {
@@ -1911,6 +1954,7 @@ describe('Posts in Groups', () => {
             query: Post,
             variables: { filter: { postsInMyGroups: true } },
           })
+
           expect(result.data?.Post).toHaveLength(2)
           expect(result).toMatchObject({
             data: {

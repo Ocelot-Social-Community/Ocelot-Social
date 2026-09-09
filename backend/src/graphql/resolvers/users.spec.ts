@@ -5,6 +5,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import { categories } from '@constants/categories'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
@@ -20,10 +22,8 @@ import UserFollowedBy from '@graphql/queries/users/UserFollowedBy.gql'
 import UserFollowing from '@graphql/queries/users/UserFollowing.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-import type User from '@db/models/User'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
-import type { DecodedUser } from '@src/jwt/decode'
 // import CONFIG from '@src/config'
 
 const categoryIds = ['cat9']
@@ -165,6 +165,7 @@ describe('User', () => {
 
     it('requires a user-administration capability (a plain user is forbidden)', async () => {
       authenticatedUser = await normalUser.toJson()
+
       await expect(
         query({ query: searchQuery, variables: { roleName: 'moderator' } }),
       ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
@@ -181,6 +182,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { search: 'Anna' },
       })
+
       expect(errors).toBeUndefined()
       expect(data.User.map((u) => u.name)).toEqual(['Anna'])
     })
@@ -190,6 +192,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { roleName: 'moderator' },
       })
+
       expect(errors).toBeUndefined()
       expect(data.User.map((u) => u.name).sort()).toEqual(['Anna', 'Bob'])
     })
@@ -199,6 +202,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { search: 'bob@example' },
       })
+
       expect(errors).toBeUndefined()
       expect(data.User.map((u) => u.name)).toEqual(['Bob'])
     })
@@ -208,6 +212,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { search: 'bob@example.org' },
       })
+
       expect(errors).toBeUndefined()
       expect(data.User.map((u) => u.name)).toEqual(['Bob'])
     })
@@ -217,11 +222,14 @@ describe('User', () => {
         query: searchQuery,
         variables: { roleName: 'moderator', orderBy: ['name_asc'] },
       })
+
       expect(asc.data.User.map((u) => u.name)).toEqual(['Anna', 'Bob'])
+
       const desc = await query({
         query: searchQuery,
         variables: { roleName: 'moderator', orderBy: ['name_desc'] },
       })
+
       expect(desc.data.User.map((u) => u.name)).toEqual(['Bob', 'Anna'])
     })
 
@@ -234,6 +242,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { roleName: 'moderator', orderBy: ['about_asc'] },
       })
+
       expect(errors).toBeUndefined()
     })
 
@@ -242,6 +251,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { roleName: 'moderator', orderBy: ['nonsense_asc'] },
       })
+
       // Enum validation now catches this before the resolver runs, which is the better place.
       expect(errors?.[0].message).toContain('nonsense_asc')
     })
@@ -251,6 +261,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { roleName: 'moderator', locationName: 'Hamburg' },
       })
+
       expect(errors?.[0].message).toContain('cannot be combined with')
     })
 
@@ -259,6 +270,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { search: 'ann', filter: { id_in: ['mod-anna'] } },
       })
+
       expect(errors?.[0].message).toContain('cannot be combined with')
     })
 
@@ -269,6 +281,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { filter: { id: 'mod-anna', id_in: ['mod-bob'] } },
       })
+
       expect(errors?.[0].message).toContain('use either `id` or `id_in`, not both')
     })
 
@@ -344,6 +357,7 @@ describe('UpdateUser', () => {
         },
         errors: undefined,
       }
+
       await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject(expected)
     })
 
@@ -351,6 +365,7 @@ describe('UpdateUser', () => {
       beforeEach(async () => {
         variables = { ...variables, termsAndConditionsAgreedVersion: '0.0.2' }
       })
+
       it('update termsAndConditionsAgreedVersion', async () => {
         const expected = {
           data: {
@@ -370,6 +385,7 @@ describe('UpdateUser', () => {
       beforeEach(async () => {
         variables = { ...variables, name: 'any name' }
       })
+
       it('update termsAndConditionsAgreedVersion', async () => {
         const expected = {
           data: {
@@ -385,12 +401,35 @@ describe('UpdateUser', () => {
       })
     })
 
+    // The avatar is merged INSIDE the same write transaction as the property update, so it is the
+    // one input to this mutation that can touch storage. Metadata without an upload is the shape
+    // the profile editor sends when only the alt text changed: the existing file has to survive
+    // it, and the property update has to land in the same commit.
+    it('updates avatar metadata without replacing the stored file', async () => {
+      const stored = await database.query({
+        query: 'MATCH (:User { id: "u47" })-[:AVATAR_IMAGE]->(image:Image) RETURN image.url AS url',
+      })
+      const url = stored.records[0].get('url') as string
+
+      const { data, errors } = await mutate({
+        mutation: UpdateUser,
+        variables: { ...variables, avatar: { alt: 'A new description' } },
+      })
+
+      expect(errors).toBeUndefined()
+      expect(data.UpdateUser).toMatchObject({
+        name: 'John Doughnut',
+        avatar: { alt: 'A new description', url },
+      })
+    })
+
     it('rejects if version of terms and conditions has wrong format', async () => {
       variables = {
         ...variables,
         termsAndConditionsAgreedVersion: 'invalid version format',
       }
       const { errors } = await mutate({ mutation: UpdateUser, variables })
+
       expect(errors?.[0]).toHaveProperty('message', 'Invalid version format!')
     })
 
@@ -398,6 +437,7 @@ describe('UpdateUser', () => {
       describe('change location to "Hamburg, New Jersey, United States"', () => {
         it('has updated location to  "Hamburg, New Jersey, United States"', async () => {
           variables = { ...variables, locationName: 'Hamburg, New Jersey, United States' }
+
           await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
             data: {
               UpdateUser: {
@@ -415,6 +455,7 @@ describe('UpdateUser', () => {
       describe('change location to unset location', () => {
         it('has updated location to  unset location', async () => {
           variables = { ...variables, locationName: '' }
+
           await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
             data: {
               UpdateUser: {
@@ -430,6 +471,7 @@ describe('UpdateUser', () => {
 
     it('publishes group membership visibility event when group visibility fields are updated', async () => {
       variables = { ...variables, showHiddenGroupsOnProfile: true }
+
       await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
         data: { UpdateUser: expect.objectContaining({ id: 'u47' }) },
         errors: undefined,
@@ -542,6 +584,7 @@ describe('Delete a User as admin', () => {
             },
             errors: undefined,
           }
+
           await expect(mutate({ mutation: DeleteUser, variables })).resolves.toMatchObject(
             expectedResponse,
           )
@@ -585,6 +628,7 @@ describe('Delete a User as admin', () => {
               },
               errors: undefined,
             }
+
             await expect(mutate({ mutation: DeleteUser, variables })).resolves.toMatchObject(
               expectedResponse,
             )
@@ -595,6 +639,7 @@ describe('Delete a User as admin', () => {
       describe('connected `EmailAddress` nodes', () => {
         it('will be removed completely', async () => {
           await expect(database.neode.all('EmailAddress')).resolves.toHaveLength(2)
+
           await mutate({ mutation: DeleteUser, variables })
 
           await expect(database.neode.all('EmailAddress')).resolves.toHaveLength(1)
@@ -609,7 +654,9 @@ describe('Delete a User as admin', () => {
 
         it('will be removed completely', async () => {
           await expect(database.neode.all('SocialMedia')).resolves.toHaveLength(1)
+
           await mutate({ mutation: DeleteUser, variables })
+
           await expect(database.neode.all('SocialMedia')).resolves.toHaveLength(0)
         })
       })
@@ -637,13 +684,16 @@ describe('Delete a User as admin', () => {
             { id: (await user.toJson()).id },
           )
           const relations = relation.records.map((record) => record.get('relationship'))
+
           expect(relations).toHaveLength(2)
+
           await mutate({ mutation: DeleteUser, variables })
           const relation2 = await database.neode.cypher(
             'MATCH (user:User {id: $id})-[relationship:FOLLOWS]-(:User) RETURN relationship',
             { id: (await user.toJson()).id },
           )
           const relations2 = relation2.records.map((record) => record.get('relationship'))
+
           expect(relations2).toHaveLength(0)
         })
       })
@@ -673,6 +723,7 @@ describe('emailNotificationSettings', () => {
       it('throws an error', async () => {
         authenticatedUser = await anotherUser.toJson()
         const targetUser = await user.toJson()
+
         await expect(
           query({ query: UserEmailNotificationSettings, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({
@@ -685,6 +736,7 @@ describe('emailNotificationSettings', () => {
     describe('as self', () => {
       it('returns the emailNotificationSettings', async () => {
         authenticatedUser = await user.toJson()
+
         await expect(
           query({
             query: UserEmailNotificationSettings,
@@ -753,6 +805,49 @@ describe('emailNotificationSettings', () => {
         })
       })
     })
+
+    // The nine `emailNotifications*` properties are what a FACTORY user carries; an account that
+    // went through registration has none of them (see the comment on createUserNode in
+    // db/factories.ts — the divergence is deliberate and pinned by writerParity.spec.ts). So the
+    // `?? true` fallback in the resolver is not a defensive leftover: it is the path every real,
+    // newly registered account takes until it saves its notification settings once. Stripping the
+    // properties reproduces exactly that node shape.
+    describe('for an account that never stored the settings', () => {
+      it('reports every setting as enabled', async () => {
+        authenticatedUser = await user.toJson()
+        await database.write({
+          query: `
+            MATCH (user:User { id: $id })
+            REMOVE user.emailNotificationsCommentOnObservedPost,
+                   user.emailNotificationsMention,
+                   user.emailNotificationsFollowingUsers,
+                   user.emailNotificationsPostInGroup,
+                   user.emailNotificationsChatMessage,
+                   user.emailNotificationsGroupMemberJoined,
+                   user.emailNotificationsGroupMemberLeft,
+                   user.emailNotificationsGroupMemberRemoved,
+                   user.emailNotificationsGroupMemberRoleChanged
+            RETURN user { .id }`,
+          variables: { id: authenticatedUser?.id },
+        })
+
+        const { data, errors } = await query({
+          query: UserEmailNotificationSettings,
+          variables: { id: authenticatedUser?.id },
+        })
+
+        expect(errors).toBeUndefined()
+
+        // Flattened: the assertion is about the DEFAULT, and it has to hold for all nine —
+        // naming them individually would only repeat the resolver's own structure.
+        const values = data.User[0].emailNotificationSettings.flatMap(
+          (group) => group.settings as { name: string; value: boolean }[],
+        )
+
+        expect(values).toHaveLength(9)
+        expect(values.every(({ value }) => value === true)).toBe(true)
+      })
+    })
   })
 
   describe('mutate the field', () => {
@@ -762,6 +857,7 @@ describe('emailNotificationSettings', () => {
       it('throws an error', async () => {
         authenticatedUser = await anotherUser.toJson()
         const targetUser = await user.toJson()
+
         await expect(
           mutate({
             mutation: UpdateUser,
@@ -776,11 +872,12 @@ describe('emailNotificationSettings', () => {
 
     describe('as self', () => {
       it('updates the emailNotificationSettings', async () => {
-        authenticatedUser = (await user.toJson()) as DecodedUser
+        authenticatedUser = await user.toJson()
+
         await expect(
           mutate({
             mutation: UpdateUser,
-            variables: { id: authenticatedUser.id, emailNotificationSettings },
+            variables: { id: authenticatedUser?.id, emailNotificationSettings },
           }),
         ).resolves.toMatchObject({
           data: {
@@ -918,6 +1015,29 @@ describe('save category settings', () => {
       })
     })
 
+    // An EMPTY list is not "deselect everything" — the front end sends it for the default, where
+    // every category is active. The resolver expresses that by writing no NOT_INTERESTED_IN edge
+    // at all, which only reads correctly if the delete above it still ran: an empty list has to
+    // CLEAR a previous narrowing rather than leave it in place.
+    describe('an empty selection', () => {
+      beforeEach(async () => {
+        await mutate({
+          mutation: saveCategorySettings,
+          variables: { activeCategories: ['cat1', 'cat3', 'cat5'] },
+        })
+      })
+
+      it('resets the user to all categories being active', async () => {
+        await expect(
+          mutate({ mutation: saveCategorySettings, variables: { activeCategories: [] } }),
+        ).resolves.toMatchObject({ data: { saveCategorySettings: true } })
+
+        const { data } = await query({ query: userQuery, variables: { id: authenticatedUser?.id } })
+
+        expect(data.User[0].activeCategories).toHaveLength(categories.length)
+      })
+    })
+
     describe('categories already saved', () => {
       beforeEach(async () => {
         variables = {
@@ -1006,11 +1126,12 @@ describe('updateOnlineStatus', () => {
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
         const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
-        await expect(dbUser.toJson()).resolves.toMatchObject({
+
+        await expect(dbUser?.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'online',
           lastActiveAt: expect.any(String),
         })
-        await expect(dbUser.toJson()).resolves.not.toMatchObject({
+        await expect(dbUser?.toJson()).resolves.not.toMatchObject({
           awaySince: expect.any(String),
         })
       })
@@ -1033,7 +1154,8 @@ describe('updateOnlineStatus', () => {
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
         const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
-        await expect(dbUser.toJson()).resolves.toMatchObject({
+
+        await expect(dbUser?.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince: expect.any(String),
         })
@@ -1048,17 +1170,14 @@ describe('updateOnlineStatus', () => {
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
         const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
-        const dbUser = database.neode.hydrateFirst<typeof User>(
-          result,
-          'u',
-          database.neode.model('User'),
-        )
-        await expect(dbUser.toJson()).resolves.toMatchObject({
+        const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
+
+        await expect(dbUser?.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince: expect.any(String),
         })
 
-        const awaySince = (await dbUser.toJson()).awaySince
+        const awaySince = (await dbUser?.toJson())?.awaySince
 
         await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toEqual(
           expect.objectContaining({
@@ -1068,7 +1187,8 @@ describe('updateOnlineStatus', () => {
 
         const result2 = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser2 = database.neode.hydrateFirst(result2, 'u', database.neode.model('User'))
-        await expect(dbUser2.toJson()).resolves.toMatchObject({
+
+        await expect(dbUser2?.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince,
         })
@@ -1591,6 +1711,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowing,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: '' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.following).toHaveLength(3)
     })
@@ -1600,6 +1721,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowing,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'alic' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.following).toEqual([{ id: 'alice', name: 'Alice Smith' }])
     })
@@ -1609,6 +1731,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowing,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'ALI' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.following).toEqual([{ id: 'alice', name: 'Alice Smith' }])
     })
@@ -1618,6 +1741,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowing,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'xyz' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.following).toHaveLength(0)
     })
@@ -1631,6 +1755,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowing,
         variables: { id: 'viewer', first: 2, offset: 2, nameFilter: '' },
       })
+
       expect(page1.errors).toBeUndefined()
       expect(page2.errors).toBeUndefined()
       expect(page1.data?.User?.[0]?.following).toHaveLength(2)
@@ -1653,6 +1778,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowedBy,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: '' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.followedBy).toHaveLength(2)
     })
@@ -1662,6 +1788,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowedBy,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'alice' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.followedBy).toEqual([{ id: 'alice', name: 'Alice Smith' }])
     })
@@ -1671,6 +1798,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowedBy,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'BOB' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.followedBy).toEqual([{ id: 'bob', name: 'Bob Brown' }])
     })
@@ -1680,6 +1808,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowedBy,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'xyz' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.followedBy).toHaveLength(0)
     })

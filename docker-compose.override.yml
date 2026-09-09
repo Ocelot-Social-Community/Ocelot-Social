@@ -149,7 +149,7 @@ services:
       context: .
       dockerfile: ./webapp/Dockerfile
       target: development
-    command: /bin/sh -c "yarn install && node scripts/fix-storybook-webpack.js && yarn storybook"
+    command: /bin/sh -c "npm install && node scripts/fix-storybook-webpack.js && npm run storybook"
     ports:
       - 3002:3002
     environment:

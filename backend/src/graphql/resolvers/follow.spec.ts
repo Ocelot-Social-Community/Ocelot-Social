@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import followUser from '@graphql/queries/interactions/followUser.gql'
 import unfollowUser from '@graphql/queries/interactions/unfollowUser.gql'
@@ -74,8 +76,9 @@ afterEach(async () => {
 describe('follow', () => {
   describe('follow user', () => {
     describe('unauthenticated follow', () => {
-      test('throws authorization error', async () => {
+      it('throws authorization error', async () => {
         authenticatedUser = null
+
         await expect(
           mutate({
             mutation: followUser,
@@ -88,12 +91,13 @@ describe('follow', () => {
       })
     })
 
-    test('I can follow another user', async () => {
+    it('i can follow another user', async () => {
       const expectedUser = {
         name: user2.name,
         followedBy: [{ id: user1.id, name: user1.name }],
         followedByCurrentUser: true,
       }
+
       await expect(
         mutate({
           mutation: followUser,
@@ -105,7 +109,7 @@ describe('follow', () => {
       })
     })
 
-    test('adds `createdAt` to `FOLLOW` relationship', async () => {
+    it('adds `createdAt` to `FOLLOW` relationship', async () => {
       await mutate({
         mutation: followUser,
         variables,
@@ -117,11 +121,13 @@ describe('follow', () => {
       const relationshipProperties = relation.records.map(
         (record) => record.get('relationship').properties.createdAt,
       )
+
       expect(relationshipProperties[0]).toEqual(expect.any(String))
     })
 
-    test('I can`t follow myself', async () => {
+    it('i can`t follow myself', async () => {
       variables.id = user1.id
+
       await expect(mutate({ mutation: followUser, variables })).resolves.toMatchObject({
         data: { followUser: null },
         errors: undefined,
@@ -131,6 +137,7 @@ describe('follow', () => {
         followedBy: [],
         followedByCurrentUser: false,
       }
+
       await expect(
         query({
           query: User,
@@ -145,6 +152,21 @@ describe('follow', () => {
     })
   })
 
+  // Neither mutation may act on a user that is not there. MERGE/MATCH against an id that binds
+  // nothing writes nothing, so returning a user object would report a follow that did not happen —
+  // and both mutations return the OTHER user, which is exactly the value a client would cache.
+  describe.each([
+    ['followUser', followUser],
+    ['unfollowUser', unfollowUser],
+  ])('%s', (name, mutation) => {
+    it('returns null for a user that does not exist', async () => {
+      const { data, errors } = await mutate({ mutation, variables: { id: 'no-such-user' } })
+
+      expect(errors).toBeUndefined()
+      expect(data).toEqual({ [name]: null })
+    })
+  })
+
   describe('unfollow user', () => {
     beforeEach(async () => {
       variables = { id: user2.id }
@@ -152,8 +174,9 @@ describe('follow', () => {
     })
 
     describe('unauthenticated follow', () => {
-      test('throws authorization error', async () => {
+      it('throws authorization error', async () => {
         authenticatedUser = null
+
         await expect(mutate({ mutation: unfollowUser, variables })).resolves.toMatchObject({
           data: { unfollowUser: null },
           errors: [{ message: 'Not Authorized!' }],
@@ -161,12 +184,23 @@ describe('follow', () => {
       })
     })
 
-    test('I can unfollow a user', async () => {
+    // The mirror of "i can`t follow myself" above. Unfollowing yourself is not merely
+    // pointless: it would DELETE a FOLLOWS edge selected by `(:User {id: me})-[:FOLLOWS]->(me)`,
+    // and the guard is the only thing keeping that pattern from being evaluated at all.
+    it('i can`t unfollow myself', async () => {
+      const { data, errors } = await mutate({ mutation: unfollowUser, variables: { id: user1.id } })
+
+      expect(errors).toBeUndefined()
+      expect(data.unfollowUser).toBeNull()
+    })
+
+    it('i can unfollow a user', async () => {
       const expectedUser = {
         name: user2.name,
         followedBy: [],
         followedByCurrentUser: false,
       }
+
       await expect(mutate({ mutation: unfollowUser, variables })).resolves.toMatchObject({
         data: { unfollowUser: expectedUser },
         errors: undefined,

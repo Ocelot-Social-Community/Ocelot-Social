@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
@@ -6,17 +5,24 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import fetch from 'node-fetch'
-
-import embed from '@graphql/queries/embed.gql'
-import embedProviders from '@graphql/queries/embedProviders.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
+import { beforeAll, afterAll, afterEach, describe, it, expect, beforeEach } from 'vitest'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 
-jest.mock('node-fetch')
-const mockedFetch = jest.mocked(fetch)
-const { Response } = jest.requireActual('node-fetch')
+// `vi.mock` IS hoisted, so the order of these lines does not decide what they see — the factory
+// has to hand out the real `Response` itself. vi.importActual is the supported way to reach past
+// one's own mock; the pre-mock import this file used under Jest would now bind the mock.
+vi.mock('node-fetch', async () => ({
+  ...(await vi.importActual<object>('node-fetch')),
+  default: vi.fn(),
+}))
+
+const { default: fetch, Response } = await import('node-fetch')
+const { default: embed } = await import('@graphql/queries/embed.gql')
+const { default: embedProviders } = await import('@graphql/queries/embedProviders.gql')
+const { createApolloTestSetup } = await import('@root/test/helpers')
+const { default: embedsResolvers } = await import('./embeds')
+const mockedFetch = vi.mocked(fetch)
 
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -42,17 +48,17 @@ afterEach(() => {
 
 // eslint-disable-next-line n/no-sync
 const HumanConnectionOrg = fs.readFileSync(
-  path.join(__dirname, '../../../snapshots/embeds/HumanConnectionOrg.html'),
+  path.join(import.meta.dirname, '../../../snapshots/embeds/HumanConnectionOrg.html'),
   'utf8',
 )
 // eslint-disable-next-line n/no-sync
 const pr3934 = fs.readFileSync(
-  path.join(__dirname, '../../../snapshots/embeds/pr3934.html'),
+  path.join(import.meta.dirname, '../../../snapshots/embeds/pr3934.html'),
   'utf8',
 )
 // eslint-disable-next-line n/no-sync
 const babyLovesCat = fs.readFileSync(
-  path.join(__dirname, '../../../snapshots/embeds/babyLovesCat.html'),
+  path.join(import.meta.dirname, '../../../snapshots/embeds/babyLovesCat.html'),
   'utf8',
 )
 
@@ -83,8 +89,11 @@ describe('Query', () => {
         errors?: unknown
         data?: { embedProviders: Array<{ name: string; url: string }> }
       }
+
       expect(result.errors).toBeUndefined()
+
       const providers = result.data?.embedProviders ?? []
+
       // The curated list this instance actually matches against, not the full oembed.com registry.
       expect(providers).toContainEqual({ name: 'YouTube', url: 'https://www.youtube.com/' })
       expect(providers).toContainEqual({ name: 'Vimeo', url: 'https://vimeo.com/' })
@@ -106,8 +115,8 @@ describe('Query', () => {
     describe('given a video link', () => {
       beforeEach(() => {
         mockedFetch
-          .mockReturnValueOnce(Promise.resolve(new Response('')))
-          .mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify({}))))
+          .mockResolvedValueOnce(new Response(''))
+          .mockResolvedValueOnce(new Response(JSON.stringify({})))
         variables = { url: 'https://www.w3schools.com/html/mov_bbb.mp4' }
       })
 
@@ -138,8 +147,8 @@ describe('Query', () => {
     describe('given a Facebook link', () => {
       beforeEach(() => {
         mockedFetch
-          .mockReturnValueOnce(Promise.resolve(new Response(HumanConnectionOrg)))
-          .mockReturnValueOnce(Promise.resolve(new Response('invalid json')))
+          .mockResolvedValueOnce(new Response(HumanConnectionOrg))
+          .mockResolvedValueOnce(new Response('invalid json'))
         variables = { url: 'https://www.facebook.com/HumanConnectionOrg/' }
       })
 
@@ -172,8 +181,8 @@ describe('Query', () => {
     describe('given a Github link', () => {
       beforeEach(() => {
         mockedFetch
-          .mockReturnValueOnce(Promise.resolve(new Response(pr3934)))
-          .mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify({}))))
+          .mockResolvedValueOnce(new Response(pr3934))
+          .mockResolvedValueOnce(new Response(JSON.stringify({})))
         variables = { url: 'https://github.com/Human-Connection/Human-Connection/pull/960' }
       })
 
@@ -206,8 +215,8 @@ Have all the information for the brand in separate config files. Set these defau
     describe('given a youtube link', () => {
       beforeEach(() => {
         mockedFetch
-          .mockReturnValueOnce(Promise.resolve(new Response(babyLovesCat)))
-          .mockReturnValueOnce(Promise.resolve(babyLovesCatEmbedResponse))
+          .mockResolvedValueOnce(new Response(babyLovesCat))
+          .mockResolvedValueOnce(babyLovesCatEmbedResponse)
         variables = { url: 'https://www.youtube.com/watch?v=qkdXAtO40Fo&t=18s' }
       })
 
@@ -235,5 +244,18 @@ Have all the information for the brand in separate config files. Set these defau
         })
       })
     })
+  })
+})
+
+// `Embed.sources` is a non-null LIST, and the scraper only sets it when at least one source
+// contributed. GraphQL's default resolver would answer `null` for the missing key and fail the
+// whole Embed — a link preview that came back with nothing to say must degrade to `[]`, not take
+// the query down with it.
+describe('Embed.sources', () => {
+  it.each([
+    ['a scrape that reported no sources', {}, []],
+    ['a scrape that reported some', { sources: ['oembed'] }, ['oembed']],
+  ])('resolves %s', async (_name, parent, expected) => {
+    await expect(embedsResolvers.Embed.sources(parent, {}, null, null)).resolves.toEqual(expected)
   })
 })

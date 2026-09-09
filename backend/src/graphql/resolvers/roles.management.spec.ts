@@ -3,6 +3,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
+import { PubSub } from 'graphql-subscriptions'
+import { describe, beforeAll, afterAll, beforeEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import CREATE_ROLE from '@graphql/queries/roles/createRole.gql'
 import DELETE_ROLE from '@graphql/queries/roles/deleteRole.gql'
@@ -17,16 +20,20 @@ import UPDATE_ROLE from '@graphql/queries/roles/updateRole.gql'
 import USER_ROLES from '@graphql/queries/roles/userRoles.gql'
 import USER_INFO from '@graphql/queries/roles/userWithRole.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { PERMISSIONS_CHANGED_CHANNEL, RoleService } from '@src/role'
+import { OWNER_ROLE, PERMISSIONS_CHANGED_CHANNEL, RoleService } from '@src/role'
+
+import rolesResolvers, { publishPermissionsChanged } from './roles'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { GraphQLFormattedError } from 'graphql'
+import type { Mock } from 'vitest'
 
 let authenticatedUser: Context['user']
 let roleService: RoleService
 // Optional per-test pubsub spy; when unset, the context falls back to the default
 // server pubsub (harmless in-memory).
-let pubsubMock: { publish: jest.Mock; asyncIterator: jest.Mock } | undefined
+let pubsubMock: { publish: Mock; asyncIterator: Mock } | undefined
 let query: ApolloTestSetup['query']
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
@@ -48,6 +55,20 @@ const asAdmin = async () => {
   )
   authenticatedUser = await admin.toJson()
 }
+
+// The "a failure must keep its own identity" cases below inject a rejection into the role service
+// and then check that the resolver did NOT relabel it — as a permission problem, as a name
+// conflict, or as a TypeError from its own error handler.
+//
+// Each of them pins the error COUNT before saying anything about the error, and then says it
+// positively. Asserting only `errors?.[0].extensions?.code).not.toBe('FORBIDDEN')` cannot carry
+// the claim: on a mutation that unexpectedly SUCCEEDED, `errors` is undefined, the optional chain
+// short-circuits to undefined, and the assertion passes having checked nothing. Matching the
+// injected failure itself also rules out every wrong mapping at once, instead of one at a time.
+const INJECTED_FAILURE = {
+  message: 'database is down',
+  extensions: { code: 'INTERNAL_SERVER_ERROR' },
+} satisfies Partial<GraphQLFormattedError>
 
 describe('role management', () => {
   beforeAll(async () => {
@@ -79,7 +100,10 @@ describe('role management', () => {
   // The live permissionsChanged broadcast (clients refetch their permissions on it).
   describe('permissionsChanged broadcast', () => {
     beforeEach(async () => {
-      pubsubMock = { publish: jest.fn().mockResolvedValue(undefined), asyncIterator: jest.fn() }
+      pubsubMock = {
+        publish: vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue(undefined),
+        asyncIterator: vi.fn(),
+      }
       await asAdmin()
       await mutate({
         mutation: CREATE_ROLE,
@@ -93,6 +117,7 @@ describe('role management', () => {
         mutation: CREATE_ROLE,
         variables: { name: 'fresh-role', permissions: [] },
       })
+
       expect(pubsubMock?.publish).not.toHaveBeenCalled()
     })
 
@@ -101,6 +126,7 @@ describe('role management', () => {
         mutation: UPDATE_ROLE,
         variables: { name: 'broadcast-role', permissions: ['post.pin'] },
       })
+
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
         permissionsChanged: { roleName: 'broadcast-role', previousRoleName: null },
       })
@@ -111,6 +137,7 @@ describe('role management', () => {
         mutation: RENAME_ROLE,
         variables: { name: 'broadcast-role', newName: 'broadcast-renamed' },
       })
+
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
         permissionsChanged: { roleName: 'broadcast-renamed', previousRoleName: 'broadcast-role' },
       })
@@ -118,6 +145,7 @@ describe('role management', () => {
 
     it('broadcasts on deleteRole (former holders fall back to baseline)', async () => {
       await mutate({ mutation: DELETE_ROLE, variables: { name: 'broadcast-role' } })
+
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
         permissionsChanged: { roleName: 'broadcast-role', previousRoleName: null },
       })
@@ -133,6 +161,7 @@ describe('role management', () => {
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-x', roleName: 'broadcast-role' },
       })
+
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
         permissionsChanged: { roleName: 'broadcast-role', previousRoleName: null },
       })
@@ -151,6 +180,7 @@ describe('role management', () => {
         mutation: UPDATE_ROLE,
         variables: { name: 'broadcast-role', permissions: ['post.pin'] },
       })
+
       expect(errors).toBeUndefined()
       expect(data?.updateRole).toMatchObject({
         name: 'broadcast-role',
@@ -168,6 +198,7 @@ describe('role management', () => {
       )
       authenticatedUser = await user.toJson()
       const { data, errors } = await query({ query: PERMISSION_CATALOG })
+
       expect(data).toEqual(null)
       expect(errors).toEqual([expect.objectContaining({ message: 'Not Authorized!' })])
     })
@@ -175,15 +206,18 @@ describe('role management', () => {
     it('allows permissionCatalog for an admin, carrying gates without erroring on ungated keys', async () => {
       await asAdmin()
       const { data, errors } = await query({ query: PERMISSION_CATALOG })
+
       // Regression guard: an ungated permission's gatedBy must serialise as null, not
       // undefined (a resolver returning undefined for a nullable field is a GraphQL error).
       expect(errors).toBeUndefined()
+
       const catalog = data.permissionCatalog as Array<{
         key: string
         gatedBy: string | null
         available: boolean
       }>
       const byKey = new Map(catalog.map((p) => [p.key, p] as const))
+
       expect(byKey.get('post.create')).toMatchObject({ gatedBy: null, available: true })
       // gatedBy is now the first CURRENTLY-CLOSED gate (the actionable one). videoConference
       // is effectively off here (no LiveKit env), so it is the gate surfaced for the group
@@ -193,6 +227,7 @@ describe('role management', () => {
       // groupsEnabled defaults on (no env requirement), so group creation is available and
       // has no blocking gate — the group gate is open.
       expect(byKey.get('group.create_public')).toMatchObject({ gatedBy: null, available: true })
+
       // available is a non-null boolean for every entry.
       for (const entry of catalog) {
         expect(typeof entry.available).toBe('boolean')
@@ -207,6 +242,7 @@ describe('role management', () => {
       // reloads the role + policy caches from the DB and returns true.
       authenticatedUser = null
       const { data, errors } = await mutate({ mutation: RESYNC_CACHES })
+
       expect(errors).toBeUndefined()
       expect(data.resyncCaches).toBe(true)
     })
@@ -222,6 +258,7 @@ describe('role management', () => {
       authenticatedUser = await user.toJson()
       const { data } = await query({ query: MY_PERMISSIONS })
       const keys = data.myPermissions.map((p: { key: string }) => p.key)
+
       expect(keys).toEqual(
         expect.arrayContaining([
           'post.create',
@@ -238,6 +275,7 @@ describe('role management', () => {
       await asAdmin()
       const { data } = await query({ query: MY_PERMISSIONS })
       const keys = data.myPermissions.map((p: { key: string }) => p.key)
+
       expect(keys).toEqual(expect.arrayContaining(['role.manage', 'content.moderate']))
       // Every entry carries its group, so the webapp can gate areas by group.
       expect(data.myPermissions).toEqual(
@@ -253,6 +291,7 @@ describe('role management', () => {
     it('lists the seeded roles', async () => {
       await asAdmin()
       const { data, errors } = await query({ query: ROLES })
+
       expect(errors).toBeUndefined()
       expect(data.roles.map((r: { name: string }) => r.name)).toEqual([
         'owner',
@@ -270,6 +309,7 @@ describe('role management', () => {
       const byName: Record<string, number> = Object.fromEntries(
         roleList.map((r) => [r.name, r.memberCount]),
       )
+
       expect(byName.user).toBeGreaterThanOrEqual(1) // the baseline member
       expect(byName.admin).toBeGreaterThanOrEqual(1) // the admin, via its edge
     })
@@ -286,6 +326,7 @@ describe('role management', () => {
           permissions: ['badge.manage', 'ghost.perm'],
         },
       })
+
       expect(errors).toBeUndefined()
       expect(data.createRole).toMatchObject({
         name: 'badge-setter',
@@ -300,6 +341,7 @@ describe('role management', () => {
         mutation: CREATE_ROLE,
         variables: { name: 'admin', permissions: [] },
       })
+
       expect(errors?.[0].message).toMatch(/already exists/)
     })
 
@@ -308,7 +350,23 @@ describe('role management', () => {
         mutation: CREATE_ROLE,
         variables: { name: 'has spaces!', permissions: [] },
       })
+
       expect(errors?.[0].message).toMatch(/Invalid role name/)
+    })
+
+    it('surfaces an infrastructure failure as such, not as a permission problem', async () => {
+      // Only RoleValidationError means "the rules forbid this"; anything else (a dropped
+      // Neo4j connection, a constraint we do not model) must keep its own identity.
+      // Rewriting it to ForbiddenError would tell the admin they lack rights while the
+      // database is simply down.
+      vi.spyOn(roleService, 'upsertRole').mockRejectedValueOnce(new Error('database is down'))
+      const { errors } = await mutate({
+        mutation: CREATE_ROLE,
+        variables: { name: 'doomed', permissions: [] },
+      })
+
+      expect(errors).toHaveLength(1)
+      expect(errors?.[0]).toMatchObject(INJECTED_FAILURE)
     })
   })
 
@@ -324,6 +382,7 @@ describe('role management', () => {
         mutation: UPDATE_ROLE,
         variables: { name: 'badge-setter', permissions: ['content.moderate', 'ghost.perm'] },
       })
+
       expect(errors).toBeUndefined()
       expect(data.updateRole).toMatchObject({
         name: 'badge-setter',
@@ -348,6 +407,7 @@ describe('role management', () => {
         mutation: UPDATE_ROLE,
         variables: { name: 'held', permissions: ['badge.manage'] },
       })
+
       expect(errors).toBeUndefined()
       expect(data.updateRole.memberCount).toBe(1)
     })
@@ -357,6 +417,7 @@ describe('role management', () => {
         mutation: UPDATE_ROLE,
         variables: { name: 'does-not-exist', permissions: [] },
       })
+
       expect(errors?.[0].message).toMatch(/Unknown role/)
     })
 
@@ -365,7 +426,20 @@ describe('role management', () => {
         mutation: UPDATE_ROLE,
         variables: { name: 'owner', permissions: [] },
       })
+
       expect(errors?.[0].message).toMatch(/protected/)
+    })
+
+    it('surfaces an infrastructure failure as such, not as a permission problem', async () => {
+      await mutate({ mutation: CREATE_ROLE, variables: { name: 'editor', permissions: [] } })
+      vi.spyOn(roleService, 'upsertRole').mockRejectedValueOnce(new Error('database is down'))
+      const { errors } = await mutate({
+        mutation: UPDATE_ROLE,
+        variables: { name: 'editor', permissions: [] },
+      })
+
+      expect(errors).toHaveLength(1)
+      expect(errors?.[0]).toMatchObject(INJECTED_FAILURE)
     })
   })
 
@@ -382,6 +456,7 @@ describe('role management', () => {
         variables: { userId: 'target', roleName: 'moderator' },
       })
       const { data, errors } = await query({ query: USER_ROLES, variables: { userId: 'target' } })
+
       expect(errors).toBeUndefined()
       expect(data.userRoles).toEqual([
         expect.objectContaining({ name: 'moderator', protected: false }),
@@ -401,8 +476,56 @@ describe('role management', () => {
       })
       await asAdmin()
       const { data, errors } = await query({ query: USER_ROLES, variables: { userId: 'edgeless' } })
+
       expect(errors).toBeUndefined()
       expect(data.userRoles).toEqual([])
+    })
+
+    it('skips an edge pointing at a Role node the role cache does not know', async () => {
+      // A :Role node can outlive the cache entry (deleted on another instance, a
+      // half-applied migration). getRole() then returns undefined, and without the
+      // type-guard filter that undefined would be mapped into the non-nullable
+      // [Role!]! list — a GraphQL "cannot return null" error instead of a clean list.
+      await Factory.build(
+        'user',
+        { id: 'orphan', role: 'user' },
+        { email: 'orphan@e.org', password: '1234' },
+      )
+      await database.write({
+        query: `MATCH (:User {id: 'orphan'})-[h:HAS_ROLE]->(:Role) DELETE h`,
+      })
+      await database.write({
+        query: `MATCH (u:User {id: 'orphan'})
+                MERGE (r:Role {id: 'vanished', name: 'vanished'})
+                MERGE (u)-[:HAS_ROLE]->(r)`,
+      })
+      await asAdmin()
+      const { data, errors } = await query({ query: USER_ROLES, variables: { userId: 'orphan' } })
+
+      expect(errors).toBeUndefined()
+      expect(data.userRoles).toEqual([])
+    })
+
+    it('reports the baseline role name for a user without a role edge', async () => {
+      // roleName drives the admin UI and the webapp's role display; an edgeless user
+      // must report the baseline they effectively have, not null.
+      await Factory.build(
+        'user',
+        { id: 'edgeless-name', role: 'user' },
+        { email: 'edgeless-name@e.org', password: '1234' },
+      )
+      await database.write({
+        query: `MATCH (:User {id: $userId})-[h:HAS_ROLE]->(:Role) DELETE h`,
+        variables: { userId: 'edgeless-name' },
+      })
+      await asAdmin()
+      const { data, errors } = await query({
+        query: USER_INFO,
+        variables: { id: 'edgeless-name' },
+      })
+
+      expect(errors).toBeUndefined()
+      expect(data.User[0].roleName).toBe('user')
     })
   })
 
@@ -411,11 +534,13 @@ describe('role management', () => {
 
     it('refuses to delete the protected owner role', async () => {
       const { errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'owner' } })
+
       expect(errors?.[0].message).toMatch(/protected/)
     })
 
     it('refuses to delete the baseline user role', async () => {
       const { errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'user' } })
+
       expect(errors?.[0].message).toMatch(/baseline/)
     })
 
@@ -425,6 +550,7 @@ describe('role management', () => {
         variables: { name: 'temp', permissions: [] },
       })
       const { data, errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'temp' } })
+
       expect(errors).toBeUndefined()
       expect(data.deleteRole).toBe('temp')
     })
@@ -441,7 +567,17 @@ describe('role management', () => {
       })
       await mutate({ mutation: SET_USER_ROLE, variables: { userId: 'holder', roleName: 'held' } })
       const { errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'held' } })
+
       expect(errors?.[0].message).toMatch(/assigned/)
+    })
+
+    it('surfaces an infrastructure failure as such, not as a permission problem', async () => {
+      await mutate({ mutation: CREATE_ROLE, variables: { name: 'temp', permissions: [] } })
+      vi.spyOn(roleService, 'deleteRole').mockRejectedValueOnce(new Error('database is down'))
+      const { errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'temp' } })
+
+      expect(errors).toHaveLength(1)
+      expect(errors?.[0]).toMatchObject(INJECTED_FAILURE)
     })
   })
 
@@ -475,14 +611,18 @@ describe('role management', () => {
         permissions: ['post.pin'],
         memberCount: 1,
       })
+
       // The old name is gone and the member now reports the new role name.
       const { data: rolesData } = await query({ query: ROLES })
+
       expect(rolesData.roles.map((role: { name: string }) => role.name)).toContain('content-lead')
       expect(rolesData.roles.map((role: { name: string }) => role.name)).not.toContain('editor')
+
       const { data: userData } = await query({
         query: USER_INFO,
         variables: { id: 'member-1' },
       })
+
       expect(userData.User[0].roleName).toBe('content-lead')
     })
 
@@ -491,6 +631,7 @@ describe('role management', () => {
         mutation: RENAME_ROLE,
         variables: { name: 'owner', newName: 'boss' },
       })
+
       expect(errors?.[0].message).toMatch(/protected/)
     })
 
@@ -499,6 +640,7 @@ describe('role management', () => {
         mutation: RENAME_ROLE,
         variables: { name: 'user', newName: 'member' },
       })
+
       expect(errors?.[0].message).toMatch(/mandatory/)
     })
 
@@ -507,6 +649,7 @@ describe('role management', () => {
         mutation: RENAME_ROLE,
         variables: { name: 'nope', newName: 'whatever' },
       })
+
       expect(errors?.[0].message).toMatch(/Unknown role/)
     })
 
@@ -516,6 +659,7 @@ describe('role management', () => {
         mutation: RENAME_ROLE,
         variables: { name: 'editor', newName: 'admin' },
       })
+
       expect(errors?.[0].message).toMatch(/already exists/)
     })
 
@@ -525,6 +669,7 @@ describe('role management', () => {
         mutation: RENAME_ROLE,
         variables: { name: 'editor', newName: 'Not Valid!' },
       })
+
       expect(errors?.[0].message).toMatch(/Invalid role name/)
     })
 
@@ -535,12 +680,78 @@ describe('role management', () => {
       const constraintError = Object.assign(new Error('constraint'), {
         code: 'Neo.ClientError.Schema.ConstraintValidationFailed',
       })
-      jest.spyOn(roleService, 'renameRole').mockRejectedValueOnce(constraintError)
+      vi.spyOn(roleService, 'renameRole').mockRejectedValueOnce(constraintError)
       const { errors } = await mutate({
         mutation: RENAME_ROLE,
         variables: { name: 'editor', newName: 'reviewer' },
       })
+
       expect(errors?.[0].message).toMatch(/already exists/)
+    })
+
+    it('accepts renaming a role to its own name as a no-op', async () => {
+      // The "already exists" pre-check looks the new name up in the cache, where the
+      // role being renamed is of course still present. Without the `name !== newName`
+      // guard, saving the admin form without touching the name field would fail with
+      // "Role 'editor' already exists" — the role colliding with itself.
+      await mutate({
+        mutation: CREATE_ROLE,
+        variables: { name: 'editor', permissions: ['post.pin'] },
+      })
+      const { data, errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'editor', newName: 'editor' },
+      })
+
+      expect(errors).toBeUndefined()
+      expect(data.renameRole).toMatchObject({ name: 'editor', permissions: ['post.pin'] })
+    })
+
+    it('surfaces a non-constraint write failure instead of reporting a name conflict', async () => {
+      await mutate({ mutation: CREATE_ROLE, variables: { name: 'editor', permissions: [] } })
+      // A generic write failure carries no Neo4j error code, so the conflict mapping
+      // must not claim the target name is taken — that would send the admin looking for
+      // a role that does not exist.
+      vi.spyOn(roleService, 'renameRole').mockRejectedValueOnce(new Error('database is down'))
+      const { errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'editor', newName: 'reviewer' },
+      })
+
+      // The exact message is the assertion: had the conflict mapping fired, this would read
+      // "Role 'reviewer' already exists" instead.
+      expect(errors).toHaveLength(1)
+      expect(errors?.[0]).toMatchObject(INJECTED_FAILURE)
+    })
+
+    // A rejection can carry any value. `'code' in err` throws a TypeError on a primitive, so the
+    // conflict check must gate on `err instanceof Error` first — otherwise the original failure is
+    // replaced by a TypeError from the error handler itself.
+    //
+    // Driven against the resolver DIRECTLY, not through a mutation, because what a non-Error
+    // rejection looks like from the outside depends on the environment. graphql-shield runs with
+    // `allowExternalErrors` and, whenever `debug` is off, RETURNS the thrown value as the field
+    // value instead of rethrowing it (graphql-shield/cjs/generator.js:42-48). graphql-js turns a
+    // returned Error back into an error, but a returned STRING it tries to complete as a `Role!`,
+    // which fails on the non-null `name`. `debug` is `!!CONFIG.DEBUG`, so the very same assertion
+    // reads "Unexpected error value: database is down" against a local .env with DEBUG=true and
+    // "Cannot return null for non-nullable field Role.name." in the CI container, where
+    // docker-compose.test.yml sets DEBUG= — measured both ways. The resolver's own contract is
+    // the part that is stable, and the part this test is about.
+    it('does not crash when the failure is not an Error object', async () => {
+      const failure = 'database is down'
+      const context = {
+        role: {
+          getRole: (name: string) =>
+            name === 'editor' ? { name: 'editor', protected: false, permissions: [] } : undefined,
+          renameRole: vi.fn().mockRejectedValue(failure),
+        },
+        user: { id: 'admin-id' },
+      } as unknown as Context
+
+      await expect(
+        rolesResolvers.Mutation.renameRole(null, { name: 'editor', newName: 'reviewer' }, context),
+      ).rejects.toBe(failure)
     })
   })
 
@@ -571,8 +782,11 @@ describe('role management', () => {
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-id', roleName: 'badge-setter' },
       })
+
       expect(errors).toBeUndefined()
+
       const user = await readUser('member-id')
+
       expect(user.roleName).toBe('badge-setter')
     })
 
@@ -587,6 +801,7 @@ describe('role management', () => {
         variables: { userId: 'member-id', roleName: 'admin' },
       })
       const user = await readUser('member-id')
+
       expect(user.roleName).toBe('admin')
     })
 
@@ -596,7 +811,21 @@ describe('role management', () => {
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-id', roleName: 'no-such-role' },
       })
+
       expect(errors?.[0].message).toMatch(/Unknown role/)
+    })
+
+    it('rejects a user id that does not exist', async () => {
+      // The owner guard runs on OPTIONAL MATCH, so a stale user id (a deleted account
+      // still listed in an open admin tab) passes it and only the write finds nothing.
+      // Without this check the mutation would return null for a non-nullable field.
+      await asAdmin()
+      const { errors } = await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'no-such-user', roleName: 'moderator' },
+      })
+
+      expect(errors?.[0].message).toMatch(/Could not find User/)
     })
 
     it('forbids a (non-owner) admin from assigning the owner role', async () => {
@@ -605,6 +834,7 @@ describe('role management', () => {
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-id', roleName: 'owner' },
       })
+
       expect(errors?.[0].message).toMatch(/owner/)
     })
 
@@ -614,12 +844,15 @@ describe('role management', () => {
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-id', roleName: 'owner' },
       })
+
       expect(assigned.errors).toBeUndefined()
+
       // member is now the only owner → demoting them must be refused
       const { errors } = await mutate({
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-id', roleName: 'user' },
       })
+
       expect(errors?.[0].message).toMatch(/last owner/)
     })
 
@@ -636,6 +869,7 @@ describe('role management', () => {
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-id', roleName: 'user' },
       })
+
       expect(errors?.[0].message).toMatch(/owner/)
     })
   })
@@ -652,8 +886,11 @@ describe('role management', () => {
         query: SEARCH,
         variables: { roleName: 'moderator' },
       })
+
       expect(errors).toBeUndefined()
+
       const ids = data.User.map((u) => u.id)
+
       expect(ids).toContain('mod1')
       expect(ids).not.toContain('admin-id')
     })
@@ -674,8 +911,11 @@ describe('role management', () => {
         query: SEARCH,
         variables: { roleName: 'moderator', search: 'ann' },
       })
+
       expect(errors).toBeUndefined()
+
       const ids = data.User.map((u) => u.id)
+
       expect(ids).toContain('mod-anna')
       expect(ids).not.toContain('mod-bob')
     })
@@ -686,9 +926,121 @@ describe('role management', () => {
         { id: 'plain', role: 'user' },
         { email: 'plain@e.org', password: '1234' },
       )
-      authenticatedUser = (await plain.toJson()) as Context['user']
+      authenticatedUser = await plain.toJson()
       const { errors } = await query({ query: SEARCH, variables: { roleName: 'admin' } })
+
       expect(errors?.[0].message).toMatch(/Not Authorized/)
     })
+  })
+})
+
+describe('Subscription.permissionsChanged', () => {
+  it('delivers the changed role name, plus the previous one on a rename', async () => {
+    // The webapp keeps an admin roles view open while another admin edits. The event
+    // carries both names so a viewer with the renamed role selected can follow the
+    // selection instead of losing it on the refetch.
+    const pubsub = new PubSub()
+    const context = { pubsub } as unknown as Context
+    const iterator = rolesResolvers.Subscription.permissionsChanged.subscribe(null, null, context)
+    const next = iterator.next()
+
+    publishPermissionsChanged(context, 'content-lead', 'editor')
+
+    const { value } = await next
+
+    expect(
+      rolesResolvers.Subscription.permissionsChanged.resolve(
+        value as { permissionsChanged: { roleName: string | null } },
+      ),
+    ).toEqual({ roleName: 'content-lead', previousRoleName: 'editor' })
+  })
+})
+
+// The resolvers' own guards, exercised without the schema. The shield guarantees an
+// authenticated role.manage actor and Neo4j's `count(*)` always yields a row, so these
+// paths cannot be reached through a GraphQL request — they decide whether the resolvers
+// degrade or crash when a future internal caller (a CLI task, a migration) skips both.
+describe('roles resolver guards (direct invocation)', () => {
+  const contextWithout = (parts: Record<string, unknown>) =>
+    ({
+      user: null,
+      pubsub: { publish: vi.fn() },
+      ...parts,
+    }) as unknown as Context
+
+  const definition = { name: 'editor', protected: false, permissions: [] }
+  // `count(*)` never returns an empty result in production; this stands in for a caller
+  // that hands the resolvers a database stub, and for a driver returning nothing at all.
+  const noRows = () => vi.fn().mockResolvedValue({ records: [] })
+
+  it('records "unknown" as the audit actor when the context carries no user', async () => {
+    // Every role write is audited with the acting user's id. A missing user must be
+    // recorded as such, not written as `undefined` into the audit trail (or crash on
+    // property access) — the trail is the only record of who changed permissions.
+    const upsertRole = vi.fn().mockResolvedValue(definition)
+    const renameRole = vi.fn().mockResolvedValue({ ...definition, name: 'renamed' })
+    const deleteRole = vi.fn().mockResolvedValue(undefined)
+    const context = contextWithout({
+      role: {
+        getRole: (name: string) => (name === 'editor' ? definition : undefined),
+        upsertRole,
+        renameRole,
+        deleteRole,
+      },
+      database: { query: noRows() },
+    })
+
+    await rolesResolvers.Mutation.createRole(null, { name: 'fresh', permissions: [] }, context)
+    await rolesResolvers.Mutation.updateRole(null, { name: 'editor', permissions: [] }, context)
+    await rolesResolvers.Mutation.renameRole(null, { name: 'editor', newName: 'renamed' }, context)
+    await rolesResolvers.Mutation.deleteRole(null, { name: 'editor' }, context)
+
+    expect(upsertRole).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ name: 'fresh' }),
+      'unknown',
+    )
+    expect(upsertRole).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ name: 'editor' }),
+      'unknown',
+    )
+    expect(renameRole).toHaveBeenCalledWith('editor', 'renamed', 'unknown')
+    expect(deleteRole).toHaveBeenCalledWith('editor', 'unknown')
+  })
+
+  it('reports memberCount 0 when the member count query yields no row', async () => {
+    // memberCount is a non-nullable Int. A row-less result must degrade to 0 rather than
+    // produce undefined/NaN, which the schema would reject as a null for a non-null field.
+    const context = contextWithout({
+      role: { getRole: () => definition, upsertRole: vi.fn().mockResolvedValue(definition) },
+      database: { query: noRows() },
+    })
+
+    const updated = await rolesResolvers.Mutation.updateRole(
+      null,
+      { name: 'editor', permissions: [] },
+      context,
+    )
+
+    expect(updated).toMatchObject({ name: 'editor', memberCount: 0 })
+  })
+
+  it('refuses to grant the owner role when the context carries no user', async () => {
+    // Owner is the failsafe role: only an owner may hand it out. The check reads the
+    // actor's effective role, so a context without a user must fall through to the
+    // baseline and be refused — never treated as an owner by default.
+    const context = contextWithout({
+      role: { getRole: () => ({ name: OWNER_ROLE, protected: true, permissions: [] }) },
+      database: { query: noRows() },
+    })
+
+    await expect(
+      rolesResolvers.Mutation.setUserRole(
+        null,
+        { userId: 'target', roleName: OWNER_ROLE },
+        context,
+      ),
+    ).rejects.toThrow(/Only an owner/)
   })
 })

@@ -33,8 +33,11 @@ function generateApiKey(): { key: string; hash: string; prefix: string } {
   return { key, hash, prefix }
 }
 
-function toNumber(value: Integer | number): number {
-  return typeof value === 'number' ? value : value.toNumber()
+// Every call site reads a `count(...)`/`size(...)` out of a record, which the driver always hands
+// back as a Bolt Integer — the `| number` half of the old signature (and its typeof check) had no
+// caller and could not run.
+function toNumber(value: Integer): number {
+  return value.toNumber()
 }
 
 function getRecord(record: Neo4jRecord, field: string): Record<string, unknown> {

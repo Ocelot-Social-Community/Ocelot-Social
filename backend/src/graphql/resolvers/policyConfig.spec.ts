@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { categoryRank } from '@src/config/categories'
 import { allKeys, createInMemoryPolicyService } from '@src/policy'
 
@@ -32,12 +34,14 @@ const rowFor = (
 describe('policyConfig resolver', () => {
   it('returns exactly one row per policy key', () => {
     const keys = rowsFor().map((row) => row.key)
+
     expect(new Set(keys).size).toBe(keys.length)
     expect([...keys].sort()).toEqual([...allKeys()].sort())
   })
 
   it('returns an empty list when the context has no policy service (guarded, like systemConfig)', () => {
     const rows = resolvers.Query.policyConfig(null, null, {} as unknown as Context)
+
     expect(rows).toEqual([])
   })
 
@@ -53,6 +57,7 @@ describe('policyConfig resolver', () => {
     // keeps no order list of its own, so the sort has to hold here at the source.
     const ranks = rowsFor().map((row) => categoryRank(row.category))
     const sorted = [...ranks].sort((a, b) => a - b)
+
     expect(ranks).toEqual(sorted)
   })
 
@@ -65,6 +70,7 @@ describe('policyConfig resolver', () => {
 
     it('is available and effective when the LiveKit env is present', () => {
       const row = rowFor('videoConference', {}, LIVEKIT)
+
       expect(row.available).toBe(true)
       expect(JSON.parse(row.effective)).toBe(true)
       expect(JSON.parse(row.softwareDefault)).toBe(true)
@@ -78,6 +84,7 @@ describe('policyConfig resolver', () => {
 
     it('is unavailable and forced off when the env is missing', () => {
       const row = rowFor('videoConference', {}, {})
+
       expect(row.available).toBe(false)
       expect(JSON.parse(row.effective)).toBe(false)
       expect(row.requiresEnv.every((entry) => entry.state === 'missing')).toBe(true)
@@ -86,6 +93,7 @@ describe('policyConfig resolver', () => {
     it('distinguishes an empty value from a missing one', () => {
       const row = rowFor('videoConference', {}, { ...LIVEKIT, LIVEKIT_API_SECRET: '' })
       const byName = Object.fromEntries(row.requiresEnv.map((entry) => [entry.name, entry.state]))
+
       expect(byName.LIVEKIT_URL).toBe('set')
       expect(byName.LIVEKIT_API_SECRET).toBe('empty')
       expect(row.available).toBe(false)
@@ -95,6 +103,7 @@ describe('policyConfig resolver', () => {
   describe('apiKeysEnabled (env-seeded, no hard requirement)', () => {
     it('reports the seed var and its presence, and folds it into the configured default', () => {
       const row = rowFor('apiKeysEnabled', {}, { API_KEYS_ENABLED: 'true' })
+
       expect(row.envSeed).toBe('API_KEYS_ENABLED')
       expect(row.envSeedState).toBe('set')
       expect(JSON.parse(row.configuredDefault)).toBe(true)
@@ -106,12 +115,14 @@ describe('policyConfig resolver', () => {
 
     it('marks the seed var missing when unset', () => {
       const row = rowFor('apiKeysEnabled', {}, {})
+
       expect(row.envSeedState).toBe('missing')
     })
   })
 
   it('exposes no envSeed for keys without one (videoConference uses requiresEnv instead)', () => {
     const row = rowFor('videoConference')
+
     expect(row.envSeed).toBeNull()
     expect(row.envSeedState).toBeNull()
   })

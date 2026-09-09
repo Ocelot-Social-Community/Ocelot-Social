@@ -31,7 +31,6 @@ reviews:
   path_filters:
     - "!**/*.lock"
     - "!**/package-lock.json"
-    - "!**/yarn.lock"
     - "!**/*.snap"
     - "!**/*.png"
     - "!**/coverage/**"

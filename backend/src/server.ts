@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable import-x/no-named-as-default-member */
@@ -72,7 +72,13 @@ const createServer = async (options?: CreateServerOptions) => {
         logger.debug('WebSocket client disconnected')
       },
     },
-    wsServer,
+    // `@types/ws` is a CommonJS types package, so under NodeNext TypeScript instantiates it once
+    // per resolution mode: this file is ESM and gets the `import` flavour, graphql-ws' own `.d.ts`
+    // is CJS and gets the `require` one. Same class at runtime, two incompatible types at compile
+    // time (`options.WebSocket` is the synthetic default on one side, the module namespace on the
+    // other). The cast states that they are the same object; it goes away with graphql-ws 6,
+    // which ships ESM types.
+    wsServer as Parameters<typeof useServer>[1],
   )
 
   // Legacy protocol: subscriptions-transport-ws (subprotocol: graphql-ws)
@@ -108,17 +114,10 @@ const createServer = async (options?: CreateServerOptions) => {
     // file uploads, which Apollo Server 4 blocks by default as a CSRF vector. The webapp relies on
     // JWT/cookie authentication and CORS configuration for request validation instead.
     csrfPrevention: false,
-    formatError: (formattedError, error) => {
-      if (formattedError.message === 'ERROR_VALIDATION') {
-        return {
-          ...formattedError,
-          message: String(
-            (error as any).originalError?.details?.map((d) => d.message) ?? formattedError.message,
-          ),
-        }
-      }
-      return formattedError
-    },
+    // No `formatError`: the one it used to carry unwrapped neode's Joi validation errors, whose
+    // `originalError.details` it flattened into the 'ERROR_VALIDATION' placeholder message. neode
+    // is gone (see src/db/schema), nothing throws that message any more and nothing attaches
+    // `.details` to an error, so the hook had become an identity function on every code path.
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
       {

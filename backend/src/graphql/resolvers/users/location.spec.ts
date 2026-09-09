@@ -1,13 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import queryLocations from '@graphql/queries/queryLocations.gql'
 import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
+import { createOrUpdateLocations } from './location'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { Session } from 'neo4j-driver'
+import type { MockInstance } from 'vitest'
 
 let variables
 let authenticatedUser: Context['user']
@@ -135,7 +142,7 @@ const welzheimFeature = {
   ],
 }
 
-let fetchSpy: jest.SpyInstance
+let fetchSpy: MockInstance<typeof global.fetch>
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -157,7 +164,7 @@ afterAll(() => {
 beforeEach(() => {
   variables = {}
   authenticatedUser = null
-  fetchSpy = jest.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+  fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
     const path = decodeURIComponent(url)
 
@@ -200,6 +207,7 @@ describe('Location Service', () => {
     variables = { place: 'Berlin', lang: 'en', proximity: '10.0,53.55' }
     await query({ query: queryLocations, variables })
     const calledUrl = fetchSpy.mock.calls[0][0] as string
+
     expect(calledUrl).toContain(`proximity=${encodeURIComponent(variables.proximity as string)}`)
   })
 
@@ -207,6 +215,7 @@ describe('Location Service', () => {
     variables = { place: 'Köln', lang: 'en' }
     await query({ query: queryLocations, variables })
     const calledUrl = fetchSpy.mock.calls[0][0] as string
+
     expect(calledUrl).toContain(encodeURIComponent('Köln')) // 'K%C3%B6ln'
     expect(calledUrl).not.toContain(encodeURIComponent(encodeURIComponent('Köln'))) // not 'K%25C3%25B6ln'
   })
@@ -217,6 +226,7 @@ describe('Location Service', () => {
       lang: 'en',
     }
     const result = await query({ query: queryLocations, variables })
+
     expect(result.data.queryLocations).toEqual(
       expect.arrayContaining([
         {
@@ -259,6 +269,7 @@ describe('Location Service', () => {
       lang: 'de',
     }
     const result = await query({ query: queryLocations, variables })
+
     expect(result.data.queryLocations).toEqual([
       {
         id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
@@ -299,6 +310,7 @@ describe('Location Service', () => {
       lang: 'en',
     }
     const result = await query({ query: queryLocations, variables })
+
     expect(result.data.queryLocations).toEqual([])
   })
 
@@ -328,7 +340,9 @@ describe('Location Service', () => {
       { id: 'poi.hagenbeck', place_name: 'Tierpark Hagenbeck', lat: 53.551, lng: 9.993 },
     ])
     expect(fetchSpy).toHaveBeenCalledTimes(2)
+
     const calledUrls = fetchSpy.mock.calls.map(([input]) => input as string)
+
     expect(calledUrls[0]).toContain('types=address')
     expect(calledUrls[0]).toContain('limit=1')
     expect(calledUrls[1]).toContain('types=poi')
@@ -373,7 +387,9 @@ describe('Location Service', () => {
     expect(result.data.queryLocations).toEqual([
       { id: 'address.example', place_name: 'Musterstraße 1, Hamburg', lat: 53.551, lng: 9.993 },
     ])
+
     const calledUrls = fetchSpy.mock.calls.map(([input]) => input as string)
+
     expect(calledUrls[0]).toContain('types=address')
   })
 
@@ -416,13 +432,214 @@ describe('Location Service', () => {
     expect(fetchSpy).toHaveBeenCalledTimes(2)
   })
 
+  // Mapbox answers an error (a bad token, a rate limit) with a body that has no `features` key at
+  // all, not with an empty list. Without the fallback the map would `.map` over undefined and the
+  // whole location search would 500 instead of showing "no results".
+  it('returns an empty array when Mapbox answers without a features array', async () => {
+    fetchSpy.mockResolvedValue(mockJsonResponse({ message: 'Not Authorized - Invalid Token' }))
+    variables = { place: 'Berlin', lang: 'en' }
+    const result = await query({ query: queryLocations, variables })
+
+    expect(result.data.queryLocations).toEqual([])
+  })
+
+  // A caller that requests no `types` at all still has to reverse-geocode in specific-to-broad
+  // order. Taking DEFAULT_LOCATION_TYPES' own country-first order here would short-circuit on the
+  // country that every coordinate on Earth trivially matches, and no pin would ever resolve to a
+  // street address.
+  it('reverse-geocodes with the default types, most specific first, when none are requested', async () => {
+    fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+      const path = decodeURIComponent(url)
+      if (path.includes('types=place')) {
+        return Promise.resolve(
+          mockJsonResponse({
+            features: [{ id: 'place.hamburg', place_name: 'Hamburg', center: [9.993, 53.551] }],
+          }),
+        )
+      }
+      return Promise.resolve(mockJsonResponse({ features: [] }))
+    })
+
+    variables = { place: '9.993,53.551', lang: 'en' }
+    const result = await query({ query: queryLocations, variables })
+
+    expect(result.data.queryLocations).toEqual([
+      { id: 'place.hamburg', place_name: 'Hamburg', lat: 53.551, lng: 9.993 },
+    ])
+
+    // DEFAULT_LOCATION_TYPES is country,region,place,address — walked here as
+    // address → place → region → country. `place` answers second, so region and country are never
+    // asked; the country request that the raw default order would have sent FIRST never happens.
+    const requestedTypes = fetchSpy.mock.calls.map(([input]) =>
+      new URL(input as string).searchParams.get('types'),
+    )
+
+    expect(requestedTypes).toEqual(['address', 'place'])
+  })
+
   it('query Location without a place name given', async () => {
     variables = {
       place: '',
       lang: 'en',
     }
     const result = await query({ query: queryLocations, variables })
+
     expect(result.data.queryLocations).toEqual([])
+  })
+})
+
+// Called directly rather than through a mutation. Every one of these paths is a REJECTION of what
+// Mapbox answered, and the mutations that reach this helper (UpdateUser, CreateGroup, CreatePost
+// with an event location, Signup) would each have to be driven with its own full fixture set to
+// arrive at the same four lines. The coordinate variant has no GraphQL entry point of its own at
+// all: it is reached only from the event-location branch of CreatePost/UpdatePost.
+describe(createOrUpdateLocations, () => {
+  const locationContext = () => ({ config: { MAPBOX_TOKEN: 'test-token' } }) as unknown as Context
+
+  const withSession = async (work: (session: Session) => Promise<unknown>): Promise<void> => {
+    const session = database.driver.session()
+    try {
+      await work(session)
+    } finally {
+      await session.close()
+    }
+  }
+
+  const respondWith = (body: unknown) => {
+    fetchSpy.mockResolvedValue(mockJsonResponse(body))
+  }
+
+  // createLocation writes one property per supported locale and the driver REFUSES a query whose
+  // parameters are undefined — so a fixture that omits a single `text_*` fails on the write rather
+  // than on what the test is about. Filled uniformly here; none of these cases is about
+  // translations.
+  const feature = (attributes: Record<string, unknown>) => ({
+    text_en: 'Fixture',
+    text_de: 'Fixture',
+    text_fr: 'Fixture',
+    text_nl: 'Fixture',
+    text_it: 'Fixture',
+    text_es: 'Fixture',
+    text_pt: 'Fixture',
+    text_pl: 'Fixture',
+    text_ru: 'Fixture',
+    text_sq: 'Fixture',
+    ...attributes,
+  })
+
+  // Reverse geocoding tries address, then poi, then place, and only gives up once all three come
+  // back empty. Coordinates in the ocean or in unmapped terrain do exactly that — and a dropped
+  // pin there must be refused, not stored as a nameless Location the UI cannot label.
+  it('refuses coordinates that reverse-geocode to nothing at all', async () => {
+    respondWith({ features: [] })
+
+    await expect(
+      withSession(async (session) =>
+        createOrUpdateLocations('Post', 'event-post', 'somewhere', session, locationContext(), {
+          lat: 0,
+          lng: 0,
+        }),
+      ),
+    ).rejects.toThrow('event location coordinates are invalid')
+
+    // One request per type, none skipped: giving up after the first empty answer would refuse
+    // every pin that sits on a POI or a place but not on an addressed building.
+    //
+    // The TYPES, not just the count — three calls is equally true of a loop that asked for
+    // `address` three times. The order is load-bearing too: `place` matches almost any
+    // coordinate on Earth, so asking it before `address` would resolve a pin dropped on a
+    // building to the surrounding city and silently discard the precise result.
+    const requestedTypes = fetchSpy.mock.calls.map(([input]) =>
+      new URL(input as string).searchParams.get('types'),
+    )
+
+    expect(requestedTypes).toEqual(['address', 'poi', 'place'])
+  })
+
+  // The forward-geocoding counterpart: free text Mapbox knows nothing about. Accepting it would
+  // attach the node to a Location with an undefined id.
+  it('refuses a location name Mapbox does not resolve', async () => {
+    respondWith({ features: [] })
+
+    await expect(
+      withSession(async (session) =>
+        createOrUpdateLocations('User', 'located-user', 'Absurdistan', session, locationContext()),
+      ),
+    ).rejects.toThrow('locationName is invalid')
+  })
+
+  // A feature CAN come back without place_type (Mapbox returns those for some interpolated
+  // address results). The code below indexes into place_type, so the guard is what stands between
+  // that and a TypeError inside the write transaction.
+  it('refuses a resolved feature that carries no place_type', async () => {
+    respondWith({ features: [{ id: 'place.no-type', place_name: 'Typeless' }] })
+
+    await expect(
+      withSession(async (session) =>
+        createOrUpdateLocations('User', 'located-user', 'Typeless', session, locationContext()),
+      ),
+    ).rejects.toThrow('locationName is invalid')
+  })
+
+  describe('given a user to attach the location to', () => {
+    beforeEach(async () => {
+      await Factory.build('user', { id: 'located-user' })
+    })
+
+    // Mapbox ranks by relevance, which is not the same as "the one the user picked". The client
+    // sends back the exact `matching_place_name` string it displayed, and that string has to win
+    // over the first result — otherwise picking "Berlin, New Jersey" from the dropdown silently
+    // saves Berlin, Germany.
+    it('prefers the feature whose matching_place_name is the requested one', async () => {
+      respondWith({
+        features: [
+          feature({ id: 'place.berlin-de', place_name: 'Berlin, Germany', place_type: ['place'] }),
+          feature({
+            id: 'place.berlin-nj',
+            place_name: 'Berlin, New Jersey',
+            matching_place_name: 'Berlin, New Jersey, United States',
+            place_type: ['place'],
+          }),
+        ],
+      })
+
+      await withSession(async (session) => {
+        await createOrUpdateLocations(
+          'User',
+          'located-user',
+          'Berlin, New Jersey, United States',
+          session,
+          locationContext(),
+        )
+      })
+
+      const { records } = await database.query({
+        query: 'MATCH (:User { id: "located-user" })-[:IS_IN]->(l:Location) RETURN l.id AS id',
+      })
+
+      expect(records.map((record) => record.get('id') as string)).toEqual(['place.berlin-nj'])
+    })
+
+    // Mapbox omits `context` for the broadest features (a country has nothing above it). The
+    // hierarchy walk has to be skipped then rather than iterated over undefined.
+    it('stores a feature that has no parent context as a standalone location', async () => {
+      respondWith({
+        features: [feature({ id: 'country.de', place_name: 'Germany', place_type: ['country'] })],
+      })
+
+      await withSession(async (session) => {
+        await createOrUpdateLocations('User', 'located-user', 'Germany', session, locationContext())
+      })
+
+      const { records } = await database.query({
+        query: `MATCH (:User { id: "located-user" })-[:IS_IN]->(l:Location)
+                RETURN l.id AS id, size([(l)-[:IS_IN]->(:Location) | 1]) AS parents`,
+      })
+
+      expect(records.map((record) => record.get('id') as string)).toEqual(['country.de'])
+      expect(records[0].get('parents').toNumber()).toBe(0)
+    })
   })
 })
 
@@ -447,6 +664,7 @@ describe('userMiddleware', () => {
         `MATCH (city:Location)-[:IS_IN]->(district:Location)-[:IS_IN]->(state:Location)-[:IS_IN]->(country:Location) return city {.*}, state {.*}, country {.*}`,
         {},
       )
+
       expect(
         locations.records.map((record) => {
           return {

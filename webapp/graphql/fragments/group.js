@@ -9,7 +9,6 @@ export const group = gql`
     deleted
     about
     description
-    descriptionExcerpt
     groupType
     actionRadius
     categories {

@@ -1,6 +1,8 @@
 // Unit tests for the visibility primitive — the single mechanism shared by the
 // `policy` query resolver and the policyChanged subscription filter.
 
+import { describe, it, expect, afterEach } from 'vitest'
+
 import {
   allKeys,
   audiencesFor,
@@ -11,6 +13,14 @@ import {
   typeFor,
   visibleKeys,
 } from './schema'
+
+// vitest has no `isolateModulesAsync`: resetting the registry before the dynamic import does the
+// same job, since a module graph is only shared within a file. Wrapped so the call sites keep
+// reading as "load this in isolation".
+const isolateModules = async (run: () => Promise<void>): Promise<void> => {
+  vi.resetModules()
+  await run()
+}
 
 // The subset of ./schema the perm-gating tests re-import against a mocked JSON
 // schema. Built from the already-imported functions to avoid a namespace import.
@@ -30,6 +40,7 @@ describe('policy visibility', () => {
     it('returns a copy — mutating it does not alter the shared schema', () => {
       const audiences = audiencesFor('apiKeysEnabled')
       audiences.push('public') // would widen visibility if it were the shared ref
+
       expect(audiencesFor('apiKeysEnabled')).toEqual(['authenticated'])
       // canView must stay unaffected: an anonymous viewer still cannot see it.
       expect(canView('apiKeysEnabled', null)).toBe(false)
@@ -84,26 +95,33 @@ describe('policy visibility', () => {
     // Reimport schema against an injected JSON that gates keys on permissions.
     // The fresh module is passed as an object (not destructured) so its functions
     // don't shadow the outer imports.
-    const withMockedSchema = (run: (schema: SchemaModule) => void) => {
-      jest.isolateModules(() => {
-        jest.doMock('./policy.schema.json', () => ({
-          type: 'object',
-          properties: {
-            // public ⇒ everyone
-            publicKey: { type: 'boolean', default: false, visibility: ['public'] },
-            // empty/missing visibility ⇒ admin-only fallback (perm:policy.manage)
-            adminOnlyKey: { type: 'boolean', default: false },
-            // explicit permission audience ⇒ gated on exactly that permission
-            badgeGatedKey: { type: 'boolean', default: false, visibility: ['perm:badge.manage'] },
+    const withMockedSchema = async (run: (schema: SchemaModule) => void) => {
+      await isolateModules(async () => {
+        // `default:` because the consumer imports the JSON as a default; ESM mock factories get
+        // no CommonJS interop layer to synthesise one.
+        vi.doMock('./policy.schema.json', () => ({
+          default: {
+            type: 'object',
+            properties: {
+              // public ⇒ everyone
+              publicKey: { type: 'boolean', default: false, visibility: ['public'] },
+              // empty/missing visibility ⇒ admin-only fallback (perm:policy.manage)
+              adminOnlyKey: { type: 'boolean', default: false },
+              // explicit permission audience ⇒ gated on exactly that permission
+              badgeGatedKey: {
+                type: 'boolean',
+                default: false,
+                visibility: ['perm:badge.manage'],
+              },
+            },
           },
         }))
-        // eslint-disable-next-line @typescript-eslint/no-require-imports, n/global-require
-        run(require('./schema') as SchemaModule)
+        run(await import('./schema'))
       })
     }
 
-    it('treats an empty-visibility key as admin-only (perm:policy.manage)', () => {
-      withMockedSchema((schema) => {
+    it('treats an empty-visibility key as admin-only (perm:policy.manage)', async () => {
+      await withMockedSchema((schema) => {
         expect(schema.audiencesFor('adminOnlyKey' as never)).toEqual(['perm:policy.manage'])
         expect(schema.canView('adminOnlyKey' as never, { authenticated: true })).toBe(false)
         expect(
@@ -115,9 +133,10 @@ describe('policy visibility', () => {
       })
     })
 
-    it('gates an explicit perm:<key> on exactly that permission', () => {
-      withMockedSchema((schema) => {
+    it('gates an explicit perm:<key> on exactly that permission', async () => {
+      await withMockedSchema((schema) => {
         const viewer = (permissions: string[]) => ({ authenticated: true, permissions })
+
         expect(schema.canView('badgeGatedKey' as never, viewer(['badge.manage']))).toBe(true)
         // a different held permission must NOT unlock it
         expect(schema.canView('badgeGatedKey' as never, viewer(['policy.manage']))).toBe(false)
@@ -125,8 +144,8 @@ describe('policy visibility', () => {
       })
     })
 
-    it('scopes visibleKeys() by the viewer’s held permissions', () => {
-      withMockedSchema((schema) => {
+    it('scopes visibleKeys() by the viewer’s held permissions', async () => {
+      await withMockedSchema((schema) => {
         expect(schema.visibleKeys(null)).toEqual(['publicKey'])
         // authenticated alone unlocks neither permission-gated key
         expect(schema.visibleKeys({ authenticated: true })).toEqual(['publicKey'])
@@ -188,7 +207,7 @@ describe('policy visibility', () => {
   })
 })
 
-describe('categoryFor', () => {
+describe(categoryFor, () => {
   it('returns each key’s declared admin-config category', () => {
     expect(categoryFor('publicRegistration')).toBe('registration')
     expect(categoryFor('inviteLinkLimit')).toBe('registration')
@@ -204,9 +223,36 @@ describe('categoryFor', () => {
       expect(categoryFor(key)).toEqual(expect.any(String))
     }
   })
+
+  // `category` is optional in the JSON schema (Ajv only enum-checks it when present), so a
+  // newly added key can ship without one. The guard above proves no shipped key does; this
+  // proves the accessor actually REFUSES such a key instead of returning undefined, which
+  // would drop it into a phantom group in the admin config tab. Only reachable against an
+  // injected schema.
+  describe('a key without a declared category', () => {
+    afterEach(() => {
+      vi.doUnmock('./policy.schema.json')
+      vi.resetModules()
+    })
+
+    it('is rejected when its category is read', async () => {
+      vi.resetModules()
+      vi.doMock('./policy.schema.json', () => ({
+        default: {
+          type: 'object',
+          properties: { uncategorised: { type: 'boolean', default: false } },
+        },
+      }))
+      const schema = await import('./schema')
+
+      expect(() => schema.categoryFor('uncategorised' as never)).toThrow(
+        /key "uncategorised" is missing a "category"/,
+      )
+    })
+  })
 })
 
-describe('requiresPolicyFor', () => {
+describe(requiresPolicyFor, () => {
   it('returns the declared policy→policy dependencies (empty for most keys)', () => {
     expect(requiresPolicyFor('showGroupButtonInHeader')).toEqual(['groupsEnabled'])
     expect(requiresPolicyFor('groupsEnabled')).toEqual([])
@@ -216,6 +262,7 @@ describe('requiresPolicyFor', () => {
   it('returns a fresh copy — a caller mutating it cannot alter the shared schema', () => {
     const deps = requiresPolicyFor('showGroupButtonInHeader')
     deps.push('groupsEnabled')
+
     expect(requiresPolicyFor('showGroupButtonInHeader')).toEqual(['groupsEnabled'])
   })
 
@@ -230,6 +277,7 @@ describe('requiresPolicyFor', () => {
         expect(allKeys()).toContain(dep)
         expect(typeFor(key)).toBe('boolean')
         expect(typeFor(dep)).toBe('boolean')
+
         // Every audience that can see the dependent must also see the dependency.
         for (const audience of keyAudiences) {
           expect(audiencesFor(dep)).toContain(audience)
@@ -246,56 +294,71 @@ describe('requiresPolicyFor', () => {
   describe('assertRequiresPolicyGraph rejects a mis-authored schema at module load', () => {
     // Returns a thunk that reloads ./schema against a mocked JSON; assertRequiresPolicyGraph
     // runs during require, so a violation surfaces as a throw when the thunk is called.
-    const loadWith = (properties: Record<string, unknown>) => (): void => {
-      jest.isolateModules(() => {
-        jest.doMock('./policy.schema.json', () => ({ type: 'object', properties }))
-        // eslint-disable-next-line @typescript-eslint/no-require-imports, n/global-require, import-x/no-unassigned-import
-        require('./schema')
-      })
+    // Async: ESM has no synchronous module load. isolateModulesAsync would swallow the load
+    // rejection this asserts on, so the registry is reset directly instead.
+    const loadWith = (properties: Record<string, unknown>) => async (): Promise<void> => {
+      vi.resetModules()
+      vi.doMock('./policy.schema.json', () => ({
+        default: { type: 'object', properties },
+      }))
+      await import('./schema')
     }
 
-    it('throws on a requiresPolicy cycle', () => {
-      expect(
+    it('accepts a dependency declared AFTER its dependent (no false cycle)', async () => {
+      // Property order is authoring order, not dependency order: "b" is first reached
+      // through "a" and coloured BLACK, so the outer DFS loop must skip it. A detector
+      // that re-visited it — or read "already seen" as GREY — would reject a perfectly
+      // valid schema and take the whole backend down at boot.
+      await expect(
+        loadWith({
+          a: { type: 'boolean', default: false, requiresPolicy: ['b'] },
+          b: { type: 'boolean', default: false },
+        })(),
+      ).resolves.toBeUndefined()
+    })
+
+    it('throws on a requiresPolicy cycle', async () => {
+      await expect(
         loadWith({
           a: { type: 'boolean', default: false, requiresPolicy: ['b'] },
           b: { type: 'boolean', default: false, requiresPolicy: ['a'] },
-        }),
-      ).toThrow(/requiresPolicy cycle/)
+        })(),
+      ).rejects.toThrow(/requiresPolicy cycle/)
     })
 
-    it('throws when a dependency names an unknown key', () => {
-      expect(
+    it('throws when a dependency names an unknown key', async () => {
+      await expect(
         loadWith({
           a: { type: 'boolean', default: false, requiresPolicy: ['missing'] },
-        }),
-      ).toThrow(/requiresPolicy unknown key "missing"/)
+        })(),
+      ).rejects.toThrow(/requiresPolicy unknown key "missing"/)
     })
 
-    it('throws when the dependent key is not boolean', () => {
-      expect(
+    it('throws when the dependent key is not boolean', async () => {
+      await expect(
         loadWith({
           a: { type: 'number', default: 0, requiresPolicy: ['b'] },
           b: { type: 'boolean', default: false },
-        }),
-      ).toThrow(/"a" has requiresPolicy but is not boolean/)
+        })(),
+      ).rejects.toThrow(/"a" has requiresPolicy but is not boolean/)
     })
 
-    it('throws when a dependency is not boolean', () => {
-      expect(
+    it('throws when a dependency is not boolean', async () => {
+      await expect(
         loadWith({
           a: { type: 'boolean', default: false, requiresPolicy: ['b'] },
           b: { type: 'number', default: 0 },
-        }),
-      ).toThrow(/requiresPolicy non-boolean key "b"/)
+        })(),
+      ).rejects.toThrow(/requiresPolicy non-boolean key "b"/)
     })
 
-    it('throws when a dependency is not visible everywhere the dependent is', () => {
-      expect(
+    it('throws when a dependency is not visible everywhere the dependent is', async () => {
+      await expect(
         loadWith({
           a: { type: 'boolean', default: false, visibility: ['public'], requiresPolicy: ['b'] },
           b: { type: 'boolean', default: false, visibility: ['authenticated'] },
-        }),
-      ).toThrow(/visible to "public" but its requiresPolicy dependency "b" is not/)
+        })(),
+      ).rejects.toThrow(/visible to "public" but its requiresPolicy dependency "b" is not/)
     })
   })
 })

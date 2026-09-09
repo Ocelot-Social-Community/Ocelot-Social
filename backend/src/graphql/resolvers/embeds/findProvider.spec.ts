@@ -1,4 +1,6 @@
-import findProvider from './findProvider'
+import { describe, it, expect } from 'vitest'
+
+import findProvider, { embedProviders } from './findProvider'
 
 describe('Vimeo', () => {
   it('matches `https://vimeo.com/showcase/2098620/video/4082288`', () => {
@@ -26,9 +28,7 @@ describe('GIPHY', () => {
 
 describe('Flicker', () => {
   it('matches `https://flic.kr/p/VT2HCQ`', () => {
-    expect(findProvider('https://flic.kr/p/VT2HCQ')).toEqual(
-      'https://www.flickr.com/services/oembed/',
-    )
+    expect(findProvider('https://flic.kr/p/VT2HCQ')).toBe('https://www.flickr.com/services/oembed/')
   })
 })
 
@@ -60,7 +60,7 @@ describe('Reddit', () => {
   it('matches `https://www.reddit.com/r/LivestreamFail/comments/d6a2ge/greek_banned/`', () => {
     expect(
       findProvider('https://www.reddit.com/r/LivestreamFail/comments/d6a2ge/greek_banned/'),
-    ).toEqual('https://www.reddit.com/oembed')
+    ).toBe('https://www.reddit.com/oembed')
   })
 })
 
@@ -70,7 +70,7 @@ describe('Slideshare', () => {
       findProvider(
         'https://www.slideshare.net/ma6/lets-build-an-airport-how-to-estimate-large-scale-projects',
       ),
-    ).toEqual('http://www.slideshare.net/api/oembed/2')
+    ).toBe('http://www.slideshare.net/api/oembed/2')
   })
 })
 
@@ -78,7 +78,7 @@ describe('Soundcloud', () => {
   it('matches `https://soundcloud.com/placid-records/zangenhand-live-altes-wettb-ro`', () => {
     expect(
       findProvider('https://soundcloud.com/placid-records/zangenhand-live-altes-wettb-ro'),
-    ).toEqual('https://soundcloud.com/oembed')
+    ).toBe('https://soundcloud.com/oembed')
   })
 })
 
@@ -100,7 +100,7 @@ describe('Facebook', () => {
   it('matches `https://www.facebook.com/FacebookDeutschland/videos/1960353927603280/`', () => {
     expect(
       findProvider('https://www.facebook.com/FacebookDeutschland/videos/1960353927603280/'),
-    ).toEqual('https://www.facebook.com/plugins/post/oembed.json')
+    ).toBe('https://www.facebook.com/plugins/post/oembed.json')
   })
 })
 
@@ -116,8 +116,59 @@ describe('Youtube', () => {
   })
 
   it('matches `https://youtu.be/qkdXAtO40Fo?t=41`', () => {
-    expect(findProvider(`https://youtu.be/qkdXAtO40Fo?t=41`)).toEqual(
-      'https://www.youtube.com/oembed',
-    )
+    expect(findProvider(`https://youtu.be/qkdXAtO40Fo?t=41`)).toBe('https://www.youtube.com/oembed')
+  })
+})
+
+describe('unknown providers', () => {
+  // The caller (`fetchEmbed` in scraper.ts) branches on `if (!endpointUrl) return {}` and then
+  // falls back to plain metadata scraping. Returning anything but null for a link nobody
+  // provides oEmbed for would send the user's URL to an unrelated provider's API.
+  it('returns null for a link no provider claims', () => {
+    expect(findProvider('https://ocelot.social/post/1234/some-slug')).toBeNull()
+  })
+
+  // No provider matched means the hostname fallback ran, and that needs a parsable URL. A term
+  // without a scheme — what a user typing `vimeo.com/12345` into the embed field produces —
+  // throws out of the resolver instead of degrading to the null path above.
+  it('throws on input that is not an absolute URL', () => {
+    expect(() => {
+      findProvider('vimeo.com/12345')
+    }).toThrow(TypeError)
+  })
+})
+
+describe(embedProviders, () => {
+  // What the `embedProviders` query returns is rendered by the embeds settings page. The oEmbed
+  // endpoints are deliberately NOT part of it: they are call targets for the backend, and an
+  // extra key here would publish the full endpoint list of every provider to anyone.
+  it('exposes provider identity only', () => {
+    const providers = embedProviders()
+
+    expect(providers).toContainEqual({ name: 'Codepen', url: 'https://codepen.io' })
+
+    for (const provider of providers) {
+      expect(Object.keys(provider).sort()).toEqual(['name', 'url'])
+    }
+  })
+
+  // providers.json is hand-maintained, and both fields are non-nullable in the schema. A missing
+  // provider_name/provider_url would otherwise reach the settings page as an empty row (or a
+  // GraphQL null error) rather than failing here.
+  it('reports a name and a url for every provider', () => {
+    for (const provider of embedProviders()) {
+      expect(provider.name).toBeTruthy()
+      expect(provider.url).toBeTruthy()
+    }
+  })
+
+  // The point of serving the list from this module rather than from a second copy: every
+  // provider the settings page advertises must be one that link previews actually resolve. An
+  // entry whose provider_url no longer matches any endpoint would promise an embed that silently
+  // never happens.
+  it('advertises only providers that findProvider resolves', () => {
+    for (const provider of embedProviders()) {
+      expect(findProvider(provider.url)).toEqual(expect.any(String))
+    }
   })
 })

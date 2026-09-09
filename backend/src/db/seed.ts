@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 
 import { faker } from '@faker-js/faker'
-import sample from 'lodash/sample'
+import sample from 'lodash/sample.js'
 
 import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
@@ -24,6 +24,18 @@ import { ensureUserRoleEdges, seedDefaultRoleNodes } from '@src/role'
 import Factory from './factories'
 import { nudgeCacheResync } from './resync-caches'
 import { trophies, verification } from './seed/badges'
+
+import type { TestNode } from './testing/node'
+
+// The fixture lookups return null for an unknown key, where neode threw. Everything the seed
+// looks up it created a few lines earlier, so a miss means the seed itself changed — worth
+// saying which node, rather than failing three statements later on undefined.
+const requireNode = (node: TestNode | null, what: string): TestNode => {
+  if (!node) {
+    throw new Error(`seed: expected ${what} to exist`)
+  }
+  return node
+}
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
@@ -1613,9 +1625,12 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
 
-    let passedEvent = await neode.find('Post', 'e1')
+    // find() returns null for an unknown key now, where neode threw. The seed knows these
+    // nodes exist — it just created them — so a non-null assertion would be honest, but the
+    // explicit throw says which one is missing if the seed above ever changes.
+    let passedEvent = requireNode(await neode.find('Post', 'e1'), 'Post e1')
     await passedEvent.update({ eventStart: new Date(2010, 8, 30, 10).toISOString() })
-    passedEvent = await neode.find('Post', 'e2')
+    passedEvent = requireNode(await neode.find('Post', 'e2'), 'Post e2')
     await passedEvent.update({
       eventStart: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 3).toISOString(),
     })
@@ -2037,7 +2052,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
 
-    const p2 = await neode.find('Post', 'p2')
+    const p2 = requireNode(await neode.find('Post', 'p2'), 'Post p2')
     const p7 = await neode.find('Post', 'p7')
     const p8 = await neode.find('Post', 'p8')
     const p12 = await neode.find('Post', 'p12')
@@ -2322,37 +2337,33 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     // review resource first time
     await reportAgainstDagobert.relateTo(bobDerBaumeister, 'reviewed', {
-      ...disableVariables,
-      resourceId: 'u7',
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
     })
     await dagobert.update({ disabled: true, updatedAt: new Date().toISOString() })
     await reportAgainstTrollingPost.relateTo(peterLustig, 'reviewed', {
-      ...disableVariables,
-      resourceId: 'p2',
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
     })
     await p2.update({ disabled: true, updatedAt: new Date().toISOString() })
     await reportAgainstTrollingComment.relateTo(bobDerBaumeister, 'reviewed', {
-      ...disableVariables,
-      resourceId: 'c1',
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
     })
     await trollingComment.update({ disabled: true, updatedAt: new Date().toISOString() })
 
     // second review of resource and close report
     await reportAgainstDagobert.relateTo(peterLustig, 'reviewed', {
-      resourceId: 'u7',
       disable: false,
       closed: true,
     })
     await dagobert.update({ disabled: false, updatedAt: new Date().toISOString(), closed: true })
     await reportAgainstTrollingPost.relateTo(bobDerBaumeister, 'reviewed', {
-      resourceId: 'p2',
       disable: true,
       closed: true,
     })
     await p2.update({ disabled: true, updatedAt: new Date().toISOString(), closed: true })
     await reportAgainstTrollingComment.relateTo(peterLustig, 'reviewed', {
-      ...disableVariables,
-      resourceId: 'c1',
       disable: true,
       closed: true,
     })

@@ -146,7 +146,25 @@ export interface BrandingConfig {
     nameLengthMin: number
     nameLengthMax: number
     descriptionMinLength: number
+    /**
+     * Characters of the group description shown on a teaser card, cut with trunc-html
+     * so the markup stays balanced and the cut ends in an ellipsis.
+     *
+     * Read by the WEBAPP, and only there. It used to drive a `descriptionExcerpt` property
+     * persisted on every Group node; that field is gone — the same cut is now made where it
+     * is displayed, which is the only place it was ever needed.
+     */
     descriptionExcerptLength: number
+    /**
+     * Height of the collapsed group description on the group page, in text lines.
+     *
+     * Deliberately a line count and not a character count like `descriptionExcerptLength`:
+     * the group page preview is capped by CSS after layout, so a description opening with
+     * a heading and a list no longer renders far taller than one of the same length in
+     * plain paragraphs. The teaser cannot do this — its cards carry no "show more", so a
+     * cut with a visible ellipsis reads better there than a silently clipped block.
+     */
+    descriptionCollapsedLines: number
   }
   registration: {
     nonceLength: number

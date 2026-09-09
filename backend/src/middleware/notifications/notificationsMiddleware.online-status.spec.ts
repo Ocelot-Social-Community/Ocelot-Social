@@ -1,25 +1,40 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-import Factory, { cleanDatabase } from '@db/factories'
-import CreatePost from '@graphql/queries/posts/CreatePost.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
+
+import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect } from 'vitest'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
-const sendNotificationMailMock: (notification) => void = jest.fn()
-jest.mock('@src/emails/sendEmail', () => ({
+const sendNotificationMailMock: (notification) => void = vi.fn()
+vi.mock('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => {
     sendNotificationMailMock(notification)
   },
+  // ESM links the whole namespace: every named export ANY importer in the graph reaches
+  // for must exist here, or the module fails to link (loginMiddleware pulls the
+  // registration/verification mails in transitively). Under CommonJS a missing key was
+  // simply undefined and only mattered if it was called. The stubs below carry no
+  // behaviour — only the two above are asserted on.
+  defaultParams: vi.fn(),
+  sendChatMessageMail: vi.fn(),
+  sendRegistrationMail: vi.fn(),
+  sendEmailVerification: vi.fn(),
+  sendResetPasswordMail: vi.fn(),
+  sendWrongEmail: vi.fn(),
 }))
 
-let isUserOnlineMock = jest.fn().mockReturnValue(false)
-jest.mock('../helpers/isUserOnline', () => ({
-  isUserOnline: () => isUserOnlineMock(),
+let isUserOnlineMock = vi.fn<() => boolean>().mockReturnValue(false)
+vi.mock('../helpers/isUserOnline', () => ({
+  isUserOnline: (): boolean => isUserOnlineMock(),
 }))
+
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
+const { default: Factory, cleanDatabase } = await import('@db/factories')
+const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
+const { createApolloTestSetup } = await import('@root/test/helpers')
 
 let authenticatedUser: Context['user']
 const policy = { categoriesActive: false }
@@ -79,12 +94,12 @@ describe('online status and sending emails', () => {
 
   describe('user is online', () => {
     beforeAll(() => {
-      isUserOnlineMock = jest.fn().mockReturnValue(true)
+      isUserOnlineMock = vi.fn().mockReturnValue(true)
     })
 
     describe('mentioned in post', () => {
       beforeEach(async () => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         authenticatedUser = await postAuthor.toJson()
         await mutate({
           mutation: CreatePost,
@@ -105,12 +120,12 @@ describe('online status and sending emails', () => {
 
   describe('user is offline', () => {
     beforeAll(() => {
-      isUserOnlineMock = jest.fn().mockReturnValue(false)
+      isUserOnlineMock = vi.fn().mockReturnValue(false)
     })
 
     describe('mentioned in post', () => {
       beforeEach(async () => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         authenticatedUser = await postAuthor.toJson()
         await mutate({
           mutation: CreatePost,

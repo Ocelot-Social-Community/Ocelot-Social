@@ -68,6 +68,13 @@ const aliases = new Map<string, RelationshipAlias>([
   ['Group.isIn', { type: 'IS_IN', direction: 'out' }],
 
   // --- InviteCode ---------------------------------------------------------
+  // --- Location -----------------------------------------------------------
+  // A place nests inside a place: Berlin IS_IN Germany. `IS_IN` declares Location as both a
+  // source and the target (see relationships/authoring.ts), and the table named every other
+  // source — User, Group — but not this one, so the seed died on its first city.
+  ['Location.isIn', { type: 'IS_IN', direction: 'out' }],
+
+  // --- InviteCode ---------------------------------------------------------
   ['InviteCode.generated', { type: 'GENERATED', direction: 'in' }],
   ['InviteCode.redeemed', { type: 'REDEEMED', direction: 'in' }],
   ['InviteCode.invitesTo', { type: 'INVITES_TO', direction: 'out' }],

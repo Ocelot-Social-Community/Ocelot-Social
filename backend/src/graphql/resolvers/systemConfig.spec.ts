@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { createInMemoryPolicyService } from '@src/policy'
 
 import resolvers from './systemConfig'
@@ -11,6 +13,7 @@ describe('systemConfig resolver', () => {
   it('returns a row per recognised env var and never surfaces a secret value', () => {
     const policy = createInMemoryPolicyService()
     const rows = resolvers.Query.systemConfig(null, null, { policy } as unknown as Context)
+
     expect(rows.find((row) => row.envKey === 'NEO4J_URI')).toBeDefined()
     // A secret is present but never surfaces a value.
     expect(rows.find((row) => row.envKey === 'JWT_SECRET')?.envValue).toBeNull()

@@ -24,7 +24,7 @@
 const fs = require('fs').promises
 const path = require('path')
 
-// eslint-disable-next-line import/no-unresolved -- package subpath, server-only (uses node:fs)
+// Package subpath, server-only (uses node:fs).
 const {
   cacheDir: resolveCacheDir,
   discoverArchives,

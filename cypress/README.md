@@ -29,7 +29,7 @@ without docker, you would have to install cypress and its dependencies first:
 
 ```bash
 # in the root folder /
-$ yarn install
+$ npm ci
 ```
 
 ### Open Interactive Test Console
@@ -39,7 +39,7 @@ The interactive cypress test console allows to run tests and have visual feedbac
 To use this feature run:
 
 ```bash
-$ yarn cypress:open
+$ npm run cypress:open
 ```
 
 ![Interactive Cypress Environment](../docu/gitbook/grafik-1%20%281%29.png)
@@ -49,7 +49,7 @@ $ yarn cypress:open
 To run cypress without the user interface:
 
 ```bash
-$ yarn cypress:run
+$ npm run cypress:run
 ```
 
 This is used to run cypress in CI or in console

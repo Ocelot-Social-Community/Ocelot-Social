@@ -278,7 +278,10 @@ export const actions = {
         throw new Error('no-cookie')
       }
     } catch (err) {
-      throw new Error(err)
+      // `String(err)` rather than `err.message`: LoginForm compares against the stringified form
+      // ('Error: no-cookie') to tell a blocked cookie from a rejected login, so the message shape
+      // is load-bearing. `cause` keeps the original error (and its stack) reachable.
+      throw new Error(String(err), { cause: err })
     } finally {
       commit('SET_PENDING', false)
     }

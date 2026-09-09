@@ -35,7 +35,6 @@ jest.mock(
   { virtual: true },
 )
 
-// eslint-disable-next-line import/order
 const { discoverArchives } = require('@ocelot-social/branding/dist/discover.js')
 
 const MANIFEST = { default: 'stage', brands: [{ id: 'stage', label: 'Stage', version: '1.0.0' }] }

@@ -24,6 +24,10 @@ export const SOFTWARE_DEFAULTS = {
   NEO4J_URI: 'bolt://localhost:7687',
   NEO4J_USERNAME: 'neo4j',
   NEO4J_PASSWORD: 'neo4j',
+  // Which constraint classes the graph backend can enforce; see db/schema/derive/ddl.ts.
+  // Community Neo4j holds uniqueness only, so it is the safe default — a wrong guess would
+  // emit statements the server rejects.
+  NEO4J_PROFILE: 'neo4j-community',
   // --- Mail / SMTP ---
   SMTP_IGNORE_TLS: true,
   SMTP_SECURE: false,

@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { entities, Role, User } from '@db/schema/index'
 import { defineEntity } from '@db/schema/types'
 
@@ -24,9 +26,10 @@ const existence = (label: string, property: string): SchemaObject => ({
   properties: [property],
 })
 
-describe('declaredObjects', () => {
+describe(declaredObjects, () => {
   it('lists the uniqueness constraints a community backend can hold', () => {
     const objects = declaredObjects([User], 'neo4j-community')
+
     expect(objects).toContainEqual(constraint('User', 'id'))
     expect(objects).toContainEqual(constraint('User', 'slug'))
   })
@@ -57,6 +60,7 @@ describe('declaredObjects', () => {
     // AND unsupported in the apply report, from the same run; and since `missing` feeds the
     // exit code, `check memgraph` against a database without it could never come back clean.
     const declared = declaredObjects([User], 'memgraph')
+
     expect(declared).not.toContainEqual({
       kind: 'fulltext',
       label: 'User',
@@ -71,7 +75,9 @@ describe('declaredObjects', () => {
     // creatable on it, or `check` reports work that no `apply` can ever do.
     const { missing } = compareSchemaObjects(declaredObjects([User], 'memgraph'), [])
     const { unsupported } = declaredIndexStatements([User], 'memgraph')
+
     expect(unsupported).toHaveLength(1)
+
     for (const object of missing) {
       expect(describeSchemaObject(object)).not.toContain('name, slug')
     }
@@ -85,7 +91,7 @@ describe('declaredObjects', () => {
   })
 })
 
-describe('inexpressibleObjects', () => {
+describe(inexpressibleObjects, () => {
   const userFulltext = { kind: 'fulltext' as const, label: 'User', properties: ['name', 'slug'] }
 
   it('names what a profile cannot create, so it is not read as surplus either', () => {
@@ -94,7 +100,9 @@ describe('inexpressibleObjects', () => {
     // present. Undeclared for that profile, it would come back as SURPLUS "declared nowhere":
     // untrue, and an invitation to drop an index the current backend needs.
     expect(inexpressibleObjects([User], 'memgraph')).toEqual([userFulltext])
+
     const { surplus } = compareSchemaObjects(declaredObjects([User], 'memgraph'), [userFulltext])
+
     expect(surplus).toEqual([userFulltext])
     // …which is why run-audit subtracts exactly this set before printing and counting.
   })
@@ -106,9 +114,10 @@ describe('inexpressibleObjects', () => {
   })
 })
 
-describe('compareSchemaObjects', () => {
+describe(compareSchemaObjects, () => {
   it('reports what the declaration wants and the database lacks', () => {
     const report = compareSchemaObjects([constraint('User', 'slug')], [])
+
     expect(report.missing).toEqual([constraint('User', 'slug')])
     expect(report.surplus).toEqual([])
   })
@@ -118,6 +127,7 @@ describe('compareSchemaObjects', () => {
     // is dropped any more, so an undeclared constraint would otherwise live forever and keep
     // rejecting writes no one expects it to reject.
     const report = compareSchemaObjects([], [constraint('Ghost', 'id')])
+
     expect(report.surplus).toEqual([constraint('Ghost', 'id')])
     expect(report.missing).toEqual([])
   })
@@ -127,6 +137,7 @@ describe('compareSchemaObjects', () => {
       [constraint('User', 'slug')],
       [{ kind: 'index', label: 'User', properties: ['slug'] }],
     )
+
     // Same label and property, different kind: an index does not satisfy a constraint.
     expect(report.missing).toEqual([constraint('User', 'slug')])
     expect(report.surplus).toEqual([{ kind: 'index', label: 'User', properties: ['slug'] }])
@@ -134,6 +145,7 @@ describe('compareSchemaObjects', () => {
 
   it('treats a composite key as one object, not as two', () => {
     const composite = constraint('X', 'a', 'b')
+
     expect(compareSchemaObjects([composite], [composite]).missing).toEqual([])
     expect(compareSchemaObjects([composite], [constraint('X', 'a')]).missing).toEqual([composite])
   })
@@ -143,11 +155,12 @@ describe('compareSchemaObjects', () => {
       constraint('User', 'id'),
       { kind: 'index' as const, label: 'Role', properties: ['name'] },
     ]
+
     expect(compareSchemaObjects(objects, objects)).toEqual({ missing: [], surplus: [] })
   })
 })
 
-describe('describeSchemaObject', () => {
+describe(describeSchemaObject, () => {
   it('reads as the operator would say it', () => {
     expect(describeSchemaObject(constraint('User', 'slug'))).toBe('unique constraint User(slug)')
     expect(describeSchemaObject(constraint('X', 'a', 'b'))).toBe('unique constraint X(a, b)')
@@ -157,7 +170,7 @@ describe('describeSchemaObject', () => {
   })
 })
 
-describe('isKnownProfile', () => {
+describe(isKnownProfile, () => {
   it('accepts the three profiles and rejects a typo', () => {
     expect(isKnownProfile('neo4j-community')).toBe(true)
     expect(isKnownProfile('memgraph')).toBe(true)
@@ -174,6 +187,7 @@ describe('the two constraint kinds are told apart', () => {
 
   it('wants both where the backend can hold both', () => {
     const declared = declaredObjects([User], 'neo4j-enterprise')
+
     expect(declared).toContainEqual(constraint('User', 'id'))
     expect(declared).toContainEqual(existence('User', 'id'))
   })
@@ -183,6 +197,7 @@ describe('the two constraint kinds are told apart', () => {
       [constraint('User', 'id'), existence('User', 'id')],
       [constraint('User', 'id')],
     )
+
     expect(report.missing).toEqual([existence('User', 'id')])
   })
 
@@ -194,6 +209,7 @@ describe('the two constraint kinds are told apart', () => {
       [constraint('User', 'id'), constraint('User', 'id')],
       [],
     )
+
     expect(wantedTwice.missing).toEqual([constraint('User', 'id')])
 
     // The present side is the harder one to reach — Neo4j will not hold two constraints over
@@ -203,6 +219,7 @@ describe('the two constraint kinds are told apart', () => {
       [],
       [constraint('User', 'id'), constraint('User', 'id')],
     )
+
     expect(presentTwice.surplus).toEqual([constraint('User', 'id')])
   })
 })
@@ -230,6 +247,7 @@ describe('the two index kinds are told apart', () => {
     const report = compareSchemaObjects(declaredObjects([Both], 'neo4j-community'), [
       { kind: 'fulltext', label: 'Both', properties: ['id'] },
     ])
+
     expect(report.missing).toEqual([{ kind: 'index', label: 'Both', properties: ['id'] }])
     expect(report.surplus).toEqual([])
   })

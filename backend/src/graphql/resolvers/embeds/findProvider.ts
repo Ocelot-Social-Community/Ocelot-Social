@@ -12,7 +12,7 @@ import { minimatch } from 'minimatch'
 // consumer (the embeds settings page) reads it through the `embedProviders` query rather than over
 // HTTP. Copied into the build by scripts/build.copy.files.sh, like the .gql files.
 // eslint-disable-next-line n/no-sync
-let oEmbedProvidersFile = fs.readFileSync(path.join(__dirname, 'providers.json'), 'utf8')
+let oEmbedProvidersFile = fs.readFileSync(path.join(import.meta.dirname, 'providers.json'), 'utf8')
 
 // some providers allow a format parameter
 // we need JSON

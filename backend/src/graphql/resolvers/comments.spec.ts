@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateComment from '@graphql/queries/comments/CreateComment.gql'
 import DeleteComment from '@graphql/queries/comments/DeleteComment.gql'
@@ -117,6 +119,29 @@ describe('Comment query', () => {
     ])
   })
 
+  // The scalar arguments (content, createdAt, updatedAt beside id) are equality matches the
+  // schema advertises. They are built into the WHERE clause from a fixed list of field names, and
+  // an argument that is silently dropped instead WIDENS the result set the caller believes to be
+  // narrowed — the same failure mode the filter guard below exists for.
+  it('constrains the query by a top-level equality argument', async () => {
+    await setupPostAndComment()
+    authenticatedUser = await commentAuthor.toJson()
+    await database.write({
+      query: `
+        MATCH (post:Post { id: 'p1' })
+        CREATE (:Comment { id: 'needle', content: 'find me', createdAt: '2020-01-01T00:00:00.000Z' })-[:COMMENTS]->(post)
+        CREATE (:Comment { id: 'haystack', content: 'not me', createdAt: '2020-01-02T00:00:00.000Z' })-[:COMMENTS]->(post)
+      `,
+    })
+
+    const { data, errors } = await query({
+      query: '{ Comment(content: "find me") { id } }',
+    })
+
+    expect(errors).toBeUndefined()
+    expect((data.Comment as { id: string }[]).map((comment) => comment.id)).toEqual(['needle'])
+  })
+
   it('honours an explicit orderBy', async () => {
     await setupPostAndComment()
     authenticatedUser = await commentAuthor.toJson()
@@ -151,6 +176,7 @@ describe('CreateComment', () => {
         content: "I'm not authorized to comment",
       }
       const { errors } = await mutate({ mutation: CreateComment, variables })
+
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -158,7 +184,7 @@ describe('CreateComment', () => {
   describe('authenticated', () => {
     beforeEach(async () => {
       const user = await database.neode.create('User', { name: 'Author' })
-      authenticatedUser = (await user.toJson()) as Context['user']
+      authenticatedUser = (await user.toJson()) as unknown as Context['user']
     })
 
     describe('given a post', () => {
@@ -201,6 +227,7 @@ describe('CreateComment', () => {
           },
         ]
         const { errors } = await mutate({ mutation: CreateComment, variables })
+
         expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -214,6 +241,7 @@ describe('UpdateComment', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const { errors } = await mutate({ mutation: updateComment, variables })
+
         expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -226,6 +254,7 @@ describe('UpdateComment', () => {
 
       it('throws authorization error', async () => {
         const { errors } = await mutate({ mutation: updateComment, variables })
+
         expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -240,6 +269,7 @@ describe('UpdateComment', () => {
           data: { UpdateComment: { id: 'c456', content: 'The comment is updated' } },
           errors: undefined,
         }
+
         await expect(mutate({ mutation: updateComment, variables })).resolves.toMatchObject(
           expected,
         )
@@ -256,6 +286,7 @@ describe('UpdateComment', () => {
           },
           errors: undefined,
         }
+
         await expect(mutate({ mutation: updateComment, variables })).resolves.toMatchObject(
           expected,
         )
@@ -266,6 +297,7 @@ describe('UpdateComment', () => {
         const {
           data: { UpdateComment },
         } = (await mutate({ mutation: updateComment, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+
         expect(newlyCreatedComment.updatedAt).toBeTruthy()
         expect(Date.parse(newlyCreatedComment.updatedAt)).toEqual(expect.any(Number))
         expect(UpdateComment.updatedAt).toBeTruthy()
@@ -280,6 +312,7 @@ describe('UpdateComment', () => {
 
         it('returns null', async () => {
           const { data, errors } = await mutate({ mutation: updateComment, variables })
+
           expect(data).toMatchObject({ UpdateComment: null })
           expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
         })
@@ -295,6 +328,7 @@ describe('DeleteComment', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const result = await mutate({ mutation: DeleteComment, variables })
+
         expect(result.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -307,6 +341,7 @@ describe('DeleteComment', () => {
 
       it('throws authorization error', async () => {
         const { errors } = await mutate({ mutation: DeleteComment, variables })
+
         expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -325,6 +360,7 @@ describe('DeleteComment', () => {
             content: 'UNAVAILABLE',
           },
         }
+
         expect(data).toMatchObject(expected)
       })
     })

@@ -1,25 +1,42 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import Factory, { cleanDatabase } from '@db/factories'
-import CreateComment from '@graphql/queries/comments/CreateComment.gql'
-import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
-import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
-import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
-import markAllAsRead from '@graphql/queries/notifications/markAllAsRead.gql'
-import notifications from '@graphql/queries/notifications/notifications.gql'
-import CreatePost from '@graphql/queries/posts/CreatePost.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
+
+import { beforeAll, afterAll, describe, beforeEach, afterEach, it, expect } from 'vitest'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
-const sendNotificationMailMock: (notification) => void = jest.fn()
-jest.mock('@src/emails/sendEmail', () => ({
+const sendNotificationMailMock: (notification) => void = vi.fn()
+vi.mock('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => {
     sendNotificationMailMock(notification)
   },
+  // ESM links the whole namespace: every named export ANY importer in the graph reaches
+  // for must exist here, or the module fails to link (loginMiddleware pulls the
+  // registration/verification mails in transitively). Under CommonJS a missing key was
+  // simply undefined and only mattered if it was called. The stubs below carry no
+  // behaviour — only the two above are asserted on.
+  defaultParams: vi.fn(),
+  sendChatMessageMail: vi.fn(),
+  sendRegistrationMail: vi.fn(),
+  sendEmailVerification: vi.fn(),
+  sendResetPasswordMail: vi.fn(),
+  sendWrongEmail: vi.fn(),
 }))
+
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
+const { default: Factory, cleanDatabase } = await import('@db/factories')
+const { default: CreateComment } = await import('@graphql/queries/comments/CreateComment.gql')
+const { default: ChangeGroupMemberRole } =
+  await import('@graphql/queries/groups/ChangeGroupMemberRole.gql')
+const { default: CreateGroup } = await import('@graphql/queries/groups/CreateGroup.gql')
+const { default: JoinGroup } = await import('@graphql/queries/groups/JoinGroup.gql')
+const { default: markAllAsRead } = await import('@graphql/queries/notifications/markAllAsRead.gql')
+const { default: notifications } = await import('@graphql/queries/notifications/notifications.gql')
+const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
+const { createApolloTestSetup } = await import('@root/test/helpers')
 
 let authenticatedUser: Context['user']
 const policy = { categoriesActive: false }
@@ -252,7 +269,7 @@ describe('mentions in groups', () => {
 
   describe('post in public group', () => {
     beforeEach(async () => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       authenticatedUser = await postAuthor.toJson()
       await mutate({
         mutation: CreatePost,
@@ -267,6 +284,7 @@ describe('mentions in groups', () => {
 
     it('sends a notification to the no member', async () => {
       authenticatedUser = await noMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -294,6 +312,7 @@ describe('mentions in groups', () => {
 
     it('sends a notification to the group member', async () => {
       authenticatedUser = await groupMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -362,7 +381,7 @@ describe('mentions in groups', () => {
 
   describe('post in closed group', () => {
     beforeEach(async () => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       authenticatedUser = await postAuthor.toJson()
       await mutate({
         mutation: CreatePost,
@@ -377,6 +396,7 @@ describe('mentions in groups', () => {
 
     it('sends NO notification to the no member', async () => {
       authenticatedUser = await noMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -395,6 +415,7 @@ describe('mentions in groups', () => {
 
     it('sends NO notification to the pending member', async () => {
       authenticatedUser = await pendingMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -413,6 +434,7 @@ describe('mentions in groups', () => {
 
     it('sends a notification to the group member', async () => {
       authenticatedUser = await groupMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -469,7 +491,7 @@ describe('mentions in groups', () => {
 
   describe('post in hidden group', () => {
     beforeEach(async () => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       authenticatedUser = await postAuthor.toJson()
       await mutate({
         mutation: CreatePost,
@@ -484,6 +506,7 @@ describe('mentions in groups', () => {
 
     it('sends NO notification to the no member', async () => {
       authenticatedUser = await noMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -502,6 +525,7 @@ describe('mentions in groups', () => {
 
     it('sends NO notification to the pending member', async () => {
       authenticatedUser = await pendingMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -520,6 +544,7 @@ describe('mentions in groups', () => {
 
     it('sends a notification to the group member', async () => {
       authenticatedUser = await groupMember.toJson()
+
       await expect(
         query({
           query: notifications,
@@ -590,7 +615,7 @@ describe('mentions in groups', () => {
         authenticatedUser = await groupMember.toJson()
         await mutate({ mutation: markAllAsRead })
         authenticatedUser = await postAuthor.toJson()
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         await mutate({
           mutation: CreateComment,
           variables: {
@@ -603,6 +628,7 @@ describe('mentions in groups', () => {
 
       it('sends a notification to the no member', async () => {
         authenticatedUser = await noMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -630,6 +656,7 @@ describe('mentions in groups', () => {
 
       it('sends a notification to the group member', async () => {
         authenticatedUser = await groupMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -687,7 +714,7 @@ describe('mentions in groups', () => {
         authenticatedUser = await groupMember.toJson()
         await mutate({ mutation: markAllAsRead })
         authenticatedUser = await postAuthor.toJson()
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         await mutate({
           mutation: CreateComment,
           variables: {
@@ -700,6 +727,7 @@ describe('mentions in groups', () => {
 
       it('sends NO notification to the no member', async () => {
         authenticatedUser = await noMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -718,6 +746,7 @@ describe('mentions in groups', () => {
 
       it('sends NO notification to the pending member', async () => {
         authenticatedUser = await pendingMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -736,6 +765,7 @@ describe('mentions in groups', () => {
 
       it('sends a notification to the group member', async () => {
         authenticatedUser = await groupMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -787,7 +817,7 @@ describe('mentions in groups', () => {
         authenticatedUser = await groupMember.toJson()
         await mutate({ mutation: markAllAsRead })
         authenticatedUser = await postAuthor.toJson()
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         await mutate({
           mutation: CreateComment,
           variables: {
@@ -800,6 +830,7 @@ describe('mentions in groups', () => {
 
       it('sends NO notification to the no member', async () => {
         authenticatedUser = await noMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -818,6 +849,7 @@ describe('mentions in groups', () => {
 
       it('sends NO notification to the pending member', async () => {
         authenticatedUser = await pendingMember.toJson()
+
         await expect(
           query({
             query: notifications,
@@ -836,6 +868,7 @@ describe('mentions in groups', () => {
 
       it('sends a notification to the group member', async () => {
         authenticatedUser = await groupMember.toJson()
+
         await expect(
           query({
             query: notifications,

@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import Validator from 'neode/build/Services/Validator.js'
-
+import { UnverifiedEmailAddress } from '@db/schema/entities/UnverifiedEmailAddress'
+import { validateProperty } from '@db/schema/validate'
 import { UserInputError } from '@graphql/errors'
 
 import existingEmailAddress from './helpers/existingEmailAddress'
@@ -13,7 +13,7 @@ import normalizeEmail from './helpers/normalizeEmail'
 export default {
   Query: {
     VerifyNonce: async (_parent, args, context, _resolveInfo) => {
-      args.email = normalizeEmail(args.email)
+      args.email = normalizeEmail(args.email as string)
       const session = context.driver.session()
       try {
         const txResult = await session.readTransaction(async (txc) => {
@@ -33,11 +33,10 @@ export default {
   },
   Mutation: {
     AddEmailAddress: async (_parent, args, context, _resolveInfo) => {
-      args.email = normalizeEmail(args.email)
-      try {
-        const { neode } = context
-        await new Validator(neode, neode.model('UnverifiedEmailAddress'), args)
-      } catch {
+      args.email = normalizeEmail(args.email as string)
+      // Was neode's Joi validator, called for its throw and nothing else. Only the address is
+      // checked here — the node is written further down, with its own nonce and timestamp.
+      if (validateProperty(UnverifiedEmailAddress, 'email', args.email)) {
         throw new UserInputError('must be a valid email')
       }
 
@@ -83,7 +82,7 @@ export default {
       const {
         user: { id: userId },
       } = context
-      args.email = normalizeEmail(args.email)
+      args.email = normalizeEmail(args.email as string)
       const { nonce, email } = args
       const session = context.driver.session()
       let response

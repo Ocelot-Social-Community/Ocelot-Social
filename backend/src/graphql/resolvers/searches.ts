@@ -130,9 +130,14 @@ const searchResultPromise = async (session, setup, params) => {
   })
 }
 
+// The `score` column is optional in the template (`returnScore: false`), and the setups that drop
+// it — the count ones — are all read by countResultCallback instead, so this callback only ever
+// sees records that HAVE a score. The guard is what keeps a future count setup wired to the
+// default callback from producing `_score: undefined` and a comparator that returns NaN.
 const searchResultCallback = (result) => {
   const response = result.records.map((r) => ({
     ...r.get('result'),
+    /* v8 ignore next -- unreachable: every returnScore:false setup is read by countResultCallback */
     _score: r.has('score') ? r.get('score') : 0,
   }))
   if (Array.isArray(response) && response.length && response[0].__typename === 'Post') {
@@ -257,6 +262,10 @@ export default {
     searchChatTargets: async (_parent, args, context, _resolveInfo) => {
       const { query } = args
       const limit = Math.max(1, Math.min(Number(args.limit) || 10, 50))
+      // Unlike searchResults (`allow`), this query is behind `isAuthenticated` in the shield —
+      // both of its setups match on `(user:User {id: $userId})`, so an anonymous caller would get
+      // an empty list rather than an error. The fallback keeps that true if the rule is loosened.
+      /* v8 ignore next -- unreachable: the shield rule guarantees an authenticated viewer */
       const userId = context.user?.id || null
       const params = {
         query: queryString(query),
@@ -270,6 +279,11 @@ export default {
         ...(await getSearchResults(context, searchUsersSetup, params)),
         ...(groupsOff ? [] : await getSearchResults(context, searchMyGroupsSetup, params)),
       ]
+      // Users and groups are two separate index queries, so their scores only become comparable
+      // here. A Lucene hit always scores above zero, which is why the guards never fire — they are
+      // there so a missing score sorts last instead of turning every comparison into NaN, which
+      // Array.sort answers by leaving the order untouched (silently unranked results).
+      /* v8 ignore next -- unreachable: a fulltext hit always carries a non-zero score */
       results.sort((a, b) => (b._score || 0) - (a._score || 0))
       return results.slice(0, limit)
     },

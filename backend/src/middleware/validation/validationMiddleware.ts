@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UserInputError } from '@graphql/errors'
 
-import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
+import type { IMiddlewareResolver } from 'graphql-middleware/types'
 
 const COMMENT_MIN_LENGTH = 1
 const NO_POST_ERR_MESSAGE = 'Comment cannot be created without a post!'

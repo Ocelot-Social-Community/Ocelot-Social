@@ -4,6 +4,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
+import { PubSub } from 'graphql-subscriptions'
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
+import { NOTIFICATION_ADDED } from '@constants/subscriptions'
 import Factory, { cleanDatabase } from '@db/factories'
 import markAllAsRead from '@graphql/queries/notifications/markAllAsRead.gql'
 import markAsRead from '@graphql/queries/notifications/markAsRead.gql'
@@ -12,6 +16,8 @@ import notifications from '@graphql/queries/notifications/notifications.gql'
 import notificationsPaginated from '@graphql/queries/notifications/notificationsPaginated.gql'
 import DeletePost from '@graphql/queries/posts/DeletePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import notificationsResolvers from './notifications'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -158,6 +164,7 @@ describe('given some notifications', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const { errors } = await query({ query: notifications })
+
         expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -221,6 +228,7 @@ describe('given some notifications', () => {
             query: notifications,
             variables: { ...variables, read: false },
           })
+
           await expect(response).toMatchObject({
             data: {
               notifications: expect.arrayContaining([
@@ -251,12 +259,14 @@ describe('given some notifications', () => {
         describe('if a resource gets deleted', () => {
           const deletePostAction = async () => {
             authenticatedUser = await author.toJson()
+
             await expect(
               mutate({ mutation: DeletePost, variables: { id: 'p3' } }),
             ).resolves.toMatchObject({
               data: { DeletePost: { id: 'p3', deleted: true } },
               errors: undefined,
             })
+
             authenticatedUser = await user.toJson()
           }
 
@@ -267,7 +277,9 @@ describe('given some notifications', () => {
               data: { notifications: [expect.any(Object), expect.any(Object)] },
               errors: undefined,
             })
+
             await deletePostAction()
+
             await expect(
               query({ query: notifications, variables: { ...variables, read: false } }),
             ).resolves.toMatchObject({ data: { notifications: [] }, errors: undefined })
@@ -281,6 +293,7 @@ describe('given some notifications', () => {
             query: notifications,
             variables: { ...variables, read: true },
           })
+
           expect(response.errors).toBeUndefined()
           expect(response.data?.notifications).toHaveLength(2)
           expect(response.data?.notifications.every((n) => n.read === true)).toBe(true)
@@ -295,6 +308,7 @@ describe('given some notifications', () => {
             query: notifications,
             variables: { orderBy: 'updatedAt_asc' },
           })
+
           expect(response.errors).toBeUndefined()
           expect(response.data?.notifications).toHaveLength(4)
         })
@@ -304,6 +318,7 @@ describe('given some notifications', () => {
             query: notifications,
             variables: { orderBy: 'updatedAt_desc' },
           })
+
           expect(response.errors).toBeUndefined()
           expect(response.data?.notifications).toHaveLength(4)
         })
@@ -315,6 +330,7 @@ describe('given some notifications', () => {
             query: notificationsPaginated,
             variables: { first: 1 },
           })
+
           expect(response.errors).toBeUndefined()
           expect(response.data?.notifications).toHaveLength(1)
         })
@@ -328,6 +344,7 @@ describe('given some notifications', () => {
             query: notificationsPaginated,
             variables: { offset: 1 },
           })
+
           expect(withOffset.data?.notifications).toHaveLength(
             withoutOffset.data.notifications.length - 1,
           )
@@ -343,6 +360,7 @@ describe('given some notifications', () => {
           mutation: markAsRead,
           variables: { ...variables, id: 'p1' },
         })
+
         expect(result.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -362,6 +380,7 @@ describe('given some notifications', () => {
 
         it('returns null', async () => {
           const response = await mutate({ mutation: markAsRead, variables })
+
           expect(response.data?.markAsRead).toEqual(null)
           expect(response.errors).toBeUndefined()
         })
@@ -378,6 +397,7 @@ describe('given some notifications', () => {
 
           it('updates `read` attribute and returns NOTIFIED relationship', async () => {
             const { data } = await mutate({ mutation: markAsRead, variables })
+
             expect(data).toEqual({
               markAsRead: {
                 id: expect.any(String),
@@ -399,8 +419,10 @@ describe('given some notifications', () => {
                 id: 'p2',
               }
             })
+
             it('returns null', async () => {
               const response = await mutate({ mutation: markAsRead, variables })
+
               expect(response.data?.markAsRead).toEqual(null)
               expect(response.errors).toBeUndefined()
             })
@@ -417,6 +439,7 @@ describe('given some notifications', () => {
 
           it('updates `read` attribute and returns NOTIFIED relationship', async () => {
             const { data } = await mutate({ mutation: markAsRead, variables })
+
             expect(data).toEqual({
               markAsRead: {
                 id: expect.any(String),
@@ -442,6 +465,7 @@ describe('given some notifications', () => {
           mutation: markAsUnread,
           variables: { id: 'p2' },
         })
+
         expect(result.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -457,6 +481,7 @@ describe('given some notifications', () => {
             mutation: markAsUnread,
             variables: { id: 'p1' },
           })
+
           expect(response.data?.markAsUnread).toEqual(null)
           expect(response.errors).toBeUndefined()
         })
@@ -468,6 +493,7 @@ describe('given some notifications', () => {
             mutation: markAsUnread,
             variables: { id: 'p2' },
           })
+
           expect(data).toEqual({
             markAsUnread: {
               id: expect.any(String),
@@ -489,6 +515,7 @@ describe('given some notifications', () => {
             mutation: markAsUnread,
             variables: { id: 'p3' },
           })
+
           expect(response.data?.markAsUnread).toEqual(null)
           expect(response.errors).toBeUndefined()
         })
@@ -500,6 +527,7 @@ describe('given some notifications', () => {
             mutation: markAsUnread,
             variables: { id: 'c1' },
           })
+
           expect(data).toEqual({
             markAsUnread: {
               id: expect.any(String),
@@ -523,6 +551,7 @@ describe('given some notifications', () => {
         const result = await mutate({
           mutation: markAllAsRead,
         })
+
         expect(result.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -541,6 +570,7 @@ describe('given some notifications', () => {
 
         it('returns all as read', async () => {
           const response = await mutate({ mutation: markAllAsRead, variables })
+
           expect(response.data?.markAllAsRead).toEqual(
             expect.arrayContaining([
               {
@@ -569,5 +599,34 @@ describe('given some notifications', () => {
         })
       })
     })
+  })
+})
+
+// A notification is addressed to exactly one person, and the channel is shared by everyone with an
+// open socket. The filter is what keeps the two apart — without it, every connected client would
+// receive every notification in the network, including the content of posts and comments they
+// cannot see. Driven through a real PubSub because the channel name and the filter only fail
+// together: a subscription attached to the wrong constant simply never fires, silently.
+describe('Subscription.notificationAdded', () => {
+  it('delivers only the notifications addressed to the subscriber', async () => {
+    const pubsub = new PubSub()
+    const iterator = notificationsResolvers.Subscription.notificationAdded.subscribe(
+      null,
+      {},
+      { user: { id: 'me' }, pubsub },
+      null,
+    )
+    const delivered = iterator.next()
+
+    await pubsub.publish(NOTIFICATION_ADDED, {
+      notificationAdded: { id: 'n-other', to: { id: 'somebody-else' } },
+    })
+    await pubsub.publish(NOTIFICATION_ADDED, {
+      notificationAdded: { id: 'n-mine', to: { id: 'me' } },
+    })
+
+    expect((await delivered).value).toMatchObject({ notificationAdded: { id: 'n-mine' } })
+
+    await iterator.return?.()
   })
 })

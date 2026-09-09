@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { parse } from 'graphql'
+import { expect, beforeAll, afterAll, describe, it } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -34,7 +35,9 @@ const postQuery = parse(`
 
 const idsFor = async (filter: Record<string, unknown>): Promise<string[]> => {
   const { data, errors } = await setup.query({ query: postQuery, variables: { filter } })
+
   expect(errors).toBeUndefined()
+
   const posts = (data?.Post ?? []) as { id: string }[]
   return posts.map((post) => post.id)
 }

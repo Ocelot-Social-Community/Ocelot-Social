@@ -19,6 +19,12 @@ Feature: Notification for a mention
       """
     And mention "@matt-rider" in the text
     And I click on "save button"
+    # Sync on the redirect, which only happens once CreatePost has responded — and the
+    # mention notification is written inside that resolver. Without this the next steps
+    # race the mutation: the counter is fetched once per page load and only topped up by
+    # the notificationAdded subscription, so a NOTIFIED edge that lands after matt's page
+    # loaded is never picked up and the counter stays at 0 for good.
+    And I am on page "/post/.*/hey-matt"
     And I am logged in as "matt-rider"
     And I navigate to page "/"
     And see 1 unread notifications in the top menu

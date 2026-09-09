@@ -185,16 +185,40 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
   groups:
+    # `@size-limit/*` pins its `size-limit` peer to an exact version, so a pull request that moves
+    # only one of the two can never install — `npm ci` fails with ERESOLVE. They have to arrive
+    # together.
+    size-limit:
+      applies-to: version-updates
+      patterns:
+        - "size-limit"
+        - "@size-limit/*"
+    storybook:
+      applies-to: version-updates
+      patterns:
+        - "*storybook*"
+    # `tailwind-merge` and `tailwind-csstree` are deliberately outside this group: they are
+    # independent packages that happen to start with the same word, not part of the v4 release train.
+    tailwind:
+      applies-to: version-updates
+      patterns:
+        - "tailwindcss*"
+        - "@tailwindcss*"
     vue:
       applies-to: version-updates
       patterns:
         - "vue*"
         - "@vue*"
+    # `vite*` also matches `vitest`, which would pull it out of the `vitest` group below and away from
+    # `@vitest/coverage-v8` — and that one pins its `vitest` peer to an exact version. Excluded here so
+    # the two vitest packages stay in one pull request.
     vite:
       applies-to: version-updates
       patterns:
         - "vite*"
         - "@vitejs*"
+      exclude-patterns:
+        - "vitest*"
     vitest:
       applies-to: version-updates
       patterns:

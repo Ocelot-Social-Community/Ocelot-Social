@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import GroupWithLocationFilter from '@graphql/queries/groups/GroupWithLocationFilter.gql'
 import PostWithLocationFilter from '@graphql/queries/posts/PostWithLocationFilter.gql'
@@ -59,6 +61,7 @@ describe('hasLocation filter', () => {
 
     it('returns all users without filter', async () => {
       const result = await query({ query: UserWithLocationFilter })
+
       expect(result.data?.User.length).toBeGreaterThanOrEqual(2)
     })
 
@@ -68,6 +71,7 @@ describe('hasLocation filter', () => {
         variables: { filter: { hasLocation: true } },
       })
       const ids = result.data?.User.map((u: { id: string }) => u.id)
+
       expect(ids).toContain('u-with-loc')
       expect(ids).not.toContain('u-without-loc')
     })
@@ -103,6 +107,7 @@ describe('hasLocation filter', () => {
 
     it('returns all groups without filter', async () => {
       const result = await query({ query: GroupWithLocationFilter })
+
       expect(result.data?.Group.length).toBeGreaterThanOrEqual(2)
     })
 
@@ -112,6 +117,7 @@ describe('hasLocation filter', () => {
         variables: { hasLocation: true },
       })
       const ids = result.data?.Group.map((g: { id: string }) => g.id)
+
       expect(ids).toContain('g-with-loc')
       expect(ids).not.toContain('g-without-loc')
     })
@@ -160,6 +166,7 @@ describe('hasLocation filter', () => {
       const result = await query({
         query: PostWithLocationFilter,
       })
+
       expect(result.data?.Post.length).toBeGreaterThanOrEqual(2)
     })
 
@@ -169,6 +176,7 @@ describe('hasLocation filter', () => {
         variables: { filter: { hasLocation: true } },
       })
       const ids = result.data?.Post.map((p: { id: string }) => p.id)
+
       expect(ids).toContain('p-with-loc')
       expect(ids).not.toContain('p-without-loc')
     })

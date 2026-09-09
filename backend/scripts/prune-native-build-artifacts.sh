@@ -1,10 +1,10 @@
 #!/bin/sh
 # Remove what building a native addon leaves behind in node_modules.
 #
-# MUST run in the same RUN layer as the `yarn install` it cleans up after: a delete in a later layer
+# MUST run in the same RUN layer as the `npm ci` it cleans up after: a delete in a later layer
 # only writes a whiteout on top and reclaims nothing.
 #
-# `re2` is the only native addon in backend/yarn.lock and it occupies 74 MB after a node-gyp build.
+# `re2` is the only native addon in backend/package-lock.json and it occupies 74 MB after a node-gyp build.
 # The runtime needs two of those: re2.js (the package main) and build/Release/re2.node. Everything
 # else is scaffolding — the bundled C++ sources it was compiled FROM (vendor/, 17 MB) and the object
 # files it was compiled THROUGH (build/Release/obj.target/, 57 MB, which also hardlinks the addon

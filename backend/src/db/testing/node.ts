@@ -178,6 +178,13 @@ export class TestNode {
     // than set one, leaving a fixture the declaration says cannot exist — and edges have no
     // second line of defence: the audit reports an undeclared NODE property, but an undeclared
     // edge property is not something any of its queries ask about.
+    //
+    // Rejected rather than dropped, and that was measured rather than assumed. Over the whole
+    // suite it caught seven call sites in three files, all doing the same thing: spreading a
+    // GraphQL mutation's variables into the edge, so a REVIEWED fixture carried the `resourceId`
+    // the mutation takes as an ARGUMENT and that the resolver writes nowhere. Dropping it
+    // silently would have left those fixtures looking like something production cannot produce,
+    // which is the failure writerParity.spec.ts exists to name.
     for (const property of given.keys()) {
       if (!declaredEdgeProperties.has(property)) {
         throw new Error(

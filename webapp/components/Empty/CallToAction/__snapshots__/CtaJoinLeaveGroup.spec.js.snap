@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`CtaJoinLeaveGroup.vue mount renders 1`] = `
 <div class="ds-my-xxx-small ds-space-centered">

@@ -32,7 +32,7 @@ import type { Request, Response } from 'express'
 /**
  * The two disk readers this router is built on. Injectable so a test can hand in fakes DIRECTLY
  * instead of mocking the package subpath: `@ocelot-social/branding/dist/discover.js` is a subpath of a
- * `file:` dependency, and whether jest binds a mock of it to this module turned out to depend on the
+ * `file:` dependency, and whether the runner binds a mock of it to this module turned out to depend on the
  * environment — green locally, silently ignored in the CI container, where the router then read the
  * real filesystem and every fixture-based assertion failed. Production passes nothing and keeps the
  * real readers.

@@ -1,3 +1,5 @@
+import { describe, afterEach, it, expect } from 'vitest'
+
 import { branding, brandingDefaults, setBranding, getBranding } from '@src/branding'
 
 // Integration check that the backend resolves the shared @ocelot-social/branding package
@@ -13,7 +15,6 @@ describe('branding (shared package)', () => {
 
   it('exposes the migrated backend domains with their default values', () => {
     expect(branding.group.descriptionMinLength).toBe(3)
-    expect(branding.group.descriptionExcerptLength).toBe(250)
     expect(branding.registration.nonceLength).toBe(5)
     expect(branding.registration.inviteCodeLength).toBe(6)
     expect(branding.metadata.applicationName).toBe('ocelot.social')
@@ -30,11 +31,13 @@ describe('branding (shared package)', () => {
       metadata: { ...brandingDefaults.metadata, applicationName: 'MyNet' },
     }
     setBranding(brand)
+
     expect(branding.group.nameLengthMax).toBe(99)
     expect(branding.metadata.applicationName).toBe('MyNet')
     expect(getBranding().group.nameLengthMax).toBe(99)
 
     setBranding(undefined)
+
     expect(branding.group.nameLengthMax).toBe(brandingDefaults.group.nameLengthMax)
     expect(branding.metadata.applicationName).toBe('ocelot.social')
   })

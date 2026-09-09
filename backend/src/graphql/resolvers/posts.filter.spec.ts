@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import Post from '@graphql/queries/posts/Post.gql'
@@ -94,6 +96,7 @@ describe('Filter Posts', () => {
       const {
         data: { Post: result },
       } = (await query({ query: Post })) as any
+
       expect(result).toHaveLength(4)
       expect(result).toEqual(
         expect.arrayContaining([
@@ -114,6 +117,7 @@ describe('Filter Posts', () => {
         query: Post,
         variables: { filter: { postType_in: ['Article'] } },
       })) as any
+
       expect(result).toHaveLength(2)
       expect(result).toEqual(
         expect.arrayContaining([
@@ -132,6 +136,7 @@ describe('Filter Posts', () => {
         query: Post,
         variables: { filter: { postType_in: ['Event'] } },
       })) as any
+
       expect(result).toHaveLength(2)
       expect(result).toEqual(
         expect.arrayContaining([
@@ -150,6 +155,7 @@ describe('Filter Posts', () => {
         query: Post,
         variables: { filter: { postType_in: ['Article', 'Event'] } },
       })) as any
+
       expect(result).toHaveLength(4)
       expect(result).toEqual(
         expect.arrayContaining([
@@ -170,6 +176,7 @@ describe('Filter Posts', () => {
         query: Post,
         variables: { filter: { postType_in: ['Event'] }, orderBy: ['eventStart_desc'] },
       })) as any
+
       expect(result).toHaveLength(2)
       expect(result).toEqual([
         expect.objectContaining({
@@ -192,6 +199,7 @@ describe('Filter Posts', () => {
         query: Post,
         variables: { filter: { postType_in: ['Event'] }, orderBy: ['eventStart_asc'] },
       })) as any
+
       expect(result).toHaveLength(2)
       expect(result).toEqual([
         expect.objectContaining({
@@ -223,6 +231,7 @@ describe('Filter Posts', () => {
           },
         },
       })) as any
+
       expect(result).toHaveLength(1)
       expect(result).toEqual([
         expect.objectContaining({
@@ -241,6 +250,7 @@ describe('Filter Posts', () => {
         query: Post,
         variables: { filter: { postType_in: ['Event'], eventEnd: null } },
       })) as any
+
       expect(result).toHaveLength(2)
       expect(result).toEqual(
         expect.arrayContaining([
@@ -265,6 +275,7 @@ describe('Filter Posts', () => {
           },
         },
       })
+
       // Otherwise a silently failed creation would be indistinguishable
       // below from e3 having been correctly filtered out.
       expect(createResult.errors).toBeUndefined()
@@ -275,6 +286,7 @@ describe('Filter Posts', () => {
         query: Post,
         variables: { filter: { postType_in: ['Event'], eventEnd: null } },
       })) as any
+
       expect(result).toHaveLength(2)
       expect(result.map((post: { id: string }) => post.id)).not.toContain('e3')
     })
