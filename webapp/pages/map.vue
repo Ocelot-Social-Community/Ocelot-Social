@@ -228,6 +228,15 @@ export default {
     // next popup open/close instead of leaking (stale Apollo subscriptions,
     // event listeners) on every marker click.
     this.popupComponentInstances = []
+    // The feature(s)/lngLat behind the currently-open popup (see
+    // showPopup()), and — separately — the ones behind a popup that got
+    // auto-closed because its marker type was just hidden via the legend,
+    // so toggling that type visible again can reopen the same popup (see
+    // the hiddenMarkerTypes watcher below). Plain instance properties, not
+    // data(): same reactivity-avoidance reasoning as
+    // popupComponentInstances above.
+    this.openPopup = null
+    this.autoClosedPopup = null
   },
   async mounted() {
     this.updateMapPosition()
@@ -325,8 +334,45 @@ export default {
         this.addMarkersOnCheckPrepared()
       }
     },
-    hiddenMarkerTypes() {
+    // Hiding a marker type only affects the mapbox layer's own filter
+    // (applyMarkerTypeFilter) — it doesn't touch an already-open popup,
+    // since that's a separate DOM overlay, not part of the layer's render
+    // state. So: close it explicitly if it's showing a feature of the
+    // type that just got hidden (remembering it first), and reopen it if
+    // that type — and every other type among its features — becomes
+    // visible again.
+    hiddenMarkerTypes(newHidden, oldHidden) {
       this.applyMarkerTypeFilter()
+      const newlyHidden = newHidden.filter((id) => !oldHidden.includes(id))
+      const newlyShown = oldHidden.filter((id) => !newHidden.includes(id))
+
+      if (
+        this.openPopup &&
+        newlyHidden.some((typeId) =>
+          this.openPopup.features.some((f) => f.properties.type === typeId),
+        )
+      ) {
+        this.autoClosedPopup = this.openPopup
+        // Also set directly (not just left to the popup's own 'close'
+        // event, which does the same thing) — remove() fires it
+        // synchronously on a real mapbox-gl Popup, but not on a bare test
+        // mock, and this state shouldn't depend on that either way.
+        this.openPopup = null
+        this.markers.popup.remove()
+        return
+      }
+
+      if (
+        this.autoClosedPopup &&
+        newlyShown.some((typeId) =>
+          this.autoClosedPopup.features.some((f) => f.properties.type === typeId),
+        ) &&
+        this.autoClosedPopup.features.every((f) => !this.isMarkerTypeHidden(f.properties.type))
+      ) {
+        const { features, lngLat } = this.autoClosedPopup
+        this.autoClosedPopup = null
+        this.showPopup(features, lngLat)
+      }
     },
   },
   methods: {
@@ -612,7 +658,10 @@ export default {
       // Escape — not just our own explicit .remove() calls in showPopup()
       // — so this is the one place that reliably catches every way the
       // popup can close.
-      this.markers.popup.on('close', () => this.destroyPopupComponents())
+      this.markers.popup.on('close', () => {
+        this.destroyPopupComponents()
+        this.openPopup = null
+      })
 
       // Desktop: show popup on hover
       this.map.on('mouseenter', 'markers', (e) => {
@@ -654,6 +703,11 @@ export default {
         this.markers.popup.remove()
       }
       this.destroyPopupComponents()
+      // A new popup is opening (whether from a real hover/click, or the
+      // hiddenMarkerTypes watcher reopening one it auto-closed) — any
+      // still-pending "reopen once visible again" state is no longer
+      // relevant to it.
+      this.autoClosedPopup = null
 
       this.map.getCanvas().style.cursor = 'pointer'
 
@@ -678,6 +732,7 @@ export default {
       })
 
       this.markers.popup.setLngLat(coordinates).setDOMContent(container).addTo(this.map)
+      this.openPopup = { features, lngLat }
     },
     // Mounts the right popover component for one marker's properties into
     // mountEl, imperatively (parent: this gives it access to $apollo/$store/

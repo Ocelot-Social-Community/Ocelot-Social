@@ -1540,6 +1540,65 @@ describe('map', () => {
           ['literal', ['theUser', 'user', 'event']],
         ])
       })
+
+      describe('open popup vs. hiding its own marker type', () => {
+        const userFeature = {
+          geometry: { coordinates: [10.0, 53.55] },
+          properties: { type: 'user', slug: 'bob', id: 'u2', name: 'Bob' },
+        }
+
+        beforeEach(() => {
+          wrapper.vm.onMapLoad({ map: mapMock })
+          wrapper.vm.markers.isSourceAndLayerAdded = true
+          wrapper.vm.showPopup([userFeature], { lng: 10.0, lat: 53.55 })
+          mapboxgl.__popupInstance.setDOMContent.mockClear()
+          mapboxgl.__popupInstance.addTo.mockClear()
+        })
+
+        it('closes the open popup when its marker type is hidden', async () => {
+          wrapper.vm.toggleMarkerTypeVisibility('user')
+          await wrapper.vm.$nextTick()
+
+          expect(mapboxgl.__popupInstance.remove).toHaveBeenCalled()
+        })
+
+        it('leaves the open popup alone when a different marker type is hidden', async () => {
+          wrapper.vm.toggleMarkerTypeVisibility('group')
+          await wrapper.vm.$nextTick()
+
+          expect(mapboxgl.__popupInstance.remove).not.toHaveBeenCalled()
+        })
+
+        it('reopens the popup once its marker type becomes visible again', async () => {
+          wrapper.vm.toggleMarkerTypeVisibility('user')
+          await wrapper.vm.$nextTick()
+
+          wrapper.vm.toggleMarkerTypeVisibility('user')
+          await wrapper.vm.$nextTick()
+
+          expect(mapboxgl.__popupInstance.setDOMContent).toHaveBeenCalled()
+          expect(mapboxgl.__popupInstance.addTo).toHaveBeenCalledWith(mapMock)
+        })
+
+        it('does not reopen a popup that was never auto-closed', async () => {
+          wrapper.vm.toggleMarkerTypeVisibility('user')
+          await wrapper.vm.$nextTick()
+          wrapper.vm.toggleMarkerTypeVisibility('user')
+          await wrapper.vm.$nextTick()
+          mapboxgl.__popupInstance.setDOMContent.mockClear()
+          mapboxgl.__popupInstance.addTo.mockClear()
+
+          // Toggling the same type again now (hide, then show) shouldn't
+          // reopen anything a second time — it was already reopened and
+          // consumed above.
+          wrapper.vm.toggleMarkerTypeVisibility('group')
+          await wrapper.vm.$nextTick()
+          wrapper.vm.toggleMarkerTypeVisibility('group')
+          await wrapper.vm.$nextTick()
+
+          expect(mapboxgl.__popupInstance.setDOMContent).not.toHaveBeenCalled()
+        })
+      })
     })
 
     describe('buildMarkersGeoJSON isPast flag', () => {
