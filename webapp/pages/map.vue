@@ -723,6 +723,10 @@ export default {
           ...MapEventPopover,
           propsData: { postId: id },
         })
+        // MapEventPopover has its own OsButton close button (replacing the
+        // mapbox-gl popup's removed built-in one) — it can't reach
+        // this.markers.popup itself, so it emits 'close' and we act on it.
+        instance.$on('close', () => this.markers.popup.remove())
         instance.$mount(mountEl)
         return instance
       }

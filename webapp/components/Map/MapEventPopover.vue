@@ -1,5 +1,19 @@
 <template>
   <div class="map-event-popover">
+    <os-button
+      v-if="!(resolvedPost && resolvedPost.image)"
+      class="close-button close-button-no-img"
+      variant="primary"
+      appearance="outline"
+      circle
+      size="sm"
+      :aria-label="$t('actions.close')"
+      @click="$emit('close')"
+    >
+      <template #icon>
+        <os-icon :icon="icons.close" />
+      </template>
+    </os-button>
     <div v-if="!showContent" class="loading-state">
       <os-spinner size="md" />
     </div>
@@ -13,8 +27,23 @@
           <responsive-image :image="resolvedPost.image" sizes="280px" class="image" />
         </div>
         <os-ribbon class="event-ribbon-w-img" :text="$t('post.event')" type="Event" />
+        <!-- click.stop.prevent: this sits inside the card-wide nuxt-link,
+             otherwise the click would also trigger navigation. -->
+        <os-button
+          class="close-button close-button-w-img"
+          variant="primary"
+          appearance="outline"
+          circle
+          size="sm"
+          :aria-label="$t('actions.close')"
+          @click.stop.prevent="$emit('close')"
+        >
+          <template #icon>
+            <os-icon :icon="icons.close" />
+          </template>
+        </os-button>
       </div>
-      <div class="content">
+      <div class="content" :class="{ 'content--no-image': !resolvedPost.image }">
         <div class="post-user-row">
           <user-avatar :user="resolvedPost.author" size="small" :show-popover="false" />
           <os-ribbon
@@ -32,6 +61,7 @@
           :is-online="resolvedPost.eventIsOnline"
         />
         <date-time-range
+          class="event-datetime"
           size="small"
           :start-date="resolvedPost.eventStart"
           :end-date="resolvedPost.eventEnd"
@@ -45,13 +75,14 @@
 </template>
 
 <script>
-import { OsRibbon, OsSpinner } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsRibbon, OsSpinner } from '@ocelot-social/ui'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import Empty from '~/components/Empty/Empty'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import { postTeaserQuery } from '~/graphql/PostQuery'
+import { iconRegistry } from '~/utils/iconRegistry'
 
 export default {
   name: 'MapEventPopover',
@@ -59,6 +90,8 @@ export default {
     DateTimeRange,
     Empty,
     LocationTeaser,
+    OsButton,
+    OsIcon,
     OsRibbon,
     OsSpinner,
     ResponsiveImage,
@@ -78,6 +111,9 @@ export default {
       querySettled: false,
       spinnerTimer: null,
     }
+  },
+  created() {
+    this.icons = iconRegistry
   },
   mounted() {
     if (this.resolvedPost) {
@@ -137,12 +173,46 @@ export default {
 
 <style scoped>
 .map-event-popover {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 220px;
   max-width: 280px;
   width: 280px;
   min-height: 120px;
+}
+
+/* Replaces the mapbox-gl popup's own close button (removed for every
+   marker type, see pages/map.vue) with a standard small outline OsButton.
+   Two variants, like the ribbon's own .event-ribbon-w-img/.event-ribbon
+   split, since "top-right corner" means a different anchor depending on
+   whether there's an image to sit on.
+   !important: OsButton is a vue-demi/Composition-API component (its own
+   render function manually re-merges the parent's class list — see its
+   source — precisely because Vue 2's usual "scoped CSS reaches a child
+   component's root element" mechanism does NOT apply to it). This scoped
+   rule's compiled selector never actually matches the real DOM node, so
+   OsButton's own baked-in Tailwind `relative` base class would otherwise
+   win by default, leaving the button in normal flow instead of taken out
+   of it — which top/right then shift as a relative offset, not an anchor. */
+.close-button {
+  position: absolute !important;
+}
+
+/* Sits on the image itself (anchored to .image-wrapper-outer) — within its
+   bounds, so it never changes the image's own size/format. */
+.close-button-w-img {
+  top: 8px;
+  right: 8px;
+}
+
+/* No image here (also covers the loading/unavailable states, which never
+   have one) — anchored to the popover root instead, same corner offsets as
+   the with-image variant. .content--no-image below adds the extra
+   headroom this needs to clear the ribbon without moving it. */
+.close-button-no-img {
+  top: 8px;
+  right: 8px;
 }
 
 .loading-state {
@@ -196,10 +266,22 @@ export default {
   padding: 24px;
 }
 
+/* Extra headroom above the ribbon's own unchanged poke (top: -16px, see
+   .event-ribbon below) so the close button — sitting at the same top: 8px
+   corner as the with-image variant — has room above it without moving or
+   resizing the ribbon itself. */
+.content--no-image {
+  padding-top: 56px;
+}
+
 .post-user-row {
   position: relative;
   display: flex;
   align-items: center;
+  /* Own dedicated (smaller) gap to the title below, on top of .content's
+     6px flex gap — deliberately less than PostTeaser's own --space-small
+     here, this popover reads better with the title closer to the row. */
+  margin-bottom: var(--space-x-small);
 }
 
 /* Anchored to the image itself (via .image-wrapper-outer) instead of
@@ -227,11 +309,21 @@ export default {
 
 .event-title {
   margin: 0;
+  /* Own dedicated gap to the location-teaser below, on top of .content's
+     6px flex gap — bigger than the row-to-title gap above, so the title
+     reads as its own block rather than crowding into the location/date. */
+  margin-bottom: var(--space-x-small);
   font-size: 1rem;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+
+/* Pulls this a little closer to the location-teaser above than .content's
+   6px flex gap alone gives it. */
+.event-datetime {
+  margin-top: calc(-1 * var(--space-xxx-small));
 }
 
 .unavailable-state {
