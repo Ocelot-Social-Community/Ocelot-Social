@@ -38,6 +38,7 @@
     "accounting": "~0.4.1",
     "apollo-cache-inmemory": "~1.6.6",
     "apollo-client": "~2.6.10",
+    "apollo-link": "~1.2.14",
     "async-validator": "^4.2.5",
     "cookie-universal-nuxt": "~2.2.2",
     "cropperjs": "^1.6.2",
