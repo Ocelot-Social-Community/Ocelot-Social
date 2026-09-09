@@ -184,6 +184,14 @@ updates:
       patterns:
         - "vitest*"
         - "@vitest*"
+    # See the `vitest-security` note under /backend: `applies-to` defaults to version-updates, so
+    # the group above leaves security updates ungrouped, and `vitest` pins `@vitest/coverage-v8`
+    # to an exact peer version.
+    vitest-security:
+      applies-to: security-updates
+      patterns:
+        - "vitest*"
+        - "@vitest*"
     tailwind:
       applies-to: version-updates
       patterns:
@@ -216,6 +224,13 @@ updates:
       patterns:
         - "size-limit"
         - "@size-limit/*"
+    # See the `vitest-security` note under /backend: `applies-to` defaults to version-updates, so
+    # the group above leaves security updates ungrouped and the exact peer pin bites again.
+    size-limit-security:
+      applies-to: security-updates
+      patterns:
+        - "size-limit"
+        - "@size-limit/*"
     storybook:
       applies-to: version-updates
       patterns:
@@ -244,6 +259,14 @@ updates:
         - "vitest*"
     vitest:
       applies-to: version-updates
+      patterns:
+        - "vitest*"
+        - "@vitest*"
+    # See the `vitest-security` note under /backend. No `vite-security` counterpart is needed: the
+    # `vite` group above exists to keep a release train together, not because anything in it pins
+    # an exact peer, so a lone security update there installs fine.
+    vitest-security:
+      applies-to: security-updates
       patterns:
         - "vitest*"
         - "@vitest*"
