@@ -95,13 +95,18 @@ async function setupNodeEvents(on, config) {
   // strategy depends on this; without it PreJoin lands in the
   // "errorDenied"/"errorNoDevice" branch and we can't exercise the happy path.
   //
-  // Note: Electron (Cypress' default browser) **does not honor
-  // launchOptions.args** and prints "browser launch options ... not
-  // supported by electron". The chrome/chromium browsers do honor them —
-  // so this hook still earns its keep when the spec is run with
-  // `--browser chrome` locally or in CI. For the bundled Electron run,
-  // permissions are auto-granted by Cypress, so we tolerate the case
-  // where the test gracefully falls into the "prompt" status path.
+  // These are live on every run since the suite moved off Electron (see the `cypress:run`
+  // script in the root package.json): Electron **does not honor launchOptions.args** and
+  // printed "browser launch options ... not supported by electron", so under it the video-call
+  // specs only ever reached the "prompt" status path. The guard below stays as-is because
+  // `--browser electron` is still reachable via CYPRESS_BROWSER.
+  //
+  // The move away from Electron was not about these flags, though. Headless Electron 146, which
+  // Cypress 16 bundles, has no working WebGL: mapbox-gl throws "Failed to initialize WebGL" from
+  // its mounted hook, that tears down the surrounding render, and the tiptap editor then patches
+  // against a detached node — "Failed to execute 'appendChild' on 'Node'". Nuxt's error page
+  // catches it and fails to render as well, so the whole contribution form is replaced by
+  // "An error occurred while showing the error page". Chromium renders the same page cleanly.
   on('before:browser:launch', (browser = {}, launchOptions) => {
     if (browser.family === 'chromium' && browser.name !== 'electron') {
       launchOptions.args.push('--use-fake-ui-for-media-stream')

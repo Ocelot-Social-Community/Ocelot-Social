@@ -32,8 +32,8 @@
     "docs:api": "cd backend && npm run schema:print && ./node_modules/.bin/spectaql --target-dir ../.vuepress/public/api spectaql.yml",
     "docs:build": "NODE_OPTIONS=--openssl-legacy-provider vuepress build .",
     "docs:dev": "NODE_OPTIONS=--openssl-legacy-provider vuepress dev .",
-    "cypress:run": "cypress run --e2e --browser electron --config-file ./cypress/cypress.config.js",
-    "cypress:open": "cypress open --e2e --browser electron --config-file ./cypress/cypress.config.js",
+    "cypress:run": "cypress run --e2e --browser ${CYPRESS_BROWSER:-chrome} --config-file ./cypress/cypress.config.js",
+    "cypress:open": "cypress open --e2e --browser ${CYPRESS_BROWSER:-chrome} --config-file ./cypress/cypress.config.js",
     "release": "./scripts/release.sh"
   },
   "devDependencies": {
