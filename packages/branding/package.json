@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "nanotar": "^0.3.0",
-    "postcss": "^8.5.26",
+    "postcss": "^8.5.28",
     "tslib": "^2.8.1"
   }
 }

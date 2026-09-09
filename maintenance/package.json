@@ -24,7 +24,7 @@
     "tailwind-merge": "^3.5.0",
     "vue": "^3.5.30",
     "vue-demi": "^0.14.10",
-    "vue-router": "^5.2.0"
+    "vue-router": "^5.3.1"
   },
   "devDependencies": {
     "@intlify/eslint-plugin-vue-i18n": "^4.5.1",
@@ -35,7 +35,7 @@
     "@vue/test-utils": "^2.4.6",
     "eslint": "^10.8.1",
     "eslint-config-it4c": "^0.13.2",
-    "happy-dom": "^20.11.12",
+    "happy-dom": "^20.14.0",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "vitest": "^4.1.2",
