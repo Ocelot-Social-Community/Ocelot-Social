@@ -68,6 +68,15 @@ updates:
       applies-to: version-updates
       patterns:
         - "metascraper*"
+    # `vitest` pins `@vitest/coverage-v8` to an exact version in its peerDependencies, so a pull
+    # request moving only one of the two can never install — `npm ci` fails with ERESOLVE before a
+    # single test runs. They have to arrive together. (Same reasoning as the `size-limit` group
+    # under /packages/ui.)
+    vitest:
+      applies-to: version-updates
+      patterns:
+        - "vitest*"
+        - "@vitest*"
 
 # webapp
 - package-ecosystem: docker
