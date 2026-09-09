@@ -165,14 +165,23 @@ describe('apollo client config', () => {
         text: () => Promise.resolve(JSON.stringify(body)),
       })
 
+    // jsdom exposes no fetch today, so this saves `undefined` — but restoring the DESCRIPTOR rather
+    // than deleting keeps the block honest if the environment (or a setup file) ever provides one:
+    // a plain reassignment would also flatten a getter into a data property.
+    let previousFetch
     beforeEach(() => {
+      previousFetch = Object.getOwnPropertyDescriptor(global, 'fetch')
       // apollo-upload-client's `checkFetcher` runs while the link is BUILT, not when it is used, so
       // a global fetch has to exist even for the tests that never send a request.
       global.fetch = jest.fn()
     })
 
     afterEach(() => {
-      delete global.fetch
+      if (previousFetch) {
+        Object.defineProperty(global, 'fetch', previousFetch)
+      } else {
+        delete global.fetch
+      }
       jest.clearAllMocks()
     })
 
