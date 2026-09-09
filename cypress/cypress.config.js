@@ -63,7 +63,12 @@ async function setupNodeEvents(on, config) {
       return true
     },
     getValue(name) {
-      console.log('getValue',name,testStore)
+      // The NAME only. This used to print the whole `testStore`, which put every value it held
+      // into the CI job log — on every read, not just the one being asked for. What the store
+      // holds is exactly the kind of thing that must not be logged: ApiKey.feature parks a freshly
+      // minted `oak_…` key here, and it was showing up verbatim in the workflow output twice per
+      // run. Job logs are readable by anyone who can read the repository.
+      console.log('getValue', name)
       return testStore[name]
     },
     // Mints the auth cookie's JWT for "I am logged in as <slug>". This runs in NODE, on
