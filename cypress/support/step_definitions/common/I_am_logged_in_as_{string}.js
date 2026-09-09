@@ -9,7 +9,7 @@ defineStep('I am logged in as {string}', slug => {
     .then(user => user.toJson())
     // Signed by the `signToken` task, i.e. in Node rather than in this browser bundle:
     // jsonwebtoken 9 needs `crypto.KeyObject`, which the browser polyfill does not provide.
-    // The config still comes from here (Cypress.env()), so only the signing moved — see the
+    // The config still comes from here (Cypress.expose()), so only the signing moved — see the
     // task in cypress/cypress.config.js. Spelled out field by field because a task argument
     // crosses a serialisation boundary, and these four are all `encode` reads.
     .then(user =>

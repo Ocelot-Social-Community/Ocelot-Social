@@ -5,7 +5,7 @@ defineStep('I use the revoked API key to query currentUser', () => {
     expect(secret).to.be.a('string').and.match(/^oak_/)
     cy.request({
       method: 'POST',
-      url: Cypress.env('GRAPHQL_URI'),
+      url: Cypress.expose('GRAPHQL_URI'),
       headers: { authorization: `Bearer ${secret}`, 'content-type': 'application/json' },
       body: { query: '{ currentUser { id name } }' },
       failOnStatusCode: false,

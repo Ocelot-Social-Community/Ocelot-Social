@@ -47,7 +47,7 @@ const REQUIRED: Record<string, string> = {
   JWT_SECRET: 'jwt-secret',
 }
 
-// Injecting a global `Cypress` makes config read Cypress.env() instead of process.env — the
+// Injecting a global `Cypress` makes config read Cypress.expose() instead of process.env — the
 // branch that lets the e2e runner drive the backend's configuration. It is also what makes this
 // spec hermetic: process.env and the repo's own .env (which sets SMTP_*, LIVEKIT_*, NEO4J_* …)
 // are bypassed entirely, so "unset" really means unset and a case cannot pass or fail because of
@@ -56,8 +56,10 @@ const REQUIRED: Record<string, string> = {
 // A key mapped to `undefined` is an absent variable (process.env behaves the same way).
 const loadConfig = async (env: Record<string, string | undefined> = {}): Promise<LoadedConfig> => {
   vi.resetModules()
-  const g = globalThis as unknown as { Cypress?: { env: () => Record<string, string | undefined> } }
-  g.Cypress = { env: () => ({ ...REQUIRED, ...env }) }
+  const g = globalThis as unknown as {
+    Cypress?: { expose: () => Record<string, string | undefined> }
+  }
+  g.Cypress = { expose: () => ({ ...REQUIRED, ...env }) }
   try {
     return (await import('./index')) as unknown as LoadedConfig
   } finally {

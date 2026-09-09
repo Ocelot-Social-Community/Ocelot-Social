@@ -73,7 +73,7 @@ async function setupNodeEvents(on, config) {
     // "Right-hand side of 'instanceof' is not an object" for every logged-in step.
     //
     // `config` is passed IN by the step rather than required here: the backend's config module
-    // reads Cypress.env() in the browser but process.env in Node, so requiring it on this side
+    // reads Cypress.expose() in the browser but process.env in Node, so requiring it on this side
     // would sign with a potentially different JWT_SECRET than the specs otherwise use. Only the
     // signing moves to Node; the values keep coming from the one source they always did.
     // `encode` is required lazily so `cypress open` still starts when backend/build is absent.
@@ -131,5 +131,9 @@ module.exports = defineConfig({
     viewportWidth: 1290,
     setupNodeEvents,
   },
-  env: parsed
+  // `expose`, not `env`: Cypress 16 removed `Cypress.env()` and split it in two. `expose` is the
+  // synchronous, browser-readable half — the only one the backend's config module can use, since it
+  // reads its values at import time (see backend/src/config/index.ts). The other half, `cy.env()`,
+  // is an async command and deliberately reaches nothing outside a test body.
+  expose: parsed
 });
