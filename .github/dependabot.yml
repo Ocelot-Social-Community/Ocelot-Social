@@ -77,6 +77,20 @@ updates:
       patterns:
         - "vitest*"
         - "@vitest*"
+    # `applies-to` defaults to version-updates, so the group above does NOT cover security updates
+    # — those would arrive one package per pull request and hit the same ERESOLVE. Hence the
+    # duplicate below.
+    #
+    # It only half closes the gap, and knowingly so: a security group bundles the dependencies that
+    # are THEMSELVES vulnerable, not everything matching the patterns. An advisory against `vitest`
+    # alone (the likely shape — they land on the runner and the browser API, not on the coverage
+    # provider) still produces a single-package pull request that cannot install. There is no
+    # Dependabot-side answer to that one; it fails in CI and gets the second package added by hand.
+    vitest-security:
+      applies-to: security-updates
+      patterns:
+        - "vitest*"
+        - "@vitest*"
 
 # webapp
 - package-ecosystem: docker
