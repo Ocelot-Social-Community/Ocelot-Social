@@ -258,6 +258,11 @@ export default {
       window.removeEventListener('resize', this.geocoderCollapseHandler)
     }
     clearTimeout(this.hoverPopupTimer)
+    // A still-open popup's mounted components (UserAvatarPopover etc.) each
+    // run their own Apollo query — leaving on a route change without this
+    // would leak that subscription instead of $destroy()ing it.
+    this.markers.popup?.remove()
+    this.destroyPopupComponents()
   },
   computed: {
     ...mapGetters({
@@ -553,6 +558,15 @@ export default {
 
       this.map.on('click', (e) => {
         if (!isPlacingEvent) return
+        // A click that lands on an existing marker should still open its
+        // popup (see the 'markers' layer's own click handler below), not
+        // place a new event on top of it — leave the tool armed and let
+        // that handler take over. getLayer() guards queryRenderedFeatures,
+        // which throws if asked about a layer that's briefly gone
+        // mid-style-switch.
+        if (this.map.getLayer('markers') && this.getFeaturesAtPoint(e.point).length > 0) {
+          return
+        }
         isPlacingEvent = false
         if (this.eventPinToolToggle) {
           this.eventPinToolToggle.classList.remove('map-event-pin-tool-toggle--active')

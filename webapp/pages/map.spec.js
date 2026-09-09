@@ -109,6 +109,7 @@ const mapMock = {
   flyTo: mapFlyToMock,
   getContainer: mapGetContainerMock,
   queryRenderedFeatures: mapQueryRenderedFeaturesMock,
+  getLayer: jest.fn(() => true),
   getStyle: mapGetStyleMock,
   getCanvas: jest.fn().mockReturnValue({
     style: { cursor: '' },
@@ -545,6 +546,38 @@ describe('map', () => {
           await getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
 
           expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
+          expect(mocks.$router.push).toHaveBeenCalledWith({
+            path: '/post/create/event',
+            query: { lat: 52.5, lng: 13.4 },
+          })
+        })
+
+        it('does not place an event when the click lands on an existing marker, leaving the tool armed for the next click', async () => {
+          mocks.$apollo.query.mockResolvedValueOnce({ data: { queryLocations: [] } })
+          armPinTool()
+
+          mapQueryRenderedFeaturesMock.mockReturnValueOnce([{ properties: { type: 'user' } }])
+          getGenericClickHandler()({
+            point: { x: 1, y: 2 },
+            lngLat: { lat: 52.5, lng: 13.4 },
+          })
+          expect(mocks.$router.push).not.toHaveBeenCalled()
+
+          // Still armed — an empty spot now should place the event.
+          await getGenericClickHandler()({ lngLat: { lat: 10, lng: 20 } })
+          expect(mocks.$router.push).toHaveBeenCalledWith({
+            path: '/post/create/event',
+            query: { lat: 10, lng: 20 },
+          })
+        })
+
+        it('places the event normally when the markers layer does not exist yet (e.g. mid style switch)', async () => {
+          mapMock.getLayer.mockReturnValueOnce(false)
+          mocks.$apollo.query.mockResolvedValueOnce({ data: { queryLocations: [] } })
+          armPinTool()
+
+          await getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
+
           expect(mocks.$router.push).toHaveBeenCalledWith({
             path: '/post/create/event',
             query: { lat: 52.5, lng: 13.4 },
@@ -1812,6 +1845,16 @@ describe('map', () => {
         expect(spy).toHaveBeenCalledWith('resize', wrapper.vm.updateMapPosition)
         expect(spy).toHaveBeenCalledWith('resize', geocoderHandler)
         spy.mockRestore()
+      })
+
+      it('removes the open popup and destroys its mounted components, so a route change does not leak them', () => {
+        wrapper.vm.onMapLoad({ map: mapMock })
+        const destroySpy = jest.spyOn(wrapper.vm, 'destroyPopupComponents')
+
+        wrapper.destroy()
+
+        expect(mapboxgl.__popupInstance.remove).toHaveBeenCalled()
+        expect(destroySpy).toHaveBeenCalled()
       })
     })
   })
