@@ -1062,6 +1062,41 @@ export default {
         features: this.markers.geoJSON,
       })
       this.openInitialEventPopup()
+      this.syncPopupWithCurrentData()
+    },
+    // Toggling "show past events" re-runs the apollo query with a
+    // different eventStart_gte filter — a past event's own feature can be
+    // entirely absent from the new data, not just filtered out client-side
+    // like hiddenMarkerTypes above. Same close-and-remember /
+    // reopen-when-it-comes-back behavior as the hiddenMarkerTypes watcher,
+    // but driven by whether the open (or previously auto-closed) popup's
+    // feature(s) still exist in the freshly rebuilt geoJSON at all.
+    syncPopupWithCurrentData() {
+      const findCurrent = (feature) =>
+        this.markers.geoJSON.find(
+          (f) =>
+            f.properties.type === feature.properties.type &&
+            f.properties.id === feature.properties.id,
+        )
+
+      if (this.openPopup && !this.openPopup.features.every((feature) => findCurrent(feature))) {
+        this.autoClosedPopup = this.openPopup
+        this.openPopup = null
+        this.markers.popup.remove()
+        return
+      }
+
+      if (
+        this.autoClosedPopup &&
+        this.autoClosedPopup.features.every((feature) => findCurrent(feature))
+      ) {
+        const { lngLat } = this.autoClosedPopup
+        // Re-resolve the actual current feature objects, not the stale
+        // ones from before the refresh.
+        const features = this.autoClosedPopup.features.map(findCurrent)
+        this.autoClosedPopup = null
+        this.showPopup(features, lngLat)
+      }
     },
     mapFlyToCenter() {
       if (this.map) {

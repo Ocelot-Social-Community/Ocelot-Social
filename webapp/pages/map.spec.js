@@ -1317,6 +1317,68 @@ describe('map', () => {
       })
     })
 
+    describe('syncPopupWithCurrentData (e.g. toggling "show past events")', () => {
+      const eventFeature = {
+        geometry: { coordinates: [9.17702, 48.78232] },
+        properties: {
+          type: 'event',
+          slug: 'kindergeburtstag',
+          id: 'e1',
+          name: 'Kindergeburtstag',
+          locationName: 'Stuttgart',
+          description: 'Fun event',
+        },
+      }
+
+      let buildSpy
+
+      beforeEach(() => {
+        wrapper.vm.onMapLoad({ map: mapMock })
+        wrapper.vm.markers.isSourceAndLayerAdded = true
+        buildSpy = jest.spyOn(wrapper.vm, 'buildMarkersGeoJSON')
+        buildSpy.mockReturnValueOnce([eventFeature])
+        wrapper.vm.refreshMarkersData()
+        wrapper.vm.showPopup([eventFeature], { lng: 9.17702, lat: 48.78232 })
+      })
+
+      it('closes the open popup once its feature is missing from a refresh (e.g. an event no longer matching the past-events filter)', () => {
+        buildSpy.mockReturnValueOnce([])
+        wrapper.vm.refreshMarkersData()
+
+        expect(mapboxgl.__popupInstance.remove).toHaveBeenCalled()
+      })
+
+      it('leaves the open popup alone when its feature is still present after a refresh', () => {
+        buildSpy.mockReturnValueOnce([eventFeature])
+        wrapper.vm.refreshMarkersData()
+
+        expect(mapboxgl.__popupInstance.remove).not.toHaveBeenCalled()
+      })
+
+      it('reopens the popup once its feature reappears in a later refresh', () => {
+        buildSpy.mockReturnValueOnce([])
+        wrapper.vm.refreshMarkersData()
+
+        buildSpy.mockReturnValueOnce([eventFeature])
+        wrapper.vm.refreshMarkersData()
+
+        expect(mapboxgl.__popupInstance.setDOMContent).toHaveBeenCalled()
+        expect(mapboxgl.__popupInstance.addTo).toHaveBeenCalledWith(mapMock)
+      })
+
+      it('does not reopen anything while the feature is still missing', () => {
+        buildSpy.mockReturnValueOnce([])
+        wrapper.vm.refreshMarkersData()
+        mapboxgl.__popupInstance.setDOMContent.mockClear()
+        mapboxgl.__popupInstance.addTo.mockClear()
+
+        buildSpy.mockReturnValueOnce([])
+        wrapper.vm.refreshMarkersData()
+
+        expect(mapboxgl.__popupInstance.setDOMContent).not.toHaveBeenCalled()
+      })
+    })
+
     describe('getUserLocation', () => {
       it('returns location when user has one', async () => {
         mocks.$apollo.query.mockResolvedValueOnce({
