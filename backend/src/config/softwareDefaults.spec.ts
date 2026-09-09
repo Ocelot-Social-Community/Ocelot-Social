@@ -60,14 +60,14 @@ describe('SOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', 
     JWT_SECRET: 'x',
   }
 
-  // config reads Cypress.env() when a global `Cypress` is present (see config/index.ts).
+  // config reads Cypress.expose() when a global `Cypress` is present (see config/index.ts).
   // Injecting it bypasses process.env / the repo .env entirely — otherwise .env (which sets
   // SMTP_* etc.) would mask the true software defaults we mean to assert.
   // async because ESM has no synchronous module load: `await import()` replaces require().
   const loadConfigWithFlagsUnset = async (): Promise<LoadedConfig> => {
     vi.resetModules()
-    const g = global as unknown as { Cypress?: { env: () => Record<string, string> } }
-    g.Cypress = { env: () => ({ ...REQUIRED }) }
+    const g = global as unknown as { Cypress?: { expose: () => Record<string, string> } }
+    g.Cypress = { expose: () => ({ ...REQUIRED }) }
     try {
       return (await import('./index')) as unknown as LoadedConfig
     } finally {

@@ -32,6 +32,23 @@ without docker, you would have to install cypress and its dependencies first:
 $ npm ci
 ```
 
+## Pick a browser
+
+Both `cypress:run` and `cypress:open` default to **Chrome**, which is what the CI runner has.
+Cypress does not download it — it has to be installed on the machine the tests run on. To use a
+different one, set `CYPRESS_BROWSER` to any browser Cypress detects:
+
+```bash
+$ npx cypress info                                  # lists what Cypress found
+$ CYPRESS_BROWSER=chromium npm run cypress:run      # e.g. Chromium instead of Chrome
+```
+
+Electron — the browser Cypress bundles, and the suite's previous default — is **not** a working
+choice any more, even though it needs no installation. Cypress 16 ships Electron 146, whose
+headless mode has no WebGL; mapbox-gl then throws while mounting and takes the surrounding render
+down with it, so every page embedding a map (the whole contribution form, for one) is replaced by
+Nuxt's error page. Cypress deprecated Electron as a test browser in the same release.
+
 ### Open Interactive Test Console
 
 The interactive cypress test console allows to run tests and have visual feedback on that. The interactive cypress environment also helps at debugging the tests, you can even time travel between individual steps and see the exact state of the app.

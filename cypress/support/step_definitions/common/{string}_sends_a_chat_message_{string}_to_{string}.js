@@ -27,7 +27,7 @@ defineStep(
           `No users found for sender "${senderSlug}" or recipient "${recipientSlug}"`)
         const senderEmail = result.records[0].get('senderEmail')
         const recipientId = result.records[0].get('recipientId')
-        const password = (Cypress.env('userPasswords') || {})[senderSlug]
+        const password = (Cypress.expose('userPasswords') || {})[senderSlug]
         expect(password, `No password found for user "${senderSlug}"`).to.exist
         return cy.authenticateAs({ email: senderEmail, password }).then((client) => {
           return client.request(createMessageMutation, { userId: recipientId, content: message })
