@@ -63,7 +63,12 @@ async function setupNodeEvents(on, config) {
       return true
     },
     getValue(name) {
-      console.log('getValue',name,testStore)
+      // The NAME only. This used to print the whole `testStore`, which put every value it held
+      // into the CI job log — on every read, not just the one being asked for. What the store
+      // holds is exactly the kind of thing that must not be logged: ApiKey.feature parks a freshly
+      // minted `oak_…` key here, and it was showing up verbatim in the workflow output twice per
+      // run. Job logs are readable by anyone who can read the repository.
+      console.log('getValue', name)
       return testStore[name]
     },
     // Mints the auth cookie's JWT for "I am logged in as <slug>". This runs in NODE, on
@@ -72,13 +77,14 @@ async function setupNodeEvents(on, config) {
     // substitutes (crypto-browserify) has no such export — `instanceof undefined` then throws
     // "Right-hand side of 'instanceof' is not an object" for every logged-in step.
     //
-    // `config` is passed IN by the step rather than required here: the backend's config module
-    // reads Cypress.env() in the browser but process.env in Node, so requiring it on this side
-    // would sign with a potentially different JWT_SECRET than the specs otherwise use. Only the
-    // signing moves to Node; the values keep coming from the one source they always did.
-    // `encode` is required lazily so `cypress open` still starts when backend/build is absent.
-    signToken({ user, config }) {
+    // `config` is read HERE rather than passed in by the step, so that JWT_SECRET never has to
+    // reach the browser. There is no second source: the backend's config module falls back to
+    // process.env outside Cypress, and the `dotenv.config({ path: '../backend/.env' })` below runs
+    // at load time of this file — so it reads the very same file the exposed values come from.
+    // Both requires are lazy so `cypress open` still starts when backend/build is absent.
+    signToken({ user }) {
       const { encode } = require('../backend/build/src/jwt/encode')
+      const { default: config } = require('../backend/build/src/config/index')
       return encode({ config })(user)
     },
   });
@@ -89,13 +95,18 @@ async function setupNodeEvents(on, config) {
   // strategy depends on this; without it PreJoin lands in the
   // "errorDenied"/"errorNoDevice" branch and we can't exercise the happy path.
   //
-  // Note: Electron (Cypress' default browser) **does not honor
-  // launchOptions.args** and prints "browser launch options ... not
-  // supported by electron". The chrome/chromium browsers do honor them —
-  // so this hook still earns its keep when the spec is run with
-  // `--browser chrome` locally or in CI. For the bundled Electron run,
-  // permissions are auto-granted by Cypress, so we tolerate the case
-  // where the test gracefully falls into the "prompt" status path.
+  // These are live on every run since the suite moved off Electron (see the `cypress:run`
+  // script in the root package.json): Electron **does not honor launchOptions.args** and
+  // printed "browser launch options ... not supported by electron", so under it the video-call
+  // specs only ever reached the "prompt" status path. The guard below stays as-is because
+  // `--browser electron` is still reachable via CYPRESS_BROWSER.
+  //
+  // The move away from Electron was not about these flags, though. Headless Electron 146, which
+  // Cypress 16 bundles, has no working WebGL: mapbox-gl throws "Failed to initialize WebGL" from
+  // its mounted hook, that tears down the surrounding render, and the tiptap editor then patches
+  // against a detached node — "Failed to execute 'appendChild' on 'Node'". Nuxt's error page
+  // catches it and fails to render as well, so the whole contribution form is replaced by
+  // "An error occurred while showing the error page". Chromium renders the same page cleanly.
   on('before:browser:launch', (browser = {}, launchOptions) => {
     if (browser.family === 'chromium' && browser.name !== 'electron') {
       launchOptions.args.push('--use-fake-ui-for-media-stream')
@@ -116,6 +127,49 @@ async function setupNodeEvents(on, config) {
 // Import backend .env (smart)?
 const { parsed } = dotenv.config({ path: '../backend/.env' })
 
+// What the spec bundle is allowed to see. NOT the whole `parsed` map: the e2e specs pull the
+// backend's config module into the BROWSER (support/factories.js → db/factories → db/neo4j →
+// config), so every key handed over here ends up readable in the test browser. Handing over the
+// whole .env put SMTP credentials — including SMTP_DKIM_PRIVATEKEY — Redis, LiveKit and Sentry
+// values there as well, none of which any spec reads.
+//
+// The two groups below are NOT interchangeable:
+//   - REAL: the keys the browser bundle actually reads.
+//   - PLACEHOLDER: keys no spec reads, but which `assertRequiredConfig` (backend/src/config/index.ts)
+//     demands at import time — it throws `ERROR: "<KEY>" env variable is missing.` for a missing or
+//     empty one, and because the import happens while the spec is being loaded that failure shows up
+//     as "an uncaught error outside of a test", killing the whole file before any scenario runs.
+//     They therefore need SOME truthy value, but not the real one.
+//
+// Drift is self-announcing: a new required variable in the backend config produces exactly that
+// loud, immediate error on the first spec rather than a subtle mis-run.
+const PLACEHOLDER = 'unused-in-e2e'
+const exposedToSpecs = {
+  // --- real ---
+  NODE_ENV: parsed.NODE_ENV,
+  CLIENT_URI: parsed.CLIENT_URI,
+  GRAPHQL_URI: parsed.GRAPHQL_URI,
+  PRODUCTION_DB_CLEAN_ALLOW: parsed.PRODUCTION_DB_CLEAN_ALLOW,
+  // The fixtures talk to neo4j straight from the browser, so these cannot be withheld without
+  // moving fixture setup into a Node task.
+  NEO4J_URI: parsed.NEO4J_URI,
+  NEO4J_USERNAME: parsed.NEO4J_USERNAME,
+  NEO4J_PASSWORD: parsed.NEO4J_PASSWORD,
+  // --- placeholder: required by config, read by nobody in the browser ---
+  // JWT_SECRET among them: the token is signed by the `signToken` task in Node, which reads the
+  // real value itself.
+  JWT_SECRET: PLACEHOLDER,
+  EMAIL_DEFAULT_SENDER: PLACEHOLDER,
+  AWS_ACCESS_KEY_ID: PLACEHOLDER,
+  AWS_SECRET_ACCESS_KEY: PLACEHOLDER,
+  AWS_ENDPOINT: PLACEHOLDER,
+  AWS_REGION: PLACEHOLDER,
+  AWS_BUCKET: PLACEHOLDER,
+  IMAGOR_PUBLIC_URL: PLACEHOLDER,
+  IMAGOR_SECRET: PLACEHOLDER,
+  MAPBOX_TOKEN: PLACEHOLDER,
+}
+
 module.exports = defineConfig({
   e2e: {
     projectId: 'qa7fe2',
@@ -131,5 +185,9 @@ module.exports = defineConfig({
     viewportWidth: 1290,
     setupNodeEvents,
   },
-  env: parsed
+  // `expose`, not `env`: Cypress 16 removed `Cypress.env()` and split it in two. `expose` is the
+  // synchronous, browser-readable half — the only one the backend's config module can use, since it
+  // reads its values at import time (see backend/src/config/index.ts). The other half, `cy.env()`,
+  // is an async command and deliberately reaches nothing outside a test body.
+  expose: exposedToSpecs
 });

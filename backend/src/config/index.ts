@@ -18,10 +18,13 @@ import type * as SMTPTransport from 'nodemailer/lib/smtp-pool'
 // Load env file
 config()
 
-// Use Cypress env or process.env
+// Use the Cypress-exposed values or process.env. `Cypress.expose()` (no argument) returns the whole
+// map, which is what makes it a drop-in for the `Cypress.env()` that Cypress 16 removed. The other
+// replacement, `cy.env()`, cannot be used here: it is an async, chainable COMMAND, while this module
+// needs its values at import time — the e2e bundle pulls config in transitively via db/factories.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Cypress: any | undefined
-const env = (typeof Cypress !== 'undefined' ? Cypress.env() : process.env) as typeof process.env
+const env = (typeof Cypress !== 'undefined' ? Cypress.expose() : process.env) as typeof process.env
 
 const environment = {
   NODE_ENV: env.NODE_ENV ?? process.env.NODE_ENV,
@@ -189,7 +192,7 @@ const language = {
   // Validate against the supported locales and fall back — an empty or invalid
   // LANGUAGE_DEFAULT (e.g. '' or 'xx') must NOT become the app-wide default locale
   // (`??` alone would let it through), which drives email localisation and the request
-  // context's languageDefault. Read via `env` (not `process.env`) so a Cypress.env() override
+  // context's languageDefault. Read via `env` (not `process.env`) so a Cypress.expose() override
   // is honoured, consistent with every other read above.
   LANGUAGE_DEFAULT: resolveLocale(env.LANGUAGE_DEFAULT, SOFTWARE_DEFAULTS.LANGUAGE_DEFAULT),
 }

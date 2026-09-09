@@ -54,9 +54,9 @@ defineStep('the following {string} are in the database:', (table,data) => {
     case 'users':
       data.hashes().forEach( entry => {
         if (entry.slug && entry.password) {
-          const passwords = Cypress.env('userPasswords') || {}
+          const passwords = Cypress.expose('userPasswords') || {}
           passwords[entry.slug] = entry.password
-          Cypress.env('userPasswords', passwords)
+          Cypress.expose('userPasswords', passwords)
         }
         cy.factory().build('user', entry, entry)
       })
