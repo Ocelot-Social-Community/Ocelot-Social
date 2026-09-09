@@ -12,7 +12,7 @@ LABEL maintainer="devops@ocelot.social"
 ## its own Valid-Until timestamp (bullseye's regular security support has
 ## ended, so deb.debian.org stopped publishing fresh ones) — without this,
 ## apt-get update fails with "Release file ... is expired".
-RUN apt-get update -o Acquire::Check-Valid-Until=false && apt-get -y install wget htop
+RUN apt-get update -o Acquire::Check-Valid-Until=false && apt-get -y install --no-install-recommends wget htop
 ## install: apoc plugin for neo4j
 RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/4.4.0.17/apoc-4.4.0.17-all.jar -P plugins/
 
@@ -30,6 +30,6 @@ LABEL maintainer="devops@ocelot.social"
 ## its own Valid-Until timestamp (bullseye's regular security support has
 ## ended, so deb.debian.org stopped publishing fresh ones) — without this,
 ## apt-get update fails with "Release file ... is expired".
-RUN apt-get update -o Acquire::Check-Valid-Until=false && apt-get -y install wget htop
+RUN apt-get update -o Acquire::Check-Valid-Until=false && apt-get -y install --no-install-recommends wget htop
 ## install: apoc plugin for neo4j
 RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/4.4.0.17/apoc-4.4.0.17-all.jar -P plugins/
