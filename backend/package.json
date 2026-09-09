@@ -134,7 +134,7 @@
     "tsc-alias": "^1.9.4",
     "tsx": "^4.23.13",
     "typescript": "^5.8.3",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.0"
   },
   "overrides": {
     "metascraper-lang-detector": {
