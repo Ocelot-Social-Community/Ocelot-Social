@@ -1,5 +1,6 @@
 import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
 import introspectionQueryResultData from './apollo-config/fragmentTypes.json'
+import { createGraphqlResponseLink } from './apollo-config/graphqlResponseLink'
 import { createAuthCookie } from '~/utils/authCookie'
 
 const fragmentMatcher = new IntrospectionFragmentMatcher({
@@ -38,6 +39,10 @@ export default (context) => {
     },
     persisting: false,
     websocketsOnly: false,
+    // A NON-terminating link: vue-cli-plugin-apollo's createApolloClient combines it as
+    // `from([link, httpLink])` while `defaultHttpLink` stays on, so it wraps HTTP requests only —
+    // subscriptions are split off to the websocket link further down and never pass through it.
+    link: createGraphqlResponseLink(),
     cache: new InMemoryCache({ fragmentMatcher }),
   }
 }

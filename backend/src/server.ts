@@ -2,14 +2,12 @@
 
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable import-x/no-named-as-default-member */
-/* eslint-disable import-x/no-deprecated */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import http from 'node:http'
 
 import { ApolloServer } from '@apollo/server'
-import { expressMiddleware } from '@apollo/server/express4'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import { expressMiddleware } from '@as-integrations/express5'
 import { searchPath } from '@ocelot-social/branding/dist/discover.js'
 import bodyParser from 'body-parser'
 import express from 'express'
