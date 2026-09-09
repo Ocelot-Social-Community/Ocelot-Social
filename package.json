@@ -44,7 +44,7 @@
     "@cucumber/cucumber": "13.2.1",
     "@cypress/webpack-preprocessor": "^8.0.0",
     "@vuepress/bundler-vite": "2.0.0-rc.18",
-    "auto-changelog": "^2.6.0",
+    "auto-changelog": "^2.6.1",
     "cypress": "^16.0.0",
     "cypress-network-idle": "^2.0.1",
     "date-fns": "^3.6.0",
