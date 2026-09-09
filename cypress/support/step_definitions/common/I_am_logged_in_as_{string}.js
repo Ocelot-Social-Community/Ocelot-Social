@@ -1,5 +1,4 @@
 import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
-import CONFIG from '../../../../backend/build/src/config/index'
 
 defineStep('I am logged in as {string}', slug => {
   cy.fixtures()
@@ -9,20 +8,9 @@ defineStep('I am logged in as {string}', slug => {
     .then(user => user.toJson())
     // Signed by the `signToken` task, i.e. in Node rather than in this browser bundle:
     // jsonwebtoken 9 needs `crypto.KeyObject`, which the browser polyfill does not provide.
-    // The config still comes from here (Cypress.expose()), so only the signing moved — see the
-    // task in cypress/cypress.config.js. Spelled out field by field because a task argument
-    // crosses a serialisation boundary, and these four are all `encode` reads.
-    .then(user =>
-      cy.task('signToken', {
-        user,
-        config: {
-          JWT_SECRET: CONFIG.JWT_SECRET,
-          JWT_EXPIRES: CONFIG.JWT_EXPIRES,
-          GRAPHQL_URI: CONFIG.GRAPHQL_URI,
-          CLIENT_URI: CONFIG.CLIENT_URI,
-        },
-      }),
-    )
+    // The task reads the signing config itself — deliberately NOT passed from here, so that
+    // JWT_SECRET never has to be among the values exposed to the browser. See cypress.config.js.
+    .then(user => cy.task('signToken', { user }))
     .then(token => {
       cy.setCookie('ocelot-social-token', token)
     })
