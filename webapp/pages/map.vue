@@ -237,6 +237,10 @@ export default {
     // popupComponentInstances above.
     this.openPopup = null
     this.autoClosedPopup = null
+    // Pending "show the hover popup" timer (see the 'mouseenter' handler on
+    // the markers layer in onMapLoad) — plain instance property, cleared in
+    // beforeDestroy() below.
+    this.hoverPopupTimer = null
   },
   async mounted() {
     this.updateMapPosition()
@@ -253,6 +257,7 @@ export default {
     if (this.geocoderCollapseHandler) {
       window.removeEventListener('resize', this.geocoderCollapseHandler)
     }
+    clearTimeout(this.hoverPopupTimer)
   },
   computed: {
     ...mapGetters({
@@ -663,15 +668,23 @@ export default {
         this.openPopup = null
       })
 
-      // Desktop: show popup on hover
+      // Desktop: show popup on hover, after the same 500ms delay as the
+      // rest of the network's name/avatar popovers (UserAvatarHelper's own
+      // hoverDelay default) — opening immediately, on every incidental
+      // pass over the map, was popping up popups constantly and blocking
+      // the view of the map and its pins underneath.
       this.map.on('mouseenter', 'markers', (e) => {
         const features = this.getFeaturesAtPoint(e.point)
-        if (features.length > 0) {
+        if (features.length === 0) return
+        this.map.getCanvas().style.cursor = 'pointer'
+        clearTimeout(this.hoverPopupTimer)
+        this.hoverPopupTimer = setTimeout(() => {
           this.showPopup(features, e.lngLat)
-        }
+        }, 500)
       })
 
       this.map.on('mouseleave', 'markers', () => {
+        clearTimeout(this.hoverPopupTimer)
         this.map.getCanvas().style.cursor = isPlacingEvent ? EVENT_PIN_TOOL_CURSOR : ''
       })
 

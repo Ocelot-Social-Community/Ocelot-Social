@@ -714,12 +714,24 @@ describe('map', () => {
 
         const getPopupDOM = () => mapboxgl.__popupInstance.setDOMContent.mock.calls[0][0]
 
+        // The popup opens after the same 500ms hover delay as the rest of
+        // the network's name/avatar popovers (see the 'mouseenter' handler
+        // in onMapLoad) — every test below has to advance past it.
+        beforeEach(() => {
+          jest.useFakeTimers()
+        })
+
+        afterEach(() => {
+          jest.useRealTimers()
+        })
+
         it('shows popup when features found', () => {
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
           onEventMocks.mouseenter({
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
+          jest.advanceTimersByTime(500)
           expect(mapboxgl.__popupInstance.setLngLat).toHaveBeenCalled()
           expect(mapboxgl.__popupInstance.setDOMContent).toHaveBeenCalled()
           expect(mapboxgl.__popupInstance.addTo).toHaveBeenCalledWith(mapMock)
@@ -731,7 +743,38 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
+          jest.advanceTimersByTime(500)
           expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
+        })
+
+        it('does not show the popup before the hover delay has elapsed', () => {
+          mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+          onEventMocks.mouseenter({
+            point: { x: 100, y: 200 },
+            lngLat: { lng: 10.0, lat: 53.55 },
+          })
+          jest.advanceTimersByTime(499)
+          expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
+        })
+
+        it('cancels the pending popup if the mouse leaves before the delay elapses', () => {
+          mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+          onEventMocks.mouseenter({
+            point: { x: 100, y: 200 },
+            lngLat: { lng: 10.0, lat: 53.55 },
+          })
+          onEventMocks.mouseleave()
+          jest.advanceTimersByTime(500)
+          expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
+        })
+
+        it('sets the pointer cursor immediately, without waiting for the delay', () => {
+          mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+          onEventMocks.mouseenter({
+            point: { x: 100, y: 200 },
+            lngLat: { lng: 10.0, lat: 53.55 },
+          })
+          expect(mapMock.getCanvas().style.cursor).toBe('pointer')
         })
 
         it('mounts a UserAvatarPopover with the feature id and profile link', () => {
@@ -740,6 +783,7 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
+          jest.advanceTimersByTime(500)
           const [instance] = wrapper.vm.popupComponentInstances
           expect(instance.$options.name).toBe('UserAvatarPopover')
           expect(instance.userId).toBe('u2')
@@ -752,6 +796,7 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
+          jest.advanceTimersByTime(500)
           const [firstInstance] = wrapper.vm.popupComponentInstances
           const destroySpy = jest.spyOn(firstInstance, '$destroy')
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
@@ -759,6 +804,7 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
+          jest.advanceTimersByTime(500)
           expect(destroySpy).toHaveBeenCalled()
         })
 
@@ -768,6 +814,7 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
+          jest.advanceTimersByTime(500)
           const [instance] = wrapper.vm.popupComponentInstances
           const destroySpy = jest.spyOn(instance, '$destroy')
           const closeHandler = mapboxgl.__popupInstance.on.mock.calls.find(
@@ -798,6 +845,7 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
+          jest.advanceTimersByTime(500)
           const dom = getPopupDOM()
           expect(dom.querySelectorAll('hr').length).toBe(1)
           const instances = wrapper.vm.popupComponentInstances
@@ -816,6 +864,7 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
+          jest.advanceTimersByTime(500)
           expect(mapboxgl.__popupInstance.remove).toHaveBeenCalled()
         })
 
@@ -838,6 +887,7 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
+          jest.advanceTimersByTime(500)
           const coords = mapboxgl.__popupInstance.setLngLat.mock.calls[0][0]
           expect(coords[0]).toBe(10.0)
         })
@@ -890,6 +940,14 @@ describe('map', () => {
       })
 
       describe('popup content for different marker types', () => {
+        beforeEach(() => {
+          jest.useFakeTimers()
+        })
+
+        afterEach(() => {
+          jest.useRealTimers()
+        })
+
         it('mounts a MapEventPopover with the feature id for event type', () => {
           const eventFeatures = [
             {
@@ -909,6 +967,7 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 9.17, lat: 48.78 },
           })
+          jest.advanceTimersByTime(500)
           const [instance] = wrapper.vm.popupComponentInstances
           expect(instance.$options.name).toBe('MapEventPopover')
           expect(instance.postId).toBe('e1')
@@ -933,6 +992,7 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 13.38, lat: 52.52 },
           })
+          jest.advanceTimersByTime(500)
           const [instance] = wrapper.vm.popupComponentInstances
           expect(instance.$options.name).toBe('UserAvatarPopover')
           expect(instance.userId).toBe('u1')
