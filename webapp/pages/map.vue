@@ -1373,16 +1373,26 @@ export default {
     left: 7px;
   }
 
-  .mapboxgl-ctrl-geocoder--button {
+  /* Mapbox positions .pin-right's children at top: 7px, with the close
+     icon carrying margin-top: 8px — tuned for its default ~36px input, so
+     it hangs below our shortened 29px one. Centre it in the input
+     instead. The compound selector matches mapbox's own
+     .mapboxgl-ctrl-geocoder .--pin-right > * rule for specificity. */
+  .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--pin-right > .mapboxgl-ctrl-geocoder--button {
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 22px;
     height: 22px;
-    top: 4px;
-    right: 4px;
   }
 
   .mapboxgl-ctrl-geocoder--icon-close {
     width: 14px;
     height: 14px;
+    margin: 0;
   }
 
   .mapboxgl-ctrl-geocoder.mapboxgl-ctrl-geocoder--collapsed {
