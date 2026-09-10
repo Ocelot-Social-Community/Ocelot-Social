@@ -48,6 +48,8 @@
         :to="groupLink"
         class="open-link"
         variant="primary"
+        appearance="outline"
+        size="sm"
       >
         {{ $t('group.teaser.openGroup') }}
       </os-button>
@@ -225,7 +227,7 @@ export default {
 }
 
 .open-link {
-  margin-top: 4px;
+  margin-top: var(--space-x-small);
 }
 
 .popover-avatar {

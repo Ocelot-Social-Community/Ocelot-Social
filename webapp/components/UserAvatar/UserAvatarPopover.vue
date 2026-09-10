@@ -44,6 +44,8 @@
         :to="userLink"
         class="open-link"
         variant="primary"
+        appearance="outline"
+        size="sm"
       >
         {{ $t('user-avatar.popover.open-profile') }}
       </os-button>
@@ -175,7 +177,7 @@ export default {
 }
 
 .open-link {
-  margin-top: 4px;
+  margin-top: var(--space-x-small);
 }
 
 .popover-avatar {
