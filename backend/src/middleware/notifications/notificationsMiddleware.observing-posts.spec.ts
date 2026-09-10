@@ -25,6 +25,14 @@ vi.mock('@src/emails/sendEmail', () => ({
   sendWrongEmail: vi.fn(),
 }))
 
+// Vitest clears mock call records before EVERY test (the v5 default), so an `it` can no longer
+// read the calls its own `beforeAll` produced — and the mails in this file are a side effect of
+// the mutations those hooks fire, several tests before the assertion. Captured in the hook
+// itself, right after the triggering mutation; `.map` copies, so a later `vi.clearAllMocks()`
+// cannot reach back into a snapshot already taken.
+const capturedMails = (): unknown[] =>
+  vi.mocked(sendNotificationMailMock).mock.calls.map(([notification]) => notification as unknown)
+
 // Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
 // registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { default: Factory, cleanDatabase } = await import('@db/factories')
@@ -123,6 +131,8 @@ describe('notifications for users that observe a post', () => {
   })
 
   describe('first comment on the post', () => {
+    let mails: unknown[]
+
     beforeAll(async () => {
       authenticatedUser = await firstCommenter.toJson()
       await mutate({
@@ -133,6 +143,7 @@ describe('notifications for users that observe a post', () => {
           content: 'first comment of first commenter',
         },
       })
+      mails = capturedMails()
     })
 
     it('sends NO notification to the commenter', async () => {
@@ -175,8 +186,8 @@ describe('notifications for users that observe a post', () => {
     })
 
     it('sends one email', () => {
-      expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
-      expect(sendNotificationMailMock).toHaveBeenCalledWith(
+      expect(mails).toHaveLength(1)
+      expect(mails).toContainEqual(
         expect.objectContaining({
           email: 'post-author@example.org',
           reason: 'commented_on_post',
@@ -185,6 +196,8 @@ describe('notifications for users that observe a post', () => {
     })
 
     describe('second comment on post', () => {
+      let secondCommentMails: unknown[]
+
       beforeAll(async () => {
         vi.clearAllMocks()
         authenticatedUser = await secondCommenter.toJson()
@@ -196,6 +209,7 @@ describe('notifications for users that observe a post', () => {
             content: 'first comment of second commenter',
           },
         })
+        secondCommentMails = capturedMails()
       })
 
       it('sends NO notification to the commenter', async () => {
@@ -271,14 +285,14 @@ describe('notifications for users that observe a post', () => {
       })
 
       it('sends two emails', () => {
-        expect(sendNotificationMailMock).toHaveBeenCalledTimes(2)
-        expect(sendNotificationMailMock).toHaveBeenCalledWith(
+        expect(secondCommentMails).toHaveLength(2)
+        expect(secondCommentMails).toContainEqual(
           expect.objectContaining({
             email: 'post-author@example.org',
             reason: 'commented_on_post',
           }),
         )
-        expect(sendNotificationMailMock).toHaveBeenCalledWith(
+        expect(secondCommentMails).toContainEqual(
           expect.objectContaining({
             email: 'first-commenter@example.org',
             reason: 'commented_on_post',
@@ -288,6 +302,8 @@ describe('notifications for users that observe a post', () => {
     })
 
     describe('first commenter unfollows the post and post author comments post', () => {
+      let authorCommentMails: unknown[]
+
       beforeAll(async () => {
         vi.clearAllMocks()
         authenticatedUser = await firstCommenter.toJson()
@@ -308,6 +324,7 @@ describe('notifications for users that observe a post', () => {
             content: 'first comment of post author',
           },
         })
+        authorCommentMails = capturedMails()
       })
 
       it('sends no new notification to the post author', async () => {
@@ -392,8 +409,8 @@ describe('notifications for users that observe a post', () => {
       })
 
       it('sends one email', () => {
-        expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
-        expect(sendNotificationMailMock).toHaveBeenCalledWith(
+        expect(authorCommentMails).toHaveLength(1)
+        expect(authorCommentMails).toContainEqual(
           expect.objectContaining({
             email: 'second-commenter@example.org',
             reason: 'commented_on_post',

@@ -25,6 +25,13 @@ vi.mock('@src/emails/sendEmail', () => ({
   sendWrongEmail: vi.fn(),
 }))
 
+// Vitest clears mock call records before EVERY test (the v5 default), so an `it` can no longer
+// read the calls its own `beforeAll` produced — and the mails in this file are a side effect of
+// the mutation that hook fires, several tests before the assertion. Captured in the hook itself,
+// right after the triggering mutation; `.map` copies, so the snapshot is not clearable.
+const capturedMails = (): unknown[] =>
+  vi.mocked(sendNotificationMailMock).mock.calls.map(([notification]) => notification as unknown)
+
 // Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
 // registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { default: Factory, cleanDatabase } = await import('@db/factories')
@@ -140,6 +147,8 @@ describe('following users notifications', () => {
   })
 
   describe('the followed user writes a post', () => {
+    let mails: unknown[]
+
     beforeAll(async () => {
       authenticatedUser = await postAuthor.toJson()
       await mutate({
@@ -150,6 +159,7 @@ describe('following users notifications', () => {
           content: 'This is the content of the post',
         },
       })
+      mails = capturedMails()
     })
 
     it('sends NO notification to the post author', async () => {
@@ -242,14 +252,14 @@ describe('following users notifications', () => {
     })
 
     it('sends only two emails, as second follower has emails disabled and email-less follower has no email', () => {
-      expect(sendNotificationMailMock).toHaveBeenCalledTimes(2)
-      expect(sendNotificationMailMock).toHaveBeenCalledWith(
+      expect(mails).toHaveLength(2)
+      expect(mails).toContainEqual(
         expect.objectContaining({
           email: 'first-follower@example.org',
           reason: 'followed_user_posted',
         }),
       )
-      expect(sendNotificationMailMock).toHaveBeenCalledWith(
+      expect(mails).toContainEqual(
         expect.objectContaining({
           email: 'third-follower@example.org',
           reason: 'followed_user_posted',
