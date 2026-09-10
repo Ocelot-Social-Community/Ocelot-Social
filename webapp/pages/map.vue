@@ -750,9 +750,12 @@ export default {
 
       features.forEach((feature, index) => {
         if (index > 0) {
-          container.appendChild(document.createElement('hr'))
+          const separator = document.createElement('hr')
+          separator.className = 'map-popup-separator'
+          container.appendChild(separator)
         }
         const mountEl = document.createElement('div')
+        mountEl.className = 'map-popup-item'
         container.appendChild(mountEl)
         const instance = this.mountPopupComponent(feature.properties, mountEl)
         if (instance) this.popupComponentInstances.push(instance)
@@ -1287,11 +1290,30 @@ export default {
   max-height: 80vh;
 }
 
+/* Plain block flow, NOT a flex column: when several markers share a popup,
+   their popovers stack here with a separator between each. A flex column
+   with a max-height distributes the height deficit by *shrinking* the
+   items — a shrunk card whose own content (or a scoped min-height) won't
+   fit then overflows and overlaps the next card, and the avatar inside can
+   collapse to a sliver. Block children just stack at their natural height
+   and the container scrolls (see the overflow-y override for the
+   user/group case below). */
 .map-popup-container {
-  display: flex;
-  flex-direction: column;
   max-height: calc(40vh - 20px);
   overflow: hidden;
+}
+
+.map-popup-separator {
+  margin: 8px 0;
+}
+
+/* GroupAvatarPopover's own scoped min-height: 260px is a single-card hint
+   that leaves dead space between short cards when they're stacked.
+   !important because the map's own unscoped popup CSS and the component's
+   scoped rule otherwise tie on specificity. Scoped to .map-popup-item so
+   the standalone hover popover is untouched. */
+.map-popup-item .group-avatar-popover {
+  min-height: 0 !important;
 }
 
 .mapboxgl-popup-content:has(.map-event-popover) .map-popup-container {
