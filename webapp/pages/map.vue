@@ -1299,6 +1299,23 @@ export default {
   overflow: visible;
 }
 
+/* User and group popovers render their full real component
+   (UserAvatarPopover / GroupAvatarPopover) — on short viewports (mobile)
+   that can outgrow the 40vh cap, and hard-clipping then silently eats the
+   avatar header or the "open profile"/"open group" button. Give them the
+   same taller budget as the event popover, and let them scroll rather than
+   lose content if they still don't fit. */
+.mapboxgl-popup-content:has(.user-avatar-popover),
+.mapboxgl-popup-content:has(.group-avatar-popover) {
+  max-height: 80vh;
+}
+
+.mapboxgl-popup-content:has(.user-avatar-popover) .map-popup-container,
+.mapboxgl-popup-content:has(.group-avatar-popover) .map-popup-container {
+  max-height: calc(80vh - 20px);
+  overflow-y: auto;
+}
+
 .map-popup-header {
   font-weight: bold;
   font-size: var(--font-size-large);
