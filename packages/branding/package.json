@@ -39,7 +39,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.3",
     "@types/node": "^26.4.1",
-    "eslint": "^10.9.1",
+    "eslint": "^10.10.0",
     "eslint-config-it4c": "^0.13.2",
     "publint": "^0.3.24",
     "typescript": "^5.6.0",
