@@ -48,18 +48,19 @@
         :to="groupLink"
         class="open-link"
         variant="primary"
+        appearance="outline"
+        size="sm"
       >
         {{ $t('group.teaser.openGroup') }}
       </os-button>
     </template>
-    <template v-else-if="showContent">
-      <p class="group-unavailable">{{ $t('group.teaser.unavailable') }}</p>
-    </template>
+    <empty v-else-if="showContent" icon="alert" :message="$t('group.teaser.unavailable')" />
   </div>
 </template>
 
 <script>
 import { OsBadge, OsButton, OsNumber, OsSpinner } from '@ocelot-social/ui'
+import Empty from '~/components/Empty/Empty'
 import LocationInfo from '~/components/LocationInfo/LocationInfo'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import touchDevice from '~/mixins/touchDevice'
@@ -69,6 +70,7 @@ export default {
   name: 'GroupAvatarPopover',
   mixins: [touchDevice],
   components: {
+    Empty,
     LocationInfo,
     OsBadge,
     OsButton,
@@ -225,7 +227,7 @@ export default {
 }
 
 .open-link {
-  margin-top: 4px;
+  margin-top: var(--space-x-small);
 }
 
 .popover-avatar {

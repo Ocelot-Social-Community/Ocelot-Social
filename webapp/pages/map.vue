@@ -17,9 +17,6 @@
         :max-pitch="60"
         @load="onMapLoad"
       >
-        <MglFullscreenControl />
-        <MglNavigationControl position="top-right" />
-        <MglGeolocateControl position="top-right" />
         <MglScaleControl />
         <div class="map-legend" :class="{ 'map-legend--open': legendOpen }">
           <button
@@ -99,6 +96,7 @@
 
 <!-- eslint-disable vue/no-reserved-component-names -->
 <script>
+import Vue from 'vue'
 import { isEmpty } from 'lodash'
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
@@ -109,14 +107,28 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import { isEventPast } from '~/utils/eventDate'
 import { profileUserQuery } from '~/graphql/User'
 import { mapQuery } from '~/graphql/MapQuery'
+import { queryLocations } from '~/graphql/location'
 import mobile from '~/mixins/mobile'
 import Empty from '~/components/Empty/Empty'
+import UserAvatarPopover from '~/components/UserAvatar/UserAvatarPopover'
+import GroupAvatarPopover from '~/components/GroupAvatar/GroupAvatarPopover'
+import MapEventPopover from '~/components/Map/MapEventPopover'
 
 const maxMobileWidth = 639 // on this width and smaller the mapbox 'MapboxGeocoder' search gets bigger
 
 // Same value as --opacity-soft in root-tokens.css, used only if that custom
 // property can't be read yet (e.g. before the stylesheet is applied).
 const PAST_EVENT_OPACITY_FALLBACK = 0.7
+
+// Same cursor (glyph, hotspot, fallback) as OsLocationMap's own pick-location
+// tool (its PICKER_CURSOR) — shown while the "place a new event here" pin
+// tool below is armed, for visual consistency with the event form's map.
+const EVENT_PIN_TOOL_CURSOR_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="33" viewBox="0 0 20 33">' +
+  '<path d="M19.25,10.4a13.0663,13.0663,0,0,1-1.4607,5.2235,41.5281,41.5281,0,0,1-3.2459,5.5483c-1.1829,1.7369-2.3662,3.2784-3.2541,4.3859-.4438.5536-.8135.9984-1.0721,1.3046-.0844.1-.157.1852-.2164.2545-.06-.07-.1325-.1564-.2173-.2578-.2587-.3088-.6284-.7571-1.0723-1.3147-.8879-1.1154-2.0714-2.6664-3.2543-4.41a42.2677,42.2677,0,0,1-3.2463-5.5535A12.978,12.978,0,0,1,.75,10.4,9.4659,9.4659,0,0,1,10,.75,9.4659,9.4659,0,0,1,19.25,10.4Z" fill="black" stroke="white" stroke-width="1.5"/>' +
+  '<path d="M13.55,10A3.55,3.55,0,1,1,10,6.45,3.5484,3.5484,0,0,1,13.55,10Z" fill="#fff"/>' +
+  '</svg>'
+const EVENT_PIN_TOOL_CURSOR = `url("data:image/svg+xml,${encodeURIComponent(EVENT_PIN_TOOL_CURSOR_SVG)}") 10 30, crosshair`
 
 export default {
   name: 'Map',
@@ -209,6 +221,26 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+    // Vue instances mounted into the currently-open popup's DOM (see
+    // showPopup()) — a plain (non-reactive) instance property, same pattern
+    // as this.geocoder below, not data(): Vue 2 would otherwise walk these
+    // component instances trying to make them reactive. Destroyed on the
+    // next popup open/close instead of leaking (stale Apollo subscriptions,
+    // event listeners) on every marker click.
+    this.popupComponentInstances = []
+    // The feature(s)/lngLat behind the currently-open popup (see
+    // showPopup()), and — separately — the ones behind a popup that got
+    // auto-closed because its marker type was just hidden via the legend,
+    // so toggling that type visible again can reopen the same popup (see
+    // the hiddenMarkerTypes watcher below). Plain instance properties, not
+    // data(): same reactivity-avoidance reasoning as
+    // popupComponentInstances above.
+    this.openPopup = null
+    this.autoClosedPopup = null
+    // Pending "show the hover popup" timer (see the 'mouseenter' handler on
+    // the markers layer in onMapLoad) — plain instance property, cleared in
+    // beforeDestroy() below.
+    this.hoverPopupTimer = null
   },
   async mounted() {
     this.updateMapPosition()
@@ -225,6 +257,12 @@ export default {
     if (this.geocoderCollapseHandler) {
       window.removeEventListener('resize', this.geocoderCollapseHandler)
     }
+    clearTimeout(this.hoverPopupTimer)
+    // A still-open popup's mounted components (UserAvatarPopover etc.) each
+    // run their own Apollo query — leaving on a route change without this
+    // would leak that subscription instead of $destroy()ing it.
+    this.markers.popup?.remove()
+    this.destroyPopupComponents()
   },
   computed: {
     ...mapGetters({
@@ -306,8 +344,45 @@ export default {
         this.addMarkersOnCheckPrepared()
       }
     },
-    hiddenMarkerTypes() {
+    // Hiding a marker type only affects the mapbox layer's own filter
+    // (applyMarkerTypeFilter) — it doesn't touch an already-open popup,
+    // since that's a separate DOM overlay, not part of the layer's render
+    // state. So: close it explicitly if it's showing a feature of the
+    // type that just got hidden (remembering it first), and reopen it if
+    // that type — and every other type among its features — becomes
+    // visible again.
+    hiddenMarkerTypes(newHidden, oldHidden) {
       this.applyMarkerTypeFilter()
+      const newlyHidden = newHidden.filter((id) => !oldHidden.includes(id))
+      const newlyShown = oldHidden.filter((id) => !newHidden.includes(id))
+
+      if (
+        this.openPopup &&
+        newlyHidden.some((typeId) =>
+          this.openPopup.features.some((f) => f.properties.type === typeId),
+        )
+      ) {
+        this.autoClosedPopup = this.openPopup
+        // Also set directly (not just left to the popup's own 'close'
+        // event, which does the same thing) — remove() fires it
+        // synchronously on a real mapbox-gl Popup, but not on a bare test
+        // mock, and this state shouldn't depend on that either way.
+        this.openPopup = null
+        this.markers.popup.remove()
+        return
+      }
+
+      if (
+        this.autoClosedPopup &&
+        newlyShown.some((typeId) =>
+          this.autoClosedPopup.features.some((f) => f.properties.type === typeId),
+        ) &&
+        this.autoClosedPopup.features.every((f) => !this.isMarkerTypeHidden(f.properties.type))
+      ) {
+        const { features, lngLat } = this.autoClosedPopup
+        this.autoClosedPopup = null
+        this.showPopup(features, lngLat)
+      }
     },
   },
   methods: {
@@ -353,6 +428,51 @@ export default {
         parent.insertBefore(container, parent.firstChild)
       }
     },
+    // Reverse-geocodes the clicked point (same endpoint/types EventLocationMap's
+    // own onPinChange uses) so the create-event page opens with a resolved
+    // address ready to submit, not just bare coordinates that would only
+    // resolve later inside the form. Shows a busy cursor for that brief
+    // request instead of navigating immediately — see the pin tool's own
+    // comment in onMapLoad for why.
+    async placeEventAtCoordinates({ lat, lng }) {
+      this.map.getCanvas().style.cursor = 'wait'
+      if (this.eventPinToolToggle) {
+        this.eventPinToolToggle.title = this.$t('map.createEvent.resolvingLocation')
+        this.eventPinToolToggle.setAttribute(
+          'aria-label',
+          this.$t('map.createEvent.resolvingLocation'),
+        )
+      }
+      const query = { lat, lng }
+      try {
+        const {
+          data: { queryLocations: results },
+        } = await this.$apollo.query({
+          query: queryLocations(),
+          variables: {
+            place: `${lng},${lat}`,
+            lang: this.$i18n.locale(),
+            types: 'address,poi,place',
+          },
+          fetchPolicy: 'network-only',
+        })
+        const match = results && results[0]
+        if (match) {
+          query.locationName = match.place_name
+          if (match.id) query.locationId = match.id
+        }
+      } catch (error) {
+        this.$toast.error(error.message)
+      } finally {
+        this.map.getCanvas().style.cursor = ''
+        if (this.eventPinToolToggle) {
+          const label = this.$t('map.createEvent.pickLocation')
+          this.eventPinToolToggle.title = label
+          this.eventPinToolToggle.setAttribute('aria-label', label)
+        }
+      }
+      this.$router.push({ path: '/post/create/event', query })
+    },
     updateMapPosition() {
       const navbar = document.getElementById('navbar')
       const footer = document.getElementById('footer')
@@ -396,6 +516,76 @@ export default {
         }
       }
       window.addEventListener('resize', this.geocoderCollapseHandler)
+
+      // add "place a new event here" pin tool — directly below the search
+      // field (added just above) and above zoom/fullscreen/geolocate (added
+      // further below), matching the order requested for this control group.
+      // Starts disarmed; same click-to-arm-then-click-the-map pattern as
+      // OsLocationMap's own pick-location tool (see its buildLocationPicker()),
+      // including the same pin glyph, for visual consistency with the event
+      // form's own map.
+      let isPlacingEvent = false
+      const pinToolLabel = this.$t('map.createEvent.pickLocation')
+      const pinTool = {
+        onAdd: () => {
+          const container = document.createElement('div')
+          container.className = 'mapboxgl-ctrl map-event-pin-tool'
+          const toggle = document.createElement('button')
+          toggle.type = 'button'
+          toggle.className = 'map-event-pin-tool-toggle'
+          toggle.title = pinToolLabel
+          toggle.setAttribute('aria-label', pinToolLabel)
+          toggle.setAttribute('aria-pressed', 'false')
+          toggle.innerHTML =
+            '<svg viewBox="0 0 20 30.5" width="16" height="24" aria-hidden="true">' +
+            '<path d="M19.25,10.4a13.0663,13.0663,0,0,1-1.4607,5.2235,41.5281,41.5281,0,0,1-3.2459,5.5483c-1.1829,1.7369-2.3662,3.2784-3.2541,4.3859-.4438.5536-.8135.9984-1.0721,1.3046-.0844.1-.157.1852-.2164.2545-.06-.07-.1325-.1564-.2173-.2578-.2587-.3088-.6284-.7571-1.0723-1.3147-.8879-1.1154-2.0714-2.6664-3.2543-4.41a42.2677,42.2677,0,0,1-3.2463-5.5535A12.978,12.978,0,0,1,.75,10.4,9.4659,9.4659,0,0,1,10,.75,9.4659,9.4659,0,0,1,19.25,10.4Z" fill="currentColor"/>' +
+            '<path d="M13.55,10A3.55,3.55,0,1,1,10,6.45,3.5484,3.5484,0,0,1,13.55,10Z" fill="#fff"/>' +
+            '</svg>'
+          toggle.addEventListener('click', (e) => {
+            e.stopPropagation()
+            isPlacingEvent = !isPlacingEvent
+            toggle.classList.toggle('map-event-pin-tool-toggle--active', isPlacingEvent)
+            toggle.setAttribute('aria-pressed', String(isPlacingEvent))
+            this.map.getCanvas().style.cursor = isPlacingEvent ? EVENT_PIN_TOOL_CURSOR : ''
+          })
+          container.appendChild(toggle)
+          this.eventPinToolToggle = toggle
+          return container
+        },
+        onRemove: () => {},
+      }
+      this.map.addControl(pinTool, 'top-right')
+
+      this.map.on('click', (e) => {
+        if (!isPlacingEvent) return
+        // A click that lands on an existing marker should still open its
+        // popup (see the 'markers' layer's own click handler below), not
+        // place a new event on top of it — leave the tool armed and let
+        // that handler take over. getLayer() guards queryRenderedFeatures,
+        // which throws if asked about a layer that's briefly gone
+        // mid-style-switch.
+        if (this.map.getLayer('markers') && this.getFeaturesAtPoint(e.point).length > 0) {
+          return
+        }
+        isPlacingEvent = false
+        if (this.eventPinToolToggle) {
+          this.eventPinToolToggle.classList.remove('map-event-pin-tool-toggle--active')
+          this.eventPinToolToggle.setAttribute('aria-pressed', 'false')
+        }
+        this.placeEventAtCoordinates(e.lngLat)
+      })
+
+      // Zoom/fullscreen/geolocate added imperatively (not as declarative
+      // <Mgl*Control> children) so their order in the top-right stack is
+      // deterministic relative to the geocoder/pin-tool (above) and the
+      // style switcher (below) — mapbox-gl stacks same-corner controls in
+      // add order, and the three declarative components used to mount
+      // independently of (and sometimes after) this method, making the
+      // final order a race. This now matches OsLocationMap's own control
+      // order (zoom → fullscreen → geolocate → style switcher).
+      this.map.addControl(new mapboxgl.NavigationControl(), 'top-right')
+      this.map.addControl(new mapboxgl.FullscreenControl(), 'top-right')
+      this.map.addControl(new mapboxgl.GeolocateControl(), 'top-right')
 
       // add style switcher control
       let closePopoverHandler = null
@@ -472,25 +662,44 @@ export default {
           }
         },
       }
+      // Added last (see the NavigationControl/FullscreenControl/
+      // GeolocateControl comment above) so it lands at the bottom of the
+      // top-right stack.
       this.map.addControl(styleSwitcher, 'top-right')
 
       // create a popup, but don't add it to the map yet
       this.markers.popup = new mapboxgl.Popup({
-        closeButton: true,
+        closeButton: false,
         closeOnClick: true,
-        maxWidth: '300px',
+        maxWidth: '320px',
+      })
+      // Fires on clicking elsewhere on the map (closeOnClick above) or
+      // Escape — not just our own explicit .remove() calls in showPopup()
+      // — so this is the one place that reliably catches every way the
+      // popup can close.
+      this.markers.popup.on('close', () => {
+        this.destroyPopupComponents()
+        this.openPopup = null
       })
 
-      // Desktop: show popup on hover
+      // Desktop: show popup on hover, after the same 500ms delay as the
+      // rest of the network's name/avatar popovers (UserAvatarHelper's own
+      // hoverDelay default) — opening immediately, on every incidental
+      // pass over the map, was popping up popups constantly and blocking
+      // the view of the map and its pins underneath.
       this.map.on('mouseenter', 'markers', (e) => {
         const features = this.getFeaturesAtPoint(e.point)
-        if (features.length > 0) {
+        if (features.length === 0) return
+        this.map.getCanvas().style.cursor = 'pointer'
+        clearTimeout(this.hoverPopupTimer)
+        this.hoverPopupTimer = setTimeout(() => {
           this.showPopup(features, e.lngLat)
-        }
+        }, 500)
       })
 
       this.map.on('mouseleave', 'markers', () => {
-        this.map.getCanvas().style.cursor = ''
+        clearTimeout(this.hoverPopupTimer)
+        this.map.getCanvas().style.cursor = isPlacingEvent ? EVENT_PIN_TOOL_CURSOR : ''
       })
 
       // Mobile: show popup on click/tap
@@ -507,10 +716,25 @@ export default {
     // Show popup for given features at coordinates. Also used to open the
     // popup programmatically for a deep-linked event (see
     // openInitialEventPopup()), not just on hover/click.
+    //
+    // Content is the same real, self-contained popover components used
+    // elsewhere on the network for a name/avatar (UserAvatarPopover,
+    // GroupAvatarPopover — each normally opens on hover over a name/avatar
+    // there; here the marker click is that trigger instead) and a
+    // PostTeaser-styled one for events (MapEventPopover, built for this,
+    // since there's no existing compact single-post preview to reuse).
+    // Each is a real, independently-mounted Vue instance (own Apollo query),
+    // not the plain hand-built DOM the popup used before.
     showPopup(features, lngLat) {
       if (this.markers.popup.isOpen()) {
         this.markers.popup.remove()
       }
+      this.destroyPopupComponents()
+      // A new popup is opening (whether from a real hover/click, or the
+      // hiddenMarkerTypes watcher reopening one it auto-closed) — any
+      // still-pending "reopen once visible again" state is no longer
+      // relevant to it.
+      this.autoClosedPopup = null
 
       this.map.getCanvas().style.cursor = 'pointer'
 
@@ -521,81 +745,81 @@ export default {
         coordinates[0] += lngLat.lng > coordinates[0] ? 360 : -360
       }
 
-      // Build popup content safely using DOM nodes (no raw HTML interpolation)
       const container = document.createElement('div')
       container.className = 'map-popup-container'
 
-      const locationName = features[0].properties.locationName
-      if (locationName) {
-        const header = document.createElement('div')
-        header.className = 'map-popup-header'
-        header.textContent = locationName
-        container.appendChild(header)
-      }
-
-      const body = document.createElement('div')
-      body.className = 'map-popup-body'
-
       features.forEach((feature, index) => {
         if (index > 0) {
-          body.appendChild(document.createElement('hr'))
+          const separator = document.createElement('hr')
+          separator.className = 'map-popup-separator'
+          container.appendChild(separator)
         }
-
-        const markerTypeLabel = this.$t(`map.markerTypes.${feature.properties.type}`)
-        const encodedId = encodeURIComponent(feature.properties.id)
-        const encodedSlug = encodeURIComponent(feature.properties.slug)
-        const markerProfile = {
-          theUser: {
-            linkTitle: '@' + feature.properties.slug,
-            link: `/profile/${encodedId}/${encodedSlug}`,
-          },
-          user: {
-            linkTitle: '@' + feature.properties.slug,
-            link: `/profile/${encodedId}/${encodedSlug}`,
-          },
-          group: {
-            linkTitle: '&' + feature.properties.slug,
-            link: `/groups/${encodedId}/${encodedSlug}`,
-          },
-          event: {
-            linkTitle: feature.properties.slug,
-            link: `/post/${encodedId}/${encodedSlug}`,
-          },
-        }
-        const profile = markerProfile[feature.properties.type]
-
-        const item = document.createElement('div')
-
-        const nameRow = document.createElement('div')
-        const nameB = document.createElement('b')
-        nameB.textContent = feature.properties.name
-        const typeI = document.createElement('i')
-        typeI.textContent = ` (${markerTypeLabel})`
-        nameRow.appendChild(nameB)
-        nameRow.appendChild(typeI)
-        item.appendChild(nameRow)
-
-        const linkRow = document.createElement('div')
-        const link = document.createElement('a')
-        link.href = profile.link
-        link.target = '_blank'
-        link.rel = 'noopener noreferrer'
-        link.textContent = profile.linkTitle
-        linkRow.appendChild(link)
-        item.appendChild(linkRow)
-
-        body.appendChild(item)
-
-        if (feature.properties.description && feature.properties.description.length > 0) {
-          const desc = document.createElement('div')
-          desc.style.marginTop = '4px'
-          desc.textContent = feature.properties.description
-          body.appendChild(desc)
-        }
+        const mountEl = document.createElement('div')
+        mountEl.className = 'map-popup-item'
+        container.appendChild(mountEl)
+        const instance = this.mountPopupComponent(feature.properties, mountEl)
+        if (instance) this.popupComponentInstances.push(instance)
       })
 
-      container.appendChild(body)
       this.markers.popup.setLngLat(coordinates).setDOMContent(container).addTo(this.map)
+      this.openPopup = { features, lngLat }
+    },
+    // Mounts the right popover component for one marker's properties into
+    // mountEl, imperatively (parent: this gives it access to $apollo/$store/
+    // $t exactly like a normally-declared child would have) since these are
+    // built as native mapbox-gl DOM controls/popups, not part of the
+    // template's own component tree.
+    mountPopupComponent(properties, mountEl) {
+      const { type, id, slug } = properties
+      if (type === 'user' || type === 'theUser') {
+        const instance = new Vue({
+          parent: this,
+          ...UserAvatarPopover,
+          propsData: {
+            userId: id,
+            userLink: { path: `/profile/${encodeURIComponent(id)}/${encodeURIComponent(slug)}` },
+          },
+        })
+        // UserAvatarPopover only shows its "open profile" link on touch
+        // devices — elsewhere it opens via hovering a name/avatar that's
+        // already its own link, so the button is redundant there. Here the
+        // marker click is the *only* way in, with no separate link, so the
+        // button must always show regardless of the actual device.
+        instance.isTouchDevice = true
+        instance.$mount(mountEl)
+        return instance
+      }
+      if (type === 'group') {
+        const instance = new Vue({
+          parent: this,
+          ...GroupAvatarPopover,
+          propsData: {
+            groupId: id,
+            groupLink: { path: `/groups/${encodeURIComponent(id)}/${encodeURIComponent(slug)}` },
+          },
+        })
+        instance.isTouchDevice = true
+        instance.$mount(mountEl)
+        return instance
+      }
+      if (type === 'event') {
+        const instance = new Vue({
+          parent: this,
+          ...MapEventPopover,
+          propsData: { postId: id },
+        })
+        // MapEventPopover has its own OsButton close button (replacing the
+        // mapbox-gl popup's removed built-in one) — it can't reach
+        // this.markers.popup itself, so it emits 'close' and we act on it.
+        instance.$on('close', () => this.markers.popup.remove())
+        instance.$mount(mountEl)
+        return instance
+      }
+      return null
+    },
+    destroyPopupComponents() {
+      this.popupComponentInstances.forEach((instance) => instance.$destroy())
+      this.popupComponentInstances = []
     },
     // Query all features at the clicked/hovered point
     getFeaturesAtPoint(point) {
@@ -868,6 +1092,41 @@ export default {
         features: this.markers.geoJSON,
       })
       this.openInitialEventPopup()
+      this.syncPopupWithCurrentData()
+    },
+    // Toggling "show past events" re-runs the apollo query with a
+    // different eventStart_gte filter — a past event's own feature can be
+    // entirely absent from the new data, not just filtered out client-side
+    // like hiddenMarkerTypes above. Same close-and-remember /
+    // reopen-when-it-comes-back behavior as the hiddenMarkerTypes watcher,
+    // but driven by whether the open (or previously auto-closed) popup's
+    // feature(s) still exist in the freshly rebuilt geoJSON at all.
+    syncPopupWithCurrentData() {
+      const findCurrent = (feature) =>
+        this.markers.geoJSON.find(
+          (f) =>
+            f.properties.type === feature.properties.type &&
+            f.properties.id === feature.properties.id,
+        )
+
+      if (this.openPopup && !this.openPopup.features.every((feature) => findCurrent(feature))) {
+        this.autoClosedPopup = this.openPopup
+        this.openPopup = null
+        this.markers.popup.remove()
+        return
+      }
+
+      if (
+        this.autoClosedPopup &&
+        this.autoClosedPopup.features.every((feature) => findCurrent(feature))
+      ) {
+        const { lngLat } = this.autoClosedPopup
+        // Re-resolve the actual current feature objects, not the stale
+        // ones from before the refresh.
+        const features = this.autoClosedPopup.features.map(findCurrent)
+        this.autoClosedPopup = null
+        this.showPopup(features, lngLat)
+      }
     },
     mapFlyToCenter() {
       if (this.map) {
@@ -996,6 +1255,15 @@ export default {
   position: static;
 }
 
+.mapboxgl-popup {
+  /* Mapbox gives .mapboxgl-popup no z-index of its own (position: absolute
+     only), while the control corners (.mapboxgl-ctrl-top-right etc.) sit at
+     z-index: 2 and our own style switcher at z-index: 3 — positioned
+     siblings with an explicit z-index always paint above ones without one,
+     regardless of DOM order, so the popup was rendering behind both. */
+  z-index: 4;
+}
+
 .mapboxgl-popup-content {
   max-height: 40vh;
   overflow: hidden;
@@ -1003,17 +1271,71 @@ export default {
   border-radius: var(--border-radius-x-large);
 }
 
+/* The event popover renders its own edge-to-edge hero image (PostTeaser
+   style) — it needs to reach this container's own rounded corners, so its
+   ambient 10px padding has to get out of the way.
+   overflow is switched to visible (like PostTeaser's own .os-card) instead
+   of hidden: the image clips itself (see .image-wrapper in
+   MapEventPopover.vue), same split PostTeaser uses between its card
+   (visible) and its hero-image wrapper (hidden) — that's what lets the
+   ribbon's folded-corner triangle poke out past the image's edge instead
+   of being clipped away by this container.
+   It also gets a taller budget than the plain 40vh other popover types
+   use: its fixed-height image plus PostTeaser-matching padding around the
+   avatar/title/location/date content need more room than a compact
+   user/group card does. */
+.mapboxgl-popup-content:has(.map-event-popover) {
+  padding: 0;
+  overflow: visible;
+  max-height: 80vh;
+}
+
+/* Plain block flow, NOT a flex column: when several markers share a popup,
+   their popovers stack here with a separator between each. A flex column
+   with a max-height distributes the height deficit by *shrinking* the
+   items — a shrunk card whose own content (or a scoped min-height) won't
+   fit then overflows and overlaps the next card, and the avatar inside can
+   collapse to a sliver. Block children just stack at their natural height
+   and the container scrolls (see the overflow-y override for the
+   user/group case below). */
 .map-popup-container {
-  display: flex;
-  flex-direction: column;
   max-height: calc(40vh - 20px);
   overflow: hidden;
 }
 
-.mapboxgl-popup-close-button {
-  font-size: var(--font-size-large);
-  padding: 2px 6px;
-  z-index: 1;
+.map-popup-separator {
+  margin: 8px 0;
+}
+
+/* GroupAvatarPopover's own scoped min-height: 260px is a single-card hint
+   that leaves dead space between short cards when they're stacked.
+   !important because the map's own unscoped popup CSS and the component's
+   scoped rule otherwise tie on specificity. Scoped to .map-popup-item so
+   the standalone hover popover is untouched. */
+.map-popup-item .group-avatar-popover {
+  min-height: 0 !important;
+}
+
+.mapboxgl-popup-content:has(.map-event-popover) .map-popup-container {
+  max-height: 80vh;
+  overflow: visible;
+}
+
+/* User and group popovers render their full real component
+   (UserAvatarPopover / GroupAvatarPopover) — on short viewports (mobile)
+   that can outgrow the 40vh cap, and hard-clipping then silently eats the
+   avatar header or the "open profile"/"open group" button. Give them the
+   same taller budget as the event popover, and let them scroll rather than
+   lose content if they still don't fit. */
+.mapboxgl-popup-content:has(.user-avatar-popover),
+.mapboxgl-popup-content:has(.group-avatar-popover) {
+  max-height: 80vh;
+}
+
+.mapboxgl-popup-content:has(.user-avatar-popover) .map-popup-container,
+.mapboxgl-popup-content:has(.group-avatar-popover) .map-popup-container {
+  max-height: calc(80vh - 20px);
+  overflow-y: auto;
 }
 
 .map-popup-header {
@@ -1051,16 +1373,26 @@ export default {
     left: 7px;
   }
 
-  .mapboxgl-ctrl-geocoder--button {
+  /* Mapbox positions .pin-right's children at top: 7px, with the close
+     icon carrying margin-top: 8px — tuned for its default ~36px input, so
+     it hangs below our shortened 29px one. Centre it in the input
+     instead. The compound selector matches mapbox's own
+     .mapboxgl-ctrl-geocoder .--pin-right > * rule for specificity. */
+  .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--pin-right > .mapboxgl-ctrl-geocoder--button {
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 22px;
     height: 22px;
-    top: 4px;
-    right: 4px;
   }
 
   .mapboxgl-ctrl-geocoder--icon-close {
     width: 14px;
     height: 14px;
+    margin: 0;
   }
 
   .mapboxgl-ctrl-geocoder.mapboxgl-ctrl-geocoder--collapsed {
@@ -1187,11 +1519,50 @@ export default {
   }
 }
 
+.map-event-pin-tool {
+  background: var(--color-neutral-100);
+  border-radius: var(--border-radius-x-large);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.map-event-pin-tool-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 29px;
+  height: 29px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #333;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+
+.map-event-pin-tool-toggle--active {
+  background: rgba(0, 0, 0, 0.1);
+  /* Same "map tool" accent as OsLocationMap's own pick-location toggle —
+     shares its --os-location-map-accent-color override hook, not
+     --color-primary, which is this app's unrelated brand accent. */
+  color: var(--os-location-map-accent-color, var(--color-secondary));
+}
+
 .map-style-switcher {
   position: relative;
   background: var(--color-neutral-100);
   border-radius: var(--border-radius-x-large);
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  /* Mapbox gives every top-level control (.mapboxgl-ctrl, including this one
+     and the scale control) `transform: translate(0)`, which makes each its
+     own stacking context. That containment means a z-index set on a
+     *descendant* (e.g. the popover below) can never win against a sibling
+     .mapboxgl-ctrl no matter how high it is — the z-index has to sit here,
+     on the .mapboxgl-ctrl element itself, to out-rank the scale control's
+     container. */
+  z-index: 3;
 }
 
 .map-style-switcher-toggle {

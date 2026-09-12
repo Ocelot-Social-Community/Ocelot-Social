@@ -1055,6 +1055,13 @@
   },
   "map": {
     "alertMessage": "De kaart is niet toegankelijk: het Mapbox-token is niet ingesteld op de server!",
+    "createEvent": {
+      "pickLocation": "Hier een nieuw evenement plaatsen",
+      "resolvingLocation": "Adres wordt opgezocht…"
+    },
+    "eventPopover": {
+      "unavailable": "Dit evenement is niet meer beschikbaar."
+    },
     "legend": {
       "event": "Evenement",
       "group": "Groep",
@@ -1686,7 +1693,8 @@
   },
   "user-avatar": {
     "popover": {
-      "open-profile": "Profiel openen"
+      "open-profile": "Profiel openen",
+      "unavailable": "Gebruiker niet meer beschikbaar"
     }
   },
   "videoCall": {

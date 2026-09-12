@@ -130,6 +130,30 @@ export const profilePagePosts = (i18n) => {
   `
 }
 
+// Compact, on-demand query for a single Event post — same self-contained
+// "just an id, fetches its own data" shape as userTeaserQuery/groupTeaserQuery,
+// used by the map's event marker popover instead of bloating MapQuery's own
+// per-marker payload with data (image, author) only needed once a popup
+// actually opens.
+export const postTeaserQuery = () => {
+  return gql`
+    ${user}
+    ${post}
+
+    query ($id: ID!) {
+      Post(id: $id) {
+        ...post
+        postType
+        eventStart
+        eventEnd
+        eventVenue
+        eventLocationName
+        eventIsOnline
+      }
+    }
+  `
+}
+
 export const postsPinnedCountsQuery = () => {
   return gql`
     query {

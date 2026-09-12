@@ -122,10 +122,54 @@ export default {
     if (!draft.groupId && this.$route.query.groupId) {
       draft.groupId = this.$route.query.groupId
     }
+    // First-time arrival via the main map's "place a new event here" pin tool
+    // (/post/create/event?lat=&lng=&locationName=&locationId=) — seed the
+    // draft's eventLocationName as the same { label, value, id, lat, lng }
+    // selection-object shape LocationSelect/EventLocationMap themselves
+    // produce, so ContributionForm shows the pin already placed. A truthy
+    // draft.eventLocationName (from a prior remount) wins, same reasoning as
+    // groupId above.
+    // Tracks whether *this* mount performed that seed (not a prior one,
+    // e.g. after switching between the article/event tabs) — drives the
+    // one-time scroll-to-map in mounted() below, without touching the
+    // shared draft itself.
+    let seededLocationFromMapPin = false
+    if (!draft.eventLocationName) {
+      const lat = parseFloat(this.$route.query.lat)
+      const lng = parseFloat(this.$route.query.lng)
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        const label = this.$route.query.locationName || ''
+        draft.eventLocationName = {
+          label,
+          value: label,
+          id: this.$route.query.locationId || null,
+          lat,
+          lng,
+        }
+        seededLocationFromMapPin = true
+      }
+    }
     return {
       type: this.$route.params.type,
       draft,
       myGroups: [],
+      seededLocationFromMapPin,
+    }
+  },
+  mounted() {
+    // Arriving via the main map's "place a new event here" pin tool: bring
+    // the (already-filled-in) location section into view so its resolved
+    // address/pin is immediately visible to confirm or correct, without
+    // requiring a manual scroll past title/content first. The pick-location
+    // tool itself is deliberately left disarmed here — same as editing any
+    // other event with an already-saved location — so this can't move the
+    // pin by accident.
+    if (this.seededLocationFromMapPin) {
+      this.$nextTick(() => {
+        this.$el
+          .querySelector('.event-location-map-field')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      })
     }
   },
   async asyncData({ route, redirect }) {
