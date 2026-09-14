@@ -775,31 +775,31 @@ export default {
         const instance = new Vue({
           parent: this,
           ...UserAvatarPopover,
-          propsData: {
-            userId: id,
-            userLink: { path: `/profile/${encodeURIComponent(id)}/${encodeURIComponent(slug)}` },
-          },
+          propsData: { userId: id },
         })
-        // UserAvatarPopover only shows its "open profile" link on touch
-        // devices — elsewhere it opens via hovering a name/avatar that's
-        // already its own link, so the button is redundant there. Here the
-        // marker click is the *only* way in, with no separate link, so the
-        // button must always show regardless of the actual device.
-        instance.isTouchDevice = true
         instance.$mount(mountEl)
+        // No userLink passed above, so UserAvatarPopover's own touch-only
+        // "open profile" button never shows here — the marker click is the
+        // only entry point on the map (unlike elsewhere in the network,
+        // where hovering a name/avatar is already its own link), so the
+        // whole card navigates instead, on both desktop and mobile.
+        this.makePopupCardClickable(
+          instance,
+          `/profile/${encodeURIComponent(id)}/${encodeURIComponent(slug)}`,
+        )
         return instance
       }
       if (type === 'group') {
         const instance = new Vue({
           parent: this,
           ...GroupAvatarPopover,
-          propsData: {
-            groupId: id,
-            groupLink: { path: `/groups/${encodeURIComponent(id)}/${encodeURIComponent(slug)}` },
-          },
+          propsData: { groupId: id },
         })
-        instance.isTouchDevice = true
         instance.$mount(mountEl)
+        this.makePopupCardClickable(
+          instance,
+          `/groups/${encodeURIComponent(id)}/${encodeURIComponent(slug)}`,
+        )
         return instance
       }
       if (type === 'event') {
@@ -808,14 +808,13 @@ export default {
           ...MapEventPopover,
           propsData: { postId: id },
         })
-        // MapEventPopover has its own OsButton close button (replacing the
-        // mapbox-gl popup's removed built-in one) — it can't reach
-        // this.markers.popup itself, so it emits 'close' and we act on it.
-        instance.$on('close', () => this.markers.popup.remove())
         instance.$mount(mountEl)
         return instance
       }
       return null
+    },
+    makePopupCardClickable(instance, path) {
+      instance.$el.addEventListener('click', () => this.$router.push({ path }))
     },
     destroyPopupComponents() {
       this.popupComponentInstances.forEach((instance) => instance.$destroy())
@@ -1314,6 +1313,14 @@ export default {
    the standalone hover popover is untouched. */
 .map-popup-item .group-avatar-popover {
   min-height: 0 !important;
+}
+
+/* No "open profile"/"open group" button on the map (see
+   makePopupCardClickable) — the whole card navigates on click/tap, so it
+   needs to look clickable. */
+.map-popup-item .user-avatar-popover,
+.map-popup-item .group-avatar-popover {
+  cursor: pointer;
 }
 
 .mapboxgl-popup-content:has(.map-event-popover) .map-popup-container {

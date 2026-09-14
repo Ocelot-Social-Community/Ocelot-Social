@@ -47,12 +47,6 @@ describe('MapEventPopover', () => {
       expect(wrapper.find('.loading-state').exists()).toBe(true)
       expect(wrapper.find('.os-spinner').exists()).toBe(true)
     })
-
-    it('shows the no-image close button (there is no image to anchor to yet)', () => {
-      const wrapper = Wrapper({ postId: 'p1' })
-      expect(wrapper.find('.close-button-no-img').exists()).toBe(true)
-      expect(wrapper.find('.close-button-w-img').exists()).toBe(false)
-    })
   })
 
   describe('given an already-loaded post (post prop), without an image', () => {
@@ -83,20 +77,6 @@ describe('MapEventPopover', () => {
       expect(wrapper.find('.event-ribbon').exists()).toBe(true)
       expect(wrapper.find('.event-ribbon-w-img').exists()).toBe(false)
     })
-
-    it('shows the no-image close button, anchored to the popover root', () => {
-      expect(wrapper.find('.close-button-no-img').exists()).toBe(true)
-      expect(wrapper.find('.close-button-w-img').exists()).toBe(false)
-    })
-
-    it('gives .content the extra no-image top padding', () => {
-      expect(wrapper.find('.content').classes()).toContain('content--no-image')
-    })
-
-    it('emits close when the close button is clicked', async () => {
-      await wrapper.find('.close-button-no-img').trigger('click')
-      expect(wrapper.emitted('close')).toHaveLength(1)
-    })
   })
 
   describe('given an already-loaded post with an image', () => {
@@ -106,24 +86,13 @@ describe('MapEventPopover', () => {
       wrapper = Wrapper({ post: postWithImage })
     })
 
-    it('shows the image wrapper and the on-image ribbon/close button', () => {
+    it('shows the image wrapper and the on-image ribbon', () => {
       expect(wrapper.find('.image-wrapper-outer').exists()).toBe(true)
       expect(wrapper.find('.event-ribbon-w-img').exists()).toBe(true)
-      expect(wrapper.find('.close-button-w-img').exists()).toBe(true)
     })
 
-    it('does not show the no-image ribbon/close button', () => {
+    it('does not show the no-image ribbon', () => {
       expect(wrapper.find('.event-ribbon').exists()).toBe(false)
-      expect(wrapper.find('.close-button-no-img').exists()).toBe(false)
-    })
-
-    it('does not add the no-image content padding class', () => {
-      expect(wrapper.find('.content').classes()).not.toContain('content--no-image')
-    })
-
-    it('emits close when the on-image close button is clicked, without navigating', async () => {
-      await wrapper.find('.close-button-w-img').trigger('click')
-      expect(wrapper.emitted('close')).toHaveLength(1)
     })
   })
 
