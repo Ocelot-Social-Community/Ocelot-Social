@@ -754,8 +754,12 @@ export default {
           separator.className = 'map-popup-separator'
           container.appendChild(separator)
         }
+        // Vue's $mount(el) *replaces* el in the DOM rather than rendering
+        // into it — this div (and any class on it) never survives past
+        // mountPopupComponent() below, so styling only needs to target the
+        // mounted popover's own root, a direct child of .map-popup-container
+        // (see the CSS for it further down).
         const mountEl = document.createElement('div')
-        mountEl.className = 'map-popup-item'
         container.appendChild(mountEl)
         const instance = this.mountPopupComponent(feature.properties, mountEl)
         if (instance) this.popupComponentInstances.push(instance)
@@ -1309,17 +1313,20 @@ export default {
 /* GroupAvatarPopover's own scoped min-height: 260px is a single-card hint
    that leaves dead space between short cards when they're stacked.
    !important because the map's own unscoped popup CSS and the component's
-   scoped rule otherwise tie on specificity. Scoped to .map-popup-item so
-   the standalone hover popover is untouched. */
-.map-popup-item .group-avatar-popover {
+   scoped rule otherwise tie on specificity. Vue's $mount() replaces the
+   mounting div with the component's own root, so the mounted popover ends
+   up a direct child of .map-popup-container — that's the selector to
+   target, not a wrapper (there isn't one). Scoped this way so the
+   standalone hover popover elsewhere in the app is untouched. */
+.map-popup-container > .group-avatar-popover {
   min-height: 0 !important;
 }
 
 /* No "open profile"/"open group" button on the map (see
    makePopupCardClickable) — the whole card navigates on click/tap, so it
    needs to look clickable. */
-.map-popup-item .user-avatar-popover,
-.map-popup-item .group-avatar-popover {
+.map-popup-container > .user-avatar-popover,
+.map-popup-container > .group-avatar-popover {
   cursor: pointer;
 }
 
