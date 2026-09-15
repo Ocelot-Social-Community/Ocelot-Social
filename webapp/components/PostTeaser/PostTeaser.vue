@@ -432,6 +432,14 @@ export default {
     margin-bottom: var(--space-small);
   }
 
+  /* The global heading reset zeroes out h2's own margin, so without this
+     the title sits flush against whatever follows it (the event location/
+     date block, or the excerpt) — most noticeable right under an image,
+     where there's no other spacing cushioning it. */
+  .title {
+    margin-bottom: var(--space-small);
+  }
+
   .user-avatar-placeholder {
     display: flex;
     align-items: center;
