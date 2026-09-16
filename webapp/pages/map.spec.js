@@ -15,10 +15,29 @@ jest.mock('@mapbox/mapbox-gl-geocoder', () => {
   })
 })
 
+jest.mock('~/components/UserAvatar/UserAvatarPopover', () => ({
+  name: 'UserAvatarPopover',
+  props: ['userId', 'userLink'],
+  render: (h) => h('div', { class: 'user-avatar-popover-stub' }),
+}))
+
+jest.mock('~/components/GroupAvatar/GroupAvatarPopover', () => ({
+  name: 'GroupAvatarPopover',
+  props: ['groupId', 'groupLink'],
+  render: (h) => h('div', { class: 'group-avatar-popover-stub' }),
+}))
+
+jest.mock('~/components/Map/MapEventPopover', () => ({
+  name: 'MapEventPopover',
+  props: ['postId'],
+  render: (h) => h('div', { class: 'map-event-popover-stub' }),
+}))
+
 jest.mock('mapbox-gl', () => {
   const popupInstance = {
     isOpen: jest.fn(() => false),
     remove: jest.fn(),
+    on: jest.fn(),
     setLngLat: jest.fn(() => popupInstance),
     setHTML: jest.fn(() => popupInstance),
     setDOMContent: jest.fn(() => popupInstance),
@@ -26,6 +45,7 @@ jest.mock('mapbox-gl', () => {
   }
   return {
     accessToken: null,
+    FullscreenControl: jest.fn(),
     GeolocateControl: jest.fn(),
     Map: jest.fn(() => ({
       addControl: jest.fn(),
@@ -89,6 +109,7 @@ const mapMock = {
   flyTo: mapFlyToMock,
   getContainer: mapGetContainerMock,
   queryRenderedFeatures: mapQueryRenderedFeaturesMock,
+  getLayer: jest.fn(() => true),
   getStyle: mapGetStyleMock,
   getCanvas: jest.fn().mockReturnValue({
     style: { cursor: '' },
@@ -178,7 +199,7 @@ describe('map', () => {
       $t: (t) => t,
       $i18n: { locale: () => 'en' },
       $route: { path: '/map', query: {} },
-      $router: { replace: jest.fn() },
+      $router: { replace: jest.fn(), push: jest.fn() },
       $env: {
         MAPBOX_TOKEN: 'MY_MAPBOX_TOKEN',
       },
@@ -386,18 +407,189 @@ describe('map', () => {
       })
 
       it('adds style switcher control', () => {
-        // style switcher is the second addControl call (after geocoder)
         const styleSwitcherCall = mapAddControlMock.mock.calls.find(
-          (call) => call[1] === 'top-right' && call[0].onAdd,
+          (call) =>
+            call[1] === 'top-right' &&
+            call[0].onAdd &&
+            call[0].onAdd().className.includes('map-style-switcher'),
         )
         expect(styleSwitcherCall).toBeTruthy()
       })
 
+      it('registers every top-right control in the documented order: geocoder → pin tool → zoom → fullscreen → geolocate → style switcher', () => {
+        const topRightControls = mapAddControlMock.mock.calls
+          .filter((call) => call[1] === 'top-right')
+          .map((call) => call[0])
+
+        const indexOf = (predicate) => topRightControls.findIndex(predicate)
+        const geocoderIndex = indexOf((control) => control === wrapper.vm.geocoder)
+        const pinToolIndex = indexOf(
+          (control) => control.onAdd && control.onAdd().className.includes('map-event-pin-tool'),
+        )
+        const navigationIndex = indexOf(
+          (control) => control === mapboxgl.NavigationControl.mock.instances[0],
+        )
+        const fullscreenIndex = indexOf(
+          (control) => control === mapboxgl.FullscreenControl.mock.instances[0],
+        )
+        const geolocateIndex = indexOf(
+          (control) => control === mapboxgl.GeolocateControl.mock.instances[0],
+        )
+        const styleSwitcherIndex = indexOf(
+          (control) => control.onAdd && control.onAdd().className.includes('map-style-switcher'),
+        )
+
+        // Each found (not -1), then strictly ascending — the actual visual
+        // top-to-bottom order in the corner (mapbox-gl stacks same-corner
+        // controls in add order).
+        expect(geocoderIndex).toBeGreaterThanOrEqual(0)
+        expect(pinToolIndex).toBeGreaterThan(geocoderIndex)
+        expect(navigationIndex).toBeGreaterThan(pinToolIndex)
+        expect(fullscreenIndex).toBeGreaterThan(navigationIndex)
+        expect(geolocateIndex).toBeGreaterThan(fullscreenIndex)
+        expect(styleSwitcherIndex).toBeGreaterThan(geolocateIndex)
+      })
+
+      describe('event pin tool control', () => {
+        let container, toggle
+
+        beforeEach(() => {
+          const pinToolCall = mapAddControlMock.mock.calls.find(
+            (call) =>
+              call[1] === 'top-right' &&
+              call[0].onAdd &&
+              call[0].onAdd().className.includes('map-event-pin-tool'),
+          )
+          container = pinToolCall[0].onAdd()
+          toggle = container.querySelector('.map-event-pin-tool-toggle')
+        })
+
+        it('adds the tool, starting disarmed', () => {
+          expect(toggle).toBeTruthy()
+          expect(toggle.getAttribute('aria-pressed')).toBe('false')
+          expect(toggle.classList.contains('map-event-pin-tool-toggle--active')).toBe(false)
+        })
+
+        it('arms on click and disarms again on a second click', () => {
+          toggle.click()
+          expect(toggle.getAttribute('aria-pressed')).toBe('true')
+          expect(toggle.classList.contains('map-event-pin-tool-toggle--active')).toBe(true)
+
+          toggle.click()
+          expect(toggle.getAttribute('aria-pressed')).toBe('false')
+          expect(toggle.classList.contains('map-event-pin-tool-toggle--active')).toBe(false)
+        })
+      })
+
+      describe('map click while the event pin tool is armed', () => {
+        // The generic (layer-less) 'click' registration — distinct from the
+        // existing 3-arg map.on('click', 'markers', handler) used for the
+        // popup, which shares the same event name.
+        const getGenericClickHandler = () =>
+          mapOnMock.mock.calls.find((call) => call[0] === 'click' && call.length === 2)[1]
+
+        const armPinTool = () => {
+          const pinToolCall = mapAddControlMock.mock.calls.find(
+            (call) =>
+              call[1] === 'top-right' &&
+              call[0].onAdd &&
+              call[0].onAdd().className.includes('map-event-pin-tool'),
+          )
+          const container = pinToolCall[0].onAdd()
+          container.querySelector('.map-event-pin-tool-toggle').click()
+        }
+
+        it('does nothing while disarmed', () => {
+          getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
+          expect(mocks.$router.push).not.toHaveBeenCalled()
+        })
+
+        it('navigates to event creation with the resolved location, and disarms itself', async () => {
+          mocks.$apollo.query.mockResolvedValueOnce({
+            data: {
+              queryLocations: [
+                { id: 'poi.1', place_name: 'Alexanderplatz, Berlin', lat: 52.52, lng: 13.41 },
+              ],
+            },
+          })
+          armPinTool()
+
+          await getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
+
+          expect(mocks.$router.push).toHaveBeenCalledWith({
+            path: '/post/create/event',
+            query: {
+              lat: 52.5,
+              lng: 13.4,
+              locationName: 'Alexanderplatz, Berlin',
+              locationId: 'poi.1',
+            },
+          })
+        })
+
+        it('still navigates with just the coordinates when reverse-geocoding finds no match', async () => {
+          mocks.$apollo.query.mockResolvedValueOnce({ data: { queryLocations: [] } })
+          armPinTool()
+
+          await getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
+
+          expect(mocks.$router.push).toHaveBeenCalledWith({
+            path: '/post/create/event',
+            query: { lat: 52.5, lng: 13.4 },
+          })
+        })
+
+        it('still navigates with just the coordinates, and toasts, when reverse-geocoding fails', async () => {
+          mocks.$apollo.query.mockRejectedValueOnce(new Error('Network error'))
+          armPinTool()
+
+          await getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
+
+          expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
+          expect(mocks.$router.push).toHaveBeenCalledWith({
+            path: '/post/create/event',
+            query: { lat: 52.5, lng: 13.4 },
+          })
+        })
+
+        it('does not place an event when the click lands on an existing marker, leaving the tool armed for the next click', async () => {
+          mocks.$apollo.query.mockResolvedValueOnce({ data: { queryLocations: [] } })
+          armPinTool()
+
+          mapQueryRenderedFeaturesMock.mockReturnValueOnce([{ properties: { type: 'user' } }])
+          getGenericClickHandler()({
+            point: { x: 1, y: 2 },
+            lngLat: { lat: 52.5, lng: 13.4 },
+          })
+          expect(mocks.$router.push).not.toHaveBeenCalled()
+
+          // Still armed — an empty spot now should place the event.
+          await getGenericClickHandler()({ lngLat: { lat: 10, lng: 20 } })
+          expect(mocks.$router.push).toHaveBeenCalledWith({
+            path: '/post/create/event',
+            query: { lat: 10, lng: 20 },
+          })
+        })
+
+        it('places the event normally when the markers layer does not exist yet (e.g. mid style switch)', async () => {
+          mapMock.getLayer.mockReturnValueOnce(false)
+          mocks.$apollo.query.mockResolvedValueOnce({ data: { queryLocations: [] } })
+          armPinTool()
+
+          await getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
+
+          expect(mocks.$router.push).toHaveBeenCalledWith({
+            path: '/post/create/event',
+            query: { lat: 52.5, lng: 13.4 },
+          })
+        })
+      })
+
       it('creates popup', () => {
         expect(mapboxgl.Popup).toHaveBeenCalledWith({
-          closeButton: true,
+          closeButton: false,
           closeOnClick: true,
-          maxWidth: '300px',
+          maxWidth: '320px',
         })
       })
 
@@ -473,7 +665,10 @@ describe('map', () => {
 
         beforeEach(() => {
           const styleSwitcherCall = mapAddControlMock.mock.calls.find(
-            (call) => call[1] === 'top-right' && call[0].onAdd,
+            (call) =>
+              call[1] === 'top-right' &&
+              call[0].onAdd &&
+              call[0].onAdd().className.includes('map-style-switcher'),
           )
           container = styleSwitcherCall[0].onAdd()
         })
@@ -552,12 +747,24 @@ describe('map', () => {
 
         const getPopupDOM = () => mapboxgl.__popupInstance.setDOMContent.mock.calls[0][0]
 
+        // The popup opens after the same 500ms hover delay as the rest of
+        // the network's name/avatar popovers (see the 'mouseenter' handler
+        // in onMapLoad) — every test below has to advance past it.
+        beforeEach(() => {
+          jest.useFakeTimers()
+        })
+
+        afterEach(() => {
+          jest.useRealTimers()
+        })
+
         it('shows popup when features found', () => {
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
           onEventMocks.mouseenter({
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
+          jest.advanceTimersByTime(500)
           expect(mapboxgl.__popupInstance.setLngLat).toHaveBeenCalled()
           expect(mapboxgl.__popupInstance.setDOMContent).toHaveBeenCalled()
           expect(mapboxgl.__popupInstance.addTo).toHaveBeenCalledWith(mapMock)
@@ -569,46 +776,94 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
+          jest.advanceTimersByTime(500)
           expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
         })
 
-        it('popup includes location name header', () => {
+        it('does not show the popup before the hover delay has elapsed', () => {
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
           onEventMocks.mouseenter({
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
-          const dom = getPopupDOM()
-          const header = dom.querySelector('.map-popup-header')
-          expect(header).toBeTruthy()
-          expect(header.textContent).toBe('Hamburg')
+          jest.advanceTimersByTime(499)
+          expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
         })
 
-        it('popup includes user name and profile link', () => {
+        it('cancels the pending popup if the mouse leaves before the delay elapses', () => {
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
           onEventMocks.mouseenter({
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
-          const dom = getPopupDOM()
-          expect(dom.textContent).toContain('Bob')
-          const link = dom.querySelector('a')
-          expect(link.textContent).toBe('@bob')
-          expect(link.getAttribute('href')).toBe('/profile/u2/bob')
-          expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+          onEventMocks.mouseleave()
+          jest.advanceTimersByTime(500)
+          expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
         })
 
-        it('popup includes description when present', () => {
+        it('sets the pointer cursor immediately, without waiting for the delay', () => {
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
           onEventMocks.mouseenter({
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
-          const dom = getPopupDOM()
-          expect(dom.textContent).toContain('Builder')
+          expect(mapMock.getCanvas().style.cursor).toBe('pointer')
         })
 
-        it('popup shows multiple features separated by hr', () => {
+        it('mounts a UserAvatarPopover with the feature id, and clicking the card navigates to the profile', () => {
+          mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+          onEventMocks.mouseenter({
+            point: { x: 100, y: 200 },
+            lngLat: { lng: 10.0, lat: 53.55 },
+          })
+          jest.advanceTimersByTime(500)
+          const [instance] = wrapper.vm.popupComponentInstances
+          expect(instance.$options.name).toBe('UserAvatarPopover')
+          expect(instance.userId).toBe('u2')
+          // No userLink prop — the map has no "open profile" button, the
+          // whole card navigates on click instead.
+          expect(instance.userLink).toBeUndefined()
+
+          instance.$el.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+          expect(mocks.$router.push).toHaveBeenCalledWith({ path: '/profile/u2/bob' })
+        })
+
+        it('destroys previously mounted popover instances before mounting new ones', () => {
+          mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+          onEventMocks.mouseenter({
+            point: { x: 100, y: 200 },
+            lngLat: { lng: 10.0, lat: 53.55 },
+          })
+          jest.advanceTimersByTime(500)
+          const [firstInstance] = wrapper.vm.popupComponentInstances
+          const destroySpy = jest.spyOn(firstInstance, '$destroy')
+          mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+          onEventMocks.mouseenter({
+            point: { x: 100, y: 200 },
+            lngLat: { lng: 10.0, lat: 53.55 },
+          })
+          jest.advanceTimersByTime(500)
+          expect(destroySpy).toHaveBeenCalled()
+        })
+
+        it('destroys mounted popover instances when the popup fires its own close event', () => {
+          mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+          onEventMocks.mouseenter({
+            point: { x: 100, y: 200 },
+            lngLat: { lng: 10.0, lat: 53.55 },
+          })
+          jest.advanceTimersByTime(500)
+          const [instance] = wrapper.vm.popupComponentInstances
+          const destroySpy = jest.spyOn(instance, '$destroy')
+          const closeHandler = mapboxgl.__popupInstance.on.mock.calls.find(
+            (call) => call[0] === 'close',
+          )[1]
+          closeHandler()
+          expect(destroySpy).toHaveBeenCalled()
+          expect(wrapper.vm.popupComponentInstances).toEqual([])
+        })
+
+        it('popup shows multiple features separated by hr, one popover instance each', () => {
           const multiFeatures = [
             ...features,
             {
@@ -628,11 +883,18 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
+          jest.advanceTimersByTime(500)
           const dom = getPopupDOM()
           expect(dom.querySelectorAll('hr').length).toBe(1)
-          const links = dom.querySelectorAll('a')
-          expect(links[1].textContent).toBe('&journalism')
-          expect(links[1].getAttribute('href')).toBe('/groups/g1/journalism')
+          const instances = wrapper.vm.popupComponentInstances
+          expect(instances.map((instance) => instance.$options.name)).toEqual([
+            'UserAvatarPopover',
+            'GroupAvatarPopover',
+          ])
+          expect(instances[1].groupId).toBe('g1')
+
+          instances[1].$el.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+          expect(mocks.$router.push).toHaveBeenCalledWith({ path: '/groups/g1/journalism' })
         })
 
         it('removes existing popup before showing new one', () => {
@@ -642,6 +904,7 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
+          jest.advanceTimersByTime(500)
           expect(mapboxgl.__popupInstance.remove).toHaveBeenCalled()
         })
 
@@ -664,8 +927,226 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
+          jest.advanceTimersByTime(500)
           const coords = mapboxgl.__popupInstance.setLngLat.mock.calls[0][0]
           expect(coords[0]).toBe(10.0)
+        })
+
+        describe('scroll mask', () => {
+          it('sets an initial mask on the popup container once it opens', () => {
+            mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+            onEventMocks.mouseenter({
+              point: { x: 100, y: 200 },
+              lngLat: { lng: 10.0, lat: 53.55 },
+            })
+            jest.advanceTimersByTime(500)
+            const dom = getPopupDOM()
+            expect(dom.style.maskImage).toBe(
+              'linear-gradient(to bottom, transparent, black 0px, black calc(100% - 0px), transparent)',
+            )
+            expect(dom.style.webkitMaskImage).toBe(dom.style.maskImage)
+          })
+
+          it('updates the mask once the popup container is scrolled', () => {
+            mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+            onEventMocks.mouseenter({
+              point: { x: 100, y: 200 },
+              lngLat: { lng: 10.0, lat: 53.55 },
+            })
+            jest.advanceTimersByTime(500)
+            const dom = getPopupDOM()
+            Object.defineProperty(dom, 'scrollHeight', { value: 300, configurable: true })
+            Object.defineProperty(dom, 'clientHeight', { value: 100, configurable: true })
+
+            dom.dispatchEvent(new Event('scroll'))
+
+            expect(dom.style.maskImage).toBe(
+              'linear-gradient(to bottom, transparent, black 0px, black calc(100% - 56px), transparent)',
+            )
+          })
+
+          it('fades only the top edge when scrolled to the bottom', () => {
+            wrapper.vm.popupHasScrollableContent = true
+            const container = document.createElement('div')
+            container.scrollTop = 200
+            Object.defineProperty(container, 'clientHeight', { value: 100, configurable: true })
+            Object.defineProperty(container, 'scrollHeight', { value: 300, configurable: true })
+
+            wrapper.vm.updatePopupScrollMask(container)
+
+            expect(container.style.maskImage).toBe(
+              'linear-gradient(to bottom, transparent, black 56px, black calc(100% - 0px), transparent)',
+            )
+          })
+
+          it('fades both edges when scrolled somewhere in the middle', () => {
+            wrapper.vm.popupHasScrollableContent = true
+            const container = document.createElement('div')
+            container.scrollTop = 100
+            Object.defineProperty(container, 'clientHeight', { value: 100, configurable: true })
+            Object.defineProperty(container, 'scrollHeight', { value: 300, configurable: true })
+
+            wrapper.vm.updatePopupScrollMask(container)
+
+            expect(container.style.maskImage).toBe(
+              'linear-gradient(to bottom, transparent, black 56px, black calc(100% - 56px), transparent)',
+            )
+          })
+
+          it('never sets a mask for an event-only popup, so its ribbon can still poke out past overflow: visible', () => {
+            const eventFeatures = [
+              {
+                geometry: { coordinates: [10.0, 53.55] },
+                properties: { type: 'event', slug: 'kindergeburtstag', id: 'e1' },
+              },
+            ]
+            mapQueryRenderedFeaturesMock.mockReturnValueOnce(eventFeatures)
+            onEventMocks.mouseenter({
+              point: { x: 100, y: 200 },
+              lngLat: { lng: 10.0, lat: 53.55 },
+            })
+            jest.advanceTimersByTime(500)
+            const dom = getPopupDOM()
+            // Even if something were to call it directly with metrics that
+            // would otherwise produce a fade.
+            Object.defineProperty(dom, 'scrollHeight', { value: 300, configurable: true })
+            Object.defineProperty(dom, 'clientHeight', { value: 100, configurable: true })
+
+            wrapper.vm.updatePopupScrollMask(dom)
+
+            expect(dom.style.maskImage).toBe('')
+            expect(dom.style.webkitMaskImage).toBe('')
+          })
+        })
+
+        describe('is-scrolling class (reveals the scrollbar, see markPopupScrolling)', () => {
+          it('adds is-scrolling while the popup container is scrolled', () => {
+            mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+            onEventMocks.mouseenter({
+              point: { x: 100, y: 200 },
+              lngLat: { lng: 10.0, lat: 53.55 },
+            })
+            jest.advanceTimersByTime(500)
+            const dom = getPopupDOM()
+
+            dom.dispatchEvent(new Event('scroll'))
+
+            expect(dom.classList.contains('is-scrolling')).toBe(true)
+          })
+
+          it('removes is-scrolling again 800ms after the last scroll event', () => {
+            mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+            onEventMocks.mouseenter({
+              point: { x: 100, y: 200 },
+              lngLat: { lng: 10.0, lat: 53.55 },
+            })
+            jest.advanceTimersByTime(500)
+            const dom = getPopupDOM()
+
+            dom.dispatchEvent(new Event('scroll'))
+            jest.advanceTimersByTime(800)
+
+            expect(dom.classList.contains('is-scrolling')).toBe(false)
+          })
+        })
+      })
+
+      describe('lazy-loading cards beyond the initial batch', () => {
+        // One more than INITIAL_POPUP_BATCH_SIZE, so exactly one placeholder
+        // is left over.
+        const manyFeatures = Array.from({ length: 9 }, (_, i) => ({
+          geometry: { coordinates: [10.0, 53.55] },
+          properties: {
+            type: 'user',
+            slug: `user-${i}`,
+            id: `u${i}`,
+            name: `User ${i}`,
+            locationName: 'Hamburg',
+            description: '',
+          },
+        }))
+
+        let OriginalIO
+        let observeMock
+        let unobserveMock
+        let disconnectMock
+        let ioCallback
+        let ioOptions
+
+        beforeEach(() => {
+          jest.useFakeTimers()
+          OriginalIO = global.IntersectionObserver
+          observeMock = jest.fn()
+          unobserveMock = jest.fn()
+          disconnectMock = jest.fn()
+          global.IntersectionObserver = jest.fn(function (callback, options) {
+            ioCallback = callback
+            ioOptions = options
+            this.observe = observeMock
+            this.unobserve = unobserveMock
+            this.disconnect = disconnectMock
+          })
+        })
+
+        afterEach(() => {
+          jest.useRealTimers()
+          global.IntersectionObserver = OriginalIO
+        })
+
+        const openManyFeaturesPopup = () => {
+          mapQueryRenderedFeaturesMock.mockReturnValueOnce(manyFeatures)
+          onEventMocks.mouseenter({
+            point: { x: 100, y: 200 },
+            lngLat: { lng: 10.0, lat: 53.55 },
+          })
+          jest.advanceTimersByTime(500)
+        }
+
+        it('mounts only the initial batch immediately, leaving the rest as observed placeholders', () => {
+          openManyFeaturesPopup()
+
+          expect(wrapper.vm.popupComponentInstances).toHaveLength(8)
+          expect(global.IntersectionObserver).toHaveBeenCalledTimes(1)
+          expect(ioOptions.root).toBeInstanceOf(HTMLElement)
+          expect(observeMock).toHaveBeenCalledTimes(1)
+        })
+
+        it('mounts a placeholder once it intersects, and stops observing it', () => {
+          openManyFeaturesPopup()
+          const [placeholderEl] = observeMock.mock.calls[0]
+
+          ioCallback([{ target: placeholderEl, isIntersecting: true }])
+
+          expect(wrapper.vm.popupComponentInstances).toHaveLength(9)
+          expect(unobserveMock).toHaveBeenCalledWith(placeholderEl)
+        })
+
+        it('ignores entries that have not intersected yet', () => {
+          openManyFeaturesPopup()
+          const [placeholderEl] = observeMock.mock.calls[0]
+
+          ioCallback([{ target: placeholderEl, isIntersecting: false }])
+
+          expect(wrapper.vm.popupComponentInstances).toHaveLength(8)
+          expect(unobserveMock).not.toHaveBeenCalled()
+        })
+
+        it('disconnects the observer once the popup is closed/replaced', () => {
+          openManyFeaturesPopup()
+
+          const closeHandler = mapboxgl.__popupInstance.on.mock.calls.find(
+            (call) => call[0] === 'close',
+          )[1]
+          closeHandler()
+
+          expect(disconnectMock).toHaveBeenCalled()
+        })
+
+        it('mounts every card immediately when IntersectionObserver is not supported', () => {
+          delete global.IntersectionObserver
+          openManyFeaturesPopup()
+
+          expect(wrapper.vm.popupComponentInstances).toHaveLength(9)
         })
       })
 
@@ -713,12 +1194,38 @@ describe('map', () => {
           })
           expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
         })
+
+        it('clears a still-pending hover-triggered popup, so it does not also fire (and remount) after a click', () => {
+          jest.useFakeTimers()
+          mapQueryRenderedFeaturesMock.mockReturnValue(features)
+          // A mouse can trigger mouseenter's 500ms delayed showPopup() and
+          // then click the same marker before that delay elapses.
+          onEventMocks.mouseenter({ point: { x: 100, y: 200 }, lngLat: { lng: 10.0, lat: 53.55 } })
+
+          onEventMocks.click({
+            point: { x: 100, y: 200 },
+            lngLat: { lng: 10.0, lat: 53.55 },
+            originalEvent: { stopPropagation: jest.fn() },
+          })
+          mapboxgl.__popupInstance.setDOMContent.mockClear()
+
+          jest.advanceTimersByTime(500)
+
+          expect(mapboxgl.__popupInstance.setDOMContent).not.toHaveBeenCalled()
+          jest.useRealTimers()
+        })
       })
 
       describe('popup content for different marker types', () => {
-        const getPopupDOMForType = () => mapboxgl.__popupInstance.setDOMContent.mock.calls[0][0]
+        beforeEach(() => {
+          jest.useFakeTimers()
+        })
 
-        it('generates correct link for event type', () => {
+        afterEach(() => {
+          jest.useRealTimers()
+        })
+
+        it('mounts a MapEventPopover with the feature id for event type', () => {
           const eventFeatures = [
             {
               geometry: { coordinates: [9.17, 48.78] },
@@ -737,13 +1244,13 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 9.17, lat: 48.78 },
           })
-          const dom = getPopupDOMForType()
-          const link = dom.querySelector('a')
-          expect(link.getAttribute('href')).toBe('/post/e1/party')
-          expect(link.textContent).toBe('party')
+          jest.advanceTimersByTime(500)
+          const [instance] = wrapper.vm.popupComponentInstances
+          expect(instance.$options.name).toBe('MapEventPopover')
+          expect(instance.postId).toBe('e1')
         })
 
-        it('generates correct link for theUser type', () => {
+        it('mounts a UserAvatarPopover for theUser type, same as user type', () => {
           const userFeatures = [
             {
               geometry: { coordinates: [13.38, 52.52] },
@@ -762,33 +1269,13 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 13.38, lat: 52.52 },
           })
-          const dom = getPopupDOMForType()
-          const link = dom.querySelector('a')
-          expect(link.getAttribute('href')).toBe('/profile/u1/peter')
-          expect(link.textContent).toBe('@peter')
-        })
+          jest.advanceTimersByTime(500)
+          const [instance] = wrapper.vm.popupComponentInstances
+          expect(instance.$options.name).toBe('UserAvatarPopover')
+          expect(instance.userId).toBe('u1')
 
-        it('omits location header when locationName is empty', () => {
-          const features = [
-            {
-              geometry: { coordinates: [10.0, 53.55] },
-              properties: {
-                type: 'user',
-                slug: 'bob',
-                id: 'u2',
-                name: 'Bob',
-                locationName: '',
-                description: '',
-              },
-            },
-          ]
-          mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
-          onEventMocks.mouseenter({
-            point: { x: 100, y: 200 },
-            lngLat: { lng: 10.0, lat: 53.55 },
-          })
-          const dom = getPopupDOMForType()
-          expect(dom.querySelector('.map-popup-header')).toBeNull()
+          instance.$el.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+          expect(mocks.$router.push).toHaveBeenCalledWith({ path: '/profile/u1/peter' })
         })
       })
 
@@ -1169,6 +1656,81 @@ describe('map', () => {
       })
     })
 
+    describe('syncPopupWithCurrentData (e.g. toggling "show past events")', () => {
+      const eventFeature = {
+        geometry: { coordinates: [9.17702, 48.78232] },
+        properties: {
+          type: 'event',
+          slug: 'kindergeburtstag',
+          id: 'e1',
+          name: 'Kindergeburtstag',
+          locationName: 'Stuttgart',
+          description: 'Fun event',
+        },
+      }
+
+      let buildSpy
+
+      beforeEach(() => {
+        wrapper.vm.onMapLoad({ map: mapMock })
+        wrapper.vm.markers.isSourceAndLayerAdded = true
+        buildSpy = jest.spyOn(wrapper.vm, 'buildMarkersGeoJSON')
+        buildSpy.mockReturnValueOnce([eventFeature])
+        wrapper.vm.refreshMarkersData()
+        wrapper.vm.showPopup([eventFeature], { lng: 9.17702, lat: 48.78232 })
+      })
+
+      it('closes the open popup once its feature is missing from a refresh (e.g. an event no longer matching the past-events filter)', () => {
+        buildSpy.mockReturnValueOnce([])
+        wrapper.vm.refreshMarkersData()
+
+        expect(mapboxgl.__popupInstance.remove).toHaveBeenCalled()
+      })
+
+      it('leaves the open popup alone when its feature is still present after a refresh', () => {
+        buildSpy.mockReturnValueOnce([eventFeature])
+        wrapper.vm.refreshMarkersData()
+
+        expect(mapboxgl.__popupInstance.remove).not.toHaveBeenCalled()
+      })
+
+      it('reopens the popup once its feature reappears in a later refresh', () => {
+        buildSpy.mockReturnValueOnce([])
+        wrapper.vm.refreshMarkersData()
+
+        buildSpy.mockReturnValueOnce([eventFeature])
+        wrapper.vm.refreshMarkersData()
+
+        expect(mapboxgl.__popupInstance.setDOMContent).toHaveBeenCalled()
+        expect(mapboxgl.__popupInstance.addTo).toHaveBeenCalledWith(mapMock)
+      })
+
+      it('does not reopen anything while the feature is still missing', () => {
+        buildSpy.mockReturnValueOnce([])
+        wrapper.vm.refreshMarkersData()
+        mapboxgl.__popupInstance.setDOMContent.mockClear()
+        mapboxgl.__popupInstance.addTo.mockClear()
+
+        buildSpy.mockReturnValueOnce([])
+        wrapper.vm.refreshMarkersData()
+
+        expect(mapboxgl.__popupInstance.setDOMContent).not.toHaveBeenCalled()
+      })
+
+      it('does not reopen the popup if its feature reappears while its marker type is hidden', () => {
+        buildSpy.mockReturnValueOnce([])
+        wrapper.vm.refreshMarkersData()
+        wrapper.vm.toggleMarkerTypeVisibility('event')
+        mapboxgl.__popupInstance.setDOMContent.mockClear()
+        mapboxgl.__popupInstance.addTo.mockClear()
+
+        buildSpy.mockReturnValueOnce([eventFeature])
+        wrapper.vm.refreshMarkersData()
+
+        expect(mapboxgl.__popupInstance.setDOMContent).not.toHaveBeenCalled()
+      })
+    })
+
     describe('getUserLocation', () => {
       it('returns location when user has one', async () => {
         mocks.$apollo.query.mockResolvedValueOnce({
@@ -1392,6 +1954,79 @@ describe('map', () => {
           ['literal', ['theUser', 'user', 'event']],
         ])
       })
+
+      describe('open popup vs. hiding its own marker type', () => {
+        const userFeature = {
+          geometry: { coordinates: [10.0, 53.55] },
+          properties: { type: 'user', slug: 'bob', id: 'u2', name: 'Bob' },
+        }
+
+        beforeEach(() => {
+          wrapper.vm.onMapLoad({ map: mapMock })
+          wrapper.vm.markers.isSourceAndLayerAdded = true
+          // Reopening now also re-resolves the feature against current
+          // data (see findCurrentFeature()) — it has to actually be there.
+          wrapper.vm.markers.geoJSON = [userFeature]
+          wrapper.vm.showPopup([userFeature], { lng: 10.0, lat: 53.55 })
+          mapboxgl.__popupInstance.setDOMContent.mockClear()
+          mapboxgl.__popupInstance.addTo.mockClear()
+        })
+
+        it('closes the open popup when its marker type is hidden', async () => {
+          wrapper.vm.toggleMarkerTypeVisibility('user')
+          await wrapper.vm.$nextTick()
+
+          expect(mapboxgl.__popupInstance.remove).toHaveBeenCalled()
+        })
+
+        it('leaves the open popup alone when a different marker type is hidden', async () => {
+          wrapper.vm.toggleMarkerTypeVisibility('group')
+          await wrapper.vm.$nextTick()
+
+          expect(mapboxgl.__popupInstance.remove).not.toHaveBeenCalled()
+        })
+
+        it('reopens the popup once its marker type becomes visible again', async () => {
+          wrapper.vm.toggleMarkerTypeVisibility('user')
+          await wrapper.vm.$nextTick()
+
+          wrapper.vm.toggleMarkerTypeVisibility('user')
+          await wrapper.vm.$nextTick()
+
+          expect(mapboxgl.__popupInstance.setDOMContent).toHaveBeenCalled()
+          expect(mapboxgl.__popupInstance.addTo).toHaveBeenCalledWith(mapMock)
+        })
+
+        it('does not reopen the popup if its feature no longer exists in the current data', async () => {
+          wrapper.vm.toggleMarkerTypeVisibility('user')
+          await wrapper.vm.$nextTick()
+          wrapper.vm.markers.geoJSON = []
+
+          wrapper.vm.toggleMarkerTypeVisibility('user')
+          await wrapper.vm.$nextTick()
+
+          expect(mapboxgl.__popupInstance.setDOMContent).not.toHaveBeenCalled()
+        })
+
+        it('does not reopen a popup that was never auto-closed', async () => {
+          wrapper.vm.toggleMarkerTypeVisibility('user')
+          await wrapper.vm.$nextTick()
+          wrapper.vm.toggleMarkerTypeVisibility('user')
+          await wrapper.vm.$nextTick()
+          mapboxgl.__popupInstance.setDOMContent.mockClear()
+          mapboxgl.__popupInstance.addTo.mockClear()
+
+          // Toggling the same type again now (hide, then show) shouldn't
+          // reopen anything a second time — it was already reopened and
+          // consumed above.
+          wrapper.vm.toggleMarkerTypeVisibility('group')
+          await wrapper.vm.$nextTick()
+          wrapper.vm.toggleMarkerTypeVisibility('group')
+          await wrapper.vm.$nextTick()
+
+          expect(mapboxgl.__popupInstance.setDOMContent).not.toHaveBeenCalled()
+        })
+      })
     })
 
     describe('buildMarkersGeoJSON isPast flag', () => {
@@ -1483,6 +2118,29 @@ describe('map', () => {
         expect(spy).toHaveBeenCalledWith('resize', wrapper.vm.updateMapPosition)
         expect(spy).toHaveBeenCalledWith('resize', geocoderHandler)
         spy.mockRestore()
+      })
+
+      it('removes the open popup and destroys its mounted components, so a route change does not leak them', () => {
+        wrapper.vm.onMapLoad({ map: mapMock })
+        const destroySpy = jest.spyOn(wrapper.vm, 'destroyPopupComponents')
+
+        wrapper.destroy()
+
+        expect(mapboxgl.__popupInstance.remove).toHaveBeenCalled()
+        expect(destroySpy).toHaveBeenCalled()
+      })
+
+      it('clears a pending popupScrollTimer', () => {
+        jest.useFakeTimers()
+        const clearSpy = jest.spyOn(global, 'clearTimeout')
+        wrapper.vm.onMapLoad({ map: mapMock })
+        wrapper.vm.popupScrollTimer = setTimeout(() => {}, 800)
+
+        wrapper.destroy()
+
+        expect(clearSpy).toHaveBeenCalledWith(wrapper.vm.popupScrollTimer)
+        clearSpy.mockRestore()
+        jest.useRealTimers()
       })
     })
   })

@@ -78,10 +78,126 @@ describe('create.vue', () => {
       expect(second.vm.draft.groupId).toBe('g2')
     })
 
+    it('seeds draft.eventLocationName from ?lat=&lng=&locationName=&locationId= on first-time arrival', () => {
+      mocks = makeMocks({
+        type: 'event',
+        query: {
+          lat: '52.5',
+          lng: '13.4',
+          locationName: 'Alexanderplatz, Berlin',
+          locationId: 'poi.1',
+        },
+      })
+      wrapper = Wrapper()
+      expect(wrapper.vm.draft.eventLocationName).toEqual({
+        label: 'Alexanderplatz, Berlin',
+        value: 'Alexanderplatz, Berlin',
+        id: 'poi.1',
+        lat: 52.5,
+        lng: 13.4,
+      })
+    })
+
+    it('seeds draft.eventLocationName with an empty label when the map pin tool found no address', () => {
+      mocks = makeMocks({ type: 'event', query: { lat: '52.5', lng: '13.4' } })
+      wrapper = Wrapper()
+      expect(wrapper.vm.draft.eventLocationName).toEqual({
+        label: '',
+        value: '',
+        id: null,
+        lat: 52.5,
+        lng: 13.4,
+      })
+    })
+
+    it('does not seed eventLocationName without both lat and lng in the URL', () => {
+      mocks = makeMocks({ type: 'event', query: { lat: '52.5' } })
+      wrapper = Wrapper()
+      expect(wrapper.vm.draft.eventLocationName).toBe('')
+    })
+
+    it('does not overwrite an existing draft.eventLocationName with a stale URL query', () => {
+      mocks = makeMocks({ type: 'event' })
+      const first = Wrapper()
+      first.vm.draft.eventLocationName = { label: 'Kept', value: 'Kept', id: null, lat: 1, lng: 1 }
+      first.destroy()
+      mocks = makeMocks({ type: 'event', query: { lat: '52.5', lng: '13.4' } })
+      const second = Wrapper()
+      expect(second.vm.draft.eventLocationName).toEqual({
+        label: 'Kept',
+        value: 'Kept',
+        id: null,
+        lat: 1,
+        lng: 1,
+      })
+    })
+
     it('passes the draft into ContributionForm via externalFormData', () => {
       wrapper = Wrapper()
       const form = wrapper.findComponent({ name: 'ContributionForm' })
       expect(form.props('externalFormData')).toBe(wrapper.vm.draft)
+    })
+  })
+
+  describe('scrolling to the location section on arrival via the map pin tool', () => {
+    // A real ContributionForm pulls in EventLocationMap/mapbox-gl and needs a
+    // MAPBOX_TOKEN — this minimal stub renders just enough (the same class
+    // ContributionForm puts on its EventLocationMap wrapper) for
+    // scrollIntoView() to have something to find and act on.
+    const stubsWithLocationField = {
+      ...stubs,
+      ContributionForm: { template: '<div class="event-location-map-field"></div>' },
+    }
+
+    let scrollIntoViewSpy
+
+    beforeEach(() => {
+      scrollIntoViewSpy = jest.fn()
+      Element.prototype.scrollIntoView = scrollIntoViewSpy
+    })
+
+    afterEach(() => {
+      delete Element.prototype.scrollIntoView
+    })
+
+    it('sets seededLocationFromMapPin and scrolls the location section into view', async () => {
+      mocks = makeMocks({ type: 'event', query: { lat: '52.5', lng: '13.4' } })
+      wrapper = mount(create, { mocks, localVue, stubs: stubsWithLocationField, store })
+      expect(wrapper.vm.seededLocationFromMapPin).toBe(true)
+
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+
+      expect(scrollIntoViewSpy).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' })
+    })
+
+    it('does not scroll on a normal arrival without ?lat=&lng=', async () => {
+      mocks = makeMocks({ type: 'event' })
+      wrapper = mount(create, { mocks, localVue, stubs: stubsWithLocationField, store })
+      expect(wrapper.vm.seededLocationFromMapPin).toBe(false)
+
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+
+      expect(scrollIntoViewSpy).not.toHaveBeenCalled()
+    })
+
+    it('does not scroll again on a remount that reuses the already-seeded shared draft', async () => {
+      mocks = makeMocks({ type: 'event', query: { lat: '52.5', lng: '13.4' } })
+      const first = mount(create, { mocks, localVue, stubs: stubsWithLocationField, store })
+      await first.vm.$nextTick()
+      await first.vm.$nextTick()
+      first.destroy()
+      scrollIntoViewSpy.mockClear()
+
+      mocks = makeMocks({ type: 'event', query: { lat: '52.5', lng: '13.4' } })
+      const second = mount(create, { mocks, localVue, stubs: stubsWithLocationField, store })
+      expect(second.vm.seededLocationFromMapPin).toBe(false)
+
+      await second.vm.$nextTick()
+      await second.vm.$nextTick()
+
+      expect(scrollIntoViewSpy).not.toHaveBeenCalled()
     })
   })
 
