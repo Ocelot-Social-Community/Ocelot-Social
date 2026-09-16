@@ -1525,8 +1525,16 @@ export default {
    scrollbar can reach the popup's true right edge instead of sitting 10px
    short of it, and the separator needs its own inset to still visually
    align with the now edge-to-edge cards' content instead of spanning
-   truly edge-to-edge itself. */
+   truly edge-to-edge itself.
+   width: auto overrides the global `hr { width: 100% }` reset
+   (assets/css/main.css) — with that 100%, the 16px side margins added on
+   top of an already-100%-wide box push it 16px past the container's true
+   right edge, and .map-popup-container's own overflow-x: hidden then
+   silently clips that away — so the separator looked flush right with a
+   gap only on the left, instead of the intended even inset on both
+   sides. */
 .map-popup-separator {
+  width: auto;
   margin: 8px 16px;
 }
 
