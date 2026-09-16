@@ -966,6 +966,7 @@ describe('map', () => {
           })
 
           it('fades only the top edge when scrolled to the bottom', () => {
+            wrapper.vm.popupHasScrollableContent = true
             const container = document.createElement('div')
             container.scrollTop = 200
             Object.defineProperty(container, 'clientHeight', { value: 100, configurable: true })
@@ -979,6 +980,7 @@ describe('map', () => {
           })
 
           it('fades both edges when scrolled somewhere in the middle', () => {
+            wrapper.vm.popupHasScrollableContent = true
             const container = document.createElement('div')
             container.scrollTop = 100
             Object.defineProperty(container, 'clientHeight', { value: 100, configurable: true })
@@ -989,6 +991,31 @@ describe('map', () => {
             expect(container.style.maskImage).toBe(
               'linear-gradient(to bottom, transparent, black 56px, black calc(100% - 56px), transparent)',
             )
+          })
+
+          it('never sets a mask for an event-only popup, so its ribbon can still poke out past overflow: visible', () => {
+            const eventFeatures = [
+              {
+                geometry: { coordinates: [10.0, 53.55] },
+                properties: { type: 'event', slug: 'kindergeburtstag', id: 'e1' },
+              },
+            ]
+            mapQueryRenderedFeaturesMock.mockReturnValueOnce(eventFeatures)
+            onEventMocks.mouseenter({
+              point: { x: 100, y: 200 },
+              lngLat: { lng: 10.0, lat: 53.55 },
+            })
+            jest.advanceTimersByTime(500)
+            const dom = getPopupDOM()
+            // Even if something were to call it directly with metrics that
+            // would otherwise produce a fade.
+            Object.defineProperty(dom, 'scrollHeight', { value: 300, configurable: true })
+            Object.defineProperty(dom, 'clientHeight', { value: 100, configurable: true })
+
+            wrapper.vm.updatePopupScrollMask(dom)
+
+            expect(dom.style.maskImage).toBe('')
+            expect(dom.style.webkitMaskImage).toBe('')
           })
         })
       })

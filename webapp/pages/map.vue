@@ -256,6 +256,9 @@ export default {
     // torn down/recreated per popup open in destroyPopupComponents().
     this.popupIntersectionObserver = null
     this.lazyPopupCardProperties = null
+    // Whether the currently-open popup's own CSS makes it scrollable (see
+    // showPopup()/updatePopupScrollMask()) — an event-only popup isn't.
+    this.popupHasScrollableContent = false
     // The feature(s)/lngLat behind the currently-open popup (see
     // showPopup()), and — separately — the ones behind a popup that got
     // auto-closed because its marker type was just hidden via the legend,
@@ -786,6 +789,15 @@ export default {
       // the lazy-mount branch below) — destroyPopupComponents() above just
       // cleared out the previous popup's.
       this.lazyPopupCardProperties = new Map()
+      // Only user/group stacks actually get overflow-y: auto (see the CSS
+      // further down) — an event-only popup stays overflow: visible so its
+      // ribbon can poke out past the card's own edge. A mask-image clips
+      // to the element's own box regardless of the overflow property, so
+      // updatePopupScrollMask() has to skip it there, or that ribbon would
+      // get cut off again despite overflow: visible.
+      this.popupHasScrollableContent = features.some((f) =>
+        ['user', 'theUser', 'group'].includes(f.properties.type),
+      )
       // A new popup is opening (whether from a real hover/click, or the
       // hiddenMarkerTypes watcher reopening one it auto-closed) — any
       // still-pending "reopen once visible again" state is no longer
@@ -858,6 +870,17 @@ export default {
     // more whenever a lazily-mounted card changes the container's
     // scrollHeight (see getLazyPopupObserver()).
     updatePopupScrollMask(container) {
+      // Only the user/group case actually scrolls (overflow-y: auto) —
+      // the event case stays overflow: visible so its ribbon can poke out
+      // past the card's own edge, and a mask-image would clip that
+      // regardless of overflow: visible (masking is a paint-time clip to
+      // the element's own box, not a layout-level one). See the comment
+      // where this flag is set in showPopup().
+      if (!this.popupHasScrollableContent) {
+        container.style.maskImage = ''
+        container.style.webkitMaskImage = ''
+        return
+      }
       const canScrollUp = container.scrollTop > 0
       // 1px tolerance for sub-pixel scroll position rounding.
       const canScrollDown =
