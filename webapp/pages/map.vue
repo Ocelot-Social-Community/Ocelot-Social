@@ -1363,6 +1363,29 @@ export default {
 .mapboxgl-popup-content:has(.group-avatar-popover) .map-popup-container {
   max-height: 80vh;
   overflow-y: auto;
+  /* Explicit, not left to the CSS Overflow spec's own coercion (pairing
+     overflow-y: auto with an inherited/earlier overflow-x: visible — e.g.
+     from the event rule below — would otherwise compute overflow-x to
+     auto too), which was letting the list drag-scroll sideways by however
+     far its widest bit of content (or the reserved ribbon padding below)
+     happened to exceed the container. The list only ever needs to scroll
+     vertically. */
+  overflow-x: hidden;
+}
+
+/* When an event is stacked together with a user/group popover, the rule
+   above wins the tie on overflow-y (same specificity, later in source).
+   Its own overflow-x: hidden already stops any sideways scrolling, but it
+   also clips right at the container's edge — so the event ribbon's few
+   pixels of overhang past its own card's right edge (see
+   .event-ribbon/.event-ribbon-w-img in MapEventPopover.vue) would get cut
+   off. This reserves just enough padding for the ribbon to land inside the
+   container's padding box (not clipped) instead of past it. A standalone
+   event popup doesn't need this — .map-popup-container stays
+   overflow: visible there, with nothing to clip against. */
+.mapboxgl-popup-content:has(.map-event-popover):has(.user-avatar-popover) .map-popup-container,
+.mapboxgl-popup-content:has(.map-event-popover):has(.group-avatar-popover) .map-popup-container {
+  padding-right: var(--space-x-small);
 }
 
 .map-popup-header {
