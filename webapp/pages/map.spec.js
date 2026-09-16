@@ -933,6 +933,105 @@ describe('map', () => {
         })
       })
 
+      describe('lazy-loading cards beyond the initial batch', () => {
+        // One more than INITIAL_POPUP_BATCH_SIZE, so exactly one placeholder
+        // is left over.
+        const manyFeatures = Array.from({ length: 9 }, (_, i) => ({
+          geometry: { coordinates: [10.0, 53.55] },
+          properties: {
+            type: 'user',
+            slug: `user-${i}`,
+            id: `u${i}`,
+            name: `User ${i}`,
+            locationName: 'Hamburg',
+            description: '',
+          },
+        }))
+
+        let OriginalIO
+        let observeMock
+        let unobserveMock
+        let disconnectMock
+        let ioCallback
+        let ioOptions
+
+        beforeEach(() => {
+          jest.useFakeTimers()
+          OriginalIO = global.IntersectionObserver
+          observeMock = jest.fn()
+          unobserveMock = jest.fn()
+          disconnectMock = jest.fn()
+          global.IntersectionObserver = jest.fn(function (callback, options) {
+            ioCallback = callback
+            ioOptions = options
+            this.observe = observeMock
+            this.unobserve = unobserveMock
+            this.disconnect = disconnectMock
+          })
+        })
+
+        afterEach(() => {
+          jest.useRealTimers()
+          global.IntersectionObserver = OriginalIO
+        })
+
+        const openManyFeaturesPopup = () => {
+          mapQueryRenderedFeaturesMock.mockReturnValueOnce(manyFeatures)
+          onEventMocks.mouseenter({
+            point: { x: 100, y: 200 },
+            lngLat: { lng: 10.0, lat: 53.55 },
+          })
+          jest.advanceTimersByTime(500)
+        }
+
+        it('mounts only the initial batch immediately, leaving the rest as observed placeholders', () => {
+          openManyFeaturesPopup()
+
+          expect(wrapper.vm.popupComponentInstances).toHaveLength(8)
+          expect(global.IntersectionObserver).toHaveBeenCalledTimes(1)
+          expect(ioOptions.root).toBeInstanceOf(HTMLElement)
+          expect(observeMock).toHaveBeenCalledTimes(1)
+        })
+
+        it('mounts a placeholder once it intersects, and stops observing it', () => {
+          openManyFeaturesPopup()
+          const [placeholderEl] = observeMock.mock.calls[0]
+
+          ioCallback([{ target: placeholderEl, isIntersecting: true }])
+
+          expect(wrapper.vm.popupComponentInstances).toHaveLength(9)
+          expect(unobserveMock).toHaveBeenCalledWith(placeholderEl)
+        })
+
+        it('ignores entries that have not intersected yet', () => {
+          openManyFeaturesPopup()
+          const [placeholderEl] = observeMock.mock.calls[0]
+
+          ioCallback([{ target: placeholderEl, isIntersecting: false }])
+
+          expect(wrapper.vm.popupComponentInstances).toHaveLength(8)
+          expect(unobserveMock).not.toHaveBeenCalled()
+        })
+
+        it('disconnects the observer once the popup is closed/replaced', () => {
+          openManyFeaturesPopup()
+
+          const closeHandler = mapboxgl.__popupInstance.on.mock.calls.find(
+            (call) => call[0] === 'close',
+          )[1]
+          closeHandler()
+
+          expect(disconnectMock).toHaveBeenCalled()
+        })
+
+        it('mounts every card immediately when IntersectionObserver is not supported', () => {
+          delete global.IntersectionObserver
+          openManyFeaturesPopup()
+
+          expect(wrapper.vm.popupComponentInstances).toHaveLength(9)
+        })
+      })
+
       describe('mouseleave event', () => {
         it('resets cursor style', () => {
           mapMock.getCanvas().style.cursor = 'pointer'

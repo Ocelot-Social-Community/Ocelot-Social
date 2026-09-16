@@ -130,6 +130,21 @@ const EVENT_PIN_TOOL_CURSOR_SVG =
   '</svg>'
 const EVENT_PIN_TOOL_CURSOR = `url("data:image/svg+xml,${encodeURIComponent(EVENT_PIN_TOOL_CURSOR_SVG)}") 10 30, crosshair`
 
+// Number of popover cards mounted (and their queries fired) immediately when
+// a stacked popup opens — enough to fill the visible list plus a little
+// slack. The rest are mounted lazily as they scroll into view (see
+// showPopup()/getLazyPopupObserver()), so clicking a large cluster doesn't
+// synchronously create dozens of Vue instances and fire as many GraphQL
+// queries at once.
+const INITIAL_POPUP_BATCH_SIZE = 8
+
+// How far past the scroll container's own visible edge a placeholder card
+// still counts as "about to be scrolled into view" (see
+// getLazyPopupObserver()) — gives its query a head start so the card is
+// (ideally) already loaded by the time it's actually scrolled to, instead of
+// popping in with its own loading spinner right as it appears.
+const LAZY_POPUP_LOOKAHEAD = '200px 0px'
+
 export default {
   name: 'Map',
   mixins: [mobile(maxMobileWidth)],
@@ -228,6 +243,13 @@ export default {
     // next popup open/close instead of leaking (stale Apollo subscriptions,
     // event listeners) on every marker click.
     this.popupComponentInstances = []
+    // Shared IntersectionObserver watching the not-yet-mounted placeholders
+    // of the currently-open popup (see getLazyPopupObserver()), and the
+    // feature properties behind each of those placeholders, keyed by
+    // element since the observer callback only gets the element back. Both
+    // torn down/recreated per popup open in destroyPopupComponents().
+    this.popupIntersectionObserver = null
+    this.lazyPopupCardProperties = null
     // The feature(s)/lngLat behind the currently-open popup (see
     // showPopup()), and — separately — the ones behind a popup that got
     // auto-closed because its marker type was just hidden via the legend,
@@ -730,6 +752,10 @@ export default {
         this.markers.popup.remove()
       }
       this.destroyPopupComponents()
+      // Fresh map for this popup's own not-yet-mounted placeholders (see
+      // the lazy-mount branch below) — destroyPopupComponents() above just
+      // cleared out the previous popup's.
+      this.lazyPopupCardProperties = new Map()
       // A new popup is opening (whether from a real hover/click, or the
       // hiddenMarkerTypes watcher reopening one it auto-closed) — any
       // still-pending "reopen once visible again" state is no longer
@@ -748,6 +774,11 @@ export default {
       const container = document.createElement('div')
       container.className = 'map-popup-container'
 
+      // Old browsers without IntersectionObserver just get every card
+      // mounted immediately, same as before this — a slower popup beats a
+      // broken (never-loading) one.
+      const supportsLazyLoading = typeof window !== 'undefined' && 'IntersectionObserver' in window
+
       features.forEach((feature, index) => {
         if (index > 0) {
           const separator = document.createElement('hr')
@@ -761,12 +792,45 @@ export default {
         // (see the CSS for it further down).
         const mountEl = document.createElement('div')
         container.appendChild(mountEl)
-        const instance = this.mountPopupComponent(feature.properties, mountEl)
-        if (instance) this.popupComponentInstances.push(instance)
+        if (index < INITIAL_POPUP_BATCH_SIZE || !supportsLazyLoading) {
+          const instance = this.mountPopupComponent(feature.properties, mountEl)
+          if (instance) this.popupComponentInstances.push(instance)
+        } else {
+          // Left as an empty placeholder for now — mounted (and its query
+          // fired) only once it scrolls near the visible list, see
+          // getLazyPopupObserver().
+          this.lazyPopupCardProperties.set(mountEl, feature.properties)
+          this.getLazyPopupObserver(container).observe(mountEl)
+        }
       })
 
       this.markers.popup.setLngLat(coordinates).setDOMContent(container).addTo(this.map)
       this.openPopup = { features, lngLat }
+    },
+    // Lazily created per popup — its root has to be that popup's own scroll
+    // container (.map-popup-container), which only exists once showPopup()
+    // builds it — and torn down again in destroyPopupComponents(). Mounts a
+    // placeholder's real popover component (and fires its query) once it
+    // scrolls within LAZY_POPUP_LOOKAHEAD of the container's visible area,
+    // instead of every card beyond the initial batch mounting (and
+    // querying) all at once when the popup opens.
+    getLazyPopupObserver(scrollContainer) {
+      if (!this.popupIntersectionObserver) {
+        this.popupIntersectionObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return
+              this.popupIntersectionObserver.unobserve(entry.target)
+              const properties = this.lazyPopupCardProperties.get(entry.target)
+              this.lazyPopupCardProperties.delete(entry.target)
+              const instance = this.mountPopupComponent(properties, entry.target)
+              if (instance) this.popupComponentInstances.push(instance)
+            })
+          },
+          { root: scrollContainer, rootMargin: LAZY_POPUP_LOOKAHEAD },
+        )
+      }
+      return this.popupIntersectionObserver
     },
     // Mounts the right popover component for one marker's properties into
     // mountEl, imperatively (parent: this gives it access to $apollo/$store/
@@ -823,6 +887,15 @@ export default {
     destroyPopupComponents() {
       this.popupComponentInstances.forEach((instance) => instance.$destroy())
       this.popupComponentInstances = []
+      // Any placeholders still waiting to scroll into view (see
+      // getLazyPopupObserver()) are gone along with the popup itself —
+      // disconnect() stops watching all of them at once and lets the next
+      // showPopup() create a fresh observer for its own container.
+      if (this.popupIntersectionObserver) {
+        this.popupIntersectionObserver.disconnect()
+        this.popupIntersectionObserver = null
+      }
+      this.lazyPopupCardProperties = null
     },
     // Query all features at the clicked/hovered point
     getFeaturesAtPoint(point) {
