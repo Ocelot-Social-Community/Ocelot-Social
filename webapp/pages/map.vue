@@ -1457,11 +1457,14 @@ export default {
 }
 
 /* User and group popovers render their full real component
-   (UserAvatarPopover / GroupAvatarPopover) — on short viewports (mobile)
-   that can outgrow the 40vh cap, and hard-clipping then silently eats the
-   avatar header or the "open profile"/"open group" button. Give them the
-   same taller budget as the event popover, and let them scroll rather than
-   lose content if they still don't fit.
+   (UserAvatarPopover / GroupAvatarPopover) — the plain 40vh cap can still
+   clip a short/mobile viewport (see the taller override in the mobile
+   media query further down), so this gives them a bit more headroom than
+   that here too, and lets them scroll rather than lose content if they
+   still don't fit. 65vh rather than the mobile-only 80vh — on a normal
+   desktop viewport, a stack of several cards filling 80% of the window
+   height looked oversized for what's usually just a couple of short
+   cards.
    padding: 0, same reasoning as the event popover above — both card
    components already carry their own 16px padding, so the ambient one here
    would double up. More importantly, it also lets the scrollbar (from the
@@ -1470,12 +1473,12 @@ export default {
 .mapboxgl-popup-content:has(.user-avatar-popover),
 .mapboxgl-popup-content:has(.group-avatar-popover) {
   padding: 0;
-  max-height: 80vh;
+  max-height: 65vh;
 }
 
 .mapboxgl-popup-content:has(.user-avatar-popover) .map-popup-container,
 .mapboxgl-popup-content:has(.group-avatar-popover) .map-popup-container {
-  max-height: 80vh;
+  max-height: 65vh;
   overflow-y: auto;
   /* Explicit, not left to the CSS Overflow spec's own coercion (pairing
      overflow-y: auto with an inherited/earlier overflow-x: visible — e.g.
@@ -1583,6 +1586,19 @@ export default {
     .mapboxgl-ctrl-geocoder--pin-right > * {
       display: none;
     }
+  }
+
+  /* Back up to the taller budget on short/mobile viewports specifically —
+     this is the case the 65vh default above still isn't enough for (see
+     the comment there). */
+  .mapboxgl-popup-content:has(.user-avatar-popover),
+  .mapboxgl-popup-content:has(.group-avatar-popover) {
+    max-height: 80vh;
+  }
+
+  .mapboxgl-popup-content:has(.user-avatar-popover) .map-popup-container,
+  .mapboxgl-popup-content:has(.group-avatar-popover) .map-popup-container {
+    max-height: 80vh;
   }
 }
 
