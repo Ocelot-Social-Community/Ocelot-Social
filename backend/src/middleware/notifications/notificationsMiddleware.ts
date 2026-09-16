@@ -103,29 +103,42 @@ const handleRemoveUserFromGroup: IMiddlewareResolver = async (
   return user
 }
 
-const handleContentDataOfPost: IMiddlewareResolver = async (
-  resolve,
-  root,
-  args,
-  context,
-  resolveInfo,
-) => {
-  const { groupId } = args
-  const idsOfUsers = extractMentionedUsers(args.content)
+/**
+ * Everyone the post MENTIONS, for both creating and editing.
+ *
+ * Shared because an @-mention added while editing has to arrive — that is the one notification
+ * an edit legitimately produces. Nothing else about an edit is news.
+ *
+ * `args.content` is read before `resolve` on purpose: the mutation runs the content through
+ * sanitising middleware, and the mentions have to be taken from what the author wrote.
+ */
+const notifyMentionedInPost = async (postId, content, context): Promise<string[]> =>
+  publishNotifications(
+    context,
+    notifyUsersOfMention(
+      'Post',
+      postId,
+      extractMentionedUsers(content),
+      'mentioned_in_post',
+      context,
+    ),
+    'emailNotificationsMention',
+  )
+
+const handleCreatePost: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
+  const { groupId, content } = args
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
-    const sentEmails: string[] = await publishNotifications(
+    // `publishNotifications` PUSHES into the array it is handed and returns that same array, so
+    // passing it along is what keeps a follower who is also mentioned from getting two mails
+    // about one post. The previous spelling wrapped the second call in `sentEmails.concat(…)`
+    // and dropped the result — dead code that read as if it were doing the accumulating.
+    const sentEmails: string[] = await notifyMentionedInPost(post.id, content, context)
+    await publishNotifications(
       context,
-      notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
-      'emailNotificationsMention',
-    )
-    sentEmails.concat(
-      await publishNotifications(
-        context,
-        notifyFollowingUsers(post.id, groupId, context),
-        'emailNotificationsFollowingUsers',
-        sentEmails,
-      ),
+      notifyFollowingUsers(post.id, context),
+      'emailNotificationsFollowingUsers',
+      sentEmails,
     )
     await publishNotifications(
       context,
@@ -133,6 +146,32 @@ const handleContentDataOfPost: IMiddlewareResolver = async (
       'emailNotificationsPostInGroup',
       sentEmails,
     )
+  }
+  return post
+}
+
+/**
+ * An edit is not a new post.
+ *
+ * Both mutations used to share one handler, which announced every edit to the author's
+ * followers and to the group as if the post had just appeared. Two things were wrong with it.
+ *
+ * The leak: the group filter took its group from `args.groupId`, an argument only CreatePost
+ * declares (see Post.gql). On an edit it arrived as `undefined`, matched no group, and the
+ * filter fell open — every follower of the author was notified about a post inside a hidden
+ * group, naming its title and author to people who cannot open it. That half is fixed in
+ * `notifyFollowingUsers`, which now asks the graph instead of trusting an argument.
+ *
+ * The resurrection: the MERGE sets `read = FALSE` on an EXISTING edge, so a correcting a typo
+ * pushed a long-read notification back to the top of everyone's bell.
+ *
+ * Mentions stay, for the reason given above them.
+ */
+const handleUpdatePost: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
+  const content = args.content
+  const post = await resolve(root, args, context, resolveInfo)
+  if (post) {
+    await notifyMentionedInPost(post.id, content, context)
   }
   return post
 }
@@ -188,14 +227,31 @@ const postAuthorOfComment = async (commentId, { context }) => {
   }
 }
 
-const notifyFollowingUsers = async (postId, groupId, context) => {
+/**
+ * Announce a new post to the author's followers — unless it lives in a non-public group.
+ *
+ * The group comes from the GRAPH, not from a mutation argument. It used to be passed in as
+ * `groupId` and matched with `(post)-[:IN]->(group:Group { id: $groupId })`, which made the
+ * filter fail OPEN in the one case it exists for: `groupId` is declared on CreatePost only, so
+ * on UpdatePost it arrived as `null`, the OPTIONAL MATCH bound nothing, `group IS NULL` was
+ * true, and every follower learned the title and author of a post inside a hidden group. An
+ * access rule cannot depend on the caller remembering to pass its subject.
+ *
+ * Spelled as "no non-public group", not "the group is public": a post reached through several
+ * `:IN` edges produced one row per group, and any public one among them let the whole post
+ * through. This is also the rule `postFilter.ts` applies to an anonymous visitor (`invisibleTo`),
+ * in the same words — the timeline and the notification now agree on what is announceable.
+ */
+const notifyFollowingUsers = async (postId, context) => {
   const reason = 'followed_user_posted'
   const cypher = `
     MATCH (post:Post { id: $postId })<-[:WROTE]-(author:User { id: $userId })<-[:FOLLOWS]-(user:User)
-    OPTIONAL MATCH (post)-[:IN]->(group:Group { id: $groupId })
     OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
-    WITH post, author, user, emailAddress, group
-    WHERE group IS NULL OR group.groupType = 'public'
+    WITH post, author, user, emailAddress
+    WHERE NOT EXISTS {
+      MATCH (post)-[:IN]->(group:Group)
+      WHERE NOT group.groupType = 'public'
+    }
     MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
       SET notification.read = FALSE
       SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
@@ -216,7 +272,6 @@ const notifyFollowingUsers = async (postId, groupId, context) => {
       const notificationTransactionResponse = await transaction.run(cypher, {
         postId,
         reason,
-        groupId: groupId || null,
         userId: context.user.id,
       })
       return notificationTransactionResponse.records.map((record) => record.get('notification'))
@@ -550,8 +605,8 @@ const handleCreateMessage: IMiddlewareResolver = async (
 
 export default {
   Mutation: {
-    CreatePost: handleContentDataOfPost,
-    UpdatePost: handleContentDataOfPost,
+    CreatePost: handleCreatePost,
+    UpdatePost: handleUpdatePost,
     CreateComment: handleContentDataOfComment,
     UpdateComment: handleContentDataOfComment,
     JoinGroup: handleJoinGroup,
