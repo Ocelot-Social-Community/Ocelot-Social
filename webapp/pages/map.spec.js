@@ -1136,6 +1136,26 @@ describe('map', () => {
           })
           expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
         })
+
+        it('clears a still-pending hover-triggered popup, so it does not also fire (and remount) after a click', () => {
+          jest.useFakeTimers()
+          mapQueryRenderedFeaturesMock.mockReturnValue(features)
+          // A mouse can trigger mouseenter's 500ms delayed showPopup() and
+          // then click the same marker before that delay elapses.
+          onEventMocks.mouseenter({ point: { x: 100, y: 200 }, lngLat: { lng: 10.0, lat: 53.55 } })
+
+          onEventMocks.click({
+            point: { x: 100, y: 200 },
+            lngLat: { lng: 10.0, lat: 53.55 },
+            originalEvent: { stopPropagation: jest.fn() },
+          })
+          mapboxgl.__popupInstance.setDOMContent.mockClear()
+
+          jest.advanceTimersByTime(500)
+
+          expect(mapboxgl.__popupInstance.setDOMContent).not.toHaveBeenCalled()
+          jest.useRealTimers()
+        })
       })
 
       describe('popup content for different marker types', () => {
@@ -1638,6 +1658,19 @@ describe('map', () => {
 
         expect(mapboxgl.__popupInstance.setDOMContent).not.toHaveBeenCalled()
       })
+
+      it('does not reopen the popup if its feature reappears while its marker type is hidden', () => {
+        buildSpy.mockReturnValueOnce([])
+        wrapper.vm.refreshMarkersData()
+        wrapper.vm.toggleMarkerTypeVisibility('event')
+        mapboxgl.__popupInstance.setDOMContent.mockClear()
+        mapboxgl.__popupInstance.addTo.mockClear()
+
+        buildSpy.mockReturnValueOnce([eventFeature])
+        wrapper.vm.refreshMarkersData()
+
+        expect(mapboxgl.__popupInstance.setDOMContent).not.toHaveBeenCalled()
+      })
     })
 
     describe('getUserLocation', () => {
@@ -1873,6 +1906,9 @@ describe('map', () => {
         beforeEach(() => {
           wrapper.vm.onMapLoad({ map: mapMock })
           wrapper.vm.markers.isSourceAndLayerAdded = true
+          // Reopening now also re-resolves the feature against current
+          // data (see findCurrentFeature()) — it has to actually be there.
+          wrapper.vm.markers.geoJSON = [userFeature]
           wrapper.vm.showPopup([userFeature], { lng: 10.0, lat: 53.55 })
           mapboxgl.__popupInstance.setDOMContent.mockClear()
           mapboxgl.__popupInstance.addTo.mockClear()
@@ -1901,6 +1937,17 @@ describe('map', () => {
 
           expect(mapboxgl.__popupInstance.setDOMContent).toHaveBeenCalled()
           expect(mapboxgl.__popupInstance.addTo).toHaveBeenCalledWith(mapMock)
+        })
+
+        it('does not reopen the popup if its feature no longer exists in the current data', async () => {
+          wrapper.vm.toggleMarkerTypeVisibility('user')
+          await wrapper.vm.$nextTick()
+          wrapper.vm.markers.geoJSON = []
+
+          wrapper.vm.toggleMarkerTypeVisibility('user')
+          await wrapper.vm.$nextTick()
+
+          expect(mapboxgl.__popupInstance.setDOMContent).not.toHaveBeenCalled()
         })
 
         it('does not reopen a popup that was never auto-closed', async () => {

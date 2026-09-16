@@ -405,9 +405,15 @@ export default {
         newlyShown.some((typeId) =>
           this.autoClosedPopup.features.some((f) => f.properties.type === typeId),
         ) &&
-        this.autoClosedPopup.features.every((f) => !this.isMarkerTypeHidden(f.properties.type))
+        this.autoClosedPopup.features.every(
+          (f) => !this.isMarkerTypeHidden(f.properties.type) && this.findCurrentFeature(f),
+        )
       ) {
-        const { features, lngLat } = this.autoClosedPopup
+        const { lngLat } = this.autoClosedPopup
+        // Re-resolve the actual current feature objects, not the stale
+        // ones from before whatever else changed while it was closed —
+        // same reasoning as syncPopupWithCurrentData()'s own reopening.
+        const features = this.autoClosedPopup.features.map((f) => this.findCurrentFeature(f))
         this.autoClosedPopup = null
         this.showPopup(features, lngLat)
       }
@@ -416,6 +422,19 @@ export default {
   methods: {
     isMarkerTypeHidden(typeId) {
       return this.hiddenMarkerTypes.includes(typeId)
+    },
+    // Shared by the hiddenMarkerTypes watcher above and
+    // syncPopupWithCurrentData() below — both close-and-remember /
+    // reopen-when-it-comes-back an auto-closed popup, and both need to
+    // check the SAME two things before reopening it (the feature still
+    // exists in the current data, and its marker type isn't hidden), not
+    // just the one each watcher is itself responsible for.
+    findCurrentFeature(feature) {
+      return this.markers.geoJSON.find(
+        (f) =>
+          f.properties.type === feature.properties.type &&
+          f.properties.id === feature.properties.id,
+      )
     },
     toggleMarkerTypeVisibility(typeId) {
       this.hiddenMarkerTypes = this.isMarkerTypeHidden(typeId)
@@ -734,6 +753,11 @@ export default {
       this.map.on('click', 'markers', (e) => {
         const features = this.getFeaturesAtPoint(e.point)
         if (features.length > 0) {
+          // A desktop mouse can also fire this — clicking a marker within
+          // the mouseenter hover delay above would otherwise leave that
+          // delayed showPopup() still pending, re-running (and
+          // re-mounting/re-querying) it a second time once its 500ms is up.
+          clearTimeout(this.hoverPopupTimer)
           this.showPopup(features, e.lngLat)
           e.originalEvent.stopPropagation()
         }
@@ -1219,14 +1243,10 @@ export default {
     // but driven by whether the open (or previously auto-closed) popup's
     // feature(s) still exist in the freshly rebuilt geoJSON at all.
     syncPopupWithCurrentData() {
-      const findCurrent = (feature) =>
-        this.markers.geoJSON.find(
-          (f) =>
-            f.properties.type === feature.properties.type &&
-            f.properties.id === feature.properties.id,
-        )
-
-      if (this.openPopup && !this.openPopup.features.every((feature) => findCurrent(feature))) {
+      if (
+        this.openPopup &&
+        !this.openPopup.features.every((feature) => this.findCurrentFeature(feature))
+      ) {
         this.autoClosedPopup = this.openPopup
         this.openPopup = null
         this.markers.popup.remove()
@@ -1235,12 +1255,17 @@ export default {
 
       if (
         this.autoClosedPopup &&
-        this.autoClosedPopup.features.every((feature) => findCurrent(feature))
+        this.autoClosedPopup.features.every(
+          (feature) =>
+            this.findCurrentFeature(feature) && !this.isMarkerTypeHidden(feature.properties.type),
+        )
       ) {
         const { lngLat } = this.autoClosedPopup
         // Re-resolve the actual current feature objects, not the stale
         // ones from before the refresh.
-        const features = this.autoClosedPopup.features.map(findCurrent)
+        const features = this.autoClosedPopup.features.map((feature) =>
+          this.findCurrentFeature(feature),
+        )
         this.autoClosedPopup = null
         this.showPopup(features, lngLat)
       }
