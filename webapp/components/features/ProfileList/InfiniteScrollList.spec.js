@@ -148,6 +148,18 @@ describe('InfiniteScrollList.vue', () => {
       expect(wrapper.vm.canScrollDown).toBe(false)
     })
 
+    it('treats being within 1px of the bottom as fully scrolled (sub-pixel tolerance)', () => {
+      const wrapper = Wrapper()
+      setMetrics(wrapper.vm.$refs.scrollEl, {
+        scrollTop: 199,
+        clientHeight: 100,
+        scrollHeight: 300,
+      })
+      wrapper.vm.updateScrollFades()
+      expect(wrapper.vm.canScrollUp).toBe(true)
+      expect(wrapper.vm.canScrollDown).toBe(false)
+    })
+
     it('shows both fades when scrolled somewhere in the middle', () => {
       const wrapper = Wrapper()
       setMetrics(wrapper.vm.$refs.scrollEl, {
