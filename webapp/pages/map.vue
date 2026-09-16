@@ -1306,8 +1306,15 @@ export default {
   overflow: hidden;
 }
 
+/* 16px horizontal inset matches the cards' own padding (UserAvatarPopover/
+   GroupAvatarPopover both use 16px) — the popup's own ambient padding is
+   removed for that stacked case (see the :has() rule below) so the
+   scrollbar can reach the popup's true right edge instead of sitting 10px
+   short of it, and the separator needs its own inset to still visually
+   align with the now edge-to-edge cards' content instead of spanning
+   truly edge-to-edge itself. */
 .map-popup-separator {
-  margin: 8px 0;
+  margin: 8px 16px;
 }
 
 /* GroupAvatarPopover's own scoped min-height: 260px is a single-card hint
@@ -1340,15 +1347,21 @@ export default {
    that can outgrow the 40vh cap, and hard-clipping then silently eats the
    avatar header or the "open profile"/"open group" button. Give them the
    same taller budget as the event popover, and let them scroll rather than
-   lose content if they still don't fit. */
+   lose content if they still don't fit.
+   padding: 0, same reasoning as the event popover above — both card
+   components already carry their own 16px padding, so the ambient one here
+   would double up. More importantly, it also lets the scrollbar (from the
+   overflow-y: auto below, when several markers stack) sit flush against
+   the popup's true right edge instead of 10px short of it. */
 .mapboxgl-popup-content:has(.user-avatar-popover),
 .mapboxgl-popup-content:has(.group-avatar-popover) {
+  padding: 0;
   max-height: 80vh;
 }
 
 .mapboxgl-popup-content:has(.user-avatar-popover) .map-popup-container,
 .mapboxgl-popup-content:has(.group-avatar-popover) .map-popup-container {
-  max-height: calc(80vh - 20px);
+  max-height: 80vh;
   overflow-y: auto;
 }
 
