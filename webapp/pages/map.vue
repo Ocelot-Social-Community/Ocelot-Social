@@ -272,6 +272,9 @@ export default {
     // the markers layer in onMapLoad) — plain instance property, cleared in
     // beforeDestroy() below.
     this.hoverPopupTimer = null
+    // Pending "stop showing this popup's scrollbar again" timer (see
+    // markPopupScrolling()) — cleared in beforeDestroy() below.
+    this.popupScrollTimer = null
   },
   async mounted() {
     this.updateMapPosition()
@@ -289,6 +292,7 @@ export default {
       window.removeEventListener('resize', this.geocoderCollapseHandler)
     }
     clearTimeout(this.hoverPopupTimer)
+    clearTimeout(this.popupScrollTimer)
     // A still-open popup's mounted components (UserAvatarPopover etc.) each
     // run their own Apollo query — leaving on a route change without this
     // would leak that subscription instead of $destroy()ing it.
@@ -815,11 +819,15 @@ export default {
 
       const container = document.createElement('div')
       container.className = 'map-popup-container'
-      // Native scrollbars are easy to miss, so this fades the container's
-      // own content to transparent near whichever edge still has more to
-      // scroll to instead — see updatePopupScrollMask() for why a
-      // mask-image on the real content, not a coloured overlay element.
-      container.addEventListener('scroll', () => this.updatePopupScrollMask(container))
+      container.addEventListener('scroll', () => {
+        // Native scrollbars are easy to miss, so this fades the
+        // container's own content to transparent near whichever edge
+        // still has more to scroll to instead — see
+        // updatePopupScrollMask() for why a mask-image on the real
+        // content, not a coloured overlay element.
+        this.updatePopupScrollMask(container)
+        this.markPopupScrolling(container)
+      })
 
       // Old browsers without IntersectionObserver just get every card
       // mounted immediately, same as before this — a slower popup beats a
@@ -890,6 +898,17 @@ export default {
       const mask = `linear-gradient(to bottom, transparent, black ${top}, black calc(100% - ${bottom}), transparent)`
       container.style.maskImage = mask
       container.style.webkitMaskImage = mask
+    },
+    // Reveals the container's scrollbar (see its .is-scrolling CSS) for as
+    // long as it's actually being scrolled, then hides it again — same
+    // 800ms-after-the-last-scroll-event debounce InfiniteScrollList.vue's
+    // own onScroll() uses for its member/follower lists.
+    markPopupScrolling(container) {
+      container.classList.add('is-scrolling')
+      clearTimeout(this.popupScrollTimer)
+      this.popupScrollTimer = setTimeout(() => {
+        container.classList.remove('is-scrolling')
+      }, 800)
     },
     // Lazily created per popup — its root has to be that popup's own scroll
     // container (.map-popup-container), which only exists once showPopup()
@@ -1466,6 +1485,38 @@ export default {
 .map-popup-container {
   max-height: calc(40vh - 20px);
   overflow: hidden;
+  /* Hidden by default, revealed only while actively scrolling
+     (.is-scrolling, toggled in showPopup()'s own 'scroll' listener) —
+     same technique and values as InfiniteScrollList.vue's own member/
+     follower lists, kept consistent with those rather than the plain
+     native scrollbar this used to fall back to. */
+  scrollbar-width: none;
+}
+
+.map-popup-container.is-scrolling {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+}
+
+.map-popup-container::-webkit-scrollbar {
+  width: 0;
+}
+
+.map-popup-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.map-popup-container::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.map-popup-container.is-scrolling::-webkit-scrollbar {
+  width: 6px;
+}
+
+.map-popup-container.is-scrolling::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25);
 }
 
 /* 16px horizontal inset matches the cards' own padding (UserAvatarPopover/

@@ -1018,6 +1018,37 @@ describe('map', () => {
             expect(dom.style.webkitMaskImage).toBe('')
           })
         })
+
+        describe('is-scrolling class (reveals the scrollbar, see markPopupScrolling)', () => {
+          it('adds is-scrolling while the popup container is scrolled', () => {
+            mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+            onEventMocks.mouseenter({
+              point: { x: 100, y: 200 },
+              lngLat: { lng: 10.0, lat: 53.55 },
+            })
+            jest.advanceTimersByTime(500)
+            const dom = getPopupDOM()
+
+            dom.dispatchEvent(new Event('scroll'))
+
+            expect(dom.classList.contains('is-scrolling')).toBe(true)
+          })
+
+          it('removes is-scrolling again 800ms after the last scroll event', () => {
+            mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+            onEventMocks.mouseenter({
+              point: { x: 100, y: 200 },
+              lngLat: { lng: 10.0, lat: 53.55 },
+            })
+            jest.advanceTimersByTime(500)
+            const dom = getPopupDOM()
+
+            dom.dispatchEvent(new Event('scroll'))
+            jest.advanceTimersByTime(800)
+
+            expect(dom.classList.contains('is-scrolling')).toBe(false)
+          })
+        })
       })
 
       describe('lazy-loading cards beyond the initial batch', () => {
@@ -2097,6 +2128,19 @@ describe('map', () => {
 
         expect(mapboxgl.__popupInstance.remove).toHaveBeenCalled()
         expect(destroySpy).toHaveBeenCalled()
+      })
+
+      it('clears a pending popupScrollTimer', () => {
+        jest.useFakeTimers()
+        const clearSpy = jest.spyOn(global, 'clearTimeout')
+        wrapper.vm.onMapLoad({ map: mapMock })
+        wrapper.vm.popupScrollTimer = setTimeout(() => {}, 800)
+
+        wrapper.destroy()
+
+        expect(clearSpy).toHaveBeenCalledWith(wrapper.vm.popupScrollTimer)
+        clearSpy.mockRestore()
+        jest.useRealTimers()
       })
     })
   })
