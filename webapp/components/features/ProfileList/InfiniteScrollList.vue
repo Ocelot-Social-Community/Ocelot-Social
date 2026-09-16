@@ -6,7 +6,16 @@
         <span v-if="count !== null" class="count">({{ count }})</span>
       </h5>
       <p v-if="subtitle" class="subtitle">{{ subtitle }}</p>
-      <div ref="scrollEl" class="scroll-container" @scroll="onScroll">
+      <!-- Native scrollbars are easy to miss (some OS/browser combinations
+           hide them until you're already scrolling), which left users
+           unable to tell a list had more entries below the fold. Masking
+           the scroll container's own edge (see scrollMaskStyle) fades the
+           real content to transparent there — unlike a separate coloured
+           overlay div (tried first), there's no colour to get wrong and
+           no separate element whose edges could ever drift from the
+           container's real ones, since it's the container's own content
+           being masked, not something painted on top of it. -->
+      <div ref="scrollEl" class="scroll-container" :style="scrollMaskStyle" @scroll="onScroll">
         <slot />
         <p v-if="empty && !loading" class="nobody-message">{{ nobodyMessage }}</p>
         <div v-if="loading" class="loading-indicator">
@@ -47,6 +56,11 @@ import { OsButton, OsCard, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import { iconRegistry } from '~/utils/iconRegistry'
 
+// How far into the list the top/bottom mask (see scrollMaskStyle) fades
+// the real content to transparent, when there's actually more to scroll
+// to in that direction.
+const SCROLL_FADE_SIZE = '56px'
+
 export default {
   name: 'InfiniteScrollList',
   components: { OsButton, OsCard, OsIcon, OsSpinner, OcelotInput },
@@ -65,20 +79,44 @@ export default {
   data() {
     return {
       filterValue: '',
+      canScrollUp: false,
+      canScrollDown: false,
     }
   },
   created() {
     this.icons = iconRegistry
   },
   mounted() {
-    this.$nextTick(this.checkScrollable)
+    this.$nextTick(() => {
+      this.checkScrollable()
+      this.updateScrollFades()
+    })
   },
   updated() {
-    this.$nextTick(this.checkScrollable)
+    this.$nextTick(() => {
+      this.checkScrollable()
+      this.updateScrollFades()
+    })
   },
   beforeDestroy() {
     clearTimeout(this._scrollTimer)
     clearTimeout(this._filterTimer)
+  },
+  computed: {
+    // mask-image (not a coloured overlay div) fades the scroll container's
+    // own real content to transparent at whichever edge still has more to
+    // scroll to — see updateScrollFades() for canScrollUp/canScrollDown.
+    // alpha-masked by default, so `black` here just means "fully visible"
+    // and has nothing to do with an actual colour. Only fading in the
+    // directions that actually have more content avoids implying there's
+    // more when the list is already scrolled all the way to that edge (or
+    // short enough not to scroll at all).
+    scrollMaskStyle() {
+      const top = this.canScrollUp ? SCROLL_FADE_SIZE : '0px'
+      const bottom = this.canScrollDown ? SCROLL_FADE_SIZE : '0px'
+      const mask = `linear-gradient(to bottom, transparent, black ${top}, black calc(100% - ${bottom}), transparent)`
+      return { maskImage: mask, WebkitMaskImage: mask }
+    },
   },
   methods: {
     clearFilter() {
@@ -97,6 +135,8 @@ export default {
     onScroll() {
       const el = this.$refs.scrollEl
       if (!el) return
+
+      this.updateScrollFades()
 
       if (!el.classList.contains('is-scrolling')) {
         this.$emit('scrolling-change', true)
@@ -120,6 +160,16 @@ export default {
       if (el.scrollHeight <= el.clientHeight) {
         this.$emit('load-more')
       }
+    },
+    // Drives scrollMaskStyle — a reliable, always-rendered substitute for
+    // "is this list scrolled to the end", since native scrollbar
+    // visibility itself turned out not to be (see project memory on this).
+    updateScrollFades() {
+      const el = this.$refs.scrollEl
+      if (!el) return
+      this.canScrollUp = el.scrollTop > 0
+      // 1px tolerance for sub-pixel scroll position rounding.
+      this.canScrollDown = el.scrollTop + el.clientHeight < el.scrollHeight - 1
     },
   },
 }

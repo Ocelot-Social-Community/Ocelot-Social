@@ -113,6 +113,124 @@ describe('InfiniteScrollList.vue', () => {
     })
   })
 
+  describe('updateScrollFades', () => {
+    const setMetrics = (el, { scrollTop, clientHeight, scrollHeight }) => {
+      el.scrollTop = scrollTop
+      Object.defineProperty(el, 'clientHeight', { value: clientHeight, configurable: true })
+      Object.defineProperty(el, 'scrollHeight', { value: scrollHeight, configurable: true })
+    }
+
+    it('shows neither fade when the list fits entirely (nothing to scroll)', () => {
+      const wrapper = Wrapper()
+      setMetrics(wrapper.vm.$refs.scrollEl, { scrollTop: 0, clientHeight: 200, scrollHeight: 200 })
+      wrapper.vm.updateScrollFades()
+      expect(wrapper.vm.canScrollUp).toBe(false)
+      expect(wrapper.vm.canScrollDown).toBe(false)
+    })
+
+    it('shows only the bottom fade when scrolled to the top of a longer list', () => {
+      const wrapper = Wrapper()
+      setMetrics(wrapper.vm.$refs.scrollEl, { scrollTop: 0, clientHeight: 100, scrollHeight: 300 })
+      wrapper.vm.updateScrollFades()
+      expect(wrapper.vm.canScrollUp).toBe(false)
+      expect(wrapper.vm.canScrollDown).toBe(true)
+    })
+
+    it('shows only the top fade when scrolled all the way to the bottom', () => {
+      const wrapper = Wrapper()
+      setMetrics(wrapper.vm.$refs.scrollEl, {
+        scrollTop: 200,
+        clientHeight: 100,
+        scrollHeight: 300,
+      })
+      wrapper.vm.updateScrollFades()
+      expect(wrapper.vm.canScrollUp).toBe(true)
+      expect(wrapper.vm.canScrollDown).toBe(false)
+    })
+
+    it('shows both fades when scrolled somewhere in the middle', () => {
+      const wrapper = Wrapper()
+      setMetrics(wrapper.vm.$refs.scrollEl, {
+        scrollTop: 100,
+        clientHeight: 100,
+        scrollHeight: 300,
+      })
+      wrapper.vm.updateScrollFades()
+      expect(wrapper.vm.canScrollUp).toBe(true)
+      expect(wrapper.vm.canScrollDown).toBe(true)
+    })
+
+    it('updates the fade classes on scroll', () => {
+      const wrapper = Wrapper()
+      const el = wrapper.vm.$refs.scrollEl
+      setMetrics(el, { scrollTop: 0, clientHeight: 100, scrollHeight: 300 })
+      el.dispatchEvent(new Event('scroll'))
+      expect(wrapper.vm.canScrollDown).toBe(true)
+    })
+  })
+
+  describe('scrollMaskStyle', () => {
+    // Bypasses mounted()'s own async updateScrollFades() (which would
+    // otherwise clobber a directly-set canScrollUp/canScrollDown on the
+    // next tick using jsdom's default, non-scrollable 0/0 metrics) by
+    // deriving the state from real scroll metrics instead, same as the
+    // updateScrollFades describe block above.
+    const setMetrics = (el, { scrollTop, clientHeight, scrollHeight }) => {
+      el.scrollTop = scrollTop
+      Object.defineProperty(el, 'clientHeight', { value: clientHeight, configurable: true })
+      Object.defineProperty(el, 'scrollHeight', { value: scrollHeight, configurable: true })
+    }
+
+    it('fades neither edge when there is nothing to scroll', () => {
+      const wrapper = Wrapper()
+      setMetrics(wrapper.vm.$refs.scrollEl, { scrollTop: 0, clientHeight: 200, scrollHeight: 200 })
+      wrapper.vm.updateScrollFades()
+      expect(wrapper.vm.scrollMaskStyle.maskImage).toBe(
+        'linear-gradient(to bottom, transparent, black 0px, black calc(100% - 0px), transparent)',
+      )
+    })
+
+    it('fades only the bottom edge when there is more content below', () => {
+      const wrapper = Wrapper()
+      setMetrics(wrapper.vm.$refs.scrollEl, { scrollTop: 0, clientHeight: 100, scrollHeight: 300 })
+      wrapper.vm.updateScrollFades()
+      expect(wrapper.vm.scrollMaskStyle.maskImage).toBe(
+        'linear-gradient(to bottom, transparent, black 0px, black calc(100% - 56px), transparent)',
+      )
+    })
+
+    it('fades only the top edge when scrolled past the start', () => {
+      const wrapper = Wrapper()
+      setMetrics(wrapper.vm.$refs.scrollEl, {
+        scrollTop: 200,
+        clientHeight: 100,
+        scrollHeight: 300,
+      })
+      wrapper.vm.updateScrollFades()
+      expect(wrapper.vm.scrollMaskStyle.maskImage).toBe(
+        'linear-gradient(to bottom, transparent, black 56px, black calc(100% - 0px), transparent)',
+      )
+    })
+
+    it('fades both edges when scrolled somewhere in the middle', () => {
+      const wrapper = Wrapper()
+      setMetrics(wrapper.vm.$refs.scrollEl, {
+        scrollTop: 100,
+        clientHeight: 100,
+        scrollHeight: 300,
+      })
+      wrapper.vm.updateScrollFades()
+      expect(wrapper.vm.scrollMaskStyle.maskImage).toBe(
+        'linear-gradient(to bottom, transparent, black 56px, black calc(100% - 56px), transparent)',
+      )
+    })
+
+    it('mirrors the same gradient into the webkit-prefixed property', () => {
+      const wrapper = Wrapper()
+      expect(wrapper.vm.scrollMaskStyle.WebkitMaskImage).toBe(wrapper.vm.scrollMaskStyle.maskImage)
+    })
+  })
+
   describe('onScroll', () => {
     it('emits load-more when scrolled to bottom threshold', () => {
       const wrapper = Wrapper({ hasMore: true, loading: false })
