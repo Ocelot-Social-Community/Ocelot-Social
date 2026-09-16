@@ -931,6 +931,66 @@ describe('map', () => {
           const coords = mapboxgl.__popupInstance.setLngLat.mock.calls[0][0]
           expect(coords[0]).toBe(10.0)
         })
+
+        describe('scroll mask', () => {
+          it('sets an initial mask on the popup container once it opens', () => {
+            mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+            onEventMocks.mouseenter({
+              point: { x: 100, y: 200 },
+              lngLat: { lng: 10.0, lat: 53.55 },
+            })
+            jest.advanceTimersByTime(500)
+            const dom = getPopupDOM()
+            expect(dom.style.maskImage).toBe(
+              'linear-gradient(to bottom, transparent, black 0px, black calc(100% - 0px), transparent)',
+            )
+            expect(dom.style.webkitMaskImage).toBe(dom.style.maskImage)
+          })
+
+          it('updates the mask once the popup container is scrolled', () => {
+            mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+            onEventMocks.mouseenter({
+              point: { x: 100, y: 200 },
+              lngLat: { lng: 10.0, lat: 53.55 },
+            })
+            jest.advanceTimersByTime(500)
+            const dom = getPopupDOM()
+            Object.defineProperty(dom, 'scrollHeight', { value: 300, configurable: true })
+            Object.defineProperty(dom, 'clientHeight', { value: 100, configurable: true })
+
+            dom.dispatchEvent(new Event('scroll'))
+
+            expect(dom.style.maskImage).toBe(
+              'linear-gradient(to bottom, transparent, black 0px, black calc(100% - 56px), transparent)',
+            )
+          })
+
+          it('fades only the top edge when scrolled to the bottom', () => {
+            const container = document.createElement('div')
+            container.scrollTop = 200
+            Object.defineProperty(container, 'clientHeight', { value: 100, configurable: true })
+            Object.defineProperty(container, 'scrollHeight', { value: 300, configurable: true })
+
+            wrapper.vm.updatePopupScrollMask(container)
+
+            expect(container.style.maskImage).toBe(
+              'linear-gradient(to bottom, transparent, black 56px, black calc(100% - 0px), transparent)',
+            )
+          })
+
+          it('fades both edges when scrolled somewhere in the middle', () => {
+            const container = document.createElement('div')
+            container.scrollTop = 100
+            Object.defineProperty(container, 'clientHeight', { value: 100, configurable: true })
+            Object.defineProperty(container, 'scrollHeight', { value: 300, configurable: true })
+
+            wrapper.vm.updatePopupScrollMask(container)
+
+            expect(container.style.maskImage).toBe(
+              'linear-gradient(to bottom, transparent, black 56px, black calc(100% - 56px), transparent)',
+            )
+          })
+        })
       })
 
       describe('lazy-loading cards beyond the initial batch', () => {

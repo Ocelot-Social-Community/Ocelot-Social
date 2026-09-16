@@ -145,6 +145,12 @@ const INITIAL_POPUP_BATCH_SIZE = 8
 // popping in with its own loading spinner right as it appears.
 const LAZY_POPUP_LOOKAHEAD = '200px 0px'
 
+// How far into the popup list updatePopupScrollMask() fades the real
+// content to transparent at whichever edge still has more to scroll to —
+// same technique (and size) as InfiniteScrollList.vue's own member/
+// follower lists use for the same purpose.
+const POPUP_SCROLL_FADE_SIZE = '56px'
+
 export default {
   name: 'Map',
   mixins: [mobile(maxMobileWidth)],
@@ -773,6 +779,11 @@ export default {
 
       const container = document.createElement('div')
       container.className = 'map-popup-container'
+      // Native scrollbars are easy to miss, so this fades the container's
+      // own content to transparent near whichever edge still has more to
+      // scroll to instead — see updatePopupScrollMask() for why a
+      // mask-image on the real content, not a coloured overlay element.
+      container.addEventListener('scroll', () => this.updatePopupScrollMask(container))
 
       // Old browsers without IntersectionObserver just get every card
       // mounted immediately, same as before this — a slower popup beats a
@@ -806,6 +817,32 @@ export default {
 
       this.markers.popup.setLngLat(coordinates).setDOMContent(container).addTo(this.map)
       this.openPopup = { features, lngLat }
+      // Only measurable once addTo() above has actually attached container
+      // to the document — scrollHeight/clientHeight on a still-detached
+      // element are just 0, which would (wrongly) read as "nothing to
+      // scroll" regardless of how many cards are in it.
+      this.updatePopupScrollMask(container)
+    },
+    // mask-image (not a coloured overlay element) fades the popup's own
+    // real content to transparent at whichever edge still have more to
+    // scroll to — same technique InfiniteScrollList.vue's member/follower
+    // lists use and for the same reason: alpha-masking the real content
+    // always looks right regardless of what's behind it (a photo, a
+    // coloured badge, whatever), and there's no separate overlay element
+    // whose edges could ever drift from the container's real ones.
+    // Called on every 'scroll' (see the listener in showPopup()) and once
+    // more whenever a lazily-mounted card changes the container's
+    // scrollHeight (see getLazyPopupObserver()).
+    updatePopupScrollMask(container) {
+      const canScrollUp = container.scrollTop > 0
+      // 1px tolerance for sub-pixel scroll position rounding.
+      const canScrollDown =
+        container.scrollTop + container.clientHeight < container.scrollHeight - 1
+      const top = canScrollUp ? POPUP_SCROLL_FADE_SIZE : '0px'
+      const bottom = canScrollDown ? POPUP_SCROLL_FADE_SIZE : '0px'
+      const mask = `linear-gradient(to bottom, transparent, black ${top}, black calc(100% - ${bottom}), transparent)`
+      container.style.maskImage = mask
+      container.style.webkitMaskImage = mask
     },
     // Lazily created per popup — its root has to be that popup's own scroll
     // container (.map-popup-container), which only exists once showPopup()
@@ -825,6 +862,10 @@ export default {
               this.lazyPopupCardProperties.delete(entry.target)
               const instance = this.mountPopupComponent(properties, entry.target)
               if (instance) this.popupComponentInstances.push(instance)
+              // A newly-mounted card changes scrollHeight — e.g. it can be
+              // what makes the list scrollable in the first place, or what
+              // finally exhausts it.
+              this.updatePopupScrollMask(scrollContainer)
             })
           },
           { root: scrollContainer, rootMargin: LAZY_POPUP_LOOKAHEAD },
