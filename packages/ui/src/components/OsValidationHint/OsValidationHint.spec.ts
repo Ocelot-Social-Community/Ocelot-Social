@@ -13,7 +13,7 @@ describe('osValidationHint', () => {
 
     it('renders nothing when all props are null', () => {
       const wrapper = mount(OsValidationHint, {
-        props: { variant: null, text: null, count: null, max: null },
+        props: { variant: null, text: null, count: null, max: null, min: null },
       })
 
       expect(wrapper.html()).toBe('')
@@ -91,6 +91,23 @@ describe('osValidationHint', () => {
       })
 
       expect(wrapper.text()).toContain('0 / 100')
+    })
+
+    it('shows count with min and max as "count / min–max"', () => {
+      const wrapper = mount(OsValidationHint, {
+        props: { count: 5, min: 3, max: 50 },
+      })
+
+      expect(wrapper.text()).toContain('5 / 3–50')
+    })
+
+    it('ignores min when max is not given', () => {
+      const wrapper = mount(OsValidationHint, {
+        props: { count: 5, min: 3 },
+      })
+
+      expect(wrapper.text()).toContain('5')
+      expect(wrapper.text()).not.toContain('–')
     })
   })
 

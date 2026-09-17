@@ -959,7 +959,14 @@
     "unmute": "Desactivar silencio",
     "unmuted": "Silencio del grupo desactivado",
     "update": "Guardar cambios",
-    "updatedGroup": "Los datos del grupo han sido cambiados."
+    "updatedGroup": "Los datos del grupo han sido cambiados.",
+    "validations": {
+      "actionRadiusRequired": "Por favor, seleccione un radio de acción.",
+      "descriptionNotEmpty": "Por favor, ingrese una descripción.",
+      "groupTypeRequired": "Por favor, elija un tipo de grupo.",
+      "nameLength": "El nombre debe tener entre {min} y {max} caracteres.",
+      "nameNotEmpty": "Por favor, ingrese un nombre de grupo."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Borrar búsqueda",

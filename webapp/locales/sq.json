@@ -959,7 +959,14 @@
     "unmute": "Çhesht grupin",
     "unmuted": "Grupi u çhesht",
     "update": "Ruaj ndryshimin",
-    "updatedGroup": "Të dhënat e grupit u ndryshuan."
+    "updatedGroup": "Të dhënat e grupit u ndryshuan.",
+    "validations": {
+      "actionRadiusRequired": "Ju lutem zgjidhni një rreze veprimi.",
+      "descriptionNotEmpty": "Ju lutem shkruani një përshkrim.",
+      "groupTypeRequired": "Ju lutem zgjidhni një lloj grupi.",
+      "nameLength": "Emri duhet të ketë midis {min} dhe {max} karaktere.",
+      "nameNotEmpty": "Ju lutem shkruani një emër grupi."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Pastro kërkimin",

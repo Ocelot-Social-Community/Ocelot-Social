@@ -51,6 +51,7 @@
           />
           <os-validation-hint
             :count="formData.title.length"
+            :min="formSchema.title.min"
             :max="formSchema.title.max"
             :variant="visibleErrors && visibleErrors.title ? 'error' : null"
             :text="titleErrorText"
@@ -146,6 +147,7 @@
             />
             <os-validation-hint
               :count="formData.eventVenue.length"
+              :min="formSchema.eventVenue.min"
               :max="formSchema.eventVenue.max"
               :variant="visibleErrors && visibleErrors.eventVenue ? 'error' : null"
               :text="venueErrorText"
@@ -341,6 +343,7 @@ export default {
     formSchema() {
       return {
         title: {
+          min: 3,
           max: 100,
           validator: (_, value = '') => {
             if (!value.trim()) {
@@ -833,8 +836,19 @@ export default {
       cursor: default;
     }
 
+    /* Not align-self: flex-end — os-validation-hint switches its OWN inner
+       layout depending on whether it has text (flex + justify-between,
+       spreading a left-aligned message and a right-aligned count/icon
+       badge across the full width) or not (just the badge, flex-end).
+       Forcing flex-end here shrinks the whole element to its content's
+       width before that inner layout gets a chance to use the space,
+       which squashed message + badge into a narrow, centered-looking
+       stack instead of message-left/badge-right. Letting it stretch (the
+       flex column's own default) gives it the full width to actually do
+       that with; the badge-only case still ends up flush right either
+       way, since its own inner justify-end doesn't need the full width to
+       do that. */
     > .os-validation-hint {
-      align-self: flex-end;
       margin-bottom: var(--space-base);
       cursor: default;
     }

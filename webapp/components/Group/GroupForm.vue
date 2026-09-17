@@ -9,15 +9,16 @@
           model="name"
           autofocus
           :placeholder="`${$t('group.name')} …`"
+          hide-error
+          @blur="dirtyFields.name && touchField('name')"
         />
-        <os-badge
-          role="status"
-          aria-live="polite"
-          :variant="formErrors && formErrors.name ? 'danger' : undefined"
-        >
-          {{ `${formData.name.length} / ${formSchema.name.min}–${formSchema.name.max}` }}
-          <os-icon v-if="formErrors && formErrors.name" :icon="icons.warning" />
-        </os-badge>
+        <os-validation-hint
+          :count="formData.name.length"
+          :min="formSchema.name.min"
+          :max="formSchema.name.max"
+          :variant="visibleErrors && visibleErrors.name ? 'error' : null"
+          :text="nameErrorText"
+        />
 
         <!-- group Slug -->
         <ocelot-input
@@ -41,6 +42,7 @@
           :value="formData.groupType"
           :disabled="update && (!group || group.myRole !== 'owner')"
           @change="changeGroupType($event)"
+          @blur="touchField('groupType')"
         >
           <option
             v-for="groupType in groupTypeOptions"
@@ -51,19 +53,11 @@
             {{ $t(`group.typesOptions.${groupType}`) }}
           </option>
         </select>
-        <os-badge
-          role="status"
-          aria-live="polite"
-          :variant="
-            formErrors && formErrors.groupType && formData.groupType === '' ? 'danger' : undefined
-          "
-        >
-          {{ `${formData.groupType === '' ? 0 : 1} / 1` }}
-          <os-icon
-            v-if="formErrors && formErrors.groupType && formData.groupType === ''"
-            :icon="icons.warning"
-          />
-        </os-badge>
+        <os-validation-hint
+          v-if="visibleErrors && visibleErrors.groupType && formData.groupType === ''"
+          variant="error"
+          :text="$t('group.validations.groupTypeRequired')"
+        />
 
         <!-- showMembers -->
         <div class="show-members-control">
@@ -101,15 +95,14 @@
           :value="formData.description"
           :hashtags="null"
           @input="updateEditorDescription"
+          @blur.native.capture="dirtyFields.description && touchField('description')"
         />
-        <os-badge
-          role="status"
-          aria-live="polite"
-          :variant="formErrors && formErrors.description ? 'danger' : undefined"
-        >
-          {{ `${descriptionLength} / ${formSchema.description.min}` }}
-          <os-icon v-if="formErrors && formErrors.description" :icon="icons.warning" />
-        </os-badge>
+        <os-validation-hint
+          :count="descriptionLength"
+          :max="formSchema.description.min"
+          :variant="visibleErrors && visibleErrors.description ? 'error' : null"
+          :text="visibleErrors && visibleErrors.description"
+        />
 
         <!-- actionRadius -->
         <p class="ds-text select-label">
@@ -118,22 +111,13 @@
         <action-radius-select
           v-model="formData.actionRadius"
           @change.native="changeActionRadius($event)"
+          @blur.native="touchField('actionRadius')"
         />
-        <os-badge
-          role="status"
-          aria-live="polite"
-          :variant="
-            formErrors && formErrors.actionRadius && formData.actionRadius === ''
-              ? 'danger'
-              : undefined
-          "
-        >
-          {{ `${formData.actionRadius === '' ? 0 : 1} / 1` }}
-          <os-icon
-            v-if="formErrors && formErrors.actionRadius && formData.actionRadius === ''"
-            :icon="icons.warning"
-          />
-        </os-badge>
+        <os-validation-hint
+          v-if="visibleErrors && visibleErrors.actionRadius && formData.actionRadius === ''"
+          variant="error"
+          :text="$t('group.validations.actionRadiusRequired')"
+        />
 
         <!-- location -->
         <location-select v-model="formData.locationName" />
@@ -151,14 +135,12 @@
             name="categoryIds"
             :existingCategoryIds="formData.categoryIds"
           />
-          <os-badge
-            role="status"
-            aria-live="polite"
-            :variant="formErrors && formErrors.categoryIds ? 'danger' : undefined"
-          >
-            {{ formData.categoryIds.length }} / 3
-            <os-icon v-if="formErrors && formErrors.categoryIds" :icon="icons.warning" />
-          </os-badge>
+          <os-validation-hint
+            :count="formData.categoryIds.length"
+            :max="3"
+            :variant="visibleErrors && visibleErrors.categoryIds ? 'error' : null"
+            :text="visibleErrors && visibleErrors.categoryIds"
+          />
         </div>
         <!-- submit -->
         <div class="buttons ds-mt-large ds-mb-large">
@@ -170,7 +152,7 @@
             appearance="filled"
             type="submit"
             :loading="loading"
-            :disabled="loading || checkFormError(formErrors)"
+            :disabled="loading"
             :class="{ 'permission-denied': !canCreateSelectedGroup }"
             :aria-disabled="!canCreateSelectedGroup"
             v-tooltip="{
@@ -187,7 +169,7 @@
 </template>
 
 <script>
-import { OsBadge, OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsValidationHint } from '@ocelot-social/ui'
 import { branding } from '@ocelot-social/branding'
 import { iconRegistry } from '~/utils/iconRegistry'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
@@ -206,9 +188,9 @@ export default {
     Editor,
     ActionRadiusSelect,
     LocationSelect,
-    OsBadge,
     OsButton,
     OsIcon,
+    OsValidationHint,
     OcelotInput,
   },
   props: {
@@ -236,25 +218,12 @@ export default {
       showMembers,
     } = this.group
     const initialCategoryIds = categories ? categories.map((category) => category.id) : []
-    const effectiveShowMembersInitial =
-      groupType === 'public' ? true : groupType === 'hidden' ? false : (showMembers ?? false)
     return {
       disabled: false,
       loading: false,
       groupTypeOptions: ['public', 'closed', 'hidden'],
       loadingGeo: false,
       cities: [],
-      initialCategoryIds,
-      savedBaseline: {
-        name: name || '',
-        slug: slug || '',
-        groupType: groupType || '',
-        about: about || '',
-        description: description || '',
-        actionRadius: actionRadius || '',
-        locationName: locationName || '',
-        showMembers: effectiveShowMembersInitial,
-      },
       formData: {
         name: name || '',
         slug: slug || '',
@@ -281,7 +250,10 @@ export default {
           min: branding.group.descriptionMinLength,
           validator: (_, value = '') => {
             if (this.$filters.removeHtml(value).length < this.formSchema.description.min) {
-              return [new Error()]
+              // A bare new Error() (no message) leaves formErrors.description as
+              // '' — falsy, so a plain `visibleErrors && visibleErrors.description`
+              // check (the validation hint's :text binding) never actually fires.
+              return [new Error(this.$t('group.validations.descriptionNotEmpty'))]
             }
             return []
           },
@@ -319,12 +291,14 @@ export default {
     descriptionLength() {
       return this.$filters.removeHtml(this.formData.description).length
     },
-    sameLocation() {
-      return this.savedBaseline.locationName === this.formLocationName
-    },
-    sameCategories() {
-      if (this.initialCategoryIds.length !== this.formData.categoryIds.length) return false
-      return this.initialCategoryIds.every((id) => this.formData.categoryIds.includes(id))
+    nameErrorText() {
+      if (!this.visibleErrors?.name) return null
+      return !this.formData.name.trim()
+        ? this.$t('group.validations.nameNotEmpty')
+        : this.$t('group.validations.nameLength', {
+            min: this.formSchema.name.min,
+            max: this.formSchema.name.max,
+          })
     },
     // Flat per-type create rights (mirrors the backend group.create_* shield): the
     // "create group" entry point is open if the user may create at least one type, and
@@ -340,30 +314,11 @@ export default {
       if (this.formData.groupType === 'hidden') return false
       return this.formData.showMembers
     },
-    disableButtonByUpdate() {
-      if (!this.update) return true
-      return (
-        this.savedBaseline.name === this.formData.name &&
-        this.savedBaseline.slug === this.formData.slug &&
-        this.savedBaseline.groupType === this.formData.groupType &&
-        this.savedBaseline.about === this.formData.about &&
-        this.savedBaseline.description === this.formData.description &&
-        this.savedBaseline.actionRadius === this.formData.actionRadius &&
-        this.sameLocation &&
-        this.sameCategories &&
-        this.savedBaseline.showMembers === this.effectiveShowMembers
-      )
-    },
   },
   created() {
     this.icons = iconRegistry
   },
   methods: {
-    checkFormError(error) {
-      if (!this.update && error && !!error && this.disableButtonByUpdate) return true
-      if (this.update && !error && this.disableButtonByUpdate) return true
-      return false
-    },
     changeGroupType(event) {
       this.updateFormField('groupType', event.target.value)
     },
@@ -389,7 +344,9 @@ export default {
       ) {
         return
       }
-      this.formSubmit(this.submit)
+      this.formSubmit(this.submit, () => {
+        this.$toast.error(this.$t('common.validations.formHasErrors'))
+      })
     },
     submit() {
       this.loading = true
@@ -405,21 +362,8 @@ export default {
         categoryIds,
         showMembers: this.effectiveShowMembers,
       }
-      const done = (success) => {
+      const done = () => {
         this.loading = false
-        if (success) {
-          this.savedBaseline = {
-            name: this.formData.name,
-            slug: this.formData.slug,
-            groupType: this.formData.groupType,
-            about: this.formData.about,
-            description: this.formData.description,
-            actionRadius: this.formData.actionRadius,
-            locationName: this.formLocationName,
-            showMembers: this.effectiveShowMembers,
-          }
-          this.initialCategoryIds = [...this.formData.categoryIds]
-        }
       }
       this.update
         ? this.$emit('updateGroup', { ...variables, id: this.group.id }, done)
@@ -456,7 +400,6 @@ export default {
     flex-direction: row;
     align-items: center;
     gap: var(--space-x-small);
-    margin-top: calc(-1 * var(--space-base) - var(--space-x-small));
     margin-bottom: var(--space-x-large);
 
     label.is-disabled {
@@ -464,23 +407,42 @@ export default {
     }
   }
 
+  /* Fixed gap after the groupType <select> itself, not a negative margin on
+     .show-members-control counting on the validation hint above it always
+     being there to cancel out — that hint (like every os-validation-hint
+     here) is only actually in the DOM while there's something to show
+     (v-if), so with no error present there was nothing for the negative
+     margin to cancel, pulling the checkbox up into/over the select. */
+  > select {
+    margin-bottom: var(--space-x-small);
+  }
+
   > .ds-form-item {
     margin: 0;
   }
 
-  > .os-badge {
-    align-self: flex-end;
-    margin: var(--space-xx-small) 0 var(--space-base);
+  > .os-validation-hint {
+    margin-bottom: var(--space-base);
     cursor: default;
   }
 
-  > div:not(.buttons):not(.show-members-control) {
+  /* :not(.os-validation-hint) — without it, this ALSO matches
+     os-validation-hint's own root div directly (it's a bare <div> too,
+     for the fields not wrapped in an extra one, e.g. name/description):
+     matches both this selector and the .os-validation-hint rule above at
+     equal specificity for shared properties, but this one is MORE
+     specific overall (div + two :not()s beats a single class), so ITS
+     flex-direction: column silently won over the component's own default
+     row layout — stacking the message and the count/icon badge instead of
+     spreading them left/right across the row. Not something
+     ContributionForm.vue hits: its fields sit inside plain-block
+     os-card__content, not a div matched by a rule like this one. */
+  > div:not(.buttons):not(.show-members-control):not(.os-validation-hint) {
     display: flex;
     flex-direction: column;
 
-    > .os-badge {
-      align-self: flex-end;
-      margin: var(--space-xx-small) 0 var(--space-base);
+    > .os-validation-hint {
+      margin-bottom: var(--space-base);
       cursor: default;
     }
   }

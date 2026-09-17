@@ -21,7 +21,8 @@ describe('GroupForm', () => {
 
   beforeEach(() => {
     mocks = {
-      $t: jest.fn(),
+      $t: jest.fn((key) => key),
+      $toast: { error: jest.fn() },
     }
     storeMocks = {
       getters: {},
@@ -44,6 +45,10 @@ describe('GroupForm', () => {
     it('renders', () => {
       expect(wrapper.findAll('.group-form')).toHaveLength(1)
     })
+
+    it('shows the name length as "count / min–max"', () => {
+      expect(wrapper.find('.os-validation-hint').text()).toContain('0 / 3–50')
+    })
   })
 
   const group = {
@@ -62,98 +67,107 @@ describe('GroupForm', () => {
     ],
   }
 
-  describe('sameCategories', () => {
-    beforeEach(() => {
-      wrapper = mount(GroupForm, {
-        propsData: { update: true, group },
-        mocks,
+  describe('validation hints', () => {
+    const mountFresh = (propsDataOverride = { update: false, group: {} }) =>
+      mount(GroupForm, {
+        propsData: propsDataOverride,
+        mocks: { ...mocks, $can: () => true },
         localVue,
         stubs,
         store,
       })
+
+    it('never disables the submit button, regardless of validity', () => {
+      wrapper = mountFresh()
+      const submitButton = wrapper.find('button[type="submit"]')
+      expect(submitButton.attributes('disabled')).toBeUndefined()
     })
 
-    it('returns true when categories unchanged', () => {
-      expect(wrapper.vm.sameCategories).toBe(true)
+    it('does not show a field error before it has been touched', () => {
+      wrapper = mountFresh()
+      expect(wrapper.vm.visibleErrors).toBeNull()
     })
 
-    it('returns false when a category is deselected', async () => {
-      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2'])
-      expect(wrapper.vm.sameCategories).toBe(false)
+    it('reveals only the touched field once it loses focus, not the whole form', async () => {
+      wrapper = mountFresh()
+      const nameInput = wrapper.find('input[name="name"]')
+      nameInput.setValue('')
+      await wrapper.vm.$nextTick()
+      nameInput.trigger('blur')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.visibleErrors.name).toBeTruthy()
+      expect(wrapper.vm.visibleErrors.description).toBeUndefined()
     })
 
-    it('returns false when a category is swapped (same count)', async () => {
-      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2', 'cat-4'])
-      expect(wrapper.vm.sameCategories).toBe(false)
+    it("does not also show OcelotInput's own raw error text next to the validation hint", async () => {
+      wrapper = mountFresh()
+      const nameInput = wrapper.find('input[name="name"]')
+      nameInput.setValue('')
+      await wrapper.vm.$nextTick()
+      nameInput.trigger('blur')
+      await wrapper.vm.$nextTick()
+      // hide-error suppresses OcelotInput's own built-in ".ds-input-error"
+      // message (the raw, untranslated async-validator text, e.g. "name is
+      // required") — the os-validation-hint next to it is the only message
+      // meant to show.
+      expect(wrapper.find('.ds-input-error').isVisible()).toBe(false)
     })
 
-    it('returns true when same categories re-selected after deselect', async () => {
-      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2'])
-      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2', 'cat-3'])
-      expect(wrapper.vm.sameCategories).toBe(true)
+    it('reveals every error and shows a toast when submitting an invalid form, without saving', async () => {
+      wrapper = mountFresh()
+      wrapper.find('form').trigger('submit')
+      await wrapper.vm.$nextTick()
+      expect(mocks.$toast.error).toHaveBeenCalledWith('common.validations.formHasErrors')
+      expect(wrapper.vm.visibleErrors.name).toBeTruthy()
+      expect(wrapper.emitted('createGroup')).toBeFalsy()
     })
-  })
 
-  describe('disableButtonByUpdate', () => {
-    beforeEach(() => {
-      wrapper = mount(GroupForm, {
-        propsData: { update: true, group },
-        mocks,
-        localVue,
-        stubs,
-        store,
+    it('saves once the form becomes valid', async () => {
+      wrapper = mountFresh()
+      await wrapper.vm.$set(wrapper.vm.formData, 'name', 'A valid name')
+      await wrapper.vm.$set(wrapper.vm.formData, 'groupType', 'public')
+      await wrapper.vm.$set(wrapper.vm.formData, 'description', 'A long enough description text.')
+      await wrapper.vm.$set(wrapper.vm.formData, 'actionRadius', 'regional')
+      wrapper.find('form').trigger('submit')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.emitted('createGroup')).toBeTruthy()
+    })
+
+    describe('nameErrorText', () => {
+      beforeEach(() => {
+        wrapper = mountFresh()
+      })
+
+      it('is null while untouched', () => {
+        expect(wrapper.vm.nameErrorText).toBeNull()
+      })
+
+      it('reports an empty name', async () => {
+        const nameInput = wrapper.find('input[name="name"]')
+        nameInput.setValue('')
+        await wrapper.vm.$nextTick()
+        wrapper.vm.touchField('name')
+        expect(wrapper.vm.nameErrorText).toBe('group.validations.nameNotEmpty')
+      })
+
+      it('reports a name that is too short', async () => {
+        const nameInput = wrapper.find('input[name="name"]')
+        nameInput.setValue('x')
+        await wrapper.vm.$nextTick()
+        wrapper.vm.touchField('name')
+        expect(wrapper.vm.nameErrorText).toBe('group.validations.nameLength')
       })
     })
 
-    it('is true initially when nothing changed', () => {
-      expect(wrapper.vm.disableButtonByUpdate).toBe(true)
-    })
-
-    it('is false when name is changed', async () => {
-      await wrapper.vm.$set(wrapper.vm.formData, 'name', 'New Name')
-      expect(wrapper.vm.disableButtonByUpdate).toBe(false)
-    })
-
-    it('is false when a category is swapped', async () => {
-      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2', 'cat-4'])
-      expect(wrapper.vm.disableButtonByUpdate).toBe(false)
-    })
-
-    it('is true again after successful save', async () => {
-      await wrapper.vm.$set(wrapper.vm.formData, 'name', 'New Name')
-      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2', 'cat-4'])
-      expect(wrapper.vm.disableButtonByUpdate).toBe(false)
-
-      wrapper.vm.submit()
-      const [, done] = wrapper.emitted('updateGroup')[0]
-      done(true)
-      await wrapper.vm.$nextTick()
-
-      expect(wrapper.vm.disableButtonByUpdate).toBe(true)
-    })
-
-    it('keeps loading false and disableButtonByUpdate false after failed save', async () => {
-      await wrapper.vm.$set(wrapper.vm.formData, 'name', 'New Name')
-      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2', 'cat-4'])
-      expect(wrapper.vm.disableButtonByUpdate).toBe(false)
-
-      wrapper.vm.submit()
-      const [, done] = wrapper.emitted('updateGroup')[0]
-      done(false)
-      await wrapper.vm.$nextTick()
-
-      expect(wrapper.vm.loading).toBe(false)
-      expect(wrapper.vm.disableButtonByUpdate).toBe(false)
-    })
-
-    it('is false again after save and further changes', async () => {
-      wrapper.vm.submit()
-      const [, done] = wrapper.emitted('updateGroup')[0]
-      done(true)
-      await wrapper.vm.$nextTick()
-
-      await wrapper.vm.$set(wrapper.vm.formData, 'name', 'Changed Again')
-      expect(wrapper.vm.disableButtonByUpdate).toBe(false)
+    describe('description validation', () => {
+      it('surfaces a real (non-empty) error message once touched', async () => {
+        wrapper = mountFresh()
+        wrapper.vm.updateEditorDescription('')
+        await wrapper.vm.$nextTick()
+        wrapper.vm.touchField('description')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.visibleErrors.description).toBe('group.validations.descriptionNotEmpty')
+      })
     })
   })
 

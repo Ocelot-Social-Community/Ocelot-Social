@@ -959,7 +959,14 @@
     "unmute": "Unmute group",
     "unmuted": "Group unmuted",
     "update": "Save change",
-    "updatedGroup": "The group data has been changed."
+    "updatedGroup": "The group data has been changed.",
+    "validations": {
+      "actionRadiusRequired": "Please choose an action radius.",
+      "descriptionNotEmpty": "Please enter a description.",
+      "groupTypeRequired": "Please choose a group type.",
+      "nameLength": "The name must be between {min} and {max} characters.",
+      "nameNotEmpty": "Please enter a group name."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",

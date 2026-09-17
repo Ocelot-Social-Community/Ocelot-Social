@@ -959,7 +959,14 @@
     "unmute": "Увімкнути сповіщення групи",
     "unmuted": "Сповіщення групи увімкнено",
     "update": "Зберегти зміни",
-    "updatedGroup": "Дані групи змінено."
+    "updatedGroup": "Дані групи змінено.",
+    "validations": {
+      "actionRadiusRequired": "Будь ласка, виберіть радіус дії.",
+      "descriptionNotEmpty": "Будь ласка, введіть опис.",
+      "groupTypeRequired": "Будь ласка, виберіть тип групи.",
+      "nameLength": "Назва повинна містити від {min} до {max} символів.",
+      "nameNotEmpty": "Будь ласка, введіть назву групи."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Очистити пошук",

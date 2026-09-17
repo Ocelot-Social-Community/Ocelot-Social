@@ -131,6 +131,12 @@ describe('ContributionForm.vue', () => {
       })
     })
 
+    describe('validation hint display', () => {
+      it('shows the title length as "count / min–max"', () => {
+        expect(wrapper.find('.os-validation-hint').text()).toContain('0 / 3–100')
+      })
+    })
+
     describe('CreatePost', () => {
       describe('invalid form submission', () => {
         beforeEach(async () => {

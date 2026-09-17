@@ -959,7 +959,14 @@
     "unmute": "Nicht stummschalten",
     "unmuted": "Gruppe nicht mehr stummgeschaltet",
     "update": "Änderung speichern",
-    "updatedGroup": "Die Gruppendaten wurden geändert!"
+    "updatedGroup": "Die Gruppendaten wurden geändert!",
+    "validations": {
+      "actionRadiusRequired": "Bitte einen Aktionsradius wählen.",
+      "descriptionNotEmpty": "Bitte eine Beschreibung eingeben.",
+      "groupTypeRequired": "Bitte einen Gruppentyp wählen.",
+      "nameLength": "Der Name muss zwischen {min} und {max} Zeichen lang sein.",
+      "nameNotEmpty": "Bitte einen Gruppennamen eingeben."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",

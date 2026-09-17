@@ -14,7 +14,8 @@
    * @prop variant - 'warning' | 'error' — drives icon, badge color and text color
    * @prop text    - Human-readable feedback message
    * @prop count   - Current character / item count
-   * @prop max     - Maximum allowed count; shown as "count / max"
+   * @prop max     - Maximum allowed count; shown as "count / max", or "count / min–max" if min is also given
+   * @prop min     - Minimum required count; only shown alongside max, as "count / min–max"
    */
   export default defineComponent({
     name: 'OsValidationHint',
@@ -33,6 +34,10 @@
         default: null,
       },
       max: {
+        type: [Number, String] as PropType<number | string | null>,
+        default: null,
+      },
+      min: {
         type: [Number, String] as PropType<number | string | null>,
         default: null,
       },
@@ -73,7 +78,11 @@
 
         if (hasCount.value) {
           const countText =
-            props.max != null ? `${props.count} / ${props.max}` : String(props.count)
+            props.max != null && props.min != null
+              ? `${props.count} / ${props.min}–${props.max}`
+              : props.max != null
+                ? `${props.count} / ${props.max}`
+                : String(props.count)
           badgeChildren.push(h('span', {}, countText))
         }
 

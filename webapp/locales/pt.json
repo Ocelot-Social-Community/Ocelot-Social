@@ -959,7 +959,14 @@
     "unmute": "Reativar grupo",
     "unmuted": "Grupo reativado",
     "update": "Salvar alterações",
-    "updatedGroup": "Os dados do grupo foram alterados."
+    "updatedGroup": "Os dados do grupo foram alterados.",
+    "validations": {
+      "actionRadiusRequired": "Por favor, selecione um raio de ação.",
+      "descriptionNotEmpty": "Por favor, insira uma descrição.",
+      "groupTypeRequired": "Por favor, escolha um tipo de grupo.",
+      "nameLength": "O nome deve ter entre {min} e {max} caracteres.",
+      "nameNotEmpty": "Por favor, insira um nome de grupo."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Limpar busca",

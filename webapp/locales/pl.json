@@ -959,7 +959,14 @@
     "unmute": "Cofnij wyciszenie grupy",
     "unmuted": "Wyciszenie grupy cofnięte",
     "update": "Zapisz zmianę",
-    "updatedGroup": "Dane grupy zostały zmienione."
+    "updatedGroup": "Dane grupy zostały zmienione.",
+    "validations": {
+      "actionRadiusRequired": "Proszę wybrać zasięg działania.",
+      "descriptionNotEmpty": "Proszę podać opis.",
+      "groupTypeRequired": "Proszę wybrać typ grupy.",
+      "nameLength": "Nazwa musi mieć od {min} do {max} znaków.",
+      "nameNotEmpty": "Proszę podać nazwę grupy."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Wyczyść wyszukiwanie",

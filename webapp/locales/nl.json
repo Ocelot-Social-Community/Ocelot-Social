@@ -959,7 +959,14 @@
     "unmute": "Groep niet meer dempen",
     "unmuted": "Groep niet meer gedempt",
     "update": "Wijziging opslaan",
-    "updatedGroup": "De groepsgegevens zijn gewijzigd."
+    "updatedGroup": "De groepsgegevens zijn gewijzigd.",
+    "validations": {
+      "actionRadiusRequired": "Kies een actieradius.",
+      "descriptionNotEmpty": "Voer een beschrijving in.",
+      "groupTypeRequired": "Kies een groepstype.",
+      "nameLength": "De naam moet tussen {min} en {max} tekens lang zijn.",
+      "nameNotEmpty": "Voer een groepsnaam in."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Zoekopdracht wissen",
