@@ -307,7 +307,14 @@ export default {
       return this.groupTypeOptions.some((type) => this.$can(`group.create_${type}`))
     },
     canCreateSelectedGroup() {
-      return this.update || this.$can(`group.create_${this.formData.groupType}`)
+      if (this.update) return true
+      // No type chosen yet (e.g. the form was just opened) — checking
+      // `group.create_` (an empty suffix, matching no real permission)
+      // would wrongly flag "denied" for someone who can create every
+      // type, just hasn't picked one. Fall back to "can create at least
+      // one type" until they do.
+      if (!this.formData.groupType) return this.canCreateAnyGroup
+      return this.$can(`group.create_${this.formData.groupType}`)
     },
     effectiveShowMembers() {
       if (this.formData.groupType === 'public') return true

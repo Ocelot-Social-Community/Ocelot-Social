@@ -230,6 +230,37 @@ describe('GroupForm', () => {
       expect(mountWith((p) => p === 'group.create_closed').vm.canCreateAnyGroup).toBe(true)
     })
 
+    describe('canCreateSelectedGroup before any type is chosen (formData.groupType === "")', () => {
+      it('is true for someone who can create at least one type, e.g. an admin with every permission', () => {
+        const wrapper = mountWith(() => true)
+        expect(wrapper.vm.formData.groupType).toBe('')
+        expect(wrapper.vm.canCreateSelectedGroup).toBe(true)
+      })
+
+      it('is false only for someone who cannot create any type at all', () => {
+        const wrapper = mountWith(() => false)
+        expect(wrapper.vm.formData.groupType).toBe('')
+        expect(wrapper.vm.canCreateSelectedGroup).toBe(false)
+      })
+
+      it('does not mark the submit button as permission-denied for an admin who has not picked a type yet', () => {
+        const wrapper = mountWith(() => true)
+        const submitButton = wrapper.find('button[type="submit"]')
+        expect(submitButton.classes()).not.toContain('permission-denied')
+        // Vue omits the attribute entirely rather than rendering
+        // aria-disabled="false".
+        expect(submitButton.attributes('aria-disabled')).toBeUndefined()
+      })
+    })
+
+    it('canCreateSelectedGroup checks the chosen type specifically once one is picked', () => {
+      const wrapper = mountWith((p) => p === 'group.create_closed')
+      wrapper.vm.formData.groupType = 'closed'
+      expect(wrapper.vm.canCreateSelectedGroup).toBe(true)
+      wrapper.vm.formData.groupType = 'public'
+      expect(wrapper.vm.canCreateSelectedGroup).toBe(false)
+    })
+
     const mountEdit = (can, groupOverrides = {}) =>
       mount(GroupForm, {
         propsData: { update: true, group: { ...group, ...groupOverrides } },
