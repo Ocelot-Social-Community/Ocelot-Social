@@ -29,7 +29,7 @@
           :placeholder="`${$t('group.labelSlug')} …`"
         ></ocelot-input>
 
-        <div v-if="update" class="ds-mt-small ds-mb-large"></div>
+        <div v-if="update" class="ds-mb-base"></div>
 
         <!-- groupType -->
         <p class="ds-text select-label">
@@ -90,7 +90,7 @@
           rows="3"
         />
 
-        <div class="ds-mt-small ds-mb-large"></div>
+        <div class="ds-mb-base"></div>
 
         <!-- description -->
         <p class="ds-text select-label">
@@ -119,7 +119,7 @@
           {{ $t('group.actionRadius') }}
         </p>
         <div
-          class="select-wrap"
+          class="select-wrap action-radius-wrap"
           :class="{
             'ds-input-has-error':
               visibleErrors && visibleErrors.actionRadius && formData.actionRadius === '',
@@ -137,12 +137,10 @@
           :text="$t('group.validations.actionRadiusRequired')"
         />
 
-        <div class="ds-mt-small ds-mb-large"></div>
-
         <!-- location -->
         <location-select v-model="formData.locationName" />
 
-        <div class="ds-mt-small ds-mb-large"></div>
+        <div class="ds-mb-base"></div>
 
         <!-- category -->
         <div v-if="categoriesActive">
@@ -449,7 +447,7 @@ export default {
     align-items: center;
     gap: var(--space-x-small);
     margin-top: var(--space-x-small);
-    margin-bottom: var(--space-x-large);
+    margin-bottom: var(--space-base);
 
     label.is-disabled {
       opacity: 0.5;
@@ -468,6 +466,24 @@ export default {
      margin reset of its own. */
   > .select-wrap {
     margin: 0;
+  }
+
+  /* Unlike groupType's select-wrap (whose next sibling is the checkbox and
+     stays deliberately tight, handled above), actionRadius's next sibling
+     is the next field group (location) and should keep the same
+     space-base gap every other field-to-field transition uses — there is
+     no explicit spacer div for it any more (see template). */
+  > .action-radius-wrap {
+    margin-bottom: var(--space-base);
+  }
+
+  /* ...unless the hint is actually showing: then the tight field+hint gap
+     (the hint's own 4px top margin) is what should apply here instead, and
+     the space-base gap to the next field comes from the hint's own
+     margin-bottom below. Without this, the two would add up and push the
+     hint away from its select. */
+  > .action-radius-wrap:has(+ .os-validation-hint) {
+    margin-bottom: 0;
   }
 
   > .os-validation-hint {
