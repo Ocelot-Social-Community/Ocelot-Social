@@ -35,24 +35,32 @@
         <p class="ds-text select-label">
           {{ $t('group.type') }}
         </p>
-        <select
-          class="select ds-input appearance--auto"
-          name="groupType"
-          model="groupType"
-          :value="formData.groupType"
-          :disabled="update && (!group || group.myRole !== 'owner')"
-          @change="changeGroupType($event)"
-          @blur="touchField('groupType')"
+        <div
+          class="select-wrap"
+          :class="{
+            'ds-input-has-error':
+              visibleErrors && visibleErrors.groupType && formData.groupType === '',
+          }"
         >
-          <option
-            v-for="groupType in groupTypeOptions"
-            :key="groupType"
-            :value="groupType"
-            :disabled="groupType !== group.groupType && !$can(`group.create_${groupType}`)"
+          <select
+            class="select ds-input appearance--auto"
+            name="groupType"
+            model="groupType"
+            :value="formData.groupType"
+            :disabled="update && (!group || group.myRole !== 'owner')"
+            @change="changeGroupType($event)"
+            @blur="touchField('groupType')"
           >
-            {{ $t(`group.typesOptions.${groupType}`) }}
-          </option>
-        </select>
+            <option
+              v-for="groupType in groupTypeOptions"
+              :key="groupType"
+              :value="groupType"
+              :disabled="groupType !== group.groupType && !$can(`group.create_${groupType}`)"
+            >
+              {{ $t(`group.typesOptions.${groupType}`) }}
+            </option>
+          </select>
+        </div>
         <os-validation-hint
           v-if="visibleErrors && visibleErrors.groupType && formData.groupType === ''"
           variant="error"
@@ -88,15 +96,17 @@
         <p class="ds-text select-label">
           {{ $t('group.description') }}
         </p>
-        <editor
-          name="description"
-          model="description"
-          :users="null"
-          :value="formData.description"
-          :hashtags="null"
-          @input="updateEditorDescription"
-          @blur.native.capture="dirtyFields.description && touchField('description')"
-        />
+        <div :class="{ 'ds-input-has-error': visibleErrors && visibleErrors.description }">
+          <editor
+            name="description"
+            model="description"
+            :users="null"
+            :value="formData.description"
+            :hashtags="null"
+            @input="updateEditorDescription"
+            @blur.native.capture="dirtyFields.description && touchField('description')"
+          />
+        </div>
         <os-validation-hint
           :count="descriptionLength"
           :max="formSchema.description.min"
@@ -108,16 +118,26 @@
         <p class="ds-text select-label">
           {{ $t('group.actionRadius') }}
         </p>
-        <action-radius-select
-          v-model="formData.actionRadius"
-          @change.native="changeActionRadius($event)"
-          @blur.native="touchField('actionRadius')"
-        />
+        <div
+          class="select-wrap"
+          :class="{
+            'ds-input-has-error':
+              visibleErrors && visibleErrors.actionRadius && formData.actionRadius === '',
+          }"
+        >
+          <action-radius-select
+            v-model="formData.actionRadius"
+            @change.native="changeActionRadius($event)"
+            @blur.native="touchField('actionRadius')"
+          />
+        </div>
         <os-validation-hint
           v-if="visibleErrors && visibleErrors.actionRadius && formData.actionRadius === ''"
           variant="error"
           :text="$t('group.validations.actionRadiusRequired')"
         />
+
+        <div class="ds-mt-small ds-mb-large"></div>
 
         <!-- location -->
         <location-select v-model="formData.locationName" />
@@ -340,8 +360,20 @@ export default {
     },
     onSubmit() {
       // Block creating a group of a type the user may not create (the button is grayed;
-      // this also guards keyboard Enter and direct navigation to the form).
-      if (!this.update && !this.$can(`group.create_${this.formData.groupType}`)) return
+      // this also guards keyboard Enter and direct navigation to the form). Only once a
+      // type is actually chosen — same fix as canCreateSelectedGroup: checking
+      // `$can('group.create_')` (empty suffix) for an untouched, still-empty groupType
+      // is never true for anyone, so this used to silently block every submit attempt
+      // on a fresh form (no validation, no toast, nothing) even for an admin who can
+      // create every type. Submitting with no type chosen should fall through to
+      // formSubmit() instead, so the schema's own "groupType is required" catches it
+      // and shows the usual error + toast like any other invalid field.
+      if (
+        !this.update &&
+        this.formData.groupType &&
+        !this.$can(`group.create_${this.formData.groupType}`)
+      )
+        return
       // Switching an existing group TO hidden additionally needs group.create_hidden
       // (the privacy-raising transition). Editing an already-hidden group is fine.
       if (
@@ -398,6 +430,15 @@ export default {
   padding-bottom: 14px;
 }
 
+/* Editor's own margin-top lives on .editor-content (the space between its
+   own toolbar and the text area) — same override ContributionForm.vue
+   uses for its own description-style editor field, matched to the
+   label's own gap above the toolbar rather than the component's larger
+   default. */
+.group-form .select-label + div .editor-content {
+  margin-top: var(--space-x-small);
+}
+
 .group-form {
   display: flex;
   flex-direction: column;
@@ -407,6 +448,7 @@ export default {
     flex-direction: row;
     align-items: center;
     gap: var(--space-x-small);
+    margin-top: var(--space-x-small);
     margin-bottom: var(--space-x-large);
 
     label.is-disabled {
@@ -414,23 +456,36 @@ export default {
     }
   }
 
-  /* Fixed gap after the groupType <select> itself, not a negative margin on
-     .show-members-control counting on the validation hint above it always
-     being there to cancel out — that hint (like every os-validation-hint
-     here) is only actually in the DOM while there's something to show
-     (v-if), so with no error present there was nothing for the negative
-     margin to cancel, pulling the checkbox up into/over the select. */
-  > select {
-    margin-bottom: var(--space-x-small);
+  > .ds-form-item {
+    margin: 0;
   }
 
-  > .ds-form-item {
+  /* Same zeroed margin as .ds-form-item above (OcelotInput's own root) —
+     without it, the groupType/actionRadius selects sat noticeably further
+     from their validation hint below than name/description do, since
+     those two are the only fields wrapped in an extra div (for the
+     ds-input-has-error red border; see the template) and that div had no
+     margin reset of its own. */
+  > .select-wrap {
     margin: 0;
   }
 
   > .os-validation-hint {
     margin-bottom: var(--space-base);
     cursor: default;
+  }
+
+  /* .show-members-control's own margin-top (8px, above) assumes it's
+     sitting right after the groupType select directly. When the select's
+     validation hint is showing instead (error state), that hint's own
+     margin-bottom (16px, from the rule above — meant for the general case
+     of one field's hint to the next field) adds to those 8px instead of
+     collapsing with them (flex containers never collapse sibling
+     margins), pulling the checkbox noticeably further down than in the
+     no-error case. Cancel just the hint's margin here so the gap stays
+     the same small size either way. */
+  > .os-validation-hint + .show-members-control {
+    margin-top: calc(var(--space-x-small) - var(--space-base));
   }
 
   /* :not(.os-validation-hint) — without it, this ALSO matches

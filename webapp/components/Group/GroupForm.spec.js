@@ -122,6 +122,26 @@ describe('GroupForm', () => {
       expect(wrapper.emitted('createGroup')).toBeFalsy()
     })
 
+    it('visually flags every invalid field (not just name) once an empty form is submitted', async () => {
+      wrapper = mountFresh()
+      wrapper.find('form').trigger('submit')
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.visibleErrors).toEqual({
+        name: expect.any(String),
+        groupType: expect.any(String),
+        description: expect.any(String),
+        actionRadius: expect.any(String),
+      })
+      const errorWraps = wrapper.findAll('.ds-input-has-error')
+      // OcelotInput (name) applies this class to its own root itself; the
+      // other three (groupType <select>, description <editor>,
+      // actionRadius <action-radius-select>) get it from the wrapping div
+      // added around each, since none of those components track/apply it
+      // on their own the way OcelotInput does.
+      expect(errorWraps).toHaveLength(4)
+    })
+
     it('saves once the form becomes valid', async () => {
       wrapper = mountFresh()
       await wrapper.vm.$set(wrapper.vm.formData, 'name', 'A valid name')
@@ -184,6 +204,17 @@ describe('GroupForm', () => {
     // Flat model: each group type is gated by its own permission. A user who can
     // create public/closed groups but not hidden ones.
     const canExceptHidden = (p) => p !== 'group.create_hidden'
+
+    it('does not block onSubmit for someone who can create every type but has not picked one yet', () => {
+      const wrapper = mountWith(() => true)
+      const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
+      expect(wrapper.vm.formData.groupType).toBe('')
+      wrapper.vm.onSubmit()
+      // Falls through to formSubmit()/validation instead of silently
+      // returning — the schema's own "groupType is required" is what
+      // should catch and report the still-missing type, not this guard.
+      expect(formSubmit).toHaveBeenCalled()
+    })
 
     it('blocks onSubmit for a hidden group without group.create_hidden', () => {
       const wrapper = mountWith(canExceptHidden)
