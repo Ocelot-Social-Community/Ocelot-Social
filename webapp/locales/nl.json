@@ -962,6 +962,7 @@
     "updatedGroup": "De groepsgegevens zijn gewijzigd.",
     "validations": {
       "actionRadiusRequired": "Kies een actieradius.",
+      "descriptionLength": "De beschrijving moet minstens {min} tekens lang zijn.",
       "descriptionNotEmpty": "Voer een beschrijving in.",
       "groupTypeRequired": "Kies een groepstype.",
       "nameLength": "De naam moet tussen {min} en {max} tekens lang zijn.",

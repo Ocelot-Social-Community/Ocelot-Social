@@ -180,13 +180,22 @@ describe('GroupForm', () => {
     })
 
     describe('description validation', () => {
-      it('surfaces a real (non-empty) error message once touched', async () => {
+      it('reports an empty description', async () => {
         wrapper = mountFresh()
         wrapper.vm.updateEditorDescription('')
         await wrapper.vm.$nextTick()
         wrapper.vm.touchField('description')
         await wrapper.vm.$nextTick()
         expect(wrapper.vm.visibleErrors.description).toBe('group.validations.descriptionNotEmpty')
+      })
+
+      it('reports a description that is too short, distinctly from an empty one', async () => {
+        wrapper = mountFresh()
+        wrapper.vm.updateEditorDescription('Hi')
+        await wrapper.vm.$nextTick()
+        wrapper.vm.touchField('description')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.visibleErrors.description).toBe('group.validations.descriptionLength')
       })
     })
 

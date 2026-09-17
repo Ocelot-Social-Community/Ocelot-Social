@@ -962,6 +962,7 @@
     "updatedGroup": "Дані групи змінено.",
     "validations": {
       "actionRadiusRequired": "Будь ласка, виберіть радіус дії.",
+      "descriptionLength": "Опис повинен містити щонайменше {min} символів.",
       "descriptionNotEmpty": "Будь ласка, введіть опис.",
       "groupTypeRequired": "Будь ласка, виберіть тип групи.",
       "nameLength": "Назва повинна містити від {min} до {max} символів.",

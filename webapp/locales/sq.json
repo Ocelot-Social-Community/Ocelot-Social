@@ -962,6 +962,7 @@
     "updatedGroup": "Të dhënat e grupit u ndryshuan.",
     "validations": {
       "actionRadiusRequired": "Ju lutem zgjidhni një rreze veprimi.",
+      "descriptionLength": "Përshkrimi duhet të ketë të paktën {min} karaktere.",
       "descriptionNotEmpty": "Ju lutem shkruani një përshkrim.",
       "groupTypeRequired": "Ju lutem zgjidhni një lloj grupi.",
       "nameLength": "Emri duhet të ketë midis {min} dhe {max} karaktere.",

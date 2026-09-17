@@ -108,7 +108,6 @@
         </div>
         <os-validation-hint
           :count="descriptionLength"
-          :max="formSchema.description.min"
           :variant="visibleErrors && visibleErrors.description ? 'error' : null"
           :text="visibleErrors && visibleErrors.description"
         />
@@ -288,11 +287,24 @@ export default {
           required: true,
           min: branding.group.descriptionMinLength,
           validator: (_, value = '') => {
-            if (this.$filters.removeHtml(value).length < this.formSchema.description.min) {
+            const plainText = this.$filters.removeHtml(value)
+            if (plainText.length < this.formSchema.description.min) {
+              // Same empty-vs-too-short distinction as nameErrorText: someone who
+              // typed a few characters did enter a description, so telling them
+              // to "enter a description" (descriptionNotEmpty) would be wrong —
+              // only a genuinely empty field gets that message.
               // A bare new Error() (no message) leaves formErrors.description as
               // '' — falsy, so a plain `visibleErrors && visibleErrors.description`
               // check (the validation hint's :text binding) never actually fires.
-              return [new Error(this.$t('group.validations.descriptionNotEmpty'))]
+              return [
+                new Error(
+                  plainText.trim()
+                    ? this.$t('group.validations.descriptionLength', {
+                        min: this.formSchema.description.min,
+                      })
+                    : this.$t('group.validations.descriptionNotEmpty'),
+                ),
+              ]
             }
             return []
           },

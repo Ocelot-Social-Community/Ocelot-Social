@@ -962,6 +962,7 @@
     "updatedGroup": "Die Gruppendaten wurden geändert!",
     "validations": {
       "actionRadiusRequired": "Bitte einen Aktionsradius wählen.",
+      "descriptionLength": "Die Beschreibung muss mindestens {min} Zeichen lang sein.",
       "descriptionNotEmpty": "Bitte eine Beschreibung eingeben.",
       "groupTypeRequired": "Bitte einen Gruppentyp wählen.",
       "nameLength": "Der Name muss zwischen {min} und {max} Zeichen lang sein.",

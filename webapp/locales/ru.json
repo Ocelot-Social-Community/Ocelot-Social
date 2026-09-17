@@ -962,6 +962,7 @@
     "updatedGroup": "Данные группы изменены.",
     "validations": {
       "actionRadiusRequired": "Пожалуйста, выберите радиус действия.",
+      "descriptionLength": "Описание должно содержать не менее {min} символов.",
       "descriptionNotEmpty": "Пожалуйста, введите описание.",
       "groupTypeRequired": "Пожалуйста, выберите тип группы.",
       "nameLength": "Название должно содержать от {min} до {max} символов.",
