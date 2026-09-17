@@ -965,7 +965,9 @@
       "descriptionNotEmpty": "Proszę podać opis.",
       "groupTypeRequired": "Proszę wybrać typ grupy.",
       "nameLength": "Nazwa musi mieć od {min} do {max} znaków.",
-      "nameNotEmpty": "Proszę podać nazwę grupy."
+      "nameNotEmpty": "Proszę podać nazwę grupy.",
+      "slugInvalidCharacters": "Dozwolone są tylko małe litery, cyfry, myślniki i podkreślenia.",
+      "slugNotEmpty": "Proszę podać unikalną nazwę grupy."
     }
   },
   "hashtags-filter": {

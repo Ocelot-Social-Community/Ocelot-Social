@@ -25,7 +25,14 @@
           :label="$t('group.labelSlug')"
           model="slug"
           prefix="&amp;"
+          hide-error
+          @blur="dirtyFields.slug && touchField('slug')"
         ></ocelot-input>
+        <os-validation-hint
+          v-if="update"
+          :variant="visibleErrors && visibleErrors.slug ? 'error' : null"
+          :text="visibleErrors && visibleErrors.slug"
+        />
 
         <div v-if="update" class="ds-mb-base"></div>
 
@@ -251,7 +258,29 @@ export default {
           min: branding.group.nameLengthMin,
           max: branding.group.nameLengthMax,
         },
-        slug: { required: false, min: branding.group.nameLengthMin },
+        slug: {
+          type: 'string',
+          // Only rendered/editable in update mode (see the template's
+          // v-if="update") — on create, formData.slug stays empty and the
+          // backend derives a fresh one from the name instead, so it must
+          // stay optional there or an untouched create form could never
+          // be submitted.
+          required: this.update,
+          min: branding.group.nameLengthMin,
+          validator: (_, value = '') => {
+            if (!this.update) return []
+            if (!value.trim()) {
+              return [new Error(this.$t('group.validations.slugNotEmpty'))]
+            }
+            // Mirrors the backend's own slug pattern (db/schema/entities/patterns.ts'
+            // SLUG) — without this, an invalid value typed here only surfaces as a
+            // generic save failure after the round trip to the server.
+            if (!/^[a-z0-9_-]+$/.test(value)) {
+              return [new Error(this.$t('group.validations.slugInvalidCharacters'))]
+            }
+            return []
+          },
+        },
         groupType: { required: true, min: 1 },
         about: { required: false },
         description: {
@@ -494,6 +523,16 @@ export default {
      the same small size either way. */
   > .os-validation-hint + .show-members-control {
     margin-top: calc(var(--space-x-small) - var(--space-base));
+  }
+
+  /* Same double-margin problem as above, one field over: the slug field's
+     own space-base spacer div (see template) assumes it sits right after
+     the input — when the slug hint renders between them instead (error
+     state), its own margin-bottom already provides that gap, so the
+     spacer's identical margin would otherwise just add another one on
+     top. */
+  > .os-validation-hint + .ds-mb-base {
+    margin-bottom: 0;
   }
 
   /* :not(.os-validation-hint) — without it, this ALSO matches

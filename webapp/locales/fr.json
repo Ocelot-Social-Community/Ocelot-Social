@@ -965,7 +965,9 @@
       "descriptionNotEmpty": "Veuillez saisir une description.",
       "groupTypeRequired": "Veuillez choisir un type de groupe.",
       "nameLength": "Le nom doit comporter entre {min} et {max} caractères.",
-      "nameNotEmpty": "Veuillez saisir un nom de groupe."
+      "nameNotEmpty": "Veuillez saisir un nom de groupe.",
+      "slugInvalidCharacters": "Seuls les lettres minuscules, les chiffres, les tirets et les underscores sont autorisés.",
+      "slugNotEmpty": "Veuillez saisir un nom de groupe unique."
     }
   },
   "hashtags-filter": {

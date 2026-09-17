@@ -965,7 +965,9 @@
       "descriptionNotEmpty": "Por favor, insira uma descrição.",
       "groupTypeRequired": "Por favor, escolha um tipo de grupo.",
       "nameLength": "O nome deve ter entre {min} e {max} caracteres.",
-      "nameNotEmpty": "Por favor, insira um nome de grupo."
+      "nameNotEmpty": "Por favor, insira um nome de grupo.",
+      "slugInvalidCharacters": "Só são permitidas letras minúsculas, números, hífens e sublinhados.",
+      "slugNotEmpty": "Por favor, insira um nome único de grupo."
     }
   },
   "hashtags-filter": {

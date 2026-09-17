@@ -965,7 +965,9 @@
       "descriptionNotEmpty": "Voer een beschrijving in.",
       "groupTypeRequired": "Kies een groepstype.",
       "nameLength": "De naam moet tussen {min} en {max} tekens lang zijn.",
-      "nameNotEmpty": "Voer een groepsnaam in."
+      "nameNotEmpty": "Voer een groepsnaam in.",
+      "slugInvalidCharacters": "Alleen kleine letters, cijfers, koppeltekens en underscores zijn toegestaan.",
+      "slugNotEmpty": "Voer een unieke groepsnaam in."
     }
   },
   "hashtags-filter": {

@@ -965,7 +965,9 @@
       "descriptionNotEmpty": "Inserire una descrizione.",
       "groupTypeRequired": "Selezionare un tipo di gruppo.",
       "nameLength": "Il nome deve essere compreso tra {min} e {max} caratteri.",
-      "nameNotEmpty": "Inserire un nome del gruppo."
+      "nameNotEmpty": "Inserire un nome del gruppo.",
+      "slugInvalidCharacters": "Sono ammessi solo lettere minuscole, numeri, trattini e trattini bassi.",
+      "slugNotEmpty": "Inserire un nome unico del gruppo."
     }
   },
   "hashtags-filter": {

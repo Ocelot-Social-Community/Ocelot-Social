@@ -965,7 +965,9 @@
       "descriptionNotEmpty": "Ju lutem shkruani një përshkrim.",
       "groupTypeRequired": "Ju lutem zgjidhni një lloj grupi.",
       "nameLength": "Emri duhet të ketë midis {min} dhe {max} karaktere.",
-      "nameNotEmpty": "Ju lutem shkruani një emër grupi."
+      "nameNotEmpty": "Ju lutem shkruani një emër grupi.",
+      "slugInvalidCharacters": "Lejohen vetëm shkronja të vogla, shifra, viza dhe nënvija.",
+      "slugNotEmpty": "Ju lutem shkruani një emër unik grupi."
     }
   },
   "hashtags-filter": {

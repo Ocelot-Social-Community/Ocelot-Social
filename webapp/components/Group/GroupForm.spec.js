@@ -189,6 +189,45 @@ describe('GroupForm', () => {
         expect(wrapper.vm.visibleErrors.description).toBe('group.validations.descriptionNotEmpty')
       })
     })
+
+    describe('slug validation', () => {
+      const mountEdit = () => mountFresh({ update: true, group })
+
+      it('is not rendered at all when creating a new group', () => {
+        wrapper = mountFresh()
+        expect(wrapper.find('input[name="slug"]').exists()).toBe(false)
+      })
+
+      it('reports an empty slug', async () => {
+        wrapper = mountEdit()
+        const slugInput = wrapper.find('input[name="slug"]')
+        slugInput.setValue('')
+        await wrapper.vm.$nextTick()
+        slugInput.trigger('blur')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.visibleErrors.slug).toBe('group.validations.slugNotEmpty')
+      })
+
+      it('rejects characters outside the backend slug pattern', async () => {
+        wrapper = mountEdit()
+        const slugInput = wrapper.find('input[name="slug"]')
+        slugInput.setValue('My Slug!')
+        await wrapper.vm.$nextTick()
+        slugInput.trigger('blur')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.visibleErrors.slug).toBe('group.validations.slugInvalidCharacters')
+      })
+
+      it('accepts a valid slug', async () => {
+        wrapper = mountEdit()
+        const slugInput = wrapper.find('input[name="slug"]')
+        slugInput.setValue('valid-slug_123')
+        await wrapper.vm.$nextTick()
+        slugInput.trigger('blur')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.visibleErrors?.slug).toBeUndefined()
+      })
+    })
   })
 
   describe('per-type create permissions (group.create_*)', () => {

@@ -965,7 +965,9 @@
       "descriptionNotEmpty": "Please enter a description.",
       "groupTypeRequired": "Please choose a group type.",
       "nameLength": "The name must be between {min} and {max} characters.",
-      "nameNotEmpty": "Please enter a group name."
+      "nameNotEmpty": "Please enter a group name.",
+      "slugInvalidCharacters": "Only lowercase letters, digits, hyphens and underscores are allowed.",
+      "slugNotEmpty": "Please enter a unique group name."
     }
   },
   "hashtags-filter": {
