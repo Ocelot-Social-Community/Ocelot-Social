@@ -8,7 +8,6 @@
           :label="$t('group.name')"
           model="name"
           autofocus
-          :placeholder="`${$t('group.name')} …`"
           hide-error
           @blur="dirtyFields.name && touchField('name')"
         />
@@ -26,7 +25,6 @@
           :label="$t('group.labelSlug')"
           model="slug"
           prefix="&amp;"
-          :placeholder="`${$t('group.labelSlug')} …`"
         ></ocelot-input>
 
         <div v-if="update" class="ds-mb-base"></div>
@@ -82,13 +80,7 @@
         </div>
 
         <!-- goal -->
-        <ocelot-input
-          name="about"
-          :label="$t('group.goal')"
-          v-model="formData.about"
-          :placeholder="$t('group.goal') + ' …'"
-          rows="3"
-        />
+        <ocelot-input name="about" :label="$t('group.goal')" v-model="formData.about" rows="3" />
 
         <div class="ds-mb-base"></div>
 
