@@ -435,6 +435,25 @@ describe('osLocationMap', () => {
     expect(ctx.markerInstance.setLngLat).toHaveBeenLastCalledWith([9.63, 48.87])
   })
 
+  // A host that resolves a drag to a deliberately coarse match (e.g. groups
+  // snapping to a place/region/country center) can resolve back to the exact
+  // same lat/lng the pin already had — even though the marker's own
+  // on-screen position has since diverged, moved there by the drag itself.
+  // A plain lat/lng comparison would never detect that as "changed" and so
+  // would never correct the marker back; pinRevision exists to force it.
+  it('repositions the marker via pinRevision even when lat/lng come back unchanged', async () => {
+    const wrapper = mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', lat: 52.5, lng: 13.4 },
+    })
+    ctx.markerInstance.setLngLat.mockClear()
+
+    // Same lat/lng as already set — only pinRevision changes.
+    await wrapper.setProps({ lat: 52.5, lng: 13.4, pinRevision: 1 })
+
+    expect(ctx.mapboxGl.Marker).toHaveBeenCalledTimes(1)
+    expect(ctx.markerInstance.setLngLat).toHaveBeenCalledWith([13.4, 52.5])
+  })
+
   it('updates the existing marker draggable state when editable changes', async () => {
     const wrapper = mount(OsLocationMap, {
       props: {

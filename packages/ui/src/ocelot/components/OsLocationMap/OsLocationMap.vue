@@ -80,6 +80,21 @@
         type: Number as PropType<number | null>,
         default: null,
       },
+      /**
+       * Bump this (e.g. an incrementing counter) whenever the host app wants
+       * the marker to resync to the current lat/lng, even if those values
+       * happen to be unchanged from before. Needed when something OTHER than
+       * this component moved the marker in the meantime — a host that
+       * reverse-geocodes a drag to a deliberately coarse match (e.g. a
+       * city-level point) can resolve back to the exact same lat/lng the pin
+       * already had, and a plain lat/lng watch would then never fire to
+       * correct the marker's own, now-diverged on-screen position (moved by
+       * the drag itself) back to it.
+       */
+      pinRevision: {
+        type: [Number, String] as PropType<number | string>,
+        default: 0,
+      },
       /** CSS color for the pin (mapbox-gl Marker's own `color` option). */
       pinColor: {
         type: String,
@@ -301,8 +316,11 @@
         map.flyTo({ center: [props.lng, props.lat], zoom })
       }
 
+      // pinRevision is included purely to force this watcher to re-run even
+      // when lat/lng come back numerically unchanged (see its own doc
+      // comment above) — its value is otherwise unused here.
       watch(
-        () => [props.lat, props.lng],
+        () => [props.lat, props.lng, props.pinRevision],
         () => {
           updateMarker()
           flyToPin()

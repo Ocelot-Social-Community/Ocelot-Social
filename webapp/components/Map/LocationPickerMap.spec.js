@@ -201,6 +201,34 @@ describe('LocationPickerMap', () => {
       })
     })
 
+    describe('pinRevision', () => {
+      // A drag that resolves back to the exact same lat/lng it already had
+      // (e.g. dragging within the same place under precision="resolved")
+      // would never make OsLocationMap's own lat/lng watcher fire again — it
+      // only detects a VALUE change. pinRevision is a separate, always-
+      // incrementing signal so the marker still resyncs to its now-diverged
+      // on-screen position (moved there by the drag itself) even then.
+      it('increments and is passed to OsLocationMap so the marker resyncs even to an unchanged lat/lng', async () => {
+        mocks.$apollo.query.mockResolvedValue(resolvedLocation())
+        wrapper = Wrapper({ precision: 'resolved' })
+        expect(wrapper.vm.pinRevision).toBe(0)
+
+        await wrapper.vm.onPinChange({ lat: 52.5, lng: 13.4 })
+
+        expect(wrapper.vm.pinRevision).toBe(1)
+        expect(wrapper.findComponent({ name: 'OsLocationMap' }).props('pinRevision')).toBe(1)
+      })
+
+      it('also increments when reverse-geocoding fails', async () => {
+        mocks.$apollo.query.mockRejectedValue(new Error('Network error'))
+        wrapper = Wrapper()
+
+        await wrapper.vm.onPinChange({ lat: 52.5, lng: 13.4 })
+
+        expect(wrapper.vm.pinRevision).toBe(1)
+      })
+    })
+
     describe('precision="resolved" (groups)', () => {
       it("snaps the pin to the matched place's own coordinate instead of the raw click", async () => {
         mocks.$apollo.query.mockResolvedValue(resolvedLocation())

@@ -6,6 +6,7 @@
         :access-token="$env.MAPBOX_TOKEN"
         :lat="lat"
         :lng="lng"
+        :pin-revision="pinRevision"
         :initial-center="defaultCenter"
         :initial-zoom="4"
         :map-style="defaultStyleUrl"
@@ -125,6 +126,15 @@ export default {
       // already resolved — only the request matching the current value
       // applies its result/error.
       pinChangeRequestId: 0,
+      // Bumped every time a pin-change resolution actually lands (success or
+      // error), passed straight through to OsLocationMap's own "pinRevision"
+      // prop — see its doc comment: needed so the marker resyncs even when
+      // the resolved lat/lng come back identical to what they already were
+      // (e.g. dragging within the same place under precision="resolved"),
+      // which a plain lat/lng comparison alone would never detect as a
+      // change worth re-applying to the marker's own (by then diverged, via
+      // the drag itself) on-screen position.
+      pinRevision: 0,
     }
   },
   computed: {
@@ -215,6 +225,7 @@ export default {
         // instead — falls back to the raw click when nothing matched, same
         // as "exact" then has no choice but to do anyway.
         const usesResolvedCoordinates = this.precision === 'resolved' && match
+        this.pinRevision += 1
         this.$emit('input', {
           label,
           value: label,
@@ -228,6 +239,7 @@ export default {
         // still save/emit its raw coordinates so the field and the pin stay
         // in sync even though reverse-geocoding couldn't label them.
         const label = formatCoordinates(lat, lng)
+        this.pinRevision += 1
         this.$emit('input', { label, value: label, id: null, lat, lng })
         this.$toast.error(error.message)
       }
