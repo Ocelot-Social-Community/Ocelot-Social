@@ -557,6 +557,33 @@ describe(createOrUpdateLocations, () => {
     expect(requestedTypes).toEqual(['address', 'poi', 'place'])
   })
 
+  // groups.ts passes its own coarser list (place/region/country — a group's location is
+  // deliberately less precise than an event's exact pin) instead of relying on the
+  // address/poi/place default asserted above.
+  it('uses the caller-provided reverseGeocodeTypes instead of the default when given', async () => {
+    respondWith({ features: [] })
+
+    await expect(
+      withSession(async (session) =>
+        createOrUpdateLocations(
+          'Group',
+          'some-group',
+          'somewhere',
+          session,
+          locationContext(),
+          { lat: 0, lng: 0 },
+          ['place', 'region', 'country'],
+        ),
+      ),
+    ).rejects.toThrow('location coordinates are invalid')
+
+    const requestedTypes = fetchSpy.mock.calls.map(([input]) =>
+      new URL(input as string).searchParams.get('types'),
+    )
+
+    expect(requestedTypes).toEqual(['place', 'region', 'country'])
+  })
+
   // The forward-geocoding counterpart: free text Mapbox knows nothing about. Accepting it would
   // attach the node to a Location with an undefined id.
   it('refuses a location name Mapbox does not resolve', async () => {

@@ -40,6 +40,8 @@ const samplePayload = {
   groupType: 'public',
   actionRadius: 'regional',
   locationName: 'Berlin',
+  lat: 52.5,
+  lng: 13.4,
   categoryIds: ['c1'],
 }
 
@@ -66,6 +68,8 @@ describe('pages/groups/edit/_id/index.vue', () => {
         groupType: 'public',
         actionRadius: 'regional',
         locationName: 'Berlin',
+        lat: 52.5,
+        lng: 13.4,
         categoryIds: ['c1'],
       })
     })

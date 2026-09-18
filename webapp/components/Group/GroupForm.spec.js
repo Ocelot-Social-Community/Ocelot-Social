@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import GroupForm from './GroupForm.vue'
+import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import Vuex from 'vuex'
 
 const localVue = global.localVue
@@ -48,6 +49,33 @@ describe('GroupForm', () => {
 
     it('shows the name length as "count / min–max"', () => {
       expect(wrapper.find('.os-validation-hint').text()).toContain('0 / 3–50')
+    })
+  })
+
+  describe('location picker map', () => {
+    beforeEach(() => {
+      wrapper = mount(GroupForm, { propsData, mocks, localVue, stubs, store })
+    })
+
+    it('renders it with the coarser, group-appropriate precision/types/marker color', () => {
+      const map = wrapper.findComponent(LocationPickerMap)
+      expect(map.exists()).toBe(true)
+      expect(map.props('precision')).toBe('resolved')
+      expect(map.props('types')).toBe('place,region,country')
+      expect(map.props('markerColorToken')).toBe('--color-map-marker-group')
+    })
+
+    it('passes the current locationName through as the map location', async () => {
+      const location = { label: 'Berlin', value: 'Berlin', lat: 52.5, lng: 13.4 }
+      wrapper.vm.$set(wrapper.vm.formData, 'locationName', location)
+      await wrapper.vm.$nextTick()
+      expect(wrapper.findComponent(LocationPickerMap).props('location')).toEqual(location)
+    })
+
+    it('adopts a location the map emits (drag/click pin placement)', () => {
+      const picked = { label: 'Hamburg', value: 'Hamburg', id: 'place.hamburg', lat: 53.5, lng: 10 }
+      wrapper.findComponent(LocationPickerMap).vm.$emit('input', picked)
+      expect(wrapper.vm.formData.locationName).toEqual(picked)
     })
   })
 
@@ -151,6 +179,39 @@ describe('GroupForm', () => {
       wrapper.find('form').trigger('submit')
       await wrapper.vm.$nextTick()
       expect(wrapper.emitted('createGroup')).toBeTruthy()
+    })
+
+    describe('lat/lng on submit', () => {
+      const setValidFields = (vm) => {
+        vm.$set(vm.formData, 'name', 'A valid name')
+        vm.$set(vm.formData, 'groupType', 'public')
+        vm.$set(vm.formData, 'description', 'A long enough description text.')
+        vm.$set(vm.formData, 'actionRadius', 'regional')
+      }
+
+      it('includes the coordinates once locationName has been resolved (map pin or search result)', async () => {
+        wrapper = mountFresh()
+        setValidFields(wrapper.vm)
+        wrapper.vm.$set(wrapper.vm.formData, 'locationName', {
+          label: 'Berlin',
+          value: 'Berlin',
+          id: 'place.berlin',
+          lat: 52.5,
+          lng: 13.4,
+        })
+        wrapper.find('form').trigger('submit')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.emitted('createGroup')[0][0]).toMatchObject({ lat: 52.5, lng: 13.4 })
+      })
+
+      it('sends null coordinates while locationName is still a plain, unresolved string', async () => {
+        wrapper = mountFresh()
+        setValidFields(wrapper.vm)
+        wrapper.vm.$set(wrapper.vm.formData, 'locationName', 'Berlin')
+        wrapper.find('form').trigger('submit')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.emitted('createGroup')[0][0]).toMatchObject({ lat: null, lng: null })
+      })
     })
 
     describe('nameErrorText', () => {

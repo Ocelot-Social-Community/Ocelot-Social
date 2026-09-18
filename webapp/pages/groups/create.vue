@@ -46,6 +46,8 @@ export default {
         groupType,
         actionRadius,
         locationName,
+        lat,
+        lng,
         categoryIds,
         showMembers,
       } = value
@@ -56,6 +58,8 @@ export default {
         groupType,
         actionRadius,
         locationName,
+        lat,
+        lng,
         categoryIds,
         showMembers,
       }

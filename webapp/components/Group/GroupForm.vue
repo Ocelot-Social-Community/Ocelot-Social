@@ -137,6 +137,13 @@
 
         <!-- location -->
         <location-select v-model="formData.locationName" />
+        <location-picker-map
+          :location="formData.locationName"
+          precision="resolved"
+          types="place,region,country"
+          marker-color-token="--color-map-marker-group"
+          @input="onLocationPickerMapInput"
+        />
 
         <div class="ds-mb-base"></div>
 
@@ -192,6 +199,7 @@ import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import Editor from '~/components/Editor/Editor'
 import ActionRadiusSelect from '~/components/Select/ActionRadiusSelect'
 import LocationSelect from '~/components/Select/LocationSelect'
+import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
@@ -204,6 +212,7 @@ export default {
     Editor,
     ActionRadiusSelect,
     LocationSelect,
+    LocationPickerMap,
     OsButton,
     OsIcon,
     OsValidationHint,
@@ -339,6 +348,19 @@ export default {
           ? this.formData.locationName
           : ''
     },
+    // LocationSelect and LocationPickerMap both already resolve lat/lng
+    // (via forward/reverse geocoding) alongside the label when a search
+    // result or map pin is picked — a plain string here means the field
+    // still holds unresolved/typed text, no coordinates to send yet.
+    formLocationCoordinates() {
+      const locationValue = this.formData.locationName
+      const hasCoordinates =
+        typeof locationValue === 'object' &&
+        locationValue !== null &&
+        typeof locationValue.lat === 'number' &&
+        typeof locationValue.lng === 'number'
+      return hasCoordinates ? { lat: locationValue.lat, lng: locationValue.lng } : null
+    },
     descriptionLength() {
       return this.$filters.removeHtml(this.formData.description).length
     },
@@ -386,6 +408,9 @@ export default {
     changeLocation(event) {
       this.formData.locationName = event.target.value
     },
+    onLocationPickerMapInput(location) {
+      this.formData.locationName = location
+    },
     updateEditorDescription(value) {
       this.updateFormField('description', value)
     },
@@ -429,6 +454,8 @@ export default {
         description,
         actionRadius,
         locationName: this.formLocationName,
+        lat: this.formLocationCoordinates?.lat ?? null,
+        lng: this.formLocationCoordinates?.lng ?? null,
         categoryIds,
         showMembers: this.effectiveShowMembers,
       }
@@ -570,6 +597,14 @@ export default {
 
   > .select-field {
     align-self: flex-end;
+  }
+
+  /* Tight coupling to the location field it belongs to — same value
+     ContributionForm.vue uses for its own LocationSelect+LocationPickerMap
+     pairing. The following ds-mb-base spacer (see template) still provides
+     the usual gap from here to the next field group. */
+  > .location-picker-map {
+    margin-top: var(--space-small);
   }
 
   > .buttons {

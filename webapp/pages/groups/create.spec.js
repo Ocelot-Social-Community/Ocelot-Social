@@ -34,6 +34,8 @@ const samplePayload = {
   groupType: 'public',
   actionRadius: 'regional',
   locationName: 'Berlin',
+  lat: 52.5,
+  lng: 13.4,
   categoryIds: ['c1', 'c2'],
 }
 
@@ -60,6 +62,8 @@ describe('pages/groups/create.vue', () => {
         groupType: 'public',
         actionRadius: 'regional',
         locationName: 'Berlin',
+        lat: 52.5,
+        lng: 13.4,
         categoryIds: ['c1', 'c2'],
       })
     })
