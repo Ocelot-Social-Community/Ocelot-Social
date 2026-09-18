@@ -281,16 +281,23 @@
           // Restored to whatever the mode currently calls for on dragend, not
           // unconditionally cleared — isPicking may still be armed by then.
           marker.on('dragstart', () => {
+            /* v8 ignore start -- map is only ever nulled in onBeforeUnmount,
+               via map.remove() — which tears down its markers first, so no
+               further drag event can reach this handler afterwards;
+               unreachable through the component's own lifecycle. */
             if (map) {
               map.getCanvas().style.cursor = 'grabbing'
             }
+            /* v8 ignore stop */
           })
           marker.on('dragend', () => {
             const { lng, lat } = marker.getLngLat()
             emit('pin-change', { lat, lng })
+            /* v8 ignore start -- see the dragstart handler above */
             if (map) {
               map.getCanvas().style.cursor = isPicking ? PICKER_CURSOR : ''
             }
+            /* v8 ignore stop */
           })
           if (props.viewOnMap) {
             const el = marker.getElement()
