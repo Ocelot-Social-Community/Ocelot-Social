@@ -3,7 +3,7 @@
  *
  * Real `mapbox-gl` requires WebGL/canvas APIs jsdom doesn't provide, so any
  * component that imports it (directly, or transitively through
- * EventLocationMap/ContributionForm) needs this stub to be mountable in
+ * LocationPickerMap/ContributionForm) needs this stub to be mountable in
  * tests. Individual spec files (e.g. pages/map.spec.js) may still call
  * `jest.mock('mapbox-gl', factory)` locally for a richer, test-specific
  * fake — that takes precedence over this fallback.

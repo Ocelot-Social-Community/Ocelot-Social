@@ -315,7 +315,7 @@ export default {
     },
     // Mapbox's icon-opacity paint property needs a resolved number, not a
     // live var() reference, hence getComputedStyle() instead of just passing
-    // "var(--opacity-soft)" straight through — mirrors how EventLocationMap
+    // "var(--opacity-soft)" straight through — mirrors how LocationPickerMap
     // resolves --color-map-marker-event for the pin color.
     pastEventOpacity() {
       if (typeof window === 'undefined') return PAST_EVENT_OPACITY_FALLBACK
@@ -482,7 +482,7 @@ export default {
         parent.insertBefore(container, parent.firstChild)
       }
     },
-    // Reverse-geocodes the clicked point (same endpoint/types EventLocationMap's
+    // Reverse-geocodes the clicked point (same endpoint/types LocationPickerMap's
     // own onPinChange uses) so the create-event page opens with a resolved
     // address ready to submit, not just bare coordinates that would only
     // resolve later inside the form. Shows a busy cursor for that brief

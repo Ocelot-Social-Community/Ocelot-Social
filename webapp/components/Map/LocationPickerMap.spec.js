@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import EventLocationMap from './EventLocationMap'
+import LocationPickerMap from './LocationPickerMap'
 import { queryLocations } from '~/graphql/location'
 
 const localVue = global.localVue
@@ -13,10 +13,10 @@ let mocks
 let wrapper
 
 const Wrapper = (propsData = {}) => {
-  return mount(EventLocationMap, { mocks, localVue, propsData, stubs })
+  return mount(LocationPickerMap, { mocks, localVue, propsData, stubs })
 }
 
-describe('EventLocationMap', () => {
+describe('LocationPickerMap', () => {
   beforeEach(() => {
     mocks = {
       $t: jest.fn((string) => string),

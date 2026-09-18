@@ -1,5 +1,5 @@
 <template>
-  <div class="event-location-map">
+  <div class="location-picker-map">
     <client-only v-if="!isEmpty($env.MAPBOX_TOKEN)">
       <os-location-map
         :mapbox-gl="mapboxgl"
@@ -50,7 +50,7 @@ function formatCoordinates(lat, lng) {
 }
 
 export default {
-  name: 'EventLocationMap',
+  name: 'LocationPickerMap',
   components: { OsLocationMap, Empty },
   props: {
     // Either a plain string (not yet geocoded) or an object as produced by
@@ -205,7 +205,7 @@ export default {
 <style>
 @import 'mapbox-gl/dist/mapbox-gl.css';
 
-.event-location-map {
+.location-picker-map {
   /* All map tools (zoom, fullscreen, geolocate, pick-location/view-on-map,
      style-switcher) now stack in the top-right corner instead of splitting
      across both sides — taller than before so that stack doesn't crowd out

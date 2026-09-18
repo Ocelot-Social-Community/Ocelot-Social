@@ -153,7 +153,7 @@
                 :endDate="post.eventEnd"
               />
             </div>
-            <event-location-map
+            <location-picker-map
               v-if="showEventMap"
               class="event-data__map"
               :location="eventMapLocation"
@@ -266,11 +266,11 @@ import CtaUnblockAuthor from '~/components/Empty/CallToAction/CtaUnblockAuthor.v
 import CtaJoinLeaveGroup from '~/components/Empty/CallToAction/CtaJoinLeaveGroup.vue'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import Dropdown from '~/components/Dropdown'
-import EventLocationMap from '~/components/Map/EventLocationMap'
 import GroupAvatarPopover from '~/components/GroupAvatar/GroupAvatarPopover'
 import HcCategory from '~/components/Category'
 import HcEmpty from '~/components/Empty/Empty'
 import HcHashtag from '~/components/Hashtag/Hashtag'
+import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 import { useShout } from '~/composables/useShout'
@@ -310,11 +310,11 @@ export default {
     CtaJoinLeaveGroup,
     DateTimeRange,
     Dropdown,
-    EventLocationMap,
     GroupAvatarPopover,
     HcCategory,
     HcEmpty,
     HcHashtag,
+    LocationPickerMap,
     LocationTeaser,
     OsActionButton,
     OsRibbon,
