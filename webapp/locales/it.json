@@ -926,6 +926,7 @@
     "muted": "Gruppo silenziato",
     "myGroups": "I miei gruppi",
     "name": "Nome del gruppo",
+    "previousLocation": "Posizione precedente: {location}",
     "radius": "Raggio",
     "removeMember": "Rimuovi membro",
     "removeMemberButton": "Rimuovi",

@@ -136,7 +136,18 @@
         />
 
         <!-- location -->
-        <location-select v-model="formData.locationName" :types="groupLocationTypes" />
+        <location-select
+          :value="formData.locationName"
+          :types="groupLocationTypes"
+          :show-previous-location="false"
+          @input="onLocationSelectInput"
+        />
+        <p
+          v-if="previousLocationName"
+          class="ds-text ds-text-soft ds-text-size-small previous-location-hint"
+        >
+          {{ $t('group.previousLocation', { location: previousLocationName }) }}
+        </p>
         <location-picker-map
           :location="formData.locationName"
           precision="resolved"
@@ -258,6 +269,29 @@ export default {
       groupTypeOptions: ['public', 'closed', 'hidden'],
       loadingGeo: false,
       cities: [],
+      // Whether the location has actually been changed by the user (map
+      // drag/click, or picking/typing a new one in the search box) — as
+      // opposed to LocationSelect's own auto-resolve of the group's already-
+      // saved locationName into a normalized object right on mount (e.g.
+      // "Hamburg" -> "Hamburg, Germany"). Without this, previousLocationName
+      // below would compare that normalized text against the raw saved
+      // string and show the hint immediately, even though nothing was
+      // actually picked yet.
+      locationChangedByUser: false,
+      // The auto-resolve above only ever fires once, and only when there
+      // was already a saved locationName to resolve — with nothing saved,
+      // every location-select input from the very start is a genuine pick.
+      ignoreNextLocationInput: !!locationName,
+      // The location as of the last successful save — starts as the
+      // group's own saved value, and is refreshed to match whatever was
+      // just saved after each further save (see submit()'s done callback).
+      // Read instead of this.group.locationName directly in
+      // previousLocationName below because the group prop itself doesn't
+      // necessarily update after a save (no refetch/navigation happens —
+      // the user just stays on the same edit form), so without this the
+      // hint would keep comparing against the value from when the form was
+      // first opened and never clear once saved.
+      savedLocationName: locationName || '',
       formData: {
         name: name || '',
         slug: slug || '',
@@ -373,6 +407,22 @@ export default {
         typeof locationValue.lng === 'number'
       return hasCoordinates ? { lat: locationValue.lat, lng: locationValue.lng } : null
     },
+    // The group's originally saved location — shown as a small note next to
+    // the field while editing, but only once the user has actually changed
+    // it to something else (so opening the form without touching the
+    // location shows nothing — locationChangedByUser guards against
+    // LocationSelect's own mount-time auto-resolve of the saved value
+    // otherwise counting as a change; see its own doc comment above).
+    // Meaningless on create, where nothing was ever saved yet —
+    // LocationSelect's own built-in "previous value" caption is turned off
+    // entirely for that same reason (see template); it only ever echoed the
+    // CURRENT value, not a genuine prior one.
+    previousLocationName() {
+      if (!this.update || !this.locationChangedByUser) return null
+      const original = this.savedLocationName
+      if (!original || original === this.formLocationName) return null
+      return original
+    },
     descriptionLength() {
       return this.$filters.removeHtml(this.formData.description).length
     },
@@ -421,6 +471,18 @@ export default {
       this.formData.locationName = event.target.value
     },
     onLocationPickerMapInput(location) {
+      this.locationChangedByUser = true
+      this.formData.locationName = location
+    },
+    onLocationSelectInput(location) {
+      // See ignoreNextLocationInput's own doc comment (data()) — the first
+      // input after mount is LocationSelect normalizing the already-saved
+      // value on its own, not a pick the user made.
+      if (this.ignoreNextLocationInput) {
+        this.ignoreNextLocationInput = false
+      } else {
+        this.locationChangedByUser = true
+      }
       this.formData.locationName = location
     },
     updateEditorDescription(value) {
@@ -471,8 +533,18 @@ export default {
         categoryIds,
         showMembers: this.effectiveShowMembers,
       }
-      const done = () => {
+      // pages/groups/edit/_id/index.vue calls this with `true` once the
+      // mutation actually succeeds (nothing on failure) — the edit form
+      // stays open afterwards rather than navigating away, so without this
+      // the previous-location hint above would keep comparing against the
+      // value from when the form was first opened and never clear once the
+      // new one is actually saved.
+      const done = (success) => {
         this.loading = false
+        if (success) {
+          this.savedLocationName = this.formLocationName
+          this.locationChangedByUser = false
+        }
       }
       this.update
         ? this.$emit('updateGroup', { ...variables, id: this.group.id }, done)
@@ -611,10 +683,20 @@ export default {
     align-self: flex-end;
   }
 
+  /* Tight to the field it's a note about, same as a validation hint would
+     be — overrides .ds-text's own sizeable default margin-bottom (1em),
+     which would otherwise push the map down further than intended. */
+  > .previous-location-hint {
+    margin-top: var(--space-xxx-small);
+    margin-bottom: var(--space-x-small);
+  }
+
   /* Tight coupling to the location field it belongs to — same value
      ContributionForm.vue uses for its own LocationSelect+LocationPickerMap
      pairing. The following ds-mb-base spacer (see template) still provides
-     the usual gap from here to the next field group. */
+     the usual gap from here to the next field group. Also the gap used when
+     .previous-location-hint (above) isn't rendered, so the map still sits
+     close to location-select either way. */
   > .location-picker-map {
     margin-top: var(--space-small);
   }

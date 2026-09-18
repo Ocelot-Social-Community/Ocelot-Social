@@ -926,6 +926,7 @@
     "muted": "Группа отключена",
     "myGroups": "Мои группы",
     "name": "Название группы",
+    "previousLocation": "Предыдущее местоположение: {location}",
     "radius": "Радиус",
     "removeMember": "Удалить участника",
     "removeMemberButton": "Удалить",

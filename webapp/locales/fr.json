@@ -926,6 +926,7 @@
     "muted": "Groupe en sourdine",
     "myGroups": "Mes groupes",
     "name": "Nom du groupe",
+    "previousLocation": "Emplacement précédent : {location}",
     "radius": "Rayon",
     "removeMember": "Retirer le membre",
     "removeMemberButton": "Retirer",

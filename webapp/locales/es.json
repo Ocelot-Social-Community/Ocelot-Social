@@ -926,6 +926,7 @@
     "muted": "Grupo silenciado",
     "myGroups": "Mis grupos",
     "name": "Nombre del grupo",
+    "previousLocation": "Ubicación anterior: {location}",
     "radius": "Radio",
     "removeMember": "Eliminar miembro",
     "removeMemberButton": "Eliminar",

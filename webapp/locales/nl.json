@@ -926,6 +926,7 @@
     "muted": "Groep gedempt",
     "myGroups": "Mijn groepen",
     "name": "Groepsnaam",
+    "previousLocation": "Vorige locatie: {location}",
     "radius": "Radius",
     "removeMember": "Lid verwijderen",
     "removeMemberButton": "Verwijderen",

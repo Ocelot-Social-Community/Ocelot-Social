@@ -926,6 +926,7 @@
     "muted": "Grupi u hesht",
     "myGroups": "Grupet e mia",
     "name": "Emri i grupit",
+    "previousLocation": "Vendndodhja e mëparshme: {location}",
     "radius": "Rrezja",
     "removeMember": "Hiq anëtarin",
     "removeMemberButton": "Hiq",

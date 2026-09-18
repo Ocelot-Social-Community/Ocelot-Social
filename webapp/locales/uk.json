@@ -926,6 +926,7 @@
     "muted": "Сповіщення групи вимкнено",
     "myGroups": "Мої групи",
     "name": "Назва групи",
+    "previousLocation": "Попереднє місцезнаходження: {location}",
     "radius": "Радіус",
     "removeMember": "Видалити учасника",
     "removeMemberButton": "Видалити",

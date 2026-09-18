@@ -926,6 +926,7 @@
     "muted": "Group muted",
     "myGroups": "My Groups",
     "name": "Group name",
+    "previousLocation": "Previous location: {location}",
     "radius": "Radius",
     "removeMember": "Remove member",
     "removeMemberButton": "Remove",

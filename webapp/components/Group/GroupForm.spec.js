@@ -105,6 +105,122 @@ describe('GroupForm', () => {
     ],
   }
 
+  describe('previousLocationName', () => {
+    const mountWith = (propsDataOverride) =>
+      mount(GroupForm, { propsData: propsDataOverride, mocks, localVue, stubs, store })
+
+    // The genuine interaction points — LocationSelect emitting 'input' (a
+    // pick from the dropdown, or the user's own typed text resolving) and
+    // LocationPickerMap emitting 'input' (a map click/drag) — as opposed to
+    // directly poking formData.locationName, which bypasses the
+    // locationChangedByUser tracking these tests are about.
+    const pickViaSelect = (value) => wrapper.findComponent(LocationSelect).vm.$emit('input', value)
+    const pickViaMap = (value) => wrapper.findComponent(LocationPickerMap).vm.$emit('input', value)
+
+    it('turns off LocationSelect\'s own built-in "previous value" caption', () => {
+      // That built-in caption only ever echoes the field's CURRENT value
+      // (see LocationSelect.vue), which isn't a useful comparison next to a
+      // select that's already showing its own current value — the hint
+      // below replaces it with a genuine previous-vs-current comparison.
+      wrapper = mountWith({ update: true, group: { ...group, locationName: 'Hamburg' } })
+      expect(wrapper.findComponent(LocationSelect).props('showPreviousLocation')).toBe(false)
+    })
+
+    it('is null when creating a new group (nothing was ever saved yet)', () => {
+      wrapper = mountWith({ update: false, group: {} })
+      pickViaSelect('Berlin')
+      expect(wrapper.vm.previousLocationName).toBeNull()
+    })
+
+    it('is null right after mount, before the location has been touched at all', () => {
+      wrapper = mountWith({ update: true, group: { ...group, locationName: 'Hamburg' } })
+      expect(wrapper.vm.formData.locationName).toBe('Hamburg')
+      expect(wrapper.vm.previousLocationName).toBeNull()
+    })
+
+    // The actual bug this covers: LocationSelect resolves the group's
+    // already-saved plain locationName into a normalized object right on
+    // mount (e.g. "Hamburg" -> { value: "Hamburg, Germany", ... }) purely to
+    // display it properly — not because anything was picked. That first
+    // 'input' must not count as a change, or the hint would show up
+    // immediately for every group that already has a location, regardless
+    // of whether the user touched it.
+    it("stays null through LocationSelect's own mount-time auto-resolve of the saved value", () => {
+      wrapper = mountWith({ update: true, group: { ...group, locationName: 'Hamburg' } })
+      pickViaSelect({ label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'place.hh' })
+      expect(wrapper.vm.previousLocationName).toBeNull()
+    })
+
+    it('is null while editing if the group never had a saved location', () => {
+      wrapper = mountWith({ update: true, group: { ...group, locationName: '' } })
+      pickViaSelect('Berlin')
+      expect(wrapper.vm.previousLocationName).toBeNull()
+    })
+
+    it('reports the saved location once a genuine pick via the search diverges from it', () => {
+      wrapper = mountWith({ update: true, group: { ...group, locationName: 'Hamburg' } })
+      // The suppressed auto-resolve (see test above) happens first...
+      pickViaSelect({ label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'place.hh' })
+      // ...then the user picks somewhere else.
+      pickViaSelect('Berlin')
+      expect(wrapper.vm.previousLocationName).toBe('Hamburg')
+    })
+
+    it('reports the saved location once the map pin is moved', () => {
+      wrapper = mountWith({ update: true, group: { ...group, locationName: 'Hamburg' } })
+      pickViaMap({ label: 'Berlin', value: 'Berlin', id: 'place.berlin', lat: 52.5, lng: 13.4 })
+      expect(wrapper.vm.previousLocationName).toBe('Hamburg')
+    })
+
+    it('shows the hint text once it applies, and hides it again once it does not', async () => {
+      wrapper = mountWith({ update: true, group: { ...group, locationName: 'Hamburg' } })
+      expect(wrapper.find('.previous-location-hint').exists()).toBe(false)
+
+      // The suppressed auto-resolve, same as LocationSelect's own would fire
+      // right after mount (see the dedicated test above) — a real drag/pick
+      // this fast essentially never happens, but keeping the sequence
+      // realistic here too rather than relying on that.
+      pickViaSelect({ label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'place.hh' })
+      pickViaSelect('Berlin')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('.previous-location-hint').text()).toBe('group.previousLocation')
+
+      pickViaSelect('Hamburg')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('.previous-location-hint').exists()).toBe(false)
+    })
+
+    it('clears once the change is actually saved, instead of comparing against the stale opened-with value', async () => {
+      wrapper = mountWith({ update: true, group: { ...group, locationName: 'Hamburg' } })
+      pickViaSelect({ label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'place.hh' })
+      pickViaSelect('Berlin')
+      expect(wrapper.vm.previousLocationName).toBe('Hamburg')
+
+      wrapper.vm.submit()
+      // The edit page stays open after a save (no navigation/remount), so
+      // the group prop itself never refreshes — only the done(true) callback
+      // tells the form the save actually went through.
+      const done = wrapper.emitted('updateGroup')[0][1]
+      done(true)
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.previousLocationName).toBeNull()
+      expect(wrapper.find('.previous-location-hint').exists()).toBe(false)
+    })
+
+    it('does not clear when the save fails', () => {
+      wrapper = mountWith({ update: true, group: { ...group, locationName: 'Hamburg' } })
+      pickViaSelect({ label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'place.hh' })
+      pickViaSelect('Berlin')
+
+      wrapper.vm.submit()
+      const done = wrapper.emitted('updateGroup')[0][1]
+      done()
+
+      expect(wrapper.vm.previousLocationName).toBe('Hamburg')
+    })
+  })
+
   describe('validation hints', () => {
     const mountFresh = (propsDataOverride = { update: false, group: {} }) =>
       mount(GroupForm, {
