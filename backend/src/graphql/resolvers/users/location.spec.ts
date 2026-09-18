@@ -541,7 +541,7 @@ describe(createOrUpdateLocations, () => {
           lng: 0,
         }),
       ),
-    ).rejects.toThrow('event location coordinates are invalid')
+    ).rejects.toThrow('location coordinates are invalid')
 
     // One request per type, none skipped: giving up after the first empty answer would refuse
     // every pin that sits on a POI or a place but not on an addressed building.

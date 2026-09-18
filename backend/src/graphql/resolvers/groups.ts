@@ -24,6 +24,40 @@ import { createOrUpdateLocations } from './users/location'
 
 import type { Context } from '@src/context'
 
+// Reverse-geocoded with these types (see createOrUpdateLocations) instead of
+// an event's precise address/poi/place — a group's location is deliberately
+// coarser than an event's exact pin, so it resolves to the general
+// place/region/country it was dropped in rather than a specific address.
+const GROUP_REVERSE_GEOCODE_TYPES = ['place', 'region', 'country']
+
+// Pulls lat/lng off params (so they never reach `SET group += $params` below
+// — a group has no lat/lng fields of its own, unlike Post) and validates
+// them, mirroring validateEventParams' own coordinate check. Returns null
+// when neither was given; throws when only one was, or either is out of
+// range.
+const extractGroupCoordinates = (params): { lat: number; lng: number } | null => {
+  const { lat, lng } = params
+  delete params.lat
+  delete params.lng
+  const hasLat = typeof lat === 'number'
+  const hasLng = typeof lng === 'number'
+  if (hasLat !== hasLng) {
+    throw new UserInputError('Group location requires both lat and lng, or neither!')
+  }
+  if (!hasLat) {
+    return null
+  }
+  if (!Number.isFinite(lat) || lat < -90 || lat > 90) {
+    throw new UserInputError('Group location latitude must be a finite number between -90 and 90!')
+  }
+  if (!Number.isFinite(lng) || lng < -180 || lng > 180) {
+    throw new UserInputError(
+      'Group location longitude must be a finite number between -180 and 180!',
+    )
+  }
+  return { lat, lng }
+}
+
 // Whether any Category nodes exist. Keeps CreateGroup graceful: the "categories
 // required" rule only applies when the policy is on AND there is at least one
 // category to choose from (mirrors the frontend gating in getCategoriesMixin).
@@ -190,6 +224,7 @@ export default {
       const { categoryIds } = params
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
+      const coordinates = extractGroupCoordinates(params)
       // Only require categories when the feature is on AND at least one category
       // exists — otherwise group creation would be impossible on an empty
       // category DB (mirrors the frontend gating in getCategoriesMixin).
@@ -256,7 +291,15 @@ export default {
           return group
         })
         // TODO: put in a middleware, see "UpdateGroup", "UpdateUser"
-        await createOrUpdateLocations('Group', params.id, params.locationName, session, context)
+        await createOrUpdateLocations(
+          'Group',
+          params.id,
+          params.locationName,
+          session,
+          context,
+          coordinates,
+          GROUP_REVERSE_GEOCODE_TYPES,
+        )
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
@@ -274,6 +317,7 @@ export default {
       const { id: groupId, avatar: avatarInput } = params
       delete params.avatar
       params.locationName = params.locationName === '' ? null : params.locationName
+      const coordinates = extractGroupCoordinates(params)
 
       if (policy.get('categoriesActive') && categoryIds) {
         if (categoryIds.length < branding.category.min) {
@@ -376,7 +420,15 @@ export default {
           return group
         })
         // TODO: put in a middleware, see "CreateGroup", "UpdateUser"
-        await createOrUpdateLocations('Group', params.id, params.locationName, session, context)
+        await createOrUpdateLocations(
+          'Group',
+          params.id,
+          params.locationName,
+          session,
+          context,
+          coordinates,
+          GROUP_REVERSE_GEOCODE_TYPES,
+        )
         if ('showMembers' in params) {
           void context.pubsub.publish(GROUP_SHOW_MEMBERS_CHANGED, {
             groupShowMembersChanged: { groupId },
