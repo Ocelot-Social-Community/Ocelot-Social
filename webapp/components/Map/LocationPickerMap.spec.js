@@ -43,6 +43,20 @@ describe('LocationPickerMap', () => {
     expect(wrapper.findComponent({ name: 'OsLocationMap' }).exists()).toBe(true)
   })
 
+  describe('pinColor', () => {
+    it('defaults to the event marker color', () => {
+      wrapper = Wrapper()
+
+      expect(wrapper.vm.pinColor).toBe('rgb(119, 83, 235)')
+    })
+
+    it('uses the group marker color when markerColorToken is set to it', () => {
+      wrapper = Wrapper({ markerColorToken: '--color-map-marker-group' })
+
+      expect(wrapper.vm.pinColor).toBe('rgb(248, 77, 77)')
+    })
+  })
+
   describe('onViewOnMap', () => {
     it('navigates to the main map centered on the coordinates', () => {
       wrapper = Wrapper()
@@ -172,6 +186,59 @@ describe('LocationPickerMap', () => {
 
       expect(wrapper.emitted('input')).toHaveLength(1)
       expect(wrapper.emitted('input')[0][0]).toMatchObject({ id: 'poi.2', label: 'Second pin' })
+    })
+
+    it('passes a custom "types" prop through to the reverse-geocoding query', async () => {
+      mocks.$apollo.query.mockResolvedValue(resolvedLocation())
+      wrapper = Wrapper({ types: 'place,region,country' })
+
+      await wrapper.vm.onPinChange({ lat: 52.5, lng: 13.4 })
+
+      expect(mocks.$apollo.query).toHaveBeenCalledWith({
+        query: queryLocations(),
+        variables: { place: '13.4,52.5', lang: 'en', types: 'place,region,country' },
+        fetchPolicy: 'network-only',
+      })
+    })
+
+    describe('precision="resolved" (groups)', () => {
+      it("snaps the pin to the matched place's own coordinate instead of the raw click", async () => {
+        mocks.$apollo.query.mockResolvedValue(resolvedLocation())
+        wrapper = Wrapper({ precision: 'resolved' })
+
+        await wrapper.vm.onPinChange({ lat: 52.5, lng: 13.4 })
+
+        expect(wrapper.emitted('input')).toStrictEqual([
+          [
+            {
+              label: 'Alexanderplatz, Berlin',
+              value: 'Alexanderplatz, Berlin',
+              id: 'poi.1',
+              lat: 52.52,
+              lng: 13.41,
+            },
+          ],
+        ])
+      })
+
+      it('still falls back to the raw coordinates when nothing matched', async () => {
+        mocks.$apollo.query.mockResolvedValue({ data: { queryLocations: [] } })
+        wrapper = Wrapper({ precision: 'resolved' })
+
+        await wrapper.vm.onPinChange({ lat: 52.5, lng: 13.4 })
+
+        expect(wrapper.emitted('input')).toStrictEqual([
+          [
+            {
+              label: '52.50000, 13.40000',
+              value: '52.50000, 13.40000',
+              id: null,
+              lat: 52.5,
+              lng: 13.4,
+            },
+          ],
+        ])
+      })
     })
 
     it('ignores a stale error that rejects after a newer pin-change request', async () => {

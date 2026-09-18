@@ -31,6 +31,8 @@ import { OsLocationMap } from '@ocelot-social/ui/ocelot'
 import Empty from '~/components/Empty/Empty'
 import { queryLocations } from '~/graphql/location'
 
+// Default for the "types" prop — precise enough for an event's exact pin.
+// Callers wanting coarser results (e.g. groups) pass their own "types" prop.
 const REVERSE_GEOCODE_TYPES = 'address,poi,place'
 
 // Must exactly match the "outdoors" entry's URL in the `styles` computed
@@ -39,9 +41,13 @@ const REVERSE_GEOCODE_TYPES = 'address,poi,place'
 // query param) leaves none of them highlighted until the user clicks one.
 const OUTDOORS_STYLE_URL = 'mapbox://styles/mapbox/outdoors-v12?optimize=true'
 
-// Same value as --color-map-marker-event in root-tokens.css, used only if that
-// custom property can't be read yet (e.g. before the stylesheet is applied).
-const EVENT_MARKER_COLOR_FALLBACK = 'rgb(119, 83, 235)'
+// Mirrors the matching --color-map-marker-* custom properties in
+// root-tokens.css, used only if they can't be read yet (e.g. before the
+// stylesheet is applied). Keyed by the "markerColorToken" prop's value.
+const MARKER_COLOR_FALLBACKS = {
+  '--color-map-marker-event': 'rgb(119, 83, 235)',
+  '--color-map-marker-group': 'rgb(248, 77, 77)',
+}
 
 // Fallback label when reverse-geocoding finds no address for a clicked/dragged
 // point — shows the raw coordinates instead of leaving the field empty/null.
@@ -80,6 +86,34 @@ export default {
       type: String,
       default: null,
     },
+    // 'exact' (default, events/posts): the pin stays exactly where it was
+    // clicked/dragged — see the "never match.lat/match.lng" comment in
+    // onPinChange below.
+    // 'resolved' (groups): the pin snaps to the reverse-geocoded match's own
+    // coordinate instead. Deliberately coarser — a group's location isn't
+    // meant to pin one exact point the way an event's is.
+    precision: {
+      type: String,
+      default: 'exact',
+      validator: (value) => ['exact', 'resolved'].includes(value),
+    },
+    // Reverse-geocode result types to ask mapbox for (comma-separated, see
+    // https://docs.mapbox.com/api/search/geocoding/#data-types). Events keep
+    // the precise default below; groups pass the coarser
+    // 'place,region,country' (LocationSelect's own default types for them).
+    types: {
+      type: String,
+      default: REVERSE_GEOCODE_TYPES,
+    },
+    // Which --color-map-marker-* custom property (root-tokens.css) to read
+    // the pin color from — the same token the main map uses for this kind of
+    // pin, so an event's map and a group's map show the same color the main
+    // map would for that pin.
+    markerColorToken: {
+      type: String,
+      default: '--color-map-marker-event',
+      validator: (value) => Object.prototype.hasOwnProperty.call(MARKER_COLOR_FALLBACKS, value),
+    },
   },
   data() {
     return {
@@ -111,18 +145,19 @@ export default {
     defaultStyleUrl() {
       return OUTDOORS_STYLE_URL
     },
-    // Same purple as the "event" markers on pages/map.vue — read from the
-    // shared CSS token (--color-map-marker-event, root-tokens.css) at
-    // runtime rather than duplicating the literal, so a brand override of
-    // that token is picked up here too. mapbox-gl's Marker needs a resolved
-    // color, not a live var() reference, hence getComputedStyle() instead of
-    // just passing "var(--color-map-marker-event)" straight through.
+    // Same color as the matching markers on pages/map.vue — read from the
+    // shared CSS token (markerColorToken, root-tokens.css) at runtime rather
+    // than duplicating the literal, so a brand override of that token is
+    // picked up here too. mapbox-gl's Marker needs a resolved color, not a
+    // live var() reference, hence getComputedStyle() instead of just passing
+    // "var(--color-map-marker-...)" straight through.
     pinColor() {
-      if (typeof window === 'undefined') return EVENT_MARKER_COLOR_FALLBACK
+      const fallback = MARKER_COLOR_FALLBACKS[this.markerColorToken]
+      if (typeof window === 'undefined') return fallback
       const value = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-map-marker-event')
+        .getPropertyValue(this.markerColorToken)
         .trim()
-      return value || EVENT_MARKER_COLOR_FALLBACK
+      return value || fallback
     },
     styles() {
       return [
@@ -163,24 +198,29 @@ export default {
           variables: {
             place: `${lng},${lat}`,
             lang: this.$i18n.locale(),
-            types: REVERSE_GEOCODE_TYPES,
+            types: this.types,
           },
           fetchPolicy: 'network-only',
         })
         if (requestId !== this.pinChangeRequestId) return
         const match = results && results[0]
         const label = match ? match.place_name : formatCoordinates(lat, lng)
-        // Always the exact clicked/dragged point, never match.lat/match.lng
-        // (the matched place's own registered coordinate, which can be
-        // measurably off — e.g. a building's entrance rather than where the
-        // user actually pinned). The match is only used for its label/id;
-        // the pin itself must stay exactly where it was put.
+        // precision="exact" (events): always the exact clicked/dragged point,
+        // never match.lat/match.lng (the matched place's own registered
+        // coordinate, which can be measurably off — e.g. a building's
+        // entrance rather than where the user actually pinned). The match is
+        // only used for its label/id there; the pin itself must stay exactly
+        // where it was put.
+        // precision="resolved" (groups): snap to the match's own coordinate
+        // instead — falls back to the raw click when nothing matched, same
+        // as "exact" then has no choice but to do anyway.
+        const usesResolvedCoordinates = this.precision === 'resolved' && match
         this.$emit('input', {
           label,
           value: label,
           id: match ? match.id : null,
-          lat,
-          lng,
+          lat: usesResolvedCoordinates ? match.lat : lat,
+          lng: usesResolvedCoordinates ? match.lng : lng,
         })
       } catch (error) {
         if (requestId !== this.pinChangeRequestId) return
