@@ -101,7 +101,14 @@ export default {
     // Reverse-geocode result types to ask mapbox for (comma-separated, see
     // https://docs.mapbox.com/api/search/geocoding/#data-types). Events keep
     // the precise default below; groups pass the coarser
-    // 'place,region,country' (LocationSelect's own default types for them).
+    // 'neighborhood,locality,place,region,country' — still deliberately less
+    // exact than an event's own address/poi/place, but specific enough to
+    // land on a city district rather than always the city's own center
+    // point. Both 'neighborhood' and 'locality' are listed since which one
+    // Mapbox actually uses for a given city's districts varies — German
+    // Stadtteile (e.g. Hamburg's Ottensen, Berlin's Kreuzberg) come back
+    // under 'locality', not 'neighborhood', verified directly against the
+    // API; other countries may differ.
     types: {
       type: String,
       default: REVERSE_GEOCODE_TYPES,

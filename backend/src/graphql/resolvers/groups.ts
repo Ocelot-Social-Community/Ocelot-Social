@@ -27,8 +27,14 @@ import type { Context } from '@src/context'
 // Reverse-geocoded with these types (see createOrUpdateLocations) instead of
 // an event's precise address/poi/place — a group's location is deliberately
 // coarser than an event's exact pin, so it resolves to the general
-// place/region/country it was dropped in rather than a specific address.
-const GROUP_REVERSE_GEOCODE_TYPES = ['place', 'region', 'country']
+// neighborhood/locality/place/region/country it was dropped in rather than a
+// specific address. 'neighborhood'/'locality' (most specific here) keep a
+// group in, say, Berlin or Hamburg from always snapping to the city's single
+// center point — it can still land on the actual district it was pinned in.
+// Both are listed since which one Mapbox uses for a city's districts varies:
+// German Stadtteile (Hamburg's Ottensen, Berlin's Kreuzberg) come back under
+// 'locality', not 'neighborhood', verified directly against the API.
+const GROUP_REVERSE_GEOCODE_TYPES = ['neighborhood', 'locality', 'place', 'region', 'country']
 
 // Pulls lat/lng off params (so they never reach `SET group += $params` below
 // — a group has no lat/lng fields of its own, unlike Post) and validates

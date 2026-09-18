@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import GroupForm from './GroupForm.vue'
 import LocationPickerMap from '~/components/Map/LocationPickerMap'
+import LocationSelect from '~/components/Select/LocationSelect'
 import Vuex from 'vuex'
 
 const localVue = global.localVue
@@ -61,8 +62,17 @@ describe('GroupForm', () => {
       const map = wrapper.findComponent(LocationPickerMap)
       expect(map.exists()).toBe(true)
       expect(map.props('precision')).toBe('resolved')
-      expect(map.props('types')).toBe('place,region,country')
+      expect(map.props('types')).toBe('neighborhood,locality,place,region,country')
       expect(map.props('markerColorToken')).toBe('--color-map-marker-group')
+    })
+
+    // Same types the map itself resolves to (see above) — otherwise typing a
+    // district's name into the search box couldn't find it even though
+    // dragging the pin there works fine.
+    it('gives the text search the same district-level types as the map', () => {
+      expect(wrapper.findComponent(LocationSelect).props('types')).toBe(
+        'neighborhood,locality,place,region,country',
+      )
     })
 
     it('passes the current locationName through as the map location', async () => {

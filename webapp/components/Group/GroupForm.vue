@@ -136,11 +136,11 @@
         />
 
         <!-- location -->
-        <location-select v-model="formData.locationName" />
+        <location-select v-model="formData.locationName" :types="groupLocationTypes" />
         <location-picker-map
           :location="formData.locationName"
           precision="resolved"
-          types="place,region,country"
+          :types="groupLocationTypes"
           marker-color-token="--color-map-marker-group"
           @input="onLocationPickerMapInput"
         />
@@ -203,6 +203,15 @@ import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
+
+// Shared by both the location-select text search and the location-picker-map
+// below it, so a group's location can land on a city district — deliberately
+// coarser than an event's exact pin, but not so coarse it only ever offers a
+// city as a whole. Both 'neighborhood' and 'locality' are listed since which
+// one Mapbox actually uses for a given city's districts varies: German
+// Stadtteile (Hamburg's Ottensen, Berlin's Kreuzberg) come back under
+// 'locality', not 'neighborhood', verified directly against the API.
+const GROUP_LOCATION_TYPES = 'neighborhood,locality,place,region,country'
 
 export default {
   name: 'GroupForm',
@@ -337,6 +346,9 @@ export default {
     }
   },
   computed: {
+    groupLocationTypes() {
+      return GROUP_LOCATION_TYPES
+    },
     formLocationName() {
       const isNestedValue =
         typeof this.formData.locationName === 'object' &&
