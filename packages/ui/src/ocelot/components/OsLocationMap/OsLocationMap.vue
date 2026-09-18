@@ -272,9 +272,25 @@
           marker = new props.mapboxGl.Marker({ draggable: props.editable, color: props.pinColor })
             .setLngLat(lngLat)
             .addTo(map)
+          // Re-arming the pick-location tool over an already-set pin (to move it
+          // by dragging OR place a new one elsewhere) leaves the canvas showing
+          // PICKER_CURSOR the whole time isPicking is true. Once an actual drag
+          // starts, the pointer quickly moves off the marker's own small element
+          // and onto the canvas underneath — which would otherwise flash back to
+          // that pin/crosshair icon mid-drag instead of staying a grab hand.
+          // Restored to whatever the mode currently calls for on dragend, not
+          // unconditionally cleared — isPicking may still be armed by then.
+          marker.on('dragstart', () => {
+            if (map) {
+              map.getCanvas().style.cursor = 'grabbing'
+            }
+          })
           marker.on('dragend', () => {
             const { lng, lat } = marker.getLngLat()
             emit('pin-change', { lat, lng })
+            if (map) {
+              map.getCanvas().style.cursor = isPicking ? PICKER_CURSOR : ''
+            }
           })
           if (props.viewOnMap) {
             const el = marker.getElement()
