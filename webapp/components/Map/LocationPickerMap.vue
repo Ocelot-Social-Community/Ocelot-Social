@@ -1,5 +1,5 @@
 <template>
-  <div class="location-picker-map">
+  <div class="location-picker-map" :style="{ height }">
     <client-only v-if="!isEmpty($env.MAPBOX_TOKEN)">
       <os-location-map
         :mapbox-gl="mapboxgl"
@@ -87,6 +87,12 @@ export default {
       type: String,
       default: null,
     },
+    // Same idea as postId, for a group's own "view on map" (e.g. from its
+    // profile page's read-only map).
+    groupId: {
+      type: String,
+      default: null,
+    },
     // 'exact' (default, events/posts): the pin stays exactly where it was
     // clicked/dragged — see the "never match.lat/match.lng" comment in
     // onPinChange below.
@@ -121,6 +127,13 @@ export default {
       type: String,
       default: '--color-map-marker-event',
       validator: (value) => Object.prototype.hasOwnProperty.call(MARKER_COLOR_FALLBACKS, value),
+    },
+    // Any valid CSS height value. Default matches the event map's own
+    // established size; a purely decorative, read-only map (e.g. on the
+    // group profile page) can afford to sit taller.
+    height: {
+      type: String,
+      default: '280px',
     },
   },
   data() {
@@ -255,6 +268,7 @@ export default {
       const query = { lat, lng }
       if (this.isPastEvent) query.showPastEvents = '1'
       if (this.postId) query.eventId = this.postId
+      if (this.groupId) query.groupId = this.groupId
       this.$router.push({ path: '/map', query })
     },
   },
@@ -264,11 +278,9 @@ export default {
 <style>
 @import 'mapbox-gl/dist/mapbox-gl.css';
 
-.location-picker-map {
-  /* All map tools (zoom, fullscreen, geolocate, pick-location/view-on-map,
-     style-switcher) now stack in the top-right corner instead of splitting
-     across both sides — taller than before so that stack doesn't crowd out
-     the visible map/pin area. */
-  height: 280px;
-}
+/* Height itself comes from the "height" prop (see template) — all map tools
+   (zoom, fullscreen, geolocate, pick-location/view-on-map, style-switcher)
+   stack in the top-right corner instead of splitting across both sides, so
+   whatever height is chosen needs to stay tall enough that stack doesn't
+   crowd out the visible map/pin area. */
 </style>

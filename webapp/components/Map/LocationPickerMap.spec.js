@@ -43,6 +43,20 @@ describe('LocationPickerMap', () => {
     expect(wrapper.findComponent({ name: 'OsLocationMap' }).exists()).toBe(true)
   })
 
+  describe('height', () => {
+    it("defaults to the event map's established height", () => {
+      wrapper = Wrapper()
+
+      expect(wrapper.find('.location-picker-map').element.style.height).toBe('280px')
+    })
+
+    it('is overridable, e.g. for a taller, purely decorative read-only map', () => {
+      wrapper = Wrapper({ height: '360px' })
+
+      expect(wrapper.find('.location-picker-map').element.style.height).toBe('360px')
+    })
+  })
+
   describe('pinColor', () => {
     it('defaults to the event marker color', () => {
       wrapper = Wrapper()
@@ -77,6 +91,17 @@ describe('LocationPickerMap', () => {
       expect(mocks.$router.push).toHaveBeenCalledWith({
         path: '/map',
         query: { lat: 52.5, lng: 13.4, showPastEvents: '1', eventId: 'post-1' },
+      })
+    })
+
+    it('includes groupId for a group deep-linked by groupId, so the main map opens its popup', () => {
+      wrapper = Wrapper({ groupId: 'group-1' })
+
+      wrapper.vm.onViewOnMap({ lat: 52.5, lng: 13.4 })
+
+      expect(mocks.$router.push).toHaveBeenCalledWith({
+        path: '/map',
+        query: { lat: 52.5, lng: 13.4, groupId: 'group-1' },
       })
     })
   })

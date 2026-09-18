@@ -44,4 +44,31 @@ describe('LocationInfo', () => {
       expect(wrapper.container).toMatchSnapshot()
     })
   })
+
+  describe('fullLocationName', () => {
+    // "Paris" alone doesn't say which one — France, or one of the several
+    // US towns of the same name — same reasoning LocationSelect's own
+    // search results (Mapbox's place_name) already show while editing.
+    it('joins the queried parent chain into a full, unambiguous name', () => {
+      const wrapper = render(LocationInfo, {
+        localVue,
+        propsData: {
+          locationData: {
+            name: 'Paris',
+            distanceToMe: null,
+            parent: { name: 'France' },
+          },
+          isOwner: false,
+        },
+        mocks: { $t: jest.fn((t) => t) },
+      })
+
+      expect(wrapper.getByText('Paris, France')).toBeTruthy()
+    })
+
+    it('falls back to the bare name when no parent was fetched', () => {
+      const wrapper = Wrapper({ withDistance: false })
+      expect(wrapper.getByText('Paris')).toBeTruthy()
+    })
+  })
 })

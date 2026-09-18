@@ -10,7 +10,7 @@ exports[`LocationInfo distance renders with distance 1`] = `
     >
       <span
         aria-hidden="true"
-        class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+        class="align-middle os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current align-middle"
       >
         <svg
           fill="currentColor"
@@ -48,7 +48,7 @@ exports[`LocationInfo distance renders without distance 1`] = `
     >
       <span
         aria-hidden="true"
-        class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+        class="align-middle os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current align-middle"
       >
         <svg
           fill="currentColor"
@@ -80,7 +80,7 @@ exports[`LocationInfo size renders in base size 1`] = `
     >
       <span
         aria-hidden="true"
-        class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+        class="align-middle os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current align-middle"
       >
         <svg
           fill="currentColor"
@@ -112,7 +112,7 @@ exports[`LocationInfo size renders in small size 1`] = `
     >
       <span
         aria-hidden="true"
-        class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+        class="align-middle os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current align-middle"
       >
         <svg
           fill="currentColor"
