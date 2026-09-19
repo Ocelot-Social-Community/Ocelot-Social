@@ -441,15 +441,27 @@ export default {
     canCreateAnyGroup() {
       return this.groupTypeOptions.some((type) => this.$can(`group.create_${type}`))
     },
+    // Switching an existing group TO hidden additionally needs
+    // group.create_hidden (the privacy-raising transition); editing an
+    // already-hidden group is fine. Mirrors onSubmit's own guard below —
+    // shared so the visually-denied button state can't drift out of sync
+    // with what onSubmit actually blocks (it used to: canCreateSelectedGroup
+    // short-circuited to true for every edit, so this specific denial left
+    // the submit button looking fully enabled while clicking it silently
+    // did nothing).
+    canSubmitHiddenTransition() {
+      if (this.formData.groupType !== 'hidden' || this.group.groupType === 'hidden') return true
+      return this.$can('group.create_hidden')
+    },
     canCreateSelectedGroup() {
-      if (this.update) return true
+      if (this.update) return this.canSubmitHiddenTransition
       // No type chosen yet (e.g. the form was just opened) — checking
       // `group.create_` (an empty suffix, matching no real permission)
       // would wrongly flag "denied" for someone who can create every
       // type, just hasn't picked one. Fall back to "can create at least
       // one type" until they do.
       if (!this.formData.groupType) return this.canCreateAnyGroup
-      return this.$can(`group.create_${this.formData.groupType}`)
+      return this.$can(`group.create_${this.formData.groupType}`) && this.canSubmitHiddenTransition
     },
     effectiveShowMembers() {
       if (this.formData.groupType === 'public') return true
@@ -547,14 +559,9 @@ export default {
       )
         return
       // Switching an existing group TO hidden additionally needs group.create_hidden
-      // (the privacy-raising transition). Editing an already-hidden group is fine.
-      if (
-        this.formData.groupType === 'hidden' &&
-        this.group.groupType !== 'hidden' &&
-        !this.$can('group.create_hidden')
-      ) {
-        return
-      }
+      // (the privacy-raising transition) — see canSubmitHiddenTransition, shared with
+      // the visually-denied button state so the two can't drift apart again.
+      if (!this.canSubmitHiddenTransition) return
       this.formSubmit(this.submit, () => {
         this.$toast.error(this.$t('common.validations.formHasErrors'))
       })
@@ -578,10 +585,19 @@ export default {
       // Snapshot exactly what's being submitted — submit() to done() is a
       // real network round-trip (not instantaneous), so the user may touch
       // the form again while the mutation is still in flight. done(true)
-      // below must only clear what THIS submit actually sent, not wipe out
-      // an edit made after the snapshot was taken, or that later edit would
-      // be silently — and wrongly — marked as saved.
-      const submittedDirtyFieldKeys = Object.keys(this.dirtyFields)
+      // below must only clear a field if its value still matches what THIS
+      // submit actually sent — a bare key snapshot isn't enough: if an
+      // already-dirty field (e.g. "name", already in dirtyFields at submit
+      // time) gets edited AGAIN before done() runs, its key was already
+      // "part of this submit" even though the newer value never got sent,
+      // so it must stay dirty rather than being wiped out alongside the
+      // fields that really were saved. JSON.stringify sidesteps reference
+      // inequality for array/object fields (e.g. categoryIds) that get
+      // re-assigned a new-but-equal-content array on every edit.
+      const submittedFieldValues = Object.keys(this.dirtyFields).reduce((snapshot, key) => {
+        snapshot[key] = JSON.stringify(this.formData[key])
+        return snapshot
+      }, {})
       const submittedLocationName = this.formLocationName
       // pages/groups/edit/_id/index.vue calls this with `true` once the
       // mutation actually succeeds (nothing on failure) — the edit form
@@ -592,10 +608,14 @@ export default {
       const done = (success) => {
         this.loading = false
         if (success) {
-          // Only clear the fields that were part of THIS submit's snapshot
-          // — see the comment above. Anything dirtied afterwards (while the
-          // mutation was in flight) stays dirty.
-          submittedDirtyFieldKeys.forEach((key) => this.$delete(this.dirtyFields, key))
+          // Only clear fields whose current value still matches the
+          // snapshot — see the comment above. Anything changed again since
+          // (whether newly dirtied or re-edited) stays dirty.
+          Object.keys(submittedFieldValues).forEach((key) => {
+            if (JSON.stringify(this.formData[key]) === submittedFieldValues[key]) {
+              this.$delete(this.dirtyFields, key)
+            }
+          })
           if (this.formLocationName === submittedLocationName) {
             this.savedLocationName = submittedLocationName
             this.locationChangedByUser = false

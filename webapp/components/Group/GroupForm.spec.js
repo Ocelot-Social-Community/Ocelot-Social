@@ -318,6 +318,30 @@ describe('GroupForm', () => {
       expect(wrapper.vm.hasUnsavedChanges).toBe(true)
     })
 
+    // Same race, but the SAME field gets edited again (not a different one)
+    // before done() runs — a bare key snapshot would still delete it, since
+    // "name" was already in dirtyFields at submit time; only comparing the
+    // actual value catches that the newer edit was never sent.
+    it('keeps a field dirty if it is changed again to a different value before done(true) runs', () => {
+      const wrapper = mount(GroupForm, {
+        propsData: { update: true, group },
+        mocks: { ...mocks, $can: () => true },
+        localVue,
+        stubs,
+        store,
+      })
+      wrapper.vm.updateFormField('name', 'A new name')
+
+      wrapper.vm.submit()
+      const done = wrapper.emitted('updateGroup')[0][1]
+      // Simulate the same field being edited again before the mutation resolves.
+      wrapper.vm.updateFormField('name', 'Yet another name')
+      done(true)
+
+      expect(wrapper.vm.dirtyFields.name).toBe(true)
+      expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+    })
+
     // Same race, but for the location field, which is tracked separately
     // via locationChangedByUser/savedLocationName rather than dirtyFields.
     it('keeps the location marked unsaved if it is changed again while the save is still in flight', () => {
@@ -390,6 +414,24 @@ describe('GroupForm', () => {
     it('still greys out for a genuinely missing permission, distinct from "no changes"', () => {
       const wrapper = mountWith({ update: false, group: {} }, () => false)
       wrapper.vm.$set(wrapper.vm.formData, 'groupType', 'public')
+
+      const submitButton = wrapper.find('button[type="submit"]')
+      expect(submitButton.classes()).toContain('permission-denied')
+      expect(wrapper.vm.submitDeniedHint).toBe('permissions.deniedHint')
+    })
+
+    // While editing, canCreateSelectedGroup used to short-circuit to true
+    // regardless of type — missing the same hidden-transition permission
+    // onSubmit itself blocks on, so the button looked clickable but a click
+    // silently did nothing. The button now has to grey out here too, not
+    // just refuse the click.
+    it('greys out while editing when switching an existing group to hidden without permission', async () => {
+      const wrapper = mountWith(
+        { update: true, group },
+        (permission) => permission !== 'group.create_hidden',
+      )
+      wrapper.vm.updateFormField('groupType', 'hidden')
+      await wrapper.vm.$nextTick()
 
       const submitButton = wrapper.find('button[type="submit"]')
       expect(submitButton.classes()).toContain('permission-denied')
