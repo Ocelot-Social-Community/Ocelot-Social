@@ -11,7 +11,13 @@
     "menu": "Open menu",
     "save": "Save",
     "saveCategories": "Save topics",
-    "search": "Search"
+    "search": "Search",
+    "unsavedChanges": {
+      "discard": "Discard",
+      "message": "You have made changes that haven't been saved yet. If you continue now, they will be lost.",
+      "stay": "Stay",
+      "title": "Unsaved changes"
+    }
   },
   "admin": {
     "api-keys": {

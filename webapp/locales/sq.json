@@ -11,7 +11,13 @@
     "menu": "Hap menunë",
     "save": "Ruaj",
     "saveCategories": "Ruaj temat",
-    "search": "Kërko"
+    "search": "Kërko",
+    "unsavedChanges": {
+      "discard": "Hidhi",
+      "message": "Ke bërë ndryshime që ende nuk janë ruajtur. Nëse vazhdon tani, ato do të humbasin.",
+      "stay": "Qëndro",
+      "title": "Ndryshime të paruajtura"
+    }
   },
   "admin": {
     "api-keys": {

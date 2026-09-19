@@ -11,7 +11,13 @@
     "menu": "Abrir menu",
     "save": "Salvar",
     "saveCategories": "Salvar tópicos",
-    "search": "Pesquisar"
+    "search": "Pesquisar",
+    "unsavedChanges": {
+      "discard": "Descartar",
+      "message": "Fez alterações que ainda não foram guardadas. Se continuar agora, serão perdidas.",
+      "stay": "Ficar",
+      "title": "Alterações não guardadas"
+    }
   },
   "admin": {
     "api-keys": {

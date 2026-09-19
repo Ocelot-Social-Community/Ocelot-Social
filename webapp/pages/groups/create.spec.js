@@ -53,7 +53,7 @@ describe('pages/groups/create.vue', () => {
         return Promise.resolve()
       })
       const { wrapper } = factory(mutate)
-      await wrapper.vm.createGroup(samplePayload)
+      await wrapper.vm.createGroup(samplePayload, jest.fn())
       expect(mutate).toHaveBeenCalled()
       expect(mutate.mock.calls[0][0].variables).toEqual({
         name: 'My Group',
@@ -74,12 +74,27 @@ describe('pages/groups/create.vue', () => {
         return Promise.resolve()
       })
       const { wrapper, $router, $toast } = factory(mutate)
-      await wrapper.vm.createGroup(samplePayload)
+      await wrapper.vm.createGroup(samplePayload, jest.fn())
       expect($toast.success).toHaveBeenCalledWith('group.groupCreated')
       expect($router.push).toHaveBeenCalledWith({
         name: 'groups-id-slug',
         params: { id: 'g1', slug: 'my-group' },
       })
+    })
+
+    it("calls done(true) before navigating, clearing GroupForm's own unsaved-changes tracking", async () => {
+      const mutate = jest.fn().mockImplementation(({ update }) => {
+        update(null, { data: { CreateGroup: { id: 'g1', slug: 'my-group' } } })
+        return Promise.resolve()
+      })
+      const { wrapper, $router } = factory(mutate)
+      const done = jest.fn()
+      await wrapper.vm.createGroup(samplePayload, done)
+
+      expect(done).toHaveBeenCalledWith(true)
+      const doneCallOrder = done.mock.invocationCallOrder[0]
+      const pushCallOrder = $router.push.mock.invocationCallOrder[0]
+      expect(doneCallOrder).toBeLessThan(pushCallOrder)
     })
 
     it('surfaces mutation errors via toast and does not navigate', async () => {
@@ -98,7 +113,7 @@ describe('pages/groups/create.vue', () => {
         return Promise.resolve()
       })
       const { wrapper } = factory(mutate)
-      wrapper.findComponent({ name: 'GroupForm' }).vm.$emit('createGroup', samplePayload)
+      wrapper.findComponent({ name: 'GroupForm' }).vm.$emit('createGroup', samplePayload, jest.fn())
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
       expect(mutate).toHaveBeenCalled()

@@ -11,7 +11,13 @@
     "menu": "Ouvrir le menu",
     "save": "Sauvegarder",
     "saveCategories": "Enregistrer les sujets",
-    "search": "Rechercher"
+    "search": "Rechercher",
+    "unsavedChanges": {
+      "discard": "Abandonner",
+      "message": "Vous avez apporté des modifications qui n'ont pas encore été enregistrées. Si vous continuez maintenant, elles seront perdues.",
+      "stay": "Rester",
+      "title": "Modifications non enregistrées"
+    }
   },
   "admin": {
     "api-keys": {

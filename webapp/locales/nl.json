@@ -11,7 +11,13 @@
     "menu": "Menu openen",
     "save": "Opslaan",
     "saveCategories": "Onderwerpen opslaan",
-    "search": "Zoeken"
+    "search": "Zoeken",
+    "unsavedChanges": {
+      "discard": "Verwerpen",
+      "message": "Je hebt wijzigingen aangebracht die nog niet zijn opgeslagen. Als je nu doorgaat, gaan ze verloren.",
+      "stay": "Blijven",
+      "title": "Niet-opgeslagen wijzigingen"
+    }
   },
   "admin": {
     "api-keys": {

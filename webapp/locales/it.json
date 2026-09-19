@@ -11,7 +11,13 @@
     "menu": "Apri menu",
     "save": "Salva",
     "saveCategories": "Salva argomenti",
-    "search": "Cerca"
+    "search": "Cerca",
+    "unsavedChanges": {
+      "discard": "Scarta",
+      "message": "Hai apportato modifiche che non sono ancora state salvate. Se continui ora, andranno perse.",
+      "stay": "Resta",
+      "title": "Modifiche non salvate"
+    }
   },
   "admin": {
     "api-keys": {

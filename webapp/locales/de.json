@@ -11,7 +11,13 @@
     "menu": "Menü öffnen",
     "save": "Speichern",
     "saveCategories": "Themen speichern",
-    "search": "Suchen"
+    "search": "Suchen",
+    "unsavedChanges": {
+      "discard": "Verwerfen",
+      "message": "Du hast Änderungen vorgenommen, die noch nicht gespeichert wurden. Wenn du jetzt fortfährst, gehen sie verloren.",
+      "stay": "Bleiben",
+      "title": "Ungespeicherte Änderungen"
+    }
   },
   "admin": {
     "api-keys": {

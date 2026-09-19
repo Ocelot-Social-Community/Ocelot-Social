@@ -79,7 +79,7 @@
             type="checkbox"
             :checked="effectiveShowMembers"
             :disabled="formData.groupType !== 'closed'"
-            @change="formData.showMembers = $event.target.checked"
+            @change="updateFormField('showMembers', $event.target.checked)"
           />
           <label for="show-members" :class="{ 'is-disabled': formData.groupType !== 'closed' }">
             {{ $t('group.showMembers') }}
@@ -456,11 +456,37 @@ export default {
       if (this.formData.groupType === 'hidden') return false
       return this.formData.showMembers
     },
+    // Exposed (via $refs) for the page component's own beforeRouteLeave
+    // guard, and used below for the native beforeunload prompt. dirtyFields
+    // covers every field wired through updateFormField()/$parentForm.update
+    // (name, slug, groupType, about, description, actionRadius, showMembers,
+    // categoryIds) — locationChangedByUser covers the location field
+    // separately, since it's set directly rather than through
+    // updateFormField (see onLocationSelectInput/onLocationPickerMapInput;
+    // it already excludes LocationSelect's own mount-time auto-resolve of
+    // an already-saved value, which dirtyFields has no equivalent for).
+    hasUnsavedChanges() {
+      return Object.keys(this.dirtyFields).length > 0 || this.locationChangedByUser
+    },
   },
   created() {
     this.icons = iconRegistry
   },
+  mounted() {
+    window.addEventListener('beforeunload', this.onBeforeUnload)
+  },
+  beforeDestroy() {
+    window.removeEventListener('beforeunload', this.onBeforeUnload)
+  },
   methods: {
+    onBeforeUnload(event) {
+      if (!this.hasUnsavedChanges) return
+      // Browsers show their own fixed wording here for security reasons —
+      // setting returnValue (the legacy way to opt in) is what triggers it;
+      // the actual string is ignored by every modern browser.
+      event.preventDefault()
+      event.returnValue = ''
+    },
     changeGroupType(event) {
       this.updateFormField('groupType', event.target.value)
     },
@@ -544,6 +570,9 @@ export default {
         if (success) {
           this.savedLocationName = this.formLocationName
           this.locationChangedByUser = false
+          // Everything just saved is no longer "unsaved" — see
+          // hasUnsavedChanges above.
+          this.dirtyFields = {}
         }
       }
       this.update

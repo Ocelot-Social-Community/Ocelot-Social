@@ -10,7 +10,7 @@
           <div class="ds-flex ds-flex-gap-base group-create-layout">
             <div class="group-create-layout__main">
               <div class="ds-container ds-container-x-large">
-                <group-form @createGroup="createGroup" />
+                <group-form ref="groupForm" @createGroup="createGroup" />
               </div>
             </div>
             <div class="group-create-layout__aside">&nbsp;</div>
@@ -18,18 +18,27 @@
         </div>
       </os-card>
     </div>
+    <confirm-modal
+      v-if="showLeaveConfirmModal"
+      :modalData="leaveConfirmModalData"
+      @close="showLeaveConfirmModal = false"
+    />
   </div>
 </template>
 
 <script>
 import { OsCard } from '@ocelot-social/ui'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 import GroupForm from '~/components/Group/GroupForm'
 import { createGroupMutation } from '~/graphql/groups.js'
+import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
 
 export default {
   middleware: ['groupsEnabled'],
+  mixins: [confirmLeaveIfUnsavedChanges],
   components: {
     OsCard,
+    ConfirmModal,
     GroupForm,
   },
   data() {
@@ -38,6 +47,9 @@ export default {
     }
   },
   methods: {
+    hasUnsavedChanges() {
+      return !!this.$refs.groupForm?.hasUnsavedChanges
+    },
     async createGroup(value, done) {
       const {
         name,
@@ -75,6 +87,10 @@ export default {
           },
         })
         this.$toast.success(this.$t('group.groupCreated'))
+        // Before navigating away — clears GroupForm's own unsaved-changes
+        // tracking so beforeRouteLeave (confirmLeaveIfUnsavedChanges) doesn't
+        // immediately ask to confirm leaving what was just saved.
+        done(true)
         this.$router.push({
           name: 'groups-id-slug',
           params: { id: responseId, slug: responseSlug },

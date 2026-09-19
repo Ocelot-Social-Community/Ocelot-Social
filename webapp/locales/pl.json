@@ -11,7 +11,13 @@
     "menu": "Otwórz menu",
     "save": "Oszczędzaj",
     "saveCategories": "Zapisz tematy",
-    "search": "Szukaj"
+    "search": "Szukaj",
+    "unsavedChanges": {
+      "discard": "Odrzuć",
+      "message": "Wprowadziłeś zmiany, które nie zostały jeszcze zapisane. Jeśli teraz kontynuujesz, zostaną utracone.",
+      "stay": "Zostań",
+      "title": "Niezapisane zmiany"
+    }
   },
   "admin": {
     "api-keys": {

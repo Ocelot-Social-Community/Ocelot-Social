@@ -11,7 +11,13 @@
     "menu": "Abrir menú",
     "save": "Guardar",
     "saveCategories": "Guardar temas",
-    "search": "Buscar"
+    "search": "Buscar",
+    "unsavedChanges": {
+      "discard": "Descartar",
+      "message": "Has realizado cambios que aún no se han guardado. Si continúas ahora, se perderán.",
+      "stay": "Quedarse",
+      "title": "Cambios sin guardar"
+    }
   },
   "admin": {
     "api-keys": {

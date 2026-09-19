@@ -221,6 +221,122 @@ describe('GroupForm', () => {
     })
   })
 
+  describe('hasUnsavedChanges', () => {
+    const mountWith = (propsDataOverride) =>
+      mount(GroupForm, { propsData: propsDataOverride, mocks, localVue, stubs, store })
+
+    it('is false right after mount', () => {
+      const wrapper = mountWith({ update: true, group })
+      expect(wrapper.vm.hasUnsavedChanges).toBe(false)
+    })
+
+    it('becomes true once a field goes through updateFormField (e.g. the name)', () => {
+      const wrapper = mountWith({ update: true, group })
+      wrapper.vm.updateFormField('name', 'A new name')
+      expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+    })
+
+    it('becomes true once showMembers is toggled', () => {
+      const wrapper = mountWith({ update: true, group: { ...group, groupType: 'closed' } })
+      wrapper.find('#show-members').setChecked(true)
+      expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+    })
+
+    it('becomes true once the location is genuinely changed (map)', () => {
+      const wrapper = mountWith({ update: true, group })
+      wrapper
+        .findComponent(LocationPickerMap)
+        .vm.$emit('input', { label: 'Berlin', value: 'Berlin', lat: 52.5, lng: 13.4 })
+      expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+    })
+
+    it("stays false through LocationSelect's own mount-time auto-resolve of an already-saved location", () => {
+      const wrapper = mountWith({ update: true, group: { ...group, locationName: 'Hamburg' } })
+      wrapper
+        .findComponent(LocationSelect)
+        .vm.$emit('input', { label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'x' })
+      expect(wrapper.vm.hasUnsavedChanges).toBe(false)
+    })
+
+    it('resets to false once the change is actually saved', () => {
+      const wrapper = mount(GroupForm, {
+        propsData: { update: true, group },
+        mocks: { ...mocks, $can: () => true },
+        localVue,
+        stubs,
+        store,
+      })
+      wrapper.vm.updateFormField('name', 'A new name')
+      expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+
+      wrapper.vm.submit()
+      const done = wrapper.emitted('updateGroup')[0][1]
+      done(true)
+
+      expect(wrapper.vm.hasUnsavedChanges).toBe(false)
+    })
+
+    it('does not reset when the save fails', () => {
+      const wrapper = mount(GroupForm, {
+        propsData: { update: true, group },
+        mocks: { ...mocks, $can: () => true },
+        localVue,
+        stubs,
+        store,
+      })
+      wrapper.vm.updateFormField('name', 'A new name')
+
+      wrapper.vm.submit()
+      const done = wrapper.emitted('updateGroup')[0][1]
+      done()
+
+      expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+    })
+  })
+
+  describe('onBeforeUnload (native browser tab-close/reload prompt)', () => {
+    const mountWith = (propsDataOverride) =>
+      mount(GroupForm, { propsData: propsDataOverride, mocks, localVue, stubs, store })
+
+    it('registers the listener on mount and unregisters it via its own beforeDestroy hook', () => {
+      const addSpy = jest.spyOn(window, 'addEventListener')
+      const removeSpy = jest.spyOn(window, 'removeEventListener')
+      const wrapper = mountWith({ update: true, group })
+
+      expect(addSpy).toHaveBeenCalledWith('beforeunload', wrapper.vm.onBeforeUnload)
+
+      // Not wrapper.destroy(): tiptap's own EditorContent#beforeDestroy
+      // throws when torn down outside a full page unmount (see
+      // ContributionForm.spec.js for the same, pre-existing issue) — call
+      // the hook directly instead of triggering a real destroy cascade.
+      wrapper.vm.$options.beforeDestroy[0].call(wrapper.vm)
+
+      expect(removeSpy).toHaveBeenCalledWith('beforeunload', wrapper.vm.onBeforeUnload)
+      addSpy.mockRestore()
+      removeSpy.mockRestore()
+    })
+
+    it('does nothing when there are no unsaved changes', () => {
+      const wrapper = mountWith({ update: true, group })
+      const event = { preventDefault: jest.fn(), returnValue: undefined }
+
+      wrapper.vm.onBeforeUnload(event)
+
+      expect(event.preventDefault).not.toHaveBeenCalled()
+    })
+
+    it('prevents the default and sets returnValue when there are unsaved changes', () => {
+      const wrapper = mountWith({ update: true, group })
+      wrapper.vm.updateFormField('name', 'A new name')
+      const event = { preventDefault: jest.fn(), returnValue: undefined }
+
+      wrapper.vm.onBeforeUnload(event)
+
+      expect(event.preventDefault).toHaveBeenCalled()
+      expect(event.returnValue).toBe('')
+    })
+  })
+
   describe('validation hints', () => {
     const mountFresh = (propsDataOverride = { update: false, group: {} }) =>
       mount(GroupForm, {
