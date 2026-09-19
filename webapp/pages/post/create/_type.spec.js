@@ -140,13 +140,13 @@ describe('create.vue', () => {
   })
 
   describe('scrolling to the location section on arrival via the map pin tool', () => {
-    // A real ContributionForm pulls in EventLocationMap/mapbox-gl and needs a
+    // A real ContributionForm pulls in LocationPickerMap/mapbox-gl and needs a
     // MAPBOX_TOKEN — this minimal stub renders just enough (the same class
-    // ContributionForm puts on its EventLocationMap wrapper) for
+    // ContributionForm puts on its LocationPickerMap wrapper) for
     // scrollIntoView() to have something to find and act on.
     const stubsWithLocationField = {
       ...stubs,
-      ContributionForm: { template: '<div class="event-location-map-field"></div>' },
+      ContributionForm: { template: '<div class="location-picker-map-field"></div>' },
     }
 
     let scrollIntoViewSpy

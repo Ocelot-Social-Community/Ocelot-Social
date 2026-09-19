@@ -11,7 +11,13 @@
     "menu": "Hap menunë",
     "save": "Ruaj",
     "saveCategories": "Ruaj temat",
-    "search": "Kërko"
+    "search": "Kërko",
+    "unsavedChanges": {
+      "discard": "Hidhi",
+      "message": "Ke bërë ndryshime që ende nuk janë ruajtur. Nëse vazhdon tani, ato do të humbasin.",
+      "stay": "Qëndro",
+      "title": "Ndryshime të paruajtura"
+    }
   },
   "admin": {
     "api-keys": {
@@ -887,6 +893,7 @@
     "foundation": "Themelimi",
     "general": "Përgjithshme",
     "goal": "Qëllimi i grupit",
+    "group": "Grup",
     "groupCreated": "Grupi u krijua!",
     "in": "në",
     "invite-links": "Lidhje ftese",
@@ -926,6 +933,8 @@
     "muted": "Grupi u hesht",
     "myGroups": "Grupet e mia",
     "name": "Emri i grupit",
+    "noChangesHint": "Ende nuk ka asgjë për të ruajtur.",
+    "previousLocation": "Vendndodhja e mëparshme: {location}",
     "radius": "Rrezja",
     "removeMember": "Hiq anëtarin",
     "removeMemberButton": "Hiq",
@@ -940,6 +949,7 @@
       "usual": "Anëtar"
     },
     "save": "Krijo grup të ri",
+    "scrollToLocationMap": "Rrëshqit te harta",
     "showMembers": "Lista e anëtarëve e dukshme për të gjithë",
     "teaser": {
       "openGroup": "Hap grupin",
@@ -959,7 +969,17 @@
     "unmute": "Çhesht grupin",
     "unmuted": "Grupi u çhesht",
     "update": "Ruaj ndryshimin",
-    "updatedGroup": "Të dhënat e grupit u ndryshuan."
+    "updatedGroup": "Të dhënat e grupit u ndryshuan.",
+    "validations": {
+      "actionRadiusRequired": "Ju lutem zgjidhni një rreze veprimi.",
+      "descriptionLength": "Përshkrimi duhet të ketë të paktën {min} karaktere.",
+      "descriptionNotEmpty": "Ju lutem shkruani një përshkrim.",
+      "groupTypeRequired": "Ju lutem zgjidhni një lloj grupi.",
+      "nameLength": "Emri duhet të ketë midis {min} dhe {max} karaktere.",
+      "nameNotEmpty": "Ju lutem shkruani një emër grupi.",
+      "slugInvalidCharacters": "Lejohen vetëm shkronja të vogla, shifra, viza dhe nënvija.",
+      "slugNotEmpty": "Ju lutem shkruani një emër unik grupi."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Pastro kërkimin",

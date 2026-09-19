@@ -11,7 +11,13 @@
     "menu": "Otwórz menu",
     "save": "Oszczędzaj",
     "saveCategories": "Zapisz tematy",
-    "search": "Szukaj"
+    "search": "Szukaj",
+    "unsavedChanges": {
+      "discard": "Odrzuć",
+      "message": "Wprowadziłeś zmiany, które nie zostały jeszcze zapisane. Jeśli teraz kontynuujesz, zostaną utracone.",
+      "stay": "Zostań",
+      "title": "Niezapisane zmiany"
+    }
   },
   "admin": {
     "api-keys": {
@@ -887,6 +893,7 @@
     "foundation": "Założenie",
     "general": "Ogólne",
     "goal": "Cel grupy",
+    "group": "Grupa",
     "groupCreated": "Grupa została utworzona!",
     "in": "w",
     "invite-links": "Linki zaproszeń",
@@ -926,6 +933,8 @@
     "muted": "Grupa wyciszona",
     "myGroups": "Moje grupy",
     "name": "Nazwa grupy",
+    "noChangesHint": "Nie ma jeszcze nic do zapisania.",
+    "previousLocation": "Poprzednia lokalizacja: {location}",
     "radius": "Zasięg",
     "removeMember": "Usuń członka",
     "removeMemberButton": "Usuń",
@@ -940,6 +949,7 @@
       "usual": "Członek"
     },
     "save": "Utwórz nową grupę",
+    "scrollToLocationMap": "Przewiń do mapy",
     "showMembers": "Lista członków widoczna dla wszystkich",
     "teaser": {
       "openGroup": "Otwórz grupę",
@@ -959,7 +969,17 @@
     "unmute": "Cofnij wyciszenie grupy",
     "unmuted": "Wyciszenie grupy cofnięte",
     "update": "Zapisz zmianę",
-    "updatedGroup": "Dane grupy zostały zmienione."
+    "updatedGroup": "Dane grupy zostały zmienione.",
+    "validations": {
+      "actionRadiusRequired": "Proszę wybrać zasięg działania.",
+      "descriptionLength": "Opis musi mieć co najmniej {min} znaków.",
+      "descriptionNotEmpty": "Proszę podać opis.",
+      "groupTypeRequired": "Proszę wybrać typ grupy.",
+      "nameLength": "Nazwa musi mieć od {min} do {max} znaków.",
+      "nameNotEmpty": "Proszę podać nazwę grupy.",
+      "slugInvalidCharacters": "Dozwolone są tylko małe litery, cyfry, myślniki i podkreślenia.",
+      "slugNotEmpty": "Proszę podać unikalną nazwę grupy."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Wyczyść wyszukiwanie",

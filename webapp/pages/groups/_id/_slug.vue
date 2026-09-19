@@ -38,13 +38,18 @@
             <p class="ds-text ds-text-center ds-text-soft word-break-all">
               {{ `&${groupSlug}` }}
             </p>
-            <!-- group location -->
-            <location-info
+            <!-- group location — clickable when the map below exists, to
+                 jump straight to it instead of making people scroll and
+                 hunt for it themselves. -->
+            <button
               v-if="group.location"
-              :location-data="group.location"
-              :is-owner="false"
-              size="small"
-            />
+              type="button"
+              class="location-info-button"
+              :aria-label="$t('group.scrollToLocationMap')"
+              @click="scrollToLocationMap"
+            >
+              <location-info :location-data="group.location" :is-owner="false" size="small" />
+            </button>
             <!-- group created at -->
             <p class="ds-text ds-text-center ds-text-soft ds-text-size-small">
               {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
@@ -207,6 +212,18 @@
             </div>
           </template>
         </os-card>
+        <template v-if="group.location">
+          <div class="ds-mb-large"></div>
+          <os-card ref="locationMapCard" class="group-location-map">
+            <location-picker-map
+              :location="group.location"
+              :editable="false"
+              :group-id="group.id"
+              marker-color-token="--color-map-marker-group"
+              height="307px"
+            />
+          </os-card>
+        </template>
         <div class="ds-mb-large"></div>
         <h3
           class="ds-heading ds-heading-h3 ds-heading-soft"
@@ -372,6 +389,7 @@ import Empty from '~/components/Empty/Empty'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
+import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
@@ -408,6 +426,7 @@ export default {
     GroupContentMenu,
     JoinLeaveButton,
     LocationInfo,
+    LocationPickerMap,
     PostTeaser,
     AvatarImage,
     GroupPageMemberList,
@@ -596,6 +615,9 @@ export default {
       showChat: 'chat/SET_OPEN_CHAT',
       openVideoCall: 'videoCall/OPEN',
     }),
+    scrollToLocationMap() {
+      this.$refs.locationMapCard?.$el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    },
     setupDescriptionOverflowObserver() {
       this.measureDescriptionOverflow()
       if (typeof ResizeObserver === 'undefined') return
@@ -925,6 +947,24 @@ export default {
 </script>
 
 <style scoped>
+/* Reset to look exactly like the plain LocationInfo it wraps (no button
+   chrome) — only the pointer cursor and hover/focus hint that it's
+   clickable, scrolling down to the location map below. */
+.location-info-button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.location-info-button:hover,
+.location-info-button:focus-visible {
+  opacity: 0.8;
+}
+
 ::v-deep .profile-page-avatar.avatar-image {
   margin: auto;
   margin-top: -60px;

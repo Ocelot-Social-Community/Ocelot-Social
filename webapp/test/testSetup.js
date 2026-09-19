@@ -45,7 +45,7 @@ console.error = (...args) => {
 config.mocks.$policy = { get: () => false }
 
 // Default $env injection (Nuxt's runtime env, e.g. MAPBOX_TOKEN) so components
-// that read it (EventLocationMap, map.vue) don't crash when mounted incidentally
+// that read it (LocationPickerMap, map.vue) don't crash when mounted incidentally
 // by unrelated specs. Empty token keeps the map-disabled/"alert" branch active;
 // tests that exercise the map itself override with `mocks: { $env: { MAPBOX_TOKEN: '...' } }`.
 // Also mirrored on the prototype (see $can below) since config.mocks is not merged

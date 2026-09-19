@@ -80,6 +80,21 @@
         type: Number as PropType<number | null>,
         default: null,
       },
+      /**
+       * Bump this (e.g. an incrementing counter) whenever the host app wants
+       * the marker to resync to the current lat/lng, even if those values
+       * happen to be unchanged from before. Needed when something OTHER than
+       * this component moved the marker in the meantime — a host that
+       * reverse-geocodes a drag to a deliberately coarse match (e.g. a
+       * city-level point) can resolve back to the exact same lat/lng the pin
+       * already had, and a plain lat/lng watch would then never fire to
+       * correct the marker's own, now-diverged on-screen position (moved by
+       * the drag itself) back to it.
+       */
+      pinRevision: {
+        type: [Number, String] as PropType<number | string>,
+        default: 0,
+      },
       /** CSS color for the pin (mapbox-gl Marker's own `color` option). */
       pinColor: {
         type: String,
@@ -257,9 +272,32 @@
           marker = new props.mapboxGl.Marker({ draggable: props.editable, color: props.pinColor })
             .setLngLat(lngLat)
             .addTo(map)
+          // Re-arming the pick-location tool over an already-set pin (to move it
+          // by dragging OR place a new one elsewhere) leaves the canvas showing
+          // PICKER_CURSOR the whole time isPicking is true. Once an actual drag
+          // starts, the pointer quickly moves off the marker's own small element
+          // and onto the canvas underneath — which would otherwise flash back to
+          // that pin/crosshair icon mid-drag instead of staying a grab hand.
+          // Restored to whatever the mode currently calls for on dragend, not
+          // unconditionally cleared — isPicking may still be armed by then.
+          marker.on('dragstart', () => {
+            /* v8 ignore start -- map is only ever nulled in onBeforeUnmount,
+               via map.remove() — which tears down its markers first, so no
+               further drag event can reach this handler afterwards;
+               unreachable through the component's own lifecycle. */
+            if (map) {
+              map.getCanvas().style.cursor = 'grabbing'
+            }
+            /* v8 ignore stop */
+          })
           marker.on('dragend', () => {
             const { lng, lat } = marker.getLngLat()
             emit('pin-change', { lat, lng })
+            /* v8 ignore start -- see the dragstart handler above */
+            if (map) {
+              map.getCanvas().style.cursor = isPicking ? PICKER_CURSOR : ''
+            }
+            /* v8 ignore stop */
           })
           if (props.viewOnMap) {
             const el = marker.getElement()
@@ -301,11 +339,23 @@
         map.flyTo({ center: [props.lng, props.lat], zoom })
       }
 
+      // pinRevision is included purely to force this watcher to re-run even
+      // when lat/lng come back numerically unchanged (see its own doc
+      // comment above) — its value is otherwise unused here. updateMarker()
+      // must still run every time (that's the whole point of pinRevision),
+      // but flyToPin() re-centers/zooms the camera — only call it when the
+      // coordinate itself actually changed, or a pinRevision-only bump
+      // (nothing moved) would re-trigger the "zoom in to pinZoom" flight,
+      // fighting a zoom-out the user made since the marker was last placed.
       watch(
-        () => [props.lat, props.lng],
-        () => {
+        () => [props.lat, props.lng, props.pinRevision],
+        // No immediate: true, so this only ever runs on an actual change —
+        // [oldLat, oldLng] is never undefined here.
+        ([newLat, newLng], [oldLat, oldLng]) => {
           updateMarker()
-          flyToPin()
+          if (newLat !== oldLat || newLng !== oldLng) {
+            flyToPin()
+          }
         },
       )
 

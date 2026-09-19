@@ -1,8 +1,12 @@
 <template>
   <div :class="`location-info size-${size}`">
     <div class="location">
-      <os-icon :icon="icons.mapMarker" />
-      {{ locationData.name }}
+      <!-- OsIcon's own default is align-bottom, which sits a pointed pin
+           glyph noticeably lower than the surrounding text's cap-height —
+           align-middle (merged in via tailwind-merge, overriding it) reads
+           much closer to the text's actual visual center. -->
+      <os-icon :icon="icons.mapMarker" class="align-middle" />
+      {{ fullLocationName }}
     </div>
     <div v-if="locationData.distanceToMe !== null && !isOwner" class="distance">
       {{ $t('location.distance', { distance: locationData.distanceToMe }) }}
@@ -34,6 +38,25 @@ export default {
   created() {
     this.icons = iconRegistry
   },
+  computed: {
+    // Same level of detail LocationSelect's own search results already show
+    // while editing (Mapbox's own place_name, e.g. "Ottensen, Hamburg,
+    // Germany") — the Location node's bare own name alone ("Ottensen")
+    // doesn't say which country or, for a common city name like "Paris",
+    // even which one. Built by walking the queried parent chain (see the
+    // "location" GraphQL fragment) instead of storing it directly, so it's
+    // always current with whatever locales/parents are actually loaded —
+    // falls back to just the bare name if no parent was fetched.
+    fullLocationName() {
+      const parts = []
+      let node = this.locationData
+      while (node && node.name) {
+        parts.push(node.name)
+        node = node.parent
+      }
+      return parts.join(', ')
+    },
+  },
 }
 </script>
 
@@ -44,10 +67,13 @@ export default {
   align-items: center;
   justify-content: center;
 
+  /* No flex here (unlike the column above) — the icon needs to sit inline,
+     as if it were the text's own first character, so it travels with the
+     first word when the (now often longer, full "district, city, region,
+     country") name wraps, instead of floating centered against the whole
+     multi-line block regardless of where any single line actually starts. */
   .location {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    text-align: center;
   }
 }
 

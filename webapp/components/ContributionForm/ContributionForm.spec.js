@@ -7,7 +7,7 @@ import Vuex from 'vuex'
 
 import ImageUploader from '~/components/Uploader/ImageUploader'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
-import EventLocationMap from '~/components/Map/EventLocationMap'
+import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import MutationObserver from 'mutation-observer'
 
 global.MutationObserver = MutationObserver
@@ -128,6 +128,12 @@ describe('ContributionForm.vue', () => {
         const editable = attached.find('.ProseMirror')
         expect(editable.attributes('aria-labelledby')).toBe(label.attributes('id'))
         expect(editable.element).toHaveAccessibleName(label.text())
+      })
+    })
+
+    describe('validation hint display', () => {
+      it('shows the title length as "count / min–max"', () => {
+        expect(wrapper.find('.os-validation-hint').text()).toContain('0 / 3–100')
       })
     })
 
@@ -357,8 +363,8 @@ describe('ContributionForm.vue', () => {
           })
         })
 
-        it('passes that same location on to EventLocationMap, so its pin is shown without re-picking', () => {
-          expect(wrapper.findComponent(EventLocationMap).props('location')).toEqual({
+        it('passes that same location on to LocationPickerMap, so its pin is shown without re-picking', () => {
+          expect(wrapper.findComponent(LocationPickerMap).props('location')).toEqual({
             label: 'Berlin, Germany',
             value: 'Berlin, Germany',
             id: 'place.berlin',
@@ -407,7 +413,7 @@ describe('ContributionForm.vue', () => {
         })
 
         it("shows the pin at the post's own precise coordinates, not eventLocation's", () => {
-          expect(wrapper.findComponent(EventLocationMap).props('location')).toMatchObject({
+          expect(wrapper.findComponent(LocationPickerMap).props('location')).toMatchObject({
             lat: 52.5001,
             lng: 13.404,
           })
@@ -637,7 +643,7 @@ describe('ContributionForm.vue', () => {
 
           describe('submit with a map-pin/search-result payload carrying coordinates', () => {
             beforeEach(async () => {
-              // Shape EventLocationMap's onPinChange and LocationSelect's
+              // Shape LocationPickerMap's onPinChange and LocationSelect's
               // processLocationsResult() both emit once a pin/result is picked.
               wrapper.vm.updateFormField('eventLocationName', {
                 label: 'Deutschland, Germany',

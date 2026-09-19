@@ -51,6 +51,7 @@
           />
           <os-validation-hint
             :count="formData.title.length"
+            :min="formSchema.title.min"
             :max="formSchema.title.max"
             :variant="visibleErrors && visibleErrors.title ? 'error' : null"
             :text="titleErrorText"
@@ -146,6 +147,7 @@
             />
             <os-validation-hint
               :count="formData.eventVenue.length"
+              :min="formSchema.eventVenue.min"
               :max="formSchema.eventVenue.max"
               :variant="visibleErrors && visibleErrors.eventVenue ? 'error' : null"
               :text="venueErrorText"
@@ -189,11 +191,11 @@
                 :text="$t('post.viewEvent.eventLocationRequired')"
               />
             </div>
-            <event-location-map
+            <location-picker-map
               v-if="!locationSelectDisabled"
               :location="formData.eventLocationName"
-              class="event-location-map-field"
-              @input="onEventLocationMapInput"
+              class="location-picker-map-field"
+              @input="onLocationPickerMapInput"
             />
           </div>
           <div class="ds-mt-x-small ds-mb-large"></div>
@@ -277,7 +279,7 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
-import EventLocationMap from '~/components/Map/EventLocationMap'
+import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 
 export default {
@@ -293,7 +295,7 @@ export default {
     PageParamsLink,
     OcelotInput,
     LocationSelect,
-    EventLocationMap,
+    LocationPickerMap,
     OsValidationHint,
     ResponsiveImage,
   },
@@ -341,6 +343,7 @@ export default {
     formSchema() {
       return {
         title: {
+          min: 3,
           max: 100,
           validator: (_, value = '') => {
             if (!value.trim()) {
@@ -443,7 +446,7 @@ export default {
     eventInput() {
       if (this.postType === 'Event') {
         const locationValue = this.formData.eventLocationName
-        // LocationSelect and EventLocationMap both already resolve lat/lng
+        // LocationSelect and LocationPickerMap both already resolve lat/lng
         // (via reverse/forward geocoding) alongside the label when a search
         // result or map pin is picked — a plain string here means the field
         // still holds unresolved/typed text, no coordinates to send yet.
@@ -557,8 +560,8 @@ export default {
         eventStart: eventStart ? new Date(eventStart) : null,
         eventEnd: eventEnd ? new Date(eventEnd) : null,
         // A selection object (same { label, value, id, lat, lng } shape
-        // LocationSelect/EventLocationMap produce when the user picks a
-        // result), not just the bare name — otherwise EventLocationMap has
+        // LocationSelect/LocationPickerMap produce when the user picks a
+        // result), not just the bare name — otherwise LocationPickerMap has
         // no coordinates to show a pin for on an event being edited, even
         // though it was already geocoded once. Falls back to the plain
         // string when there's no saved location (online events) or no
@@ -648,7 +651,7 @@ export default {
     changeEventIsOnline() {
       this.updateFormField('eventIsOnline', this.formData.eventIsOnline)
     },
-    onEventLocationMapInput(location) {
+    onLocationPickerMapInput(location) {
       this.formData.eventLocationName = location
       this.touchField('eventLocationName')
       this.$validateForm()
@@ -780,7 +783,7 @@ export default {
     margin-bottom: var(--space-x-small);
   }
 
-  .event-location-map-field {
+  .location-picker-map-field {
     margin-top: var(--space-small);
     margin-bottom: var(--space-x-small);
   }
@@ -833,8 +836,19 @@ export default {
       cursor: default;
     }
 
+    /* Not align-self: flex-end — os-validation-hint switches its OWN inner
+       layout depending on whether it has text (flex + justify-between,
+       spreading a left-aligned message and a right-aligned count/icon
+       badge across the full width) or not (just the badge, flex-end).
+       Forcing flex-end here shrinks the whole element to its content's
+       width before that inner layout gets a chance to use the space,
+       which squashed message + badge into a narrow, centered-looking
+       stack instead of message-left/badge-right. Letting it stretch (the
+       flex column's own default) gives it the full width to actually do
+       that with; the badge-only case still ends up flush right either
+       way, since its own inner justify-end doesn't need the full width to
+       do that. */
     > .os-validation-hint {
-      align-self: flex-end;
       margin-bottom: var(--space-base);
       cursor: default;
     }

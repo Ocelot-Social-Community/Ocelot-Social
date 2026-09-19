@@ -125,7 +125,7 @@ export default {
     // First-time arrival via the main map's "place a new event here" pin tool
     // (/post/create/event?lat=&lng=&locationName=&locationId=) — seed the
     // draft's eventLocationName as the same { label, value, id, lat, lng }
-    // selection-object shape LocationSelect/EventLocationMap themselves
+    // selection-object shape LocationSelect/LocationPickerMap themselves
     // produce, so ContributionForm shows the pin already placed. A truthy
     // draft.eventLocationName (from a prior remount) wins, same reasoning as
     // groupId above.
@@ -167,7 +167,7 @@ export default {
     if (this.seededLocationFromMapPin) {
       this.$nextTick(() => {
         this.$el
-          .querySelector('.event-location-map-field')
+          .querySelector('.location-picker-map-field')
           ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       })
     }

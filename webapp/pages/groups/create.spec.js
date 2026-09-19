@@ -13,6 +13,10 @@ const Stub = (name, slot = false) => ({
 const stubs = {
   OsCard: Stub('OsCard', true),
   GroupForm: Stub('GroupForm'),
+  // OsMenu renders its routes through this tag — not registered on this
+  // spec's own plain createLocalVue() (unlike global.localVue elsewhere,
+  // which installs a real router).
+  'router-link': true,
 }
 
 const factory = (mutate = jest.fn().mockResolvedValue()) => {
@@ -34,6 +38,8 @@ const samplePayload = {
   groupType: 'public',
   actionRadius: 'regional',
   locationName: 'Berlin',
+  lat: 52.5,
+  lng: 13.4,
   categoryIds: ['c1', 'c2'],
 }
 
@@ -44,6 +50,15 @@ describe('pages/groups/create.vue', () => {
     expect(wrapper.find('.stub-groupform').exists()).toBe(true)
   })
 
+  // Modeled on pages/post/create/_type.vue's own left-hand type menu — for
+  // now just the one entry, since there's only one group-creation flow.
+  it('shows a sidebar menu with a single "group" entry', () => {
+    const { wrapper } = factory()
+    expect(wrapper.vm.routes).toEqual([{ name: 'group.group', path: '/groups/create' }])
+    expect(wrapper.findComponent({ name: 'OsMenu' }).exists()).toBe(true)
+    expect(wrapper.text()).toContain('group.group')
+  })
+
   describe('createGroup', () => {
     it('passes the form values straight through as mutation variables', async () => {
       const mutate = jest.fn().mockImplementation(({ update }) => {
@@ -51,7 +66,7 @@ describe('pages/groups/create.vue', () => {
         return Promise.resolve()
       })
       const { wrapper } = factory(mutate)
-      await wrapper.vm.createGroup(samplePayload)
+      await wrapper.vm.createGroup(samplePayload, jest.fn())
       expect(mutate).toHaveBeenCalled()
       expect(mutate.mock.calls[0][0].variables).toEqual({
         name: 'My Group',
@@ -60,6 +75,8 @@ describe('pages/groups/create.vue', () => {
         groupType: 'public',
         actionRadius: 'regional',
         locationName: 'Berlin',
+        lat: 52.5,
+        lng: 13.4,
         categoryIds: ['c1', 'c2'],
       })
     })
@@ -70,12 +87,27 @@ describe('pages/groups/create.vue', () => {
         return Promise.resolve()
       })
       const { wrapper, $router, $toast } = factory(mutate)
-      await wrapper.vm.createGroup(samplePayload)
+      await wrapper.vm.createGroup(samplePayload, jest.fn())
       expect($toast.success).toHaveBeenCalledWith('group.groupCreated')
       expect($router.push).toHaveBeenCalledWith({
         name: 'groups-id-slug',
         params: { id: 'g1', slug: 'my-group' },
       })
+    })
+
+    it("calls done(true) before navigating, clearing GroupForm's own unsaved-changes tracking", async () => {
+      const mutate = jest.fn().mockImplementation(({ update }) => {
+        update(null, { data: { CreateGroup: { id: 'g1', slug: 'my-group' } } })
+        return Promise.resolve()
+      })
+      const { wrapper, $router } = factory(mutate)
+      const done = jest.fn()
+      await wrapper.vm.createGroup(samplePayload, done)
+
+      expect(done).toHaveBeenCalledWith(true)
+      const doneCallOrder = done.mock.invocationCallOrder[0]
+      const pushCallOrder = $router.push.mock.invocationCallOrder[0]
+      expect(doneCallOrder).toBeLessThan(pushCallOrder)
     })
 
     it('surfaces mutation errors via toast and does not navigate', async () => {
@@ -94,7 +126,7 @@ describe('pages/groups/create.vue', () => {
         return Promise.resolve()
       })
       const { wrapper } = factory(mutate)
-      wrapper.findComponent({ name: 'GroupForm' }).vm.$emit('createGroup', samplePayload)
+      wrapper.findComponent({ name: 'GroupForm' }).vm.$emit('createGroup', samplePayload, jest.fn())
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
       expect(mutate).toHaveBeenCalled()
