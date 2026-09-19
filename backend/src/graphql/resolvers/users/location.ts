@@ -51,7 +51,10 @@ const createLocation = async (session, mapboxData) => {
     'l.nameSQ = $nameSQ, ' +
     'l.type = $type'
 
-  if (data.lat && data.lng) {
+  // Not a truthy check — a place sitting exactly on the equator or the
+  // prime meridian (lat/lng === 0) is a real, valid coordinate, not a
+  // missing one.
+  if (typeof data.lat === 'number' && typeof data.lng === 'number') {
     mutation += ', l.lat = $lat, l.lng = $lng'
   }
   if (data.address) {

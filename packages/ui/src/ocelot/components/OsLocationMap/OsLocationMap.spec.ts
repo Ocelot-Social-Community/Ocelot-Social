@@ -457,6 +457,10 @@ describe('osLocationMap', () => {
 
     expect(ctx.mapboxGl.Marker).toHaveBeenCalledTimes(1)
     expect(ctx.markerInstance.setLngLat).toHaveBeenCalledWith([13.4, 52.5])
+    // The coordinate itself didn't change, so the camera has nothing to fly
+    // to — a pinRevision-only bump must not re-trigger flyToPin(), or it
+    // would fight a zoom-out the user made since the pin was last placed.
+    expect(ctx.mapInstance.flyTo).not.toHaveBeenCalled()
   })
 
   // Re-arming the pick-location tool over an already-set pin (to drag it, or

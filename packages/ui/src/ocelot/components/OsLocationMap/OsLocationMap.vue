@@ -341,12 +341,21 @@
 
       // pinRevision is included purely to force this watcher to re-run even
       // when lat/lng come back numerically unchanged (see its own doc
-      // comment above) — its value is otherwise unused here.
+      // comment above) — its value is otherwise unused here. updateMarker()
+      // must still run every time (that's the whole point of pinRevision),
+      // but flyToPin() re-centers/zooms the camera — only call it when the
+      // coordinate itself actually changed, or a pinRevision-only bump
+      // (nothing moved) would re-trigger the "zoom in to pinZoom" flight,
+      // fighting a zoom-out the user made since the marker was last placed.
       watch(
         () => [props.lat, props.lng, props.pinRevision],
-        () => {
+        // No immediate: true, so this only ever runs on an actual change —
+        // [oldLat, oldLng] is never undefined here.
+        ([newLat, newLng], [oldLat, oldLng]) => {
           updateMarker()
-          flyToPin()
+          if (newLat !== oldLat || newLng !== oldLng) {
+            flyToPin()
+          }
         },
       )
 

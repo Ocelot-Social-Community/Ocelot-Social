@@ -667,6 +667,41 @@ describe(createOrUpdateLocations, () => {
       expect(records.map((record) => record.get('id') as string)).toEqual(['country.de'])
       expect(records[0].get('parents').toNumber()).toBe(0)
     })
+
+    // Regression test for a truthy check (`data.lat && data.lng`) that would
+    // treat a place sitting exactly on the equator or the prime meridian as
+    // having "no coordinates" and silently drop them, rather than checking
+    // they are actually numbers.
+    it('stores lat/lng even when one of them is exactly 0 (prime meridian)', async () => {
+      respondWith({
+        features: [
+          feature({
+            id: 'place.greenwich',
+            place_name: 'Greenwich',
+            place_type: ['place'],
+            center: [0, 51.5],
+          }),
+        ],
+      })
+
+      await withSession(async (session) => {
+        await createOrUpdateLocations(
+          'User',
+          'located-user',
+          'Greenwich',
+          session,
+          locationContext(),
+        )
+      })
+
+      const { records } = await database.query({
+        query: `MATCH (:User { id: "located-user" })-[:IS_IN]->(l:Location)
+                RETURN l.lat AS lat, l.lng AS lng`,
+      })
+
+      expect(Number(records[0].get('lat'))).toBe(51.5)
+      expect(Number(records[0].get('lng'))).toBe(0)
+    })
   })
 })
 
