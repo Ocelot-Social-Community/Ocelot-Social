@@ -292,6 +292,57 @@ describe('GroupForm', () => {
 
       expect(wrapper.vm.hasUnsavedChanges).toBe(true)
     })
+
+    // submit() to done() is a real network round-trip, not instantaneous —
+    // an edit made while the mutation is still in flight was not part of
+    // what got sent, so it must survive done(true) rather than being wiped
+    // out along with the fields that actually were submitted.
+    it('keeps a field dirty if it is changed again while the save is still in flight', () => {
+      const wrapper = mount(GroupForm, {
+        propsData: { update: true, group },
+        mocks: { ...mocks, $can: () => true },
+        localVue,
+        stubs,
+        store,
+      })
+      wrapper.vm.updateFormField('name', 'A new name')
+
+      wrapper.vm.submit()
+      const done = wrapper.emitted('updateGroup')[0][1]
+      // Simulate a further edit arriving before the mutation resolves.
+      wrapper.vm.updateFormField('about', 'A new about text')
+      done(true)
+
+      expect(wrapper.vm.dirtyFields.name).toBeUndefined()
+      expect(wrapper.vm.dirtyFields.about).toBe(true)
+      expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+    })
+
+    // Same race, but for the location field, which is tracked separately
+    // via locationChangedByUser/savedLocationName rather than dirtyFields.
+    it('keeps the location marked unsaved if it is changed again while the save is still in flight', () => {
+      const wrapper = mount(GroupForm, {
+        propsData: { update: true, group },
+        mocks: { ...mocks, $can: () => true },
+        localVue,
+        stubs,
+        store,
+      })
+      wrapper
+        .findComponent(LocationPickerMap)
+        .vm.$emit('input', { label: 'Berlin', value: 'Berlin', lat: 52.5, lng: 13.4 })
+
+      wrapper.vm.submit()
+      const done = wrapper.emitted('updateGroup')[0][1]
+      // Simulate a further location change arriving before the mutation resolves.
+      wrapper
+        .findComponent(LocationPickerMap)
+        .vm.$emit('input', { label: 'Hamburg', value: 'Hamburg', lat: 53.5, lng: 10 })
+      done(true)
+
+      expect(wrapper.vm.locationChangedByUser).toBe(true)
+      expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+    })
   })
 
   describe('submit button greyed-out-but-clickable states', () => {

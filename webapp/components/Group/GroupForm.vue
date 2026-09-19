@@ -575,6 +575,14 @@ export default {
         categoryIds,
         showMembers: this.effectiveShowMembers,
       }
+      // Snapshot exactly what's being submitted — submit() to done() is a
+      // real network round-trip (not instantaneous), so the user may touch
+      // the form again while the mutation is still in flight. done(true)
+      // below must only clear what THIS submit actually sent, not wipe out
+      // an edit made after the snapshot was taken, or that later edit would
+      // be silently — and wrongly — marked as saved.
+      const submittedDirtyFieldKeys = Object.keys(this.dirtyFields)
+      const submittedLocationName = this.formLocationName
       // pages/groups/edit/_id/index.vue calls this with `true` once the
       // mutation actually succeeds (nothing on failure) — the edit form
       // stays open afterwards rather than navigating away, so without this
@@ -584,11 +592,14 @@ export default {
       const done = (success) => {
         this.loading = false
         if (success) {
-          this.savedLocationName = this.formLocationName
-          this.locationChangedByUser = false
-          // Everything just saved is no longer "unsaved" — see
-          // hasUnsavedChanges above.
-          this.dirtyFields = {}
+          // Only clear the fields that were part of THIS submit's snapshot
+          // — see the comment above. Anything dirtied afterwards (while the
+          // mutation was in flight) stays dirty.
+          submittedDirtyFieldKeys.forEach((key) => this.$delete(this.dirtyFields, key))
+          if (this.formLocationName === submittedLocationName) {
+            this.savedLocationName = submittedLocationName
+            this.locationChangedByUser = false
+          }
         }
       }
       this.update
