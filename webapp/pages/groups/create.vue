@@ -4,19 +4,21 @@
       <h1 class="ds-heading ds-heading-h1">{{ $t('group.createNewGroup.title') }}</h1>
     </div>
     <div class="ds-my-large"></div>
-    <div class="ds-container ds-container-x-large">
-      <os-card>
-        <div class="ds-my-large">
-          <div class="ds-flex ds-flex-gap-base group-create-layout">
-            <div class="group-create-layout__main">
-              <div class="ds-container ds-container-x-large">
-                <group-form ref="groupForm" @createGroup="createGroup" />
-              </div>
-            </div>
-            <div class="group-create-layout__aside">&nbsp;</div>
+    <div class="ds-flex ds-flex-gap-base group-create-layout">
+      <div class="group-create-layout__sidebar">
+        <os-menu :routes="routes" link-tag="router-link">
+          <os-menu-item slot="menuitem" slot-scope="item" :route="item.route">
+            {{ item.route.name }}
+          </os-menu-item>
+        </os-menu>
+      </div>
+      <div class="group-create-layout__main">
+        <os-card>
+          <div class="ds-my-large">
+            <group-form ref="groupForm" @createGroup="createGroup" />
           </div>
-        </div>
-      </os-card>
+        </os-card>
+      </div>
     </div>
     <confirm-modal
       v-if="showLeaveConfirmModal"
@@ -27,7 +29,7 @@
 </template>
 
 <script>
-import { OsCard } from '@ocelot-social/ui'
+import { OsCard, OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
 import GroupForm from '~/components/Group/GroupForm'
 import { createGroupMutation } from '~/graphql/groups.js'
@@ -38,6 +40,8 @@ export default {
   mixins: [confirmLeaveIfUnsavedChanges],
   components: {
     OsCard,
+    OsMenu,
+    OsMenuItem,
     ConfirmModal,
     GroupForm,
   },
@@ -45,6 +49,20 @@ export default {
     return {
       createGroupData: {},
     }
+  },
+  computed: {
+    // Modeled on pages/post/create/_type.vue's own left-hand type menu —
+    // for now there is only one group-creation flow, so there's nothing to
+    // switch between yet (no click handler needed either), but the
+    // structure is ready for whichever future group types land here.
+    routes() {
+      return [
+        {
+          name: this.$t('group.group'),
+          path: '/groups/create',
+        },
+      ]
+    },
   },
   methods: {
     hasUnsavedChanges() {
@@ -105,16 +123,17 @@ export default {
 </script>
 
 <style>
-.group-create-layout__main,
-.group-create-layout__aside {
+.group-create-layout__sidebar,
+.group-create-layout__main {
   flex: 0 0 100%;
   width: 100%;
 }
 @media (--vp-tablet-up) {
-  .group-create-layout__main {
-    flex: 5 0 0;
+  .group-create-layout__sidebar {
+    flex: 0 0 200px;
+    width: 200px;
   }
-  .group-create-layout__aside {
+  .group-create-layout__main {
     flex: 1 0 0;
   }
 }
