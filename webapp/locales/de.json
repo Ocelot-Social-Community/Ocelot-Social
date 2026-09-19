@@ -932,6 +932,7 @@
     "muted": "Gruppe stummgeschaltet",
     "myGroups": "Meine Gruppen",
     "name": "Gruppenname",
+    "noChangesHint": "Es gibt noch nichts zu speichern.",
     "previousLocation": "Vorheriger Ort: {location}",
     "radius": "Radius",
     "removeMember": "Mitglied aus der Gruppe entfernen?",

@@ -932,6 +932,7 @@
     "muted": "Группа отключена",
     "myGroups": "Мои группы",
     "name": "Название группы",
+    "noChangesHint": "Пока нечего сохранять.",
     "previousLocation": "Предыдущее местоположение: {location}",
     "radius": "Радиус",
     "removeMember": "Удалить участника",

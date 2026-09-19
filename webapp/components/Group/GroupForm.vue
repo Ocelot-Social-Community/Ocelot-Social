@@ -187,10 +187,10 @@
             type="submit"
             :loading="loading"
             :disabled="loading"
-            :class="{ 'permission-denied': !canCreateSelectedGroup }"
-            :aria-disabled="!canCreateSelectedGroup"
+            :class="{ 'permission-denied': submitVisuallyDenied }"
+            :aria-disabled="submitVisuallyDenied"
             v-tooltip="{
-              content: !canCreateSelectedGroup ? $t('permissions.deniedHint') : '',
+              content: submitDeniedHint,
             }"
           >
             <template #icon><os-icon :icon="icons.save" /></template>
@@ -467,6 +467,22 @@ export default {
     // an already-saved value, which dirtyFields has no equivalent for).
     hasUnsavedChanges() {
       return Object.keys(this.dirtyFields).length > 0 || this.locationChangedByUser
+    },
+    // Same grey-but-still-clickable treatment the submit button already
+    // uses for a missing permission (see canCreateSelectedGroup) — not an
+    // actual :disabled, deliberately: hasUnsavedChanges only tracks whether
+    // something was TOUCHED, not whether it truly differs from what's
+    // saved, so a gap in that tracking (a future field that forgets to wire
+    // itself up, the way the location and showMembers ones once did) must
+    // never make a real save unreachable. Worst case here is an invitingly-
+    // styled click that just re-saves the same values — never a blocked one.
+    submitVisuallyDenied() {
+      return !this.canCreateSelectedGroup || (this.update && !this.hasUnsavedChanges)
+    },
+    submitDeniedHint() {
+      if (!this.canCreateSelectedGroup) return this.$t('permissions.deniedHint')
+      if (this.update && !this.hasUnsavedChanges) return this.$t('group.noChangesHint')
+      return ''
     },
   },
   created() {

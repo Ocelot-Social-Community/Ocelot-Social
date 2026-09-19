@@ -932,6 +932,7 @@
     "muted": "Grupi u hesht",
     "myGroups": "Grupet e mia",
     "name": "Emri i grupit",
+    "noChangesHint": "Ende nuk ka asgjë për të ruajtur.",
     "previousLocation": "Vendndodhja e mëparshme: {location}",
     "radius": "Rrezja",
     "removeMember": "Hiq anëtarin",

@@ -294,6 +294,58 @@ describe('GroupForm', () => {
     })
   })
 
+  describe('submit button greyed-out-but-clickable states', () => {
+    const mountWith = (propsDataOverride, can = () => true) =>
+      mount(GroupForm, {
+        propsData: propsDataOverride,
+        mocks: { ...mocks, $can: can },
+        localVue,
+        stubs,
+        store,
+      })
+
+    // Not an actual :disabled — see submitVisuallyDenied's own doc comment:
+    // hasUnsavedChanges only tracks whether something was touched, not
+    // whether it truly differs from what's saved, so a tracking gap must
+    // never make a real save unreachable. Asserting classes()/aria-disabled
+    // here, not the disabled attribute, on purpose.
+    it('greys out the submit button while editing with nothing changed yet', () => {
+      const wrapper = mountWith({ update: true, group })
+      const submitButton = wrapper.find('button[type="submit"]')
+
+      expect(submitButton.classes()).toContain('permission-denied')
+      expect(submitButton.attributes('aria-disabled')).toBe('true')
+      expect(submitButton.attributes('disabled')).toBeUndefined()
+    })
+
+    it('un-greys the submit button once something has actually been changed', async () => {
+      const wrapper = mountWith({ update: true, group })
+      wrapper.vm.updateFormField('name', 'A new name')
+      await wrapper.vm.$nextTick()
+
+      const submitButton = wrapper.find('button[type="submit"]')
+      expect(submitButton.classes()).not.toContain('permission-denied')
+      expect(submitButton.attributes('aria-disabled')).toBeUndefined()
+    })
+
+    it('leaves the create form exactly as it was — never greyed out for "no changes"', () => {
+      const wrapper = mountWith({ update: false, group: {} })
+      const submitButton = wrapper.find('button[type="submit"]')
+
+      expect(submitButton.classes()).not.toContain('permission-denied')
+      expect(submitButton.attributes('aria-disabled')).toBeUndefined()
+    })
+
+    it('still greys out for a genuinely missing permission, distinct from "no changes"', () => {
+      const wrapper = mountWith({ update: false, group: {} }, () => false)
+      wrapper.vm.$set(wrapper.vm.formData, 'groupType', 'public')
+
+      const submitButton = wrapper.find('button[type="submit"]')
+      expect(submitButton.classes()).toContain('permission-denied')
+      expect(wrapper.vm.submitDeniedHint).toBe('permissions.deniedHint')
+    })
+  })
+
   describe('onBeforeUnload (native browser tab-close/reload prompt)', () => {
     const mountWith = (propsDataOverride) =>
       mount(GroupForm, { propsData: propsDataOverride, mocks, localVue, stubs, store })

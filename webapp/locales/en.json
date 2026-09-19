@@ -932,6 +932,7 @@
     "muted": "Group muted",
     "myGroups": "My Groups",
     "name": "Group name",
+    "noChangesHint": "There's nothing to save yet.",
     "previousLocation": "Previous location: {location}",
     "radius": "Radius",
     "removeMember": "Remove member",

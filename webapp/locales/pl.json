@@ -932,6 +932,7 @@
     "muted": "Grupa wyciszona",
     "myGroups": "Moje grupy",
     "name": "Nazwa grupy",
+    "noChangesHint": "Nie ma jeszcze nic do zapisania.",
     "previousLocation": "Poprzednia lokalizacja: {location}",
     "radius": "Zasięg",
     "removeMember": "Usuń członka",

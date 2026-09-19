@@ -932,6 +932,7 @@
     "muted": "Groupe en sourdine",
     "myGroups": "Mes groupes",
     "name": "Nom du groupe",
+    "noChangesHint": "Il n'y a encore rien à enregistrer.",
     "previousLocation": "Emplacement précédent : {location}",
     "radius": "Rayon",
     "removeMember": "Retirer le membre",
