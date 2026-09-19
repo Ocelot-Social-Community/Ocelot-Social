@@ -178,7 +178,7 @@
         </div>
         <!-- submit -->
         <div class="buttons ds-mt-large ds-mb-large">
-          <os-button as="nuxt-link" to="/groups" variant="default" appearance="filled">
+          <os-button as="nuxt-link" to="/groups" variant="primary" appearance="outline">
             {{ $t('actions.cancel') }}
           </os-button>
           <os-button
@@ -749,6 +749,8 @@ export default {
   > .buttons {
     align-self: flex-end;
     margin-top: var(--space-base);
+    display: flex;
+    gap: var(--space-small);
   }
 
   > .location-hint {
