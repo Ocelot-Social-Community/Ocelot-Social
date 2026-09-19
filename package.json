@@ -45,7 +45,7 @@
     "@cypress/webpack-preprocessor": "^8.0.0",
     "@vuepress/bundler-vite": "2.0.0-rc.18",
     "auto-changelog": "^2.6.1",
-    "cypress": "^16.0.0",
+    "cypress": "^16.1.0",
     "cypress-network-idle": "^2.0.1",
     "date-fns": "^3.6.0",
     "dotenv": "^17.3.1",
@@ -53,11 +53,11 @@
     "mock-socket": "^9.0.3",
     "multiple-cucumber-html-reporter": "^4.3.0",
     "node-polyfill-webpack-plugin": "^4.1.0",
-    "sass-embedded": "^1.104.0",
+    "sass-embedded": "^1.104.1",
     "vuepress": "2.0.0-rc.18",
     "vuepress-plugin-search-pro": "2.0.0-rc.59",
     "vuepress-theme-hope": "2.0.0-rc.59",
-    "webpack": "^5.110.3"
+    "webpack": "^5.111.0"
   },
   "resolutions": {
     "set-value": "^2.0.1",
