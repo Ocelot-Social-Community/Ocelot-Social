@@ -744,6 +744,23 @@ export default {
   margin-top: 0;
 }
 
+/* Beginn/Ende (date-picker) and Adresse (location-select) sit right next to
+   Titel/Ortsbeschreibung (both OcelotInput, whose bundled .ds-input-label
+   gets only its own 4px padding-bottom — see .ds-form-item above), so the
+   full extra 4px margin-bottom the shared .select-label rule adds on top of
+   its own 4px padding-bottom (8px total, see that rule's own comment) read
+   as a visibly bigger gap right where the two patterns sit side by side.
+   Dropping it to 0 (matching OcelotInput's 4px exactly) then read as
+   visibly tighter instead — these three end up next to a boxed control
+   with no validation-hint/description line underneath eating into the
+   whitespace the way OcelotInput's own fields have, so the same token
+   value doesn't read the same. 2px (--space-xxx-small) splits the
+   difference. */
+.event-grid-item > .select-label,
+.eventData label[for='city'].select-label {
+  margin-bottom: var(--space-xxx-small);
+}
+
 /* Editor's own margin-top lives on .editor-content (the space between its
    own toolbar and the text area), nested inside the error-state wrapper div
    that's the label's actual sibling here — out of reach of the
