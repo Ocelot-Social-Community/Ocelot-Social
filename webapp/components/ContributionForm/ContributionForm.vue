@@ -33,7 +33,12 @@
           </template>
           <div v-if="formData.image" class="blur-toggle">
             <label for="blur-img">{{ $t('contribution.inappropriatePicture') }}</label>
-            <input type="checkbox" id="blur-img" v-model="formData.imageBlurred" />
+            <input
+              type="checkbox"
+              id="blur-img"
+              v-model="formData.imageBlurred"
+              @change="imageChangedByUser = true"
+            />
             <page-params-link class="link" :pageParams="links.FAQ">
               {{ $t('contribution.inappropriatePicture') }}
               <os-icon :icon="icons.questionCircle" />
@@ -180,10 +185,7 @@
                 :show-label="false"
                 :placeholder="$t('post.viewEvent.eventLocationName')"
                 :disabled="locationSelectDisabled"
-                @input="
-                  touchField('eventLocationName')
-                  $validateForm()
-                "
+                @input="onEventLocationSelectInput"
               />
               <os-validation-hint
                 v-if="!locationSelectDisabled && visibleErrors && visibleErrors.eventLocationName"
@@ -243,11 +245,10 @@
                 appearance="filled"
                 type="submit"
                 :loading="loading"
-                :class="{ 'permission-denied': !contribution.id && !$can('post.create') }"
-                :aria-disabled="!contribution.id && !$can('post.create')"
+                :class="{ 'permission-denied': submitVisuallyDenied }"
+                :aria-disabled="submitVisuallyDenied"
                 v-tooltip="{
-                  content:
-                    !contribution.id && !$can('post.create') ? $t('permissions.deniedHint') : '',
+                  content: submitDeniedHint,
                 }"
               >
                 <template #icon>
@@ -321,20 +322,41 @@ export default {
     },
   },
   data() {
+    const formData = this.externalFormData || this.buildInitialFormData()
     return {
       links,
-      formData: this.externalFormData || this.buildInitialFormData(),
+      formData,
       loading: false,
       users: [],
       hashtags: [],
+      // eventLocationName and the hero image are set directly rather than
+      // through updateFormField()/$parentForm.update, so dirtyFields has no
+      // equivalent for them — same reasoning as GroupForm.vue's own
+      // locationChangedByUser (see hasUnsavedChanges below).
+      locationChangedByUser: false,
+      imageChangedByUser: false,
+      // See GroupForm.vue's own ignoreNextLocationInput for the full
+      // explanation: LocationSelect resolves an already-saved location into
+      // a normalized object right on mount, purely to display it — not a
+      // pick the user made. Only relevant when eventLocationName starts out
+      // as a plain string with something already in it — an already-
+      // resolved { lat, lng, ... } object (the common case once an event has
+      // been geocoded once) makes LocationSelect skip that resolve entirely,
+      // so there's nothing here to suppress.
+      ignoreNextLocationInput:
+        typeof formData.eventLocationName === 'string' && !!formData.eventLocationName,
     }
   },
   async mounted() {
+    window.addEventListener('beforeunload', this.onBeforeUnload)
     try {
       await import(`vue2-datepicker/locale/${this.currentUser.locale}`)
     } catch {
       await import('vue2-datepicker/locale/en')
     }
+  },
+  beforeDestroy() {
+    window.removeEventListener('beforeunload', this.onBeforeUnload)
   },
   computed: {
     ...mapGetters({
@@ -506,6 +528,37 @@ export default {
     locationSelectDisabled() {
       return this.formData.eventIsOnline
     },
+    canSubmit() {
+      return !!this.contribution.id || this.$can('post.create')
+    },
+    // Exposed (via $refs) for the page's own beforeRouteLeave guard and the
+    // native beforeunload prompt below — same pattern as GroupForm.vue.
+    // dirtyFields covers every field wired through updateFormField()/
+    // $parentForm.update (title, content, eventVenue, eventIsOnline,
+    // eventEnd, eventStart, categoryIds) — eventLocationName and the hero
+    // image are tracked separately (see data() above), since they're set
+    // directly rather than through updateFormField.
+    hasUnsavedChanges() {
+      return (
+        Object.keys(this.dirtyFields).length > 0 ||
+        this.locationChangedByUser ||
+        this.imageChangedByUser
+      )
+    },
+    // Same grey-but-still-clickable treatment GroupForm.vue's submit button
+    // uses — not an actual :disabled, deliberately: hasUnsavedChanges only
+    // tracks whether something was TOUCHED, not whether it truly differs
+    // from what's saved, so a gap in that tracking must never make a real
+    // save unreachable. Worst case here is an invitingly-styled click that
+    // just re-saves the same values — never a blocked one.
+    submitVisuallyDenied() {
+      return !this.canSubmit || (!!this.contribution.id && !this.hasUnsavedChanges)
+    },
+    submitDeniedHint() {
+      if (!this.canSubmit) return this.$t('permissions.deniedHint')
+      if (this.contribution.id && !this.hasUnsavedChanges) return this.$t('common.noChangesHint')
+      return ''
+    },
   },
   watch: {
     groupCategories() {
@@ -592,7 +645,7 @@ export default {
       }
     },
     onSubmit() {
-      if (!this.contribution.id && !this.$can('post.create')) {
+      if (!this.canSubmit) {
         this.$toast.error(this.$t('permissions.deniedHint'))
         return
       }
@@ -635,6 +688,15 @@ export default {
           this.$toast.success(this.$t('contribution.success'))
           const result = data[this.contribution.id ? 'UpdatePost' : 'CreatePost']
 
+          // Clear all unsaved-changes tracking before navigating away — this
+          // is the very save the leave-confirmation guard (beforeRouteLeave,
+          // see confirmLeaveIfUnsavedChanges) would otherwise still see as
+          // dirty for the push() below, wrongly asking to confirm discarding
+          // what was just saved.
+          this.dirtyFields = {}
+          this.locationChangedByUser = false
+          this.imageChangedByUser = false
+
           this.$router.push({
             name: 'post-id-slug',
             params: { id: result.id, slug: result.slug },
@@ -651,7 +713,20 @@ export default {
     changeEventIsOnline() {
       this.updateFormField('eventIsOnline', this.formData.eventIsOnline)
     },
+    // See ignoreNextLocationInput's own doc comment (data()) — the first
+    // input after mount can be LocationSelect normalizing an already-saved
+    // plain-string value on its own, not a pick the user made.
+    onEventLocationSelectInput() {
+      if (this.ignoreNextLocationInput) {
+        this.ignoreNextLocationInput = false
+      } else {
+        this.locationChangedByUser = true
+      }
+      this.touchField('eventLocationName')
+      this.$validateForm()
+    },
     onLocationPickerMapInput(location) {
+      this.locationChangedByUser = true
       this.formData.eventLocationName = location
       this.touchField('eventLocationName')
       this.$validateForm()
@@ -662,10 +737,20 @@ export default {
     },
     changeEventStart(event) {
       this.touchField('eventStart')
+      this.$set(this.dirtyFields, 'eventStart', true)
       this.$set(this.formData, 'eventStart', event)
       this.$validateForm()
     },
+    onBeforeUnload(event) {
+      if (!this.hasUnsavedChanges) return
+      // Browsers show their own fixed wording here for security reasons —
+      // setting returnValue (the legacy way to opt in) is what triggers it;
+      // the actual string is ignored by every modern browser.
+      event.preventDefault()
+      event.returnValue = ''
+    },
     addHeroImage(file) {
+      this.imageChangedByUser = true
       this.formData.image = null
       this.formData.imageUpload = null
       if (file) {
@@ -681,9 +766,11 @@ export default {
       }
     },
     addImageAspectRatio(aspectRatio) {
+      this.imageChangedByUser = true
       this.formData.imageAspectRatio = aspectRatio
     },
     addImageType(imageType) {
+      this.imageChangedByUser = true
       this.formData.imageType = imageType
     },
   },

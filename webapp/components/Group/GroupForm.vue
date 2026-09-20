@@ -493,7 +493,7 @@ export default {
     },
     submitDeniedHint() {
       if (!this.canCreateSelectedGroup) return this.$t('permissions.deniedHint')
-      if (this.update && !this.hasUnsavedChanges) return this.$t('group.noChangesHint')
+      if (this.update && !this.hasUnsavedChanges) return this.$t('common.noChangesHint')
       return ''
     },
   },

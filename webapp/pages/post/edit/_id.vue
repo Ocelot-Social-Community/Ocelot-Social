@@ -37,24 +37,34 @@
       </div>
       <div class="post-edit-layout__main">
         <contribution-form
+          ref="contributionForm"
           :contribution="contribution"
           :group="contribution && contribution.group ? contribution.group : null"
           :post-type="currentPostType"
         />
       </div>
     </div>
+    <confirm-modal
+      v-if="showLeaveConfirmModal"
+      :modalData="leaveConfirmModalData"
+      @close="showLeaveConfirmModal = false"
+    />
   </div>
 </template>
 
 <script>
 import { OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import ContributionForm from '~/components/ContributionForm/ContributionForm.vue'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 import PostQuery from '~/graphql/PostQuery'
 import { mapGetters } from 'vuex'
+import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
 
 export default {
+  mixins: [confirmLeaveIfUnsavedChanges],
   components: {
     ContributionForm,
+    ConfirmModal,
     OsMenu,
     OsMenuItem,
   },
@@ -108,6 +118,9 @@ export default {
     return { contribution, currentPostType: contribution.postType?.[0] || 'Article' }
   },
   methods: {
+    hasUnsavedChanges() {
+      return !!this.$refs.contributionForm?.hasUnsavedChanges
+    },
     switchPostType(_event, item) {
       this.currentPostType = item.route.type
     },

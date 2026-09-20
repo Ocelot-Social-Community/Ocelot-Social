@@ -50,6 +50,7 @@
       <div class="post-create-layout__main">
         <transition name="slide-up" appear>
           <contribution-form
+            ref="contributionForm"
             :group="selectedGroup"
             :post-type="type === 'event' ? 'Event' : 'Article'"
             :externalFormData="draft"
@@ -57,6 +58,11 @@
         </transition>
       </div>
     </div>
+    <confirm-modal
+      v-if="showLeaveConfirmModal"
+      :modalData="leaveConfirmModalData"
+      @close="showLeaveConfirmModal = false"
+    />
   </div>
 </template>
 
@@ -66,6 +72,8 @@ import { mapGetters } from 'vuex'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { myGroupsForPostCreation } from '~/graphql/groups'
 import ContributionForm from '~/components/ContributionForm/ContributionForm'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
+import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
 
 const buildEmptyDraft = () => ({
   title: '',
@@ -108,8 +116,10 @@ export const __resetSharedDraftForTests = () => {
 }
 
 export default {
+  mixins: [confirmLeaveIfUnsavedChanges],
   components: {
     ContributionForm,
+    ConfirmModal,
     OsIcon,
     OsMenu,
     OsMenuItem,
@@ -270,6 +280,9 @@ export default {
     },
   },
   methods: {
+    hasUnsavedChanges() {
+      return !!this.$refs.contributionForm?.hasUnsavedChanges
+    },
     selectContext(groupId) {
       this.draft.groupId = groupId
       this.syncUrlQuery()
