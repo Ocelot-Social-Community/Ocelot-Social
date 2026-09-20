@@ -236,7 +236,7 @@
                 variant="primary"
                 appearance="outline"
                 :disabled="loading"
-                @click="$router.back()"
+                @click="onCancel"
               >
                 {{ $t('actions.cancel') }}
               </os-button>
@@ -318,6 +318,17 @@ export default {
     // Lets callers hoist form state so it survives remounts (e.g. type switch).
     externalFormData: {
       type: Object,
+      default: null,
+    },
+    // Where "Cancel" should navigate to — the page the user actually
+    // arrived from, captured by the hosting page's own beforeRouteEnter
+    // (there isn't just one place this form is reached from, and within
+    // /post/create/* switching the article/event type itself does a
+    // route navigation, so $router.back() could just undo that switch
+    // instead of leaving the flow). Falls back to $router.back() when not
+    // provided, e.g. for any other future caller that doesn't wire this up.
+    cancelTo: {
+      type: String,
       default: null,
     },
   },
@@ -642,6 +653,16 @@ export default {
               : eventLocationName || '',
         eventVenue: eventVenue || '',
         eventIsOnline: eventIsOnline || false,
+      }
+    },
+    onCancel() {
+      // beforeRouteLeave (confirmLeaveIfUnsavedChanges, wired up on the
+      // hosting page) still intercepts this navigation exactly like any
+      // other, so an unsaved-changes prompt still applies here too.
+      if (this.cancelTo) {
+        this.$router.push(this.cancelTo)
+      } else {
+        this.$router.back()
       }
     },
     onSubmit() {

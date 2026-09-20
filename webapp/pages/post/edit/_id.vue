@@ -41,6 +41,7 @@
           :contribution="contribution"
           :group="contribution && contribution.group ? contribution.group : null"
           :post-type="currentPostType"
+          :cancel-to="cancelReturnPath"
         />
       </div>
     </div>
@@ -94,7 +95,21 @@ export default {
         postType: ['Article'],
       },
       currentPostType: 'Article',
+      // Where "Cancel" should return to — see ContributionForm.vue's own
+      // cancelTo prop doc comment. '/' covers the no-real-referrer case
+      // (e.g. a fresh direct load), same as beforeRouteEnter's own fallback
+      // below.
+      cancelReturnPath: '/',
     }
+  },
+  // Unlike pages/post/create/_type.vue, switchPostType here never navigates
+  // (it just flips currentPostType locally), so there's no remount to
+  // survive — setting this directly on the instance via next(vm => …) is
+  // enough.
+  beforeRouteEnter(_to, from, next) {
+    next((vm) => {
+      vm.cancelReturnPath = from.fullPath || '/'
+    })
   },
   async asyncData(context) {
     const {

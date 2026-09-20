@@ -160,6 +160,24 @@ describe('post/edit/_id.vue', () => {
     })
   })
 
+  describe('cancelReturnPath ("Cancel" target)', () => {
+    it('defaults to "/" (no real referrer, e.g. a fresh direct load)', async () => {
+      wrapper = await buildWrapper()
+      expect(wrapper.findComponent({ name: 'ContributionForm' }).props('cancelTo')).toBe('/')
+    })
+
+    it('is set from beforeRouteEnter and passed through to ContributionForm as cancel-to', async () => {
+      wrapper = await buildWrapper()
+      const next = jest.fn((cb) => cb(wrapper.vm))
+      _id.beforeRouteEnter({}, { fullPath: '/post/p1/some-slug' }, next)
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.findComponent({ name: 'ContributionForm' }).props('cancelTo')).toBe(
+        '/post/p1/some-slug',
+      )
+    })
+  })
+
   describe('heading', () => {
     it('shows the article heading by default', async () => {
       wrapper = await buildWrapper()

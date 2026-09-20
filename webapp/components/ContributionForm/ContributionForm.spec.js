@@ -270,10 +270,29 @@ describe('ContributionForm.vue', () => {
       })
 
       describe('cancel', () => {
-        it('calls $router.back() when cancel button clicked', () => {
+        it('falls back to $router.back() when no cancelTo is given', () => {
           cancelBtn = wrapper.find('[data-test="cancel-button"]')
           cancelBtn.trigger('click')
           expect(mocks.$router.back).toHaveBeenCalledTimes(1)
+        })
+
+        // The hosting page (pages/post/create/_type.vue, pages/post/edit/_id.vue)
+        // captures where the user actually arrived from and passes it down as
+        // cancelTo — $router.back() alone can't do this, since there are
+        // multiple places this form is reached from, and switching the
+        // article/event type mid-flow is itself a route navigation that
+        // $router.back() would just undo instead of leaving the flow.
+        it('navigates to cancelTo instead, when given', () => {
+          const withCancelTo = mount(ContributionForm, {
+            mocks,
+            localVue,
+            store,
+            propsData: { ...propsData, cancelTo: '/groups/g1/some-group' },
+            stubs,
+          })
+          withCancelTo.find('[data-test="cancel-button"]').trigger('click')
+          expect(mocks.$router.push).toHaveBeenCalledWith('/groups/g1/some-group')
+          expect(mocks.$router.back).not.toHaveBeenCalled()
         })
       })
 

@@ -54,6 +54,7 @@
             :group="selectedGroup"
             :post-type="type === 'event' ? 'Event' : 'Article'"
             :externalFormData="draft"
+            :cancel-to="cancelReturnPath"
           />
         </transition>
       </div>
@@ -115,6 +116,19 @@ export const __resetSharedDraftForTests = () => {
   sharedDraft = null
 }
 
+// Where "Cancel" should return to — captured once on genuine arrival via
+// beforeRouteEnter below. Module-level for the same reason as sharedDraft:
+// switching the article/event type mid-flow does a real route navigation
+// (see switchPostType), which Nuxt remounts this page for, and
+// beforeRouteEnter does not re-fire for that (same matched route, only the
+// :type param changes) — a plain data() value would be wiped by the
+// remount. Reset in beforeRouteLeave when actually leaving the flow.
+let cancelReturnPath = null
+
+export const __resetCancelReturnPathForTests = () => {
+  cancelReturnPath = null
+}
+
 export default {
   mixins: [confirmLeaveIfUnsavedChanges],
   components: {
@@ -164,6 +178,7 @@ export default {
       draft,
       myGroups: [],
       seededLocationFromMapPin,
+      cancelReturnPath,
     }
   },
   mounted() {
@@ -194,9 +209,20 @@ export default {
       redirect(path)
     }
   },
+  // Only fires on a genuine arrival (a different matched route) — not on
+  // switchPostType's own $router.replace between article/event, which
+  // updates the :type param of this same route instead. Exactly the
+  // distinction cancelReturnPath needs: it must capture where the user
+  // actually came from, not get reset to "the create page itself" every
+  // time they switch type mid-flow.
+  beforeRouteEnter(_to, from, next) {
+    cancelReturnPath = from.fullPath || '/'
+    next()
+  },
   beforeRouteLeave(to, _from, next) {
     if (!to.path || !to.path.startsWith('/post/create/')) {
       sharedDraft = null
+      cancelReturnPath = null
     }
     next()
   },

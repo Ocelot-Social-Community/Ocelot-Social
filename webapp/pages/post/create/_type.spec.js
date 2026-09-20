@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import create, { __resetSharedDraftForTests } from './_type.vue'
+import create, { __resetSharedDraftForTests, __resetCancelReturnPathForTests } from './_type.vue'
 import Vuex from 'vuex'
 
 const localVue = global.localVue
@@ -48,6 +48,7 @@ describe('create.vue', () => {
     routerReplace = jest.fn()
     mocks = makeMocks()
     __resetSharedDraftForTests()
+    __resetCancelReturnPathForTests()
   })
 
   describe('mount', () => {
@@ -422,6 +423,61 @@ describe('create.vue', () => {
       const backToArticle = Wrapper()
       expect(backToArticle.vm.draft.title).toBe('Keep me')
       expect(backToArticle.vm.draft.eventStart).toBe('2026-06-01T12:00:00')
+    })
+  })
+
+  describe('cancelReturnPath ("Cancel" target)', () => {
+    it('is passed through to ContributionForm as cancel-to', () => {
+      const enter = create.beforeRouteEnter
+      const next = jest.fn()
+      enter({}, { fullPath: '/newsfeed' }, next)
+      expect(next).toHaveBeenCalled()
+
+      wrapper = Wrapper()
+      expect(wrapper.findComponent({ name: 'ContributionForm' }).props('cancelTo')).toBe(
+        '/newsfeed',
+      )
+    })
+
+    it('falls back to "/" when there is no real referrer (e.g. a fresh direct load)', () => {
+      const enter = create.beforeRouteEnter
+      const next = jest.fn()
+      // Vue Router's own START_LOCATION has no fullPath worth keeping.
+      enter({}, {}, next)
+
+      wrapper = Wrapper()
+      expect(wrapper.findComponent({ name: 'ContributionForm' }).props('cancelTo')).toBe('/')
+    })
+
+    // The actual reason this needs to be module-level rather than plain
+    // data() — see cancelReturnPath's own doc comment: switchPostType does a
+    // real $router.replace, which remounts this page (same as the draft
+    // persistence tests above), but beforeRouteEnter itself does not re-fire
+    // for it (same matched route, only :type changes).
+    it('survives the remount caused by switching type mid-flow', () => {
+      const enter = create.beforeRouteEnter
+      enter({}, { fullPath: '/groups/g1/slug' }, jest.fn())
+
+      const first = Wrapper()
+      first.destroy()
+
+      const second = Wrapper()
+      expect(second.findComponent({ name: 'ContributionForm' }).props('cancelTo')).toBe(
+        '/groups/g1/slug',
+      )
+    })
+
+    it('is cleared once the user actually leaves the post-create flow', () => {
+      const enter = create.beforeRouteEnter
+      enter({}, { fullPath: '/groups/g1/slug' }, jest.fn())
+
+      wrapper = Wrapper()
+      const next = jest.fn()
+      const leave = create.beforeRouteLeave
+      leave.call(wrapper.vm, { path: '/some/other/page' }, {}, next)
+
+      const fresh = Wrapper()
+      expect(fresh.findComponent({ name: 'ContributionForm' }).props('cancelTo')).toBeNull()
     })
   })
 
