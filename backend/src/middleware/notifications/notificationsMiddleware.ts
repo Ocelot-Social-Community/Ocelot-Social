@@ -103,29 +103,42 @@ const handleRemoveUserFromGroup: IMiddlewareResolver = async (
   return user
 }
 
-const handleContentDataOfPost: IMiddlewareResolver = async (
-  resolve,
-  root,
-  args,
-  context,
-  resolveInfo,
-) => {
-  const { groupId } = args
-  const idsOfUsers = extractMentionedUsers(args.content)
+/**
+ * Everyone the post MENTIONS, for both creating and editing.
+ *
+ * Shared because an @-mention added while editing has to arrive — that is the one notification
+ * an edit legitimately produces. Nothing else about an edit is news.
+ *
+ * `args.content` is read before `resolve` on purpose: the mutation runs the content through
+ * sanitising middleware, and the mentions have to be taken from what the author wrote.
+ */
+const notifyMentionedInPost = async (postId, content, context): Promise<string[]> =>
+  publishNotifications(
+    context,
+    notifyUsersOfMention(
+      'Post',
+      postId,
+      extractMentionedUsers(content),
+      'mentioned_in_post',
+      context,
+    ),
+    'emailNotificationsMention',
+  )
+
+const handleCreatePost: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
+  const { groupId, content } = args
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
-    const sentEmails: string[] = await publishNotifications(
+    // `publishNotifications` PUSHES into the array it is handed and returns that same array, so
+    // passing it along is what keeps a follower who is also mentioned from getting two mails
+    // about one post. The previous spelling wrapped the second call in `sentEmails.concat(…)`
+    // and dropped the result — dead code that read as if it were doing the accumulating.
+    const sentEmails: string[] = await notifyMentionedInPost(post.id, content, context)
+    await publishNotifications(
       context,
-      notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
-      'emailNotificationsMention',
-    )
-    sentEmails.concat(
-      await publishNotifications(
-        context,
-        notifyFollowingUsers(post.id, groupId, context),
-        'emailNotificationsFollowingUsers',
-        sentEmails,
-      ),
+      notifyFollowingUsers(post.id, context),
+      'emailNotificationsFollowingUsers',
+      sentEmails,
     )
     await publishNotifications(
       context,
@@ -133,6 +146,32 @@ const handleContentDataOfPost: IMiddlewareResolver = async (
       'emailNotificationsPostInGroup',
       sentEmails,
     )
+  }
+  return post
+}
+
+/**
+ * An edit is not a new post.
+ *
+ * Both mutations used to share one handler, which announced every edit to the author's
+ * followers and to the group as if the post had just appeared. Two things were wrong with it.
+ *
+ * The leak: the group filter took its group from `args.groupId`, an argument only CreatePost
+ * declares (see Post.gql). On an edit it arrived as `undefined`, matched no group, and the
+ * filter fell open — every follower of the author was notified about a post inside a hidden
+ * group, naming its title and author to people who cannot open it. That half is fixed in
+ * `notifyFollowingUsers`, which now asks the graph instead of trusting an argument.
+ *
+ * The resurrection: the MERGE sets `read = FALSE` on an EXISTING edge, so a correcting a typo
+ * pushed a long-read notification back to the top of everyone's bell.
+ *
+ * Mentions stay, for the reason given above them.
+ */
+const handleUpdatePost: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
+  const content = args.content
+  const post = await resolve(root, args, context, resolveInfo)
+  if (post) {
+    await notifyMentionedInPost(post.id, content, context)
   }
   return post
 }
@@ -188,14 +227,31 @@ const postAuthorOfComment = async (commentId, { context }) => {
   }
 }
 
-const notifyFollowingUsers = async (postId, groupId, context) => {
+/**
+ * Announce a new post to the author's followers — unless it lives in a non-public group.
+ *
+ * The group comes from the GRAPH, not from a mutation argument. It used to be passed in as
+ * `groupId` and matched with `(post)-[:IN]->(group:Group { id: $groupId })`, which made the
+ * filter fail OPEN in the one case it exists for: `groupId` is declared on CreatePost only, so
+ * on UpdatePost it arrived as `null`, the OPTIONAL MATCH bound nothing, `group IS NULL` was
+ * true, and every follower learned the title and author of a post inside a hidden group. An
+ * access rule cannot depend on the caller remembering to pass its subject.
+ *
+ * Spelled as "no non-public group", not "the group is public": a post reached through several
+ * `:IN` edges produced one row per group, and any public one among them let the whole post
+ * through. This is also the rule `postFilter.ts` applies to an anonymous visitor (`invisibleTo`),
+ * in the same words — the timeline and the notification now agree on what is announceable.
+ */
+const notifyFollowingUsers = async (postId, context) => {
   const reason = 'followed_user_posted'
   const cypher = `
     MATCH (post:Post { id: $postId })<-[:WROTE]-(author:User { id: $userId })<-[:FOLLOWS]-(user:User)
-    OPTIONAL MATCH (post)-[:IN]->(group:Group { id: $groupId })
     OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
-    WITH post, author, user, emailAddress, group
-    WHERE group IS NULL OR group.groupType = 'public'
+    WITH post, author, user, emailAddress
+    WHERE NOT EXISTS {
+      MATCH (post)-[:IN]->(group:Group)
+      WHERE NOT group.groupType = 'public'
+    }
     MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
       SET notification.read = FALSE
       SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
@@ -216,7 +272,6 @@ const notifyFollowingUsers = async (postId, groupId, context) => {
       const notificationTransactionResponse = await transaction.run(cypher, {
         postId,
         reason,
-        groupId: groupId || null,
         userId: context.user.id,
       })
       return notificationTransactionResponse.records.map((record) => record.get('notification'))
@@ -337,6 +392,25 @@ const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
   }
 }
 
+/**
+ * Notify everyone a post or comment MENTIONS — once per resource, ever.
+ *
+ * Both mutations of a resource run this, and an edit hands over every mention the new content
+ * carries, unchanged ones included. Without the `NOT EXISTS` guard below, MERGE would find the
+ * existing edge and the unconditional `SET notification.read = FALSE` further down would flip a
+ * long-read notification back to unread, push it to the top of the bell, reset the unread badge
+ * and send a second mail — for a typo fix. That is the same "resurrection" the split of
+ * Create/UpdatePost fixed for followers and group members (see `handleUpdatePost`); it lived on
+ * here because the mention path is shared between creating and editing on purpose.
+ *
+ * The guard drops those recipients before the MERGE, so there is no row at all: no edge written,
+ * no `read` reset, no subscription, no mail. It is a no-op on creation — a resource that was just
+ * created has no NOTIFIED edges — and it deliberately does NOT catch the one notification an edit
+ * legitimately produces: a mention ADDED while editing has no edge yet.
+ *
+ * Being told once is the whole of what this notification says. It carries no indication of which
+ * revision mentioned you, so a second alert about the same post conveys nothing the first did not.
+ */
 const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
   if (!idsOfUsers?.length) {
     return []
@@ -354,8 +428,24 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
         OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
         OPTIONAL MATCH (post)-[:IN]->(group:Group)
         OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(user)
-        WITH post, author, user, group, emailAddress
-        WHERE group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner']
+        // \`membership\` is projected because the WHERE below reads it. Neo4j 4.4 resolves it
+        // even when the WITH drops it — the closed-group cases in
+        // notificationsMiddleware.mentions-in-groups.spec.ts only pass because it evaluates
+        // per user there (member notified, pending member not, non-member not, all three
+        // decided by \`membership.role\` alone) — but that is a tolerance, not a guarantee, and
+        // every other query in this codebase carries the variable explicitly. Relying on it
+        // would hand the Neo4j 5 upgrade a silent \`Variable not defined\`.
+        WITH post, author, user, group, emailAddress, membership
+        // The parentheses are load-bearing, and they protect the GUARD, not the group rule:
+        // unparenthesised, \`A OR B OR C AND D\` binds as \`A OR B OR (C AND D)\`, so for a post
+        // outside any group \`group IS NULL\` alone satisfies the disjunction and the
+        // \`NOT EXISTS\` below is never consulted — every already-mentioned user is notified
+        // again on every edit, which is the whole bug this guard exists for. Verified by
+        // removing them: the group cases stay green, the three edit cases in
+        // notificationsMiddleware.spec.ts fail.
+        WHERE (group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner'])
+        // Already told about this post — see the note on this function.
+        AND NOT EXISTS { MATCH (post)-[:NOTIFIED { reason: $reason }]->(user) }
         MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
         WITH post AS resource, notification, user, emailAddress
       `
@@ -373,8 +463,12 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
       OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
       OPTIONAL MATCH (post)-[:IN]->(group:Group)
       OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(user)
-      WITH comment, user, group, emailAddress
-      WHERE group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner']
+      // \`membership\` projected for the same reason as in the post branch above.
+      WITH comment, user, group, emailAddress, membership
+      // Parenthesised for the same reason as in the post branch above.
+      WHERE (group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner'])
+      // Already told about this comment — see the note on this function.
+      AND NOT EXISTS { MATCH (comment)-[:NOTIFIED { reason: $reason }]->(user) }
       MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(user)
       WITH comment AS resource, notification, user, emailAddress
       `
@@ -407,6 +501,19 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
   }
 }
 
+/**
+ * Tell everyone observing the post that a comment appeared — once per comment, ever.
+ *
+ * `handleContentDataOfComment` serves CreateComment AND UpdateComment, so this ran again on every
+ * edit of a comment: the MERGE found the existing edge, `read` was reset to FALSE and a second
+ * mail went out to EVERY observer of the post, because someone fixed a typo in a reply. Same
+ * defect as the mention path (see `notifyUsersOfMention`), with a larger audience — observers of
+ * the post rather than the people named in it.
+ *
+ * Hence the `NOT EXISTS` guard: an observer already told about this comment produces no row, so
+ * nothing is written, reset, published or mailed. A no-op on CreateComment, where no edge exists
+ * yet. An edit of a comment is not news; its appearance was.
+ */
 const notifyUsersOfComment = async (label, commentId, reason, context) => {
   await validateNotifyUsers(label, reason)
   const session = context.driver.session()
@@ -418,6 +525,10 @@ const notifyUsersOfComment = async (label, commentId, reason, context) => {
           WHERE NOT (observingUser)-[:BLOCKED]-(commenter)
           AND NOT (observingUser)-[:MUTED]->(commenter)
           AND NOT observingUser.id = $userId
+          // Already told about this comment — see the note on this function. Safe to append as
+          // a bare AND here: this WHERE is a chain of ANDs, unlike the group rule in
+          // notifyUsersOfMention, which needed parentheses.
+          AND NOT EXISTS { MATCH (comment)-[:NOTIFIED { reason: $reason }]->(observingUser) }
         OPTIONAL MATCH (observingUser)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
         WITH observingUser, emailAddress, post, comment, commenter
         MATCH (postAuthor:User)-[:WROTE]->(post)
@@ -550,8 +661,8 @@ const handleCreateMessage: IMiddlewareResolver = async (
 
 export default {
   Mutation: {
-    CreatePost: handleContentDataOfPost,
-    UpdatePost: handleContentDataOfPost,
+    CreatePost: handleCreatePost,
+    UpdatePost: handleUpdatePost,
     CreateComment: handleContentDataOfComment,
     UpdateComment: handleContentDataOfComment,
     JoinGroup: handleJoinGroup,
