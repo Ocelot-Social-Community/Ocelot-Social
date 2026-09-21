@@ -674,6 +674,42 @@ describe('given a notification about a post the recipient may not see', () => {
     )
   })
 
+  describe('and a second notification about a comment on a post the recipient may see', () => {
+    // The reach-through has to bind the parent post to the CANNOT_SEE edge. A version that asked
+    // only whether the resource is *a* comment, or a comment on *any* post, passes every
+    // assertion above — there the single comment sits under the single hidden post, so the
+    // over-broad and the correct condition are indistinguishable. This is what separates them:
+    // same recipient, same CANNOT_SEE edge, but a comment whose post is reachable.
+    beforeEach(async () => {
+      await Factory.build(
+        'post',
+        { id: 'open-post', content: 'A post you are in the group for' },
+        { author, categoryIds: ['cat1'] },
+      )
+      const openComment = await Factory.build(
+        'comment',
+        { id: 'open-comment', content: 'A comment on it' },
+        { author, postId: 'open-post' },
+      )
+      await openComment.relateTo(user, 'notified', {
+        createdAt: '2026-09-16T10:02:00.000Z',
+        read: false,
+        reason: 'commented_on_post',
+      })
+    })
+
+    it('lists that one and neither of the two hidden ones', async () => {
+      await expect(query({ query: notifications, variables })).resolves.toMatchObject({
+        data: {
+          notifications: [
+            expect.objectContaining({ from: expect.objectContaining({ id: 'open-comment' }) }),
+          ],
+        },
+        errors: undefined,
+      })
+    })
+  })
+
   it('still lists it for someone who may see the post', async () => {
     // The filter is per recipient, not per post: the same notification must survive for a
     // reader without the edge. Without this, a filter that dropped everything would pass.
