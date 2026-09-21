@@ -19,6 +19,7 @@ import { orderClause } from './helpers/ordering'
 import { pagingClause } from './helpers/paging'
 import { postFilterToCypher, postOrderClause } from './helpers/postFilter'
 import Resolver from './helpers/Resolver'
+import { viewerScope } from './helpers/viewerGroups'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
 
@@ -71,8 +72,33 @@ const NOTIFIED_COMMENTS_FOR_POST_CYPHER = `
 // the empty case. That branch was redundant twice over: spreading an empty (or absent) filter
 // produces exactly `{}` anyway, so the two arms were the same value — and by the time either runs,
 // filterInvisiblePosts has already put `invisibleTo` into the filter, so it is never empty.
+
+/**
+ * Filter operators that must stay OUTSIDE the pinned-post OR.
+ *
+ * A pinned post is exempt from the filters that express PREFERENCE — muting, event dates — and
+ * that is the point of pinning. It is not exempt from the ones that express PERMISSION, and
+ * putting the whole filter into one branch of `pinned OR (…)` made it exactly that: the clause
+ * `post.pinned = true` satisfied the query on its own.
+ *
+ * That was reachable. `pinPost` refuses a post in a non-public group, but nothing un-pins one
+ * when its group turns non-public LATER — pin a post while the group is public, switch the
+ * group to hidden, and the post stayed readable to non-members and to logged-out visitors.
+ *
+ * Hoisting these two out makes the shape `permission AND (pinned OR preference)` instead of
+ * `pinned OR (permission AND preference)`.
+ */
+const splitPermissionFilters = (filter: Record<string, unknown> | undefined) => {
+  // Destructured by name rather than looped over a list of keys: there are two of them, and
+  // static keys mean no computed property access to reason about. Carrying them through as
+  // `undefined` when absent is safe — postFilterToCypher skips undefined filter values.
+  const { invisibleTo, inGroupsOf, ...rest } = filter ?? {}
+  return { permissions: { invisibleTo, inGroupsOf }, rest }
+}
+
 const maintainPinnedPosts = (params) => {
-  params.filter = { OR: [{ pinned: true }, { ...params.filter }] }
+  const { permissions, rest } = splitPermissionFilters(params.filter)
+  params.filter = { ...permissions, OR: [{ pinned: true }, rest] }
   return params
 }
 
@@ -81,8 +107,9 @@ const maintainGroupPinnedPosts = (params) => {
   if (!params.filter?.group) {
     return params
   }
-  const pinnedPostFilter = { groupPinned: true, group: params.filter.group }
-  params.filter = { OR: [pinnedPostFilter, { ...params.filter }] }
+  const { permissions, rest } = splitPermissionFilters(params.filter)
+  const pinnedPostFilter = { groupPinned: true, group: rest.group }
+  params.filter = { ...permissions, OR: [pinnedPostFilter, rest] }
   return params
 }
 
@@ -143,23 +170,39 @@ const commentOrderClause = (orderBy: unknown): string =>
 // localise. postFilterToCypher translates the tree they build.
 const queryPosts = async (params, context: Context) => {
   const { where, params: whereParams } = postFilterToCypher(params)
-  // Never actually empty on either path into this helper: filterInvisiblePosts always writes
-  // `invisibleTo` into the filter, even for an anonymous viewer, so postFilterToCypher always has
-  // at least that one condition to translate. Kept as a guard rather than inlined because an
-  // unconditional `WHERE` with nothing behind it is a Cypher syntax error, not an empty filter.
+  // Not a filter. Post.createdAt is required by the entity schema, so this excludes nothing —
+  // it exists so the planner will consider the `post_created_at` index, which Neo4j 4.4 does
+  // only when a predicate names the property. That index is what supplies the ORDER BY: with
+  // it the scan yields rows already in createdAt order, the Sort collapses to a PartialTop
+  // over the id tiebreaker alone, and the scan stops at the LIMIT. Measured over 20.000 posts:
+  // 220.376 db hits without, 724 with.
+  //
+  // Harmless on the other paths through here. A lookup filtering on `post.id` still gets the
+  // unique index seek (19 db hits either way), and an ordering the index cannot serve just
+  // sorts as before.
+  //
+  // `where` is never actually empty on either path into this helper: filterInvisiblePosts
+  // always writes `invisibleTo` into the filter, even for an anonymous viewer.
   /* v8 ignore next -- unreachable: filterInvisiblePosts guarantees at least one condition */
-  const whereClause = where ? `WHERE ${where}` : ''
+  const filterClause = where ? ` AND (${where})` : ''
+  const whereClause = `WHERE post.createdAt IS NOT NULL${filterClause}`
   const paging = pagingClause(params)
   const session = context.driver.session()
   try {
     return await session.readTransaction(async (transaction) => {
       const result = await transaction.run(
+        // Project AFTER paging, not before. `RETURN post {.*} AS post ORDER BY post.createdAt`
+        // reads as one clause but is two: RETURN rewrites `post` into a map, so the ORDER BY
+        // that follows sorts MAPS, and Cypher has to build the full property map of every
+        // matching post before it can sort — 238.000 db hits over 14.000 posts to keep 25.
+        // Sorting the node references first and projecting the survivors costs 375.
         `
           MATCH (post:Post)
           ${whereClause}
-          RETURN post { .* } AS post
+          WITH post
           ORDER BY ${postOrderClause(params.orderBy)}
           ${paging.clause}
+          RETURN post { .* } AS post
         `,
         { ...whereParams, ...paging.params },
       )
@@ -177,8 +220,10 @@ export default {
       if (params.filter) {
         delete params.filter.skipPinnedFilter
       }
-      params = filterPostsOfMyGroups(params, context)
-      params = filterInvisiblePosts(params, context)
+      // One membership lookup feeds both group filters; see viewerGroups.ts.
+      const viewer = await viewerScope(context)
+      params = filterPostsOfMyGroups(params, viewer)
+      params = filterInvisiblePosts(params, viewer)
       params = filterForMutedUsers(params, context)
       params = filterEventDates(params)
       if (!skipPinnedFilter) {
@@ -187,8 +232,9 @@ export default {
       return queryPosts(params, context)
     },
     profilePagePosts: async (_object, params, context: Context, _resolveInfo) => {
-      params = filterPostsOfMyGroups(params, context)
-      params = filterInvisiblePosts(params, context)
+      const viewer = await viewerScope(context)
+      params = filterPostsOfMyGroups(params, viewer)
+      params = filterInvisiblePosts(params, viewer)
       params = filterForMutedUsers(params, context)
       params = await maintainGroupPinnedPosts(params)
       return queryPosts(params, context)
@@ -269,30 +315,16 @@ export default {
       params.id = params.id || uuid()
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        let groupCypher = ''
-        if (groupId) {
-          groupCypher = `
-            WITH post MATCH (group:Group { id: $groupId })
-            MERGE (post)-[:IN]->(group)`
-          const groupTypeResponse = await transaction.run(
-            `
-            MATCH (group:Group { id: $groupId }) RETURN group.groupType AS groupType`,
-            { groupId },
-          )
-          const [groupType] = groupTypeResponse.records.map((record) => record.get('groupType'))
-          if (groupType !== 'public') {
-            groupCypher += `
-             WITH post, group
-             MATCH (user:User)-[membership:MEMBER_OF]->(group)
-               WHERE group.groupType IN ['closed', 'hidden']
-                 AND membership.role IN ['usual', 'admin', 'owner']
-             WITH post, collect(user.id) AS userIds
-             OPTIONAL MATCH path =(restricted:User) WHERE NOT restricted.id IN userIds 
-             FOREACH (user IN nodes(path) |
-               MERGE (user)-[:CANNOT_SEE]->(post)
-             )`
-          }
-        }
+        // Just the :IN edge. Posting into a non-public group used to scan the ENTIRE user
+        // table here and write one CANNOT_SEE edge per non-member — O(users) writes inside the
+        // create transaction, and a race besides: a registration running concurrently could
+        // not see this post yet, and this statement could not see that user yet, so neither
+        // wrote the edge between them. Visibility is read off the group now, so the :IN edge
+        // this line creates IS the restriction.
+        const groupCypher = groupId
+          ? `WITH post MATCH (group:Group { id: $groupId })
+             MERGE (post)-[:IN]->(group)`
+          : ''
         const categoriesCypher =
           policy.get('categoriesActive') && categoryIds && categoryIds.length > 0
             ? `WITH post

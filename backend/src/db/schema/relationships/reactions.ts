@@ -66,12 +66,6 @@ export const reactions: readonly RelationshipDefinition[] = [
     cardinality: 'many',
   }),
   defineRelationship({
-    type: 'CANNOT_SEE',
-    from: User,
-    to: Post,
-    cardinality: 'many',
-  }),
-  defineRelationship({
     type: 'NOTIFIED',
     from: [Post, Comment, Group],
     to: User,

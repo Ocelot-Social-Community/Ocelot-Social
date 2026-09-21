@@ -151,27 +151,37 @@ const translate = (
       case 'id_in':
         fragments.push({ where: `${alias}.id IN $${parameter}`, params: { [parameter]: value } })
         continue
-      // Access control, evaluated in the graph instead of as an id list.
+      // Access control: the post visibility rule, read off the group.
       //
-      // These two replace what filterInvisiblePosts and the location helper used to do by
-      // COLLECTING every matching id and passing it in as a parameter array. For an
-      // anonymous visitor that meant every post in a non-public group — an unbounded list
-      // sent with each request, growing with the database. The library could not filter on
-      // a relation, so the ids were the only way; hand-written Cypher can just ask.
+      // A post is visible unless it sits in a non-public group the viewer is not an active
+      // member of — with one exception, your own posts stay yours. Nothing is stored: the
+      // membership the rule consults is the same MEMBER_OF edge that grants access to the
+      // group in the first place, so there is no second copy that can go stale.
+      //
+      // This replaces a materialised negative ACL, `(:User)-[:CANNOT_SEE]->(:Post)`, written by
+      // five different mutations. Its cost grew as posts × users: profiled against 20.000 posts
+      // it cost 3.551.945 db hits at 1.000 users and 9.142.613 at 2.000, where this rule costs
+      // 124.395 at either size. It was only ever a workaround for neo4j-graphql-js, which could
+      // not filter across a relation — and that library is gone.
+      //
+      // ONE expression for both viewer kinds rather than a branch. An anonymous visitor carries
+      // an empty group list (`NOT g.id IN []` is true for every group) and a null id, which no
+      // node matches — verified: a pattern property compared against null never binds. Access
+      // control with fewer branches is worth more than the handful of db hits the unused
+      // author clause costs a logged-out request.
       case 'invisibleTo': {
-        const viewerId = value as string | null
-        fragments.push(
-          viewerId
-            ? {
-                where: `NOT EXISTS { MATCH (${alias})<-[:CANNOT_SEE]-(:User { id: $${parameter} }) }`,
-                params: { [parameter]: viewerId },
-              }
-            : {
-                // Anonymous: posts inside a non-public group are not visible.
-                where: `NOT EXISTS { MATCH (${alias})-[:IN]->(g:Group) WHERE NOT g.groupType = 'public' }`,
-                params: {},
-              },
-        )
+        const { viewerId, groupIds } = value as { viewerId: string | null; groupIds: string[] }
+        const groupsParameter = next()
+        fragments.push({
+          where: `(
+            NOT EXISTS {
+              MATCH (${alias})-[:IN]->(g:Group)
+              WHERE NOT g.groupType = 'public' AND NOT g.id IN $${groupsParameter}
+            }
+            OR EXISTS { MATCH (${alias})<-[:WROTE]-(:User { id: $${parameter} }) }
+          )`,
+          params: { [parameter]: viewerId, [groupsParameter]: groupIds },
+        })
         continue
       }
 
@@ -188,21 +198,20 @@ const translate = (
         continue
       }
 
-      // Posts in groups the viewer is an active member of. The roles mirror what
-      // filterPostsOfMyGroups used to query for before handing over an id list.
+      // Posts in groups the viewer is an active member of — the same membership set
+      // `invisibleTo` consults, resolved once per request in viewerGroups.ts instead of
+      // re-derived here from the viewer id.
       case 'inGroupsOf': {
-        const viewerId = value as string | null
-        // No viewer ⇒ no groups ⇒ nothing matches, rather than "no restriction".
-        if (!viewerId) {
+        const groupIds = value as string[]
+        // No memberships ⇒ nothing matches, rather than "no restriction". An anonymous viewer
+        // reaches this with an empty list, and `postsInMyGroups` must not widen to everything.
+        if (groupIds.length === 0) {
           fragments.push({ where: 'false', params: {} })
           continue
         }
         fragments.push({
-          where: `EXISTS {
-            MATCH (${alias})-[:IN]->(:Group)<-[membership:MEMBER_OF]-(:User { id: $${parameter} })
-            WHERE membership.role IN ['usual', 'admin', 'owner']
-          }`,
-          params: { [parameter]: viewerId },
+          where: `EXISTS { MATCH (${alias})-[:IN]->(g:Group) WHERE g.id IN $${parameter} }`,
+          params: { [parameter]: groupIds },
         })
         continue
       }

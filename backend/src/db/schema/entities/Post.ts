@@ -48,5 +48,19 @@ export const Post = defineEntity({
   // Both are `primary`/`unique` in db/models/Post.ts and both constraints exist in the
   // database — `id` was missing here until the audit run compared the two.
   unique: ['id', 'slug'],
+  // The feed's ordering property. `MATCH (post:Post) WHERE … ORDER BY post.createdAt DESC,
+  // post.id ASC SKIP … LIMIT …` without this is a label scan over every post plus a full Sort
+  // of everything the filter admits, to keep 25 rows — the cost of the newest page grows with
+  // the whole database. With it, Neo4j plans a NodeIndexScan that already yields rows in
+  // createdAt order: the Sort collapses to a PartialTop over the `id` tiebreaker alone and the
+  // scan stops at the LIMIT. Profiled over 20.000 posts: 220.376 db hits before, 724 after.
+  //
+  // Single property, deliberately. A composite `(createdAt, id)` index was measured too and
+  // the Neo4j 4.4 planner will not use it for this ordering — it fell back to the label scan.
+  //
+  // queryPosts carries a matching `post.createdAt IS NOT NULL`, because 4.4 only considers an
+  // index when a predicate names the property. `createdAt` is in `required` above, so that
+  // predicate excludes nothing.
+  indexed: ['createdAt'],
   fulltext: [{ name: 'post_fulltext_search', properties: ['title', 'content'] }],
 })

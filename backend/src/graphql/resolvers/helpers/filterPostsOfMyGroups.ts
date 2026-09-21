@@ -1,19 +1,20 @@
 import type { PostQueryParams } from './postFilter'
-import type { Context } from '@src/context'
+import type { ViewerScope } from './viewerGroups'
 
 // Translates the client-facing `postsInMyGroups` flag into a graph condition.
 //
 // It used to fetch the ids of every group the viewer belongs to and pass them in as
-// `group.id_in`. The membership set is bounded, so this was never the scaling problem that
-// the invisible-post list was — but it is still one query per request for something the
-// main query can express itself (see the `inGroupsOf` operator).
+// `group.id_in`, then moved to asking the graph per post. Both are gone: the membership set is
+// resolved once per request (see viewerGroups.ts) and shared with `filterInvisiblePosts`, so
+// "the groups I am an active member of" is looked up once and means the same thing in both
+// filters.
 export const filterPostsOfMyGroups = (
   params: PostQueryParams,
-  context: Context,
+  viewer: ViewerScope,
 ): PostQueryParams => {
   if (!params.filter?.postsInMyGroups) {
     return params
   }
   const { postsInMyGroups: _flag, ...rest } = params.filter
-  return { ...params, filter: { ...rest, inGroupsOf: context.user?.id ?? null } }
+  return { ...params, filter: { ...rest, inGroupsOf: viewer.groupIds } }
 }
