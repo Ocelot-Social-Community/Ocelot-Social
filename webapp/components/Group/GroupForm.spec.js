@@ -382,14 +382,17 @@ describe('GroupForm', () => {
     // Not an actual :disabled — see submitVisuallyDenied's own doc comment:
     // hasUnsavedChanges only tracks whether something was touched, not
     // whether it truly differs from what's saved, so a tracking gap must
-    // never make a real save unreachable. Asserting classes()/aria-disabled
-    // here, not the disabled attribute, on purpose.
-    it('greys out the submit button while editing with nothing changed yet', () => {
+    // never make a real save unreachable. Visually greyed via the class, but
+    // deliberately NOT aria-disabled — the button genuinely still works, and
+    // telling assistive tech otherwise would be actively wrong here, not
+    // just cosmetically off (see the template's own aria-disabled binding,
+    // which only reflects the real permission gate).
+    it('greys out the submit button while editing with nothing changed yet, without marking it aria-disabled', () => {
       const wrapper = mountWith({ update: true, group })
       const submitButton = wrapper.find('button[type="submit"]')
 
       expect(submitButton.classes()).toContain('permission-denied')
-      expect(submitButton.attributes('aria-disabled')).toBe('true')
+      expect(submitButton.attributes('aria-disabled')).toBeUndefined()
       expect(submitButton.attributes('disabled')).toBeUndefined()
     })
 
@@ -411,12 +414,13 @@ describe('GroupForm', () => {
       expect(submitButton.attributes('aria-disabled')).toBeUndefined()
     })
 
-    it('still greys out for a genuinely missing permission, distinct from "no changes"', () => {
+    it('still greys out for a genuinely missing permission, distinct from "no changes", and marks it aria-disabled', () => {
       const wrapper = mountWith({ update: false, group: {} }, () => false)
       wrapper.vm.$set(wrapper.vm.formData, 'groupType', 'public')
 
       const submitButton = wrapper.find('button[type="submit"]')
       expect(submitButton.classes()).toContain('permission-denied')
+      expect(submitButton.attributes('aria-disabled')).toBe('true')
       expect(wrapper.vm.submitDeniedHint).toBe('permissions.deniedHint')
     })
 

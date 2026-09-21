@@ -246,7 +246,7 @@
                 type="submit"
                 :loading="loading"
                 :class="{ 'permission-denied': submitVisuallyDenied }"
-                :aria-disabled="submitVisuallyDenied"
+                :aria-disabled="canSubmit ? undefined : true"
                 v-tooltip="{
                   content: submitDeniedHint,
                 }"
@@ -562,6 +562,10 @@ export default {
     // from what's saved, so a gap in that tracking must never make a real
     // save unreachable. Worst case here is an invitingly-styled click that
     // just re-saves the same values — never a blocked one.
+    // Deliberately NOT reflected in aria-disabled (see the template) — the
+    // button genuinely still works when this is true for the "nothing
+    // changed yet" reason, and telling assistive tech it's disabled would
+    // be actively wrong, not just cosmetically off.
     submitVisuallyDenied() {
       return !this.canSubmit || (!!this.contribution.id && !this.hasUnsavedChanges)
     },
@@ -586,6 +590,16 @@ export default {
     },
     groupId() {
       this.$validateForm()
+    },
+    // Lets a hosting page mirror this outside the component instance itself
+    // — pages/post/create/_type.vue needs it, since switching the
+    // article/event type there does a real route navigation that remounts
+    // this whole form (see its own cancelReturnPath/sharedDraftIsDirty
+    // comments), wiping dirtyFields/locationChangedByUser/imageChangedByUser
+    // (plain instance data) even though externalFormData's actual content
+    // survives via its own module-level cache.
+    hasUnsavedChanges(value) {
+      this.$emit('has-unsaved-changes-change', value)
     },
   },
   created() {
@@ -690,6 +704,39 @@ export default {
       }
       this.loading = true
 
+      // Snapshot exactly what's being submitted — submit() to the .then()
+      // below is a real network round-trip (not instantaneous), so the user
+      // may touch the form again while the mutation is still in flight. The
+      // success handler must only clear a field's dirty status if its value
+      // still matches what THIS submit actually sent — a bare "clear
+      // everything" would wipe out an edit made in that window too, right
+      // before navigating away, without ever asking about it. Same fix as
+      // GroupForm.vue's own submit(); JSON.stringify sidesteps reference
+      // inequality for array/object fields (categoryIds, eventLocationName)
+      // that get re-assigned a new-but-equal-content value on every edit.
+      const submittedFieldValues = Object.keys(this.dirtyFields).reduce((snapshot, key) => {
+        snapshot[key] = JSON.stringify(this.formData[key])
+        return snapshot
+      }, {})
+      const submittedEventLocationName = JSON.stringify(this.formData.eventLocationName)
+      // The hero image isn't one field but several (image.url, the raw
+      // upload, its aspect ratio/type, the blur toggle) — imageUpload is a
+      // raw File, so it's compared by reference (a genuinely new pick is a
+      // new File object; the untouched one stays the same reference).
+      const submittedImageSnapshot = {
+        imageUrl: this.formData.image?.url ?? null,
+        imageUpload: this.formData.imageUpload,
+        imageAspectRatio: this.formData.imageAspectRatio,
+        imageType: this.formData.imageType,
+        imageBlurred: this.formData.imageBlurred,
+      }
+      const imageStillMatchesSubmitted = () =>
+        (this.formData.image?.url ?? null) === submittedImageSnapshot.imageUrl &&
+        this.formData.imageUpload === submittedImageSnapshot.imageUpload &&
+        this.formData.imageAspectRatio === submittedImageSnapshot.imageAspectRatio &&
+        this.formData.imageType === submittedImageSnapshot.imageType &&
+        this.formData.imageBlurred === submittedImageSnapshot.imageBlurred
+
       this.$apollo
         .mutate({
           mutation: this.contribution.id ? PostMutations().UpdatePost : PostMutations().CreatePost,
@@ -709,14 +756,23 @@ export default {
           this.$toast.success(this.$t('contribution.success'))
           const result = data[this.contribution.id ? 'UpdatePost' : 'CreatePost']
 
-          // Clear all unsaved-changes tracking before navigating away — this
-          // is the very save the leave-confirmation guard (beforeRouteLeave,
+          // Clear unsaved-changes tracking before navigating away — this is
+          // the very save the leave-confirmation guard (beforeRouteLeave,
           // see confirmLeaveIfUnsavedChanges) would otherwise still see as
           // dirty for the push() below, wrongly asking to confirm discarding
-          // what was just saved.
-          this.dirtyFields = {}
-          this.locationChangedByUser = false
-          this.imageChangedByUser = false
+          // what was just saved. Only clears what still matches the
+          // snapshot above — see its own comment for why.
+          Object.keys(submittedFieldValues).forEach((key) => {
+            if (JSON.stringify(this.formData[key]) === submittedFieldValues[key]) {
+              this.$delete(this.dirtyFields, key)
+            }
+          })
+          if (JSON.stringify(this.formData.eventLocationName) === submittedEventLocationName) {
+            this.locationChangedByUser = false
+          }
+          if (imageStillMatchesSubmitted()) {
+            this.imageChangedByUser = false
+          }
 
           this.$router.push({
             name: 'post-id-slug',

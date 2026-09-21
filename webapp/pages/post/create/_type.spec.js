@@ -383,6 +383,50 @@ describe('create.vue', () => {
       expect(fresh.vm.draft.groupId).toBe('g1')
     })
 
+    // The actual regression this guards against: dirtyFields/
+    // locationChangedByUser/imageChangedByUser live on ContributionForm's
+    // own instance, not in sharedDraft — switching type remounts
+    // ContributionForm (same as the draft-content tests above), which would
+    // silently reset them to "nothing changed" even though sharedDraft's
+    // actual content survived. Without sharedDraftIsDirty mirroring this
+    // across the remount, "edit a field → switch type → leave" would
+    // discard the draft without ever asking, since
+    // confirmLeaveIfUnsavedChanges calls this exact method to decide.
+    it('keeps hasUnsavedChanges true across the remount caused by switching type mid-flow', () => {
+      const first = Wrapper()
+      first.findComponent({ name: 'ContributionForm' }).vm.$emit('has-unsaved-changes-change', true)
+      first.destroy()
+
+      const second = Wrapper()
+      expect(second.vm.hasUnsavedChanges()).toBe(true)
+    })
+
+    it('resets hasUnsavedChanges once the user actually leaves the post-create flow', () => {
+      wrapper = Wrapper()
+      wrapper
+        .findComponent({ name: 'ContributionForm' })
+        .vm.$emit('has-unsaved-changes-change', true)
+      const next = jest.fn()
+      const leave = create.beforeRouteLeave
+      leave.call(wrapper.vm, { path: '/some/other/page' }, {}, next)
+
+      const fresh = Wrapper()
+      expect(fresh.vm.hasUnsavedChanges()).toBe(false)
+    })
+
+    it('keeps hasUnsavedChanges true when only navigating within the post-create flow', () => {
+      wrapper = Wrapper()
+      wrapper
+        .findComponent({ name: 'ContributionForm' })
+        .vm.$emit('has-unsaved-changes-change', true)
+      const next = jest.fn()
+      const leave = create.beforeRouteLeave
+      leave.call(wrapper.vm, { path: '/post/create/event' }, {}, next)
+
+      const fresh = Wrapper()
+      expect(fresh.vm.hasUnsavedChanges()).toBe(true)
+    })
+
     it('does not leak draft state across server-side renders', () => {
       // On the server a single Node.js process serves many requests; a
       // module-scoped sharedDraft would leak user A's typed data into user

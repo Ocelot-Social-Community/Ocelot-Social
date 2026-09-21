@@ -50,11 +50,11 @@
       <div class="post-create-layout__main">
         <transition name="slide-up" appear>
           <contribution-form
-            ref="contributionForm"
             :group="selectedGroup"
             :post-type="type === 'event' ? 'Event' : 'Article'"
             :externalFormData="draft"
             :cancel-to="cancelReturnPath"
+            @has-unsaved-changes-change="onContributionFormUnsavedChangesChange"
           />
         </transition>
       </div>
@@ -106,6 +106,20 @@ const buildEmptyDraft = () => ({
 // acquireDraft() runs in the browser.
 let sharedDraft = null
 
+// Mirrors ContributionForm's own hasUnsavedChanges across the remount that
+// switching the article/event type causes (see switchPostType) — that
+// remount destroys and recreates ContributionForm, wiping its
+// dirtyFields/locationChangedByUser/imageChangedByUser (plain instance
+// data), even though sharedDraft's actual content survives untouched.
+// Without this, "edit a field → switch type → try to leave" would silently
+// discard the draft: hasUnsavedChanges() below would read false from the
+// fresh instance, confirmLeaveIfUnsavedChanges wouldn't ask, and
+// beforeRouteLeave would clear sharedDraft right along with it. Kept in
+// sync via ContributionForm's own has-unsaved-changes-change event (see the
+// template), reset alongside sharedDraft itself below and in
+// __resetSharedDraftForTests.
+let sharedDraftIsDirty = false
+
 const acquireDraft = () => {
   if (process.server) return buildEmptyDraft()
   if (!sharedDraft) sharedDraft = buildEmptyDraft()
@@ -114,6 +128,7 @@ const acquireDraft = () => {
 
 export const __resetSharedDraftForTests = () => {
   sharedDraft = null
+  sharedDraftIsDirty = false
 }
 
 // Where "Cancel" should return to — captured once on genuine arrival via
@@ -222,6 +237,7 @@ export default {
   beforeRouteLeave(to, _from, next) {
     if (!to.path || !to.path.startsWith('/post/create/')) {
       sharedDraft = null
+      sharedDraftIsDirty = false
       cancelReturnPath = null
     }
     next()
@@ -306,8 +322,18 @@ export default {
     },
   },
   methods: {
+    // sharedDraftIsDirty alone (not OR'd with the live instance below) is
+    // deliberate: it's kept in sync with the current instance's own
+    // hasUnsavedChanges via the has-unsaved-changes-change event (see the
+    // template and sharedDraftIsDirty's own doc comment above), including
+    // right after mount — so it already reflects a prior instance's state
+    // correctly across a type-switch remount, without needing a live ref at
+    // all.
     hasUnsavedChanges() {
-      return !!this.$refs.contributionForm?.hasUnsavedChanges
+      return sharedDraftIsDirty
+    },
+    onContributionFormUnsavedChangesChange(value) {
+      sharedDraftIsDirty = value
     },
     selectContext(groupId) {
       this.draft.groupId = groupId

@@ -188,7 +188,7 @@
             :loading="loading"
             :disabled="loading"
             :class="{ 'permission-denied': submitVisuallyDenied }"
-            :aria-disabled="submitVisuallyDenied"
+            :aria-disabled="canCreateSelectedGroup ? undefined : true"
             v-tooltip="{
               content: submitDeniedHint,
             }"
@@ -488,6 +488,10 @@ export default {
     // itself up, the way the location and showMembers ones once did) must
     // never make a real save unreachable. Worst case here is an invitingly-
     // styled click that just re-saves the same values — never a blocked one.
+    // Deliberately NOT reflected in aria-disabled (see the template) — the
+    // button genuinely still works when this is true for the "nothing
+    // changed yet" reason, and telling assistive tech it's disabled would
+    // be actively wrong, not just cosmetically off.
     submitVisuallyDenied() {
       return !this.canCreateSelectedGroup || (this.update && !this.hasUnsavedChanges)
     },

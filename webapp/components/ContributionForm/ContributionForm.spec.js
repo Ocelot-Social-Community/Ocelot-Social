@@ -912,6 +912,38 @@ describe('ContributionForm.vue', () => {
 
         expect(wrapper.vm.hasUnsavedChanges).toBe(true)
       })
+
+      // submit() to its .then() is a real network round-trip, not
+      // instantaneous — an edit made while the mutation is still in flight
+      // was not part of what got sent, so it must survive the success
+      // handler's reset rather than being wiped out just because "title"
+      // was already dirty at submit time too.
+      it('keeps a field dirty if it is changed again to a different value before the save resolves', async () => {
+        wrapper = Wrapper()
+        wrapper.find('.ds-input').setValue(postTitle)
+        await wrapper.vm.updateEditorContent(postContent)
+
+        await wrapper.find('form').trigger('submit')
+        // Simulate the same field being edited again before the mutation resolves.
+        wrapper.vm.updateFormField('title', 'Yet another title')
+        await mocks.$apollo.mutate
+
+        expect(wrapper.vm.dirtyFields.title).toBe(true)
+        expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+      })
+
+      // Lets a hosting page mirror this outside the instance — see
+      // pages/post/create/_type.vue's own sharedDraftIsDirty doc comment for
+      // why (switching the article/event type there remounts this form,
+      // wiping its own dirty tracking, even though the actual draft content
+      // survives via externalFormData's separate module-level cache).
+      it('emits has-unsaved-changes-change whenever hasUnsavedChanges changes', async () => {
+        wrapper = Wrapper()
+        wrapper.vm.updateFormField('title', 'A new title')
+        await wrapper.vm.$nextTick()
+
+        expect(wrapper.emitted('has-unsaved-changes-change')).toEqual([[true]])
+      })
     })
 
     describe('submit button greyed-out-but-clickable states', () => {
@@ -926,7 +958,7 @@ describe('ContributionForm.vue', () => {
         expect(submitButton.attributes('aria-disabled')).toBeUndefined()
       })
 
-      it('still greys out a create form for a genuinely missing permission', () => {
+      it('still greys out a create form for a genuinely missing permission, and marks it aria-disabled', () => {
         wrapper = mount(ContributionForm, {
           mocks: { ...mocks, $can: () => false },
           localVue,
@@ -936,14 +968,20 @@ describe('ContributionForm.vue', () => {
         })
         const submitButton = wrapper.find('button[type="submit"]')
         expect(submitButton.classes()).toContain('permission-denied')
+        expect(submitButton.attributes('aria-disabled')).toBe('true')
         expect(wrapper.vm.submitDeniedHint).toBe('permissions.deniedHint')
       })
 
-      it('greys out the submit button while editing with nothing changed yet', () => {
+      // Visually greyed via the class, but deliberately NOT aria-disabled —
+      // the button genuinely still works here (see submitVisuallyDenied's
+      // own doc comment), and telling assistive tech otherwise would be
+      // actively wrong, not just cosmetically off.
+      it('greys out the submit button while editing with nothing changed yet, without marking it aria-disabled', () => {
         propsData = { contribution: { id: 'p1456', title: 'x', content: 'y' } }
         wrapper = Wrapper()
         const submitButton = wrapper.find('button[type="submit"]')
         expect(submitButton.classes()).toContain('permission-denied')
+        expect(submitButton.attributes('aria-disabled')).toBeUndefined()
         expect(wrapper.vm.submitDeniedHint).toBe('common.noChangesHint')
       })
 
