@@ -436,9 +436,14 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
         // every other query in this codebase carries the variable explicitly. Relying on it
         // would hand the Neo4j 5 upgrade a silent \`Variable not defined\`.
         WITH post, author, user, group, emailAddress, membership
-        // The parentheses are load-bearing: unparenthesised, \`A OR B OR C AND D\` binds as
-        // \`A OR B OR (C AND D)\`, and the group rule would wave every non-member through.
-        WHERE group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner']
+        // The parentheses are load-bearing, and they protect the GUARD, not the group rule:
+        // unparenthesised, \`A OR B OR C AND D\` binds as \`A OR B OR (C AND D)\`, so for a post
+        // outside any group \`group IS NULL\` alone satisfies the disjunction and the
+        // \`NOT EXISTS\` below is never consulted — every already-mentioned user is notified
+        // again on every edit, which is the whole bug this guard exists for. Verified by
+        // removing them: the group cases stay green, the three edit cases in
+        // notificationsMiddleware.spec.ts fail.
+        WHERE (group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner'])
         // Already told about this post — see the note on this function.
         AND NOT EXISTS { MATCH (post)-[:NOTIFIED { reason: $reason }]->(user) }
         MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
@@ -461,7 +466,7 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
       // \`membership\` projected for the same reason as in the post branch above.
       WITH comment, user, group, emailAddress, membership
       // Parenthesised for the same reason as in the post branch above.
-      WHERE group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner']
+      WHERE (group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner'])
       // Already told about this comment — see the note on this function.
       AND NOT EXISTS { MATCH (comment)-[:NOTIFIED { reason: $reason }]->(user) }
       MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(user)
