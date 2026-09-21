@@ -11,7 +11,13 @@
     "menu": "Ouvrir le menu",
     "save": "Sauvegarder",
     "saveCategories": "Enregistrer les sujets",
-    "search": "Rechercher"
+    "search": "Rechercher",
+    "unsavedChanges": {
+      "discard": "Abandonner",
+      "message": "Vous avez apporté des modifications qui n'ont pas encore été enregistrées. Si vous continuez maintenant, elles seront perdues.",
+      "stay": "Rester",
+      "title": "Modifications non enregistrées"
+    }
   },
   "admin": {
     "api-keys": {
@@ -474,6 +480,7 @@
     "loading": "chargement",
     "loadMore": "charger plus",
     "name": "Nom",
+    "noChangesHint": "Il n'y a encore rien à enregistrer.",
     "organization": "Organisation ::: Organisations",
     "post": "Message ::: Messages",
     "project": "Projet ::: Projets",
@@ -887,6 +894,7 @@
     "foundation": "Fondation",
     "general": "Général",
     "goal": "Objectif du groupe",
+    "group": "Groupe",
     "groupCreated": "Le groupe a été créé !",
     "in": "dans",
     "invite-links": "Liens d'invitation",
@@ -926,6 +934,7 @@
     "muted": "Groupe en sourdine",
     "myGroups": "Mes groupes",
     "name": "Nom du groupe",
+    "previousLocation": "Emplacement précédent : {location}",
     "radius": "Rayon",
     "removeMember": "Retirer le membre",
     "removeMemberButton": "Retirer",
@@ -940,6 +949,7 @@
       "usual": "Membre"
     },
     "save": "Créer un nouveau groupe",
+    "scrollToLocationMap": "Faire défiler jusqu’à la carte",
     "showMembers": "Liste des membres visible par tous",
     "teaser": {
       "openGroup": "Ouvrir le groupe",
@@ -959,7 +969,17 @@
     "unmute": "Réactiver le groupe",
     "unmuted": "Groupe réactivé",
     "update": "Enregistrer les modifications",
-    "updatedGroup": "Les données du groupe ont été modifiées."
+    "updatedGroup": "Les données du groupe ont été modifiées.",
+    "validations": {
+      "actionRadiusRequired": "Veuillez choisir un rayon d'action.",
+      "descriptionLength": "La description doit comporter au moins {min} caractères.",
+      "descriptionNotEmpty": "Veuillez saisir une description.",
+      "groupTypeRequired": "Veuillez choisir un type de groupe.",
+      "nameLength": "Le nom doit comporter entre {min} et {max} caractères.",
+      "nameNotEmpty": "Veuillez saisir un nom de groupe.",
+      "slugInvalidCharacters": "Seuls les lettres minuscules, les chiffres, les tirets et les underscores sont autorisés.",
+      "slugNotEmpty": "Veuillez saisir un nom de groupe unique."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Réinitialiser la recherche",

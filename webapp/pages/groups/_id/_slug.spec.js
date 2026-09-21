@@ -308,6 +308,14 @@ describe('GroupProfileSlug', () => {
           expect(wrapper.container).toMatchSnapshot()
         })
 
+        it('does not show the location map when the group has no location', () => {
+          expect(wrapper.container.querySelector('.group-location-map')).toBeNull()
+        })
+
+        it('does not show a clickable location name/distance either, with nothing to scroll to', () => {
+          expect(wrapper.container.querySelector('.location-info-button')).toBeNull()
+        })
+
         describe('after "show more" click displays full description', () => {
           beforeEach(async () => {
             const button = screen.getByText('comment.show.more')
@@ -516,6 +524,34 @@ describe('GroupProfileSlug', () => {
 
           it('renders', () => {
             expect(wrapper.container).toMatchSnapshot()
+          })
+
+          it('shows a read-only map with the group location', () => {
+            expect(wrapper.container.querySelector('.group-location-map')).not.toBeNull()
+            expect(wrapper.container.querySelector('.location-picker-map')).not.toBeNull()
+          })
+
+          describe('clicking the location name/distance', () => {
+            let scrollIntoViewSpy
+
+            beforeEach(() => {
+              scrollIntoViewSpy = jest.fn()
+              Element.prototype.scrollIntoView = scrollIntoViewSpy
+            })
+
+            afterEach(() => {
+              delete Element.prototype.scrollIntoView
+            })
+
+            it('scrolls to the location map', async () => {
+              const button = wrapper.container.querySelector('.location-info-button')
+              await fireEvent.click(button)
+
+              expect(scrollIntoViewSpy).toHaveBeenCalledWith({
+                behavior: 'smooth',
+                block: 'center',
+              })
+            })
           })
         })
 

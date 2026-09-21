@@ -51,7 +51,10 @@ const createLocation = async (session, mapboxData) => {
     'l.nameSQ = $nameSQ, ' +
     'l.type = $type'
 
-  if (data.lat && data.lng) {
+  // Not a truthy check — a place sitting exactly on the equator or the
+  // prime meridian (lat/lng === 0) is a real, valid coordinate, not a
+  // missing one.
+  if (typeof data.lat === 'number' && typeof data.lng === 'number') {
     mutation += ', l.lat = $lat, l.lng = $lng'
   }
   if (data.address) {
@@ -67,21 +70,23 @@ const createLocation = async (session, mapboxData) => {
 
 // Coordinates take priority over forward-geocoding locationName's text (see
 // createOrUpdateLocations below) — reverse-geocoded here with the same
-// types the map-pin/search UI itself reverse-geocodes with (EventLocationMap.vue's
-// REVERSE_GEOCODE_TYPES), so the saved location is a concrete nearby address/
-// POI/place, same as what the user was shown when picking it — never bare
-// coordinates with no name. Mapbox's reverse endpoint (a "lng,lat" query)
-// only accepts one type per request and returns its single best match, so
-// these are tried one at a time, most specific first, same pattern as
-// queryLocations' own reverse-geocoding below.
-const EVENT_REVERSE_GEOCODE_TYPES = ['address', 'poi', 'place']
+// types the map-pin/search UI itself reverse-geocodes with (LocationPickerMap.vue's
+// "types" prop), so the saved location is a concrete nearby address/POI/place
+// (or, for a group's coarser pin, a place/region/country), same as what the
+// user was shown when picking it — never bare coordinates with no name.
+// Mapbox's reverse endpoint (a "lng,lat" query) only accepts one type per
+// request and returns its single best match, so these are tried one at a
+// time, most specific first, same pattern as queryLocations' own
+// reverse-geocoding below.
+export const EVENT_REVERSE_GEOCODE_TYPES = ['address', 'poi', 'place']
 
 const reverseGeocodeCoordinates = async (
   lat: number,
   lng: number,
   context: Context,
+  types: string[],
 ): Promise<any> => {
-  for (const type of EVENT_REVERSE_GEOCODE_TYPES) {
+  for (const type of types) {
     const response: any = await fetch(
       `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json` +
         `?access_token=${context.config.MAPBOX_TOKEN}&types=${type}&limit=1&language=${locales.join(',')}`,
@@ -104,6 +109,9 @@ export const createOrUpdateLocations = async (
   session,
   context: Context,
   coordinates?: { lat: number; lng: number } | null,
+  // Defaults to the precise, address-level types an event's exact pin uses.
+  // Groups pass their own coarser list (place/region/country) — see groups.ts.
+  reverseGeocodeTypes: string[] = EVENT_REVERSE_GEOCODE_TYPES,
 ) => {
   if (locationName === undefined) {
     return
@@ -115,9 +123,14 @@ export const createOrUpdateLocations = async (
     let data
 
     if (coordinates) {
-      data = await reverseGeocodeCoordinates(coordinates.lat, coordinates.lng, context)
+      data = await reverseGeocodeCoordinates(
+        coordinates.lat,
+        coordinates.lng,
+        context,
+        reverseGeocodeTypes,
+      )
       if (!data?.place_type?.length) {
-        throw new UserInputError('event location coordinates are invalid')
+        throw new UserInputError('location coordinates are invalid')
       }
     } else {
       const response: any = await fetch(

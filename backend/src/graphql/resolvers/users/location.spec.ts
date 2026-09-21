@@ -541,7 +541,7 @@ describe(createOrUpdateLocations, () => {
           lng: 0,
         }),
       ),
-    ).rejects.toThrow('event location coordinates are invalid')
+    ).rejects.toThrow('location coordinates are invalid')
 
     // One request per type, none skipped: giving up after the first empty answer would refuse
     // every pin that sits on a POI or a place but not on an addressed building.
@@ -555,6 +555,33 @@ describe(createOrUpdateLocations, () => {
     )
 
     expect(requestedTypes).toEqual(['address', 'poi', 'place'])
+  })
+
+  // groups.ts passes its own coarser list (place/region/country — a group's location is
+  // deliberately less precise than an event's exact pin) instead of relying on the
+  // address/poi/place default asserted above.
+  it('uses the caller-provided reverseGeocodeTypes instead of the default when given', async () => {
+    respondWith({ features: [] })
+
+    await expect(
+      withSession(async (session) =>
+        createOrUpdateLocations(
+          'Group',
+          'some-group',
+          'somewhere',
+          session,
+          locationContext(),
+          { lat: 0, lng: 0 },
+          ['place', 'region', 'country'],
+        ),
+      ),
+    ).rejects.toThrow('location coordinates are invalid')
+
+    const requestedTypes = fetchSpy.mock.calls.map(([input]) =>
+      new URL(input as string).searchParams.get('types'),
+    )
+
+    expect(requestedTypes).toEqual(['place', 'region', 'country'])
   })
 
   // The forward-geocoding counterpart: free text Mapbox knows nothing about. Accepting it would
@@ -639,6 +666,41 @@ describe(createOrUpdateLocations, () => {
 
       expect(records.map((record) => record.get('id') as string)).toEqual(['country.de'])
       expect(records[0].get('parents').toNumber()).toBe(0)
+    })
+
+    // Regression test for a truthy check (`data.lat && data.lng`) that would
+    // treat a place sitting exactly on the equator or the prime meridian as
+    // having "no coordinates" and silently drop them, rather than checking
+    // they are actually numbers.
+    it('stores lat/lng even when one of them is exactly 0 (prime meridian)', async () => {
+      respondWith({
+        features: [
+          feature({
+            id: 'place.greenwich',
+            place_name: 'Greenwich',
+            place_type: ['place'],
+            center: [0, 51.5],
+          }),
+        ],
+      })
+
+      await withSession(async (session) => {
+        await createOrUpdateLocations(
+          'User',
+          'located-user',
+          'Greenwich',
+          session,
+          locationContext(),
+        )
+      })
+
+      const { records } = await database.query({
+        query: `MATCH (:User { id: "located-user" })-[:IS_IN]->(l:Location)
+                RETURN l.lat AS lat, l.lng AS lng`,
+      })
+
+      expect(Number(records[0].get('lat'))).toBe(51.5)
+      expect(Number(records[0].get('lng'))).toBe(0)
     })
   })
 })

@@ -1656,6 +1656,45 @@ describe('map', () => {
       })
     })
 
+    describe('openInitialGroupPopup', () => {
+      const groupFeature = {
+        geometry: { coordinates: [10.0, 53.55] },
+        properties: {
+          type: 'group',
+          slug: 'journalism',
+          id: 'g1',
+          name: 'Journalism',
+          locationName: 'Hamburg',
+          description: '',
+        },
+      }
+
+      it('does nothing without an initialGroupId', () => {
+        wrapper.vm.markers.geoJSON = [groupFeature]
+        wrapper.vm.openInitialGroupPopup()
+        expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
+      })
+
+      it('does nothing when no group matches the deep-linked id', () => {
+        mocks.$route = { path: '/map', query: { groupId: 'does-not-exist' } }
+        const w = createWrapper()
+        w.vm.markers.geoJSON = [groupFeature]
+        w.vm.openInitialGroupPopup()
+        expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
+      })
+
+      it('opens the popup for the matching group feature', () => {
+        mocks.$route = { path: '/map', query: { groupId: 'g1' } }
+        const w = createWrapper()
+        w.vm.onMapLoad({ map: mapMock })
+        w.vm.markers.geoJSON = [groupFeature]
+        w.vm.openInitialGroupPopup()
+        expect(mapboxgl.__popupInstance.setLngLat).toHaveBeenCalledWith([10.0, 53.55])
+        expect(mapboxgl.__popupInstance.setDOMContent).toHaveBeenCalled()
+        expect(mapboxgl.__popupInstance.addTo).toHaveBeenCalledWith(mapMock)
+      })
+    })
+
     describe('syncPopupWithCurrentData (e.g. toggling "show past events")', () => {
       const eventFeature = {
         geometry: { coordinates: [9.17702, 48.78232] },

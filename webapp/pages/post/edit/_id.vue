@@ -37,24 +37,35 @@
       </div>
       <div class="post-edit-layout__main">
         <contribution-form
+          ref="contributionForm"
           :contribution="contribution"
           :group="contribution && contribution.group ? contribution.group : null"
           :post-type="currentPostType"
+          :cancel-to="cancelReturnPath"
         />
       </div>
     </div>
+    <confirm-modal
+      v-if="showLeaveConfirmModal"
+      :modalData="leaveConfirmModalData"
+      @close="showLeaveConfirmModal = false"
+    />
   </div>
 </template>
 
 <script>
 import { OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import ContributionForm from '~/components/ContributionForm/ContributionForm.vue'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 import PostQuery from '~/graphql/PostQuery'
 import { mapGetters } from 'vuex'
+import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
 
 export default {
+  mixins: [confirmLeaveIfUnsavedChanges],
   components: {
     ContributionForm,
+    ConfirmModal,
     OsMenu,
     OsMenuItem,
   },
@@ -84,7 +95,21 @@ export default {
         postType: ['Article'],
       },
       currentPostType: 'Article',
+      // Where "Cancel" should return to — see ContributionForm.vue's own
+      // cancelTo prop doc comment. '/' covers the no-real-referrer case
+      // (e.g. a fresh direct load), same as beforeRouteEnter's own fallback
+      // below.
+      cancelReturnPath: '/',
     }
+  },
+  // Unlike pages/post/create/_type.vue, switchPostType here never navigates
+  // (it just flips currentPostType locally), so there's no remount to
+  // survive — setting this directly on the instance via next(vm => …) is
+  // enough.
+  beforeRouteEnter(_to, from, next) {
+    next((vm) => {
+      vm.cancelReturnPath = from.fullPath || '/'
+    })
   },
   async asyncData(context) {
     const {
@@ -108,6 +133,13 @@ export default {
     return { contribution, currentPostType: contribution.postType?.[0] || 'Article' }
   },
   methods: {
+    // Delegates entirely to ContributionForm — it already compares
+    // currentPostType (passed through as its own postType prop) against
+    // what was actually saved, alongside its own field tracking. See its
+    // postTypeChanged computed.
+    hasUnsavedChanges() {
+      return !!this.$refs.contributionForm?.hasUnsavedChanges
+    },
     switchPostType(_event, item) {
       this.currentPostType = item.route.type
     },

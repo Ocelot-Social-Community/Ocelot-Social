@@ -487,6 +487,76 @@ describe('in mode', () => {
             })
           })
         })
+
+        // lat/lng (e.g. a dropped map pin) are validated and reverse-geocoded before ever
+        // touching the group node itself — same shape as CreatePost's own event-location
+        // coordinates (see posts.spec.ts), just with the group's own error wording.
+        describe('location coordinates', () => {
+          it('rejects an out-of-range latitude', async () => {
+            const { errors } = await mutate({
+              mutation: CreateGroup,
+              variables: { ...variables, lat: 90.1, lng: 13.4 },
+            })
+
+            expect(errors?.[0]).toHaveProperty(
+              'message',
+              'Group location latitude must be a finite number between -90 and 90!',
+            )
+          })
+
+          it('rejects an out-of-range longitude', async () => {
+            const { errors } = await mutate({
+              mutation: CreateGroup,
+              variables: { ...variables, lat: 52.5, lng: 200 },
+            })
+
+            expect(errors?.[0]).toHaveProperty(
+              'message',
+              'Group location longitude must be a finite number between -180 and 180!',
+            )
+          })
+
+          it('rejects lat given without lng, instead of silently discarding it', async () => {
+            const { errors } = await mutate({
+              mutation: CreateGroup,
+              variables: { ...variables, lat: 52.5 },
+            })
+
+            expect(errors?.[0]).toHaveProperty(
+              'message',
+              'Group location requires both lat and lng, or neither!',
+            )
+          })
+
+          it('rejects lng given without lat, instead of silently discarding it', async () => {
+            const { errors } = await mutate({
+              mutation: CreateGroup,
+              variables: { ...variables, lng: 13.4 },
+            })
+
+            expect(errors?.[0]).toHaveProperty(
+              'message',
+              'Group location requires both lat and lng, or neither!',
+            )
+          })
+
+          it('accepts valid coordinates and resolves them to a location, without storing lat/lng on the group itself', async () => {
+            await expect(
+              mutate({
+                mutation: CreateGroup,
+                variables: { ...variables, lat: 53.5511, lng: 9.9937 },
+              }),
+            ).resolves.toMatchObject({
+              data: {
+                CreateGroup: {
+                  name: 'The Best Group',
+                  location: expect.objectContaining({ id: expect.any(String) }),
+                },
+              },
+              errors: undefined,
+            })
+          })
+        })
       })
     })
   })
@@ -3432,6 +3502,80 @@ describe('in mode', () => {
                     },
                     errors: undefined,
                   })
+                })
+              })
+            })
+
+            // Same validation/reverse-geocoding path as CreateGroup, exercised again here since
+            // UpdateGroup re-extracts lat/lng from its own params independently (see groups.ts).
+            describe('location coordinates', () => {
+              it('rejects an out-of-range latitude', async () => {
+                const { errors } = await mutate({
+                  mutation: UpdateGroup,
+                  variables: { id: 'my-group', lat: 90.1, lng: 13.4 },
+                })
+
+                expect(errors?.[0]).toHaveProperty(
+                  'message',
+                  'Group location latitude must be a finite number between -90 and 90!',
+                )
+              })
+
+              it('rejects an out-of-range longitude', async () => {
+                const { errors } = await mutate({
+                  mutation: UpdateGroup,
+                  variables: { id: 'my-group', lat: 52.5, lng: 200 },
+                })
+
+                expect(errors?.[0]).toHaveProperty(
+                  'message',
+                  'Group location longitude must be a finite number between -180 and 180!',
+                )
+              })
+
+              it('rejects lat given without lng, instead of silently discarding it', async () => {
+                const { errors } = await mutate({
+                  mutation: UpdateGroup,
+                  variables: { id: 'my-group', lat: 52.5 },
+                })
+
+                expect(errors?.[0]).toHaveProperty(
+                  'message',
+                  'Group location requires both lat and lng, or neither!',
+                )
+              })
+
+              it('rejects lng given without lat, instead of silently discarding it', async () => {
+                const { errors } = await mutate({
+                  mutation: UpdateGroup,
+                  variables: { id: 'my-group', lng: 13.4 },
+                })
+
+                expect(errors?.[0]).toHaveProperty(
+                  'message',
+                  'Group location requires both lat and lng, or neither!',
+                )
+              })
+
+              it('accepts valid coordinates and resolves them to a location, without storing lat/lng on the group itself', async () => {
+                await expect(
+                  mutate({
+                    mutation: UpdateGroup,
+                    variables: {
+                      id: 'my-group',
+                      locationName: 'Hamburg, Germany',
+                      lat: 53.5511,
+                      lng: 9.9937,
+                    },
+                  }),
+                ).resolves.toMatchObject({
+                  data: {
+                    UpdateGroup: {
+                      id: 'my-group',
+                      location: expect.objectContaining({ id: expect.any(String) }),
+                    },
+                  },
+                  errors: undefined,
                 })
               })
             })

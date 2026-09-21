@@ -212,7 +212,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
               >
                 <span
                   aria-hidden="true"
-                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  class="align-middle os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current align-middle"
                 >
                   <svg
                     fill="currentColor"
@@ -891,7 +891,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
               >
                 <span
                   aria-hidden="true"
-                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  class="align-middle os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current align-middle"
                 >
                   <svg
                     fill="currentColor"
@@ -1585,7 +1585,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
               >
                 <span
                   aria-hidden="true"
-                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  class="align-middle os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current align-middle"
                 >
                   <svg
                     fill="currentColor"
@@ -2187,7 +2187,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
               >
                 <span
                   aria-hidden="true"
-                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  class="align-middle os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current align-middle"
                 >
                   <svg
                     fill="currentColor"

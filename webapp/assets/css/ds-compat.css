@@ -794,7 +794,6 @@ textarea.ds-input-size-large {
 /*  directly on the element (works for positioned/fixed buttons, unlike a wrapper). */
 .permission-denied {
   opacity: 0.45;
-  filter: grayscale(0.7);
   cursor: not-allowed;
 }
 

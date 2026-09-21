@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import create, { __resetSharedDraftForTests } from './_type.vue'
+import create, { __resetSharedDraftForTests, __resetCancelReturnPathForTests } from './_type.vue'
 import Vuex from 'vuex'
 
 const localVue = global.localVue
@@ -48,6 +48,7 @@ describe('create.vue', () => {
     routerReplace = jest.fn()
     mocks = makeMocks()
     __resetSharedDraftForTests()
+    __resetCancelReturnPathForTests()
   })
 
   describe('mount', () => {
@@ -140,13 +141,13 @@ describe('create.vue', () => {
   })
 
   describe('scrolling to the location section on arrival via the map pin tool', () => {
-    // A real ContributionForm pulls in EventLocationMap/mapbox-gl and needs a
+    // A real ContributionForm pulls in LocationPickerMap/mapbox-gl and needs a
     // MAPBOX_TOKEN — this minimal stub renders just enough (the same class
-    // ContributionForm puts on its EventLocationMap wrapper) for
+    // ContributionForm puts on its LocationPickerMap wrapper) for
     // scrollIntoView() to have something to find and act on.
     const stubsWithLocationField = {
       ...stubs,
-      ContributionForm: { template: '<div class="event-location-map-field"></div>' },
+      ContributionForm: { template: '<div class="location-picker-map-field"></div>' },
     }
 
     let scrollIntoViewSpy
@@ -335,6 +336,17 @@ describe('create.vue', () => {
       wrapper.vm.switchPostType(null, { route: { type: 'article' } })
       expect(routerReplace).not.toHaveBeenCalled()
     })
+
+    // Deliberately NOT a change on its own here — unlike
+    // pages/post/edit/_id.vue's identical switch (nothing is saved yet in
+    // the create flow, so the type alone doesn't carry that same weight).
+    // Only what's actually typed afterwards makes it dirty, via dirtyFields
+    // etc. mirrored into sharedDraftIsDirty as usual.
+    it('does not mark hasUnsavedChanges just from switching type', () => {
+      wrapper = Wrapper()
+      wrapper.vm.switchPostType(null, { route: { type: 'event' } })
+      expect(wrapper.vm.hasUnsavedChanges()).toBe(false)
+    })
   })
 
   describe('draft persistence across page remount', () => {
@@ -382,6 +394,50 @@ describe('create.vue', () => {
       expect(fresh.vm.draft.groupId).toBe('g1')
     })
 
+    // The actual regression this guards against: dirtyFields/
+    // locationChangedByUser/imageChangedByUser live on ContributionForm's
+    // own instance, not in sharedDraft — switching type remounts
+    // ContributionForm (same as the draft-content tests above), which would
+    // silently reset them to "nothing changed" even though sharedDraft's
+    // actual content survived. Without sharedDraftIsDirty mirroring this
+    // across the remount, "edit a field → switch type → leave" would
+    // discard the draft without ever asking, since
+    // confirmLeaveIfUnsavedChanges calls this exact method to decide.
+    it('keeps hasUnsavedChanges true across the remount caused by switching type mid-flow', () => {
+      const first = Wrapper()
+      first.findComponent({ name: 'ContributionForm' }).vm.$emit('has-unsaved-changes-change', true)
+      first.destroy()
+
+      const second = Wrapper()
+      expect(second.vm.hasUnsavedChanges()).toBe(true)
+    })
+
+    it('resets hasUnsavedChanges once the user actually leaves the post-create flow', () => {
+      wrapper = Wrapper()
+      wrapper
+        .findComponent({ name: 'ContributionForm' })
+        .vm.$emit('has-unsaved-changes-change', true)
+      const next = jest.fn()
+      const leave = create.beforeRouteLeave
+      leave.call(wrapper.vm, { path: '/some/other/page' }, {}, next)
+
+      const fresh = Wrapper()
+      expect(fresh.vm.hasUnsavedChanges()).toBe(false)
+    })
+
+    it('keeps hasUnsavedChanges true when only navigating within the post-create flow', () => {
+      wrapper = Wrapper()
+      wrapper
+        .findComponent({ name: 'ContributionForm' })
+        .vm.$emit('has-unsaved-changes-change', true)
+      const next = jest.fn()
+      const leave = create.beforeRouteLeave
+      leave.call(wrapper.vm, { path: '/post/create/event' }, {}, next)
+
+      const fresh = Wrapper()
+      expect(fresh.vm.hasUnsavedChanges()).toBe(true)
+    })
+
     it('does not leak draft state across server-side renders', () => {
       // On the server a single Node.js process serves many requests; a
       // module-scoped sharedDraft would leak user A's typed data into user
@@ -422,6 +478,61 @@ describe('create.vue', () => {
       const backToArticle = Wrapper()
       expect(backToArticle.vm.draft.title).toBe('Keep me')
       expect(backToArticle.vm.draft.eventStart).toBe('2026-06-01T12:00:00')
+    })
+  })
+
+  describe('cancelReturnPath ("Cancel" target)', () => {
+    it('is passed through to ContributionForm as cancel-to', () => {
+      const enter = create.beforeRouteEnter
+      const next = jest.fn()
+      enter({}, { fullPath: '/newsfeed' }, next)
+      expect(next).toHaveBeenCalled()
+
+      wrapper = Wrapper()
+      expect(wrapper.findComponent({ name: 'ContributionForm' }).props('cancelTo')).toBe(
+        '/newsfeed',
+      )
+    })
+
+    it('falls back to "/" when there is no real referrer (e.g. a fresh direct load)', () => {
+      const enter = create.beforeRouteEnter
+      const next = jest.fn()
+      // Vue Router's own START_LOCATION has no fullPath worth keeping.
+      enter({}, {}, next)
+
+      wrapper = Wrapper()
+      expect(wrapper.findComponent({ name: 'ContributionForm' }).props('cancelTo')).toBe('/')
+    })
+
+    // The actual reason this needs to be module-level rather than plain
+    // data() — see cancelReturnPath's own doc comment: switchPostType does a
+    // real $router.replace, which remounts this page (same as the draft
+    // persistence tests above), but beforeRouteEnter itself does not re-fire
+    // for it (same matched route, only :type changes).
+    it('survives the remount caused by switching type mid-flow', () => {
+      const enter = create.beforeRouteEnter
+      enter({}, { fullPath: '/groups/g1/slug' }, jest.fn())
+
+      const first = Wrapper()
+      first.destroy()
+
+      const second = Wrapper()
+      expect(second.findComponent({ name: 'ContributionForm' }).props('cancelTo')).toBe(
+        '/groups/g1/slug',
+      )
+    })
+
+    it('is cleared once the user actually leaves the post-create flow', () => {
+      const enter = create.beforeRouteEnter
+      enter({}, { fullPath: '/groups/g1/slug' }, jest.fn())
+
+      wrapper = Wrapper()
+      const next = jest.fn()
+      const leave = create.beforeRouteLeave
+      leave.call(wrapper.vm, { path: '/some/other/page' }, {}, next)
+
+      const fresh = Wrapper()
+      expect(fresh.findComponent({ name: 'ContributionForm' }).props('cancelTo')).toBeNull()
     })
   })
 

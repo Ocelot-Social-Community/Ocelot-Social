@@ -11,7 +11,13 @@
     "menu": "Menü öffnen",
     "save": "Speichern",
     "saveCategories": "Themen speichern",
-    "search": "Suchen"
+    "search": "Suchen",
+    "unsavedChanges": {
+      "discard": "Verwerfen",
+      "message": "Du hast Änderungen vorgenommen, die noch nicht gespeichert wurden. Wenn du jetzt fortfährst, gehen sie verloren.",
+      "stay": "Bleiben",
+      "title": "Ungespeicherte Änderungen"
+    }
   },
   "admin": {
     "api-keys": {
@@ -474,6 +480,7 @@
     "loading": "wird geladen",
     "loadMore": "mehr laden",
     "name": "Name",
+    "noChangesHint": "Es gibt noch nichts zu speichern.",
     "organization": "Organisation ::: Organisationen",
     "post": "Beitrag ::: Beiträge",
     "project": "Projekt ::: Projekte",
@@ -887,6 +894,7 @@
     "foundation": "Gründung",
     "general": "Allgemein",
     "goal": "Ziel der Gruppe",
+    "group": "Gruppe",
     "groupCreated": "Die Gruppe wurde angelegt!",
     "in": "in",
     "invite-links": "Einladungslinks",
@@ -926,6 +934,7 @@
     "muted": "Gruppe stummgeschaltet",
     "myGroups": "Meine Gruppen",
     "name": "Gruppenname",
+    "previousLocation": "Vorheriger Ort: {location}",
     "radius": "Radius",
     "removeMember": "Mitglied aus der Gruppe entfernen?",
     "removeMemberButton": "Entfernen",
@@ -940,6 +949,7 @@
       "usual": "Mitglied"
     },
     "save": "Neue Gruppe anlegen",
+    "scrollToLocationMap": "Zur Karte scrollen",
     "showMembers": "Mitgliederliste für alle sichtbar",
     "teaser": {
       "openGroup": "Gruppe öffnen",
@@ -959,7 +969,17 @@
     "unmute": "Nicht stummschalten",
     "unmuted": "Gruppe nicht mehr stummgeschaltet",
     "update": "Änderung speichern",
-    "updatedGroup": "Die Gruppendaten wurden geändert!"
+    "updatedGroup": "Die Gruppendaten wurden geändert!",
+    "validations": {
+      "actionRadiusRequired": "Bitte einen Aktionsradius wählen.",
+      "descriptionLength": "Die Beschreibung muss mindestens {min} Zeichen lang sein.",
+      "descriptionNotEmpty": "Bitte eine Beschreibung eingeben.",
+      "groupTypeRequired": "Bitte einen Gruppentyp wählen.",
+      "nameLength": "Der Name muss zwischen {min} und {max} Zeichen lang sein.",
+      "nameNotEmpty": "Bitte einen Gruppennamen eingeben.",
+      "slugInvalidCharacters": "Nur Kleinbuchstaben, Ziffern, Bindestriche und Unterstriche sind erlaubt.",
+      "slugNotEmpty": "Bitte einen eindeutigen Gruppennamen eingeben."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",

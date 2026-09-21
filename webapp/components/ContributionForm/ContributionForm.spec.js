@@ -7,7 +7,8 @@ import Vuex from 'vuex'
 
 import ImageUploader from '~/components/Uploader/ImageUploader'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
-import EventLocationMap from '~/components/Map/EventLocationMap'
+import LocationPickerMap from '~/components/Map/LocationPickerMap'
+import LocationSelect from '~/components/Select/LocationSelect'
 import MutationObserver from 'mutation-observer'
 
 global.MutationObserver = MutationObserver
@@ -128,6 +129,12 @@ describe('ContributionForm.vue', () => {
         const editable = attached.find('.ProseMirror')
         expect(editable.attributes('aria-labelledby')).toBe(label.attributes('id'))
         expect(editable.element).toHaveAccessibleName(label.text())
+      })
+    })
+
+    describe('validation hint display', () => {
+      it('shows the title length as "count / min–max"', () => {
+        expect(wrapper.find('.os-validation-hint').text()).toContain('0 / 3–100')
       })
     })
 
@@ -263,10 +270,29 @@ describe('ContributionForm.vue', () => {
       })
 
       describe('cancel', () => {
-        it('calls $router.back() when cancel button clicked', () => {
+        it('falls back to $router.back() when no cancelTo is given', () => {
           cancelBtn = wrapper.find('[data-test="cancel-button"]')
           cancelBtn.trigger('click')
           expect(mocks.$router.back).toHaveBeenCalledTimes(1)
+        })
+
+        // The hosting page (pages/post/create/_type.vue, pages/post/edit/_id.vue)
+        // captures where the user actually arrived from and passes it down as
+        // cancelTo — $router.back() alone can't do this, since there are
+        // multiple places this form is reached from, and switching the
+        // article/event type mid-flow is itself a route navigation that
+        // $router.back() would just undo instead of leaving the flow.
+        it('navigates to cancelTo instead, when given', () => {
+          const withCancelTo = mount(ContributionForm, {
+            mocks,
+            localVue,
+            store,
+            propsData: { ...propsData, cancelTo: '/groups/g1/some-group' },
+            stubs,
+          })
+          withCancelTo.find('[data-test="cancel-button"]').trigger('click')
+          expect(mocks.$router.push).toHaveBeenCalledWith('/groups/g1/some-group')
+          expect(mocks.$router.back).not.toHaveBeenCalled()
         })
       })
 
@@ -357,8 +383,8 @@ describe('ContributionForm.vue', () => {
           })
         })
 
-        it('passes that same location on to EventLocationMap, so its pin is shown without re-picking', () => {
-          expect(wrapper.findComponent(EventLocationMap).props('location')).toEqual({
+        it('passes that same location on to LocationPickerMap, so its pin is shown without re-picking', () => {
+          expect(wrapper.findComponent(LocationPickerMap).props('location')).toEqual({
             label: 'Berlin, Germany',
             value: 'Berlin, Germany',
             id: 'place.berlin',
@@ -407,7 +433,7 @@ describe('ContributionForm.vue', () => {
         })
 
         it("shows the pin at the post's own precise coordinates, not eventLocation's", () => {
-          expect(wrapper.findComponent(EventLocationMap).props('location')).toMatchObject({
+          expect(wrapper.findComponent(LocationPickerMap).props('location')).toMatchObject({
             lat: 52.5001,
             lng: 13.404,
           })
@@ -637,7 +663,7 @@ describe('ContributionForm.vue', () => {
 
           describe('submit with a map-pin/search-result payload carrying coordinates', () => {
             beforeEach(async () => {
-              // Shape EventLocationMap's onPinChange and LocationSelect's
+              // Shape LocationPickerMap's onPinChange and LocationSelect's
               // processLocationsResult() both emit once a pin/result is picked.
               wrapper.vm.updateFormField('eventLocationName', {
                 label: 'Deutschland, Germany',
@@ -801,6 +827,295 @@ describe('ContributionForm.vue', () => {
             variables: expect.objectContaining({ groupId: 'g1' }),
           }),
         )
+      })
+    })
+
+    // Same mechanism as GroupForm.vue's own hasUnsavedChanges — reused here
+    // per explicit request, for both the leave-confirmation guard (on the
+    // pages hosting this form) and the submit button's greyed-out-but-
+    // clickable "nothing to save" state below.
+    describe('hasUnsavedChanges', () => {
+      it('is false right after mount', () => {
+        wrapper = Wrapper()
+        expect(wrapper.vm.hasUnsavedChanges).toBe(false)
+      })
+
+      it('becomes true once a field goes through updateFormField (e.g. the title)', () => {
+        wrapper = Wrapper()
+        wrapper.vm.updateFormField('title', 'A new title')
+        expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+      })
+
+      it('becomes true once the hero image changes', () => {
+        const spy = jest
+          .spyOn(FileReader.prototype, 'readAsDataURL')
+          .mockImplementation(function () {
+            this.onload({ target: { result: 'someUrlToImage' } })
+          })
+        wrapper = Wrapper()
+        wrapper.findComponent(ImageUploader).vm.$emit('addHeroImage', imageUpload)
+        expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+        spy.mockRestore()
+      })
+
+      // eventStart is set directly ($set), not through updateFormField —
+      // same reasoning as GroupForm.vue's location field, tracked separately.
+      it('becomes true once eventStart is changed', () => {
+        propsData = { postType: 'Event' }
+        wrapper = Wrapper()
+        wrapper.vm.changeEventStart(new Date())
+        expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+      })
+
+      it('becomes true once the event location is genuinely changed (map)', () => {
+        propsData = { postType: 'Event' }
+        wrapper = Wrapper()
+        wrapper
+          .findComponent(LocationPickerMap)
+          .vm.$emit('input', { label: 'Berlin', value: 'Berlin', lat: 52.5, lng: 13.4 })
+        expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+      })
+
+      // The actual bug this guards against (see GroupForm.vue's identical
+      // ignoreNextLocationInput): LocationSelect resolves an already-saved
+      // plain-string eventLocationName into a normalized object right on
+      // mount, purely to display it — not a pick the user made.
+      it("stays false through LocationSelect's own mount-time auto-resolve of an already-saved location", () => {
+        propsData = {
+          postType: 'Event',
+          contribution: { id: 'p1', eventLocationName: 'Hamburg' },
+        }
+        wrapper = Wrapper()
+        wrapper
+          .findComponent(LocationSelect)
+          .vm.$emit('input', { label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'x' })
+        expect(wrapper.vm.hasUnsavedChanges).toBe(false)
+      })
+
+      it('resets to false once the change is actually saved, before navigating away', async () => {
+        wrapper = Wrapper()
+        wrapper.find('.ds-input').setValue(postTitle)
+        await wrapper.vm.updateEditorContent(postContent)
+        await wrapper.find('form').trigger('submit')
+        await mocks.$apollo.mutate
+
+        expect(wrapper.vm.hasUnsavedChanges).toBe(false)
+      })
+
+      it('does not reset when the save fails', async () => {
+        mocks.$apollo.mutate = jest.fn().mockRejectedValueOnce({ message: 'boom' })
+        wrapper = Wrapper()
+        wrapper.find('.ds-input').setValue(postTitle)
+        await wrapper.vm.updateEditorContent(postContent)
+        await wrapper.find('form').trigger('submit')
+        await mocks.$apollo.mutate
+
+        expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+      })
+
+      // submit() to its .then() is a real network round-trip, not
+      // instantaneous — an edit made while the mutation is still in flight
+      // was not part of what got sent, so it must survive the success
+      // handler's reset rather than being wiped out just because "title"
+      // was already dirty at submit time too.
+      it('keeps a field dirty if it is changed again to a different value before the save resolves', async () => {
+        wrapper = Wrapper()
+        wrapper.find('.ds-input').setValue(postTitle)
+        await wrapper.vm.updateEditorContent(postContent)
+
+        await wrapper.find('form').trigger('submit')
+        // Simulate the same field being edited again before the mutation resolves.
+        wrapper.vm.updateFormField('title', 'Yet another title')
+        await mocks.$apollo.mutate
+
+        expect(wrapper.vm.dirtyFields.title).toBe(true)
+        expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+      })
+
+      // Lets a hosting page mirror this outside the instance — see
+      // pages/post/create/_type.vue's own sharedDraftIsDirty doc comment for
+      // why (switching the article/event type there remounts this form,
+      // wiping its own dirty tracking, even though the actual draft content
+      // survives via externalFormData's separate module-level cache).
+      it('emits has-unsaved-changes-change whenever hasUnsavedChanges changes', async () => {
+        wrapper = Wrapper()
+        wrapper.vm.updateFormField('title', 'A new title')
+        await wrapper.vm.$nextTick()
+
+        expect(wrapper.emitted('has-unsaved-changes-change')).toEqual([[true]])
+      })
+
+      // The actual bug this guards against: $router.push() below fires the
+      // leave-confirmation guard synchronously, before the watcher above
+      // gets a chance to run on its own next tick — without an explicit,
+      // synchronous emit in the success handler itself, a host page
+      // mirroring this event (pages/post/create/_type.vue's
+      // sharedDraftIsDirty) would still read "dirty" for that very
+      // navigation and wrongly show the discard-changes modal right after a
+      // successful save.
+      it('emits has-unsaved-changes-change(false) before navigating away on save, not just via the async watcher', async () => {
+        wrapper = Wrapper()
+        wrapper.find('.ds-input').setValue(postTitle)
+        await wrapper.vm.updateEditorContent(postContent)
+
+        const emitSpy = jest.spyOn(wrapper.vm, '$emit')
+        await wrapper.find('form').trigger('submit')
+        await mocks.$apollo.mutate
+
+        const emitCallIndex = emitSpy.mock.calls.findIndex(
+          ([event, value]) => event === 'has-unsaved-changes-change' && value === false,
+        )
+        expect(emitCallIndex).toBeGreaterThanOrEqual(0)
+        const emitCallOrder = emitSpy.mock.invocationCallOrder[emitCallIndex]
+        const pushCallOrder = mocks.$router.push.mock.invocationCallOrder[0]
+        expect(emitCallOrder).toBeLessThan(pushCallOrder)
+        emitSpy.mockRestore()
+      })
+    })
+
+    // Switching the type (via the hosting page's own sidebar menu —
+    // pages/post/edit/_id.vue) is itself a change worth reflecting here,
+    // same as any other field — postType is passed straight through as a
+    // prop, compared against what was actually saved.
+    describe('postType changes (switching Article <-> Event while editing)', () => {
+      it('is not counted while creating — nothing saved yet to differ from', async () => {
+        propsData = { postType: 'Article' }
+        wrapper = Wrapper()
+        await wrapper.setProps({ postType: 'Event' })
+        expect(wrapper.vm.hasUnsavedChanges).toBe(false)
+      })
+
+      it('becomes true once the type differs from what was saved', async () => {
+        propsData = {
+          contribution: { id: 'p1', title: 'A valid title', content: 'y', postType: ['Article'] },
+          postType: 'Article',
+        }
+        wrapper = Wrapper()
+        await wrapper.setProps({ postType: 'Event' })
+        expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+      })
+
+      it('is false again once switched back to the saved type', async () => {
+        propsData = {
+          contribution: { id: 'p1', title: 'A valid title', content: 'y', postType: ['Article'] },
+          postType: 'Article',
+        }
+        wrapper = Wrapper()
+        await wrapper.setProps({ postType: 'Event' })
+        await wrapper.setProps({ postType: 'Article' })
+        expect(wrapper.vm.hasUnsavedChanges).toBe(false)
+      })
+
+      // Same reasoning as the dirtyFields/location/image resets above —
+      // otherwise the very navigation a successful save triggers would
+      // immediately re-show the discard-changes modal over the type switch
+      // alone. Switching Event -> Article here (not the other way around)
+      // so the form still validates without also having to fill in
+      // event-only fields (eventStart etc.), which Article doesn't need.
+      it('resets once the type switch is actually saved', async () => {
+        mocks.$apollo.mutate = jest.fn().mockResolvedValueOnce({
+          data: { UpdatePost: { title: postTitle, slug: 'slug' } },
+        })
+        propsData = {
+          contribution: { id: 'p1', title: 'A valid title', content: 'y', postType: ['Event'] },
+          postType: 'Event',
+        }
+        wrapper = Wrapper()
+        await wrapper.setProps({ postType: 'Article' })
+        expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+
+        await wrapper.find('form').trigger('submit')
+        await mocks.$apollo.mutate
+
+        expect(wrapper.vm.hasUnsavedChanges).toBe(false)
+      })
+    })
+
+    describe('submit button greyed-out-but-clickable states', () => {
+      // Not an actual :disabled — see submitVisuallyDenied's own doc
+      // comment: hasUnsavedChanges only tracks whether something was
+      // touched, not whether it truly differs from what's saved, so a
+      // tracking gap must never make a real save unreachable.
+      it('never greys out the create form for "nothing changed" — there is nothing saved yet to compare against', () => {
+        wrapper = Wrapper()
+        const submitButton = wrapper.find('button[type="submit"]')
+        expect(submitButton.classes()).not.toContain('permission-denied')
+        expect(submitButton.attributes('aria-disabled')).toBeUndefined()
+      })
+
+      it('still greys out a create form for a genuinely missing permission, and marks it aria-disabled', () => {
+        wrapper = mount(ContributionForm, {
+          mocks: { ...mocks, $can: () => false },
+          localVue,
+          store,
+          propsData,
+          stubs,
+        })
+        const submitButton = wrapper.find('button[type="submit"]')
+        expect(submitButton.classes()).toContain('permission-denied')
+        expect(submitButton.attributes('aria-disabled')).toBe('true')
+        expect(wrapper.vm.submitDeniedHint).toBe('permissions.deniedHint')
+      })
+
+      // Visually greyed via the class, but deliberately NOT aria-disabled —
+      // the button genuinely still works here (see submitVisuallyDenied's
+      // own doc comment), and telling assistive tech otherwise would be
+      // actively wrong, not just cosmetically off.
+      it('greys out the submit button while editing with nothing changed yet, without marking it aria-disabled', () => {
+        propsData = { contribution: { id: 'p1456', title: 'x', content: 'y' } }
+        wrapper = Wrapper()
+        const submitButton = wrapper.find('button[type="submit"]')
+        expect(submitButton.classes()).toContain('permission-denied')
+        expect(submitButton.attributes('aria-disabled')).toBeUndefined()
+        expect(wrapper.vm.submitDeniedHint).toBe('common.noChangesHint')
+      })
+
+      it('un-greys the submit button while editing once something has actually been changed', async () => {
+        propsData = { contribution: { id: 'p1456', title: 'x', content: 'y' } }
+        wrapper = Wrapper()
+        wrapper.vm.updateFormField('title', 'A new title')
+        await wrapper.vm.$nextTick()
+
+        const submitButton = wrapper.find('button[type="submit"]')
+        expect(submitButton.classes()).not.toContain('permission-denied')
+        expect(submitButton.attributes('aria-disabled')).toBeUndefined()
+      })
+    })
+
+    describe('onBeforeUnload (native browser tab-close/reload prompt)', () => {
+      it('registers the listener on mount and unregisters it via its own beforeDestroy hook', () => {
+        const addSpy = jest.spyOn(window, 'addEventListener')
+        const removeSpy = jest.spyOn(window, 'removeEventListener')
+        wrapper = Wrapper()
+
+        expect(addSpy).toHaveBeenCalledWith('beforeunload', wrapper.vm.onBeforeUnload)
+
+        // Not wrapper.destroy(): tiptap's own EditorContent#beforeDestroy
+        // throws when torn down outside a full page unmount (see this
+        // file's other mounts, none of which call .destroy() either) —
+        // call the hook directly instead of triggering a real destroy
+        // cascade.
+        wrapper.vm.$options.beforeDestroy[0].call(wrapper.vm)
+
+        expect(removeSpy).toHaveBeenCalledWith('beforeunload', wrapper.vm.onBeforeUnload)
+        addSpy.mockRestore()
+        removeSpy.mockRestore()
+      })
+
+      it('does nothing when there are no unsaved changes', () => {
+        wrapper = Wrapper()
+        const event = { preventDefault: jest.fn() }
+        wrapper.vm.onBeforeUnload(event)
+        expect(event.preventDefault).not.toHaveBeenCalled()
+      })
+
+      it('prevents the default and sets returnValue when there are unsaved changes', () => {
+        wrapper = Wrapper()
+        wrapper.vm.updateFormField('title', 'A new title')
+        const event = { preventDefault: jest.fn() }
+        wrapper.vm.onBeforeUnload(event)
+        expect(event.preventDefault).toHaveBeenCalled()
+        expect(event.returnValue).toBe('')
       })
     })
   })
