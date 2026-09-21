@@ -438,7 +438,7 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
         WITH post, author, user, group, emailAddress, membership
         // The parentheses are load-bearing: unparenthesised, \`A OR B OR C AND D\` binds as
         // \`A OR B OR (C AND D)\`, and the group rule would wave every non-member through.
-        WHERE (group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner'])
+        WHERE group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner']
         // Already told about this post — see the note on this function.
         AND NOT EXISTS { MATCH (post)-[:NOTIFIED { reason: $reason }]->(user) }
         MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
@@ -461,7 +461,7 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
       // \`membership\` projected for the same reason as in the post branch above.
       WITH comment, user, group, emailAddress, membership
       // Parenthesised for the same reason as in the post branch above.
-      WHERE (group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner'])
+      WHERE group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner']
       // Already told about this comment — see the note on this function.
       AND NOT EXISTS { MATCH (comment)-[:NOTIFIED { reason: $reason }]->(user) }
       MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(user)
