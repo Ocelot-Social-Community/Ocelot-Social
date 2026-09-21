@@ -36,7 +36,12 @@ export const activeGroupIds = async (context: Context): Promise<string[]> => {
     `,
     variables: { userId: context.user.id, roles: ACTIVE_GROUP_ROLES },
   })
-  return (result.records[0]?.get('groupIds') as string[] | undefined) ?? []
+  // No `?.` and no `?? []`. An aggregation with no grouping key emits exactly ONE row whatever
+  // the MATCH found, and `collect()` yields an empty list rather than null — so a viewer with
+  // no memberships lands here with `[]` in hand, not with a missing record. Guarding against
+  // either was an unreachable arm; coverage is what surfaced that, and the guarantee is the
+  // reason it stays gone rather than being silenced.
+  return result.records[0].get('groupIds') as string[]
 }
 
 /**

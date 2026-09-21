@@ -92,7 +92,13 @@ const splitPermissionFilters = (filter: Record<string, unknown> | undefined) => 
   // Destructured by name rather than looped over a list of keys: there are two of them, and
   // static keys mean no computed property access to reason about. Carrying them through as
   // `undefined` when absent is safe — postFilterToCypher skips undefined filter values.
-  const { invisibleTo, inGroupsOf, ...rest } = filter ?? {}
+  //
+  // `{ ...filter }` rather than `filter ?? {}`: spreading undefined yields `{}` too, but
+  // without a branch. Both callers always pass an object — filterInvisiblePosts has written
+  // `invisibleTo` by then, and maintainGroupPinnedPosts returns early unless `filter.group`
+  // exists — so `??` was an unreachable arm that coverage correctly refused to accept, while
+  // destructuring `undefined` directly would throw if that ever changed.
+  const { invisibleTo, inGroupsOf, ...rest } = { ...filter }
   return { permissions: { invisibleTo, inGroupsOf }, rest }
 }
 
