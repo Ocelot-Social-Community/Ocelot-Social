@@ -40,6 +40,7 @@ vi.mock('../helpers/isUserOnline', () => ({
 const { default: pubsubContext } = await import('@context/pubsub')
 const { default: Factory, cleanDatabase } = await import('@db/factories')
 const { default: CreateComment } = await import('@graphql/queries/comments/CreateComment.gql')
+const { default: UpdateComment } = await import('@graphql/queries/comments/UpdateComment.gql')
 const { default: ChangeGroupMemberRole } =
   await import('@graphql/queries/groups/ChangeGroupMemberRole.gql')
 const { default: CreateGroup } = await import('@graphql/queries/groups/CreateGroup.gql')
@@ -119,7 +120,7 @@ describe('notifications', () => {
 
     describe('given another user', () => {
       let title
-      let postContent
+      let postContent: string
       let postAuthor
 
       const createPostAction = async () => {
@@ -277,6 +278,51 @@ describe('notifications', () => {
               expect(sendNotificationMailMock).toHaveBeenCalledWith(
                 expect.objectContaining({ reason: 'commented_on_post' }),
               )
+            })
+          })
+
+          // `handleContentDataOfComment` is registered for CreateComment AND UpdateComment, and
+          // nothing here covered the edit until now. Before the `NOT EXISTS` guard in
+          // `notifyUsersOfComment`, every edit of a comment re-announced it to EVERY observer of
+          // the post: the MERGE found the existing edge, `read` went back to FALSE and a fresh
+          // mail went out. Same defect as the mention path, larger audience — a commenter fixing
+          // their own typo re-alerted the whole thread.
+          describe('and the commenter later edits that comment', () => {
+            const updateCommentAction = async () => {
+              authenticatedUser = await commentAuthor.toJson()
+              await mutate({
+                mutation: UpdateComment,
+                variables: { id: 'c47', content: 'Commenters comment, typo fixed.' },
+              })
+              authenticatedUser = await notifiedUser.toJson()
+            }
+
+            it('leaves my notification read and sends no second email', async () => {
+              await createCommentOnPostAction()
+              await mutate({ mutation: markAsRead, variables: { id: 'c47' } })
+
+              expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+
+              await updateCommentAction()
+
+              await expect(
+                query({
+                  query: notifications,
+                  variables: { orderBy: 'updatedAt_desc' },
+                }),
+              ).resolves.toMatchObject({
+                data: {
+                  notifications: [
+                    expect.objectContaining({
+                      read: true,
+                      reason: 'commented_on_post',
+                      from: expect.objectContaining({ id: 'c47' }),
+                    }),
+                  ],
+                },
+                errors: undefined,
+              })
+              expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
             })
           })
 
@@ -532,9 +578,19 @@ describe('notifications', () => {
             ).resolves.toEqual(expected)
           })
 
+          // This block asserted the OPPOSITE until the `NOT EXISTS` guard in
+          // `notifyUsersOfMention`: an edit that still carried the same mention flipped `read`
+          // back to FALSE, so a long-read notification returned to the top of the bell, the
+          // unread badge came back and a second mail went out — because the author fixed a typo.
+          //
+          // Read the old names against the old fixture and the inversion is not a change of
+          // mind: the block was called "but the next mention happens after the notification was
+          // marked as read", while `updatePostAction` repeats the mention that was ALREADY
+          // delivered. The name described a new mention; the fixture exercised an unchanged one.
+          // A new mention is the case below, and it still notifies.
           describe('if the notification was marked as read earlier', () => {
-            describe('but the next mention happens after the notification was marked as read', () => {
-              it('sets the `read` attribute to false again', async () => {
+            describe('and the edit repeats the mention it was already sent for', () => {
+              it('leaves the notification read', async () => {
                 await createPostAction()
                 await mutate({ mutation: markAsRead, variables: { id: 'p47' } })
                 const {
@@ -556,12 +612,24 @@ describe('notifications', () => {
                   query: notifications,
                   variables: {
                     orderBy: 'updatedAt_desc',
-                    read: false,
                   },
                 })
 
                 expect(readBefore).toEqual(true)
-                expect(readAfter).toEqual(false)
+                expect(readAfter).toEqual(true)
+              })
+
+              it('sends no second email', async () => {
+                // The half `read` alone does not cover: the mail goes out per publish, and
+                // `publishNotifications` dedupes only WITHIN one call, so a resurrected
+                // notification mails again on every single edit.
+                await createPostAction()
+
+                expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+
+                await updatePostAction()
+
+                expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
               })
 
               it('does not update the `createdAt` attribute', async () => {
@@ -586,7 +654,6 @@ describe('notifications', () => {
                   query: notifications,
                   variables: {
                     orderBy: 'updatedAt_desc',
-                    read: false,
                   },
                 })
 
@@ -597,6 +664,57 @@ describe('notifications', () => {
                 expect(createdAtBefore).toEqual(createdAtAfter)
               })
             })
+          })
+        })
+
+        // The counterpart, and the reason the mention path runs on UpdatePost at all: being
+        // @-mentioned by an edit is the one notification an edit legitimately produces. Without
+        // this, the guard above could be spelled "never notify on an edit" and still pass.
+        describe('updates the post to mention somebody who was not mentioned before', () => {
+          it('notifies the newly mentioned user, and only them', async () => {
+            const newlyMentioned = await Factory.build(
+              'user',
+              { id: 'late', name: 'Late Arrival', slug: 'late-arrival' },
+              { email: 'late@example.org', password: '1234' },
+            )
+            await createPostAction()
+            vi.clearAllMocks()
+
+            authenticatedUser = await postAuthor.toJson()
+            await mutate({
+              mutation: UpdatePost,
+              variables: {
+                id: 'p47',
+                title,
+                content: `${postContent} And you too, <a class="mention" data-mention-id="late" href="/profile/late/late-arrival">@late-arrival</a>!`,
+                categoryIds,
+              },
+            })
+
+            authenticatedUser = await newlyMentioned.toJson()
+
+            await expect(
+              query({
+                query: notifications,
+                variables: { orderBy: 'updatedAt_desc', read: false },
+              }),
+            ).resolves.toMatchObject({
+              data: {
+                notifications: [
+                  expect.objectContaining({
+                    reason: 'mentioned_in_post',
+                    from: expect.objectContaining({ id: 'p47' }),
+                  }),
+                ],
+              },
+              errors: undefined,
+            })
+            // "and only them": the already-mentioned user must not be mailed a second time by
+            // the same edit, even though the content still names them.
+            expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+            expect(sendNotificationMailMock).toHaveBeenCalledWith(
+              expect.objectContaining({ email: 'late@example.org' }),
+            )
           })
         })
 

@@ -392,6 +392,25 @@ const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
   }
 }
 
+/**
+ * Notify everyone a post or comment MENTIONS — once per resource, ever.
+ *
+ * Both mutations of a resource run this, and an edit hands over every mention the new content
+ * carries, unchanged ones included. Without the `NOT EXISTS` guard below, MERGE would find the
+ * existing edge and the unconditional `SET notification.read = FALSE` further down would flip a
+ * long-read notification back to unread, push it to the top of the bell, reset the unread badge
+ * and send a second mail — for a typo fix. That is the same "resurrection" the split of
+ * Create/UpdatePost fixed for followers and group members (see `handleUpdatePost`); it lived on
+ * here because the mention path is shared between creating and editing on purpose.
+ *
+ * The guard drops those recipients before the MERGE, so there is no row at all: no edge written,
+ * no `read` reset, no subscription, no mail. It is a no-op on creation — a resource that was just
+ * created has no NOTIFIED edges — and it deliberately does NOT catch the one notification an edit
+ * legitimately produces: a mention ADDED while editing has no edge yet.
+ *
+ * Being told once is the whole of what this notification says. It carries no indication of which
+ * revision mentioned you, so a second alert about the same post conveys nothing the first did not.
+ */
 const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
   if (!idsOfUsers?.length) {
     return []
@@ -410,7 +429,11 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
         OPTIONAL MATCH (post)-[:IN]->(group:Group)
         OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(user)
         WITH post, author, user, group, emailAddress
-        WHERE group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner']
+        // The parentheses are load-bearing: unparenthesised, \`A OR B OR C AND D\` binds as
+        // \`A OR B OR (C AND D)\`, and the group rule would wave every non-member through.
+        WHERE (group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner'])
+        // Already told about this post — see the note on this function.
+        AND NOT EXISTS { MATCH (post)-[:NOTIFIED { reason: $reason }]->(user) }
         MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
         WITH post AS resource, notification, user, emailAddress
       `
@@ -429,7 +452,10 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
       OPTIONAL MATCH (post)-[:IN]->(group:Group)
       OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(user)
       WITH comment, user, group, emailAddress
-      WHERE group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner']
+      // Parenthesised for the same reason as in the post branch above.
+      WHERE (group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner'])
+      // Already told about this comment — see the note on this function.
+      AND NOT EXISTS { MATCH (comment)-[:NOTIFIED { reason: $reason }]->(user) }
       MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(user)
       WITH comment AS resource, notification, user, emailAddress
       `
@@ -462,6 +488,19 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
   }
 }
 
+/**
+ * Tell everyone observing the post that a comment appeared — once per comment, ever.
+ *
+ * `handleContentDataOfComment` serves CreateComment AND UpdateComment, so this ran again on every
+ * edit of a comment: the MERGE found the existing edge, `read` was reset to FALSE and a second
+ * mail went out to EVERY observer of the post, because someone fixed a typo in a reply. Same
+ * defect as the mention path (see `notifyUsersOfMention`), with a larger audience — observers of
+ * the post rather than the people named in it.
+ *
+ * Hence the `NOT EXISTS` guard: an observer already told about this comment produces no row, so
+ * nothing is written, reset, published or mailed. A no-op on CreateComment, where no edge exists
+ * yet. An edit of a comment is not news; its appearance was.
+ */
 const notifyUsersOfComment = async (label, commentId, reason, context) => {
   await validateNotifyUsers(label, reason)
   const session = context.driver.session()
@@ -473,6 +512,10 @@ const notifyUsersOfComment = async (label, commentId, reason, context) => {
           WHERE NOT (observingUser)-[:BLOCKED]-(commenter)
           AND NOT (observingUser)-[:MUTED]->(commenter)
           AND NOT observingUser.id = $userId
+          // Already told about this comment — see the note on this function. Safe to append as
+          // a bare AND here: this WHERE is a chain of ANDs, unlike the group rule in
+          // notifyUsersOfMention, which needed parentheses.
+          AND NOT EXISTS { MATCH (comment)-[:NOTIFIED { reason: $reason }]->(observingUser) }
         OPTIONAL MATCH (observingUser)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
         WITH observingUser, emailAddress, post, comment, commenter
         MATCH (postAuthor:User)-[:WROTE]->(post)
