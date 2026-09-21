@@ -336,6 +336,17 @@ describe('create.vue', () => {
       wrapper.vm.switchPostType(null, { route: { type: 'article' } })
       expect(routerReplace).not.toHaveBeenCalled()
     })
+
+    // Deliberately NOT a change on its own here — unlike
+    // pages/post/edit/_id.vue's identical switch (nothing is saved yet in
+    // the create flow, so the type alone doesn't carry that same weight).
+    // Only what's actually typed afterwards makes it dirty, via dirtyFields
+    // etc. mirrored into sharedDraftIsDirty as usual.
+    it('does not mark hasUnsavedChanges just from switching type', () => {
+      wrapper = Wrapper()
+      wrapper.vm.switchPostType(null, { route: { type: 'event' } })
+      expect(wrapper.vm.hasUnsavedChanges()).toBe(false)
+    })
   })
 
   describe('draft persistence across page remount', () => {

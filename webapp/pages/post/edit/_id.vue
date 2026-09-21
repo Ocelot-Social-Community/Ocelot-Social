@@ -133,6 +133,10 @@ export default {
     return { contribution, currentPostType: contribution.postType?.[0] || 'Article' }
   },
   methods: {
+    // Delegates entirely to ContributionForm — it already compares
+    // currentPostType (passed through as its own postType prop) against
+    // what was actually saved, alongside its own field tracking. See its
+    // postTypeChanged computed.
     hasUnsavedChanges() {
       return !!this.$refs.contributionForm?.hasUnsavedChanges
     },

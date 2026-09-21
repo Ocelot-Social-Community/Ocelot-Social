@@ -144,6 +144,21 @@ describe('post/edit/_id.vue', () => {
     })
   })
 
+  // Switching the type via the sidebar menu just flips currentPostType,
+  // which is passed straight through as ContributionForm's own postType
+  // prop — that's where "does it differ from what was saved" is actually
+  // tracked now (see its own postTypeChanged computed and
+  // ContributionForm.spec.js for the dedicated tests), alongside its other
+  // field tracking. This page's hasUnsavedChanges() just delegates to it.
+  describe('hasUnsavedChanges', () => {
+    it('delegates to ContributionForm', async () => {
+      wrapper = await buildWrapper()
+      expect(wrapper.vm.hasUnsavedChanges()).toBe(
+        !!wrapper.vm.$refs.contributionForm?.hasUnsavedChanges,
+      )
+    })
+  })
+
   describe('postTypeMatcher', () => {
     it('returns true for the current type and false for the other', async () => {
       wrapper = await buildWrapper()

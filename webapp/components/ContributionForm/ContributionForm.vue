@@ -346,6 +346,15 @@ export default {
       // locationChangedByUser (see hasUnsavedChanges below).
       locationChangedByUser: false,
       imageChangedByUser: false,
+      // The type as of the last successful save — starts as the
+      // contribution's own saved value, refreshed after each further save
+      // (see submit()'s success handler), since the contribution prop
+      // itself never updates after a save (submit() navigates away
+      // immediately, no refetch happens first). Compared against the
+      // postType prop below rather than contribution.postType directly for
+      // the same reason GroupForm.vue reads its own savedLocationName
+      // instead of the group prop's locationName.
+      savedPostType: this.contribution.postType?.[0] ?? null,
       // See GroupForm.vue's own ignoreNextLocationInput for the full
       // explanation: LocationSelect resolves an already-saved location into
       // a normalized object right on mount, purely to display it — not a
@@ -542,6 +551,13 @@ export default {
     canSubmit() {
       return !!this.contribution.id || this.$can('post.create')
     },
+    // Switching the type (postType is passed straight through as a prop by
+    // the hosting page's own sidebar menu — see pages/post/edit/_id.vue) is
+    // itself a change worth reflecting here, same as any other field. Only
+    // meaningful while editing — creating has no saved type to differ from.
+    postTypeChanged() {
+      return !!this.contribution.id && !!this.savedPostType && this.postType !== this.savedPostType
+    },
     // Exposed (via $refs) for the page's own beforeRouteLeave guard and the
     // native beforeunload prompt below — same pattern as GroupForm.vue.
     // dirtyFields covers every field wired through updateFormField()/
@@ -553,7 +569,8 @@ export default {
       return (
         Object.keys(this.dirtyFields).length > 0 ||
         this.locationChangedByUser ||
-        this.imageChangedByUser
+        this.imageChangedByUser ||
+        this.postTypeChanged
       )
     },
     // Same grey-but-still-clickable treatment GroupForm.vue's submit button
@@ -730,6 +747,7 @@ export default {
         imageType: this.formData.imageType,
         imageBlurred: this.formData.imageBlurred,
       }
+      const submittedPostType = this.postType
       const imageStillMatchesSubmitted = () =>
         (this.formData.image?.url ?? null) === submittedImageSnapshot.imageUrl &&
         this.formData.imageUpload === submittedImageSnapshot.imageUpload &&
@@ -772,6 +790,9 @@ export default {
           }
           if (imageStillMatchesSubmitted()) {
             this.imageChangedByUser = false
+          }
+          if (this.postType === submittedPostType) {
+            this.savedPostType = submittedPostType
           }
           // The has-unsaved-changes-change watcher (see watch: below) only
           // fires on Vue's own async nextTick — too late here, since

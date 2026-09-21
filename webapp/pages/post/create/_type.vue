@@ -116,7 +116,10 @@ let sharedDraft = null
 // fresh instance, confirmLeaveIfUnsavedChanges wouldn't ask, and
 // beforeRouteLeave would clear sharedDraft right along with it. Kept in
 // sync via ContributionForm's own has-unsaved-changes-change event (see the
-// template), reset alongside sharedDraft itself below and in
+// template) — switching type on its own does NOT set this directly (unlike
+// pages/post/edit/_id.vue's identical switch): nothing is saved yet here,
+// so the type alone doesn't carry that same weight, only what's actually
+// typed does. Reset alongside sharedDraft itself below and in
 // __resetSharedDraftForTests.
 let sharedDraftIsDirty = false
 
@@ -351,6 +354,11 @@ export default {
       const { type: oldType } = this.$route.params
       const newType = route.route.type.toLowerCase()
       if (newType === oldType) return
+      // Deliberately NOT marked as a change on its own here (unlike
+      // pages/post/edit/_id.vue's identical switch) — nothing is saved yet
+      // in the create flow, so switching type by itself doesn't have the
+      // same "differs from what you'd lose" weight; it only matters once
+      // something is actually typed, which dirtyFields etc. already cover.
       this.type = newType
       const query = this.draft.groupId ? { groupId: this.draft.groupId } : {}
       this.$router.replace({ path: `/post/create/${this.type}`, query })

@@ -973,6 +973,64 @@ describe('ContributionForm.vue', () => {
       })
     })
 
+    // Switching the type (via the hosting page's own sidebar menu —
+    // pages/post/edit/_id.vue) is itself a change worth reflecting here,
+    // same as any other field — postType is passed straight through as a
+    // prop, compared against what was actually saved.
+    describe('postType changes (switching Article <-> Event while editing)', () => {
+      it('is not counted while creating — nothing saved yet to differ from', async () => {
+        propsData = { postType: 'Article' }
+        wrapper = Wrapper()
+        await wrapper.setProps({ postType: 'Event' })
+        expect(wrapper.vm.hasUnsavedChanges).toBe(false)
+      })
+
+      it('becomes true once the type differs from what was saved', async () => {
+        propsData = {
+          contribution: { id: 'p1', title: 'A valid title', content: 'y', postType: ['Article'] },
+          postType: 'Article',
+        }
+        wrapper = Wrapper()
+        await wrapper.setProps({ postType: 'Event' })
+        expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+      })
+
+      it('is false again once switched back to the saved type', async () => {
+        propsData = {
+          contribution: { id: 'p1', title: 'A valid title', content: 'y', postType: ['Article'] },
+          postType: 'Article',
+        }
+        wrapper = Wrapper()
+        await wrapper.setProps({ postType: 'Event' })
+        await wrapper.setProps({ postType: 'Article' })
+        expect(wrapper.vm.hasUnsavedChanges).toBe(false)
+      })
+
+      // Same reasoning as the dirtyFields/location/image resets above —
+      // otherwise the very navigation a successful save triggers would
+      // immediately re-show the discard-changes modal over the type switch
+      // alone. Switching Event -> Article here (not the other way around)
+      // so the form still validates without also having to fill in
+      // event-only fields (eventStart etc.), which Article doesn't need.
+      it('resets once the type switch is actually saved', async () => {
+        mocks.$apollo.mutate = jest.fn().mockResolvedValueOnce({
+          data: { UpdatePost: { title: postTitle, slug: 'slug' } },
+        })
+        propsData = {
+          contribution: { id: 'p1', title: 'A valid title', content: 'y', postType: ['Event'] },
+          postType: 'Event',
+        }
+        wrapper = Wrapper()
+        await wrapper.setProps({ postType: 'Article' })
+        expect(wrapper.vm.hasUnsavedChanges).toBe(true)
+
+        await wrapper.find('form').trigger('submit')
+        await mocks.$apollo.mutate
+
+        expect(wrapper.vm.hasUnsavedChanges).toBe(false)
+      })
+    })
+
     describe('submit button greyed-out-but-clickable states', () => {
       // Not an actual :disabled — see submitVisuallyDenied's own doc
       // comment: hasUnsavedChanges only tracks whether something was
