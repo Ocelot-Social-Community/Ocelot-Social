@@ -39,12 +39,24 @@ export const description = `
   There is no \`down\`. See the note on it below.
 `
 
-const deleteBatch = async (session: Session, batchSize: number): Promise<number> => {
+/**
+ * Deletes up to `batchSize` relationships and reports how many it got.
+ *
+ * Exported for the spec, which runs it against a real Neo4j with a batch size small enough to
+ * need several rounds. Both defects this function has had are invisible to a mocked driver —
+ * one was the parameter's Cypher TYPE, the other the return value's — so a fake session that
+ * accepts any query and returns any number would have passed while `db:migrate up` died.
+ */
+export const deleteBatch = async (session: Session, batchSize: number): Promise<number> => {
   const result = await session.writeTransaction((transaction: Transaction) =>
     transaction.run(
+      // `toInteger($batchSize)`, not a bare `$batchSize`. The driver sends a plain JS number
+      // as a Cypher Float, and LIMIT rejects that outright: "'100000.0' is not a valid value.
+      // Must be a non-negative integer." Same reason pagingClause writes
+      // `SKIP toInteger($offset) LIMIT toInteger($first)`.
       `
         MATCH ()-[restriction:CANNOT_SEE]->()
-        WITH restriction LIMIT $batchSize
+        WITH restriction LIMIT toInteger($batchSize)
         DELETE restriction
         RETURN count(restriction) AS deleted
       `,
