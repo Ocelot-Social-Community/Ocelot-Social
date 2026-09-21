@@ -153,9 +153,13 @@ describe('post/edit/_id.vue', () => {
   describe('hasUnsavedChanges', () => {
     it('delegates to ContributionForm', async () => {
       wrapper = await buildWrapper()
-      expect(wrapper.vm.hasUnsavedChanges()).toBe(
-        !!wrapper.vm.$refs.contributionForm?.hasUnsavedChanges,
-      )
+      const contributionForm = wrapper.vm.$refs.contributionForm
+
+      contributionForm.hasUnsavedChanges = true
+      expect(wrapper.vm.hasUnsavedChanges()).toBe(true)
+
+      contributionForm.hasUnsavedChanges = false
+      expect(wrapper.vm.hasUnsavedChanges()).toBe(false)
     })
   })
 
