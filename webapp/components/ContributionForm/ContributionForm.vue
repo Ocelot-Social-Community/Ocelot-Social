@@ -773,6 +773,17 @@ export default {
           if (imageStillMatchesSubmitted()) {
             this.imageChangedByUser = false
           }
+          // The has-unsaved-changes-change watcher (see watch: below) only
+          // fires on Vue's own async nextTick — too late here, since
+          // $router.push() right below triggers the leave-confirmation
+          // guard (confirmLeaveIfUnsavedChanges) synchronously, before that
+          // watcher gets a chance to run. Emitting explicitly closes that
+          // gap, so the page's own mirrored dirty flag (e.g.
+          // pages/post/create/_type.vue's sharedDraftIsDirty) is already
+          // correct by the time the guard checks it — without this, saving
+          // a brand-new post would wrongly show the discard-changes modal
+          // on its own immediate post-save navigation.
+          this.$emit('has-unsaved-changes-change', this.hasUnsavedChanges)
 
           this.$router.push({
             name: 'post-id-slug',

@@ -944,6 +944,33 @@ describe('ContributionForm.vue', () => {
 
         expect(wrapper.emitted('has-unsaved-changes-change')).toEqual([[true]])
       })
+
+      // The actual bug this guards against: $router.push() below fires the
+      // leave-confirmation guard synchronously, before the watcher above
+      // gets a chance to run on its own next tick — without an explicit,
+      // synchronous emit in the success handler itself, a host page
+      // mirroring this event (pages/post/create/_type.vue's
+      // sharedDraftIsDirty) would still read "dirty" for that very
+      // navigation and wrongly show the discard-changes modal right after a
+      // successful save.
+      it('emits has-unsaved-changes-change(false) before navigating away on save, not just via the async watcher', async () => {
+        wrapper = Wrapper()
+        wrapper.find('.ds-input').setValue(postTitle)
+        await wrapper.vm.updateEditorContent(postContent)
+
+        const emitSpy = jest.spyOn(wrapper.vm, '$emit')
+        await wrapper.find('form').trigger('submit')
+        await mocks.$apollo.mutate
+
+        const emitCallIndex = emitSpy.mock.calls.findIndex(
+          ([event, value]) => event === 'has-unsaved-changes-change' && value === false,
+        )
+        expect(emitCallIndex).toBeGreaterThanOrEqual(0)
+        const emitCallOrder = emitSpy.mock.invocationCallOrder[emitCallIndex]
+        const pushCallOrder = mocks.$router.push.mock.invocationCallOrder[0]
+        expect(emitCallOrder).toBeLessThan(pushCallOrder)
+        emitSpy.mockRestore()
+      })
     })
 
     describe('submit button greyed-out-but-clickable states', () => {
