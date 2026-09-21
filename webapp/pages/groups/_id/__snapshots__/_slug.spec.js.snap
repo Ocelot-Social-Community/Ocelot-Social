@@ -258,8 +258,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </p>
              
             <button
-              aria-label="group.scrollToLocationMap"
               class="location-info-button"
+              title="group.scrollToLocationMap"
               type="button"
             >
               <div
@@ -971,8 +971,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </p>
              
             <button
-              aria-label="group.scrollToLocationMap"
               class="location-info-button"
+              title="group.scrollToLocationMap"
               type="button"
             >
               <div
@@ -1561,8 +1561,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </p>
              
             <button
-              aria-label="group.scrollToLocationMap"
               class="location-info-button"
+              title="group.scrollToLocationMap"
               type="button"
             >
               <div
@@ -2291,8 +2291,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </p>
              
             <button
-              aria-label="group.scrollToLocationMap"
               class="location-info-button"
+              title="group.scrollToLocationMap"
               type="button"
             >
               <div
@@ -5662,8 +5662,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             </p>
              
             <button
-              aria-label="group.scrollToLocationMap"
               class="location-info-button"
+              title="group.scrollToLocationMap"
               type="button"
             >
               <div
@@ -6513,8 +6513,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             </p>
              
             <button
-              aria-label="group.scrollToLocationMap"
               class="location-info-button"
+              title="group.scrollToLocationMap"
               type="button"
             >
               <div

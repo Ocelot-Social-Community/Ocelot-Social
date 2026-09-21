@@ -3,6 +3,7 @@ import GroupForm from './GroupForm.vue'
 import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import LocationSelect from '~/components/Select/LocationSelect'
 import Vuex from 'vuex'
+import { branding } from '@ocelot-social/branding'
 
 const localVue = global.localVue
 
@@ -50,6 +51,33 @@ describe('GroupForm', () => {
 
     it('shows the name length as "count / min–max"', () => {
       expect(wrapper.find('.os-validation-hint').text()).toContain('0 / 3–50')
+    })
+  })
+
+  describe('category validation hint', () => {
+    // The category count hint used to hard-code "3" as its max (and had no
+    // min at all), even though formSchema.categoryIds' own validator already
+    // used branding.category.min/max — a silent mismatch if that branding
+    // config ever changed. categoriesActive requires both the $policy flag
+    // and at least one real category (see getCategoriesMixin.js), neither of
+    // which the shared mocks/store above provide.
+    it('reflects branding.category.min/max instead of a hard-coded value', () => {
+      const wrapper = mount(GroupForm, {
+        propsData,
+        mocks: { ...mocks, $policy: { get: () => true } },
+        localVue,
+        stubs,
+        store: new Vuex.Store({
+          getters: {
+            'categories/categories': () => [{ id: 'cat-1', slug: 'family' }],
+            'categories/isInitialized': () => true,
+          },
+          actions: { 'categories/init': jest.fn() },
+        }),
+      })
+      const hints = wrapper.findAll('.os-validation-hint')
+      const categoryHint = hints.at(hints.length - 1)
+      expect(categoryHint.text()).toContain(`0 / ${branding.category.min}–${branding.category.max}`)
     })
   })
 

@@ -45,7 +45,7 @@
               v-if="group.location"
               type="button"
               class="location-info-button"
-              :aria-label="$t('group.scrollToLocationMap')"
+              :title="$t('group.scrollToLocationMap')"
               @click="scrollToLocationMap"
             >
               <location-info :location-data="group.location" :is-owner="false" size="small" />

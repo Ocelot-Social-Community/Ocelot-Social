@@ -171,7 +171,8 @@
           />
           <os-validation-hint
             :count="formData.categoryIds.length"
-            :max="3"
+            :min="branding.category.min"
+            :max="branding.category.max"
             :variant="visibleErrors && visibleErrors.categoryIds ? 'error' : null"
             :text="visibleErrors && visibleErrors.categoryIds"
           />
@@ -292,6 +293,9 @@ export default {
       // hint would keep comparing against the value from when the form was
       // first opened and never clear once saved.
       savedLocationName: locationName || '',
+      // Exposed for the template (see the category validation hint below) —
+      // bare module-scope reads don't resolve there, unlike in the script.
+      branding,
       formData: {
         name: name || '',
         slug: slug || '',
