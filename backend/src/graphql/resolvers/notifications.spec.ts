@@ -602,6 +602,157 @@ describe('given some notifications', () => {
   })
 })
 
+// A notification carries the title, the author and the group of its resource — the bell renders
+// all three. Listing one for a post the recipient may not open therefore publishes exactly what
+// the group's visibility exists to withhold, and offers a dead link on top: every post query DOES
+// apply the rule, so following the notification lands on nothing.
+//
+// The edges below are the ones a bug produced on a live instance (a group filter that fell open
+// on UpdatePost, fixed in notificationsMiddleware). They are written by hand rather than through
+// the mutation for that reason: this describes what the read path does with such an edge no
+// matter how it got there, which is the half that has to hold when the next writer gets it wrong.
+describe('given a notification about a post the recipient may not see', () => {
+  const invisibleTo = async (userId: string, postId: string) => {
+    const session = database.driver.session()
+    try {
+      await session.writeTransaction((transaction) =>
+        transaction.run(
+          `MATCH (user:User { id: $userId }), (post:Post { id: $postId })
+           MERGE (user)-[:CANNOT_SEE]->(post)`,
+          { userId, postId },
+        ),
+      )
+    } finally {
+      await session.close()
+    }
+  }
+
+  beforeEach(async () => {
+    author = await Factory.build('user', { id: 'author' })
+    user = await Factory.build('user', { id: 'you' })
+    await Factory.build('category', { id: 'cat1' })
+    const post = await Factory.build(
+      'post',
+      { id: 'secret-post', content: 'Inside a group you are not in' },
+      { author, categoryIds: ['cat1'] },
+    )
+    const comment = await Factory.build(
+      'comment',
+      { id: 'secret-comment', content: 'A comment on it' },
+      { author, postId: 'secret-post' },
+    )
+    await post.relateTo(user, 'notified', {
+      createdAt: '2026-09-16T10:00:00.000Z',
+      read: false,
+      reason: 'followed_user_posted',
+    })
+    await comment.relateTo(user, 'notified', {
+      createdAt: '2026-09-16T10:01:00.000Z',
+      read: false,
+      reason: 'commented_on_post',
+    })
+    await invisibleTo('you', 'secret-post')
+    authenticatedUser = await user.toJson()
+  })
+
+  it('does not list the notification about the post', async () => {
+    await expect(query({ query: notifications, variables })).resolves.toMatchObject({
+      data: { notifications: [] },
+      errors: undefined,
+    })
+  })
+
+  it('does not list the notification about a COMMENT on that post either', async () => {
+    // CANNOT_SEE points at posts. A comment has no such edge of its own and is exactly as
+    // unreachable as the post carrying it, so the filter has to reach through `:COMMENTS`.
+    // Covered by the assertion above only as long as both notifications exist — hence its own
+    // test, which fails loudly if the comment slips through while the post does not.
+    const { data } = await query({ query: notifications, variables })
+
+    expect(data?.notifications).not.toContainEqual(
+      expect.objectContaining({ from: expect.objectContaining({ id: 'secret-comment' }) }),
+    )
+  })
+
+  describe('and a second notification about a comment on a post the recipient may see', () => {
+    // The reach-through has to bind the parent post to the CANNOT_SEE edge. A version that asked
+    // only whether the resource is *a* comment, or a comment on *any* post, passes every
+    // assertion above — there the single comment sits under the single hidden post, so the
+    // over-broad and the correct condition are indistinguishable. This is what separates them:
+    // same recipient, same CANNOT_SEE edge, but a comment whose post is reachable.
+    beforeEach(async () => {
+      await Factory.build(
+        'post',
+        { id: 'open-post', content: 'A post you are in the group for' },
+        { author, categoryIds: ['cat1'] },
+      )
+      const openComment = await Factory.build(
+        'comment',
+        { id: 'open-comment', content: 'A comment on it' },
+        { author, postId: 'open-post' },
+      )
+      await openComment.relateTo(user, 'notified', {
+        createdAt: '2026-09-16T10:02:00.000Z',
+        read: false,
+        reason: 'commented_on_post',
+      })
+    })
+
+    it('lists that one and neither of the two hidden ones', async () => {
+      await expect(query({ query: notifications, variables })).resolves.toMatchObject({
+        data: {
+          notifications: [
+            expect.objectContaining({ from: expect.objectContaining({ id: 'open-comment' }) }),
+          ],
+        },
+        errors: undefined,
+      })
+    })
+  })
+
+  it('still lists it for someone who may see the post', async () => {
+    // The filter is per recipient, not per post: the same notification must survive for a
+    // reader without the edge. Without this, a filter that dropped everything would pass.
+    const neighbor = await Factory.build('user', { id: 'neighbor' })
+    const session = database.driver.session()
+    try {
+      await session.writeTransaction((transaction) =>
+        transaction.run(
+          `MATCH (post:Post { id: 'secret-post' }), (user:User { id: 'neighbor' })
+           MERGE (post)-[notification:NOTIFIED { reason: 'followed_user_posted' }]->(user)
+           SET notification.read = FALSE,
+               notification.createdAt = '2026-09-16T10:00:00.000Z',
+               notification.updatedAt = '2026-09-16T10:00:00.000Z'`,
+        ),
+      )
+    } finally {
+      await session.close()
+    }
+    authenticatedUser = await neighbor.toJson()
+
+    await expect(query({ query: notifications, variables })).resolves.toMatchObject({
+      data: {
+        notifications: [
+          expect.objectContaining({ from: expect.objectContaining({ id: 'secret-post' }) }),
+        ],
+      },
+      errors: undefined,
+    })
+  })
+
+  it('keeps filtering when the query asks for unread only', async () => {
+    // The read filter used to be its own WHERE clause and is now an AND on this one. A mistake
+    // there would make `read: false` — the variables the bell itself sends — skip the visibility
+    // condition entirely, which is the one call that matters.
+    await expect(
+      query({ query: notifications, variables: { ...variables, read: false } }),
+    ).resolves.toMatchObject({
+      data: { notifications: [] },
+      errors: undefined,
+    })
+  })
+})
+
 // A notification is addressed to exactly one person, and the channel is shared by everyone with an
 // open socket. The filter is what keeps the two apart — without it, every connected client would
 // receive every notification in the network, including the content of posts and comments they

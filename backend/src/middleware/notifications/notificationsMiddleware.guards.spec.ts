@@ -33,6 +33,10 @@ describe.each([
   ['ChangeGroupMemberRole', { groupId: 'g1', userId: 'u1', roleInGroup: 'admin' }],
   ['RemoveUserFromGroup', { groupId: 'g1', userId: 'u1' }],
   ['CreatePost', { title: 'A title', content: 'Hello @somebody' }],
+  // UpdatePost carries its own guard since the two stopped sharing `handleCreatePost` — an edit
+  // is not a new post, see the note on `handleUpdatePost`. The split duplicated the guard without
+  // duplicating this row, which is how the branch went uncovered.
+  ['UpdatePost', { id: 'p1', title: 'A title', content: 'Hello @somebody' }],
   // CreateComment/UpdateComment are deliberately NOT in this table: handleContentDataOfComment is
   // the one handler with no such guard — it reads `comment.id` straight off the result. Adding it
   // here would be asserting behaviour that does not exist (it throws a TypeError instead).

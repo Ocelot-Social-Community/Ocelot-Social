@@ -67,17 +67,19 @@ export default {
     notifications: async (_parent, args, context, _resolveInfo) => {
       const { user: currentUser } = context
       const session = context.driver.session()
-      let whereClause, orderByClause
+      let readCondition, orderByClause
 
+      // An AND rather than its own WHERE: the visibility condition below is unconditional, so
+      // this one can only ever narrow it further.
       switch (args.read) {
         case true:
-          whereClause = 'WHERE notification.read = TRUE'
+          readCondition = 'AND notification.read = TRUE'
           break
         case false:
-          whereClause = 'WHERE notification.read = FALSE'
+          readCondition = 'AND notification.read = FALSE'
           break
         default:
-          whereClause = ''
+          readCondition = ''
       }
       switch (args.orderBy) {
         case 'updatedAt_asc':
@@ -96,7 +98,23 @@ export default {
         const notificationsTransactionResponse = await transaction.run(
           ` 
           MATCH (resource {deleted: false, disabled: false})-[notification:NOTIFIED]->(user:User {id:$id})
-          ${whereClause}
+          // Never hand out a notification about something the recipient may not open. A
+          // notification is not a pointer, it is CONTENT: it carries the title, the author and
+          // the group of its resource. Listing one for an unreachable post leaks exactly what
+          // the group's visibility exists to withhold, and offers a dead link on top.
+          //
+          // The condition is the one every post query applies (helpers/postFilter.ts,
+          // \`invisibleTo\`), reached through the parent post when the resource is a comment —
+          // CANNOT_SEE points at posts, and a comment is as unreachable as the post carrying it.
+          //
+          // Defence in depth, not the fix: notifications like these should not be WRITTEN, and
+          // notificationsMiddleware no longer writes them. This is what keeps the next such bug
+          // from reaching a bell, and what makes the ones already in the database harmless.
+          WHERE NOT EXISTS {
+            MATCH (user)-[:CANNOT_SEE]->(post:Post)
+            WHERE post = resource OR (resource)-[:COMMENTS]->(post)
+          }
+          ${readCondition}
           OPTIONAL MATCH (relatedUser:User { id: notification.relatedUserId })
           OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)
           WITH user, notification, resource, membership, relatedUser,

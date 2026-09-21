@@ -39,6 +39,8 @@ const { default: CreateGroup } = await import('@graphql/queries/groups/CreateGro
 const { default: followUser } = await import('@graphql/queries/interactions/followUser.gql')
 const { default: notifications } = await import('@graphql/queries/notifications/notifications.gql')
 const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
+const { default: UpdatePost } = await import('@graphql/queries/posts/UpdatePost.gql')
+const { default: markAllAsRead } = await import('@graphql/queries/notifications/markAllAsRead.gql')
 const { createApolloTestSetup } = await import('@root/test/helpers')
 
 let authenticatedUser: Context['user']
@@ -478,6 +480,103 @@ describe('following users notifications', () => {
               reason: 'followed_user_posted',
             },
           ],
+        },
+        errors: undefined,
+      })
+    })
+  })
+
+  // The bug this file did not catch. Creating the post above was filtered correctly, because
+  // CreatePost passes `groupId` and the filter read it from there. UpdatePost declares no such
+  // argument (see Post.gql) while both mutations shared ONE middleware handler, so on an edit
+  // the group arrived as null, no group matched, and `group IS NULL` waved the post through:
+  // every follower was told the title and author of a post inside a hidden group. Editing a
+  // typo in a months-old post was enough.
+  //
+  // Reached through the public mutation rather than by calling the helper, because the defect
+  // was in the seam between the two — the argument the schema does not carry. A unit test on
+  // `notifyFollowingUsers` would have passed throughout.
+  describe('followed user EDITS the post in the hidden group', () => {
+    beforeAll(async () => {
+      authenticatedUser = await postAuthor.toJson()
+      await mutate({
+        mutation: UpdatePost,
+        variables: {
+          id: 'hidden-group-post',
+          title: 'This is the edited post in the hidden group',
+          content: 'This is the edited content of the post in the hidden group',
+        },
+      })
+    })
+
+    it('still sends NO notification to the first follower', async () => {
+      authenticatedUser = await firstFollower.toJson()
+
+      await expect(
+        query({
+          query: notifications,
+          variables: { orderBy: 'updatedAt_desc' },
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          notifications: [
+            { from: { __typename: 'Post', id: 'group-post' } },
+            { from: { __typename: 'Post', id: 'post' } },
+          ],
+        },
+        errors: undefined,
+      })
+    })
+
+    it('leaves no notification edge on the hidden post at all', async () => {
+      // The GraphQL query above now filters invisible resources itself, so it would report an
+      // empty list even if the edge existed. Asked of the graph directly, this fails if the
+      // notification is merely hidden rather than never written.
+      const session = database.driver.session()
+      try {
+        const result = await session.readTransaction((transaction) =>
+          transaction.run(
+            `MATCH (:Post { id: 'hidden-group-post' })-[notification:NOTIFIED]->(:User)
+             RETURN count(notification) AS count`,
+          ),
+        )
+
+        expect(result.records[0].get('count').toNumber()).toBe(0)
+      } finally {
+        await session.close()
+      }
+    })
+  })
+
+  // An edit is not a new post. The MERGE sets `read = FALSE` on an edge that already exists, so
+  // before the handlers were split, correcting a typo pushed a long-read notification back to
+  // the top of every follower's bell — and reset the unread badge the webapp derives from it.
+  describe('followed user EDITS a post everybody may see', () => {
+    beforeAll(async () => {
+      authenticatedUser = await firstFollower.toJson()
+      await mutate({ mutation: markAllAsRead })
+      authenticatedUser = await postAuthor.toJson()
+      await mutate({
+        mutation: UpdatePost,
+        variables: {
+          id: 'post',
+          title: 'This is the edited post',
+          content: 'This is the edited content of the post',
+        },
+      })
+    })
+
+    it('does not mark the follower’s read notification as unread again', async () => {
+      authenticatedUser = await firstFollower.toJson()
+
+      await expect(
+        query({
+          query: notifications,
+          variables: { read: false, orderBy: 'updatedAt_desc' },
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          notifications: [],
         },
         errors: undefined,
       })
