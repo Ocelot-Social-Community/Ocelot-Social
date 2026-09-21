@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import EventLocationMap from './EventLocationMap'
+import LocationPickerMap from './LocationPickerMap'
 import { queryLocations } from '~/graphql/location'
 
 const localVue = global.localVue
@@ -13,10 +13,10 @@ let mocks
 let wrapper
 
 const Wrapper = (propsData = {}) => {
-  return mount(EventLocationMap, { mocks, localVue, propsData, stubs })
+  return mount(LocationPickerMap, { mocks, localVue, propsData, stubs })
 }
 
-describe('EventLocationMap', () => {
+describe('LocationPickerMap', () => {
   beforeEach(() => {
     mocks = {
       $t: jest.fn((string) => string),
@@ -43,6 +43,34 @@ describe('EventLocationMap', () => {
     expect(wrapper.findComponent({ name: 'OsLocationMap' }).exists()).toBe(true)
   })
 
+  describe('height', () => {
+    it("defaults to the event map's established height", () => {
+      wrapper = Wrapper()
+
+      expect(wrapper.find('.location-picker-map').element.style.height).toBe('280px')
+    })
+
+    it('is overridable, e.g. for a taller, purely decorative read-only map', () => {
+      wrapper = Wrapper({ height: '360px' })
+
+      expect(wrapper.find('.location-picker-map').element.style.height).toBe('360px')
+    })
+  })
+
+  describe('pinColor', () => {
+    it('defaults to the event marker color', () => {
+      wrapper = Wrapper()
+
+      expect(wrapper.vm.pinColor).toBe('rgb(119, 83, 235)')
+    })
+
+    it('uses the group marker color when markerColorToken is set to it', () => {
+      wrapper = Wrapper({ markerColorToken: '--color-map-marker-group' })
+
+      expect(wrapper.vm.pinColor).toBe('rgb(248, 77, 77)')
+    })
+  })
+
   describe('onViewOnMap', () => {
     it('navigates to the main map centered on the coordinates', () => {
       wrapper = Wrapper()
@@ -63,6 +91,17 @@ describe('EventLocationMap', () => {
       expect(mocks.$router.push).toHaveBeenCalledWith({
         path: '/map',
         query: { lat: 52.5, lng: 13.4, showPastEvents: '1', eventId: 'post-1' },
+      })
+    })
+
+    it('includes groupId for a group deep-linked by groupId, so the main map opens its popup', () => {
+      wrapper = Wrapper({ groupId: 'group-1' })
+
+      wrapper.vm.onViewOnMap({ lat: 52.5, lng: 13.4 })
+
+      expect(mocks.$router.push).toHaveBeenCalledWith({
+        path: '/map',
+        query: { lat: 52.5, lng: 13.4, groupId: 'group-1' },
       })
     })
   })
@@ -172,6 +211,87 @@ describe('EventLocationMap', () => {
 
       expect(wrapper.emitted('input')).toHaveLength(1)
       expect(wrapper.emitted('input')[0][0]).toMatchObject({ id: 'poi.2', label: 'Second pin' })
+    })
+
+    it('passes a custom "types" prop through to the reverse-geocoding query', async () => {
+      mocks.$apollo.query.mockResolvedValue(resolvedLocation())
+      wrapper = Wrapper({ types: 'place,region,country' })
+
+      await wrapper.vm.onPinChange({ lat: 52.5, lng: 13.4 })
+
+      expect(mocks.$apollo.query).toHaveBeenCalledWith({
+        query: queryLocations(),
+        variables: { place: '13.4,52.5', lang: 'en', types: 'place,region,country' },
+        fetchPolicy: 'network-only',
+      })
+    })
+
+    describe('pinRevision', () => {
+      // A drag that resolves back to the exact same lat/lng it already had
+      // (e.g. dragging within the same place under precision="resolved")
+      // would never make OsLocationMap's own lat/lng watcher fire again — it
+      // only detects a VALUE change. pinRevision is a separate, always-
+      // incrementing signal so the marker still resyncs to its now-diverged
+      // on-screen position (moved there by the drag itself) even then.
+      it('increments and is passed to OsLocationMap so the marker resyncs even to an unchanged lat/lng', async () => {
+        mocks.$apollo.query.mockResolvedValue(resolvedLocation())
+        wrapper = Wrapper({ precision: 'resolved' })
+        expect(wrapper.vm.pinRevision).toBe(0)
+
+        await wrapper.vm.onPinChange({ lat: 52.5, lng: 13.4 })
+
+        expect(wrapper.vm.pinRevision).toBe(1)
+        expect(wrapper.findComponent({ name: 'OsLocationMap' }).props('pinRevision')).toBe(1)
+      })
+
+      it('also increments when reverse-geocoding fails', async () => {
+        mocks.$apollo.query.mockRejectedValue(new Error('Network error'))
+        wrapper = Wrapper()
+
+        await wrapper.vm.onPinChange({ lat: 52.5, lng: 13.4 })
+
+        expect(wrapper.vm.pinRevision).toBe(1)
+      })
+    })
+
+    describe('precision="resolved" (groups)', () => {
+      it("snaps the pin to the matched place's own coordinate instead of the raw click", async () => {
+        mocks.$apollo.query.mockResolvedValue(resolvedLocation())
+        wrapper = Wrapper({ precision: 'resolved' })
+
+        await wrapper.vm.onPinChange({ lat: 52.5, lng: 13.4 })
+
+        expect(wrapper.emitted('input')).toStrictEqual([
+          [
+            {
+              label: 'Alexanderplatz, Berlin',
+              value: 'Alexanderplatz, Berlin',
+              id: 'poi.1',
+              lat: 52.52,
+              lng: 13.41,
+            },
+          ],
+        ])
+      })
+
+      it('still falls back to the raw coordinates when nothing matched', async () => {
+        mocks.$apollo.query.mockResolvedValue({ data: { queryLocations: [] } })
+        wrapper = Wrapper({ precision: 'resolved' })
+
+        await wrapper.vm.onPinChange({ lat: 52.5, lng: 13.4 })
+
+        expect(wrapper.emitted('input')).toStrictEqual([
+          [
+            {
+              label: '52.50000, 13.40000',
+              value: '52.50000, 13.40000',
+              id: null,
+              lat: 52.5,
+              lng: 13.4,
+            },
+          ],
+        ])
+      })
     })
 
     it('ignores a stale error that rejects after a newer pin-change request', async () => {

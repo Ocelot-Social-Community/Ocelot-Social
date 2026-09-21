@@ -33,7 +33,12 @@
           </template>
           <div v-if="formData.image" class="blur-toggle">
             <label for="blur-img">{{ $t('contribution.inappropriatePicture') }}</label>
-            <input type="checkbox" id="blur-img" v-model="formData.imageBlurred" />
+            <input
+              type="checkbox"
+              id="blur-img"
+              v-model="formData.imageBlurred"
+              @change="imageChangedByUser = true"
+            />
             <page-params-link class="link" :pageParams="links.FAQ">
               {{ $t('contribution.inappropriatePicture') }}
               <os-icon :icon="icons.questionCircle" />
@@ -51,6 +56,7 @@
           />
           <os-validation-hint
             :count="formData.title.length"
+            :min="formSchema.title.min"
             :max="formSchema.title.max"
             :variant="visibleErrors && visibleErrors.title ? 'error' : null"
             :text="titleErrorText"
@@ -146,6 +152,7 @@
             />
             <os-validation-hint
               :count="formData.eventVenue.length"
+              :min="formSchema.eventVenue.min"
               :max="formSchema.eventVenue.max"
               :variant="visibleErrors && visibleErrors.eventVenue ? 'error' : null"
               :text="venueErrorText"
@@ -178,10 +185,7 @@
                 :show-label="false"
                 :placeholder="$t('post.viewEvent.eventLocationName')"
                 :disabled="locationSelectDisabled"
-                @input="
-                  touchField('eventLocationName')
-                  $validateForm()
-                "
+                @input="onEventLocationSelectInput"
               />
               <os-validation-hint
                 v-if="!locationSelectDisabled && visibleErrors && visibleErrors.eventLocationName"
@@ -189,11 +193,11 @@
                 :text="$t('post.viewEvent.eventLocationRequired')"
               />
             </div>
-            <event-location-map
+            <location-picker-map
               v-if="!locationSelectDisabled"
               :location="formData.eventLocationName"
-              class="event-location-map-field"
-              @input="onEventLocationMapInput"
+              class="location-picker-map-field"
+              @input="onLocationPickerMapInput"
             />
           </div>
           <div class="ds-mt-x-small ds-mb-large"></div>
@@ -232,7 +236,7 @@
                 variant="primary"
                 appearance="outline"
                 :disabled="loading"
-                @click="$router.back()"
+                @click="onCancel"
               >
                 {{ $t('actions.cancel') }}
               </os-button>
@@ -241,11 +245,10 @@
                 appearance="filled"
                 type="submit"
                 :loading="loading"
-                :class="{ 'permission-denied': !contribution.id && !$can('post.create') }"
-                :aria-disabled="!contribution.id && !$can('post.create')"
+                :class="{ 'permission-denied': submitVisuallyDenied }"
+                :aria-disabled="canSubmit ? undefined : true"
                 v-tooltip="{
-                  content:
-                    !contribution.id && !$can('post.create') ? $t('permissions.deniedHint') : '',
+                  content: submitDeniedHint,
                 }"
               >
                 <template #icon>
@@ -277,7 +280,7 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
-import EventLocationMap from '~/components/Map/EventLocationMap'
+import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 
 export default {
@@ -293,7 +296,7 @@ export default {
     PageParamsLink,
     OcelotInput,
     LocationSelect,
-    EventLocationMap,
+    LocationPickerMap,
     OsValidationHint,
     ResponsiveImage,
   },
@@ -317,22 +320,63 @@ export default {
       type: Object,
       default: null,
     },
+    // Where "Cancel" should navigate to — the page the user actually
+    // arrived from, captured by the hosting page's own beforeRouteEnter
+    // (there isn't just one place this form is reached from, and within
+    // /post/create/* switching the article/event type itself does a
+    // route navigation, so $router.back() could just undo that switch
+    // instead of leaving the flow). Falls back to $router.back() when not
+    // provided, e.g. for any other future caller that doesn't wire this up.
+    cancelTo: {
+      type: String,
+      default: null,
+    },
   },
   data() {
+    const formData = this.externalFormData || this.buildInitialFormData()
     return {
       links,
-      formData: this.externalFormData || this.buildInitialFormData(),
+      formData,
       loading: false,
       users: [],
       hashtags: [],
+      // eventLocationName and the hero image are set directly rather than
+      // through updateFormField()/$parentForm.update, so dirtyFields has no
+      // equivalent for them — same reasoning as GroupForm.vue's own
+      // locationChangedByUser (see hasUnsavedChanges below).
+      locationChangedByUser: false,
+      imageChangedByUser: false,
+      // The type as of the last successful save — starts as the
+      // contribution's own saved value, refreshed after each further save
+      // (see submit()'s success handler), since the contribution prop
+      // itself never updates after a save (submit() navigates away
+      // immediately, no refetch happens first). Compared against the
+      // postType prop below rather than contribution.postType directly for
+      // the same reason GroupForm.vue reads its own savedLocationName
+      // instead of the group prop's locationName.
+      savedPostType: this.contribution.postType?.[0] ?? null,
+      // See GroupForm.vue's own ignoreNextLocationInput for the full
+      // explanation: LocationSelect resolves an already-saved location into
+      // a normalized object right on mount, purely to display it — not a
+      // pick the user made. Only relevant when eventLocationName starts out
+      // as a plain string with something already in it — an already-
+      // resolved { lat, lng, ... } object (the common case once an event has
+      // been geocoded once) makes LocationSelect skip that resolve entirely,
+      // so there's nothing here to suppress.
+      ignoreNextLocationInput:
+        typeof formData.eventLocationName === 'string' && !!formData.eventLocationName,
     }
   },
   async mounted() {
+    window.addEventListener('beforeunload', this.onBeforeUnload)
     try {
       await import(`vue2-datepicker/locale/${this.currentUser.locale}`)
     } catch {
       await import('vue2-datepicker/locale/en')
     }
+  },
+  beforeDestroy() {
+    window.removeEventListener('beforeunload', this.onBeforeUnload)
   },
   computed: {
     ...mapGetters({
@@ -341,6 +385,7 @@ export default {
     formSchema() {
       return {
         title: {
+          min: 3,
           max: 100,
           validator: (_, value = '') => {
             if (!value.trim()) {
@@ -443,7 +488,7 @@ export default {
     eventInput() {
       if (this.postType === 'Event') {
         const locationValue = this.formData.eventLocationName
-        // LocationSelect and EventLocationMap both already resolve lat/lng
+        // LocationSelect and LocationPickerMap both already resolve lat/lng
         // (via reverse/forward geocoding) alongside the label when a search
         // result or map pin is picked — a plain string here means the field
         // still holds unresolved/typed text, no coordinates to send yet.
@@ -503,6 +548,49 @@ export default {
     locationSelectDisabled() {
       return this.formData.eventIsOnline
     },
+    canSubmit() {
+      return !!this.contribution.id || this.$can('post.create')
+    },
+    // Switching the type (postType is passed straight through as a prop by
+    // the hosting page's own sidebar menu — see pages/post/edit/_id.vue) is
+    // itself a change worth reflecting here, same as any other field. Only
+    // meaningful while editing — creating has no saved type to differ from.
+    postTypeChanged() {
+      return !!this.contribution.id && !!this.savedPostType && this.postType !== this.savedPostType
+    },
+    // Exposed (via $refs) for the page's own beforeRouteLeave guard and the
+    // native beforeunload prompt below — same pattern as GroupForm.vue.
+    // dirtyFields covers every field wired through updateFormField()/
+    // $parentForm.update (title, content, eventVenue, eventIsOnline,
+    // eventEnd, eventStart, categoryIds) — eventLocationName and the hero
+    // image are tracked separately (see data() above), since they're set
+    // directly rather than through updateFormField.
+    hasUnsavedChanges() {
+      return (
+        Object.keys(this.dirtyFields).length > 0 ||
+        this.locationChangedByUser ||
+        this.imageChangedByUser ||
+        this.postTypeChanged
+      )
+    },
+    // Same grey-but-still-clickable treatment GroupForm.vue's submit button
+    // uses — not an actual :disabled, deliberately: hasUnsavedChanges only
+    // tracks whether something was TOUCHED, not whether it truly differs
+    // from what's saved, so a gap in that tracking must never make a real
+    // save unreachable. Worst case here is an invitingly-styled click that
+    // just re-saves the same values — never a blocked one.
+    // Deliberately NOT reflected in aria-disabled (see the template) — the
+    // button genuinely still works when this is true for the "nothing
+    // changed yet" reason, and telling assistive tech it's disabled would
+    // be actively wrong, not just cosmetically off.
+    submitVisuallyDenied() {
+      return !this.canSubmit || (!!this.contribution.id && !this.hasUnsavedChanges)
+    },
+    submitDeniedHint() {
+      if (!this.canSubmit) return this.$t('permissions.deniedHint')
+      if (this.contribution.id && !this.hasUnsavedChanges) return this.$t('common.noChangesHint')
+      return ''
+    },
   },
   watch: {
     groupCategories() {
@@ -519,6 +607,16 @@ export default {
     },
     groupId() {
       this.$validateForm()
+    },
+    // Lets a hosting page mirror this outside the component instance itself
+    // — pages/post/create/_type.vue needs it, since switching the
+    // article/event type there does a real route navigation that remounts
+    // this whole form (see its own cancelReturnPath/sharedDraftIsDirty
+    // comments), wiping dirtyFields/locationChangedByUser/imageChangedByUser
+    // (plain instance data) even though externalFormData's actual content
+    // survives via its own module-level cache.
+    hasUnsavedChanges(value) {
+      this.$emit('has-unsaved-changes-change', value)
     },
   },
   created() {
@@ -557,8 +655,8 @@ export default {
         eventStart: eventStart ? new Date(eventStart) : null,
         eventEnd: eventEnd ? new Date(eventEnd) : null,
         // A selection object (same { label, value, id, lat, lng } shape
-        // LocationSelect/EventLocationMap produce when the user picks a
-        // result), not just the bare name — otherwise EventLocationMap has
+        // LocationSelect/LocationPickerMap produce when the user picks a
+        // result), not just the bare name — otherwise LocationPickerMap has
         // no coordinates to show a pin for on an event being edited, even
         // though it was already geocoded once. Falls back to the plain
         // string when there's no saved location (online events) or no
@@ -588,8 +686,18 @@ export default {
         eventIsOnline: eventIsOnline || false,
       }
     },
+    onCancel() {
+      // beforeRouteLeave (confirmLeaveIfUnsavedChanges, wired up on the
+      // hosting page) still intercepts this navigation exactly like any
+      // other, so an unsaved-changes prompt still applies here too.
+      if (this.cancelTo) {
+        this.$router.push(this.cancelTo)
+      } else {
+        this.$router.back()
+      }
+    },
     onSubmit() {
-      if (!this.contribution.id && !this.$can('post.create')) {
+      if (!this.canSubmit) {
         this.$toast.error(this.$t('permissions.deniedHint'))
         return
       }
@@ -613,6 +721,40 @@ export default {
       }
       this.loading = true
 
+      // Snapshot exactly what's being submitted — submit() to the .then()
+      // below is a real network round-trip (not instantaneous), so the user
+      // may touch the form again while the mutation is still in flight. The
+      // success handler must only clear a field's dirty status if its value
+      // still matches what THIS submit actually sent — a bare "clear
+      // everything" would wipe out an edit made in that window too, right
+      // before navigating away, without ever asking about it. Same fix as
+      // GroupForm.vue's own submit(); JSON.stringify sidesteps reference
+      // inequality for array/object fields (categoryIds, eventLocationName)
+      // that get re-assigned a new-but-equal-content value on every edit.
+      const submittedFieldValues = Object.keys(this.dirtyFields).reduce((snapshot, key) => {
+        snapshot[key] = JSON.stringify(this.formData[key])
+        return snapshot
+      }, {})
+      const submittedEventLocationName = JSON.stringify(this.formData.eventLocationName)
+      // The hero image isn't one field but several (image.url, the raw
+      // upload, its aspect ratio/type, the blur toggle) — imageUpload is a
+      // raw File, so it's compared by reference (a genuinely new pick is a
+      // new File object; the untouched one stays the same reference).
+      const submittedImageSnapshot = {
+        imageUrl: this.formData.image?.url ?? null,
+        imageUpload: this.formData.imageUpload,
+        imageAspectRatio: this.formData.imageAspectRatio,
+        imageType: this.formData.imageType,
+        imageBlurred: this.formData.imageBlurred,
+      }
+      const submittedPostType = this.postType
+      const imageStillMatchesSubmitted = () =>
+        (this.formData.image?.url ?? null) === submittedImageSnapshot.imageUrl &&
+        this.formData.imageUpload === submittedImageSnapshot.imageUpload &&
+        this.formData.imageAspectRatio === submittedImageSnapshot.imageAspectRatio &&
+        this.formData.imageType === submittedImageSnapshot.imageType &&
+        this.formData.imageBlurred === submittedImageSnapshot.imageBlurred
+
       this.$apollo
         .mutate({
           mutation: this.contribution.id ? PostMutations().UpdatePost : PostMutations().CreatePost,
@@ -632,6 +774,38 @@ export default {
           this.$toast.success(this.$t('contribution.success'))
           const result = data[this.contribution.id ? 'UpdatePost' : 'CreatePost']
 
+          // Clear unsaved-changes tracking before navigating away — this is
+          // the very save the leave-confirmation guard (beforeRouteLeave,
+          // see confirmLeaveIfUnsavedChanges) would otherwise still see as
+          // dirty for the push() below, wrongly asking to confirm discarding
+          // what was just saved. Only clears what still matches the
+          // snapshot above — see its own comment for why.
+          Object.keys(submittedFieldValues).forEach((key) => {
+            if (JSON.stringify(this.formData[key]) === submittedFieldValues[key]) {
+              this.$delete(this.dirtyFields, key)
+            }
+          })
+          if (JSON.stringify(this.formData.eventLocationName) === submittedEventLocationName) {
+            this.locationChangedByUser = false
+          }
+          if (imageStillMatchesSubmitted()) {
+            this.imageChangedByUser = false
+          }
+          if (this.postType === submittedPostType) {
+            this.savedPostType = submittedPostType
+          }
+          // The has-unsaved-changes-change watcher (see watch: below) only
+          // fires on Vue's own async nextTick — too late here, since
+          // $router.push() right below triggers the leave-confirmation
+          // guard (confirmLeaveIfUnsavedChanges) synchronously, before that
+          // watcher gets a chance to run. Emitting explicitly closes that
+          // gap, so the page's own mirrored dirty flag (e.g.
+          // pages/post/create/_type.vue's sharedDraftIsDirty) is already
+          // correct by the time the guard checks it — without this, saving
+          // a brand-new post would wrongly show the discard-changes modal
+          // on its own immediate post-save navigation.
+          this.$emit('has-unsaved-changes-change', this.hasUnsavedChanges)
+
           this.$router.push({
             name: 'post-id-slug',
             params: { id: result.id, slug: result.slug },
@@ -648,7 +822,20 @@ export default {
     changeEventIsOnline() {
       this.updateFormField('eventIsOnline', this.formData.eventIsOnline)
     },
-    onEventLocationMapInput(location) {
+    // See ignoreNextLocationInput's own doc comment (data()) — the first
+    // input after mount can be LocationSelect normalizing an already-saved
+    // plain-string value on its own, not a pick the user made.
+    onEventLocationSelectInput() {
+      if (this.ignoreNextLocationInput) {
+        this.ignoreNextLocationInput = false
+      } else {
+        this.locationChangedByUser = true
+      }
+      this.touchField('eventLocationName')
+      this.$validateForm()
+    },
+    onLocationPickerMapInput(location) {
+      this.locationChangedByUser = true
       this.formData.eventLocationName = location
       this.touchField('eventLocationName')
       this.$validateForm()
@@ -659,10 +846,20 @@ export default {
     },
     changeEventStart(event) {
       this.touchField('eventStart')
+      this.$set(this.dirtyFields, 'eventStart', true)
       this.$set(this.formData, 'eventStart', event)
       this.$validateForm()
     },
+    onBeforeUnload(event) {
+      if (!this.hasUnsavedChanges) return
+      // Browsers show their own fixed wording here for security reasons —
+      // setting returnValue (the legacy way to opt in) is what triggers it;
+      // the actual string is ignored by every modern browser.
+      event.preventDefault()
+      event.returnValue = ''
+    },
     addHeroImage(file) {
+      this.imageChangedByUser = true
       this.formData.image = null
       this.formData.imageUpload = null
       if (file) {
@@ -678,9 +875,11 @@ export default {
       }
     },
     addImageAspectRatio(aspectRatio) {
+      this.imageChangedByUser = true
       this.formData.imageAspectRatio = aspectRatio
     },
     addImageType(imageType) {
+      this.imageChangedByUser = true
       this.formData.imageType = imageType
     },
   },
@@ -741,6 +940,23 @@ export default {
   margin-top: 0;
 }
 
+/* Beginn/Ende (date-picker) and Adresse (location-select) sit right next to
+   Titel/Ortsbeschreibung (both OcelotInput, whose bundled .ds-input-label
+   gets only its own 4px padding-bottom — see .ds-form-item above), so the
+   full extra 4px margin-bottom the shared .select-label rule adds on top of
+   its own 4px padding-bottom (8px total, see that rule's own comment) read
+   as a visibly bigger gap right where the two patterns sit side by side.
+   Dropping it to 0 (matching OcelotInput's 4px exactly) then read as
+   visibly tighter instead — these three end up next to a boxed control
+   with no validation-hint/description line underneath eating into the
+   whitespace the way OcelotInput's own fields have, so the same token
+   value doesn't read the same. 2px (--space-xxx-small) splits the
+   difference. */
+.event-grid-item > .select-label,
+.eventData label[for='city'].select-label {
+  margin-bottom: var(--space-xxx-small);
+}
+
 /* Editor's own margin-top lives on .editor-content (the space between its
    own toolbar and the text area), nested inside the error-state wrapper div
    that's the label's actual sibling here — out of reach of the
@@ -780,7 +996,7 @@ export default {
     margin-bottom: var(--space-x-small);
   }
 
-  .event-location-map-field {
+  .location-picker-map-field {
     margin-top: var(--space-small);
     margin-bottom: var(--space-x-small);
   }
@@ -833,8 +1049,19 @@ export default {
       cursor: default;
     }
 
+    /* Not align-self: flex-end — os-validation-hint switches its OWN inner
+       layout depending on whether it has text (flex + justify-between,
+       spreading a left-aligned message and a right-aligned count/icon
+       badge across the full width) or not (just the badge, flex-end).
+       Forcing flex-end here shrinks the whole element to its content's
+       width before that inner layout gets a chance to use the space,
+       which squashed message + badge into a narrow, centered-looking
+       stack instead of message-left/badge-right. Letting it stretch (the
+       flex column's own default) gives it the full width to actually do
+       that with; the badge-only case still ends up flush right either
+       way, since its own inner justify-end doesn't need the full width to
+       do that. */
     > .os-validation-hint {
-      align-self: flex-end;
       margin-bottom: var(--space-base);
       cursor: default;
     }

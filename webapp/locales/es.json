@@ -11,7 +11,13 @@
     "menu": "Abrir menú",
     "save": "Guardar",
     "saveCategories": "Guardar temas",
-    "search": "Buscar"
+    "search": "Buscar",
+    "unsavedChanges": {
+      "discard": "Descartar",
+      "message": "Has realizado cambios que aún no se han guardado. Si continúas ahora, se perderán.",
+      "stay": "Quedarse",
+      "title": "Cambios sin guardar"
+    }
   },
   "admin": {
     "api-keys": {
@@ -474,6 +480,7 @@
     "loading": "cargando",
     "loadMore": "cargar más",
     "name": "Nombre",
+    "noChangesHint": "Todavía no hay nada que guardar.",
     "organization": "Organización ::: Organizaciones",
     "post": "Mensaje ::: Mensajes",
     "project": "Proyecto ::: Proyectos",
@@ -887,6 +894,7 @@
     "foundation": "Fundación",
     "general": "General",
     "goal": "Objetivo del grupo",
+    "group": "Grupo",
     "groupCreated": "¡El grupo fue creado!",
     "in": "en",
     "invite-links": "Enlaces de invitación",
@@ -926,6 +934,7 @@
     "muted": "Grupo silenciado",
     "myGroups": "Mis grupos",
     "name": "Nombre del grupo",
+    "previousLocation": "Ubicación anterior: {location}",
     "radius": "Radio",
     "removeMember": "Eliminar miembro",
     "removeMemberButton": "Eliminar",
@@ -940,6 +949,7 @@
       "usual": "Miembro"
     },
     "save": "Crear nuevo grupo",
+    "scrollToLocationMap": "Desplazarse al mapa",
     "showMembers": "Lista de miembros visible para todos",
     "teaser": {
       "openGroup": "Abrir grupo",
@@ -959,7 +969,17 @@
     "unmute": "Desactivar silencio",
     "unmuted": "Silencio del grupo desactivado",
     "update": "Guardar cambios",
-    "updatedGroup": "Los datos del grupo han sido cambiados."
+    "updatedGroup": "Los datos del grupo han sido cambiados.",
+    "validations": {
+      "actionRadiusRequired": "Por favor, seleccione un radio de acción.",
+      "descriptionLength": "La descripción debe tener al menos {min} caracteres.",
+      "descriptionNotEmpty": "Por favor, ingrese una descripción.",
+      "groupTypeRequired": "Por favor, elija un tipo de grupo.",
+      "nameLength": "El nombre debe tener entre {min} y {max} caracteres.",
+      "nameNotEmpty": "Por favor, ingrese un nombre de grupo.",
+      "slugInvalidCharacters": "Solo se permiten letras minúsculas, números, guiones y guiones bajos.",
+      "slugNotEmpty": "Por favor, ingrese un nombre único de grupo."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Borrar búsqueda",

@@ -41,6 +41,10 @@ function createMockMapboxGl() {
   // so tests can pre-populate it, e.g. to simulate mapbox-gl's own
   // untyped-button controls (like the attribution "i" toggle).
   const mapContainer = document.createElement('div')
+  // Also stable, same reasoning — real mapbox-gl-js's getCanvas() returns the
+  // one persistent canvas element every time too, and tests need that same
+  // reference back to observe cursor changes setPicking()/drag handlers make.
+  const canvasElement = document.createElement('canvas')
   const mapInstance = {
     addControl: vi.fn<(control?: MapboxControl, position?: string) => void>((control) => {
       if (typeof control?.onAdd === 'function') {
@@ -78,7 +82,7 @@ function createMockMapboxGl() {
       })
     }),
     getContainer: vi.fn<() => HTMLElement>(() => mapContainer),
-    getCanvas: vi.fn<() => HTMLCanvasElement>(() => ({ style: {} }) as HTMLCanvasElement),
+    getCanvas: vi.fn<() => HTMLCanvasElement>(() => canvasElement),
     // Below the default pinZoom (14) so existing flyTo assertions (which
     // expect zoom: 14) keep working unchanged — tests exercising the
     // "never zoom back out" behavior override this per-test.
@@ -123,6 +127,7 @@ function createMockMapboxGl() {
     mapInstance,
     markerInstance,
     markerElement,
+    canvasElement,
     mapHandlers,
     markerHandlers,
     controlContainers,
@@ -433,6 +438,85 @@ describe('osLocationMap', () => {
 
     expect(ctx.mapboxGl.Marker).toHaveBeenCalledTimes(1)
     expect(ctx.markerInstance.setLngLat).toHaveBeenLastCalledWith([9.63, 48.87])
+  })
+
+  // A host that resolves a drag to a deliberately coarse match (e.g. groups
+  // snapping to a place/region/country center) can resolve back to the exact
+  // same lat/lng the pin already had — even though the marker's own
+  // on-screen position has since diverged, moved there by the drag itself.
+  // A plain lat/lng comparison would never detect that as "changed" and so
+  // would never correct the marker back; pinRevision exists to force it.
+  it('repositions the marker via pinRevision even when lat/lng come back unchanged', async () => {
+    const wrapper = mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', lat: 52.5, lng: 13.4 },
+    })
+    ctx.markerInstance.setLngLat.mockClear()
+
+    // Same lat/lng as already set — only pinRevision changes.
+    await wrapper.setProps({ lat: 52.5, lng: 13.4, pinRevision: 1 })
+
+    expect(ctx.mapboxGl.Marker).toHaveBeenCalledTimes(1)
+    expect(ctx.markerInstance.setLngLat).toHaveBeenCalledWith([13.4, 52.5])
+    // The coordinate itself didn't change, so the camera has nothing to fly
+    // to — a pinRevision-only bump must not re-trigger flyToPin(), or it
+    // would fight a zoom-out the user made since the pin was last placed.
+    expect(ctx.mapInstance.flyTo).not.toHaveBeenCalled()
+  })
+
+  // Re-arming the pick-location tool over an already-set pin (to drag it, or
+  // click elsewhere to place a new one) leaves the canvas cursor showing the
+  // pin/crosshair PICKER_CURSOR the whole time it's armed. Once an actual
+  // drag starts, the pointer quickly moves off the marker's own small
+  // element and onto the canvas underneath — which must keep showing a plain
+  // grab hand throughout the drag, not flash back to that pin icon.
+  it('shows a grabbing cursor for the duration of a drag, even with the tool re-armed over an existing pin', () => {
+    mount(OsLocationMap, {
+      props: {
+        mapboxGl: ctx.mapboxGl,
+        accessToken: 'test-token',
+        editable: true,
+        lat: 52.5,
+        lng: 13.4,
+      },
+    })
+
+    getPickerToggle().dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+    expect(ctx.canvasElement.style.cursor).toContain('crosshair')
+
+    ctx.markerHandlers.dragstart()
+
+    expect(ctx.canvasElement.style.cursor).toBe('grabbing')
+
+    // isPicking is still armed once the drag ends — the picker cursor comes
+    // back, not left stuck on "grabbing".
+    ctx.markerHandlers.dragend()
+
+    expect(ctx.canvasElement.style.cursor).toContain('crosshair')
+  })
+
+  it('restores the plain (non-armed) cursor after a drag ends with the tool not armed', () => {
+    mount(OsLocationMap, {
+      props: {
+        mapboxGl: ctx.mapboxGl,
+        accessToken: 'test-token',
+        editable: true,
+        lat: 52.5,
+        lng: 13.4,
+      },
+    })
+
+    // A pin already exists, so the tool starts disarmed (see "ignores a bare
+    // map click once a pin already exists" above) — nothing re-arms it here.
+    expect(ctx.canvasElement.style.cursor).toBe('')
+
+    ctx.markerHandlers.dragstart()
+
+    expect(ctx.canvasElement.style.cursor).toBe('grabbing')
+
+    ctx.markerHandlers.dragend()
+
+    expect(ctx.canvasElement.style.cursor).toBe('')
   })
 
   it('updates the existing marker draggable state when editable changes', async () => {

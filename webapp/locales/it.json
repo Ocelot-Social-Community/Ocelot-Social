@@ -11,7 +11,13 @@
     "menu": "Apri menu",
     "save": "Salva",
     "saveCategories": "Salva argomenti",
-    "search": "Cerca"
+    "search": "Cerca",
+    "unsavedChanges": {
+      "discard": "Scarta",
+      "message": "Hai apportato modifiche che non sono ancora state salvate. Se continui ora, andranno perse.",
+      "stay": "Resta",
+      "title": "Modifiche non salvate"
+    }
   },
   "admin": {
     "api-keys": {
@@ -474,6 +480,7 @@
     "loading": "Caricamento in corso",
     "loadMore": "Caricare di più",
     "name": "Nome",
+    "noChangesHint": "Non c'è ancora nulla da salvare.",
     "organization": "Organizzazione ::: Organizzazioni",
     "post": "Messaggio ::: Messaggi",
     "project": "Progetto ::: Progetti",
@@ -887,6 +894,7 @@
     "foundation": "Fondazione",
     "general": "Generale",
     "goal": "Obiettivo del gruppo",
+    "group": "Gruppo",
     "groupCreated": "Il gruppo è stato creato!",
     "in": "in",
     "invite-links": "Link di invito",
@@ -926,6 +934,7 @@
     "muted": "Gruppo silenziato",
     "myGroups": "I miei gruppi",
     "name": "Nome del gruppo",
+    "previousLocation": "Posizione precedente: {location}",
     "radius": "Raggio",
     "removeMember": "Rimuovi membro",
     "removeMemberButton": "Rimuovi",
@@ -940,6 +949,7 @@
       "usual": "Membro"
     },
     "save": "Crea nuovo gruppo",
+    "scrollToLocationMap": "Scorri fino alla mappa",
     "showMembers": "Elenco membri visibile a tutti",
     "teaser": {
       "openGroup": "Apri gruppo",
@@ -959,7 +969,17 @@
     "unmute": "Riattiva gruppo",
     "unmuted": "Gruppo riattivato",
     "update": "Salva modifiche",
-    "updatedGroup": "I dati del gruppo sono stati modificati."
+    "updatedGroup": "I dati del gruppo sono stati modificati.",
+    "validations": {
+      "actionRadiusRequired": "Selezionare un raggio d'azione.",
+      "descriptionLength": "La descrizione deve contenere almeno {min} caratteri.",
+      "descriptionNotEmpty": "Inserire una descrizione.",
+      "groupTypeRequired": "Selezionare un tipo di gruppo.",
+      "nameLength": "Il nome deve essere compreso tra {min} e {max} caratteri.",
+      "nameNotEmpty": "Inserire un nome del gruppo.",
+      "slugInvalidCharacters": "Sono ammessi solo lettere minuscole, numeri, trattini e trattini bassi.",
+      "slugNotEmpty": "Inserire un nome unico del gruppo."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Cancella ricerca",

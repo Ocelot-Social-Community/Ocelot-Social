@@ -16,6 +16,8 @@ export const createGroupMutation = () => {
       $actionRadius: GroupActionRadius!
       $categoryIds: [ID]
       $locationName: String # empty string '' sets it to null
+      $lat: Float
+      $lng: Float
       $showMembers: Boolean
     ) {
       CreateGroup(
@@ -28,6 +30,8 @@ export const createGroupMutation = () => {
         actionRadius: $actionRadius
         categoryIds: $categoryIds
         locationName: $locationName
+        lat: $lat
+        lng: $lng
         showMembers: $showMembers
       ) {
         id
@@ -70,6 +74,8 @@ export const updateGroupMutation = () => {
       $categoryIds: [ID]
       $avatar: ImageInput
       $locationName: String # empty string '' sets it to null
+      $lat: Float
+      $lng: Float
       $showMembers: Boolean
     ) {
       UpdateGroup(
@@ -83,6 +89,8 @@ export const updateGroupMutation = () => {
         categoryIds: $categoryIds
         avatar: $avatar
         locationName: $locationName
+        lat: $lat
+        lng: $lng
         showMembers: $showMembers
       ) {
         id

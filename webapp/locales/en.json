@@ -11,7 +11,13 @@
     "menu": "Open menu",
     "save": "Save",
     "saveCategories": "Save topics",
-    "search": "Search"
+    "search": "Search",
+    "unsavedChanges": {
+      "discard": "Discard",
+      "message": "You have made changes that haven't been saved yet. If you continue now, they will be lost.",
+      "stay": "Stay",
+      "title": "Unsaved changes"
+    }
   },
   "admin": {
     "api-keys": {
@@ -474,6 +480,7 @@
     "loading": "loading",
     "loadMore": "load more",
     "name": "Name",
+    "noChangesHint": "There's nothing to save yet.",
     "organization": "Organization ::: Organizations",
     "post": "Post ::: Posts",
     "project": "Project ::: Projects",
@@ -887,6 +894,7 @@
     "foundation": "Foundation",
     "general": "General",
     "goal": "Goal of group",
+    "group": "Group",
     "groupCreated": "The group was created!",
     "in": "in",
     "invite-links": "Invite Links",
@@ -926,6 +934,7 @@
     "muted": "Group muted",
     "myGroups": "My Groups",
     "name": "Group name",
+    "previousLocation": "Previous location: {location}",
     "radius": "Radius",
     "removeMember": "Remove member",
     "removeMemberButton": "Remove",
@@ -940,6 +949,7 @@
       "usual": "Member"
     },
     "save": "Create new group",
+    "scrollToLocationMap": "Scroll to map",
     "showMembers": "Member list visible to everyone",
     "teaser": {
       "openGroup": "Open group",
@@ -959,7 +969,17 @@
     "unmute": "Unmute group",
     "unmuted": "Group unmuted",
     "update": "Save change",
-    "updatedGroup": "The group data has been changed."
+    "updatedGroup": "The group data has been changed.",
+    "validations": {
+      "actionRadiusRequired": "Please choose an action radius.",
+      "descriptionLength": "The description must be at least {min} characters.",
+      "descriptionNotEmpty": "Please enter a description.",
+      "groupTypeRequired": "Please choose a group type.",
+      "nameLength": "The name must be between {min} and {max} characters.",
+      "nameNotEmpty": "Please enter a group name.",
+      "slugInvalidCharacters": "Only lowercase letters, digits, hyphens and underscores are allowed.",
+      "slugNotEmpty": "Please enter a unique group name."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",

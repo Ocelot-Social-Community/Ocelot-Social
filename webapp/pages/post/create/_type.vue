@@ -53,10 +53,17 @@
             :group="selectedGroup"
             :post-type="type === 'event' ? 'Event' : 'Article'"
             :externalFormData="draft"
+            :cancel-to="cancelReturnPath"
+            @has-unsaved-changes-change="onContributionFormUnsavedChangesChange"
           />
         </transition>
       </div>
     </div>
+    <confirm-modal
+      v-if="showLeaveConfirmModal"
+      :modalData="leaveConfirmModalData"
+      @close="showLeaveConfirmModal = false"
+    />
   </div>
 </template>
 
@@ -66,6 +73,8 @@ import { mapGetters } from 'vuex'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { myGroupsForPostCreation } from '~/graphql/groups'
 import ContributionForm from '~/components/ContributionForm/ContributionForm'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
+import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
 
 const buildEmptyDraft = () => ({
   title: '',
@@ -97,6 +106,23 @@ const buildEmptyDraft = () => ({
 // acquireDraft() runs in the browser.
 let sharedDraft = null
 
+// Mirrors ContributionForm's own hasUnsavedChanges across the remount that
+// switching the article/event type causes (see switchPostType) — that
+// remount destroys and recreates ContributionForm, wiping its
+// dirtyFields/locationChangedByUser/imageChangedByUser (plain instance
+// data), even though sharedDraft's actual content survives untouched.
+// Without this, "edit a field → switch type → try to leave" would silently
+// discard the draft: hasUnsavedChanges() below would read false from the
+// fresh instance, confirmLeaveIfUnsavedChanges wouldn't ask, and
+// beforeRouteLeave would clear sharedDraft right along with it. Kept in
+// sync via ContributionForm's own has-unsaved-changes-change event (see the
+// template) — switching type on its own does NOT set this directly (unlike
+// pages/post/edit/_id.vue's identical switch): nothing is saved yet here,
+// so the type alone doesn't carry that same weight, only what's actually
+// typed does. Reset alongside sharedDraft itself below and in
+// __resetSharedDraftForTests.
+let sharedDraftIsDirty = false
+
 const acquireDraft = () => {
   if (process.server) return buildEmptyDraft()
   if (!sharedDraft) sharedDraft = buildEmptyDraft()
@@ -105,11 +131,27 @@ const acquireDraft = () => {
 
 export const __resetSharedDraftForTests = () => {
   sharedDraft = null
+  sharedDraftIsDirty = false
+}
+
+// Where "Cancel" should return to — captured once on genuine arrival via
+// beforeRouteEnter below. Module-level for the same reason as sharedDraft:
+// switching the article/event type mid-flow does a real route navigation
+// (see switchPostType), which Nuxt remounts this page for, and
+// beforeRouteEnter does not re-fire for that (same matched route, only the
+// :type param changes) — a plain data() value would be wiped by the
+// remount. Reset in beforeRouteLeave when actually leaving the flow.
+let cancelReturnPath = null
+
+export const __resetCancelReturnPathForTests = () => {
+  cancelReturnPath = null
 }
 
 export default {
+  mixins: [confirmLeaveIfUnsavedChanges],
   components: {
     ContributionForm,
+    ConfirmModal,
     OsIcon,
     OsMenu,
     OsMenuItem,
@@ -125,7 +167,7 @@ export default {
     // First-time arrival via the main map's "place a new event here" pin tool
     // (/post/create/event?lat=&lng=&locationName=&locationId=) — seed the
     // draft's eventLocationName as the same { label, value, id, lat, lng }
-    // selection-object shape LocationSelect/EventLocationMap themselves
+    // selection-object shape LocationSelect/LocationPickerMap themselves
     // produce, so ContributionForm shows the pin already placed. A truthy
     // draft.eventLocationName (from a prior remount) wins, same reasoning as
     // groupId above.
@@ -154,6 +196,7 @@ export default {
       draft,
       myGroups: [],
       seededLocationFromMapPin,
+      cancelReturnPath,
     }
   },
   mounted() {
@@ -167,7 +210,7 @@ export default {
     if (this.seededLocationFromMapPin) {
       this.$nextTick(() => {
         this.$el
-          .querySelector('.event-location-map-field')
+          .querySelector('.location-picker-map-field')
           ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       })
     }
@@ -184,9 +227,21 @@ export default {
       redirect(path)
     }
   },
+  // Only fires on a genuine arrival (a different matched route) — not on
+  // switchPostType's own $router.replace between article/event, which
+  // updates the :type param of this same route instead. Exactly the
+  // distinction cancelReturnPath needs: it must capture where the user
+  // actually came from, not get reset to "the create page itself" every
+  // time they switch type mid-flow.
+  beforeRouteEnter(_to, from, next) {
+    cancelReturnPath = from.fullPath || '/'
+    next()
+  },
   beforeRouteLeave(to, _from, next) {
     if (!to.path || !to.path.startsWith('/post/create/')) {
       sharedDraft = null
+      sharedDraftIsDirty = false
+      cancelReturnPath = null
     }
     next()
   },
@@ -270,6 +325,19 @@ export default {
     },
   },
   methods: {
+    // sharedDraftIsDirty alone (not OR'd with the live instance below) is
+    // deliberate: it's kept in sync with the current instance's own
+    // hasUnsavedChanges via the has-unsaved-changes-change event (see the
+    // template and sharedDraftIsDirty's own doc comment above), including
+    // right after mount — so it already reflects a prior instance's state
+    // correctly across a type-switch remount, without needing a live ref at
+    // all.
+    hasUnsavedChanges() {
+      return sharedDraftIsDirty
+    },
+    onContributionFormUnsavedChangesChange(value) {
+      sharedDraftIsDirty = value
+    },
     selectContext(groupId) {
       this.draft.groupId = groupId
       this.syncUrlQuery()
@@ -286,6 +354,11 @@ export default {
       const { type: oldType } = this.$route.params
       const newType = route.route.type.toLowerCase()
       if (newType === oldType) return
+      // Deliberately NOT marked as a change on its own here (unlike
+      // pages/post/edit/_id.vue's identical switch) — nothing is saved yet
+      // in the create flow, so switching type by itself doesn't have the
+      // same "differs from what you'd lose" weight; it only matters once
+      // something is actually typed, which dirtyFields etc. already cover.
       this.type = newType
       const query = this.draft.groupId ? { groupId: this.draft.groupId } : {}
       this.$router.replace({ path: `/post/create/${this.type}`, query })

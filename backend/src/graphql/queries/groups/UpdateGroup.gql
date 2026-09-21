@@ -9,6 +9,8 @@ mutation UpdateGroup(
   $categoryIds: [ID]
   $avatar: ImageInput
   $locationName: String # empty string '' sets it to null
+  $lat: Float
+  $lng: Float
   $showMembers: Boolean
 ) {
   UpdateGroup(
@@ -22,6 +24,8 @@ mutation UpdateGroup(
     categoryIds: $categoryIds
     avatar: $avatar
     locationName: $locationName
+    lat: $lat
+    lng: $lng
     showMembers: $showMembers
   ) {
     id
@@ -46,6 +50,8 @@ mutation UpdateGroup(
     location {
       id
       name
+      lat
+      lng
     }
     myRole
   }

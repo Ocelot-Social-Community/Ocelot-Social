@@ -144,6 +144,25 @@ describe('post/edit/_id.vue', () => {
     })
   })
 
+  // Switching the type via the sidebar menu just flips currentPostType,
+  // which is passed straight through as ContributionForm's own postType
+  // prop — that's where "does it differ from what was saved" is actually
+  // tracked now (see its own postTypeChanged computed and
+  // ContributionForm.spec.js for the dedicated tests), alongside its other
+  // field tracking. This page's hasUnsavedChanges() just delegates to it.
+  describe('hasUnsavedChanges', () => {
+    it('delegates to ContributionForm', async () => {
+      wrapper = await buildWrapper()
+      const contributionForm = wrapper.vm.$refs.contributionForm
+
+      contributionForm.hasUnsavedChanges = true
+      expect(wrapper.vm.hasUnsavedChanges()).toBe(true)
+
+      contributionForm.hasUnsavedChanges = false
+      expect(wrapper.vm.hasUnsavedChanges()).toBe(false)
+    })
+  })
+
   describe('postTypeMatcher', () => {
     it('returns true for the current type and false for the other', async () => {
       wrapper = await buildWrapper()
@@ -157,6 +176,24 @@ describe('post/edit/_id.vue', () => {
       await wrapper.vm.$nextTick()
       expect(wrapper.vm.postTypeMatcher('', { type: 'Event' })).toBe(true)
       expect(wrapper.vm.postTypeMatcher('', { type: 'Article' })).toBe(false)
+    })
+  })
+
+  describe('cancelReturnPath ("Cancel" target)', () => {
+    it('defaults to "/" (no real referrer, e.g. a fresh direct load)', async () => {
+      wrapper = await buildWrapper()
+      expect(wrapper.findComponent({ name: 'ContributionForm' }).props('cancelTo')).toBe('/')
+    })
+
+    it('is set from beforeRouteEnter and passed through to ContributionForm as cancel-to', async () => {
+      wrapper = await buildWrapper()
+      const next = jest.fn((cb) => cb(wrapper.vm))
+      _id.beforeRouteEnter({}, { fullPath: '/post/p1/some-slug' }, next)
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.findComponent({ name: 'ContributionForm' }).props('cancelTo')).toBe(
+        '/post/p1/some-slug',
+      )
     })
   })
 

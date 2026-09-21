@@ -11,7 +11,13 @@
     "menu": "Menu openen",
     "save": "Opslaan",
     "saveCategories": "Onderwerpen opslaan",
-    "search": "Zoeken"
+    "search": "Zoeken",
+    "unsavedChanges": {
+      "discard": "Verwerpen",
+      "message": "Je hebt wijzigingen aangebracht die nog niet zijn opgeslagen. Als je nu doorgaat, gaan ze verloren.",
+      "stay": "Blijven",
+      "title": "Niet-opgeslagen wijzigingen"
+    }
   },
   "admin": {
     "api-keys": {
@@ -474,6 +480,7 @@
     "loading": "inlading",
     "loadMore": "meer laden",
     "name": "Naam",
+    "noChangesHint": "Er is nog niets om op te slaan.",
     "organization": "Organisatie ::: Organisaties",
     "post": "Bericht ::: Berichten",
     "project": "Project ::: Projecten",
@@ -887,6 +894,7 @@
     "foundation": "Oprichting",
     "general": "Algemeen",
     "goal": "Doel van de groep",
+    "group": "Groep",
     "groupCreated": "De groep is aangemaakt!",
     "in": "in",
     "invite-links": "Uitnodigingslinks",
@@ -926,6 +934,7 @@
     "muted": "Groep gedempt",
     "myGroups": "Mijn groepen",
     "name": "Groepsnaam",
+    "previousLocation": "Vorige locatie: {location}",
     "radius": "Radius",
     "removeMember": "Lid verwijderen",
     "removeMemberButton": "Verwijderen",
@@ -940,6 +949,7 @@
       "usual": "Lid"
     },
     "save": "Nieuwe groep aanmaken",
+    "scrollToLocationMap": "Naar de kaart scrollen",
     "showMembers": "Ledenlijst zichtbaar voor iedereen",
     "teaser": {
       "openGroup": "Groep openen",
@@ -959,7 +969,17 @@
     "unmute": "Groep niet meer dempen",
     "unmuted": "Groep niet meer gedempt",
     "update": "Wijziging opslaan",
-    "updatedGroup": "De groepsgegevens zijn gewijzigd."
+    "updatedGroup": "De groepsgegevens zijn gewijzigd.",
+    "validations": {
+      "actionRadiusRequired": "Kies een actieradius.",
+      "descriptionLength": "De beschrijving moet minstens {min} tekens lang zijn.",
+      "descriptionNotEmpty": "Voer een beschrijving in.",
+      "groupTypeRequired": "Kies een groepstype.",
+      "nameLength": "De naam moet tussen {min} en {max} tekens lang zijn.",
+      "nameNotEmpty": "Voer een groepsnaam in.",
+      "slugInvalidCharacters": "Alleen kleine letters, cijfers, koppeltekens en underscores zijn toegestaan.",
+      "slugNotEmpty": "Voer een unieke groepsnaam in."
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Zoekopdracht wissen",
