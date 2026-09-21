@@ -1,5 +1,6 @@
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 
+import { cleanDatabase } from '@db/factories'
 import { deleteBatch, up, down } from '@db/migrations/20260921120000-drop-cannot-see-relationships'
 import { getDriver } from '@db/neo4j'
 
@@ -18,13 +19,25 @@ import { getDriver } from '@db/neo4j'
 
 const driver = getDriver()
 
-/** `edgeCount` CANNOT_SEE relationships, spread over a handful of users and posts. */
+/**
+ * `edgeCount` CANNOT_SEE relationships, spread over a handful of users and posts.
+ *
+ * Starts from `cleanDatabase()` — the same helper the other 81 database-backed specs use —
+ * rather than a hand-written DELETE. Two reasons, and the second is the load-bearing one:
+ * this suite shares one Neo4j and a bespoke cleanup is a second, divergent answer to a
+ * question that is already answered; and the assertions below count restrictions across the
+ * WHOLE graph, so a leftover CANNOT_SEE edge from anywhere else would make `deleteBatch`
+ * return more than the fixture put in. Scoping the cleanup to this fixture's own nodes would
+ * leave exactly that hole open.
+ *
+ * `cleanDatabase()` preserves `Migration` nodes by design, which matters here more than
+ * anywhere else: they are node-migrate's bookkeeping, and wiping them would tell the runner
+ * to replay every migration.
+ */
 const givenRestrictions = async (edgeCount: number) => {
+  await cleanDatabase()
   const session = driver.session()
   try {
-    await session.writeTransaction((transaction) =>
-      transaction.run('MATCH (n) WHERE n:User OR n:Post DETACH DELETE n'),
-    )
     await session.writeTransaction((transaction) =>
       transaction.run(
         `
@@ -53,19 +66,8 @@ const remainingRestrictions = async (): Promise<number> => {
   }
 }
 
-const cleanUp = async () => {
-  const session = driver.session()
-  try {
-    await session.writeTransaction((transaction) =>
-      transaction.run('MATCH (n) WHERE n:User OR n:Post DETACH DELETE n'),
-    )
-  } finally {
-    await session.close()
-  }
-}
-
 afterAll(async () => {
-  await cleanUp()
+  await cleanDatabase()
 })
 
 describe(deleteBatch, () => {
@@ -124,7 +126,7 @@ describe(up, () => {
   })
 
   it('is a no-op on a database that has none', async () => {
-    await cleanUp()
+    await cleanDatabase()
 
     await up(undefined)
 
