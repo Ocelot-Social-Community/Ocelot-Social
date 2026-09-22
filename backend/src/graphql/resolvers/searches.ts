@@ -26,19 +26,38 @@ const cypherTemplate = (setup) => `
 const simpleWhereClause =
   'WHERE score >= 0.0 AND NOT (resource.deleted = true OR resource.disabled = true)'
 
+// The group visibility rule, in the same shape postFilter.ts and users.ts use it: a hit inside
+// a non-public group is dropped unless the searcher is an active member — or wrote it, which
+// here is just `author = user`, since the MATCH above already bound the post's author.
+//
+// Replaces `restriction IS NULL` over a materialised `(:User)-[:CANNOT_SEE]->(:Post)` edge.
+const postVisibilityClause = `(
+    NOT EXISTS {
+      MATCH (resource)-[:IN]->(g:Group)
+      WHERE NOT g.groupType = 'public'
+        AND NOT EXISTS {
+          MATCH (g)<-[membership:MEMBER_OF]-(user)
+          WHERE membership.role IN ['usual', 'admin', 'owner']
+        }
+    }
+    OR author.id = user.id
+  )`
+
 const postWhereClause = `WHERE score >= 0.0
   AND NOT (
     author.deleted = true OR author.disabled = true
     OR resource.deleted = true OR resource.disabled = true
-  ) AND block IS NULL AND restriction IS NULL`
+  ) AND block IS NULL AND ${postVisibilityClause}`
 
 const searchPostsSetup = {
   fulltextIndex: 'post_fulltext_search',
+  // `user` stays a hard MATCH: it carries the mute check as well, and with a null $userId it
+  // matches nothing, which is why post search returns nothing for a logged-out visitor. That
+  // is pre-existing behaviour (searches.spec.ts) and deliberately left alone here.
   match: `MATCH (resource:Post)<-[:WROTE]-(author:User)
           MATCH (user:User {id: $userId})
           OPTIONAL MATCH (user)-[block:MUTED]->(author)
-          OPTIONAL MATCH (user)-[restriction:CANNOT_SEE]->(resource)
-          WITH user, resource, author, block, restriction, score`,
+          WITH user, resource, author, block, score`,
   whereClause: postWhereClause,
   withClause: `WITH resource, author, score,
   [(resource)<-[:COMMENTS]-(comment:Comment) | comment] AS comments,

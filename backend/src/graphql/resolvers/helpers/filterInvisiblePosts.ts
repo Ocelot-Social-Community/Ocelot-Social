@@ -1,20 +1,20 @@
 import type { PostQueryParams } from './postFilter'
-import type { Context } from '@src/context'
+import type { ViewerScope } from './viewerGroups'
 
 // Marks the query so postFilterToCypher can express visibility as a graph condition.
 //
-// This used to run its own query first, collecting the ids of every post the viewer must
-// not see and passing them in as `id_not_in`. For an anonymous visitor that is every post
-// in a non-public group — a list that grows with the database and travels with each
-// request. neo4j-graphql-js could not filter on a relation, so the ids were the only way
-// through; hand-written Cypher asks the graph directly (see the `invisibleTo` operator).
+// Two rewrites deep now. It first ran its own query and collected the ids of every post the
+// viewer must not see, passing them in as `id_not_in` — for an anonymous visitor that was every
+// post in a non-public group, an unbounded list travelling with each request, because
+// neo4j-graphql-js could not filter across a relation. It then asked the graph for a
+// CANNOT_SEE edge instead. The edge is gone; the rule is now read off the group itself.
 //
 // Kept as a wrapper rather than inlined into the resolvers so the two post queries cannot
 // drift apart on something this close to access control.
 export const filterInvisiblePosts = (
   params: PostQueryParams,
-  context: Context,
+  viewer: ViewerScope,
 ): PostQueryParams => ({
   ...params,
-  filter: { ...params.filter, invisibleTo: context.user?.id ?? null },
+  filter: { ...params.filter, invisibleTo: viewer },
 })

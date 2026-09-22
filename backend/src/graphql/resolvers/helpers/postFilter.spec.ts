@@ -139,27 +139,35 @@ describe('postFilterToCypher boolean composition', () => {
 })
 
 describe('postFilterToCypher access control operators', () => {
-  // filterInvisiblePosts used to COLLECT every id the viewer must not see and pass them in as a
-  // parameter array; for an anonymous visitor that was every post in a non-public group — a
-  // list that grows with the database and travels with each request. The relation is asked
-  // about in the graph instead, which is why there are two distinct clauses here.
-  it('excludes posts the viewer cannot see', () => {
-    const { where, params } = postFilterToCypher({ filter: { invisibleTo: 'viewer-id' } })
+  // The visibility rule, read off the group rather than from a stored CANNOT_SEE edge.
+  //
+  // Asserted as three separate claims instead of one string match, because each one fails in a
+  // different direction: a missing `NOT` on the group type serves only the private posts, a
+  // missing group-list check hides the viewer's own groups, and a missing author clause loses
+  // the one exception the rule grants.
+  it('excludes posts in non-public groups the viewer is not a member of', () => {
+    const { where, params } = postFilterToCypher({
+      filter: { invisibleTo: { viewerId: 'viewer-id', groupIds: ['group-a', 'group-b'] } },
+    })
 
-    expect(where).toBe('NOT EXISTS { MATCH (post)<-[:CANNOT_SEE]-(:User { id: $pf0 }) }')
-    expect(params).toEqual({ pf0: 'viewer-id' })
+    expect(where).toContain("WHERE NOT g.groupType = 'public' AND NOT g.id IN $pf1")
+    expect(where).toContain('NOT EXISTS {')
+    expect(where).toContain('OR EXISTS { MATCH (post)<-[:WROTE]-(:User { id: $pf0 }) }')
+    expect(params).toEqual({ pf0: 'viewer-id', pf1: ['group-a', 'group-b'] })
   })
 
-  // Anonymous visitors have no CANNOT_SEE edges to check, so the rule is the group type — and
-  // it still has to constrain. Returning "no restriction" for a logged-out request would put
-  // every closed and hidden group's posts on the public start page.
-  it('excludes posts in non-public groups for an anonymous viewer', () => {
-    const { where, params } = postFilterToCypher({ filter: { invisibleTo: null } })
+  // One expression covers the anonymous visitor too: an empty group list makes `NOT g.id IN []`
+  // true for every group, and a null id matches no author. The clause still has to CONSTRAIN —
+  // returning "no restriction" for a logged-out request would put every closed and hidden
+  // group's posts on the public start page, which is why the parameters are pinned here rather
+  // than the clause being allowed to drop out.
+  it('keeps constraining for an anonymous viewer', () => {
+    const { where, params } = postFilterToCypher({
+      filter: { invisibleTo: { viewerId: null, groupIds: [] } },
+    })
 
-    expect(where).toBe(
-      "NOT EXISTS { MATCH (post)-[:IN]->(g:Group) WHERE NOT g.groupType = 'public' }",
-    )
-    expect(params).toEqual({})
+    expect(where).toContain("WHERE NOT g.groupType = 'public' AND NOT g.id IN $pf1")
+    expect(params).toEqual({ pf0: null, pf1: [] })
   })
 
   it('excludes posts written by an author the viewer muted', () => {
@@ -179,20 +187,19 @@ describe('postFilterToCypher access control operators', () => {
   })
 
   it('restricts to groups the viewer is an active member of', () => {
-    const { where, params } = postFilterToCypher({ filter: { inGroupsOf: 'viewer-id' } })
+    const { where, params } = postFilterToCypher({
+      filter: { inGroupsOf: ['group-a', 'group-b'] },
+    })
 
-    expect(where).toContain(
-      'MATCH (post)-[:IN]->(:Group)<-[membership:MEMBER_OF]-(:User { id: $pf0 })',
-    )
-    expect(where).toContain("WHERE membership.role IN ['usual', 'admin', 'owner']")
-    expect(params).toEqual({ pf0: 'viewer-id' })
+    expect(where).toBe('EXISTS { MATCH (post)-[:IN]->(g:Group) WHERE g.id IN $pf0 }')
+    expect(params).toEqual({ pf0: ['group-a', 'group-b'] })
   })
 
-  // No viewer means no memberships, and "posts in my groups" then has to match NOTHING. Falling
-  // through as an absent constraint would turn the my-groups feed into the unrestricted feed
-  // for exactly the requests that are not allowed to see it.
-  it('matches nothing for the my-groups feed of an anonymous viewer', () => {
-    const { where, params } = postFilterToCypher({ filter: { inGroupsOf: null } })
+  // No memberships means "posts in my groups" has to match NOTHING. Falling through as an
+  // absent constraint would turn the my-groups feed into the unrestricted feed — and an
+  // anonymous viewer arrives here with exactly this empty list.
+  it('matches nothing for the my-groups feed without memberships', () => {
+    const { where, params } = postFilterToCypher({ filter: { inGroupsOf: [] } })
 
     expect(where).toBe('false')
     expect(params).toEqual({})
@@ -445,9 +452,9 @@ describe('postFilterToCypher parameter binding', () => {
     id_not_in: [payload],
     language_in: [payload],
     postType_in: [payload],
-    invisibleTo: payload,
+    invisibleTo: { viewerId: payload, groupIds: [payload] },
     mutedBy: payload,
-    inGroupsOf: payload,
+    inGroupsOf: [payload],
     eventStart_gte: payload,
     eventEnd_gte: payload,
     eventEnd: payload,

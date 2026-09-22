@@ -9,45 +9,38 @@ import LeaveGroup from '@graphql/queries/groups/LeaveGroup.gql'
 import RemoveUserFromGroup from '@graphql/queries/groups/RemoveUserFromGroup.gql'
 import UpdateGroup from '@graphql/queries/groups/UpdateGroup.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
+import pinPost from '@graphql/queries/posts/pinPost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { DocumentNode } from 'graphql'
 
-// Characterisation of the CANNOT_SEE model — the materialised negative ACL that decides
-// which posts in non-public groups a viewer may see.
+// Post visibility across every transition that changes it.
 //
-// posts.inGroups.spec.ts already covers the STATIC matrix (anonymous / new / non-member /
-// pending / member × public / closed / hidden). What it does not pin down is the part that
-// makes CANNOT_SEE hard to reason about: the edges are written by five different mutations
-// (registration.ts:97, posts.ts:285, groups.ts:352/365, groups.ts:449/455, groups.ts:858),
-// and those five do NOT agree with each other. The stored state is therefore a function of
-// the mutation HISTORY, not of the current graph — two users with identical memberships can
-// have different visibility depending on how they got there.
+// THE RULE: a post in a non-public group is served to the group's active members, and to its
+// own author. Nothing else. It is derived from the graph on every read — there is no stored
+// restriction, so there is no state here that can be right or wrong independently of the
+// memberships it is read from.
 //
-// Two things are tested here:
+// posts.inGroups.spec.ts covers the STATIC matrix (anonymous / new / non-member / pending /
+// member × public / closed / hidden). This file covers the TRANSITIONS, and covers each of them
+// twice: once for a viewer who wrote the post and once for a viewer who did not. That split is
+// the whole point. posts.inGroups.spec.ts cannot make it — its `allGroupsUser` wrote all three
+// group posts itself, so "usual member leaves … stil shows the posts" (line 1729) exercises
+// only the author exception under a name that reads like a general claim about leaving a group.
 //
-//   1. Every membership-losing transition, separately for a viewer who AUTHORED the post and
-//      one who did not. posts.inGroups.spec.ts cannot distinguish the two: its `allGroupsUser`
-//      wrote all three group posts itself, so its "usual member leaves … stil shows the posts"
-//      (line 1729) in fact only exercises the author exception, under a name that reads like a
-//      general statement about leaving a group.
-//
-//   2. `restrictionDrift()` — the stored CANNOT_SEE edges diffed against what the group graph
-//      alone implies. That is the invariant a derived rule would satisfy by construction, so
-//      it is the measurement that says how far the materialised copy has moved away from it.
-//
-// TARGET SEMANTICS (decided, not yet implemented): visibility follows active group membership,
-// with one exception — you always keep seeing a post you wrote yourself. `restrictionDrift()`
-// encodes that target. Where the current implementation deviates, the test asserts the
-// deviation EXPLICITLY rather than skipping it, so the eventual switch to a derived rule
-// breaks exactly at the assertions that describe the intended behaviour change.
-
-const ACTIVE_ROLES = ['usual', 'admin', 'owner']
+// These tests were written against the previous implementation, a materialised
+// `(:User)-[:CANNOT_SEE]->(:Post)` edge maintained by five different mutations. Six of them
+// asserted the opposite of what they assert now, because those five writers did not agree with
+// each other: losing membership by being demoted hid your own posts, losing it by leaving did
+// not, and losing it because the group turned private hid them again. The rule below has one
+// answer, so the three cases that used to differ are now `describe.each` branches of the same
+// expectation — which is the observable half of what the refactor bought.
 
 let authenticatedUser: Context['user']
-const policy = { categoriesActive: false }
+// `maxPinnedPosts` is set because one scenario pins a post; pinning is refused outright at 0.
+const policy = { categoriesActive: false, maxPinnedPosts: 3 }
 const context = () => ({ authenticatedUser, policy })
 
 let mutate: ApolloTestSetup['mutate']
@@ -90,8 +83,8 @@ const expectMutation = async (mutation: DocumentNode, variables: Record<string, 
 }
 
 /** Builds a user node and returns it in the shape the test context expects as viewer. */
-const buildUser = async (id: string, name: string): Promise<Context['user']> => {
-  const built = (await factory.build('user', { id, name })) as {
+const buildUser = async (id: string, name: string, role?: string): Promise<Context['user']> => {
+  const built = (await factory.build('user', role ? { id, name, role } : { id, name })) as {
     toJson: () => Promise<Context['user']>
   }
   return built.toJson()
@@ -113,57 +106,6 @@ const visiblePostIds = async (viewer: Context['user']): Promise<string[]> => {
     authenticatedUser = previous
   }
 }
-
-interface Drift {
-  /** Pairs the group graph says must be restricted, but which carry no CANNOT_SEE edge. */
-  missing: string[]
-  /** CANNOT_SEE edges the group graph does not justify. */
-  extra: string[]
-}
-
-/**
- * Diffs the stored CANNOT_SEE edges against the target semantics.
- *
- * `missing` is the direction that leaks: a post the viewer should not be served, that no edge
- * hides. `extra` is over-restriction: an edge that survives a membership the graph now grants,
- * or that the author exception should never have produced.
- *
- * Both are reported as `"<userId> → <postId>"` so a failure names the offending pair instead
- * of printing a count.
- */
-const restrictionDrift = async (): Promise<Drift> => {
-  const expected = await database.query({
-    query: `
-      MATCH (post:Post)-[:IN]->(group:Group)
-        WHERE group.groupType <> 'public'
-      MATCH (user:User)
-        WHERE NOT EXISTS {
-                MATCH (group)<-[membership:MEMBER_OF]-(user)
-                WHERE membership.role IN $activeRoles
-              }
-          AND NOT EXISTS { MATCH (post)<-[:WROTE]-(user) }
-      RETURN user.id + ' → ' + post.id AS pair
-    `,
-    variables: { activeRoles: ACTIVE_ROLES },
-  })
-  const actual = await database.query({
-    query: `
-      MATCH (user:User)-[:CANNOT_SEE]->(post:Post)
-      RETURN user.id + ' → ' + post.id AS pair
-    `,
-    variables: {},
-  })
-
-  const expectedPairs = new Set(expected.records.map((record) => record.get('pair') as string))
-  const actualPairs = new Set(actual.records.map((record) => record.get('pair') as string))
-
-  return {
-    missing: [...expectedPairs].filter((pair) => !actualPairs.has(pair)).sort(),
-    extra: [...actualPairs].filter((pair) => !expectedPairs.has(pair)).sort(),
-  }
-}
-
-const noDrift: Drift = { missing: [], extra: [] }
 
 let owner: Context['user']
 let author: Context['user']
@@ -276,6 +218,42 @@ const ALL_POSTS = [
   'gv-hidden-by-member',
 ].sort()
 
+/**
+ * The three ways `gv-member` can stop being an active member of a group.
+ *
+ * Listed together because the rule gives them ONE answer. Under the CANNOT_SEE model they were
+ * three code paths with three different opinions about the member's own posts — the author
+ * exception existed only in the Leave/Remove branch. Running the same expectations over all
+ * three is what says that is over.
+ */
+const LOSING_MEMBERSHIP: [string, (groupId: string) => Promise<void>][] = [
+  [
+    'the member leaves',
+    async (groupId) => {
+      authenticatedUser = member
+      await expectMutation(LeaveGroup, { groupId, userId: 'gv-member' })
+    },
+  ],
+  [
+    'an owner removes the member',
+    async (groupId) => {
+      authenticatedUser = owner
+      await expectMutation(RemoveUserFromGroup, { groupId, userId: 'gv-member' })
+    },
+  ],
+  [
+    'an owner demotes the member to pending',
+    async (groupId) => {
+      authenticatedUser = owner
+      await expectMutation(ChangeGroupMemberRole, {
+        groupId,
+        userId: 'gv-member',
+        roleInGroup: 'pending',
+      })
+    },
+  ],
+]
+
 describe('post visibility derived from group membership', () => {
   describe('baseline', () => {
     givenScenario()
@@ -284,29 +262,18 @@ describe('post visibility derived from group membership', () => {
       await expect(visiblePostIds(member)).resolves.toEqual(ALL_POSTS)
       await expect(visiblePostIds(outsider)).resolves.toEqual(PUBLICLY_VISIBLE)
     })
-
-    it('stores exactly the CANNOT_SEE edges the group graph implies', async () => {
-      await expect(restrictionDrift()).resolves.toEqual(noDrift)
-    })
   })
 
-  // groups.ts:855 — `WHERE … AND NOT author.id = $userId`. The author exception lives here
-  // and only here; the two other membership-losing paths below disagree with it.
-  describe.each([
-    ['LeaveGroup', LeaveGroup, () => member],
-    ['RemoveUserFromGroup', RemoveUserFromGroup, () => owner],
-  ])('%s', (_name, mutation, actor) => {
+  describe.each(LOSING_MEMBERSHIP)('%s', (_name, losesMembership) => {
     describe.each(['gv-closed', 'gv-hidden'])('%s group', (groupId) => {
-      givenScenario(async () => {
-        authenticatedUser = actor()
-        await expectMutation(mutation, { groupId, userId: 'gv-member' })
-      })
+      givenScenario(async () => losesMembership(groupId))
 
       it("hides the group's posts written by SOMEONE ELSE", async () => {
         await expect(visiblePostIds(member)).resolves.not.toContain(`${groupId}-by-author`)
       })
 
-      // The behaviour posts.inGroups.spec.ts:1729 exercises without naming it.
+      // The author exception. posts.inGroups.spec.ts:1729 exercises it without naming it, and
+      // only for the one path that used to implement it.
       it('keeps the posts the departing user wrote THEMSELVES visible to them', async () => {
         await expect(visiblePostIds(member)).resolves.toContain(`${groupId}-by-member`)
       })
@@ -318,48 +285,10 @@ describe('post visibility derived from group membership', () => {
         expect(visible).toContain(`${other}-by-author`)
         expect(visible).toContain(`${other}-by-member`)
       })
-
-      it('matches the group-derived truth', async () => {
-        await expect(restrictionDrift()).resolves.toEqual(noDrift)
-      })
     })
   })
 
-  // groups.ts:452-455 — the same loss of membership, expressed as a role change, has NO
-  // author exception: the FOREACH merges an edge for every post in the group.
-  describe('ChangeGroupMemberRole to pending', () => {
-    describe.each(['gv-closed', 'gv-hidden'])('%s group', (groupId) => {
-      givenScenario(async () => {
-        authenticatedUser = owner
-        await expectMutation(ChangeGroupMemberRole, {
-          groupId,
-          userId: 'gv-member',
-          roleInGroup: 'pending',
-        })
-      })
-
-      it("hides the group's posts written by someone else", async () => {
-        await expect(visiblePostIds(member)).resolves.not.toContain(`${groupId}-by-author`)
-      })
-
-      // DEVIATION from the target semantics, asserted rather than skipped.
-      //
-      // Losing membership through a role change hides the demoted user's OWN post; losing it
-      // through LeaveGroup / RemoveUserFromGroup does not. Nothing about the two situations
-      // justifies the difference — it is the absence of `NOT author.id = $userId` in
-      // groups.ts:452-455. Under the author exception this assertion inverts.
-      it('ALSO hides the demoted user their own post — unlike leaving the group', async () => {
-        await expect(visiblePostIds(member)).resolves.not.toContain(`${groupId}-by-member`)
-      })
-
-      it('records the author-exception deviation as a surplus edge', async () => {
-        await expect(restrictionDrift()).resolves.toEqual({
-          missing: [],
-          extra: [`gv-member → ${groupId}-by-member`],
-        })
-      })
-    })
-
+  describe('ChangeGroupMemberRole', () => {
     describe('promoting back to usual', () => {
       givenScenario(async () => {
         authenticatedUser = owner
@@ -375,15 +304,16 @@ describe('post visibility derived from group membership', () => {
         })
       })
 
-      it('restores full visibility and leaves no stale edges behind', async () => {
+      it('restores full visibility', async () => {
         await expect(visiblePostIds(member)).resolves.toEqual(ALL_POSTS)
-        await expect(restrictionDrift()).resolves.toEqual(noDrift)
       })
     })
   })
 
-  // groups.ts:348-370. posts.inGroups / groups.spec cover public ↔ hidden; the transitions
-  // BETWEEN two non-public types take the same `else` branch and were never exercised.
+  // posts.inGroups / groups.spec cover public ↔ hidden. The transitions BETWEEN two non-public
+  // types were never exercised: under CANNOT_SEE they hit the same edge-rewriting branch, and
+  // under the derived rule they must be a no-op for visibility — both types are non-public, so
+  // nothing about who may read the group's posts changes.
   describe('UpdateGroup groupType transitions', () => {
     const changeType = async (groupId: string, groupType: string) => {
       authenticatedUser = owner
@@ -403,10 +333,6 @@ describe('post visibility derived from group membership', () => {
         await expect(visiblePostIds(outsider)).resolves.toEqual(PUBLICLY_VISIBLE)
         await expect(visiblePostIds(member)).resolves.toEqual(ALL_POSTS)
       })
-
-      it('rebuilds the edges without drift', async () => {
-        await expect(restrictionDrift()).resolves.toEqual(noDrift)
-      })
     })
 
     describe('public → closed', () => {
@@ -421,14 +347,12 @@ describe('post visibility derived from group membership', () => {
       it('keeps them visible to the members', async () => {
         await expect(visiblePostIds(member)).resolves.toEqual(ALL_POSTS)
       })
-
-      it('matches the group-derived truth', async () => {
-        await expect(restrictionDrift()).resolves.toEqual(noDrift)
-      })
     })
 
-    // Third answer to "do I keep seeing my own post". groups.ts:364 restricts every user who
-    // is not an active member — the author of a post in the group included, once they left.
+    // The case that used to give a THIRD answer to "do I keep seeing my own post": the author
+    // is not a member any more when the group turns private, and the rewrite that ran here
+    // restricted every non-member, the author included. The author exception is part of the
+    // rule now, so it applies here too.
     describe('public → closed after the author left the group', () => {
       givenScenario(async () => {
         authenticatedUser = author
@@ -436,23 +360,54 @@ describe('post visibility derived from group membership', () => {
         await changeType('gv-public', 'closed')
       })
 
-      // DEVIATION from the target semantics, asserted rather than skipped: under the author
-      // exception the author keeps `gv-public-by-author` and this assertion inverts.
-      it('hides the authors OWN post from them', async () => {
-        await expect(visiblePostIds(author)).resolves.not.toContain('gv-public-by-author')
+      it('keeps the authors own post visible to them', async () => {
+        await expect(visiblePostIds(author)).resolves.toContain('gv-public-by-author')
       })
 
-      it('records it as a surplus edge', async () => {
-        await expect(restrictionDrift()).resolves.toEqual({
-          missing: [],
-          extra: ['gv-author → gv-public-by-author'],
-        })
+      it('hides it from everyone outside the group', async () => {
+        await expect(visiblePostIds(outsider)).resolves.toEqual(['gv-no-group'])
+      })
+    })
+
+    // A pinned post skips the filters that express PREFERENCE — that is what pinning is for.
+    // It must not skip the ones that express PERMISSION, and it used to: the pinned-post
+    // wrapper put the entire filter into one branch of `pinned OR (…)`, so `post.pinned = true`
+    // satisfied the query by itself.
+    //
+    // `pinPost` refuses a post in a non-public group, which is why this needs the group to turn
+    // private AFTERWARDS. Nothing un-pins a post when that happens.
+    describe('a post pinned while its group was still public', () => {
+      givenScenario(async () => {
+        const admin = await buildUser('gv-pin-admin', 'Pinning Admin', 'admin')
+        authenticatedUser = admin
+        await expectMutation(pinPost, { id: 'gv-public-by-author' })
+        authenticatedUser = owner
+        await expectMutation(UpdateGroup, { id: 'gv-public', groupType: 'hidden' })
+      })
+
+      it('is hidden from a non-member once the group turns private', async () => {
+        await expect(visiblePostIds(outsider)).resolves.not.toContain('gv-public-by-author')
+      })
+
+      it('is hidden from a logged-out visitor', async () => {
+        await expect(visiblePostIds(null)).resolves.not.toContain('gv-public-by-author')
+      })
+
+      it('is still served to the members', async () => {
+        await expect(visiblePostIds(member)).resolves.toContain('gv-public-by-author')
       })
     })
   })
 
-  // Users created after the fact. Both paths below produce a user with no membership anywhere;
-  // only one of them ends up restricted, because only one of them runs the backfill.
+  // Users created after the posts exist. The two paths differ in everything except the part
+  // that matters: neither produces a membership.
+  //
+  // They used to differ in outcome, and that difference was a trap. SignupVerification ran a
+  // backfill that wrote a CANNOT_SEE edge to every existing post in a non-public group;
+  // `Factory.build('user')` writes the node directly and ran nothing, so a factory user built
+  // after such a post was served it. Existing suites were correct only because they build
+  // their users first. Reading the rule from the membership — which neither user has — makes
+  // the two paths agree, so the trap is gone rather than documented.
   describe('users created after the posts exist', () => {
     let latecomer: Context['user']
 
@@ -480,44 +435,18 @@ describe('post visibility derived from group membership', () => {
         latecomer = (result.data as { SignupVerification: Context['user'] }).SignupVerification
       })
 
-      it('is restricted to the public posts by the registration backfill', async () => {
+      it('sees only the public posts', async () => {
         await expect(visiblePostIds(latecomer)).resolves.toEqual(PUBLICLY_VISIBLE)
-      })
-
-      it('matches the group-derived truth', async () => {
-        await expect(restrictionDrift()).resolves.toEqual(noDrift)
       })
     })
 
-    // NOT a statement of intended behaviour — a trap in the test harness, pinned so it is
-    // discovered here rather than in whichever suite silently relies on it.
-    //
-    // `Factory.build('user')` writes the node directly and never runs registration.ts:97, so a
-    // factory user created AFTER a post in a non-public group carries no CANNOT_SEE edge and is
-    // served that post. Existing suites are safe only because they build their users first.
-    // Any test that needs a realistic latecomer must go through SignupVerification.
-    //
-    // A group-derived rule removes the trap: it consults the membership, which a factory user
-    // genuinely lacks. These assertions are then expected to flip to PUBLICLY_VISIBLE / noDrift.
-    describe('built by the factory — harness artifact, not intended behaviour', () => {
+    describe('built directly by the factory', () => {
       givenScenario(async () => {
         latecomer = await buildUser('gv-latecomer', 'Latecomer')
       })
 
-      it('is served the posts of every non-public group', async () => {
-        await expect(visiblePostIds(latecomer)).resolves.toEqual(ALL_POSTS)
-      })
-
-      it('leaves the group-derived restrictions unwritten', async () => {
-        await expect(restrictionDrift()).resolves.toEqual({
-          missing: [
-            'gv-latecomer → gv-closed-by-author',
-            'gv-latecomer → gv-closed-by-member',
-            'gv-latecomer → gv-hidden-by-author',
-            'gv-latecomer → gv-hidden-by-member',
-          ],
-          extra: [],
-        })
+      it('sees only the public posts, same as a registered one', async () => {
+        await expect(visiblePostIds(latecomer)).resolves.toEqual(PUBLICLY_VISIBLE)
       })
     })
   })
