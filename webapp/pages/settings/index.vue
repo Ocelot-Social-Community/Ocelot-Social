@@ -64,20 +64,36 @@
           :label="$t('settings.data.labelBio')"
           :placeholder="$t('settings.data.labelBio')"
         />
-        <os-button
-          variant="primary"
-          appearance="filled"
-          type="submit"
-          :loading="loadingData"
-          :class="{ 'permission-denied': submitVisuallyDenied }"
-          :aria-disabled="canSubmit ? undefined : true"
-          v-tooltip="{
-            content: submitDeniedHint,
-          }"
-        >
-          <template #icon><os-icon :icon="icons.check" /></template>
-          {{ $t('actions.save') }}
-        </os-button>
+        <div class="buttons">
+          <os-button
+            type="button"
+            data-test="reset-button"
+            variant="primary"
+            appearance="outline"
+            :class="{ 'permission-denied': submitVisuallyDenied }"
+            :aria-disabled="canSubmit ? undefined : true"
+            v-tooltip="{
+              content: submitDeniedHint,
+            }"
+            @click="resetForm"
+          >
+            {{ $t('actions.reset') }}
+          </os-button>
+          <os-button
+            variant="primary"
+            appearance="filled"
+            type="submit"
+            :loading="loadingData"
+            :class="{ 'permission-denied': submitVisuallyDenied }"
+            :aria-disabled="canSubmit ? undefined : true"
+            v-tooltip="{
+              content: submitDeniedHint,
+            }"
+          >
+            <template #icon><os-icon :icon="icons.check" /></template>
+            {{ $t('actions.save') }}
+          </os-button>
+        </div>
       </os-card>
     </form>
     <confirm-modal
@@ -293,6 +309,27 @@ export default {
       }
       this.formData.locationName = location
     },
+    // Reverts the form back to the last actually saved values — the
+    // reverse of submit()'s own success handler below, without a server
+    // round-trip since nothing needs re-fetching (currentUser already
+    // holds them). Same field defaults as mounted() (see its own comment).
+    resetForm() {
+      this.formData.name = this.currentUser.name || ''
+      this.formData.slug = this.currentUser.slug || ''
+      this.formData.about = this.currentUser.about || ''
+      this.formData.locationName = this.currentUser.locationName || ''
+      // Writing formData.locationName back here can make LocationSelect
+      // re-resolve it (its own value watcher sees an external change, same
+      // as on mount) — suppress that echo the same way ignoreNextLocationInput
+      // already does for the mount-time case, or the reset would immediately
+      // re-mark the location as changed by the "user".
+      this.ignoreNextLocationInput = !!this.currentUser.locationName
+      this.locationChangedByUser = false
+      this.dirtyFields = {}
+      this.touchedFields = {}
+      this.submitAttempted = false
+      this.$validateForm()
+    },
     onSubmit() {
       this.formSubmit(this.submit, () => {
         this.$toast.error(this.$t('common.validations.formHasErrors'))
@@ -422,11 +459,11 @@ export default {
     margin-bottom: var(--space-base);
   }
 
-  /* OsButton renders no semantic class of its own on the root (pure
-     Tailwind utility classes) — the type attribute is the stable hook. */
-  > button[type='submit'] {
+  > .buttons {
     align-self: flex-end;
     margin-top: var(--space-base);
+    display: flex;
+    gap: var(--space-small);
   }
 }
 </style>

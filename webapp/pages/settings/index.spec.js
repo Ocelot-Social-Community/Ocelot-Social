@@ -425,6 +425,77 @@ describe('index.vue', () => {
         const submitButton = wrapper.find('button[type="submit"]')
         expect(submitButton.classes()).not.toContain('permission-denied')
       })
+
+      it('greys out the reset button the same way', async () => {
+        const wrapper = Wrapper()
+        const resetButton = wrapper.find('[data-test="reset-button"]')
+        expect(resetButton.classes()).toContain('permission-denied')
+
+        wrapper.vm.updateFormField('name', 'A new name')
+        await wrapper.vm.$nextTick()
+        expect(resetButton.classes()).not.toContain('permission-denied')
+      })
+    })
+
+    describe('resetForm', () => {
+      it('reverts touched fields back to the saved values', () => {
+        getters = {
+          ...getters,
+          'auth/user': () => ({ name: 'Peter', slug: 'peter', about: 'Old bio' }),
+        }
+        const wrapper = Wrapper()
+        wrapper.vm.updateFormField('name', 'A new name')
+        wrapper.vm.updateFormField('slug', 'a-new-slug')
+        wrapper.vm.updateFormField('about', 'A new bio')
+
+        wrapper.vm.resetForm()
+
+        expect(wrapper.vm.formData.name).toBe('Peter')
+        expect(wrapper.vm.formData.slug).toBe('peter')
+        expect(wrapper.vm.formData.about).toBe('Old bio')
+      })
+
+      it('clears hasUnsavedChanges', () => {
+        const wrapper = Wrapper()
+        wrapper.vm.updateFormField('name', 'A new name')
+        expect(wrapper.vm.hasUnsavedChanges()).toBe(true)
+
+        wrapper.vm.resetForm()
+
+        expect(wrapper.vm.hasUnsavedChanges()).toBe(false)
+      })
+
+      it('reverts a genuinely changed location and clears the previous-location hint', () => {
+        getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
+        const wrapper = Wrapper()
+        wrapper
+          .findComponent(LocationSelect)
+          .vm.$emit('input', { label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'x' })
+        wrapper.findComponent(LocationSelect).vm.$emit('input', 'Berlin')
+        expect(wrapper.vm.previousLocationName).toBe('Hamburg')
+
+        wrapper.vm.resetForm()
+
+        expect(wrapper.vm.formData.locationName).toBe('Hamburg')
+        expect(wrapper.vm.previousLocationName).toBeNull()
+      })
+
+      // Same reasoning as ignoreNextLocationInput's own mount-time doc
+      // comment: writing formData.locationName back here can make
+      // LocationSelect re-resolve it and echo an 'input' event — that echo
+      // must not be mistaken for a genuine new pick right after resetting.
+      it("suppresses LocationSelect's own resolve echo right after a reset", () => {
+        getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
+        const wrapper = Wrapper()
+        wrapper.findComponent(LocationSelect).vm.$emit('input', 'Berlin')
+        wrapper.vm.resetForm()
+
+        wrapper
+          .findComponent(LocationSelect)
+          .vm.$emit('input', { label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'x' })
+
+        expect(wrapper.vm.locationChangedByUser).toBe(false)
+      })
     })
 
     describe('previousLocationName', () => {
