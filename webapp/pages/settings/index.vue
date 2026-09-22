@@ -70,11 +70,7 @@
             data-test="reset-button"
             variant="primary"
             appearance="outline"
-            :class="{ 'permission-denied': submitVisuallyDenied }"
-            :aria-disabled="canSubmit ? undefined : true"
-            v-tooltip="{
-              content: submitDeniedHint,
-            }"
+            :disabled="!hasUnsavedChanges()"
             @click="resetForm"
           >
             {{ $t('actions.reset') }}
@@ -85,7 +81,6 @@
             type="submit"
             :loading="loadingData"
             :class="{ 'permission-denied': submitVisuallyDenied }"
-            :aria-disabled="canSubmit ? undefined : true"
             v-tooltip="{
               content: submitDeniedHint,
             }"
@@ -251,22 +246,15 @@ export default {
       if (!original || original === this.formLocationName) return null
       return original
     },
-    // Editing your own profile has no permission gate, unlike GroupForm's
-    // canCreateSelectedGroup / ContributionForm's canSubmit — kept as its
-    // own computed anyway so aria-disabled has the same shape as those two
-    // (only ever reflecting a genuine inability to submit, never "nothing
-    // changed" — see submitVisuallyDenied's own doc comment below).
-    canSubmit() {
-      return true
-    },
     // Same grey-but-still-clickable treatment GroupForm.vue's/
     // ContributionForm.vue's submit buttons use — not an actual :disabled,
     // deliberately: hasUnsavedChanges() only tracks whether something was
     // TOUCHED, not whether it truly differs from what's saved, so a gap in
-    // that tracking must never make a real save unreachable. Deliberately
-    // NOT reflected in aria-disabled (see the template) — the button
-    // genuinely still works when this is true, and telling assistive tech
-    // it's disabled would be actively wrong, not just cosmetically off.
+    // that tracking must never make a real save unreachable. Unlike those
+    // two forms there's no permission gate on editing your own profile, so
+    // (unlike them) there's no meaningful aria-disabled case here either —
+    // this button is never genuinely unable to submit, only "nothing to
+    // submit yet".
     submitVisuallyDenied() {
       return !this.hasUnsavedChanges()
     },

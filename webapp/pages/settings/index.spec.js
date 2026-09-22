@@ -425,15 +425,27 @@ describe('index.vue', () => {
         const submitButton = wrapper.find('button[type="submit"]')
         expect(submitButton.classes()).not.toContain('permission-denied')
       })
+    })
 
-      it('greys out the reset button the same way', async () => {
+    describe('reset button', () => {
+      // Unlike the submit button above, a genuinely disabled reset has no
+      // downside if the dirty-tracking has a gap somewhere — the worst case
+      // is just an unclickable "nothing to discard" button, never a lost
+      // save, so this one uses a real :disabled instead of the
+      // grey-but-clickable pattern.
+      it('is disabled with nothing changed yet', () => {
         const wrapper = Wrapper()
         const resetButton = wrapper.find('[data-test="reset-button"]')
-        expect(resetButton.classes()).toContain('permission-denied')
+        expect(resetButton.attributes('disabled')).toBeDefined()
+      })
 
+      it('becomes clickable once something has actually been changed', async () => {
+        const wrapper = Wrapper()
         wrapper.vm.updateFormField('name', 'A new name')
         await wrapper.vm.$nextTick()
-        expect(resetButton.classes()).not.toContain('permission-denied')
+
+        const resetButton = wrapper.find('[data-test="reset-button"]')
+        expect(resetButton.attributes('disabled')).toBeUndefined()
       })
     })
 
