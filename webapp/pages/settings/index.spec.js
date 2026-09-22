@@ -480,15 +480,19 @@ describe('index.vue', () => {
       it('reverts a genuinely changed location and clears the previous-location hint', () => {
         getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
         const wrapper = Wrapper()
-        wrapper
-          .findComponent(LocationSelect)
-          .vm.$emit('input', { label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'x' })
+        const resolvedHamburg = { label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'x' }
+        wrapper.findComponent(LocationSelect).vm.$emit('input', resolvedHamburg)
         wrapper.findComponent(LocationSelect).vm.$emit('input', 'Berlin')
         expect(wrapper.vm.previousLocationName).toBe('Hamburg')
 
         wrapper.vm.resetForm()
 
-        expect(wrapper.vm.formData.locationName).toBe('Hamburg')
+        // The resolved object (with its id, and lat/lng when geocoded), not
+        // just the bare "Hamburg" string — see savedLocationValue's own doc
+        // comment: restoring the string alone would drop the map pin's
+        // coordinates until a fresh, momentarily pin-less geocode round-trip
+        // brought them back.
+        expect(wrapper.vm.formData.locationName).toEqual(resolvedHamburg)
         expect(wrapper.vm.previousLocationName).toBeNull()
       })
 
@@ -507,6 +511,47 @@ describe('index.vue', () => {
           .vm.$emit('input', { label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'x' })
 
         expect(wrapper.vm.locationChangedByUser).toBe(false)
+      })
+
+      // The actual bug this guards against: restoring only the bare
+      // locationName string on reset leaves LocationPickerMap with no
+      // lat/lng to show a pin for at all, until a fresh geocode round-trip
+      // resolves it again — the pin visibly disappears and only comes back
+      // a moment later, instead of staying put the whole time.
+      it('keeps the map pin (lat/lng) in place across a reset', () => {
+        getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
+        const wrapper = Wrapper()
+        const resolvedHamburg = { label: 'Hamburg', value: 'Hamburg', id: 'x', lat: 53.5, lng: 10 }
+        wrapper.findComponent(LocationSelect).vm.$emit('input', resolvedHamburg)
+        wrapper
+          .findComponent(LocationPickerMap)
+          .vm.$emit('input', { label: 'Berlin', value: 'Berlin', lat: 52.5, lng: 13.4 })
+
+        wrapper.vm.resetForm()
+
+        expect(wrapper.vm.formData.locationName).toEqual(resolvedHamburg)
+      })
+
+      it('updates the value a later reset restores once a location change is actually saved', async () => {
+        options = { computed: { formSchema: () => ({}) } }
+        mocks.$apollo.mutate = jest.fn().mockResolvedValueOnce({
+          data: { UpdateUser: { id: 'u1' } },
+        })
+        getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
+        const wrapper = Wrapper()
+        wrapper.findComponent(LocationSelect).vm.$emit('input', {
+          label: 'Hamburg, Germany',
+          value: 'Hamburg, Germany',
+          id: 'x',
+        })
+        const pickedBerlin = { label: 'Berlin', value: 'Berlin', lat: 52.5, lng: 13.4 }
+        wrapper.findComponent(LocationPickerMap).vm.$emit('input', pickedBerlin)
+
+        wrapper.find('form').trigger('submit')
+        await flushPromises()
+        wrapper.vm.resetForm()
+
+        expect(wrapper.vm.formData.locationName).toEqual(pickedBerlin)
       })
     })
 

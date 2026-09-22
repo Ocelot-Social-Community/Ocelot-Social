@@ -153,6 +153,16 @@ export default {
       locationChangedByUser: false,
       ignoreNextLocationInput: false,
       savedLocationName: '',
+      // The actual value (not just its display string, see savedLocationName
+      // above) resetForm() below restores — starts as the same bare string
+      // formData.locationName does, but gets upgraded to the full resolved
+      // { label, value, lat, lng, ... } object as soon as one becomes
+      // available (LocationSelect's own mount-time auto-resolve, or a
+      // genuine pick that gets saved), so a reset can put it straight back
+      // without a fresh geocode round-trip — which would otherwise leave the
+      // map pin missing for a moment (no lat/lng on a bare string) until
+      // the resolve came back.
+      savedLocationValue: '',
     }
   },
   created() {
@@ -169,6 +179,7 @@ export default {
     this.formData.about = this.currentUser.about || ''
     this.formData.locationName = this.currentUser.locationName || ''
     this.savedLocationName = this.currentUser.locationName || ''
+    this.savedLocationValue = this.currentUser.locationName || ''
     // See GroupForm.vue's own ignoreNextLocationInput doc comment: the
     // auto-resolve only ever fires once, and only when there was already a
     // saved locationName to resolve.
@@ -292,6 +303,10 @@ export default {
       // value on its own, not a pick the user made.
       if (this.ignoreNextLocationInput) {
         this.ignoreNextLocationInput = false
+        // The bare string savedLocationValue started as (see its own doc
+        // comment) just became the real resolved object — capture it so a
+        // later reset can restore it directly, pin and all.
+        this.savedLocationValue = location
       } else {
         this.locationChangedByUser = true
       }
@@ -305,12 +320,17 @@ export default {
       this.formData.name = this.currentUser.name || ''
       this.formData.slug = this.currentUser.slug || ''
       this.formData.about = this.currentUser.about || ''
-      this.formData.locationName = this.currentUser.locationName || ''
-      // Writing formData.locationName back here can make LocationSelect
-      // re-resolve it (its own value watcher sees an external change, same
-      // as on mount) — suppress that echo the same way ignoreNextLocationInput
-      // already does for the mount-time case, or the reset would immediately
-      // re-mark the location as changed by the "user".
+      // savedLocationValue (not currentUser.locationName directly) — see
+      // its own doc comment: restoring the already-resolved object instead
+      // of a bare string keeps the map pin (which needs lat/lng) showing
+      // immediately, without a fresh geocode round-trip re-fetching what's
+      // already known.
+      this.formData.locationName = this.savedLocationValue
+      // Only relevant if savedLocationValue is still a bare string (e.g.
+      // resetting in the brief window before the mount-time auto-resolve
+      // above has completed) — an already-resolved object short-circuits
+      // LocationSelect's own value watcher before it gets anywhere near
+      // emitting an echo (see its own early-return for that shape).
       this.ignoreNextLocationInput = !!this.currentUser.locationName
       this.locationChangedByUser = false
       this.dirtyFields = {}
@@ -339,6 +359,9 @@ export default {
         return snapshot
       }, {})
       const submittedLocationName = this.formLocationName
+      // The full value (see savedLocationValue's own doc comment), snapshot
+      // the same way and for the same reason as submittedLocationName.
+      const submittedLocationValue = this.formData.locationName
 
       try {
         await this.$apollo.mutate({
@@ -367,6 +390,7 @@ export default {
         })
         if (this.formLocationName === submittedLocationName) {
           this.savedLocationName = submittedLocationName
+          this.savedLocationValue = submittedLocationValue
           this.locationChangedByUser = false
         }
       } catch (err) {
