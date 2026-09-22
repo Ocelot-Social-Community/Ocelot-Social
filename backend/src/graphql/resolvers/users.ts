@@ -27,8 +27,27 @@ import {
 
 import type { Context } from '@src/context'
 
-const visiblePostFilter =
-  'WHERE NOT related.disabled = true AND NOT related.deleted = true AND NOT (related)<-[:CANNOT_SEE]-(:User {id: $cypherParams.currentUserId})'
+// The post visibility rule for the profile-page counts, in the same shape postFilter.ts uses:
+// a post in a non-public group is out unless the VIEWER (not the profile owner) is an active
+// member, and your own posts always count for you.
+//
+// Written with the membership nested rather than hoisted into a parameter the way the feed
+// does it. These subqueries run over the posts of ONE profile, so the per-row lookup is
+// bounded by that person's output — the hoisting that matters over 20.000 posts buys nothing
+// over a few dozen, and it would cost this module a per-request query it does not otherwise
+// need.
+const visiblePostFilter = `WHERE NOT related.disabled = true AND NOT related.deleted = true
+  AND (
+    NOT EXISTS {
+      MATCH (related)-[:IN]->(g:Group)
+      WHERE NOT g.groupType = 'public'
+        AND NOT EXISTS {
+          MATCH (g)<-[membership:MEMBER_OF]-(:User {id: $cypherParams.currentUserId})
+          WHERE membership.role IN ['usual', 'admin', 'owner']
+        }
+    }
+    OR EXISTS { MATCH (related)<-[:WROTE]-(:User {id: $cypherParams.currentUserId}) }
+  )`
 
 export const getMutedUsers = async (context: Context) => {
   if (!context.user) {

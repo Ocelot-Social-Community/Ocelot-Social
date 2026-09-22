@@ -736,9 +736,13 @@ describe('resolvers/searches — typed entry points', () => {
 
   describe('searchPosts', () => {
     it('returns nothing to an anonymous caller', async () => {
-      // Post search is bound to the viewer — the query joins the viewer's MUTED and
-      // CANNOT_SEE edges to filter the result. With no viewer nothing matches, which is
-      // the fail-closed side: it must never fall through to an unfiltered post listing.
+      // Post search is bound to the viewer: the query hard-MATCHes the viewer to hang the
+      // mute check and the group visibility rule off. With no viewer nothing matches, which
+      // is the fail-closed side — it must never fall through to an unfiltered post listing.
+      //
+      // Losing the viewer binding entirely would now be serveable (the visibility rule works
+      // for an anonymous reader: public groups and groupless posts), but that is a product
+      // change, not a consequence of dropping the CANNOT_SEE edge, so the behaviour stands.
       authenticatedUser = null
 
       const { data, errors } = await query({

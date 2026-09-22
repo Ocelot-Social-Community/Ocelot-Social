@@ -375,29 +375,12 @@ export default {
             params,
           })
           const [group] = transactionResponse.records.map((record) => record.get('group'))
-          if (params.groupType && params.groupType !== previousGroupType) {
-            if (params.groupType === 'public') {
-              await transaction.run(
-                `
-                  MATCH (user:User)-[r:CANNOT_SEE]->(post:Post)-[:IN]->(group:Group {id: $groupId})
-                  DELETE r
-                `,
-                { groupId },
-              )
-            } else {
-              await transaction.run(
-                `
-                  MATCH (group:Group {id: $groupId})<-[:IN]-(post:Post)
-                  OPTIONAL MATCH (member:User)-[m:MEMBER_OF]->(group)
-                    WHERE m.role IN ['usual', 'admin', 'owner']
-                  WITH post, collect(member.id) AS memberIds
-                  MATCH (user:User) WHERE NOT user.id IN memberIds
-                  MERGE (user)-[:CANNOT_SEE]->(post)
-                `,
-                { groupId },
-              )
-            }
-          }
+          // Changing groupType used to rewrite the stored restrictions here: delete every
+          // CANNOT_SEE edge into the group on the way to `public`, and on the way back write
+          // one edge per (post × non-member) — a cartesian product in a single write
+          // transaction, 500.000 rows for a 100-post group on a 5.000-user instance.
+          // `SET group += $params` above is now the whole change; the visibility rule reads
+          // groupType at query time, so every post in the group flips with it, atomically.
           if (avatarInput) {
             await images(context.config).mergeImage(group, 'AVATAR_IMAGE', avatarInput, {
               transaction,
@@ -480,19 +463,11 @@ export default {
       const session = context.driver.session()
       try {
         return await session.writeTransaction(async (transaction) => {
-          let postRestrictionCypher: string
-          if (['usual', 'admin', 'owner'].includes(roleInGroup)) {
-            postRestrictionCypher = `
-              WITH group, member, membership
-              FOREACH (restriction IN [(member)-[r:CANNOT_SEE]->(:Post)-[:IN]->(group) | r] |
-                DELETE restriction)`
-          } else {
-            postRestrictionCypher = `
-              With group, member, membership
-              FOREACH (post IN [(p:Post)-[:IN]->(group) | p] |
-                MERGE (member)-[:CANNOT_SEE]->(post))`
-          }
-
+          // Setting `membership.role` is the whole operation now. It used to be followed by a
+          // FOREACH that deleted or created one CANNOT_SEE edge per post in the group — and
+          // the two branches disagreed: the demoting one had no author exception, so losing
+          // membership through a role change hid your own posts while LeaveGroup did not.
+          // Reading the rule from the membership removes the branch and the disagreement.
           const joinGroupCypher = `
             MATCH (member:User {id: $userId})
             MATCH (group:Group {id: $groupId})
@@ -504,7 +479,6 @@ export default {
             ON MATCH SET
               membership.updatedAt = toString(datetime()),
               membership.role = $roleInGroup
-            ${postRestrictionCypher}
             RETURN member {.*} as user, membership {.*}
           `
 
@@ -884,16 +858,14 @@ const removeUserFromGroupChatRoom = async (transaction, groupId, userId) => {
 
 const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId) => {
   return session.writeTransaction(async (transaction) => {
+    // Deleting the membership is the whole operation. The FOREACH that used to follow wrote
+    // one CANNOT_SEE edge per post in the group, skipping the ones this user wrote — that
+    // `NOT author.id = $userId` was the only place the author exception existed. It is part of
+    // the visibility rule itself now, so it applies to every way of losing membership instead
+    // of just this one.
     const removeUserFromGroupCypher = `
       MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
       DELETE membership
-      WITH user, group
-      OPTIONAL MATCH (author:User)-[:WROTE]->(p:Post)-[:IN]->(group)
-      WHERE NOT group.groupType = 'public'
-        AND NOT author.id = $userId
-      WITH user, collect(p) AS posts
-      FOREACH (post IN posts |
-        MERGE (user)-[:CANNOT_SEE]->(post))
       RETURN user {.*}, NULL as membership
     `
 

@@ -78,6 +78,13 @@ export default {
       const { driver } = context
       const session = driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        // No visibility backfill. Signing up used to walk every post in every non-public group
+        // and write a CANNOT_SEE edge to each — O(posts) writes inside the signup transaction,
+        // so the cost of registering grew with the age of the network. It was also racy: a post
+        // created in a closed group by a transaction that had not committed yet was invisible
+        // to this query, and this user was invisible to that one, so the post stayed readable
+        // for the new account. A new user simply holds no memberships, which is all the
+        // visibility rule needs to know.
         const createUserTransactionResponse = await transaction.run(
           `
             MATCH (email:EmailAddress {nonce: $nonce, email: $email})
@@ -93,13 +100,6 @@ export default {
             SET user.showShoutsPublicly = false
             SET user.locationName = $locationName
             SET email.verifiedAt = toString(datetime())
-            WITH user
-            OPTIONAL MATCH (post:Post)-[:IN]->(group:Group)
-              WHERE NOT group.groupType = 'public'
-            WITH user, collect(post) AS invisiblePosts
-            FOREACH (invisiblePost IN invisiblePosts |
-              MERGE (user)-[:CANNOT_SEE]->(invisiblePost)
-            )
             WITH user
             OPTIONAL MATCH (baselineRole:Role {id: 'user'})
             FOREACH (r IN CASE WHEN baselineRole IS NULL THEN [] ELSE [baselineRole] END |
