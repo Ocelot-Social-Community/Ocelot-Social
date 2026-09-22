@@ -30,7 +30,7 @@ export function validateBranding(config: BrandingConfig): string[] {
     }
   }
 
-  const { group, registration, comment, category, badges, metadata } = config
+  const { group, user, registration, comment, category, badges, metadata } = config
 
   atLeast('group.nameLengthMin', group.nameLengthMin, 0)
   atMost('group.nameLengthMin', group.nameLengthMin, 'group.nameLengthMax', group.nameLengthMax)
@@ -38,6 +38,9 @@ export function validateBranding(config: BrandingConfig): string[] {
   atLeast('group.descriptionExcerptLength', group.descriptionExcerptLength, 0)
   // At least one line, otherwise the collapsed preview shows nothing at all.
   atLeast('group.descriptionCollapsedLines', group.descriptionCollapsedLines, 1)
+
+  atLeast('user.nameLengthMin', user.nameLengthMin, 0)
+  atMost('user.nameLengthMin', user.nameLengthMin, 'user.nameLengthMax', user.nameLengthMax)
 
   atLeast('registration.nonceLength', registration.nonceLength, 1)
   atLeast('registration.inviteCodeLength', registration.inviteCodeLength, 1)

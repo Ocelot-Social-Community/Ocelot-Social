@@ -20,6 +20,7 @@ test('validateBranding collects ALL invariant violations, not just the first', (
       // 0 lines would collapse the group description preview to nothing at all
       descriptionCollapsedLines: 0,
     },
+    user: { ...brandingDefaults.user, nameLengthMin: 60, nameLengthMax: 50 },
     registration: { ...brandingDefaults.registration, nonceLength: 0 },
     comment: { ...brandingDefaults.comment, truncateToLength: 5000, maxUntruncatedLength: 1200 },
     category: { min: 5, max: 3 },
@@ -30,13 +31,14 @@ test('validateBranding collects ALL invariant violations, not just the first', (
     v.some((x) => x.includes('group.nameLengthMin (60) must be ≤ group.nameLengthMax (50)')),
   )
   assert.ok(v.some((x) => x.includes('group.descriptionCollapsedLines must be ≥ 1')))
+  assert.ok(v.some((x) => x.includes('user.nameLengthMin (60) must be ≤ user.nameLengthMax (50)')))
   assert.ok(v.some((x) => x.includes('registration.nonceLength must be ≥ 1')))
   assert.ok(
     v.some((x) => /comment\.truncateToLength .* must be ≤ comment\.maxUntruncatedLength/.test(x)),
   )
   assert.ok(v.some((x) => x.includes('category.min (5) must be ≤ category.max (3)')))
   assert.ok(v.some((x) => x.includes('metadata.applicationName must not be empty')))
-  assert.ok(v.length >= 5)
+  assert.ok(v.length >= 6)
 })
 
 test('defineBranding THROWS on a well-typed but invalid override, listing the problem(s)', () => {
@@ -46,8 +48,16 @@ test('defineBranding THROWS on a well-typed but invalid override, listing the pr
   )
 })
 
+test('defineBranding THROWS on an invalid user name length override, same as group', () => {
+  assert.throws(
+    () => defineBranding({ user: { nameLengthMin: 100 } }), // 100 > default max 50
+    /invalid branding config[\s\S]*nameLengthMin \(100\) must be ≤ user\.nameLengthMax \(50\)/,
+  )
+})
+
 test('defineBranding accepts valid overrides and the vanilla (empty) config', () => {
   assert.doesNotThrow(() => defineBranding({}))
   assert.doesNotThrow(() => defineBranding({ group: { nameLengthMax: 80 } }))
+  assert.doesNotThrow(() => defineBranding({ user: { nameLengthMax: 80 } }))
   assert.doesNotThrow(() => defineBranding({ category: { min: 0, max: 0 } })) // min ≤ max, both ≥ 0
 })
