@@ -80,6 +80,57 @@ const createLocation = async (session, mapboxData) => {
 // reverse-geocoding below.
 export const EVENT_REVERSE_GEOCODE_TYPES = ['address', 'poi', 'place']
 
+// A group's or a user's own location is deliberately coarser than an
+// event's exact pin — it resolves to the general neighborhood/locality/
+// place/region/country it was dropped in rather than a specific address.
+// 'neighborhood'/'locality' (most specific here) keep it from always
+// snapping to a city's single center point — it can still land on the
+// actual district it was pinned in. Both are listed since which one Mapbox
+// uses for a city's districts varies: German Stadtteile (Hamburg's
+// Ottensen, Berlin's Kreuzberg) come back under 'locality', not
+// 'neighborhood', verified directly against the API.
+export const NEIGHBORHOOD_REVERSE_GEOCODE_TYPES = [
+  'neighborhood',
+  'locality',
+  'place',
+  'region',
+  'country',
+]
+
+// Pulls lat/lng off params (so they never reach a plain `SET node += $params`
+// — neither Group nor User has lat/lng fields of its own, unlike Post) and
+// validates them, mirroring validateEventParams' own coordinate check.
+// Returns null when neither was given; throws when only one was, or either
+// is out of range. entityLabel only shapes the error messages (e.g. "Group
+// location requires…" / "User location requires…").
+export const extractCoordinates = (
+  params,
+  entityLabel: string,
+): { lat: number; lng: number } | null => {
+  const { lat, lng } = params
+  delete params.lat
+  delete params.lng
+  const hasLat = typeof lat === 'number'
+  const hasLng = typeof lng === 'number'
+  if (hasLat !== hasLng) {
+    throw new UserInputError(`${entityLabel} location requires both lat and lng, or neither!`)
+  }
+  if (!hasLat) {
+    return null
+  }
+  if (!Number.isFinite(lat) || lat < -90 || lat > 90) {
+    throw new UserInputError(
+      `${entityLabel} location latitude must be a finite number between -90 and 90!`,
+    )
+  }
+  if (!Number.isFinite(lng) || lng < -180 || lng > 180) {
+    throw new UserInputError(
+      `${entityLabel} location longitude must be a finite number between -180 and 180!`,
+    )
+  }
+  return { lat, lng }
+}
+
 const reverseGeocodeCoordinates = async (
   lat: number,
   lng: number,

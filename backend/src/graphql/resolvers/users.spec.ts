@@ -467,6 +467,80 @@ describe('UpdateUser', () => {
           })
         })
       })
+
+      // Same validation/reverse-geocoding path as Group's own — see groups.spec.ts's identical
+      // block — UpdateUser now extracts lat/lng from its own params the same way.
+      describe('location coordinates', () => {
+        it('rejects an out-of-range latitude', async () => {
+          const { errors } = await mutate({
+            mutation: UpdateUser,
+            variables: { ...variables, lat: 90.1, lng: 13.4 },
+          })
+
+          expect(errors?.[0]).toHaveProperty(
+            'message',
+            'User location latitude must be a finite number between -90 and 90!',
+          )
+        })
+
+        it('rejects an out-of-range longitude', async () => {
+          const { errors } = await mutate({
+            mutation: UpdateUser,
+            variables: { ...variables, lat: 52.5, lng: 200 },
+          })
+
+          expect(errors?.[0]).toHaveProperty(
+            'message',
+            'User location longitude must be a finite number between -180 and 180!',
+          )
+        })
+
+        it('rejects lat given without lng, instead of silently discarding it', async () => {
+          const { errors } = await mutate({
+            mutation: UpdateUser,
+            variables: { ...variables, lat: 52.5 },
+          })
+
+          expect(errors?.[0]).toHaveProperty(
+            'message',
+            'User location requires both lat and lng, or neither!',
+          )
+        })
+
+        it('rejects lng given without lat, instead of silently discarding it', async () => {
+          const { errors } = await mutate({
+            mutation: UpdateUser,
+            variables: { ...variables, lng: 13.4 },
+          })
+
+          expect(errors?.[0]).toHaveProperty(
+            'message',
+            'User location requires both lat and lng, or neither!',
+          )
+        })
+
+        it('accepts valid coordinates and resolves them to a location, without storing lat/lng on the user itself', async () => {
+          await expect(
+            mutate({
+              mutation: UpdateUser,
+              variables: {
+                ...variables,
+                locationName: 'Hamburg, Germany',
+                lat: 53.5511,
+                lng: 9.9937,
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              UpdateUser: {
+                id: 'u47',
+                location: expect.objectContaining({ id: expect.any(String) }),
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
     })
 
     it('publishes group membership visibility event when group visibility fields are updated', async () => {
