@@ -40,7 +40,6 @@
           :value="formData.locationName"
           :types="userLocationTypes"
           :canBeCleared="$policy.get('requireLocation') !== true"
-          :show-previous-location="false"
           @input="onLocationSelectInput"
         />
         <p

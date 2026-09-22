@@ -145,15 +145,6 @@ describe('GroupForm', () => {
     const pickViaSelect = (value) => wrapper.findComponent(LocationSelect).vm.$emit('input', value)
     const pickViaMap = (value) => wrapper.findComponent(LocationPickerMap).vm.$emit('input', value)
 
-    it('turns off LocationSelect\'s own built-in "previous value" caption', () => {
-      // That built-in caption only ever echoes the field's CURRENT value
-      // (see LocationSelect.vue), which isn't a useful comparison next to a
-      // select that's already showing its own current value — the hint
-      // below replaces it with a genuine previous-vs-current comparison.
-      wrapper = mountWith({ update: true, group: { ...group, locationName: 'Hamburg' } })
-      expect(wrapper.findComponent(LocationSelect).props('showPreviousLocation')).toBe(false)
-    })
-
     it('is null when creating a new group (nothing was ever saved yet)', () => {
       wrapper = mountWith({ update: false, group: {} })
       pickViaSelect('Berlin')

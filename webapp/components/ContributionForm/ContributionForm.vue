@@ -181,7 +181,6 @@
               <location-select
                 v-model="formData.eventLocationName"
                 types="country,region,postcode,district,place,locality,neighborhood,address,poi"
-                :show-previous-location="false"
                 :show-label="false"
                 :placeholder="$t('post.viewEvent.eventLocationName')"
                 :disabled="locationSelectDisabled"

@@ -139,7 +139,6 @@
         <location-select
           :value="formData.locationName"
           :types="groupLocationTypes"
-          :show-previous-location="false"
           @input="onLocationSelectInput"
         />
         <p

@@ -90,12 +90,7 @@
         />
 
         <!-- location -->
-        <location-select
-          v-if="locationRequired"
-          v-model="locationName"
-          :canBeCleared="false"
-          :showPreviousLocation="false"
-        />
+        <location-select v-if="locationRequired" v-model="locationName" :canBeCleared="false" />
 
         <div class="checkbox-group">
           <div class="checkbox-item">

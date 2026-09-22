@@ -556,17 +556,6 @@ describe('index.vue', () => {
     })
 
     describe('previousLocationName', () => {
-      // That built-in caption only ever echoes the field's CURRENT value
-      // (see LocationSelect.vue), which isn't a useful comparison next to a
-      // select that's already showing its own current value — the hint
-      // below replaces it with a genuine previous-vs-current comparison,
-      // same as GroupForm.vue's own identical setup.
-      it('turns off LocationSelect\'s own built-in "previous value" caption', () => {
-        getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
-        const wrapper = Wrapper()
-        expect(wrapper.findComponent(LocationSelect).props('showPreviousLocation')).toBe(false)
-      })
-
       it('is null right after mount, before the location has been touched at all', () => {
         getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
         const wrapper = Wrapper()
