@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.0.4](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.3...ui-v0.0.4) (2026-09-22)
+
+
+### Features
+
+* **other:** map for events ([#10025](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10025)) ([fe32632](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/fe3263264bb0a6e567615e4f3ac0eac6ca9c9921))
+* **other:** use validation hint component on group form ([#10259](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10259)) ([0b2e0f3](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/0b2e0f35209e545163fea5e92f04c89f741aa678))
+
+
+### Bug Fixes
+
+* **other:** update .tools-versions to node26 ([#10209](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10209)) ([08012fd](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/08012fdcfabcd2347c16c173073403fc4197616b))
+* **package/ui:** bump size-limit package ([#10207](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10207)) ([8445efb](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/8445efb0995e51deccb5041b9d3010b4b773fb1b))
+* **package/ui:** update eslint-config-it4c & dependencies ([#10074](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10074)) ([2f85dcf](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/2f85dcfc0ab6a1d5ffebc942e8f569be91bbdacb))
+
 ## [0.0.3](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.2...ui-v0.0.3) (2026-08-15)
 
 
