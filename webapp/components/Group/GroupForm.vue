@@ -146,7 +146,7 @@
           v-if="previousLocationName"
           class="ds-text ds-text-soft ds-text-size-small previous-location-hint"
         >
-          {{ $t('group.previousLocation', { location: previousLocationName }) }}
+          {{ $t('common.previousLocation', { location: previousLocationName }) }}
         </p>
         <location-picker-map
           :location="formData.locationName"
@@ -434,7 +434,7 @@ export default {
       if (!this.visibleErrors?.name) return null
       return !this.formData.name.trim()
         ? this.$t('group.validations.nameNotEmpty')
-        : this.$t('group.validations.nameLength', {
+        : this.$t('common.validations.nameLength', {
             min: this.formSchema.name.min,
             max: this.formSchema.name.max,
           })

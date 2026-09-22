@@ -211,7 +211,7 @@ describe('GroupForm', () => {
       pickViaSelect({ label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'place.hh' })
       pickViaSelect('Berlin')
       await wrapper.vm.$nextTick()
-      expect(wrapper.find('.previous-location-hint').text()).toBe('group.previousLocation')
+      expect(wrapper.find('.previous-location-hint').text()).toBe('common.previousLocation')
 
       pickViaSelect('Hamburg')
       await wrapper.vm.$nextTick()
@@ -655,7 +655,7 @@ describe('GroupForm', () => {
         nameInput.setValue('x')
         await wrapper.vm.$nextTick()
         wrapper.vm.touchField('name')
-        expect(wrapper.vm.nameErrorText).toBe('group.validations.nameLength')
+        expect(wrapper.vm.nameErrorText).toBe('common.validations.nameLength')
       })
     })
 

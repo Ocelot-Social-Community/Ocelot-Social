@@ -1,67 +1,126 @@
 <template>
-  <form class="settings-form" @submit.prevent="onSubmit" novalidate>
-    <os-card>
-      <h2 class="title">{{ $t('settings.data.name') }}</h2>
-      <ocelot-input
-        id="name"
-        model="name"
-        icon="user"
-        :label="
-          $policy.get('askForRealName') === true
-            ? $t('settings.data.realNamePlease')
-            : $t('settings.data.labelName')
-        "
-        :placeholder="$t('settings.data.namePlaceholder')"
-      />
-      <ocelot-input id="slug" model="slug" icon="at" :label="$t('settings.data.labelSlug')" />
-      <location-select
-        class="location-selet"
-        v-model="formData.locationName"
-        :canBeCleared="$policy.get('requireLocation') !== true"
-      />
-      <!-- eslint-enable vue/use-v-on-exact -->
-      <ocelot-input
-        id="about"
-        model="about"
-        type="textarea"
-        rows="3"
-        :label="$t('settings.data.labelBio')"
-        :placeholder="$t('settings.data.labelBio')"
-      />
-      <os-button
-        variant="primary"
-        appearance="filled"
-        type="submit"
-        :disabled="!!formErrors"
-        :loading="loadingData"
-      >
-        <template #icon><os-icon :icon="icons.check" /></template>
-        {{ $t('actions.save') }}
-      </os-button>
-    </os-card>
-  </form>
+  <div>
+    <form class="settings-form" @submit.prevent="onSubmit" novalidate>
+      <os-card>
+        <h2 class="title">{{ $t('settings.data.name') }}</h2>
+        <ocelot-input
+          id="name"
+          model="name"
+          icon="user"
+          hide-error
+          :label="
+            $policy.get('askForRealName') === true
+              ? $t('settings.data.realNamePlease')
+              : $t('settings.data.labelName')
+          "
+          :placeholder="$t('settings.data.namePlaceholder')"
+          @blur="dirtyFields.name && touchField('name')"
+        />
+        <os-validation-hint
+          :count="formData.name.length"
+          :min="branding.user.nameLengthMin"
+          :max="branding.user.nameLengthMax"
+          :variant="visibleErrors && visibleErrors.name ? 'error' : null"
+          :text="nameErrorText"
+        />
+        <ocelot-input
+          id="slug"
+          model="slug"
+          icon="at"
+          hide-error
+          :label="$t('settings.data.labelSlug')"
+          @blur="dirtyFields.slug && touchField('slug')"
+        />
+        <os-validation-hint
+          :variant="visibleErrors && visibleErrors.slug ? 'error' : null"
+          :text="visibleErrors && visibleErrors.slug"
+        />
+        <location-select
+          class="location-selet"
+          :value="formData.locationName"
+          :types="userLocationTypes"
+          :canBeCleared="$policy.get('requireLocation') !== true"
+          :show-previous-location="false"
+          @input="onLocationSelectInput"
+        />
+        <p
+          v-if="previousLocationName"
+          class="ds-text ds-text-soft ds-text-size-small previous-location-hint"
+        >
+          {{ $t('common.previousLocation', { location: previousLocationName }) }}
+        </p>
+        <location-picker-map
+          :location="formData.locationName"
+          precision="resolved"
+          :types="userLocationTypes"
+          marker-color-token="--color-map-marker-current-user"
+          @input="onLocationPickerMapInput"
+        />
+        <ocelot-input
+          id="about"
+          model="about"
+          type="textarea"
+          rows="3"
+          :label="$t('settings.data.labelBio')"
+          :placeholder="$t('settings.data.labelBio')"
+        />
+        <os-button
+          variant="primary"
+          appearance="filled"
+          type="submit"
+          :loading="loadingData"
+          :class="{ 'permission-denied': submitVisuallyDenied }"
+          :aria-disabled="canSubmit ? undefined : true"
+          v-tooltip="{
+            content: submitDeniedHint,
+          }"
+        >
+          <template #icon><os-icon :icon="icons.check" /></template>
+          {{ $t('actions.save') }}
+        </os-button>
+      </os-card>
+    </form>
+    <confirm-modal
+      v-if="showLeaveConfirmModal"
+      :modalData="leaveConfirmModalData"
+      @close="showLeaveConfirmModal = false"
+    />
+  </div>
 </template>
 
 <script>
-import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon, OsValidationHint } from '@ocelot-social/ui'
+import { branding } from '@ocelot-social/branding'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import UniqueSlugForm from '~/components/utils/UniqueSlugForm'
 import LocationSelect from '~/components/Select/LocationSelect'
+import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 import { updateUserMutation } from '~/graphql/User'
 import scrollToContent from './scroll-to-content.js'
 import formValidation from '~/mixins/formValidation'
+import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
+
+// Same coarse precision as GroupForm.vue's own location — deliberately as
+// imprecise as a group's, not an event's exact pin (see the backend's
+// NEIGHBORHOOD_REVERSE_GEOCODE_TYPES doc comment for the full reasoning).
+// Shared between the search box and the map below.
+const USER_LOCATION_TYPES = 'neighborhood,locality,place,region,country'
 
 export default {
-  mixins: [scrollToContent, formValidation],
+  mixins: [scrollToContent, formValidation, confirmLeaveIfUnsavedChanges],
   name: 'Settings',
   components: {
     OsButton,
     OsCard,
     OsIcon,
+    OsValidationHint,
     LocationSelect,
+    LocationPickerMap,
     OcelotInput,
+    ConfirmModal,
   },
   data() {
     return {
@@ -74,21 +133,47 @@ export default {
         about: '',
         locationName: '',
       },
+      // Exposed for the template (category/name-length hint below) — bare
+      // module-scope reads don't resolve there, unlike in the script.
+      branding,
+      // Same tracking GroupForm.vue uses for its own location field — see
+      // its doc comments for the full reasoning. Populated for real once
+      // currentUser is read in mounted() below.
+      locationChangedByUser: false,
+      ignoreNextLocationInput: false,
+      savedLocationName: '',
     }
   },
   created() {
     this.icons = iconRegistry
   },
   mounted() {
-    this.formData.name = this.currentUser.name
-    this.formData.slug = this.currentUser.slug
-    this.formData.about = this.currentUser.about
+    // The || '' fallbacks matter here in a way they didn't before: this used
+    // to only ever feed OcelotInput's own v-model, but formData.name is now
+    // also read by OsValidationHint's :count="formData.name.length" below —
+    // an undefined currentUser.name (e.g. still loading) would throw there
+    // instead of just rendering an empty field.
+    this.formData.name = this.currentUser.name || ''
+    this.formData.slug = this.currentUser.slug || ''
+    this.formData.about = this.currentUser.about || ''
     this.formData.locationName = this.currentUser.locationName || ''
+    this.savedLocationName = this.currentUser.locationName || ''
+    // See GroupForm.vue's own ignoreNextLocationInput doc comment: the
+    // auto-resolve only ever fires once, and only when there was already a
+    // saved locationName to resolve.
+    this.ignoreNextLocationInput = !!this.currentUser.locationName
+    window.addEventListener('beforeunload', this.onBeforeUnload)
+  },
+  beforeDestroy() {
+    window.removeEventListener('beforeunload', this.onBeforeUnload)
   },
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+    userLocationTypes() {
+      return USER_LOCATION_TYPES
+    },
     formSchema() {
       const uniqueSlugForm = UniqueSlugForm({
         apollo: this.$apollo,
@@ -97,23 +182,139 @@ export default {
       })
       return {
         locationName: { required: this.$policy.get('requireLocation') === true },
-        name: { required: true, min: 3 },
+        name: {
+          required: true,
+          min: branding.user.nameLengthMin,
+          max: branding.user.nameLengthMax,
+        },
         ...uniqueSlugForm.formSchema,
       }
+    },
+    // LocationSelect and LocationPickerMap both already resolve lat/lng
+    // (via forward/reverse geocoding) alongside the label when a search
+    // result or map pin is picked — a plain string here means the field
+    // still holds unresolved/typed text, no coordinates to send yet.
+    formLocationName() {
+      const isNestedValue =
+        typeof this.formData.locationName === 'object' &&
+        typeof this.formData.locationName.value === 'string'
+      const isDirectString = typeof this.formData.locationName === 'string'
+      return isNestedValue
+        ? this.formData.locationName.value
+        : isDirectString
+          ? this.formData.locationName
+          : ''
+    },
+    formLocationCoordinates() {
+      const locationValue = this.formData.locationName
+      const hasCoordinates =
+        typeof locationValue === 'object' &&
+        locationValue !== null &&
+        typeof locationValue.lat === 'number' &&
+        typeof locationValue.lng === 'number'
+      return hasCoordinates ? { lat: locationValue.lat, lng: locationValue.lng } : null
+    },
+    nameErrorText() {
+      if (!this.visibleErrors?.name) return null
+      return !this.formData.name.trim()
+        ? this.$t('settings.validation.nameNotEmpty')
+        : this.$t('common.validations.nameLength', {
+            min: this.formSchema.name.min,
+            max: this.formSchema.name.max,
+          })
+    },
+    // The previously saved location — shown as a small note next to the
+    // field, but only once the user has actually changed it to something
+    // else (so opening the page without touching the location shows
+    // nothing — locationChangedByUser guards against LocationSelect's own
+    // mount-time auto-resolve of the saved value otherwise counting as a
+    // change; see its own doc comment above).
+    previousLocationName() {
+      if (!this.locationChangedByUser) return null
+      const original = this.savedLocationName
+      if (!original || original === this.formLocationName) return null
+      return original
+    },
+    // Editing your own profile has no permission gate, unlike GroupForm's
+    // canCreateSelectedGroup / ContributionForm's canSubmit — kept as its
+    // own computed anyway so aria-disabled has the same shape as those two
+    // (only ever reflecting a genuine inability to submit, never "nothing
+    // changed" — see submitVisuallyDenied's own doc comment below).
+    canSubmit() {
+      return true
+    },
+    // Same grey-but-still-clickable treatment GroupForm.vue's/
+    // ContributionForm.vue's submit buttons use — not an actual :disabled,
+    // deliberately: hasUnsavedChanges() only tracks whether something was
+    // TOUCHED, not whether it truly differs from what's saved, so a gap in
+    // that tracking must never make a real save unreachable. Deliberately
+    // NOT reflected in aria-disabled (see the template) — the button
+    // genuinely still works when this is true, and telling assistive tech
+    // it's disabled would be actively wrong, not just cosmetically off.
+    submitVisuallyDenied() {
+      return !this.hasUnsavedChanges()
+    },
+    submitDeniedHint() {
+      if (!this.hasUnsavedChanges()) return this.$t('common.noChangesHint')
+      return ''
     },
   },
   methods: {
     ...mapMutations({
       setCurrentUser: 'auth/SET_USER',
     }),
+    // A method, not a computed — confirmLeaveIfUnsavedChanges (see its own
+    // doc comment) calls this exact name as a function on the page itself.
+    // Unlike GroupForm.vue/ContributionForm.vue, there's no separate child
+    // form component to delegate to here — this page IS the form.
+    hasUnsavedChanges() {
+      return Object.keys(this.dirtyFields).length > 0 || this.locationChangedByUser
+    },
+    onBeforeUnload(event) {
+      if (!this.hasUnsavedChanges()) return
+      // Browsers show their own fixed wording here for security reasons —
+      // setting returnValue (the legacy way to opt in) is what triggers it;
+      // the actual string is ignored by every modern browser.
+      event.preventDefault()
+      event.returnValue = ''
+    },
+    onLocationPickerMapInput(location) {
+      this.locationChangedByUser = true
+      this.formData.locationName = location
+    },
+    onLocationSelectInput(location) {
+      // See ignoreNextLocationInput's own doc comment (data()) — the first
+      // input after mount is LocationSelect normalizing the already-saved
+      // value on its own, not a pick the user made.
+      if (this.ignoreNextLocationInput) {
+        this.ignoreNextLocationInput = false
+      } else {
+        this.locationChangedByUser = true
+      }
+      this.formData.locationName = location
+    },
     onSubmit() {
-      this.formSubmit(this.submit)
+      this.formSubmit(this.submit, () => {
+        this.$toast.error(this.$t('common.validations.formHasErrors'))
+      })
     },
     async submit() {
       this.loadingData = true
       const { name, slug, about } = this.formData
-      let { locationName } = this.formData || this.currentUser
-      locationName = locationName && (locationName.label || locationName)
+
+      // Snapshot exactly what's being submitted — submit() to the mutation's
+      // resolution is a real network round-trip (not instantaneous), so the
+      // user may touch the form again while it's still in flight. Only clear
+      // a field's dirty status below if its value still matches what THIS
+      // submit actually sent — same fix as GroupForm.vue's/
+      // ContributionForm.vue's own submit(), see their comments for the full
+      // reasoning.
+      const submittedFieldValues = Object.keys(this.dirtyFields).reduce((snapshot, key) => {
+        snapshot[key] = JSON.stringify(this.formData[key])
+        return snapshot
+      }, {})
+      const submittedLocationName = this.formLocationName
+
       try {
         await this.$apollo.mutate({
           mutation: updateUserMutation(),
@@ -121,7 +322,9 @@ export default {
             id: this.currentUser.id,
             name,
             slug,
-            locationName,
+            locationName: this.formLocationName,
+            lat: this.formLocationCoordinates?.lat ?? null,
+            lng: this.formLocationCoordinates?.lng ?? null,
             about,
           },
           update: (store, { data: { UpdateUser } }) => {
@@ -132,6 +335,15 @@ export default {
           },
         })
         this.$toast.success(this.$t('settings.data.success'))
+        Object.keys(submittedFieldValues).forEach((key) => {
+          if (JSON.stringify(this.formData[key]) === submittedFieldValues[key]) {
+            this.$delete(this.dirtyFields, key)
+          }
+        })
+        if (this.formLocationName === submittedLocationName) {
+          this.savedLocationName = submittedLocationName
+          this.locationChangedByUser = false
+        }
       } catch (err) {
         this.$toast.error(err.message)
       } finally {
@@ -143,11 +355,78 @@ export default {
 </script>
 
 <style>
-.location-hint {
-  margin-top: calc(-1 * var(--space-x-small) - var(--space-xxx-small) - var(--space-xxx-small));
-}
+/* Same field-to-field spacing GroupForm.vue's own form uses. OsCard only
+   wraps its default slot in a .os-card__content div when a heroImage slot
+   is ALSO given (see OsCard.vue) — this page has none, so its fields land
+   directly inside .os-card itself, one level up from where ContributionForm
+   (which does use heroImage) targets the equivalent rule. */
+.settings-form > .os-card {
+  display: flex;
+  flex-direction: column;
 
-.location-selet {
-  margin-bottom: var(--space-small);
+  > .title {
+    margin: 0 0 var(--space-large) 0;
+  }
+
+  /* OcelotInput bundles its own label+input into one .ds-form-item, which
+     otherwise keeps its own default margin-bottom — zeroed here the same
+     way GroupForm.vue/ContributionForm.vue do, so the gap to the next
+     field comes only from the .os-validation-hint rule below (or, for
+     fields with none, this element's own margin-bottom set explicitly
+     further down). */
+  > .ds-form-item {
+    margin: 0;
+  }
+
+  > .os-validation-hint {
+    margin-bottom: var(--space-base);
+    cursor: default;
+  }
+
+  /* The slug field's own hint (unlike name's) renders NOTHING when there's
+     no error — OsValidationHint returns null with no text/count/variant to
+     show (see its own source) — so the rule above never applies there and
+     the field needs its own gap to the next one (the location label)
+     instead. */
+  > .ds-form-item:has(#slug) {
+    margin-bottom: var(--space-base);
+  }
+
+  > .location-selet {
+    margin-bottom: var(--space-small);
+  }
+
+  /* Flex siblings' margins don't collapse the way block ones do — without
+     this, .location-selet's own margin-bottom above and this element's own
+     margin-top would both apply and stack, on top of the hint's already
+     wanting to sit close to the field it's about. Zeroing .location-selet's
+     margin-bottom here lets this element's own (smaller) margin-top govern
+     the gap instead, only when the hint actually renders. */
+  > .location-selet:has(+ .previous-location-hint) {
+    margin-bottom: 0;
+  }
+
+  /* Tight to the field it's a note about, same as a validation hint would
+     be — overrides .ds-text's own sizeable default margin-bottom (1em),
+     which would otherwise push the map down further than intended. */
+  > .previous-location-hint {
+    margin-top: var(--space-xxx-small);
+    margin-bottom: var(--space-x-small);
+  }
+
+  /* No margin-top of its own — whatever precedes it (.location-selet
+     directly, or .previous-location-hint when shown) already provides the
+     lead-in gap via its own margin-bottom; adding one here would stack on
+     top of that, the same double-margin problem as above. */
+  > .location-picker-map {
+    margin-bottom: var(--space-base);
+  }
+
+  /* OsButton renders no semantic class of its own on the root (pure
+     Tailwind utility classes) — the type attribute is the stable hook. */
+  > button[type='submit'] {
+    align-self: flex-end;
+    margin-top: var(--space-base);
+  }
 }
 </style>

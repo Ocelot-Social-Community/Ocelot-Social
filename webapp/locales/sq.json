@@ -483,6 +483,7 @@
     "noChangesHint": "Ende nuk ka asgjë për të ruajtur.",
     "organization": "Organizatë ::: Organizata",
     "post": "Postim ::: Postime",
+    "previousLocation": "Vendndodhja e mëparshme: {location}",
     "project": "Projekt ::: Projekte",
     "reportContent": "Raporto",
     "shout": "Thirrje ::: Thirrje",
@@ -499,6 +500,7 @@
       "eventVenueNotEmpty": "Ju lutem shkruani një përshkrim të vendit.",
       "followableUrl": "duhet të jetë një adresë uebi ose e-mail e vlefshme",
       "formHasErrors": "Ju lutem plotësoni të gjitha fushat e detyrueshme.",
+      "nameLength": "Emri duhet të ketë midis {min} dhe {max} karaktere.",
       "titleLength": "Titulli duhet të ketë midis {min} dhe {max} karaktere.",
       "titleNotEmpty": "Ju lutem shkruani një titull."
     },
@@ -934,7 +936,6 @@
     "muted": "Grupi u hesht",
     "myGroups": "Grupet e mia",
     "name": "Emri i grupit",
-    "previousLocation": "Vendndodhja e mëparshme: {location}",
     "radius": "Rrezja",
     "removeMember": "Hiq anëtarin",
     "removeMemberButton": "Hiq",
@@ -975,7 +976,6 @@
       "descriptionLength": "Përshkrimi duhet të ketë të paktën {min} karaktere.",
       "descriptionNotEmpty": "Ju lutem shkruani një përshkrim.",
       "groupTypeRequired": "Ju lutem zgjidhni një lloj grupi.",
-      "nameLength": "Emri duhet të ketë midis {min} dhe {max} karaktere.",
       "nameNotEmpty": "Ju lutem shkruani një emër grupi.",
       "slugInvalidCharacters": "Lejohen vetëm shkronja të vogla, shifra, viza dhe nënvija.",
       "slugNotEmpty": "Ju lutem shkruani një emër unik grupi."
@@ -1679,6 +1679,7 @@
       "successDelete": "Rrjeti social u fshi. Profili i përdoruesit u përditësua!"
     },
     "validation": {
+      "nameNotEmpty": "Ju lutem fut emrin tënd.",
       "slug": {
         "alreadyTaken": "Ky emër përdoruesi është tashmë i zënë.",
         "regex": "Karakteret e lejuara janë vetëm shkronja të vogla, numra, nënviza dhe viza."

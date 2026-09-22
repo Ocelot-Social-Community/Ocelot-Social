@@ -483,6 +483,7 @@
     "noChangesHint": "Non c'è ancora nulla da salvare.",
     "organization": "Organizzazione ::: Organizzazioni",
     "post": "Messaggio ::: Messaggi",
+    "previousLocation": "Posizione precedente: {location}",
     "project": "Progetto ::: Progetti",
     "reportContent": "Segnala",
     "shout": "Grido ::: Gridi",
@@ -499,6 +500,7 @@
       "eventVenueNotEmpty": "Inserire una descrizione del luogo.",
       "followableUrl": "deve essere un indirizzo web o e-mail valido",
       "formHasErrors": "Si prega di compilare tutti i campi obbligatori.",
+      "nameLength": "Il nome deve essere compreso tra {min} e {max} caratteri.",
       "titleLength": "Il titolo deve essere compreso tra {min} e {max} caratteri.",
       "titleNotEmpty": "Inserire un titolo."
     },
@@ -934,7 +936,6 @@
     "muted": "Gruppo silenziato",
     "myGroups": "I miei gruppi",
     "name": "Nome del gruppo",
-    "previousLocation": "Posizione precedente: {location}",
     "radius": "Raggio",
     "removeMember": "Rimuovi membro",
     "removeMemberButton": "Rimuovi",
@@ -975,7 +976,6 @@
       "descriptionLength": "La descrizione deve contenere almeno {min} caratteri.",
       "descriptionNotEmpty": "Inserire una descrizione.",
       "groupTypeRequired": "Selezionare un tipo di gruppo.",
-      "nameLength": "Il nome deve essere compreso tra {min} e {max} caratteri.",
       "nameNotEmpty": "Inserire un nome del gruppo.",
       "slugInvalidCharacters": "Sono ammessi solo lettere minuscole, numeri, trattini e trattini bassi.",
       "slugNotEmpty": "Inserire un nome unico del gruppo."
@@ -1679,6 +1679,7 @@
       "successDelete": "Social media cancellati. Profilo utente aggiornato!"
     },
     "validation": {
+      "nameNotEmpty": "Per favore inserisci il tuo nome.",
       "slug": {
         "alreadyTaken": "Questo nome utente è già in uso.",
         "regex": "I caratteri consentiti sono solo lettere minuscole, numeri, trattini bassi e trattini."

@@ -483,6 +483,7 @@
     "noChangesHint": "Il n'y a encore rien à enregistrer.",
     "organization": "Organisation ::: Organisations",
     "post": "Message ::: Messages",
+    "previousLocation": "Emplacement précédent : {location}",
     "project": "Projet ::: Projets",
     "reportContent": "Signaler",
     "shout": "Partage ::: Partages",
@@ -499,6 +500,7 @@
       "eventVenueNotEmpty": "Veuillez saisir une description du lieu.",
       "followableUrl": "doit être une adresse web ou e-mail valide",
       "formHasErrors": "Veuillez remplir tous les champs obligatoires.",
+      "nameLength": "Le nom doit comporter entre {min} et {max} caractères.",
       "titleLength": "Le titre doit comporter entre {min} et {max} caractères.",
       "titleNotEmpty": "Veuillez saisir un titre."
     },
@@ -934,7 +936,6 @@
     "muted": "Groupe en sourdine",
     "myGroups": "Mes groupes",
     "name": "Nom du groupe",
-    "previousLocation": "Emplacement précédent : {location}",
     "radius": "Rayon",
     "removeMember": "Retirer le membre",
     "removeMemberButton": "Retirer",
@@ -975,7 +976,6 @@
       "descriptionLength": "La description doit comporter au moins {min} caractères.",
       "descriptionNotEmpty": "Veuillez saisir une description.",
       "groupTypeRequired": "Veuillez choisir un type de groupe.",
-      "nameLength": "Le nom doit comporter entre {min} et {max} caractères.",
       "nameNotEmpty": "Veuillez saisir un nom de groupe.",
       "slugInvalidCharacters": "Seuls les lettres minuscules, les chiffres, les tirets et les underscores sont autorisés.",
       "slugNotEmpty": "Veuillez saisir un nom de groupe unique."
@@ -1679,6 +1679,7 @@
       "successDelete": "Médias sociaux supprimé. Profil mis à jour !"
     },
     "validation": {
+      "nameNotEmpty": "Veuillez entrer ton nom.",
       "slug": {
         "alreadyTaken": "Ce nom d'utilisateur est déjà pris.",
         "regex": "Les caractères autorisés ne sont que les lettres minuscules, les chiffres, les traits de soulignement et les traits d'union."

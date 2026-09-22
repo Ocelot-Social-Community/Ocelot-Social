@@ -483,6 +483,7 @@
     "noChangesHint": "Es gibt noch nichts zu speichern.",
     "organization": "Organisation ::: Organisationen",
     "post": "Beitrag ::: Beiträge",
+    "previousLocation": "Vorheriger Ort: {location}",
     "project": "Projekt ::: Projekte",
     "reportContent": "Melden",
     "shout": "Empfehlung ::: Empfehlungen",
@@ -499,6 +500,7 @@
       "eventVenueNotEmpty": "Bitte eine Ortsbeschreibung eingeben.",
       "followableUrl": "muss eine gültige Web- oder E-Mail-Adresse sein",
       "formHasErrors": "Bitte alle Pflichtfelder ausfüllen.",
+      "nameLength": "Der Name muss zwischen {min} und {max} Zeichen lang sein.",
       "titleLength": "Der Titel muss zwischen {min} und {max} Zeichen lang sein.",
       "titleNotEmpty": "Bitte einen Titel eingeben."
     },
@@ -934,7 +936,6 @@
     "muted": "Gruppe stummgeschaltet",
     "myGroups": "Meine Gruppen",
     "name": "Gruppenname",
-    "previousLocation": "Vorheriger Ort: {location}",
     "radius": "Radius",
     "removeMember": "Mitglied aus der Gruppe entfernen?",
     "removeMemberButton": "Entfernen",
@@ -975,7 +976,6 @@
       "descriptionLength": "Die Beschreibung muss mindestens {min} Zeichen lang sein.",
       "descriptionNotEmpty": "Bitte eine Beschreibung eingeben.",
       "groupTypeRequired": "Bitte einen Gruppentyp wählen.",
-      "nameLength": "Der Name muss zwischen {min} und {max} Zeichen lang sein.",
       "nameNotEmpty": "Bitte einen Gruppennamen eingeben.",
       "slugInvalidCharacters": "Nur Kleinbuchstaben, Ziffern, Bindestriche und Unterstriche sind erlaubt.",
       "slugNotEmpty": "Bitte einen eindeutigen Gruppennamen eingeben."
@@ -1679,6 +1679,7 @@
       "successDelete": "Soziales Netzwerk entfernt. Profil wurde aktualisiert!"
     },
     "validation": {
+      "nameNotEmpty": "Bitte gib deinen Namen an.",
       "slug": {
         "alreadyTaken": "Dieser Nutzername ist schon vergeben.",
         "regex": "Es sind nur Kleinbuchstaben, Zahlen, Unterstriche oder Bindestriche erlaubt."

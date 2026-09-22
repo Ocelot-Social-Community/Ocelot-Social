@@ -483,6 +483,7 @@
     "noChangesHint": "Ainda não há nada para guardar.",
     "organization": "Organização ::: Organizações",
     "post": "Postagem ::: Postagens",
+    "previousLocation": "Localização anterior: {location}",
     "project": "Projeto ::: Projetos",
     "reportContent": "Denunciar",
     "shout": "Aclamação ::: Aclamações",
@@ -499,6 +500,7 @@
       "eventVenueNotEmpty": "Por favor, insira uma descrição do local.",
       "followableUrl": "deve ser um endereço web ou de e-mail válido",
       "formHasErrors": "Por favor, preencha todos os campos obrigatórios.",
+      "nameLength": "O nome deve ter entre {min} e {max} caracteres.",
       "titleLength": "O título deve ter entre {min} e {max} caracteres.",
       "titleNotEmpty": "Por favor, insira um título."
     },
@@ -934,7 +936,6 @@
     "muted": "Grupo silenciado",
     "myGroups": "Meus grupos",
     "name": "Nome do grupo",
-    "previousLocation": "Localização anterior: {location}",
     "radius": "Raio",
     "removeMember": "Remover membro",
     "removeMemberButton": "Remover",
@@ -975,7 +976,6 @@
       "descriptionLength": "A descrição deve ter pelo menos {min} caracteres.",
       "descriptionNotEmpty": "Por favor, insira uma descrição.",
       "groupTypeRequired": "Por favor, escolha um tipo de grupo.",
-      "nameLength": "O nome deve ter entre {min} e {max} caracteres.",
       "nameNotEmpty": "Por favor, insira um nome de grupo.",
       "slugInvalidCharacters": "Só são permitidas letras minúsculas, números, hífens e sublinhados.",
       "slugNotEmpty": "Por favor, insira um nome único de grupo."
@@ -1679,6 +1679,7 @@
       "successDelete": "Mídias sociais removidas. Perfil de usuário atualizado!"
     },
     "validation": {
+      "nameNotEmpty": "Por favor, insira seu nome.",
       "slug": {
         "alreadyTaken": "Este nome de usuário já está em uso.",
         "regex": "Caracteres permitidos são apenas letras minúsculas, números, sublinhados e hífens."

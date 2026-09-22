@@ -48,6 +48,7 @@ const OUTDOORS_STYLE_URL = 'mapbox://styles/mapbox/outdoors-v12?optimize=true'
 const MARKER_COLOR_FALLBACKS = {
   '--color-map-marker-event': 'rgb(119, 83, 235)',
   '--color-map-marker-group': 'rgb(248, 77, 77)',
+  '--color-map-marker-current-user': 'rgb(247, 150, 64)',
 }
 
 // Fallback label when reverse-geocoding finds no address for a clicked/dragged

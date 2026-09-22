@@ -483,6 +483,7 @@
     "noChangesHint": "Nie ma jeszcze nic do zapisania.",
     "organization": "Organizacja ::: Organizacje",
     "post": "Poczta ::: Posty",
+    "previousLocation": "Poprzednia lokalizacja: {location}",
     "project": "Projekt ::: Projekty",
     "reportContent": "Sprawozdanie",
     "shout": "przekazanie sprawy ::: Polecam tę stronę",
@@ -499,6 +500,7 @@
       "eventVenueNotEmpty": "Proszę podać opis miejsca.",
       "followableUrl": "musi być poprawnym adresem internetowym lub adresem e-mail",
       "formHasErrors": "Proszę wypełnić wszystkie wymagane pola.",
+      "nameLength": "Nazwa musi mieć od {min} do {max} znaków.",
       "titleLength": "Tytuł musi mieć od {min} do {max} znaków.",
       "titleNotEmpty": "Proszę podać tytuł."
     },
@@ -934,7 +936,6 @@
     "muted": "Grupa wyciszona",
     "myGroups": "Moje grupy",
     "name": "Nazwa grupy",
-    "previousLocation": "Poprzednia lokalizacja: {location}",
     "radius": "Zasięg",
     "removeMember": "Usuń członka",
     "removeMemberButton": "Usuń",
@@ -975,7 +976,6 @@
       "descriptionLength": "Opis musi mieć co najmniej {min} znaków.",
       "descriptionNotEmpty": "Proszę podać opis.",
       "groupTypeRequired": "Proszę wybrać typ grupy.",
-      "nameLength": "Nazwa musi mieć od {min} do {max} znaków.",
       "nameNotEmpty": "Proszę podać nazwę grupy.",
       "slugInvalidCharacters": "Dozwolone są tylko małe litery, cyfry, myślniki i podkreślenia.",
       "slugNotEmpty": "Proszę podać unikalną nazwę grupy."
@@ -1679,6 +1679,7 @@
       "successDelete": "Usunięto społeczność. Profil zaktualizowany!"
     },
     "validation": {
+      "nameNotEmpty": "Proszę podaj swoje imię.",
       "slug": {
         "alreadyTaken": "Ta nazwa użytkownika jest już zajęta.",
         "regex": "Dozwolone znaki to tylko małe litery, cyfry, podkreślenia i myślniki."
