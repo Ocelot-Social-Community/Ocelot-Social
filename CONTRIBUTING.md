@@ -34,6 +34,36 @@ Every pull request needs to:
 * pass all tests (linter, backend, webapp, code coverage, end-to-end)
 * be approved by at least 1 developer who is not the owner of the PR (when more than 10 files were changed it needs 2 approvals)
 
+## Releasing
+
+Releases are cut by [release-please](https://github.com/googleapis/release-please). Nobody picks a
+version number by hand and nobody runs a script; the pull request title **is** the release input.
+
+* **Pull request titles are the changelog.** Every pull request is squash merged, so its title
+  becomes the commit message release-please parses. `test.lint_pr.yml` already enforces the
+  Conventional Commits shape and the allowed scopes; what it cannot enforce is that the subject
+  describes the change well enough to stand on its own in the release notes.
+* **The type decides the version.** `feat` bumps the minor, everything else (`fix`, `refactor`,
+  `build`, `chore`, `ci`, `docs`, `perf`, `style`, `test`) bumps the patch, and a `!` after the type
+  or a `BREAKING CHANGE:` footer bumps the major.
+* **A release pull request is open more or less permanently**, titled `chore(release): vX.Y.Z`. It
+  accumulates every merged change and carries the version bump for `package.json` (root, `backend`,
+  `webapp`, `maintenance`, plus the matching lockfiles), both Helm `Chart.yaml` files and
+  `CHANGELOG.md`. Releasing means reviewing and merging it — that merge creates the `X.Y.Z` tag and
+  the GitHub release, and `publish.yml` then moves the `X.Y.Z`, `X.Y` and `X` container image tags
+  onto that commit's images and appends them to the release notes.
+* **Forcing a version** (a major without a breaking-change commit, or skipping ahead) is done with a
+  `Release-As` footer on any commit that lands on master, typically an empty one:
+
+  ```bash
+  git commit --allow-empty -m "chore(release): 4.0.0" -m "Release-As: 4.0.0"
+  ```
+
+The configuration lives in [`.github/release-please/`](./.github/release-please/README.md), which
+also explains why the application and the `packages/*` libraries each have their own config,
+manifest and workflow. `packages/ui` and `packages/branding` release independently of the
+application and of each other — their versions are unrelated to `X.Y.Z` above.
+
 ## Contribution Flow For Open Source Contributors
 
 See [contributing in main README.md](./README.md#contributing)

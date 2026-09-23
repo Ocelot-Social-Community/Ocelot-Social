@@ -1,11 +1,40 @@
 # release-please configuration
 
-One config/manifest pair **per released package**, not one shared pair for the monorepo:
+One config/manifest pair **per released thing**, not one shared pair for the monorepo:
 
-| Package               | Config                  | Manifest                  | Workflow                                                  |
-| --------------------- | ----------------------- | ------------------------- | --------------------------------------------------------- |
-| `packages/ui`         | `ui-config.json`        | `ui-manifest.json`        | [`ui-release.yml`](../workflows/ui-release.yml)             |
-| `packages/branding`   | `branding-config.json`  | `branding-manifest.json`  | [`branding-release.yml`](../workflows/branding-release.yml) |
+| Released thing        | Config                  | Manifest                  | Workflow                                                    |
+| --------------------- | ----------------------- | ------------------------- | ----------------------------------------------------------- |
+| the application (`.`) | `root-config.json`      | `root-manifest.json`      | [`publish.yml`](../workflows/publish.yml)                     |
+| `packages/ui`         | `ui-config.json`        | `ui-manifest.json`        | [`ui-release.yml`](../workflows/ui-release.yml)               |
+| `packages/branding`   | `branding-config.json`  | `branding-manifest.json`  | [`branding-release.yml`](../workflows/branding-release.yml)   |
+
+## The application is different from the packages
+
+Three things the root config does that a package config must not copy:
+
+- **`include-v-in-tag: false`.** The application's tags are `3.18.4`, not `v3.18.4`, and the branded
+  downstream repositories resolve container images by exactly that string. The packages tag
+  `ui-v0.0.4` and keep `true`.
+- **`pull-request-title-pattern: "chore(release): v${version}"`.** `release` is one of the scopes
+  [`test.lint_pr.yml`](../workflows/test.lint_pr.yml) allows; release-please's own default
+  (`chore(master): release …`) would be rejected by that check. No `${component}` here, because the
+  root has none — see "Adding a package" for why the packages need theirs.
+- **`changelog-sections` with every type `hidden: false`.** The hand-run `auto-changelog` listed
+  every merged pull request, dependency bumps and refactors included, and that is what the release
+  notes are read for. release-please hides `refactor`, `build`, `chore`, `ci`, `test` and `style` by
+  default, which would silently drop the ~60 % of entries that are dependency bumps. Sections are
+  matched by commit **type** only — release-please has no scope-based grouping, so `build(deps)` and
+  `build(deps-dev)` bundle together under "Build System & Dependencies".
+
+The root config deliberately does **not** set `exclude-paths`: a `feat(package/ui)` is shipped by the
+application, so it bumps the application's version and appears in its changelog, exactly as it did
+before the migration.
+
+Because the version is derived from the commits, the version tag and the GitHub release are created
+when the release pull request is merged — not by [`publish.yml`](../workflows/publish.yml) after the
+fact. That is why `release_created` is now the one answer to "is this commit a release?"; the old
+"the version tag does not exist yet" heuristic only worked while that workflow created the tag
+itself.
 
 ## Why they are split
 
@@ -28,7 +57,9 @@ overlap nor the shared tag/label state exists any more.
 
 1. Add `<name>-config.json` and `<name>-manifest.json` here, modelled on the existing pair. Package
    paths inside the config stay **repository-root relative** (`packages/<name>`) — that is also what
-   keys the action's outputs (`packages/<name>--release_created`).
+   keys the action's outputs (`packages/<name>--release_created`). The root path `.` is the one
+   exception: its outputs come back unprefixed (`release_created`), which is why `publish.yml` reads
+   them without a prefix.
 2. Keep `component-no-space: true` together with the
    `chore(package/${component}): release ${version}` title pattern: `${component}` renders bare only
    with that flag, and release-please needs the placeholder in the pattern to parse its own pull

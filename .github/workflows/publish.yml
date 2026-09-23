@@ -19,9 +19,10 @@ concurrency:
   queue: max
 
 # Read-only floor, so no job silently inherits the repository or organisation default. Write is
-# granted per job, to the ones that need it: `contents: write` for github_tag and github_release,
-# which create the git tags and the GitHub release with GITHUB_TOKEN, and `packages: write` for
-# docker_retag, which pushes the version tags to the registry. The repository dispatches in
+# granted per job, to the ones that need it: `contents: write` for github_tag and release_notes,
+# which create the build tag and edit the GitHub release with GITHUB_TOKEN, and `packages: write`
+# for docker_retag, which pushes the version tags to the registry. `release_please` needs none of
+# it — it works through the it4c-release-bot app token it mints itself. The repository dispatches in
 # build_trigger authenticate with OCELOT_PUBLISH_EVENT_PAT rather than GITHUB_TOKEN, so that job
 # needs no scope at all and says so with `permissions: {}`.
 permissions:
@@ -29,30 +30,85 @@ permissions:
 
 jobs:
   ##############################################################################
+  # JOB: RELEASE PLEASE ########################################################
+  ##############################################################################
+  # Owns the version. On a normal master push it only refreshes the open release pull request; on
+  # the push that merges that pull request it bumps every versioned file, writes CHANGELOG.md,
+  # creates the `<version>` git tag and cuts the GitHub release. `release_created` is therefore the
+  # single answer to "is this commit a release?" — it used to be inferred from the absence of the
+  # version tag, which only worked because the release job created that tag itself.
+  #
+  # Runs first in this workflow rather than in a file of its own (the packages each have one) so
+  # that the tag, the version image tags and the release notes are produced by one run, in order,
+  # with no cross-workflow race over who releases what.
+  release_please:
+    name: Release Please
+    runs-on: ubuntu-latest
+    outputs:
+      # For the root package (manifest path `.`) the action publishes its outputs unprefixed —
+      # `packages/branding--release_created` in branding-release.yml has no counterpart here.
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      # Mint a token from the it4c-release-bot GitHub App (vars.RELEASE_APP_ID +
+      # secrets.RELEASE_APP_PRIVATE_KEY) instead of the default GITHUB_TOKEN — a GITHUB_TOKEN-created
+      # release PR/tag does NOT trigger other workflows, so none of the CI checks would ever run on
+      # the release pull request. The app token lets them run. Same reasoning as in the package
+      # release workflows.
+      - name: Generate it4c-release-bot token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          # Narrow the minted token to what release-please actually does. Without these inputs the
+          # token inherits all the installation's permissions — the workflow-level `permissions:`
+          # block above governs GITHUB_TOKEN only and does not constrain this one.
+          #   contents      — commits, branches, tags and the GitHub release
+          #   pull-requests — the release pull request itself
+          #   issues        — its `autorelease: pending`/`tagged` labels; labelling a pull request
+          #                   goes through the issues API, so it is a separate scope
+          permission-contents: write
+          permission-pull-requests: write
+          permission-issues: write
+
+      - name: Release Please
+        id: release
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          # Scoped to the application at the repository root. `packages/*` have their own
+          # config/manifest pair and their own workflow — see .github/release-please/README.md. The
+          # root config does NOT exclude packages/**: a `feat(package/ui)` ships with the app, so it
+          # belongs in the app's changelog and bumps the app's version, exactly as the hand-written
+          # auto-changelog releases did.
+          config-file: .github/release-please/root-config.json
+          manifest-file: .github/release-please/root-manifest.json
+
+  ##############################################################################
   # JOB: GITHUB TAG LATEST VERSION #############################################
   ##############################################################################
   github_tag:
     name: Tag latest version on Github
     runs-on: ubuntu-latest
-    # Writes the per-commit build tag with GITHUB_TOKEN. `github_release` below needs the same
-    # scope for the release itself; `docker_retag` needs `packages: write` instead, and
-    # `build_trigger` needs nothing at all — its repository dispatches authenticate with
-    # OCELOT_PUBLISH_EVENT_PAT. Each job states its own, none inherits more than it uses.
+    # Writes the per-commit build tag with GITHUB_TOKEN. `release_notes` below needs the same scope
+    # to edit the release body; `docker_retag` needs `packages: write` instead, and `build_trigger`
+    # needs nothing at all — its repository dispatches authenticate with OCELOT_PUBLISH_EVENT_PAT.
+    # Each job states its own, none inherits more than it uses.
     permissions:
       contents: write
     outputs:
       version: ${{ steps.version.outputs.version }}
       build_tag: ${{ steps.version.outputs.build_tag }}
-      is_release: ${{ steps.version.outputs.is_release }}
     steps:
       - name: Checkout code
         # actions/checkout leaves GITHUB_TOKEN in the workspace's .git/config unless told not to,
         # and no step in this workflow runs an authenticated git operation: git-tag-action below
-        # reaches the API through `github.getOctokit(github_token)`, and auto-changelog in
-        # github_release only reads local state (`git config --get`, `git tag -l`, `git log`).
+        # reaches the API through `github.getOctokit(github_token)`, and release_notes talks to the
+        # releases API through `gh`.
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0 # Fetch full History for changelog
           persist-credentials: false
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -62,22 +118,15 @@ jobs:
         id: version
         run: |
           set -euo pipefail
+          # package.json, not the release_please output: this job runs on EVERY master push and the
+          # build tag has to exist for all of them. On a release commit the two agree by
+          # construction — release-please bumped package.json in that same commit.
           VERSION="$(node -p -e "require('./package.json').version")"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           # Matches what git-tag-action produces below: the `b` prefix plus version and build
           # number. Downstream consumers get one immutable identifier that names both the git tag
           # and the container image tag for this exact commit.
           echo "build_tag=b${VERSION}-${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
-          # Every master push runs this workflow, but only the release commit bumps the version in
-          # package.json. The version tag is created by the release job below and nowhere else, so
-          # its absence identifies the first commit carrying this version — the release commit.
-          # Without this distinction the retag job would move `3.18.4` onto every later master
-          # commit, which is the mutability the version tags exist to avoid.
-          if git rev-parse -q --verify "refs/tags/${VERSION}" > /dev/null; then
-            echo "is_release=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "is_release=true" >> "$GITHUB_OUTPUT"
-          fi
       - name: package-version-to-git-tag + build number
         uses: pkgdeps/git-tag-action@a5a161774bace8b4e1969dd850c67a7421f1b710 # v3.0.1
         with:
@@ -85,6 +134,9 @@ jobs:
           github_repo: ${{ github.repository }}
           version: ${{ steps.version.outputs.version }}-${{ github.run_number }}
           git_commit_sha: ${{ github.sha }}
+          # The `b` prefix is load-bearing now that release-please derives the version from the
+          # tags: `3.18.4-2267` parses as a prerelease of the root component and would join the
+          # release history, `b3.18.4-2267` is not a version and is ignored.
           git_tag_prefix: "b"
 
   ##############################################################################
@@ -97,7 +149,7 @@ jobs:
   docker_retag:
     name: Tag container images
     runs-on: ubuntu-latest
-    needs: [github_tag]
+    needs: [release_please, github_tag]
     permissions:
       contents: read
       packages: write
@@ -105,7 +157,9 @@ jobs:
       REGISTRY: ghcr.io
       VERSION: ${{ needs.github_tag.outputs.version }}
       BUILD_TAG: ${{ needs.github_tag.outputs.build_tag }}
-      IS_RELEASE: ${{ needs.github_tag.outputs.is_release }}
+      IS_RELEASE: ${{ needs.release_please.outputs.release_created }}
+      # Empty on every push that is not a release. Only used to cross-check VERSION below.
+      RELEASE_VERSION: ${{ needs.release_please.outputs.version }}
       # `docker-push` and this workflow are triggered by the same push and run concurrently, with
       # no way to express a dependency across workflows. Waiting for the source manifest to appear
       # is that dependency. The budget covers a cold cache on the slowest image; exceeding it is a
@@ -129,9 +183,19 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Two sources say what this release is called: the tag release-please created, and the
+          # version it wrote into package.json through the config's `extra-files`. They can only
+          # disagree if that file list stops matching reality — and the failure would be silent:
+          # images tagged with the old version while the git tag carries the new one, which is
+          # exactly what the branded downstream repositories resolve by.
+          if [ "${IS_RELEASE}" = 'true' ] && [ "${RELEASE_VERSION}" != "${VERSION}" ]; then
+            echo "::error::release-please released ${RELEASE_VERSION} but package.json says ${VERSION} — check extra-files in .github/release-please/root-config.json"
+            exit 1
+          fi
+
           # GITHUB_REPOSITORY and GITHUB_SHA rather than the matching Actions expressions: an
           # expression is substituted into the script text, the runner defaults arrive as data. Same
-          # reason as in the changelog step of github_release, applied uniformly so the rule does
+          # reason as in the release notes step of release_notes, applied uniformly so the rule does
           # not read as if these two were exceptions.
           #
           # GITHUB_REPOSITORY keeps the owner's capitalisation, registry paths are lowercase only.
@@ -155,7 +219,10 @@ jobs:
             done
 
             # The build tag is unique per commit and therefore always safe to apply. The version
-            # tags are only moved on the release commit — see is_release above.
+            # tags are only moved on the release commit — that is what IS_RELEASE, fed by
+            # release-please's `release_created`, decides. Without the distinction this would move
+            # `3.18.4` onto every later master commit, which is the mutability the version tags
+            # exist to avoid.
             TAGS=(--tag "${IMAGE}:${BUILD_TAG}")
             if [ "${IS_RELEASE}" = 'true' ]; then
               TAGS+=(--tag "${IMAGE}:${VERSION}" --tag "${IMAGE}:${MINOR}" --tag "${IMAGE}:${MAJOR}")
@@ -168,45 +235,54 @@ jobs:
   ##############################################################################
   # JOB: CUT THE GITHUB RELEASE ################################################
   ##############################################################################
-  # Runs after docker_retag so the image tags quoted in the release notes exist by the time anyone
-  # can read them.
-  github_release:
-    name: Create Github release
+  # The release itself is created by release_please, with the changelog entry it generated as the
+  # body — that is the whole point of the migration, so nothing here re-derives release notes.
+  # What is appended is the one thing release-please cannot know: which container image tags this
+  # release is published under. It runs after docker_retag so those tags exist by the time anyone
+  # can read about them.
+  #
+  # Appending rather than composing the whole body is also why the release is not created as a
+  # draft and published here instead: a draft release carries a tag NAME but no git ref, so the
+  # `<version>` tag — which the branded downstream repositories resolve images by — would not exist
+  # until someone pressed publish.
+  release_notes:
+    name: Append image tags to the release
     runs-on: ubuntu-latest
-    needs: [github_tag, docker_retag]
-    if: needs.github_tag.outputs.is_release == 'true'
+    needs: [release_please, github_tag, docker_retag]
+    if: needs.release_please.outputs.release_created == 'true'
     permissions:
       contents: write
     env:
       REGISTRY: ghcr.io
-      VERSION: ${{ needs.github_tag.outputs.version }}
+      VERSION: ${{ needs.release_please.outputs.version }}
+      TAG_NAME: ${{ needs.release_please.outputs.tag_name }}
       BUILD_TAG: ${{ needs.github_tag.outputs.build_tag }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
     steps:
+      # Only .github/images.json is read here, and nothing in the checkout is executed.
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0 # Fetch full History for changelog
           persist-credentials: false
-      - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version-file: '.nvmrc'
+          sparse-checkout: .github/images.json
+          sparse-checkout-cone-mode: false
       # `"${VERSION}"` and not `${{ env.VERSION }}`: an expression is pasted into the script text
-      # before the shell starts, so the version string from package.json would be parsed as shell
-      # source. It reaches here through a merged pull request, which is review-gated but not a
-      # trust boundary. Reading it from the environment hands it over as data.
-      - name: Generate changelog
-        run: |
-          npm ci
-          # `--no`: use only the locked local binary, never a registry fetch (see scripts/release.sh).
-          npx --no -- auto-changelog --latest-version "${VERSION}" --unreleased-only
-      - name: Compose release notes
+      # before the shell starts, so the version string would be parsed as shell source. It reaches
+      # here through a merged pull request, which is review-gated but not a trust boundary. Reading
+      # it from the environment hands it over as data.
+      - name: Append container image tags to the release notes
         run: |
           set -euo pipefail
 
           REPOSITORY="$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')"
           MAJOR="${VERSION%%.*}"
           MINOR="${VERSION%.*}"
+
+          # Read the body back rather than keeping a copy of it: release-please owns that text, and
+          # `gh release edit --notes-file` replaces the body wholesale, so the existing notes have
+          # to be carried through the edit.
+          gh release view "${TAG_NAME}" --json body --jq .body > notes.md
 
           # The images themselves are not attached as release assets: a release asset is not a
           # registry, so a `docker save` tarball could not be pulled, would share no layers with
@@ -225,16 +301,9 @@ jobs:
               '.[] | select(.release) | "docker pull \($registry)/\(.name):\($version)"' \
               .github/images.json
             echo '```'
-          } >> CHANGELOG.md
-      - name: package-version-to-git-release
-        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ env.VERSION }}
-          name: ${{ env.VERSION }}
-          body_path: ./CHANGELOG.md
-          draft: false
-          prerelease: false
+          } >> notes.md
+
+          gh release edit "${TAG_NAME}" --notes-file notes.md
 
   build_trigger:
     name: Trigger successful build

@@ -33,8 +33,7 @@
     "docs:build": "NODE_OPTIONS=--openssl-legacy-provider vuepress build .",
     "docs:dev": "NODE_OPTIONS=--openssl-legacy-provider vuepress dev .",
     "cypress:run": "cypress run --e2e --browser ${CYPRESS_BROWSER:-chrome} --config-file ./cypress/cypress.config.js",
-    "cypress:open": "cypress open --e2e --browser ${CYPRESS_BROWSER:-chrome} --config-file ./cypress/cypress.config.js",
-    "release": "./scripts/release.sh"
+    "cypress:open": "cypress open --e2e --browser ${CYPRESS_BROWSER:-chrome} --config-file ./cypress/cypress.config.js"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
@@ -44,7 +43,6 @@
     "@cucumber/cucumber": "13.2.1",
     "@cypress/webpack-preprocessor": "^8.0.0",
     "@vuepress/bundler-vite": "2.0.0-rc.18",
-    "auto-changelog": "^2.6.1",
     "cypress": "^16.1.0",
     "cypress-network-idle": "^2.0.1",
     "date-fns": "^3.6.0",
