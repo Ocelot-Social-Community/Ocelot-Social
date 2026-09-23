@@ -8,9 +8,26 @@ One config/manifest pair **per released thing**, not one shared pair for the mon
 | `packages/ui`         | `ui-config.json`        | `ui-manifest.json`        | [`ui-release.yml`](../workflows/ui-release.yml)               |
 | `packages/branding`   | `branding-config.json`  | `branding-manifest.json`  | [`branding-release.yml`](../workflows/branding-release.yml)   |
 
+## `changelog-sections`: the same list in all three configs
+
+Every config carries the identical twelve-entry `changelog-sections` array, each one explicitly
+`hidden: false`. release-please's defaults hide `refactor`, `build`, `chore`, `ci`, `test` and
+`style`, and hiding those is not an option here: the hand-run `auto-changelog` listed every merged
+pull request, dependency bumps and refactors included, and that is what these notes are read for.
+The defaults would drop about 60 % of the application's entries — and far more of a package's.
+`ui-v0.0.4` published 5 of the 42 commits that went into it; 34 of the 37 missing ones were its own
+dependency bumps.
+
+Sections are matched by commit **type** only — release-please has no scope-based grouping, so
+`build(deps)` and `build(deps-dev)` bundle together under "Build System & Dependencies" rather than
+forming a "Dependencies" section of their own.
+
+There is no include mechanism for these config files: release-please reads each one whole from the
+repository, so the list is duplicated by necessity. **When you change one, change all three.**
+
 ## The application is different from the packages
 
-Three things the root config does that a package config must not copy:
+Two things the root config does that a package config must not copy:
 
 - **`include-v-in-tag: false`.** The application's tags are `3.18.4`, not `v3.18.4`, and the branded
   downstream repositories resolve container images by exactly that string. The packages tag
@@ -19,16 +36,12 @@ Three things the root config does that a package config must not copy:
   [`test.lint_pr.yml`](../workflows/test.lint_pr.yml) allows; release-please's own default
   (`chore(master): release …`) would be rejected by that check. No `${component}` here, because the
   root has none — see "Adding a package" for why the packages need theirs.
-- **`changelog-sections` with every type `hidden: false`.** The hand-run `auto-changelog` listed
-  every merged pull request, dependency bumps and refactors included, and that is what the release
-  notes are read for. release-please hides `refactor`, `build`, `chore`, `ci`, `test` and `style` by
-  default, which would silently drop the ~60 % of entries that are dependency bumps. Sections are
-  matched by commit **type** only — release-please has no scope-based grouping, so `build(deps)` and
-  `build(deps-dev)` bundle together under "Build System & Dependencies".
 
 The root config deliberately does **not** set `exclude-paths`: a `feat(package/ui)` is shipped by the
 application, so it bumps the application's version and appears in its changelog, exactly as it did
-before the migration.
+before the migration. The packages are the other way round — release-please only ever sees the
+commits that touched files under their own path, which is why turning `build` on for `packages/ui`
+lists ui's dependency bumps and not the backend's.
 
 Because the version is derived from the commits, the version tag and the GitHub release are created
 when the release pull request is merged — not by [`publish.yml`](../workflows/publish.yml) after the
@@ -68,5 +81,8 @@ overlap nor the shared tag/label state exists any more.
    top level too and inherits it into every package, but the config schema declares it per-package
    only — a top-level one is honoured at runtime and flagged by any editor or tool validating
    against `$schema`.
-3. Give the package its own release workflow whose `on: push: paths` lists `packages/<name>/**` plus
+3. Copy the `changelog-sections` array verbatim from an existing config — see the section above for
+   why it is duplicated rather than shared, and why leaving it out is not the neutral choice it
+   looks like.
+4. Give the package its own release workflow whose `on: push: paths` lists `packages/<name>/**` plus
    only that package's two files here. Never list another package's files, and never share a config.
