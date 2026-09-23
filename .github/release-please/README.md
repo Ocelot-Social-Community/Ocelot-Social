@@ -62,7 +62,11 @@ overlap nor the shared tag/label state exists any more.
    them without a prefix.
 2. Keep `component-no-space: true` together with the
    `chore(package/${component}): release ${version}` title pattern: `${component}` renders bare only
-   with that flag, and release-please needs the placeholder in the pattern to parse its own pull
-   request titles back.
+   with that flag (without it the title becomes `chore(package/ ui): release 0.0.5`), and
+   release-please needs the placeholder in the pattern to parse its own pull request titles back.
+   It belongs **inside the package's block**, next to `component`. release-please reads it from the
+   top level too and inherits it into every package, but the config schema declares it per-package
+   only — a top-level one is honoured at runtime and flagged by any editor or tool validating
+   against `$schema`.
 3. Give the package its own release workflow whose `on: push: paths` lists `packages/<name>/**` plus
    only that package's two files here. Never list another package's files, and never share a config.

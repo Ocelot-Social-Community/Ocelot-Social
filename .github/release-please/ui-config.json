@@ -10,11 +10,11 @@
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "draft": false,
-      "prerelease": false
+      "prerelease": false,
+      "component-no-space": true
     }
   },
   "separate-pull-requests": true,
   "pull-request-title-pattern": "chore(package/${component}): release ${version}",
-  "component-no-space": true,
   "include-v-in-tag": true
 }
