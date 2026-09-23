@@ -923,36 +923,23 @@ export default {
           Track && participant.isScreenShareEnabled
             ? findVideoPub(participant, Track.Source.ScreenShare)
             : null
-        if (!cameraPub && !screenPub) {
-          // No active video — always render an audio-only tile so the avatar
-          // fallback shows, even when the user is alone in the room with
-          // camera and mic both turned off.
-          tiles.push({
-            key: `${participant.identity}/audio`,
-            identity: participant.identity,
-            name: participant.name || participant.identity,
-            profile,
-            videoTrack: null,
-            audioTrack,
-            isLocal,
-            isScreen: false,
-            micEnabled,
-          })
-          return
-        }
-        if (cameraPub) {
-          tiles.push({
-            key: `${participant.identity}/cam`,
-            identity: participant.identity,
-            name: participant.name || participant.identity,
-            profile,
-            videoTrack: cameraPub.track,
-            audioTrack,
-            isLocal,
-            isScreen: false,
-            micEnabled,
-          })
-        }
+        // Camera and mic share a single tile/key regardless of whether the camera is
+        // currently on — the avatar fallback covers the no-video case. Giving the
+        // no-video and camera-on states different keys used to force Vue to destroy
+        // and recreate the tile (and with it the <audio> element) on every camera
+        // toggle, which could leave the participant silent until the next toggle
+        // happened to re-attach successfully.
+        tiles.push({
+          key: `${participant.identity}/main`,
+          identity: participant.identity,
+          name: participant.name || participant.identity,
+          profile,
+          videoTrack: cameraPub ? cameraPub.track : null,
+          audioTrack,
+          isLocal,
+          isScreen: false,
+          micEnabled,
+        })
         if (screenPub) {
           tiles.push({
             key: `${participant.identity}/screen`,
