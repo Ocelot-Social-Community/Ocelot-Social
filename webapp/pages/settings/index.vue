@@ -353,8 +353,14 @@ export default {
       // resetting in the brief window before the mount-time auto-resolve
       // above has completed) — an already-resolved object short-circuits
       // LocationSelect's own value watcher before it gets anywhere near
-      // emitting an echo (see its own early-return for that shape).
-      this.ignoreNextLocationInput = !!this.currentUser.locationName
+      // emitting an echo (see its own early-return for that shape). Checking
+      // currentUser.locationName here instead would arm this even when
+      // savedLocationValue is already a resolved object (the common case,
+      // once the mount-time auto-resolve has run) — with no echo ever
+      // coming to consume the flag, it would stay armed and wrongly swallow
+      // the user's next genuine pick as if it were another auto-resolve.
+      this.ignoreNextLocationInput =
+        typeof this.savedLocationValue === 'string' && !!this.savedLocationValue
       this.locationChangedByUser = false
       this.dirtyFields = {}
       this.touchedFields = {}

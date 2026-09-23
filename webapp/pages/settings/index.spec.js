@@ -550,6 +550,35 @@ describe('index.vue', () => {
         expect(wrapper.vm.formData.locationName).toEqual(resolvedHamburg)
       })
 
+      // The actual bug this guards against: arming ignoreNextLocationInput
+      // off currentUser.locationName (rather than savedLocationValue's own
+      // type) would stay armed after a reset once savedLocationValue is
+      // already a resolved object — no echo ever comes to consume it, so it
+      // would wrongly swallow the very next genuine pick as if it were
+      // another auto-resolve, leaving hasUnsavedChanges() stuck at false.
+      it('recognizes a genuine pick right after a reset, once the location is already a resolved object', () => {
+        getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
+        const wrapper = Wrapper()
+        // Mount-time auto-resolve — upgrades the bare string to a resolved
+        // object, consuming ignoreNextLocationInput.
+        wrapper.findComponent(LocationSelect).vm.$emit('input', {
+          label: 'Hamburg, Germany',
+          value: 'Hamburg, Germany',
+          id: 'x',
+        })
+
+        wrapper.vm.resetForm()
+
+        // A real new pick, right after the reset.
+        wrapper.findComponent(LocationSelect).vm.$emit('input', {
+          label: 'Berlin',
+          value: 'Berlin',
+          id: 'y',
+        })
+
+        expect(wrapper.vm.hasUnsavedChanges()).toBe(true)
+      })
+
       it('updates the value a later reset restores once a location change is actually saved', async () => {
         options = { computed: { formSchema: () => ({}) } }
         mocks.$apollo.mutate = jest.fn().mockResolvedValueOnce({
