@@ -487,6 +487,7 @@
     "previousLocation": "Emplacement précédent : {location}",
     "project": "Projet ::: Projets",
     "reportContent": "Signaler",
+    "scrollToLocationMap": "Faire défiler jusqu’à la carte",
     "shout": "Partage ::: Partages",
     "tag": "Tag ::: Tags",
     "takeAction": "Passer à l'action",
@@ -951,7 +952,6 @@
       "usual": "Membre"
     },
     "save": "Créer un nouveau groupe",
-    "scrollToLocationMap": "Faire défiler jusqu’à la carte",
     "showMembers": "Liste des membres visible par tous",
     "teaser": {
       "openGroup": "Ouvrir le groupe",

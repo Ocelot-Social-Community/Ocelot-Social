@@ -1695,6 +1695,58 @@ describe('map', () => {
       })
     })
 
+    describe('openInitialUserPopup', () => {
+      const userFeature = {
+        geometry: { coordinates: [13.4, 52.5] },
+        properties: {
+          type: 'user',
+          slug: 'jenny-rostock',
+          id: 'u1',
+          name: 'Jenny Rostock',
+          locationName: 'Berlin',
+          description: '',
+        },
+      }
+      const theUserFeature = {
+        ...userFeature,
+        properties: { ...userFeature.properties, type: 'theUser', id: 'u2' },
+      }
+
+      it('does nothing without an initialUserId', () => {
+        wrapper.vm.markers.geoJSON = [userFeature]
+        wrapper.vm.openInitialUserPopup()
+        expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
+      })
+
+      it('does nothing when no user matches the deep-linked id', () => {
+        mocks.$route = { path: '/map', query: { userId: 'does-not-exist' } }
+        const w = createWrapper()
+        w.vm.markers.geoJSON = [userFeature]
+        w.vm.openInitialUserPopup()
+        expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
+      })
+
+      it('opens the popup for a matching "user" feature (someone else\'s profile)', () => {
+        mocks.$route = { path: '/map', query: { userId: 'u1' } }
+        const w = createWrapper()
+        w.vm.onMapLoad({ map: mapMock })
+        w.vm.markers.geoJSON = [userFeature]
+        w.vm.openInitialUserPopup()
+        expect(mapboxgl.__popupInstance.setLngLat).toHaveBeenCalledWith([13.4, 52.5])
+        expect(mapboxgl.__popupInstance.setDOMContent).toHaveBeenCalled()
+        expect(mapboxgl.__popupInstance.addTo).toHaveBeenCalledWith(mapMock)
+      })
+
+      it('opens the popup for a matching "theUser" feature (own profile)', () => {
+        mocks.$route = { path: '/map', query: { userId: 'u2' } }
+        const w = createWrapper()
+        w.vm.onMapLoad({ map: mapMock })
+        w.vm.markers.geoJSON = [theUserFeature]
+        w.vm.openInitialUserPopup()
+        expect(mapboxgl.__popupInstance.setLngLat).toHaveBeenCalledWith([13.4, 52.5])
+      })
+    })
+
     describe('syncPopupWithCurrentData (e.g. toggling "show past events")', () => {
       const eventFeature = {
         geometry: { coordinates: [9.17702, 48.78232] },

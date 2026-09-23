@@ -487,6 +487,7 @@
     "previousLocation": "Posizione precedente: {location}",
     "project": "Progetto ::: Progetti",
     "reportContent": "Segnala",
+    "scrollToLocationMap": "Scorri fino alla mappa",
     "shout": "Grido ::: Gridi",
     "tag": "Tag ::: Tag",
     "takeAction": "Agire",
@@ -951,7 +952,6 @@
       "usual": "Membro"
     },
     "save": "Crea nuovo gruppo",
-    "scrollToLocationMap": "Scorri fino alla mappa",
     "showMembers": "Elenco membri visibile a tutti",
     "teaser": {
       "openGroup": "Apri gruppo",

@@ -487,6 +487,7 @@
     "previousLocation": "Poprzednia lokalizacja: {location}",
     "project": "Projekt ::: Projekty",
     "reportContent": "Sprawozdanie",
+    "scrollToLocationMap": "Przewiń do mapy",
     "shout": "przekazanie sprawy ::: Polecam tę stronę",
     "tag": "Znacznik ::: Znaczniki",
     "takeAction": "Podejmij działania",
@@ -951,7 +952,6 @@
       "usual": "Członek"
     },
     "save": "Utwórz nową grupę",
-    "scrollToLocationMap": "Przewiń do mapy",
     "showMembers": "Lista członków widoczna dla wszystkich",
     "teaser": {
       "openGroup": "Otwórz grupę",

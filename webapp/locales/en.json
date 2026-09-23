@@ -487,6 +487,7 @@
     "previousLocation": "Previous location: {location}",
     "project": "Project ::: Projects",
     "reportContent": "Report",
+    "scrollToLocationMap": "Scroll to map",
     "shout": "Shout ::: Shouts",
     "tag": "Tag ::: Tags",
     "takeAction": "Take Action",
@@ -951,7 +952,6 @@
       "usual": "Member"
     },
     "save": "Create new group",
-    "scrollToLocationMap": "Scroll to map",
     "showMembers": "Member list visible to everyone",
     "teaser": {
       "openGroup": "Open group",

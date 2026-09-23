@@ -49,6 +49,7 @@ const MARKER_COLOR_FALLBACKS = {
   '--color-map-marker-event': 'rgb(119, 83, 235)',
   '--color-map-marker-group': 'rgb(248, 77, 77)',
   '--color-map-marker-current-user': 'rgb(247, 150, 64)',
+  '--color-map-marker-user': 'rgb(51, 195, 119)',
 }
 
 // Fallback label when reverse-geocoding finds no address for a clicked/dragged
@@ -91,6 +92,12 @@ export default {
     // Same idea as postId, for a group's own "view on map" (e.g. from its
     // profile page's read-only map).
     groupId: {
+      type: String,
+      default: null,
+    },
+    // Same idea as postId/groupId, for a user's own "view on map" (from
+    // their profile page's read-only map).
+    userId: {
       type: String,
       default: null,
     },
@@ -270,6 +277,7 @@ export default {
       if (this.isPastEvent) query.showPastEvents = '1'
       if (this.postId) query.eventId = this.postId
       if (this.groupId) query.groupId = this.groupId
+      if (this.userId) query.userId = this.userId
       this.$router.push({ path: '/map', query })
     },
   },

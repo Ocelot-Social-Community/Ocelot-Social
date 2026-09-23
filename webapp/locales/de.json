@@ -487,6 +487,7 @@
     "previousLocation": "Vorheriger Ort: {location}",
     "project": "Projekt ::: Projekte",
     "reportContent": "Melden",
+    "scrollToLocationMap": "Zur Karte scrollen",
     "shout": "Empfehlung ::: Empfehlungen",
     "tag": "Schlagwort ::: Schlagwörter",
     "takeAction": "Aktiv werden",
@@ -951,7 +952,6 @@
       "usual": "Mitglied"
     },
     "save": "Neue Gruppe anlegen",
-    "scrollToLocationMap": "Zur Karte scrollen",
     "showMembers": "Mitgliederliste für alle sichtbar",
     "teaser": {
       "openGroup": "Gruppe öffnen",

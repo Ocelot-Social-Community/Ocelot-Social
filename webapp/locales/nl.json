@@ -487,6 +487,7 @@
     "previousLocation": "Vorige locatie: {location}",
     "project": "Project ::: Projecten",
     "reportContent": "Melden",
+    "scrollToLocationMap": "Naar de kaart scrollen",
     "shout": "Shout ::: Shouts",
     "tag": "Tag ::: Tags",
     "takeAction": "Onderneem actie",
@@ -951,7 +952,6 @@
       "usual": "Lid"
     },
     "save": "Nieuwe groep aanmaken",
-    "scrollToLocationMap": "Naar de kaart scrollen",
     "showMembers": "Ledenlijst zichtbaar voor iedereen",
     "teaser": {
       "openGroup": "Groep openen",

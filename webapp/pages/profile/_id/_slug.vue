@@ -33,12 +33,18 @@
             <p class="ds-text ds-text-center ds-text-soft">
               {{ `@${userSlug}` }}
             </p>
-            <location-info
+            <!-- user location — clickable when the map below exists, to jump
+                 straight to it instead of making people scroll and hunt for
+                 it themselves. Mirrors the group profile page's own pattern. -->
+            <button
               v-if="user.location"
-              :location-data="user.location"
-              :is-owner="myProfile"
-              size="small"
-            />
+              type="button"
+              class="location-info-button"
+              :title="$t('common.scrollToLocationMap')"
+              @click="scrollToLocationMap"
+            >
+              <location-info :location-data="user.location" :is-owner="myProfile" size="small" />
+            </button>
             <p class="ds-text ds-text-center ds-text-soft ds-text-size-small">
               {{ $t('profile.memberSince') }} {{ user.createdAt | date('MMMM yyyy') }}
             </p>
@@ -130,6 +136,20 @@
             </div>
           </template>
         </os-card>
+        <template v-if="user.location">
+          <div class="ds-mb-large"></div>
+          <os-card ref="locationMapCard" class="profile-location-map">
+            <location-picker-map
+              :location="user.location"
+              :editable="false"
+              :user-id="user.id"
+              :marker-color-token="
+                myProfile ? '--color-map-marker-current-user' : '--color-map-marker-user'
+              "
+              height="307px"
+            />
+          </os-card>
+        </template>
         <div class="ds-mb-large"></div>
         <h3 class="ds-heading ds-heading-h3 ds-heading-soft ds-text-center ds-mb-x-small">
           {{ $t('profile.network.title') }}
@@ -324,6 +344,7 @@ import SocialMedia from '~/components/SocialMedia/SocialMedia'
 import DateTime from '~/components/DateTime'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
+import LocationPickerMap from '~/components/Map/LocationPickerMap'
 
 const tabToFilterMapping = ({ tab, id }) => {
   return {
@@ -357,6 +378,7 @@ export default {
     GroupMemberList,
     TabNavigation,
     LocationInfo,
+    LocationPickerMap,
   },
   created() {
     this.icons = iconRegistry
@@ -621,6 +643,9 @@ export default {
       }
       this.followLoading = false
     },
+    scrollToLocationMap() {
+      this.$refs.locationMapCard?.$el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    },
     showOrChangeChat(userId) {
       if (this.getShowChat.showChat && this.getShowChat.chatUserId === userId) {
         this.showChat({ showChat: false, chatUserId: null, groupId: null })
@@ -678,6 +703,20 @@ export default {
 </script>
 
 <style scoped>
+.location-info-button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.location-info-button:hover,
+.location-info-button:focus-visible {
+  opacity: 0.8;
+}
 ::v-deep .profile-page-avatar.avatar-image {
   margin: auto;
   margin-top: -60px;

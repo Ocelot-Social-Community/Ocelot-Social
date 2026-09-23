@@ -487,6 +487,7 @@
     "previousLocation": "Vendndodhja e mëparshme: {location}",
     "project": "Projekt ::: Projekte",
     "reportContent": "Raporto",
+    "scrollToLocationMap": "Rrëshqit te harta",
     "shout": "Thirrje ::: Thirrje",
     "tag": "Etiketë ::: Etiketa",
     "takeAction": "Merr masa",
@@ -951,7 +952,6 @@
       "usual": "Anëtar"
     },
     "save": "Krijo grup të ri",
-    "scrollToLocationMap": "Rrëshqit te harta",
     "showMembers": "Lista e anëtarëve e dukshme për të gjithë",
     "teaser": {
       "openGroup": "Hap grupin",

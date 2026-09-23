@@ -487,6 +487,7 @@
     "previousLocation": "Localização anterior: {location}",
     "project": "Projeto ::: Projetos",
     "reportContent": "Denunciar",
+    "scrollToLocationMap": "Rolar até o mapa",
     "shout": "Aclamação ::: Aclamações",
     "tag": "Etiqueta ::: Etiquetas",
     "takeAction": "Tomar uma ação",
@@ -951,7 +952,6 @@
       "usual": "Membro"
     },
     "save": "Criar novo grupo",
-    "scrollToLocationMap": "Rolar até o mapa",
     "showMembers": "Lista de membros visível para todos",
     "teaser": {
       "openGroup": "Abrir grupo",
