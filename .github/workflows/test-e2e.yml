@@ -170,7 +170,14 @@ jobs:
 
       - name: Install cypress requirements
         run: |
-          sudo wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-amd64"
+          # GitHub's release CDN occasionally answers a plain asset download with a
+          # transient 5xx — the SHA256 check right after still catches any genuinely
+          # bad/partial download, so a few retries here are safe, not a trust weakening.
+          for attempt in 1 2 3; do
+            sudo wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-amd64" && break
+            [ "$attempt" -lt 3 ] || { echo "cucumber-json-formatter download failed after 3 attempts"; exit 1; }
+            sleep 10
+          done
           echo "66a2ef158866c3ecb3d8e49a7189814a485bddca43e133e4ca5735b8d3951bf7  /opt/cucumber-json-formatter" | sha256sum -c -
           sudo chmod +x /opt/cucumber-json-formatter
           # Build the @ocelot-social/branding file: dependency first so the backend `npm run build` (tsc)
@@ -285,7 +292,13 @@ jobs:
       - name: Ensure cucumber-json-formatter exists
         run: |
           if [ ! -f /opt/cucumber-json-formatter ]; then
-            sudo wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-amd64"
+            # See the matching comment in "Install cypress requirements" — same
+            # transient-5xx-tolerant retry, same SHA256 check right after.
+            for attempt in 1 2 3; do
+              sudo wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-amd64" && break
+              [ "$attempt" -lt 3 ] || { echo "cucumber-json-formatter download failed after 3 attempts"; exit 1; }
+              sleep 10
+            done
             echo "66a2ef158866c3ecb3d8e49a7189814a485bddca43e133e4ca5735b8d3951bf7  /opt/cucumber-json-formatter" | sha256sum -c -
           fi
           sudo chmod +x /opt/cucumber-json-formatter
