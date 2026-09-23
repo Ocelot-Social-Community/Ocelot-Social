@@ -9,6 +9,7 @@
     "loading": "laden",
     "loadMore": "meer laden",
     "menu": "Menu openen",
+    "reset": "Terugzetten",
     "save": "Opslaan",
     "saveCategories": "Onderwerpen opslaan",
     "search": "Zoeken",
@@ -483,8 +484,10 @@
     "noChangesHint": "Er is nog niets om op te slaan.",
     "organization": "Organisatie ::: Organisaties",
     "post": "Bericht ::: Berichten",
+    "previousLocation": "Vorige locatie: {location}",
     "project": "Project ::: Projecten",
     "reportContent": "Melden",
+    "scrollToLocationMap": "Naar de kaart scrollen",
     "shout": "Shout ::: Shouts",
     "tag": "Tag ::: Tags",
     "takeAction": "Onderneem actie",
@@ -499,6 +502,7 @@
       "eventVenueNotEmpty": "Voer een plaatsbeschrijving in.",
       "followableUrl": "moet een geldig webadres of e-mailadres zijn",
       "formHasErrors": "Vul alstublieft alle verplichte velden in.",
+      "nameLength": "De naam moet tussen {min} en {max} tekens lang zijn.",
       "titleLength": "De titel moet tussen {min} en {max} tekens lang zijn.",
       "titleNotEmpty": "Voer een titel in."
     },
@@ -934,7 +938,6 @@
     "muted": "Groep gedempt",
     "myGroups": "Mijn groepen",
     "name": "Groepsnaam",
-    "previousLocation": "Vorige locatie: {location}",
     "radius": "Radius",
     "removeMember": "Lid verwijderen",
     "removeMemberButton": "Verwijderen",
@@ -949,7 +952,6 @@
       "usual": "Lid"
     },
     "save": "Nieuwe groep aanmaken",
-    "scrollToLocationMap": "Naar de kaart scrollen",
     "showMembers": "Ledenlijst zichtbaar voor iedereen",
     "teaser": {
       "openGroup": "Groep openen",
@@ -975,7 +977,6 @@
       "descriptionLength": "De beschrijving moet minstens {min} tekens lang zijn.",
       "descriptionNotEmpty": "Voer een beschrijving in.",
       "groupTypeRequired": "Kies een groepstype.",
-      "nameLength": "De naam moet tussen {min} en {max} tekens lang zijn.",
       "nameNotEmpty": "Voer een groepsnaam in.",
       "slugInvalidCharacters": "Alleen kleine letters, cijfers, koppeltekens en underscores zijn toegestaan.",
       "slugNotEmpty": "Voer een unieke groepsnaam in."
@@ -1679,6 +1680,7 @@
       "successDelete": "Sociale media verwijderd. Gebruikersprofiel bijgewerkt!"
     },
     "validation": {
+      "nameNotEmpty": "Voer alstublieft je naam in.",
       "slug": {
         "alreadyTaken": "Deze gebruikersnaam is al in gebruik.",
         "regex": "Toegestane tekens zijn alleen kleine letters, cijfers, underscores en koppeltekens."

@@ -365,6 +365,8 @@ export const updateUserMutation = () => {
       $termsAndConditionsAgreedVersion: String
       $avatar: ImageInput
       $locationName: String # empty string '' sets it to null
+      $lat: Float
+      $lng: Float
       $locale: String
     ) {
       UpdateUser(
@@ -381,12 +383,20 @@ export const updateUserMutation = () => {
         termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
         avatar: $avatar
         locationName: $locationName
+        lat: $lat
+        lng: $lng
         locale: $locale
       ) {
         id
         slug
         name
         locationName
+        location {
+          id
+          name
+          lat
+          lng
+        }
         about
         allowEmbedIframes
         showShoutsPublicly

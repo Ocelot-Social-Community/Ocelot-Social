@@ -104,6 +104,17 @@ describe('LocationPickerMap', () => {
         query: { lat: 52.5, lng: 13.4, groupId: 'group-1' },
       })
     })
+
+    it('includes userId for a user deep-linked by userId, so the main map opens its popup', () => {
+      wrapper = Wrapper({ userId: 'user-1' })
+
+      wrapper.vm.onViewOnMap({ lat: 52.5, lng: 13.4 })
+
+      expect(mocks.$router.push).toHaveBeenCalledWith({
+        path: '/map',
+        query: { lat: 52.5, lng: 13.4, userId: 'user-1' },
+      })
+    })
   })
 
   describe('onPinChange', () => {

@@ -9,6 +9,7 @@
     "loading": "wird geladen",
     "loadMore": "mehr laden",
     "menu": "Menü öffnen",
+    "reset": "Zurücksetzen",
     "save": "Speichern",
     "saveCategories": "Themen speichern",
     "search": "Suchen",
@@ -483,8 +484,10 @@
     "noChangesHint": "Es gibt noch nichts zu speichern.",
     "organization": "Organisation ::: Organisationen",
     "post": "Beitrag ::: Beiträge",
+    "previousLocation": "Vorheriger Ort: {location}",
     "project": "Projekt ::: Projekte",
     "reportContent": "Melden",
+    "scrollToLocationMap": "Zur Karte scrollen",
     "shout": "Empfehlung ::: Empfehlungen",
     "tag": "Schlagwort ::: Schlagwörter",
     "takeAction": "Aktiv werden",
@@ -499,6 +502,7 @@
       "eventVenueNotEmpty": "Bitte eine Ortsbeschreibung eingeben.",
       "followableUrl": "muss eine gültige Web- oder E-Mail-Adresse sein",
       "formHasErrors": "Bitte alle Pflichtfelder ausfüllen.",
+      "nameLength": "Der Name muss zwischen {min} und {max} Zeichen lang sein.",
       "titleLength": "Der Titel muss zwischen {min} und {max} Zeichen lang sein.",
       "titleNotEmpty": "Bitte einen Titel eingeben."
     },
@@ -934,7 +938,6 @@
     "muted": "Gruppe stummgeschaltet",
     "myGroups": "Meine Gruppen",
     "name": "Gruppenname",
-    "previousLocation": "Vorheriger Ort: {location}",
     "radius": "Radius",
     "removeMember": "Mitglied aus der Gruppe entfernen?",
     "removeMemberButton": "Entfernen",
@@ -949,7 +952,6 @@
       "usual": "Mitglied"
     },
     "save": "Neue Gruppe anlegen",
-    "scrollToLocationMap": "Zur Karte scrollen",
     "showMembers": "Mitgliederliste für alle sichtbar",
     "teaser": {
       "openGroup": "Gruppe öffnen",
@@ -975,7 +977,6 @@
       "descriptionLength": "Die Beschreibung muss mindestens {min} Zeichen lang sein.",
       "descriptionNotEmpty": "Bitte eine Beschreibung eingeben.",
       "groupTypeRequired": "Bitte einen Gruppentyp wählen.",
-      "nameLength": "Der Name muss zwischen {min} und {max} Zeichen lang sein.",
       "nameNotEmpty": "Bitte einen Gruppennamen eingeben.",
       "slugInvalidCharacters": "Nur Kleinbuchstaben, Ziffern, Bindestriche und Unterstriche sind erlaubt.",
       "slugNotEmpty": "Bitte einen eindeutigen Gruppennamen eingeben."
@@ -1679,6 +1680,7 @@
       "successDelete": "Soziales Netzwerk entfernt. Profil wurde aktualisiert!"
     },
     "validation": {
+      "nameNotEmpty": "Bitte gib deinen Namen an.",
       "slug": {
         "alreadyTaken": "Dieser Nutzername ist schon vergeben.",
         "regex": "Es sind nur Kleinbuchstaben, Zahlen, Unterstriche oder Bindestriche erlaubt."

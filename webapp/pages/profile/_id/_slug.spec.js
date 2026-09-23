@@ -1,5 +1,7 @@
-import { render } from '@testing-library/vue'
+import { render, fireEvent } from '@testing-library/vue'
+import { mount } from '@vue/test-utils'
 import ProfileSlug from './_slug.vue'
+import LocationPickerMap from '~/components/Map/LocationPickerMap'
 
 const localVue = global.localVue
 
@@ -164,6 +166,21 @@ describe('ProfileSlug', () => {
           expect(wrapper.container).toMatchSnapshot()
         })
       })
+
+      it("uses the green pin on someone else's profile", () => {
+        // mount() (unlike testing-library's render() used elsewhere in this
+        // file) actually descends into client-only's default slot content —
+        // stub infinite-loading too, or its mounted hook throws in jsdom.
+        const mountWrapper = mount(ProfileSlug, {
+          localVue,
+          stubs: { ...stubs, 'infinite-loading': true },
+          data: () => user,
+          mocks: { ...mocks, $policy: { get: () => true } },
+        })
+        expect(mountWrapper.findComponent(LocationPickerMap).props('markerColorToken')).toBe(
+          '--color-map-marker-user',
+        )
+      })
     })
 
     describe('given the logged in user as profile user', () => {
@@ -250,6 +267,59 @@ describe('ProfileSlug', () => {
           const button = addButton()
           expect(button.tagName.toLowerCase()).toBe('button')
           expect(button.classList.contains('permission-denied')).toBe(true)
+        })
+      })
+
+      describe('location map (mirrors the group profile page)', () => {
+        beforeEach(() => {
+          wrapper = Wrapper(true, user)
+        })
+
+        it('shows a read-only map with the user location', () => {
+          expect(wrapper.container.querySelector('.profile-location-map')).not.toBeNull()
+          expect(wrapper.container.querySelector('.location-picker-map')).not.toBeNull()
+        })
+
+        it('uses the orange "current user" pin on my own profile', () => {
+          // See the matching comment in the "someone else's profile" test above.
+          const mountWrapper = mount(ProfileSlug, {
+            localVue,
+            stubs: { ...stubs, 'infinite-loading': true },
+            data: () => user,
+            mocks: { ...mocks, $policy: { get: () => true } },
+          })
+          expect(mountWrapper.findComponent(LocationPickerMap).props('markerColorToken')).toBe(
+            '--color-map-marker-current-user',
+          )
+        })
+
+        it('hides the map when the user has no location', () => {
+          const userWithoutLocation = { User: [{ ...user.User[0], location: null }] }
+          wrapper = Wrapper(true, userWithoutLocation)
+          expect(wrapper.container.querySelector('.profile-location-map')).toBeNull()
+        })
+
+        describe('clicking the location name/distance', () => {
+          let scrollIntoViewSpy
+
+          beforeEach(() => {
+            scrollIntoViewSpy = jest.fn()
+            Element.prototype.scrollIntoView = scrollIntoViewSpy
+          })
+
+          afterEach(() => {
+            delete Element.prototype.scrollIntoView
+          })
+
+          it('scrolls to the location map', async () => {
+            const button = wrapper.container.querySelector('.location-info-button')
+            await fireEvent.click(button)
+
+            expect(scrollIntoViewSpy).toHaveBeenCalledWith({
+              behavior: 'smooth',
+              block: 'center',
+            })
+          })
         })
       })
 

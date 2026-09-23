@@ -210,6 +210,10 @@ type Mutation {
     avatar: ImageInput
     "Empty string '' clears the location (sets it to null)."
     locationName: String
+    "Coordinates for locationName (e.g. a dropped map pin), given together or not at all. Not stored on the user themselves — the server reverse-geocodes them (to a coarser place/region/country match, deliberately less precise than an event's exact pin) instead of forward-geocoding locationName's text, so the saved location matches the general area the user picked rather than a text-search approximation."
+    lat: Float
+    "See lat."
+    lng: Float
     about: String
     termsAndConditionsAgreedVersion: String
     termsAndConditionsAgreedAt: String

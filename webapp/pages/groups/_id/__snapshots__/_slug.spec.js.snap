@@ -259,7 +259,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
              
             <button
               class="location-info-button"
-              title="group.scrollToLocationMap"
+              title="common.scrollToLocationMap"
               type="button"
             >
               <div
@@ -972,7 +972,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
              
             <button
               class="location-info-button"
-              title="group.scrollToLocationMap"
+              title="common.scrollToLocationMap"
               type="button"
             >
               <div
@@ -1562,7 +1562,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
              
             <button
               class="location-info-button"
-              title="group.scrollToLocationMap"
+              title="common.scrollToLocationMap"
               type="button"
             >
               <div
@@ -2292,7 +2292,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
              
             <button
               class="location-info-button"
-              title="group.scrollToLocationMap"
+              title="common.scrollToLocationMap"
               type="button"
             >
               <div
@@ -5663,7 +5663,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
              
             <button
               class="location-info-button"
-              title="group.scrollToLocationMap"
+              title="common.scrollToLocationMap"
               type="button"
             >
               <div
@@ -6514,7 +6514,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
              
             <button
               class="location-info-button"
-              title="group.scrollToLocationMap"
+              title="common.scrollToLocationMap"
               type="button"
             >
               <div

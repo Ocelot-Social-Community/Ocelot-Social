@@ -19,7 +19,11 @@ import { orderClause } from './helpers/ordering'
 import { pagingClause } from './helpers/paging'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
-import { createOrUpdateLocations } from './users/location'
+import {
+  createOrUpdateLocations,
+  extractCoordinates,
+  NEIGHBORHOOD_REVERSE_GEOCODE_TYPES,
+} from './users/location'
 
 import type { Context } from '@src/context'
 
@@ -364,6 +368,10 @@ export default {
       const { avatar: avatarInput } = params
       delete params.avatar
       params.locationName = params.locationName === '' ? null : params.locationName
+      // Pulled off params (so it never reaches `SET user += $params` below —
+      // a user has no lat/lng fields of its own, unlike Post) and validated,
+      // same as Group's own coordinate handling.
+      const coordinates = extractCoordinates(params, 'User')
       const { termsAndConditionsAgreedVersion } = params
       if (termsAndConditionsAgreedVersion) {
         const regEx = /^[0-9]+\.[0-9]+\.[0-9]+$/g
@@ -406,7 +414,15 @@ export default {
           return user
         })
         // TODO: put in a middleware, see "CreateGroup", "UpdateGroup"
-        await createOrUpdateLocations('User', params.id, params.locationName, session, context)
+        await createOrUpdateLocations(
+          'User',
+          params.id,
+          params.locationName,
+          session,
+          context,
+          coordinates,
+          NEIGHBORHOOD_REVERSE_GEOCODE_TYPES,
+        )
         if (
           'showPublicGroupsOnProfile' in params ||
           'showClosedGroupsOnProfile' in params ||
