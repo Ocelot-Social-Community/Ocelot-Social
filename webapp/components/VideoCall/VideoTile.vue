@@ -44,6 +44,13 @@
     </div>
     <div class="video-tile__label">
       {{ tile.name }}
+      <os-icon
+        v-if="!tile.isScreen"
+        :icon="tile.micEnabled ? icons.microphone : icons.microphoneSlash"
+        class="video-tile__mic-status"
+        :class="{ 'video-tile__mic-status--muted': !tile.micEnabled }"
+        :aria-label="tile.micEnabled ? $t('videoCall.micUnmuted') : $t('videoCall.micMuted')"
+      />
       <span v-if="tile.isLocal" class="video-tile__local-tag">({{ $t('videoCall.you') }})</span>
       <span v-if="tile.isScreen" class="video-tile__screen-tag">
         — {{ $t('videoCall.screenShare') }}
@@ -408,5 +415,16 @@ export default {
 .video-tile__local-tag {
   opacity: 0.75;
   margin-left: var(--space-xxx-small);
+}
+
+.video-tile__mic-status {
+  width: 12px;
+  height: 12px;
+  margin-left: var(--space-xxx-small);
+  vertical-align: middle;
+}
+
+.video-tile__mic-status--muted {
+  color: var(--color-danger);
 }
 </style>

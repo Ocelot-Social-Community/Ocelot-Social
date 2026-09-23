@@ -1755,6 +1755,8 @@
     },
     "leave": "Leave call",
     "maximize": "Maximize",
+    "micMuted": "Microphone off",
+    "micUnmuted": "Microphone on",
     "minimize": "Minimize",
     "muteMic": "Mute microphone",
     "openChat": "Open chat",
