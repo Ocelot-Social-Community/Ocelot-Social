@@ -1755,6 +1755,8 @@
     },
     "leave": "Gesprek verlaten",
     "maximize": "Maximaliseren",
+    "micMuted": "Microfoon uit",
+    "micUnmuted": "Microfoon aan",
     "minimize": "Minimaliseren",
     "muteMic": "Microfoon dempen",
     "openChat": "Chat openen",

@@ -910,6 +910,7 @@ export default {
       const collect = (participant, isLocal) => {
         const audioTrack = collectAudio(participant)
         const profile = profileFor(participant, isLocal)
+        const micEnabled = !!participant.isMicrophoneEnabled
         // Use the participant-level getters (isCameraEnabled / isScreenShareEnabled)
         // as the source of truth — they reflect mute AND publication state more
         // reliably than iterating the publication map (where mute flags can lag
@@ -935,6 +936,7 @@ export default {
             audioTrack,
             isLocal,
             isScreen: false,
+            micEnabled,
           })
           return
         }
@@ -948,6 +950,7 @@ export default {
             audioTrack,
             isLocal,
             isScreen: false,
+            micEnabled,
           })
         }
         if (screenPub) {
