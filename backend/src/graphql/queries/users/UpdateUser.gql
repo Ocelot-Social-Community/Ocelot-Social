@@ -12,6 +12,8 @@ mutation UpdateUser(
   $termsAndConditionsAgreedVersion: String
   $avatar: ImageInput
   $locationName: String # empty string '' sets it to null
+  $lat: Float
+  $lng: Float
   $locale: String
 ) {
   UpdateUser(
@@ -28,6 +30,8 @@ mutation UpdateUser(
     termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
     avatar: $avatar
     locationName: $locationName
+    lat: $lat
+    lng: $lng
     locale: $locale
   ) {
     id
@@ -43,6 +47,8 @@ mutation UpdateUser(
     location {
       id
       name
+      lat
+      lng
     }
     emailNotificationSettings {
       type

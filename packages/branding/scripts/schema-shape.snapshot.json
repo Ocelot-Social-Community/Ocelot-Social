@@ -68,7 +68,9 @@
     "registration.layout: string",
     "registration.nonceLength: number",
     "termsAndConditions.version: string",
-    "theme.tokens: object"
+    "theme.tokens: object",
+    "user.nameLengthMax: number",
+    "user.nameLengthMin: number"
   ],
   "buckets": {
     "theme": [
@@ -100,6 +102,7 @@
     ],
     "behavior": [
       "group",
+      "user",
       "comment",
       "dateTime",
       "badges",

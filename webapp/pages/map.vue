@@ -182,6 +182,12 @@ export default {
     const initialEventId = typeof query.eventId === 'string' ? query.eventId : null
     // Same idea, from a group's own "view on map" (see openInitialGroupPopup()).
     const initialGroupId = typeof query.groupId === 'string' ? query.groupId : null
+    // Same idea, from a user's own "view on map" (see openInitialUserPopup()).
+    // Matches against BOTH the 'user' and 'theUser' marker types (see
+    // buildMarkersGeoJSON()) — this page can't know in advance which one the
+    // linked id will turn out to be, since that depends on whether it's the
+    // current user's own id.
+    const initialUserId = typeof query.userId === 'string' ? query.userId : null
     return {
       isEmpty,
       mapboxgl,
@@ -190,6 +196,7 @@ export default {
       initialCoordinates,
       initialEventId,
       initialGroupId,
+      initialUserId,
       // ids from markers.types.id that the user hid via the legend's eye
       // toggle. Purely a local display preference (not deep-linked).
       hiddenMarkerTypes: [],
@@ -1232,13 +1239,14 @@ export default {
         this.markers.isFlyToCenter = true
         this.openInitialEventPopup()
         this.openInitialGroupPopup()
+        this.openInitialUserPopup()
       }
     },
-    // Opens the popup for the event/group a "view on map" deep-link pointed
-    // at, so arriving here immediately shows the same info instead of just
-    // an unlabeled pin among possibly many others. The popup positions
-    // itself from its own lngLat, so it doesn't need to wait for the flyTo
-    // above to finish animating.
+    // Opens the popup for the event/group/user a "view on map" deep-link
+    // pointed at, so arriving here immediately shows the same info instead
+    // of just an unlabeled pin among possibly many others. The popup
+    // positions itself from its own lngLat, so it doesn't need to wait for
+    // the flyTo above to finish animating.
     openInitialEventPopup() {
       this.openInitialTypedPopup('event', this.initialEventId, () => {
         this.initialEventId = null
@@ -1249,10 +1257,18 @@ export default {
         this.initialGroupId = null
       })
     },
-    openInitialTypedPopup(type, id, clearId) {
+    openInitialUserPopup() {
+      this.openInitialTypedPopup(['user', 'theUser'], this.initialUserId, () => {
+        this.initialUserId = null
+      })
+    },
+    // types: either one marker type, or (see openInitialUserPopup above) an
+    // array of the possible ones for an id that could match more than one.
+    openInitialTypedPopup(types, id, clearId) {
       if (!id) return
+      const typeMatches = Array.isArray(types) ? (t) => types.includes(t) : (t) => t === types
       const feature = this.markers.geoJSON.find(
-        (f) => f.properties.type === type && f.properties.id === id,
+        (f) => typeMatches(f.properties.type) && f.properties.id === id,
       )
       // Left set (not cleared) when the feature isn't found yet — the
       // deep-linked event/group may still be missing from an early cache
@@ -1290,6 +1306,7 @@ export default {
       })
       this.openInitialEventPopup()
       this.openInitialGroupPopup()
+      this.openInitialUserPopup()
       this.syncPopupWithCurrentData()
     },
     // Toggling "show past events" re-runs the apollo query with a

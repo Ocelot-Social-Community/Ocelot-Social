@@ -40,8 +40,8 @@ describe('LocationSelect', () => {
       wrapper = Wrapper()
     })
 
-    it('renders the label with previous location by default', () => {
-      expect(wrapper.find('label.ds-input-label').text()).toBe('settings.data.labelCity — nowhere')
+    it('renders the plain label, without echoing the current value', () => {
+      expect(wrapper.find('label.ds-input-label').text()).toBe('settings.data.labelCity')
     })
 
     it('renders the select', () => {
@@ -85,17 +85,6 @@ describe('LocationSelect', () => {
 
       it('does not show clear location name button', () => {
         expect(wrapper.find('button[data-test="clear-location-button"]').exists()).toBe(false)
-      })
-    })
-
-    describe('showPreviousLocation is false', () => {
-      beforeEach(() => {
-        propsData.showPreviousLocation = false
-        wrapper = Wrapper()
-      })
-
-      it('does not show the previous location', () => {
-        expect(wrapper.find('.ds-input-label').text()).toBe('settings.data.labelCity')
       })
     })
 

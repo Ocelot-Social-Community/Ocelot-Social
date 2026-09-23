@@ -145,15 +145,6 @@ describe('GroupForm', () => {
     const pickViaSelect = (value) => wrapper.findComponent(LocationSelect).vm.$emit('input', value)
     const pickViaMap = (value) => wrapper.findComponent(LocationPickerMap).vm.$emit('input', value)
 
-    it('turns off LocationSelect\'s own built-in "previous value" caption', () => {
-      // That built-in caption only ever echoes the field's CURRENT value
-      // (see LocationSelect.vue), which isn't a useful comparison next to a
-      // select that's already showing its own current value — the hint
-      // below replaces it with a genuine previous-vs-current comparison.
-      wrapper = mountWith({ update: true, group: { ...group, locationName: 'Hamburg' } })
-      expect(wrapper.findComponent(LocationSelect).props('showPreviousLocation')).toBe(false)
-    })
-
     it('is null when creating a new group (nothing was ever saved yet)', () => {
       wrapper = mountWith({ update: false, group: {} })
       pickViaSelect('Berlin')
@@ -211,7 +202,7 @@ describe('GroupForm', () => {
       pickViaSelect({ label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'place.hh' })
       pickViaSelect('Berlin')
       await wrapper.vm.$nextTick()
-      expect(wrapper.find('.previous-location-hint').text()).toBe('group.previousLocation')
+      expect(wrapper.find('.previous-location-hint').text()).toBe('common.previousLocation')
 
       pickViaSelect('Hamburg')
       await wrapper.vm.$nextTick()
@@ -655,7 +646,23 @@ describe('GroupForm', () => {
         nameInput.setValue('x')
         await wrapper.vm.$nextTick()
         wrapper.vm.touchField('name')
-        expect(wrapper.vm.nameErrorText).toBe('group.validations.nameLength')
+        expect(wrapper.vm.nameErrorText).toBe('common.validations.nameLength')
+      })
+
+      it('reports a name consisting only of whitespace as empty, even if long enough', async () => {
+        const nameInput = wrapper.find('input[name="name"]')
+        nameInput.setValue('    ')
+        await wrapper.vm.$nextTick()
+        wrapper.vm.touchField('name')
+        expect(wrapper.vm.nameErrorText).toBe('group.validations.nameNotEmpty')
+      })
+
+      it('accepts a valid name padded with whitespace', async () => {
+        const nameInput = wrapper.find('input[name="name"]')
+        nameInput.setValue('  Solawi Freiburg  ')
+        await wrapper.vm.$nextTick()
+        wrapper.vm.touchField('name')
+        expect(wrapper.vm.nameErrorText).toBeNull()
       })
     })
 

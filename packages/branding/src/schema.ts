@@ -166,6 +166,10 @@ export interface BrandingConfig {
      */
     descriptionCollapsedLines: number
   }
+  user: {
+    nameLengthMin: number
+    nameLengthMax: number
+  }
   registration: {
     nonceLength: number
     inviteCodeLength: number

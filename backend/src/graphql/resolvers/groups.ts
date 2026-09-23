@@ -20,49 +20,29 @@ import { branding } from '@src/branding'
 
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
-import { createOrUpdateLocations } from './users/location'
+import {
+  createOrUpdateLocations,
+  extractCoordinates,
+  NEIGHBORHOOD_REVERSE_GEOCODE_TYPES,
+} from './users/location'
 
 import type { Context } from '@src/context'
 
 // Reverse-geocoded with these types (see createOrUpdateLocations) instead of
 // an event's precise address/poi/place — a group's location is deliberately
-// coarser than an event's exact pin, so it resolves to the general
-// neighborhood/locality/place/region/country it was dropped in rather than a
-// specific address. 'neighborhood'/'locality' (most specific here) keep a
-// group in, say, Berlin or Hamburg from always snapping to the city's single
-// center point — it can still land on the actual district it was pinned in.
-// Both are listed since which one Mapbox uses for a city's districts varies:
-// German Stadtteile (Hamburg's Ottensen, Berlin's Kreuzberg) come back under
-// 'locality', not 'neighborhood', verified directly against the API.
-const GROUP_REVERSE_GEOCODE_TYPES = ['neighborhood', 'locality', 'place', 'region', 'country']
+// coarser than an event's exact pin (see NEIGHBORHOOD_REVERSE_GEOCODE_TYPES'
+// own doc comment for the full reasoning).
+const GROUP_REVERSE_GEOCODE_TYPES = NEIGHBORHOOD_REVERSE_GEOCODE_TYPES
 
 // Pulls lat/lng off params (so they never reach `SET group += $params` below
 // — a group has no lat/lng fields of its own, unlike Post) and validates
 // them, mirroring validateEventParams' own coordinate check. Returns null
 // when neither was given; throws when only one was, or either is out of
-// range.
-const extractGroupCoordinates = (params): { lat: number; lng: number } | null => {
-  const { lat, lng } = params
-  delete params.lat
-  delete params.lng
-  const hasLat = typeof lat === 'number'
-  const hasLng = typeof lng === 'number'
-  if (hasLat !== hasLng) {
-    throw new UserInputError('Group location requires both lat and lng, or neither!')
-  }
-  if (!hasLat) {
-    return null
-  }
-  if (!Number.isFinite(lat) || lat < -90 || lat > 90) {
-    throw new UserInputError('Group location latitude must be a finite number between -90 and 90!')
-  }
-  if (!Number.isFinite(lng) || lng < -180 || lng > 180) {
-    throw new UserInputError(
-      'Group location longitude must be a finite number between -180 and 180!',
-    )
-  }
-  return { lat, lng }
-}
+// range. Thin wrapper around the shared extractCoordinates (see
+// users/location.ts) — User's own UpdateUser resolver uses the same
+// function directly with its own entity label.
+const extractGroupCoordinates = (params): { lat: number; lng: number } | null =>
+  extractCoordinates(params, 'Group')
 
 // Whether any Category nodes exist. Keeps CreateGroup graceful: the "categories
 // required" rule only applies when the policy is on AND there is at least one

@@ -45,7 +45,7 @@
               v-if="group.location"
               type="button"
               class="location-info-button"
-              :title="$t('group.scrollToLocationMap')"
+              :title="$t('common.scrollToLocationMap')"
               @click="scrollToLocationMap"
             >
               <location-info :location-data="group.location" :is-owner="false" size="small" />

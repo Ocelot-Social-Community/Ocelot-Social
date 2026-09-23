@@ -3,6 +3,7 @@ import flushPromises from 'flush-promises'
 import index from './index.vue'
 import Vuex from 'vuex'
 import LocationSelect from '~/components/Select/LocationSelect'
+import LocationPickerMap from '~/components/Map/LocationPickerMap'
 
 const localVue = global.localVue
 
@@ -14,7 +15,7 @@ describe('index.vue', () => {
   beforeEach(() => {
     mocks = {
       $i18n: { locale: () => 'en' },
-      $t: jest.fn(),
+      $t: jest.fn((key) => key),
       $apollo: {
         mutate: jest
           .fn()
@@ -91,14 +92,32 @@ describe('index.vue', () => {
     })
 
     it('renders', () => {
-      expect(Wrapper().element.tagName).toBe('FORM')
+      expect(Wrapper().find('form').exists()).toBe(true)
     })
 
     it('formSchema computed returns schema with name and locationName', () => {
       const wrapper = Wrapper()
       expect(wrapper.vm.formSchema).toHaveProperty('name')
-      expect(wrapper.vm.formSchema.name).toEqual({ required: true, min: 3 })
+      expect(wrapper.vm.formSchema.name).toMatchObject({ required: true, min: 3, max: 50 })
+      expect(wrapper.vm.formSchema.name.validator).toEqual(expect.any(Function))
       expect(wrapper.vm.formSchema).toHaveProperty('locationName')
+    })
+
+    it('rejects a whitespace-only name', () => {
+      const wrapper = Wrapper()
+      const [error] = wrapper.vm.formSchema.name.validator(null, '   ')
+      expect(error.message).toBe('settings.validation.nameNotEmpty')
+    })
+
+    it('rejects a name that is too short after trimming', () => {
+      const wrapper = Wrapper()
+      const [error] = wrapper.vm.formSchema.name.validator(null, '  ab  ')
+      expect(error.message).toBe('common.validations.nameLength')
+    })
+
+    it('accepts a valid name padded with whitespace', () => {
+      const wrapper = Wrapper()
+      expect(wrapper.vm.formSchema.name.validator(null, '  Peter Lustig  ')).toEqual([])
     })
 
     describe('given form validation errors', () => {
@@ -177,10 +196,15 @@ describe('index.vue', () => {
         })
       })
 
-      describe('given location with label property', () => {
-        it('extracts label from locationName', () => {
+      describe('given a selection object as locationName', () => {
+        // { label, value, ... } is the shape LocationSelect/LocationPickerMap
+        // actually emit on a real pick — formLocationName reads .value (see
+        // GroupForm.vue's own identical computed), not .label.
+        it('extracts value from locationName', () => {
           const wrapper = Wrapper()
-          wrapper.setData({ formData: { locationName: { label: 'Berlin, Germany' } } })
+          wrapper.setData({
+            formData: { locationName: { label: 'Berlin, Germany', value: 'Berlin, Germany' } },
+          })
           wrapper.find('#name').setValue('Peter')
           wrapper.find('form').trigger('submit')
 
@@ -334,6 +358,333 @@ describe('index.vue', () => {
         wrapper.find('#city').trigger('keyup.esc')
 
         expect(wrapper.find('.ds-select-is-open').exists()).toBe(false)
+      })
+    })
+
+    // Same tracking GroupForm.vue uses for its own submit button/leave
+    // guard — see its own tests for the full reasoning behind each case.
+    describe('hasUnsavedChanges', () => {
+      it('is false right after mount', () => {
+        const wrapper = Wrapper()
+        expect(wrapper.vm.hasUnsavedChanges()).toBe(false)
+      })
+
+      it('becomes true once a field goes through updateFormField (e.g. the name)', () => {
+        const wrapper = Wrapper()
+        wrapper.vm.updateFormField('name', 'A new name')
+        expect(wrapper.vm.hasUnsavedChanges()).toBe(true)
+      })
+
+      it('becomes true once the location is genuinely changed (map)', () => {
+        const wrapper = Wrapper()
+        wrapper
+          .findComponent(LocationPickerMap)
+          .vm.$emit('input', { label: 'Berlin', value: 'Berlin', lat: 52.5, lng: 13.4 })
+        expect(wrapper.vm.hasUnsavedChanges()).toBe(true)
+      })
+
+      it("stays false through LocationSelect's own mount-time auto-resolve of an already-saved location", () => {
+        getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
+        const wrapper = Wrapper()
+        wrapper
+          .findComponent(LocationSelect)
+          .vm.$emit('input', { label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'x' })
+        expect(wrapper.vm.hasUnsavedChanges()).toBe(false)
+      })
+
+      it('resets to false once the change is actually saved', async () => {
+        options = { computed: { formSchema: () => ({}) } }
+        mocks.$apollo.mutate = jest.fn().mockResolvedValueOnce({
+          data: { UpdateUser: { id: 'u1', name: 'A new name' } },
+        })
+        const wrapper = Wrapper()
+        wrapper.vm.updateFormField('name', 'A new name')
+        expect(wrapper.vm.hasUnsavedChanges()).toBe(true)
+
+        wrapper.find('form').trigger('submit')
+        await flushPromises()
+
+        expect(mocks.$apollo.mutate).toHaveBeenCalled()
+        expect(wrapper.vm.hasUnsavedChanges()).toBe(false)
+      })
+
+      it('does not reset when the save fails', async () => {
+        options = { computed: { formSchema: () => ({}) } }
+        mocks.$apollo.mutate = jest.fn().mockRejectedValueOnce({ message: 'boom' })
+        const wrapper = Wrapper()
+        wrapper.vm.updateFormField('name', 'A new name')
+
+        wrapper.find('form').trigger('submit')
+        await flushPromises()
+
+        expect(mocks.$apollo.mutate).toHaveBeenCalled()
+        expect(wrapper.vm.hasUnsavedChanges()).toBe(true)
+      })
+    })
+
+    describe('submit button greyed-out-but-clickable state', () => {
+      // Not an actual :disabled — see submitVisuallyDenied's own doc
+      // comment: hasUnsavedChanges() only tracks whether something was
+      // touched, not whether it truly differs from what's saved, so a
+      // tracking gap must never make a real save unreachable.
+      it('greys out the submit button with nothing changed yet, without marking it aria-disabled', () => {
+        const wrapper = Wrapper()
+        const submitButton = wrapper.find('button[type="submit"]')
+
+        expect(submitButton.classes()).toContain('permission-denied')
+        expect(submitButton.attributes('aria-disabled')).toBeUndefined()
+      })
+
+      it('un-greys the submit button once something has actually been changed', async () => {
+        const wrapper = Wrapper()
+        wrapper.vm.updateFormField('name', 'A new name')
+        await wrapper.vm.$nextTick()
+
+        const submitButton = wrapper.find('button[type="submit"]')
+        expect(submitButton.classes()).not.toContain('permission-denied')
+      })
+    })
+
+    describe('reset button', () => {
+      // Unlike the submit button above, a genuinely disabled reset has no
+      // downside if the dirty-tracking has a gap somewhere — the worst case
+      // is just an unclickable "nothing to discard" button, never a lost
+      // save, so this one uses a real :disabled instead of the
+      // grey-but-clickable pattern.
+      it('is disabled with nothing changed yet', () => {
+        const wrapper = Wrapper()
+        const resetButton = wrapper.find('[data-test="reset-button"]')
+        expect(resetButton.attributes('disabled')).toBeDefined()
+      })
+
+      it('becomes clickable once something has actually been changed', async () => {
+        const wrapper = Wrapper()
+        wrapper.vm.updateFormField('name', 'A new name')
+        await wrapper.vm.$nextTick()
+
+        const resetButton = wrapper.find('[data-test="reset-button"]')
+        expect(resetButton.attributes('disabled')).toBeUndefined()
+      })
+    })
+
+    describe('resetForm', () => {
+      it('reverts touched fields back to the saved values', () => {
+        getters = {
+          ...getters,
+          'auth/user': () => ({ name: 'Peter', slug: 'peter', about: 'Old bio' }),
+        }
+        const wrapper = Wrapper()
+        wrapper.vm.updateFormField('name', 'A new name')
+        wrapper.vm.updateFormField('slug', 'a-new-slug')
+        wrapper.vm.updateFormField('about', 'A new bio')
+
+        wrapper.vm.resetForm()
+
+        expect(wrapper.vm.formData.name).toBe('Peter')
+        expect(wrapper.vm.formData.slug).toBe('peter')
+        expect(wrapper.vm.formData.about).toBe('Old bio')
+      })
+
+      it('clears hasUnsavedChanges', () => {
+        const wrapper = Wrapper()
+        wrapper.vm.updateFormField('name', 'A new name')
+        expect(wrapper.vm.hasUnsavedChanges()).toBe(true)
+
+        wrapper.vm.resetForm()
+
+        expect(wrapper.vm.hasUnsavedChanges()).toBe(false)
+      })
+
+      it('reverts a genuinely changed location and clears the previous-location hint', () => {
+        getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
+        const wrapper = Wrapper()
+        const resolvedHamburg = { label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'x' }
+        wrapper.findComponent(LocationSelect).vm.$emit('input', resolvedHamburg)
+        wrapper.findComponent(LocationSelect).vm.$emit('input', 'Berlin')
+        expect(wrapper.vm.previousLocationName).toBe('Hamburg')
+
+        wrapper.vm.resetForm()
+
+        // The resolved object (with its id, and lat/lng when geocoded), not
+        // just the bare "Hamburg" string — see savedLocationValue's own doc
+        // comment: restoring the string alone would drop the map pin's
+        // coordinates until a fresh, momentarily pin-less geocode round-trip
+        // brought them back.
+        expect(wrapper.vm.formData.locationName).toEqual(resolvedHamburg)
+        expect(wrapper.vm.previousLocationName).toBeNull()
+      })
+
+      // Same reasoning as ignoreNextLocationInput's own mount-time doc
+      // comment: writing formData.locationName back here can make
+      // LocationSelect re-resolve it and echo an 'input' event — that echo
+      // must not be mistaken for a genuine new pick right after resetting.
+      it("suppresses LocationSelect's own resolve echo right after a reset", () => {
+        getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
+        const wrapper = Wrapper()
+        wrapper.findComponent(LocationSelect).vm.$emit('input', 'Berlin')
+        wrapper.vm.resetForm()
+
+        wrapper
+          .findComponent(LocationSelect)
+          .vm.$emit('input', { label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'x' })
+
+        expect(wrapper.vm.locationChangedByUser).toBe(false)
+      })
+
+      // The actual bug this guards against: restoring only the bare
+      // locationName string on reset leaves LocationPickerMap with no
+      // lat/lng to show a pin for at all, until a fresh geocode round-trip
+      // resolves it again — the pin visibly disappears and only comes back
+      // a moment later, instead of staying put the whole time.
+      it('keeps the map pin (lat/lng) in place across a reset', () => {
+        getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
+        const wrapper = Wrapper()
+        const resolvedHamburg = { label: 'Hamburg', value: 'Hamburg', id: 'x', lat: 53.5, lng: 10 }
+        wrapper.findComponent(LocationSelect).vm.$emit('input', resolvedHamburg)
+        wrapper
+          .findComponent(LocationPickerMap)
+          .vm.$emit('input', { label: 'Berlin', value: 'Berlin', lat: 52.5, lng: 13.4 })
+
+        wrapper.vm.resetForm()
+
+        expect(wrapper.vm.formData.locationName).toEqual(resolvedHamburg)
+      })
+
+      // The actual bug this guards against: arming ignoreNextLocationInput
+      // off currentUser.locationName (rather than savedLocationValue's own
+      // type) would stay armed after a reset once savedLocationValue is
+      // already a resolved object — no echo ever comes to consume it, so it
+      // would wrongly swallow the very next genuine pick as if it were
+      // another auto-resolve, leaving hasUnsavedChanges() stuck at false.
+      it('recognizes a genuine pick right after a reset, once the location is already a resolved object', () => {
+        getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
+        const wrapper = Wrapper()
+        // Mount-time auto-resolve — upgrades the bare string to a resolved
+        // object, consuming ignoreNextLocationInput.
+        wrapper.findComponent(LocationSelect).vm.$emit('input', {
+          label: 'Hamburg, Germany',
+          value: 'Hamburg, Germany',
+          id: 'x',
+        })
+
+        wrapper.vm.resetForm()
+
+        // A real new pick, right after the reset.
+        wrapper.findComponent(LocationSelect).vm.$emit('input', {
+          label: 'Berlin',
+          value: 'Berlin',
+          id: 'y',
+        })
+
+        expect(wrapper.vm.hasUnsavedChanges()).toBe(true)
+      })
+
+      it('updates the value a later reset restores once a location change is actually saved', async () => {
+        options = { computed: { formSchema: () => ({}) } }
+        mocks.$apollo.mutate = jest.fn().mockResolvedValueOnce({
+          data: { UpdateUser: { id: 'u1' } },
+        })
+        getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
+        const wrapper = Wrapper()
+        wrapper.findComponent(LocationSelect).vm.$emit('input', {
+          label: 'Hamburg, Germany',
+          value: 'Hamburg, Germany',
+          id: 'x',
+        })
+        const pickedBerlin = { label: 'Berlin', value: 'Berlin', lat: 52.5, lng: 13.4 }
+        wrapper.findComponent(LocationPickerMap).vm.$emit('input', pickedBerlin)
+
+        wrapper.find('form').trigger('submit')
+        await flushPromises()
+        wrapper.vm.resetForm()
+
+        expect(wrapper.vm.formData.locationName).toEqual(pickedBerlin)
+      })
+    })
+
+    describe('previousLocationName', () => {
+      it('is null right after mount, before the location has been touched at all', () => {
+        getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
+        const wrapper = Wrapper()
+        expect(wrapper.vm.previousLocationName).toBeNull()
+      })
+
+      it('reports the saved location once a genuine pick diverges from it', () => {
+        getters = { ...getters, 'auth/user': () => ({ locationName: 'Hamburg' }) }
+        const wrapper = Wrapper()
+        // The suppressed mount-time auto-resolve happens first...
+        wrapper
+          .findComponent(LocationSelect)
+          .vm.$emit('input', { label: 'Hamburg, Germany', value: 'Hamburg, Germany', id: 'x' })
+        // ...then the user picks somewhere else.
+        wrapper.findComponent(LocationSelect).vm.$emit('input', 'Berlin')
+        expect(wrapper.vm.previousLocationName).toBe('Hamburg')
+      })
+    })
+
+    describe('leaving the page with unsaved changes', () => {
+      it('navigates straight through when there are no unsaved changes', () => {
+        const wrapper = Wrapper()
+        const next = jest.fn()
+        wrapper.vm.$options.beforeRouteLeave.call(wrapper.vm, {}, {}, next)
+
+        expect(next).toHaveBeenCalledWith()
+        expect(wrapper.vm.showLeaveConfirmModal).toBe(false)
+      })
+
+      it('holds the navigation and opens the confirm modal when there are unsaved changes', () => {
+        const wrapper = Wrapper()
+        wrapper.vm.updateFormField('name', 'A new name')
+        const next = jest.fn()
+        wrapper.vm.$options.beforeRouteLeave.call(wrapper.vm, {}, {}, next)
+
+        expect(next).not.toHaveBeenCalled()
+        expect(wrapper.vm.showLeaveConfirmModal).toBe(true)
+      })
+    })
+
+    describe('submitting coordinates', () => {
+      beforeEach(() => {
+        options = { computed: { formSchema: () => ({}) } }
+      })
+
+      it('sends lat/lng alongside locationName when a map pin/search result carries them', () => {
+        const wrapper = Wrapper()
+        wrapper.setData({
+          formData: {
+            locationName: {
+              label: 'Berlin, Germany',
+              value: 'Berlin, Germany',
+              lat: 52.5,
+              lng: 13.4,
+            },
+          },
+        })
+        wrapper.find('#name').setValue('Peter')
+        wrapper.find('form').trigger('submit')
+
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            variables: expect.objectContaining({
+              locationName: 'Berlin, Germany',
+              lat: 52.5,
+              lng: 13.4,
+            }),
+          }),
+        )
+      })
+
+      it('sends null lat/lng for unresolved, plain-text locationName', () => {
+        const wrapper = Wrapper()
+        wrapper.findComponent(LocationSelect).vm.$emit('input', 'Berlin')
+        wrapper.find('#name').setValue('Peter')
+        wrapper.find('form').trigger('submit')
+
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            variables: expect.objectContaining({ locationName: 'Berlin', lat: null, lng: null }),
+          }),
+        )
       })
     })
   })

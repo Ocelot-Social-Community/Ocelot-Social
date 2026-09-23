@@ -9,6 +9,7 @@
     "loading": "cargamento",
     "loadMore": "cargar más",
     "menu": "Abrir menú",
+    "reset": "Restablecer",
     "save": "Guardar",
     "saveCategories": "Guardar temas",
     "search": "Buscar",
@@ -483,8 +484,10 @@
     "noChangesHint": "Todavía no hay nada que guardar.",
     "organization": "Organización ::: Organizaciones",
     "post": "Mensaje ::: Mensajes",
+    "previousLocation": "Ubicación anterior: {location}",
     "project": "Proyecto ::: Proyectos",
     "reportContent": "Informe",
+    "scrollToLocationMap": "Desplazarse al mapa",
     "shout": "Grito ::: Gritos",
     "tag": "Etiqueta ::: Etiquetas",
     "takeAction": "Tomar acción",
@@ -499,6 +502,7 @@
       "eventVenueNotEmpty": "Por favor, ingrese una descripción del lugar.",
       "followableUrl": "debe ser una dirección web o de correo electrónico válida",
       "formHasErrors": "Por favor, rellene todos los campos obligatorios.",
+      "nameLength": "El nombre debe tener entre {min} y {max} caracteres.",
       "titleLength": "El título debe tener entre {min} y {max} caracteres.",
       "titleNotEmpty": "Por favor, ingrese un título."
     },
@@ -934,7 +938,6 @@
     "muted": "Grupo silenciado",
     "myGroups": "Mis grupos",
     "name": "Nombre del grupo",
-    "previousLocation": "Ubicación anterior: {location}",
     "radius": "Radio",
     "removeMember": "Eliminar miembro",
     "removeMemberButton": "Eliminar",
@@ -949,7 +952,6 @@
       "usual": "Miembro"
     },
     "save": "Crear nuevo grupo",
-    "scrollToLocationMap": "Desplazarse al mapa",
     "showMembers": "Lista de miembros visible para todos",
     "teaser": {
       "openGroup": "Abrir grupo",
@@ -975,7 +977,6 @@
       "descriptionLength": "La descripción debe tener al menos {min} caracteres.",
       "descriptionNotEmpty": "Por favor, ingrese una descripción.",
       "groupTypeRequired": "Por favor, elija un tipo de grupo.",
-      "nameLength": "El nombre debe tener entre {min} y {max} caracteres.",
       "nameNotEmpty": "Por favor, ingrese un nombre de grupo.",
       "slugInvalidCharacters": "Solo se permiten letras minúsculas, números, guiones y guiones bajos.",
       "slugNotEmpty": "Por favor, ingrese un nombre único de grupo."
@@ -1679,6 +1680,7 @@
       "successDelete": "Social-Media borrado. Perfil actualizado!"
     },
     "validation": {
+      "nameNotEmpty": "Por favor introduce tu nombre.",
       "slug": {
         "alreadyTaken": "Este nombre de usuario ya está en uso.",
         "regex": "Los caracteres permitidos son solo letras minúsculas, números, guiones bajos y guiones."
@@ -1753,6 +1755,8 @@
     },
     "leave": "Salir de la llamada",
     "maximize": "Maximizar",
+    "micMuted": "Micrófono apagado",
+    "micUnmuted": "Micrófono encendido",
     "minimize": "Minimizar",
     "muteMic": "Silenciar micrófono",
     "openChat": "Abrir chat",

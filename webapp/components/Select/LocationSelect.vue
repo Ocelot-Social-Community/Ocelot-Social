@@ -1,7 +1,7 @@
 <template>
   <div>
     <label v-if="showLabel" class="ds-input-label">
-      {{ `${$t('settings.data.labelCity')}` + locationNameLabelAddOnOldName }}
+      {{ $t('settings.data.labelCity') }}
     </label>
     <ocelot-select
       ref="select"
@@ -55,11 +55,6 @@ export default {
       required: false,
       default: true,
     },
-    showPreviousLocation: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
     types: {
       type: String,
       required: false,
@@ -109,9 +104,6 @@ export default {
   computed: {
     locationName() {
       return typeof this.value === 'object' ? this.value.value : this.value
-    },
-    locationNameLabelAddOnOldName() {
-      return this.locationName !== '' && this.showPreviousLocation ? ' — ' + this.locationName : ''
     },
     currentLocale() {
       return this.$store && this.$store.state.i18n && this.$store.state.i18n.locale

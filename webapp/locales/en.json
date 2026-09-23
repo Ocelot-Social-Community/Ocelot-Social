@@ -9,6 +9,7 @@
     "loading": "loading",
     "loadMore": "load more",
     "menu": "Open menu",
+    "reset": "Reset",
     "save": "Save",
     "saveCategories": "Save topics",
     "search": "Search",
@@ -483,8 +484,10 @@
     "noChangesHint": "There's nothing to save yet.",
     "organization": "Organization ::: Organizations",
     "post": "Post ::: Posts",
+    "previousLocation": "Previous location: {location}",
     "project": "Project ::: Projects",
     "reportContent": "Report",
+    "scrollToLocationMap": "Scroll to map",
     "shout": "Shout ::: Shouts",
     "tag": "Tag ::: Tags",
     "takeAction": "Take Action",
@@ -499,6 +502,7 @@
       "eventVenueNotEmpty": "Please enter a venue description.",
       "followableUrl": "must be a valid web address or mail address",
       "formHasErrors": "Please fill in all required fields.",
+      "nameLength": "The name must be between {min} and {max} characters.",
       "titleLength": "The title must be between {min} and {max} characters.",
       "titleNotEmpty": "Please enter a title."
     },
@@ -934,7 +938,6 @@
     "muted": "Group muted",
     "myGroups": "My Groups",
     "name": "Group name",
-    "previousLocation": "Previous location: {location}",
     "radius": "Radius",
     "removeMember": "Remove member",
     "removeMemberButton": "Remove",
@@ -949,7 +952,6 @@
       "usual": "Member"
     },
     "save": "Create new group",
-    "scrollToLocationMap": "Scroll to map",
     "showMembers": "Member list visible to everyone",
     "teaser": {
       "openGroup": "Open group",
@@ -975,7 +977,6 @@
       "descriptionLength": "The description must be at least {min} characters.",
       "descriptionNotEmpty": "Please enter a description.",
       "groupTypeRequired": "Please choose a group type.",
-      "nameLength": "The name must be between {min} and {max} characters.",
       "nameNotEmpty": "Please enter a group name.",
       "slugInvalidCharacters": "Only lowercase letters, digits, hyphens and underscores are allowed.",
       "slugNotEmpty": "Please enter a unique group name."
@@ -1679,6 +1680,7 @@
       "successDelete": "Deleted social media. Updated user profile!"
     },
     "validation": {
+      "nameNotEmpty": "Please enter your name.",
       "slug": {
         "alreadyTaken": "This user name is already taken.",
         "regex": "Allowed characters are only lowercase letters, numbers, underscores and hyphens."
@@ -1753,6 +1755,8 @@
     },
     "leave": "Leave call",
     "maximize": "Maximize",
+    "micMuted": "Microphone off",
+    "micUnmuted": "Microphone on",
     "minimize": "Minimize",
     "muteMic": "Mute microphone",
     "openChat": "Open chat",
