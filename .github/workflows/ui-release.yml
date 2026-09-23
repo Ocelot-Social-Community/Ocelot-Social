@@ -269,3 +269,61 @@ jobs:
         run: npm publish "${RUNNER_TEMP}"/pkg/*.tgz --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # The release itself is created by release-please, with the changelog entry it generated as the
+  # body. Appended here is the one thing release-please cannot know: where the published artefact
+  # actually lives. Mirrors the `## Container images` block that publish.yml appends to the
+  # application's releases.
+  #
+  # `always()` together with the explicit `needs.publish.result` gate keeps publish-gpr's deliberate
+  # independence intact: GitHub Packages is the mirror, a failure there must not hold back the
+  # release notes for a successful npm publish. It is still listed in `needs` so this job waits for
+  # it and can tell the truth about it — the mirror line is only written when it actually succeeded.
+  release_notes:
+    name: Append install instructions to the release
+    needs: [release-please, publish, publish-gpr]
+    if: ${{ always() && needs.publish.result == 'success' }}
+    runs-on: ubuntu-latest
+    # The only write in this workflow that uses GITHUB_TOKEN rather than the app token or OIDC:
+    # editing the release body. Nothing is checked out and nothing is executed.
+    permissions:
+      contents: write
+    env:
+      TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
+      VERSION: ${{ needs.release-please.outputs.version }}
+      PACKAGE_NAME: '@ocelot-social/ui'
+      GPR_PACKAGE_NAME: '@ocelot-social-community/ui'
+      GPR_PUBLISHED: ${{ needs.publish-gpr.result == 'success' }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      # Values arrive through the environment, not through `${{ }}` interpolation into the script
+      # text: an expression is pasted in before the shell starts and would be parsed as shell source.
+      - name: Append install instructions to the release notes
+        run: |
+          set -euo pipefail
+
+          # Read the body back rather than keeping a copy: release-please owns that text, and
+          # `gh release edit --notes-file` replaces the body wholesale.
+          gh release view "${TAG_NAME}" --json body --jq .body > notes.md
+
+          {
+            echo
+            echo '## Package'
+            echo
+            echo "Published to the npm registry as \`${PACKAGE_NAME}@${VERSION}\`, with a provenance attestation."
+            echo
+            echo '```bash'
+            echo "npm install ${PACKAGE_NAME}@${VERSION}"
+            echo '```'
+            if [ "${GPR_PUBLISHED}" = 'true' ]; then
+              echo
+              echo "The same build is mirrored to GitHub Packages as \`${GPR_PACKAGE_NAME}@${VERSION}\` — GitHub Packages only accepts the repository owner's scope, hence the different name."
+              echo
+              echo '```bash'
+              echo "npm install ${GPR_PACKAGE_NAME}@${VERSION} --registry=https://npm.pkg.github.com"
+              echo '```'
+            fi
+          } >> notes.md
+
+          gh release edit "${TAG_NAME}" --notes-file notes.md

@@ -23,7 +23,25 @@ Sections are matched by commit **type** only — release-please has no scope-bas
 forming a "Dependencies" section of their own.
 
 There is no include mechanism for these config files: release-please reads each one whole from the
-repository, so the list is duplicated by necessity. **When you change one, change all three.**
+repository, so the list is duplicated by necessity. **When you change one, change all three** —
+[`lint.mjs`](./lint.mjs) fails the build if they drift apart.
+
+## The lint
+
+[`lint.mjs`](./lint.mjs), run by [`release-please-lint.yml`](../workflows/release-please-lint.yml) on
+any change under this directory or `.github/workflows/`, checks the invariants that otherwise break
+silently — none of them turns a release workflow red on its own:
+
+| Check | What it catches |
+| ----- | --------------- |
+| Every config validates against release-please's own JSON schema | Options that moved between versions, or sit at the wrong level. `component-no-space` is valid per package and rejected at the top level, and the runtime accepts both — so no amount of release testing reveals it. |
+| `<name>-config.json` ↔ `<name>-manifest.json` exist in pairs, and their package paths match | A manifest key the config does not release is a version nobody bumps; a config path the manifest does not list makes release-please treat the package as unreleased and start its changelog from the repository's first commit. |
+| Every config has `changelog-sections`, and all of them are identical | The drift described above. A config without the list silently falls back to the defaults. |
+| Every config is read by exactly **one** workflow | Two readers is the `@ocelot-social/ui@0.0.2` race below. Zero readers is quieter: the package simply stops releasing. |
+
+The lint pins its own `release-please` version rather than reading the one the action bundles. A
+bump there may legitimately turn it red — that is the point, and the pull request that bumps it is a
+better place to find out than a release run.
 
 ## The application is different from the packages
 
@@ -86,3 +104,8 @@ overlap nor the shared tag/label state exists any more.
    looks like.
 4. Give the package its own release workflow whose `on: push: paths` lists `packages/<name>/**` plus
    only that package's two files here. Never list another package's files, and never share a config.
+5. End that workflow with a `release_notes` job, modelled on the one in `ui-release.yml`: it appends
+   the install instructions to the release release-please created, because release-please knows the
+   changelog but not where the artefact was published. Keep its `always() && needs.publish.result ==
+   'success'` gate — a failed GitHub Packages mirror must not withhold the notes for a successful
+   npm publish, and the mirror line is written only when that job actually succeeded.
