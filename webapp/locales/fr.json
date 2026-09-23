@@ -1755,6 +1755,8 @@
     },
     "leave": "Quitter l'appel",
     "maximize": "Agrandir",
+    "micMuted": "Microphone désactivé",
+    "micUnmuted": "Microphone activé",
     "minimize": "Réduire",
     "muteMic": "Couper le microphone",
     "openChat": "Ouvrir le chat",
