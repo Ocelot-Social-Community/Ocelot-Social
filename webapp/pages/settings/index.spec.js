@@ -676,12 +676,13 @@ describe('index.vue', () => {
 
       it('sends null lat/lng for unresolved, plain-text locationName', () => {
         const wrapper = Wrapper()
+        wrapper.findComponent(LocationSelect).vm.$emit('input', 'Berlin')
         wrapper.find('#name').setValue('Peter')
         wrapper.find('form').trigger('submit')
 
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
           expect.objectContaining({
-            variables: expect.objectContaining({ lat: null, lng: null }),
+            variables: expect.objectContaining({ locationName: 'Berlin', lat: null, lng: null }),
           }),
         )
       })
