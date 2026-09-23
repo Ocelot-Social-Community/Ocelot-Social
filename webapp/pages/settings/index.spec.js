@@ -15,7 +15,7 @@ describe('index.vue', () => {
   beforeEach(() => {
     mocks = {
       $i18n: { locale: () => 'en' },
-      $t: jest.fn(),
+      $t: jest.fn((key) => key),
       $apollo: {
         mutate: jest
           .fn()
@@ -98,8 +98,26 @@ describe('index.vue', () => {
     it('formSchema computed returns schema with name and locationName', () => {
       const wrapper = Wrapper()
       expect(wrapper.vm.formSchema).toHaveProperty('name')
-      expect(wrapper.vm.formSchema.name).toEqual({ required: true, min: 3, max: 50 })
+      expect(wrapper.vm.formSchema.name).toMatchObject({ required: true, min: 3, max: 50 })
+      expect(wrapper.vm.formSchema.name.validator).toEqual(expect.any(Function))
       expect(wrapper.vm.formSchema).toHaveProperty('locationName')
+    })
+
+    it('rejects a whitespace-only name', () => {
+      const wrapper = Wrapper()
+      const [error] = wrapper.vm.formSchema.name.validator(null, '   ')
+      expect(error.message).toBe('settings.validation.nameNotEmpty')
+    })
+
+    it('rejects a name that is too short after trimming', () => {
+      const wrapper = Wrapper()
+      const [error] = wrapper.vm.formSchema.name.validator(null, '  ab  ')
+      expect(error.message).toBe('common.validations.nameLength')
+    })
+
+    it('accepts a valid name padded with whitespace', () => {
+      const wrapper = Wrapper()
+      expect(wrapper.vm.formSchema.name.validator(null, '  Peter Lustig  ')).toEqual([])
     })
 
     describe('given form validation errors', () => {

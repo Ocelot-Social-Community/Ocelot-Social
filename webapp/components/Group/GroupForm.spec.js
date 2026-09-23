@@ -648,6 +648,22 @@ describe('GroupForm', () => {
         wrapper.vm.touchField('name')
         expect(wrapper.vm.nameErrorText).toBe('common.validations.nameLength')
       })
+
+      it('reports a name consisting only of whitespace as empty, even if long enough', async () => {
+        const nameInput = wrapper.find('input[name="name"]')
+        nameInput.setValue('    ')
+        await wrapper.vm.$nextTick()
+        wrapper.vm.touchField('name')
+        expect(wrapper.vm.nameErrorText).toBe('group.validations.nameNotEmpty')
+      })
+
+      it('accepts a valid name padded with whitespace', async () => {
+        const nameInput = wrapper.find('input[name="name"]')
+        nameInput.setValue('  Solawi Freiburg  ')
+        await wrapper.vm.$nextTick()
+        wrapper.vm.touchField('name')
+        expect(wrapper.vm.nameErrorText).toBeNull()
+      })
     })
 
     describe('description validation', () => {

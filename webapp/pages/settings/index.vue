@@ -17,7 +17,7 @@
           @blur="dirtyFields.name && touchField('name')"
         />
         <os-validation-hint
-          :count="formData.name.length"
+          :count="formData.name.trim().length"
           :min="branding.user.nameLengthMin"
           :max="branding.user.nameLengthMax"
           :variant="visibleErrors && visibleErrors.name ? 'error' : null"
@@ -170,9 +170,9 @@ export default {
   mounted() {
     // The || '' fallbacks matter here in a way they didn't before: this used
     // to only ever feed OcelotInput's own v-model, but formData.name is now
-    // also read by OsValidationHint's :count="formData.name.length" below —
-    // an undefined currentUser.name (e.g. still loading) would throw there
-    // instead of just rendering an empty field.
+    // also read by OsValidationHint's :count="formData.name.trim().length"
+    // below — an undefined currentUser.name (e.g. still loading) would throw
+    // there instead of just rendering an empty field.
     this.formData.name = this.currentUser.name || ''
     this.formData.slug = this.currentUser.slug || ''
     this.formData.about = this.currentUser.about || ''
@@ -207,6 +207,30 @@ export default {
           required: true,
           min: branding.user.nameLengthMin,
           max: branding.user.nameLengthMax,
+          // Without this, "   " (only whitespace) passes required/min/max
+          // as-is — they check the raw string, and whitespace still counts
+          // toward its length — silently accepting a name with no real
+          // content. Mirrors GroupForm.vue's own name validator.
+          validator: (_, value = '') => {
+            const trimmed = value.trim()
+            if (!trimmed) {
+              return [new Error(this.$t('settings.validation.nameNotEmpty'))]
+            }
+            if (
+              trimmed.length < branding.user.nameLengthMin ||
+              trimmed.length > branding.user.nameLengthMax
+            ) {
+              return [
+                new Error(
+                  this.$t('common.validations.nameLength', {
+                    min: branding.user.nameLengthMin,
+                    max: branding.user.nameLengthMax,
+                  }),
+                ),
+              ]
+            }
+            return []
+          },
         },
         ...uniqueSlugForm.formSchema,
       }

@@ -12,7 +12,7 @@
           @blur="dirtyFields.name && touchField('name')"
         />
         <os-validation-hint
-          :count="formData.name.length"
+          :count="formData.name.trim().length"
           :min="formSchema.name.min"
           :max="formSchema.name.max"
           :variant="visibleErrors && visibleErrors.name ? 'error' : null"
@@ -311,6 +311,30 @@ export default {
           required: true,
           min: branding.group.nameLengthMin,
           max: branding.group.nameLengthMax,
+          // Without this, "   " (only whitespace) passes required/min/max
+          // as-is — they check the raw string, and whitespace still counts
+          // toward its length — silently accepting a name with no real
+          // content. Mirrors ContributionForm.vue's own title validator.
+          validator: (_, value = '') => {
+            const trimmed = value.trim()
+            if (!trimmed) {
+              return [new Error(this.$t('group.validations.nameNotEmpty'))]
+            }
+            if (
+              trimmed.length < branding.group.nameLengthMin ||
+              trimmed.length > branding.group.nameLengthMax
+            ) {
+              return [
+                new Error(
+                  this.$t('common.validations.nameLength', {
+                    min: branding.group.nameLengthMin,
+                    max: branding.group.nameLengthMax,
+                  }),
+                ),
+              ]
+            }
+            return []
+          },
         },
         slug: {
           type: 'string',
