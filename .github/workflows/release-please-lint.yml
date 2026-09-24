@@ -1,19 +1,58 @@
 name: Release Please Config Lint
 
+# Three groups of paths, and all three have to be here:
+#
+#   the configs       — the obvious one.
+#   the workflows     — one invariant is that exactly one workflow reads each config, and that can
+#                       be broken by editing a workflow alone, which is precisely how the
+#                       @ocelot-social/ui@0.0.2 publish was lost.
+#   the bump targets  — every file the configs claim to version. The lockstep check compares those
+#                       against the manifest, so a hand-edited version in backend/package.json or a
+#                       deleted `x-release-please-version` marker in a chart has to start a run.
+#                       Without them the drift would only surface on the next release pull request,
+#                       landing on whoever merges the release rather than on whoever caused it.
+#
+# The third group duplicates the `extra-files` of the configs, and `push`/`pull_request` then
+# duplicate each other — a YAML anchor would be the obvious fix and does NOT work here, because the
+# Actions workflow parser does not support anchors and aliases. The failure mode of trying is the
+# worst kind: the trigger silently never matches and the workflow simply stops running. So the list
+# is written out twice, and `lint.mjs` checks that BOTH copies still cover every bump target — see
+# the `lint workflow triggers` check there.
 on:
   push:
     branches: [master]
     paths:
       - '.github/release-please/**'
-      # The workflow files are part of what is checked: one of the invariants is that exactly one
-      # workflow reads each config, and that can be broken by editing a workflow alone — which is
-      # precisely how the @ocelot-social/ui@0.0.2 publish was lost.
       - '.github/workflows/**'
+      - 'package.json'
+      - 'backend/package.json'
+      - 'backend/package-lock.json'
+      - 'webapp/package.json'
+      - 'webapp/package-lock.json'
+      - 'maintenance/package.json'
+      - 'maintenance/package-lock.json'
+      - 'deployment/helm/charts/ocelot-social/Chart.yaml'
+      - 'deployment/helm/charts/ocelot-neo4j/Chart.yaml'
+      - 'packages/ui/package.json'
+      - 'packages/branding/package.json'
+      - 'packages/branding/src/version.ts'
   pull_request:
     branches: [master]
     paths:
       - '.github/release-please/**'
       - '.github/workflows/**'
+      - 'package.json'
+      - 'backend/package.json'
+      - 'backend/package-lock.json'
+      - 'webapp/package.json'
+      - 'webapp/package-lock.json'
+      - 'maintenance/package.json'
+      - 'maintenance/package-lock.json'
+      - 'deployment/helm/charts/ocelot-social/Chart.yaml'
+      - 'deployment/helm/charts/ocelot-neo4j/Chart.yaml'
+      - 'packages/ui/package.json'
+      - 'packages/branding/package.json'
+      - 'packages/branding/src/version.ts'
 
 # One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
 # cancelled instead of holding a runner. `event_name` is part of the group on purpose: a branch

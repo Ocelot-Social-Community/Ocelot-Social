@@ -56,21 +56,27 @@ const workflows = fs
       doc = YAML.parse(fs.readFileSync(path.join(WORKFLOWS, name), 'utf8'))
     } catch (error) {
       fail(name, `is not parseable YAML: ${error.message}`)
-      return { name, releasePlease: [], paths: [] }
+      return { name, releasePlease: [], paths: [], pathsByEvent: {}, runsThisLint: false }
     }
     // `on` is a YAML 1.1 boolean; the parser here is YAML 1.2, where it stays a string. Both are
     // read so a parser change cannot quietly turn every workflow into "no triggers, no steps".
     const on = doc?.on ?? doc?.[true] ?? {}
-    const paths = Object.values(on)
-      .filter((event) => event && typeof event === 'object')
-      .flatMap((event) => event.paths ?? [])
+    const pathsByEvent = Object.fromEntries(
+      Object.entries(on)
+        .filter(([, event]) => event && typeof event === 'object' && event.paths)
+        .map(([name, event]) => [name, event.paths]),
+    )
+    const paths = Object.values(pathsByEvent).flat()
 
-    const releasePlease = Object.values(doc?.jobs ?? {})
-      .flatMap((job) => job?.steps ?? [])
+    const steps = Object.values(doc?.jobs ?? {}).flatMap((job) => job?.steps ?? [])
+    const releasePlease = steps
       .filter((step) => typeof step?.uses === 'string' && step.uses.startsWith('googleapis/release-please-action@'))
       .map((step) => ({ configFile: step.with?.['config-file'], manifestFile: step.with?.['manifest-file'] }))
+    // Which workflow runs this script is discovered, not hard-coded, so renaming the file or moving
+    // the step cannot leave the check below silently pointing at nothing.
+    const runsThisLint = steps.some((step) => typeof step?.run === 'string' && step.run.includes('release-please/lint.mjs'))
 
-    return { name, releasePlease, paths }
+    return { name, releasePlease, paths, pathsByEvent, runsThisLint }
   })
 
 const entries = fs.readdirSync(HERE)
@@ -187,10 +193,16 @@ const MARKER = 'x-release-please-version'
 const BLOCK_MARKER = 'x-release-please-start-'
 const TRAP_EXTENSIONS = /\.(json|ya?ml|toml|xml)$/
 
+// Every file the checks below open, collected for the trigger check that follows them.
+const bumpTargets = new Set()
+
 // `extra-files` are relative to the package path, except for the root component and for paths
 // written with a leading slash, which are relative to the repository root.
-const resolveExtra = (pkgPath, filePath) =>
-  filePath.startsWith('/') || pkgPath === '.' ? filePath.replace(/^\//, '') : path.posix.join(pkgPath, filePath)
+const resolveExtra = (pkgPath, filePath) => {
+  const resolved = filePath.startsWith('/') || pkgPath === '.' ? filePath.replace(/^\//, '') : path.posix.join(pkgPath, filePath)
+  bumpTargets.add(resolved)
+  return resolved
+}
 
 function checkGeneric(configFile, relPath, version) {
   const abs = path.join(REPO, relPath)
@@ -254,6 +266,35 @@ for (const file of configs) {
         fail(file, `extra-files type "${extra.type}" (${extra.path}) is not covered by this lint — teach lint.mjs how to read a version out of it before using it`)
       }
     }
+  }
+}
+
+// 6. Lint workflow triggers. Check 5 only helps if it runs when one of the files it reads changes,
+//    and that trigger list is a hand-written copy of what the configs bump — written twice on top
+//    of that, because the Actions parser does not support YAML anchors. Nothing keeps the copies
+//    honest except this check: a bump target missing from the triggers means a hand-edited version
+//    or a deleted marker sits unnoticed until the next release pull request happens to change the
+//    manifest, landing on whoever merges the release rather than on whoever caused it.
+const linter = workflows.find((w) => w.runsThisLint)
+if (!linter) {
+  fail('lint.mjs', 'no workflow runs this script — every check in it is dead weight')
+} else {
+  // GitHub path filters are globs. Only the prefix up to the first wildcard is compared here: a
+  // pattern cleverer than that is reported as not covering, which errs toward noise rather than
+  // toward a check that quietly passes.
+  const covers = (pattern, target) => {
+    const wildcard = pattern.search(/[*?[]/)
+    return wildcard === -1 ? pattern === target : target.startsWith(pattern.slice(0, wildcard))
+  }
+  for (const [event, paths] of Object.entries(linter.pathsByEvent)) {
+    for (const target of [...bumpTargets].sort()) {
+      if (!paths.some((pattern) => covers(pattern, target))) {
+        fail(linter.name, `checks ${target} but is not triggered by it on \`${event}\` — add it to that paths list`)
+      }
+    }
+  }
+  if (Object.keys(linter.pathsByEvent).length === 0) {
+    fail(linter.name, 'has no path filters at all — either that is intentional and this check should go, or the triggers were lost')
   }
 }
 
