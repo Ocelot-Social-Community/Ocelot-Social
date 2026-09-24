@@ -25,6 +25,7 @@ on:
       - '.github/release-please/**'
       - '.github/workflows/**'
       - 'package.json'
+      - 'package-lock.json'
       - 'backend/package.json'
       - 'backend/package-lock.json'
       - 'webapp/package.json'
@@ -34,7 +35,9 @@ on:
       - 'deployment/helm/charts/ocelot-social/Chart.yaml'
       - 'deployment/helm/charts/ocelot-neo4j/Chart.yaml'
       - 'packages/ui/package.json'
+      - 'packages/ui/package-lock.json'
       - 'packages/branding/package.json'
+      - 'packages/branding/package-lock.json'
       - 'packages/branding/src/version.ts'
   pull_request:
     branches: [master]
@@ -42,6 +45,7 @@ on:
       - '.github/release-please/**'
       - '.github/workflows/**'
       - 'package.json'
+      - 'package-lock.json'
       - 'backend/package.json'
       - 'backend/package-lock.json'
       - 'webapp/package.json'
@@ -51,7 +55,9 @@ on:
       - 'deployment/helm/charts/ocelot-social/Chart.yaml'
       - 'deployment/helm/charts/ocelot-neo4j/Chart.yaml'
       - 'packages/ui/package.json'
+      - 'packages/ui/package-lock.json'
       - 'packages/branding/package.json'
+      - 'packages/branding/package-lock.json'
       - 'packages/branding/src/version.ts'
 
 # One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
@@ -77,11 +83,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Deliberately NOT a sparse checkout. The lint does not only read this directory: the lockstep
-      # check opens every file the configs claim to bump — package.json and package-lock.json in
-      # backend, webapp and maintenance, both Helm charts, each package's own manifest — and that
-      # list is defined by the configs, so no static `sparse-checkout` can stay correct. An earlier
-      # version of this workflow checked out `.github` alone and the lint reported all fourteen of
-      # those files as missing.
+      # check opens every file the configs claim to bump — the package.json and package-lock.json of
+      # the application, of backend, webapp and maintenance and of each package, plus both Helm
+      # charts — and that list is defined by the configs, so no static `sparse-checkout` can stay
+      # correct. An earlier version of this workflow checked out `.github` alone, and the lint then
+      # reported every one of those files as missing.
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

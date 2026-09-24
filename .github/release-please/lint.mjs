@@ -248,6 +248,21 @@ for (const file of configs) {
     const releaseType = pkgConfig['release-type'] ?? config['release-type']
     if (releaseType === 'node') {
       checkJsonPath(file, resolveExtra(pkgPath, 'package.json'), '$.version', version)
+
+      // The node release-type bumps the lockfile alongside package.json, in both of the places npm
+      // records the package's own version — so both are checked. It is NOT an `extra-files` entry
+      // and therefore easy to forget: the application's backend, webapp and maintenance lockfiles
+      // are listed explicitly and were checked from the start, while the root's and the two
+      // packages' own lockfiles were bumped by the release-type and checked by nothing.
+      //
+      // Conditional on existence, because a package without a lockfile is legitimate — the updater
+      // is registered with `createIfMissing: false`, so release-please skips it rather than failing.
+      const lockfile = pkgPath === '.' ? 'package-lock.json' : path.posix.join(pkgPath, 'package-lock.json')
+      if (fs.existsSync(path.join(REPO, lockfile))) {
+        bumpTargets.add(lockfile)
+        checkJsonPath(file, lockfile, '$.version', version)
+        checkJsonPath(file, lockfile, "$.packages[''].version", version)
+      }
     }
 
     for (const extra of pkgConfig['extra-files'] ?? []) {
