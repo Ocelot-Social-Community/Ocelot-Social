@@ -158,12 +158,6 @@ jobs:
           if [ "$(printf '%s' "${REF}" | jq -r '.object.type // empty')" = 'tag' ]; then
             TAGGED_SHA="$(gh api "repos/${GITHUB_REPOSITORY}/git/tags/${TAGGED_SHA}" --jq '.object.sha')"
           fi
-          if [ "${TAGGED_SHA}" = "${GITHUB_SHA}" ]; then
-            echo 'is_release=true' >> "$GITHUB_OUTPUT"
-          else
-            echo 'is_release=false' >> "$GITHUB_OUTPUT"
-          fi
-
           # A SECOND question, and the two must not be confused. `is_release` says "this commit IS
           # the release of this version" — permanently true, which is exactly what lets a re-run
           # finish an interrupted release. It does NOT say "this version is still the newest", and
@@ -173,10 +167,42 @@ jobs:
           #
           # Answered per tag rather than with one "is newest" flag, because the three tags track
           # three different lines: 3.19.5 can be the newest 3.19 while 3.20.0 already owns `3` and
-          # `latest`. Only plain `X.Y.Z` tags count — the `b<version>-<run>` build tags and the
-          # `ui-v*` / `branding-v*` package tags are filtered out by the pattern.
-          RELEASED="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/git/matching-refs/tags" \
-            --jq '.[].ref | sub("^refs/tags/"; "")' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' || true)"
+          # `latest`.
+          #
+          # Only asked on a release commit. Every other master push would pay ~20 paginated API
+          # calls for three answers nobody reads, and would fail outright on a transient API error
+          # — a routine push has no business breaking over a tag listing it does not need.
+          if [ "${TAGGED_SHA}" != "${GITHUB_SHA}" ]; then
+            {
+              echo 'is_release=false'
+              echo 'is_newest=false'
+              echo 'is_newest_minor=false'
+              echo 'is_newest_major=false'
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo 'is_release=true' >> "$GITHUB_OUTPUT"
+
+          # Fetch and filter as SEPARATE statements. In one pipeline, the `|| true` that absorbs
+          # grep's "no match" would also absorb a failed or half-paginated `gh api` — and an empty
+          # list reads as "not the newest" for every line, so the release would quietly ship
+          # without `latest`, `X.Y` and `X` and nothing would say so. As an assignment of its own,
+          # a failed call takes the step down, which is the honest outcome.
+          #
+          # Only plain `X.Y.Z` tags count — the `b<version>-<run>` build tags and the `ui-v*` /
+          # `branding-v*` package tags are what the pattern filters out.
+          ALL_TAGS="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/git/matching-refs/tags" \
+            --jq '.[].ref | sub("^refs/tags/"; "")')"
+          RELEASED="$(printf '%s\n' "${ALL_TAGS}" | { grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' || true; })"
+
+          # Cross-check, because a truncated-but-successful listing would fail the same silent way.
+          # This commit carries the `<version>` tag, so that version HAS to be in the list the
+          # moving tags are about to be decided from.
+          if ! printf '%s\n' "${RELEASED}" | grep -qxF "${VERSION}"; then
+            echo "::error::${VERSION} is tagged at this commit but absent from the tag listing — refusing to decide the moving tags on an incomplete list"
+            exit 1
+          fi
+
           MAJOR="${VERSION%%.*}"
           MINOR="${VERSION%.*}"
           # `|| true`: an empty match makes grep exit 1, which `pipefail` would turn into a failure
