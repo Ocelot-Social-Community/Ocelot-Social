@@ -321,4 +321,10 @@ jobs:
       # badge on ocelot.social itself. Unconditional: a release that skipped the notes above must
       # not hold on to it either.
       - name: Decline the "Latest" badge
+        # `!cancelled()`, because a step carries an implicit `if: success()`: had the append above
+        # FAILED rather than been skipped, this would not run and the package release would keep a
+        # badge that belongs to the application. The job-level `always()` does not cover that — it
+        # governs whether the job starts, not whether a later step survives an earlier failure.
+        # `!cancelled()` rather than `always()` so a cancelled run still stops promptly.
+        if: ${{ !cancelled() }}
         run: gh release edit "${TAG_NAME}" --latest=false

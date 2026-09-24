@@ -434,6 +434,14 @@ jobs:
       # Block scalar, not a plain one: the title contains `: `, which ends a plain YAML scalar and
       # makes the whole workflow unparseable.
       - name: Publish the release
+        # `!cancelled()` for the same reason as the badge step in the package workflows: a step
+        # carries an implicit `if: success()`, so a FAILED append above would skip this one and
+        # strand the release as a draft — the one state this job exists to leave behind never.
+        # Publishing does not depend on the paragraph: the job only starts once docker_retag has
+        # succeeded, so the images this release names are already tagged by the time we get here.
+        # The notes are the cosmetic part; a re-run appends them, and the marker check makes that
+        # safe.
+        if: ${{ !cancelled() }}
         env:
           IS_NEWEST: ${{ needs.github_tag.outputs.is_newest }}
         run: |
