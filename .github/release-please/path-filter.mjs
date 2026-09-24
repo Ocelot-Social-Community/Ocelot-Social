@@ -10,26 +10,44 @@
 //
 // https://docs.github.com/actions/reference/workflows-and-actions/workflow-syntax#patterns-to-match-branches-and-paths
 
-/**
- * Translate one GitHub filter pattern into an anchored regular expression.
- *
- *   `*`     any run of characters except `/`
- *   `**`    any run of characters, `/` included
- *   `?`     zero or one of the preceding character
- *   `+`     one or more of the preceding character
- *   `[…]`   one character from the set; a leading `!` negates the set
- *
- * @param {string} pattern a filter pattern without its leading `!`
- * @returns {RegExp} anchored at both ends
- */
+// Line comments, not a JSDoc block: the patterns discussed here contain a double star followed by
+// a slash, which would close a block comment mid-sentence.
+//
+//   *          any run of characters except `/`
+//   **         any run of characters, `/` included
+//   ** then /  a whole directory prefix — possibly none at all, see below
+//   ?          zero or one of the preceding character
+//   +          one or more of the preceding character
+//   [ … ]      one character from the set; a leading `!` negates the set
+//
+// A double star followed by a slash is special-cased AGAINST GitHub's own prose definition of the
+// double star ("zero or more of any character"), because GitHub's example table contradicts that
+// prose and the table is the better evidence of what the implementation does. Three of its ten
+// rows only work if that slash may match nothing:
+//
+//   docs/ ** /*.md   is listed as matching  docs/README.md
+//   ** /README.md    is listed as matching  README.md
+//   ** /docs/ **     is listed as matching  docs/hello.md
+//
+// Read literally, each of those needs a slash that the path does not have. Translating the pair as
+// an OPTIONAL directory prefix reproduces every row of the table; translating it as `.*` plus a
+// literal slash fails those three. The transcribed table is in path-filter.test.mjs.
+//
+// @param {string} pattern a filter pattern without its leading `!`
+// @returns {RegExp} anchored at both ends
 export function patternToRegExp(pattern) {
   let out = '^'
   for (let i = 0; i < pattern.length; i++) {
     const char = pattern[i]
     if (char === '*') {
       if (pattern[i + 1] === '*') {
-        out += '.*'
-        i++
+        if (pattern[i + 2] === '/') {
+          out += '(?:.*/)?'
+          i += 2
+        } else {
+          out += '.*'
+          i++
+        }
       } else {
         out += '[^/]*'
       }

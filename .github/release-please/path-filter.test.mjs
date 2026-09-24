@@ -3,6 +3,32 @@ import test from 'node:test'
 
 import { triggers } from './path-filter.mjs'
 
+// GitHub's own filter-pattern cheat sheet, transcribed row for row. It is the closest thing to a
+// specification that exists for this syntax, and it is the reason `**/` is translated as an
+// optional directory prefix rather than as the `.*` its prose definition implies: rows 8, 9 and 10
+// fail under the literal reading.
+// https://docs.github.com/actions/reference/workflows-and-actions/workflow-syntax#filter-pattern-cheat-sheet
+const cheatSheet = [
+  ['*', ['README.md', 'server.rb']],
+  ['*.jsx?', ['page.js', 'page.jsx']],
+  ['**', ['all/the/files.md']],
+  ['*.js', ['app.js', 'index.js']],
+  ['**.js', ['index.js', 'js/index.js', 'src/js/app.js']],
+  ['docs/*', ['docs/README.md', 'docs/file.txt']],
+  ['docs/**', ['docs/README.md', 'docs/mona/octocat.txt']],
+  ['docs/**/*.md', ['docs/README.md', 'docs/mona/hello-world.md']],
+  ['**/docs/**', ['docs/hello.md', 'dir/docs/my-file.txt']],
+  ['**/README.md', ['README.md', 'js/README.md']],
+]
+
+for (const [pattern, targets] of cheatSheet) {
+  for (const target of targets) {
+    test(`cheat sheet: ${pattern} matches ${target}`, () => {
+      assert.equal(triggers([pattern], target), true)
+    })
+  }
+}
+
 // Node's built-in runner, no dependency: `node --test .github/release-please/`.
 //
 // The first case is the one that motivated writing a real matcher. A prefix comparison up to the
@@ -13,6 +39,9 @@ const cases = [
   [['packages/*/package.json'], 'packages/ui/package.json', true, 'the same pattern does cover the package.json'],
   [['packages/*/package.json'], 'packages/a/b/package.json', false, '`*` does not match `/`'],
   [['packages/**/package.json'], 'packages/a/b/package.json', true, '`**` matches across `/`'],
+  [['packages/**/package.json'], 'packages/package.json', true, '`**/` also matches no directory at all'],
+  [['packages/**/package.json'], 'packages/ui/package-lock.json', false, 'the optional prefix does not loosen the rest'],
+  [['docs/**'], 'docsomething/x.md', false, '`docs/**` is not a prefix match on the directory name'],
 
   [['.github/release-please/**'], '.github/release-please/ui-config.json', true, 'directory glob'],
   [['.github/release-please/**'], '.github/workflows/publish.yml', false, 'a different directory'],
