@@ -107,7 +107,12 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
       build_tag: ${{ steps.version.outputs.build_tag }}
+      # "this commit is the release of this version" — permanent, survives re-runs
       is_release: ${{ steps.version.outputs.is_release }}
+      # "this version still owns that moving tag" — false once a newer release exists
+      is_newest: ${{ steps.version.outputs.is_newest }}
+      is_newest_minor: ${{ steps.version.outputs.is_newest_minor }}
+      is_newest_major: ${{ steps.version.outputs.is_newest_major }}
     steps:
       - name: Checkout code
         # actions/checkout leaves GITHUB_TOKEN in the workspace's .git/config unless told not to,
@@ -158,6 +163,29 @@ jobs:
           else
             echo 'is_release=false' >> "$GITHUB_OUTPUT"
           fi
+
+          # A SECOND question, and the two must not be confused. `is_release` says "this commit IS
+          # the release of this version" — permanently true, which is exactly what lets a re-run
+          # finish an interrupted release. It does NOT say "this version is still the newest", and
+          # that is what `3.19`, `3`, `latest` and the GitHub "Latest" badge all mean. Re-running
+          # the 3.19.0 run after 3.20.0 has shipped would otherwise drag every one of those moving
+          # tags back onto 3.19.0 — a silent downgrade for anyone tracking them.
+          #
+          # Answered per tag rather than with one "is newest" flag, because the three tags track
+          # three different lines: 3.19.5 can be the newest 3.19 while 3.20.0 already owns `3` and
+          # `latest`. Only plain `X.Y.Z` tags count — the `b<version>-<run>` build tags and the
+          # `ui-v*` / `branding-v*` package tags are filtered out by the pattern.
+          RELEASED="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/git/matching-refs/tags" \
+            --jq '.[].ref | sub("^refs/tags/"; "")' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' || true)"
+          MAJOR="${VERSION%%.*}"
+          MINOR="${VERSION%.*}"
+          # `|| true`: an empty match makes grep exit 1, which `pipefail` would turn into a failure
+          # of the whole step rather than into the "no, not the newest" it actually means.
+          newest_of() { printf '%s\n' "${RELEASED}" | { grep -E "$1" || true; } | sort -V | tail -n 1; }
+          emit() { if [ "$2" = "${VERSION}" ]; then echo "$1=true"; else echo "$1=false"; fi >> "$GITHUB_OUTPUT"; }
+          emit is_newest       "$(newest_of '.')"
+          emit is_newest_minor "$(newest_of "^${MINOR//./\\.}\\.")"
+          emit is_newest_major "$(newest_of "^${MAJOR}\\.")"
       - name: package-version-to-git-tag + build number
         uses: pkgdeps/git-tag-action@a5a161774bace8b4e1969dd850c67a7421f1b710 # v3.0.1
         with:
@@ -189,6 +217,9 @@ jobs:
       VERSION: ${{ needs.github_tag.outputs.version }}
       BUILD_TAG: ${{ needs.github_tag.outputs.build_tag }}
       IS_RELEASE: ${{ needs.github_tag.outputs.is_release }}
+      IS_NEWEST: ${{ needs.github_tag.outputs.is_newest }}
+      IS_NEWEST_MINOR: ${{ needs.github_tag.outputs.is_newest_minor }}
+      IS_NEWEST_MAJOR: ${{ needs.github_tag.outputs.is_newest_major }}
       # Empty on every push that is not a release, AND on a re-run of one — release-please only
       # reports a version in the run that created the release. Only used to cross-check VERSION
       # below, so an empty value simply skips that check rather than failing it.
@@ -258,15 +289,28 @@ jobs:
             # github_tag's tag lookup, decides. Without the distinction this would move
             # `3.18.4` onto every later master commit, which is the mutability the version tags
             # exist to avoid.
-            # `latest` alongside the version tags, because without it `docker pull <image>` — the
-            # form every registry UI and every copied command line uses — fails outright. It only
-            # moves on a release, never on an ordinary master commit: the moving tag that follows
-            # master already exists and is called `master` (docker-push applies it through
-            # `type=ref,event=branch`), and conflating the two would make `latest` mean "newest
-            # commit" rather than "newest release".
+            # `X.Y.Z` is immutable and is applied whenever this commit is that release, re-runs
+            # included — writing it again is a no-op on the same manifest.
+            #
+            # `X.Y`, `X` and `latest` MOVE, and each only when this version still owns that line.
+            # Re-running an old release's workflow otherwise drags them backwards: after 3.20.0 has
+            # shipped, a re-run of the 3.19.0 job would point `3` and `latest` at 3.19.0 again and
+            # silently downgrade everyone tracking them. The three are separate questions — 3.19.5
+            # can still be the newest `3.19` while 3.20.0 already owns `3` and `latest`.
+            #
+            # `latest` exists at all because without it `docker pull <image>` — the form every
+            # registry UI and every copied command line uses — fails outright. It never follows
+            # master: that moving tag already exists and is called `master` (docker-push applies it
+            # through `type=ref,event=branch`), and conflating the two would make `latest` mean
+            # "newest commit" rather than "newest release".
             TAGS=(--tag "${IMAGE}:${BUILD_TAG}")
             if [ "${IS_RELEASE}" = 'true' ]; then
-              TAGS+=(--tag "${IMAGE}:${VERSION}" --tag "${IMAGE}:${MINOR}" --tag "${IMAGE}:${MAJOR}" --tag "${IMAGE}:latest")
+              # `if`, not `[ … ] && TAGS+=(…)`: under `set -e` a false test IS the final command of
+              # the list, so the shell would exit the moment a moving tag does not apply.
+              TAGS+=(--tag "${IMAGE}:${VERSION}")
+              if [ "${IS_NEWEST_MINOR}" = 'true' ]; then TAGS+=(--tag "${IMAGE}:${MINOR}"); fi
+              if [ "${IS_NEWEST_MAJOR}" = 'true' ]; then TAGS+=(--tag "${IMAGE}:${MAJOR}"); fi
+              if [ "${IS_NEWEST}" = 'true' ]; then TAGS+=(--tag "${IMAGE}:latest"); fi
             fi
 
             echo "tagging ${IMAGE}: ${TAGS[*]//--tag /}"
@@ -381,11 +425,22 @@ jobs:
       #            package release most of the time, so the application — the thing anyone visiting
       #            this repository is looking for — gets buried. Claiming it explicitly here, and
       #            declining it in the package workflows, keeps the badge on ocelot.social itself.
+      #
+      #            Only while this version is still the newest, though. The badge MOVES, and
+      #            re-running an old release's workflow — the recovery path this job exists for —
+      #            would otherwise hand it back to a superseded version. Omitting the flag leaves
+      #            whoever holds it untouched; `--latest=false` would actively demote, which is a
+      #            different and wrong thing to do here.
       # Block scalar, not a plain one: the title contains `: `, which ends a plain YAML scalar and
       # makes the whole workflow unparseable.
       - name: Publish the release
+        env:
+          IS_NEWEST: ${{ needs.github_tag.outputs.is_newest }}
         run: |
-          gh release edit "${TAG_NAME}" --title "ocelot: v${VERSION}" --latest --draft=false
+          set -euo pipefail
+          ARGS=(--title "ocelot: v${VERSION}" --draft=false)
+          if [ "${IS_NEWEST}" = 'true' ]; then ARGS+=(--latest); fi
+          gh release edit "${TAG_NAME}" "${ARGS[@]}"
 
   build_trigger:
     name: Trigger successful build
