@@ -50,8 +50,10 @@ version number by hand and nobody runs a script; the pull request title **is** t
   accumulates every merged change and carries the version bump for `package.json` (root, `backend`,
   `webapp`, `maintenance`, plus the matching lockfiles), both Helm `Chart.yaml` files and
   `CHANGELOG.md`. Releasing means reviewing and merging it — that merge creates the `X.Y.Z` tag and
-  the GitHub release, and `publish.yml` then moves the `X.Y.Z`, `X.Y` and `X` container image tags
-  onto that commit's images and appends them to the release notes.
+  a **draft** GitHub release, and `publish.yml` then moves the `X.Y.Z`, `X.Y` and `X` container
+  image tags onto that commit's images, appends them to the release notes and publishes the
+  release. A release that stays a draft therefore means the image tagging failed: the run is red,
+  and re-running it finishes the job rather than starting a second release.
 * **Forcing a version** (a major without a breaking-change commit, or skipping ahead) is done with a
   `Release-As` footer on any commit that lands on master, typically an empty one:
 

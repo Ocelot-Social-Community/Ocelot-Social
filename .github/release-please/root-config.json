@@ -5,7 +5,8 @@
       "release-type": "node",
       "package-name": "ocelot-social",
       "changelog-path": "CHANGELOG.md",
-      "draft": false,
+      "draft": true,
+      "force-tag-creation": true,
       "prerelease": false,
       "extra-files": [
         { "type": "json", "path": "backend/package.json", "jsonpath": "$.version" },

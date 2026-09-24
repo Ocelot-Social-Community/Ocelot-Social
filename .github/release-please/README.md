@@ -86,9 +86,23 @@ lists ui's dependency bumps and not the backend's.
 
 Because the version is derived from the commits, the version tag and the GitHub release are created
 when the release pull request is merged — not by [`publish.yml`](../workflows/publish.yml) after the
-fact. That is why `release_created` is now the one answer to "is this commit a release?"; the old
-"the version tag does not exist yet" heuristic only worked while that workflow created the tag
-itself.
+fact. Two settings follow from that:
+
+- **`draft: true`.** The release is not public until `publish.yml` has moved the container image
+  tags onto the release commit's images and appended them to the notes. The branded downstream
+  repositories resolve their base images by exactly those tags, so a release announced before they
+  exist is a release nobody can deploy.
+- **`force-tag-creation: true`.** A draft release carries a tag *name* but no git ref — GitHub only
+  creates the tag when the draft is published. This flag makes release-please create
+  `refs/tags/<version>` outright, before the release, so the tag is there from the merge on.
+
+`publish.yml` does **not** gate on the action's `release_created` output, even though that is the
+obvious thing to read. It is true exactly once, because release-please refuses to create an existing
+release a second time — the same property that lost `@ocelot-social/ui@0.0.2` below. A re-run after
+a failed image retag would report `false` and skip the retag entirely, leaving the version tags
+unapplied with no way to recover but by hand. The workflow asks the repository instead: does the
+`<version>` tag point at this commit? That is true on the release commit and on every re-run of it,
+and false on every later one.
 
 ## Why they are split
 

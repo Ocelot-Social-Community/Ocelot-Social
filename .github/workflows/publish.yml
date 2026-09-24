@@ -34,9 +34,12 @@ jobs:
   ##############################################################################
   # Owns the version. On a normal master push it only refreshes the open release pull request; on
   # the push that merges that pull request it bumps every versioned file, writes CHANGELOG.md,
-  # creates the `<version>` git tag and cuts the GitHub release. `release_created` is therefore the
-  # single answer to "is this commit a release?" — it used to be inferred from the absence of the
-  # version tag, which only worked because the release job created that tag itself.
+  # creates the `<version>` git tag and cuts the GitHub release.
+  #
+  # Its `release_created` output is NOT what the jobs below gate on. It is true exactly once —
+  # release-please will not create an existing release a second time — so a re-run after a failure
+  # further down would report `false` and silently skip the work that failed. github_tag answers
+  # "is this commit the release?" from the tag instead, which stays true across re-runs.
   #
   # Runs first in this workflow rather than in a file of its own (the packages each have one) so
   # that the tag, the version image tags and the release notes are produced by one run, in order,
@@ -45,10 +48,10 @@ jobs:
     name: Release Please
     runs-on: ubuntu-latest
     outputs:
-      # For the root package (manifest path `.`) the action publishes its outputs unprefixed —
-      # `packages/branding--release_created` in branding-release.yml has no counterpart here.
-      release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
+      # Only the version, and only as a cross-check — see the comment above on why
+      # `release_created` is deliberately not exposed as a gate. For the root package (manifest path
+      # `.`) the action publishes its outputs unprefixed, so there is no
+      # `packages/branding--version` equivalent of the key branding-release.yml reads.
       version: ${{ steps.release.outputs.version }}
     steps:
       # Mint a token from the it4c-release-bot GitHub App (vars.RELEASE_APP_ID +
@@ -92,6 +95,9 @@ jobs:
   github_tag:
     name: Tag latest version on Github
     runs-on: ubuntu-latest
+    # Ordering only: the release state below is read back from the repository, and release_please
+    # has to have created the tag before that read happens.
+    needs: [release_please]
     # Writes the per-commit build tag with GITHUB_TOKEN. `release_notes` below needs the same scope
     # to edit the release body; `docker_retag` needs `packages: write` instead, and `build_trigger`
     # needs nothing at all — its repository dispatches authenticate with OCELOT_PUBLISH_EVENT_PAT.
@@ -101,6 +107,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
       build_tag: ${{ steps.version.outputs.build_tag }}
+      is_release: ${{ steps.version.outputs.is_release }}
     steps:
       - name: Checkout code
         # actions/checkout leaves GITHUB_TOKEN in the workspace's .git/config unless told not to,
@@ -116,6 +123,8 @@ jobs:
           node-version-file: '.nvmrc'
       - name: Setup env
         id: version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           # package.json, not the release_please output: this job runs on EVERY master push and the
@@ -127,6 +136,28 @@ jobs:
           # number. Downstream consumers get one immutable identifier that names both the git tag
           # and the container image tag for this exact commit.
           echo "build_tag=b${VERSION}-${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+
+          # "Is this commit the release?" is answered from the repository — does the `<version>` tag
+          # point here — and NOT from release_please's `release_created`. That output is true exactly
+          # once: release-please refuses to create an existing release a second time (the same
+          # property that lost @ocelot-social/ui@0.0.2, see .github/release-please/README.md). Gating
+          # the retag on it means that if docker_retag ever fails, a re-run reports `false` and the
+          # version image tags are never applied at all — unrecoverable without doing it by hand.
+          # Reading the tag is idempotent: true on the release commit and on every re-run of it,
+          # false on every later commit.
+          REF="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${VERSION}" 2>/dev/null || true)"
+          TAGGED_SHA="$(printf '%s' "${REF}" | jq -r '.object.sha // empty')"
+          # An annotated tag's ref points at the tag object, not at the commit. release-please
+          # creates lightweight ones, but a tag pushed by hand would not be, and the difference
+          # would silently read as "not the release commit".
+          if [ "$(printf '%s' "${REF}" | jq -r '.object.type // empty')" = 'tag' ]; then
+            TAGGED_SHA="$(gh api "repos/${GITHUB_REPOSITORY}/git/tags/${TAGGED_SHA}" --jq '.object.sha')"
+          fi
+          if [ "${TAGGED_SHA}" = "${GITHUB_SHA}" ]; then
+            echo 'is_release=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'is_release=false' >> "$GITHUB_OUTPUT"
+          fi
       - name: package-version-to-git-tag + build number
         uses: pkgdeps/git-tag-action@a5a161774bace8b4e1969dd850c67a7421f1b710 # v3.0.1
         with:
@@ -157,8 +188,10 @@ jobs:
       REGISTRY: ghcr.io
       VERSION: ${{ needs.github_tag.outputs.version }}
       BUILD_TAG: ${{ needs.github_tag.outputs.build_tag }}
-      IS_RELEASE: ${{ needs.release_please.outputs.release_created }}
-      # Empty on every push that is not a release. Only used to cross-check VERSION below.
+      IS_RELEASE: ${{ needs.github_tag.outputs.is_release }}
+      # Empty on every push that is not a release, AND on a re-run of one — release-please only
+      # reports a version in the run that created the release. Only used to cross-check VERSION
+      # below, so an empty value simply skips that check rather than failing it.
       RELEASE_VERSION: ${{ needs.release_please.outputs.version }}
       # `docker-push` and this workflow are triggered by the same push and run concurrently, with
       # no way to express a dependency across workflows. Waiting for the source manifest to appear
@@ -183,12 +216,14 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Two sources say what this release is called: the tag release-please created, and the
-          # version it wrote into package.json through the config's `extra-files`. They can only
+          # Two sources say what this release is called: the version release-please released, and
+          # the one it wrote into package.json through the config's `extra-files`. They can only
           # disagree if that file list stops matching reality — and the failure would be silent:
           # images tagged with the old version while the git tag carries the new one, which is
-          # exactly what the branded downstream repositories resolve by.
-          if [ "${IS_RELEASE}" = 'true' ] && [ "${RELEASE_VERSION}" != "${VERSION}" ]; then
+          # exactly what the branded downstream repositories resolve by. Skipped when
+          # RELEASE_VERSION is empty, which is every run that did not itself create the release —
+          # including a re-run of the release commit, where the tag comparison above still holds.
+          if [ -n "${RELEASE_VERSION}" ] && [ "${RELEASE_VERSION}" != "${VERSION}" ]; then
             echo "::error::release-please released ${RELEASE_VERSION} but package.json says ${VERSION} — check extra-files in .github/release-please/root-config.json"
             exit 1
           fi
@@ -220,7 +255,7 @@ jobs:
 
             # The build tag is unique per commit and therefore always safe to apply. The version
             # tags are only moved on the release commit — that is what IS_RELEASE, fed by
-            # release-please's `release_created`, decides. Without the distinction this would move
+            # github_tag's tag lookup, decides. Without the distinction this would move
             # `3.18.4` onto every later master commit, which is the mutability the version tags
             # exist to avoid.
             TAGS=(--tag "${IMAGE}:${BUILD_TAG}")
@@ -239,23 +274,28 @@ jobs:
   # body — that is the whole point of the migration, so nothing here re-derives release notes.
   # What is appended is the one thing release-please cannot know: which container image tags this
   # release is published under. It runs after docker_retag so those tags exist by the time anyone
-  # can read about them.
+  # can read about them, and it is also what takes the release out of draft — see the publish step.
   #
-  # Appending rather than composing the whole body is also why the release is not created as a
-  # draft and published here instead: a draft release carries a tag NAME but no git ref, so the
-  # `<version>` tag — which the branded downstream repositories resolve images by — would not exist
-  # until someone pressed publish.
+  # `gh release view`/`edit` do find a draft by tag: the releases-by-tag endpoint returns 404 for
+  # drafts, and gh falls back to listing releases and matching the tag name itself.
+  #
+  # Gated on the same repository-derived `is_release` as docker_retag, not on release-please's
+  # one-shot `release_created`, so that a re-run after a failed retag appends the section it never
+  # got to write. That makes the step itself re-entrant, hence the marker check below.
   release_notes:
     name: Append image tags to the release
     runs-on: ubuntu-latest
     needs: [release_please, github_tag, docker_retag]
-    if: needs.release_please.outputs.release_created == 'true'
+    if: needs.github_tag.outputs.is_release == 'true'
     permissions:
       contents: write
     env:
       REGISTRY: ghcr.io
-      VERSION: ${{ needs.release_please.outputs.version }}
-      TAG_NAME: ${{ needs.release_please.outputs.tag_name }}
+      # From github_tag, which reads package.json: release-please only reports a version in the run
+      # that created the release, and this job has to work on a re-run too. `include-v-in-tag` is
+      # false for the application, so the tag and the version are the same string.
+      VERSION: ${{ needs.github_tag.outputs.version }}
+      TAG_NAME: ${{ needs.github_tag.outputs.version }}
       BUILD_TAG: ${{ needs.github_tag.outputs.build_tag }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GH_REPO: ${{ github.repository }}
@@ -284,6 +324,15 @@ jobs:
           # to be carried through the edit.
           gh release view "${TAG_NAME}" --json body --jq .body > notes.md
 
+          # Re-entrant: this job runs again on a re-run of the release commit, and appending a
+          # second copy of the section would be the visible result. Publishing still has to happen
+          # below, so this only skips the append — a re-run of a job that failed AFTER appending
+          # would otherwise leave the release a draft forever.
+          if grep -qxF '## Container images' notes.md; then
+            echo "release ${TAG_NAME} already lists its container images, nothing to append"
+            exit 0
+          fi
+
           # The images themselves are not attached as release assets: a release asset is not a
           # registry, so a `docker save` tarball could not be pulled, would share no layers with
           # any other version and would cost gigabytes per release. Pointing at the registry tags
@@ -304,6 +353,19 @@ jobs:
           } >> notes.md
 
           gh release edit "${TAG_NAME}" --notes-file notes.md
+
+      # A SEPARATE step, so the early exit above cannot skip it: a re-run that finds the section
+      # already appended must still publish, or a job that died between the append and the publish
+      # would leave the release a draft for good.
+      #
+      # This is the moment the release becomes public. Until here it exists only as a draft, which
+      # is what keeps a failed docker_retag from announcing a version whose images were never
+      # tagged — the branded downstream repositories resolve their base images by exactly those
+      # tags. The `<version>` git tag is NOT waiting on this: `force-tag-creation` in
+      # root-config.json has release-please create the ref outright rather than letting it appear
+      # as a side effect of publishing the release.
+      - name: Publish the release
+        run: gh release edit "${TAG_NAME}" --draft=false
 
   build_trigger:
     name: Trigger successful build
