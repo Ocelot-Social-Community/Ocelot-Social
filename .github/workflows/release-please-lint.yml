@@ -98,6 +98,14 @@ jobs:
         with:
           node-version-file: '.nvmrc'
 
+      # Before the lint, and without any dependency: `path-filter.mjs` reimplements GitHub's filter
+      # patterns so the lint can tell whether this workflow is really triggered by the files it
+      # checks, and a matcher that is only approximately right fails silently — it would call the
+      # trigger list complete while GitHub starts no run. Node's built-in runner picks up
+      # `*.test.mjs` only, so `lint.mjs` beside it is not executed here.
+      - name: Test the filter-pattern matcher
+        run: node --test .github/release-please/
+
       # Into a throwaway prefix, never into the repository. release-please is a release tool, not an
       # application dependency; adding it to the root package.json to satisfy a lint would put it
       # into the dependency tree of everything built from this repository.

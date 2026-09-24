@@ -13,6 +13,8 @@ import { createRequire } from 'node:module'
 import fs from 'node:fs'
 import path from 'node:path'
 
+import { triggers } from './path-filter.mjs'
+
 const HERE = path.dirname(new URL(import.meta.url).pathname)
 const WORKFLOWS = path.join(HERE, '..', 'workflows')
 
@@ -294,16 +296,9 @@ const linter = workflows.find((w) => w.runsThisLint)
 if (!linter) {
   fail('lint.mjs', 'no workflow runs this script — every check in it is dead weight')
 } else {
-  // GitHub path filters are globs. Only the prefix up to the first wildcard is compared here: a
-  // pattern cleverer than that is reported as not covering, which errs toward noise rather than
-  // toward a check that quietly passes.
-  const covers = (pattern, target) => {
-    const wildcard = pattern.search(/[*?[]/)
-    return wildcard === -1 ? pattern === target : target.startsWith(pattern.slice(0, wildcard))
-  }
   for (const [event, paths] of Object.entries(linter.pathsByEvent)) {
     for (const target of [...bumpTargets].sort()) {
-      if (!paths.some((pattern) => covers(pattern, target))) {
+      if (!triggers(paths, target)) {
         fail(linter.name, `checks ${target} but is not triggered by it on \`${event}\` — add it to that paths list`)
       }
     }
