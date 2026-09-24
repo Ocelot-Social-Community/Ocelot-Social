@@ -1,0 +1,43 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "ocelot-social",
+      "changelog-path": "CHANGELOG.md",
+      "draft": true,
+      "force-tag-creation": true,
+      "prerelease": false,
+      "extra-files": [
+        { "type": "json", "path": "backend/package.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "backend/package-lock.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "backend/package-lock.json", "jsonpath": "$.packages[''].version" },
+        { "type": "json", "path": "webapp/package.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "webapp/package-lock.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "webapp/package-lock.json", "jsonpath": "$.packages[''].version" },
+        { "type": "json", "path": "maintenance/package.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "maintenance/package-lock.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "maintenance/package-lock.json", "jsonpath": "$.packages[''].version" },
+        { "type": "generic", "path": "deployment/helm/charts/ocelot-social/Chart.yaml" },
+        { "type": "generic", "path": "deployment/helm/charts/ocelot-neo4j/Chart.yaml" }
+      ]
+    }
+  },
+  "include-component-in-tag": false,
+  "include-v-in-tag": false,
+  "pull-request-title-pattern": "chore(release): v${version}",
+  "changelog-sections": [
+    { "type": "feat", "section": "Features", "hidden": false },
+    { "type": "feature", "section": "Features", "hidden": false },
+    { "type": "fix", "section": "Bug Fixes", "hidden": false },
+    { "type": "perf", "section": "Performance Improvements", "hidden": false },
+    { "type": "revert", "section": "Reverts", "hidden": false },
+    { "type": "refactor", "section": "Code Refactoring", "hidden": false },
+    { "type": "docs", "section": "Documentation", "hidden": false },
+    { "type": "test", "section": "Tests", "hidden": false },
+    { "type": "build", "section": "Build System & Dependencies", "hidden": false },
+    { "type": "ci", "section": "Continuous Integration", "hidden": false },
+    { "type": "style", "section": "Styles", "hidden": false },
+    { "type": "chore", "section": "Miscellaneous Chores", "hidden": false }
+  ]
+}

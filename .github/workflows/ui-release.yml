@@ -269,3 +269,79 @@ jobs:
         run: npm publish "${RUNNER_TEMP}"/pkg/*.tgz --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # The release itself is created by release-please, with the changelog entry it generated as the
+  # body. Appended here is the one thing release-please cannot know: where the published artefact
+  # actually lives. Mirrors the `## Container images` block that publish.yml appends to the
+  # application's releases.
+  #
+  # `always()` together with the explicit `needs.publish.result` gate keeps publish-gpr's deliberate
+  # independence intact: GitHub Packages is the mirror, a failure there must not hold back the
+  # release notes for a successful npm publish. It is still listed in `needs` so this job waits for
+  # it and can tell the truth about it — the mirror line is only written when it actually succeeded.
+  release_notes:
+    name: Append install instructions to the release
+    needs: [release-please, publish, publish-gpr]
+    # Runs whenever a release was cut, even if publishing failed: the "Latest" demotion below has
+    # to happen either way, or a half-finished package release keeps the badge that belongs to the
+    # application. Only the notes append is conditional on a successful npm publish.
+    if: ${{ always() && needs.release-please.outputs.release_created == 'true' }}
+    runs-on: ubuntu-latest
+    # The only write in this workflow that uses GITHUB_TOKEN rather than the app token or OIDC:
+    # editing the release body. Nothing is checked out and nothing is executed.
+    permissions:
+      contents: write
+    env:
+      TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
+      VERSION: ${{ needs.release-please.outputs.version }}
+      PACKAGE_NAME: '@ocelot-social/ui'
+      GPR_PACKAGE_NAME: '@ocelot-social-community/ui'
+      GPR_PUBLISHED: ${{ needs.publish-gpr.result == 'success' }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      # Values arrive through the environment, not through `${{ }}` interpolation into the script
+      # text: an expression is pasted in before the shell starts and would be parsed as shell source.
+      - name: Append install instructions to the release notes
+        if: ${{ needs.publish.result == 'success' }}
+        run: |
+          set -euo pipefail
+
+          # Read the body back rather than keeping a copy: release-please owns that text, and
+          # `gh release edit --notes-file` replaces the body wholesale.
+          gh release view "${TAG_NAME}" --json body --jq .body > notes.md
+
+          {
+            echo
+            echo '## Package'
+            echo
+            echo "Published to the npm registry as \`${PACKAGE_NAME}@${VERSION}\`, with a provenance attestation."
+            echo
+            echo '```bash'
+            echo "npm install ${PACKAGE_NAME}@${VERSION}"
+            echo '```'
+            if [ "${GPR_PUBLISHED}" = 'true' ]; then
+              echo
+              echo "The same build is mirrored to GitHub Packages as \`${GPR_PACKAGE_NAME}@${VERSION}\` — GitHub Packages only accepts the repository owner's scope, hence the different name."
+              echo
+              echo '```bash'
+              echo "npm install ${GPR_PACKAGE_NAME}@${VERSION} --registry=https://npm.pkg.github.com"
+              echo '```'
+            fi
+          } >> notes.md
+
+          gh release edit "${TAG_NAME}" --notes-file notes.md
+
+      # GitHub has no pin for releases; the "Latest" badge is the mechanism, and it otherwise
+      # follows whichever release was published most recently — which is a package release far more
+      # often than the application. Declining it here, and claiming it in publish.yml, keeps the
+      # badge on ocelot.social itself. Unconditional: a release that skipped the notes above must
+      # not hold on to it either.
+      - name: Decline the "Latest" badge
+        # `!cancelled()`, because a step carries an implicit `if: success()`: had the append above
+        # FAILED rather than been skipped, this would not run and the package release would keep a
+        # badge that belongs to the application. The job-level `always()` does not cover that — it
+        # governs whether the job starts, not whether a later step survives an earlier failure.
+        # `!cancelled()` rather than `always()` so a cancelled run still stops promptly.
+        if: ${{ !cancelled() }}
+        run: gh release edit "${TAG_NAME}" --latest=false
