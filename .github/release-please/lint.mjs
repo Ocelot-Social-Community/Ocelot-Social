@@ -32,6 +32,13 @@ const REPO = path.join(HERE, '..', '..')
 const problems = []
 const fail = (file, message) => problems.push({ file, message })
 
+// The lockstep check reads files from all over the repository, so a partial checkout makes every
+// one of them look deleted. Said once here, instead of fourteen misleading "does not exist" lines.
+if (!fs.existsSync(path.join(REPO, 'package.json'))) {
+  console.error(`${path.join(REPO, 'package.json')} is missing — lint.mjs needs a full checkout, not a sparse one`)
+  process.exit(2)
+}
+
 const readJson = (file) => JSON.parse(fs.readFileSync(path.join(HERE, file), 'utf8'))
 
 // Repository-root relative, which is how the workflows spell these paths.
