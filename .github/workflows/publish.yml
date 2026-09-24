@@ -392,8 +392,6 @@ jobs:
           set -euo pipefail
 
           REPOSITORY="$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')"
-          MAJOR="${VERSION%%.*}"
-          MINOR="${VERSION%.*}"
 
           # Read the body back rather than keeping a copy of it: release-please owns that text, and
           # `gh release edit --notes-file` replaces the body wholesale, so the existing notes have
@@ -415,11 +413,19 @@ jobs:
           # is what makes a release actionable. Only the runtime images are listed — the `-base`
           # and `-build` stages carry the same tags but are consumed by downstream image builds,
           # not deployed.
+          #
+          # And only the IMMUTABLE tags are named. A release body is written once and read for
+          # years, while `X.Y`, `X` and `latest` move to the next release — so listing them here
+          # would be false for every release but the current one, and false straight away for a
+          # re-run of an older release, which no longer claims those tags at all. `VERSION` and
+          # `BUILD_TAG` are the two that still mean the same thing whenever the note is read.
           {
             echo
             echo '## Container images'
             echo
-            echo "Published to \`${REGISTRY}\` and tagged \`${VERSION}\`, \`${MINOR}\`, \`${MAJOR}\`, \`latest\` and \`${BUILD_TAG}\` (this commit only)."
+            echo "Published to \`${REGISTRY}\`, tagged \`${VERSION}\` and \`${BUILD_TAG}\` (this exact commit)."
+            echo
+            echo 'The `X.Y`, `X` and `latest` tags are deliberately not listed here: they follow whichever release is newest, so a release note naming them stops being true the moment the next one ships.'
             echo
             echo '```bash'
             jq -r --arg registry "${REGISTRY}/${REPOSITORY}" --arg version "${VERSION}" \
