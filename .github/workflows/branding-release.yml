@@ -265,7 +265,10 @@ jobs:
   release_notes:
     name: Append install instructions to the release
     needs: [release-please, publish, publish-gpr]
-    if: ${{ always() && needs.publish.result == 'success' }}
+    # Runs whenever a release was cut, even if publishing failed: the "Latest" demotion below has
+    # to happen either way, or a half-finished package release keeps the badge that belongs to the
+    # application. Only the notes append is conditional on a successful npm publish.
+    if: ${{ always() && needs.release-please.outputs.release_created == 'true' }}
     runs-on: ubuntu-latest
     # The only write in this workflow that uses GITHUB_TOKEN rather than the app token or OIDC:
     # editing the release body. Nothing is checked out and nothing is executed.
@@ -283,6 +286,7 @@ jobs:
       # Values arrive through the environment, not through `${{ }}` interpolation into the script
       # text: an expression is pasted in before the shell starts and would be parsed as shell source.
       - name: Append install instructions to the release notes
+        if: ${{ needs.publish.result == 'success' }}
         run: |
           set -euo pipefail
 
@@ -310,3 +314,11 @@ jobs:
           } >> notes.md
 
           gh release edit "${TAG_NAME}" --notes-file notes.md
+
+      # GitHub has no pin for releases; the "Latest" badge is the mechanism, and it otherwise
+      # follows whichever release was published most recently — which is a package release far more
+      # often than the application. Declining it here, and claiming it in publish.yml, keeps the
+      # badge on ocelot.social itself. Unconditional: a release that skipped the notes above must
+      # not hold on to it either.
+      - name: Decline the "Latest" badge
+        run: gh release edit "${TAG_NAME}" --latest=false

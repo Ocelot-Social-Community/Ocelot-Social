@@ -258,9 +258,15 @@ jobs:
             # github_tag's tag lookup, decides. Without the distinction this would move
             # `3.18.4` onto every later master commit, which is the mutability the version tags
             # exist to avoid.
+            # `latest` alongside the version tags, because without it `docker pull <image>` — the
+            # form every registry UI and every copied command line uses — fails outright. It only
+            # moves on a release, never on an ordinary master commit: the moving tag that follows
+            # master already exists and is called `master` (docker-push applies it through
+            # `type=ref,event=branch`), and conflating the two would make `latest` mean "newest
+            # commit" rather than "newest release".
             TAGS=(--tag "${IMAGE}:${BUILD_TAG}")
             if [ "${IS_RELEASE}" = 'true' ]; then
-              TAGS+=(--tag "${IMAGE}:${VERSION}" --tag "${IMAGE}:${MINOR}" --tag "${IMAGE}:${MAJOR}")
+              TAGS+=(--tag "${IMAGE}:${VERSION}" --tag "${IMAGE}:${MINOR}" --tag "${IMAGE}:${MAJOR}" --tag "${IMAGE}:latest")
             fi
 
             echo "tagging ${IMAGE}: ${TAGS[*]//--tag /}"
@@ -343,7 +349,7 @@ jobs:
             echo
             echo '## Container images'
             echo
-            echo "Published to \`${REGISTRY}\` and tagged \`${VERSION}\`, \`${MINOR}\`, \`${MAJOR}\` and \`${BUILD_TAG}\` (this commit only)."
+            echo "Published to \`${REGISTRY}\` and tagged \`${VERSION}\`, \`${MINOR}\`, \`${MAJOR}\`, \`latest\` and \`${BUILD_TAG}\` (this commit only)."
             echo
             echo '```bash'
             jq -r --arg registry "${REGISTRY}/${REPOSITORY}" --arg version "${VERSION}" \
@@ -364,8 +370,22 @@ jobs:
       # tags. The `<version>` git tag is NOT waiting on this: `force-tag-creation` in
       # root-config.json has release-please create the ref outright rather than letting it appear
       # as a side effect of publishing the release.
+      #   --title  the release list holds the application's releases next to `ui: v0.0.4` and
+      #            `branding: v0.2.1`, and an entry reading just `3.19.0` does not say what it is
+      #            the version OF. release-please cannot produce this name: it only prefixes the
+      #            component when `include-component-in-tag` is on, which would turn the tag into
+      #            `ocelot-v3.19.0` — the one string the branded downstream repositories resolve
+      #            their base images by. So the name is set here and the tag stays bare.
+      #   --latest GitHub has no way to pin a release; the "Latest" badge is the mechanism, and by
+      #            default it follows whichever release was published most recently. That is a
+      #            package release most of the time, so the application — the thing anyone visiting
+      #            this repository is looking for — gets buried. Claiming it explicitly here, and
+      #            declining it in the package workflows, keeps the badge on ocelot.social itself.
+      # Block scalar, not a plain one: the title contains `: `, which ends a plain YAML scalar and
+      # makes the whole workflow unparseable.
       - name: Publish the release
-        run: gh release edit "${TAG_NAME}" --draft=false
+        run: |
+          gh release edit "${TAG_NAME}" --title "ocelot: v${VERSION}" --latest --draft=false
 
   build_trigger:
     name: Trigger successful build
