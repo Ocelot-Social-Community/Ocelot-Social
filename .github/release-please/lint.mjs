@@ -25,6 +25,7 @@ const require = createRequire(path.join(modulesPrefix, '/'))
 const Ajv = require('ajv')
 const addFormats = require('ajv-formats')
 const { JSONPath } = require('jsonpath-plus')
+const YAML = require('yaml')
 const schema = require('release-please/schemas/config.json')
 
 const REPO = path.join(HERE, '..', '..')
@@ -32,6 +33,39 @@ const problems = []
 const fail = (file, message) => problems.push({ file, message })
 
 const readJson = (file) => JSON.parse(fs.readFileSync(path.join(HERE, file), 'utf8'))
+
+// Repository-root relative, which is how the workflows spell these paths.
+const rel = (file) => `.github/release-please/${file}`
+
+// Every workflow reduced to the two things the checks below care about: which release-please steps
+// it runs with which config/manifest, and which paths trigger it. Parsed, never grepped — see the
+// comment on check 4.
+const workflows = fs
+  .readdirSync(WORKFLOWS)
+  .filter((w) => w.endsWith('.yml') || w.endsWith('.yaml'))
+  .map((name) => {
+    let doc
+    try {
+      doc = YAML.parse(fs.readFileSync(path.join(WORKFLOWS, name), 'utf8'))
+    } catch (error) {
+      fail(name, `is not parseable YAML: ${error.message}`)
+      return { name, releasePlease: [], paths: [] }
+    }
+    // `on` is a YAML 1.1 boolean; the parser here is YAML 1.2, where it stays a string. Both are
+    // read so a parser change cannot quietly turn every workflow into "no triggers, no steps".
+    const on = doc?.on ?? doc?.[true] ?? {}
+    const paths = Object.values(on)
+      .filter((event) => event && typeof event === 'object')
+      .flatMap((event) => event.paths ?? [])
+
+    const releasePlease = Object.values(doc?.jobs ?? {})
+      .flatMap((job) => job?.steps ?? [])
+      .filter((step) => typeof step?.uses === 'string' && step.uses.startsWith('googleapis/release-please-action@'))
+      .map((step) => ({ configFile: step.with?.['config-file'], manifestFile: step.with?.['manifest-file'] }))
+
+    return { name, releasePlease, paths }
+  })
+
 const entries = fs.readdirSync(HERE)
 const configs = entries.filter((f) => f.endsWith('-config.json')).sort()
 const manifests = entries.filter((f) => f.endsWith('-manifest.json')).sort()
@@ -89,15 +123,45 @@ for (const file of configs) {
     sectionLists.set(file, JSON.stringify(config['changelog-sections']))
   }
 
-  // 4. Exactly one workflow per config. Two workflows reading one config is what lost the
-  //    @ocelot-social/ui@0.0.2 publish — both ran on the same commit and raced for the same tag.
-  //    Zero workflows reading it is the quieter failure: the package simply never releases.
-  const readers = fs
-    .readdirSync(WORKFLOWS)
-    .filter((w) => w.endsWith('.yml'))
-    .filter((w) => fs.readFileSync(path.join(WORKFLOWS, w), 'utf8').includes(file))
+  // 4. Exactly one workflow per config, and that workflow's trigger matches what it releases.
+  //
+  //    Read out of the parsed workflow, not by searching its text: a config file name also appears
+  //    in comments and in error messages (publish.yml quotes root-config.json in the hint it prints
+  //    when the version guard trips), and a substring match counts those as if a release step used
+  //    the config. It would equally miss the opposite — a workflow that still mentions a config in
+  //    a comment but lost its `config-file:` input releases nothing at all, and nothing says so.
+  const readers = workflows.filter((w) => w.releasePlease.some((r) => r.configFile === rel(file)))
   if (readers.length !== 1) {
-    fail(file, `is referenced by ${readers.length} workflow(s) [${readers.join(', ')}] — expected exactly 1`)
+    fail(
+      file,
+      `is the \`config-file\` of ${readers.length} workflow(s) [${readers.map((w) => w.name).join(', ') || 'none'}] — expected exactly 1. ` +
+        'Two is the @ocelot-social/ui@0.0.2 race; zero means the package silently stops releasing.',
+    )
+  }
+
+  for (const reader of readers) {
+    const step = reader.releasePlease.find((r) => r.configFile === rel(file))
+    const expectedManifest = rel(`${name}-manifest.json`)
+    if (step.manifestFile !== expectedManifest) {
+      fail(file, `${reader.name} pairs it with \`manifest-file: ${step.manifestFile}\`, expected ${expectedManifest}`)
+    }
+    // Only meaningful when the workflow filters by path at all: publish.yml runs on every master
+    // push and therefore cannot miss a change to its own config.
+    if (reader.paths.length > 0) {
+      for (const needed of [rel(file), expectedManifest]) {
+        if (!reader.paths.includes(needed)) {
+          fail(file, `${reader.name} releases it but does not list ${needed} in its trigger paths — a change to it would not start a run`)
+        }
+      }
+    }
+  }
+
+  // The mirror image: no workflow may be triggered by a config it does not release. That is the
+  // shape the ui@0.0.2 race actually had — branding-release.yml woke up on ui's files.
+  for (const workflow of workflows) {
+    if (workflow.paths.includes(rel(file)) && !workflow.releasePlease.some((r) => r.configFile === rel(file))) {
+      fail(file, `${workflow.name} is triggered by it but does not release it — that is exactly the cross-trigger that lost @ocelot-social/ui@0.0.2`)
+    }
   }
 }
 
