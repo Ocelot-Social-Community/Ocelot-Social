@@ -38,6 +38,27 @@ silently — none of them turns a release workflow red on its own:
 | `<name>-config.json` ↔ `<name>-manifest.json` exist in pairs, and their package paths match | A manifest key the config does not release is a version nobody bumps; a config path the manifest does not list makes release-please treat the package as unreleased and start its changelog from the repository's first commit. |
 | Every config has `changelog-sections`, and all of them are identical | The drift described above. A config without the list silently falls back to the defaults. |
 | Every config is read by exactly **one** workflow | Two readers is the `@ocelot-social/ui@0.0.2` race below. Zero readers is quieter: the package simply stops releasing. |
+| Every file a config bumps carries the version its manifest records | The lockstep bump silently stopping — see below. This one fires on the release pull request itself, because that pull request edits `<name>-manifest.json` and therefore triggers the lint: a file the bump missed still shows the old version while the manifest already shows the new one. |
+| No `extra-files` entry is a bare string ending in `.json`/`.yaml`/`.toml`/`.xml` | The trap below. |
+
+### The `extra-files` trap
+
+`extra-files` accepts strings and objects, and release-please picks a **different updater** per form
+and per file extension. A bare string ending in `.yaml` does not get the marker-based updater — it
+gets `CompositeUpdater(GenericYaml('$.version'), Generic)`, which reparses and reserialises the
+YAML. That strips every comment in the file, including the `# x-release-please-version` markers the
+second half of the composite would have needed, and it only ever addresses `$.version` — so
+`appVersion` is left on the previous release. Nothing fails; the chart is just wrong, and the
+branded deployments then resolve an `appVersion` that no longer matches the release.
+
+Hence `{ "type": "generic", "path": "…/Chart.yaml" }` for the Helm charts: `generic` is the only
+form that uses the `Generic` updater alone, which does line-level replacement and honours the
+markers on both `version` and `appVersion`. Bare strings stay fine for extensions release-please has
+no parser for — `packages/branding`'s `src/version.ts` is one.
+
+The lockstep set is what the configs list, nothing is discovered: `styleguide/package.json` carries
+its own unrelated version and is deliberately absent. A **newly added** chart or application
+directory is therefore not noticed by the lint — add it to `extra-files` when you add it.
 
 The lint pins its own `release-please` version rather than reading the one the action bundles. A
 bump there may legitimately turn it red — that is the point, and the pull request that bumps it is a

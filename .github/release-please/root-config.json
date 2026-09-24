@@ -17,8 +17,8 @@
         { "type": "json", "path": "maintenance/package.json", "jsonpath": "$.version" },
         { "type": "json", "path": "maintenance/package-lock.json", "jsonpath": "$.version" },
         { "type": "json", "path": "maintenance/package-lock.json", "jsonpath": "$.packages[''].version" },
-        "deployment/helm/charts/ocelot-social/Chart.yaml",
-        "deployment/helm/charts/ocelot-neo4j/Chart.yaml"
+        { "type": "generic", "path": "deployment/helm/charts/ocelot-social/Chart.yaml" },
+        { "type": "generic", "path": "deployment/helm/charts/ocelot-neo4j/Chart.yaml" }
       ]
     }
   },

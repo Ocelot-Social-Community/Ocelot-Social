@@ -24,8 +24,10 @@ if (!modulesPrefix) {
 const require = createRequire(path.join(modulesPrefix, '/'))
 const Ajv = require('ajv')
 const addFormats = require('ajv-formats')
+const { JSONPath } = require('jsonpath-plus')
 const schema = require('release-please/schemas/config.json')
 
+const REPO = path.join(HERE, '..', '..')
 const problems = []
 const fail = (file, message) => problems.push({ file, message })
 
@@ -96,6 +98,91 @@ for (const file of configs) {
     .filter((w) => fs.readFileSync(path.join(WORKFLOWS, w), 'utf8').includes(file))
   if (readers.length !== 1) {
     fail(file, `is referenced by ${readers.length} workflow(s) [${readers.join(', ')}] — expected exactly 1`)
+  }
+}
+
+// 5. Lockstep versions. Everything a config claims to bump has to actually carry the version the
+//    manifest records. This is the check that fires on the release pull request itself — that pull
+//    request edits `<name>-manifest.json`, so it triggers this workflow, and any file the bump
+//    missed still shows the previous version while the manifest already shows the new one.
+//
+//    It exists because the failure is invisible otherwise. `extra-files` entries are strings or
+//    objects, and release-please picks a DIFFERENT updater per form and per file extension: the
+//    bare string `"…/Chart.yaml"` is routed to `GenericYaml('$.version')`, which reparses and
+//    reserialises the YAML — stripping every comment, including the `x-release-please-version`
+//    markers — and never touches `appVersion`. Nothing fails; the chart is simply wrong, and the
+//    branded deployments resolve an appVersion that no longer matches the release.
+const MARKER = 'x-release-please-version'
+const BLOCK_MARKER = 'x-release-please-start-'
+const TRAP_EXTENSIONS = /\.(json|ya?ml|toml|xml)$/
+
+// `extra-files` are relative to the package path, except for the root component and for paths
+// written with a leading slash, which are relative to the repository root.
+const resolveExtra = (pkgPath, filePath) =>
+  filePath.startsWith('/') || pkgPath === '.' ? filePath.replace(/^\//, '') : path.posix.join(pkgPath, filePath)
+
+function checkGeneric(configFile, relPath, version) {
+  const abs = path.join(REPO, relPath)
+  if (!fs.existsSync(abs)) return fail(configFile, `bumps ${relPath}, which does not exist`)
+  const lines = fs.readFileSync(abs, 'utf8').split('\n')
+  const marked = lines.filter((l) => l.includes(MARKER) && !l.includes(BLOCK_MARKER))
+  if (marked.length === 0 && !lines.some((l) => l.includes('x-release-please-'))) {
+    return fail(configFile, `bumps ${relPath} with the generic updater, but that file carries no \`${MARKER}\` marker — the bump would be a silent no-op`)
+  }
+  for (const line of marked) {
+    if (!line.includes(version)) {
+      fail(configFile, `${relPath} is marked for bumping but reads \`${line.trim()}\` while the manifest says ${version}`)
+    }
+  }
+}
+
+function checkJsonPath(configFile, relPath, jsonpath, version) {
+  const abs = path.join(REPO, relPath)
+  if (!fs.existsSync(abs)) return fail(configFile, `bumps ${relPath}, which does not exist`)
+  let found
+  try {
+    found = JSONPath({ path: jsonpath, json: JSON.parse(fs.readFileSync(abs, 'utf8')) })
+  } catch (error) {
+    return fail(configFile, `cannot evaluate \`${jsonpath}\` against ${relPath}: ${error.message}`)
+  }
+  if (found.length === 0) return fail(configFile, `\`${jsonpath}\` matches nothing in ${relPath} — the bump would be a silent no-op`)
+  for (const value of found) {
+    if (value !== version) fail(configFile, `${relPath} \`${jsonpath}\` is ${JSON.stringify(value)}, manifest says ${version}`)
+  }
+}
+
+for (const file of configs) {
+  const name = file.replace('-config.json', '')
+  if (!namesFromManifests.includes(name)) continue
+  const config = readJson(file)
+  const manifest = readJson(`${name}-manifest.json`)
+
+  for (const [pkgPath, pkgConfig] of Object.entries(config.packages ?? {})) {
+    const version = manifest[pkgPath]
+    if (!version) continue // already reported by the pairing check above
+
+    // The package's own manifest file, written by the release-type rather than by `extra-files`.
+    const releaseType = pkgConfig['release-type'] ?? config['release-type']
+    if (releaseType === 'node') {
+      checkJsonPath(file, resolveExtra(pkgPath, 'package.json'), '$.version', version)
+    }
+
+    for (const extra of pkgConfig['extra-files'] ?? []) {
+      if (typeof extra === 'string') {
+        if (TRAP_EXTENSIONS.test(extra)) {
+          fail(file, `extra-files entry "${extra}" is a bare string: release-please then routes it through a parse-and-reserialise updater that only touches \`$.version\` and destroys comments. Use {"type": "generic", "path": "${extra}"} for marker-based bumping, or {"type": "json"/"yaml", "path": …, "jsonpath": …} to address a field.`)
+          continue
+        }
+        checkGeneric(file, resolveExtra(pkgPath, extra), version)
+      } else if (extra.type === 'generic') {
+        checkGeneric(file, resolveExtra(pkgPath, extra.path), version)
+      } else if (extra.type === 'json') {
+        checkJsonPath(file, resolveExtra(pkgPath, extra.path), extra.jsonpath, version)
+      } else {
+        // Anything else would pass unchecked, which is worse than a noisy failure.
+        fail(file, `extra-files type "${extra.type}" (${extra.path}) is not covered by this lint — teach lint.mjs how to read a version out of it before using it`)
+      }
+    }
   }
 }
 

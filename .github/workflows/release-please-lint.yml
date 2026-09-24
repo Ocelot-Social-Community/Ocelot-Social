@@ -64,7 +64,7 @@ jobs:
       # workflows (v5.0.0 depends on `release-please@^17.6.0`); a newer patch only ever validates
       # more strictly than what the action bundles, which is the safe direction.
       - name: Install lint dependencies
-        run: npm install --prefix "${RUNNER_TEMP}/rp-lint" --no-audit --no-fund --no-save ajv@8.20.0 ajv-formats@3.0.1 release-please@17.11.2
+        run: npm install --prefix "${RUNNER_TEMP}/rp-lint" --no-audit --no-fund --no-save ajv@8.20.0 ajv-formats@3.0.1 jsonpath-plus@10.3.0 release-please@17.11.2
 
       - name: Lint release-please config
         run: node .github/release-please/lint.mjs
