@@ -224,6 +224,44 @@ $ docker compose exec backend npm run db:seed
 For a closer description see [backend](./backend/README.md).  
 For a full documentation of the Docker installation see [summary](./SUMMARY.md).
 
+##### One-time MinIO Volume Migration
+
+MinIO stopped publishing free community images, so the development and test stacks
+now use `cgr.dev/chainguard/minio` instead of `quay.io/minio/minio`. The new image
+runs as UID `65532` where the old one ran as root, and the `minio_data` volume
+written by the old image is owned by root. MinIO therefore cannot write to it and
+aborts on startup:
+
+```
+FATAL Unable to initialize backend: Unable to write to the backend
+Error: unable to rename (/data/.minio.sys/tmp -> …) file access denied,
+       drive may be faulty, please investigate
+```
+
+Despite how it reads, this is a permission problem and not data loss. If you have
+an existing volume, hand its ownership over once — note that the path lives inside
+a Docker volume, so the `sudo chown -R nonroot. <path>` hint MinIO prints does not
+apply:
+
+```bash
+# in main folder, with the stack stopped
+$ docker compose rm -sf minio
+$ docker run --rm -v ocelot-social_minio_data:/data busybox \
+    chown -R 65532:65532 /data
+```
+
+If the uploads are expendable, discarding the volume works just as well. Remove
+only that one volume — `docker compose down -v` would take the Neo4j data with it:
+
+```bash
+$ docker compose rm -sf minio
+$ docker volume rm ocelot-social_minio_data
+```
+
+A fresh volume needs neither step. The volume is prefixed with the Compose project
+name, which defaults to the directory you cloned into (`ocelot-social` above) —
+check `docker volume ls` if yours differs.
+
 #### Local Installation
 
 For a full documentation of the local installation see [summary](./SUMMARY.md).

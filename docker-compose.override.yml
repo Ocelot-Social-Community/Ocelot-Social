@@ -71,9 +71,26 @@ services:
     # the upstream repository is archived and source-only. Chainguard rebuilds
     # the same server and serves it anonymously on its free tier.
     # Entrypoint is `/usr/bin/minio` (not the old docker-entrypoint.sh), so the
-    # `command:` below still arrives as its arguments. The image ships /data
-    # owned by its non-root user, which a fresh named volume inherits — no
-    # chown dance needed.
+    # `command:` below still arrives as its arguments.
+    #
+    # Unlike the quay.io image it runs as UID 65532 rather than root. A FRESH
+    # named volume still works, but not because of ownership: /data in the image
+    # is root-owned and mode 0777, and that mode is what the volume inherits. An
+    # EXISTING volume written by the old image is root-owned 0755 instead, and
+    # minio dies on it with "Unable to initialize backend: Unable to write to
+    # the backend". The accompanying "drive may be faulty, please investigate"
+    # reads like data loss and is not, and minio's own hint
+    # (`sudo chown -R nonroot. <path>`) misleads as well — the path is inside a
+    # Docker volume, not on the host. Hand the ownership over from a container:
+    #
+    #   docker compose rm -sf minio
+    #   docker run --rm -v ocelot-social_minio_data:/data busybox \
+    #     chown -R 65532:65532 /data
+    #
+    # Deliberately a documented one-time step (see README.md) rather than an
+    # init container that chowns on every start: this is the dev and test stack
+    # only, CI always begins with an empty volume, so it is needed once per
+    # developer — not worth a permanently root-running service in here.
     image: cgr.dev/chainguard/minio
     ports:
       # 9000 = S3 API, 9001 = web console. The backend test suite hits the S3
