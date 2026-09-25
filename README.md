@@ -224,6 +224,58 @@ $ docker compose exec backend npm run db:seed
 For a closer description see [backend](./backend/README.md).  
 For a full documentation of the Docker installation see [summary](./SUMMARY.md).
 
+##### One-time MinIO Volume Migration
+
+MinIO stopped publishing free community images, so the development and test stacks
+now use `cgr.dev/chainguard/minio` instead of `quay.io/minio/minio`. The new image
+runs as UID `65532` where the old one ran as root, and the `minio_data` volume
+written by the old image is owned by root. MinIO therefore cannot write to it and
+aborts on startup:
+
+```
+FATAL Unable to initialize backend: Unable to write to the backend
+Error: unable to rename (/data/.minio.sys/tmp -> …) file access denied,
+       drive may be faulty, please investigate
+```
+
+Despite how it reads, this is a permission problem and not data loss. A fresh
+volume needs no migration at all; only a volume the old image already wrote to
+does.
+
+Compose names the volume `minio_data` and prefixes it with the project name, which
+defaults to the directory you cloned into. Look the real name up first and
+substitute it in **both** commands below — the examples say
+`ocelot-social_minio_data`, which is only correct for a clone in a directory called
+`ocelot-social`:
+
+```bash
+$ docker volume ls --filter name=minio_data
+```
+
+Getting that name wrong is worse than a typo. `docker run -v` CREATES any volume it
+does not find, so the `chown` would report success while operating on a new, empty
+volume and leaving the real one untouched; `docker volume rm` would simply fail with
+`no such volume`.
+
+To keep the uploads, hand the ownership over once. Note that MinIO's own
+`sudo chown -R nonroot. <path>` hint does not apply — the path lives inside a Docker
+volume, not on the host:
+
+```bash
+# in main folder, with the stack stopped
+$ docker compose rm -sf minio
+$ docker run --rm -v ocelot-social_minio_data:/data busybox \
+    chown -R 65532:65532 /data
+```
+
+If the uploads are expendable, discarding the volume works just as well. Remove only
+that one volume — `docker compose down -v` would take the Neo4j data with it:
+
+```bash
+$ docker compose rm -sf minio
+$ docker volume rm ocelot-social_minio_data
+```
+
 #### Local Installation
 
 For a full documentation of the local installation see [summary](./SUMMARY.md).

@@ -84,7 +84,38 @@ services:
       - 1025:1025
 
   minio:
-    image: quay.io/minio/minio
+    # MinIO stopped publishing free community images: Docker Hub deleted the
+    # repositories in September 2026, quay.io locked them down days later, and
+    # the upstream repository is archived and source-only. Chainguard rebuilds
+    # the same server and serves it anonymously on its free tier.
+    # Entrypoint is `/usr/bin/minio` (not the old docker-entrypoint.sh), so the
+    # `command:` below still arrives as its arguments.
+    #
+    # Unlike the quay.io image it runs as UID 65532 rather than root. A FRESH
+    # named volume still works, but not because of ownership: /data in the image
+    # is root-owned and mode 0777, and that mode is what the volume inherits. An
+    # EXISTING volume written by the old image is root-owned 0755 instead, and
+    # minio dies on it with "Unable to initialize backend: Unable to write to
+    # the backend". The accompanying "drive may be faulty, please investigate"
+    # reads like data loss and is not, and minio's own hint
+    # (`sudo chown -R nonroot. <path>`) misleads as well — the path is inside a
+    # Docker volume, not on the host. Hand the ownership over from a container:
+    #
+    #   docker compose rm -sf minio
+    #   docker run --rm -v ocelot-social_minio_data:/data busybox \
+    #     chown -R 65532:65532 /data
+    #
+    # That volume name carries the Compose project name, which defaults to the
+    # checkout directory. Look the real one up first
+    # (`docker volume ls --filter name=minio_data`): `docker run -v` CREATES any
+    # volume it does not find, so a wrong name makes the chown report success
+    # against a new empty volume and leaves the real one untouched.
+    #
+    # Deliberately a documented one-time step (see README.md) rather than an
+    # init container that chowns on every start: this is the dev and test stack
+    # only, CI always begins with an empty volume, so it is needed once per
+    # developer — not worth a permanently root-running service in here.
+    image: cgr.dev/chainguard/minio
     ports:
       - 9000:9000
       - 9001:9001
@@ -96,7 +127,11 @@ services:
     command: server /data --console-address ":9001"
 
   minio-mc:
-    image: quay.io/minio/mc
+    # `-dev` deliberately: the plain Chainguard image has no /bin/sh at all
+    # (only bash, incidentally), and the entrypoint below is a shell script. A
+    # guaranteed shell is what the -dev variant is for; relying on bash
+    # happening to stay in a minimal image is how this breaks again silently.
+    image: cgr.dev/chainguard/minio-client:latest-dev
     depends_on:
       - minio
     restart: on-failure
