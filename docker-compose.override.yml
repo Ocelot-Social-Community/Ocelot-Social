@@ -66,7 +66,15 @@ services:
       - 1025:1025
 
   minio:
-    image: quay.io/minio/minio
+    # MinIO stopped publishing free community images: Docker Hub deleted the
+    # repositories in September 2026, quay.io locked them down days later, and
+    # the upstream repository is archived and source-only. Chainguard rebuilds
+    # the same server and serves it anonymously on its free tier.
+    # Entrypoint is `/usr/bin/minio` (not the old docker-entrypoint.sh), so the
+    # `command:` below still arrives as its arguments. The image ships /data
+    # owned by its non-root user, which a fresh named volume inherits — no
+    # chown dance needed.
+    image: cgr.dev/chainguard/minio
     ports:
       # 9000 = S3 API, 9001 = web console. The backend test suite hits the S3
       # API at http://localhost:9000 (see backend/test/helpers.ts), so without
@@ -82,7 +90,11 @@ services:
     command: server /data --console-address ":9001"
 
   minio-mc:
-    image: quay.io/minio/mc
+    # `-dev` deliberately: the plain Chainguard image has no /bin/sh at all
+    # (only bash, incidentally), and the entrypoint below is a shell script. A
+    # guaranteed shell is what the -dev variant is for; relying on bash
+    # happening to stay in a minimal image is how this breaks again silently.
+    image: cgr.dev/chainguard/minio-client:latest-dev
     depends_on:
       - minio
     restart: on-failure

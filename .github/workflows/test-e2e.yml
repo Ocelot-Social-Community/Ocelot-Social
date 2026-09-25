@@ -69,8 +69,8 @@ jobs:
 
       - name: Pull third-party images
         run: |
-          docker pull quay.io/minio/minio:latest
-          docker pull quay.io/minio/mc:latest
+          docker pull cgr.dev/chainguard/minio:latest
+          docker pull cgr.dev/chainguard/minio-client:latest-dev
           docker pull maildev/maildev:latest
 
       # Compressed on the way out: `docker save` writes UNCOMPRESSED layer tars, and every byte here is
@@ -82,8 +82,8 @@ jobs:
         run: |
           docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" | zstd -T0 -3 > /tmp/backend.tar.zst
           docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" | zstd -T0 -3 > /tmp/neo4j.tar.zst
-          docker save "quay.io/minio/minio:latest" | zstd -T0 -3 > /tmp/minio.tar.zst
-          docker save "quay.io/minio/mc:latest" | zstd -T0 -3 > /tmp/minio-mc.tar.zst
+          docker save "cgr.dev/chainguard/minio:latest" | zstd -T0 -3 > /tmp/minio.tar.zst
+          docker save "cgr.dev/chainguard/minio-client:latest-dev" | zstd -T0 -3 > /tmp/minio-mc.tar.zst
           docker save "maildev/maildev:latest" | zstd -T0 -3 > /tmp/mailserver.tar.zst
 
       # ARTIFACT, not cache. These are run-scoped hand-offs between jobs, which is what artifacts are
