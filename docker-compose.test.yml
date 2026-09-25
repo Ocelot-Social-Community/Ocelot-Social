@@ -105,6 +105,12 @@ services:
     #   docker run --rm -v ocelot-social_minio_data:/data busybox \
     #     chown -R 65532:65532 /data
     #
+    # That volume name carries the Compose project name, which defaults to the
+    # checkout directory. Look the real one up first
+    # (`docker volume ls --filter name=minio_data`): `docker run -v` CREATES any
+    # volume it does not find, so a wrong name makes the chown report success
+    # against a new empty volume and leaves the real one untouched.
+    #
     # Deliberately a documented one-time step (see README.md) rather than an
     # init container that chowns on every start: this is the dev and test stack
     # only, CI always begins with an empty volume, so it is needed once per

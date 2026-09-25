@@ -238,10 +238,28 @@ Error: unable to rename (/data/.minio.sys/tmp -> …) file access denied,
        drive may be faulty, please investigate
 ```
 
-Despite how it reads, this is a permission problem and not data loss. If you have
-an existing volume, hand its ownership over once — note that the path lives inside
-a Docker volume, so the `sudo chown -R nonroot. <path>` hint MinIO prints does not
-apply:
+Despite how it reads, this is a permission problem and not data loss. A fresh
+volume needs no migration at all; only a volume the old image already wrote to
+does.
+
+Compose names the volume `minio_data` and prefixes it with the project name, which
+defaults to the directory you cloned into. Look the real name up first and
+substitute it in **both** commands below — the examples say
+`ocelot-social_minio_data`, which is only correct for a clone in a directory called
+`ocelot-social`:
+
+```bash
+$ docker volume ls --filter name=minio_data
+```
+
+Getting that name wrong is worse than a typo. `docker run -v` CREATES any volume it
+does not find, so the `chown` would report success while operating on a new, empty
+volume and leaving the real one untouched; `docker volume rm` would simply fail with
+`no such volume`.
+
+To keep the uploads, hand the ownership over once. Note that MinIO's own
+`sudo chown -R nonroot. <path>` hint does not apply — the path lives inside a Docker
+volume, not on the host:
 
 ```bash
 # in main folder, with the stack stopped
@@ -250,17 +268,13 @@ $ docker run --rm -v ocelot-social_minio_data:/data busybox \
     chown -R 65532:65532 /data
 ```
 
-If the uploads are expendable, discarding the volume works just as well. Remove
-only that one volume — `docker compose down -v` would take the Neo4j data with it:
+If the uploads are expendable, discarding the volume works just as well. Remove only
+that one volume — `docker compose down -v` would take the Neo4j data with it:
 
 ```bash
 $ docker compose rm -sf minio
 $ docker volume rm ocelot-social_minio_data
 ```
-
-A fresh volume needs neither step. The volume is prefixed with the Compose project
-name, which defaults to the directory you cloned into (`ocelot-social` above) —
-check `docker volume ls` if yours differs.
 
 #### Local Installation
 
