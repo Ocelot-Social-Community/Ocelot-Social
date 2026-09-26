@@ -119,7 +119,7 @@
     "jest-serializer-vue": "^3.1.0",
     "mutation-observer": "^1.0.3",
     "nuxt": "^2.18.1",
-    "prettier": "~3.9.6",
+    "prettier": "~3.9.8",
     "raw-loader": "^4.0.2",
     "storybook": "7.6.24",
     "storybook-design-token": "^3.3.0",
