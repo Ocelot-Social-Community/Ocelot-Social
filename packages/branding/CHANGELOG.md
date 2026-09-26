@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.2.1...branding-v0.2.2) (2026-09-26)
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump typescript-eslint from 8.70.0 to 8.70.1 in /packages/branding ([#10325](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10325)) ([0dd6902](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/0dd6902b1373ad860e635da49b7a43c785d07325))
+
 ## [0.2.1](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.2.0...branding-v0.2.1) (2026-09-23)
 
 
