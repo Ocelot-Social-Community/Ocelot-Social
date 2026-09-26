@@ -29,8 +29,9 @@ repository, so the list is duplicated by necessity. **When you change one, chang
 ## The lint
 
 [`lint.mjs`](./lint.mjs), run by [`release-please-lint.yml`](../workflows/release-please-lint.yml) on
-any change under this directory or `.github/workflows/`, checks the invariants that otherwise break
-silently — none of them turns a release workflow red on its own:
+any change under this directory, under `.github/workflows/`, or to a file one of the configs bumps,
+checks the invariants that otherwise break silently — none of them turns a release workflow red on
+its own:
 
 | Check | What it catches |
 | ----- | --------------- |
