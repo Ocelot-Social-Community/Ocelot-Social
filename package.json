@@ -36,9 +36,9 @@
     "cypress:open": "cypress open --e2e --browser ${CYPRESS_BROWSER:-chrome} --config-file ./cypress/cypress.config.js"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.0",
-    "@babel/preset-env": "^7.29.0",
-    "@babel/register": "^7.28.6",
+    "@babel/core": "^8.0.6",
+    "@babel/preset-env": "^8.0.6",
+    "@babel/register": "^8.0.6",
     "@badeball/cypress-cucumber-preprocessor": "^28.0.0",
     "@cucumber/cucumber": "13.2.1",
     "@cypress/webpack-preprocessor": "^8.0.0",
