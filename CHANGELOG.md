@@ -9,6 +9,29 @@ verbatim; only its version headings were lifted to `##`, because release-please 
 in front of the first `##`/`###` version heading it finds and would otherwise have written it into
 the middle of the file.
 
+## [3.19.1](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/3.19.0...3.19.1) (2026-09-26)
+
+
+### Bug Fixes
+
+* **docker:** use changeguard minio image ([#10294](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10294)) ([4cef659](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/4cef659d6855b06b356fc6b6aa2eba7551286be6))
+* **workflow:** fix release-please lint workflow ([#10327](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10327)) ([cd6bcd5](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/cd6bcd571d8be71147ae58355b73c077217c22a1))
+
+
+### Documentation
+
+* **docu:** release 3.19 docu ([#10326](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10326)) ([ddfeb23](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/ddfeb23477edbb87a378d4da55ac1e2260300712))
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump dotenv from 17.3.1 to 18.0.3 ([#10301](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10301)) ([01ef377](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/01ef37745d97c4dfef4d18f369eb263f1df2f811))
+* **deps-dev:** bump sass-embedded from 1.104.1 to 1.105.0 ([#10299](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10299)) ([82ca99d](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/82ca99de516c345bc44ca2001df742269c581167))
+* **deps-dev:** bump typescript-eslint from 8.70.0 to 8.70.1 in /packages/branding ([#10325](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10325)) ([0dd6902](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/0dd6902b1373ad860e635da49b7a43c785d07325))
+* **deps-dev:** bump webpack from 5.111.0 to 5.111.1 ([#10298](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10298)) ([7480e34](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/7480e34a47cdbd186e6badfd912e229c2dd3d414))
+* **deps:** bump node from 26.8.1-alpine to 26.10.0-alpine in /webapp ([#10297](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10297)) ([977b553](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/977b55304d35709d6ec3a852e08732f85448b000))
+* **deps:** bump node from 26.9.0-alpine to 26.10.0-alpine in /backend ([#10296](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10296)) ([74eb2ab](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/74eb2ab25ba92cd615973688a92142cba3cf0334))
+
 ## [3.19.0](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/3.18.4...3.19.0) (2026-09-24)
 
 
