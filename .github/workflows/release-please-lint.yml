@@ -1,64 +1,30 @@
 name: Release Please Config Lint
 
-# Three groups of paths, and all three have to be here:
+# No `paths:` filter here, deliberately — the filtering happens on the `lint` job below instead.
 #
-#   the configs       — the obvious one.
-#   the workflows     — one invariant is that exactly one workflow reads each config, and that can
-#                       be broken by editing a workflow alone, which is precisely how the
-#                       @ocelot-social/ui@0.0.2 publish was lost.
-#   the bump targets  — every file the configs claim to version. The lockstep check compares those
-#                       against the manifest, so a hand-edited version in backend/package.json or a
-#                       deleted `x-release-please-version` marker in a chart has to start a run.
-#                       Without them the drift would only surface on the next release pull request,
-#                       landing on whoever merges the release rather than on whoever caused it.
+# Where the filter sits is not a style question once the job is a REQUIRED status check, because
+# Actions treats the two placements in opposite ways:
 #
-# The third group duplicates the `extra-files` of the configs, and `push`/`pull_request` then
-# duplicate each other — a YAML anchor would be the obvious fix and does NOT work here, because the
-# Actions workflow parser does not support anchors and aliases. The failure mode of trying is the
-# worst kind: the trigger silently never matches and the workflow simply stops running. So the list
-# is written out twice, and `lint.mjs` checks that BOTH copies still cover every bump target — see
-# the `lint workflow triggers` check there.
+#   workflow-level `paths:` — a run that the filter turns away does not happen, so NO check run is
+#                             ever reported. Branch protection cannot tell "never reported" from
+#                             "still running": the check sits at "Expected — waiting for status to
+#                             be reported" and the pull request can never be merged. Since the
+#                             common pull request touches none of the bump targets, that blocked
+#                             essentially everything.
+#   job-level `if:`         — the workflow runs, the job is skipped, and a skipped job reports
+#                             success. That is the behaviour a required check needs.
+#
+# So the workflow starts on every pull request and the job decides. The shape is the one
+# branding-lint.yml and maintenance-lint.yml already use: `dorny/paths-filter` against the shared
+# `.github/file-filters.yml`, where the path list lives under `release-please:` together with the
+# reasoning for what belongs in it. As a side effect the list is written ONCE — that file is plain
+# YAML and supports anchors, where the Actions workflow parser does not, which is why this workflow
+# used to spell the same list out twice.
 on:
   push:
     branches: [master]
-    paths:
-      - '.github/release-please/**'
-      - '.github/workflows/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'backend/package.json'
-      - 'backend/package-lock.json'
-      - 'webapp/package.json'
-      - 'webapp/package-lock.json'
-      - 'maintenance/package.json'
-      - 'maintenance/package-lock.json'
-      - 'deployment/helm/charts/ocelot-social/Chart.yaml'
-      - 'deployment/helm/charts/ocelot-neo4j/Chart.yaml'
-      - 'packages/ui/package.json'
-      - 'packages/ui/package-lock.json'
-      - 'packages/branding/package.json'
-      - 'packages/branding/package-lock.json'
-      - 'packages/branding/src/version.ts'
   pull_request:
     branches: [master]
-    paths:
-      - '.github/release-please/**'
-      - '.github/workflows/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'backend/package.json'
-      - 'backend/package-lock.json'
-      - 'webapp/package.json'
-      - 'webapp/package-lock.json'
-      - 'maintenance/package.json'
-      - 'maintenance/package-lock.json'
-      - 'deployment/helm/charts/ocelot-social/Chart.yaml'
-      - 'deployment/helm/charts/ocelot-neo4j/Chart.yaml'
-      - 'packages/ui/package.json'
-      - 'packages/ui/package-lock.json'
-      - 'packages/branding/package.json'
-      - 'packages/branding/package-lock.json'
-      - 'packages/branding/src/version.ts'
 
 # One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
 # cancelled instead of holding a runner. `event_name` is part of the group on purpose: a branch
@@ -71,15 +37,41 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-# Nothing here writes, and nothing needs the token at all — the checkout is public repository
-# content. Stated explicitly so the job cannot inherit a read-write repository or organisation
-# default.
+# Nothing here writes. `contents: read` covers the checkout of public repository content;
+# `pull-requests: read` is what dorny/paths-filter needs to list a pull request's changed files via
+# the API, the fetch-depth:1 checkout having no base history for a local diff. Stated explicitly so
+# the jobs cannot inherit a read-write repository or organisation default.
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
+  files-changed:
+    name: Detect File Changes
+    runs-on: ubuntu-latest
+    outputs:
+      release-please: ${{ steps.changes.outputs.release-please }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # `lint.mjs` resolves its way from the `if:` below to this step's `id`, to the filter file and
+      # finally to the `release-please` rule inside it, and then checks that the rule still matches
+      # every file the lint opens. Rewiring any link of that chain fails the lint loudly rather than
+      # leaving the job gated on a list nobody maintains.
+      - name: Check for file changes
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: changes
+        with:
+          token: ${{ github.token }}
+          filters: .github/file-filters.yml
+
   lint:
     name: Lint release-please config
+    needs: files-changed
+    if: needs.files-changed.outputs.release-please == 'true'
     runs-on: ubuntu-latest
     steps:
       # Deliberately NOT a sparse checkout. The lint does not only read this directory: the lockstep
@@ -98,12 +90,13 @@ jobs:
         with:
           node-version-file: '.nvmrc'
 
-      # Before the lint, and without any dependency: `path-filter.mjs` reimplements GitHub's filter
-      # patterns so the lint can tell whether this workflow is really triggered by the files it
-      # checks, and a matcher that is only approximately right fails silently — it would call the
-      # trigger list complete while GitHub starts no run. Node's built-in runner picks up
-      # `*.test.mjs` only, so `lint.mjs` beside it is not executed here.
-      - name: Test the filter-pattern matcher
+      # Before the lint, and without any dependency. Two units are tested here, both of them the
+      # kind whose bugs are silent: `path-filter.mjs` reimplements GitHub's filter patterns, which
+      # differ from any classic glob, and `workflow-gate.mjs` resolves the chain from a job's `if:`
+      # to the filter rule that gates it. An approximately-right matcher or a half-resolved chain
+      # would report the trigger list as complete while nothing actually starts a run. Node's
+      # built-in runner picks up `*.test.mjs` only, so `lint.mjs` beside them is not executed here.
+      - name: Test the lint's helper modules
         run: node --test .github/release-please/
 
       # Into a throwaway prefix, never into the repository. release-please is a release tool, not an
@@ -116,8 +109,14 @@ jobs:
       # release run. Keep it in the same major as the release-please-action pinned in the release
       # workflows (v5.0.0 depends on `release-please@^17.6.0`); a newer patch only ever validates
       # more strictly than what the action bundles, which is the safe direction.
+      #
+      # `picomatch` is here for the opposite reason — it must match the version dorny/paths-filter
+      # bundles (v4.0.3 depends on `picomatch@^2.3.1`), because the lint uses it to decide whether
+      # the `release-please` filter rule covers a file. Any other matcher would answer a slightly
+      # different question than the action does, and the disagreement would show up as a lint that
+      # calls the rule complete while the job it gates never runs.
       - name: Install lint dependencies
-        run: npm install --prefix "${RUNNER_TEMP}/rp-lint" --no-audit --no-fund --no-save ajv@8.20.0 ajv-formats@3.0.1 jsonpath-plus@10.3.0 yaml@2.9.1 release-please@17.11.2
+        run: npm install --prefix "${RUNNER_TEMP}/rp-lint" --no-audit --no-fund --no-save ajv@8.20.0 ajv-formats@3.0.1 jsonpath-plus@10.3.0 yaml@2.9.1 picomatch@2.3.1 release-please@17.11.2
 
       - name: Lint release-please config
         run: node .github/release-please/lint.mjs

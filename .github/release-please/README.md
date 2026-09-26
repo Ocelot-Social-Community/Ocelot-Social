@@ -29,8 +29,9 @@ repository, so the list is duplicated by necessity. **When you change one, chang
 ## The lint
 
 [`lint.mjs`](./lint.mjs), run by [`release-please-lint.yml`](../workflows/release-please-lint.yml) on
-any change under this directory or `.github/workflows/`, checks the invariants that otherwise break
-silently — none of them turns a release workflow red on its own:
+any change under this directory, under `.github/workflows/`, or to a file one of the configs bumps,
+checks the invariants that otherwise break silently — none of them turns a release workflow red on
+its own:
 
 | Check | What it catches |
 | ----- | --------------- |
@@ -38,8 +39,8 @@ silently — none of them turns a release workflow red on its own:
 | `<name>-config.json` ↔ `<name>-manifest.json` exist in pairs, and their package paths match | A manifest key the config does not release is a version nobody bumps; a config path the manifest does not list makes release-please treat the package as unreleased and start its changelog from the repository's first commit. |
 | Every config has `changelog-sections`, and all of them are identical | The drift described above. A config without the list silently falls back to the defaults. |
 | Every config is the `config-file` of exactly **one** workflow, paired with its own `manifest-file` | Two is the `@ocelot-social/ui@0.0.2` race below. Zero is quieter: the package simply stops releasing. Read out of the parsed workflow, not searched for in its text — the file names also occur in comments and in `publish.yml`'s version-guard error message, and a substring match would count those as releases. |
-| A workflow that filters by path lists its own config and manifest there, and no other package's | Losing the path means a config change no longer starts a run. Listing a foreign one is the cross-trigger shape the `ui@0.0.2` race actually had. |
-| The lint workflow is triggered by every file the lint reads — on `push` **and** on `pull_request` | The lockstep check only helps if it runs when one of those files changes. Its trigger list is a hand-written copy of what the configs bump, written twice because the Actions parser has no YAML anchors; this check is the only thing keeping the copies honest. |
+| A workflow that filters by path is triggered by its own config and manifest, and by no other package's | Losing the path means a config change no longer starts a run. Listing a foreign one is the cross-trigger shape the `ui@0.0.2` race actually had. Decided by matching the patterns ([`path-filter.mjs`](./path-filter.mjs)), not by looking for the literal path: `.github/release-please/**` is a cross-trigger too, and a string comparison does not see it. |
+| The filter rule gating the lint job matches every file the lint reads | The checks above only help if they run when one of those files changes, and the rule is a hand-written copy of what the configs bump — this is the only thing keeping it honest. The chain from the job's `if:` to the rule is resolved, not assumed ([`workflow-gate.mjs`](./workflow-gate.mjs)), so rewiring the gate fails loudly instead of leaving the check pointing at a list nobody uses. Matched with the same `picomatch` version `dorny/paths-filter` bundles — any other matcher would answer a slightly different question than the action does. |
 | Every file a config bumps carries the version its manifest records | The lockstep bump silently stopping — see below. Covers the `extra-files` *and* what the `node` release-type bumps on its own: `package.json` plus both version fields of `package-lock.json`. The latter are easy to miss precisely because no config mentions them. This check also fires on the release pull request itself, since that pull request edits `<name>-manifest.json`: a file the bump missed still shows the old version while the manifest already shows the new one. |
 | No `extra-files` entry is a bare string ending in `.json`/`.yaml`/`.toml`/`.xml` | The trap below. |
 
@@ -65,6 +66,26 @@ directory is therefore not noticed by the lint — add it to `extra-files` when 
 The lint pins its own `release-please` version rather than reading the one the action bundles. A
 bump there may legitimately turn it red — that is the point, and the pull request that bumps it is a
 better place to find out than a release run.
+
+### Why the workflow has no `paths:` filter
+
+Its lint job is a **required status check**, and that changes what a path filter does. Actions never
+starts a run it filters away, so no check run is reported for it — and branch protection cannot tell
+"never reported" from "still running". The check sits at *Expected — waiting for status to be
+reported* and the pull request can never be merged. Since the common pull request touches none of
+the bump targets, the workflow-level filter this lint shipped with blocked essentially every open
+pull request until it was moved.
+
+A job skipped by an `if:` inside a workflow that **did** run reports success, which is the behaviour
+a required check needs. So the workflow triggers on every pull request and the `lint` job is gated
+by `dorny/paths-filter`, exactly as `branding-lint.yml` and `maintenance-lint.yml` are. The path
+list moved to the `release-please` rule in [`.github/file-filters.yml`](../file-filters.yml), which
+— being plain YAML with anchor support, unlike the Actions workflow parser — also ends the previous
+version's duplication of the same list for `push` and for `pull_request`.
+
+One caveat comes with the pattern: if the `files-changed` job itself fails, `lint` is skipped and
+therefore still reports success. Make `Detect File Changes` required alongside the lint if that
+matters.
 
 ## The application is different from the packages
 

@@ -14,6 +14,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { triggers } from './path-filter.mjs'
+import { flattenRule, resolveFilterGate } from './workflow-gate.mjs'
 
 const HERE = path.dirname(new URL(import.meta.url).pathname)
 const WORKFLOWS = path.join(HERE, '..', 'workflows')
@@ -28,6 +29,10 @@ const Ajv = require('ajv')
 const addFormats = require('ajv-formats')
 const { JSONPath } = require('jsonpath-plus')
 const YAML = require('yaml')
+// The matcher dorny/paths-filter itself uses, at the version it bundles — see the install step in
+// release-please-lint.yml. Its filter patterns are picomatch's, not GitHub's, so `path-filter.mjs`
+// is the wrong tool for them and vice versa; both are needed, for different lists.
+const picomatch = require('picomatch')
 const schema = require('release-please/schemas/config.json')
 
 const REPO = path.join(HERE, '..', '..')
@@ -58,27 +63,27 @@ const workflows = fs
       doc = YAML.parse(fs.readFileSync(path.join(WORKFLOWS, name), 'utf8'))
     } catch (error) {
       fail(name, `is not parseable YAML: ${error.message}`)
-      return { name, releasePlease: [], paths: [], pathsByEvent: {}, runsThisLint: false }
+      return { name, doc: null, releasePlease: [], paths: [], lintJobId: null }
     }
     // `on` is a YAML 1.1 boolean; the parser here is YAML 1.2, where it stays a string. Both are
     // read so a parser change cannot quietly turn every workflow into "no triggers, no steps".
     const on = doc?.on ?? doc?.[true] ?? {}
-    const pathsByEvent = Object.fromEntries(
-      Object.entries(on)
-        .filter(([, event]) => event && typeof event === 'object' && event.paths)
-        .map(([name, event]) => [name, event.paths]),
-    )
-    const paths = Object.values(pathsByEvent).flat()
+    const paths = Object.values(on)
+      .filter((event) => event && typeof event === 'object' && event.paths)
+      .flatMap((event) => event.paths)
 
-    const steps = Object.values(doc?.jobs ?? {}).flatMap((job) => job?.steps ?? [])
+    const jobs = Object.entries(doc?.jobs ?? {})
+    const steps = jobs.flatMap(([, job]) => job?.steps ?? [])
     const releasePlease = steps
       .filter((step) => typeof step?.uses === 'string' && step.uses.startsWith('googleapis/release-please-action@'))
       .map((step) => ({ configFile: step.with?.['config-file'], manifestFile: step.with?.['manifest-file'] }))
-    // Which workflow runs this script is discovered, not hard-coded, so renaming the file or moving
-    // the step cannot leave the check below silently pointing at nothing.
-    const runsThisLint = steps.some((step) => typeof step?.run === 'string' && step.run.includes('release-please/lint.mjs'))
+    // Which workflow — and which JOB in it — runs this script is discovered, not hard-coded, so
+    // renaming the file or moving the step cannot leave the check below silently pointing at
+    // nothing. The job id matters because check 6 reads that job's `if:` to find its path filter.
+    const runsThisLint = (step) => typeof step?.run === 'string' && step.run.includes('release-please/lint.mjs')
+    const lintJobId = jobs.find(([, job]) => (job?.steps ?? []).some(runsThisLint))?.[0] ?? null
 
-    return { name, releasePlease, paths, pathsByEvent, runsThisLint }
+    return { name, doc, releasePlease, paths, lintJobId }
   })
 
 const entries = fs.readdirSync(HERE)
@@ -162,10 +167,17 @@ for (const file of configs) {
     }
     // Only meaningful when the workflow filters by path at all: publish.yml runs on every master
     // push and therefore cannot miss a change to its own config.
+    //
+    // Matched, not searched for as a literal string. The invariant is "a change to this file starts
+    // a run", and a pattern satisfies that just as well as the spelled-out path — but only the
+    // matcher can say so. It matters more in the mirror check below, where the literal comparison
+    // was a false negative: a workflow listing `.github/release-please/**` IS woken by every
+    // package's config, which is the cross-trigger this pair of checks exists to catch, and
+    // `.includes()` saw nothing.
     if (reader.paths.length > 0) {
       for (const needed of [rel(file), expectedManifest]) {
-        if (!reader.paths.includes(needed)) {
-          fail(file, `${reader.name} releases it but does not list ${needed} in its trigger paths — a change to it would not start a run`)
+        if (!triggers(reader.paths, needed)) {
+          fail(file, `${reader.name} releases it but is not triggered by ${needed} — a change to it would not start a run`)
         }
       }
     }
@@ -174,7 +186,7 @@ for (const file of configs) {
   // The mirror image: no workflow may be triggered by a config it does not release. That is the
   // shape the ui@0.0.2 race actually had — branding-release.yml woke up on ui's files.
   for (const workflow of workflows) {
-    if (workflow.paths.includes(rel(file)) && !workflow.releasePlease.some((r) => r.configFile === rel(file))) {
+    if (triggers(workflow.paths, rel(file)) && !workflow.releasePlease.some((r) => r.configFile === rel(file))) {
       fail(file, `${workflow.name} is triggered by it but does not release it — that is exactly the cross-trigger that lost @ocelot-social/ui@0.0.2`)
     }
   }
@@ -286,25 +298,57 @@ for (const file of configs) {
   }
 }
 
-// 6. Lint workflow triggers. Check 5 only helps if it runs when one of the files it reads changes,
-//    and that trigger list is a hand-written copy of what the configs bump — written twice on top
-//    of that, because the Actions parser does not support YAML anchors. Nothing keeps the copies
-//    honest except this check: a bump target missing from the triggers means a hand-edited version
-//    or a deleted marker sits unnoticed until the next release pull request happens to change the
-//    manifest, landing on whoever merges the release rather than on whoever caused it.
-const linter = workflows.find((w) => w.runsThisLint)
+// 6. The lint's own gate. Every check above only helps if it runs when one of the files it reads
+//    changes, and the list deciding that is a hand-written copy of what the configs bump. Nothing
+//    keeps the copy honest except this check: a bump target missing from it means a hand-edited
+//    version or a deleted marker sits unnoticed until the next release pull request happens to
+//    change the manifest, landing on whoever merges the release rather than on whoever caused it.
+//
+//    The list lives in `.github/file-filters.yml`, not in the workflow's `on: paths`, because the
+//    lint job is a required status check and Actions reports nothing at all for a workflow a path
+//    filter turns away — see the header of release-please-lint.yml and of workflow-gate.mjs. So the
+//    gate is resolved through the job's `if:` rather than read off the trigger.
+//
+//    Verified against everything the lint OPENS, derived rather than listed: the bump targets
+//    collected by check 5, this directory (the configs, the manifests and these scripts), every
+//    workflow — check 4 parses all of them, so a workflow edit alone can break an invariant — and
+//    the filter file itself.
+const linter = workflows.find((w) => w.lintJobId)
 if (!linter) {
   fail('lint.mjs', 'no workflow runs this script — every check in it is dead weight')
 } else {
-  for (const [event, paths] of Object.entries(linter.pathsByEvent)) {
-    for (const target of [...bumpTargets].sort()) {
-      if (!triggers(paths, target)) {
-        fail(linter.name, `checks ${target} but is not triggered by it on \`${event}\` — add it to that paths list`)
+  const gate = resolveFilterGate(linter.doc, linter.lintJobId)
+  if (gate.status === 'error') {
+    fail(linter.name, `${gate.reason} — so this check cannot verify that the lint runs when a file it reads changes`)
+  } else if (gate.status === 'gated') {
+    const lintInputs = new Set([
+      ...bumpTargets,
+      ...entries.map((f) => rel(f)),
+      ...workflows.map((w) => `.github/workflows/${w.name}`),
+      gate.filtersFile,
+    ])
+
+    const filtersPath = path.join(REPO, gate.filtersFile)
+    if (!fs.existsSync(filtersPath)) {
+      fail(linter.name, `gates its lint job on ${gate.filtersFile}, which does not exist`)
+    } else {
+      const rules = YAML.parse(fs.readFileSync(filtersPath, 'utf8')) ?? {}
+      if (!(gate.filterKey in rules)) {
+        fail(gate.filtersFile, `has no \`${gate.filterKey}\` rule, but ${linter.name} gates its lint job on it — the job would never run, and would keep reporting success as a skipped check`)
+      } else {
+        const { patterns, unsupported } = flattenRule(rules[gate.filterKey])
+        for (const item of unsupported) {
+          fail(gate.filtersFile, `\`${gate.filterKey}\` contains ${JSON.stringify(item)}; this check only reads plain pattern strings`)
+        }
+        // dorny/paths-filter's default quantifier is `some` — the gate opens when ANY pattern
+        // matches. resolveFilterGate has already rejected the other two.
+        for (const target of [...lintInputs].sort()) {
+          if (!patterns.some((pattern) => picomatch.isMatch(target, pattern, { dot: true }))) {
+            fail(gate.filtersFile, `\`${gate.filterKey}\` does not match ${target}, which the lint reads — add it, or a change to that file will not start a run`)
+          }
+        }
       }
     }
-  }
-  if (Object.keys(linter.pathsByEvent).length === 0) {
-    fail(linter.name, 'has no path filters at all — either that is intentional and this check should go, or the triggers were lost')
   }
 }
 
