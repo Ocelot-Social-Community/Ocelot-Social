@@ -12,10 +12,10 @@ npm install
 npm run dev
 
 # Run tests
-npm test
+npm run test:unit
 
 # Run linter
-npm run lint
+npm run test:lint
 ```
 
 ## Creating a New Component
@@ -150,13 +150,13 @@ describe('OsButton', () => {
 
 ```bash
 # Run once
-npm test
+npm run test:unit
 
 # Watch mode
-npm run test:watch
+npm run test:unit:watch
 
 # With coverage
-npm run test:coverage
+npm run test:unit:coverage
 ```
 
 ## Commit Conventions
@@ -184,8 +184,8 @@ refactor: simplify dropdown logic
 
 Before submitting a PR, ensure:
 
-- [ ] Tests pass (`npm test`)
-- [ ] Linter passes (`npm run lint`)
+- [ ] Tests pass (`npm run test:unit`)
+- [ ] Linter passes (`npm run test:lint`)
 - [ ] Build succeeds (`npm run build`)
 - [ ] 100% code coverage maintained
 - [ ] New components have Histoire stories

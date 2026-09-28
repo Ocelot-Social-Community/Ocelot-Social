@@ -81,7 +81,7 @@ jobs:
       # Through the package script, not a bare `jest` call: the backend runs as ESM, which Jest
       # only loads with `--experimental-vm-modules`. Spelling the invocation out here once meant
       # this job silently kept the old one and failed on `import.meta` while every other suite
-      # passed. The flag, the spec list and the coverage switch now live in `test:schema-contract`
+      # passed. The flag, the spec list and the coverage switch now live in `test:unit:schema-contract`
       # so there is one place to change.
       #
       # --coverage=false (inside that script) is required, not a preference. jest.config.ts sets
@@ -90,4 +90,4 @@ jobs:
       # meaningless here and the threshold fails on principle (2.19% of the backend, all 19 tests
       # green). Coverage stays enforced where it means something: the full run in test-backend.yml.
       - name: Validate the webapp's GraphQL documents against the schema
-        run: cd backend && npm run test:schema-contract
+        run: cd backend && npm run test:unit:schema-contract

@@ -23,7 +23,7 @@ import globals from 'globals'
 export default [
   {
     // Former .eslintignore. `coverage/` is new here: it holds generated report scripts that only
-    // exist after a local `npm test`, so linting them fails on the developer's machine and nowhere else.
+    // exist after a local `npm run test:unit`, so linting them fails on the developer's machine and nowhere else.
     ignores: [
       'node_modules/',
       'dist/',

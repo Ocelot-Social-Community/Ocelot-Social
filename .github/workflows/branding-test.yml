@@ -71,4 +71,4 @@ jobs:
       # Builds the CJS dist, then runs the .mts tests via Node type-stripping with the coverage gate
       # (--test-coverage-lines/functions/branches). Requires Node >= 23 (see .tool-versions).
       - name: Run tests with coverage
-        run: npm run test:coverage
+        run: npm run test:unit:coverage

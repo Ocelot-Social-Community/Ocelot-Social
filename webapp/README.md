@@ -71,12 +71,12 @@ After starting the application following the above guidelines, open new terminal
 
 ```bash
 # run eslint
-$ docker-compose exec webapp npm run lint
+$ docker-compose exec webapp npm run test:lint
 ```
 
 ```bash
 # run unit tests
-$ docker-compose exec webapp npm test
+$ docker-compose exec webapp npm run test:unit
 ```
 
 ```bash
@@ -92,12 +92,12 @@ After starting the application following the above guidelines, open new terminal
 
 ```bash
 # run eslint in /webapp (use option --fix to normalize the files)
-$ npm run lint
+$ npm run test:lint
 ```
 
 ```bash
 # run unit tests in /webapp
-$ npm test
+$ npm run test:unit
 ```
 
 ```bash

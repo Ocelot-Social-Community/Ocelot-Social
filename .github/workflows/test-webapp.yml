@@ -130,12 +130,12 @@ jobs:
         run: cd packages/branding && npm ci && npm run build
 
       - name: webapp | Lint
-        run: cd webapp && npm ci && npm run lint
+        run: cd webapp && npm ci && npm run test:lint
 
       # Separate step so a token regression reads as one in the log, rather than as "lint failed".
       # Needs no install of its own — it only reads files (see webapp/scripts/check-css-tokens.js).
       - name: webapp | Design tokens
-        run: cd webapp && npm run lint:css-tokens
+        run: cd webapp && npm run test:lint:css-tokens
 
   unit_test_webapp:
     name: Unit Tests - Webapp
@@ -170,4 +170,4 @@ jobs:
         run: docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
 
       - name: webapp | Unit tests incl. coverage check
-        run: docker compose exec -T webapp npm test
+        run: docker compose exec -T webapp npm run test:unit

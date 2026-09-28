@@ -222,16 +222,16 @@ Run the unit tests:
 
 ```sh
 # in backend/ while database is running
-$ npm test
+$ npm run test:unit
 
 # for docker
 # in main folder while docker compose is running
-$ docker exec ocelot-social-backend-1 npm test
+$ docker exec ocelot-social-backend-1 npm run test:unit
 ```
 
 If the snapshots of the emails must be updated, you have to run the tests in docker! Otherwise the CI will fail.
 
 ```sh
 # in main folder while docker compose is running
-$ docker exec ocelot-social-backend-1 npm test -- -u src/emails/
+$ docker exec ocelot-social-backend-1 npm run test:unit -- -u src/emails/
 ```

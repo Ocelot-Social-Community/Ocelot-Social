@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run",
-    "lint": "eslint --max-warnings 0 ."
+    "test:unit": "vitest run",
+    "test:lint": "eslint --max-warnings 0 ."
   },
   "dependencies": {
     "@ocelot-social/ui": "file:../..",

@@ -74,10 +74,10 @@ jobs:
         run: npm run build
 
       - name: Run ESLint
-        run: npm run lint
+        run: npm run test:lint
 
       - name: Run TypeScript type check
-        run: npm run typecheck
+        run: npm run test:lint:typecheck
 
       # publint + are-the-types-wrong: guards the published package's exports/types resolution — catches
       # ESM/CJS interop regressions (the package is "type": "module" with a CommonJS dist).

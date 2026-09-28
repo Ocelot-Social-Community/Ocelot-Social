@@ -14,8 +14,8 @@ npm run dev        # http://localhost:3000
 ## Testing & Linting
 
 ```bash
-npm test           # vitest
-npm run lint       # eslint
+npm run test:unit  # vitest
+npm run test:lint  # eslint
 ```
 
 ## Production Build

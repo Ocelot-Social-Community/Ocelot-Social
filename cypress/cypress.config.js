@@ -95,7 +95,7 @@ async function setupNodeEvents(on, config) {
   // strategy depends on this; without it PreJoin lands in the
   // "errorDenied"/"errorNoDevice" branch and we can't exercise the happy path.
   //
-  // These are live on every run since the suite moved off Electron (see the `cypress:run`
+  // These are live on every run since the suite moved off Electron (see the `test:e2e`
   // script in the root package.json): Electron **does not honor launchOptions.args** and
   // printed "browser launch options ... not supported by electron", so under it the video-call
   // specs only ever reached the "prompt" status path. The guard below stays as-is because

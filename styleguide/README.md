@@ -55,5 +55,5 @@ npm run serve
 
 ### Lints and fixes files
 ```
-npm run lint
+npm run test:lint
 ```

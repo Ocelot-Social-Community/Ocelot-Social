@@ -14,7 +14,7 @@ import { derivedEnumSDLs } from './src/graphql/derivedEnums'
 export default [
   {
     // public-docs/ is generated (spectaql, see the root `docs:api` script) and gitignored, so it only
-    // exists on a machine that ran the generator — where its minified bundle made `npm run lint` fail
+    // exists on a machine that ran the generator — where its minified bundle made `npm run test:lint` fail
     // while CI, which never generates it, stayed green.
     //
     // schema.graphql is likewise generated (`npm run schema:print`), but it IS committed, so unlike

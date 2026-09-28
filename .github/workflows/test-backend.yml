@@ -153,7 +153,7 @@ jobs:
         run: cd packages/branding && npm ci && npm run build
 
       - name: backend | Lint
-        run: cd backend && npm ci && npm run lint
+        run: cd backend && npm ci && npm run test:lint
 
   # Sharded across four runners. The suite runs with `fileParallelism: false` because every spec
   # talks to the SAME Neo4j and wipes it between cases (cleanDatabase) — so no parallelism is
@@ -308,7 +308,7 @@ jobs:
         run: docker compose exec -T backend npm run db:schema:check
 
       # `--coverage` stays ON per shard: the coverage data is what gets embedded in the blob and
-      # merged later. The THRESHOLDS are what have to be off — ALL FOUR of them (`test:shard`
+      # merged later. The THRESHOLDS are what have to be off — ALL FOUR of them (`test:unit:shard`
       # zeroes lines, statements, branches AND functions). A shard runs a quarter of the specs
       # against the whole of `src/**/*.ts`, so every gate in vitest.config.ts fails on a shard by
       # construction; vitest has no single switch for "no thresholds", each metric has to be
@@ -319,7 +319,7 @@ jobs:
       # `--merge-reports=<dir>` parses EVERY file in the directory it is given as a blob, and
       # chokes on the first one that is not (verified — it fails with a JSON SyntaxError).
       #
-      # What makes a RED shard readable lives in vitest.config.ts, not here: `test:shard` only sets
+      # What makes a RED shard readable lives in vitest.config.ts, not here: `test:unit:shard` only sets
       # VITEST_BLOB_REPORT=true and the config assembles `default` + `blob` (+ `github-actions`
       # when it sees Actions). It used to pass `--reporter=blob` on the command line, and that
       # REPLACES the default reporter instead of adding to it — the blob reporter prints exactly
@@ -332,7 +332,7 @@ jobs:
       # with all three still merges, and the merge job re-reports the failure from it.
       - name: backend | Unit test (shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
         run: |
-          docker compose exec -T backend npm run test:shard -- \
+          docker compose exec -T backend npm run test:unit:shard -- \
             --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} \
             --outputFile=coverage/blobs/blob-${{ matrix.shardIndex }}.json
 
@@ -425,7 +425,7 @@ jobs:
       - name: backend | Merge coverage incl. coverage check
         run: |
           docker compose -f docker-compose.yml -f docker-compose.test.yml \
-            run --rm --no-deps -T backend npm run test:merge
+            run --rm --no-deps -T backend npm run test:unit:merge
 
       # `if: always()` so the report survives a FAILED threshold check — that is precisely when
       # someone needs to look at it. The step above exits non-zero when coverage drops below the

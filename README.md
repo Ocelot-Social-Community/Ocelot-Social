@@ -295,15 +295,15 @@ Please run the following commands before you push:
 
 ```bash
 # in folder backend/
-$ npm run lint -- --fix
-$ npm test
+$ npm run test:lint -- --fix
+$ npm run test:unit
 ```
 
 ```bash
 # in folder webapp/
-$ npm run lint -- --fix
+$ npm run test:lint -- --fix
 $ npm run locales -- --fix
-$ npm test
+$ npm run test:unit
 ```
 
 Check out our [contribution guideline](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/CONTRIBUTING.md), too!

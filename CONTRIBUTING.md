@@ -34,6 +34,32 @@ Every pull request needs to:
 * pass all tests (linter, backend, webapp, code coverage, end-to-end)
 * be approved by at least 1 developer who is not the owner of the PR (when more than 10 files were changed it needs 2 approvals)
 
+### Naming Of Check Scripts
+
+This repository is eleven npm projects — `backend/`, `webapp/`, `maintenance/`, `styleguide/`,
+`packages/branding/`, `packages/ui/` and the four `packages/ui/examples/*` — plus the Cypress suite
+at the root. Every one of them names the checks it offers the same way, so that a single name means
+the same thing everywhere and tooling can find them without knowing the project:
+
+| Script                 | What it runs                                            |
+| ---------------------- | ------------------------------------------------------- |
+| `test:lint`            | the linter (ESLint, or `vue-cli-service lint`)           |
+| `test:lint:typecheck`  | the type checker (`tsc --noEmit` / `vue-tsc --noEmit`)   |
+| `test:unit`            | the unit and integration suite                           |
+| `test:e2e`             | the browser end-to-end suite (root only — Cypress)       |
+
+A project declares only the ones it actually has: `webapp/` and `styleguide/` are JavaScript and
+therefore carry no `test:lint:typecheck`, and only the root runs end-to-end tests.
+
+Variants of a check hang below the name of the check they vary, never beside it —
+`test:unit:coverage`, `test:unit:watch`, `test:unit:shard`, `test:lint:fix`, `test:e2e:open`. Checks
+that are none of the four keep their own name (`validate`, `verify`, `size`, `test:visual`); do not
+bend them into the scheme, it would only make the name lie.
+
+New scripts follow this, and so does every caller — a workflow, a Dockerfile, a README. There is no
+`lint` or bare `test` anywhere any more, which is what makes a stale call site fail loudly instead
+of silently running the wrong thing.
+
 ## Releasing
 
 Releases are cut by [release-please](https://github.com/googleapis/release-please). Nobody picks a

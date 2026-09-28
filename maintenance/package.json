@@ -9,9 +9,9 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "lint": "eslint .",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:lint": "eslint .",
     "brand": "node tools/brand.mjs",
     "brand:reset": "node tools/brand.mjs --reset"
   },

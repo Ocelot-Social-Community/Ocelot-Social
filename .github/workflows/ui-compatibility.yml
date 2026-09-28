@@ -113,10 +113,10 @@ jobs:
         run: npm install
 
       - name: Lint
-        run: npm run lint
+        run: npm run test:lint
 
       - name: Run tests
-        run: npm test
+        run: npm run test:unit
 
       - name: Build example app
         run: npm run build

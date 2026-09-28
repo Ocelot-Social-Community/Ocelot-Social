@@ -197,7 +197,7 @@ RUN --mount=type=cache,target=/root/.npm,sharing=locked \
 
 # The test image has TWO consumers with opposite needs, hence two stages off the same build:
 #   • test — the webapp UNIT tests (.github/workflows/test-webapp.yml runs `docker compose exec webapp
-#            npm test`). Jest needs the sources and all 45 devDependencies, so this one keeps the whole
+#            npm run test:unit`). Jest needs the sources and all 45 devDependencies, so this one keeps the whole
 #            /app tree. Its CMD only has to keep the container alive for the `exec`.
 #   • e2e  — the CYPRESS matrix (.github/workflows/test-e2e.yml). That workflow `docker save`s the image
 #            and pulls it down again in EVERY one of the 40 matrix jobs, so nothing that only the build

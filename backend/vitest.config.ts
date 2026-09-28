@@ -95,8 +95,8 @@ const reporters: Reporters = [
   // "blob report written to …" line whatever the outcome, which is how a red shard used to end at
   // `Error: Process completed with exit code 1` with no indication of which test failed.
   'default',
-  // The machine-readable report `test:merge` consumes via `--merge-reports`. Only in shard mode —
-  // set by the `test:shard` script, which is the only caller that produces one.
+  // The machine-readable report `test:unit:merge` consumes via `--merge-reports`. Only in shard mode —
+  // set by the `test:unit:shard` script, which is the only caller that produces one.
   // eslint-disable-next-line n/no-process-env
   ...(process.env.VITEST_BLOB_REPORT === 'true' ? ['blob'] : []),
   // Inline annotations on the pull request. Vitest adds this reporter itself when it detects

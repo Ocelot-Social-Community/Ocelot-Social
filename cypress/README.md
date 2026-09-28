@@ -34,13 +34,13 @@ $ npm ci
 
 ## Pick a browser
 
-Both `cypress:run` and `cypress:open` default to **Chrome**, which is what the CI runner has.
+Both `test:e2e` and `test:e2e:open` default to **Chrome**, which is what the CI runner has.
 Cypress does not download it — it has to be installed on the machine the tests run on. To use a
 different one, set `CYPRESS_BROWSER` to any browser Cypress detects:
 
 ```bash
 $ npx cypress info                                  # lists what Cypress found
-$ CYPRESS_BROWSER=chromium npm run cypress:run      # e.g. Chromium instead of Chrome
+$ CYPRESS_BROWSER=chromium npm run test:e2e         # e.g. Chromium instead of Chrome
 ```
 
 Electron — the browser Cypress bundles, and the suite's previous default — is **not** a working
@@ -56,7 +56,7 @@ The interactive cypress test console allows to run tests and have visual feedbac
 To use this feature run:
 
 ```bash
-$ npm run cypress:open
+$ npm run test:e2e:open
 ```
 
 ![Interactive Cypress Environment](../docu/gitbook/grafik-1%20%281%29.png)
@@ -66,7 +66,7 @@ $ npm run cypress:open
 To run cypress without the user interface:
 
 ```bash
-$ npm run cypress:run
+$ npm run test:e2e
 ```
 
 This is used to run cypress in CI or in console
