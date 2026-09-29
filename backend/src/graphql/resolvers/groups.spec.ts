@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable vitest/no-commented-out-tests */
+
 import { setImmediate as scheduleMacrotask } from 'node:timers/promises'
 
 import { PubSub } from 'graphql-subscriptions'
@@ -2289,7 +2289,7 @@ describe('in mode', () => {
                 }
               })
 
-              describe('by owner themself "owner-member-user"', () => {
+              describe('by owner themself "owner-member-user", while a second owner exists', () => {
                 beforeEach(async () => {
                   authenticatedUser = await ownerMemberUser.toJson()
                 })
@@ -2302,13 +2302,40 @@ describe('in mode', () => {
                     }
                   })
 
-                  it('throws authorization error', async () => {
-                    const { errors } = await mutate({
-                      mutation: ChangeGroupMemberRole,
-                      variables,
+                  it('has role admin', async () => {
+                    await expect(
+                      mutate({
+                        mutation: ChangeGroupMemberRole,
+                        variables,
+                      }),
+                    ).resolves.toMatchObject({
+                      data: {
+                        ChangeGroupMemberRole: {
+                          user: {
+                            id: 'owner-member-user',
+                          },
+                          membership: {
+                            role: 'admin',
+                          },
+                        },
+                      },
+                      errors: undefined,
                     })
+                  })
 
-                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+                  afterEach(async () => {
+                    // restore "owner-member-user" as owner so later tests in this suite can keep
+                    // relying on it — only another owner is allowed to promote them back, since an
+                    // owner can never be demoted by anyone but themself.
+                    authenticatedUser = await secondOwnerMemberUser.toJson()
+                    await mutate({
+                      mutation: ChangeGroupMemberRole,
+                      variables: {
+                        groupId: 'closed-group',
+                        userId: 'owner-member-user',
+                        roleInGroup: 'owner',
+                      },
+                    })
                   })
                 })
               })
@@ -2977,6 +3004,154 @@ describe('in mode', () => {
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
+              })
+            })
+          })
+        })
+
+        describe('hierarchy limits on "hidden-group" (owner: "owner-member-user", admin: "admin-member-user", usual: "usual-member-user")', () => {
+          describe('owner self-demotion', () => {
+            describe('as the only owner in the group', () => {
+              it('cannot demote themself', async () => {
+                authenticatedUser = await ownerMemberUser.toJson()
+                const { errors } = await mutate({
+                  mutation: ChangeGroupMemberRole,
+                  variables: {
+                    groupId: 'hidden-group',
+                    userId: 'owner-member-user',
+                    roleInGroup: 'admin',
+                  },
+                })
+
+                expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+              })
+            })
+          })
+
+          describe('admin cannot promote a usual member to admin', () => {
+            it('throws authorization error', async () => {
+              authenticatedUser = await adminMemberUser.toJson()
+              const { errors } = await mutate({
+                mutation: ChangeGroupMemberRole,
+                variables: {
+                  groupId: 'hidden-group',
+                  userId: 'usual-member-user',
+                  roleInGroup: 'admin',
+                },
+              })
+
+              expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+            })
+          })
+
+          describe('admin can accept a pending member', () => {
+            beforeEach(async () => {
+              authenticatedUser = await ownerMemberUser.toJson()
+              await mutate({
+                mutation: ChangeGroupMemberRole,
+                variables: {
+                  groupId: 'hidden-group',
+                  userId: 'pending-member-user',
+                  roleInGroup: 'pending',
+                },
+              })
+            })
+
+            it('sets role to usual', async () => {
+              authenticatedUser = await adminMemberUser.toJson()
+
+              await expect(
+                mutate({
+                  mutation: ChangeGroupMemberRole,
+                  variables: {
+                    groupId: 'hidden-group',
+                    userId: 'pending-member-user',
+                    roleInGroup: 'usual',
+                  },
+                }),
+              ).resolves.toMatchObject({
+                data: {
+                  ChangeGroupMemberRole: {
+                    user: {
+                      id: 'pending-member-user',
+                    },
+                    membership: {
+                      role: 'usual',
+                    },
+                  },
+                },
+                errors: undefined,
+              })
+            })
+          })
+
+          describe("admin cannot change another admin's role", () => {
+            beforeEach(async () => {
+              authenticatedUser = await ownerMemberUser.toJson()
+              await mutate({
+                mutation: ChangeGroupMemberRole,
+                variables: {
+                  groupId: 'hidden-group',
+                  userId: 'second-owner-member-user',
+                  roleInGroup: 'admin',
+                },
+              })
+            })
+
+            it('throws authorization error', async () => {
+              authenticatedUser = await adminMemberUser.toJson()
+              const { errors } = await mutate({
+                mutation: ChangeGroupMemberRole,
+                variables: {
+                  groupId: 'hidden-group',
+                  userId: 'second-owner-member-user',
+                  roleInGroup: 'usual',
+                },
+              })
+
+              expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+            })
+          })
+
+          describe('admin self-demotion', () => {
+            it('can set own role to usual', async () => {
+              authenticatedUser = await adminMemberUser.toJson()
+
+              await expect(
+                mutate({
+                  mutation: ChangeGroupMemberRole,
+                  variables: {
+                    groupId: 'hidden-group',
+                    userId: 'admin-member-user',
+                    roleInGroup: 'usual',
+                  },
+                }),
+              ).resolves.toMatchObject({
+                data: {
+                  ChangeGroupMemberRole: {
+                    user: {
+                      id: 'admin-member-user',
+                    },
+                    membership: {
+                      role: 'usual',
+                    },
+                  },
+                },
+                errors: undefined,
+              })
+            })
+
+            afterEach(async () => {
+              // restore "admin-member-user" as admin for any later test in this suite that relies
+              // on it
+              authenticatedUser = await ownerMemberUser.toJson()
+              await mutate({
+                mutation: ChangeGroupMemberRole,
+                variables: {
+                  groupId: 'hidden-group',
+                  userId: 'admin-member-user',
+                  roleInGroup: 'admin',
+                },
               })
             })
           })
@@ -3928,7 +4103,9 @@ describe('in mode', () => {
 
       describe('as admin', () => {
         beforeEach(async () => {
-          authenticatedUser = await adminMemberUser.toJson()
+          // Reset via the owner: re-adding a fully removed (non-member) user is an owner-only
+          // shortcut (see isAllowedToChangeGroupMemberRole), so the fixture reset can't use admin.
+          authenticatedUser = await ownerMemberUser.toJson()
           await mutate({
             mutation: ChangeGroupMemberRole,
             variables: {
@@ -3937,6 +4114,7 @@ describe('in mode', () => {
               roleInGroup: 'usual',
             },
           })
+          authenticatedUser = await adminMemberUser.toJson()
         })
 
         it('throws an error', async () => {
@@ -3959,7 +4137,6 @@ describe('in mode', () => {
           })
         })
 
-        /*
         it('removes the user from the group', async () => {
           await expect(
             mutate({
@@ -3972,9 +4149,9 @@ describe('in mode', () => {
           ).resolves.toMatchObject({
             data: {
               RemoveUserFromGroup: expect.objectContaining({
-                user: {
+                user: expect.objectContaining({
                   id: 'usual-member-user',
-                },
+                }),
                 membership: null,
               }),
             },
@@ -4017,7 +4194,35 @@ describe('in mode', () => {
             ]),
           })
         })
-        */
+
+        it('cannot remove another admin', async () => {
+          authenticatedUser = await ownerMemberUser.toJson()
+          await mutate({
+            mutation: ChangeGroupMemberRole,
+            variables: {
+              groupId: 'hidden-group',
+              userId: 'second-owner-member-user',
+              roleInGroup: 'admin',
+            },
+          })
+          authenticatedUser = await adminMemberUser.toJson()
+
+          await expect(
+            mutate({
+              mutation: RemoveUserFromGroup,
+              variables: {
+                groupId: 'hidden-group',
+                userId: 'second-owner-member-user',
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: expect.arrayContaining([
+              expect.objectContaining({
+                message: 'Not Authorized!',
+              }),
+            ]),
+          })
+        })
       })
     })
   })

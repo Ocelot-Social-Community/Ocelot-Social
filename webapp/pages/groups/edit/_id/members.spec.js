@@ -1,7 +1,9 @@
-import { mount, createLocalVue } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Members from './members.vue'
 
-const localVue = createLocalVue()
+// v-tooltip (used by the new read-only wrapper around AddGroupMember) is registered on
+// global.localVue by testSetup.js — a bare createLocalVue() wouldn't know the directive.
+const localVue = global.localVue
 
 const Stub = (name, hasSlot = false) => ({
   name,
