@@ -913,6 +913,7 @@
     "leaveModal": {
       "confirmButton": "Salir",
       "message": "¡Salir de un grupo puede ser irreversible!<br>¡Salir del grupo <b>“{name}”</b>!",
+      "messageAdmin": "¡Salir de un grupo puede ser irreversible! Además, perderás inmediatamente tus derechos de administrador en este grupo.<br>¡Salir del grupo <b>“{name}”</b>!",
       "title": "¿Realmente quieres salir del grupo?"
     },
     "memberRemoved": "¡El usuario “{name}” fue eliminado del grupo!",
@@ -944,6 +945,20 @@
     "removeMemberConfirmText": "¿Eliminar al usuario \"{name}\" del grupo?",
     "removeMemberTitle": "Eliminar miembro",
     "role": "Tu rol en el grupo",
+    "roleChangeModal": {
+      "promoteToOwner": {
+        "message": "“{name}” se convertirá en propietario del grupo y tendrá el control total sobre él. Después no podrás deshacer esto por ti mismo.",
+        "title": "¿Convertir en propietario?"
+      },
+      "selfDemoteAdmin": {
+        "message": "Perderás inmediatamente tus derechos de administrador en este grupo.",
+        "title": "¿Renunciar a los derechos de administrador?"
+      },
+      "selfDemoteOwner": {
+        "message": "Renuncias a tu rol de propietario y después no podrás restaurarlo tú mismo.",
+        "title": "¿Renunciar a tu propiedad?"
+      }
+    },
     "roles": {
       "admin": "Administrador",
       "members": "Miembros",

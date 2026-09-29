@@ -74,7 +74,9 @@ export default {
       query: groupEditQuery(),
       variables: { id },
     })
-    if (group.myRole !== 'owner') {
+    // Admins reach this area too (Members/Invites tabs), just not the General settings tab
+    // itself — see GroupForm.vue's readOnly.
+    if (!['owner', 'admin'].includes(group.myRole)) {
       error({ statusCode: 403, message: 'NONONNNO' })
     }
     return { group }

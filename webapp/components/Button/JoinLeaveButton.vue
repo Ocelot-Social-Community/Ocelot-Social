@@ -55,7 +55,12 @@ export default {
     leaveModalData() {
       return {
         titleIdent: 'group.leaveModal.title',
-        messageIdent: 'group.leaveModal.message',
+        // An admin loses their admin rights the moment they leave — call that out explicitly,
+        // same as the role-change confirmations in GroupMember.vue.
+        messageIdent:
+          this.group.myRole === 'admin'
+            ? 'group.leaveModal.messageAdmin'
+            : 'group.leaveModal.message',
         messageParams: {
           name: this.group.name,
         },

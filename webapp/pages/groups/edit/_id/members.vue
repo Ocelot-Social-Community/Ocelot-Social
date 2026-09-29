@@ -1,15 +1,23 @@
 <template>
   <div>
-    <add-group-member
-      :groupId="group.id"
-      :groupMembers="groupMembers"
-      @loadGroupMembers="loadGroupMembers"
-    />
+    <div
+      class="add-group-member-wrap"
+      :class="{ 'is-read-only': group.myRole !== 'owner' }"
+      :aria-disabled="group.myRole !== 'owner' ? true : undefined"
+      v-tooltip="group.myRole !== 'owner' ? { content: $t('permissions.deniedHint') } : undefined"
+    >
+      <add-group-member
+        :groupId="group.id"
+        :groupMembers="groupMembers"
+        @loadGroupMembers="loadGroupMembers"
+      />
+    </div>
     <div class="ds-mb-small"></div>
     <os-card>
       <group-member
         :groupId="group.id"
         :groupMembers="groupMembers"
+        :myRole="group.myRole"
         @loadGroupMembers="loadGroupMembers"
       />
     </os-card>
@@ -65,3 +73,13 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+/* Adding a brand-new member directly (bypassing pending) is an owner-only shortcut — see
+   isAllowedToChangeGroupMemberRole. Visible but non-interactive for an admin, same pattern as
+   GroupForm.vue's read-only settings fields. */
+.add-group-member-wrap.is-read-only {
+  pointer-events: none;
+  opacity: 0.55;
+}
+</style>

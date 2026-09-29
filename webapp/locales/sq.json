@@ -913,6 +913,7 @@
     "leaveModal": {
       "confirmButton": "Largohu",
       "message": "Largimi nga një grup mund të jetë i pakthyeshëm!<br>Largohu nga grupi <b>“{name}”</b>!",
+      "messageAdmin": "Largimi nga një grup mund të jetë i pakthyeshëm! Gjithashtu do të humbësh menjëherë të drejtat e tua si administrator në këtë grup.<br>Largohu nga grupi <b>“{name}”</b>!",
       "title": "A dëshiron vërtet të largohesh nga grupi?"
     },
     "memberRemoved": "Përdoruesi “{name}” u hoq nga grupi!",
@@ -944,6 +945,20 @@
     "removeMemberConfirmText": "Hiq përdoruesin \"{name}\" nga grupi?",
     "removeMemberTitle": "Hiq anëtarin",
     "role": "Roli yt në grup",
+    "roleChangeModal": {
+      "promoteToOwner": {
+        "message": "“{name}” do të bëhet pronar i grupit dhe do të marrë kontroll të plotë mbi të. Më vonë nuk do ta anulosh dot këtë vetë.",
+        "title": "Ta bësh pronar?"
+      },
+      "selfDemoteAdmin": {
+        "message": "Do të humbësh menjëherë të drejtat e tua si administrator në këtë grup.",
+        "title": "Të heqësh dorë nga të drejtat e administratorit?"
+      },
+      "selfDemoteOwner": {
+        "message": "Ti po heq dorë nga roli yt si pronar dhe nuk do ta rikthesh dot vetë më vonë.",
+        "title": "Të heqësh dorë nga pronësia jote?"
+      }
+    },
     "roles": {
       "admin": "Administrator",
       "members": "Anëtarë",

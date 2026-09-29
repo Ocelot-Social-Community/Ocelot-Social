@@ -913,6 +913,7 @@
     "leaveModal": {
       "confirmButton": "Opuść",
       "message": "Opuszczenie grupy może być nieodwracalne!<br>Opuść grupę <b>“{name}”</b>!",
+      "messageAdmin": "Opuszczenie grupy może być nieodwracalne! Stracisz też natychmiast swoje uprawnienia administratora w tej grupie.<br>Opuść grupę <b>“{name}”</b>!",
       "title": "Czy na pewno chcesz opuścić grupę?"
     },
     "memberRemoved": "Użytkownik “{name}” został usunięty z grupy!",
@@ -944,6 +945,20 @@
     "removeMemberConfirmText": "Usunąć użytkownika \"{name}\" z grupy?",
     "removeMemberTitle": "Usuń członka",
     "role": "Twoja rola w grupie",
+    "roleChangeModal": {
+      "promoteToOwner": {
+        "message": "“{name}” zostanie właścicielem grupy i uzyska nad nią pełną kontrolę. Później nie będziesz mógł/mogła cofnąć tej zmiany samodzielnie.",
+        "title": "Uczynić właścicielem?"
+      },
+      "selfDemoteAdmin": {
+        "message": "Natychmiast stracisz swoje uprawnienia administratora w tej grupie.",
+        "title": "Zrzec się uprawnień administratora?"
+      },
+      "selfDemoteOwner": {
+        "message": "Zrzekasz się roli właściciela i nie będziesz mógł/mogła jej sam(a) przywrócić.",
+        "title": "Zrzec się własności?"
+      }
+    },
     "roles": {
       "admin": "Administrator",
       "members": "Członkowie",

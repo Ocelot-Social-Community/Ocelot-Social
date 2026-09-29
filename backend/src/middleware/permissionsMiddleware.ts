@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 import { createRequire } from 'node:module'
 
 import CONFIG from '@config/index'
@@ -234,42 +234,68 @@ const isAllowedToChangeGroupMemberRole = rule({
   }
   const currentUserId = user.id
   const { groupId, userId, roleInGroup } = args
-  if (currentUserId === userId) {
-    return false
-  }
+  const isSelf = currentUserId === userId
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
     const transactionResponse = await transaction.run(
       `
         MATCH (currentUser:User {id: $currentUserId})-[currentUserMembership:MEMBER_OF]->(group:Group {id: $groupId})
         OPTIONAL MATCH (group)<-[userMembership:MEMBER_OF]-(member:User {id: $userId})
-        RETURN group {.*}, currentUser {.*, myRoleInGroup: currentUserMembership.role}, member {.*, myRoleInGroup: userMembership.role}
+        RETURN
+          group {.*},
+          currentUser {.*, myRoleInGroup: currentUserMembership.role},
+          member {.*, myRoleInGroup: userMembership.role},
+          size((group)<-[:MEMBER_OF {role: 'owner'}]-(:User)) AS ownerCount
       `,
       { groupId, currentUserId, userId },
     )
+    const record = transactionResponse.records[0]
     return {
-      currentUser: transactionResponse.records.map((record) => record.get('currentUser'))[0],
-      group: transactionResponse.records.map((record) => record.get('group'))[0],
-      member: transactionResponse.records.map((record) => record.get('member'))[0],
+      currentUser: record?.get('currentUser'),
+      group: record?.get('group'),
+      member: record?.get('member'),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- driver Record.get() is untyped, same as elsewhere in the codebase (e.g. resolvers/statistics.ts)
+      ownerCount: record?.get('ownerCount')?.toNumber() ?? 0,
     }
   })
   try {
-    const { currentUser, group, member } = await readTxPromise
-    const groupExists = !!group
-    const currentUserExists = !!currentUser
-    const userIsMember = !!member
-    const sameUserRoleInGroup = member && member.myRoleInGroup === roleInGroup
-    const userIsOwner = member && ['owner'].includes(member.myRoleInGroup)
-    const currentUserIsAdmin = currentUser && ['admin'].includes(currentUser.myRoleInGroup)
-    const adminCanSetRole = ['pending', 'usual', 'admin'].includes(roleInGroup)
-    const currentUserIsOwner = currentUser && ['owner'].includes(currentUser.myRoleInGroup)
-    const ownerCanSetRole = ['pending', 'usual', 'admin', 'owner'].includes(roleInGroup)
-    return (
-      groupExists &&
-      currentUserExists &&
-      (!userIsMember || (userIsMember && (sameUserRoleInGroup || !userIsOwner))) &&
-      ((currentUserIsAdmin && adminCanSetRole) || (currentUserIsOwner && ownerCanSetRole))
-    )
+    const { currentUser, group, member, ownerCount } = await readTxPromise
+    if (!group || !currentUser) {
+      return false
+    }
+    const currentUserRole = currentUser.myRoleInGroup
+    // No `member` means the target has no MEMBER_OF relation yet — owners use this rule to add
+    // someone to the group directly (bypassing JoinGroup), so `targetRole` is simply absent
+    // rather than one of the four enum values.
+    const targetRole = member ? member.myRoleInGroup : null
+
+    // Owner: full control over everyone else, but can never demote a fellow owner (only
+    // re-confirming their existing 'owner' role is a no-op pass-through). Owner may demote
+    // themself, but only while at least one other owner remains — the group can never end up
+    // ownerless through a role change. `ownerCount` includes the acting owner themself, so more
+    // than one owner means at least one other owner exists.
+    if (currentUserRole === 'owner') {
+      if (isSelf) {
+        return ownerCount > 1 && roleInGroup !== 'owner'
+      }
+      return targetRole !== 'owner' || roleInGroup === 'owner'
+    }
+
+    // Admin: may only move an existing member between 'pending' and 'usual' (accept/reject a join
+    // request, demote a usual member) — never promote to 'admin'/'owner', and never touch a
+    // member who is already 'admin' or 'owner'. The one exception is demoting themself to
+    // 'usual'. Adding a brand-new member directly is an owner-only shortcut, not an admin power.
+    if (currentUserRole === 'admin') {
+      if (isSelf) {
+        return roleInGroup === 'usual'
+      }
+      if (!member) {
+        return false
+      }
+      return ['pending', 'usual'].includes(targetRole) && ['pending', 'usual'].includes(roleInGroup)
+    }
+
+    return false
   } finally {
     await session.close()
   }
@@ -397,9 +423,18 @@ const canRemoveUserFromGroup = rule({
   })
   try {
     const { currentUserRole, userRole } = await readTxPromise
-    return (
-      currentUserRole && ['owner'].includes(currentUserRole) && userRole && userRole !== 'owner'
-    )
+    if (!userRole) {
+      return false
+    }
+    if (currentUserRole === 'owner') {
+      return userRole !== 'owner'
+    }
+    // Admin may remove pending/usual members (e.g. reject a join request), but must not touch
+    // another admin or the owner.
+    if (currentUserRole === 'admin') {
+      return ['pending', 'usual'].includes(userRole)
+    }
+    return false
   } finally {
     await session.close()
   }

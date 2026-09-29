@@ -1,13 +1,20 @@
 <template>
   <div>
-    <form class="group-form" @submit.prevent="onSubmit" novalidate>
+    <form
+      class="group-form"
+      :class="{ 'is-read-only': readOnly }"
+      :aria-disabled="readOnly ? true : undefined"
+      v-tooltip="readOnly ? { content: $t('permissions.deniedHint') } : undefined"
+      @submit.prevent="onSubmit"
+      novalidate
+    >
       <template>
         <!-- group Name -->
         <ocelot-input
           name="name"
           :label="$t('group.name')"
           model="name"
-          autofocus
+          :autofocus="!readOnly"
           hide-error
           @blur="dirtyFields.name && touchField('name')"
         />
@@ -139,6 +146,7 @@
         <location-select
           :value="formData.locationName"
           :types="groupLocationTypes"
+          :disabled="readOnly"
           @input="onLocationSelectInput"
         />
         <p
@@ -188,7 +196,7 @@
             :loading="loading"
             :disabled="loading"
             :class="{ 'permission-denied': submitVisuallyDenied }"
-            :aria-disabled="canCreateSelectedGroup ? undefined : true"
+            :aria-disabled="canCreateSelectedGroup && !readOnly ? undefined : true"
             v-tooltip="{
               content: submitDeniedHint,
             }"
@@ -490,6 +498,12 @@ export default {
       if (!this.formData.groupType) return this.canCreateAnyGroup
       return this.$can(`group.create_${this.formData.groupType}`) && this.canSubmitHiddenTransition
     },
+    // Editing group settings is owner-only — an admin may reach this form (they need the
+    // Members/Invites tabs alongside it), but sees every field here visibly disabled rather
+    // than hidden, same as GroupContentMenu.vue's "Einstellungen" entry being reachable for them.
+    readOnly() {
+      return this.update && (!this.group || this.group.myRole !== 'owner')
+    },
     effectiveShowMembers() {
       if (this.formData.groupType === 'public') return true
       if (this.formData.groupType === 'hidden') return false
@@ -520,10 +534,12 @@ export default {
     // changed yet" reason, and telling assistive tech it's disabled would
     // be actively wrong, not just cosmetically off.
     submitVisuallyDenied() {
-      return !this.canCreateSelectedGroup || (this.update && !this.hasUnsavedChanges)
+      return (
+        this.readOnly || !this.canCreateSelectedGroup || (this.update && !this.hasUnsavedChanges)
+      )
     },
     submitDeniedHint() {
-      if (!this.canCreateSelectedGroup) return this.$t('permissions.deniedHint')
+      if (this.readOnly || !this.canCreateSelectedGroup) return this.$t('permissions.deniedHint')
       if (this.update && !this.hasUnsavedChanges) return this.$t('common.noChangesHint')
       return ''
     },
@@ -574,6 +590,9 @@ export default {
       this.updateFormField('description', value)
     },
     onSubmit() {
+      // Admin viewing an owner-only settings form — grayed out same as the permission cases
+      // below, see readOnly's own doc comment.
+      if (this.readOnly) return
       // Block creating a group of a type the user may not create (the button is grayed;
       // this also guards keyboard Enter and direct navigation to the form). Only once a
       // type is actually chosen — same fix as canCreateSelectedGroup: checking
@@ -686,6 +705,18 @@ export default {
    default. */
 .group-form .select-label + div .editor-content {
   margin-top: var(--space-x-small);
+}
+
+.group-form.is-read-only > *:not(.buttons) {
+  /* Visible but non-interactive — covers the custom, non-form-associated
+     fields (Editor, LocationPickerMap, CategoriesSelect) that a native
+     :disabled would miss; groupType and location additionally get a real
+     :disabled (see template) for proper a11y/keyboard handling. The Cancel
+     button in .buttons stays reachable; Save is grayed via
+     submitVisuallyDenied instead, same pattern as the permission checks
+     below. */
+  pointer-events: none;
+  opacity: 0.55;
 }
 
 .group-form {

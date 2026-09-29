@@ -126,6 +126,9 @@ describe('GroupForm', () => {
     description: 'Description text',
     actionRadius: 'local',
     locationName: '',
+    // Every existing test below mounts this fixture assuming the current viewer may actually
+    // edit it — explicit now that GroupForm also gates on myRole (see readOnly).
+    myRole: 'owner',
     categories: [
       { id: 'cat-1', slug: 'family' },
       { id: 'cat-2', slug: 'work' },
@@ -459,6 +462,51 @@ describe('GroupForm', () => {
       const submitButton = wrapper.find('button[type="submit"]')
       expect(submitButton.classes()).toContain('permission-denied')
       expect(wrapper.vm.submitDeniedHint).toBe('permissions.deniedHint')
+    })
+  })
+
+  describe('readOnly — an admin reaches this form but may not edit group settings', () => {
+    const mountWith = (propsDataOverride) =>
+      mount(GroupForm, { propsData: propsDataOverride, mocks, localVue, stubs, store })
+
+    it('is read-only when editing as an admin', () => {
+      const wrapper = mountWith({ update: true, group: { ...group, myRole: 'admin' } })
+      expect(wrapper.vm.readOnly).toBe(true)
+      expect(wrapper.find('form.group-form').classes()).toContain('is-read-only')
+    })
+
+    it('does not autofocus the name field for a read-only admin', () => {
+      const wrapper = mountWith({ update: true, group: { ...group, myRole: 'admin' } })
+      expect(wrapper.find('input[name="name"]').attributes('autofocus')).toBeUndefined()
+    })
+
+    it('still autofocuses the name field for the owner', () => {
+      const wrapper = mountWith({ update: true, group })
+      expect(wrapper.find('input[name="name"]').attributes('autofocus')).toBe('autofocus')
+    })
+
+    it('greys out the submit button and blocks onSubmit for an admin', () => {
+      const wrapper = mountWith({ update: true, group: { ...group, myRole: 'admin' } })
+      const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
+
+      const submitButton = wrapper.find('button[type="submit"]')
+      expect(submitButton.classes()).toContain('permission-denied')
+      expect(submitButton.attributes('aria-disabled')).toBe('true')
+      expect(wrapper.vm.submitDeniedHint).toBe('permissions.deniedHint')
+
+      wrapper.vm.onSubmit()
+      expect(formSubmit).not.toHaveBeenCalled()
+    })
+
+    it('is not read-only for the owner', () => {
+      const wrapper = mountWith({ update: true, group })
+      expect(wrapper.vm.readOnly).toBe(false)
+      expect(wrapper.find('form.group-form').classes()).not.toContain('is-read-only')
+    })
+
+    it('is never read-only on the create form', () => {
+      const wrapper = mountWith({ update: false, group: {} })
+      expect(wrapper.vm.readOnly).toBe(false)
     })
   })
 

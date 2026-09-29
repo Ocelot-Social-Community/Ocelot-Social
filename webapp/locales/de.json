@@ -913,6 +913,7 @@
     "leaveModal": {
       "confirmButton": "Verlassen",
       "message": "Eine Gruppe zu verlassen ist möglicherweise nicht rückgängig zu machen!<br>Gruppe <b>„{name}“</b> verlassen!",
+      "messageAdmin": "Eine Gruppe zu verlassen ist möglicherweise nicht rückgängig zu machen! Du verlierst außerdem sofort deine Administratorenrechte in dieser Gruppe.<br>Gruppe <b>„{name}“</b> verlassen!",
       "title": "Möchtest du wirklich die Gruppe verlassen?"
     },
     "memberRemoved": "Nutzer „{name}“ wurde aus der Gruppe entfernt!",
@@ -944,6 +945,20 @@
     "removeMemberConfirmText": "Nutzer \"{name}\" aus der Gruppe entfernen?",
     "removeMemberTitle": "Mitglied entfernen",
     "role": "Deine Rolle in der Gruppe",
+    "roleChangeModal": {
+      "promoteToOwner": {
+        "message": "„{name}“ wird zum Inhaber der Gruppe gemacht und hat damit die volle Kontrolle über die Gruppe. Das kannst du später nicht mehr rückgängig machen.",
+        "title": "Zum Inhaber machen?"
+      },
+      "selfDemoteAdmin": {
+        "message": "Du verlierst sofort deine Administratorenrechte in dieser Gruppe.",
+        "title": "Admin-Rechte abgeben?"
+      },
+      "selfDemoteOwner": {
+        "message": "Du gibst deine Rolle als Inhaber ab und kannst sie dir danach nicht mehr selbst zurückgeben.",
+        "title": "Eigene Inhaberschaft abgeben?"
+      }
+    },
     "roles": {
       "admin": "Administrator",
       "members": "Mitglieder",

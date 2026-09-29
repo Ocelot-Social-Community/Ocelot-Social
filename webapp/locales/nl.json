@@ -913,6 +913,7 @@
     "leaveModal": {
       "confirmButton": "Verlaten",
       "message": "Een groep verlaten kan onomkeerbaar zijn!<br>Groep <b>“{name}”</b> verlaten!",
+      "messageAdmin": "Een groep verlaten kan onomkeerbaar zijn! Ook verlies je direct je beheerdersrechten in deze groep.<br>Groep <b>“{name}”</b> verlaten!",
       "title": "Wil je de groep echt verlaten?"
     },
     "memberRemoved": "Gebruiker “{name}” is uit de groep verwijderd!",
@@ -944,6 +945,20 @@
     "removeMemberConfirmText": "Gebruiker \"{name}\" uit de groep verwijderen?",
     "removeMemberTitle": "Lid verwijderen",
     "role": "Jouw rol in de groep",
+    "roleChangeModal": {
+      "promoteToOwner": {
+        "message": "“{name}” wordt eigenaar van de groep en krijgt daarmee volledige controle erover. Dit kun je later niet meer zelf ongedaan maken.",
+        "title": "Eigenaar maken?"
+      },
+      "selfDemoteAdmin": {
+        "message": "Je verliest direct je beheerdersrechten in deze groep.",
+        "title": "Beheerdersrechten opgeven?"
+      },
+      "selfDemoteOwner": {
+        "message": "Je geeft je rol als eigenaar op en kunt deze daarna niet zelf herstellen.",
+        "title": "Je eigenaarschap opgeven?"
+      }
+    },
     "roles": {
       "admin": "Beheerder",
       "members": "Leden",

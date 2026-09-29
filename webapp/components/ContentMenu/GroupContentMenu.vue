@@ -134,7 +134,9 @@ export default {
         }
       }
 
-      if (this.group.myRole === 'owner') {
+      // Admins reach the same edit area as owners — they manage members and invite links there,
+      // even though the "General" settings tab itself stays owner-only (see GroupForm.vue).
+      if (['owner', 'admin'].includes(this.group.myRole)) {
         routes.push({
           label: this.$t('admin.settings.name'),
           path: `/groups/edit/${this.group.id}`,

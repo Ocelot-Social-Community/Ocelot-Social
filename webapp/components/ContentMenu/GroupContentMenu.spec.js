@@ -57,6 +57,14 @@ describe('GroupContentMenu', () => {
     expect(wrapper.container).toMatchSnapshot()
   })
 
+  it('offers settings and invite links when I am an admin, same as an owner', () => {
+    const wrapper = Wrapper({
+      usage: 'groupProfile',
+      group: { myRole: 'admin', id: 'groupid' },
+    })
+    expect(wrapper.container).toMatchSnapshot()
+  })
+
   describe('mute button', () => {
     it('emits mute', async () => {
       const wrapper = Wrapper({

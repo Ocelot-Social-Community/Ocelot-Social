@@ -105,8 +105,21 @@ describe('pages/groups/edit/_id.vue', () => {
       expect(ctx.errorFn).not.toHaveBeenCalled()
     })
 
+    it('returns the loaded group when the current user is an admin', async () => {
+      const ctx = buildContext({ group: { id: 'g1', myRole: 'admin', name: 'Mine' } })
+      const result = await EditId.asyncData(ctx)
+      expect(result).toEqual({ group: { id: 'g1', myRole: 'admin', name: 'Mine' } })
+      expect(ctx.errorFn).not.toHaveBeenCalled()
+    })
+
     it('triggers error(403) when the current user is not the owner', async () => {
       const ctx = buildContext({ group: { id: 'g1', myRole: 'usual' } })
+      await EditId.asyncData(ctx)
+      expect(ctx.errorFn).toHaveBeenCalledWith({ statusCode: 403, message: 'NONONNNO' })
+    })
+
+    it('triggers error(403) for a pending member', async () => {
+      const ctx = buildContext({ group: { id: 'g1', myRole: 'pending' } })
       await EditId.asyncData(ctx)
       expect(ctx.errorFn).toHaveBeenCalledWith({ statusCode: 403, message: 'NONONNNO' })
     })
