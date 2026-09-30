@@ -1,5 +1,3 @@
-import type { PermissionKey } from '@src/permission'
-
 // The act-on hierarchy: who may disable/delete whom.
 //
 // There is no rank/ordering field (see the roles concept §3) — hierarchy is
@@ -21,7 +19,12 @@ import type { PermissionKey } from '@src/permission'
 // This is the only place the otherwise display-only broadest-first role ordering
 // (RoleService.allRoles) is actually ENFORCED — but as set dominance, a partial
 // order, not the total list index.
-export function dominates(actor: Set<PermissionKey>, target: Set<PermissionKey>): boolean {
+//
+// Generic in the key type so the identical rule serves both layers: network permissions
+// for who may disable/delete whom, and GROUP permissions for who may remove or re-role
+// whom inside a group (see groupRole/authority.ts). The rule is set math — duplicating it
+// per key type would be two places for one invariant.
+export function dominates<Key>(actor: ReadonlySet<Key>, target: ReadonlySet<Key>): boolean {
   // Strict: must have strictly more. Combined with target ⊆ actor below, a larger
   // size guarantees a proper superset (equal sets share the same size → blocked).
   if (actor.size <= target.size) {
