@@ -31,9 +31,19 @@ type GroupRole {
   memberCount: Int
 }
 
+"The network-wide default role set a new group of that type is seeded from."
+type GroupRoleTemplate {
+  groupType: String!
+  roles: [GroupRole!]!
+  "How many groups still run on this template untouched — the ones an `applyGroupRoleTemplates` would reach."
+  untouchedGroupCount: Int!
+}
+
 type Query {
   "The closed catalog of group-scoped rights. Requires authentication; it is the same for every group."
   groupPermissionCatalog: [GroupPermission!]!
+  "The network-wide group role templates, one per group type. Requires `group.roleTemplate.manage`."
+  groupRoleTemplates: [GroupRoleTemplate!]!
 }
 
 type Mutation {
@@ -49,6 +59,15 @@ type Mutation {
   resetGroupRoles(groupId: ID!): [GroupRole!]!
   "Set a member's role by name. Subject to the act-on rules: the actor must outrank the member and must hold every right the assigned role grants."
   setGroupMemberRole(groupId: ID!, userId: ID!, roleName: String!): GroupMember!
+  "Change one role of the network-wide template for a group type. Existing groups are NOT touched — that is what applyGroupRoleTemplates is for. Requires `group.roleTemplate.manage`."
+  updateGroupRoleTemplate(
+    groupType: String!
+    name: String!
+    permissions: [String!]!
+    label: String
+  ): GroupRole!
+  "Apply the templates to every group that has never edited its own roles, and return how many groups were changed. A group that customised its roles is left alone — its edit is not overwritten by a network default. Requires `group.roleTemplate.manage`."
+  applyGroupRoleTemplates: Int!
 }
 
 "A signal that the rights inside a group may have changed — a role's permission set, a rename, a reset or a member's role. Clients refetch the group's myGroupPermissions on receipt; the payload carries no actor."

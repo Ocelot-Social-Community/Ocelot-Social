@@ -774,6 +774,24 @@ export default {
           'MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )',
       },
     }),
+    ownerCount: async (parent, _args, context: Context, _resolveInfo) => {
+      // Carried along by the admin list query; counted on demand elsewhere. Behind the same
+      // right as the member list: it is a fact about the members.
+      if (typeof parent.ownerCount === 'number') {
+        return parent.ownerCount
+      }
+      const authorization = await context.groupAuthorization?.forGroup(parent.id as string)
+      if (context.groupAuthorization && !authorization?.has('group.members.read')) {
+        return null
+      }
+      const result = await context.database.query({
+        query: `MATCH (:User)-[m:MEMBER_OF]->(:Group {id: $id})
+                WHERE m.role = 'owner'
+                RETURN toString(count(m)) AS count`,
+        variables: { id: parent.id },
+      })
+      return Number.parseInt((result.records[0]?.get('count') as string) ?? '0', 10)
+    },
     membersCount: async (parent, _args, context: Context, _resolveInfo) => {
       // Counting members is part of seeing them (concept E7). Null rather than an error: a
       // viewer who may not count is a normal case on a group teaser, not a fault.
@@ -822,7 +840,9 @@ export default {
       // never disagree, with the old property as the fallback for a group whose roles are not
       // seeded yet (a database mid-migration).
       // Same tolerance as membersCount above for a partial context in a unit test.
-      const roles = context.database ? await readGroupRoles(context.database, parent.id as string) : []
+      const roles = context.database
+        ? await readGroupRoles(context.database, parent.id as string)
+        : []
       const none = roles.find((role) => role.name === NONE_ROLE)
       if (none) {
         return none.permissions.includes('group.members.read')

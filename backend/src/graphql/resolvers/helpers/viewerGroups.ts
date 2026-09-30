@@ -59,9 +59,33 @@ export interface ViewerScope {
   /** `null` for an anonymous visitor. */
   viewerId: string | null
   groupIds: string[]
+  /**
+   * The group TYPES whose content this viewer may read without being a member.
+   *
+   * Always contains `public` — that content is open. A network moderator additionally holds
+   * `group.content.read.any_closed` (and an admin `_hidden`), which is how #9405 gets fixed:
+   * the filter's hard-coded `'public'` becomes a list the viewer brings with them, so the
+   * moderator sees what they are asked to moderate without a per-row lookup and without
+   * `groupType` stopping being the axis.
+   */
+  readableGroupTypes: string[]
 }
+
+// `public` plus whatever the viewer's network rights open up. Order is irrelevant; the list is
+// bounded by the number of group types, not by anything the database holds.
+export const readableGroupTypes = (context: Context): string[] => [
+  'public',
+  ...['closed', 'hidden'].filter((groupType) =>
+    context.effectivePermissions.has(
+      `group.content.read.any_${groupType}` as Parameters<
+        Context['effectivePermissions']['has']
+      >[0],
+    ),
+  ),
+]
 
 export const viewerScope = async (context: Context): Promise<ViewerScope> => ({
   viewerId: context.user?.id ?? null,
   groupIds: await activeGroupIds(context),
+  readableGroupTypes: readableGroupTypes(context),
 })

@@ -27,6 +27,8 @@ const EXPECTED_KEYS: PermissionKey[] = [
   'user.delete.any',
   'badge.manage',
   'content.moderate',
+  'group.content.read.any_closed',
+  'group.content.read.any_hidden',
   'user.disable',
   'post.pin',
   'post.push',
@@ -42,6 +44,10 @@ const EXPECTED_KEYS: PermissionKey[] = [
   'videoCall.create_hidden',
   'apiKey.create',
   'branding.manage',
+  'group.administer.any_public',
+  'group.administer.any_closed',
+  'group.administer.any_hidden',
+  'group.roleTemplate.manage',
 ]
 
 describe('permission catalog', () => {
@@ -83,6 +89,14 @@ describe('permission catalog', () => {
       expect(gatesFor('badge.manage')).toEqual(['badgesEnabled'])
       expect(gatesFor('user.invite')).toEqual(['inviteRegistration'])
       expect(gatesFor('apiKey.administer')).toEqual([])
+      // Reaching into groups, and the templates they are seeded from, is inert while the
+      // groups feature is off.
+      expect(gatesFor('group.content.read.any_closed')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.content.read.any_hidden')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.administer.any_public')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.administer.any_closed')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.administer.any_hidden')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.roleTemplate.manage')).toEqual(['groupsEnabled'])
       // A representative ungated right.
       expect(gatesFor('post.create')).toEqual([])
 
@@ -99,8 +113,10 @@ describe('permission catalog', () => {
       // then apiKey.create.
       expect(allPermissionGates()).toEqual([
         'badgesEnabled',
-        'socialMediaEnabled',
+        // groupsEnabled moved up: the group-access rights that sit next to content.moderate
+        // declare it before group.create_* does.
         'groupsEnabled',
+        'socialMediaEnabled',
         'inviteRegistration',
         'videoConference',
         'apiKeysEnabled',

@@ -170,17 +170,30 @@ const translate = (
       // control with fewer branches is worth more than the handful of db hits the unused
       // author clause costs a logged-out request.
       case 'invisibleTo': {
-        const { viewerId, groupIds } = value as { viewerId: string | null; groupIds: string[] }
+        const { viewerId, groupIds, readableGroupTypes } = value as {
+          viewerId: string | null
+          groupIds: string[]
+          readableGroupTypes?: string[]
+        }
         const groupsParameter = next()
+        const typesParameter = next()
         fragments.push({
+          // The hard-coded `'public'` became a list the viewer brings along: it is `['public']`
+          // for everybody, plus the types a network moderator/admin may read into (#9405).
+          // Still one expression and still no per-row lookup — the list is bounded by the
+          // number of group types.
           where: `(
             NOT EXISTS {
               MATCH (${alias})-[:IN]->(g:Group)
-              WHERE NOT g.groupType = 'public' AND NOT g.id IN $${groupsParameter}
+              WHERE NOT g.groupType IN $${typesParameter} AND NOT g.id IN $${groupsParameter}
             }
             OR EXISTS { MATCH (${alias})<-[:WROTE]-(:User { id: $${parameter} }) }
           )`,
-          params: { [parameter]: viewerId, [groupsParameter]: groupIds },
+          params: {
+            [parameter]: viewerId,
+            [groupsParameter]: groupIds,
+            [typesParameter]: readableGroupTypes ?? ['public'],
+          },
         })
         continue
       }

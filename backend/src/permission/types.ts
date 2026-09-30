@@ -19,6 +19,8 @@ export type PermissionKey =
   | 'user.delete.any'
   | 'badge.manage'
   | 'content.moderate'
+  | 'group.content.read.any_closed'
+  | 'group.content.read.any_hidden'
   | 'user.disable'
   | 'post.pin'
   | 'post.push'
@@ -34,6 +36,10 @@ export type PermissionKey =
   | 'videoCall.create_hidden'
   | 'apiKey.create'
   | 'branding.manage'
+  | 'group.administer.any_public'
+  | 'group.administer.any_closed'
+  | 'group.administer.any_hidden'
+  | 'group.roleTemplate.manage'
 
 // Grouping for the admin UI. Open string (the JSON is the source of truth); the
 // known groups today are 'administration' | 'moderation' | 'content' | 'membership'

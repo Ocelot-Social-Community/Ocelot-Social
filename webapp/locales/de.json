@@ -236,9 +236,6 @@
     "notifications": {
       "name": "Benachrichtigungen"
     },
-    "organizations": {
-      "name": "Organisationen"
-    },
     "pages": {
       "name": "Seiten"
     },
@@ -416,6 +413,40 @@
           "status": "Status"
         }
       }
+    },
+    "groups": {
+      "name": "Gruppen",
+      "title": "Gruppen verwalten",
+      "description": "Alle Gruppen, die du verwalten darfst — auch die geheimen, die es sonst nirgends in einer Liste gibt. Gruppen ohne Inhaber findest du hier ueber den Filter.",
+      "searchPlaceholder": "Name oder Kurzname",
+      "allTypes": "Alle Typen",
+      "ownerlessOnly": "nur ohne Inhaber",
+      "disabledOnly": "nur deaktivierte",
+      "empty": "Keine Gruppe passt zu diesen Filtern.",
+      "noOwner": "kein Inhaber",
+      "disabled": "deaktiviert",
+      "active": "aktiv",
+      "previous": "Zurueck",
+      "next": "Weiter",
+      "count": "{shown} von {total}",
+      "columns": {
+        "name": "Gruppe",
+        "type": "Typ",
+        "members": "Mitglieder",
+        "owners": "Inhaber",
+        "state": "Status"
+      }
+    },
+    "groupRoles": {
+      "name": "Gruppen-Rollen",
+      "title": "Standard-Rollen fuer Gruppen",
+      "description": "Diese Vorlagen bekommt jede neu angelegte Gruppe. Bestehende Gruppen aendern sich dadurch nicht — dafuer gibt es die Schaltflaeche unten.",
+      "untouched": "{count} Gruppen laufen noch unveraendert auf dieser Vorlage.",
+      "apply": "Auf unveraenderte Gruppen anwenden",
+      "confirmApply": "Vorlagen auf {count} Gruppen anwenden, die ihre Rollen nie angepasst haben? Angepasste Gruppen bleiben unberuehrt.",
+      "applied": "{count} Gruppen aktualisiert",
+      "saved": "Vorlage gespeichert",
+      "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte und ist nicht bearbeitbar."
     }
   },
   "chat": {

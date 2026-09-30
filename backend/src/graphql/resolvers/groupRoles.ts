@@ -3,7 +3,7 @@ import { withFilter } from 'graphql-subscriptions'
 import { GROUP_PERMISSIONS_CHANGED } from '@constants/subscriptions'
 import { UserInputError } from '@graphql/errors'
 import { groupPermissionCatalog, sanitizeGroupPermissions } from '@src/groupPermission'
-import { coversRole, NONE_ROLE, SYSTEM_ROLE_NAMES, USUAL_ROLE } from '@src/groupRole'
+import { coversRole, NONE_ROLE, OWNER_ROLE, SYSTEM_ROLE_NAMES, USUAL_ROLE } from '@src/groupRole'
 import {
   deleteGroupRole,
   markGroupRolesCustomized,
@@ -12,12 +12,15 @@ import {
   readGroupRoleTemplates,
   renameGroupRole,
   replaceGroupRoles,
+  untouchedGroupIdsByType,
   writeGroupRole,
+  writeGroupRoleTemplate,
 } from '@src/groupRole/repository'
 
 import type { Context } from '@src/context'
 import type { GroupPermissionKey } from '@src/groupPermission'
 import type { GroupRoleDefinition } from '@src/groupRole'
+import type { PermissionKey } from '@src/permission'
 
 // A role name is a KEY, not a display name — the label carries the wording. Kept narrow on
 // purpose: it ends up in `id` as `<groupId>:<name>`, in a membership property and in i18n
@@ -105,9 +108,97 @@ const touched = async (context: Context, groupId: string, now: string): Promise<
   announce(context, groupId)
 }
 
+interface AdminGroupFilter {
+  search?: string | null
+  groupType?: string | null
+  ownerless?: boolean | null
+  disabled?: boolean | null
+  first?: number | null
+  offset?: number | null
+}
+
+/**
+ * The group types this viewer may administer.
+ *
+ * The list IS the authorization: a viewer holding only `group.administer.any_public` gets public
+ * groups and nothing else, so a hidden group cannot be enumerated by asking for it.
+ */
+const administrableGroupTypes = (context: Context): string[] =>
+  ['public', 'closed', 'hidden'].filter((groupType) =>
+    context.effectivePermissions.has(`group.administer.any_${groupType}` as PermissionKey),
+  )
+
+/**
+ * The admin group list, and the count behind the same filters.
+ *
+ * Its own query rather than an option on `Query.Group`: that one answers "the groups I am in or
+ * may see", this one answers "the groups I may administer", and conflating the two is how a
+ * hidden group ends up in a listing it has no business being in.
+ */
+const adminGroupList = async (context: Context, params: AdminGroupFilter, countOnly = false) => {
+  const types = administrableGroupTypes(context)
+  const requested = params.groupType ? [params.groupType].filter((t) => types.includes(t)) : types
+  if (requested.length === 0) {
+    return countOnly ? 0 : []
+  }
+  const clauses = ['g.groupType IN $types', 'coalesce(g.deleted, false) = false']
+  if (params.search) {
+    clauses.push('(toLower(g.name) CONTAINS toLower($search) OR g.slug CONTAINS toLower($search))')
+  }
+  if (params.disabled === true || params.disabled === false) {
+    clauses.push('coalesce(g.disabled, false) = $disabled')
+  }
+  if (params.ownerless === true) {
+    clauses.push('ownerCount = 0')
+  }
+  const variables = {
+    types: requested,
+    search: params.search ?? '',
+    disabled: params.disabled ?? false,
+    first: params.first ?? 25,
+    offset: params.offset ?? 0,
+  }
+  const result = await context.database.query({
+    query: `
+      MATCH (g:Group)
+      OPTIONAL MATCH (:User)-[m:MEMBER_OF]->(g)
+      WHERE m.role = '${OWNER_ROLE}'
+      WITH g, count(m) AS ownerCount
+      WHERE ${clauses.join(' AND ')}
+      ${
+        countOnly
+          ? 'RETURN toString(count(g)) AS count'
+          : `RETURN g {.*, ownerCount: ownerCount} AS group
+             ORDER BY toLower(g.name) ASC
+             SKIP toInteger($offset) LIMIT toInteger($first)`
+      }
+    `,
+    variables,
+  })
+  if (countOnly) {
+    return Number.parseInt((result.records[0]?.get('count') as string) ?? '0', 10)
+  }
+  return result.records.map((record) => record.get('group') as Record<string, unknown>)
+}
+
 export default {
   Query: {
     groupPermissionCatalog: () => groupPermissionCatalog(),
+    adminGroups: async (_parent, params: AdminGroupFilter, context: Context) =>
+      adminGroupList(context, params),
+    adminGroupCount: async (_parent, params: AdminGroupFilter, context: Context) =>
+      adminGroupList(context, params, true),
+    groupRoleTemplates: async (_parent, _args, context: Context) => {
+      const [templates, untouched] = await Promise.all([
+        readGroupRoleTemplates(context.database),
+        untouchedGroupIdsByType(context.database),
+      ])
+      return Object.entries(templates).map(([groupType, roles]) => ({
+        groupType,
+        roles: roles.map((role) => ({ ...role, memberCount: null })),
+        untouchedGroupCount: untouched.get(groupType)?.length ?? 0,
+      }))
+    },
   },
   Group: {
     myGroupRole: async (parent: { id: string }, _args, context: Context) => {
@@ -297,6 +388,69 @@ export default {
         user: record.get('user') as Record<string, unknown>,
         membership: record.get('membership') as Record<string, unknown>,
       }
+    },
+    updateGroupRoleTemplate: async (
+      _parent,
+      params: { groupType: string; name: string; permissions: string[]; label?: string | null },
+      context: Context,
+    ) => {
+      const { groupType, name } = params
+      const templates = await readGroupRoleTemplates(context.database)
+      const existing = new Map(Object.entries(templates))
+        .get(groupType)
+        ?.find((role) => role.name === name)
+      if (!existing) {
+        throw new UserInputError('Unknown group role template!')
+      }
+      if (existing.protected && params.permissions.length > 0) {
+        throw new UserInputError('The owner role holds every right and cannot be edited!')
+      }
+      const updated = {
+        ...existing,
+        label: validateLabel(params.label),
+        permissions: existing.protected ? [] : sanitizeGroupPermissions(params.permissions),
+      }
+      await writeGroupRoleTemplate(
+        context.database,
+        groupType,
+        updated,
+        actorId(context),
+        new Date().toISOString(),
+      )
+      // Deliberately no announce(): existing groups are untouched by a template change
+      // (concept E12), so nobody's effective rights just changed.
+      return { ...updated, memberCount: null }
+    },
+    applyGroupRoleTemplates: async (_parent, _args, context: Context) => {
+      const [templates, untouched] = await Promise.all([
+        readGroupRoleTemplates(context.database),
+        untouchedGroupIdsByType(context.database),
+      ])
+      const byType = new Map(Object.entries(templates))
+      const now = new Date().toISOString()
+      let changed = 0
+      for (const [groupType, groupIds] of untouched) {
+        const template = byType.get(groupType)
+        if (!template || template.length === 0) {
+          continue
+        }
+        for (const groupId of groupIds) {
+          await replaceGroupRoles(
+            context.database,
+            groupId,
+            template,
+            USUAL_ROLE,
+            actorId(context),
+            now,
+          )
+          // The group's rights may well have changed, so its members need to refetch — but its
+          // rolesCustomizedAt stays null: the group still runs on the template, it did not
+          // choose anything.
+          announce(context, groupId)
+          changed += 1
+        }
+      }
+      return changed
     },
   },
   Subscription: {

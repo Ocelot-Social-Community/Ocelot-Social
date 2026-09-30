@@ -68,6 +68,8 @@ type Group {
   "Invite codes to this group the current user has generated."
   inviteCodes: [InviteCode]!
 
+  "How many members hold the owner role. Zero means the group has no owner left — legal, and the criterion the admin group list filters by. Null when the viewer may not see the member list."
+  ownerCount: Int
   "Number of posts currently pinned within this group."
   currentlyPinnedPostsCount: Int!
   "Total number of non-deleted, non-disabled posts in this group."
@@ -101,6 +103,25 @@ type Query {
 
   "Count groups, optionally restricted to the current user's memberships. Requires authentication."
   GroupCount(isMember: Boolean): Int
+
+  "Every group the viewer may administer, for the admin area — including the hidden ones, which are reachable no other way. Restricted to the group types the viewer holds `group.administer.any_<type>` for. Set `ownerless` to find the groups that have no owner left."
+  adminGroups(
+    "Free-text match on name and slug."
+    search: String
+    groupType: GroupType
+    "Only groups whose owner role has no members."
+    ownerless: Boolean
+    disabled: Boolean
+    first: Int
+    offset: Int
+  ): [Group!]!
+  "How many groups the same filters match, for paging the admin list."
+  adminGroupCount(
+    search: String
+    groupType: GroupType
+    ownerless: Boolean
+    disabled: Boolean
+  ): Int!
 
   # AvailableGroupTypes: [GroupType]!
 

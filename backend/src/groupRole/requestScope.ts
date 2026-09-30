@@ -8,7 +8,7 @@
 // Deliberately NOT a process-wide cache the way the network roles have one: those are a
 // handful of global objects, whereas group roles scale with the number of groups. A read per
 // request against an indexed lookup is the cheaper trade — and it cannot go stale.
-import { GROUPS_ENABLED_GATE } from '@src/groupPermission'
+import { allGroupPermissionKeys, GROUPS_ENABLED_GATE } from '@src/groupPermission'
 
 import { authoritySourceFor, effectiveGroupPermissions } from './effective'
 import { isActiveMembershipRole, NONE_ROLE, OWNER_ROLE } from './types'
@@ -141,6 +141,29 @@ export function createGroupAuthorizationScope({
     },
   }
 
+  /**
+   * What the viewer may do in a group of this type by virtue of a NETWORK right rather than a
+   * membership — the folded `*.any_<type>` rights (concept 7.3).
+   *
+   * `group.administer.any_<type>` folds in the whole group catalog: it exists so a group left
+   * without an owner can be made workable again, and that needs everything an owner has.
+   * `group.content.read.any_<type>` folds in exactly the reading rights, because a moderator
+   * has to see what they are asked to moderate and nothing more.
+   *
+   * The runtime gates are not checked here: every one of these keys is gated by
+   * `groupsEnabled`, and effectiveGroupPermissions requires that for every group right anyway.
+   */
+  const networkAuthorityFor = (groupType: string): Set<GroupPermissionKey> => {
+    const holds = (key: string) => effectivePermissions.has(key as PermissionKey)
+    if (holds(`group.administer.any_${groupType}`)) {
+      return new Set(allGroupPermissionKeys())
+    }
+    if (holds(`group.content.read.any_${groupType}`)) {
+      return new Set<GroupPermissionKey>(['group.read', 'group.content.read', 'group.members.read'])
+    }
+    return new Set<GroupPermissionKey>()
+  }
+
   const resolveGroup = async (groupId: string): Promise<GroupAuthorization | null> => {
     const result = await database.query({
       query: AUTHORIZATION_QUERY,
@@ -165,8 +188,10 @@ export function createGroupAuthorizationScope({
         }
       : null
     const groupType = record.get('groupType') as string
+    const networkAuthority = networkAuthorityFor(groupType)
     const effective = effectiveGroupPermissions({
       role,
+      networkAuthority,
       networkEffective: effectivePermissions,
       groupType,
       gateContext,
@@ -178,7 +203,7 @@ export function createGroupAuthorizationScope({
       isMember: isActiveMembershipRole(roleName),
       effective,
       has: (permission) => effective.has(permission),
-      sourceOf: (permission) => authoritySourceFor(permission, role),
+      sourceOf: (permission) => authoritySourceFor(permission, role, networkAuthority),
     }
   }
 

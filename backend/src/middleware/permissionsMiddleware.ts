@@ -277,6 +277,40 @@ const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
   return dominates(context.effectivePermissions, targetPermissions)
 })
 
+// No blind moderation: a report whose subject sits in a group this moderator may not read is
+// masked in the queue (concept E19), so deciding it would mean deciding about something they
+// cannot see. It needs escalating to somebody who holds group.content.read.any_<type>.
+const canReviewReportedContent = rule({ cache: 'no_cache' })(async (
+  _parent,
+  args,
+  ctx: Context,
+) => {
+  const resourceId = args.resourceId as string | undefined
+  if (!resourceId) {
+    return false
+  }
+  const result = await ctx.database.query({
+    query: `MATCH (resource {id: $resourceId})
+            OPTIONAL MATCH (resource)-[:IN]->(direct:Group)
+            OPTIONAL MATCH (resource)-[:COMMENTS]->(:Post)-[:IN]->(viaPost:Group)
+            RETURN coalesce(direct.groupType, viaPost.groupType) AS groupType`,
+    variables: { resourceId },
+  })
+  const groupType = result.records[0]?.get('groupType') as string | null
+  if (!groupType || groupType === 'public') {
+    return true
+  }
+  return hasPermissionEffective(ctx, `group.content.read.any_${groupType}` as PermissionKey)
+})
+
+// Holding any of the per-type administration rights is what opens the admin group list; the
+// resolver then restricts the result to exactly those types.
+const canAdministerSomeGroup = rule({ cache: 'contextual' })(async (_parent, _args, ctx: Context) =>
+  ['public', 'closed', 'hidden'].some((groupType) =>
+    hasPermissionEffective(ctx, `group.administer.any_${groupType}` as PermissionKey),
+  ),
+)
+
 const noEmailFilter = rule({
   cache: 'no_cache',
 })(async (_, args) => {
@@ -519,6 +553,12 @@ export default shield(
       // The group rights catalog is the same for everybody and drives the group rights UI;
       // which of them a viewer holds is Group.myGroupPermissions, resolved per group.
       groupPermissionCatalog: and(groupsEnabled, isAuthenticated),
+      groupRoleTemplates: hasPermission('group.roleTemplate.manage'),
+      // The admin group list. One rule for "may administer groups at all"; WHICH groups come
+      // back is decided in the resolver by the per-type rights, so a viewer who may only
+      // administer public groups cannot enumerate the hidden ones.
+      adminGroups: canAdministerSomeGroup,
+      adminGroupCount: canAdministerSomeGroup,
       Room: isAuthenticated,
       Message: isAuthenticated,
       UnreadRooms: isAuthenticated,
@@ -585,7 +625,11 @@ export default shield(
       shout: isAuthenticated,
       unshout: isAuthenticated,
       changePassword: isAuthenticated,
-      review: and(hasPermission('content.moderate'), canModerateTargetUser),
+      review: and(
+        hasPermission('content.moderate'),
+        canModerateTargetUser,
+        canReviewReportedContent,
+      ),
       CreateComment: and(
         isAuthenticated,
         hasPermission('comment.create'),
@@ -649,6 +693,11 @@ export default shield(
       deleteGroupRole: and(groupsEnabled, hasGroupPermission('group.role.manage')),
       resetGroupRoles: and(groupsEnabled, hasGroupPermission('group.role.manage')),
       setGroupMemberRole: and(groupsEnabled, canAssignGroupRole),
+
+      // The network-wide defaults new groups are seeded from, and the bulk application of them
+      // to groups that never touched their own roles.
+      updateGroupRoleTemplate: hasPermission('group.roleTemplate.manage'),
+      applyGroupRoleTemplates: hasPermission('group.roleTemplate.manage'),
       markTeaserAsViewed: allow,
 
       // Network Policy

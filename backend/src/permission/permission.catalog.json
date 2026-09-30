@@ -41,6 +41,16 @@
       "group": "moderation",
       "description": "Access reports and review (decide) on reported content."
     },
+    "group.content.read.any_closed": {
+      "group": "moderation",
+      "gatedBy": "groupsEnabled",
+      "description": "Read the content of any CLOSED group without being a member — what a network moderator needs to moderate what they were never shown."
+    },
+    "group.content.read.any_hidden": {
+      "group": "moderation",
+      "gatedBy": "groupsEnabled",
+      "description": "Read the content of any HIDDEN group without being a member. Deliberately separate from the closed variant: an unlisted group is the stricter case."
+    },
     "user.disable": {
       "group": "moderation",
       "description": "Disable (deactivate) and re-enable user accounts (reversible), subject to the act-on hierarchy — you can only disable a user whose permissions are a strict subset of yours."
@@ -88,17 +98,26 @@
     },
     "videoCall.create_public": {
       "group": "communication",
-      "gatedBy": ["videoConference", "groupsEnabled"],
+      "gatedBy": [
+        "videoConference",
+        "groupsEnabled"
+      ],
       "description": "Start (open) a video call in a public group. Joining an existing call stays open to any member."
     },
     "videoCall.create_closed": {
       "group": "communication",
-      "gatedBy": ["videoConference", "groupsEnabled"],
+      "gatedBy": [
+        "videoConference",
+        "groupsEnabled"
+      ],
       "description": "Start (open) a video call in a closed group. Joining an existing call stays open to any member."
     },
     "videoCall.create_hidden": {
       "group": "communication",
-      "gatedBy": ["videoConference", "groupsEnabled"],
+      "gatedBy": [
+        "videoConference",
+        "groupsEnabled"
+      ],
       "description": "Start (open) a video call in a hidden group. Joining an existing call stays open to any member."
     },
     "apiKey.create": {
@@ -109,6 +128,26 @@
     "branding.manage": {
       "group": "administration",
       "description": "View the available baked-in brandings and switch the active branding network-wide."
+    },
+    "group.administer.any_public": {
+      "group": "administration",
+      "gatedBy": "groupsEnabled",
+      "description": "Administer any PUBLIC group as if owning it: settings, roles and member management. The recovery path for a group left without an owner; it may only promote EXISTING members, never the holder themselves."
+    },
+    "group.administer.any_closed": {
+      "group": "administration",
+      "gatedBy": "groupsEnabled",
+      "description": "Administer any CLOSED group as if owning it: settings, roles and member management. The recovery path for a group left without an owner; it may only promote EXISTING members, never the holder themselves."
+    },
+    "group.administer.any_hidden": {
+      "group": "administration",
+      "gatedBy": "groupsEnabled",
+      "description": "Administer any HIDDEN group as if owning it: settings, roles and member management. The recovery path for a group left without an owner; it may only promote EXISTING members, never the holder themselves."
+    },
+    "group.roleTemplate.manage": {
+      "group": "administration",
+      "gatedBy": "groupsEnabled",
+      "description": "View and edit the network-wide group role templates that every new group is seeded from."
     }
   }
 }

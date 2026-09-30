@@ -145,15 +145,51 @@ describe('postFilterToCypher access control operators', () => {
   // different direction: a missing `NOT` on the group type serves only the private posts, a
   // missing group-list check hides the viewer's own groups, and a missing author clause loses
   // the one exception the rule grants.
-  it('excludes posts in non-public groups the viewer is not a member of', () => {
+  it('excludes posts in group types the viewer may not read and is not a member of', () => {
     const { where, params } = postFilterToCypher({
-      filter: { invisibleTo: { viewerId: 'viewer-id', groupIds: ['group-a', 'group-b'] } },
+      filter: {
+        invisibleTo: {
+          viewerId: 'viewer-id',
+          groupIds: ['group-a', 'group-b'],
+          readableGroupTypes: ['public'],
+        },
+      },
     })
 
-    expect(where).toContain("WHERE NOT g.groupType = 'public' AND NOT g.id IN $pf1")
+    expect(where).toContain('WHERE NOT g.groupType IN $pf2 AND NOT g.id IN $pf1')
     expect(where).toContain('NOT EXISTS {')
     expect(where).toContain('OR EXISTS { MATCH (post)<-[:WROTE]-(:User { id: $pf0 }) }')
-    expect(params).toEqual({ pf0: 'viewer-id', pf1: ['group-a', 'group-b'] })
+    expect(params).toEqual({
+      pf0: 'viewer-id',
+      pf1: ['group-a', 'group-b'],
+      pf2: ['public'],
+    })
+  })
+
+  // What #9405 asked for: a network moderator holding group.content.read.any_closed brings the
+  // type along, so the reported content they are supposed to review stops being invisible —
+  // without a per-row lookup, and with groupType still the axis.
+  it('lets a viewer read into the group types their network rights cover', () => {
+    const { params } = postFilterToCypher({
+      filter: {
+        invisibleTo: {
+          viewerId: 'moderator-id',
+          groupIds: [],
+          readableGroupTypes: ['public', 'closed'],
+        },
+      },
+    })
+
+    expect(params).toEqual({ pf0: 'moderator-id', pf1: [], pf2: ['public', 'closed'] })
+  })
+
+  // A caller that does not know about the new field must not accidentally open everything up.
+  it('falls back to public only when no readable types are given', () => {
+    const { params } = postFilterToCypher({
+      filter: { invisibleTo: { viewerId: null, groupIds: [] } },
+    })
+
+    expect(params).toEqual({ pf0: null, pf1: [], pf2: ['public'] })
   })
 
   // One expression covers the anonymous visitor too: an empty group list makes `NOT g.id IN []`
@@ -166,8 +202,8 @@ describe('postFilterToCypher access control operators', () => {
       filter: { invisibleTo: { viewerId: null, groupIds: [] } },
     })
 
-    expect(where).toContain("WHERE NOT g.groupType = 'public' AND NOT g.id IN $pf1")
-    expect(params).toEqual({ pf0: null, pf1: [] })
+    expect(where).toContain('WHERE NOT g.groupType IN $pf2 AND NOT g.id IN $pf1')
+    expect(params).toEqual({ pf0: null, pf1: [], pf2: ['public'] })
   })
 
   it('excludes posts written by an author the viewer muted', () => {

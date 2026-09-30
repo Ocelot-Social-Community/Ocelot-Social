@@ -418,3 +418,54 @@ export async function setNonMemberMemberListAccess(
     variables: { groupId, permissions: JSON.stringify(sanitizeGroupPermissions(permissions)), now },
   })
 }
+
+/** Write one template role, creating it when it is not there yet (the admin edit path). */
+export async function writeGroupRoleTemplate(
+  db: DbContext,
+  groupType: string,
+  role: GroupRoleDefinition,
+  actor: string,
+  now: string,
+): Promise<void> {
+  await db.write({
+    query: `MERGE (r:GroupRoleTemplate {id: $id})
+            ON CREATE SET r.createdAt = $now, r.groupType = $groupType, r.name = $name
+            SET r.label = $label,
+                r.system = $system,
+                r.protected = $protected,
+                r.permissions = $permissions,
+                r.updatedAt = $now,
+                r.updatedBy = $actor`,
+    variables: {
+      id: `${groupType}:${role.name}`,
+      groupType,
+      name: role.name,
+      label: role.label ?? null,
+      system: role.system,
+      protected: role.protected,
+      permissions: JSON.stringify(role.permissions),
+      actor,
+      now,
+    },
+  })
+}
+
+/**
+ * The groups that still run on the template untouched, by group type.
+ *
+ * `rolesCustomizedAt IS NULL` is the whole criterion (concept E12): a group that edited its own
+ * roles is never overwritten by a network default, however tempting a bulk update is.
+ */
+export async function untouchedGroupIdsByType(db: DbContext): Promise<Map<string, string[]>> {
+  const result = await db.query({
+    query: `MATCH (g:Group)
+            WHERE g.rolesCustomizedAt IS NULL
+            RETURN g.groupType AS groupType, collect(g.id) AS ids`,
+  })
+  return new Map(
+    result.records.map((record) => [
+      record.get('groupType') as string,
+      record.get('ids') as string[],
+    ]),
+  )
+}
