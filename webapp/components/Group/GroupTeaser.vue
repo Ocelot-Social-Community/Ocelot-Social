@@ -31,8 +31,8 @@
       <footer class="footer">
         <div>
           <!-- group my role in group -->
-          <os-badge v-if="group && group.myRole" variant="primary">
-            {{ group && group.myRole ? $t('group.roles.' + group.myRole) : '' }}
+          <os-badge v-if="group && group.myGroupRole" variant="primary">
+            {{ $groupRoleLabel(group.myGroupRole) }}
           </os-badge>
           <!-- group type -->
           <os-badge variant="primary">

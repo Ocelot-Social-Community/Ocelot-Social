@@ -453,7 +453,8 @@ export default {
       }
     },
     commentingAllowedByGroupRole() {
-      return this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole)
+      // The right itself: a group may open commenting to applicants or close it for members.
+      return this.$canInGroup('group.comment.create', this.group)
     },
     // Prefers the post's own precise pin (Post.lat/lng — the exact point
     // picked on the map) over eventLocation's coordinates (the shared

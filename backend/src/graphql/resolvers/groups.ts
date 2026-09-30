@@ -17,8 +17,12 @@ import {
 import { ForbiddenError, UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 import { branding } from '@src/branding'
-import { PENDING_ROLE, USUAL_ROLE } from '@src/groupRole'
-import { seedRolesForNewGroup } from '@src/groupRole/repository'
+import { NONE_ROLE, PENDING_ROLE, USUAL_ROLE } from '@src/groupRole'
+import {
+  readGroupRoles,
+  seedRolesForNewGroup,
+  setNonMemberMemberListAccess,
+} from '@src/groupRole/repository'
 
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
@@ -410,6 +414,14 @@ export default {
           GROUP_REVERSE_GEOCODE_TYPES,
         )
         if ('showMembers' in params) {
+          // Keep the right and the (deprecated) property in step: the property is what older
+          // clients still read, the right is what actually decides.
+          await setNonMemberMemberListAccess(
+            context.database,
+            groupId,
+            params.showMembers === true,
+            new Date().toISOString(),
+          )
           void context.pubsub.publish(GROUP_SHOW_MEMBERS_CHANGED, {
             groupShowMembersChanged: { groupId },
           })
@@ -763,6 +775,16 @@ export default {
       },
     }),
     membersCount: async (parent, _args, context: Context, _resolveInfo) => {
+      // Counting members is part of seeing them (concept E7). Null rather than an error: a
+      // viewer who may not count is a normal case on a group teaser, not a fault.
+      //
+      // The optional call is for the unit tests that hand in a partial context: a real request
+      // always carries the scope (getContext builds it), and without one this field behaves as
+      // it did before the right existed rather than crashing.
+      const authorization = await context.groupAuthorization?.forGroup(parent.id)
+      if (context.groupAuthorization && !authorization?.has('group.members.read')) {
+        return null
+      }
       if (typeof parent.membersCount !== 'undefined') {
         return parent.membersCount
       }
@@ -794,14 +816,23 @@ export default {
       }
       return parent.about
     },
-    showMembers: (parent) => {
+    showMembers: async (parent, _args, context: Context) => {
+      // "Non-members may see the member list" IS the non-member role holding group.members.read;
+      // the setting was only ever a second way of saying it. Read from the role so the two can
+      // never disagree, with the old property as the fallback for a group whose roles are not
+      // seeded yet (a database mid-migration).
+      // Same tolerance as membersCount above for a partial context in a unit test.
+      const roles = context.database ? await readGroupRoles(context.database, parent.id as string) : []
+      const none = roles.find((role) => role.name === NONE_ROLE)
+      if (none) {
+        return none.permissions.includes('group.members.read')
+      }
       if (parent.groupType === 'public') {
         return true
       }
       if (parent.groupType === 'hidden') {
         return false
       }
-      // closed: configurable by owner; default false when property not yet set on the node
       return (parent.showMembers as boolean) ?? false
     },
   },

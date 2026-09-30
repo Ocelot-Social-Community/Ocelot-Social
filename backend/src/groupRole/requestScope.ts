@@ -42,6 +42,8 @@ export interface GroupAuthorizationScope {
   forPost: (postId: string) => Promise<GroupAuthorization | null>
   /** null when the room does not exist or is not a group room. */
   forRoom: (roomId: string) => Promise<GroupAuthorization | null>
+  /** The role name another user currently carries in that group, or `none` without one. */
+  forGroupMemberRole: (groupId: string, userId: string) => Promise<string>
   /**
    * What ANOTHER member of that group currently holds — the target side of the act-on rules.
    * A user with no membership resolves to the group's `none` role, which is the right answer
@@ -230,6 +232,16 @@ export function createGroupAuthorizationScope({
       : null
   }
 
+  const forGroupMemberRole = async (groupId: string, targetUserId: string): Promise<string> => {
+    const result = await database.query({
+      query: `MATCH (g:Group {id: $groupId})
+              OPTIONAL MATCH (:User {id: $userId})-[m:MEMBER_OF]->(g)
+              RETURN coalesce(m.role, $noneRole) AS roleName`,
+      variables: { groupId, userId: targetUserId, noneRole: NONE_ROLE },
+    })
+    return (result.records[0]?.get('roleName') as string | undefined) ?? NONE_ROLE
+  }
+
   const memberPermissions = async (
     groupId: string,
     targetUserId: string,
@@ -289,6 +301,7 @@ export function createGroupAuthorizationScope({
     forGroup,
     forPost: viaLookup(groupIdByPostId, GROUP_OF_POST_QUERY, 'postId'),
     forRoom: viaLookup(groupIdByRoomId, GROUP_OF_ROOM_QUERY, 'roomId'),
+    forGroupMemberRole,
     memberPermissions,
     rolePermissions,
   }

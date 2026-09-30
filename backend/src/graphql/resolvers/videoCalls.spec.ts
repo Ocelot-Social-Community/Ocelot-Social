@@ -177,7 +177,10 @@ describe('videoCallParticipantCount', () => {
       variables: { groupId: 'pub-1' },
     })
 
-    expect(errors?.[0].message).toMatch(/disabled/i)
+    // The shield denies first now: group.videoCall.* are gated by the videoConference policy,
+    // so with the feature off the right is not effective and the request never reaches the
+    // resolver's own "disabled" message.
+    expect(errors?.[0].message).toMatch(/disabled|not authorized/i)
   })
 
   it('throws when user is not a member of the group', async () => {
@@ -193,7 +196,9 @@ describe('videoCallParticipantCount', () => {
       variables: { groupId: 'pub-1' },
     })
 
-    expect(errors?.[0].message).toMatch(/not a member/i)
+    // Membership is a group right now (group.videoCall.join), checked in the shield rather
+    // than by the resolver's getGroupMembershipType - so the denial reads as "Not Authorized!".
+    expect(errors?.[0].message).toMatch(/not a member|not authorized/i)
   })
 
   it('returns the count for a member of a non-public (closed) group', async () => {
@@ -297,7 +302,10 @@ describe('joinGroupVideoCall', () => {
       variables: { groupId: 'pub-1' },
     })
 
-    expect(errors?.[0].message).toMatch(/disabled/i)
+    // The shield denies first now: group.videoCall.* are gated by the videoConference policy,
+    // so with the feature off the right is not effective and the request never reaches the
+    // resolver's own "disabled" message.
+    expect(errors?.[0].message).toMatch(/disabled|not authorized/i)
   })
 
   it('throws for non-members', async () => {
@@ -313,7 +321,9 @@ describe('joinGroupVideoCall', () => {
       variables: { groupId: 'pub-1' },
     })
 
-    expect(errors?.[0].message).toMatch(/not a member/i)
+    // Membership is a group right now (group.videoCall.join), checked in the shield rather
+    // than by the resolver's getGroupMembershipType - so the denial reads as "Not Authorized!".
+    expect(errors?.[0].message).toMatch(/not a member|not authorized/i)
   })
 
   it('denies OPENING a hidden-group call without videoCall.create_hidden (baseline user)', async () => {

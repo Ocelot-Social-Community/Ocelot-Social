@@ -1129,6 +1129,10 @@ describe('in mode', () => {
           describe('joined by its owner', () => {
             describe('does not create additional "MEMBER_OF" relation and therefore', () => {
               it('has still "owner" as membership role', async () => {
+                // The point of this case is the MERGE semantics (no second edge, role
+                // untouched), so the owner joins THEMSELVES: adding another person is an act of
+                // membership management now and needs group.member.approve.
+                authenticatedUser = await ownerOfClosedGroupUser.toJson()
                 await expect(
                   mutate({
                     mutation: JoinGroup,
@@ -1173,6 +1177,9 @@ describe('in mode', () => {
           describe('joined by its owner', () => {
             describe('does not create additional "MEMBER_OF" relation and therefore', () => {
               it('has still "owner" as membership role', async () => {
+                // Same as above: the owner joins themselves, which is what makes this a test of
+                // MERGE and not of who may add whom.
+                authenticatedUser = await ownerOfHiddenGroupUser.toJson()
                 await expect(
                   mutate({
                     mutation: JoinGroup,
@@ -1316,6 +1323,10 @@ describe('in mode', () => {
               categoryIds,
             },
           })
+          // A join request has to be made BY the applicant: an owner adding somebody is an act
+          // of membership management now (group.member.approve) and lands them as a member,
+          // which is what "add a user to the group" has always meant in the UI.
+          authenticatedUser = await user.toJson()
           await mutate({
             mutation: JoinGroup,
             variables: {
@@ -1323,6 +1334,7 @@ describe('in mode', () => {
               userId: 'current-user',
             },
           })
+          authenticatedUser = await ownerOfClosedGroupUser.toJson()
           await mutate({
             mutation: ChangeGroupMemberRole,
             variables: {
@@ -2302,13 +2314,30 @@ describe('in mode', () => {
                     }
                   })
 
-                  it('throws authorization error', async () => {
-                    const { errors } = await mutate({
+                  // Demoting yourself needs no dominance (nobody dominates themselves) and no
+                  // second owner: it only has to stay within what you already hold. This is
+                  // exactly what #6173 asked for.
+                  it('degrades themself', async () => {
+                    const { data, errors } = await mutate({
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
 
-                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors).toBeUndefined()
+                    expect(data?.ChangeGroupMemberRole).toMatchObject({
+                      user: { id: 'owner-member-user' },
+                      membership: { role: 'admin' },
+                    })
+
+                    // This describe block builds its state up, so hand the role back: the
+                    // cases after this one expect an owner to act on. The second owner can do
+                    // it — they hold everything the owner role holds.
+                    authenticatedUser = await secondOwnerMemberUser.toJson()
+                    await mutate({
+                      mutation: ChangeGroupMemberRole,
+                      variables: { ...variables, roleInGroup: 'owner' },
+                    })
+                    authenticatedUser = await ownerMemberUser.toJson()
                   })
                 })
               })
@@ -3176,10 +3205,13 @@ describe('in mode', () => {
               })
             })
 
+            // An owner may leave now: the group is allowed to end up without one, and its
+            // admins keep it running while a network admin can appoint a new owner. That is
+            // what removes the "provided another owner exists" condition #6173 asked about.
             describe('left by "owner-member-user"', () => {
-              it('throws authorization error', async () => {
+              it('leaves the group', async () => {
                 authenticatedUser = await ownerMemberUser.toJson()
-                const { errors } = await mutate({
+                const { data, errors } = await mutate({
                   mutation: LeaveGroup,
                   variables: {
                     ...variables,
@@ -3187,14 +3219,15 @@ describe('in mode', () => {
                   },
                 })
 
-                expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+                expect(errors).toBeUndefined()
+                expect(data?.LeaveGroup).toMatchObject({ user: { id: 'owner-member-user' } })
               })
             })
 
             describe('left by "second-owner-member-user"', () => {
-              it('throws authorization error', async () => {
+              it('leaves the group', async () => {
                 authenticatedUser = await secondOwnerMemberUser.toJson()
-                const { errors } = await mutate({
+                const { data, errors } = await mutate({
                   mutation: LeaveGroup,
                   variables: {
                     ...variables,
@@ -3202,7 +3235,10 @@ describe('in mode', () => {
                   },
                 })
 
-                expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+                expect(errors).toBeUndefined()
+                expect(data?.LeaveGroup).toMatchObject({
+                  user: { id: 'second-owner-member-user' },
+                })
               })
             })
 
@@ -4777,7 +4813,7 @@ describe('in mode', () => {
 
     describe('setGroupMembershipVisibility for a pending membership', () => {
       beforeEach(async () => {
-        await Factory.build(
+        const applicant = await Factory.build(
           'user',
           { id: 'visibility-pending-user', name: 'Visibility Pending User' },
           { email: 'visibility-pending-user@example.org', password: '1234' },
@@ -4795,10 +4831,13 @@ describe('in mode', () => {
             categoryIds: ['cat9'],
           },
         })
+        // The applicant asks themselves — an owner adding somebody makes them a member now.
+        authenticatedUser = await applicant.toJson()
         await mutate({
           mutation: JoinGroup,
           variables: { groupId: 'visibility-closed-group', userId: 'visibility-pending-user' },
         })
+        authenticatedUser = await user.toJson()
       })
 
       // A pending join request is not a membership: it must not be publishable on a profile.

@@ -20,8 +20,8 @@
       />
       <div class="chips">
         <os-badge variant="primary">{{ $t(`group.types.${resolvedGroup.groupType}`) }}</os-badge>
-        <os-badge v-if="resolvedGroup.myRole" variant="primary">
-          {{ $t(`group.roles.${resolvedGroup.myRole}`) }}
+        <os-badge v-if="resolvedGroup.myGroupRole" variant="primary">
+          {{ $groupRoleLabel(resolvedGroup.myGroupRole) }}
         </os-badge>
         <os-badge v-if="resolvedGroup.actionRadius" variant="primary">
           {{ $t(`group.actionRadii.${resolvedGroup.actionRadius}`) }}

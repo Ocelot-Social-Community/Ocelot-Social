@@ -44,14 +44,21 @@ type Group {
 
   categories: [Category]
 
-  "Number of members, excluding those with a pending join request."
-  membersCount: Int!
+  "Number of members, excluding those with a pending join request. Null when the viewer may not see the member list (`group.members.read`): in a small group the number plus a known owner is nearly the list itself. Nullable rather than refused, so a group teaser renders without an error for a viewer who simply may not count."
+  membersCount: Int
 
-  "The current user's role in this group, or null if they are not a member."
+  "The current user's role in this group, or null if they are not a member. Deprecated: a group defines its own roles, so the value is not an enum any more — use myGroupRoleName. Returns null for a role the enum cannot express."
   myRole: GroupMemberRole
+    @deprecated(reason: "Group roles are group-defined; use myGroupRoleName instead.")
+  "The current user's role in this group, or null when they have no membership. Unlike myRole this carries any role the group defined, with the label it chose for it."
+  myGroupRole: GroupRole
+  "The group rights the current user effectively holds here: their role's set, capped by their network permissions and by the runtime feature gates. Drives the webapp's canInGroup()."
+  myGroupPermissions: [String!]!
+  "The group's own role definitions. Requires `group.role.manage` in this group."
+  roles: [GroupRole!]!
   "Whether the profile owner has chosen to show this group on their public profile."
   showOnProfile: Boolean
-  "For closed groups: whether non-members can see the member list."
+  "For closed groups: whether non-members can see the member list. Derived: it is true exactly when the group's non-member role holds `group.members.read`, which is where that setting now lives."
   showMembers: Boolean
   posts: [Post]
 

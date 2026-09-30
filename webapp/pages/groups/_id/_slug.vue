@@ -8,7 +8,7 @@
           style="position: relative; height: auto; overflow: visible"
         >
           <avatar-uploader
-            v-if="isGroupOwner"
+            v-if="canManageGroup"
             :profile="group"
             :updateMutation="updateGroupMutation"
           >
@@ -79,9 +79,9 @@
             <join-leave-button
               :group="group"
               :userId="currentUser.id"
-              :isMember="isGroupMember"
+              :isMember="hasGroupMembership"
               :isNonePendingMember="isGroupMemberNonePending"
-              :disabled="isGroupOwner"
+              :disabled="hasGroupMembership && !$canInGroup('group.leave', group)"
               :loading="hydrated && $apollo.loading"
               @update="updateJoinLeave"
             />
@@ -129,13 +129,13 @@
           <hr />
           <div class="ds-mt-small ds-mb-small">
             <!-- group my role in group -->
-            <template v-if="isGroupMember">
+            <template v-if="hasGroupMembership">
               <p class="ds-text ds-text-soft ds-text-size-small centered-text hyphenate-text">
                 {{ $t('group.role') }}
               </p>
               <div class="chip" align="center">
                 <os-badge variant="primary">
-                  {{ group && group.myRole ? $t('group.roles.' + group.myRole) : '' }}
+                  {{ $groupRoleLabel(group && group.myGroupRole) }}
                 </os-badge>
               </div>
             </template>
@@ -513,19 +513,26 @@ export default {
         overflow: 'hidden',
       }
     },
-    isGroupOwner() {
-      return this.group ? this.group.myRole === 'owner' : false
+    // "May I administer this group" rather than "am I the owner": the rights are granted
+    // independently now, so an admin can hold the settings right without being an owner.
+    canManageGroup() {
+      return this.$canInGroup('group.settings.manage', this.group)
     },
-    isGroupMember() {
-      return this.group ? !!this.group.myRole : false
+    canManageGroupRoles() {
+      return this.$canInGroup('group.role.manage', this.group)
+    },
+    hasGroupMembership() {
+      return !!this.group?.myGroupRole
     },
     isGroupMemberNonePending() {
-      return this.group ? ['usual', 'admin', 'owner'].includes(this.group.myRole) : false
+      return this.$isGroupMember(this.group)
     },
     isGroupVisible() {
       return this.group && !(this.group.groupType === 'hidden' && !this.isGroupMemberNonePending)
     },
     isAllowedSeeingGroupMembers() {
+      // One right instead of the groupType/showMembers/membership cascade this used to be.
+      if (this.$canInGroup('group.members.read', this.group)) return true
       if (!this.group) return false
       if (this.group.groupType === 'public') return true
       if (['closed', 'hidden'].includes(this.group.groupType) && this.isGroupMemberNonePending)
@@ -577,7 +584,7 @@ export default {
     this.setupDescriptionOverflowObserver()
     if (this.isGroupMemberNonePending) this.setupRoomUpdatedSubscription()
     if (this.canShowVideoCallButton) this.setupVideoCallCountSubscription()
-    if (this.group?.myRole) this.setupGroupShowMembersSubscription()
+    if (this.group?.myGroupRole) this.setupGroupShowMembersSubscription()
   },
   beforeDestroy() {
     this._roomUpdatedSub?.unsubscribe()
@@ -587,7 +594,7 @@ export default {
   },
   watch: {
     isGroupMemberNonePending(isMember) {
-      // Group membership is derived from the Apollo-populated group.myRole, which
+      // Group membership is derived from the Apollo-populated group.myGroupRole, which
       // isn't available synchronously on first visits (no SSR cache). Set up the
       // subscription reactively when membership becomes known.
       if (isMember) this.setupRoomUpdatedSubscription()
@@ -596,8 +603,8 @@ export default {
       if (can) this.setupVideoCallCountSubscription()
       else this.teardownVideoCallCountSubscription()
     },
-    'group.myRole'(myRole) {
-      if (myRole) this.setupGroupShowMembersSubscription()
+    'group.myGroupRole'(myGroupRole) {
+      if (myGroupRole) this.setupGroupShowMembersSubscription()
     },
     // The group usually arrives from Apollo AFTER mount, so the first measurement
     // ran against an empty card. ResizeObserver catches this too, but not everywhere

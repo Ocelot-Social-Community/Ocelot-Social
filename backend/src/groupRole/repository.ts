@@ -7,9 +7,8 @@
 // registry derives from the entity declarations. `permissions` is stored JSON-stringified,
 // like Role.permissions.
 //
-// Only the read and seed paths live here. The editing paths (write, rename, delete, reset)
-// arrive with the mutations that call them: a repository function nobody calls is as dead as
-// a permission nobody enforces.
+// The editing paths at the bottom arrive with the mutations that call them — a repository
+// function nobody calls is as dead as a permission nobody enforces.
 import { sanitizeGroupPermissions } from '@src/groupPermission'
 
 import { defaultTemplateFor } from './defaults'
@@ -232,5 +231,190 @@ export async function seedRolesForNewGroup(
     groupId,
     now,
     roles: fallback.map(toRow),
+  })
+}
+
+/** How many members carry each role of a group. `none` never appears: it is the absence of an edge. */
+export async function memberCountsByRole(
+  db: DbContext,
+  groupId: string,
+): Promise<Map<string, number>> {
+  const result = await db.query({
+    query: `MATCH (:User)-[m:MEMBER_OF]->(:Group {id: $groupId})
+            RETURN m.role AS roleName, toString(count(*)) AS count`,
+    variables: { groupId },
+  })
+  return new Map(
+    result.records.map((record) => [
+      record.get('roleName') as string,
+      Number.parseInt(record.get('count') as string, 10),
+    ]),
+  )
+}
+
+/** Create or replace one role of a group. */
+export async function writeGroupRole(
+  db: DbContext,
+  groupId: string,
+  role: GroupRoleDefinition,
+  actor: string,
+  now: string,
+): Promise<void> {
+  await db.write({
+    query: `MATCH (g:Group {id: $groupId})
+            MERGE (g)-[:HAS_GROUP_ROLE]->(r:GroupRole {id: $groupId + ':' + $name})
+            ON CREATE SET r.createdAt = $now, r.groupId = $groupId, r.name = $name
+            SET r.label = $label,
+                r.system = $system,
+                r.protected = $protected,
+                r.permissions = $permissions,
+                r.updatedAt = $now,
+                r.updatedBy = $actor`,
+    variables: {
+      groupId,
+      name: role.name,
+      label: role.label ?? null,
+      system: role.system,
+      protected: role.protected,
+      permissions: JSON.stringify(role.permissions),
+      actor,
+      now,
+    },
+  })
+}
+
+/**
+ * Rename a role in place AND move the memberships pointing at it.
+ *
+ * This is where the group layer differs from the network one: a HAS_ROLE edge references the
+ * role NODE, so renaming a network role leaves its members alone — a membership names its group
+ * role by STRING, so a rename that forgot the edges would turn every member of that role into
+ * someone holding a role that does not exist (and, failing closed, holding nothing).
+ */
+export async function renameGroupRole(
+  db: DbContext,
+  groupId: string,
+  oldName: string,
+  newName: string,
+  actor: string,
+  now: string,
+): Promise<void> {
+  await db.write({
+    query: `MATCH (g:Group {id: $groupId})-[:HAS_GROUP_ROLE]->(r:GroupRole {name: $oldName})
+            SET r.id = $groupId + ':' + $newName,
+                r.name = $newName,
+                r.updatedAt = $now,
+                r.updatedBy = $actor
+            WITH g
+            MATCH (:User)-[m:MEMBER_OF]->(g)
+            WHERE m.role = $oldName
+            SET m.role = $newName, m.updatedAt = $now`,
+    variables: { groupId, oldName, newName, actor, now },
+  })
+}
+
+/** Delete a role and move its members to another one, in a single statement. */
+export async function deleteGroupRole(
+  db: DbContext,
+  groupId: string,
+  name: string,
+  reassignTo: string,
+  now: string,
+): Promise<void> {
+  await db.write({
+    query: `MATCH (g:Group {id: $groupId})-[:HAS_GROUP_ROLE]->(r:GroupRole {name: $name})
+            WITH g, r
+            OPTIONAL MATCH (:User)-[m:MEMBER_OF]->(g)
+            WHERE m.role = $name
+            SET m.role = $reassignTo, m.updatedAt = $now
+            WITH r
+            DETACH DELETE r`,
+    variables: { groupId, name, reassignTo, now },
+  })
+}
+
+/**
+ * Put a group's roles back on a template.
+ *
+ * Roles the template does not have are dropped and their members moved to `fallbackRoleName`
+ * — otherwise a reset would leave memberships pointing at names that no longer exist. The
+ * roles the template does have are overwritten, so an edited `usual` returns to the default.
+ */
+export async function replaceGroupRoles(
+  db: DbContext,
+  groupId: string,
+  roles: readonly GroupRoleDefinition[],
+  fallbackRoleName: string,
+  actor: string,
+  now: string,
+): Promise<void> {
+  const keep = roles.map((role) => role.name)
+  await db.write({
+    query: `MATCH (g:Group {id: $groupId})-[:HAS_GROUP_ROLE]->(r:GroupRole)
+            WHERE NOT r.name IN $keep
+            WITH g, collect(r) AS obsolete, [role IN collect(r) | role.name] AS obsoleteNames
+            OPTIONAL MATCH (:User)-[m:MEMBER_OF]->(g)
+            WHERE m.role IN obsoleteNames
+            SET m.role = $fallbackRoleName, m.updatedAt = $now
+            WITH obsolete
+            UNWIND obsolete AS role
+            DETACH DELETE role`,
+    variables: { groupId, keep, fallbackRoleName, now },
+  })
+  for (const role of roles) {
+    await writeGroupRole(db, groupId, role, actor, now)
+  }
+}
+
+/**
+ * Mark a group as having customised its roles (concept E12).
+ *
+ * Only the FIRST edit is recorded: the timestamp is what the "apply the template to groups that
+ * never touched their roles" admin action selects by, so it must not move every time somebody
+ * flips a checkbox.
+ */
+export async function markGroupRolesCustomized(
+  db: DbContext,
+  groupId: string,
+  now: string,
+): Promise<void> {
+  await db.write({
+    query: `MATCH (g:Group {id: $groupId})
+            WHERE g.rolesCustomizedAt IS NULL
+            SET g.rolesCustomizedAt = $now`,
+    variables: { groupId, now },
+  })
+}
+
+/**
+ * Switch `group.members.read` on the group's non-member role — the right that the deprecated
+ * `showMembers` setting is really about.
+ *
+ * Kept as its own narrow function rather than going through writeGroupRole: the setting lives in
+ * the group form, not in the rights matrix, and it must not overwrite whatever else the group
+ * granted its non-members.
+ */
+export async function setNonMemberMemberListAccess(
+  db: DbContext,
+  groupId: string,
+  allowed: boolean,
+  now: string,
+): Promise<void> {
+  const roles = await readGroupRoles(db, groupId)
+  const none = roles.find((role) => role.name === 'none')
+  if (!none) {
+    return
+  }
+  const has = none.permissions.includes('group.members.read')
+  if (has === allowed) {
+    return
+  }
+  const permissions = allowed
+    ? [...none.permissions, 'group.members.read' as const]
+    : none.permissions.filter((key) => key !== 'group.members.read')
+  await db.write({
+    query: `MATCH (:Group {id: $groupId})-[:HAS_GROUP_ROLE]->(r:GroupRole {name: 'none'})
+            SET r.permissions = $permissions, r.updatedAt = $now`,
+    variables: { groupId, permissions: JSON.stringify(sanitizeGroupPermissions(permissions)), now },
   })
 }

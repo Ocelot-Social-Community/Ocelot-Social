@@ -292,7 +292,7 @@ export default {
       if (
         this.resourceType === 'contribution' &&
         this.resource.group &&
-        ['admin', 'owner'].includes(this.resource.group.myRole) &&
+        this.$canInGroup('group.post.pin', this.resource.group) &&
         (this.canBeGroupPinned || this.resource.groupPinned)
       ) {
         routes.push({

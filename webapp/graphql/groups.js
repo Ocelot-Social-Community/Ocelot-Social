@@ -53,6 +53,11 @@ export const createGroupMutation = () => {
         }
         locationName
         myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
         showMembers
       }
     }
@@ -115,6 +120,11 @@ export const updateGroupMutation = () => {
         }
         locationName
         myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
         showMembers
       }
     }
@@ -238,6 +248,11 @@ export const groupQuery = (i18n) => {
         ...locationOnGroup
         membersCount
         myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
         showMembers
       }
     }
@@ -268,6 +283,11 @@ export const groupEditQuery = () => {
           ...imageUrls
         }
         myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
         showMembers
         inviteCodes {
           createdAt
@@ -345,6 +365,11 @@ export const groupTeaserQuery = (i18n) => {
         groupType
         actionRadius
         myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
         membersCount
         postsCount
         avatar {

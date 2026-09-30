@@ -263,8 +263,10 @@ describe('edge properties', () => {
   })
 
   it('audits an edge enum', () => {
-    expect(audit('[:MEMBER_OF].role enum')?.cypher).toContain(
-      "NOT n.role IN ['pending', 'usual', 'admin', 'owner']",
+    // MEMBER_OF.role used to be the example here. It is a plain string now: a group defines
+    // its own roles, so the valid values are per group and cannot be declared globally.
+    expect(audit('[:EMOTED].emotion enum')?.cypher).toContain(
+      "NOT n.emotion IN ['happy', 'cry', 'surprised', 'angry', 'funny']",
     )
   })
 

@@ -390,7 +390,16 @@ const canChangeGroupType = rule({ cache: 'no_cache' })(async (_parent, args, ctx
     return true
   }
   const authorization = await ctx.groupAuthorization.forGroup(args.id)
-  return !!authorization && authorization.has('group.type.change')
+  if (!authorization) {
+    return false
+  }
+  // Sending the type the group already has is not a change. The group form posts every field
+  // it knows, so demanding the right for an unchanged value would stop an owner who may not
+  // create hidden groups from editing the hidden group they already own.
+  if (args.groupType === authorization.groupType) {
+    return true
+  }
+  return authorization.has('group.type.change')
 })
 
 // Joining is two different acts sharing one mutation: joining oneself, and adding somebody
@@ -423,7 +432,13 @@ const canAssignGroupRole = rule({ cache: 'no_cache' })(async (_parent, args, ctx
   if (!ctx.user) {
     return false
   }
-  const { groupId, userId, roleInGroup } = args
+  const { groupId, userId } = args
+  // ChangeGroupMemberRole calls it roleInGroup, its successor setGroupMemberRole calls it
+  // roleName. One rule serves both while the deprecated mutation is still around.
+  const roleInGroup = (args.roleName ?? args.roleInGroup) as string | undefined
+  if (typeof roleInGroup !== 'string') {
+    return false
+  }
   const authorization = await ctx.groupAuthorization.forGroup(groupId)
   if (!authorization?.has('group.member.role.assign')) {
     return false
@@ -438,6 +453,13 @@ const canAssignGroupRole = rule({ cache: 'no_cache' })(async (_parent, args, ctx
     // handing a group over (#6173), and with an owner-less group being legal it needs no
     // second owner to exist first.
     return coversRole(authorization.effective, assigned)
+  }
+  // Assigning the role somebody already holds changes nothing, so it does not need the
+  // authority to change them — and the group UI sends it (a role picker set to its current
+  // value). The old rule had the same exception, spelled `sameUserRoleInGroup`.
+  const current = await ctx.groupAuthorization.forGroupMemberRole(groupId, userId)
+  if (current === roleInGroup) {
+    return true
   }
   const target = await ctx.groupAuthorization.memberPermissions(groupId, userId)
   return mayAssignGroupRole(authorization.effective, target, assigned)
@@ -494,6 +516,9 @@ export default shield(
       roles: hasPermission('role.manage'),
       userRoles: hasPermission('role.manage'),
       myPermissions: isAuthenticated,
+      // The group rights catalog is the same for everybody and drives the group rights UI;
+      // which of them a viewer holds is Group.myGroupPermissions, resolved per group.
+      groupPermissionCatalog: and(groupsEnabled, isAuthenticated),
       Room: isAuthenticated,
       Message: isAuthenticated,
       UnreadRooms: isAuthenticated,
@@ -614,6 +639,16 @@ export default shield(
       renameRole: hasPermission('role.manage'),
       deleteRole: hasPermission('role.manage'),
       setUserRole: hasPermission('role.manage'),
+
+      // Group roles: editing a group's own role definitions is the group's meta right, and
+      // every one of these additionally requires that the actor holds what they hand out
+      // (checked in the resolver, which is where the resulting set is known).
+      updateGroupRole: and(groupsEnabled, hasGroupPermission('group.role.manage')),
+      createGroupRole: and(groupsEnabled, hasGroupPermission('group.role.manage')),
+      renameGroupRole: and(groupsEnabled, hasGroupPermission('group.role.manage')),
+      deleteGroupRole: and(groupsEnabled, hasGroupPermission('group.role.manage')),
+      resetGroupRoles: and(groupsEnabled, hasGroupPermission('group.role.manage')),
+      setGroupMemberRole: and(groupsEnabled, canAssignGroupRole),
       markTeaserAsViewed: allow,
 
       // Network Policy
@@ -681,11 +716,9 @@ export default shield(
       name: allow,
       about: allow,
       groupType: allow,
-      // The member count is part of the member list, not a separate fact: in a small group
-      // "3 members" plus a known owner is nearly the list itself (concept E7). Still behind
-      // isAuthenticated as well, so switching the right on for non-members of a public group
-      // does not silently expose it to anonymous visitors too.
-      membersCount: and(isAuthenticated, parentHasGroupPermission('group.members.read')),
+      // A group's role definitions are its own business; reading them is the same right as
+      // editing them, because the matrix IS the editing UI.
+      roles: and(isAuthenticated, parentHasGroupPermission('group.role.manage')),
     },
     InviteCode: {
       '*': allow,

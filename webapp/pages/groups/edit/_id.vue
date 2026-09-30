@@ -74,7 +74,8 @@ export default {
       query: groupEditQuery(),
       variables: { id },
     })
-    if (group.myRole !== 'owner') {
+    // The right, not the role: a group may grant its admins the settings right.
+    if (!(group.myGroupPermissions || []).includes('group.settings.manage')) {
       error({ statusCode: 403, message: 'NONONNNO' })
     }
     return { group }

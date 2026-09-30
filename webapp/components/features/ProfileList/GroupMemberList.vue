@@ -147,8 +147,8 @@ export default {
         }, {})
       }
       return {
-        shared: (this.groups || []).filter((g) => g.myRole !== null && g.myRole !== 'pending'),
-        other: (this.groups || []).filter((g) => g.myRole === null || g.myRole === 'pending'),
+        shared: (this.groups || []).filter((g) => this.$isGroupMember(g)),
+        other: (this.groups || []).filter((g) => !this.$isGroupMember(g)),
       }
     },
     typesWithGroups() {

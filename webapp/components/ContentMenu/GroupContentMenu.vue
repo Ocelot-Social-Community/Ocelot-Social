@@ -80,7 +80,7 @@ export default {
   },
   computed: {
     isMember() {
-      return ['usual', 'admin', 'owner'].includes(this.group.myRole)
+      return this.$isGroupMember(this.group)
     },
     routes() {
       const routes = []
@@ -134,12 +134,16 @@ export default {
         }
       }
 
-      if (this.group.myRole === 'owner') {
+      // Two separate rights, not "is the owner": editing the group and handing out invite
+      // links are granted independently now, and an admin may well hold one without the other.
+      if (this.$canInGroup('group.settings.manage', this.group)) {
         routes.push({
           label: this.$t('admin.settings.name'),
           path: `/groups/edit/${this.group.id}`,
           icon: this.icons.edit,
         })
+      }
+      if (this.$canInGroup('group.invite', this.group)) {
         routes.push({
           label: this.$t('group.contentMenu.inviteLinks'),
           path: `/groups/edit/${this.group.id}/invites`,

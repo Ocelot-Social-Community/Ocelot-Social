@@ -105,6 +105,11 @@ export const searchGroups = (i18n) => {
             name(lang: "${lang}")
           }
           myRole
+          myGroupRole {
+            name
+            label
+          }
+          myGroupPermissions
         }
       }
     }
@@ -159,6 +164,11 @@ export const searchChatTargets = gql`
           ...imageUrls
         }
         myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
       }
     }
   }

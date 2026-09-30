@@ -52,7 +52,7 @@
             name="groupType"
             model="groupType"
             :value="formData.groupType"
-            :disabled="update && (!group || group.myRole !== 'owner')"
+            :disabled="update && !$canInGroup('group.type.change', group)"
             @change="changeGroupType($event)"
             @blur="touchField('groupType')"
           >

@@ -1,0 +1,62 @@
+# Group-scoped rights: the group axis of the rights system, under the network-wide one.
+# The catalog of keys is code-owned (dotted keys are not valid GraphQL enum values, so they
+# travel as String and are validated against the catalog); a group's role definitions are
+# runtime data the GROUP owns, seeded from a network-wide template per group type.
+
+"A single entry in the group permission catalog: a right that can be granted inside a group."
+type GroupPermission {
+  key: String!
+  "The catalog group this right belongs to, for sectioning the rights UI: visibility, content, membership, administration, communication."
+  group: String!
+  description: String!
+  "Further runtime feature gates beyond the groups feature itself (e.g. videoConference). Empty when the right depends on nothing else."
+  gatedBy: [String!]!
+  "The network permission that must ALSO be held for this right to be effective, with `<type>` standing in for the group's type. Null when the capability is purely group-scoped."
+  requiresNetworkPermission: String
+}
+
+"A role definition owned by one group."
+type GroupRole {
+  "The internal key. Memberships point at it, and for a system role it never changes."
+  name: String!
+  "The group's own display name for the role, or null for the translated default."
+  label: String
+  "A role the code's behaviour depends on — none (no membership), pending (applicant), usual (where a new member lands) and owner (the failsafe). Its label and permissions are the group's business; its key and its existence are not."
+  system: Boolean!
+  "Only `owner`: its permission set cannot be edited, because it resolves to the whole catalog."
+  protected: Boolean!
+  "The group permission keys this role grants."
+  permissions: [String!]!
+  "How many members currently carry this role. Null for `none`, which is the absence of a membership rather than a role somebody has."
+  memberCount: Int
+}
+
+type Query {
+  "The closed catalog of group-scoped rights. Requires authentication; it is the same for every group."
+  groupPermissionCatalog: [GroupPermission!]!
+}
+
+type Mutation {
+  "Replace a group role's permission set, and optionally its display label (null resets it to the translated default). The owner role's permissions cannot be changed, a system role's key cannot. Requires `group.role.manage` in that group, and the resulting set must be covered by the actor's own rights."
+  updateGroupRole(groupId: ID!, name: String!, permissions: [String!]!, label: String): GroupRole!
+  "Add a role to a group. The name is a key (lower-case, no spaces) and must not collide with a system role. Requires `group.role.manage`, and the new set must be covered by the actor's own rights."
+  createGroupRole(groupId: ID!, name: String!, permissions: [String!]!, label: String): GroupRole!
+  "Rename a non-system role, carrying its members with it. To change how a system role reads, set its label instead."
+  renameGroupRole(groupId: ID!, name: String!, newName: String!): GroupRole!
+  "Delete a non-system role. Its members move to `reassignTo`, so no membership is left pointing at a role that no longer exists. Returns the deleted name."
+  deleteGroupRole(groupId: ID!, name: String!, reassignTo: String!): String!
+  "Put a group's roles back on the network template for its group type. Roles the template does not have are removed and their members become ordinary members."
+  resetGroupRoles(groupId: ID!): [GroupRole!]!
+  "Set a member's role by name. Subject to the act-on rules: the actor must outrank the member and must hold every right the assigned role grants."
+  setGroupMemberRole(groupId: ID!, userId: ID!, roleName: String!): GroupMember!
+}
+
+"A signal that the rights inside a group may have changed — a role's permission set, a rename, a reset or a member's role. Clients refetch the group's myGroupPermissions on receipt; the payload carries no actor."
+type GroupPermissionsChanged {
+  groupId: ID!
+}
+
+type Subscription {
+  "Fires when a group's role definitions or a member's role change."
+  groupPermissionsChanged(groupId: ID!): GroupPermissionsChanged!
+}
