@@ -158,10 +158,20 @@ export function createGroupAuthorizationScope({
     if (holds(`group.administer.any_${groupType}`)) {
       return new Set(allGroupPermissionKeys())
     }
+    const authority = new Set<GroupPermissionKey>()
     if (holds(`group.content.read.any_${groupType}`)) {
-      return new Set<GroupPermissionKey>(['group.read', 'group.content.read', 'group.members.read'])
+      authority.add('group.read')
+      authority.add('group.content.read')
+      authority.add('group.members.read')
     }
-    return new Set<GroupPermissionKey>()
+    if (holds(`group.moderate.any_${groupType}`)) {
+      // Moderating without reading would be blind, so the read rights come along — the default
+      // roles grant both together anyway.
+      authority.add('group.read')
+      authority.add('group.content.read')
+      authority.add('group.post.moderate')
+    }
+    return authority
   }
 
   const resolveGroup = async (groupId: string): Promise<GroupAuthorization | null> => {

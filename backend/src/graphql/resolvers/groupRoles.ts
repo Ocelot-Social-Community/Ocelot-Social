@@ -389,6 +389,36 @@ export default {
         membership: record.get('membership') as Record<string, unknown>,
       }
     },
+    removePostFromGroup: async (
+      _parent,
+      params: { groupId: string; postId: string },
+      context: Context,
+    ) => {
+      const { groupId, postId } = params
+      const now = new Date().toISOString()
+      // One statement: drop the post's place in the group and notify its author, so a removal
+      // can never happen silently. The post itself is untouched — it belongs to its author, and
+      // deleting somebody else's writing is a different (network) matter.
+      const result = await context.database.write({
+        query: `
+          MATCH (post:Post {id: $postId})-[edge:IN]->(group:Group {id: $groupId})
+          MATCH (post)<-[:WROTE]-(author:User)
+          DELETE edge
+          WITH post, group, author
+          MERGE (post)-[notification:NOTIFIED {reason: 'post_removed_from_group'}]->(author)
+          ON CREATE SET notification.createdAt = $now, notification.updatedAt = $now,
+                        notification.read = false
+          SET notification.updatedAt = $now, notification.read = false
+          RETURN post {.*} AS post
+        `,
+        variables: { groupId, postId, now },
+      })
+      const record = result.records[0]
+      if (!record) {
+        throw new UserInputError('That post is not in this group!')
+      }
+      return record.get('post') as Record<string, unknown>
+    },
     updateGroupRoleTemplate: async (
       _parent,
       params: { groupType: string; name: string; permissions: string[]; label?: string | null },

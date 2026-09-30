@@ -307,6 +307,24 @@ export default {
         })
       }
 
+      // Taking a post out of a group: neither deleting it nor disabling it — the post stays
+      // with its author, it just loses its place here. Its own right, so a group can grant it
+      // without granting anything else.
+      if (
+        this.resourceType === 'contribution' &&
+        this.resource.group &&
+        this.canInGroup('group.post.moderate', this.resource.group) &&
+        !this.isOwner
+      ) {
+        routes.push({
+          label: this.$t('post.menu.removeFromGroup'),
+          callback: () => {
+            this.$emit('removeFromGroup', this.resource)
+          },
+          icon: this.icons.unlink,
+        })
+      }
+
       return routes
     },
     // Disabling a USER account is a user.disable capability (the moderator-grade,

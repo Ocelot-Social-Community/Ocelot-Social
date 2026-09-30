@@ -325,6 +325,7 @@
                 @unpinPost="unpinPost(post, refetchPostList)"
                 @pinGroupPost="pinGroupPost(post, refetchPostList)"
                 @unpinGroupPost="unpinGroupPost(post, refetchPostList)"
+                @removeFromGroup="removePostFromGroup(post, refetchPostList)"
                 @pushPost="pushPost(post, refetchPostList)"
                 @unpushPost="unpushPost(post, refetchPostList)"
                 @toggleObservePost="

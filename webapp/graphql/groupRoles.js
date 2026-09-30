@@ -108,3 +108,11 @@ export const groupPermissionsChangedSubscription = () => gql`
     }
   }
 `
+
+export const removePostFromGroupMutation = () => gql`
+  mutation ($groupId: ID!, $postId: ID!) {
+    removePostFromGroup(groupId: $groupId, postId: $postId) {
+      id
+    }
+  }
+`

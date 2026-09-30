@@ -18,6 +18,7 @@ export type GroupPermissionKey =
   | 'group.post.create'
   | 'group.comment.create'
   | 'group.post.pin'
+  | 'group.post.moderate'
   | 'group.join'
   | 'group.join.request'
   | 'group.leave'

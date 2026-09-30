@@ -29,6 +29,8 @@ const EXPECTED_KEYS: PermissionKey[] = [
   'content.moderate',
   'group.content.read.any_closed',
   'group.content.read.any_hidden',
+  'group.moderate.any_closed',
+  'group.moderate.any_hidden',
   'user.disable',
   'post.pin',
   'post.push',
@@ -93,6 +95,8 @@ describe('permission catalog', () => {
       // groups feature is off.
       expect(gatesFor('group.content.read.any_closed')).toEqual(['groupsEnabled'])
       expect(gatesFor('group.content.read.any_hidden')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.moderate.any_closed')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.moderate.any_hidden')).toEqual(['groupsEnabled'])
       expect(gatesFor('group.administer.any_public')).toEqual(['groupsEnabled'])
       expect(gatesFor('group.administer.any_closed')).toEqual(['groupsEnabled'])
       expect(gatesFor('group.administer.any_hidden')).toEqual(['groupsEnabled'])

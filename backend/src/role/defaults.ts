@@ -63,6 +63,8 @@ export const DEFAULT_ROLES: RoleDefinition[] = [
       // holds, hence both variants here as well.
       'group.content.read.any_closed',
       'group.content.read.any_hidden',
+      'group.moderate.any_closed',
+      'group.moderate.any_hidden',
       'badge.manage',
       // admin MUST hold every moderator capability (incl. user.disable) so the
       // act-on dominance rule keeps the intuitive chain owner ⊋ admin ⊋ moderator
@@ -99,6 +101,7 @@ export const DEFAULT_ROLES: RoleDefinition[] = [
       // Closed groups only: an unlisted group stays an admin matter, which is the
       // distinction #9405 asks about.
       'group.content.read.any_closed',
+      'group.moderate.any_closed',
       'badge.manage',
       'user.disable',
     ],

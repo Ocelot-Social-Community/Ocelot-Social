@@ -696,6 +696,9 @@ export default shield(
 
       // The network-wide defaults new groups are seeded from, and the bulk application of them
       // to groups that never touched their own roles.
+      // Taking a post out of a group: the group's own right, or the network-wide one folded in
+      // for a moderator who is not a member.
+      removePostFromGroup: and(groupsEnabled, hasGroupPermission('group.post.moderate')),
       updateGroupRoleTemplate: hasPermission('group.roleTemplate.manage'),
       applyGroupRoleTemplates: hasPermission('group.roleTemplate.manage'),
       markTeaserAsViewed: allow,

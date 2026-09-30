@@ -57,6 +57,8 @@ describe('DEFAULT_ROLES', () => {
     // owner left, and the templates new groups are seeded from.
     'group.content.read.any_closed',
     'group.content.read.any_hidden',
+    'group.moderate.any_closed',
+    'group.moderate.any_hidden',
     'group.administer.any_public',
     'group.administer.any_closed',
     'group.administer.any_hidden',
@@ -94,6 +96,7 @@ describe('DEFAULT_ROLES', () => {
         ...BASELINE,
         'content.moderate',
         'group.content.read.any_closed',
+        'group.moderate.any_closed',
         'badge.manage',
         'user.disable',
       ),

@@ -1282,7 +1282,8 @@
       "post_in_group": "Hat einen Beitrag in der Gruppe geschrieben",
       "removed_user_from_group": "Hat dich aus der Gruppe entfernt",
       "user_joined_group": "Ist deiner Gruppe beigetreten",
-      "user_left_group": "Hat deine Gruppe verlassen"
+      "user_left_group": "Hat deine Gruppe verlassen",
+      "post_removed_from_group": "Hat deinen Beitrag aus der Gruppe entfernt"
     },
     "title": "Benachrichtigungen",
     "user": "Nutzer"
@@ -1341,7 +1342,10 @@
       "unpin": "Beitrag loslösen (Netzwerk)",
       "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!",
       "unpush": "Beitrag hochschieben aufheben",
-      "unpushedSuccessfully": "Hochschieben des Beitrags erfolgreich rückgängig gemacht!"
+      "unpushedSuccessfully": "Hochschieben des Beitrags erfolgreich rückgängig gemacht!",
+      "removeFromGroup": "Aus der Gruppe entfernen",
+      "removeFromGroupConfirm": "Diesen Beitrag aus der Gruppe \"{group}\" entfernen? Der Beitrag bleibt bei seinem Autor, verliert aber seinen Platz in der Gruppe.",
+      "removedFromGroupSuccessfully": "Beitrag aus der Gruppe entfernt"
     },
     "pinned": "Meldung",
     "sensitiveContent": {

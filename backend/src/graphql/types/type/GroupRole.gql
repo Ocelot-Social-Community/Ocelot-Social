@@ -66,6 +66,8 @@ type Mutation {
     permissions: [String!]!
     label: String
   ): GroupRole!
+  "Take a post out of a group without deleting it: the post stays with its author, it just loses its place in the group. Requires `group.post.moderate` in that group (or `group.moderate.any_<type>` network-wide). The author is notified."
+  removePostFromGroup(groupId: ID!, postId: ID!): Post
   "Apply the templates to every group that has never edited its own roles, and return how many groups were changed. A group that customised its roles is left alone — its edit is not overwritten by a network default. Requires `group.roleTemplate.manage`."
   applyGroupRoleTemplates: Int!
 }

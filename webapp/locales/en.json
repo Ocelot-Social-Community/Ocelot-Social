@@ -1282,7 +1282,8 @@
       "post_in_group": "Posted in a group",
       "removed_user_from_group": "Removed you from group",
       "user_joined_group": "Joined your group",
-      "user_left_group": "Left your group"
+      "user_left_group": "Left your group",
+      "post_removed_from_group": "Removed your post from the group"
     },
     "title": "Notifications",
     "user": "User"
@@ -1341,7 +1342,10 @@
       "unpin": "Unpin post (Network)",
       "unpinnedSuccessfully": "Post unpinned successfully!",
       "unpush": "Cancel push",
-      "unpushedSuccessfully": "Post push has been canceled!"
+      "unpushedSuccessfully": "Post push has been canceled!",
+      "removeFromGroup": "Remove from group",
+      "removeFromGroupConfirm": "Remove this post from the group \"{group}\"? The post stays with its author but loses its place in the group.",
+      "removedFromGroupSuccessfully": "Post removed from the group"
     },
     "pinned": "Announcement",
     "sensitiveContent": {

@@ -30,6 +30,7 @@ const EXPECTED_KEYS: GroupPermissionKey[] = [
   'group.post.create',
   'group.comment.create',
   'group.post.pin',
+  'group.post.moderate',
   'group.join',
   'group.join.request',
   'group.leave',
@@ -111,7 +112,6 @@ describe('group permission catalog', () => {
 
     it.each([
       'group.delete', // deliberately not in the catalog: no resolver consumes it yet
-      'group.post.moderate', // ships with the group moderation feature
       'group.owner.transfer', // covered by the assignment coverage rule instead
       'post.create', // a NETWORK key, not a group key
       '',

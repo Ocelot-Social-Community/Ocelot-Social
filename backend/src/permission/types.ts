@@ -21,6 +21,8 @@ export type PermissionKey =
   | 'content.moderate'
   | 'group.content.read.any_closed'
   | 'group.content.read.any_hidden'
+  | 'group.moderate.any_closed'
+  | 'group.moderate.any_hidden'
   | 'user.disable'
   | 'post.pin'
   | 'post.push'

@@ -1,5 +1,6 @@
 import PostMutations from '~/graphql/PostMutations'
 import { mapMutations } from 'vuex'
+import { removePostFromGroupMutation } from '~/graphql/groupRoles.js'
 
 export default {
   methods: {
@@ -64,6 +65,26 @@ export default {
         .then(() => {
           this.$toast.success(this.$t('post.menu.groupUnpinnedSuccessfully'))
           // this.storeUnpinGroupPost()
+          refetchPostList()
+        })
+        .catch((error) => this.$toast.error(error.message))
+    },
+    /**
+     * Take a post out of a group without deleting it.
+     *
+     * Confirmed first, because it is not undoable from the list: the post keeps existing with
+     * its author, but putting it back would mean the author posting it again.
+     */
+    removePostFromGroup(post, refetchPostList = () => {}) {
+      if (!window.confirm(this.$t('post.menu.removeFromGroupConfirm', { group: post.group?.name })))
+        return
+      this.$apollo
+        .mutate({
+          mutation: removePostFromGroupMutation(),
+          variables: { groupId: post.group.id, postId: post.id },
+        })
+        .then(() => {
+          this.$toast.success(this.$t('post.menu.removedFromGroupSuccessfully'))
           refetchPostList()
         })
         .catch((error) => this.$toast.error(error.message))
