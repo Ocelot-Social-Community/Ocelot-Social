@@ -220,6 +220,40 @@
       "showDonationsCheckboxLabel": "Показати панель прогресу пожертв",
       "successfulUpdate": "Інформацію про пожертви успішно оновлено!"
     },
+    "groupRoles": {
+      "applied": null,
+      "apply": null,
+      "confirmApply": null,
+      "description": null,
+      "name": null,
+      "ownerHoldsEverything": null,
+      "saved": null,
+      "title": null,
+      "untouched": null
+    },
+    "groups": {
+      "active": null,
+      "allTypes": null,
+      "columns": {
+        "members": null,
+        "name": null,
+        "owners": null,
+        "state": null,
+        "type": null
+      },
+      "count": null,
+      "description": null,
+      "disabled": null,
+      "disabledOnly": null,
+      "empty": null,
+      "name": null,
+      "next": null,
+      "noOwner": null,
+      "ownerlessOnly": null,
+      "previous": null,
+      "searchPlaceholder": null,
+      "title": null
+    },
     "hashtags": {
       "name": "Хештеги",
       "nameOfHashtag": "Назва",
@@ -235,9 +269,6 @@
     "name": "Адміністрування",
     "notifications": {
       "name": "Сповіщення"
-    },
-    "organizations": {
-      "name": "Організації"
     },
     "pages": {
       "name": "Сторінки"
@@ -943,10 +974,51 @@
     "removeMemberButton": "Видалити",
     "removeMemberConfirmText": "Видалити користувача «{name}» з групи?",
     "removeMemberTitle": "Видалити учасника",
+    "rights": {
+      "addRole": null,
+      "blockedByFeature": null,
+      "blockedByNetwork": null,
+      "confirmDelete": null,
+      "confirmReset": null,
+      "deleteRole": null,
+      "description": null,
+      "groups": {
+        "administration": null,
+        "communication": null,
+        "content": null,
+        "membership": null,
+        "visibility": null
+      },
+      "labelField": null,
+      "members": null,
+      "noRight": null,
+      "ownerHoldsEverything": null,
+      "presets": {
+        "channel": null
+      },
+      "reset": null,
+      "roleKeyPlaceholder": null,
+      "roleLabelPlaceholder": null,
+      "saved": null,
+      "simple": {
+        "applicants-read": null,
+        "members-chat": null,
+        "members-comment": null,
+        "members-invite": null,
+        "members-post": null,
+        "nonmembers-members": null,
+        "nonmembers-read": null
+      },
+      "systemRole": null,
+      "title": null,
+      "toAdvanced": null,
+      "toSimple": null
+    },
     "role": "Ваша роль у групі",
     "roles": {
       "admin": "Адміністратор",
       "members": "Учасники",
+      "none": null,
       "owner": "Власник",
       "pending": "Очікуючий учасник",
       "usual": "Учасник"
@@ -1208,6 +1280,7 @@
       "mentioned_in_post": "Згадав(-ла) вас у дописі",
       "on_date": "",
       "post_in_group": "Написав(-ла) допис у групі",
+      "post_removed_from_group": null,
       "removed_user_from_group": "Видалив(-ла) вас з групи",
       "user_joined_group": "Приєднався(-лася) до вашої групи",
       "user_left_group": "Покинув(-ла) вашу групу"
@@ -1264,6 +1337,9 @@
       "push": "Підняти вгору",
       "pushed": "Піднято вгору",
       "pushedSuccessfully": "Допис успішно піднято вгору!",
+      "removedFromGroupSuccessfully": null,
+      "removeFromGroup": null,
+      "removeFromGroupConfirm": null,
       "unobserve": "Припинити спостереження",
       "unobservedSuccessfully": "Ви більше не спостерігаєте за цим дописом!",
       "unpin": "Відкріпити допис (Мережа)",

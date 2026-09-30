@@ -220,6 +220,40 @@
       "showDonationsCheckboxLabel": "Toon donatie-voortgangsbalk",
       "successfulUpdate": "Donatie-informatie succesvol bijgewerkt!"
     },
+    "groupRoles": {
+      "applied": null,
+      "apply": null,
+      "confirmApply": null,
+      "description": null,
+      "name": null,
+      "ownerHoldsEverything": null,
+      "saved": null,
+      "title": null,
+      "untouched": null
+    },
+    "groups": {
+      "active": null,
+      "allTypes": null,
+      "columns": {
+        "members": null,
+        "name": null,
+        "owners": null,
+        "state": null,
+        "type": null
+      },
+      "count": null,
+      "description": null,
+      "disabled": null,
+      "disabledOnly": null,
+      "empty": null,
+      "name": null,
+      "next": null,
+      "noOwner": null,
+      "ownerlessOnly": null,
+      "previous": null,
+      "searchPlaceholder": null,
+      "title": null
+    },
     "hashtags": {
       "name": "Hashtags",
       "nameOfHashtag": "Naam",
@@ -235,9 +269,6 @@
     "name": "Admin",
     "notifications": {
       "name": "Meldingen"
-    },
-    "organizations": {
-      "name": "Organisaties"
     },
     "pages": {
       "name": "Pages"
@@ -943,10 +974,51 @@
     "removeMemberButton": "Verwijderen",
     "removeMemberConfirmText": "Gebruiker \"{name}\" uit de groep verwijderen?",
     "removeMemberTitle": "Lid verwijderen",
+    "rights": {
+      "addRole": null,
+      "blockedByFeature": null,
+      "blockedByNetwork": null,
+      "confirmDelete": null,
+      "confirmReset": null,
+      "deleteRole": null,
+      "description": null,
+      "groups": {
+        "administration": null,
+        "communication": null,
+        "content": null,
+        "membership": null,
+        "visibility": null
+      },
+      "labelField": null,
+      "members": null,
+      "noRight": null,
+      "ownerHoldsEverything": null,
+      "presets": {
+        "channel": null
+      },
+      "reset": null,
+      "roleKeyPlaceholder": null,
+      "roleLabelPlaceholder": null,
+      "saved": null,
+      "simple": {
+        "applicants-read": null,
+        "members-chat": null,
+        "members-comment": null,
+        "members-invite": null,
+        "members-post": null,
+        "nonmembers-members": null,
+        "nonmembers-read": null
+      },
+      "systemRole": null,
+      "title": null,
+      "toAdvanced": null,
+      "toSimple": null
+    },
     "role": "Jouw rol in de groep",
     "roles": {
       "admin": "Beheerder",
       "members": "Leden",
+      "none": null,
       "owner": "Eigenaar",
       "pending": "In afwachting",
       "usual": "Lid"
@@ -1208,6 +1280,7 @@
       "mentioned_in_post": "Heeft je genoemd in een bericht",
       "on_date": "op",
       "post_in_group": "Heeft gepost in een groep",
+      "post_removed_from_group": null,
       "removed_user_from_group": "Heeft je uit de groep verwijderd",
       "user_joined_group": "Is lid geworden van je groep",
       "user_left_group": "Heeft je groep verlaten"
@@ -1264,6 +1337,9 @@
       "push": "Naar boven duwen",
       "pushed": "Naar boven geduwd",
       "pushedSuccessfully": "Bericht succesvol naar boven geduwd!",
+      "removedFromGroupSuccessfully": null,
+      "removeFromGroup": null,
+      "removeFromGroupConfirm": null,
       "unobserve": "Bericht niet meer observeren",
       "unobservedSuccessfully": "Je observeert dit bericht niet meer!",
       "unpin": "Bericht losmaken (Netwerk)",

@@ -220,6 +220,40 @@
       "showDonationsCheckboxLabel": "Mostra barra di progresso delle donazioni",
       "successfulUpdate": "Informazioni sulle donazioni aggiornate con successo!"
     },
+    "groupRoles": {
+      "applied": null,
+      "apply": null,
+      "confirmApply": null,
+      "description": null,
+      "name": null,
+      "ownerHoldsEverything": null,
+      "saved": null,
+      "title": null,
+      "untouched": null
+    },
+    "groups": {
+      "active": null,
+      "allTypes": null,
+      "columns": {
+        "members": null,
+        "name": null,
+        "owners": null,
+        "state": null,
+        "type": null
+      },
+      "count": null,
+      "description": null,
+      "disabled": null,
+      "disabledOnly": null,
+      "empty": null,
+      "name": null,
+      "next": null,
+      "noOwner": null,
+      "ownerlessOnly": null,
+      "previous": null,
+      "searchPlaceholder": null,
+      "title": null
+    },
     "hashtags": {
       "name": "Hashtag",
       "nameOfHashtag": "Nome",
@@ -235,9 +269,6 @@
     "name": "Admin",
     "notifications": {
       "name": "Notifiche"
-    },
-    "organizations": {
-      "name": "Organizzazioni"
     },
     "pages": {
       "name": "Pagine"
@@ -943,10 +974,51 @@
     "removeMemberButton": "Rimuovi",
     "removeMemberConfirmText": "Rimuovere l'utente \"{name}\" dal gruppo?",
     "removeMemberTitle": "Rimuovi membro",
+    "rights": {
+      "addRole": null,
+      "blockedByFeature": null,
+      "blockedByNetwork": null,
+      "confirmDelete": null,
+      "confirmReset": null,
+      "deleteRole": null,
+      "description": null,
+      "groups": {
+        "administration": null,
+        "communication": null,
+        "content": null,
+        "membership": null,
+        "visibility": null
+      },
+      "labelField": null,
+      "members": null,
+      "noRight": null,
+      "ownerHoldsEverything": null,
+      "presets": {
+        "channel": null
+      },
+      "reset": null,
+      "roleKeyPlaceholder": null,
+      "roleLabelPlaceholder": null,
+      "saved": null,
+      "simple": {
+        "applicants-read": null,
+        "members-chat": null,
+        "members-comment": null,
+        "members-invite": null,
+        "members-post": null,
+        "nonmembers-members": null,
+        "nonmembers-read": null
+      },
+      "systemRole": null,
+      "title": null,
+      "toAdvanced": null,
+      "toSimple": null
+    },
     "role": "Il tuo ruolo nel gruppo",
     "roles": {
       "admin": "Amministratore",
       "members": "Membri",
+      "none": null,
       "owner": "Proprietario",
       "pending": "Membro in attesa",
       "usual": "Membro"
@@ -1208,6 +1280,7 @@
       "mentioned_in_post": "Ti ha menzionato in una pubblicazione",
       "on_date": "il",
       "post_in_group": "Ha pubblicato in un gruppo",
+      "post_removed_from_group": null,
       "removed_user_from_group": "Ti ha rimosso dal gruppo",
       "user_joined_group": "Si è unito al tuo gruppo",
       "user_left_group": "Ha lasciato il tuo gruppo"
@@ -1264,6 +1337,9 @@
       "push": "Porta in cima",
       "pushed": "Spostato in alto",
       "pushedSuccessfully": "Pubblicazione portata in cima con successo!",
+      "removedFromGroupSuccessfully": null,
+      "removeFromGroup": null,
+      "removeFromGroupConfirm": null,
       "unobserve": "Smetti di osservare",
       "unobservedSuccessfully": "Non stai più osservando questa pubblicazione!",
       "unpin": "Rimuovi fissaggio (Rete)",

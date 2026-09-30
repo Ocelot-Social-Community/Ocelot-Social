@@ -220,6 +220,40 @@
       "showDonationsCheckboxLabel": "Shfaq shiritin e progresit të dhurimeve",
       "successfulUpdate": "Informacioni mbi dhurimet u përditësua me sukses!"
     },
+    "groupRoles": {
+      "applied": null,
+      "apply": null,
+      "confirmApply": null,
+      "description": null,
+      "name": null,
+      "ownerHoldsEverything": null,
+      "saved": null,
+      "title": null,
+      "untouched": null
+    },
+    "groups": {
+      "active": null,
+      "allTypes": null,
+      "columns": {
+        "members": null,
+        "name": null,
+        "owners": null,
+        "state": null,
+        "type": null
+      },
+      "count": null,
+      "description": null,
+      "disabled": null,
+      "disabledOnly": null,
+      "empty": null,
+      "name": null,
+      "next": null,
+      "noOwner": null,
+      "ownerlessOnly": null,
+      "previous": null,
+      "searchPlaceholder": null,
+      "title": null
+    },
     "hashtags": {
       "name": "Hashtag-ët",
       "nameOfHashtag": "Emri",
@@ -235,9 +269,6 @@
     "name": "Admin",
     "notifications": {
       "name": "Njoftimet"
-    },
-    "organizations": {
-      "name": "Organizatat"
     },
     "pages": {
       "name": "Faqet"
@@ -943,10 +974,51 @@
     "removeMemberButton": "Hiq",
     "removeMemberConfirmText": "Hiq përdoruesin \"{name}\" nga grupi?",
     "removeMemberTitle": "Hiq anëtarin",
+    "rights": {
+      "addRole": null,
+      "blockedByFeature": null,
+      "blockedByNetwork": null,
+      "confirmDelete": null,
+      "confirmReset": null,
+      "deleteRole": null,
+      "description": null,
+      "groups": {
+        "administration": null,
+        "communication": null,
+        "content": null,
+        "membership": null,
+        "visibility": null
+      },
+      "labelField": null,
+      "members": null,
+      "noRight": null,
+      "ownerHoldsEverything": null,
+      "presets": {
+        "channel": null
+      },
+      "reset": null,
+      "roleKeyPlaceholder": null,
+      "roleLabelPlaceholder": null,
+      "saved": null,
+      "simple": {
+        "applicants-read": null,
+        "members-chat": null,
+        "members-comment": null,
+        "members-invite": null,
+        "members-post": null,
+        "nonmembers-members": null,
+        "nonmembers-read": null
+      },
+      "systemRole": null,
+      "title": null,
+      "toAdvanced": null,
+      "toSimple": null
+    },
     "role": "Roli yt në grup",
     "roles": {
       "admin": "Administrator",
       "members": "Anëtarë",
+      "none": null,
       "owner": "Pronar",
       "pending": "Anëtar në pritje",
       "usual": "Anëtar"
@@ -1208,6 +1280,7 @@
       "mentioned_in_post": "Të përmendi në një postim",
       "on_date": "më",
       "post_in_group": "Postoi në një grup",
+      "post_removed_from_group": null,
       "removed_user_from_group": "Të hoqi nga grupi",
       "user_joined_group": "U bashkua me grupin tënd",
       "user_left_group": "U largua nga grupi yt"
@@ -1264,6 +1337,9 @@
       "push": "Shtyj lart",
       "pushed": "Shtytur lart",
       "pushedSuccessfully": "Postimi u shty lart me sukses!",
+      "removedFromGroupSuccessfully": null,
+      "removeFromGroup": null,
+      "removeFromGroupConfirm": null,
       "unobserve": "Ndalo observimin e postimit",
       "unobservedSuccessfully": "Nuk po observon më këtë postim!",
       "unpin": "Çngul postimin (Rrjeti)",

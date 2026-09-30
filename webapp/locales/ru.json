@@ -220,6 +220,40 @@
       "showDonationsCheckboxLabel": "Показать полосу прогресса пожертвований",
       "successfulUpdate": "Информация о пожертвованиях успешно обновлена!"
     },
+    "groupRoles": {
+      "applied": null,
+      "apply": null,
+      "confirmApply": null,
+      "description": null,
+      "name": null,
+      "ownerHoldsEverything": null,
+      "saved": null,
+      "title": null,
+      "untouched": null
+    },
+    "groups": {
+      "active": null,
+      "allTypes": null,
+      "columns": {
+        "members": null,
+        "name": null,
+        "owners": null,
+        "state": null,
+        "type": null
+      },
+      "count": null,
+      "description": null,
+      "disabled": null,
+      "disabledOnly": null,
+      "empty": null,
+      "name": null,
+      "next": null,
+      "noOwner": null,
+      "ownerlessOnly": null,
+      "previous": null,
+      "searchPlaceholder": null,
+      "title": null
+    },
     "hashtags": {
       "name": "Хэштеги",
       "nameOfHashtag": "Имя",
@@ -235,9 +269,6 @@
     "name": "Администрирование",
     "notifications": {
       "name": "Уведомления"
-    },
-    "organizations": {
-      "name": "Организации"
     },
     "pages": {
       "name": "Страницы"
@@ -943,10 +974,51 @@
     "removeMemberButton": "Удалить",
     "removeMemberConfirmText": "Удалить пользователя «{name}» из группы?",
     "removeMemberTitle": "Удалить участника",
+    "rights": {
+      "addRole": null,
+      "blockedByFeature": null,
+      "blockedByNetwork": null,
+      "confirmDelete": null,
+      "confirmReset": null,
+      "deleteRole": null,
+      "description": null,
+      "groups": {
+        "administration": null,
+        "communication": null,
+        "content": null,
+        "membership": null,
+        "visibility": null
+      },
+      "labelField": null,
+      "members": null,
+      "noRight": null,
+      "ownerHoldsEverything": null,
+      "presets": {
+        "channel": null
+      },
+      "reset": null,
+      "roleKeyPlaceholder": null,
+      "roleLabelPlaceholder": null,
+      "saved": null,
+      "simple": {
+        "applicants-read": null,
+        "members-chat": null,
+        "members-comment": null,
+        "members-invite": null,
+        "members-post": null,
+        "nonmembers-members": null,
+        "nonmembers-read": null
+      },
+      "systemRole": null,
+      "title": null,
+      "toAdvanced": null,
+      "toSimple": null
+    },
     "role": "Твоя роль в группе",
     "roles": {
       "admin": "Администратор",
       "members": "Участники",
+      "none": null,
       "owner": "Владелец",
       "pending": "Ожидающий участник",
       "usual": "Участник"
@@ -1208,6 +1280,7 @@
       "mentioned_in_post": "Упоминание в посте....",
       "on_date": "от",
       "post_in_group": "Опубликовал в группе",
+      "post_removed_from_group": null,
       "removed_user_from_group": "Удалил тебя из группы",
       "user_joined_group": "Вступил в твою группу",
       "user_left_group": "Покинул твою группу"
@@ -1264,6 +1337,9 @@
       "push": "Поднять наверх",
       "pushed": "Поднято наверх",
       "pushedSuccessfully": "Публикация успешно поднята наверх!",
+      "removedFromGroupSuccessfully": null,
+      "removeFromGroup": null,
+      "removeFromGroupConfirm": null,
       "unobserve": "Прекратить наблюдение",
       "unobservedSuccessfully": "Ты больше не наблюдаешь за этой публикацией!",
       "unpin": "Открепить пост (Сеть)",
