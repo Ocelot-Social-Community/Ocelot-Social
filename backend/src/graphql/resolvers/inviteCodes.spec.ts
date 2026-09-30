@@ -6,6 +6,7 @@ import { beforeAll, afterAll, describe, beforeEach, it, expect } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import currentUser from '@graphql/queries/auth/currentUser.gql'
+import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
 import Group from '@graphql/queries/groups/Group.gql'
 import GroupMembers from '@graphql/queries/groups/GroupMembers.gql'
@@ -509,7 +510,7 @@ describe('generatePersonalInviteCode', () => {
 })
 
 describe('generateGroupInviteCode', () => {
-  let invitingUser, notMemberUser, pendingMemberUser
+  let invitingUser, notMemberUser, pendingMemberUser, usualMemberUser
 
   beforeEach(async () => {
     await cleanDatabase()
@@ -529,6 +530,12 @@ describe('generateGroupInviteCode', () => {
       id: 'pending-member-user',
       role: 'user',
       name: 'Pending Member User',
+    })
+
+    usualMemberUser = await Factory.build('user', {
+      id: 'usual-member-user',
+      role: 'user',
+      name: 'Usual Member User',
     })
 
     authenticatedUser = await invitingUser.toJson()
@@ -589,6 +596,84 @@ describe('generateGroupInviteCode', () => {
     it('throws authorization error', async () => {
       await expect(
         mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'public-group' } }),
+      ).resolves.toMatchObject({
+        data: null,
+        errors: [{ message: 'Not Authorized!' }],
+      })
+    })
+  })
+
+  // The cases below are the ones that were missing while the guard passed everyone: only the
+  // unauthenticated path was covered, and that one is short-circuited before the query runs.
+  describe('as a user who is not a member of the group', () => {
+    beforeEach(async () => {
+      authenticatedUser = await notMemberUser.toJson()
+    })
+
+    it.each(['public-group', 'closed-group', 'hidden-group'])(
+      'throws authorization error for the %s',
+      async (groupId) => {
+        await expect(
+          mutate({ mutation: generateGroupInviteCode, variables: { groupId } }),
+        ).resolves.toMatchObject({
+          data: null,
+          errors: [{ message: 'Not Authorized!' }],
+        })
+      },
+    )
+  })
+
+  describe('as a pending member', () => {
+    beforeEach(async () => {
+      authenticatedUser = await pendingMemberUser.toJson()
+    })
+
+    it('throws authorization error', async () => {
+      await expect(
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'closed-group' } }),
+      ).resolves.toMatchObject({
+        data: null,
+        errors: [{ message: 'Not Authorized!' }],
+      })
+    })
+  })
+
+  describe('as a usual member', () => {
+    beforeEach(async () => {
+      // Joining is done by the owner on behalf of the member, as in the setup above. A closed
+      // group admits everyone as `pending`, so the owner promotes them to a full member.
+      authenticatedUser = await invitingUser.toJson()
+      await mutate({
+        mutation: JoinGroup,
+        variables: { groupId: 'public-group', userId: 'usual-member-user' },
+      })
+      await mutate({
+        mutation: JoinGroup,
+        variables: { groupId: 'closed-group', userId: 'usual-member-user' },
+      })
+      await mutate({
+        mutation: ChangeGroupMemberRole,
+        variables: {
+          groupId: 'closed-group',
+          userId: 'usual-member-user',
+          roleInGroup: 'usual',
+        },
+      })
+      authenticatedUser = await usualMemberUser.toJson()
+    })
+
+    it('generates a code for the public group', async () => {
+      await expect(
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'public-group' } }),
+      ).resolves.toMatchObject({
+        data: { generateGroupInviteCode: { code: expect.any(String) } },
+        errors: undefined,
+      })
+    })
+
+    it('throws authorization error for the closed group, where only admins invite', async () => {
+      await expect(
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'closed-group' } }),
       ).resolves.toMatchObject({
         data: null,
         errors: [{ message: 'Not Authorized!' }],

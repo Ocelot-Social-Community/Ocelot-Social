@@ -571,6 +571,20 @@ const inviteRegistration = rule()(async (_parent, args, context: Context) => {
   return validateInviteCode(context, inviteCode)
 })
 
+// Who may hand out an invite code to a group: in a closed or hidden group only its admins and
+// owner, in a public one every member except an applicant (`pending`).
+//
+// This rule used to pass EVERY authenticated user, for two independent reasons that happened to
+// add up to "always allowed":
+//   • it filtered on `group.type`, a property no Group has (it is `groupType`). In Cypher
+//     `NULL IN [...]` is NULL and `NOT NULL` is NULL, so neither branch of the WHERE was ever
+//     true and no row survived the filter.
+//   • it then read `count` through `!!`. The driver runs with lossless integers, so `count()`
+//     arrives as an Integer OBJECT — and an aggregation without a grouping key always returns one
+//     row, so `!!Integer{low: 0}` was `true`.
+// Hence the `toString(count(…)) === '1'` below, the same shape isAllowedToPinGroupPost already
+// uses: a value, not an object, compared against the one row a single membership can produce.
+// (`=== '1'` rather than `!== '0'` also fails closed should duplicate MEMBER_OF edges ever exist.)
 const isAllowedToGenerateGroupInviteCode = rule({
   cache: 'no_cache',
 })(async (_parent, args, context: Context) => {
@@ -578,17 +592,19 @@ const isAllowedToGenerateGroupInviteCode = rule({
     return false
   }
 
-  return !!(
-    await context.database.query({
-      query: `
-    MATCH (user:User{id: $user.id})-[membership:MEMBER_OF]->(group:Group {id: $args.groupId})
-    WHERE (group.type IN ['closed','hidden'] AND membership.role IN ['admin', 'owner'])
-      OR (NOT group.type IN ['closed','hidden'] AND NOT membership.role = 'pending')
-    RETURN count(group) as count
+  return (
+    (
+      await context.database.query({
+        query: `
+    MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
+    WHERE (group.groupType IN ['closed', 'hidden'] AND membership.role IN ['admin', 'owner'])
+      OR (NOT group.groupType IN ['closed', 'hidden'] AND NOT membership.role = 'pending')
+    RETURN toString(count(group)) AS count
     `,
-      variables: { user: context.user, args },
-    })
-  ).records[0].get('count')
+        variables: { userId: context.user.id, groupId: args.groupId },
+      })
+    ).records[0].get('count') === '1'
+  )
 })
 
 const isAllowedToPinGroupPost = rule({
