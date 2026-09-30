@@ -201,4 +201,155 @@ describe('rights.vue', () => {
       }),
     )
   })
+
+  describe('the advanced view', () => {
+    const advanced = async (permissions) => {
+      const wrapper = await Wrapper(permissions)
+      await at(wrapper, 'to-advanced').trigger('click')
+      return wrapper
+    }
+
+    it('edits and saves the permission set of a role', async () => {
+      const wrapper = await advanced()
+
+      at(wrapper, 'perm-group.comment.create').element.checked = true
+      await at(wrapper, 'perm-group.comment.create').trigger('change')
+      await at(wrapper, 'save').trigger('click')
+
+      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({
+            name: 'usual',
+            permissions: ['group.post.create', 'group.members.read', 'group.comment.create'],
+          }),
+        }),
+      )
+    })
+
+    it('reverts a draft without saving', async () => {
+      const wrapper = await advanced()
+
+      at(wrapper, 'perm-group.comment.create').element.checked = true
+      await at(wrapper, 'perm-group.comment.create').trigger('change')
+      expect(wrapper.vm.dirty).toBe(true)
+
+      await at(wrapper, 'revert').trigger('click')
+
+      expect(wrapper.vm.dirty).toBe(false)
+      expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+    })
+
+    it('leaves a right the editor lacks inert', async () => {
+      const wrapper = await advanced(['group.role.manage', 'group.post.create'])
+
+      expect(at(wrapper, 'perm-group.members.read').element.disabled).toBe(true)
+      expect(at(wrapper, 'perm-group.post.create').element.disabled).toBe(false)
+    })
+
+    it('offers no delete button for a system role', async () => {
+      // none, pending, usual and owner exist because the code depends on them.
+      const wrapper = await advanced()
+
+      expect(at(wrapper, 'role-delete').exists()).toBe(false)
+    })
+
+    it('adds a role, starting from what a member may do', async () => {
+      mocks.$apollo.mutate = jest.fn().mockResolvedValue({
+        data: {
+          createGroupRole: {
+            name: 'editors',
+            label: 'Redaktion',
+            system: false,
+            protected: false,
+            permissions: ['group.post.create'],
+            memberCount: 0,
+          },
+        },
+      })
+      const wrapper = await advanced()
+
+      await at(wrapper, 'role-add').trigger('click')
+      at(wrapper, 'new-role-name').setValue('editors')
+      at(wrapper, 'new-role-label').setValue('Redaktion')
+      await at(wrapper, 'role-create').trigger('submit')
+
+      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({
+            name: 'editors',
+            label: 'Redaktion',
+            // A member plus something is the usual reason to add a role at all.
+            permissions: ['group.post.create', 'group.members.read'],
+          }),
+        }),
+      )
+      expect(wrapper.vm.activeRoleName).toBe('editors')
+    })
+
+    it('deletes a role it created, moving its members to the member role', async () => {
+      window.confirm = jest.fn().mockReturnValue(true)
+      const wrapper = await advanced()
+      wrapper.setData({
+        roles: [
+          ...ROLES,
+          {
+            name: 'editors',
+            label: null,
+            system: false,
+            protected: false,
+            permissions: [],
+            memberCount: 2,
+          },
+        ],
+        activeRoleName: 'editors',
+      })
+      await wrapper.vm.$nextTick()
+
+      await at(wrapper, 'role-delete').trigger('click')
+
+      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: { groupId: 'group-1', name: 'editors', reassignTo: 'usual' },
+        }),
+      )
+      delete window.confirm
+    })
+
+    it('resets the roles to the network template after asking', async () => {
+      window.confirm = jest.fn().mockReturnValue(true)
+      mocks.$apollo.mutate = jest.fn().mockResolvedValue({
+        data: { resetGroupRoles: ROLES },
+      })
+      const wrapper = await Wrapper()
+
+      await at(wrapper, 'reset').trigger('click')
+      await wrapper.vm.$nextTick()
+
+      expect(window.confirm).toHaveBeenCalled()
+      expect(mocks.$apollo.mutate).toHaveBeenCalled()
+      delete window.confirm
+    })
+
+    it('does not reset when the question is declined', async () => {
+      window.confirm = jest.fn().mockReturnValue(false)
+      const wrapper = await Wrapper()
+
+      await at(wrapper, 'reset').trigger('click')
+
+      expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+      delete window.confirm
+    })
+
+    it('toasts a save error', async () => {
+      mocks.$apollo.mutate = jest.fn().mockRejectedValue({ message: 'refused' })
+      const wrapper = await advanced()
+
+      at(wrapper, 'perm-group.comment.create').element.checked = true
+      await at(wrapper, 'perm-group.comment.create').trigger('change')
+      await at(wrapper, 'save').trigger('click')
+      await wrapper.vm.$nextTick()
+
+      expect(mocks.$toast.error).toHaveBeenCalledWith('refused')
+    })
+  })
 })

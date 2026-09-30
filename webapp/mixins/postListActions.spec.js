@@ -131,4 +131,47 @@ describe('postListActions mixin', () => {
       expect(error).toHaveBeenCalledWith('observe-fail')
     })
   })
+
+  // Taking a post out of a group asks first: the post keeps existing, but putting it back
+  // would mean its author posting it again.
+  describe('removePostFromGroup', () => {
+    const post = { id: 'p1', group: { id: 'g1', name: 'Yoga' } }
+
+    afterEach(() => {
+      delete window.confirm
+    })
+
+    it('does nothing when the confirmation is declined', async () => {
+      window.confirm = jest.fn().mockReturnValue(false)
+      const { vm, mutate } = makeVm()
+
+      await vm.removePostFromGroup(post)
+
+      expect(window.confirm).toHaveBeenCalled()
+      expect(mutate).not.toHaveBeenCalled()
+    })
+
+    it('removes the post and refetches the list', async () => {
+      window.confirm = jest.fn().mockReturnValue(true)
+      const { vm, mutate, success } = makeVm()
+      const refetch = jest.fn()
+
+      await vm.removePostFromGroup(post, refetch)
+
+      expect(mutate).toHaveBeenCalledWith(
+        expect.objectContaining({ variables: { groupId: 'g1', postId: 'p1' } }),
+      )
+      expect(success).toHaveBeenCalledWith('post.menu.removedFromGroupSuccessfully')
+      expect(refetch).toHaveBeenCalled()
+    })
+
+    it('toasts the server error', async () => {
+      window.confirm = jest.fn().mockReturnValue(true)
+      const { vm, error } = makeVm({ mutate: jest.fn().mockRejectedValue({ message: 'Nope' }) })
+
+      await vm.removePostFromGroup(post)
+
+      expect(error).toHaveBeenCalledWith('Nope')
+    })
+  })
 })

@@ -77,8 +77,10 @@ export default {
      */
     removePostFromGroup(post, refetchPostList = () => {}) {
       if (!window.confirm(this.$t('post.menu.removeFromGroupConfirm', { group: post.group?.name })))
-        return
-      this.$apollo
+        return undefined
+      // Returns the chain, unlike its older siblings here: a caller that wants to wait for the
+      // list to settle can, and a test can await the error path instead of flushing timers.
+      return this.$apollo
         .mutate({
           mutation: removePostFromGroupMutation(),
           variables: { groupId: post.group.id, postId: post.id },
