@@ -26,9 +26,11 @@ const MEMBER_BASELINE: GroupPermissionKey[] = [
   'group.post.create',
   'group.comment.create',
   'group.leave',
-  // DEVIATION (security fix): CreateGroupRoom / CreateMessage / joinGroupVideoCall are
-  // gated by `isAuthenticated` alone today, i.e. not bound to membership at all. Chat and
-  // calls become members-only, which is what everyone already assumes they are.
+  // Chat and calls ARE members-only today — but the check lives in three different places:
+  // CreateGroupRoom filters on `membership.role IN [...]` in its own Cypher,
+  // joinGroupVideoCall throws from getGroupMembershipType, and CreateMessage relies on the
+  // CHATS_IN edge that only active members get. Here they become one right, checked in the
+  // one place the shield looks.
   'group.chat.participate',
   'group.videoCall.join',
   // Capped by the network's videoCall.create_<type>, whose default only covers public
