@@ -32,6 +32,7 @@ import { createNode, findNode } from '@db/testing/create'
 import { generateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { isUniqueFor } from '@middleware/sluggifyMiddleware'
 import uniqueSlug, { toSlug } from '@middleware/slugify/uniqueSlug'
+import { seedRolesForNewGroup } from '@src/groupRole/repository'
 import { seedDefaultRoleNodes } from '@src/role'
 
 import { getDriver } from './neo4j'
@@ -442,6 +443,12 @@ Factory.define('group')
           `,
           { ownerId: owner.get('id'), groupId: buildObject.id },
         ),
+      )
+      // The group's role definitions, in the same transaction — a factory-built group has to
+      // be as usable as one created through the API, or every spec that builds a group would
+      // get a group whose members hold no rights at all.
+      await session.writeTransaction(async (txc) =>
+        seedRolesForNewGroup(txc, buildObject.id, buildObject.groupType, new Date().toISOString()),
       )
     } finally {
       await session.close()

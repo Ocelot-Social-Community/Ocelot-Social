@@ -15,6 +15,7 @@ export {
 } from './defaults'
 export { permissionsForGroupRole, effectiveGroupPermissions, authoritySourceFor } from './effective'
 export type { EffectiveGroupPermissionsInput } from './effective'
+export { seedGroupRoleTemplates } from './seedTemplates'
 export {
   dominatesInGroup,
   coversRole,

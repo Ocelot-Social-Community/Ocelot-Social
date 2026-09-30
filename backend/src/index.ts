@@ -2,8 +2,10 @@
 import './branding/bootstrap'
 
 import CONFIG from './config'
+import { serverDatabase } from './context'
 import pubsubContext from './context/pubsub'
 import { closeDriver } from './db/neo4j'
+import { seedGroupRoleTemplates } from './groupRole'
 import { loggerPlugin } from './plugins/apolloLogger'
 import { getPolicyService } from './policy'
 import createProxy from './proxy'
@@ -26,6 +28,10 @@ async function main() {
   // roles.changed for cross-instance cache sync. Also must complete before the
   // server accepts requests, since authorization resolves against the cache.
   await getRoleService().init(pubsub as unknown as RolePubSub)
+
+  // Ensure the group role templates exist. Not only in the migration: a fresh install has no
+  // history to replay, and db:reset wipes them. ON CREATE, so an edited template survives.
+  await seedGroupRoleTemplates(serverDatabase)
 
   const { server, httpServer } = await createServer({
     plugins: [loggerPlugin],

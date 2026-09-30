@@ -6,6 +6,9 @@ import type { GroupRoleDefinition } from '@src/groupRole'
 export const description =
   'Give every group its own role definitions. Seeds the network-wide (:GroupRoleTemplate) defaults per group type and copies them into a (:GroupRole) set per existing group, hanging off (:Group)-[:HAS_GROUP_ROLE]->(:GroupRole). The default sets are an audit of the shield guards they replace, so behaviour does not change; the one per-group detail carried over is `showMembers`, which for a closed group becomes group.members.read on its non-member role. Idempotent: every write is ON CREATE, so a re-run adds what is missing and touches nothing that exists.'
 
+// Paged so a network with many groups does not build one huge result set. toInteger() in the
+// statement rather than a driver Integer here: the driver sends a JS number as a float, and
+// Neo4j rejects `SKIP 500.0` — a lesson from the CI run that caught it.
 const BATCH_SIZE = 500
 
 // Serialised exactly as the repository does, so a role written here and a role written by
@@ -59,7 +62,7 @@ export async function up(_next) {
           `MATCH (g:Group)
            RETURN g.id AS id, g.groupType AS groupType, coalesce(g.showMembers, false) AS showMembers
            ORDER BY g.id ASC
-           SKIP $offset LIMIT $limit`,
+           SKIP toInteger($offset) LIMIT toInteger($limit)`,
           { offset: skip, limit: BATCH_SIZE },
         )
         return result.records.map((record) => ({

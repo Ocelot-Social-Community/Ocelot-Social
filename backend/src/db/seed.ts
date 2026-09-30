@@ -19,6 +19,7 @@ import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { seedGroupRoleTemplates } from '@src/groupRole'
 import { ensureUserRoleEdges, seedDefaultRoleNodes } from '@src/role'
 
 import Factory from './factories'
@@ -67,6 +68,10 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     // peterLustig can be created directly as owner. This script runs as a CLI without
     // RoleService.init(), so nothing else seeds the role nodes.
     await seedDefaultRoleNodes(database)
+
+    // Same reasoning for the group role templates: this CLI never runs the boot path, and the
+    // groups created below copy their roles from the template for their type.
+    await seedGroupRoleTemplates(database)
 
     // eslint-disable-next-line no-console
     console.log('seed', 'locations')
