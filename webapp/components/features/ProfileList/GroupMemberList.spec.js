@@ -349,7 +349,9 @@ describe('GroupMemberList.vue', () => {
 
       mockApollo.query.mockResolvedValueOnce({
         data: {
-          User: [{ id: 'user-1', groups: [{ id: 'g2', groupType: 'public', ...groupRights('usual') }] }],
+          User: [
+            { id: 'user-1', groups: [{ id: 'g2', groupType: 'public', ...groupRights('usual') }] },
+          ],
         },
       })
       await wrapper.vm.loadGroups(0)
@@ -366,7 +368,9 @@ describe('GroupMemberList.vue', () => {
       wrapper.setData({ groups: [{ id: 'g1', groupType: 'public', ...groupRights('usual') }] })
       mockApollo.query.mockResolvedValueOnce({
         data: {
-          User: [{ id: 'user-1', groups: [{ id: 'g2', groupType: 'public', ...groupRights('usual') }] }],
+          User: [
+            { id: 'user-1', groups: [{ id: 'g2', groupType: 'public', ...groupRights('usual') }] },
+          ],
         },
       })
       await wrapper.vm.loadGroups(1)

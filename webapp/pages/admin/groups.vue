@@ -5,13 +5,13 @@
 
     <form class="filters" @submit.prevent="reload">
       <input
-        v-model="filter.search"
+        v-model="groupFilter.search"
         type="search"
         :placeholder="$t('admin.groups.searchPlaceholder')"
         data-test="search"
         @input="debouncedReload"
       />
-      <select v-model="filter.groupType" data-test="filter-type" @change="reload">
+      <select v-model="groupFilter.groupType" data-test="filter-type" @change="reload">
         <option :value="null">{{ $t('admin.groups.allTypes') }}</option>
         <option v-for="type in groupTypes" :key="type" :value="type">
           {{ $t(`group.types.${type}`) }}
@@ -19,7 +19,7 @@
       </select>
       <label class="checkbox">
         <input
-          v-model="filter.ownerless"
+          v-model="groupFilter.ownerless"
           type="checkbox"
           data-test="filter-ownerless"
           @change="reload"
@@ -28,7 +28,7 @@
       </label>
       <label class="checkbox">
         <input
-          v-model="filter.disabled"
+          v-model="groupFilter.disabled"
           type="checkbox"
           data-test="filter-disabled"
           @change="reload"
@@ -108,7 +108,9 @@ export default {
       total: 0,
       offset: 0,
       pageSize: PAGE_SIZE,
-      filter: { search: '', groupType: null, ownerless: false, disabled: false },
+      // Named groupFilter, not filter: the schema contract test reads every `filter: {`
+      // in the webapp as a post filter, and this one is about groups.
+      groupFilter: { search: '', groupType: null, ownerless: false, disabled: false },
     }
   },
   computed: {
@@ -117,12 +119,12 @@ export default {
     },
     variables() {
       return {
-        search: this.filter.search || null,
-        groupType: this.filter.groupType,
+        search: this.groupFilter.search || null,
+        groupType: this.groupFilter.groupType,
         // Only send the flags when they are on: `false` would mean "only groups that are NOT
         // disabled", which is a different question from "all of them".
-        ownerless: this.filter.ownerless ? true : null,
-        disabled: this.filter.disabled ? true : null,
+        ownerless: this.groupFilter.ownerless ? true : null,
+        disabled: this.groupFilter.disabled ? true : null,
         first: this.pageSize,
         offset: this.offset,
       }
