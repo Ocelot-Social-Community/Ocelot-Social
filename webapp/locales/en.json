@@ -220,6 +220,40 @@
       "showDonationsCheckboxLabel": "Show donations progress bar",
       "successfulUpdate": "Donations info updated successfully!"
     },
+    "groupRoles": {
+      "applied": "{count} groups updated",
+      "apply": "Apply to untouched groups",
+      "confirmApply": "Apply the templates to {count} groups that never customised their roles? Customised groups are left alone.",
+      "description": "Every newly created group starts from these templates. Existing groups are not changed by an edit here — that is what the button below is for.",
+      "name": "Group roles",
+      "ownerHoldsEverything": "The owner role always holds every right and cannot be edited.",
+      "saved": "Template saved",
+      "title": "Default roles for groups",
+      "untouched": "{count} groups still run on this template untouched."
+    },
+    "groups": {
+      "active": "active",
+      "allTypes": "All types",
+      "columns": {
+        "members": "Members",
+        "name": "Group",
+        "owners": "Owners",
+        "state": "State",
+        "type": "Type"
+      },
+      "count": "{shown} of {total}",
+      "description": "Every group you may administer — including the hidden ones, which appear in no other listing. Groups left without an owner are one filter away.",
+      "disabled": "disabled",
+      "disabledOnly": "disabled only",
+      "empty": "No group matches these filters.",
+      "name": "Groups",
+      "next": "Next",
+      "noOwner": "no owner",
+      "ownerlessOnly": "without an owner only",
+      "previous": "Previous",
+      "searchPlaceholder": "name or slug",
+      "title": "Manage groups"
+    },
     "hashtags": {
       "name": "Hashtags",
       "nameOfHashtag": "Name",
@@ -413,40 +447,6 @@
           "status": "Status"
         }
       }
-    },
-    "groups": {
-      "name": "Groups",
-      "title": "Manage groups",
-      "description": "Every group you may administer — including the hidden ones, which appear in no other listing. Groups left without an owner are one filter away.",
-      "searchPlaceholder": "name or slug",
-      "allTypes": "All types",
-      "ownerlessOnly": "without an owner only",
-      "disabledOnly": "disabled only",
-      "empty": "No group matches these filters.",
-      "noOwner": "no owner",
-      "disabled": "disabled",
-      "active": "active",
-      "previous": "Previous",
-      "next": "Next",
-      "count": "{shown} of {total}",
-      "columns": {
-        "name": "Group",
-        "type": "Type",
-        "members": "Members",
-        "owners": "Owners",
-        "state": "State"
-      }
-    },
-    "groupRoles": {
-      "name": "Group roles",
-      "title": "Default roles for groups",
-      "description": "Every newly created group starts from these templates. Existing groups are not changed by an edit here — that is what the button below is for.",
-      "untouched": "{count} groups still run on this template untouched.",
-      "apply": "Apply to untouched groups",
-      "confirmApply": "Apply the templates to {count} groups that never customised their roles? Customised groups are left alone.",
-      "applied": "{count} groups updated",
-      "saved": "Template saved",
-      "ownerHoldsEverything": "The owner role always holds every right and cannot be edited."
     }
   },
   "chat": {
@@ -974,14 +974,54 @@
     "removeMemberButton": "Remove",
     "removeMemberConfirmText": "Remove user \"{name}\" from the group?",
     "removeMemberTitle": "Remove Member",
+    "rights": {
+      "addRole": "Add a role",
+      "blockedByFeature": "That feature is switched off for this network ({feature}).",
+      "blockedByNetwork": "Capped network-wide: this needs the {permission} permission.",
+      "confirmDelete": "Delete the role \"{role}\"? Its members become \"{target}\".",
+      "confirmReset": "Reset every role of this group to the defaults? Roles you added are removed and their members become ordinary members.",
+      "deleteRole": "Delete role",
+      "description": "Decide who may do what in this group — from outsiders to administrators.",
+      "groups": {
+        "administration": "Administration",
+        "communication": "Communication",
+        "content": "Content",
+        "membership": "Membership",
+        "visibility": "Visibility"
+      },
+      "labelField": "Display name",
+      "members": "{count} members",
+      "noRight": "You cannot grant a right you do not hold yourself.",
+      "ownerHoldsEverything": "The owner role always holds every right in this group. Only its display name can be changed.",
+      "presets": {
+        "channel": "Turn into a channel (only admins write)"
+      },
+      "reset": "Reset to defaults",
+      "roleKeyPlaceholder": "key, e.g. editors",
+      "roleLabelPlaceholder": "display name, e.g. Editors",
+      "saved": "Rights saved",
+      "simple": {
+        "applicants-read": "Waiting applicants may read the posts",
+        "members-chat": "Members may write in the group chat",
+        "members-comment": "Members may comment",
+        "members-invite": "Members may invite others",
+        "members-post": "Members may write posts",
+        "nonmembers-members": "Outsiders may see the member list",
+        "nonmembers-read": "Outsiders may read the posts"
+      },
+      "systemRole": "System role: cannot be deleted or renamed",
+      "title": "Rights",
+      "toAdvanced": "Advanced: every right in detail",
+      "toSimple": "Back to the simple view"
+    },
     "role": "Your role in the group",
     "roles": {
       "admin": "Administrator",
       "members": "Members",
+      "none": "Not a member",
       "owner": "Owner",
       "pending": "Pending Member",
-      "usual": "Member",
-      "none": "Not a member"
+      "usual": "Member"
     },
     "save": "Create new group",
     "showMembers": "Member list visible to everyone",
@@ -1012,46 +1052,6 @@
       "nameNotEmpty": "Please enter a group name.",
       "slugInvalidCharacters": "Only lowercase letters, digits, hyphens and underscores are allowed.",
       "slugNotEmpty": "Please enter a unique group name."
-    },
-    "rights": {
-      "title": "Rights",
-      "description": "Decide who may do what in this group — from outsiders to administrators.",
-      "saved": "Rights saved",
-      "reset": "Reset to defaults",
-      "confirmReset": "Reset every role of this group to the defaults? Roles you added are removed and their members become ordinary members.",
-      "toAdvanced": "Advanced: every right in detail",
-      "toSimple": "Back to the simple view",
-      "systemRole": "System role: cannot be deleted or renamed",
-      "addRole": "Add a role",
-      "deleteRole": "Delete role",
-      "confirmDelete": "Delete the role \"{role}\"? Its members become \"{target}\".",
-      "roleKeyPlaceholder": "key, e.g. editors",
-      "roleLabelPlaceholder": "display name, e.g. Editors",
-      "labelField": "Display name",
-      "members": "{count} members",
-      "ownerHoldsEverything": "The owner role always holds every right in this group. Only its display name can be changed.",
-      "noRight": "You cannot grant a right you do not hold yourself.",
-      "blockedByNetwork": "Capped network-wide: this needs the {permission} permission.",
-      "blockedByFeature": "That feature is switched off for this network ({feature}).",
-      "presets": {
-        "channel": "Turn into a channel (only admins write)"
-      },
-      "groups": {
-        "visibility": "Visibility",
-        "content": "Content",
-        "membership": "Membership",
-        "administration": "Administration",
-        "communication": "Communication"
-      },
-      "simple": {
-        "members-post": "Members may write posts",
-        "members-comment": "Members may comment",
-        "members-chat": "Members may write in the group chat",
-        "members-invite": "Members may invite others",
-        "applicants-read": "Waiting applicants may read the posts",
-        "nonmembers-read": "Outsiders may read the posts",
-        "nonmembers-members": "Outsiders may see the member list"
-      }
     }
   },
   "hashtags-filter": {
@@ -1280,10 +1280,10 @@
       "mentioned_in_post": "Mentioned you in a post",
       "on_date": "on",
       "post_in_group": "Posted in a group",
+      "post_removed_from_group": "Removed your post from the group",
       "removed_user_from_group": "Removed you from group",
       "user_joined_group": "Joined your group",
-      "user_left_group": "Left your group",
-      "post_removed_from_group": "Removed your post from the group"
+      "user_left_group": "Left your group"
     },
     "title": "Notifications",
     "user": "User"
@@ -1337,15 +1337,15 @@
       "push": "Push to top",
       "pushed": "Pushed to top",
       "pushedSuccessfully": "Post pushed to top successfully!",
+      "removedFromGroupSuccessfully": "Post removed from the group",
+      "removeFromGroup": "Remove from group",
+      "removeFromGroupConfirm": "Remove this post from the group \"{group}\"? The post stays with its author but loses its place in the group.",
       "unobserve": "Stop to observe post",
       "unobservedSuccessfully": "You are no longer observing this post!",
       "unpin": "Unpin post (Network)",
       "unpinnedSuccessfully": "Post unpinned successfully!",
       "unpush": "Cancel push",
-      "unpushedSuccessfully": "Post push has been canceled!",
-      "removeFromGroup": "Remove from group",
-      "removeFromGroupConfirm": "Remove this post from the group \"{group}\"? The post stays with its author but loses its place in the group.",
-      "removedFromGroupSuccessfully": "Post removed from the group"
+      "unpushedSuccessfully": "Post push has been canceled!"
     },
     "pinned": "Announcement",
     "sensitiveContent": {

@@ -220,6 +220,40 @@
       "showDonationsCheckboxLabel": "Spendenfortschritt anzeigen",
       "successfulUpdate": "Spenden-Info erfolgreich aktualisiert!"
     },
+    "groupRoles": {
+      "applied": "{count} Gruppen aktualisiert",
+      "apply": "Auf unveraenderte Gruppen anwenden",
+      "confirmApply": "Vorlagen auf {count} Gruppen anwenden, die ihre Rollen nie angepasst haben? Angepasste Gruppen bleiben unberuehrt.",
+      "description": "Diese Vorlagen bekommt jede neu angelegte Gruppe. Bestehende Gruppen aendern sich dadurch nicht — dafuer gibt es die Schaltflaeche unten.",
+      "name": "Gruppen-Rollen",
+      "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte und ist nicht bearbeitbar.",
+      "saved": "Vorlage gespeichert",
+      "title": "Standard-Rollen fuer Gruppen",
+      "untouched": "{count} Gruppen laufen noch unveraendert auf dieser Vorlage."
+    },
+    "groups": {
+      "active": "aktiv",
+      "allTypes": "Alle Typen",
+      "columns": {
+        "members": "Mitglieder",
+        "name": "Gruppe",
+        "owners": "Inhaber",
+        "state": "Status",
+        "type": "Typ"
+      },
+      "count": "{shown} von {total}",
+      "description": "Alle Gruppen, die du verwalten darfst — auch die geheimen, die es sonst nirgends in einer Liste gibt. Gruppen ohne Inhaber findest du hier ueber den Filter.",
+      "disabled": "deaktiviert",
+      "disabledOnly": "nur deaktivierte",
+      "empty": "Keine Gruppe passt zu diesen Filtern.",
+      "name": "Gruppen",
+      "next": "Weiter",
+      "noOwner": "kein Inhaber",
+      "ownerlessOnly": "nur ohne Inhaber",
+      "previous": "Zurueck",
+      "searchPlaceholder": "Name oder Kurzname",
+      "title": "Gruppen verwalten"
+    },
     "hashtags": {
       "name": "Hashtags",
       "nameOfHashtag": "Name",
@@ -413,40 +447,6 @@
           "status": "Status"
         }
       }
-    },
-    "groups": {
-      "name": "Gruppen",
-      "title": "Gruppen verwalten",
-      "description": "Alle Gruppen, die du verwalten darfst — auch die geheimen, die es sonst nirgends in einer Liste gibt. Gruppen ohne Inhaber findest du hier ueber den Filter.",
-      "searchPlaceholder": "Name oder Kurzname",
-      "allTypes": "Alle Typen",
-      "ownerlessOnly": "nur ohne Inhaber",
-      "disabledOnly": "nur deaktivierte",
-      "empty": "Keine Gruppe passt zu diesen Filtern.",
-      "noOwner": "kein Inhaber",
-      "disabled": "deaktiviert",
-      "active": "aktiv",
-      "previous": "Zurueck",
-      "next": "Weiter",
-      "count": "{shown} von {total}",
-      "columns": {
-        "name": "Gruppe",
-        "type": "Typ",
-        "members": "Mitglieder",
-        "owners": "Inhaber",
-        "state": "Status"
-      }
-    },
-    "groupRoles": {
-      "name": "Gruppen-Rollen",
-      "title": "Standard-Rollen fuer Gruppen",
-      "description": "Diese Vorlagen bekommt jede neu angelegte Gruppe. Bestehende Gruppen aendern sich dadurch nicht — dafuer gibt es die Schaltflaeche unten.",
-      "untouched": "{count} Gruppen laufen noch unveraendert auf dieser Vorlage.",
-      "apply": "Auf unveraenderte Gruppen anwenden",
-      "confirmApply": "Vorlagen auf {count} Gruppen anwenden, die ihre Rollen nie angepasst haben? Angepasste Gruppen bleiben unberuehrt.",
-      "applied": "{count} Gruppen aktualisiert",
-      "saved": "Vorlage gespeichert",
-      "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte und ist nicht bearbeitbar."
     }
   },
   "chat": {
@@ -974,14 +974,54 @@
     "removeMemberButton": "Entfernen",
     "removeMemberConfirmText": "Nutzer \"{name}\" aus der Gruppe entfernen?",
     "removeMemberTitle": "Mitglied entfernen",
+    "rights": {
+      "addRole": "Rolle hinzufuegen",
+      "blockedByFeature": "Diese Funktion ist im Netzwerk abgeschaltet ({feature}).",
+      "blockedByNetwork": "Netzwerkweit gesperrt: dafuer fehlt das Recht {permission}.",
+      "confirmDelete": "Rolle \"{role}\" loeschen? Ihre Mitglieder werden zu \"{target}\".",
+      "confirmReset": "Alle Rollen dieser Gruppe auf den Standard zuruecksetzen? Selbst angelegte Rollen werden dabei entfernt, ihre Mitglieder werden gewoehnliche Mitglieder.",
+      "deleteRole": "Rolle loeschen",
+      "description": "Hier legt ihr fest, was in dieser Gruppe wer darf — von Aussenstehenden bis zu den Administratoren.",
+      "groups": {
+        "administration": "Verwaltung",
+        "communication": "Austausch",
+        "content": "Inhalte",
+        "membership": "Mitgliedschaft",
+        "visibility": "Sichtbarkeit"
+      },
+      "labelField": "Anzeigename",
+      "members": "{count} Mitglieder",
+      "noRight": "Dieses Recht kannst du nicht vergeben, weil du es selbst nicht hast.",
+      "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte dieser Gruppe. Nur ihr Anzeigename laesst sich aendern.",
+      "presets": {
+        "channel": "Als Kanal einrichten (nur Admins schreiben)"
+      },
+      "reset": "Auf Standard zuruecksetzen",
+      "roleKeyPlaceholder": "Schluessel, z. B. redaktion",
+      "roleLabelPlaceholder": "Anzeigename, z. B. Redaktion",
+      "saved": "Rechte gespeichert",
+      "simple": {
+        "applicants-read": "Wartende Bewerber duerfen die Beitraege lesen",
+        "members-chat": "Mitglieder duerfen im Gruppen-Chat schreiben",
+        "members-comment": "Mitglieder duerfen kommentieren",
+        "members-invite": "Mitglieder duerfen andere einladen",
+        "members-post": "Mitglieder duerfen Beitraege schreiben",
+        "nonmembers-members": "Aussenstehende duerfen die Mitgliederliste sehen",
+        "nonmembers-read": "Aussenstehende duerfen die Beitraege lesen"
+      },
+      "systemRole": "Systemrolle: kann nicht geloescht oder umbenannt werden",
+      "title": "Rechte",
+      "toAdvanced": "Erweitert: alle Rechte im Detail",
+      "toSimple": "Zurueck zur einfachen Ansicht"
+    },
     "role": "Deine Rolle in der Gruppe",
     "roles": {
       "admin": "Administrator",
       "members": "Mitglieder",
+      "none": "Kein Mitglied",
       "owner": "Inhaber",
       "pending": "Ausstehendes Mitglied",
-      "usual": "Mitglied",
-      "none": "Kein Mitglied"
+      "usual": "Mitglied"
     },
     "save": "Neue Gruppe anlegen",
     "showMembers": "Mitgliederliste für alle sichtbar",
@@ -1012,46 +1052,6 @@
       "nameNotEmpty": "Bitte einen Gruppennamen eingeben.",
       "slugInvalidCharacters": "Nur Kleinbuchstaben, Ziffern, Bindestriche und Unterstriche sind erlaubt.",
       "slugNotEmpty": "Bitte einen eindeutigen Gruppennamen eingeben."
-    },
-    "rights": {
-      "title": "Rechte",
-      "description": "Hier legt ihr fest, was in dieser Gruppe wer darf — von Aussenstehenden bis zu den Administratoren.",
-      "saved": "Rechte gespeichert",
-      "reset": "Auf Standard zuruecksetzen",
-      "confirmReset": "Alle Rollen dieser Gruppe auf den Standard zuruecksetzen? Selbst angelegte Rollen werden dabei entfernt, ihre Mitglieder werden gewoehnliche Mitglieder.",
-      "toAdvanced": "Erweitert: alle Rechte im Detail",
-      "toSimple": "Zurueck zur einfachen Ansicht",
-      "systemRole": "Systemrolle: kann nicht geloescht oder umbenannt werden",
-      "addRole": "Rolle hinzufuegen",
-      "deleteRole": "Rolle loeschen",
-      "confirmDelete": "Rolle \"{role}\" loeschen? Ihre Mitglieder werden zu \"{target}\".",
-      "roleKeyPlaceholder": "Schluessel, z. B. redaktion",
-      "roleLabelPlaceholder": "Anzeigename, z. B. Redaktion",
-      "labelField": "Anzeigename",
-      "members": "{count} Mitglieder",
-      "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte dieser Gruppe. Nur ihr Anzeigename laesst sich aendern.",
-      "noRight": "Dieses Recht kannst du nicht vergeben, weil du es selbst nicht hast.",
-      "blockedByNetwork": "Netzwerkweit gesperrt: dafuer fehlt das Recht {permission}.",
-      "blockedByFeature": "Diese Funktion ist im Netzwerk abgeschaltet ({feature}).",
-      "presets": {
-        "channel": "Als Kanal einrichten (nur Admins schreiben)"
-      },
-      "groups": {
-        "visibility": "Sichtbarkeit",
-        "content": "Inhalte",
-        "membership": "Mitgliedschaft",
-        "administration": "Verwaltung",
-        "communication": "Austausch"
-      },
-      "simple": {
-        "members-post": "Mitglieder duerfen Beitraege schreiben",
-        "members-comment": "Mitglieder duerfen kommentieren",
-        "members-chat": "Mitglieder duerfen im Gruppen-Chat schreiben",
-        "members-invite": "Mitglieder duerfen andere einladen",
-        "applicants-read": "Wartende Bewerber duerfen die Beitraege lesen",
-        "nonmembers-read": "Aussenstehende duerfen die Beitraege lesen",
-        "nonmembers-members": "Aussenstehende duerfen die Mitgliederliste sehen"
-      }
     }
   },
   "hashtags-filter": {
@@ -1280,10 +1280,10 @@
       "mentioned_in_post": "Hat dich in einem Beitrag erwähnt",
       "on_date": "am",
       "post_in_group": "Hat einen Beitrag in der Gruppe geschrieben",
+      "post_removed_from_group": "Hat deinen Beitrag aus der Gruppe entfernt",
       "removed_user_from_group": "Hat dich aus der Gruppe entfernt",
       "user_joined_group": "Ist deiner Gruppe beigetreten",
-      "user_left_group": "Hat deine Gruppe verlassen",
-      "post_removed_from_group": "Hat deinen Beitrag aus der Gruppe entfernt"
+      "user_left_group": "Hat deine Gruppe verlassen"
     },
     "title": "Benachrichtigungen",
     "user": "Nutzer"
@@ -1337,15 +1337,15 @@
       "push": "Beitrag hochschieben",
       "pushed": "Nach oben geschoben",
       "pushedSuccessfully": "Beitrag erfolgreich nach oben geschoben!",
+      "removedFromGroupSuccessfully": "Beitrag aus der Gruppe entfernt",
+      "removeFromGroup": "Aus der Gruppe entfernen",
+      "removeFromGroupConfirm": "Diesen Beitrag aus der Gruppe \"{group}\" entfernen? Der Beitrag bleibt bei seinem Autor, verliert aber seinen Platz in der Gruppe.",
       "unobserve": "Beitrag nicht mehr beobachten",
       "unobservedSuccessfully": "Du beobachtest diesen Beitrag nicht mehr!",
       "unpin": "Beitrag loslösen (Netzwerk)",
       "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!",
       "unpush": "Beitrag hochschieben aufheben",
-      "unpushedSuccessfully": "Hochschieben des Beitrags erfolgreich rückgängig gemacht!",
-      "removeFromGroup": "Aus der Gruppe entfernen",
-      "removeFromGroupConfirm": "Diesen Beitrag aus der Gruppe \"{group}\" entfernen? Der Beitrag bleibt bei seinem Autor, verliert aber seinen Platz in der Gruppe.",
-      "removedFromGroupSuccessfully": "Beitrag aus der Gruppe entfernt"
+      "unpushedSuccessfully": "Hochschieben des Beitrags erfolgreich rückgängig gemacht!"
     },
     "pinned": "Meldung",
     "sensitiveContent": {
