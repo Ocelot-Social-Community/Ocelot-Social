@@ -450,25 +450,25 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .title {
   margin-bottom: 0;
 }
 .description {
-  color: $text-color-soft;
-  margin-bottom: $space-base;
+  color: var(--text-color-soft);
+  margin-bottom: var(--space-base);
 }
 .switches {
   list-style: none;
   padding: 0;
-  margin: 0 0 $space-base;
+  margin: 0 0 var(--space-base);
 }
 .switch {
-  padding: $space-xx-small 0;
+  padding: var(--space-xx-small) 0;
 
   label {
     display: flex;
-    gap: $space-x-small;
+    gap: var(--space-x-small);
     align-items: baseline;
     cursor: pointer;
   }
@@ -480,76 +480,76 @@ export default {
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: $space-small;
+  gap: var(--space-small);
   align-items: center;
-  margin-top: $space-base;
+  margin-top: var(--space-base);
 }
 .link {
   background: none;
   border: none;
   padding: 0;
-  color: $text-color-link;
+  color: var(--color-primary);
   cursor: pointer;
   text-decoration: underline;
 }
 .role-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: $space-xx-small;
-  margin-bottom: $space-small;
+  gap: var(--space-xx-small);
+  margin-bottom: var(--space-small);
 }
 .role-tab {
-  border: $border-size-base solid $border-color-softer;
-  border-radius: $border-radius-base;
-  background: $background-color-softest;
-  padding: $space-xx-small $space-x-small;
+  border: 1px solid var(--border-color-softer);
+  border-radius: var(--border-radius-base);
+  background: var(--background-color-softest);
+  padding: var(--space-xx-small) var(--space-x-small);
   cursor: pointer;
 }
 .role-tab--active {
-  border-color: $color-primary;
+  border-color: var(--color-primary);
   font-weight: bold;
 }
 .role-tab__badge {
-  color: $text-color-soft;
+  color: var(--text-color-soft);
 }
 .role-create {
   display: flex;
   flex-wrap: wrap;
-  gap: $space-x-small;
-  margin-bottom: $space-small;
+  gap: var(--space-x-small);
+  margin-bottom: var(--space-small);
 }
 .role-header {
   display: flex;
   flex-wrap: wrap;
-  gap: $space-small;
+  gap: var(--space-small);
   justify-content: space-between;
   align-items: baseline;
 }
 .role-members {
-  color: $text-color-soft;
+  color: var(--text-color-soft);
 }
 .role-note {
-  color: $text-color-soft;
+  color: var(--text-color-soft);
 }
 .perm-groups {
   display: grid;
-  gap: $space-small;
+  gap: var(--space-small);
 
   @media (min-width: 1024px) {
     grid-template-columns: 1fr 1fr;
   }
 }
 .perm-group {
-  border: $border-size-base solid $border-color-softer;
-  border-radius: $border-radius-base;
-  padding: $space-x-small;
+  border: 1px solid var(--border-color-softer);
+  border-radius: var(--border-radius-base);
+  padding: var(--space-x-small);
 }
 .perm-row {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: $space-xx-small $space-x-small;
+  gap: var(--space-xx-small) var(--space-x-small);
   align-items: baseline;
-  padding: $space-xxx-small 0;
+  padding: var(--space-xxx-small) 0;
   cursor: pointer;
 }
 .perm-row--blocked {
@@ -559,11 +559,11 @@ export default {
 .perm-row__key {
   grid-column: 2;
   font-family: monospace;
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 .perm-row__description {
   grid-column: 2;
-  color: $text-color-soft;
-  font-size: $font-size-small;
+  color: var(--text-color-soft);
+  font-size: var(--font-size-small);
 }
 </style>

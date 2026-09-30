@@ -167,40 +167,40 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .title {
   margin-bottom: 0;
 }
 .description {
-  color: $text-color-soft;
+  color: var(--text-color-soft);
 }
 .filters {
   display: flex;
   flex-wrap: wrap;
-  gap: $space-small;
+  gap: var(--space-small);
   align-items: center;
-  margin-bottom: $space-base;
+  margin-bottom: var(--space-base);
 }
 .checkbox {
   display: flex;
-  gap: $space-xx-small;
+  gap: var(--space-xx-small);
   align-items: center;
 }
 .slug {
-  color: $text-color-soft;
-  margin-left: $space-xx-small;
+  color: var(--text-color-soft);
+  margin-left: var(--space-xx-small);
 }
 .ownerless {
-  color: $text-color-danger;
+  color: var(--text-color-danger);
   font-weight: bold;
 }
 .empty {
-  color: $text-color-soft;
+  color: var(--text-color-soft);
 }
 .pager {
   display: flex;
-  gap: $space-small;
+  gap: var(--space-small);
   align-items: center;
-  margin-top: $space-base;
+  margin-top: var(--space-base);
 }
 </style>

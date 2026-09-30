@@ -214,70 +214,70 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .title {
   margin-bottom: 0;
 }
 .description,
 .untouched,
 .note {
-  color: $text-color-soft;
+  color: var(--text-color-soft);
 }
 .type-tabs,
 .role-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: $space-xx-small;
-  margin-bottom: $space-small;
+  gap: var(--space-xx-small);
+  margin-bottom: var(--space-small);
 }
 .type-tab,
 .role-tab {
-  border: $border-size-base solid $border-color-softer;
-  border-radius: $border-radius-base;
-  background: $background-color-softest;
-  padding: $space-xx-small $space-x-small;
+  border: 1px solid var(--border-color-softer);
+  border-radius: var(--border-radius-base);
+  background: var(--background-color-softest);
+  padding: var(--space-xx-small) var(--space-x-small);
   cursor: pointer;
 }
 .type-tab--active,
 .role-tab--active {
-  border-color: $color-primary;
+  border-color: var(--color-primary);
   font-weight: bold;
 }
 .perm-groups {
   display: grid;
-  gap: $space-small;
+  gap: var(--space-small);
 
   @media (min-width: 1024px) {
     grid-template-columns: 1fr 1fr;
   }
 }
 .perm-group {
-  border: $border-size-base solid $border-color-softer;
-  border-radius: $border-radius-base;
-  padding: $space-x-small;
+  border: 1px solid var(--border-color-softer);
+  border-radius: var(--border-radius-base);
+  padding: var(--space-x-small);
 }
 .perm-row {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: $space-xx-small $space-x-small;
+  gap: var(--space-xx-small) var(--space-x-small);
   align-items: baseline;
-  padding: $space-xxx-small 0;
+  padding: var(--space-xxx-small) 0;
   cursor: pointer;
 }
 .perm-row__key {
   grid-column: 2;
   font-family: monospace;
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 .perm-row__description {
   grid-column: 2;
-  color: $text-color-soft;
-  font-size: $font-size-small;
+  color: var(--text-color-soft);
+  font-size: var(--font-size-small);
 }
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: $space-small;
-  margin-top: $space-base;
+  gap: var(--space-small);
+  margin-top: var(--space-base);
 }
 </style>
