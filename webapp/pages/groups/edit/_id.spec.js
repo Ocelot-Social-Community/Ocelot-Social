@@ -48,12 +48,13 @@ describe('pages/groups/edit/_id.vue', () => {
   })
 
   describe('routes computed', () => {
-    it('builds general / members / invites routes for the active group', () => {
+    it('builds general / members / invites / rights routes for the active group', () => {
       const { wrapper } = factory({ id: 'g1', slug: 's', name: 'n' })
       expect(wrapper.vm.routes).toEqual([
         { name: 'group.general', path: '/groups/edit/g1' },
         { name: 'group.members', path: '/groups/edit/g1/members' },
         { name: 'group.invite-links', path: '/groups/edit/g1/invites' },
+        { name: 'group.rights.title', path: '/groups/edit/g1/rights' },
       ])
     })
 
@@ -65,6 +66,7 @@ describe('pages/groups/edit/_id.vue', () => {
         '/groups/edit/g9',
         '/groups/edit/g9/members',
         '/groups/edit/g9/invites',
+        '/groups/edit/g9/rights',
       ])
     })
   })
@@ -98,15 +100,19 @@ describe('pages/groups/edit/_id.vue', () => {
     }
 
     it('returns the loaded group when the current user owns it', async () => {
-      const ctx = buildContext({ group: { id: 'g1', myRole: 'owner', name: 'Mine' } })
+      const ctx = buildContext({
+        group: { id: 'g1', myGroupPermissions: ['group.settings.manage'], name: 'Mine' },
+      })
       const result = await EditId.asyncData(ctx)
       expect(ctx.query).toHaveBeenCalled()
-      expect(result).toEqual({ group: { id: 'g1', myRole: 'owner', name: 'Mine' } })
+      expect(result).toEqual({
+        group: { id: 'g1', myGroupPermissions: ['group.settings.manage'], name: 'Mine' },
+      })
       expect(ctx.errorFn).not.toHaveBeenCalled()
     })
 
     it('triggers error(403) when the current user is not the owner', async () => {
-      const ctx = buildContext({ group: { id: 'g1', myRole: 'usual' } })
+      const ctx = buildContext({ group: { id: 'g1', myGroupPermissions: [] } })
       await EditId.asyncData(ctx)
       expect(ctx.errorFn).toHaveBeenCalledWith({ statusCode: 403, message: 'NONONNNO' })
     })

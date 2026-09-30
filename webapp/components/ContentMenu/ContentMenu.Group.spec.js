@@ -2,6 +2,7 @@ import { mount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import VTooltip from 'v-tooltip'
 import ContentMenu from './ContentMenu.vue'
+import { groupRights } from '~/test/groupRightsFixture'
 
 const localVue = createLocalVue()
 
@@ -57,7 +58,7 @@ describe('ContentMenu.vue - Group', () => {
   }
 
   describe('as group owner', () => {
-    const myRole = 'owner'
+    const rights = groupRights('owner')
 
     describe('when maxGroupPinnedPosts = 0', () => {
       beforeEach(() => {
@@ -72,7 +73,7 @@ describe('ContentMenu.vue - Group', () => {
             id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
             groupPinned: false,
             group: {
-              myRole,
+              ...rights,
             },
           },
         })
@@ -89,7 +90,7 @@ describe('ContentMenu.vue - Group', () => {
             id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
             groupPinned: true,
             group: {
-              myRole,
+              ...rights,
             },
           },
         })
@@ -104,7 +105,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: true,
               group: {
-                myRole,
+                ...rights,
               },
             },
           ],
@@ -128,7 +129,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: false,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -144,7 +145,7 @@ describe('ContentMenu.vue - Group', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 groupPinned: false,
                 group: {
-                  myRole,
+                  ...rights,
                   currentlyPinnedPostsCount,
                 },
               },
@@ -160,7 +161,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: true,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -176,7 +177,7 @@ describe('ContentMenu.vue - Group', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 groupPinned: true,
                 group: {
-                  myRole,
+                  ...rights,
                   currentlyPinnedPostsCount,
                 },
               },
@@ -196,7 +197,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: false,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -212,7 +213,7 @@ describe('ContentMenu.vue - Group', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 groupPinned: false,
                 group: {
-                  myRole,
+                  ...rights,
                   currentlyPinnedPostsCount,
                 },
               },
@@ -228,7 +229,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: true,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -244,7 +245,7 @@ describe('ContentMenu.vue - Group', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 groupPinned: true,
                 group: {
-                  myRole,
+                  ...rights,
                   currentlyPinnedPostsCount,
                 },
               },
@@ -270,7 +271,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: false,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -286,7 +287,7 @@ describe('ContentMenu.vue - Group', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 groupPinned: false,
                 group: {
-                  myRole,
+                  ...rights,
                   currentlyPinnedPostsCount,
                 },
               },
@@ -302,7 +303,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: true,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -318,7 +319,7 @@ describe('ContentMenu.vue - Group', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 groupPinned: true,
                 group: {
-                  myRole,
+                  ...rights,
                   currentlyPinnedPostsCount,
                 },
               },
@@ -338,7 +339,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: false,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -357,7 +358,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: true,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -373,7 +374,7 @@ describe('ContentMenu.vue - Group', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 groupPinned: true,
                 group: {
-                  myRole,
+                  ...rights,
                   currentlyPinnedPostsCount,
                 },
               },
@@ -385,7 +386,7 @@ describe('ContentMenu.vue - Group', () => {
   })
 
   describe('as group admin', () => {
-    const myRole = 'admin'
+    const rights = groupRights('admin')
 
     describe('when maxGroupPinnedPosts = 0', () => {
       beforeEach(() => {
@@ -400,7 +401,7 @@ describe('ContentMenu.vue - Group', () => {
             id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
             groupPinned: false,
             group: {
-              myRole,
+              ...rights,
             },
           },
         })
@@ -417,7 +418,7 @@ describe('ContentMenu.vue - Group', () => {
             id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
             groupPinned: true,
             group: {
-              myRole,
+              ...rights,
             },
           },
         })
@@ -432,7 +433,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: true,
               group: {
-                myRole,
+                ...rights,
               },
             },
           ],
@@ -456,7 +457,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: false,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -472,7 +473,7 @@ describe('ContentMenu.vue - Group', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 groupPinned: false,
                 group: {
-                  myRole,
+                  ...rights,
                   currentlyPinnedPostsCount,
                 },
               },
@@ -488,7 +489,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: true,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -504,7 +505,7 @@ describe('ContentMenu.vue - Group', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 groupPinned: true,
                 group: {
-                  myRole,
+                  ...rights,
                   currentlyPinnedPostsCount,
                 },
               },
@@ -524,7 +525,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: false,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -540,7 +541,7 @@ describe('ContentMenu.vue - Group', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 groupPinned: false,
                 group: {
-                  myRole,
+                  ...rights,
                   currentlyPinnedPostsCount,
                 },
               },
@@ -556,7 +557,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: true,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -572,7 +573,7 @@ describe('ContentMenu.vue - Group', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 groupPinned: true,
                 group: {
-                  myRole,
+                  ...rights,
                   currentlyPinnedPostsCount,
                 },
               },
@@ -598,7 +599,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: false,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -614,7 +615,7 @@ describe('ContentMenu.vue - Group', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 groupPinned: false,
                 group: {
-                  myRole,
+                  ...rights,
                   currentlyPinnedPostsCount,
                 },
               },
@@ -630,7 +631,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: true,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -646,7 +647,7 @@ describe('ContentMenu.vue - Group', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 groupPinned: true,
                 group: {
-                  myRole,
+                  ...rights,
                   currentlyPinnedPostsCount,
                 },
               },
@@ -666,7 +667,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: false,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -685,7 +686,7 @@ describe('ContentMenu.vue - Group', () => {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               groupPinned: true,
               group: {
-                myRole,
+                ...rights,
                 currentlyPinnedPostsCount,
               },
             },
@@ -701,7 +702,7 @@ describe('ContentMenu.vue - Group', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 groupPinned: true,
                 group: {
-                  myRole,
+                  ...rights,
                   currentlyPinnedPostsCount,
                 },
               },
@@ -713,7 +714,7 @@ describe('ContentMenu.vue - Group', () => {
   })
 
   describe('as group usual', () => {
-    const myRole = 'usual'
+    const rights = groupRights('usual')
 
     describe('when maxGroupPinnedPosts = 0', () => {
       beforeEach(() => {
@@ -728,7 +729,7 @@ describe('ContentMenu.vue - Group', () => {
             id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
             groupPinned: false,
             group: {
-              myRole,
+              ...rights,
             },
           },
         })
@@ -745,7 +746,7 @@ describe('ContentMenu.vue - Group', () => {
             id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
             groupPinned: true,
             group: {
-              myRole,
+              ...rights,
             },
           },
         })
@@ -768,7 +769,7 @@ describe('ContentMenu.vue - Group', () => {
             id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
             groupPinned: false,
             group: {
-              myRole,
+              ...rights,
               currentlyPinnedPostsCount: 0,
             },
           },
@@ -786,7 +787,7 @@ describe('ContentMenu.vue - Group', () => {
             id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
             groupPinned: true,
             group: {
-              myRole,
+              ...rights,
               currentlyPinnedPostsCount: 1,
             },
           },

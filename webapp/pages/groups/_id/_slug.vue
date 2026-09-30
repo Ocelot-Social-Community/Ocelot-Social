@@ -81,7 +81,7 @@
               :userId="currentUser.id"
               :isMember="hasGroupMembership"
               :isNonePendingMember="isGroupMemberNonePending"
-              :disabled="hasGroupMembership && !$canInGroup('group.leave', group)"
+              :disabled="hasGroupMembership && !canInGroup('group.leave', group)"
               :loading="hydrated && $apollo.loading"
               @update="updateJoinLeave"
             />
@@ -135,7 +135,7 @@
               </p>
               <div class="chip" align="center">
                 <os-badge variant="primary">
-                  {{ $groupRoleLabel(group && group.myGroupRole) }}
+                  {{ roleLabel(group && group.myGroupRole) }}
                 </os-badge>
               </div>
             </template>
@@ -399,6 +399,7 @@ import SortCategories from '~/mixins/sortCategoriesMixin.js'
 import { mapGetters, mapMutations } from 'vuex'
 import { branding } from '@ocelot-social/branding'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
+import groupRights from '~/mixins/groupRights'
 // import SocialMedia from '~/components/SocialMedia/SocialMedia'
 // import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 
@@ -435,7 +436,7 @@ export default {
     // SocialMedia,
     // TabNavigation,
   },
-  mixins: [postListActions, SortCategories, GetCategories],
+  mixins: [postListActions, SortCategories, GetCategories, groupRights],
   transition: {
     name: 'slide-up',
     mode: 'out-in',
@@ -516,23 +517,20 @@ export default {
     // "May I administer this group" rather than "am I the owner": the rights are granted
     // independently now, so an admin can hold the settings right without being an owner.
     canManageGroup() {
-      return this.$canInGroup('group.settings.manage', this.group)
-    },
-    canManageGroupRoles() {
-      return this.$canInGroup('group.role.manage', this.group)
+      return this.canInGroup('group.settings.manage', this.group)
     },
     hasGroupMembership() {
       return !!this.group?.myGroupRole
     },
     isGroupMemberNonePending() {
-      return this.$isGroupMember(this.group)
+      return this.isGroupMember(this.group)
     },
     isGroupVisible() {
       return this.group && !(this.group.groupType === 'hidden' && !this.isGroupMemberNonePending)
     },
     isAllowedSeeingGroupMembers() {
       // One right instead of the groupType/showMembers/membership cascade this used to be.
-      if (this.$canInGroup('group.members.read', this.group)) return true
+      if (this.canInGroup('group.members.read', this.group)) return true
       if (!this.group) return false
       if (this.group.groupType === 'public') return true
       if (['closed', 'hidden'].includes(this.group.groupType) && this.isGroupMemberNonePending)

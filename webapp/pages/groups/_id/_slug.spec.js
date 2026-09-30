@@ -4,6 +4,7 @@ import { mount } from '@vue/test-utils'
 import { branding as brandingDefaults } from '@ocelot-social/branding'
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { groupRights } from '~/test/groupRightsFixture'
 
 const localVue = global.localVue
 
@@ -179,7 +180,7 @@ describe('GroupProfileSlug', () => {
       location: null,
       isMutedByMe: false,
       membersCount: 4,
-      // myRole: 'usual',
+      // ...groupRights('usual'),
     }
     schoolForCitizens = {
       id: 'g1',
@@ -211,7 +212,7 @@ describe('GroupProfileSlug', () => {
       },
       isMutedByMe: true,
       membersCount: 0,
-      // myRole: 'usual',
+      // ...groupRights('usual'),
     }
     investigativeJournalism = {
       id: 'g0',
@@ -251,7 +252,7 @@ describe('GroupProfileSlug', () => {
       },
       isMutedByMe: false,
       membersCount: 0,
-      // myRole: 'usual',
+      // ...groupRights('usual'),
     }
     peterLustig = {
       id: 'u1',
@@ -298,7 +299,7 @@ describe('GroupProfileSlug', () => {
             return {
               group: {
                 ...yogaPractice,
-                myRole: 'owner',
+                ...groupRights('owner'),
               },
             }
           })
@@ -342,7 +343,7 @@ describe('GroupProfileSlug', () => {
             return {
               group: {
                 ...yogaPractice,
-                myRole: 'owner',
+                ...groupRights('owner'),
                 description: linkedDescription,
               },
             }
@@ -404,7 +405,7 @@ describe('GroupProfileSlug', () => {
           // The overflow verdict only reaches the DOM on the next tick, so re-render
           // and wait rather than reusing the wrapper from the enclosing beforeEach.
           const renderGroup = async (group = yogaPractice) => {
-            wrapper = Wrapper(() => ({ group: { ...group, myRole: 'owner' } }))
+            wrapper = Wrapper(() => ({ group: { ...group, ...groupRights('owner') } }))
             await Vue.nextTick()
           }
 
@@ -459,7 +460,7 @@ describe('GroupProfileSlug', () => {
             return {
               group: {
                 ...yogaPractice,
-                myRole: 'usual',
+                ...groupRights('usual'),
               },
             }
           })
@@ -477,7 +478,7 @@ describe('GroupProfileSlug', () => {
             return {
               group: {
                 ...yogaPractice,
-                myRole: 'pending',
+                ...groupRights('pending'),
               },
             }
           })
@@ -516,7 +517,7 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...schoolForCitizens,
-                  myRole: 'owner',
+                  ...groupRights('owner'),
                 },
               }
             })
@@ -562,7 +563,7 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...schoolForCitizens,
-                  myRole: 'usual',
+                  ...groupRights('usual'),
                 },
               }
             })
@@ -603,7 +604,7 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...schoolForCitizens,
-                  myRole: 'pending',
+                  ...groupRights('pending'),
                 },
               }
             })
@@ -643,7 +644,7 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...investigativeJournalism,
-                  myRole: 'owner',
+                  ...groupRights('owner'),
                 },
               }
             })
@@ -661,7 +662,7 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...investigativeJournalism,
-                  myRole: 'usual',
+                  ...groupRights('usual'),
                 },
               }
             })
@@ -679,7 +680,7 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...investigativeJournalism,
-                  myRole: 'pending',
+                  ...groupRights('pending'),
                 },
               }
             })
@@ -753,7 +754,7 @@ describe('GroupProfileSlug', () => {
           },
         },
         mocks,
-        data: () => ({ group: { ...yogaPractice, myRole: 'owner', description: '' } }),
+        data: () => ({ group: { ...yogaPractice, ...groupRights('owner'), description: '' } }),
       })
       await Vue.nextTick()
       expect(wrapper.find('.collaps-button').exists()).toBe(false)
@@ -761,7 +762,7 @@ describe('GroupProfileSlug', () => {
       await wrapper.setData({
         group: {
           ...yogaPractice,
-          myRole: 'owner',
+          ...groupRights('owner'),
           description: '<p>Now there is something to read.</p>',
         },
       })
@@ -834,7 +835,7 @@ describe('GroupProfileSlug', () => {
     })
 
     it('subscribes when group membership is already known at mount', () => {
-      mountWithGroup({ ...yogaPractice, myRole: 'usual' })
+      mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
       expect(subscribeMock).toHaveBeenCalledWith(
         expect.objectContaining({ fetchPolicy: 'no-cache' }),
       )
@@ -843,16 +844,16 @@ describe('GroupProfileSlug', () => {
     it('subscribes reactively when membership becomes known after mount', async () => {
       const wrapper = mountWithGroup({})
       expect(subscribeMock).not.toHaveBeenCalled()
-      wrapper.setData({ group: { ...yogaPractice, myRole: 'usual' } })
+      wrapper.setData({ group: { ...yogaPractice, ...groupRights('usual') } })
       await wrapper.vm.$nextTick()
       expect(subscribeMock).toHaveBeenCalled()
     })
 
     it('does not double-subscribe if membership signal fires multiple times', async () => {
-      const wrapper = mountWithGroup({ ...yogaPractice, myRole: 'usual' })
+      const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
       // roomUpdated + groupShowMembers are both set up on mount for members
       expect(subscribeMock).toHaveBeenCalledTimes(2)
-      wrapper.setData({ group: { ...yogaPractice, myRole: 'admin' } })
+      wrapper.setData({ group: { ...yogaPractice, ...groupRights('admin') } })
       await wrapper.vm.$nextTick()
       // neither subscription is set up again after role change
       expect(subscribeMock).toHaveBeenCalledTimes(2)
@@ -889,7 +890,7 @@ describe('GroupProfileSlug', () => {
             queries: { chatRoom: { refetch: jest.fn() }, Group: { refetch: jest.fn() } },
           },
         },
-        data: () => ({ group: { ...yogaPractice, myRole: 'usual' } }),
+        data: () => ({ group: { ...yogaPractice, ...groupRights('usual') } }),
       })
       // subscribe is called twice: roomUpdated (index 0) and groupShowMembers (index 1)
       const groupShowMembersError = capturedCallbacks[1]?.error
@@ -969,12 +970,16 @@ describe('GroupProfileSlug', () => {
     }
 
     it('renders the video-call button for a public group member', () => {
-      const wrapper = mountWithGroup({ ...yogaPractice, myRole: 'usual' })
+      const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
       expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(true)
     })
 
     it('renders the video-call button for a non-public group member (joining is open to all)', () => {
-      const wrapper = mountWithGroup({ ...yogaPractice, groupType: 'closed', myRole: 'usual' })
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        groupType: 'closed',
+        ...groupRights('usual'),
+      })
       expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(true)
     })
 
@@ -982,7 +987,7 @@ describe('GroupProfileSlug', () => {
       // No per-type open permission ($can → false) and no active call (count 0): the
       // button is shown but marked denied; joining-only would re-enable it.
       const wrapper = mountWithGroup(
-        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { ...yogaPractice, groupType: 'closed', ...groupRights('usual') },
         { $can: () => false },
       )
       const button = wrapper.find('[data-test="video-call-btn"]')
@@ -992,7 +997,7 @@ describe('GroupProfileSlug', () => {
 
     it('does not gray out the button when a call is already running (join is allowed)', async () => {
       const wrapper = mountWithGroup(
-        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { ...yogaPractice, groupType: 'closed', ...groupRights('usual') },
         { $can: () => false },
       )
       wrapper.setData({ videoCallParticipantCount: 2 })
@@ -1007,14 +1012,14 @@ describe('GroupProfileSlug', () => {
     })
 
     it('hides the video-call button for pending members', () => {
-      const wrapper = mountWithGroup({ ...yogaPractice, myRole: 'pending' })
+      const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('pending') })
       expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(false)
     })
 
     it('dispatches videoCall/OPEN with the group payload when clicked', async () => {
       const group = {
         ...yogaPractice,
-        myRole: 'usual',
+        ...groupRights('usual'),
         avatar: { url: 'http://example.test/avatar.png' },
       }
       const wrapper = mountWithGroup(group)
@@ -1032,7 +1037,7 @@ describe('GroupProfileSlug', () => {
       // No open permission ($can → false) and no running call (count 0): clicking the
       // (still-clickable) button must short-circuit with feedback instead of an OPEN.
       const wrapper = mountWithGroup(
-        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { ...yogaPractice, groupType: 'closed', ...groupRights('usual') },
         { $can: () => false },
       )
       await wrapper.find('[data-test="video-call-btn"]').trigger('click')
@@ -1044,7 +1049,7 @@ describe('GroupProfileSlug', () => {
       // Counter > 0 → this is a JOIN, allowed for any member regardless of the open
       // permission: the click must dispatch and not surface the denied feedback.
       const wrapper = mountWithGroup(
-        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { ...yogaPractice, groupType: 'closed', ...groupRights('usual') },
         { $can: () => false },
       )
       wrapper.setData({ videoCallParticipantCount: 2 })
@@ -1058,7 +1063,7 @@ describe('GroupProfileSlug', () => {
       // Stale snapshot: count is 0 at click time, but a refetch reveals a live call.
       // The client must re-check and not hard-block the JOIN on the stale value.
       const wrapper = mountWithGroup(
-        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { ...yogaPractice, groupType: 'closed', ...groupRights('usual') },
         { $can: () => false },
       )
       const refetch = jest.fn().mockImplementation(() => {
@@ -1078,7 +1083,7 @@ describe('GroupProfileSlug', () => {
       // rejection / raw backend error) and the decision falls back to the stale count we
       // already have — which here is 0, so the JOIN stays denied with the usual toast.
       const wrapper = mountWithGroup(
-        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { ...yogaPractice, groupType: 'closed', ...groupRights('usual') },
         { $can: () => false },
       )
       const refetch = jest.fn().mockRejectedValue(new Error('network down'))
@@ -1137,7 +1142,7 @@ describe('GroupProfileSlug', () => {
             queries: { chatRoom: { refetch: jest.fn() } },
           },
         },
-        data: () => ({ group: { ...yogaPractice, myRole: 'usual' } }),
+        data: () => ({ group: { ...yogaPractice, ...groupRights('usual') } }),
       })
       expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(false)
     })

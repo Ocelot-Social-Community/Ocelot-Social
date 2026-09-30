@@ -6,5 +6,7 @@
  * holds everything. Every other role name is the group's own business and must not appear in
  * code — that is what `myGroupPermissions` is for.
  */
+export const NONE_GROUP_ROLE = 'none'
 export const PENDING_GROUP_ROLE = 'pending'
+export const USUAL_GROUP_ROLE = 'usual'
 export const OWNER_GROUP_ROLE = 'owner'

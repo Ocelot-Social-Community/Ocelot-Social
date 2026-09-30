@@ -6,6 +6,14 @@ const localVue = global.localVue
 
 const propsData = {
   groupId: 'group-id',
+  // The picker offers the group's OWN roles now, so a fixture has to carry them; without them
+  // it falls back to the roles the listed members happen to have.
+  groupRoles: [
+    { name: 'pending', label: null, system: true, protected: false, permissions: [] },
+    { name: 'usual', label: null, system: true, protected: false, permissions: [] },
+    { name: 'admin', label: null, system: false, protected: false, permissions: [] },
+    { name: 'owner', label: null, system: true, protected: true, permissions: [] },
+  ],
   groupMembers: [
     {
       user: {

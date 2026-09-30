@@ -52,7 +52,7 @@
             name="groupType"
             model="groupType"
             :value="formData.groupType"
-            :disabled="update && !$canInGroup('group.type.change', group)"
+            :disabled="update && !canInGroup('group.type.change', group)"
             @change="changeGroupType($event)"
             @blur="touchField('groupType')"
           >
@@ -214,6 +214,7 @@ import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
+import groupRights from '~/mixins/groupRights'
 
 // Shared by both the location-select text search and the location-picker-map
 // below it, so a group's location can land on a city district — deliberately
@@ -226,7 +227,7 @@ const GROUP_LOCATION_TYPES = 'neighborhood,locality,place,region,country'
 
 export default {
   name: 'GroupForm',
-  mixins: [GetCategories, formValidation],
+  mixins: [GetCategories, formValidation, groupRights],
   components: {
     CategoriesSelect,
     Editor,

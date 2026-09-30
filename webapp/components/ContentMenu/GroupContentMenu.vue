@@ -43,8 +43,10 @@ import { OsButton, OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
 import { setGroupMembershipVisibilityMutation } from '~/graphql/UserGroups'
+import groupRights from '~/mixins/groupRights'
 
 export default {
+  mixins: [groupRights],
   name: 'GroupContentMenu',
   components: {
     Dropdown,
@@ -80,7 +82,7 @@ export default {
   },
   computed: {
     isMember() {
-      return this.$isGroupMember(this.group)
+      return this.isGroupMember(this.group)
     },
     routes() {
       const routes = []
@@ -136,14 +138,21 @@ export default {
 
       // Two separate rights, not "is the owner": editing the group and handing out invite
       // links are granted independently now, and an admin may well hold one without the other.
-      if (this.$canInGroup('group.settings.manage', this.group)) {
+      if (this.canInGroup('group.settings.manage', this.group)) {
         routes.push({
           label: this.$t('admin.settings.name'),
           path: `/groups/edit/${this.group.id}`,
           icon: this.icons.edit,
         })
       }
-      if (this.$canInGroup('group.invite', this.group)) {
+      if (this.canInGroup('group.role.manage', this.group)) {
+        routes.push({
+          label: this.$t('group.rights.title'),
+          path: `/groups/edit/${this.group.id}/rights`,
+          icon: this.icons.lock ?? this.icons.edit,
+        })
+      }
+      if (this.canInGroup('group.invite', this.group)) {
         routes.push({
           label: this.$t('group.contentMenu.inviteLinks'),
           path: `/groups/edit/${this.group.id}/invites`,

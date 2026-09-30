@@ -32,7 +32,7 @@
         <div>
           <!-- group my role in group -->
           <os-badge v-if="group && group.myGroupRole" variant="primary">
-            {{ $groupRoleLabel(group.myGroupRole) }}
+            {{ roleLabel(group.myGroupRole) }}
           </os-badge>
           <!-- group type -->
           <os-badge variant="primary">
@@ -86,10 +86,11 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import Category from '~/components/Category'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
+import groupRights from '~/mixins/groupRights'
 
 export default {
   name: 'GroupTeaser',
-  mixins: [GetCategories],
+  mixins: [GetCategories, groupRights],
   components: {
     Category,
     GroupContentMenu,

@@ -949,7 +949,8 @@
       "members": "Members",
       "owner": "Owner",
       "pending": "Pending Member",
-      "usual": "Member"
+      "usual": "Member",
+      "none": "Not a member"
     },
     "save": "Create new group",
     "showMembers": "Member list visible to everyone",
@@ -980,6 +981,46 @@
       "nameNotEmpty": "Please enter a group name.",
       "slugInvalidCharacters": "Only lowercase letters, digits, hyphens and underscores are allowed.",
       "slugNotEmpty": "Please enter a unique group name."
+    },
+    "rights": {
+      "title": "Rights",
+      "description": "Decide who may do what in this group — from outsiders to administrators.",
+      "saved": "Rights saved",
+      "reset": "Reset to defaults",
+      "confirmReset": "Reset every role of this group to the defaults? Roles you added are removed and their members become ordinary members.",
+      "toAdvanced": "Advanced: every right in detail",
+      "toSimple": "Back to the simple view",
+      "systemRole": "System role: cannot be deleted or renamed",
+      "addRole": "Add a role",
+      "deleteRole": "Delete role",
+      "confirmDelete": "Delete the role \"{role}\"? Its members become \"{target}\".",
+      "roleKeyPlaceholder": "key, e.g. editors",
+      "roleLabelPlaceholder": "display name, e.g. Editors",
+      "labelField": "Display name",
+      "members": "{count} members",
+      "ownerHoldsEverything": "The owner role always holds every right in this group. Only its display name can be changed.",
+      "noRight": "You cannot grant a right you do not hold yourself.",
+      "blockedByNetwork": "Capped network-wide: this needs the {permission} permission.",
+      "blockedByFeature": "That feature is switched off for this network ({feature}).",
+      "presets": {
+        "channel": "Turn into a channel (only admins write)"
+      },
+      "groups": {
+        "visibility": "Visibility",
+        "content": "Content",
+        "membership": "Membership",
+        "administration": "Administration",
+        "communication": "Communication"
+      },
+      "simple": {
+        "members-post": "Members may write posts",
+        "members-comment": "Members may comment",
+        "members-chat": "Members may write in the group chat",
+        "members-invite": "Members may invite others",
+        "applicants-read": "Waiting applicants may read the posts",
+        "nonmembers-read": "Outsiders may read the posts",
+        "nonmembers-members": "Outsiders may see the member list"
+      }
     }
   },
   "hashtags-filter": {

@@ -229,7 +229,6 @@ export default {
     // server-rendered brand. After policy-subscribe so the policy store is live.
     { src: '~/plugins/branding-subscribe.js', ssr: false },
     { src: '~/plugins/permissions.js', ssr: true },
-    { src: '~/plugins/group-permissions.js', ssr: true },
     { src: '~/plugins/permissions-subscribe.js', ssr: false },
     { src: '~/plugins/i18n.js', ssr: true },
     { src: '~/plugins/axios.js', ssr: false },

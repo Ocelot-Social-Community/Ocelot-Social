@@ -56,6 +56,10 @@ export default {
           name: this.$t('group.invite-links'),
           path: `/groups/edit/${this.group.id}/invites`,
         },
+        {
+          name: this.$t('group.rights.title'),
+          path: `/groups/edit/${this.group.id}/rights`,
+        },
       ]
     },
   },

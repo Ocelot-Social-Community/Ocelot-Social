@@ -59,6 +59,7 @@ import ReportModal from '~/components/Modal/ReportModal'
 import { reviewMutation } from '~/graphql/Moderation.js'
 import { disableUserMutation } from '~/graphql/User'
 import PinnedPostsMixin from '~/mixins/pinnedPosts'
+import groupRights from '~/mixins/groupRights'
 
 export default {
   name: 'ContentMenu',
@@ -71,7 +72,7 @@ export default {
     OsMenuItem,
     ReportModal,
   },
-  mixins: [PinnedPostsMixin],
+  mixins: [PinnedPostsMixin, groupRights],
   props: {
     placement: { type: String, default: 'top-end' },
     resource: { type: Object, required: true },
@@ -292,7 +293,7 @@ export default {
       if (
         this.resourceType === 'contribution' &&
         this.resource.group &&
-        this.$canInGroup('group.post.pin', this.resource.group) &&
+        this.canInGroup('group.post.pin', this.resource.group) &&
         (this.canBeGroupPinned || this.resource.groupPinned)
       ) {
         routes.push({

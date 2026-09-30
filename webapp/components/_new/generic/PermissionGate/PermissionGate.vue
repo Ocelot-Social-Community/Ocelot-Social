@@ -1,5 +1,5 @@
 <script>
-import { canInGroup } from '~/plugins/group-permissions'
+import { canInGroup } from '~/utils/groupRights'
 
 /**
  * Renders its default slot only when the current user holds `permission` — the

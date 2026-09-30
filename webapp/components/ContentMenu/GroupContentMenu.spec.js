@@ -1,5 +1,6 @@
 import GroupContentMenu from './GroupContentMenu.vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
+import { groupRights } from '~/test/groupRightsFixture'
 
 const localVue = global.localVue
 
@@ -52,7 +53,7 @@ describe('GroupContentMenu', () => {
   it('renders as groupProfile when I am the owner', () => {
     const wrapper = Wrapper({
       usage: 'groupProfile',
-      group: { myRole: 'owner', id: 'groupid' },
+      group: { ...groupRights('owner'), id: 'groupid' },
     })
     expect(wrapper.container).toMatchSnapshot()
   })

@@ -63,12 +63,12 @@
                 :value="`${member.membership.role}`"
                 @change="changeMemberRole(member.user.id, $event)"
               >
-                <option v-for="role in groupRoles" :key="role" :value="role">
-                  {{ $t(`group.roles.${role}`) }}
+                <option v-for="role in selectableRoles" :key="role.name" :value="role.name">
+                  {{ roleLabel(role) }}
                 </option>
               </select>
               <os-badge v-else variant="primary">
-                {{ $t(`group.roles.${member.membership.role}`) }}
+                {{ roleLabel(roleOf(member)) }}
               </os-badge>
             </td>
             <td class="ds-table-col">
@@ -120,10 +120,18 @@ import { OsBadge, OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { changeGroupMemberRoleMutation, removeUserFromGroupMutation } from '~/graphql/groups.js'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
+import groupRights from '~/mixins/groupRights'
 
-const GROUP_ROLES = ['pending', 'usual', 'admin', 'owner']
+// Fallback for a viewer who may manage members but not read the role definitions: render the
+// roles that actually occur among the members, so the picker still shows where everybody is.
+const rolesFromMembers = (members) =>
+  [...new Set(members.map((member) => member.membership?.role).filter(Boolean))].map((name) => ({
+    name,
+    label: null,
+  }))
 
 export default {
+  mixins: [groupRights],
   name: 'GroupMember',
   components: {
     OsBadge,
@@ -142,10 +150,14 @@ export default {
       required: false,
       default: () => [],
     },
+    groupRoles: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
   },
   created() {
     this.icons = iconRegistry
-    this.groupRoles = GROUP_ROLES
   },
   data() {
     return {
@@ -158,7 +170,22 @@ export default {
       userName: null,
     }
   },
+  computed: {
+    // What the picker offers: the group's own definitions when they are readable, otherwise the
+    // roles the members already carry. `none` is never offered — it means "no membership", and
+    // removing somebody is the button next to it.
+    selectableRoles() {
+      const roles = this.groupRoles.length ? this.groupRoles : rolesFromMembers(this.groupMembers)
+      return roles.filter((role) => role.name !== 'none')
+    },
+  },
   methods: {
+    // The role a member carries, as a definition if the group's are known — so a custom role
+    // renders with the label the group gave it rather than as its key.
+    roleOf(member) {
+      const name = member.membership?.role
+      return this.groupRoles.find((role) => role.name === name) ?? { name, label: null }
+    },
     async changeMemberRole(id, event) {
       const newRole = event.target.value
       try {
