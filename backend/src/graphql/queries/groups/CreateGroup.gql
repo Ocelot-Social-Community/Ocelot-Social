@@ -48,6 +48,7 @@ mutation CreateGroup(
       lat
       lng
     }
+    # eslint-disable-next-line @graphql-eslint/no-deprecated -- deliberately still selected: the deprecated field stays part of the contract until the next major, and the specs assert it keeps working
     myRole
   }
 }

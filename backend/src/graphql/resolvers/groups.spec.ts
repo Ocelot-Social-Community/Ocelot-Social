@@ -1133,6 +1133,7 @@ describe('in mode', () => {
                 // untouched), so the owner joins THEMSELVES: adding another person is an act of
                 // membership management now and needs group.member.approve.
                 authenticatedUser = await ownerOfClosedGroupUser.toJson()
+
                 await expect(
                   mutate({
                     mutation: JoinGroup,
@@ -1180,6 +1181,7 @@ describe('in mode', () => {
                 // Same as above: the owner joins themselves, which is what makes this a test of
                 // MERGE and not of who may add whom.
                 authenticatedUser = await ownerOfHiddenGroupUser.toJson()
+
                 await expect(
                   mutate({
                     mutation: JoinGroup,
