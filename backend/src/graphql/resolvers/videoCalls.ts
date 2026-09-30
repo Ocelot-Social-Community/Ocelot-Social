@@ -69,7 +69,7 @@ const getGroupMembershipType = async (
       tx.run(
         `
           MATCH (u:User { id: $userId })-[m:MEMBER_OF]->(g:Group { id: $groupId })
-          WHERE m.role IN ['usual', 'admin', 'owner']
+          WHERE m.role <> 'pending'
           RETURN g.groupType AS groupType
         `,
         { userId: currentUserId, groupId },

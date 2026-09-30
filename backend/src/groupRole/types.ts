@@ -27,15 +27,25 @@ export const NONE_ROLE = 'none'
 export const PENDING_ROLE = 'pending'
 export const OWNER_ROLE = 'owner'
 
-// The two seeded, freely editable roles. Names only — a group may rename, delete or
-// replace them, and add any number of roles beside them.
+// The role a new member lands in — a system role too, because "joining" has to have a
+// destination the code can name. Its label and its permissions are the group's business; its
+// key is not, which costs a group nothing: a group that wants to call its members "Aktive"
+// sets the label (concept E13).
 export const USUAL_ROLE = 'usual'
+
+// Seeded but ordinary: a group may rename, delete or replace it, and add any number of roles
+// beside it.
 export const ADMIN_ROLE = 'admin'
 
-export const SYSTEM_ROLE_NAMES: readonly string[] = [NONE_ROLE, PENDING_ROLE, OWNER_ROLE]
+export const SYSTEM_ROLE_NAMES: readonly string[] = [
+  NONE_ROLE,
+  PENDING_ROLE,
+  USUAL_ROLE,
+  OWNER_ROLE,
+]
 
 // The roles that count as an actual membership. `none` is no membership, `pending` is an
-// applicant — the same distinction ACTIVE_GROUP_ROLES draws in the resolvers today.
+// applicant — the same distinction the resolvers draw with `role <> 'pending'`.
 export function isActiveMembershipRole(roleName: string): boolean {
   return roleName !== NONE_ROLE && roleName !== PENDING_ROLE
 }

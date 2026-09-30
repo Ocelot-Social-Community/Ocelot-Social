@@ -1,13 +1,18 @@
 import type { Context } from '@src/context'
 
 /**
- * The membership roles that grant access to a group's content.
+ * What counts as an actual membership, as a Cypher condition rather than a list of names.
  *
- * `pending` is deliberately absent: an applicant is a member row, not a member. The literal is
- * repeated in a dozen hand-written Cypher strings across the resolvers; this copy is the one
- * the post visibility rule uses, so that rule and the lookup feeding it cannot drift apart.
+ * It used to be the list `['usual', 'admin', 'owner']`, repeated in a dozen hand-written Cypher
+ * strings. With group-defined roles that list is wrong by construction: a group that renames
+ * `usual` would turn its own members into non-members everywhere the literal appears. The
+ * question was never "which of these three names" — it is "is this edge a membership or an
+ * application", so `role <> 'pending'` answers it for any role name a group invents.
+ *
+ * `none` needs no mention: it is the absence of the edge, so a viewer without a membership
+ * never reaches this condition.
  */
-export const ACTIVE_GROUP_ROLES = ['usual', 'admin', 'owner']
+export const PENDING_GROUP_ROLE = 'pending'
 
 /**
  * The ids of the groups the viewer is an active member of.
@@ -31,10 +36,10 @@ export const activeGroupIds = async (context: Context): Promise<string[]> => {
   const result = await context.database.query({
     query: `
       MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group:Group)
-      WHERE membership.role IN $roles
+      WHERE membership.role <> $pendingRole
       RETURN collect(group.id) AS groupIds
     `,
-    variables: { userId: context.user.id, roles: ACTIVE_GROUP_ROLES },
+    variables: { userId: context.user.id, pendingRole: PENDING_GROUP_ROLE },
   })
   // No `?.` and no `?? []`. An aggregation with no grouping key emits exactly ONE row whatever
   // the MATCH found, and `collect()` yields an empty list rather than null — so a viewer with

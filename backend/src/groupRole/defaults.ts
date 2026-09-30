@@ -88,7 +88,7 @@ export const DEFAULT_GROUP_ROLE_TEMPLATES: GroupRoleTemplates = {
     systemRole(PENDING_ROLE, PENDING_PERMISSIONS),
     // Members of a public group may bring others in; the intent of today's (broken)
     // invite guard.
-    editableRole(USUAL_ROLE, [...MEMBER_BASELINE, 'group.invite']),
+    systemRole(USUAL_ROLE, [...MEMBER_BASELINE, 'group.invite']),
     // group.invite is already part of ADMIN_EXTRAS — an admin holds it in every group type.
     editableRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
     ownerRole(),
@@ -99,7 +99,7 @@ export const DEFAULT_GROUP_ROLE_TEMPLATES: GroupRoleTemplates = {
   closed: [
     systemRole(NONE_ROLE, ['group.read', 'group.join.request']),
     systemRole(PENDING_ROLE, PENDING_PERMISSIONS),
-    editableRole(USUAL_ROLE, [...MEMBER_BASELINE]),
+    systemRole(USUAL_ROLE, [...MEMBER_BASELINE]),
     editableRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
     ownerRole(),
   ],
@@ -108,21 +108,34 @@ export const DEFAULT_GROUP_ROLE_TEMPLATES: GroupRoleTemplates = {
   hidden: [
     systemRole(NONE_ROLE, []),
     systemRole(PENDING_ROLE, PENDING_PERMISSIONS),
-    editableRole(USUAL_ROLE, [...MEMBER_BASELINE]),
+    systemRole(USUAL_ROLE, [...MEMBER_BASELINE]),
     editableRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
     ownerRole(),
   ],
 }
 
-// The role names every group must always have, whatever an operator did to the
-// templates: the three system roles plus the two seeded editable ones are re-ensured on
-// seeding, and the system ones can never be removed afterwards.
-export const MANDATORY_GROUP_ROLE_NAMES: readonly string[] = [NONE_ROLE, PENDING_ROLE, OWNER_ROLE]
+// The role names every group must always have, whatever an operator did to the templates.
+// They are exactly the system roles: no membership without a destination (`usual`), no
+// application without a waiting room (`pending`), no group without a non-member view (`none`)
+// and none without a failsafe (`owner`).
+export const MANDATORY_GROUP_ROLE_NAMES: readonly string[] = [
+  NONE_ROLE,
+  PENDING_ROLE,
+  USUAL_ROLE,
+  OWNER_ROLE,
+]
 
+// A Map rather than dynamic indexing into the record: groupType arrives from a request, and a
+// lookup that cannot be a prototype key needs no reasoning about whether it is safe.
+const templatesByGroupType = new Map(Object.entries(DEFAULT_GROUP_ROLE_TEMPLATES))
+
+/**
+ * A fresh copy of the template for this group type, or undefined when the type has none —
+ * which the drift guard in ./defaults.spec.ts makes unreachable for the types the schema
+ * offers. Copies, so seeding one group can never mutate the shared template.
+ */
 export function defaultTemplateFor(groupType: string): GroupRoleDefinition[] | undefined {
-  // eslint-disable-next-line security/detect-object-injection -- groupType is validated against the GroupType enum before it reaches here
-  const template = DEFAULT_GROUP_ROLE_TEMPLATES[groupType]
-  return template
-    ? template.map((role) => ({ ...role, permissions: [...role.permissions] }))
-    : undefined
+  return templatesByGroupType
+    .get(groupType)
+    ?.map((role) => ({ ...role, permissions: [...role.permissions] }))
 }

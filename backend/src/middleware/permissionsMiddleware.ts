@@ -4,16 +4,19 @@
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 import { createRequire } from 'node:module'
 
 import CONFIG from '@config/index'
 import { AuthenticationError } from '@graphql/errors'
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
+import { coversRole, mayAssignGroupRole, mayRemoveGroupMember } from '@src/groupRole'
 import { isPermissionAvailable } from '@src/permission'
 import { dominates } from '@src/role'
 
 import type { Context } from '@src/context'
+import type { GroupPermissionKey } from '@src/groupPermission'
+import type { GroupAuthorization } from '@src/groupRole/requestScope'
 import type { PermissionKey } from '@src/permission'
 import type {
   allow as Allow,
@@ -160,285 +163,6 @@ const isMySocialMedia = rule({
   return Boolean(result.records[0]?.get('isMine'))
 })
 
-const isAllowedToChangeGroupSettings = rule({
-  cache: 'no_cache',
-})(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) {
-    return false
-  }
-  const ownerId = user.id
-  const { id: groupId } = args
-  const session = driver.session()
-  const readTxPromise = session.readTransaction(async (transaction) => {
-    const transactionResponse = await transaction.run(
-      `
-        MATCH (owner:User {id: $ownerId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
-        RETURN group {.*}, owner {.*, myRoleInGroup: membership.role}
-      `,
-      { groupId, ownerId },
-    )
-    return {
-      owner: transactionResponse.records.map((record) => record.get('owner'))[0],
-      group: transactionResponse.records.map((record) => record.get('group'))[0],
-    }
-  })
-  try {
-    const { owner, group } = await readTxPromise
-    return !!group && !!owner && ['owner'].includes(owner.myRoleInGroup)
-  } finally {
-    await session.close()
-  }
-})
-
-const isAllowedSeeingGroupMembers = rule({
-  cache: 'no_cache',
-})(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) {
-    return false
-  }
-  const { id: groupId } = args
-  const session = driver.session()
-  const readTxPromise = session.readTransaction(async (transaction) => {
-    const transactionResponse = await transaction.run(
-      `
-        MATCH (group:Group {id: $groupId})
-        OPTIONAL MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group)
-        RETURN group {.*}, member {.*, myRoleInGroup: membership.role}
-      `,
-      { groupId, userId: user.id },
-    )
-    return {
-      member: transactionResponse.records.map((record) => record.get('member'))[0],
-      group: transactionResponse.records.map((record) => record.get('group'))[0],
-    }
-  })
-  try {
-    const { member, group } = await readTxPromise
-    const isMember = !!member && ['usual', 'admin', 'owner'].includes(member.myRoleInGroup)
-    return (
-      !!group &&
-      (group.groupType === 'public' ||
-        (['closed', 'hidden'].includes(group.groupType) && isMember) ||
-        (group.groupType === 'closed' && group.showMembers === true))
-    )
-  } finally {
-    await session.close()
-  }
-})
-
-const isAllowedToChangeGroupMemberRole = rule({
-  cache: 'no_cache',
-})(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) {
-    return false
-  }
-  const currentUserId = user.id
-  const { groupId, userId, roleInGroup } = args
-  if (currentUserId === userId) {
-    return false
-  }
-  const session = driver.session()
-  const readTxPromise = session.readTransaction(async (transaction) => {
-    const transactionResponse = await transaction.run(
-      `
-        MATCH (currentUser:User {id: $currentUserId})-[currentUserMembership:MEMBER_OF]->(group:Group {id: $groupId})
-        OPTIONAL MATCH (group)<-[userMembership:MEMBER_OF]-(member:User {id: $userId})
-        RETURN group {.*}, currentUser {.*, myRoleInGroup: currentUserMembership.role}, member {.*, myRoleInGroup: userMembership.role}
-      `,
-      { groupId, currentUserId, userId },
-    )
-    return {
-      currentUser: transactionResponse.records.map((record) => record.get('currentUser'))[0],
-      group: transactionResponse.records.map((record) => record.get('group'))[0],
-      member: transactionResponse.records.map((record) => record.get('member'))[0],
-    }
-  })
-  try {
-    const { currentUser, group, member } = await readTxPromise
-    const groupExists = !!group
-    const currentUserExists = !!currentUser
-    const userIsMember = !!member
-    const sameUserRoleInGroup = member && member.myRoleInGroup === roleInGroup
-    const userIsOwner = member && ['owner'].includes(member.myRoleInGroup)
-    const currentUserIsAdmin = currentUser && ['admin'].includes(currentUser.myRoleInGroup)
-    const adminCanSetRole = ['pending', 'usual', 'admin'].includes(roleInGroup)
-    const currentUserIsOwner = currentUser && ['owner'].includes(currentUser.myRoleInGroup)
-    const ownerCanSetRole = ['pending', 'usual', 'admin', 'owner'].includes(roleInGroup)
-    return (
-      groupExists &&
-      currentUserExists &&
-      (!userIsMember || (userIsMember && (sameUserRoleInGroup || !userIsOwner))) &&
-      ((currentUserIsAdmin && adminCanSetRole) || (currentUserIsOwner && ownerCanSetRole))
-    )
-  } finally {
-    await session.close()
-  }
-})
-
-const isAllowedToJoinGroup = rule({
-  cache: 'no_cache',
-})(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) {
-    return false
-  }
-  const { groupId, userId } = args
-  const session = driver.session()
-  const readTxPromise = session.readTransaction(async (transaction) => {
-    const transactionResponse = await transaction.run(
-      `
-        MATCH (group:Group {id: $groupId})
-        OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(member:User {id: $userId})
-        RETURN group {.*}, member {.*, myRoleInGroup: membership.role}
-      `,
-      { groupId, userId },
-    )
-    return {
-      group: transactionResponse.records.map((record) => record.get('group'))[0],
-      member: transactionResponse.records.map((record) => record.get('member'))[0],
-    }
-  })
-  try {
-    const { group, member } = await readTxPromise
-    return !!group && (group.groupType !== 'hidden' || (!!member && !!member.myRoleInGroup))
-  } finally {
-    await session.close()
-  }
-})
-
-const isAllowedToLeaveGroup = rule({
-  cache: 'no_cache',
-})(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) {
-    return false
-  }
-  const { groupId, userId } = args
-  if (user.id !== userId) {
-    return false
-  }
-  const session = driver.session()
-  const readTxPromise = session.readTransaction(async (transaction) => {
-    const transactionResponse = await transaction.run(
-      `
-        MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
-        RETURN group {.*}, member {.*, myRoleInGroup: membership.role}
-      `,
-      { groupId, userId },
-    )
-    return {
-      group: transactionResponse.records.map((record) => record.get('group'))[0],
-      member: transactionResponse.records.map((record) => record.get('member'))[0],
-    }
-  })
-  try {
-    const { group, member } = await readTxPromise
-    return !!group && !!member && !!member.myRoleInGroup && member.myRoleInGroup !== 'owner'
-  } finally {
-    await session.close()
-  }
-})
-
-const isMemberOfGroup = rule({
-  cache: 'no_cache',
-})(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) {
-    return false
-  }
-  const { groupId } = args
-  if (!groupId) {
-    return true
-  }
-  const userId = user.id
-  const session = driver.session()
-  const readTxPromise = session.readTransaction(async (transaction) => {
-    const transactionResponse = await transaction.run(
-      `
-        MATCH (User {id: $userId})-[membership:MEMBER_OF]->(Group {id: $groupId})
-        RETURN membership.role AS role
-      `,
-      { groupId, userId },
-    )
-    return transactionResponse.records.map((record) => record.get('role'))[0]
-  })
-  try {
-    const role = await readTxPromise
-    return ['usual', 'admin', 'owner'].includes(role)
-  } finally {
-    await session.close()
-  }
-})
-
-const canRemoveUserFromGroup = rule({
-  cache: 'no_cache',
-})(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) {
-    return false
-  }
-  const { groupId, userId } = args
-  const currentUserId = user.id
-  if (currentUserId === userId) {
-    return false
-  }
-  const session = driver.session()
-  const readTxPromise = session.readTransaction(async (transaction) => {
-    const transactionResponse = await transaction.run(
-      `
-        MATCH (User {id: $currentUserId})-[currentUserMembership:MEMBER_OF]->(group:Group {id: $groupId})
-        OPTIONAL MATCH (group)<-[userMembership:MEMBER_OF]-(user:User { id: $userId })
-        RETURN currentUserMembership.role AS currentUserRole, userMembership.role AS userRole
-      `,
-      { currentUserId, groupId, userId },
-    )
-    return {
-      currentUserRole: transactionResponse.records.map((record) =>
-        record.get('currentUserRole'),
-      )[0],
-      userRole: transactionResponse.records.map((record) => record.get('userRole'))[0],
-    }
-  })
-  try {
-    const { currentUserRole, userRole } = await readTxPromise
-    return (
-      currentUserRole && ['owner'].includes(currentUserRole) && userRole && userRole !== 'owner'
-    )
-  } finally {
-    await session.close()
-  }
-})
-
-const canCommentPost = rule({
-  cache: 'no_cache',
-})(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) {
-    return false
-  }
-  const { postId } = args
-  const userId = user.id
-  const session = driver.session()
-  const readTxPromise = session.readTransaction(async (transaction) => {
-    const transactionResponse = await transaction.run(
-      `
-        MATCH (post:Post { id: $postId })
-        OPTIONAL MATCH (post)-[:IN]->(group:Group)
-        OPTIONAL MATCH (user:User { id: $userId })-[membership:MEMBER_OF]->(group)
-        RETURN group AS group, membership AS membership
-      `,
-      { postId, userId },
-    )
-    return {
-      group: transactionResponse.records.map((record) => record.get('group'))[0],
-      membership: transactionResponse.records.map((record) => record.get('membership'))[0],
-    }
-  })
-  try {
-    const { group, membership } = await readTxPromise
-    return (
-      !group || (membership && ['usual', 'admin', 'owner'].includes(membership.properties.role))
-    )
-  } finally {
-    await session.close()
-  }
-})
-
 const isAuthor = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }: Context) => {
@@ -571,62 +295,164 @@ const inviteRegistration = rule()(async (_parent, args, context: Context) => {
   return validateInviteCode(context, inviteCode)
 })
 
-// Who may hand out an invite code to a group: in a closed or hidden group only its admins and
-// owner, in a public one every member except an applicant (`pending`).
+// ─────────────────────────────────────────────────────────────────────────────────────────
+// Group-scoped authorization.
 //
-// This rule used to pass EVERY authenticated user, for two independent reasons that happened to
-// add up to "always allowed":
-//   • it filtered on `group.type`, a property no Group has (it is `groupType`). In Cypher
-//     `NULL IN [...]` is NULL and `NOT NULL` is NULL, so neither branch of the WHERE was ever
-//     true and no row survived the filter.
-//   • it then read `count` through `!!`. The driver runs with lossless integers, so `count()`
-//     arrives as an Integer OBJECT — and an aggregation without a grouping key always returns one
-//     row, so `!!Integer{low: 0}` was `true`.
-// Hence the `toString(count(…)) === '1'` below, the same shape isAllowedToPinGroupPost already
-// uses: a value, not an object, compared against the one row a single membership can produce.
-// (`=== '1'` rather than `!== '0'` also fails closed should duplicate MEMBER_OF edges ever exist.)
-const isAllowedToGenerateGroupInviteCode = rule({
-  cache: 'no_cache',
-})(async (_parent, args, context: Context) => {
-  if (!context.user) {
-    return false
+// One rule for every group right — `hasGroupPermission(key, locator)` — where the locator
+// says which argument carries the group. Explicit per entry rather than a chain of fallbacks,
+// so the shield map states where the group comes from and a renamed argument cannot silently
+// resolve through something else. The answer itself comes from context.groupAuthorization,
+// which resolves a group once per request (see groupRole/requestScope.ts).
+
+type GroupLocation =
+  // A group was named and found: check the right against it.
+  | { type: 'group'; authorization: GroupAuthorization }
+  // An id was given but no group came back — deny, the operation cannot be authorized.
+  | { type: 'notFound' }
+  // Nothing named a group: the operation has no group context, so the network permission
+  // alone decides (a post outside any group, a direct-message room).
+  | { type: 'noGroup' }
+
+type GroupLocator = (args: Record<string, unknown>, ctx: Context) => Promise<GroupLocation>
+
+const stringArg = (args: Record<string, unknown>, name: string): string | null => {
+  const value = args[name] // eslint-disable-line security/detect-object-injection -- name is a literal at every call site
+  return typeof value === 'string' && value !== '' ? value : null
+}
+
+/** The group is named directly by an argument (`groupId`, or `id` on group operations). */
+const byArg =
+  (argument: string): GroupLocator =>
+  async (args, ctx) => {
+    const groupId = stringArg(args, argument)
+    if (groupId === null) {
+      return { type: 'noGroup' }
+    }
+    const authorization = await ctx.groupAuthorization.forGroup(groupId)
+    return authorization ? { type: 'group', authorization } : { type: 'notFound' }
   }
 
-  return (
-    (
-      await context.database.query({
-        query: `
-    MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
-    WHERE (group.groupType IN ['closed', 'hidden'] AND membership.role IN ['admin', 'owner'])
-      OR (NOT group.groupType IN ['closed', 'hidden'] AND NOT membership.role = 'pending')
-    RETURN toString(count(group)) AS count
-    `,
-        variables: { userId: context.user.id, groupId: args.groupId },
-      })
-    ).records[0].get('count') === '1'
-  )
+/** The group is the one a post lives in. A post outside any group carries no group context. */
+const byPost =
+  (argument: string): GroupLocator =>
+  async (args, ctx) => {
+    const postId = stringArg(args, argument)
+    if (postId === null) {
+      return { type: 'noGroup' }
+    }
+    const authorization = await ctx.groupAuthorization.forPost(postId)
+    return authorization ? { type: 'group', authorization } : { type: 'noGroup' }
+  }
+
+/** The group a chat room belongs to. A direct-message room belongs to none. */
+const byRoom =
+  (argument: string): GroupLocator =>
+  async (args, ctx) => {
+    const roomId = stringArg(args, argument)
+    if (roomId === null) {
+      return { type: 'noGroup' }
+    }
+    const authorization = await ctx.groupAuthorization.forRoom(roomId)
+    return authorization ? { type: 'group', authorization } : { type: 'noGroup' }
+  }
+
+const hasGroupPermission = (
+  permission: GroupPermissionKey,
+  locate: GroupLocator = byArg('groupId'),
+) =>
+  rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
+    const location = await locate((args ?? {}) as Record<string, unknown>, ctx)
+    if (location.type === 'notFound') {
+      return false
+    }
+    if (location.type === 'noGroup') {
+      return true
+    }
+    return location.authorization.has(permission)
+  })
+
+/** Field rules on the Group type: the group is the parent object. */
+const parentHasGroupPermission = (permission: GroupPermissionKey) =>
+  rule({ cache: 'no_cache' })(async (parent, _args, ctx: Context) => {
+    const groupId = (parent as { id?: string } | null)?.id
+    if (typeof groupId !== 'string') {
+      return false
+    }
+    const authorization = await ctx.groupAuthorization.forGroup(groupId)
+    return !!authorization && authorization.has(permission)
+  })
+
+// Changing the group TYPE is its own right on top of the settings right, because it flips the
+// visibility of everything inside — and it is capped by the network right to create a group of
+// the target type, so switching is never a way around group.create_<type>.
+const canChangeGroupType = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
+  if (args.groupType === undefined || args.groupType === null) {
+    return true
+  }
+  const authorization = await ctx.groupAuthorization.forGroup(args.id)
+  return !!authorization && authorization.has('group.type.change')
 })
 
-const isAllowedToPinGroupPost = rule({
-  cache: 'no_cache',
-})(async (_parent, args, context: Context) => {
-  if (!context.user) {
+// Joining is two different acts sharing one mutation: joining oneself, and adding somebody
+// else. The first is governed by group.join / group.join.request (which of the two the viewer
+// holds also decides whether they land as a member or as an applicant — the resolver reads the
+// same pair), the second is membership management and needs group.member.approve. Before this,
+// ANY authenticated user could add ANY other user to a public or closed group.
+const canJoinGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
+  if (!ctx.user) {
     return false
   }
+  const authorization = await ctx.groupAuthorization.forGroup(args.groupId)
+  if (!authorization) {
+    return false
+  }
+  if (args.userId === ctx.user.id) {
+    return authorization.has('group.join') || authorization.has('group.join.request')
+  }
+  return authorization.has('group.member.approve')
+})
 
-  return (
-    (
-      await context.database.query({
-        query: `
-    MATCH (post:Post{id: $args.id})-[:IN]->(group:Group)
-    MATCH (user:User{id: $user.id})-[membership:MEMBER_OF]->(group)
-    WHERE (membership.role IN ['admin', 'owner'])
-    RETURN toString(count(group)) as count
-    `,
-        variables: { user: context.user, args },
-      })
-    ).records[0].get('count') === '1'
-  )
+// Leaving is about one's own membership only; removing somebody else is RemoveUserFromGroup.
+const isLeavingSelf = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
+  return !!ctx.user && ctx.user.id === args.userId
+})
+
+// Changing a member's role: the right, plus the two act-on rules from groupRole/authority.ts —
+// dominance over the member as they are now, and coverage of the role they would become.
+const canAssignGroupRole = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
+  if (!ctx.user) {
+    return false
+  }
+  const { groupId, userId, roleInGroup } = args
+  const authorization = await ctx.groupAuthorization.forGroup(groupId)
+  if (!authorization?.has('group.member.role.assign')) {
+    return false
+  }
+  const assigned = await ctx.groupAuthorization.rolePermissions(groupId, roleInGroup)
+  if (assigned === null) {
+    return false
+  }
+  if (userId === ctx.user.id) {
+    // Changing one's OWN role: coverage alone. Dominance can never hold against oneself, and
+    // demoting yourself is not an act of power over anybody — it is what an owner does when
+    // handing a group over (#6173), and with an owner-less group being legal it needs no
+    // second owner to exist first.
+    return coversRole(authorization.effective, assigned)
+  }
+  const target = await ctx.groupAuthorization.memberPermissions(groupId, userId)
+  return mayAssignGroupRole(authorization.effective, target, assigned)
+})
+
+const canRemoveGroupMember = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
+  if (!ctx.user || ctx.user.id === args.userId) {
+    return false
+  }
+  const authorization = await ctx.groupAuthorization.forGroup(args.groupId)
+  if (!authorization) {
+    return false
+  }
+  const target = await ctx.groupAuthorization.memberPermissions(args.groupId, args.userId)
+  return mayRemoveGroupMember(authorization.effective, target)
 })
 
 // Permissions
@@ -648,7 +474,7 @@ export default shield(
       statistics: hasPermission('network.statistics.read'),
       currentUser: isAuthenticated,
       Group: and(groupsEnabled, isAuthenticated),
-      GroupMembers: and(groupsEnabled, isAllowedSeeingGroupMembers),
+      GroupMembers: and(groupsEnabled, hasGroupPermission('group.members.read', byArg('id'))),
       GroupCount: and(groupsEnabled, isAuthenticated),
       Post: allow,
       profilePagePosts: allow,
@@ -672,7 +498,7 @@ export default shield(
       Message: isAuthenticated,
       UnreadRooms: isAuthenticated,
       videoCallConfig: allow,
-      videoCallParticipantCount: isAuthenticated,
+      videoCallParticipantCount: and(isAuthenticated, hasGroupPermission('group.videoCall.join')),
       PostsPinnedCounts: hasPermission('post.pin'),
 
       // Invite Code
@@ -706,12 +532,20 @@ export default shield(
       SignupVerification: allow,
       UpdateUser: onlyYourself,
       CreateGroup: and(isAuthenticated, canCreateGroup),
-      UpdateGroup: and(groupsEnabled, isAllowedToChangeGroupSettings),
-      JoinGroup: and(groupsEnabled, isAllowedToJoinGroup),
-      LeaveGroup: and(groupsEnabled, isAllowedToLeaveGroup),
-      ChangeGroupMemberRole: and(groupsEnabled, isAllowedToChangeGroupMemberRole),
-      RemoveUserFromGroup: and(groupsEnabled, canRemoveUserFromGroup),
-      CreatePost: and(isAuthenticated, hasPermission('post.create'), isMemberOfGroup),
+      UpdateGroup: and(
+        groupsEnabled,
+        hasGroupPermission('group.settings.manage', byArg('id')),
+        canChangeGroupType,
+      ),
+      JoinGroup: and(groupsEnabled, canJoinGroup),
+      LeaveGroup: and(groupsEnabled, isLeavingSelf, hasGroupPermission('group.leave')),
+      ChangeGroupMemberRole: and(groupsEnabled, canAssignGroupRole),
+      RemoveUserFromGroup: and(groupsEnabled, canRemoveGroupMember),
+      CreatePost: and(
+        isAuthenticated,
+        hasPermission('post.create'),
+        hasGroupPermission('group.post.create'),
+      ),
       UpdatePost: isAuthor,
       DeletePost: isAuthor,
       fileReport: isAuthenticated,
@@ -727,7 +561,11 @@ export default shield(
       unshout: isAuthenticated,
       changePassword: isAuthenticated,
       review: and(hasPermission('content.moderate'), canModerateTargetUser),
-      CreateComment: and(isAuthenticated, hasPermission('comment.create'), canCommentPost),
+      CreateComment: and(
+        isAuthenticated,
+        hasPermission('comment.create'),
+        hasGroupPermission('group.comment.create', byPost('postId')),
+      ),
       UpdateComment: isAuthor,
       DeleteComment: isAuthor,
       DeleteUser: or(
@@ -750,15 +588,15 @@ export default shield(
       VerifyEmailAddress: isAuthenticated,
       pinPost: hasPermission('post.pin'),
       unpinPost: hasPermission('post.pin'),
-      pinGroupPost: and(groupsEnabled, isAllowedToPinGroupPost),
-      unpinGroupPost: and(groupsEnabled, isAllowedToPinGroupPost),
+      pinGroupPost: and(groupsEnabled, hasGroupPermission('group.post.pin', byPost('id'))),
+      unpinGroupPost: and(groupsEnabled, hasGroupPermission('group.post.pin', byPost('id'))),
       pushPost: hasPermission('post.push'),
       unpushPost: hasPermission('post.push'),
       UpdateDonations: hasPermission('donation.manage'),
 
       // InviteCode
       generatePersonalInviteCode: and(isAuthenticated, hasPermission('user.invite')),
-      generateGroupInviteCode: and(groupsEnabled, isAllowedToGenerateGroupInviteCode),
+      generateGroupInviteCode: and(groupsEnabled, hasGroupPermission('group.invite')),
       invalidateInviteCode: isAuthenticated,
       redeemInviteCode: isAuthenticated,
 
@@ -794,14 +632,32 @@ export default shield(
 
       saveCategorySettings: isAuthenticated,
       updateOnlineStatus: isAuthenticated,
-      CreateGroupRoom: and(groupsEnabled, isAuthenticated),
-      CreateMessage: isAuthenticated,
-      joinGroupVideoCall: and(groupsEnabled, isAuthenticated),
-      MarkMessagesAsSeen: isAuthenticated,
+      CreateGroupRoom: and(
+        groupsEnabled,
+        isAuthenticated,
+        hasGroupPermission('group.chat.participate'),
+      ),
+      CreateMessage: and(
+        isAuthenticated,
+        hasGroupPermission('group.chat.participate', byRoom('roomId')),
+      ),
+      joinGroupVideoCall: and(
+        groupsEnabled,
+        isAuthenticated,
+        hasGroupPermission('group.videoCall.join'),
+      ),
+      MarkMessagesAsSeen: and(
+        isAuthenticated,
+        hasGroupPermission('group.chat.participate', byRoom('roomId')),
+      ),
       toggleObservePost: isAuthenticated,
-      muteGroup: and(groupsEnabled, isAuthenticated, isMemberOfGroup),
-      unmuteGroup: and(groupsEnabled, isAuthenticated, isMemberOfGroup),
-      setGroupMembershipVisibility: and(groupsEnabled, isAuthenticated, isMemberOfGroup),
+      muteGroup: and(groupsEnabled, isAuthenticated, hasGroupPermission('group.content.read')),
+      unmuteGroup: and(groupsEnabled, isAuthenticated, hasGroupPermission('group.content.read')),
+      setGroupMembershipVisibility: and(
+        groupsEnabled,
+        isAuthenticated,
+        hasGroupPermission('group.content.read'),
+      ),
       setTrophyBadgeSelected: isAuthenticated,
       resetTrophyBadgesSelected: isAuthenticated,
     },
@@ -819,12 +675,17 @@ export default shield(
       roleName: or(isMyOwn, hasPermission('role.manage')),
     },
     Group: {
-      '*': isAuthenticated, // TODO - only those who are allowed to see the group
+      '*': isAuthenticated,
       slug: allow,
       avatar: allow,
       name: allow,
       about: allow,
       groupType: allow,
+      // The member count is part of the member list, not a separate fact: in a small group
+      // "3 members" plus a known owner is nearly the list itself (concept E7). Still behind
+      // isAuthenticated as well, so switching the right on for non-members of a public group
+      // does not silently expose it to anonymous visitors too.
+      membersCount: and(isAuthenticated, parentHasGroupPermission('group.members.read')),
     },
     InviteCode: {
       '*': allow,

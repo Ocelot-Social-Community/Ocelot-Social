@@ -17,6 +17,7 @@ import {
 import { ForbiddenError, UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 import { branding } from '@src/branding'
+import { PENDING_ROLE, USUAL_ROLE } from '@src/groupRole'
 import { seedRolesForNewGroup } from '@src/groupRole/repository'
 
 import Resolver from './helpers/Resolver'
@@ -90,9 +91,9 @@ export default {
             ${locationMatch}
             OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
             WITH group, membership
-            ${(isMember === true && "WHERE membership IS NOT NULL AND (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])") || ''}
+            ${(isMember === true && "WHERE membership IS NOT NULL AND (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role <> 'pending')") || ''}
             ${(isMember === false && "WHERE membership IS NULL AND (group.groupType IN ['public', 'closed'])") || ''}
-            ${(isMember === undefined && "WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])") || ''}
+            ${(isMember === undefined && "WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role <> 'pending')") || ''}
             RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
             ORDER BY group.createdAt DESC
             ${first !== undefined && offset !== undefined ? 'SKIP toInteger($offset) LIMIT toInteger($first)' : ''}
@@ -123,7 +124,7 @@ export default {
         return await session.readTransaction(async (txc) => {
           const memberCheckResult = await txc.run(
             `MATCH (:User {id: $viewerId})-[m:MEMBER_OF]->(:Group {id: $groupId})
-             WHERE m.role IN ['usual', 'admin', 'owner']
+             WHERE m.role <> 'pending'
              RETURN m.role AS role`,
             { viewerId, groupId },
           )
@@ -185,7 +186,7 @@ export default {
           if (isMember) {
             cypher = `MATCH (user:User)-[membership:MEMBER_OF]->(group:Group)
                       WHERE user.id = $userId
-                      AND membership.role IN ['usual', 'admin', 'owner', 'pending']
+                      AND membership IS NOT NULL
                       RETURN toString(count(group)) AS count`
           } else {
             cypher = `MATCH (group:Group)
@@ -193,7 +194,7 @@ export default {
                       WHERE user.id = $userId
                       WITH group, membership
                       WHERE group.groupType IN ['public', 'closed']
-                      OR membership.role IN ['usual', 'admin', 'owner']
+                      OR membership.role <> 'pending'
                       RETURN toString(count(group)) AS count`
           }
           const transactionResponse = await txc.run(cypher, { userId })
@@ -425,6 +426,14 @@ export default {
     },
     JoinGroup: async (_parent, params, context: Context, _resolveInfo) => {
       const { groupId, userId } = params
+      // Where the membership lands follows the RIGHT, not the group type: someone who holds
+      // group.join enters as a member, someone who only holds group.join.request waits as an
+      // applicant. Adding another person is an act of membership management (the shield
+      // required group.member.approve for it), so it lands as a member. The group type still
+      // decides all of this — it just does so through the non-member role it seeded.
+      const authorization = await context.groupAuthorization.forGroup(groupId)
+      const joinsAsMember = context.user?.id !== userId || !!authorization?.has('group.join')
+      const role = joinsAsMember ? USUAL_ROLE : PENDING_ROLE
       const session = context.driver.session()
       try {
         const result = await session.writeTransaction(async (transaction) => {
@@ -434,14 +443,14 @@ export default {
             ON CREATE SET
               membership.createdAt = toString(datetime()),
               membership.updatedAt = toString(datetime()),
-              membership.role =
-                CASE WHEN group.groupType = 'public'
-                  THEN 'usual'
-                  ELSE 'pending'
-                  END
+              membership.role = $role
             RETURN user {.*}, membership {.*}
           `
-          const transactionResponse = await transaction.run(joinGroupCypher, { groupId, userId })
+          const transactionResponse = await transaction.run(joinGroupCypher, {
+            groupId,
+            userId,
+            role,
+          })
           const records = transactionResponse.records.map((record) => {
             return { user: record.get('user'), membership: record.get('membership') }
           })
@@ -501,7 +510,7 @@ export default {
             return { user: record.get('user'), membership: record.get('membership') }
           })
           // Manage group chat room membership based on role
-          if (['usual', 'admin', 'owner'].includes(roleInGroup)) {
+          if (roleInGroup !== 'pending') {
             await addUserToGroupChatRoom(transaction, groupId, userId)
           } else {
             await removeUserFromGroupChatRoom(transaction, groupId, userId)
@@ -562,7 +571,7 @@ export default {
           const result = await transaction.run(
             `
               MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
-              WHERE membership.role IN ['usual', 'admin', 'owner']
+              WHERE membership.role <> 'pending'
               SET membership.showOnProfile = $showOnProfile
               SET membership.updatedAt = toString(datetime())
               RETURN membership {.*}
@@ -633,7 +642,7 @@ export default {
           if (isOwnProfile) {
             cypher = `
               MATCH (profileUser:User {id: $profileUserId})-[membership:MEMBER_OF]->(group:Group)
-              WHERE membership.role IN ['usual', 'admin', 'owner']
+              WHERE membership.role <> 'pending'
                 AND ($nameFilter = '' OR toLower(group.name) CONTAINS toLower($nameFilter))
               RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
               ORDER BY group.groupType ASC, group.createdAt DESC
@@ -642,7 +651,7 @@ export default {
           } else {
             cypher = `
               MATCH (profileUser:User {id: $profileUserId})-[membership:MEMBER_OF]->(group:Group)
-              WHERE membership.role IN ['usual', 'admin', 'owner']
+              WHERE membership.role <> 'pending'
                 AND coalesce(membership.showOnProfile, true) = true
                 AND ($nameFilter = '' OR toLower(group.name) CONTAINS toLower($nameFilter))
               OPTIONAL MATCH (viewer:User {id: $viewerId})-[viewerMembership:MEMBER_OF]->(group)
@@ -654,12 +663,12 @@ export default {
                   group.groupType = 'hidden'
                   AND coalesce(profileUser.showHiddenGroupsOnProfile, true) = true
                   AND viewerMembership IS NOT NULL
-                  AND viewerMembership.role IN ['usual', 'admin', 'owner']
+                  AND viewerMembership.role <> 'pending'
                 )
               )
               RETURN group {.*, myRole: viewerMembership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
               ORDER BY
-                CASE WHEN viewerMembership IS NOT NULL AND viewerMembership.role IN ['usual', 'admin', 'owner'] THEN 0 ELSE 1 END ASC,
+                CASE WHEN viewerMembership IS NOT NULL AND viewerMembership.role <> 'pending' THEN 0 ELSE 1 END ASC,
                 group.createdAt DESC
               SKIP toInteger($offset) LIMIT toInteger($first)
             `

@@ -37,7 +37,7 @@ const postVisibilityClause = `(
       WHERE NOT g.groupType = 'public'
         AND NOT EXISTS {
           MATCH (g)<-[membership:MEMBER_OF]-(user)
-          WHERE membership.role IN ['usual', 'admin', 'owner']
+          WHERE membership.role <> 'pending'
         }
     }
     OR author.id = user.id
@@ -101,7 +101,7 @@ const searchGroupsSetup = {
   whereClause: `WHERE score >= 0.0
                 AND NOT (resource.deleted = true OR resource.disabled = true)
                 AND (resource.groupType IN ['public', 'closed']
-                  OR membership.role IN ['usual', 'admin', 'owner'])`,
+                  OR membership.role <> 'pending')`,
   withClause: 'WITH resource, membership, score',
   returnClause: `resource { .*, myRole: membership.role, __typename: 'Group' }`,
   limit: 'LIMIT toInteger($limit)',
@@ -114,7 +114,7 @@ const searchMyGroupsSetup = {
           WITH user, resource, membership, score`,
   whereClause: `WHERE score >= 0.0
                 AND NOT (resource.deleted = true OR resource.disabled = true)
-                AND membership.role IN ['usual', 'admin', 'owner']`,
+                AND membership.role <> 'pending'`,
   withClause: 'WITH resource, membership, score',
   returnClause: `resource { .*, myRole: membership.role, __typename: 'Group' }`,
   limit: 'LIMIT toInteger($limit)',

@@ -43,7 +43,7 @@ const visiblePostFilter = `WHERE NOT related.disabled = true AND NOT related.del
       WHERE NOT g.groupType = 'public'
         AND NOT EXISTS {
           MATCH (g)<-[membership:MEMBER_OF]-(:User {id: $cypherParams.currentUserId})
-          WHERE membership.role IN ['usual', 'admin', 'owner']
+          WHERE membership.role <> 'pending'
         }
     }
     OR EXISTS { MATCH (related)<-[:WROTE]-(:User {id: $cypherParams.currentUserId}) }

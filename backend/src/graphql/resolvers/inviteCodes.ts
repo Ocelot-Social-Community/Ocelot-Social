@@ -43,6 +43,11 @@ export const validateInviteCode = async (context: Context, inviteCode) => {
       RETURN
         CASE
         WHEN inviteCode IS NULL THEN false
+        // A group invite code whose creator may invite members but not outsiders cannot be
+        // redeemed for a REGISTRATION; it still works for somebody who already has an account
+        // (redeemInviteCode). Absent property ⇒ true, which covers every code handed out
+        // before the two rights were split and every personal code.
+        WHEN coalesce(inviteCode.externalAllowed, true) = false THEN false
         WHEN inviteCode.expiresAt IS NULL THEN true
         WHEN datetime(inviteCode.expiresAt) >=  datetime() THEN true
         ELSE false END AS result
@@ -192,6 +197,12 @@ export default {
       ).records[0].get('inviteCode')
     },
     generateGroupInviteCode: async (_parent, args, context: Context, _resolveInfo) => {
+      // Two rights, one object: group.invite lets a member bring in people who already have an
+      // account, group.invite.external additionally entitles the code's holder to register. The
+      // code records which of the two it is, and the registration path reads it back
+      // (validateInviteCode above).
+      const authorization = await context.groupAuthorization.forGroup(args.groupId as string)
+      const externalAllowed = !!authorization?.has('group.invite.external')
       const userInviteCodeAmount = (
         await context.database.query({
           query: `
@@ -229,9 +240,10 @@ export default {
           ON CREATE SET
             inviteCode.createdAt = toString(datetime()),
             inviteCode.expiresAt = $args.expiresAt,
-            inviteCode.comment = $args.comment
+            inviteCode.comment = $args.comment,
+            inviteCode.externalAllowed = $externalAllowed
           RETURN inviteCode {.*}`,
-          variables: { user: context.user, code, args },
+          variables: { user: context.user, code, args, externalAllowed },
         })
       ).records
 
