@@ -17,6 +17,7 @@ import {
 import { ForbiddenError, UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 import { branding } from '@src/branding'
+import { seedRolesForNewGroup } from '@src/groupRole/repository'
 
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
@@ -273,6 +274,15 @@ export default {
           )
           const [group] = ownerCreateGroupTransactionResponse.records.map((record) =>
             record.get('group'),
+          )
+          // The group's own role definitions, copied from the network template for its type.
+          // In the same transaction as the group itself: a group without roles is a group
+          // nobody can act in, so the two commit together or not at all.
+          await seedRolesForNewGroup(
+            transaction,
+            params.id,
+            params.groupType,
+            new Date().toISOString(),
           )
           return group
         })

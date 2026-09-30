@@ -24,6 +24,12 @@ export const Group = defineEntity({
     disabled: { type: 'boolean' },
     createdAt: { type: 'string', pattern: ISO_DATE_TIME },
     updatedAt: { type: 'string', pattern: ISO_DATE_TIME },
+    rolesCustomizedAt: {
+      type: ['string', 'null'],
+      pattern: ISO_DATE_TIME,
+      description:
+        'when this group first edited its own role definitions; null ⇒ still on the template, which is what the "apply template" admin action selects by',
+    },
   },
   required: ['id', 'name', 'slug', 'groupType', 'createdAt', 'updatedAt'],
   unique: ['id', 'slug'],
