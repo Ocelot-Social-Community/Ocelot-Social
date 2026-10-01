@@ -104,7 +104,6 @@ export const searchGroups = (i18n) => {
           location {
             name(lang: "${lang}")
           }
-          myRole
           myGroupRole {
             name
             label
@@ -163,7 +162,6 @@ export const searchChatTargets = gql`
         avatar {
           ...imageUrls
         }
-        myRole
         myGroupRole {
           name
           label

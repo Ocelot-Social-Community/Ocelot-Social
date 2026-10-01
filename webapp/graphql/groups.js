@@ -52,7 +52,6 @@ export const createGroupMutation = () => {
           icon
         }
         locationName
-        myRole
         myGroupRole {
           name
           label
@@ -119,7 +118,6 @@ export const updateGroupMutation = () => {
           ...imageUrls
         }
         locationName
-        myRole
         myGroupRole {
           name
           label
@@ -152,23 +150,6 @@ export const leaveGroupMutation = () => {
   return gql`
     mutation ($groupId: ID!, $userId: ID!) {
       LeaveGroup(groupId: $groupId, userId: $userId) {
-        user {
-          id
-          name
-          slug
-        }
-        membership {
-          role
-        }
-      }
-    }
-  `
-}
-
-export const changeGroupMemberRoleMutation = () => {
-  return gql`
-    mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
-      ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
         user {
           id
           name
@@ -247,7 +228,6 @@ export const groupQuery = (i18n) => {
         }
         ...locationOnGroup
         membersCount
-        myRole
         myGroupRole {
           name
           label
@@ -282,7 +262,6 @@ export const groupEditQuery = () => {
         avatar {
           ...imageUrls
         }
-        myRole
         myGroupRole {
           name
           label
@@ -364,7 +343,6 @@ export const groupTeaserQuery = (i18n) => {
         about
         groupType
         actionRadius
-        myRole
         myGroupRole {
           name
           label

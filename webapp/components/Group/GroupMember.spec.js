@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import GroupMember from './GroupMember.vue'
-import { changeGroupMemberRoleMutation, removeUserFromGroupMutation } from '~/graphql/groups.js'
+import { removeUserFromGroupMutation } from '~/graphql/groups.js'
+import { setGroupMemberRoleMutation } from '~/graphql/groupRoles.js'
 
 const localVue = global.localVue
 
@@ -45,7 +46,7 @@ const apolloMock = jest
   .mockRejectedValueOnce({ message: 'Oh no!' })
   .mockResolvedValue({
     data: {
-      ChangeGroupMemberRole: {
+      setGroupMemberRole: {
         user: {
           slug: 'user',
           id: 'user',
@@ -121,8 +122,8 @@ describe('GroupMember', () => {
       describe('with server success', () => {
         it('calls the API', () => {
           expect(apolloMock).toHaveBeenCalledWith({
-            mutation: changeGroupMemberRoleMutation(),
-            variables: { groupId: 'group-id', userId: 'user', roleInGroup: 'admin' },
+            mutation: setGroupMemberRoleMutation(),
+            variables: { groupId: 'group-id', userId: 'user', roleName: 'admin' },
           })
         })
 

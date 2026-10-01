@@ -4,6 +4,8 @@ import {
   groupRoleTemplatesQuery,
   updateGroupRoleTemplateMutation,
 } from './adminGroups'
+import { post } from './fragments/post'
+import { groupQuery } from './groups'
 import {
   createGroupRoleMutation,
   deleteGroupRoleMutation,
@@ -52,6 +54,24 @@ describe('group rights documents', () => {
     expect(printed).toContain('ownerCount')
     expect(printed).toContain('membersCount')
     expect(printed).toContain('adminGroupCount')
+  })
+
+  it('carries the group rights on every post, for the content menu', () => {
+    // The group pin and "take out of group" entries ask canInGroup() against post.group, and a
+    // group object WITHOUT myGroupPermissions answers no to everything — so leaving the field
+    // out of this fragment switched both entries off everywhere without any test noticing.
+    const printed = JSON.stringify(post)
+
+    expect(printed).toContain('myGroupPermissions')
+    expect(printed).toContain('myGroupRole')
+  })
+
+  it('no longer asks for the deprecated myRole anywhere', () => {
+    // Group roles are group-defined, so the enum field cannot express them. Everything reads
+    // myGroupRole / myGroupPermissions now; this guards the documents against it creeping back.
+    for (const document of [post, groupQuery(), groupRightsQuery()]) {
+      expect(JSON.stringify(document)).not.toContain('"myRole"')
+    }
   })
 
   it('asks the rights page for the catalog AND what the viewer holds', () => {

@@ -118,7 +118,8 @@
 <script>
 import { OsBadge, OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { changeGroupMemberRoleMutation, removeUserFromGroupMutation } from '~/graphql/groups.js'
+import { removeUserFromGroupMutation } from '~/graphql/groups.js'
+import { setGroupMemberRoleMutation } from '~/graphql/groupRoles.js'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import groupRights from '~/mixins/groupRights'
 
@@ -183,18 +184,24 @@ export default {
     // The role a member carries, as a definition if the group's are known — so a custom role
     // renders with the label the group gave it rather than as its key.
     roleOf(member) {
-      const name = member.membership?.role
+      return this.roleByName(member.membership?.role)
+    },
+    /** A role definition by name, or a bare stand-in so roleLabel() can still name it. */
+    roleByName(name) {
       return this.groupRoles.find((role) => role.name === name) ?? { name, label: null }
     },
     async changeMemberRole(id, event) {
       const newRole = event.target.value
       try {
+        // setGroupMemberRole, not the deprecated ChangeGroupMemberRole: that one takes the
+        // GroupMemberRole ENUM, so every role a group invented for itself failed validation
+        // before it ever reached the shield.
         await this.$apollo.mutate({
-          mutation: changeGroupMemberRoleMutation(),
-          variables: { groupId: this.groupId, userId: id, roleInGroup: newRole },
+          mutation: setGroupMemberRoleMutation(),
+          variables: { groupId: this.groupId, userId: id, roleName: newRole },
         })
         this.$toast.success(
-          this.$t('group.changeMemberRole', { role: this.$t(`group.roles.${newRole}`) }),
+          this.$t('group.changeMemberRole', { role: this.roleLabel(this.roleByName(newRole)) }),
         )
       } catch (error) {
         this.$toast.error(error.message)

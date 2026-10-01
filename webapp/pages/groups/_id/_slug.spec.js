@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils'
 import { branding as brandingDefaults } from '@ocelot-social/branding'
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { groupRights } from '~/test/groupRightsFixture'
+import { groupRights, groupRightsWithout } from '~/test/groupRightsFixture'
 
 const localVue = global.localVue
 
@@ -905,6 +905,106 @@ describe('GroupProfileSlug', () => {
     })
   })
 
+  describe("group action buttons follow the group's rights", () => {
+    let subscribeMock
+    let savedErrorHandler
+    let savedWarnHandler
+
+    beforeEach(() => {
+      savedErrorHandler = Vue.config.errorHandler
+      savedWarnHandler = Vue.config.warnHandler
+      Vue.config.errorHandler = null
+      Vue.config.warnHandler = null
+    })
+
+    afterEach(() => {
+      Vue.config.errorHandler = savedErrorHandler
+      Vue.config.warnHandler = savedWarnHandler
+    })
+
+    const mountWithGroup = (group) => {
+      subscribeMock = jest.fn().mockReturnValue({
+        subscribe: jest.fn().mockReturnValue({ unsubscribe: jest.fn() }),
+      })
+      currentUserMock.mockReturnValue(peterLustig)
+      return mount(GroupProfileSlug, {
+        localVue,
+        store,
+        stubs: {
+          ...stubs,
+          'infinite-loading': true,
+          'masonry-grid': true,
+          'masonry-grid-item': true,
+          'post-teaser': true,
+          'content-viewer': true,
+          OsCounterIcon: { props: ['icon', 'count'], template: '<i class="stub-counter-icon" />' },
+          OsIcon: { props: ['icon'], template: '<i class="stub-icon" />' },
+        },
+        mocks: {
+          ...mocks,
+          $apollo: {
+            loading: false,
+            mutate: jest.fn().mockResolvedValue(),
+            subscribe: subscribeMock,
+            queries: { chatRoom: { refetch: jest.fn() } },
+          },
+        },
+        data: () => ({ group }),
+      })
+    }
+
+    it('offers the chat to a member who holds group.chat.participate', () => {
+      const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
+      expect(wrapper.find('[data-test="chat-btn"]').exists()).toBe(true)
+    })
+
+    it('hides the chat when the group withheld the right from its members', () => {
+      // Being a member is no longer the question: the backend decides CreateGroupRoom and
+      // CreateMessage on group.chat.participate, so a button offered without it would only
+      // produce an error toast.
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        ...groupRightsWithout('usual', 'group.chat.participate'),
+      })
+      expect(wrapper.find('[data-test="chat-btn"]').exists()).toBe(false)
+    })
+
+    it('does not subscribe to room updates without the chat right', () => {
+      mountWithGroup({
+        ...yogaPractice,
+        ...groupRightsWithout('usual', 'group.chat.participate'),
+      })
+      // groupShowMembers still subscribes (that one follows the membership), roomUpdated does not
+      expect(subscribeMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('subscribes to room updates once the chat right arrives after mount', async () => {
+      const wrapper = mountWithGroup({})
+      expect(subscribeMock).not.toHaveBeenCalled()
+      wrapper.setData({ group: { ...yogaPractice, ...groupRights('usual') } })
+      await wrapper.vm.$nextTick()
+      expect(subscribeMock).toHaveBeenCalled()
+    })
+
+    it('marks the new-post button denied when the group withheld group.post.create', () => {
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        ...groupRightsWithout('usual', 'group.post.create'),
+      })
+      const button = wrapper.find('.profile-post-add-button')
+      expect(button.exists()).toBe(true)
+      expect(button.classes()).toContain('permission-denied')
+      expect(button.attributes('aria-disabled')).toBe('true')
+    })
+
+    it('leaves the new-post button alone for a member who may post', () => {
+      const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
+      const button = wrapper.find('.profile-post-add-button')
+      expect(button.exists()).toBe(true)
+      expect(button.classes()).not.toContain('permission-denied')
+    })
+  })
+
   describe('video call button (videoCall/enabled = true)', () => {
     let openVideoCallMock
     let savedErrorHandler
@@ -984,22 +1084,24 @@ describe('GroupProfileSlug', () => {
     })
 
     it('grays out the button (permission-denied) when the role may not open a call and none is running', () => {
-      // No per-type open permission ($can → false) and no active call (count 0): the
-      // button is shown but marked denied; joining-only would re-enable it.
-      const wrapper = mountWithGroup(
-        { ...yogaPractice, groupType: 'closed', ...groupRights('usual') },
-        { $can: () => false },
-      )
+      // The group withheld group.videoCall.create from its members and no call is running
+      // (count 0): the button is shown but marked denied; joining-only would re-enable it.
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        groupType: 'closed',
+        ...groupRightsWithout('usual', 'group.videoCall.create'),
+      })
       const button = wrapper.find('[data-test="video-call-btn"]')
       expect(button.exists()).toBe(true)
       expect(button.classes()).toContain('permission-denied')
     })
 
     it('does not gray out the button when a call is already running (join is allowed)', async () => {
-      const wrapper = mountWithGroup(
-        { ...yogaPractice, groupType: 'closed', ...groupRights('usual') },
-        { $can: () => false },
-      )
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        groupType: 'closed',
+        ...groupRightsWithout('usual', 'group.videoCall.create'),
+      })
       wrapper.setData({ videoCallParticipantCount: 2 })
       await wrapper.vm.$nextTick()
       const button = wrapper.find('[data-test="video-call-btn"]')
@@ -1034,24 +1136,26 @@ describe('GroupProfileSlug', () => {
     })
 
     it('does not dispatch videoCall/OPEN but shows a toast when the viewer may not open a call', async () => {
-      // No open permission ($can → false) and no running call (count 0): clicking the
+      // No group.videoCall.create and no running call (count 0): clicking the
       // (still-clickable) button must short-circuit with feedback instead of an OPEN.
-      const wrapper = mountWithGroup(
-        { ...yogaPractice, groupType: 'closed', ...groupRights('usual') },
-        { $can: () => false },
-      )
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        groupType: 'closed',
+        ...groupRightsWithout('usual', 'group.videoCall.create'),
+      })
       await wrapper.find('[data-test="video-call-btn"]').trigger('click')
       expect(openVideoCallMock).not.toHaveBeenCalled()
       expect(mocks.$toast.error).toHaveBeenCalledWith('permissions.deniedHint')
     })
 
     it('dispatches videoCall/OPEN (no toast) when a call is already running, even without open permission', async () => {
-      // Counter > 0 → this is a JOIN, allowed for any member regardless of the open
-      // permission: the click must dispatch and not surface the denied feedback.
-      const wrapper = mountWithGroup(
-        { ...yogaPractice, groupType: 'closed', ...groupRights('usual') },
-        { $can: () => false },
-      )
+      // Counter > 0 → this is a JOIN, allowed for anybody holding group.videoCall.join
+      // whether or not they may open one: the click must dispatch and not surface the toast.
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        groupType: 'closed',
+        ...groupRightsWithout('usual', 'group.videoCall.create'),
+      })
       wrapper.setData({ videoCallParticipantCount: 2 })
       await wrapper.vm.$nextTick()
       await wrapper.find('[data-test="video-call-btn"]').trigger('click')
@@ -1062,10 +1166,11 @@ describe('GroupProfileSlug', () => {
     it('refetches the count before denying, then proceeds with the JOIN when a call turns out to be running', async () => {
       // Stale snapshot: count is 0 at click time, but a refetch reveals a live call.
       // The client must re-check and not hard-block the JOIN on the stale value.
-      const wrapper = mountWithGroup(
-        { ...yogaPractice, groupType: 'closed', ...groupRights('usual') },
-        { $can: () => false },
-      )
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        groupType: 'closed',
+        ...groupRightsWithout('usual', 'group.videoCall.create'),
+      })
       const refetch = jest.fn().mockImplementation(() => {
         wrapper.vm.videoCallParticipantCount = 2
         return Promise.resolve()
@@ -1082,10 +1187,11 @@ describe('GroupProfileSlug', () => {
       // Refetch rejects (network/load race): the failure must be swallowed (no unhandled
       // rejection / raw backend error) and the decision falls back to the stale count we
       // already have — which here is 0, so the JOIN stays denied with the usual toast.
-      const wrapper = mountWithGroup(
-        { ...yogaPractice, groupType: 'closed', ...groupRights('usual') },
-        { $can: () => false },
-      )
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        groupType: 'closed',
+        ...groupRightsWithout('usual', 'group.videoCall.create'),
+      })
       const refetch = jest.fn().mockRejectedValue(new Error('network down'))
       wrapper.vm.$apollo.queries.videoCallParticipantCount = { refetch }
       const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})

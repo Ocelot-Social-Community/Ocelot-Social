@@ -3,6 +3,7 @@
     <add-group-member
       :groupId="group.id"
       :groupMembers="groupMembers"
+      :groupRoles="assignableRoles"
       @loadGroupMembers="loadGroupMembers"
     />
     <div class="ds-mb-small"></div>

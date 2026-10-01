@@ -87,7 +87,7 @@
             />
             <!-- Group chat -->
             <os-button
-              v-if="isGroupMemberNonePending"
+              v-if="canParticipateInChat"
               data-test="chat-btn"
               variant="primary"
               appearance="outline"
@@ -284,22 +284,20 @@
         </div>
         <div v-if="isGroupMemberNonePending" class="ds-mt-small ds-mb-small ds-space-centered">
           <os-button
-            :as="$can('post.create') ? 'nuxt-link' : 'button'"
+            :as="canPostInGroup ? 'nuxt-link' : 'button'"
             :to="{
               name: 'post-create-type',
               query: { groupId: group.id },
             }"
-            :class="{ 'permission-denied': !$can('post.create') }"
-            :aria-disabled="!$can('post.create')"
+            :class="{ 'permission-denied': !canPostInGroup }"
+            :aria-disabled="!canPostInGroup"
             class="profile-post-add-button"
             variant="primary"
             appearance="filled"
             circle
             :aria-label="$t('contribution.newPost')"
             v-tooltip="{
-              content: $can('post.create')
-                ? $t('contribution.newPost')
-                : $t('permissions.deniedHint'),
+              content: canPostInGroup ? $t('contribution.newPost') : $t('permissions.deniedHint'),
               placement: 'left',
             }"
           >
@@ -480,15 +478,13 @@ export default {
       return (this.chatRoom && this.chatRoom.unreadCount) || 0
     },
     canShowVideoCallButton() {
-      // Shown to members of ANY group type: joining an existing call is open to all
-      // members. Opening one (no active call) is gated per group type below.
-      return this.videoCallEnabled && this.isGroupMemberNonePending && !!this.group
+      return this.videoCallEnabled && this.canInGroup('group.videoCall.join', this.group)
     },
-    // Network permission to OPEN (start) a call in this group's type.
     canOpenVideoCall() {
-      return this.group ? this.$can(`videoCall.create_${this.group.groupType}`) : false
+      // Opening a call is its own group right, capped server-side by the network
+      // videoCall.create_<type> this used to ask for directly.
+      return this.canInGroup('group.videoCall.create', this.group)
     },
-    // No call running and the viewer may not start one → the button is a dead end.
     videoCallOpenDenied() {
       return this.videoCallParticipantCount === 0 && !this.canOpenVideoCall
     },
@@ -522,6 +518,18 @@ export default {
     },
     hasGroupMembership() {
       return !!this.group?.myGroupRole
+    },
+    // Chat, calls and posting are rights now, not consequences of being a member: a group may
+    // close its chat for members or open a channel's posting to nobody. The backend decides on
+    // exactly these keys, so the button that triggers it has to ask the same question —
+    // otherwise the only feedback is the shield's error toast.
+    canParticipateInChat() {
+      return this.canInGroup('group.chat.participate', this.group)
+    },
+    canPostInGroup() {
+      // No separate $can('post.create'): myGroupPermissions is already capped by the viewer's
+      // network rights, so the group key cannot be held without the network one.
+      return this.canInGroup('group.post.create', this.group)
     },
     isGroupMemberNonePending() {
       return this.isGroupMember(this.group)
@@ -581,7 +589,7 @@ export default {
     this._videoCallCountSub = null
     this._groupShowMembersSub = null
     this.setupDescriptionOverflowObserver()
-    if (this.isGroupMemberNonePending) this.setupRoomUpdatedSubscription()
+    if (this.canParticipateInChat) this.setupRoomUpdatedSubscription()
     if (this.canShowVideoCallButton) this.setupVideoCallCountSubscription()
     if (this.group?.myGroupRole) this.setupGroupShowMembersSubscription()
   },
@@ -592,11 +600,11 @@ export default {
     this.teardownDescriptionOverflowObserver()
   },
   watch: {
-    isGroupMemberNonePending(isMember) {
-      // Group membership is derived from the Apollo-populated group.myGroupRole, which
-      // isn't available synchronously on first visits (no SSR cache). Set up the
-      // subscription reactively when membership becomes known.
-      if (isMember) this.setupRoomUpdatedSubscription()
+    canParticipateInChat(mayChat) {
+      // The right is derived from the Apollo-populated group.myGroupPermissions, which isn't
+      // available synchronously on first visits (no SSR cache). Set up the subscription
+      // reactively once the answer is known.
+      if (mayChat) this.setupRoomUpdatedSubscription()
     },
     canShowVideoCallButton(can) {
       if (can) this.setupVideoCallCountSubscription()

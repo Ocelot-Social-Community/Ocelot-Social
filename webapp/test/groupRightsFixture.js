@@ -44,4 +44,19 @@ export const groupRights = (roleName) => ({
   myGroupPermissions: roleName ? PERMISSIONS[roleName] : PERMISSIONS.none,
 })
 
+/**
+ * The same role, minus named rights — for the case a group closed something for its own
+ * members (no chat, no posting, calls joinable but not startable). That is a right the group
+ * took away, not a network permission, so a `$can` mock cannot express it.
+ */
+export const groupRightsWithout = (roleName, ...withheld) => {
+  const rights = groupRights(roleName)
+  return {
+    ...rights,
+    myGroupPermissions: rights.myGroupPermissions.filter(
+      (permission) => !withheld.includes(permission),
+    ),
+  }
+}
+
 export default groupRights

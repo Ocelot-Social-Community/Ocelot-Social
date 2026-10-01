@@ -18,6 +18,5 @@ export const group = gql`
       icon
     }
     locationName
-    myRole
   }
 `
