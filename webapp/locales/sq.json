@@ -873,12 +873,12 @@
     "categoriesTitle": "Temat e grupit",
     "changeMemberRole": "Roli u ndryshua në „{role}“!",
     "contentMenu": {
-      "hideFromProfile": "Hide from my profile",
+      "hideFromProfile": "Fshihe nga profili im",
       "inviteLinks": "Lidhje ftese",
       "menuButton": "Menuja e grupit",
       "muteGroup": "Hesht grupin",
       "profileVisibilityUpdated": "Dukshmëria u përditësua",
-      "showOnProfile": "Show on my profile",
+      "showOnProfile": "Shfaqe në profilin tim",
       "unmuteGroup": "Çhesht grupin",
       "visitGroupPage": "Shfaq grupin"
     },
@@ -1311,15 +1311,15 @@
     "followers": "Ndjekës",
     "following": "Duke ndjekur",
     "groups": {
-      "closed": "Closed groups",
-      "hidden": "Secret groups",
-      "hiddenFromOthers": "hidden from others",
-      "nobody": "no groups",
+      "closed": "Grupe të mbyllura",
+      "hidden": "Grupe sekrete",
+      "hiddenFromOthers": "e fshehur nga të tjerët",
+      "nobody": "asnjë grup",
       "noFilterResults": "Nuk u gjetën grupe për këtë filtër.",
       "other": "Grupe pa mua",
-      "public": "Public groups",
+      "public": "Grupe publike",
       "shared": "Grupe të ndara",
-      "title": "Groups of {name}"
+      "title": "Grupet e {name}"
     },
     "invites": {
       "description": "Fut adresën e tyre të e-mailit për ftesë.",
@@ -1636,11 +1636,11 @@
     "privacy": {
       "make-shouts-public": "Ndaj artikujt që kam rekomanduar në profilin tim publik",
       "name": "Privatësia",
-      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-closed-groups-on-profile": "Shfaq grupet e mbyllura në profilin tim",
       "show-groups-on-profile-hint": "Dukshmëria e çdo grupi individual mund të caktohet gjithashtu nëpërmjet menysë me tre pika të grupit ose drejtpërdrejt në listën e grupeve në profilin tuaj.",
-      "show-groups-on-profile-section": "Show groups on profile",
+      "show-groups-on-profile-section": "Shfaq grupet në profil",
       "show-hidden-groups-on-profile": "Shfaq grupet sekrete në profilin tim",
-      "show-public-groups-on-profile": "Show public groups on my profile",
+      "show-public-groups-on-profile": "Shfaq grupet publike në profilin tim",
       "success-update": "Cilësimet e privatësisë u ruajtën!"
     },
     "security": {

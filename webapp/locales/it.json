@@ -873,12 +873,12 @@
     "categoriesTitle": "Argomenti del gruppo",
     "changeMemberRole": "Il ruolo è stato cambiato in «{role}»!",
     "contentMenu": {
-      "hideFromProfile": "Hide from my profile",
+      "hideFromProfile": "Nascondi dal mio profilo",
       "inviteLinks": "Link di invito",
       "menuButton": "Menu del gruppo",
       "muteGroup": "Silenzia gruppo",
       "profileVisibilityUpdated": "Visibilità aggiornata",
-      "showOnProfile": "Show on my profile",
+      "showOnProfile": "Mostra nel mio profilo",
       "unmuteGroup": "Riattiva gruppo",
       "visitGroupPage": "Mostra gruppo"
     },
@@ -1311,15 +1311,15 @@
     "followers": "Seguenti",
     "following": "Seguendo",
     "groups": {
-      "closed": "Closed groups",
-      "hidden": "Secret groups",
-      "hiddenFromOthers": "hidden from others",
-      "nobody": "no groups",
+      "closed": "Gruppi chiusi",
+      "hidden": "Gruppi segreti",
+      "hiddenFromOthers": "nascosto agli altri",
+      "nobody": "nessun gruppo",
       "noFilterResults": "Nessun gruppo trovato per questo filtro.",
       "other": "Gruppi senza di me",
-      "public": "Public groups",
+      "public": "Gruppi pubblici",
       "shared": "Gruppi condivisi",
-      "title": "Groups of {name}"
+      "title": "Gruppi di {name}"
     },
     "invites": {
       "description": "Inserisci il loro indirizzo e-mail per l'invito.",
@@ -1636,11 +1636,11 @@
     "privacy": {
       "make-shouts-public": "Condividi gli articoli che ho raccomandato sul mio profilo pubblico",
       "name": "Privacy",
-      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-closed-groups-on-profile": "Mostra gruppi chiusi nel mio profilo",
       "show-groups-on-profile-hint": "La visibilità di ogni singolo gruppo può essere impostata anche tramite il menu a tre puntini del gruppo o direttamente nell'elenco dei gruppi del tuo profilo.",
-      "show-groups-on-profile-section": "Show groups on profile",
+      "show-groups-on-profile-section": "Mostra gruppi nel profilo",
       "show-hidden-groups-on-profile": "Mostra gruppi segreti nel mio profilo",
-      "show-public-groups-on-profile": "Show public groups on my profile",
+      "show-public-groups-on-profile": "Mostra gruppi pubblici nel mio profilo",
       "success-update": "Impostazioni privacy salvate!"
     },
     "security": {

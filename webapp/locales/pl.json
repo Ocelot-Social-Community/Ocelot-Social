@@ -873,12 +873,12 @@
     "categoriesTitle": "Tematy grupy",
     "changeMemberRole": "Rola została zmieniona na „{role}”!",
     "contentMenu": {
-      "hideFromProfile": "Hide from my profile",
+      "hideFromProfile": "Ukryj na moim profilu",
       "inviteLinks": "Linki zaproszeń",
       "menuButton": "Menu grupy",
       "muteGroup": "Wycisz grupę",
       "profileVisibilityUpdated": "Widoczność zaktualizowana",
-      "showOnProfile": "Show on my profile",
+      "showOnProfile": "Pokaż na moim profilu",
       "unmuteGroup": "Cofnij wyciszenie grupy",
       "visitGroupPage": "Pokaż grupę"
     },
@@ -1311,15 +1311,15 @@
     "followers": "Obserwujący",
     "following": "Obserwowani",
     "groups": {
-      "closed": "Closed groups",
-      "hidden": "Secret groups",
-      "hiddenFromOthers": "hidden from others",
-      "nobody": "no groups",
+      "closed": "Grupy zamknięte",
+      "hidden": "Grupy tajne",
+      "hiddenFromOthers": "ukryte przed innymi",
+      "nobody": "brak grup",
       "noFilterResults": "Nie znaleziono grup dla tego filtra.",
       "other": "Grupy beze mnie",
-      "public": "Public groups",
+      "public": "Grupy publiczne",
       "shared": "Wspólne grupy",
-      "title": "Groups of {name}"
+      "title": "Grupy użytkownika {name}"
     },
     "invites": {
       "description": "Wprowadź adres e-mail, aby wysłać zaproszenie.",
@@ -1636,11 +1636,11 @@
     "privacy": {
       "make-shouts-public": "Udostępniaj artykuły, które poleciłem/am, na moim publicznym profilu",
       "name": "Prywatność",
-      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-closed-groups-on-profile": "Pokaż zamknięte grupy na moim profilu",
       "show-groups-on-profile-hint": "Widoczność każdej indywidualnej grupy można również ustawić za pomocą menu z trzema kropkami grupy lub bezpośrednio na liście grup w swoim profilu.",
-      "show-groups-on-profile-section": "Show groups on profile",
+      "show-groups-on-profile-section": "Pokaż grupy na profilu",
       "show-hidden-groups-on-profile": "Pokaż tajne grupy na moim profilu",
-      "show-public-groups-on-profile": "Show public groups on my profile",
+      "show-public-groups-on-profile": "Pokaż publiczne grupy na moim profilu",
       "success-update": "Ustawienia prywatności zapisane!"
     },
     "security": {
@@ -1700,7 +1700,7 @@
     "error-occurred": "Wystąpił błąd.",
     "faq": "FAQ",
     "germany": "Niemcy",
-    "imprint": "Nadruk",
+    "imprint": "Informacje prawne",
     "made": "Z ❤️ zrobiony",
     "navigation": "Nawigacja",
     "register": "numer rejestracyjny",
