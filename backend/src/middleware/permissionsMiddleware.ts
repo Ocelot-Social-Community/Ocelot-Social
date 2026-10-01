@@ -14,7 +14,7 @@ import {
   nonMemberReadsContent,
   optionalMemberRoleMatch,
 } from '@graphql/resolvers/helpers/groupAccessCypher'
-import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
+import { inviteCodeAllowsRegistration } from '@graphql/resolvers/inviteCodes'
 import { coversRole, mayAssignGroupRole, mayRemoveGroupMember } from '@src/groupRole'
 import { isPermissionAvailable } from '@src/permission'
 import { dominates } from '@src/role'
@@ -341,7 +341,10 @@ const inviteRegistration = rule()(async (_parent, args, context: Context) => {
     return false
   }
   const { inviteCode } = args
-  return validateInviteCode(context, inviteCode)
+  // Registering with a code is the question here, not whether the code is alive: a group
+  // invite without `group.invite.external` brings people INTO a group, it does not open the
+  // network's door (E11).
+  return inviteCodeAllowsRegistration(context, inviteCode)
 })
 
 // ─────────────────────────────────────────────────────────────────────────────────────────

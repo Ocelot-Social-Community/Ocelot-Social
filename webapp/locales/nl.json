@@ -938,6 +938,7 @@
       "join": "Lid worden",
       "leave": "Verlaten",
       "pendingMember": "In afwachting",
+      "requestJoin": "Verzoek om lid te worden",
       "tooltip": "De groepseigenaar moet je nog bevestigen."
     },
     "labelSlug": "Unieke groepsnaam",
@@ -1113,6 +1114,7 @@
     "invite-link-message-personal": "Je bent uitgenodigd om lid te worden van {network}.",
     "invited-count": "Je hebt al {count} mensen uitgenodigd.",
     "limit-reached": "Je hebt het maximale aantal uitnodigingslinks bereikt.",
+    "members-only": "alleen voor mensen die al een account hebben",
     "my-invite-links": "Mijn uitnodigingslinks",
     "no-links": "Nog geen uitnodigingslinks aangemaakt.",
     "redeemed-count": "Deze code is {count} keer gebruikt.",

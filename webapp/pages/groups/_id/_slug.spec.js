@@ -496,7 +496,7 @@ describe('GroupProfileSlug', () => {
             return {
               group: {
                 ...yogaPractice,
-                myRole: null,
+                ...groupRights(null),
               },
             }
           })
@@ -622,7 +622,10 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...schoolForCitizens,
-                  myRole: null,
+                  // A closed group asks rather than admits: its `none` role holds
+                  // group.join.request, not group.join, so the button offers "ask to join".
+                  myGroupRole: null,
+                  myGroupPermissions: ['group.read', 'group.join.request'],
                 },
               }
             })
@@ -698,7 +701,9 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...investigativeJournalism,
-                  myRole: null,
+                  // A hidden group's `none` role holds nothing: no door, no button.
+                  myGroupRole: null,
+                  myGroupPermissions: [],
                 },
               }
             })

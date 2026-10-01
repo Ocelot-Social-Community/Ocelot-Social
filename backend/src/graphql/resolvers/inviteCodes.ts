@@ -36,28 +36,60 @@ const uniqueInviteCode = async (context: Context, code: string) => {
   )
 }
 
-export const validateInviteCode = async (context: Context, inviteCode) => {
+/**
+ * Two different questions about one code, which used to be the same function — and that is
+ * what made a perfectly usable invite link show up under "expired".
+ *
+ *  - REDEEMABLE: does this code still exist and has it not run out? That is what `isValid`
+ *    answers, and what the invite list sorts by.
+ *  - ALLOWS REGISTRATION: may somebody create an ACCOUNT with it? A group code whose issuer
+ *    holds `group.invite` but not `group.invite.external` may not (E11) — it still brings
+ *    somebody who already has an account into the group, which is the whole point of it.
+ *
+ * `coalesce(externalAllowed, true)` covers every code handed out before the two rights were
+ * split, and every personal code: those have always entitled their holder to register.
+ */
+const inviteCodeState = async (
+  context: Context,
+  inviteCode: string,
+): Promise<{ redeemable: boolean; allowsRegistration: boolean }> => {
   const result = (
     await context.database.query({
       query: `
       OPTIONAL MATCH (inviteCode:InviteCode { code: toUpper($inviteCode) })
-      RETURN
+      WITH inviteCode,
         CASE
         WHEN inviteCode IS NULL THEN false
-        // A group invite code whose creator may invite members but not outsiders cannot be
-        // redeemed for a REGISTRATION; it still works for somebody who already has an account
-        // (redeemInviteCode). Absent property ⇒ true, which covers every code handed out
-        // before the two rights were split and every personal code.
-        WHEN coalesce(inviteCode.externalAllowed, true) = false THEN false
         WHEN inviteCode.expiresAt IS NULL THEN true
-        WHEN datetime(inviteCode.expiresAt) >=  datetime() THEN true
-        ELSE false END AS result
+        WHEN datetime(inviteCode.expiresAt) >= datetime() THEN true
+        ELSE false END AS redeemable
+      RETURN redeemable,
+             redeemable AND coalesce(inviteCode.externalAllowed, true) AS allowsRegistration
       `,
       variables: { inviteCode },
     })
   ).records
-  return result[0].get('result') === true
+  const record = result[0]
+  return {
+    redeemable: record?.get('redeemable') === true,
+    allowsRegistration: record?.get('allowsRegistration') === true,
+  }
 }
+
+/** Whether the code can still be redeemed at all — not whether one may register with it. */
+export const isInviteCodeRedeemable = async (
+  context: Context,
+  inviteCode: string,
+): Promise<boolean> => (await inviteCodeState(context, inviteCode)).redeemable
+
+/**
+ * Whether somebody may create an account with this code. The registration gate asks this one
+ * (see the `inviteRegistration` shield rule), and so does the registration screen.
+ */
+export const inviteCodeAllowsRegistration = async (
+  context: Context,
+  inviteCode: string,
+): Promise<boolean> => (await inviteCodeState(context, inviteCode)).allowsRegistration
 
 export const redeemInviteCode = async (context: Context, code, newUser = false) => {
   if (!context.user) {
@@ -315,11 +347,25 @@ export default {
       }
       return result[0].get('group')
     },
-    isValid: async (parent, _args, context: Context, _resolveInfo) => {
+    isValid: async (parent: { code?: string }, _args, context: Context, _resolveInfo) => {
       if (!parent.code) {
         return false
       }
-      return validateInviteCode(context, parent.code)
+      // Redeemable, which is NOT the same as "one may register with it": an invite a member
+      // handed out with `group.invite` alone is perfectly usable and used to be filed under
+      // "expired" here, because this field asked the registration question.
+      return isInviteCodeRedeemable(context, parent.code)
+    },
+    allowsRegistration: async (
+      parent: { code?: string },
+      _args,
+      context: Context,
+      _resolveInfo,
+    ) => {
+      if (!parent.code) {
+        return false
+      }
+      return inviteCodeAllowsRegistration(context, parent.code)
     },
     ...Resolver('InviteCode', {
       idAttribute: 'code',

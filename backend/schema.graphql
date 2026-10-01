@@ -652,6 +652,11 @@ input ImageInput {
 An invite code. A personal code lets its holder register on the instance; a group code additionally grants membership in a specific group. May be limited by an expiry and a redemption limit.
 """
 type InviteCode {
+  """
+  Whether somebody without an account may register with this code. False for a group invite whose issuer holds `group.invite` but not `group.invite.external`: such a code brings an existing account into the group and nothing more.
+  """
+  allowsRegistration: Boolean!
+
   """The code string, which also serves as its identifier."""
   code: ID!
 
@@ -671,7 +676,7 @@ type InviteCode {
   invitedTo: Group
 
   """
-  Whether the code can still be redeemed (not expired, invalidated, or over its redemption limit).
+  Whether the code can still be redeemed (not expired, invalidated, or over its redemption limit). A group code that does not entitle its holder to REGISTER is still valid — see allowsRegistration.
   """
   isValid: Boolean!
 

@@ -938,6 +938,7 @@
       "join": "Beitreten",
       "leave": "Verlassen",
       "pendingMember": "Ausstehendes Mitglied",
+      "requestJoin": "Beitritt anfragen",
       "tooltip": "Der Gruppeninhaber muss dich noch bestätigen."
     },
     "labelSlug": "Eindeutiger Gruppenname",
@@ -1113,6 +1114,7 @@
     "invite-link-message-personal": "Du wurdest eingeladen, dem Netzwerk {network} beizutreten",
     "invited-count": "Du hast bereits {count} Personen eingeladen.",
     "limit-reached": "Du hast die maximale Anzahl an Einladungslinks erreicht.",
+    "members-only": "nur für Leute, die schon ein Konto haben",
     "my-invite-links": "Meine Einladungslinks",
     "no-links": "Keine Links vorhanden",
     "redeemed-count": "{count} mal eingelöst",

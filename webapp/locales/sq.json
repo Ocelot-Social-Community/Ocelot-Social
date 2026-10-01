@@ -938,6 +938,7 @@
       "join": "Bashkohu",
       "leave": "Largohu",
       "pendingMember": "Anëtar në pritje",
+      "requestJoin": "Kërko t’i bashkohesh",
       "tooltip": "Pronari i grupit duhet ende të të konfirmojë."
     },
     "labelSlug": "Emri unik i grupit",
@@ -1113,6 +1114,7 @@
     "invite-link-message-personal": "Je ftuar të bashkohesh me {network}.",
     "invited-count": "Ke ftuar tashmë {count} persona.",
     "limit-reached": "Ke arritur numrin maksimal të lidhjeve të ftesës.",
+    "members-only": "vetëm për ata që kanë një llogari",
     "my-invite-links": "Lidhjet e mia të ftesës",
     "no-links": "Nuk janë krijuar ende lidhje ftese.",
     "redeemed-count": "Ky kod është përdorur {count} herë.",

@@ -938,6 +938,7 @@
       "join": "Join",
       "leave": "Leave",
       "pendingMember": "Pending member",
+      "requestJoin": "Ask to join",
       "tooltip": "The group owner has yet to confirm you."
     },
     "labelSlug": "Unique group name",
@@ -1113,6 +1114,7 @@
     "invite-link-message-personal": "You have been invited to join {network}.",
     "invited-count": "You have already invited {count} people.",
     "limit-reached": "You have reached the maximum number of invite links.",
+    "members-only": "only for people who already have an account",
     "my-invite-links": "My invite links",
     "no-links": "No invite links created yet.",
     "redeemed-count": "This code has been used {count} times.",

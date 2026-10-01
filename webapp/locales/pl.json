@@ -938,6 +938,7 @@
       "join": "Dołącz",
       "leave": "Opuść",
       "pendingMember": "Oczekujący członek",
+      "requestJoin": "Poproś o dołączenie",
       "tooltip": "Właściciel grupy musi jeszcze cię zatwierdzić."
     },
     "labelSlug": "Unikalna nazwa grupy",
@@ -1113,6 +1114,7 @@
     "invite-link-message-personal": "Zostałeś/aś zaproszony/a do dołączenia do {network}.",
     "invited-count": "Zaprosiłeś/aś już {count} osób.",
     "limit-reached": "Osiągnąłeś/aś maksymalną liczbę linków zaproszeń.",
+    "members-only": "tylko dla osób, które już mają konto",
     "my-invite-links": "Moje linki zaproszeń",
     "no-links": "Nie utworzono jeszcze żadnych linków zaproszeń.",
     "redeemed-count": "Ten kod został użyty {count} razy.",

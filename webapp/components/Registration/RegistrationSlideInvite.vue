@@ -140,7 +140,10 @@ export default {
 
           const validationResult = response.data.validateInviteCode
 
-          if (validationResult && validationResult.isValid) {
+          // `allowsRegistration`, not `isValid`: a group invite that only brings existing
+          // accounts into a group is a valid code — it just cannot open an account here, and
+          // the shield would refuse the signup behind this screen.
+          if (validationResult && validationResult.allowsRegistration) {
             // Auto-advance to next slide
             const currentIndex = this.sliderData.sliderIndex
             const nextIndex = currentIndex + 1

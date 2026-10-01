@@ -28,5 +28,6 @@ mutation generatePersonalInviteCode($expiresAt: String, $comment: String) {
       }
     }
     isValid
+    allowsRegistration
   }
 }

@@ -938,6 +938,7 @@
       "join": "Entrar",
       "leave": "Sair",
       "pendingMember": "Membro pendente",
+      "requestJoin": "Pedir para entrar",
       "tooltip": "O dono do grupo ainda precisa confirmar você."
     },
     "labelSlug": "Nome único do grupo",
@@ -1113,6 +1114,7 @@
     "invite-link-message-personal": "Você foi convidado a entrar em {network}.",
     "invited-count": "Já convidaste {count} pessoas.",
     "limit-reached": "Você atingiu o número máximo de links de convite.",
+    "members-only": "apenas para quem já tem uma conta",
     "my-invite-links": "Meus links de convite",
     "no-links": "Nenhum link de convite criado ainda.",
     "redeemed-count": "Este código foi usado {count} vezes.",

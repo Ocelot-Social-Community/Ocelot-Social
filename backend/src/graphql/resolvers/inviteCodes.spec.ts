@@ -703,6 +703,23 @@ describe('generateGroupInviteCode', () => {
       })
     })
 
+    it('generates a code that is valid but does not open an account', async () => {
+      // A member of a public group holds `group.invite`, not `group.invite.external` (E11):
+      // their link brings people who already have an account into the group. That is a
+      // perfectly usable code — it used to be reported as invalid, because `isValid` asked
+      // the registration question instead of the redemption one.
+      const { data, errors } = await mutate({
+        mutation: generateGroupInviteCode,
+        variables: { groupId: 'public-group' },
+      })
+
+      expect(errors).toBeUndefined()
+      expect(data.generateGroupInviteCode).toMatchObject({
+        isValid: true,
+        allowsRegistration: false,
+      })
+    })
+
     it('throws authorization error for the closed group, where only admins invite', async () => {
       await expect(
         mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'closed-group' } }),
