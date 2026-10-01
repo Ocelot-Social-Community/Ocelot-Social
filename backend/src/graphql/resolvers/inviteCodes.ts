@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { branding } from '@src/branding'
+import { PENDING_ROLE, USUAL_ROLE } from '@src/groupRole'
 
 import Resolver from './helpers/Resolver'
 
@@ -110,7 +111,14 @@ export const redeemInviteCode = async (context: Context, code, newUser = false) 
     })
     // Group Invite Link
   } else {
-    const role = ['closed', 'hidden'].includes(group.groupType as string) ? 'pending' : 'usual'
+    // Where an invited membership lands follows the group's RIGHTS, exactly as JoinGroup does
+    // it: whoever may enter without approval (`group.join`) becomes a member, everybody else
+    // waits as an applicant. The group type still decides — it just does so through the
+    // non-member role it seeded, so a group that opened or closed its own door is not overruled
+    // here. The authorization is resolved for the redeeming viewer, who has no membership yet
+    // and therefore sees the group's `none` role.
+    const authorization = await context.groupAuthorization.forGroup(group.id as string)
+    const role = authorization?.has('group.join') ? USUAL_ROLE : PENDING_ROLE
 
     const optionalInvited = newUser
       ? 'MERGE (host)-[:INVITED { createdAt: toString(datetime()) }]->(user)'
