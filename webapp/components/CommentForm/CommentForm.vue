@@ -145,7 +145,7 @@ export default {
           this.closeEditWindow()
         }
       } catch (err) {
-        this.$toast.error(err.message)
+        this.$toast.error(this.$backendError(err))
         this.disabled = false
       } finally {
         this.loading = false
