@@ -110,7 +110,11 @@ export const DEFAULT_GROUP_ROLE_TEMPLATES: GroupRoleTemplates = {
   // group structurally impossible rather than a special case in the join guard (#8398).
   hidden: [
     systemRole(NONE_ROLE, []),
-    systemRole(PENDING_ROLE, PENDING_PERMISSIONS),
+    // An applicant does not see a hidden group either — `group.read` is deliberately absent
+    // here, where the other two types grant it. That is the guard this replaces:
+    // `groupType = 'hidden' AND membership.role <> 'pending'`, i.e. invisible to everybody who
+    // is not actually a member. Withdrawing still works, because leaving needs no reading.
+    systemRole(PENDING_ROLE, ['group.leave']),
     systemRole(USUAL_ROLE, [...MEMBER_BASELINE]),
     editableRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
     ownerRole(),

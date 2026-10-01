@@ -15,6 +15,7 @@ import { beforeAll, afterAll, beforeEach, describe, it, expect } from 'vitest'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { closeDriver } from '@db/neo4j'
+import { createGroupAuthorizationScope } from '@src/groupRole/requestScope'
 
 import inviteCodesResolvers, { redeemInviteCode } from './inviteCodes'
 
@@ -22,8 +23,21 @@ import type { Context } from '@src/context'
 
 let database: ReturnType<typeof databaseContext>
 
+// The real authorization scope, not a stub: where an invited membership lands follows the
+// group's own rights (`group.join` on its non-member role), so a stub would be deciding the
+// outcome instead of the code under test. No network permissions and an open groups gate — the
+// group read rights have no network prerequisite.
 const contextFor = (id: string | null) =>
-  ({ user: id ? { id } : null, database }) as unknown as Context
+  ({
+    user: id ? { id } : null,
+    database,
+    groupAuthorization: createGroupAuthorizationScope({
+      database,
+      userId: id,
+      effectivePermissions: new Set(),
+      policy: { getEffective: () => true },
+    }),
+  }) as unknown as Context
 
 const codesOf = async (query: string, variables: Record<string, unknown> = {}) => {
   const { records } = await database.query({ query, variables })
