@@ -193,4 +193,12 @@ describe('InviteCode field resolvers for a parent without a code', () => {
       inviteCodesResolvers.InviteCode.isValid({}, {}, contextFor('someone'), null),
     ).resolves.toBe(false)
   })
+
+  it('resolves allowsRegistration to false', async () => {
+    // The stricter of the two answers: an unknown code must not be read as one that opens the
+    // network's door.
+    await expect(
+      inviteCodesResolvers.InviteCode.allowsRegistration({}, {}, contextFor('someone'), null),
+    ).resolves.toBe(false)
+  })
 })

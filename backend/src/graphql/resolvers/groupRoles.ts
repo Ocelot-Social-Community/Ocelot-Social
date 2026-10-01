@@ -30,6 +30,7 @@ import { isPermissionAvailable } from '@src/permission'
 import type { Context } from '@src/context'
 import type { GroupPermissionKey } from '@src/groupPermission'
 import type { GroupPrivacyLevel, GroupRoleDefinition } from '@src/groupRole'
+import type { GroupAuthorization } from '@src/groupRole/requestScope'
 import type { PermissionKey } from '@src/permission'
 
 // A role name is a KEY, not a display name — the label carries the wording. Kept narrow on
@@ -95,15 +96,11 @@ const hasNetworkPermission = (context: Context, permission: PermissionKey): bool
  * Only the direction that takes something away is checked. Opening a group up asks for no
  * right: whoever may edit the roles can already see everything inside.
  */
-const requirePrivacyCap = async (
+const requirePrivacyCap = (
   context: Context,
-  groupId: string,
+  authorization: GroupAuthorization,
   nextNonMemberPermissions: GroupPermissionKey[],
-): Promise<void> => {
-  const authorization = await context.groupAuthorization.forGroup(groupId)
-  if (!authorization) {
-    throw new UserInputError('Group not found!')
-  }
+): void => {
   const next = privacyLevelOfPermissions(nextNonMemberPermissions)
   if (!isMorePrivate(next, authorization.groupType as GroupPrivacyLevel)) {
     return
@@ -125,11 +122,14 @@ const requireCoverage = async (
   context: Context,
   groupId: string,
   permissions: GroupPermissionKey[],
-): Promise<void> => {
+): Promise<GroupAuthorization> => {
   const authorization = await context.groupAuthorization.forGroup(groupId)
   if (!authorization || !coversRole(authorization.effective, new Set(permissions))) {
     throw new UserInputError('You cannot grant rights you do not hold yourself!')
   }
+  // Handed back rather than resolved twice: the group it found is the one the privacy cap
+  // asks about, and a second lookup would be a second chance to disagree with it.
+  return authorization
 }
 
 // Every one of these mutations sits behind an authenticated shield rule, so the user is there
@@ -293,10 +293,10 @@ export default {
         return { ...relabelled, memberCount: null }
       }
       const permissions = sanitizeGroupPermissions(params.permissions)
-      await requireCoverage(context, groupId, permissions)
+      const authorization = await requireCoverage(context, groupId, permissions)
       if (name === NONE_ROLE) {
         // The non-member role IS the group's visibility, so editing it is the type change.
-        await requirePrivacyCap(context, groupId, permissions)
+        requirePrivacyCap(context, authorization, permissions)
       }
       const now = new Date().toISOString()
       const updated = { ...existing, label, permissions }

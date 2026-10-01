@@ -15,7 +15,7 @@ import {
   GROUP_PERMISSIONS_CHANGED,
   GROUP_SHOW_MEMBERS_CHANGED,
 } from '@constants/subscriptions'
-import { ForbiddenError, UserInputError } from '@graphql/errors'
+import { UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 import { branding } from '@src/branding'
 import { NONE_ROLE, PENDING_ROLE, USUAL_ROLE } from '@src/groupRole'
@@ -430,17 +430,10 @@ export default {
           )
           previousGroupType = previousGroupTypeResult.records[0]?.get('groupType') as
             string | undefined
-          // Turning a group hidden needs group.create_hidden (same gate as creating a
-          // hidden group). Keeping an already-hidden group hidden is fine. Switching to
-          // other types is intentionally not gated here — only the privacy-raising
-          // transition to hidden is.
-          if (
-            params.groupType === 'hidden' &&
-            previousGroupType !== 'hidden' &&
-            !context.effectivePermissions.has('group.create_hidden')
-          ) {
-            throw new ForbiddenError('Not Authorized!')
-          }
+          // No type check here: making a group MORE private needs the right to have created
+          // it that way, and the shield's canChangeGroupType asks that before this resolver
+          // runs — for every privacy-raising transition, not just the one to hidden. A second
+          // copy of a weaker rule could only ever disagree with it.
           if (policy.get('categoriesActive') && categoryIds?.length) {
             await transaction.run(
               `

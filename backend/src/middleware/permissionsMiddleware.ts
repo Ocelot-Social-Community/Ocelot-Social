@@ -420,7 +420,7 @@ const hasGroupPermission = (
   locate: GroupLocator = byArg('groupId'),
 ) =>
   rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
-    const location = await locate((args ?? {}) as Record<string, unknown>, ctx)
+    const location = await locate(args as Record<string, unknown>, ctx)
     if (location.type === 'notFound') {
       return false
     }
