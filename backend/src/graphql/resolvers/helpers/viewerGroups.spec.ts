@@ -76,6 +76,18 @@ describe(groupReadScope, () => {
     })
   })
 
+  it('expands the owner role, which stores nothing and means everything', async () => {
+    // The owner role keeps an EMPTY stored list on purpose, so a newly added key is owned
+    // automatically. Reading that list literally would hide an owner's own group from them —
+    // which is exactly what happened before this went through permissionsForGroupRole.
+    const context = contextWithMemberships([membershipRow('mine', 'owner', '[]')])
+
+    expect(await groupReadScope(context)).toEqual({
+      readableGroupIds: ['mine'],
+      contentGroupIds: ['mine'],
+    })
+  })
+
   it('falls back to the pre-rights behaviour for a role with no definition', async () => {
     // A group that predates the roles, or a half-applied migration. The empty set would be the
     // shield's answer; here it would take a group's content away from the people in it, so the

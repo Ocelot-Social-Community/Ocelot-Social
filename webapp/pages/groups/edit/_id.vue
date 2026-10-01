@@ -28,6 +28,38 @@ import { OsMenu } from '@ocelot-social/ui'
 import { groupEditQuery } from '~/graphql/groups.js'
 import { mapGetters } from 'vuex'
 
+// Which right each tab of the group settings needs, and in which order they read.
+//
+// The tabs are routes rather than components here, so this shell is the one place that can know
+// it — and it has to, because the rights are granted independently: the group content menu
+// offers "invite links" to anybody holding `group.invite`, which in a public group is every
+// member by default. Gating the whole area on `group.settings.manage` (as it did) sent exactly
+// those people into a 403 from a link the app had just shown them.
+const TABS = [
+  { path: '', label: 'group.general', permissions: ['group.settings.manage'] },
+  {
+    path: '/members',
+    label: 'group.members',
+    // Any of the three: the tab is the member list plus the actions on it, and a group may
+    // hand out approving without removing.
+    permissions: ['group.member.approve', 'group.member.remove', 'group.member.role.assign'],
+  },
+  { path: '/invites', label: 'group.invite-links', permissions: ['group.invite'] },
+  { path: '/rights', label: 'group.rights.title', permissions: ['group.role.manage'] },
+]
+
+const holdsAnyOf = (group, permissions) => {
+  const held = group?.myGroupPermissions ?? []
+  return permissions.some((permission) => held.includes(permission))
+}
+
+/** The tab a path asks for — the longest matching suffix, so `/invites` wins over ``. */
+const tabForPath = (path, groupId) => {
+  const base = `/groups/edit/${groupId}`
+  const suffix = path.startsWith(base) ? path.slice(base.length).replace(/\/$/, '') : path
+  return TABS.find((tab) => tab.path === suffix)
+}
+
 export default {
   middleware: ['groupsEnabled'],
   components: {
@@ -42,25 +74,13 @@ export default {
     ...mapGetters({
       user: 'auth/user',
     }),
+    // Only the tabs this viewer may actually open. A member who may invite sees the invite
+    // links and nothing else.
     routes() {
-      return [
-        {
-          name: this.$t('group.general'),
-          path: `/groups/edit/${this.group.id}`,
-        },
-        {
-          name: this.$t('group.members'),
-          path: `/groups/edit/${this.group.id}/members`,
-        },
-        {
-          name: this.$t('group.invite-links'),
-          path: `/groups/edit/${this.group.id}/invites`,
-        },
-        {
-          name: this.$t('group.rights.title'),
-          path: `/groups/edit/${this.group.id}/rights`,
-        },
-      ]
+      return TABS.filter((tab) => holdsAnyOf(this.group, tab.permissions)).map((tab) => ({
+        name: this.$t(tab.label),
+        path: `/groups/edit/${this.group.id}${tab.path}`,
+      }))
     },
   },
   async asyncData(context) {
@@ -68,6 +88,7 @@ export default {
       app,
       error,
       params: { id },
+      route,
     } = context
     const client = app.apolloProvider.defaultClient
     const {
@@ -78,8 +99,14 @@ export default {
       query: groupEditQuery(),
       variables: { id },
     })
-    // The right, not the role: a group may grant its admins the settings right.
-    if (!(group.myGroupPermissions || []).includes('group.settings.manage')) {
+    // The right of the TAB that was asked for, not one right for the whole area: these are
+    // granted independently, so a member who may only hand out invite links has to be able to
+    // open that one tab — and must not be able to open the others.
+    const tab = tabForPath(route?.path ?? '', id)
+    const allowed = tab
+      ? holdsAnyOf(group, tab.permissions)
+      : TABS.some((candidate) => holdsAnyOf(group, candidate.permissions))
+    if (!allowed) {
       error({ statusCode: 403, message: 'NONONNNO' })
     }
     return { group }

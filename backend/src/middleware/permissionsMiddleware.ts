@@ -10,8 +10,9 @@ import { createRequire } from 'node:module'
 import CONFIG from '@config/index'
 import { AuthenticationError } from '@graphql/errors'
 import {
-  memberHoldsInGroup,
+  memberRoleHolds,
   nonMemberReadsContent,
+  optionalMemberRoleMatch,
 } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { coversRole, mayAssignGroupRole, mayRemoveGroupMember } from '@src/groupRole'
@@ -302,10 +303,11 @@ const canReviewReportedContent = rule({ cache: 'no_cache' })(async (
             OPTIONAL MATCH (resource)-[:IN]->(direct:Group)
             OPTIONAL MATCH (resource)-[:COMMENTS]->(:Post)-[:IN]->(viaPost:Group)
             WITH coalesce(direct, viaPost) AS group
+            ${optionalMemberRoleMatch('group', '$viewerId')}
             RETURN group.groupType AS groupType,
                    (group IS NULL
                      OR ${nonMemberReadsContent('group')}
-                     OR ${memberHoldsInGroup('group', 'group.content.read', '$viewerId')}) AS readableHere`,
+                     OR ${memberRoleHolds('group.content.read')}) AS readableHere`,
     variables: { resourceId, viewerId: ctx.user?.id ?? null },
   })
   const record = result.records[0]

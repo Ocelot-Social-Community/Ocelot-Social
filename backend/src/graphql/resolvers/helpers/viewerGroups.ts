@@ -1,4 +1,4 @@
-import { parseStoredPermissions, PENDING_ROLE } from '@src/groupRole'
+import { parseStoredPermissions, PENDING_ROLE, permissionsForGroupRole } from '@src/groupRole'
 
 import type { Context } from '@src/context'
 import type { GroupPermissionKey } from '@src/groupPermission'
@@ -35,6 +35,24 @@ const MEMBER_READ_SCOPE_QUERY = `
  */
 const fallbackPermissions = (roleName: string): GroupPermissionKey[] =>
   roleName === PENDING_ROLE ? ['group.read'] : ['group.read', 'group.content.read']
+
+/**
+ * What the viewer's role in one group grants them.
+ *
+ * Through `permissionsForGroupRole`, because that is where the `owner` exception lives: the
+ * owner role stores an EMPTY list and resolves to the whole catalog, so reading the stored
+ * list alone would hide an owner's own group from them.
+ */
+const heldByRole = (roleName: string, stored: string | null): Set<GroupPermissionKey> =>
+  stored === null
+    ? new Set(fallbackPermissions(roleName))
+    : permissionsForGroupRole({
+        name: roleName,
+        label: null,
+        system: false,
+        protected: false,
+        permissions: parseStoredPermissions(stored),
+      })
 
 /** Which groups the viewer's OWN role lets them read — profile and content, separately. */
 export interface GroupReadScope {
@@ -74,11 +92,9 @@ export const groupReadScope = async (context: Context): Promise<GroupReadScope> 
   const contentGroupIds: string[] = []
   for (const record of result.records) {
     const groupId = record.get('groupId') as string
-    const stored = record.get('permissions') as string | null
-    const held = new Set<GroupPermissionKey>(
-      stored === null
-        ? fallbackPermissions(record.get('roleName') as string)
-        : parseStoredPermissions(stored),
+    const held = heldByRole(
+      record.get('roleName') as string,
+      record.get('permissions') as string | null,
     )
     if (held.has('group.read')) {
       readableGroupIds.push(groupId)

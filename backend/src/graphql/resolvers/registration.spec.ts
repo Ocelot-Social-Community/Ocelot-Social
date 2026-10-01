@@ -301,6 +301,71 @@ describe('SignupVerification', () => {
             expect(records[0].get('locations').toNumber()).toBe(0)
           })
 
+          // A GROUP invite code on signup: the invited account has to end up IN the group, and
+          // where it lands follows the group's own rights rather than its type (see
+          // resolvers/inviteCodes.ts). This is the whole chain an invited person walks —
+          // registering, redeeming, and arriving somewhere they may actually be.
+          describe('signing up with a group invite code', () => {
+            const GROUP_DESCRIPTION =
+              'A description for the invite-code group that is comfortably longer than the hundred characters the Group model asks for.'
+
+            const signUpWith = async (code: string) => {
+              const { data, errors } = await mutate({
+                mutation: SignupVerificationWithExtras,
+                variables: { ...variables, inviteCode: code },
+              })
+
+              expect(errors).toBeUndefined()
+
+              const { records } = await database.query({
+                query: `MATCH (user:User { id: $id })-[membership:MEMBER_OF]->(:Group { id: 'invite-group' })
+                        RETURN membership.role AS role`,
+                variables: { id: data.SignupVerification.id as string },
+              })
+              return records[0]?.get('role') as string | undefined
+            }
+
+            const buildInviteGroup = async (groupType: string) => {
+              await Factory.build('user', { id: 'group-host', name: 'Group Host' })
+              await Factory.build(
+                'group',
+                { id: 'invite-group', groupType, description: GROUP_DESCRIPTION },
+                { ownerId: 'group-host' },
+              )
+              await database.write({
+                query: `MATCH (host:User { id: 'group-host' }), (group:Group { id: 'invite-group' })
+                        MERGE (host)-[:GENERATED]->(code:InviteCode { code: 'GRPSUP' })
+                        MERGE (code)-[:INVITES_TO]->(group)`,
+              })
+            }
+
+            it('admits the new account as a member of a public group', async () => {
+              await buildInviteGroup('public')
+
+              expect(await signUpWith('GRPSUP')).toBe('usual')
+            })
+
+            it('admits it as an applicant of a closed group', async () => {
+              await buildInviteGroup('closed')
+
+              expect(await signUpWith('GRPSUP')).toBe('pending')
+            })
+
+            it("follows the group's own rights, not its type", async () => {
+              // The closed group hands its non-member role the direct-join right. The invited
+              // account must then land as a member, although the TYPE still says "ask first" —
+              // which is the difference between the old literal and the rights.
+              await buildInviteGroup('closed')
+              await database.write({
+                query: `MATCH (:Group { id: 'invite-group' })-[:HAS_GROUP_ROLE]->(role:GroupRole { name: 'none' })
+                        SET role.permissions = $permissions`,
+                variables: { permissions: JSON.stringify(['group.read', 'group.join']) },
+              })
+
+              expect(await signUpWith('GRPSUP')).toBe('usual')
+            })
+          })
+
           // The one caller that passes `newUser = true` to redeemInviteCode. Redeeming on signup
           // is what links the fresh account to whoever invited it — the mutual FOLLOWS and the
           // INVITED edge that the invite statistics count. Redeeming the same link from an

@@ -4,7 +4,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-import { memberHoldsInGroup, nonMemberReadsContent } from './helpers/groupAccessCypher'
+import {
+  memberRoleHolds,
+  nonMemberReadsContent,
+  optionalMemberRoleMatch,
+} from './helpers/groupAccessCypher'
 
 import type { Context } from '@src/context'
 import type { PermissionKey } from '@src/permission'
@@ -157,11 +161,12 @@ export default {
             // Whether the content is readable BY THE GROUP's own answer: it opened its content
             // to non-members, or this moderator's role in it grants reading. The network-side
             // per-type right is folded in afterwards, in maskUnreadableGroupContent.
-            WITH report, reviewed, filed, finalResource, group.groupType as groupType,
+            ${optionalMemberRoleMatch('group', '$viewerId')}
+            WITH report, reviewed, filed, finalResource, group,
             (group IS NULL
               OR ${nonMemberReadsContent('group')}
-              OR ${memberHoldsInGroup('group', 'group.content.read', '$viewerId')}) as readableHere
-            RETURN report {.*, resource: finalResource, filed: filed, reviewed: reviewed, groupType: groupType, readableHere: readableHere }
+              OR ${memberRoleHolds('group.content.read')}) as readableHere
+            RETURN report {.*, resource: finalResource, filed: filed, reviewed: reviewed, groupType: group.groupType, readableHere: readableHere }
             ${orderByClause}
             ${offset} ${limit}
           `,

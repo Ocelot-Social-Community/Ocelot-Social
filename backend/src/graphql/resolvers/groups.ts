@@ -12,6 +12,7 @@ import { v4 as uuid } from 'uuid'
 
 import {
   GROUP_MEMBERSHIP_VISIBILITY_CHANGED,
+  GROUP_PERMISSIONS_CHANGED,
   GROUP_SHOW_MEMBERS_CHANGED,
 } from '@constants/subscriptions'
 import { ForbiddenError, UserInputError } from '@graphql/errors'
@@ -19,6 +20,7 @@ import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 import { branding } from '@src/branding'
 import { NONE_ROLE, PENDING_ROLE, USUAL_ROLE } from '@src/groupRole'
 import {
+  applyGroupTypeToNonMemberRoles,
   readGroupRoles,
   seedRolesForNewGroup,
   setNonMemberMemberListAccess,
@@ -345,6 +347,10 @@ export default {
         throw new UserInputError('Description too short!')
       }
       const session = context.driver.session()
+      // Read inside the transaction below, used after it: switching the type has to be
+      // translated into the roles that carry it (see applyGroupTypeToNonMemberRoles), and that
+      // needs to know whether the type actually changed.
+      let previousGroupType: string | undefined
       try {
         const group = await session.writeTransaction(async (transaction) => {
           if (!context.user) {
@@ -354,7 +360,8 @@ export default {
             `MATCH (group:Group {id: $groupId}) RETURN group.groupType AS groupType`,
             { groupId },
           )
-          const previousGroupType = previousGroupTypeResult.records[0]?.get('groupType')
+          previousGroupType = previousGroupTypeResult.records[0]?.get('groupType') as
+            string | undefined
           // Turning a group hidden needs group.create_hidden (same gate as creating a
           // hidden group). Keeping an already-hidden group hidden is fine. Switching to
           // other types is intentionally not gated here — only the privacy-raising
@@ -423,6 +430,21 @@ export default {
           coordinates,
           GROUP_REVERSE_GEOCODE_TYPES,
         )
+        if (params.groupType && params.groupType !== previousGroupType) {
+          // The type is a preset for what outsiders may do, so switching it writes those
+          // rights. Nothing reads groupType for visibility any more — which is why the switch
+          // has to land in the `none` and `pending` roles to have any effect at all.
+          await applyGroupTypeToNonMemberRoles(
+            context.database,
+            groupId,
+            params.groupType as string,
+            context.user?.id ?? 'system',
+            new Date().toISOString(),
+          )
+          void context.pubsub.publish(GROUP_PERMISSIONS_CHANGED, {
+            groupPermissionsChanged: { groupId },
+          })
+        }
         if ('showMembers' in params) {
           // Keep the right and the (deprecated) property in step: the property is what older
           // clients still read, the right is what actually decides.

@@ -14,7 +14,7 @@ import { sanitizeGroupPermissions } from '@src/groupPermission'
 import { defaultTemplateFor } from './defaults'
 import { nonMemberAccessFrom } from './nonMemberAccess'
 import { parseStoredPermissions } from './storedPermissions'
-import { NONE_ROLE } from './types'
+import { NONE_ROLE, PENDING_ROLE } from './types'
 
 import type { GroupRoleDefinition, GroupRoleTemplates } from './types'
 import type databaseContext from '@context/database'
@@ -393,6 +393,47 @@ export async function replaceGroupRoles(
   })
   for (const role of roles) {
     await writeGroupRole(db, groupId, role, actor, now)
+  }
+}
+
+/**
+ * Re-apply a group type's template to the roles that say what OUTSIDERS may do.
+ *
+ * Changing the type IS a change to exactly that question — `closed` means "the profile, not the
+ * content", `hidden` means "nothing at all" — so the switch WRITES those rights instead of
+ * being consulted at read time. Without this, a group switched from public to closed would
+ * keep a non-member role that still reads everything, and the switch would do nothing.
+ *
+ * Only `none` and `pending` are touched. What the group granted its own members, and any role
+ * it invented, is its own business and survives the switch — as does a label it gave these two.
+ */
+export async function applyGroupTypeToNonMemberRoles(
+  db: DbContext,
+  groupId: string,
+  groupType: string,
+  actor: string,
+  now: string,
+): Promise<void> {
+  const template = defaultTemplateFor(groupType)
+  if (!template) {
+    // Unreachable through the API: groupType comes from the GraphQL enum and every value has a
+    // template (asserted in defaults.spec.ts). Leaving the roles untouched is the safe arm —
+    // it keeps the group as it was rather than opening it.
+    return
+  }
+  const existing = await readGroupRoles(db, groupId)
+  for (const name of [NONE_ROLE, PENDING_ROLE]) {
+    const fromTemplate = template.find((role) => role.name === name)
+    if (!fromTemplate) {
+      continue
+    }
+    await writeGroupRole(
+      db,
+      groupId,
+      { ...fromTemplate, label: existing.find((role) => role.name === name)?.label ?? null },
+      actor,
+      now,
+    )
   }
 }
 
