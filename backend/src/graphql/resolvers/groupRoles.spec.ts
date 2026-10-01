@@ -5,7 +5,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { GROUP_PERMISSIONS_CHANGED } from '@constants/subscriptions'
 import { UserInputError } from '@graphql/errors'
-import * as repository from '@src/groupRole/repository'
+import {
+  deleteGroupRole,
+  markGroupRolesCustomized,
+  memberCountsByRole,
+  readGroupRoles,
+  readGroupRoleTemplates,
+  renameGroupRole,
+  replaceGroupRoles,
+  untouchedGroupIdsByType,
+  writeGroupRole,
+  writeGroupRoleTemplate,
+} from '@src/groupRole/repository'
 
 import resolvers from './groupRoles'
 
@@ -30,7 +41,20 @@ vi.mock('@src/groupRole/repository', () => ({
   writeGroupRoleTemplate: vi.fn(),
 }))
 
-const mocked = vi.mocked(repository)
+// The mocked repository, named once so the tests read as `mocked.writeGroupRole` rather than
+// wrapping each call site in vi.mocked().
+const mocked = {
+  deleteGroupRole: vi.mocked(deleteGroupRole),
+  markGroupRolesCustomized: vi.mocked(markGroupRolesCustomized),
+  memberCountsByRole: vi.mocked(memberCountsByRole),
+  readGroupRoles: vi.mocked(readGroupRoles),
+  readGroupRoleTemplates: vi.mocked(readGroupRoleTemplates),
+  renameGroupRole: vi.mocked(renameGroupRole),
+  replaceGroupRoles: vi.mocked(replaceGroupRoles),
+  untouchedGroupIdsByType: vi.mocked(untouchedGroupIdsByType),
+  writeGroupRole: vi.mocked(writeGroupRole),
+  writeGroupRoleTemplate: vi.mocked(writeGroupRoleTemplate),
+}
 
 const role = (
   name: string,
@@ -97,7 +121,7 @@ const contextFor = (options: ContextOptions = {}) => {
   return { context, queries, published }
 }
 
-const { Query, Group, Mutation, Subscription } = resolvers
+const { Query, Group, Mutation } = resolvers
 
 beforeEach(() => {
   vi.clearAllMocks()
