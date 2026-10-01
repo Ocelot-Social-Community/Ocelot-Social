@@ -26,7 +26,11 @@ describe('GraphQL error classes', () => {
         code: ErrorCode.GROUP_TOO_MANY_CATEGORIES,
         params: { max: 3 },
       }).extensions,
-    ).toEqual({ code: 'BAD_USER_INPUT', errorCode: 'GROUP_TOO_MANY_CATEGORIES', params: { max: 3 } })
+    ).toEqual({
+      code: 'BAD_USER_INPUT',
+      errorCode: 'GROUP_TOO_MANY_CATEGORIES',
+      params: { max: 3 },
+    })
   })
 })
 
