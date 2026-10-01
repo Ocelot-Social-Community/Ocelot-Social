@@ -222,7 +222,7 @@ export default {
     const messageObserver = this.$apollo.subscribe({ query: chatMessageAdded() })
     const messageSub = messageObserver.subscribe({
       next: this.chatMessageAdded,
-      error: (error) => this.$toast.error(error),
+      error: (error) => this.$toast.error(this.$backendError(error)),
     })
     this._subscriptions.push(messageSub)
 
@@ -634,7 +634,7 @@ export default {
         }
       } catch (error) {
         this.rooms = []
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       }
       this.loadingRooms = false
     },
@@ -754,7 +754,7 @@ export default {
         this.$nextTick(() => this.setupMessageVisibilityTracking())
       } catch (error) {
         this.messages = []
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       }
     },
 
@@ -941,7 +941,7 @@ export default {
         // Remove the optimistic local message so it doesn't linger as a ghost
         this.messages = this.messages.filter((m) => m._id !== localMessage._id)
         this.applyAvatarsOnList(this.messages)
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       }
     },
 
@@ -1128,7 +1128,7 @@ export default {
         const room = this.fixRoomObject(CreateGroupRoom)
         this.bringRoomToTopAndSelect(room)
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       }
     },
 

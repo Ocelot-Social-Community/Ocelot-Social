@@ -1,6 +1,6 @@
 import { joinGroupMutation, leaveGroupMutation } from '~/graphql/groups'
 
-export function useJoinLeaveGroup({ apollo, toast }) {
+export function useJoinLeaveGroup({ apollo, toast, backendError = (error) => error.message }) {
   async function joinLeaveGroup({ groupId, userId, isMember }) {
     const join = !isMember
     const mutation = join ? joinGroupMutation() : leaveGroupMutation()
@@ -12,7 +12,7 @@ export function useJoinLeaveGroup({ apollo, toast }) {
       const result = join ? data.JoinGroup : data.LeaveGroup
       return { success: true, data: result }
     } catch (error) {
-      toast.error(error.message)
+      toast.error(backendError(error))
       return { success: false }
     }
   }

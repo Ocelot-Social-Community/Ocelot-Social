@@ -132,7 +132,7 @@ export default {
         this.$toast.success(this.$t('moderation.reports.DecisionSuccess'))
         await this.$apollo.queries.reportsList.refetch()
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
         throw error
       }
     },

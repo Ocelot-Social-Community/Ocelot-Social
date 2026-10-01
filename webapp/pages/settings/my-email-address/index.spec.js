@@ -105,7 +105,8 @@ describe('EmailSettingsIndexPage', () => {
         describe('if backend responds with unique constraint violation', () => {
           beforeEach(() => {
             mocks.$apollo.mutate = jest.fn().mockRejectedValue({
-              message: 'User account already exists',
+              message: 'GraphQL error: A user account with this email already exists.',
+              graphQLErrors: [{ extensions: { errorCode: 'EMAIL_ALREADY_EXISTS' } }],
             })
             wrapper = Wrapper()
             wrapper.find('#email').setValue('already-taken@example.org')

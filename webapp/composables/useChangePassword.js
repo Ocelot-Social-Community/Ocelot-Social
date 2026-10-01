@@ -1,6 +1,12 @@
 import { changePasswordMutation } from '~/graphql/Password'
 
-export function useChangePassword({ apollo, store, toast, t }) {
+export function useChangePassword({
+  apollo,
+  store,
+  toast,
+  t,
+  backendError = (error) => error.message,
+}) {
   async function changePassword({ oldPassword, password }) {
     try {
       const { data } = await apollo.mutate({
@@ -11,7 +17,7 @@ export function useChangePassword({ apollo, store, toast, t }) {
       toast.success(t('settings.security.change-password.success'))
       return { success: true }
     } catch (err) {
-      toast.error(err.message)
+      toast.error(backendError(err))
       return { success: false }
     }
   }

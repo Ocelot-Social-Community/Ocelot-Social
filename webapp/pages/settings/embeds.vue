@@ -111,7 +111,7 @@ export default {
         })
         this.disabled = !this.disabled
       } catch (err) {
-        this.$toast.error(err.message)
+        this.$toast.error(this.$backendError(err))
       }
     },
   },

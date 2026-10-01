@@ -239,7 +239,7 @@ export default {
 
         return this.cities.find((city) => city.value === value)
       } catch (error) {
-        if (reqId === this._cityQueryId) this.$toast.error(error.message)
+        if (reqId === this._cityQueryId) this.$toast.error(this.$backendError(error))
       } finally {
         if (reqId === this._cityQueryId) this.loadingGeo = false
       }
