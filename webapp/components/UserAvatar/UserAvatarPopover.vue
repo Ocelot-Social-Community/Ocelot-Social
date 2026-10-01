@@ -1,5 +1,10 @@
 <template>
-  <div class="user-avatar-popover">
+  <component
+    :is="canNavigate ? 'nuxt-link' : 'div'"
+    :to="canNavigate ? userLink : undefined"
+    class="user-avatar-popover"
+    :class="{ 'is-clickable': canNavigate }"
+  >
     <template v-if="user">
       <div class="user-header">
         <avatar-image :profile="user" class="popover-avatar" />
@@ -39,7 +44,7 @@
         </li>
       </ul>
       <os-button
-        v-if="isTouchDevice && userLink"
+        v-if="showProfileLink && userLink"
         as="nuxt-link"
         :to="userLink"
         class="open-link"
@@ -51,7 +56,7 @@
       </os-button>
     </template>
     <empty v-else-if="querySettled" icon="alert" :message="$t('user-avatar.popover.unavailable')" />
-  </div>
+  </component>
 </template>
 
 <script>
@@ -60,12 +65,10 @@ import Badges from '~/components/Badges.vue'
 import Empty from '~/components/Empty/Empty'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
-import touchDevice from '~/mixins/touchDevice'
 import { userTeaserQuery } from '~/graphql/User.js'
 
 export default {
   name: 'UserAvatarPopover',
-  mixins: [touchDevice],
   components: {
     Badges,
     Empty,
@@ -77,6 +80,10 @@ export default {
   props: {
     userId: { type: String, required: true },
     userLink: { type: Object },
+    // Shows the old explicit "open profile" button again, in addition to the whole card already
+    // being a link (see canNavigate) — off by default, kept for callers that might still want an
+    // extra, more discoverable call-to-action alongside the click-anywhere card.
+    showProfileLink: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -89,6 +96,17 @@ export default {
   computed: {
     user() {
       return (this.User && this.User[0]) ?? null
+    },
+    // Confirmed gone (query settled, nothing came back) — don't navigate to a profile we already
+    // know doesn't exist, even though userLink is still set.
+    confirmedMissing() {
+      return this.querySettled && !this.user
+    },
+    // Whole card becomes a link whenever we have somewhere to send it and haven't ruled that out
+    // — including while still loading, so an eager click (e.g. from pages/map.vue's popups)
+    // navigates immediately instead of waiting on the teaser query.
+    canNavigate() {
+      return !!this.userLink && !this.confirmedMissing
     },
   },
   apollo: {
@@ -120,6 +138,19 @@ export default {
   min-width: 200px;
   max-width: 280px;
   width: 280px;
+  /* Overrides resets.css's global `a { color: var(--color-primary) }` for the
+     nuxt-link case (see canNavigate) — the card's own text keeps its normal
+     color, only the explicit "open profile" button below still looks like a
+     button/link. */
+  color: var(--text-color-base);
+}
+
+.user-avatar-popover.is-clickable {
+  /* Belt-and-braces: the native anchor already shows a pointer, but this
+     holds regardless of which element renders the root (e.g. the map
+     popover already forces this too, scoped more narrowly, in
+     pages/map.vue). */
+  cursor: pointer;
 }
 
 .user-header {
