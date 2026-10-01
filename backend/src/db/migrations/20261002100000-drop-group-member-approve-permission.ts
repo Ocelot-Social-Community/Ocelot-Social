@@ -1,7 +1,7 @@
 import { getDriver } from '@db/neo4j'
 
 export const description =
-  'Remove `group.member.approve` from every stored group role. The key had no consumer that could do what it names: JoinGroup writes the membership role ON CREATE only, so an existing applicant cannot be promoted through it, and nothing else approves. Adding ANOTHER person to a group — the one act the key was guarding — is giving them a role in it, which `group.member.role.assign` already names, and that is what the shield asks for now. Approving a pending applicant comes back as its own feature, with the UI it needs (#10352). The parser drops unknown keys anyway, so this is about the stored lists telling the truth rather than about effect. Idempotent.'
+  'Remove `group.member.approve` from every stored group role. Approving an applicant is not a separate act: ChangeGroupMemberRole promotes a `pending` membership to a member role, and that is guarded by `group.member.role.assign` — which is also what adding another person to a group needs. The separate key therefore guarded nothing of its own and only made the rights matrix promise a second decision (concept E9: no key without a consumer). A purpose-built accept/decline affordance is #10352. The parser drops unknown keys anyway, so this is about the stored lists telling the truth rather than about effect. Idempotent.'
 
 const REMOVED = 'group.member.approve'
 

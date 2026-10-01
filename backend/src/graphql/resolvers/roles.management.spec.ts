@@ -222,7 +222,7 @@ describe('role management', () => {
       // gatedBy is now the first CURRENTLY-CLOSED gate (the actionable one). videoConference
       // is effectively off here (no LiveKit env), so it is the gate surfaced for the group
       // video-call right even though it is multi-gated (videoConference AND groupsEnabled).
-      expect(byKey.get('videoCall.create_public')?.gatedBy).toBe('videoConference')
+      expect(byKey.get('videoCall.create_open')?.gatedBy).toBe('videoConference')
       expect(byKey.get('apiKey.create')?.gatedBy).toBe('apiKeysEnabled')
       // groupsEnabled defaults on (no env requirement), so group creation is available and
       // has no blocking gate — the group gate is open.

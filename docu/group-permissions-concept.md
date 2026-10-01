@@ -17,7 +17,7 @@
 > | Owner-los erlaubt (E8) | umgesetzt |
 > | `groupType` bleibt autoritatives Preset (E2) | **abgewichen, inzwischen vollstaendig** — die Lesewege fragen die Rechte ueber abgeleitete Spalten am Gruppenknoten, und der Typ selbst ist jetzt *abgeleitet* (`groupRole/privacyLevel.ts`, Handlungsoption A aus `group-type-from-rights-concept.md`): er wird vom Sync geschrieben, nicht gewaehlt |
 > | `videoCall.create_<type>` (E5-Muster) | **ersetzt** — gekoppelt an die *Tuer* statt an den Typ: `videoCall.create_open` fuer eine Gruppe, in die ein Fremder hineinlaufen kann (`group.read` + `group.join` auf `none`), `videoCall.create_restricted` sonst (`groupRole/callDoor.ts`). Auf den drei Presets verhaltensgleich |
-> | `group.member.approve` (E9: kein Key ohne Konsument) | **entfernt** — es gab keinen Konsumenten, der tut was der Key benennt: `JoinGroup` setzt die Rolle nur `ON CREATE`. Jemanden *hinzufuegen* verlangt `group.member.role.assign`; das Freigeben eines Bewerbers kommt als eigenes Feature mit UI zurueck (#10352) |
+> | `group.member.approve` (E9: kein Key ohne Konsument) | **entfernt** — Freigeben ist derselbe Akt wie Rolle zuweisen: `ChangeGroupMemberRole` befoerdert eine `pending`-Mitgliedschaft, der Mitglieder-Tab listet Bewerber (`includePending`), und `group.member.role.assign` deckelt beides. Der eigene Key deckelte damit nichts Eigenes. Was fehlt, ist eine *Affordanz* (Annehmen/Ablehnen, Zaehler, Benachrichtigung) — #10352 |
 > | `banned`-Rolle (E14), `group.delete` (E9) | bewusst Folge-Issues |
 
 Gruppen bekommen dasselbe Freiheitsniveau, das das Netzwerk seit dem RBAC-Umbau
@@ -504,7 +504,7 @@ sich mit diesem Entwurf, teils wortgleich:
 | Aussage in #5386 | Entsprechung hier |
 |---|---|
 | "Owners can all do what admins can" | Dominanz als echte Mengen-Obermenge (3.4) — kein Rangfeld noetig |
-| "Owners only can decide **what admins can do**: invite new members, confirm pending members" | **genau `group.role.manage` + Matrix.** Das erste ist `group.invite`; das Freigeben von Bewerbern fehlt noch als Feature (#10352) und kommt mit seinem Recht zurueck. Das Konzept ist die Verallgemeinerung dieses Satzes. |
+| "Owners only can decide **what admins can do**: invite new members, confirm pending members" | **genau `group.role.manage` + Matrix.** Das erste ist `group.invite`, das zweite `group.member.role.assign` (Freigeben = Rolle zuweisen); eine eigene Annehmen/Ablehnen-Oberflaeche fehlt noch (#10352). Das Konzept ist die Verallgemeinerung dieses Satzes. |
 | Netzwerk-Setting: Gruppen-Erstellung an/aus, `hidden` unmoeglich, Erstellung nur fuer Admins | **bereits erledigt** durch die `groupsEnabled`-Policy + `group.create_public/_closed/_hidden` (#5549 ist damit beantwortet) |
 | "enable owners to downgrade their role in case another owner exists" | faellt aus der Dominanz heraus (#6173) |
 | "is an owner allowed to change the role of other owners?" | **nein** — gleiche Menge, keine Dominanz (3.4) |

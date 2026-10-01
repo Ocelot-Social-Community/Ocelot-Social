@@ -477,10 +477,13 @@ const canChangeGroupType = rule({ cache: 'no_cache' })(async (_parent, args, ctx
 // else. The first is governed by group.join / group.join.request (which of the two the viewer
 // holds also decides whether they land as a member or as an applicant — the resolver reads the
 // same pair). The second gives another person a role in the group, which is what
-// group.member.role.assign names — there is no separate approve right, because nothing can
-// approve yet: JoinGroup writes the role ON CREATE only, so an existing applicant cannot be
-// promoted through it. That feature is its own issue (#10352), UI included. Before any of
-// this, ANY authenticated user could add ANY other user to a public or closed group.
+// group.member.role.assign names.
+//
+// There is no separate approve right because approving is the same act: an applicant is
+// promoted by ChangeGroupMemberRole (pending → usual), which this right already guards, and
+// the members tab lists applicants (`includePending`) with that dropdown. What is missing is
+// an affordance built for it — accept/decline, a count, a notification — which is #10352.
+// Before any of this, ANY authenticated user could add ANY other user to a public group.
 const canJoinGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
   if (!ctx.user) {
     return false

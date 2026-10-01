@@ -19,7 +19,7 @@ import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { seedGroupRoleTemplates } from '@src/groupRole'
+import { NONE_ROLE, seedGroupRoleTemplates, writeGroupRole } from '@src/groupRole'
 import { ensureUserRoleEdges, seedDefaultRoleNodes } from '@src/role'
 
 import Factory from './factories'
@@ -495,10 +495,23 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         locationName: 'France',
       },
     })
-    await database.write({
-      query: `MATCH (group:Group {id: 'g1'}) SET group.showMembers = true`,
-      variables: {},
-    })
+    // "A closed group that still shows its member list" is a RIGHT now, not a column: it is
+    // `group.members.read` on the group's non-member role. Written through the repository so
+    // the derived columns (showMembers among them) are recomputed from the role — a direct
+    // SET would leave the two disagreeing, which is exactly what the integrity audit reports.
+    await writeGroupRole(
+      database,
+      'g1',
+      {
+        name: NONE_ROLE,
+        label: null,
+        system: true,
+        protected: false,
+        permissions: ['group.read', 'group.join.request', 'group.members.read'],
+      },
+      'seed',
+      new Date().toISOString(),
+    )
     await mutate({
       mutation: JoinGroup,
       variables: {

@@ -2888,6 +2888,10 @@ describe('in mode', () => {
               })
             })
 
+            // THIS is the approve path: promoting a pending membership to a member role is
+            // what "accept the join request" means, and `group.member.role.assign` is the
+            // right that guards it (there is no separate approve key — see #10352 for the
+            // affordance the members tab still lacks).
             describe('of still pending member "pending-member-user"', () => {
               beforeEach(async () => {
                 variables = {
