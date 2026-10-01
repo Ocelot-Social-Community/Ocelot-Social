@@ -15,19 +15,34 @@ import type { GroupPrivacyLevel } from './privacyLevel'
 describe(privacyLevelFrom, () => {
   it('reads an unreadable profile as unlisted', () => {
     expect(
-      privacyLevelFrom({ nonMemberRead: false, nonMemberContentRead: false, showMembers: false }),
+      privacyLevelFrom({
+        nonMemberRead: false,
+        nonMemberContentRead: false,
+        showMembers: false,
+        nonMemberJoin: false,
+      }),
     ).toBe('hidden')
   })
 
   it('reads a readable profile with private content as closed', () => {
     expect(
-      privacyLevelFrom({ nonMemberRead: true, nonMemberContentRead: false, showMembers: false }),
+      privacyLevelFrom({
+        nonMemberRead: true,
+        nonMemberContentRead: false,
+        showMembers: false,
+        nonMemberJoin: false,
+      }),
     ).toBe('closed')
   })
 
   it('reads both as public', () => {
     expect(
-      privacyLevelFrom({ nonMemberRead: true, nonMemberContentRead: true, showMembers: true }),
+      privacyLevelFrom({
+        nonMemberRead: true,
+        nonMemberContentRead: true,
+        showMembers: true,
+        nonMemberJoin: false,
+      }),
     ).toBe('public')
   })
 
@@ -35,7 +50,12 @@ describe(privacyLevelFrom, () => {
     // "Public, but the member list stays private" is a combination the presets do not have and
     // the rights allow. It changes nothing about how FINDABLE the group is.
     expect(
-      privacyLevelFrom({ nonMemberRead: true, nonMemberContentRead: true, showMembers: false }),
+      privacyLevelFrom({
+        nonMemberRead: true,
+        nonMemberContentRead: true,
+        showMembers: false,
+        nonMemberJoin: false,
+      }),
     ).toBe('public')
   })
 
@@ -44,7 +64,12 @@ describe(privacyLevelFrom, () => {
     // so without it the group is unlisted whatever else is granted — rounding towards the more
     // private answer is what keeps the caps conservative.
     expect(
-      privacyLevelFrom({ nonMemberRead: false, nonMemberContentRead: true, showMembers: true }),
+      privacyLevelFrom({
+        nonMemberRead: false,
+        nonMemberContentRead: true,
+        showMembers: true,
+        nonMemberJoin: false,
+      }),
     ).toBe('hidden')
   })
 })

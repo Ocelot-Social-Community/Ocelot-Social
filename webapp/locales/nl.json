@@ -382,9 +382,8 @@
         "user_delete_any": "Het account van elke gebruiker verwijderen.",
         "user_email_readAny": "Het e-mailadres van elke gebruiker lezen.",
         "user_invite": "Persoonlijke uitnodigingscodes genereren.",
-        "videoCall_create_closed": "Een videogesprek starten in een gesloten groep.",
-        "videoCall_create_hidden": "Een videogesprek starten in een verborgen groep.",
-        "videoCall_create_public": "Een videogesprek starten in een openbare groep."
+        "videoCall_create_open": "Een videogesprek starten in een groep waar iedereen binnen kan lopen — vindbaar en zonder goedkeuring te betreden.",
+        "videoCall_create_restricted": "Een videogesprek starten in een groep waar je niet zomaar binnen kunt: lid worden vraagt goedkeuring of een uitnodiging, of de groep is verborgen."
       },
       "permUnavailable": "Functie niet geconfigureerd — dit recht heeft geen effect.",
       "permUnavailableLink": "Configuratie bekijken",

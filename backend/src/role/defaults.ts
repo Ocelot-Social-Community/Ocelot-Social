@@ -20,7 +20,7 @@ const BASELINE: RoleDefinition['permissions'] = [
   'post.create',
   'comment.create',
   'socialMedia.create',
-  // Flat per-group-type creation rights (mirrors videoCall.create_*). The baseline
+  // Flat per-group-type creation rights. The baseline
   // grants all three for parity with the prior model (group.create covered public +
   // closed, group.create_hidden added hidden) — i.e. every member could create any
   // group type. Tightening a type out of the baseline is a per-role opt-in.
@@ -28,10 +28,11 @@ const BASELINE: RoleDefinition['permissions'] = [
   'group.create_closed',
   'group.create_hidden',
   'user.invite',
-  // Only public-group video calls are baseline (parity with the prior public-only
-  // implementation). videoCall.create_closed / _hidden are NOT granted by default —
-  // they are opt-in per role (owner still holds them via full-catalog expansion).
-  'videoCall.create_public',
+  // Only calls in a group anybody may walk into are baseline — which is what the prior
+  // public-only implementation meant by "public" (see groupRole/callDoor.ts).
+  // videoCall.create_restricted is NOT granted by default: a call nobody can look in on is
+  // opt-in per role (owner still holds it via full-catalog expansion).
+  'videoCall.create_open',
   // Creating personal API keys was open to any authenticated user (when the feature
   // is enabled) — baseline preserves that. NOTE: group 'account', NOT 'administration',
   // so holding it does not make a user count as an admin (isAdmin is group-driven).

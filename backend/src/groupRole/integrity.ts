@@ -51,11 +51,13 @@ export const GROUP_ROLE_INTEGRITY_AUDITS: readonly AuditQuery[] = [
              WHERE coalesce(g.nonMemberRead, false) <> (r.permissions CONTAINS '"group.read"')
                 OR coalesce(g.nonMemberContentRead, false) <> (r.permissions CONTAINS '"group.content.read"')
                 OR coalesce(g.showMembers, false) <> (r.permissions CONTAINS '"group.members.read"')
+                OR coalesce(g.nonMemberJoin, false) <> (r.permissions CONTAINS '"group.join"')
              RETURN count(g) AS violations`,
     sampleCypher: `MATCH (g:Group)-[:HAS_GROUP_ROLE]->(r:GroupRole { name: 'none' })
                    WHERE coalesce(g.nonMemberRead, false) <> (r.permissions CONTAINS '"group.read"')
                       OR coalesce(g.nonMemberContentRead, false) <> (r.permissions CONTAINS '"group.content.read"')
                       OR coalesce(g.showMembers, false) <> (r.permissions CONTAINS '"group.members.read"')
+                      OR coalesce(g.nonMemberJoin, false) <> (r.permissions CONTAINS '"group.join"')
                    RETURN g.id AS id, 'columns disagree with ' + coalesce(r.permissions, 'null') AS detail
                    LIMIT 10`,
   },

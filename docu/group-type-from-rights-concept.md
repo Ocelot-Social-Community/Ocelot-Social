@@ -26,7 +26,7 @@ search results, because both now ask `nonMemberRead` rather than the type.
 What the type still does:
 
 1. **The per-type network rights.** Eleven catalog keys are families over the type:
-   `group.create_<type>`, `videoCall.create_<type>`, `group.administer.any_<type>`,
+   `group.create_<type>`, `videoCall.create_<door>`, `group.administer.any_<type>`,
    `group.content.read.any_<type>`, `group.moderate.any_<type>`. They encode a *privacy
    ordering* — a moderator may read into `closed` groups but not `hidden` ones — which the
    rights themselves do not have.

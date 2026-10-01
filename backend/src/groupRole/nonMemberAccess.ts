@@ -21,6 +21,12 @@ export interface NonMemberAccess {
   nonMemberContentRead: boolean
   /** `group.members.read` — its member list and count. The old `showMembers` setting. */
   showMembers: boolean
+  /**
+   * `group.join` — whether a stranger may walk in without approval. Not a reading right, so
+   * it says nothing about the privacy level; it is what the video call cap asks about
+   * (see ./callDoor.ts), and it is here because it is the same `none` role and the same sync.
+   */
+  nonMemberJoin: boolean
 }
 
 /** The derived flags for a non-member role holding these permissions. */
@@ -32,6 +38,7 @@ export function nonMemberAccessFrom(
     nonMemberRead: held.has('group.read'),
     nonMemberContentRead: held.has('group.content.read'),
     showMembers: held.has('group.members.read'),
+    nonMemberJoin: held.has('group.join'),
   }
 }
 

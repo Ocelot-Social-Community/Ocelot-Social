@@ -382,9 +382,8 @@
         "user_delete_any": "Delete any user’s account.",
         "user_email_readAny": "Read any user’s email address.",
         "user_invite": "Generate personal invite codes.",
-        "videoCall_create_closed": "Start a video call in a closed group.",
-        "videoCall_create_hidden": "Start a video call in a hidden group.",
-        "videoCall_create_public": "Start a video call in a public group."
+        "videoCall_create_open": "Start a video call in a group a stranger can walk into — one anybody may find and join without approval.",
+        "videoCall_create_restricted": "Start a video call in a group one cannot simply walk into: joining needs approval, an invite, or the group is unlisted."
       },
       "permUnavailable": "Feature not configured — granting this has no effect.",
       "permUnavailableLink": "View configuration",

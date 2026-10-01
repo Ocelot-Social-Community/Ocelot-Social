@@ -3,21 +3,24 @@ import { describe, expect, it } from 'vitest'
 import { defaultNonMemberAccessFor, nonMemberAccessFrom } from './nonMemberAccess'
 
 describe(nonMemberAccessFrom, () => {
-  it('reads the three rights off the permission list', () => {
-    expect(nonMemberAccessFrom(['group.read', 'group.content.read', 'group.members.read'])).toEqual(
-      {
-        nonMemberRead: true,
-        nonMemberContentRead: true,
-        showMembers: true,
-      },
-    )
+  it('reads the four rights off the permission list', () => {
+    expect(
+      nonMemberAccessFrom(['group.read', 'group.content.read', 'group.members.read', 'group.join']),
+    ).toEqual({
+      nonMemberRead: true,
+      nonMemberContentRead: true,
+      showMembers: true,
+      nonMemberJoin: true,
+    })
   })
 
   it('is false for every right a role does not hold', () => {
-    expect(nonMemberAccessFrom(['group.read'])).toEqual({
+    expect(nonMemberAccessFrom(['group.read', 'group.join.request'])).toEqual({
       nonMemberRead: true,
       nonMemberContentRead: false,
       showMembers: false,
+      // Asking to join is not joining: the longer key must not satisfy the shorter one.
+      nonMemberJoin: false,
     })
   })
 
@@ -29,21 +32,23 @@ describe(nonMemberAccessFrom, () => {
         nonMemberRead: false,
         nonMemberContentRead: false,
         showMembers: false,
+        nonMemberJoin: false,
       })
     }
   })
 })
 
 describe(defaultNonMemberAccessFor, () => {
-  // These three ARE the two Cypher fallbacks (`coalesce(g.nonMemberRead, g.groupType <>
-  // 'hidden')`, `coalesce(g.nonMemberContentRead, g.groupType = 'public')`) and what the
-  // migration writes for a group without roles. If a template changes, this fails and the
-  // fallbacks have to be changed with it.
+  // These ARE the Cypher fallbacks (`coalesce(g.nonMemberRead, g.groupType <> 'hidden')`,
+  // `coalesce(g.nonMemberContentRead, g.groupType = 'public')`, `coalesce(g.nonMemberJoin,
+  // g.groupType = 'public')`) and what the migration writes for a group without roles. If a
+  // template changes, this fails and the fallbacks have to be changed with it.
   it('matches the seeded template of a public group: everything open', () => {
     expect(defaultNonMemberAccessFor('public')).toEqual({
       nonMemberRead: true,
       nonMemberContentRead: true,
       showMembers: true,
+      nonMemberJoin: true,
     })
   })
 
@@ -52,6 +57,8 @@ describe(defaultNonMemberAccessFor, () => {
       nonMemberRead: true,
       nonMemberContentRead: false,
       showMembers: false,
+      // `group.join.request` instead: the door asks before it opens.
+      nonMemberJoin: false,
     })
   })
 
@@ -60,6 +67,7 @@ describe(defaultNonMemberAccessFor, () => {
       nonMemberRead: false,
       nonMemberContentRead: false,
       showMembers: false,
+      nonMemberJoin: false,
     })
   })
 
@@ -68,6 +76,7 @@ describe(defaultNonMemberAccessFor, () => {
       nonMemberRead: false,
       nonMemberContentRead: false,
       showMembers: false,
+      nonMemberJoin: false,
     })
   })
 })

@@ -32,9 +32,8 @@ const NETWORK_ALL = new Set<PermissionKey>([
   'group.create_public',
   'group.create_closed',
   'group.create_hidden',
-  'videoCall.create_public',
-  'videoCall.create_closed',
-  'videoCall.create_hidden',
+  'videoCall.create_open',
+  'videoCall.create_restricted',
 ])
 
 describe(permissionsForGroupRole, () => {
@@ -120,22 +119,26 @@ describe(effectiveGroupPermissions, () => {
       networkEffective: new Set<PermissionKey>([
         'post.create',
         'comment.create',
-        'videoCall.create_public',
+        'videoCall.create_open',
         'group.create_public',
       ]),
       gateContext: ALL_GATES_OPEN,
     }
 
-    // Holding the PUBLIC call right does not open calls in a CLOSED group, and the same
-    // for switching the group's type.
-    const inClosed = effectiveGroupPermissions({ ...owner, groupType: 'closed' })
+    // Holding the OPEN-DOOR call right does not open calls in a group one cannot walk into,
+    // and holding `group.create_public` does not make a group closed.
+    const inClosed = effectiveGroupPermissions({
+      ...owner,
+      groupType: 'closed',
+      callDoor: 'restricted',
+    })
 
     expect(inClosed.has('group.videoCall.create')).toBe(false)
     expect(inClosed.has('group.type.change')).toBe(false)
     // Joining a running call has no network counterpart, so it stays.
     expect(inClosed.has('group.videoCall.join')).toBe(true)
 
-    const inPublic = effectiveGroupPermissions({ ...owner, groupType: 'public' })
+    const inPublic = effectiveGroupPermissions({ ...owner, groupType: 'public', callDoor: 'open' })
 
     expect(inPublic.has('group.videoCall.create')).toBe(true)
     expect(inPublic.has('group.type.change')).toBe(true)

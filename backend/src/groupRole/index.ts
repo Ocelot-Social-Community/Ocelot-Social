@@ -29,6 +29,13 @@ export {
 export type { GroupPrivacyLevel } from './privacyLevel'
 export type { NonMemberAccess } from './nonMemberAccess'
 export {
+  CALL_DOORS,
+  callDoorFrom,
+  callDoorOfPermissions,
+  videoCallCreatePermissionFor,
+} from './callDoor'
+export type { CallDoor } from './callDoor'
+export {
   dominatesInGroup,
   coversRole,
   mayAssignGroupRole,

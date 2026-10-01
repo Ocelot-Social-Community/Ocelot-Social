@@ -95,6 +95,8 @@ describe(seedRolesForNewGroup, () => {
       nonMemberRead: true,
       nonMemberContentRead: false,
       showMembers: true,
+      // The door the video call cap reads (./callDoor.ts): this role may ASK to join.
+      nonMemberJoin: false,
       // Derived from the same two rights, in the same statement: a readable profile with
       // private content IS a closed group (see ./privacyLevel.ts).
       groupType: 'closed',
@@ -288,6 +290,7 @@ describe(syncNonMemberAccess, () => {
       nonMemberRead: true,
       nonMemberContentRead: false,
       showMembers: true,
+      nonMemberJoin: false,
       groupType: 'closed',
     })
   })

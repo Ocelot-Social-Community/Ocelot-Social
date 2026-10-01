@@ -382,9 +382,8 @@
         "user_delete_any": "Eliminar la cuenta de cualquier usuario.",
         "user_email_readAny": "Leer la dirección de correo de cualquier usuario.",
         "user_invite": "Generar códigos de invitación personales.",
-        "videoCall_create_closed": "Iniciar una videollamada en un grupo cerrado.",
-        "videoCall_create_hidden": "Iniciar una videollamada en un grupo oculto.",
-        "videoCall_create_public": "Iniciar una videollamada en un grupo público."
+        "videoCall_create_open": "Iniciar una videollamada en un grupo al que cualquiera puede entrar: localizable y al que se puede unir sin aprobación.",
+        "videoCall_create_restricted": "Iniciar una videollamada en un grupo al que no se puede entrar sin más: unirse requiere aprobación o invitación, o el grupo está oculto."
       },
       "permUnavailable": "Función no configurada: conceder este permiso no tiene efecto.",
       "permUnavailableLink": "Ver configuración",

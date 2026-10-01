@@ -382,9 +382,8 @@
         "user_delete_any": "Supprimer le compte de n’importe quel utilisateur.",
         "user_email_readAny": "Lire l’adresse e-mail de n’importe quel utilisateur.",
         "user_invite": "Générer des codes d’invitation personnels.",
-        "videoCall_create_closed": "Démarrer un appel vidéo dans un groupe fermé.",
-        "videoCall_create_hidden": "Démarrer un appel vidéo dans un groupe caché.",
-        "videoCall_create_public": "Démarrer un appel vidéo dans un groupe public."
+        "videoCall_create_open": "Démarrer un appel vidéo dans un groupe où tout le monde peut entrer : trouvable et rejoignable sans approbation.",
+        "videoCall_create_restricted": "Démarrer un appel vidéo dans un groupe où l'on ne peut pas simplement entrer : rejoindre demande une approbation ou une invitation, ou le groupe est masqué."
       },
       "permUnavailable": "Fonctionnalité non configurée — accorder ce droit n'a aucun effet.",
       "permUnavailableLink": "Voir la configuration",

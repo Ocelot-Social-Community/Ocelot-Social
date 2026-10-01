@@ -382,9 +382,8 @@
         "user_delete_any": "Beliebiges Nutzerkonto löschen.",
         "user_email_readAny": "E-Mail-Adresse beliebiger Nutzer lesen.",
         "user_invite": "Persönliche Einladungscodes erzeugen.",
-        "videoCall_create_closed": "Videoanruf in einer geschlossenen Gruppe starten.",
-        "videoCall_create_hidden": "Videoanruf in einer verborgenen Gruppe starten.",
-        "videoCall_create_public": "Videoanruf in einer öffentlichen Gruppe starten."
+        "videoCall_create_open": "Einen Video-Call in einer Gruppe starten, die jeder betreten kann — die also auffindbar ist und ohne Freigabe beigetreten werden kann.",
+        "videoCall_create_restricted": "Einen Video-Call in einer Gruppe starten, die man nicht einfach betreten kann: Der Beitritt braucht eine Freigabe oder Einladung, oder die Gruppe ist unsichtbar."
       },
       "permUnavailable": "Funktion nicht konfiguriert – das Recht hat keine Wirkung.",
       "permUnavailableLink": "Konfiguration ansehen",

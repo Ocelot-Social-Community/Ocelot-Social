@@ -187,6 +187,7 @@ const WRITE_NON_MEMBER_ACCESS_CYPHER = `
   SET g.nonMemberRead = $nonMemberRead,
       g.nonMemberContentRead = $nonMemberContentRead,
       g.showMembers = $showMembers,
+      g.nonMemberJoin = $nonMemberJoin,
       g.groupType = $groupType
 `
 

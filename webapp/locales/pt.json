@@ -382,9 +382,8 @@
         "user_delete_any": "Eliminar a conta de qualquer utilizador.",
         "user_email_readAny": "Ler o endereço de e-mail de qualquer utilizador.",
         "user_invite": "Gerar códigos de convite pessoais.",
-        "videoCall_create_closed": "Iniciar uma chamada de vídeo num grupo fechado.",
-        "videoCall_create_hidden": "Iniciar uma chamada de vídeo num grupo oculto.",
-        "videoCall_create_public": "Iniciar uma chamada de vídeo num grupo público."
+        "videoCall_create_open": "Iniciar uma videochamada num grupo em que qualquer pessoa pode entrar — localizável e acessível sem aprovação.",
+        "videoCall_create_restricted": "Iniciar uma videochamada num grupo em que não se pode simplesmente entrar: entrar exige aprovação ou convite, ou o grupo está oculto."
       },
       "permUnavailable": "Recurso não configurado — conceder esta permissão não tem efeito.",
       "permUnavailableLink": "Ver configuração",

@@ -382,9 +382,8 @@
         "user_delete_any": "Usuwanie konta dowolnego użytkownika.",
         "user_email_readAny": "Odczyt adresu e-mail dowolnego użytkownika.",
         "user_invite": "Generowanie osobistych kodów zaproszeń.",
-        "videoCall_create_closed": "Rozpoczynanie rozmowy wideo w grupie zamkniętej.",
-        "videoCall_create_hidden": "Rozpoczynanie rozmowy wideo w grupie ukrytej.",
-        "videoCall_create_public": "Rozpoczynanie rozmowy wideo w grupie publicznej."
+        "videoCall_create_open": "Rozpoczęcie rozmowy wideo w grupie, do której każdy może wejść — widocznej i dostępnej bez zatwierdzenia.",
+        "videoCall_create_restricted": "Rozpoczęcie rozmowy wideo w grupie, do której nie można po prostu wejść: dołączenie wymaga zatwierdzenia lub zaproszenia, albo grupa jest ukryta."
       },
       "permUnavailable": "Funkcja nieskonfigurowana — przyznanie tego uprawnienia nie ma efektu.",
       "permUnavailableLink": "Zobacz konfigurację",

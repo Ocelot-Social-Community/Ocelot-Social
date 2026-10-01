@@ -88,8 +88,8 @@ const DESCRIPTION_OVERRIDE = {
 
 let authenticatedUser: Context['user']
 let livekitConfig: Record<string, unknown> = {}
-// Per-test role override: tweaks the viewer's effective permissions to test the
-// per-group-type open gate (videoCall.create_public / _closed / _hidden).
+// Per-test role override: tweaks the viewer's effective permissions to test the per-door
+// open gate (videoCall.create_open / _restricted).
 let rolesOverride: RoleDefinition[] | undefined
 // videoConference's effective value (the single switch the resolvers now read) folds
 // the LiveKit env via requiresEnv, so feed the same LiveKit vars as the policy env:
@@ -326,9 +326,9 @@ describe('joinGroupVideoCall', () => {
     expect(errors?.[0].message).toMatch(/not a member|not authorized/i)
   })
 
-  it('denies OPENING a hidden-group call without videoCall.create_hidden (baseline user)', async () => {
-    // No live participants (default mock → []), so this is an OPEN. The baseline user
-    // holds videoCall.create_public but not _hidden → denied for a hidden group.
+  it('denies OPENING a hidden-group call without videoCall.create_restricted (baseline user)', async () => {
+    // No live participants (default mock → []), so this is an OPEN. A hidden group is not one
+    // a stranger can walk into, and the baseline user holds only the open-door right.
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
     await Factory.build(
@@ -346,7 +346,7 @@ describe('joinGroupVideoCall', () => {
 
   it('allows JOINING an existing hidden-group call without the open permission', async () => {
     // A call is already running (participants > 0) → this is a JOIN, which any member
-    // may do regardless of the per-type open permission.
+    // may do regardless of which door the group has.
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
     await Factory.build(
@@ -365,7 +365,7 @@ describe('joinGroupVideoCall', () => {
     expect(data.joinGroupVideoCall.token).toContain('member-1')
   })
 
-  it('denies OPENING a public-group call when the role lacks videoCall.create_public', async () => {
+  it('denies OPENING a walk-in group call when the role lacks videoCall.create_open', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
     rolesOverride = [
@@ -384,10 +384,12 @@ describe('joinGroupVideoCall', () => {
     expect(errors?.[0].message).toMatch(/may not start a video call/i)
   })
 
-  it('allows OPENING a hidden-group call when the role holds videoCall.create_hidden', async () => {
+  it('allows OPENING a hidden-group call when the role holds videoCall.create_restricted', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
-    rolesOverride = [{ name: 'user', protected: false, permissions: ['videoCall.create_hidden'] }]
+    rolesOverride = [
+      { name: 'user', protected: false, permissions: ['videoCall.create_restricted'] },
+    ]
     await Factory.build(
       'group',
       { id: 'h-1', groupType: 'hidden', ...DESCRIPTION_OVERRIDE },
@@ -402,7 +404,7 @@ describe('joinGroupVideoCall', () => {
     expect(data.joinGroupVideoCall.roomName).toBe('group-h-1')
   })
 
-  it('denies OPENING a closed-group call when the role lacks videoCall.create_closed', async () => {
+  it('denies OPENING a closed-group call when the role lacks videoCall.create_restricted', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
     rolesOverride = [
@@ -421,10 +423,12 @@ describe('joinGroupVideoCall', () => {
     expect(errors?.[0].message).toMatch(/may not start a video call/i)
   })
 
-  it('allows OPENING a closed-group call when the role holds videoCall.create_closed', async () => {
+  it('allows OPENING a closed-group call when the role holds videoCall.create_restricted', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
-    rolesOverride = [{ name: 'user', protected: false, permissions: ['videoCall.create_closed'] }]
+    rolesOverride = [
+      { name: 'user', protected: false, permissions: ['videoCall.create_restricted'] },
+    ]
     await Factory.build(
       'group',
       { id: 'cl-1', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
@@ -440,7 +444,7 @@ describe('joinGroupVideoCall', () => {
   })
 
   it('denies OPENING when the group withheld group.videoCall.create from the role', async () => {
-    // The point of the group right: the viewer holds videoCall.create_public network-wide
+    // The point of the group right: the viewer holds videoCall.create_open network-wide
     // (baseline role) and is an ordinary member here — but this group decided its members
     // may join calls without being able to start one.
     livekitConfig = ENABLED_LIVEKIT
@@ -533,43 +537,60 @@ describe('joinGroupVideoCall', () => {
     expect(data.joinGroupVideoCall.token).toContain('group-pub-1')
   })
 
-  it('refuses to OPEN a call in a group whose type has no open permission', async () => {
-    // Fail closed on an unmapped group type: group.videoCall.create is capped by
-    // videoCall.create_<type>, and for a type the network catalog does not know that
-    // resolves to an `unknown.*` key nobody can hold (see groupPermission/prerequisites).
-    // The role below holds ALL three open permissions, so only the missing per-type
-    // sibling can produce the rejection.
+  it('refuses to OPEN a call in a group one cannot walk into, whatever its type says', async () => {
+    // What caps opening a call is the DOOR, not the name: this group is listed (`group.read`
+    // for non-members) but joining it needs approval, so a stranger cannot be in the call —
+    // and the open-door right is the only one the role holds.
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
-    rolesOverride = [
-      {
-        name: 'user',
-        protected: false,
-        permissions: [
-          'videoCall.create_public',
-          'videoCall.create_closed',
-          'videoCall.create_hidden',
-        ],
-      },
-    ]
+    rolesOverride = [{ name: 'user', protected: false, permissions: ['videoCall.create_open'] }]
     await Factory.build(
       'group',
-      { id: 'exp-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { id: 'ask-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
-    // Written past the model validation on purpose — this mirrors a future group type
-    // reaching the resolver before the permission map knows about it.
     await database.write({
-      query: `MATCH (g:Group { id: 'exp-1' }) SET g.groupType = 'experimental'`,
+      query: `MATCH (g:Group { id: 'ask-1' })-[:HAS_GROUP_ROLE]->(r:GroupRole { name: 'none' })
+              SET r.permissions = '["group.read","group.join.request"]',
+                  g.nonMemberRead = true,
+                  g.nonMemberJoin = false`,
       variables: {},
     })
 
     const { errors } = await mutate({
       mutation: JoinGroupVideoCall,
-      variables: { groupId: 'exp-1' },
+      variables: { groupId: 'ask-1' },
     })
 
     expect(errors?.[0].message).toMatch(/may not start a video call/i)
+  })
+
+  it('allows OPENING a closed-group call when that group admits everybody directly', async () => {
+    // The other side of the same coin: a group whose content is private but whose door is
+    // open is a call a stranger can be in, so the open-door right is the right cap for it.
+    livekitConfig = ENABLED_LIVEKIT
+    authenticatedUser = memberJson
+    rolesOverride = [{ name: 'user', protected: false, permissions: ['videoCall.create_open'] }]
+    await Factory.build(
+      'group',
+      { id: 'walk-1', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
+    await database.write({
+      query: `MATCH (g:Group { id: 'walk-1' })-[:HAS_GROUP_ROLE]->(r:GroupRole { name: 'none' })
+              SET r.permissions = '["group.read","group.join"]',
+                  g.nonMemberRead = true,
+                  g.nonMemberJoin = true`,
+      variables: {},
+    })
+
+    const { data, errors } = await mutate({
+      mutation: JoinGroupVideoCall,
+      variables: { groupId: 'walk-1' },
+    })
+
+    expect(errors).toBeUndefined()
+    expect(data.joinGroupVideoCall.roomName).toBe('group-walk-1')
   })
 
   describe('access token metadata', () => {

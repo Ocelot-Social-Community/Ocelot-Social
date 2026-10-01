@@ -106,29 +106,21 @@
       "gatedBy": "inviteRegistration",
       "description": "Generate personal invite codes to invite people to the network."
     },
-    "videoCall.create_public": {
+    "videoCall.create_open": {
       "group": "communication",
       "gatedBy": [
         "videoConference",
         "groupsEnabled"
       ],
-      "description": "Start (open) a video call in a public group. Joining an existing call stays open to any member."
+      "description": "Start (open) a video call in a group a stranger may walk into — one whose non-member role may both find it and join it without approval. Joining an existing call stays a group right."
     },
-    "videoCall.create_closed": {
+    "videoCall.create_restricted": {
       "group": "communication",
       "gatedBy": [
         "videoConference",
         "groupsEnabled"
       ],
-      "description": "Start (open) a video call in a closed group. Joining an existing call stays open to any member."
-    },
-    "videoCall.create_hidden": {
-      "group": "communication",
-      "gatedBy": [
-        "videoConference",
-        "groupsEnabled"
-      ],
-      "description": "Start (open) a video call in a hidden group. Joining an existing call stays open to any member."
+      "description": "Start (open) a video call in a group one cannot simply walk into: joining it needs approval, an invite, or the group is unlisted. The stronger of the two, because such a call cannot be looked in on."
     },
     "apiKey.create": {
       "group": "account",

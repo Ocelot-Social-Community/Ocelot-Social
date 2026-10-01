@@ -31,7 +31,7 @@ const CATALOG = [
     group: 'communication',
     description: 'Open a video call.',
     gatedBy: ['videoConference'],
-    requiresNetworkPermission: 'videoCall.create_<type>',
+    requiresNetworkPermission: 'videoCall.create_<door>',
   },
 ]
 

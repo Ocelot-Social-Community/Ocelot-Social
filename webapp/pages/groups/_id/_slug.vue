@@ -482,7 +482,8 @@ export default {
     },
     canOpenVideoCall() {
       // Opening a call is its own group right, capped server-side by the network
-      // videoCall.create_<type> this used to ask for directly.
+      // videoCall.create_<door> — whether a stranger could walk into this group — where this
+      // used to ask for a per-group-type right directly.
       return this.canInGroup('group.videoCall.create', this.group)
     },
     videoCallOpenDenied() {

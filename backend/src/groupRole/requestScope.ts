@@ -10,10 +10,12 @@
 // request against an indexed lookup is the cheaper trade — and it cannot go stale.
 import { allGroupPermissionKeys, GROUPS_ENABLED_GATE } from '@src/groupPermission'
 
+import { callDoorFrom } from './callDoor'
 import { authoritySourceFor, effectiveGroupPermissions } from './effective'
 import { parseStoredPermissions } from './storedPermissions'
 import { isActiveMembershipRole, NONE_ROLE, OWNER_ROLE } from './types'
 
+import type { CallDoor } from './callDoor'
 import type { AuthoritySource, GroupRoleDefinition } from './types'
 import type databaseContext from '@context/database'
 import type { GroupPermissionKey } from '@src/groupPermission'
@@ -40,6 +42,8 @@ export interface GroupAuthorization {
    * group-type behaviour.
    */
   hasRoleDefinition: boolean
+  /** Whether a stranger could walk into this group — the video call cap (./callDoor.ts). */
+  callDoor: CallDoor
   effective: ReadonlySet<GroupPermissionKey>
   has: (permission: GroupPermissionKey) => boolean
   /** Where a held right comes from — membership or a network right (concept E16/E18). */
@@ -84,6 +88,10 @@ const AUTHORIZATION_QUERY = `
   WITH g, coalesce(m.role, $noneRole) AS roleName
   OPTIONAL MATCH (g)-[:HAS_GROUP_ROLE]->(r:GroupRole {name: roleName})
   RETURN g.groupType AS groupType,
+         // The derived door columns, with the same template fallback the Cypher helpers use
+         // for a group the backfill has not reached yet (groupRole/nonMemberAccess.ts).
+         coalesce(g.nonMemberRead, g.groupType <> 'hidden') AS nonMemberRead,
+         coalesce(g.nonMemberJoin, g.groupType = 'public') AS nonMemberJoin,
          roleName AS roleName,
          r.name AS name,
          r.label AS label,
@@ -196,12 +204,20 @@ export function createGroupAuthorizationScope({
         }
       : null
     const groupType = record.get('groupType') as string
+    // Whether a stranger could walk into this group, which is what caps opening a video call
+    // (groupRole/callDoor.ts) — read off the group node rather than from its `none` role,
+    // because the role this query loads is the VIEWER's.
+    const callDoor = callDoorFrom({
+      nonMemberRead: record.get('nonMemberRead') === true,
+      nonMemberJoin: record.get('nonMemberJoin') === true,
+    })
     const networkAuthority = networkAuthorityFor(groupType)
     const effective = effectiveGroupPermissions({
       role,
       networkAuthority,
       networkEffective: effectivePermissions,
       groupType,
+      callDoor,
       gateContext,
     })
     // A membership whose role the group does not define must still be LEAVABLE. Everything
@@ -222,6 +238,7 @@ export function createGroupAuthorizationScope({
       // that predates the roles or a half-applied migration, which a caller cannot tell from
       // "a role that grants nothing" (a hidden group's non-member role) without being told.
       hasRoleDefinition: role !== null,
+      callDoor,
       effective: effectiveWithEscape,
       has: (permission) => effectiveWithEscape.has(permission),
       sourceOf: (permission) => authoritySourceFor(permission, role, networkAuthority),
@@ -258,10 +275,18 @@ export function createGroupAuthorizationScope({
     }
   }
 
-  // Both of the two below resolve a role of the SAME group, so they share the group's type
-  // (for the per-type caps) with whatever forGroup already read.
-  const groupTypeOf = async (groupId: string): Promise<string | null> =>
-    (await forGroup(groupId))?.groupType ?? null
+  // Both of the two below resolve a role of the SAME group, so they share the facts the caps
+  // are resolved against — the type and the door — with whatever forGroup already read.
+  // Resolving them differently is how a right that is capped for everybody in this group
+  // starts blocking a role assignment on one side of the comparison only.
+  const groupScopeOf = async (
+    groupId: string,
+  ): Promise<{ groupType: string; callDoor: CallDoor } | null> => {
+    const authorization = await forGroup(groupId)
+    return authorization
+      ? { groupType: authorization.groupType, callDoor: authorization.callDoor }
+      : null
+  }
 
   const definitionFrom = (record: {
     get: (key: string) => unknown
@@ -292,8 +317,8 @@ export function createGroupAuthorizationScope({
     groupId: string,
     targetUserId: string,
   ): Promise<Set<GroupPermissionKey>> => {
-    const groupType = await groupTypeOf(groupId)
-    if (groupType === null) {
+    const scope = await groupScopeOf(groupId)
+    if (scope === null) {
       return new Set()
     }
     const result = await database.query({
@@ -307,7 +332,7 @@ export function createGroupAuthorizationScope({
     return effectiveGroupPermissions({
       role: definitionFrom(record),
       networkEffective: effectivePermissions,
-      groupType,
+      ...scope,
       gateContext,
     })
   }
@@ -316,8 +341,8 @@ export function createGroupAuthorizationScope({
     groupId: string,
     roleName: string,
   ): Promise<Set<GroupPermissionKey> | null> => {
-    const groupType = await groupTypeOf(groupId)
-    if (groupType === null) {
+    const scope = await groupScopeOf(groupId)
+    if (scope === null) {
       return null
     }
     const result = await database.query({
@@ -338,7 +363,7 @@ export function createGroupAuthorizationScope({
     return effectiveGroupPermissions({
       role,
       networkEffective: effectivePermissions,
-      groupType,
+      ...scope,
       gateContext,
     })
   }

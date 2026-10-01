@@ -15,8 +15,9 @@
 > | Invite gesplittet (E11) | umgesetzt |
 > | Admin-Gruppenliste statt `organizations.vue` (E17) | umgesetzt |
 > | Owner-los erlaubt (E8) | umgesetzt |
-> | `groupType` bleibt autoritatives Preset (E2) | **abgewichen** — die Lesewege (Feed, Liste, Suche, Profil, Pinnen) fragen jetzt die Rechte ueber abgeleitete Spalten am Gruppenknoten; der Typ ist Preset fuer `none`/`pending` und entscheidet nur noch die per-Typ-Netzrechte. Das war das Folge-Issue 8, vorgezogen; die offene Ableitung des Typs beschreibt `group-type-from-rights-concept.md` |
-> | `group.member.approve` (E9: kein Key ohne Konsument) | **offen** — `JoinGroup` setzt die Rolle nur `ON CREATE`, nimmt also keinen bestehenden Bewerber an, und die Webapp ruft den Pfad nicht auf |
+> | `groupType` bleibt autoritatives Preset (E2) | **abgewichen, inzwischen vollstaendig** — die Lesewege fragen die Rechte ueber abgeleitete Spalten am Gruppenknoten, und der Typ selbst ist jetzt *abgeleitet* (`groupRole/privacyLevel.ts`, Handlungsoption A aus `group-type-from-rights-concept.md`): er wird vom Sync geschrieben, nicht gewaehlt |
+> | `videoCall.create_<type>` (E5-Muster) | **ersetzt** — gekoppelt an die *Tuer* statt an den Typ: `videoCall.create_open` fuer eine Gruppe, in die ein Fremder hineinlaufen kann (`group.read` + `group.join` auf `none`), `videoCall.create_restricted` sonst (`groupRole/callDoor.ts`). Auf den drei Presets verhaltensgleich |
+> | `group.member.approve` (E9: kein Key ohne Konsument) | **entfernt** — es gab keinen Konsumenten, der tut was der Key benennt: `JoinGroup` setzt die Rolle nur `ON CREATE`. Jemanden *hinzufuegen* verlangt `group.member.role.assign`; das Freigeben eines Bewerbers kommt als eigenes Feature mit UI zurueck (#10352) |
 > | `banned`-Rolle (E14), `group.delete` (E9) | bewusst Folge-Issues |
 
 Gruppen bekommen dasselbe Freiheitsniveau, das das Netzwerk seit dem RBAC-Umbau
@@ -162,7 +163,6 @@ Katalog, nicht Doku.
 | `group.join` | membership | — | — | `JoinGroup` (direkt) | Direkt beitreten (Preset `public`) |
 | `group.join.request` | membership | — | — | `JoinGroup` (→ `pending`) | Beitritt anfragen (Preset `closed`) |
 | `group.leave` | membership | — | — | `LeaveGroup` | Gruppe verlassen |
-| `group.member.approve` | membership | — | — | `setGroupMemberRole` (`pending` → Mitglied) | Beitrittsanfrage freigeben |
 | `group.member.remove` | membership | — | — | `RemoveUserFromGroup` (+ Dominanz, 3.4) | Mitglied entfernen |
 | `group.member.role.assign` | membership | — | — | `setGroupMemberRole` (+ Dominanz + Deckung, 3.4) | Rolle eines Mitglieds aendern |
 | `group.invite` | membership | — | — | `generateGroupInviteCode` | Invite-Code fuer **bestehende** Netzwerk-Mitglieder erzeugen |
@@ -171,7 +171,7 @@ Katalog, nicht Doku.
 | `group.type.change` | administration | `group.create_<type>` | — | `UpdateGroup` mit `groupType` im Payload | `groupType` aendern; gedeckelt durch das Erstellungsrecht fuer den Zieltyp (E10) |
 | `group.role.manage` | administration | — | — | `updateGroupRole` / `createGroupRole` / `renameGroupRole` / `deleteGroupRole` / `resetGroupRoles`, `Group.roles` | **Meta-Recht:** Rollendefinitionen dieser Gruppe bearbeiten |
 | `group.chat.participate` | communication | — | — | `CreateGroupRoom`, `CreateMessage`, `MarkMessagesAsSeen` (Gruppen-Room) | Gruppen-Room lesen/schreiben — schliesst die heutige Luecke |
-| `group.videoCall.create` | communication | `videoCall.create_<type>` | `videoConference` | Start eines Calls in der Gruppe | Video-Call eroeffnen |
+| `group.videoCall.create` | communication | `videoCall.create_<door>` | `videoConference` | Start eines Calls in der Gruppe | Video-Call eroeffnen |
 | `group.videoCall.join` | communication | — | `videoConference` | `joinGroupVideoCall` | Laufendem Call beitreten |
 
 **20 Keys.** Bewusst *nicht* enthalten (E9):
@@ -446,7 +446,6 @@ Randfaelle:
 | `group.invite` | · | · | · | · | ✓ (public) | ✓ | ✓ |
 | `group.invite.external` | · | · | · | · | · | ✓ | ✓ |
 | `group.post.pin` | · | · | · | · | · | ✓ | ✓ |
-| `group.member.approve` | · | · | · | · | · | ✓ | ✓ |
 | `group.member.role.assign` | · | · | · | · | · | ✓ | ✓ |
 | `group.member.remove` | · | · | · | · | · | ✓ ⚠ | ✓ |
 | `group.settings.manage` | · | · | · | · | · | ✓ ⚠ | ✓ |
@@ -479,7 +478,7 @@ koennen. Aber nicht Inhaber bestimmen koennen."):
 | `isAllowedSeeingGroupMembers` | `hasGroupPermission('group.members.read')` |
 | `isAllowedToChangeGroupMemberRole` | `and(hasGroupPermission('group.member.role.assign'), dominatesInGroup)` |
 | `canRemoveUserFromGroup` | `and(hasGroupPermission('group.member.remove'), dominatesInGroup)` |
-| `isAllowedToJoinGroup` | `or(group.join, group.join.request)` — Zielrolle folgt dem Recht, nicht dem `groupType`-`CASE` im Resolver; Approve-Pfad = `group.member.approve` |
+| `isAllowedToJoinGroup` | `or(group.join, group.join.request)` — Zielrolle folgt dem Recht, nicht dem `groupType`-`CASE` im Resolver; jemand *anderen* hinzufuegen = `group.member.role.assign` |
 | `isAllowedToLeaveGroup` | `hasGroupPermission('group.leave')` |
 | `isMemberOfGroup` (bei `CreatePost`) | `hasGroupPermission('group.post.create')` |
 | `canCommentPost` | `hasGroupPermission('group.comment.create')` |
@@ -505,7 +504,7 @@ sich mit diesem Entwurf, teils wortgleich:
 | Aussage in #5386 | Entsprechung hier |
 |---|---|
 | "Owners can all do what admins can" | Dominanz als echte Mengen-Obermenge (3.4) — kein Rangfeld noetig |
-| "Owners only can decide **what admins can do**: invite new members, confirm pending members" | **genau `group.role.manage` + Matrix.** Die zwei genannten Rechte sind `group.invite` und `group.member.approve`. Das Konzept ist die Verallgemeinerung dieses Satzes. |
+| "Owners only can decide **what admins can do**: invite new members, confirm pending members" | **genau `group.role.manage` + Matrix.** Das erste ist `group.invite`; das Freigeben von Bewerbern fehlt noch als Feature (#10352) und kommt mit seinem Recht zurueck. Das Konzept ist die Verallgemeinerung dieses Satzes. |
 | Netzwerk-Setting: Gruppen-Erstellung an/aus, `hidden` unmoeglich, Erstellung nur fuer Admins | **bereits erledigt** durch die `groupsEnabled`-Policy + `group.create_public/_closed/_hidden` (#5549 ist damit beantwortet) |
 | "enable owners to downgrade their role in case another owner exists" | faellt aus der Dominanz heraus (#6173) |
 | "is an owner allowed to change the role of other owners?" | **nein** — gleiche Menge, keine Dominanz (3.4) |

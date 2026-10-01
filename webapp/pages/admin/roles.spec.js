@@ -118,7 +118,7 @@ describe('admin/roles.vue', () => {
     const gatedCatalog = [
       { key: 'post.create', group: 'content', description: 'Create posts', available: true },
       {
-        key: 'videoCall.create_public',
+        key: 'videoCall.create_open',
         group: 'communication',
         description: 'Start a public call',
         gatedBy: 'videoConference',
@@ -144,7 +144,7 @@ describe('admin/roles.vue', () => {
       wrapper
         .findAll('.perm-row')
         .wrappers.find((row) => row.find(`[data-test="role-user-perm-${key}"]`).exists())
-    const gatedRow = rowOf('videoCall.create_public')
+    const gatedRow = rowOf('videoCall.create_open')
     const openRow = rowOf('post.create')
     // The gated right is disabled and carries the "not configured" note…
     expect(gatedRow.find('input').attributes('disabled')).toBeDefined()

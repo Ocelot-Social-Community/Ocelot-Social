@@ -17,6 +17,7 @@ import {
 
 import { OWNER_ROLE } from './types'
 
+import type { CallDoor } from './callDoor'
 import type { AuthoritySource, GroupRoleDefinition } from './types'
 import type { GroupGateContext, GroupPermissionKey } from '@src/groupPermission'
 import type { PermissionKey } from '@src/permission'
@@ -56,6 +57,12 @@ export interface EffectiveGroupPermissionsInput {
   networkEffective: ReadonlySet<PermissionKey>
   /** The group's type, which the per-type prerequisites are resolved against. */
   groupType: string
+  /**
+   * Whether a stranger could walk into this group — the value `videoCall.create_<door>` is
+   * resolved against (see ./callDoor.ts). Defaults to the stricter `restricted`, so a caller
+   * that does not know cannot accidentally hand out the weaker cap.
+   */
+  callDoor?: CallDoor
   /** Policy reader, for the feature gates (groupsEnabled and friends). */
   gateContext: GroupGateContext
 }
@@ -69,6 +76,7 @@ export function effectiveGroupPermissions({
   networkAuthority,
   networkEffective,
   groupType,
+  callDoor = 'restricted',
   gateContext,
 }: EffectiveGroupPermissionsInput): Set<GroupPermissionKey> {
   const granted = new Set<GroupPermissionKey>([
@@ -80,7 +88,7 @@ export function effectiveGroupPermissions({
     if (!isGroupPermissionAvailable(key, gateContext)) {
       continue
     }
-    if (!networkPrerequisiteSatisfied(key, groupType, networkEffective)) {
+    if (!networkPrerequisiteSatisfied(key, { groupType, callDoor }, networkEffective)) {
       continue
     }
     effective.add(key)

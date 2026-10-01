@@ -382,9 +382,8 @@
         "user_delete_any": "Fshi llogarinë e çdo përdoruesi.",
         "user_email_readAny": "Lexo adresën e email-it të çdo përdoruesi.",
         "user_invite": "Gjenero kode ftese personale.",
-        "videoCall_create_closed": "Nis një thirrje video në një grup të mbyllur.",
-        "videoCall_create_hidden": "Nis një thirrje video në një grup të fshehur.",
-        "videoCall_create_public": "Nis një thirrje video në një grup publik."
+        "videoCall_create_open": "Nis një thirrje video në një grup ku kushdo mund të hyjë — që gjendet lehtë dhe pranon anëtarë pa miratim.",
+        "videoCall_create_restricted": "Nis një thirrje video në një grup ku nuk hyn kushdo: bashkimi kërkon miratim ose ftesë, ose grupi është i fshehur."
       },
       "permUnavailable": "Funksioni nuk është konfiguruar — dhënia e kësaj të drejte nuk ka efekt.",
       "permUnavailableLink": "Shiko konfigurimin",
