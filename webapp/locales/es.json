@@ -37,7 +37,7 @@
       },
       "revoke": {
         "confirm": "Revocar",
-        "message": "¿Estás seguro de que quieres revocar la API Key \"{name}\" de {user}?",
+        "message": "¿Estás seguro de que quieres revocar la API Key «{name}» de {user}?",
         "success": "API Key revocada con éxito",
         "title": "Revocar API Key"
       },
@@ -368,7 +368,7 @@
       "saveSuccess": "Rol guardado.",
       "selfLockout": {
         "confirm": "Quitar de todos modos",
-        "message": "Estás a punto de quitar el permiso “gestionar roles” de <strong>{role}</strong>, tu propio rol. Después ya no podrás gestionar roles; solo un propietario podrá restaurarlo. ¿Continuar?",
+        "message": "Estás a punto de quitar el permiso «gestionar roles» de <strong>{role}</strong>, tu propio rol. Después ya no podrás gestionar roles; solo un propietario podrá restaurarlo. ¿Continuar?",
         "title": "¿Quitar la gestión de tu propio rol?"
       },
       "title": "Roles y permisos"
@@ -427,7 +427,7 @@
     "expandChat": "Expandir chat",
     "groupChatButton": {
       "label": "Chat grupal",
-      "tooltip": "Chat con el grupo \"{name}\""
+      "tooltip": "Chat con el grupo «{name}»"
     },
     "isOnline": "está en línea",
     "isTyping": "está escribiendo...",
@@ -450,7 +450,7 @@
     "typeMessage": "Escribe un mensaje",
     "userProfileButton": {
       "label": "Chat",
-      "tooltip": "Chatear con “{name}”"
+      "tooltip": "Chatear con «{name}»"
     }
   },
   "client-only": {
@@ -664,7 +664,7 @@
     "comment": {
       "commenting-disabled": {
         "blocked-author": {
-          "button-label": "Visitar “{name}”",
+          "button-label": "Visitar «{name}»",
           "call-to-action": "Si quieres dejar un comentario, desbloquéalo en su perfil.",
           "reason": "Estás bloqueando al autor de la publicación."
         },
@@ -711,18 +711,18 @@
       "supportedFormats": "Insertar una imagen de formato de archivo JPG, PNG o GIF!"
     },
     "title": "Título",
-    "visibleOnlyForMembersOfGroup": "Esta publicación solo será visible para los miembros del grupo “<b>{name}</b>”."
+    "visibleOnlyForMembersOfGroup": "Esta publicación solo será visible para los miembros del grupo «<b>{name}</b>»."
   },
   "delete": {
     "cancel": "Cancelar",
     "comment": {
-      "message": "¿Realmente quieres borrar el comentario de \"<b>{name}</b>\" ?",
+      "message": "¿Realmente quieres borrar el comentario de «<b>{name}</b>» ?",
       "success": "¡Comentario eliminado con éxito!",
       "title": "Eliminar comentario",
       "type": "Comentario"
     },
     "contribution": {
-      "message": "¿Realmente desea eliminar la Contribución \"<b>{name}</b>\" ?",
+      "message": "¿Realmente desea eliminar la Contribución «<b>{name}</b>» ?",
       "success": "¡Publicación eliminado con éxito!",
       "title": "Borrar contribución",
       "type": "Contribución"
@@ -732,19 +732,19 @@
   "disable": {
     "cancel": "Cancelar",
     "comment": {
-      "message": "¿Realmente quieres deshabilitar el comentario de \"<b>{name}</b>\"?",
+      "message": "¿Realmente quieres deshabilitar el comentario de «<b>{name}</b>»?",
       "title": "Desactivar comentario",
       "type": "Comentario"
     },
     "contribution": {
-      "message": "¿Realmente quieres deshabilitar la contribución \"<b>{name}</b>\"?",
+      "message": "¿Realmente quieres deshabilitar la contribución «<b>{name}</b>»?",
       "title": "Deshabilitar contribución",
       "type": "Contribución"
     },
     "submit": "Desactivar",
     "success": "Discapacitado con éxito",
     "user": {
-      "message": "¿Realmente quieres deshabilitar el usuario \"<b>{name}</b>\"?",
+      "message": "¿Realmente quieres deshabilitar el usuario «<b>{name}</b>»?",
       "title": "Desactivar usuario",
       "type": "Usuario"
     }
@@ -864,14 +864,14 @@
     "actionRadius": "Radio de acción del grupo",
     "addMember": "Añadir miembro",
     "addMemberToGroup": "Añadir al grupo",
-    "addMemberToGroupSuccess": "¡“{name}” fue añadido al grupo con el rol “{role}”!",
+    "addMemberToGroupSuccess": "¡«{name}» fue añadido al grupo con el rol «{role}»!",
     "addUser": "Añadir usuario",
     "addUserNoOptions": "¡No se encontraron usuarios!",
     "addUserPlaceholder": "Nombre de usuario",
     "allGroups": "Todos los grupos",
     "categories": "Tema ::: Temas",
     "categoriesTitle": "Temas del grupo",
-    "changeMemberRole": "¡El rol se ha cambiado a “{role}”!",
+    "changeMemberRole": "¡El rol se ha cambiado a «{role}»!",
     "contentMenu": {
       "hideFromProfile": "Ocultar de mi perfil",
       "inviteLinks": "Enlaces de invitación",
@@ -892,7 +892,7 @@
       "title": "Editar mi grupo"
     },
     "errors": {
-      "userAlreadyMember": "¡El usuario “{name}” ya es miembro!"
+      "userAlreadyMember": "¡El usuario «{name}» ya es miembro!"
     },
     "follow": "Seguir",
     "foundation": "Fundación",
@@ -912,10 +912,10 @@
     "labelSlug": "Nombre único del grupo",
     "leaveModal": {
       "confirmButton": "Salir",
-      "message": "¡Salir de un grupo puede ser irreversible!<br>¡Salir del grupo <b>“{name}”</b>!",
+      "message": "¡Salir de un grupo puede ser irreversible!<br>¡Salir del grupo <b>«{name}»</b>!",
       "title": "¿Realmente quieres salir del grupo?"
     },
-    "memberRemoved": "¡El usuario “{name}” fue eliminado del grupo!",
+    "memberRemoved": "¡El usuario «{name}» fue eliminado del grupo!",
     "members": "Miembros",
     "membersAdministrationList": {
       "avatar": "Avatar",
@@ -932,7 +932,7 @@
     "modal": {
       "cancel": "Cancelar",
       "confirm": "Confirmar",
-      "confirmAddGroupMemberText": "¿Añadir usuario “{name}” al grupo?",
+      "confirmAddGroupMemberText": "¿Añadir usuario «{name}» al grupo?",
       "confirmAddGroupMemberTitle": "Confirmar"
     },
     "muted": "Grupo silenciado",
@@ -941,7 +941,7 @@
     "radius": "Radio",
     "removeMember": "Eliminar miembro",
     "removeMemberButton": "Eliminar",
-    "removeMemberConfirmText": "¿Eliminar al usuario \"{name}\" del grupo?",
+    "removeMemberConfirmText": "¿Eliminar al usuario «{name}» del grupo?",
     "removeMemberTitle": "Eliminar miembro",
     "role": "Tu rol en el grupo",
     "roles": {
@@ -1035,7 +1035,7 @@
     "invalidate": "Invalidar enlace",
     "invalidate-error": "¡Error al invalidar el enlace de invitación! Error: {error}",
     "invalidate-success": "¡Enlace de invitación invalidado con éxito!",
-    "invite-link-message-group": "Has sido invitado a unirte al grupo “{groupName}” en {network}.",
+    "invite-link-message-group": "Has sido invitado a unirte al grupo «{groupName}» en {network}.",
     "invite-link-message-hidden-group": "Has sido invitado a unirte a un grupo oculto en {network}.",
     "invite-link-message-personal": "Has sido invitado a unirte a {network}.",
     "invited-count": "Ya has invitado a {count} personas.",
@@ -1125,32 +1125,32 @@
         "cancel": "Cancelar",
         "Comment": {
           "disable": {
-            "message": "¿Realmente quiere que el comentario \"<b>{name}</b>\" permanezca <b>desactivado</b>?",
+            "message": "¿Realmente quiere que el comentario «<b>{name}</b>» permanezca <b>desactivado</b>?",
             "title": "Desactivar finalmente Comentario"
           },
           "enable": {
-            "message": "¿Realmente quiere que el comentario \"<b>{nombre}</b>\" permanezca <b>habilitado</b>?",
+            "message": "¿Realmente quiere que el comentario «<b>{nombre}</b>» permanezca <b>habilitado</b>?",
             "title": "Finalmente Habilitar Comentario"
           }
         },
         "Post": {
           "disable": {
-            "message": "¿Realmente quiere que la entrada \"<b>{name}</b>\" permanezca <b>desactivada</b>?",
+            "message": "¿Realmente quiere que la entrada «<b>{name}</b>» permanezca <b>desactivada</b>?",
             "title": "Finalmente Desactivar Contribución"
           },
           "enable": {
-            "message": "¿Realmente quiere que la contribución \"<b>{name}</b>\" permanezca <b>activada</b>?",
+            "message": "¿Realmente quiere que la contribución «<b>{name}</b>» permanezca <b>activada</b>?",
             "title": "Finalmente Habilitar Contribución"
           }
         },
         "submit": "Confirmar decisión",
         "User": {
           "disable": {
-            "message": "¿Realmente quiere que el usuario \"<b>{name}</b>\" permanezca <b>desactivado</b>?",
+            "message": "¿Realmente quiere que el usuario «<b>{name}</b>» permanezca <b>desactivado</b>?",
             "title": "Finalmente Deshabilitar Usuario"
           },
           "enable": {
-            "message": "¿Realmente quiere que el usuario \"<b>{name}</b>\" permanezca <b>habilitado</b>?",
+            "message": "¿Realmente quiere que el usuario «<b>{name}</b>» permanezca <b>habilitado</b>?",
             "title": "Finalmente Habilitar Usuario"
           }
         }
@@ -1228,7 +1228,7 @@
   "post": {
     "article": "Artículo",
     "comment": {
-      "joinGroup": "Se unió al grupo „<b>{name}</b>“",
+      "joinGroup": "Se unió al grupo «<b>{name}</b>»",
       "noPermission": "Los comentarios no están habilitados para tu rol.",
       "reply": "Contestar",
       "submit": "Comentario",
@@ -1350,13 +1350,13 @@
     "cancel": "Cancelar",
     "comment": {
       "error": "¡Ya ha reportado el comentario!",
-      "message": "¿Realmente quieres liberar el comentario de \"<b>{name}</b>\"?",
+      "message": "¿Realmente quieres liberar el comentario de «<b>{name}</b>»?",
       "title": "Comentario de la versión",
       "type": "Comentario"
     },
     "contribution": {
       "error": "¡Ya ha reportado la contribución!",
-      "message": "¿Realmente quieres liberar la contribución \"<b>{name}</b>\"?",
+      "message": "¿Realmente quieres liberar la contribución «<b>{name}</b>»?",
       "title": "Contribución de la versión ",
       "type": "Contribución"
     },
@@ -1364,7 +1364,7 @@
     "success": "¡Liberado con éxito!",
     "user": {
       "error": "¡Ya ha reportado el usuario!",
-      "message": "¿Realmente quieres liberar al usuario \"<b>{name}</b>\"?",
+      "message": "¿Realmente quieres liberar al usuario «<b>{name}</b>»?",
       "title": "Liberar usuario",
       "type": "Usuario"
     }
@@ -1373,13 +1373,13 @@
     "cancel": "Cancelar",
     "comment": {
       "error": "¡Ya ha reportado al comentario!",
-      "message": "¿Realmente quieres reportar el comentario de \"<b>{name}</b>\"?",
+      "message": "¿Realmente quieres reportar el comentario de «<b>{name}</b>»?",
       "title": "Reportar comentario",
       "type": "Comentario"
     },
     "contribution": {
       "error": "¡Ya ha reportado la contribución!",
-      "message": "¿Realmente quieres informar al usuario de la contribución \"<b>{name}</b>\"?",
+      "message": "¿Realmente quieres informar al usuario de la contribución «<b>{name}</b>»?",
       "title": "Informe Contribución",
       "type": "Contribución"
     },
@@ -1391,7 +1391,7 @@
           "advert_products_services_commercial": "Publicidad de productos y servicios con fines comerciales.",
           "criminal_behavior_violation_german_law": "Comportamiento criminal o violación de la ley alemana.",
           "discrimination_etc": "Contribuciones discriminatorias, comentarios, expresiones o insultos.",
-          "doxing": "La divulgación de información personal de otros sin su consentimiento o amenaza de (\"doxing\").",
+          "doxing": "La divulgación de información personal de otros sin su consentimiento o amenaza de («doxing»).",
           "glorific_trivia_of_cruel_inhuman_acts": "Glorificación o minimización de actos de violencia crueles o inhumanos.",
           "intentional_intimidation_stalking_persecution": "Intimidación intencional, acoso o persecución.",
           "other": "Otra ...",
@@ -1408,7 +1408,7 @@
     "success": "¡Gracias por informar!",
     "user": {
       "error": "¡Ya reportó al usuario!",
-      "message": "¿Realmente quieres reportar al usuario \"<b>{name}</b>\"?",
+      "message": "¿Realmente quieres reportar al usuario «<b>{name}</b>»?",
       "title": "Reportar usuario",
       "type": "Usuario"
     }
@@ -1423,7 +1423,7 @@
       "User": "Usuarios"
     },
     "hint": "¿Qué estás buscando? Utiliza !… para contribuciones, @… para usuarios, #… para hashtags.",
-    "no-results": "No se encontraron resultados para \"{search}\". ¡Prueba con otro término de búsqueda!",
+    "no-results": "No se encontraron resultados para «{search}». ¡Prueba con otro término de búsqueda!",
     "page": "Página",
     "placeholder": "Buscar",
     "results": "resultado encontrado ::: resultados encontrados",
@@ -1460,8 +1460,8 @@
       "name": "API Keys",
       "revoke": {
         "confirm": "Revocar",
-        "message": "¿Estás seguro de que quieres revocar la API Key \"{name}\"? Esta acción no se puede deshacer.",
-        "success": "API Key \"{name}\" ha sido revocada",
+        "message": "¿Estás seguro de que quieres revocar la API Key «{name}»? Esta acción no se puede deshacer.",
+        "success": "API Key «{name}» ha sido revocada",
         "title": "Revocar API Key"
       },
       "revoked-list": {
@@ -1537,7 +1537,7 @@
       "contributionsCount": "Eliminar mis {count} contribuciones",
       "infoAdmin": "¡Todas las contribuciones y comentarios del usuario serán eliminados adicionalmente!",
       "name": "Eliminar cuenta de usuario",
-      "pleaseConfirm": "¡Acción destructiva! Escriba “{confirm}” para confirmar.",
+      "pleaseConfirm": "¡Acción destructiva! Escriba «{confirm}» para confirmar.",
       "success": "¡Cuenta eliminada con éxito!"
     },
     "download": {
@@ -1667,7 +1667,7 @@
       "add-new-link": "Añadir nuevo enlace",
       "delete-modal": {
         "confirm-button": "Eliminar",
-        "message": "Eliminar “{name}”.",
+        "message": "Eliminar «{name}».",
         "title": "¿Realmente quieres eliminar tu enlace?"
       },
       "edit-link": "Editar enlace",
