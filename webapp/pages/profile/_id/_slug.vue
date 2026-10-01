@@ -538,7 +538,7 @@ export default {
       try {
         await this.$apollo.mutate({ mutation: muteUser(), variables: { id: user.id } })
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       } finally {
         this.$apollo.queries.User.refetch()
         this.resetPostList()
@@ -549,7 +549,7 @@ export default {
       try {
         await this.$apollo.mutate({ mutation: unmuteUser(), variables: { id: user.id } })
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       } finally {
         this.$apollo.queries.User.refetch()
         this.resetPostList()
@@ -560,7 +560,7 @@ export default {
       try {
         await this.$apollo.mutate({ mutation: blockUser(), variables: { id: user.id } })
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       } finally {
         this.$apollo.queries.User.refetch()
       }
@@ -569,7 +569,7 @@ export default {
       try {
         await this.$apollo.mutate({ mutation: unblockUser(), variables: { id: user.id } })
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       } finally {
         this.$apollo.queries.User.refetch()
       }
@@ -599,7 +599,7 @@ export default {
         this.showDeleteModal = false
         this.$router.replace('/')
       } catch (err) {
-        this.$toast.error(err.message)
+        this.$toast.error(this.$backendError(err))
         this.showDeleteModal = false
       } finally {
         this.deleteLoading = false

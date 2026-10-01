@@ -23,6 +23,7 @@ export default {
       store: this.$store,
       toast: this.$toast,
       t: (key, ...args) => this.$t(key, ...args),
+      backendError: (error) => this.$backendError(error),
     })
     this._changePassword = changePassword
   },

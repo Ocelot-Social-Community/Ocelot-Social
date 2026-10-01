@@ -43,6 +43,7 @@ import { SweetalertIcon } from 'vue-sweetalert-icons'
 import scrollToContent from '../scroll-to-content.js'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
+import { backendErrorCode } from '~/plugins/backend-error'
 
 export default {
   mixins: [scrollToContent, formValidation],
@@ -118,7 +119,7 @@ export default {
           })
         }, 3000)
       } catch (err) {
-        if (err.message.includes('exists')) {
+        if (backendErrorCode(err) === 'EMAIL_ALREADY_EXISTS') {
           // We cannot use form validation errors here, the backend does not
           // have a query to filter for email addresses. This is a privacy
           // consideration. We could implement a dedicated query to check that
@@ -128,7 +129,7 @@ export default {
           }
           return
         }
-        this.$toast.error(err.message)
+        this.$toast.error(this.$backendError(err))
       } finally {
         this.loadingData = false
       }

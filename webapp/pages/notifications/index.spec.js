@@ -291,7 +291,10 @@ describe('PostIndex', () => {
 
       it('reports query errors via $toast.error', () => {
         const toast = { error: jest.fn() }
-        apollo.error.call({ $toast: toast }, { message: 'bad query' })
+        apollo.error.call(
+          { $toast: toast, $backendError: (error) => error.message },
+          { message: 'bad query' },
+        )
         expect(toast.error).toHaveBeenCalledWith('bad query')
       })
 

@@ -29,7 +29,7 @@ export default {
         })
         this.$toast.success(this.$t('contribution.success'))
       } catch (err) {
-        this.$toast.error(err.message)
+        this.$toast.error(this.$backendError(err))
       }
     },
   },

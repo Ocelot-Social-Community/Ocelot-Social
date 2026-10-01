@@ -164,7 +164,7 @@ export default {
       // groups() falls back to the snapshot keys so every value stays visible and editable
       // (with widget type inferred from the value — see isNumberKey).
       error(error) {
-        this.$toast.error(this.$t('admin.policy.loadError', { message: error.message }))
+        this.$toast.error(this.$t('admin.policy.loadError', { message: this.$backendError(error) }))
       },
     },
   },
@@ -388,7 +388,7 @@ export default {
         }
         this.$toast.success(this.$t('admin.policy.saveSuccess'))
       } catch (err) {
-        this.$toast.error(this.$t('admin.policy.saveError', { message: err.message }))
+        this.$toast.error(this.$t('admin.policy.saveError', { message: this.$backendError(err) }))
       } finally {
         this.saving = false
       }
@@ -402,7 +402,7 @@ export default {
         this.syncFormFromSnapshot()
         this.$toast.success(this.$t('admin.policy.saveSuccess'))
       } catch (err) {
-        this.$toast.error(this.$t('admin.policy.saveError', { message: err.message }))
+        this.$toast.error(this.$t('admin.policy.saveError', { message: this.$backendError(err) }))
       } finally {
         this.saving = false
       }
