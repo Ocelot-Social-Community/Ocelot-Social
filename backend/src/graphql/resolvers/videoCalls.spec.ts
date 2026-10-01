@@ -439,6 +439,79 @@ describe('joinGroupVideoCall', () => {
     expect(data.joinGroupVideoCall.roomName).toBe('group-cl-1')
   })
 
+  it('denies OPENING when the group withheld group.videoCall.create from the role', async () => {
+    // The point of the group right: the viewer holds videoCall.create_public network-wide
+    // (baseline role) and is an ordinary member here — but this group decided its members
+    // may join calls without being able to start one.
+    livekitConfig = ENABLED_LIVEKIT
+    authenticatedUser = memberJson
+    await Factory.build(
+      'group',
+      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'outsider-1' },
+    )
+    await database.write({
+      query: `MATCH (u:User { id: 'member-1' }), (g:Group { id: 'pub-1' })
+              MERGE (u)-[m:MEMBER_OF]->(g)
+              SET m.role = 'usual',
+                  m.createdAt = toString(datetime()),
+                  m.updatedAt = toString(datetime())`,
+      variables: {},
+    })
+    await database.write({
+      query: `MATCH (:Group { id: 'pub-1' })-[:HAS_GROUP_ROLE]->(r:GroupRole { name: 'usual' })
+              SET r.permissions = $permissions`,
+      variables: {
+        permissions: JSON.stringify(['group.read', 'group.content.read', 'group.videoCall.join']),
+      },
+    })
+
+    const { errors } = await mutate({
+      mutation: JoinGroupVideoCall,
+      variables: { groupId: 'pub-1' },
+    })
+
+    expect(errors?.[0].message).toMatch(/may not start a video call/i)
+  })
+
+  it('still lets that role JOIN a call somebody else opened', async () => {
+    // Same group, same withheld right — but a call is running, so this is a JOIN and
+    // group.videoCall.join is all it takes.
+    livekitConfig = ENABLED_LIVEKIT
+    authenticatedUser = memberJson
+    listParticipantsMock = vi
+      .fn<(...args: unknown[]) => Promise<unknown>>()
+      .mockResolvedValue([{ identity: 'outsider-1' }])
+    await Factory.build(
+      'group',
+      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'outsider-1' },
+    )
+    await database.write({
+      query: `MATCH (u:User { id: 'member-1' }), (g:Group { id: 'pub-1' })
+              MERGE (u)-[m:MEMBER_OF]->(g)
+              SET m.role = 'usual',
+                  m.createdAt = toString(datetime()),
+                  m.updatedAt = toString(datetime())`,
+      variables: {},
+    })
+    await database.write({
+      query: `MATCH (:Group { id: 'pub-1' })-[:HAS_GROUP_ROLE]->(r:GroupRole { name: 'usual' })
+              SET r.permissions = $permissions`,
+      variables: {
+        permissions: JSON.stringify(['group.read', 'group.content.read', 'group.videoCall.join']),
+      },
+    })
+
+    const { data, errors } = await mutate({
+      mutation: JoinGroupVideoCall,
+      variables: { groupId: 'pub-1' },
+    })
+
+    expect(errors).toBeUndefined()
+    expect(data.joinGroupVideoCall.roomName).toBe('group-pub-1')
+  })
+
   it('returns token, url and deterministic room name when OPENING a public-group call (baseline user)', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
@@ -461,11 +534,11 @@ describe('joinGroupVideoCall', () => {
   })
 
   it('refuses to OPEN a call in a group whose type has no open permission', async () => {
-    // Fail closed on an unmapped group type: if a new type is ever added without
-    // extending openPermissionForGroupType, nobody may open a call there — the
-    // alternative (falling through) would let everybody open one unchecked.
-    // The role below holds ALL three open permissions, so only the missing mapping
-    // can produce the rejection.
+    // Fail closed on an unmapped group type: group.videoCall.create is capped by
+    // videoCall.create_<type>, and for a type the network catalog does not know that
+    // resolves to an `unknown.*` key nobody can hold (see groupPermission/prerequisites).
+    // The role below holds ALL three open permissions, so only the missing per-type
+    // sibling can produce the rejection.
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
     rolesOverride = [

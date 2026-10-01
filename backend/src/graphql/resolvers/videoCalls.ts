@@ -14,7 +14,6 @@ import { ForbiddenError } from '@graphql/errors'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
-import type { PermissionKey } from '@src/permission'
 import type { Driver } from 'neo4j-driver'
 
 const ROOM_PREFIX = 'group-'
@@ -39,25 +38,10 @@ const ensureEnabled = (enabled: boolean) => {
   }
 }
 
-// The permission that gates OPENING (being the first into) a call, per group type.
-// Joining an existing call needs none of these — only group membership.
-const openPermissionForGroupType = (groupType: string): PermissionKey | null => {
-  switch (groupType) {
-    case 'public':
-      return 'videoCall.create_public'
-    case 'closed':
-      return 'videoCall.create_closed'
-    case 'hidden':
-      return 'videoCall.create_hidden'
-    default:
-      return null
-  }
-}
-
-// Returns the group's type if the user is a member with a participating role
-// (usual/admin/owner); throws ForbiddenError otherwise. Video calls are available in
-// every group type now — who may OPEN one is gated per type by permission (above),
-// while joining stays open to any member.
+// Returns the group's type if the user has an active (non-pending) membership; throws
+// ForbiddenError otherwise. Only the SUBSCRIPTION filter still asks this: the queries and
+// mutations are covered by the shield, which decides them on the group rights
+// (group.videoCall.join / group.videoCall.create) instead of on role names.
 const getGroupMembershipType = async (
   driver: Driver,
   groupId: string,
@@ -195,26 +179,27 @@ export default {
     }),
     videoCallParticipantCount: async (_root, params: { groupId: string }, context) => {
       ensureEnabled(context.policy.getEffective('videoConference'))
-      // Viewing the count (and joining) only needs membership — opening is gated below.
-      await getGroupMembershipType(context.driver, params.groupId, context.user.id)
+      // Who may see the count is `group.videoCall.join`, enforced in the shield. No second
+      // membership query here: the right IS the answer, and a group that decided to open
+      // (or close) its calls for a role must not be overruled by a role-name check.
       return getLiveParticipantCount(context.config, roomNameForGroup(params.groupId))
     },
   },
   Mutation: {
     joinGroupVideoCall: async (_root, params: { groupId: string }, context) => {
       ensureEnabled(context.policy.getEffective('videoConference'))
-      const groupType = await getGroupMembershipType(
-        context.driver,
-        params.groupId,
-        context.user.id,
-      )
       const roomName = roomNameForGroup(params.groupId)
-      // OPENING a call (no live participants yet → LiveKit room not created) is gated
-      // per group type. JOINING an existing call (count > 0) stays open to any member.
+      // Two different acts through one mutation. JOINING an existing call (count > 0) needs
+      // `group.videoCall.join`, which the shield has already checked. OPENING one (no live
+      // participants yet → LiveKit room not created) needs `group.videoCall.create` IN THIS
+      // GROUP — so a group may withhold starting calls from a role whose holders could
+      // otherwise start one network-wide. The group right is itself capped by the network
+      // `videoCall.create_<type>` (catalog: requiresNetworkPermission), which is why asking
+      // the group side alone is strictly stronger than the per-type check this replaces.
       const participantCount = await getLiveParticipantCount(context.config, roomName)
       if (participantCount === 0) {
-        const permission = openPermissionForGroupType(groupType)
-        if (!permission || !context.effectivePermissions.has(permission)) {
+        const authorization = await context.groupAuthorization.forGroup(params.groupId)
+        if (!authorization?.has('group.videoCall.create')) {
           throw new ForbiddenError('You may not start a video call in this group.')
         }
       }
