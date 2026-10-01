@@ -16,6 +16,9 @@ export {
 export { permissionsForGroupRole, effectiveGroupPermissions, authoritySourceFor } from './effective'
 export type { EffectiveGroupPermissionsInput } from './effective'
 export { seedGroupRoleTemplates } from './seedTemplates'
+export { parseStoredPermissions } from './storedPermissions'
+export { nonMemberAccessFrom, defaultNonMemberAccessFor } from './nonMemberAccess'
+export type { NonMemberAccess } from './nonMemberAccess'
 export {
   dominatesInGroup,
   coversRole,

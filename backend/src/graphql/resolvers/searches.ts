@@ -6,6 +6,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+import {
+  memberHoldsInGroup,
+  nonMemberReadsContent,
+  nonMemberReadsGroup,
+} from './helpers/groupAccessCypher'
 import { queryString } from './searches/queryString'
 
 // see http://lucene.apache.org/core/8_3_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package.description
@@ -34,11 +39,8 @@ const simpleWhereClause =
 const postVisibilityClause = `(
     NOT EXISTS {
       MATCH (resource)-[:IN]->(g:Group)
-      WHERE NOT g.groupType = 'public'
-        AND NOT EXISTS {
-          MATCH (g)<-[membership:MEMBER_OF]-(user)
-          WHERE membership.role <> 'pending'
-        }
+      WHERE NOT (${nonMemberReadsContent('g')})
+        AND NOT ${memberHoldsInGroup('g', 'group.content.read', 'user.id')}
     }
     OR author.id = user.id
   )`
@@ -100,8 +102,8 @@ const searchGroupsSetup = {
           WITH user, resource, membership, score`,
   whereClause: `WHERE score >= 0.0
                 AND NOT (resource.deleted = true OR resource.disabled = true)
-                AND (resource.groupType IN ['public', 'closed']
-                  OR membership.role <> 'pending')`,
+                AND (${nonMemberReadsGroup('resource')}
+                  OR ${memberHoldsInGroup('resource', 'group.read', 'user.id')})`,
   withClause: 'WITH resource, membership, score',
   returnClause: `resource { .*, myRole: membership.role, __typename: 'Group' }`,
   limit: 'LIMIT toInteger($limit)',

@@ -14,6 +14,7 @@ import { branding } from '@src/branding'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
+import { memberHoldsInGroup, nonMemberReadsContent } from './helpers/groupAccessCypher'
 import normalizeEmail from './helpers/normalizeEmail'
 import { orderClause } from './helpers/ordering'
 import { pagingClause } from './helpers/paging'
@@ -40,11 +41,8 @@ const visiblePostFilter = `WHERE NOT related.disabled = true AND NOT related.del
   AND (
     NOT EXISTS {
       MATCH (related)-[:IN]->(g:Group)
-      WHERE NOT g.groupType = 'public'
-        AND NOT EXISTS {
-          MATCH (g)<-[membership:MEMBER_OF]-(:User {id: $cypherParams.currentUserId})
-          WHERE membership.role <> 'pending'
-        }
+      WHERE NOT (${nonMemberReadsContent('g')})
+        AND NOT ${memberHoldsInGroup('g', 'group.content.read', '$cypherParams.currentUserId')}
     }
     OR EXISTS { MATCH (related)<-[:WROTE]-(:User {id: $cypherParams.currentUserId}) }
   )`

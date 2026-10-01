@@ -12,6 +12,9 @@
 import { sanitizeGroupPermissions } from '@src/groupPermission'
 
 import { defaultTemplateFor } from './defaults'
+import { nonMemberAccessFrom } from './nonMemberAccess'
+import { parseStoredPermissions } from './storedPermissions'
+import { NONE_ROLE } from './types'
 
 import type { GroupRoleDefinition, GroupRoleTemplates } from './types'
 import type databaseContext from '@context/database'
@@ -40,28 +43,13 @@ interface RawRoleRow {
   permissions: string
 }
 
-// Malformed JSON ⇒ no permissions. A role whose list cannot be read grants nothing, which
-// is the safe reading; anything that is not a JSON syntax error is a real fault and rethrown.
-function parsePermissions(raw: string | null): GroupRoleDefinition['permissions'] {
-  let parsed: unknown
-  try {
-    parsed = JSON.parse(raw ?? '[]')
-  } catch (error) {
-    if (!(error instanceof SyntaxError)) {
-      throw error
-    }
-    parsed = []
-  }
-  return sanitizeGroupPermissions(Array.isArray(parsed) ? (parsed as string[]) : [])
-}
-
 function toDefinition(row: RawRoleRow): GroupRoleDefinition {
   return {
     name: row.name,
     label: row.label,
     system: row.system,
     protected: row.protected,
-    permissions: parsePermissions(row.permissions),
+    permissions: parseStoredPermissions(row.permissions),
   }
 }
 
@@ -188,6 +176,42 @@ export async function seedGroupRoleTemplate(
  * One statement for the whole set: UNWIND rather than a write per role, because this runs
  * once per group in the migration and the round trips are what would make it slow.
  */
+const NONE_ROLE_PERMISSIONS_CYPHER = `
+  MATCH (:Group {id: $groupId})-[:HAS_GROUP_ROLE]->(r:GroupRole {name: $noneRole})
+  RETURN r.permissions AS permissions
+`
+
+const WRITE_NON_MEMBER_ACCESS_CYPHER = `
+  MATCH (g:Group {id: $groupId})
+  SET g.nonMemberRead = $nonMemberRead,
+      g.nonMemberContentRead = $nonMemberContentRead,
+      g.showMembers = $showMembers
+`
+
+/** A db context, as the runner the seeding path already speaks. */
+const runnerFor = (db: DbContext): RoleSeedTransaction => ({
+  run: async (query, variables) => db.write({ query, variables: variables ?? {} }),
+})
+
+/**
+ * Recompute a group's derived non-member access from its `none` role (see ./nonMemberAccess).
+ *
+ * Takes the runner rather than a db context, so seeding can do this inside the very
+ * transaction that writes the roles: a group whose roles exist while its derived columns do
+ * not would be missing from the list it belongs in and from every feed.
+ */
+export async function syncNonMemberAccess(
+  run: RoleSeedTransaction,
+  groupId: string,
+): Promise<void> {
+  const result = await run.run(NONE_ROLE_PERMISSIONS_CYPHER, { groupId, noneRole: NONE_ROLE })
+  const raw = result.records[0]?.get('permissions') as string | null | undefined
+  // No row at all ⇒ no non-member role ⇒ nothing is open to a stranger. parsePermissions
+  // already reads a malformed list as empty, which is the same safe answer.
+  const access = nonMemberAccessFrom(raw ? parseStoredPermissions(raw) : null)
+  await run.run(WRITE_NON_MEMBER_ACCESS_CYPHER, { groupId, ...access })
+}
+
 export async function seedGroupRoles(
   db: DbContext,
   groupId: string,
@@ -198,6 +222,7 @@ export async function seedGroupRoles(
     query: SEED_ROLES_CYPHER,
     variables: { groupId, now, roles: roles.map(toRow) },
   })
+  await syncNonMemberAccess(runnerFor(db), groupId)
 }
 
 /**
@@ -218,6 +243,7 @@ export async function seedRolesForNewGroup(
   const copied = await transaction.run(COPY_TEMPLATE_CYPHER, { groupId, groupType, now })
   const names = (copied.records[0]?.get('names') as string[] | undefined) ?? []
   if (names.length > 0) {
+    await syncNonMemberAccess(transaction, groupId)
     return
   }
   const fallback = defaultTemplateFor(groupType)
@@ -232,6 +258,7 @@ export async function seedRolesForNewGroup(
     now,
     roles: fallback.map(toRow),
   })
+  await syncNonMemberAccess(transaction, groupId)
 }
 
 /** How many members carry each role of a group. `none` never appears: it is the absence of an edge. */
@@ -281,6 +308,9 @@ export async function writeGroupRole(
       now,
     },
   })
+  if (role.name === NONE_ROLE) {
+    await syncNonMemberAccess(runnerFor(db), groupId)
+  }
 }
 
 /**
@@ -417,6 +447,7 @@ export async function setNonMemberMemberListAccess(
             SET r.permissions = $permissions, r.updatedAt = $now`,
     variables: { groupId, permissions: JSON.stringify(sanitizeGroupPermissions(permissions)), now },
   })
+  await syncNonMemberAccess(runnerFor(db), groupId)
 }
 
 /** Write one template role, creating it when it is not there yet (the admin edit path). */

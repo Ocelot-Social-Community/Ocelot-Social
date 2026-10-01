@@ -24,7 +24,9 @@ import {
   setNonMemberMemberListAccess,
 } from '@src/groupRole/repository'
 
+import { nonMemberReadsGroup, nonMemberReadsMembers } from './helpers/groupAccessCypher'
 import Resolver from './helpers/Resolver'
+import { groupReadScope } from './helpers/viewerGroups'
 import { images } from './images/images'
 import {
   createOrUpdateLocations,
@@ -88,6 +90,15 @@ export default {
 
           const locationMatch = hasLocation === true ? 'MATCH (group)-[:IS_IN]->(:Location)' : ''
 
+          // Which groups the viewer may see is `group.read`, from two directions: the group
+          // opened its profile to non-members (mirrored onto the node as `nonMemberRead` — see
+          // groupRole/nonMemberAccess.ts, the only shape a many-groups filter can use), or the
+          // viewer's own role in that group grants it. The group TYPE appears only in the
+          // coalesce fallback, for a node the backfill migration has not reached yet.
+          const { readableGroupIds } = await groupReadScope(context)
+          const readableByStranger = nonMemberReadsGroup('group')
+          const readableByViewer = 'group.id IN $readableGroupIds'
+
           const transactionResponse = await txc.run(
             `
             MATCH (group:Group)
@@ -95,15 +106,16 @@ export default {
             ${locationMatch}
             OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
             WITH group, membership
-            ${(isMember === true && "WHERE membership IS NOT NULL AND (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role <> 'pending')") || ''}
-            ${(isMember === false && "WHERE membership IS NULL AND (group.groupType IN ['public', 'closed'])") || ''}
-            ${(isMember === undefined && "WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role <> 'pending')") || ''}
+            ${(isMember === true && `WHERE membership IS NOT NULL AND ${readableByViewer}`) || ''}
+            ${(isMember === false && `WHERE membership IS NULL AND ${readableByStranger}`) || ''}
+            ${(isMember === undefined && `WHERE ${readableByViewer} OR ${readableByStranger}`) || ''}
             RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
             ORDER BY group.createdAt DESC
             ${first !== undefined && offset !== undefined ? 'SKIP toInteger($offset) LIMIT toInteger($first)' : ''}
           `,
             {
               userId: context.user.id,
+              readableGroupIds,
               id,
               slug,
               first,
@@ -154,10 +166,7 @@ export default {
           } else {
             cypher = `
               MATCH (group:Group {id: $groupId})
-              WHERE (
-                group.groupType = 'public'
-                OR (group.groupType = 'closed' AND coalesce(group.showMembers, false) = true)
-              )
+              WHERE ${nonMemberReadsMembers('group')}
               MATCH (user:User)-[membership:MEMBER_OF]->(group)
               WHERE membership.role <> 'pending'
                 AND coalesce(membership.showOnProfile, true) = true
@@ -183,6 +192,7 @@ export default {
       const {
         user: { id: userId },
       } = context
+      const { readableGroupIds } = await groupReadScope(context as Context)
       const session = context.driver.session()
       try {
         const result = await session.readTransaction(async (txc) => {
@@ -193,15 +203,15 @@ export default {
                       AND membership IS NOT NULL
                       RETURN toString(count(group)) AS count`
           } else {
+            // The same two directions as the Group query itself — the group's own
+            // `nonMemberRead` or the viewer's role — so the count cannot disagree with the
+            // list it is counting.
             cypher = `MATCH (group:Group)
-                      OPTIONAL MATCH (user:User)-[membership:MEMBER_OF]->(group)
-                      WHERE user.id = $userId
-                      WITH group, membership
-                      WHERE group.groupType IN ['public', 'closed']
-                      OR membership.role <> 'pending'
+                      WHERE group.id IN $readableGroupIds
+                      OR ${nonMemberReadsGroup('group')}
                       RETURN toString(count(group)) AS count`
           }
-          const transactionResponse = await txc.run(cypher, { userId })
+          const transactionResponse = await txc.run(cypher, { userId, readableGroupIds })
           return transactionResponse.records.map((record) => record.get('count'))[0]
         })
         return parseInt(result, 10) || 0

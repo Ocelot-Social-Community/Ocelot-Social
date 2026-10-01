@@ -3,6 +3,7 @@
 /* eslint-disable security/detect-object-injection */
 import { UserInputError } from '@graphql/errors'
 
+import { nonMemberReadsContent } from './groupAccessCypher'
 import { orderClause } from './ordering'
 
 // Translates the `_PostFilter` tree into a Cypher WHERE clause — the part neo4j-graphql-js
@@ -170,29 +171,40 @@ const translate = (
       // control with fewer branches is worth more than the handful of db hits the unused
       // author clause costs a logged-out request.
       case 'invisibleTo': {
-        const { viewerId, groupIds, readableGroupTypes } = value as {
+        const { viewerId, contentGroupIds, moderatorGroupTypes } = value as {
           viewerId: string | null
-          groupIds: string[]
-          readableGroupTypes?: string[]
+          contentGroupIds: string[]
+          moderatorGroupTypes?: string[]
         }
         const groupsParameter = next()
         const typesParameter = next()
         fragments.push({
-          // The hard-coded `'public'` became a list the viewer brings along: it is `['public']`
-          // for everybody, plus the types a network moderator/admin may read into (#9405).
-          // Still one expression and still no per-row lookup — the list is bounded by the
-          // number of group types.
+          // Three ways a post in a group can be visible, and none of them is the group TYPE any
+          // more: the group opened its content to non-members (`group.content.read` on its
+          // `none` role, mirrored onto the node as `nonMemberContentRead` — see
+          // groupRole/nonMemberAccess.ts), or the viewer's own role in that group opens it, or
+          // a network right lets them read into that type (#9405: a moderator sees what they
+          // are asked to review).
+          //
+          // The mirrored column is what keeps this one expression with no per-row role lookup.
+          // `coalesce` carries a group whose column is not written yet — the window between
+          // deploying this and running the backfill migration — at the value its seeded
+          // template would give it, which for content is "public groups only".
           where: `(
             NOT EXISTS {
               MATCH (${alias})-[:IN]->(g:Group)
-              WHERE NOT g.groupType IN $${typesParameter} AND NOT g.id IN $${groupsParameter}
+              WHERE NOT (${nonMemberReadsContent('g')})
+                AND NOT g.id IN $${groupsParameter}
+                AND NOT g.groupType IN $${typesParameter}
             }
             OR EXISTS { MATCH (${alias})<-[:WROTE]-(:User { id: $${parameter} }) }
           )`,
           params: {
             [parameter]: viewerId,
-            [groupsParameter]: groupIds,
-            [typesParameter]: readableGroupTypes ?? ['public'],
+            [groupsParameter]: contentGroupIds,
+            // No `?? ['public']` any more: a caller that does not know about the field must
+            // widen NOTHING, and `public` is the group's statement to make, not the type's.
+            [typesParameter]: moderatorGroupTypes ?? [],
           },
         })
         continue

@@ -11,6 +11,7 @@
 import { allGroupPermissionKeys, GROUPS_ENABLED_GATE } from '@src/groupPermission'
 
 import { authoritySourceFor, effectiveGroupPermissions } from './effective'
+import { parseStoredPermissions } from './storedPermissions'
 import { isActiveMembershipRole, NONE_ROLE, OWNER_ROLE } from './types'
 
 import type { AuthoritySource, GroupRoleDefinition } from './types'
@@ -105,19 +106,6 @@ const GROUP_OF_ROOM_QUERY = `
   RETURN g.id AS groupId
 `
 
-function parsePermissions(raw: string | null): GroupPermissionKey[] {
-  let parsed: unknown
-  try {
-    parsed = JSON.parse(raw ?? '[]')
-  } catch (error) {
-    if (!(error instanceof SyntaxError)) {
-      throw error
-    }
-    parsed = []
-  }
-  return Array.isArray(parsed) ? (parsed as GroupPermissionKey[]) : []
-}
-
 /**
  * Build the per-request scope. Called once while the context is assembled, so the memo it
  * keeps lives exactly as long as the request — it closes over this viewer's id and can never
@@ -194,7 +182,7 @@ export function createGroupAuthorizationScope({
           label: (record.get('label') as string | null) ?? null,
           system: Boolean(record.get('system')),
           protected: Boolean(record.get('protected')),
-          permissions: parsePermissions(record.get('permissions') as string | null),
+          permissions: parseStoredPermissions(record.get('permissions') as string | null),
         }
       : null
     const groupType = record.get('groupType') as string
@@ -262,7 +250,7 @@ export function createGroupAuthorizationScope({
           label: null,
           system: false,
           protected: Boolean(record.get('protected')),
-          permissions: parsePermissions(record.get('permissions') as string | null),
+          permissions: parseStoredPermissions(record.get('permissions') as string | null),
         }
       : null
   }

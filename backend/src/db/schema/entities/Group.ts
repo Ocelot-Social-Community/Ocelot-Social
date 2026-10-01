@@ -6,7 +6,9 @@ import { ISO_DATE_TIME, SLUG } from './patterns'
  * Transcribed from db/models/Group.ts.
  *
  * `showMembers` is not in the model but sits on one seeded node — see the note in
- * entities/README-drift.md. Declared so the read path does not reject it.
+ * entities/README-drift.md. Declared so the read path does not reject it. It is also the
+ * oldest of the three derived non-member columns (see groupRole/nonMemberAccess.ts): all
+ * three mirror what the group's `none` role grants, which is the source of truth.
  */
 export const Group = defineEntity({
   label: 'Group',
@@ -20,6 +22,16 @@ export const Group = defineEntity({
     actionRadius: { type: 'string' },
     locationName: { type: ['string', 'null'] },
     showMembers: { type: 'boolean' },
+    nonMemberRead: {
+      type: 'boolean',
+      description:
+        'derived: the non-member role holds group.read. A column so the group list can decide for many groups in one statement — see groupRole/nonMemberAccess.ts',
+    },
+    nonMemberContentRead: {
+      type: 'boolean',
+      description:
+        'derived: the non-member role holds group.content.read. A column so the post filter needs no per-row role lookup — see groupRole/nonMemberAccess.ts',
+    },
     deleted: { type: 'boolean' },
     disabled: { type: 'boolean' },
     createdAt: { type: 'string', pattern: ISO_DATE_TIME },
