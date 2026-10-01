@@ -648,6 +648,34 @@ describe(createOrUpdateLocations, () => {
       expect(records.map((record) => record.get('id') as string)).toEqual(['place.berlin-nj'])
     })
 
+    // matchLocationNameExactly means locationName is the user's own picked choice (see its doc
+    // comment on createOrUpdateLocations) — without a matching_place_name among the results,
+    // silently saving Mapbox's top-ranked guess instead would be a different place than the one
+    // they picked. Standard mode (tested above via the "prefers..." case, and implicitly by every
+    // other test here that doesn't pass the flag) keeps falling back to the first result instead.
+    it('rejects locationName when matchLocationNameExactly is set and nothing matches it exactly', async () => {
+      respondWith({
+        features: [
+          feature({ id: 'place.berlin-de', place_name: 'Berlin, Germany', place_type: ['place'] }),
+        ],
+      })
+
+      await expect(
+        withSession(async (session) =>
+          createOrUpdateLocations(
+            'User',
+            'located-user',
+            'Berlin, New Jersey, United States',
+            session,
+            locationContext(),
+            undefined,
+            undefined,
+            true,
+          ),
+        ),
+      ).rejects.toThrow('locationName is invalid')
+    })
+
     // Mapbox omits `context` for the broadest features (a country has nothing above it). The
     // hierarchy walk has to be skipped then rather than iterated over undefined.
     it('stores a feature that has no parent context as a standalone location', async () => {

@@ -227,11 +227,24 @@ export const createOrUpdateLocations = async (
       }
 
       res.features.forEach((item) => {
-        if (item.matching_place_name === locationName) {
+        // place_name is what the frontend actually displays and sends back (see
+        // LocationSelect.vue, and queryLocations below, which never exposes
+        // matching_place_name to it in the first place). matching_place_name is
+        // additionally checked for completeness — Mapbox only sets it when it had to
+        // fuzzy-correct the query, so it is unset on the common, already-exact case.
+        if (item.place_name === locationName || item.matching_place_name === locationName) {
           data = item
         }
       })
       if (!data) {
+        // matchLocationNameExactly means locationName IS the user's picked choice (see its own
+        // doc comment above) — silently falling back to Mapbox's top-ranked result here would
+        // save a different place than the one they picked. Standard mode (no coordinates, no
+        // flag) keeps the fallback: there, locationName is free text with no claim to an exact
+        // match in the first place.
+        if (matchLocationNameExactly) {
+          throw new UserInputError('locationName is invalid')
+        }
         data = res.features[0]
       }
 
