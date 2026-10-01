@@ -29,15 +29,6 @@ const httpUrlFor = (livekitUrl: string) =>
       ? livekitUrl.replace(/^ws:\/\//, 'http://')
       : livekitUrl
 
-// The videoConference policy is the single runtime switch. Its effective value already
-// folds in the LiveKit env requirements (requiresEnv), so an enabled call is guaranteed
-// to have the secrets the RoomService below needs.
-const ensureEnabled = (enabled: boolean) => {
-  if (!enabled) {
-    throw new Error('Video calls are disabled.')
-  }
-}
-
 // Returns the group's type if the user has an active (non-pending) membership; throws
 // ForbiddenError otherwise. Only the SUBSCRIPTION filter still asks this: the queries and
 // mutations are covered by the shield, which decides them on the group rights
@@ -150,6 +141,11 @@ export const getLiveParticipantCount = async (
   }
 }
 
+// The videoConference policy is the single runtime switch, and it is enforced where every
+// other right is: the two group rights these resolvers sit behind carry it as their catalog
+// gate (`gatedBy: videoConference`), so the shield denies a disabled call before it arrives.
+// This file used to re-check it on the way in, which became unreachable — and an unreachable
+// guard is a claim nobody can verify.
 export default {
   Subscription: {
     videoCallParticipantCountChanged: {
@@ -178,7 +174,6 @@ export default {
       enabled: context.policy.getEffective('videoConference'),
     }),
     videoCallParticipantCount: async (_root, params: { groupId: string }, context) => {
-      ensureEnabled(context.policy.getEffective('videoConference'))
       // Who may see the count is `group.videoCall.join`, enforced in the shield. No second
       // membership query here: the right IS the answer, and a group that decided to open
       // (or close) its calls for a role must not be overruled by a role-name check.
@@ -187,7 +182,6 @@ export default {
   },
   Mutation: {
     joinGroupVideoCall: async (_root, params: { groupId: string }, context) => {
-      ensureEnabled(context.policy.getEffective('videoConference'))
       const roomName = roomNameForGroup(params.groupId)
       // Two different acts through one mutation. JOINING an existing call (count > 0) needs
       // `group.videoCall.join`, which the shield has already checked. OPENING one (no live

@@ -58,7 +58,7 @@ export function gatesFor(key: GroupPermissionKey): GroupPermissionGate[] {
   if (gatedBy === undefined) {
     return []
   }
-  return Array.isArray(gatedBy) ? [...gatedBy] : [gatedBy]
+  return [gatedBy]
 }
 
 // The distinct extra gates the catalog declares, in first-seen (declaration) order.

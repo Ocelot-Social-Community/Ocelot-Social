@@ -60,10 +60,12 @@ export type NetworkPrerequisiteTemplate = PermissionKey | `${string}<type>`
 
 export interface GroupPermissionCatalogEntry {
   group: GroupPermissionGroup
-  // Optional runtime feature gate(s) beyond groupsEnabled; the permission is only
-  // effective while every listed gate is open. A single string is shorthand for a
-  // one-element list. Normalised via gatesFor() in ./schema.ts.
-  gatedBy?: GroupPermissionGate | GroupPermissionGate[]
+  // An optional runtime feature gate beyond groupsEnabled; the permission is only effective
+  // while it is open. ONE gate, where the network catalog takes a list: no group capability
+  // needs two, and `groupsEnabled` — the one every key has — is applied in code rather than
+  // repeated here. gatesFor() in ./schema.ts still answers in list form, because that is what
+  // the gate check and the API field consume.
+  gatedBy?: GroupPermissionGate
   // Optional network permission that must ALSO be held, possibly type-dependent.
   requiresNetworkPermission?: NetworkPrerequisiteTemplate
   description: string

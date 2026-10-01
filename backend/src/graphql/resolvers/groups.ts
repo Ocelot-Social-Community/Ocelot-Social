@@ -410,6 +410,13 @@ export default {
       ) {
         throw new UserInputError('Description too short!')
       }
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
+      // Captured here rather than read after the transaction: the narrowing above does not
+      // reach into the callback, and `context.user?.id ?? 'system'` would be a second answer
+      // to a question the shield has already settled.
+      const actor = context.user.id
       const session = context.driver.session()
       // Read inside the transaction below, used after it: switching the type has to be
       // translated into the roles that carry it (see applyGroupTypeToNonMemberRoles), and that
@@ -502,7 +509,7 @@ export default {
             context.database,
             groupId,
             params.groupType as string,
-            context.user?.id ?? 'system',
+            actor,
             new Date().toISOString(),
           )
           void context.pubsub.publish(GROUP_PERMISSIONS_CHANGED, {

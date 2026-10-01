@@ -526,6 +526,28 @@ const canRemoveGroupMember = rule({ cache: 'no_cache' })(async (_parent, args, c
   return mayRemoveGroupMember(authorization.effective, target)
 })
 
+// Exported for permissionsMiddleware.group.spec.ts.
+//
+// These rules ARE the group authorization, and several of their arms cannot be reached through
+// a GraphQL request at all: a group id that resolves to nothing, an argument the schema types
+// as non-null, a parent object the server builds itself. Asserting them directly is the
+// difference between a guard that holds and a guard that is merely written down. The shield map
+// below is their only production user.
+export const groupAuthorizationRules = {
+  byArg,
+  byPost,
+  byRoom,
+  hasGroupPermission,
+  parentHasGroupPermission,
+  canChangeGroupType,
+  canJoinGroup,
+  isLeavingSelf,
+  canAssignGroupRole,
+  canRemoveGroupMember,
+  canAdministerSomeGroup,
+  canReviewReportedContent,
+}
+
 // Permissions
 export default shield(
   {

@@ -28,12 +28,23 @@ import type { PermissionKey } from '@src/permission'
  * more — a public group that closed its content closed it here too.
  *
  * A reported USER carries no group, so nothing is masked for them.
+ *
+ * Exported for its own spec: it is a pure decision over a report row, and driving it through a
+ * seeded moderation queue would say less about it than handing it the rows directly.
  */
-const maskUnreadableGroupContent = (
-  report,
+/** A report row as the queue's statement returns it, plus the two facts it computes. */
+export interface ReportRow {
+  [field: string]: unknown
+  groupType?: string | null
+  readableHere?: boolean
+  resource?: Record<string, unknown> | null
+}
+
+export const maskUnreadableGroupContent = (
+  report: ReportRow,
   effectivePermissions: Context['effectivePermissions'],
-) => {
-  const groupType = report.groupType as string | null
+): ReportRow & { resourceHidden: boolean } => {
+  const groupType = report.groupType
   if (!groupType || report.readableHere === true) {
     return { ...report, resourceHidden: false }
   }
@@ -41,7 +52,7 @@ const maskUnreadableGroupContent = (
   if (readable) {
     return { ...report, resourceHidden: false }
   }
-  const resource = report.resource as Record<string, unknown> | null
+  const resource = report.resource ?? null
   return {
     ...report,
     resourceHidden: true,
@@ -180,7 +191,7 @@ export default {
         const reports = await reportsReadTxPromise
         return reports.map((report) =>
           maskUnreadableGroupContent(
-            report,
+            report as ReportRow,
             context.effectivePermissions as Context['effectivePermissions'],
           ),
         )
