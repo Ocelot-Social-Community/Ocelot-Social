@@ -4,7 +4,13 @@
   import OsButton from '#src/components/OsButton/OsButton.vue'
   import OsIcon from '#src/components/OsIcon/OsIcon.vue'
 
+  import type { ButtonSize, ButtonVariants } from '#src/components/OsButton/button.variants'
   import type { Component, PropType } from 'vue-demi'
+
+  // The count badge scales with the button — at 'sm' (26px) a fixed 25px badge would be nearly
+  // as big as the button itself. top/left/font-size are derived from this via CSS calc() (see
+  // <style> below), matching the proportions the original fixed 25px/12px/-12px/-16px used at 'md'.
+  const BADGE_DIAMETER: Record<ButtonSize, number> = { sm: 18, md: 25, lg: 32, xl: 38 }
 
   /**
    * Circular icon button with a count badge.
@@ -21,6 +27,8 @@
       ariaLabel: { type: String, required: true },
       /** Icon component or render function */
       icon: { type: [Object, Function] as PropType<Component>, required: true },
+      /** Button size, same scale as OsButton's own `size` prop */
+      size: { type: String as PropType<ButtonVariants['size']>, default: 'md' },
       /** Whether the button appears filled (active state) */
       filled: { type: Boolean, default: false },
       /** Disables the button */
@@ -48,6 +56,7 @@
                 props: {
                   variant: 'primary',
                   appearance: props.filled ? 'filled' : 'outline',
+                  size: props.size,
                   loading: props.loading,
                   disabled: props.disabled,
                   circle: true,
@@ -58,6 +67,7 @@
             : /* v8 ignore stop */ {
                 variant: 'primary',
                 appearance: props.filled ? 'filled' : 'outline',
+                size: props.size,
                 loading: props.loading,
                 disabled: props.disabled,
                 circle: true,
@@ -71,6 +81,9 @@
           'div',
           {
             class: 'os-action-button__count',
+            style: {
+              '--os-action-button-badge-diameter': `${BADGE_DIAMETER[props.size as ButtonSize]}px`,
+            },
             'aria-hidden': 'true',
           },
           /* v8 ignore next -- Vue 2 */ isVue2 ? [String(props.count)] : String(props.count),
@@ -91,6 +104,9 @@
   }
 
   .os-action-button__count {
+    /* Overridden inline per size (see BADGE_DIAMETER) — this default only covers usage
+       outside OsActionButton's own render, if any. */
+    --os-action-button-badge-diameter: 25px;
     user-select: none;
     color: var(--os-action-button-color, var(--color-primary));
     background-color: var(--os-action-button-bg, var(--color-primary-contrast));
@@ -99,12 +115,12 @@
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: -12px;
-    left: calc(100% - 16px);
-    min-width: 25px;
-    height: 25px;
-    border-radius: 12px;
-    font-size: 12px;
+    top: calc(-1 * var(--os-action-button-badge-diameter) / 2);
+    left: calc(100% - var(--os-action-button-badge-diameter) + 9px);
+    min-width: var(--os-action-button-badge-diameter);
+    height: var(--os-action-button-badge-diameter);
+    border-radius: calc(var(--os-action-button-badge-diameter) / 2);
+    font-size: calc(var(--os-action-button-badge-diameter) * 0.48);
     padding-inline: 2px;
   }
 </style>

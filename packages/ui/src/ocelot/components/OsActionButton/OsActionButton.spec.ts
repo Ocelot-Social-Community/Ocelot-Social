@@ -35,6 +35,32 @@ describe('osActionButton', () => {
     expect(wrapper.find('button').classes()).toContain('rounded-full')
   })
 
+  describe('size prop', () => {
+    it('renders at the md circle width by default', () => {
+      const wrapper = mount(OsActionButton, { props: defaultProps })
+
+      expect(wrapper.find('button').classes()).toContain('w-[36px]')
+    })
+
+    it('renders at the sm circle width when size is "sm"', () => {
+      const wrapper = mount(OsActionButton, { props: { ...defaultProps, size: 'sm' } })
+
+      expect(wrapper.find('button').classes()).toContain('w-[26px]')
+    })
+
+    it('scales the count badge down with a smaller button, not just the button itself', () => {
+      const mdBadge = mount(OsActionButton, { props: defaultProps }).find(
+        '.os-action-button__count',
+      )
+      const smBadge = mount(OsActionButton, {
+        props: { ...defaultProps, size: 'sm' },
+      }).find('.os-action-button__count')
+
+      expect(mdBadge.attributes('style')).toContain('--os-action-button-badge-diameter: 25px')
+      expect(smBadge.attributes('style')).toContain('--os-action-button-badge-diameter: 18px')
+    })
+  })
+
   describe('filled prop', () => {
     it('renders outline appearance by default', () => {
       const wrapper = mount(OsActionButton, { props: defaultProps })

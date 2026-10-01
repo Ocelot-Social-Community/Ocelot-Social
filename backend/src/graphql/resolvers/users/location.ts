@@ -163,6 +163,19 @@ export const createOrUpdateLocations = async (
   // Defaults to the precise, address-level types an event's exact pin uses.
   // Groups pass their own coarser list (place/region/country) — see groups.ts.
   reverseGeocodeTypes: string[] = EVENT_REVERSE_GEOCODE_TYPES,
+  // Events drop a pin that need not correspond 1:1 to any piece of text, so
+  // their coordinates are authoritative and reverse-geocoded (the default,
+  // false, below). User/Group locations are always picked either via exact
+  // text search or via a map click that the frontend itself already
+  // resolved to a named place (LocationPickerMap's precision="resolved") —
+  // there, `locationName` IS the user's actual choice, so it must be
+  // matched by forward-geocoding that exact text, never overridden by a
+  // second, independent reverse-geocode of the coordinates (which can land
+  // on a more specific place — e.g. a city district — than the one picked,
+  // since it tries the most specific type first). Coordinates are still
+  // useful there, just demoted to a `proximity` bias that disambiguates
+  // same-named places instead of a source of truth in their own right.
+  matchLocationNameExactly = false,
 ) => {
   if (locationName === undefined) {
     return
@@ -173,7 +186,7 @@ export const createOrUpdateLocations = async (
   if (locationName !== null) {
     let data
 
-    if (coordinates) {
+    if (coordinates && !matchLocationNameExactly) {
       data = await reverseGeocodeCoordinates(
         coordinates.lat,
         coordinates.lng,
@@ -184,12 +197,24 @@ export const createOrUpdateLocations = async (
         throw new UserInputError('location coordinates are invalid')
       }
     } else {
+      // matchLocationNameExactly reuses reverseGeocodeTypes as the forward-
+      // search type filter (already the right granularity — e.g. groups'
+      // neighborhood/locality/place/region/country — and, unlike the
+      // reverse endpoint, forward search accepts several types in one
+      // combined request) instead of the narrower default below, which
+      // exists only for callers that never pass coordinates or the flag
+      // (e.g. registration.ts) and are unaffected by this branch either way.
+      const types = matchLocationNameExactly
+        ? reverseGeocodeTypes.join(',')
+        : 'region,place,country,address'
+      const proximity = coordinates ? `${coordinates.lng},${coordinates.lat}` : null
       const response: any = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
           locationName,
         )}.json?access_token=${
           context.config.MAPBOX_TOKEN
-        }&types=region,place,country,address&language=${locales.join(',')}`,
+        }&types=${types}&language=${locales.join(',')}` +
+          (proximity ? `&proximity=${encodeURIComponent(proximity)}` : ''),
         {
           signal: AbortSignal.timeout(REQUEST_TIMEOUT),
         },
@@ -202,11 +227,24 @@ export const createOrUpdateLocations = async (
       }
 
       res.features.forEach((item) => {
-        if (item.matching_place_name === locationName) {
+        // place_name is what the frontend actually displays and sends back (see
+        // LocationSelect.vue, and queryLocations below, which never exposes
+        // matching_place_name to it in the first place). matching_place_name is
+        // additionally checked for completeness — Mapbox only sets it when it had to
+        // fuzzy-correct the query, so it is unset on the common, already-exact case.
+        if (item.place_name === locationName || item.matching_place_name === locationName) {
           data = item
         }
       })
       if (!data) {
+        // matchLocationNameExactly means locationName IS the user's picked choice (see its own
+        // doc comment above) — silently falling back to Mapbox's top-ranked result here would
+        // save a different place than the one they picked. Standard mode (no coordinates, no
+        // flag) keeps the fallback: there, locationName is free text with no claim to an exact
+        // match in the first place.
+        if (matchLocationNameExactly) {
+          throw new UserInputError('locationName is invalid')
+        }
         data = res.features[0]
       }
 

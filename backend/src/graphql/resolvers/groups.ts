@@ -285,6 +285,7 @@ export default {
           context,
           coordinates,
           GROUP_REVERSE_GEOCODE_TYPES,
+          true,
         )
         return group
       } catch (error) {
@@ -397,6 +398,7 @@ export default {
           context,
           coordinates,
           GROUP_REVERSE_GEOCODE_TYPES,
+          true,
         )
         if ('showMembers' in params) {
           void context.pubsub.publish(GROUP_SHOW_MEMBERS_CHANGED, {

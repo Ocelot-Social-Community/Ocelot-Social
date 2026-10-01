@@ -17,12 +17,18 @@ slugify.extend({ Ä: 'AE', ä: 'ae', Ö: 'OE', ö: 'oe', Ü: 'UE', ü: 'ue', ß:
 // (commas etc. would survive), hence the explicit post-filter. Falls back to
 // 'anonymous' when nothing slug-able remains (e.g. '!!!').
 export function toSlug(str: string): string {
-  return (
-    slugify(str || 'anonymous', {
-      lower: true,
-      remove: /[*+~.()'"!:@]/g,
-    }).replace(/[^a-z0-9_-]/g, '') || 'anonymous'
-  )
+  const slug = slugify(str || 'anonymous', {
+    lower: true,
+    remove: /[*+~.()'"!:@]/g,
+  })
+    // A character slugify doesn't map to '-' and isn't in `remove` either (e.g. '?', '#', '/',
+    // most emoji) survives as its own "word" and gets a real '-' separator from the space next
+    // to it; stripping it here (after slugify, so it can't collapse into that separator itself)
+    // leaves that now-orphaned '-' behind — at the start/end, or doubled up mid-string.
+    .replace(/[^a-z0-9_-]/g, '')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+|-+$/g, '')
+  return slug || 'anonymous'
 }
 
 type IsUnique = (slug: string) => Promise<boolean>

@@ -249,4 +249,60 @@ describe('LocationSelect', () => {
       })
     })
   })
+
+  // Regression test: a slow geocode response (debounce + proximity lookup + network) that
+  // only lands after the user has already clicked away used to vanish into OcelotSelect's
+  // `cities` prop unseen, and the next open() would then wipe the typed text back to '' (see
+  // OcelotSelect.vue's open()) — showing an empty search box with the now-populated, but
+  // unfiltered, results underneath instead of what the user actually typed.
+  describe('a slow geocode response arriving after the field was closed', () => {
+    let resolveQuery
+
+    beforeEach(() => {
+      jest.useFakeTimers()
+      queryMock.mockClear()
+      queryMock.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolveQuery = resolve
+          }),
+      )
+      wrapper = mount(LocationSelect, { mocks, localVue, propsData: { value: '' } })
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it('keeps the typed text and filters the late results by it once reopened', async () => {
+      const input = wrapper.find('#city')
+      input.element.value = 'Niendorf, Hamburg, Deutschland'
+      await input.trigger('input')
+      jest.advanceTimersByTime(500)
+      // requestGeoData awaits the (already-settled, no geolocation mock here) proximity
+      // promise before it reaches $apollo.query — one tick to let it get there.
+      await wrapper.vm.$nextTick()
+
+      // Simulate a click outside while the request is still in flight.
+      wrapper.vm.$refs.select.closeAndBlur()
+      expect(wrapper.vm.$refs.select.isOpen).toBe(false)
+
+      // The response only resolves now — after the field was already closed.
+      resolveQuery({
+        data: {
+          queryLocations: [{ place_name: 'Niendorf, Hamburg, Deutschland', place_id: 'niendorf' }],
+        },
+      })
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+
+      wrapper.vm.$refs.select.openAndFocus()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.$refs.select.isOpen).toBe(true)
+      expect(wrapper.vm.$refs.select.searchString).toBe('Niendorf, Hamburg, Deutschland')
+      expect(wrapper.findAll('.ds-select-option').length).toBe(1)
+      expect(wrapper.find('.ds-select-option').text()).toBe('Niendorf, Hamburg, Deutschland')
+    })
+  })
 })
