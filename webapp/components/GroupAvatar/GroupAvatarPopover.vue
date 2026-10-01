@@ -95,6 +95,9 @@ export default {
       showContent: false,
       minSpinnerDone: false,
       querySettled: false,
+      // A network/GraphQL error settles the query too, but it's not evidence the group is
+      // actually gone — only a successful, empty response is (see confirmedMissing).
+      queryFailed: false,
       spinnerTimer: null,
     }
   },
@@ -116,9 +119,10 @@ export default {
       return this.group || (this.Group && this.Group[0]) || null
     },
     // Confirmed gone (content settled, nothing came back) — don't navigate to a group we already
-    // know doesn't exist, even though groupLink is still set.
+    // know doesn't exist, even though groupLink is still set. A failed query must NOT count as
+    // confirmation — that would block navigation on a transient network error.
     confirmedMissing() {
-      return this.showContent && !this.resolvedGroup
+      return this.showContent && !this.queryFailed && !this.resolvedGroup
     },
     // Whole card becomes a link whenever we have somewhere to send it and haven't ruled that out
     // — including while still loading, so an eager click (e.g. from pages/map.vue's popups)
@@ -156,6 +160,7 @@ export default {
         this.onQuerySettled()
       },
       error() {
+        this.queryFailed = true
         this.onQuerySettled()
       },
     },

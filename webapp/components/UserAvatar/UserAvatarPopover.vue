@@ -91,16 +91,20 @@ export default {
       // came back without a user" (show the Empty state) — the query result
       // itself can't tell those apart since `user` is null in both cases.
       querySettled: false,
+      // A network/GraphQL error settles the query too, but it's not evidence the profile is
+      // actually gone — only a successful, empty response is (see confirmedMissing).
+      queryFailed: false,
     }
   },
   computed: {
     user() {
       return (this.User && this.User[0]) ?? null
     },
-    // Confirmed gone (query settled, nothing came back) — don't navigate to a profile we already
-    // know doesn't exist, even though userLink is still set.
+    // Confirmed gone (query succeeded, settled, nothing came back) — don't navigate to a profile
+    // we already know doesn't exist, even though userLink is still set. A failed query must NOT
+    // count as confirmation — that would block navigation on a transient network error.
     confirmedMissing() {
-      return this.querySettled && !this.user
+      return this.querySettled && !this.queryFailed && !this.user
     },
     // Whole card becomes a link whenever we have somewhere to send it and haven't ruled that out
     // — including while still loading, so an eager click (e.g. from pages/map.vue's popups)
@@ -122,6 +126,7 @@ export default {
       },
       error() {
         this.querySettled = true
+        this.queryFailed = true
       },
     },
   },

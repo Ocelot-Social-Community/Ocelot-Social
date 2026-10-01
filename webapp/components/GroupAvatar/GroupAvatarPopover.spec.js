@@ -22,16 +22,24 @@ describe('GroupAvatarPopover', () => {
   // Passing `group` directly skips the Apollo query (see its own `skip()`); `showContent` is
   // forced true here too (instead of waiting on its own mount-time spinner delay, see
   // GroupAvatarPopover's `mounted()`) so these tests don't need to await a timer.
-  const Wrapper = ({ withGroupLink = true, showProfileLink = false, groupData = group } = {}) => {
+  const Wrapper = ({
+    withGroupLink = true,
+    showProfileLink = false,
+    groupData = group,
+    queryFailed,
+  } = {}) => {
     return render(GroupAvatarPopover, {
       localVue,
       propsData: {
-        groupId: groupData.id,
+        groupId: groupData ? groupData.id : 'missing-group',
         group: groupData,
         groupLink: withGroupLink ? groupLink : null,
         showProfileLink,
       },
-      data: () => ({ showContent: true }),
+      data: () => ({
+        showContent: true,
+        ...(queryFailed !== undefined && { queryFailed }),
+      }),
       stubs: {
         NuxtLink: RouterLinkStub,
       },
@@ -70,6 +78,20 @@ describe('GroupAvatarPopover', () => {
 
     it('renders a plain div, not a link, when no groupLink is provided', () => {
       const wrapper = Wrapper({ withGroupLink: false })
+      const root = wrapper.container.querySelector('.group-avatar-popover')
+      expect(root.tagName).toBe('DIV')
+    })
+
+    // A failed query settles content too, but it is not evidence the group is actually gone —
+    // treating it as such would wrongly block navigation on a transient network error.
+    it('stays a link when the teaser query fails, even with no group resolved yet', () => {
+      const wrapper = Wrapper({ withGroupLink: true, groupData: null, queryFailed: true })
+      const root = wrapper.container.querySelector('.group-avatar-popover')
+      expect(root.tagName).toBe('A')
+    })
+
+    it('becomes a plain div once the query succeeds with no group (confirmed missing)', () => {
+      const wrapper = Wrapper({ withGroupLink: true, groupData: null, queryFailed: false })
       const root = wrapper.container.querySelector('.group-avatar-popover')
       expect(root.tagName).toBe('DIV')
     })

@@ -50,7 +50,9 @@ describe('UserAvatarPopover', () => {
     withUserLink = true,
     showProfileLink = false,
     userData = user,
-  }) => {
+    querySettled,
+    queryFailed,
+  } = {}) => {
     return render(UserAvatarPopover, {
       localVue,
       propsData: {
@@ -59,7 +61,9 @@ describe('UserAvatarPopover', () => {
         showProfileLink,
       },
       data: () => ({
-        User: [userData],
+        User: userData ? [userData] : [],
+        ...(querySettled !== undefined && { querySettled }),
+        ...(queryFailed !== undefined && { queryFailed }),
       }),
       stubs: {
         NuxtLink: RouterLinkStub,
@@ -100,6 +104,30 @@ describe('UserAvatarPopover', () => {
 
     it('renders a plain div, not a link, when no userLink is provided', () => {
       const wrapper = Wrapper({ withUserLink: false })
+      const root = wrapper.container.querySelector('.user-avatar-popover')
+      expect(root.tagName).toBe('DIV')
+    })
+
+    // A failed query settles too, but it is not evidence the profile is actually gone — treating
+    // it as such would wrongly block navigation on a transient network error.
+    it('stays a link when the teaser query fails, even with no user resolved yet', () => {
+      const wrapper = Wrapper({
+        withUserLink: true,
+        userData: null,
+        querySettled: true,
+        queryFailed: true,
+      })
+      const root = wrapper.container.querySelector('.user-avatar-popover')
+      expect(root.tagName).toBe('A')
+    })
+
+    it('becomes a plain div once the query succeeds with no user (confirmed missing)', () => {
+      const wrapper = Wrapper({
+        withUserLink: true,
+        userData: null,
+        querySettled: true,
+        queryFailed: false,
+      })
       const root = wrapper.container.querySelector('.user-avatar-popover')
       expect(root.tagName).toBe('DIV')
     })
