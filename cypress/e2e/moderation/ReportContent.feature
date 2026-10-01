@@ -24,7 +24,7 @@ Feature: Report and Moderate
     And I click on "Report Post" from the content menu of the post
     And I confirm the reporting dialog because it is a criminal act under German law:
       """
-      Do you really want to report the contribution "The Truth about the Holocaust"?
+      Do you really want to report the contribution “The Truth about the Holocaust”?
       """
     Then I see a toaster with "Thanks for reporting!"
     Examples:
@@ -39,7 +39,7 @@ Feature: Report and Moderate
     And I click on "Report User" from the content menu in the user info box
     And I confirm the reporting dialog because he is a holocaust denier:
       """
-      Do you really want to report the user "I'm gonna mute Moderators and …"?
+      Do you really want to report the user “I'm gonna mute Moderators and …”?
       """
     Then I see a toaster with "Thanks for reporting!"
 

@@ -37,7 +37,7 @@
       },
       "revoke": {
         "confirm": "Відкликати",
-        "message": "Ти впевнений, що хочеш відкликати API Key \"{name}\" користувача {user}?",
+        "message": "Ти впевнений, що хочеш відкликати API Key «{name}» користувача {user}?",
         "success": "API Key успішно відкликано",
         "title": "Відкликати API Key"
       },
@@ -1460,8 +1460,8 @@
       "name": "API Keys",
       "revoke": {
         "confirm": "Відкликати",
-        "message": "Ти впевнений, що хочеш відкликати API Key \"{name}\"? Цю дію не можна скасувати.",
-        "success": "API Key \"{name}\" було відкликано",
+        "message": "Ти впевнений, що хочеш відкликати API Key «{name}»? Цю дію не можна скасувати.",
+        "success": "API Key «{name}» було відкликано",
         "title": "Відкликати API Key"
       },
       "revoked-list": {

@@ -37,7 +37,7 @@
       },
       "revoke": {
         "confirm": "Revoca",
-        "message": "Sei sicuro di voler revocare l'API Key \"{name}\" di {user}?",
+        "message": "Sei sicuro di voler revocare l'API Key «{name}» di {user}?",
         "success": "API Key revocata con successo",
         "title": "Revoca API Key"
       },
@@ -427,7 +427,7 @@
     "expandChat": "Espandi chat",
     "groupChatButton": {
       "label": "Chat di gruppo",
-      "tooltip": "Chatta con il gruppo \"{name}\""
+      "tooltip": "Chatta con il gruppo «{name}»"
     },
     "isOnline": "è online",
     "isTyping": "sta scrivendo...",
@@ -450,7 +450,7 @@
     "typeMessage": "Scrivi un messaggio",
     "userProfileButton": {
       "label": "Chat",
-      "tooltip": "Chatta con “{name}”"
+      "tooltip": "Chatta con «{name}»"
     }
   },
   "client-only": {
@@ -664,7 +664,7 @@
     "comment": {
       "commenting-disabled": {
         "blocked-author": {
-          "button-label": "Visita “{name}”",
+          "button-label": "Visita «{name}»",
           "call-to-action": "Se vuoi lasciare un commento, sblocca l'autore nel suo profilo.",
           "reason": "Stai bloccando l'autore della pubblicazione."
         },
@@ -711,18 +711,18 @@
       "supportedFormats": "Inserisci un'immagine in formato file JPG, PNG o GIF!"
     },
     "title": "Titolo",
-    "visibleOnlyForMembersOfGroup": "Questa pubblicazione sarà visibile solo ai membri del gruppo “<b>{name}</b>”."
+    "visibleOnlyForMembersOfGroup": "Questa pubblicazione sarà visibile solo ai membri del gruppo «<b>{name}</b>»."
   },
   "delete": {
     "cancel": "Annulla",
     "comment": {
-      "message": "Vuoi davvero eliminare il commento \"<b>{name}</b>\"?",
+      "message": "Vuoi davvero eliminare il commento «<b>{name}</b>»?",
       "success": "Commento eliminato con successo!",
       "title": "Elimina commento",
       "type": "Commento"
     },
     "contribution": {
-      "message": "Vuoi davvero eliminare la pubblicazione \"<b>{name}</b>\"?",
+      "message": "Vuoi davvero eliminare la pubblicazione «<b>{name}</b>»?",
       "success": "Pubblicazione eliminata con successo!",
       "title": "Elimina pubblicazione",
       "type": "Contributo"
@@ -732,19 +732,19 @@
   "disable": {
     "cancel": "Annulla",
     "comment": {
-      "message": "Vuoi davvero disabilitare il commento di \"<b>{name}</b>\"?",
+      "message": "Vuoi davvero disabilitare il commento di «<b>{name}</b>»?",
       "title": "Disabilita commento",
       "type": "Commento"
     },
     "contribution": {
-      "message": "Vuoi davvero disabilitare il contributo \"<b>{name}</b>\"?",
+      "message": "Vuoi davvero disabilitare il contributo «<b>{name}</b>»?",
       "title": "Disabilita contributo",
       "type": "Contributo"
     },
     "submit": "Disabilita",
     "success": "Disabilitato con successo!",
     "user": {
-      "message": "Vuoi davvero disabilitare l'utente \"<b>{name}</b>\"?",
+      "message": "Vuoi davvero disabilitare l'utente «<b>{name}</b>»?",
       "title": "Disabilita utente",
       "type": "Utente"
     }
@@ -864,14 +864,14 @@
     "actionRadius": "Raggio d'azione del gruppo",
     "addMember": "Aggiungi membro",
     "addMemberToGroup": "Aggiungi al gruppo",
-    "addMemberToGroupSuccess": "“{name}” è stato aggiunto al gruppo con il ruolo “{role}”!",
+    "addMemberToGroupSuccess": "«{name}» è stato aggiunto al gruppo con il ruolo «{role}»!",
     "addUser": "Aggiungi utente",
     "addUserNoOptions": "Nessun utente trovato!",
     "addUserPlaceholder": "Nome utente",
     "allGroups": "Tutti i gruppi",
     "categories": "Argomento ::: Argomenti",
     "categoriesTitle": "Argomenti del gruppo",
-    "changeMemberRole": "Il ruolo è stato cambiato in “{role}”!",
+    "changeMemberRole": "Il ruolo è stato cambiato in «{role}»!",
     "contentMenu": {
       "hideFromProfile": "Hide from my profile",
       "inviteLinks": "Link di invito",
@@ -892,7 +892,7 @@
       "title": "Modifica il mio gruppo"
     },
     "errors": {
-      "userAlreadyMember": "L'utente “{name}” è già membro!"
+      "userAlreadyMember": "L'utente «{name}» è già membro!"
     },
     "follow": "Segui",
     "foundation": "Fondazione",
@@ -912,10 +912,10 @@
     "labelSlug": "Nome unico del gruppo",
     "leaveModal": {
       "confirmButton": "Esci",
-      "message": "Uscire da un gruppo potrebbe essere irreversibile!<br>Esci dal gruppo <b>“{name}”</b>!",
+      "message": "Uscire da un gruppo potrebbe essere irreversibile!<br>Esci dal gruppo <b>«{name}»</b>!",
       "title": "Vuoi davvero uscire dal gruppo?"
     },
-    "memberRemoved": "L'utente “{name}” è stato rimosso dal gruppo!",
+    "memberRemoved": "L'utente «{name}» è stato rimosso dal gruppo!",
     "members": "Membri",
     "membersAdministrationList": {
       "avatar": "Avatar",
@@ -932,7 +932,7 @@
     "modal": {
       "cancel": "Annulla",
       "confirm": "Conferma",
-      "confirmAddGroupMemberText": "Aggiungere l'utente “{name}” al gruppo?",
+      "confirmAddGroupMemberText": "Aggiungere l'utente «{name}» al gruppo?",
       "confirmAddGroupMemberTitle": "Conferma"
     },
     "muted": "Gruppo silenziato",
@@ -941,7 +941,7 @@
     "radius": "Raggio",
     "removeMember": "Rimuovi membro",
     "removeMemberButton": "Rimuovi",
-    "removeMemberConfirmText": "Rimuovere l'utente \"{name}\" dal gruppo?",
+    "removeMemberConfirmText": "Rimuovere l'utente «{name}» dal gruppo?",
     "removeMemberTitle": "Rimuovi membro",
     "role": "Il tuo ruolo nel gruppo",
     "roles": {
@@ -1035,7 +1035,7 @@
     "invalidate": "Invalida link",
     "invalidate-error": "Errore nell'invalidazione del link di invito! Errore: {error}",
     "invalidate-success": "Link di invito invalidato con successo!",
-    "invite-link-message-group": "Sei stato invitato a unirti al gruppo “{groupName}” su {network}.",
+    "invite-link-message-group": "Sei stato invitato a unirti al gruppo «{groupName}» su {network}.",
     "invite-link-message-hidden-group": "Sei stato invitato a unirti a un gruppo nascosto su {network}.",
     "invite-link-message-personal": "Sei stato invitato a unirti a {network}.",
     "invited-count": "Hai già invitato {count} persone.",
@@ -1125,32 +1125,32 @@
         "cancel": "Annulla",
         "Comment": {
           "disable": {
-            "message": "Vuoi davvero lasciare il commento \"<b>{name}</b>\" <b>disabilitato</b>?",
+            "message": "Vuoi davvero lasciare il commento «<b>{name}</b>» <b>disabilitato</b>?",
             "title": "Disabilita commento definitivamente"
           },
           "enable": {
-            "message": "Vuoi davvero lasciare il commento \"<b>{name}</b>\" <b>abilitato</b>?",
+            "message": "Vuoi davvero lasciare il commento «<b>{name}</b>» <b>abilitato</b>?",
             "title": "Abilita commento definitivamente"
           }
         },
         "Post": {
           "disable": {
-            "message": "Vuoi davvero lasciare la pubblicazione \"<b>{name}</b>\" <b>disabilitata</b>?",
+            "message": "Vuoi davvero lasciare la pubblicazione «<b>{name}</b>» <b>disabilitata</b>?",
             "title": "Disabilita pubblicazione definitivamente"
           },
           "enable": {
-            "message": "Vuoi davvero lasciare la pubblicazione \"<b>{name}</b>\" <b>abilitata</b>?",
+            "message": "Vuoi davvero lasciare la pubblicazione «<b>{name}</b>» <b>abilitata</b>?",
             "title": "Abilita pubblicazione definitivamente"
           }
         },
         "submit": "Conferma decisione",
         "User": {
           "disable": {
-            "message": "Vuoi davvero lasciare l'utente \"<b>{name}</b>\" <b>disabilitato</b>?",
+            "message": "Vuoi davvero lasciare l'utente «<b>{name}</b>» <b>disabilitato</b>?",
             "title": "Disabilita utente definitivamente"
           },
           "enable": {
-            "message": "Vuoi davvero lasciare l'utente \"<b>{name}</b>\" <b>abilitato</b>?",
+            "message": "Vuoi davvero lasciare l'utente «<b>{name}</b>» <b>abilitato</b>?",
             "title": "Abilita utente definitivamente"
           }
         }
@@ -1228,7 +1228,7 @@
   "post": {
     "article": "Articolo",
     "comment": {
-      "joinGroup": "Si è unito al gruppo „<b>{name}</b>“",
+      "joinGroup": "Si è unito al gruppo «<b>{name}</b>»",
       "noPermission": "I commenti non sono abilitati per il tuo ruolo.",
       "reply": "Rispondi",
       "submit": "Commenta",
@@ -1350,13 +1350,13 @@
     "cancel": "Annulla",
     "comment": {
       "error": "Hai già segnalato questo commento!",
-      "message": "Vuoi davvero rilasciare il commento di \"<b>{name}</b>\"?",
+      "message": "Vuoi davvero rilasciare il commento di «<b>{name}</b>»?",
       "title": "Rilascia commento",
       "type": "Commento"
     },
     "contribution": {
       "error": "Hai già segnalato questo contributo!",
-      "message": "Vuoi davvero rilasciare il contributo \"<b>{name}</b>\"?",
+      "message": "Vuoi davvero rilasciare il contributo «<b>{name}</b>»?",
       "title": "Rilascia contributo",
       "type": "Contributo"
     },
@@ -1364,7 +1364,7 @@
     "success": "Rilasciato con successo!",
     "user": {
       "error": "Hai già segnalato questo utente!",
-      "message": "Vuoi davvero rilasciare l'utente \"<b>{name}</b>\"?",
+      "message": "Vuoi davvero rilasciare l'utente «<b>{name}</b>»?",
       "title": "Rilascia utente",
       "type": "Utente"
     }
@@ -1373,13 +1373,13 @@
     "cancel": "Annulla",
     "comment": {
       "error": "Hai già segnalato questo commento!",
-      "message": "Vuoi davvero segnalare il commento di \"<b>{name}</b>\"?",
+      "message": "Vuoi davvero segnalare il commento di «<b>{name}</b>»?",
       "title": "Segnala commento",
       "type": "Commento"
     },
     "contribution": {
       "error": "Hai già segnalato questo contributo!",
-      "message": "Vuoi davvero segnalare il contributo \"<b>{name}</b>\"?",
+      "message": "Vuoi davvero segnalare il contributo «<b>{name}</b>»?",
       "title": "Segnala pubblicazione",
       "type": "Contributo"
     },
@@ -1391,7 +1391,7 @@
           "advert_products_services_commercial": "Pubblicità di prodotti e servizi con intento commerciale.",
           "criminal_behavior_violation_german_law": "Comportamento criminale o violazione della legge tedesca.",
           "discrimination_etc": "Pubblicazioni, commenti, dichiarazioni o insulti discriminatori.",
-          "doxing": "La divulgazione di informazioni personali di altri senza il loro consenso o minaccia di farlo (\"doxing\").",
+          "doxing": "La divulgazione di informazioni personali di altri senza il loro consenso o minaccia di farlo («doxing»).",
           "glorific_trivia_of_cruel_inhuman_acts": "Glorificazione o banalizzazione di atti crudeli o disumani di violenza.",
           "intentional_intimidation_stalking_persecution": "Intimidazione intenzionale, stalking o persecuzione.",
           "other": "Altro …",
@@ -1408,7 +1408,7 @@
     "success": "Grazie per la segnalazione!",
     "user": {
       "error": "Hai già segnalato questo utente!",
-      "message": "Vuoi davvero segnalare l'utente \"<b>{name}</b>\"?",
+      "message": "Vuoi davvero segnalare l'utente «<b>{name}</b>»?",
       "title": "Segnala utente",
       "type": "Utente"
     }
@@ -1423,7 +1423,7 @@
       "User": "Utente ::: Utenti"
     },
     "hint": "Cosa state cercando? Usate !... per i post, @... per gli utenti, #... per gli hashtag.",
-    "no-results": "Nessun risultato trovato per \"{search}\". Prova un altro termine di ricerca!",
+    "no-results": "Nessun risultato trovato per «{search}». Prova un altro termine di ricerca!",
     "page": "Pagina",
     "placeholder": "Ricerca",
     "results": "risultato trovato ::: risultati trovati",
@@ -1460,8 +1460,8 @@
       "name": "API Keys",
       "revoke": {
         "confirm": "Revoca",
-        "message": "Sei sicuro di voler revocare l'API Key \"{name}\"? Questa azione non può essere annullata.",
-        "success": "L'API Key \"{name}\" è stata revocata",
+        "message": "Sei sicuro di voler revocare l'API Key «{name}»? Questa azione non può essere annullata.",
+        "success": "L'API Key «{name}» è stata revocata",
         "title": "Revoca API Key"
       },
       "revoked-list": {
@@ -1537,7 +1537,7 @@
       "contributionsCount": "Cancellare i miei {count} messaggi",
       "infoAdmin": "Tutti i contributi e i commenti dell'utente verranno eliminati in aggiunta!",
       "name": "Cancellare l'account utente",
-      "pleaseConfirm": "Azione distruttiva! Digita “{confirm}” per confermare.",
+      "pleaseConfirm": "Azione distruttiva! Digita «{confirm}» per confermare.",
       "success": "Account eliminato con successo!"
     },
     "download": {
@@ -1667,7 +1667,7 @@
       "add-new-link": "Aggiungi nuovo link",
       "delete-modal": {
         "confirm-button": "Elimina",
-        "message": "Eliminare “{name}”.",
+        "message": "Eliminare «{name}».",
         "title": "Vuoi davvero eliminare il tuo link?"
       },
       "edit-link": "Modifica link",

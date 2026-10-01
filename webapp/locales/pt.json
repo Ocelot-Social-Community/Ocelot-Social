@@ -37,7 +37,7 @@
       },
       "revoke": {
         "confirm": "Revogar",
-        "message": "Tens a certeza de que queres revogar o API Key \"{name}\" de {user}?",
+        "message": "Tens a certeza de que queres revogar o API Key “{name}” de {user}?",
         "success": "API Key revogada com sucesso",
         "title": "Revogar API Key"
       },
@@ -427,7 +427,7 @@
     "expandChat": "Expandir chat",
     "groupChatButton": {
       "label": "Chat de grupo",
-      "tooltip": "Chat com o grupo \"{name}\""
+      "tooltip": "Chat com o grupo “{name}”"
     },
     "isOnline": "está online",
     "isTyping": "está escrevendo...",
@@ -716,13 +716,13 @@
   "delete": {
     "cancel": "Cancelar",
     "comment": {
-      "message": "Você realmente deseja excluir o comentário \"<b>{name}</b>\"?",
+      "message": "Você realmente deseja excluir o comentário “<b>{name}</b>”?",
       "success": "Comentário excluído com sucesso!",
       "title": "Excluir Comentário",
       "type": "Comentário"
     },
     "contribution": {
-      "message": "Você realmente deseja excluir a publicação \"<b>{name}</b>\"?",
+      "message": "Você realmente deseja excluir a publicação “<b>{name}</b>”?",
       "success": "Publicação  excluída com êxito!",
       "title": "Excluir publicação",
       "type": "Contribuição"
@@ -732,19 +732,19 @@
   "disable": {
     "cancel": "Cancelar",
     "comment": {
-      "message": "Você realmente deseja desativar o comentário de \" <b> {name} </b> \"?",
+      "message": "Você realmente deseja desativar o comentário de “<b>{name}</b>”?",
       "title": "Desativar comentário",
       "type": "Comentário"
     },
     "contribution": {
-      "message": "Você realmente deseja desativar a contribuição \" <b> {name} </b> \"?",
+      "message": "Você realmente deseja desativar a contribuição “<b>{name}</b>”?",
       "title": "Desativar Contribuição",
       "type": "Contribuição"
     },
     "submit": "Desativar",
     "success": "Desativado com sucesso!",
     "user": {
-      "message": "Você realmente deseja desativar o usuário \" <b> {name} </b> \"?",
+      "message": "Você realmente deseja desativar o usuário “<b>{name}</b>”?",
       "title": "Desativar usuário",
       "type": "Usuário"
     }
@@ -941,7 +941,7 @@
     "radius": "Raio",
     "removeMember": "Remover membro",
     "removeMemberButton": "Remover",
-    "removeMemberConfirmText": "Remover o usuário \"{name}\" do grupo?",
+    "removeMemberConfirmText": "Remover o usuário “{name}” do grupo?",
     "removeMemberTitle": "Remover membro",
     "role": "Seu papel no grupo",
     "roles": {
@@ -1125,32 +1125,32 @@
         "cancel": "Cancelar",
         "Comment": {
           "disable": {
-            "message": "Você realmente quer deixar o comentário \"<b>{name}</b>\" <b>desativado</b>?",
+            "message": "Você realmente quer deixar o comentário “<b>{name}</b>” <b>desativado</b>?",
             "title": "Desativar comentário definitivamente"
           },
           "enable": {
-            "message": "Você realmente quer deixar o comentário \"<b>{name}</b>\" <b>ativado</b>?",
+            "message": "Você realmente quer deixar o comentário “<b>{name}</b>” <b>ativado</b>?",
             "title": "Ativar comentário definitivamente"
           }
         },
         "Post": {
           "disable": {
-            "message": "Você realmente quer deixar a publicação \"<b>{name}</b>\" <b>desativada</b>?",
+            "message": "Você realmente quer deixar a publicação “<b>{name}</b>” <b>desativada</b>?",
             "title": "Desativar publicação definitivamente"
           },
           "enable": {
-            "message": "Você realmente quer deixar a publicação \"<b>{name}</b>\" <b>ativada</b>?",
+            "message": "Você realmente quer deixar a publicação “<b>{name}</b>” <b>ativada</b>?",
             "title": "Ativar publicação definitivamente"
           }
         },
         "submit": "Confirmar decisão",
         "User": {
           "disable": {
-            "message": "Você realmente quer deixar o usuário \"<b>{name}</b>\" <b>desativado</b>?",
+            "message": "Você realmente quer deixar o usuário “<b>{name}</b>” <b>desativado</b>?",
             "title": "Desativar usuário definitivamente"
           },
           "enable": {
-            "message": "Você realmente quer deixar o usuário \"<b>{name}</b>\" <b>ativado</b>?",
+            "message": "Você realmente quer deixar o usuário “<b>{name}</b>” <b>ativado</b>?",
             "title": "Ativar usuário definitivamente"
           }
         }
@@ -1228,7 +1228,7 @@
   "post": {
     "article": "Artigo",
     "comment": {
-      "joinGroup": "Entrou no grupo „<b>{name}</b>“",
+      "joinGroup": "Entrou no grupo “<b>{name}</b>”",
       "noPermission": "Os comentários não estão ativados para a tua função.",
       "reply": "Responder",
       "submit": "Commentar",
@@ -1350,13 +1350,13 @@
     "cancel": "Cancelar",
     "comment": {
       "error": "Você já denunciou este comentário!",
-      "message": "Você realmente quer liberar o comentário de \"<b>{name}</b>\"?",
+      "message": "Você realmente quer liberar o comentário de “<b>{name}</b>”?",
       "title": "Liberar Comentário ",
       "type": "Comentário"
     },
     "contribution": {
       "error": "Você já denunciou esta contribuição!",
-      "message": "Você realmente quer liberar a contribuição \"<b>{name}</b>\"?",
+      "message": "Você realmente quer liberar a contribuição “<b>{name}</b>”?",
       "title": "Liberar contribuição ",
       "type": "Contribuição"
     },
@@ -1364,7 +1364,7 @@
     "success": "Liberado com sucesso!",
     "user": {
       "error": "Você já denunciou este usuário!",
-      "message": "Você realmente quer liberar o usuário \"<b>{name}</b>\"?",
+      "message": "Você realmente quer liberar o usuário “<b>{name}</b>”?",
       "title": "Liberar usuário",
       "type": "Usuário"
     }
@@ -1373,13 +1373,13 @@
     "cancel": "Cancelar",
     "comment": {
       "error": "Você já denunciou o comentário!",
-      "message": "Você realmente deseja denunciar o comentário de \"<b>{name}</b>\"?",
+      "message": "Você realmente deseja denunciar o comentário de “<b>{name}</b>”?",
       "title": "Denunciar Comentário",
       "type": "Comentário"
     },
     "contribution": {
       "error": "Você já denunciou a contribuição!",
-      "message": "Você realmente deseja denunciar a contribuição \" <b> {name} </b> \"?",
+      "message": "Você realmente deseja denunciar a contribuição “<b>{name}</b>”?",
       "title": "Denunciar Contribuição",
       "type": "Contribuição"
     },
@@ -1391,7 +1391,7 @@
           "advert_products_services_commercial": "Publicidade de produtos e serviços com intenção comercial.",
           "criminal_behavior_violation_german_law": "Comportamento criminoso ou violação da lei alemã.",
           "discrimination_etc": "Publicações, comentários, declarações ou insultos discriminatórios.",
-          "doxing": "A divulgação de informações pessoais de terceiros sem seu consentimento ou ameaça de fazê-lo (\"doxing\").",
+          "doxing": "A divulgação de informações pessoais de terceiros sem seu consentimento ou ameaça de fazê-lo (“doxing”).",
           "glorific_trivia_of_cruel_inhuman_acts": "Glorificação ou banalização de atos cruéis ou desumanos de violência.",
           "intentional_intimidation_stalking_persecution": "Intimidação intencional, perseguição ou assédio.",
           "other": "Outro …",
@@ -1408,7 +1408,7 @@
     "success": "Obrigado por denunciar!",
     "user": {
       "error": "Você já denunciou o usuário!",
-      "message": "Você realmente deseja denunciar o usuário \" <b> {name} </b> \"?",
+      "message": "Você realmente deseja denunciar o usuário “<b>{name}</b>”?",
       "title": "Denunciar usuário",
       "type": "Usuário"
     }
@@ -1423,7 +1423,7 @@
       "User": "Usuário ::: Usuários"
     },
     "hint": "O que você está buscando? Use !... para postagens, @... para usuários, #... para hashtags.",
-    "no-results": "Nenhum resultado encontrado para \"{search}\". Tente um termo de busca diferente!",
+    "no-results": "Nenhum resultado encontrado para “{search}”. Tente um termo de busca diferente!",
     "page": "Página",
     "placeholder": "Buscar",
     "results": "resultado encontrado ::: resultados encontrados",
@@ -1460,8 +1460,8 @@
       "name": "API Keys",
       "revoke": {
         "confirm": "Revogar",
-        "message": "Tens a certeza de que queres revogar o API Key \"{name}\"? Esta ação não pode ser desfeita.",
-        "success": "API Key \"{name}\" foi revogada",
+        "message": "Tens a certeza de que queres revogar o API Key “{name}”? Esta ação não pode ser desfeita.",
+        "success": "API Key “{name}” foi revogada",
         "title": "Revogar API Key"
       },
       "revoked-list": {
@@ -1748,10 +1748,10 @@
         "noDevice": "Nenhum ecrã disponível para partilhar."
       }
     },
-    "gotoGroup": "Ir para o grupo «{name}»",
+    "gotoGroup": "Ir para o grupo “{name}”",
     "groupVideoCallButton": {
       "label": "Vídeo de grupo",
-      "tooltip": "Videochamada no grupo «{name}»"
+      "tooltip": "Videochamada no grupo “{name}”"
     },
     "leave": "Sair da chamada",
     "maximize": "Maximizar",
