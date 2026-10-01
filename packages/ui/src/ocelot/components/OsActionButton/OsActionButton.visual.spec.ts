@@ -79,4 +79,15 @@ test.describe('OsActionButton visual regression', () => {
 
     await checkA11y(page)
   })
+
+  test('sizes', async ({ page }) => {
+    await page.goto(`${STORY_URL}--sizes&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+
+    await expect(root).toHaveScreenshot('sizes.png')
+
+    await checkA11y(page)
+  })
 })
