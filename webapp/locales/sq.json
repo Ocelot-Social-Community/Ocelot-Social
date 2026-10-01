@@ -1242,6 +1242,8 @@
         "reviewed": "Rishikuar",
         "unreviewed": "Pa rishikuar"
       },
+      "hiddenContent": null,
+      "hiddenDecision": null,
       "moreDetails": "Shiko detajet",
       "name": "Raportimet",
       "noDecision": "Asnjë vendim!",

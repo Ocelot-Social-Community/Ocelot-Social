@@ -1242,6 +1242,8 @@
         "reviewed": "Revu",
         "unreviewed": "Non révisé"
       },
+      "hiddenContent": null,
+      "hiddenDecision": null,
       "moreDetails": "Voir les détails",
       "name": "Signalisations",
       "noDecision": "Pas de décision!",

@@ -1242,6 +1242,8 @@
         "reviewed": "Reviewed",
         "unreviewed": "Unreviewed"
       },
+      "hiddenContent": "Content in a group you may not read",
+      "hiddenDecision": "Not decidable here",
       "moreDetails": "View Details",
       "name": "Reports",
       "noDecision": "No decision!",

@@ -1242,6 +1242,8 @@
         "reviewed": "Beoordeeld",
         "unreviewed": "Niet beoordeeld"
       },
+      "hiddenContent": null,
+      "hiddenDecision": null,
       "moreDetails": "Details bekijken",
       "name": "Meldingen",
       "noDecision": "Geen beslissing!",

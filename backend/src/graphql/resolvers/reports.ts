@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+import { memberHoldsInGroup, nonMemberReadsContent } from './helpers/groupAccessCypher'
+
 import type { Context } from '@src/context'
 import type { PermissionKey } from '@src/permission'
 
@@ -15,6 +17,12 @@ import type { PermissionKey } from '@src/permission'
  * the same post was invisible to them everywhere else (#9405, concept E19). Metadata stays — the
  * report is still there to be escalated — and `resourceHidden` tells the UI to say why.
  *
+ * Three ways the content stays visible, and the first two come from the query because they are
+ * about the GROUP rather than about the network role: the group opened its content to
+ * non-members, or the moderator's own role in that group lets them read it. Only then does the
+ * per-type network right decide. `groupType = 'public'` is deliberately NOT a shortcut any
+ * more — a public group that closed its content closed it here too.
+ *
  * A reported USER carries no group, so nothing is masked for them.
  */
 const maskUnreadableGroupContent = (
@@ -22,7 +30,7 @@ const maskUnreadableGroupContent = (
   effectivePermissions: Context['effectivePermissions'],
 ) => {
   const groupType = report.groupType as string | null
-  if (!groupType || groupType === 'public') {
+  if (!groupType || report.readableHere === true) {
     return { ...report, resourceHidden: false }
   }
   const readable = effectivePermissions.has(`group.content.read.any_${groupType}` as PermissionKey)
@@ -140,16 +148,24 @@ export default {
             // The group the reported content lives in, so the queue can mask what this moderator
             // may not read (concept E19). A comment is reached through its post; a reported user
             // belongs to no group.
-            [(resource)-[:IN]->(g:Group) | g.groupType][0] as directGroupType,
-            [(resource)-[:COMMENTS]->(:Post)-[:IN]->(g:Group) | g.groupType][0] as commentedGroupType,
+            [(resource)-[:IN]->(g:Group) | g][0] as directGroup,
+            [(resource)-[:COMMENTS]->(:Post)-[:IN]->(g:Group) | g][0] as commentedGroup,
             resource {.*, __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'User']][0] } as resourceWithType
             WITH report, optionalAuthors, optionalCommentedPosts, reviewed, filed,
-            coalesce(directGroupType, commentedGroupType) as groupType,
+            coalesce(directGroup, commentedGroup) as group,
             resourceWithType {.*, post: optionalCommentedPosts[0], author: optionalAuthors[0] } as finalResource
-            RETURN report {.*, resource: finalResource, filed: filed, reviewed: reviewed, groupType: groupType }
+            // Whether the content is readable BY THE GROUP's own answer: it opened its content
+            // to non-members, or this moderator's role in it grants reading. The network-side
+            // per-type right is folded in afterwards, in maskUnreadableGroupContent.
+            WITH report, reviewed, filed, finalResource, group.groupType as groupType,
+            (group IS NULL
+              OR ${nonMemberReadsContent('group')}
+              OR ${memberHoldsInGroup('group', 'group.content.read', '$viewerId')}) as readableHere
+            RETURN report {.*, resource: finalResource, filed: filed, reviewed: reviewed, groupType: groupType, readableHere: readableHere }
             ${orderByClause}
             ${offset} ${limit}
           `,
+          { viewerId: context.user.id },
         )
         return reportsTransactionResponse.records.map((record) => record.get('report'))
       })

@@ -1242,6 +1242,8 @@
         "reviewed": "Revisionati",
         "unreviewed": "Non revisionati"
       },
+      "hiddenContent": null,
+      "hiddenDecision": null,
       "moreDetails": "Vedi dettagli",
       "name": "Segnalazioni",
       "noDecision": "Nessuna decisione!",

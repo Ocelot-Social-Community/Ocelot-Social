@@ -1242,6 +1242,8 @@
         "reviewed": "Рассмотренный",
         "unreviewed": "Нерассмотренный"
       },
+      "hiddenContent": null,
+      "hiddenDecision": null,
       "moreDetails": "Посмотреть подробности",
       "name": "Отчеты",
       "noDecision": "Нет решения!",

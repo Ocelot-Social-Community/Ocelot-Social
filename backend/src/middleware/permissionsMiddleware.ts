@@ -9,6 +9,10 @@ import { createRequire } from 'node:module'
 
 import CONFIG from '@config/index'
 import { AuthenticationError } from '@graphql/errors'
+import {
+  memberHoldsInGroup,
+  nonMemberReadsContent,
+} from '@graphql/resolvers/helpers/groupAccessCypher'
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { coversRole, mayAssignGroupRole, mayRemoveGroupMember } from '@src/groupRole'
 import { isPermissionAvailable } from '@src/permission'
@@ -290,14 +294,23 @@ const canReviewReportedContent = rule({ cache: 'no_cache' })(async (
     return false
   }
   const result = await ctx.database.query({
+    // The same question the moderation queue asks when it decides what to blank (see
+    // resolvers/reports.ts): the group's own answer first — it opened its content to
+    // non-members, or this moderator's role in it grants reading — and only then the
+    // per-type network right below.
     query: `MATCH (resource {id: $resourceId})
             OPTIONAL MATCH (resource)-[:IN]->(direct:Group)
             OPTIONAL MATCH (resource)-[:COMMENTS]->(:Post)-[:IN]->(viaPost:Group)
-            RETURN coalesce(direct.groupType, viaPost.groupType) AS groupType`,
-    variables: { resourceId },
+            WITH coalesce(direct, viaPost) AS group
+            RETURN group.groupType AS groupType,
+                   (group IS NULL
+                     OR ${nonMemberReadsContent('group')}
+                     OR ${memberHoldsInGroup('group', 'group.content.read', '$viewerId')}) AS readableHere`,
+    variables: { resourceId, viewerId: ctx.user?.id ?? null },
   })
-  const groupType = result.records[0]?.get('groupType') as string | null
-  if (!groupType || groupType === 'public') {
+  const record = result.records[0]
+  const groupType = record?.get('groupType') as string | null
+  if (!groupType || record?.get('readableHere') === true) {
     return true
   }
   return hasPermissionEffective(ctx, `group.content.read.any_${groupType}` as PermissionKey)
