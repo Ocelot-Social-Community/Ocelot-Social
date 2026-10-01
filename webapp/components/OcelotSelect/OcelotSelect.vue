@@ -361,9 +361,15 @@ export default {
     },
     open() {
       if (this.prefillOnOpen) {
-        this.searchString = this.innerValue
-          ? String(this.innerValue[this.labelProp] || this.innerValue)
-          : ''
+        // Only overwrite searchString when there's an actual committed selection to prefill
+        // from. Falling back to '' here (instead of leaving searchString alone) used to wipe
+        // out text the user had typed but never selected — e.g. LocationSelect.vue's async
+        // geocode response arriving after a blur-triggered close(): closing never clears
+        // searchString, but the next open() did, right as the now-populated options would
+        // finally have been filterable by what they typed.
+        if (this.innerValue) {
+          this.searchString = String(this.innerValue[this.labelProp] || this.innerValue)
+        }
       } else if (this.autoResetSearch || this.multiple) {
         this.resetSearch()
       }
