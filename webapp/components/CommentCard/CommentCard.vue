@@ -242,7 +242,7 @@ export default {
         this.$toast.success(this.$t(`delete.comment.success`))
         this.$emit('deleteComment', DeleteComment)
       } catch (err) {
-        this.$toast.error(err.message)
+        this.$toast.error(this.$backendError(err))
       }
     },
   },

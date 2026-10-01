@@ -176,7 +176,7 @@ export default {
       },
       error(error) {
         this.Group = []
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       },
       fetchPolicy: 'cache-and-network',
     },

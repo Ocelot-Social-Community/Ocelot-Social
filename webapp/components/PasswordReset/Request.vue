@@ -97,7 +97,7 @@ export default {
           this.$emit('handleSubmitted', { email })
         }, 3000)
       } catch (err) {
-        this.$toast.error(err.message)
+        this.$toast.error(this.$backendError(err))
       }
     },
   },

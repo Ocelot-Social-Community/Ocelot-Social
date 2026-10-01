@@ -2,6 +2,9 @@ import { createHash, randomBytes } from 'node:crypto'
 
 import { v4 as uuid } from 'uuid'
 
+import { ErrorCode } from '@graphql/errorCodes'
+import { ForbiddenError, UserInputError } from '@graphql/errors'
+
 import Resolver from './helpers/Resolver'
 
 import type { Context } from '@src/context'
@@ -107,11 +110,13 @@ export default {
   Mutation: {
     createApiKey: async (_parent: unknown, args: ApiKeyArgs, context: Context) => {
       if (!context.policy.get('apiKeysEnabled')) {
-        throw new Error('API keys are not enabled')
+        throw new ForbiddenError('API keys are not enabled', { code: ErrorCode.API_KEYS_DISABLED })
       }
 
       if (args.expiresInDays != null && args.expiresInDays < 1) {
-        throw new Error('expiresInDays must be a positive integer')
+        throw new UserInputError('expiresInDays must be a positive integer', {
+          code: ErrorCode.API_KEY_EXPIRY_INVALID,
+        })
       }
 
       let expiresAt: string | null = null
@@ -161,8 +166,12 @@ export default {
       })
 
       if (result.records.length === 0) {
-        throw new Error(
+        throw new UserInputError(
           `Maximum of ${String(context.policy.get('apiKeysMaxPerUser'))} active API keys reached`,
+          {
+            code: ErrorCode.API_KEYS_LIMIT_REACHED,
+            params: { max: context.policy.get('apiKeysMaxPerUser') },
+          },
         )
       }
 
@@ -182,7 +191,7 @@ export default {
         variables: { userId: context.user?.id, keyId: args.id, name: args.name },
       })
       if (result.records.length === 0) {
-        throw new Error('API key not found')
+        throw new UserInputError('API key not found', { code: ErrorCode.API_KEY_NOT_FOUND })
       }
       return normalizeApiKey(getRecord(result.records[0], 'k'))
     },

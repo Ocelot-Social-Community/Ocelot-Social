@@ -46,7 +46,7 @@ describe('LoginForm', () => {
       }
       const store = new Vuex.Store(storeMocks)
       mocks = {
-        $t: () => {},
+        $t: (key) => key,
         $toast: {
           success: jest.fn(),
           error: jest.fn(),
@@ -62,6 +62,39 @@ describe('LoginForm', () => {
         wrapper.find('input[name="password"]').setValue(password)
         await wrapper.find('form').trigger('submit')
       }
+
+      describe('login fails', () => {
+        const failWith = (error) => {
+          const wrapper = Wrapper()
+          storeMocks.actions['auth/login'].mockRejectedValue(error)
+          return wrapper
+        }
+
+        it('shows the generic failure for wrong credentials', async () => {
+          const cause = { graphQLErrors: [{ extensions: { errorCode: 'INVALID_CREDENTIALS' } }] }
+          await fillIn(failWith(new Error('GraphQL error: Incorrect', { cause })))
+          await Vue.nextTick()
+          expect(mocks.$toast.error).toHaveBeenCalledWith('login.failure')
+        })
+
+        it('shows why for a disabled account', async () => {
+          const cause = {
+            message: 'GraphQL error: Your account has been disabled.',
+            graphQLErrors: [{ extensions: { errorCode: 'ACCOUNT_DISABLED' } }],
+          }
+          await fillIn(failWith(new Error('GraphQL error: disabled', { cause })))
+          await Vue.nextTick()
+          expect(mocks.$toast.error).toHaveBeenCalledWith(
+            'GraphQL error: Your account has been disabled.',
+          )
+        })
+
+        it('shows the cookie hint when no cookie can be set', async () => {
+          await fillIn(failWith(new Error('Error: no-cookie')))
+          await Vue.nextTick()
+          expect(mocks.$toast.error).toHaveBeenCalledWith('login.no-cookie')
+        })
+      })
 
       it('dispatches login with form data', async () => {
         await fillIn(Wrapper())

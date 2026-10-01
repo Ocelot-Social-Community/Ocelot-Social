@@ -10,6 +10,7 @@ import { withFilter } from 'graphql-subscriptions'
 import { AccessToken, RoomServiceClient, TwirpError } from 'livekit-server-sdk'
 
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@constants/subscriptions'
+import { ErrorCode } from '@graphql/errorCodes'
 import { ForbiddenError } from '@graphql/errors'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
@@ -35,7 +36,7 @@ const httpUrlFor = (livekitUrl: string) =>
 // to have the secrets the RoomService below needs.
 const ensureEnabled = (enabled: boolean) => {
   if (!enabled) {
-    throw new Error('Video calls are disabled.')
+    throw new ForbiddenError('Video calls are disabled.', { code: ErrorCode.VIDEO_CALLS_DISABLED })
   }
 }
 
@@ -76,7 +77,7 @@ const getGroupMembershipType = async (
       ),
     )
     if (result.records.length === 0) {
-      throw new ForbiddenError('Not a member of this group.')
+      throw new ForbiddenError('Not a member of this group.', { code: ErrorCode.NOT_GROUP_MEMBER })
     }
     return result.records[0].get('groupType') as string
   } finally {
@@ -215,7 +216,9 @@ export default {
       if (participantCount === 0) {
         const permission = openPermissionForGroupType(groupType)
         if (!permission || !context.effectivePermissions.has(permission)) {
-          throw new ForbiddenError('You may not start a video call in this group.')
+          throw new ForbiddenError('You may not start a video call in this group.', {
+            code: ErrorCode.VIDEO_CALL_NOT_ALLOWED,
+          })
         }
       }
       // LiveKit treats `identity` as a unique key in a room; two connections

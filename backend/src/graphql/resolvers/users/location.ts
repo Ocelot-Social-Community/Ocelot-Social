@@ -9,6 +9,7 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-loop-func */
 
+import { ErrorCode } from '@graphql/errorCodes'
 import { UserInputError } from '@graphql/errors'
 
 import type { Context } from '@src/context'
@@ -113,7 +114,9 @@ export const extractCoordinates = (
   const hasLat = typeof lat === 'number'
   const hasLng = typeof lng === 'number'
   if (hasLat !== hasLng) {
-    throw new UserInputError(`${entityLabel} location requires both lat and lng, or neither!`)
+    throw new UserInputError(`${entityLabel} location requires both lat and lng, or neither!`, {
+      code: ErrorCode.LOCATION_INVALID,
+    })
   }
   if (!hasLat) {
     return null
@@ -121,11 +124,13 @@ export const extractCoordinates = (
   if (!Number.isFinite(lat) || lat < -90 || lat > 90) {
     throw new UserInputError(
       `${entityLabel} location latitude must be a finite number between -90 and 90!`,
+      { code: ErrorCode.LOCATION_INVALID },
     )
   }
   if (!Number.isFinite(lng) || lng < -180 || lng > 180) {
     throw new UserInputError(
       `${entityLabel} location longitude must be a finite number between -180 and 180!`,
+      { code: ErrorCode.LOCATION_INVALID },
     )
   }
   return { lat, lng }
@@ -194,7 +199,9 @@ export const createOrUpdateLocations = async (
         reverseGeocodeTypes,
       )
       if (!data?.place_type?.length) {
-        throw new UserInputError('location coordinates are invalid')
+        throw new UserInputError('location coordinates are invalid', {
+          code: ErrorCode.LOCATION_INVALID,
+        })
       }
     } else {
       // matchLocationNameExactly reuses reverseGeocodeTypes as the forward-
@@ -223,7 +230,7 @@ export const createOrUpdateLocations = async (
       const res = await response.json()
 
       if (!res?.features?.[0]) {
-        throw new UserInputError('locationName is invalid')
+        throw new UserInputError('locationName is invalid', { code: ErrorCode.LOCATION_INVALID })
       }
 
       res.features.forEach((item) => {
@@ -243,13 +250,13 @@ export const createOrUpdateLocations = async (
         // flag) keeps the fallback: there, locationName is free text with no claim to an exact
         // match in the first place.
         if (matchLocationNameExactly) {
-          throw new UserInputError('locationName is invalid')
+          throw new UserInputError('locationName is invalid', { code: ErrorCode.LOCATION_INVALID })
         }
         data = res.features[0]
       }
 
       if (!data?.place_type?.length) {
-        throw new UserInputError('locationName is invalid')
+        throw new UserInputError('locationName is invalid', { code: ErrorCode.LOCATION_INVALID })
       }
     }
 

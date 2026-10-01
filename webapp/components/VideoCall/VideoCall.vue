@@ -818,7 +818,7 @@ export default {
         this.refreshTiles()
         this.phase = 'in-call'
       } catch (err) {
-        const message = (err && err.message) || String(err)
+        const message = this.$backendError(err)
         // The user navigated away while the handshake was still running, so
         // the window is parked in the corner. Since isFullscreen treats every
         // non-'in-call' phase as full screen, showing the error block here
