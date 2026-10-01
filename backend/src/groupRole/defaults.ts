@@ -44,7 +44,6 @@ const ADMIN_EXTRAS: GroupPermissionKey[] = [
   // Taking a post out of the group. Not deleting it: it stays with its author, which is why
   // this is a group right and not a moderation right about the post itself.
   'group.post.moderate',
-  'group.member.approve',
   'group.member.remove',
   'group.member.role.assign',
   // DEVIATION: owner-only today, although the schema doc claims admins may change

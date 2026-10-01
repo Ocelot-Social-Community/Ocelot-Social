@@ -307,9 +307,10 @@ describe('canJoinGroup', () => {
     expect(await resolve(canJoinGroup, {}, { groupId: 'g1', userId: 'actor' }, neither)).toBe(false)
   })
 
-  it('treats adding somebody ELSE as membership management', async () => {
+  it('treats adding somebody ELSE as giving them a role', async () => {
     // Before this rule, any authenticated user could add any other user to a public group.
-    const approver = contextFor({ group: { effective: ['group.member.approve'] } })
+    // `group.join` is about one's OWN membership, so it says nothing about another person.
+    const approver = contextFor({ group: { effective: ['group.member.role.assign'] } })
     const joiner = contextFor({ group: { effective: ['group.join'] } })
 
     expect(await resolve(canJoinGroup, {}, { groupId: 'g1', userId: 'other' }, approver)).toBe(true)

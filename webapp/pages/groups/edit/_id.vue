@@ -40,9 +40,9 @@ const TABS = [
   {
     path: '/members',
     label: 'group.members',
-    // Any of the three: the tab is the member list plus the actions on it, and a group may
-    // hand out approving without removing.
-    permissions: ['group.member.approve', 'group.member.remove', 'group.member.role.assign'],
+    // Either: the tab is the member list plus the actions on it, and a group may hand out
+    // changing roles without removing.
+    permissions: ['group.member.remove', 'group.member.role.assign'],
   },
   { path: '/invites', label: 'group.invite-links', permissions: ['group.invite'] },
   { path: '/rights', label: 'group.rights.title', permissions: ['group.role.manage'] },

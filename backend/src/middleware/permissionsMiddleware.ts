@@ -476,8 +476,11 @@ const canChangeGroupType = rule({ cache: 'no_cache' })(async (_parent, args, ctx
 // Joining is two different acts sharing one mutation: joining oneself, and adding somebody
 // else. The first is governed by group.join / group.join.request (which of the two the viewer
 // holds also decides whether they land as a member or as an applicant — the resolver reads the
-// same pair), the second is membership management and needs group.member.approve. Before this,
-// ANY authenticated user could add ANY other user to a public or closed group.
+// same pair). The second gives another person a role in the group, which is what
+// group.member.role.assign names — there is no separate approve right, because nothing can
+// approve yet: JoinGroup writes the role ON CREATE only, so an existing applicant cannot be
+// promoted through it. That feature is its own issue (#10352), UI included. Before any of
+// this, ANY authenticated user could add ANY other user to a public or closed group.
 const canJoinGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
   if (!ctx.user) {
     return false
@@ -489,7 +492,7 @@ const canJoinGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Cont
   if (args.userId === ctx.user.id) {
     return authorization.has('group.join') || authorization.has('group.join.request')
   }
-  return authorization.has('group.member.approve')
+  return authorization.has('group.member.role.assign')
 })
 
 // Leaving is about one's own membership only; removing somebody else is RemoveUserFromGroup.

@@ -57,7 +57,7 @@ describe(dominatesInGroup, () => {
   it('refuses between incomparable custom roles', () => {
     // Disjoint extras: neither dominates, so for a destructive action both are blocked.
     const editor = new Set<GroupPermissionKey>(['group.read', 'group.post.pin'])
-    const greeter = new Set<GroupPermissionKey>(['group.read', 'group.member.approve'])
+    const greeter = new Set<GroupPermissionKey>(['group.read', 'group.invite'])
 
     expect(dominatesInGroup(editor, greeter)).toBe(false)
     expect(dominatesInGroup(greeter, editor)).toBe(false)

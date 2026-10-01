@@ -27,7 +27,6 @@ const buildStore = (user = { id: 'u1', name: 'User' }) =>
 
 const OWNER_RIGHTS = [
   'group.settings.manage',
-  'group.member.approve',
   'group.member.remove',
   'group.member.role.assign',
   'group.invite',
@@ -113,7 +112,7 @@ describe('pages/groups/edit/_id.vue', () => {
         id: 'g1',
         slug: 's',
         name: 'n',
-        myGroupPermissions: ['group.member.approve'],
+        myGroupPermissions: ['group.member.role.assign'],
       })
       expect(wrapper.vm.routes.map((route) => route.path)).toEqual(['/groups/edit/g1/members'])
     })

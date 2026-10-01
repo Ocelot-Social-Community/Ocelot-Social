@@ -34,7 +34,6 @@ const EXPECTED_KEYS: GroupPermissionKey[] = [
   'group.join',
   'group.join.request',
   'group.leave',
-  'group.member.approve',
   'group.member.remove',
   'group.member.role.assign',
   'group.invite',
@@ -126,7 +125,7 @@ describe('group permission catalog', () => {
       expect(networkPrerequisiteTemplateFor('group.comment.create')).toBe('comment.create')
       expect(networkPrerequisiteTemplateFor('group.type.change')).toBe('group.create_<type>')
       expect(networkPrerequisiteTemplateFor('group.videoCall.create')).toBe(
-        'videoCall.create_<type>',
+        'videoCall.create_<door>',
       )
     })
 
@@ -146,7 +145,7 @@ describe('group permission catalog', () => {
         key: 'group.videoCall.create',
         group: 'communication',
         gatedBy: ['videoConference'],
-        requiresNetworkPermission: 'videoCall.create_<type>',
+        requiresNetworkPermission: 'videoCall.create_<door>',
       })
       expect(entry?.description.length).toBeGreaterThan(0)
     })

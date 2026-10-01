@@ -533,8 +533,8 @@ export default {
       const { groupId, userId } = params
       // Where the membership lands follows the RIGHT, not the group type: someone who holds
       // group.join enters as a member, someone who only holds group.join.request waits as an
-      // applicant. Adding another person is an act of membership management (the shield
-      // required group.member.approve for it), so it lands as a member. The group type still
+      // applicant. Adding another person gives them a role in the group (the shield required
+      // group.member.role.assign for it), so it lands as a member. The group type still
       // decides all of this — it just does so through the non-member role it seeded.
       const authorization = await context.groupAuthorization.forGroup(groupId)
       const joinsAsMember = context.user?.id !== userId || !!authorization?.has('group.join')

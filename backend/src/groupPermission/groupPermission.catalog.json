@@ -46,10 +46,6 @@
       "group": "membership",
       "description": "Leave the group."
     },
-    "group.member.approve": {
-      "group": "membership",
-      "description": "Approve a pending applicant, turning them into a member."
-    },
     "group.member.remove": {
       "group": "membership",
       "description": "Remove a member from the group, subject to the act-on hierarchy."
@@ -86,9 +82,9 @@
     },
     "group.videoCall.create": {
       "group": "communication",
-      "requiresNetworkPermission": "videoCall.create_<type>",
+      "requiresNetworkPermission": "videoCall.create_<door>",
       "gatedBy": "videoConference",
-      "description": "Open a video call in the group."
+      "description": "Open a video call in the group. Capped network-side by whether the group is one a stranger can walk into (videoCall.create_open) or not (videoCall.create_restricted)."
     },
     "group.videoCall.join": {
       "group": "communication",

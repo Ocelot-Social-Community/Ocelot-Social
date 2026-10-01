@@ -1154,8 +1154,8 @@ describe('in mode', () => {
             describe('does not create additional "MEMBER_OF" relation and therefore', () => {
               it('has still "owner" as membership role', async () => {
                 // The point of this case is the MERGE semantics (no second edge, role
-                // untouched), so the owner joins THEMSELVES: adding another person is an act of
-                // membership management now and needs group.member.approve.
+                // untouched), so the owner joins THEMSELVES: adding another person gives them
+                // a role in the group and needs group.member.role.assign.
                 authenticatedUser = await ownerOfClosedGroupUser.toJson()
 
                 await expect(
@@ -1349,8 +1349,8 @@ describe('in mode', () => {
               categoryIds,
             },
           })
-          // A join request has to be made BY the applicant: an owner adding somebody is an act
-          // of membership management now (group.member.approve) and lands them as a member,
+          // A join request has to be made BY the applicant: an owner adding somebody assigns
+          // them a role (group.member.role.assign) and lands them as a member,
           // which is what "add a user to the group" has always meant in the UI.
           authenticatedUser = await user.toJson()
           await mutate({

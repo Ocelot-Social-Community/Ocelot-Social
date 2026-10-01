@@ -20,7 +20,6 @@ const MEMBER = [
 const ADMIN = [
   ...MEMBER,
   'group.post.pin',
-  'group.member.approve',
   'group.member.remove',
   'group.member.role.assign',
   'group.settings.manage',
