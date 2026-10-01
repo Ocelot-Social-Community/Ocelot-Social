@@ -934,14 +934,23 @@ export default {
       }
     },
     name: async (parent, _args, context: Context, _resolveInfo) => {
-      if (!context.user) {
+      // An unlisted group keeps its name from a logged-out visitor: an id that leaks somewhere
+      // must not leak a name with it. The one exception is an invite code — holding it IS the
+      // entitlement, and the registration screen has to be able to say what one is invited to
+      // (the marker is set by InviteCode.invitedTo, never by a request).
+      if (!context.user && !parent.invitedThroughCode) {
         return parent.groupType === 'hidden' ? '' : parent.name
       }
       return parent.name
     },
     about: async (parent, _args, context: Context, _resolveInfo) => {
-      if (!context.user) {
+      if (!context.user && !parent.invitedThroughCode) {
         return parent.groupType === 'hidden' ? '' : parent.about
+      }
+      // An invited visitor sees the summary for the same reason they see the name; beyond that
+      // the profile follows `group.read` like for everybody else.
+      if (!context.user) {
+        return parent.about
       }
       // Part of the profile, so it follows `group.read`. For everybody who may read the group
       // — which includes every stranger to a public or closed one — this is just `parent.about`

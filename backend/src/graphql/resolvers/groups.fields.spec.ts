@@ -186,6 +186,22 @@ describe('the profile fields', () => {
     ).toBe('Secret')
   })
 
+  it('name the hidden group a visitor was INVITED to, code in hand', async () => {
+    // `invitedThroughCode` is set by InviteCode.invitedTo and is not a GraphQL field, so no
+    // request can claim it. Holding the code is the entitlement the name rests on.
+    const { context } = contextFor({ user: null, effective: [] })
+    const invited = {
+      ...group,
+      groupType: 'hidden',
+      name: 'Secret',
+      about: 'Hush',
+      invitedThroughCode: true,
+    }
+
+    expect(await Group.name(invited, {}, context, null)).toBe('Secret')
+    expect(await Group.about(invited, {}, context, null)).toBe('Hush')
+  })
+
   it('keep the name of a listed group for a visitor who is not logged in', async () => {
     const { context } = contextFor({ user: null, effective: [] })
 

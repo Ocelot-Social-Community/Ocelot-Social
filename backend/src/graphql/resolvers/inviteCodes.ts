@@ -345,7 +345,13 @@ export default {
       if (result.length !== 1) {
         return null
       }
-      return result[0].get('group')
+      // Reached THROUGH the code, which is the entitlement: whoever holds it was handed it by
+      // somebody in the group, so they get to know which group they were invited to — name,
+      // summary and avatar — even while logged out, and even for an unlisted group. Without
+      // this marker the registration screen would ask them to sign up for "".
+      //
+      // Server-set and not a GraphQL field: no request can claim it (see Group.name/about).
+      return { ...(result[0].get('group') as Record<string, unknown>), invitedThroughCode: true }
     },
     isValid: async (parent: { code?: string }, _args, context: Context, _resolveInfo) => {
       if (!parent.code) {

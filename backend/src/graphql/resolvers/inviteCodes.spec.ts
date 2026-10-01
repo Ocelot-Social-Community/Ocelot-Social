@@ -31,13 +31,16 @@ const INVITE_CODES_GROUP_PER_USER = 7
 let authenticatedUser: Context['user']
 // Per-test role override, for the one case where the network side reaches into a group.
 let rolesOverride: RoleDefinition[] | undefined
+// The network's own invite-registration switch. `group.invite.external` is gated by it, so
+// turning it off has to take the external half of a group invite with it.
+let inviteRegistration = true
 const context = () => ({
   authenticatedUser,
   roles: rolesOverride,
   policy: {
     // user.invite is gated by inviteRegistration; pin it on so generatePersonalInviteCode
     // stays available here regardless of the schema default (the gate is unit-covered).
-    inviteRegistration: true,
+    inviteRegistration,
     inviteCodesPersonalPerUser: INVITE_CODES_PERSONAL_PER_USER,
     inviteCodesGroupPerUser: INVITE_CODES_GROUP_PER_USER,
   },
@@ -232,7 +235,7 @@ describe('validateInviteCode', () => {
       )
     })
 
-    it('returns the inviteCode with redacted group details if the code invites to a hidden group', async () => {
+    it('names the hidden group a code invites to, because holding the code is the entitlement', async () => {
       await expect(
         query({ query: unauthenticatedValidateInviteCode, variables: { code: 'GRPHDN' } }),
       ).resolves.toEqual(
@@ -246,10 +249,14 @@ describe('validateInviteCode', () => {
                 },
                 name: 'Inviting User',
               },
+              // Not blanked, although the viewer is logged out and the group is unlisted:
+              // somebody in that group handed them this code, and the registration screen has
+              // to be able to say what they are signing up for. Everything beyond name and
+              // summary still follows `group.read`.
               invitedTo: {
                 groupType: 'hidden',
-                name: '',
-                about: '',
+                name: 'Hidden Group',
+                about: 'We are hidden',
                 avatar: null,
               },
               isValid: true,
@@ -670,6 +677,33 @@ describe('generateGroupInviteCode', () => {
       ).resolves.toMatchObject({
         data: null,
         errors: [{ message: 'Not Authorized!' }],
+      })
+    })
+  })
+
+  describe('while the network has invite registration switched off', () => {
+    // Restored here rather than at the end of the test body, so a failing expectation cannot
+    // leave the switch off for everything that follows.
+    afterEach(() => {
+      inviteRegistration = true
+    })
+
+    it('leaves the group invite usable but strips its external half', async () => {
+      // `group.invite.external` is gated by the `inviteRegistration` policy (E11): a network
+      // that does not let people register by invitation must not be undercut through groups.
+      // The group invite itself keeps working — it brings existing accounts in.
+      inviteRegistration = false
+      authenticatedUser = await invitingUser.toJson()
+
+      const { data, errors } = await mutate({
+        mutation: generateGroupInviteCode,
+        variables: { groupId: 'public-group' },
+      })
+
+      expect(errors).toBeUndefined()
+      expect(data.generateGroupInviteCode).toMatchObject({
+        isValid: true,
+        allowsRegistration: false,
       })
     })
   })
