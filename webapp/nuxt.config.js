@@ -236,6 +236,7 @@ export default {
     { src: '~/plugins/vue-directives.js', ssr: false },
     { src: '~/plugins/v-tooltip.js', ssr: false },
     { src: '~/plugins/izi-toast.js', ssr: false },
+    { src: '~/plugins/backend-error.js' },
     { src: '~/plugins/vue-filters.js' },
     { src: '~/plugins/vue-infinite-loading.js', ssr: false },
     { src: '~/plugins/vue-observe-visibility.js', ssr: false },

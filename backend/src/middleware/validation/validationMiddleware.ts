@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { ErrorCode } from '@graphql/errorCodes'
 import { UserInputError } from '@graphql/errors'
 
 import type { IMiddlewareResolver } from 'graphql-middleware/types'
@@ -16,7 +17,10 @@ const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, c
   const { postId } = args
 
   if (!args.content || content.length < COMMENT_MIN_LENGTH) {
-    throw new UserInputError(`Comment must be at least ${COMMENT_MIN_LENGTH} character long!`)
+    throw new UserInputError(`Comment must be at least ${COMMENT_MIN_LENGTH} character long!`, {
+      code: ErrorCode.COMMENT_TOO_SHORT,
+      params: { min: COMMENT_MIN_LENGTH },
+    })
   }
   const session = context.driver.session()
   try {
@@ -34,7 +38,7 @@ const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, c
     })
 
     if (!post) {
-      throw new UserInputError(NO_POST_ERR_MESSAGE)
+      throw new UserInputError(NO_POST_ERR_MESSAGE, { code: ErrorCode.POST_NOT_FOUND })
     } else {
       return resolve(root, args, context, info)
     }
@@ -46,7 +50,10 @@ const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, c
 const validateUpdateComment: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const content = args.content.replace(/<(?:.|\n)*?>/gm, '').trim()
   if (!args.content || content.length < COMMENT_MIN_LENGTH) {
-    throw new UserInputError(`Comment must be at least ${COMMENT_MIN_LENGTH} character long!`)
+    throw new UserInputError(`Comment must be at least ${COMMENT_MIN_LENGTH} character long!`, {
+      code: ErrorCode.COMMENT_TOO_SHORT,
+      params: { min: COMMENT_MIN_LENGTH },
+    })
   }
 
   return resolve(root, args, context, info)
@@ -56,7 +63,7 @@ const validateReport: IMiddlewareResolver = async (resolve, root, args, context,
   const { resourceId } = args
   const { user } = context
   if (resourceId === user.id) {
-    throw new Error('You cannot report yourself!')
+    throw new UserInputError('You cannot report yourself!', { code: ErrorCode.CANNOT_REPORT_SELF })
   }
   return resolve(root, args, context, info)
 }
@@ -66,7 +73,7 @@ const validateReview: IMiddlewareResolver = async (resolve, root, args, context,
   let existingReportedResource
   const { user, driver } = context
   if (resourceId === user.id) {
-    throw new Error('You cannot review yourself!')
+    throw new UserInputError('You cannot review yourself!', { code: ErrorCode.CANNOT_REVIEW_OWN })
   }
   const session = driver.session()
   try {
@@ -105,7 +112,9 @@ const validateReview: IMiddlewareResolver = async (resolve, root, args, context,
         ? existingReportedResource.author.properties.id
         : null
     if (authorId && authorId === user.id) {
-      throw new Error(`You cannot review your own ${existingReportedResource.label}!`)
+      throw new UserInputError(`You cannot review your own ${existingReportedResource.label}!`, {
+        code: ErrorCode.CANNOT_REVIEW_OWN,
+      })
     }
   } finally {
     await session.close()
@@ -136,7 +145,10 @@ export const validateNotifyUsers = async (label: string, reason: string): Promis
 const validateUpdateUser: IMiddlewareResolver = async (resolve, root, params, context, info) => {
   const { name } = params
   if (typeof name === 'string' && name.trim().length < USERNAME_MIN_LENGTH) {
-    throw new UserInputError(`Username must be at least ${USERNAME_MIN_LENGTH} character long!`)
+    throw new UserInputError(`Username must be at least ${USERNAME_MIN_LENGTH} character long!`, {
+      code: ErrorCode.USERNAME_TOO_SHORT,
+      params: { min: USERNAME_MIN_LENGTH },
+    })
   }
   return resolve(root, params, context, info)
 }

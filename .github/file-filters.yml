@@ -73,6 +73,10 @@ webapp: &webapp
   - 'styleguide/**/*'
   - 'package.json'
   - *ui
+  # scripts/translations/backend-error-codes.sh checks webapp/locales/en.json against the backend's
+  # error codes, so adding a code there without its translation must fail the webapp check
+  - 'backend/src/graphql/errorCodes.ts'
+  - 'scripts/translations/**/*'
   # webapp consumes @ocelot-social/branding (file: dep) → a branding change can break it
   - *branding
 

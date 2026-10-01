@@ -6,6 +6,7 @@ import VTooltip from 'v-tooltip'
 import Filters from '~/plugins/vue-filters'
 import InfiniteLoading from '~/plugins/vue-infinite-loading'
 import Directives from '~/plugins/vue-directives'
+import BackendError from '~/plugins/backend-error'
 import VueObserveVisibility from '~/plugins/vue-observe-visibility'
 import PermissionGate from '~/components/_new/generic/PermissionGate/PermissionGate.vue'
 
@@ -59,6 +60,11 @@ Vue.prototype.$env = defaultEnv
 // default so existing tests behave as before; denied/gray-out tests override per-mount
 // with `mocks: { $can: () => false }` or `(p) => allowed.includes(p)`.
 Vue.prototype.$can = () => true
+
+// Mirror the $backendError inject (plugins/backend-error.js) on the prototype, for the same reason.
+// The real one: with no $i18n.keyExists in a spec's mocks it shows the error's own message, which
+// is what those specs assert.
+BackendError()
 
 global.localVue = createLocalVue()
 

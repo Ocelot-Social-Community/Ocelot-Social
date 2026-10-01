@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import bcrypt from 'bcryptjs'
 
+import { ErrorCode } from '@graphql/errorCodes'
 import { AuthenticationError } from '@graphql/errors'
 import { encode } from '@jwt/encode'
 
@@ -57,9 +58,13 @@ export default {
           delete currentUser.encryptedPassword
           return encode(context)(currentUser)
         } else if (currentUser?.disabled) {
-          throw new AuthenticationError('Your account has been disabled.')
+          throw new AuthenticationError('Your account has been disabled.', {
+            code: ErrorCode.ACCOUNT_DISABLED,
+          })
         } else {
-          throw new AuthenticationError('Incorrect email address or password.')
+          throw new AuthenticationError('Incorrect email address or password.', {
+            code: ErrorCode.INVALID_CREDENTIALS,
+          })
         }
       } finally {
         await session.close()
@@ -76,15 +81,21 @@ export default {
       })
       const encryptedPassword = stored.records[0]?.get('encryptedPassword') as string | undefined
       if (!encryptedPassword) {
-        throw new AuthenticationError('Old password is not correct')
+        throw new AuthenticationError('Old password is not correct', {
+          code: ErrorCode.OLD_PASSWORD_INCORRECT,
+        })
       }
 
       if (!(await bcrypt.compare(oldPassword, encryptedPassword))) {
-        throw new AuthenticationError('Old password is not correct')
+        throw new AuthenticationError('Old password is not correct', {
+          code: ErrorCode.OLD_PASSWORD_INCORRECT,
+        })
       }
 
       if (await bcrypt.compare(newPassword, encryptedPassword)) {
-        throw new AuthenticationError('Old password and new password should be different')
+        throw new AuthenticationError('Old password and new password should be different', {
+          code: ErrorCode.PASSWORD_UNCHANGED,
+        })
       }
 
       const newEncryptedPassword = await bcrypt.hash(newPassword, 10)
