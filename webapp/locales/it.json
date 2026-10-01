@@ -998,6 +998,7 @@
         "channel": "Trasforma in canale (scrivono solo gli amministratori)"
       },
       "reset": "Ripristina i valori predefiniti",
+      "resultingType": "Con questi permessi il gruppo è:",
       "roleKeyPlaceholder": "chiave, ad es. redazione",
       "roleLabelPlaceholder": "nome visualizzato, ad es. Redazione",
       "saved": "Permessi salvati",

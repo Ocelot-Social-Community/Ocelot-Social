@@ -228,9 +228,43 @@ describe('canChangeGroupType', () => {
     )
   })
 
+  it('needs the creation right for the target level, too (E10)', async () => {
+    // The cap: switching to a more private type is the same act as creating the group that
+    // way, so it asks the same right. Without it, "public now, hidden in a minute" is the way
+    // around `group.create_hidden`.
+    const holder = contextFor({
+      group: { groupType: 'public', effective: ['group.type.change'] },
+      network: ['group.create_hidden'],
+    })
+    const without = contextFor({
+      group: { groupType: 'public', effective: ['group.type.change'] },
+      network: ['group.create_public'],
+    })
+
+    expect(await resolve(canChangeGroupType, {}, { id: 'g1', groupType: 'hidden' }, holder)).toBe(
+      true,
+    )
+    expect(await resolve(canChangeGroupType, {}, { id: 'g1', groupType: 'hidden' }, without)).toBe(
+      false,
+    )
+  })
+
+  it('asks for no creation right when the switch opens the group up', async () => {
+    // Opening takes nothing away from people outside the group.
+    const context = contextFor({
+      group: { groupType: 'hidden', effective: ['group.type.change'] },
+      network: [],
+    })
+
+    expect(await resolve(canChangeGroupType, {}, { id: 'g1', groupType: 'public' }, context)).toBe(
+      true,
+    )
+  })
+
   it('needs the right for an actual change', async () => {
     const withRight = contextFor({
       group: { groupType: 'public', effective: ['group.type.change'] },
+      network: ['group.create_closed'],
     })
     const without = contextFor({ group: { groupType: 'public', effective: [] } })
 

@@ -998,6 +998,7 @@
         "channel": "Turn into a channel (only admins write)"
       },
       "reset": "Reset to defaults",
+      "resultingType": "With these rights the group is:",
       "roleKeyPlaceholder": "key, e.g. editors",
       "roleLabelPlaceholder": "display name, e.g. Editors",
       "saved": "Rights saved",

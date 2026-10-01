@@ -998,6 +998,7 @@
         "channel": "Zamień w kanał (piszą tylko administratorzy)"
       },
       "reset": "Przywróć domyślne",
+      "resultingType": "Z tymi uprawnieniami grupa jest:",
       "roleKeyPlaceholder": "klucz, np. redakcja",
       "roleLabelPlaceholder": "nazwa wyświetlana, np. Redakcja",
       "saved": "Uprawnienia zapisane",

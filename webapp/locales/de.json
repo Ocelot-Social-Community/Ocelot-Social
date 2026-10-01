@@ -998,6 +998,7 @@
         "channel": "Als Kanal einrichten (nur Admins schreiben)"
       },
       "reset": "Auf Standard zuruecksetzen",
+      "resultingType": "Mit diesen Rechten ist die Gruppe:",
       "roleKeyPlaceholder": "Schluessel, z. B. redaktion",
       "roleLabelPlaceholder": "Anzeigename, z. B. Redaktion",
       "saved": "Rechte gespeichert",

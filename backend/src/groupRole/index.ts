@@ -19,6 +19,14 @@ export { seedGroupRoleTemplates } from './seedTemplates'
 export { seedRolesForGroupsWithoutRoles } from './repository'
 export { parseStoredPermissions } from './storedPermissions'
 export { nonMemberAccessFrom, defaultNonMemberAccessFor } from './nonMemberAccess'
+export {
+  createPermissionForLevel,
+  isMorePrivate,
+  PRIVACY_LEVELS,
+  privacyLevelFrom,
+  privacyLevelOfPermissions,
+} from './privacyLevel'
+export type { GroupPrivacyLevel } from './privacyLevel'
 export type { NonMemberAccess } from './nonMemberAccess'
 export {
   dominatesInGroup,

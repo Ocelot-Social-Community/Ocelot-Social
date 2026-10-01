@@ -998,6 +998,7 @@
         "channel": "Omzetten in een kanaal (alleen beheerders schrijven)"
       },
       "reset": "Terug naar de standaard",
+      "resultingType": "Met deze rechten is de groep:",
       "roleKeyPlaceholder": "sleutel, bijv. redactie",
       "roleLabelPlaceholder": "weergavenaam, bijv. Redactie",
       "saved": "Rechten opgeslagen",

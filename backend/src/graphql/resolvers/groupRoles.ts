@@ -3,7 +3,16 @@ import { withFilter } from 'graphql-subscriptions'
 import { GROUP_PERMISSIONS_CHANGED } from '@constants/subscriptions'
 import { UserInputError } from '@graphql/errors'
 import { groupPermissionCatalog, sanitizeGroupPermissions } from '@src/groupPermission'
-import { coversRole, NONE_ROLE, OWNER_ROLE, SYSTEM_ROLE_NAMES, USUAL_ROLE } from '@src/groupRole'
+import {
+  coversRole,
+  createPermissionForLevel,
+  isMorePrivate,
+  NONE_ROLE,
+  OWNER_ROLE,
+  privacyLevelOfPermissions,
+  SYSTEM_ROLE_NAMES,
+  USUAL_ROLE,
+} from '@src/groupRole'
 import {
   deleteGroupRole,
   markGroupRolesCustomized,
@@ -16,10 +25,11 @@ import {
   writeGroupRole,
   writeGroupRoleTemplate,
 } from '@src/groupRole/repository'
+import { isPermissionAvailable } from '@src/permission'
 
 import type { Context } from '@src/context'
 import type { GroupPermissionKey } from '@src/groupPermission'
-import type { GroupRoleDefinition } from '@src/groupRole'
+import type { GroupPrivacyLevel, GroupRoleDefinition } from '@src/groupRole'
 import type { PermissionKey } from '@src/permission'
 
 // A role name is a KEY, not a display name — the label carries the wording. Kept narrow on
@@ -68,6 +78,40 @@ const validateLabel = (label: string | null | undefined): string | null => {
     throw new UserInputError('Invalid role label!')
   }
   return label
+}
+
+/** The network side of a right, gate-aware — the same reading the shield's rules use. */
+const hasNetworkPermission = (context: Context, permission: PermissionKey): boolean =>
+  context.effectivePermissions.has(permission) && isPermissionAvailable(permission, context)
+
+/**
+ * Making a group MORE private needs the right to have created it that way (concept E10).
+ *
+ * `group.type.change` is capped by `group.create_<type>`, but the type is derived from the
+ * rights now — so without this the cap would be one edit away from pointless: create a public
+ * group with `group.create_public`, take `group.read` off its non-member role, and the result
+ * is an unlisted group nobody checked `group.create_hidden` for.
+ *
+ * Only the direction that takes something away is checked. Opening a group up asks for no
+ * right: whoever may edit the roles can already see everything inside.
+ */
+const requirePrivacyCap = async (
+  context: Context,
+  groupId: string,
+  nextNonMemberPermissions: GroupPermissionKey[],
+): Promise<void> => {
+  const authorization = await context.groupAuthorization.forGroup(groupId)
+  if (!authorization) {
+    throw new UserInputError('Group not found!')
+  }
+  const next = privacyLevelOfPermissions(nextNonMemberPermissions)
+  if (!isMorePrivate(next, authorization.groupType as GroupPrivacyLevel)) {
+    return
+  }
+  const needed = createPermissionForLevel(next)
+  if (!needed || !hasNetworkPermission(context, needed)) {
+    throw new UserInputError('You cannot make this group more private than you may create one!')
+  }
 }
 
 /**
@@ -250,6 +294,10 @@ export default {
       }
       const permissions = sanitizeGroupPermissions(params.permissions)
       await requireCoverage(context, groupId, permissions)
+      if (name === NONE_ROLE) {
+        // The non-member role IS the group's visibility, so editing it is the type change.
+        await requirePrivacyCap(context, groupId, permissions)
+      }
       const now = new Date().toISOString()
       const updated = { ...existing, label, permissions }
       await writeGroupRole(context.database, groupId, updated, actorId(context), now)
@@ -439,6 +487,15 @@ export default {
         ...existing,
         label: validateLabel(params.label),
         permissions: existing.protected ? [] : sanitizeGroupPermissions(params.permissions),
+      }
+      // A template's NAME is a privacy level, and the level is derived from exactly these
+      // rights — so a `public` template whose non-member role cannot read is a contradiction,
+      // and every group created from it would be listed as something it is not. The operator
+      // who wants that has the `closed` template for it.
+      if (name === NONE_ROLE && privacyLevelOfPermissions(updated.permissions) !== groupType) {
+        throw new UserInputError(
+          'These rights would make this template a different group type than it is named!',
+        )
       }
       await writeGroupRoleTemplate(
         context.database,

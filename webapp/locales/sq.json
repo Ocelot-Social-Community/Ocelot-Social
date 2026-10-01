@@ -998,6 +998,7 @@
         "channel": "Shndërroje në kanal (shkruajnë vetëm administratorët)"
       },
       "reset": "Rikthe parazgjedhjet",
+      "resultingType": "Me këto leje grupi është:",
       "roleKeyPlaceholder": "çelës, p.sh. redaksia",
       "roleLabelPlaceholder": "emri i shfaqur, p.sh. Redaksia",
       "saved": "Lejet u ruajtën",

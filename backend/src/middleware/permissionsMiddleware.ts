@@ -15,12 +15,19 @@ import {
   optionalMemberRoleMatch,
 } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { inviteCodeAllowsRegistration } from '@graphql/resolvers/inviteCodes'
-import { coversRole, mayAssignGroupRole, mayRemoveGroupMember } from '@src/groupRole'
+import {
+  coversRole,
+  createPermissionForLevel,
+  isMorePrivate,
+  mayAssignGroupRole,
+  mayRemoveGroupMember,
+} from '@src/groupRole'
 import { isPermissionAvailable } from '@src/permission'
 import { dominates } from '@src/role'
 
 import type { Context } from '@src/context'
 import type { GroupPermissionKey } from '@src/groupPermission'
+import type { GroupPrivacyLevel } from '@src/groupRole'
 import type { GroupAuthorization } from '@src/groupRole/requestScope'
 import type { PermissionKey } from '@src/permission'
 import type {
@@ -451,7 +458,19 @@ const canChangeGroupType = rule({ cache: 'no_cache' })(async (_parent, args, ctx
   if (args.groupType === authorization.groupType) {
     return true
   }
-  return authorization.has('group.type.change')
+  if (!authorization.has('group.type.change')) {
+    return false
+  }
+  // And the network cap (E10): switching to a more private type needs the right to have
+  // created the group that way, or "public now, hidden in a minute" is the way around
+  // `group.create_hidden`. The same cap guards the rights matrix, which is the other way to
+  // the same result (see requirePrivacyCap in resolvers/groupRoles.ts).
+  const target = args.groupType as GroupPrivacyLevel
+  if (!isMorePrivate(target, authorization.groupType as GroupPrivacyLevel)) {
+    return true
+  }
+  const needed = createPermissionForLevel(target)
+  return !!needed && hasPermissionEffective(ctx, needed)
 })
 
 // Joining is two different acts sharing one mutation: joining oneself, and adding somebody

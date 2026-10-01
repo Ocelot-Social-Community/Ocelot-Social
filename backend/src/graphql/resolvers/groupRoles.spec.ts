@@ -101,6 +101,9 @@ const contextFor = (options: ContextOptions = {}) => {
   const context = {
     user: options.user === undefined ? { id: 'actor' } : options.user,
     effectivePermissions: new Set((options.network ?? []) as PermissionKey[]),
+    // `group.create_*` is gated by `groupsEnabled`, so without a policy reader the privacy cap
+    // would answer "unavailable" and the gate rather than the cap would be under test.
+    policy: { getEffective: () => true, get: () => true },
     database: {
       query: vi.fn(async (args: { query: string; variables?: Record<string, unknown> }) => {
         queries.push(args)
@@ -442,6 +445,103 @@ describe('Mutation.updateGroupRole', () => {
         context,
       ),
     ).rejects.toThrow('You cannot grant rights you do not hold yourself!')
+  })
+
+  describe('the privacy cap on the non-member role (E10)', () => {
+    // Editing `none` IS the type change now, because the type is derived from exactly the two
+    // read rights on it. Without the cap, "create public, then take group.read away" would be
+    // the way around `group.create_hidden`.
+    const editorOf = (groupType: string, network: string[] = []) => ({
+      authorization: {
+        groupType,
+        // Enough to COVER what the tests grant: the coverage rule is a separate guard, and a
+        // missing right there would fail these for the wrong reason.
+        effective: ['group.role.manage', 'group.read', 'group.content.read', 'group.members.read'],
+      },
+      network,
+    })
+
+    beforeEach(() => {
+      mocked.readGroupRoles.mockResolvedValue([role('none', ['group.read', 'group.content.read'])])
+    })
+
+    it('refuses to unlist a public group without group.create_hidden', async () => {
+      const { context } = contextFor(editorOf('public'))
+
+      await expect(
+        Mutation.updateGroupRole({}, { groupId: 'g1', name: 'none', permissions: [] }, context),
+      ).rejects.toThrow('You cannot make this group more private than you may create one!')
+    })
+
+    it('allows it for somebody who may create hidden groups', async () => {
+      const { context } = contextFor(editorOf('public', ['group.create_hidden']))
+
+      await expect(
+        Mutation.updateGroupRole({}, { groupId: 'g1', name: 'none', permissions: [] }, context),
+      ).resolves.toMatchObject({ name: 'none', permissions: [] })
+    })
+
+    it('refuses to close a public group`s content without group.create_closed', async () => {
+      const { context } = contextFor(editorOf('public'))
+
+      await expect(
+        Mutation.updateGroupRole(
+          {},
+          { groupId: 'g1', name: 'none', permissions: ['group.read'] },
+          context,
+        ),
+      ).rejects.toThrow('more private')
+    })
+
+    it('lets anybody who may edit the roles OPEN a group up', async () => {
+      // The other direction takes nothing away from people outside, and whoever may edit the
+      // roles can see everything inside already.
+      const { context } = contextFor(editorOf('hidden'))
+
+      await expect(
+        Mutation.updateGroupRole(
+          {},
+          { groupId: 'g1', name: 'none', permissions: ['group.read', 'group.content.read'] },
+          context,
+        ),
+      ).resolves.toMatchObject({ name: 'none' })
+    })
+
+    it('asks for nothing when the level does not change', async () => {
+      // A group editing what its non-member role may do WITHOUT touching the two read rights —
+      // say the member list — must not need a creation right for that.
+      const { context } = contextFor(editorOf('public'))
+
+      await expect(
+        Mutation.updateGroupRole(
+          {},
+          {
+            groupId: 'g1',
+            name: 'none',
+            permissions: ['group.read', 'group.content.read', 'group.members.read'],
+          },
+          context,
+        ),
+      ).resolves.toMatchObject({ name: 'none' })
+    })
+
+    it('leaves every other role alone', async () => {
+      // Only the non-member role decides visibility; editing `usual` is not a type change.
+      mocked.readGroupRoles.mockResolvedValue([role('usual', ['group.read'])])
+      const { context } = contextFor(editorOf('public'))
+
+      await expect(
+        Mutation.updateGroupRole({}, { groupId: 'g1', name: 'usual', permissions: [] }, context),
+      ).resolves.toMatchObject({ name: 'usual' })
+    })
+
+    it('refuses for a group that is not there', async () => {
+      const { context } = contextFor({ authorization: null })
+
+      await expect(
+        Mutation.updateGroupRole({}, { groupId: 'g1', name: 'none', permissions: [] }, context),
+      ).rejects.toThrow(UserInputError)
+    })
   })
 
   it('writes the sanitised list and counts the members of the role', async () => {
@@ -798,6 +898,35 @@ describe('Mutation.updateGroupRoleTemplate', () => {
     )
 
     expect(updated).toMatchObject({ permissions: [], label: 'Founder' })
+  })
+
+  it('refuses a non-member role that contradicts the template`s own name', async () => {
+    // The name of a template IS a privacy level, and the level comes from these two rights. A
+    // `public` template whose non-member role cannot read would create groups listed as
+    // public that nobody can find — the operator who wants that has the `closed` template.
+    mocked.readGroupRoleTemplates.mockResolvedValue({ public: [role('none', ['group.read'])] })
+    const { context } = contextFor()
+
+    await expect(
+      Mutation.updateGroupRoleTemplate(
+        {},
+        { groupType: 'public', name: 'none', permissions: ['group.read'] },
+        context,
+      ),
+    ).rejects.toThrow('a different group type than it is named')
+  })
+
+  it('accepts a non-member role that matches the name', async () => {
+    mocked.readGroupRoleTemplates.mockResolvedValue({ closed: [role('none', ['group.read'])] })
+    const { context } = contextFor()
+
+    await expect(
+      Mutation.updateGroupRoleTemplate(
+        {},
+        { groupType: 'closed', name: 'none', permissions: ['group.read', 'group.join.request'] },
+        context,
+      ),
+    ).resolves.toMatchObject({ name: 'none' })
   })
 
   it('writes the template and leaves existing groups alone', async () => {

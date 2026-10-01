@@ -36,6 +36,7 @@ type Group {
   about: String
   "Full group description (rich text)."
   description: String!
+  "DERIVED from the group's rights, not chosen: `hidden` while its non-member role cannot read the profile, `closed` while it cannot read the content, `public` otherwise. Setting it through UpdateGroup applies the matching preset to the `none` and `pending` roles; the per-level network rights (group.create_*, group.administer.any_*, group.content.read.any_*) read it."
   groupType: GroupType!
   actionRadius: GroupActionRadius!
 

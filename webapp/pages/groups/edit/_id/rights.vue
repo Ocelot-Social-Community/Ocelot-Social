@@ -3,6 +3,14 @@
     <h2 class="title">{{ $t('group.rights.title') }}</h2>
     <p class="description">{{ $t('group.rights.description') }}</p>
 
+    <!-- What the group IS, derived from what it grants outsiders. The type is no longer a
+         separate choice: these two rights are the choice, and this says so while they are
+         being ticked rather than after saving. -->
+    <p class="resulting-type" data-test="resulting-type">
+      {{ $t('group.rights.resultingType') }}
+      <strong>{{ $t(`group.types.${resultingType}`) }}</strong>
+    </p>
+
     <!-- Simple mode: the handful of questions a group actually asks itself, as sentences.
          The matrix is one click away for whoever wants it, but it must not be the entry. -->
     <section v-if="!advanced" data-test="rights-simple">
@@ -177,6 +185,7 @@ import {
   updateGroupRoleMutation,
 } from '~/graphql/groupRoles.js'
 import { NONE_GROUP_ROLE, PENDING_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
+import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
 import groupRights from '~/mixins/groupRights'
 
 // The order the tabs read in: the ladder, then whatever the group invented.
@@ -230,6 +239,17 @@ export default {
     },
     activeRole() {
       return this.roles.find((role) => role.name === this.activeRoleName) ?? null
+    },
+    // Live, from the draft: while the non-member role is the one being edited, the unsaved
+    // ticks are what counts — otherwise the badge would lag one save behind.
+    nonMemberPermissions() {
+      if (this.activeRoleName === NONE_GROUP_ROLE) {
+        return this.draftPermissions
+      }
+      return this.roles.find((role) => role.name === NONE_GROUP_ROLE)?.permissions ?? []
+    },
+    resultingType() {
+      return privacyLevelOf(this.nonMemberPermissions)
     },
     catalogGroups() {
       const groups = []
@@ -454,6 +474,11 @@ export default {
 .title {
   margin-bottom: 0;
 }
+.resulting-type {
+  margin-bottom: var(--space-small);
+  color: var(--text-color-soft);
+}
+
 .description {
   color: var(--text-color-soft);
   margin-bottom: var(--space-base);

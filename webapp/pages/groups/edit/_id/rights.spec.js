@@ -134,6 +134,34 @@ describe('rights.vue', () => {
     expect(at(wrapper, 'rights-advanced').exists()).toBe(false)
   })
 
+  describe('the resulting group type', () => {
+    // The type is not a separate choice any more: these two non-member rights ARE the choice,
+    // so the page has to name the result while they are being ticked.
+    it('names what the stored non-member rights make the group', async () => {
+      const wrapper = await Wrapper()
+
+      expect(at(wrapper, 'resulting-type').text()).toContain('group.types.hidden')
+    })
+
+    it('reads the unsaved draft while the non-member role is the one being edited', async () => {
+      const wrapper = await Wrapper()
+
+      // Switching the tab reloads the draft from the role, so the draft is set afterwards —
+      // the same order a click and a tick produce.
+      wrapper.setData({ activeRoleName: 'none' })
+      await wrapper.vm.$nextTick()
+      wrapper.setData({ draftPermissions: ['group.read', 'group.content.read'] })
+      await wrapper.vm.$nextTick()
+
+      expect(at(wrapper, 'resulting-type').text()).toContain('group.types.public')
+
+      wrapper.setData({ draftPermissions: ['group.read'] })
+      await wrapper.vm.$nextTick()
+
+      expect(at(wrapper, 'resulting-type').text()).toContain('group.types.closed')
+    })
+  })
+
   it('reflects what a role currently grants', async () => {
     const wrapper = await Wrapper()
 

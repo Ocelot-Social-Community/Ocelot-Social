@@ -998,6 +998,7 @@
         "channel": "Transformar em canal (só os administradores escrevem)"
       },
       "reset": "Restaurar os valores predefinidos",
+      "resultingType": "Com estas permissões o grupo é:",
       "roleKeyPlaceholder": "chave, p. ex. redacao",
       "roleLabelPlaceholder": "nome visível, p. ex. Redação",
       "saved": "Permissões guardadas",

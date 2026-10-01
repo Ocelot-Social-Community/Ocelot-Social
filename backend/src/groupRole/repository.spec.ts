@@ -95,6 +95,9 @@ describe(seedRolesForNewGroup, () => {
       nonMemberRead: true,
       nonMemberContentRead: false,
       showMembers: true,
+      // Derived from the same two rights, in the same statement: a readable profile with
+      // private content IS a closed group (see ./privacyLevel.ts).
+      groupType: 'closed',
     })
   })
 
@@ -285,6 +288,7 @@ describe(syncNonMemberAccess, () => {
       nonMemberRead: true,
       nonMemberContentRead: false,
       showMembers: true,
+      groupType: 'closed',
     })
   })
 

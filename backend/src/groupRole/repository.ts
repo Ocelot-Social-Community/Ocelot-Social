@@ -13,6 +13,7 @@ import { sanitizeGroupPermissions } from '@src/groupPermission'
 
 import { defaultTemplateFor } from './defaults'
 import { nonMemberAccessFrom } from './nonMemberAccess'
+import { privacyLevelFrom } from './privacyLevel'
 import { parseStoredPermissions } from './storedPermissions'
 import { NONE_ROLE, PENDING_ROLE } from './types'
 
@@ -185,7 +186,8 @@ const WRITE_NON_MEMBER_ACCESS_CYPHER = `
   MATCH (g:Group {id: $groupId})
   SET g.nonMemberRead = $nonMemberRead,
       g.nonMemberContentRead = $nonMemberContentRead,
-      g.showMembers = $showMembers
+      g.showMembers = $showMembers,
+      g.groupType = $groupType
 `
 
 /** A db context, as the runner the seeding path already speaks. */
@@ -216,7 +218,13 @@ export async function syncNonMemberAccess(
   }
   // A malformed list reads as empty, which is the safe answer for a damaged row.
   const access = nonMemberAccessFrom(parseStoredPermissions(row.get('permissions') as string))
-  await run.run(WRITE_NON_MEMBER_ACCESS_CYPHER, { groupId, ...access })
+  // `groupType` is derived from the same two rights (see ./privacyLevel.ts) and written here
+  // rather than chosen: public / closed / hidden are what the rights RESULT in. Everything
+  // that still reads the type — the per-level network rights, the admin filter, the enum in
+  // the API — therefore reads something true instead of a label that can drift from the
+  // rights it is supposed to describe.
+  const groupType = privacyLevelFrom(access)
+  await run.run(WRITE_NON_MEMBER_ACCESS_CYPHER, { groupId, ...access, groupType })
 }
 
 /**
