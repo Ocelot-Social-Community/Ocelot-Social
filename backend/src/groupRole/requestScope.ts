@@ -30,6 +30,16 @@ export interface GroupAuthorization {
   roleName: string
   /** An ACTIVE membership: neither `none` nor `pending`. */
   isMember: boolean
+  /**
+   * Whether the group actually defines the role this viewer carries.
+   *
+   * `false` means the group predates the group roles, or a migration is half applied — not
+   * "the role grants nothing", which is a legitimate answer (a hidden group's non-member role).
+   * The few decisions that cannot simply fail closed, because failing closed would CHANGE what
+   * people may do while a deployment is mid-migration, read this to fall back to the old
+   * group-type behaviour.
+   */
+  hasRoleDefinition: boolean
   effective: ReadonlySet<GroupPermissionKey>
   has: (permission: GroupPermissionKey) => boolean
   /** Where a held right comes from — membership or a network right (concept E16/E18). */
@@ -199,6 +209,10 @@ export function createGroupAuthorizationScope({
       groupType,
       roleName,
       isMember: isActiveMembershipRole(roleName),
+      // Whether the group has a definition for this viewer's role at all. False for a group
+      // that predates the roles or a half-applied migration, which a caller cannot tell from
+      // "a role that grants nothing" (a hidden group's non-member role) without being told.
+      hasRoleDefinition: role !== null,
       effective,
       has: (permission) => effective.has(permission),
       sourceOf: (permission) => authoritySourceFor(permission, role, networkAuthority),

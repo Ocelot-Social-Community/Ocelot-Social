@@ -126,6 +126,10 @@ describe(redeemInviteCode, () => {
     // The group-link branch differs from the personal one: it does NOT create follow edges, only
     // the membership — but on signup it still has to record who invited whom, which is the one
     // statement `newUser` switches on here.
+    //
+    // The group below is a bare node with no role definitions, which is also the mid-migration
+    // state: where the membership lands then falls back to the group TYPE, so a deployment
+    // between the code and its migration does not quietly turn invited people into applicants.
     it('records the invitation alongside the membership for a group invite link', async () => {
       await database.write({
         query: `MATCH (host:User { id: 'invite-host' })
@@ -147,6 +151,29 @@ describe(redeemInviteCode, () => {
         hostFollows: false,
         role: 'usual',
       })
+    })
+
+    // The same link into a group that HAS its roles: the rights decide, and this group's
+    // non-member role may only ask to join.
+    it('lands an invited person where the group`s own rights say', async () => {
+      await database.write({
+        query: `MATCH (host:User { id: 'invite-host' })
+                MERGE (group:Group { id: 'rights-group', groupType: 'public' })
+                MERGE (group)-[:HAS_GROUP_ROLE]->(role:GroupRole { id: 'rights-group:none' })
+                SET role.name = 'none', role.permissions = $permissions
+                MERGE (host)-[:GENERATED]->(code:InviteCode { code: 'GRP002' })
+                MERGE (code)-[:INVITES_TO]->(group)`,
+        variables: { permissions: JSON.stringify(['group.read', 'group.join.request']) },
+      })
+
+      await expect(redeemInviteCode(contextFor('invited-user'), 'GRP002', true)).resolves.toBe(true)
+
+      const records = await codesOf(`
+        MATCH (user:User { id: 'invited-user' })
+        RETURN head([(user)-[m:MEMBER_OF]->(:Group { id: 'rights-group' }) | m.role]) AS role`)
+
+      // Although the TYPE is public: the group asked for approval, so the invited person waits.
+      expect(records[0].get('role')).toBe('pending')
     })
   })
 })
