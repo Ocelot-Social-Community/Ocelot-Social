@@ -160,6 +160,15 @@ describe(hasGroupPermission, () => {
     expect(await resolve(rule, {}, {}, contextFor())).toBe(true)
   })
 
+  it('takes the locator it is given, not only the default one', async () => {
+    // The shield map names the locator per entry — `byPost` for a comment, `byRoom` for a chat
+    // message — so the default is only one of the two ways this is called.
+    const rule = hasGroupPermission('group.chat.participate', byRoom('roomId'))
+    const context = contextFor({ room: { effective: ['group.chat.participate'] } })
+
+    expect(await resolve(rule, {}, { roomId: 'r1' }, context)).toBe(true)
+  })
+
   it('asks the group for the right when one was found', async () => {
     const rule = hasGroupPermission('group.post.create')
     const holding = contextFor({ group: { effective: ['group.post.create'] } })

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { beforeAll, afterAll, describe, beforeEach, it, expect } from 'vitest'
+import { beforeAll, afterAll, describe, beforeEach, it, expect, afterEach } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import currentUser from '@graphql/queries/auth/currentUser.gql'
@@ -21,6 +21,7 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { RoleDefinition } from '@src/role'
 
 // The invite-code limits are network policy now; pin them explicitly so the
 // "max reached" loops below are deterministic regardless of the schema default.
@@ -28,8 +29,11 @@ const INVITE_CODES_PERSONAL_PER_USER = 7
 const INVITE_CODES_GROUP_PER_USER = 7
 
 let authenticatedUser: Context['user']
+// Per-test role override, for the one case where the network side reaches into a group.
+let rolesOverride: RoleDefinition[] | undefined
 const context = () => ({
   authenticatedUser,
+  roles: rolesOverride,
   policy: {
     // user.invite is gated by inviteRegistration; pin it on so generatePersonalInviteCode
     // stays available here regardless of the schema default (the gate is unit-covered).
@@ -621,6 +625,34 @@ describe('generateGroupInviteCode', () => {
         })
       },
     )
+  })
+
+  describe('as a network administrator who is not a member', () => {
+    beforeEach(async () => {
+      // `group.administer.any_public` folds the whole group catalog in, so the shield lets the
+      // request through on the strength of a network right alone.
+      rolesOverride = [
+        { name: 'user', protected: false, permissions: ['group.administer.any_public'] },
+      ] as RoleDefinition[]
+      authenticatedUser = await notMemberUser.toJson()
+    })
+
+    afterEach(() => {
+      rolesOverride = undefined
+    })
+
+    it('still cannot hand out an invite code for a group it is not in', async () => {
+      // The code is issued BY a member: it hangs off their GENERATED edge and counts against
+      // their per-group quota. The recovery path (concept E16) promotes existing members, it
+      // does not turn a network admin into one — so the statement finds no membership and the
+      // resolver refuses rather than creating a code nobody in the group handed out.
+      await expect(
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'public-group' } }),
+      ).resolves.toMatchObject({
+        data: null,
+        errors: [{ message: 'Not Authorized!' }],
+      })
+    })
   })
 
   describe('as a pending member', () => {

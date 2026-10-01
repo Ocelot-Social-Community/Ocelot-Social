@@ -13,7 +13,6 @@ import {
   CHAT_MESSAGE_STATUS_UPDATED,
   ROOM_UPDATED,
 } from '@constants/subscriptions'
-import { ForbiddenError } from '@graphql/errors'
 
 import { attachments } from './attachments/attachments'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
@@ -192,13 +191,6 @@ export default {
       const session = context.driver.session()
 
       try {
-        // Block posting into a group room while the groups feature is off (the userId/DM path
-        // can never resolve a group room, so only the roomId path needs the check). Inside the
-        // try so the finally closes the session even if roomIsGroupRoom() throws on a DB error.
-        if (roomId && groupChatGated(context) && (await roomIsGroupRoom(roomId, session))) {
-          throw new ForbiddenError('Not Authorized!')
-        }
-
         return await session.writeTransaction(async (transaction) => {
           // If userId is provided, find-or-create a DM room first
           if (userId) {

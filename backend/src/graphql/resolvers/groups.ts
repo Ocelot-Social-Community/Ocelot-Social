@@ -424,9 +424,6 @@ export default {
       let previousGroupType: string | undefined
       try {
         const group = await session.writeTransaction(async (transaction) => {
-          if (!context.user) {
-            throw new Error('Missing authenticated user.')
-          }
           const previousGroupTypeResult = await transaction.run(
             `MATCH (group:Group {id: $groupId}) RETURN group.groupType AS groupType`,
             { groupId },
@@ -473,7 +470,7 @@ export default {
           `
           const transactionResponse = await transaction.run(updateGroupCypher, {
             groupId,
-            userId: context.user.id,
+            userId: actor,
             categoryIds,
             params,
           })
