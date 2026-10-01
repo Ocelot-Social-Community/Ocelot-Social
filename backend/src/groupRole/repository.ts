@@ -190,7 +190,7 @@ const WRITE_NON_MEMBER_ACCESS_CYPHER = `
 
 /** A db context, as the runner the seeding path already speaks. */
 const runnerFor = (db: DbContext): RoleSeedTransaction => ({
-  run: async (query, variables) => db.write({ query, variables: variables ?? {} }),
+  run: async (query, variables) => db.write({ query, variables }),
 })
 
 /**
@@ -217,19 +217,6 @@ export async function syncNonMemberAccess(
   // A malformed list reads as empty, which is the safe answer for a damaged row.
   const access = nonMemberAccessFrom(parseStoredPermissions(row.get('permissions') as string))
   await run.run(WRITE_NON_MEMBER_ACCESS_CYPHER, { groupId, ...access })
-}
-
-export async function seedGroupRoles(
-  db: DbContext,
-  groupId: string,
-  roles: readonly GroupRoleDefinition[],
-  now: string,
-): Promise<void> {
-  await db.write({
-    query: SEED_ROLES_CYPHER,
-    variables: { groupId, now, roles: roles.map(toRow) },
-  })
-  await syncNonMemberAccess(runnerFor(db), groupId)
 }
 
 /**
@@ -469,15 +456,20 @@ export async function applyGroupTypeToNonMemberRoles(
     return
   }
   const existing = await readGroupRoles(db, groupId)
-  for (const name of [NONE_ROLE, PENDING_ROLE]) {
-    const fromTemplate = template.find((role) => role.name === name)
-    if (!fromTemplate) {
-      continue
-    }
+  // Filtering the template rather than looking each name up in it: every template has both
+  // roles (the drift guard in defaults.spec.ts says so), so a "role missing from the template"
+  // arm would be code no test can reach.
+  const nonMemberRoles = template.filter(
+    (role) => role.name === NONE_ROLE || role.name === PENDING_ROLE,
+  )
+  for (const fromTemplate of nonMemberRoles) {
     await writeGroupRole(
       db,
       groupId,
-      { ...fromTemplate, label: existing.find((role) => role.name === name)?.label ?? null },
+      {
+        ...fromTemplate,
+        label: existing.find((role) => role.name === fromTemplate.name)?.label ?? null,
+      },
       actor,
       now,
     )

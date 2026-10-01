@@ -26,6 +26,19 @@ describe(parseStoredPermissions, () => {
     expect(parseStoredPermissions('"group.read"')).toEqual([])
   })
 
+  it('rethrows anything that is not a malformed list', () => {
+    // JSON.parse coerces its argument to a string first, so a value whose own toString fails
+    // throws something that is NOT a SyntaxError. That is a real fault — a bug or a broken
+    // driver — and it has to surface instead of reading as "this role holds nothing".
+    const hostile = {
+      toString: () => {
+        throw new TypeError('boom')
+      },
+    } as unknown as string
+
+    expect(() => parseStoredPermissions(hostile)).toThrow(TypeError)
+  })
+
   it('drops keys the catalog does not know', () => {
     // A key left behind by a downgrade. It could never be effective, and carrying it would
     // make a role look like it holds something that no longer exists.
