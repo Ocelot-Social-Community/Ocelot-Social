@@ -9,7 +9,8 @@
 // never from request data.
 /* eslint-disable security/detect-object-injection */
 import { GROUP_MEMBERSHIP_VISIBILITY_CHANGED } from '@constants/subscriptions'
-import { UserInputError, ForbiddenError } from '@graphql/errors'
+import { ErrorCode } from '@graphql/errorCodes'
+import { ForbiddenError, UserInputError } from '@graphql/errors'
 import { branding } from '@src/branding'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
@@ -112,7 +113,7 @@ export default {
           'user.email.readAny',
         ].some((permission) => context.effectivePermissions.has(permission))
         if (!mayAdministerUsers) {
-          throw new ForbiddenError('Not Authorized!')
+          throw new ForbiddenError('Not Authorized!', { code: ErrorCode.NOT_AUTHORIZED })
         }
         // This specialised path honours only roleName/search + pagination + ordering.
         // Other filter args the schema advertises do NOT compose here, so reject them
@@ -330,7 +331,7 @@ export default {
           return blockUserResponse.records.map((record) => record.get('blockedUser'))[0]
         })
         if (!blockedUser) {
-          throw new UserInputError('Could not find User')
+          throw new UserInputError('Could not find User', { code: ErrorCode.USER_NOT_FOUND })
         }
         return blockedUser
       } finally {
@@ -357,7 +358,9 @@ export default {
           return unblockUserResponse.records.map((record) => record.get('blockedUser'))[0]
         })
         if (!unblockedUser) {
-          throw new UserInputError('Could not find blocked User')
+          throw new UserInputError('Could not find blocked User', {
+            code: ErrorCode.USER_NOT_FOUND,
+          })
         }
         return unblockedUser
       } finally {
@@ -608,7 +611,9 @@ export default {
           return result.records.map((record) => record.get('user'))[0]
         })
         if (!user) {
-          throw new UserInputError('You cannot set badges not rewarded to you.')
+          throw new UserInputError('You cannot set badges not rewarded to you.', {
+            code: ErrorCode.BADGE_NOT_REWARDED,
+          })
         }
         return user
       } finally {

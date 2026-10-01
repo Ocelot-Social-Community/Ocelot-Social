@@ -8,6 +8,7 @@
 import { createRequire } from 'node:module'
 
 import CONFIG from '@config/index'
+import { ErrorCode } from '@graphql/errorCodes'
 import { AuthenticationError } from '@graphql/errors'
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { isPermissionAvailable } from '@src/permission'
@@ -827,6 +828,6 @@ export default shield(
     debug,
     allowExternalErrors,
     fallbackRule: allow,
-    fallbackError: new AuthenticationError('Not Authorized!'),
+    fallbackError: new AuthenticationError('Not Authorized!', { code: ErrorCode.NOT_AUTHORIZED }),
   },
 )

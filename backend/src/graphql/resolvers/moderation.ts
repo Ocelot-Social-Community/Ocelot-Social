@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { ErrorCode } from '@graphql/errorCodes'
 import { UserInputError } from '@graphql/errors'
 
 export default {
@@ -71,7 +72,7 @@ export default {
           // No User with that id (deleted concurrently). The shield's dominance check
           // treats a missing target as a baseline user and lets it through, so this is
           // reachable; fail loudly rather than returning a success-looking null.
-          throw new UserInputError('Could not find User')
+          throw new UserInputError('Could not find User', { code: ErrorCode.USER_NOT_FOUND })
         }
         return user
       } finally {
