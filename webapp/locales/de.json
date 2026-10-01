@@ -1026,6 +1026,7 @@
     "save": "Neue Gruppe anlegen",
     "showMembers": "Mitgliederliste für alle sichtbar",
     "teaser": {
+      "notReadable": "Diese Gruppe kannst du noch nicht öffnen — deine Anfrage läuft noch",
       "openGroup": "Gruppe öffnen",
       "unavailable": "Gruppe nicht mehr verfügbar"
     },

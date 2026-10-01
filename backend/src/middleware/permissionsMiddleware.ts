@@ -777,35 +777,17 @@ export default shield(
       roleName: or(isMyOwn, hasPermission('role.manage')),
     },
     Group: {
-      // The group's PROFILE beyond the always-public fields is `group.read` — the right that
-      // used to be the group type: `closed` was "profile yes, content no", which is now two
-      // rights a group sets for its non-member role. The Group query already drops what the
-      // viewer may not read; these rules are what makes the same true of a group reached
-      // through a post, a search hit or a profile.
-      '*': and(isAuthenticated, parentHasGroupPermission('group.read')),
+      '*': isAuthenticated,
       slug: allow,
       avatar: allow,
       name: allow,
       about: allow,
       groupType: allow,
-      // The identifier is not content, and it is what a link needs. Left exactly as strict as
-      // it was, because a post in a group whose content the viewer may read while its profile
-      // stays closed must still be able to carry the group it is in.
-      id: isAuthenticated,
-      // What is about the VIEWER rather than about the group. The group page asks these to
-      // find out what it may offer at all, so gating them on reading the group would make the
-      // page unable to ask why it may not.
-      myRole: isAuthenticated,
-      myGroupRole: isAuthenticated,
-      myGroupPermissions: isAuthenticated,
-      // The group's CONTENT, which is the other half of what the type used to decide.
-      posts: and(isAuthenticated, parentHasGroupPermission('group.content.read')),
-      postsCount: and(isAuthenticated, parentHasGroupPermission('group.content.read')),
-      // Deliberately NOT content-gated: the webapp asks it on every post it renders, including
-      // somebody's own post in a group they have since left, and refusing it there would null
-      // the whole group object on that post rather than one number. It says nothing about the
-      // content either — only how many of it the group pinned.
-      currentlyPinnedPostsCount: isAuthenticated,
+      // The two READ rights are not enforced here but in the field resolvers, which blank
+      // instead of refusing (see resolvers/groups.ts, mayReadGroup). A rule would null the
+      // whole group out of the one list where a group the viewer may not read legitimately
+      // appears — their own, with an applicant to a hidden group seeing that they applied.
+      //
       // A group's role definitions are its own business; reading them is the same right as
       // editing them, because the matrix IS the editing UI.
       roles: and(isAuthenticated, parentHasGroupPermission('group.role.manage')),

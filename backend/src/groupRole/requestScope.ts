@@ -204,6 +204,15 @@ export function createGroupAuthorizationScope({
       groupType,
       gateContext,
     })
+    // A membership whose role the group does not define must still be LEAVABLE. Everything
+    // else fails closed there (permissionsForGroupRole(null) is the empty set), and
+    // `LeaveGroup` is checked against `group.leave` like any other right — so without this
+    // one exception a damaged row would mean a group its member cannot get out of. Only
+    // leaving, and only with a membership: granting `group.join` here would turn a group whose
+    // roles are missing into one anybody may walk into.
+    const effectiveWithEscape =
+      role === null && roleName !== NONE_ROLE ? new Set(effective).add('group.leave') : effective
+
     return {
       groupId,
       groupType,
@@ -213,8 +222,8 @@ export function createGroupAuthorizationScope({
       // that predates the roles or a half-applied migration, which a caller cannot tell from
       // "a role that grants nothing" (a hidden group's non-member role) without being told.
       hasRoleDefinition: role !== null,
-      effective,
-      has: (permission) => effective.has(permission),
+      effective: effectiveWithEscape,
+      has: (permission) => effectiveWithEscape.has(permission),
       sourceOf: (permission) => authoritySourceFor(permission, role, networkAuthority),
     }
   }

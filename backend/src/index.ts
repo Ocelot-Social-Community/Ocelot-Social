@@ -5,7 +5,8 @@ import CONFIG from './config'
 import { serverDatabase } from './context'
 import pubsubContext from './context/pubsub'
 import { closeDriver } from './db/neo4j'
-import { seedGroupRoleTemplates } from './groupRole'
+import { seedGroupRoleTemplates, seedRolesForGroupsWithoutRoles } from './groupRole'
+import ocelotLogger from './logger'
 import { loggerPlugin } from './plugins/apolloLogger'
 import { getPolicyService } from './policy'
 import createProxy from './proxy'
@@ -32,6 +33,20 @@ async function main() {
   // Ensure the group role templates exist. Not only in the migration: a fresh install has no
   // history to replay, and db:reset wipes them. ON CREATE, so an edited template survives.
   await seedGroupRoleTemplates(serverDatabase)
+
+  // And make sure every GROUP has its own roles, copied from those templates. A group without
+  // them is one where the shield lets nobody act — not even its owner — so this repairs what
+  // neither the creation transaction nor the migration can reach: an older dump, a group
+  // created before the migration ran, a row deleted by hand. Normally a no-op.
+  const repaired = await seedRolesForGroupsWithoutRoles(serverDatabase, new Date().toISOString())
+  if (repaired.seeded.length > 0 || repaired.skipped.length > 0) {
+    ocelotLogger.warn(
+      `seeded group roles for ${String(repaired.seeded.length)} group(s) that had none` +
+        (repaired.skipped.length > 0
+          ? `; skipped ${String(repaired.skipped.length)} with an unknown group type: ${repaired.skipped.join(', ')}`
+          : ''),
+    )
+  }
 
   const { server, httpServer } = await createServer({
     plugins: [loggerPlugin],

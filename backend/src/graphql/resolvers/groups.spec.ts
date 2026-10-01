@@ -901,7 +901,12 @@ describe('in mode', () => {
             })
 
             describe('isMember = true', () => {
-              it('finds only listed groups where user is member', async () => {
+              // "The groups I am in" asks about MEMBERSHIPS, not about what the viewer may
+              // read — which is why the hidden group they are waiting in is here too: an
+              // applicant has to be able to see that they applied. The group's own fields stay
+              // blank for them (its `pending` role grants no `group.read`), and the discovery
+              // list above does not show it.
+              it('finds every group the viewer has a membership in, waiting included', async () => {
                 const result = await query({ query: groupQuery, variables: { isMember: true } })
 
                 expect(result).toMatchObject({
@@ -917,11 +922,30 @@ describe('in mode', () => {
                         slug: 'third-investigative-journalism-group',
                         myRole: 'usual',
                       }),
+                      expect.objectContaining({
+                        id: 'second-hidden-group',
+                        myRole: 'pending',
+                      }),
                     ]),
                   },
                   errors: undefined,
                 })
-                expect(result.data?.Group.length).toBe(2)
+                expect(result.data?.Group.length).toBe(3)
+              })
+
+              it('tells the applicant nothing about that group beyond their own status', async () => {
+                const result = await query({ query: groupQuery, variables: { isMember: true } })
+                const waiting = result.data?.Group.find(
+                  (group) => group.id === 'second-hidden-group',
+                )
+
+                // The name is what they were invited with; the profile is not theirs to read.
+                expect(waiting).toMatchObject({
+                  myRole: 'pending',
+                  description: '',
+                  about: '',
+                })
+                expect(result.errors).toBeUndefined()
               })
             })
 

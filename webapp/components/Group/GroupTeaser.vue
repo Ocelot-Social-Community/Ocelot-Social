@@ -1,6 +1,7 @@
 <template>
   <nuxt-link
     class="group-teaser"
+    :class="{ 'group-teaser--not-readable': !mayOpen }"
     :to="{ name: 'groups-id-slug', params: { id: group.id, slug: group.slug } }"
     @click.native.capture="guardNavigation"
   >
@@ -115,10 +116,23 @@ export default {
     guardNavigation(event) {
       if (event.target.closest('.content-menu')) {
         event.preventDefault()
+        return
+      }
+      // A group the viewer may not read has no page to go to — the Group query would answer
+      // with nothing. It still appears on this card, because an applicant has to see THAT they
+      // applied; the card then names their status and stays where it is.
+      if (!this.mayOpen) {
+        event.preventDefault()
+        this.$toast.info(this.$t('group.teaser.notReadable'))
       }
     },
   },
   computed: {
+    // Whether there is a group page to open: `group.read` is what the Group query asks for, so
+    // without it the link would lead to an empty result.
+    mayOpen() {
+      return this.canInGroup('group.read', this.group)
+    },
     // Cut here rather than in the database. This is trunc-html at the same length the
     // backend's excerptMiddleware used, so the card renders exactly what the stored
     // descriptionExcerpt used to hold — trailing "…" included — and the excerpt no
@@ -154,6 +168,12 @@ export default {
     top: 50%;
     right: -7px;
   }
+}
+
+/* No page to open: the card is still a link element (it carries the whole layout), but it
+   says so and the click is stopped in guardNavigation. */
+.group-teaser--not-readable {
+  cursor: default;
 }
 
 .group-teaser > .os-card {

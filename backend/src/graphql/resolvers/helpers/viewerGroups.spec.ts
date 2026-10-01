@@ -88,19 +88,19 @@ describe(groupReadScope, () => {
     })
   })
 
-  it('falls back to the pre-rights behaviour for a role with no definition', async () => {
-    // A group that predates the roles, or a half-applied migration. The empty set would be the
-    // shield's answer; here it would take a group's content away from the people in it, so the
-    // fallback is what a membership meant before: an applicant sees the group, a member also
-    // sees its content.
+  it('grants nothing for a role the group does not define', async () => {
+    // The same answer the shield gives such a membership, rather than a second and more
+    // generous one. It used to fall back to the pre-rights behaviour for a database
+    // mid-migration; the boot repair (seedRolesForGroupsWithoutRoles) removes that state
+    // instead, which beats two layers disagreeing about what a broken row means.
     const context = contextWithMemberships([
       membershipRow('unseeded', 'usual', null),
       membershipRow('unseeded-applicant', 'pending', null),
     ])
 
     expect(await groupReadScope(context)).toEqual({
-      readableGroupIds: ['unseeded', 'unseeded-applicant'],
-      contentGroupIds: ['unseeded'],
+      readableGroupIds: [],
+      contentGroupIds: [],
     })
   })
 

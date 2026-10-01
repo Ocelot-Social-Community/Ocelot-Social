@@ -72,8 +72,8 @@ type Group {
   ownerCount: Int
   "Number of posts currently pinned within this group."
   currentlyPinnedPostsCount: Int!
-  "Total number of non-deleted, non-disabled posts in this group."
-  postsCount: Int!
+  "Total number of non-deleted, non-disabled posts in this group. Null when the viewer may not read the content (`group.content.read`) — counting the posts is reading them, the same way counting members is reading the member list. Nullable rather than refused, so a teaser renders for a viewer who simply may not count."
+  postsCount: Int
 }
 
 "A group member paired with their membership relationship (role, join date)."

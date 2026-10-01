@@ -1026,6 +1026,7 @@
     "save": "Create new group",
     "showMembers": "Member list visible to everyone",
     "teaser": {
+      "notReadable": "You cannot open this group yet — your request is still pending",
       "openGroup": "Open group",
       "unavailable": "Group no longer available"
     },

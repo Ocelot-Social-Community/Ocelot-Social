@@ -1026,6 +1026,7 @@
     "save": "Krijo grup të ri",
     "showMembers": "Lista e anëtarëve e dukshme për të gjithë",
     "teaser": {
+      "notReadable": null,
       "openGroup": "Hap grupin",
       "unavailable": "Grupi nuk është më i disponueshëm"
     },

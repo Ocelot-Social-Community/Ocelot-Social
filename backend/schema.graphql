@@ -453,8 +453,10 @@ type Group {
   ownerCount: Int
   posts: [Post]
 
-  """Total number of non-deleted, non-disabled posts in this group."""
-  postsCount: Int!
+  """
+  Total number of non-deleted, non-disabled posts in this group. Null when the viewer may not read the content (`group.content.read`) — counting the posts is reading them, the same way counting members is reading the member list. Nullable rather than refused, so a teaser renders for a viewer who simply may not count.
+  """
+  postsCount: Int
 
   """
   The group's own role definitions. Requires `group.role.manage` in this group.

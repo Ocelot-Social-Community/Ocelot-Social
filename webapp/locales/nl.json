@@ -1026,6 +1026,7 @@
     "save": "Nieuwe groep aanmaken",
     "showMembers": "Ledenlijst zichtbaar voor iedereen",
     "teaser": {
+      "notReadable": null,
       "openGroup": "Groep openen",
       "unavailable": "Groep niet meer beschikbaar"
     },

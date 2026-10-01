@@ -205,10 +205,17 @@ export async function syncNonMemberAccess(
   groupId: string,
 ): Promise<void> {
   const result = await run.run(NONE_ROLE_PERMISSIONS_CYPHER, { groupId, noneRole: NONE_ROLE })
-  const raw = result.records[0]?.get('permissions') as string | null | undefined
-  // No row at all ⇒ no non-member role ⇒ nothing is open to a stranger. parsePermissions
-  // already reads a malformed list as empty, which is the same safe answer.
-  const access = nonMemberAccessFrom(raw ? parseStoredPermissions(raw) : null)
+  const row = result.records[0]
+  if (!row) {
+    // No non-member role to mirror. Writing "nothing is open to a stranger" here would be a
+    // statement this function is not entitled to make: a group whose roles are not seeded yet
+    // would silently go invisible to everybody, where the queries' coalesce fallback reads it
+    // as its TYPE says. Leaving the columns alone keeps that fallback in charge until the roles
+    // exist — which seedRolesForGroupsWithoutRoles() makes sure of on the next boot.
+    return
+  }
+  // A malformed list reads as empty, which is the safe answer for a damaged row.
+  const access = nonMemberAccessFrom(parseStoredPermissions(row.get('permissions') as string))
   await run.run(WRITE_NON_MEMBER_ACCESS_CYPHER, { groupId, ...access })
 }
 
@@ -259,6 +266,46 @@ export async function seedRolesForNewGroup(
     roles: fallback.map(toRow),
   })
   await syncNonMemberAccess(transaction, groupId)
+}
+
+const GROUPS_WITHOUT_ROLES_CYPHER = `
+  MATCH (g:Group)
+  WHERE NOT (g)-[:HAS_GROUP_ROLE]->(:GroupRole)
+  RETURN g.id AS groupId, g.groupType AS groupType
+`
+
+/**
+ * Give every group that has NO role definitions the template for its type.
+ *
+ * The invariant this repairs is "a group always has its roles": they are written in the same
+ * transaction as the group itself, and a migration seeded the ones that predate them. Neither
+ * covers a database restored from an older dump, a group created while the migration had not
+ * run, or a row deleted by hand — and a group without roles is one where the shield lets
+ * nobody do anything, including its own owner.
+ *
+ * Runs on boot, right after the template seeding it depends on (a group copies the templates).
+ * Idempotent, and bounded by the number of groups in that state — normally zero, so one scan.
+ */
+export async function seedRolesForGroupsWithoutRoles(
+  db: DbContext,
+  now: string,
+): Promise<{ seeded: string[]; skipped: string[] }> {
+  const result = await db.query({ query: GROUPS_WITHOUT_ROLES_CYPHER, variables: {} })
+  const seeded: string[] = []
+  const skipped: string[] = []
+  for (const record of result.records) {
+    const groupId = record.get('groupId') as string
+    const groupType = record.get('groupType') as string
+    // A type the code has no template for is reported rather than thrown: one odd row must not
+    // stop a deployment, and leaving it alone changes nothing about it.
+    if (!defaultTemplateFor(groupType)) {
+      skipped.push(groupId)
+      continue
+    }
+    await seedRolesForNewGroup(runnerFor(db), groupId, groupType, now)
+    seeded.push(groupId)
+  }
+  return { seeded, skipped }
 }
 
 /** How many members carry each role of a group. `none` never appears: it is the absence of an edge. */

@@ -1026,6 +1026,7 @@
     "save": "Crear nuevo grupo",
     "showMembers": "Lista de miembros visible para todos",
     "teaser": {
+      "notReadable": null,
       "openGroup": "Abrir grupo",
       "unavailable": "Grupo no disponible"
     },

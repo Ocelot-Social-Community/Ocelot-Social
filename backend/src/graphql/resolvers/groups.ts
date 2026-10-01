@@ -71,6 +71,65 @@ const categoriesExist = async (context: Context): Promise<boolean> => {
   }
 }
 
+// One generated cypher-field resolver, as the overrides below need to call it.
+type GroupFieldResolver = (
+  parent: Record<string, unknown>,
+  args: unknown,
+  context: Context,
+  info: unknown,
+) => Promise<unknown>
+
+// The generated cypher-field resolvers for Group, captured so the gated overrides below can
+// delegate to them instead of reimplementing the traversal. `Resolver()` builds its map
+// dynamically and is declared as returning `{}`, so the three fields that get a gate are named
+// here — the rest is spread as it comes.
+const groupCypherFields = Resolver('Group', {
+  hasMany: {
+    categories: '-[:CATEGORIZED]->(related:Category)',
+    posts: '<-[:IN]-(related:Post)',
+  },
+  hasOne: {
+    avatar: '-[:AVATAR_IMAGE]->(related:Image)',
+    location: '-[:IS_IN]->(related:Location)',
+  },
+  boolean: {
+    isMutedByMe:
+      'MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )',
+  },
+}) as Record<string, unknown> & {
+  categories: GroupFieldResolver
+  location: GroupFieldResolver
+  posts: GroupFieldResolver
+}
+
+/**
+ * May this viewer read the group's profile (`group.read`) / its content (`group.content.read`)?
+ *
+ * The fields below BLANK rather than refuse. A shield rule would be the shorter way to say it,
+ * but it would also be the wrong answer for the one list where a group a viewer may not read
+ * legitimately appears: their own. An applicant to a hidden group has to see that they applied,
+ * and several of these fields are non-null — a refusal there nulls the whole group out of the
+ * list and reports it as an error, where an empty description simply reads as "nothing to see".
+ *
+ * The optional call is for the unit tests that hand in a partial context; a real request always
+ * carries the scope, and without one these fields behave as they did before the rights existed.
+ */
+const mayReadGroup = async (parent: { id?: string }, context: Context): Promise<boolean> => {
+  if (!context.groupAuthorization) {
+    return true
+  }
+  const authorization = await context.groupAuthorization.forGroup(parent.id as string)
+  return !!authorization?.has('group.read')
+}
+
+const mayReadGroupContent = async (parent: { id?: string }, context: Context): Promise<boolean> => {
+  if (!context.groupAuthorization) {
+    return true
+  }
+  const authorization = await context.groupAuthorization.forGroup(parent.id as string)
+  return !!authorization?.has('group.content.read')
+}
+
 export default {
   Query: {
     Group: async (_object, params, context: Context, _resolveInfo) => {
@@ -97,6 +156,11 @@ export default {
           // groupRole/nonMemberAccess.ts, the only shape a many-groups filter can use), or the
           // viewer's own role in that group grants it. The group TYPE appears only in the
           // coalesce fallback, for a node the backfill migration has not reached yet.
+          //
+          // `isMember: true` is the exception: that list is "the groups I am in", so a
+          // MEMBERSHIP is what qualifies, not a right. An applicant to a hidden group has to
+          // be able to see that they applied — the group's own fields stay blank for them,
+          // which the field resolvers below take care of.
           const { readableGroupIds } = await groupReadScope(context)
           const readableByStranger = nonMemberReadsGroup('group')
           const readableByViewer = 'group.id IN $readableGroupIds'
@@ -108,7 +172,7 @@ export default {
             ${locationMatch}
             OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
             WITH group, membership
-            ${(isMember === true && `WHERE membership IS NOT NULL AND ${readableByViewer}`) || ''}
+            ${(isMember === true && 'WHERE membership IS NOT NULL') || ''}
             ${(isMember === false && `WHERE membership IS NULL AND ${readableByStranger}`) || ''}
             ${(isMember === undefined && `WHERE ${readableByViewer} OR ${readableByStranger}`) || ''}
             RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
@@ -771,6 +835,11 @@ export default {
       if (!parent.id) {
         throw new Error('Can not identify selected Group!')
       }
+      // Counting the posts is reading the content (concept E7), the same way counting members
+      // is reading the member list. Null rather than an error, so a teaser renders.
+      if (!(await mayReadGroupContent(parent, context))) {
+        return null
+      }
       const result = await context.database.query({
         query: `
           MATCH (post:Post)-[:IN]->(:Group {id: $group.id})
@@ -792,20 +861,26 @@ export default {
       })
       return result.records[0].get('count')
     },
-    ...Resolver('Group', {
-      hasMany: {
-        categories: '-[:CATEGORIZED]->(related:Category)',
-        posts: '<-[:IN]-(related:Post)',
-      },
-      hasOne: {
-        avatar: '-[:AVATAR_IMAGE]->(related:Image)',
-        location: '-[:IS_IN]->(related:Location)',
-      },
-      boolean: {
-        isMutedByMe:
-          'MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )',
-      },
-    }),
+    ...groupCypherFields,
+    // The three generated fields that are part of the group's PROFILE and its CONTENT rather
+    // than of its identity. Each delegates to the generated resolver when the viewer may read,
+    // and otherwise answers empty — never refuses, for the reason given at mayReadGroup.
+    categories: async (parent, args, context: Context, info) =>
+      (await mayReadGroup(parent, context))
+        ? groupCypherFields.categories(parent, args, context, info)
+        : [],
+    location: async (parent, args, context: Context, info) =>
+      (await mayReadGroup(parent, context))
+        ? groupCypherFields.location(parent, args, context, info)
+        : null,
+    posts: async (parent, args, context: Context, info) =>
+      (await mayReadGroupContent(parent, context))
+        ? groupCypherFields.posts(parent, args, context, info)
+        : [],
+    description: async (parent, _args, context: Context) =>
+      (await mayReadGroup(parent, context)) ? parent.description : '',
+    locationName: async (parent, _args, context: Context) =>
+      (await mayReadGroup(parent, context)) ? parent.locationName : null,
     ownerCount: async (parent, _args, context: Context, _resolveInfo) => {
       // Carried along by the admin list query; counted on demand elsewhere. Behind the same
       // right as the member list: it is a fact about the members.
@@ -864,7 +939,10 @@ export default {
       if (!context.user) {
         return parent.groupType === 'hidden' ? '' : parent.about
       }
-      return parent.about
+      // Part of the profile, so it follows `group.read`. For everybody who may read the group
+      // — which includes every stranger to a public or closed one — this is just `parent.about`
+      // as before.
+      return (await mayReadGroup(parent, context)) ? parent.about : ''
     },
     showMembers: async (parent, _args, context: Context) => {
       // "Non-members may see the member list" IS the non-member role holding group.members.read;

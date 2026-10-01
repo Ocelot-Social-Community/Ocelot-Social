@@ -24,35 +24,26 @@ const MEMBER_READ_SCOPE_QUERY = `
 `
 
 /**
- * What a membership grants when the group has no definition for its role — a group that
- * predates the roles, or a half-applied migration.
- *
- * Deliberately NOT the empty set, although that is what the shield does with an unknown role
- * (`permissionsForGroupRole(null)`): this list decides what a member can still SEE, and a
- * database mid-migration must not take a group's content away from the people in it. So the
- * fallback is the behaviour from before the rights existed — an applicant sees the group, a
- * member also sees its content.
- */
-const fallbackPermissions = (roleName: string): GroupPermissionKey[] =>
-  roleName === PENDING_ROLE ? ['group.read'] : ['group.read', 'group.content.read']
-
-/**
  * What the viewer's role in one group grants them.
  *
  * Through `permissionsForGroupRole`, because that is where the `owner` exception lives: the
  * owner role stores an EMPTY list and resolves to the whole catalog, so reading the stored
  * list alone would hide an owner's own group from them.
+ *
+ * A role the group has no definition for grants NOTHING here — the same answer the shield
+ * gives it, rather than a second, more generous one. That used to be a fallback to the
+ * pre-rights behaviour for a database mid-migration; the boot repair
+ * (`seedRolesForGroupsWithoutRoles`) makes that state go away instead, which is better than
+ * two layers disagreeing about what a broken row means.
  */
 const heldByRole = (roleName: string, stored: string | null): Set<GroupPermissionKey> =>
-  stored === null
-    ? new Set(fallbackPermissions(roleName))
-    : permissionsForGroupRole({
-        name: roleName,
-        label: null,
-        system: false,
-        protected: false,
-        permissions: parseStoredPermissions(stored),
-      })
+  permissionsForGroupRole({
+    name: roleName,
+    label: null,
+    system: false,
+    protected: false,
+    permissions: stored === null ? [] : parseStoredPermissions(stored),
+  })
 
 /** Which groups the viewer's OWN role lets them read — profile and content, separately. */
 export interface GroupReadScope {

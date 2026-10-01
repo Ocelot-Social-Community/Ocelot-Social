@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 
 import { DEFAULT_GROUP_ROLE_TEMPLATES } from './defaults'
-import { seedRolesForNewGroup } from './repository'
+import { seedRolesForGroupsWithoutRoles, seedRolesForNewGroup } from './repository'
 import { NONE_ROLE, OWNER_ROLE } from './types'
 
 import type { RoleSeedTransaction } from './repository'
@@ -103,5 +103,86 @@ describe(seedRolesForNewGroup, () => {
     await expect(seedRolesForNewGroup(transaction, 'group-3', 'ephemeral', NOW)).rejects.toThrow(
       "No group role template for groupType 'ephemeral'",
     )
+  })
+})
+
+// The boot repair. A fake db context rather than a database: what matters is which groups it
+// picks up and which statements it sends for each, and both are visible here.
+const fakeDatabase = (groups: Array<{ groupId: string; groupType: string }>) => {
+  const statements: Array<{ query: string; variables?: Record<string, unknown> }> = []
+  const rowsFor = (query: string) => {
+    // The template copy answers with the names it copied; an empty list sends the caller to
+    // the code defaults. The permission read-back feeds the derived columns.
+    if (query.includes('GroupRoleTemplate')) {
+      return [{ get: () => [NONE_ROLE] }]
+    }
+    if (query.includes('RETURN r.permissions AS permissions')) {
+      return [{ get: () => '["group.read"]' }]
+    }
+    return []
+  }
+  return {
+    statements,
+    db: {
+      query: vi.fn(async ({ query }: { query: string }) => {
+        statements.push({ query })
+        return Promise.resolve({
+          records: query.includes('NOT (g)-[:HAS_GROUP_ROLE]')
+            ? groups.map((group) => ({
+                get: (key: string) => group[key as 'groupId'],
+              }))
+            : rowsFor(query),
+        })
+      }),
+      write: vi.fn(
+        async ({ query, variables }: { query: string; variables?: Record<string, unknown> }) => {
+          statements.push({ query, variables })
+          return Promise.resolve({ records: rowsFor(query) })
+        },
+      ),
+    },
+  }
+}
+
+describe(seedRolesForGroupsWithoutRoles, () => {
+  it('does nothing when every group has its roles', async () => {
+    const { db, statements } = fakeDatabase([])
+
+    expect(await seedRolesForGroupsWithoutRoles(db as never, NOW)).toEqual({
+      seeded: [],
+      skipped: [],
+    })
+    // One statement: the scan that found nothing.
+    expect(statements).toHaveLength(1)
+  })
+
+  it('seeds the template of its type for every group that has none', async () => {
+    const { db, statements } = fakeDatabase([
+      { groupId: 'older-group', groupType: 'closed' },
+      { groupId: 'restored-group', groupType: 'public' },
+    ])
+
+    expect(await seedRolesForGroupsWithoutRoles(db as never, NOW)).toEqual({
+      seeded: ['older-group', 'restored-group'],
+      skipped: [],
+    })
+
+    const copies = statements.filter((statement) => statement.query.includes('GroupRoleTemplate'))
+
+    expect(copies.map((statement) => statement.variables?.groupType)).toEqual(['closed', 'public'])
+  })
+
+  it('reports a group whose type has no template instead of throwing', async () => {
+    // One odd row must not stop a deployment: the group is left exactly as it was, and named
+    // so an operator can look at it.
+    const { db } = fakeDatabase([
+      { groupId: 'odd-group', groupType: 'experimental' },
+      { groupId: 'normal-group', groupType: 'public' },
+    ])
+
+    expect(await seedRolesForGroupsWithoutRoles(db as never, NOW)).toEqual({
+      seeded: ['normal-group'],
+      skipped: ['odd-group'],
+    })
   })
 })
