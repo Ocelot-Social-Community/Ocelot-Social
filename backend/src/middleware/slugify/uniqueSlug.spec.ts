@@ -64,4 +64,26 @@ describe(uniqueSlug, () => {
       await expect(uniqueSlug('!!!', isUnique)).resolves.toEqual('anonymous')
     })
   })
+
+  // A character slugify neither maps to '-' nor removes (it's not whitespace and not in the
+  // custom `remove` regex — '?', '#', '/', most emoji) survives slugify as its own "word" and
+  // gets a real '-' separator from the space next to it. Stripping that character afterwards
+  // leaves the separator orphaned — trailing, leading, or doubled up mid-string.
+  describe('does not leave a stray "-" behind from a stripped character', () => {
+    const isUnique = vi.fn<IsUnique>().mockResolvedValue(true)
+
+    it('trailing: a title ending in "space + stripped character"', async () => {
+      await expect(uniqueSlug('Hello World ?', isUnique)).resolves.toEqual('hello-world')
+    })
+
+    it('leading: a title starting with "stripped character + space"', async () => {
+      await expect(uniqueSlug('? Leading special', isUnique)).resolves.toEqual('leading-special')
+    })
+
+    it('doubled mid-string: a stripped character surrounded by spaces', async () => {
+      await expect(uniqueSlug('Middle ? special word', isUnique)).resolves.toEqual(
+        'middle-special-word',
+      )
+    })
+  })
 })
