@@ -26,6 +26,18 @@ export function isMandatoryFor(roleName: string, permission: GroupPermissionKey)
 }
 
 /**
+ * Whether the right means anything for this role at all.
+ *
+ * `group.leave` on the non-member role is the case: there is no membership to end, so granting
+ * it would be neither true nor false but meaningless — and a checkbox that changes nothing is
+ * worse than one that is absent. The matrices show it ticked-and-locked where it is mandatory
+ * and greyed where it is moot, so the one place says both.
+ */
+export function isMootFor(roleName: string, permission: GroupPermissionKey): boolean {
+  return roleName === NONE_ROLE && MANDATORY_MEMBERSHIP_RIGHTS.includes(permission)
+}
+
+/**
  * The permission list as it must be stored: whatever was asked for, plus the rights that role
  * cannot be without. Applied where roles are written rather than where they are read, so the
  * stored list says what is true instead of being corrected on every lookup.

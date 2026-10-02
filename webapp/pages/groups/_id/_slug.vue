@@ -1,6 +1,10 @@
 <template>
   <div class="group-profile" v-if="isGroupVisible">
     <div class="ds-mb-large"></div>
+    <!-- Where a moderator or admin LANDS when a report points them at a group they are not in.
+         Picking the network rights up is a decision, and this is where it is offered — the
+         settings pages are behind the very rights it unlocks. -->
+    <group-elevation :group="group" @changed="$nuxt.refresh()" />
     <div v-if="group" class="ds-flex ds-flex-gap-base group-layout">
       <div class="group-layout__sidebar">
         <os-card
@@ -386,6 +390,7 @@ import Category from '~/components/Category'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import Empty from '~/components/Empty/Empty'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
+import GroupElevation from '~/components/Group/GroupElevation'
 import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 import LocationPickerMap from '~/components/Map/LocationPickerMap'
@@ -424,6 +429,7 @@ export default {
     ContentViewer,
     Empty,
     GroupContentMenu,
+    GroupElevation,
     JoinLeaveButton,
     LocationInfo,
     LocationPickerMap,

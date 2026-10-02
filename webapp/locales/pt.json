@@ -231,7 +231,7 @@
       "resultingVisibility": "Os grupos criados a partir deste modelo são:",
       "saved": "Modelo guardado",
       "title": "Funções predefinidas para grupos",
-      "untouched": "Ainda usam este modelo: {untouched} de {total} grupos."
+      "untouched": "Uma alteração aqui alcança {untouched} de {total} grupos — os que nunca mudaram os seus próprios direitos — e só quando a aplicares."
     },
     "groups": {
       "active": "ativo",
@@ -353,14 +353,6 @@
       "deleteError": "Não foi possível eliminar a função: {message}",
       "deleteSuccess": "Função eliminada.",
       "description": "Crie funções e atribua permissões. As alterações aplicam-se imediatamente.",
-      "groups": {
-        "account": "Conta",
-        "administration": "Administração",
-        "communication": "Comunicação",
-        "content": "Conteúdo",
-        "membership": "Adesão",
-        "moderation": "Moderação"
-      },
       "members": "{count} membros",
       "name": "Funções e permissões",
       "nameLabel": "Nome",
@@ -993,16 +985,10 @@
       "confirmReset": "Restaurar todas as funções deste grupo para os valores predefinidos? As funções que criaram são removidas e os seus membros passam a membros comuns.",
       "deleteRole": "Eliminar função",
       "description": "Decidam quem pode fazer o quê neste grupo — de quem está fora até aos administradores.",
-      "groups": {
-        "administration": "Administração",
-        "communication": "Comunicação",
-        "content": "Conteúdo",
-        "membership": "Associação",
-        "visibility": "Visibilidade"
-      },
       "labelField": "Nome visível",
       "mandatory": "Sempre concedido: uma adesão que não se pode terminar não é uma opção.",
       "members": "{count} membros",
+      "moot": "Quem não é membro não tem nenhuma adesão para terminar.",
       "noRight": "Não podes conceder uma permissão que tu mesmo não tens.",
       "ownerHoldsEverything": "A função de proprietário tem sempre todas as permissões deste grupo. Só o nome visível pode ser alterado.",
       "presets": {
@@ -1313,7 +1299,18 @@
     "previous": "Anterior"
   },
   "permissions": {
-    "deniedHint": "Não tens permissão para isto."
+    "deniedHint": "Não tens permissão para isto.",
+    "sections": {
+      "account": "Conta",
+      "administration": "Administração",
+      "communication": "Comunicação",
+      "content": "Conteúdo",
+      "groupAdministration": "Grupos — administração",
+      "groupModeration": "Grupos — moderação",
+      "membership": "Adesão",
+      "moderation": "Moderação",
+      "visibility": "Visibilidade"
+    }
   },
   "post": {
     "article": "Artigo",

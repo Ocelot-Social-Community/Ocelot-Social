@@ -47,11 +47,11 @@
       "description": "Leave the group."
     },
     "group.member.remove": {
-      "group": "membership",
+      "group": "administration",
       "description": "Remove a member from the group, subject to the act-on hierarchy."
     },
     "group.member.role.assign": {
-      "group": "membership",
+      "group": "administration",
       "description": "Change a member's role in the group, subject to the act-on hierarchy and to holding every right the assigned role holds."
     },
     "group.invite": {

@@ -231,7 +231,7 @@
       "resultingVisibility": "Grupy utworzone z tego szablonu są:",
       "saved": "Szablon zapisany",
       "title": "Domyślne role dla grup",
-      "untouched": "Nadal korzystają z tego szablonu: {untouched} z {total} grup."
+      "untouched": "Zmiana tutaj obejmie {untouched} z {total} grup — te, które nigdy nie zmieniły własnych uprawnień — i dopiero po zastosowaniu."
     },
     "groups": {
       "active": "aktywna",
@@ -353,14 +353,6 @@
       "deleteError": "Nie można usunąć roli: {message}",
       "deleteSuccess": "Rola usunięta.",
       "description": "Twórz role i przypisuj uprawnienia. Zmiany obowiązują natychmiast.",
-      "groups": {
-        "account": "Konto",
-        "administration": "Administracja",
-        "communication": "Komunikacja",
-        "content": "Treści",
-        "membership": "Członkostwo",
-        "moderation": "Moderacja"
-      },
       "members": "{count} członków",
       "name": "Role i uprawnienia",
       "nameLabel": "Nazwa",
@@ -993,16 +985,10 @@
       "confirmReset": "Przywrócić wszystkie role tej grupy do domyślnych? Role dodane przez was zostaną usunięte, a ich członkowie staną się zwykłymi członkami.",
       "deleteRole": "Usuń rolę",
       "description": "Ustalcie, kto co może w tej grupie — od osób z zewnątrz po administratorów.",
-      "groups": {
-        "administration": "Administracja",
-        "communication": "Komunikacja",
-        "content": "Treści",
-        "membership": "Członkostwo",
-        "visibility": "Widoczność"
-      },
       "labelField": "Nazwa wyświetlana",
       "mandatory": "Zawsze przyznane: członkostwo, którego nie można zakończyć, nie jest ustawieniem.",
       "members": "{count} członków",
+      "moot": "Kto nie jest członkiem, nie ma członkostwa do opuszczenia.",
       "noRight": "Nie możesz nadać uprawnienia, którego sam nie masz.",
       "ownerHoldsEverything": "Rola właściciela ma zawsze wszystkie uprawnienia w tej grupie. Zmienić można tylko jej nazwę wyświetlaną.",
       "presets": {
@@ -1313,7 +1299,18 @@
     "previous": "Poprzednia"
   },
   "permissions": {
-    "deniedHint": "Nie masz do tego uprawnień."
+    "deniedHint": "Nie masz do tego uprawnień.",
+    "sections": {
+      "account": "Konto",
+      "administration": "Administracja",
+      "communication": "Komunikacja",
+      "content": "Treści",
+      "groupAdministration": "Grupy — administracja",
+      "groupModeration": "Grupy — moderacja",
+      "membership": "Członkostwo",
+      "moderation": "Moderacja",
+      "visibility": "Widoczność"
+    }
   },
   "post": {
     "article": "Artykuł",

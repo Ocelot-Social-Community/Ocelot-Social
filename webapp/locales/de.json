@@ -231,7 +231,7 @@
       "resultingVisibility": "Gruppen aus dieser Vorlage sind:",
       "saved": "Vorlage gespeichert",
       "title": "Standard-Rollen fuer Gruppen",
-      "untouched": "Läuft noch auf diesem Template: {untouched} von {total} Gruppen."
+      "untouched": "Eine Änderung hier erreicht {untouched} von {total} Gruppen — die, die ihre Rechte nie selbst geändert haben — und erst, wenn du sie anwendest."
     },
     "groups": {
       "active": "aktiv",
@@ -353,14 +353,6 @@
       "deleteError": "Rolle konnte nicht gelöscht werden: {message}",
       "deleteSuccess": "Rolle gelöscht.",
       "description": "Rollen erstellen und Berechtigungen vergeben. Änderungen gelten sofort.",
-      "groups": {
-        "account": "Konto",
-        "administration": "Administration",
-        "communication": "Kommunikation",
-        "content": "Inhalte",
-        "membership": "Mitgliedschaft",
-        "moderation": "Moderation"
-      },
       "members": "{count} Mitglieder",
       "name": "Rollen & Berechtigungen",
       "nameLabel": "Name",
@@ -993,16 +985,10 @@
       "confirmReset": "Alle Rollen dieser Gruppe auf den Standard zuruecksetzen? Selbst angelegte Rollen werden dabei entfernt, ihre Mitglieder werden gewoehnliche Mitglieder.",
       "deleteRole": "Rolle loeschen",
       "description": "Hier legt ihr fest, was in dieser Gruppe wer darf — von Aussenstehenden bis zu den Administratoren.",
-      "groups": {
-        "administration": "Verwaltung",
-        "communication": "Austausch",
-        "content": "Inhalte",
-        "membership": "Mitgliedschaft",
-        "visibility": "Sichtbarkeit"
-      },
       "labelField": "Anzeigename",
       "mandatory": "Immer vergeben: eine Mitgliedschaft, die man nicht beenden kann, ist keine Einstellung.",
       "members": "{count} Mitglieder",
+      "moot": "Wer nicht Mitglied ist, hat keine Mitgliedschaft zu beenden.",
       "noRight": "Dieses Recht kannst du nicht vergeben, weil du es selbst nicht hast.",
       "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte dieser Gruppe. Nur ihr Anzeigename laesst sich aendern.",
       "presets": {
@@ -1313,7 +1299,18 @@
     "previous": "Zurück"
   },
   "permissions": {
-    "deniedHint": "Dir fehlt die Berechtigung dafür."
+    "deniedHint": "Dir fehlt die Berechtigung dafür.",
+    "sections": {
+      "account": "Konto",
+      "administration": "Administration",
+      "communication": "Kommunikation",
+      "content": "Inhalte",
+      "groupAdministration": "Gruppen — Administration",
+      "groupModeration": "Gruppen — Moderation",
+      "membership": "Mitgliedschaft",
+      "moderation": "Moderation",
+      "visibility": "Sichtbarkeit"
+    }
   },
   "post": {
     "article": "Artikel",

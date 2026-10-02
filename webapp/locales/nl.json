@@ -231,7 +231,7 @@
       "resultingVisibility": "Groepen uit dit sjabloon zijn:",
       "saved": "Sjabloon opgeslagen",
       "title": "Standaardrollen voor groepen",
-      "untouched": "Draaien nog op dit sjabloon: {untouched} van {total} groepen."
+      "untouched": "Een wijziging hier bereikt {untouched} van {total} groepen — die hun eigen rechten nooit wijzigden — en pas als je ze toepast."
     },
     "groups": {
       "active": "actief",
@@ -353,14 +353,6 @@
       "deleteError": "Kon rol niet verwijderen: {message}",
       "deleteSuccess": "Rol verwijderd.",
       "description": "Maak rollen aan en wijs rechten toe. Wijzigingen worden direct toegepast.",
-      "groups": {
-        "account": "Account",
-        "administration": "Beheer",
-        "communication": "Communicatie",
-        "content": "Inhoud",
-        "membership": "Lidmaatschap",
-        "moderation": "Moderatie"
-      },
       "members": "{count} leden",
       "name": "Rollen en rechten",
       "nameLabel": "Naam",
@@ -993,16 +985,10 @@
       "confirmReset": "Alle rollen van deze groep terugzetten naar de standaard? Rollen die jullie hebben toegevoegd verdwijnen en hun leden worden gewone leden.",
       "deleteRole": "Rol verwijderen",
       "description": "Bepaal wie wat mag in deze groep — van buitenstaanders tot beheerders.",
-      "groups": {
-        "administration": "Beheer",
-        "communication": "Uitwisseling",
-        "content": "Inhoud",
-        "membership": "Lidmaatschap",
-        "visibility": "Zichtbaarheid"
-      },
       "labelField": "Weergavenaam",
       "mandatory": "Altijd toegekend: een lidmaatschap dat je niet kunt beëindigen is geen instelling.",
       "members": "{count} leden",
+      "moot": "Wie geen lid is, heeft geen lidmaatschap om te beëindigen.",
       "noRight": "Je kunt geen recht geven dat je zelf niet hebt.",
       "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten in deze groep. Alleen de weergavenaam kan worden aangepast.",
       "presets": {
@@ -1313,7 +1299,18 @@
     "previous": "Vorige"
   },
   "permissions": {
-    "deniedHint": "Je hebt hiervoor geen rechten."
+    "deniedHint": "Je hebt hiervoor geen rechten.",
+    "sections": {
+      "account": "Account",
+      "administration": "Beheer",
+      "communication": "Communicatie",
+      "content": "Inhoud",
+      "groupAdministration": "Groepen — beheer",
+      "groupModeration": "Groepen — moderatie",
+      "membership": "Lidmaatschap",
+      "moderation": "Moderatie",
+      "visibility": "Zichtbaarheid"
+    }
   },
   "post": {
     "article": "Artikel",

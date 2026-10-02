@@ -231,7 +231,7 @@
       "resultingVisibility": "Los grupos creados con esta plantilla son:",
       "saved": "Plantilla guardada",
       "title": "Roles predeterminados para los grupos",
-      "untouched": "Siguen con esta plantilla: {untouched} de {total} grupos."
+      "untouched": "Un cambio aquí alcanza {untouched} de {total} grupos — los que nunca cambiaron sus propios permisos — y solo cuando lo apliques."
     },
     "groups": {
       "active": "activo",
@@ -353,14 +353,6 @@
       "deleteError": "No se pudo eliminar el rol: {message}",
       "deleteSuccess": "Rol eliminado.",
       "description": "Crea roles y asigna permisos. Los cambios se aplican de inmediato.",
-      "groups": {
-        "account": "Cuenta",
-        "administration": "Administración",
-        "communication": "Comunicación",
-        "content": "Contenido",
-        "membership": "Membresía",
-        "moderation": "Moderación"
-      },
       "members": "{count} miembros",
       "name": "Roles y permisos",
       "nameLabel": "Nombre",
@@ -993,16 +985,10 @@
       "confirmReset": "¿Restablecer todos los roles de este grupo a los valores predeterminados? Los roles que hayáis añadido se eliminan y sus miembros pasan a ser miembros normales.",
       "deleteRole": "Eliminar rol",
       "description": "Decidid quién puede hacer qué en este grupo — desde quienes no son miembros hasta los administradores.",
-      "groups": {
-        "administration": "Administración",
-        "communication": "Comunicación",
-        "content": "Contenido",
-        "membership": "Miembros",
-        "visibility": "Visibilidad"
-      },
       "labelField": "Nombre visible",
       "mandatory": "Siempre concedido: una membresía que no se puede terminar no es una opción.",
       "members": "{count} miembros",
+      "moot": "Quien no es miembro no tiene ninguna membresía que abandonar.",
       "noRight": "No puedes conceder un permiso que tú misma no tienes.",
       "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos de este grupo. Solo se puede cambiar su nombre visible.",
       "presets": {
@@ -1313,7 +1299,18 @@
     "previous": "Anterior"
   },
   "permissions": {
-    "deniedHint": "No tienes permiso para esto."
+    "deniedHint": "No tienes permiso para esto.",
+    "sections": {
+      "account": "Cuenta",
+      "administration": "Administración",
+      "communication": "Comunicación",
+      "content": "Contenido",
+      "groupAdministration": "Grupos — administración",
+      "groupModeration": "Grupos — moderación",
+      "membership": "Membresía",
+      "moderation": "Moderación",
+      "visibility": "Visibilidad"
+    }
   },
   "post": {
     "article": "Artículo",

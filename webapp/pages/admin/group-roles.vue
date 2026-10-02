@@ -66,9 +66,16 @@
         :permissions="catalog"
         :granted="draft"
         :diff="hoverDiff"
-        :group-label="(name) => $t(`group.rights.groups.${name}`)"
-        :disabled-for="(permission) => saving || isMandatory(permission)"
-        :hint-for="(permission) => (isMandatory(permission) ? $t('group.rights.mandatory') : null)"
+        :group-label="(name) => $t(`permissions.sections.${name}`)"
+        :disabled-for="(permission) => saving || isMandatory(permission) || isMoot(permission)"
+        :hint-for="
+          (permission) =>
+            isMoot(permission)
+              ? $t('group.rights.moot')
+              : isMandatory(permission)
+                ? $t('group.rights.mandatory')
+                : null
+        "
         @toggle="toggle"
       />
 
@@ -204,6 +211,16 @@ export default {
     },
     // Ticked and locked: a membership role cannot be stored without the right to end the
     // membership (see groupRole/mandatoryRights.ts).
+    /**
+     * A right that means nothing for this role: `group.leave` on the non-member role, which has
+     * no membership to end. Greyed rather than offered — a checkbox that changes nothing is
+     * worse than one that is not there.
+     */
+    isMoot(permission) {
+      return (
+        this.activeRoleName === NONE_GROUP_ROLE && MANDATORY_GROUP_RIGHTS.includes(permission?.key)
+      )
+    },
     isMandatory(permission) {
       return (
         this.activeRoleName !== NONE_GROUP_ROLE && MANDATORY_GROUP_RIGHTS.includes(permission?.key)
@@ -320,6 +337,11 @@ export default {
   background: var(--color-primary);
   color: var(--color-primary-inverse);
   font-weight: bold;
+}
+/* The hover rule above would otherwise lighten the ACTIVE tab's background while its text
+   stays the inverse colour — white on near-white, unreadable. */
+.type-tab--active:hover {
+  background: var(--color-primary);
 }
 .role-label {
   display: flex;

@@ -278,6 +278,17 @@ describe('rights.vue', () => {
     expect(leave.attributes('disabled')).toBeDefined()
   })
 
+  it('greys the right to leave on the non-member role, which has nothing to leave', async () => {
+    const wrapper = await Wrapper()
+    await at(wrapper, 'to-advanced').trigger('click')
+    await at(wrapper, 'role-tab-none').trigger('click')
+
+    const leave = at(wrapper, 'perm-group.leave')
+
+    expect(leave.attributes('disabled')).toBeDefined()
+    expect(leave.element.checked).toBe(false)
+  })
+
   it('lets the owner role be renamed although its rights are fixed', async () => {
     // The owner holds the whole catalog — but "Owner" is just what this group calls the
     // person, and the save button used to be hidden for exactly that role.

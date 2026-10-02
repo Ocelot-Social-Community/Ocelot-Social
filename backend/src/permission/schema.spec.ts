@@ -133,8 +133,13 @@ describe('permission catalog', () => {
     })
 
     it('only uses known groups', () => {
+      // The two group-shaped sections are their own: a right that reaches INTO somebody else's
+      // group is not the same kind of thing as administering the network, and an admin reading
+      // a flat "administration" list could not tell them apart.
       const knownGroups = [
         'administration',
+        'groupAdministration',
+        'groupModeration',
         'moderation',
         'content',
         'membership',

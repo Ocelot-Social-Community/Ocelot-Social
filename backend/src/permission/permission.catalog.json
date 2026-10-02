@@ -42,22 +42,22 @@
       "description": "Access reports and review (decide) on reported content."
     },
     "group.content.read.any_closed": {
-      "group": "moderation",
+      "group": "groupModeration",
       "gatedBy": "groupsEnabled",
       "description": "Read the content of any CLOSED group without being a member — what a network moderator needs to moderate what they were never shown."
     },
     "group.content.read.any_hidden": {
-      "group": "moderation",
+      "group": "groupModeration",
       "gatedBy": "groupsEnabled",
       "description": "Read the content of any HIDDEN group without being a member. Deliberately separate from the closed variant: an unlisted group is the stricter case."
     },
     "group.moderate.any_closed": {
-      "group": "moderation",
+      "group": "groupModeration",
       "gatedBy": "groupsEnabled",
       "description": "Moderate inside any CLOSED group without being a member: take a post out of the group. Folds group.post.moderate into the group scope."
     },
     "group.moderate.any_hidden": {
-      "group": "moderation",
+      "group": "groupModeration",
       "gatedBy": "groupsEnabled",
       "description": "Moderate inside any HIDDEN group without being a member: take a post out of the group. Folds group.post.moderate into the group scope."
     },
@@ -132,22 +132,22 @@
       "description": "View the available baked-in brandings and switch the active branding network-wide."
     },
     "group.administer.any_public": {
-      "group": "administration",
+      "group": "groupAdministration",
       "gatedBy": "groupsEnabled",
       "description": "Administer any PUBLIC group as if owning it: settings, roles and member management. The recovery path for a group left without an owner; it may only promote EXISTING members, never the holder themselves."
     },
     "group.administer.any_closed": {
-      "group": "administration",
+      "group": "groupAdministration",
       "gatedBy": "groupsEnabled",
       "description": "Administer any CLOSED group as if owning it: settings, roles and member management. The recovery path for a group left without an owner; it may only promote EXISTING members, never the holder themselves."
     },
     "group.administer.any_hidden": {
-      "group": "administration",
+      "group": "groupAdministration",
       "gatedBy": "groupsEnabled",
       "description": "Administer any HIDDEN group as if owning it: settings, roles and member management. The recovery path for a group left without an owner; it may only promote EXISTING members, never the holder themselves."
     },
     "group.roleTemplate.manage": {
-      "group": "administration",
+      "group": "groupAdministration",
       "gatedBy": "groupsEnabled",
       "description": "View and edit the network-wide group role templates that every new group is seeded from."
     }

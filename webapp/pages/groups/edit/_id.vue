@@ -108,9 +108,15 @@ export default {
     // granted independently, so a member who may only hand out invite links has to be able to
     // open that one tab — and must not be able to open the others.
     const tab = tabForPath(route?.path ?? '', id)
-    const allowed = tab
-      ? holdsAnyOf(group, tab.permissions)
-      : TABS.some((candidate) => holdsAnyOf(group, candidate.permissions))
+    // Somebody who COULD pick their network rights up here is let in to do exactly that: the
+    // page then shows the elevation card and no tabs. Refusing them would be the chicken and
+    // the egg — the rights that open these tabs are the ones they have not picked up yet.
+    const mayElevate = group?.mayElevateInGroup === true
+    const allowed =
+      mayElevate ||
+      (tab
+        ? holdsAnyOf(group, tab.permissions)
+        : TABS.some((candidate) => holdsAnyOf(group, candidate.permissions)))
     if (!allowed) {
       error({ statusCode: 403, message: 'NONONNNO' })
     }

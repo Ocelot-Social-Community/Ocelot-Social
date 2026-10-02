@@ -500,7 +500,7 @@ export default {
     // Localized label for a permission group, falling back to the raw group name.
     // vuex-i18n returns the key itself when there is no translation.
     groupLabel(group) {
-      const path = `admin.roles.groups.${group}`
+      const path = `permissions.sections.${group}`
       const label = this.$t(path)
       return label && label !== path ? label : group
     },

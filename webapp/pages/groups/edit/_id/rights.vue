@@ -123,10 +123,14 @@
           :permissions="catalog"
           :granted="draftPermissions"
           :diff="hoverDiff"
-          :group-label="(name) => $t(`group.rights.groups.${name}`)"
+          :group-label="(name) => $t(`permissions.sections.${name}`)"
           :disabled-for="
             (permission) =>
-              !canManageRoles || !grantable(permission) || saving || isMandatory(permission)
+              !canManageRoles ||
+              !grantable(permission) ||
+              saving ||
+              isMandatory(permission) ||
+              isMoot(permission)
           "
           :hint-for="blockedHint"
           @toggle="togglePermission"
@@ -288,6 +292,16 @@ export default {
      * offered: `group.leave` on anything that IS a membership. Without it the only way out of
      * the group would be somebody else removing you (see groupRole/mandatoryRights.ts).
      */
+    /**
+     * A right that means nothing for this role: `group.leave` on the non-member role, which has
+     * no membership to end. Greyed rather than offered — a checkbox that changes nothing is
+     * worse than one that is not there.
+     */
+    isMoot(permission) {
+      return (
+        this.activeRoleName === NONE_GROUP_ROLE && MANDATORY_GROUP_RIGHTS.includes(permission?.key)
+      )
+    },
     isMandatory(permission) {
       // The simple view asks about rights the catalog may not carry yet, so a missing entry is
       // a legitimate argument here and answers "no" rather than throwing.
@@ -299,6 +313,9 @@ export default {
       return !!permission && this.myGroupPermissions.includes(permission.key)
     },
     blockedHint(permission) {
+      if (this.isMoot(permission)) {
+        return this.$t('group.rights.moot')
+      }
       if (this.isMandatory(permission)) {
         return this.$t('group.rights.mandatory')
       }

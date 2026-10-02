@@ -231,7 +231,7 @@
       "resultingVisibility": "Les groupes créés à partir de ce modèle sont :",
       "saved": "Modèle enregistré",
       "title": "Rôles par défaut des groupes",
-      "untouched": "Utilisent encore ce modèle : {untouched} groupes sur {total}."
+      "untouched": "Une modification ici touche {untouched} groupes sur {total} — ceux qui n'ont jamais changé leurs propres droits — et seulement quand tu l'appliques."
     },
     "groups": {
       "active": "actif",
@@ -353,14 +353,6 @@
       "deleteError": "Impossible de supprimer le rôle : {message}",
       "deleteSuccess": "Rôle supprimé.",
       "description": "Créez des rôles et attribuez des permissions. Les changements s’appliquent immédiatement.",
-      "groups": {
-        "account": "Compte",
-        "administration": "Administration",
-        "communication": "Communication",
-        "content": "Contenu",
-        "membership": "Adhésion",
-        "moderation": "Modération"
-      },
       "members": "{count} membres",
       "name": "Rôles et permissions",
       "nameLabel": "Nom",
@@ -993,16 +985,10 @@
       "confirmReset": "Réinitialiser tous les rôles de ce groupe aux valeurs par défaut ? Les rôles que vous avez ajoutés seront supprimés et leurs membres deviendront des membres ordinaires.",
       "deleteRole": "Supprimer le rôle",
       "description": "Décidez qui peut faire quoi dans ce groupe — des non-membres jusqu’aux administrateurs.",
-      "groups": {
-        "administration": "Administration",
-        "communication": "Échanges",
-        "content": "Contenus",
-        "membership": "Adhésion",
-        "visibility": "Visibilité"
-      },
       "labelField": "Nom affiché",
       "mandatory": "Toujours accordé : une adhésion qu'on ne peut pas quitter n'est pas un réglage.",
       "members": "{count} membres",
+      "moot": "Qui n'est pas membre n'a pas d'adhésion à quitter.",
       "noRight": "Vous ne pouvez pas accorder une permission que vous n’avez pas vous-même.",
       "ownerHoldsEverything": "Le rôle de propriétaire détient toujours toutes les permissions de ce groupe. Seul son nom affiché peut être modifié.",
       "presets": {
@@ -1313,7 +1299,18 @@
     "previous": "Précédent"
   },
   "permissions": {
-    "deniedHint": "Vous n'avez pas la permission pour cela."
+    "deniedHint": "Vous n'avez pas la permission pour cela.",
+    "sections": {
+      "account": "Compte",
+      "administration": "Administration",
+      "communication": "Communication",
+      "content": "Contenu",
+      "groupAdministration": "Groupes — administration",
+      "groupModeration": "Groupes — modération",
+      "membership": "Adhésion",
+      "moderation": "Modération",
+      "visibility": "Visibilité"
+    }
   },
   "post": {
     "article": "Article",

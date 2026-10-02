@@ -231,7 +231,7 @@
       "resultingVisibility": "Grupet e krijuara nga ky shabllon janë:",
       "saved": "Shablloni u ruajt",
       "title": "Rolet e parazgjedhura për grupet",
-      "untouched": "Ende përdorin këtë shabllon: {untouched} nga {total} grupe."
+      "untouched": "Një ndryshim këtu prek {untouched} nga {total} grupe — ato që s'i kanë ndryshuar kurrë të drejtat e veta — dhe vetëm kur ta zbatosh."
     },
     "groups": {
       "active": "aktiv",
@@ -353,14 +353,6 @@
       "deleteError": "Roli nuk u fshi dot: {message}",
       "deleteSuccess": "Roli u fshi.",
       "description": "Krijo role dhe cakto leje. Ndryshimet zbatohen menjëherë.",
-      "groups": {
-        "account": "Llogaria",
-        "administration": "Administrim",
-        "communication": "Komunikim",
-        "content": "Përmbajtje",
-        "membership": "Anëtarësia",
-        "moderation": "Moderim"
-      },
       "members": "{count} anëtarë",
       "name": "Rolet dhe lejet",
       "nameLabel": "Emri",
@@ -993,16 +985,10 @@
       "confirmReset": "Të rikthehen të gjitha rolet e këtij grupi në parazgjedhjet? Rolet që shtuat hiqen dhe anëtarët e tyre bëhen anëtarë të zakonshëm.",
       "deleteRole": "Fshi rolin",
       "description": "Vendosni kush çfarë mund të bëjë në këtë grup — nga të jashtmit deri te administratorët.",
-      "groups": {
-        "administration": "Administrim",
-        "communication": "Komunikim",
-        "content": "Përmbajtje",
-        "membership": "Anëtarësi",
-        "visibility": "Dukshmëri"
-      },
       "labelField": "Emri i shfaqur",
       "mandatory": "Gjithmonë e dhënë: një anëtarësim që nuk mund të përfundohet nuk është një rregullim.",
       "members": "{count} anëtarë",
+      "moot": "Kush nuk është anëtar, nuk ka anëtarësi për të lënë.",
       "noRight": "Nuk mund të dhurosh një leje që ti vetë nuk e ke.",
       "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet e këtij grupi. Mund të ndryshohet vetëm emri i shfaqur.",
       "presets": {
@@ -1313,7 +1299,18 @@
     "previous": "Mëparshëm"
   },
   "permissions": {
-    "deniedHint": "Nuk ke leje për këtë."
+    "deniedHint": "Nuk ke leje për këtë.",
+    "sections": {
+      "account": "Llogari",
+      "administration": "Administrim",
+      "communication": "Komunikim",
+      "content": "Përmbajtje",
+      "groupAdministration": "Grupe — administrim",
+      "groupModeration": "Grupe — moderim",
+      "membership": "Anëtarësi",
+      "moderation": "Moderim",
+      "visibility": "Dukshmëri"
+    }
   },
   "post": {
     "article": "Artikull",

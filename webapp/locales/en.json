@@ -231,7 +231,7 @@
       "resultingVisibility": "Groups created from this template are:",
       "saved": "Template saved",
       "title": "Default roles for groups",
-      "untouched": "Still running on this template: {untouched} of {total} groups."
+      "untouched": "An edit here reaches {untouched} of {total} groups — the ones that never changed their own rights — and only when you apply it."
     },
     "groups": {
       "active": "active",
@@ -353,14 +353,6 @@
       "deleteError": "Could not delete role: {message}",
       "deleteSuccess": "Role deleted.",
       "description": "Create roles and assign permissions. Changes apply immediately.",
-      "groups": {
-        "account": "Account",
-        "administration": "Administration",
-        "communication": "Communication",
-        "content": "Content",
-        "membership": "Membership",
-        "moderation": "Moderation"
-      },
       "members": "{count} members",
       "name": "Roles & permissions",
       "nameLabel": "Name",
@@ -993,16 +985,10 @@
       "confirmReset": "Reset every role of this group to the defaults? Roles you added are removed and their members become ordinary members.",
       "deleteRole": "Delete role",
       "description": "Decide who may do what in this group — from outsiders to administrators.",
-      "groups": {
-        "administration": "Administration",
-        "communication": "Communication",
-        "content": "Content",
-        "membership": "Membership",
-        "visibility": "Visibility"
-      },
       "labelField": "Display name",
       "mandatory": "Always granted: a membership one cannot end is not a setting.",
       "members": "{count} members",
+      "moot": "A non-member has no membership to leave.",
       "noRight": "You cannot grant a right you do not hold yourself.",
       "ownerHoldsEverything": "The owner role always holds every right in this group. Only its display name can be changed.",
       "presets": {
@@ -1313,7 +1299,18 @@
     "previous": "Previous"
   },
   "permissions": {
-    "deniedHint": "You don't have permission for this."
+    "deniedHint": "You don't have permission for this.",
+    "sections": {
+      "account": "Account",
+      "administration": "Administration",
+      "communication": "Communication",
+      "content": "Content",
+      "groupAdministration": "Groups — administration",
+      "groupModeration": "Groups — moderation",
+      "membership": "Membership",
+      "moderation": "Moderation",
+      "visibility": "Visibility"
+    }
   },
   "post": {
     "article": "Article",
