@@ -3,10 +3,13 @@
     <h2 class="title">{{ $t('admin.groupRoles.title') }}</h2>
     <p class="description">{{ $t('admin.groupRoles.description') }}</p>
 
-    <!-- One tab per TEMPLATE. What a template is called and how findable the groups it creates
-         are are two different things, so the visibility is stated below rather than read into
-         the tab's name. -->
+    <!-- One tab per TEMPLATE. What a template is CALLED and how findable the groups it creates
+         are are two different things that used to share one vocabulary — the tab said "Public"
+         and the line below said the groups are "Public", and the two can disagree the moment
+         somebody edits the template's non-member role. The row is labelled as templates, and
+         the visibility is stated below as a consequence. -->
     <div class="type-tabs">
+      <span class="type-tabs__label">{{ $t('admin.groupRoles.templateLabel') }}</span>
       <button
         v-for="template in templates"
         :key="template.name"
@@ -23,10 +26,16 @@
     </div>
 
     <template v-if="activeTemplate">
-      <p class="visibility" data-test="template-visibility">
-        {{ $t('admin.groupRoles.resultingVisibility') }}
-        <strong>{{ $t(`group.types.${activeTemplate.visibility}`) }}</strong>
-      </p>
+      <!-- The same card and the same switches a group gets for its own rights, so a template is
+           read the way the thing it produces is read. -->
+      <group-rights-simple
+        :roles="activeTemplate.roles"
+        :catalog="catalog"
+        :caption="$t('admin.groupRoles.resultingVisibility')"
+        :disabled="saving || dirty"
+        :disabled-hint="$t('admin.groupRoles.saveFirst')"
+        @toggle="toggleSimple"
+      />
 
       <p class="untouched" data-test="untouched">
         {{
@@ -101,6 +110,7 @@
 
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
+import GroupRightsSimple from '~/components/Permissions/GroupRightsSimple'
 import OcelotInput from '~/components/OcelotInput/OcelotInput'
 import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
 import RoleTabs from '~/components/Permissions/RoleTabs'
@@ -115,7 +125,7 @@ import { orderRolesByPrivilege } from '~/utils/groupRights'
 import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
 
 export default {
-  components: { OcelotInput, OsButton, OsCard, PermissionMatrix, RoleTabs },
+  components: { GroupRightsSimple, OcelotInput, OsButton, OsCard, PermissionMatrix, RoleTabs },
   data() {
     return {
       catalog: [],
@@ -216,17 +226,29 @@ export default {
     toggle(key, enabled) {
       this.draft = enabled ? [...this.draft, key] : this.draft.filter((k) => k !== key)
     },
-    async save() {
+    save() {
+      return this.writeRole(this.activeRoleName, this.draft, this.draftLabel || null)
+    },
+    /**
+     * One tick in the simple view writes one role of this template straight away — the same
+     * immediacy a group's own simple view has. The matrix keeps its draft-and-save flow, which
+     * is why the switches are locked while that draft is dirty: saving a role here would
+     * otherwise discard the edit in progress without saying so.
+     */
+    toggleSimple(roleName, permissionKey, enabled) {
+      const role = this.activeTemplate?.roles.find((candidate) => candidate.name === roleName)
+      if (!role) return
+      const permissions = enabled
+        ? [...role.permissions, permissionKey]
+        : role.permissions.filter((key) => key !== permissionKey)
+      return this.writeRole(role.name, permissions, role.label ?? null)
+    },
+    async writeRole(name, permissions, label) {
       this.saving = true
       try {
         const { data } = await this.$apollo.mutate({
           mutation: updateGroupRoleTemplateMutation(),
-          variables: {
-            template: this.activeTemplateName,
-            name: this.activeRoleName,
-            permissions: this.draft,
-            label: this.draftLabel || null,
-          },
+          variables: { template: this.activeTemplateName, name, permissions, label },
         })
         this.mergeRole(data.updateGroupRoleTemplate)
         this.$toast.success(this.$t('admin.groupRoles.saved'))
@@ -297,7 +319,6 @@ export default {
   margin-bottom: 0;
 }
 .description,
-.visibility,
 .untouched,
 .note {
   color: var(--text-color-soft);
@@ -305,8 +326,18 @@ export default {
 .type-tabs {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-xx-small);
   margin-bottom: var(--space-small);
+}
+/* Names what the row IS, so the three short words are read as presets rather than as the
+   visibility they happen to share their names with. */
+.type-tabs__label {
+  margin-right: var(--space-xx-small);
+  color: var(--text-color-softer);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 .type-tab {
   border: 1px solid var(--border-color-soft);

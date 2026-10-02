@@ -229,7 +229,9 @@
       "name": "Groepsrollen",
       "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten en kan niet worden aangepast.",
       "resultingVisibility": "Groepen uit dit sjabloon zijn:",
+      "saveFirst": "Eerst opslaan of verwerpen — deze rol heeft niet-opgeslagen wijzigingen.",
       "saved": "Sjabloon opgeslagen",
+      "templateLabel": "Sjabloon",
       "title": "Standaardrollen voor groepen",
       "untouched": "Een wijziging hier bereikt {untouched} van {total} groepen — die hun eigen rechten nooit wijzigden — en pas als je ze toepast."
     },
@@ -1035,6 +1037,11 @@
       "closed": "Gesloten",
       "hidden": "Geheim",
       "public": "Openbaar"
+    },
+    "typeDescriptions": {
+      "closed": "Alle berichten alleen zichtbaar voor groepsleden",
+      "hidden": "Groep (inclusief de naam) is volledig onzichtbaar",
+      "public": "Groep en alle berichten zijn zichtbaar voor alle geregistreerde gebruikers"
     },
     "typesOptions": {
       "closed": "Gesloten — Alle berichten alleen zichtbaar voor groepsleden",

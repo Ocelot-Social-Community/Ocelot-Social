@@ -229,7 +229,9 @@
       "name": "Rolet e grupeve",
       "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet dhe nuk mund të redaktohet.",
       "resultingVisibility": "Grupet e krijuara nga ky shabllon janë:",
+      "saveFirst": "Fillimisht ruaj ose hidh poshtë — ky rol ka ndryshime të paruajtura.",
       "saved": "Shablloni u ruajt",
+      "templateLabel": "Model",
       "title": "Rolet e parazgjedhura për grupet",
       "untouched": "Një ndryshim këtu prek {untouched} nga {total} grupe — ato që s'i kanë ndryshuar kurrë të drejtat e veta — dhe vetëm kur ta zbatosh."
     },
@@ -1035,6 +1037,11 @@
       "closed": "I mbyllur",
       "hidden": "Sekret",
       "public": "Publik"
+    },
+    "typeDescriptions": {
+      "closed": "Të gjitha postimet janë të dukshme vetëm për anëtarët e grupit",
+      "hidden": "Grupi (përfshirë emrin) është plotësisht i padukshëm",
+      "public": "Grupi dhe të gjitha postimet janë të dukshme për të gjithë përdoruesit e regjistruar"
     },
     "typesOptions": {
       "closed": "I mbyllur — Të gjitha postimet janë të dukshme vetëm për anëtarët e grupit",

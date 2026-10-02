@@ -229,7 +229,9 @@
       "name": "Role w grupach",
       "ownerHoldsEverything": "Rola właściciela ma zawsze wszystkie uprawnienia i nie da się jej edytować.",
       "resultingVisibility": "Grupy utworzone z tego szablonu są:",
+      "saveFirst": "Najpierw zapisz lub odrzuć — ta rola ma niezapisane zmiany.",
       "saved": "Szablon zapisany",
+      "templateLabel": "Szablon",
       "title": "Domyślne role dla grup",
       "untouched": "Zmiana tutaj obejmie {untouched} z {total} grup — te, które nigdy nie zmieniły własnych uprawnień — i dopiero po zastosowaniu."
     },
@@ -1035,6 +1037,11 @@
       "closed": "Zamknięta",
       "hidden": "Tajna",
       "public": "Publiczna"
+    },
+    "typeDescriptions": {
+      "closed": "Wszystkie wpisy widoczne tylko dla członków grupy",
+      "hidden": "Grupa (łącznie z nazwą) jest całkowicie niewidoczna",
+      "public": "Grupa i wszystkie wpisy są widoczne dla wszystkich zarejestrowanych użytkowników"
     },
     "typesOptions": {
       "closed": "Zamknięta — Wszystkie wpisy widoczne tylko dla członków grupy",

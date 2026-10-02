@@ -30,6 +30,10 @@ const role = (name, permissions, extra = {}) => ({
   ...extra,
 })
 
+// The `none` role carries the rights the visibility is DERIVED from, so these fixtures have to
+// be internally consistent: a template claiming `visibility: 'public'` whose non-member role
+// cannot even read the profile is a state the server never produces, and a screen built on it
+// would be tested against a fiction.
 const TEMPLATES = [
   {
     name: 'public',
@@ -37,7 +41,7 @@ const TEMPLATES = [
     untouchedGroupCount: 4,
     groupCount: 7,
     roles: [
-      role('none', ['group.members.read']),
+      role('none', ['group.read', 'group.content.read', 'group.members.read']),
       role('usual', ['group.post.create']),
       role('owner', [], { protected: true }),
     ],
@@ -47,9 +51,9 @@ const TEMPLATES = [
     visibility: 'closed',
     untouchedGroupCount: 0,
     groupCount: 2,
-    // Deliberately different from the public template's `usual`: that difference is what a
-    // hover over the type tab is supposed to show.
-    roles: [role('none', []), role('usual', ['group.members.read'])],
+    // The `usual` role is deliberately different from the public template's: that difference is
+    // what a hover over the template tab is supposed to show.
+    roles: [role('none', ['group.read']), role('usual', ['group.members.read'])],
   },
 ]
 
@@ -182,13 +186,55 @@ describe('admin/group-roles.vue', () => {
     )
   })
 
+  it('writes the template role straight away when a simple switch is ticked', async () => {
+    // The simple view is immediate on both levels. The role it writes is the one the SENTENCE
+    // is about, not the one the matrix tabs happen to have selected.
+    const wrapper = await Wrapper()
+
+    await at(wrapper, 'switch-members-post').setChecked(false)
+
+    expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variables: expect.objectContaining({
+          template: 'public',
+          name: 'usual',
+          permissions: [],
+        }),
+      }),
+    )
+  })
+
+  it('locks the simple switches while the matrix has an unsaved draft', async () => {
+    // Writing a role here would discard that draft without saying so, since the answer from the
+    // server replaces it. Locked with a reason beats a silent loss.
+    const wrapper = await Wrapper()
+
+    wrapper.setData({ draft: ['group.post.create', 'group.members.read'] })
+    await wrapper.vm.$nextTick()
+
+    expect(at(wrapper, 'switch-members-post').element.disabled).toBe(true)
+  })
+
   it('offers one tab per template, names the visibility it produces, and starts on public', async () => {
     const wrapper = await Wrapper()
 
     expect(at(wrapper, 'type-tab-public').exists()).toBe(true)
     expect(at(wrapper, 'type-tab-closed').exists()).toBe(true)
     expect(wrapper.vm.activeTemplateName).toBe('public')
-    expect(at(wrapper, 'template-visibility').text()).toContain('group.types.public')
+    // Derived from the template's own non-member role by the shared card — the same statement a
+    // group gets about itself, rather than a second implementation that can disagree.
+    expect(at(wrapper, 'visibility-title').text()).toContain('group.types.public')
+  })
+
+  it('follows the template under the tabs rather than the tab that is called public', async () => {
+    // The tab name is a KEY, the card is a CONSEQUENCE. A template whose non-member role was
+    // opened or closed keeps its name and changes what it produces, and the two must not be
+    // read as one thing.
+    const wrapper = await Wrapper()
+
+    await at(wrapper, 'type-tab-closed').trigger('click')
+
+    expect(at(wrapper, 'visibility-title').text()).toContain('group.types.closed')
   })
 
   it('says how many groups still run on the template untouched', async () => {

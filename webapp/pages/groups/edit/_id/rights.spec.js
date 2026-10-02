@@ -145,13 +145,19 @@ describe('rights.vue', () => {
     // The type is not a separate choice any more: these two non-member rights ARE the choice,
     // so the page has to name the result while they are being ticked.
     it('names what the stored non-member rights make the group', async () => {
+      // In the simple view that statement is the shared card, which the admin template page
+      // shows as well — one derivation, so the two screens cannot disagree.
       const wrapper = await Wrapper()
 
-      expect(at(wrapper, 'resulting-type').text()).toContain('group.types.hidden')
+      expect(at(wrapper, 'visibility-title').text()).toContain('group.types.hidden')
     })
 
     it('reads the unsaved draft while the non-member role is the one being edited', async () => {
+      // The matrix view only: there the `none` role is editable, so the answer has to follow the
+      // DRAFT. The simple view saves each tick straight away and reads the stored roles.
       const wrapper = await Wrapper()
+      wrapper.setData({ advanced: true })
+      await wrapper.vm.$nextTick()
 
       // Switching the tab reloads the draft from the role, so the draft is set afterwards —
       // the same order a click and a tick produce.

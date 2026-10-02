@@ -229,7 +229,9 @@
       "name": "Group roles",
       "ownerHoldsEverything": "The owner role always holds every right and cannot be edited.",
       "resultingVisibility": "Groups created from this template are:",
+      "saveFirst": "Save or discard first — this role has unsaved changes.",
       "saved": "Template saved",
+      "templateLabel": "Template",
       "title": "Default roles for groups",
       "untouched": "An edit here reaches {untouched} of {total} groups — the ones that never changed their own rights — and only when you apply it."
     },
@@ -1035,6 +1037,11 @@
       "closed": "Closed",
       "hidden": "Secret",
       "public": "Public"
+    },
+    "typeDescriptions": {
+      "closed": "All posts only visible to the group's members",
+      "hidden": "Group (including the name) is completely invisible",
+      "public": "Group and all posts are visible for all registered users"
     },
     "typesOptions": {
       "closed": "Closed — All posts only visible to the group's members",

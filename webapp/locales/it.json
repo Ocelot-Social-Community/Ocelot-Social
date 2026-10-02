@@ -229,7 +229,9 @@
       "name": "Ruoli dei gruppi",
       "ownerHoldsEverything": "Il ruolo di proprietario ha sempre tutti i permessi e non è modificabile.",
       "resultingVisibility": "I gruppi creati da questo modello sono:",
+      "saveFirst": "Prima salva o annulla: questo ruolo ha modifiche non salvate.",
       "saved": "Modello salvato",
+      "templateLabel": "Modello",
       "title": "Ruoli predefiniti per i gruppi",
       "untouched": "Una modifica qui raggiunge {untouched} gruppi su {total} — quelli che non hanno mai cambiato i propri permessi — e solo quando la applichi."
     },
@@ -1035,6 +1037,11 @@
       "closed": "Chiuso",
       "hidden": "Segreto",
       "public": "Pubblico"
+    },
+    "typeDescriptions": {
+      "closed": "Tutte le pubblicazioni visibili solo ai membri del gruppo",
+      "hidden": "Il gruppo (compreso il nome) è completamente invisibile",
+      "public": "Il gruppo e tutte le pubblicazioni sono visibili a tutti gli utenti registrati"
     },
     "typesOptions": {
       "closed": "Chiuso — Tutte le pubblicazioni visibili solo ai membri del gruppo",

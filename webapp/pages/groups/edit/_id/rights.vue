@@ -3,51 +3,51 @@
     <h2 class="title">{{ $t('group.rights.title') }}</h2>
     <p class="description">{{ $t('group.rights.description') }}</p>
 
-    <!-- What the group IS, derived from what it grants outsiders. The type is no longer a
-         separate choice: these two rights are the choice, and this says so while they are
-         being ticked rather than after saving. -->
-    <p class="resulting-type" data-test="resulting-type">
-      {{ $t('group.rights.resultingType') }}
-      <strong>{{ $t(`group.types.${resultingType}`) }}</strong>
-    </p>
-
-    <!-- Simple mode: the handful of questions a group actually asks itself, as sentences.
-         The matrix is one click away for whoever wants it, but it must not be the entry. -->
+    <!-- Simple mode: the handful of questions a group actually asks itself, as sentences, with
+         what those answers MAKE the group above them. The matrix is one click away for whoever
+         wants it, but it must not be the entry. -->
     <section v-if="!advanced" data-test="rights-simple">
-      <ul class="switches">
-        <li v-for="item in simpleSwitches" :key="item.id" class="switch">
-          <label :class="{ 'switch--disabled': !item.editable }" :title="item.hint">
-            <input
-              type="checkbox"
-              :checked="item.enabled"
-              :disabled="!item.editable || saving"
-              :data-test="`switch-${item.id}`"
-              @change="toggleSimple(item, $event.target.checked)"
-            />
-            <span>{{ item.label }}</span>
-          </label>
-        </li>
-      </ul>
-
-      <div class="actions">
-        <os-button
-          :disabled="saving || !canManageRoles"
-          data-test="preset-channel"
-          @click="applyChannelPreset"
-        >
-          {{ $t('group.rights.presets.channel') }}
-        </os-button>
-        <os-button :disabled="saving || !canManageRoles" data-test="reset" @click="confirmReset">
-          {{ $t('group.rights.reset') }}
-        </os-button>
-        <button type="button" class="link" data-test="to-advanced" @click="advanced = true">
-          {{ $t('group.rights.toAdvanced') }}
-        </button>
-      </div>
+      <group-rights-simple
+        :roles="roles"
+        :catalog="catalog"
+        :caption="$t('group.rights.resultingType')"
+        :disabled="saving || !canManageRoles"
+        :disabled-hint="$t('group.rights.noRight')"
+        :grantable="grantable"
+        :hint-for="blockedHint"
+        @toggle="toggleSimple"
+      >
+        <template #actions>
+          <div class="actions">
+            <os-button
+              :disabled="saving || !canManageRoles"
+              data-test="preset-channel"
+              @click="applyChannelPreset"
+            >
+              {{ $t('group.rights.presets.channel') }}
+            </os-button>
+            <os-button
+              :disabled="saving || !canManageRoles"
+              data-test="reset"
+              @click="confirmReset"
+            >
+              {{ $t('group.rights.reset') }}
+            </os-button>
+            <button type="button" class="link" data-test="to-advanced" @click="advanced = true">
+              {{ $t('group.rights.toAdvanced') }}
+            </button>
+          </div>
+        </template>
+      </group-rights-simple>
     </section>
 
-    <!-- Advanced mode: the full matrix, one tab per role. -->
+    <!-- Advanced mode: the full matrix, one tab per role. The resulting visibility is stated
+         here too — the `none` role is editable in this view, so it can change under the cursor. -->
     <section v-else data-test="rights-advanced">
+      <p class="resulting-type" data-test="resulting-type">
+        {{ $t('group.rights.resultingType') }}
+        <strong>{{ $t(`group.types.${resultingType}`) }}</strong>
+      </p>
       <role-tabs
         :roles="orderedRoles"
         :active-name="activeRoleName"
@@ -166,6 +166,7 @@
 <script>
 import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import OcelotInput from '~/components/OcelotInput/OcelotInput'
+import GroupRightsSimple from '~/components/Permissions/GroupRightsSimple'
 import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
 import RoleTabs from '~/components/Permissions/RoleTabs'
 
@@ -176,7 +177,7 @@ import {
   resetGroupRolesMutation,
   updateGroupRoleMutation,
 } from '~/graphql/groupRoles.js'
-import { NONE_GROUP_ROLE, PENDING_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
+import { NONE_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
 import { MANDATORY_GROUP_RIGHTS } from '~/constants/groups'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
@@ -184,20 +185,17 @@ import { orderRolesByPrivilege } from '~/utils/groupRights'
 import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
 import groupRights from '~/mixins/groupRights'
 
-// The simple mode, declared rather than hand-written per row: one sentence, one role, one right.
-const SIMPLE_SWITCHES = [
-  { id: 'members-post', role: USUAL_GROUP_ROLE, permission: 'group.post.create' },
-  { id: 'members-comment', role: USUAL_GROUP_ROLE, permission: 'group.comment.create' },
-  { id: 'members-chat', role: USUAL_GROUP_ROLE, permission: 'group.chat.participate' },
-  { id: 'members-invite', role: USUAL_GROUP_ROLE, permission: 'group.invite' },
-  { id: 'applicants-read', role: PENDING_GROUP_ROLE, permission: 'group.content.read' },
-  { id: 'nonmembers-read', role: NONE_GROUP_ROLE, permission: 'group.content.read' },
-  { id: 'nonmembers-members', role: NONE_GROUP_ROLE, permission: 'group.members.read' },
-]
-
 export default {
   mixins: [groupRights],
-  components: { OcelotInput, OsButton, OsCard, OsIcon, PermissionMatrix, RoleTabs },
+  components: {
+    GroupRightsSimple,
+    OcelotInput,
+    OsButton,
+    OsCard,
+    OsIcon,
+    PermissionMatrix,
+    RoleTabs,
+  },
   props: {
     group: { type: Object, required: true },
   },
@@ -255,20 +253,6 @@ export default {
     },
     dirty() {
       return isRoleDirty(this.activeRole, this.draftPermissions, this.draftLabel)
-    },
-    simpleSwitches() {
-      return SIMPLE_SWITCHES.map((item) => {
-        const role = this.roles.find((candidate) => candidate.name === item.role)
-        const permission = this.catalog.find((entry) => entry.key === item.permission)
-        const editable = this.canManageRoles && !!role && !!permission && this.grantable(permission)
-        return {
-          ...item,
-          label: this.$t(`group.rights.simple.${item.id}`),
-          enabled: !!role?.permissions.includes(item.permission),
-          editable,
-          hint: editable ? null : this.blockedHint(permission) || this.$t('group.rights.noRight'),
-        }
-      })
     },
   },
   watch: {
@@ -374,12 +358,12 @@ export default {
       const permissions = this.activeRole.protected ? [] : this.draftPermissions
       return this.writeRole(this.activeRole.name, permissions, this.draftLabel)
     },
-    toggleSimple(item, enabled) {
-      const role = this.roles.find((candidate) => candidate.name === item.role)
+    toggleSimple(roleName, permissionKey, enabled) {
+      const role = this.roles.find((candidate) => candidate.name === roleName)
       if (!role) return
       const permissions = enabled
-        ? [...role.permissions, item.permission]
-        : role.permissions.filter((key) => key !== item.permission)
+        ? [...role.permissions, permissionKey]
+        : role.permissions.filter((key) => key !== permissionKey)
       return this.writeRole(role.name, permissions, role.label)
     },
     /**

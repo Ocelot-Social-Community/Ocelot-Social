@@ -229,7 +229,9 @@
       "name": "Gruppen-Rollen",
       "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte und ist nicht bearbeitbar.",
       "resultingVisibility": "Gruppen aus dieser Vorlage sind:",
+      "saveFirst": "Erst speichern oder verwerfen — die Rolle hat ungesicherte Änderungen.",
       "saved": "Vorlage gespeichert",
+      "templateLabel": "Vorlage",
       "title": "Standard-Rollen fuer Gruppen",
       "untouched": "Eine Änderung hier erreicht {untouched} von {total} Gruppen — die, die ihre Rechte nie selbst geändert haben — und erst, wenn du sie anwendest."
     },
@@ -1035,6 +1037,11 @@
       "closed": "Geschlossen",
       "hidden": "Geheim",
       "public": "Öffentlich"
+    },
+    "typeDescriptions": {
+      "closed": "Alle Beiträge nur für Gruppenmitglieder sichtbar",
+      "hidden": "Gruppe (auch der Name) komplett unsichtbar",
+      "public": "Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
     },
     "typesOptions": {
       "closed": "Geschlossen — Alle Beiträge nur für Gruppenmitglieder sichtbar",

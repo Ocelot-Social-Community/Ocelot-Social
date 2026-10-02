@@ -229,7 +229,9 @@
       "name": "Rôles de groupe",
       "ownerHoldsEverything": "Le rôle de propriétaire détient toujours toutes les permissions et ne peut pas être modifié.",
       "resultingVisibility": "Les groupes créés à partir de ce modèle sont :",
+      "saveFirst": "Enregistrez ou annulez d'abord : ce rôle a des modifications non enregistrées.",
       "saved": "Modèle enregistré",
+      "templateLabel": "Modèle",
       "title": "Rôles par défaut des groupes",
       "untouched": "Une modification ici touche {untouched} groupes sur {total} — ceux qui n'ont jamais changé leurs propres droits — et seulement quand tu l'appliques."
     },
@@ -1035,6 +1037,11 @@
       "closed": "Fermé",
       "hidden": "Secret",
       "public": "Public"
+    },
+    "typeDescriptions": {
+      "closed": "Toutes les publications visibles uniquement par les membres du groupe",
+      "hidden": "Le groupe (y compris le nom) est complètement invisible",
+      "public": "Le groupe et toutes les publications sont visibles pour tous les utilisateurs inscrits"
     },
     "typesOptions": {
       "closed": "Fermé — Toutes les publications visibles uniquement par les membres du groupe",

@@ -229,7 +229,9 @@
       "name": "Roles de grupo",
       "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos y no se puede editar.",
       "resultingVisibility": "Los grupos creados con esta plantilla son:",
+      "saveFirst": "Guarda o descarta primero: este rol tiene cambios sin guardar.",
       "saved": "Plantilla guardada",
+      "templateLabel": "Plantilla",
       "title": "Roles predeterminados para los grupos",
       "untouched": "Un cambio aquí alcanza {untouched} de {total} grupos — los que nunca cambiaron sus propios permisos — y solo cuando lo apliques."
     },
@@ -1035,6 +1037,11 @@
       "closed": "Cerrado",
       "hidden": "Secreto",
       "public": "Público"
+    },
+    "typeDescriptions": {
+      "closed": "Todas las publicaciones solo visibles para los miembros del grupo",
+      "hidden": "El grupo (incluido el nombre) es completamente invisible",
+      "public": "El grupo y todas las publicaciones son visibles para todos los usuarios registrados"
     },
     "typesOptions": {
       "closed": "Cerrado — Todas las publicaciones solo visibles para los miembros del grupo",
