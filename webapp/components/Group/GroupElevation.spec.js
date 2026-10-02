@@ -97,6 +97,95 @@ describe('GroupElevation', () => {
     expect(wrapper.emitted('changed')).toHaveLength(1)
   })
 
+  it('tells the page the moment the window closes, without being asked', async () => {
+    // Nothing pushes the expiry to the client, so a card left open keeps offering actions the
+    // backend has already stopped allowing. The refetch happens when the hour is up, not when
+    // the viewer next clicks something and gets a refusal.
+    jest.useFakeTimers()
+    try {
+      const wrapper = Wrapper({
+        id: 'g1',
+        mayElevateInGroup: true,
+        myGroupElevation: { expiresAt: new Date(Date.now() + 60_000).toISOString(), reason: null },
+      })
+
+      expect(wrapper.emitted('changed')).toBeUndefined()
+
+      jest.advanceTimersByTime(60_000)
+
+      expect(wrapper.emitted('changed')).toHaveLength(1)
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it('asks straight away for a window that has already closed', async () => {
+    jest.useFakeTimers()
+    try {
+      const wrapper = Wrapper({
+        id: 'g1',
+        mayElevateInGroup: true,
+        myGroupElevation: { expiresAt: new Date(Date.now() - 1000).toISOString(), reason: null },
+      })
+
+      jest.advanceTimersByTime(0)
+
+      expect(wrapper.emitted('changed')).toHaveLength(1)
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it('drops the pending timer when it leaves the page', () => {
+    // A timer that outlives the component would emit into nothing — and in a test run, after
+    // the environment is gone.
+    jest.useFakeTimers()
+    try {
+      const wrapper = Wrapper({
+        id: 'g1',
+        mayElevateInGroup: true,
+        myGroupElevation: { expiresAt: new Date(Date.now() + 60_000).toISOString(), reason: null },
+      })
+
+      wrapper.destroy()
+      jest.advanceTimersByTime(60_000)
+
+      expect(wrapper.emitted('changed')).toBeUndefined()
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it('re-arms when a fresh elevation replaces the old one', async () => {
+    jest.useFakeTimers()
+    try {
+      const wrapper = Wrapper({
+        id: 'g1',
+        mayElevateInGroup: true,
+        myGroupElevation: { expiresAt: new Date(Date.now() + 10_000).toISOString(), reason: null },
+      })
+
+      await wrapper.setProps({
+        group: {
+          id: 'g1',
+          mayElevateInGroup: true,
+          myGroupElevation: {
+            expiresAt: new Date(Date.now() + 90_000).toISOString(),
+            reason: null,
+          },
+        },
+      })
+
+      jest.advanceTimersByTime(10_000)
+      expect(wrapper.emitted('changed')).toBeUndefined()
+
+      jest.advanceTimersByTime(80_000)
+      expect(wrapper.emitted('changed')).toHaveLength(1)
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
   it('reports a refusal instead of pretending it worked', async () => {
     mocks.$apollo.mutate.mockRejectedValueOnce(new Error('You hold nothing here beyond reading!'))
     const wrapper = Wrapper({ id: 'g1', mayElevateInGroup: true, myGroupElevation: null })

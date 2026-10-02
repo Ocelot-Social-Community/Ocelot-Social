@@ -50,6 +50,22 @@ export default {
   data() {
     return { reason: '', working: false }
   },
+  mounted() {
+    this.scheduleLapse()
+  },
+  beforeDestroy() {
+    this.clearLapse()
+  },
+  watch: {
+    /**
+     * The window closes on its own after an hour, and nothing pushes that moment to the client.
+     * Without this the card keeps offering actions the backend has already stopped allowing, and
+     * the viewer finds out through a failed mutation.
+     */
+    'elevation.expiresAt'() {
+      this.scheduleLapse()
+    },
+  },
   computed: {
     elevation() {
       return this.group?.myGroupElevation ?? null
@@ -76,6 +92,27 @@ export default {
     },
   },
   methods: {
+    scheduleLapse() {
+      this.clearLapse()
+      const at = this.elevation?.expiresAt
+      if (!at || typeof window === 'undefined') return
+      const remaining = new Date(at).getTime() - Date.now()
+      // Already past: ask straight away rather than waiting out a negative delay, which
+      // setTimeout would fire immediately anyway but less obviously.
+      this._lapseTimer = window.setTimeout(
+        () => {
+          this._lapseTimer = null
+          this.$emit('changed')
+        },
+        Math.max(remaining, 0),
+      )
+    },
+    clearLapse() {
+      if (this._lapseTimer) {
+        window.clearTimeout(this._lapseTimer)
+        this._lapseTimer = null
+      }
+    },
     async start() {
       await this.run(elevateInGroupMutation(), {
         groupId: this.group.id,

@@ -377,6 +377,7 @@ import {
   groupQuery,
   groupShowMembersChangedSubscription,
 } from '~/graphql/groups'
+import { groupPermissionsChangedSubscription } from '~/graphql/groupRoles'
 import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import {
   videoCallParticipantCountQuery,
@@ -600,15 +601,18 @@ export default {
     this._roomUpdatedSub = null
     this._videoCallCountSub = null
     this._groupShowMembersSub = null
+    this._groupPermissionsSub = null
     this.setupDescriptionOverflowObserver()
     if (this.canParticipateInChat) this.setupRoomUpdatedSubscription()
     if (this.canShowVideoCallButton) this.setupVideoCallCountSubscription()
     if (this.group?.myGroupRole) this.setupGroupShowMembersSubscription()
+    this.setupGroupPermissionsSubscription()
   },
   beforeDestroy() {
     this._roomUpdatedSub?.unsubscribe()
     this._videoCallCountSub?.unsubscribe()
     this._groupShowMembersSub?.unsubscribe()
+    this._groupPermissionsSub?.unsubscribe()
     this.teardownDescriptionOverflowObserver()
   },
   watch: {
@@ -697,6 +701,33 @@ export default {
         error: (err) => {
           // eslint-disable-next-line no-console
           console.error('groupShowMembersChanged subscription error:', err)
+        },
+      })
+    },
+    /**
+     * Every button, tab and menu entry on this page is drawn from `myGroupPermissions`, so a
+     * right that changes while somebody is looking has to reach them — an owner editing the
+     * roles, a visibility switch, or a member being promoted. No membership guard: a
+     * NON-member's rights live in the group's `none` role and change with it, which is exactly
+     * the case (a group opening or closing its door) where a stale page is wrong about what the
+     * viewer may do.
+     */
+    setupGroupPermissionsSubscription() {
+      if (this._groupPermissionsSub) return
+      const groupId = this.$route.params.id
+      if (!groupId) return
+      const observer = this.$apollo.subscribe({
+        query: groupPermissionsChangedSubscription(),
+        variables: { groupId },
+        fetchPolicy: 'no-cache',
+      })
+      this._groupPermissionsSub = observer.subscribe({
+        next: () => {
+          this.reloadGroup()
+        },
+        error: (err) => {
+          // eslint-disable-next-line no-console
+          console.error('groupPermissionsChanged subscription error:', err)
         },
       })
     },

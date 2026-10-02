@@ -5,6 +5,9 @@ import { branding as brandingDefaults } from '@ocelot-social/branding'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { groupRights, groupRightsWithout } from '~/test/groupRightsFixture'
+import { groupPermissionsChangedSubscription } from '~/graphql/groupRoles'
+import { groupShowMembersChangedSubscription } from '~/graphql/groups'
+import { roomUpdated } from '~/graphql/Rooms'
 
 const localVue = global.localVue
 
@@ -831,18 +834,25 @@ describe('GroupProfileSlug', () => {
       })
     }
 
-    it('does not subscribe when group membership is unknown at mount', () => {
+    // Which document a call carries, rather than how many calls there were: the page sets up
+    // several subscriptions under different conditions, and counting them couples every test
+    // here to all of them.
+    const callsFor = (document) =>
+      subscribeMock.mock.calls.filter(([options]) => options.query === document)
+
+    it('does not subscribe to the member list when group membership is unknown at mount', () => {
       mountWithGroup({})
-      expect(subscribeMock).not.toHaveBeenCalled()
+      expect(callsFor(groupShowMembersChangedSubscription())).toHaveLength(0)
     })
 
-    it('does not subscribe for non-members', () => {
+    it('does not subscribe to the member list for non-members', () => {
       mountWithGroup({ ...yogaPractice, myRole: null })
-      expect(subscribeMock).not.toHaveBeenCalled()
+      expect(callsFor(groupShowMembersChangedSubscription())).toHaveLength(0)
     })
 
-    it('subscribes when group membership is already known at mount', () => {
+    it('subscribes to the member list when group membership is already known at mount', () => {
       mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
+      expect(callsFor(groupShowMembersChangedSubscription())).toHaveLength(1)
       expect(subscribeMock).toHaveBeenCalledWith(
         expect.objectContaining({ fetchPolicy: 'no-cache' }),
       )
@@ -850,20 +860,121 @@ describe('GroupProfileSlug', () => {
 
     it('subscribes reactively when membership becomes known after mount', async () => {
       const wrapper = mountWithGroup({})
-      expect(subscribeMock).not.toHaveBeenCalled()
+      expect(callsFor(groupShowMembersChangedSubscription())).toHaveLength(0)
       wrapper.setData({ group: { ...yogaPractice, ...groupRights('usual') } })
       await wrapper.vm.$nextTick()
-      expect(subscribeMock).toHaveBeenCalled()
+      expect(callsFor(groupShowMembersChangedSubscription())).toHaveLength(1)
     })
 
     it('does not double-subscribe if membership signal fires multiple times', async () => {
       const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
-      // roomUpdated + groupShowMembers are both set up on mount for members
-      expect(subscribeMock).toHaveBeenCalledTimes(2)
+      // roomUpdated + groupShowMembers + groupPermissions are set up on mount for members
+      expect(subscribeMock).toHaveBeenCalledTimes(3)
       wrapper.setData({ group: { ...yogaPractice, ...groupRights('admin') } })
       await wrapper.vm.$nextTick()
-      // neither subscription is set up again after role change
-      expect(subscribeMock).toHaveBeenCalledTimes(2)
+      // no subscription is set up again after a role change
+      expect(subscribeMock).toHaveBeenCalledTimes(3)
+    })
+
+    // The rights behind every button on this page can change under the viewer: an owner edits a
+    // role, somebody is promoted, the group's door opens or closes. Non-members included —
+    // their rights live in the group's `none` role.
+    it('subscribes to the rights of the group, membership or not', () => {
+      mountWithGroup({ ...yogaPractice, myRole: null })
+
+      expect(callsFor(groupPermissionsChangedSubscription())).toHaveLength(1)
+      expect(callsFor(groupPermissionsChangedSubscription())[0][0]).toMatchObject({
+        variables: { groupId: 'g1' },
+        fetchPolicy: 'no-cache',
+      })
+    })
+
+    it('refetches the group when its rights change', () => {
+      const capturedCallbacks = []
+      subscribeMock = jest.fn().mockImplementation(({ query }) => ({
+        subscribe: jest.fn().mockImplementation((callbacks) => {
+          capturedCallbacks.push({ query, callbacks })
+          return { unsubscribe: jest.fn() }
+        }),
+      }))
+      const refetch = jest.fn()
+      currentUserMock.mockReturnValue(peterLustig)
+      mount(GroupProfileSlug, {
+        localVue,
+        store,
+        stubs: {
+          ...stubs,
+          'infinite-loading': true,
+          'masonry-grid': true,
+          'masonry-grid-item': true,
+          'post-teaser': true,
+          'content-viewer': true,
+        },
+        mocks: {
+          ...mocks,
+          $apollo: {
+            loading: false,
+            mutate: jest.fn().mockResolvedValue(),
+            subscribe: subscribeMock,
+            queries: { chatRoom: { refetch: jest.fn() }, Group: { refetch } },
+          },
+        },
+        data: () => ({ group: { ...yogaPractice, ...groupRights('usual') } }),
+      })
+
+      const entry = capturedCallbacks.find(
+        ({ query }) => query === groupPermissionsChangedSubscription(),
+      )
+      expect(entry).toBeDefined()
+      entry.callbacks.next({})
+
+      expect(refetch).toHaveBeenCalled()
+    })
+
+    it('logs errors from the groupPermissionsChanged subscription', () => {
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const capturedCallbacks = []
+      subscribeMock = jest.fn().mockImplementation(({ query }) => ({
+        subscribe: jest.fn().mockImplementation((callbacks) => {
+          capturedCallbacks.push({ query, callbacks })
+          return { unsubscribe: jest.fn() }
+        }),
+      }))
+      currentUserMock.mockReturnValue(peterLustig)
+      mount(GroupProfileSlug, {
+        localVue,
+        store,
+        stubs: {
+          ...stubs,
+          'infinite-loading': true,
+          'masonry-grid': true,
+          'masonry-grid-item': true,
+          'post-teaser': true,
+          'content-viewer': true,
+        },
+        mocks: {
+          ...mocks,
+          $apollo: {
+            loading: false,
+            mutate: jest.fn().mockResolvedValue(),
+            subscribe: subscribeMock,
+            queries: { chatRoom: { refetch: jest.fn() }, Group: { refetch: jest.fn() } },
+          },
+        },
+        data: () => ({ group: { ...yogaPractice, ...groupRights('usual') } }),
+      })
+
+      const entry = capturedCallbacks.find(
+        ({ query }) => query === groupPermissionsChangedSubscription(),
+      )
+      const mockError = new Error('subscription failed')
+      entry.callbacks.error(mockError)
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'groupPermissionsChanged subscription error:',
+        mockError,
+      )
+      consoleSpy.mockRestore()
     })
 
     it('logs errors from the groupShowMembersChanged subscription', () => {
@@ -976,21 +1087,25 @@ describe('GroupProfileSlug', () => {
       expect(wrapper.find('[data-test="chat-btn"]').exists()).toBe(false)
     })
 
+    const subscribedTo = (document) =>
+      subscribeMock.mock.calls.filter(([options]) => options.query === document)
+
     it('does not subscribe to room updates without the chat right', () => {
       mountWithGroup({
         ...yogaPractice,
         ...groupRightsWithout('usual', 'group.chat.participate'),
       })
-      // groupShowMembers still subscribes (that one follows the membership), roomUpdated does not
-      expect(subscribeMock).toHaveBeenCalledTimes(1)
+      // The other two still subscribe — one follows the membership, one the group's rights.
+      expect(subscribedTo(roomUpdated())).toHaveLength(0)
+      expect(subscribedTo(groupShowMembersChangedSubscription())).toHaveLength(1)
     })
 
     it('subscribes to room updates once the chat right arrives after mount', async () => {
       const wrapper = mountWithGroup({})
-      expect(subscribeMock).not.toHaveBeenCalled()
+      expect(subscribedTo(roomUpdated())).toHaveLength(0)
       wrapper.setData({ group: { ...yogaPractice, ...groupRights('usual') } })
       await wrapper.vm.$nextTick()
-      expect(subscribeMock).toHaveBeenCalled()
+      expect(subscribedTo(roomUpdated())).toHaveLength(1)
     })
 
     it('marks the new-post button denied when the group withheld group.post.create', () => {
