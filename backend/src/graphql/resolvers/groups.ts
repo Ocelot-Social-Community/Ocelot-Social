@@ -398,7 +398,14 @@ export default {
           // In the same transaction as the group itself: a group without roles is a group
           // nobody can act in, so the two commit together or not at all.
           await seedRolesForNewGroup(transaction, params.id, template, new Date().toISOString())
-          return group
+          // Read back AFTER the roles: seeding writes the derived columns, and the visibility
+          // is computed from them — the row captured before would answer `hidden` for every
+          // group ever created.
+          const seeded = await transaction.run(
+            `MATCH (group:Group {id: $groupId}) RETURN group {.*} AS group`,
+            { groupId: params.id },
+          )
+          return seeded.records[0]?.get('group') ?? group
         })
         // TODO: put in a middleware, see "UpdateGroup", "UpdateUser"
         await createOrUpdateLocations(

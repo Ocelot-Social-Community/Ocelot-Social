@@ -8,22 +8,29 @@ import {
   nonMemberReadsMembers,
   optionalMemberRoleMatch,
   roleHoldsPermission,
+  visibilityOf,
 } from './groupAccessCypher'
 
 describe('non-member conditions', () => {
-  it('read the mirrored column, not the visibility', () => {
-    // The column is the group's own decision; the type only appears as the fallback for a node
-    // the backfill has not written yet. If this ever stops holding, a public group that closed
-    // its content starts leaking again.
-    expect(nonMemberReadsGroup('g')).toBe(
-      "coalesce(g.nonMemberRead, g.visibility <> 'hidden') = true",
+  it('read the mirrored column, and fail closed where it was never written', () => {
+    // The column is the group's own decision, and nothing else may stand in for it: a node
+    // whose column is missing grants strangers nothing until the boot repair seeds its roles.
+    // There is no visibility to fall back on — it is derived FROM these columns.
+    expect(nonMemberReadsGroup('g')).toBe('coalesce(g.nonMemberRead, false) = true')
+    expect(nonMemberReadsContent('g')).toBe('coalesce(g.nonMemberContentRead, false) = true')
+    expect(nonMemberReadsMembers('g')).toBe('coalesce(g.showMembers, false) = true')
+  })
+
+  it('derive the visibility from the same two columns the TypeScript does', () => {
+    // The Cypher twin of privacyLevelFrom(): same order, same rounding towards the more
+    // private answer, so a query and a resolver cannot disagree about one group.
+    const expression = visibilityOf('g')
+
+    expect(expression).toContain("WHEN coalesce(g.nonMemberRead, false) <> true THEN 'hidden'")
+    expect(expression).toContain(
+      "WHEN coalesce(g.nonMemberContentRead, false) <> true THEN 'closed'",
     )
-    expect(nonMemberReadsContent('g')).toBe(
-      "coalesce(g.nonMemberContentRead, g.visibility = 'public') = true",
-    )
-    expect(nonMemberReadsMembers('g')).toBe(
-      "coalesce(g.showMembers, g.visibility = 'public') = true",
-    )
+    expect(expression).toContain("ELSE 'public'")
   })
 
   it('address whichever alias the calling statement bound', () => {

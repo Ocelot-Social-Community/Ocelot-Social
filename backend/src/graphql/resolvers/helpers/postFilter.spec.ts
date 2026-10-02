@@ -157,12 +157,13 @@ describe('postFilterToCypher access control operators', () => {
     })
 
     // The group's own answer first — the mirrored `group.content.read` of its non-member role,
-    // with the seeded-template value for a node the backfill has not reached yet.
-    expect(where).toContain(
-      "NOT (coalesce(g.nonMemberContentRead, g.visibility = 'public') = true)",
-    )
+    // failing closed for a node the backfill has not reached yet.
+    expect(where).toContain('NOT (coalesce(g.nonMemberContentRead, false) = true)')
     expect(where).toContain('AND NOT g.id IN $pf1')
-    expect(where).toContain('AND NOT g.visibility IN $pf2')
+    // …then the network side, which quantifies over VISIBILITIES — derived from the columns
+    // rather than read from one, so there is a CASE here and not a property.
+    expect(where).toContain('IN $pf2')
+    expect(where).toContain("WHEN coalesce(g.nonMemberRead, false) <> true THEN 'hidden'")
     expect(where).toContain('NOT EXISTS {')
     expect(where).toContain('OR EXISTS { MATCH (post)<-[:WROTE]-(:User { id: $pf0 }) }')
     expect(params).toEqual({
@@ -188,7 +189,7 @@ describe('postFilterToCypher access control operators', () => {
   // What #9405 asked for: a network moderator holding group.content.read.any_closed brings the
   // type along, so the reported content they are supposed to review stops being invisible —
   // without a per-row lookup, and with visibility still the axis.
-  it('lets a viewer read into the visibilitys their network rights cover', () => {
+  it('lets a viewer read into the visibilities their network rights cover', () => {
     const { params } = postFilterToCypher({
       filter: {
         invisibleTo: {
@@ -205,7 +206,7 @@ describe('postFilterToCypher access control operators', () => {
   // A caller that does not know about the field must widen NOTHING. It used to default to
   // ['public'], which was right while the type carried the statement "strangers may read
   // this"; now the group carries it, so the default is the empty list.
-  it('widens nothing when no moderator types are given', () => {
+  it('widens nothing when no moderator visibilities are given', () => {
     const { params } = postFilterToCypher({
       filter: { invisibleTo: { viewerId: null, contentGroupIds: [] } },
     })
@@ -223,9 +224,7 @@ describe('postFilterToCypher access control operators', () => {
       filter: { invisibleTo: { viewerId: null, contentGroupIds: [] } },
     })
 
-    expect(where).toContain(
-      "NOT (coalesce(g.nonMemberContentRead, g.visibility = 'public') = true)",
-    )
+    expect(where).toContain('NOT (coalesce(g.nonMemberContentRead, false) = true)')
     expect(where).toContain('AND NOT g.id IN $pf1')
     expect(params).toEqual({ pf0: null, pf1: [], pf2: [] })
   })

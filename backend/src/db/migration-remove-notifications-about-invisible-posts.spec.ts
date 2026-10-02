@@ -41,8 +41,10 @@ describe('migration: remove-notifications-about-invisible-posts', () => {
       CREATE (pending:User {id: 'pending', slug: 'pending', deleted: false})
       CREATE (outsider:User {id: 'outsider', slug: 'outsider', deleted: false})
 
-      CREATE (hidden:Group {id: 'hidden-group', slug: 'hidden-group', visibility: 'hidden'})
-      CREATE (open:Group {id: 'public-group', slug: 'public-group', visibility: 'public'})
+      // groupType on purpose: this migration ran when the group type was a stored property,
+      // and a migration spec sets its data up as it looked then. A later migration removes it.
+      CREATE (hidden:Group {id: 'hidden-group', slug: 'hidden-group', groupType: 'hidden'})
+      CREATE (open:Group {id: 'public-group', slug: 'public-group', groupType: 'public'})
 
       CREATE (member)-[:MEMBER_OF {role: 'usual'}]->(hidden)
       CREATE (pending)-[:MEMBER_OF {role: 'pending'}]->(hidden)
