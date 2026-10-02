@@ -1,7 +1,7 @@
 import { Kind } from 'graphql'
 import { describe, it, expect } from 'vitest'
 
-import GroupTypeEnum from '@graphql/types/enum/GroupType.gql'
+import GroupVisibilityEnum from '@graphql/types/enum/GroupVisibility.gql'
 import { isKnownGroupPermission } from '@src/groupPermission'
 
 import {
@@ -14,43 +14,43 @@ import { ADMIN_ROLE, NONE_ROLE, OWNER_ROLE, PENDING_ROLE, USUAL_ROLE } from './t
 
 import type { EnumTypeDefinitionNode } from 'graphql'
 
-// Off the LIVE schema, so a fourth group type cannot be added without a template: a group
+// Off the LIVE schema, so a fourth visibility cannot be added without a template: a group
 // created from a missing template would get no roles at all, i.e. nobody could do anything
 // in it.
-const groupTypes = GroupTypeEnum.definitions
+const visibilities = GroupVisibilityEnum.definitions
   .filter(
     (definition): definition is EnumTypeDefinitionNode =>
-      definition.kind === Kind.ENUM_TYPE_DEFINITION && definition.name.value === 'GroupType',
+      definition.kind === Kind.ENUM_TYPE_DEFINITION && definition.name.value === 'GroupVisibility',
   )
   .flatMap((definition) => definition.values ?? [])
   .map((value) => value.name.value)
 
 const templates = new Map(Object.entries(DEFAULT_GROUP_ROLE_TEMPLATES))
-const rolesOf = (groupType: string) => templates.get(groupType) ?? []
+const rolesOf = (visibility: string) => templates.get(visibility) ?? []
 
-const roleIn = (groupType: string, name: string) => {
-  const role = rolesOf(groupType).find((entry) => entry.name === name)
+const roleIn = (visibility: string, name: string) => {
+  const role = rolesOf(visibility).find((entry) => entry.name === name)
   if (!role) {
-    throw new Error(`no ${name} role in the ${groupType} template`)
+    throw new Error(`no ${name} role in the ${visibility} template`)
   }
   return role
 }
 
 describe('default group role templates', () => {
-  it('reads more than one group type off the schema', () => {
-    expect(groupTypes.length).toBeGreaterThan(1)
+  it('reads more than one visibility off the schema', () => {
+    expect(visibilities.length).toBeGreaterThan(1)
   })
 
-  it.each(groupTypes)('has a template for %s', (groupType) => {
-    expect(templates.get(groupType)).toBeDefined()
+  it.each(visibilities)('has a template for %s', (visibility) => {
+    expect(templates.get(visibility)).toBeDefined()
   })
 
   it('has a template for no other type', () => {
-    expect(Object.keys(DEFAULT_GROUP_ROLE_TEMPLATES).sort()).toEqual([...groupTypes].sort())
+    expect(Object.keys(DEFAULT_GROUP_ROLE_TEMPLATES).sort()).toEqual([...visibilities].sort())
   })
 
-  it.each(groupTypes)('seeds the five known roles for %s', (groupType) => {
-    expect(rolesOf(groupType).map((role) => role.name)).toEqual([
+  it.each(visibilities)('seeds the five known roles for %s', (visibility) => {
+    expect(rolesOf(visibility).map((role) => role.name)).toEqual([
       NONE_ROLE,
       PENDING_ROLE,
       USUAL_ROLE,
@@ -59,23 +59,23 @@ describe('default group role templates', () => {
     ])
   })
 
-  it.each(groupTypes)('grants only catalog keys in the %s template', (groupType) => {
-    for (const role of rolesOf(groupType)) {
+  it.each(visibilities)('grants only catalog keys in the %s template', (visibility) => {
+    for (const role of rolesOf(visibility)) {
       expect(role.permissions.filter((key) => !isKnownGroupPermission(key))).toEqual([])
       expect(new Set(role.permissions).size).toBe(role.permissions.length)
     }
   })
 
-  it.each(groupTypes)('marks the system roles and only those in %s', (groupType) => {
-    const system = rolesOf(groupType)
+  it.each(visibilities)('marks the system roles and only those in %s', (visibility) => {
+    const system = rolesOf(visibility)
       .filter((role) => role.system)
       .map((role) => role.name)
 
     expect(system.sort()).toEqual([...MANDATORY_GROUP_ROLE_NAMES].sort())
   })
 
-  it.each(groupTypes)('keeps owner protected and list-free in %s', (groupType) => {
-    const owner = roleIn(groupType, OWNER_ROLE)
+  it.each(visibilities)('keeps owner protected and list-free in %s', (visibility) => {
+    const owner = roleIn(visibility, OWNER_ROLE)
 
     // Storing no list is what makes a newly added catalog key automatically owned.
     expect(owner.permissions).toEqual([])
@@ -83,14 +83,14 @@ describe('default group role templates', () => {
     expect(owner.system).toBe(true)
   })
 
-  it.each(groupTypes)('leaves every role without a label in %s', (groupType) => {
-    for (const role of rolesOf(groupType)) {
+  it.each(visibilities)('leaves every role without a label in %s', (visibility) => {
+    for (const role of rolesOf(visibility)) {
       // No label means "use the i18n default"; a template must not ship English names.
       expect(role.label).toBeNull()
     }
   })
 
-  describe('the non-member role encodes the group type', () => {
+  describe('the non-member role encodes the visibility', () => {
     it('lets anyone read and join a public group', () => {
       expect(roleIn('public', NONE_ROLE).permissions).toEqual([
         'group.read',
@@ -113,21 +113,21 @@ describe('default group role templates', () => {
     })
   })
 
-  describe('inviting follows the group type', () => {
+  describe('inviting follows the visibility', () => {
     it('lets members invite into a public group', () => {
       expect(roleIn('public', USUAL_ROLE).permissions).toContain('group.invite')
     })
 
-    it.each(['closed', 'hidden'])('reserves inviting for admins in a %s group', (groupType) => {
-      expect(roleIn(groupType, USUAL_ROLE).permissions).not.toContain('group.invite')
-      expect(roleIn(groupType, ADMIN_ROLE).permissions).toContain('group.invite')
+    it.each(['closed', 'hidden'])('reserves inviting for admins in a %s group', (visibility) => {
+      expect(roleIn(visibility, USUAL_ROLE).permissions).not.toContain('group.invite')
+      expect(roleIn(visibility, ADMIN_ROLE).permissions).toContain('group.invite')
     })
 
-    it.each(groupTypes)(
+    it.each(visibilities)(
       'reserves the registration-capable invite for admins in %s',
-      (groupType) => {
-        expect(roleIn(groupType, USUAL_ROLE).permissions).not.toContain('group.invite.external')
-        expect(roleIn(groupType, ADMIN_ROLE).permissions).toContain('group.invite.external')
+      (visibility) => {
+        expect(roleIn(visibility, USUAL_ROLE).permissions).not.toContain('group.invite.external')
+        expect(roleIn(visibility, ADMIN_ROLE).permissions).toContain('group.invite.external')
       },
     )
   })
@@ -135,12 +135,12 @@ describe('default group role templates', () => {
   // The act-on rules are set dominance, so the intuitive ladder only holds while each
   // seeded role is a strict superset of the one below it. If it ever stops holding, an
   // admin silently loses the ability to remove a member.
-  it.each(groupTypes)(
+  it.each(visibilities)(
     'keeps the ladder none ⊂ pending? ⊂ usual ⊂ admin ⊂ owner in %s',
-    (groupType) => {
-      const usual = permissionsForGroupRole(roleIn(groupType, USUAL_ROLE))
-      const admin = permissionsForGroupRole(roleIn(groupType, ADMIN_ROLE))
-      const owner = permissionsForGroupRole(roleIn(groupType, OWNER_ROLE))
+    (visibility) => {
+      const usual = permissionsForGroupRole(roleIn(visibility, USUAL_ROLE))
+      const admin = permissionsForGroupRole(roleIn(visibility, ADMIN_ROLE))
+      const owner = permissionsForGroupRole(roleIn(visibility, OWNER_ROLE))
 
       expect([...usual].filter((key) => !admin.has(key))).toEqual([])
       expect(admin.size).toBeGreaterThan(usual.size)
@@ -149,17 +149,17 @@ describe('default group role templates', () => {
     },
   )
 
-  it.each(groupTypes)('keeps pending below usual in %s', (groupType) => {
-    const pending = permissionsForGroupRole(roleIn(groupType, PENDING_ROLE))
-    const usual = permissionsForGroupRole(roleIn(groupType, USUAL_ROLE))
+  it.each(visibilities)('keeps pending below usual in %s', (visibility) => {
+    const pending = permissionsForGroupRole(roleIn(visibility, PENDING_ROLE))
+    const usual = permissionsForGroupRole(roleIn(visibility, USUAL_ROLE))
 
     expect([...pending].filter((key) => !usual.has(key))).toEqual([])
     expect(usual.size).toBeGreaterThan(pending.size)
   })
 
   describe(defaultTemplateFor, () => {
-    it.each(groupTypes)('returns the template for %s', (groupType) => {
-      expect(defaultTemplateFor(groupType)?.map((role) => role.name)).toEqual([
+    it.each(visibilities)('returns the template for %s', (visibility) => {
+      expect(defaultTemplateFor(visibility)?.map((role) => role.name)).toEqual([
         NONE_ROLE,
         PENDING_ROLE,
         USUAL_ROLE,
@@ -168,7 +168,7 @@ describe('default group role templates', () => {
       ])
     })
 
-    it('returns undefined for an unknown group type', () => {
+    it('returns undefined for an unknown visibility', () => {
       expect(defaultTemplateFor('ephemeral')).toBeUndefined()
     })
 

@@ -11,18 +11,18 @@ import {
 } from './groupAccessCypher'
 
 describe('non-member conditions', () => {
-  it('read the mirrored column, not the group type', () => {
+  it('read the mirrored column, not the visibility', () => {
     // The column is the group's own decision; the type only appears as the fallback for a node
     // the backfill has not written yet. If this ever stops holding, a public group that closed
     // its content starts leaking again.
     expect(nonMemberReadsGroup('g')).toBe(
-      "coalesce(g.nonMemberRead, g.groupType <> 'hidden') = true",
+      "coalesce(g.nonMemberRead, g.visibility <> 'hidden') = true",
     )
     expect(nonMemberReadsContent('g')).toBe(
-      "coalesce(g.nonMemberContentRead, g.groupType = 'public') = true",
+      "coalesce(g.nonMemberContentRead, g.visibility = 'public') = true",
     )
     expect(nonMemberReadsMembers('g')).toBe(
-      "coalesce(g.showMembers, g.groupType = 'public') = true",
+      "coalesce(g.showMembers, g.visibility = 'public') = true",
     )
   })
 

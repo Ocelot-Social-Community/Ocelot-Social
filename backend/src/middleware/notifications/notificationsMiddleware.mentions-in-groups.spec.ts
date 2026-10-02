@@ -134,7 +134,7 @@ describe('mentions in groups', () => {
         id: 'public-group',
         name: 'A public group',
         description: 'A public group to test the notifications of mentions',
-        groupType: 'public',
+        visibility: 'public',
         actionRadius: 'national',
       },
     })
@@ -144,7 +144,7 @@ describe('mentions in groups', () => {
         id: 'closed-group',
         name: 'A closed group',
         description: 'A closed group to test the notifications of mentions',
-        groupType: 'closed',
+        visibility: 'closed',
         actionRadius: 'national',
       },
     })
@@ -154,7 +154,7 @@ describe('mentions in groups', () => {
         id: 'hidden-group',
         name: 'A hidden group',
         description: 'A hidden group to test the notifications of mentions',
-        groupType: 'hidden',
+        visibility: 'hidden',
         actionRadius: 'national',
       },
     })

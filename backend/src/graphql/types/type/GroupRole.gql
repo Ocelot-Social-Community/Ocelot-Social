@@ -37,8 +37,6 @@ type GroupRoleTemplate {
   name: String!
   "The visibility a group created from this template starts with."
   visibility: GroupVisibility!
-  "The template's name under its old key. Deprecated: a template is not a group type."
-  groupType: String! @deprecated(reason: "Use `name` for the template and `visibility` for what it derives to.")
   roles: [GroupRole!]!
   "How many groups still run on this template untouched — the ones an `applyGroupRoleTemplates` would reach."
   untouchedGroupCount: Int!
@@ -77,10 +75,8 @@ type Mutation {
   setGroupMemberRole(groupId: ID!, userId: ID!, roleName: String!): GroupMember!
   "Change one role of a network-wide template. Existing groups are NOT touched — that is what applyGroupRoleTemplates is for. Requires `group.roleTemplate.manage`."
   updateGroupRoleTemplate(
-    "Which template. Exactly one of `template` and the deprecated `groupType` is required."
-    template: String
-    "Deprecated: Use `template`."
-    groupType: String
+    "Which template to change."
+    template: String!
     name: String!
     permissions: [String!]!
     label: String

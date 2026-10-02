@@ -18,7 +18,7 @@ vi.mock('@src/groupRole/repository', () => ({
   readGroupRoles: vi.fn(),
   seedRolesForNewGroup: vi.fn(),
   setNonMemberMemberListAccess: vi.fn(),
-  applyGroupTypeToNonMemberRoles: vi.fn(),
+  applyTemplateToNonMemberRoles: vi.fn(),
 }))
 
 const mockedReadGroupRoles = vi.mocked(readGroupRoles)
@@ -213,7 +213,6 @@ describe('the profile fields', () => {
     expect(await Group.about({ ...group, about: 'Hi' }, {}, context, null)).toBe('Hi')
     // …and the field that answers it reads the same two columns.
     expect(Group.visibility(group)).toBe('closed')
-    expect(Group.groupType(group)).toBe('closed')
   })
 
   it('answer as before for a partial context, which is what a unit test hands in', async () => {

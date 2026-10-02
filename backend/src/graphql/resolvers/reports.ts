@@ -25,7 +25,7 @@ import type { PermissionKey } from '@src/permission'
  * Three ways the content stays visible, and the first two come from the query because they are
  * about the GROUP rather than about the network role: the group opened its content to
  * non-members, or the moderator's own role in that group lets them read it. Only then does the
- * per-type network right decide. `groupType = 'public'` is deliberately NOT a shortcut any
+ * per-visibility network right decide. `visibility = 'public'` is deliberately NOT a shortcut any
  * more — a public group that closed its content closed it here too.
  *
  * A reported USER carries no group, so nothing is masked for them.
@@ -36,7 +36,7 @@ import type { PermissionKey } from '@src/permission'
 /** A report row as the queue's statement returns it, plus the two facts it computes. */
 export interface ReportRow {
   [field: string]: unknown
-  groupType?: string | null
+  visibility?: string | null
   readableHere?: boolean
   resource?: Record<string, unknown> | null
 }
@@ -45,11 +45,11 @@ export const maskUnreadableGroupContent = (
   report: ReportRow,
   effectivePermissions: Context['effectivePermissions'],
 ): ReportRow & { resourceHidden: boolean } => {
-  const groupType = report.groupType
-  if (!groupType || report.readableHere === true) {
+  const visibility = report.visibility
+  if (!visibility || report.readableHere === true) {
     return { ...report, resourceHidden: false }
   }
-  const readable = effectivePermissions.has(`group.content.read.any_${groupType}` as PermissionKey)
+  const readable = effectivePermissions.has(`group.content.read.any_${visibility}` as PermissionKey)
   if (readable) {
     return { ...report, resourceHidden: false }
   }
@@ -178,7 +178,7 @@ export default {
             (group IS NULL
               OR ${nonMemberReadsContent('group')}
               OR ${memberRoleHolds('group.content.read')}) as readableHere
-            RETURN report {.*, resource: finalResource, filed: filed, reviewed: reviewed, groupType: ${visibilityOf('group')}, readableHere: readableHere }
+            RETURN report {.*, resource: finalResource, filed: filed, reviewed: reviewed, visibility: ${visibilityOf('group')}, readableHere: readableHere }
             ${orderByClause}
             ${offset} ${limit}
           `,

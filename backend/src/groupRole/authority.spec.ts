@@ -7,10 +7,10 @@ import { ADMIN_ROLE, NONE_ROLE, OWNER_ROLE, PENDING_ROLE, USUAL_ROLE } from './t
 
 import type { GroupPermissionKey } from '@src/groupPermission'
 
-const permissions = (name: string, groupType = 'closed') => {
-  const role = defaultTemplateFor(groupType)?.find((entry) => entry.name === name)
+const permissions = (name: string, visibility = 'closed') => {
+  const role = defaultTemplateFor(visibility)?.find((entry) => entry.name === name)
   if (!role) {
-    throw new Error(`no ${name} role in the ${groupType} template`)
+    throw new Error(`no ${name} role in the ${visibility} template`)
   }
   return permissionsForGroupRole(role)
 }

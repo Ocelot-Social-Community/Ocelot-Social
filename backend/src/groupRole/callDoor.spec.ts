@@ -48,10 +48,10 @@ describe('the seeded templates', () => {
 
   it.each(Object.entries(DEFAULT_GROUP_ROLE_TEMPLATES))(
     '%s keeps its old cap',
-    (groupType, roles) => {
+    (visibility, roles) => {
       const none = roles.find((role) => role.name === NONE_ROLE)
 
-      expect(callDoorOfPermissions(none?.permissions)).toBe(expected.get(groupType))
+      expect(callDoorOfPermissions(none?.permissions)).toBe(expected.get(visibility))
     },
   )
 })

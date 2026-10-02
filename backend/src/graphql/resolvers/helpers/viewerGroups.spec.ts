@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { groupReadScope, moderatorGroupTypes, viewerScope } from './viewerGroups'
+import { groupReadScope, moderatorVisibilities, viewerScope } from './viewerGroups'
 
 import type { Context } from '@src/context'
 import type { PermissionKey } from '@src/permission'
@@ -23,20 +23,22 @@ const contextWithMemberships = (
     database: { query: vi.fn().mockResolvedValue({ records: rows }) },
   }) as unknown as Context
 
-describe(moderatorGroupTypes, () => {
+describe(moderatorVisibilities, () => {
   it('is empty without a network right, because `public` is the group`s own statement now', () => {
     // It used to start at ['public']: the type WAS the statement "strangers may read this".
     // That statement is the group's `group.content.read` for non-members today, so keeping
     // public in here would let the type override a public group that closed its content.
-    expect(moderatorGroupTypes(contextHolding())).toEqual([])
+    expect(moderatorVisibilities(contextHolding())).toEqual([])
   })
 
   it('adds the types a network right covers', () => {
     // The fix for #9405: a moderator brings the closed type along, so the content they are
     // asked to review stops being invisible to them.
-    expect(moderatorGroupTypes(contextHolding('group.content.read.any_closed'))).toEqual(['closed'])
+    expect(moderatorVisibilities(contextHolding('group.content.read.any_closed'))).toEqual([
+      'closed',
+    ])
     expect(
-      moderatorGroupTypes(
+      moderatorVisibilities(
         contextHolding('group.content.read.any_closed', 'group.content.read.any_hidden'),
       ),
     ).toEqual(['closed', 'hidden'])
@@ -45,16 +47,18 @@ describe(moderatorGroupTypes, () => {
   it('does not let the hidden right alone open closed groups, or the other way round', () => {
     // Two separate rights, because an unlisted group is the stricter case — that distinction
     // would be lost if one implied the other.
-    expect(moderatorGroupTypes(contextHolding('group.content.read.any_hidden'))).toEqual(['hidden'])
+    expect(moderatorVisibilities(contextHolding('group.content.read.any_hidden'))).toEqual([
+      'hidden',
+    ])
   })
 
   it('counts administering a type as reading into it, and ignores the rest', () => {
     // Administering folds the whole group catalog, moderating brings the reading rights along
     // — one fold for every shape (groupRole/networkAuthority.ts), so the post filter cannot
     // disagree with the per-group answer about who may see what.
-    expect(moderatorGroupTypes(contextHolding('group.administer.any_closed'))).toEqual(['closed'])
-    expect(moderatorGroupTypes(contextHolding('group.moderate.any_hidden'))).toEqual(['hidden'])
-    expect(moderatorGroupTypes(contextHolding('content.moderate', 'post.create'))).toEqual([])
+    expect(moderatorVisibilities(contextHolding('group.administer.any_closed'))).toEqual(['closed'])
+    expect(moderatorVisibilities(contextHolding('group.moderate.any_hidden'))).toEqual(['hidden'])
+    expect(moderatorVisibilities(contextHolding('content.moderate', 'post.create'))).toEqual([])
   })
 })
 
@@ -65,7 +69,7 @@ describe(groupReadScope, () => {
     expect(await groupReadScope(context)).toEqual({
       readableGroupIds: [],
       contentGroupIds: [],
-      readableGroupTypes: [],
+      readableVisibilities: [],
     })
   })
 
@@ -81,7 +85,7 @@ describe(groupReadScope, () => {
       readableGroupIds: ['both', 'profile-only'],
       contentGroupIds: ['both', 'content-only'],
       // No network right in this context, so nothing comes from that direction.
-      readableGroupTypes: [],
+      readableVisibilities: [],
     })
   })
 
@@ -94,7 +98,7 @@ describe(groupReadScope, () => {
     expect(await groupReadScope(context)).toEqual({
       readableGroupIds: ['mine'],
       contentGroupIds: ['mine'],
-      readableGroupTypes: [],
+      readableVisibilities: [],
     })
   })
 
@@ -111,7 +115,7 @@ describe(groupReadScope, () => {
     expect(await groupReadScope(context)).toEqual({
       readableGroupIds: [],
       contentGroupIds: [],
-      readableGroupTypes: [],
+      readableVisibilities: [],
     })
   })
 
@@ -121,7 +125,7 @@ describe(groupReadScope, () => {
     expect(await groupReadScope(context)).toEqual({
       readableGroupIds: [],
       contentGroupIds: [],
-      readableGroupTypes: [],
+      readableVisibilities: [],
     })
   })
 })
@@ -136,7 +140,7 @@ describe(viewerScope, () => {
     expect(await viewerScope(context)).toEqual({
       viewerId: 'viewer',
       contentGroupIds: ['mine'],
-      moderatorGroupTypes: ['closed'],
+      moderatorVisibilities: ['closed'],
     })
   })
 
@@ -146,7 +150,7 @@ describe(viewerScope, () => {
     expect(await viewerScope(context)).toEqual({
       viewerId: null,
       contentGroupIds: [],
-      moderatorGroupTypes: [],
+      moderatorVisibilities: [],
     })
   })
 })

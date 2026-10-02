@@ -1,7 +1,7 @@
 // The group read rights, as Cypher conditions.
 //
 // Eight hand-written queries used to decide "may this viewer see that group / its content" by
-// comparing `groupType` against a literal list. The rights replace that decision, and these
+// comparing `visibility` against a literal list. The rights replace that decision, and these
 // builders are the single place where they are spelled in Cypher — a feed, a profile, a search
 // and a count that disagree about it are four different leaks.
 //

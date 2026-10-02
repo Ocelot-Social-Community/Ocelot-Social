@@ -133,7 +133,7 @@ describe(redeemInviteCode, () => {
     it('records the invitation alongside the membership for a group invite link', async () => {
       await database.write({
         query: `MATCH (host:User { id: 'invite-host' })
-                MERGE (group:Group { id: 'invite-group', groupType: 'public' })
+                MERGE (group:Group { id: 'invite-group', visibility: 'public' })
                 MERGE (host)-[:GENERATED]->(code:InviteCode { code: 'GRP001' })
                 MERGE (code)-[:INVITES_TO]->(group)`,
       })
@@ -158,7 +158,7 @@ describe(redeemInviteCode, () => {
     it('lands an invited person where the group`s own rights say', async () => {
       await database.write({
         query: `MATCH (host:User { id: 'invite-host' })
-                MERGE (group:Group { id: 'rights-group', groupType: 'public' })
+                MERGE (group:Group { id: 'rights-group', visibility: 'public' })
                 MERGE (group)-[:HAS_GROUP_ROLE]->(role:GroupRole { id: 'rights-group:none' })
                 SET role.name = 'none', role.permissions = $permissions
                 MERGE (host)-[:GENERATED]->(code:InviteCode { code: 'GRP002' })

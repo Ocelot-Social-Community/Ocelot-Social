@@ -76,7 +76,7 @@ const record = (values: Record<string, unknown>) => ({
 interface ContextOptions {
   user?: { id: string } | null
   network?: string[]
-  authorization?: { groupType?: string; roleName?: string; effective?: string[] } | null
+  authorization?: { visibility?: string; roleName?: string; effective?: string[] } | null
   queryRecords?: Array<ReturnType<typeof record>>
   writeRecords?: Array<ReturnType<typeof record>>
 }
@@ -89,7 +89,7 @@ const contextFor = (options: ContextOptions = {}) => {
       ? null
       : {
           groupId: 'g1',
-          groupType: options.authorization?.groupType ?? 'public',
+          visibility: options.authorization?.visibility ?? 'public',
           roleName: options.authorization?.roleName ?? 'admin',
           isMember: true,
           hasRoleDefinition: true,
@@ -153,7 +153,7 @@ describe('Query.groupPermissionCatalog', () => {
 describe('Query.adminGroups', () => {
   const administrator = { network: ['group.administer.any_public', 'group.administer.any_hidden'] }
 
-  it('answers nothing to somebody who may administer no group type', async () => {
+  it('answers nothing to somebody who may administer no visibility', async () => {
     const { context, queries } = contextFor()
 
     expect(await Query.adminGroups({}, {}, context)).toEqual([])
@@ -180,14 +180,14 @@ describe('Query.adminGroups', () => {
     // group could be enumerated by anybody who guesses the filter.
     const { context, queries } = contextFor(administrator)
 
-    expect(await Query.adminGroups({}, { groupType: 'closed' }, context)).toEqual([])
+    expect(await Query.adminGroups({}, { visibility: 'closed' }, context)).toEqual([])
     expect(queries).toEqual([])
   })
 
   it('narrows to a single requested type', async () => {
     const { context, queries } = contextFor(administrator)
 
-    await Query.adminGroups({}, { groupType: 'hidden' }, context)
+    await Query.adminGroups({}, { visibility: 'hidden' }, context)
 
     expect(queries[0].variables?.types).toEqual(['hidden'])
   })
@@ -293,11 +293,10 @@ describe('Query.groupRoleTemplates', () => {
 
     expect(await Query.groupRoleTemplates({}, {}, context)).toEqual([
       {
-        // The template's name, what it derives to, and the old key for the same string — two
-        // questions that happen to share an answer for the three shipped templates.
+        // The template's name and what it derives to: two questions that happen to share an
+        // answer for the three shipped templates.
         name: 'public',
         visibility: 'public',
-        groupType: 'public',
         roles: [{ ...role('none', ['group.read', 'group.content.read']), memberCount: null }],
         untouchedGroupCount: 2,
         // Five public groups exist, two of them never edited their roles. Without the second
@@ -307,7 +306,6 @@ describe('Query.groupRoleTemplates', () => {
       {
         name: 'hidden',
         visibility: 'hidden',
-        groupType: 'hidden',
         roles: [{ ...role('none'), memberCount: null }],
         // A template nobody uses answers 0 of 0, not null.
         untouchedGroupCount: 0,
@@ -514,9 +512,9 @@ describe('Mutation.updateGroupRole', () => {
     // Editing `none` IS the type change now, because the type is derived from exactly the two
     // read rights on it. Without the cap, "create public, then take group.read away" would be
     // the way around `group.create_hidden`.
-    const editorOf = (groupType: string, network: string[] = []) => ({
+    const editorOf = (visibility: string, network: string[] = []) => ({
       authorization: {
-        groupType,
+        visibility,
         // Enough to COVER what the tests grant: the coverage rule is a separate guard, and a
         // missing right there would fail these for the wrong reason.
         effective: ['group.role.manage', 'group.read', 'group.content.read', 'group.members.read'],
@@ -837,10 +835,10 @@ describe('Mutation.resetGroupRoles', () => {
 
   it('refuses when the group`s type has no template', async () => {
     mocked.readGroupRoleTemplates.mockResolvedValue({ public: [] })
-    const { context } = contextFor({ authorization: { groupType: 'public' } })
+    const { context } = contextFor({ authorization: { visibility: 'public' } })
 
     await expect(Mutation.resetGroupRoles({}, { groupId: 'g1' }, context)).rejects.toThrow(
-      'No role template for this group type!',
+      'No role template for this visibility!',
     )
   })
 
@@ -848,7 +846,7 @@ describe('Mutation.resetGroupRoles', () => {
     const template = [role('none'), role('usual')]
     mocked.readGroupRoleTemplates.mockResolvedValue({ closed: template })
     mocked.readGroupRoles.mockResolvedValue(template)
-    const { context, published } = contextFor({ authorization: { groupType: 'closed' } })
+    const { context, published } = contextFor({ authorization: { visibility: 'closed' } })
 
     await Mutation.resetGroupRoles({}, { groupId: 'g1' }, context)
 
@@ -932,7 +930,7 @@ describe('Mutation.updateGroupRoleTemplate', () => {
     await expect(
       Mutation.updateGroupRoleTemplate(
         {},
-        { groupType: 'public', name: 'ghost', permissions: [] },
+        { template: 'public', name: 'ghost', permissions: [] },
         context,
       ),
     ).rejects.toThrow('Unknown group role template!')
@@ -947,7 +945,7 @@ describe('Mutation.updateGroupRoleTemplate', () => {
     await expect(
       Mutation.updateGroupRoleTemplate(
         {},
-        { groupType: 'public', name: 'owner', permissions: ['group.read'] },
+        { template: 'public', name: 'owner', permissions: ['group.read'] },
         context,
       ),
     ).rejects.toThrow('The owner role holds every right and cannot be edited!')
@@ -961,7 +959,7 @@ describe('Mutation.updateGroupRoleTemplate', () => {
 
     const updated = await Mutation.updateGroupRoleTemplate(
       {},
-      { groupType: 'public', name: 'owner', permissions: [], label: 'Founder' },
+      { template: 'public', name: 'owner', permissions: [], label: 'Founder' },
       context,
     )
 
@@ -978,10 +976,10 @@ describe('Mutation.updateGroupRoleTemplate', () => {
     await expect(
       Mutation.updateGroupRoleTemplate(
         {},
-        { groupType: 'public', name: 'none', permissions: ['group.read'] },
+        { template: 'public', name: 'none', permissions: ['group.read'] },
         context,
       ),
-    ).rejects.toThrow('a different group type than it is named')
+    ).rejects.toThrow('a different visibility than it is named')
   })
 
   it('accepts a non-member role that matches the name', async () => {
@@ -991,7 +989,7 @@ describe('Mutation.updateGroupRoleTemplate', () => {
     await expect(
       Mutation.updateGroupRoleTemplate(
         {},
-        { groupType: 'closed', name: 'none', permissions: ['group.read', 'group.join.request'] },
+        { template: 'closed', name: 'none', permissions: ['group.read', 'group.join.request'] },
         context,
       ),
     ).resolves.toMatchObject({ name: 'none' })
@@ -1005,7 +1003,7 @@ describe('Mutation.updateGroupRoleTemplate', () => {
 
     const updated = await Mutation.updateGroupRoleTemplate(
       {},
-      { groupType: 'public', name: 'admin', permissions: ['group.invite', 'group.teleport'] },
+      { template: 'public', name: 'admin', permissions: ['group.invite', 'group.teleport'] },
       context,
     )
 
@@ -1038,7 +1036,7 @@ describe('Mutation.applyGroupRoleTemplates', () => {
     expect(published).toHaveLength(3)
   })
 
-  it('skips a group type whose template is missing or empty', async () => {
+  it('skips a visibility whose template is missing or empty', async () => {
     mocked.readGroupRoleTemplates.mockResolvedValue({ public: [] })
     mocked.untouchedGroupIdsByType.mockResolvedValue(
       new Map([

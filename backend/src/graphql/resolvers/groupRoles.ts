@@ -108,7 +108,7 @@ const requirePrivacyCap = (
   nextNonMemberPermissions: GroupPermissionKey[],
 ): void => {
   const next = privacyLevelOfPermissions(nextNonMemberPermissions)
-  if (!isMorePrivate(next, authorization.groupType as GroupPrivacyLevel)) {
+  if (!isMorePrivate(next, authorization.visibility as GroupPrivacyLevel)) {
     return
   }
   const needed = createPermissionForLevel(next)
@@ -171,9 +171,8 @@ const touched = async (context: Context, groupId: string, now: string): Promise<
 
 interface AdminGroupFilter {
   search?: string | null
-  /** The new name for the same filter; `groupType` is what it used to be called. */
+  /** Which visibility to show, or all of them when absent. */
   visibility?: string | null
-  groupType?: string | null
   ownerless?: boolean | null
   disabled?: boolean | null
   first?: number | null
@@ -181,14 +180,14 @@ interface AdminGroupFilter {
 }
 
 /**
- * The group types this viewer may administer.
+ * The visibilitys this viewer may administer.
  *
  * The list IS the authorization: a viewer holding only `group.administer.any_public` gets public
  * groups and nothing else, so a hidden group cannot be enumerated by asking for it.
  */
-const administrableGroupTypes = (context: Context): string[] =>
-  ['public', 'closed', 'hidden'].filter((groupType) =>
-    context.effectivePermissions.has(`group.administer.any_${groupType}` as PermissionKey),
+const administrableVisibilities = (context: Context): string[] =>
+  ['public', 'closed', 'hidden'].filter((visibility) =>
+    context.effectivePermissions.has(`group.administer.any_${visibility}` as PermissionKey),
   )
 
 /**
@@ -199,8 +198,8 @@ const administrableGroupTypes = (context: Context): string[] =>
  * hidden group ends up in a listing it has no business being in.
  */
 const adminGroupList = async (context: Context, params: AdminGroupFilter, countOnly = false) => {
-  const types = administrableGroupTypes(context)
-  const asked = params.visibility ?? params.groupType
+  const types = administrableVisibilities(context)
+  const asked = params.visibility
   const requested = asked ? [asked].filter((type) => types.includes(type)) : types
   if (requested.length === 0) {
     return countOnly ? 0 : []
@@ -264,21 +263,20 @@ export default {
           PRIVACY_LEVELS.indexOf(a as GroupPrivacyLevel) -
           PRIVACY_LEVELS.indexOf(b as GroupPrivacyLevel),
       )
-      return ordered.map(([groupType, roles]) => ({
+      return ordered.map(([template, roles]) => ({
         // The template's NAME and the visibility it produces: the same string today, because
         // the three shipped templates are named after what they derive to (and a drift guard
         // keeps them that way). Two fields, because they answer two different questions — one
         // about the template an operator edits, one about the groups it creates.
-        name: groupType,
+        name: template,
         visibility: privacyLevelOfPermissions(
           roles.find((role) => role.name === NONE_ROLE)?.permissions,
         ),
-        groupType,
         roles: roles.map((role) => ({ ...role, memberCount: null })),
-        untouchedGroupCount: untouched.get(groupType)?.untouchedIds.length ?? 0,
+        untouchedGroupCount: untouched.get(template)?.untouchedIds.length ?? 0,
         // The denominator: "10 untouched" reads as "only 10 of them" without it, when it may
         // well be all of them.
-        groupCount: untouched.get(groupType)?.total ?? 0,
+        groupCount: untouched.get(template)?.total ?? 0,
       }))
     },
   },
@@ -439,9 +437,9 @@ export default {
         throw new UserInputError('Group not found!')
       }
       const templates = await readGroupRoleTemplates(context.database)
-      const template = new Map(Object.entries(templates)).get(authorization.groupType)
+      const template = new Map(Object.entries(templates)).get(authorization.visibility)
       if (!template || template.length === 0) {
-        throw new UserInputError('No role template for this group type!')
+        throw new UserInputError('No role template for this visibility!')
       }
       const now = new Date().toISOString()
       await replaceGroupRoles(
@@ -522,25 +520,13 @@ export default {
     },
     updateGroupRoleTemplate: async (
       _parent,
-      params: {
-        template?: string | null
-        groupType?: string | null
-        name: string
-        permissions: string[]
-        label?: string | null
-      },
+      params: { template: string; name: string; permissions: string[]; label?: string | null },
       context: Context,
     ) => {
-      const { name } = params
-      // `template` is the name of the thing being edited; `groupType` is what it used to be
-      // called. One of them has to be there — the schema cannot say "exactly one" itself.
-      const groupType = params.template ?? params.groupType
-      if (!groupType) {
-        throw new UserInputError('Which template? Pass `template`.')
-      }
+      const { name, template: visibility } = params
       const templates = await readGroupRoleTemplates(context.database)
       const existing = new Map(Object.entries(templates))
-        .get(groupType)
+        .get(visibility)
         ?.find((role) => role.name === name)
       if (!existing) {
         throw new UserInputError('Unknown group role template!')
@@ -559,14 +545,14 @@ export default {
       // rights — so a `public` template whose non-member role cannot read is a contradiction,
       // and every group created from it would be listed as something it is not. The operator
       // who wants that has the `closed` template for it.
-      if (name === NONE_ROLE && privacyLevelOfPermissions(updated.permissions) !== groupType) {
+      if (name === NONE_ROLE && privacyLevelOfPermissions(updated.permissions) !== visibility) {
         throw new UserInputError(
-          'These rights would make this template a different group type than it is named!',
+          'These rights would make this template a different visibility than it is named!',
         )
       }
       await writeGroupRoleTemplate(
         context.database,
-        groupType,
+        visibility,
         updated,
         actorId(context),
         new Date().toISOString(),
@@ -620,8 +606,8 @@ export default {
       const byType = new Map(Object.entries(templates))
       const now = new Date().toISOString()
       let changed = 0
-      for (const [groupType, groups] of untouched) {
-        const template = byType.get(groupType)
+      for (const [visibility, groups] of untouched) {
+        const template = byType.get(visibility)
         if (!template || template.length === 0) {
           continue
         }

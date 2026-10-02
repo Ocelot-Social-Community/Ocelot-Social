@@ -141,14 +141,14 @@ const setupFixture = async () => {
   ])
 
   authenticatedUser = owner
-  for (const groupType of ['public', 'closed', 'hidden']) {
-    const id = `gv-${groupType}`
+  for (const visibility of ['public', 'closed', 'hidden']) {
+    const id = `gv-${visibility}`
     await expectMutation(CreateGroup, {
       id,
-      name: `The ${groupType} group`,
-      about: `The ${groupType} group`,
+      name: `The ${visibility} group`,
+      about: `The ${visibility} group`,
       description,
-      groupType,
+      visibility,
       actionRadius: 'regional',
       categoryIds: null,
     })
@@ -314,19 +314,19 @@ describe('post visibility derived from group membership', () => {
   // types were never exercised: under CANNOT_SEE they hit the same edge-rewriting branch, and
   // under the derived rule they must be a no-op for visibility — both types are non-public, so
   // nothing about who may read the group's posts changes.
-  describe('UpdateGroup groupType transitions', () => {
-    const changeType = async (groupId: string, groupType: string) => {
+  describe('UpdateGroup visibility transitions', () => {
+    const changeType = async (groupId: string, visibility: string) => {
       authenticatedUser = owner
-      await expectMutation(UpdateGroup, { id: groupId, groupType })
+      await expectMutation(UpdateGroup, { id: groupId, visibility })
       authenticatedUser = null
     }
 
     describe.each([
       ['closed → hidden', 'gv-closed', 'hidden'],
       ['hidden → closed', 'gv-hidden', 'closed'],
-    ])('%s', (_name, groupId, groupType) => {
+    ])('%s', (_name, groupId, visibility) => {
       givenScenario(async () => {
-        await changeType(groupId, groupType)
+        await changeType(groupId, visibility)
       })
 
       it('keeps the posts hidden from outsiders and visible to members', async () => {
@@ -382,7 +382,7 @@ describe('post visibility derived from group membership', () => {
         authenticatedUser = admin
         await expectMutation(pinPost, { id: 'gv-public-by-author' })
         authenticatedUser = owner
-        await expectMutation(UpdateGroup, { id: 'gv-public', groupType: 'hidden' })
+        await expectMutation(UpdateGroup, { id: 'gv-public', visibility: 'hidden' })
       })
 
       it('is hidden from a non-member once the group turns private', async () => {

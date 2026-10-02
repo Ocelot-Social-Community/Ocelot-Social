@@ -415,7 +415,10 @@ Factory.define('group')
     name: faker.company.name,
     about: faker.lorem.sentence,
     description: faker.lorem.paragraphs,
-    groupType: 'public',
+    // Which role template the group starts from — the same thing `CreateGroup(visibility:)`
+    // picks, and the one half of the old `visibility` that is actually stored. How findable the
+    // group ends up is derived from the roles this seeds (groupRole/privacyLevel.ts).
+    visibility: 'public',
     actionRadius: 'regional',
     deleted: false,
     disabled: false,
@@ -428,7 +431,13 @@ Factory.define('group')
     return slug || toSlug(name)
   })
   .after(async (buildObject, options) => {
-    const [group, owner] = await Promise.all([createNode(Group, buildObject), options.owner])
+    // The node carries `template`; `visibility` is what the caller said, and for a brand-new
+    // group the two are the same statement.
+    const { visibility, ...properties } = buildObject
+    const [group, owner] = await Promise.all([
+      createNode(Group, { ...properties, template: visibility }),
+      options.owner,
+    ])
     const session = driver.session()
     try {
       await session.writeTransaction((txc) =>
@@ -448,7 +457,7 @@ Factory.define('group')
       // be as usable as one created through the API, or every spec that builds a group would
       // get a group whose members hold no rights at all.
       await session.writeTransaction(async (txc) =>
-        seedRolesForNewGroup(txc, buildObject.id, buildObject.groupType, new Date().toISOString()),
+        seedRolesForNewGroup(txc, buildObject.id, visibility, new Date().toISOString()),
       )
     } finally {
       await session.close()

@@ -169,7 +169,7 @@ describe('videoCallParticipantCount', () => {
     authenticatedUser = memberJson
     await Factory.build(
       'group',
-      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { id: 'pub-1', visibility: 'public', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     const { errors } = await query({
@@ -188,7 +188,7 @@ describe('videoCallParticipantCount', () => {
     authenticatedUser = outsiderJson
     await Factory.build(
       'group',
-      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { id: 'pub-1', visibility: 'public', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     const { errors } = await query({
@@ -202,13 +202,13 @@ describe('videoCallParticipantCount', () => {
   })
 
   it('returns the count for a member of a non-public (closed) group', async () => {
-    // Video calls are available in every group type now; viewing the count only
+    // Video calls are available in every visibility now; viewing the count only
     // needs membership (opening is gated separately on the mutation).
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
     await Factory.build(
       'group',
-      { id: 'cl-1', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
+      { id: 'cl-1', visibility: 'closed', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     listParticipantsMock.mockResolvedValueOnce([{}, {}])
@@ -226,7 +226,7 @@ describe('videoCallParticipantCount', () => {
     authenticatedUser = memberJson
     await Factory.build(
       'group',
-      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { id: 'pub-1', visibility: 'public', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     listParticipantsMock.mockResolvedValueOnce([{}, {}, {}])
@@ -245,7 +245,7 @@ describe('videoCallParticipantCount', () => {
     authenticatedUser = memberJson
     await Factory.build(
       'group',
-      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { id: 'pub-1', visibility: 'public', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     listParticipantsMock.mockRejectedValueOnce(
@@ -265,7 +265,7 @@ describe('videoCallParticipantCount', () => {
     authenticatedUser = memberJson
     await Factory.build(
       'group',
-      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { id: 'pub-1', visibility: 'public', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     listParticipantsMock.mockRejectedValueOnce(
@@ -294,7 +294,7 @@ describe('joinGroupVideoCall', () => {
     authenticatedUser = memberJson
     await Factory.build(
       'group',
-      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { id: 'pub-1', visibility: 'public', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     const { errors } = await mutate({
@@ -313,7 +313,7 @@ describe('joinGroupVideoCall', () => {
     authenticatedUser = outsiderJson
     await Factory.build(
       'group',
-      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { id: 'pub-1', visibility: 'public', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     const { errors } = await mutate({
@@ -333,7 +333,7 @@ describe('joinGroupVideoCall', () => {
     authenticatedUser = memberJson
     await Factory.build(
       'group',
-      { id: 'h-1', groupType: 'hidden', ...DESCRIPTION_OVERRIDE },
+      { id: 'h-1', visibility: 'hidden', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     const { errors } = await mutate({
@@ -351,7 +351,7 @@ describe('joinGroupVideoCall', () => {
     authenticatedUser = memberJson
     await Factory.build(
       'group',
-      { id: 'h-1', groupType: 'hidden', ...DESCRIPTION_OVERRIDE },
+      { id: 'h-1', visibility: 'hidden', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     listParticipantsMock.mockResolvedValueOnce([{}, {}])
@@ -373,7 +373,7 @@ describe('joinGroupVideoCall', () => {
     ]
     await Factory.build(
       'group',
-      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { id: 'pub-1', visibility: 'public', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     const { errors } = await mutate({
@@ -392,7 +392,7 @@ describe('joinGroupVideoCall', () => {
     ]
     await Factory.build(
       'group',
-      { id: 'h-1', groupType: 'hidden', ...DESCRIPTION_OVERRIDE },
+      { id: 'h-1', visibility: 'hidden', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     const { data, errors } = await mutate({
@@ -412,7 +412,7 @@ describe('joinGroupVideoCall', () => {
     ]
     await Factory.build(
       'group',
-      { id: 'cl-1', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
+      { id: 'cl-1', visibility: 'closed', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     const { errors } = await mutate({
@@ -431,7 +431,7 @@ describe('joinGroupVideoCall', () => {
     ]
     await Factory.build(
       'group',
-      { id: 'cl-1', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
+      { id: 'cl-1', visibility: 'closed', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     const { data, errors } = await mutate({
@@ -451,7 +451,7 @@ describe('joinGroupVideoCall', () => {
     authenticatedUser = memberJson
     await Factory.build(
       'group',
-      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { id: 'pub-1', visibility: 'public', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'outsider-1' },
     )
     await database.write({
@@ -488,7 +488,7 @@ describe('joinGroupVideoCall', () => {
       .mockResolvedValue([{ identity: 'outsider-1' }])
     await Factory.build(
       'group',
-      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { id: 'pub-1', visibility: 'public', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'outsider-1' },
     )
     await database.write({
@@ -521,7 +521,7 @@ describe('joinGroupVideoCall', () => {
     authenticatedUser = memberJson
     await Factory.build(
       'group',
-      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { id: 'pub-1', visibility: 'public', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     const { data, errors } = await mutate({
@@ -546,7 +546,7 @@ describe('joinGroupVideoCall', () => {
     rolesOverride = [{ name: 'user', protected: false, permissions: ['videoCall.create_open'] }]
     await Factory.build(
       'group',
-      { id: 'ask-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { id: 'ask-1', visibility: 'public', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     await database.write({
@@ -573,7 +573,7 @@ describe('joinGroupVideoCall', () => {
     rolesOverride = [{ name: 'user', protected: false, permissions: ['videoCall.create_open'] }]
     await Factory.build(
       'group',
-      { id: 'walk-1', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
+      { id: 'walk-1', visibility: 'closed', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     await database.write({
@@ -605,7 +605,7 @@ describe('joinGroupVideoCall', () => {
       authenticatedUser = memberJson
       await Factory.build(
         'group',
-        { id: 'meta-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+        { id: 'meta-1', visibility: 'public', ...DESCRIPTION_OVERRIDE },
         { ownerId: 'member-1' },
       )
 
@@ -631,7 +631,7 @@ describe('joinGroupVideoCall', () => {
       authenticatedUser = await bare.toJson()
       await Factory.build(
         'group',
-        { id: 'meta-2', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+        { id: 'meta-2', visibility: 'public', ...DESCRIPTION_OVERRIDE },
         { ownerId: 'bare-1' },
       )
 
@@ -656,7 +656,7 @@ describe('joinGroupVideoCall', () => {
       authenticatedUser = memberJson
       await Factory.build(
         'group',
-        { id: 'meta-3', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+        { id: 'meta-3', visibility: 'public', ...DESCRIPTION_OVERRIDE },
         { ownerId: 'member-1' },
       )
 
@@ -697,7 +697,7 @@ describe('assertGroupMembershipCached', () => {
   it('rejects a non-member and does not cache the rejection', async () => {
     await Factory.build(
       'group',
-      { id: 'cache-1', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
+      { id: 'cache-1', visibility: 'closed', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
 
@@ -722,7 +722,7 @@ describe('assertGroupMembershipCached', () => {
   it('serves repeat checks from the cache but re-reads once the TTL has passed', async () => {
     await Factory.build(
       'group',
-      { id: 'cache-2', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
+      { id: 'cache-2', visibility: 'closed', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
 
@@ -789,7 +789,7 @@ describe('Subscription.videoCallParticipantCountChanged', () => {
   it('delivers the count to a member of the addressed group', async () => {
     await Factory.build(
       'group',
-      { id: 'sub-1', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
+      { id: 'sub-1', visibility: 'closed', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     const { pubsub, context: subscriber } = subscriptionSetup(memberJson)
@@ -810,12 +810,12 @@ describe('Subscription.videoCallParticipantCountChanged', () => {
     await Promise.all([
       Factory.build(
         'group',
-        { id: 'sub-2a', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
+        { id: 'sub-2a', visibility: 'closed', ...DESCRIPTION_OVERRIDE },
         { ownerId: 'member-1' },
       ),
       Factory.build(
         'group',
-        { id: 'sub-2b', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
+        { id: 'sub-2b', visibility: 'closed', ...DESCRIPTION_OVERRIDE },
         { ownerId: 'member-1' },
       ),
     ])
@@ -836,7 +836,7 @@ describe('Subscription.videoCallParticipantCountChanged', () => {
   it('drops every event for an unauthenticated subscriber', async () => {
     await Factory.build(
       'group',
-      { id: 'sub-3', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { id: 'sub-3', visibility: 'public', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     const { pubsub, context: subscriber } = subscriptionSetup(null)
@@ -853,7 +853,7 @@ describe('Subscription.videoCallParticipantCountChanged', () => {
     // busy a (hidden) group's call is just by subscribing.
     await Factory.build(
       'group',
-      { id: 'sub-4', groupType: 'hidden', ...DESCRIPTION_OVERRIDE },
+      { id: 'sub-4', visibility: 'hidden', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
     const { pubsub, context: subscriber } = subscriptionSetup(outsiderJson)

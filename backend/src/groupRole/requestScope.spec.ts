@@ -13,7 +13,7 @@ const rows = (values: Record<string, unknown>) => ({
 
 interface GroupRow {
   [key: string]: unknown
-  groupType?: string
+  visibility?: string
   roleName?: string
   name?: string | null
   label?: string | null
@@ -36,7 +36,7 @@ const fakeDatabase = (answers: {
     // matching on the pattern would answer the wrong question.
     // The visibility is an expression now, not a column, so the authorization query is
     // recognised by what it returns ALONGSIDE it.
-    if (statement.includes('AS groupType') && statement.includes('AS elevated')) {
+    if (statement.includes('AS visibility') && statement.includes('AS elevated')) {
       return Promise.resolve({ records: answers.group ? [rows(answers.group)] : [] })
     }
     if (statement.includes('RETURN roleName AS roleName, r.name AS name')) {
@@ -82,9 +82,9 @@ const scopeFor = (
   return { ...fake, scope }
 }
 
-const memberOf = (permissions: string[], groupType = 'public') => ({
+const memberOf = (permissions: string[], visibility = 'public') => ({
   group: {
-    groupType,
+    visibility,
     roleName: 'usual',
     name: 'usual',
     label: null,
@@ -126,7 +126,7 @@ describe(createGroupAuthorizationScope, () => {
     it('reads a viewer with no membership as the group`s non-member role', async () => {
       const { scope } = scopeFor({
         group: {
-          groupType: 'closed',
+          visibility: 'closed',
           roleName: 'none',
           name: 'none',
           protected: false,
@@ -143,7 +143,7 @@ describe(createGroupAuthorizationScope, () => {
       // The escape hatch: everything fails closed there, and LeaveGroup is checked like any
       // other right — without this, a damaged row would mean a group nobody can get out of.
       const { scope } = scopeFor({
-        group: { groupType: 'public', roleName: 'usual', name: null, permissions: null },
+        group: { visibility: 'public', roleName: 'usual', name: null, permissions: null },
       })
       const authorization = await scope.forGroup('g1')
 
@@ -154,7 +154,7 @@ describe(createGroupAuthorizationScope, () => {
 
     it('does not hand that escape to somebody without a membership', async () => {
       const { scope } = scopeFor({
-        group: { groupType: 'public', roleName: 'none', name: null, permissions: null },
+        group: { visibility: 'public', roleName: 'none', name: null, permissions: null },
       })
       const authorization = await scope.forGroup('g1')
 
@@ -166,7 +166,7 @@ describe(createGroupAuthorizationScope, () => {
     it('expands the owner role to the whole catalog', async () => {
       const { scope } = scopeFor({
         group: {
-          groupType: 'hidden',
+          visibility: 'hidden',
           roleName: 'owner',
           name: 'owner',
           protected: true,
@@ -209,7 +209,7 @@ describe(createGroupAuthorizationScope, () => {
       // (groupRole/elevation.ts). Unelevated, it reads; that is all.
       const { scope } = scopeFor(
         {
-          group: { groupType: 'closed', roleName: 'none', name: 'none', permissions: '[]' },
+          group: { visibility: 'closed', roleName: 'none', name: 'none', permissions: '[]' },
         },
         { network: ['group.administer.any_closed'] },
       )
@@ -226,7 +226,7 @@ describe(createGroupAuthorizationScope, () => {
       const { scope } = scopeFor(
         {
           group: {
-            groupType: 'closed',
+            visibility: 'closed',
             roleName: 'none',
             name: 'none',
             permissions: '[]',
@@ -242,12 +242,12 @@ describe(createGroupAuthorizationScope, () => {
       expect(authorization?.elevated).toBe(true)
     })
 
-    it('folds the moderator`s read rights in for a group type they may read into', async () => {
+    it('folds the moderator`s read rights in for a visibility they may read into', async () => {
       // #9405: a moderator sees what they are asked to review, and nothing more — reading, not
       // posting, not administering.
       const { scope } = scopeFor(
         {
-          group: { groupType: 'closed', roleName: 'none', name: 'none', permissions: '[]' },
+          group: { visibility: 'closed', roleName: 'none', name: 'none', permissions: '[]' },
         },
         { network: ['group.content.read.any_closed'] },
       )
@@ -265,7 +265,7 @@ describe(createGroupAuthorizationScope, () => {
       const { scope } = scopeFor(
         {
           group: {
-            groupType: 'hidden',
+            visibility: 'hidden',
             roleName: 'none',
             name: 'none',
             permissions: '[]',
@@ -282,10 +282,10 @@ describe(createGroupAuthorizationScope, () => {
       expect(authorization?.has('group.members.read')).toBe(false)
     })
 
-    it('does not fold anything in for a DIFFERENT group type', async () => {
+    it('does not fold anything in for a DIFFERENT visibility', async () => {
       const { scope } = scopeFor(
         {
-          group: { groupType: 'hidden', roleName: 'none', name: 'none', permissions: '[]' },
+          group: { visibility: 'hidden', roleName: 'none', name: 'none', permissions: '[]' },
         },
         { network: ['group.content.read.any_closed', 'group.moderate.any_closed'] },
       )
@@ -417,7 +417,7 @@ describe(createGroupAuthorizationScope, () => {
       const { scope } = scopeFor(
         {
           group: {
-            groupType: 'public',
+            visibility: 'public',
             roleName: 'none',
             name: 'none',
             permissions: '["group.read","group.join"]',

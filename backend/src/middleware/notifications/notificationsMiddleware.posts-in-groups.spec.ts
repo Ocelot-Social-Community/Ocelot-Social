@@ -116,7 +116,7 @@ describe('notify group members of new posts in group', () => {
         id: 'g-1',
         name: 'A closed group',
         description: 'A closed group to test the notifications to group members',
-        groupType: 'closed',
+        visibility: 'closed',
         actionRadius: 'national',
       },
     })

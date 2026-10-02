@@ -151,16 +151,18 @@ describe('postFilterToCypher access control operators', () => {
         invisibleTo: {
           viewerId: 'viewer-id',
           contentGroupIds: ['group-a', 'group-b'],
-          moderatorGroupTypes: [],
+          moderatorVisibilities: [],
         },
       },
     })
 
     // The group's own answer first — the mirrored `group.content.read` of its non-member role,
     // with the seeded-template value for a node the backfill has not reached yet.
-    expect(where).toContain("NOT (coalesce(g.nonMemberContentRead, g.groupType = 'public') = true)")
+    expect(where).toContain(
+      "NOT (coalesce(g.nonMemberContentRead, g.visibility = 'public') = true)",
+    )
     expect(where).toContain('AND NOT g.id IN $pf1')
-    expect(where).toContain('AND NOT g.groupType IN $pf2')
+    expect(where).toContain('AND NOT g.visibility IN $pf2')
     expect(where).toContain('NOT EXISTS {')
     expect(where).toContain('OR EXISTS { MATCH (post)<-[:WROTE]-(:User { id: $pf0 }) }')
     expect(params).toEqual({
@@ -174,25 +176,25 @@ describe('postFilterToCypher access control operators', () => {
   // `group.content.read` away from its non-member role is not readable by a stranger, and no
   // part of this clause may hand it back. The flag is a node property, so what this pins is
   // that the type is not consulted for it at all.
-  it('does not let the group type decide what the group decided', () => {
+  it('does not let the visibility decide what the group decided', () => {
     const { where } = postFilterToCypher({
-      filter: { invisibleTo: { viewerId: null, contentGroupIds: [], moderatorGroupTypes: [] } },
+      filter: { invisibleTo: { viewerId: null, contentGroupIds: [], moderatorVisibilities: [] } },
     })
 
-    expect(where).not.toContain("g.groupType = 'public' AND")
-    expect(where).not.toContain("NOT g.groupType IN ['public']")
+    expect(where).not.toContain("g.visibility = 'public' AND")
+    expect(where).not.toContain("NOT g.visibility IN ['public']")
   })
 
   // What #9405 asked for: a network moderator holding group.content.read.any_closed brings the
   // type along, so the reported content they are supposed to review stops being invisible —
-  // without a per-row lookup, and with groupType still the axis.
-  it('lets a viewer read into the group types their network rights cover', () => {
+  // without a per-row lookup, and with visibility still the axis.
+  it('lets a viewer read into the visibilitys their network rights cover', () => {
     const { params } = postFilterToCypher({
       filter: {
         invisibleTo: {
           viewerId: 'moderator-id',
           contentGroupIds: [],
-          moderatorGroupTypes: ['closed'],
+          moderatorVisibilities: ['closed'],
         },
       },
     })
@@ -221,7 +223,9 @@ describe('postFilterToCypher access control operators', () => {
       filter: { invisibleTo: { viewerId: null, contentGroupIds: [] } },
     })
 
-    expect(where).toContain("NOT (coalesce(g.nonMemberContentRead, g.groupType = 'public') = true)")
+    expect(where).toContain(
+      "NOT (coalesce(g.nonMemberContentRead, g.visibility = 'public') = true)",
+    )
     expect(where).toContain('AND NOT g.id IN $pf1')
     expect(params).toEqual({ pf0: null, pf1: [], pf2: [] })
   })
@@ -508,7 +512,11 @@ describe('postFilterToCypher parameter binding', () => {
     id_not_in: [payload],
     language_in: [payload],
     postType_in: [payload],
-    invisibleTo: { viewerId: payload, contentGroupIds: [payload], moderatorGroupTypes: [payload] },
+    invisibleTo: {
+      viewerId: payload,
+      contentGroupIds: [payload],
+      moderatorVisibilities: [payload],
+    },
     mutedBy: payload,
     inGroupsOf: [payload],
     eventStart_gte: payload,

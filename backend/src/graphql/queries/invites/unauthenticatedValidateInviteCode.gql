@@ -3,7 +3,7 @@ query unauthenticatedValidateInviteCode($code: String!) {
     code
     # eslint-disable-next-line @graphql-eslint/require-selections
     invitedTo {
-      groupType
+      visibility
       name
       about
       avatar {

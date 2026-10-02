@@ -325,11 +325,11 @@ describe('SignupVerification', () => {
               return records[0]?.get('role') as string | undefined
             }
 
-            const buildInviteGroup = async (groupType: string) => {
+            const buildInviteGroup = async (visibility: string) => {
               await Factory.build('user', { id: 'group-host', name: 'Group Host' })
               await Factory.build(
                 'group',
-                { id: 'invite-group', groupType, description: GROUP_DESCRIPTION },
+                { id: 'invite-group', visibility, description: GROUP_DESCRIPTION },
                 { ownerId: 'group-host' },
               )
               await database.write({

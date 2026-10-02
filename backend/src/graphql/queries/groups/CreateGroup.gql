@@ -4,7 +4,7 @@ mutation CreateGroup(
   $slug: String
   $about: String
   $description: String!
-  $groupType: GroupType!
+  $visibility: GroupVisibility!
   $actionRadius: GroupActionRadius!
   $categoryIds: [ID]
   $locationName: String # empty string '' sets it to null
@@ -17,7 +17,7 @@ mutation CreateGroup(
     slug: $slug
     about: $about
     description: $description
-    groupType: $groupType
+    visibility: $visibility
     actionRadius: $actionRadius
     categoryIds: $categoryIds
     locationName: $locationName
@@ -33,7 +33,7 @@ mutation CreateGroup(
     deleted
     about
     description
-    groupType
+    visibility
     actionRadius
     categories {
       id

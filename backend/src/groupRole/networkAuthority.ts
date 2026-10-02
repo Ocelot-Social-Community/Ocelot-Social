@@ -25,22 +25,22 @@ import type { PermissionKey } from '@src/permission'
 /** The network permission set a request already resolved. */
 type NetworkPermissions = ReadonlySet<PermissionKey> | { has: (key: PermissionKey) => boolean }
 
-/** What the viewer's network rights grant them inside ANY group of this type. */
+/** What the viewer's network rights grant them inside ANY group of this visibility. */
 export function networkAuthorityIn(
-  groupType: string,
+  visibility: string,
   effectivePermissions: NetworkPermissions,
 ): Set<GroupPermissionKey> {
   const holds = (key: string) => effectivePermissions.has(key as PermissionKey)
-  if (holds(`group.administer.any_${groupType}`)) {
+  if (holds(`group.administer.any_${visibility}`)) {
     return new Set(allGroupPermissionKeys())
   }
   const authority = new Set<GroupPermissionKey>()
-  if (holds(`group.content.read.any_${groupType}`)) {
+  if (holds(`group.content.read.any_${visibility}`)) {
     authority.add('group.read')
     authority.add('group.content.read')
     authority.add('group.members.read')
   }
-  if (holds(`group.moderate.any_${groupType}`)) {
+  if (holds(`group.moderate.any_${visibility}`)) {
     authority.add('group.read')
     authority.add('group.content.read')
     authority.add('group.post.moderate')
@@ -49,14 +49,14 @@ export function networkAuthorityIn(
 }
 
 /**
- * The group types in which the viewer holds this right WITHOUT a membership — the form a
- * many-groups query can use (`group.groupType IN $types`).
+ * The visibilities in which the viewer holds this right WITHOUT a membership — the form a
+ * many-groups query can use (`visibilityOf(group) IN $visibilities`).
  */
-export function groupTypesWithNetworkAuthority(
+export function visibilitiesWithNetworkAuthority(
   permission: GroupPermissionKey,
   effectivePermissions: NetworkPermissions,
 ): string[] {
-  return PRIVACY_LEVELS.filter((groupType) =>
-    networkAuthorityIn(groupType, effectivePermissions).has(permission),
+  return PRIVACY_LEVELS.filter((visibility) =>
+    networkAuthorityIn(visibility, effectivePermissions).has(permission),
   )
 }

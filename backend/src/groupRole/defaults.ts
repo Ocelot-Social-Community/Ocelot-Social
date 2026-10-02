@@ -3,7 +3,7 @@ import { ADMIN_ROLE, NONE_ROLE, OWNER_ROLE, PENDING_ROLE, USUAL_ROLE } from './t
 import type { GroupRoleDefinition, GroupRoleTemplates } from './types'
 import type { GroupPermissionKey } from '@src/groupPermission'
 
-// The seeded default group roles, per group type.
+// The seeded default group roles, per visibility.
 //
 // These sets are an AUDIT of the hand-written shield guards they replace, so a group
 // upgrading to this model keeps exactly the behaviour it had — the same discipline
@@ -18,7 +18,7 @@ import type { GroupPermissionKey } from '@src/groupPermission'
 // (permissionsForGroupRole), so a newly added key is owned automatically and an owner can
 // never be locked out of their own group.
 
-// What a member may do in any group type.
+// What a member may do in any visibility.
 const MEMBER_BASELINE: GroupPermissionKey[] = [
   'group.read',
   'group.content.read',
@@ -51,7 +51,7 @@ const ADMIN_EXTRAS: GroupPermissionKey[] = [
   'group.settings.manage',
   'group.invite',
   // Inviting someone who is not on the network yet is the stronger of the two invite
-  // rights (it can lead to a registration), so it stays with admins in every group type.
+  // rights (it can lead to a registration), so it stays with admins in every visibility.
   'group.invite.external',
 ]
 
@@ -91,7 +91,7 @@ export const DEFAULT_GROUP_ROLE_TEMPLATES: GroupRoleTemplates = {
     // Members of a public group may bring others in; the intent of today's (broken)
     // invite guard.
     systemRole(USUAL_ROLE, [...MEMBER_BASELINE, 'group.invite']),
-    // group.invite is already part of ADMIN_EXTRAS — an admin holds it in every group type.
+    // group.invite is already part of ADMIN_EXTRAS — an admin holds it in every visibility.
     editableRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
     ownerRole(),
   ],
@@ -111,7 +111,7 @@ export const DEFAULT_GROUP_ROLE_TEMPLATES: GroupRoleTemplates = {
     systemRole(NONE_ROLE, []),
     // An applicant does not see a hidden group either — `group.read` is deliberately absent
     // here, where the other two types grant it. That is the guard this replaces:
-    // `groupType = 'hidden' AND membership.role <> 'pending'`, i.e. invisible to everybody who
+    // `visibility = 'hidden' AND membership.role <> 'pending'` (as it then was), i.e. invisible
     // is not actually a member. Withdrawing still works, because leaving needs no reading.
     systemRole(PENDING_ROLE, ['group.leave']),
     systemRole(USUAL_ROLE, [...MEMBER_BASELINE]),
@@ -131,17 +131,17 @@ export const MANDATORY_GROUP_ROLE_NAMES: readonly string[] = [
   OWNER_ROLE,
 ]
 
-// A Map rather than dynamic indexing into the record: groupType arrives from a request, and a
+// A Map rather than dynamic indexing into the record: the name arrives from a request, and a
 // lookup that cannot be a prototype key needs no reasoning about whether it is safe.
 const templatesByGroupType = new Map(Object.entries(DEFAULT_GROUP_ROLE_TEMPLATES))
 
 /**
- * A fresh copy of the template for this group type, or undefined when the type has none —
+ * A fresh copy of the template for this visibility, or undefined when the type has none —
  * which the drift guard in ./defaults.spec.ts makes unreachable for the types the schema
  * offers. Copies, so seeding one group can never mutate the shared template.
  */
-export function defaultTemplateFor(groupType: string): GroupRoleDefinition[] | undefined {
+export function defaultTemplateFor(template: string): GroupRoleDefinition[] | undefined {
   return templatesByGroupType
-    .get(groupType)
+    .get(template)
     ?.map((role) => ({ ...role, permissions: [...role.permissions] }))
 }

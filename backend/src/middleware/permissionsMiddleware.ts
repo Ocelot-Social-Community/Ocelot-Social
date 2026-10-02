@@ -88,8 +88,8 @@ const hasPermission = (permission: PermissionKey) =>
 // Exported for the drift test in permissionsMiddleware.spec.ts, which asserts that EVERY value of
 // the GroupType enum still maps to a permission. That is what the `default` below is for: a
 // fourth group type added to the schema and not to this switch must be refused, not created.
-export const groupCreatePermissionForType = (groupType: string): PermissionKey | null => {
-  switch (groupType) {
+export const groupCreatePermissionFor = (visibility: string): PermissionKey | null => {
+  switch (visibility) {
     case 'public':
       return 'group.create_public'
     case 'closed':
@@ -100,15 +100,14 @@ export const groupCreatePermissionForType = (groupType: string): PermissionKey |
       return null
   }
 }
-// Both names for the same argument. The shield runs BEFORE the resolver normalises them, so it
-// has to read either — a rule that only knew the old name would wave the new one through.
+/** The visibility a request asks for, where it asks for one at all. */
 const requestedVisibility = (args: Record<string, unknown>): string | null =>
-  (args.visibility as string | null) ?? (args.groupType as string | null) ?? null
+  (args.visibility as string | null) ?? null
 
 const canCreateGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
   const requested = requestedVisibility(args)
-  const permission = requested === null ? null : groupCreatePermissionForType(requested)
-  // Same check as hasPermission(), but the permission depends on the requested groupType,
+  const permission = requested === null ? null : groupCreatePermissionFor(requested)
+  // Same check as hasPermission(), but the permission depends on the requested visibility,
   // so it can't be a static hasPermission() gate. group.create_* is gated by groupsEnabled,
   // so hasPermissionEffective also blocks creation when groups are off.
   return !!permission && hasPermissionEffective(ctx, permission)
@@ -318,25 +317,25 @@ const canReviewReportedContent = rule({ cache: 'no_cache' })(async (
             OPTIONAL MATCH (resource)-[:COMMENTS]->(:Post)-[:IN]->(viaPost:Group)
             WITH coalesce(direct, viaPost) AS group
             ${optionalMemberRoleMatch('group', '$viewerId')}
-            RETURN ${visibilityOf('group')} AS groupType,
+            RETURN ${visibilityOf('group')} AS visibility,
                    (group IS NULL
                      OR ${nonMemberReadsContent('group')}
                      OR ${memberRoleHolds('group.content.read')}) AS readableHere`,
     variables: { resourceId, viewerId: ctx.user?.id ?? null },
   })
   const record = result.records[0]
-  const groupType = record?.get('groupType') as string | null
-  if (!groupType || record?.get('readableHere') === true) {
+  const visibility = record?.get('visibility') as string | null
+  if (!visibility || record?.get('readableHere') === true) {
     return true
   }
-  return hasPermissionEffective(ctx, `group.content.read.any_${groupType}` as PermissionKey)
+  return hasPermissionEffective(ctx, `group.content.read.any_${visibility}` as PermissionKey)
 })
 
 // Holding any of the per-type administration rights is what opens the admin group list; the
 // resolver then restricts the result to exactly those types.
 const canAdministerSomeGroup = rule({ cache: 'contextual' })(async (_parent, _args, ctx: Context) =>
-  ['public', 'closed', 'hidden'].some((groupType) =>
-    hasPermissionEffective(ctx, `group.administer.any_${groupType}` as PermissionKey),
+  ['public', 'closed', 'hidden'].some((visibility) =>
+    hasPermissionEffective(ctx, `group.administer.any_${visibility}` as PermissionKey),
   ),
 )
 
@@ -463,7 +462,7 @@ const canChangeGroupType = rule({ cache: 'no_cache' })(async (_parent, args, ctx
   // Sending the type the group already has is not a change. The group form posts every field
   // it knows, so demanding the right for an unchanged value would stop an owner who may not
   // create hidden groups from editing the hidden group they already own.
-  if (requested === authorization.groupType) {
+  if (requested === authorization.visibility) {
     return true
   }
   // Setting the type IS editing the group's non-member and applicant roles — the preset writes
@@ -478,7 +477,7 @@ const canChangeGroupType = rule({ cache: 'no_cache' })(async (_parent, args, ctx
   // `group.create_hidden`. The same cap guards the rights matrix, which is the other way to
   // the same result (see requirePrivacyCap in resolvers/groupRoles.ts).
   const target = requested as GroupPrivacyLevel
-  if (!isMorePrivate(target, authorization.groupType as GroupPrivacyLevel)) {
+  if (!isMorePrivate(target, authorization.visibility as GroupPrivacyLevel)) {
     return true
   }
   const needed = createPermissionForLevel(target)
@@ -849,7 +848,7 @@ export default shield(
       avatar: allow,
       name: allow,
       about: allow,
-      groupType: allow,
+      visibility: allow,
       // The two READ rights are not enforced here but in the field resolvers, which blank
       // instead of refusing (see resolvers/groups.ts, mayReadGroup). A rule would null the
       // whole group out of the one list where a group the viewer may not read legitimately

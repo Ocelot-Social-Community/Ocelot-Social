@@ -27,13 +27,13 @@ const {
 } = groupAuthorizationRules
 
 interface AuthorizationStub {
-  groupType?: string
+  visibility?: string
   effective?: string[]
 }
 
 const authorizationOf = (stub: AuthorizationStub) => ({
   groupId: 'g1',
-  groupType: stub.groupType ?? 'public',
+  visibility: stub.visibility ?? 'public',
   roleName: 'usual',
   isMember: true,
   hasRoleDefinition: true,
@@ -203,16 +203,18 @@ describe(parentHasGroupPermission, () => {
 
 describe('canChangeGroupType', () => {
   it('allows a request that does not touch the type', async () => {
-    const context = contextFor({ group: { groupType: 'public' } })
+    const context = contextFor({ group: { visibility: 'public' } })
 
     expect(await resolve(canChangeGroupType, {}, { id: 'g1' }, context)).toBe(true)
-    expect(await resolve(canChangeGroupType, {}, { id: 'g1', groupType: null }, context)).toBe(true)
+    expect(await resolve(canChangeGroupType, {}, { id: 'g1', visibility: null }, context)).toBe(
+      true,
+    )
   })
 
   it('denies for a group that does not exist', async () => {
     const context = contextFor({ group: null })
 
-    expect(await resolve(canChangeGroupType, {}, { id: 'g1', groupType: 'hidden' }, context)).toBe(
+    expect(await resolve(canChangeGroupType, {}, { id: 'g1', visibility: 'hidden' }, context)).toBe(
       false,
     )
   })
@@ -221,9 +223,9 @@ describe('canChangeGroupType', () => {
     // The group form posts every field it knows, so demanding the right for an unchanged value
     // would stop an owner who may not create hidden groups from editing the hidden group they
     // already own.
-    const context = contextFor({ group: { groupType: 'hidden', effective: [] } })
+    const context = contextFor({ group: { visibility: 'hidden', effective: [] } })
 
-    expect(await resolve(canChangeGroupType, {}, { id: 'g1', groupType: 'hidden' }, context)).toBe(
+    expect(await resolve(canChangeGroupType, {}, { id: 'g1', visibility: 'hidden' }, context)).toBe(
       true,
     )
   })
@@ -233,18 +235,18 @@ describe('canChangeGroupType', () => {
     // way, so it asks the same right. Without it, "public now, hidden in a minute" is the way
     // around `group.create_hidden`.
     const holder = contextFor({
-      group: { groupType: 'public', effective: ['group.role.manage'] },
+      group: { visibility: 'public', effective: ['group.role.manage'] },
       network: ['group.create_hidden'],
     })
     const without = contextFor({
-      group: { groupType: 'public', effective: ['group.role.manage'] },
+      group: { visibility: 'public', effective: ['group.role.manage'] },
       network: ['group.create_public'],
     })
 
-    expect(await resolve(canChangeGroupType, {}, { id: 'g1', groupType: 'hidden' }, holder)).toBe(
+    expect(await resolve(canChangeGroupType, {}, { id: 'g1', visibility: 'hidden' }, holder)).toBe(
       true,
     )
-    expect(await resolve(canChangeGroupType, {}, { id: 'g1', groupType: 'hidden' }, without)).toBe(
+    expect(await resolve(canChangeGroupType, {}, { id: 'g1', visibility: 'hidden' }, without)).toBe(
       false,
     )
   })
@@ -252,26 +254,26 @@ describe('canChangeGroupType', () => {
   it('asks for no creation right when the switch opens the group up', async () => {
     // Opening takes nothing away from people outside the group.
     const context = contextFor({
-      group: { groupType: 'hidden', effective: ['group.role.manage'] },
+      group: { visibility: 'hidden', effective: ['group.role.manage'] },
       network: [],
     })
 
-    expect(await resolve(canChangeGroupType, {}, { id: 'g1', groupType: 'public' }, context)).toBe(
+    expect(await resolve(canChangeGroupType, {}, { id: 'g1', visibility: 'public' }, context)).toBe(
       true,
     )
   })
 
   it('needs the right for an actual change', async () => {
     const withRight = contextFor({
-      group: { groupType: 'public', effective: ['group.role.manage'] },
+      group: { visibility: 'public', effective: ['group.role.manage'] },
       network: ['group.create_closed'],
     })
-    const without = contextFor({ group: { groupType: 'public', effective: [] } })
+    const without = contextFor({ group: { visibility: 'public', effective: [] } })
 
     expect(
-      await resolve(canChangeGroupType, {}, { id: 'g1', groupType: 'closed' }, withRight),
+      await resolve(canChangeGroupType, {}, { id: 'g1', visibility: 'closed' }, withRight),
     ).toBe(true)
-    expect(await resolve(canChangeGroupType, {}, { id: 'g1', groupType: 'closed' }, without)).toBe(
+    expect(await resolve(canChangeGroupType, {}, { id: 'g1', visibility: 'closed' }, without)).toBe(
       false,
     )
   })
@@ -490,7 +492,7 @@ describe('canReviewReportedContent', () => {
   })
 
   it('allows a review of content that is in no group', async () => {
-    const context = contextFor({ queryRecords: [row({ groupType: null, readableHere: false })] })
+    const context = contextFor({ queryRecords: [row({ visibility: null, readableHere: false })] })
 
     expect(await resolve(canReviewReportedContent, {}, { resourceId: 'p1' }, context)).toBe(true)
   })
@@ -498,13 +500,15 @@ describe('canReviewReportedContent', () => {
   it('allows it when the group itself says the content is readable', async () => {
     // Either it opened its content to non-members, or this moderator`s role in it grants
     // reading — the query answers both as `readableHere`.
-    const context = contextFor({ queryRecords: [row({ groupType: 'closed', readableHere: true })] })
+    const context = contextFor({
+      queryRecords: [row({ visibility: 'closed', readableHere: true })],
+    })
 
     expect(await resolve(canReviewReportedContent, {}, { resourceId: 'p1' }, context)).toBe(true)
   })
 
   it('falls back to the per-type network right', async () => {
-    const records = [row({ groupType: 'closed', readableHere: false })]
+    const records = [row({ visibility: 'closed', readableHere: false })]
     const moderator = contextFor({
       queryRecords: records,
       network: ['group.content.read.any_closed'],

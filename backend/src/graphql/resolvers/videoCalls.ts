@@ -46,7 +46,7 @@ const getGroupMembershipType = async (
         `
           MATCH (u:User { id: $userId })-[m:MEMBER_OF]->(g:Group { id: $groupId })
           WHERE m.role <> 'pending'
-          RETURN ${visibilityOf('g')} AS groupType
+          RETURN ${visibilityOf('g')} AS visibility
         `,
         { userId: currentUserId, groupId },
       ),
@@ -54,7 +54,7 @@ const getGroupMembershipType = async (
     if (result.records.length === 0) {
       throw new ForbiddenError('Not a member of this group.')
     }
-    return result.records[0].get('groupType') as string
+    return result.records[0].get('visibility') as string
   } finally {
     await session.close()
   }

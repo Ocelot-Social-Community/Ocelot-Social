@@ -8,7 +8,7 @@
 //
 // This is not a new device: the deprecated `showMembers` property has always been exactly this
 // for `group.members.read`. It is generalised here to the other two read rights so the rights
-// matrix can decide them instead of `groupType`.
+// matrix can decide them instead of `visibility`.
 import { defaultTemplateFor } from './defaults'
 import { NONE_ROLE } from './types'
 
@@ -45,13 +45,13 @@ export function nonMemberAccessFrom(
 /**
  * What a group of this type would let a non-member read if it still has the seeded template —
  * which is what the migration writes for a group whose roles predate it, and what the two
- * Cypher fallbacks (`coalesce(g.nonMemberRead, g.groupType <> 'hidden')` and
- * `coalesce(g.nonMemberContentRead, g.groupType = 'public')`) say for the window between
+ * Cypher fallbacks (`coalesce(g.nonMemberRead, g.visibility <> 'hidden')` and
+ * `coalesce(g.nonMemberContentRead, g.visibility = 'public')`) say for the window between
  * deploying the code and running the migration. Derived from the templates rather than
  * written out again, so there is one answer and the spec can hold the fallbacks to it.
  */
-export function defaultNonMemberAccessFor(groupType: string): NonMemberAccess {
-  const template = defaultTemplateFor(groupType)
+export function defaultNonMemberAccessFor(visibility: string): NonMemberAccess {
+  const template = defaultTemplateFor(visibility)
   const none = template?.find((role) => role.name === NONE_ROLE)
   return nonMemberAccessFrom(none?.permissions)
 }

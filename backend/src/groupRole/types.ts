@@ -22,7 +22,7 @@ export interface GroupRoleDefinition {
 }
 
 // The system roles. `none` is the role of someone with no MEMBER_OF edge at all, which
-// is what turns "non-member" from an implicit groupType branch into an ordinary role.
+// is what turns "non-member" from an implicit visibility branch into an ordinary role.
 export const NONE_ROLE = 'none'
 export const PENDING_ROLE = 'pending'
 export const OWNER_ROLE = 'owner'
@@ -56,7 +56,7 @@ export function isActiveMembershipRole(roleName: string): boolean {
 // (E18).
 export type AuthoritySource = 'membership' | 'network' | 'both'
 
-// A network-level default set of group role definitions, one per group type: what a
+// A network-level default set of group role definitions, one per visibility: what a
 // newly created group of that type starts with, and what `resetGroupRoles` restores.
 // Unlike per-group roles these are few and global, so they are cached and Redis-synced
 // like the network roles and the policy.

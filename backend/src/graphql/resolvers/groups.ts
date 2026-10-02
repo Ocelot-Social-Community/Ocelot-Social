@@ -20,7 +20,7 @@ import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 import { branding } from '@src/branding'
 import { NONE_ROLE, PENDING_ROLE, privacyLevelFrom, USUAL_ROLE } from '@src/groupRole'
 import {
-  applyGroupTypeToNonMemberRoles,
+  applyTemplateToNonMemberRoles,
   readGroupRoles,
   seedRolesForNewGroup,
   setNonMemberMemberListAccess,
@@ -180,13 +180,13 @@ export default {
           // MEMBERSHIP is what qualifies, not a right. An applicant to a hidden group has to
           // be able to see that they applied — the group's own fields stay blank for them,
           // which the field resolvers below take care of.
-          const { readableGroupIds, readableGroupTypes } = await groupReadScope(context)
+          const { readableGroupIds, readableVisibilities } = await groupReadScope(context)
           const readableByStranger = nonMemberReadsGroup('group')
           const readableByViewer = 'group.id IN $readableGroupIds'
           // The third direction: a network right that reaches into groups of this type without
           // a membership — what a moderator reviewing a report, or an admin recovering an
           // ownerless group, holds (groupRole/networkAuthority.ts).
-          const readableByNetworkRight = `${visibilityOf('group')} IN $readableGroupTypes`
+          const readableByNetworkRight = `${visibilityOf('group')} IN $readableVisibilities`
 
           const transactionResponse = await txc.run(
             `
@@ -209,7 +209,7 @@ export default {
             {
               userId: context.user.id,
               readableGroupIds,
-              readableGroupTypes,
+              readableVisibilities,
               id,
               slug,
               first,
@@ -286,7 +286,7 @@ export default {
       const {
         user: { id: userId },
       } = context
-      const { readableGroupIds, readableGroupTypes } = await groupReadScope(context as Context)
+      const { readableGroupIds, readableVisibilities } = await groupReadScope(context as Context)
       const session = context.driver.session()
       try {
         const result = await session.readTransaction(async (txc) => {
@@ -303,13 +303,13 @@ export default {
             cypher = `MATCH (group:Group)
                       WHERE group.id IN $readableGroupIds
                       OR ${nonMemberReadsGroup('group')}
-                      OR ${visibilityOf('group')} IN $readableGroupTypes
+                      OR ${visibilityOf('group')} IN $readableVisibilities
                       RETURN toString(count(group)) AS count`
           }
           const transactionResponse = await txc.run(cypher, {
             userId,
             readableGroupIds,
-            readableGroupTypes,
+            readableVisibilities,
           })
           return transactionResponse.records.map((record) => record.get('count'))[0]
         })
@@ -322,13 +322,11 @@ export default {
   Mutation: {
     CreateGroup: async (_parent, params, context: Context, _resolveInfo) => {
       const { policy } = context
-      // `visibility` is the name now; `groupType` is what it was called. Normalised once, here,
-      // so everything downstream — the shield already ran — sees one field.
-      params.groupType = params.visibility ?? params.groupType
+      // The visibility a new group starts at IS the template it is seeded from — the three
+      // shipped templates are named after what they derive to. Stored as `template`, because
+      // that half is the one nothing computes back.
+      const template = params.visibility as string
       delete params.visibility
-      if (!params.groupType) {
-        throw new UserInputError('A group needs a visibility!')
-      }
       const { categoryIds } = params
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
@@ -399,12 +397,7 @@ export default {
           // The group's own role definitions, copied from the network template for its type.
           // In the same transaction as the group itself: a group without roles is a group
           // nobody can act in, so the two commit together or not at all.
-          await seedRolesForNewGroup(
-            transaction,
-            params.id,
-            params.groupType,
-            new Date().toISOString(),
-          )
+          await seedRolesForNewGroup(transaction, params.id, template, new Date().toISOString())
           return group
         })
         // TODO: put in a middleware, see "UpdateGroup", "UpdateUser"
@@ -428,10 +421,8 @@ export default {
       }
     },
     UpdateGroup: async (_parent, params, context: Context, _resolveInfo) => {
-      // Same normalisation as CreateGroup: one field downstream, two names at the door.
-      if (params.visibility) {
-        params.groupType = params.visibility
-      }
+      // Applying a visibility means applying the template of that name, below.
+      const requestedTemplate = params.visibility as string | undefined
       delete params.visibility
       const { policy } = context
       const { categoryIds } = params
@@ -466,14 +457,14 @@ export default {
       // Read inside the transaction below, used after it: switching the type has to be
       // translated into the roles that carry it (see applyGroupTypeToNonMemberRoles), and that
       // needs to know whether the type actually changed.
-      let previousGroupType: string | undefined
+      let previousVisibility: string | undefined
       try {
         const group = await session.writeTransaction(async (transaction) => {
-          const previousGroupTypeResult = await transaction.run(
-            `MATCH (group:Group {id: $groupId}) RETURN ${visibilityOf('group')} AS groupType`,
+          const previousVisibilityResult = await transaction.run(
+            `MATCH (group:Group {id: $groupId}) RETURN ${visibilityOf('group')} AS visibility`,
             { groupId },
           )
-          previousGroupType = previousGroupTypeResult.records[0]?.get('groupType') as
+          previousVisibility = previousVisibilityResult.records[0]?.get('visibility') as
             string | undefined
           // No type check here: making a group MORE private needs the right to have created
           // it that way, and the shield's canChangeGroupType asks that before this resolver
@@ -513,12 +504,12 @@ export default {
             params,
           })
           const [group] = transactionResponse.records.map((record) => record.get('group'))
-          // Changing groupType used to rewrite the stored restrictions here: delete every
+          // Changing the visibility used to rewrite the stored restrictions here: delete every
           // CANNOT_SEE edge into the group on the way to `public`, and on the way back write
           // one edge per (post × non-member) — a cartesian product in a single write
           // transaction, 500.000 rows for a 100-post group on a 5.000-user instance.
           // `SET group += $params` above is now the whole change; the visibility rule reads
-          // groupType at query time, so every post in the group flips with it, atomically.
+          // the rights at query time, so every post in the group flips with them, atomically.
           if (avatarInput) {
             await images(context.config).mergeImage(group, 'AVATAR_IMAGE', avatarInput, {
               transaction,
@@ -536,14 +527,14 @@ export default {
           coordinates,
           GROUP_REVERSE_GEOCODE_TYPES,
         )
-        if (params.groupType && params.groupType !== previousGroupType) {
-          // The type is a preset for what outsiders may do, so switching it writes those
-          // rights. Nothing reads groupType for visibility any more — which is why the switch
-          // has to land in the `none` and `pending` roles to have any effect at all.
-          await applyGroupTypeToNonMemberRoles(
+        if (requestedTemplate && requestedTemplate !== previousVisibility) {
+          // A template is a preset for what outsiders may do, so applying one writes those
+          // rights. Nothing stores the visibility any more — which is why the switch has to
+          // land in the `none` and `pending` roles to have any effect at all.
+          await applyTemplateToNonMemberRoles(
             context.database,
             groupId,
-            params.groupType as string,
+            requestedTemplate,
             actor,
             new Date().toISOString(),
           )
@@ -974,8 +965,6 @@ export default {
     // The visibility, from the columns the group carries — never from a column of its own, so
     // the API and the rights cannot drift (groupRole/privacyLevel.ts, `visibilityOf` in Cypher).
     visibility: (parent) => visibilityOfGroup(parent),
-    // The same answer under the name clients used before.
-    groupType: (parent) => visibilityOfGroup(parent),
     name: async (parent, _args, context: Context, _resolveInfo) => {
       // An unlisted group keeps its name from a logged-out visitor: an id that leaks somewhere
       // must not leak a name with it. The one exception is an invite code — holding it IS the

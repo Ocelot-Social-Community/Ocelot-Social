@@ -9,21 +9,21 @@ const NOW = '2026-10-01T10:00:00.000Z'
 // interesting behaviour is that this refuses to boot on an incomplete template, and that is
 // exactly the state a database should never be in.
 const fakeDatabase = (persistedNames: Record<string, string[]>) => {
-  const written: Array<{ groupType: unknown; name: unknown }> = []
+  const written: Array<{ template: unknown; name: unknown }> = []
   return {
     written,
     db: {
       write: vi.fn(async ({ variables }: { variables: Record<string, unknown> }) => {
-        written.push({ groupType: variables.groupType, name: variables.name })
+        written.push({ template: variables.template, name: variables.name })
         return Promise.resolve({ records: [] })
       }),
       query: vi.fn(async () =>
         Promise.resolve({
-          records: Object.entries(persistedNames).flatMap(([groupType, names]) =>
+          records: Object.entries(persistedNames).flatMap(([template, names]) =>
             names.map((name) => ({
               get: (key: string) =>
                 ({
-                  groupType,
+                  template,
                   name,
                   label: null,
                   system: true,
@@ -39,14 +39,14 @@ const fakeDatabase = (persistedNames: Record<string, string[]>) => {
 }
 
 const everyTemplateName = Object.fromEntries(
-  Object.entries(DEFAULT_GROUP_ROLE_TEMPLATES).map(([groupType, roles]) => [
-    groupType,
+  Object.entries(DEFAULT_GROUP_ROLE_TEMPLATES).map(([template, roles]) => [
+    template,
     roles.map((role) => role.name),
   ]),
 )
 
 describe(seedGroupRoleTemplates, () => {
-  it('writes every role of every group type, then hands back what is persisted', async () => {
+  it('writes every role of every template, then hands back what is persisted', async () => {
     const { db, written } = fakeDatabase(everyTemplateName)
 
     const persisted = await seedGroupRoleTemplates(db, NOW)
@@ -65,9 +65,7 @@ describe(seedGroupRoleTemplates, () => {
       closed: ['usual', 'admin'],
     })
 
-    await expect(seedGroupRoleTemplates(db, NOW)).rejects.toThrow(
-      /template incomplete for group type\(s\) closed/,
-    )
+    await expect(seedGroupRoleTemplates(db, NOW)).rejects.toThrow(/incomplete template\(s\) closed/)
   })
 
   it('names the system roles it insists on, so the message is actionable', async () => {

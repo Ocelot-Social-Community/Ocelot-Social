@@ -13,9 +13,9 @@ import type databaseContext from '@context/database'
 type DbContext = ReturnType<typeof databaseContext>
 
 /**
- * Ensure a template exists for every group type, and hand back what is persisted.
+ * Ensure a template exists for every visibility, and hand back what is persisted.
  *
- * Throws when a group type ends up without its system roles: a group created from such a
+ * Throws when a visibility ends up without its system roles: a group created from such a
  * template would have no `none`, `pending` or `owner` role, which means nobody could look at
  * it and nobody could administer it. Failing at boot is better than serving that.
  */
@@ -23,20 +23,20 @@ export async function seedGroupRoleTemplates(
   db: DbContext,
   now: string = new Date().toISOString(),
 ): Promise<GroupRoleTemplates> {
-  for (const [groupType, roles] of Object.entries(DEFAULT_GROUP_ROLE_TEMPLATES)) {
+  for (const [visibility, roles] of Object.entries(DEFAULT_GROUP_ROLE_TEMPLATES)) {
     for (const role of roles) {
-      await seedGroupRoleTemplate(db, groupType, role, now)
+      await seedGroupRoleTemplate(db, visibility, role, now)
     }
   }
   const persisted = await readGroupRoleTemplates(db)
   const persistedByType = new Map(Object.entries(persisted))
-  const incomplete = Object.keys(DEFAULT_GROUP_ROLE_TEMPLATES).filter((groupType) => {
-    const names = new Set((persistedByType.get(groupType) ?? []).map((role) => role.name))
+  const incomplete = Object.keys(DEFAULT_GROUP_ROLE_TEMPLATES).filter((visibility) => {
+    const names = new Set((persistedByType.get(visibility) ?? []).map((role) => role.name))
     return MANDATORY_GROUP_ROLE_NAMES.some((name) => !names.has(name))
   })
   if (incomplete.length > 0) {
     throw new Error(
-      `seedGroupRoleTemplates: template incomplete for group type(s) ${incomplete.join(
+      `seedGroupRoleTemplates: incomplete template(s) ${incomplete.join(
         ', ',
       )} — the system roles (${MANDATORY_GROUP_ROLE_NAMES.join(
         ', ',

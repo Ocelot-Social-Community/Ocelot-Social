@@ -171,10 +171,10 @@ const translate = (
       // control with fewer branches is worth more than the handful of db hits the unused
       // author clause costs a logged-out request.
       case 'invisibleTo': {
-        const { viewerId, contentGroupIds, moderatorGroupTypes } = value as {
+        const { viewerId, contentGroupIds, moderatorVisibilities } = value as {
           viewerId: string | null
           contentGroupIds: string[]
-          moderatorGroupTypes?: string[]
+          moderatorVisibilities?: string[]
         }
         const groupsParameter = next()
         const typesParameter = next()
@@ -204,7 +204,7 @@ const translate = (
             [groupsParameter]: contentGroupIds,
             // No `?? ['public']` any more: a caller that does not know about the field must
             // widen NOTHING, and `public` is the group's statement to make, not the type's.
-            [typesParameter]: moderatorGroupTypes ?? [],
+            [typesParameter]: moderatorVisibilities ?? [],
           },
         })
         continue

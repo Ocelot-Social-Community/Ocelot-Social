@@ -1,7 +1,7 @@
 import { Kind } from 'graphql'
 import { describe, it, expect } from 'vitest'
 
-import GroupTypeEnum from '@graphql/types/enum/GroupType.gql'
+import GroupVisibilityEnum from '@graphql/types/enum/GroupVisibility.gql'
 import { isKnownPermission } from '@src/permission'
 
 import { networkPrerequisiteFor, networkPrerequisiteSatisfied } from './prerequisites'
@@ -9,13 +9,13 @@ import { networkPrerequisiteFor, networkPrerequisiteSatisfied } from './prerequi
 import type { PermissionKey } from '@src/permission'
 import type { EnumTypeDefinitionNode } from 'graphql'
 
-// Read the group types off the LIVE schema document rather than hard-coding them: the
-// point of the checks below is that a fourth group type cannot be added without its
+// Read the visibilitys off the LIVE schema document rather than hard-coding them: the
+// point of the checks below is that a fourth visibility cannot be added without its
 // network siblings, and a hand-written list would be exactly what fails to notice.
-const groupTypes = GroupTypeEnum.definitions
+const visibilities = GroupVisibilityEnum.definitions
   .filter(
     (definition): definition is EnumTypeDefinitionNode =>
-      definition.kind === Kind.ENUM_TYPE_DEFINITION && definition.name.value === 'GroupType',
+      definition.kind === Kind.ENUM_TYPE_DEFINITION && definition.name.value === 'GroupVisibility',
   )
   .flatMap((definition) => definition.values ?? [])
   .map((value) => value.name.value)
@@ -27,9 +27,9 @@ const setOf = (...keys: string[]) => new Set(keys as PermissionKey[])
 const inGroup = (callDoor = 'open') => ({ callDoor })
 
 describe(networkPrerequisiteFor, () => {
-  it('reads more than one group type off the schema', () => {
+  it('reads more than one visibility off the schema', () => {
     // Guards the guards below, which quantify over the types.
-    expect(groupTypes.length).toBeGreaterThan(1)
+    expect(visibilities.length).toBeGreaterThan(1)
   })
 
   it('resolves the call prerequisite by the DOOR', () => {

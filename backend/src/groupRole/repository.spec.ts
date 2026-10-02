@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 
 import { DEFAULT_GROUP_ROLE_TEMPLATES } from './defaults'
 import {
-  applyGroupTypeToNonMemberRoles,
+  applyTemplateToNonMemberRoles,
   deleteGroupRole,
   markGroupRolesCustomized,
   memberCountsByRole,
@@ -75,9 +75,9 @@ describe(seedRolesForNewGroup, () => {
     // derives — then one statement writes the roles: the copy. An operator who edited the
     // templates gets what they edited, without this code knowing what that was.
     expect(runs[0].query).toContain('SET g.template')
-    expect(runs[0].parameters).toEqual({ groupId: 'group-1', groupType: 'closed' })
+    expect(runs[0].parameters).toEqual({ groupId: 'group-1', template: 'closed' })
     expect(runs[1].query).toContain('GroupRoleTemplate')
-    expect(runs[1].parameters).toEqual({ groupId: 'group-1', groupType: 'closed', now: NOW })
+    expect(runs[1].parameters).toEqual({ groupId: 'group-1', template: 'closed', now: NOW })
     // The rest is the derived columns, IN THE SAME TRANSACTION — a group whose roles exist
     // while its columns do not would be missing from the list it belongs in.
     expect(accessRuns(runs)).toHaveLength(2)
@@ -100,7 +100,7 @@ describe(seedRolesForNewGroup, () => {
       showMembers: true,
       // The door the video call cap reads (./callDoor.ts): this role may ASK to join.
       nonMemberJoin: false,
-      // No `groupType` among them: the visibility is a function of two of these columns, so
+      // No visibility among them: it is a function of two of these columns, so
       // storing it would be a third copy of the same bits (see ./privacyLevel.ts).
     })
   })
@@ -146,14 +146,14 @@ describe(seedRolesForNewGroup, () => {
     expect(runs[2].query).toContain('UNWIND $roles AS role')
   })
 
-  it('refuses a group type that has no template at all', async () => {
-    // Unreachable through the API, since groupType comes from the GraphQL enum. It throws
+  it('refuses a template name that does not exist', async () => {
+    // Unreachable through the API, since the visibility comes from the GraphQL enum. It throws
     // rather than skipping so a fourth group type surfaces here and not as a group whose
     // members have no rights.
     const { transaction } = fakeTransaction([])
 
     await expect(seedRolesForNewGroup(transaction, 'group-3', 'ephemeral', NOW)).rejects.toThrow(
-      "No group role template for groupType 'ephemeral'",
+      "No group role template named 'ephemeral'",
     )
   })
 })
@@ -229,11 +229,11 @@ describe('a stored row with nothing in its optional columns', () => {
 })
 
 describe(readGroupRoleTemplates, () => {
-  it('groups the templates by group type', async () => {
+  it('groups the roles by the template they belong to', async () => {
     const { db } = fakeDb(() => [
-      roleRecord({ groupType: 'public', name: 'none', permissions: '["group.read"]' }),
-      roleRecord({ groupType: 'public', name: 'usual', permissions: '[]' }),
-      roleRecord({ groupType: 'hidden', name: 'none', permissions: '[]' }),
+      roleRecord({ template: 'public', name: 'none', permissions: '["group.read"]' }),
+      roleRecord({ template: 'public', name: 'usual', permissions: '[]' }),
+      roleRecord({ template: 'hidden', name: 'none', permissions: '[]' }),
     ])
 
     const templates = await readGroupRoleTemplates(db)
@@ -244,7 +244,7 @@ describe(readGroupRoleTemplates, () => {
 })
 
 describe(seedGroupRoleTemplate, () => {
-  it('writes one template role under <groupType>:<name>, ON CREATE only', async () => {
+  it('writes one template role under <template>:<name>, ON CREATE only', async () => {
     const { db, sent } = fakeDb()
 
     await seedGroupRoleTemplate(db, 'closed', definition('usual', ['group.read']), NOW)
@@ -253,7 +253,7 @@ describe(seedGroupRoleTemplate, () => {
     expect(sent[0].query).not.toContain('\n            SET ')
     expect(sent[0].variables).toMatchObject({
       id: 'closed:usual',
-      groupType: 'closed',
+      template: 'closed',
       name: 'usual',
       permissions: '["group.read"]',
     })
@@ -268,7 +268,7 @@ describe(writeGroupRoleTemplate, () => {
 
     expect(sent[0].variables).toMatchObject({
       id: 'public:admin',
-      groupType: 'public',
+      template: 'public',
       name: 'admin',
       permissions: '["group.invite"]',
       actor: 'editor',
@@ -391,7 +391,7 @@ describe(replaceGroupRoles, () => {
   })
 })
 
-describe(applyGroupTypeToNonMemberRoles, () => {
+describe(applyTemplateToNonMemberRoles, () => {
   it('writes the type`s template into `none` and `pending`, keeping their labels', async () => {
     const { db, sent } = fakeDb((query) =>
       query.includes('ORDER BY r.name ASC')
@@ -399,7 +399,7 @@ describe(applyGroupTypeToNonMemberRoles, () => {
         : [],
     )
 
-    await applyGroupTypeToNonMemberRoles(db, 'g1', 'closed', 'editor', NOW)
+    await applyTemplateToNonMemberRoles(db, 'g1', 'closed', 'editor', NOW)
 
     const written = sent.filter((statement) =>
       statement.query.includes('MERGE (g)-[:HAS_GROUP_ROLE]'),
@@ -414,7 +414,7 @@ describe(applyGroupTypeToNonMemberRoles, () => {
   it('leaves the roles alone for a group type it has no template for', async () => {
     const { db, sent } = fakeDb()
 
-    await applyGroupTypeToNonMemberRoles(db, 'g1', 'experimental', 'editor', NOW)
+    await applyTemplateToNonMemberRoles(db, 'g1', 'experimental', 'editor', NOW)
 
     // It still records which template was asked for — that is the group's own answer to "what
     // do I run on" — but writes no roles, which is the safe arm for a name nothing maps to.
@@ -486,8 +486,8 @@ describe(untouchedGroupIdsByType, () => {
     // One statement answers both: an apply reaches the untouched ones, and the UI needs the
     // total to say "4 of 7" instead of a bare "4" that reads as "only 4".
     const { db, sent } = fakeDb(() => [
-      roleRecord({ groupType: 'public', ids: ['a', 'b'], total: '5' }),
-      roleRecord({ groupType: 'hidden', ids: ['c'], total: '1' }),
+      roleRecord({ template: 'public', ids: ['a', 'b'], total: '5' }),
+      roleRecord({ template: 'hidden', ids: ['c'], total: '1' }),
     ])
 
     expect([...(await untouchedGroupIdsByType(db))]).toEqual([
@@ -500,7 +500,7 @@ describe(untouchedGroupIdsByType, () => {
   it('drops the nulls a customised group leaves in the collect', async () => {
     // `collect(CASE WHEN … THEN g.id END)` keeps one null per non-matching row, and a null in
     // that list would become a group id an apply then tries to write to.
-    const { db } = fakeDb(() => [roleRecord({ groupType: 'public', ids: ['a', null], total: '2' })])
+    const { db } = fakeDb(() => [roleRecord({ template: 'public', ids: ['a', null], total: '2' })])
 
     expect([...(await untouchedGroupIdsByType(db))]).toEqual([
       ['public', { untouchedIds: ['a'], total: 2 }],
@@ -510,7 +510,7 @@ describe(untouchedGroupIdsByType, () => {
 
 // The boot repair. A fake db context rather than a database: what matters is which groups it
 // picks up and which statements it sends for each, and both are visible here.
-const fakeDatabase = (groups: Array<{ groupId: string; groupType: string }>) => {
+const fakeDatabase = (groups: Array<{ groupId: string; template: string }>) => {
   const statements: Array<{ query: string; variables?: Record<string, unknown> }> = []
   const rowsFor = (query: string) => {
     // The template copy answers with the names it copied; an empty list sends the caller to
@@ -558,10 +558,10 @@ describe(seedRolesForGroupsWithoutRoles, () => {
     expect(statements).toHaveLength(1)
   })
 
-  it('seeds the template of its type for every group that has none', async () => {
+  it('seeds its own template for every group that has none', async () => {
     const { db, statements } = fakeDatabase([
-      { groupId: 'older-group', groupType: 'closed' },
-      { groupId: 'restored-group', groupType: 'public' },
+      { groupId: 'older-group', template: 'closed' },
+      { groupId: 'restored-group', template: 'public' },
     ])
 
     expect(await seedRolesForGroupsWithoutRoles(db as never, NOW)).toEqual({
@@ -571,15 +571,15 @@ describe(seedRolesForGroupsWithoutRoles, () => {
 
     const copies = statements.filter((statement) => statement.query.includes('GroupRoleTemplate'))
 
-    expect(copies.map((statement) => statement.variables?.groupType)).toEqual(['closed', 'public'])
+    expect(copies.map((statement) => statement.variables?.template)).toEqual(['closed', 'public'])
   })
 
-  it('reports a group whose type has no template instead of throwing', async () => {
+  it('reports a group whose template name is unknown instead of throwing', async () => {
     // One odd row must not stop a deployment: the group is left exactly as it was, and named
     // so an operator can look at it.
     const { db } = fakeDatabase([
-      { groupId: 'odd-group', groupType: 'experimental' },
-      { groupId: 'normal-group', groupType: 'public' },
+      { groupId: 'odd-group', template: 'experimental' },
+      { groupId: 'normal-group', template: 'public' },
     ])
 
     expect(await seedRolesForGroupsWithoutRoles(db as never, NOW)).toEqual({

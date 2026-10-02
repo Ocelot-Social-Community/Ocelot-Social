@@ -30,7 +30,8 @@ type DbContext = ReturnType<typeof databaseContext>
 /** What the viewer may do in one group, plus the facts that produced the answer. */
 export interface GroupAuthorization {
   groupId: string
-  groupType: string
+  /** How findable the group is — derived, never stored (./privacyLevel.ts). */
+  visibility: string
   /** The viewer's role name, or `none` when they have no membership edge. */
   roleName: string
   /** An ACTIVE membership: neither `none` nor `pending`. */
@@ -99,7 +100,7 @@ const AUTHORIZATION_QUERY = `
   WITH g, m, e
   WITH g, coalesce(m.role, $noneRole) AS roleName, e IS NOT NULL AS elevated
   OPTIONAL MATCH (g)-[:HAS_GROUP_ROLE]->(r:GroupRole {name: roleName})
-  RETURN ${visibilityOf('g')} AS groupType,
+  RETURN ${visibilityOf('g')} AS visibility,
          elevated AS elevated,
          // The door columns, failing closed where they were never written (nonMemberAccess.ts).
          coalesce(g.nonMemberRead, false) AS nonMemberRead,
@@ -184,7 +185,7 @@ export function createGroupAuthorizationScope({
           permissions: parseStoredPermissions(record.get('permissions') as string | null),
         }
       : null
-    const groupType = record.get('groupType') as string
+    const visibility = record.get('visibility') as string
     // Whether a stranger could walk into this group, which is what caps opening a video call
     // (groupRole/callDoor.ts) — read off the group node rather than from its `none` role,
     // because the role this query loads is the VIEWER's.
@@ -197,7 +198,7 @@ export function createGroupAuthorizationScope({
     // Narrowed to reading until the viewer has asked for it HERE (elevation.ts): holding the
     // right is not the same as using it.
     const elevated = record.get('elevated') === true
-    const fullNetworkAuthority = networkAuthorityIn(groupType, effectivePermissions)
+    const fullNetworkAuthority = networkAuthorityIn(visibility, effectivePermissions)
     const networkAuthority = withElevation(fullNetworkAuthority, elevated)
     const effective = effectiveGroupPermissions({
       role,
@@ -217,7 +218,7 @@ export function createGroupAuthorizationScope({
 
     return {
       groupId,
-      groupType,
+      visibility,
       roleName,
       isMember: isActiveMembershipRole(roleName),
       // Whether the group has a definition for this viewer's role at all. False for a group

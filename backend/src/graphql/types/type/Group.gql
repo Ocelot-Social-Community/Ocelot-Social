@@ -42,8 +42,6 @@ type Group {
   mayElevateInGroup: Boolean!
   "How findable this group is — DERIVED from its rights, not chosen: `hidden` while its non-member role cannot read the profile, `closed` while it cannot read the content, `public` otherwise. Setting it through UpdateGroup applies the matching role template; the per-level network rights (group.create_*, group.administer.any_*, group.content.read.any_*) read it."
   visibility: GroupVisibility!
-  "The same value under its old name. Deprecated: it was never a `type` the group HAS, it is the visibility its rights RESULT in."
-  groupType: GroupType! @deprecated(reason: "Use `visibility`. Same three values; this field is the old name for what the rights derive to.")
   actionRadius: GroupActionRadius!
 
   locationName: String
@@ -116,8 +114,6 @@ type Query {
     "Free-text match on name and slug."
     search: String
     visibility: GroupVisibility
-    "Deprecated: Use `visibility`."
-    groupType: GroupType
     "Only groups whose owner role has no members."
     ownerless: Boolean
     disabled: Boolean
@@ -128,8 +124,6 @@ type Query {
   adminGroupCount(
     search: String
     visibility: GroupVisibility
-    "Deprecated: Use `visibility`."
-    groupType: GroupType
     ownerless: Boolean
     disabled: Boolean
   ): Int!
@@ -149,10 +143,8 @@ type Mutation {
     slug: String
     about: String
     description: String!
-    "Which role template the group starts from, and therefore how findable it is. Exactly one of `visibility` and the deprecated `groupType` is required."
-    visibility: GroupVisibility
-    "Deprecated: Use `visibility`."
-    groupType: GroupType
+    "Which role template the group starts from, and therefore how findable it is."
+    visibility: GroupVisibility!
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
 
@@ -177,8 +169,6 @@ type Mutation {
 
     "Applying a visibility writes the matching role template onto the `none` and `pending` roles — the rights ARE the visibility, so this is a preset rather than a label."
     visibility: GroupVisibility
-    "Deprecated: Use `visibility`."
-    groupType: GroupType
 
     actionRadius: GroupActionRadius
     categoryIds: [ID]

@@ -1,5 +1,5 @@
 import {
-  groupTypesWithNetworkAuthority,
+  visibilitiesWithNetworkAuthority,
   parseStoredPermissions,
   PENDING_ROLE,
   permissionsForGroupRole,
@@ -57,16 +57,16 @@ export interface GroupReadScope {
   /** Group ids whose posts and comments the viewer may read (`group.content.read`). */
   contentGroupIds: string[]
   /**
-   * Group TYPES whose profile the viewer may read WITHOUT being a member — the folded
+   * The VISIBILITIES whose groups the viewer may read into WITHOUT being a member — the folded
    * `group.administer.any_<type>` / `group.content.read.any_<type>` / `group.moderate.any_<type>`
    * rights (see groupRole/networkAuthority.ts).
    *
-   * A type list, not an id list: it is bounded by the three levels instead of by the database,
+   * A list of visibilities, not of ids: bounded by the three levels instead of by the database,
    * which is what lets a many-groups query ask it. Without this, a network admin could open a
    * hidden group through the per-group authorization (which folds the same rights) and get a
    * 404 from the query that lists it — one answer per shape, which is the bug this closes.
    */
-  readableGroupTypes: string[]
+  readableVisibilities: string[]
 }
 
 /**
@@ -91,9 +91,9 @@ export const groupReadScope = async (context: Context): Promise<GroupReadScope> 
   // Anonymous first: a visitor holds no membership AND no network right, so there is nothing
   // to look up in either direction.
   if (!context.user) {
-    return { readableGroupIds: [], contentGroupIds: [], readableGroupTypes: [] }
+    return { readableGroupIds: [], contentGroupIds: [], readableVisibilities: [] }
   }
-  const readableGroupTypes = groupTypesWithNetworkAuthority(
+  const readableVisibilities = visibilitiesWithNetworkAuthority(
     'group.read',
     context.effectivePermissions,
   )
@@ -116,7 +116,7 @@ export const groupReadScope = async (context: Context): Promise<GroupReadScope> 
       contentGroupIds.push(groupId)
     }
   }
-  return { readableGroupIds, contentGroupIds, readableGroupTypes }
+  return { readableGroupIds, contentGroupIds, readableVisibilities }
 }
 
 /**
@@ -131,7 +131,7 @@ export interface ViewerScope {
   /** The groups whose content the viewer's own role opens (see {@link groupReadScope}). */
   contentGroupIds: string[]
   /**
-   * The group TYPES whose content this viewer may read into WITHOUT a membership and without
+   * The VISIBILITIES whose content this viewer may read into WITHOUT a membership and without
    * the group granting it — the folded `group.content.read.any_<type>` network rights.
    *
    * `public` is deliberately NOT in here any more. It used to be, because "public" WAS the
@@ -141,22 +141,22 @@ export interface ViewerScope {
    * group that closed its content — the type would decide again, which is the thing the rights
    * replace.
    */
-  moderatorGroupTypes: string[]
+  moderatorVisibilities: string[]
 }
 
-// Only what the viewer's network rights open up; bounded by the number of group types, not by
+// Only what the viewer's network rights open up; bounded by the number of visibilitys, not by
 // anything the database holds. A moderator holds `group.content.read.any_closed`, an admin
 // additionally `_hidden` (#9405): the reported content they are asked to review stops being
 // invisible to them, without a per-row lookup.
-export const moderatorGroupTypes = (context: Context): string[] =>
-  groupTypesWithNetworkAuthority('group.content.read', context.effectivePermissions).filter(
+export const moderatorVisibilities = (context: Context): string[] =>
+  visibilitiesWithNetworkAuthority('group.content.read', context.effectivePermissions).filter(
     // `public` cannot come from here: a public group that closed its content must not be
     // reopened by a right that quantifies over types (see the field doc above).
-    (groupType) => groupType !== 'public',
+    (visibility) => visibility !== 'public',
   )
 
 export const viewerScope = async (context: Context): Promise<ViewerScope> => ({
   viewerId: context.user?.id ?? null,
   contentGroupIds: (await groupReadScope(context)).contentGroupIds,
-  moderatorGroupTypes: moderatorGroupTypes(context),
+  moderatorVisibilities: moderatorVisibilities(context),
 })

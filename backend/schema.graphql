@@ -413,11 +413,6 @@ type Group {
   """Full group description (rich text)."""
   description: String!
   disabled: Boolean
-
-  """
-  The same value under its old name. Deprecated: it was never a `type` the group HAS, it is the visibility its rights RESULT in.
-  """
-  groupType: GroupType! @deprecated(reason: "Use `visibility`. Same three values; this field is the old name for what the rights derive to.")
   id: ID!
 
   """Invite codes to this group the current user has generated."""
@@ -624,11 +619,6 @@ type GroupRoleTemplate {
   groupCount: Int!
 
   """
-  The template's name under its old key. Deprecated: a template is not a group type.
-  """
-  groupType: String! @deprecated(reason: "Use `name` for the template and `visibility` for what it derives to.")
-
-  """
   What this template is called. The three shipped ones are named after the visibility they produce.
   """
   name: String!
@@ -645,22 +635,6 @@ type GroupRoleTemplate {
 
 type GroupShowMembersChanged {
   groupId: ID!
-}
-
-"""
-The visibility of a group, under its old name. Deprecated: a group's `type` was a CHOICE an operator made, and the rights that followed from it could drift away from the label. It is a RESULT now — of two rights on the group's non-member role — which is what `GroupVisibility` says. Same three values; existing clients keep working.
-"""
-enum GroupType {
-  """
-  Anyone can find the group, but joining requires approval by a group admin/owner.
-  """
-  closed
-
-  """The group is unlisted; it can only be found and joined via invite."""
-  hidden
-
-  """Anyone can find the group and join without approval."""
-  public
 }
 
 """
@@ -876,9 +850,6 @@ type Mutation {
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
     description: String!
-
-    """Deprecated: Use `visibility`."""
-    groupType: GroupType
     id: ID
 
     """
@@ -896,9 +867,9 @@ type Mutation {
     slug: String
 
     """
-    Which role template the group starts from, and therefore how findable it is. Exactly one of `visibility` and the deprecated `groupType` is required.
+    Which role template the group starts from, and therefore how findable it is.
     """
-    visibility: GroupVisibility
+    visibility: GroupVisibility!
   ): Group
 
   """Create (or fetch) the chat room for a group. Requires authentication."""
@@ -997,9 +968,6 @@ type Mutation {
     avatar: ImageInput
     categoryIds: [ID]
     description: String
-
-    """Deprecated: Use `visibility`."""
-    groupType: GroupType
     id: ID!
 
     """
@@ -1350,16 +1318,12 @@ type Mutation {
   Change one role of a network-wide template. Existing groups are NOT touched — that is what applyGroupRoleTemplates is for. Requires `group.roleTemplate.manage`.
   """
   updateGroupRoleTemplate(
-    """Deprecated: Use `template`."""
-    groupType: String
     label: String
     name: String!
     permissions: [String!]!
 
-    """
-    Which template. Exactly one of `template` and the deprecated `groupType` is required.
-    """
-    template: String
+    """Which template to change."""
+    template: String!
   ): GroupRole!
 
   """Update the current user's online/away status. Requires authentication."""
@@ -1830,15 +1794,7 @@ type Query {
   VerifyNonce(email: String!, nonce: String!): Boolean!
 
   """How many groups the same filters match, for paging the admin list."""
-  adminGroupCount(
-    disabled: Boolean
-
-    """Deprecated: Use `visibility`."""
-    groupType: GroupType
-    ownerless: Boolean
-    search: String
-    visibility: GroupVisibility
-  ): Int!
+  adminGroupCount(disabled: Boolean, ownerless: Boolean, search: String, visibility: GroupVisibility): Int!
 
   """
   Every group the viewer may administer, for the admin area — including the hidden ones, which are reachable no other way. Restricted to the visibilities the viewer holds `group.administer.any_<visibility>` for. Set `ownerless` to find the groups that have no owner left.
@@ -1846,9 +1802,6 @@ type Query {
   adminGroups(
     disabled: Boolean
     first: Int
-
-    """Deprecated: Use `visibility`."""
-    groupType: GroupType
     offset: Int
 
     """Only groups whose owner role has no members."""

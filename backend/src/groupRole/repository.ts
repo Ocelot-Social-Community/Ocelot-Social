@@ -3,7 +3,7 @@
 // Two node types, one shape: (:GroupRoleTemplate) holds the network-wide defaults per group
 // type, (:GroupRole) the copy a single group owns, hanging off it via
 // (:Group)-[:HAS_GROUP_ROLE]->(:GroupRole). Uniqueness is encoded in `id` —
-// `<groupType>:<name>` and `<groupId>:<name>` — and enforced by the constraint the schema
+// `<visibility>:<name>` and `<groupId>:<name>` — and enforced by the constraint the schema
 // registry derives from the entity declarations. `permissions` is stored JSON-stringified,
 // like Role.permissions.
 //
@@ -70,7 +70,7 @@ const RETURN_ROLE_FIELDS = `r.name AS name, r.label AS label, r.system AS system
 // can act in, and the two must therefore commit or fail together.
 const COPY_TEMPLATE_CYPHER = `
   MATCH (g:Group {id: $groupId})
-  MATCH (t:GroupRoleTemplate {groupType: $groupType})
+  MATCH (t:GroupRoleTemplate {template: $template})
   MERGE (g)-[:HAS_GROUP_ROLE]->(r:GroupRole {id: $groupId + ':' + t.name})
   ON CREATE SET r.groupId = $groupId,
                 r.name = t.name,
@@ -119,21 +119,21 @@ export async function readGroupRoles(
   return result.records.map((record) => toDefinition(rowOf(record)))
 }
 
-/** The network-wide templates, grouped by group type. */
+/** The network-wide templates, grouped by visibility. */
 export async function readGroupRoleTemplates(db: DbContext): Promise<GroupRoleTemplates> {
   const result = await db.query({
     query: `MATCH (r:GroupRoleTemplate)
-            RETURN r.groupType AS groupType, ${RETURN_ROLE_FIELDS}
-            ORDER BY r.groupType ASC, r.name ASC`,
+            RETURN r.template AS template, ${RETURN_ROLE_FIELDS}
+            ORDER BY r.template ASC, r.name ASC`,
   })
-  const byGroupType = new Map<string, GroupRoleDefinition[]>()
+  const byTemplate = new Map<string, GroupRoleDefinition[]>()
   for (const record of result.records) {
-    const groupType = record.get('groupType') as string
-    const roles = byGroupType.get(groupType) ?? []
+    const template = record.get('template') as string
+    const roles = byTemplate.get(template) ?? []
     roles.push(toDefinition(rowOf(record)))
-    byGroupType.set(groupType, roles)
+    byTemplate.set(template, roles)
   }
-  return Object.fromEntries(byGroupType)
+  return Object.fromEntries(byTemplate)
 }
 
 /**
@@ -142,13 +142,13 @@ export async function readGroupRoleTemplates(db: DbContext): Promise<GroupRoleTe
  */
 export async function seedGroupRoleTemplate(
   db: DbContext,
-  groupType: string,
+  template: string,
   role: GroupRoleDefinition,
   now: string,
 ): Promise<void> {
   await db.write({
     query: `MERGE (r:GroupRoleTemplate {id: $id})
-            ON CREATE SET r.groupType = $groupType,
+            ON CREATE SET r.template = $template,
                           r.name = $name,
                           r.label = $label,
                           r.system = $system,
@@ -157,8 +157,8 @@ export async function seedGroupRoleTemplate(
                           r.createdAt = $now,
                           r.updatedAt = $now`,
     variables: {
-      id: `${groupType}:${role.name}`,
-      groupType,
+      id: `${template}:${role.name}`,
+      template,
       name: role.name,
       label: role.label ?? null,
       system: role.system,
@@ -237,25 +237,25 @@ export async function syncNonMemberAccess(
 export async function seedRolesForNewGroup(
   transaction: RoleSeedTransaction,
   groupId: string,
-  groupType: string,
+  template: string,
   now: string,
 ): Promise<void> {
-  await transaction.run(`MATCH (g:Group {id: $groupId}) SET g.template = $groupType`, {
+  await transaction.run(`MATCH (g:Group {id: $groupId}) SET g.template = $template`, {
     groupId,
-    groupType,
+    template,
   })
-  const copied = await transaction.run(COPY_TEMPLATE_CYPHER, { groupId, groupType, now })
+  const copied = await transaction.run(COPY_TEMPLATE_CYPHER, { groupId, template, now })
   const names = (copied.records[0]?.get('names') as string[] | undefined) ?? []
   if (names.length > 0) {
     await syncNonMemberAccess(transaction, groupId)
     return
   }
-  const fallback = defaultTemplateFor(groupType)
+  const fallback = defaultTemplateFor(template)
   if (!fallback) {
-    // Unreachable through the API (groupType comes from the GraphQL enum, and every enum
-    // value has a template — asserted in defaults.spec.ts). Left as a throw rather than a
-    // silent skip so a fourth group type shows up here instead of as a group without rights.
-    throw new Error(`No group role template for groupType '${groupType}'`)
+    // Unreachable through the API (the visibility comes from the GraphQL enum, and every enum
+    // value names a template — asserted in defaults.spec.ts). Left as a throw rather than a
+    // silent skip so a fourth template shows up here instead of as a group without rights.
+    throw new Error(`No group role template named '${template}'`)
   }
   await transaction.run(SEED_ROLES_CYPHER, {
     groupId,
@@ -271,7 +271,7 @@ const GROUPS_WITHOUT_ROLES_CYPHER = `
   // Which template to seed from is the group's own, stored, because — unlike its visibility —
   // nothing derives it. A row that has lost even that is seeded from the most private template:
   // a group nobody can read is repairable, a group accidentally opened is not.
-  RETURN g.id AS groupId, coalesce(g.template, 'hidden') AS groupType
+  RETURN g.id AS groupId, coalesce(g.template, 'hidden') AS template
 `
 
 /**
@@ -295,14 +295,14 @@ export async function seedRolesForGroupsWithoutRoles(
   const skipped: string[] = []
   for (const record of result.records) {
     const groupId = record.get('groupId') as string
-    const groupType = record.get('groupType') as string
-    // A type the code has no template for is reported rather than thrown: one odd row must not
+    const template = record.get('template') as string
+    // A name the code has no template for is reported rather than thrown: one odd row must not
     // stop a deployment, and leaving it alone changes nothing about it.
-    if (!defaultTemplateFor(groupType)) {
+    if (!defaultTemplateFor(template)) {
       skipped.push(groupId)
       continue
     }
-    await seedRolesForNewGroup(runnerFor(db), groupId, groupType, now)
+    await seedRolesForNewGroup(runnerFor(db), groupId, template, now)
     seeded.push(groupId)
   }
   return { seeded, skipped }
@@ -444,7 +444,7 @@ export async function replaceGroupRoles(
 }
 
 /**
- * Re-apply a group type's template to the roles that say what OUTSIDERS may do.
+ * Re-apply a visibility's template to the roles that say what OUTSIDERS may do.
  *
  * Changing the type IS a change to exactly that question — `closed` means "the profile, not the
  * content", `hidden` means "nothing at all" — so the switch WRITES those rights instead of
@@ -454,30 +454,30 @@ export async function replaceGroupRoles(
  * Only `none` and `pending` are touched. What the group granted its own members, and any role
  * it invented, is its own business and survives the switch — as does a label it gave these two.
  */
-export async function applyGroupTypeToNonMemberRoles(
+export async function applyTemplateToNonMemberRoles(
   db: DbContext,
   groupId: string,
-  groupType: string,
+  template: string,
   actor: string,
   now: string,
 ): Promise<void> {
   // Applying a template is also a statement about which one the group runs on from now on.
   await db.write({
-    query: `MATCH (g:Group {id: $groupId}) SET g.template = $groupType`,
-    variables: { groupId, groupType },
+    query: `MATCH (g:Group {id: $groupId}) SET g.template = $template`,
+    variables: { groupId, template },
   })
-  const template = defaultTemplateFor(groupType)
-  if (!template) {
-    // Unreachable through the API: groupType comes from the GraphQL enum and every value has a
-    // template (asserted in defaults.spec.ts). Leaving the roles untouched is the safe arm —
-    // it keeps the group as it was rather than opening it.
+  const definitions = defaultTemplateFor(template)
+  if (!definitions) {
+    // Unreachable through the API: the visibility comes from the GraphQL enum and every value
+    // names a template (asserted in defaults.spec.ts). Leaving the roles untouched is the safe
+    // arm — it keeps the group as it was rather than opening it.
     return
   }
   const existing = await readGroupRoles(db, groupId)
   // Filtering the template rather than looking each name up in it: every template has both
   // roles (the drift guard in defaults.spec.ts says so), so a "role missing from the template"
   // arm would be code no test can reach.
-  const nonMemberRoles = template.filter(
+  const nonMemberRoles = definitions.filter(
     (role) => role.name === NONE_ROLE || role.name === PENDING_ROLE,
   )
   for (const fromTemplate of nonMemberRoles) {
@@ -551,14 +551,14 @@ export async function setNonMemberMemberListAccess(
 /** Write one template role, creating it when it is not there yet (the admin edit path). */
 export async function writeGroupRoleTemplate(
   db: DbContext,
-  groupType: string,
+  template: string,
   role: GroupRoleDefinition,
   actor: string,
   now: string,
 ): Promise<void> {
   await db.write({
     query: `MERGE (r:GroupRoleTemplate {id: $id})
-            ON CREATE SET r.createdAt = $now, r.groupType = $groupType, r.name = $name
+            ON CREATE SET r.createdAt = $now, r.template = $template, r.name = $name
             SET r.label = $label,
                 r.system = $system,
                 r.protected = $protected,
@@ -566,8 +566,8 @@ export async function writeGroupRoleTemplate(
                 r.updatedAt = $now,
                 r.updatedBy = $actor`,
     variables: {
-      id: `${groupType}:${role.name}`,
-      groupType,
+      id: `${template}:${role.name}`,
+      template,
       name: role.name,
       label: role.label ?? null,
       system: role.system,
@@ -580,7 +580,7 @@ export async function writeGroupRoleTemplate(
 }
 
 /**
- * The groups that still run on the template untouched, by group type.
+ * The groups that still run on the template untouched, by visibility.
  *
  * `rolesCustomizedAt IS NULL` is the whole criterion (concept E12): a group that edited its own
  * roles is never overwritten by a network default, however tempting a bulk update is.
@@ -600,13 +600,13 @@ export async function untouchedGroupIdsByType(db: DbContext): Promise<Map<string
     // group created from `closed` and later opened up still runs on that template, and this
     // counts the groups an `applyGroupRoleTemplates` would reach.
     query: `MATCH (g:Group)
-            RETURN coalesce(g.template, 'hidden') AS groupType,
+            RETURN coalesce(g.template, 'hidden') AS template,
                    collect(CASE WHEN g.rolesCustomizedAt IS NULL THEN g.id END) AS ids,
                    toString(count(g)) AS total`,
   })
   return new Map(
     result.records.map((record) => [
-      record.get('groupType') as string,
+      record.get('template') as string,
       {
         // `collect` keeps a null per non-matching row in Neo4j 4.4, so they are dropped here.
         untouchedIds: (record.get('ids') as (string | null)[]).filter(

@@ -87,7 +87,7 @@ describe('group.create_hidden backend enforcement', () => {
       authenticatedUser = await restrictedUser.toJson()
       const { errors } = await mutate({
         mutation: CreateGroup,
-        variables: { ...baseVariables, id: 'hidden-attempt', groupType: 'hidden' },
+        variables: { ...baseVariables, id: 'hidden-attempt', visibility: 'hidden' },
       })
 
       expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
@@ -97,22 +97,22 @@ describe('group.create_hidden backend enforcement', () => {
       authenticatedUser = await restrictedUser.toJson()
       const { data, errors } = await mutate({
         mutation: CreateGroup,
-        variables: { ...baseVariables, id: 'public-ok', groupType: 'public' },
+        variables: { ...baseVariables, id: 'public-ok', visibility: 'public' },
       })
 
       expect(errors).toBeUndefined()
-      expect(data?.CreateGroup).toMatchObject({ id: 'public-ok', groupType: 'public' })
+      expect(data?.CreateGroup).toMatchObject({ id: 'public-ok', visibility: 'public' })
     })
 
     it('allows creating a hidden group for an owner (has group.create_hidden)', async () => {
       authenticatedUser = await ownerUser.toJson()
       const { data, errors } = await mutate({
         mutation: CreateGroup,
-        variables: { ...baseVariables, id: 'hidden-by-owner', groupType: 'hidden' },
+        variables: { ...baseVariables, id: 'hidden-by-owner', visibility: 'hidden' },
       })
 
       expect(errors).toBeUndefined()
-      expect(data?.CreateGroup).toMatchObject({ id: 'hidden-by-owner', groupType: 'hidden' })
+      expect(data?.CreateGroup).toMatchObject({ id: 'hidden-by-owner', visibility: 'hidden' })
     })
   })
 
@@ -121,11 +121,11 @@ describe('group.create_hidden backend enforcement', () => {
       authenticatedUser = await restrictedUser.toJson()
       await mutate({
         mutation: CreateGroup,
-        variables: { ...baseVariables, id: 'to-hide', groupType: 'public' },
+        variables: { ...baseVariables, id: 'to-hide', visibility: 'public' },
       })
       const { errors } = await mutate({
         mutation: UpdateGroup,
-        variables: { id: 'to-hide', groupType: 'hidden' },
+        variables: { id: 'to-hide', visibility: 'hidden' },
       })
 
       expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
@@ -135,15 +135,15 @@ describe('group.create_hidden backend enforcement', () => {
       authenticatedUser = await ownerUser.toJson()
       await mutate({
         mutation: CreateGroup,
-        variables: { ...baseVariables, id: 'owner-to-hide', groupType: 'public' },
+        variables: { ...baseVariables, id: 'owner-to-hide', visibility: 'public' },
       })
       const { data, errors } = await mutate({
         mutation: UpdateGroup,
-        variables: { id: 'owner-to-hide', groupType: 'hidden' },
+        variables: { id: 'owner-to-hide', visibility: 'hidden' },
       })
 
       expect(errors).toBeUndefined()
-      expect(data?.UpdateGroup).toMatchObject({ id: 'owner-to-hide', groupType: 'hidden' })
+      expect(data?.UpdateGroup).toMatchObject({ id: 'owner-to-hide', visibility: 'hidden' })
     })
 
     it('lets a restricted owner edit an already-hidden group (no type change)', async () => {
@@ -151,7 +151,7 @@ describe('group.create_hidden backend enforcement', () => {
       authenticatedUser = await ownerUser.toJson()
       await mutate({
         mutation: CreateGroup,
-        variables: { ...baseVariables, id: 'already-hidden', groupType: 'hidden' },
+        variables: { ...baseVariables, id: 'already-hidden', visibility: 'hidden' },
       })
       await mutate({
         mutation: ChangeGroupMemberRole,
@@ -163,13 +163,13 @@ describe('group.create_hidden backend enforcement', () => {
       authenticatedUser = await restrictedUser.toJson()
       const { data, errors } = await mutate({
         mutation: UpdateGroup,
-        variables: { id: 'already-hidden', groupType: 'hidden', name: 'Renamed Hidden' },
+        variables: { id: 'already-hidden', visibility: 'hidden', name: 'Renamed Hidden' },
       })
 
       expect(errors).toBeUndefined()
       expect(data?.UpdateGroup).toMatchObject({
         id: 'already-hidden',
-        groupType: 'hidden',
+        visibility: 'hidden',
         name: 'Renamed Hidden',
       })
     })

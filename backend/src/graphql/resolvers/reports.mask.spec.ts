@@ -24,7 +24,7 @@ const reportOf = (overrides: Record<string, unknown> = {}) => ({
     post: null,
     author: { id: 'author' },
   },
-  groupType: null,
+  visibility: null,
   readableHere: false,
   ...overrides,
 })
@@ -42,7 +42,7 @@ describe(maskUnreadableGroupContent, () => {
     // `readableHere` is the group's own answer, computed in the query: it opened its content to
     // non-members, or this moderator's role in it grants reading.
     const masked = maskUnreadableGroupContent(
-      reportOf({ groupType: 'closed', readableHere: true }),
+      reportOf({ visibility: 'closed', readableHere: true }),
       holding(),
     )
 
@@ -50,9 +50,9 @@ describe(maskUnreadableGroupContent, () => {
     expect(masked.resource).toMatchObject({ title: 'A title' })
   })
 
-  it('leaves it alone for a moderator who may read into that group type', () => {
+  it('leaves it alone for a moderator who may read into that visibility', () => {
     const masked = maskUnreadableGroupContent(
-      reportOf({ groupType: 'closed' }),
+      reportOf({ visibility: 'closed' }),
       holding('group.content.read.any_closed'),
     )
 
@@ -62,7 +62,7 @@ describe(maskUnreadableGroupContent, () => {
   it('does not let the right for one type open another', () => {
     // Two separate rights, because an unlisted group is the stricter case.
     const masked = maskUnreadableGroupContent(
-      reportOf({ groupType: 'hidden' }),
+      reportOf({ visibility: 'hidden' }),
       holding('group.content.read.any_closed'),
     )
 
@@ -72,7 +72,7 @@ describe(maskUnreadableGroupContent, () => {
   it('blanks the content but keeps what the report is', () => {
     // The metadata stays so the report can be escalated by somebody who may read the group —
     // and `resourceHidden` is what lets the UI say why instead of rendering an empty link.
-    const masked = maskUnreadableGroupContent(reportOf({ groupType: 'closed' }), holding())
+    const masked = maskUnreadableGroupContent(reportOf({ visibility: 'closed' }), holding())
 
     expect(masked).toMatchObject({
       id: 'r1',
@@ -92,10 +92,10 @@ describe(maskUnreadableGroupContent, () => {
   })
 
   it('blanks a public group that closed its content, too', () => {
-    // `groupType = 'public'` is deliberately not a shortcut any more: what the group decided
+    // `visibility = 'public'` is deliberately not a shortcut any more: what the group decided
     // is what counts, and the queue is not a way around it.
     const masked = maskUnreadableGroupContent(
-      reportOf({ groupType: 'public', readableHere: false }),
+      reportOf({ visibility: 'public', readableHere: false }),
       holding(),
     )
 
@@ -104,7 +104,7 @@ describe(maskUnreadableGroupContent, () => {
 
   it('survives a report row with no resource at all', () => {
     const masked = maskUnreadableGroupContent(
-      reportOf({ groupType: 'closed', resource: null }),
+      reportOf({ visibility: 'closed', resource: null }),
       holding(),
     )
 

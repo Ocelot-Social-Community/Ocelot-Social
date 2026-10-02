@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { groupTypesWithNetworkAuthority, networkAuthorityIn } from './networkAuthority'
+import { visibilitiesWithNetworkAuthority, networkAuthorityIn } from './networkAuthority'
 
 import type { PermissionKey } from '@src/permission'
 
@@ -39,16 +39,16 @@ describe(networkAuthorityIn, () => {
   })
 })
 
-describe(groupTypesWithNetworkAuthority, () => {
+describe(visibilitiesWithNetworkAuthority, () => {
   it('answers in types, which is the form a many-groups query can use', () => {
     const effective = holding('group.administer.any_hidden', 'group.content.read.any_closed')
 
-    expect(groupTypesWithNetworkAuthority('group.read', effective)).toEqual(['closed', 'hidden'])
+    expect(visibilitiesWithNetworkAuthority('group.read', effective)).toEqual(['closed', 'hidden'])
     // Administering folds everything; reading content does not reach role management.
-    expect(groupTypesWithNetworkAuthority('group.role.manage', effective)).toEqual(['hidden'])
+    expect(visibilitiesWithNetworkAuthority('group.role.manage', effective)).toEqual(['hidden'])
   })
 
   it('is empty for somebody holding no network authority over groups', () => {
-    expect(groupTypesWithNetworkAuthority('group.read', holding('post.create'))).toEqual([])
+    expect(visibilitiesWithNetworkAuthority('group.read', holding('post.create'))).toEqual([])
   })
 })

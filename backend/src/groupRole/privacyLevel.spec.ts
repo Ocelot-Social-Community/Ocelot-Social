@@ -79,10 +79,10 @@ describe('the seeded templates', () => {
   // name, or a group created from it would be listed as something it is not.
   it.each(Object.entries(DEFAULT_GROUP_ROLE_TEMPLATES))(
     '%s derives to its own name',
-    (groupType, roles) => {
+    (visibility, roles) => {
       const none = roles.find((role) => role.name === NONE_ROLE)
 
-      expect(privacyLevelOfPermissions(none?.permissions)).toBe(groupType)
+      expect(privacyLevelOfPermissions(none?.permissions)).toBe(visibility)
     },
   )
 

@@ -10,10 +10,10 @@ import type { GroupRoleDefinition } from './types'
 import type { GroupGateContext, GroupPermissionKey } from '@src/groupPermission'
 import type { PermissionKey } from '@src/permission'
 
-const template = (groupType: string, name: string): GroupRoleDefinition => {
-  const role = defaultTemplateFor(groupType)?.find((entry) => entry.name === name)
+const template = (visibility: string, name: string): GroupRoleDefinition => {
+  const role = defaultTemplateFor(visibility)?.find((entry) => entry.name === name)
   if (!role) {
-    throw new Error(`no ${name} role in the ${groupType} template`)
+    throw new Error(`no ${name} role in the ${visibility} template`)
   }
   return role
 }
