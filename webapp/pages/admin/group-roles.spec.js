@@ -45,7 +45,9 @@ const TEMPLATES = [
     groupType: 'closed',
     untouchedGroupCount: 0,
     groupCount: 2,
-    roles: [role('none', []), role('usual', ['group.post.create'])],
+    // Deliberately different from the public template's `usual`: that difference is what a
+    // hover over the type tab is supposed to show.
+    roles: [role('none', []), role('usual', ['group.members.read'])],
   },
 ]
 
@@ -114,6 +116,34 @@ describe('admin/group-roles.vue', () => {
       expect(classesOf(wrapper, 'group.members.read')).not.toContain('perm-row--added')
     })
 
+    it('previews the SAME role in another type when a type tab is hovered', async () => {
+      // The question the three presets exist to answer: what does a closed group's member
+      // role do differently from a public one's?
+      const wrapper = await Wrapper()
+
+      await at(wrapper, 'type-tab-closed').trigger('mouseenter')
+
+      expect(classesOf(wrapper, 'group.members.read')).toContain('perm-row--added')
+      expect(classesOf(wrapper, 'group.post.create')).toContain('perm-row--removed')
+    })
+
+    it('clears a type preview when the cursor leaves', async () => {
+      const wrapper = await Wrapper()
+
+      await at(wrapper, 'type-tab-closed').trigger('mouseenter')
+      await at(wrapper, 'type-tab-closed').trigger('mouseleave')
+
+      expect(classesOf(wrapper, 'group.members.read')).not.toContain('perm-row--added')
+    })
+
+    it('shows nothing for the type that is already open', async () => {
+      const wrapper = await Wrapper()
+
+      await at(wrapper, 'type-tab-public').trigger('mouseenter')
+
+      expect(classesOf(wrapper, 'group.post.create')).not.toContain('perm-row--removed')
+    })
+
     it('reads the protected owner role as the whole catalog', async () => {
       // `owner` stores no permission list at all — hovering it must read as "everything",
       // not as an empty role that would appear to strip the matrix.
@@ -156,7 +186,7 @@ describe('admin/group-roles.vue', () => {
 
     expect(wrapper.vm.activeTemplate.groupType).toBe('closed')
     // The draft follows the type, so an edit cannot leak from one template into another.
-    expect(wrapper.vm.draft).toEqual(['group.post.create'])
+    expect(wrapper.vm.draft).toEqual(['group.members.read'])
     expect(at(wrapper, 'apply').element.disabled).toBe(true)
   })
 

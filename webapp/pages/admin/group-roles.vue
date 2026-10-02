@@ -12,6 +12,8 @@
         :class="{ 'type-tab--active': template.groupType === activeType }"
         :data-test="`type-tab-${template.groupType}`"
         @click="activeType = template.groupType"
+        @mouseenter="hoveredType = template.groupType"
+        @mouseleave="hoveredType = null"
       >
         {{ $t(`group.types.${template.groupType}`) }}
       </button>
@@ -91,6 +93,10 @@ export default {
       templates: [],
       activeType: 'public',
       activeRoleName: 'usual',
+      // The TYPE tab under the cursor: hovering `closed` while editing the public template's
+      // member role previews what a closed group's member role does differently — the question
+      // these three presets exist to answer.
+      hoveredType: null,
       // The role tab currently under the cursor, to preview its rights against the one being
       // edited — the same affordance the network roles page has.
       hoveredRoleName: null,
@@ -114,14 +120,30 @@ export default {
       if (!this.activeRole) return false
       return [...this.activeRole.permissions].sort().join(',') !== [...this.draft].sort().join(',')
     },
-    // Hovering another role marks every right it would change: 'added' where the hovered role
-    // grants what this one does not, 'removed' the other way round. Compared against the
-    // DRAFT, so an unsaved edit is part of the comparison rather than ignored by it.
+    /**
+     * What the cursor is previewing, or null: ANOTHER ROLE of this template, or the SAME role
+     * in another type's template. Two hovers, one comparison — the rows can only mark one
+     * difference at a time, and a type hover is the more specific of the two.
+     */
+    hoveredRole() {
+      if (this.hoveredType && this.hoveredType !== this.activeType) {
+        return (
+          this.templates
+            .find((template) => template.groupType === this.hoveredType)
+            ?.roles.find((role) => role.name === this.activeRoleName) ?? null
+        )
+      }
+      if (this.hoveredRoleName && this.hoveredRoleName !== this.activeRoleName) {
+        return this.activeTemplate?.roles.find((role) => role.name === this.hoveredRoleName) ?? null
+      }
+      return null
+    },
+    // Every right the preview would change: 'added' where it grants what the edited role does
+    // not, 'removed' the other way round. Compared against the DRAFT, so an unsaved edit is
+    // part of the comparison rather than ignored by it.
     hoverDiff() {
-      if (!this.hoveredRoleName || this.hoveredRoleName === this.activeRoleName) return {}
-      const hovered = this.activeTemplate?.roles.find((role) => role.name === this.hoveredRoleName)
-      if (!hovered) return {}
-      const hoveredSet = this.permissionSetOf(hovered)
+      if (!this.hoveredRole) return {}
+      const hoveredSet = this.permissionSetOf(this.hoveredRole)
       const activeSet = new Set(this.draft)
       const diff = {}
       for (const permission of this.catalog) {
