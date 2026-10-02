@@ -80,20 +80,29 @@
       </tbody>
     </table>
 
+    <!-- The app's own pager (arrows + page counter), rather than a second pair of buttons that
+         only this page knows about. -->
     <div v-if="total > groups.length" class="pager">
-      <os-button :disabled="offset === 0" data-test="prev" @click="page(-1)">
-        {{ $t('admin.groups.previous') }}
-      </os-button>
-      <span>{{ $t('admin.groups.count', { shown: groups.length, total }) }}</span>
-      <os-button :disabled="offset + pageSize >= total" data-test="next" @click="page(1)">
-        {{ $t('admin.groups.next') }}
-      </os-button>
+      <pagination-buttons
+        :hasPrevious="offset > 0"
+        :hasNext="offset + pageSize < total"
+        :pageSize="pageSize"
+        :activePage="Math.floor(offset / pageSize)"
+        :activeResourceCount="total"
+        showPageCounter
+        @back="page(-1)"
+        @next="page(1)"
+      />
+      <span class="pager__count">
+        {{ $t('admin.groups.count', { shown: groups.length, total }) }}
+      </span>
     </div>
   </os-card>
 </template>
 
 <script>
-import { OsButton, OsCard } from '@ocelot-social/ui'
+import { OsCard } from '@ocelot-social/ui'
+import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 
 import { adminGroupsQuery } from '~/graphql/adminGroups.js'
 
@@ -101,7 +110,7 @@ const PAGE_SIZE = 25
 const GROUP_TYPES = ['public', 'closed', 'hidden']
 
 export default {
-  components: { OsButton, OsCard },
+  components: { OsCard, PaginationButtons },
   data() {
     return {
       groups: [],
@@ -201,6 +210,10 @@ export default {
 }
 .empty {
   color: var(--text-color-soft);
+}
+.pager__count {
+  color: var(--text-color-soft);
+  font-size: 0.9em;
 }
 .pager {
   display: flex;

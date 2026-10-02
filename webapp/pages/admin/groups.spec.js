@@ -160,20 +160,20 @@ describe('admin/groups.vue', () => {
     it('stays hidden while everything fits on one page', async () => {
       const wrapper = await Wrapper(GROUPS, 3)
 
-      expect(at(wrapper, 'next').exists()).toBe(false)
+      expect(at(wrapper, 'next-button').exists()).toBe(false)
     })
 
     it('walks forward and back, never past the start', async () => {
       const wrapper = await Wrapper(GROUPS, 60)
 
-      await at(wrapper, 'next').trigger('click')
+      await at(wrapper, 'next-button').trigger('click')
       expect(wrapper.vm.offset).toBe(25)
       expect(refetch).toHaveBeenCalledWith()
 
-      await at(wrapper, 'prev').trigger('click')
+      await at(wrapper, 'previous-button').trigger('click')
       expect(wrapper.vm.offset).toBe(0)
 
-      await at(wrapper, 'prev').trigger('click')
+      await at(wrapper, 'previous-button').trigger('click')
       expect(wrapper.vm.offset).toBe(0)
     })
   })
