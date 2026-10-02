@@ -567,7 +567,14 @@ export default {
             groupShowMembersChanged: { groupId },
           })
         }
-        return group
+        // Read back last: both writes above land in the ROLES, and the visibility is computed
+        // from the columns they keep in step — the row captured before them would report the
+        // group as it was, which is the one thing a mutation's answer must not do.
+        const { records } = await context.database.query({
+          query: `MATCH (group:Group {id: $groupId}) RETURN group {.*} AS group`,
+          variables: { groupId },
+        })
+        return records[0]?.get('group') ?? group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
           throw new UserInputError('Group with this slug already exists!')
