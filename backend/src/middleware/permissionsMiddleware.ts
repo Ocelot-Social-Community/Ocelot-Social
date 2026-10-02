@@ -105,8 +105,10 @@ const requestedVisibility = (args: Record<string, unknown>): string | null =>
   (args.visibility as string | null) ?? null
 
 const canCreateGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
-  const requested = requestedVisibility(args)
-  const permission = requested === null ? null : groupCreatePermissionFor(requested)
+  // `visibility` is non-null on CreateGroup, so a request without it never reaches this rule —
+  // validation rejects it first. Only an unknown value is possible here, and that one
+  // groupCreatePermissionFor answers with null.
+  const permission = groupCreatePermissionFor(args.visibility as string)
   // Same check as hasPermission(), but the permission depends on the requested visibility,
   // so it can't be a static hasPermission() gate. group.create_* is gated by groupsEnabled,
   // so hasPermissionEffective also blocks creation when groups are off.

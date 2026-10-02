@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-shadow */
+
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { withFilter } from 'graphql-subscriptions'
 import { v4 as uuid } from 'uuid'
@@ -377,7 +377,7 @@ export default {
                   MERGE (group)-[:CATEGORIZED]->(category)
                 `
               : ''
-          const ownerCreateGroupTransactionResponse = await transaction.run(
+          await transaction.run(
             `
               CREATE (group:Group)
               SET group += $params
@@ -396,21 +396,19 @@ export default {
             `,
             { userId: context.user.id, categoryIds, params },
           )
-          const [group] = ownerCreateGroupTransactionResponse.records.map((record) =>
-            record.get('group'),
-          )
           // The group's own role definitions, copied from the network template for its type.
           // In the same transaction as the group itself: a group without roles is a group
           // nobody can act in, so the two commit together or not at all.
           await seedRolesForNewGroup(transaction, params.id, template, new Date().toISOString())
-          // Read back AFTER the roles: seeding writes the derived columns, and the visibility
-          // is computed from them — the row captured before would answer `hidden` for every
-          // group ever created.
+          // The answer is read AFTER the roles, not captured from the CREATE above: seeding
+          // writes the derived columns and the visibility is computed from them, so the earlier
+          // row would answer `hidden` for every group ever created. The node is matched inside
+          // the transaction that just created it, so there is exactly one row.
           const seeded = await transaction.run(
             `MATCH (group:Group {id: $groupId}) RETURN group {.*} AS group`,
             { groupId: params.id },
           )
-          return seeded.records[0]?.get('group') ?? group
+          return seeded.records[0].get('group')
         })
         // TODO: put in a middleware, see "UpdateGroup", "UpdateUser"
         await createOrUpdateLocations(
@@ -471,7 +469,10 @@ export default {
       // needs to know whether the type actually changed.
       let previousVisibility: string | undefined
       try {
-        const group = await session.writeTransaction(async (transaction) => {
+        // The row this transaction produces is NOT the answer — the answer is read back below,
+        // after the role writes that the visibility is computed from. It is still returned
+        // inside, because the avatar merge needs the node.
+        await session.writeTransaction(async (transaction) => {
           const previousVisibilityResult = await transaction.run(
             `MATCH (group:Group {id: $groupId}) RETURN ${visibilityOf('group')} AS visibility`,
             { groupId },
@@ -574,7 +575,7 @@ export default {
           query: `MATCH (group:Group {id: $groupId}) RETURN group {.*} AS group`,
           variables: { groupId },
         })
-        return records[0]?.get('group') ?? group
+        return records[0].get('group')
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
           throw new UserInputError('Group with this slug already exists!')
