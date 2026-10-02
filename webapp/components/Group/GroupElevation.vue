@@ -17,7 +17,7 @@
 
     <template v-else>
       <p class="elevation__offer" data-test="elevation-offer">
-        <strong>{{ $t('group.elevation.offerTitle') }}</strong>
+        <strong>{{ actingAs }}</strong>
         {{ $t('group.elevation.offerBody') }}
       </p>
       <input
@@ -37,9 +37,11 @@
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
 import { elevateInGroupMutation, endGroupElevationMutation } from '~/graphql/groupRoles.js'
+import groupRights from '~/mixins/groupRights'
 
 export default {
   name: 'GroupElevation',
+  mixins: [groupRights],
   components: { OsButton, OsCard },
   props: {
     /** The group as the page already has it: `myGroupElevation` and `mayElevateInGroup`. */
@@ -54,6 +56,17 @@ export default {
     },
     mayElevate() {
       return this.group?.mayElevateInGroup === true
+    },
+    /**
+     * What the viewer is right now — which is NOT "elevated": until they ask, they act on their
+     * membership, and for a member saying otherwise is simply wrong.
+     */
+    actingAs() {
+      const role = this.group?.myGroupRole
+      if (!role) {
+        return this.$t('group.elevation.actingAsNonMember')
+      }
+      return this.$t('group.elevation.actingAsMember', { role: this.roleLabel(role) })
     },
     expiresAt() {
       const at = this.elevation?.expiresAt

@@ -916,11 +916,12 @@
       "title": "Ndrysho grupin tim"
     },
     "elevation": {
+      "actingAsMember": "Këtu vepron si {role}.",
+      "actingAsNonMember": "Nuk je anëtar i këtij grupi.",
       "activeTitle": "Qasja si administrator është aktive.",
       "activeUntil": "Përfundon në {time}, ose kur ta mbyllësh ti.",
       "end": "Mbyll qasjen si administrator",
-      "offerBody": "Ke të drejta rrjeti mbi këtë grup. Leximi është i hapur; çdo ndryshim kërkon këtë konfirmim, i cili regjistrohet te grupi.",
-      "offerTitle": "Këtu nuk vepron si anëtar.",
+      "offerBody": "Përveç kësaj ke të drejta rrjeti mbi të. Leximi është i hapur; çdo ndryshim kërkon këtë konfirmim, i cili regjistrohet te grupi.",
       "reasonPlaceholder": "Për çfarë bëhet fjalë? (opsionale)",
       "start": "Përdor qasjen si administrator"
     },

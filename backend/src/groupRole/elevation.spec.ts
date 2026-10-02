@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  elevationWouldAddAnything,
-  ELEVATION_MINUTES,
-  UNELEVATED_NETWORK_RIGHTS,
-  withElevation,
-} from './elevation'
+import { ELEVATION_MINUTES, UNELEVATED_NETWORK_RIGHTS, withElevation } from './elevation'
 
 import type { GroupPermissionKey } from '@src/groupPermission'
 
@@ -38,17 +33,6 @@ describe(withElevation, () => {
     const full = authority('group.read')
 
     expect(withElevation(full, true)).not.toBe(full)
-  })
-})
-
-describe(elevationWouldAddAnything, () => {
-  it('is true where a right reaches past reading', () => {
-    expect(elevationWouldAddAnything(authority('group.read', 'group.post.moderate'))).toBe(true)
-  })
-
-  it('is false for somebody who may only look, so they are offered nothing', () => {
-    expect(elevationWouldAddAnything(authority(...UNELEVATED_NETWORK_RIGHTS))).toBe(false)
-    expect(elevationWouldAddAnything(authority())).toBe(false)
   })
 })
 

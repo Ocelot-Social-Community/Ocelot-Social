@@ -46,11 +46,3 @@ export function withElevation(
   }
   return new Set([...authority].filter((key) => UNELEVATED_NETWORK_RIGHTS.includes(key)))
 }
-
-/**
- * Whether there is anything to elevate: a viewer whose network rights give them nothing beyond
- * reading here has nothing to confirm, and must not be offered the button.
- */
-export function elevationWouldAddAnything(authority: ReadonlySet<GroupPermissionKey>): boolean {
-  return [...authority].some((key) => !UNELEVATED_NETWORK_RIGHTS.includes(key))
-}

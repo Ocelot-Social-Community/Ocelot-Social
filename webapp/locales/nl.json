@@ -916,11 +916,12 @@
       "title": "Mijn groep bewerken"
     },
     "elevation": {
+      "actingAsMember": "Je handelt hier als {role}.",
+      "actingAsNonMember": "Je bent geen lid van deze groep.",
       "activeTitle": "Beheerderstoegang is actief.",
       "activeUntil": "Hij eindigt om {time}, of wanneer je hem beëindigt.",
       "end": "Beheerderstoegang beëindigen",
-      "offerBody": "Je hebt netwerkrechten over deze groep. Lezen staat open; iets wijzigen vraagt om deze bevestiging, en die wordt bij de groep vastgelegd.",
-      "offerTitle": "Je handelt hier niet als lid.",
+      "offerBody": "Daarnaast heb je netwerkrechten over de groep. Lezen staat open; iets wijzigen vraagt om deze bevestiging, en die wordt bij de groep vastgelegd.",
       "reasonPlaceholder": "Waar gaat het om? (optioneel)",
       "start": "Beheerderstoegang gebruiken"
     },

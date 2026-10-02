@@ -4,7 +4,7 @@
     <!-- Where a moderator or admin LANDS when a report points them at a group they are not in.
          Picking the network rights up is a decision, and this is where it is offered — the
          settings pages are behind the very rights it unlocks. -->
-    <group-elevation :group="group" @changed="$nuxt.refresh()" />
+    <group-elevation :group="group" @changed="reloadGroup" />
     <div v-if="group" class="ds-flex ds-flex-gap-base group-layout">
       <div class="group-layout__sidebar">
         <os-card
@@ -542,7 +542,12 @@ export default {
       return this.isGroupMember(this.group)
     },
     isGroupVisible() {
-      return this.group && !(this.group.visibility === 'hidden' && !this.isGroupMemberNonePending)
+      // The one right that governs the profile, rather than the visibility/membership cascade
+      // this used to be. It holds for a member, for a stranger to a listed group, and for a
+      // moderator whose network right reaches in — the last of which the cascade got wrong,
+      // leaving them on an empty page. An applicant to an unlisted group still sees nothing
+      // but their own status: `pending` there grants no `group.read`.
+      return Boolean(this.group?.id) && this.canInGroup('group.read', this.group)
     },
     isAllowedSeeingGroupMembers() {
       // One right instead of the visibility/showMembers/membership cascade this used to be.
@@ -632,6 +637,14 @@ export default {
     },
   },
   methods: {
+    /**
+     * After picking the network rights up (or putting them down) everything on this page that
+     * depends on them has to be asked again — the smart query is the source, and
+     * `$nuxt.refresh()` does not touch it, which is why only a browser reload showed the change.
+     */
+    async reloadGroup() {
+      await this.$apollo.queries.Group.refetch()
+    },
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
       openVideoCall: 'videoCall/OPEN',

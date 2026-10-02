@@ -683,7 +683,9 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...investigativeJournalism,
-                  ...groupRights('pending'),
+                  // An applicant to an UNLISTED group sees that they applied and nothing else:
+                  // its `pending` role holds no `group.read`, where a listed group's does.
+                  ...groupRightsWithout('pending', 'group.read'),
                 },
               }
             })

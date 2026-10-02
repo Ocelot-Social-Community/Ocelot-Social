@@ -13,7 +13,7 @@ import { GROUPS_ENABLED_GATE } from '@src/groupPermission'
 
 import { callDoorFrom } from './callDoor'
 import { authoritySourceFor, effectiveGroupPermissions } from './effective'
-import { elevationWouldAddAnything, withElevation } from './elevation'
+import { withElevation } from './elevation'
 import { networkAuthorityIn } from './networkAuthority'
 import { parseStoredPermissions } from './storedPermissions'
 import { isActiveMembershipRole, NONE_ROLE, OWNER_ROLE } from './types'
@@ -216,6 +216,26 @@ export function createGroupAuthorizationScope({
     const effectiveWithEscape =
       role === null && roleName !== NONE_ROLE ? new Set(effective).add('group.leave') : effective
 
+    /**
+     * What an elevation would ADD on top of what the viewer already holds — the question the
+     * offer has to answer. Computed by resolving the same effective set with the full network
+     * authority, because the fold is capped by prerequisites and gates and a raw set difference
+     * would promise rights that are not effective anyway.
+     */
+    const elevationWouldAdd = (held: ReadonlySet<GroupPermissionKey>): boolean => {
+      if (fullNetworkAuthority.size === 0) {
+        return false
+      }
+      const withRights = effectiveGroupPermissions({
+        role,
+        networkAuthority: fullNetworkAuthority,
+        networkEffective: effectivePermissions,
+        callDoor,
+        gateContext,
+      })
+      return [...withRights].some((permission) => !held.has(permission))
+    }
+
     return {
       groupId,
       visibility,
@@ -227,8 +247,12 @@ export function createGroupAuthorizationScope({
       hasRoleDefinition: role !== null,
       /** Whether the viewer has asked to act with their network rights in this group. */
       elevated,
-      /** Whether asking would give them anything beyond what they can already read. */
-      mayElevate: elevationWouldAddAnything(fullNetworkAuthority),
+      /**
+       * Whether asking would give them anything they do not already hold HERE. An owner holds
+       * the whole catalog through their membership, so the network right adds nothing and the
+       * offer would be noise; a moderator who is not a member sees it.
+       */
+      mayElevate: !elevated && elevationWouldAdd(effectiveWithEscape),
       callDoor,
       effective: effectiveWithEscape,
       has: (permission) => effectiveWithEscape.has(permission),

@@ -222,6 +222,27 @@ describe(createGroupAuthorizationScope, () => {
       expect(authorization?.elevated).toBe(false)
     })
 
+    it('offers nothing to somebody whose membership already grants it all', async () => {
+      // An owner holds the whole catalog through their membership, so picking the network
+      // right up would add nothing — and an offer that changes nothing is noise.
+      const { scope } = scopeFor(
+        {
+          group: {
+            visibility: 'closed',
+            roleName: 'owner',
+            name: 'owner',
+            protected: true,
+            permissions: '[]',
+          },
+        },
+        { network: ['group.administer.any_closed'] },
+      )
+      const authorization = await scope.forGroup('g1')
+
+      expect(authorization?.has('group.settings.manage')).toBe(true)
+      expect(authorization?.mayElevate).toBe(false)
+    })
+
     it('hands the folded rights over once the viewer has picked them up', async () => {
       const { scope } = scopeFor(
         {
@@ -240,6 +261,8 @@ describe(createGroupAuthorizationScope, () => {
       expect(authorization?.has('group.settings.manage')).toBe(true)
       expect(authorization?.sourceOf('group.settings.manage')).toBe('network')
       expect(authorization?.elevated).toBe(true)
+      // …and with them in hand there is nothing left to offer.
+      expect(authorization?.mayElevate).toBe(false)
     })
 
     it('folds the moderator`s read rights in for a visibility they may read into', async () => {

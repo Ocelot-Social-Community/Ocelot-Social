@@ -183,10 +183,18 @@ export default {
           const { readableGroupIds, readableVisibilities } = await groupReadScope(context)
           const readableByStranger = nonMemberReadsGroup('group')
           const readableByViewer = 'group.id IN $readableGroupIds'
-          // The third direction: a network right that reaches into groups of this type without
-          // a membership — what a moderator reviewing a report, or an admin recovering an
-          // ownerless group, holds (groupRole/networkAuthority.ts).
-          const readableByNetworkRight = `${visibilityOf('group')} IN $readableVisibilities`
+          // The third direction, and the narrowest: a network right that reaches into groups of
+          // this visibility without a membership (groupRole/networkAuthority.ts).
+          //
+          // It applies ONLY when the request NAMES a group. Holding `group.administer.any_hidden`
+          // is the power to open any unlisted group one is pointed at — a report, the admin
+          // list, a link — and not a standing subscription to every unlisted group on the
+          // network: a moderator's group list would otherwise fill with spaces nobody invited
+          // them into, and the groups whose whole point is not being listed would be listed.
+          const namesOneGroup = id !== undefined || slug !== undefined
+          const readableByNetworkRight = namesOneGroup
+            ? `${visibilityOf('group')} IN $readableVisibilities`
+            : 'false'
 
           const transactionResponse = await txc.run(
             `
@@ -286,7 +294,7 @@ export default {
       const {
         user: { id: userId },
       } = context
-      const { readableGroupIds, readableVisibilities } = await groupReadScope(context as Context)
+      const { readableGroupIds } = await groupReadScope(context as Context)
       const session = context.driver.session()
       try {
         const result = await session.readTransaction(async (txc) => {
@@ -300,17 +308,14 @@ export default {
             // The same two directions as the Group query itself — the group's own
             // `nonMemberRead` or the viewer's role — so the count cannot disagree with the
             // list it is counting.
+            // No network direction here, and none in the list above either when no group is
+            // named: what a network right opens is a group one is pointed at, not the listing.
             cypher = `MATCH (group:Group)
                       WHERE group.id IN $readableGroupIds
                       OR ${nonMemberReadsGroup('group')}
-                      OR ${visibilityOf('group')} IN $readableVisibilities
                       RETURN toString(count(group)) AS count`
           }
-          const transactionResponse = await txc.run(cypher, {
-            userId,
-            readableGroupIds,
-            readableVisibilities,
-          })
+          const transactionResponse = await txc.run(cypher, { userId, readableGroupIds })
           return transactionResponse.records.map((record) => record.get('count'))[0]
         })
         return parseInt(result, 10) || 0

@@ -38,6 +38,24 @@ describe('GroupElevation', () => {
     expect(at(wrapper, 'group-elevation').exists()).toBe(false)
   })
 
+  it('says what the viewer is RIGHT NOW, which is not elevated', async () => {
+    // Until they ask, they act on their membership — telling a member they are "not acting as
+    // a member" was simply wrong, and telling anyone they are elevated before they asked is
+    // worse.
+    const asMember = Wrapper({
+      id: 'g1',
+      mayElevateInGroup: true,
+      myGroupElevation: null,
+      myGroupRole: { name: 'usual', label: null },
+    })
+
+    expect(at(asMember, 'elevation-offer').text()).toContain('group.elevation.actingAsMember')
+
+    const asStranger = Wrapper({ id: 'g1', mayElevateInGroup: true, myGroupElevation: null })
+
+    expect(at(asStranger, 'elevation-offer').text()).toContain('group.elevation.actingAsNonMember')
+  })
+
   it('offers the access to somebody who holds network rights here', () => {
     const wrapper = Wrapper({ id: 'g1', mayElevateInGroup: true, myGroupElevation: null })
 

@@ -916,11 +916,12 @@
       "title": "Meine Gruppe ändern"
     },
     "elevation": {
+      "actingAsMember": "Du handelst hier als {role}.",
+      "actingAsNonMember": "Du bist kein Mitglied dieser Gruppe.",
       "activeTitle": "Administratorzugriff ist aktiv.",
       "activeUntil": "Er endet um {time} oder wenn du ihn beendest.",
       "end": "Administratorzugriff beenden",
-      "offerBody": "Du hast Netzwerkrechte über diese Gruppe. Lesen ist offen; für Änderungen braucht es diese Bestätigung, und sie wird bei der Gruppe vermerkt.",
-      "offerTitle": "Du handelst hier nicht als Mitglied.",
+      "offerBody": "Zusätzlich hältst du Netzwerkrechte über sie. Lesen ist offen; für Änderungen braucht es diese Bestätigung, und sie wird bei der Gruppe vermerkt.",
       "reasonPlaceholder": "Worum geht es? (optional)",
       "start": "Administratorzugriff nutzen"
     },

@@ -916,11 +916,12 @@
       "title": "Editar meu grupo"
     },
     "elevation": {
+      "actingAsMember": "Aqui ages como {role}.",
+      "actingAsNonMember": "Não és membro deste grupo.",
       "activeTitle": "O acesso de administrador está ativo.",
       "activeUntil": "Termina às {time}, ou quando o encerrares.",
       "end": "Encerrar o acesso de administrador",
-      "offerBody": "Tens direitos de rede sobre este grupo. Ler está aberto; alterar algo pede esta confirmação, que fica registada junto do grupo.",
-      "offerTitle": "Aqui não ages como membro.",
+      "offerBody": "Além disso tens direitos de rede sobre ele. Ler está aberto; alterar algo pede esta confirmação, que fica registada junto do grupo.",
       "reasonPlaceholder": "Do que se trata? (opcional)",
       "start": "Usar acesso de administrador"
     },
