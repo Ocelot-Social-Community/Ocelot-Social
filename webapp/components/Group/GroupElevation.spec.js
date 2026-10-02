@@ -66,7 +66,7 @@ describe('GroupElevation', () => {
   it('picks the rights up with the reason, and tells the page to refetch', async () => {
     const wrapper = Wrapper({ id: 'g1', mayElevateInGroup: true, myGroupElevation: null })
 
-    await at(wrapper, 'elevation-reason').setValue('Reviewing a report')
+    await at(wrapper, 'elevation-reason').find('input').setValue('Reviewing a report')
     await at(wrapper, 'elevation-start').trigger('click')
 
     expect(mocks.$apollo.mutate).toHaveBeenCalledWith(

@@ -296,7 +296,7 @@ describe('rights.vue', () => {
     await at(wrapper, 'to-advanced').trigger('click')
     await at(wrapper, 'role-tab-owner').trigger('click')
 
-    await at(wrapper, 'role-label-input').setValue('Guardian')
+    await at(wrapper, 'role-label').find('input').setValue('Guardian')
 
     expect(at(wrapper, 'save').element.disabled).toBe(false)
 
@@ -403,8 +403,8 @@ describe('rights.vue', () => {
       const wrapper = await advanced()
 
       await at(wrapper, 'role-add').trigger('click')
-      at(wrapper, 'new-role-name').setValue('editors')
-      at(wrapper, 'new-role-label').setValue('Redaktion')
+      at(wrapper, 'new-role-name').find('input').setValue('editors')
+      at(wrapper, 'new-role-label').find('input').setValue('Redaktion')
       await at(wrapper, 'role-create').trigger('submit')
 
       expect(mocks.$apollo.mutate).toHaveBeenCalledWith(

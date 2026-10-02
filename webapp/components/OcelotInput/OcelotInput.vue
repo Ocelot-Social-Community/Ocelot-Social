@@ -11,6 +11,7 @@
         {{ prefix }}
       </div>
       <component
+        ref="control"
         class="ds-input"
         :class="[
           (resolvedIcon || prefix) && 'ds-input-has-icon',
@@ -201,6 +202,20 @@ export default {
     }
   },
   methods: {
+    /**
+     * Put the cursor in the field.
+     *
+     * A method on the component, because `$refs.field.focus()` at a call site would land on the
+     * component instance rather than on the control — the root element here is the
+     * `ds-form-item` wrapper. Needed by the fields that appear on demand (an inline rename, a
+     * "new role" box): `autofocus` only fires reliably on a document's first load, not on an
+     * element Vue inserts later.
+     *
+     * Not called `focus`: that name is taken by the data flag behind `ds-input-has-focus`.
+     */
+    focusControl() {
+      this.$refs.control?.focus()
+    },
     handleInput(event) {
       this.input(event.target.value)
     },

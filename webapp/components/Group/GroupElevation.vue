@@ -20,9 +20,10 @@
         <strong>{{ actingAs }}</strong>
         {{ $t('group.elevation.offerBody') }}
       </p>
-      <input
+      <ocelot-input
         v-model="reason"
-        type="text"
+        class="elevation__reason"
+        :aria-label="$t('group.elevation.reasonPlaceholder')"
         :placeholder="$t('group.elevation.reasonPlaceholder')"
         :disabled="working"
         data-test="elevation-reason"
@@ -36,13 +37,14 @@
 
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
+import OcelotInput from '~/components/OcelotInput/OcelotInput'
 import { elevateInGroupMutation, endGroupElevationMutation } from '~/graphql/groupRoles.js'
 import groupRights from '~/mixins/groupRights'
 
 export default {
   name: 'GroupElevation',
   mixins: [groupRights],
-  components: { OsButton, OsCard },
+  components: { OcelotInput, OsButton, OsCard },
   props: {
     /** The group as the page already has it: `myGroupElevation` and `mayElevateInGroup`. */
     group: { type: Object, default: null },
@@ -147,6 +149,10 @@ export default {
   align-items: center;
   margin-bottom: var(--space-small);
   border-left: 4px solid var(--color-warning, var(--color-primary));
+}
+
+.elevation__reason {
+  flex: 1 1 14rem;
 }
 
 .elevation__active,

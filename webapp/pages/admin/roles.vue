@@ -25,7 +25,7 @@
           data-test="role-add"
           @click="startCreate"
         >
-          +
+          <os-icon :icon="icons.plus" />
         </button>
         <span v-else class="role-tab role-tab--input" data-test="role-create">
           <input
@@ -47,7 +47,7 @@
             data-test="new-role-create"
             @click="createRole"
           >
-            ✓
+            <os-icon :icon="icons.check" />
           </button>
           <button
             type="button"
@@ -55,7 +55,7 @@
             :aria-label="$t('actions.cancel')"
             @click="cancelCreate"
           >
-            ✕
+            <os-icon :icon="icons.close" />
           </button>
         </span>
       </template>
@@ -103,7 +103,7 @@
               data-test="rename-role-confirm"
               @click="renameRole"
             >
-              ✓
+              <os-icon :icon="icons.check" />
             </button>
             <button
               type="button"
@@ -111,7 +111,7 @@
               :aria-label="$t('actions.cancel')"
               @click="cancelRename"
             >
-              ✕
+              <os-icon :icon="icons.close" />
             </button>
           </span>
         </h3>
@@ -216,13 +216,14 @@
 </template>
 
 <script>
-import { OsButton, OsCard } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
 import ConflictBanner from '~/components/ConflictBanner.vue'
 import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
 import RoleTabs from '~/components/Permissions/RoleTabs'
 import permissionsChangedSubscription from '~/graphql/PermissionsSubscription'
 import { iconRegistry } from '~/utils/iconRegistry'
+import { diffBetween, permissionSetOf, samePermissions } from '~/utils/permissionDiff'
 import {
   createRoleMutation,
   deleteRoleMutation,
@@ -236,7 +237,15 @@ const emptyPermissionMap = (catalog) =>
   catalog.reduce((map, permission) => ({ ...map, [permission.key]: false }), {})
 
 export default {
-  components: { ConfirmModal, ConflictBanner, OsButton, OsCard, PermissionMatrix, RoleTabs },
+  components: {
+    ConfirmModal,
+    ConflictBanner,
+    OsButton,
+    OsCard,
+    OsIcon,
+    PermissionMatrix,
+    RoleTabs,
+  },
   middleware: ['isAdmin'],
   data() {
     return {
@@ -339,16 +348,11 @@ export default {
       if (!this.hoveredRoleName || this.hoveredRoleName === this.activeRoleName) return {}
       const hovered = this.roles.find((role) => role.name === this.hoveredRoleName)
       if (!hovered) return {}
-      const activeSet = this.permissionSetOf(this.activeRole)
-      const hoveredSet = this.permissionSetOf(hovered)
-      const diff = {}
-      for (const permission of this.permissionCatalog) {
-        const inActive = activeSet.has(permission.key)
-        const inHovered = hoveredSet.has(permission.key)
-        if (inHovered && !inActive) diff[permission.key] = 'added'
-        else if (!inHovered && inActive) diff[permission.key] = 'removed'
-      }
-      return diff
+      return diffBetween(
+        this.permissionCatalog,
+        this.permissionSetOf(this.activeRole),
+        this.permissionSetOf(hovered),
+      )
     },
     // While a conflict banner is up for the active role, which permissions the OTHER admin
     // changed relative to this draft's baseline — 'added' (server now grants it) / 'removed'
@@ -357,26 +361,11 @@ export default {
     conflictDiff() {
       const form = this.activeRole && this.forms[this.activeRoleName]
       if (!this.activeRole || !this.conflicts[this.activeRoleName] || !form) return {}
-      const baseSet = new Set(form.baseline)
-      const serverSet = this.permissionSetOf(this.activeRole)
-      const diff = {}
-      for (const permission of this.permissionCatalog) {
-        const inBase = baseSet.has(permission.key)
-        const inServer = serverSet.has(permission.key)
-        if (inServer && !inBase) diff[permission.key] = 'added'
-        else if (!inServer && inBase) diff[permission.key] = 'removed'
-      }
-      return diff
-    },
-    // Catalog grouped by permission group, for sectioned checkboxes.
-    permissionGroups() {
-      const byGroup = {}
-      for (const permission of this.permissionCatalog) {
-        ;(byGroup[permission.group] = byGroup[permission.group] || []).push(permission)
-      }
-      return Object.keys(byGroup)
-        .sort()
-        .map((name) => ({ name, permissions: byGroup[name] }))
+      return diffBetween(
+        this.permissionCatalog,
+        new Set(form.baseline),
+        this.permissionSetOf(this.activeRole),
+      )
     },
   },
   methods: {
@@ -514,9 +503,7 @@ export default {
     },
     // The effective permission key set of a role (full catalog for protected roles).
     permissionSetOf(role) {
-      if (!role) return new Set()
-      if (role.protected) return new Set(this.permissionCatalog.map((p) => p.key))
-      return new Set(role.permissions)
+      return permissionSetOf(role, this.permissionCatalog)
     },
     // Keep a valid role selected: default to the first one shown (lowest-privilege,
     // the baseline `user` group), and re-select after a role is deleted/renamed away.
@@ -626,12 +613,7 @@ export default {
     isDirty(role) {
       const form = this.forms[role.name]
       if (!form) return false
-      const selected = this.selectedPermissions(form.permissions).sort()
-      const original = [...role.permissions].sort()
-      return (
-        selected.length !== original.length ||
-        selected.some((key, index) => key !== original[index])
-      )
+      return !samePermissions(this.selectedPermissions(form.permissions), role.permissions)
     },
     // Whether the draft differs from the server set it was BUILT from (its baseline),
     // i.e. this admin has toggled something locally. Unlike isDirty (draft vs the current
@@ -640,12 +622,7 @@ export default {
     isLocallyEdited(roleName) {
       const form = this.forms[roleName]
       if (!form || !form.baseline) return false
-      const selected = this.selectedPermissions(form.permissions).sort()
-      const baseline = [...form.baseline].sort()
-      return (
-        selected.length !== baseline.length ||
-        selected.some((key, index) => key !== baseline[index])
-      )
+      return !samePermissions(this.selectedPermissions(form.permissions), form.baseline)
     },
     canDelete(role) {
       // Protected (owner) and the implicit baseline (user) cannot be deleted, and a

@@ -43,7 +43,13 @@ describe('RoleTabs', () => {
     })
 
     expect(wrapper.find('[data-test="role-tab-owner"]').text()).toContain('Owner')
-    expect(wrapper.find('[data-test="role-tab-owner"] .role-tab__badge').exists()).toBe(true)
+    const badge = wrapper.find('[data-test="role-tab-owner"] .role-tab__badge')
+
+    expect(badge.exists()).toBe(true)
+    // The reason the role is marked has to be READABLE, not only hoverable: this was a `★` with
+    // a `title`, which a screen reader does not announce and which said nothing about why.
+    expect(badge.attributes('aria-label')).toBe('Protected')
+    expect(badge.attributes('role')).toBe('img')
     expect(wrapper.find('[data-test="role-tab-user"] .role-tab__badge').exists()).toBe(false)
   })
 

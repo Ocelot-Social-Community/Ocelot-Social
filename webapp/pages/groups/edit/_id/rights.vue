@@ -63,10 +63,11 @@
             type="button"
             class="role-tab-add"
             :title="$t('group.rights.addRole')"
+            :aria-label="$t('group.rights.addRole')"
             data-test="role-add"
             @click="startCreate"
           >
-            +
+            <os-icon :icon="icons.plus" />
           </button>
         </template>
       </role-tabs>
@@ -77,16 +78,16 @@
         data-test="role-create"
         @submit.prevent="createRole"
       >
-        <input
+        <ocelot-input
           v-model="newRoleName"
-          type="text"
           :placeholder="$t('group.rights.roleKeyPlaceholder')"
+          :aria-label="$t('group.rights.roleKeyPlaceholder')"
           data-test="new-role-name"
         />
-        <input
+        <ocelot-input
           v-model="newRoleLabel"
-          type="text"
           :placeholder="$t('group.rights.roleLabelPlaceholder')"
+          :aria-label="$t('group.rights.roleLabelPlaceholder')"
           data-test="new-role-label"
         />
         <os-button type="submit" :disabled="!newRoleName || saving">
@@ -99,16 +100,14 @@
 
       <template v-if="activeRole">
         <header class="role-header">
-          <label class="role-label">
-            {{ $t('group.rights.labelField') }}
-            <input
-              v-model="draftLabel"
-              type="text"
-              :placeholder="roleLabel({ name: activeRole.name })"
-              :disabled="!canManageRoles || saving"
-              data-test="role-label-input"
-            />
-          </label>
+          <ocelot-input
+            v-model="draftLabel"
+            class="role-label"
+            :label="$t('group.rights.labelField')"
+            :placeholder="roleLabel({ name: activeRole.name })"
+            :disabled="!canManageRoles || saving"
+            data-test="role-label"
+          />
           <span v-if="activeRole.memberCount !== null" class="role-members">
             {{ $t('group.rights.members', { count: activeRole.memberCount }) }}
           </span>
@@ -165,7 +164,8 @@
 </template>
 
 <script>
-import { OsButton, OsCard } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
+import OcelotInput from '~/components/OcelotInput/OcelotInput'
 import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
 import RoleTabs from '~/components/Permissions/RoleTabs'
 
@@ -178,8 +178,10 @@ import {
 } from '~/graphql/groupRoles.js'
 import { NONE_GROUP_ROLE, PENDING_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
 import { MANDATORY_GROUP_RIGHTS } from '~/constants/groups'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
+import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
 import groupRights from '~/mixins/groupRights'
 
 // The simple mode, declared rather than hand-written per row: one sentence, one role, one right.
@@ -195,12 +197,13 @@ const SIMPLE_SWITCHES = [
 
 export default {
   mixins: [groupRights],
-  components: { OsButton, OsCard, PermissionMatrix, RoleTabs },
+  components: { OcelotInput, OsButton, OsCard, OsIcon, PermissionMatrix, RoleTabs },
   props: {
     group: { type: Object, required: true },
   },
   data() {
     return {
+      icons: iconRegistry,
       catalog: [],
       roles: [],
       myGroupPermissions: [],
@@ -244,22 +247,14 @@ export default {
       if (!this.hoveredRoleName || this.hoveredRoleName === this.activeRoleName) return {}
       const hovered = this.roles.find((role) => role.name === this.hoveredRoleName)
       if (!hovered) return {}
-      const hoveredSet = this.permissionSetOf(hovered)
-      const activeSet = new Set(this.draftPermissions)
-      const diff = {}
-      for (const permission of this.catalog) {
-        const inHovered = hoveredSet.has(permission.key)
-        const inActive = activeSet.has(permission.key)
-        if (inHovered && !inActive) diff[permission.key] = 'added'
-        else if (!inHovered && inActive) diff[permission.key] = 'removed'
-      }
-      return diff
+      return diffBetween(
+        this.catalog,
+        new Set(this.draftPermissions),
+        this.permissionSetOf(hovered),
+      )
     },
     dirty() {
-      if (!this.activeRole) return false
-      const stored = [...this.activeRole.permissions].sort().join(',')
-      const draft = [...this.draftPermissions].sort().join(',')
-      return stored !== draft || (this.activeRole.label ?? '') !== this.draftLabel
+      return isRoleDirty(this.activeRole, this.draftPermissions, this.draftLabel)
     },
     simpleSwitches() {
       return SIMPLE_SWITCHES.map((item) => {
@@ -333,9 +328,7 @@ export default {
     // What a role effectively grants. `owner` stores no list and resolves to the whole
     // catalog, so hovering it has to show that rather than an empty role.
     permissionSetOf(role) {
-      if (!role) return new Set()
-      if (role.protected) return new Set(this.catalog.map((permission) => permission.key))
-      return new Set(role.permissions)
+      return permissionSetOf(role, this.catalog)
     },
     resetDraft() {
       this.draftPermissions = this.activeRole ? [...this.activeRole.permissions] : []

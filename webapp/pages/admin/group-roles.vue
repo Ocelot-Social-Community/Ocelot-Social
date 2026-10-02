@@ -46,16 +46,15 @@
         @hover="hoveredRoleName = $event"
       />
 
-      <label v-if="activeRole" class="role-label" data-test="role-label">
-        {{ $t('admin.groupRoles.labelField') }}
-        <input
-          v-model="draftLabel"
-          type="text"
-          :placeholder="activeRole.name"
-          :disabled="saving"
-          data-test="role-label-input"
-        />
-      </label>
+      <ocelot-input
+        v-if="activeRole"
+        v-model="draftLabel"
+        class="role-label"
+        :label="$t('admin.groupRoles.labelField')"
+        :placeholder="activeRole.name"
+        :disabled="saving"
+        data-test="role-label"
+      />
 
       <p v-if="activeRole && activeRole.protected" class="note" data-test="owner-note">
         {{ $t('admin.groupRoles.ownerHoldsEverything') }}
@@ -102,6 +101,7 @@
 
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
+import OcelotInput from '~/components/OcelotInput/OcelotInput'
 import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
 import RoleTabs from '~/components/Permissions/RoleTabs'
 
@@ -112,9 +112,10 @@ import {
 } from '~/graphql/adminGroups.js'
 import { MANDATORY_GROUP_RIGHTS, NONE_GROUP_ROLE } from '~/constants/groups'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
+import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
 
 export default {
-  components: { OsButton, OsCard, PermissionMatrix, RoleTabs },
+  components: { OcelotInput, OsButton, OsCard, PermissionMatrix, RoleTabs },
   data() {
     return {
       catalog: [],
@@ -149,10 +150,7 @@ export default {
       return orderRolesByPrivilege(this.activeTemplate?.roles ?? [])
     },
     dirty() {
-      if (!this.activeRole) return false
-      const stored = [...this.activeRole.permissions].sort().join(',')
-      const draft = [...this.draft].sort().join(',')
-      return stored !== draft || (this.activeRole.label ?? '') !== this.draftLabel
+      return isRoleDirty(this.activeRole, this.draft, this.draftLabel)
     },
     /**
      * What the cursor is previewing, or null: ANOTHER ROLE of this template, or the SAME role
@@ -177,16 +175,7 @@ export default {
     // part of the comparison rather than ignored by it.
     hoverDiff() {
       if (!this.hoveredRole) return {}
-      const hoveredSet = this.permissionSetOf(this.hoveredRole)
-      const activeSet = new Set(this.draft)
-      const diff = {}
-      for (const permission of this.catalog) {
-        const inHovered = hoveredSet.has(permission.key)
-        const inActive = activeSet.has(permission.key)
-        if (inHovered && !inActive) diff[permission.key] = 'added'
-        else if (!inHovered && inActive) diff[permission.key] = 'removed'
-      }
-      return diff
+      return diffBetween(this.catalog, new Set(this.draft), this.permissionSetOf(this.hoveredRole))
     },
   },
   watch: {
@@ -205,9 +194,7 @@ export default {
     // The rights a role effectively holds. `owner` stores no list and resolves to the whole
     // catalog — hovering it has to show that, not an empty role.
     permissionSetOf(role) {
-      if (!role) return new Set()
-      if (role.protected) return new Set(this.catalog.map((permission) => permission.key))
-      return new Set(role.permissions)
+      return permissionSetOf(role, this.catalog)
     },
     // Ticked and locked: a membership role cannot be stored without the right to end the
     // membership (see groupRole/mandatoryRights.ts).
@@ -344,11 +331,8 @@ export default {
   background: var(--color-primary);
 }
 .role-label {
-  display: flex;
-  gap: var(--space-x-small);
-  align-items: baseline;
+  max-width: 24rem;
   margin: var(--space-small) 0;
-  color: var(--text-color-soft);
 }
 .actions {
   display: flex;

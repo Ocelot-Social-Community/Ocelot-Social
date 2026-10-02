@@ -172,7 +172,7 @@ describe('admin/group-roles.vue', () => {
     // instead of a per-group chore — and the owner role has nothing but its name to edit.
     const wrapper = await Wrapper()
 
-    await at(wrapper, 'role-label-input').setValue('Mitglied')
+    await at(wrapper, 'role-label').find('input').setValue('Mitglied')
     await at(wrapper, 'save').trigger('click')
 
     expect(mocks.$apollo.mutate).toHaveBeenCalledWith(

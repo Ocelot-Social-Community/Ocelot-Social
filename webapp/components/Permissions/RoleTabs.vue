@@ -18,7 +18,18 @@
       @mouseleave="$emit('hover', null)"
     >
       {{ labelFor(role) }}
-      <span v-if="badgeFor(role)" class="role-tab__badge" :title="badgeTitle">★</span>
+      <!--
+        A role nobody may reshape: the network's `owner`, a group's system roles. An icon with an
+        `aria-label` rather than the `★` with a `title` this was — a title on a span reaches a
+        sighted mouse user and nobody else, and the star said nothing about WHY the role is
+        special. OsIcon turns the label into `role="img"` and hides the glyph when there is none.
+      -->
+      <os-icon
+        v-if="badgeFor(role)"
+        :icon="icons.lock"
+        :aria-label="badgeTitle"
+        class="role-tab__badge"
+      />
     </button>
 
     <!-- Whatever the page adds at the end of the row: an add button, an inline name input. -->
@@ -27,8 +38,12 @@
 </template>
 
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
+
 export default {
   name: 'RoleTabs',
+  components: { OsIcon },
   props: {
     roles: { type: Array, required: true },
     activeName: { type: String, default: null },
@@ -37,6 +52,9 @@ export default {
     /** Which roles carry the ★: protected ones by default, system ones where that is meant. */
     badgeFor: { type: Function, default: (role) => Boolean(role.protected) },
     badgeTitle: { type: String, default: null },
+  },
+  data() {
+    return { icons: iconRegistry }
   },
 }
 </script>
