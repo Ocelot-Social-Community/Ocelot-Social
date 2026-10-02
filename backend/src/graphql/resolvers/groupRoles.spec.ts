@@ -134,6 +134,13 @@ beforeEach(() => {
   mocked.untouchedGroupIdsByType.mockResolvedValue(new Map())
 })
 
+// The shape untouchedGroupIdsByType answers in: which groups an apply would reach, and how
+// many there are of that type altogether.
+const groupsOfType = (untouchedIds: string[], total = untouchedIds.length) => ({
+  untouchedIds,
+  total,
+})
+
 describe('Query.groupPermissionCatalog', () => {
   it('hands out the whole catalog, which is the same for everybody', () => {
     const catalog = Query.groupPermissionCatalog()
@@ -982,13 +989,6 @@ describe('Mutation.updateGroupRoleTemplate', () => {
     expect(mocked.writeGroupRoleTemplate).toHaveBeenCalled()
     expect(published).toEqual([])
   })
-})
-
-// The shape untouchedGroupIdsByType answers in: which groups an apply would reach, and how
-// many there are of that type altogether.
-const groupsOfType = (untouchedIds: string[], total = untouchedIds.length) => ({
-  untouchedIds,
-  total,
 })
 
 describe('Mutation.applyGroupRoleTemplates', () => {

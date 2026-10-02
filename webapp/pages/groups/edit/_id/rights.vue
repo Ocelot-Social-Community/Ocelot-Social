@@ -545,5 +545,4 @@ export default {
 .role-note {
   color: var(--text-color-soft);
 }
-}
 </style>

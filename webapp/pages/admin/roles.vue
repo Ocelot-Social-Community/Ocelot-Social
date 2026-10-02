@@ -782,9 +782,6 @@ export default {
   margin-bottom: var(--space-base);
   color: var(--text-color-soft);
 }
-}
-
-}
 
 .role-tab--add {
   font-weight: bold;
@@ -899,17 +896,11 @@ export default {
 .role__action {
   display: inline-flex;
 }
-/*  Desktop (>=1024px): pack the permission groups into two columns for a more */
-/*  compact overview. Mobile/tablet stay single-column (the default). column-* is */
-/*  used (rather than grid/flex) so unequal-height groups fill the space tightly. */
-}
-}
 
-  /*  The deep-link to the policy tab. Colour/affordance come from the global `a` reset */
-  /*  (var(--color-primary), no underline — the app-wide link convention, matching the policy tab's */
-  /*  env-link); only keep it from wrapping mid-phrase inside the italic gate note. */
-}
-
+/* The deep-link to the policy tab, inside the shared matrix' gate note. Colour and affordance
+   come from the global `a` reset (var(--color-primary), no underline — the app-wide link
+   convention, matching the policy tab's env-link); this only keeps it from wrapping
+   mid-phrase inside the italic note. */
 .perm-gate-link {
   white-space: nowrap;
 }
