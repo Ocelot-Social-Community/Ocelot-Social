@@ -17,6 +17,8 @@
 > | Owner-los erlaubt (E8) | umgesetzt |
 > | `groupType` bleibt autoritatives Preset (E2) | **abgewichen, inzwischen vollstaendig** — die Lesewege fragen die Rechte ueber abgeleitete Spalten am Gruppenknoten, und der Typ selbst ist jetzt *abgeleitet* (`groupRole/privacyLevel.ts`, Handlungsoption A aus `group-type-from-rights-concept.md`): er wird vom Sync geschrieben, nicht gewaehlt |
 > | `videoCall.create_<type>` (E5-Muster) | **ersetzt** — gekoppelt an die *Tuer* statt an den Typ: `videoCall.create_open` fuer eine Gruppe, in die ein Fremder hineinlaufen kann (`group.read` + `group.join` auf `none`), `videoCall.create_restricted` sonst (`groupRole/callDoor.ts`). Auf den drei Presets verhaltensgleich |
+> | `group.type.change` | **entfernt** — der Typ ist abgeleitet, also IST seine Aenderung das Bearbeiten der `none`/`pending`-Rollen: `group.role.manage` deckelt beides, ein eigener Key war ein zweiter Name fuer einen Weg dorthin |
+> | `group.leave` | **nicht abwaehlbar** fuer jede Rolle, die eine Mitgliedschaft ist (`groupRole/mandatoryRights.ts`). Die andere Tuer hinaus (`group.member.remove`) liegt in fremder Hand, also waere eine Rolle ohne `group.leave` eine Falle statt einer Einstellung |
 > | `group.member.approve` (E9: kein Key ohne Konsument) | **entfernt** — Freigeben ist derselbe Akt wie Rolle zuweisen: `ChangeGroupMemberRole` befoerdert eine `pending`-Mitgliedschaft, der Mitglieder-Tab listet Bewerber (`includePending`), und `group.member.role.assign` deckelt beides. Der eigene Key deckelte damit nichts Eigenes. Was fehlt, ist eine *Affordanz* (Annehmen/Ablehnen, Zaehler, Benachrichtigung) — #10352 |
 > | `banned`-Rolle (E14), `group.delete` (E9) | bewusst Folge-Issues |
 
@@ -122,9 +124,9 @@ den Umbau, inklusive der fehlenden Negativ-Tests.
 | E5 | **Netzwerk-Rechte fuer Gruppenzugriff pro `groupType`**, nach dem Muster von `group.create_*` | Das Repo hat dieses flache Per-Typ-Muster bereits zweimal (`group.create_*`, `videoCall.create_*`) und dokumentiert es als gewollt. `group.create_*` beantwortet #9405 **nicht** — es regelt das Anlegen, nicht das Lesen. Details in 7.3. |
 | E6 | **Reports bleiben netzwerkweit.** Die Gruppe bekommt `group.post.moderate` (Inhalt aus der Gruppe entfernen), aber keinen Report-Zugriff | Ein Report kann einen *Account* treffen, nicht nur einen Post — das ist Netzwerk-Hoheit. #7702 nennt die Alternative selbst ("member writes to the admin per chat"). Haelt Schritt 1 klein; ein `group.report.review` liesse sich spaeter ohne Key-Bruch ergaenzen. |
 | E7 | **`membersCount` haengt an `group.members.read`** | Bei kleinen Gruppen ist die Zahl selbst die Information ("3 Mitglieder" + bekannter Owner ≈ die Liste). Datensparsame Variante, beantwortet die Frage aus #5386. |
-| E8 | **Owner-loser Zustand ist erlaubt.** Kein "mindestens ein Owner"-Guard; Wiederherstellung ueber `group.administer.any_<type>`, Mechanik in 3.9 | Mit der Matrix ist eine owner-lose Gruppe **nicht tot**: ihre Admins behalten Settings, Mitglieder- und Inhaltsverwaltung. Blockiert sind nur die beiden Owner-Rechte (`group.role.manage`, `group.type.change`). Damit entfaellt die Bedingung "provided another owner exists" aus #5386/#6153 komplett, und #6173 ist trivial erfuellt. **Weicht bewusst von #5386 ab** — gehoert im EPIC explizit markiert. |
+| E8 | **Owner-loser Zustand ist erlaubt.** Kein "mindestens ein Owner"-Guard; Wiederherstellung ueber `group.administer.any_<type>`, Mechanik in 3.9 | Mit der Matrix ist eine owner-lose Gruppe **nicht tot**: ihre Admins behalten Settings, Mitglieder- und Inhaltsverwaltung. Blockiert ist nur das Owner-Recht `group.role.manage` (das inzwischen auch den Typ-Wechsel deckelt, siehe oben). Damit entfaellt die Bedingung "provided another owner exists" aus #5386/#6153 komplett, und #6173 ist trivial erfuellt. **Weicht bewusst von #5386 ab** — gehoert im EPIC explizit markiert. |
 | E9 | **Kein Key ohne Konsument.** Der Katalog enthaelt nur Rechte, die einen echten Enforcement-Punkt haben (Spalte in 3.1). `group.post.moderate` und `group.delete` fliegen deshalb aus Schritt 1 und kommen mit ihrer Funktion in eigenen Issues; `group.owner.transfer` faellt ganz weg (redundant, s. 3.4) | Ein Recht, das nichts blockiert, ist toter Code in der Matrix: es suggeriert dem Gruppen-Owner eine Wirkung, die es nicht hat. Genau die Disziplin, die der Netzwerk-Katalog sich selbst auferlegt ("a new key ships with a new gate"). |
-| E10 | **`group.type.change` ist durch `group.create_<Zieltyp>` gedeckelt** | Sonst ist "public anlegen, dann auf hidden schalten" der Umweg um `group.create_hidden` — dieselbe Eskalationslogik wie E3. Neu gegenueber heute, wo jeder Owner jeden Typ setzen darf. |
+| E10 | **Privatere Typen sind durch `group.create_<Zieltyp>` gedeckelt** | Sonst ist "public anlegen, dann auf hidden schalten" der Umweg um `group.create_hidden` — dieselbe Eskalationslogik wie E3. Umgesetzt an **beiden** Wegen: das Typ-Preset im Shield (`canChangeGroupType`) und die Rechte-Matrix selbst (`requirePrivacyCap`), weil beides seit der Ableitung dasselbe tut. |
 | E11 | **`group.invite` wird gesplittet**: `group.invite` (bestehende Netzwerk-Mitglieder in die Gruppe holen, ungegated) und `group.invite.external` (Code, der auch zur Registrierung berechtigt, `gatedBy: inviteRegistration`) | Ein Gruppen-Invite-Code erfuellt heute zwei Zwecke in einem Objekt. Wer Mitglieder einladen darf, soll nicht automatisch Fremde ins Netzwerk holen duerfen — und ein Netzwerk mit abgeschalteter Invite-Registrierung darf nicht ueber Gruppen unterlaufen werden. |
 | E12 | **Template-Aenderungen propagieren nicht automatisch**, dazu ein Admin-Werkzeug "auf Gruppen anwenden, die ihre Rollen nie angepasst haben" | Spiegelt die `ON CREATE`-Semantik des Rollen-Seedings: eine Anpassung wird nie ueberschrieben. Der Masseneingriff bleibt moeglich, aber als bewusste Aktion. |
 | E13 | **Anzeigename frei, Key fix.** `GroupRole` traegt neben `name` (interner Key; fuer `none`/`pending`/`owner` unveraenderlich) ein optionales `label`; leer = i18n-Default | Code-Verhalten haengt am Key, Kommunikation am Label. Eine Gruppe mit eigenem Vokabular ("Anwaerter", "Aktive", "Gast") ist ein realer Wunsch aus #8993, und der Key bleibt trotzdem der stabile Anker fuer Cypher, Migrationen und `ACTIVE_GROUP_ROLES`. |
@@ -168,7 +170,6 @@ Katalog, nicht Doku.
 | `group.invite` | membership | — | — | `generateGroupInviteCode` | Invite-Code fuer **bestehende** Netzwerk-Mitglieder erzeugen |
 | `group.invite.external` | membership | — | `inviteRegistration` | `generateGroupInviteCode` (Flag `externalAllowed`), `validateInviteCode` im Signup-Pfad | Code erzeugen, der auch zur **Registrierung** berechtigt (E11) |
 | `group.settings.manage` | administration | — | — | `UpdateGroup` | Name, About, Description, Avatar, Ort, Kategorien, `showMembers` |
-| `group.type.change` | administration | `group.create_<type>` | — | `UpdateGroup` mit `groupType` im Payload | `groupType` aendern; gedeckelt durch das Erstellungsrecht fuer den Zieltyp (E10) |
 | `group.role.manage` | administration | — | — | `updateGroupRole` / `createGroupRole` / `renameGroupRole` / `deleteGroupRole` / `resetGroupRoles`, `Group.roles` | **Meta-Recht:** Rollendefinitionen dieser Gruppe bearbeiten |
 | `group.chat.participate` | communication | — | — | `CreateGroupRoom`, `CreateMessage`, `MarkMessagesAsSeen` (Gruppen-Room) | Gruppen-Room lesen/schreiben — schliesst die heutige Luecke |
 | `group.videoCall.create` | communication | `videoCall.create_<door>` | `videoConference` | Start eines Calls in der Gruppe | Video-Call eroeffnen |
@@ -449,7 +450,6 @@ Randfaelle:
 | `group.member.role.assign` | · | · | · | · | · | ✓ | ✓ |
 | `group.member.remove` | · | · | · | · | · | ✓ ⚠ | ✓ |
 | `group.settings.manage` | · | · | · | · | · | ✓ ⚠ | ✓ |
-| `group.type.change` | · | · | · | · | · | · | ✓ |
 | `group.role.manage` | · | · | · | · | · | · | ✓ |
 
 **Vier bewusste Abweichungen vom Ist-Zustand** (mit ⚠ markiert) — drei davon
@@ -474,7 +474,7 @@ koennen. Aber nicht Inhaber bestimmen koennen."):
 
 | heute | neu |
 |---|---|
-| `isAllowedToChangeGroupSettings` | `hasGroupPermission('group.settings.manage')` (+ `group.type.change` wenn `groupType` im Payload) |
+| `isAllowedToChangeGroupSettings` | `hasGroupPermission('group.settings.manage')` (+ `group.role.manage` und der E10-Deckel, wenn `groupType` im Payload steht — das Preset schreibt Rollen) |
 | `isAllowedSeeingGroupMembers` | `hasGroupPermission('group.members.read')` |
 | `isAllowedToChangeGroupMemberRole` | `and(hasGroupPermission('group.member.role.assign'), dominatesInGroup)` |
 | `canRemoveUserFromGroup` | `and(hasGroupPermission('group.member.remove'), dominatesInGroup)` |

@@ -225,6 +225,7 @@
       "apply": "Aplicar a los grupos sin cambios",
       "confirmApply": "¿Aplicar las plantillas a {count} grupos que nunca personalizaron sus roles? Los grupos personalizados quedan intactos.",
       "description": "Cada grupo nuevo parte de estas plantillas. Los grupos existentes no cambian al editarlas aquí — para eso está el botón de abajo.",
+      "labelField": "Nombre",
       "name": "Roles de grupo",
       "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos y no se puede editar.",
       "saved": "Plantilla guardada",
@@ -990,6 +991,7 @@
         "visibility": "Visibilidad"
       },
       "labelField": "Nombre visible",
+      "mandatory": "Siempre concedido: una membresía que no se puede terminar no es una opción.",
       "members": "{count} miembros",
       "noRight": "No puedes conceder un permiso que tú misma no tienes.",
       "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos de este grupo. Solo se puede cambiar su nombre visible.",

@@ -3,14 +3,15 @@
 // would be a way around network policy — a right revoked network-wide could be granted
 // back to oneself inside one's own group.
 //
-// Two prerequisites are not one key but a family, because what the network grants depends on
-// the group it is used in:
+// One prerequisite is not a single key but a family, because what the network grants depends on
+// the group it is used in: `videoCall.create_<door>`, per door — open or restricted (see
+// groupRole/callDoor.ts). The catalog stores it with the placeholder, so the table stays one
+// row per capability, and the resolution below substitutes the group's own value.
 //
-//   `group.create_<type>`        per privacy level — public / closed / hidden
-//   `videoCall.create_<door>`    per door — open / restricted (see groupRole/callDoor.ts)
-//
-// The catalog stores them with the placeholder, so the table stays one row per capability, and
-// the resolution below substitutes the group's own value.
+// There used to be a second one, `group.create_<type>` behind `group.type.change`. The type is
+// derived from the rights now, so changing it IS editing the non-member role: the cap lives
+// where that edit happens (requirePrivacyCap in graphql/resolvers/groupRoles.ts) rather than in
+// a right of its own.
 import { isKnownPermission } from '@src/permission'
 
 import { networkPrerequisiteTemplateFor } from './schema'
@@ -18,8 +19,7 @@ import { networkPrerequisiteTemplateFor } from './schema'
 import type { GroupPermissionKey } from './types'
 import type { PermissionKey } from '@src/permission'
 
-// The placeholders the catalog uses for a per-group prerequisite.
-const TYPE_PLACEHOLDER = '<type>'
+// The placeholder the catalog uses for a per-group prerequisite.
 const DOOR_PLACEHOLDER = '<door>'
 
 /**
@@ -29,8 +29,6 @@ const DOOR_PLACEHOLDER = '<door>'
  * not know fails closed below.
  */
 export interface PrerequisiteScope {
-  /** The group's privacy level, for `group.create_<type>`. */
-  groupType: string
   /** Whether its call is one a stranger can walk into, for `videoCall.create_<door>`. */
   callDoor: string
 }
@@ -40,8 +38,7 @@ export interface PrerequisiteScope {
  * concrete group — or null when the capability has no network counterpart.
  *
  * Fails CLOSED in the one case that matters: if a placeholder resolves to something the
- * network catalog does not know (a group type or a door added without its `group.create_*` /
- * `videoCall.create_*` sibling), the caller is handed a key that nobody can hold rather than
+ * network catalog does not know (a door added without its `videoCall.create_*` sibling), the caller is handed a key that nobody can hold rather than
  * silently dropping the cap. `unknown.<key>` cannot be a catalog key, so it can never be
  * satisfied — the drift guard in ./prerequisites.spec.ts is what keeps this from being
  * reachable in the first place.
@@ -54,9 +51,7 @@ export function networkPrerequisiteFor(
   if (template === null) {
     return null
   }
-  const resolved = template
-    .replace(TYPE_PLACEHOLDER, scope.groupType)
-    .replace(DOOR_PLACEHOLDER, scope.callDoor)
+  const resolved = template.replace(DOOR_PLACEHOLDER, scope.callDoor)
   if (resolved === template) {
     return template as PermissionKey
   }

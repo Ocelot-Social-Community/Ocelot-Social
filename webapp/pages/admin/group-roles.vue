@@ -38,6 +38,17 @@
         @hover="hoveredRoleName = $event"
       />
 
+      <label v-if="activeRole" class="role-label" data-test="role-label">
+        {{ $t('admin.groupRoles.labelField') }}
+        <input
+          v-model="draftLabel"
+          type="text"
+          :placeholder="activeRole.name"
+          :disabled="saving"
+          data-test="role-label-input"
+        />
+      </label>
+
       <p v-if="activeRole && activeRole.protected" class="note" data-test="owner-note">
         {{ $t('admin.groupRoles.ownerHoldsEverything') }}
       </p>
@@ -48,7 +59,8 @@
         :granted="draft"
         :diff="hoverDiff"
         :group-label="(name) => $t(`group.rights.groups.${name}`)"
-        :disabled-for="() => saving"
+        :disabled-for="(permission) => saving || isMandatory(permission)"
+        :hint-for="(permission) => (isMandatory(permission) ? $t('group.rights.mandatory') : null)"
         @toggle="toggle"
       />
 
@@ -83,6 +95,7 @@ import {
   groupRoleTemplatesQuery,
   updateGroupRoleTemplateMutation,
 } from '~/graphql/adminGroups.js'
+import { MANDATORY_GROUP_RIGHTS, NONE_GROUP_ROLE } from '~/constants/groups'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
 
 export default {
@@ -101,6 +114,10 @@ export default {
       // edited — the same affordance the network roles page has.
       hoveredRoleName: null,
       draft: [],
+      // The label a group role carries network-wide. Every new group copies it, which is what
+      // makes renaming `usual` to "Mitglied" here a one-place change rather than a per-group
+      // chore — and the owner role, whose rights are fixed, has nothing BUT its name to edit.
+      draftLabel: '',
       saving: false,
     }
   },
@@ -118,7 +135,9 @@ export default {
     },
     dirty() {
       if (!this.activeRole) return false
-      return [...this.activeRole.permissions].sort().join(',') !== [...this.draft].sort().join(',')
+      const stored = [...this.activeRole.permissions].sort().join(',')
+      const draft = [...this.draft].sort().join(',')
+      return stored !== draft || (this.activeRole.label ?? '') !== this.draftLabel
     },
     /**
      * What the cursor is previewing, or null: ANOTHER ROLE of this template, or the SAME role
@@ -166,6 +185,7 @@ export default {
   methods: {
     resetDraft() {
       this.draft = this.activeRole ? [...this.activeRole.permissions] : []
+      this.draftLabel = this.activeRole?.label ?? ''
     },
     // The rights a role effectively holds. `owner` stores no list and resolves to the whole
     // catalog — hovering it has to show that, not an empty role.
@@ -173,6 +193,13 @@ export default {
       if (!role) return new Set()
       if (role.protected) return new Set(this.catalog.map((permission) => permission.key))
       return new Set(role.permissions)
+    },
+    // Ticked and locked: a membership role cannot be stored without the right to end the
+    // membership (see groupRole/mandatoryRights.ts).
+    isMandatory(permission) {
+      return (
+        this.activeRoleName !== NONE_GROUP_ROLE && MANDATORY_GROUP_RIGHTS.includes(permission?.key)
+      )
     },
     toggle(key, enabled) {
       this.draft = enabled ? [...this.draft, key] : this.draft.filter((k) => k !== key)
@@ -186,7 +213,7 @@ export default {
             groupType: this.activeType,
             name: this.activeRoleName,
             permissions: this.draft,
-            label: this.activeRole?.label ?? null,
+            label: this.draftLabel || null,
           },
         })
         this.mergeRole(data.updateGroupRoleTemplate)
@@ -284,6 +311,13 @@ export default {
   background: var(--color-primary);
   color: var(--color-primary-inverse);
   font-weight: bold;
+}
+.role-label {
+  display: flex;
+  gap: var(--space-x-small);
+  align-items: baseline;
+  margin: var(--space-small) 0;
+  color: var(--text-color-soft);
 }
 .actions {
   display: flex;

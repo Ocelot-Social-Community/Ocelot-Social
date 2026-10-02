@@ -225,6 +225,7 @@
       "apply": "Apply to untouched groups",
       "confirmApply": "Apply the templates to {count} groups that never customised their roles? Customised groups are left alone.",
       "description": "Every newly created group starts from these templates. Existing groups are not changed by an edit here — that is what the button below is for.",
+      "labelField": "Name",
       "name": "Group roles",
       "ownerHoldsEverything": "The owner role always holds every right and cannot be edited.",
       "saved": "Template saved",
@@ -990,6 +991,7 @@
         "visibility": "Visibility"
       },
       "labelField": "Display name",
+      "mandatory": "Always granted: a membership one cannot end is not a setting.",
       "members": "{count} members",
       "noRight": "You cannot grant a right you do not hold yourself.",
       "ownerHoldsEverything": "The owner role always holds every right in this group. Only its display name can be changed.",

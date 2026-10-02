@@ -10,3 +10,10 @@ export const NONE_GROUP_ROLE = 'none'
 export const PENDING_GROUP_ROLE = 'pending'
 export const USUAL_GROUP_ROLE = 'usual'
 export const OWNER_GROUP_ROLE = 'owner'
+
+/**
+ * Rights a role that IS a membership cannot be written without — the webapp side of
+ * backend/src/groupRole/mandatoryRights.ts. Ticked and locked rather than offered: a group
+ * whose members cannot leave it would need somebody else to let them out.
+ */
+export const MANDATORY_GROUP_RIGHTS = ['group.leave']

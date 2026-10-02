@@ -458,7 +458,11 @@ const canChangeGroupType = rule({ cache: 'no_cache' })(async (_parent, args, ctx
   if (args.groupType === authorization.groupType) {
     return true
   }
-  if (!authorization.has('group.type.change')) {
+  // Setting the type IS editing the group's non-member and applicant roles — the preset writes
+  // them, and the type is derived back out of them. So it asks for the right that governs those
+  // roles rather than one of its own: a separate `group.type.change` would have been a second
+  // name for `group.role.manage` restricted to one way of using it.
+  if (!authorization.has('group.role.manage')) {
     return false
   }
   // And the network cap (E10): switching to a more private type needs the right to have

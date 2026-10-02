@@ -124,18 +124,20 @@
           :granted="draftPermissions"
           :diff="hoverDiff"
           :group-label="(name) => $t(`group.rights.groups.${name}`)"
-          :disabled-for="(permission) => !canManageRoles || !grantable(permission) || saving"
+          :disabled-for="
+            (permission) =>
+              !canManageRoles || !grantable(permission) || saving || isMandatory(permission)
+          "
           :hint-for="blockedHint"
           @toggle="togglePermission"
         />
 
         <div class="actions">
-          <os-button
-            v-if="!activeRole.protected"
-            :disabled="!dirty || saving || !canManageRoles"
-            data-test="save"
-            @click="save"
-          >
+          <!-- Also for the owner role: its RIGHTS cannot be edited (it holds the catalog), but
+               its name can — "Owner" is what a group calls the person, and some call it
+               something else. The backend takes a relabel of a protected role for the same
+               reason; the button being hidden was the only thing in the way. -->
+          <os-button :disabled="!dirty || saving || !canManageRoles" data-test="save" @click="save">
             {{ $t('actions.save') }}
           </os-button>
           <os-button :disabled="!dirty || saving" data-test="revert" @click="resetDraft">
@@ -171,6 +173,7 @@ import {
   updateGroupRoleMutation,
 } from '~/graphql/groupRoles.js'
 import { NONE_GROUP_ROLE, PENDING_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
+import { MANDATORY_GROUP_RIGHTS } from '~/constants/groups'
 import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
 import groupRights from '~/mixins/groupRights'
@@ -280,10 +283,25 @@ export default {
      * backend enforces. Showing an ineffective checkbox would promise an effect that the save
      * would then refuse.
      */
+    /**
+     * A right the role cannot be written without, so the box is ticked and locked rather than
+     * offered: `group.leave` on anything that IS a membership. Without it the only way out of
+     * the group would be somebody else removing you (see groupRole/mandatoryRights.ts).
+     */
+    isMandatory(permission) {
+      // The simple view asks about rights the catalog may not carry yet, so a missing entry is
+      // a legitimate argument here and answers "no" rather than throwing.
+      return (
+        this.activeRoleName !== NONE_GROUP_ROLE && MANDATORY_GROUP_RIGHTS.includes(permission?.key)
+      )
+    },
     grantable(permission) {
       return !!permission && this.myGroupPermissions.includes(permission.key)
     },
     blockedHint(permission) {
+      if (this.isMandatory(permission)) {
+        return this.$t('group.rights.mandatory')
+      }
       if (!permission) return null
       if (permission.requiresNetworkPermission && !this.grantable(permission)) {
         return this.$t('group.rights.blockedByNetwork', {

@@ -27,7 +27,6 @@ export type GroupPermissionKey =
   | 'group.invite'
   | 'group.invite.external'
   | 'group.settings.manage'
-  | 'group.type.change'
   | 'group.role.manage'
   | 'group.chat.participate'
   | 'group.videoCall.create'
@@ -51,11 +50,11 @@ export type GroupPermissionGate = 'videoConference' | 'inviteRegistration'
 export const GROUPS_ENABLED_GATE = 'groupsEnabled'
 
 // The hard cap (concept E3): where a group capability also exists network-wide, the
-// group right is only effective while the user ALSO holds the network right. A
-// '<type>' placeholder is substituted with the group's groupType and a '<door>' one with
-// whether its call can be walked into — see ./prerequisites.ts — which is how the flat
-// families group.create_* and videoCall.create_* are addressed without repeating them here.
-export type NetworkPrerequisiteTemplate = PermissionKey | `${string}<type>` | `${string}<door>`
+// group right is only effective while the user ALSO holds the network right. A '<door>'
+// placeholder is substituted with whether the group's call can be walked into — see
+// ./prerequisites.ts — which is how the flat family videoCall.create_* is addressed
+// without repeating it here.
+export type NetworkPrerequisiteTemplate = PermissionKey | `${string}<door>`
 
 export interface GroupPermissionCatalogEntry {
   group: GroupPermissionGroup

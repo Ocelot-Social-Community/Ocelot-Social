@@ -225,6 +225,7 @@
       "apply": "Appliquer aux groupes inchangés",
       "confirmApply": "Appliquer les modèles à {count} groupes qui n’ont jamais personnalisé leurs rôles ? Les groupes personnalisés ne sont pas touchés.",
       "description": "Chaque nouveau groupe démarre avec ces modèles. Les groupes existants ne changent pas quand vous les modifiez ici — c’est à cela que sert le bouton ci-dessous.",
+      "labelField": "Nom",
       "name": "Rôles de groupe",
       "ownerHoldsEverything": "Le rôle de propriétaire détient toujours toutes les permissions et ne peut pas être modifié.",
       "saved": "Modèle enregistré",
@@ -990,6 +991,7 @@
         "visibility": "Visibilité"
       },
       "labelField": "Nom affiché",
+      "mandatory": "Toujours accordé : une adhésion qu'on ne peut pas quitter n'est pas un réglage.",
       "members": "{count} membres",
       "noRight": "Vous ne pouvez pas accorder une permission que vous n’avez pas vous-même.",
       "ownerHoldsEverything": "Le rôle de propriétaire détient toujours toutes les permissions de ce groupe. Seul son nom affiché peut être modifié.",

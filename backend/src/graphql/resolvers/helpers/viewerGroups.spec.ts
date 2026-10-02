@@ -48,10 +48,13 @@ describe(moderatorGroupTypes, () => {
     expect(moderatorGroupTypes(contextHolding('group.content.read.any_hidden'))).toEqual(['hidden'])
   })
 
-  it('ignores rights that are about something else', () => {
-    expect(
-      moderatorGroupTypes(contextHolding('content.moderate', 'group.administer.any_closed')),
-    ).toEqual([])
+  it('counts administering a type as reading into it, and ignores the rest', () => {
+    // Administering folds the whole group catalog, moderating brings the reading rights along
+    // — one fold for every shape (groupRole/networkAuthority.ts), so the post filter cannot
+    // disagree with the per-group answer about who may see what.
+    expect(moderatorGroupTypes(contextHolding('group.administer.any_closed'))).toEqual(['closed'])
+    expect(moderatorGroupTypes(contextHolding('group.moderate.any_hidden'))).toEqual(['hidden'])
+    expect(moderatorGroupTypes(contextHolding('content.moderate', 'post.create'))).toEqual([])
   })
 })
 
@@ -59,7 +62,11 @@ describe(groupReadScope, () => {
   it('asks nothing for an anonymous visitor, who holds no membership', async () => {
     const context = { user: null } as unknown as Context
 
-    expect(await groupReadScope(context)).toEqual({ readableGroupIds: [], contentGroupIds: [] })
+    expect(await groupReadScope(context)).toEqual({
+      readableGroupIds: [],
+      contentGroupIds: [],
+      readableGroupTypes: [],
+    })
   })
 
   it('separates the profile from the content, because a role may grant either', async () => {
@@ -73,6 +80,8 @@ describe(groupReadScope, () => {
     expect(await groupReadScope(context)).toEqual({
       readableGroupIds: ['both', 'profile-only'],
       contentGroupIds: ['both', 'content-only'],
+      // No network right in this context, so nothing comes from that direction.
+      readableGroupTypes: [],
     })
   })
 
@@ -85,6 +94,7 @@ describe(groupReadScope, () => {
     expect(await groupReadScope(context)).toEqual({
       readableGroupIds: ['mine'],
       contentGroupIds: ['mine'],
+      readableGroupTypes: [],
     })
   })
 
@@ -101,6 +111,7 @@ describe(groupReadScope, () => {
     expect(await groupReadScope(context)).toEqual({
       readableGroupIds: [],
       contentGroupIds: [],
+      readableGroupTypes: [],
     })
   })
 
@@ -110,6 +121,7 @@ describe(groupReadScope, () => {
     expect(await groupReadScope(context)).toEqual({
       readableGroupIds: [],
       contentGroupIds: [],
+      readableGroupTypes: [],
     })
   })
 })

@@ -165,6 +165,21 @@ describe('admin/group-roles.vue', () => {
     expect(at(wrapper, 'untouched').text()).toContain('"total":7')
   })
 
+  it('renames a template role without touching its rights', async () => {
+    // Every new group copies the label, so naming `usual` "Mitglied" here is a one-place change
+    // instead of a per-group chore — and the owner role has nothing but its name to edit.
+    const wrapper = await Wrapper()
+
+    await at(wrapper, 'role-label-input').setValue('Mitglied')
+    await at(wrapper, 'save').trigger('click')
+
+    expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variables: expect.objectContaining({ name: 'usual', label: 'Mitglied' }),
+      }),
+    )
+  })
+
   it('offers one tab per group type and starts on public', async () => {
     const wrapper = await Wrapper()
 

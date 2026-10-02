@@ -67,11 +67,6 @@
       "group": "administration",
       "description": "Change the group's settings: name, about, description, avatar, location, categories and member-list visibility."
     },
-    "group.type.change": {
-      "group": "administration",
-      "requiresNetworkPermission": "group.create_<type>",
-      "description": "Change the group's type. Capped by the network right to create a group of the TARGET type, so switching is never a way around group.create_<type>."
-    },
     "group.role.manage": {
       "group": "administration",
       "description": "Edit this group's own role definitions."

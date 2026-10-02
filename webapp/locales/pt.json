@@ -225,6 +225,7 @@
       "apply": "Aplicar aos grupos sem alterações",
       "confirmApply": "Aplicar os modelos a {count} grupos que nunca personalizaram as suas funções? Os grupos personalizados não são tocados.",
       "description": "Cada grupo novo começa com estes modelos. Os grupos existentes não mudam ao editá-los aqui — para isso existe o botão abaixo.",
+      "labelField": "Nome",
       "name": "Funções de grupo",
       "ownerHoldsEverything": "A função de proprietário tem sempre todas as permissões e não pode ser editada.",
       "saved": "Modelo guardado",
@@ -990,6 +991,7 @@
         "visibility": "Visibilidade"
       },
       "labelField": "Nome visível",
+      "mandatory": "Sempre concedido: uma adesão que não se pode terminar não é uma opção.",
       "members": "{count} membros",
       "noRight": "Não podes conceder uma permissão que tu mesmo não tens.",
       "ownerHoldsEverything": "A função de proprietário tem sempre todas as permissões deste grupo. Só o nome visível pode ser alterado.",

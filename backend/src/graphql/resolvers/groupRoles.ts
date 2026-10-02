@@ -6,6 +6,7 @@ import { groupPermissionCatalog, sanitizeGroupPermissions } from '@src/groupPerm
 import {
   coversRole,
   PRIVACY_LEVELS,
+  withMandatoryRights,
   createPermissionForLevel,
   isMorePrivate,
   NONE_ROLE,
@@ -314,17 +315,16 @@ export default {
         await touched(context, groupId, new Date().toISOString())
         return { ...relabelled, memberCount: null }
       }
-      const permissions = sanitizeGroupPermissions(params.permissions)
-      const authorization = await requireCoverage(
-        context,
-        groupId,
-        permissions,
-        existing.permissions,
-      )
+      const requested = sanitizeGroupPermissions(params.permissions)
+      const authorization = await requireCoverage(context, groupId, requested, existing.permissions)
       if (name === NONE_ROLE) {
         // The non-member role IS the group's visibility, so editing it is the type change.
-        requirePrivacyCap(context, authorization, permissions)
+        requirePrivacyCap(context, authorization, requested)
       }
+      // Added AFTER the checks, not before: the rights a role cannot be without are imposed by
+      // the model, not granted by the editor, so asking them to hold `group.leave` themselves
+      // would refuse an edit over a right nobody chose (see groupRole/mandatoryRights.ts).
+      const permissions = withMandatoryRights(name, requested)
       const now = new Date().toISOString()
       const updated = { ...existing, label, permissions }
       await writeGroupRole(context.database, groupId, updated, actorId(context), now)
@@ -348,8 +348,10 @@ export default {
       if (existing.some((role) => role.name === name)) {
         throw new UserInputError('A role with that name already exists in this group!')
       }
-      const permissions = sanitizeGroupPermissions(params.permissions)
-      await requireCoverage(context, groupId, permissions)
+      const requested = sanitizeGroupPermissions(params.permissions)
+      await requireCoverage(context, groupId, requested)
+      // A new role is a membership too, so it cannot be created without the right to end it.
+      const permissions = withMandatoryRights(name, requested)
       const now = new Date().toISOString()
       const created: GroupRoleDefinition = {
         name,
@@ -513,7 +515,9 @@ export default {
       const updated = {
         ...existing,
         label: validateLabel(params.label),
-        permissions: existing.protected ? [] : sanitizeGroupPermissions(params.permissions),
+        permissions: existing.protected
+          ? []
+          : withMandatoryRights(name, sanitizeGroupPermissions(params.permissions)),
       }
       // A template's NAME is a privacy level, and the level is derived from exactly these
       // rights — so a `public` template whose non-member role cannot read is a contradiction,

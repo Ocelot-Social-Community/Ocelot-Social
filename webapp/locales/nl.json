@@ -225,6 +225,7 @@
       "apply": "Toepassen op ongewijzigde groepen",
       "confirmApply": "De sjablonen toepassen op {count} groepen die hun rollen nooit hebben aangepast? Aangepaste groepen blijven ongemoeid.",
       "description": "Elke nieuwe groep begint met deze sjablonen. Bestaande groepen veranderen niet als je ze hier aanpast — daarvoor is de knop hieronder.",
+      "labelField": "Naam",
       "name": "Groepsrollen",
       "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten en kan niet worden aangepast.",
       "saved": "Sjabloon opgeslagen",
@@ -990,6 +991,7 @@
         "visibility": "Zichtbaarheid"
       },
       "labelField": "Weergavenaam",
+      "mandatory": "Altijd toegekend: een lidmaatschap dat je niet kunt beëindigen is geen instelling.",
       "members": "{count} leden",
       "noRight": "Je kunt geen recht geven dat je zelf niet hebt.",
       "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten in deze groep. Alleen de weergavenaam kan worden aangepast.",

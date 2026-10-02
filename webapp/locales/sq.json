@@ -225,6 +225,7 @@
       "apply": "Zbato në grupet e paprekura",
       "confirmApply": "Të zbatohen shabllonet në {count} grupe që nuk i kanë përshtatur kurrë rolet e tyre? Grupet e përshtatura nuk preken.",
       "description": "Çdo grup i ri nis me këto shabllone. Grupet që ekzistojnë nuk ndryshojnë nga një ndryshim këtu — për atë shërben butoni më poshtë.",
+      "labelField": "Emri",
       "name": "Rolet e grupeve",
       "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet dhe nuk mund të redaktohet.",
       "saved": "Shablloni u ruajt",
@@ -990,6 +991,7 @@
         "visibility": "Dukshmëri"
       },
       "labelField": "Emri i shfaqur",
+      "mandatory": "Gjithmonë e dhënë: një anëtarësim që nuk mund të përfundohet nuk është një rregullim.",
       "members": "{count} anëtarë",
       "noRight": "Nuk mund të dhurosh një leje që ti vetë nuk e ke.",
       "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet e këtij grupi. Mund të ndryshohet vetëm emri i shfaqur.",

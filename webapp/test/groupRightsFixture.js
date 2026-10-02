@@ -27,7 +27,7 @@ const ADMIN = [
   'group.invite.external',
 ]
 
-const OWNER = [...ADMIN, 'group.type.change', 'group.role.manage']
+const OWNER = [...ADMIN, 'group.role.manage']
 
 const PERMISSIONS = {
   none: ['group.read', 'group.content.read', 'group.members.read', 'group.join'],

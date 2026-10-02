@@ -225,6 +225,7 @@
       "apply": "Auf unveraenderte Gruppen anwenden",
       "confirmApply": "Vorlagen auf {count} Gruppen anwenden, die ihre Rollen nie angepasst haben? Angepasste Gruppen bleiben unberuehrt.",
       "description": "Diese Vorlagen bekommt jede neu angelegte Gruppe. Bestehende Gruppen aendern sich dadurch nicht — dafuer gibt es die Schaltflaeche unten.",
+      "labelField": "Name",
       "name": "Gruppen-Rollen",
       "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte und ist nicht bearbeitbar.",
       "saved": "Vorlage gespeichert",
@@ -990,6 +991,7 @@
         "visibility": "Sichtbarkeit"
       },
       "labelField": "Anzeigename",
+      "mandatory": "Immer vergeben: eine Mitgliedschaft, die man nicht beenden kann, ist keine Einstellung.",
       "members": "{count} Mitglieder",
       "noRight": "Dieses Recht kannst du nicht vergeben, weil du es selbst nicht hast.",
       "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte dieser Gruppe. Nur ihr Anzeigename laesst sich aendern.",

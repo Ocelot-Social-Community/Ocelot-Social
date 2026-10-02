@@ -55,8 +55,6 @@ export interface EffectiveGroupPermissionsInput {
   networkAuthority?: ReadonlySet<GroupPermissionKey>
   /** The viewer's effective NETWORK permissions, for the hard cap. */
   networkEffective: ReadonlySet<PermissionKey>
-  /** The group's type, which the per-type prerequisites are resolved against. */
-  groupType: string
   /**
    * Whether a stranger could walk into this group — the value `videoCall.create_<door>` is
    * resolved against (see ./callDoor.ts). Defaults to the stricter `restricted`, so a caller
@@ -75,7 +73,6 @@ export function effectiveGroupPermissions({
   role,
   networkAuthority,
   networkEffective,
-  groupType,
   callDoor = 'restricted',
   gateContext,
 }: EffectiveGroupPermissionsInput): Set<GroupPermissionKey> {
@@ -88,7 +85,7 @@ export function effectiveGroupPermissions({
     if (!isGroupPermissionAvailable(key, gateContext)) {
       continue
     }
-    if (!networkPrerequisiteSatisfied(key, { groupType, callDoor }, networkEffective)) {
+    if (!networkPrerequisiteSatisfied(key, { callDoor }, networkEffective)) {
       continue
     }
     effective.add(key)

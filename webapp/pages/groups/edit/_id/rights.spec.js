@@ -20,6 +20,13 @@ const CATALOG = [
     requiresNetworkPermission: 'comment.create',
   },
   {
+    key: 'group.leave',
+    group: 'membership',
+    description: 'Leave the group.',
+    gatedBy: [],
+    requiresNetworkPermission: null,
+  },
+  {
     key: 'group.members.read',
     group: 'visibility',
     description: 'See the member list.',
@@ -258,6 +265,37 @@ describe('rights.vue', () => {
       // from the role it would be compared against — the rows are gone, the state is not.
       expect(wrapper.vm.hoverDiff['group.comment.create']).toBe('added')
     })
+  })
+
+  it('locks the right to leave on a membership role instead of offering it', async () => {
+    // A group whose members cannot leave it would need somebody else to let them out, so the
+    // box is ticked and inert rather than a choice (see groupRole/mandatoryRights.ts).
+    const wrapper = await Wrapper()
+    await at(wrapper, 'to-advanced').trigger('click')
+
+    const leave = at(wrapper, 'perm-group.leave')
+
+    expect(leave.attributes('disabled')).toBeDefined()
+  })
+
+  it('lets the owner role be renamed although its rights are fixed', async () => {
+    // The owner holds the whole catalog — but "Owner" is just what this group calls the
+    // person, and the save button used to be hidden for exactly that role.
+    const wrapper = await Wrapper()
+    await at(wrapper, 'to-advanced').trigger('click')
+    await at(wrapper, 'role-tab-owner').trigger('click')
+
+    await at(wrapper, 'role-label-input').setValue('Guardian')
+
+    expect(at(wrapper, 'save').element.disabled).toBe(false)
+
+    await at(wrapper, 'save').trigger('click')
+
+    expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variables: expect.objectContaining({ name: 'owner', label: 'Guardian', permissions: [] }),
+      }),
+    )
   })
 
   it('shows the matrix on demand, with the owner role explained rather than editable', async () => {

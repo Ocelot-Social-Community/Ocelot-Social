@@ -61,7 +61,6 @@ describe(effectiveGroupPermissions, () => {
     const effective = effectiveGroupPermissions({
       role: template('public', USUAL_ROLE),
       networkEffective: NETWORK_ALL,
-      groupType: 'public',
       gateContext: ALL_GATES_OPEN,
     })
 
@@ -75,7 +74,6 @@ describe(effectiveGroupPermissions, () => {
       role: template('hidden', NONE_ROLE),
       networkAuthority: new Set<GroupPermissionKey>(['group.read', 'group.content.read']),
       networkEffective: NETWORK_ALL,
-      groupType: 'hidden',
       gateContext: ALL_GATES_OPEN,
     })
 
@@ -87,7 +85,6 @@ describe(effectiveGroupPermissions, () => {
       role: template('closed', USUAL_ROLE),
       networkAuthority: new Set<GroupPermissionKey>(['group.settings.manage']),
       networkEffective: NETWORK_ALL,
-      groupType: 'closed',
       gateContext: ALL_GATES_OPEN,
     })
 
@@ -103,7 +100,6 @@ describe(effectiveGroupPermissions, () => {
     const effective = effectiveGroupPermissions({
       role: template('public', USUAL_ROLE),
       networkEffective: new Set<PermissionKey>(['comment.create']),
-      groupType: 'public',
       gateContext: ALL_GATES_OPEN,
     })
 
@@ -113,35 +109,27 @@ describe(effectiveGroupPermissions, () => {
     expect(effective.has('group.read')).toBe(true)
   })
 
-  it('caps the per-type rights against the right type', () => {
+  it('caps the call right against the door the group has', () => {
     const owner = {
       role: template('closed', OWNER_ROLE),
       networkEffective: new Set<PermissionKey>([
         'post.create',
         'comment.create',
         'videoCall.create_open',
-        'group.create_public',
       ]),
       gateContext: ALL_GATES_OPEN,
     }
 
-    // Holding the OPEN-DOOR call right does not open calls in a group one cannot walk into,
-    // and holding `group.create_public` does not make a group closed.
-    const inClosed = effectiveGroupPermissions({
-      ...owner,
-      groupType: 'closed',
-      callDoor: 'restricted',
-    })
+    // Holding the OPEN-DOOR call right does not open calls in a group one cannot walk into.
+    const behindADoor = effectiveGroupPermissions({ ...owner, callDoor: 'restricted' })
 
-    expect(inClosed.has('group.videoCall.create')).toBe(false)
-    expect(inClosed.has('group.type.change')).toBe(false)
+    expect(behindADoor.has('group.videoCall.create')).toBe(false)
     // Joining a running call has no network counterpart, so it stays.
-    expect(inClosed.has('group.videoCall.join')).toBe(true)
+    expect(behindADoor.has('group.videoCall.join')).toBe(true)
 
-    const inPublic = effectiveGroupPermissions({ ...owner, groupType: 'public', callDoor: 'open' })
+    const walkIn = effectiveGroupPermissions({ ...owner, callDoor: 'open' })
 
-    expect(inPublic.has('group.videoCall.create')).toBe(true)
-    expect(inPublic.has('group.type.change')).toBe(true)
+    expect(walkIn.has('group.videoCall.create')).toBe(true)
   })
 
   it('drops everything while groups are disabled', () => {
@@ -149,7 +137,6 @@ describe(effectiveGroupPermissions, () => {
       role: template('public', OWNER_ROLE),
       networkAuthority: new Set<GroupPermissionKey>(['group.read']),
       networkEffective: NETWORK_ALL,
-      groupType: 'public',
       gateContext: gatesExcept('groupsEnabled'),
     })
 
@@ -160,7 +147,6 @@ describe(effectiveGroupPermissions, () => {
     const effective = effectiveGroupPermissions({
       role: template('public', OWNER_ROLE),
       networkEffective: NETWORK_ALL,
-      groupType: 'public',
       gateContext: gatesExcept('videoConference'),
     })
 
@@ -173,7 +159,6 @@ describe(effectiveGroupPermissions, () => {
     const effective = effectiveGroupPermissions({
       role: template('public', ADMIN_ROLE),
       networkEffective: NETWORK_ALL,
-      groupType: 'public',
       gateContext: gatesExcept('inviteRegistration'),
     })
 
@@ -187,7 +172,6 @@ describe(effectiveGroupPermissions, () => {
       effectiveGroupPermissions({
         role: template('hidden', NONE_ROLE),
         networkEffective: NETWORK_ALL,
-        groupType: 'hidden',
         gateContext: ALL_GATES_OPEN,
       }),
     ).toEqual(new Set())

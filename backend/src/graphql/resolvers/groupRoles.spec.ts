@@ -444,7 +444,7 @@ describe('Mutation.updateGroupRole', () => {
     await expect(
       Mutation.updateGroupRole(
         {},
-        { groupId: 'g1', name: 'admin', permissions: ['group.type.change'] },
+        { groupId: 'g1', name: 'admin', permissions: ['group.member.remove'] },
         context,
       ),
     ).rejects.toThrow('You cannot grant rights you do not hold yourself!')
@@ -599,12 +599,16 @@ describe('Mutation.updateGroupRole', () => {
       context,
     )
 
-    // The unknown key is dropped on the way in rather than stored and ignored later.
-    expect(updated).toMatchObject({ permissions: ['group.invite'], memberCount: 3 })
+    // The unknown key is dropped on the way in rather than stored and ignored later, and the
+    // right the role cannot be without comes along (groupRole/mandatoryRights.ts).
+    expect(updated).toMatchObject({
+      permissions: ['group.invite', 'group.leave'],
+      memberCount: 3,
+    })
     expect(mocked.writeGroupRole).toHaveBeenCalledWith(
       context.database,
       'g1',
-      expect.objectContaining({ name: 'admin', permissions: ['group.invite'] }),
+      expect.objectContaining({ name: 'admin', permissions: ['group.invite', 'group.leave'] }),
       'actor',
       expect.any(String),
     )
@@ -647,7 +651,7 @@ describe('Mutation.createGroupRole', () => {
     await expect(
       Mutation.createGroupRole(
         {},
-        { groupId: 'g1', name: 'steward', permissions: ['group.role.manage', 'group.type.change'] },
+        { groupId: 'g1', name: 'steward', permissions: ['group.role.manage', 'group.post.pin'] },
         context,
       ),
     ).rejects.toThrow('You cannot grant rights you do not hold yourself!')
@@ -667,7 +671,8 @@ describe('Mutation.createGroupRole', () => {
       label: 'Steward',
       system: false,
       protected: false,
-      permissions: ['group.invite'],
+      // A new role is a membership too, so the right to end it comes with it.
+      permissions: ['group.invite', 'group.leave'],
       memberCount: 0,
     })
     expect(published).toHaveLength(1)
@@ -985,7 +990,10 @@ describe('Mutation.updateGroupRoleTemplate', () => {
       context,
     )
 
-    expect(updated).toMatchObject({ permissions: ['group.invite'], memberCount: null })
+    expect(updated).toMatchObject({
+      permissions: ['group.invite', 'group.leave'],
+      memberCount: null,
+    })
     expect(mocked.writeGroupRoleTemplate).toHaveBeenCalled()
     expect(published).toEqual([])
   })

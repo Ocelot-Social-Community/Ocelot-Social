@@ -189,7 +189,6 @@ export function createGroupAuthorizationScope({
       role,
       networkAuthority,
       networkEffective: effectivePermissions,
-      groupType,
       callDoor,
       gateContext,
     })
@@ -248,17 +247,13 @@ export function createGroupAuthorizationScope({
     }
   }
 
-  // Both of the two below resolve a role of the SAME group, so they share the facts the caps
-  // are resolved against — the type and the door — with whatever forGroup already read.
-  // Resolving them differently is how a right that is capped for everybody in this group
-  // starts blocking a role assignment on one side of the comparison only.
-  const groupScopeOf = async (
-    groupId: string,
-  ): Promise<{ groupType: string; callDoor: CallDoor } | null> => {
+  // Both of the two below resolve a role of the SAME group, so they share the fact the cap is
+  // resolved against — the door — with whatever forGroup already read. Resolving it differently
+  // is how a right that is capped for everybody in this group starts blocking a role assignment
+  // on one side of the comparison only.
+  const groupScopeOf = async (groupId: string): Promise<{ callDoor: CallDoor } | null> => {
     const authorization = await forGroup(groupId)
-    return authorization
-      ? { groupType: authorization.groupType, callDoor: authorization.callDoor }
-      : null
+    return authorization ? { callDoor: authorization.callDoor } : null
   }
 
   const definitionFrom = (record: {

@@ -225,6 +225,7 @@
       "apply": "Zastosuj do niezmienionych grup",
       "confirmApply": "Zastosować szablony do {count} grup, które nigdy nie zmieniały swoich ról? Grupy z własnymi ustawieniami pozostaną nietknięte.",
       "description": "Każda nowa grupa startuje z tych szablonów. Istniejące grupy nie zmieniają się przy edycji tutaj — do tego służy przycisk poniżej.",
+      "labelField": "Nazwa",
       "name": "Role w grupach",
       "ownerHoldsEverything": "Rola właściciela ma zawsze wszystkie uprawnienia i nie da się jej edytować.",
       "saved": "Szablon zapisany",
@@ -990,6 +991,7 @@
         "visibility": "Widoczność"
       },
       "labelField": "Nazwa wyświetlana",
+      "mandatory": "Zawsze przyznane: członkostwo, którego nie można zakończyć, nie jest ustawieniem.",
       "members": "{count} członków",
       "noRight": "Nie możesz nadać uprawnienia, którego sam nie masz.",
       "ownerHoldsEverything": "Rola właściciela ma zawsze wszystkie uprawnienia w tej grupie. Zmienić można tylko jej nazwę wyświetlaną.",

@@ -88,13 +88,15 @@ export interface GroupReadScope {
  * Anonymous viewers hold no memberships, so they skip the query entirely.
  */
 export const groupReadScope = async (context: Context): Promise<GroupReadScope> => {
+  // Anonymous first: a visitor holds no membership AND no network right, so there is nothing
+  // to look up in either direction.
+  if (!context.user) {
+    return { readableGroupIds: [], contentGroupIds: [], readableGroupTypes: [] }
+  }
   const readableGroupTypes = groupTypesWithNetworkAuthority(
     'group.read',
     context.effectivePermissions,
   )
-  if (!context.user) {
-    return { readableGroupIds: [], contentGroupIds: [], readableGroupTypes: [] }
-  }
   const result = await context.database.query({
     query: MEMBER_READ_SCOPE_QUERY,
     variables: { userId: context.user.id },

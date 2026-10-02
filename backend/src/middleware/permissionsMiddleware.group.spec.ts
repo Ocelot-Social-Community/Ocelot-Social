@@ -233,11 +233,11 @@ describe('canChangeGroupType', () => {
     // way, so it asks the same right. Without it, "public now, hidden in a minute" is the way
     // around `group.create_hidden`.
     const holder = contextFor({
-      group: { groupType: 'public', effective: ['group.type.change'] },
+      group: { groupType: 'public', effective: ['group.role.manage'] },
       network: ['group.create_hidden'],
     })
     const without = contextFor({
-      group: { groupType: 'public', effective: ['group.type.change'] },
+      group: { groupType: 'public', effective: ['group.role.manage'] },
       network: ['group.create_public'],
     })
 
@@ -252,7 +252,7 @@ describe('canChangeGroupType', () => {
   it('asks for no creation right when the switch opens the group up', async () => {
     // Opening takes nothing away from people outside the group.
     const context = contextFor({
-      group: { groupType: 'hidden', effective: ['group.type.change'] },
+      group: { groupType: 'hidden', effective: ['group.role.manage'] },
       network: [],
     })
 
@@ -263,7 +263,7 @@ describe('canChangeGroupType', () => {
 
   it('needs the right for an actual change', async () => {
     const withRight = contextFor({
-      group: { groupType: 'public', effective: ['group.type.change'] },
+      group: { groupType: 'public', effective: ['group.role.manage'] },
       network: ['group.create_closed'],
     })
     const without = contextFor({ group: { groupType: 'public', effective: [] } })
@@ -386,7 +386,7 @@ describe('canAssignGroupRole', () => {
     })
     const notCovering = contextFor({
       group: { effective: ['group.member.role.assign'] },
-      rolePermissions: ['group.type.change'],
+      rolePermissions: ['group.role.manage'],
     })
 
     expect(await resolve(canAssignGroupRole, {}, { ...args, userId: 'actor' }, covering)).toBe(true)
@@ -400,7 +400,7 @@ describe('canAssignGroupRole', () => {
     // so it needs no authority over that person.
     const context = contextFor({
       group: { effective: ['group.member.role.assign'] },
-      rolePermissions: ['group.type.change'],
+      rolePermissions: ['group.role.manage'],
       memberRole: 'admin',
     })
 

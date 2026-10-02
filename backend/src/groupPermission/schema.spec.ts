@@ -39,7 +39,6 @@ const EXPECTED_KEYS: GroupPermissionKey[] = [
   'group.invite',
   'group.invite.external',
   'group.settings.manage',
-  'group.type.change',
   'group.role.manage',
   'group.chat.participate',
   'group.videoCall.create',
@@ -123,7 +122,6 @@ describe('group permission catalog', () => {
     it('declares the hard cap where a capability exists network-wide too', () => {
       expect(networkPrerequisiteTemplateFor('group.post.create')).toBe('post.create')
       expect(networkPrerequisiteTemplateFor('group.comment.create')).toBe('comment.create')
-      expect(networkPrerequisiteTemplateFor('group.type.change')).toBe('group.create_<type>')
       expect(networkPrerequisiteTemplateFor('group.videoCall.create')).toBe(
         'videoCall.create_<door>',
       )
