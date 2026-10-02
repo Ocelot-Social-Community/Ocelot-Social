@@ -15,6 +15,9 @@
         <os-menu :routes="routes" :is-exact="() => true" link-tag="router-link" />
       </div>
       <div class="group-edit-layout__main">
+        <!-- Acting here on a network right rather than on a membership is a decision, and this
+             is where it is made and shown (components/Group/GroupElevation.vue). -->
+        <group-elevation :group="group" @changed="$nuxt.refresh()" />
         <transition name="slide-up" appear>
           <nuxt-child :group="group" @update-invite-codes="updateInviteCodes" />
         </transition>
@@ -25,6 +28,7 @@
 
 <script>
 import { OsMenu } from '@ocelot-social/ui'
+import GroupElevation from '~/components/Group/GroupElevation'
 import { groupEditQuery } from '~/graphql/groups.js'
 import { mapGetters } from 'vuex'
 
@@ -64,6 +68,7 @@ export default {
   middleware: ['groupsEnabled'],
   components: {
     OsMenu,
+    GroupElevation,
   },
   data() {
     return {

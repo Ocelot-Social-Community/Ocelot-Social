@@ -116,3 +116,23 @@ export const removePostFromGroupMutation = () => gql`
     }
   }
 `
+
+/**
+ * Pick up the network rights one holds over a group — the deliberate half of holding them.
+ * Without it those rights give reading and nothing else (backend: groupRole/elevation.ts).
+ */
+export const elevateInGroupMutation = () => gql`
+  mutation ($groupId: ID!, $reason: String) {
+    elevateInGroup(groupId: $groupId, reason: $reason) {
+      groupId
+      expiresAt
+      reason
+    }
+  }
+`
+
+export const endGroupElevationMutation = () => gql`
+  mutation ($groupId: ID!) {
+    endGroupElevation(groupId: $groupId)
+  }
+`

@@ -923,6 +923,15 @@
       "groupTitle": "Einstellungen für ",
       "title": "Meine Gruppe ändern"
     },
+    "elevation": {
+      "activeTitle": "Administratorzugriff ist aktiv.",
+      "activeUntil": "Er endet um {time} oder wenn du ihn beendest.",
+      "end": "Administratorzugriff beenden",
+      "offerBody": "Du hast Netzwerkrechte über diese Gruppe. Lesen ist offen; für Änderungen braucht es diese Bestätigung, und sie wird bei der Gruppe vermerkt.",
+      "offerTitle": "Du handelst hier nicht als Mitglied.",
+      "reasonPlaceholder": "Worum geht es? (optional)",
+      "start": "Administratorzugriff nutzen"
+    },
     "errors": {
       "userAlreadyMember": "Nutzer „{name}“ ist bereits Mitglied!"
     },

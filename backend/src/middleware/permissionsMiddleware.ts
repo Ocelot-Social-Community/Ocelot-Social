@@ -775,6 +775,11 @@ export default shield(
       // Taking a post out of a group: the group's own right, or the network-wide one folded in
       // for a moderator who is not a member.
       removePostFromGroup: and(groupsEnabled, hasGroupPermission('group.post.moderate')),
+      // Picking up a network right needs no right of its own: the resolver refuses unless the
+      // viewer actually holds something beyond reading in that group, which is the only thing
+      // there is to pick up. Authentication is what the shield has to insist on.
+      elevateInGroup: and(groupsEnabled, isAuthenticated),
+      endGroupElevation: and(groupsEnabled, isAuthenticated),
       updateGroupRoleTemplate: hasPermission('group.roleTemplate.manage'),
       applyGroupRoleTemplates: hasPermission('group.roleTemplate.manage'),
       markTeaserAsViewed: allow,

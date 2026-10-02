@@ -923,6 +923,15 @@
       "groupTitle": "Impostazioni di ",
       "title": "Modifica il mio gruppo"
     },
+    "elevation": {
+      "activeTitle": "L'accesso da amministratore è attivo.",
+      "activeUntil": "Termina alle {time}, o quando lo chiudi tu.",
+      "end": "Termina l'accesso da amministratore",
+      "offerBody": "Hai diritti di rete su questo gruppo. La lettura è aperta; per modificare serve questa conferma, che resta registrata presso il gruppo.",
+      "offerTitle": "Qui non agisci come membro.",
+      "reasonPlaceholder": "Di cosa si tratta? (facoltativo)",
+      "start": "Usa l'accesso da amministratore"
+    },
     "errors": {
       "userAlreadyMember": "L'utente “{name}” è già membro!"
     },

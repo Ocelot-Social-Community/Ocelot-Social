@@ -36,6 +36,10 @@ type Group {
   about: String
   "Full group description (rich text)."
   description: String!
+  "The live elevation of the viewer in this group, or null when they are acting on their membership alone (see GroupElevation)."
+  myGroupElevation: GroupElevation
+  "Whether asking for an elevation here would grant the viewer anything beyond what they can already read."
+  mayElevateInGroup: Boolean!
   "How findable this group is — DERIVED from its rights, not chosen: `hidden` while its non-member role cannot read the profile, `closed` while it cannot read the content, `public` otherwise. Setting it through UpdateGroup applies the matching role template; the per-level network rights (group.create_*, group.administer.any_*, group.content.read.any_*) read it."
   visibility: GroupVisibility!
   "The same value under its old name. Deprecated: it was never a `type` the group HAS, it is the visibility its rights RESULT in."

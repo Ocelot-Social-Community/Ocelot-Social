@@ -923,6 +923,15 @@
       "groupTitle": "Instellingen van ",
       "title": "Mijn groep bewerken"
     },
+    "elevation": {
+      "activeTitle": "Beheerderstoegang is actief.",
+      "activeUntil": "Hij eindigt om {time}, of wanneer je hem beëindigt.",
+      "end": "Beheerderstoegang beëindigen",
+      "offerBody": "Je hebt netwerkrechten over deze groep. Lezen staat open; iets wijzigen vraagt om deze bevestiging, en die wordt bij de groep vastgelegd.",
+      "offerTitle": "Je handelt hier niet als lid.",
+      "reasonPlaceholder": "Waar gaat het om? (optioneel)",
+      "start": "Beheerderstoegang gebruiken"
+    },
     "errors": {
       "userAlreadyMember": "Gebruiker “{name}” is al lid!"
     },

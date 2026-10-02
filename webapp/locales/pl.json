@@ -923,6 +923,15 @@
       "groupTitle": "Ustawienia ",
       "title": "Edytuj moją grupę"
     },
+    "elevation": {
+      "activeTitle": "Dostęp administratora jest aktywny.",
+      "activeUntil": "Kończy się o {time} albo kiedy go zakończysz.",
+      "end": "Zakończ dostęp administratora",
+      "offerBody": "Masz uprawnienia sieciowe do tej grupy. Czytanie jest otwarte; zmiany wymagają tego potwierdzenia, które zostaje odnotowane przy grupie.",
+      "offerTitle": "Nie działasz tu jako członek.",
+      "reasonPlaceholder": "O co chodzi? (opcjonalnie)",
+      "start": "Użyj dostępu administratora"
+    },
     "errors": {
       "userAlreadyMember": "Użytkownik “{name}” jest już członkiem!"
     },

@@ -201,8 +201,10 @@ describe(createGroupAuthorizationScope, () => {
       expect((await allowed.forGroup('g1'))?.has('group.post.create')).toBe(true)
     })
 
-    it('folds a network-wide group right in for somebody with no membership', async () => {
-      // group.administer.any_<type> is the recovery path for a group left without an owner.
+    it('leaves a network-wide group right at reading until it is picked up', async () => {
+      // `group.administer.any_<visibility>` is the recovery path for a group left without an
+      // owner — and a quiet power over every group of that kind until somebody asks for it
+      // (groupRole/elevation.ts). Unelevated, it reads; that is all.
       const { scope } = scopeFor(
         {
           group: { groupType: 'closed', roleName: 'none', name: 'none', permissions: '[]' },
@@ -211,8 +213,31 @@ describe(createGroupAuthorizationScope, () => {
       )
       const authorization = await scope.forGroup('g1')
 
+      expect(authorization?.has('group.settings.manage')).toBe(false)
+      expect(authorization?.has('group.read')).toBe(true)
+      // …and the page can say so, instead of showing a control that would be refused.
+      expect(authorization?.mayElevate).toBe(true)
+      expect(authorization?.elevated).toBe(false)
+    })
+
+    it('hands the folded rights over once the viewer has picked them up', async () => {
+      const { scope } = scopeFor(
+        {
+          group: {
+            groupType: 'closed',
+            roleName: 'none',
+            name: 'none',
+            permissions: '[]',
+            elevated: true,
+          },
+        },
+        { network: ['group.administer.any_closed'] },
+      )
+      const authorization = await scope.forGroup('g1')
+
       expect(authorization?.has('group.settings.manage')).toBe(true)
       expect(authorization?.sourceOf('group.settings.manage')).toBe('network')
+      expect(authorization?.elevated).toBe(true)
     })
 
     it('folds the moderator`s read rights in for a group type they may read into', async () => {
@@ -233,10 +258,17 @@ describe(createGroupAuthorizationScope, () => {
     })
 
     it('brings the read rights along with the moderation right', async () => {
-      // Moderating without reading would be blind.
+      // Moderating without reading would be blind — and taking a post out is an ACT, so it
+      // waits for the elevation while the reading does not.
       const { scope } = scopeFor(
         {
-          group: { groupType: 'hidden', roleName: 'none', name: 'none', permissions: '[]' },
+          group: {
+            groupType: 'hidden',
+            roleName: 'none',
+            name: 'none',
+            permissions: '[]',
+            elevated: true,
+          },
         },
         { network: ['group.moderate.any_hidden'] },
       )

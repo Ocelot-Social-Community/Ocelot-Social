@@ -923,6 +923,15 @@
       "groupTitle": "Configurações de ",
       "title": "Editar meu grupo"
     },
+    "elevation": {
+      "activeTitle": "O acesso de administrador está ativo.",
+      "activeUntil": "Termina às {time}, ou quando o encerrares.",
+      "end": "Encerrar o acesso de administrador",
+      "offerBody": "Tens direitos de rede sobre este grupo. Ler está aberto; alterar algo pede esta confirmação, que fica registada junto do grupo.",
+      "offerTitle": "Aqui não ages como membro.",
+      "reasonPlaceholder": "Do que se trata? (opcional)",
+      "start": "Usar acesso de administrador"
+    },
     "errors": {
       "userAlreadyMember": "O usuário “{name}” já é membro!"
     },

@@ -57,6 +57,11 @@ export const createGroupMutation = () => {
           label
         }
         myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+        }
         showMembers
       }
     }
@@ -123,6 +128,11 @@ export const updateGroupMutation = () => {
           label
         }
         myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+        }
         showMembers
       }
     }
@@ -233,6 +243,11 @@ export const groupQuery = (i18n) => {
           label
         }
         myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+        }
         showMembers
       }
     }
@@ -267,6 +282,11 @@ export const groupEditQuery = () => {
           label
         }
         myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+        }
         showMembers
         inviteCodes {
           createdAt
@@ -348,6 +368,11 @@ export const groupTeaserQuery = (i18n) => {
           label
         }
         myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+        }
         membersCount
         postsCount
         avatar {

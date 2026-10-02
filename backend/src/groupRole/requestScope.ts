@@ -12,6 +12,7 @@ import { GROUPS_ENABLED_GATE } from '@src/groupPermission'
 
 import { callDoorFrom } from './callDoor'
 import { authoritySourceFor, effectiveGroupPermissions } from './effective'
+import { elevationWouldAddAnything, withElevation } from './elevation'
 import { networkAuthorityIn } from './networkAuthority'
 import { parseStoredPermissions } from './storedPermissions'
 import { isActiveMembershipRole, NONE_ROLE, OWNER_ROLE } from './types'
@@ -43,6 +44,10 @@ export interface GroupAuthorization {
    * group-type behaviour.
    */
   hasRoleDefinition: boolean
+  /** Whether the viewer asked to act with their network rights here, and the ask still stands. */
+  elevated: boolean
+  /** Whether such an ask would grant anything beyond reading (./elevation.ts). */
+  mayElevate: boolean
   /** Whether a stranger could walk into this group — the video call cap (./callDoor.ts). */
   callDoor: CallDoor
   effective: ReadonlySet<GroupPermissionKey>
@@ -86,9 +91,15 @@ interface ScopeDependencies {
 const AUTHORIZATION_QUERY = `
   MATCH (g:Group {id: $groupId})
   OPTIONAL MATCH (:User {id: $userId})-[m:MEMBER_OF]->(g)
-  WITH g, coalesce(m.role, $noneRole) AS roleName
+  // A live elevation: the viewer asked to act with their network rights in THIS group, and the
+  // ask has not lapsed yet (groupRole/elevation.ts).
+  OPTIONAL MATCH (:User {id: $userId})-[e:ELEVATED_IN]->(g)
+  WHERE e.expiresAt > datetime()
+  WITH g, m, e
+  WITH g, coalesce(m.role, $noneRole) AS roleName, e IS NOT NULL AS elevated
   OPTIONAL MATCH (g)-[:HAS_GROUP_ROLE]->(r:GroupRole {name: roleName})
   RETURN g.groupType AS groupType,
+         elevated AS elevated,
          // The derived door columns, with the same template fallback the Cypher helpers use
          // for a group the backfill has not reached yet (groupRole/nonMemberAccess.ts).
          coalesce(g.nonMemberRead, g.groupType <> 'hidden') AS nonMemberRead,
@@ -150,9 +161,6 @@ export function createGroupAuthorizationScope({
 
   // What a network right grants in a group of this type — the shared fold, so the per-request
   // answer and the list queries cannot disagree about it (see ./networkAuthority.ts).
-  const networkAuthorityFor = (groupType: string): Set<GroupPermissionKey> =>
-    networkAuthorityIn(groupType, effectivePermissions)
-
   const resolveGroup = async (groupId: string): Promise<GroupAuthorization | null> => {
     const result = await database.query({
       query: AUTHORIZATION_QUERY,
@@ -184,7 +192,13 @@ export function createGroupAuthorizationScope({
       nonMemberRead: record.get('nonMemberRead') === true,
       nonMemberJoin: record.get('nonMemberJoin') === true,
     })
-    const networkAuthority = networkAuthorityFor(groupType)
+    // What a network right grants in a group of this visibility — the shared fold, so the
+    // per-request answer and the list queries cannot disagree about it (networkAuthority.ts).
+    // Narrowed to reading until the viewer has asked for it HERE (elevation.ts): holding the
+    // right is not the same as using it.
+    const elevated = record.get('elevated') === true
+    const fullNetworkAuthority = networkAuthorityIn(groupType, effectivePermissions)
+    const networkAuthority = withElevation(fullNetworkAuthority, elevated)
     const effective = effectiveGroupPermissions({
       role,
       networkAuthority,
@@ -210,6 +224,10 @@ export function createGroupAuthorizationScope({
       // that predates the roles or a half-applied migration, which a caller cannot tell from
       // "a role that grants nothing" (a hidden group's non-member role) without being told.
       hasRoleDefinition: role !== null,
+      /** Whether the viewer has asked to act with their network rights in this group. */
+      elevated,
+      /** Whether asking would give them anything beyond what they can already read. */
+      mayElevate: elevationWouldAddAnything(fullNetworkAuthority),
       callDoor,
       effective: effectiveWithEscape,
       has: (permission) => effectiveWithEscape.has(permission),

@@ -16,14 +16,17 @@ import {
   USUAL_ROLE,
 } from '@src/groupRole'
 import {
+  clearElevation,
   deleteGroupRole,
   markGroupRolesCustomized,
   memberCountsByRole,
+  readElevation,
   readGroupRoles,
   readGroupRoleTemplates,
   renameGroupRole,
   replaceGroupRoles,
   untouchedGroupIdsByType,
+  writeElevation,
   writeGroupRole,
   writeGroupRoleTemplate,
 } from '@src/groupRole/repository'
@@ -293,6 +296,15 @@ export default {
       // count would turn every group teaser into an aggregation.
       return role ? { ...role, memberCount: null } : null
     },
+    myGroupElevation: async (parent: { id: string }, _args, context: Context) => {
+      const authorization = await context.groupAuthorization.forGroup(parent.id)
+      if (!authorization?.elevated) {
+        return null
+      }
+      return readElevation(context.database, parent.id, actorId(context))
+    },
+    mayElevateInGroup: async (parent: { id: string }, _args, context: Context) =>
+      (await context.groupAuthorization.forGroup(parent.id))?.mayElevate ?? false,
     myGroupPermissions: async (parent: { id: string }, _args, context: Context) => {
       const authorization = await context.groupAuthorization.forGroup(parent.id)
       return [...(authorization?.effective ?? [])]
@@ -561,6 +573,43 @@ export default {
       // Deliberately no announce(): existing groups are untouched by a template change
       // (concept E12), so nobody's effective rights just changed.
       return { ...updated, memberCount: null }
+    },
+    elevateInGroup: async (
+      _parent,
+      params: { groupId: string; reason?: string | null },
+      context: Context,
+    ) => {
+      const { groupId } = params
+      const authorization = await context.groupAuthorization.forGroup(groupId)
+      if (!authorization) {
+        throw new UserInputError('Group not found!')
+      }
+      // Nothing to pick up means nothing to confirm: a viewer whose network rights give them
+      // only reading here would otherwise be handed a button that changes nothing.
+      if (!authorization.mayElevate) {
+        throw new UserInputError('You hold nothing here beyond reading!')
+      }
+      const actor = actorId(context)
+      const elevation = await writeElevation(
+        context.database,
+        groupId,
+        actor,
+        validateLabel(params.reason),
+      )
+      // The record is the switch AND the log entry (concept E18): who, where, why, until when.
+      // eslint-disable-next-line no-console
+      console.log(
+        `group elevation: ${actor} picked up network rights in ${groupId} until ${elevation.expiresAt}`,
+      )
+      announce(context, groupId)
+      return elevation
+    },
+    endGroupElevation: async (_parent, params: { groupId: string }, context: Context) => {
+      const ended = await clearElevation(context.database, params.groupId, actorId(context))
+      if (ended) {
+        announce(context, params.groupId)
+      }
+      return ended
     },
     applyGroupRoleTemplates: async (_parent, _args, context: Context) => {
       const [templates, untouched] = await Promise.all([

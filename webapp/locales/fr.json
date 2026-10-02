@@ -923,6 +923,15 @@
       "groupTitle": "Paramètres de ",
       "title": "Modifier mon groupe"
     },
+    "elevation": {
+      "activeTitle": "L'accès administrateur est actif.",
+      "activeUntil": "Il se termine à {time}, ou quand tu y mets fin.",
+      "end": "Terminer l'accès administrateur",
+      "offerBody": "Tu disposes de droits réseau sur ce groupe. La lecture est ouverte ; toute modification demande cette confirmation, qui est consignée auprès du groupe.",
+      "offerTitle": "Ici, tu n'agis pas en tant que membre.",
+      "reasonPlaceholder": "De quoi s'agit-il ? (facultatif)",
+      "start": "Utiliser l'accès administrateur"
+    },
     "errors": {
       "userAlreadyMember": "L'utilisateur “{name}” est déjà membre !"
     },

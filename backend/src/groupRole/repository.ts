@@ -12,6 +12,7 @@
 import { sanitizeGroupPermissions } from '@src/groupPermission'
 
 import { defaultTemplateFor } from './defaults'
+import { ELEVATION_MINUTES } from './elevation'
 import { nonMemberAccessFrom } from './nonMemberAccess'
 import { privacyLevelFrom } from './privacyLevel'
 import { parseStoredPermissions } from './storedPermissions'
@@ -606,4 +607,69 @@ export async function untouchedGroupIdsByType(db: DbContext): Promise<Map<string
       },
     ]),
   )
+}
+
+/** The live elevation of one viewer in one group, or null when there is none (./elevation.ts). */
+export async function readElevation(
+  db: DbContext,
+  groupId: string,
+  userId: string,
+): Promise<{ groupId: string; expiresAt: string; reason: string | null } | null> {
+  const result = await db.query({
+    query: `MATCH (:User {id: $userId})-[e:ELEVATED_IN]->(:Group {id: $groupId})
+            WHERE e.expiresAt > datetime()
+            RETURN toString(e.expiresAt) AS expiresAt, e.reason AS reason`,
+    variables: { groupId, userId },
+  })
+  const row = result.records[0]
+  return row
+    ? {
+        groupId,
+        expiresAt: row.get('expiresAt') as string,
+        reason: (row.get('reason') as string | null) ?? null,
+      }
+    : null
+}
+
+/**
+ * Pick up the network rights in one group for a while. MERGE rather than CREATE: asking twice
+ * extends the same record instead of leaving two, and the reason of the latest ask is the one
+ * that stands.
+ */
+export async function writeElevation(
+  db: DbContext,
+  groupId: string,
+  userId: string,
+  reason: string | null,
+): Promise<{ groupId: string; expiresAt: string; reason: string | null }> {
+  const result = await db.write({
+    query: `MATCH (u:User {id: $userId}), (g:Group {id: $groupId})
+            MERGE (u)-[e:ELEVATED_IN]->(g)
+            SET e.createdAt = datetime(),
+                e.expiresAt = datetime() + duration({minutes: $minutes}),
+                e.reason = $reason
+            RETURN toString(e.expiresAt) AS expiresAt`,
+    variables: { groupId, userId, reason, minutes: ELEVATION_MINUTES },
+  })
+  const row = result.records[0]
+  if (!row) {
+    throw new Error(`Cannot elevate in ${groupId}: no such group or user`)
+  }
+  return { groupId, expiresAt: row.get('expiresAt') as string, reason }
+}
+
+/** Put them down again. Answers whether there was anything to put down. */
+export async function clearElevation(
+  db: DbContext,
+  groupId: string,
+  userId: string,
+): Promise<boolean> {
+  const result = await db.write({
+    query: `MATCH (:User {id: $userId})-[e:ELEVATED_IN]->(:Group {id: $groupId})
+            WITH e, count(e) AS found
+            DELETE e
+            RETURN toString(found) AS found`,
+    variables: { groupId, userId },
+  })
+  return (result.records[0]?.get('found') as string | undefined) !== undefined
 }

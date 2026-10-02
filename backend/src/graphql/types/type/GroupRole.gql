@@ -54,6 +54,21 @@ type GroupRoleTemplate {
   groupCount: Int!
 }
 
+"""
+A deliberate use of a network right inside one group.
+
+Holding `group.administer.any_<visibility>` is the power to rewrite any group of that kind; this
+is the act of picking it up, and it lapses on its own. Reading is not part of it — a moderator
+reviewing a report must not have to confirm anything to see what they were asked about.
+"""
+type GroupElevation {
+  groupId: ID!
+  "When it lapses. ISO 8601."
+  expiresAt: String!
+  "What the holder said they are doing, kept with the record."
+  reason: String
+}
+
 type Query {
   "The closed catalog of group-scoped rights. Requires authentication; it is the same for every group."
   groupPermissionCatalog: [GroupPermission!]!
@@ -86,6 +101,16 @@ type Mutation {
   ): GroupRole!
   "Take a post out of a group without deleting it: the post stays with its author, it just loses its place in the group. Requires `group.post.moderate` in that group (or `group.moderate.any_<type>` network-wide). The author is notified."
   removePostFromGroup(groupId: ID!, postId: ID!): Post
+  """
+  Pick up the network rights one holds over this group, for a while.
+
+  Without it a network right gives reading and nothing else, whatever it folds in — so settings,
+  roles, memberships and moderation inside a group one is not a member of all wait for this.
+  Requires that the viewer actually holds something beyond reading there.
+  """
+  elevateInGroup(groupId: ID!, reason: String): GroupElevation!
+  "Put them down again before they lapse. Returns true when there was something to end."
+  endGroupElevation(groupId: ID!): Boolean!
   "Apply the templates to every group that has never edited its own roles, and return how many groups were changed. A group that customised its roles is left alone — its edit is not overwritten by a network default. Requires `group.roleTemplate.manage`."
   applyGroupRoleTemplates: Int!
 }

@@ -923,6 +923,15 @@
       "groupTitle": "Cilësimet e ",
       "title": "Ndrysho grupin tim"
     },
+    "elevation": {
+      "activeTitle": "Qasja si administrator është aktive.",
+      "activeUntil": "Përfundon në {time}, ose kur ta mbyllësh ti.",
+      "end": "Mbyll qasjen si administrator",
+      "offerBody": "Ke të drejta rrjeti mbi këtë grup. Leximi është i hapur; çdo ndryshim kërkon këtë konfirmim, i cili regjistrohet te grupi.",
+      "offerTitle": "Këtu nuk vepron si anëtar.",
+      "reasonPlaceholder": "Për çfarë bëhet fjalë? (opsionale)",
+      "start": "Përdor qasjen si administrator"
+    },
     "errors": {
       "userAlreadyMember": "Përdoruesi “{name}” është tashmë anëtar!"
     },

@@ -923,6 +923,15 @@
       "groupTitle": "Settings of ",
       "title": "Edit My Group"
     },
+    "elevation": {
+      "activeTitle": "Administrator access is active.",
+      "activeUntil": "It ends at {time}, or when you end it.",
+      "end": "End administrator access",
+      "offerBody": "You hold network rights over this group. Reading is open; changing anything asks for this, and the request is recorded with the group.",
+      "offerTitle": "You are not acting as a member here.",
+      "reasonPlaceholder": "What are you doing? (optional)",
+      "start": "Use administrator access"
+    },
     "errors": {
       "userAlreadyMember": "User “{name}” is already a member!"
     },

@@ -429,9 +429,19 @@ type Group {
   locationName: String
 
   """
+  Whether asking for an elevation here would grant the viewer anything beyond what they can already read.
+  """
+  mayElevateInGroup: Boolean!
+
+  """
   Number of members, excluding those with a pending join request. Null when the viewer may not see the member list (`group.members.read`): in a small group the number plus a known owner is nearly the list itself. Nullable rather than refused, so a group teaser renders without an error for a viewer who simply may not count.
   """
   membersCount: Int
+
+  """
+  The live elevation of the viewer in this group, or null when they are acting on their membership alone (see GroupElevation).
+  """
+  myGroupElevation: GroupElevation
 
   """
   The group rights the current user effectively holds here: their role's set, capped by their network permissions and by the runtime feature gates. Drives the webapp's canInGroup().
@@ -498,6 +508,22 @@ enum GroupActionRadius {
   interplanetary
   national
   regional
+}
+
+"""
+A deliberate use of a network right inside one group.
+
+Holding `group.administer.any_<visibility>` is the power to rewrite any group of that kind; this
+is the act of picking it up, and it lapses on its own. Reading is not part of it — a moderator
+reviewing a report must not have to confirm anything to see what they were asked about.
+"""
+type GroupElevation {
+  """When it lapses. ISO 8601."""
+  expiresAt: String!
+  groupId: ID!
+
+  """What the holder said they are doing, kept with the record."""
+  reason: String
 }
 
 """
@@ -1104,6 +1130,20 @@ type Mutation {
   Reversibly deactivate (disable: true) or reactivate (disable: false) a user account. Moderator-grade, subject to the act-on hierarchy.
   """
   disableUser(disable: Boolean!, id: ID!): User
+
+  """
+  Pick up the network rights one holds over this group, for a while.
+  
+  Without it a network right gives reading and nothing else, whatever it folds in — so settings,
+  roles, memberships and moderation inside a group one is not a member of all wait for this.
+  Requires that the viewer actually holds something beyond reading there.
+  """
+  elevateInGroup(groupId: ID!, reason: String): GroupElevation!
+
+  """
+  Put them down again before they lapse. Returns true when there was something to end.
+  """
+  endGroupElevation(groupId: ID!): Boolean!
 
   """
   File a moderation report against a user, post or comment. Requires authentication.
