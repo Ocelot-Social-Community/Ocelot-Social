@@ -27,7 +27,7 @@
 // (./privacyLevel.ts). Granted apart, the stricter right silently wins and the editor is left
 // with a ticked box that does nothing — which is exactly what the simple view produced: every
 // switch ticked, and the group still reported as hidden.
-import { NONE_ROLE } from './types'
+import { isActiveMembershipRole, NONE_ROLE } from './types'
 
 import type { GroupPermissionKey } from '@src/groupPermission'
 
@@ -110,4 +110,43 @@ export function storableRightsFor(
     }
   }
   return [...held]
+}
+
+/**
+ * What a role inherits from the NON-MEMBER role, because that role is the group's floor.
+ *
+ * Whatever `none` grants, the group grants to everybody — so nobody inside it can hold less
+ * than a stranger. Without this, an applicant to an open group was worse off for having asked:
+ * the seeded `pending` role carries `group.read` and `group.leave`, while `none` in a public
+ * group carries the content and the member list as well. Measured on a live instance, not
+ * imagined.
+ *
+ * Computed rather than stored: the floor follows the non-member role, so a group that opens or
+ * closes its door moves everybody with it and no row has to be rewritten.
+ *
+ * The two join rights are where the floor stops, and they stop at different roles:
+ *
+ *   - `group.join.request` is spent for anybody who already has an edge — they have asked, or
+ *     they are in;
+ *   - `group.join` is spent only for an ACTIVE membership. An applicant is deliberately not one
+ *     (`isActiveMembershipRole`), and inheriting it is the whole point: the door the group holds
+ *     open for strangers is open for them too, so they can walk in themselves instead of
+ *     waiting for an approval nobody needs any more.
+ */
+export function floorFromNonMemberRole(
+  roleName: string,
+  nonMemberPermissions: readonly GroupPermissionKey[],
+): GroupPermissionKey[] {
+  if (roleName === NONE_ROLE) {
+    return [...nonMemberPermissions]
+  }
+  return nonMemberPermissions.filter((permission) => {
+    if (permission === 'group.join.request') {
+      return false
+    }
+    if (permission === 'group.join') {
+      return !isActiveMembershipRole(roleName)
+    }
+    return true
+  })
 }

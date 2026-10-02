@@ -63,6 +63,36 @@ describe('JoinLeaveButton.vue', () => {
       expect(Wrapper().find('[data-test="join-leave-btn"]').exists()).toBe(false)
     })
 
+    it('offers an applicant the door the group has since opened', () => {
+      // Measured on a live instance: a public group anybody may walk into, with one person
+      // still waiting from when it was closed. The floor hands them `group.join` like anyone
+      // else, so the honest offer is "come in" rather than "you are waiting" — and the click
+      // must not open the leave-this-group confirmation.
+      propsData.group.myGroupPermissions = ['group.join']
+      propsData.isMember = true
+      propsData.isNonePendingMember = false
+      const wrapper = Wrapper()
+
+      expect(wrapper.vm.label).toBe('group.joinLeaveButton.join')
+      expect(wrapper.vm.mayCompleteJoin).toBe(true)
+
+      // The decision, not the request: a click must take the join path rather than open the
+      // "do you want to leave this group" confirmation every other `isMember` click opens.
+      wrapper.vm.joinLeave = jest.fn()
+      wrapper.vm.toggle()
+
+      expect(wrapper.vm.showConfirmModal).toBe(false)
+      expect(wrapper.vm.joinLeave).toHaveBeenCalled()
+    })
+
+    it('still says "waiting" where the door stayed shut', () => {
+      propsData.group.myGroupPermissions = ['group.read']
+      propsData.isMember = true
+      propsData.isNonePendingMember = false
+
+      expect(Wrapper().vm.label).toBe('group.joinLeaveButton.pendingMember')
+    })
+
     it('keeps the button for a member, whatever a stranger may do', () => {
       // Members need it to leave, and `group.leave` is what the group page disables it on.
       propsData.group.myGroupPermissions = []

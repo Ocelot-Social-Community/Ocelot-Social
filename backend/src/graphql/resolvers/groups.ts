@@ -605,12 +605,29 @@ export default {
               membership.createdAt = toString(datetime()),
               membership.updatedAt = toString(datetime()),
               membership.role = $role
+            // An applicant walking through a door that is now open to everybody: the group
+            // grants group.join to non-members, so it grants it to them as well (the floor in
+            // groupRole/mandatoryRights.ts), and without this the MERGE would find their edge
+            // and leave them waiting for an approval nobody needs.
+            //
+            // Narrow on purpose: ONLY pending becomes a member. Setting the role on every
+            // match would demote an admin the moment somebody adds them to their own group.
+            //
+            // updatedAt first and unconditionally, because two CASE expressions in one SET would
+            // have the second read the role the first just wrote.
+            ON MATCH SET
+              membership.updatedAt = toString(datetime()),
+              membership.role = CASE
+                WHEN membership.role = $pendingRole AND $role <> $pendingRole THEN $role
+                ELSE membership.role
+              END
             RETURN user {.*}, membership {.*}
           `
           const transactionResponse = await transaction.run(joinGroupCypher, {
             groupId,
             userId,
             role,
+            pendingRole: PENDING_ROLE,
           })
           const records = transactionResponse.records.map((record) => {
             return { user: record.get('user'), membership: record.get('membership') }

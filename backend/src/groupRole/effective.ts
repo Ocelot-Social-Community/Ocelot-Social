@@ -15,7 +15,8 @@ import {
   networkPrerequisiteSatisfied,
 } from '@src/groupPermission'
 
-import { OWNER_ROLE } from './types'
+import { floorFromNonMemberRole } from './mandatoryRights'
+import { NONE_ROLE, OWNER_ROLE } from './types'
 
 import type { CallDoor } from './callDoor'
 import type { AuthoritySource, GroupRoleDefinition } from './types'
@@ -56,6 +57,12 @@ export interface EffectiveGroupPermissionsInput {
   /** The viewer's effective NETWORK permissions, for the hard cap. */
   networkEffective: ReadonlySet<PermissionKey>
   /**
+   * What this group's NON-MEMBER role grants — the floor nobody inside the group falls below
+   * (see floorFromNonMemberRole). Absent means "no floor known", which costs rights rather than
+   * inventing them.
+   */
+  nonMemberPermissions?: readonly GroupPermissionKey[]
+  /**
    * Whether a stranger could walk into this group — the value `videoCall.create_<door>` is
    * resolved against (see ./callDoor.ts). Defaults to the stricter `restricted`, so a caller
    * that does not know cannot accidentally hand out the weaker cap.
@@ -73,11 +80,15 @@ export function effectiveGroupPermissions({
   role,
   networkAuthority,
   networkEffective,
+  nonMemberPermissions,
   callDoor = 'restricted',
   gateContext,
 }: EffectiveGroupPermissionsInput): Set<GroupPermissionKey> {
   const granted = new Set<GroupPermissionKey>([
     ...permissionsForGroupRole(role),
+    // The group's own floor: what it grants to strangers, it grants to everybody. An applicant
+    // to an open group used to hold LESS than somebody who never asked.
+    ...floorFromNonMemberRole(role?.name ?? NONE_ROLE, nonMemberPermissions ?? []),
     ...(networkAuthority ?? []),
   ])
   const effective = new Set<GroupPermissionKey>()
@@ -104,8 +115,13 @@ export function authoritySourceFor(
   key: GroupPermissionKey,
   role: GroupRoleDefinition | null | undefined,
   networkAuthority?: ReadonlySet<GroupPermissionKey>,
+  nonMemberPermissions?: readonly GroupPermissionKey[],
 ): AuthoritySource | null {
-  const fromMembership = permissionsForGroupRole(role).has(key)
+  // The floor counts as membership: it comes from the group's own role definitions, which is
+  // what this answer distinguishes from a `*.any_*` right carried in from the network.
+  const fromMembership =
+    permissionsForGroupRole(role).has(key) ||
+    floorFromNonMemberRole(role?.name ?? NONE_ROLE, nonMemberPermissions ?? []).includes(key)
   const fromNetwork = networkAuthority?.has(key) ?? false
   if (fromMembership && fromNetwork) {
     return 'both'

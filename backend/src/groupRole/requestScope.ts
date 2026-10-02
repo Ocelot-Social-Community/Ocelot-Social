@@ -100,6 +100,11 @@ const AUTHORIZATION_QUERY = `
   WITH g, m, e
   WITH g, coalesce(m.role, $noneRole) AS roleName, e IS NOT NULL AS elevated
   OPTIONAL MATCH (g)-[:HAS_GROUP_ROLE]->(r:GroupRole {name: roleName})
+  // The group's floor, read alongside the viewer's own role: whatever the non-member role
+  // grants, the group grants to everybody, so nobody inside it holds less than a stranger
+  // (groupRole/mandatoryRights.ts, floorFromNonMemberRole). One extra optional match on the
+  // same node, not a second round trip.
+  OPTIONAL MATCH (g)-[:HAS_GROUP_ROLE]->(nonMemberRole:GroupRole {name: $noneRole})
   RETURN ${visibilityOf('g')} AS visibility,
          elevated AS elevated,
          // The door columns, failing closed where they were never written (nonMemberAccess.ts).
@@ -110,7 +115,8 @@ const AUTHORIZATION_QUERY = `
          r.label AS label,
          r.system AS system,
          r.protected AS protected,
-         r.permissions AS permissions
+         r.permissions AS permissions,
+         nonMemberRole.permissions AS nonMemberPermissions
 `
 
 const MEMBER_ROLE_QUERY = `
@@ -185,6 +191,9 @@ export function createGroupAuthorizationScope({
           permissions: parseStoredPermissions(record.get('permissions') as string | null),
         }
       : null
+    const nonMemberPermissions = parseStoredPermissions(
+      record.get('nonMemberPermissions') as string | null,
+    )
     const visibility = record.get('visibility') as string
     // Whether a stranger could walk into this group, which is what caps opening a video call
     // (groupRole/callDoor.ts) — read off the group node rather than from its `none` role,
@@ -204,6 +213,7 @@ export function createGroupAuthorizationScope({
       role,
       networkAuthority,
       networkEffective: effectivePermissions,
+      nonMemberPermissions,
       callDoor,
       gateContext,
     })
@@ -230,6 +240,7 @@ export function createGroupAuthorizationScope({
         role,
         networkAuthority: fullNetworkAuthority,
         networkEffective: effectivePermissions,
+        nonMemberPermissions,
         callDoor,
         gateContext,
       })
@@ -256,7 +267,8 @@ export function createGroupAuthorizationScope({
       callDoor,
       effective: effectiveWithEscape,
       has: (permission) => effectiveWithEscape.has(permission),
-      sourceOf: (permission) => authoritySourceFor(permission, role, networkAuthority),
+      sourceOf: (permission) =>
+        authoritySourceFor(permission, role, networkAuthority, nonMemberPermissions),
     }
   }
 

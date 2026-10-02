@@ -80,6 +80,9 @@ export default {
       }
     },
     icon() {
+      if (this.mayCompleteJoin) {
+        return this.icons.plus
+      }
       if (this.isMember) {
         if (this.isNonePendingMember) {
           return this.hovered ? this.icons.close : this.icons.check
@@ -103,7 +106,20 @@ export default {
     mayEnter() {
       return this.mayJoinDirectly || this.mayRequestToJoin
     },
+    /**
+     * An applicant whose group has since opened its door to everybody.
+     *
+     * They hold `group.join` because the group grants it to non-members and nobody inside a
+     * group holds less than a stranger — so the honest offer is "come in", not "you are still
+     * waiting for an approval that nobody needs any more".
+     */
+    mayCompleteJoin() {
+      return this.isMember && !this.isNonePendingMember && this.mayJoinDirectly
+    },
     label() {
+      if (this.mayCompleteJoin) {
+        return this.$t('group.joinLeaveButton.join')
+      }
       if (this.isMember) {
         if (this.isNonePendingMember) {
           return this.hovered
@@ -152,7 +168,9 @@ export default {
       }
     },
     toggle() {
-      if (this.isMember) {
+      // The applicant's button is a JOIN, although they already have an edge — so it must not
+      // open the "leave this group" confirmation the way every other `isMember` click does.
+      if (this.isMember && !this.mayCompleteJoin) {
         this.showConfirmModal = true
       } else {
         this.joinLeave()
@@ -160,11 +178,12 @@ export default {
     },
     async joinLeave() {
       this.hovered = false
-      this.$emit('prepare', !this.isMember)
+      const joining = !this.isMember || this.mayCompleteJoin
+      this.$emit('prepare', joining)
       const { success, data } = await this._joinLeaveGroup({
         groupId: this.group.id,
         userId: this.userId,
-        isMember: this.isMember,
+        isMember: !joining,
       })
       if (success) {
         this.$emit('update', data)

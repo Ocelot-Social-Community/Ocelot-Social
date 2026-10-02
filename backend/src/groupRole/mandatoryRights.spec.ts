@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_GROUP_ROLE_TEMPLATES } from './defaults'
 import {
+  floorFromNonMemberRole,
   isMandatoryFor,
   isMootFor,
   MANDATORY_MEMBERSHIP_RIGHTS,
@@ -125,5 +126,53 @@ describe(isMootFor, () => {
         expect(isMootFor(roleName, permission) && isMandatoryFor(roleName, permission)).toBe(false)
       }
     }
+  })
+})
+
+describe(floorFromNonMemberRole, () => {
+  // Measured on a live instance before this existed: a public group whose `none` role carried
+  // read, content, members and join, and one person stuck as an applicant with nothing but
+  // `group.read` and `group.leave` — strictly less than somebody who never asked.
+  const openGroup = [
+    'group.read',
+    'group.content.read',
+    'group.members.read',
+    'group.join',
+  ] as const
+
+  it('hands an applicant everything a stranger gets, including the open door', () => {
+    expect(floorFromNonMemberRole('pending', openGroup)).toEqual([
+      'group.read',
+      'group.content.read',
+      'group.members.read',
+      'group.join',
+    ])
+  })
+
+  it('does not hand a member the door they already walked through', () => {
+    expect(floorFromNonMemberRole('usual', openGroup)).toEqual([
+      'group.read',
+      'group.content.read',
+      'group.members.read',
+    ])
+  })
+
+  it('applies to a role a group invented too', () => {
+    expect(floorFromNonMemberRole('steward', openGroup)).not.toContain('group.join')
+  })
+
+  it('never hands anybody the right to ask to join again', () => {
+    // Spent for everyone who already has an edge: an applicant has asked, a member is in.
+    for (const roleName of ['pending', 'usual', 'admin']) {
+      expect(floorFromNonMemberRole(roleName, ['group.join.request'])).toEqual([])
+    }
+  })
+
+  it('is the whole list for the non-member role, which IS the floor', () => {
+    expect(floorFromNonMemberRole(NONE_ROLE, openGroup)).toEqual([...openGroup])
+  })
+
+  it('adds nothing where the group grants strangers nothing', () => {
+    expect(floorFromNonMemberRole('pending', [])).toEqual([])
   })
 })

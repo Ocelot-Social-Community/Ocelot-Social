@@ -203,3 +203,65 @@ describe(authoritySourceFor, () => {
     expect(authoritySourceFor('group.role.manage', role)).toBeNull()
   })
 })
+
+describe('the floor from the non-member role', () => {
+  // The group's own rules reach everybody in it: whatever `none` grants, nobody inside holds
+  // less. Without it an applicant to an open group was worse off for having asked.
+  it('lifts an applicant to what a stranger already gets', () => {
+    const effective = effectiveGroupPermissions({
+      role: {
+        name: 'pending',
+        label: null,
+        system: true,
+        protected: false,
+        permissions: ['group.read', 'group.leave'],
+      },
+      networkEffective: new Set(),
+      nonMemberPermissions: ['group.read', 'group.content.read', 'group.members.read'],
+      gateContext: ALL_GATES_OPEN,
+    })
+
+    expect([...effective].sort()).toEqual([
+      'group.content.read',
+      'group.leave',
+      'group.members.read',
+      'group.read',
+    ])
+  })
+
+  it('leaves a member who already holds more exactly as they were', () => {
+    const effective = effectiveGroupPermissions({
+      role: {
+        name: 'usual',
+        label: null,
+        system: true,
+        protected: false,
+        permissions: ['group.read', 'group.content.read', 'group.post.create'],
+      },
+      // `group.post.create` is capped by the network's `post.create`; with an empty network set
+      // the right drops out and the test would be about the cap rather than about the floor.
+      networkEffective: NETWORK_ALL,
+      nonMemberPermissions: ['group.read'],
+      gateContext: ALL_GATES_OPEN,
+    })
+
+    expect([...effective].sort()).toEqual(['group.content.read', 'group.post.create', 'group.read'])
+  })
+
+  it('does not lift anybody above what the group grants strangers', () => {
+    const effective = effectiveGroupPermissions({
+      role: {
+        name: 'pending',
+        label: null,
+        system: true,
+        protected: false,
+        permissions: ['group.leave'],
+      },
+      networkEffective: new Set(),
+      nonMemberPermissions: [],
+      gateContext: ALL_GATES_OPEN,
+    })
+
+    expect([...effective]).toEqual(['group.leave'])
+  })
+})
