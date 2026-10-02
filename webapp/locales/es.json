@@ -228,6 +228,7 @@
       "labelField": "Nombre",
       "name": "Roles de grupo",
       "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos y no se puede editar.",
+      "resultingVisibility": "Los grupos creados con esta plantilla son:",
       "saved": "Plantilla guardada",
       "title": "Roles predeterminados para los grupos",
       "untouched": "Siguen con esta plantilla: {untouched} de {total} grupos."

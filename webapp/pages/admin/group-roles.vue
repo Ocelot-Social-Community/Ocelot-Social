@@ -3,23 +3,31 @@
     <h2 class="title">{{ $t('admin.groupRoles.title') }}</h2>
     <p class="description">{{ $t('admin.groupRoles.description') }}</p>
 
+    <!-- One tab per TEMPLATE. What a template is called and how findable the groups it creates
+         are are two different things, so the visibility is stated below rather than read into
+         the tab's name. -->
     <div class="type-tabs">
       <button
         v-for="template in templates"
-        :key="template.groupType"
+        :key="template.name"
         type="button"
         class="type-tab"
-        :class="{ 'type-tab--active': template.groupType === activeType }"
-        :data-test="`type-tab-${template.groupType}`"
-        @click="activeType = template.groupType"
-        @mouseenter="hoveredType = template.groupType"
-        @mouseleave="hoveredType = null"
+        :class="{ 'type-tab--active': template.name === activeTemplateName }"
+        :data-test="`type-tab-${template.name}`"
+        @click="activeTemplateName = template.name"
+        @mouseenter="hoveredTemplateName = template.name"
+        @mouseleave="hoveredTemplateName = null"
       >
-        {{ $t(`group.types.${template.groupType}`) }}
+        {{ $t(`group.types.${template.name}`) }}
       </button>
     </div>
 
     <template v-if="activeTemplate">
+      <p class="visibility" data-test="template-visibility">
+        {{ $t('admin.groupRoles.resultingVisibility') }}
+        <strong>{{ $t(`group.types.${activeTemplate.visibility}`) }}</strong>
+      </p>
+
       <p class="untouched" data-test="untouched">
         {{
           $t('admin.groupRoles.untouched', {
@@ -104,12 +112,12 @@ export default {
     return {
       catalog: [],
       templates: [],
-      activeType: 'public',
+      activeTemplateName: 'public',
       activeRoleName: 'usual',
-      // The TYPE tab under the cursor: hovering `closed` while editing the public template's
+      // The TEMPLATE tab under the cursor: hovering `closed` while editing the public one's
       // member role previews what a closed group's member role does differently — the question
       // these three presets exist to answer.
-      hoveredType: null,
+      hoveredTemplateName: null,
       // The role tab currently under the cursor, to preview its rights against the one being
       // edited — the same affordance the network roles page has.
       hoveredRoleName: null,
@@ -123,7 +131,7 @@ export default {
   },
   computed: {
     activeTemplate() {
-      return this.templates.find((template) => template.groupType === this.activeType) ?? null
+      return this.templates.find((template) => template.name === this.activeTemplateName) ?? null
     },
     activeRole() {
       return this.activeTemplate?.roles.find((role) => role.name === this.activeRoleName) ?? null
@@ -145,10 +153,10 @@ export default {
      * difference at a time, and a type hover is the more specific of the two.
      */
     hoveredRole() {
-      if (this.hoveredType && this.hoveredType !== this.activeType) {
+      if (this.hoveredTemplateName && this.hoveredTemplateName !== this.activeTemplateName) {
         return (
           this.templates
-            .find((template) => template.groupType === this.hoveredType)
+            .find((template) => template.name === this.hoveredTemplateName)
             ?.roles.find((role) => role.name === this.activeRoleName) ?? null
         )
       }
@@ -175,7 +183,7 @@ export default {
     },
   },
   watch: {
-    activeType() {
+    activeTemplateName() {
       this.resetDraft()
     },
     activeRoleName() {
@@ -210,7 +218,7 @@ export default {
         const { data } = await this.$apollo.mutate({
           mutation: updateGroupRoleTemplateMutation(),
           variables: {
-            groupType: this.activeType,
+            template: this.activeTemplateName,
             name: this.activeRoleName,
             permissions: this.draft,
             label: this.draftLabel || null,
@@ -226,7 +234,7 @@ export default {
     },
     mergeRole(role) {
       this.templates = this.templates.map((template) =>
-        template.groupType === this.activeType
+        template.name === this.activeTemplateName
           ? {
               ...template,
               roles: template.roles.map((candidate) =>
@@ -285,6 +293,7 @@ export default {
   margin-bottom: 0;
 }
 .description,
+.visibility,
 .untouched,
 .note {
   color: var(--text-color-soft);

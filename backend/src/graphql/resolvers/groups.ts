@@ -303,6 +303,13 @@ export default {
   Mutation: {
     CreateGroup: async (_parent, params, context: Context, _resolveInfo) => {
       const { policy } = context
+      // `visibility` is the name now; `groupType` is what it was called. Normalised once, here,
+      // so everything downstream — the shield already ran — sees one field.
+      params.groupType = params.visibility ?? params.groupType
+      delete params.visibility
+      if (!params.groupType) {
+        throw new UserInputError('A group needs a visibility!')
+      }
       const { categoryIds } = params
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
@@ -402,6 +409,11 @@ export default {
       }
     },
     UpdateGroup: async (_parent, params, context: Context, _resolveInfo) => {
+      // Same normalisation as CreateGroup: one field downstream, two names at the door.
+      if (params.visibility) {
+        params.groupType = params.visibility
+      }
+      delete params.visibility
       const { policy } = context
       const { categoryIds } = params
       delete params.categoryIds

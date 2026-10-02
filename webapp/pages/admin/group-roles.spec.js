@@ -32,7 +32,8 @@ const role = (name, permissions, extra = {}) => ({
 
 const TEMPLATES = [
   {
-    groupType: 'public',
+    name: 'public',
+    visibility: 'public',
     untouchedGroupCount: 4,
     groupCount: 7,
     roles: [
@@ -42,7 +43,8 @@ const TEMPLATES = [
     ],
   },
   {
-    groupType: 'closed',
+    name: 'closed',
+    visibility: 'closed',
     untouchedGroupCount: 0,
     groupCount: 2,
     // Deliberately different from the public template's `usual`: that difference is what a
@@ -116,7 +118,7 @@ describe('admin/group-roles.vue', () => {
       expect(classesOf(wrapper, 'group.members.read')).not.toContain('perm-row--added')
     })
 
-    it('previews the SAME role in another type when a type tab is hovered', async () => {
+    it('previews the SAME role in another template when its tab is hovered', async () => {
       // The question the three presets exist to answer: what does a closed group's member
       // role do differently from a public one's?
       const wrapper = await Wrapper()
@@ -180,12 +182,13 @@ describe('admin/group-roles.vue', () => {
     )
   })
 
-  it('offers one tab per group type and starts on public', async () => {
+  it('offers one tab per template, names the visibility it produces, and starts on public', async () => {
     const wrapper = await Wrapper()
 
     expect(at(wrapper, 'type-tab-public').exists()).toBe(true)
     expect(at(wrapper, 'type-tab-closed').exists()).toBe(true)
-    expect(wrapper.vm.activeType).toBe('public')
+    expect(wrapper.vm.activeTemplateName).toBe('public')
+    expect(at(wrapper, 'template-visibility').text()).toContain('group.types.public')
   })
 
   it('says how many groups still run on the template untouched', async () => {
@@ -199,7 +202,7 @@ describe('admin/group-roles.vue', () => {
 
     await at(wrapper, 'type-tab-closed').trigger('click')
 
-    expect(wrapper.vm.activeTemplate.groupType).toBe('closed')
+    expect(wrapper.vm.activeTemplate.name).toBe('closed')
     // The draft follows the type, so an edit cannot leak from one template into another.
     expect(wrapper.vm.draft).toEqual(['group.members.read'])
     expect(at(wrapper, 'apply').element.disabled).toBe(true)
@@ -226,7 +229,7 @@ describe('admin/group-roles.vue', () => {
     expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
       expect.objectContaining({
         variables: expect.objectContaining({
-          groupType: 'public',
+          template: 'public',
           name: 'usual',
           permissions: ['group.post.create', 'group.members.read'],
         }),

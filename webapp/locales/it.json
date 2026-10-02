@@ -228,6 +228,7 @@
       "labelField": "Nome",
       "name": "Ruoli dei gruppi",
       "ownerHoldsEverything": "Il ruolo di proprietario ha sempre tutti i permessi e non è modificabile.",
+      "resultingVisibility": "I gruppi creati da questo modello sono:",
       "saved": "Modello salvato",
       "title": "Ruoli predefiniti per i gruppi",
       "untouched": "Usano ancora questo modello: {untouched} gruppi su {total}."

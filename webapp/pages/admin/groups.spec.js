@@ -9,7 +9,7 @@ const GROUPS = [
     id: 'g1',
     slug: 'yoga',
     name: 'Yoga',
-    groupType: 'public',
+    visibility: 'public',
     disabled: false,
     createdAt: '2026-01-01T00:00:00.000Z',
     membersCount: 12,
@@ -19,7 +19,7 @@ const GROUPS = [
     id: 'g2',
     slug: 'orphan',
     name: 'Orphaned Group',
-    groupType: 'closed',
+    visibility: 'closed',
     disabled: false,
     createdAt: '2026-01-02T00:00:00.000Z',
     membersCount: 3,
@@ -30,7 +30,7 @@ const GROUPS = [
     id: 'g3',
     slug: 'silent',
     name: 'Disabled Group',
-    groupType: 'hidden',
+    visibility: 'hidden',
     disabled: true,
     createdAt: '2026-01-03T00:00:00.000Z',
     // The viewer may not see this one's member list.
@@ -110,19 +110,19 @@ describe('admin/groups.vue', () => {
 
       expect(wrapper.vm.variables).toMatchObject({
         search: null,
-        groupType: null,
+        visibility: null,
         ownerless: null,
         disabled: null,
       })
 
       wrapper.setData({
-        groupFilter: { search: 'yoga', groupType: 'closed', ownerless: true, disabled: true },
+        groupFilter: { search: 'yoga', visibility: 'closed', ownerless: true, disabled: true },
       })
       await wrapper.vm.$nextTick()
 
       expect(wrapper.vm.variables).toMatchObject({
         search: 'yoga',
-        groupType: 'closed',
+        visibility: 'closed',
         ownerless: true,
         disabled: true,
       })

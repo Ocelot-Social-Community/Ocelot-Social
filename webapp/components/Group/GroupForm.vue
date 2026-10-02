@@ -36,7 +36,7 @@
 
         <div v-if="update" class="ds-mb-base"></div>
 
-        <!-- groupType -->
+        <!-- visibility -->
         <p class="ds-text select-label">
           {{ $t('group.type') }}
         </p>
@@ -44,32 +44,32 @@
           class="select-wrap"
           :class="{
             'ds-input-has-error':
-              visibleErrors && visibleErrors.groupType && formData.groupType === '',
+              visibleErrors && visibleErrors.visibility && formData.visibility === '',
           }"
         >
           <select
             class="select ds-input appearance--auto"
-            name="groupType"
-            model="groupType"
-            :value="formData.groupType"
+            name="visibility"
+            model="visibility"
+            :value="formData.visibility"
             :disabled="update && !canInGroup('group.role.manage', group)"
             @change="changeGroupType($event)"
-            @blur="touchField('groupType')"
+            @blur="touchField('visibility')"
           >
             <option
-              v-for="groupType in groupTypeOptions"
-              :key="groupType"
-              :value="groupType"
-              :disabled="groupType !== group.groupType && !$can(`group.create_${groupType}`)"
+              v-for="visibility in visibilityOptions"
+              :key="visibility"
+              :value="visibility"
+              :disabled="visibility !== group.visibility && !$can(`group.create_${visibility}`)"
             >
-              {{ $t(`group.typesOptions.${groupType}`) }}
+              {{ $t(`group.typesOptions.${visibility}`) }}
             </option>
           </select>
         </div>
         <os-validation-hint
-          v-if="visibleErrors && visibleErrors.groupType && formData.groupType === ''"
+          v-if="visibleErrors && visibleErrors.visibility && formData.visibility === ''"
           variant="error"
-          :text="$t('group.validations.groupTypeRequired')"
+          :text="$t('group.validations.visibilityRequired')"
         />
 
         <!-- showMembers -->
@@ -78,10 +78,10 @@
             id="show-members"
             type="checkbox"
             :checked="effectiveShowMembers"
-            :disabled="formData.groupType !== 'closed'"
+            :disabled="formData.visibility !== 'closed'"
             @change="updateFormField('showMembers', $event.target.checked)"
           />
-          <label for="show-members" :class="{ 'is-disabled': formData.groupType !== 'closed' }">
+          <label for="show-members" :class="{ 'is-disabled': formData.visibility !== 'closed' }">
             {{ $t('group.showMembers') }}
           </label>
         </div>
@@ -255,7 +255,7 @@ export default {
     const {
       name,
       slug,
-      groupType,
+      visibility,
       about,
       description,
       actionRadius,
@@ -267,7 +267,7 @@ export default {
     return {
       disabled: false,
       loading: false,
-      groupTypeOptions: ['public', 'closed', 'hidden'],
+      visibilityOptions: ['public', 'closed', 'hidden'],
       loadingGeo: false,
       cities: [],
       // Whether the location has actually been changed by the user (map
@@ -299,7 +299,7 @@ export default {
       formData: {
         name: name || '',
         slug: slug || '',
-        groupType: groupType || '',
+        visibility: visibility || '',
         about: about || '',
         description: description || '',
         locationName: locationName || '',
@@ -360,7 +360,7 @@ export default {
             return []
           },
         },
-        groupType: { required: true, min: 1 },
+        visibility: { required: true, min: 1 },
         about: { required: false },
         description: {
           type: 'string',
@@ -467,7 +467,7 @@ export default {
     // "create group" entry point is open if the user may create at least one type, and
     // the submit gate keys off the currently selected type.
     canCreateAnyGroup() {
-      return this.groupTypeOptions.some((type) => this.$can(`group.create_${type}`))
+      return this.visibilityOptions.some((type) => this.$can(`group.create_${type}`))
     },
     // Switching an existing group TO hidden additionally needs
     // group.create_hidden (the privacy-raising transition); editing an
@@ -478,7 +478,7 @@ export default {
     // the submit button looking fully enabled while clicking it silently
     // did nothing).
     canSubmitHiddenTransition() {
-      if (this.formData.groupType !== 'hidden' || this.group.groupType === 'hidden') return true
+      if (this.formData.visibility !== 'hidden' || this.group.visibility === 'hidden') return true
       return this.$can('group.create_hidden')
     },
     canCreateSelectedGroup() {
@@ -488,18 +488,18 @@ export default {
       // would wrongly flag "denied" for someone who can create every
       // type, just hasn't picked one. Fall back to "can create at least
       // one type" until they do.
-      if (!this.formData.groupType) return this.canCreateAnyGroup
-      return this.$can(`group.create_${this.formData.groupType}`) && this.canSubmitHiddenTransition
+      if (!this.formData.visibility) return this.canCreateAnyGroup
+      return this.$can(`group.create_${this.formData.visibility}`) && this.canSubmitHiddenTransition
     },
     effectiveShowMembers() {
-      if (this.formData.groupType === 'public') return true
-      if (this.formData.groupType === 'hidden') return false
+      if (this.formData.visibility === 'public') return true
+      if (this.formData.visibility === 'hidden') return false
       return this.formData.showMembers
     },
     // Exposed (via $refs) for the page component's own beforeRouteLeave
     // guard, and used below for the native beforeunload prompt. dirtyFields
     // covers every field wired through updateFormField()/$parentForm.update
-    // (name, slug, groupType, about, description, actionRadius, showMembers,
+    // (name, slug, visibility, about, description, actionRadius, showMembers,
     // categoryIds) — locationChangedByUser covers the location field
     // separately, since it's set directly rather than through
     // updateFormField (see onLocationSelectInput/onLocationPickerMapInput;
@@ -548,7 +548,7 @@ export default {
       event.returnValue = ''
     },
     changeGroupType(event) {
-      this.updateFormField('groupType', event.target.value)
+      this.updateFormField('visibility', event.target.value)
     },
     changeActionRadius(event) {
       this.updateFormField('actionRadius', event.target.value)
@@ -578,16 +578,16 @@ export default {
       // Block creating a group of a type the user may not create (the button is grayed;
       // this also guards keyboard Enter and direct navigation to the form). Only once a
       // type is actually chosen — same fix as canCreateSelectedGroup: checking
-      // `$can('group.create_')` (empty suffix) for an untouched, still-empty groupType
+      // `$can('group.create_')` (empty suffix) for an untouched, still-empty visibility
       // is never true for anyone, so this used to silently block every submit attempt
       // on a fresh form (no validation, no toast, nothing) even for an admin who can
       // create every type. Submitting with no type chosen should fall through to
-      // formSubmit() instead, so the schema's own "groupType is required" catches it
+      // formSubmit() instead, so the schema's own "visibility is required" catches it
       // and shows the usual error + toast like any other invalid field.
       if (
         !this.update &&
-        this.formData.groupType &&
-        !this.$can(`group.create_${this.formData.groupType}`)
+        this.formData.visibility &&
+        !this.$can(`group.create_${this.formData.visibility}`)
       )
         return
       // Switching an existing group TO hidden additionally needs group.create_hidden
@@ -600,11 +600,12 @@ export default {
     },
     submit() {
       this.loading = true
-      const { name, slug, about, description, groupType, actionRadius, categoryIds } = this.formData
+      const { name, slug, about, description, visibility, actionRadius, categoryIds } =
+        this.formData
       const variables = {
         name,
         slug,
-        groupType,
+        visibility,
         about,
         description,
         actionRadius,
@@ -711,7 +712,7 @@ export default {
   }
 
   /* Same zeroed margin as .ds-form-item above (OcelotInput's own root) —
-     without it, the groupType/actionRadius selects sat noticeably further
+     without it, the visibility/actionRadius selects sat noticeably further
      from their validation hint below than name/description do, since
      those two are the only fields wrapped in an extra div (for the
      ds-input-has-error red border; see the template) and that div had no
@@ -720,7 +721,7 @@ export default {
     margin: 0;
   }
 
-  /* Unlike groupType's select-wrap (whose next sibling is the checkbox and
+  /* Unlike visibility's select-wrap (whose next sibling is the checkbox and
      stays deliberately tight, handled above), actionRadius's next sibling
      is the next field group (location) and should keep the same
      space-base gap every other field-to-field transition uses — there is
@@ -744,7 +745,7 @@ export default {
   }
 
   /* .show-members-control's own margin-top (8px, above) assumes it's
-     sitting right after the groupType select directly. When the select's
+     sitting right after the visibility select directly. When the select's
      validation hint is showing instead (error state), that hint's own
      margin-bottom (16px, from the rule above — meant for the general case
      of one field's hint to the next field) adds to those 8px instead of

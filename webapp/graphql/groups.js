@@ -12,7 +12,7 @@ export const createGroupMutation = () => {
       $slug: String
       $about: String
       $description: String!
-      $groupType: GroupType!
+      $visibility: GroupVisibility!
       $actionRadius: GroupActionRadius!
       $categoryIds: [ID]
       $locationName: String # empty string '' sets it to null
@@ -26,7 +26,7 @@ export const createGroupMutation = () => {
         slug: $slug
         about: $about
         description: $description
-        groupType: $groupType
+        visibility: $visibility
         actionRadius: $actionRadius
         categoryIds: $categoryIds
         locationName: $locationName
@@ -43,7 +43,7 @@ export const createGroupMutation = () => {
         deleted
         about
         description
-        groupType
+        visibility
         actionRadius
         categories {
           id
@@ -73,7 +73,7 @@ export const updateGroupMutation = () => {
       $slug: String
       $about: String
       $description: String
-      $groupType: GroupType
+      $visibility: GroupVisibility
       $actionRadius: GroupActionRadius
       $categoryIds: [ID]
       $avatar: ImageInput
@@ -88,7 +88,7 @@ export const updateGroupMutation = () => {
         slug: $slug
         about: $about
         description: $description
-        groupType: $groupType
+        visibility: $visibility
         actionRadius: $actionRadius
         categoryIds: $categoryIds
         avatar: $avatar
@@ -106,7 +106,7 @@ export const updateGroupMutation = () => {
         deleted
         about
         description
-        groupType
+        visibility
         actionRadius
         categories {
           id
@@ -188,7 +188,7 @@ export const myGroupsForPostCreation = () => gql`
       id
       name
       slug
-      groupType
+      visibility
       categories {
         id
         slug
@@ -214,7 +214,7 @@ export const groupQuery = (i18n) => {
         deleted
         about
         description
-        groupType
+        visibility
         actionRadius
         isMutedByMe
         categories {
@@ -250,7 +250,7 @@ export const groupEditQuery = () => {
         slug
         about
         description
-        groupType
+        visibility
         actionRadius
         locationName
         categories {
@@ -341,7 +341,7 @@ export const groupTeaserQuery = (i18n) => {
         name
         slug
         about
-        groupType
+        visibility
         actionRadius
         myGroupRole {
           name

@@ -21,7 +21,7 @@ const group = {
   id: 'g1',
   name: 'Yoga Practice',
   slug: 'yoga-practice',
-  groupType: 'public',
+  visibility: 'public',
   actionRadius: 'regional',
   about: 'Yoga',
   description:

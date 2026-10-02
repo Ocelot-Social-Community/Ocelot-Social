@@ -394,7 +394,7 @@ type FiledReport {
 }
 
 """
-A group: a space where members share posts, chat and optionally hold video calls. Discoverability and joining are governed by its groupType.
+A group: a space where members share posts, chat and optionally hold video calls. How findable it is follows from its rights (`visibility`); who may do what inside it follows from its roles.
 """
 type Group {
   """Short statement of the group's goal."""
@@ -415,9 +415,9 @@ type Group {
   disabled: Boolean
 
   """
-  DERIVED from the group's rights, not chosen: `hidden` while its non-member role cannot read the profile, `closed` while it cannot read the content, `public` otherwise. Setting it through UpdateGroup applies the matching preset to the `none` and `pending` roles; the per-level network rights (group.create_*, group.administer.any_*, group.content.read.any_*) read it.
+  The same value under its old name. Deprecated: it was never a `type` the group HAS, it is the visibility its rights RESULT in.
   """
-  groupType: GroupType!
+  groupType: GroupType! @deprecated(reason: "Use `visibility`. Same three values; this field is the old name for what the rights derive to.")
   id: ID!
 
   """Invite codes to this group the current user has generated."""
@@ -482,6 +482,11 @@ type Group {
 
   """ISO 8601 date-time string of the last update."""
   updatedAt: String!
+
+  """
+  How findable this group is — DERIVED from its rights, not chosen: `hidden` while its non-member role cannot read the profile, `closed` while it cannot read the content, `public` otherwise. Setting it through UpdateGroup applies the matching role template; the per-level network rights (group.create_*, group.administer.any_*, group.content.read.any_*) read it.
+  """
+  visibility: GroupVisibility!
 }
 
 """The geographic reach a group intends its activities to have."""
@@ -588,27 +593,51 @@ type GroupRole {
 }
 
 """
-The network-wide default role set a new group of that type is seeded from.
+A named set of roles a new group starts from.
+
+Its NAME and the visibility it results in are two different things, and the type says so: the
+name identifies the template an operator edits and groups are created from, `visibility` is what
+the rights in its non-member role derive to (groupRole/privacyLevel.ts). They agree for the three
+shipped templates — a drift guard keeps them agreeing — but a template is a starting point and a
+visibility is a property of a group, and only one of them changes when a group edits its rights.
 """
 type GroupRoleTemplate {
   """
-  How many groups of this type exist at all, so the count above can be read as a share rather than as an absolute.
+  How many groups run on this template at all, so the count above can be read as a share rather than as an absolute.
   """
   groupCount: Int!
-  groupType: String!
+
+  """
+  The template's name under its old key. Deprecated: a template is not a group type.
+  """
+  groupType: String! @deprecated(reason: "Use `name` for the template and `visibility` for what it derives to.")
+
+  """
+  What this template is called. The three shipped ones are named after the visibility they produce.
+  """
+  name: String!
   roles: [GroupRole!]!
 
   """
   How many groups still run on this template untouched — the ones an `applyGroupRoleTemplates` would reach.
   """
   untouchedGroupCount: Int!
+
+  """The visibility a group created from this template starts with."""
+  visibility: GroupVisibility!
 }
 
 type GroupShowMembersChanged {
   groupId: ID!
 }
 
-"""Determines a group's discoverability and how users become members."""
+"""
+The visibility of a group, under its old name.
+
+Deprecated: a group's `type` was a CHOICE an operator made, and the rights that followed from it
+could drift away from the label. It is a RESULT now — of two rights on the group's non-member
+role — which is what `GroupVisibility` says. Same three values; existing clients keep working.
+"""
 enum GroupType {
   """
   Anyone can find the group, but joining requires approval by a group admin/owner.
@@ -619,6 +648,23 @@ enum GroupType {
   hidden
 
   """Anyone can find the group and join without approval."""
+  public
+}
+
+"""
+How findable a group is, and therefore how private: derived from what its non-member role may
+read (see backend/src/groupRole/privacyLevel.ts), not chosen.
+"""
+enum GroupVisibility {
+  """The group is findable, its content is not."""
+  closed
+
+  """
+  Unlisted: the group is not findable at all, and reachable only through an invite.
+  """
+  hidden
+
+  """Profile and content are open to everybody, members or not."""
   public
 }
 
@@ -812,14 +858,16 @@ type Mutation {
   CreateComment(content: String!, id: ID, postId: ID!): Comment
 
   """
-  Create a group. Requires authentication and the `group.create_<type>` permission matching the chosen groupType.
+  Create a group. Requires authentication and the `group.create_<visibility>` permission matching the chosen visibility. The new group starts from the role template of that visibility.
   """
   CreateGroup(
     about: String
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
     description: String!
-    groupType: GroupType!
+
+    """Deprecated: Use `visibility`."""
+    groupType: GroupType
     id: ID
 
     """
@@ -835,6 +883,11 @@ type Mutation {
     name: String!
     showMembers: Boolean
     slug: String
+
+    """
+    Which role template the group starts from, and therefore how findable it is. Exactly one of `visibility` and the deprecated `groupType` is required.
+    """
+    visibility: GroupVisibility
   ): Group
 
   """Create (or fetch) the chat room for a group. Requires authentication."""
@@ -933,6 +986,8 @@ type Mutation {
     avatar: ImageInput
     categoryIds: [ID]
     description: String
+
+    """Deprecated: Use `visibility`."""
     groupType: GroupType
     id: ID!
 
@@ -949,6 +1004,11 @@ type Mutation {
     name: String
     showMembers: Boolean
     slug: String
+
+    """
+    Applying a visibility writes the matching role template onto the `none` and `pending` roles — the rights ARE the visibility, so this is a preset rather than a label.
+    """
+    visibility: GroupVisibility
   ): Group
 
   """Update one of your own posts. Restricted to the author."""
@@ -1137,7 +1197,7 @@ type Mutation {
   requestPasswordReset(email: String!, locale: String!): Boolean!
 
   """
-  Put a group's roles back on the network template for its group type. Roles the template does not have are removed and their members become ordinary members.
+  Put a group's roles back on the network template it was created from. Roles the template does not have are removed and their members become ordinary members.
   """
   resetGroupRoles(groupId: ID!): [GroupRole!]!
 
@@ -1266,9 +1326,20 @@ type Mutation {
   updateGroupRole(groupId: ID!, label: String, name: String!, permissions: [String!]!): GroupRole!
 
   """
-  Change one role of the network-wide template for a group type. Existing groups are NOT touched — that is what applyGroupRoleTemplates is for. Requires `group.roleTemplate.manage`.
+  Change one role of a network-wide template. Existing groups are NOT touched — that is what applyGroupRoleTemplates is for. Requires `group.roleTemplate.manage`.
   """
-  updateGroupRoleTemplate(groupType: String!, label: String, name: String!, permissions: [String!]!): GroupRole!
+  updateGroupRoleTemplate(
+    """Deprecated: Use `template`."""
+    groupType: String
+    label: String
+    name: String!
+    permissions: [String!]!
+
+    """
+    Which template. Exactly one of `template` and the deprecated `groupType` is required.
+    """
+    template: String
+  ): GroupRole!
 
   """Update the current user's online/away status. Requires authentication."""
   updateOnlineStatus(status: OnlineStatus!): Boolean!
@@ -1738,14 +1809,24 @@ type Query {
   VerifyNonce(email: String!, nonce: String!): Boolean!
 
   """How many groups the same filters match, for paging the admin list."""
-  adminGroupCount(disabled: Boolean, groupType: GroupType, ownerless: Boolean, search: String): Int!
+  adminGroupCount(
+    disabled: Boolean
+
+    """Deprecated: Use `visibility`."""
+    groupType: GroupType
+    ownerless: Boolean
+    search: String
+    visibility: GroupVisibility
+  ): Int!
 
   """
-  Every group the viewer may administer, for the admin area — including the hidden ones, which are reachable no other way. Restricted to the group types the viewer holds `group.administer.any_<type>` for. Set `ownerless` to find the groups that have no owner left.
+  Every group the viewer may administer, for the admin area — including the hidden ones, which are reachable no other way. Restricted to the visibilities the viewer holds `group.administer.any_<visibility>` for. Set `ownerless` to find the groups that have no owner left.
   """
   adminGroups(
     disabled: Boolean
     first: Int
+
+    """Deprecated: Use `visibility`."""
     groupType: GroupType
     offset: Int
 
@@ -1754,6 +1835,7 @@ type Query {
 
     """Free-text match on name and slug."""
     search: String
+    visibility: GroupVisibility
   ): [Group!]!
 
   """

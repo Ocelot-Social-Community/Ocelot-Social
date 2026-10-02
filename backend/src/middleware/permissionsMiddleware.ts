@@ -99,8 +99,14 @@ export const groupCreatePermissionForType = (groupType: string): PermissionKey |
       return null
   }
 }
+// Both names for the same argument. The shield runs BEFORE the resolver normalises them, so it
+// has to read either — a rule that only knew the old name would wave the new one through.
+const requestedVisibility = (args: Record<string, unknown>): string | null =>
+  (args.visibility as string | null) ?? (args.groupType as string | null) ?? null
+
 const canCreateGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
-  const permission = groupCreatePermissionForType(args.groupType)
+  const requested = requestedVisibility(args)
+  const permission = requested === null ? null : groupCreatePermissionForType(requested)
   // Same check as hasPermission(), but the permission depends on the requested groupType,
   // so it can't be a static hasPermission() gate. group.create_* is gated by groupsEnabled,
   // so hasPermissionEffective also blocks creation when groups are off.
@@ -441,11 +447,12 @@ const parentHasGroupPermission = (permission: GroupPermissionKey) =>
     return !!authorization && authorization.has(permission)
   })
 
-// Changing the group TYPE is its own right on top of the settings right, because it flips the
-// visibility of everything inside — and it is capped by the network right to create a group of
-// the target type, so switching is never a way around group.create_<type>.
+// Setting the visibility writes the matching role template onto the group's non-member and
+// applicant roles — so it asks for the right that governs roles, capped by the network right to
+// CREATE a group that private (E10): switching is never a way around group.create_<visibility>.
 const canChangeGroupType = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
-  if (args.groupType === undefined || args.groupType === null) {
+  const requested = requestedVisibility(args)
+  if (requested === null) {
     return true
   }
   const authorization = await ctx.groupAuthorization.forGroup(args.id)
@@ -455,7 +462,7 @@ const canChangeGroupType = rule({ cache: 'no_cache' })(async (_parent, args, ctx
   // Sending the type the group already has is not a change. The group form posts every field
   // it knows, so demanding the right for an unchanged value would stop an owner who may not
   // create hidden groups from editing the hidden group they already own.
-  if (args.groupType === authorization.groupType) {
+  if (requested === authorization.groupType) {
     return true
   }
   // Setting the type IS editing the group's non-member and applicant roles — the preset writes
@@ -469,7 +476,7 @@ const canChangeGroupType = rule({ cache: 'no_cache' })(async (_parent, args, ctx
   // created the group that way, or "public now, hidden in a minute" is the way around
   // `group.create_hidden`. The same cap guards the rights matrix, which is the other way to
   // the same result (see requirePrivacyCap in resolvers/groupRoles.ts).
-  const target = args.groupType as GroupPrivacyLevel
+  const target = requested as GroupPrivacyLevel
   if (!isMorePrivate(target, authorization.groupType as GroupPrivacyLevel)) {
     return true
   }

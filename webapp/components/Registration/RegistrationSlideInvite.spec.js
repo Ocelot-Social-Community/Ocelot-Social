@@ -91,7 +91,7 @@ describe('RegistrationSlideInvite', () => {
               response: {
                 validateInviteCode: {
                   generatedBy: { name: 'Host' },
-                  invitedTo: { name: 'Group', groupType: 'public' },
+                  invitedTo: { name: 'Group', visibility: 'public' },
                 },
               },
             },
@@ -101,7 +101,7 @@ describe('RegistrationSlideInvite', () => {
       const wrapper = Wrapper()
       await wrapper.setData({ formData: { inviteCode: 'ABCDEF' } })
       expect(wrapper.vm.invitedBy).toEqual({ name: 'Host' })
-      expect(wrapper.vm.invitedTo).toEqual({ name: 'Group', groupType: 'public' })
+      expect(wrapper.vm.invitedTo).toEqual({ name: 'Group', visibility: 'public' })
     })
   })
 
@@ -123,14 +123,14 @@ describe('RegistrationSlideInvite', () => {
     }
 
     it('shows the hidden-group message for a hidden group invite', async () => {
-      const wrapper = mountWithInvite({ name: 'Secret', groupType: 'hidden' })
+      const wrapper = mountWithInvite({ name: 'Secret', visibility: 'hidden' })
       await flushPromises()
       await wrapper.vm.$nextTick()
       expect(wrapper.text()).toContain('invited-to-hidden-group')
     })
 
     it('shows the invited-by-and-to message for a normal group invite', async () => {
-      const wrapper = mountWithInvite({ name: 'Group', groupType: 'public' })
+      const wrapper = mountWithInvite({ name: 'Group', visibility: 'public' })
       await flushPromises()
       await wrapper.vm.$nextTick()
       expect(wrapper.text()).toContain('invited-by-and-to')

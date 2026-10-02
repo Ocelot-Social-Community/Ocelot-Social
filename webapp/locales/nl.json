@@ -228,6 +228,7 @@
       "labelField": "Naam",
       "name": "Groepsrollen",
       "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten en kan niet worden aangepast.",
+      "resultingVisibility": "Groepen uit dit sjabloon zijn:",
       "saved": "Sjabloon opgeslagen",
       "title": "Standaardrollen voor groepen",
       "untouched": "Draaien nog op dit sjabloon: {untouched} van {total} groepen."

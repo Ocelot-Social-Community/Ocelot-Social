@@ -167,6 +167,8 @@ const touched = async (context: Context, groupId: string, now: string): Promise<
 
 interface AdminGroupFilter {
   search?: string | null
+  /** The new name for the same filter; `groupType` is what it used to be called. */
+  visibility?: string | null
   groupType?: string | null
   ownerless?: boolean | null
   disabled?: boolean | null
@@ -194,7 +196,8 @@ const administrableGroupTypes = (context: Context): string[] =>
  */
 const adminGroupList = async (context: Context, params: AdminGroupFilter, countOnly = false) => {
   const types = administrableGroupTypes(context)
-  const requested = params.groupType ? [params.groupType].filter((t) => types.includes(t)) : types
+  const asked = params.visibility ?? params.groupType
+  const requested = asked ? [asked].filter((type) => types.includes(type)) : types
   if (requested.length === 0) {
     return countOnly ? 0 : []
   }
@@ -258,6 +261,14 @@ export default {
           PRIVACY_LEVELS.indexOf(b as GroupPrivacyLevel),
       )
       return ordered.map(([groupType, roles]) => ({
+        // The template's NAME and the visibility it produces: the same string today, because
+        // the three shipped templates are named after what they derive to (and a drift guard
+        // keeps them that way). Two fields, because they answer two different questions — one
+        // about the template an operator edits, one about the groups it creates.
+        name: groupType,
+        visibility: privacyLevelOfPermissions(
+          roles.find((role) => role.name === NONE_ROLE)?.permissions,
+        ),
         groupType,
         roles: roles.map((role) => ({ ...role, memberCount: null })),
         untouchedGroupCount: untouched.get(groupType)?.untouchedIds.length ?? 0,
@@ -498,10 +509,22 @@ export default {
     },
     updateGroupRoleTemplate: async (
       _parent,
-      params: { groupType: string; name: string; permissions: string[]; label?: string | null },
+      params: {
+        template?: string | null
+        groupType?: string | null
+        name: string
+        permissions: string[]
+        label?: string | null
+      },
       context: Context,
     ) => {
-      const { groupType, name } = params
+      const { name } = params
+      // `template` is the name of the thing being edited; `groupType` is what it used to be
+      // called. One of them has to be there — the schema cannot say "exactly one" itself.
+      const groupType = params.template ?? params.groupType
+      if (!groupType) {
+        throw new UserInputError('Which template? Pass `template`.')
+      }
       const templates = await readGroupRoleTemplates(context.database)
       const existing = new Map(Object.entries(templates))
         .get(groupType)

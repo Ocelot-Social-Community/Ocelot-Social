@@ -16,7 +16,7 @@ export const groupRightsQuery = () => gql`
       id
       slug
       name
-      groupType
+      visibility
       myGroupPermissions
       roles {
         name

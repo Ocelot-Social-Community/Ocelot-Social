@@ -228,6 +228,7 @@
       "labelField": "Nazwa",
       "name": "Role w grupach",
       "ownerHoldsEverything": "Rola właściciela ma zawsze wszystkie uprawnienia i nie da się jej edytować.",
+      "resultingVisibility": "Grupy utworzone z tego szablonu są:",
       "saved": "Szablon zapisany",
       "title": "Domyślne role dla grup",
       "untouched": "Nadal korzystają z tego szablonu: {untouched} z {total} grup."

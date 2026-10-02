@@ -144,7 +144,7 @@ export default {
     groupsByType() {
       if (this.myProfile) {
         return GROUP_SECTIONS_BY_TYPE.reduce((acc, type) => {
-          acc[type] = (this.groups || []).filter((g) => g.groupType === type)
+          acc[type] = (this.groups || []).filter((g) => g.visibility === type)
           return acc
         }, {})
       }

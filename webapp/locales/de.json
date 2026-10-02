@@ -228,6 +228,7 @@
       "labelField": "Name",
       "name": "Gruppen-Rollen",
       "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte und ist nicht bearbeitbar.",
+      "resultingVisibility": "Gruppen aus dieser Vorlage sind:",
       "saved": "Vorlage gespeichert",
       "title": "Standard-Rollen fuer Gruppen",
       "untouched": "Läuft noch auf diesem Template: {untouched} von {total} Gruppen."

@@ -15,7 +15,7 @@
 #   updatedAt_desc
 # }
 
-"A group: a space where members share posts, chat and optionally hold video calls. Discoverability and joining are governed by its groupType."
+"A group: a space where members share posts, chat and optionally hold video calls. How findable it is follows from its rights (`visibility`); who may do what inside it follows from its roles."
 type Group {
   id: ID!
   "The group's title."
@@ -36,8 +36,10 @@ type Group {
   about: String
   "Full group description (rich text)."
   description: String!
-  "DERIVED from the group's rights, not chosen: `hidden` while its non-member role cannot read the profile, `closed` while it cannot read the content, `public` otherwise. Setting it through UpdateGroup applies the matching preset to the `none` and `pending` roles; the per-level network rights (group.create_*, group.administer.any_*, group.content.read.any_*) read it."
-  groupType: GroupType!
+  "How findable this group is — DERIVED from its rights, not chosen: `hidden` while its non-member role cannot read the profile, `closed` while it cannot read the content, `public` otherwise. Setting it through UpdateGroup applies the matching role template; the per-level network rights (group.create_*, group.administer.any_*, group.content.read.any_*) read it."
+  visibility: GroupVisibility!
+  "The same value under its old name. Deprecated: it was never a `type` the group HAS, it is the visibility its rights RESULT in."
+  groupType: GroupType! @deprecated(reason: "Use `visibility`. Same three values; this field is the old name for what the rights derive to.")
   actionRadius: GroupActionRadius!
 
   locationName: String
@@ -105,10 +107,12 @@ type Query {
   "Count groups, optionally restricted to the current user's memberships. Requires authentication."
   GroupCount(isMember: Boolean): Int
 
-  "Every group the viewer may administer, for the admin area — including the hidden ones, which are reachable no other way. Restricted to the group types the viewer holds `group.administer.any_<type>` for. Set `ownerless` to find the groups that have no owner left."
+  "Every group the viewer may administer, for the admin area — including the hidden ones, which are reachable no other way. Restricted to the visibilities the viewer holds `group.administer.any_<visibility>` for. Set `ownerless` to find the groups that have no owner left."
   adminGroups(
     "Free-text match on name and slug."
     search: String
+    visibility: GroupVisibility
+    "Deprecated: Use `visibility`."
     groupType: GroupType
     "Only groups whose owner role has no members."
     ownerless: Boolean
@@ -119,6 +123,8 @@ type Query {
   "How many groups the same filters match, for paging the admin list."
   adminGroupCount(
     search: String
+    visibility: GroupVisibility
+    "Deprecated: Use `visibility`."
     groupType: GroupType
     ownerless: Boolean
     disabled: Boolean
@@ -132,14 +138,17 @@ type Query {
 }
 
 type Mutation {
-  "Create a group. Requires authentication and the `group.create_<type>` permission matching the chosen groupType."
+  "Create a group. Requires authentication and the `group.create_<visibility>` permission matching the chosen visibility. The new group starts from the role template of that visibility."
   CreateGroup(
     id: ID
     name: String!
     slug: String
     about: String
     description: String!
-    groupType: GroupType!
+    "Which role template the group starts from, and therefore how findable it is. Exactly one of `visibility` and the deprecated `groupType` is required."
+    visibility: GroupVisibility
+    "Deprecated: Use `visibility`."
+    groupType: GroupType
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
 
@@ -162,6 +171,9 @@ type Mutation {
     about: String
     description: String
 
+    "Applying a visibility writes the matching role template onto the `none` and `pending` roles — the rights ARE the visibility, so this is a preset rather than a label."
+    visibility: GroupVisibility
+    "Deprecated: Use `visibility`."
     groupType: GroupType
 
     actionRadius: GroupActionRadius

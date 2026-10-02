@@ -31,13 +31,26 @@ type GroupRole {
   memberCount: Int
 }
 
-"The network-wide default role set a new group of that type is seeded from."
+"""
+A named set of roles a new group starts from.
+
+Its NAME and the visibility it results in are two different things, and the type says so: the
+name identifies the template an operator edits and groups are created from, `visibility` is what
+the rights in its non-member role derive to (groupRole/privacyLevel.ts). They agree for the three
+shipped templates — a drift guard keeps them agreeing — but a template is a starting point and a
+visibility is a property of a group, and only one of them changes when a group edits its rights.
+"""
 type GroupRoleTemplate {
-  groupType: String!
+  "What this template is called. The three shipped ones are named after the visibility they produce."
+  name: String!
+  "The visibility a group created from this template starts with."
+  visibility: GroupVisibility!
+  "The template's name under its old key. Deprecated: a template is not a group type."
+  groupType: String! @deprecated(reason: "Use `name` for the template and `visibility` for what it derives to.")
   roles: [GroupRole!]!
   "How many groups still run on this template untouched — the ones an `applyGroupRoleTemplates` would reach."
   untouchedGroupCount: Int!
-  "How many groups of this type exist at all, so the count above can be read as a share rather than as an absolute."
+  "How many groups run on this template at all, so the count above can be read as a share rather than as an absolute."
   groupCount: Int!
 }
 
@@ -57,13 +70,16 @@ type Mutation {
   renameGroupRole(groupId: ID!, name: String!, newName: String!): GroupRole!
   "Delete a non-system role. Its members move to `reassignTo`, so no membership is left pointing at a role that no longer exists. Returns the deleted name."
   deleteGroupRole(groupId: ID!, name: String!, reassignTo: String!): String!
-  "Put a group's roles back on the network template for its group type. Roles the template does not have are removed and their members become ordinary members."
+  "Put a group's roles back on the network template it was created from. Roles the template does not have are removed and their members become ordinary members."
   resetGroupRoles(groupId: ID!): [GroupRole!]!
   "Set a member's role by name. Subject to the act-on rules: the actor must outrank the member and must hold every right the assigned role grants."
   setGroupMemberRole(groupId: ID!, userId: ID!, roleName: String!): GroupMember!
-  "Change one role of the network-wide template for a group type. Existing groups are NOT touched — that is what applyGroupRoleTemplates is for. Requires `group.roleTemplate.manage`."
+  "Change one role of a network-wide template. Existing groups are NOT touched — that is what applyGroupRoleTemplates is for. Requires `group.roleTemplate.manage`."
   updateGroupRoleTemplate(
-    groupType: String!
+    "Which template. Exactly one of `template` and the deprecated `groupType` is required."
+    template: String
+    "Deprecated: Use `template`."
+    groupType: String
     name: String!
     permissions: [String!]!
     label: String

@@ -228,6 +228,7 @@
       "labelField": "Emri",
       "name": "Rolet e grupeve",
       "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet dhe nuk mund të redaktohet.",
+      "resultingVisibility": "Grupet e krijuara nga ky shabllon janë:",
       "saved": "Shablloni u ruajt",
       "title": "Rolet e parazgjedhura për grupet",
       "untouched": "Ende përdorin këtë shabllon: {untouched} nga {total} grupe."

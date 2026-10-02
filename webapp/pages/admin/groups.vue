@@ -11,9 +11,9 @@
         data-test="search"
         @input="debouncedReload"
       />
-      <select v-model="groupFilter.groupType" data-test="filter-type" @change="reload">
+      <select v-model="groupFilter.visibility" data-test="filter-type" @change="reload">
         <option :value="null">{{ $t('admin.groups.allTypes') }}</option>
-        <option v-for="type in groupTypes" :key="type" :value="type">
+        <option v-for="type in visibilitys" :key="type" :value="type">
           {{ $t(`group.types.${type}`) }}
         </option>
       </select>
@@ -57,7 +57,7 @@
             </nuxt-link>
             <span class="slug">@{{ group.slug }}</span>
           </td>
-          <td>{{ $t(`group.types.${group.groupType}`) }}</td>
+          <td>{{ $t(`group.types.${group.visibility}`) }}</td>
           <td>{{ group.membersCount === null ? '–' : group.membersCount }}</td>
           <td>
             <!-- Zero owners is legal and is exactly what an admin is here to fix: the member
@@ -119,17 +119,17 @@ export default {
       pageSize: PAGE_SIZE,
       // Named groupFilter, not filter: the schema contract test reads every `filter: {`
       // in the webapp as a post filter, and this one is about groups.
-      groupFilter: { search: '', groupType: null, ownerless: false, disabled: false },
+      groupFilter: { search: '', visibility: null, ownerless: false, disabled: false },
     }
   },
   computed: {
-    groupTypes() {
+    visibilitys() {
       return GROUP_TYPES
     },
     variables() {
       return {
         search: this.groupFilter.search || null,
-        groupType: this.groupFilter.groupType,
+        visibility: this.groupFilter.visibility,
         // Only send the flags when they are on: `false` would mean "only groups that are NOT
         // disabled", which is a different question from "all of them".
         ownerless: this.groupFilter.ownerless ? true : null,

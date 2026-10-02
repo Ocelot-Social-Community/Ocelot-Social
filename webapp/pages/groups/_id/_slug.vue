@@ -145,7 +145,7 @@
             </p>
             <div class="chip" align="center">
               <os-badge variant="primary">
-                {{ group && group.groupType ? $t('group.types.' + group.groupType) : '' }}
+                {{ group && group.visibility ? $t('group.types.' + group.visibility) : '' }}
               </os-badge>
             </div>
             <!-- group action radius -->
@@ -536,22 +536,22 @@ export default {
       return this.isGroupMember(this.group)
     },
     isGroupVisible() {
-      return this.group && !(this.group.groupType === 'hidden' && !this.isGroupMemberNonePending)
+      return this.group && !(this.group.visibility === 'hidden' && !this.isGroupMemberNonePending)
     },
     isAllowedSeeingGroupMembers() {
-      // One right instead of the groupType/showMembers/membership cascade this used to be.
+      // One right instead of the visibility/showMembers/membership cascade this used to be.
       if (this.canInGroup('group.members.read', this.group)) return true
       if (!this.group) return false
-      if (this.group.groupType === 'public') return true
-      if (['closed', 'hidden'].includes(this.group.groupType) && this.isGroupMemberNonePending)
+      if (this.group.visibility === 'public') return true
+      if (['closed', 'hidden'].includes(this.group.visibility) && this.isGroupMemberNonePending)
         return true
       // non-members can see the member list of a closed group when the owner enabled showMembers
-      if (this.group.groupType === 'closed' && this.group.showMembers === true) return true
+      if (this.group.visibility === 'closed' && this.group.showMembers === true) return true
       return false
     },
     membersListSubtitle() {
       if (!this.group || !this.isGroupMemberNonePending) return null
-      if (this.group.groupType === 'public' || this.group.showMembers === true) {
+      if (this.group.visibility === 'public' || this.group.showMembers === true) {
         return this.$t('group.membersListVisibleToNonMembers')
       }
       return this.$t('group.membersListNotVisibleToNonMembers')

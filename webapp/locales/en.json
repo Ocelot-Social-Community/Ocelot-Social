@@ -228,6 +228,7 @@
       "labelField": "Name",
       "name": "Group roles",
       "ownerHoldsEverything": "The owner role always holds every right and cannot be edited.",
+      "resultingVisibility": "Groups created from this template are:",
       "saved": "Template saved",
       "title": "Default roles for groups",
       "untouched": "Still running on this template: {untouched} of {total} groups."

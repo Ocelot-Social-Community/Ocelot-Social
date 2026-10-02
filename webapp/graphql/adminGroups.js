@@ -6,7 +6,7 @@ import gql from 'graphql-tag'
 export const adminGroupsQuery = () => gql`
   query (
     $search: String
-    $groupType: GroupType
+    $visibility: GroupVisibility
     $ownerless: Boolean
     $disabled: Boolean
     $first: Int
@@ -14,7 +14,7 @@ export const adminGroupsQuery = () => gql`
   ) {
     adminGroups(
       search: $search
-      groupType: $groupType
+      visibility: $visibility
       ownerless: $ownerless
       disabled: $disabled
       first: $first
@@ -23,7 +23,7 @@ export const adminGroupsQuery = () => gql`
       id
       slug
       name
-      groupType
+      visibility
       disabled
       createdAt
       membersCount
@@ -31,7 +31,7 @@ export const adminGroupsQuery = () => gql`
     }
     adminGroupCount(
       search: $search
-      groupType: $groupType
+      visibility: $visibility
       ownerless: $ownerless
       disabled: $disabled
     )
@@ -48,7 +48,8 @@ export const groupRoleTemplatesQuery = () => gql`
       requiresNetworkPermission
     }
     groupRoleTemplates {
-      groupType
+      name
+      visibility
       untouchedGroupCount
       groupCount
       roles {
@@ -63,9 +64,9 @@ export const groupRoleTemplatesQuery = () => gql`
 `
 
 export const updateGroupRoleTemplateMutation = () => gql`
-  mutation ($groupType: String!, $name: String!, $permissions: [String!]!, $label: String) {
+  mutation ($template: String!, $name: String!, $permissions: [String!]!, $label: String) {
     updateGroupRoleTemplate(
-      groupType: $groupType
+      template: $template
       name: $name
       permissions: $permissions
       label: $label

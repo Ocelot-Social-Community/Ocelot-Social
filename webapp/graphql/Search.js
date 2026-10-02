@@ -89,7 +89,7 @@ export const searchGroups = (i18n) => {
           deleted
           about
           description
-          groupType
+          visibility
           actionRadius
           categories {
             id

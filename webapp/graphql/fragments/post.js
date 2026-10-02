@@ -33,7 +33,7 @@ export const post = gql`
       id
       name
       slug
-      groupType
+      visibility
       myGroupRole {
         name
         label

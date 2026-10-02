@@ -151,7 +151,7 @@ describe('GroupProfileSlug', () => {
       slug: 'yoga-practice',
       about: null,
       description: `<h3>What Is yoga?</h3><p>Yoga is not just about practicing asanas. It's about how we do it.</p><p class="">And practicing asanas doesn't have to be yoga, it can be more athletic than yogic.</p><h3>What makes practicing asanas yogic?</h3><p class="">The important thing is:</p><ul><li><p>Use the exercises (consciously) for your personal development.</p></li></ul>`,
-      groupType: 'public',
+      visibility: 'public',
       actionRadius: 'interplanetary',
       categories: [
         {
@@ -188,7 +188,7 @@ describe('GroupProfileSlug', () => {
       slug: 'school-for-citizens',
       about: 'Our children shall receive education for life.',
       description: `<p class=""><em>English</em></p><h3>Our goal</h3><p>Only those who enjoy learning and do not lose their curiosity can obtain a good education for life and continue to learn with joy throughout their lives.</p><h3>Curiosity</h3><p>For this we need a school that takes up the curiosity of the children, the people, and satisfies it through a lot of experience.</p><p><br></p><p><em>Deutsch</em></p><h3>Unser Ziel</h3><p class="">Nur wer Spaß am Lernen hat und seine Neugier nicht verliert, kann gute Bildung für's Leben erlangen und sein ganzes Leben mit Freude weiter lernen.</p><h3>Neugier</h3><p class="">Dazu benötigen wir eine Schule, die die Neugier der Kinder, der Menschen, aufnimmt und durch viel Erfahrung befriedigt.</p>`,
-      groupType: 'closed',
+      visibility: 'closed',
       actionRadius: 'national',
       categories: [
         {
@@ -220,7 +220,7 @@ describe('GroupProfileSlug', () => {
       slug: 'investigative-journalism',
       about: 'Investigative journalists share ideas and insights and can collaborate.',
       description: `<p class=""><em>English:</em></p><p class="">This group is hidden.</p><h3>What is our group for?</h3><p>This group was created to allow investigative journalists to share and collaborate.</p><h3>How does it work?</h3><p>Here you can internally share posts and comments about them.</p><p><br></p><p><em>Deutsch:</em></p><p class="">Diese Gruppe ist verborgen.</p><h3>Wofür ist unsere Gruppe?</h3><p class="">Diese Gruppe wurde geschaffen, um investigativen Journalisten den Austausch und die Zusammenarbeit zu ermöglichen.</p><h3>Wie funktioniert das?</h3><p class="">Hier könnt ihr euch intern über Beiträge und Kommentare zu ihnen austauschen.</p>`,
-      groupType: 'hidden',
+      visibility: 'hidden',
       actionRadius: 'global',
       categories: [
         {
@@ -1082,7 +1082,7 @@ describe('GroupProfileSlug', () => {
     it('renders the video-call button for a non-public group member (joining is open to all)', () => {
       const wrapper = mountWithGroup({
         ...yogaPractice,
-        groupType: 'closed',
+        visibility: 'closed',
         ...groupRights('usual'),
       })
       expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(true)
@@ -1093,7 +1093,7 @@ describe('GroupProfileSlug', () => {
       // (count 0): the button is shown but marked denied; joining-only would re-enable it.
       const wrapper = mountWithGroup({
         ...yogaPractice,
-        groupType: 'closed',
+        visibility: 'closed',
         ...groupRightsWithout('usual', 'group.videoCall.create'),
       })
       const button = wrapper.find('[data-test="video-call-btn"]')
@@ -1104,7 +1104,7 @@ describe('GroupProfileSlug', () => {
     it('does not gray out the button when a call is already running (join is allowed)', async () => {
       const wrapper = mountWithGroup({
         ...yogaPractice,
-        groupType: 'closed',
+        visibility: 'closed',
         ...groupRightsWithout('usual', 'group.videoCall.create'),
       })
       wrapper.setData({ videoCallParticipantCount: 2 })
@@ -1145,7 +1145,7 @@ describe('GroupProfileSlug', () => {
       // (still-clickable) button must short-circuit with feedback instead of an OPEN.
       const wrapper = mountWithGroup({
         ...yogaPractice,
-        groupType: 'closed',
+        visibility: 'closed',
         ...groupRightsWithout('usual', 'group.videoCall.create'),
       })
       await wrapper.find('[data-test="video-call-btn"]').trigger('click')
@@ -1158,7 +1158,7 @@ describe('GroupProfileSlug', () => {
       // whether or not they may open one: the click must dispatch and not surface the toast.
       const wrapper = mountWithGroup({
         ...yogaPractice,
-        groupType: 'closed',
+        visibility: 'closed',
         ...groupRightsWithout('usual', 'group.videoCall.create'),
       })
       wrapper.setData({ videoCallParticipantCount: 2 })
@@ -1173,7 +1173,7 @@ describe('GroupProfileSlug', () => {
       // The client must re-check and not hard-block the JOIN on the stale value.
       const wrapper = mountWithGroup({
         ...yogaPractice,
-        groupType: 'closed',
+        visibility: 'closed',
         ...groupRightsWithout('usual', 'group.videoCall.create'),
       })
       const refetch = jest.fn().mockImplementation(() => {
@@ -1194,7 +1194,7 @@ describe('GroupProfileSlug', () => {
       // already have — which here is 0, so the JOIN stays denied with the usual toast.
       const wrapper = mountWithGroup({
         ...yogaPractice,
-        groupType: 'closed',
+        visibility: 'closed',
         ...groupRightsWithout('usual', 'group.videoCall.create'),
       })
       const refetch = jest.fn().mockRejectedValue(new Error('network down'))

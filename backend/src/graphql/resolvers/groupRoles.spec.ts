@@ -266,12 +266,25 @@ describe('Query.adminGroups', () => {
 })
 
 describe('Query.groupRoleTemplates', () => {
-  it('reports each type with its roles and how many groups still run on it', async () => {
+  it('computes the visibility from the rights, not from the template`s name', async () => {
+    // The two are separate fields because they answer separate questions. The mutation keeps
+    // the shipped templates' names honest, but `visibility` is derived either way — a template
+    // named `public` whose non-member role cannot read the content IS a closed one.
+    mocked.readGroupRoleTemplates.mockResolvedValue({ public: [role('none', ['group.read'])] })
+    mocked.untouchedGroupIdsByType.mockResolvedValue(new Map())
+    const { context } = contextFor()
+
+    expect(await Query.groupRoleTemplates({}, {}, context)).toMatchObject([
+      { name: 'public', visibility: 'closed' },
+    ])
+  })
+
+  it('reports each template with its visibility, roles and share of groups', async () => {
     // Deliberately handed over in the wrong order: the resolver sorts them by privacy level,
     // so the tabs read public → closed → secret instead of alphabetically.
     mocked.readGroupRoleTemplates.mockResolvedValue({
       hidden: [role('none')],
-      public: [role('none', ['group.read'])],
+      public: [role('none', ['group.read', 'group.content.read'])],
     })
     mocked.untouchedGroupIdsByType.mockResolvedValue(
       new Map([['public', groupsOfType(['a', 'b'], 5)]]),
@@ -280,17 +293,23 @@ describe('Query.groupRoleTemplates', () => {
 
     expect(await Query.groupRoleTemplates({}, {}, context)).toEqual([
       {
+        // The template's name, what it derives to, and the old key for the same string — two
+        // questions that happen to share an answer for the three shipped templates.
+        name: 'public',
+        visibility: 'public',
         groupType: 'public',
-        roles: [{ ...role('none', ['group.read']), memberCount: null }],
+        roles: [{ ...role('none', ['group.read', 'group.content.read']), memberCount: null }],
         untouchedGroupCount: 2,
         // Five public groups exist, two of them never edited their roles. Without the second
         // number "2" reads as "only 2", which is the misreading this answers.
         groupCount: 5,
       },
       {
+        name: 'hidden',
+        visibility: 'hidden',
         groupType: 'hidden',
         roles: [{ ...role('none'), memberCount: null }],
-        // A type with no groups at all answers 0 of 0, not null.
+        // A template nobody uses answers 0 of 0, not null.
         untouchedGroupCount: 0,
         groupCount: 0,
       },
