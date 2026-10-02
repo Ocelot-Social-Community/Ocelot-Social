@@ -192,10 +192,8 @@ import {
 } from '~/graphql/groupRoles.js'
 import { NONE_GROUP_ROLE, PENDING_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
 import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
+import { orderRolesByPrivilege } from '~/utils/groupRights'
 import groupRights from '~/mixins/groupRights'
-
-// The order the tabs read in: the ladder, then whatever the group invented.
-const ROLE_ORDER = [NONE_GROUP_ROLE, PENDING_GROUP_ROLE, USUAL_GROUP_ROLE]
 
 // The simple mode, declared rather than hand-written per row: one sentence, one role, one right.
 const SIMPLE_SWITCHES = [
@@ -237,14 +235,7 @@ export default {
       return this.myGroupPermissions.includes('group.role.manage')
     },
     orderedRoles() {
-      const rank = (role) => {
-        const index = ROLE_ORDER.indexOf(role.name)
-        if (index !== -1) return index
-        // Custom roles sit between the member role and the owner, ordered by breadth so the
-        // tabs read as a ladder rather than as an alphabet.
-        return role.protected ? 100 : 10 + role.permissions.length / 100
-      }
-      return [...this.roles].sort((a, b) => rank(a) - rank(b))
+      return orderRolesByPrivilege(this.roles)
     },
     activeRole() {
       return this.roles.find((role) => role.name === this.activeRoleName) ?? null
@@ -366,6 +357,9 @@ export default {
         this.$toast.success(this.$t('group.rights.saved'))
       } catch (error) {
         this.$toast.error(error.message)
+        // The checkbox is where the click left it, and `:checked` binds a value that did not
+        // change — so without this the switch keeps showing a right the group does not have.
+        this.$forceUpdate()
       } finally {
         this.saving = false
       }

@@ -5,6 +5,7 @@ import { UserInputError } from '@graphql/errors'
 import { groupPermissionCatalog, sanitizeGroupPermissions } from '@src/groupPermission'
 import {
   coversRole,
+  PRIVACY_LEVELS,
   createPermissionForLevel,
   isMorePrivate,
   NONE_ROLE,
@@ -117,14 +118,25 @@ const requirePrivacyCap = (
  * Without this, `group.role.manage` would be a way to climb: an admin holding it could write
  * `group.type.change` into their own role and then use it. It is the same coverage rule that
  * governs handing out a role (groupRole/authority.ts), applied to defining one.
+ *
+ * What is checked is what the edit ADDS, not the whole resulting list. Keeping a right the
+ * role already had grants nobody anything, and demanding coverage for it made every role
+ * holding a right that is currently switched off network-wide uneditable: the video call
+ * rights are in every seeded `usual` role, a network without LiveKit has them gated out of
+ * everybody's effective set, and so "members may comment" could not be unticked either —
+ * the whole list went back with the request and the gated keys failed the comparison.
+ * Removing is always allowed, and an UNCHANGED right cannot be an escalation.
  */
 const requireCoverage = async (
   context: Context,
   groupId: string,
   permissions: GroupPermissionKey[],
+  existing: readonly GroupPermissionKey[] = [],
 ): Promise<GroupAuthorization> => {
   const authorization = await context.groupAuthorization.forGroup(groupId)
-  if (!authorization || !coversRole(authorization.effective, new Set(permissions))) {
+  const held = new Set(existing)
+  const added = new Set(permissions.filter((permission) => !held.has(permission)))
+  if (!authorization || !coversRole(authorization.effective, added)) {
     throw new UserInputError('You cannot grant rights you do not hold yourself!')
   }
   // Handed back rather than resolved twice: the group it found is the one the privacy cap
@@ -237,7 +249,14 @@ export default {
         readGroupRoleTemplates(context.database),
         untouchedGroupIdsByType(context.database),
       ])
-      return Object.entries(templates).map(([groupType, roles]) => ({
+      // Least private first, from the one list that orders the levels (groupRole/privacyLevel):
+      // the tabs are a scale, and an alphabet reads as "closed, secret, public".
+      const ordered = [...Object.entries(templates)].sort(
+        ([a], [b]) =>
+          PRIVACY_LEVELS.indexOf(a as GroupPrivacyLevel) -
+          PRIVACY_LEVELS.indexOf(b as GroupPrivacyLevel),
+      )
+      return ordered.map(([groupType, roles]) => ({
         groupType,
         roles: roles.map((role) => ({ ...role, memberCount: null })),
         untouchedGroupCount: untouched.get(groupType)?.untouchedIds.length ?? 0,
@@ -296,7 +315,12 @@ export default {
         return { ...relabelled, memberCount: null }
       }
       const permissions = sanitizeGroupPermissions(params.permissions)
-      const authorization = await requireCoverage(context, groupId, permissions)
+      const authorization = await requireCoverage(
+        context,
+        groupId,
+        permissions,
+        existing.permissions,
+      )
       if (name === NONE_ROLE) {
         // The non-member role IS the group's visibility, so editing it is the type change.
         requirePrivacyCap(context, authorization, permissions)

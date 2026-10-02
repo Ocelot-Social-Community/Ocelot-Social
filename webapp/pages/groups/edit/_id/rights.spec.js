@@ -169,6 +169,21 @@ describe('rights.vue', () => {
     expect(at(wrapper, 'switch-members-comment').element.checked).toBe(false)
   })
 
+  it('puts a switch back when the write is refused', async () => {
+    // A rejected mutation leaves the DOM checkbox where the click put it, which reads as "the
+    // group has this right now" — while the server said no.
+    mocks.$apollo.mutate.mockRejectedValueOnce(new Error('Not Authorized!'))
+    const wrapper = await Wrapper()
+    const forceUpdate = jest.spyOn(wrapper.vm, '$forceUpdate')
+
+    at(wrapper, 'switch-members-post').element.checked = false
+    await at(wrapper, 'switch-members-post').trigger('change')
+    await wrapper.vm.$nextTick()
+
+    expect(mocks.$toast.error).toHaveBeenCalled()
+    expect(forceUpdate).toHaveBeenCalled()
+  })
+
   it('writes a single right when a switch is flipped', async () => {
     const wrapper = await Wrapper()
 

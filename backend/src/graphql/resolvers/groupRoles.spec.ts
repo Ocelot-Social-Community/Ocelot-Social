@@ -260,9 +260,11 @@ describe('Query.adminGroups', () => {
 
 describe('Query.groupRoleTemplates', () => {
   it('reports each type with its roles and how many groups still run on it', async () => {
+    // Deliberately handed over in the wrong order: the resolver sorts them by privacy level,
+    // so the tabs read public → closed → secret instead of alphabetically.
     mocked.readGroupRoleTemplates.mockResolvedValue({
-      public: [role('none', ['group.read'])],
       hidden: [role('none')],
+      public: [role('none', ['group.read'])],
     })
     mocked.untouchedGroupIdsByType.mockResolvedValue(
       new Map([['public', groupsOfType(['a', 'b'], 5)]]),
@@ -439,6 +441,34 @@ describe('Mutation.updateGroupRole', () => {
         context,
       ),
     ).rejects.toThrow('You cannot grant rights you do not hold yourself!')
+  })
+
+  it('lets an edit KEEP a right the actor cannot hold right now', async () => {
+    // The case that made every role with a video-call right uneditable on a network without
+    // LiveKit: the gate takes `group.videoCall.*` out of everybody's effective set, the whole
+    // list goes back with the request, and a right that is merely staying put was read as one
+    // being granted. Removing stays allowed, adding still is not.
+    mocked.readGroupRoles.mockResolvedValue([
+      role('usual', ['group.post.create', 'group.videoCall.create']),
+    ])
+    const { context } = contextFor({
+      authorization: { effective: ['group.role.manage', 'group.post.create', 'group.leave'] },
+    })
+
+    await expect(
+      Mutation.updateGroupRole(
+        {},
+        {
+          groupId: 'g1',
+          name: 'usual',
+          // The gated right stays, posting goes, leaving arrives — all three within what the
+          // actor may do.
+          permissions: ['group.videoCall.create', 'group.leave'],
+        },
+        context,
+      ),
+      // Sanitised into catalog order on the way through, which is why `leave` reads first.
+    ).resolves.toMatchObject({ permissions: ['group.leave', 'group.videoCall.create'] })
   })
 
   it('refuses when the actor holds nothing in that group at all', async () => {
