@@ -48,34 +48,28 @@
 
     <!-- Advanced mode: the full matrix, one tab per role. -->
     <section v-else data-test="rights-advanced">
-      <div class="role-tabs">
-        <button
-          v-for="role in orderedRoles"
-          :key="role.name"
-          type="button"
-          class="role-tab"
-          :class="{ 'role-tab--active': role.name === activeRoleName }"
-          :data-test="`role-tab-${role.name}`"
-          @click="activeRoleName = role.name"
-          @mouseenter="hoveredRoleName = role.name"
-          @mouseleave="hoveredRoleName = null"
-        >
-          {{ roleLabel(role) }}
-          <span v-if="role.system" class="role-tab__badge" :title="$t('group.rights.systemRole')">
-            ★
-          </span>
-        </button>
-        <button
-          v-if="canManageRoles"
-          type="button"
-          class="role-tab role-tab--add"
-          :title="$t('group.rights.addRole')"
-          data-test="role-add"
-          @click="startCreate"
-        >
-          +
-        </button>
-      </div>
+      <role-tabs
+        :roles="orderedRoles"
+        :active-name="activeRoleName"
+        :label-for="roleLabel"
+        :badge-for="(role) => role.system"
+        :badge-title="$t('group.rights.systemRole')"
+        @select="activeRoleName = $event"
+        @hover="hoveredRoleName = $event"
+      >
+        <template #extra>
+          <button
+            v-if="canManageRoles"
+            type="button"
+            class="role-tab-add"
+            :title="$t('group.rights.addRole')"
+            data-test="role-add"
+            @click="startCreate"
+          >
+            +
+          </button>
+        </template>
+      </role-tabs>
 
       <form
         v-if="creating"
@@ -124,32 +118,16 @@
           {{ $t('group.rights.ownerHoldsEverything') }}
         </p>
 
-        <div v-else class="perm-groups">
-          <fieldset v-for="group in catalogGroups" :key="group.name" class="perm-group">
-            <legend>{{ $t(`group.rights.groups.${group.name}`) }}</legend>
-            <label
-              v-for="permission in group.permissions"
-              :key="permission.key"
-              class="perm-row"
-              :class="{
-                'perm-row--blocked': !grantable(permission),
-                'perm-row--added': rowDiff(permission.key) === 'added',
-                'perm-row--removed': rowDiff(permission.key) === 'removed',
-              }"
-              :title="blockedHint(permission)"
-            >
-              <input
-                type="checkbox"
-                :checked="draftPermissions.includes(permission.key)"
-                :disabled="!canManageRoles || !grantable(permission) || saving"
-                :data-test="`perm-${permission.key}`"
-                @change="togglePermission(permission.key, $event.target.checked)"
-              />
-              <span class="perm-row__key">{{ permission.key }}</span>
-              <span class="perm-row__description">{{ permission.description }}</span>
-            </label>
-          </fieldset>
-        </div>
+        <permission-matrix
+          v-else
+          :permissions="catalog"
+          :granted="draftPermissions"
+          :diff="hoverDiff"
+          :group-label="(name) => $t(`group.rights.groups.${name}`)"
+          :disabled-for="(permission) => !canManageRoles || !grantable(permission) || saving"
+          :hint-for="blockedHint"
+          @toggle="togglePermission"
+        />
 
         <div class="actions">
           <os-button
@@ -182,6 +160,8 @@
 
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
+import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
+import RoleTabs from '~/components/Permissions/RoleTabs'
 
 import {
   createGroupRoleMutation,
@@ -208,7 +188,7 @@ const SIMPLE_SWITCHES = [
 
 export default {
   mixins: [groupRights],
-  components: { OsButton, OsCard },
+  components: { OsButton, OsCard, PermissionMatrix, RoleTabs },
   props: {
     group: { type: Object, required: true },
   },
@@ -268,18 +248,6 @@ export default {
       }
       return diff
     },
-    catalogGroups() {
-      const groups = []
-      for (const permission of this.catalog) {
-        let group = groups.find((candidate) => candidate.name === permission.group)
-        if (!group) {
-          group = { name: permission.group, permissions: [] }
-          groups.push(group)
-        }
-        group.permissions.push(permission)
-      }
-      return groups
-    },
     dirty() {
       if (!this.activeRole) return false
       const stored = [...this.activeRole.permissions].sort().join(',')
@@ -333,9 +301,6 @@ export default {
       if (!role) return new Set()
       if (role.protected) return new Set(this.catalog.map((permission) => permission.key))
       return new Set(role.permissions)
-    },
-    rowDiff(key) {
-      return this.hoverDiff[key] ?? null
     },
     resetDraft() {
       this.draftPermissions = this.activeRole ? [...this.activeRole.permissions] : []
@@ -501,6 +466,20 @@ export default {
 </script>
 
 <style scoped>
+/* The pill row and the matrix are shared components now (components/Permissions/*); what is
+   left here is this page's own furniture. */
+.role-tab-add {
+  border: 1px dashed var(--border-color-soft);
+  border-radius: var(--border-radius-x-large);
+  background: var(--background-color-base);
+  padding: var(--space-xx-small) var(--space-small);
+  font-weight: bold;
+  cursor: pointer;
+}
+.role-tab-add:hover {
+  background: var(--background-color-softer);
+}
+
 .title {
   margin-bottom: 0;
 }
@@ -547,26 +526,6 @@ export default {
   cursor: pointer;
   text-decoration: underline;
 }
-.role-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xx-small);
-  margin-bottom: var(--space-small);
-}
-.role-tab {
-  border: 1px solid var(--border-color-softer);
-  border-radius: var(--border-radius-base);
-  background: var(--background-color-softest);
-  padding: var(--space-xx-small) var(--space-x-small);
-  cursor: pointer;
-}
-.role-tab--active {
-  border-color: var(--color-primary);
-  font-weight: bold;
-}
-.role-tab__badge {
-  color: var(--text-color-soft);
-}
 .role-create {
   display: flex;
   flex-wrap: wrap;
@@ -586,52 +545,5 @@ export default {
 .role-note {
   color: var(--text-color-soft);
 }
-.perm-groups {
-  display: grid;
-  gap: var(--space-small);
-
-  @media (min-width: 1024px) {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-.perm-group {
-  border: 1px solid var(--border-color-softer);
-  border-radius: var(--border-radius-base);
-  padding: var(--space-x-small);
-}
-.perm-row {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--space-xx-small) var(--space-x-small);
-  align-items: baseline;
-  /* The left border carries the hover-diff colour, so it is reserved here rather than added
-     with the modifier — otherwise every marked row would shift sideways. */
-  padding: var(--space-xxx-small) var(--space-xx-small);
-  border-radius: var(--border-radius-small);
-  border-left: 3px solid transparent;
-  cursor: pointer;
-  transition: background-color 0.1s ease;
-}
-.perm-row--added {
-  background: color-mix(in srgb, var(--color-success) 16%, transparent);
-  border-left-color: var(--color-success);
-}
-.perm-row--removed {
-  background: color-mix(in srgb, var(--color-danger) 16%, transparent);
-  border-left-color: var(--color-danger);
-}
-.perm-row--blocked {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.perm-row__key {
-  grid-column: 2;
-  font-family: monospace;
-  font-size: var(--font-size-small);
-}
-.perm-row__description {
-  grid-column: 2;
-  color: var(--text-color-soft);
-  font-size: var(--font-size-small);
 }
 </style>

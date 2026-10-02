@@ -27,50 +27,28 @@
         }}
       </p>
 
-      <div class="role-tabs">
-        <button
-          v-for="role in orderedRoles"
-          :key="role.name"
-          type="button"
-          class="role-tab"
-          :class="{ 'role-tab--active': role.name === activeRoleName }"
-          :data-test="`role-tab-${role.name}`"
-          @click="activeRoleName = role.name"
-          @mouseenter="hoveredRoleName = role.name"
-          @mouseleave="hoveredRoleName = null"
-        >
-          {{ role.label || role.name }}
-        </button>
-      </div>
+      <role-tabs
+        :roles="orderedRoles"
+        :active-name="activeRoleName"
+        :label-for="(role) => role.label || role.name"
+        :badge-title="$t('admin.groupRoles.ownerHoldsEverything')"
+        @select="activeRoleName = $event"
+        @hover="hoveredRoleName = $event"
+      />
 
       <p v-if="activeRole && activeRole.protected" class="note" data-test="owner-note">
         {{ $t('admin.groupRoles.ownerHoldsEverything') }}
       </p>
 
-      <div v-else-if="activeRole" class="perm-groups">
-        <fieldset v-for="group in catalogGroups" :key="group.name" class="perm-group">
-          <legend>{{ $t(`group.rights.groups.${group.name}`) }}</legend>
-          <label
-            v-for="permission in group.permissions"
-            :key="permission.key"
-            class="perm-row"
-            :class="{
-              'perm-row--added': rowDiff(permission.key) === 'added',
-              'perm-row--removed': rowDiff(permission.key) === 'removed',
-            }"
-          >
-            <input
-              type="checkbox"
-              :checked="draft.includes(permission.key)"
-              :disabled="saving"
-              :data-test="`perm-${permission.key}`"
-              @change="toggle(permission.key, $event.target.checked)"
-            />
-            <span class="perm-row__key">{{ permission.key }}</span>
-            <span class="perm-row__description">{{ permission.description }}</span>
-          </label>
-        </fieldset>
-      </div>
+      <permission-matrix
+        v-else-if="activeRole"
+        :permissions="catalog"
+        :granted="draft"
+        :diff="hoverDiff"
+        :group-label="(name) => $t(`group.rights.groups.${name}`)"
+        :disabled-for="() => saving"
+        @toggle="toggle"
+      />
 
       <div class="actions">
         <os-button :disabled="!dirty || saving" data-test="save" @click="save">
@@ -95,6 +73,8 @@
 
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
+import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
+import RoleTabs from '~/components/Permissions/RoleTabs'
 
 import {
   applyGroupRoleTemplatesMutation,
@@ -104,7 +84,7 @@ import {
 import { orderRolesByPrivilege } from '~/utils/groupRights'
 
 export default {
-  components: { OsButton, OsCard },
+  components: { OsButton, OsCard, PermissionMatrix, RoleTabs },
   data() {
     return {
       catalog: [],
@@ -129,18 +109,6 @@ export default {
     // member, whatever the template adds, owner.
     orderedRoles() {
       return orderRolesByPrivilege(this.activeTemplate?.roles ?? [])
-    },
-    catalogGroups() {
-      const groups = []
-      for (const permission of this.catalog) {
-        let group = groups.find((candidate) => candidate.name === permission.group)
-        if (!group) {
-          group = { name: permission.group, permissions: [] }
-          groups.push(group)
-        }
-        group.permissions.push(permission)
-      }
-      return groups
     },
     dirty() {
       if (!this.activeRole) return false
@@ -183,9 +151,6 @@ export default {
       if (!role) return new Set()
       if (role.protected) return new Set(this.catalog.map((permission) => permission.key))
       return new Set(role.permissions)
-    },
-    rowDiff(key) {
-      return this.hoverDiff[key] ?? null
     },
     toggle(key, enabled) {
       this.draft = enabled ? [...this.draft, key] : this.draft.filter((k) => k !== key)
@@ -275,71 +240,28 @@ export default {
 .note {
   color: var(--text-color-soft);
 }
-.type-tabs,
-.role-tabs {
+.type-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-xx-small);
   margin-bottom: var(--space-small);
 }
-.type-tab,
-.role-tab {
-  border: 1px solid var(--border-color-softer);
-  border-radius: var(--border-radius-base);
-  background: var(--background-color-softest);
-  padding: var(--space-xx-small) var(--space-x-small);
+.type-tab {
+  border: 1px solid var(--border-color-soft);
+  border-radius: var(--border-radius-x-large);
+  background: var(--background-color-base);
+  padding: var(--space-xx-small) var(--space-small);
+  font-size: 0.9em;
   cursor: pointer;
 }
-.type-tab--active,
-.role-tab--active {
+.type-tab:hover {
+  background: var(--background-color-softer);
+}
+.type-tab--active {
   border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-primary-inverse);
   font-weight: bold;
-}
-.perm-groups {
-  display: grid;
-  gap: var(--space-small);
-
-  @media (min-width: 1024px) {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-.perm-group {
-  border: 1px solid var(--border-color-softer);
-  border-radius: var(--border-radius-base);
-  padding: var(--space-x-small);
-}
-.perm-row {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--space-xx-small) var(--space-x-small);
-  align-items: baseline;
-  /* The left border carries the hover-diff colour below, so it is reserved here rather than
-     added with the modifier — otherwise every marked row would shift sideways. */
-  padding: var(--space-xxx-small) var(--space-xx-small);
-  border-radius: var(--border-radius-small);
-  border-left: 3px solid transparent;
-  cursor: pointer;
-  transition: background-color 0.1s ease;
-}
-.perm-row--added {
-  background: color-mix(in srgb, var(--color-success) 16%, transparent);
-  border-left-color: var(--color-success);
-}
-
-.perm-row--removed {
-  background: color-mix(in srgb, var(--color-danger) 16%, transparent);
-  border-left-color: var(--color-danger);
-}
-
-.perm-row__key {
-  grid-column: 2;
-  font-family: monospace;
-  font-size: var(--font-size-small);
-}
-.perm-row__description {
-  grid-column: 2;
-  color: var(--text-color-soft);
-  font-size: var(--font-size-small);
 }
 .actions {
   display: flex;

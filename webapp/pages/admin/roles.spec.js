@@ -148,10 +148,11 @@ describe('admin/roles.vue', () => {
     const openRow = rowOf('post.create')
     // The gated right is disabled and carries the "not configured" note…
     expect(gatedRow.find('input').attributes('disabled')).toBeDefined()
-    expect(gatedRow.find('.perm-row__gate').exists()).toBe(true)
+    // The note (and its deep-link into the policy tab) now comes from the shared matrix.
+    expect(gatedRow.find('.perm-row__note').exists()).toBe(true)
     // …the ungated one stays editable and shows no note.
     expect(openRow.find('input').attributes('disabled')).toBeUndefined()
-    expect(openRow.find('.perm-row__gate').exists()).toBe(false)
+    expect(openRow.find('.perm-row__note').exists()).toBe(false)
   })
 
   it('preserves unsaved edits when forms are rebuilt by a live refetch', async () => {
@@ -217,7 +218,7 @@ describe('admin/roles.vue', () => {
       expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
       // The highlight marks what the OTHER admin changed (baseline → server), not my edit.
       expect(wrapper.vm.conflictDiff).toEqual({ 'badge.manage': 'removed' })
-      expect(wrapper.vm.rowDiff('badge.manage')).toBe('removed')
+      expect(wrapper.vm.matrixDiff['badge.manage']).toBe('removed')
       // The banner renders with its resolve/keep actions.
       expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(true)
       expect(wrapper.find('[data-test="role-badge-setter-conflict-load"]').exists()).toBe(true)
@@ -240,7 +241,7 @@ describe('admin/roles.vue', () => {
       expect(wrapper.vm.conflicts['badge-setter']).toBe(true)
       // The newly-granted permission is marked 'added'; the unchanged one is not in the diff.
       expect(wrapper.vm.conflictDiff).toEqual({ 'post.create': 'added' })
-      expect(wrapper.vm.rowDiff('post.create')).toBe('added')
+      expect(wrapper.vm.matrixDiff['post.create']).toBe('added')
     })
 
     it('does not flag a conflict when the draft matches what another admin already saved', async () => {
