@@ -27,11 +27,11 @@
       "description": "Comment on posts in the group."
     },
     "group.post.pin": {
-      "group": "content",
+      "group": "moderation",
       "description": "Pin and unpin posts within the group."
     },
     "group.post.moderate": {
-      "group": "content",
+      "group": "moderation",
       "description": "Remove someone else's post from this group. The post itself stays with its author — what is taken away is its place in the group."
     },
     "group.join": {

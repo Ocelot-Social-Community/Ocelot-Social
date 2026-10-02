@@ -177,11 +177,12 @@ import {
   resetGroupRolesMutation,
   updateGroupRoleMutation,
 } from '~/graphql/groupRoles.js'
+import { isMootRight, MANDATORY_GROUP_RIGHTS } from '~/constants/groups'
 import { NONE_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
-import { MANDATORY_GROUP_RIGHTS } from '~/constants/groups'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
+import { applyRightChange } from '~/utils/groupRoleRights'
 import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
 import groupRights from '~/mixins/groupRights'
 
@@ -221,6 +222,11 @@ export default {
   computed: {
     canManageRoles() {
       return this.myGroupPermissions.includes('group.role.manage')
+    },
+    /** What a new role may start from: the member role, capped by what the creator may grant. */
+    grantableSubsetOfMemberRole() {
+      const member = this.roles.find((role) => role.name === USUAL_GROUP_ROLE)
+      return (member?.permissions ?? []).filter((key) => this.myGroupPermissions.includes(key))
     },
     orderedRoles() {
       return orderRolesByPrivilege(this.roles)
@@ -277,9 +283,7 @@ export default {
      * worse than one that is not there.
      */
     isMoot(permission) {
-      return (
-        this.activeRoleName === NONE_GROUP_ROLE && MANDATORY_GROUP_RIGHTS.includes(permission?.key)
-      )
+      return isMootRight(this.activeRoleName, permission?.key)
     },
     isMandatory(permission) {
       // The simple view asks about rights the catalog may not carry yet, so a missing entry is
@@ -361,9 +365,10 @@ export default {
     toggleSimple(roleName, permissionKey, enabled) {
       const role = this.roles.find((candidate) => candidate.name === roleName)
       if (!role) return
-      const permissions = enabled
-        ? [...role.permissions, permissionKey]
-        : role.permissions.filter((key) => key !== permissionKey)
+      // Through the coupling: ticking "outsiders may read the posts" also grants the right to
+      // see the group at all, and unticking that one takes the posts with it. Otherwise the
+      // backend's implication puts it straight back and the untick looks inert.
+      const permissions = applyRightChange(role.permissions, permissionKey, enabled)
       return this.writeRole(role.name, permissions, role.label)
     },
     /**
@@ -395,9 +400,12 @@ export default {
             name: this.newRoleName.trim(),
             label: this.newRoleLabel.trim() || null,
             // A new role starts from what a member may do, which is the useful starting point
-            // for "a member plus something" — the usual reason to add a role at all.
-            permissions:
-              this.roles.find((role) => role.name === USUAL_GROUP_ROLE)?.permissions ?? [],
+            // for "a member plus something" — the usual reason to add a role at all. Minus
+            // whatever the creator cannot grant right now: the member role legitimately holds
+            // rights that are capped away for THEM (a network cap takes `group.videoCall.create`
+            // out of everybody's effective set in a group whose door is restricted), and
+            // copying those turned "add a role" into a refusal nobody could act on.
+            permissions: this.grantableSubsetOfMemberRole,
           },
         })
         this.mergeRole(data.createGroupRole)

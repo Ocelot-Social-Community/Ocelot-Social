@@ -224,16 +224,16 @@
       "applied": "Zaktualizowano {count} grup",
       "apply": "Zastosuj do niezmienionych grup",
       "confirmApply": "Zastosować szablony do {count} grup, które nigdy nie zmieniały swoich ról? Grupy z własnymi ustawieniami pozostaną nietknięte.",
-      "description": "Każda nowa grupa startuje z tych szablonów. Istniejące grupy nie zmieniają się przy edycji tutaj — do tego służy przycisk poniżej.",
+      "description": "Kto co może wewnątrz grupy. Każda nowa grupa startuje z tych szablonów; istniejących grup zmiana tutaj nie dotyczy — od tego jest przycisk poniżej.",
       "labelField": "Nazwa",
-      "name": "Role w grupach",
+      "name": "Role i uprawnienia grup",
       "ownerHoldsEverything": "Rola właściciela ma zawsze wszystkie uprawnienia i nie da się jej edytować.",
       "resultingVisibility": "Grupy utworzone z tego szablonu są:",
-      "saveFirst": "Najpierw zapisz lub odrzuć — ta rola ma niezapisane zmiany.",
       "saved": "Szablon zapisany",
+      "saveFirst": "Najpierw zapisz lub odrzuć — ta rola ma niezapisane zmiany.",
       "templateLabel": "Szablon",
-      "title": "Domyślne role dla grup",
-      "untouched": "Zmiana tutaj obejmie {untouched} z {total} grup — te, które nigdy nie zmieniły własnych uprawnień — i dopiero po zastosowaniu."
+      "title": "Role i uprawnienia grup",
+      "untouched": "Zmiana tutaj obejmie {untouched} z {total} grup utworzonych z tego szablonu — te, które nigdy nie zmieniły własnych uprawnień — i tylko wtedy, gdy ją zastosujesz."
     },
     "groups": {
       "active": "aktywna",
@@ -354,7 +354,7 @@
       "delete": "Usuń",
       "deleteError": "Nie można usunąć roli: {message}",
       "deleteSuccess": "Rola usunięta.",
-      "description": "Twórz role i przypisuj uprawnienia. Zmiany obowiązują natychmiast.",
+      "description": "Kto co może w całej sieci. Twórz role i przypisuj uprawnienia — zmiany działają natychmiast.",
       "members": "{count} członków",
       "name": "Role i uprawnienia",
       "nameLabel": "Nazwa",
@@ -992,6 +992,7 @@
       "mandatory": "Zawsze przyznane: członkostwo, którego nie można zakończyć, nie jest ustawieniem.",
       "members": "{count} członków",
       "moot": "Kto nie jest członkiem, nie ma członkostwa do opuszczenia.",
+      "noApplicants": "Nikt nie może obecnie poprosić o dołączenie, więc nie ma oczekujących.",
       "noRight": "Nie możesz nadać uprawnienia, którego sam nie masz.",
       "ownerHoldsEverything": "Rola właściciela ma zawsze wszystkie uprawnienia w tej grupie. Zmienić można tylko jej nazwę wyświetlaną.",
       "presets": {
@@ -1009,6 +1010,7 @@
         "members-invite": "Członkowie mogą zapraszać innych",
         "members-post": "Członkowie mogą pisać wpisy",
         "nonmembers-members": "Osoby niebędące członkami mogą widzieć listę członków",
+        "nonmembers-profile": "Osoby spoza grupy widzą, że grupa istnieje",
         "nonmembers-read": "Osoby niebędące członkami mogą czytać wpisy"
       },
       "systemRole": "Rola systemowa: nie można jej usunąć ani zmienić jej nazwy",
@@ -1033,15 +1035,15 @@
       "unavailable": "Grupa niedostępna"
     },
     "type": "Widoczność grupy",
-    "types": {
-      "closed": "Zamknięta",
-      "hidden": "Tajna",
-      "public": "Publiczna"
-    },
     "typeDescriptions": {
       "closed": "Wszystkie wpisy widoczne tylko dla członków grupy",
       "hidden": "Grupa (łącznie z nazwą) jest całkowicie niewidoczna",
       "public": "Grupa i wszystkie wpisy są widoczne dla wszystkich zarejestrowanych użytkowników"
+    },
+    "types": {
+      "closed": "Zamknięta",
+      "hidden": "Tajna",
+      "public": "Publiczna"
     },
     "typesOptions": {
       "closed": "Zamknięta — Wszystkie wpisy widoczne tylko dla członków grupy",

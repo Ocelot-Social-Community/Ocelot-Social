@@ -120,8 +120,9 @@ import {
   groupRoleTemplatesQuery,
   updateGroupRoleTemplateMutation,
 } from '~/graphql/adminGroups.js'
-import { MANDATORY_GROUP_RIGHTS, NONE_GROUP_ROLE } from '~/constants/groups'
+import { isMootRight, MANDATORY_GROUP_RIGHTS, NONE_GROUP_ROLE } from '~/constants/groups'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
+import { applyRightChange } from '~/utils/groupRoleRights'
 import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
 
 export default {
@@ -214,9 +215,7 @@ export default {
      * worse than one that is not there.
      */
     isMoot(permission) {
-      return (
-        this.activeRoleName === NONE_GROUP_ROLE && MANDATORY_GROUP_RIGHTS.includes(permission?.key)
-      )
+      return isMootRight(this.activeRoleName, permission?.key)
     },
     isMandatory(permission) {
       return (
@@ -238,9 +237,7 @@ export default {
     toggleSimple(roleName, permissionKey, enabled) {
       const role = this.activeTemplate?.roles.find((candidate) => candidate.name === roleName)
       if (!role) return
-      const permissions = enabled
-        ? [...role.permissions, permissionKey]
-        : role.permissions.filter((key) => key !== permissionKey)
+      const permissions = applyRightChange(role.permissions, permissionKey, enabled)
       return this.writeRole(role.name, permissions, role.label ?? null)
     },
     async writeRole(name, permissions, label) {

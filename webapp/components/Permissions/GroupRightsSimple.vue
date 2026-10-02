@@ -9,7 +9,7 @@
   -->
   <div class="simple-rights">
     <div class="visibility" :data-test="`visibility-${visibility}`">
-      <os-icon :icon="icons[iconName]" class="visibility__icon" aria-hidden="true" />
+      <os-icon :icon="icons[iconName]" size="2xl" class="visibility__icon" aria-hidden="true" />
       <div class="visibility__text">
         <p class="visibility__caption">{{ caption }}</p>
         <strong class="visibility__title" data-test="visibility-title">
@@ -36,6 +36,12 @@
       </li>
     </ul>
 
+    <!-- A role nobody can reach is a setting that does nothing. Said rather than hidden: the
+         applicant rights stay editable, because enabling the request is one tick away. -->
+    <p v-if="!anyoneMayRequestToJoin" class="note" data-test="no-applicants-note">
+      {{ $t('group.rights.noApplicants') }}
+    </p>
+
     <!-- The buttons differ per level — a group resets to defaults, the admin applies to groups. -->
     <slot name="actions" />
   </div>
@@ -55,6 +61,10 @@ const SIMPLE_SWITCHES = [
   { id: 'members-chat', role: USUAL_GROUP_ROLE, permission: 'group.chat.participate' },
   { id: 'members-invite', role: USUAL_GROUP_ROLE, permission: 'group.invite' },
   { id: 'applicants-read', role: PENDING_GROUP_ROLE, permission: 'group.content.read' },
+  // The hinge of the whole visibility, and it was missing: without `group.read` on the
+  // non-member role a group is hidden no matter what else is ticked, so the simple view could
+  // produce nothing but secret groups — every box ticked and still "Secret".
+  { id: 'nonmembers-profile', role: NONE_GROUP_ROLE, permission: 'group.read' },
   { id: 'nonmembers-read', role: NONE_GROUP_ROLE, permission: 'group.content.read' },
   { id: 'nonmembers-members', role: NONE_GROUP_ROLE, permission: 'group.members.read' },
 ]
@@ -100,6 +110,13 @@ export default {
     iconName() {
       return VISIBILITY_ICONS[this.visibility]
     },
+    /**
+     * Whether anybody can become an applicant at all. Nothing grants `group.join.request` ⇒ the
+     * `pending` role is never held, and every right on it is inert.
+     */
+    anyoneMayRequestToJoin() {
+      return this.roles.some((role) => role.permissions?.includes('group.join.request'))
+    },
     switches() {
       return SIMPLE_SWITCHES.map((item) => {
         const role = this.roleNamed(item.role)
@@ -130,11 +147,13 @@ export default {
   margin-bottom: var(--space-base);
 }
 
-/* The size the empty pages set their illustrations at, so the two read as one family. */
+/*
+ * OsIcon sizes itself in `em` (ICON_SIZES), so a width/height in pixels here was simply ignored
+ * and the glyph came out at text size. The font-size is the handle; `2xl` is 2.5em of it.
+ */
 .visibility__icon {
   flex: 0 0 auto;
-  width: 48px;
-  height: 48px;
+  font-size: 1.6rem;
   color: var(--text-color-soft);
 }
 
@@ -179,5 +198,12 @@ export default {
 .switch--disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.note {
+  margin: 0 0 var(--space-base);
+  color: var(--text-color-softer);
+  font-size: 0.85em;
+  font-style: italic;
 }
 </style>

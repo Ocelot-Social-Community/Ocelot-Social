@@ -224,16 +224,16 @@
       "applied": "{count} grupos atualizados",
       "apply": "Aplicar aos grupos sem alterações",
       "confirmApply": "Aplicar os modelos a {count} grupos que nunca personalizaram as suas funções? Os grupos personalizados não são tocados.",
-      "description": "Cada grupo novo começa com estes modelos. Os grupos existentes não mudam ao editá-los aqui — para isso existe o botão abaixo.",
+      "description": "Quem pode fazer o quê dentro de um grupo. Cada grupo novo parte destes modelos; os grupos existentes não mudam com uma edição aqui — é para isso que serve o botão abaixo.",
       "labelField": "Nome",
-      "name": "Funções de grupo",
+      "name": "Funções e permissões de grupo",
       "ownerHoldsEverything": "A função de proprietário tem sempre todas as permissões e não pode ser editada.",
       "resultingVisibility": "Os grupos criados a partir deste modelo são:",
-      "saveFirst": "Guarde ou descarte primeiro: este papel tem alterações não guardadas.",
       "saved": "Modelo guardado",
+      "saveFirst": "Guarde ou descarte primeiro: este papel tem alterações não guardadas.",
       "templateLabel": "Modelo",
-      "title": "Funções predefinidas para grupos",
-      "untouched": "Uma alteração aqui alcança {untouched} de {total} grupos — os que nunca mudaram os seus próprios direitos — e só quando a aplicares."
+      "title": "Funções e permissões de grupo",
+      "untouched": "Uma alteração aqui atinge {untouched} dos {total} grupos criados a partir deste modelo — os que nunca alteraram os seus próprios direitos — e apenas quando a aplicar."
     },
     "groups": {
       "active": "ativo",
@@ -354,7 +354,7 @@
       "delete": "Eliminar",
       "deleteError": "Não foi possível eliminar a função: {message}",
       "deleteSuccess": "Função eliminada.",
-      "description": "Crie funções e atribua permissões. As alterações aplicam-se imediatamente.",
+      "description": "Quem pode fazer o quê em toda a rede. Crie funções e atribua permissões — as alterações aplicam-se de imediato.",
       "members": "{count} membros",
       "name": "Funções e permissões",
       "nameLabel": "Nome",
@@ -992,6 +992,7 @@
       "mandatory": "Sempre concedido: uma adesão que não se pode terminar não é uma opção.",
       "members": "{count} membros",
       "moot": "Quem não é membro não tem nenhuma adesão para terminar.",
+      "noApplicants": "Ninguém pode pedir para entrar neste momento, por isso não há candidatos em espera.",
       "noRight": "Não podes conceder uma permissão que tu mesmo não tens.",
       "ownerHoldsEverything": "A função de proprietário tem sempre todas as permissões deste grupo. Só o nome visível pode ser alterado.",
       "presets": {
@@ -1009,6 +1010,7 @@
         "members-invite": "Os membros podem convidar outras pessoas",
         "members-post": "Os membros podem escrever publicações",
         "nonmembers-members": "Quem não é membro pode ver a lista de membros",
+        "nonmembers-profile": "Pessoas de fora podem ver que o grupo existe",
         "nonmembers-read": "Quem não é membro pode ler as publicações"
       },
       "systemRole": "Função do sistema: não pode ser eliminada nem renomeada",
@@ -1033,15 +1035,15 @@
       "unavailable": "Grupo não disponível"
     },
     "type": "Visibilidade do grupo",
-    "types": {
-      "closed": "Fechado",
-      "hidden": "Secreto",
-      "public": "Público"
-    },
     "typeDescriptions": {
       "closed": "Todas as publicações visíveis apenas para os membros do grupo",
       "hidden": "O grupo (incluindo o nome) é completamente invisível",
       "public": "O grupo e todas as publicações são visíveis para todos os usuários registrados"
+    },
+    "types": {
+      "closed": "Fechado",
+      "hidden": "Secreto",
+      "public": "Público"
     },
     "typesOptions": {
       "closed": "Fechado — Todas as publicações visíveis apenas para os membros do grupo",

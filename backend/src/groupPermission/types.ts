@@ -33,8 +33,8 @@ export type GroupPermissionKey =
   | 'group.videoCall.join'
 
 // Grouping for the group's rights UI. Open string (the JSON is the source of
-// truth); the known groups today are 'visibility' | 'content' | 'membership'
-// | 'administration' | 'communication'.
+// truth); the known groups today are 'visibility' | 'content' | 'moderation'
+// | 'membership' | 'administration' | 'communication'.
 export type GroupPermissionGroup = string
 
 // Additional runtime feature gates, on top of the `groupsEnabled` policy that gates

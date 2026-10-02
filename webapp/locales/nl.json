@@ -224,16 +224,16 @@
       "applied": "{count} groepen bijgewerkt",
       "apply": "Toepassen op ongewijzigde groepen",
       "confirmApply": "De sjablonen toepassen op {count} groepen die hun rollen nooit hebben aangepast? Aangepaste groepen blijven ongemoeid.",
-      "description": "Elke nieuwe groep begint met deze sjablonen. Bestaande groepen veranderen niet als je ze hier aanpast — daarvoor is de knop hieronder.",
+      "description": "Wie wat mag binnen een groep. Elke nieuwe groep start vanuit deze sjablonen; bestaande groepen veranderen niet door een wijziging hier — daarvoor is de knop hieronder.",
       "labelField": "Naam",
-      "name": "Groepsrollen",
+      "name": "Groepsrollen & rechten",
       "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten en kan niet worden aangepast.",
       "resultingVisibility": "Groepen uit dit sjabloon zijn:",
-      "saveFirst": "Eerst opslaan of verwerpen — deze rol heeft niet-opgeslagen wijzigingen.",
       "saved": "Sjabloon opgeslagen",
+      "saveFirst": "Eerst opslaan of verwerpen — deze rol heeft niet-opgeslagen wijzigingen.",
       "templateLabel": "Sjabloon",
-      "title": "Standaardrollen voor groepen",
-      "untouched": "Een wijziging hier bereikt {untouched} van {total} groepen — die hun eigen rechten nooit wijzigden — en pas als je ze toepast."
+      "title": "Groepsrollen & rechten",
+      "untouched": "Een wijziging hier bereikt {untouched} van de {total} groepen die met dit sjabloon zijn gemaakt — de groepen die hun eigen rechten nooit hebben gewijzigd — en alleen als je die toepast."
     },
     "groups": {
       "active": "actief",
@@ -354,9 +354,9 @@
       "delete": "Verwijderen",
       "deleteError": "Kon rol niet verwijderen: {message}",
       "deleteSuccess": "Rol verwijderd.",
-      "description": "Maak rollen aan en wijs rechten toe. Wijzigingen worden direct toegepast.",
+      "description": "Wie wat mag in het hele netwerk. Maak rollen aan en wijs rechten toe — wijzigingen gelden meteen.",
       "members": "{count} leden",
-      "name": "Rollen en rechten",
+      "name": "Rollen & rechten",
       "nameLabel": "Naam",
       "perm": {
         "apiKey_administer": "API-sleutels van andere gebruikers beheren.",
@@ -397,7 +397,7 @@
         "message": "Je staat op het punt de rechten ‘rollen beheren’ te verwijderen van <strong>{role}</strong> — je eigen rol. Je kunt dan geen rollen meer beheren; alleen een eigenaar kan dit herstellen. Doorgaan?",
         "title": "Je eigen rolbeheer verwijderen?"
       },
-      "title": "Rollen en rechten"
+      "title": "Rollen & rechten"
     },
     "settings": {
       "name": "Instellingen"
@@ -992,6 +992,7 @@
       "mandatory": "Altijd toegekend: een lidmaatschap dat je niet kunt beëindigen is geen instelling.",
       "members": "{count} leden",
       "moot": "Wie geen lid is, heeft geen lidmaatschap om te beëindigen.",
+      "noApplicants": "Niemand kan op dit moment lidmaatschap aanvragen, dus er zijn geen wachtende aanvragers.",
       "noRight": "Je kunt geen recht geven dat je zelf niet hebt.",
       "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten in deze groep. Alleen de weergavenaam kan worden aangepast.",
       "presets": {
@@ -1009,6 +1010,7 @@
         "members-invite": "Leden mogen anderen uitnodigen",
         "members-post": "Leden mogen berichten schrijven",
         "nonmembers-members": "Niet-leden mogen de ledenlijst zien",
+        "nonmembers-profile": "Buitenstaanders kunnen zien dat de groep bestaat",
         "nonmembers-read": "Niet-leden mogen de berichten lezen"
       },
       "systemRole": "Systeemrol: kan niet worden verwijderd of hernoemd",
@@ -1033,15 +1035,15 @@
       "unavailable": "Groep niet meer beschikbaar"
     },
     "type": "Zichtbaarheid van de groep",
-    "types": {
-      "closed": "Gesloten",
-      "hidden": "Geheim",
-      "public": "Openbaar"
-    },
     "typeDescriptions": {
       "closed": "Alle berichten alleen zichtbaar voor groepsleden",
       "hidden": "Groep (inclusief de naam) is volledig onzichtbaar",
       "public": "Groep en alle berichten zijn zichtbaar voor alle geregistreerde gebruikers"
+    },
+    "types": {
+      "closed": "Gesloten",
+      "hidden": "Geheim",
+      "public": "Openbaar"
     },
     "typesOptions": {
       "closed": "Gesloten — Alle berichten alleen zichtbaar voor groepsleden",

@@ -481,7 +481,28 @@ describe('Mutation.updateGroupRole', () => {
         { groupId: 'g1', name: 'admin', permissions: ['group.member.remove'] },
         context,
       ),
-    ).rejects.toThrow('You cannot grant rights you do not hold yourself!')
+    ).rejects.toThrow('You cannot grant rights you do not hold yourself')
+  })
+
+  it('names the rights that blocked it, rather than leaving the reader to guess', async () => {
+    // A right can be missing from the actor's EFFECTIVE set without being missing from their
+    // role — the network cap takes `group.videoCall.create` away in a group whose door is
+    // restricted. "You cannot grant rights you do not hold" then sends whoever reads it
+    // looking in entirely the wrong place.
+    mocked.readGroupRoles.mockResolvedValue([role('admin')])
+    const { context } = contextFor(editor)
+
+    await expect(
+      Mutation.updateGroupRole(
+        {},
+        {
+          groupId: 'g1',
+          name: 'admin',
+          permissions: ['group.member.remove', 'group.videoCall.create'],
+        },
+        context,
+      ),
+    ).rejects.toThrow('group.member.remove, group.videoCall.create')
   })
 
   it('lets an edit KEEP a right the actor cannot hold right now', async () => {
@@ -522,7 +543,7 @@ describe('Mutation.updateGroupRole', () => {
         { groupId: 'g1', name: 'admin', permissions: ['group.read'] },
         context,
       ),
-    ).rejects.toThrow('You cannot grant rights you do not hold yourself!')
+    ).rejects.toThrow('You cannot grant rights you do not hold yourself')
   })
 
   describe('the privacy cap on the non-member role (E10)', () => {
@@ -569,6 +590,26 @@ describe('Mutation.updateGroupRole', () => {
           context,
         ),
       ).rejects.toThrow('more private')
+    })
+
+    it('judges the set that will be STORED, not the one that was ticked', async () => {
+      // `group.content.read` alone derives to `hidden`, because the visibility asks for
+      // `group.read` first — so before the implication ran ahead of the cap, opening a hidden
+      // group's content was refused for making it MORE private. The implication adds
+      // `group.read`, the cap sees `public`, and the edit is the opening it actually is.
+      const { context } = contextFor(editorOf('hidden'))
+
+      await expect(
+        Mutation.updateGroupRole(
+          {},
+          { groupId: 'g1', name: 'none', permissions: ['group.content.read'] },
+          context,
+        ),
+      ).resolves.toMatchObject({
+        name: 'none',
+        // The implication appends, so the stored order is the ask followed by what it dragged in.
+        permissions: ['group.content.read', 'group.read'],
+      })
     })
 
     it('lets anybody who may edit the roles OPEN a group up', async () => {
@@ -688,7 +729,7 @@ describe('Mutation.createGroupRole', () => {
         { groupId: 'g1', name: 'steward', permissions: ['group.role.manage', 'group.post.pin'] },
         context,
       ),
-    ).rejects.toThrow('You cannot grant rights you do not hold yourself!')
+    ).rejects.toThrow('You cannot grant rights you do not hold yourself')
   })
 
   it('creates the role with nobody in it yet', async () => {

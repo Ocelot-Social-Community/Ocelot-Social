@@ -5,6 +5,23 @@ import rights from './rights.vue'
 const localVue = global.localVue
 
 const CATALOG = [
+  // The two rights the visibility is derived from. Without them in the catalog the outsider
+  // switches are not grantable, and the rows that decide whether a group is secret or public
+  // could not be exercised at all.
+  {
+    key: 'group.read',
+    group: 'visibility',
+    description: "See the group's profile.",
+    gatedBy: [],
+    requiresNetworkPermission: null,
+  },
+  {
+    key: 'group.content.read',
+    group: 'visibility',
+    description: "Read the group's posts.",
+    gatedBy: [],
+    requiresNetworkPermission: null,
+  },
   {
     key: 'group.post.create',
     group: 'content',
@@ -77,6 +94,8 @@ describe('rights.vue', () => {
   // "held" set is what decides which rows are editable.
   const held = [
     'group.role.manage',
+    'group.read',
+    'group.content.read',
     'group.post.create',
     'group.comment.create',
     'group.members.read',
@@ -139,6 +158,41 @@ describe('rights.vue', () => {
     expect(at(wrapper, 'switch-nonmembers-members').exists()).toBe(true)
     // The matrix is reachable but is not the entry point.
     expect(at(wrapper, 'rights-advanced').exists()).toBe(false)
+  })
+
+  describe('the simple view can reach every visibility', () => {
+    // Both directions were unreachable: `group.read` sat on no switch, so whatever was ticked
+    // the group could never become public — and whatever was UNticked it never became secret
+    // either, because nothing took that right away again.
+    const noneRoleAfter = (wrapper) => {
+      const call = mocks.$apollo.mutate.mock.calls.at(-1)[0]
+      return call.variables.permissions
+    }
+
+    it('makes the group secret when the last outsider right is taken away', async () => {
+      const wrapper = await Wrapper()
+      wrapper.setData({
+        roles: ROLES.map((role) =>
+          role.name === 'none'
+            ? { ...role, permissions: ['group.read', 'group.content.read', 'group.members.read'] }
+            : role,
+        ),
+      })
+      await wrapper.vm.$nextTick()
+
+      await at(wrapper, 'switch-nonmembers-profile').setChecked(false)
+
+      // The dependants go with it: reading the posts of a group one cannot see is not a state.
+      expect(noneRoleAfter(wrapper)).toEqual([])
+    })
+
+    it('makes the group public when the posts are opened, without a second tick', async () => {
+      const wrapper = await Wrapper()
+
+      await at(wrapper, 'switch-nonmembers-read').setChecked(true)
+
+      expect(noneRoleAfter(wrapper)).toEqual(['group.content.read', 'group.read'])
+    })
   })
 
   describe('the resulting group type', () => {
@@ -424,6 +478,36 @@ describe('rights.vue', () => {
         }),
       )
       expect(wrapper.vm.activeRoleName).toBe('editors')
+    })
+
+    it('leaves out a member right the creator cannot grant right now', async () => {
+      // The refusal this fixes: the member role legitimately holds rights that are capped away
+      // for the person adding a role — a network cap takes `group.videoCall.create` out of
+      // everybody's effective set in a group whose door is restricted — and copying those made
+      // the server answer "you cannot grant rights you do not hold yourself" every time.
+      mocks.$apollo.mutate = jest.fn().mockResolvedValue({
+        data: {
+          createGroupRole: {
+            name: 'editors',
+            label: null,
+            system: false,
+            protected: false,
+            permissions: ['group.post.create'],
+            memberCount: 0,
+          },
+        },
+      })
+      const wrapper = await advanced(['group.role.manage', 'group.post.create'])
+
+      await at(wrapper, 'role-add').trigger('click')
+      at(wrapper, 'new-role-name').find('input').setValue('editors')
+      await at(wrapper, 'role-create').trigger('submit')
+
+      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({ permissions: ['group.post.create'] }),
+        }),
+      )
     })
 
     it('deletes a role it created, moving its members to the member role', async () => {

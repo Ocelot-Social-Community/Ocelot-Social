@@ -5,6 +5,7 @@ import GroupRightsSimple from './GroupRightsSimple.vue'
 const localVue = global.localVue
 
 const CATALOG = [
+  { key: 'group.read' },
   { key: 'group.post.create' },
   { key: 'group.comment.create' },
   { key: 'group.chat.participate' },
@@ -51,6 +52,16 @@ describe('GroupRightsSimple', () => {
       const wrapper = Wrapper({ roles: rolesWith(['group.read', 'group.content.read']) })
 
       expect(at(wrapper, 'visibility-public').exists()).toBe(true)
+    })
+
+    it('can be reached by ticking the boxes — every one of them makes it public', () => {
+      // The bug this row was added for: `group.read` was on no switch, so whatever an owner
+      // ticked the group stayed hidden. Every switch on must be able to mean "public".
+      const everything = ['group.read', 'group.content.read', 'group.members.read']
+      const wrapper = Wrapper({ roles: rolesWith(everything) })
+
+      expect(at(wrapper, 'visibility-public').exists()).toBe(true)
+      expect(at(wrapper, 'switch-nonmembers-profile').element.checked).toBe(true)
     })
 
     it('shows the caption it was given, because the two levels say different things', () => {
@@ -103,6 +114,28 @@ describe('GroupRightsSimple', () => {
       const wrapper = Wrapper({ roles: [{ name: 'none', permissions: [] }] })
 
       expect(at(wrapper, 'switch-members-post').element.disabled).toBe(true)
+    })
+  })
+
+  describe('the applicant rights', () => {
+    it('says so when nobody can become an applicant at all', () => {
+      // Nothing grants `group.join.request`, so the `pending` role is never held and every
+      // right on it is inert. Said rather than hidden: enabling the request is one tick away.
+      const wrapper = Wrapper()
+
+      expect(at(wrapper, 'no-applicants-note').exists()).toBe(true)
+    })
+
+    it('stays quiet once some role may ask to join', () => {
+      const wrapper = Wrapper({
+        roles: [
+          { name: 'none', permissions: ['group.join.request'] },
+          { name: 'pending', permissions: [] },
+          { name: 'usual', permissions: [] },
+        ],
+      })
+
+      expect(at(wrapper, 'no-applicants-note').exists()).toBe(false)
     })
   })
 })

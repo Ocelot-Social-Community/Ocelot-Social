@@ -224,16 +224,16 @@
       "applied": "{count} groupes mis à jour",
       "apply": "Appliquer aux groupes inchangés",
       "confirmApply": "Appliquer les modèles à {count} groupes qui n’ont jamais personnalisé leurs rôles ? Les groupes personnalisés ne sont pas touchés.",
-      "description": "Chaque nouveau groupe démarre avec ces modèles. Les groupes existants ne changent pas quand vous les modifiez ici — c’est à cela que sert le bouton ci-dessous.",
+      "description": "Qui peut faire quoi au sein d'un groupe. Chaque nouveau groupe part de ces modèles ; les groupes existants ne sont pas modifiés par une édition ici — c'est à cela que sert le bouton ci-dessous.",
       "labelField": "Nom",
-      "name": "Rôles de groupe",
+      "name": "Rôles et droits de groupe",
       "ownerHoldsEverything": "Le rôle de propriétaire détient toujours toutes les permissions et ne peut pas être modifié.",
       "resultingVisibility": "Les groupes créés à partir de ce modèle sont :",
-      "saveFirst": "Enregistrez ou annulez d'abord : ce rôle a des modifications non enregistrées.",
       "saved": "Modèle enregistré",
+      "saveFirst": "Enregistrez ou annulez d'abord : ce rôle a des modifications non enregistrées.",
       "templateLabel": "Modèle",
-      "title": "Rôles par défaut des groupes",
-      "untouched": "Une modification ici touche {untouched} groupes sur {total} — ceux qui n'ont jamais changé leurs propres droits — et seulement quand tu l'appliques."
+      "title": "Rôles et droits de groupe",
+      "untouched": "Une modification ici touche {untouched} des {total} groupes créés à partir de ce modèle — ceux qui n'ont jamais modifié leurs propres droits — et seulement lorsque vous l'appliquez."
     },
     "groups": {
       "active": "actif",
@@ -354,9 +354,9 @@
       "delete": "Supprimer",
       "deleteError": "Impossible de supprimer le rôle : {message}",
       "deleteSuccess": "Rôle supprimé.",
-      "description": "Créez des rôles et attribuez des permissions. Les changements s’appliquent immédiatement.",
+      "description": "Qui peut faire quoi sur l'ensemble du réseau. Créez des rôles et attribuez des droits — les modifications s'appliquent immédiatement.",
       "members": "{count} membres",
-      "name": "Rôles et permissions",
+      "name": "Rôles et droits",
       "nameLabel": "Nom",
       "perm": {
         "apiKey_administer": "Administrer les clés API des autres utilisateurs.",
@@ -397,7 +397,7 @@
         "message": "Vous êtes sur le point de retirer la permission « gérer les rôles » de <strong>{role}</strong> — votre propre rôle. Vous ne pourrez alors plus gérer les rôles ; seul un propriétaire pourra la rétablir. Continuer ?",
         "title": "Retirer la gestion de votre propre rôle ?"
       },
-      "title": "Rôles et permissions"
+      "title": "Rôles et droits"
     },
     "settings": {
       "name": "Paramètres"
@@ -992,6 +992,7 @@
       "mandatory": "Toujours accordé : une adhésion qu'on ne peut pas quitter n'est pas un réglage.",
       "members": "{count} membres",
       "moot": "Qui n'est pas membre n'a pas d'adhésion à quitter.",
+      "noApplicants": "Personne ne peut demander à rejoindre pour le moment, il n'y a donc aucun candidat en attente.",
       "noRight": "Vous ne pouvez pas accorder une permission que vous n’avez pas vous-même.",
       "ownerHoldsEverything": "Le rôle de propriétaire détient toujours toutes les permissions de ce groupe. Seul son nom affiché peut être modifié.",
       "presets": {
@@ -1009,6 +1010,7 @@
         "members-invite": "Les membres peuvent inviter d’autres personnes",
         "members-post": "Les membres peuvent écrire des publications",
         "nonmembers-members": "Les non-membres peuvent voir la liste des membres",
+        "nonmembers-profile": "Les personnes extérieures peuvent voir que le groupe existe",
         "nonmembers-read": "Les non-membres peuvent lire les publications"
       },
       "systemRole": "Rôle système : ne peut être ni supprimé ni renommé",
@@ -1033,15 +1035,15 @@
       "unavailable": "Groupe non disponible"
     },
     "type": "Visibilité du groupe",
-    "types": {
-      "closed": "Fermé",
-      "hidden": "Secret",
-      "public": "Public"
-    },
     "typeDescriptions": {
       "closed": "Toutes les publications visibles uniquement par les membres du groupe",
       "hidden": "Le groupe (y compris le nom) est complètement invisible",
       "public": "Le groupe et toutes les publications sont visibles pour tous les utilisateurs inscrits"
+    },
+    "types": {
+      "closed": "Fermé",
+      "hidden": "Secret",
+      "public": "Public"
     },
     "typesOptions": {
       "closed": "Fermé — Toutes les publications visibles uniquement par les membres du groupe",

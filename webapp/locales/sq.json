@@ -224,16 +224,16 @@
       "applied": "{count} grupe të përditësuara",
       "apply": "Zbato në grupet e paprekura",
       "confirmApply": "Të zbatohen shabllonet në {count} grupe që nuk i kanë përshtatur kurrë rolet e tyre? Grupet e përshtatura nuk preken.",
-      "description": "Çdo grup i ri nis me këto shabllone. Grupet që ekzistojnë nuk ndryshojnë nga një ndryshim këtu — për atë shërben butoni më poshtë.",
+      "description": "Kush mund të bëjë çfarë brenda një grupi. Çdo grup i ri niset nga këto modele; grupet ekzistuese nuk ndryshojnë nga një redaktim këtu — për këtë shërben butoni më poshtë.",
       "labelField": "Emri",
-      "name": "Rolet e grupeve",
+      "name": "Rolet dhe të drejtat e grupeve",
       "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet dhe nuk mund të redaktohet.",
       "resultingVisibility": "Grupet e krijuara nga ky shabllon janë:",
-      "saveFirst": "Fillimisht ruaj ose hidh poshtë — ky rol ka ndryshime të paruajtura.",
       "saved": "Shablloni u ruajt",
+      "saveFirst": "Fillimisht ruaj ose hidh poshtë — ky rol ka ndryshime të paruajtura.",
       "templateLabel": "Model",
-      "title": "Rolet e parazgjedhura për grupet",
-      "untouched": "Një ndryshim këtu prek {untouched} nga {total} grupe — ato që s'i kanë ndryshuar kurrë të drejtat e veta — dhe vetëm kur ta zbatosh."
+      "title": "Rolet dhe të drejtat e grupeve",
+      "untouched": "Një ndryshim këtu arrin {untouched} nga {total} grupet e krijuara nga ky model — ato që nuk i kanë ndryshuar kurrë të drejtat e veta — dhe vetëm kur e zbaton."
     },
     "groups": {
       "active": "aktiv",
@@ -354,9 +354,9 @@
       "delete": "Fshi",
       "deleteError": "Roli nuk u fshi dot: {message}",
       "deleteSuccess": "Roli u fshi.",
-      "description": "Krijo role dhe cakto leje. Ndryshimet zbatohen menjëherë.",
+      "description": "Kush mund të bëjë çfarë në të gjithë rrjetin. Krijo role dhe cakto të drejta — ndryshimet veprojnë menjëherë.",
       "members": "{count} anëtarë",
-      "name": "Rolet dhe lejet",
+      "name": "Rolet dhe të drejtat",
       "nameLabel": "Emri",
       "perm": {
         "apiKey_administer": "Administro çelësat API të përdoruesve të tjerë.",
@@ -397,7 +397,7 @@
         "message": "Po hiqni lejen «menaxho rolet» nga <strong>{role}</strong> — roli juaj. Pas kësaj nuk do të mund të menaxhoni më rolet; vetëm një pronar mund ta rivendosë. Të vazhdohet?",
         "title": "Të hiqet menaxhimi i rolit tuaj?"
       },
-      "title": "Rolet dhe lejet"
+      "title": "Rolet dhe të drejtat"
     },
     "settings": {
       "name": "Cilësimet"
@@ -992,6 +992,7 @@
       "mandatory": "Gjithmonë e dhënë: një anëtarësim që nuk mund të përfundohet nuk është një rregullim.",
       "members": "{count} anëtarë",
       "moot": "Kush nuk është anëtar, nuk ka anëtarësi për të lënë.",
+      "noApplicants": "Askush nuk mund të kërkojë të bashkohet për momentin, prandaj nuk ka aplikantë në pritje.",
       "noRight": "Nuk mund të dhurosh një leje që ti vetë nuk e ke.",
       "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet e këtij grupi. Mund të ndryshohet vetëm emri i shfaqur.",
       "presets": {
@@ -1009,6 +1010,7 @@
         "members-invite": "Anëtarët mund të ftojnë të tjerë",
         "members-post": "Anëtarët mund të shkruajnë postime",
         "nonmembers-members": "Jo-anëtarët mund të shohin listën e anëtarëve",
+        "nonmembers-profile": "Të jashtmit mund të shohin se grupi ekziston",
         "nonmembers-read": "Jo-anëtarët mund të lexojnë postimet"
       },
       "systemRole": "Rol i sistemit: nuk mund të fshihet ose riemërtohet",
@@ -1033,15 +1035,15 @@
       "unavailable": "Grupi nuk është më i disponueshëm"
     },
     "type": "Dukshmëria e grupit",
-    "types": {
-      "closed": "I mbyllur",
-      "hidden": "Sekret",
-      "public": "Publik"
-    },
     "typeDescriptions": {
       "closed": "Të gjitha postimet janë të dukshme vetëm për anëtarët e grupit",
       "hidden": "Grupi (përfshirë emrin) është plotësisht i padukshëm",
       "public": "Grupi dhe të gjitha postimet janë të dukshme për të gjithë përdoruesit e regjistruar"
+    },
+    "types": {
+      "closed": "I mbyllur",
+      "hidden": "Sekret",
+      "public": "Publik"
     },
     "typesOptions": {
       "closed": "I mbyllur — Të gjitha postimet janë të dukshme vetëm për anëtarët e grupit",

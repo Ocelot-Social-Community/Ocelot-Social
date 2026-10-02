@@ -224,16 +224,16 @@
       "applied": "{count} grupos actualizados",
       "apply": "Aplicar a los grupos sin cambios",
       "confirmApply": "¿Aplicar las plantillas a {count} grupos que nunca personalizaron sus roles? Los grupos personalizados quedan intactos.",
-      "description": "Cada grupo nuevo parte de estas plantillas. Los grupos existentes no cambian al editarlas aquí — para eso está el botón de abajo.",
+      "description": "Quién puede hacer qué dentro de un grupo. Cada grupo nuevo parte de estas plantillas; los grupos existentes no cambian al editar aquí: para eso está el botón de abajo.",
       "labelField": "Nombre",
-      "name": "Roles de grupo",
+      "name": "Roles y permisos de grupo",
       "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos y no se puede editar.",
       "resultingVisibility": "Los grupos creados con esta plantilla son:",
-      "saveFirst": "Guarda o descarta primero: este rol tiene cambios sin guardar.",
       "saved": "Plantilla guardada",
+      "saveFirst": "Guarda o descarta primero: este rol tiene cambios sin guardar.",
       "templateLabel": "Plantilla",
-      "title": "Roles predeterminados para los grupos",
-      "untouched": "Un cambio aquí alcanza {untouched} de {total} grupos — los que nunca cambiaron sus propios permisos — y solo cuando lo apliques."
+      "title": "Roles y permisos de grupo",
+      "untouched": "Una edición aquí alcanza {untouched} de los {total} grupos creados a partir de esta plantilla —los que nunca cambiaron sus propios derechos— y solo cuando la aplicas."
     },
     "groups": {
       "active": "activo",
@@ -354,7 +354,7 @@
       "delete": "Eliminar",
       "deleteError": "No se pudo eliminar el rol: {message}",
       "deleteSuccess": "Rol eliminado.",
-      "description": "Crea roles y asigna permisos. Los cambios se aplican de inmediato.",
+      "description": "Quién puede hacer qué en toda la red. Crea roles y asigna permisos: los cambios se aplican de inmediato.",
       "members": "{count} miembros",
       "name": "Roles y permisos",
       "nameLabel": "Nombre",
@@ -992,6 +992,7 @@
       "mandatory": "Siempre concedido: una membresía que no se puede terminar no es una opción.",
       "members": "{count} miembros",
       "moot": "Quien no es miembro no tiene ninguna membresía que abandonar.",
+      "noApplicants": "Por ahora nadie puede solicitar unirse, así que no hay solicitantes en espera.",
       "noRight": "No puedes conceder un permiso que tú misma no tienes.",
       "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos de este grupo. Solo se puede cambiar su nombre visible.",
       "presets": {
@@ -1009,6 +1010,7 @@
         "members-invite": "Los miembros pueden invitar a otras personas",
         "members-post": "Los miembros pueden escribir publicaciones",
         "nonmembers-members": "Quienes no son miembros pueden ver la lista de miembros",
+        "nonmembers-profile": "Los externos pueden ver que el grupo existe",
         "nonmembers-read": "Quienes no son miembros pueden leer las publicaciones"
       },
       "systemRole": "Rol del sistema: no se puede eliminar ni renombrar",
@@ -1033,15 +1035,15 @@
       "unavailable": "Grupo no disponible"
     },
     "type": "Visibilidad del grupo",
-    "types": {
-      "closed": "Cerrado",
-      "hidden": "Secreto",
-      "public": "Público"
-    },
     "typeDescriptions": {
       "closed": "Todas las publicaciones solo visibles para los miembros del grupo",
       "hidden": "El grupo (incluido el nombre) es completamente invisible",
       "public": "El grupo y todas las publicaciones son visibles para todos los usuarios registrados"
+    },
+    "types": {
+      "closed": "Cerrado",
+      "hidden": "Secreto",
+      "public": "Público"
     },
     "typesOptions": {
       "closed": "Cerrado — Todas las publicaciones solo visibles para los miembros del grupo",

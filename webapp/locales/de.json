@@ -224,16 +224,16 @@
       "applied": "{count} Gruppen aktualisiert",
       "apply": "Auf unveraenderte Gruppen anwenden",
       "confirmApply": "Vorlagen auf {count} Gruppen anwenden, die ihre Rollen nie angepasst haben? Angepasste Gruppen bleiben unberuehrt.",
-      "description": "Diese Vorlagen bekommt jede neu angelegte Gruppe. Bestehende Gruppen aendern sich dadurch nicht — dafuer gibt es die Schaltflaeche unten.",
+      "description": "Wer innerhalb einer Gruppe was darf. Jede neu angelegte Gruppe startet aus diesen Vorlagen; bestehende Gruppen ändert eine Bearbeitung hier nicht — dafür ist der Knopf unten da.",
       "labelField": "Name",
-      "name": "Gruppen-Rollen",
+      "name": "Gruppen-Rollen & Rechte",
       "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte und ist nicht bearbeitbar.",
       "resultingVisibility": "Gruppen aus dieser Vorlage sind:",
-      "saveFirst": "Erst speichern oder verwerfen — die Rolle hat ungesicherte Änderungen.",
       "saved": "Vorlage gespeichert",
+      "saveFirst": "Erst speichern oder verwerfen — die Rolle hat ungesicherte Änderungen.",
       "templateLabel": "Vorlage",
-      "title": "Standard-Rollen fuer Gruppen",
-      "untouched": "Eine Änderung hier erreicht {untouched} von {total} Gruppen — die, die ihre Rechte nie selbst geändert haben — und erst, wenn du sie anwendest."
+      "title": "Gruppen-Rollen & Rechte",
+      "untouched": "Eine Änderung hier erreicht {untouched} der {total} aus dieser Vorlage erstellten Gruppen — die, die ihre Rechte nie selbst geändert haben — und nur, wenn du sie anwendest."
     },
     "groups": {
       "active": "aktiv",
@@ -354,9 +354,9 @@
       "delete": "Löschen",
       "deleteError": "Rolle konnte nicht gelöscht werden: {message}",
       "deleteSuccess": "Rolle gelöscht.",
-      "description": "Rollen erstellen und Berechtigungen vergeben. Änderungen gelten sofort.",
+      "description": "Wer im Netzwerk was darf. Rollen anlegen und Rechte zuweisen — Änderungen gelten sofort.",
       "members": "{count} Mitglieder",
-      "name": "Rollen & Berechtigungen",
+      "name": "Rollen & Rechte",
       "nameLabel": "Name",
       "perm": {
         "apiKey_administer": "API-Schlüssel anderer Nutzer verwalten.",
@@ -397,7 +397,7 @@
         "message": "Du entfernst gerade die Berechtigung „Rollen verwalten“ von <strong>{role}</strong> — deiner eigenen Rolle. Du kannst danach keine Rollen mehr verwalten; nur ein Owner kann das rückgängig machen. Fortfahren?",
         "title": "Eigene Rollenverwaltung entfernen?"
       },
-      "title": "Rollen & Berechtigungen"
+      "title": "Rollen & Rechte"
     },
     "settings": {
       "name": "Einstellungen"
@@ -992,6 +992,7 @@
       "mandatory": "Immer vergeben: eine Mitgliedschaft, die man nicht beenden kann, ist keine Einstellung.",
       "members": "{count} Mitglieder",
       "moot": "Wer nicht Mitglied ist, hat keine Mitgliedschaft zu beenden.",
+      "noApplicants": "Zurzeit kann niemand eine Mitgliedschaft beantragen, also gibt es keine Wartenden.",
       "noRight": "Dieses Recht kannst du nicht vergeben, weil du es selbst nicht hast.",
       "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte dieser Gruppe. Nur ihr Anzeigename laesst sich aendern.",
       "presets": {
@@ -1009,6 +1010,7 @@
         "members-invite": "Mitglieder duerfen andere einladen",
         "members-post": "Mitglieder duerfen Beitraege schreiben",
         "nonmembers-members": "Aussenstehende duerfen die Mitgliederliste sehen",
+        "nonmembers-profile": "Außenstehende sehen, dass es die Gruppe gibt",
         "nonmembers-read": "Aussenstehende duerfen die Beitraege lesen"
       },
       "systemRole": "Systemrolle: kann nicht geloescht oder umbenannt werden",
@@ -1033,15 +1035,15 @@
       "unavailable": "Gruppe nicht mehr verfügbar"
     },
     "type": "Öffentlichkeit der Gruppe",
-    "types": {
-      "closed": "Geschlossen",
-      "hidden": "Geheim",
-      "public": "Öffentlich"
-    },
     "typeDescriptions": {
       "closed": "Alle Beiträge nur für Gruppenmitglieder sichtbar",
       "hidden": "Gruppe (auch der Name) komplett unsichtbar",
       "public": "Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
+    },
+    "types": {
+      "closed": "Geschlossen",
+      "hidden": "Geheim",
+      "public": "Öffentlich"
     },
     "typesOptions": {
       "closed": "Geschlossen — Alle Beiträge nur für Gruppenmitglieder sichtbar",

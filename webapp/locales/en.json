@@ -224,16 +224,16 @@
       "applied": "{count} groups updated",
       "apply": "Apply to untouched groups",
       "confirmApply": "Apply the templates to {count} groups that never customised their roles? Customised groups are left alone.",
-      "description": "Every newly created group starts from these templates. Existing groups are not changed by an edit here — that is what the button below is for.",
+      "description": "Who may do what inside a group. Every newly created group starts from these templates; existing groups are not changed by an edit here — that is what the button below is for.",
       "labelField": "Name",
-      "name": "Group roles",
+      "name": "Group roles & permissions",
       "ownerHoldsEverything": "The owner role always holds every right and cannot be edited.",
       "resultingVisibility": "Groups created from this template are:",
-      "saveFirst": "Save or discard first — this role has unsaved changes.",
       "saved": "Template saved",
+      "saveFirst": "Save or discard first — this role has unsaved changes.",
       "templateLabel": "Template",
-      "title": "Default roles for groups",
-      "untouched": "An edit here reaches {untouched} of {total} groups — the ones that never changed their own rights — and only when you apply it."
+      "title": "Group roles & permissions",
+      "untouched": "An edit here reaches {untouched} of the {total} groups created from this template — the ones that never changed their own rights — and only when you apply it."
     },
     "groups": {
       "active": "active",
@@ -354,7 +354,7 @@
       "delete": "Delete",
       "deleteError": "Could not delete role: {message}",
       "deleteSuccess": "Role deleted.",
-      "description": "Create roles and assign permissions. Changes apply immediately.",
+      "description": "Who may do what across the network. Create roles and assign permissions — changes apply immediately.",
       "members": "{count} members",
       "name": "Roles & permissions",
       "nameLabel": "Name",
@@ -992,6 +992,7 @@
       "mandatory": "Always granted: a membership one cannot end is not a setting.",
       "members": "{count} members",
       "moot": "A non-member has no membership to leave.",
+      "noApplicants": "Nobody can ask to join at the moment, so there are no waiting applicants.",
       "noRight": "You cannot grant a right you do not hold yourself.",
       "ownerHoldsEverything": "The owner role always holds every right in this group. Only its display name can be changed.",
       "presets": {
@@ -1009,6 +1010,7 @@
         "members-invite": "Members may invite others",
         "members-post": "Members may write posts",
         "nonmembers-members": "Outsiders may see the member list",
+        "nonmembers-profile": "Outsiders may see that the group exists",
         "nonmembers-read": "Outsiders may read the posts"
       },
       "systemRole": "System role: cannot be deleted or renamed",
@@ -1033,15 +1035,15 @@
       "unavailable": "Group no longer available"
     },
     "type": "Visibility of the group",
-    "types": {
-      "closed": "Closed",
-      "hidden": "Secret",
-      "public": "Public"
-    },
     "typeDescriptions": {
       "closed": "All posts only visible to the group's members",
       "hidden": "Group (including the name) is completely invisible",
       "public": "Group and all posts are visible for all registered users"
+    },
+    "types": {
+      "closed": "Closed",
+      "hidden": "Secret",
+      "public": "Public"
     },
     "typesOptions": {
       "closed": "Closed — All posts only visible to the group's members",

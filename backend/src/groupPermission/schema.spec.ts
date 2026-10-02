@@ -70,7 +70,18 @@ describe('group permission catalog', () => {
     it('sorts every key into one of the known UI groups', () => {
       // Open string in the type, closed in practice: a typo would silently create a
       // section in the group rights UI that nobody styled or translated.
-      const known = ['visibility', 'content', 'membership', 'administration', 'communication']
+      const known = [
+        'visibility',
+        'content',
+        // Acting on somebody else's post — pinning it or taking it out of the group — is a
+        // different kind of right from writing one's own, and sat under `content` until the
+        // sections were read side by side. `permissions.sections.moderation` already existed
+        // for the network catalog, so the label came for free in all eleven languages.
+        'moderation',
+        'membership',
+        'administration',
+        'communication',
+      ]
 
       expect([...new Set(EXPECTED_KEYS.map(groupFor))].sort()).toEqual([...known].sort())
     })

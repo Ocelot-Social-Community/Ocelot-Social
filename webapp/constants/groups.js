@@ -17,3 +17,17 @@ export const OWNER_GROUP_ROLE = 'owner'
  * whose members cannot leave it would need somebody else to let them out.
  */
 export const MANDATORY_GROUP_RIGHTS = ['group.leave']
+
+/**
+ * Rights that only mean something for somebody who is NOT in the group yet — the webapp side of
+ * `NON_MEMBER_ONLY_RIGHTS` in backend/src/groupRole/mandatoryRights.ts. Somebody holding a
+ * membership role has already joined, and on `pending` a join right would read as "an applicant
+ * may admit themselves", which is what approval exists to prevent.
+ */
+export const NON_MEMBER_ONLY_RIGHTS = ['group.join', 'group.join.request']
+
+/** Whether the right means anything for this role at all. Mirrors the backend's `isMootFor`. */
+export const isMootRight = (roleName, permissionKey) =>
+  roleName === NONE_GROUP_ROLE
+    ? MANDATORY_GROUP_RIGHTS.includes(permissionKey)
+    : NON_MEMBER_ONLY_RIGHTS.includes(permissionKey)

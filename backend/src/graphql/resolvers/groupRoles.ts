@@ -7,7 +7,8 @@ import { groupPermissionCatalog, sanitizeGroupPermissions } from '@src/groupPerm
 import {
   coversRole,
   PRIVACY_LEVELS,
-  withMandatoryRights,
+  storableRightsFor,
+  withImpliedRights,
   createPermissionForLevel,
   isMorePrivate,
   NONE_ROLE,
@@ -142,7 +143,16 @@ const requireCoverage = async (
   const held = new Set(existing)
   const added = new Set(permissions.filter((permission) => !held.has(permission)))
   if (!authorization || !coversRole(authorization.effective, added)) {
-    throw new UserInputError('You cannot grant rights you do not hold yourself!')
+    // Named, not just refused. A right can be missing from the actor's EFFECTIVE set without
+    // being missing from their role — the network cap takes `group.videoCall.create` away in a
+    // group whose door is restricted, for one — and "you cannot grant rights you do not hold"
+    // sends whoever reads it looking in the wrong place.
+    const missing = authorization
+      ? [...added].filter((permission) => !authorization.effective.has(permission))
+      : [...added]
+    throw new UserInputError(
+      `You cannot grant rights you do not hold yourself: ${missing.sort().join(', ')}`,
+    )
   }
   // Handed back rather than resolved twice: the group it found is the one the privacy cap
   // asks about, and a second lookup would be a second chance to disagree with it.
@@ -337,16 +347,20 @@ export default {
         await touched(context, groupId, new Date().toISOString())
         return { ...relabelled, memberCount: null }
       }
-      const requested = sanitizeGroupPermissions(params.permissions)
+      // The implications come FIRST: reading the content of a group one may not see is not a
+      // state the product has, so granting it is also granting `group.read` — and both the
+      // coverage check and the privacy cap have to judge what will actually be stored.
+      const requested = withImpliedRights(sanitizeGroupPermissions(params.permissions))
       const authorization = await requireCoverage(context, groupId, requested, existing.permissions)
       if (name === NONE_ROLE) {
         // The non-member role IS the group's visibility, so editing it is the type change.
         requirePrivacyCap(context, authorization, requested)
       }
-      // Added AFTER the checks, not before: the rights a role cannot be without are imposed by
-      // the model, not granted by the editor, so asking them to hold `group.leave` themselves
-      // would refuse an edit over a right nobody chose (see groupRole/mandatoryRights.ts).
-      const permissions = withMandatoryRights(name, requested)
+      // Applied AFTER the checks, not before: the rights a role cannot be without — and the ones
+      // that cannot apply to it — are imposed by the model, not granted by the editor, so asking
+      // them to hold `group.leave` themselves would refuse an edit over a right nobody chose
+      // (see groupRole/mandatoryRights.ts).
+      const permissions = storableRightsFor(name, requested)
       const now = new Date().toISOString()
       const updated = { ...existing, label, permissions }
       await writeGroupRole(context.database, groupId, updated, actorId(context), now)
@@ -370,10 +384,11 @@ export default {
       if (existing.some((role) => role.name === name)) {
         throw new UserInputError('A role with that name already exists in this group!')
       }
-      const requested = sanitizeGroupPermissions(params.permissions)
+      const requested = withImpliedRights(sanitizeGroupPermissions(params.permissions))
       await requireCoverage(context, groupId, requested)
-      // A new role is a membership too, so it cannot be created without the right to end it.
-      const permissions = withMandatoryRights(name, requested)
+      // A new role is a membership too, so it cannot be created without the right to end it —
+      // and it cannot carry the rights that only mean something for a non-member.
+      const permissions = storableRightsFor(name, requested)
       const now = new Date().toISOString()
       const created: GroupRoleDefinition = {
         name,
@@ -539,7 +554,10 @@ export default {
         label: validateLabel(params.label),
         permissions: existing.protected
           ? []
-          : withMandatoryRights(name, sanitizeGroupPermissions(params.permissions)),
+          : storableRightsFor(
+              name,
+              withImpliedRights(sanitizeGroupPermissions(params.permissions)),
+            ),
       }
       // A template's NAME is a privacy level, and the level is derived from exactly these
       // rights — so a `public` template whose non-member role cannot read is a contradiction,

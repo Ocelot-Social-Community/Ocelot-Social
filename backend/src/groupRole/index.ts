@@ -36,7 +36,14 @@ export {
 } from './callDoor'
 export type { CallDoor } from './callDoor'
 export { visibilitiesWithNetworkAuthority, networkAuthorityIn } from './networkAuthority'
-export { isMandatoryFor, MANDATORY_MEMBERSHIP_RIGHTS, withMandatoryRights } from './mandatoryRights'
+export {
+  isMandatoryFor,
+  isMootFor,
+  MANDATORY_MEMBERSHIP_RIGHTS,
+  NON_MEMBER_ONLY_RIGHTS,
+  storableRightsFor,
+  withImpliedRights,
+} from './mandatoryRights'
 export {
   dominatesInGroup,
   coversRole,
