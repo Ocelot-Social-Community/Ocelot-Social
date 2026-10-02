@@ -35,6 +35,7 @@ export {
   videoCallCreatePermissionFor,
 } from './callDoor'
 export type { CallDoor } from './callDoor'
+export { groupTypesWithNetworkAuthority, networkAuthorityIn } from './networkAuthority'
 export {
   dominatesInGroup,
   coversRole,

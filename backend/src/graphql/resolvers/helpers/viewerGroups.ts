@@ -1,4 +1,9 @@
-import { parseStoredPermissions, PENDING_ROLE, permissionsForGroupRole } from '@src/groupRole'
+import {
+  groupTypesWithNetworkAuthority,
+  parseStoredPermissions,
+  PENDING_ROLE,
+  permissionsForGroupRole,
+} from '@src/groupRole'
 
 import type { Context } from '@src/context'
 import type { GroupPermissionKey } from '@src/groupPermission'
@@ -45,12 +50,23 @@ const heldByRole = (roleName: string, stored: string | null): Set<GroupPermissio
     permissions: stored === null ? [] : parseStoredPermissions(stored),
   })
 
-/** Which groups the viewer's OWN role lets them read — profile and content, separately. */
+/** What the viewer may read: by their own role, and by a network right that needs no membership. */
 export interface GroupReadScope {
   /** Group ids whose profile the viewer may read (`group.read`). */
   readableGroupIds: string[]
   /** Group ids whose posts and comments the viewer may read (`group.content.read`). */
   contentGroupIds: string[]
+  /**
+   * Group TYPES whose profile the viewer may read WITHOUT being a member — the folded
+   * `group.administer.any_<type>` / `group.content.read.any_<type>` / `group.moderate.any_<type>`
+   * rights (see groupRole/networkAuthority.ts).
+   *
+   * A type list, not an id list: it is bounded by the three levels instead of by the database,
+   * which is what lets a many-groups query ask it. Without this, a network admin could open a
+   * hidden group through the per-group authorization (which folds the same rights) and get a
+   * 404 from the query that lists it — one answer per shape, which is the bug this closes.
+   */
+  readableGroupTypes: string[]
 }
 
 /**
@@ -72,8 +88,12 @@ export interface GroupReadScope {
  * Anonymous viewers hold no memberships, so they skip the query entirely.
  */
 export const groupReadScope = async (context: Context): Promise<GroupReadScope> => {
+  const readableGroupTypes = groupTypesWithNetworkAuthority(
+    'group.read',
+    context.effectivePermissions,
+  )
   if (!context.user) {
-    return { readableGroupIds: [], contentGroupIds: [] }
+    return { readableGroupIds: [], contentGroupIds: [], readableGroupTypes: [] }
   }
   const result = await context.database.query({
     query: MEMBER_READ_SCOPE_QUERY,
@@ -94,7 +114,7 @@ export const groupReadScope = async (context: Context): Promise<GroupReadScope> 
       contentGroupIds.push(groupId)
     }
   }
-  return { readableGroupIds, contentGroupIds }
+  return { readableGroupIds, contentGroupIds, readableGroupTypes }
 }
 
 /**
@@ -127,12 +147,10 @@ export interface ViewerScope {
 // additionally `_hidden` (#9405): the reported content they are asked to review stops being
 // invisible to them, without a per-row lookup.
 export const moderatorGroupTypes = (context: Context): string[] =>
-  ['closed', 'hidden'].filter((groupType) =>
-    context.effectivePermissions.has(
-      `group.content.read.any_${groupType}` as Parameters<
-        Context['effectivePermissions']['has']
-      >[0],
-    ),
+  groupTypesWithNetworkAuthority('group.content.read', context.effectivePermissions).filter(
+    // `public` cannot come from here: a public group that closed its content must not be
+    // reopened by a right that quantifies over types (see the field doc above).
+    (groupType) => groupType !== 'public',
   )
 
 export const viewerScope = async (context: Context): Promise<ViewerScope> => ({

@@ -161,9 +161,13 @@ export default {
           // MEMBERSHIP is what qualifies, not a right. An applicant to a hidden group has to
           // be able to see that they applied — the group's own fields stay blank for them,
           // which the field resolvers below take care of.
-          const { readableGroupIds } = await groupReadScope(context)
+          const { readableGroupIds, readableGroupTypes } = await groupReadScope(context)
           const readableByStranger = nonMemberReadsGroup('group')
           const readableByViewer = 'group.id IN $readableGroupIds'
+          // The third direction: a network right that reaches into groups of this type without
+          // a membership — what a moderator reviewing a report, or an admin recovering an
+          // ownerless group, holds (groupRole/networkAuthority.ts).
+          const readableByNetworkRight = 'group.groupType IN $readableGroupTypes'
 
           const transactionResponse = await txc.run(
             `
@@ -174,7 +178,11 @@ export default {
             WITH group, membership
             ${(isMember === true && 'WHERE membership IS NOT NULL') || ''}
             ${(isMember === false && `WHERE membership IS NULL AND ${readableByStranger}`) || ''}
-            ${(isMember === undefined && `WHERE ${readableByViewer} OR ${readableByStranger}`) || ''}
+            ${
+              (isMember === undefined &&
+                `WHERE ${readableByViewer} OR ${readableByStranger} OR ${readableByNetworkRight}`) ||
+              ''
+            }
             RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
             ORDER BY group.createdAt DESC
             ${first !== undefined && offset !== undefined ? 'SKIP toInteger($offset) LIMIT toInteger($first)' : ''}
@@ -182,6 +190,7 @@ export default {
             {
               userId: context.user.id,
               readableGroupIds,
+              readableGroupTypes,
               id,
               slug,
               first,
@@ -258,7 +267,7 @@ export default {
       const {
         user: { id: userId },
       } = context
-      const { readableGroupIds } = await groupReadScope(context as Context)
+      const { readableGroupIds, readableGroupTypes } = await groupReadScope(context as Context)
       const session = context.driver.session()
       try {
         const result = await session.readTransaction(async (txc) => {
@@ -275,9 +284,14 @@ export default {
             cypher = `MATCH (group:Group)
                       WHERE group.id IN $readableGroupIds
                       OR ${nonMemberReadsGroup('group')}
+                      OR group.groupType IN $readableGroupTypes
                       RETURN toString(count(group)) AS count`
           }
-          const transactionResponse = await txc.run(cypher, { userId, readableGroupIds })
+          const transactionResponse = await txc.run(cypher, {
+            userId,
+            readableGroupIds,
+            readableGroupTypes,
+          })
           return transactionResponse.records.map((record) => record.get('count'))[0]
         })
         return parseInt(result, 10) || 0

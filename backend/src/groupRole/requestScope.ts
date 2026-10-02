@@ -8,10 +8,11 @@
 // Deliberately NOT a process-wide cache the way the network roles have one: those are a
 // handful of global objects, whereas group roles scale with the number of groups. A read per
 // request against an indexed lookup is the cheaper trade — and it cannot go stale.
-import { allGroupPermissionKeys, GROUPS_ENABLED_GATE } from '@src/groupPermission'
+import { GROUPS_ENABLED_GATE } from '@src/groupPermission'
 
 import { callDoorFrom } from './callDoor'
 import { authoritySourceFor, effectiveGroupPermissions } from './effective'
+import { networkAuthorityIn } from './networkAuthority'
 import { parseStoredPermissions } from './storedPermissions'
 import { isActiveMembershipRole, NONE_ROLE, OWNER_ROLE } from './types'
 
@@ -147,38 +148,10 @@ export function createGroupAuthorizationScope({
     },
   }
 
-  /**
-   * What the viewer may do in a group of this type by virtue of a NETWORK right rather than a
-   * membership — the folded `*.any_<type>` rights (concept 7.3).
-   *
-   * `group.administer.any_<type>` folds in the whole group catalog: it exists so a group left
-   * without an owner can be made workable again, and that needs everything an owner has.
-   * `group.content.read.any_<type>` folds in exactly the reading rights, because a moderator
-   * has to see what they are asked to moderate and nothing more.
-   *
-   * The runtime gates are not checked here: every one of these keys is gated by
-   * `groupsEnabled`, and effectiveGroupPermissions requires that for every group right anyway.
-   */
-  const networkAuthorityFor = (groupType: string): Set<GroupPermissionKey> => {
-    const holds = (key: string) => effectivePermissions.has(key as PermissionKey)
-    if (holds(`group.administer.any_${groupType}`)) {
-      return new Set(allGroupPermissionKeys())
-    }
-    const authority = new Set<GroupPermissionKey>()
-    if (holds(`group.content.read.any_${groupType}`)) {
-      authority.add('group.read')
-      authority.add('group.content.read')
-      authority.add('group.members.read')
-    }
-    if (holds(`group.moderate.any_${groupType}`)) {
-      // Moderating without reading would be blind, so the read rights come along — the default
-      // roles grant both together anyway.
-      authority.add('group.read')
-      authority.add('group.content.read')
-      authority.add('group.post.moderate')
-    }
-    return authority
-  }
+  // What a network right grants in a group of this type — the shared fold, so the per-request
+  // answer and the list queries cannot disagree about it (see ./networkAuthority.ts).
+  const networkAuthorityFor = (groupType: string): Set<GroupPermissionKey> =>
+    networkAuthorityIn(groupType, effectivePermissions)
 
   const resolveGroup = async (groupId: string): Promise<GroupAuthorization | null> => {
     const result = await database.query({
