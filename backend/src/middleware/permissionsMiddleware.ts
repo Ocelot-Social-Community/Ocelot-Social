@@ -13,6 +13,7 @@ import {
   memberRoleHolds,
   nonMemberReadsContent,
   optionalMemberRoleMatch,
+  visibilityOf,
 } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { inviteCodeAllowsRegistration } from '@graphql/resolvers/inviteCodes'
 import {
@@ -317,7 +318,7 @@ const canReviewReportedContent = rule({ cache: 'no_cache' })(async (
             OPTIONAL MATCH (resource)-[:COMMENTS]->(:Post)-[:IN]->(viaPost:Group)
             WITH coalesce(direct, viaPost) AS group
             ${optionalMemberRoleMatch('group', '$viewerId')}
-            RETURN group.groupType AS groupType,
+            RETURN ${visibilityOf('group')} AS groupType,
                    (group IS NULL
                      OR ${nonMemberReadsContent('group')}
                      OR ${memberRoleHolds('group.content.read')}) AS readableHere`,

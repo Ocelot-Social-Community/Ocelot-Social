@@ -18,7 +18,7 @@ import {
 import { UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 import { branding } from '@src/branding'
-import { NONE_ROLE, PENDING_ROLE, USUAL_ROLE } from '@src/groupRole'
+import { NONE_ROLE, PENDING_ROLE, privacyLevelFrom, USUAL_ROLE } from '@src/groupRole'
 import {
   applyGroupTypeToNonMemberRoles,
   readGroupRoles,
@@ -26,7 +26,11 @@ import {
   setNonMemberMemberListAccess,
 } from '@src/groupRole/repository'
 
-import { nonMemberReadsGroup, nonMemberReadsMembers } from './helpers/groupAccessCypher'
+import {
+  nonMemberReadsGroup,
+  nonMemberReadsMembers,
+  visibilityOf,
+} from './helpers/groupAccessCypher'
 import Resolver from './helpers/Resolver'
 import { groupReadScope } from './helpers/viewerGroups'
 import { images } from './images/images'
@@ -114,6 +118,21 @@ const groupCypherFields = Resolver('Group', {
  * The optional call is for the unit tests that hand in a partial context; a real request always
  * carries the scope, and without one these fields behave as they did before the rights existed.
  */
+/**
+ * How findable a group is, from the row the query returned.
+ *
+ * Not a stored property: the two columns below ARE the visibility (privacyLevelFrom), and a
+ * third copy of them could only ever go stale. `showMembers` is deliberately not part of it —
+ * a group may keep its member list private without being any harder to find.
+ */
+const visibilityOfGroup = (group: { nonMemberRead?: unknown; nonMemberContentRead?: unknown }) =>
+  privacyLevelFrom({
+    nonMemberRead: group.nonMemberRead === true,
+    nonMemberContentRead: group.nonMemberContentRead === true,
+    showMembers: false,
+    nonMemberJoin: false,
+  })
+
 const mayReadGroup = async (parent: { id?: string }, context: Context): Promise<boolean> => {
   if (!context.groupAuthorization) {
     return true
@@ -167,7 +186,7 @@ export default {
           // The third direction: a network right that reaches into groups of this type without
           // a membership — what a moderator reviewing a report, or an admin recovering an
           // ownerless group, holds (groupRole/networkAuthority.ts).
-          const readableByNetworkRight = 'group.groupType IN $readableGroupTypes'
+          const readableByNetworkRight = `${visibilityOf('group')} IN $readableGroupTypes`
 
           const transactionResponse = await txc.run(
             `
@@ -284,7 +303,7 @@ export default {
             cypher = `MATCH (group:Group)
                       WHERE group.id IN $readableGroupIds
                       OR ${nonMemberReadsGroup('group')}
-                      OR group.groupType IN $readableGroupTypes
+                      OR ${visibilityOf('group')} IN $readableGroupTypes
                       RETURN toString(count(group)) AS count`
           }
           const transactionResponse = await txc.run(cypher, {
@@ -451,7 +470,7 @@ export default {
       try {
         const group = await session.writeTransaction(async (transaction) => {
           const previousGroupTypeResult = await transaction.run(
-            `MATCH (group:Group {id: $groupId}) RETURN group.groupType AS groupType`,
+            `MATCH (group:Group {id: $groupId}) RETURN ${visibilityOf('group')} AS groupType`,
             { groupId },
           )
           previousGroupType = previousGroupTypeResult.records[0]?.get('groupType') as
@@ -776,7 +795,7 @@ export default {
               WHERE membership.role <> 'pending'
                 AND ($nameFilter = '' OR toLower(group.name) CONTAINS toLower($nameFilter))
               RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
-              ORDER BY group.groupType ASC, group.createdAt DESC
+              ORDER BY ${visibilityOf('group')} ASC, group.createdAt DESC
               SKIP toInteger($offset) LIMIT toInteger($first)
             `
           } else {
@@ -788,10 +807,10 @@ export default {
               OPTIONAL MATCH (viewer:User {id: $viewerId})-[viewerMembership:MEMBER_OF]->(group)
               WITH profileUser, membership, group, viewerMembership
               WHERE (
-                (group.groupType = 'public' AND coalesce(profileUser.showPublicGroupsOnProfile, true) = true)
-                OR (group.groupType = 'closed' AND coalesce(profileUser.showClosedGroupsOnProfile, true) = true)
+                (${visibilityOf('group')} = 'public' AND coalesce(profileUser.showPublicGroupsOnProfile, true) = true)
+                OR (${visibilityOf('group')} = 'closed' AND coalesce(profileUser.showClosedGroupsOnProfile, true) = true)
                 OR (
-                  group.groupType = 'hidden'
+                  ${visibilityOf('group')} = 'hidden'
                   AND coalesce(profileUser.showHiddenGroupsOnProfile, true) = true
                   AND viewerMembership IS NOT NULL
                   AND viewerMembership.role <> 'pending'
@@ -952,19 +971,24 @@ export default {
         await session.close()
       }
     },
+    // The visibility, from the columns the group carries — never from a column of its own, so
+    // the API and the rights cannot drift (groupRole/privacyLevel.ts, `visibilityOf` in Cypher).
+    visibility: (parent) => visibilityOfGroup(parent),
+    // The same answer under the name clients used before.
+    groupType: (parent) => visibilityOfGroup(parent),
     name: async (parent, _args, context: Context, _resolveInfo) => {
       // An unlisted group keeps its name from a logged-out visitor: an id that leaks somewhere
       // must not leak a name with it. The one exception is an invite code — holding it IS the
       // entitlement, and the registration screen has to be able to say what one is invited to
       // (the marker is set by InviteCode.invitedTo, never by a request).
       if (!context.user && !parent.invitedThroughCode) {
-        return parent.groupType === 'hidden' ? '' : parent.name
+        return visibilityOfGroup(parent) === 'hidden' ? '' : parent.name
       }
       return parent.name
     },
     about: async (parent, _args, context: Context, _resolveInfo) => {
       if (!context.user && !parent.invitedThroughCode) {
-        return parent.groupType === 'hidden' ? '' : parent.about
+        return visibilityOfGroup(parent) === 'hidden' ? '' : parent.about
       }
       // An invited visitor sees the summary for the same reason they see the name; beyond that
       // the profile follows `group.read` like for everybody else.
@@ -980,7 +1004,7 @@ export default {
       // "Non-members may see the member list" IS the non-member role holding group.members.read;
       // the setting was only ever a second way of saying it. Read from the role so the two can
       // never disagree, with the old property as the fallback for a group whose roles are not
-      // seeded yet (a database mid-migration).
+      // seeded yet (a database mid-migration), which the boot repair then fixes.
       // Same tolerance as membersCount above for a partial context in a unit test.
       const roles = context.database
         ? await readGroupRoles(context.database, parent.id as string)
@@ -988,12 +1012,6 @@ export default {
       const none = roles.find((role) => role.name === NONE_ROLE)
       if (none) {
         return none.permissions.includes('group.members.read')
-      }
-      if (parent.groupType === 'public') {
-        return true
-      }
-      if (parent.groupType === 'hidden') {
-        return false
       }
       return (parent.showMembers as boolean) ?? false
     },

@@ -151,13 +151,13 @@ export const redeemInviteCode = async (context: Context, code, newUser = false) 
     // and therefore sees the group's `none` role.
     const authorization = await context.groupAuthorization.forGroup(group.id as string)
     // A group with no role definitions at all — one that predates them, or a deployment between
-    // the code and its migration — falls back to what the group TYPE used to say. Failing
-    // closed here would be wrong in a way the read paths can afford and this cannot: it would
-    // quietly turn every invited person into an applicant until the migration runs.
+    // the code and its migration — falls back to the template it runs on. Failing closed here
+    // would be wrong in a way the read paths can afford and this cannot: it would quietly turn
+    // every invited person into an applicant until the migration runs.
     const role = (
       authorization?.hasRoleDefinition
         ? authorization.has('group.join')
-        : group.groupType === 'public'
+        : group.template === 'public'
     )
       ? USUAL_ROLE
       : PENDING_ROLE

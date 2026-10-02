@@ -8,6 +8,7 @@ import {
   memberRoleHolds,
   nonMemberReadsContent,
   optionalMemberRoleMatch,
+  visibilityOf,
 } from './helpers/groupAccessCypher'
 
 import type { Context } from '@src/context'
@@ -177,7 +178,7 @@ export default {
             (group IS NULL
               OR ${nonMemberReadsContent('group')}
               OR ${memberRoleHolds('group.content.read')}) as readableHere
-            RETURN report {.*, resource: finalResource, filed: filed, reviewed: reviewed, groupType: group.groupType, readableHere: readableHere }
+            RETURN report {.*, resource: finalResource, filed: filed, reviewed: reviewed, groupType: ${visibilityOf('group')}, readableHere: readableHere }
             ${orderByClause}
             ${offset} ${limit}
           `,

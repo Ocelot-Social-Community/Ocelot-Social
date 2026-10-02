@@ -3,7 +3,7 @@
 /* eslint-disable security/detect-object-injection */
 import { UserInputError } from '@graphql/errors'
 
-import { nonMemberReadsContent } from './groupAccessCypher'
+import { nonMemberReadsContent, visibilityOf } from './groupAccessCypher'
 import { orderClause } from './ordering'
 
 // Translates the `_PostFilter` tree into a Cypher WHERE clause — the part neo4j-graphql-js
@@ -195,7 +195,7 @@ const translate = (
               MATCH (${alias})-[:IN]->(g:Group)
               WHERE NOT (${nonMemberReadsContent('g')})
                 AND NOT g.id IN $${groupsParameter}
-                AND NOT g.groupType IN $${typesParameter}
+                AND NOT ${visibilityOf('g')} IN $${typesParameter}
             }
             OR EXISTS { MATCH (${alias})<-[:WROTE]-(:User { id: $${parameter} }) }
           )`,

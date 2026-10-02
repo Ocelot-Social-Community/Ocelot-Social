@@ -79,9 +79,12 @@ const contextFor = (
 }
 
 const { Group } = resolvers
+// A row as a query returns it: the visibility is read from these two columns, never from a
+// property of its own (groupRole/privacyLevel.ts). These say "closed".
 const group = {
   id: 'g1',
-  groupType: 'closed',
+  nonMemberRead: true,
+  nonMemberContentRead: false,
   description: '<p>About us</p>',
   locationName: 'Kiel',
 }
@@ -172,7 +175,8 @@ describe('the profile fields', () => {
   it('blank the name and the summary of a hidden group for a visitor who is not logged in', async () => {
     // An id leaking somewhere must not leak a name with it.
     const { context } = contextFor({ user: null, effective: [] })
-    const hidden = { ...group, groupType: 'hidden', name: 'Secret', about: 'Hush' }
+    // Unlisted: its non-member role cannot read the profile, which is what makes it so.
+    const hidden = { ...group, nonMemberRead: false, name: 'Secret', about: 'Hush' }
 
     expect(await Group.name(hidden, {}, context, null)).toBe('')
     expect(await Group.about(hidden, {}, context, null)).toBe('')
@@ -182,7 +186,7 @@ describe('the profile fields', () => {
     const { context } = contextFor({ effective: [] })
 
     expect(
-      await Group.name({ ...group, groupType: 'hidden', name: 'Secret' }, {}, context, null),
+      await Group.name({ ...group, nonMemberRead: false, name: 'Secret' }, {}, context, null),
     ).toBe('Secret')
   })
 
@@ -192,7 +196,7 @@ describe('the profile fields', () => {
     const { context } = contextFor({ user: null, effective: [] })
     const invited = {
       ...group,
-      groupType: 'hidden',
+      nonMemberRead: false,
       name: 'Secret',
       about: 'Hush',
       invitedThroughCode: true,
@@ -207,6 +211,9 @@ describe('the profile fields', () => {
 
     expect(await Group.name({ ...group, name: 'Public' }, {}, context, null)).toBe('Public')
     expect(await Group.about({ ...group, about: 'Hi' }, {}, context, null)).toBe('Hi')
+    // …and the field that answers it reads the same two columns.
+    expect(Group.visibility(group)).toBe('closed')
+    expect(Group.groupType(group)).toBe('closed')
   })
 
   it('answer as before for a partial context, which is what a unit test hands in', async () => {
@@ -309,21 +316,9 @@ describe('Group.showMembers', () => {
   })
 
   describe('for a group whose roles are not seeded yet', () => {
-    // A database mid-migration. The deprecated property and the group type are what the code
-    // read before the rights existed, and they stay the answer until the roles arrive.
-    it('falls back to open for a public group', async () => {
-      const { context } = contextFor()
-
-      expect(await Group.showMembers({ ...group, groupType: 'public' }, {}, context)).toBe(true)
-    })
-
-    it('falls back to closed for a hidden group', async () => {
-      const { context } = contextFor()
-
-      expect(await Group.showMembers({ ...group, groupType: 'hidden' }, {}, context)).toBe(false)
-    })
-
-    it('falls back to the old setting for a closed group', async () => {
+    // A database mid-migration. The group's own `showMembers` column is what the code read
+    // before the rights existed, and it stays the answer until the roles arrive.
+    it('falls back to the stored setting', async () => {
       const { context } = contextFor()
 
       expect(await Group.showMembers({ ...group, showMembers: true }, {}, context)).toBe(true)
@@ -334,7 +329,7 @@ describe('Group.showMembers', () => {
       const { context } = contextFor({ withoutScope: true })
       const partial = { ...context, database: undefined } as unknown as Context
 
-      expect(await Group.showMembers({ ...group, groupType: 'public' }, {}, partial)).toBe(true)
+      expect(await Group.showMembers({ ...group, showMembers: true }, {}, partial)).toBe(true)
       expect(mockedReadGroupRoles).not.toHaveBeenCalled()
     })
   })

@@ -6,6 +6,7 @@ import { beforeAll, afterAll, beforeEach, describe, it, expect } from 'vitest'
 import Factory, { cleanDatabase } from '@db/factories'
 import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
+import elevateInGroup from '@graphql/queries/groups/elevateInGroup.gql'
 import GroupPosts from '@graphql/queries/groups/GroupPosts.gql'
 import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
 import removePostFromGroup from '@graphql/queries/groups/removePostFromGroup.gql'
@@ -218,11 +219,31 @@ describe('removePostFromGroup', () => {
       expect((await postsOfGroup()).posts).toHaveLength(1)
     })
 
-    it('works for a network moderator holding group.moderate.any_closed', async () => {
-      // The network authority folded into the group scope: no membership, and still able to
-      // moderate what a report pointed them at.
+    it('refuses a network moderator who has not picked their rights up yet', async () => {
+      // Holding `group.moderate.any_closed` lets them READ what the report points at; taking
+      // the post out is an act, and acts wait for the ask (groupRole/elevation.ts).
       rolesOverride = MODERATOR_WITH_GROUP_RIGHTS
       authenticatedUser = await moderator.toJson()
+
+      const { errors } = await mutate({
+        mutation: removePostFromGroup,
+        variables: { groupId: 'closed-group', postId: 'members-post' },
+      })
+
+      expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+      expect((await postsOfGroup()).posts).toHaveLength(1)
+    })
+
+    it('works for a network moderator who picked them up', async () => {
+      // The network authority folded into the group scope: no membership, and still able to
+      // moderate what a report pointed them at — once they said they are doing it.
+      rolesOverride = MODERATOR_WITH_GROUP_RIGHTS
+      authenticatedUser = await moderator.toJson()
+
+      await mutate({
+        mutation: elevateInGroup,
+        variables: { groupId: 'closed-group', reason: 'Reviewing a report' },
+      })
 
       const { errors } = await mutate({
         mutation: removePostFromGroup,

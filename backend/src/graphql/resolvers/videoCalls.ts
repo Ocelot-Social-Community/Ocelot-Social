@@ -11,6 +11,7 @@ import { AccessToken, RoomServiceClient, TwirpError } from 'livekit-server-sdk'
 
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@constants/subscriptions'
 import { ForbiddenError } from '@graphql/errors'
+import { visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
@@ -45,7 +46,7 @@ const getGroupMembershipType = async (
         `
           MATCH (u:User { id: $userId })-[m:MEMBER_OF]->(g:Group { id: $groupId })
           WHERE m.role <> 'pending'
-          RETURN g.groupType AS groupType
+          RETURN ${visibilityOf('g')} AS groupType
         `,
         { userId: currentUserId, groupId },
       ),

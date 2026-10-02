@@ -31,15 +31,7 @@ type GroupRole {
   memberCount: Int
 }
 
-"""
-A named set of roles a new group starts from.
-
-Its NAME and the visibility it results in are two different things, and the type says so: the
-name identifies the template an operator edits and groups are created from, `visibility` is what
-the rights in its non-member role derive to (groupRole/privacyLevel.ts). They agree for the three
-shipped templates — a drift guard keeps them agreeing — but a template is a starting point and a
-visibility is a property of a group, and only one of them changes when a group edits its rights.
-"""
+"A named set of roles a new group starts from. Its NAME and the visibility it results in are two different things, and the type says so: the name identifies the template an operator edits and groups are created from, `visibility` is what the rights in its non-member role derive to (groupRole/privacyLevel.ts). They agree for the three shipped templates — a drift guard keeps them agreeing — but a template is a starting point and a visibility is a property of a group, and only one of them changes when a group edits its rights."
 type GroupRoleTemplate {
   "What this template is called. The three shipped ones are named after the visibility they produce."
   name: String!
@@ -54,13 +46,7 @@ type GroupRoleTemplate {
   groupCount: Int!
 }
 
-"""
-A deliberate use of a network right inside one group.
-
-Holding `group.administer.any_<visibility>` is the power to rewrite any group of that kind; this
-is the act of picking it up, and it lapses on its own. Reading is not part of it — a moderator
-reviewing a report must not have to confirm anything to see what they were asked about.
-"""
+"A deliberate use of a network right inside one group. Holding `group.administer.any_<visibility>` is the power to rewrite any group of that kind; this is the act of picking it up, and it lapses on its own. Reading is not part of it — a moderator reviewing a report must not have to confirm anything to see what they were asked about."
 type GroupElevation {
   groupId: ID!
   "When it lapses. ISO 8601."
@@ -101,13 +87,7 @@ type Mutation {
   ): GroupRole!
   "Take a post out of a group without deleting it: the post stays with its author, it just loses its place in the group. Requires `group.post.moderate` in that group (or `group.moderate.any_<type>` network-wide). The author is notified."
   removePostFromGroup(groupId: ID!, postId: ID!): Post
-  """
-  Pick up the network rights one holds over this group, for a while.
-
-  Without it a network right gives reading and nothing else, whatever it folds in — so settings,
-  roles, memberships and moderation inside a group one is not a member of all wait for this.
-  Requires that the viewer actually holds something beyond reading there.
-  """
+  "Pick up the network rights one holds over this group, for a while. Without it a network right gives reading and nothing else, whatever it folds in — so settings, roles, memberships and moderation inside a group one is not a member of all wait for this. Requires that the viewer actually holds something beyond reading there."
   elevateInGroup(groupId: ID!, reason: String): GroupElevation!
   "Put them down again before they lapse. Returns true when there was something to end."
   endGroupElevation(groupId: ID!): Boolean!

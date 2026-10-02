@@ -511,11 +511,7 @@ enum GroupActionRadius {
 }
 
 """
-A deliberate use of a network right inside one group.
-
-Holding `group.administer.any_<visibility>` is the power to rewrite any group of that kind; this
-is the act of picking it up, and it lapses on its own. Reading is not part of it — a moderator
-reviewing a report must not have to confirm anything to see what they were asked about.
+A deliberate use of a network right inside one group. Holding `group.administer.any_<visibility>` is the power to rewrite any group of that kind; this is the act of picking it up, and it lapses on its own. Reading is not part of it — a moderator reviewing a report must not have to confirm anything to see what they were asked about.
 """
 type GroupElevation {
   """When it lapses. ISO 8601."""
@@ -619,13 +615,7 @@ type GroupRole {
 }
 
 """
-A named set of roles a new group starts from.
-
-Its NAME and the visibility it results in are two different things, and the type says so: the
-name identifies the template an operator edits and groups are created from, `visibility` is what
-the rights in its non-member role derive to (groupRole/privacyLevel.ts). They agree for the three
-shipped templates — a drift guard keeps them agreeing — but a template is a starting point and a
-visibility is a property of a group, and only one of them changes when a group edits its rights.
+A named set of roles a new group starts from. Its NAME and the visibility it results in are two different things, and the type says so: the name identifies the template an operator edits and groups are created from, `visibility` is what the rights in its non-member role derive to (groupRole/privacyLevel.ts). They agree for the three shipped templates — a drift guard keeps them agreeing — but a template is a starting point and a visibility is a property of a group, and only one of them changes when a group edits its rights.
 """
 type GroupRoleTemplate {
   """
@@ -658,11 +648,7 @@ type GroupShowMembersChanged {
 }
 
 """
-The visibility of a group, under its old name.
-
-Deprecated: a group's `type` was a CHOICE an operator made, and the rights that followed from it
-could drift away from the label. It is a RESULT now — of two rights on the group's non-member
-role — which is what `GroupVisibility` says. Same three values; existing clients keep working.
+The visibility of a group, under its old name. Deprecated: a group's `type` was a CHOICE an operator made, and the rights that followed from it could drift away from the label. It is a RESULT now — of two rights on the group's non-member role — which is what `GroupVisibility` says. Same three values; existing clients keep working.
 """
 enum GroupType {
   """
@@ -678,8 +664,7 @@ enum GroupType {
 }
 
 """
-How findable a group is, and therefore how private: derived from what its non-member role may
-read (see backend/src/groupRole/privacyLevel.ts), not chosen.
+How findable a group is, and therefore how private: derived from what its non-member role may read (see backend/src/groupRole/privacyLevel.ts), not chosen.
 """
 enum GroupVisibility {
   """The group is findable, its content is not."""
@@ -1132,11 +1117,7 @@ type Mutation {
   disableUser(disable: Boolean!, id: ID!): User
 
   """
-  Pick up the network rights one holds over this group, for a while.
-  
-  Without it a network right gives reading and nothing else, whatever it folds in — so settings,
-  roles, memberships and moderation inside a group one is not a member of all wait for this.
-  Requires that the viewer actually holds something beyond reading there.
+  Pick up the network rights one holds over this group, for a while. Without it a network right gives reading and nothing else, whatever it folds in — so settings, roles, memberships and moderation inside a group one is not a member of all wait for this. Requires that the viewer actually holds something beyond reading there.
   """
   elevateInGroup(groupId: ID!, reason: String): GroupElevation!
 

@@ -14,7 +14,6 @@ import { sanitizeGroupPermissions } from '@src/groupPermission'
 import { defaultTemplateFor } from './defaults'
 import { ELEVATION_MINUTES } from './elevation'
 import { nonMemberAccessFrom } from './nonMemberAccess'
-import { privacyLevelFrom } from './privacyLevel'
 import { parseStoredPermissions } from './storedPermissions'
 import { NONE_ROLE, PENDING_ROLE } from './types'
 
@@ -188,8 +187,7 @@ const WRITE_NON_MEMBER_ACCESS_CYPHER = `
   SET g.nonMemberRead = $nonMemberRead,
       g.nonMemberContentRead = $nonMemberContentRead,
       g.showMembers = $showMembers,
-      g.nonMemberJoin = $nonMemberJoin,
-      g.groupType = $groupType
+      g.nonMemberJoin = $nonMemberJoin
 `
 
 /** A db context, as the runner the seeding path already speaks. */
@@ -220,13 +218,11 @@ export async function syncNonMemberAccess(
   }
   // A malformed list reads as empty, which is the safe answer for a damaged row.
   const access = nonMemberAccessFrom(parseStoredPermissions(row.get('permissions') as string))
-  // `groupType` is derived from the same two rights (see ./privacyLevel.ts) and written here
-  // rather than chosen: public / closed / hidden are what the rights RESULT in. Everything
-  // that still reads the type — the per-level network rights, the admin filter, the enum in
-  // the API — therefore reads something true instead of a label that can drift from the
-  // rights it is supposed to describe.
-  const groupType = privacyLevelFrom(access)
-  await run.run(WRITE_NON_MEMBER_ACCESS_CYPHER, { groupId, ...access, groupType })
+  // The VISIBILITY is not written here, and is not stored at all: it is a function of two of
+  // these very columns (privacyLevelFrom / the `visibilityOf` expression in Cypher), so a
+  // column for it would be a third copy of the same two bits — one a direct write or a restore
+  // could leave disagreeing with the rights it claims to describe.
+  await run.run(WRITE_NON_MEMBER_ACCESS_CYPHER, { groupId, ...access })
 }
 
 /**
@@ -244,6 +240,10 @@ export async function seedRolesForNewGroup(
   groupType: string,
   now: string,
 ): Promise<void> {
+  await transaction.run(`MATCH (g:Group {id: $groupId}) SET g.template = $groupType`, {
+    groupId,
+    groupType,
+  })
   const copied = await transaction.run(COPY_TEMPLATE_CYPHER, { groupId, groupType, now })
   const names = (copied.records[0]?.get('names') as string[] | undefined) ?? []
   if (names.length > 0) {
@@ -268,7 +268,10 @@ export async function seedRolesForNewGroup(
 const GROUPS_WITHOUT_ROLES_CYPHER = `
   MATCH (g:Group)
   WHERE NOT (g)-[:HAS_GROUP_ROLE]->(:GroupRole)
-  RETURN g.id AS groupId, g.groupType AS groupType
+  // Which template to seed from is the group's own, stored, because — unlike its visibility —
+  // nothing derives it. A row that has lost even that is seeded from the most private template:
+  // a group nobody can read is repairable, a group accidentally opened is not.
+  RETURN g.id AS groupId, coalesce(g.template, 'hidden') AS groupType
 `
 
 /**
@@ -458,6 +461,11 @@ export async function applyGroupTypeToNonMemberRoles(
   actor: string,
   now: string,
 ): Promise<void> {
+  // Applying a template is also a statement about which one the group runs on from now on.
+  await db.write({
+    query: `MATCH (g:Group {id: $groupId}) SET g.template = $groupType`,
+    variables: { groupId, groupType },
+  })
   const template = defaultTemplateFor(groupType)
   if (!template) {
     // Unreachable through the API: groupType comes from the GraphQL enum and every value has a
@@ -588,8 +596,11 @@ export async function untouchedGroupIdsByType(db: DbContext): Promise<Map<string
   // Both numbers in one statement: "4 untouched" means nothing without "of how many", and two
   // queries could answer about two different moments.
   const result = await db.query({
+    // Grouped by the TEMPLATE a group runs on, not by what its rights currently derive to: a
+    // group created from `closed` and later opened up still runs on that template, and this
+    // counts the groups an `applyGroupRoleTemplates` would reach.
     query: `MATCH (g:Group)
-            RETURN g.groupType AS groupType,
+            RETURN coalesce(g.template, 'hidden') AS groupType,
                    collect(CASE WHEN g.rolesCustomizedAt IS NULL THEN g.id END) AS ids,
                    toString(count(g)) AS total`,
   })

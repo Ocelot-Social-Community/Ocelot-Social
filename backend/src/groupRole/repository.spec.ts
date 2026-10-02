@@ -71,10 +71,13 @@ describe(seedRolesForNewGroup, () => {
 
     await seedRolesForNewGroup(transaction, 'group-1', 'closed', NOW)
 
-    // One statement writes the roles: the copy. An operator who edited the templates gets what
-    // they edited, without this code knowing what that was.
-    expect(runs[0].query).toContain('GroupRoleTemplate')
-    expect(runs[0].parameters).toEqual({ groupId: 'group-1', groupType: 'closed', now: NOW })
+    // First the group records WHICH template it runs on — the one thing about it that nothing
+    // derives — then one statement writes the roles: the copy. An operator who edited the
+    // templates gets what they edited, without this code knowing what that was.
+    expect(runs[0].query).toContain('SET g.template')
+    expect(runs[0].parameters).toEqual({ groupId: 'group-1', groupType: 'closed' })
+    expect(runs[1].query).toContain('GroupRoleTemplate')
+    expect(runs[1].parameters).toEqual({ groupId: 'group-1', groupType: 'closed', now: NOW })
     // The rest is the derived columns, IN THE SAME TRANSACTION — a group whose roles exist
     // while its columns do not would be missing from the list it belongs in.
     expect(accessRuns(runs)).toHaveLength(2)
@@ -97,9 +100,8 @@ describe(seedRolesForNewGroup, () => {
       showMembers: true,
       // The door the video call cap reads (./callDoor.ts): this role may ASK to join.
       nonMemberJoin: false,
-      // Derived from the same two rights, in the same statement: a readable profile with
-      // private content IS a closed group (see ./privacyLevel.ts).
-      groupType: 'closed',
+      // No `groupType` among them: the visibility is a function of two of these columns, so
+      // storing it would be a third copy of the same bits (see ./privacyLevel.ts).
     })
   })
 
@@ -110,9 +112,10 @@ describe(seedRolesForNewGroup, () => {
 
     await seedRolesForNewGroup(transaction, 'group-2', 'public', NOW)
 
-    expect(runs[1].query).toContain('UNWIND $roles AS role')
+    // runs[0] records the template, runs[1] tries the stored copy, runs[2] is the fallback.
+    expect(runs[2].query).toContain('UNWIND $roles AS role')
 
-    const roles = runs[1].parameters?.roles as Array<{ name: string; permissions: string }>
+    const roles = runs[2].parameters?.roles as Array<{ name: string; permissions: string }>
 
     expect(roles.map((role) => role.name)).toEqual(
       DEFAULT_GROUP_ROLE_TEMPLATES.public.map((role) => role.name),
@@ -140,7 +143,7 @@ describe(seedRolesForNewGroup, () => {
 
     await seedRolesForNewGroup(transaction, 'group-4', 'public', NOW)
 
-    expect(runs[1].query).toContain('UNWIND $roles AS role')
+    expect(runs[2].query).toContain('UNWIND $roles AS role')
   })
 
   it('refuses a group type that has no template at all', async () => {
@@ -291,7 +294,6 @@ describe(syncNonMemberAccess, () => {
       nonMemberContentRead: false,
       showMembers: true,
       nonMemberJoin: false,
-      groupType: 'closed',
     })
   })
 
@@ -414,7 +416,9 @@ describe(applyGroupTypeToNonMemberRoles, () => {
 
     await applyGroupTypeToNonMemberRoles(db, 'g1', 'experimental', 'editor', NOW)
 
-    expect(sent).toEqual([])
+    // It still records which template was asked for — that is the group's own answer to "what
+    // do I run on" — but writes no roles, which is the safe arm for a name nothing maps to.
+    expect(sent.map((statement) => statement.query.includes('SET g.template'))).toEqual([true])
   })
 })
 

@@ -1,7 +1,4 @@
-"""
-How findable a group is, and therefore how private: derived from what its non-member role may
-read (see backend/src/groupRole/privacyLevel.ts), not chosen.
-"""
+"How findable a group is, and therefore how private: derived from what its non-member role may read (see backend/src/groupRole/privacyLevel.ts), not chosen."
 enum GroupVisibility {
   "Profile and content are open to everybody, members or not."
   public
@@ -11,13 +8,7 @@ enum GroupVisibility {
   hidden
 }
 
-"""
-The visibility of a group, under its old name.
-
-Deprecated: a group's `type` was a CHOICE an operator made, and the rights that followed from it
-could drift away from the label. It is a RESULT now — of two rights on the group's non-member
-role — which is what `GroupVisibility` says. Same three values; existing clients keep working.
-"""
+"The visibility of a group, under its old name. Deprecated: a group's `type` was a CHOICE an operator made, and the rights that followed from it could drift away from the label. It is a RESULT now — of two rights on the group's non-member role — which is what `GroupVisibility` says. Same three values; existing clients keep working."
 enum GroupType {
   "Anyone can find the group and join without approval."
   public

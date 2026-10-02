@@ -15,8 +15,9 @@
 //    group; the post filter instead gets the same answer hoisted into an id list once per
 //    request (see viewerGroups.ts), because it runs against every post in the database.
 //
-// `coalesce(…, <type comparison>)` is not the type deciding again: it is the value the seeded
-// template gives a group whose column the backfill migration has not written yet.
+// `coalesce(…, false)` fails closed for a group whose columns were never written: the backfill
+// migration writes them for every group, the boot repair seeds the roles of any group that has
+// none, and until both have run a group grants strangers nothing — which is the safe reading.
 //
 // Everything here has to run on Neo4j 4.4 (see neo4j/Dockerfile), which is stricter than 5:
 // an `EXISTS { … }` subquery may hold ONE match clause (comma-separated patterns are fine) and
@@ -28,15 +29,33 @@ import type { GroupPermissionKey } from '@src/groupPermission'
 
 /** The group opened its profile to people who are not in it (`group.read`). */
 export const nonMemberReadsGroup = (group: string): string =>
-  `coalesce(${group}.nonMemberRead, ${group}.groupType <> 'hidden') = true`
+  `coalesce(${group}.nonMemberRead, false) = true`
 
 /** The group opened its posts and comments to people who are not in it (`group.content.read`). */
 export const nonMemberReadsContent = (group: string): string =>
-  `coalesce(${group}.nonMemberContentRead, ${group}.groupType = 'public') = true`
+  `coalesce(${group}.nonMemberContentRead, false) = true`
 
 /** The group opened its member list to people who are not in it (`group.members.read`). */
 export const nonMemberReadsMembers = (group: string): string =>
-  `coalesce(${group}.showMembers, ${group}.groupType = 'public') = true`
+  `coalesce(${group}.showMembers, false) = true`
+
+/**
+ * How findable the group is, as an expression rather than a stored value.
+ *
+ * This is `privacyLevelFrom()` (groupRole/privacyLevel.ts) written in Cypher, and it is the
+ * reason the visibility is NOT a column: it is a function of two columns that are already
+ * there, so storing it would be a third copy of the same two bits — one that a direct write,
+ * a restore or a half-finished migration could leave disagreeing with the rights it describes.
+ *
+ * The two forms have to stay in step, which is what the drift guard in the audit checks: the
+ * TS function and this expression are asked the same question about the same rows.
+ */
+export const visibilityOf = (group: string): string =>
+  `CASE
+     WHEN coalesce(${group}.nonMemberRead, false) <> true THEN 'hidden'
+     WHEN coalesce(${group}.nonMemberContentRead, false) <> true THEN 'closed'
+     ELSE 'public'
+   END`
 
 /**
  * Whether a role holds a right, as a condition on an already-bound role node.

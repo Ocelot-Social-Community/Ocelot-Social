@@ -8,6 +8,7 @@
 // Deliberately NOT a process-wide cache the way the network roles have one: those are a
 // handful of global objects, whereas group roles scale with the number of groups. A read per
 // request against an indexed lookup is the cheaper trade — and it cannot go stale.
+import { visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { GROUPS_ENABLED_GATE } from '@src/groupPermission'
 
 import { callDoorFrom } from './callDoor'
@@ -98,12 +99,11 @@ const AUTHORIZATION_QUERY = `
   WITH g, m, e
   WITH g, coalesce(m.role, $noneRole) AS roleName, e IS NOT NULL AS elevated
   OPTIONAL MATCH (g)-[:HAS_GROUP_ROLE]->(r:GroupRole {name: roleName})
-  RETURN g.groupType AS groupType,
+  RETURN ${visibilityOf('g')} AS groupType,
          elevated AS elevated,
-         // The derived door columns, with the same template fallback the Cypher helpers use
-         // for a group the backfill has not reached yet (groupRole/nonMemberAccess.ts).
-         coalesce(g.nonMemberRead, g.groupType <> 'hidden') AS nonMemberRead,
-         coalesce(g.nonMemberJoin, g.groupType = 'public') AS nonMemberJoin,
+         // The door columns, failing closed where they were never written (nonMemberAccess.ts).
+         coalesce(g.nonMemberRead, false) AS nonMemberRead,
+         coalesce(g.nonMemberJoin, false) AS nonMemberJoin,
          roleName AS roleName,
          r.name AS name,
          r.label AS label,

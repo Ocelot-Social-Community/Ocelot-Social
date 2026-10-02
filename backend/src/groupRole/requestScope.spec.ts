@@ -34,7 +34,9 @@ const fakeDatabase = (answers: {
     queries.push(statement)
     // Discriminated by what each statement RETURNS: three of them share the same MATCH, so
     // matching on the pattern would answer the wrong question.
-    if (statement.includes('RETURN g.groupType AS groupType')) {
+    // The visibility is an expression now, not a column, so the authorization query is
+    // recognised by what it returns ALONGSIDE it.
+    if (statement.includes('AS groupType') && statement.includes('AS elevated')) {
       return Promise.resolve({ records: answers.group ? [rows(answers.group)] : [] })
     }
     if (statement.includes('RETURN roleName AS roleName, r.name AS name')) {

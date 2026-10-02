@@ -2,6 +2,7 @@ import { withFilter } from 'graphql-subscriptions'
 
 import { GROUP_PERMISSIONS_CHANGED } from '@constants/subscriptions'
 import { UserInputError } from '@graphql/errors'
+import { visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { groupPermissionCatalog, sanitizeGroupPermissions } from '@src/groupPermission'
 import {
   coversRole,
@@ -204,7 +205,7 @@ const adminGroupList = async (context: Context, params: AdminGroupFilter, countO
   if (requested.length === 0) {
     return countOnly ? 0 : []
   }
-  const clauses = ['g.groupType IN $types', 'coalesce(g.deleted, false) = false']
+  const clauses = [`${visibilityOf('g')} IN $types`, 'coalesce(g.deleted, false) = false']
   if (params.search) {
     clauses.push('(toLower(g.name) CONTAINS toLower($search) OR g.slug CONTAINS toLower($search))')
   }
