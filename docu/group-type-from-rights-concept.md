@@ -116,3 +116,45 @@ change to the permission catalog, which is why it belongs after (A) and not inst
   and immediately be made hidden by its owner — the cap in step 4 is what closes that, and it
   only works if editing the `none` role is gated by the creation right rather than by
   `group.role.manage` alone.
+
+---
+
+## 5. Outcome
+
+**(A) was taken, and then went one step further than (A) proposed.** What shipped
+on `feat/group-permissions`:
+
+- The field is **not stored at all.** (A) kept `groupType` as a derived *column*,
+  written by the sync. It is now computed on read — `privacyLevelFrom()` in
+  TypeScript and the `visibilityOf()` `CASE` in Cypher
+  (`helpers/groupAccessCypher.ts`), from the same two mirrored columns
+  (`nonMemberRead`, `nonMemberContentRead`). A stored copy of a derived value is
+  a second source of truth that can drift, and the sync that would keep it in
+  step already writes the columns it would be derived from.
+- The field is **renamed**: `Group.groupType` → `Group.visibility`, because the
+  two things this paper separated got separate names. What *is* stored is
+  `Group.template` (`GroupRoleTemplate.groupType` → `.name`) — the role preset a
+  group was created from. That one is genuinely not derivable: it answers "which
+  template is this group still running", which is what E12's "apply to untouched
+  groups" needs.
+- `UpdateGroup(groupType:)` did not become a deprecated preset mutation, it
+  became `UpdateGroup(visibility:)` — a preset that writes the `none`/`pending`
+  roles, capped by `group.create_<visibility>` (E10) on both paths. The separate
+  `group.type.change` key was dropped: changing the visibility *is* editing those
+  roles, and `group.role.manage` already covers it.
+- The per-type network rights kept their names (`group.read.any_hidden`, …):
+  their suffix always named a privacy level, which is exactly what `visibility`
+  is. No compatibility layer was kept anywhere else — there are no foreign
+  clients, so the old names are simply gone.
+
+The open questions from §4, answered:
+
+- **Does `hidden` mean more than "no non-member may read it"?** No new meaning was
+  found. The hidden-field blanking keys on the rights, not on the label.
+- **A combination with no preset.** It is expressible and the level function
+  rounds towards the more private answer (`PRIVACY_LEVELS` order), so such a
+  group reports the stricter of the two. The video-call door (`callDoor.ts`) is
+  the second derived value built on the same principle.
+- **Create public, then switch to hidden.** Closed, as step 4 required, in both
+  places that can do it: `canChangeGroupType` in the shield and
+  `requirePrivacyCap` in the rights matrix.

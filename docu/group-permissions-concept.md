@@ -18,10 +18,19 @@
 > | `groupType` bleibt autoritatives Preset (E2) | **abgewichen, inzwischen vollstaendig** — die Lesewege fragen die Rechte ueber abgeleitete Spalten am Gruppenknoten, und der Typ selbst ist jetzt *abgeleitet* (`groupRole/privacyLevel.ts`, Handlungsoption A aus `group-type-from-rights-concept.md`): er wird vom Sync geschrieben, nicht gewaehlt |
 > | `videoCall.create_<type>` (E5-Muster) | **ersetzt** — gekoppelt an die *Tuer* statt an den Typ: `videoCall.create_open` fuer eine Gruppe, in die ein Fremder hineinlaufen kann (`group.read` + `group.join` auf `none`), `videoCall.create_restricted` sonst (`groupRole/callDoor.ts`). Auf den drei Presets verhaltensgleich |
 > | `group.type.change` | **entfernt** — der Typ ist abgeleitet, also IST seine Aenderung das Bearbeiten der `none`/`pending`-Rollen: `group.role.manage` deckelt beides, ein eigener Key war ein zweiter Name fuer einen Weg dorthin |
-> | Netzwerk-Rechte in fremden Gruppen (E18) | **Bestaetigung noetig** — `group.administer.any_*` & Co. geben ohne explizite Freischaltung nur **Lesen**; alles Weitere wartet auf `elevateInGroup` (`groupRole/elevation.ts`), das nach 60 Minuten von selbst verfaellt und bei der Gruppe vermerkt wird |
+> | Netzwerk-Rechte in fremden Gruppen (E18) | **abgewichen (Variante B), umgesetzt** — `group.administer.any_*` & Co. geben ohne explizite Freischaltung nur **Lesen**; alles Weitere wartet auf `elevateInGroup` (`groupRole/elevation.ts`), das nach 60 Minuten von selbst verfaellt und bei der Gruppe vermerkt wird. Ausserdem: ein Netzwerk-Recht macht eine Gruppe **erreichbar, nicht gelistet** (3.9) |
 > | `group.leave` | **nicht abwaehlbar** fuer jede Rolle, die eine Mitgliedschaft ist (`groupRole/mandatoryRights.ts`). Die andere Tuer hinaus (`group.member.remove`) liegt in fremder Hand, also waere eine Rolle ohne `group.leave` eine Falle statt einer Einstellung |
 > | `group.member.approve` (E9: kein Key ohne Konsument) | **entfernt** — Freigeben ist derselbe Akt wie Rolle zuweisen: `ChangeGroupMemberRole` befoerdert eine `pending`-Mitgliedschaft, der Mitglieder-Tab listet Bewerber (`includePending`), und `group.member.role.assign` deckelt beides. Der eigene Key deckelte damit nichts Eigenes. Was fehlt, ist eine *Affordanz* (Annehmen/Ablehnen, Zaehler, Benachrichtigung) — #10352 |
 > | `banned`-Rolle (E14), `group.delete` (E9) | bewusst Folge-Issues |
+>
+> **Benennung.** Was das Konzept `groupType` nennt, heisst im Code
+> `visibility` — `Group.visibility` ist abgeleitet (`groupRole/privacyLevel.ts`)
+> und wird nicht gespeichert; gespeichert ist allein `Group.template`, das
+> Rollen-Preset, aus dem die Gruppe entstand. Die Netzwerk-Keys behalten ihre
+> Namen (`group.read.any_hidden`, …), weil ihr Suffix eine Sichtbarkeit benennt.
+> Die Abschnitte unten verwenden `groupType` dort weiter, wo sie den
+> **Ist-Zustand vor dem Umbau** oder die Entscheidung in ihrem Wortlaut
+> beschreiben.
 
 Gruppen bekommen dasselbe Freiheitsniveau, das das Netzwerk seit dem RBAC-Umbau
 hat: einen **Katalog** gruppen-skopierter Rechte, **Rollendefinitionen als Daten**
@@ -260,11 +269,12 @@ der selbst alles haelt — ein Owner oder ein Netzwerk-Admin mit
 
 ```
 effectiveInGroup(user, group) =
-   (  permissionsOf(groupRole(user, group))    // aus der Mitgliedschaft; owner ⇒ voller Katalog
-   ∪  networkAuthority(user, group.groupType)  // aus *.any_<type>; fuer Nicht-Mitglieder die
-   )                                           //   einzige Quelle
-  ∩   networkPrerequisites(user)               // E3: Keys mit Netz-Gegenstueck
-  ∩   openGates(policy)                        // groupsEnabled, videoConference, …
+   (  permissionsOf(groupRole(user, group))      // aus der Mitgliedschaft; owner ⇒ voller Katalog
+   ∪  networkAuthority(user, group.visibility)   // aus *.any_<visibility>; fuer Nicht-Mitglieder
+   )                                             //   die einzige Quelle — unelevated nur die
+                                                 //   drei Leserechte (E18, 3.9)
+  ∩   networkPrerequisites(user)                 // E3: Keys mit Netz-Gegenstueck
+  ∩   openGates(policy)                          // groupsEnabled, videoConference, …
 ```
 
 Die **Vereinigung** der beiden Autoritaetsquellen ist wesentlich: ein
@@ -298,10 +308,16 @@ Aufloesung **einmal pro (Request, Gruppe)**, gecacht in `context`, in einer Quer
 ```cypher
 MATCH (g:Group {id: $groupId})
 OPTIONAL MATCH (:User {id: $userId})-[m:MEMBER_OF]->(g)
-OPTIONAL MATCH (g)-[:HAS_GROUP_ROLE]->(r:GroupRole {name: coalesce(m.role, 'none')})
-RETURN g.groupType AS groupType, coalesce(m.role, 'none') AS role,
+OPTIONAL MATCH (:User {id: $userId})-[e:ELEVATED_IN]->(g) WHERE e.expiresAt > datetime()
+WITH g, coalesce(m.role, 'none') AS role, e IS NOT NULL AS elevated
+OPTIONAL MATCH (g)-[:HAS_GROUP_ROLE]->(r:GroupRole {name: role})
+RETURN visibilityOf(g) AS visibility, role, elevated,
        r.permissions AS permissions, coalesce(r.protected, false) AS protected
 ```
+
+`visibilityOf(g)` ist kein Neo4j-Builtin, sondern das `CASE` aus
+`helpers/groupAccessCypher.ts` — der Cypher-Zwilling von `privacyLevelFrom()`:
+die Sichtbarkeit ist **abgeleitet** und steht nicht am Knoten (siehe 3.6).
 
 **Invariante: Autorisierung prueft nie einen Rollennamen.** Weder netzwerkweit
 noch gruppenintern — Rollennamen sind Daten, Rechte sind die Waehrung. `.any_*`
@@ -347,7 +363,7 @@ extend type Mutation {
   deleteGroupRole(groupId: ID!, name: String!, reassignTo: String!): Boolean!
   resetGroupRoles(groupId: ID!): [GroupRole!]!                   # zurueck auf Template
   setGroupMemberRole(groupId: ID!, userId: ID!, roleName: String!): GroupMember!
-  updateGroupRoleTemplate(name: String!, groupType: GroupType, permissions: [String!]!): GroupRole!
+  updateGroupRoleTemplate(template: String!, name: String!, permissions: [String!]!, label: String): GroupRole!
 }
 extend type Subscription { groupPermissionsChanged(groupId: ID!): ID! }
 ```
@@ -373,15 +389,35 @@ Co. haengen an `group.role.manage`, die Template-Mutation am neuen Netzwerk-Rech
 ### 3.9 Owner-los: der Recovery-Pfad konkret
 
 E8 erlaubt den owner-losen Zustand — hier steht, wie er endet. **Kein neuer
-Resolver**, sondern drei vorhandene Teile:
+Resolver**, sondern drei vorhandene Teile. Zwei Regeln begrenzen dabei, was ein
+Netzwerk-Recht ueberhaupt bedeutet:
+
+> **Ein Netzwerk-Recht macht eine Gruppe erreichbar, nicht gelistet.** Wer
+> `group.read.any_hidden` haelt, bekommt die versteckten Gruppen des Netzwerks
+> *nicht* in Gruppenliste, Suche oder Sidebar — er kann eine **benannte** Gruppe
+> oeffnen. Technisch loest `Query.Group` den Netzwerk-Zweig nur auf, wenn
+> `id` oder `slug` genau eine Gruppe benennt (`namesOneGroup`); ohne das bleibt
+> die Bedingung `false` und es zaehlt allein die eigene Mitgliedschaft. Das
+> Verzeichnis der benennbaren Gruppen ist damit ein einziges und ein bewusst
+> betretenes: die Gruppen-Verwaltung im Admin-Bereich (E17).
+
+> **Lesen gilt sofort, Handeln auf Ansage** (E18). Die
+> `.any_*`-Rechte falten unelevated nur `group.read`, `group.content.read` und
+> `group.members.read` (`UNELEVATED_NETWORK_RIGHTS`). Alles Schreibende wartet
+> auf `elevateInGroup` — eine Freischaltung mit optionalem Grund, die an der
+> Gruppe vermerkt wird (`ELEVATED_IN`) und nach 60 Minuten von selbst verfaellt.
+> Angeboten wird sie dort, wo man landet: als Karte auf dem Gruppenprofil, und
+> nur, wenn sie etwas hinzufuegt (`mayElevateInGroup` vergleicht die gehaltenen
+> Rechte mit denen nach Freischaltung — ein Owner bekommt kein Angebot).
 
 1. **Auffinden.** Gruppen-Verwaltung im Admin-Bereich (E17) mit Filter "ohne
    Owner". Ohne diesen Schritt ist der Pfad nur reaktiv begehbar, und eine
    `hidden`-Gruppe gar nicht.
-2. **Zugriff.** `group.administer.any_<type>` loest fuer Gruppen dieses Typs auf
-   den vollen Gruppen-Katalog auf. Der Netzwerk-Admin haelt damit `group.read`,
-   `group.members.read` und `group.member.role.assign` — er benutzt die
-   **normale Mitglieder-UI der Gruppe**, keine Sonderoberflaeche.
+2. **Zugriff.** `group.administer.any_<visibility>` macht die Gruppe lesbar: der
+   Netzwerk-Admin oeffnet das Profil, sieht Mitglieder und findet dort die
+   Freischaltung. Nach der Freischaltung loest das Recht auf den vollen
+   Gruppen-Katalog auf — er benutzt die **normale Mitglieder-UI der Gruppe**,
+   keine Sonderoberflaeche.
 3. **Einsetzen.** Ein bestehendes Mitglied wird auf die Owner-Rolle gesetzt.
    Beide Schutzregeln greifen: Dominanz (Admin ⊋ einfaches Mitglied) und Deckung
    (Admin ⊇ Owner-Rolle, als Gleichheit erfuellt). Nach E16 **nur** bestehende
@@ -394,7 +430,8 @@ Randfaelle:
 | Gruppe hat Mitglieder, aber keinen Owner | Normalfall oben |
 | Gruppe hat **kein** Mitglied mehr | Kein Recovery, sondern Loeschfall → #5388 |
 | Rollen der Gruppe sind verkonfiguriert (z. B. `group.role.manage` nirgends) | `resetGroupRoles` setzt auf das Template zurueck; ausserdem loest `owner` immer auf den vollen Katalog auf, kann also nie ausgeschlossen werden |
-| Admin handelt in einer Gruppe, in der er nichts zu suchen hat | Jede Nutzung eines `*.any_*`-Rechts ist ein Moderationsakt und wird geloggt |
+| Admin handelt in einer Gruppe, in der er nichts zu suchen hat | Die Freischaltung ist der Moderationsakt: sie wird mit Grund, Zeitpunkt und Person an der Gruppe vermerkt und verfaellt |
+| Admin ruft eine Gruppe auf, in der er gar nichts darf | `Query.Group` liefert nichts — dieselbe Antwort wie fuer eine Gruppe, die es nicht gibt. Eine `hidden`-Gruppe verraet ihre Existenz auch dem Admin nicht, der das passende `.any_*` nicht haelt |
 
 ---
 
@@ -575,24 +612,27 @@ Die Sicht-Umschaltung aus #5578 ist **kein** Recht: sie setzt nur
 `group.content.read.any_*` voraus und ist ansonsten UI.
 
 **Wie #9405 technisch behoben wird** — und was die Konsumenten dieser Rechte sind
-(E9). Die Post-Sichtbarkeit bleibt bei `groupType` (E2), deshalb genuegt es, das
-hartcodierte `'public'` im Filter durch eine vom Viewer abgeleitete Liste zu
-ersetzen. Heute steht in `helpers/postFilter.ts`:
+(E9). Vor dem Umbau stand in `helpers/postFilter.ts` ein hartcodiertes
+`'public'`:
 
 ```cypher
 WHERE NOT g.groupType = 'public' AND NOT g.id IN $groupIds
 ```
 
-und danach:
+Danach entscheidet dort die **Rechtelage der Gruppe**, nicht ihr Label — und
+weil der Typ inzwischen abgeleitet ist (E2, abgewichen), ist die erste
+Bedingung die gespiegelte Spalte selbst:
 
 ```cypher
-WHERE NOT g.groupType IN $readableGroupTypes AND NOT g.id IN $groupIds
+WHERE NOT coalesce(g.nonMemberContentRead, false)
+  AND NOT g.id IN $groupIds
+  AND NOT visibilityOf(g) IN $readableVisibilities
 ```
 
-mit `$readableGroupTypes = ['public'] + Typen aus den gehaltenen
-`group.content.read.any_*`-Rechten`. Kein zusaetzlicher Join, keine mit der
-Gruppenzahl wachsende Liste — und `groupType` bleibt die Achse, wie E2 es
-verlangt.
+mit `$groupIds` = die Gruppen, in denen der Viewer selbst `group.content.read`
+haelt, und `$readableVisibilities` = die Sichtbarkeiten aus seinen gehaltenen
+`group.content.read.any_*`-Rechten. Kein zusaetzlicher Join, keine mit der
+Gruppenzahl wachsende Typ-Liste — die Spiegelspalte ist genau dafuer da.
 
 | Recht | Konsumenten |
 |---|---|
@@ -621,8 +661,10 @@ was bewusst nicht in Schritt 1 gehoert, steht in 9.
 
 Nicht in diesem Vorhaben:
 
-* **Aufloesung von `groupType` in Rechte** (E2) — eigenes Issue, braucht eine
-  Performance-Betrachtung fuer Post-Visibility, Suche und Karte.
+* ~~**Aufloesung von `groupType` in Rechte** (E2)~~ — **doch drin**: der Typ ist
+  jetzt abgeleitet und die Lesewege fragen die gespiegelten Spalten am
+  Gruppenknoten, ohne Per-Zeilen-Rollen-Lookup. Die Performance-Betrachtung, die
+  das Parken begruendete, ist damit beantwortet (`helpers/postFilter.ts`, 7.3).
 * **Sichtbarkeit einzelner Posts innerhalb einer Gruppe** ("public posts of closed
   groups", #5386) — eine zweite Achse neben der Rolle: nicht *wer darf posten*,
   sondern *wie weit reicht ein einzelner Post*. Beruehrt das Public-Content-Feature
@@ -659,13 +701,12 @@ Nicht in diesem Vorhaben:
 | 7 | 🚀 Feature | backend + webapp | Netzwerk-Ebene: Template-Verwaltung im Admin-Bereich, die sieben `*.any_<type>`-Rechte aus 7.3, `group.roleTemplate.manage` — schliesst #9405 und #6751 |
 | 8 | 🚀 Feature | backend + webapp | **neu:** fremde Posts aus der Gruppe entfernen — `group.post.moderate` samt Resolver und UI (an #7702) |
 | 10 | 🚀 Feature | webapp | Gruppen-Verwaltung im Admin-Bereich (E17): Liste, Suche, Filter (Typ, Kategorie, **ohne Owner**, deaktiviert), Detailansicht, Owner-Recovery — ersetzt den `organizations.vue`-Stub, erledigt #6751 |
-| 9 | 🔧 Refactor | backend | *(geparkt)* `groupType` in Rechte aufloesen |
+| 9 | 🔧 Refactor | backend | ~~*(geparkt)*~~ **erledigt** — `groupType` in Rechte aufgeloest: `Group.visibility` ist abgeleitet, `Group.template` ist das Gespeicherte |
 
-Reihenfolge: 1 → 2 → 3 → 4 → (5 ∥ 6) → 7. Nach 3 ist das Verhalten identisch zu
-heute (plus die vier Korrekturen aus 5), ab 4 wird es konfigurierbar.
-
-Reihenfolge: 1 → 2 → 3 → 4 → (5 ∥ 6) → 7 → 10; 8 danach, 9 bleibt geparkt.
-10 ist der Punkt, an dem E8 tatsaechlich bedienbar wird.
+Reihenfolge: 1 → 2 → 3 → 4 → (5 ∥ 6) → 7 → 10; 8 danach, 9 kam mit der
+Ableitung unterwegs mit. Nach 3 ist das Verhalten identisch zu heute (plus die
+vier Korrekturen aus 5), ab 4 wird es konfigurierbar, und 10 ist der Punkt, an
+dem E8 tatsaechlich bedienbar wird.
 
 Querverweise fuers EPIC: **relates** #5386, #5578, #7702, #8993, #8537, #5388,
 #5549 — **fixes** #5588, #5511, #8398, #6173, #9405 (Teil-Issue 7), #6751 (Teil-Issue 10).
