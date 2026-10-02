@@ -478,17 +478,29 @@ describe(setNonMemberMemberListAccess, () => {
 })
 
 describe(untouchedGroupIdsByType, () => {
-  it('groups the untouched group ids by type', async () => {
+  it('groups the untouched group ids by type, with the total beside them', async () => {
+    // One statement answers both: an apply reaches the untouched ones, and the UI needs the
+    // total to say "4 of 7" instead of a bare "4" that reads as "only 4".
     const { db, sent } = fakeDb(() => [
-      roleRecord({ groupType: 'public', ids: ['a', 'b'] }),
-      roleRecord({ groupType: 'hidden', ids: ['c'] }),
+      roleRecord({ groupType: 'public', ids: ['a', 'b'], total: '5' }),
+      roleRecord({ groupType: 'hidden', ids: ['c'], total: '1' }),
     ])
 
     expect([...(await untouchedGroupIdsByType(db))]).toEqual([
-      ['public', ['a', 'b']],
-      ['hidden', ['c']],
+      ['public', { untouchedIds: ['a', 'b'], total: 5 }],
+      ['hidden', { untouchedIds: ['c'], total: 1 }],
     ])
-    expect(sent[0].query).toContain('WHERE g.rolesCustomizedAt IS NULL')
+    expect(sent[0].query).toContain('g.rolesCustomizedAt IS NULL')
+  })
+
+  it('drops the nulls a customised group leaves in the collect', async () => {
+    // `collect(CASE WHEN … THEN g.id END)` keeps one null per non-matching row, and a null in
+    // that list would become a group id an apply then tries to write to.
+    const { db } = fakeDb(() => [roleRecord({ groupType: 'public', ids: ['a', null], total: '2' })])
+
+    expect([...(await untouchedGroupIdsByType(db))]).toEqual([
+      ['public', { untouchedIds: ['a'], total: 2 }],
+    ])
   })
 })
 

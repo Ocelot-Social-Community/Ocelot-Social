@@ -229,7 +229,7 @@
       "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte und ist nicht bearbeitbar.",
       "saved": "Vorlage gespeichert",
       "title": "Standard-Rollen fuer Gruppen",
-      "untouched": "{count} Gruppen laufen noch unveraendert auf dieser Vorlage."
+      "untouched": "Läuft noch auf diesem Template: {untouched} von {total} Gruppen."
     },
     "groups": {
       "active": "aktiv",

@@ -229,7 +229,7 @@
       "ownerHoldsEverything": "Le rôle de propriétaire détient toujours toutes les permissions et ne peut pas être modifié.",
       "saved": "Modèle enregistré",
       "title": "Rôles par défaut des groupes",
-      "untouched": "{count} groupes utilisent encore ce modèle sans modification."
+      "untouched": "Utilisent encore ce modèle : {untouched} groupes sur {total}."
     },
     "groups": {
       "active": "actif",

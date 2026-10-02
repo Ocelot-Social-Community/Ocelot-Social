@@ -229,7 +229,7 @@
       "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos y no se puede editar.",
       "saved": "Plantilla guardada",
       "title": "Roles predeterminados para los grupos",
-      "untouched": "{count} grupos siguen usando esta plantilla sin cambios."
+      "untouched": "Siguen con esta plantilla: {untouched} de {total} grupos."
     },
     "groups": {
       "active": "activo",

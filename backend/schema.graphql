@@ -591,6 +591,10 @@ type GroupRole {
 The network-wide default role set a new group of that type is seeded from.
 """
 type GroupRoleTemplate {
+  """
+  How many groups of this type exist at all, so the count above can be read as a share rather than as an absolute.
+  """
+  groupCount: Int!
   groupType: String!
   roles: [GroupRole!]!
 

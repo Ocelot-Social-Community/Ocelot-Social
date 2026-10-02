@@ -240,7 +240,10 @@ export default {
       return Object.entries(templates).map(([groupType, roles]) => ({
         groupType,
         roles: roles.map((role) => ({ ...role, memberCount: null })),
-        untouchedGroupCount: untouched.get(groupType)?.length ?? 0,
+        untouchedGroupCount: untouched.get(groupType)?.untouchedIds.length ?? 0,
+        // The denominator: "10 untouched" reads as "only 10 of them" without it, when it may
+        // well be all of them.
+        groupCount: untouched.get(groupType)?.total ?? 0,
       }))
     },
   },
@@ -516,12 +519,12 @@ export default {
       const byType = new Map(Object.entries(templates))
       const now = new Date().toISOString()
       let changed = 0
-      for (const [groupType, groupIds] of untouched) {
+      for (const [groupType, groups] of untouched) {
         const template = byType.get(groupType)
         if (!template || template.length === 0) {
           continue
         }
-        for (const groupId of groupIds) {
+        for (const groupId of groups.untouchedIds) {
           await replaceGroupRoles(
             context.database,
             groupId,

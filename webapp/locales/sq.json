@@ -229,7 +229,7 @@
       "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet dhe nuk mund të redaktohet.",
       "saved": "Shablloni u ruajt",
       "title": "Rolet e parazgjedhura për grupet",
-      "untouched": "{count} grupe punojnë edhe sot me këtë shabllon, të paprekura."
+      "untouched": "Ende përdorin këtë shabllon: {untouched} nga {total} grupe."
     },
     "groups": {
       "active": "aktiv",

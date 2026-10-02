@@ -229,7 +229,7 @@
       "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten en kan niet worden aangepast.",
       "saved": "Sjabloon opgeslagen",
       "title": "Standaardrollen voor groepen",
-      "untouched": "{count} groepen gebruiken dit sjabloon nog ongewijzigd."
+      "untouched": "Draaien nog op dit sjabloon: {untouched} van {total} groepen."
     },
     "groups": {
       "active": "actief",

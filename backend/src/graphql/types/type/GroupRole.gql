@@ -37,6 +37,8 @@ type GroupRoleTemplate {
   roles: [GroupRole!]!
   "How many groups still run on this template untouched — the ones an `applyGroupRoleTemplates` would reach."
   untouchedGroupCount: Int!
+  "How many groups of this type exist at all, so the count above can be read as a share rather than as an absolute."
+  groupCount: Int!
 }
 
 type Query {

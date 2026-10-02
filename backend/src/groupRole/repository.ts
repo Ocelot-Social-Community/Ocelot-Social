@@ -576,16 +576,34 @@ export async function writeGroupRoleTemplate(
  * `rolesCustomizedAt IS NULL` is the whole criterion (concept E12): a group that edited its own
  * roles is never overwritten by a network default, however tempting a bulk update is.
  */
-export async function untouchedGroupIdsByType(db: DbContext): Promise<Map<string, string[]>> {
+export interface GroupsOfType {
+  /** The groups of that type whose roles nobody has edited — what an apply would reach. */
+  untouchedIds: string[]
+  /** How many groups of that type exist at all, so a count can be read as a share. */
+  total: number
+}
+
+export async function untouchedGroupIdsByType(db: DbContext): Promise<Map<string, GroupsOfType>> {
+  // Both numbers in one statement: "4 untouched" means nothing without "of how many", and two
+  // queries could answer about two different moments.
   const result = await db.query({
     query: `MATCH (g:Group)
-            WHERE g.rolesCustomizedAt IS NULL
-            RETURN g.groupType AS groupType, collect(g.id) AS ids`,
+            RETURN g.groupType AS groupType,
+                   collect(CASE WHEN g.rolesCustomizedAt IS NULL THEN g.id END) AS ids,
+                   toString(count(g)) AS total`,
   })
   return new Map(
     result.records.map((record) => [
       record.get('groupType') as string,
-      record.get('ids') as string[],
+      {
+        // `collect` keeps a null per non-matching row in Neo4j 4.4, so they are dropped here.
+        untouchedIds: (record.get('ids') as (string | null)[]).filter(
+          (id): id is string => id !== null,
+        ),
+        // Counted as a string in Cypher, as everywhere else here: a Neo4j integer is not a
+        // JS number and GraphQL wants one.
+        total: parseInt(record.get('total') as string, 10),
+      },
     ]),
   )
 }

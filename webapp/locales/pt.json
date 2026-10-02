@@ -229,7 +229,7 @@
       "ownerHoldsEverything": "A função de proprietário tem sempre todas as permissões e não pode ser editada.",
       "saved": "Modelo guardado",
       "title": "Funções predefinidas para grupos",
-      "untouched": "{count} grupos continuam a usar este modelo sem alterações."
+      "untouched": "Ainda usam este modelo: {untouched} de {total} grupos."
     },
     "groups": {
       "active": "ativo",

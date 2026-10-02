@@ -50,6 +50,7 @@ export const groupRoleTemplatesQuery = () => gql`
     groupRoleTemplates {
       groupType
       untouchedGroupCount
+      groupCount
       roles {
         name
         label

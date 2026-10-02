@@ -229,7 +229,7 @@
       "ownerHoldsEverything": "Rola właściciela ma zawsze wszystkie uprawnienia i nie da się jej edytować.",
       "saved": "Szablon zapisany",
       "title": "Domyślne role dla grup",
-      "untouched": "{count} grup nadal działa na tym szablonie bez zmian."
+      "untouched": "Nadal korzystają z tego szablonu: {untouched} z {total} grup."
     },
     "groups": {
       "active": "aktywna",

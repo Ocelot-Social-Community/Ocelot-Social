@@ -229,7 +229,7 @@
       "ownerHoldsEverything": "Il ruolo di proprietario ha sempre tutti i permessi e non è modificabile.",
       "saved": "Modello salvato",
       "title": "Ruoli predefiniti per i gruppi",
-      "untouched": "{count} gruppi usano ancora questo modello senza modifiche."
+      "untouched": "Usano ancora questo modello: {untouched} gruppi su {total}."
     },
     "groups": {
       "active": "attivo",

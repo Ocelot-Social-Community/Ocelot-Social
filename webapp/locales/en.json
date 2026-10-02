@@ -229,7 +229,7 @@
       "ownerHoldsEverything": "The owner role always holds every right and cannot be edited.",
       "saved": "Template saved",
       "title": "Default roles for groups",
-      "untouched": "{count} groups still run on this template untouched."
+      "untouched": "Still running on this template: {untouched} of {total} groups."
     },
     "groups": {
       "active": "active",

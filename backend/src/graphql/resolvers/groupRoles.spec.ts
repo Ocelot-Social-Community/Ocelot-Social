@@ -264,7 +264,9 @@ describe('Query.groupRoleTemplates', () => {
       public: [role('none', ['group.read'])],
       hidden: [role('none')],
     })
-    mocked.untouchedGroupIdsByType.mockResolvedValue(new Map([['public', ['a', 'b']]]))
+    mocked.untouchedGroupIdsByType.mockResolvedValue(
+      new Map([['public', groupsOfType(['a', 'b'], 5)]]),
+    )
     const { context } = contextFor()
 
     expect(await Query.groupRoleTemplates({}, {}, context)).toEqual([
@@ -272,11 +274,16 @@ describe('Query.groupRoleTemplates', () => {
         groupType: 'public',
         roles: [{ ...role('none', ['group.read']), memberCount: null }],
         untouchedGroupCount: 2,
+        // Five public groups exist, two of them never edited their roles. Without the second
+        // number "2" reads as "only 2", which is the misreading this answers.
+        groupCount: 5,
       },
       {
         groupType: 'hidden',
         roles: [{ ...role('none'), memberCount: null }],
+        // A type with no groups at all answers 0 of 0, not null.
         untouchedGroupCount: 0,
+        groupCount: 0,
       },
     ])
   })
@@ -947,6 +954,13 @@ describe('Mutation.updateGroupRoleTemplate', () => {
   })
 })
 
+// The shape untouchedGroupIdsByType answers in: which groups an apply would reach, and how
+// many there are of that type altogether.
+const groupsOfType = (untouchedIds: string[], total = untouchedIds.length) => ({
+  untouchedIds,
+  total,
+})
+
 describe('Mutation.applyGroupRoleTemplates', () => {
   it('applies each type`s template to the groups that never touched their roles', async () => {
     mocked.readGroupRoleTemplates.mockResolvedValue({
@@ -955,8 +969,8 @@ describe('Mutation.applyGroupRoleTemplates', () => {
     })
     mocked.untouchedGroupIdsByType.mockResolvedValue(
       new Map([
-        ['public', ['a', 'b']],
-        ['closed', ['c']],
+        ['public', groupsOfType(['a', 'b'])],
+        ['closed', groupsOfType(['c'])],
       ]),
     )
     const { context, published } = contextFor()
@@ -971,8 +985,8 @@ describe('Mutation.applyGroupRoleTemplates', () => {
     mocked.readGroupRoleTemplates.mockResolvedValue({ public: [] })
     mocked.untouchedGroupIdsByType.mockResolvedValue(
       new Map([
-        ['public', ['a']],
-        ['hidden', ['b']],
+        ['public', groupsOfType(['a'])],
+        ['hidden', groupsOfType(['b'])],
       ]),
     )
     const { context } = contextFor()
