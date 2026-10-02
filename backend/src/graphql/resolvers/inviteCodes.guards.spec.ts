@@ -128,12 +128,14 @@ describe(redeemInviteCode, () => {
     // statement `newUser` switches on here.
     //
     // The group below is a bare node with no role definitions, which is also the mid-migration
-    // state: where the membership lands then falls back to the group TYPE, so a deployment
-    // between the code and its migration does not quietly turn invited people into applicants.
+    // state: where the membership lands then falls back to the TEMPLATE the group runs on
+    // (`Group.template`, the one thing about the preset that is stored — the visibility itself is
+    // derived from the roles and a group without them has none), so a deployment between the code
+    // and its migration does not quietly turn invited people into applicants.
     it('records the invitation alongside the membership for a group invite link', async () => {
       await database.write({
         query: `MATCH (host:User { id: 'invite-host' })
-                MERGE (group:Group { id: 'invite-group', visibility: 'public' })
+                MERGE (group:Group { id: 'invite-group', template: 'public' })
                 MERGE (host)-[:GENERATED]->(code:InviteCode { code: 'GRP001' })
                 MERGE (code)-[:INVITES_TO]->(group)`,
       })
@@ -158,7 +160,7 @@ describe(redeemInviteCode, () => {
     it('lands an invited person where the group`s own rights say', async () => {
       await database.write({
         query: `MATCH (host:User { id: 'invite-host' })
-                MERGE (group:Group { id: 'rights-group', visibility: 'public' })
+                MERGE (group:Group { id: 'rights-group', template: 'public' })
                 MERGE (group)-[:HAS_GROUP_ROLE]->(role:GroupRole { id: 'rights-group:none' })
                 SET role.name = 'none', role.permissions = $permissions
                 MERGE (host)-[:GENERATED]->(code:InviteCode { code: 'GRP002' })
@@ -172,7 +174,8 @@ describe(redeemInviteCode, () => {
         MATCH (user:User { id: 'invited-user' })
         RETURN head([(user)-[m:MEMBER_OF]->(:Group { id: 'rights-group' }) | m.role]) AS role`)
 
-      // Although the TYPE is public: the group asked for approval, so the invited person waits.
+      // Although the TEMPLATE is public: the group asked for approval, so the invited person
+      // waits. The rights outrank the preset a group started from.
       expect(records[0].get('role')).toBe('pending')
     })
   })
