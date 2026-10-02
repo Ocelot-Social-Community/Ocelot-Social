@@ -16,12 +16,18 @@ const stubs = {
   GroupMember: Stub('GroupMember'),
 }
 
-const factory = ({ apolloOverrides = {}, initialMembers } = {}) => {
+// Adding somebody to a group gives them a role in it, so the form hangs on the same right the
+// backend asks for — the default here holds it; one test below takes it away.
+const factory = ({
+  apolloOverrides = {},
+  initialMembers,
+  myGroupPermissions = ['group.member.role.assign', 'group.member.remove'],
+} = {}) => {
   const refetch = jest.fn()
   const $toast = { success: jest.fn(), error: jest.fn() }
   const wrapper = mount(Members, {
     localVue,
-    propsData: { group: { id: 'g1' } },
+    propsData: { group: { id: 'g1', myGroupPermissions } },
     stubs,
     // Apollo would normally add `GroupMembers` to the instance; in tests we
     // seed it via the local data() option so the prop is reactive without
@@ -41,6 +47,14 @@ const factory = ({ apolloOverrides = {}, initialMembers } = {}) => {
 
 describe('pages/groups/edit/_id/members.vue', () => {
   describe('rendering', () => {
+    it('hides the add form from somebody who may not assign roles', () => {
+      // The member list stays readable — handing somebody a membership does not.
+      const { wrapper } = factory({ myGroupPermissions: ['group.member.remove'] })
+
+      expect(wrapper.findComponent({ name: 'AddGroupMember' }).exists()).toBe(false)
+      expect(wrapper.findComponent({ name: 'GroupMember' }).exists()).toBe(true)
+    })
+
     it('mounts AddGroupMember and the GroupMember card', () => {
       const { wrapper } = factory()
       expect(wrapper.find('.stub-addgroupmember').exists()).toBe(true)

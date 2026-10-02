@@ -1,6 +1,7 @@
 <template>
   <div>
     <add-group-member
+      v-if="canInGroup('group.member.role.assign', group)"
       :groupId="group.id"
       :groupMembers="groupMembers"
       :groupRoles="assignableRoles"
@@ -10,6 +11,7 @@
     <os-card>
       <group-member
         :groupId="group.id"
+        :group="group"
         :groupMembers="groupMembers"
         :groupRoles="assignableRoles"
         @loadGroupMembers="loadGroupMembers"
@@ -24,9 +26,11 @@ import GroupMember from '~/components/Group/GroupMember'
 import AddGroupMember from '~/components/Group/AddGroupMember'
 import { groupMembersQuery } from '~/graphql/groups.js'
 import { groupRightsQuery } from '~/graphql/groupRoles.js'
+import groupRights from '~/mixins/groupRights'
 import { NONE_GROUP_ROLE } from '~/constants/groups'
 
 export default {
+  mixins: [groupRights],
   components: {
     OsCard,
     GroupMember,

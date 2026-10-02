@@ -59,7 +59,7 @@
             </td>
             <td class="ds-table-col">
               <select
-                v-if="member.membership.role !== 'owner'"
+                v-if="member.membership.role !== 'owner' && mayAssignRoles"
                 :value="`${member.membership.role}`"
                 @change="changeMemberRole(member.user.id, $event)"
               >
@@ -73,7 +73,7 @@
             </td>
             <td class="ds-table-col">
               <os-button
-                v-if="member.membership.role !== 'owner'"
+                v-if="member.membership.role !== 'owner' && mayRemoveMembers"
                 appearance="outline"
                 variant="primary"
                 size="sm"
@@ -146,6 +146,14 @@ export default {
       type: String,
       required: true,
     },
+    // The group itself, for the rights: the member list is readable with one right and
+    // ACTIONABLE with others, and a viewer who may only look must not be offered a control
+    // the backend will refuse.
+    group: {
+      type: Object,
+      required: false,
+      default: null,
+    },
     groupMembers: {
       type: Array,
       required: false,
@@ -172,6 +180,12 @@ export default {
     }
   },
   computed: {
+    mayAssignRoles() {
+      return this.canInGroup('group.member.role.assign', this.group)
+    },
+    mayRemoveMembers() {
+      return this.canInGroup('group.member.remove', this.group)
+    },
     // What the picker offers: the group's own definitions when they are readable, otherwise the
     // roles the members already carry. `none` is never offered — it means "no membership", and
     // removing somebody is the button next to it.
