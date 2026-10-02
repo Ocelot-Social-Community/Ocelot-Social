@@ -6,14 +6,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { GROUP_PERMISSIONS_CHANGED } from '@constants/subscriptions'
 import { UserInputError } from '@graphql/errors'
 import {
+  clearElevation,
   deleteGroupRole,
   markGroupRolesCustomized,
   memberCountsByRole,
+  readElevation,
   readGroupRoles,
   readGroupRoleTemplates,
   renameGroupRole,
   replaceGroupRoles,
   untouchedGroupIdsByType,
+  writeElevation,
   writeGroupRole,
   writeGroupRoleTemplate,
 } from '@src/groupRole/repository'
@@ -39,19 +42,25 @@ vi.mock('@src/groupRole/repository', () => ({
   markGroupRolesCustomized: vi.fn(),
   untouchedGroupIdsByType: vi.fn(),
   writeGroupRoleTemplate: vi.fn(),
+  readElevation: vi.fn(),
+  writeElevation: vi.fn(),
+  clearElevation: vi.fn(),
 }))
 
 // The mocked repository, named once so the tests read as `mocked.writeGroupRole` rather than
 // wrapping each call site in vi.mocked().
 const mocked = {
+  clearElevation: vi.mocked(clearElevation),
   deleteGroupRole: vi.mocked(deleteGroupRole),
   markGroupRolesCustomized: vi.mocked(markGroupRolesCustomized),
   memberCountsByRole: vi.mocked(memberCountsByRole),
+  readElevation: vi.mocked(readElevation),
   readGroupRoles: vi.mocked(readGroupRoles),
   readGroupRoleTemplates: vi.mocked(readGroupRoleTemplates),
   renameGroupRole: vi.mocked(renameGroupRole),
   replaceGroupRoles: vi.mocked(replaceGroupRoles),
   untouchedGroupIdsByType: vi.mocked(untouchedGroupIdsByType),
+  writeElevation: vi.mocked(writeElevation),
   writeGroupRole: vi.mocked(writeGroupRole),
   writeGroupRoleTemplate: vi.mocked(writeGroupRoleTemplate),
 }
@@ -76,7 +85,13 @@ const record = (values: Record<string, unknown>) => ({
 interface ContextOptions {
   user?: { id: string } | null
   network?: string[]
-  authorization?: { visibility?: string; roleName?: string; effective?: string[] } | null
+  authorization?: {
+    visibility?: string
+    roleName?: string
+    effective?: string[]
+    elevated?: boolean
+    mayElevate?: boolean
+  } | null
   queryRecords?: Array<ReturnType<typeof record>>
   writeRecords?: Array<ReturnType<typeof record>>
 }
@@ -97,6 +112,8 @@ const contextFor = (options: ContextOptions = {}) => {
           has: (permission: string) =>
             new Set(options.authorization?.effective ?? []).has(permission),
           sourceOf: () => null,
+          elevated: options.authorization?.elevated ?? false,
+          mayElevate: options.authorization?.mayElevate ?? false,
         }
   const context = {
     user: options.user === undefined ? { id: 'actor' } : options.user,
@@ -1094,5 +1111,136 @@ describe('Subscription.groupPermissionsChanged', () => {
     })
 
     expect(await bounded(next)).toBe(DROPPED)
+  })
+})
+
+// The break-glass path (concept E18). Reading into a group a network right reaches is immediate;
+// ACTING there waits for the viewer to say so, and that ask is a record at the group with an
+// hour on it. These are this file's own decisions about it — the Cypher is repository.spec.ts.
+describe('Group.myGroupElevation', () => {
+  it('says nothing while the viewer has not asked', async () => {
+    // Not even a read: `elevated` is already in the authorization every request resolves once,
+    // so a page full of group teasers must not turn into a query per teaser.
+    const { context } = contextFor({ authorization: { elevated: false } })
+
+    await expect(Group.myGroupElevation({ id: 'g1' }, {}, context)).resolves.toBeNull()
+    expect(mocked.readElevation).not.toHaveBeenCalled()
+  })
+
+  it('reads the record out once there is one, so the page can show until when', async () => {
+    const elevation = {
+      groupId: 'g1',
+      expiresAt: '2026-10-02T17:00:00.000Z',
+      reason: 'Reviewing a report',
+    }
+    mocked.readElevation.mockResolvedValue(elevation)
+    const { context } = contextFor({ authorization: { elevated: true } })
+
+    await expect(Group.myGroupElevation({ id: 'g1' }, {}, context)).resolves.toEqual(elevation)
+    expect(mocked.readElevation).toHaveBeenCalledWith(context.database, 'g1', 'actor')
+  })
+})
+
+describe('Group.mayElevateInGroup', () => {
+  it('offers the ask only where it would add something', async () => {
+    const { context } = contextFor({ authorization: { mayElevate: true } })
+
+    await expect(Group.mayElevateInGroup({ id: 'g1' }, {}, context)).resolves.toBe(true)
+  })
+
+  it('does not offer it to somebody who already holds everything here', async () => {
+    const { context } = contextFor({ authorization: { mayElevate: false } })
+
+    await expect(Group.mayElevateInGroup({ id: 'g1' }, {}, context)).resolves.toBe(false)
+  })
+
+  it('answers no, not null, for a group the viewer cannot resolve at all', async () => {
+    // The field is non-null in the schema; a null here would fail the whole group query rather
+    // than answer "no".
+    const { context } = contextFor({ authorization: null })
+
+    await expect(Group.mayElevateInGroup({ id: 'g1' }, {}, context)).resolves.toBe(false)
+  })
+})
+
+describe('Mutation.elevateInGroup', () => {
+  it('writes the record with the reason, announces it, and logs who did it where', async () => {
+    const elevation = { groupId: 'g1', expiresAt: '2026-10-02T17:00:00.000Z', reason: 'Report #12' }
+    mocked.writeElevation.mockResolvedValue(elevation)
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    const { context, published } = contextFor({ authorization: { mayElevate: true } })
+
+    await expect(
+      Mutation.elevateInGroup({}, { groupId: 'g1', reason: 'Report #12' }, context),
+    ).resolves.toEqual(elevation)
+
+    expect(mocked.writeElevation).toHaveBeenCalledWith(
+      context.database,
+      'g1',
+      'actor',
+      'Report #12',
+    )
+    // The record IS the log entry: who, where, until when. Without the line the only trace
+    // would be a relationship that deletes itself an hour later.
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('actor'))
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('g1'))
+    // Everything the viewer may do here just changed, so the pages holding this group re-ask.
+    expect(published).toEqual([
+      { event: GROUP_PERMISSIONS_CHANGED, payload: { groupPermissionsChanged: { groupId: 'g1' } } },
+    ])
+
+    log.mockRestore()
+  })
+
+  it('refuses for a group that is not there', async () => {
+    const { context } = contextFor({ authorization: null })
+
+    await expect(Mutation.elevateInGroup({}, { groupId: 'ghost' }, context)).rejects.toThrow(
+      UserInputError,
+    )
+    expect(mocked.writeElevation).not.toHaveBeenCalled()
+  })
+
+  it('refuses when there is nothing to pick up', async () => {
+    // A member, or an owner: their rights come from the membership, and an elevation that adds
+    // nothing would still be a record saying they acted as the network.
+    const { context } = contextFor({ authorization: { mayElevate: false } })
+
+    await expect(Mutation.elevateInGroup({}, { groupId: 'g1' }, context)).rejects.toThrow(
+      'You hold nothing here beyond reading!',
+    )
+    expect(mocked.writeElevation).not.toHaveBeenCalled()
+  })
+
+  it('refuses a reason that is not one', async () => {
+    // The reason is shown to whoever reads the group's record later, so it goes through the
+    // same validation as a role label rather than straight into the graph.
+    const { context } = contextFor({ authorization: { mayElevate: true } })
+
+    await expect(
+      Mutation.elevateInGroup({}, { groupId: 'g1', reason: ' padded ' }, context),
+    ).rejects.toThrow('Invalid role label!')
+    expect(mocked.writeElevation).not.toHaveBeenCalled()
+  })
+})
+
+describe('Mutation.endGroupElevation', () => {
+  it('puts the rights down and announces that it happened', async () => {
+    mocked.clearElevation.mockResolvedValue(true)
+    const { context, published } = contextFor()
+
+    await expect(Mutation.endGroupElevation({}, { groupId: 'g1' }, context)).resolves.toBe(true)
+
+    expect(mocked.clearElevation).toHaveBeenCalledWith(context.database, 'g1', 'actor')
+    expect(published).toHaveLength(1)
+  })
+
+  it('stays quiet when there was nothing to put down', async () => {
+    // Announcing anyway would make every page holding this group refetch for nothing.
+    mocked.clearElevation.mockResolvedValue(false)
+    const { context, published } = contextFor()
+
+    await expect(Mutation.endGroupElevation({}, { groupId: 'g1' }, context)).resolves.toBe(false)
+    expect(published).toEqual([])
   })
 })

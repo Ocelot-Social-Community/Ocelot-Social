@@ -3,9 +3,11 @@ import { describe, it, expect, vi } from 'vitest'
 import { DEFAULT_GROUP_ROLE_TEMPLATES } from './defaults'
 import {
   applyTemplateToNonMemberRoles,
+  clearElevation,
   deleteGroupRole,
   markGroupRolesCustomized,
   memberCountsByRole,
+  readElevation,
   readGroupRoles,
   readGroupRoleTemplates,
   renameGroupRole,
@@ -16,6 +18,7 @@ import {
   setNonMemberMemberListAccess,
   syncNonMemberAccess,
   untouchedGroupIdsByType,
+  writeElevation,
   writeGroupRole,
   writeGroupRoleTemplate,
 } from './repository'
@@ -586,5 +589,83 @@ describe(seedRolesForGroupsWithoutRoles, () => {
       seeded: ['normal-group'],
       skipped: ['odd-group'],
     })
+  })
+})
+
+// The break-glass record (./elevation.ts). All three statements are filtered on `expiresAt` or
+// on the edge existing, so the interesting cases are the EMPTY answer — a window that lapsed, a
+// group that is not there — and what each function makes of it.
+describe(readElevation, () => {
+  it('reads the live record, carrying the group it was asked about', async () => {
+    const { db, sent } = fakeDb(() => [
+      roleRecord({ expiresAt: '2026-10-02T17:00:00.000Z', reason: 'Reviewing a report' }),
+    ])
+
+    expect(await readElevation(db, 'g1', 'u1')).toEqual({
+      groupId: 'g1',
+      expiresAt: '2026-10-02T17:00:00.000Z',
+      reason: 'Reviewing a report',
+    })
+    // The expiry is part of the match, not of the answer: a lapsed window must not come back
+    // as a record with a date in the past.
+    expect(sent[0].query).toContain('e.expiresAt > datetime()')
+  })
+
+  it('reads a record without a reason as one without a reason, not as undefined', async () => {
+    const { db } = fakeDb(() => [roleRecord({ expiresAt: '2026-10-02T17:00:00.000Z' })])
+
+    expect(await readElevation(db, 'g1', 'u1')).toEqual({
+      groupId: 'g1',
+      expiresAt: '2026-10-02T17:00:00.000Z',
+      reason: null,
+    })
+  })
+
+  it('answers null where there is nothing live', async () => {
+    const { db } = fakeDb()
+
+    expect(await readElevation(db, 'g1', 'u1')).toBeNull()
+  })
+})
+
+describe(writeElevation, () => {
+  it('merges one record per viewer and group, and hands back when it lapses', async () => {
+    const { db, sent } = fakeDb(() => [roleRecord({ expiresAt: '2026-10-02T17:00:00.000Z' })])
+
+    expect(await writeElevation(db, 'g1', 'u1', 'Reviewing a report')).toEqual({
+      groupId: 'g1',
+      expiresAt: '2026-10-02T17:00:00.000Z',
+      reason: 'Reviewing a report',
+    })
+    // MERGE, not CREATE: asking twice extends one window instead of leaving two, of which only
+    // the later one would ever be read.
+    expect(sent[0].query).toContain('MERGE (u)-[e:ELEVATED_IN]->(g)')
+    expect(sent[0].variables).toMatchObject({ groupId: 'g1', userId: 'u1' })
+  })
+
+  it('throws when there is no such group or user to attach it to', async () => {
+    // Silently answering "elevated until null" would hand the UI an active card over an
+    // elevation that does not exist.
+    const { db } = fakeDb()
+
+    await expect(writeElevation(db, 'ghost', 'u1', null)).rejects.toThrow(
+      'Cannot elevate in ghost: no such group or user',
+    )
+  })
+})
+
+describe(clearElevation, () => {
+  it('reports that there was something to put down', async () => {
+    const { db } = fakeDb(() => [roleRecord({ found: '1' })])
+
+    expect(await clearElevation(db, 'g1', 'u1')).toBe(true)
+  })
+
+  it('reports that there was not', async () => {
+    // The mutation answers this boolean, and the page only re-reads itself when something
+    // actually changed.
+    const { db } = fakeDb()
+
+    expect(await clearElevation(db, 'g1', 'u1')).toBe(false)
   })
 })
