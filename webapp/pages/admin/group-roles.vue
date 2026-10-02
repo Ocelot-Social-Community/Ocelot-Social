@@ -29,7 +29,7 @@
 
       <div class="role-tabs">
         <button
-          v-for="role in activeTemplate.roles"
+          v-for="role in orderedRoles"
           :key="role.name"
           type="button"
           class="role-tab"
@@ -101,6 +101,7 @@ import {
   groupRoleTemplatesQuery,
   updateGroupRoleTemplateMutation,
 } from '~/graphql/adminGroups.js'
+import { orderRolesByPrivilege } from '~/utils/groupRights'
 
 export default {
   components: { OsButton, OsCard },
@@ -123,6 +124,11 @@ export default {
     },
     activeRole() {
       return this.activeTemplate?.roles.find((role) => role.name === this.activeRoleName) ?? null
+    },
+    // Least privileged first, like everywhere else roles are listed: outsider, applicant,
+    // member, whatever the template adds, owner.
+    orderedRoles() {
+      return orderRolesByPrivilege(this.activeTemplate?.roles ?? [])
     },
     catalogGroups() {
       const groups = []
