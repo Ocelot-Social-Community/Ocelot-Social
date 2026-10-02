@@ -135,13 +135,18 @@ export default {
       clearTimeout(this.searchTimeout)
       this.searchTimeout = setTimeout(() => this.reload(), 300)
     },
+    // Both of these only move the state the `variables()` function below reads. Passing the
+    // variables to refetch() instead would REPLACE that function with a plain object
+    // (vue-apollo: `variables && (this.options.variables = variables)`), and the watcher it
+    // registered still calls `options.variables.call(vm)` on the next change — which then
+    // throws, takes the smart query down with it, and leaves the page on Nuxt's error screen.
     reload() {
       this.offset = 0
-      return this.$apollo.queries.adminGroups.refetch(this.variables)
+      return this.$apollo.queries.adminGroups.refetch()
     },
     page(direction) {
       this.offset = Math.max(0, this.offset + direction * this.pageSize)
-      return this.$apollo.queries.adminGroups.refetch(this.variables)
+      return this.$apollo.queries.adminGroups.refetch()
     },
   },
   apollo: {

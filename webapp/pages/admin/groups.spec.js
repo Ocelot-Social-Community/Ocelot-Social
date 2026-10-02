@@ -135,7 +135,12 @@ describe('admin/groups.vue', () => {
       await at(wrapper, 'filter-ownerless').trigger('change')
 
       expect(wrapper.vm.offset).toBe(0)
-      expect(refetch).toHaveBeenCalledWith(expect.objectContaining({ offset: 0 }))
+      // Without an argument, deliberately: vue-apollo would REPLACE the reactive `variables()`
+      // function with the object handed to refetch, and the watcher it keeps calling would
+      // then throw on the next change — which is how every filter ended on the error page.
+      expect(refetch).toHaveBeenCalledWith()
+      // The variables the query will read are the computed ones, which the reset above moved.
+      expect(wrapper.vm.variables).toMatchObject({ offset: 0 })
     })
 
     it('debounces the search field', async () => {
@@ -163,6 +168,7 @@ describe('admin/groups.vue', () => {
 
       await at(wrapper, 'next').trigger('click')
       expect(wrapper.vm.offset).toBe(25)
+      expect(refetch).toHaveBeenCalledWith()
 
       await at(wrapper, 'prev').trigger('click')
       expect(wrapper.vm.offset).toBe(0)
