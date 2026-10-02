@@ -57,6 +57,8 @@
           :class="{ 'role-tab--active': role.name === activeRoleName }"
           :data-test="`role-tab-${role.name}`"
           @click="activeRoleName = role.name"
+          @mouseenter="hoveredRoleName = role.name"
+          @mouseleave="hoveredRoleName = null"
         >
           {{ roleLabel(role) }}
           <span v-if="role.system" class="role-tab__badge" :title="$t('group.rights.systemRole')">
@@ -129,7 +131,11 @@
               v-for="permission in group.permissions"
               :key="permission.key"
               class="perm-row"
-              :class="{ 'perm-row--blocked': !grantable(permission) }"
+              :class="{
+                'perm-row--blocked': !grantable(permission),
+                'perm-row--added': rowDiff(permission.key) === 'added',
+                'perm-row--removed': rowDiff(permission.key) === 'removed',
+              }"
               :title="blockedHint(permission)"
             >
               <input
@@ -215,6 +221,9 @@ export default {
       myGroupPermissions: [],
       advanced: false,
       activeRoleName: USUAL_GROUP_ROLE,
+      // The role tab under the cursor, to preview what it would change about the one being
+      // edited — the same affordance the network and template role pages have.
+      hoveredRoleName: null,
       draftPermissions: [],
       draftLabel: '',
       creating: false,
@@ -250,6 +259,23 @@ export default {
     },
     resultingType() {
       return privacyLevelOf(this.nonMemberPermissions)
+    },
+    // Hovering another role marks every right it would change against the DRAFT: 'added'
+    // where the hovered role grants what this one does not, 'removed' the other way round.
+    hoverDiff() {
+      if (!this.hoveredRoleName || this.hoveredRoleName === this.activeRoleName) return {}
+      const hovered = this.roles.find((role) => role.name === this.hoveredRoleName)
+      if (!hovered) return {}
+      const hoveredSet = this.permissionSetOf(hovered)
+      const activeSet = new Set(this.draftPermissions)
+      const diff = {}
+      for (const permission of this.catalog) {
+        const inHovered = hoveredSet.has(permission.key)
+        const inActive = activeSet.has(permission.key)
+        if (inHovered && !inActive) diff[permission.key] = 'added'
+        else if (!inHovered && inActive) diff[permission.key] = 'removed'
+      }
+      return diff
     },
     catalogGroups() {
       const groups = []
@@ -309,6 +335,16 @@ export default {
         return this.$t('group.rights.blockedByFeature', { feature: permission.gatedBy.join(', ') })
       }
       return null
+    },
+    // What a role effectively grants. `owner` stores no list and resolves to the whole
+    // catalog, so hovering it has to show that rather than an empty role.
+    permissionSetOf(role) {
+      if (!role) return new Set()
+      if (role.protected) return new Set(this.catalog.map((permission) => permission.key))
+      return new Set(role.permissions)
+    },
+    rowDiff(key) {
+      return this.hoverDiff[key] ?? null
     },
     resetDraft() {
       this.draftPermissions = this.activeRole ? [...this.activeRole.permissions] : []
@@ -574,8 +610,21 @@ export default {
   grid-template-columns: auto 1fr;
   gap: var(--space-xx-small) var(--space-x-small);
   align-items: baseline;
-  padding: var(--space-xxx-small) 0;
+  /* The left border carries the hover-diff colour, so it is reserved here rather than added
+     with the modifier — otherwise every marked row would shift sideways. */
+  padding: var(--space-xxx-small) var(--space-xx-small);
+  border-radius: var(--border-radius-small);
+  border-left: 3px solid transparent;
   cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+.perm-row--added {
+  background: color-mix(in srgb, var(--color-success) 16%, transparent);
+  border-left-color: var(--color-success);
+}
+.perm-row--removed {
+  background: color-mix(in srgb, var(--color-danger) 16%, transparent);
+  border-left-color: var(--color-danger);
 }
 .perm-row--blocked {
   opacity: 0.5;

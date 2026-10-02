@@ -203,6 +203,48 @@ describe('rights.vue', () => {
     expect(at(wrapper, 'preset-channel').element.disabled).toBe(true)
   })
 
+  describe('hover diff in the matrix', () => {
+    // Same affordance as the network and template role pages: hovering a role tab marks what
+    // that role would change about the one being edited.
+    const classesOf = (wrapper, key) =>
+      at(wrapper, `perm-${key}`).element.closest('label').className
+
+    const advanced = async () => {
+      const wrapper = await Wrapper()
+      await at(wrapper, 'to-advanced').trigger('click')
+      return wrapper
+    }
+
+    it('marks both directions against the role being edited', async () => {
+      const wrapper = await advanced()
+
+      // Active role is `usual` (posting + member list), hovered is `none` (nothing).
+      await at(wrapper, 'role-tab-none').trigger('mouseenter')
+
+      expect(classesOf(wrapper, 'group.post.create')).toContain('perm-row--removed')
+      expect(classesOf(wrapper, 'group.comment.create')).not.toContain('perm-row--added')
+    })
+
+    it('clears the marks when the cursor leaves', async () => {
+      const wrapper = await advanced()
+
+      await at(wrapper, 'role-tab-none').trigger('mouseenter')
+      await at(wrapper, 'role-tab-none').trigger('mouseleave')
+
+      expect(classesOf(wrapper, 'group.post.create')).not.toContain('perm-row--removed')
+    })
+
+    it('reads the protected owner role as the whole catalog', async () => {
+      const wrapper = await advanced()
+
+      await at(wrapper, 'role-tab-owner').trigger('mouseenter')
+
+      // The owner tab shows the explanatory note instead of the matrix, so the hover is read
+      // from the role it would be compared against — the rows are gone, the state is not.
+      expect(wrapper.vm.hoverDiff['group.comment.create']).toBe('added')
+    })
+  })
+
   it('shows the matrix on demand, with the owner role explained rather than editable', async () => {
     const wrapper = await Wrapper()
 

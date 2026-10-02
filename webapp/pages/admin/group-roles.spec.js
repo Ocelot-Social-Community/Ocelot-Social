@@ -34,6 +34,7 @@ const TEMPLATES = [
   {
     groupType: 'public',
     untouchedGroupCount: 4,
+    groupCount: 7,
     roles: [
       role('none', ['group.members.read']),
       role('usual', ['group.post.create']),
@@ -43,6 +44,7 @@ const TEMPLATES = [
   {
     groupType: 'closed',
     untouchedGroupCount: 0,
+    groupCount: 2,
     roles: [role('none', []), role('usual', ['group.post.create'])],
   },
 ]
@@ -85,6 +87,53 @@ describe('admin/group-roles.vue', () => {
     await wrapper.vm.$nextTick()
     return wrapper
   }
+
+  describe('hover diff', () => {
+    // Same affordance as the network roles page: hovering a role tab marks what that role
+    // would change about the one being edited, instead of making an admin compare by eye.
+    const classesOf = (wrapper, key) =>
+      at(wrapper, `perm-${key}`).element.closest('label').className
+
+    it('marks both directions against the role being edited', async () => {
+      const wrapper = await Wrapper()
+
+      await at(wrapper, 'role-tab-none').trigger('mouseenter')
+
+      // Active role is `usual` (posting only), hovered is `none` (member list only).
+      expect(classesOf(wrapper, 'group.post.create')).toContain('perm-row--removed')
+      expect(classesOf(wrapper, 'group.members.read')).toContain('perm-row--added')
+    })
+
+    it('clears the marks when the cursor leaves', async () => {
+      const wrapper = await Wrapper()
+
+      await at(wrapper, 'role-tab-none').trigger('mouseenter')
+      await at(wrapper, 'role-tab-none').trigger('mouseleave')
+
+      expect(classesOf(wrapper, 'group.post.create')).not.toContain('perm-row--removed')
+      expect(classesOf(wrapper, 'group.members.read')).not.toContain('perm-row--added')
+    })
+
+    it('reads the protected owner role as the whole catalog', async () => {
+      // `owner` stores no permission list at all — hovering it must read as "everything",
+      // not as an empty role that would appear to strip the matrix.
+      const wrapper = await Wrapper()
+
+      await at(wrapper, 'role-tab-owner').trigger('mouseenter')
+
+      expect(classesOf(wrapper, 'group.members.read')).toContain('perm-row--added')
+      expect(classesOf(wrapper, 'group.post.create')).not.toContain('perm-row--removed')
+    })
+  })
+
+  it('reads the untouched count as a share of the type`s groups', async () => {
+    // A bare "4 groups still run on this template" reads as "only 4" — the denominator is
+    // what tells an admin whether that is all of them.
+    const wrapper = await Wrapper()
+
+    expect(at(wrapper, 'untouched').text()).toContain('"untouched":4')
+    expect(at(wrapper, 'untouched').text()).toContain('"total":7')
+  })
 
   it('offers one tab per group type and starts on public', async () => {
     const wrapper = await Wrapper()

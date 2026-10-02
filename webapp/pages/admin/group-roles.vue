@@ -19,7 +19,12 @@
 
     <template v-if="activeTemplate">
       <p class="untouched" data-test="untouched">
-        {{ $t('admin.groupRoles.untouched', { count: activeTemplate.untouchedGroupCount }) }}
+        {{
+          $t('admin.groupRoles.untouched', {
+            untouched: activeTemplate.untouchedGroupCount,
+            total: activeTemplate.groupCount,
+          })
+        }}
       </p>
 
       <div class="role-tabs">
@@ -31,6 +36,8 @@
           :class="{ 'role-tab--active': role.name === activeRoleName }"
           :data-test="`role-tab-${role.name}`"
           @click="activeRoleName = role.name"
+          @mouseenter="hoveredRoleName = role.name"
+          @mouseleave="hoveredRoleName = null"
         >
           {{ role.label || role.name }}
         </button>
@@ -43,7 +50,15 @@
       <div v-else-if="activeRole" class="perm-groups">
         <fieldset v-for="group in catalogGroups" :key="group.name" class="perm-group">
           <legend>{{ $t(`group.rights.groups.${group.name}`) }}</legend>
-          <label v-for="permission in group.permissions" :key="permission.key" class="perm-row">
+          <label
+            v-for="permission in group.permissions"
+            :key="permission.key"
+            class="perm-row"
+            :class="{
+              'perm-row--added': rowDiff(permission.key) === 'added',
+              'perm-row--removed': rowDiff(permission.key) === 'removed',
+            }"
+          >
             <input
               type="checkbox"
               :checked="draft.includes(permission.key)"
@@ -95,6 +110,9 @@ export default {
       templates: [],
       activeType: 'public',
       activeRoleName: 'usual',
+      // The role tab currently under the cursor, to preview its rights against the one being
+      // edited — the same affordance the network roles page has.
+      hoveredRoleName: null,
       draft: [],
       saving: false,
     }
@@ -122,6 +140,24 @@ export default {
       if (!this.activeRole) return false
       return [...this.activeRole.permissions].sort().join(',') !== [...this.draft].sort().join(',')
     },
+    // Hovering another role marks every right it would change: 'added' where the hovered role
+    // grants what this one does not, 'removed' the other way round. Compared against the
+    // DRAFT, so an unsaved edit is part of the comparison rather than ignored by it.
+    hoverDiff() {
+      if (!this.hoveredRoleName || this.hoveredRoleName === this.activeRoleName) return {}
+      const hovered = this.activeTemplate?.roles.find((role) => role.name === this.hoveredRoleName)
+      if (!hovered) return {}
+      const hoveredSet = this.permissionSetOf(hovered)
+      const activeSet = new Set(this.draft)
+      const diff = {}
+      for (const permission of this.catalog) {
+        const inHovered = hoveredSet.has(permission.key)
+        const inActive = activeSet.has(permission.key)
+        if (inHovered && !inActive) diff[permission.key] = 'added'
+        else if (!inHovered && inActive) diff[permission.key] = 'removed'
+      }
+      return diff
+    },
   },
   watch: {
     activeType() {
@@ -134,6 +170,16 @@ export default {
   methods: {
     resetDraft() {
       this.draft = this.activeRole ? [...this.activeRole.permissions] : []
+    },
+    // The rights a role effectively holds. `owner` stores no list and resolves to the whole
+    // catalog — hovering it has to show that, not an empty role.
+    permissionSetOf(role) {
+      if (!role) return new Set()
+      if (role.protected) return new Set(this.catalog.map((permission) => permission.key))
+      return new Set(role.permissions)
+    },
+    rowDiff(key) {
+      return this.hoverDiff[key] ?? null
     },
     toggle(key, enabled) {
       this.draft = enabled ? [...this.draft, key] : this.draft.filter((k) => k !== key)
@@ -261,9 +307,24 @@ export default {
   grid-template-columns: auto 1fr;
   gap: var(--space-xx-small) var(--space-x-small);
   align-items: baseline;
-  padding: var(--space-xxx-small) 0;
+  /* The left border carries the hover-diff colour below, so it is reserved here rather than
+     added with the modifier — otherwise every marked row would shift sideways. */
+  padding: var(--space-xxx-small) var(--space-xx-small);
+  border-radius: var(--border-radius-small);
+  border-left: 3px solid transparent;
   cursor: pointer;
+  transition: background-color 0.1s ease;
 }
+.perm-row--added {
+  background: color-mix(in srgb, var(--color-success) 16%, transparent);
+  border-left-color: var(--color-success);
+}
+
+.perm-row--removed {
+  background: color-mix(in srgb, var(--color-danger) 16%, transparent);
+  border-left-color: var(--color-danger);
+}
+
 .perm-row__key {
   grid-column: 2;
   font-family: monospace;
