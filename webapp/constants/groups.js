@@ -9,6 +9,7 @@
 export const NONE_GROUP_ROLE = 'none'
 export const PENDING_GROUP_ROLE = 'pending'
 export const USUAL_GROUP_ROLE = 'usual'
+export const ADMIN_GROUP_ROLE = 'admin'
 export const OWNER_GROUP_ROLE = 'owner'
 
 /**

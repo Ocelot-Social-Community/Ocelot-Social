@@ -901,6 +901,7 @@
         "title": "Vetëm me ftesë"
       },
       "label": "Pranimi",
+      "needsVisibility": "Në një grup që askush nga jashtë nuk e gjen dot, askush nuk mund të hyjë — vetëm një ftesë të fut brenda.",
       "onRequest": {
         "description": "Mund të kërkohet bashkimi; dikush nga grupi duhet të pranojë.",
         "title": "Me kërkesë"
@@ -966,6 +967,8 @@
     "leaveModal": {
       "confirmButton": "Largohu",
       "message": "Largimi nga një grup mund të jetë i pakthyeshëm!<br>Largohu nga grupi <b>“{name}”</b>!",
+      "messageAdmin": "Ti e <b>administron</b> këtë grup. Nëse largohesh, heq dorë nga kjo.<br>Vërtet ta lësh grupin <b>“{name}”</b>?",
+      "messageOwner": "Je <b>pronar</b> i këtij grupi. Nëse largohesh, ai mund të mbetet pa pronar — dhe atëherë vetëm një administrim rrjeti mund ta bëjë sërish funksional.<br>Vërtet ta lësh grupin <b>“{name}”</b>?",
       "title": "A dëshiron vërtet të largohesh nga grupi?"
     },
     "memberRemoved": "Përdoruesi “{name}” u hoq nga grupi!",

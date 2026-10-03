@@ -47,8 +47,15 @@ export default {
   props: {
     roles: { type: Array, required: true },
     activeName: { type: String, default: null },
-    /** How a role is named here — its label, a translation, or just its key. */
-    labelFor: { type: Function, default: (role) => role.name },
+    /**
+     * How a role READS here — its own label, a translation, or the bare key.
+     *
+     * Required, like `badgeFor` and for the same reason: it used to default to the key, the
+     * group's rights page overrode it with the translated name and the template page did not,
+     * so the same five roles were called "Mitglied" on one screen and `usual` on the other.
+     * A default here is an invitation for two screens to disagree quietly.
+     */
+    labelFor: { type: Function, required: true },
     /**
      * Which roles are FIXED — cannot be renamed or deleted — and so carry the lock.
      *

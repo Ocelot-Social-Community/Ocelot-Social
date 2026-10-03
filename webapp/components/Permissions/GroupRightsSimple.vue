@@ -54,6 +54,7 @@
       <span class="admission-control__label">{{ $t('group.admission.label') }}</span>
       <button
         v-for="state in admissionStates"
+        v-show="!admissionLocked || state === admission"
         :key="state"
         type="button"
         role="radio"
@@ -67,6 +68,9 @@
       >
         {{ $t(`group.admission.${state}.title`) }}
       </button>
+      <span v-if="admissionLocked" class="admission-control__reason" data-test="admission-locked">
+        {{ $t('group.admission.needsVisibility') }}
+      </span>
     </div>
 
     <ul class="switches">
@@ -164,10 +168,20 @@ export default {
     admissionIcon() {
       return ADMISSION_ICONS[this.admission]
     },
+    /**
+     * A door only exists where there is a group to see. Entering and asking to enter both begin
+     * with finding the group, so on a hidden one neither is a setting — the backend drops both
+     * rights for the same reason, and offering the choice here would promise something the save
+     * would silently undo.
+     */
+    admissionLocked() {
+      return this.visibility === 'hidden'
+    },
     admissionEditable() {
-      return !this.disabled && !!this.roleNamed(NONE_GROUP_ROLE)
+      return !this.disabled && !this.admissionLocked && !!this.roleNamed(NONE_GROUP_ROLE)
     },
     admissionHint() {
+      if (this.admissionLocked) return this.$t('group.admission.needsVisibility')
       return this.disabled ? this.disabledHint : null
     },
     switches() {
@@ -341,6 +355,12 @@ export default {
 .admission-option:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.admission-control__reason {
+  color: var(--text-color-softer);
+  font-size: 0.85em;
+  font-style: italic;
 }
 
 .switches {

@@ -901,6 +901,7 @@
         "title": "By invitation only"
       },
       "label": "Admission",
+      "needsVisibility": "A group nobody outside can find is a group nobody can enter — an invitation is the only way in.",
       "onRequest": {
         "description": "People may ask to join; somebody in the group has to agree.",
         "title": "On request"
@@ -966,6 +967,8 @@
     "leaveModal": {
       "confirmButton": "Leave",
       "message": "Leaving a group may be irreversible!<br>Leave group <b>“{name}”</b>!",
+      "messageAdmin": "You <b>administer</b> this group. If you leave, you give that up.<br>Really leave the group <b>“{name}”</b>?",
+      "messageOwner": "You are an <b>owner</b> of this group. If you leave, it may be left without one — and then only a network administrator can make it workable again.<br>Really leave the group <b>“{name}”</b>?",
       "title": "Do you really want to leave the group?"
     },
     "memberRemoved": "User “{name}” was removed from group!",

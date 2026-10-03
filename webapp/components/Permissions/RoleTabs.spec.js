@@ -16,8 +16,10 @@ describe('RoleTabs', () => {
       propsData: {
         roles: ROLES,
         activeName: 'user',
-        // Required now: the rule used to default to `protected`, and two of the three pages
-        // silently kept that default while the third overrode it.
+        // Both required now: each used to have a default that two of the three pages kept and
+        // the third overrode, which is how the same five roles ended up called "Mitglied" on
+        // one screen and `usual` on the other, with five locks here and one there.
+        labelFor: (role) => role.name,
         badgeFor: (role) => Boolean(role.protected),
         ...propsData,
       },

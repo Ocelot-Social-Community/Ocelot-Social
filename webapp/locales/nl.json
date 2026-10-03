@@ -901,6 +901,7 @@
         "title": "Alleen op uitnodiging"
       },
       "label": "Toelating",
+      "needsVisibility": "Een groep die niemand van buitenaf kan vinden, kan ook niemand betreden — alleen een uitnodiging geeft toegang.",
       "onRequest": {
         "description": "Je kunt lidmaatschap aanvragen; iemand uit de groep moet akkoord gaan.",
         "title": "Op verzoek"
@@ -966,6 +967,8 @@
     "leaveModal": {
       "confirmButton": "Verlaten",
       "message": "Een groep verlaten kan onomkeerbaar zijn!<br>Groep <b>“{name}”</b> verlaten!",
+      "messageAdmin": "Je <b>beheert</b> deze groep. Als je vertrekt, geef je dat op.<br>Groep <b>“{name}”</b> echt verlaten?",
+      "messageOwner": "Je bent <b>eigenaar</b> van deze groep. Als je vertrekt, blijft die mogelijk zonder eigenaar achter — dan kan alleen een netwerkbeheer de groep weer werkbaar maken.<br>Groep <b>“{name}”</b> echt verlaten?",
       "title": "Wil je de groep echt verlaten?"
     },
     "memberRemoved": "Gebruiker “{name}” is uit de groep verwijderd!",

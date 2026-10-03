@@ -901,6 +901,7 @@
         "title": "Sur invitation uniquement"
       },
       "label": "Admission",
+      "needsVisibility": "Un groupe que personne de l'extérieur ne peut trouver, personne ne peut y entrer — seule une invitation ouvre la porte.",
       "onRequest": {
         "description": "On peut demander à rejoindre ; quelqu'un du groupe doit accepter.",
         "title": "Sur demande"
@@ -966,6 +967,8 @@
     "leaveModal": {
       "confirmButton": "Quitter",
       "message": "Quitter un groupe peut être irréversible !<br>Quitter le groupe <b>“{name}”</b> !",
+      "messageAdmin": "Tu <b>administres</b> ce groupe. Si tu le quittes, tu y renonces.<br>Quitter vraiment le groupe <b>« {name} »</b> ?",
+      "messageOwner": "Tu es <b>propriétaire</b> de ce groupe. Si tu le quittes, il risque de se retrouver sans propriétaire — et seule une administration du réseau pourra alors le rendre à nouveau opérationnel.<br>Quitter vraiment le groupe <b>« {name} »</b> ?",
       "title": "Veux-tu vraiment quitter le groupe ?"
     },
     "memberRemoved": "L'utilisateur “{name}” a été retiré du groupe !",

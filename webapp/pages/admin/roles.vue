@@ -10,6 +10,7 @@
     <role-tabs
       :roles="orderedRoles"
       :active-name="activeRoleName"
+      :label-for="(role) => role.name"
       :badge-for="(role) => role.protected"
       :badge-title="$t('admin.roles.protected')"
       @select="setActive"

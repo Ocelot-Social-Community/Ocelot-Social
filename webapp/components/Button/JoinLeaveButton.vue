@@ -34,6 +34,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
 import { useJoinLeaveGroup } from '~/composables/useJoinLeaveGroup'
 import groupRights from '~/mixins/groupRights'
+import { ADMIN_GROUP_ROLE, OWNER_GROUP_ROLE } from '~/constants/groups'
 
 export default {
   name: 'JoinLeaveButton',
@@ -57,10 +58,24 @@ export default {
     }
   },
   computed: {
+    /**
+     * What leaving actually costs, which is not the same for everybody.
+     *
+     * An ordinary member walks out. Somebody who ADMINISTERS the group gives that up with the
+     * same click, and an owner may leave the group without one at all — after which only a
+     * network administrator can make it workable again (concept 3.9). The same button for three
+     * different consequences needs three different sentences in front of it.
+     */
+    leaveMessageIdent() {
+      const role = this.group?.myGroupRole?.name
+      if (role === OWNER_GROUP_ROLE) return 'group.leaveModal.messageOwner'
+      if (role === ADMIN_GROUP_ROLE) return 'group.leaveModal.messageAdmin'
+      return 'group.leaveModal.message'
+    },
     leaveModalData() {
       return {
         titleIdent: 'group.leaveModal.title',
-        messageIdent: 'group.leaveModal.message',
+        messageIdent: this.leaveMessageIdent,
         messageParams: {
           name: this.group.name,
         },

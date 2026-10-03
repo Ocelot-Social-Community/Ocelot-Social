@@ -901,6 +901,7 @@
         "title": "Solo por invitación"
       },
       "label": "Admisión",
+      "needsVisibility": "A un grupo que nadie de fuera puede encontrar tampoco puede entrar nadie: solo una invitación da acceso.",
       "onRequest": {
         "description": "Se puede solicitar la entrada; alguien del grupo debe aceptarla.",
         "title": "Previa solicitud"
@@ -966,6 +967,8 @@
     "leaveModal": {
       "confirmButton": "Salir",
       "message": "¡Salir de un grupo puede ser irreversible!<br>¡Salir del grupo <b>“{name}”</b>!",
+      "messageAdmin": "<b>Administras</b> este grupo. Si te vas, renuncias a ello.<br>¿Salir realmente del grupo <b>«{name}»</b>?",
+      "messageOwner": "Eres <b>propietario</b> de este grupo. Si te vas, puede quedarse sin ninguno, y entonces solo una administración de red podrá volver a hacerlo operativo.<br>¿Salir realmente del grupo <b>«{name}»</b>?",
       "title": "¿Realmente quieres salir del grupo?"
     },
     "memberRemoved": "¡El usuario “{name}” fue eliminado del grupo!",

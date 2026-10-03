@@ -73,7 +73,7 @@
         <role-tabs
           :roles="orderedRoles"
           :active-name="activeRoleName"
-          :label-for="(role) => role.label || role.name"
+          :label-for="roleLabel"
           :badge-for="(role) => role.system"
           :badge-title="$t('group.rights.systemRole')"
           @select="activeRoleName = $event"
@@ -85,7 +85,7 @@
           v-model="draftLabel"
           class="role-label"
           :label="$t('admin.groupRoles.labelField')"
-          :placeholder="activeRole.name"
+          :placeholder="roleLabel({ name: activeRole.name })"
           :disabled="saving"
           data-test="role-label"
         />
@@ -151,7 +151,7 @@ import {
   NONE_GROUP_ROLE,
   PENDING_GROUP_ROLE,
 } from '~/constants/groups'
-import { orderRolesByPrivilege } from '~/utils/groupRights'
+import { groupRoleLabel, orderRolesByPrivilege } from '~/utils/groupRights'
 import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
 
 export default {
@@ -257,6 +257,10 @@ export default {
      * no membership to end. Greyed rather than offered — a checkbox that changes nothing is
      * worse than one that is not there.
      */
+    /** The label a group gave a role, else the translation of a seeded name, else its key. */
+    roleLabel(role) {
+      return groupRoleLabel(role, (key) => this.$t(key))
+    },
     isMoot(permission) {
       return isMootRight(this.activeRoleName, permission?.key)
     },

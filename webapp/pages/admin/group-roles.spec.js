@@ -235,6 +235,17 @@ describe('admin/group-roles.vue', () => {
     expect(at(wrapper, 'to-simple').attributes('disabled')).toBeTruthy()
   })
 
+  it('calls the roles what the group screen calls them, not by their keys', async () => {
+    // Same five roles, same vocabulary. The template page used to print the bare key while the
+    // group's own rights page printed the translated name — one component, two call sites, two
+    // answers. Asserted by the translation being CONSULTED: this spec's `$t` echoes the key, so
+    // the rendered text falls back to the key either way and would prove nothing.
+    await advanced()
+
+    expect(mocks.$t).toHaveBeenCalledWith('group.roles.usual')
+    expect(mocks.$t).toHaveBeenCalledWith('group.roles.none')
+  })
+
   it('offers one tab per template, names the visibility it produces, and starts on public', async () => {
     const wrapper = await Wrapper()
 

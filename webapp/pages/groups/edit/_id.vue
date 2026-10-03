@@ -103,6 +103,12 @@ export default {
     } = await client.query({
       query: groupEditQuery(),
       variables: { id },
+      // The server, not the cache. This page is reached again by `$nuxt.refresh()` after an
+      // elevation is picked up or put down, and the whole point of that refresh is that the
+      // rights have CHANGED — a cached answer re-ran the access check below against the state
+      // the viewer was in before, so ending administrator access left the page exactly as it
+      // was until a browser reload.
+      fetchPolicy: 'network-only',
     })
     // The right of the TAB that was asked for, not one right for the whole area: these are
     // granted independently, so a member who may only hand out invite links has to be able to

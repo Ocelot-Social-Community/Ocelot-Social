@@ -901,6 +901,7 @@
         "title": "Solo su invito"
       },
       "label": "Ammissione",
+      "needsVisibility": "In un gruppo che nessuno da fuori può trovare non può entrare nessuno: solo un invito apre la porta.",
       "onRequest": {
         "description": "Si può chiedere di unirsi; qualcuno del gruppo deve acconsentire.",
         "title": "Su richiesta"
@@ -966,6 +967,8 @@
     "leaveModal": {
       "confirmButton": "Esci",
       "message": "Uscire da un gruppo potrebbe essere irreversibile!<br>Esci dal gruppo <b>“{name}”</b>!",
+      "messageAdmin": "<b>Amministri</b> questo gruppo. Se esci, vi rinunci.<br>Vuoi davvero lasciare il gruppo <b>«{name}»</b>?",
+      "messageOwner": "Sei <b>proprietario</b> di questo gruppo. Se esci, potrebbe restare senza, e allora solo un’amministrazione di rete potrà renderlo di nuovo operativo.<br>Vuoi davvero lasciare il gruppo <b>«{name}»</b>?",
       "title": "Vuoi davvero uscire dal gruppo?"
     },
     "memberRemoved": "L'utente “{name}” è stato rimosso dal gruppo!",

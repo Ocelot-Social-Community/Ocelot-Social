@@ -52,6 +52,29 @@ describe(storableRightsFor, () => {
   })
 })
 
+describe('a door into a group nobody can find', () => {
+  it('drops both join rights from a non-member role that cannot even see the group', () => {
+    // Entering and asking to enter both begin with seeing that the group is there. An unlisted
+    // group is reached by invitation or not at all — redeemInviteCode does not consult these.
+    expect(storableRightsFor(NONE_ROLE, ['group.join'])).toEqual([])
+    expect(storableRightsFor(NONE_ROLE, ['group.join.request'])).toEqual([])
+  })
+
+  it('keeps them once the group can be seen', () => {
+    expect(storableRightsFor(NONE_ROLE, ['group.read', 'group.join'])).toEqual([
+      'group.read',
+      'group.join',
+    ])
+  })
+
+  it('does not make the group visible as a side effect of its door', () => {
+    // The other way to close this gap would be to imply `group.read` — which would turn a
+    // secret group visible because somebody touched its admission setting. That is the one
+    // thing a group that chose to be unlisted must not have happen to it.
+    expect(storableRightsFor(NONE_ROLE, ['group.join'])).not.toContain('group.read')
+  })
+})
+
 describe(withImpliedRights, () => {
   it('adds the right to see the group to the right to read its content', () => {
     // Without this, every switch in the simple view could be ticked and the group still

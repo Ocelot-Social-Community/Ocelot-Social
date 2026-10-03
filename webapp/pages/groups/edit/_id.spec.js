@@ -159,6 +159,22 @@ describe('pages/groups/edit/_id.vue', () => {
       expect(ctx.errorFn).not.toHaveBeenCalled()
     })
 
+    it('asks the server rather than the cache, so a refresh sees the rights that changed', async () => {
+      // `$nuxt.refresh()` re-runs this after an elevation is picked up or put down, and the
+      // whole point of that refresh is that the rights are different now. A cached answer
+      // re-ran the access check against the state the viewer was in BEFORE, which is why
+      // "end administrator access" did nothing until a browser reload.
+      const ctx = buildContext({
+        group: { id: 'g1', myGroupPermissions: ['group.settings.manage'] },
+      })
+
+      await EditId.asyncData(ctx)
+
+      expect(ctx.query).toHaveBeenCalledWith(
+        expect.objectContaining({ fetchPolicy: 'network-only' }),
+      )
+    })
+
     it('triggers error(403) when the viewer holds no right in this group at all', async () => {
       const ctx = buildContext({ group: { id: 'g1', myGroupPermissions: [] } })
       await EditId.asyncData(ctx)

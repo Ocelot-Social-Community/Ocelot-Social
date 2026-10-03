@@ -901,6 +901,7 @@
         "title": "Tylko z zaproszeniem"
       },
       "label": "Przyjmowanie",
+      "needsVisibility": "Do grupy, której nikt z zewnątrz nie znajdzie, nikt też nie wejdzie — wejście daje tylko zaproszenie.",
       "onRequest": {
         "description": "Można poprosić o dołączenie; ktoś z grupy musi się zgodzić.",
         "title": "Na prośbę"
@@ -966,6 +967,8 @@
     "leaveModal": {
       "confirmButton": "Opuść",
       "message": "Opuszczenie grupy może być nieodwracalne!<br>Opuść grupę <b>“{name}”</b>!",
+      "messageAdmin": "<b>Administrujesz</b> tą grupą. Jeśli odejdziesz, rezygnujesz z tego.<br>Na pewno opuścić grupę <b>„{name}”</b>?",
+      "messageOwner": "Jesteś <b>właścicielem</b> tej grupy. Jeśli odejdziesz, może zostać bez właściciela — wtedy tylko administracja sieci przywróci jej sprawność.<br>Na pewno opuścić grupę <b>„{name}”</b>?",
       "title": "Czy na pewno chcesz opuścić grupę?"
     },
     "memberRemoved": "Użytkownik “{name}” został usunięty z grupy!",

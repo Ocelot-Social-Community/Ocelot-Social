@@ -109,6 +109,19 @@ export function storableRightsFor(
       held.delete(permission)
     }
   }
+  // A door into a group nobody outside can find. Entering and asking to enter both begin with
+  // seeing that the group is there — so without `group.read` on the non-member role these two
+  // are not a stricter setting, they are no setting at all, and an unlisted group is reached by
+  // invitation or not at all (redeemInviteCode does not consult them).
+  //
+  // Dropped rather than made to imply `group.read`: implying it would turn a secret group
+  // visible as a side effect of touching its door, which is the one thing a group that chose to
+  // be unlisted must not have happen to it.
+  if (roleName === NONE_ROLE && !held.has('group.read')) {
+    for (const permission of NON_MEMBER_ONLY_RIGHTS) {
+      held.delete(permission)
+    }
+  }
   return [...held]
 }
 

@@ -184,11 +184,32 @@ describe('GroupRightsSimple', () => {
     })
 
     it('previews the new door before it is saved', async () => {
-      const wrapper = Wrapper({ roles: rolesWith([]) })
+      // A group that can be SEEN — on a hidden one there is no door to set (below).
+      const wrapper = Wrapper({ roles: rolesWith(['group.read']) })
 
       await at(wrapper, 'admission-option-onRequest').trigger('click')
 
       expect(at(wrapper, 'admission-onRequest').exists()).toBe(true)
+    })
+
+    it('offers no door at all on a group nobody outside can find', async () => {
+      // Entering and asking to enter both begin with finding the group. The backend drops both
+      // rights for the same reason, so offering the choice here would promise something the
+      // save would silently undo.
+      const wrapper = Wrapper({ roles: rolesWith([]) })
+
+      expect(at(wrapper, 'admission-locked').exists()).toBe(true)
+      expect(at(wrapper, 'admission-option-open').element.disabled).toBe(true)
+      expect(at(wrapper, 'admission-closed').exists()).toBe(true)
+    })
+
+    it('offers it again as soon as the group can be seen', async () => {
+      const wrapper = Wrapper({ roles: rolesWith([]) })
+
+      await at(wrapper, 'switch-nonmembers-profile').setChecked(true)
+
+      expect(at(wrapper, 'admission-locked').exists()).toBe(false)
+      expect(at(wrapper, 'admission-option-open').element.disabled).toBe(false)
     })
   })
 })

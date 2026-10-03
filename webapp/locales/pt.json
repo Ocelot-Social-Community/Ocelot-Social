@@ -901,6 +901,7 @@
         "title": "Apenas por convite"
       },
       "label": "Admissão",
+      "needsVisibility": "Num grupo que ninguém de fora consegue encontrar também ninguém pode entrar — só um convite abre a porta.",
       "onRequest": {
         "description": "É possível pedir para entrar; alguém do grupo tem de concordar.",
         "title": "Mediante pedido"
@@ -966,6 +967,8 @@
     "leaveModal": {
       "confirmButton": "Sair",
       "message": "Sair de um grupo pode ser irreversível!<br>Sair do grupo <b>“{name}”</b>!",
+      "messageAdmin": "<b>Administras</b> este grupo. Se saíres, abdicas disso.<br>Sair mesmo do grupo <b>«{name}»</b>?",
+      "messageOwner": "És <b>proprietário</b> deste grupo. Se saíres, pode ficar sem nenhum — e então só uma administração da rede poderá torná-lo funcional novamente.<br>Sair mesmo do grupo <b>«{name}»</b>?",
       "title": "Você realmente quer sair do grupo?"
     },
     "memberRemoved": "O usuário “{name}” foi removido do grupo!",

@@ -40,6 +40,31 @@ describe('JoinLeaveButton.vue', () => {
     })
   })
 
+  describe('what leaving costs, said before it happens', () => {
+    // The same click means three different things. An owner may leave the group without one at
+    // all, after which only a network administrator can revive it — that is not something to
+    // find out afterwards.
+    const messageFor = (roleName) => {
+      propsData.isMember = true
+      propsData.isNonePendingMember = true
+      propsData.group.myGroupRole = roleName ? { name: roleName } : null
+      return Wrapper().vm.leaveModalData.messageIdent
+    }
+
+    it('warns an owner that the group may be left without one', () => {
+      expect(messageFor('owner')).toBe('group.leaveModal.messageOwner')
+    })
+
+    it('tells an admin they are giving the administration up', () => {
+      expect(messageFor('admin')).toBe('group.leaveModal.messageAdmin')
+    })
+
+    it('says the ordinary thing to an ordinary member', () => {
+      expect(messageFor('usual')).toBe('group.leaveModal.message')
+      expect(messageFor(null)).toBe('group.leaveModal.message')
+    })
+  })
+
   describe('what a stranger is offered', () => {
     const labelOf = () => Wrapper().vm.label
 

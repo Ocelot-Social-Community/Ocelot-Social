@@ -901,6 +901,7 @@
         "title": "Nur auf Einladung"
       },
       "label": "Einlass",
+      "needsVisibility": "Eine Gruppe, die von aussen niemand findet, kann auch niemand betreten — hinein fuehrt nur eine Einladung.",
       "onRequest": {
         "description": "Beitreten kann man beantragen; jemand aus der Gruppe muss zustimmen.",
         "title": "Auf Anfrage"
@@ -966,6 +967,8 @@
     "leaveModal": {
       "confirmButton": "Verlassen",
       "message": "Eine Gruppe zu verlassen ist möglicherweise nicht rückgängig zu machen!<br>Gruppe <b>„{name}“</b> verlassen!",
+      "messageAdmin": "Du <b>verwaltest</b> diese Gruppe. Verlaesst du sie, gibst du diese Verwaltung ab.<br>Gruppe <b>„{name}“</b> wirklich verlassen?",
+      "messageOwner": "Du bist <b>Inhaber</b> dieser Gruppe. Verlaesst du sie, bleibt sie moeglicherweise ohne Inhaber zurueck — dann kann nur noch eine Netzwerk-Administration sie wieder handlungsfaehig machen.<br>Gruppe <b>„{name}“</b> wirklich verlassen?",
       "title": "Möchtest du wirklich die Gruppe verlassen?"
     },
     "memberRemoved": "Nutzer „{name}“ wurde aus der Gruppe entfernt!",
