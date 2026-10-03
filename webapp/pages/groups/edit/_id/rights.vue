@@ -51,7 +51,7 @@
                throw that draft out without a word. -->
           <button
             type="button"
-            class="link"
+            class="link-button"
             :disabled="simpleDirty"
             :title="simpleDirty ? $t('group.rights.saveFirst') : null"
             data-test="to-advanced"
@@ -74,7 +74,7 @@
         :roles="orderedRoles"
         :active-name="activeRoleName"
         :label-for="roleLabel"
-        :badge-for="(role) => role.system"
+        :badge-for="(role) => isSystemGroupRole(role.name)"
         :badge-title="$t('group.rights.systemRole')"
         @select="activeRoleName = $event"
         @hover="hoveredRoleName = $event"
@@ -154,7 +154,7 @@
           </os-button>
           <button
             type="button"
-            class="link"
+            class="link-button"
             :disabled="dirty"
             :title="dirty ? $t('group.rights.saveFirst') : null"
             data-test="to-simple"
@@ -165,11 +165,17 @@
         </div>
       </template>
     </section>
+    <confirm-modal
+      v-if="templateToApply"
+      :modalData="applyTemplateModalData"
+      @close="templateToApply = null"
+    />
   </os-card>
 </template>
 
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 import OcelotInput from '~/components/OcelotInput/OcelotInput'
 import GroupRightsSimple from '~/components/Permissions/GroupRightsSimple'
 import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
@@ -181,8 +187,14 @@ import {
   resetGroupRolesMutation,
   updateGroupRoleMutation,
 } from '~/graphql/groupRoles.js'
-import { isMootRight, MANDATORY_GROUP_RIGHTS, PENDING_GROUP_ROLE } from '~/constants/groups'
+import {
+  isMootRight,
+  isSystemGroupRole,
+  MANDATORY_GROUP_RIGHTS,
+  PENDING_GROUP_ROLE,
+} from '~/constants/groups'
 import { NONE_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
 import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
@@ -191,6 +203,7 @@ import groupRights from '~/mixins/groupRights'
 export default {
   mixins: [groupRights],
   components: {
+    ConfirmModal,
     GroupRightsSimple,
     OcelotInput,
     OsButton,
@@ -203,8 +216,13 @@ export default {
   },
   data() {
     return {
+      icons: iconRegistry,
       catalog: [],
       templateNames: [],
+      // The template the viewer picked, waiting for them to confirm. Replacing every role of a
+      // group is too much for a browser confirm box — the same modal that asks about leaving
+      // an editor asks about this.
+      templateToApply: null,
       roles: [],
       myGroupPermissions: [],
       advanced: false,
@@ -226,6 +244,23 @@ export default {
     },
     orderedRoles() {
       return orderRolesByPrivilege(this.roles)
+    },
+    applyTemplateModalData() {
+      const template = this.$t(`group.types.${this.templateToApply}`)
+      return {
+        titleIdent: 'group.rights.applyTemplate',
+        messageIdent: 'group.rights.confirmApplyTemplate',
+        messageParams: { template },
+        buttons: {
+          confirm: {
+            danger: true,
+            icon: this.icons.save,
+            textIdent: 'actions.save',
+            callback: () => this.applyTemplate(this.templateToApply),
+          },
+          cancel: { icon: this.icons.close, textIdent: 'actions.cancel', callback: () => {} },
+        },
+      }
     },
     /** The applicant role is being edited, and nothing can produce an applicant. */
     pendingUnreachable() {
@@ -270,6 +305,7 @@ export default {
     },
   },
   methods: {
+    isSystemGroupRole,
     /**
      * A right can only be handed out by somebody who holds it — the same coverage rule the
      * backend enforces. Showing an ineffective checkbox would promise an effect that the save
@@ -389,11 +425,9 @@ export default {
      * Confirmed, because it replaces every role rather than changing one right — and named in
      * the question, so "I meant the other one" is caught before the roles are gone.
      */
-    async confirmApplyTemplate(name) {
+    confirmApplyTemplate(name) {
       if (name === this.group.template) return
-      const template = this.$t(`group.types.${name}`)
-      if (!window.confirm(this.$t('group.rights.confirmApplyTemplate', { template }))) return
-      await this.applyTemplate(name)
+      this.templateToApply = name
     },
     async applyTemplate(template) {
       this.saving = true
@@ -567,14 +601,6 @@ export default {
   gap: var(--space-small);
   align-items: center;
   margin-top: var(--space-base);
-}
-.link {
-  background: none;
-  border: none;
-  padding: 0;
-  color: var(--color-primary);
-  cursor: pointer;
-  text-decoration: underline;
 }
 .role-create {
   display: flex;

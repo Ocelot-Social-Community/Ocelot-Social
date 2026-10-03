@@ -51,7 +51,7 @@
           </os-button>
           <button
             type="button"
-            class="link"
+            class="link-button"
             :disabled="simpleDirty"
             :title="simpleDirty ? $t('admin.groupRoles.saveFirst') : null"
             data-test="to-advanced"
@@ -76,7 +76,7 @@
           :roles="orderedRoles"
           :active-name="activeRoleName"
           :label-for="roleLabel"
-          :badge-for="(role) => role.system"
+          :badge-for="(role) => isSystemGroupRole(role.name)"
           :badge-title="$t('group.rights.systemRole')"
           @select="activeRoleName = $event"
           @hover="hoveredRoleName = $event"
@@ -121,7 +121,7 @@
           </os-button>
           <button
             type="button"
-            class="link"
+            class="link-button"
             :disabled="dirty"
             :title="dirty ? $t('admin.groupRoles.saveFirst') : null"
             data-test="to-simple"
@@ -149,6 +149,7 @@ import {
 } from '~/graphql/adminGroups.js'
 import {
   isMootRight,
+  isSystemGroupRole,
   MANDATORY_GROUP_RIGHTS,
   NONE_GROUP_ROLE,
   PENDING_GROUP_ROLE,
@@ -243,6 +244,7 @@ export default {
     },
   },
   methods: {
+    isSystemGroupRole,
     resetDraft() {
       this.draft = this.activeRole ? [...this.activeRole.permissions] : []
       this.draftLabel = this.activeRole?.label ?? ''

@@ -422,14 +422,19 @@ describe('rights.vue', () => {
     // "Turn this into a channel" used to be a button that silently took two rights off the
     // member role — a thing one could neither see beforehand nor recognise afterwards. A
     // channel is a template now: named in the question, and visible as the active tab after.
-    window.confirm = jest.fn().mockReturnValue(true)
     // The mutation answers with the roles the template put on the group, which the page adopts.
     mocks.$apollo.mutate = jest.fn().mockResolvedValue({ data: { resetGroupRoles: ROLES } })
     const wrapper = await Wrapper()
 
     await at(wrapper, 'template-channel').trigger('click')
 
-    expect(window.confirm).toHaveBeenCalled()
+    // Asked in a modal, not in a browser confirm box: replacing every role of a group is the
+    // same weight as leaving an editor with unsaved work.
+    expect(wrapper.vm.templateToApply).toBe('channel')
+    expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+
+    await wrapper.vm.applyTemplateModalData.buttons.confirm.callback()
+
     expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
       expect.objectContaining({
         variables: { groupId: 'group-1', template: 'channel' },
@@ -437,22 +442,22 @@ describe('rights.vue', () => {
     )
   })
 
-  it('does not replace every role because somebody clicked the tab they are already on', async () => {
-    window.confirm = jest.fn().mockReturnValue(true)
-    const wrapper = await Wrapper()
-
-    await at(wrapper, 'template-public').trigger('click')
-
-    expect(window.confirm).not.toHaveBeenCalled()
-    expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
-  })
-
-  it('leaves the roles alone when the question is answered with no', async () => {
-    window.confirm = jest.fn().mockReturnValue(false)
+  it('names the template in the question, so the wrong one is caught before the roles are gone', async () => {
     const wrapper = await Wrapper()
 
     await at(wrapper, 'template-channel').trigger('click')
 
+    expect(wrapper.vm.applyTemplateModalData.messageParams).toEqual({
+      template: 'group.types.channel',
+    })
+  })
+
+  it('does not ask at all when somebody clicks the template they are already on', async () => {
+    const wrapper = await Wrapper()
+
+    await at(wrapper, 'template-public').trigger('click')
+
+    expect(wrapper.vm.templateToApply).toBeNull()
     expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
   })
 

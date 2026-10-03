@@ -105,6 +105,11 @@ export const DEFAULT_GROUP_ROLE_TEMPLATES: GroupRoleTemplates = {
     // here, where the other two types grant it. That is the guard this replaces:
     // `visibility = 'hidden' AND membership.role <> 'pending'` (as it then was), i.e. invisible
     // is not actually a member. Withdrawing still works, because leaving needs no reading.
+    //
+    // It leaves one dead end, which is a product question rather than a bug in this file: an
+    // invitation to an unlisted group lands the invitee as `pending` (redeemInviteCode reads
+    // `group.join`, which the non-member role here does not grant), and they then hold nothing
+    // but the right to leave something they cannot see.
     systemRole(PENDING_ROLE, ['group.leave']),
     systemRole(USUAL_ROLE, [...MEMBER_BASELINE]),
     systemRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
@@ -119,12 +124,10 @@ export const DEFAULT_GROUP_ROLE_TEMPLATES: GroupRoleTemplates = {
   channel: [
     systemRole(NONE_ROLE, ['group.read', 'group.content.read', 'group.members.read', 'group.join']),
     systemRole(PENDING_ROLE, PENDING_PERMISSIONS),
-    systemRole(
-      USUAL_ROLE,
-      MEMBER_BASELINE.filter(
-        (key) => key !== 'group.post.create' && key !== 'group.comment.create',
-      ),
-    ),
+    // Posting is what a channel withholds — COMMENTING is not. A channel where nobody may
+    // answer is a broadcast, and that is a different product; whether somebody who is not a
+    // member may comment is a further question this template does not answer.
+    systemRole(USUAL_ROLE, MEMBER_BASELINE.filter((key) => key !== 'group.post.create')),
     systemRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
     ownerRole(),
   ],

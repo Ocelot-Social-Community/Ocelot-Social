@@ -20,7 +20,10 @@
     <div class="states">
       <div class="state" :data-test="`visibility-${visibility}`">
         <!-- The page's own way of setting this — the template tabs in the admin area. -->
-        <div v-if="$slots['visibility-control']" class="state__control">
+        <!-- Always rendered, even where a page passes nothing: the grid places items into the
+             next free cell of their row, so a missing control would move the admission one
+             into the visibility column. -->
+        <div class="state__control">
           <slot name="visibility-control" />
         </div>
         <div class="state__body">
@@ -277,34 +280,40 @@ export default {
 </script>
 
 <style scoped>
+/*
+ * A grid rather than a flex row, with the controls on one row and the bodies on the next.
+ *
+ * Flex made each column size itself, so the moment one column's buttons wrapped — which German
+ * does to "Öffentlich / Geschlossen / Geheim / Kanal" and English does not — its icon dropped a
+ * line and the two states stopped reading as a pair. `subgrid` is not available here, so the
+ * two rows are explicit: whatever the controls do, both bodies start on the same line.
+ */
 .states {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-large);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  grid-template-rows: auto auto;
+  gap: var(--space-x-small) var(--space-large);
   margin-bottom: var(--space-base);
 }
 
 .state {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-x-small);
-  flex: 1 1 18rem;
+  display: contents;
 }
 
-/* The control stands over what it sets. Reserved height even when a page passes no slot, so
-   the two columns' icons stay on one line. */
 .state__control {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-xx-small);
-  min-height: 2rem;
+  grid-row: 1;
+  align-self: end;
 }
 
 .state__body {
   display: flex;
   align-items: center;
   gap: var(--space-base);
+  grid-row: 2;
 }
 
 /*
