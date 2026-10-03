@@ -894,6 +894,22 @@
     "addUser": "Añadir usuario",
     "addUserNoOptions": "¡No se encontraron usuarios!",
     "addUserPlaceholder": "Nombre de usuario",
+    "admission": {
+      "caption": "Se entra:",
+      "closed": {
+        "description": "Desde fuera nadie puede unirse ni solicitarlo: solo una invitación da acceso.",
+        "title": "Solo por invitación"
+      },
+      "label": "Admisión",
+      "onRequest": {
+        "description": "Se puede solicitar la entrada; alguien del grupo debe aceptarla.",
+        "title": "Previa solicitud"
+      },
+      "open": {
+        "description": "Quien ve el grupo puede unirse directamente.",
+        "title": "Sin preguntar"
+      }
+    },
     "allGroups": "Todos los grupos",
     "categories": "Tema ::: Temas",
     "categoriesTitle": "Temas del grupo",
@@ -992,7 +1008,6 @@
       "mandatory": "Siempre concedido: una membresía que no se puede terminar no es una opción.",
       "members": "{count} miembros",
       "moot": "Quien no es miembro no tiene ninguna membresía que abandonar.",
-      "noApplicants": "Por ahora nadie puede solicitar unirse, así que no hay solicitantes en espera.",
       "noRight": "No puedes conceder un permiso que tú misma no tienes.",
       "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos de este grupo. Solo se puede cambiar su nombre visible.",
       "presets": {

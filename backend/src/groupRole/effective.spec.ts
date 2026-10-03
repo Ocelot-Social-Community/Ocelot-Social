@@ -198,6 +198,13 @@ describe(authoritySourceFor, () => {
     expect(authoritySourceFor('group.role.manage', role, network)).toBeNull()
   })
 
+  it('reads somebody with no role at all as the non-member they are', () => {
+    // No membership edge ⇒ the floor is the whole non-member role, and what it carries is still
+    // the group's own doing rather than a network right.
+    expect(authoritySourceFor('group.read', null, network, ['group.read'])).toBe('membership')
+    expect(authoritySourceFor('group.read', null, network, [])).toBeNull()
+  })
+
   it('counts a right that reaches the viewer through the FLOOR as membership', () => {
     // It comes from the group's own role definitions, not from a `*.any_*` right carried in
     // from outside — and that distinction is the whole purpose of this answer (E16, E18).

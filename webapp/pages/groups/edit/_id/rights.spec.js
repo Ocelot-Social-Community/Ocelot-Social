@@ -164,7 +164,10 @@ describe('rights.vue', () => {
     // Both directions were unreachable: `group.read` sat on no switch, so whatever was ticked
     // the group could never become public — and whatever was UNticked it never became secret
     // either, because nothing took that right away again.
-    const noneRoleAfter = (wrapper) => {
+    // What the SAVE wrote for the non-member role. Each tick is a draft now; nothing reaches
+    // the server until somebody presses save.
+    const noneRoleAfter = async (wrapper) => {
+      await at(wrapper, 'simple-save').trigger('click')
       const call = mocks.$apollo.mutate.mock.calls.at(-1)[0]
       return call.variables.permissions
     }
@@ -183,7 +186,7 @@ describe('rights.vue', () => {
       await at(wrapper, 'switch-nonmembers-profile').setChecked(false)
 
       // The dependants go with it: reading the posts of a group one cannot see is not a state.
-      expect(noneRoleAfter(wrapper)).toEqual([])
+      expect(await noneRoleAfter(wrapper)).toEqual([])
     })
 
     it('makes the group public when the posts are opened, without a second tick', async () => {
@@ -191,7 +194,7 @@ describe('rights.vue', () => {
 
       await at(wrapper, 'switch-nonmembers-read').setChecked(true)
 
-      expect(noneRoleAfter(wrapper)).toEqual(['group.content.read', 'group.read'])
+      expect(await noneRoleAfter(wrapper)).toEqual(['group.content.read', 'group.read'])
     })
   })
 
@@ -236,26 +239,22 @@ describe('rights.vue', () => {
     expect(at(wrapper, 'switch-members-comment').element.checked).toBe(false)
   })
 
-  it('puts a switch back when the write is refused', async () => {
-    // A rejected mutation leaves the DOM checkbox where the click put it, which reads as "the
-    // group has this right now" — while the server said no.
+  it('reports a refused write instead of leaving the screen claiming it worked', async () => {
     mocks.$apollo.mutate.mockRejectedValueOnce(new Error('Not Authorized!'))
     const wrapper = await Wrapper()
-    const forceUpdate = jest.spyOn(wrapper.vm, '$forceUpdate')
 
-    at(wrapper, 'switch-members-post').element.checked = false
-    await at(wrapper, 'switch-members-post').trigger('change')
+    await at(wrapper, 'switch-members-post').setChecked(false)
+    await at(wrapper, 'simple-save').trigger('click')
     await wrapper.vm.$nextTick()
 
     expect(mocks.$toast.error).toHaveBeenCalled()
-    expect(forceUpdate).toHaveBeenCalled()
   })
 
-  it('writes a single right when a switch is flipped', async () => {
+  it('writes a single right when a switch is flipped and the draft is saved', async () => {
     const wrapper = await Wrapper()
 
-    at(wrapper, 'switch-members-post').element.checked = false
-    at(wrapper, 'switch-members-post').trigger('change')
+    await at(wrapper, 'switch-members-post').setChecked(false)
+    await at(wrapper, 'simple-save').trigger('click')
 
     expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
       expect.objectContaining({

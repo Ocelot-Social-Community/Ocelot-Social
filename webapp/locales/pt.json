@@ -894,6 +894,22 @@
     "addUser": "Adicionar usuário",
     "addUserNoOptions": "Nenhum usuário encontrado!",
     "addUserPlaceholder": "Nome de usuário",
+    "admission": {
+      "caption": "Entra-se:",
+      "closed": {
+        "description": "De fora ninguém pode entrar nem pedir — só um convite abre a porta.",
+        "title": "Apenas por convite"
+      },
+      "label": "Admissão",
+      "onRequest": {
+        "description": "É possível pedir para entrar; alguém do grupo tem de concordar.",
+        "title": "Mediante pedido"
+      },
+      "open": {
+        "description": "Quem vê o grupo pode juntar-se de imediato.",
+        "title": "Sem perguntar"
+      }
+    },
     "allGroups": "Todos os grupos",
     "categories": "Tópico ::: Tópicos",
     "categoriesTitle": "Tópicos do grupo",
@@ -992,7 +1008,6 @@
       "mandatory": "Sempre concedido: uma adesão que não se pode terminar não é uma opção.",
       "members": "{count} membros",
       "moot": "Quem não é membro não tem nenhuma adesão para terminar.",
-      "noApplicants": "Ninguém pode pedir para entrar neste momento, por isso não há candidatos em espera.",
       "noRight": "Não podes conceder uma permissão que tu mesmo não tens.",
       "ownerHoldsEverything": "A função de proprietário tem sempre todas as permissões deste grupo. Só o nome visível pode ser alterado.",
       "presets": {

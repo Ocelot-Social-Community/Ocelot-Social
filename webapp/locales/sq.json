@@ -894,6 +894,22 @@
     "addUser": "Shto përdorues",
     "addUserNoOptions": "Nuk u gjetën përdorues!",
     "addUserPlaceholder": "Emri i përdoruesit",
+    "admission": {
+      "caption": "Hyhet:",
+      "closed": {
+        "description": "Nga jashtë askush nuk mund të bashkohet apo të kërkojë — vetëm një ftesë të fut brenda.",
+        "title": "Vetëm me ftesë"
+      },
+      "label": "Pranimi",
+      "onRequest": {
+        "description": "Mund të kërkohet bashkimi; dikush nga grupi duhet të pranojë.",
+        "title": "Me kërkesë"
+      },
+      "open": {
+        "description": "Kush e sheh grupin mund të bashkohet menjëherë.",
+        "title": "Pa pyetur"
+      }
+    },
     "allGroups": "Të gjitha grupet",
     "categories": "Temë ::: Tema",
     "categoriesTitle": "Temat e grupit",
@@ -992,7 +1008,6 @@
       "mandatory": "Gjithmonë e dhënë: një anëtarësim që nuk mund të përfundohet nuk është një rregullim.",
       "members": "{count} anëtarë",
       "moot": "Kush nuk është anëtar, nuk ka anëtarësi për të lënë.",
-      "noApplicants": "Askush nuk mund të kërkojë të bashkohet për momentin, prandaj nuk ka aplikantë në pritje.",
       "noRight": "Nuk mund të dhurosh një leje që ti vetë nuk e ke.",
       "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet e këtij grupi. Mund të ndryshohet vetëm emri i shfaqur.",
       "presets": {

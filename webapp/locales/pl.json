@@ -894,6 +894,22 @@
     "addUser": "Dodaj użytkownika",
     "addUserNoOptions": "Nie znaleziono użytkowników!",
     "addUserPlaceholder": "Nazwa użytkownika",
+    "admission": {
+      "caption": "Do grupy wchodzi się:",
+      "closed": {
+        "description": "Z zewnątrz nikt nie może dołączyć ani poprosić — wejście daje tylko zaproszenie.",
+        "title": "Tylko z zaproszeniem"
+      },
+      "label": "Przyjmowanie",
+      "onRequest": {
+        "description": "Można poprosić o dołączenie; ktoś z grupy musi się zgodzić.",
+        "title": "Na prośbę"
+      },
+      "open": {
+        "description": "Kto widzi grupę, może od razu do niej dołączyć.",
+        "title": "Bez pytania"
+      }
+    },
     "allGroups": "Wszystkie grupy",
     "categories": "Temat ::: Tematy",
     "categoriesTitle": "Tematy grupy",
@@ -992,7 +1008,6 @@
       "mandatory": "Zawsze przyznane: członkostwo, którego nie można zakończyć, nie jest ustawieniem.",
       "members": "{count} członków",
       "moot": "Kto nie jest członkiem, nie ma członkostwa do opuszczenia.",
-      "noApplicants": "Nikt nie może obecnie poprosić o dołączenie, więc nie ma oczekujących.",
       "noRight": "Nie możesz nadać uprawnienia, którego sam nie masz.",
       "ownerHoldsEverything": "Rola właściciela ma zawsze wszystkie uprawnienia w tej grupie. Zmienić można tylko jej nazwę wyświetlaną.",
       "presets": {

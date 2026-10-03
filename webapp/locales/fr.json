@@ -894,6 +894,22 @@
     "addUser": "Ajouter un utilisateur",
     "addUserNoOptions": "Aucun utilisateur trouvé !",
     "addUserPlaceholder": "Nom d'utilisateur",
+    "admission": {
+      "caption": "On entre :",
+      "closed": {
+        "description": "De l'extérieur, personne ne peut rejoindre ni même demander — seule une invitation ouvre la porte.",
+        "title": "Sur invitation uniquement"
+      },
+      "label": "Admission",
+      "onRequest": {
+        "description": "On peut demander à rejoindre ; quelqu'un du groupe doit accepter.",
+        "title": "Sur demande"
+      },
+      "open": {
+        "description": "Qui voit le groupe peut le rejoindre directement.",
+        "title": "Sans demander"
+      }
+    },
     "allGroups": "Tous les groupes",
     "categories": "Sujet ::: Sujets",
     "categoriesTitle": "Sujets du groupe",
@@ -992,7 +1008,6 @@
       "mandatory": "Toujours accordé : une adhésion qu'on ne peut pas quitter n'est pas un réglage.",
       "members": "{count} membres",
       "moot": "Qui n'est pas membre n'a pas d'adhésion à quitter.",
-      "noApplicants": "Personne ne peut demander à rejoindre pour le moment, il n'y a donc aucun candidat en attente.",
       "noRight": "Vous ne pouvez pas accorder une permission que vous n’avez pas vous-même.",
       "ownerHoldsEverything": "Le rôle de propriétaire détient toujours toutes les permissions de ce groupe. Seul son nom affiché peut être modifié.",
       "presets": {

@@ -1,25 +1,63 @@
 <template>
   <!--
-    The handful of questions a group actually asks itself, as sentences — and above them, what
-    those answers MAKE the group.
+    The handful of questions a group actually asks itself, as sentences — and above them, the two
+    things those answers MAKE the group: how far it can be seen, and how somebody gets in.
 
     One component for both levels: a group editing its own rights, and the admin editing the
-    template new groups start from. The visibility is derived from the same two rights in both
-    places, so stating it in two implementations is how the two came to disagree.
+    template new groups start from. Both states are derived from the same non-member role in both
+    places, so stating them in two implementations is how the two came to disagree.
+
+    Edits are a DRAFT. A single tick here can open a group to the whole network, and that is too
+    much to happen on the way past — the cards preview what the draft would make the group, and
+    nothing is written until somebody says so.
   -->
   <div class="simple-rights">
-    <div class="visibility" :data-test="`visibility-${visibility}`">
-      <os-icon :icon="icons[iconName]" size="2xl" class="visibility__icon" aria-hidden="true" />
-      <div class="visibility__text">
-        <p class="visibility__caption">{{ caption }}</p>
-        <strong class="visibility__title" data-test="visibility-title">
-          {{ $t(`group.types.${visibility}`) }}
-        </strong>
-        <p class="visibility__description" data-test="visibility-description">
-          {{ $t(`group.typeDescriptions.${visibility}`) }}
-        </p>
+    <div class="states">
+      <div class="state" :data-test="`visibility-${visibility}`">
+        <os-icon :icon="icons[visibilityIcon]" size="2xl" class="state__icon" aria-hidden="true" />
+        <div class="state__text">
+          <p class="state__caption">{{ caption }}</p>
+          <strong class="state__title" data-test="visibility-title">
+            {{ $t(`group.types.${visibility}`) }}
+          </strong>
+          <p class="state__description" data-test="visibility-description">
+            {{ $t(`group.typeDescriptions.${visibility}`) }}
+          </p>
+        </div>
+      </div>
+
+      <div class="state" :data-test="`admission-${admission}`">
+        <os-icon :icon="icons[admissionIcon]" size="2xl" class="state__icon" aria-hidden="true" />
+        <div class="state__text">
+          <p class="state__caption">{{ $t('group.admission.caption') }}</p>
+          <strong class="state__title" data-test="admission-title">
+            {{ $t(`group.admission.${admission}.title`) }}
+          </strong>
+          <p class="state__description" data-test="admission-description">
+            {{ $t(`group.admission.${admission}.description`) }}
+          </p>
+        </div>
       </div>
     </div>
+
+    <!--
+      Three states of ONE question, so a select rather than three checkboxes: two ticks would
+      let somebody express "anybody may enter AND must ask", which the model has no answer for.
+    -->
+    <label class="admission-control">
+      <span>{{ $t('group.admission.label') }}</span>
+      <select
+        :value="admission"
+        :disabled="!admissionEditable"
+        :title="admissionEditable ? null : admissionHint"
+        data-test="admission-select"
+        @change="setAdmission($event.target.value)"
+      >
+        <option v-for="state in admissionStates" :key="state" :value="state">
+          {{ $t(`group.admission.${state}.title`) }}
+        </option>
+      </select>
+    </label>
 
     <ul class="switches">
       <li v-for="item in switches" :key="item.id" class="switch">
@@ -29,28 +67,33 @@
             :checked="item.enabled"
             :disabled="!item.editable"
             :data-test="`switch-${item.id}`"
-            @change="$emit('toggle', item.role, item.permission, $event.target.checked)"
+            @change="toggle(item, $event.target.checked)"
           />
           <span>{{ $t(`group.rights.simple.${item.id}`) }}</span>
         </label>
       </li>
     </ul>
 
-    <!-- A role nobody can reach is a setting that does nothing. Said rather than hidden: the
-         applicant rights stay editable, because enabling the request is one tick away. -->
-    <p v-if="!anyoneMayRequestToJoin" class="note" data-test="no-applicants-note">
-      {{ $t('group.rights.noApplicants') }}
-    </p>
-
-    <!-- The buttons differ per level — a group resets to defaults, the admin applies to groups. -->
-    <slot name="actions" />
+    <div class="actions">
+      <os-button :disabled="!dirty || disabled" data-test="simple-save" @click="save">
+        {{ $t('actions.save') }}
+      </os-button>
+      <os-button :disabled="!dirty || disabled" data-test="simple-revert" @click="resetDraft">
+        {{ $t('actions.cancel') }}
+      </os-button>
+      <!-- The buttons differ per level — a group resets to defaults, the admin applies to
+           groups — so the rest of the row belongs to the page. -->
+      <slot name="actions" />
+    </div>
   </div>
 </template>
 
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { NONE_GROUP_ROLE, PENDING_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
+import { ADMISSION_STATES, admissionOf, withAdmission } from '~/utils/groupAdmission'
 import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
+import { applyRightChange } from '~/utils/groupRoleRights'
 import { iconRegistry } from '~/utils/iconRegistry'
 
 // Declared rather than hand-written per row: one sentence, one role, one right. The order is the
@@ -61,25 +104,20 @@ const SIMPLE_SWITCHES = [
   { id: 'members-chat', role: USUAL_GROUP_ROLE, permission: 'group.chat.participate' },
   { id: 'members-invite', role: USUAL_GROUP_ROLE, permission: 'group.invite' },
   { id: 'applicants-read', role: PENDING_GROUP_ROLE, permission: 'group.content.read' },
-  // The hinge of the whole visibility, and it was missing: without `group.read` on the
-  // non-member role a group is hidden no matter what else is ticked, so the simple view could
-  // produce nothing but secret groups — every box ticked and still "Secret".
+  // The hinge of the whole visibility: without `group.read` on the non-member role a group is
+  // hidden no matter what else is ticked.
   { id: 'nonmembers-profile', role: NONE_GROUP_ROLE, permission: 'group.read' },
   { id: 'nonmembers-read', role: NONE_GROUP_ROLE, permission: 'group.content.read' },
   { id: 'nonmembers-members', role: NONE_GROUP_ROLE, permission: 'group.members.read' },
 ]
 
-// One glyph per visibility, from the icons the app already ships: the world may see it, it is
-// locked, or it is not there to be seen.
-const VISIBILITY_ICONS = {
-  public: 'globe',
-  closed: 'lock',
-  hidden: 'eyeSlash',
-}
+// One glyph per state, from the icons the app already ships.
+const VISIBILITY_ICONS = { public: 'globe', closed: 'lock', hidden: 'eyeSlash' }
+const ADMISSION_ICONS = { open: 'signIn', onRequest: 'handPointer', closed: 'ban' }
 
 export default {
   name: 'GroupRightsSimple',
-  components: { OsIcon },
+  components: { OsButton, OsIcon },
   props: {
     /** The group's (or template's) role definitions: `{ name, permissions, … }`. */
     roles: { type: Array, required: true },
@@ -87,7 +125,7 @@ export default {
     catalog: { type: Array, required: true },
     /** The sentence above the visibility — what the group IS, or what new groups WILL BE. */
     caption: { type: String, required: true },
-    /** Nothing is editable: no right to edit, a save in flight, an unsaved draft elsewhere. */
+    /** Nothing is editable: no right to edit, or a save in flight. */
     disabled: { type: Boolean, default: false },
     /** Why nothing is editable, shown on every row while `disabled`. */
     disabledHint: { type: String, default: null },
@@ -97,25 +135,30 @@ export default {
     hintFor: { type: Function, default: () => null },
   },
   data() {
-    return { icons: iconRegistry }
+    return { icons: iconRegistry, admissionStates: ADMISSION_STATES, draft: {} }
   },
   computed: {
     /**
-     * What the group is, read off the rights its NON-MEMBER role holds — the same two the
-     * backend derives it from. Said while the boxes are still being ticked, not after saving.
+     * What the group would be if the draft were saved, read off the rights its NON-MEMBER role
+     * would then hold — the same two the backend derives it from.
      */
     visibility() {
-      return privacyLevelOf(this.roleNamed(NONE_GROUP_ROLE)?.permissions)
+      return privacyLevelOf(this.permissionsOf(NONE_GROUP_ROLE))
     },
-    iconName() {
+    admission() {
+      return admissionOf(this.permissionsOf(NONE_GROUP_ROLE))
+    },
+    visibilityIcon() {
       return VISIBILITY_ICONS[this.visibility]
     },
-    /**
-     * Whether anybody can become an applicant at all. Nothing grants `group.join.request` ⇒ the
-     * `pending` role is never held, and every right on it is inert.
-     */
-    anyoneMayRequestToJoin() {
-      return this.roles.some((role) => role.permissions?.includes('group.join.request'))
+    admissionIcon() {
+      return ADMISSION_ICONS[this.admission]
+    },
+    admissionEditable() {
+      return !this.disabled && !!this.roleNamed(NONE_GROUP_ROLE)
+    },
+    admissionHint() {
+      return this.disabled ? this.disabledHint : null
     },
     switches() {
       return SIMPLE_SWITCHES.map((item) => {
@@ -124,58 +167,129 @@ export default {
         const allowed = !!role && !!permission && this.grantable(permission)
         return {
           ...item,
-          enabled: !!role?.permissions.includes(item.permission),
+          enabled: this.permissionsOf(item.role).includes(item.permission),
           editable: allowed && !this.disabled,
           hint: this.hintFor(permission) || (this.disabled ? this.disabledHint : null),
         }
       })
+    },
+    /** The roles the draft would change, and what it would change them to. */
+    changes() {
+      return this.roles
+        .filter((role) => this.draft[role.name])
+        .map((role) => ({ name: role.name, permissions: this.draft[role.name] }))
+        .filter(({ name, permissions }) => !this.same(permissions, this.storedPermissions(name)))
+    },
+    dirty() {
+      return this.changes.length > 0
+    },
+  },
+  watch: {
+    // A fresh answer from the server replaces the draft: what is on screen must be what is
+    // stored, or the next save would write an edit against a group that moved on.
+    roles() {
+      this.resetDraft()
+    },
+    // Announced so a page showing the matrix as well can lock it: both edit the same roles, and
+    // whichever saved second would discard the other without saying so.
+    dirty(value) {
+      this.$emit('dirty', value)
     },
   },
   methods: {
     roleNamed(name) {
       return this.roles.find((role) => role.name === name)
     },
+    storedPermissions(name) {
+      return this.roleNamed(name)?.permissions ?? []
+    },
+    /** What the role holds in the draft, falling back to what is stored. */
+    permissionsOf(name) {
+      return this.draft[name] ?? this.storedPermissions(name)
+    },
+    same(left, right) {
+      const a = new Set(left)
+      const b = new Set(right)
+      return a.size === b.size && [...a].every((key) => b.has(key))
+    },
+    toggle(item, enabled) {
+      // Through the coupling: ticking "outsiders may read the posts" also grants the right to
+      // see the group at all, and unticking that one takes the posts with it.
+      this.$set(
+        this.draft,
+        item.role,
+        applyRightChange(this.permissionsOf(item.role), item.permission, enabled),
+      )
+    },
+    setAdmission(state) {
+      this.$set(
+        this.draft,
+        NONE_GROUP_ROLE,
+        withAdmission(this.permissionsOf(NONE_GROUP_ROLE), state),
+      )
+    },
+    resetDraft() {
+      this.draft = {}
+    },
+    save() {
+      this.$emit('save', this.changes)
+    },
   },
 }
 </script>
 
 <style scoped>
-.visibility {
+.states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-large);
+  margin-bottom: var(--space-base);
+}
+
+.state {
   display: flex;
   align-items: center;
   gap: var(--space-base);
-  margin-bottom: var(--space-base);
+  flex: 1 1 18rem;
 }
 
 /*
  * OsIcon sizes itself in `em` (ICON_SIZES), so a width/height in pixels here was simply ignored
  * and the glyph came out at text size. The font-size is the handle; `2xl` is 2.5em of it.
  */
-.visibility__icon {
+.state__icon {
   flex: 0 0 auto;
   font-size: 1.6rem;
   color: var(--text-color-soft);
 }
 
-.visibility__text {
+.state__text {
   display: flex;
   flex-direction: column;
 }
 
-.visibility__caption {
+.state__caption {
   margin: 0;
   color: var(--text-color-softer);
   font-size: 0.85em;
 }
 
-.visibility__title {
+.state__title {
   font-size: 1.1em;
 }
 
-.visibility__description {
+.state__description {
   margin: 0;
   color: var(--text-color-soft);
   font-size: 0.9em;
+}
+
+.admission-control {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-x-small);
+  margin-bottom: var(--space-base);
+  color: var(--text-color-soft);
 }
 
 .switches {
@@ -200,10 +314,10 @@ export default {
   cursor: not-allowed;
 }
 
-.note {
-  margin: 0 0 var(--space-base);
-  color: var(--text-color-softer);
-  font-size: 0.85em;
-  font-style: italic;
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-x-small);
 }
 </style>

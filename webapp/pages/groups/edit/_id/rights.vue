@@ -15,28 +15,22 @@
         :disabled-hint="$t('group.rights.noRight')"
         :grantable="grantable"
         :hint-for="blockedHint"
-        @toggle="toggleSimple"
+        @save="saveSimple"
       >
         <template #actions>
-          <div class="actions">
-            <os-button
-              :disabled="saving || !canManageRoles"
-              data-test="preset-channel"
-              @click="applyChannelPreset"
-            >
-              {{ $t('group.rights.presets.channel') }}
-            </os-button>
-            <os-button
-              :disabled="saving || !canManageRoles"
-              data-test="reset"
-              @click="confirmReset"
-            >
-              {{ $t('group.rights.reset') }}
-            </os-button>
-            <button type="button" class="link" data-test="to-advanced" @click="advanced = true">
-              {{ $t('group.rights.toAdvanced') }}
-            </button>
-          </div>
+          <os-button
+            :disabled="saving || !canManageRoles"
+            data-test="preset-channel"
+            @click="applyChannelPreset"
+          >
+            {{ $t('group.rights.presets.channel') }}
+          </os-button>
+          <os-button :disabled="saving || !canManageRoles" data-test="reset" @click="confirmReset">
+            {{ $t('group.rights.reset') }}
+          </os-button>
+          <button type="button" class="link" data-test="to-advanced" @click="advanced = true">
+            {{ $t('group.rights.toAdvanced') }}
+          </button>
         </template>
       </group-rights-simple>
     </section>
@@ -144,7 +138,6 @@ import { isMootRight, MANDATORY_GROUP_RIGHTS } from '~/constants/groups'
 import { NONE_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
 import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
-import { applyRightChange } from '~/utils/groupRoleRights'
 import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
 import groupRights from '~/mixins/groupRights'
 
@@ -314,14 +307,19 @@ export default {
       const permissions = this.activeRole.protected ? [] : this.draftPermissions
       return this.writeRole(this.activeRole.name, permissions, this.draftLabel)
     },
-    toggleSimple(roleName, permissionKey, enabled) {
-      const role = this.roles.find((candidate) => candidate.name === roleName)
-      if (!role) return
-      // Through the coupling: ticking "outsiders may read the posts" also grants the right to
-      // see the group at all, and unticking that one takes the posts with it. Otherwise the
-      // backend's implication puts it straight back and the untick looks inert.
-      const permissions = applyRightChange(role.permissions, permissionKey, enabled)
-      return this.writeRole(role.name, permissions, role.label)
+    /**
+     * The simple view's draft, written in one go.
+     *
+     * Sequentially rather than in parallel: each write answers with the role it stored and the
+     * page merges it, and two answers landing at once would have the second merge overwrite the
+     * list the first just produced.
+     */
+    async saveSimple(changes) {
+      for (const change of changes) {
+        const role = this.roles.find((candidate) => candidate.name === change.name)
+        if (!role) continue
+        await this.writeRole(role.name, change.permissions, role.label)
+      }
     },
     /**
      * The read-only channel from #5588: members read, only admins write. Expressed as the

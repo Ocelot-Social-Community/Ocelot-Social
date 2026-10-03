@@ -34,7 +34,8 @@
         :caption="$t('admin.groupRoles.resultingVisibility')"
         :disabled="saving || dirty"
         :disabled-hint="$t('admin.groupRoles.saveFirst')"
-        @toggle="toggleSimple"
+        @save="saveSimple"
+        @dirty="simpleDirty = $event"
       />
 
       <p class="untouched" data-test="untouched">
@@ -76,7 +77,9 @@
         :granted="draft"
         :diff="hoverDiff"
         :group-label="(name) => $t(`permissions.sections.${name}`)"
-        :disabled-for="(permission) => saving || isMandatory(permission) || isMoot(permission)"
+        :disabled-for="
+          (permission) => saving || simpleDirty || isMandatory(permission) || isMoot(permission)
+        "
         :hint-for="
           (permission) =>
             isMoot(permission)
@@ -89,7 +92,7 @@
       />
 
       <div class="actions">
-        <os-button :disabled="!dirty || saving" data-test="save" @click="save">
+        <os-button :disabled="!dirty || saving || simpleDirty" data-test="save" @click="save">
           {{ $t('actions.save') }}
         </os-button>
         <os-button :disabled="!dirty || saving" data-test="revert" @click="resetDraft">
@@ -123,7 +126,6 @@ import {
 } from '~/graphql/adminGroups.js'
 import { isMootRight, MANDATORY_GROUP_RIGHTS, NONE_GROUP_ROLE } from '~/constants/groups'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
-import { applyRightChange } from '~/utils/groupRoleRights'
 import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
 
 export default {
@@ -134,6 +136,9 @@ export default {
       templates: [],
       activeTemplateName: 'public',
       activeRoleName: 'usual',
+      // Whether the simple view above has an unsaved draft. The matrix is locked while it does,
+      // and the simple view while the matrix does: both write the same roles.
+      simpleDirty: false,
       // The TEMPLATE tab under the cursor: hovering `closed` while editing the public one's
       // member role previews what a closed group's member role does differently — the question
       // these three presets exist to answer.
@@ -230,16 +235,22 @@ export default {
       return this.writeRole(this.activeRoleName, this.draft, this.draftLabel || null)
     },
     /**
-     * One tick in the simple view writes one role of this template straight away — the same
-     * immediacy a group's own simple view has. The matrix keeps its draft-and-save flow, which
-     * is why the switches are locked while that draft is dirty: saving a role here would
-     * otherwise discard the edit in progress without saying so.
+     * The simple view's draft, written in one go.
+     *
+     * Sequentially rather than in parallel: each write answers with the role it stored and
+     * `mergeRole` folds it back in, and two answers landing at once would have the second
+     * overwrite the list the first just produced.
+     *
+     * The switches stay locked while the MATRIX below has an unsaved draft (and the matrix the
+     * other way round): both edit the same roles, and whichever saved second would discard the
+     * other without saying so.
      */
-    toggleSimple(roleName, permissionKey, enabled) {
-      const role = this.activeTemplate?.roles.find((candidate) => candidate.name === roleName)
-      if (!role) return
-      const permissions = applyRightChange(role.permissions, permissionKey, enabled)
-      return this.writeRole(role.name, permissions, role.label ?? null)
+    async saveSimple(changes) {
+      for (const change of changes) {
+        const role = this.activeTemplate?.roles.find((candidate) => candidate.name === change.name)
+        if (!role) continue
+        await this.writeRole(role.name, change.permissions, role.label ?? null)
+      }
     },
     async writeRole(name, permissions, label) {
       this.saving = true

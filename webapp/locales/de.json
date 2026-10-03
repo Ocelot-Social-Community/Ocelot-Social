@@ -894,6 +894,22 @@
     "addUser": "Nutzer hinzufügen",
     "addUserNoOptions": "Keine Nutzer gefunden!",
     "addUserPlaceholder": "Nutzername",
+    "admission": {
+      "caption": "Hinein kommt man:",
+      "closed": {
+        "description": "Von aussen kann niemand beitreten oder anfragen — nur eine Einladung fuehrt hinein.",
+        "title": "Nur auf Einladung"
+      },
+      "label": "Einlass",
+      "onRequest": {
+        "description": "Beitreten kann man beantragen; jemand aus der Gruppe muss zustimmen.",
+        "title": "Auf Anfrage"
+      },
+      "open": {
+        "description": "Wer die Gruppe sieht, kann direkt beitreten.",
+        "title": "Ohne Anfrage"
+      }
+    },
     "allGroups": "Alle Gruppen",
     "categories": "Thema ::: Themen",
     "categoriesTitle": "Themen der Gruppe",
@@ -992,7 +1008,6 @@
       "mandatory": "Immer vergeben: eine Mitgliedschaft, die man nicht beenden kann, ist keine Einstellung.",
       "members": "{count} Mitglieder",
       "moot": "Wer nicht Mitglied ist, hat keine Mitgliedschaft zu beenden.",
-      "noApplicants": "Zurzeit kann niemand eine Mitgliedschaft beantragen, also gibt es keine Wartenden.",
       "noRight": "Dieses Recht kannst du nicht vergeben, weil du es selbst nicht hast.",
       "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte dieser Gruppe. Nur ihr Anzeigename laesst sich aendern.",
       "presets": {

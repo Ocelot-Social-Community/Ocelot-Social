@@ -186,12 +186,16 @@ describe('admin/group-roles.vue', () => {
     )
   })
 
-  it('writes the template role straight away when a simple switch is ticked', async () => {
-    // The simple view is immediate on both levels. The role it writes is the one the SENTENCE
-    // is about, not the one the matrix tabs happen to have selected.
+  it('writes the template role the SENTENCE is about, once the draft is saved', async () => {
+    // Not the role the matrix tabs happen to have selected — and not on the tick either: the
+    // simple view collects a draft and writes it when somebody says so.
     const wrapper = await Wrapper()
 
     await at(wrapper, 'switch-members-post').setChecked(false)
+
+    expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+
+    await at(wrapper, 'simple-save').trigger('click')
 
     expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -202,6 +206,16 @@ describe('admin/group-roles.vue', () => {
         }),
       }),
     )
+  })
+
+  it('locks the matrix while the SIMPLE view has an unsaved draft', async () => {
+    // The other half of the same rule: both edit the same roles, and whichever saved second
+    // would discard the other without saying so.
+    const wrapper = await Wrapper()
+
+    await at(wrapper, 'switch-members-post').setChecked(false)
+
+    expect(at(wrapper, 'save').attributes('disabled')).toBeTruthy()
   })
 
   it('locks the simple switches while the matrix has an unsaved draft', async () => {

@@ -81,14 +81,43 @@ describe('GroupRightsSimple', () => {
       expect(at(wrapper, 'switch-members-comment').element.checked).toBe(false)
     })
 
-    it('reports which ROLE and which RIGHT changed, so the page can save it', () => {
-      // The component owns no mutation: the group level writes a group role, the admin level a
-      // template role, and only the page knows which.
+    it('collects the ticks into a draft and writes nothing until it is saved', async () => {
+      // One tick here can open a group to the whole network. The component owns no mutation
+      // either: the group level writes a group role, the admin level a template role, and only
+      // the page knows which — so the save hands over WHAT changed, per role.
       const wrapper = Wrapper()
 
-      at(wrapper, 'switch-nonmembers-read').setChecked(true)
+      await at(wrapper, 'switch-nonmembers-read').setChecked(true)
 
-      expect(wrapper.emitted('toggle')).toEqual([['none', 'group.content.read', true]])
+      expect(wrapper.emitted('save')).toBeUndefined()
+
+      await at(wrapper, 'simple-save').trigger('click')
+
+      expect(wrapper.emitted('save')).toEqual([
+        [[{ name: 'none', permissions: ['group.content.read', 'group.read'] }]],
+      ])
+    })
+
+    it('previews what the draft would make the group, before it is saved', async () => {
+      // The whole reason the save exists: the consequence has to be readable while it is still
+      // a draft, not discovered after the fact.
+      const wrapper = Wrapper({ roles: rolesWith([]) })
+
+      expect(at(wrapper, 'visibility-hidden').exists()).toBe(true)
+
+      await at(wrapper, 'switch-nonmembers-read').setChecked(true)
+
+      expect(at(wrapper, 'visibility-public').exists()).toBe(true)
+    })
+
+    it('throws the draft away on cancel', async () => {
+      const wrapper = Wrapper({ roles: rolesWith([]) })
+
+      await at(wrapper, 'switch-nonmembers-read').setChecked(true)
+      await at(wrapper, 'simple-revert').trigger('click')
+
+      expect(at(wrapper, 'visibility-hidden').exists()).toBe(true)
+      expect(at(wrapper, 'simple-save').attributes('disabled')).toBeTruthy()
     })
 
     it('locks every row when the page says so, and says why', () => {
@@ -117,25 +146,39 @@ describe('GroupRightsSimple', () => {
     })
   })
 
-  describe('the applicant rights', () => {
-    it('says so when nobody can become an applicant at all', () => {
-      // Nothing grants `group.join.request`, so the `pending` role is never held and every
-      // right on it is inert. Said rather than hidden: enabling the request is one tick away.
-      const wrapper = Wrapper()
-
-      expect(at(wrapper, 'no-applicants-note').exists()).toBe(true)
+  describe('how somebody gets in', () => {
+    // The question that had no control at all: the screen said "nobody can ask to join at the
+    // moment" and offered no way to change it. Three states of one question, so a select —
+    // two checkboxes would let somebody express "anybody may enter AND must ask".
+    it('names the state the non-member role puts the group in', () => {
+      expect(at(Wrapper({ roles: rolesWith([]) }), 'admission-closed').exists()).toBe(true)
+      expect(at(Wrapper({ roles: rolesWith(['group.join']) }), 'admission-open').exists()).toBe(
+        true,
+      )
+      expect(
+        at(Wrapper({ roles: rolesWith(['group.join.request']) }), 'admission-onRequest').exists(),
+      ).toBe(true)
     })
 
-    it('stays quiet once some role may ask to join', () => {
-      const wrapper = Wrapper({
-        roles: [
-          { name: 'none', permissions: ['group.join.request'] },
-          { name: 'pending', permissions: [] },
-          { name: 'usual', permissions: [] },
-        ],
-      })
+    it('changes the door, replacing the other answer rather than adding to it', async () => {
+      const wrapper = Wrapper({ roles: rolesWith(['group.read', 'group.join.request']) })
 
-      expect(at(wrapper, 'no-applicants-note').exists()).toBe(false)
+      at(wrapper, 'admission-select').element.value = 'open'
+      await at(wrapper, 'admission-select').trigger('change')
+      await at(wrapper, 'simple-save').trigger('click')
+
+      expect(wrapper.emitted('save')).toEqual([
+        [[{ name: 'none', permissions: ['group.read', 'group.join'] }]],
+      ])
+    })
+
+    it('previews the new door before it is saved', async () => {
+      const wrapper = Wrapper({ roles: rolesWith([]) })
+
+      at(wrapper, 'admission-select').element.value = 'onRequest'
+      await at(wrapper, 'admission-select').trigger('change')
+
+      expect(at(wrapper, 'admission-onRequest').exists()).toBe(true)
     })
   })
 })

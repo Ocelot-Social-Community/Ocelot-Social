@@ -894,6 +894,22 @@
     "addUser": "Gebruiker toevoegen",
     "addUserNoOptions": "Geen gebruikers gevonden!",
     "addUserPlaceholder": "Gebruikersnaam",
+    "admission": {
+      "caption": "Je komt binnen:",
+      "closed": {
+        "description": "Van buitenaf kan niemand lid worden of het vragen — alleen een uitnodiging geeft toegang.",
+        "title": "Alleen op uitnodiging"
+      },
+      "label": "Toelating",
+      "onRequest": {
+        "description": "Je kunt lidmaatschap aanvragen; iemand uit de groep moet akkoord gaan.",
+        "title": "Op verzoek"
+      },
+      "open": {
+        "description": "Wie de groep ziet, kan er meteen lid van worden.",
+        "title": "Zonder te vragen"
+      }
+    },
     "allGroups": "Alle groepen",
     "categories": "Onderwerp ::: Onderwerpen",
     "categoriesTitle": "Onderwerpen van de groep",
@@ -992,7 +1008,6 @@
       "mandatory": "Altijd toegekend: een lidmaatschap dat je niet kunt beëindigen is geen instelling.",
       "members": "{count} leden",
       "moot": "Wie geen lid is, heeft geen lidmaatschap om te beëindigen.",
-      "noApplicants": "Niemand kan op dit moment lidmaatschap aanvragen, dus er zijn geen wachtende aanvragers.",
       "noRight": "Je kunt geen recht geven dat je zelf niet hebt.",
       "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten in deze groep. Alleen de weergavenaam kan worden aangepast.",
       "presets": {
