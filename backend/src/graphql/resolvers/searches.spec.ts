@@ -717,7 +717,7 @@ describe('resolvers/searches — typed entry points', () => {
         {
           id: 'qg-own',
           name: 'Quokka Owners',
-          visibility: 'public',
+          template: 'public',
           description: groupDescription,
         },
         { ownerId: 'quokka-author' },
@@ -727,7 +727,7 @@ describe('resolvers/searches — typed entry points', () => {
         {
           id: 'qg-foreign',
           name: 'Quokka Strangers',
-          visibility: 'public',
+          template: 'public',
           description: groupDescription,
         },
         { ownerId: 'quokka-fan' },

@@ -13,9 +13,9 @@ import type databaseContext from '@context/database'
 type DbContext = ReturnType<typeof databaseContext>
 
 /**
- * Ensure a template exists for every visibility, and hand back what is persisted.
+ * Ensure every shipped template exists, and hand back what is persisted.
  *
- * Throws when a visibility ends up without its system roles: a group created from such a
+ * Throws when a template ends up without its system roles: a group created from such a
  * template would have no `none`, `pending` or `owner` role, which means nobody could look at
  * it and nobody could administer it. Failing at boot is better than serving that.
  */

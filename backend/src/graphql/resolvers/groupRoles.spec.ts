@@ -16,7 +16,7 @@ import {
   renameGroupRole,
   replaceGroupRoles,
   readGroupTemplate,
-  untouchedGroupIdsByType,
+  untouchedGroupIdsByTemplate,
   writeElevation,
   writeGroupRole,
   writeGroupRoleTemplate,
@@ -42,7 +42,7 @@ vi.mock('@src/groupRole/repository', () => ({
   deleteGroupRole: vi.fn(),
   replaceGroupRoles: vi.fn(),
   markGroupRolesCustomized: vi.fn(),
-  untouchedGroupIdsByType: vi.fn(),
+  untouchedGroupIdsByTemplate: vi.fn(),
   readGroupTemplate: vi.fn(),
   writeGroupTemplate: vi.fn(),
   writeGroupRoleTemplate: vi.fn(),
@@ -63,7 +63,7 @@ const mocked = {
   readGroupRoleTemplates: vi.mocked(readGroupRoleTemplates),
   renameGroupRole: vi.mocked(renameGroupRole),
   replaceGroupRoles: vi.mocked(replaceGroupRoles),
-  untouchedGroupIdsByType: vi.mocked(untouchedGroupIdsByType),
+  untouchedGroupIdsByTemplate: vi.mocked(untouchedGroupIdsByTemplate),
   readGroupTemplate: vi.mocked(readGroupTemplate),
   writeGroupTemplate: vi.mocked(writeGroupTemplate),
   writeElevation: vi.mocked(writeElevation),
@@ -154,12 +154,12 @@ beforeEach(() => {
   mocked.readGroupRoles.mockResolvedValue([])
   mocked.readGroupRoleTemplates.mockResolvedValue({})
   mocked.memberCountsByRole.mockResolvedValue(new Map())
-  mocked.untouchedGroupIdsByType.mockResolvedValue(new Map())
+  mocked.untouchedGroupIdsByTemplate.mockResolvedValue(new Map())
 })
 
-// The shape untouchedGroupIdsByType answers in: which groups an apply would reach, and how
+// The shape untouchedGroupIdsByTemplate answers in: which groups an apply would reach, and how
 // many there are of that type altogether.
-const groupsOfType = (untouchedIds: string[], total = untouchedIds.length) => ({
+const groupsOfTemplate = (untouchedIds: string[], total = untouchedIds.length) => ({
   untouchedIds,
   total,
 })
@@ -294,7 +294,7 @@ describe('Query.groupRoleTemplates', () => {
     // the shipped templates' names honest, but `visibility` is derived either way — a template
     // named `public` whose non-member role cannot read the content IS a closed one.
     mocked.readGroupRoleTemplates.mockResolvedValue({ public: [role('none', ['group.read'])] })
-    mocked.untouchedGroupIdsByType.mockResolvedValue(new Map())
+    mocked.untouchedGroupIdsByTemplate.mockResolvedValue(new Map())
     const { context } = contextFor()
 
     expect(await Query.groupRoleTemplates({}, {}, context)).toMatchObject([
@@ -309,8 +309,8 @@ describe('Query.groupRoleTemplates', () => {
       hidden: [role('none')],
       public: [role('none', ['group.read', 'group.content.read'])],
     })
-    mocked.untouchedGroupIdsByType.mockResolvedValue(
-      new Map([['public', groupsOfType(['a', 'b'], 5)]]),
+    mocked.untouchedGroupIdsByTemplate.mockResolvedValue(
+      new Map([['public', groupsOfTemplate(['a', 'b'], 5)]]),
     )
     const { context } = contextFor()
 
@@ -1162,10 +1162,10 @@ describe('Mutation.applyGroupRoleTemplates', () => {
       public: [role('none')],
       closed: [role('none')],
     })
-    mocked.untouchedGroupIdsByType.mockResolvedValue(
+    mocked.untouchedGroupIdsByTemplate.mockResolvedValue(
       new Map([
-        ['public', groupsOfType(['a', 'b'])],
-        ['closed', groupsOfType(['c'])],
+        ['public', groupsOfTemplate(['a', 'b'])],
+        ['closed', groupsOfTemplate(['c'])],
       ]),
     )
     const { context, published } = contextFor()
@@ -1178,10 +1178,10 @@ describe('Mutation.applyGroupRoleTemplates', () => {
 
   it('skips a visibility whose template is missing or empty', async () => {
     mocked.readGroupRoleTemplates.mockResolvedValue({ public: [] })
-    mocked.untouchedGroupIdsByType.mockResolvedValue(
+    mocked.untouchedGroupIdsByTemplate.mockResolvedValue(
       new Map([
-        ['public', groupsOfType(['a'])],
-        ['hidden', groupsOfType(['b'])],
+        ['public', groupsOfTemplate(['a'])],
+        ['hidden', groupsOfTemplate(['b'])],
       ]),
     )
     const { context } = contextFor()
@@ -1194,7 +1194,7 @@ describe('Mutation.applyGroupRoleTemplates', () => {
     // The whole point of rolesCustomizedAt: a bulk update never overwrites a group's own
     // decision.
     mocked.readGroupRoleTemplates.mockResolvedValue({ public: [role('none')] })
-    mocked.untouchedGroupIdsByType.mockResolvedValue(new Map())
+    mocked.untouchedGroupIdsByTemplate.mockResolvedValue(new Map())
     const { context } = contextFor()
 
     expect(await Mutation.applyGroupRoleTemplates({}, {}, context)).toBe(0)

@@ -119,7 +119,7 @@ export async function readGroupRoles(
   return result.records.map((record) => toDefinition(rowOf(record)))
 }
 
-/** The network-wide templates, grouped by visibility. */
+/** The network-wide templates, keyed by the template name. */
 export async function readGroupRoleTemplates(db: DbContext): Promise<GroupRoleTemplates> {
   const result = await db.query({
     query: `MATCH (r:GroupRoleTemplate)
@@ -580,19 +580,24 @@ export async function writeGroupRoleTemplate(
 }
 
 /**
- * The groups that still run on the template untouched, by visibility.
+ * The groups that still run on their template untouched, keyed by that template.
+ *
+ * By TEMPLATE, not by visibility: two templates can derive to the same visibility (`channel` is
+ * public), and what an apply reaches is the groups created from one particular preset.
  *
  * `rolesCustomizedAt IS NULL` is the whole criterion (concept E12): a group that edited its own
  * roles is never overwritten by a network default, however tempting a bulk update is.
  */
-export interface GroupsOfType {
-  /** The groups of that type whose roles nobody has edited — what an apply would reach. */
+export interface GroupsOfTemplate {
+  /** The groups on that template whose roles nobody has edited — what an apply would reach. */
   untouchedIds: string[]
-  /** How many groups of that type exist at all, so a count can be read as a share. */
+  /** How many groups run on it at all, so a count can be read as a share. */
   total: number
 }
 
-export async function untouchedGroupIdsByType(db: DbContext): Promise<Map<string, GroupsOfType>> {
+export async function untouchedGroupIdsByTemplate(
+  db: DbContext,
+): Promise<Map<string, GroupsOfTemplate>> {
   // Both numbers in one statement: "4 untouched" means nothing without "of how many", and two
   // queries could answer about two different moments.
   const result = await db.query({
@@ -698,7 +703,7 @@ export async function readGroupTemplate(db: DbContext, groupId: string): Promise
  * Record which template the group runs on now.
  *
  * Written whenever a whole template is put on a group, because that is the question
- * `untouchedGroupIdsByType` answers for the admin area: "how many groups would this edit
+ * `untouchedGroupIdsByTemplate` answers for the admin area: "how many groups would this edit
  * reach". A group given the channel template and still recorded as `public` would be counted
  * under the wrong one and silently rewritten by an edit meant for somebody else.
  */

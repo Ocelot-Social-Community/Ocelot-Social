@@ -3,7 +3,8 @@ import { ADMIN_ROLE, NONE_ROLE, OWNER_ROLE, PENDING_ROLE, USUAL_ROLE } from './t
 import type { GroupRoleDefinition, GroupRoleTemplates } from './types'
 import type { GroupPermissionKey } from '@src/groupPermission'
 
-// The seeded default group roles, per visibility.
+// The seeded default group roles, one set per TEMPLATE — of which there may be more than
+// there are visibilities: `channel` derives to `public` and differs in what members may do.
 //
 // These sets are an AUDIT of the hand-written shield guards they replace, so a group
 // upgrading to this model keeps exactly the behaviour it had — the same discipline
@@ -157,7 +158,7 @@ export const MANDATORY_GROUP_ROLE_NAMES: readonly string[] = [
 const templatesByGroupType = new Map(Object.entries(DEFAULT_GROUP_ROLE_TEMPLATES))
 
 /**
- * A fresh copy of the template for this visibility, or undefined when the type has none —
+ * A fresh copy of the roles for this template name, or undefined when there is none —
  * which the drift guard in ./defaults.spec.ts makes unreachable for the types the schema
  * offers. Copies, so seeding one group can never mutate the shared template.
  */

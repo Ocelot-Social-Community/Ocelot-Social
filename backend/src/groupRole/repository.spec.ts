@@ -17,7 +17,7 @@ import {
   seedRolesForNewGroup,
   setNonMemberMemberListAccess,
   syncNonMemberAccess,
-  untouchedGroupIdsByType,
+  untouchedGroupIdsByTemplate,
   writeElevation,
   writeGroupRole,
   writeGroupRoleTemplate,
@@ -484,7 +484,7 @@ describe(setNonMemberMemberListAccess, () => {
   })
 })
 
-describe(untouchedGroupIdsByType, () => {
+describe(untouchedGroupIdsByTemplate, () => {
   it('groups the untouched group ids by type, with the total beside them', async () => {
     // One statement answers both: an apply reaches the untouched ones, and the UI needs the
     // total to say "4 of 7" instead of a bare "4" that reads as "only 4".
@@ -493,7 +493,7 @@ describe(untouchedGroupIdsByType, () => {
       roleRecord({ template: 'hidden', ids: ['c'], total: '1' }),
     ])
 
-    expect([...(await untouchedGroupIdsByType(db))]).toEqual([
+    expect([...(await untouchedGroupIdsByTemplate(db))]).toEqual([
       ['public', { untouchedIds: ['a', 'b'], total: 5 }],
       ['hidden', { untouchedIds: ['c'], total: 1 }],
     ])
@@ -505,7 +505,7 @@ describe(untouchedGroupIdsByType, () => {
     // that list would become a group id an apply then tries to write to.
     const { db } = fakeDb(() => [roleRecord({ template: 'public', ids: ['a', null], total: '2' })])
 
-    expect([...(await untouchedGroupIdsByType(db))]).toEqual([
+    expect([...(await untouchedGroupIdsByTemplate(db))]).toEqual([
       ['public', { untouchedIds: ['a'], total: 2 }],
     ])
   })

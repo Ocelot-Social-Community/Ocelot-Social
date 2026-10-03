@@ -332,6 +332,10 @@ export default {
     return {
       disabled: false,
       loading: false,
+      // The three VISIBILITIES, which the edit form offers as a preset to write onto the
+      // non-member role. They double as the names of three templates — a backend drift guard
+      // keeps one template per visibility — which is why the create form can fall back to them
+      // while `groupTemplates` has not answered.
       visibilityOptions: ['public', 'closed', 'hidden'],
       loadingGeo: false,
       cities: [],

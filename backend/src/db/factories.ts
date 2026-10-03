@@ -416,11 +416,10 @@ Factory.define('group')
     about: faker.lorem.sentence,
     description: faker.lorem.paragraphs,
     // Which role template the group starts from — the same thing `CreateGroup(template:)`
-    // picks, and the one half of the old `visibility` argument that is actually stored. How
-    // findable the group ends up is derived from the roles this seeds (privacyLevel.ts).
-    // Still called `visibility` here, which the specs pass by that name; `template` would be
-    // the honest attribute name and is a rename of its own (34 call sites).
-    visibility: 'public',
+    // picks, and the one thing about the preset that is stored. How findable the group ends up
+    // is NOT set here: it is derived from the roles this seeds (privacyLevel.ts), so a spec
+    // that wants a closed group asks for the closed template and reads the visibility back.
+    template: 'public',
     actionRadius: 'regional',
     deleted: false,
     disabled: false,
@@ -433,13 +432,7 @@ Factory.define('group')
     return slug || toSlug(name)
   })
   .after(async (buildObject, options) => {
-    // The node carries `template`; `visibility` is what the caller said, and for a brand-new
-    // group the two are the same statement.
-    const { visibility, ...properties } = buildObject
-    const [group, owner] = await Promise.all([
-      createNode(Group, { ...properties, template: visibility }),
-      options.owner,
-    ])
+    const [group, owner] = await Promise.all([createNode(Group, buildObject), options.owner])
     const session = driver.session()
     try {
       await session.writeTransaction((txc) =>
@@ -459,7 +452,7 @@ Factory.define('group')
       // be as usable as one created through the API, or every spec that builds a group would
       // get a group whose members hold no rights at all.
       await session.writeTransaction(async (txc) =>
-        seedRolesForNewGroup(txc, buildObject.id, visibility, new Date().toISOString()),
+        seedRolesForNewGroup(txc, buildObject.id, buildObject.template, new Date().toISOString()),
       )
     } finally {
       await session.close()

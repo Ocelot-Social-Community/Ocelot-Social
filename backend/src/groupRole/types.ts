@@ -59,7 +59,7 @@ export function isActiveMembershipRole(roleName: string): boolean {
 // (E18).
 export type AuthoritySource = 'membership' | 'network' | 'both'
 
-// A network-level default set of group role definitions, one per visibility: what a
+// A network-level default set of group role definitions, one per TEMPLATE: what a
 // newly created group of that type starts with, and what `resetGroupRoles` restores.
 // Unlike per-group roles these are few and global, so they are cached and Redis-synced
 // like the network roles and the policy.

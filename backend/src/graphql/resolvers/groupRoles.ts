@@ -27,7 +27,7 @@ import {
   readGroupTemplate,
   renameGroupRole,
   replaceGroupRoles,
-  untouchedGroupIdsByType,
+  untouchedGroupIdsByTemplate,
   writeElevation,
   writeGroupRole,
   writeGroupTemplate,
@@ -270,7 +270,7 @@ export default {
     groupRoleTemplates: async (_parent, _args, context: Context) => {
       const [templates, untouched] = await Promise.all([
         readGroupRoleTemplates(context.database),
-        untouchedGroupIdsByType(context.database),
+        untouchedGroupIdsByTemplate(context.database),
       ])
       // Least private first, ordered by what each template DERIVES to rather than by its name:
       // the tabs are a scale, an alphabet reads as "closed, secret, public", and sorting the
@@ -645,7 +645,7 @@ export default {
     applyGroupRoleTemplates: async (_parent, _args, context: Context) => {
       const [templates, untouched] = await Promise.all([
         readGroupRoleTemplates(context.database),
-        untouchedGroupIdsByType(context.database),
+        untouchedGroupIdsByTemplate(context.database),
       ])
       const byType = new Map(Object.entries(templates))
       const now = new Date().toISOString()
