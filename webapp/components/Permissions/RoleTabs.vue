@@ -12,6 +12,8 @@
       type="button"
       class="role-tab"
       :class="{ 'role-tab--active': role.name === activeName }"
+      :disabled="!!blockedFor(role)"
+      :title="blockedFor(role)"
       :data-test="`role-tab-${role.name}`"
       @click="$emit('select', role.name)"
       @mouseenter="$emit('hover', role.name)"
@@ -68,6 +70,12 @@ export default {
      */
     badgeFor: { type: Function, required: true },
     badgeTitle: { type: String, default: null },
+    /**
+     * Why this role cannot be opened at all, or null. A role nobody can hold has nothing to
+     * configure, and a tab that opens onto an explanation is a worse way of saying that than a
+     * tab that says it where the cursor already is.
+     */
+    blockedFor: { type: Function, default: () => null },
   },
   data() {
     return { icons: iconRegistry }
@@ -99,8 +107,13 @@ export default {
   cursor: pointer;
 }
 
-.role-tab:hover {
+.role-tab:hover:not(:disabled) {
   background: var(--background-color-softer);
+}
+
+.role-tab:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .role-tab--active {

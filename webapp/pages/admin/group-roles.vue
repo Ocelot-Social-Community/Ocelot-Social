@@ -77,6 +77,7 @@
           :active-name="activeRoleName"
           :label-for="roleLabel"
           :badge-for="(role) => isSystemGroupRole(role.name)"
+          :blocked-for="blockedRole"
           :badge-title="$t('group.rights.systemRole')"
           @select="activeRoleName = $event"
           @hover="hoveredRoleName = $event"
@@ -149,6 +150,7 @@ import {
 } from '~/graphql/adminGroups.js'
 import {
   isMootRight,
+  mootReasonFor,
   isSystemGroupRole,
   MANDATORY_GROUP_RIGHTS,
   NONE_GROUP_ROLE,
@@ -245,6 +247,18 @@ export default {
   },
   methods: {
     isSystemGroupRole,
+    /**
+     * Why a role tab cannot be opened — today only the applicant role, when nothing lets
+     * anybody ask to join. Blocked rather than left to open onto an explanation: a role nobody
+     * can hold has nothing to configure, and the cursor is already on the tab.
+     */
+    blockedRole(role) {
+      if (role.name !== PENDING_GROUP_ROLE) return null
+      const reachable = (this.activeTemplate?.roles ?? []).some((candidate) =>
+        candidate.permissions?.includes('group.join.request'),
+      )
+      return reachable ? null : this.$t('group.rights.pendingBlocked')
+    },
     resetDraft() {
       this.draft = this.activeRole ? [...this.activeRole.permissions] : []
       this.draftLabel = this.activeRole?.label ?? ''
@@ -270,7 +284,8 @@ export default {
     },
     /** Why a row cannot be ticked, in words — shown on the row, not only as a tooltip. */
     blockedHint(permission) {
-      if (this.isMoot(permission)) return this.$t('group.rights.moot')
+      if (this.isMoot(permission))
+        return this.$t(mootReasonFor(this.activeRoleName, permission?.key))
       if (this.isMandatory(permission)) return this.$t('group.rights.mandatory')
       return null
     },

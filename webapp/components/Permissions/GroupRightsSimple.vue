@@ -24,6 +24,7 @@
              next free cell of their row, so a missing control would move the admission one
              into the visibility column. -->
         <div class="state__control">
+          <span class="state__control-label">{{ $t('admin.groupRoles.templateLabel') }}</span>
           <slot name="visibility-control" />
         </div>
         <div class="state__body">
@@ -55,6 +56,7 @@
           matters for a setting whose options are opposite ends of one scale.
         -->
         <div class="state__control" role="radiogroup" :aria-label="$t('group.admission.label')">
+          <span class="state__control-label">{{ $t('group.admission.label') }}</span>
           <button
             v-for="state in admissionStates"
             v-show="!admissionLocked || state === admission"
@@ -93,25 +95,27 @@
     <!-- Grouped by WHO the sentence is about, because that is the order somebody reads them
          in: what members may do, then what the people waiting see, then what everybody else
          sees. Eight sentences in one list made the reader find that grouping themselves. -->
-    <fieldset v-for="group in switchGroups" :key="group.name" class="switch-group">
-      <legend class="switch-group__title">
-        {{ $t(`group.rights.simpleGroups.${group.name}`) }}
-      </legend>
-      <ul class="switches">
-        <li v-for="item in group.items" :key="item.id" class="switch">
-          <label :class="{ 'switch--disabled': !item.editable }" :title="item.hint">
-            <input
-              type="checkbox"
-              :checked="item.enabled"
-              :disabled="!item.editable"
-              :data-test="`switch-${item.id}`"
-              @change="toggle(item, $event.target.checked)"
-            />
-            <span>{{ $t(`group.rights.simple.${item.id}`) }}</span>
-          </label>
-        </li>
-      </ul>
-    </fieldset>
+    <div class="switch-groups">
+      <fieldset v-for="group in switchGroups" :key="group.name" class="switch-group">
+        <legend class="switch-group__title">
+          {{ $t(`group.rights.simpleGroups.${group.name}`) }}
+        </legend>
+        <ul class="switches">
+          <li v-for="item in group.items" :key="item.id" class="switch">
+            <label :class="{ 'switch--disabled': !item.editable }" :title="item.hint">
+              <input
+                type="checkbox"
+                :checked="item.enabled"
+                :disabled="!item.editable"
+                :data-test="`switch-${item.id}`"
+                @change="toggle(item, $event.target.checked)"
+              />
+              <span>{{ $t(`group.rights.simple.${item.id}`) }}</span>
+            </label>
+          </li>
+        </ul>
+      </fieldset>
+    </div>
 
     <div class="actions">
       <os-button :disabled="!dirty || disabled" data-test="simple-save" @click="save">
@@ -340,6 +344,15 @@ export default {
   margin-bottom: var(--space-base);
 }
 
+.state__control-label {
+  display: block;
+  margin-top: var(--space-x-small);
+  color: var(--text-color-softer);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 .state {
   display: contents;
 }
@@ -349,15 +362,15 @@ export default {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-xx-small);
-  grid-row: 1;
-  align-self: end;
+  grid-row: 2;
+  align-self: start;
 }
 
 .state__body {
   display: flex;
   align-items: center;
   gap: var(--space-base);
-  grid-row: 2;
+  grid-row: 1;
 }
 
 /*
@@ -431,10 +444,21 @@ export default {
   cursor: not-allowed;
 }
 
+/* Side by side on a wide screen, like the full matrix — eight sentences in one column is a
+   longer scroll than it is a thought. */
+.switch-groups {
+  @media (--vp-desktop-up) {
+    column-count: 2;
+    column-gap: var(--space-large);
+  }
+}
+
 .switch-group {
   border: none;
   padding: 0;
   margin: 0 0 var(--space-small);
+  /* Keep a heading with its sentences rather than splitting them across the two columns. */
+  break-inside: avoid;
 }
 
 .switch-group__title {

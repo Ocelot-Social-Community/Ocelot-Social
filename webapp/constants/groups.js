@@ -52,3 +52,15 @@ export const isMootRight = (roleName, permissionKey) =>
   roleName === NONE_GROUP_ROLE
     ? MANDATORY_GROUP_RIGHTS.includes(permissionKey)
     : NON_MEMBER_ONLY_RIGHTS.includes(permissionKey)
+
+/**
+ * WHY a right means nothing here — one reason per case, rather than one sentence for both.
+ *
+ * There used to be a single `group.rights.moot`, written for `group.leave` on the non-member
+ * role ("somebody who is not a member has no membership to leave"). It was then shown on the
+ * JOIN rights of member roles as well, where it says something that is simply not the reason.
+ */
+export const mootReasonFor = (roleName, permissionKey) => {
+  if (!isMootRight(roleName, permissionKey)) return null
+  return roleName === NONE_GROUP_ROLE ? 'group.rights.mootLeave' : 'group.rights.mootJoin'
+}

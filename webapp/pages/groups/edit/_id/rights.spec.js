@@ -395,13 +395,29 @@ describe('rights.vue', () => {
     expect(row.textContent).toContain('group.rights.mandatory')
   })
 
-  it('explains an applicant role nobody can reach, instead of only greying it', async () => {
+  it('blocks the applicant role nobody can reach, and says why on the tab', async () => {
+    // No role grants `group.join.request` in the fixture, so nobody ever becomes an applicant.
+    // Blocked rather than opening onto an explanation: the cursor is already on the tab.
     const wrapper = await Wrapper()
     await at(wrapper, 'to-advanced').trigger('click')
-    await at(wrapper, 'role-tab-pending').trigger('click')
 
-    // No role grants `group.join.request` in the fixture, so nobody ever becomes an applicant.
-    expect(at(wrapper, 'pending-unreachable').exists()).toBe(true)
+    const tab = at(wrapper, 'role-tab-pending')
+
+    expect(tab.attributes('disabled')).toBeTruthy()
+    expect(tab.attributes('title')).toBe('group.rights.pendingBlocked')
+  })
+
+  it('opens the applicant role again once somebody can ask to join', async () => {
+    const wrapper = await Wrapper()
+    wrapper.setData({
+      roles: ROLES.map((role) =>
+        role.name === 'none' ? { ...role, permissions: ['group.join.request'] } : role,
+      ),
+    })
+    await wrapper.vm.$nextTick()
+    await at(wrapper, 'to-advanced').trigger('click')
+
+    expect(at(wrapper, 'role-tab-pending').attributes('disabled')).toBeFalsy()
   })
 
   it('stays quiet about the applicant role once somebody can ask to join', async () => {
