@@ -56,47 +56,11 @@
         :badge-title="$t('group.rights.systemRole')"
         @select="activeRoleName = $event"
         @hover="hoveredRoleName = $event"
-      >
-        <template #extra>
-          <button
-            v-if="canManageRoles"
-            type="button"
-            class="role-tab-add"
-            :title="$t('group.rights.addRole')"
-            :aria-label="$t('group.rights.addRole')"
-            data-test="role-add"
-            @click="startCreate"
-          >
-            <os-icon :icon="icons.plus" />
-          </button>
-        </template>
-      </role-tabs>
+      />
 
-      <form
-        v-if="creating"
-        class="role-create"
-        data-test="role-create"
-        @submit.prevent="createRole"
-      >
-        <ocelot-input
-          v-model="newRoleName"
-          :placeholder="$t('group.rights.roleKeyPlaceholder')"
-          :aria-label="$t('group.rights.roleKeyPlaceholder')"
-          data-test="new-role-name"
-        />
-        <ocelot-input
-          v-model="newRoleLabel"
-          :placeholder="$t('group.rights.roleLabelPlaceholder')"
-          :aria-label="$t('group.rights.roleLabelPlaceholder')"
-          data-test="new-role-label"
-        />
-        <os-button type="submit" :disabled="!newRoleName || saving">
-          {{ $t('actions.save') }}
-        </os-button>
-        <button type="button" class="link" @click="creating = false">
-          {{ $t('actions.cancel') }}
-        </button>
-      </form>
+      <!-- No "add a role" here: a group defining its own roles is parked (#10356), the server
+           refuses it, and a button that is refused is worse than no button. The five system
+           roles are the whole vocabulary for now. -->
 
       <template v-if="activeRole">
         <header class="role-header">
@@ -164,14 +128,13 @@
 </template>
 
 <script>
-import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard } from '@ocelot-social/ui'
 import OcelotInput from '~/components/OcelotInput/OcelotInput'
 import GroupRightsSimple from '~/components/Permissions/GroupRightsSimple'
 import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
 import RoleTabs from '~/components/Permissions/RoleTabs'
 
 import {
-  createGroupRoleMutation,
   deleteGroupRoleMutation,
   groupRightsQuery,
   resetGroupRolesMutation,
@@ -179,7 +142,6 @@ import {
 } from '~/graphql/groupRoles.js'
 import { isMootRight, MANDATORY_GROUP_RIGHTS } from '~/constants/groups'
 import { NONE_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
-import { iconRegistry } from '~/utils/iconRegistry'
 import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
 import { applyRightChange } from '~/utils/groupRoleRights'
@@ -193,7 +155,6 @@ export default {
     OcelotInput,
     OsButton,
     OsCard,
-    OsIcon,
     PermissionMatrix,
     RoleTabs,
   },
@@ -202,7 +163,6 @@ export default {
   },
   data() {
     return {
-      icons: iconRegistry,
       catalog: [],
       roles: [],
       myGroupPermissions: [],
@@ -213,20 +173,12 @@ export default {
       hoveredRoleName: null,
       draftPermissions: [],
       draftLabel: '',
-      creating: false,
-      newRoleName: '',
-      newRoleLabel: '',
       saving: false,
     }
   },
   computed: {
     canManageRoles() {
       return this.myGroupPermissions.includes('group.role.manage')
-    },
-    /** What a new role may start from: the member role, capped by what the creator may grant. */
-    grantableSubsetOfMemberRole() {
-      const member = this.roles.find((role) => role.name === USUAL_GROUP_ROLE)
-      return (member?.permissions ?? []).filter((key) => this.myGroupPermissions.includes(key))
     },
     orderedRoles() {
       return orderRolesByPrivilege(this.roles)
@@ -385,38 +337,6 @@ export default {
         role.label,
       )
     },
-    startCreate() {
-      this.creating = true
-      this.newRoleName = ''
-      this.newRoleLabel = ''
-    },
-    async createRole() {
-      this.saving = true
-      try {
-        const { data } = await this.$apollo.mutate({
-          mutation: createGroupRoleMutation(),
-          variables: {
-            groupId: this.group.id,
-            name: this.newRoleName.trim(),
-            label: this.newRoleLabel.trim() || null,
-            // A new role starts from what a member may do, which is the useful starting point
-            // for "a member plus something" — the usual reason to add a role at all. Minus
-            // whatever the creator cannot grant right now: the member role legitimately holds
-            // rights that are capped away for THEM (a network cap takes `group.videoCall.create`
-            // out of everybody's effective set in a group whose door is restricted), and
-            // copying those turned "add a role" into a refusal nobody could act on.
-            permissions: this.grantableSubsetOfMemberRole,
-          },
-        })
-        this.mergeRole(data.createGroupRole)
-        this.activeRoleName = data.createGroupRole.name
-        this.creating = false
-      } catch (error) {
-        this.$toast.error(error.message)
-      } finally {
-        this.saving = false
-      }
-    },
     async confirmDelete() {
       if (!this.activeRole || this.activeRole.system) return
       // Members have to land somewhere, or their membership would point at a role that is gone.
@@ -488,18 +408,6 @@ export default {
 <style scoped>
 /* The pill row and the matrix are shared components now (components/Permissions/*); what is
    left here is this page's own furniture. */
-.role-tab-add {
-  border: 1px dashed var(--border-color-soft);
-  border-radius: var(--border-radius-x-large);
-  background: var(--background-color-base);
-  padding: var(--space-xx-small) var(--space-small);
-  font-weight: bold;
-  cursor: pointer;
-}
-.role-tab-add:hover {
-  background: var(--background-color-softer);
-}
-
 .title {
   margin-bottom: 0;
 }

@@ -8,7 +8,7 @@
 import { createRequire } from 'node:module'
 
 import CONFIG from '@config/index'
-import { AuthenticationError } from '@graphql/errors'
+import { AuthenticationError, UserInputError } from '@graphql/errors'
 import {
   memberRoleHolds,
   nonMemberReadsContent,
@@ -452,6 +452,17 @@ const parentHasGroupPermission = (permission: GroupPermissionKey) =>
 // Setting the visibility writes the matching role template onto the group's non-member and
 // applicant roles — so it asks for the right that governs roles, capped by the network right to
 // CREATE a group that private (E10): switching is never a way around group.create_<visibility>.
+/**
+ * Creating a group-defined role is switched off for now (#10356).
+ *
+ * Returns the reason rather than `false`: graphql-shield passes an Error through as the
+ * message, and "Not Authorized!" would send an owner looking for a right they are missing
+ * instead of telling them the capability is not there yet.
+ */
+const groupRolesAreFixed = rule({ cache: 'no_cache' })(
+  () => new UserInputError('Groups cannot define their own roles yet!'),
+)
+
 const canChangeGroupType = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
   const requested = requestedVisibility(args)
   if (requested === null) {
@@ -766,7 +777,15 @@ export default shield(
       // every one of these additionally requires that the actor holds what they hand out
       // (checked in the resolver, which is where the resulting set is known).
       updateGroupRole: and(groupsEnabled, hasGroupPermission('group.role.manage')),
-      createGroupRole: and(groupsEnabled, hasGroupPermission('group.role.manage')),
+      // Parked rather than removed (#10356). A group inventing its OWN roles is the corner of
+      // this model with the least product around it: nothing tells the owner what a new role is
+      // for, the simple view cannot express one, and the matrix is the only way to reach it — so
+      // it produces roles whose purpose nobody can read afterwards. The five system roles carry
+      // every case the product currently names.
+      //
+      // In the shield rather than in the resolver, so the resolver stays whole and tested: when
+      // the UI has an answer for the sixth role, this line is the only thing to take back out.
+      createGroupRole: groupRolesAreFixed,
       renameGroupRole: and(groupsEnabled, hasGroupPermission('group.role.manage')),
       deleteGroupRole: and(groupsEnabled, hasGroupPermission('group.role.manage')),
       resetGroupRoles: and(groupsEnabled, hasGroupPermission('group.role.manage')),

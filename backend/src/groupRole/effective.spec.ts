@@ -4,7 +4,7 @@ import { allGroupPermissionKeys } from '@src/groupPermission'
 
 import { defaultTemplateFor } from './defaults'
 import { authoritySourceFor, effectiveGroupPermissions, permissionsForGroupRole } from './effective'
-import { ADMIN_ROLE, NONE_ROLE, OWNER_ROLE, USUAL_ROLE } from './types'
+import { ADMIN_ROLE, NONE_ROLE, OWNER_ROLE, PENDING_ROLE, USUAL_ROLE } from './types'
 
 import type { GroupRoleDefinition } from './types'
 import type { GroupGateContext, GroupPermissionKey } from '@src/groupPermission'
@@ -196,6 +196,19 @@ describe(authoritySourceFor, () => {
 
   it('reports nothing for a right that is not held', () => {
     expect(authoritySourceFor('group.role.manage', role, network)).toBeNull()
+  })
+
+  it('counts a right that reaches the viewer through the FLOOR as membership', () => {
+    // It comes from the group's own role definitions, not from a `*.any_*` right carried in
+    // from outside — and that distinction is the whole purpose of this answer (E16, E18).
+    expect(
+      authoritySourceFor('group.members.read', template('hidden', PENDING_ROLE), network),
+    ).toBeNull()
+    expect(
+      authoritySourceFor('group.members.read', template('hidden', PENDING_ROLE), network, [
+        'group.members.read',
+      ]),
+    ).toBe('membership')
   })
 
   it('works without a network set at all', () => {

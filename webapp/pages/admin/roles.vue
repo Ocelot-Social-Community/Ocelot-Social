@@ -10,6 +10,7 @@
     <role-tabs
       :roles="orderedRoles"
       :active-name="activeRoleName"
+      :badge-for="(role) => role.protected"
       :badge-title="$t('admin.roles.protected')"
       @select="setActive"
       @hover="hoveredRoleName = $event"

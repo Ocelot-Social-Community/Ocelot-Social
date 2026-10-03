@@ -13,7 +13,14 @@ describe('RoleTabs', () => {
   const Wrapper = (propsData = {}, slots = {}) =>
     mount(RoleTabs, {
       localVue,
-      propsData: { roles: ROLES, activeName: 'user', ...propsData },
+      propsData: {
+        roles: ROLES,
+        activeName: 'user',
+        // Required now: the rule used to default to `protected`, and two of the three pages
+        // silently kept that default while the third overrode it.
+        badgeFor: (role) => Boolean(role.protected),
+        ...propsData,
+      },
       slots,
     })
 
@@ -33,6 +40,21 @@ describe('RoleTabs', () => {
 
     expect(wrapper.emitted('select')).toEqual([['owner']])
     expect(wrapper.emitted('hover')).toEqual([['owner'], [null]])
+  })
+
+  it('leaves the lock rule to the page, because the two role models differ', () => {
+    // Group roles are fixed by `system`, network roles only have `protected`. The component
+    // must not pick one of them behind the caller's back.
+    const bySystem = Wrapper({
+      roles: [
+        { name: 'usual', system: true, protected: false },
+        { name: 'steward', system: false, protected: false },
+      ],
+      badgeFor: (role) => role.system,
+    })
+
+    expect(bySystem.find('[data-test="role-tab-usual"] .role-tab__badge').exists()).toBe(true)
+    expect(bySystem.find('[data-test="role-tab-steward"] .role-tab__badge').exists()).toBe(false)
   })
 
   it('names a role the way the page wants and badges the ones it marks', () => {

@@ -690,6 +690,9 @@ describe('Mutation.updateGroupRole', () => {
   })
 })
 
+// The resolver stays whole and tested — creating a group-defined role is parked in the SHIELD
+// (#10356), which is the one line to take back out when the UI has an answer for a sixth role.
+// permissionsMiddleware.spec.ts pins that the door is shut.
 describe('Mutation.createGroupRole', () => {
   const editor = { authorization: { effective: ['group.role.manage', 'group.invite'] } }
 

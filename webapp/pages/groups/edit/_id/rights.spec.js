@@ -447,67 +447,14 @@ describe('rights.vue', () => {
       expect(at(wrapper, 'role-delete').exists()).toBe(false)
     })
 
-    it('adds a role, starting from what a member may do', async () => {
-      mocks.$apollo.mutate = jest.fn().mockResolvedValue({
-        data: {
-          createGroupRole: {
-            name: 'editors',
-            label: 'Redaktion',
-            system: false,
-            protected: false,
-            permissions: ['group.post.create'],
-            memberCount: 0,
-          },
-        },
-      })
+    it('offers no way to add a role, because the server would refuse it', async () => {
+      // Parked (#10356): a group defining its own roles has no product around it yet, and a
+      // button the shield rejects is worse than no button. The five system roles are the whole
+      // vocabulary for now.
       const wrapper = await advanced()
 
-      await at(wrapper, 'role-add').trigger('click')
-      at(wrapper, 'new-role-name').find('input').setValue('editors')
-      at(wrapper, 'new-role-label').find('input').setValue('Redaktion')
-      await at(wrapper, 'role-create').trigger('submit')
-
-      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          variables: expect.objectContaining({
-            name: 'editors',
-            label: 'Redaktion',
-            // A member plus something is the usual reason to add a role at all.
-            permissions: ['group.post.create', 'group.members.read'],
-          }),
-        }),
-      )
-      expect(wrapper.vm.activeRoleName).toBe('editors')
-    })
-
-    it('leaves out a member right the creator cannot grant right now', async () => {
-      // The refusal this fixes: the member role legitimately holds rights that are capped away
-      // for the person adding a role — a network cap takes `group.videoCall.create` out of
-      // everybody's effective set in a group whose door is restricted — and copying those made
-      // the server answer "you cannot grant rights you do not hold yourself" every time.
-      mocks.$apollo.mutate = jest.fn().mockResolvedValue({
-        data: {
-          createGroupRole: {
-            name: 'editors',
-            label: null,
-            system: false,
-            protected: false,
-            permissions: ['group.post.create'],
-            memberCount: 0,
-          },
-        },
-      })
-      const wrapper = await advanced(['group.role.manage', 'group.post.create'])
-
-      await at(wrapper, 'role-add').trigger('click')
-      at(wrapper, 'new-role-name').find('input').setValue('editors')
-      await at(wrapper, 'role-create').trigger('submit')
-
-      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          variables: expect.objectContaining({ permissions: ['group.post.create'] }),
-        }),
-      )
+      expect(at(wrapper, 'role-add').exists()).toBe(false)
+      expect(at(wrapper, 'role-create').exists()).toBe(false)
     })
 
     it('deletes a role it created, moving its members to the member role', async () => {

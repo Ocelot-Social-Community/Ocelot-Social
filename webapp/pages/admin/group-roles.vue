@@ -50,7 +50,8 @@
         :roles="orderedRoles"
         :active-name="activeRoleName"
         :label-for="(role) => role.label || role.name"
-        :badge-title="$t('admin.groupRoles.ownerHoldsEverything')"
+        :badge-for="(role) => role.system"
+        :badge-title="$t('group.rights.systemRole')"
         @select="activeRoleName = $event"
         @hover="hoveredRoleName = $event"
       />

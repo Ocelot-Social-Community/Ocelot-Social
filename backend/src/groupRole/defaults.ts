@@ -75,14 +75,6 @@ const ownerRole = (): GroupRoleDefinition => ({
   permissions: [],
 })
 
-const editableRole = (name: string, permissions: GroupPermissionKey[]): GroupRoleDefinition => ({
-  name,
-  label: null,
-  system: false,
-  protected: false,
-  permissions,
-})
-
 export const DEFAULT_GROUP_ROLE_TEMPLATES: GroupRoleTemplates = {
   // Anyone may read and join without approval.
   public: [
@@ -92,7 +84,7 @@ export const DEFAULT_GROUP_ROLE_TEMPLATES: GroupRoleTemplates = {
     // invite guard.
     systemRole(USUAL_ROLE, [...MEMBER_BASELINE, 'group.invite']),
     // group.invite is already part of ADMIN_EXTRAS — an admin holds it in every visibility.
-    editableRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
+    systemRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
     ownerRole(),
   ],
   // Findable, but joining needs approval — so a non-member may ask, not enter. Whether
@@ -102,7 +94,7 @@ export const DEFAULT_GROUP_ROLE_TEMPLATES: GroupRoleTemplates = {
     systemRole(NONE_ROLE, ['group.read', 'group.join.request']),
     systemRole(PENDING_ROLE, PENDING_PERMISSIONS),
     systemRole(USUAL_ROLE, [...MEMBER_BASELINE]),
-    editableRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
+    systemRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
     ownerRole(),
   ],
   // Unlisted: a non-member has no rights at all, which is what makes joining a hidden
@@ -115,19 +107,24 @@ export const DEFAULT_GROUP_ROLE_TEMPLATES: GroupRoleTemplates = {
     // is not actually a member. Withdrawing still works, because leaving needs no reading.
     systemRole(PENDING_ROLE, ['group.leave']),
     systemRole(USUAL_ROLE, [...MEMBER_BASELINE]),
-    editableRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
+    systemRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
     ownerRole(),
   ],
 }
 
 // The role names every group must always have, whatever an operator did to the templates.
 // They are exactly the system roles: no membership without a destination (`usual`), no
-// application without a waiting room (`pending`), no group without a non-member view (`none`)
-// and none without a failsafe (`owner`).
+// application without a waiting room (`pending`), no group without a non-member view (`none`),
+// none without somebody to run it (`admin`) and none without a failsafe (`owner`).
+//
+// `admin` joined this list with #10356: it used to be an ordinary role a group could delete,
+// which was defensible only while the group could also create roles of its own. With that
+// parked, a group that had deleted its admin role would have had no way back to one.
 export const MANDATORY_GROUP_ROLE_NAMES: readonly string[] = [
   NONE_ROLE,
   PENDING_ROLE,
   USUAL_ROLE,
+  ADMIN_ROLE,
   OWNER_ROLE,
 ]
 

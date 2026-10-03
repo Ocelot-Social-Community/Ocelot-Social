@@ -49,8 +49,17 @@ export default {
     activeName: { type: String, default: null },
     /** How a role is named here — its label, a translation, or just its key. */
     labelFor: { type: Function, default: (role) => role.name },
-    /** Which roles carry the ★: protected ones by default, system ones where that is meant. */
-    badgeFor: { type: Function, default: (role) => Boolean(role.protected) },
+    /**
+     * Which roles are FIXED — cannot be renamed or deleted — and so carry the lock.
+     *
+     * Required, with no default on purpose. It used to default to `role.protected`, which the
+     * group rights page overrode with `role.system` and the two admin pages did not: the same
+     * row of tabs then showed five locks on one screen and one on another, for roles that are
+     * equally fixed. The two role models answer this differently (group roles have `system`,
+     * network roles only `protected`), so the answer belongs to the caller — but it has to be
+     * given rather than inherited by accident.
+     */
+    badgeFor: { type: Function, required: true },
     badgeTitle: { type: String, default: null },
   },
   data() {

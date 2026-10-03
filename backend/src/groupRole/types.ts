@@ -33,14 +33,17 @@ export const OWNER_ROLE = 'owner'
 // sets the label (concept E13).
 export const USUAL_ROLE = 'usual'
 
-// Seeded but ordinary: a group may rename, delete or replace it, and add any number of roles
-// beside it.
+// Fixed for now (#10356), like the four below it. It was seeded as an ordinary role a group
+// could rename, delete or replace — which only made sense while a group could also define roles
+// of its own. With that parked, a group whose `admin` role had been deleted would have no way
+// back to one, and the five names below are the whole vocabulary the product speaks.
 export const ADMIN_ROLE = 'admin'
 
 export const SYSTEM_ROLE_NAMES: readonly string[] = [
   NONE_ROLE,
   PENDING_ROLE,
   USUAL_ROLE,
+  ADMIN_ROLE,
   OWNER_ROLE,
 ]
 
