@@ -5,15 +5,14 @@
     the current tab put its white text on the light hover background. Built on OsButton, so how a button looks in each state is the
     library's business and the same as everywhere else in the app.
   -->
-  <div class="toggle-group" role="radiogroup" :aria-label="label">
+  <div class="toggle-group" role="group" :aria-label="label">
     <os-button
       v-for="item in items"
       :key="item.value"
       :variant="item.value === value ? 'primary' : 'default'"
       :appearance="item.value === value ? 'filled' : 'outline'"
       size="sm"
-      role="radio"
-      :aria-checked="String(item.value === value)"
+      :aria-pressed="String(item.value === value)"
       class="toggle-group__item"
       :class="{ 'toggle-group__item--active': item.value === value }"
       :data-test="item.testId"

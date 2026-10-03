@@ -392,9 +392,7 @@ describe('admin/roles.vue', () => {
     // Translation present: look it up by the sanitised (dot-free) key.
     wrapper.vm.$t = (path) => `T:${path}`
     expect(wrapper.vm.permLabel(perm)).toBe('T:admin.roles.perm.badge_manage')
-    // One namespace for both catalogs: a section heading reads the same whether the right is
-    // network-wide or inside a group.
-    expect(wrapper.vm.groupLabel('moderation')).toBe('T:permissions.sections.moderation')
+    expect(wrapper.vm.groupLabel('moderation')).toBe('T:admin.roles.groups.moderation')
   })
 
   it('links the member count to the user list filtered by that role', async () => {
