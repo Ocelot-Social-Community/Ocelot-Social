@@ -37,7 +37,7 @@
       },
       "revoke": {
         "confirm": "Intrekken",
-        "message": "Weet je zeker dat je de API Key \"{name}\" van {user} wilt intrekken?",
+        "message": "Weet je zeker dat je de API Key “{name}” van {user} wilt intrekken?",
         "success": "API Key is ingetrokken",
         "title": "API Key intrekken"
       },
@@ -394,7 +394,7 @@
       "saveSuccess": "Rol opgeslagen.",
       "selfLockout": {
         "confirm": "Toch verwijderen",
-        "message": "Je staat op het punt de rechten ‘rollen beheren’ te verwijderen van <strong>{role}</strong> — je eigen rol. Je kunt dan geen rollen meer beheren; alleen een eigenaar kan dit herstellen. Doorgaan?",
+        "message": "Je staat op het punt de rechten “rollen beheren” te verwijderen van <strong>{role}</strong> — je eigen rol. Je kunt dan geen rollen meer beheren; alleen een eigenaar kan dit herstellen. Doorgaan?",
         "title": "Je eigen rolbeheer verwijderen?"
       },
       "title": "Rollen & rechten"
@@ -453,7 +453,7 @@
     "expandChat": "Chat uitvouwen",
     "groupChatButton": {
       "label": "Groepschat",
-      "tooltip": "Chat met groep \"{name}\""
+      "tooltip": "Chat met groep “{name}”"
     },
     "isOnline": "is online",
     "isTyping": "is aan het typen...",
@@ -758,7 +758,7 @@
   "disable": {
     "cancel": "Annuleren",
     "comment": {
-      "message": "Wilt u de reactie van \" <b> {name} </b> \" echt uitschakelen ?",
+      "message": "Wilt u de reactie van “<b>{name}</b>” echt uitschakelen ?",
       "title": "Commentaar uitschakelen",
       "type": "Melding"
     },
@@ -916,12 +916,12 @@
     "categoriesTitle": "Onderwerpen van de groep",
     "changeMemberRole": "De rol is gewijzigd naar “{role}”!",
     "contentMenu": {
-      "hideFromProfile": "Hide from my profile",
+      "hideFromProfile": "Verbergen op mijn profiel",
       "inviteLinks": "Uitnodigingslinks",
       "menuButton": "Groepsmenu",
       "muteGroup": "Groep dempen",
       "profileVisibilityUpdated": "Zichtbaarheid bijgewerkt",
-      "showOnProfile": "Show on my profile",
+      "showOnProfile": "Weergeven op mijn profiel",
       "unmuteGroup": "Groep niet meer dempen",
       "visitGroupPage": "Groep bekijken"
     },
@@ -998,7 +998,7 @@
     "radius": "Radius",
     "removeMember": "Lid verwijderen",
     "removeMemberButton": "Verwijderen",
-    "removeMemberConfirmText": "Gebruiker \"{name}\" uit de groep verwijderen?",
+    "removeMemberConfirmText": "Gebruiker “{name}” uit de groep verwijderen?",
     "removeMemberTitle": "Lid verwijderen",
     "rights": {
       "addRole": "Rol toevoegen",
@@ -1008,7 +1008,7 @@
       "blockedByNetwork": "Netwerkbreed begrensd: hiervoor is het recht {permission} nodig.",
       "confirmApplyTemplate": "Sjabloon “{template}” op deze groep toepassen? Alle rollen worden vervangen door die van het sjabloon.",
       "confirmApplyTemplateDiscards": "Sjabloon “{template}” op deze groep toepassen? Alle rollen worden vervangen door die van het sjabloon — en de niet-opgeslagen wijzigingen gaan verloren.",
-      "confirmDelete": "De rol \"{role}\" verwijderen? De leden worden \"{target}\".",
+      "confirmDelete": "De rol “{role}” verwijderen? De leden worden “{target}”.",
       "confirmReset": "Alle rollen van deze groep terugzetten naar de standaard? Rollen die jullie hebben toegevoegd verdwijnen en hun leden worden gewone leden.",
       "deleteRole": "Rol verwijderen",
       "description": "Bepaal wie wat mag in deze groep — van buitenstaanders tot beheerders.",
@@ -1365,7 +1365,7 @@
   "post": {
     "article": "Artikel",
     "comment": {
-      "joinGroup": "Lid geworden van groep „<b>{name}</b>“",
+      "joinGroup": "Lid geworden van groep “<b>{name}</b>”",
       "noPermission": "Reageren is niet ingeschakeld voor jouw rol.",
       "reply": "Antwoorden",
       "submit": "Reageren",
@@ -1403,7 +1403,7 @@
       "pushedSuccessfully": "Bericht succesvol naar boven geduwd!",
       "removedFromGroupSuccessfully": "Bericht uit de groep verwijderd",
       "removeFromGroup": "Uit de groep verwijderen",
-      "removeFromGroupConfirm": "Dit bericht uit de groep \"{group}\" verwijderen? Het bericht blijft bij de auteur, maar verliest zijn plek in de groep.",
+      "removeFromGroupConfirm": "Dit bericht uit de groep “{group}” verwijderen? Het bericht blijft bij de auteur, maar verliest zijn plek in de groep.",
       "unobserve": "Bericht niet meer observeren",
       "unobservedSuccessfully": "Je observeert dit bericht niet meer!",
       "unpin": "Bericht losmaken (Netwerk)",
@@ -1451,15 +1451,15 @@
     "followers": "Volgelingen",
     "following": "Volgt",
     "groups": {
-      "closed": "Closed groups",
-      "hidden": "Secret groups",
-      "hiddenFromOthers": "hidden from others",
-      "nobody": "no groups",
+      "closed": "Gesloten groepen",
+      "hidden": "Geheime groepen",
+      "hiddenFromOthers": "verborgen voor anderen",
+      "nobody": "geen groepen",
       "noFilterResults": "Geen groepen gevonden voor dit filter.",
       "other": "Groepen zonder mij",
-      "public": "Public groups",
+      "public": "Openbare groepen",
       "shared": "Gedeelde groepen",
-      "title": "Groups of {name}"
+      "title": "Groepen van {name}"
     },
     "invites": {
       "description": "Voer hun e-mailadres in voor de uitnodiging.",
@@ -1513,13 +1513,13 @@
     "cancel": "Annuleren",
     "comment": {
       "error": "Je hebt de reactie al gemeld!",
-      "message": "Wilt u echt het commentaar van \"<b>{name}</b>\" melden?",
+      "message": "Wilt u echt het commentaar van “<b>{name}</b>” melden?",
       "title": "Reactie melden",
       "type": "Melding"
     },
     "contribution": {
       "error": "Je hebt de bijdrage al gemeld!",
-      "message": "Wilt u echt het commentaar van \"<b>{name}</b>\" melden?",
+      "message": "Wilt u echt het commentaar van “<b>{name}</b>” melden?",
       "title": "Bijdrage melden",
       "type": "Bijdrage"
     },
@@ -1548,7 +1548,7 @@
     "success": "Bedankt voor het melden!",
     "user": {
       "error": "Je hebt de gebruiker al gemeld!",
-      "message": "Wilt u echt het commentaar van \"<b>{name}</b>\" melden?",
+      "message": "Wilt u echt het commentaar van “<b>{name}</b>” melden?",
       "title": "Gebruiker melden",
       "type": "Gebruiker"
     }
@@ -1600,8 +1600,8 @@
       "name": "API Keys",
       "revoke": {
         "confirm": "Intrekken",
-        "message": "Weet je zeker dat je de API Key \"{name}\" wilt intrekken? Deze actie kan niet ongedaan worden gemaakt.",
-        "success": "API Key \"{name}\" is ingetrokken",
+        "message": "Weet je zeker dat je de API Key “{name}” wilt intrekken? Deze actie kan niet ongedaan worden gemaakt.",
+        "success": "API Key “{name}” is ingetrokken",
         "title": "API Key intrekken"
       },
       "revoked-list": {
@@ -1776,11 +1776,11 @@
     "privacy": {
       "make-shouts-public": "Artikelen die ik heb geshout delen op mijn openbare profiel",
       "name": "Privacy",
-      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-closed-groups-on-profile": "Gesloten groepen op mijn profiel weergeven",
       "show-groups-on-profile-hint": "De zichtbaarheid van elke afzonderlijke groep kan ook worden ingesteld via het driepuntsmenu van de groep of rechtstreeks in de groeplijst op uw profiel.",
-      "show-groups-on-profile-section": "Show groups on profile",
+      "show-groups-on-profile-section": "Groepen op profiel weergeven",
       "show-hidden-groups-on-profile": "Geheime groepen op mijn profiel weergeven",
-      "show-public-groups-on-profile": "Show public groups on my profile",
+      "show-public-groups-on-profile": "Openbare groepen op mijn profiel weergeven",
       "success-update": "Privacy-instellingen opgeslagen!"
     },
     "security": {
@@ -1840,7 +1840,7 @@
     "error-occurred": "Er is een fout opgetreden.",
     "faq": "FAQ",
     "germany": "Duitsland",
-    "imprint": "Afdruk",
+    "imprint": "Colofon",
     "made": "Met ❤️ gemaakt",
     "navigation": "Navigatie",
     "register": "inschrijfnummer",
@@ -1888,10 +1888,10 @@
         "noDevice": "Geen scherm beschikbaar om te delen."
       }
     },
-    "gotoGroup": "Naar groep „{name}”",
+    "gotoGroup": "Naar groep “{name}”",
     "groupVideoCallButton": {
       "label": "Groepsvideo",
-      "tooltip": "Videogesprek in groep „{name}”"
+      "tooltip": "Videogesprek in groep “{name}”"
     },
     "leave": "Gesprek verlaten",
     "maximize": "Maximaliseren",

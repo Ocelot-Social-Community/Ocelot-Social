@@ -37,7 +37,7 @@
       },
       "revoke": {
         "confirm": "Unieważnij",
-        "message": "Czy na pewno chcesz unieważnić API Key \"{name}\" użytkownika {user}?",
+        "message": "Czy na pewno chcesz unieważnić API Key „{name}” użytkownika {user}?",
         "success": "API Key został unieważniony",
         "title": "Unieważnij API Key"
       },
@@ -476,7 +476,7 @@
     "typeMessage": "Wpisz wiadomość",
     "userProfileButton": {
       "label": "Czat",
-      "tooltip": "Czat z “{name}”"
+      "tooltip": "Czat z „{name}”"
     }
   },
   "client-only": {
@@ -690,7 +690,7 @@
     "comment": {
       "commenting-disabled": {
         "blocked-author": {
-          "button-label": "Odwiedź “{name}”",
+          "button-label": "Odwiedź „{name}”",
           "call-to-action": "Jeśli chcesz zostawić komentarz, odblokuj tę osobę w jej profilu.",
           "reason": "Blokujesz autora tego wpisu."
         },
@@ -737,18 +737,18 @@
       "supportedFormats": "Wstaw zdjęcie w formacie pliku JPG, PNG lub GIF!"
     },
     "title": "Tytuł",
-    "visibleOnlyForMembersOfGroup": "Ten wpis będzie widoczny tylko dla członków grupy “<b>{name}</b>”."
+    "visibleOnlyForMembersOfGroup": "Ten wpis będzie widoczny tylko dla członków grupy „<b>{name}</b>”."
   },
   "delete": {
     "cancel": "Odwołaj",
     "comment": {
-      "message": "Czy na pewno chcesz ukryć komentarz użytkownika \" <b> {name} </b> \"?",
+      "message": "Czy na pewno chcesz ukryć komentarz użytkownika „<b>{name}</b>”?",
       "success": "Komentarz usunięty!",
       "title": "Usuń komentarz",
       "type": "Komentarz"
     },
     "contribution": {
-      "message": "Czy na pewno chcesz ukryć wpis \" <b> {name} </b> \"?",
+      "message": "Czy na pewno chcesz ukryć wpis „<b>{name}</b>”?",
       "success": "Wyślij pomyślnie usunięty!",
       "title": "Ukryj wpis",
       "type": "Wpis / Post"
@@ -758,19 +758,19 @@
   "disable": {
     "cancel": "Anuluj",
     "comment": {
-      "message": "Naprawdę chcesz wyłączyć komentarz \"<b>{name}</b>\"?",
+      "message": "Naprawdę chcesz wyłączyć komentarz „<b>{name}</b>”?",
       "title": "Wyłącz komentarz",
       "type": "Komentarz"
     },
     "contribution": {
-      "message": "Naprawdę chcesz unieszkodliwić ten wkład \"<b>{name}</b>\"?",
+      "message": "Naprawdę chcesz unieszkodliwić ten wkład „<b>{name}</b>”?",
       "title": "Wyłącz Wkład",
       "type": "Wkład"
     },
     "submit": "Deaktywuj",
     "success": "Zdeaktywowano",
     "user": {
-      "message": "Czy naprawdę chcesz wyłączyć użytkownika  \"<b>{name}</b>\"?",
+      "message": "Czy naprawdę chcesz wyłączyć użytkownika „<b>{name}</b>”?",
       "title": "Wyłączenie użytkownika",
       "type": "Użytkownik"
     }
@@ -890,7 +890,7 @@
     "actionRadius": "Zasięg działania grupy",
     "addMember": "Dodaj członka",
     "addMemberToGroup": "Dodaj do grupy",
-    "addMemberToGroupSuccess": "“{name}” został/a dodany/a do grupy z rolą “{role}”!",
+    "addMemberToGroupSuccess": "„{name}” został/a dodany/a do grupy z rolą „{role}”!",
     "addUser": "Dodaj użytkownika",
     "addUserNoOptions": "Nie znaleziono użytkowników!",
     "addUserPlaceholder": "Nazwa użytkownika",
@@ -914,14 +914,14 @@
     "allGroups": "Wszystkie grupy",
     "categories": "Temat ::: Tematy",
     "categoriesTitle": "Tematy grupy",
-    "changeMemberRole": "Rola została zmieniona na “{role}”!",
+    "changeMemberRole": "Rola została zmieniona na „{role}”!",
     "contentMenu": {
-      "hideFromProfile": "Hide from my profile",
+      "hideFromProfile": "Ukryj na moim profilu",
       "inviteLinks": "Linki zaproszeń",
       "menuButton": "Menu grupy",
       "muteGroup": "Wycisz grupę",
       "profileVisibilityUpdated": "Widoczność zaktualizowana",
-      "showOnProfile": "Show on my profile",
+      "showOnProfile": "Pokaż na moim profilu",
       "unmuteGroup": "Cofnij wyciszenie grupy",
       "visitGroupPage": "Pokaż grupę"
     },
@@ -945,7 +945,7 @@
       "start": "Użyj dostępu administratora"
     },
     "errors": {
-      "userAlreadyMember": "Użytkownik “{name}” jest już członkiem!"
+      "userAlreadyMember": "Użytkownik „{name}” jest już członkiem!"
     },
     "follow": "Obserwuj",
     "foundation": "Założenie",
@@ -966,13 +966,13 @@
     "labelSlug": "Unikalna nazwa grupy",
     "leaveModal": {
       "confirmButton": "Opuść",
-      "message": "Opuszczenie grupy może być nieodwracalne!<br>Opuść grupę <b>“{name}”</b>!",
+      "message": "Opuszczenie grupy może być nieodwracalne!<br>Opuść grupę <b>„{name}”</b>!",
       "messageAdmin": "<b>Administrujesz</b> tą grupą. Jeśli odejdziesz, rezygnujesz z tego.<br>Na pewno opuścić grupę <b>„{name}”</b>?",
       "messageOwner": "Jesteś <b>właścicielem</b> tej grupy. Jeśli odejdziesz, może zostać bez właściciela — wtedy tylko administracja sieci przywróci jej sprawność.<br>Na pewno opuścić grupę <b>„{name}”</b>?",
       "title": "Czy na pewno chcesz opuścić grupę?"
     },
     "memberOutranked": "Nie możesz zmienić roli tej osoby — ma co najmniej tyle, co ty.",
-    "memberRemoved": "Użytkownik “{name}” został usunięty z grupy!",
+    "memberRemoved": "Użytkownik „{name}” został usunięty z grupy!",
     "members": "Członkowie",
     "membersAdministrationList": {
       "avatar": "Awatar",
@@ -989,7 +989,7 @@
     "modal": {
       "cancel": "Anuluj",
       "confirm": "Potwierdź",
-      "confirmAddGroupMemberText": "Dodać użytkownika “{name}” do grupy?",
+      "confirmAddGroupMemberText": "Dodać użytkownika „{name}” do grupy?",
       "confirmAddGroupMemberTitle": "Potwierdź"
     },
     "muted": "Grupa wyciszona",
@@ -998,7 +998,7 @@
     "radius": "Zasięg",
     "removeMember": "Usuń członka",
     "removeMemberButton": "Usuń",
-    "removeMemberConfirmText": "Usunąć użytkownika \"{name}\" z grupy?",
+    "removeMemberConfirmText": "Usunąć użytkownika „{name}” z grupy?",
     "removeMemberTitle": "Usuń członka",
     "rights": {
       "addRole": "Dodaj rolę",
@@ -1157,7 +1157,7 @@
     "invalidate": "Unieważnij link",
     "invalidate-error": "Unieważnienie linku zaproszenia nie powiodło się! Błąd: {error}",
     "invalidate-success": "Link zaproszenia został unieważniony!",
-    "invite-link-message-group": "Zostałeś/aś zaproszony/a do dołączenia do grupy “{groupName}” w sieci {network}.",
+    "invite-link-message-group": "Zostałeś/aś zaproszony/a do dołączenia do grupy „{groupName}” w sieci {network}.",
     "invite-link-message-hidden-group": "Zostałeś/aś zaproszony/a do dołączenia do ukrytej grupy w sieci {network}.",
     "invite-link-message-personal": "Zostałeś/aś zaproszony/a do dołączenia do {network}.",
     "invited-count": "Zaprosiłeś/aś już {count} osób.",
@@ -1248,32 +1248,32 @@
         "cancel": "Anuluj",
         "Comment": {
           "disable": {
-            "message": "Czy na pewno chcesz, aby komentarz “<b>{name}</b>” pozostał <b>wyłączony</b>?",
+            "message": "Czy na pewno chcesz, aby komentarz „<b>{name}</b>” pozostał <b>wyłączony</b>?",
             "title": "Ostatecznie wyłącz komentarz"
           },
           "enable": {
-            "message": "Czy na pewno chcesz, aby komentarz “<b>{name}</b>” pozostał <b>włączony</b>?",
+            "message": "Czy na pewno chcesz, aby komentarz „<b>{name}</b>” pozostał <b>włączony</b>?",
             "title": "Ostatecznie włącz komentarz"
           }
         },
         "Post": {
           "disable": {
-            "message": "Czy na pewno chcesz, aby wpis “<b>{name}</b>” pozostał <b>wyłączony</b>?",
+            "message": "Czy na pewno chcesz, aby wpis „<b>{name}</b>” pozostał <b>wyłączony</b>?",
             "title": "Ostatecznie wyłącz wpis"
           },
           "enable": {
-            "message": "Czy na pewno chcesz, aby wpis “<b>{name}</b>” pozostał <b>włączony</b>?",
+            "message": "Czy na pewno chcesz, aby wpis „<b>{name}</b>” pozostał <b>włączony</b>?",
             "title": "Ostatecznie włącz wpis"
           }
         },
         "submit": "Potwierdź decyzję",
         "User": {
           "disable": {
-            "message": "Czy na pewno chcesz, aby użytkownik “<b>{name}</b>” pozostał <b>wyłączony</b>?",
+            "message": "Czy na pewno chcesz, aby użytkownik „<b>{name}</b>” pozostał <b>wyłączony</b>?",
             "title": "Ostatecznie wyłącz użytkownika"
           },
           "enable": {
-            "message": "Czy na pewno chcesz, aby użytkownik “<b>{name}</b>” pozostał <b>włączony</b>?",
+            "message": "Czy na pewno chcesz, aby użytkownik „<b>{name}</b>” pozostał <b>włączony</b>?",
             "title": "Ostatecznie włącz użytkownika"
           }
         }
@@ -1365,7 +1365,7 @@
   "post": {
     "article": "Artykuł",
     "comment": {
-      "joinGroup": "Dołączył/a do grupy „<b>{name}</b>“",
+      "joinGroup": "Dołączył/a do grupy „<b>{name}</b>”",
       "noPermission": "Komentowanie nie jest włączone dla Twojej roli.",
       "reply": "Odpowiedz",
       "submit": "Komentarz",
@@ -1451,15 +1451,15 @@
     "followers": "Obserwujący",
     "following": "Obserwowani",
     "groups": {
-      "closed": "Closed groups",
-      "hidden": "Secret groups",
-      "hiddenFromOthers": "hidden from others",
-      "nobody": "no groups",
+      "closed": "Grupy zamknięte",
+      "hidden": "Grupy tajne",
+      "hiddenFromOthers": "ukryte przed innymi",
+      "nobody": "brak grup",
       "noFilterResults": "Nie znaleziono grup dla tego filtra.",
       "other": "Grupy beze mnie",
-      "public": "Public groups",
+      "public": "Grupy publiczne",
       "shared": "Wspólne grupy",
-      "title": "Groups of {name}"
+      "title": "Grupy użytkownika {name}"
     },
     "invites": {
       "description": "Wprowadź adres e-mail, aby wysłać zaproszenie.",
@@ -1490,13 +1490,13 @@
     "cancel": "Anuluj",
     "comment": {
       "error": "Już zgłosiłeś/aś ten komentarz!",
-      "message": "Czy na pewno chcesz zgłosić komentarz użytkownika \"<b> {name} </b>\"?",
+      "message": "Czy na pewno chcesz zgłosić komentarz użytkownika „<b>{name}</b>”?",
       "title": "Zgłoś komentarz",
       "type": "Komentarz"
     },
     "contribution": {
       "error": "Już zgłosiłeś/aś tę publikację!",
-      "message": "Czy na pewno chcesz zgłosić wpis użytkownika \"<b> {name} </b>\"?",
+      "message": "Czy na pewno chcesz zgłosić wpis użytkownika „<b>{name}</b>”?",
       "title": "Zgłoś wpis",
       "type": "Wpis"
     },
@@ -1504,7 +1504,7 @@
     "success": "Zgłoszono pomyślnie!",
     "user": {
       "error": "Już zgłosiłeś/aś tego użytkownika!",
-      "message": "Czy na pewno chcesz zgłosić użytkownika \"<b> {name} </b>\"?",
+      "message": "Czy na pewno chcesz zgłosić użytkownika „<b>{name}</b>”?",
       "title": "Zgłoś użytkownika",
       "type": "Użytkownik"
     }
@@ -1513,13 +1513,13 @@
     "cancel": "Anuluj",
     "comment": {
       "error": "Zgłosiłeś już komentarz!",
-      "message": "Czy na pewno chcesz zgłosić komentarz użytkownika\" <b> {name} </b> \"?",
+      "message": "Czy na pewno chcesz zgłosić komentarz użytkownika „<b>{name}</b>”?",
       "title": "Sprawozdanie Komentarz",
       "type": "Komentarz"
     },
     "contribution": {
       "error": "Zgłosiłeś już ten wkład!",
-      "message": "Czy na pewno chcesz zgłosić ten wpis użytkownika \" <b> {name} </b> \"?",
+      "message": "Czy na pewno chcesz zgłosić ten wpis użytkownika „<b>{name}</b>”?",
       "title": "Zgłoś wpis",
       "type": "Wpis / Post"
     },
@@ -1531,7 +1531,7 @@
           "advert_products_services_commercial": "Reklama produktów i usług w celach komercyjnych.",
           "criminal_behavior_violation_german_law": "Zachowanie przestępcze lub naruszenie prawa niemieckiego.",
           "discrimination_etc": "Dyskryminujące wpisy, komentarze, wypowiedzi lub obelgi.",
-          "doxing": "Ujawnianie danych osobowych innych osób bez ich zgody lub grożenie tym (“doxing”).",
+          "doxing": "Ujawnianie danych osobowych innych osób bez ich zgody lub grożenie tym („doxing”).",
           "glorific_trivia_of_cruel_inhuman_acts": "Gloryfikacja lub bagatelizowanie okrutnych lub nieludzkich aktów przemocy.",
           "intentional_intimidation_stalking_persecution": "Celowe zastraszanie, stalking lub prześladowanie.",
           "other": "Inne …",
@@ -1548,7 +1548,7 @@
     "success": "Dziękujemy za Twoje zgłoszenie!",
     "user": {
       "error": "Zgłosiłeś już użytkownika!",
-      "message": "Czy na pewno chcesz zgłosić użytkownika \" <b> {name} </b> \"?",
+      "message": "Czy na pewno chcesz zgłosić użytkownika „<b>{name}</b>”?",
       "title": "Raport Użytkownik",
       "type": "Użytkownik"
     }
@@ -1563,7 +1563,7 @@
       "User": "Użytkownik ::: Użytkownicy"
     },
     "hint": "Czego szukasz? Użyj !... dla postów, @... dla użytkowników, #... dla hashtagów.",
-    "no-results": "Nie znaleziono wyników dla “{search}”. Spróbuj innego wyszukiwania!",
+    "no-results": "Nie znaleziono wyników dla „{search}”. Spróbuj innego wyszukiwania!",
     "page": "Strona",
     "placeholder": "Szukaj",
     "results": "wynik znaleziony ::: wyniki znalezione",
@@ -1600,8 +1600,8 @@
       "name": "API Keys",
       "revoke": {
         "confirm": "Unieważnij",
-        "message": "Czy na pewno chcesz unieważnić API Key \"{name}\"? Tej akcji nie można cofnąć.",
-        "success": "API Key \"{name}\" został unieważniony",
+        "message": "Czy na pewno chcesz unieważnić API Key „{name}”? Tej akcji nie można cofnąć.",
+        "success": "API Key „{name}” został unieważniony",
         "title": "Unieważnij API Key"
       },
       "revoked-list": {
@@ -1776,11 +1776,11 @@
     "privacy": {
       "make-shouts-public": "Udostępniaj artykuły, które poleciłem/am, na moim publicznym profilu",
       "name": "Prywatność",
-      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-closed-groups-on-profile": "Pokaż zamknięte grupy na moim profilu",
       "show-groups-on-profile-hint": "Widoczność każdej indywidualnej grupy można również ustawić za pomocą menu z trzema kropkami grupy lub bezpośrednio na liście grup w swoim profilu.",
-      "show-groups-on-profile-section": "Show groups on profile",
+      "show-groups-on-profile-section": "Pokaż grupy na profilu",
       "show-hidden-groups-on-profile": "Pokaż tajne grupy na moim profilu",
-      "show-public-groups-on-profile": "Show public groups on my profile",
+      "show-public-groups-on-profile": "Pokaż publiczne grupy na moim profilu",
       "success-update": "Ustawienia prywatności zapisane!"
     },
     "security": {
@@ -1807,7 +1807,7 @@
       "add-new-link": "Dodaj nowy link",
       "delete-modal": {
         "confirm-button": "Usuń",
-        "message": "Usuń “{name}”.",
+        "message": "Usuń „{name}”.",
         "title": "Czy na pewno chcesz usunąć swój link?"
       },
       "edit-link": "Edytuj link",
@@ -1840,7 +1840,7 @@
     "error-occurred": "Wystąpił błąd.",
     "faq": "FAQ",
     "germany": "Niemcy",
-    "imprint": "Nadruk",
+    "imprint": "Informacje prawne",
     "made": "Z ❤️ zrobiony",
     "navigation": "Nawigacja",
     "register": "numer rejestracyjny",

@@ -37,7 +37,7 @@
       },
       "revoke": {
         "confirm": "Widerrufen",
-        "message": "Möchtest du den API Key \"{name}\" von {user} wirklich widerrufen?",
+        "message": "Möchtest du den API Key „{name}“ von {user} wirklich widerrufen?",
         "success": "API Key wurde widerrufen",
         "title": "API Key widerrufen"
       },
@@ -813,7 +813,7 @@
   "error-pages": {
     "403-default": "Kein Zugang zu dieser Seite!",
     "404-default": "Diese Seite konnte nicht gefunden werden!",
-    "500-default": "Internal Server Error!",
+    "500-default": "Interner Serverfehler!",
     "503-default": "Dienst steht nicht zur Verfügung!",
     "back-to-index": "Zurück zur Startseite!",
     "cannot-edit-post": "Dieser Beitrag kann nicht editiert werden!",
@@ -998,7 +998,7 @@
     "radius": "Radius",
     "removeMember": "Mitglied aus der Gruppe entfernen?",
     "removeMemberButton": "Entfernen",
-    "removeMemberConfirmText": "Nutzer \"{name}\" aus der Gruppe entfernen?",
+    "removeMemberConfirmText": "Nutzer „{name}“ aus der Gruppe entfernen?",
     "removeMemberTitle": "Mitglied entfernen",
     "rights": {
       "addRole": "Rolle hinzufügen",
@@ -1008,7 +1008,7 @@
       "blockedByNetwork": "Netzwerkweit gesperrt: dafür fehlt das Recht {permission}.",
       "confirmApplyTemplate": "Vorlage „{template}“ auf diese Gruppe anwenden? Alle Rollen werden durch die der Vorlage ersetzt.",
       "confirmApplyTemplateDiscards": "Vorlage „{template}“ auf diese Gruppe anwenden? Alle Rollen werden durch die der Vorlage ersetzt — und die ungespeicherten Änderungen gehen verloren.",
-      "confirmDelete": "Rolle \"{role}\" löschen? Ihre Mitglieder werden zu \"{target}\".",
+      "confirmDelete": "Rolle „{role}“ löschen? Ihre Mitglieder werden zu „{target}“.",
       "confirmReset": "Alle Rollen dieser Gruppe auf den Standard zurücksetzen? Selbst angelegte Rollen werden dabei entfernt, ihre Mitglieder werden gewöhnliche Mitglieder.",
       "deleteRole": "Rolle löschen",
       "description": "Hier legt ihr fest, was in dieser Gruppe wer darf — von Außenstehenden bis zu den Administratoren.",
@@ -1403,7 +1403,7 @@
       "pushedSuccessfully": "Beitrag erfolgreich nach oben geschoben!",
       "removedFromGroupSuccessfully": "Beitrag aus der Gruppe entfernt",
       "removeFromGroup": "Aus der Gruppe entfernen",
-      "removeFromGroupConfirm": "Diesen Beitrag aus der Gruppe \"{group}\" entfernen? Der Beitrag bleibt bei seinem Autor, verliert aber seinen Platz in der Gruppe.",
+      "removeFromGroupConfirm": "Diesen Beitrag aus der Gruppe „{group}“ entfernen? Der Beitrag bleibt bei seinem Autor, verliert aber seinen Platz in der Gruppe.",
       "unobserve": "Beitrag nicht mehr beobachten",
       "unobservedSuccessfully": "Du beobachtest diesen Beitrag nicht mehr!",
       "unpin": "Beitrag loslösen (Netzwerk)",
@@ -1563,7 +1563,7 @@
       "User": "Nutzer ::: Nutzer"
     },
     "hint": "!... sucht Beiträge, @... sucht Nutzer, &... sucht Gruppen, #… sucht Hashtags",
-    "no-results": "Keine Ergebnisse für \"{search}\" gefunden. Versuch' es mit einem anderen Begriff!",
+    "no-results": "Keine Ergebnisse für „{search}“ gefunden. Versuch' es mit einem anderen Begriff!",
     "page": "Seite",
     "placeholder": "Suchen",
     "results": "Ergebnis gefunden ::: Ergebnisse gefunden",
@@ -1600,8 +1600,8 @@
       "name": "API Keys",
       "revoke": {
         "confirm": "Widerrufen",
-        "message": "Möchtest du den API Key \"{name}\" wirklich widerrufen? Diese Aktion kann nicht rückgängig gemacht werden.",
-        "success": "API Key \"{name}\" wurde widerrufen",
+        "message": "Möchtest du den API Key „{name}“ wirklich widerrufen? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "success": "API Key „{name}“ wurde widerrufen",
         "title": "API Key widerrufen"
       },
       "revoked-list": {

@@ -810,7 +810,7 @@ describe('map', () => {
           expect(mapMock.getCanvas().style.cursor).toBe('pointer')
         })
 
-        it('mounts a UserAvatarPopover with the feature id, and clicking the card navigates to the profile', () => {
+        it('mounts a UserAvatarPopover with the feature id and a userLink to the profile', () => {
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
           onEventMocks.mouseenter({
             point: { x: 100, y: 200 },
@@ -820,12 +820,11 @@ describe('map', () => {
           const [instance] = wrapper.vm.popupComponentInstances
           expect(instance.$options.name).toBe('UserAvatarPopover')
           expect(instance.userId).toBe('u2')
-          // No userLink prop — the map has no "open profile" button, the
-          // whole card navigates on click instead.
-          expect(instance.userLink).toBeUndefined()
-
-          instance.$el.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-          expect(mocks.$router.push).toHaveBeenCalledWith({ path: '/profile/u2/bob' })
+          // userLink makes the whole card a nuxt-link (see UserAvatarPopover's
+          // canNavigate) — the map has no separate "open profile" button, the
+          // card itself is the link. The click-through-to-router behavior
+          // itself is covered by UserAvatarPopover's own spec.
+          expect(instance.userLink).toEqual({ path: '/profile/u2/bob' })
         })
 
         it('destroys previously mounted popover instances before mounting new ones', () => {
@@ -892,9 +891,7 @@ describe('map', () => {
             'GroupAvatarPopover',
           ])
           expect(instances[1].groupId).toBe('g1')
-
-          instances[1].$el.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-          expect(mocks.$router.push).toHaveBeenCalledWith({ path: '/groups/g1/journalism' })
+          expect(instances[1].groupLink).toEqual({ path: '/groups/g1/journalism' })
         })
 
         it('removes existing popup before showing new one', () => {
@@ -1273,9 +1270,7 @@ describe('map', () => {
           const [instance] = wrapper.vm.popupComponentInstances
           expect(instance.$options.name).toBe('UserAvatarPopover')
           expect(instance.userId).toBe('u1')
-
-          instance.$el.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-          expect(mocks.$router.push).toHaveBeenCalledWith({ path: '/profile/u1/peter' })
+          expect(instance.userLink).toEqual({ path: '/profile/u1/peter' })
         })
       })
 

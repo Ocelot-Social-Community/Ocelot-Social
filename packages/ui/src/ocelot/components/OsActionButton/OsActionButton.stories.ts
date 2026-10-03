@@ -60,3 +60,43 @@ export const Disabled: Story = {
     disabled: true,
   },
 }
+
+export const Sizes: Story = {
+  render: () => ({
+    components: { OsActionButton },
+    setup() {
+      return { icon: iconMap.heartO }
+    },
+    template: `
+      <div class="flex flex-col gap-6">
+        <div>
+          <h3 class="text-sm font-bold mb-2">Small (26px button)</h3>
+          <!-- The count badge floats above the button (see OsActionButton's
+               BADGE_DIAMETER) — pt-4 keeps it clear of the heading above,
+               enough even for xl's larger badge. -->
+          <div class="pt-4">
+            <OsActionButton size="sm" :count="3" aria-label="Like" :icon="icon" />
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Medium (36px button, default)</h3>
+          <div class="pt-4">
+            <OsActionButton size="md" :count="12" aria-label="Like" :icon="icon" />
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Large (48px button)</h3>
+          <div class="pt-4">
+            <OsActionButton size="lg" :count="42" aria-label="Like" :icon="icon" />
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Extra Large (56px button)</h3>
+          <div class="pt-4">
+            <OsActionButton size="xl" :count="128" aria-label="Like" :icon="icon" />
+          </div>
+        </div>
+      </div>
+    `,
+  }),
+}

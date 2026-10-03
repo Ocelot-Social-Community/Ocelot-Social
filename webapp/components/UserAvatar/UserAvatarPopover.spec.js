@@ -2,15 +2,6 @@ import { render } from '@testing-library/vue'
 import { RouterLinkStub } from '@vue/test-utils'
 import UserAvatarPopover from './UserAvatarPopover.vue'
 
-const mockMatchMedia = (matches = false) => {
-  window.matchMedia = jest.fn().mockImplementation(() => ({
-    matches,
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-  }))
-}
-mockMatchMedia(false)
-
 const localVue = global.localVue
 
 const user = {
@@ -57,18 +48,22 @@ describe('UserAvatarPopover', () => {
   const Wrapper = ({
     badgesEnabled = true,
     withUserLink = true,
-    onTouchScreen = false,
+    showProfileLink = false,
     userData = user,
-  }) => {
-    mockMatchMedia(onTouchScreen)
+    querySettled,
+    queryFailed,
+  } = {}) => {
     return render(UserAvatarPopover, {
       localVue,
       propsData: {
         userId: 'id',
         userLink: withUserLink ? userLink : null,
+        showProfileLink,
       },
       data: () => ({
-        User: [userData],
+        User: userData ? [userData] : [],
+        ...(querySettled !== undefined && { querySettled }),
+        ...(queryFailed !== undefined && { queryFailed }),
       }),
       stubs: {
         NuxtLink: RouterLinkStub,
@@ -80,22 +75,61 @@ describe('UserAvatarPopover', () => {
     })
   }
 
-  describe('given a touch device', () => {
-    it('shows button when userLink is provided', () => {
-      const wrapper = Wrapper({ withUserLink: true, onTouchScreen: true })
-      expect(wrapper.container).toMatchSnapshot()
+  // The explicit "open profile" button is off by default everywhere now — the whole card is a
+  // link instead (see canNavigate), on both touch and non-touch devices. showProfileLink is kept
+  // only for a caller that might still want that extra, more discoverable call-to-action.
+  describe('explicit "open profile" button (showProfileLink)', () => {
+    it('is not shown by default, even with a userLink', () => {
+      const wrapper = Wrapper({ withUserLink: true })
+      expect(wrapper.queryByText('user-avatar.popover.open-profile')).toBeNull()
     })
 
-    it('does not show button when userLink is not provided', () => {
-      const wrapper = Wrapper({ withUserLink: false, onTouchScreen: true })
-      expect(wrapper.container).toMatchSnapshot()
+    it('is shown when showProfileLink is explicitly enabled', () => {
+      const wrapper = Wrapper({ withUserLink: true, showProfileLink: true })
+      expect(wrapper.queryByText('user-avatar.popover.open-profile')).not.toBeNull()
+    })
+
+    it('stays hidden with showProfileLink enabled but no userLink', () => {
+      const wrapper = Wrapper({ withUserLink: false, showProfileLink: true })
+      expect(wrapper.queryByText('user-avatar.popover.open-profile')).toBeNull()
     })
   })
 
-  describe('given a non-touch device', () => {
-    it('does not show button when userLink is provided', () => {
-      const wrapper = Wrapper({ withUserLink: true, onTouchScreen: false })
-      expect(wrapper.container).toMatchSnapshot()
+  describe('whole card as a link (canNavigate)', () => {
+    it('renders the card itself as a link when a userLink is provided', () => {
+      const wrapper = Wrapper({ withUserLink: true })
+      const root = wrapper.container.querySelector('.user-avatar-popover')
+      expect(root.tagName).toBe('A')
+    })
+
+    it('renders a plain div, not a link, when no userLink is provided', () => {
+      const wrapper = Wrapper({ withUserLink: false })
+      const root = wrapper.container.querySelector('.user-avatar-popover')
+      expect(root.tagName).toBe('DIV')
+    })
+
+    // A failed query settles too, but it is not evidence the profile is actually gone — treating
+    // it as such would wrongly block navigation on a transient network error.
+    it('stays a link when the teaser query fails, even with no user resolved yet', () => {
+      const wrapper = Wrapper({
+        withUserLink: true,
+        userData: null,
+        querySettled: true,
+        queryFailed: true,
+      })
+      const root = wrapper.container.querySelector('.user-avatar-popover')
+      expect(root.tagName).toBe('A')
+    })
+
+    it('becomes a plain div once the query succeeds with no user (confirmed missing)', () => {
+      const wrapper = Wrapper({
+        withUserLink: true,
+        userData: null,
+        querySettled: true,
+        queryFailed: false,
+      })
+      const root = wrapper.container.querySelector('.user-avatar-popover')
+      expect(root.tagName).toBe('DIV')
     })
   })
 

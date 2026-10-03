@@ -37,13 +37,13 @@
       },
       "revoke": {
         "confirm": "Révoquer",
-        "message": "Es-tu sûr de vouloir révoquer l'API Key \"{name}\" de {user} ?",
+        "message": "Es-tu sûr de vouloir révoquer l'API Key « {name} » de {user} ?",
         "success": "API Key révoquée avec succès",
         "title": "Révoquer l'API Key"
       },
       "revoke-all": "Révoquer toutes les keys de cet utilisateur",
       "revoke-all-confirm": "Tout révoquer",
-      "revoke-all-message": "Es-tu sûr de vouloir révoquer TOUTES les API Keys de {user} ? Cette action est irréversible.",
+      "revoke-all-message": "Es-tu sûr de vouloir révoquer TOUTES les API Keys de {user} ? Cette action est irréversible.",
       "revoke-all-short": "Tout révoquer",
       "revoke-all-success": "{count} API Keys de {user} ont été révoquées",
       "revoke-all-title": "Révoquer toutes les API Keys",
@@ -67,20 +67,20 @@
       "description": "Configurer les badges disponibles pour cet utilisateur",
       "noBadges": "Aucun badge disponible",
       "revokeTrophy": {
-        "error": "Le trophée n'a pas pu être révoqué !",
-        "success": "Trophée révoqué avec succès !"
+        "error": "Le trophée n'a pas pu être révoqué !",
+        "success": "Trophée révoqué avec succès !"
       },
       "revokeVerification": {
-        "error": "La vérification n'a pas pu être révoquée !",
+        "error": "La vérification n'a pas pu être révoquée !",
         "success": "Vérification révoquée avec succès"
       },
       "rewardTrophy": {
-        "error": "Le trophée n'a pas pu être attribué !",
-        "success": "Trophée attribué avec succès !"
+        "error": "Le trophée n'a pas pu être attribué !",
+        "success": "Trophée attribué avec succès !"
       },
       "setVerification": {
-        "error": "La vérification n'a pas pu être définie !",
-        "success": "Vérification définie avec succès !"
+        "error": "La vérification n'a pas pu être définie !",
+        "success": "Vérification définie avec succès !"
       },
       "title": "Badges",
       "trophyBadges": "Trophées",
@@ -108,7 +108,7 @@
         "description": "Définissez la source de chaque zone, superposée au paquet de base ({base}). Modifier une zone recharge l'application pour tout le monde.",
         "details": "Afficher les détails",
         "frameworkDefault": "Valeur par défaut du framework (vanilla)",
-        "from": "De : {source}",
+        "from": "De : {source}",
         "inherit": "Hériter du paquet ({base})",
         "noDetails": "Aucune valeur (valeur par défaut du framework).",
         "provides": "Contient",
@@ -174,7 +174,7 @@
         "override": "Remplacement par la politique",
         "softwareDefault": "Valeur par défaut du logiciel"
       },
-      "description": "Toutes les variables d'environnement que ce déploiement lit, et comment elles sont résolues. Ceci est un miroir de diagnostic en lecture seule de l'environnement du déploiement ; les valeurs actives se modifient dans l'onglet Politique réseau. Les valeurs secrètes ne sont jamais affichées, seulement si elles sont définies.",
+      "description": "Toutes les variables d'environnement que ce déploiement lit, et comment elles sont résolues. Ceci est un miroir de diagnostic en lecture seule de l'environnement du déploiement ; les valeurs actives se modifient dans l'onglet Politique réseau. Les valeurs secrètes ne sont jamais affichées, seulement si elles sont définies.",
       "editPolicy": "Modifier la politique {policy}",
       "name": "Environnement",
       "noDefault": "aucune valeur par défaut",
@@ -218,18 +218,18 @@
       "name": "Informations sur les dons",
       "progress": "Dons recueillis jusqu'à présent",
       "showDonationsCheckboxLabel": "Afficher la barre de progression des dons",
-      "successfulUpdate": "Les informations sur les dons ont été mises à jour avec succès !"
+      "successfulUpdate": "Les informations sur les dons ont été mises à jour avec succès !"
     },
     "groupRoles": {
       "applied": "{count} groupes mis à jour",
       "apply": "Appliquer aux groupes inchangés",
-      "confirmApply": "Appliquer les modèles à {count} groupes qui n’ont jamais personnalisé leurs rôles ? Les groupes personnalisés ne sont pas touchés.",
+      "confirmApply": "Appliquer les modèles à {count} groupes qui n’ont jamais personnalisé leurs rôles ? Les groupes personnalisés ne sont pas touchés.",
       "description": "Ici tu modifies les modèles à partir desquels les nouveaux groupes sont créés — aucun groupe existant n'en est affecté. Seul le bouton ci-dessous applique une modification aux groupes, et seulement à ceux qui n'ont jamais modifié leurs propres droits.",
-      "editingTemplate": "Vous modifiez le modèle « {template} »",
+      "editingTemplate": "Vous modifiez le modèle « {template} »",
       "labelField": "Nom",
       "name": "Modèles de groupe",
       "ownerHoldsEverything": "Le rôle de propriétaire détient toujours toutes les permissions et ne peut pas être modifié.",
-      "resultingVisibility": "Les groupes créés à partir de ce modèle sont :",
+      "resultingVisibility": "Les groupes créés à partir de ce modèle sont :",
       "saved": "Modèle enregistré",
       "templateLabel": "Modèle",
       "title": "Modèles de groupe",
@@ -282,17 +282,17 @@
         "keep": "Continuer l'édition",
         "load": "Charger la nouvelle version",
         "message": "Un paramètre a été modifié ailleurs pendant que vous l'éditiez. Vos modifications non enregistrées sont conservées — vérifiez les paramètres mis en évidence.",
-        "serverValue": "serveur désormais : {value}"
+        "serverValue": "serveur désormais : {value}"
       },
-      "defaultValue": "par défaut : {value}",
+      "defaultValue": "par défaut : {value}",
       "description": "Configuration en exécution. Les modifications s'appliquent immédiatement à tous les clients connectés.",
       "descriptions": {
         "apiKeysEnabled": "Permet aux utilisateurs de créer des clés API personnelles pour un accès programmatique au backend. Affecte la section des clés API dans les paramètres utilisateur.",
         "apiKeysMaxPerUser": "Nombre maximal de clés API actives qu'un même utilisateur peut détenir à la fois.",
         "askForRealName": "Demande aux nouveaux utilisateurs leur vrai nom (prénom et nom) lors de l'inscription plutôt qu'un simple nom affiché.",
-        "badgesEnabled": "Active la fonction badges : les badges sont affichés sur les profils et aperçus et peuvent être gérés dans l'espace d'administration.",
+        "badgesEnabled": "Active la fonction badges : les badges sont affichés sur les profils et aperçus et peuvent être gérés dans l'espace d'administration.",
         "categoriesActive": "Active les catégories thématiques pour les publications et les groupes, afin de classer et filtrer le contenu. Nécessite au moins une catégorie.",
-        "groupsEnabled": "Active la fonctionnalité de groupes : les utilisateurs peuvent créer et parcourir des groupes (et lancer des appels vidéo de groupe). Contrôle aussi le bouton des groupes dans l'en-tête.",
+        "groupsEnabled": "Active la fonctionnalité de groupes : les utilisateurs peuvent créer et parcourir des groupes (et lancer des appels vidéo de groupe). Contrôle aussi le bouton des groupes dans l'en-tête.",
         "inviteCodesGroupPerUser": "Nombre maximal de codes d'invitation de groupe qu'un même utilisateur peut générer par groupe.",
         "inviteCodesPersonalPerUser": "Nombre maximal de codes d'invitation personnels qu'un même utilisateur peut générer.",
         "inviteLinkLimit": "Nombre maximal de liens d'invitation personnels qu'un même utilisateur peut avoir.",
@@ -304,8 +304,8 @@
         "showContentFilterHeaderMenu": "Affiche le filtre de contenu dans le menu d'en-tête.",
         "showContentFilterMasonryGrid": "Affiche le filtre de contenu dans la grille en maçonnerie (fil d'actualité).",
         "showGroupButtonInHeader": "Affiche le bouton des groupes dans l'en-tête.",
-        "socialMediaEnabled": "Active la fonctionnalité de liens vers les réseaux sociaux : les liens sont affichés sur les profils et gérés dans les paramètres utilisateur.",
-        "videoConference": "Active la visioconférence (LiveKit). L’interrupteur d’exécution pour les autorisations d’appel vidéo. Nécessite les variables d’environnement LiveKit ; sans elles, elle reste désactivée et grisée."
+        "socialMediaEnabled": "Active la fonctionnalité de liens vers les réseaux sociaux : les liens sont affichés sur les profils et gérés dans les paramètres utilisateur.",
+        "videoConference": "Active la visioconférence (LiveKit). L’interrupteur d’exécution pour les autorisations d’appel vidéo. Nécessite les variables d’environnement LiveKit ; sans elles, elle reste désactivée et grisée."
       },
       "envLink": "Voir l’environnement",
       "envUnavailable": "L’environnement requis n’est pas configuré — ce réglage n’a aucun effet tant qu’il ne l’est pas.",
@@ -330,13 +330,13 @@
         "socialMediaEnabled": "Réseaux sociaux",
         "videoConference": "Visioconférence"
       },
-      "lastUpdated": "Dernière modification : {timestamp} par {actor}",
-      "loadError": "Impossible de charger la configuration de la politique : {message}",
+      "lastUpdated": "Dernière modification : {timestamp} par {actor}",
+      "loadError": "Impossible de charger la configuration de la politique : {message}",
       "name": "Politique réseau",
-      "policyUnavailable": "Cette option est sans effet tant que la fonctionnalité dont elle dépend n'est pas activée :",
+      "policyUnavailable": "Cette option est sans effet tant que la fonctionnalité dont elle dépend n'est pas activée :",
       "reset": "Réinitialiser par défaut",
       "save": "Enregistrer les modifications",
-      "saveError": "Impossible de mettre à jour la politique : {message}",
+      "saveError": "Impossible de mettre à jour la politique : {message}",
       "saveSuccess": "Politique mise à jour.",
       "title": "Paramètres de la politique réseau"
     },
@@ -352,7 +352,7 @@
       "create": "Créer un rôle",
       "createTitle": "Créer un nouveau rôle",
       "delete": "Supprimer",
-      "deleteError": "Impossible de supprimer le rôle : {message}",
+      "deleteError": "Impossible de supprimer le rôle : {message}",
       "deleteSuccess": "Rôle supprimé.",
       "description": "Qui peut faire quoi sur l'ensemble du réseau. Créez des rôles et attribuez des droits — les modifications s'appliquent immédiatement.",
       "members": "{count} membres",
@@ -378,24 +378,24 @@
         "user_delete_any": "Supprimer le compte de n’importe quel utilisateur.",
         "user_email_readAny": "Lire l’adresse e-mail de n’importe quel utilisateur.",
         "user_invite": "Générer des codes d’invitation personnels.",
-        "videoCall_create_open": "Démarrer un appel vidéo dans un groupe où tout le monde peut entrer : trouvable et rejoignable sans approbation.",
-        "videoCall_create_restricted": "Démarrer un appel vidéo dans un groupe où l'on ne peut pas simplement entrer : rejoindre demande une approbation ou une invitation, ou le groupe est masqué."
+        "videoCall_create_open": "Démarrer un appel vidéo dans un groupe où tout le monde peut entrer : trouvable et rejoignable sans approbation.",
+        "videoCall_create_restricted": "Démarrer un appel vidéo dans un groupe où l'on ne peut pas simplement entrer : rejoindre demande une approbation ou une invitation, ou le groupe est masqué."
       },
       "permUnavailable": "Fonctionnalité non configurée — accorder ce droit n'a aucun effet.",
       "permUnavailableLink": "Voir la configuration",
       "protected": "protégé",
       "protectedHint": "Le rôle propriétaire détient toutes les permissions et ne peut pas être modifié.",
       "rename": "Renommer le rôle",
-      "renameError": "Impossible de renommer le rôle : {message}",
+      "renameError": "Impossible de renommer le rôle : {message}",
       "renameSuccess": "Rôle renommé.",
       "roleLabel": "Rôle",
       "save": "Enregistrer",
-      "saveError": "Impossible d’enregistrer le rôle : {message}",
+      "saveError": "Impossible d’enregistrer le rôle : {message}",
       "saveSuccess": "Rôle enregistré.",
       "selfLockout": {
         "confirm": "Retirer quand même",
-        "message": "Vous êtes sur le point de retirer la permission « gérer les rôles » de <strong>{role}</strong> — votre propre rôle. Vous ne pourrez alors plus gérer les rôles ; seul un propriétaire pourra la rétablir. Continuer ?",
-        "title": "Retirer la gestion de votre propre rôle ?"
+        "message": "Vous êtes sur le point de retirer la permission « gérer les rôles » de <strong>{role}</strong> — votre propre rôle. Vous ne pourrez alors plus gérer les rôles ; seul un propriétaire pourra la rétablir. Continuer ?",
+        "title": "Retirer la gestion de votre propre rôle ?"
       },
       "title": "Rôles et droits"
     },
@@ -406,18 +406,18 @@
       "addRole": "Attribuer un rôle…",
       "allRoles": "Tous les rôles",
       "delete": {
-        "error": "Impossible de supprimer l'utilisateur : {message}",
-        "message": "Voulez-vous vraiment supprimer définitivement <strong>{name}</strong> ? Cette action est irréversible.",
+        "error": "Impossible de supprimer l'utilisateur : {message}",
+        "message": "Voulez-vous vraiment supprimer définitivement <strong>{name}</strong> ? Cette action est irréversible.",
         "submit": "Supprimer l'utilisateur",
         "success": "Utilisateur supprimé.",
-        "title": "Supprimer l'utilisateur ?"
+        "title": "Supprimer l'utilisateur ?"
       },
       "disable": {
         "disabledSuccess": "Utilisateur désactivé.",
         "disableLabel": "Désactiver l'utilisateur",
         "enabledSuccess": "Utilisateur réactivé.",
         "enableLabel": "Réactiver l'utilisateur",
-        "error": "Impossible de modifier le statut de l'utilisateur : {message}"
+        "error": "Impossible de modifier le statut de l'utilisateur : {message}"
       },
       "empty": "Aucun utilisateur trouvé",
       "form": {
@@ -425,7 +425,7 @@
       },
       "name": "Utilisateurs",
       "removeRole": "Retirer le rôle {role}",
-      "roleChanged": "Rôle modifié avec succès !",
+      "roleChanged": "Rôle modifié avec succès !",
       "table": {
         "columns": {
           "badges": "Badges",
@@ -449,11 +449,11 @@
     "addRoomHeadline": "Rechercher un utilisateur pour un nouveau chat",
     "cancelSelectMessage": "Annuler",
     "closeChat": "Fermer le chat",
-    "conversationStarted": "Conversation commencée le :",
+    "conversationStarted": "Conversation commencée le :",
     "expandChat": "Agrandir le chat",
     "groupChatButton": {
       "label": "Chat de groupe",
-      "tooltip": "Discuter avec le groupe « {name} »"
+      "tooltip": "Discuter avec le groupe « {name} »"
     },
     "isOnline": "est en ligne",
     "isTyping": "écrit...",
@@ -476,7 +476,7 @@
     "typeMessage": "Écris un message",
     "userProfileButton": {
       "label": "Chat",
-      "tooltip": "Chatter avec “{name}”"
+      "tooltip": "Chatter avec « {name} »"
     }
   },
   "client-only": {
@@ -510,7 +510,7 @@
     "noChangesHint": "Il n'y a encore rien à enregistrer.",
     "organization": "Organisation ::: Organisations",
     "post": "Message ::: Messages",
-    "previousLocation": "Emplacement précédent : {location}",
+    "previousLocation": "Emplacement précédent : {location}",
     "project": "Projet ::: Projets",
     "reportContent": "Signaler",
     "scrollToLocationMap": "Faire défiler jusqu’à la carte",
@@ -545,9 +545,9 @@
     },
     "password-reset": {
       "change-password": {
-        "error": "La modification de votre mot de passe a échoué. Peut-être que le code de sécurité n'était pas correct ?",
-        "help": "En cas de problème, n'hésitez pas à nous demander de l'aide en nous envoyant un mail à :",
-        "success": "La modification de votre mot de passe a réussi !"
+        "error": "La modification de votre mot de passe a échoué. Peut-être que le code de sécurité n'était pas correct ?",
+        "help": "En cas de problème, n'hésitez pas à nous demander de l'aide en nous envoyant un mail à :",
+        "success": "La modification de votre mot de passe a réussi !"
       },
       "request": {
         "form": {
@@ -561,11 +561,11 @@
     "registration": {
       "create-user-account": {
         "buttonTitle": "Créer",
-        "error": "Compte d'utilisateur n'a pas pu être créé!",
-        "help": " Peut-être que la confirmation n'était pas valide? En cas de problème, n'hésitez pas à nous demander de l'aide en nous envoyant un mail à:",
+        "error": "Compte d'utilisateur n'a pas pu être créé !",
+        "help": " Peut-être que la confirmation n'était pas valide ? En cas de problème, n'hésitez pas à nous demander de l'aide en nous envoyant un mail à :",
         "receiveCommunicationAsEmailsEtcConfirmed": "J'accepte également de recevoir des e-mails et d'autres formes de communication (p. ex. notifications push).",
-        "success": "Votre compte a été créé!",
-        "termsAndCondsEtcConfirmed": "J'ai lu, compris et accepté ce qui suit :",
+        "success": "Votre compte a été créé !",
+        "termsAndCondsEtcConfirmed": "J'ai lu, compris et accepté ce qui suit :",
         "title": "Créer un compte utilisateur"
       },
       "email": {
@@ -576,13 +576,13 @@
         },
         "form": {
           "sendEmailAgain": "Envoyer l'e-mail à nouveau",
-          "success": "E-mail de vérification envoyé à <b>{email}</b> !"
+          "success": "E-mail de vérification envoyé à <b>{email}</b> !"
         },
         "title": "E-mail"
       },
       "email-display": {
-        "warningFormat": "⚠️ L'e-mail a un format incorrect !",
-        "warningUndef": "⚠️ Aucun e-mail défini !"
+        "warningFormat": "⚠️ L'e-mail a un format incorrect !",
+        "warningUndef": "⚠️ Aucun e-mail défini !"
       },
       "email-nonce": {
         "buttonTitle": "Continuer",
@@ -592,9 +592,9 @@
           "next": "Continuer",
           "nonce": "Entrez votre code",
           "validations": {
-            "error": "Code de vérification invalide <b>{nonce}</b> pour l'e-mail <b>{email}</b> !",
+            "error": "Code de vérification invalide <b>{nonce}</b> pour l'e-mail <b>{email}</b> !",
             "length": "doit comporter {nonceLength} caractères",
-            "success": "Code de vérification valide <b>{nonce}</b> pour l'e-mail <b>{email}</b> !"
+            "success": "Code de vérification valide <b>{nonce}</b> pour l'e-mail <b>{email}</b> !"
           }
         },
         "title": "Confirmation de l'e-mail"
@@ -603,12 +603,12 @@
         "buttonTitle": "Suivant",
         "form": {
           "description": "Saisis le code d'invitation que tu as reçu.",
-          "invite-code": "Code d'invitation : ACJERB",
+          "invite-code": "Code d'invitation : ACJERB",
           "next": "Continuer",
           "validations": {
-            "error": "Code d'invitation invalide <b>{inviteCode}</b> !",
+            "error": "Code d'invitation invalide <b>{inviteCode}</b> !",
             "length": "doit contenir {inviteCodeLength} caractères",
-            "success": "Code d'invitation valide <b>{inviteCode}</b> !"
+            "success": "Code d'invitation valide <b>{inviteCode}</b> !"
           }
         },
         "invited-by": "Invité par {invitedBy}.",
@@ -621,15 +621,15 @@
       "signup": {
         "form": {
           "data-privacy": "J'ai lu et compris la Déclaration de confidentialité.",
-          "description": "Pour commencer, entrez votre adresse mail :",
+          "description": "Pour commencer, entrez votre adresse mail :",
           "errors": {
-            "email-exists": "Il existe déjà un compte utilisateur avec cette adresse mail!"
+            "email-exists": "Il existe déjà un compte utilisateur avec cette adresse mail !"
           },
           "submit": "Créer un compte",
           "success": "Un mail avec un lien pour compléter votre inscription a été envoyé à <b>{email}</b>",
           "terms-and-condition": "Je confirme les Conditions générales."
         },
-        "title": "Rejoignez {APPLICATION_NAME}!",
+        "title": "Rejoignez {APPLICATION_NAME} !",
         "unavailable": "Malheureusement, l'enregistrement public des comptes utilisateurs n'est pas encore disponible sur ce serveur."
       }
     }
@@ -690,13 +690,13 @@
     "comment": {
       "commenting-disabled": {
         "blocked-author": {
-          "button-label": "Visiter “{name}”",
+          "button-label": "Visiter « {name} »",
           "call-to-action": "Si tu veux laisser un commentaire, débloque-le dans son profil.",
           "reason": "Tu bloques l'auteur de la publication."
         },
         "no-group-member": {
           "call-to-action": "Si tu veux commenter, rejoins le groupe.",
-          "reason": "Tu n'es pas membre du groupe :"
+          "reason": "Tu n'es pas membre du groupe :"
         }
       }
     },
@@ -726,30 +726,30 @@
     "postIn": "Publier dans",
     "postInGroupOption": "Groupe : {name}",
     "postInPersonalProfile": "Profil personnel",
-    "success": "Enregistré!",
+    "success": "Enregistré !",
     "teaserImage": {
       "cropImage": "Rogner l'image",
       "cropperConfirm": "Confirmer",
       "errors": {
         "aspect-ratio-too-small": "Cette image est trop haute.",
-        "unSupported-file-format": "Veuillez télécharger une image au format : JPG, JPEG, PNG ou GIF !"
+        "unSupported-file-format": "Veuillez télécharger une image au format : JPG, JPEG, PNG ou GIF !"
       },
-      "supportedFormats": "Insérer une image au format de fichier JPG, PNG ou GIF!"
+      "supportedFormats": "Insérer une image au format de fichier JPG, PNG ou GIF !"
     },
     "title": "Titre",
-    "visibleOnlyForMembersOfGroup": "Cette publication ne sera visible que par les membres du groupe “<b>{name}</b>”."
+    "visibleOnlyForMembersOfGroup": "Cette publication ne sera visible que par les membres du groupe « <b>{name}</b> »."
   },
   "delete": {
     "cancel": "Annuler",
     "comment": {
-      "message": "Voulez-vous vraiment supprimer le commentaire de \"<b>{name}</b>\"?",
-      "success": "Commentaire supprimé avec succès !",
+      "message": "Voulez-vous vraiment supprimer le commentaire de « <b>{name}</b> » ?",
+      "success": "Commentaire supprimé avec succès !",
       "title": "Supprimer un commentaire",
       "type": "Commentaire"
     },
     "contribution": {
-      "message": "Voulez-vous vraiment supprimer la contribution  \"<b>{name}</b>\"?",
-      "success": "Contribution supprimée avec succès !",
+      "message": "Voulez-vous vraiment supprimer la contribution « <b>{name}</b> » ?",
+      "success": "Contribution supprimée avec succès !",
       "title": "Supprimer la contribution",
       "type": "Contribution"
     },
@@ -758,19 +758,19 @@
   "disable": {
     "cancel": "Annuler",
     "comment": {
-      "message": "Souhaitez-vous vraiment désactiver le commentaire de « <b>{name}</b> » ?",
+      "message": "Souhaitez-vous vraiment désactiver le commentaire de « <b>{name}</b> » ?",
       "title": "Désactiver le commentaire",
       "type": "Commentaire"
     },
     "contribution": {
-      "message": "Souhaitez-vous vraiment signaler l'entrée « <b> {name} </b> »?",
+      "message": "Souhaitez-vous vraiment signaler l'entrée « <b>{name}</b> » ?",
       "title": "Désactiver l'apport",
       "type": "Contribution"
     },
     "submit": "Désactiver",
     "success": "Désactivé avec succès",
     "user": {
-      "message": "Souhaitez-vous vraiment désactiver l'utilisateur « <b> {name} </b> »?",
+      "message": "Souhaitez-vous vraiment désactiver l'utilisateur « <b>{name}</b> » ?",
       "title": "Désactiver l'utilisateur",
       "type": "Utilisateur"
     }
@@ -782,8 +782,8 @@
   "editor": {
     "embed": {
       "always_allow": "Autoriser toujours le contenu intégré par des fournisseurs tiers (ce paramètre peut être modifié à tout moment)",
-      "data_privacy_info": "Vos données n'ont pas encore été partagées avec des fournisseurs tiers. Si vous regardez cette vidéo, le fournisseur suivant recueillera probablement des données utilisateurs:",
-      "data_privacy_warning": "Attention à la confidentialité des données!",
+      "data_privacy_info": "Vos données n'ont pas encore été partagées avec des fournisseurs tiers. Si vous regardez cette vidéo, le fournisseur suivant recueillera probablement des données utilisateurs :",
+      "data_privacy_warning": "Attention à la confidentialité des données !",
       "play_now": "Regarder maintenant"
     },
     "hashtag": {
@@ -811,16 +811,16 @@
     "placeholder": "Écrivez quelque chose d'inspirant..."
   },
   "error-pages": {
-    "403-default": "Non autorisé à accéder à cette page !",
-    "404-default": "Cette page est introuvable !",
-    "500-default": "Erreur interne du serveur !",
-    "503-default": "Service indisponible !",
-    "back-to-index": "Retour à la page d'accueil !",
-    "cannot-edit-post": "Cette publication ne peut pas être modifiée !",
-    "default": "Une erreur s'est produite !",
-    "group-not-found": "Ce profil de groupe est introuvable !",
-    "post-not-found": "Cette publication est introuvable !",
-    "profile-not-found": "Ce profil est introuvable !"
+    "403-default": "Non autorisé à accéder à cette page !",
+    "404-default": "Cette page est introuvable !",
+    "500-default": "Erreur interne du serveur !",
+    "503-default": "Service indisponible !",
+    "back-to-index": "Retour à la page d'accueil !",
+    "cannot-edit-post": "Cette publication ne peut pas être modifiée !",
+    "default": "Une erreur s'est produite !",
+    "group-not-found": "Ce profil de groupe est introuvable !",
+    "post-not-found": "Cette publication est introuvable !",
+    "profile-not-found": "Ce profil est introuvable !"
   },
   "filter-menu": {
     "all": "Toutes",
@@ -868,8 +868,8 @@
     "order-by": "Trier par ...",
     "post-type": "Type de contenu",
     "save": {
-      "error": "Erreur lors de l'enregistrement des paramètres de sujets !",
-      "success": "Sujets enregistrés !"
+      "error": "Erreur lors de l'enregistrement des paramètres de sujets !",
+      "success": "Sujets enregistrés !"
     },
     "startDate": "Date de début"
   },
@@ -890,12 +890,12 @@
     "actionRadius": "Rayon d'action du groupe",
     "addMember": "Ajouter un membre",
     "addMemberToGroup": "Ajouter au groupe",
-    "addMemberToGroupSuccess": "“{name}” a été ajouté au groupe avec le rôle “{role}” !",
+    "addMemberToGroupSuccess": "« {name} » a été ajouté au groupe avec le rôle « {role} » !",
     "addUser": "Ajouter un utilisateur",
-    "addUserNoOptions": "Aucun utilisateur trouvé !",
+    "addUserNoOptions": "Aucun utilisateur trouvé !",
     "addUserPlaceholder": "Nom d'utilisateur",
     "admission": {
-      "caption": "On entre :",
+      "caption": "On entre :",
       "closed": {
         "description": "De l'extérieur, personne ne peut rejoindre ni même demander — seule une invitation ouvre la porte.",
         "title": "Sur invitation uniquement"
@@ -903,7 +903,7 @@
       "label": "Onboarding",
       "needsVisibility": "Un groupe que personne de l'extérieur ne peut trouver, personne ne peut y entrer — seule une invitation ouvre la porte.",
       "onRequest": {
-        "description": "On peut demander à rejoindre ; quelqu'un du groupe doit accepter.",
+        "description": "On peut demander à rejoindre ; quelqu'un du groupe doit accepter.",
         "title": "Sur demande"
       },
       "open": {
@@ -914,7 +914,7 @@
     "allGroups": "Tous les groupes",
     "categories": "Sujet ::: Sujets",
     "categoriesTitle": "Sujets du groupe",
-    "changeMemberRole": "Le rôle a été changé en “{role}” !",
+    "changeMemberRole": "Le rôle a été changé en « {role} » !",
     "contentMenu": {
       "hideFromProfile": "Masquer de mon profil",
       "inviteLinks": "Liens d'invitation",
@@ -940,19 +940,19 @@
       "activeTitle": "L'accès administrateur est actif.",
       "activeUntil": "Il se termine à {time}, ou quand tu y mets fin.",
       "end": "Terminer l'accès administrateur",
-      "offerBody": "Tu disposes en plus de droits réseau sur lui. La lecture est ouverte ; toute modification demande cette confirmation, qui est consignée auprès du groupe.",
-      "reasonPlaceholder": "De quoi s'agit-il ? (facultatif)",
+      "offerBody": "Tu disposes en plus de droits réseau sur lui. La lecture est ouverte ; toute modification demande cette confirmation, qui est consignée auprès du groupe.",
+      "reasonPlaceholder": "De quoi s'agit-il ? (facultatif)",
       "start": "Utiliser l'accès administrateur"
     },
     "errors": {
-      "userAlreadyMember": "L'utilisateur “{name}” est déjà membre !"
+      "userAlreadyMember": "L'utilisateur « {name} » est déjà membre !"
     },
     "follow": "Suivre",
     "foundation": "Fondation",
     "general": "Général",
     "goal": "Objectif du groupe",
     "group": "Groupe",
-    "groupCreated": "Le groupe a été créé !",
+    "groupCreated": "Le groupe a été créé !",
     "in": "dans",
     "invite-links": "Liens d'invitation",
     "joinLeaveButton": {
@@ -966,13 +966,13 @@
     "labelSlug": "Nom unique du groupe",
     "leaveModal": {
       "confirmButton": "Quitter",
-      "message": "Quitter un groupe peut être irréversible !<br>Quitter le groupe <b>“{name}”</b> !",
-      "messageAdmin": "Tu <b>administres</b> ce groupe. Si tu le quittes, tu y renonces.<br>Quitter vraiment le groupe <b>« {name} »</b> ?",
-      "messageOwner": "Tu es <b>propriétaire</b> de ce groupe. Si tu le quittes, il risque de se retrouver sans propriétaire — et seule une administration du réseau pourra alors le rendre à nouveau opérationnel.<br>Quitter vraiment le groupe <b>« {name} »</b> ?",
-      "title": "Veux-tu vraiment quitter le groupe ?"
+      "message": "Quitter un groupe peut être irréversible !<br>Quitter le groupe <b>« {name} »</b> !",
+      "messageAdmin": "Tu <b>administres</b> ce groupe. Si tu le quittes, tu y renonces.<br>Quitter vraiment le groupe <b>« {name} »</b> ?",
+      "messageOwner": "Tu es <b>propriétaire</b> de ce groupe. Si tu le quittes, il risque de se retrouver sans propriétaire — et seule une administration du réseau pourra alors le rendre à nouveau opérationnel.<br>Quitter vraiment le groupe <b>« {name} »</b> ?",
+      "title": "Veux-tu vraiment quitter le groupe ?"
     },
-    "memberOutranked": "Tu ne peux pas changer le rôle de cette personne : elle détient au moins autant que toi.",
-    "memberRemoved": "L'utilisateur “{name}” a été retiré du groupe !",
+    "memberOutranked": "Tu ne peux pas changer le rôle de cette personne : elle détient au moins autant que toi.",
+    "memberRemoved": "L'utilisateur « {name} » a été retiré du groupe !",
     "members": "Membres",
     "membersAdministrationList": {
       "avatar": "Avatar",
@@ -989,7 +989,7 @@
     "modal": {
       "cancel": "Annuler",
       "confirm": "Confirmer",
-      "confirmAddGroupMemberText": "Ajouter l'utilisateur “{name}” au groupe ?",
+      "confirmAddGroupMemberText": "Ajouter l'utilisateur « {name} » au groupe ?",
       "confirmAddGroupMemberTitle": "Confirmer"
     },
     "muted": "Groupe en sourdine",
@@ -998,38 +998,38 @@
     "radius": "Rayon",
     "removeMember": "Retirer le membre",
     "removeMemberButton": "Retirer",
-    "removeMemberConfirmText": "Retirer l'utilisateur « {name} » du groupe ?",
+    "removeMemberConfirmText": "Retirer l'utilisateur « {name} » du groupe ?",
     "removeMemberTitle": "Retirer le membre",
     "rights": {
       "addRole": "Ajouter un rôle",
       "advancedTitle": "Toutes les permissions en détail",
       "applyTemplate": "Appliquer un modèle — remplace tous les rôles de ce groupe par ceux du modèle.",
       "blockedByFeature": "Cette fonction est désactivée sur le réseau ({feature}).",
-      "blockedByNetwork": "Limité à l’échelle du réseau : il faut la permission {permission}.",
-      "confirmApplyTemplate": "Appliquer le modèle « {template} » à ce groupe ? Tous les rôles sont remplacés par ceux du modèle.",
-      "confirmApplyTemplateDiscards": "Appliquer le modèle « {template} » à ce groupe ? Tous les rôles sont remplacés par ceux du modèle, et les modifications non enregistrées sont perdues.",
-      "confirmDelete": "Supprimer le rôle « {role} » ? Ses membres deviendront « {target} ».",
-      "confirmReset": "Réinitialiser tous les rôles de ce groupe aux valeurs par défaut ? Les rôles que vous avez ajoutés seront supprimés et leurs membres deviendront des membres ordinaires.",
+      "blockedByNetwork": "Limité à l’échelle du réseau : il faut la permission {permission}.",
+      "confirmApplyTemplate": "Appliquer le modèle « {template} » à ce groupe ? Tous les rôles sont remplacés par ceux du modèle.",
+      "confirmApplyTemplateDiscards": "Appliquer le modèle « {template} » à ce groupe ? Tous les rôles sont remplacés par ceux du modèle, et les modifications non enregistrées sont perdues.",
+      "confirmDelete": "Supprimer le rôle « {role} » ? Ses membres deviendront « {target} ».",
+      "confirmReset": "Réinitialiser tous les rôles de ce groupe aux valeurs par défaut ? Les rôles que vous avez ajoutés seront supprimés et leurs membres deviendront des membres ordinaires.",
       "deleteRole": "Supprimer le rôle",
       "description": "Décidez qui peut faire quoi dans ce groupe — des non-membres jusqu’aux administrateurs.",
-      "discardDraft": "Les modifications non enregistrées seront perdues. Continuer quand même ?",
+      "discardDraft": "Les modifications non enregistrées seront perdues. Continuer quand même ?",
       "drafted": "Modifications non enregistrées",
       "hideAdvanced": "Masquer la vue détaillée",
       "labelField": "Nom affiché",
-      "mandatory": "Toujours accordé : une adhésion qu'on ne peut pas quitter n'est pas un réglage.",
+      "mandatory": "Toujours accordé : une adhésion qu'on ne peut pas quitter n'est pas un réglage.",
       "members": "{count} membres",
       "mootJoin": "Qui a déjà une adhésion ne rejoint pas une seconde fois.",
       "mootLeave": "Qui n'est pas membre n'a pas d'adhésion à quitter.",
       "noRight": "Vous ne pouvez pas accorder une permission que vous n’avez pas vous-même.",
       "ownerHoldsEverything": "Le rôle de propriétaire détient toujours toutes les permissions de ce groupe. Seul son nom affiché peut être modifié.",
-      "pendingBlocked": "Personne n'a ce rôle pour le moment : personne ne peut demander à rejoindre.",
+      "pendingBlocked": "Personne n'a ce rôle pour le moment : personne ne peut demander à rejoindre.",
       "pendingUnreachable": "Personne ne peut demander à rejoindre pour le moment, donc personne n'a ce rôle. C'est l'admission qui en décide.",
       "reset": "Rétablir les valeurs par défaut",
-      "resultingType": "Avec ces permissions, le groupe est :",
+      "resultingType": "Avec ces permissions, le groupe est :",
       "roleKeyPlaceholder": "clé, par ex. redaction",
       "roleLabelPlaceholder": "nom affiché, par ex. Rédaction",
       "saved": "Permissions enregistrées",
-      "saveFirst": "Enregistrez ou annulez d'abord : il y a des modifications non enregistrées.",
+      "saveFirst": "Enregistrez ou annulez d'abord : il y a des modifications non enregistrées.",
       "simple": {
         "applicants-read": "Les candidats en attente peuvent lire les publications",
         "members-chat": "Les membres peuvent écrire dans le chat du groupe",
@@ -1045,9 +1045,9 @@
         "members": "Membres",
         "outsiders": "Personnes extérieures"
       },
-      "systemRole": "Rôle système : ne peut être ni supprimé ni renommé",
+      "systemRole": "Rôle système : ne peut être ni supprimé ni renommé",
       "title": "Permissions",
-      "toAdvanced": "Avancé : toutes les permissions en détail"
+      "toAdvanced": "Avancé : toutes les permissions en détail"
     },
     "role": "Ton rôle dans le groupe",
     "roles": {
@@ -1065,7 +1065,7 @@
       "openGroup": "Ouvrir le groupe",
       "unavailable": "Groupe non disponible"
     },
-    "templateChoice": "Quel type de groupe est-ce ?",
+    "templateChoice": "Quel type de groupe est-ce ?",
     "templateDescriptions": {
       "channel": "Public — mais seule la direction du groupe publie",
       "closed": "Toutes les publications visibles uniquement par les membres du groupe",
@@ -1145,19 +1145,19 @@
     "comment-placeholder": "Commentaire (optionnel)",
     "copy-code": "Copier le lien d'invitation",
     "copy-success": "Code d'invitation copié dans le presse-papiers",
-    "create-error": "Erreur lors de la création d'un nouveau lien d'invitation ! Erreur : {error}",
-    "create-success": "Lien d'invitation créé avec succès !",
+    "create-error": "Erreur lors de la création d'un nouveau lien d'invitation ! Erreur : {error}",
+    "create-success": "Lien d'invitation créé avec succès !",
     "delete-modal": {
-      "message": "Veux-tu vraiment invalider ce lien d'invitation ?",
-      "title": "Invalider le lien ?"
+      "message": "Veux-tu vraiment invalider ce lien d'invitation ?",
+      "title": "Invalider le lien ?"
     },
     "generate-code": "Créer un nouveau lien",
     "generate-code-explanation": "Crée un nouveau lien. Tu peux ajouter un commentaire si tu veux (visible uniquement par toi).",
     "group-invite-links": "Liens d'invitation du groupe",
     "invalidate": "Invalider le lien",
-    "invalidate-error": "Erreur lors de l'invalidation du lien d'invitation ! Erreur : {error}",
-    "invalidate-success": "Lien d'invitation invalidé avec succès !",
-    "invite-link-message-group": "Tu as été invité à rejoindre le groupe “{groupName}” sur {network}.",
+    "invalidate-error": "Erreur lors de l'invalidation du lien d'invitation ! Erreur : {error}",
+    "invalidate-success": "Lien d'invitation invalidé avec succès !",
+    "invite-link-message-group": "Tu as été invité à rejoindre le groupe « {groupName} » sur {network}.",
     "invite-link-message-hidden-group": "Tu as été invité à rejoindre un groupe caché sur {network}.",
     "invite-link-message-personal": "Tu as été invité à rejoindre {network}.",
     "invited-count": "Vous avez déjà invité {count} personnes.",
@@ -1184,21 +1184,21 @@
   "login": {
     "email": "Votre mail",
     "failure": "Adresse mail ou mot de passe incorrect.",
-    "forgotPassword": "Mot de passe oublié?",
+    "forgotPassword": "Mot de passe oublié ?",
     "hello": "Bonjour",
     "loggingOut": "Déconnexion en cours …",
     "login": "Connexion",
     "logout": "Déconnexion",
-    "moreInfo": "Qu'est-ce que {APPLICATION_NAME}?",
+    "moreInfo": "Qu'est-ce que {APPLICATION_NAME} ?",
     "moreInfoHint": "à la page de présentation",
-    "no-account": "Vous n'avez pas de compte?",
+    "no-account": "Vous n'avez pas de compte ?",
     "no-cookie": "Aucun cookie ne peut être défini. Tu dois accepter les cookies.",
     "password": "Votre mot de passe",
     "register": "S'inscrire",
-    "success": "Vous êtes connecté!"
+    "success": "Vous êtes connecté !"
   },
   "map": {
-    "alertMessage": "La carte n'est pas accessible : Le token Mapbox n'est pas configuré sur le serveur !",
+    "alertMessage": "La carte n'est pas accessible : Le token Mapbox n'est pas configuré sur le serveur !",
     "createEvent": {
       "pickLocation": "Créer un nouvel événement ici",
       "resolvingLocation": "Recherche de l'adresse…"
@@ -1248,38 +1248,38 @@
         "cancel": "Annuler",
         "Comment": {
           "disable": {
-            "message": "Voulez-vous vraiment que le commentaire \"<b>{name}</b>\" reste <b>désactivé</b> ?",
+            "message": "Voulez-vous vraiment que le commentaire « <b>{name}</b> » reste <b>désactivé</b> ?",
             "title": "Finalement désactiver le commentaire"
           },
           "enable": {
-            "message": "Voulez-vous vraiment que le commentaire \"<b>{name}</b>\" reste <b>activé</b>?",
+            "message": "Voulez-vous vraiment que le commentaire « <b>{name}</b> » reste <b>activé</b> ?",
             "title": "Finalement activer le commentaire"
           }
         },
         "Post": {
           "disable": {
-            "message": "Voulez-vous vraiment que la publication \"<b>{name}</b>\" reste <b>désactivé</b>?",
+            "message": "Voulez-vous vraiment que la publication « <b>{name}</b> » reste <b>désactivé</b> ?",
             "title": "Finalement désactiver la publication"
           },
           "enable": {
-            "message": "Voulez-vous vraiment que la publication \"<b>{name}</b>\" reste <b>activé</b>?",
+            "message": "Voulez-vous vraiment que la publication « <b>{name}</b> » reste <b>activé</b> ?",
             "title": "Finalement activer le post"
           }
         },
         "submit": "Confirmer la décision",
         "User": {
           "disable": {
-            "message": "Voulez-vous vraiment laisser l'utilisateur \"<b>{name}</b>\" <b>désactivé</b>?",
+            "message": "Voulez-vous vraiment laisser l'utilisateur « <b>{name}</b> » <b>désactivé</b> ?",
             "title": "Finalement désactiver l'utilisateur"
           },
           "enable": {
-            "message": "Voulez-vous réellement laisser l'utilisateur \"<b>{name}</b>\" <b>activé</b>?",
+            "message": "Voulez-vous réellement laisser l'utilisateur « <b>{name}</b> » <b>activé</b> ?",
             "title": "Finalement activer utilisateur"
           }
         }
       },
       "decision": "Décision",
-      "DecisionSuccess": "Décidé avec succès!",
+      "DecisionSuccess": "Décidé avec succès !",
       "disabled": "Désactivé",
       "disabledAt": "Désactivé le",
       "disabledBy": "désactivé par",
@@ -1297,9 +1297,9 @@
       "hiddenDecision": "Pas décidable ici",
       "moreDetails": "Voir les détails",
       "name": "Signalisations",
-      "noDecision": "Pas de décision!",
+      "noDecision": "Pas de décision !",
       "numberOfUsers": "{count} utilisateurs",
-      "previousDecision": "Décision précédente:",
+      "previousDecision": "Décision précédente :",
       "reasonCategory": "Catégorie",
       "reasonDescription": "Description",
       "reportedOn": "Date",
@@ -1365,7 +1365,7 @@
   "post": {
     "article": "Article",
     "comment": {
-      "joinGroup": "A rejoint le groupe „<b>{name}</b>“",
+      "joinGroup": "A rejoint le groupe « <b>{name}</b> »",
       "noPermission": "Les commentaires ne sont pas activés pour votre rôle.",
       "reply": "Répondre",
       "submit": "Commenté",
@@ -1391,25 +1391,25 @@
       "delete": "Supprimer le Post",
       "edit": "Modifier le Post",
       "groupPin": "Épingler la publication (Groupe)",
-      "groupPinnedSuccessfully": "Publication épinglée avec succès !",
+      "groupPinnedSuccessfully": "Publication épinglée avec succès !",
       "groupUnpin": "Désépingler la publication (Groupe)",
-      "groupUnpinnedSuccessfully": "Publication désépinglée avec succès !",
+      "groupUnpinnedSuccessfully": "Publication désépinglée avec succès !",
       "observe": "Observer le Post",
-      "observedSuccessfully": "Tu observes maintenant cette publication !",
+      "observedSuccessfully": "Tu observes maintenant cette publication !",
       "pin": "Épingler le Post (Réseau)",
-      "pinnedSuccessfully": "Poste épinglé avec succès!",
+      "pinnedSuccessfully": "Poste épinglé avec succès !",
       "push": "Remonter en haut",
       "pushed": "Remonté en haut",
-      "pushedSuccessfully": "Publication remontée en haut avec succès !",
+      "pushedSuccessfully": "Publication remontée en haut avec succès !",
       "removedFromGroupSuccessfully": "Post retiré du groupe",
       "removeFromGroup": "Retirer du groupe",
-      "removeFromGroupConfirm": "Retirer ce post du groupe « {group} » ? Le post reste à son auteur mais perd sa place dans le groupe.",
+      "removeFromGroupConfirm": "Retirer ce post du groupe « {group} » ? Le post reste à son auteur mais perd sa place dans le groupe.",
       "unobserve": "Ne plus observer le Post",
-      "unobservedSuccessfully": "Tu n'observes plus cette publication !",
+      "unobservedSuccessfully": "Tu n'observes plus cette publication !",
       "unpin": "Retirer l'épingle du poste (Réseau)",
-      "unpinnedSuccessfully": "Épingle retirer du Post avec succès!",
+      "unpinnedSuccessfully": "Épingle retirer du Post avec succès !",
       "unpush": "Annuler la remontée",
-      "unpushedSuccessfully": "La remontée de la publication a été annulée !"
+      "unpushedSuccessfully": "La remontée de la publication a été annulée !"
     },
     "pinned": "Annonce",
     "sensitiveContent": {
@@ -1464,7 +1464,7 @@
     "invites": {
       "description": "Entrez leur adresse mail pour l'invitation.",
       "emailPlaceholder": "Mail d'invitation",
-      "title": "Invitez quelqu'un à {APPLICATION_NAME}!"
+      "title": "Invitez quelqu'un à {APPLICATION_NAME} !"
     },
     "memberSince": "Membre depuis",
     "network": {
@@ -1489,22 +1489,22 @@
   "release": {
     "cancel": "Annuler",
     "comment": {
-      "error": "Vous avez déjà signalé le commentaire!",
-      "message": "Voulez-vous vraiment publier le commentaire de \"<b>{name}</b>\"?",
+      "error": "Vous avez déjà signalé le commentaire !",
+      "message": "Voulez-vous vraiment publier le commentaire de « <b>{name}</b> » ?",
       "title": "Publication des commentaires",
       "type": "Commentaire"
     },
     "contribution": {
-      "error": "Vous avez déjà signalé la contribution !!",
-      "message": "Voulez-vous vraiment débloquer la contribution \"<b>{name}</b>\"?",
+      "error": "Vous avez déjà signalé la contribution !!",
+      "message": "Voulez-vous vraiment débloquer la contribution « <b>{name}</b> » ?",
       "title": "Versement de la contribution",
       "type": "Contribution"
     },
     "submit": "Relâchez",
-    "success": "Relâchez avec succès!",
+    "success": "Relâchez avec succès !",
     "user": {
-      "error": "Vous avez déjà signalé l'utilisateur!",
-      "message": "Voulez-vous vraiment libérer l'utilisateur \"<b>{name}</b>\"?",
+      "error": "Vous avez déjà signalé l'utilisateur !",
+      "message": "Voulez-vous vraiment libérer l'utilisateur « <b>{name}</b> » ?",
       "title": "Validation par l'utilisateur",
       "type": "Utilisateur"
     }
@@ -1512,26 +1512,26 @@
   "report": {
     "cancel": "Annuler",
     "comment": {
-      "error": "Vous avez déjà rapporté le commentaire!",
-      "message": "Souhaitez-vous vraiment signaler l'utilisateur « <b> {name} </b> »?",
+      "error": "Vous avez déjà rapporté le commentaire !",
+      "message": "Souhaitez-vous vraiment signaler l'utilisateur « <b>{name}</b> » ?",
       "title": "Signaler un commentaire",
       "type": "Commentaire"
     },
     "contribution": {
-      "error": "Vous avez déjà rapporté la contribution!",
-      "message": "Souhaitez-vous vraiment signaler l'entrée « <b> {name} </b> »?",
+      "error": "Vous avez déjà rapporté la contribution !",
+      "message": "Souhaitez-vous vraiment signaler l'entrée « <b>{name}</b> » ?",
       "title": "Signaler l'entrée",
       "type": "Apport"
     },
     "reason": {
       "category": {
         "invalid": "Veuillez sélectionner une catégorie valide",
-        "label": "Sélectionnez une catégorie:",
+        "label": "Sélectionnez une catégorie :",
         "options": {
           "advert_products_services_commercial": "Publicité de produits et de services à des fins commerciaux.",
           "criminal_behavior_violation_german_law": "Comportement criminel ou violation du droit allemand.",
           "discrimination_etc": "Posts, commentaires, expressions ou insultes discriminatoires.",
-          "doxing": "La divulgation de renseignements personnels sans le consentement ou la menace de (\"doxing\").",
+          "doxing": "La divulgation de renseignements personnels sans le consentement ou la menace de (« doxing »).",
           "glorific_trivia_of_cruel_inhuman_acts": "Glorification ou banalisation d'actes de violence cruels ou inhumains.",
           "intentional_intimidation_stalking_persecution": "L'intimidation, le harcèlement ou la persécution intentionnelle.",
           "other": "Autres...",
@@ -1540,15 +1540,15 @@
         "placeholder": "Catégorie..."
       },
       "description": {
-        "label": "S'il vous plaît expliquer: Pourquoi voulez-vous signaler cela?",
+        "label": "S'il vous plaît expliquer : Pourquoi voulez-vous signaler cela ?",
         "placeholder": "Informations complémentaires..."
       }
     },
     "submit": "Envoyer le rapport",
-    "success": "Merci de nous avoir fait part de vos commentaires!",
+    "success": "Merci de nous avoir fait part de vos commentaires !",
     "user": {
-      "error": "Vous avez déjà signalé l'utilisateur!",
-      "message": "Souhaitez-vous vraiment signaler l'utilisateur « <b> {name} </b> »?",
+      "error": "Vous avez déjà signalé l'utilisateur !",
+      "message": "Souhaitez-vous vraiment signaler l'utilisateur « <b>{name}</b> » ?",
       "title": "Signaler l'utilisateur",
       "type": "Utilisateur"
     }
@@ -1562,8 +1562,8 @@
       "Tag": "Hashtag ::: Hashtags",
       "User": "Utilisateurs"
     },
-    "hint": "Qu'est-ce que vous cherchez? Utiliser !… pour des posts, @… pour des membres, #… pour des hashtag.",
-    "no-results": "Aucun résultat trouvé pour \"{search}\". Essaie un autre terme de recherche !",
+    "hint": "Qu'est-ce que vous cherchez ? Utiliser !… pour des posts, @… pour des membres, #… pour des hashtag.",
+    "no-results": "Aucun résultat trouvé pour « {search} ». Essaie un autre terme de recherche !",
     "page": "Page",
     "placeholder": "Rechercher",
     "results": "résultat trouvé ::: résultats trouvés",
@@ -1600,8 +1600,8 @@
       "name": "API Keys",
       "revoke": {
         "confirm": "Révoquer",
-        "message": "Es-tu sûr de vouloir révoquer l'API Key \"{name}\" ? Cette action est irréversible.",
-        "success": "L'API Key \"{name}\" a été révoquée",
+        "message": "Es-tu sûr de vouloir révoquer l'API Key « {name} » ? Cette action est irréversible.",
+        "success": "L'API Key « {name} » a été révoquée",
         "title": "Révoquer l'API Key"
       },
       "revoked-list": {
@@ -1612,7 +1612,7 @@
         "copied": "API Key copiée dans le presse-papiers",
         "copy": "Copier",
         "copy-failed": "Échec de la copie dans le presse-papiers",
-        "title": "Ton nouveau API Key (visible une seule fois !)",
+        "title": "Ton nouveau API Key (visible une seule fois !)",
         "warning": "Enregistre cette key maintenant. Tu ne pourras plus la voir après avoir fermé cette page."
       }
     },
@@ -1642,9 +1642,9 @@
       "explanation": {
         "closing": "Ceci devrait être suffisant pour le moment afin que les utilisateurs bloqués ne puissent plus vous déranger.",
         "commenting-disabled": "Tu ne peux pas commenter cette publication pour le moment.",
-        "intro": "Si vous avez bloqué un autre utilisateur, voici ce qui se passe:",
+        "intro": "Si vous avez bloqué un autre utilisateur, voici ce qui se passe :",
         "notifications": "Les utilisateurs bloqués ne recevront plus de notifications s'ils sont mentionnés dans vos postes.",
-        "their-perspective": "Vice versa: la personne bloquée ne verra plus non plus vos postes dans son fil d'actualités.",
+        "their-perspective": "Vice versa : la personne bloquée ne verra plus non plus vos postes dans son fil d'actualités.",
         "your-perspective": "Les postes de la personne bloquée n'apparaîtront dans votre fil d'actualités."
       },
       "how-to": "Vous pouvez bloquer d'autres utilisateurs sur leur page de profil via le menu de contenu.",
@@ -1663,22 +1663,22 @@
       "name": "Vos données",
       "namePlaceholder": "Fémanon Funny",
       "realNamePlease": "Veuillez entrer ton vrai nom",
-      "success": "Vos données ont été mises à jour avec succès !",
+      "success": "Vos données ont été mises à jour avec succès !",
       "surName": "Ton nom de famille",
       "surNamePlaceholder": "Funny"
     },
     "deleteUserAccount": {
       "accountDescription": "Sachez que vos postes et commentaires sont importants pour notre communauté. Si vous voulez quand même les supprimer, vous devez les marquer ci-dessous.",
-      "accountWarning": "Vous NE POUVEZ PAS GÉRER et NE POUVEZ PAS RECOUVRIR votre compte, vos messages ou vos commentaires après avoir supprimé votre compte!",
-      "accountWarningAdmin": "Le compte, les contributions ou les commentaires NE PEUVENT PAS ÊTRE ADMINISTRÉS NI RESTAURÉS après la suppression !",
-      "accountWarningIsAdmin": "Attention ! Tu es sur le point de supprimer un compte utilisateur !",
+      "accountWarning": "Vous NE POUVEZ PAS GÉRER et NE POUVEZ PAS RECOUVRIR votre compte, vos messages ou vos commentaires après avoir supprimé votre compte !",
+      "accountWarningAdmin": "Le compte, les contributions ou les commentaires NE PEUVENT PAS ÊTRE ADMINISTRÉS NI RESTAURÉS après la suppression !",
+      "accountWarningIsAdmin": "Attention ! Tu es sur le point de supprimer un compte utilisateur !",
       "commentedCount": "Supprimer mes {count} commentaires",
       "confirmDeleting": "Supprimer le compte utilisateur maintenant",
       "contributionsCount": "Supprimer mes {count} postes",
-      "infoAdmin": "Toutes les contributions et commentaires de l'utilisateur seront également supprimés !",
+      "infoAdmin": "Toutes les contributions et commentaires de l'utilisateur seront également supprimés !",
       "name": "Supprimer un compte utilisateur",
-      "pleaseConfirm": "Action destructive! Saisissez “{confirm}” pour confirmer.",
-      "success": "Compte supprimer avec succès!"
+      "pleaseConfirm": "Action destructive ! Saisissez « {confirm} » pour confirmer.",
+      "success": "Compte supprimer avec succès !"
     },
     "download": {
       "description": "Clique sur le bouton ci-dessus pour télécharger le contenu de tes publications et commentaires. Pour télécharger les images de tes publications, clique sur le lien correspondant ci-dessous.",
@@ -1697,11 +1697,11 @@
         "same-email": "Voici votre adresse mail actuelle"
       },
       "verification-error": {
-        "explanation": "Cela peut avoir différentes causes:",
+        "explanation": "Cela peut avoir différentes causes :",
         "message": "Votre mail n'a pas pu être changé.",
         "reason": {
-          "invalid-nonce": "Le code de confirmation est-il invalide?",
-          "no-email-request": "Êtes-vous certain d'avoir demandé un changement d'adresse mail?"
+          "invalid-nonce": "Le code de confirmation est-il invalide ?",
+          "no-email-request": "Êtes-vous certain d'avoir demandé un changement d'adresse mail ?"
         },
         "support": "Si le problème persiste, veuillez nous contacter par mail à l'adresse suivante"
       }
@@ -1713,7 +1713,7 @@
         "change": {
           "allow": "Sûr",
           "deny": "Non merci",
-          "question": "Est-ce que vous voulez que le code source intégrer vous soit toujours affiché?"
+          "question": "Est-ce que vous voulez que le code source intégrer vous soit toujours affiché ?"
         },
         "description": "Par défaut, le code incorporé des fournisseurs tiers est",
         "disabled": {
@@ -1739,7 +1739,7 @@
       },
       "empty": "Jusqu'à présent, tu n'as mis personne en sourdine.",
       "explanation": {
-        "intro": "Si tu as mis un autre utilisateur en sourdine, voici ce qui se passe :",
+        "intro": "Si tu as mis un autre utilisateur en sourdine, voici ce qui se passe :",
         "search": "Les publications des personnes en sourdine disparaissent de tes résultats de recherche.",
         "your-perspective": "Les publications de la personne en sourdine n'apparaîtront plus dans ton fil d'actualité."
       },
@@ -1767,7 +1767,7 @@
       "postByFollowedUser": "Messages des utilisateurs que je suis",
       "postInGroup": "Message dans un groupe dont je suis membre",
       "send-email-notifications": "Envoyer des notifications par courrier électronique",
-      "success-update": "Paramètres de notification sauvegardés ! ",
+      "success-update": "Paramètres de notification sauvegardés ! ",
       "uncheckAll": "Tout décocher"
     },
     "organizations": {
@@ -1799,7 +1799,7 @@
         "passwordStrength2": "Mot de passe médiocre",
         "passwordStrength3": "Mot de passe fort",
         "passwordStrength4": "Mot de passe très fort",
-        "success": "Mot de passe modifié avec succès !"
+        "success": "Mot de passe modifié avec succès !"
       },
       "name": "Sécurité"
     },
@@ -1807,8 +1807,8 @@
       "add-new-link": "Ajouter un nouveau lien",
       "delete-modal": {
         "confirm-button": "Supprimer",
-        "message": "Supprimer “{name}”.",
-        "title": "Veux-tu vraiment supprimer ton lien ?"
+        "message": "Supprimer « {name} ».",
+        "title": "Veux-tu vraiment supprimer ton lien ?"
       },
       "edit-link": "Modifier le lien",
       "name": "Médias sociaux",
@@ -1816,8 +1816,8 @@
       "privacy-hint": "Les liens que vous ajoutez ici apparaissent sur votre profil. Une adresse e-mail sera alors visible par toutes les personnes qui peuvent voir votre profil.",
       "requireUnique": "Vous avez déjà ajouté cette URL",
       "submit": "Ajouter un lien",
-      "successAdd": "Les médias sociaux ont été ajoutés. Profil mis à jour !",
-      "successDelete": "Médias sociaux supprimé. Profil mis à jour !"
+      "successAdd": "Les médias sociaux ont été ajoutés. Profil mis à jour !",
+      "successDelete": "Médias sociaux supprimé. Profil mis à jour !"
     },
     "validation": {
       "nameNotEmpty": "Veuillez entrer ton nom.",
@@ -1846,12 +1846,12 @@
     "register": "Numéro de registre",
     "support": "Support",
     "termsAndConditions": "Conditions générales",
-    "thanks": "Merci!"
+    "thanks": "Merci !"
   },
   "termsAndConditions": {
     "newTermsAndConditions": "Nouvelles conditions générales",
     "termsAndConditionsNewConfirm": "J'ai lu et accepté les nouvelles conditions générales.",
-    "termsAndConditionsNewConfirmText": "Veuillez lire les nouvelles conditions d'utilisation dès maintenant !"
+    "termsAndConditionsNewConfirmText": "Veuillez lire les nouvelles conditions d'utilisation dès maintenant !"
   },
   "user-avatar": {
     "popover": {
@@ -1888,10 +1888,10 @@
         "noDevice": "Aucun écran disponible à partager."
       }
     },
-    "gotoGroup": "Aller au groupe « {name} »",
+    "gotoGroup": "Aller au groupe « {name} »",
     "groupVideoCallButton": {
       "label": "Vidéo de groupe",
-      "tooltip": "Appel vidéo dans le groupe « {name} »"
+      "tooltip": "Appel vidéo dans le groupe « {name} »"
     },
     "leave": "Quitter l'appel",
     "maximize": "Agrandir",
@@ -1904,8 +1904,8 @@
     "prejoin": {
       "camera": "Caméra",
       "cameraDisabled": "La caméra est désactivée.",
-      "cameraOff": "Caméra : Désactivée",
-      "cameraOn": "Caméra : Activée",
+      "cameraOff": "Caméra : Désactivée",
+      "cameraOn": "Caméra : Activée",
       "cancel": "Annuler",
       "description": "Vous êtes sur le point de rejoindre l'appel vidéo de ce groupe. Vérifiez votre caméra, votre microphone et votre haut-parleur, puis rejoignez l'appel.",
       "errorBusy": "Le périphérique est utilisé par une autre application.",
@@ -1918,8 +1918,8 @@
       "hintMic": "Vous rejoignez sans microphone — les autres vous verront mais ne vous entendront pas.",
       "join": "Rejoindre l'appel",
       "micLevel": "Niveau du microphone",
-      "micOff": "Micro : Désactivé",
-      "micOn": "Micro : Activé",
+      "micOff": "Micro : Désactivé",
+      "micOn": "Micro : Activé",
       "microphone": "Microphone",
       "noCamera": "L'aperçu de la caméra n'est pas disponible.",
       "noDevices": "Aucun périphérique détecté",

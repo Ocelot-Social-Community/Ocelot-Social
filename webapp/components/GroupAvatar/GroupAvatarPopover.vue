@@ -1,5 +1,10 @@
 <template>
-  <div class="group-avatar-popover">
+  <component
+    :is="canNavigate ? 'nuxt-link' : 'div'"
+    :to="canNavigate ? groupLink : undefined"
+    class="group-avatar-popover"
+    :class="{ 'is-clickable': canNavigate }"
+  >
     <div v-if="!showContent" class="loading-state">
       <os-spinner size="md" />
     </div>
@@ -43,7 +48,7 @@
         </li>
       </ul>
       <os-button
-        v-if="isTouchDevice && groupLink"
+        v-if="showProfileLink && groupLink"
         as="nuxt-link"
         :to="groupLink"
         class="open-link"
@@ -55,7 +60,7 @@
       </os-button>
     </template>
     <empty v-else-if="showContent" icon="alert" :message="$t('group.teaser.unavailable')" />
-  </div>
+  </component>
 </template>
 
 <script>
@@ -63,13 +68,12 @@ import { OsBadge, OsButton, OsNumber, OsSpinner } from '@ocelot-social/ui'
 import Empty from '~/components/Empty/Empty'
 import LocationInfo from '~/components/LocationInfo/LocationInfo'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
-import touchDevice from '~/mixins/touchDevice'
 import { groupTeaserQuery } from '~/graphql/groups'
 import groupRights from '~/mixins/groupRights'
 
 export default {
   name: 'GroupAvatarPopover',
-  mixins: [touchDevice, groupRights],
+  mixins: [groupRights],
   components: {
     Empty,
     LocationInfo,
@@ -83,12 +87,19 @@ export default {
     group: { type: Object, default: null },
     groupId: { type: String, default: null },
     groupLink: { type: Object, default: null },
+    // Shows the old explicit "open group" button again, in addition to the whole card already
+    // being a link (see canNavigate) — off by default, kept for callers that might still want an
+    // extra, more discoverable call-to-action alongside the click-anywhere card.
+    showProfileLink: { type: Boolean, default: false },
   },
   data() {
     return {
       showContent: false,
       minSpinnerDone: false,
       querySettled: false,
+      // A network/GraphQL error settles the query too, but it's not evidence the group is
+      // actually gone — only a successful, empty response is (see confirmedMissing).
+      queryFailed: false,
       spinnerTimer: null,
     }
   },
@@ -108,6 +119,18 @@ export default {
   computed: {
     resolvedGroup() {
       return this.group || (this.Group && this.Group[0]) || null
+    },
+    // Confirmed gone (content settled, nothing came back) — don't navigate to a group we already
+    // know doesn't exist, even though groupLink is still set. A failed query must NOT count as
+    // confirmation — that would block navigation on a transient network error.
+    confirmedMissing() {
+      return this.showContent && !this.queryFailed && !this.resolvedGroup
+    },
+    // Whole card becomes a link whenever we have somewhere to send it and haven't ruled that out
+    // — including while still loading, so an eager click (e.g. from pages/map.vue's popups)
+    // navigates immediately instead of waiting on the teaser query.
+    canNavigate() {
+      return !!this.groupLink && !this.confirmedMissing
     },
   },
   watch: {
@@ -139,6 +162,7 @@ export default {
         this.onQuerySettled()
       },
       error() {
+        this.queryFailed = true
         this.onQuerySettled()
       },
     },
@@ -157,6 +181,19 @@ export default {
   max-width: 280px;
   width: 280px;
   min-height: 260px;
+  /* Overrides resets.css's global `a { color: var(--color-primary) }` for the
+     nuxt-link case (see canNavigate) — the card's own text keeps its normal
+     color, only the explicit "open group" button below still looks like a
+     button/link. */
+  color: var(--text-color-base);
+}
+
+.group-avatar-popover.is-clickable {
+  /* Belt-and-braces: the native anchor already shows a pointer, but this
+     holds regardless of which element renders the root (e.g. the map
+     popover already forces this too, scoped more narrowly, in
+     pages/map.vue). */
+  cursor: pointer;
 }
 
 .loading-state {

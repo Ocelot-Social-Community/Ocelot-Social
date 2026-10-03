@@ -421,6 +421,7 @@ export default {
           context,
           coordinates,
           GROUP_REVERSE_GEOCODE_TYPES,
+          true,
         )
         return group
       } catch (error) {
@@ -541,6 +542,7 @@ export default {
           context,
           coordinates,
           GROUP_REVERSE_GEOCODE_TYPES,
+          true,
         )
         if (requestedTemplate && requestedTemplate !== previousVisibility) {
           // A template is a preset for what outsiders may do, so applying one writes those

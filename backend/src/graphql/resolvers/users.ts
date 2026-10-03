@@ -420,6 +420,7 @@ export default {
           context,
           coordinates,
           NEIGHBORHOOD_REVERSE_GEOCODE_TYPES,
+          true,
         )
         if (
           'showPublicGroupsOnProfile' in params ||

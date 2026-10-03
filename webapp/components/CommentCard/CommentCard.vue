@@ -53,6 +53,7 @@
         :filled="shouted"
         :icon="icons.heartO"
         :loading="shoutLoading"
+        size="sm"
         class="shout-button"
         @click="toggleShout"
       />
@@ -281,9 +282,5 @@ export default {
   align-items: center;
   justify-content: right;
   gap: calc(var(--space-base) * 0.5);
-}
-
-.shout-button {
-  --circle-button-width: 28px;
 }
 </style>

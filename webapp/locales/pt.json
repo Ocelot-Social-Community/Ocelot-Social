@@ -9,15 +9,15 @@
     "loading": "Carregando",
     "loadMore": "Carregar mais",
     "menu": "Abrir menu",
-    "reset": "Repor",
+    "reset": "Redefinir",
     "save": "Salvar",
     "saveCategories": "Salvar tópicos",
     "search": "Pesquisar",
     "unsavedChanges": {
       "discard": "Descartar",
-      "message": "Fez alterações que ainda não foram guardadas. Se continuar agora, serão perdidas.",
+      "message": "Você fez alterações que ainda não foram salvas. Se continuar agora, elas serão perdidas.",
       "stay": "Ficar",
-      "title": "Alterações não guardadas"
+      "title": "Alterações não salvas"
     }
   },
   "admin": {
@@ -26,7 +26,7 @@
         "active": "Keys ativas ({count})",
         "revoked": "Keys revogadas ({count})"
       },
-      "empty": "Nenhum utilizador com API Keys encontrado.",
+      "empty": "Nenhum usuário com API Keys encontrado.",
       "name": "API Keys",
       "never": "nunca",
       "order": {
@@ -37,13 +37,13 @@
       },
       "revoke": {
         "confirm": "Revogar",
-        "message": "Tens a certeza de que queres revogar o API Key \"{name}\" de {user}?",
+        "message": "Você tem certeza de que quer revogar a API Key “{name}” de {user}?",
         "success": "API Key revogada com sucesso",
         "title": "Revogar API Key"
       },
-      "revoke-all": "Revogar todas as keys deste utilizador",
+      "revoke-all": "Revogar todas as keys deste usuário",
       "revoke-all-confirm": "Revogar todas",
-      "revoke-all-message": "Tens a certeza de que queres revogar TODAS as API Keys de {user}? Esta ação não pode ser desfeita.",
+      "revoke-all-message": "Você tem certeza de que quer revogar TODAS as API Keys de {user}? Esta ação não pode ser desfeita.",
       "revoke-all-short": "Revogar todas",
       "revoke-all-success": "{count} API Keys de {user} foram revogadas",
       "revoke-all-title": "Revogar todas as API Keys",
@@ -60,7 +60,7 @@
         "posts": "Publicações",
         "prefix": "Key",
         "revoked-count": "Revogadas",
-        "user": "Utilizador"
+        "user": "Usuário"
       }
     },
     "badges": {
@@ -154,15 +154,15 @@
       "blocks": "bloqueia {policy}",
       "category": {
         "auth": "Autenticação",
-        "database": "Base de dados",
+        "database": "Banco de dados",
         "features": "Funcionalidades",
         "general": "Geral",
         "layout": "Esquema",
         "mail": "E-mail / SMTP",
         "maps": "Mapas",
-        "monitoring": "Monitorização",
+        "monitoring": "Monitoramento",
         "redis": "Redis",
-        "registration": "Registo",
+        "registration": "Registro",
         "server": "Servidor",
         "storage": "Armazenamento / S3",
         "video": "Videoconferência"
@@ -174,7 +174,7 @@
         "override": "Substituição de política",
         "softwareDefault": "Padrão do software"
       },
-      "description": "Todas as variáveis de ambiente que esta implantação lê e como são resolvidas. É um espelho de diagnóstico só de leitura do ambiente da implantação; os valores ativos são editados na aba Política de rede. Os valores secretos nunca são mostrados, apenas se estão definidos.",
+      "description": "Todas as variáveis de ambiente que esta implantação lê e como são resolvidas. É um espelho de diagnóstico somente leitura do ambiente da implantação; os valores ativos são editados na aba Política de rede. Os valores secretos nunca são mostrados, apenas se estão definidos.",
       "editPolicy": "Editar a política {policy}",
       "name": "Ambiente",
       "noDefault": "sem padrão",
@@ -225,7 +225,7 @@
       "apply": "Aplicar aos grupos sem alterações",
       "confirmApply": "Aplicar os modelos a {count} grupos que nunca personalizaram as suas funções? Os grupos personalizados não são tocados.",
       "description": "Aqui editas os modelos a partir dos quais os novos grupos são criados — nenhum grupo existente muda por causa disso. Só o botão abaixo aplica uma alteração aos grupos, e apenas aos que nunca alteraram os seus próprios direitos.",
-      "editingTemplate": "Estás a editar o modelo «{template}»",
+      "editingTemplate": "Estás a editar o modelo “{template}”",
       "labelField": "Nome",
       "name": "Modelos de grupo",
       "ownerHoldsEverything": "A função de proprietário tem sempre todas as permissões e não pode ser editada.",
@@ -279,53 +279,53 @@
     },
     "policy": {
       "conflict": {
-        "keep": "Continuar a editar",
+        "keep": "Continuar editando",
         "load": "Carregar a nova versão",
-        "message": "Uma definição foi alterada noutro local enquanto a editava. As suas alterações não guardadas são mantidas — reveja as definições destacadas.",
+        "message": "Uma configuração foi alterada em outro lugar enquanto você a editava. Suas alterações não salvas foram mantidas — revise as configurações destacadas.",
         "serverValue": "servidor agora: {value}"
       },
       "defaultValue": "padrão: {value}",
       "description": "Configuração em tempo de execução. As alterações são aplicadas imediatamente a todos os clientes conectados.",
       "descriptions": {
-        "apiKeysEnabled": "Permite que os utilizadores criem chaves de API pessoais para acesso programático ao backend. Afeta a secção de chaves de API nas definições do utilizador.",
-        "apiKeysMaxPerUser": "Número máximo de chaves de API ativas que um único utilizador pode ter ao mesmo tempo.",
-        "askForRealName": "Pede aos novos utilizadores o seu nome verdadeiro (nome próprio e apelido) durante o registo, em vez de um único nome visível.",
-        "badgesEnabled": "Ativa a funcionalidade de distintivos: os distintivos são apresentados nos perfis e pré-visualizações e podem ser geridos na área de administração.",
+        "apiKeysEnabled": "Permite que os usuários criem chaves de API pessoais para acesso programático ao backend. Afeta a seção de chaves de API nas configurações do usuário.",
+        "apiKeysMaxPerUser": "Número máximo de chaves de API ativas que um único usuário pode ter ao mesmo tempo.",
+        "askForRealName": "Pede aos novos usuários seu nome real (nome e sobrenome) durante o registro, em vez de um único nome de exibição.",
+        "badgesEnabled": "Ativa a funcionalidade de emblemas: os emblemas são exibidos nos perfis e nas pré-visualizações e podem ser gerenciados na área de administração.",
         "categoriesActive": "Ativa as categorias temáticas para publicações e grupos, para classificar e filtrar conteúdo. Requer que exista pelo menos uma categoria.",
-        "groupsEnabled": "Ativa a funcionalidade de grupos: os utilizadores podem criar e explorar grupos (e iniciar videochamadas de grupo). Também controla o botão de grupos no cabeçalho.",
-        "inviteCodesGroupPerUser": "Número máximo de códigos de convite de grupo que um único utilizador pode gerar por grupo.",
-        "inviteCodesPersonalPerUser": "Número máximo de códigos de convite pessoais que um único utilizador pode gerar.",
-        "inviteLinkLimit": "Número máximo de links de convite pessoais que um único utilizador pode ter.",
-        "inviteRegistration": "Permite que membros existentes convidem novos utilizadores através de códigos de convite. Quando desativado, os códigos de convite não podem ser usados para registo.",
+        "groupsEnabled": "Ativa a funcionalidade de grupos: os usuários podem criar e explorar grupos (e iniciar videochamadas de grupo). Também controla o botão de grupos no cabeçalho.",
+        "inviteCodesGroupPerUser": "Número máximo de códigos de convite de grupo que um único usuário pode gerar por grupo.",
+        "inviteCodesPersonalPerUser": "Número máximo de códigos de convite pessoais que um único usuário pode gerar.",
+        "inviteLinkLimit": "Número máximo de links de convite pessoais que um único usuário pode ter.",
+        "inviteRegistration": "Permite que membros existentes convidem novos usuários por meio de códigos de convite. Quando desativado, os códigos de convite não podem ser usados para registro.",
         "maxGroupPinnedPosts": "Número máximo de publicações que podem ser fixadas dentro de um grupo. Defina 0 para desativar a fixação em grupos.",
         "maxPinnedPosts": "Número máximo de publicações que podem ser fixadas em toda a rede (administradores). Defina 0 para desativar a fixação.",
-        "publicRegistration": "Permite que qualquer pessoa crie uma conta diretamente, sem código de convite. Quando desativado, novos utilizadores só podem entrar por convite.",
-        "requireLocation": "Torna obrigatória uma localização durante o registo e nas definições do perfil.",
+        "publicRegistration": "Permite que qualquer pessoa crie uma conta diretamente, sem código de convite. Quando desativado, novos usuários só podem entrar por convite.",
+        "requireLocation": "Torna obrigatória uma localização durante o registro e nas configurações do perfil.",
         "showContentFilterHeaderMenu": "Mostra o filtro de conteúdo no menu de cabeçalho.",
-        "showContentFilterMasonryGrid": "Mostra o filtro de conteúdo na grelha masonry (notícias).",
+        "showContentFilterMasonryGrid": "Mostra o filtro de conteúdo na grade masonry (notícias).",
         "showGroupButtonInHeader": "Mostra o botão de grupos no cabeçalho.",
-        "socialMediaEnabled": "Ativa a funcionalidade de links de redes sociais: os links são exibidos nos perfis e geridos nas configurações do utilizador.",
+        "socialMediaEnabled": "Ativa a funcionalidade de links de redes sociais: os links são exibidos nos perfis e gerenciados nas configurações do usuário.",
         "videoConference": "Ativa a videoconferência (LiveKit). O interruptor de tempo de execução para as permissões de chamada de vídeo. Requer as variáveis de ambiente do LiveKit; sem elas permanece desativada e esmaecida."
       },
       "envLink": "Ver ambiente",
       "envUnavailable": "O ambiente necessário não está configurado — esta opção não tem efeito até que esteja.",
       "keys": {
         "apiKeysEnabled": "Chaves de API",
-        "apiKeysMaxPerUser": "Máx. de chaves de API por utilizador",
+        "apiKeysMaxPerUser": "Máx. de chaves de API por usuário",
         "askForRealName": "Pedir nome verdadeiro",
-        "badgesEnabled": "Distintivos",
+        "badgesEnabled": "Emblemas",
         "categoriesActive": "Categorias",
         "groupsEnabled": "Grupos",
-        "inviteCodesGroupPerUser": "Máx. de códigos de convite de grupo por utilizador",
-        "inviteCodesPersonalPerUser": "Máx. de códigos de convite pessoais por utilizador",
-        "inviteLinkLimit": "Máx. de links de convite por utilizador",
-        "inviteRegistration": "Registo por convite",
+        "inviteCodesGroupPerUser": "Máx. de códigos de convite de grupo por usuário",
+        "inviteCodesPersonalPerUser": "Máx. de códigos de convite pessoais por usuário",
+        "inviteLinkLimit": "Máx. de links de convite por usuário",
+        "inviteRegistration": "Registro por convite",
         "maxGroupPinnedPosts": "Máx. de publicações fixadas por grupo",
         "maxPinnedPosts": "Máx. de publicações fixadas (rede)",
-        "publicRegistration": "Registo aberto",
+        "publicRegistration": "Registro aberto",
         "requireLocation": "Localização obrigatória",
         "showContentFilterHeaderMenu": "Filtro de conteúdo no cabeçalho",
-        "showContentFilterMasonryGrid": "Filtro de conteúdo na grelha",
+        "showContentFilterMasonryGrid": "Filtro de conteúdo na grade",
         "showGroupButtonInHeader": "Botão de grupos no cabeçalho",
         "socialMediaEnabled": "Redes sociais",
         "videoConference": "Videoconferência"
@@ -343,25 +343,25 @@
     "roles": {
       "allPermissions": "Detém todas as permissões (protegida).",
       "cannotDelete": "Esta função não pode ser excluída.",
-      "cannotDeleteHasMembers": "Esta função ainda tem membros — reatribua-os antes de a eliminar.",
+      "cannotDeleteHasMembers": "Esta função ainda tem membros — reatribua-os antes de excluí-la.",
       "conflict": {
-        "keep": "Continuar a editar",
+        "keep": "Continuar editando",
         "load": "Carregar a nova versão",
-        "message": "Esta função foi alterada noutro local enquanto a editava. As suas alterações não guardadas são mantidas — reveja as permissões destacadas."
+        "message": "Esta função foi alterada em outro lugar enquanto você a editava. Suas alterações não salvas foram mantidas — revise as permissões destacadas."
       },
       "create": "Criar função",
       "createTitle": "Criar uma nova função",
-      "delete": "Eliminar",
-      "deleteError": "Não foi possível eliminar a função: {message}",
-      "deleteSuccess": "Função eliminada.",
-      "description": "Quem pode fazer o quê em toda a rede. Crie funções e atribua permissões — as alterações aplicam-se de imediato.",
+      "delete": "Excluir",
+      "deleteError": "Não foi possível excluir a função: {message}",
+      "deleteSuccess": "Função excluída.",
+      "description": "Quem pode fazer o quê em toda a rede. Crie funções e atribua permissões — as alterações são aplicadas de imediato.",
       "members": "{count} membros",
       "name": "Funções e permissões",
       "nameLabel": "Nome",
       "perm": {
-        "apiKey_administer": "Administrar as chaves de API de outros utilizadores.",
+        "apiKey_administer": "Administrar as chaves de API de outros usuários.",
         "apiKey_create": "Criar chaves API pessoais.",
-        "badge_manage": "Conceder e revogar distintivos.",
+        "badge_manage": "Conceder e revogar emblemas.",
         "comment_create": "Comentar publicações.",
         "content_moderate": "Analisar e decidir sobre conteúdo denunciado.",
         "donation_manage": "Configurar o widget de doações.",
@@ -369,14 +369,14 @@
         "group_create_hidden": "Criar grupos ocultos.",
         "group_create_public": "Criar grupos públicos.",
         "network_statistics_read": "Ver estatísticas de toda a rede.",
-        "policy_manage": "Ver e alterar as definições de política da rede.",
+        "policy_manage": "Ver e alterar as configurações de política da rede.",
         "post_create": "Criar publicações.",
         "post_pin": "Fixar e desafixar publicações em toda a rede.",
         "post_push": "Impulsionar e remover (boost) publicações.",
-        "role_manage": "Gerir funções e atribuí-las aos utilizadores.",
-        "socialMedia_create": "Adicionar ligações de redes sociais ao perfil.",
-        "user_delete_any": "Eliminar a conta de qualquer utilizador.",
-        "user_email_readAny": "Ler o endereço de e-mail de qualquer utilizador.",
+        "role_manage": "Gerenciar funções e atribuí-las aos usuários.",
+        "socialMedia_create": "Adicionar links de redes sociais ao perfil.",
+        "user_delete_any": "Excluir a conta de qualquer usuário.",
+        "user_email_readAny": "Ler o endereço de e-mail de qualquer usuário.",
         "user_invite": "Gerar códigos de convite pessoais.",
         "videoCall_create_open": "Iniciar uma videochamada num grupo em que qualquer pessoa pode entrar — localizável e acessível sem aprovação.",
         "videoCall_create_restricted": "Iniciar uma videochamada num grupo em que não se pode simplesmente entrar: entrar exige aprovação ou convite, ou o grupo está oculto."
@@ -389,9 +389,9 @@
       "renameError": "Não foi possível renomear a função: {message}",
       "renameSuccess": "Função renomeada.",
       "roleLabel": "Função",
-      "save": "Guardar",
-      "saveError": "Não foi possível guardar a função: {message}",
-      "saveSuccess": "Função guardada.",
+      "save": "Salvar",
+      "saveError": "Não foi possível salvar a função: {message}",
+      "saveSuccess": "Função salva.",
       "selfLockout": {
         "confirm": "Remover mesmo assim",
         "message": "Você está prestes a remover a permissão “gerenciar funções” de <strong>{role}</strong> — sua própria função. Depois disso, você não poderá mais gerenciar funções; apenas um proprietário pode restaurá-la. Continuar?",
@@ -437,7 +437,7 @@
           "name": "Nome",
           "number": "N.º",
           "role": "Função",
-          "shouted": "Partilhado",
+          "shouted": "Compartilhado",
           "slug": "Slug",
           "status": "Status"
         }
@@ -445,7 +445,7 @@
     }
   },
   "chat": {
-    "addGroupRoomHeadline": "Procurar grupo para novo chat",
+    "addGroupRoomHeadline": "Buscar grupo para novo chat",
     "addRoomHeadline": "Buscar usuário para novo chat",
     "cancelSelectMessage": "Cancelar",
     "closeChat": "Fechar chat",
@@ -453,7 +453,7 @@
     "expandChat": "Expandir chat",
     "groupChatButton": {
       "label": "Chat de grupo",
-      "tooltip": "Chat com o grupo \"{name}\""
+      "tooltip": "Chat com o grupo “{name}”"
     },
     "isOnline": "está online",
     "isTyping": "está escrevendo...",
@@ -469,9 +469,9 @@
     "roomsEmpty": "Sem salas",
     "search": "Filtrar salas de chat",
     "searchBadgeGroup": "Grupo",
-    "searchBadgeUser": "Utilizador",
-    "searchGroupPlaceholder": "Procurar grupo…",
-    "searchPlaceholder": "Procurar utilizador ou grupo…",
+    "searchBadgeUser": "Usuário",
+    "searchGroupPlaceholder": "Buscar grupo…",
+    "searchPlaceholder": "Buscar usuário ou grupo…",
     "transmitting": "Enviando mensagem ...",
     "typeMessage": "Escreva uma mensagem",
     "userProfileButton": {
@@ -507,7 +507,7 @@
     "loading": "Carregando",
     "loadMore": "Carregar mais",
     "name": "Nome",
-    "noChangesHint": "Ainda não há nada para guardar.",
+    "noChangesHint": "Ainda não há nada para salvar.",
     "organization": "Organização ::: Organizações",
     "post": "Postagem ::: Postagens",
     "previousLocation": "Localização anterior: {location}",
@@ -545,7 +545,7 @@
     },
     "password-reset": {
       "change-password": {
-        "error": "A alteração da sua senha falhou. Talvez o código de segurança não estava correto?",
+        "error": "A alteração da sua senha falhou. Talvez o código de segurança não estivesse correto?",
         "help": "Em caso de problemas, sinta-se à vontade para pedir ajuda, enviando um e-mail para:",
         "success": "A alteração da sua senha foi bem-sucedida!"
       },
@@ -742,13 +742,13 @@
   "delete": {
     "cancel": "Cancelar",
     "comment": {
-      "message": "Você realmente deseja excluir o comentário \"<b>{name}</b>\"?",
+      "message": "Você realmente deseja excluir o comentário “<b>{name}</b>”?",
       "success": "Comentário excluído com sucesso!",
       "title": "Excluir Comentário",
       "type": "Comentário"
     },
     "contribution": {
-      "message": "Você realmente deseja excluir a publicação \"<b>{name}</b>\"?",
+      "message": "Você realmente deseja excluir a publicação “<b>{name}</b>”?",
       "success": "Publicação  excluída com êxito!",
       "title": "Excluir publicação",
       "type": "Contribuição"
@@ -758,19 +758,19 @@
   "disable": {
     "cancel": "Cancelar",
     "comment": {
-      "message": "Você realmente deseja desativar o comentário de \" <b> {name} </b> \"?",
+      "message": "Você realmente deseja desativar o comentário de “<b>{name}</b>”?",
       "title": "Desativar comentário",
       "type": "Comentário"
     },
     "contribution": {
-      "message": "Você realmente deseja desativar a contribuição \" <b> {name} </b> \"?",
+      "message": "Você realmente deseja desativar a contribuição “<b>{name}</b>”?",
       "title": "Desativar Contribuição",
       "type": "Contribuição"
     },
     "submit": "Desativar",
     "success": "Desativado com sucesso!",
     "user": {
-      "message": "Você realmente deseja desativar o usuário \" <b> {name} </b> \"?",
+      "message": "Você realmente deseja desativar o usuário “<b>{name}</b>”?",
       "title": "Desativar usuário",
       "type": "Usuário"
     }
@@ -916,12 +916,12 @@
     "categoriesTitle": "Tópicos do grupo",
     "changeMemberRole": "O papel foi alterado para “{role}”!",
     "contentMenu": {
-      "hideFromProfile": "Hide from my profile",
+      "hideFromProfile": "Ocultar do meu perfil",
       "inviteLinks": "Links de convite",
       "menuButton": "Menu do grupo",
       "muteGroup": "Silenciar grupo",
       "profileVisibilityUpdated": "Visibilidade atualizada",
-      "showOnProfile": "Show on my profile",
+      "showOnProfile": "Mostrar no meu perfil",
       "unmuteGroup": "Reativar grupo",
       "visitGroupPage": "Mostrar grupo"
     },
@@ -967,8 +967,8 @@
     "leaveModal": {
       "confirmButton": "Sair",
       "message": "Sair de um grupo pode ser irreversível!<br>Sair do grupo <b>“{name}”</b>!",
-      "messageAdmin": "<b>Administras</b> este grupo. Se saíres, abdicas disso.<br>Sair mesmo do grupo <b>«{name}»</b>?",
-      "messageOwner": "És <b>proprietário</b> deste grupo. Se saíres, pode ficar sem nenhum — e então só uma administração da rede poderá torná-lo funcional novamente.<br>Sair mesmo do grupo <b>«{name}»</b>?",
+      "messageAdmin": "<b>Administras</b> este grupo. Se saíres, abdicas disso.<br>Sair mesmo do grupo <b>“{name}”</b>?",
+      "messageOwner": "És <b>proprietário</b> deste grupo. Se saíres, pode ficar sem nenhum — e então só uma administração da rede poderá torná-lo funcional novamente.<br>Sair mesmo do grupo <b>“{name}”</b>?",
       "title": "Você realmente quer sair do grupo?"
     },
     "memberOutranked": "Não podes alterar a função desta pessoa: tem pelo menos tanto quanto tu.",
@@ -998,7 +998,7 @@
     "radius": "Raio",
     "removeMember": "Remover membro",
     "removeMemberButton": "Remover",
-    "removeMemberConfirmText": "Remover o usuário \"{name}\" do grupo?",
+    "removeMemberConfirmText": "Remover o usuário “{name}” do grupo?",
     "removeMemberTitle": "Remover membro",
     "rights": {
       "addRole": "Adicionar uma função",
@@ -1006,9 +1006,9 @@
       "applyTemplate": "Aplicar um modelo — substitui todas as funções deste grupo pelas do modelo.",
       "blockedByFeature": "Esta funcionalidade está desativada nesta rede ({feature}).",
       "blockedByNetwork": "Limitado em toda a rede: é necessária a permissão {permission}.",
-      "confirmApplyTemplate": "Aplicar o modelo «{template}» a este grupo? Todas as funções são substituídas pelas do modelo.",
-      "confirmApplyTemplateDiscards": "Aplicar o modelo «{template}» a este grupo? Todas as funções são substituídas pelas do modelo e as alterações não guardadas perdem-se.",
-      "confirmDelete": "Eliminar a função «{role}»? Os seus membros passarão a «{target}».",
+      "confirmApplyTemplate": "Aplicar o modelo “{template}” a este grupo? Todas as funções são substituídas pelas do modelo.",
+      "confirmApplyTemplateDiscards": "Aplicar o modelo “{template}” a este grupo? Todas as funções são substituídas pelas do modelo e as alterações não guardadas perdem-se.",
+      "confirmDelete": "Eliminar a função “{role}”? Os seus membros passarão a “{target}”.",
       "confirmReset": "Restaurar todas as funções deste grupo para os valores predefinidos? As funções que criaram são removidas e os seus membros passam a membros comuns.",
       "deleteRole": "Eliminar função",
       "description": "Decidam quem pode fazer o quê neste grupo — de quem está fora até aos administradores.",
@@ -1160,7 +1160,7 @@
     "invite-link-message-group": "Você foi convidado a entrar no grupo “{groupName}” em {network}.",
     "invite-link-message-hidden-group": "Você foi convidado a entrar em um grupo oculto em {network}.",
     "invite-link-message-personal": "Você foi convidado a entrar em {network}.",
-    "invited-count": "Já convidaste {count} pessoas.",
+    "invited-count": "Você já convidou {count} pessoas.",
     "limit-reached": "Você atingiu o número máximo de links de convite.",
     "members-only": "apenas para quem já tem uma conta",
     "my-invite-links": "Meus links de convite",
@@ -1186,7 +1186,7 @@
     "failure": "Endereço de e-mail ou senha incorretos.",
     "forgotPassword": "Esqueceu a sua senha?",
     "hello": "Olá",
-    "loggingOut": "A terminar sessão …",
+    "loggingOut": "Saindo …",
     "login": "Entrar",
     "logout": "Sair",
     "moreInfo": "O que é a {APPLICATION_NAME}?",
@@ -1248,32 +1248,32 @@
         "cancel": "Cancelar",
         "Comment": {
           "disable": {
-            "message": "Você realmente quer deixar o comentário \"<b>{name}</b>\" <b>desativado</b>?",
+            "message": "Você realmente quer deixar o comentário “<b>{name}</b>” <b>desativado</b>?",
             "title": "Desativar comentário definitivamente"
           },
           "enable": {
-            "message": "Você realmente quer deixar o comentário \"<b>{name}</b>\" <b>ativado</b>?",
+            "message": "Você realmente quer deixar o comentário “<b>{name}</b>” <b>ativado</b>?",
             "title": "Ativar comentário definitivamente"
           }
         },
         "Post": {
           "disable": {
-            "message": "Você realmente quer deixar a publicação \"<b>{name}</b>\" <b>desativada</b>?",
+            "message": "Você realmente quer deixar a publicação “<b>{name}</b>” <b>desativada</b>?",
             "title": "Desativar publicação definitivamente"
           },
           "enable": {
-            "message": "Você realmente quer deixar a publicação \"<b>{name}</b>\" <b>ativada</b>?",
+            "message": "Você realmente quer deixar a publicação “<b>{name}</b>” <b>ativada</b>?",
             "title": "Ativar publicação definitivamente"
           }
         },
         "submit": "Confirmar decisão",
         "User": {
           "disable": {
-            "message": "Você realmente quer deixar o usuário \"<b>{name}</b>\" <b>desativado</b>?",
+            "message": "Você realmente quer deixar o usuário “<b>{name}</b>” <b>desativado</b>?",
             "title": "Desativar usuário definitivamente"
           },
           "enable": {
-            "message": "Você realmente quer deixar o usuário \"<b>{name}</b>\" <b>ativado</b>?",
+            "message": "Você realmente quer deixar o usuário “<b>{name}</b>” <b>ativado</b>?",
             "title": "Ativar usuário definitivamente"
           }
         }
@@ -1345,11 +1345,11 @@
     "observed": "{count} observadores"
   },
   "pagination": {
-    "next": "Seguinte",
+    "next": "Próxima",
     "previous": "Anterior"
   },
   "permissions": {
-    "deniedHint": "Não tens permissão para isto.",
+    "deniedHint": "Você não tem permissão para isto.",
     "sections": {
       "account": "Conta",
       "administration": "Administração",
@@ -1365,10 +1365,10 @@
   "post": {
     "article": "Artigo",
     "comment": {
-      "joinGroup": "Entrou no grupo „<b>{name}</b>“",
-      "noPermission": "Os comentários não estão ativados para a tua função.",
+      "joinGroup": "Entrou no grupo “<b>{name}</b>”",
+      "noPermission": "Os comentários não estão ativados para a sua função.",
       "reply": "Responder",
-      "submit": "Commentar",
+      "submit": "Comentar",
       "submitted": "Comentário Enviado",
       "updated": "Alterações salvas!"
     },
@@ -1403,7 +1403,7 @@
       "pushedSuccessfully": "Publicação subida ao topo com sucesso!",
       "removedFromGroupSuccessfully": "Publicação removida do grupo",
       "removeFromGroup": "Remover do grupo",
-      "removeFromGroupConfirm": "Remover esta publicação do grupo «{group}»? A publicação continua a ser do seu autor, mas perde o seu lugar no grupo.",
+      "removeFromGroupConfirm": "Remover esta publicação do grupo “{group}”? A publicação continua a ser do seu autor, mas perde o seu lugar no grupo.",
       "unobserve": "Parar de observar publicação",
       "unobservedSuccessfully": "Você não está mais observando esta publicação!",
       "unpin": "Desfixar publicação (Rede)",
@@ -1451,15 +1451,15 @@
     "followers": "Seguidores",
     "following": "Seguindo",
     "groups": {
-      "closed": "Closed groups",
-      "hidden": "Secret groups",
-      "hiddenFromOthers": "hidden from others",
-      "nobody": "no groups",
+      "closed": "Grupos fechados",
+      "hidden": "Grupos secretos",
+      "hiddenFromOthers": "oculto para outros",
+      "nobody": "nenhum grupo",
       "noFilterResults": "Nenhum grupo encontrado para este filtro.",
       "other": "Grupos sem mim",
-      "public": "Public groups",
+      "public": "Grupos públicos",
       "shared": "Grupos compartilhados",
-      "title": "Groups of {name}"
+      "title": "Grupos de {name}"
     },
     "invites": {
       "description": "Digite o endereço de e-mail para convidar.",
@@ -1490,13 +1490,13 @@
     "cancel": "Cancelar",
     "comment": {
       "error": "Você já denunciou este comentário!",
-      "message": "Você realmente quer liberar o comentário de \"<b>{name}</b>\"?",
+      "message": "Você realmente quer liberar o comentário de “<b>{name}</b>”?",
       "title": "Liberar Comentário ",
       "type": "Comentário"
     },
     "contribution": {
       "error": "Você já denunciou esta contribuição!",
-      "message": "Você realmente quer liberar a contribuição \"<b>{name}</b>\"?",
+      "message": "Você realmente quer liberar a contribuição “<b>{name}</b>”?",
       "title": "Liberar contribuição ",
       "type": "Contribuição"
     },
@@ -1504,7 +1504,7 @@
     "success": "Liberado com sucesso!",
     "user": {
       "error": "Você já denunciou este usuário!",
-      "message": "Você realmente quer liberar o usuário \"<b>{name}</b>\"?",
+      "message": "Você realmente quer liberar o usuário “<b>{name}</b>”?",
       "title": "Liberar usuário",
       "type": "Usuário"
     }
@@ -1513,13 +1513,13 @@
     "cancel": "Cancelar",
     "comment": {
       "error": "Você já denunciou o comentário!",
-      "message": "Você realmente deseja denunciar o comentário de \"<b>{name}</b>\"?",
+      "message": "Você realmente deseja denunciar o comentário de “<b>{name}</b>”?",
       "title": "Denunciar Comentário",
       "type": "Comentário"
     },
     "contribution": {
       "error": "Você já denunciou a contribuição!",
-      "message": "Você realmente deseja denunciar a contribuição \" <b> {name} </b> \"?",
+      "message": "Você realmente deseja denunciar a contribuição “<b>{name}</b>”?",
       "title": "Denunciar Contribuição",
       "type": "Contribuição"
     },
@@ -1531,7 +1531,7 @@
           "advert_products_services_commercial": "Publicidade de produtos e serviços com intenção comercial.",
           "criminal_behavior_violation_german_law": "Comportamento criminoso ou violação da lei alemã.",
           "discrimination_etc": "Publicações, comentários, declarações ou insultos discriminatórios.",
-          "doxing": "A divulgação de informações pessoais de terceiros sem seu consentimento ou ameaça de fazê-lo (\"doxing\").",
+          "doxing": "A divulgação de informações pessoais de terceiros sem seu consentimento ou ameaça de fazê-lo (“doxing”).",
           "glorific_trivia_of_cruel_inhuman_acts": "Glorificação ou banalização de atos cruéis ou desumanos de violência.",
           "intentional_intimidation_stalking_persecution": "Intimidação intencional, perseguição ou assédio.",
           "other": "Outro …",
@@ -1548,7 +1548,7 @@
     "success": "Obrigado por denunciar!",
     "user": {
       "error": "Você já denunciou o usuário!",
-      "message": "Você realmente deseja denunciar o usuário \" <b> {name} </b> \"?",
+      "message": "Você realmente deseja denunciar o usuário “<b>{name}</b>”?",
       "title": "Denunciar usuário",
       "type": "Usuário"
     }
@@ -1563,7 +1563,7 @@
       "User": "Usuário ::: Usuários"
     },
     "hint": "O que você está buscando? Use !... para postagens, @... para usuários, #... para hashtags.",
-    "no-results": "Nenhum resultado encontrado para \"{search}\". Tente um termo de busca diferente!",
+    "no-results": "Nenhum resultado encontrado para “{search}”. Tente um termo de busca diferente!",
     "page": "Página",
     "placeholder": "Buscar",
     "results": "resultado encontrado ::: resultados encontrados",
@@ -1575,33 +1575,33 @@
         "expiry-days": "{days} dias",
         "expiry-label": "Validade",
         "expiry-never": "Sem data de expiração",
-        "limit-reached": "Atingiste o máximo de {max} API Keys ativas. Revoga uma key existente para criar uma nova.",
+        "limit-reached": "Você atingiu o máximo de {max} API Keys ativas. Revogue uma key existente para criar uma nova.",
         "name-label": "Nome",
-        "no-permission": "A criação de chaves API não está ativada para a tua função.",
+        "no-permission": "A criação de chaves API não está ativada para a sua função.",
         "submit": "Criar key",
         "success": "API Key criada com sucesso",
-        "title": "Criar novo API Key"
+        "title": "Criar nova API Key"
       },
       "list": {
         "actions": "Ações",
         "created-at": "Criada em",
-        "empty": "Ainda não tens API Keys.",
+        "empty": "Você ainda não tem API Keys.",
         "expired": "expirada",
         "expires": "Expira",
-        "last-used": "Última utilização",
+        "last-used": "Último uso",
         "name": "Nome",
         "never": "nunca",
         "never-expires": "nunca",
         "prefix": "Key",
         "revoke": "Revogar key",
         "revoked": "revogada",
-        "title": "As minhas API Keys"
+        "title": "Minhas API Keys"
       },
       "name": "API Keys",
       "revoke": {
         "confirm": "Revogar",
-        "message": "Tens a certeza de que queres revogar o API Key \"{name}\"? Esta ação não pode ser desfeita.",
-        "success": "API Key \"{name}\" foi revogada",
+        "message": "Você tem certeza de que quer revogar a API Key “{name}”? Esta ação não pode ser desfeita.",
+        "success": "API Key “{name}” foi revogada",
         "title": "Revogar API Key"
       },
       "revoked-list": {
@@ -1612,24 +1612,24 @@
         "copied": "API Key copiada para a área de transferência",
         "copy": "Copiar",
         "copy-failed": "Falha ao copiar para a área de transferência",
-        "title": "O teu novo API Key (visível apenas uma vez!)",
-        "warning": "Guarda esta key agora. Não a poderás ver novamente depois de fechar esta página."
+        "title": "Sua nova API Key (visível apenas uma vez!)",
+        "warning": "Guarde esta key agora. Você não poderá vê-la novamente depois de fechar esta página."
       }
     },
     "badges": {
-      "click-to-select": "Clique num espaço vazio para adicionar uma medalha.",
-      "click-to-use": "Clique numa medalha para a colocar no espaço selecionado.",
-      "description": "Aqui pode escolher como exibir as suas medalhas conquistadas no seu perfil.",
+      "click-to-select": "Clique em um espaço vazio para adicionar uma medalha.",
+      "click-to-use": "Clique em uma medalha para colocá-la no espaço selecionado.",
+      "description": "Aqui você pode escolher como exibir suas medalhas conquistadas no seu perfil.",
       "drag-instruction": "Arraste e solte as medalhas para reorganizá-las.",
       "drop-to-remove": "Solte aqui para remover a medalha.",
-      "error-update": "Ocorreu um erro ao atualizar as suas medalhas.",
+      "error-update": "Ocorreu um erro ao atualizar suas medalhas.",
       "name": "Medalhas",
-      "no-badges-available": "De momento não tem medalhas disponíveis para adicionar.",
+      "no-badges-available": "No momento, você não tem medalhas disponíveis para adicionar.",
       "remove": "Remover medalha",
       "reserve-title": "Medalhas disponíveis",
-      "success-update": "As suas medalhas foram atualizadas com sucesso.",
+      "success-update": "Suas medalhas foram atualizadas com sucesso.",
       "swap-partial-error": "A troca de medalhas não pôde ser concluída. Tente novamente.",
-      "verification": "Esta é a sua medalha de verificação e não pode ser alterada."
+      "verification": "Esta é sua medalha de verificação e não pode ser alterada."
     },
     "blocked-users": {
       "block": "Bloquear usuário",
@@ -1677,8 +1677,8 @@
       "contributionsCount": "Deletar minhas {count} publicações",
       "infoAdmin": "Todas as contribuições e comentários do usuário serão excluídos adicionalmente!",
       "name": "Deletar dados",
-      "pleaseConfirm": "Ação destrutiva! Digitar “{confirm}” para confirmar.",
-      "success": "Conta eliminada com sucesso!"
+      "pleaseConfirm": "Ação destrutiva! Digite “{confirm}” para confirmar.",
+      "success": "Conta excluída com sucesso!"
     },
     "download": {
       "description": "Clique no botão acima para baixar o conteúdo de suas publicações e comentários. Para baixar as imagens de suas publicações, clique no link correspondente abaixo.",
@@ -1724,9 +1724,9 @@
     },
     "invites": {
       "expired-codes": "{count} códigos desativados",
-      "invited-users": "Utilizadores convidados",
+      "invited-users": "Usuários convidados",
       "name": "Convites",
-      "nobody-invited": "Ainda ninguém convidado."
+      "nobody-invited": "Ninguém foi convidado ainda."
     },
     "languages": {
       "name": "Idiomas"
@@ -1757,17 +1757,17 @@
       "commentOnObservedPost": "Comentários sobre as mensagens observadas",
       "followingUsers": "Um usuário que sigo publicou uma nova publicação.",
       "group": "Grupos",
-      "groupMemberJoined": "Member joined a group I own",
-      "groupMemberLeft": "Membro saiu de um grupo de que sou proprietário",
+      "groupMemberJoined": "Um membro entrou em um grupo do qual sou proprietário",
+      "groupMemberLeft": "Membro saiu de um grupo do qual sou proprietário",
       "groupMemberRemoved": "Fui removido de um grupo",
-      "groupMemberRoleChanged": "O meu papel num grupo foi alterado",
+      "groupMemberRoleChanged": "Meu papel em um grupo foi alterado",
       "mention": "Fui mencionado",
-      "name": "Notificações por correio eletrónico",
+      "name": "Notificações por e-mail",
       "post": "Posts e comentários",
-      "postByFollowedUser": "Publicações de utilizadores que sigo",
-      "postInGroup": "Postar num grupo de que sou membro",
-      "send-email-notifications": "Enviar notificações por correio eletrónico",
-      "success-update": "Definições de notificações guardadas!",
+      "postByFollowedUser": "Publicações de usuários que sigo",
+      "postInGroup": "Publicação em um grupo do qual sou membro",
+      "send-email-notifications": "Enviar notificações por e-mail",
+      "success-update": "Configurações de notificações salvas!",
       "uncheckAll": "Desmarcar tudo"
     },
     "organizations": {
@@ -1776,11 +1776,11 @@
     "privacy": {
       "make-shouts-public": "Compartilhar artigos que recomendei no meu perfil público",
       "name": "Privacidade",
-      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-closed-groups-on-profile": "Mostrar grupos fechados no meu perfil",
       "show-groups-on-profile-hint": "A visibilidade de cada grupo individual também pode ser definida através do menu de três pontos do grupo ou diretamente na lista de grupos do seu perfil.",
-      "show-groups-on-profile-section": "Show groups on profile",
+      "show-groups-on-profile-section": "Mostrar grupos no perfil",
       "show-hidden-groups-on-profile": "Mostrar grupos secretos no meu perfil",
-      "show-public-groups-on-profile": "Show public groups on my profile",
+      "show-public-groups-on-profile": "Mostrar grupos públicos no meu perfil",
       "success-update": "Configurações de privacidade salvas!"
     },
     "security": {
@@ -1840,10 +1840,10 @@
     "error-occurred": "Ocorreu um erro.",
     "faq": "FAQ",
     "germany": "Alemanha",
-    "imprint": "Impressão",
+    "imprint": "Informações legais",
     "made": "Feito com ❤️",
     "navigation": "Navegação",
-    "register": "número de registo",
+    "register": "número de registro",
     "support": "Suporte",
     "termsAndConditions": "Termos e condições",
     "thanks": "Obrigado!"
@@ -1860,38 +1860,38 @@
     }
   },
   "videoCall": {
-    "activeSpeakers": "Oradores ativos",
+    "activeSpeakers": "Falantes ativos",
     "closeChat": "Fechar chat",
-    "connecting": "A ligar…",
+    "connecting": "Conectando…",
     "dialogLabel": "Videochamada de grupo",
-    "disableCamera": "Desligar a câmara",
-    "enableCamera": "Ligar a câmara",
+    "disableCamera": "Desligar a câmera",
+    "enableCamera": "Ligar a câmera",
     "errorBackToPrejoin": "Alterar configurações",
     "errorRetry": "Tentar novamente",
     "errors": {
       "camera": {
-        "busy": "A câmara está a ser usada por outra aplicação.",
-        "denied": "Acesso à câmara negado. Ative a permissão nas definições do navegador (ícone de cadeado na barra de endereço).",
-        "generic": "Não foi possível ligar a câmara.",
-        "noDevice": "Nenhuma câmara encontrada."
+        "busy": "A câmera está sendo usada por outro aplicativo.",
+        "denied": "Acesso à câmera negado. Ative a permissão nas configurações do navegador (ícone de cadeado na barra de endereço).",
+        "generic": "Não foi possível ligar a câmera.",
+        "noDevice": "Nenhuma câmera encontrada."
       },
       "mic": {
-        "busy": "O microfone está a ser usado por outra aplicação.",
-        "denied": "Acesso ao microfone negado. Ative a permissão nas definições do navegador (ícone de cadeado na barra de endereço).",
+        "busy": "O microfone está sendo usado por outro aplicativo.",
+        "denied": "Acesso ao microfone negado. Ative a permissão nas configurações do navegador (ícone de cadeado na barra de endereço).",
         "generic": "Não foi possível ligar o microfone.",
         "noDevice": "Nenhum microfone encontrado."
       },
       "screen": {
-        "busy": "A partilha de ecrã não está disponível agora.",
-        "denied": "A partilha de ecrã foi recusada.",
-        "generic": "Não foi possível partilhar o ecrã.",
-        "noDevice": "Nenhum ecrã disponível para partilhar."
+        "busy": "O compartilhamento de tela não está disponível agora.",
+        "denied": "O compartilhamento de tela foi recusado.",
+        "generic": "Não foi possível compartilhar a tela.",
+        "noDevice": "Nenhuma tela disponível para compartilhar."
       }
     },
-    "gotoGroup": "Ir para o grupo «{name}»",
+    "gotoGroup": "Ir para o grupo “{name}”",
     "groupVideoCallButton": {
       "label": "Vídeo de grupo",
-      "tooltip": "Videochamada no grupo «{name}»"
+      "tooltip": "Videochamada no grupo “{name}”"
     },
     "leave": "Sair da chamada",
     "maximize": "Maximizar",
@@ -1902,27 +1902,27 @@
     "openChat": "Abrir chat",
     "participants": "Participantes",
     "prejoin": {
-      "camera": "Câmara",
-      "cameraDisabled": "A câmara está desativada.",
-      "cameraOff": "Câmara: Desligada",
-      "cameraOn": "Câmara: Ligada",
+      "camera": "Câmera",
+      "cameraDisabled": "A câmera está desativada.",
+      "cameraOff": "Câmera: Desligada",
+      "cameraOn": "Câmera: Ligada",
       "cancel": "Cancelar",
-      "description": "Estás prestes a juntar-te à chamada de vídeo deste grupo. Verifica a câmara, o microfone e o altifalante e depois entra na chamada.",
-      "errorBusy": "O dispositivo está a ser usado por outra aplicação.",
-      "errorDenied": "Acesso negado. Permita o acesso à câmara e ao microfone nas definições do navegador.",
+      "description": "Você está prestes a entrar na chamada de vídeo deste grupo. Verifique a câmera, o microfone e o alto-falante e depois entre na chamada.",
+      "errorBusy": "O dispositivo está sendo usado por outro aplicativo.",
+      "errorDenied": "Acesso negado. Permita o acesso à câmera e ao microfone nas configurações do navegador.",
       "errorNoDevice": "Nenhum dispositivo correspondente encontrado.",
-      "errorUnknown": "Não foi possível aceder aos seus dispositivos.",
-      "headerTitle": "{name} – Juntar-se à chamada de vídeo",
-      "hintBoth": "Estás a entrar sem câmara nem microfone — vais só ver e ouvir os outros.",
-      "hintCamera": "Estás a entrar sem câmara — os outros ouvem-te mas não te veem.",
-      "hintMic": "Estás a entrar sem microfone — os outros veem-te mas não te ouvem.",
+      "errorUnknown": "Não foi possível acessar seus dispositivos.",
+      "headerTitle": "{name} – Entrar na chamada de vídeo",
+      "hintBoth": "Você está entrando sem câmera nem microfone — só vai ver e ouvir os outros.",
+      "hintCamera": "Você está entrando sem câmera — os outros ouvem você, mas não veem você.",
+      "hintMic": "Você está entrando sem microfone — os outros veem você, mas não ouvem você.",
       "join": "Entrar na chamada",
       "micLevel": "Nível do microfone",
       "micOff": "Microfone: Desligado",
       "micOn": "Microfone: Ligado",
       "microphone": "Microfone",
-      "noCamera": "Pré-visualização da câmara não disponível.",
-      "noDevices": "Nenhum dispositivo detetado",
+      "noCamera": "Pré-visualização da câmera não disponível.",
+      "noDevices": "Nenhum dispositivo detectado",
       "permission": {
         "denied": "Bloqueado",
         "granted": "OK",
@@ -1930,24 +1930,24 @@
         "unsupported": "Não suportado"
       },
       "retry": "Tentar de novo",
-      "speaker": "Coluna",
+      "speaker": "Alto-falante",
       "speakerUnsupported": "A seleção do dispositivo de saída não é suportada neste navegador.",
-      "testingSound": "A reproduzir…",
+      "testingSound": "Reproduzindo…",
       "testSound": "Testar som",
-      "title": "Configura os teus dispositivos",
-      "unnamedCamera": "Câmara",
+      "title": "Configure seus dispositivos",
+      "unnamedCamera": "Câmera",
       "unnamedMic": "Microfone",
-      "unnamedSpeaker": "Coluna",
-      "unsupportedBrowser": "O teu navegador não suporta áudio/vídeo."
+      "unnamedSpeaker": "Alto-falante",
+      "unsupportedBrowser": "Seu navegador não suporta áudio/vídeo."
     },
-    "screenShare": "Ecrã",
-    "screenShareEnded": "Partilha de ecrã terminada",
+    "screenShare": "Tela",
+    "screenShareEnded": "Compartilhamento de tela encerrado",
     "spotlightExit": "Sair do destaque",
-    "startScreenShare": "Partilhar ecrã",
-    "stopScreenShare": "Parar partilha",
+    "startScreenShare": "Compartilhar tela",
+    "stopScreenShare": "Parar compartilhamento",
     "title": "Videochamada de grupo",
     "unmuteMic": "Reativar microfone",
-    "you": "tu",
-    "youAreSharingScreen": "Estás a partilhar o teu ecrã"
+    "you": "você",
+    "youAreSharingScreen": "Você está compartilhando sua tela"
   }
 }

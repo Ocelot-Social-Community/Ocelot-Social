@@ -37,7 +37,7 @@
       },
       "revoke": {
         "confirm": "Revoko",
-        "message": "A je i sigurt që dëshiron të revokosh API Key \"{name}\" të {user}?",
+        "message": "A je i sigurt që dëshiron të revokosh API Key „{name}“ të {user}?",
         "success": "API Key u revokua me sukses",
         "title": "Revoko API Key"
       },
@@ -225,7 +225,7 @@
       "apply": "Zbato në grupet e paprekura",
       "confirmApply": "Të zbatohen shabllonet në {count} grupe që nuk i kanë përshtatur kurrë rolet e tyre? Grupet e përshtatura nuk preken.",
       "description": "Këtu redakton modelet nga të cilat krijohen grupet e reja — asnjë grup ekzistues nuk ndryshon prej kësaj. Vetëm butoni më poshtë e zbaton një ndryshim te grupet, dhe vetëm te ato që nuk i kanë ndryshuar kurrë të drejtat e veta.",
-      "editingTemplate": "Po redaktoni shabllonin “{template}”",
+      "editingTemplate": "Po redaktoni shabllonin „{template}“",
       "labelField": "Emri",
       "name": "Modelet e grupeve",
       "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet dhe nuk mund të redaktohet.",
@@ -394,7 +394,7 @@
       "saveSuccess": "Roli u ruajt.",
       "selfLockout": {
         "confirm": "Hiqe gjithsesi",
-        "message": "Po hiqni lejen «menaxho rolet» nga <strong>{role}</strong> — roli juaj. Pas kësaj nuk do të mund të menaxhoni më rolet; vetëm një pronar mund ta rivendosë. Të vazhdohet?",
+        "message": "Po hiqni lejen „menaxho rolet“ nga <strong>{role}</strong> — roli juaj. Pas kësaj nuk do të mund të menaxhoni më rolet; vetëm një pronar mund ta rivendosë. Të vazhdohet?",
         "title": "Të hiqet menaxhimi i rolit tuaj?"
       },
       "title": "Rolet dhe të drejtat"
@@ -453,7 +453,7 @@
     "expandChat": "Zgjero bisedën",
     "groupChatButton": {
       "label": "Bisedë grupi",
-      "tooltip": "Bisedo me grupin \"{name}\""
+      "tooltip": "Bisedo me grupin „{name}“"
     },
     "isOnline": "është online",
     "isTyping": "po shkruan...",
@@ -476,7 +476,7 @@
     "typeMessage": "Shkruaj mesazh",
     "userProfileButton": {
       "label": "Biseda",
-      "tooltip": "Bisedo me “{name}”"
+      "tooltip": "Bisedo me „{name}“"
     }
   },
   "client-only": {
@@ -690,7 +690,7 @@
     "comment": {
       "commenting-disabled": {
         "blocked-author": {
-          "button-label": "Vizito “{name}”",
+          "button-label": "Vizito „{name}“",
           "call-to-action": "Nëse dëshiron të lësh një koment, zhblloko ata në profilin e tyre.",
           "reason": "Ti po bllokon autorin e postimit."
         },
@@ -737,18 +737,18 @@
       "supportedFormats": "Fut një foto në formatin JPG, PNG ose GIF"
     },
     "title": "Titulli",
-    "visibleOnlyForMembersOfGroup": "Ky postim do të jetë i dukshëm vetëm për anëtarët e grupit “<b>{name}</b>”."
+    "visibleOnlyForMembersOfGroup": "Ky postim do të jetë i dukshëm vetëm për anëtarët e grupit „<b>{name}</b>“."
   },
   "delete": {
     "cancel": "Anulo",
     "comment": {
-      "message": "A dëshiron vërtet të fshish komentin “<b>{name}</b>”?",
+      "message": "A dëshiron vërtet të fshish komentin „<b>{name}</b>“?",
       "success": "Komenti u fshi me sukses!",
       "title": "Fshi komentin",
       "type": "Koment"
     },
     "contribution": {
-      "message": "A dëshiron vërtet të fshish postimin “<b>{name}</b>”?",
+      "message": "A dëshiron vërtet të fshish postimin „<b>{name}</b>“?",
       "success": "Postimi u fshi me sukses!",
       "title": "Fshi postimin",
       "type": "Kontribut"
@@ -758,19 +758,19 @@
   "disable": {
     "cancel": "Anulo",
     "comment": {
-      "message": "A dëshiron vërtet të çaktivizosh komentin nga “<b>{name}</b>”?",
+      "message": "A dëshiron vërtet të çaktivizosh komentin nga „<b>{name}</b>“?",
       "title": "Çaktivizo komentin",
       "type": "Koment"
     },
     "contribution": {
-      "message": "A dëshiron vërtet të çaktivizosh kontributin “<b>{name}</b>”?",
+      "message": "A dëshiron vërtet të çaktivizosh kontributin „<b>{name}</b>“?",
       "title": "Çaktivizo kontributin",
       "type": "Kontribut"
     },
     "submit": "Çaktivizo",
     "success": "U çaktivizua me sukses!",
     "user": {
-      "message": "A dëshiron vërtet të çaktivizosh përdoruesin “<b>{name}</b>”?",
+      "message": "A dëshiron vërtet të çaktivizosh përdoruesin „<b>{name}</b>“?",
       "title": "Çaktivizo përdoruesin",
       "type": "Përdorues"
     }
@@ -890,7 +890,7 @@
     "actionRadius": "Rrezja e veprimit të grupit",
     "addMember": "Shto anëtar",
     "addMemberToGroup": "Shto në grup",
-    "addMemberToGroupSuccess": "“{name}” u shtua në grup me rolin “{role}”!",
+    "addMemberToGroupSuccess": "„{name}“ u shtua në grup me rolin „{role}“!",
     "addUser": "Shto përdorues",
     "addUserNoOptions": "Nuk u gjetën përdorues!",
     "addUserPlaceholder": "Emri i përdoruesit",
@@ -914,14 +914,14 @@
     "allGroups": "Të gjitha grupet",
     "categories": "Temë ::: Tema",
     "categoriesTitle": "Temat e grupit",
-    "changeMemberRole": "Roli u ndryshua në “{role}”!",
+    "changeMemberRole": "Roli u ndryshua në „{role}“!",
     "contentMenu": {
-      "hideFromProfile": "Hide from my profile",
+      "hideFromProfile": "Fshihe nga profili im",
       "inviteLinks": "Lidhje ftese",
       "menuButton": "Menuja e grupit",
       "muteGroup": "Hesht grupin",
       "profileVisibilityUpdated": "Dukshmëria u përditësua",
-      "showOnProfile": "Show on my profile",
+      "showOnProfile": "Shfaqe në profilin tim",
       "unmuteGroup": "Çhesht grupin",
       "visitGroupPage": "Shfaq grupin"
     },
@@ -945,7 +945,7 @@
       "start": "Përdor qasjen si administrator"
     },
     "errors": {
-      "userAlreadyMember": "Përdoruesi “{name}” është tashmë anëtar!"
+      "userAlreadyMember": "Përdoruesi „{name}“ është tashmë anëtar!"
     },
     "follow": "Ndiq",
     "foundation": "Themelimi",
@@ -966,13 +966,13 @@
     "labelSlug": "Emri unik i grupit",
     "leaveModal": {
       "confirmButton": "Largohu",
-      "message": "Largimi nga një grup mund të jetë i pakthyeshëm!<br>Largohu nga grupi <b>“{name}”</b>!",
-      "messageAdmin": "Ti e <b>administron</b> këtë grup. Nëse largohesh, heq dorë nga kjo.<br>Vërtet ta lësh grupin <b>“{name}”</b>?",
-      "messageOwner": "Je <b>pronar</b> i këtij grupi. Nëse largohesh, ai mund të mbetet pa pronar — dhe atëherë vetëm një administrim rrjeti mund ta bëjë sërish funksional.<br>Vërtet ta lësh grupin <b>“{name}”</b>?",
+      "message": "Largimi nga një grup mund të jetë i pakthyeshëm!<br>Largohu nga grupi <b>„{name}“</b>!",
+      "messageAdmin": "Ti e <b>administron</b> këtë grup. Nëse largohesh, heq dorë nga kjo.<br>Vërtet ta lësh grupin <b>„{name}“</b>?",
+      "messageOwner": "Je <b>pronar</b> i këtij grupi. Nëse largohesh, ai mund të mbetet pa pronar — dhe atëherë vetëm një administrim rrjeti mund ta bëjë sërish funksional.<br>Vërtet ta lësh grupin <b>„{name}“</b>?",
       "title": "A dëshiron vërtet të largohesh nga grupi?"
     },
     "memberOutranked": "Nuk mund ta ndryshosh rolin e kësaj personi — ka të paktën aq sa ti.",
-    "memberRemoved": "Përdoruesi “{name}” u hoq nga grupi!",
+    "memberRemoved": "Përdoruesi „{name}“ u hoq nga grupi!",
     "members": "Anëtarët",
     "membersAdministrationList": {
       "avatar": "Avatari",
@@ -989,7 +989,7 @@
     "modal": {
       "cancel": "Anulo",
       "confirm": "Konfirmo",
-      "confirmAddGroupMemberText": "Shto përdoruesin “{name}” në grup?",
+      "confirmAddGroupMemberText": "Shto përdoruesin „{name}“ në grup?",
       "confirmAddGroupMemberTitle": "Konfirmo"
     },
     "muted": "Grupi u hesht",
@@ -998,7 +998,7 @@
     "radius": "Rrezja",
     "removeMember": "Hiq anëtarin",
     "removeMemberButton": "Hiq",
-    "removeMemberConfirmText": "Hiq përdoruesin \"{name}\" nga grupi?",
+    "removeMemberConfirmText": "Hiq përdoruesin „{name}“ nga grupi?",
     "removeMemberTitle": "Hiq anëtarin",
     "rights": {
       "addRole": "Shto një rol",
@@ -1006,9 +1006,9 @@
       "applyTemplate": "Zbato një model — zëvendëson të gjitha rolet e këtij grupi me ato të modelit.",
       "blockedByFeature": "Kjo funksion është e çaktivizuar në rrjet ({feature}).",
       "blockedByNetwork": "E kufizuar në të gjithë rrjetin: për këtë duhet leja {permission}.",
-      "confirmApplyTemplate": "Të zbatohet modeli “{template}” për këtë grup? Të gjitha rolet zëvendësohen me ato të modelit.",
-      "confirmApplyTemplateDiscards": "Të zbatohet modeli “{template}” për këtë grup? Të gjitha rolet zëvendësohen me ato të modelit — dhe ndryshimet e paruajtura humbasin.",
-      "confirmDelete": "Të fshihet roli «{role}»? Anëtarët e tij do të bëhen «{target}».",
+      "confirmApplyTemplate": "Të zbatohet modeli „{template}“ për këtë grup? Të gjitha rolet zëvendësohen me ato të modelit.",
+      "confirmApplyTemplateDiscards": "Të zbatohet modeli „{template}“ për këtë grup? Të gjitha rolet zëvendësohen me ato të modelit — dhe ndryshimet e paruajtura humbasin.",
+      "confirmDelete": "Të fshihet roli „{role}“? Anëtarët e tij do të bëhen „{target}“.",
       "confirmReset": "Të rikthehen të gjitha rolet e këtij grupi në parazgjedhjet? Rolet që shtuat hiqen dhe anëtarët e tyre bëhen anëtarë të zakonshëm.",
       "deleteRole": "Fshi rolin",
       "description": "Vendosni kush çfarë mund të bëjë në këtë grup — nga të jashtmit deri te administratorët.",
@@ -1157,7 +1157,7 @@
     "invalidate": "Bëj të pavlefshme lidhjen",
     "invalidate-error": "Pavlefshmëria e lidhjes së ftesës dështoi! Gabim: {error}",
     "invalidate-success": "Lidhja e ftesës u bë e pavlefshme me sukses!",
-    "invite-link-message-group": "Je ftuar të bashkohesh me grupin “{groupName}” në {network}.",
+    "invite-link-message-group": "Je ftuar të bashkohesh me grupin „{groupName}“ në {network}.",
     "invite-link-message-hidden-group": "Je ftuar të bashkohesh me një grup të fshehur në {network}.",
     "invite-link-message-personal": "Je ftuar të bashkohesh me {network}.",
     "invited-count": "Ke ftuar tashmë {count} persona.",
@@ -1248,32 +1248,32 @@
         "cancel": "Anulo",
         "Comment": {
           "disable": {
-            "message": "A dëshiron vërtet që komenti “<b>{name}</b>” të qëndrojë <b>i çaktivizuar</b>?",
+            "message": "A dëshiron vërtet që komenti „<b>{name}</b>“ të qëndrojë <b>i çaktivizuar</b>?",
             "title": "Çaktivizo përfundimisht komentin"
           },
           "enable": {
-            "message": "A dëshiron vërtet që komenti “<b>{name}</b>” të qëndrojë <b>i aktivizuar</b>?",
+            "message": "A dëshiron vërtet që komenti „<b>{name}</b>“ të qëndrojë <b>i aktivizuar</b>?",
             "title": "Aktivizo përfundimisht komentin"
           }
         },
         "Post": {
           "disable": {
-            "message": "A dëshiron vërtet që postimi “<b>{name}</b>” të qëndrojë <b>i çaktivizuar</b>?",
+            "message": "A dëshiron vërtet që postimi „<b>{name}</b>“ të qëndrojë <b>i çaktivizuar</b>?",
             "title": "Çaktivizo përfundimisht postimin"
           },
           "enable": {
-            "message": "A dëshiron vërtet që postimi “<b>{name}</b>” të qëndrojë <b>i aktivizuar</b>?",
+            "message": "A dëshiron vërtet që postimi „<b>{name}</b>“ të qëndrojë <b>i aktivizuar</b>?",
             "title": "Aktivizo përfundimisht postimin"
           }
         },
         "submit": "Konfirmo vendimin",
         "User": {
           "disable": {
-            "message": "A dëshiron vërtet që përdoruesi “<b>{name}</b>” të qëndrojë <b>i çaktivizuar</b>?",
+            "message": "A dëshiron vërtet që përdoruesi „<b>{name}</b>“ të qëndrojë <b>i çaktivizuar</b>?",
             "title": "Çaktivizo përfundimisht përdoruesin"
           },
           "enable": {
-            "message": "A dëshiron vërtet që përdoruesi “<b>{name}</b>” të qëndrojë <b>i aktivizuar</b>?",
+            "message": "A dëshiron vërtet që përdoruesi „<b>{name}</b>“ të qëndrojë <b>i aktivizuar</b>?",
             "title": "Aktivizo përfundimisht përdoruesin"
           }
         }
@@ -1403,7 +1403,7 @@
       "pushedSuccessfully": "Postimi u shty lart me sukses!",
       "removedFromGroupSuccessfully": "Postimi u hoq nga grupi",
       "removeFromGroup": "Hiq nga grupi",
-      "removeFromGroupConfirm": "Të hiqet ky postim nga grupi «{group}»? Postimi mbetet i autorit, por humb vendin e tij në grup.",
+      "removeFromGroupConfirm": "Të hiqet ky postim nga grupi „{group}“? Postimi mbetet i autorit, por humb vendin e tij në grup.",
       "unobserve": "Ndalo observimin e postimit",
       "unobservedSuccessfully": "Nuk po observon më këtë postim!",
       "unpin": "Çngul postimin (Rrjeti)",
@@ -1451,15 +1451,15 @@
     "followers": "Ndjekës",
     "following": "Duke ndjekur",
     "groups": {
-      "closed": "Closed groups",
-      "hidden": "Secret groups",
-      "hiddenFromOthers": "hidden from others",
-      "nobody": "no groups",
+      "closed": "Grupe të mbyllura",
+      "hidden": "Grupe sekrete",
+      "hiddenFromOthers": "e fshehur nga të tjerët",
+      "nobody": "asnjë grup",
       "noFilterResults": "Nuk u gjetën grupe për këtë filtër.",
       "other": "Grupe pa mua",
-      "public": "Public groups",
+      "public": "Grupe publike",
       "shared": "Grupe të ndara",
-      "title": "Groups of {name}"
+      "title": "Grupet e {name}"
     },
     "invites": {
       "description": "Fut adresën e tyre të e-mailit për ftesë.",
@@ -1490,13 +1490,13 @@
     "cancel": "Anulo",
     "comment": {
       "error": "E ke raportuar tashmë këtë koment!",
-      "message": "A dëshiron vërtet të lirosh komentin nga “<b>{name}</b>”?",
+      "message": "A dëshiron vërtet të lirosh komentin nga „<b>{name}</b>“?",
       "title": "Liro komentin",
       "type": "Koment"
     },
     "contribution": {
       "error": "E ke raportuar tashmë këtë kontribut!",
-      "message": "A dëshiron vërtet të lirosh kontributin “<b>{name}</b>”?",
+      "message": "A dëshiron vërtet të lirosh kontributin „<b>{name}</b>“?",
       "title": "Liro kontributin",
       "type": "Kontribut"
     },
@@ -1504,7 +1504,7 @@
     "success": "U lirua me sukses!",
     "user": {
       "error": "E ke raportuar tashmë këtë përdorues!",
-      "message": "A dëshiron vërtet të lirosh përdoruesin “<b>{name}</b>”?",
+      "message": "A dëshiron vërtet të lirosh përdoruesin „<b>{name}</b>“?",
       "title": "Liro përdoruesin",
       "type": "Përdorues"
     }
@@ -1513,13 +1513,13 @@
     "cancel": "Anulo",
     "comment": {
       "error": "E ke raportuar tashmë këtë koment!",
-      "message": "A dëshiron vërtet të raportosh komentin nga “<b>{name}</b>”?",
+      "message": "A dëshiron vërtet të raportosh komentin nga „<b>{name}</b>“?",
       "title": "Raporto komentin",
       "type": "Koment"
     },
     "contribution": {
       "error": "E ke raportuar tashmë këtë kontribut!",
-      "message": "A dëshiron vërtet të raportosh kontributin “<b>{name}</b>”?",
+      "message": "A dëshiron vërtet të raportosh kontributin „<b>{name}</b>“?",
       "title": "Raporto postimin",
       "type": "Kontribut"
     },
@@ -1531,7 +1531,7 @@
           "advert_products_services_commercial": "Reklamim i produkteve dhe shërbimeve me qëllim komercial.",
           "criminal_behavior_violation_german_law": "Sjellje kriminale ose shkelje e ligjit gjerman.",
           "discrimination_etc": "Postime, komente, shprehje ose fyerje diskriminuese.",
-          "doxing": "Zbulimi i informacionit personal të të tjerëve pa pëlqimin e tyre ose kërcënimi për këtë (“doxing”).",
+          "doxing": "Zbulimi i informacionit personal të të tjerëve pa pëlqimin e tyre ose kërcënimi për këtë („doxing“).",
           "glorific_trivia_of_cruel_inhuman_acts": "Lavdërimi ose banalizimi i akteve të egra ose çnjerëzore të dhunës.",
           "intentional_intimidation_stalking_persecution": "Frikësim i qëllimshëm, ndjekje ose persekutim.",
           "other": "Tjetër …",
@@ -1548,7 +1548,7 @@
     "success": "Faleminderit për raportimin!",
     "user": {
       "error": "E ke raportuar tashmë këtë përdorues!",
-      "message": "A dëshiron vërtet të raportosh përdoruesin “<b>{name}</b>”?",
+      "message": "A dëshiron vërtet të raportosh përdoruesin „<b>{name}</b>“?",
       "title": "Raporto përdoruesin",
       "type": "Përdorues"
     }
@@ -1563,7 +1563,7 @@
       "User": "Përdorues ::: Përdorues"
     },
     "hint": "!... kërkon postime, @... kërkon përdorues, &... kërkon grupe, #… kërkon hashtag-ë",
-    "no-results": "Nuk u gjetën rezultate për “{search}”. Provo një term tjetër kërkimi!",
+    "no-results": "Nuk u gjetën rezultate për „{search}“. Provo një term tjetër kërkimi!",
     "page": "Faqja",
     "placeholder": "Kërko",
     "results": "rezultat i gjetur ::: rezultate të gjetura",
@@ -1600,8 +1600,8 @@
       "name": "API Keys",
       "revoke": {
         "confirm": "Revoko",
-        "message": "A je i sigurt që dëshiron të revokosh API Key \"{name}\"? Ky veprim nuk mund të zhbëhet.",
-        "success": "API Key \"{name}\" u revokua",
+        "message": "A je i sigurt që dëshiron të revokosh API Key „{name}“? Ky veprim nuk mund të zhbëhet.",
+        "success": "API Key „{name}“ u revokua",
         "title": "Revoko API Key"
       },
       "revoked-list": {
@@ -1677,7 +1677,7 @@
       "contributionsCount": "Fshi {count} postimin tim ::: Fshi {count} postimet e mia",
       "infoAdmin": "Të gjitha kontributet dhe komentet e përdoruesit do të fshihen gjithashtu!",
       "name": "Fshi llogarinë e përdoruesit",
-      "pleaseConfirm": "Veprim shkatërrues! Shkruaj “{confirm}” për të konfirmuar.",
+      "pleaseConfirm": "Veprim shkatërrues! Shkruaj „{confirm}“ për të konfirmuar.",
       "success": "Llogaria u fshi me sukses!"
     },
     "download": {
@@ -1776,11 +1776,11 @@
     "privacy": {
       "make-shouts-public": "Ndaj artikujt që kam rekomanduar në profilin tim publik",
       "name": "Privatësia",
-      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-closed-groups-on-profile": "Shfaq grupet e mbyllura në profilin tim",
       "show-groups-on-profile-hint": "Dukshmëria e çdo grupi individual mund të caktohet gjithashtu nëpërmjet menysë me tre pika të grupit ose drejtpërdrejt në listën e grupeve në profilin tuaj.",
-      "show-groups-on-profile-section": "Show groups on profile",
+      "show-groups-on-profile-section": "Shfaq grupet në profil",
       "show-hidden-groups-on-profile": "Shfaq grupet sekrete në profilin tim",
-      "show-public-groups-on-profile": "Show public groups on my profile",
+      "show-public-groups-on-profile": "Shfaq grupet publike në profilin tim",
       "success-update": "Cilësimet e privatësisë u ruajtën!"
     },
     "security": {
@@ -1807,7 +1807,7 @@
       "add-new-link": "Shto lidhje të re",
       "delete-modal": {
         "confirm-button": "Fshi",
-        "message": "Fshi “{name}”.",
+        "message": "Fshi „{name}“.",
         "title": "A dëshiron vërtet ta fshish lidhjen tënde?"
       },
       "edit-link": "Ndrysho lidhjen",
@@ -1888,10 +1888,10 @@
         "noDevice": "Nuk ka ekran të disponueshëm për t'u ndarë."
       }
     },
-    "gotoGroup": "Shko te grupi «{name}»",
+    "gotoGroup": "Shko te grupi „{name}“",
     "groupVideoCallButton": {
       "label": "Video grupi",
-      "tooltip": "Telefonatë me video në grupin «{name}»"
+      "tooltip": "Telefonatë me video në grupin „{name}“"
     },
     "leave": "Largohu nga telefonata",
     "maximize": "Maksimizo",

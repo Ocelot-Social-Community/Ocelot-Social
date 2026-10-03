@@ -960,31 +960,28 @@ export default {
         const instance = new Vue({
           parent: this,
           ...UserAvatarPopover,
-          propsData: { userId: id },
+          // userLink makes the whole card itself a nuxt-link (see UserAvatarPopover's
+          // canNavigate) — the marker click is the only entry point on the map (unlike
+          // elsewhere in the network, where hovering a name/avatar is already its own
+          // link), so the whole card navigates, on both desktop and mobile.
+          propsData: {
+            userId: id,
+            userLink: { path: `/profile/${encodeURIComponent(id)}/${encodeURIComponent(slug)}` },
+          },
         })
         instance.$mount(mountEl)
-        // No userLink passed above, so UserAvatarPopover's own touch-only
-        // "open profile" button never shows here — the marker click is the
-        // only entry point on the map (unlike elsewhere in the network,
-        // where hovering a name/avatar is already its own link), so the
-        // whole card navigates instead, on both desktop and mobile.
-        this.makePopupCardClickable(
-          instance,
-          `/profile/${encodeURIComponent(id)}/${encodeURIComponent(slug)}`,
-        )
         return instance
       }
       if (type === 'group') {
         const instance = new Vue({
           parent: this,
           ...GroupAvatarPopover,
-          propsData: { groupId: id },
+          propsData: {
+            groupId: id,
+            groupLink: { path: `/groups/${encodeURIComponent(id)}/${encodeURIComponent(slug)}` },
+          },
         })
         instance.$mount(mountEl)
-        this.makePopupCardClickable(
-          instance,
-          `/groups/${encodeURIComponent(id)}/${encodeURIComponent(slug)}`,
-        )
         return instance
       }
       if (type === 'event') {
@@ -997,9 +994,6 @@ export default {
         return instance
       }
       return null
-    },
-    makePopupCardClickable(instance, path) {
-      instance.$el.addEventListener('click', () => this.$router.push({ path }))
     },
     destroyPopupComponents() {
       this.popupComponentInstances.forEach((instance) => instance.$destroy())
@@ -1582,9 +1576,10 @@ export default {
   min-height: 0 !important;
 }
 
-/* No "open profile"/"open group" button on the map (see
-   makePopupCardClickable) — the whole card navigates on click/tap, so it
-   needs to look clickable. */
+/* No "open profile"/"open group" button on the map — mountPopupComponent passes
+   userLink/groupLink, so the whole card is itself a nuxt-link (see UserAvatarPopover/
+   GroupAvatarPopover's canNavigate) and already shows the native pointer cursor; this rule is
+   just a safety net in case a future change ever renders the card as a plain, non-link div here. */
 .map-popup-container > .user-avatar-popover,
 .map-popup-container > .group-avatar-popover {
   cursor: pointer;
