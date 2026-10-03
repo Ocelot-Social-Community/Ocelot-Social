@@ -129,7 +129,9 @@ describe('rights.vue', () => {
     const wrapper = mount(rights, {
       localVue,
       mocks,
-      propsData: { group: { id: 'group-1', name: 'Group One' } },
+      // `template` is which preset the group runs on — the active tab in the picker, and what
+      // "you are already on this one" is checked against.
+      propsData: { group: { id: 'group-1', name: 'Group One', template: 'public' } },
       stubs: {
         'os-card': { template: '<div><slot /></div>' },
         'os-button': {
@@ -140,6 +142,7 @@ describe('rights.vue', () => {
     })
     wrapper.setData({
       catalog: CATALOG,
+      templateNames: ['public', 'closed', 'hidden', 'channel'],
       roles: ROLES,
       myGroupPermissions,
       draftPermissions: ROLES.find((role) => role.name === 'usual').permissions,
@@ -281,7 +284,7 @@ describe('rights.vue', () => {
     const wrapper = await Wrapper(['group.post.create'])
 
     expect(at(wrapper, 'switch-members-post').element.disabled).toBe(true)
-    expect(at(wrapper, 'preset-channel').element.disabled).toBe(true)
+    expect(at(wrapper, 'template-channel').element.disabled).toBe(true)
   })
 
   describe('hover diff in the matrix', () => {
@@ -415,20 +418,42 @@ describe('rights.vue', () => {
     expect(at(wrapper, 'pending-unreachable').exists()).toBe(false)
   })
 
-  it('turns the group into a channel in one action', async () => {
+  it('puts a whole template on the group, after asking', async () => {
+    // "Turn this into a channel" used to be a button that silently took two rights off the
+    // member role — a thing one could neither see beforehand nor recognise afterwards. A
+    // channel is a template now: named in the question, and visible as the active tab after.
+    window.confirm = jest.fn().mockReturnValue(true)
+    // The mutation answers with the roles the template put on the group, which the page adopts.
+    mocks.$apollo.mutate = jest.fn().mockResolvedValue({ data: { resetGroupRoles: ROLES } })
     const wrapper = await Wrapper()
 
-    await at(wrapper, 'preset-channel').trigger('click')
+    await at(wrapper, 'template-channel').trigger('click')
 
+    expect(window.confirm).toHaveBeenCalled()
     expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
       expect.objectContaining({
-        variables: expect.objectContaining({
-          name: 'usual',
-          // Members keep reading and everything else; writing is what goes.
-          permissions: ['group.members.read'],
-        }),
+        variables: { groupId: 'group-1', template: 'channel' },
       }),
     )
+  })
+
+  it('does not replace every role because somebody clicked the tab they are already on', async () => {
+    window.confirm = jest.fn().mockReturnValue(true)
+    const wrapper = await Wrapper()
+
+    await at(wrapper, 'template-public').trigger('click')
+
+    expect(window.confirm).not.toHaveBeenCalled()
+    expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+  })
+
+  it('leaves the roles alone when the question is answered with no', async () => {
+    window.confirm = jest.fn().mockReturnValue(false)
+    const wrapper = await Wrapper()
+
+    await at(wrapper, 'template-channel').trigger('click')
+
+    expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
   })
 
   describe('the advanced view', () => {

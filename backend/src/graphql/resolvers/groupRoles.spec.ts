@@ -15,10 +15,12 @@ import {
   readGroupRoleTemplates,
   renameGroupRole,
   replaceGroupRoles,
+  readGroupTemplate,
   untouchedGroupIdsByType,
   writeElevation,
   writeGroupRole,
   writeGroupRoleTemplate,
+  writeGroupTemplate,
 } from '@src/groupRole/repository'
 
 import resolvers from './groupRoles'
@@ -41,6 +43,8 @@ vi.mock('@src/groupRole/repository', () => ({
   replaceGroupRoles: vi.fn(),
   markGroupRolesCustomized: vi.fn(),
   untouchedGroupIdsByType: vi.fn(),
+  readGroupTemplate: vi.fn(),
+  writeGroupTemplate: vi.fn(),
   writeGroupRoleTemplate: vi.fn(),
   readElevation: vi.fn(),
   writeElevation: vi.fn(),
@@ -60,6 +64,8 @@ const mocked = {
   renameGroupRole: vi.mocked(renameGroupRole),
   replaceGroupRoles: vi.mocked(replaceGroupRoles),
   untouchedGroupIdsByType: vi.mocked(untouchedGroupIdsByType),
+  readGroupTemplate: vi.mocked(readGroupTemplate),
+  writeGroupTemplate: vi.mocked(writeGroupTemplate),
   writeElevation: vi.mocked(writeElevation),
   writeGroupRole: vi.mocked(writeGroupRole),
   writeGroupRoleTemplate: vi.mocked(writeGroupRoleTemplate),
@@ -894,18 +900,70 @@ describe('Mutation.resetGroupRoles', () => {
     )
   })
 
-  it('refuses when the group`s type has no template', async () => {
+  it('refuses a template nobody seeded', async () => {
     mocked.readGroupRoleTemplates.mockResolvedValue({ public: [] })
+    mocked.readGroupTemplate.mockResolvedValue('public')
     const { context } = contextFor({ authorization: { visibility: 'public' } })
 
     await expect(Mutation.resetGroupRoles({}, { groupId: 'g1' }, context)).rejects.toThrow(
-      'No role template for this visibility!',
+      'No such role template!',
     )
   })
 
+  it('falls back to the template the group was created from, not to its visibility', async () => {
+    // They were the same thing while every template was named after a visibility. Since
+    // `channel` they are not: a group running on it is public, and looking the template up by
+    // visibility would silently put the `public` one back on.
+    const template = [role('none', ['group.read', 'group.content.read']), role('usual')]
+    mocked.readGroupRoleTemplates.mockResolvedValue({ channel: template, public: [role('none')] })
+    mocked.readGroupTemplate.mockResolvedValue('channel')
+    mocked.readGroupRoles.mockResolvedValue(template)
+    const { context } = contextFor({ authorization: { visibility: 'public' } })
+
+    await Mutation.resetGroupRoles({}, { groupId: 'g1' }, context)
+
+    expect(mocked.replaceGroupRoles).toHaveBeenCalledWith(
+      context.database,
+      'g1',
+      template,
+      'usual',
+      'actor',
+      expect.any(String),
+    )
+  })
+
+  it('records which template the group runs on now', async () => {
+    // What the admin area counts when it says how many groups an edit would reach. A group
+    // given the channel template and still recorded as `public` would be counted under the
+    // wrong one and rewritten by an edit meant for somebody else.
+    const template = [role('none', ['group.read', 'group.content.read']), role('usual')]
+    mocked.readGroupRoleTemplates.mockResolvedValue({ channel: template })
+    mocked.readGroupTemplate.mockResolvedValue('public')
+    mocked.readGroupRoles.mockResolvedValue(template)
+    const { context } = contextFor({ authorization: { visibility: 'public' } })
+
+    await Mutation.resetGroupRoles({}, { groupId: 'g1', template: 'channel' }, context)
+
+    expect(mocked.writeGroupTemplate).toHaveBeenCalledWith(context.database, 'g1', 'channel')
+  })
+
+  it('refuses a template that would make the group more private than one may create', async () => {
+    // Applying a template rewrites the non-member role, which IS the visibility — so the same
+    // cap guards it as guards editing that role by hand (E10). Without it, "apply the secret
+    // template" would be the way around `group.create_hidden`.
+    mocked.readGroupRoleTemplates.mockResolvedValue({ hidden: [role('none')] })
+    mocked.readGroupTemplate.mockResolvedValue('public')
+    const { context } = contextFor({ authorization: { visibility: 'public' } })
+
+    await expect(
+      Mutation.resetGroupRoles({}, { groupId: 'g1', template: 'hidden' }, context),
+    ).rejects.toThrow('more private')
+  })
+
   it('replaces the roles with the template and keeps the members as ordinary ones', async () => {
-    const template = [role('none'), role('usual')]
+    const template = [role('none', ['group.read']), role('usual')]
     mocked.readGroupRoleTemplates.mockResolvedValue({ closed: template })
+    mocked.readGroupTemplate.mockResolvedValue('closed')
     mocked.readGroupRoles.mockResolvedValue(template)
     const { context, published } = contextFor({ authorization: { visibility: 'closed' } })
 

@@ -1001,8 +1001,10 @@
     "removeMemberTitle": "Remover membro",
     "rights": {
       "addRole": "Adicionar uma função",
+      "applyTemplate": "Aplicar um modelo — substitui todas as funções deste grupo pelas do modelo.",
       "blockedByFeature": "Esta funcionalidade está desativada nesta rede ({feature}).",
       "blockedByNetwork": "Limitado em toda a rede: é necessária a permissão {permission}.",
+      "confirmApplyTemplate": "Aplicar o modelo «{template}» a este grupo? Todas as funções são substituídas pelas do modelo.",
       "confirmDelete": "Eliminar a função «{role}»? Os seus membros passarão a «{target}».",
       "confirmReset": "Restaurar todas as funções deste grupo para os valores predefinidos? As funções que criaram são removidas e os seus membros passam a membros comuns.",
       "deleteRole": "Eliminar função",
@@ -1014,9 +1016,6 @@
       "noRight": "Não podes conceder uma permissão que tu mesmo não tens.",
       "ownerHoldsEverything": "A função de proprietário tem sempre todas as permissões deste grupo. Só o nome visível pode ser alterado.",
       "pendingUnreachable": "Ninguém pode pedir para entrar neste momento, por isso ninguém tem esta função. É a admissão que decide.",
-      "presets": {
-        "channel": "Transformar em canal (só os administradores escrevem)"
-      },
       "reset": "Restaurar os valores predefinidos",
       "resultingType": "Com estas permissões o grupo é:",
       "roleKeyPlaceholder": "chave, p. ex. redacao",
@@ -1061,6 +1060,7 @@
       "public": "O grupo e todas as publicações são visíveis para todos os usuários registrados"
     },
     "types": {
+      "channel": "Canal",
       "closed": "Fechado",
       "hidden": "Secreto",
       "public": "Público"

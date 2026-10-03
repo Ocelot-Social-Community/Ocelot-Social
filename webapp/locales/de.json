@@ -1001,8 +1001,10 @@
     "removeMemberTitle": "Mitglied entfernen",
     "rights": {
       "addRole": "Rolle hinzufuegen",
+      "applyTemplate": "Vorlage anwenden — ersetzt alle Rollen dieser Gruppe durch die der Vorlage.",
       "blockedByFeature": "Diese Funktion ist im Netzwerk abgeschaltet ({feature}).",
       "blockedByNetwork": "Netzwerkweit gesperrt: dafuer fehlt das Recht {permission}.",
+      "confirmApplyTemplate": "Vorlage „{template}“ auf diese Gruppe anwenden? Alle Rollen werden durch die der Vorlage ersetzt.",
       "confirmDelete": "Rolle \"{role}\" loeschen? Ihre Mitglieder werden zu \"{target}\".",
       "confirmReset": "Alle Rollen dieser Gruppe auf den Standard zuruecksetzen? Selbst angelegte Rollen werden dabei entfernt, ihre Mitglieder werden gewoehnliche Mitglieder.",
       "deleteRole": "Rolle loeschen",
@@ -1014,9 +1016,6 @@
       "noRight": "Dieses Recht kannst du nicht vergeben, weil du es selbst nicht hast.",
       "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte dieser Gruppe. Nur ihr Anzeigename laesst sich aendern.",
       "pendingUnreachable": "Zurzeit kann niemand eine Mitgliedschaft beantragen — diese Rolle hat deshalb niemand. Darueber entscheidet der Einlass.",
-      "presets": {
-        "channel": "Als Kanal einrichten (nur Admins schreiben)"
-      },
       "reset": "Auf Standard zuruecksetzen",
       "resultingType": "Mit diesen Rechten ist die Gruppe:",
       "roleKeyPlaceholder": "Schluessel, z. B. redaktion",
@@ -1061,6 +1060,7 @@
       "public": "Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
     },
     "types": {
+      "channel": "Kanal",
       "closed": "Geschlossen",
       "hidden": "Geheim",
       "public": "Öffentlich"

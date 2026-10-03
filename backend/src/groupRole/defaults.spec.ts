@@ -26,12 +26,16 @@ const visibilities = GroupVisibilityEnum.definitions
   .map((value) => value.name.value)
 
 const templates = new Map(Object.entries(DEFAULT_GROUP_ROLE_TEMPLATES))
-const rolesOf = (visibility: string) => templates.get(visibility) ?? []
+// Every template, not only the ones named after a visibility: since `channel` there are more
+// templates than visibilities, and an unguarded template is one that can seed a group with
+// rights nobody checked.
+const templateNames = [...templates.keys()]
+const rolesOf = (template: string) => templates.get(template) ?? []
 
-const roleIn = (visibility: string, name: string) => {
-  const role = rolesOf(visibility).find((entry) => entry.name === name)
+const roleIn = (template: string, name: string) => {
+  const role = rolesOf(template).find((entry) => entry.name === name)
   if (!role) {
-    throw new Error(`no ${name} role in the ${visibility} template`)
+    throw new Error(`no ${name} role in the ${template} template`)
   }
   return role
 }
@@ -45,11 +49,19 @@ describe('default group role templates', () => {
     expect(templates.get(visibility)).toBeDefined()
   })
 
-  it('has a template for no other type', () => {
-    expect(Object.keys(DEFAULT_GROUP_ROLE_TEMPLATES).sort()).toEqual([...visibilities].sort())
+  it('covers every visibility, and may offer more than one template per visibility', () => {
+    // The direction that matters is "no visibility without a template": a group created from a
+    // missing one would get no roles at all. The reverse used to be asserted as well, back when
+    // the three templates were named after the three visibilities — `channel` is public too,
+    // and what makes it a different template sits in the member role.
+    for (const visibility of visibilities) {
+      expect(templates.get(visibility)).toBeDefined()
+    }
+
+    expect(templateNames.length).toBeGreaterThanOrEqual(visibilities.length)
   })
 
-  it.each(visibilities)('seeds the five known roles for %s', (visibility) => {
+  it.each(templateNames)('seeds the five known roles for %s', (visibility) => {
     expect(rolesOf(visibility).map((role) => role.name)).toEqual([
       NONE_ROLE,
       PENDING_ROLE,
@@ -59,14 +71,14 @@ describe('default group role templates', () => {
     ])
   })
 
-  it.each(visibilities)('grants only catalog keys in the %s template', (visibility) => {
+  it.each(templateNames)('grants only catalog keys in the %s template', (visibility) => {
     for (const role of rolesOf(visibility)) {
       expect(role.permissions.filter((key) => !isKnownGroupPermission(key))).toEqual([])
       expect(new Set(role.permissions).size).toBe(role.permissions.length)
     }
   })
 
-  it.each(visibilities)('marks the system roles and only those in %s', (visibility) => {
+  it.each(templateNames)('marks the system roles and only those in %s', (visibility) => {
     const system = rolesOf(visibility)
       .filter((role) => role.system)
       .map((role) => role.name)
@@ -74,7 +86,7 @@ describe('default group role templates', () => {
     expect(system.sort()).toEqual([...MANDATORY_GROUP_ROLE_NAMES].sort())
   })
 
-  it.each(visibilities)('keeps owner protected and list-free in %s', (visibility) => {
+  it.each(templateNames)('keeps owner protected and list-free in %s', (visibility) => {
     const owner = roleIn(visibility, OWNER_ROLE)
 
     // Storing no list is what makes a newly added catalog key automatically owned.
@@ -83,7 +95,7 @@ describe('default group role templates', () => {
     expect(owner.system).toBe(true)
   })
 
-  it.each(visibilities)('leaves every role without a label in %s', (visibility) => {
+  it.each(templateNames)('leaves every role without a label in %s', (visibility) => {
     for (const role of rolesOf(visibility)) {
       // No label means "use the i18n default"; a template must not ship English names.
       expect(role.label).toBeNull()

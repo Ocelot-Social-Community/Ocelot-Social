@@ -1001,8 +1001,10 @@
     "removeMemberTitle": "Lid verwijderen",
     "rights": {
       "addRole": "Rol toevoegen",
+      "applyTemplate": "Sjabloon toepassen — vervangt alle rollen van deze groep door die van het sjabloon.",
       "blockedByFeature": "Deze functie is uitgeschakeld in dit netwerk ({feature}).",
       "blockedByNetwork": "Netwerkbreed begrensd: hiervoor is het recht {permission} nodig.",
+      "confirmApplyTemplate": "Sjabloon “{template}” op deze groep toepassen? Alle rollen worden vervangen door die van het sjabloon.",
       "confirmDelete": "De rol \"{role}\" verwijderen? De leden worden \"{target}\".",
       "confirmReset": "Alle rollen van deze groep terugzetten naar de standaard? Rollen die jullie hebben toegevoegd verdwijnen en hun leden worden gewone leden.",
       "deleteRole": "Rol verwijderen",
@@ -1014,9 +1016,6 @@
       "noRight": "Je kunt geen recht geven dat je zelf niet hebt.",
       "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten in deze groep. Alleen de weergavenaam kan worden aangepast.",
       "pendingUnreachable": "Niemand kan op dit moment lidmaatschap aanvragen, dus niemand heeft deze rol. De toelating bepaalt dat.",
-      "presets": {
-        "channel": "Omzetten in een kanaal (alleen beheerders schrijven)"
-      },
       "reset": "Terug naar de standaard",
       "resultingType": "Met deze rechten is de groep:",
       "roleKeyPlaceholder": "sleutel, bijv. redactie",
@@ -1061,6 +1060,7 @@
       "public": "Groep en alle berichten zijn zichtbaar voor alle geregistreerde gebruikers"
     },
     "types": {
+      "channel": "Kanaal",
       "closed": "Gesloten",
       "hidden": "Geheim",
       "public": "Openbaar"

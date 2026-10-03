@@ -1001,8 +1001,10 @@
     "removeMemberTitle": "Rimuovi membro",
     "rights": {
       "addRole": "Aggiungi un ruolo",
+      "applyTemplate": "Applica un modello: sostituisce tutti i ruoli di questo gruppo con quelli del modello.",
       "blockedByFeature": "Questa funzione è disattivata nella rete ({feature}).",
       "blockedByNetwork": "Limitato a livello di rete: serve il permesso {permission}.",
+      "confirmApplyTemplate": "Applicare il modello «{template}» a questo gruppo? Tutti i ruoli vengono sostituiti da quelli del modello.",
       "confirmDelete": "Eliminare il ruolo «{role}»? I suoi membri diventeranno «{target}».",
       "confirmReset": "Ripristinare tutti i ruoli di questo gruppo ai valori predefiniti? I ruoli che avete aggiunto vengono rimossi e i loro membri diventano membri ordinari.",
       "deleteRole": "Elimina ruolo",
@@ -1014,9 +1016,6 @@
       "noRight": "Non puoi concedere un permesso che tu stesso non hai.",
       "ownerHoldsEverything": "Il ruolo di proprietario ha sempre tutti i permessi di questo gruppo. Si può cambiare solo il suo nome visualizzato.",
       "pendingUnreachable": "Al momento nessuno può chiedere di unirsi, quindi nessuno ha questo ruolo. Lo decide l’ammissione.",
-      "presets": {
-        "channel": "Trasforma in canale (scrivono solo gli amministratori)"
-      },
       "reset": "Ripristina i valori predefiniti",
       "resultingType": "Con questi permessi il gruppo è:",
       "roleKeyPlaceholder": "chiave, ad es. redazione",
@@ -1061,6 +1060,7 @@
       "public": "Il gruppo e tutte le pubblicazioni sono visibili a tutti gli utenti registrati"
     },
     "types": {
+      "channel": "Canale",
       "closed": "Chiuso",
       "hidden": "Segreto",
       "public": "Pubblico"

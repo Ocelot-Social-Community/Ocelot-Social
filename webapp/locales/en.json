@@ -1001,8 +1001,10 @@
     "removeMemberTitle": "Remove Member",
     "rights": {
       "addRole": "Add a role",
+      "applyTemplate": "Apply a template — replaces every role of this group with the template’s.",
       "blockedByFeature": "That feature is switched off for this network ({feature}).",
       "blockedByNetwork": "Capped network-wide: this needs the {permission} permission.",
+      "confirmApplyTemplate": "Apply the template “{template}” to this group? Every role is replaced by the template’s.",
       "confirmDelete": "Delete the role \"{role}\"? Its members become \"{target}\".",
       "confirmReset": "Reset every role of this group to the defaults? Roles you added are removed and their members become ordinary members.",
       "deleteRole": "Delete role",
@@ -1014,9 +1016,6 @@
       "noRight": "You cannot grant a right you do not hold yourself.",
       "ownerHoldsEverything": "The owner role always holds every right in this group. Only its display name can be changed.",
       "pendingUnreachable": "Nobody can ask to join at the moment, so nobody holds this role. The admission setting decides that.",
-      "presets": {
-        "channel": "Turn into a channel (only admins write)"
-      },
       "reset": "Reset to defaults",
       "resultingType": "With these rights the group is:",
       "roleKeyPlaceholder": "key, e.g. editors",
@@ -1061,6 +1060,7 @@
       "public": "Group and all posts are visible for all registered users"
     },
     "types": {
+      "channel": "Channel",
       "closed": "Closed",
       "hidden": "Secret",
       "public": "Public"

@@ -12,65 +12,79 @@
     nothing is written until somebody says so.
   -->
   <div class="simple-rights">
+    <!--
+      Each state with its own control directly above it: what sets the thing stands over the
+      thing it sets, rather than in a row of buttons further down that one has to connect back
+      to the right card by eye.
+    -->
     <div class="states">
       <div class="state" :data-test="`visibility-${visibility}`">
-        <os-icon :icon="icons[visibilityIcon]" size="2xl" class="state__icon" aria-hidden="true" />
-        <div class="state__text">
-          <p class="state__caption">{{ caption }}</p>
-          <strong class="state__title" data-test="visibility-title">
-            {{ $t(`group.types.${visibility}`) }}
-          </strong>
-          <p class="state__description" data-test="visibility-description">
-            {{ $t(`group.typeDescriptions.${visibility}`) }}
-          </p>
+        <!-- The page's own way of setting this — the template tabs in the admin area. -->
+        <div v-if="$slots['visibility-control']" class="state__control">
+          <slot name="visibility-control" />
+        </div>
+        <div class="state__body">
+          <os-icon
+            :icon="icons[visibilityIcon]"
+            size="2xl"
+            class="state__icon"
+            aria-hidden="true"
+          />
+          <div class="state__text">
+            <p class="state__caption">{{ caption }}</p>
+            <strong class="state__title" data-test="visibility-title">
+              {{ $t(`group.types.${visibility}`) }}
+            </strong>
+            <p class="state__description" data-test="visibility-description">
+              {{ $t(`group.typeDescriptions.${visibility}`) }}
+            </p>
+          </div>
         </div>
       </div>
 
       <div class="state" :data-test="`admission-${admission}`">
-        <os-icon :icon="icons[admissionIcon]" size="2xl" class="state__icon" aria-hidden="true" />
-        <div class="state__text">
-          <p class="state__caption">{{ $t('group.admission.caption') }}</p>
-          <strong class="state__title" data-test="admission-title">
-            {{ $t(`group.admission.${admission}.title`) }}
-          </strong>
-          <p class="state__description" data-test="admission-description">
-            {{ $t(`group.admission.${admission}.description`) }}
-          </p>
+        <!--
+          Three states of ONE question, so one control with three positions rather than three
+          checkboxes: two ticks would let somebody express "anybody may enter AND must ask",
+          which the model has no answer for.
+
+          A row of buttons rather than a dropdown: all three answers are readable at once, which
+          matters for a setting whose options are opposite ends of one scale.
+        -->
+        <div class="state__control" role="radiogroup" :aria-label="$t('group.admission.label')">
+          <button
+            v-for="state in admissionStates"
+            v-show="!admissionLocked || state === admission"
+            :key="state"
+            type="button"
+            role="radio"
+            :aria-checked="String(state === admission)"
+            class="admission-option"
+            :class="{ 'admission-option--active': state === admission }"
+            :disabled="!admissionEditable"
+            :title="admissionEditable ? null : admissionHint"
+            :data-test="`admission-option-${state}`"
+            @click="setAdmission(state)"
+          >
+            {{ $t(`group.admission.${state}.title`) }}
+          </button>
+        </div>
+        <div class="state__body">
+          <os-icon :icon="icons[admissionIcon]" size="2xl" class="state__icon" aria-hidden="true" />
+          <div class="state__text">
+            <p class="state__caption">{{ $t('group.admission.caption') }}</p>
+            <strong class="state__title" data-test="admission-title">
+              {{ $t(`group.admission.${admission}.title`) }}
+            </strong>
+            <p class="state__description" data-test="admission-description">
+              {{ $t(`group.admission.${admission}.description`) }}
+            </p>
+            <p v-if="admissionLocked" class="state__reason" data-test="admission-locked">
+              {{ $t('group.admission.needsVisibility') }}
+            </p>
+          </div>
         </div>
       </div>
-    </div>
-
-    <!--
-      Three states of ONE question, so one control with three positions rather than three
-      checkboxes: two ticks would let somebody express "anybody may enter AND must ask", which
-      the model has no answer for.
-
-      A row of buttons rather than a dropdown, like the template tabs above: all three answers
-      are readable at once, which matters for a setting whose options are not interchangeable —
-      "by invitation only" and "without asking" are opposite ends, and a closed dropdown shows
-      neither of them next to the one it has.
-    -->
-    <div class="admission-control" role="radiogroup" :aria-label="$t('group.admission.label')">
-      <span class="admission-control__label">{{ $t('group.admission.label') }}</span>
-      <button
-        v-for="state in admissionStates"
-        v-show="!admissionLocked || state === admission"
-        :key="state"
-        type="button"
-        role="radio"
-        :aria-checked="String(state === admission)"
-        class="admission-option"
-        :class="{ 'admission-option--active': state === admission }"
-        :disabled="!admissionEditable"
-        :title="admissionEditable ? null : admissionHint"
-        :data-test="`admission-option-${state}`"
-        @click="setAdmission(state)"
-      >
-        {{ $t(`group.admission.${state}.title`) }}
-      </button>
-      <span v-if="admissionLocked" class="admission-control__reason" data-test="admission-locked">
-        {{ $t('group.admission.needsVisibility') }}
-      </span>
     </div>
 
     <ul class="switches">
@@ -272,9 +286,25 @@ export default {
 
 .state {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-x-small);
+  flex: 1 1 18rem;
+}
+
+/* The control stands over what it sets. Reserved height even when a page passes no slot, so
+   the two columns' icons stay on one line. */
+.state__control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xx-small);
+  min-height: 2rem;
+}
+
+.state__body {
+  display: flex;
   align-items: center;
   gap: var(--space-base);
-  flex: 1 1 18rem;
 }
 
 /*
@@ -308,20 +338,11 @@ export default {
   font-size: 0.9em;
 }
 
-.admission-control {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-xx-small);
-  margin-bottom: var(--space-base);
-}
-
-.admission-control__label {
-  margin-right: var(--space-xx-small);
+.state__reason {
+  margin: 0;
   color: var(--text-color-softer);
   font-size: 0.85em;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  font-style: italic;
 }
 
 /* The same pill the template tabs are, so the two rows read as the same kind of choice. */
@@ -355,12 +376,6 @@ export default {
 .admission-option:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.admission-control__reason {
-  color: var(--text-color-softer);
-  font-size: 0.85em;
-  font-style: italic;
 }
 
 .switches {

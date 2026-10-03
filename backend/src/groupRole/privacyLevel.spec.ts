@@ -75,19 +75,34 @@ describe(privacyLevelFrom, () => {
 })
 
 describe('the seeded templates', () => {
-  // The drift guard that makes the derivation trustworthy: each preset has to derive to its own
-  // name, or a group created from it would be listed as something it is not.
+  // The drift guard that makes the derivation trustworthy. It used to say "each preset derives
+  // to its own name", which held while every template was named after a visibility — `channel`
+  // is public too, and what makes it a different template sits in the member role. What has to
+  // stay true is weaker but still the thing that matters: every preset derives to a level the
+  // code knows, so a group created from it is never listed as something that does not exist.
   it.each(Object.entries(DEFAULT_GROUP_ROLE_TEMPLATES))(
-    '%s derives to its own name',
-    (visibility, roles) => {
+    '%s derives to a level the code knows',
+    (_template, roles) => {
       const none = roles.find((role) => role.name === NONE_ROLE)
 
-      expect(privacyLevelOfPermissions(none?.permissions)).toBe(visibility)
+      expect(PRIVACY_LEVELS).toContain(privacyLevelOfPermissions(none?.permissions))
     },
   )
 
-  it('covers every level the code knows', () => {
-    expect([...PRIVACY_LEVELS].sort()).toEqual(Object.keys(DEFAULT_GROUP_ROLE_TEMPLATES).sort())
+  it('has a preset that derives to every level, so none of them is unreachable', () => {
+    const derived = Object.values(DEFAULT_GROUP_ROLE_TEMPLATES).map((roles) =>
+      privacyLevelOfPermissions(roles.find((role) => role.name === NONE_ROLE)?.permissions),
+    )
+
+    for (const level of PRIVACY_LEVELS) {
+      expect(derived).toContain(level)
+    }
+  })
+
+  it('still has one preset named after each level, which is what the tabs read', () => {
+    for (const level of PRIVACY_LEVELS) {
+      expect(Object.keys(DEFAULT_GROUP_ROLE_TEMPLATES)).toContain(level)
+    }
   })
 })
 

@@ -1001,8 +1001,10 @@
     "removeMemberTitle": "Usuń członka",
     "rights": {
       "addRole": "Dodaj rolę",
+      "applyTemplate": "Zastosuj szablon — zastępuje wszystkie role tej grupy rolami z szablonu.",
       "blockedByFeature": "Ta funkcja jest wyłączona w tej sieci ({feature}).",
       "blockedByNetwork": "Ograniczone w całej sieci: potrzebne jest uprawnienie {permission}.",
+      "confirmApplyTemplate": "Zastosować szablon „{template}” do tej grupy? Wszystkie role zostaną zastąpione rolami z szablonu.",
       "confirmDelete": "Usunąć rolę „{role}”? Jej członkowie staną się „{target}”.",
       "confirmReset": "Przywrócić wszystkie role tej grupy do domyślnych? Role dodane przez was zostaną usunięte, a ich członkowie staną się zwykłymi członkami.",
       "deleteRole": "Usuń rolę",
@@ -1014,9 +1016,6 @@
       "noRight": "Nie możesz nadać uprawnienia, którego sam nie masz.",
       "ownerHoldsEverything": "Rola właściciela ma zawsze wszystkie uprawnienia w tej grupie. Zmienić można tylko jej nazwę wyświetlaną.",
       "pendingUnreachable": "Nikt nie może obecnie poprosić o dołączenie, więc nikt nie ma tej roli. Decyduje o tym przyjmowanie.",
-      "presets": {
-        "channel": "Zamień w kanał (piszą tylko administratorzy)"
-      },
       "reset": "Przywróć domyślne",
       "resultingType": "Z tymi uprawnieniami grupa jest:",
       "roleKeyPlaceholder": "klucz, np. redakcja",
@@ -1061,6 +1060,7 @@
       "public": "Grupa i wszystkie wpisy są widoczne dla wszystkich zarejestrowanych użytkowników"
     },
     "types": {
+      "channel": "Kanał",
       "closed": "Zamknięta",
       "hidden": "Tajna",
       "public": "Publiczna"

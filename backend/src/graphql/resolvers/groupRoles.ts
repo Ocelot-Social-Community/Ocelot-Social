@@ -25,11 +25,13 @@ import {
   readElevation,
   readGroupRoles,
   readGroupRoleTemplates,
+  readGroupTemplate,
   renameGroupRole,
   replaceGroupRoles,
   untouchedGroupIdsByType,
   writeElevation,
   writeGroupRole,
+  writeGroupTemplate,
   writeGroupRoleTemplate,
 } from '@src/groupRole/repository'
 import { isPermissionAvailable } from '@src/permission'
@@ -289,6 +291,8 @@ export default {
         groupCount: untouched.get(template)?.total ?? 0,
       }))
     },
+    groupRoleTemplateNames: async (_parent, _args, context: Context) =>
+      Object.keys(await readGroupRoleTemplates(context.database)).sort(),
   },
   Group: {
     myGroupRole: async (parent: { id: string }, _args, context: Context) => {
@@ -445,17 +449,35 @@ export default {
       await touched(context, groupId, now)
       return name
     },
-    resetGroupRoles: async (_parent, params: { groupId: string }, context: Context) => {
+    /**
+     * Put a whole template on a group — the one it was created from by default, or any other.
+     *
+     * It used to look the template up by the group's current VISIBILITY, which worked only
+     * while every template was named after one. It is not any more (`channel` is public too),
+     * and a template nobody can name is a template nobody can reach — so the name is what is
+     * asked for, and `Group.template` is what answers when nothing is.
+     */
+    resetGroupRoles: async (
+      _parent,
+      params: { groupId: string; template?: string | null },
+      context: Context,
+    ) => {
       const { groupId } = params
       const authorization = await context.groupAuthorization.forGroup(groupId)
       if (!authorization) {
         throw new UserInputError('Group not found!')
       }
       const templates = await readGroupRoleTemplates(context.database)
-      const template = new Map(Object.entries(templates)).get(authorization.visibility)
+      const name = params.template ?? (await readGroupTemplate(context.database, groupId))
+      const template = new Map(Object.entries(templates)).get(name)
       if (!template || template.length === 0) {
-        throw new UserInputError('No role template for this visibility!')
+        throw new UserInputError('No such role template!')
       }
+      // Applying a template rewrites the non-member role, which IS the group's visibility — so
+      // the same cap that guards editing that role by hand guards it here (E10). Without it,
+      // "apply the secret template" would be the way around `group.create_hidden`.
+      const nonMember = template.find((role) => role.name === NONE_ROLE)
+      requirePrivacyCap(context, authorization, [...(nonMember?.permissions ?? [])])
       const now = new Date().toISOString()
       await replaceGroupRoles(
         context.database,
@@ -467,6 +489,9 @@ export default {
         actorId(context),
         now,
       )
+      // The group now runs on the template it was given, which is what the admin area counts
+      // when it says how many groups an edit would reach.
+      await writeGroupTemplate(context.database, groupId, name)
       announce(context, groupId)
       return groupRoles(context, groupId)
     },

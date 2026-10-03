@@ -643,6 +643,10 @@ export default shield(
       // which of them a viewer holds is Group.myGroupPermissions, resolved per group.
       groupPermissionCatalog: and(groupsEnabled, isAuthenticated),
       groupRoleTemplates: hasPermission('group.roleTemplate.manage'),
+      // The NAMES only. Which presets exist is product vocabulary, not a secret — and a group
+      // owner has to be able to name one to put it on their group, without being handed the
+      // network's template editor.
+      groupRoleTemplateNames: and(groupsEnabled, isAuthenticated),
       // The admin group list. One rule for "may administer groups at all"; WHICH groups come
       // back is decided in the resolver by the per-type rights, so a viewer who may only
       // administer public groups cannot enumerate the hidden ones.

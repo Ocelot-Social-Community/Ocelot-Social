@@ -110,6 +110,24 @@ export const DEFAULT_GROUP_ROLE_TEMPLATES: GroupRoleTemplates = {
     systemRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
     ownerRole(),
   ],
+  // A channel: everybody may read and join, only the people running it write. The first
+  // template that is NOT named after the visibility it produces — it produces `public`, same as
+  // the one above, and what distinguishes the two is in the member role rather than in the
+  // non-member one. That is the point of it being a template: "turn this into a channel" used
+  // to be a button that silently took two rights off `usual`, which is a thing one can neither
+  // see beforehand nor recognise afterwards.
+  channel: [
+    systemRole(NONE_ROLE, ['group.read', 'group.content.read', 'group.members.read', 'group.join']),
+    systemRole(PENDING_ROLE, PENDING_PERMISSIONS),
+    systemRole(
+      USUAL_ROLE,
+      MEMBER_BASELINE.filter(
+        (key) => key !== 'group.post.create' && key !== 'group.comment.create',
+      ),
+    ),
+    systemRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
+    ownerRole(),
+  ],
 }
 
 // The role names every group must always have, whatever an operator did to the templates.

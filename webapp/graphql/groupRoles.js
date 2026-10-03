@@ -5,6 +5,7 @@ import gql from 'graphql-tag'
 // a role more than the person editing it holds themselves.
 export const groupRightsQuery = () => gql`
   query ($id: ID!) {
+    groupRoleTemplateNames
     groupPermissionCatalog {
       key
       group
@@ -76,8 +77,8 @@ export const deleteGroupRoleMutation = () => gql`
 `
 
 export const resetGroupRolesMutation = () => gql`
-  mutation ($groupId: ID!) {
-    resetGroupRoles(groupId: $groupId) {
+  mutation ($groupId: ID!, $template: String) {
+    resetGroupRoles(groupId: $groupId, template: $template) {
       name
       label
       system

@@ -3,28 +3,6 @@
     <h2 class="title">{{ $t('admin.groupRoles.title') }}</h2>
     <p class="description">{{ $t('admin.groupRoles.description') }}</p>
 
-    <!-- One tab per TEMPLATE. What a template is CALLED and how findable the groups it creates
-         are are two different things that used to share one vocabulary — the tab said "Public"
-         and the line below said the groups are "Public", and the two can disagree the moment
-         somebody edits the template's non-member role. The row is labelled as templates, and
-         the visibility is stated below as a consequence. -->
-    <div class="type-tabs">
-      <span class="type-tabs__label">{{ $t('admin.groupRoles.templateLabel') }}</span>
-      <button
-        v-for="template in templates"
-        :key="template.name"
-        type="button"
-        class="type-tab"
-        :class="{ 'type-tab--active': template.name === activeTemplateName }"
-        :data-test="`type-tab-${template.name}`"
-        @click="activeTemplateName = template.name"
-        @mouseenter="hoveredTemplateName = template.name"
-        @mouseleave="hoveredTemplateName = null"
-      >
-        {{ $t(`group.types.${template.name}`) }}
-      </button>
-    </div>
-
     <template v-if="activeTemplate">
       <!-- The same card and the same switches a group gets for its own rights, so a template is
            read the way the thing it produces is read. -->
@@ -37,6 +15,30 @@
         @save="saveSimple"
         @dirty="simpleDirty = $event"
       >
+        <template #visibility-control>
+          <!-- One tab per TEMPLATE. What a template is CALLED and how findable the groups it creates
+             are are two different things that used to share one vocabulary — the tab said "Public"
+             and the line below said the groups are "Public", and the two can disagree the moment
+             somebody edits the template's non-member role. The row is labelled as templates, and
+             the visibility is stated below as a consequence. -->
+          <div class="type-tabs">
+            <span class="type-tabs__label">{{ $t('admin.groupRoles.templateLabel') }}</span>
+            <button
+              v-for="template in templates"
+              :key="template.name"
+              type="button"
+              class="type-tab"
+              :class="{ 'type-tab--active': template.name === activeTemplateName }"
+              :data-test="`type-tab-${template.name}`"
+              @click="activeTemplateName = template.name"
+              @mouseenter="hoveredTemplateName = template.name"
+              @mouseleave="hoveredTemplateName = null"
+            >
+              {{ $t(`group.types.${template.name}`) }}
+            </button>
+          </div>
+        </template>
+
         <template #actions>
           <!-- A template change reaches existing groups only when an admin asks for it, and
                then only the groups that never edited their own roles (concept E12). -->

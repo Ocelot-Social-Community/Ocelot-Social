@@ -58,6 +58,8 @@ type Query {
   groupPermissionCatalog: [GroupPermission!]!
   "The network-wide group role templates, one per group type. Requires `group.roleTemplate.manage`."
   groupRoleTemplates: [GroupRoleTemplate!]!
+  "The names of the templates a group can be put on. The contents stay behind group.roleTemplate.manage; the names are the vocabulary a group owner picks from."
+  groupRoleTemplateNames: [String!]!
 }
 
 type Mutation {
@@ -69,8 +71,8 @@ type Mutation {
   renameGroupRole(groupId: ID!, name: String!, newName: String!): GroupRole!
   "Delete a non-system role. Its members move to `reassignTo`, so no membership is left pointing at a role that no longer exists. Returns the deleted name."
   deleteGroupRole(groupId: ID!, name: String!, reassignTo: String!): String!
-  "Put a group's roles back on the network template it was created from. Roles the template does not have are removed and their members become ordinary members."
-  resetGroupRoles(groupId: ID!): [GroupRole!]!
+  "Put a whole network template on a group: the one it was created from, or the one named. Roles the template does not have are removed and their members become ordinary members."
+  resetGroupRoles(groupId: ID!, template: String): [GroupRole!]!
   "Set a member's role by name. Subject to the act-on rules: the actor must outrank the member and must hold every right the assigned role grants."
   setGroupMemberRole(groupId: ID!, userId: ID!, roleName: String!): GroupMember!
   "Change one role of a network-wide template. Existing groups are NOT touched — that is what applyGroupRoleTemplates is for. Requires `group.roleTemplate.manage`."

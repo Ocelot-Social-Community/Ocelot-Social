@@ -18,14 +18,32 @@
         @save="saveSimple"
         @dirty="simpleDirty = $event"
       >
+        <!--
+          The same presets the admin area edits, offered where a group picks one. "Turn this
+          into a channel" used to be a button here that silently took two rights off the member
+          role; a channel is a template now, so the choice is visible before and recognisable
+          after.
+        -->
+        <template #visibility-control>
+          <div class="template-tabs" :title="$t('group.rights.applyTemplate')">
+            <span class="template-tabs__label">{{ $t('admin.groupRoles.templateLabel') }}</span>
+            <button
+              v-for="name in templateNames"
+              :key="name"
+              type="button"
+              class="template-tab"
+              :class="{ 'template-tab--active': name === group.template }"
+              :disabled="saving || !canManageRoles || simpleDirty"
+              :title="simpleDirty ? $t('group.rights.saveFirst') : null"
+              :data-test="`template-${name}`"
+              @click="confirmApplyTemplate(name)"
+            >
+              {{ $t(`group.types.${name}`) }}
+            </button>
+          </div>
+        </template>
+
         <template #actions>
-          <os-button
-            :disabled="saving || !canManageRoles"
-            data-test="preset-channel"
-            @click="applyChannelPreset"
-          >
-            {{ $t('group.rights.presets.channel') }}
-          </os-button>
           <os-button :disabled="saving || !canManageRoles" data-test="reset" @click="confirmReset">
             {{ $t('group.rights.reset') }}
           </os-button>
@@ -186,6 +204,7 @@ export default {
   data() {
     return {
       catalog: [],
+      templateNames: [],
       roles: [],
       myGroupPermissions: [],
       advanced: false,
@@ -364,15 +383,34 @@ export default {
      * The read-only channel from #5588: members read, only admins write. Expressed as the
      * three rights it actually is rather than as a mode the backend would have to know about.
      */
-    async applyChannelPreset() {
-      const role = this.roles.find((candidate) => candidate.name === USUAL_GROUP_ROLE)
-      if (!role) return
-      const removed = ['group.post.create', 'group.comment.create']
-      await this.writeRole(
-        role.name,
-        role.permissions.filter((key) => !removed.includes(key)),
-        role.label,
-      )
+    /**
+     * Put a whole template on this group.
+     *
+     * Confirmed, because it replaces every role rather than changing one right — and named in
+     * the question, so "I meant the other one" is caught before the roles are gone.
+     */
+    async confirmApplyTemplate(name) {
+      if (name === this.group.template) return
+      const template = this.$t(`group.types.${name}`)
+      if (!window.confirm(this.$t('group.rights.confirmApplyTemplate', { template }))) return
+      await this.applyTemplate(name)
+    },
+    async applyTemplate(template) {
+      this.saving = true
+      try {
+        const { data } = await this.$apollo.mutate({
+          mutation: resetGroupRolesMutation(),
+          variables: { groupId: this.group.id, template },
+        })
+        this.roles = data.resetGroupRoles
+        this.group.template = template
+        this.resetDraft()
+        this.$toast.success(this.$t('group.rights.saved'))
+      } catch (error) {
+        this.$toast.error(error.message)
+      } finally {
+        this.saving = false
+      }
     },
     async confirmDelete() {
       if (!this.activeRole || this.activeRole.system) return
@@ -432,6 +470,7 @@ export default {
       result({ data, loading }) {
         if (loading || !data) return
         this.catalog = data.groupPermissionCatalog ?? []
+        this.templateNames = data.groupRoleTemplateNames ?? []
         const group = data.Group?.[0]
         this.roles = group?.roles ?? []
         this.myGroupPermissions = group?.myGroupPermissions ?? []
@@ -445,6 +484,52 @@ export default {
 <style scoped>
 /* The pill row and the matrix are shared components now (components/Permissions/*); what is
    left here is this page's own furniture. */
+.template-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xx-small);
+}
+
+.template-tabs__label {
+  margin-right: var(--space-xx-small);
+  color: var(--text-color-softer);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.template-tab {
+  border: 1px solid var(--border-color-soft);
+  border-radius: var(--border-radius-x-large);
+  background: var(--background-color-base);
+  color: var(--text-color-base);
+  padding: var(--space-xx-small) var(--space-small);
+  font-size: 0.9em;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.template-tab:hover:not(:disabled) {
+  background: var(--background-color-softer);
+}
+
+.template-tab--active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-primary-inverse);
+  font-weight: bold;
+}
+
+.template-tab--active:hover:not(:disabled) {
+  background: var(--color-primary);
+}
+
+.template-tab:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .title {
   margin-bottom: 0;
 }

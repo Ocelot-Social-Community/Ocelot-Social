@@ -39,6 +39,9 @@ describe('the seeded templates', () => {
     ['public', 'open'],
     ['closed', 'restricted'],
     ['hidden', 'restricted'],
+    // A channel is public and anybody may walk in — what it withholds is WRITING, which the
+    // door does not ask about.
+    ['channel', 'open'],
   ])
 
   it('states a door for every preset there is', () => {

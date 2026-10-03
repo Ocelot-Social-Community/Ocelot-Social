@@ -1001,8 +1001,10 @@
     "removeMemberTitle": "Hiq anëtarin",
     "rights": {
       "addRole": "Shto një rol",
+      "applyTemplate": "Zbato një model — zëvendëson të gjitha rolet e këtij grupi me ato të modelit.",
       "blockedByFeature": "Kjo funksion është e çaktivizuar në rrjet ({feature}).",
       "blockedByNetwork": "E kufizuar në të gjithë rrjetin: për këtë duhet leja {permission}.",
+      "confirmApplyTemplate": "Të zbatohet modeli “{template}” për këtë grup? Të gjitha rolet zëvendësohen me ato të modelit.",
       "confirmDelete": "Të fshihet roli «{role}»? Anëtarët e tij do të bëhen «{target}».",
       "confirmReset": "Të rikthehen të gjitha rolet e këtij grupi në parazgjedhjet? Rolet që shtuat hiqen dhe anëtarët e tyre bëhen anëtarë të zakonshëm.",
       "deleteRole": "Fshi rolin",
@@ -1014,9 +1016,6 @@
       "noRight": "Nuk mund të dhurosh një leje që ti vetë nuk e ke.",
       "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet e këtij grupi. Mund të ndryshohet vetëm emri i shfaqur.",
       "pendingUnreachable": "Askush nuk mund të kërkojë të bashkohet për momentin, prandaj askush nuk e ka këtë rol. Këtë e vendos pranimi.",
-      "presets": {
-        "channel": "Shndërroje në kanal (shkruajnë vetëm administratorët)"
-      },
       "reset": "Rikthe parazgjedhjet",
       "resultingType": "Me këto leje grupi është:",
       "roleKeyPlaceholder": "çelës, p.sh. redaksia",
@@ -1061,6 +1060,7 @@
       "public": "Grupi dhe të gjitha postimet janë të dukshme për të gjithë përdoruesit e regjistruar"
     },
     "types": {
+      "channel": "Kanal",
       "closed": "I mbyllur",
       "hidden": "Sekret",
       "public": "Publik"

@@ -684,3 +684,31 @@ export async function clearElevation(
   })
   return (result.records[0]?.get('found') as string | undefined) !== undefined
 }
+
+/** Which template a group runs on, falling back to the strictest one for a row without it. */
+export async function readGroupTemplate(db: DbContext, groupId: string): Promise<string> {
+  const result = await db.query({
+    query: `MATCH (g:Group {id: $groupId}) RETURN coalesce(g.template, 'hidden') AS template`,
+    variables: { groupId },
+  })
+  return (result.records[0]?.get('template') as string | undefined) ?? 'hidden'
+}
+
+/**
+ * Record which template the group runs on now.
+ *
+ * Written whenever a whole template is put on a group, because that is the question
+ * `untouchedGroupIdsByType` answers for the admin area: "how many groups would this edit
+ * reach". A group given the channel template and still recorded as `public` would be counted
+ * under the wrong one and silently rewritten by an edit meant for somebody else.
+ */
+export async function writeGroupTemplate(
+  db: DbContext,
+  groupId: string,
+  template: string,
+): Promise<void> {
+  await db.write({
+    query: `MATCH (g:Group {id: $groupId}) SET g.template = $template`,
+    variables: { groupId, template },
+  })
+}
