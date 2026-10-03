@@ -5,68 +5,65 @@
 
     <!-- Role switcher: one pill per role, plus an add button that turns into a
          name input. Only the active role's permissions are shown below. -->
-    <div class="role-tabs" data-test="role-tabs">
-      <button
-        v-for="role in orderedRoles"
-        :key="role.name"
-        type="button"
-        class="role-tab"
-        :class="{ 'role-tab--active': role.name === activeRoleName }"
-        :data-test="`role-tab-${role.name}`"
-        @click="setActive(role.name)"
-        @mouseenter="hoveredRoleName = role.name"
-        @mouseleave="hoveredRoleName = null"
-      >
-        {{ role.name }}
-        <span v-if="role.protected" class="role-tab__badge" :title="$t('admin.roles.protected')">
-          ★
+    <!-- Role switcher: one pill per role, plus an add button that turns into a
+         name input. Only the active role's permissions are shown below. -->
+    <role-tabs
+      :roles="orderedRoles"
+      :active-name="activeRoleName"
+      :label-for="(role) => role.name"
+      :badge-for="(role) => role.protected"
+      :badge-title="$t('admin.roles.protected')"
+      :label="$t('admin.roles.title')"
+      @select="setActive"
+      @hover="hoveredRoleName = $event"
+    >
+      <template #extra>
+        <!-- Add a role: the + button morphs into a name input -->
+        <os-button
+          v-if="!creating"
+          size="sm"
+          appearance="outline"
+          class="role-tab--add"
+          :title="$t('admin.roles.create')"
+          :aria-label="$t('admin.roles.create')"
+          data-test="role-add"
+          @click="startCreate"
+        >
+          <os-icon :icon="icons.plus" />
+        </os-button>
+        <span v-else class="role-tab role-tab--input" data-test="role-create">
+          <input
+            ref="newRoleInput"
+            v-model="newRole.name"
+            type="text"
+            class="role-tab__input"
+            :placeholder="$t('admin.roles.nameLabel')"
+            :aria-label="$t('admin.roles.create')"
+            data-test="new-role-name"
+            @keyup.enter="createRole"
+            @keyup.esc="cancelCreate"
+          />
+          <button
+            type="button"
+            class="role-tab__confirm"
+            :disabled="!newRole.name || saving"
+            :aria-label="$t('admin.roles.create')"
+            data-test="new-role-create"
+            @click="createRole"
+          >
+            <os-icon :icon="icons.check" />
+          </button>
+          <button
+            type="button"
+            class="role-tab__cancel"
+            :aria-label="$t('actions.cancel')"
+            @click="cancelCreate"
+          >
+            <os-icon :icon="icons.close" />
+          </button>
         </span>
-      </button>
-
-      <!-- Add a role: the + button morphs into a name input -->
-      <button
-        v-if="!creating"
-        type="button"
-        class="role-tab role-tab--add"
-        :title="$t('admin.roles.create')"
-        :aria-label="$t('admin.roles.create')"
-        data-test="role-add"
-        @click="startCreate"
-      >
-        +
-      </button>
-      <span v-else class="role-tab role-tab--input" data-test="role-create">
-        <input
-          ref="newRoleInput"
-          v-model="newRole.name"
-          type="text"
-          class="role-tab__input"
-          :placeholder="$t('admin.roles.nameLabel')"
-          :aria-label="$t('admin.roles.create')"
-          data-test="new-role-name"
-          @keyup.enter="createRole"
-          @keyup.esc="cancelCreate"
-        />
-        <button
-          type="button"
-          class="role-tab__confirm"
-          :disabled="!newRole.name || saving"
-          :aria-label="$t('admin.roles.create')"
-          data-test="new-role-create"
-          @click="createRole"
-        >
-          ✓
-        </button>
-        <button
-          type="button"
-          class="role-tab__cancel"
-          :aria-label="$t('actions.cancel')"
-          @click="cancelCreate"
-        >
-          ✕
-        </button>
-      </span>
-    </div>
+      </template>
+    </role-tabs>
 
     <!-- Active role -->
     <section v-if="activeRole" class="role" :data-test="`role-${activeRole.name}`">
@@ -110,7 +107,7 @@
               data-test="rename-role-confirm"
               @click="renameRole"
             >
-              ✓
+              <os-icon :icon="icons.check" />
             </button>
             <button
               type="button"
@@ -118,7 +115,7 @@
               :aria-label="$t('actions.cancel')"
               @click="cancelRename"
             >
-              ✕
+              <os-icon :icon="icons.close" />
             </button>
           </span>
         </h3>
@@ -153,44 +150,35 @@
 
         <!-- Two-column masonry on desktop (>=1024px) for a compact overview; each
              group stays intact (break-inside: avoid). Single column on mobile. -->
-        <div class="perm-groups">
-          <fieldset v-for="group in permissionGroups" :key="group.name" class="perm-group">
-            <legend class="perm-group__title">{{ groupLabel(group.name) }}</legend>
-            <label
-              v-for="permission in group.permissions"
-              :key="permission.key"
-              class="perm-row"
-              :class="{
-                'perm-row--added': rowDiff(permission.key) === 'added',
-                'perm-row--removed': rowDiff(permission.key) === 'removed',
-                'perm-row--unavailable': permission.available === false,
-              }"
-              :title="permission.available === false ? $t('admin.roles.permUnavailable') : null"
+        <permission-matrix
+          :permissions="permissionCatalog"
+          :granted="grantedPermissions"
+          :diff="matrixDiff"
+          :group-label="groupLabel"
+          :disabled-for="(permission) => activeRole.protected || permission.available === false"
+          :hint-for="
+            (permission) =>
+              permission.available === false ? $t('admin.roles.permUnavailable') : null
+          "
+          :note-for="
+            (permission) =>
+              permission.available === false ? $t('admin.roles.permUnavailable') : null
+          "
+          :description-for="permLabel"
+          :test-prefix="`role-${activeRole.name}-perm-`"
+          @toggle="setPermission"
+        >
+          <template #note="{ permission }">
+            <nuxt-link
+              v-if="permission.gatedBy && $can('policy.manage')"
+              :to="`/admin/policy#${permission.gatedBy}`"
+              class="perm-gate-link"
+              :data-test="`perm-gate-link-${permission.key}`"
             >
-              <input
-                type="checkbox"
-                :disabled="activeRole.protected || permission.available === false"
-                v-model="forms[activeRole.name].permissions[permission.key]"
-                :data-test="`role-${activeRole.name}-perm-${permission.key}`"
-              />
-              <span class="perm-row__text">
-                <span class="perm-row__key">{{ permission.key }}</span>
-                <span class="perm-row__desc">{{ permLabel(permission) }}</span>
-                <span v-if="permission.available === false" class="perm-row__gate">
-                  {{ $t('admin.roles.permUnavailable') }}
-                  <nuxt-link
-                    v-if="permission.gatedBy && $can('policy.manage')"
-                    :to="`/admin/policy#${permission.gatedBy}`"
-                    class="perm-row__gate-link"
-                    :data-test="`perm-gate-link-${permission.key}`"
-                  >
-                    {{ $t('admin.roles.permUnavailableLink') }}
-                  </nuxt-link>
-                </span>
-              </span>
-            </label>
-          </fieldset>
-        </div>
+              {{ $t('admin.roles.permUnavailableLink') }}
+            </nuxt-link>
+          </template>
+        </permission-matrix>
 
         <div class="role__actions">
           <!-- Always visible; disabled (with a hint) where the action does not apply. -->
@@ -232,11 +220,14 @@
 </template>
 
 <script>
-import { OsButton, OsCard } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
 import ConflictBanner from '~/components/ConflictBanner.vue'
+import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
+import RoleTabs from '~/components/Permissions/RoleTabs'
 import permissionsChangedSubscription from '~/graphql/PermissionsSubscription'
 import { iconRegistry } from '~/utils/iconRegistry'
+import { diffBetween, permissionSetOf, samePermissions } from '~/utils/permissionDiff'
 import {
   createRoleMutation,
   deleteRoleMutation,
@@ -250,7 +241,15 @@ const emptyPermissionMap = (catalog) =>
   catalog.reduce((map, permission) => ({ ...map, [permission.key]: false }), {})
 
 export default {
-  components: { ConfirmModal, ConflictBanner, OsButton, OsCard },
+  components: {
+    ConfirmModal,
+    ConflictBanner,
+    OsButton,
+    OsCard,
+    OsIcon,
+    PermissionMatrix,
+    RoleTabs,
+  },
   middleware: ['isAdmin'],
   data() {
     return {
@@ -334,20 +333,30 @@ export default {
     // When hovering another pill, map each permission key to how it differs from the
     // active role: 'added' (hovered role has it, active doesn't) / 'removed' (active
     // has it, hovered doesn't). Empty while hovering nothing or the active role.
+    /** The active role's granted keys as a list — the shape the shared matrix reads. */
+    grantedPermissions() {
+      const form = this.forms[this.activeRoleName]
+      if (!form) return []
+      return this.permissionCatalog
+        .filter((permission) => form.permissions[permission.key])
+        .map((permission) => permission.key)
+    },
+    /**
+     * What the rows mark: the hover preview takes precedence, the conflict diff stays up
+     * while its banner does.
+     */
+    matrixDiff() {
+      return { ...this.conflictDiff, ...this.hoverDiff }
+    },
     hoverDiff() {
       if (!this.hoveredRoleName || this.hoveredRoleName === this.activeRoleName) return {}
       const hovered = this.roles.find((role) => role.name === this.hoveredRoleName)
       if (!hovered) return {}
-      const activeSet = this.permissionSetOf(this.activeRole)
-      const hoveredSet = this.permissionSetOf(hovered)
-      const diff = {}
-      for (const permission of this.permissionCatalog) {
-        const inActive = activeSet.has(permission.key)
-        const inHovered = hoveredSet.has(permission.key)
-        if (inHovered && !inActive) diff[permission.key] = 'added'
-        else if (!inHovered && inActive) diff[permission.key] = 'removed'
-      }
-      return diff
+      return diffBetween(
+        this.permissionCatalog,
+        this.permissionSetOf(this.activeRole),
+        this.permissionSetOf(hovered),
+      )
     },
     // While a conflict banner is up for the active role, which permissions the OTHER admin
     // changed relative to this draft's baseline — 'added' (server now grants it) / 'removed'
@@ -356,26 +365,11 @@ export default {
     conflictDiff() {
       const form = this.activeRole && this.forms[this.activeRoleName]
       if (!this.activeRole || !this.conflicts[this.activeRoleName] || !form) return {}
-      const baseSet = new Set(form.baseline)
-      const serverSet = this.permissionSetOf(this.activeRole)
-      const diff = {}
-      for (const permission of this.permissionCatalog) {
-        const inBase = baseSet.has(permission.key)
-        const inServer = serverSet.has(permission.key)
-        if (inServer && !inBase) diff[permission.key] = 'added'
-        else if (!inServer && inBase) diff[permission.key] = 'removed'
-      }
-      return diff
-    },
-    // Catalog grouped by permission group, for sectioned checkboxes.
-    permissionGroups() {
-      const byGroup = {}
-      for (const permission of this.permissionCatalog) {
-        ;(byGroup[permission.group] = byGroup[permission.group] || []).push(permission)
-      }
-      return Object.keys(byGroup)
-        .sort()
-        .map((name) => ({ name, permissions: byGroup[name] }))
+      return diffBetween(
+        this.permissionCatalog,
+        new Set(form.baseline),
+        this.permissionSetOf(this.activeRole),
+      )
     },
   },
   methods: {
@@ -470,10 +464,11 @@ export default {
       const baseline = [...(form.baseline || [])].sort()
       return server.length !== baseline.length || server.some((key, i) => key !== baseline[i])
     },
-    // Hover-diff (previewing another pill) takes precedence; otherwise the conflict-diff
-    // (persistent while a conflict banner is up). Drives the row highlight.
-    rowDiff(key) {
-      return this.hoverDiff[key] || this.conflictDiff[key] || null
+    /** One of the two checkbox writes the form object takes, from the shared matrix. */
+    setPermission(key, enabled) {
+      const form = this.forms[this.activeRoleName]
+      if (!form) return
+      this.$set(form.permissions, key, enabled)
     },
     // Resolve a conflict by discarding local edits and rebuilding the draft from the current
     // server set (take theirs). The banner clears; baseline advances to the server set.
@@ -512,9 +507,7 @@ export default {
     },
     // The effective permission key set of a role (full catalog for protected roles).
     permissionSetOf(role) {
-      if (!role) return new Set()
-      if (role.protected) return new Set(this.permissionCatalog.map((p) => p.key))
-      return new Set(role.permissions)
+      return permissionSetOf(role, this.permissionCatalog)
     },
     // Keep a valid role selected: default to the first one shown (lowest-privilege,
     // the baseline `user` group), and re-select after a role is deleted/renamed away.
@@ -624,12 +617,7 @@ export default {
     isDirty(role) {
       const form = this.forms[role.name]
       if (!form) return false
-      const selected = this.selectedPermissions(form.permissions).sort()
-      const original = [...role.permissions].sort()
-      return (
-        selected.length !== original.length ||
-        selected.some((key, index) => key !== original[index])
-      )
+      return !samePermissions(this.selectedPermissions(form.permissions), role.permissions)
     },
     // Whether the draft differs from the server set it was BUILT from (its baseline),
     // i.e. this admin has toggled something locally. Unlike isDirty (draft vs the current
@@ -638,12 +626,7 @@ export default {
     isLocallyEdited(roleName) {
       const form = this.forms[roleName]
       if (!form || !form.baseline) return false
-      const selected = this.selectedPermissions(form.permissions).sort()
-      const baseline = [...form.baseline].sort()
-      return (
-        selected.length !== baseline.length ||
-        selected.some((key, index) => key !== baseline[index])
-      )
+      return !samePermissions(this.selectedPermissions(form.permissions), form.baseline)
     },
     canDelete(role) {
       // Protected (owner) and the implicit baseline (user) cannot be deleted, and a
@@ -780,55 +763,23 @@ export default {
   margin-bottom: var(--space-base);
   color: var(--text-color-soft);
 }
-.role-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-x-small);
-  padding-bottom: var(--space-small);
-  border-bottom: 1px solid var(--border-color-softer);
-}
-.role-tab {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xxx-small);
-  padding: var(--space-xx-small) var(--space-small);
-  border: 1px solid var(--border-color-soft);
-  border-radius: var(--border-radius-x-large);
-  background: var(--background-color-base);
-  color: var(--text-color-base);
-  font-size: 0.9em;
-  line-height: 1.4;
-  cursor: pointer;
 
-  &:hover {
-    background: var(--background-color-softer);
-  }
-}
-
-.role-tab--active {
-  border-color: var(--color-primary);
-  background: var(--color-primary);
-  color: var(--color-primary-inverse);
-  font-weight: bold;
-
-  &:hover {
-    background: var(--color-primary);
-  }
-}
-
+/* An outlined OsButton like the role tabs beside it, dashed because it is not a role. */
 .role-tab--add {
-  font-weight: bold;
   border-style: dashed;
 }
 
+/* The name field the + turns into, sized and framed like the buttons in the row. */
 .role-tab--input {
-  padding: var(--space-xxx-small) var(--space-xx-small);
-  cursor: default;
-}
-
-.role-tab__badge {
-  font-size: 0.8em;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xxx-small);
+  height: 26px;
+  padding: 0 var(--space-xx-small);
+  border: 1px solid var(--border-color-soft);
+  border-radius: 5px;
+  background: var(--background-color-base);
+  font-size: 12px;
 }
 
 .role-tab__input {
@@ -934,96 +885,12 @@ export default {
 .role__action {
   display: inline-flex;
 }
-/*  Desktop (>=1024px): pack the permission groups into two columns for a more */
-/*  compact overview. Mobile/tablet stay single-column (the default). column-* is */
-/*  used (rather than grid/flex) so unequal-height groups fill the space tightly. */
-.perm-groups {
-  @media (--vp-desktop-up) {
-    column-count: 2;
-    column-gap: var(--space-large);
-  }
-}
-.perm-group {
-  border: none;
-  padding: 0;
-  margin: var(--space-x-small) 0;
-  /*  Keep a group (title + its rows) from splitting across the two columns. */
-  break-inside: avoid;
-  /*  The first group's top margin would otherwise misalign the two column tops. */
-  &:first-child {
-    margin-top: 0;
-  }
-}
 
-.perm-group__title {
-  color: var(--text-color-soft);
-  font-weight: bold;
-  font-size: 0.85em;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-.perm-row {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-x-small);
-  margin: var(--space-xxx-small) 0;
-  padding: var(--space-xxx-small) var(--space-xx-small);
-  border-radius: var(--border-radius-small);
-  border-left: 3px solid transparent;
-  cursor: pointer;
-  transition: background-color 0.1s ease;
-
-  /*  Hover-diff against the active role: the hovered role would add (green) or */
-  /*  remove (red) this permission. */
-  /*  The permission's feature is not configured/enabled: granting it has no effect, */
-  /*  so the row is dimmed and the checkbox disabled (with an explanatory note). */
-  input:disabled {
-    cursor: default;
-  }
-
-  /*  The deep-link to the policy tab. Colour/affordance come from the global `a` reset */
-  /*  (var(--color-primary), no underline — the app-wide link convention, matching the policy tab's */
-  /*  env-link); only keep it from wrapping mid-phrase inside the italic gate note. */
-}
-
-.perm-row--added {
-  background: color-mix(in srgb, var(--color-success) 16%, transparent);
-  border-left-color: var(--color-success);
-}
-
-.perm-row--removed {
-  background: color-mix(in srgb, var(--color-danger) 16%, transparent);
-  border-left-color: var(--color-danger);
-}
-
-.perm-row--unavailable {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.perm-row__text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.25;
-}
-
-.perm-row__key {
-  font-family: monospace;
-  font-size: 0.85em;
-}
-
-.perm-row__desc {
-  color: var(--text-color-soft);
-  font-size: 0.8em;
-}
-
-.perm-row__gate {
-  color: var(--color-danger);
-  font-size: 0.75em;
-  font-style: italic;
-}
-
-.perm-row__gate-link {
+/* The deep-link to the policy tab, inside the shared matrix' gate note. Colour and affordance
+   come from the global `a` reset (var(--color-primary), no underline — the app-wide link
+   convention, matching the policy tab's env-link); this only keeps it from wrapping
+   mid-phrase inside the italic note. */
+.perm-gate-link {
   white-space: nowrap;
 }
 </style>
