@@ -255,12 +255,6 @@ describe('GroupForm', () => {
       expect(wrapper.vm.hasUnsavedChanges).toBe(true)
     })
 
-    it('becomes true once showMembers is toggled', () => {
-      const wrapper = mountWith({ update: true, group: { ...group, visibility: 'closed' } })
-      wrapper.find('#show-members').setChecked(true)
-      expect(wrapper.vm.hasUnsavedChanges).toBe(true)
-    })
-
     it('becomes true once the location is genuinely changed (map)', () => {
       const wrapper = mountWith({ update: true, group })
       wrapper
@@ -819,6 +813,31 @@ describe('GroupForm', () => {
       expect(wrapper.vm.formData.visibility).toBe('public')
     })
 
+    it('names the templates and explains the one pointed at, else the one picked', async () => {
+      // Four cards each carrying their own sentence were as tall as the longest of them.
+      const wrapper = mountWith(() => true, {
+        templates: [
+          { name: 'channel', visibility: 'public' },
+          { name: 'closed', visibility: 'closed' },
+        ],
+      })
+      const description = () => wrapper.find('[data-test="template-description"]')
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+
+      expect(description().exists()).toBe(false)
+
+      await card('channel').trigger('click')
+      expect(wrapper.vm.describedTemplate).toBe('channel')
+      expect(description().exists()).toBe(true)
+      expect(card('channel').attributes('aria-describedby')).toBe('template-description')
+
+      await card('closed').trigger('mouseenter')
+      expect(wrapper.vm.describedTemplate).toBe('closed')
+
+      await card('closed').trigger('mouseleave')
+      expect(wrapper.vm.describedTemplate).toBe('channel')
+    })
+
     it('canCreateAnyGroup is false only when no type is permitted', () => {
       expect(mountWith(() => false).vm.canCreateAnyGroup).toBe(false)
       expect(mountWith((p) => p === 'group.create_closed').vm.canCreateAnyGroup).toBe(true)
@@ -889,38 +908,29 @@ describe('GroupForm', () => {
     })
   })
 
-  describe('effectiveShowMembers', () => {
-    const mountWithType = (visibility, showMembers = false) =>
+  describe('who may see the members', () => {
+    // A right of the non-member role, set under Rights. The checkbox this form had for it wrote
+    // that right on every save — so renaming a group undid a member list opened up there.
+    const mountWithType = (update) =>
       mount(GroupForm, {
-        propsData: { update: false, group: { visibility, showMembers } },
+        propsData: { update, group: { ...group, visibility: 'closed', showMembers: true } },
         mocks: { $t: jest.fn(), $can: () => true },
         localVue,
         stubs,
         store,
       })
 
-    it('returns true for public groups regardless of showMembers', () => {
-      expect(mountWithType('public', false).vm.effectiveShowMembers).toBe(true)
-      expect(mountWithType('public', true).vm.effectiveShowMembers).toBe(true)
+    it('is not asked here, on either form', () => {
+      expect(mountWithType(false).find('#show-members').exists()).toBe(false)
+      expect(mountWithType(true).find('#show-members').exists()).toBe(false)
     })
 
-    it('returns false for hidden groups regardless of showMembers', () => {
-      expect(mountWithType('hidden', true).vm.effectiveShowMembers).toBe(false)
-      expect(mountWithType('hidden', false).vm.effectiveShowMembers).toBe(false)
-    })
+    it('is not written by a save of this form', () => {
+      const wrapper = mountWithType(true)
 
-    it('returns the actual showMembers value for closed groups', () => {
-      expect(mountWithType('closed', false).vm.effectiveShowMembers).toBe(false)
-      expect(mountWithType('closed', true).vm.effectiveShowMembers).toBe(true)
-    })
+      wrapper.vm.submit()
 
-    it('disables the checkbox when visibility is not closed', async () => {
-      const wrapper = mountWithType('public')
-      expect(wrapper.find('#show-members').attributes('disabled')).toBeDefined()
-      await wrapper.vm.$set(wrapper.vm.formData, 'visibility', 'closed')
-      expect(wrapper.find('#show-members').attributes('disabled')).toBeUndefined()
-      await wrapper.vm.$set(wrapper.vm.formData, 'visibility', 'hidden')
-      expect(wrapper.find('#show-members').attributes('disabled')).toBeDefined()
+      expect(wrapper.emitted('updateGroup')[0][0]).not.toHaveProperty('showMembers')
     })
   })
 })

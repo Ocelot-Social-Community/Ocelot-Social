@@ -47,30 +47,38 @@
           <p class="ds-text select-label">{{ $t('group.templateChoice') }}</p>
           <ul class="template-cards" data-test="template-cards">
             <li v-for="choice in templateChoices" :key="choice.name" class="template-cards__item">
-              <button
+              <group-state-card
+                tag="button"
                 type="button"
-                class="template-card"
-                :class="{ 'template-card--active': choice.name === formData.template }"
+                :icon="icons[choice.icon]"
+                :active="choice.name === formData.template"
                 :disabled="!choice.allowed"
                 :title="choice.allowed ? null : $t('group.validations.groupTypeNotAllowed')"
+                :aria-describedby="
+                  choice.name === describedTemplate ? 'template-description' : null
+                "
                 :data-test="`template-card-${choice.name}`"
                 @click="chooseTemplate(choice)"
+                @mouseenter="hoveredTemplate = choice.name"
+                @mouseleave="hoveredTemplate = null"
+                @focus="hoveredTemplate = choice.name"
+                @blur="hoveredTemplate = null"
               >
-                <os-icon
-                  :icon="icons[choice.icon]"
-                  size="2xl"
-                  class="template-card__icon"
-                  aria-hidden="true"
-                />
-                <span class="template-card__text">
-                  <strong>{{ $t(`group.types.${choice.name}`) }}</strong>
-                  <span class="template-card__description">
-                    {{ $t(`group.templateDescriptions.${choice.name}`) }}
-                  </span>
-                </span>
-              </button>
+                <template #title>{{ $t(`group.types.${choice.name}`) }}</template>
+              </group-state-card>
             </li>
           </ul>
+          <!-- The cards only NAME the templates; what one means stands here — for the card under
+               the cursor (or keyboard focus), else for the one picked. Four cards each carrying
+               their own sentence were as tall as the longest of them. -->
+          <p
+            v-if="describedTemplate"
+            id="template-description"
+            class="template-description"
+            data-test="template-description"
+          >
+            {{ $t(`group.templateDescriptions.${describedTemplate}`) }}
+          </p>
           <os-validation-hint
             v-if="visibleErrors && visibleErrors.template && formData.template === ''"
             variant="error"
@@ -86,7 +94,7 @@
             {{ $t('group.type') }}
           </p>
           <div
-            class="select-wrap"
+            class="select-wrap visibility-wrap"
             :class="{
               'ds-input-has-error':
                 visibleErrors && visibleErrors.visibility && formData.visibility === '',
@@ -118,19 +126,9 @@
           />
         </template>
 
-        <!-- showMembers -->
-        <div class="show-members-control">
-          <input
-            id="show-members"
-            type="checkbox"
-            :checked="effectiveShowMembers"
-            :disabled="formData.visibility !== 'closed'"
-            @change="updateFormField('showMembers', $event.target.checked)"
-          />
-          <label for="show-members" :class="{ 'is-disabled': formData.visibility !== 'closed' }">
-            {{ $t('group.showMembers') }}
-          </label>
-        </div>
+        <!-- No member-list checkbox here any more: who may see the members is a right of the
+             non-member role, set under Rights. A second control for it wrote that right on
+             EVERY save of this form, and so quietly undid what had been set there. -->
 
         <!-- goal -->
         <ocelot-input name="about" :label="$t('group.goal')" v-model="formData.about" rows="3" />
@@ -259,6 +257,7 @@ import LocationSelect from '~/components/Select/LocationSelect'
 import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
+import GroupStateCard from '~/components/Group/GroupStateCard'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import groupRights from '~/mixins/groupRights'
 
@@ -285,6 +284,7 @@ export default {
   mixins: [GetCategories, formValidation, groupRights],
   components: {
     CategoriesSelect,
+    GroupStateCard,
     Editor,
     ActionRadiusSelect,
     LocationSelect,
@@ -317,17 +317,8 @@ export default {
     },
   },
   data() {
-    const {
-      name,
-      slug,
-      visibility,
-      about,
-      description,
-      actionRadius,
-      locationName,
-      categories,
-      showMembers,
-    } = this.group
+    const { name, slug, visibility, about, description, actionRadius, locationName, categories } =
+      this.group
     const initialCategoryIds = categories ? categories.map((category) => category.id) : []
     return {
       disabled: false,
@@ -362,6 +353,8 @@ export default {
       // hint would keep comparing against the value from when the form was
       // first opened and never clear once saved.
       savedLocationName: locationName || '',
+      // The template card under the cursor or focus, whose meaning is spelled out under the row.
+      hoveredTemplate: null,
       // Exposed for the template (see the category validation hint below) —
       // bare module-scope reads don't resolve there, unlike in the script.
       branding,
@@ -380,7 +373,6 @@ export default {
         locationName: locationName || '',
         actionRadius: actionRadius || '',
         categoryIds: [...initialCategoryIds],
-        showMembers: showMembers ?? false,
       },
       formSchema: {
         name: {
@@ -555,6 +547,10 @@ export default {
      * slow or failed request leaves the form usable rather than empty. Those three always exist
      * — a drift guard in the backend keeps one template per visibility.
      */
+    /** Which template the line under the cards explains: the one pointed at, else the one picked. */
+    describedTemplate() {
+      return this.hoveredTemplate || this.formData.template || null
+    },
     templateChoices() {
       const choices = this.templates.length
         ? this.templates
@@ -593,15 +589,10 @@ export default {
       if (!this.formData.visibility) return this.canCreateAnyGroup
       return this.$can(`group.create_${this.formData.visibility}`) && this.canSubmitHiddenTransition
     },
-    effectiveShowMembers() {
-      if (this.formData.visibility === 'public') return true
-      if (this.formData.visibility === 'hidden') return false
-      return this.formData.showMembers
-    },
     // Exposed (via $refs) for the page component's own beforeRouteLeave
     // guard, and used below for the native beforeunload prompt. dirtyFields
     // covers every field wired through updateFormField()/$parentForm.update
-    // (name, slug, visibility, about, description, actionRadius, showMembers,
+    // (name, slug, visibility, about, description, actionRadius,
     // categoryIds) — locationChangedByUser covers the location field
     // separately, since it's set directly rather than through
     // updateFormField (see onLocationSelectInput/onLocationPickerMapInput;
@@ -615,7 +606,7 @@ export default {
     // actual :disabled, deliberately: hasUnsavedChanges only tracks whether
     // something was TOUCHED, not whether it truly differs from what's
     // saved, so a gap in that tracking (a future field that forgets to wire
-    // itself up, the way the location and showMembers ones once did) must
+    // itself up, the way the location one once did) must
     // never make a real save unreachable. Worst case here is an invitingly-
     // styled click that just re-saves the same values — never a blocked one.
     // Deliberately NOT reflected in aria-disabled (see the template) — the
@@ -729,7 +720,6 @@ export default {
         lat: this.formLocationCoordinates?.lat ?? null,
         lng: this.formLocationCoordinates?.lng ?? null,
         categoryIds,
-        showMembers: this.effectiveShowMembers,
       }
       // Snapshot exactly what's being submitted — submit() to done() is a
       // real network round-trip (not instantaneous), so the user may touch
@@ -780,66 +770,34 @@ export default {
 </script>
 
 <style>
-/* One card per template: a glyph, what it is called and what it makes the group — the same
-   three things the rights screen states, so the choice made here is recognisable there. */
+/* One card per template (GroupStateCard): a glyph, what it is called and what it makes the
+   group — the same card the rights screen states the group with, so the choice made here is
+   recognisable there. In one row on a wide screen however many templates there are: they are
+   one scale, and a second row read as a second, lesser set. */
 .template-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
   gap: var(--space-x-small);
   list-style: none;
   padding: 0;
   margin: 0 0 var(--space-base);
+
+  @media (--vp-desktop-up) {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+  }
 }
 
-.template-card {
-  display: flex;
-  align-items: center;
-  gap: var(--space-small);
-  width: 100%;
-  height: 100%;
-  text-align: left;
-  border: 1px solid var(--border-color-soft);
-  border-radius: var(--border-radius-base);
-  background: var(--background-color-base);
-  color: var(--text-color-base);
-  padding: var(--space-small);
-  cursor: pointer;
+.template-cards:has(+ .template-description),
+.template-cards:has(+ .os-validation-hint) {
+  margin-bottom: 0;
 }
 
-.template-card:hover:not(:disabled) {
-  background: var(--background-color-softer);
-}
-
-.template-card--active {
-  border-color: var(--color-primary);
-  box-shadow: inset 0 0 0 1px var(--color-primary);
-}
-
-/* Not a filled card: the description under the name has to stay readable, and white on the
-   brand green is exactly the contrast the filled buttons had to be fixed for. */
-.template-card--active:hover:not(:disabled) {
-  background: var(--background-color-base);
-}
-
-.template-card:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.template-card__icon {
-  flex: 0 0 auto;
-  font-size: 1.4rem;
+.template-description {
+  margin: var(--space-xx-small) 0 var(--space-base);
   color: var(--text-color-soft);
-}
-
-.template-card__text {
-  display: flex;
-  flex-direction: column;
-}
-
-.template-card__description {
-  color: var(--text-color-soft);
-  font-size: 0.85em;
+  font-size: 0.9em;
 }
 
 .appearance--auto {
@@ -872,19 +830,6 @@ export default {
   display: flex;
   flex-direction: column;
 
-  > .show-members-control {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: var(--space-x-small);
-    margin-top: var(--space-x-small);
-    margin-bottom: var(--space-base);
-
-    label.is-disabled {
-      opacity: 0.5;
-    }
-  }
-
   > .ds-form-item {
     margin: 0;
   }
@@ -899,11 +844,10 @@ export default {
     margin: 0;
   }
 
-  /* Unlike visibility's select-wrap (whose next sibling is the checkbox and
-     stays deliberately tight, handled above), actionRadius's next sibling
-     is the next field group (location) and should keep the same
+  /* Both selects are followed by the next field and keep the same
      space-base gap every other field-to-field transition uses — there is
-     no explicit spacer div for it any more (see template). */
+     no explicit spacer div for either (see template). */
+  > .visibility-wrap,
   > .action-radius-wrap {
     margin-bottom: var(--space-base);
   }
@@ -913,6 +857,7 @@ export default {
      the space-base gap to the next field comes from the hint's own
      margin-bottom below. Without this, the two would add up and push the
      hint away from its select. */
+  > .visibility-wrap:has(+ .os-validation-hint),
   > .action-radius-wrap:has(+ .os-validation-hint) {
     margin-bottom: 0;
   }
@@ -920,19 +865,6 @@ export default {
   > .os-validation-hint {
     margin-bottom: var(--space-base);
     cursor: default;
-  }
-
-  /* .show-members-control's own margin-top (8px, above) assumes it's
-     sitting right after the visibility select directly. When the select's
-     validation hint is showing instead (error state), that hint's own
-     margin-bottom (16px, from the rule above — meant for the general case
-     of one field's hint to the next field) adds to those 8px instead of
-     collapsing with them (flex containers never collapse sibling
-     margins), pulling the checkbox noticeably further down than in the
-     no-error case. Cancel just the hint's margin here so the gap stays
-     the same small size either way. */
-  > .os-validation-hint + .show-members-control {
-    margin-top: calc(var(--space-x-small) - var(--space-base));
   }
 
   /* Same double-margin problem as above, one field over: the slug field's
@@ -956,7 +888,7 @@ export default {
      spreading them left/right across the row. Not something
      ContributionForm.vue hits: its fields sit inside plain-block
      os-card__content, not a div matched by a rule like this one. */
-  > div:not(.buttons):not(.show-members-control):not(.os-validation-hint) {
+  > div:not(.buttons):not(.os-validation-hint) {
     display: flex;
     flex-direction: column;
 

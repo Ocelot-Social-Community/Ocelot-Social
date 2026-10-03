@@ -18,7 +18,6 @@ export const createGroupMutation = () => {
       $locationName: String # empty string '' sets it to null
       $lat: Float
       $lng: Float
-      $showMembers: Boolean
     ) {
       CreateGroup(
         id: $id
@@ -32,7 +31,6 @@ export const createGroupMutation = () => {
         locationName: $locationName
         lat: $lat
         lng: $lng
-        showMembers: $showMembers
       ) {
         id
         name
@@ -85,7 +83,6 @@ export const updateGroupMutation = () => {
       $locationName: String # empty string '' sets it to null
       $lat: Float
       $lng: Float
-      $showMembers: Boolean
     ) {
       UpdateGroup(
         id: $id
@@ -100,7 +97,6 @@ export const updateGroupMutation = () => {
         locationName: $locationName
         lat: $lat
         lng: $lng
-        showMembers: $showMembers
       ) {
         id
         name

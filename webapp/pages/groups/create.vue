@@ -93,7 +93,6 @@ export default {
         lat,
         lng,
         categoryIds,
-        showMembers,
       } = value
       const variables = {
         name,
@@ -105,7 +104,6 @@ export default {
         lat,
         lng,
         categoryIds,
-        showMembers,
       }
       let responseId, responseSlug
       try {

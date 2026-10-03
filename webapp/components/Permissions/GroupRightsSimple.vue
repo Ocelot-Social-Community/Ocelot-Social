@@ -57,50 +57,47 @@
         </div>
       </div>
 
-      <!-- What the group IS — a status, not a control, so it is set apart as one: framed, sunk
-           in, and saying what it would become while something under the cursor would change it. -->
-      <div
+      <!-- What the group IS, on the same card the create form offers its templates on — so the
+           state reads as the choice it came from — saying what it would become while something
+           under the cursor would change it. -->
+      <group-state-card
         class="state state--visibility"
         :class="{ 'state--changes': nextVisibility }"
+        :icon="icons[visibilityIcon]"
         :data-test="`visibility-${visibility}`"
       >
-        <os-icon :icon="icons[visibilityIcon]" class="state__icon" aria-hidden="true" />
-        <div class="state__text">
-          <p class="state__caption">{{ caption }}</p>
-          <strong class="state__title" data-test="visibility-title">
-            {{ $t(`group.types.${visibility}`) }}
-            <span v-if="nextVisibility" class="state__next" data-test="visibility-next">
-              → {{ $t(`group.types.${nextVisibility}`) }}
-            </span>
-          </strong>
-          <p class="state__description" data-test="visibility-description">
-            {{ $t(`group.typeDescriptions.${visibility}`) }}
-          </p>
-        </div>
-      </div>
+        <template #caption>{{ caption }}</template>
+        <template #title>
+          <span data-test="visibility-title">{{ $t(`group.types.${visibility}`) }}</span>
+          <span v-if="nextVisibility" class="state__next" data-test="visibility-next">
+            → {{ $t(`group.types.${nextVisibility}`) }}
+          </span>
+        </template>
+        <span data-test="visibility-description">
+          {{ $t(`group.typeDescriptions.${visibility}`) }}
+        </span>
+      </group-state-card>
 
-      <div
+      <group-state-card
         class="state state--admission"
         :class="{ 'state--changes': nextAdmission }"
+        :icon="icons[admissionIcon]"
         :data-test="`admission-${admission}`"
       >
-        <os-icon :icon="icons[admissionIcon]" class="state__icon" aria-hidden="true" />
-        <div class="state__text">
-          <p class="state__caption">{{ $t('group.admission.caption') }}</p>
-          <strong class="state__title" data-test="admission-title">
-            {{ $t(`group.admission.${admission}.title`) }}
-            <span v-if="nextAdmission" class="state__next" data-test="admission-next">
-              → {{ $t(`group.admission.${nextAdmission}.title`) }}
-            </span>
-          </strong>
-          <p class="state__description" data-test="admission-description">
-            {{ $t(`group.admission.${admission}.description`) }}
-          </p>
-          <p v-if="admissionLocked" class="state__reason" data-test="admission-locked">
-            {{ $t('group.admission.needsVisibility') }}
-          </p>
-        </div>
-      </div>
+        <template #caption>{{ $t('group.admission.caption') }}</template>
+        <template #title>
+          <span data-test="admission-title">{{ $t(`group.admission.${admission}.title`) }}</span>
+          <span v-if="nextAdmission" class="state__next" data-test="admission-next">
+            → {{ $t(`group.admission.${nextAdmission}.title`) }}
+          </span>
+        </template>
+        <span data-test="admission-description">
+          {{ $t(`group.admission.${admission}.description`) }}
+        </span>
+        <span v-if="admissionLocked" class="state__reason" data-test="admission-locked">
+          {{ $t('group.admission.needsVisibility') }}
+        </span>
+      </group-state-card>
     </div>
 
     <!-- Grouped by WHO the sentence is about, because that is the order somebody reads them
@@ -145,7 +142,7 @@
 </template>
 
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import GroupStateCard from '~/components/Group/GroupStateCard'
 import { NONE_GROUP_ROLE, PENDING_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
 import { ADMISSION_STATES, admissionOf, JOIN_RIGHTS, withAdmission } from '~/utils/groupAdmission'
 import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
@@ -220,7 +217,7 @@ const changeBetween = (now, next) => {
 
 export default {
   name: 'GroupRightsSimple',
-  components: { OsIcon },
+  components: { GroupStateCard },
   props: {
     /** The group's (or template's) roles AS DRAFTED: `{ name, permissions, … }`. */
     roles: { type: Array, required: true },
@@ -479,57 +476,27 @@ export default {
   letter-spacing: 0.03em;
 }
 
-/*
- * A status of the group rather than something to click: framed and sunk into the page, like a
- * display set into a panel. Top-aligned, not centred — the glyph belongs beside the first line
- * of what it illustrates.
- */
+/* The cards are GroupStateCard's; here only where they sit and the mark they get. */
 .state {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-small);
-  padding: var(--space-small) var(--space-base);
-  border: 1px solid var(--border-color-softer);
-  border-radius: var(--border-radius-base);
-  background: var(--background-color-softer);
-  box-shadow: inset 0 1px 4px rgb(0 0 0 / 12%);
-  font-size: 0.9em;
   outline: 2px solid transparent;
   outline-offset: 2px;
   transition: outline-color 0.1s ease;
 }
 
-/* Something under the cursor would change it — the line under the title says into what. */
+/* Something under the cursor would change it — the line beside the title says into what. */
 .state--changes {
   outline-color: var(--color-primary);
-}
-
-/* OsIcon sizes itself in `em`, so the font-size is the handle. */
-.state__icon {
-  flex: 0 0 auto;
-  font-size: 1.75rem;
-  color: var(--text-color-soft);
-}
-
-.state__text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xxx-small);
-}
-
-.state__caption,
-.state__description,
-.state__reason {
-  margin: 0;
-}
-
-.state__caption {
-  color: var(--text-color-soft);
 }
 
 .state__next {
   color: var(--color-primary);
   white-space: nowrap;
+}
+
+/* The reason a door cannot be set, as its own line under the description. */
+.state__reason {
+  display: block;
+  margin-top: var(--space-xxx-small);
 }
 
 /* The same pill the template tabs are, so the two rows read as the same kind of choice. */
