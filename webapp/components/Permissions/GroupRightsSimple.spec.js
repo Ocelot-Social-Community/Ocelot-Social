@@ -213,3 +213,61 @@ describe('GroupRightsSimple', () => {
     })
   })
 })
+
+describe('what it points at', () => {
+  const Wrapper = (propsData = {}) =>
+    mount(GroupRightsSimple, {
+      localVue,
+      mocks: { $t: (key) => key },
+      propsData: { roles: rolesWith(), catalog: CATALOG, caption: 'Resulting:', ...propsData },
+    })
+
+  it('names the role and the rights one sentence stands for', async () => {
+    // What makes the matrix below readable: the sentence says "members may write posts", the
+    // matrix says `group.post.create` on the `usual` tab, and the hover is what joins the two.
+    const wrapper = Wrapper()
+
+    await wrapper.find('[data-test="switch-row-members-post"]').trigger('mouseenter')
+
+    expect(wrapper.emitted('highlight').at(-1)).toEqual([{ usual: ['group.post.create'] }])
+  })
+
+  it('carries the implied right along, as the tick itself would', () => {
+    const wrapper = Wrapper()
+
+    wrapper.find('[data-test="switch-row-nonmembers-read"]').trigger('mouseenter')
+
+    const [marked] = wrapper.emitted('highlight').at(-1)
+    expect(marked.none.sort()).toEqual(['group.content.read', 'group.read'])
+  })
+
+  it('points at both join rights from any of the three door buttons', async () => {
+    // Picking a state rewrites the PAIR, so "nobody may ask" is as much about `group.join` as
+    // "anybody may walk in" is.
+    const wrapper = Wrapper({ roles: rolesWith(['group.read']) })
+
+    await wrapper.find('[data-test="admission-option-closed"]').trigger('mouseenter')
+
+    const [marked] = wrapper.emitted('highlight').at(-1)
+    expect(marked.none.sort()).toEqual(['group.join', 'group.join.request'])
+  })
+
+  it('points from a LOCKED sentence too, so a blocked right can still be found', async () => {
+    // The handler sits on the row rather than on the input: a right one may not grant is the
+    // one a reader most needs to locate in the matrix.
+    const wrapper = Wrapper({ disabled: true })
+
+    await wrapper.find('[data-test="switch-row-members-post"]').trigger('mouseenter')
+
+    expect(wrapper.emitted('highlight').at(-1)).toEqual([{ usual: ['group.post.create'] }])
+  })
+
+  it('stops pointing when the cursor leaves', async () => {
+    const wrapper = Wrapper()
+
+    await wrapper.find('[data-test="switch-row-members-post"]').trigger('mouseenter')
+    await wrapper.find('[data-test="switch-row-members-post"]').trigger('mouseleave')
+
+    expect(wrapper.emitted('highlight').at(-1)).toEqual([null])
+  })
+})

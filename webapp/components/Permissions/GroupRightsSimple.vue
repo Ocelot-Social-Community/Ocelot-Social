@@ -19,34 +19,39 @@
     -->
     <div class="states">
       <div class="state" :data-test="`visibility-${visibility}`">
-        <!-- The page's own way of setting this — the template tabs in the admin area. -->
-        <!-- Always rendered, even where a page passes nothing: the grid places items into the
-             next free cell of their row, so a missing control would move the admission one
-             into the visibility column. -->
+        <os-icon :icon="icons[visibilityIcon]" size="2xl" class="state__icon" aria-hidden="true" />
+        <div class="state__text">
+          <p class="state__caption">{{ caption }}</p>
+          <strong class="state__title" data-test="visibility-title">
+            {{ $t(`group.types.${visibility}`) }}
+          </strong>
+          <p class="state__description" data-test="visibility-description">
+            {{ $t(`group.typeDescriptions.${visibility}`) }}
+          </p>
+        </div>
+        <!-- The page's own way of setting this — the template tabs on both levels. The LABEL is
+             here rather than in the slot: the page used to bring its own, and the two then stood
+             above each other saying "Vorlage" twice. -->
         <div class="state__control">
           <span class="state__control-label">{{ $t('admin.groupRoles.templateLabel') }}</span>
           <slot name="visibility-control" />
         </div>
-        <div class="state__body">
-          <os-icon
-            :icon="icons[visibilityIcon]"
-            size="2xl"
-            class="state__icon"
-            aria-hidden="true"
-          />
-          <div class="state__text">
-            <p class="state__caption">{{ caption }}</p>
-            <strong class="state__title" data-test="visibility-title">
-              {{ $t(`group.types.${visibility}`) }}
-            </strong>
-            <p class="state__description" data-test="visibility-description">
-              {{ $t(`group.typeDescriptions.${visibility}`) }}
-            </p>
-          </div>
-        </div>
       </div>
 
       <div class="state" :data-test="`admission-${admission}`">
+        <os-icon :icon="icons[admissionIcon]" size="2xl" class="state__icon" aria-hidden="true" />
+        <div class="state__text">
+          <p class="state__caption">{{ $t('group.admission.caption') }}</p>
+          <strong class="state__title" data-test="admission-title">
+            {{ $t(`group.admission.${admission}.title`) }}
+          </strong>
+          <p class="state__description" data-test="admission-description">
+            {{ $t(`group.admission.${admission}.description`) }}
+          </p>
+          <p v-if="admissionLocked" class="state__reason" data-test="admission-locked">
+            {{ $t('group.admission.needsVisibility') }}
+          </p>
+        </div>
         <!--
           Three states of ONE question, so one control with three positions rather than three
           checkboxes: two ticks would let somebody express "anybody may enter AND must ask",
@@ -70,24 +75,11 @@
             :title="admissionEditable ? null : admissionHint"
             :data-test="`admission-option-${state}`"
             @click="setAdmission(state)"
+            @mouseenter="highlightAdmission"
+            @mouseleave="clearHighlight"
           >
             {{ $t(`group.admission.${state}.title`) }}
           </button>
-        </div>
-        <div class="state__body">
-          <os-icon :icon="icons[admissionIcon]" size="2xl" class="state__icon" aria-hidden="true" />
-          <div class="state__text">
-            <p class="state__caption">{{ $t('group.admission.caption') }}</p>
-            <strong class="state__title" data-test="admission-title">
-              {{ $t(`group.admission.${admission}.title`) }}
-            </strong>
-            <p class="state__description" data-test="admission-description">
-              {{ $t(`group.admission.${admission}.description`) }}
-            </p>
-            <p v-if="admissionLocked" class="state__reason" data-test="admission-locked">
-              {{ $t('group.admission.needsVisibility') }}
-            </p>
-          </div>
         </div>
       </div>
     </div>
@@ -101,7 +93,14 @@
           {{ $t(`group.rights.simpleGroups.${group.name}`) }}
         </legend>
         <ul class="switches">
-          <li v-for="item in group.items" :key="item.id" class="switch">
+          <li
+            v-for="item in group.items"
+            :key="item.id"
+            class="switch"
+            :data-test="`switch-row-${item.id}`"
+            @mouseenter="highlightSwitch(item)"
+            @mouseleave="clearHighlight"
+          >
             <label :class="{ 'switch--disabled': !item.editable }" :title="item.hint">
               <input
                 type="checkbox"
@@ -134,9 +133,9 @@
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { NONE_GROUP_ROLE, PENDING_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
-import { ADMISSION_STATES, admissionOf, withAdmission } from '~/utils/groupAdmission'
+import { ADMISSION_STATES, admissionOf, JOIN_RIGHTS, withAdmission } from '~/utils/groupAdmission'
 import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
-import { applyRightChange } from '~/utils/groupRoleRights'
+import { applyRightChange, rightsTouchedBy } from '~/utils/groupRoleRights'
 import { iconRegistry } from '~/utils/iconRegistry'
 
 // Declared rather than hand-written per row: one sentence, one role, one right. The order is the
@@ -317,6 +316,28 @@ export default {
         withAdmission(this.permissionsOf(NONE_GROUP_ROLE), state),
       )
     },
+    /**
+     * What the cursor is pointing at, as `{ roleName: [permissionKey] }`.
+     *
+     * One sentence here stands for one right on one role, and the matrix below states the same
+     * thing in the catalog's own vocabulary. Saying which is which costs a hover: the page marks
+     * the rows AND the role tab the sentence reaches, so the two views stop being two unrelated
+     * lists of the same facts. Emitted rather than rendered here — what the mark looks like
+     * belongs to whatever is showing the rights.
+     */
+    highlightSwitch(item) {
+      this.$emit('highlight', { [item.role]: rightsTouchedBy(item.permission) })
+    },
+    /**
+     * Both join rights, whichever of the three the cursor is on: picking a state REWRITES the
+     * pair (see `withAdmission`), so "closed" is as much about `group.join` as "open" is.
+     */
+    highlightAdmission() {
+      this.$emit('highlight', { [NONE_GROUP_ROLE]: [...JOIN_RIGHTS] })
+    },
+    clearHighlight() {
+      this.$emit('highlight', null)
+    },
     resetDraft() {
       this.draft = {}
     },
@@ -329,32 +350,30 @@ export default {
 
 <style scoped>
 /*
- * A grid rather than a flex row, with the controls on one row and the bodies on the next.
+ * One grid for BOTH states, so the two icons line up under each other however long the words
+ * next to them are: a column for the icon and a column for everything that belongs to it.
  *
- * Flex made each column size itself, so the moment one column's buttons wrapped — which German
- * does to "Öffentlich / Geschlossen / Geheim / Kanal" and English does not — its icon dropped a
- * line and the two states stopped reading as a pair. `subgrid` is not available here, so the
- * two rows are explicit: whatever the controls do, both bodies start on the same line.
+ * `display: contents` on the state is what puts all four children into that one grid. Each icon
+ * spans the two rows of its own pair, so what a state IS and what SETS it stay side by side with
+ * their glyph instead of drifting apart — which is what two independent grids did as soon as one
+ * column's buttons wrapped (German does that to "Öffentlich / Geschlossen / Geheim / Kanal").
  */
 .states {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-  grid-template-rows: auto auto;
-  gap: var(--space-x-small) var(--space-large);
+  grid-template-columns: auto 1fr;
+  gap: var(--space-xx-small) var(--space-base);
   margin-bottom: var(--space-base);
-}
-
-.state__control-label {
-  display: block;
-  margin-top: var(--space-x-small);
-  color: var(--text-color-softer);
-  font-size: 0.85em;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
 }
 
 .state {
   display: contents;
+}
+
+.state__control-label {
+  color: var(--text-color-softer);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .state__control {
@@ -362,15 +381,9 @@ export default {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-xx-small);
-  grid-row: 2;
+  grid-column: 2;
   align-self: start;
-}
-
-.state__body {
-  display: flex;
-  align-items: center;
-  gap: var(--space-base);
-  grid-row: 1;
+  margin-bottom: var(--space-small);
 }
 
 /*
@@ -378,6 +391,9 @@ export default {
  * and the glyph came out at text size. The font-size is the handle; `2xl` is 2.5em of it.
  */
 .state__icon {
+  grid-column: 1;
+  grid-row: span 2;
+  align-self: center;
   flex: 0 0 auto;
   font-size: 1.6rem;
   color: var(--text-color-soft);
@@ -386,29 +402,7 @@ export default {
 .state__text {
   display: flex;
   flex-direction: column;
-}
-
-.state__caption {
-  margin: 0;
-  color: var(--text-color-softer);
-  font-size: 0.85em;
-}
-
-.state__title {
-  font-size: 1.1em;
-}
-
-.state__description {
-  margin: 0;
-  color: var(--text-color-soft);
-  font-size: 0.9em;
-}
-
-.state__reason {
-  margin: 0;
-  color: var(--text-color-softer);
-  font-size: 0.85em;
-  font-style: italic;
+  grid-column: 2;
 }
 
 /* The same pill the template tabs are, so the two rows read as the same kind of choice. */
@@ -440,8 +434,16 @@ export default {
 }
 
 .admission-option:disabled {
-  opacity: 0.6;
   cursor: not-allowed;
+}
+
+/*
+ * Greyed only while there is something to tell it apart FROM. On a hidden group the other two
+ * are not rendered at all, and fading the one that is left put white text on a washed-out green
+ * — the reason is already spelled out under the title, so the pill only has to stay readable.
+ */
+.admission-option:disabled:not(.admission-option--active) {
+  opacity: 0.6;
 }
 
 /* Side by side on a wide screen, like the full matrix — eight sentences in one column is a

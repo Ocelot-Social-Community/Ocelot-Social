@@ -1010,6 +1010,7 @@
       "confirmReset": "Alle rollen van deze groep terugzetten naar de standaard? Rollen die jullie hebben toegevoegd verdwijnen en hun leden worden gewone leden.",
       "deleteRole": "Rol verwijderen",
       "description": "Bepaal wie wat mag in deze groep — van buitenstaanders tot beheerders.",
+      "hideAdvanced": "Gedetailleerde weergave verbergen",
       "labelField": "Weergavenaam",
       "mandatory": "Altijd toegekend: een lidmaatschap dat je niet kunt beëindigen is geen instelling.",
       "members": "{count} leden",
@@ -1042,8 +1043,7 @@
       },
       "systemRole": "Systeemrol: kan niet worden verwijderd of hernoemd",
       "title": "Rechten",
-      "toAdvanced": "Geavanceerd: alle rechten in detail",
-      "toSimple": "Terug naar de eenvoudige weergave"
+      "toAdvanced": "Geavanceerd: alle rechten in detail"
     },
     "role": "Jouw rol in de groep",
     "roles": {

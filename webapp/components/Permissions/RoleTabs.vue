@@ -11,7 +11,10 @@
       :key="role.name"
       type="button"
       class="role-tab"
-      :class="{ 'role-tab--active': role.name === activeName }"
+      :class="{
+        'role-tab--active': role.name === activeName,
+        'role-tab--touched': highlightFor(role),
+      }"
       :disabled="!!blockedFor(role)"
       :title="blockedFor(role)"
       :data-test="`role-tab-${role.name}`"
@@ -76,6 +79,12 @@ export default {
      * tab that says it where the cursor already is.
      */
     blockedFor: { type: Function, default: () => null },
+    /**
+     * Which roles something elsewhere on the page is pointing at. A sentence like "members may
+     * write posts" names a role as well as a right, and the row of tabs is where that role is —
+     * so the tab says "this one" rather than leaving it to be worked out from the wording.
+     */
+    highlightFor: { type: Function, default: () => false },
   },
   data() {
     return { icons: iconRegistry }
@@ -114,6 +123,15 @@ export default {
 .role-tab:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/*
+ * An outline rather than a colour, so it reads the same on the active tab (already filled with
+ * the primary colour) and on an inactive one.
+ */
+.role-tab--touched {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .role-tab--active {

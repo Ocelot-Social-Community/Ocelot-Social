@@ -37,6 +37,27 @@ export const applyRightChange = (permissions, permissionKey, enabled) => {
   return [...held]
 }
 
+/**
+ * Every right one simple sentence is ABOUT — the right itself plus whatever the implication
+ * drags along, in either direction.
+ *
+ * Not the difference a click would make, which depends on where the tick currently is: hovering
+ * "outsiders may read the posts" has to point at the same two rows whether the box is ticked or
+ * not, or the connection it is there to teach would appear and disappear under the cursor.
+ */
+export const rightsTouchedBy = (permissionKey) => {
+  const touched = new Set([permissionKey])
+  for (const implied of IMPLIED_BY[permissionKey] ?? []) {
+    touched.add(implied)
+  }
+  for (const [dependent, implies] of Object.entries(IMPLIED_BY)) {
+    if (implies.includes(permissionKey)) {
+      touched.add(dependent)
+    }
+  }
+  return [...touched]
+}
+
 export default applyRightChange
 
 /**

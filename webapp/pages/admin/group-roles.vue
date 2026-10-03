@@ -7,13 +7,14 @@
       <!-- The same card and the same switches a group gets for its own rights, so a template is
            read the way the thing it produces is read. -->
       <group-rights-simple
-        :roles="activeTemplate.roles"
+        :roles="rolesForSimple"
         :catalog="catalog"
         :caption="$t('admin.groupRoles.resultingVisibility')"
-        :disabled="saving"
+        :disabled="saving || dirty"
         :disabled-hint="$t('admin.groupRoles.saveFirst')"
         @save="saveSimple"
         @dirty="simpleDirty = $event"
+        @highlight="switchHighlight = $event"
       >
         <template #visibility-control>
           <!-- One tab per TEMPLATE. What a template is CALLED and how findable the groups it creates
@@ -22,7 +23,6 @@
              somebody edits the template's non-member role. The row is labelled as templates, and
              the visibility is stated below as a consequence. -->
           <div class="type-tabs">
-            <span class="type-tabs__label">{{ $t('admin.groupRoles.templateLabel') }}</span>
             <button
               v-for="template in templates"
               :key="template.name"
@@ -40,16 +40,8 @@
         </template>
 
         <template #actions>
-          <!-- A template change reaches existing groups only when an admin asks for it, and
-               then only the groups that never edited their own roles (concept E12). -->
-          <os-button
-            :disabled="saving || simpleDirty || !activeTemplate.untouchedGroupCount"
-            data-test="apply"
-            @click="confirmApply"
-          >
-            {{ $t('admin.groupRoles.apply') }}
-          </os-button>
           <button
+            v-if="!advanced"
             type="button"
             class="link-button"
             :disabled="simpleDirty"
@@ -62,14 +54,30 @@
         </template>
       </group-rights-simple>
 
-      <p class="untouched" data-test="untouched">
-        {{
-          $t('admin.groupRoles.untouched', {
-            untouched: activeTemplate.untouchedGroupCount,
-            total: activeTemplate.groupCount,
-          })
-        }}
-      </p>
+      <!--
+        The one control on this page that reaches existing groups, with the sentence that says how
+        far it reaches — set apart from Save and Cancel above, which only ever write the template.
+        Standing in the same row, it read as a third way of saving the same edit.
+      -->
+      <section class="apply">
+        <p class="untouched" data-test="untouched">
+          {{
+            $t('admin.groupRoles.untouched', {
+              untouched: activeTemplate.untouchedGroupCount,
+              total: activeTemplate.groupCount,
+            })
+          }}
+        </p>
+        <!-- A template change reaches existing groups only when an admin asks for it, and then
+             only the groups that never edited their own roles (concept E12). -->
+        <os-button
+          :disabled="saving || simpleDirty || dirty || !activeTemplate.untouchedGroupCount"
+          data-test="apply"
+          @click="confirmApply"
+        >
+          {{ $t('admin.groupRoles.apply') }}
+        </os-button>
+      </section>
 
       <template v-if="advanced">
         <role-tabs
@@ -78,6 +86,7 @@
           :label-for="roleLabel"
           :badge-for="(role) => isSystemGroupRole(role.name)"
           :blocked-for="blockedRole"
+          :highlight-for="highlightsRole"
           :badge-title="$t('group.rights.systemRole')"
           @select="activeRoleName = $event"
           @hover="hoveredRoleName = $event"
@@ -106,6 +115,7 @@
           :permissions="catalog"
           :granted="draft"
           :diff="hoverDiff"
+          :highlight="highlightedRights"
           :group-label="(name) => $t(`permissions.sections.${name}`)"
           :disabled-for="(permission) => saving || isMandatory(permission) || isMoot(permission)"
           :hint-for="blockedHint"
@@ -128,7 +138,7 @@
             data-test="to-simple"
             @click="advanced = false"
           >
-            {{ $t('group.rights.toSimple') }}
+            {{ $t('group.rights.hideAdvanced') }}
           </button>
         </div>
       </template>
@@ -157,7 +167,7 @@ import {
   PENDING_GROUP_ROLE,
 } from '~/constants/groups'
 import { groupRoleLabel, orderRolesByPrivilege } from '~/utils/groupRights'
-import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
+import { diffBetween, isRoleDirty, permissionSetOf, samePermissions } from '~/utils/permissionDiff'
 
 export default {
   components: { GroupRightsSimple, OcelotInput, OsButton, OsCard, PermissionMatrix, RoleTabs },
@@ -167,10 +177,10 @@ export default {
       templates: [],
       activeTemplateName: 'public',
       activeRoleName: 'usual',
-      // The two halves are mutually EXCLUSIVE now rather than mutually locked: they edit the
-      // same roles, and showing both at once meant two drafts over one set of data.
+      // Whether the matrix is unfolded under the sentences. Both are on screen then, and only
+      // one of them may hold a draft at a time — they edit the same roles, and whichever saved
+      // second would discard the other's edit without saying so.
       advanced: false,
-      // Still tracked, because the way INTO the matrix must not throw an unsaved draft away.
       simpleDirty: false,
       // The TEMPLATE tab under the cursor: hovering `closed` while editing the public one's
       // member role previews what a closed group's member role does differently — the question
@@ -179,6 +189,8 @@ export default {
       // The role tab currently under the cursor, to preview its rights against the one being
       // edited — the same affordance the network roles page has.
       hoveredRoleName: null,
+      // What the simple view says the cursor is pointing at: `{ roleName: [permissionKey] }`.
+      switchHighlight: null,
       draft: [],
       // The label a group role carries network-wide. Every new group copies it, which is what
       // makes renaming `usual` to "Mitglied" here a one-place change rather than a per-group
@@ -236,6 +248,47 @@ export default {
       if (!this.hoveredRole) return {}
       return diffBetween(this.catalog, new Set(this.draft), this.permissionSetOf(this.hoveredRole))
     },
+    /**
+     * What the matrix and the role tabs should point at: a sentence under the cursor, else the
+     * roles a hovered TEMPLATE would change. Both answer "what does this control reach", and the
+     * mark can only carry one answer — the sentence is the more specific of the two, so it wins.
+     */
+    highlight() {
+      return this.switchHighlight ?? this.templateHighlight
+    },
+    /**
+     * Every role the hovered template holds differently from the one being edited. Rights are
+     * left out: the matrix already paints those green and red through `hoverDiff`, and a role
+     * only has to be findable in the row of tabs.
+     */
+    templateHighlight() {
+      const hovered = this.templates.find((template) => template.name === this.hoveredTemplateName)
+      if (!hovered || hovered.name === this.activeTemplateName) return null
+      const marked = {}
+      for (const role of this.activeTemplate?.roles ?? []) {
+        const other = hovered.roles.find((candidate) => candidate.name === role.name)
+        if (!other || !samePermissions(role.permissions, other.permissions)) {
+          marked[role.name] = []
+        }
+      }
+      return marked
+    },
+    /** The highlighted rights OF THE ROLE ON SCREEN — a sentence about another role marks none. */
+    highlightedRights() {
+      return this.highlight?.[this.activeRoleName] ?? []
+    },
+    /**
+     * The template's roles with the matrix's UNSAVED edit folded in, so the card above states
+     * what the template would BE rather than what it still is. Only while that edit exists: the
+     * card's own switches are locked then, and a fresh array resets the draft they hold.
+     */
+    rolesForSimple() {
+      const roles = this.activeTemplate?.roles ?? []
+      if (!this.dirty || !this.activeRole) return roles
+      return roles.map((role) =>
+        role.name === this.activeRoleName ? { ...role, permissions: this.draft } : role,
+      )
+    },
   },
   watch: {
     activeTemplateName() {
@@ -247,6 +300,10 @@ export default {
   },
   methods: {
     isSystemGroupRole,
+    /** Whether anything under the cursor reaches this role. */
+    highlightsRole(role) {
+      return !!this.highlight && role.name in this.highlight
+    },
     /**
      * Why a role tab cannot be opened — today only the applicant role, when nothing lets
      * anybody ask to join. Blocked rather than left to open onto an explanation: a role nobody
@@ -405,15 +462,6 @@ export default {
   gap: var(--space-xx-small);
   margin-bottom: var(--space-small);
 }
-/* Names what the row IS, so the three short words are read as presets rather than as the
-   visibility they happen to share their names with. */
-.type-tabs__label {
-  margin-right: var(--space-xx-small);
-  color: var(--text-color-softer);
-  font-size: 0.85em;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
 .type-tab {
   border: 1px solid var(--border-color-soft);
   border-radius: var(--border-radius-x-large);
@@ -440,6 +488,22 @@ export default {
   max-width: 24rem;
   margin: var(--space-small) 0;
 }
+/* Its own block with a rule above it: this is the only button here that changes a GROUP. */
+.apply {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-small);
+  margin-top: var(--space-base);
+  padding-top: var(--space-small);
+  border-top: 1px solid var(--border-color-softer);
+}
+
+.untouched {
+  flex: 1 1 20rem;
+  margin: 0;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;

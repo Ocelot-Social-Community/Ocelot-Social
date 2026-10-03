@@ -83,3 +83,30 @@ describe('RoleTabs', () => {
     expect(wrapper.find('[data-test="add"]').exists()).toBe(true)
   })
 })
+
+describe('the highlight', () => {
+  const Wrapper = (propsData = {}) =>
+    mount(RoleTabs, {
+      localVue,
+      propsData: {
+        roles: ROLES,
+        activeName: 'user',
+        labelFor: (role) => role.name,
+        badgeFor: (role) => Boolean(role.protected),
+        ...propsData,
+      },
+    })
+
+  it('marks the roles something elsewhere on the page points at', () => {
+    const wrapper = Wrapper({ highlightFor: (role) => role.name === 'owner' })
+
+    expect(wrapper.find('[data-test="role-tab-owner"]').classes()).toContain('role-tab--touched')
+    expect(wrapper.find('[data-test="role-tab-user"]').classes()).not.toContain('role-tab--touched')
+  })
+
+  it('marks nothing by default, so a page that says nothing marks nothing', () => {
+    const wrapper = Wrapper()
+
+    expect(wrapper.findAll('.role-tab--touched')).toHaveLength(0)
+  })
+})

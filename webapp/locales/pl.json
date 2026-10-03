@@ -1010,6 +1010,7 @@
       "confirmReset": "Przywrócić wszystkie role tej grupy do domyślnych? Role dodane przez was zostaną usunięte, a ich członkowie staną się zwykłymi członkami.",
       "deleteRole": "Usuń rolę",
       "description": "Ustalcie, kto co może w tej grupie — od osób z zewnątrz po administratorów.",
+      "hideAdvanced": "Ukryj widok szczegółowy",
       "labelField": "Nazwa wyświetlana",
       "mandatory": "Zawsze przyznane: członkostwo, którego nie można zakończyć, nie jest ustawieniem.",
       "members": "{count} członków",
@@ -1042,8 +1043,7 @@
       },
       "systemRole": "Rola systemowa: nie można jej usunąć ani zmienić jej nazwy",
       "title": "Uprawnienia",
-      "toAdvanced": "Zaawansowane: wszystkie uprawnienia szczegółowo",
-      "toSimple": "Powrót do widoku prostego"
+      "toAdvanced": "Zaawansowane: wszystkie uprawnienia szczegółowo"
     },
     "role": "Twoja rola w grupie",
     "roles": {

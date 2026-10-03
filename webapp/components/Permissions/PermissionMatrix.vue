@@ -18,6 +18,7 @@
           'perm-row--added': diff[permission.key] === 'added',
           'perm-row--removed': diff[permission.key] === 'removed',
           'perm-row--unavailable': disabledFor(permission),
+          'perm-row--touched': highlight.includes(permission.key),
         }"
         :title="hintFor(permission)"
       >
@@ -52,6 +53,11 @@ export default {
     granted: { type: Array, default: () => [] },
     /** key → 'added' | 'removed', for the hover and conflict previews. */
     diff: { type: Object, default: () => ({}) },
+    /**
+     * Keys to mark as "this is what is meant", without saying added or removed — what a simple
+     * sentence somewhere else on the page stands for, in the catalog's own vocabulary.
+     */
+    highlight: { type: Array, default: () => [] },
     /** Which rows cannot be ticked — an ungranted feature, a protected role, a missing right. */
     disabledFor: { type: Function, default: () => false },
     /** The row's `title`, for saying WHY it cannot be ticked. */
@@ -128,6 +134,16 @@ export default {
 
 .perm-row input:disabled {
   cursor: default;
+}
+
+/*
+ * Pointed at from elsewhere on the page. Neutral on purpose — nothing is being added or taken
+ * away, this row simply IS the sentence under the cursor. The outline rather than a background
+ * so it still reads on a row that is already marked added or removed.
+ */
+.perm-row--touched {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -1px;
 }
 
 /* What the hovered role would add (green) or remove (red) against the one being edited. */

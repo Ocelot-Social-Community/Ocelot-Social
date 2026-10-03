@@ -1010,6 +1010,7 @@
       "confirmReset": "Të rikthehen të gjitha rolet e këtij grupi në parazgjedhjet? Rolet që shtuat hiqen dhe anëtarët e tyre bëhen anëtarë të zakonshëm.",
       "deleteRole": "Fshi rolin",
       "description": "Vendosni kush çfarë mund të bëjë në këtë grup — nga të jashtmit deri te administratorët.",
+      "hideAdvanced": "Fshih pamjen e detajuar",
       "labelField": "Emri i shfaqur",
       "mandatory": "Gjithmonë e dhënë: një anëtarësim që nuk mund të përfundohet nuk është një rregullim.",
       "members": "{count} anëtarë",
@@ -1042,8 +1043,7 @@
       },
       "systemRole": "Rol i sistemit: nuk mund të fshihet ose riemërtohet",
       "title": "Lejet",
-      "toAdvanced": "Të avancuara: të gjitha lejet në detaje",
-      "toSimple": "Kthehu te pamja e thjeshtë"
+      "toAdvanced": "Të avancuara: të gjitha lejet në detaje"
     },
     "role": "Roli yt në grup",
     "roles": {

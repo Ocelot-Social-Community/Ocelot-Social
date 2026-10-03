@@ -1,4 +1,4 @@
-import { applyRightChange, mayAssignGroupRole } from '~/utils/groupRoleRights'
+import { applyRightChange, mayAssignGroupRole, rightsTouchedBy } from '~/utils/groupRoleRights'
 
 describe('applyRightChange', () => {
   it('adds the right that was ticked', () => {
@@ -105,5 +105,34 @@ describe('mayAssignGroupRole', () => {
         rolePermissions: ['group.read', 'group.settings.manage'],
       }),
     ).toBe(true)
+  })
+})
+
+describe('rightsTouchedBy', () => {
+  it('names the right itself where nothing else depends on it', () => {
+    expect(rightsTouchedBy('group.post.create')).toEqual(['group.post.create'])
+  })
+
+  it('names what a right cannot be held without', () => {
+    expect(rightsTouchedBy('group.content.read').sort()).toEqual([
+      'group.content.read',
+      'group.read',
+    ])
+  })
+
+  it('names what would fall with it, too', () => {
+    // The other direction of the same implication: unticking "outsiders see the group" takes
+    // the two reading rights with it, so hovering it has to point at all three.
+    expect(rightsTouchedBy('group.read').sort()).toEqual([
+      'group.content.read',
+      'group.members.read',
+      'group.read',
+    ])
+  })
+
+  it('answers the same whether the right is currently held or not', () => {
+    // It describes the sentence, not the click. A set that changed with the tick would make the
+    // connection appear and disappear under the cursor.
+    expect(rightsTouchedBy('group.content.read')).toEqual(rightsTouchedBy('group.content.read'))
   })
 })

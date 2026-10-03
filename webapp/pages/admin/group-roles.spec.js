@@ -96,8 +96,8 @@ describe('admin/group-roles.vue', () => {
     return wrapper
   }
 
-  // The matrix lives behind the same "advanced" step the group's own rights page has: the two
-  // halves edit the same roles, and showing both at once meant two drafts over one set of data.
+  // The matrix unfolds UNDER the sentences rather than replacing them, so a hovered sentence can
+  // point at the rows it stands for. Only one of the two may hold a draft at a time.
   const advanced = async () => {
     const wrapper = await Wrapper()
     await at(wrapper, 'to-advanced').trigger('click')
@@ -363,6 +363,64 @@ describe('admin/group-roles.vue', () => {
       await at(wrapper, 'apply').trigger('click')
 
       expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('what a hovered sentence points at', () => {
+    const classesOf = (wrapper, key) =>
+      at(wrapper, `perm-${key}`).element.closest('label').className
+
+    it('marks the rights it means, on the role it means them for', async () => {
+      const wrapper = await advanced()
+      await at(wrapper, 'role-tab-usual').trigger('click')
+
+      await at(wrapper, 'switch-row-members-post').trigger('mouseenter')
+
+      expect(classesOf(wrapper, 'group.post.create')).toContain('perm-row--touched')
+      expect(classesOf(wrapper, 'group.members.read')).not.toContain('perm-row--touched')
+      expect(at(wrapper, 'role-tab-usual').classes()).toContain('role-tab--touched')
+    })
+
+    it('marks the role but no row while another role is on screen', async () => {
+      // The point of marking the tab as well: the sentence is about `usual`, the matrix is
+      // showing `none`, and without the tab there would be nothing at all to see.
+      const wrapper = await advanced()
+      await at(wrapper, 'role-tab-none').trigger('click')
+
+      await at(wrapper, 'switch-row-members-post').trigger('mouseenter')
+
+      expect(at(wrapper, 'role-tab-usual').classes()).toContain('role-tab--touched')
+      expect(at(wrapper, 'role-tab-none').classes()).not.toContain('role-tab--touched')
+      expect(wrapper.findAll('.perm-row--touched')).toHaveLength(0)
+    })
+
+    it('stops marking when the cursor leaves', async () => {
+      const wrapper = await advanced()
+
+      await at(wrapper, 'switch-row-members-post').trigger('mouseenter')
+      await at(wrapper, 'switch-row-members-post').trigger('mouseleave')
+
+      expect(wrapper.findAll('.role-tab--touched')).toHaveLength(0)
+    })
+
+    it('marks every role another template would change, and no other', async () => {
+      // `closed` gives `none` less and `usual` something else, and has no owner role at all —
+      // three differences, and the tab row is where an admin finds them.
+      const wrapper = await advanced()
+
+      await at(wrapper, 'type-tab-closed').trigger('mouseenter')
+
+      expect(at(wrapper, 'role-tab-none').classes()).toContain('role-tab--touched')
+      expect(at(wrapper, 'role-tab-usual').classes()).toContain('role-tab--touched')
+      expect(at(wrapper, 'role-tab-owner').classes()).toContain('role-tab--touched')
+    })
+
+    it('marks no role for the template already being edited', async () => {
+      const wrapper = await advanced()
+
+      await at(wrapper, 'type-tab-public').trigger('mouseenter')
+
+      expect(wrapper.findAll('.role-tab--touched')).toHaveLength(0)
     })
   })
 

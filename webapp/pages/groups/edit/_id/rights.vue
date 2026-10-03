@@ -3,20 +3,22 @@
     <h2 class="title">{{ $t('group.rights.title') }}</h2>
     <p class="description">{{ $t('group.rights.description') }}</p>
 
-    <!-- Simple mode: the handful of questions a group actually asks itself, as sentences, with
-         what those answers MAKE the group above them. The matrix is one click away for whoever
-         wants it, but it must not be the entry. -->
-    <section v-if="!advanced" data-test="rights-simple">
+    <!-- The handful of questions a group actually asks itself, as sentences, with what those
+         answers MAKE the group above them. Always on screen: the matrix below is an EXPANSION of
+         it, not a different page — which is what lets a hovered sentence point at the rows it
+         stands for. -->
+    <section data-test="rights-simple">
       <group-rights-simple
-        :roles="roles"
+        :roles="rolesForSimple"
         :catalog="catalog"
         :caption="$t('group.rights.resultingType')"
-        :disabled="saving || !canManageRoles"
-        :disabled-hint="$t('group.rights.noRight')"
+        :disabled="simpleDisabled"
+        :disabled-hint="simpleDisabledHint"
         :grantable="grantable"
         :hint-for="blockedHint"
         @save="saveSimple"
         @dirty="simpleDirty = $event"
+        @highlight="switchHighlight = $event"
       >
         <!--
           The same presets the admin area edits, offered where a group picks one. "Turn this
@@ -26,7 +28,6 @@
         -->
         <template #visibility-control>
           <div class="template-tabs" :title="$t('group.rights.applyTemplate')">
-            <span class="template-tabs__label">{{ $t('admin.groupRoles.templateLabel') }}</span>
             <button
               v-for="name in templateNames"
               :key="name"
@@ -37,6 +38,8 @@
               :title="simpleDirty ? $t('group.rights.saveFirst') : null"
               :data-test="`template-${name}`"
               @click="confirmApplyTemplate(name)"
+              @mouseenter="hoveredTemplateName = name"
+              @mouseleave="hoveredTemplateName = null"
             >
               {{ $t(`group.types.${name}`) }}
             </button>
@@ -44,13 +47,12 @@
         </template>
 
         <template #actions>
-          <!-- Guarded: the simple view holds a DRAFT now, and switching away from it used to
-               throw that draft out without a word. -->
+          <!-- No guard on the way IN: the simple view stays mounted, so opening the matrix can
+               no longer throw its draft away. -->
           <button
+            v-if="!advanced"
             type="button"
             class="link-button"
-            :disabled="simpleDirty"
-            :title="simpleDirty ? $t('group.rights.saveFirst') : null"
             data-test="to-advanced"
             @click="advanced = true"
           >
@@ -60,19 +62,17 @@
       </group-rights-simple>
     </section>
 
-    <!-- Advanced mode: the full matrix, one tab per role. The resulting visibility is stated
-         here too — the `none` role is editable in this view, so it can change under the cursor. -->
-    <section v-else data-test="rights-advanced">
-      <p class="resulting-type" data-test="resulting-type">
-        {{ $t('group.rights.resultingType') }}
-        <strong>{{ $t(`group.types.${resultingType}`) }}</strong>
-      </p>
+    <!-- The full matrix, one tab per role, under the sentences rather than instead of them. The
+         card above already states the resulting visibility and follows this view's draft, so the
+         line that used to repeat it here is gone. -->
+    <section v-if="advanced" data-test="rights-advanced">
       <role-tabs
         :roles="orderedRoles"
         :active-name="activeRoleName"
         :label-for="roleLabel"
         :badge-for="(role) => isSystemGroupRole(role.name)"
         :blocked-for="blockedRole"
+        :highlight-for="highlightsRole"
         :badge-title="$t('group.rights.systemRole')"
         @select="activeRoleName = $event"
         @hover="hoveredRoleName = $event"
@@ -117,6 +117,7 @@
           :permissions="catalog"
           :granted="draftPermissions"
           :diff="hoverDiff"
+          :highlight="highlightedRights"
           :group-label="(name) => $t(`permissions.sections.${name}`)"
           :disabled-for="
             (permission) =>
@@ -158,7 +159,7 @@
             data-test="to-simple"
             @click="advanced = false"
           >
-            {{ $t('group.rights.toSimple') }}
+            {{ $t('group.rights.hideAdvanced') }}
           </button>
         </div>
       </template>
@@ -194,7 +195,6 @@ import {
 } from '~/constants/groups'
 import { NONE_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
 import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
 import groupRights from '~/mixins/groupRights'
@@ -232,6 +232,9 @@ export default {
       // The role tab under the cursor, to preview what it would change about the one being
       // edited — the same affordance the network and template role pages have.
       hoveredRoleName: null,
+      // The template button under the cursor, and what the simple view says it is pointing at.
+      hoveredTemplateName: null,
+      switchHighlight: null,
       draftPermissions: [],
       draftLabel: '',
       saving: false,
@@ -240,6 +243,16 @@ export default {
   computed: {
     canManageRoles() {
       return this.myGroupPermissions.includes('group.role.manage')
+    },
+    /**
+     * The two views edit the same roles, so only one of them may hold a draft at a time —
+     * whichever saved second would discard the other's edit without saying so.
+     */
+    simpleDisabled() {
+      return this.saving || !this.canManageRoles || this.dirty
+    },
+    simpleDisabledHint() {
+      return this.dirty ? this.$t('group.rights.saveFirst') : this.$t('group.rights.noRight')
     },
     orderedRoles() {
       return orderRolesByPrivilege(this.roles)
@@ -271,17 +284,6 @@ export default {
     activeRole() {
       return this.roles.find((role) => role.name === this.activeRoleName) ?? null
     },
-    // Live, from the draft: while the non-member role is the one being edited, the unsaved
-    // ticks are what counts — otherwise the badge would lag one save behind.
-    nonMemberPermissions() {
-      if (this.activeRoleName === NONE_GROUP_ROLE) {
-        return this.draftPermissions
-      }
-      return this.roles.find((role) => role.name === NONE_GROUP_ROLE)?.permissions ?? []
-    },
-    resultingType() {
-      return privacyLevelOf(this.nonMemberPermissions)
-    },
     // Hovering another role marks every right it would change against the DRAFT: 'added'
     // where the hovered role grants what this one does not, 'removed' the other way round.
     hoverDiff() {
@@ -297,6 +299,37 @@ export default {
     dirty() {
       return isRoleDirty(this.activeRole, this.draftPermissions, this.draftLabel)
     },
+    /**
+     * What the matrix and the role tabs should point at: the sentence under the cursor, else —
+     * for a template button — every role, because putting a template on a group replaces all of
+     * them. What a template would change to cannot be shown here: its contents sit behind
+     * `group.roleTemplate.manage`, which a group owner does not hold, so this page knows the
+     * names and nothing else.
+     */
+    highlight() {
+      if (this.switchHighlight) return this.switchHighlight
+      if (!this.hoveredTemplateName) return null
+      return Object.fromEntries(this.roles.map((role) => [role.name, []]))
+    },
+    /** The highlighted rights OF THE ROLE ON SCREEN — a sentence about another role marks none. */
+    highlightedRights() {
+      return this.highlight?.[this.activeRoleName] ?? []
+    },
+    /**
+     * The roles as the card above should read them: what is stored, with the matrix's UNSAVED
+     * edit folded in. The two views are on screen together now, so without this the card would
+     * go on calling a group hidden while the row that makes it public sits ticked just below.
+     *
+     * Only while that edit exists — the card's own switches are locked then, so handing the
+     * component a new array (which resets its draft) costs nothing. Doing it unconditionally
+     * would reset that draft on every role tab click instead.
+     */
+    rolesForSimple() {
+      if (!this.dirty || !this.activeRole) return this.roles
+      return this.roles.map((role) =>
+        role.name === this.activeRoleName ? { ...role, permissions: this.draftPermissions } : role,
+      )
+    },
   },
   watch: {
     activeRoleName() {
@@ -305,6 +338,10 @@ export default {
   },
   methods: {
     isSystemGroupRole,
+    /** Whether anything under the cursor reaches this role. */
+    highlightsRole(role) {
+      return !!this.highlight && role.name in this.highlight
+    },
     /**
      * Why a role tab cannot be opened — today only the applicant role, when nothing lets
      * anybody ask to join. Blocked rather than left to open onto an explanation: a role nobody
@@ -525,14 +562,6 @@ export default {
   gap: var(--space-xx-small);
 }
 
-.template-tabs__label {
-  margin-right: var(--space-xx-small);
-  color: var(--text-color-softer);
-  font-size: 0.85em;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
 .template-tab {
   border: 1px solid var(--border-color-soft);
   border-radius: var(--border-radius-x-large);
@@ -567,11 +596,6 @@ export default {
 .title {
   margin-bottom: 0;
 }
-.resulting-type {
-  margin-bottom: var(--space-small);
-  color: var(--text-color-soft);
-}
-
 .description {
   color: var(--text-color-soft);
   margin-bottom: var(--space-base);

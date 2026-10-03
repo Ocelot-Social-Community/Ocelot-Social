@@ -212,9 +212,11 @@ describe('rights.vue', () => {
       expect(at(wrapper, 'visibility-title').text()).toContain('group.types.hidden')
     })
 
-    it('reads the unsaved draft while the non-member role is the one being edited', async () => {
-      // The matrix view only: there the `none` role is editable, so the answer has to follow the
-      // DRAFT. The simple view saves each tick straight away and reads the stored roles.
+    it('reads the matrix\'s unsaved draft while the non-member role is the one being edited', async () => {
+      // The two views are on screen together, and only one of them may hold a draft at a time.
+      // The card is the one statement of what the group is, so it has to follow whichever view
+      // is being edited — a card still saying "hidden" over a ticked, unsaved `group.read` is
+      // the one place this page can contradict itself.
       const wrapper = await Wrapper()
       wrapper.setData({ advanced: true })
       await wrapper.vm.$nextTick()
@@ -226,12 +228,47 @@ describe('rights.vue', () => {
       wrapper.setData({ draftPermissions: ['group.read', 'group.content.read'] })
       await wrapper.vm.$nextTick()
 
-      expect(at(wrapper, 'resulting-type').text()).toContain('group.types.public')
+      expect(at(wrapper, 'visibility-title').text()).toContain('group.types.public')
 
       wrapper.setData({ draftPermissions: ['group.read'] })
       await wrapper.vm.$nextTick()
 
-      expect(at(wrapper, 'resulting-type').text()).toContain('group.types.closed')
+      expect(at(wrapper, 'visibility-title').text()).toContain('group.types.closed')
+    })
+  })
+
+  describe('what a hovered control points at', () => {
+    const classesOf = (wrapper, key) =>
+      at(wrapper, `perm-${key}`).element.closest('label').className
+
+    it('marks the rights a sentence means, on the role it means them for', async () => {
+      const wrapper = await Wrapper()
+      wrapper.setData({ advanced: true, activeRoleName: 'none' })
+      await wrapper.vm.$nextTick()
+
+      await at(wrapper, 'switch-row-nonmembers-read').trigger('mouseenter')
+
+      // Through the implication: reading the posts cannot be held without seeing the group.
+      expect(classesOf(wrapper, 'group.content.read')).toContain('perm-row--touched')
+      expect(classesOf(wrapper, 'group.read')).toContain('perm-row--touched')
+      expect(classesOf(wrapper, 'group.post.create')).not.toContain('perm-row--touched')
+      expect(at(wrapper, 'role-tab-none').classes()).toContain('role-tab--touched')
+    })
+
+    it('marks every role for a template button, because applying one replaces all of them', async () => {
+      // What a template would change TO cannot be shown here: its contents sit behind
+      // `group.roleTemplate.manage`, which a group owner does not hold. How FAR it reaches can.
+      const wrapper = await Wrapper()
+      wrapper.setData({ advanced: true })
+      await wrapper.vm.$nextTick()
+
+      await at(wrapper, 'template-closed').trigger('mouseenter')
+
+      expect(wrapper.findAll('.role-tab--touched').length).toBe(ROLES.length)
+
+      await at(wrapper, 'template-closed').trigger('mouseleave')
+
+      expect(wrapper.findAll('.role-tab--touched')).toHaveLength(0)
     })
   })
 

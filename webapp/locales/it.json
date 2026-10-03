@@ -1010,6 +1010,7 @@
       "confirmReset": "Ripristinare tutti i ruoli di questo gruppo ai valori predefiniti? I ruoli che avete aggiunto vengono rimossi e i loro membri diventano membri ordinari.",
       "deleteRole": "Elimina ruolo",
       "description": "Decidete chi può fare cosa in questo gruppo — da chi non è membro fino agli amministratori.",
+      "hideAdvanced": "Nascondi la vista dettagliata",
       "labelField": "Nome visualizzato",
       "mandatory": "Sempre concesso: un'iscrizione che non si può terminare non è un'impostazione.",
       "members": "{count} membri",
@@ -1042,8 +1043,7 @@
       },
       "systemRole": "Ruolo di sistema: non può essere eliminato né rinominato",
       "title": "Permessi",
-      "toAdvanced": "Avanzate: tutti i permessi in dettaglio",
-      "toSimple": "Torna alla vista semplice"
+      "toAdvanced": "Avanzate: tutti i permessi in dettaglio"
     },
     "role": "Il tuo ruolo nel gruppo",
     "roles": {

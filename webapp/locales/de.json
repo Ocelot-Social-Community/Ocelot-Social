@@ -222,12 +222,12 @@
     },
     "groupRoles": {
       "applied": "{count} Gruppen aktualisiert",
-      "apply": "Auf unveraenderte Gruppen anwenden",
-      "confirmApply": "Vorlagen auf {count} Gruppen anwenden, die ihre Rollen nie angepasst haben? Angepasste Gruppen bleiben unberuehrt.",
-      "description": "Hier bearbeitest du die Vorlagen, aus denen neue Gruppen entstehen — keine bestehende Gruppe aendert sich dadurch. Nur der Knopf unten wendet eine Aenderung auf Gruppen an, und auch dann nur auf die, die ihre Rechte nie selbst geaendert haben.",
+      "apply": "Auf unveränderte Gruppen anwenden",
+      "confirmApply": "Vorlagen auf {count} Gruppen anwenden, die ihre Rollen nie angepasst haben? Angepasste Gruppen bleiben unberührt.",
+      "description": "Hier bearbeitest du die Vorlagen, aus denen neue Gruppen entstehen — keine bestehende Gruppe ändert sich dadurch. Nur der Knopf unten wendet eine Änderung auf Gruppen an, und auch dann nur auf die, die ihre Rechte nie selbst geändert haben.",
       "labelField": "Name",
       "name": "Gruppen-Vorlagen",
-      "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte und ist nicht bearbeitbar.",
+      "ownerHoldsEverything": "Die Inhaber-Rolle hält immer alle Rechte und ist nicht bearbeitbar.",
       "resultingVisibility": "Gruppen aus dieser Vorlage sind:",
       "saved": "Vorlage gespeichert",
       "saveFirst": "Erst speichern oder verwerfen — es gibt ungesicherte Änderungen.",
@@ -897,11 +897,11 @@
     "admission": {
       "caption": "Hinein kommt man:",
       "closed": {
-        "description": "Von aussen kann niemand beitreten oder anfragen — nur eine Einladung fuehrt hinein.",
+        "description": "Von außen kann niemand beitreten oder anfragen — nur eine Einladung führt hinein.",
         "title": "Nur auf Einladung"
       },
       "label": "Onboarding",
-      "needsVisibility": "Eine Gruppe, die von aussen niemand findet, kann auch niemand betreten — hinein fuehrt nur eine Einladung.",
+      "needsVisibility": "Eine Gruppe, die von außen niemand findet, kann auch niemand betreten — hinein führt nur eine Einladung.",
       "onRequest": {
         "description": "Beitreten kann man beantragen; jemand aus der Gruppe muss zustimmen.",
         "title": "Auf Anfrage"
@@ -967,11 +967,11 @@
     "leaveModal": {
       "confirmButton": "Verlassen",
       "message": "Eine Gruppe zu verlassen ist möglicherweise nicht rückgängig zu machen!<br>Gruppe <b>„{name}“</b> verlassen!",
-      "messageAdmin": "Du <b>verwaltest</b> diese Gruppe. Verlaesst du sie, gibst du diese Verwaltung ab.<br>Gruppe <b>„{name}“</b> wirklich verlassen?",
-      "messageOwner": "Du bist <b>Inhaber</b> dieser Gruppe. Verlaesst du sie, bleibt sie moeglicherweise ohne Inhaber zurueck — dann kann nur noch eine Netzwerk-Administration sie wieder handlungsfaehig machen.<br>Gruppe <b>„{name}“</b> wirklich verlassen?",
+      "messageAdmin": "Du <b>verwaltest</b> diese Gruppe. Verlässt du sie, gibst du diese Verwaltung ab.<br>Gruppe <b>„{name}“</b> wirklich verlassen?",
+      "messageOwner": "Du bist <b>Inhaber</b> dieser Gruppe. Verlässt du sie, bleibt sie möglicherweise ohne Inhaber zurück — dann kann nur noch eine Netzwerk-Administration sie wieder handlungsfähig machen.<br>Gruppe <b>„{name}“</b> wirklich verlassen?",
       "title": "Möchtest du wirklich die Gruppe verlassen?"
     },
-    "memberOutranked": "Du kannst diese Person nicht umstufen — sie haelt mindestens so viel wie du.",
+    "memberOutranked": "Du kannst diese Person nicht umstufen — sie hält mindestens so viel wie du.",
     "memberRemoved": "Nutzer „{name}“ wurde aus der Gruppe entfernt!",
     "members": "Mitglieder",
     "membersAdministrationList": {
@@ -1001,49 +1001,49 @@
     "removeMemberConfirmText": "Nutzer \"{name}\" aus der Gruppe entfernen?",
     "removeMemberTitle": "Mitglied entfernen",
     "rights": {
-      "addRole": "Rolle hinzufuegen",
+      "addRole": "Rolle hinzufügen",
       "applyTemplate": "Vorlage anwenden — ersetzt alle Rollen dieser Gruppe durch die der Vorlage.",
       "blockedByFeature": "Diese Funktion ist im Netzwerk abgeschaltet ({feature}).",
-      "blockedByNetwork": "Netzwerkweit gesperrt: dafuer fehlt das Recht {permission}.",
+      "blockedByNetwork": "Netzwerkweit gesperrt: dafür fehlt das Recht {permission}.",
       "confirmApplyTemplate": "Vorlage „{template}“ auf diese Gruppe anwenden? Alle Rollen werden durch die der Vorlage ersetzt.",
-      "confirmDelete": "Rolle \"{role}\" loeschen? Ihre Mitglieder werden zu \"{target}\".",
-      "confirmReset": "Alle Rollen dieser Gruppe auf den Standard zuruecksetzen? Selbst angelegte Rollen werden dabei entfernt, ihre Mitglieder werden gewoehnliche Mitglieder.",
-      "deleteRole": "Rolle loeschen",
-      "description": "Hier legt ihr fest, was in dieser Gruppe wer darf — von Aussenstehenden bis zu den Administratoren.",
+      "confirmDelete": "Rolle \"{role}\" löschen? Ihre Mitglieder werden zu \"{target}\".",
+      "confirmReset": "Alle Rollen dieser Gruppe auf den Standard zurücksetzen? Selbst angelegte Rollen werden dabei entfernt, ihre Mitglieder werden gewöhnliche Mitglieder.",
+      "deleteRole": "Rolle löschen",
+      "description": "Hier legt ihr fest, was in dieser Gruppe wer darf — von Außenstehenden bis zu den Administratoren.",
+      "hideAdvanced": "Detail-Ansicht ausblenden",
       "labelField": "Anzeigename",
       "mandatory": "Immer vergeben: eine Mitgliedschaft, die man nicht beenden kann, ist keine Einstellung.",
       "members": "{count} Mitglieder",
       "mootJoin": "Wer schon eine Mitgliedschaft hat, tritt nicht noch einmal bei.",
       "mootLeave": "Wer nicht Mitglied ist, hat keine Mitgliedschaft zu beenden.",
       "noRight": "Dieses Recht kannst du nicht vergeben, weil du es selbst nicht hast.",
-      "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte dieser Gruppe. Nur ihr Anzeigename laesst sich aendern.",
+      "ownerHoldsEverything": "Die Inhaber-Rolle hält immer alle Rechte dieser Gruppe. Nur ihr Anzeigename lässt sich ändern.",
       "pendingBlocked": "Diese Rolle hat zurzeit niemand: es kann niemand eine Mitgliedschaft beantragen.",
-      "pendingUnreachable": "Zurzeit kann niemand eine Mitgliedschaft beantragen — diese Rolle hat deshalb niemand. Darueber entscheidet der Einlass.",
-      "reset": "Auf Standard zuruecksetzen",
+      "pendingUnreachable": "Zurzeit kann niemand eine Mitgliedschaft beantragen — diese Rolle hat deshalb niemand. Darüber entscheidet der Einlass.",
+      "reset": "Auf Standard zurücksetzen",
       "resultingType": "Mit diesen Rechten ist die Gruppe:",
-      "roleKeyPlaceholder": "Schluessel, z. B. redaktion",
+      "roleKeyPlaceholder": "Schlüssel, z. B. redaktion",
       "roleLabelPlaceholder": "Anzeigename, z. B. Redaktion",
       "saved": "Rechte gespeichert",
       "saveFirst": "Erst speichern oder verwerfen — es gibt ungesicherte Änderungen.",
       "simple": {
-        "applicants-read": "Wartende Bewerber duerfen die Beitraege lesen",
-        "members-chat": "Mitglieder duerfen im Gruppen-Chat schreiben",
-        "members-comment": "Mitglieder duerfen kommentieren",
-        "members-invite": "Mitglieder duerfen andere einladen",
-        "members-post": "Mitglieder duerfen Beitraege schreiben",
-        "nonmembers-members": "Aussenstehende duerfen die Mitgliederliste sehen",
+        "applicants-read": "Wartende Bewerber dürfen die Beiträge lesen",
+        "members-chat": "Mitglieder dürfen im Gruppen-Chat schreiben",
+        "members-comment": "Mitglieder dürfen kommentieren",
+        "members-invite": "Mitglieder dürfen andere einladen",
+        "members-post": "Mitglieder dürfen Beiträge schreiben",
+        "nonmembers-members": "Außenstehende dürfen die Mitgliederliste sehen",
         "nonmembers-profile": "Außenstehende sehen, dass es die Gruppe gibt",
-        "nonmembers-read": "Aussenstehende duerfen die Beitraege lesen"
+        "nonmembers-read": "Außenstehende dürfen die Beiträge lesen"
       },
       "simpleGroups": {
         "applicants": "Wartende",
         "members": "Mitglieder",
-        "outsiders": "Aussenstehende"
+        "outsiders": "Außenstehende"
       },
-      "systemRole": "Systemrolle: kann nicht geloescht oder umbenannt werden",
+      "systemRole": "Systemrolle: kann nicht gelöscht oder umbenannt werden",
       "title": "Rechte",
-      "toAdvanced": "Erweitert: alle Rechte im Detail",
-      "toSimple": "Zurueck zur einfachen Ansicht"
+      "toAdvanced": "Erweitert: alle Rechte im Detail"
     },
     "role": "Deine Rolle in der Gruppe",
     "roles": {

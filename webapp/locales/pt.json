@@ -1010,6 +1010,7 @@
       "confirmReset": "Restaurar todas as funções deste grupo para os valores predefinidos? As funções que criaram são removidas e os seus membros passam a membros comuns.",
       "deleteRole": "Eliminar função",
       "description": "Decidam quem pode fazer o quê neste grupo — de quem está fora até aos administradores.",
+      "hideAdvanced": "Ocultar a vista detalhada",
       "labelField": "Nome visível",
       "mandatory": "Sempre concedido: uma adesão que não se pode terminar não é uma opção.",
       "members": "{count} membros",
@@ -1042,8 +1043,7 @@
       },
       "systemRole": "Função do sistema: não pode ser eliminada nem renomeada",
       "title": "Permissões",
-      "toAdvanced": "Avançado: todas as permissões em detalhe",
-      "toSimple": "Voltar à vista simples"
+      "toAdvanced": "Avançado: todas as permissões em detalhe"
     },
     "role": "Seu papel no grupo",
     "roles": {

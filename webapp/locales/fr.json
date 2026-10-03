@@ -1010,6 +1010,7 @@
       "confirmReset": "Réinitialiser tous les rôles de ce groupe aux valeurs par défaut ? Les rôles que vous avez ajoutés seront supprimés et leurs membres deviendront des membres ordinaires.",
       "deleteRole": "Supprimer le rôle",
       "description": "Décidez qui peut faire quoi dans ce groupe — des non-membres jusqu’aux administrateurs.",
+      "hideAdvanced": "Masquer la vue détaillée",
       "labelField": "Nom affiché",
       "mandatory": "Toujours accordé : une adhésion qu'on ne peut pas quitter n'est pas un réglage.",
       "members": "{count} membres",
@@ -1042,8 +1043,7 @@
       },
       "systemRole": "Rôle système : ne peut être ni supprimé ni renommé",
       "title": "Permissions",
-      "toAdvanced": "Avancé : toutes les permissions en détail",
-      "toSimple": "Retour à la vue simple"
+      "toAdvanced": "Avancé : toutes les permissions en détail"
     },
     "role": "Ton rôle dans le groupe",
     "roles": {

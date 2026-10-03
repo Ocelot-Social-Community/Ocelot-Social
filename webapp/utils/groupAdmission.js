@@ -15,6 +15,9 @@
  */
 export const ADMISSION_STATES = ['open', 'onRequest', 'closed']
 
+/** The two rights the three states are made of — the pair every state rewrites as a whole. */
+export const JOIN_RIGHTS = ['group.join', 'group.join.request']
+
 export const admissionOf = (nonMemberPermissions) => {
   const held = new Set(nonMemberPermissions ?? [])
   if (held.has('group.join')) return 'open'
@@ -36,9 +39,7 @@ export const admissionRights = (state) => {
  * a list holding both would read as two answers to it.
  */
 export const withAdmission = (nonMemberPermissions, state) => {
-  const kept = (nonMemberPermissions ?? []).filter(
-    (key) => key !== 'group.join' && key !== 'group.join.request',
-  )
+  const kept = (nonMemberPermissions ?? []).filter((key) => !JOIN_RIGHTS.includes(key))
   return [...kept, ...admissionRights(state)]
 }
 
