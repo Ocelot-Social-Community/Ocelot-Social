@@ -6,7 +6,6 @@ import { visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { groupPermissionCatalog, sanitizeGroupPermissions } from '@src/groupPermission'
 import {
   coversRole,
-  PRIVACY_LEVELS,
   storableRightsFor,
   withImpliedRights,
   createPermissionForLevel,
@@ -34,6 +33,11 @@ import {
   writeGroupTemplate,
   writeGroupRoleTemplate,
 } from '@src/groupRole/repository'
+import {
+  byPrivacyThenName,
+  readTemplateChoices,
+  templateVisibilityOf,
+} from '@src/groupRole/templateChoices'
 import { isPermissionAvailable } from '@src/permission'
 
 import type { Context } from '@src/context'
@@ -268,31 +272,28 @@ export default {
         readGroupRoleTemplates(context.database),
         untouchedGroupIdsByType(context.database),
       ])
-      // Least private first, from the one list that orders the levels (groupRole/privacyLevel):
-      // the tabs are a scale, and an alphabet reads as "closed, secret, public".
-      const ordered = [...Object.entries(templates)].sort(
-        ([a], [b]) =>
-          PRIVACY_LEVELS.indexOf(a as GroupPrivacyLevel) -
-          PRIVACY_LEVELS.indexOf(b as GroupPrivacyLevel),
-      )
-      return ordered.map(([template, roles]) => ({
-        // The template's NAME and the visibility it produces: the same string today, because
-        // the three shipped templates are named after what they derive to (and a drift guard
-        // keeps them that way). Two fields, because they answer two different questions — one
-        // about the template an operator edits, one about the groups it creates.
-        name: template,
-        visibility: privacyLevelOfPermissions(
-          roles.find((role) => role.name === NONE_ROLE)?.permissions,
-        ),
+      // Least private first, ordered by what each template DERIVES to rather than by its name:
+      // the tabs are a scale, an alphabet reads as "closed, secret, public", and sorting the
+      // names against PRIVACY_LEVELS put `channel` — which is not a visibility — at -1.
+      const ordered = [...Object.entries(templates)]
+        .map(([name, roles]) => ({ name, visibility: templateVisibilityOf(roles), roles }))
+        .sort(byPrivacyThenName)
+      return ordered.map(({ name, visibility, roles }) => ({
+        // The template's NAME and the visibility it produces answer two different questions —
+        // one about the template an operator edits, one about the groups it creates. They are
+        // the same string for the three named after a visibility, and `channel` is why they
+        // are two fields.
+        name,
+        visibility,
         roles: roles.map((role) => ({ ...role, memberCount: null })),
-        untouchedGroupCount: untouched.get(template)?.untouchedIds.length ?? 0,
+        untouchedGroupCount: untouched.get(name)?.untouchedIds.length ?? 0,
         // The denominator: "10 untouched" reads as "only 10 of them" without it, when it may
         // well be all of them.
-        groupCount: untouched.get(template)?.total ?? 0,
+        groupCount: untouched.get(name)?.total ?? 0,
       }))
     },
-    groupRoleTemplateNames: async (_parent, _args, context: Context) =>
-      Object.keys(await readGroupRoleTemplates(context.database)).sort(),
+    groupTemplates: async (_parent, _args, context: Context) =>
+      readTemplateChoices(context.database),
   },
   Group: {
     myGroupRole: async (parent: { id: string }, _args, context: Context) => {

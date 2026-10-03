@@ -95,7 +95,7 @@ beforeEach(async () => {
       about: 'About',
       description: 'A sufficiently long description ' + '-'.repeat(100),
       actionRadius: 'global',
-      visibility: 'closed',
+      template: 'closed',
       categoryIds: null,
     },
   })

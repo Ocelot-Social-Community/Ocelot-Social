@@ -40,12 +40,12 @@
         </template>
 
         <template #actions>
+          <!-- No guard on the way IN: the card stays on screen, so unfolding the matrix can no
+               longer throw its draft away. -->
           <button
             v-if="!advanced"
             type="button"
             class="link-button"
-            :disabled="simpleDirty"
-            :title="simpleDirty ? $t('admin.groupRoles.saveFirst') : null"
             data-test="to-advanced"
             @click="advanced = true"
           >
@@ -55,31 +55,20 @@
       </group-rights-simple>
 
       <!--
-        The one control on this page that reaches existing groups, with the sentence that says how
-        far it reaches — set apart from Save and Cancel above, which only ever write the template.
-        Standing in the same row, it read as a third way of saving the same edit.
+        Its own block with a rule above it and a heading that NAMES the template: the tabs below
+        are the roles of the one picked at the top, and with the matrix standing loose under the
+        card there was nothing on screen saying which template a tick was changing.
       -->
-      <section class="apply">
-        <p class="untouched" data-test="untouched">
+      <section v-if="advanced" class="advanced" data-test="advanced">
+        <h3 class="advanced__title">{{ $t('group.rights.advancedTitle') }}</h3>
+        <p class="advanced__subject" data-test="editing-template">
           {{
-            $t('admin.groupRoles.untouched', {
-              untouched: activeTemplate.untouchedGroupCount,
-              total: activeTemplate.groupCount,
+            $t('admin.groupRoles.editingTemplate', {
+              template: $t(`group.types.${activeTemplateName}`),
             })
           }}
         </p>
-        <!-- A template change reaches existing groups only when an admin asks for it, and then
-             only the groups that never edited their own roles (concept E12). -->
-        <os-button
-          :disabled="saving || simpleDirty || dirty || !activeTemplate.untouchedGroupCount"
-          data-test="apply"
-          @click="confirmApply"
-        >
-          {{ $t('admin.groupRoles.apply') }}
-        </os-button>
-      </section>
 
-      <template v-if="advanced">
         <role-tabs
           :roles="orderedRoles"
           :active-name="activeRoleName"
@@ -117,14 +106,16 @@
           :diff="hoverDiff"
           :highlight="highlightedRights"
           :group-label="(name) => $t(`permissions.sections.${name}`)"
-          :disabled-for="(permission) => saving || isMandatory(permission) || isMoot(permission)"
+          :disabled-for="
+            (permission) => saving || simpleDirty || isMandatory(permission) || isMoot(permission)
+          "
           :hint-for="blockedHint"
           :note-for="blockedHint"
           @toggle="toggle"
         />
 
         <div class="actions">
-          <os-button :disabled="!dirty || saving" data-test="save" @click="save">
+          <os-button :disabled="!dirty || saving || simpleDirty" data-test="save" @click="save">
             {{ $t('actions.save') }}
           </os-button>
           <os-button :disabled="!dirty || saving" data-test="revert" @click="resetDraft">
@@ -141,7 +132,34 @@
             {{ $t('group.rights.hideAdvanced') }}
           </button>
         </div>
-      </template>
+      </section>
+
+      <!--
+        The one control on this page that reaches existing groups, with the sentence that says how
+        far it reaches — set apart from Save and Cancel, which only ever write the template.
+        Standing in the same row, it read as a third way of saving the same edit; standing above
+        the matrix, it sat between an edit and the button that stores it. Last on the page, so
+        whatever is unfolded, this stays the thing one reaches after everything else.
+      -->
+      <section class="apply">
+        <p class="untouched" data-test="untouched">
+          {{
+            $t('admin.groupRoles.untouched', {
+              untouched: activeTemplate.untouchedGroupCount,
+              total: activeTemplate.groupCount,
+            })
+          }}
+        </p>
+        <!-- A template change reaches existing groups only when an admin asks for it, and then
+             only the groups that never edited their own roles (concept E12). -->
+        <os-button
+          :disabled="saving || simpleDirty || dirty || !activeTemplate.untouchedGroupCount"
+          data-test="apply"
+          @click="confirmApply"
+        >
+          {{ $t('admin.groupRoles.apply') }}
+        </os-button>
+      </section>
     </template>
   </os-card>
 </template>
@@ -341,6 +359,9 @@ export default {
     },
     /** Why a row cannot be ticked, in words — shown on the row, not only as a tooltip. */
     blockedHint(permission) {
+      // The lock between the two views, said where the cursor is: the card above holds an
+      // unsaved edit, and whichever of the two saved second would discard the other's.
+      if (this.simpleDirty) return this.$t('admin.groupRoles.saveFirst')
       if (this.isMoot(permission))
         return this.$t(mootReasonFor(this.activeRoleName, permission?.key))
       if (this.isMandatory(permission)) return this.$t('group.rights.mandatory')
@@ -488,6 +509,21 @@ export default {
   max-width: 24rem;
   margin: var(--space-small) 0;
 }
+.advanced {
+  margin-top: var(--space-large);
+  padding-top: var(--space-base);
+  border-top: 1px solid var(--border-color-softer);
+}
+
+.advanced__title {
+  margin: 0;
+}
+
+.advanced__subject {
+  margin: 0 0 var(--space-base);
+  color: var(--text-color-soft);
+}
+
 /* Its own block with a rule above it: this is the only button here that changes a GROUP. */
 .apply {
   display: flex;

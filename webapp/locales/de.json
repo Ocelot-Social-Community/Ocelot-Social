@@ -225,6 +225,7 @@
       "apply": "Auf unveränderte Gruppen anwenden",
       "confirmApply": "Vorlagen auf {count} Gruppen anwenden, die ihre Rollen nie angepasst haben? Angepasste Gruppen bleiben unberührt.",
       "description": "Hier bearbeitest du die Vorlagen, aus denen neue Gruppen entstehen — keine bestehende Gruppe ändert sich dadurch. Nur der Knopf unten wendet eine Änderung auf Gruppen an, und auch dann nur auf die, die ihre Rechte nie selbst geändert haben.",
+      "editingTemplate": "Du bearbeitest die Vorlage „{template}“",
       "labelField": "Name",
       "name": "Gruppen-Vorlagen",
       "ownerHoldsEverything": "Die Inhaber-Rolle hält immer alle Rechte und ist nicht bearbeitbar.",
@@ -1002,6 +1003,7 @@
     "removeMemberTitle": "Mitglied entfernen",
     "rights": {
       "addRole": "Rolle hinzufügen",
+      "advancedTitle": "Alle Rechte im Detail",
       "applyTemplate": "Vorlage anwenden — ersetzt alle Rollen dieser Gruppe durch die der Vorlage.",
       "blockedByFeature": "Diese Funktion ist im Netzwerk abgeschaltet ({feature}).",
       "blockedByNetwork": "Netzwerkweit gesperrt: dafür fehlt das Recht {permission}.",
@@ -1061,6 +1063,13 @@
       "openGroup": "Gruppe öffnen",
       "unavailable": "Gruppe nicht mehr verfügbar"
     },
+    "templateChoice": "Was für eine Gruppe wird das?",
+    "templateDescriptions": {
+      "channel": "Öffentlich — Beiträge schreibt nur die Gruppenleitung",
+      "closed": "Alle Beiträge nur für Gruppenmitglieder sichtbar",
+      "hidden": "Gruppe (auch der Name) komplett unsichtbar",
+      "public": "Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
+    },
     "type": "Öffentlichkeit der Gruppe",
     "typeDescriptions": {
       "closed": "Alle Beiträge nur für Gruppenmitglieder sichtbar",
@@ -1086,6 +1095,7 @@
       "actionRadiusRequired": "Bitte einen Aktionsradius wählen.",
       "descriptionLength": "Die Beschreibung muss mindestens {min} Zeichen lang sein.",
       "descriptionNotEmpty": "Bitte eine Beschreibung eingeben.",
+      "groupTypeNotAllowed": "Diese Art Gruppe darfst du nicht anlegen.",
       "groupTypeRequired": "Bitte einen Gruppentyp wählen.",
       "nameNotEmpty": "Bitte einen Gruppennamen eingeben.",
       "slugInvalidCharacters": "Nur Kleinbuchstaben, Ziffern, Bindestriche und Unterstriche sind erlaubt.",

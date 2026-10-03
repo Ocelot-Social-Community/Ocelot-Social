@@ -327,11 +327,13 @@ export default {
   Mutation: {
     CreateGroup: async (_parent, params, context: Context, _resolveInfo) => {
       const { policy } = context
-      // The visibility a new group starts at IS the template it is seeded from — the three
-      // shipped templates are named after what they derive to. Stored as `template`, because
-      // that half is the one nothing computes back.
-      const template = params.visibility as string
-      delete params.visibility
+      // Which template to seed from, named outright. It used to arrive as a VISIBILITY and be
+      // cast to a template name, which worked only while every template was named after what
+      // it derives to — `channel` is a public group, and under the old argument there was no
+      // way to ask for one. Stored on the group, because that half is the one nothing
+      // computes back; the visibility is read from the rights the seeding writes.
+      const template = params.template as string
+      delete params.template
       const { categoryIds } = params
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName

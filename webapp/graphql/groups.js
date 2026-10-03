@@ -12,7 +12,7 @@ export const createGroupMutation = () => {
       $slug: String
       $about: String
       $description: String!
-      $visibility: GroupVisibility!
+      $template: String!
       $actionRadius: GroupActionRadius!
       $categoryIds: [ID]
       $locationName: String # empty string '' sets it to null
@@ -26,7 +26,7 @@ export const createGroupMutation = () => {
         slug: $slug
         about: $about
         description: $description
-        visibility: $visibility
+        template: $template
         actionRadius: $actionRadius
         categoryIds: $categoryIds
         locationName: $locationName

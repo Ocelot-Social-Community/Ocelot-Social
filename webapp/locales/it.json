@@ -225,6 +225,7 @@
       "apply": "Applica ai gruppi non modificati",
       "confirmApply": "Applicare i modelli a {count} gruppi che non hanno mai personalizzato i propri ruoli? I gruppi personalizzati non vengono toccati.",
       "description": "Qui modifichi i modelli da cui nascono i nuovi gruppi: nessun gruppo esistente cambia per questo. Solo il pulsante qui sotto applica una modifica ai gruppi, e solo a quelli che non hanno mai cambiato i propri diritti.",
+      "editingTemplate": "Stai modificando il modello «{template}»",
       "labelField": "Nome",
       "name": "Modelli di gruppo",
       "ownerHoldsEverything": "Il ruolo di proprietario ha sempre tutti i permessi e non è modificabile.",
@@ -1002,6 +1003,7 @@
     "removeMemberTitle": "Rimuovi membro",
     "rights": {
       "addRole": "Aggiungi un ruolo",
+      "advancedTitle": "Tutti i permessi in dettaglio",
       "applyTemplate": "Applica un modello: sostituisce tutti i ruoli di questo gruppo con quelli del modello.",
       "blockedByFeature": "Questa funzione è disattivata nella rete ({feature}).",
       "blockedByNetwork": "Limitato a livello di rete: serve il permesso {permission}.",
@@ -1061,6 +1063,13 @@
       "openGroup": "Apri gruppo",
       "unavailable": "Gruppo non disponibile"
     },
+    "templateChoice": "Che tipo di gruppo è questo?",
+    "templateDescriptions": {
+      "channel": "Pubblico — ma solo la direzione del gruppo scrive i post",
+      "closed": "Tutte le pubblicazioni visibili solo ai membri del gruppo",
+      "hidden": "Il gruppo (compreso il nome) è completamente invisibile",
+      "public": "Il gruppo e tutte le pubblicazioni sono visibili a tutti gli utenti registrati"
+    },
     "type": "Visibilità del gruppo",
     "typeDescriptions": {
       "closed": "Tutte le pubblicazioni visibili solo ai membri del gruppo",
@@ -1086,6 +1095,7 @@
       "actionRadiusRequired": "Selezionare un raggio d'azione.",
       "descriptionLength": "La descrizione deve contenere almeno {min} caratteri.",
       "descriptionNotEmpty": "Inserire una descrizione.",
+      "groupTypeNotAllowed": "Non puoi creare questo tipo di gruppo.",
       "groupTypeRequired": "Selezionare un tipo di gruppo.",
       "nameNotEmpty": "Inserire un nome del gruppo.",
       "slugInvalidCharacters": "Sono ammessi solo lettere minuscole, numeri, trattini e trattini bassi.",

@@ -301,8 +301,8 @@ describe('SignupVerification', () => {
             expect(records[0].get('locations').toNumber()).toBe(0)
           })
 
-          // A GROUP invite code on signup: the invited account has to end up IN the group, and
-          // where it lands follows the group's own rights rather than its type (see
+          // A GROUP invite code on signup: the invited account has to end up IN the group, as a
+          // MEMBER — an invitation is the approval, so there is nothing left to approve (see
           // resolvers/inviteCodes.ts). This is the whole chain an invited person walks —
           // registering, redeeming, and arriving somewhere they may actually be.
           describe('signing up with a group invite code', () => {
@@ -345,21 +345,24 @@ describe('SignupVerification', () => {
               expect(await signUpWith('GRPSUP')).toBe('usual')
             })
 
-            it('admits it as an applicant of a closed group', async () => {
+            it('admits it as a member of a closed group too, because it was invited', async () => {
+              // It used to land as an applicant here: the door said "ask first", so the invited
+              // account queued at a door somebody inside had already opened for it — and in a
+              // SECRET group it queued where it could not even see what it was queuing for.
+              // Who may walk in uninvited and who was invited are two questions.
               await buildInviteGroup('closed')
 
-              expect(await signUpWith('GRPSUP')).toBe('pending')
+              expect(await signUpWith('GRPSUP')).toBe('usual')
             })
 
-            it("follows the group's own rights, not its type", async () => {
-              // The closed group hands its non-member role the direct-join right. The invited
-              // account must then land as a member, although the TYPE still says "ask first" —
-              // which is the difference between the old literal and the rights.
+            it('does not consult the door at all', async () => {
+              // The same closed group with the direct-join right taken off its non-member role:
+              // nobody may walk in, and the invited account is still a member.
               await buildInviteGroup('closed')
               await database.write({
                 query: `MATCH (:Group { id: 'invite-group' })-[:HAS_GROUP_ROLE]->(role:GroupRole { name: 'none' })
                         SET role.permissions = $permissions`,
-                variables: { permissions: JSON.stringify(['group.read', 'group.join']) },
+                variables: { permissions: JSON.stringify(['group.read']) },
               })
 
               expect(await signUpWith('GRPSUP')).toBe('usual')

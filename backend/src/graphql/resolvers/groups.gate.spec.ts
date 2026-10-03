@@ -48,7 +48,7 @@ const createGroupVariables = (id: string, name: string) => ({
   name,
   about: 'About the group',
   description,
-  visibility: 'public',
+  template: 'public',
   actionRadius: 'national',
 })
 

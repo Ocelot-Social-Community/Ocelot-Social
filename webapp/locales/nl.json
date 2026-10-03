@@ -225,6 +225,7 @@
       "apply": "Toepassen op ongewijzigde groepen",
       "confirmApply": "De sjablonen toepassen op {count} groepen die hun rollen nooit hebben aangepast? Aangepaste groepen blijven ongemoeid.",
       "description": "Hier bewerk je de sjablonen waaruit nieuwe groepen ontstaan — geen bestaande groep verandert daardoor. Alleen de knop hieronder past een wijziging toe op groepen, en dan alleen op de groepen die hun eigen rechten nooit hebben gewijzigd.",
+      "editingTemplate": "Je bewerkt het sjabloon “{template}”",
       "labelField": "Naam",
       "name": "Groepssjablonen",
       "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten en kan niet worden aangepast.",
@@ -1002,6 +1003,7 @@
     "removeMemberTitle": "Lid verwijderen",
     "rights": {
       "addRole": "Rol toevoegen",
+      "advancedTitle": "Alle rechten in detail",
       "applyTemplate": "Sjabloon toepassen — vervangt alle rollen van deze groep door die van het sjabloon.",
       "blockedByFeature": "Deze functie is uitgeschakeld in dit netwerk ({feature}).",
       "blockedByNetwork": "Netwerkbreed begrensd: hiervoor is het recht {permission} nodig.",
@@ -1061,6 +1063,13 @@
       "openGroup": "Groep openen",
       "unavailable": "Groep niet meer beschikbaar"
     },
+    "templateChoice": "Wat voor groep wordt dit?",
+    "templateDescriptions": {
+      "channel": "Openbaar — maar alleen de groepsleiding schrijft berichten",
+      "closed": "Alle berichten alleen zichtbaar voor groepsleden",
+      "hidden": "Groep (inclusief de naam) is volledig onzichtbaar",
+      "public": "Groep en alle berichten zijn zichtbaar voor alle geregistreerde gebruikers"
+    },
     "type": "Zichtbaarheid van de groep",
     "typeDescriptions": {
       "closed": "Alle berichten alleen zichtbaar voor groepsleden",
@@ -1086,6 +1095,7 @@
       "actionRadiusRequired": "Kies een actieradius.",
       "descriptionLength": "De beschrijving moet minstens {min} tekens lang zijn.",
       "descriptionNotEmpty": "Voer een beschrijving in.",
+      "groupTypeNotAllowed": "Je mag dit soort groep niet aanmaken.",
       "groupTypeRequired": "Kies een groepstype.",
       "nameNotEmpty": "Voer een groepsnaam in.",
       "slugInvalidCharacters": "Alleen kleine letters, cijfers, koppeltekens en underscores zijn toegestaan.",

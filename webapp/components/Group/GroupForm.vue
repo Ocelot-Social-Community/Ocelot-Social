@@ -37,40 +37,86 @@
         <div v-if="update" class="ds-mb-base"></div>
 
         <!-- visibility -->
-        <p class="ds-text select-label">
-          {{ $t('group.type') }}
-        </p>
-        <div
-          class="select-wrap"
-          :class="{
-            'ds-input-has-error':
-              visibleErrors && visibleErrors.visibility && formData.visibility === '',
-          }"
-        >
-          <select
-            class="select ds-input appearance--auto"
-            name="visibility"
-            model="visibility"
-            :value="formData.visibility"
-            :disabled="update && !canInGroup('group.role.manage', group)"
-            @change="changeGroupType($event)"
-            @blur="touchField('visibility')"
+        <!--
+          Creating: ONE question, one card per template, over all of them. The old control was a
+          select over the three VISIBILITIES, which left `channel` — a template that derives to
+          `public` — with no way of being asked for at all. Everything else about the group is
+          what the template brings, and is edited afterwards under Rights.
+        -->
+        <template v-if="!update">
+          <p class="ds-text select-label">{{ $t('group.templateChoice') }}</p>
+          <ul class="template-cards" data-test="template-cards">
+            <li v-for="choice in templateChoices" :key="choice.name" class="template-cards__item">
+              <button
+                type="button"
+                class="template-card"
+                :class="{ 'template-card--active': choice.name === formData.template }"
+                :disabled="!choice.allowed"
+                :title="choice.allowed ? null : $t('group.validations.groupTypeNotAllowed')"
+                :data-test="`template-card-${choice.name}`"
+                @click="chooseTemplate(choice)"
+              >
+                <os-icon
+                  :icon="icons[choice.icon]"
+                  size="2xl"
+                  class="template-card__icon"
+                  aria-hidden="true"
+                />
+                <span class="template-card__text">
+                  <strong>{{ $t(`group.types.${choice.name}`) }}</strong>
+                  <span class="template-card__description">
+                    {{ $t(`group.templateDescriptions.${choice.name}`) }}
+                  </span>
+                </span>
+              </button>
+            </li>
+          </ul>
+          <os-validation-hint
+            v-if="visibleErrors && visibleErrors.template && formData.template === ''"
+            variant="error"
+            :text="$t('group.validations.groupTypeRequired')"
+          />
+        </template>
+
+        <!-- Editing: the visibility stays a visibility here. Which template the group RUNS on is
+             a different question with its own screen (Rights), where changing it replaces every
+             role rather than the two non-member ones this writes. -->
+        <template v-else>
+          <p class="ds-text select-label">
+            {{ $t('group.type') }}
+          </p>
+          <div
+            class="select-wrap"
+            :class="{
+              'ds-input-has-error':
+                visibleErrors && visibleErrors.visibility && formData.visibility === '',
+            }"
           >
-            <option
-              v-for="visibility in visibilityOptions"
-              :key="visibility"
-              :value="visibility"
-              :disabled="visibility !== group.visibility && !$can(`group.create_${visibility}`)"
+            <select
+              class="select ds-input appearance--auto"
+              name="visibility"
+              model="visibility"
+              :value="formData.visibility"
+              :disabled="!canInGroup('group.role.manage', group)"
+              @change="changeGroupType($event)"
+              @blur="touchField('visibility')"
             >
-              {{ $t(`group.typesOptions.${visibility}`) }}
-            </option>
-          </select>
-        </div>
-        <os-validation-hint
-          v-if="visibleErrors && visibleErrors.visibility && formData.visibility === ''"
-          variant="error"
-          :text="$t('group.validations.visibilityRequired')"
-        />
+              <option
+                v-for="visibility in visibilityOptions"
+                :key="visibility"
+                :value="visibility"
+                :disabled="visibility !== group.visibility && !$can(`group.create_${visibility}`)"
+              >
+                {{ $t(`group.typesOptions.${visibility}`) }}
+              </option>
+            </select>
+          </div>
+          <os-validation-hint
+            v-if="visibleErrors && visibleErrors.visibility && formData.visibility === ''"
+            variant="error"
+            :text="$t('group.validations.groupTypeRequired')"
+          />
+        </template>
 
         <!-- showMembers -->
         <div class="show-members-control">
@@ -216,6 +262,15 @@ import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import groupRights from '~/mixins/groupRights'
 
+// One glyph per template, falling back to the one for the visibility it derives to — so a
+// template nobody has drawn an icon for still shows what kind of group it makes.
+const TEMPLATE_ICONS = {
+  public: 'globe',
+  closed: 'lock',
+  hidden: 'eyeSlash',
+  channel: 'volumeUp',
+}
+
 // Shared by both the location-select text search and the location-picker-map
 // below it, so a group's location can land on a city district — deliberately
 // coarser than an event's exact pin, but not so coarse it only ever offers a
@@ -244,6 +299,16 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    /**
+     * The templates a new group can start from, `{ name, visibility }` — runtime data, so the
+     * page fetches it and hands it over rather than this component carrying a list that goes
+     * stale the moment an operator adds one. Empty while editing, where no template is picked.
+     */
+    templates: {
+      type: Array,
+      required: false,
+      default: () => [],
     },
     group: {
       type: Object,
@@ -299,6 +364,12 @@ export default {
       formData: {
         name: name || '',
         slug: slug || '',
+        // Which preset a NEW group starts from. Empty while editing: the group already runs on
+        // one, and changing it belongs to the rights screen.
+        template: '',
+        // What the group can be seen as. On create this is DERIVED from the template picked
+        // above, so everything keyed off it — the create cap, the member-list rule — keeps
+        // reading one visibility rather than learning about templates.
         visibility: visibility || '',
         about: about || '',
         description: description || '',
@@ -360,7 +431,12 @@ export default {
             return []
           },
         },
-        visibility: { required: true, min: 1 },
+        // One of the two, never both: creating asks for a TEMPLATE, editing for a VISIBILITY.
+        // Requiring both would report an empty create form as missing two choices when it is
+        // missing one — the visibility is derived from the template the moment it is picked.
+        ...(this.update
+          ? { visibility: { required: true, min: 1 } }
+          : { template: { required: true, min: 1 } }),
         about: { required: false },
         description: {
           type: 'string',
@@ -463,11 +539,33 @@ export default {
             max: this.formSchema.name.max,
           })
     },
+    /**
+     * The cards on the create form: every template, with the glyph and the right it costs.
+     *
+     * The cost is read off the VISIBILITY the template derives to, not off its name — the same
+     * rule the server applies, and the reason the visibility travels with the name in the query.
+     * A template the viewer may not create is shown and refused rather than hidden: "there is a
+     * kind of group I am not allowed to make" is information, an absent card is not.
+     *
+     * Falls back to the three visibility-named templates while the query has not answered, so a
+     * slow or failed request leaves the form usable rather than empty. Those three always exist
+     * — a drift guard in the backend keeps one template per visibility.
+     */
+    templateChoices() {
+      const choices = this.templates.length
+        ? this.templates
+        : this.visibilityOptions.map((name) => ({ name, visibility: name }))
+      return choices.map((choice) => ({
+        ...choice,
+        icon: TEMPLATE_ICONS[choice.name] ?? TEMPLATE_ICONS[choice.visibility],
+        allowed: this.$can(`group.create_${choice.visibility}`),
+      }))
+    },
     // Flat per-type create rights (mirrors the backend group.create_* shield): the
     // "create group" entry point is open if the user may create at least one type, and
     // the submit gate keys off the currently selected type.
     canCreateAnyGroup() {
-      return this.visibilityOptions.some((type) => this.$can(`group.create_${type}`))
+      return this.templateChoices.some((choice) => choice.allowed)
     },
     // Switching an existing group TO hidden additionally needs
     // group.create_hidden (the privacy-raising transition); editing an
@@ -550,6 +648,16 @@ export default {
     changeGroupType(event) {
       this.updateFormField('visibility', event.target.value)
     },
+    /**
+     * Picking a template on the create form also fixes the visibility, because the template's
+     * rights are what the visibility is read from. Both are written: the template is what gets
+     * sent, the visibility is what every rule on this form already asks about.
+     */
+    chooseTemplate(choice) {
+      this.updateFormField('template', choice.name)
+      this.updateFormField('visibility', choice.visibility)
+      this.touchField('template')
+    },
     changeActionRadius(event) {
       this.updateFormField('actionRadius', event.target.value)
     },
@@ -600,12 +708,16 @@ export default {
     },
     submit() {
       this.loading = true
-      const { name, slug, about, description, visibility, actionRadius, categoryIds } =
+      const { name, slug, about, description, template, visibility, actionRadius, categoryIds } =
         this.formData
       const variables = {
         name,
         slug,
-        visibility,
+        // Creating names a TEMPLATE, editing writes a VISIBILITY: one picks the whole set of
+        // roles a group starts with, the other rewrites the two non-member ones of a group that
+        // already has them. The two mutations ask for exactly that, so the form sends exactly
+        // that rather than one value standing in for both.
+        ...(this.update ? { visibility } : { template }),
         about,
         description,
         actionRadius,
@@ -664,6 +776,68 @@ export default {
 </script>
 
 <style>
+/* One card per template: a glyph, what it is called and what it makes the group — the same
+   three things the rights screen states, so the choice made here is recognisable there. */
+.template-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-x-small);
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-base);
+}
+
+.template-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-small);
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  border: 1px solid var(--border-color-soft);
+  border-radius: var(--border-radius-base);
+  background: var(--background-color-base);
+  color: var(--text-color-base);
+  padding: var(--space-small);
+  cursor: pointer;
+}
+
+.template-card:hover:not(:disabled) {
+  background: var(--background-color-softer);
+}
+
+.template-card--active {
+  border-color: var(--color-primary);
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+
+/* Not a filled card: the description under the name has to stay readable, and white on the
+   brand green is exactly the contrast the filled buttons had to be fixed for. */
+.template-card--active:hover:not(:disabled) {
+  background: var(--background-color-base);
+}
+
+.template-card:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.template-card__icon {
+  flex: 0 0 auto;
+  font-size: 1.4rem;
+  color: var(--text-color-soft);
+}
+
+.template-card__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.template-card__description {
+  color: var(--text-color-soft);
+  font-size: 0.85em;
+}
+
 .appearance--auto {
   -webkit-appearance: auto;
   -moz-appearance: auto;

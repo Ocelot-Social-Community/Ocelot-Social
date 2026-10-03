@@ -35,7 +35,7 @@ const samplePayload = {
   name: 'My Group',
   about: 'about',
   description: 'description text long enough',
-  visibility: 'public',
+  template: 'channel',
   actionRadius: 'regional',
   locationName: 'Berlin',
   lat: 52.5,
@@ -72,7 +72,9 @@ describe('pages/groups/create.vue', () => {
         name: 'My Group',
         about: 'about',
         description: 'description text long enough',
-        visibility: 'public',
+        // A TEMPLATE, not a visibility: `channel` makes a public group, and under the old
+        // argument there was no way to ask for one.
+        template: 'channel',
         actionRadius: 'regional',
         locationName: 'Berlin',
         lat: 52.5,

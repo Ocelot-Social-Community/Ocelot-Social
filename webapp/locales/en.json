@@ -225,6 +225,7 @@
       "apply": "Apply to untouched groups",
       "confirmApply": "Apply the templates to {count} groups that never customised their roles? Customised groups are left alone.",
       "description": "Here you edit the templates new groups are created from — no existing group changes because of it. Only the button below applies a change to groups, and then only to the ones that never changed their own rights.",
+      "editingTemplate": "You are editing the “{template}” template",
       "labelField": "Name",
       "name": "Group templates",
       "ownerHoldsEverything": "The owner role always holds every right and cannot be edited.",
@@ -1002,6 +1003,7 @@
     "removeMemberTitle": "Remove Member",
     "rights": {
       "addRole": "Add a role",
+      "advancedTitle": "Every right in detail",
       "applyTemplate": "Apply a template — replaces every role of this group with the template’s.",
       "blockedByFeature": "That feature is switched off for this network ({feature}).",
       "blockedByNetwork": "Capped network-wide: this needs the {permission} permission.",
@@ -1061,6 +1063,13 @@
       "openGroup": "Open group",
       "unavailable": "Group no longer available"
     },
+    "templateChoice": "What kind of group is this?",
+    "templateDescriptions": {
+      "channel": "Public — but only the group’s leadership writes posts",
+      "closed": "All posts only visible to the group's members",
+      "hidden": "Group (including the name) is completely invisible",
+      "public": "Group and all posts are visible for all registered users"
+    },
     "type": "Visibility of the group",
     "typeDescriptions": {
       "closed": "All posts only visible to the group's members",
@@ -1086,6 +1095,7 @@
       "actionRadiusRequired": "Please choose an action radius.",
       "descriptionLength": "The description must be at least {min} characters.",
       "descriptionNotEmpty": "Please enter a description.",
+      "groupTypeNotAllowed": "You may not create this kind of group.",
       "groupTypeRequired": "Please choose a group type.",
       "nameNotEmpty": "Please enter a group name.",
       "slugInvalidCharacters": "Only lowercase letters, digits, hyphens and underscores are allowed.",

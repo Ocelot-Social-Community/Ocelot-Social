@@ -22,6 +22,7 @@ import {
   isMorePrivate,
   mayAssignGroupRole,
   mayRemoveGroupMember,
+  templateVisibility,
 } from '@src/groupRole'
 import { isPermissionAvailable } from '@src/permission'
 import { dominates } from '@src/role'
@@ -83,11 +84,14 @@ const hasPermission = (permission: PermissionKey) =>
     hasPermissionEffective(ctx, permission),
   )
 
-// Flat per-group-type creation rights (mirrors videoCall.create_*): creating a group
-// of a given type needs exactly that type's permission, independent of the others.
+// Flat per-visibility creation rights (mirrors videoCall.create_*): creating a group that can
+// be seen that far needs exactly that permission, independent of the others.
+// The argument is a VISIBILITY, never a template name — a template derives to one (`channel` to
+// `public`), and what creating costs is about the group that comes out, not about which preset
+// it was made from.
 // Exported for the drift test in permissionsMiddleware.spec.ts, which asserts that EVERY value of
-// the GroupType enum still maps to a permission. That is what the `default` below is for: a
-// fourth group type added to the schema and not to this switch must be refused, not created.
+// the GroupVisibility enum still maps to a permission. That is what the `default` below is for: a
+// fourth visibility added to the schema and not to this switch must be refused, not created.
 export const groupCreatePermissionFor = (visibility: string): PermissionKey | null => {
   switch (visibility) {
     case 'public':
@@ -105,13 +109,19 @@ const requestedVisibility = (args: Record<string, unknown>): string | null =>
   (args.visibility as string | null) ?? null
 
 const canCreateGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
-  // `visibility` is non-null on CreateGroup, so a request without it never reaches this rule —
-  // validation rejects it first. Only an unknown value is possible here, and that one
-  // groupCreatePermissionFor answers with null.
-  const permission = groupCreatePermissionFor(args.visibility as string)
-  // Same check as hasPermission(), but the permission depends on the requested visibility,
-  // so it can't be a static hasPermission() gate. group.create_* is gated by groupsEnabled,
-  // so hasPermissionEffective also blocks creation when groups are off.
+  // `template` is a free String — the set of templates is runtime data, not an enum — so an
+  // unknown name is a possible request and gets said back as one. "Not Authorised" for a typo
+  // would send somebody looking for a missing right instead of a missing template.
+  const visibility = await templateVisibility(ctx.database, args.template as string)
+  if (!visibility) {
+    return new UserInputError(`No group role template named '${String(args.template)}'`)
+  }
+  // What creating costs is read off the VISIBILITY the template derives to, not off its name:
+  // a `channel` is a public group, and making one has to cost `group.create_public`.
+  const permission = groupCreatePermissionFor(visibility)
+  // Same check as hasPermission(), but the permission depends on the chosen template, so it
+  // can't be a static hasPermission() gate. group.create_* is gated by groupsEnabled, so
+  // hasPermissionEffective also blocks creation when groups are off.
   return !!permission && hasPermissionEffective(ctx, permission)
 })
 
@@ -646,7 +656,7 @@ export default shield(
       // The NAMES only. Which presets exist is product vocabulary, not a secret — and a group
       // owner has to be able to name one to put it on their group, without being handed the
       // network's template editor.
-      groupRoleTemplateNames: and(groupsEnabled, isAuthenticated),
+      groupTemplates: and(groupsEnabled, isAuthenticated),
       // The admin group list. One rule for "may administer groups at all"; WHICH groups come
       // back is decided in the resolver by the per-type rights, so a viewer who may only
       // administer public groups cannot enumerate the hidden ones.

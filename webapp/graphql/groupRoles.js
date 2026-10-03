@@ -5,7 +5,12 @@ import gql from 'graphql-tag'
 // a role more than the person editing it holds themselves.
 export const groupRightsQuery = () => gql`
   query ($id: ID!) {
-    groupRoleTemplateNames
+    # Every template a group can be put on, with what it makes the group. The permission SETS
+    # stay behind group.roleTemplate.manage — this is the vocabulary, not the contents.
+    groupTemplates {
+      name
+      visibility
+    }
     groupPermissionCatalog {
       key
       group
@@ -135,5 +140,21 @@ export const elevateInGroupMutation = () => gql`
 export const endGroupElevationMutation = () => gql`
   mutation ($groupId: ID!) {
     endGroupElevation(groupId: $groupId)
+  }
+`
+
+/**
+ * The templates a group can be created from, with what each one makes the group.
+ *
+ * The visibility travels with the name because `group.create_<visibility>` is checked against
+ * it, and the two are not the same string: a `channel` is a public group, so making one costs
+ * `group.create_public`.
+ */
+export const groupTemplatesQuery = () => gql`
+  query {
+    groupTemplates {
+      name
+      visibility
+    }
   }
 `

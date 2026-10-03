@@ -225,6 +225,7 @@
       "apply": "Appliquer aux groupes inchangés",
       "confirmApply": "Appliquer les modèles à {count} groupes qui n’ont jamais personnalisé leurs rôles ? Les groupes personnalisés ne sont pas touchés.",
       "description": "Ici tu modifies les modèles à partir desquels les nouveaux groupes sont créés — aucun groupe existant n'en est affecté. Seul le bouton ci-dessous applique une modification aux groupes, et seulement à ceux qui n'ont jamais modifié leurs propres droits.",
+      "editingTemplate": "Vous modifiez le modèle « {template} »",
       "labelField": "Nom",
       "name": "Modèles de groupe",
       "ownerHoldsEverything": "Le rôle de propriétaire détient toujours toutes les permissions et ne peut pas être modifié.",
@@ -1002,6 +1003,7 @@
     "removeMemberTitle": "Retirer le membre",
     "rights": {
       "addRole": "Ajouter un rôle",
+      "advancedTitle": "Toutes les permissions en détail",
       "applyTemplate": "Appliquer un modèle — remplace tous les rôles de ce groupe par ceux du modèle.",
       "blockedByFeature": "Cette fonction est désactivée sur le réseau ({feature}).",
       "blockedByNetwork": "Limité à l’échelle du réseau : il faut la permission {permission}.",
@@ -1061,6 +1063,13 @@
       "openGroup": "Ouvrir le groupe",
       "unavailable": "Groupe non disponible"
     },
+    "templateChoice": "Quel type de groupe est-ce ?",
+    "templateDescriptions": {
+      "channel": "Public — mais seule la direction du groupe publie",
+      "closed": "Toutes les publications visibles uniquement par les membres du groupe",
+      "hidden": "Le groupe (y compris le nom) est complètement invisible",
+      "public": "Le groupe et toutes les publications sont visibles pour tous les utilisateurs inscrits"
+    },
     "type": "Visibilité du groupe",
     "typeDescriptions": {
       "closed": "Toutes les publications visibles uniquement par les membres du groupe",
@@ -1086,6 +1095,7 @@
       "actionRadiusRequired": "Veuillez choisir un rayon d'action.",
       "descriptionLength": "La description doit comporter au moins {min} caractères.",
       "descriptionNotEmpty": "Veuillez saisir une description.",
+      "groupTypeNotAllowed": "Vous ne pouvez pas créer ce type de groupe.",
       "groupTypeRequired": "Veuillez choisir un type de groupe.",
       "nameNotEmpty": "Veuillez saisir un nom de groupe.",
       "slugInvalidCharacters": "Seuls les lettres minuscules, les chiffres, les tirets et les underscores sont autorisés.",

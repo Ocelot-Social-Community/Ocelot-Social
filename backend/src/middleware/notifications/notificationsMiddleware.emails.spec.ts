@@ -106,7 +106,7 @@ describe('emails sent for notifications', () => {
         id: 'public-group',
         name: 'A public group',
         description: 'A public group to test the notifications of mentions',
-        visibility: 'public',
+        template: 'public',
         actionRadius: 'national',
       },
     })

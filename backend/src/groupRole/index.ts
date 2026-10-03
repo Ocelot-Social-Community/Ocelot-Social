@@ -27,6 +27,13 @@ export {
   privacyLevelOfPermissions,
 } from './privacyLevel'
 export type { GroupPrivacyLevel } from './privacyLevel'
+export {
+  byPrivacyThenName,
+  readTemplateChoices,
+  templateVisibility,
+  templateVisibilityOf,
+} from './templateChoices'
+export type { GroupTemplateChoice } from './templateChoices'
 export type { NonMemberAccess } from './nonMemberAccess'
 export {
   CALL_DOORS,

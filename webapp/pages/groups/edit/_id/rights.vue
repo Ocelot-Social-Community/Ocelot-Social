@@ -65,7 +65,9 @@
     <!-- The full matrix, one tab per role, under the sentences rather than instead of them. The
          card above already states the resulting visibility and follows this view's draft, so the
          line that used to repeat it here is gone. -->
-    <section v-if="advanced" data-test="rights-advanced">
+    <section v-if="advanced" class="advanced" data-test="rights-advanced">
+      <h3 class="advanced__title">{{ $t('group.rights.advancedTitle') }}</h3>
+
       <role-tabs
         :roles="orderedRoles"
         :active-name="activeRoleName"
@@ -124,6 +126,7 @@
               !canManageRoles ||
               !grantable(permission) ||
               saving ||
+              simpleDirty ||
               isMandatory(permission) ||
               isMoot(permission)
           "
@@ -137,7 +140,11 @@
                its name can — "Owner" is what a group calls the person, and some call it
                something else. The backend takes a relabel of a protected role for the same
                reason; the button being hidden was the only thing in the way. -->
-          <os-button :disabled="!dirty || saving || !canManageRoles" data-test="save" @click="save">
+          <os-button
+            :disabled="!dirty || saving || simpleDirty || !canManageRoles"
+            data-test="save"
+            @click="save"
+          >
             {{ $t('actions.save') }}
           </os-button>
           <os-button :disabled="!dirty || saving" data-test="revert" @click="resetDraft">
@@ -383,6 +390,9 @@ export default {
       return !!permission && this.myGroupPermissions.includes(permission.key)
     },
     blockedHint(permission) {
+      // The lock between the two views, said where the cursor is: the card above holds an
+      // unsaved edit, and whichever of the two saved second would discard the other's.
+      if (this.simpleDirty) return this.$t('group.rights.saveFirst')
       if (this.isMoot(permission)) {
         return this.$t(mootReasonFor(this.activeRoleName, permission?.key))
       }
@@ -541,7 +551,7 @@ export default {
       result({ data, loading }) {
         if (loading || !data) return
         this.catalog = data.groupPermissionCatalog ?? []
-        this.templateNames = data.groupRoleTemplateNames ?? []
+        this.templateNames = (data.groupTemplates ?? []).map((template) => template.name)
         const group = data.Group?.[0]
         this.roles = group?.roles ?? []
         this.myGroupPermissions = group?.myGroupPermissions ?? []
@@ -595,6 +605,15 @@ export default {
 
 .title {
   margin-bottom: 0;
+}
+/* Set off from the sentences above it, which stay on screen while it is unfolded. */
+.advanced {
+  margin-top: var(--space-large);
+  padding-top: var(--space-base);
+  border-top: 1px solid var(--border-color-softer);
+}
+.advanced__title {
+  margin: 0 0 var(--space-base);
 }
 .description {
   color: var(--text-color-soft);

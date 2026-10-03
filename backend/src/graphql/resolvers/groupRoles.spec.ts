@@ -338,6 +338,27 @@ describe('Query.groupRoleTemplates', () => {
   })
 })
 
+describe('Query.groupTemplates', () => {
+  it('names each template with what it makes a group, least private first', async () => {
+    // `channel` is the reason this answers two fields rather than a list of names: it derives
+    // to `public`, so making one costs group.create_public — which the name does not say. It is
+    // also what broke the old ordering, which sorted the NAMES against the privacy levels and
+    // so put a template that is not a visibility at index -1.
+    mocked.readGroupRoleTemplates.mockResolvedValue({
+      hidden: [role('none')],
+      channel: [role('none', ['group.read', 'group.content.read'])],
+      closed: [role('none', ['group.read'])],
+    })
+    const { context } = contextFor()
+
+    expect(await Query.groupTemplates({}, {}, context)).toEqual([
+      { name: 'channel', visibility: 'public' },
+      { name: 'closed', visibility: 'closed' },
+      { name: 'hidden', visibility: 'hidden' },
+    ])
+  })
+})
+
 describe('Group.myGroupRole', () => {
   it('is null for a group that does not exist', async () => {
     const { context } = contextFor({ authorization: null })

@@ -271,3 +271,58 @@ describe('what it points at', () => {
     expect(wrapper.emitted('highlight').at(-1)).toEqual([null])
   })
 })
+
+describe('a sentence with nothing to decide', () => {
+  const Wrapper = (propsData = {}) =>
+    mount(GroupRightsSimple, {
+      localVue,
+      mocks: { $t: (key) => key },
+      propsData: {
+        roles: rolesWith(),
+        catalog: [...CATALOG, { key: 'group.join' }, { key: 'group.join.request' }],
+        caption: 'Resulting:',
+        ...propsData,
+      },
+    })
+
+  it('greys the applicant row while nobody can ask to join', () => {
+    // An open door and a shut one both produce no applicants, so "waiting applicants may read
+    // the posts" is a question about nobody.
+    const wrapper = Wrapper({ roles: rolesWith(['group.read', 'group.join']) })
+
+    expect(wrapper.find('[data-test="switch-applicants-read"]').attributes('disabled')).toBe(
+      'disabled',
+    )
+    expect(wrapper.find('[data-test="switch-row-applicants-read"]').text()).toContain(
+      'group.rights.simple.applicants-read',
+    )
+  })
+
+  it('leaves it editable where somebody can ask', () => {
+    const wrapper = Wrapper({ roles: rolesWith(['group.read', 'group.join.request']) })
+
+    expect(
+      wrapper.find('[data-test="switch-applicants-read"]').attributes('disabled'),
+    ).toBeUndefined()
+  })
+
+  it('follows the DRAFT, so picking a door greys it straight away', async () => {
+    // The two controls sit side by side. A consequence that waits for a save is worse than
+    // none: the screen would show a door nobody can queue at and a question about the queue.
+    const wrapper = Wrapper({ roles: rolesWith(['group.read', 'group.join.request']) })
+
+    await wrapper.find('[data-test="admission-option-open"]').trigger('click')
+
+    expect(wrapper.find('[data-test="switch-applicants-read"]').attributes('disabled')).toBe(
+      'disabled',
+    )
+  })
+
+  it('says why, rather than greying it silently', () => {
+    const wrapper = Wrapper({ roles: rolesWith(['group.read', 'group.join']) })
+
+    expect(wrapper.find('[data-test="switch-row-applicants-read"] label').attributes('title')).toBe(
+      'group.rights.pendingBlocked',
+    )
+  })
+})

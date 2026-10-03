@@ -415,9 +415,11 @@ Factory.define('group')
     name: faker.company.name,
     about: faker.lorem.sentence,
     description: faker.lorem.paragraphs,
-    // Which role template the group starts from — the same thing `CreateGroup(visibility:)`
-    // picks, and the one half of the old `visibility` that is actually stored. How findable the
-    // group ends up is derived from the roles this seeds (groupRole/privacyLevel.ts).
+    // Which role template the group starts from — the same thing `CreateGroup(template:)`
+    // picks, and the one half of the old `visibility` argument that is actually stored. How
+    // findable the group ends up is derived from the roles this seeds (privacyLevel.ts).
+    // Still called `visibility` here, which the specs pass by that name; `template` would be
+    // the honest attribute name and is a rename of its own (34 call sites).
     visibility: 'public',
     actionRadius: 'regional',
     deleted: false,

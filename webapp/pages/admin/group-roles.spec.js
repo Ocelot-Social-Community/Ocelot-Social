@@ -216,14 +216,17 @@ describe('admin/group-roles.vue', () => {
     )
   })
 
-  it('does not open the matrix while the simple view has an unsaved draft', async () => {
-    // The two halves are mutually exclusive now rather than mutually locked — so the way INTO
-    // the matrix is what has to refuse, or the draft would be thrown away on the way.
-    const wrapper = await Wrapper()
+  it('locks the matrix while the simple view has an unsaved draft, and says why', async () => {
+    // Both are on screen, so neither can be "the way in" that refuses — the lock has to be on
+    // the rows themselves. Whichever of the two saved second would discard the other's edit.
+    const wrapper = await advanced()
 
     await at(wrapper, 'switch-members-post').setChecked(false)
 
-    expect(at(wrapper, 'to-advanced').attributes('disabled')).toBeTruthy()
+    const row = at(wrapper, 'perm-group.post.create').element.closest('label')
+    expect(row.querySelector('input').disabled).toBe(true)
+    expect(row.getAttribute('title')).toBe('admin.groupRoles.saveFirst')
+    expect(at(wrapper, 'save').attributes('disabled')).toBeTruthy()
   })
 
   it('does not leave the matrix while ITS draft is unsaved', async () => {
@@ -422,6 +425,15 @@ describe('admin/group-roles.vue', () => {
 
       expect(wrapper.findAll('.role-tab--touched')).toHaveLength(0)
     })
+  })
+
+  it('names the template the matrix is editing', async () => {
+    // The matrix stands under the card rather than instead of it, so without this the row of
+    // role tabs belonged to no visible subject — four templates on the page, one set of tabs.
+    const wrapper = await advanced()
+
+    expect(at(wrapper, 'editing-template').text()).toContain('admin.groupRoles.editingTemplate')
+    expect(at(wrapper, 'editing-template').text()).toContain('group.types.public')
   })
 
   it('toasts a query error', async () => {

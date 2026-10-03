@@ -102,7 +102,7 @@ beforeEach(async () => {
       name: 'Closed Group',
       about: 'We are closed',
       description: DESCRIPTION,
-      visibility: 'closed',
+      template: 'closed',
       actionRadius: 'regional',
     },
   })

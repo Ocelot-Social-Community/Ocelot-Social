@@ -148,7 +148,9 @@ const setupFixture = async () => {
       name: `The ${visibility} group`,
       about: `The ${visibility} group`,
       description,
-      visibility,
+      // The template is named after the visibility for these three, which is what makes the
+      // loop variable serve as both: a group seeded from `closed` derives to `closed`.
+      template: visibility,
       actionRadius: 'regional',
       categoryIds: null,
     })

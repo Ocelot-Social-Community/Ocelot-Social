@@ -212,7 +212,7 @@ describe('rights.vue', () => {
       expect(at(wrapper, 'visibility-title').text()).toContain('group.types.hidden')
     })
 
-    it('reads the matrix\'s unsaved draft while the non-member role is the one being edited', async () => {
+    it("reads the matrix's unsaved draft while the non-member role is the one being edited", async () => {
       // The two views are on screen together, and only one of them may hold a draft at a time.
       // The card is the one statement of what the group is, so it has to follow whichever view
       // is being edited — a card still saying "hidden" over a ticked, unsaved `group.read` is

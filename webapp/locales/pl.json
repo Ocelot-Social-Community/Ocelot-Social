@@ -225,6 +225,7 @@
       "apply": "Zastosuj do niezmienionych grup",
       "confirmApply": "Zastosować szablony do {count} grup, które nigdy nie zmieniały swoich ról? Grupy z własnymi ustawieniami pozostaną nietknięte.",
       "description": "Tutaj edytujesz szablony, z których powstają nowe grupy — żadna istniejąca grupa się przez to nie zmienia. Dopiero przycisk poniżej stosuje zmianę do grup, i tylko do tych, które nigdy nie zmieniły własnych uprawnień.",
+      "editingTemplate": "Edytujesz szablon „{template}”",
       "labelField": "Nazwa",
       "name": "Szablony grup",
       "ownerHoldsEverything": "Rola właściciela ma zawsze wszystkie uprawnienia i nie da się jej edytować.",
@@ -1002,6 +1003,7 @@
     "removeMemberTitle": "Usuń członka",
     "rights": {
       "addRole": "Dodaj rolę",
+      "advancedTitle": "Wszystkie uprawnienia szczegółowo",
       "applyTemplate": "Zastosuj szablon — zastępuje wszystkie role tej grupy rolami z szablonu.",
       "blockedByFeature": "Ta funkcja jest wyłączona w tej sieci ({feature}).",
       "blockedByNetwork": "Ograniczone w całej sieci: potrzebne jest uprawnienie {permission}.",
@@ -1061,6 +1063,13 @@
       "openGroup": "Otwórz grupę",
       "unavailable": "Grupa niedostępna"
     },
+    "templateChoice": "Jaka to będzie grupa?",
+    "templateDescriptions": {
+      "channel": "Publiczna — ale wpisy pisze tylko kierownictwo grupy",
+      "closed": "Wszystkie wpisy widoczne tylko dla członków grupy",
+      "hidden": "Grupa (łącznie z nazwą) jest całkowicie niewidoczna",
+      "public": "Grupa i wszystkie wpisy są widoczne dla wszystkich zarejestrowanych użytkowników"
+    },
     "type": "Widoczność grupy",
     "typeDescriptions": {
       "closed": "Wszystkie wpisy widoczne tylko dla członków grupy",
@@ -1086,6 +1095,7 @@
       "actionRadiusRequired": "Proszę wybrać zasięg działania.",
       "descriptionLength": "Opis musi mieć co najmniej {min} znaków.",
       "descriptionNotEmpty": "Proszę podać opis.",
+      "groupTypeNotAllowed": "Nie możesz utworzyć grupy tego rodzaju.",
       "groupTypeRequired": "Proszę wybrać typ grupy.",
       "nameNotEmpty": "Proszę podać nazwę grupy.",
       "slugInvalidCharacters": "Dozwolone są tylko małe litery, cyfry, myślniki i podkreślenia.",

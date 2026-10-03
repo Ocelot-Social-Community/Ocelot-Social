@@ -4,7 +4,7 @@ mutation CreateGroup(
   $slug: String
   $about: String
   $description: String!
-  $visibility: GroupVisibility!
+  $template: String!
   $actionRadius: GroupActionRadius!
   $categoryIds: [ID]
   $locationName: String # empty string '' sets it to null
@@ -17,7 +17,7 @@ mutation CreateGroup(
     slug: $slug
     about: $about
     description: $description
-    visibility: $visibility
+    template: $template
     actionRadius: $actionRadius
     categoryIds: $categoryIds
     locationName: $locationName
@@ -34,6 +34,8 @@ mutation CreateGroup(
     about
     description
     visibility
+    # Which preset it was created from — stored, unlike the visibility, which is derived.
+    template
     actionRadius
     categories {
       id

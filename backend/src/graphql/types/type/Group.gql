@@ -138,15 +138,15 @@ type Query {
 }
 
 type Mutation {
-  "Create a group. Requires authentication and the `group.create_<visibility>` permission matching the chosen visibility. The new group starts from the role template of that visibility."
+  "Create a group from one of the role templates (`groupTemplates`). Requires authentication and the `group.create_<visibility>` permission for the visibility that template derives to — which is not the name of the template: `channel` is a public group. The template is stored on the group; its visibility is not, because the rights it starts with are what the visibility is read from."
   CreateGroup(
     id: ID
     name: String!
     slug: String
     about: String
     description: String!
-    "Which role template the group starts from, and therefore how findable it is."
-    visibility: GroupVisibility!
+    "Which role template the group starts from. A name from `groupTemplates` — not a visibility, which is what the rights of that template derive to."
+    template: String!
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
 

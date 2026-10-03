@@ -13,45 +13,63 @@
   -->
   <div class="simple-rights">
     <!--
-      Each state with its own control directly above it: what sets the thing stands over the
-      thing it sets, rather than in a row of buttons further down that one has to connect back
-      to the right card by eye.
+      Two halves: what the group IS, and what sets it. Each control carried its state's glyph
+      for a while, which tied the two together but let a wrapped description drag its buttons
+      out of line — so the statements keep the pictures and the controls stand as a list of
+      their own, each under its own heading.
     -->
     <div class="states">
-      <div class="state" :data-test="`visibility-${visibility}`">
-        <os-icon :icon="icons[visibilityIcon]" size="2xl" class="state__icon" aria-hidden="true" />
-        <div class="state__text">
-          <p class="state__caption">{{ caption }}</p>
-          <strong class="state__title" data-test="visibility-title">
-            {{ $t(`group.types.${visibility}`) }}
-          </strong>
-          <p class="state__description" data-test="visibility-description">
-            {{ $t(`group.typeDescriptions.${visibility}`) }}
-          </p>
+      <!-- Left: what the group IS, each statement with its glyph, the two as one unit. -->
+      <div class="states__facts">
+        <div class="state" :data-test="`visibility-${visibility}`">
+          <os-icon
+            :icon="icons[visibilityIcon]"
+            size="2xl"
+            class="state__icon"
+            aria-hidden="true"
+          />
+          <div class="state__text">
+            <p class="state__caption">{{ caption }}</p>
+            <strong class="state__title" data-test="visibility-title">
+              {{ $t(`group.types.${visibility}`) }}
+            </strong>
+            <p class="state__description" data-test="visibility-description">
+              {{ $t(`group.typeDescriptions.${visibility}`) }}
+            </p>
+          </div>
         </div>
-        <!-- The page's own way of setting this — the template tabs on both levels. The LABEL is
+
+        <div class="state" :data-test="`admission-${admission}`">
+          <os-icon :icon="icons[admissionIcon]" size="2xl" class="state__icon" aria-hidden="true" />
+          <div class="state__text">
+            <p class="state__caption">{{ $t('group.admission.caption') }}</p>
+            <strong class="state__title" data-test="admission-title">
+              {{ $t(`group.admission.${admission}.title`) }}
+            </strong>
+            <p class="state__description" data-test="admission-description">
+              {{ $t(`group.admission.${admission}.description`) }}
+            </p>
+            <p v-if="admissionLocked" class="state__reason" data-test="admission-locked">
+              {{ $t('group.admission.needsVisibility') }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!--
+        Right: what SETS them, as a block of labelled rows of its own — read as a list of
+        controls rather than hung off the pictures beside it. Each row carries its own heading,
+        which is what lets it stand away from the statement it changes.
+      -->
+      <div class="states__controls">
+        <!-- The page's own way of picking this — the template tabs on both levels. The LABEL is
              here rather than in the slot: the page used to bring its own, and the two then stood
              above each other saying "Vorlage" twice. -->
         <div class="state__control">
           <span class="state__control-label">{{ $t('admin.groupRoles.templateLabel') }}</span>
           <slot name="visibility-control" />
         </div>
-      </div>
 
-      <div class="state" :data-test="`admission-${admission}`">
-        <os-icon :icon="icons[admissionIcon]" size="2xl" class="state__icon" aria-hidden="true" />
-        <div class="state__text">
-          <p class="state__caption">{{ $t('group.admission.caption') }}</p>
-          <strong class="state__title" data-test="admission-title">
-            {{ $t(`group.admission.${admission}.title`) }}
-          </strong>
-          <p class="state__description" data-test="admission-description">
-            {{ $t(`group.admission.${admission}.description`) }}
-          </p>
-          <p v-if="admissionLocked" class="state__reason" data-test="admission-locked">
-            {{ $t('group.admission.needsVisibility') }}
-          </p>
-        </div>
         <!--
           Three states of ONE question, so one control with three positions rather than three
           checkboxes: two ticks would let somebody express "anybody may enter AND must ask",
@@ -62,24 +80,26 @@
         -->
         <div class="state__control" role="radiogroup" :aria-label="$t('group.admission.label')">
           <span class="state__control-label">{{ $t('group.admission.label') }}</span>
-          <button
-            v-for="state in admissionStates"
-            v-show="!admissionLocked || state === admission"
-            :key="state"
-            type="button"
-            role="radio"
-            :aria-checked="String(state === admission)"
-            class="admission-option"
-            :class="{ 'admission-option--active': state === admission }"
-            :disabled="!admissionEditable"
-            :title="admissionEditable ? null : admissionHint"
-            :data-test="`admission-option-${state}`"
-            @click="setAdmission(state)"
-            @mouseenter="highlightAdmission"
-            @mouseleave="clearHighlight"
-          >
-            {{ $t(`group.admission.${state}.title`) }}
-          </button>
+          <div class="state__control-options">
+            <button
+              v-for="state in admissionStates"
+              v-show="!admissionLocked || state === admission"
+              :key="state"
+              type="button"
+              role="radio"
+              :aria-checked="String(state === admission)"
+              class="admission-option"
+              :class="{ 'admission-option--active': state === admission }"
+              :disabled="!admissionEditable"
+              :title="admissionEditable ? null : admissionHint"
+              :data-test="`admission-option-${state}`"
+              @click="setAdmission(state)"
+              @mouseenter="highlightAdmission"
+              @mouseleave="clearHighlight"
+            >
+              {{ $t(`group.admission.${state}.title`) }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -246,11 +266,14 @@ export default {
         const role = this.roleNamed(item.role)
         const permission = this.catalog.find((entry) => entry.key === item.permission)
         const allowed = !!role && !!permission && this.grantable(permission)
+        const moot = this.mootReasonFor(item)
         return {
           ...item,
           enabled: this.permissionsOf(item.role).includes(item.permission),
-          editable: allowed && !this.disabled,
-          hint: this.hintFor(permission) || (this.disabled ? this.disabledHint : null),
+          editable: allowed && !this.disabled && !moot,
+          // The reason it cannot be answered comes first: "you may not grant this" is true of a
+          // locked row too, and the more specific answer is the useful one.
+          hint: moot || this.hintFor(permission) || (this.disabled ? this.disabledHint : null),
         }
       })
     },
@@ -285,6 +308,19 @@ export default {
     },
   },
   methods: {
+    /**
+     * Why a sentence has nothing to decide, or null.
+     *
+     * Today only the applicant ones: a role nobody can hold answers no question. Which is read
+     * off the DRAFT's admission rather than off what is stored, so choosing "anybody may walk
+     * in" greys the applicant row under the cursor instead of one save later — the two controls
+     * are side by side, and a live setting with a stale consequence next to it is worse than no
+     * consequence at all.
+     */
+    mootReasonFor(item) {
+      if (item.role !== PENDING_GROUP_ROLE) return null
+      return this.admission === 'onRequest' ? null : this.$t('group.rights.pendingBlocked')
+    },
     roleNamed(name) {
       return this.roles.find((role) => role.name === name)
     },
@@ -350,23 +386,55 @@ export default {
 
 <style scoped>
 /*
- * One grid for BOTH states, so the two icons line up under each other however long the words
- * next to them are: a column for the icon and a column for everything that belongs to it.
+ * Two halves, the way the sentences below are two columns: on the left what the group IS, each
+ * statement with its glyph; on the right what SETS those two, as a labelled block of its own.
  *
- * `display: contents` on the state is what puts all four children into that one grid. Each icon
- * spans the two rows of its own pair, so what a state IS and what SETS it stay side by side with
- * their glyph instead of drifting apart — which is what two independent grids did as soon as one
- * column's buttons wrapped (German does that to "Öffentlich / Geschlossen / Geheim / Kanal").
+ * The controls do NOT line up with the pictures. They used to, and then the longer of the two
+ * statements pushed its row of buttons down and the two rows stopped reading as one list — the
+ * row of buttons is a list of choices, so it starts at the top of the box and stacks.
  */
 .states {
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--space-xx-small) var(--space-base);
-  margin-bottom: var(--space-base);
+  gap: var(--space-base) var(--space-large);
+  margin-bottom: var(--space-large);
+
+  @media (--vp-desktop-up) {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
+/* One rhythm for both halves, so a block on the left and a block on the right sit the same
+   distance apart — the two used to be spaced by whatever their contents happened to be. */
+.states__facts,
+.states__controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-large);
+  align-self: start;
+}
+
+/* Top-aligned, not centred: the glyph belongs beside the first line of what it illustrates. A
+   centred icon drifted half a statement down as soon as the description wrapped to four lines. */
 .state {
-  display: contents;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-base);
+}
+
+/* The heading stands ABOVE its buttons, like the headings over the sentences below. Beside
+   them it read as a first, unclickable option in the row. */
+.state__control {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xx-small);
+}
+
+.state__control-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xx-small);
 }
 
 .state__control-label {
@@ -376,24 +444,11 @@ export default {
   letter-spacing: 0.03em;
 }
 
-.state__control {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-xx-small);
-  grid-column: 2;
-  align-self: start;
-  margin-bottom: var(--space-small);
-}
-
 /*
  * OsIcon sizes itself in `em` (ICON_SIZES), so a width/height in pixels here was simply ignored
  * and the glyph came out at text size. The font-size is the handle; `2xl` is 2.5em of it.
  */
 .state__icon {
-  grid-column: 1;
-  grid-row: span 2;
-  align-self: center;
   flex: 0 0 auto;
   font-size: 1.6rem;
   color: var(--text-color-soft);
@@ -402,7 +457,7 @@ export default {
 .state__text {
   display: flex;
   flex-direction: column;
-  grid-column: 2;
+  gap: var(--space-xxx-small);
 }
 
 /* The same pill the template tabs are, so the two rows read as the same kind of choice. */
@@ -458,7 +513,7 @@ export default {
 .switch-group {
   border: none;
   padding: 0;
-  margin: 0 0 var(--space-small);
+  margin: 0 0 var(--space-base);
   /* Keep a heading with its sentences rather than splitting them across the two columns. */
   break-inside: avoid;
 }
@@ -478,7 +533,7 @@ export default {
 }
 
 .switch {
-  margin: var(--space-xx-small) 0;
+  margin: var(--space-x-small) 0;
 }
 
 .switch label {
@@ -497,6 +552,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-x-small);
+  gap: var(--space-small);
+  margin-top: var(--space-base);
 }
 </style>

@@ -225,6 +225,7 @@
       "apply": "Zbato në grupet e paprekura",
       "confirmApply": "Të zbatohen shabllonet në {count} grupe që nuk i kanë përshtatur kurrë rolet e tyre? Grupet e përshtatura nuk preken.",
       "description": "Këtu redakton modelet nga të cilat krijohen grupet e reja — asnjë grup ekzistues nuk ndryshon prej kësaj. Vetëm butoni më poshtë e zbaton një ndryshim te grupet, dhe vetëm te ato që nuk i kanë ndryshuar kurrë të drejtat e veta.",
+      "editingTemplate": "Po redaktoni shabllonin “{template}”",
       "labelField": "Emri",
       "name": "Modelet e grupeve",
       "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet dhe nuk mund të redaktohet.",
@@ -1002,6 +1003,7 @@
     "removeMemberTitle": "Hiq anëtarin",
     "rights": {
       "addRole": "Shto një rol",
+      "advancedTitle": "Të gjitha të drejtat në detaje",
       "applyTemplate": "Zbato një model — zëvendëson të gjitha rolet e këtij grupi me ato të modelit.",
       "blockedByFeature": "Kjo funksion është e çaktivizuar në rrjet ({feature}).",
       "blockedByNetwork": "E kufizuar në të gjithë rrjetin: për këtë duhet leja {permission}.",
@@ -1061,6 +1063,13 @@
       "openGroup": "Hap grupin",
       "unavailable": "Grupi nuk është më i disponueshëm"
     },
+    "templateChoice": "Çfarë lloj grupi është ky?",
+    "templateDescriptions": {
+      "channel": "Publik — por vetëm drejtimi i grupit shkruan postime",
+      "closed": "Të gjitha postimet janë të dukshme vetëm për anëtarët e grupit",
+      "hidden": "Grupi (përfshirë emrin) është plotësisht i padukshëm",
+      "public": "Grupi dhe të gjitha postimet janë të dukshme për të gjithë përdoruesit e regjistruar"
+    },
     "type": "Dukshmëria e grupit",
     "typeDescriptions": {
       "closed": "Të gjitha postimet janë të dukshme vetëm për anëtarët e grupit",
@@ -1086,6 +1095,7 @@
       "actionRadiusRequired": "Ju lutem zgjidhni një rreze veprimi.",
       "descriptionLength": "Përshkrimi duhet të ketë të paktën {min} karaktere.",
       "descriptionNotEmpty": "Ju lutem shkruani një përshkrim.",
+      "groupTypeNotAllowed": "Nuk mund ta krijoni këtë lloj grupi.",
       "groupTypeRequired": "Ju lutem zgjidhni një lloj grupi.",
       "nameNotEmpty": "Ju lutem shkruani një emër grupi.",
       "slugInvalidCharacters": "Lejohen vetëm shkronja të vogla, shifra, viza dhe nënvija.",

@@ -485,6 +485,11 @@ type Group {
   """URL-safe unique handle for the group."""
   slug: String!
 
+  """
+  Which role template this group was created from, or last put on. Stored, unlike `visibility`, which is derived: two templates can produce the same visibility (`channel` is public too), so this is what says which preset a group is running — and what the admin area counts when it asks how many groups an edit would reach.
+  """
+  template: String
+
   """ISO 8601 date-time string of the last update."""
   updatedAt: String!
 
@@ -635,6 +640,16 @@ type GroupRoleTemplate {
 
 type GroupShowMembersChanged {
   groupId: ID!
+}
+
+"""
+A template on offer, without its permission sets: what it is called, and what a group made from it would be. Two templates can derive to the same visibility — `channel` is public — so the name alone does not answer what creating one takes.
+"""
+type GroupTemplateChoice {
+  name: String!
+
+  """The visibility a group created from this template starts with."""
+  visibility: GroupVisibility!
 }
 
 """
@@ -843,7 +858,7 @@ type Mutation {
   CreateComment(content: String!, id: ID, postId: ID!): Comment
 
   """
-  Create a group. Requires authentication and the `group.create_<visibility>` permission matching the chosen visibility. The new group starts from the role template of that visibility.
+  Create a group from one of the role templates (`groupTemplates`). Requires authentication and the `group.create_<visibility>` permission for the visibility that template derives to — which is not the name of the template: `channel` is a public group. The template is stored on the group; its visibility is not, because the rights it starts with are what the visibility is read from.
   """
   CreateGroup(
     about: String
@@ -867,9 +882,9 @@ type Mutation {
     slug: String
 
     """
-    Which role template the group starts from, and therefore how findable it is.
+    Which role template the group starts from. A name from `groupTemplates` — not a visibility, which is what the rights of that template derive to.
     """
-    visibility: GroupVisibility!
+    template: String!
   ): Group
 
   """Create (or fetch) the chat room for a group. Requires authentication."""
@@ -1186,9 +1201,9 @@ type Mutation {
   requestPasswordReset(email: String!, locale: String!): Boolean!
 
   """
-  Put a group's roles back on the network template it was created from. Roles the template does not have are removed and their members become ordinary members.
+  Put a whole network template on a group: the one it was created from, or the one named. Roles the template does not have are removed and their members become ordinary members.
   """
-  resetGroupRoles(groupId: ID!): [GroupRole!]!
+  resetGroupRoles(groupId: ID!, template: String): [GroupRole!]!
 
   """Reset a password using the nonce from the reset email. Public."""
   resetPassword(email: String!, newPassword: String!, nonce: String!): Boolean!
@@ -1843,6 +1858,11 @@ type Query {
   The network-wide group role templates, one per group type. Requires `group.roleTemplate.manage`.
   """
   groupRoleTemplates: [GroupRoleTemplate!]!
+
+  """
+  The templates a group can be created from or put on, least private first. The permission SETS stay behind group.roleTemplate.manage; the names and what they make a group are the vocabulary a group owner picks from — and `group.create_<visibility>` is checked against that visibility, so it has to travel with the name.
+  """
+  groupTemplates: [GroupTemplateChoice!]!
 
   """Users the current user has muted. Requires authentication."""
   mutedUsers: [User]

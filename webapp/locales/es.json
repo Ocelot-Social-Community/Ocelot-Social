@@ -225,6 +225,7 @@
       "apply": "Aplicar a los grupos sin cambios",
       "confirmApply": "¿Aplicar las plantillas a {count} grupos que nunca personalizaron sus roles? Los grupos personalizados quedan intactos.",
       "description": "Aquí editas las plantillas con las que se crean los grupos nuevos: ningún grupo existente cambia por ello. Solo el botón de abajo aplica un cambio a los grupos, y solo a los que nunca cambiaron sus propios derechos.",
+      "editingTemplate": "Estás editando la plantilla «{template}»",
       "labelField": "Nombre",
       "name": "Plantillas de grupo",
       "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos y no se puede editar.",
@@ -1002,6 +1003,7 @@
     "removeMemberTitle": "Eliminar miembro",
     "rights": {
       "addRole": "Añadir un rol",
+      "advancedTitle": "Todos los permisos en detalle",
       "applyTemplate": "Aplicar una plantilla: reemplaza todos los roles de este grupo por los de la plantilla.",
       "blockedByFeature": "Esta función está desactivada en la red ({feature}).",
       "blockedByNetwork": "Limitado en toda la red: para esto hace falta el permiso {permission}.",
@@ -1061,6 +1063,13 @@
       "openGroup": "Abrir grupo",
       "unavailable": "Grupo no disponible"
     },
+    "templateChoice": "¿Qué tipo de grupo es este?",
+    "templateDescriptions": {
+      "channel": "Público — pero solo la dirección del grupo publica",
+      "closed": "Todas las publicaciones solo visibles para los miembros del grupo",
+      "hidden": "El grupo (incluido el nombre) es completamente invisible",
+      "public": "El grupo y todas las publicaciones son visibles para todos los usuarios registrados"
+    },
     "type": "Visibilidad del grupo",
     "typeDescriptions": {
       "closed": "Todas las publicaciones solo visibles para los miembros del grupo",
@@ -1086,6 +1095,7 @@
       "actionRadiusRequired": "Por favor, seleccione un radio de acción.",
       "descriptionLength": "La descripción debe tener al menos {min} caracteres.",
       "descriptionNotEmpty": "Por favor, ingrese una descripción.",
+      "groupTypeNotAllowed": "No puedes crear este tipo de grupo.",
       "groupTypeRequired": "Por favor, elija un tipo de grupo.",
       "nameNotEmpty": "Por favor, ingrese un nombre de grupo.",
       "slugInvalidCharacters": "Solo se permiten letras minúsculas, números, guiones y guiones bajos.",

@@ -567,23 +567,25 @@ describe('GroupForm', () => {
       await wrapper.vm.$nextTick()
       expect(wrapper.vm.visibleErrors).toEqual({
         name: expect.any(String),
-        visibility: expect.any(String),
+        // The CREATE form asks for a template; the visibility it results in is derived from it
+        // and is never a field of its own here.
+        template: expect.any(String),
         description: expect.any(String),
         actionRadius: expect.any(String),
       })
       const errorWraps = wrapper.findAll('.ds-input-has-error')
       // OcelotInput (name) applies this class to its own root itself; the
-      // other three (visibility <select>, description <editor>,
-      // actionRadius <action-radius-select>) get it from the wrapping div
-      // added around each, since none of those components track/apply it
-      // on their own the way OcelotInput does.
-      expect(errorWraps).toHaveLength(4)
+      // other two (description <editor>, actionRadius <action-radius-select>)
+      // get it from the wrapping div added around each, since neither tracks
+      // it on its own the way OcelotInput does. The template picker is a row
+      // of cards rather than an input, and says so with its own hint.
+      expect(errorWraps).toHaveLength(3)
     })
 
     it('saves once the form becomes valid', async () => {
       wrapper = mountFresh()
       await wrapper.vm.$set(wrapper.vm.formData, 'name', 'A valid name')
-      await wrapper.vm.$set(wrapper.vm.formData, 'visibility', 'public')
+      await wrapper.vm.$set(wrapper.vm.formData, 'template', 'public')
       await wrapper.vm.$set(wrapper.vm.formData, 'description', 'A long enough description text.')
       await wrapper.vm.$set(wrapper.vm.formData, 'actionRadius', 'regional')
       wrapper.find('form').trigger('submit')
@@ -594,7 +596,7 @@ describe('GroupForm', () => {
     describe('lat/lng on submit', () => {
       const setValidFields = (vm) => {
         vm.$set(vm.formData, 'name', 'A valid name')
-        vm.$set(vm.formData, 'visibility', 'public')
+        vm.$set(vm.formData, 'template', 'public')
         vm.$set(vm.formData, 'description', 'A long enough description text.')
         vm.$set(vm.formData, 'actionRadius', 'regional')
       }
@@ -727,9 +729,9 @@ describe('GroupForm', () => {
   })
 
   describe('per-type create permissions (group.create_*)', () => {
-    const mountWith = (can) =>
+    const mountWith = (can, propsData = {}) =>
       mount(GroupForm, {
-        propsData: { update: false, group: {} },
+        propsData: { update: false, group: {}, ...propsData },
         mocks: { $t: jest.fn(), $can: can },
         localVue,
         stubs,
@@ -775,20 +777,46 @@ describe('GroupForm', () => {
       expect(formSubmit).toHaveBeenCalled()
     })
 
-    it('disables the hidden option in the type select when not permitted', () => {
+    it('refuses, rather than hides, a template the viewer may not create', () => {
+      // Shown and disabled: "there is a kind of group I am not allowed to make" is information,
+      // an absent card is not — and the card says which right it would take.
       const wrapper = mountWith(canExceptHidden)
-      const hiddenOption = wrapper
-        .findAll('option')
-        .wrappers.find((o) => o.attributes('value') === 'hidden')
-      expect(hiddenOption.attributes('disabled')).toBeDefined()
+
+      expect(
+        wrapper.find('[data-test="template-card-hidden"]').attributes('disabled'),
+      ).toBeDefined()
+      expect(
+        wrapper.find('[data-test="template-card-public"]').attributes('disabled'),
+      ).toBeUndefined()
     })
 
-    it('disables the closed option in the type select when not permitted', () => {
-      const wrapper = mountWith((p) => p !== 'group.create_closed')
-      const closedOption = wrapper
-        .findAll('option')
-        .wrappers.find((o) => o.attributes('value') === 'closed')
-      expect(closedOption.attributes('disabled')).toBeDefined()
+    it('reads the cost off the visibility a template derives to, not off its name', () => {
+      // A channel IS a public group, so making one takes group.create_public — the whole point
+      // of carrying the visibility alongside the name.
+      const wrapper = mountWith((p) => p !== 'group.create_public', {
+        templates: [
+          { name: 'channel', visibility: 'public' },
+          { name: 'closed', visibility: 'closed' },
+        ],
+      })
+
+      expect(
+        wrapper.find('[data-test="template-card-channel"]').attributes('disabled'),
+      ).toBeDefined()
+      expect(
+        wrapper.find('[data-test="template-card-closed"]').attributes('disabled'),
+      ).toBeUndefined()
+    })
+
+    it('picking a template sets the visibility it derives to', async () => {
+      const wrapper = mountWith(() => true, {
+        templates: [{ name: 'channel', visibility: 'public' }],
+      })
+
+      await wrapper.find('[data-test="template-card-channel"]').trigger('click')
+
+      expect(wrapper.vm.formData.template).toBe('channel')
+      expect(wrapper.vm.formData.visibility).toBe('public')
     })
 
     it('canCreateAnyGroup is false only when no type is permitted', () => {
