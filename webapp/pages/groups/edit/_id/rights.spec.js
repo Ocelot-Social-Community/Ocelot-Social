@@ -379,6 +379,42 @@ describe('rights.vue', () => {
     expect(at(wrapper, 'perm-group.post.create').exists()).toBe(false)
   })
 
+  it('says WHY a row cannot be ticked, on the row rather than in a tooltip', async () => {
+    // The reason existed, but only as a `title`: invisible until somebody points a mouse at it,
+    // and unreachable for a keyboard or a screen reader. The matrix has a visible note slot and
+    // the network roles page was already using it.
+    const wrapper = await Wrapper()
+    await at(wrapper, 'to-advanced').trigger('click')
+    await at(wrapper, 'role-tab-pending').trigger('click')
+
+    const row = wrapper.find('[data-test="perm-group.leave"]').element.closest('.perm-row')
+
+    expect(row.textContent).toContain('group.rights.mandatory')
+  })
+
+  it('explains an applicant role nobody can reach, instead of only greying it', async () => {
+    const wrapper = await Wrapper()
+    await at(wrapper, 'to-advanced').trigger('click')
+    await at(wrapper, 'role-tab-pending').trigger('click')
+
+    // No role grants `group.join.request` in the fixture, so nobody ever becomes an applicant.
+    expect(at(wrapper, 'pending-unreachable').exists()).toBe(true)
+  })
+
+  it('stays quiet about the applicant role once somebody can ask to join', async () => {
+    const wrapper = await Wrapper()
+    wrapper.setData({
+      roles: ROLES.map((role) =>
+        role.name === 'none' ? { ...role, permissions: ['group.join.request'] } : role,
+      ),
+    })
+    await wrapper.vm.$nextTick()
+    await at(wrapper, 'to-advanced').trigger('click')
+    await at(wrapper, 'role-tab-pending').trigger('click')
+
+    expect(at(wrapper, 'pending-unreachable').exists()).toBe(false)
+  })
+
   it('turns the group into a channel in one action', async () => {
     const wrapper = await Wrapper()
 

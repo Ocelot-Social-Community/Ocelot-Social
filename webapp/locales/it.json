@@ -230,7 +230,7 @@
       "ownerHoldsEverything": "Il ruolo di proprietario ha sempre tutti i permessi e non è modificabile.",
       "resultingVisibility": "I gruppi creati da questo modello sono:",
       "saved": "Modello salvato",
-      "saveFirst": "Prima salva o annulla: questo ruolo ha modifiche non salvate.",
+      "saveFirst": "Prima salva o annulla: ci sono modifiche non salvate.",
       "templateLabel": "Modello",
       "title": "Ruoli e permessi di gruppo",
       "untouched": "Una modifica qui raggiunge {untouched} dei {total} gruppi creati da questo modello — quelli che non hanno mai cambiato i propri diritti — e solo quando la applichi."
@@ -1010,6 +1010,7 @@
       "moot": "Chi non è iscritto non ha nessuna iscrizione da lasciare.",
       "noRight": "Non puoi concedere un permesso che tu stesso non hai.",
       "ownerHoldsEverything": "Il ruolo di proprietario ha sempre tutti i permessi di questo gruppo. Si può cambiare solo il suo nome visualizzato.",
+      "pendingUnreachable": "Al momento nessuno può chiedere di unirsi, quindi nessuno ha questo ruolo. Lo decide l’ammissione.",
       "presets": {
         "channel": "Trasforma in canale (scrivono solo gli amministratori)"
       },
@@ -1018,6 +1019,7 @@
       "roleKeyPlaceholder": "chiave, ad es. redazione",
       "roleLabelPlaceholder": "nome visualizzato, ad es. Redazione",
       "saved": "Permessi salvati",
+      "saveFirst": "Prima salva o annulla: ci sono modifiche non salvate.",
       "simple": {
         "applicants-read": "I richiedenti in attesa possono leggere le pubblicazioni",
         "members-chat": "I membri possono scrivere nella chat del gruppo",

@@ -230,7 +230,7 @@
       "ownerHoldsEverything": "A função de proprietário tem sempre todas as permissões e não pode ser editada.",
       "resultingVisibility": "Os grupos criados a partir deste modelo são:",
       "saved": "Modelo guardado",
-      "saveFirst": "Guarde ou descarte primeiro: este papel tem alterações não guardadas.",
+      "saveFirst": "Guarde ou descarte primeiro: há alterações não guardadas.",
       "templateLabel": "Modelo",
       "title": "Funções e permissões de grupo",
       "untouched": "Uma alteração aqui atinge {untouched} dos {total} grupos criados a partir deste modelo — os que nunca alteraram os seus próprios direitos — e apenas quando a aplicar."
@@ -1010,6 +1010,7 @@
       "moot": "Quem não é membro não tem nenhuma adesão para terminar.",
       "noRight": "Não podes conceder uma permissão que tu mesmo não tens.",
       "ownerHoldsEverything": "A função de proprietário tem sempre todas as permissões deste grupo. Só o nome visível pode ser alterado.",
+      "pendingUnreachable": "Ninguém pode pedir para entrar neste momento, por isso ninguém tem esta função. É a admissão que decide.",
       "presets": {
         "channel": "Transformar em canal (só os administradores escrevem)"
       },
@@ -1018,6 +1019,7 @@
       "roleKeyPlaceholder": "chave, p. ex. redacao",
       "roleLabelPlaceholder": "nome visível, p. ex. Redação",
       "saved": "Permissões guardadas",
+      "saveFirst": "Guarde ou descarte primeiro: há alterações não guardadas.",
       "simple": {
         "applicants-read": "Os candidatos pendentes podem ler as publicações",
         "members-chat": "Os membros podem escrever no chat do grupo",

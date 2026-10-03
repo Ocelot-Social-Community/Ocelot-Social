@@ -150,6 +150,18 @@ describe('GroupRightsSimple', () => {
     // The question that had no control at all: the screen said "nobody can ask to join at the
     // moment" and offered no way to change it. Three states of one question, so a select —
     // two checkboxes would let somebody express "anybody may enter AND must ask".
+    it('marks which of the three the group is on, all three readable at once', () => {
+      // A row of buttons rather than a dropdown: the options are opposite ends of one scale,
+      // and a closed dropdown shows neither of the others next to the one it has.
+      const wrapper = Wrapper({ roles: rolesWith(['group.join']) })
+
+      expect(at(wrapper, 'admission-option-open').classes()).toContain('admission-option--active')
+      expect(at(wrapper, 'admission-option-closed').classes()).not.toContain(
+        'admission-option--active',
+      )
+      expect(at(wrapper, 'admission-option-open').attributes('aria-checked')).toBe('true')
+    })
+
     it('names the state the non-member role puts the group in', () => {
       expect(at(Wrapper({ roles: rolesWith([]) }), 'admission-closed').exists()).toBe(true)
       expect(at(Wrapper({ roles: rolesWith(['group.join']) }), 'admission-open').exists()).toBe(
@@ -163,8 +175,7 @@ describe('GroupRightsSimple', () => {
     it('changes the door, replacing the other answer rather than adding to it', async () => {
       const wrapper = Wrapper({ roles: rolesWith(['group.read', 'group.join.request']) })
 
-      at(wrapper, 'admission-select').element.value = 'open'
-      await at(wrapper, 'admission-select').trigger('change')
+      await at(wrapper, 'admission-option-open').trigger('click')
       await at(wrapper, 'simple-save').trigger('click')
 
       expect(wrapper.emitted('save')).toEqual([
@@ -175,8 +186,7 @@ describe('GroupRightsSimple', () => {
     it('previews the new door before it is saved', async () => {
       const wrapper = Wrapper({ roles: rolesWith([]) })
 
-      at(wrapper, 'admission-select').element.value = 'onRequest'
-      await at(wrapper, 'admission-select').trigger('change')
+      await at(wrapper, 'admission-option-onRequest').trigger('click')
 
       expect(at(wrapper, 'admission-onRequest').exists()).toBe(true)
     })

@@ -16,6 +16,7 @@
         :grantable="grantable"
         :hint-for="blockedHint"
         @save="saveSimple"
+        @dirty="simpleDirty = $event"
       >
         <template #actions>
           <os-button
@@ -28,7 +29,16 @@
           <os-button :disabled="saving || !canManageRoles" data-test="reset" @click="confirmReset">
             {{ $t('group.rights.reset') }}
           </os-button>
-          <button type="button" class="link" data-test="to-advanced" @click="advanced = true">
+          <!-- Guarded: the simple view holds a DRAFT now, and switching away from it used to
+               throw that draft out without a word. -->
+          <button
+            type="button"
+            class="link"
+            :disabled="simpleDirty"
+            :title="simpleDirty ? $t('group.rights.saveFirst') : null"
+            data-test="to-advanced"
+            @click="advanced = true"
+          >
             {{ $t('group.rights.toAdvanced') }}
           </button>
         </template>
@@ -71,6 +81,17 @@
           </span>
         </header>
 
+        <!-- A role nobody can reach: every right on it is editable and none of it applies to
+             anybody. Said here rather than left to the greyed rows, which showed WHAT was
+             blocked and never why.
+
+             Above the owner note on purpose: that one and the matrix are a v-if/v-else pair,
+             and anything between them breaks the pairing — which is how the matrix briefly
+             rendered for the owner role as well. -->
+        <p v-if="pendingUnreachable" class="role-note" data-test="pending-unreachable">
+          {{ $t('group.rights.pendingUnreachable') }}
+        </p>
+
         <p v-if="activeRole.protected" class="role-note" data-test="owner-note">
           {{ $t('group.rights.ownerHoldsEverything') }}
         </p>
@@ -90,6 +111,7 @@
               isMoot(permission)
           "
           :hint-for="blockedHint"
+          :note-for="blockedHint"
           @toggle="togglePermission"
         />
 
@@ -112,7 +134,14 @@
           >
             {{ $t('group.rights.deleteRole') }}
           </os-button>
-          <button type="button" class="link" data-test="to-simple" @click="advanced = false">
+          <button
+            type="button"
+            class="link"
+            :disabled="dirty"
+            :title="dirty ? $t('group.rights.saveFirst') : null"
+            data-test="to-simple"
+            @click="advanced = false"
+          >
             {{ $t('group.rights.toSimple') }}
           </button>
         </div>
@@ -134,7 +163,7 @@ import {
   resetGroupRolesMutation,
   updateGroupRoleMutation,
 } from '~/graphql/groupRoles.js'
-import { isMootRight, MANDATORY_GROUP_RIGHTS } from '~/constants/groups'
+import { isMootRight, MANDATORY_GROUP_RIGHTS, PENDING_GROUP_ROLE } from '~/constants/groups'
 import { NONE_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
 import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
@@ -160,6 +189,9 @@ export default {
       roles: [],
       myGroupPermissions: [],
       advanced: false,
+      // Whether the simple view has an unsaved draft — it owns the draft, the page owns the
+      // view toggle, and the toggle must not throw the draft away silently.
+      simpleDirty: false,
       activeRoleName: USUAL_GROUP_ROLE,
       // The role tab under the cursor, to preview what it would change about the one being
       // edited — the same affordance the network and template role pages have.
@@ -175,6 +207,13 @@ export default {
     },
     orderedRoles() {
       return orderRolesByPrivilege(this.roles)
+    },
+    /** The applicant role is being edited, and nothing can produce an applicant. */
+    pendingUnreachable() {
+      return (
+        this.activeRoleName === PENDING_GROUP_ROLE &&
+        !this.roles.some((role) => role.permissions?.includes('group.join.request'))
+      )
     },
     activeRole() {
       return this.roles.find((role) => role.name === this.activeRoleName) ?? null

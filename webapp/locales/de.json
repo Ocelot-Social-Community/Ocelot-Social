@@ -230,7 +230,7 @@
       "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte und ist nicht bearbeitbar.",
       "resultingVisibility": "Gruppen aus dieser Vorlage sind:",
       "saved": "Vorlage gespeichert",
-      "saveFirst": "Erst speichern oder verwerfen — die Rolle hat ungesicherte Änderungen.",
+      "saveFirst": "Erst speichern oder verwerfen — es gibt ungesicherte Änderungen.",
       "templateLabel": "Vorlage",
       "title": "Gruppen-Rollen & Rechte",
       "untouched": "Eine Änderung hier erreicht {untouched} der {total} aus dieser Vorlage erstellten Gruppen — die, die ihre Rechte nie selbst geändert haben — und nur, wenn du sie anwendest."
@@ -1010,6 +1010,7 @@
       "moot": "Wer nicht Mitglied ist, hat keine Mitgliedschaft zu beenden.",
       "noRight": "Dieses Recht kannst du nicht vergeben, weil du es selbst nicht hast.",
       "ownerHoldsEverything": "Die Inhaber-Rolle haelt immer alle Rechte dieser Gruppe. Nur ihr Anzeigename laesst sich aendern.",
+      "pendingUnreachable": "Zurzeit kann niemand eine Mitgliedschaft beantragen — diese Rolle hat deshalb niemand. Darueber entscheidet der Einlass.",
       "presets": {
         "channel": "Als Kanal einrichten (nur Admins schreiben)"
       },
@@ -1018,6 +1019,7 @@
       "roleKeyPlaceholder": "Schluessel, z. B. redaktion",
       "roleLabelPlaceholder": "Anzeigename, z. B. Redaktion",
       "saved": "Rechte gespeichert",
+      "saveFirst": "Erst speichern oder verwerfen — es gibt ungesicherte Änderungen.",
       "simple": {
         "applicants-read": "Wartende Bewerber duerfen die Beitraege lesen",
         "members-chat": "Mitglieder duerfen im Gruppen-Chat schreiben",

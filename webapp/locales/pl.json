@@ -230,7 +230,7 @@
       "ownerHoldsEverything": "Rola właściciela ma zawsze wszystkie uprawnienia i nie da się jej edytować.",
       "resultingVisibility": "Grupy utworzone z tego szablonu są:",
       "saved": "Szablon zapisany",
-      "saveFirst": "Najpierw zapisz lub odrzuć — ta rola ma niezapisane zmiany.",
+      "saveFirst": "Najpierw zapisz lub odrzuć — są niezapisane zmiany.",
       "templateLabel": "Szablon",
       "title": "Role i uprawnienia grup",
       "untouched": "Zmiana tutaj obejmie {untouched} z {total} grup utworzonych z tego szablonu — te, które nigdy nie zmieniły własnych uprawnień — i tylko wtedy, gdy ją zastosujesz."
@@ -1010,6 +1010,7 @@
       "moot": "Kto nie jest członkiem, nie ma członkostwa do opuszczenia.",
       "noRight": "Nie możesz nadać uprawnienia, którego sam nie masz.",
       "ownerHoldsEverything": "Rola właściciela ma zawsze wszystkie uprawnienia w tej grupie. Zmienić można tylko jej nazwę wyświetlaną.",
+      "pendingUnreachable": "Nikt nie może obecnie poprosić o dołączenie, więc nikt nie ma tej roli. Decyduje o tym przyjmowanie.",
       "presets": {
         "channel": "Zamień w kanał (piszą tylko administratorzy)"
       },
@@ -1018,6 +1019,7 @@
       "roleKeyPlaceholder": "klucz, np. redakcja",
       "roleLabelPlaceholder": "nazwa wyświetlana, np. Redakcja",
       "saved": "Uprawnienia zapisane",
+      "saveFirst": "Najpierw zapisz lub odrzuć — są niezapisane zmiany.",
       "simple": {
         "applicants-read": "Oczekujący kandydaci mogą czytać wpisy",
         "members-chat": "Członkowie mogą pisać na czacie grupy",

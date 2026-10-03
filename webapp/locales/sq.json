@@ -230,7 +230,7 @@
       "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet dhe nuk mund të redaktohet.",
       "resultingVisibility": "Grupet e krijuara nga ky shabllon janë:",
       "saved": "Shablloni u ruajt",
-      "saveFirst": "Fillimisht ruaj ose hidh poshtë — ky rol ka ndryshime të paruajtura.",
+      "saveFirst": "Fillimisht ruaj ose hidh poshtë — ka ndryshime të paruajtura.",
       "templateLabel": "Model",
       "title": "Rolet dhe të drejtat e grupeve",
       "untouched": "Një ndryshim këtu arrin {untouched} nga {total} grupet e krijuara nga ky model — ato që nuk i kanë ndryshuar kurrë të drejtat e veta — dhe vetëm kur e zbaton."
@@ -1010,6 +1010,7 @@
       "moot": "Kush nuk është anëtar, nuk ka anëtarësi për të lënë.",
       "noRight": "Nuk mund të dhurosh një leje që ti vetë nuk e ke.",
       "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet e këtij grupi. Mund të ndryshohet vetëm emri i shfaqur.",
+      "pendingUnreachable": "Askush nuk mund të kërkojë të bashkohet për momentin, prandaj askush nuk e ka këtë rol. Këtë e vendos pranimi.",
       "presets": {
         "channel": "Shndërroje në kanal (shkruajnë vetëm administratorët)"
       },
@@ -1018,6 +1019,7 @@
       "roleKeyPlaceholder": "çelës, p.sh. redaksia",
       "roleLabelPlaceholder": "emri i shfaqur, p.sh. Redaksia",
       "saved": "Lejet u ruajtën",
+      "saveFirst": "Fillimisht ruaj ose hidh poshtë — ka ndryshime të paruajtura.",
       "simple": {
         "applicants-read": "Aplikuesit në pritje mund të lexojnë postimet",
         "members-chat": "Anëtarët mund të shkruajnë në chat-in e grupit",

@@ -230,7 +230,7 @@
       "ownerHoldsEverything": "The owner role always holds every right and cannot be edited.",
       "resultingVisibility": "Groups created from this template are:",
       "saved": "Template saved",
-      "saveFirst": "Save or discard first — this role has unsaved changes.",
+      "saveFirst": "Save or discard first — there are unsaved changes.",
       "templateLabel": "Template",
       "title": "Group roles & permissions",
       "untouched": "An edit here reaches {untouched} of the {total} groups created from this template — the ones that never changed their own rights — and only when you apply it."
@@ -1010,6 +1010,7 @@
       "moot": "A non-member has no membership to leave.",
       "noRight": "You cannot grant a right you do not hold yourself.",
       "ownerHoldsEverything": "The owner role always holds every right in this group. Only its display name can be changed.",
+      "pendingUnreachable": "Nobody can ask to join at the moment, so nobody holds this role. The admission setting decides that.",
       "presets": {
         "channel": "Turn into a channel (only admins write)"
       },
@@ -1018,6 +1019,7 @@
       "roleKeyPlaceholder": "key, e.g. editors",
       "roleLabelPlaceholder": "display name, e.g. Editors",
       "saved": "Rights saved",
+      "saveFirst": "Save or discard first — there are unsaved changes.",
       "simple": {
         "applicants-read": "Waiting applicants may read the posts",
         "members-chat": "Members may write in the group chat",

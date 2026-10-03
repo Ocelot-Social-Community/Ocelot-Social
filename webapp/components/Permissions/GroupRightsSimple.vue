@@ -41,23 +41,33 @@
     </div>
 
     <!--
-      Three states of ONE question, so a select rather than three checkboxes: two ticks would
-      let somebody express "anybody may enter AND must ask", which the model has no answer for.
+      Three states of ONE question, so one control with three positions rather than three
+      checkboxes: two ticks would let somebody express "anybody may enter AND must ask", which
+      the model has no answer for.
+
+      A row of buttons rather than a dropdown, like the template tabs above: all three answers
+      are readable at once, which matters for a setting whose options are not interchangeable —
+      "by invitation only" and "without asking" are opposite ends, and a closed dropdown shows
+      neither of them next to the one it has.
     -->
-    <label class="admission-control">
-      <span>{{ $t('group.admission.label') }}</span>
-      <select
-        :value="admission"
+    <div class="admission-control" role="radiogroup" :aria-label="$t('group.admission.label')">
+      <span class="admission-control__label">{{ $t('group.admission.label') }}</span>
+      <button
+        v-for="state in admissionStates"
+        :key="state"
+        type="button"
+        role="radio"
+        :aria-checked="String(state === admission)"
+        class="admission-option"
+        :class="{ 'admission-option--active': state === admission }"
         :disabled="!admissionEditable"
         :title="admissionEditable ? null : admissionHint"
-        data-test="admission-select"
-        @change="setAdmission($event.target.value)"
+        :data-test="`admission-option-${state}`"
+        @click="setAdmission(state)"
       >
-        <option v-for="state in admissionStates" :key="state" :value="state">
-          {{ $t(`group.admission.${state}.title`) }}
-        </option>
-      </select>
-    </label>
+        {{ $t(`group.admission.${state}.title`) }}
+      </button>
+    </div>
 
     <ul class="switches">
       <li v-for="item in switches" :key="item.id" class="switch">
@@ -286,10 +296,51 @@ export default {
 
 .admission-control {
   display: flex;
-  align-items: baseline;
-  gap: var(--space-x-small);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xx-small);
   margin-bottom: var(--space-base);
-  color: var(--text-color-soft);
+}
+
+.admission-control__label {
+  margin-right: var(--space-xx-small);
+  color: var(--text-color-softer);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* The same pill the template tabs are, so the two rows read as the same kind of choice. */
+.admission-option {
+  border: 1px solid var(--border-color-soft);
+  border-radius: var(--border-radius-x-large);
+  background: var(--background-color-base);
+  color: var(--text-color-base);
+  padding: var(--space-xx-small) var(--space-small);
+  font-size: 0.9em;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.admission-option:hover:not(:disabled) {
+  background: var(--background-color-softer);
+}
+
+.admission-option--active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-primary-inverse);
+  font-weight: bold;
+}
+
+/* Not the soft hover of an inactive pill: white on a light background is unreadable. */
+.admission-option--active:hover:not(:disabled) {
+  background: var(--color-primary);
+}
+
+.admission-option:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .switches {

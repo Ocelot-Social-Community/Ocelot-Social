@@ -230,7 +230,7 @@
       "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos y no se puede editar.",
       "resultingVisibility": "Los grupos creados con esta plantilla son:",
       "saved": "Plantilla guardada",
-      "saveFirst": "Guarda o descarta primero: este rol tiene cambios sin guardar.",
+      "saveFirst": "Guarda o descarta primero: hay cambios sin guardar.",
       "templateLabel": "Plantilla",
       "title": "Roles y permisos de grupo",
       "untouched": "Una edición aquí alcanza {untouched} de los {total} grupos creados a partir de esta plantilla —los que nunca cambiaron sus propios derechos— y solo cuando la aplicas."
@@ -1010,6 +1010,7 @@
       "moot": "Quien no es miembro no tiene ninguna membresía que abandonar.",
       "noRight": "No puedes conceder un permiso que tú misma no tienes.",
       "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos de este grupo. Solo se puede cambiar su nombre visible.",
+      "pendingUnreachable": "Por ahora nadie puede solicitar unirse, así que nadie tiene este rol. Lo decide la admisión.",
       "presets": {
         "channel": "Convertir en canal (solo escriben los administradores)"
       },
@@ -1018,6 +1019,7 @@
       "roleKeyPlaceholder": "clave, p. ej. redaccion",
       "roleLabelPlaceholder": "nombre visible, p. ej. Redacción",
       "saved": "Permisos guardados",
+      "saveFirst": "Guarda o descarta primero: hay cambios sin guardar.",
       "simple": {
         "applicants-read": "Los solicitantes en espera pueden leer las publicaciones",
         "members-chat": "Los miembros pueden escribir en el chat del grupo",

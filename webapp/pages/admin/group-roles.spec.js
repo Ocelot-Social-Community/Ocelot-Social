@@ -96,6 +96,14 @@ describe('admin/group-roles.vue', () => {
     return wrapper
   }
 
+  // The matrix lives behind the same "advanced" step the group's own rights page has: the two
+  // halves edit the same roles, and showing both at once meant two drafts over one set of data.
+  const advanced = async () => {
+    const wrapper = await Wrapper()
+    await at(wrapper, 'to-advanced').trigger('click')
+    return wrapper
+  }
+
   describe('hover diff', () => {
     // Same affordance as the network roles page: hovering a role tab marks what that role
     // would change about the one being edited, instead of making an admin compare by eye.
@@ -103,7 +111,7 @@ describe('admin/group-roles.vue', () => {
       at(wrapper, `perm-${key}`).element.closest('label').className
 
     it('marks both directions against the role being edited', async () => {
-      const wrapper = await Wrapper()
+      const wrapper = await advanced()
 
       await at(wrapper, 'role-tab-none').trigger('mouseenter')
 
@@ -113,7 +121,7 @@ describe('admin/group-roles.vue', () => {
     })
 
     it('clears the marks when the cursor leaves', async () => {
-      const wrapper = await Wrapper()
+      const wrapper = await advanced()
 
       await at(wrapper, 'role-tab-none').trigger('mouseenter')
       await at(wrapper, 'role-tab-none').trigger('mouseleave')
@@ -125,7 +133,7 @@ describe('admin/group-roles.vue', () => {
     it('previews the SAME role in another template when its tab is hovered', async () => {
       // The question the three presets exist to answer: what does a closed group's member
       // role do differently from a public one's?
-      const wrapper = await Wrapper()
+      const wrapper = await advanced()
 
       await at(wrapper, 'type-tab-closed').trigger('mouseenter')
 
@@ -134,7 +142,7 @@ describe('admin/group-roles.vue', () => {
     })
 
     it('clears a type preview when the cursor leaves', async () => {
-      const wrapper = await Wrapper()
+      const wrapper = await advanced()
 
       await at(wrapper, 'type-tab-closed').trigger('mouseenter')
       await at(wrapper, 'type-tab-closed').trigger('mouseleave')
@@ -143,7 +151,7 @@ describe('admin/group-roles.vue', () => {
     })
 
     it('shows nothing for the type that is already open', async () => {
-      const wrapper = await Wrapper()
+      const wrapper = await advanced()
 
       await at(wrapper, 'type-tab-public').trigger('mouseenter')
 
@@ -153,7 +161,7 @@ describe('admin/group-roles.vue', () => {
     it('reads the protected owner role as the whole catalog', async () => {
       // `owner` stores no permission list at all — hovering it must read as "everything",
       // not as an empty role that would appear to strip the matrix.
-      const wrapper = await Wrapper()
+      const wrapper = await advanced()
 
       await at(wrapper, 'role-tab-owner').trigger('mouseenter')
 
@@ -165,7 +173,7 @@ describe('admin/group-roles.vue', () => {
   it('reads the untouched count as a share of the type`s groups', async () => {
     // A bare "4 groups still run on this template" reads as "only 4" — the denominator is
     // what tells an admin whether that is all of them.
-    const wrapper = await Wrapper()
+    const wrapper = await advanced()
 
     expect(at(wrapper, 'untouched').text()).toContain('"untouched":4')
     expect(at(wrapper, 'untouched').text()).toContain('"total":7')
@@ -174,7 +182,7 @@ describe('admin/group-roles.vue', () => {
   it('renames a template role without touching its rights', async () => {
     // Every new group copies the label, so naming `usual` "Mitglied" here is a one-place change
     // instead of a per-group chore — and the owner role has nothing but its name to edit.
-    const wrapper = await Wrapper()
+    const wrapper = await advanced()
 
     await at(wrapper, 'role-label').find('input').setValue('Mitglied')
     await at(wrapper, 'save').trigger('click')
@@ -189,7 +197,7 @@ describe('admin/group-roles.vue', () => {
   it('writes the template role the SENTENCE is about, once the draft is saved', async () => {
     // Not the role the matrix tabs happen to have selected — and not on the tick either: the
     // simple view collects a draft and writes it when somebody says so.
-    const wrapper = await Wrapper()
+    const wrapper = await advanced()
 
     await at(wrapper, 'switch-members-post').setChecked(false)
 
@@ -208,25 +216,23 @@ describe('admin/group-roles.vue', () => {
     )
   })
 
-  it('locks the matrix while the SIMPLE view has an unsaved draft', async () => {
-    // The other half of the same rule: both edit the same roles, and whichever saved second
-    // would discard the other without saying so.
+  it('does not open the matrix while the simple view has an unsaved draft', async () => {
+    // The two halves are mutually exclusive now rather than mutually locked — so the way INTO
+    // the matrix is what has to refuse, or the draft would be thrown away on the way.
     const wrapper = await Wrapper()
 
     await at(wrapper, 'switch-members-post').setChecked(false)
 
-    expect(at(wrapper, 'save').attributes('disabled')).toBeTruthy()
+    expect(at(wrapper, 'to-advanced').attributes('disabled')).toBeTruthy()
   })
 
-  it('locks the simple switches while the matrix has an unsaved draft', async () => {
-    // Writing a role here would discard that draft without saying so, since the answer from the
-    // server replaces it. Locked with a reason beats a silent loss.
-    const wrapper = await Wrapper()
+  it('does not leave the matrix while ITS draft is unsaved', async () => {
+    const wrapper = await advanced()
 
     wrapper.setData({ draft: ['group.post.create', 'group.members.read'] })
     await wrapper.vm.$nextTick()
 
-    expect(at(wrapper, 'switch-members-post').element.disabled).toBe(true)
+    expect(at(wrapper, 'to-simple').attributes('disabled')).toBeTruthy()
   })
 
   it('offers one tab per template, names the visibility it produces, and starts on public', async () => {
@@ -269,7 +275,7 @@ describe('admin/group-roles.vue', () => {
   })
 
   it('explains the owner role rather than offering checkboxes', async () => {
-    const wrapper = await Wrapper()
+    const wrapper = await advanced()
 
     await at(wrapper, 'role-tab-owner').trigger('click')
 
@@ -278,7 +284,7 @@ describe('admin/group-roles.vue', () => {
   })
 
   it('saves a changed permission set', async () => {
-    const wrapper = await Wrapper()
+    const wrapper = await advanced()
 
     at(wrapper, 'perm-group.members.read').element.checked = true
     await at(wrapper, 'perm-group.members.read').trigger('change')
@@ -299,7 +305,7 @@ describe('admin/group-roles.vue', () => {
   })
 
   it('reverts a draft', async () => {
-    const wrapper = await Wrapper()
+    const wrapper = await advanced()
 
     at(wrapper, 'perm-group.members.read').element.checked = true
     await at(wrapper, 'perm-group.members.read').trigger('change')
@@ -311,7 +317,7 @@ describe('admin/group-roles.vue', () => {
 
   it('toasts a save error', async () => {
     mocks.$apollo.mutate = jest.fn().mockRejectedValue({ message: 'nope' })
-    const wrapper = await Wrapper()
+    const wrapper = await advanced()
 
     at(wrapper, 'perm-group.members.read').element.checked = true
     await at(wrapper, 'perm-group.members.read').trigger('change')
@@ -328,7 +334,7 @@ describe('admin/group-roles.vue', () => {
 
     it('asks first and reports how many groups changed', async () => {
       window.confirm = jest.fn().mockReturnValue(true)
-      const wrapper = await Wrapper()
+      const wrapper = await advanced()
 
       await at(wrapper, 'apply').trigger('click')
       await wrapper.vm.$nextTick()
@@ -341,7 +347,7 @@ describe('admin/group-roles.vue', () => {
 
     it('does nothing when declined', async () => {
       window.confirm = jest.fn().mockReturnValue(false)
-      const wrapper = await Wrapper()
+      const wrapper = await advanced()
 
       await at(wrapper, 'apply').trigger('click')
 

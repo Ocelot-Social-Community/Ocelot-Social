@@ -32,11 +32,33 @@
         :roles="activeTemplate.roles"
         :catalog="catalog"
         :caption="$t('admin.groupRoles.resultingVisibility')"
-        :disabled="saving || dirty"
+        :disabled="saving"
         :disabled-hint="$t('admin.groupRoles.saveFirst')"
         @save="saveSimple"
         @dirty="simpleDirty = $event"
-      />
+      >
+        <template #actions>
+          <!-- A template change reaches existing groups only when an admin asks for it, and
+               then only the groups that never edited their own roles (concept E12). -->
+          <os-button
+            :disabled="saving || simpleDirty || !activeTemplate.untouchedGroupCount"
+            data-test="apply"
+            @click="confirmApply"
+          >
+            {{ $t('admin.groupRoles.apply') }}
+          </os-button>
+          <button
+            type="button"
+            class="link"
+            :disabled="simpleDirty"
+            :title="simpleDirty ? $t('admin.groupRoles.saveFirst') : null"
+            data-test="to-advanced"
+            @click="advanced = true"
+          >
+            {{ $t('group.rights.toAdvanced') }}
+          </button>
+        </template>
+      </group-rights-simple>
 
       <p class="untouched" data-test="untouched">
         {{
@@ -47,67 +69,66 @@
         }}
       </p>
 
-      <role-tabs
-        :roles="orderedRoles"
-        :active-name="activeRoleName"
-        :label-for="(role) => role.label || role.name"
-        :badge-for="(role) => role.system"
-        :badge-title="$t('group.rights.systemRole')"
-        @select="activeRoleName = $event"
-        @hover="hoveredRoleName = $event"
-      />
+      <template v-if="advanced">
+        <role-tabs
+          :roles="orderedRoles"
+          :active-name="activeRoleName"
+          :label-for="(role) => role.label || role.name"
+          :badge-for="(role) => role.system"
+          :badge-title="$t('group.rights.systemRole')"
+          @select="activeRoleName = $event"
+          @hover="hoveredRoleName = $event"
+        />
 
-      <ocelot-input
-        v-if="activeRole"
-        v-model="draftLabel"
-        class="role-label"
-        :label="$t('admin.groupRoles.labelField')"
-        :placeholder="activeRole.name"
-        :disabled="saving"
-        data-test="role-label"
-      />
+        <ocelot-input
+          v-if="activeRole"
+          v-model="draftLabel"
+          class="role-label"
+          :label="$t('admin.groupRoles.labelField')"
+          :placeholder="activeRole.name"
+          :disabled="saving"
+          data-test="role-label"
+        />
 
-      <p v-if="activeRole && activeRole.protected" class="note" data-test="owner-note">
-        {{ $t('admin.groupRoles.ownerHoldsEverything') }}
-      </p>
+        <p v-if="pendingUnreachable" class="note" data-test="pending-unreachable">
+          {{ $t('group.rights.pendingUnreachable') }}
+        </p>
 
-      <permission-matrix
-        v-else-if="activeRole"
-        :permissions="catalog"
-        :granted="draft"
-        :diff="hoverDiff"
-        :group-label="(name) => $t(`permissions.sections.${name}`)"
-        :disabled-for="
-          (permission) => saving || simpleDirty || isMandatory(permission) || isMoot(permission)
-        "
-        :hint-for="
-          (permission) =>
-            isMoot(permission)
-              ? $t('group.rights.moot')
-              : isMandatory(permission)
-                ? $t('group.rights.mandatory')
-                : null
-        "
-        @toggle="toggle"
-      />
+        <p v-if="activeRole && activeRole.protected" class="note" data-test="owner-note">
+          {{ $t('admin.groupRoles.ownerHoldsEverything') }}
+        </p>
 
-      <div class="actions">
-        <os-button :disabled="!dirty || saving || simpleDirty" data-test="save" @click="save">
-          {{ $t('actions.save') }}
-        </os-button>
-        <os-button :disabled="!dirty || saving" data-test="revert" @click="resetDraft">
-          {{ $t('actions.cancel') }}
-        </os-button>
-        <!-- A template change reaches existing groups only when an admin asks for it, and then
-             only the groups that never edited their own roles (concept E12). -->
-        <os-button
-          :disabled="saving || !activeTemplate.untouchedGroupCount"
-          data-test="apply"
-          @click="confirmApply"
-        >
-          {{ $t('admin.groupRoles.apply') }}
-        </os-button>
-      </div>
+        <permission-matrix
+          v-else-if="activeRole"
+          :permissions="catalog"
+          :granted="draft"
+          :diff="hoverDiff"
+          :group-label="(name) => $t(`permissions.sections.${name}`)"
+          :disabled-for="(permission) => saving || isMandatory(permission) || isMoot(permission)"
+          :hint-for="blockedHint"
+          :note-for="blockedHint"
+          @toggle="toggle"
+        />
+
+        <div class="actions">
+          <os-button :disabled="!dirty || saving" data-test="save" @click="save">
+            {{ $t('actions.save') }}
+          </os-button>
+          <os-button :disabled="!dirty || saving" data-test="revert" @click="resetDraft">
+            {{ $t('actions.cancel') }}
+          </os-button>
+          <button
+            type="button"
+            class="link"
+            :disabled="dirty"
+            :title="dirty ? $t('admin.groupRoles.saveFirst') : null"
+            data-test="to-simple"
+            @click="advanced = false"
+          >
+            {{ $t('group.rights.toSimple') }}
+          </button>
+        </div>
+      </template>
     </template>
   </os-card>
 </template>
@@ -124,7 +145,12 @@ import {
   groupRoleTemplatesQuery,
   updateGroupRoleTemplateMutation,
 } from '~/graphql/adminGroups.js'
-import { isMootRight, MANDATORY_GROUP_RIGHTS, NONE_GROUP_ROLE } from '~/constants/groups'
+import {
+  isMootRight,
+  MANDATORY_GROUP_RIGHTS,
+  NONE_GROUP_ROLE,
+  PENDING_GROUP_ROLE,
+} from '~/constants/groups'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
 import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
 
@@ -136,8 +162,10 @@ export default {
       templates: [],
       activeTemplateName: 'public',
       activeRoleName: 'usual',
-      // Whether the simple view above has an unsaved draft. The matrix is locked while it does,
-      // and the simple view while the matrix does: both write the same roles.
+      // The two halves are mutually EXCLUSIVE now rather than mutually locked: they edit the
+      // same roles, and showing both at once meant two drafts over one set of data.
+      advanced: false,
+      // Still tracked, because the way INTO the matrix must not throw an unsaved draft away.
       simpleDirty: false,
       // The TEMPLATE tab under the cursor: hovering `closed` while editing the public one's
       // member role previews what a closed group's member role does differently — the question
@@ -168,6 +196,15 @@ export default {
     },
     dirty() {
       return isRoleDirty(this.activeRole, this.draft, this.draftLabel)
+    },
+    /** The applicant role is being edited, and nothing in this template produces an applicant. */
+    pendingUnreachable() {
+      return (
+        this.activeRoleName === PENDING_GROUP_ROLE &&
+        !(this.activeTemplate?.roles ?? []).some((role) =>
+          role.permissions?.includes('group.join.request'),
+        )
+      )
     },
     /**
      * What the cursor is previewing, or null: ANOTHER ROLE of this template, or the SAME role
@@ -222,6 +259,12 @@ export default {
      */
     isMoot(permission) {
       return isMootRight(this.activeRoleName, permission?.key)
+    },
+    /** Why a row cannot be ticked, in words — shown on the row, not only as a tooltip. */
+    blockedHint(permission) {
+      if (this.isMoot(permission)) return this.$t('group.rights.moot')
+      if (this.isMandatory(permission)) return this.$t('group.rights.mandatory')
+      return null
     },
     isMandatory(permission) {
       return (

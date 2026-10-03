@@ -230,7 +230,7 @@
       "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten en kan niet worden aangepast.",
       "resultingVisibility": "Groepen uit dit sjabloon zijn:",
       "saved": "Sjabloon opgeslagen",
-      "saveFirst": "Eerst opslaan of verwerpen — deze rol heeft niet-opgeslagen wijzigingen.",
+      "saveFirst": "Eerst opslaan of verwerpen — er zijn niet-opgeslagen wijzigingen.",
       "templateLabel": "Sjabloon",
       "title": "Groepsrollen & rechten",
       "untouched": "Een wijziging hier bereikt {untouched} van de {total} groepen die met dit sjabloon zijn gemaakt — de groepen die hun eigen rechten nooit hebben gewijzigd — en alleen als je die toepast."
@@ -1010,6 +1010,7 @@
       "moot": "Wie geen lid is, heeft geen lidmaatschap om te beëindigen.",
       "noRight": "Je kunt geen recht geven dat je zelf niet hebt.",
       "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten in deze groep. Alleen de weergavenaam kan worden aangepast.",
+      "pendingUnreachable": "Niemand kan op dit moment lidmaatschap aanvragen, dus niemand heeft deze rol. De toelating bepaalt dat.",
       "presets": {
         "channel": "Omzetten in een kanaal (alleen beheerders schrijven)"
       },
@@ -1018,6 +1019,7 @@
       "roleKeyPlaceholder": "sleutel, bijv. redactie",
       "roleLabelPlaceholder": "weergavenaam, bijv. Redactie",
       "saved": "Rechten opgeslagen",
+      "saveFirst": "Eerst opslaan of verwerpen — er zijn niet-opgeslagen wijzigingen.",
       "simple": {
         "applicants-read": "Wachtende aanvragers mogen de berichten lezen",
         "members-chat": "Leden mogen in de groepschat schrijven",
