@@ -971,6 +971,7 @@
       "messageOwner": "Je <b>pronar</b> i këtij grupi. Nëse largohesh, ai mund të mbetet pa pronar — dhe atëherë vetëm një administrim rrjeti mund ta bëjë sërish funksional.<br>Vërtet ta lësh grupin <b>“{name}”</b>?",
       "title": "A dëshiron vërtet të largohesh nga grupi?"
     },
+    "memberOutranked": "Nuk mund ta ndryshosh rolin e kësaj personi — ka të paktën aq sa ti.",
     "memberRemoved": "Përdoruesi “{name}” u hoq nga grupi!",
     "members": "Anëtarët",
     "membersAdministrationList": {
@@ -1031,6 +1032,11 @@
         "nonmembers-members": "Jo-anëtarët mund të shohin listën e anëtarëve",
         "nonmembers-profile": "Të jashtmit mund të shohin se grupi ekziston",
         "nonmembers-read": "Jo-anëtarët mund të lexojnë postimet"
+      },
+      "simpleGroups": {
+        "applicants": "Aplikantë në pritje",
+        "members": "Anëtarët",
+        "outsiders": "Të jashtmit"
       },
       "systemRole": "Rol i sistemit: nuk mund të fshihet ose riemërtohet",
       "title": "Lejet",

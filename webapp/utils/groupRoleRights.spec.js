@@ -1,4 +1,4 @@
-import { applyRightChange } from '~/utils/groupRoleRights'
+import { applyRightChange, mayAssignGroupRole } from '~/utils/groupRoleRights'
 
 describe('applyRightChange', () => {
   it('adds the right that was ticked', () => {
@@ -48,5 +48,62 @@ describe('applyRightChange', () => {
 
   it('does not duplicate a right that is already held', () => {
     expect(applyRightChange(['group.read'], 'group.read', true)).toEqual(['group.read'])
+  })
+})
+
+describe('mayAssignGroupRole', () => {
+  const assign = 'group.member.role.assign'
+
+  it('refuses somebody without the right at all', () => {
+    expect(
+      mayAssignGroupRole({
+        viewerPermissions: ['group.read'],
+        memberPermissions: [],
+        rolePermissions: [],
+      }),
+    ).toBe(false)
+  })
+
+  it('refuses a role the viewer does not hold every right of', () => {
+    // Otherwise handing out a role would be a way to climb: write the right into a role, then
+    // put somebody in it and take it back.
+    expect(
+      mayAssignGroupRole({
+        viewerPermissions: [assign, 'group.read'],
+        memberPermissions: [],
+        rolePermissions: ['group.settings.manage'],
+      }),
+    ).toBe(false)
+  })
+
+  it('refuses to reshape somebody who holds as much as the viewer', () => {
+    // A moderator demoting an admin is the case this exists for; so is a peer demoting a peer.
+    expect(
+      mayAssignGroupRole({
+        viewerPermissions: [assign, 'group.read'],
+        memberPermissions: [assign, 'group.read'],
+        rolePermissions: ['group.read'],
+      }),
+    ).toBe(false)
+  })
+
+  it('refuses to reshape somebody who holds MORE than the viewer', () => {
+    expect(
+      mayAssignGroupRole({
+        viewerPermissions: [assign, 'group.read'],
+        memberPermissions: [assign, 'group.read', 'group.settings.manage'],
+        rolePermissions: ['group.read'],
+      }),
+    ).toBe(false)
+  })
+
+  it('allows it where the viewer outranks the member and covers the role', () => {
+    expect(
+      mayAssignGroupRole({
+        viewerPermissions: [assign, 'group.read', 'group.settings.manage'],
+        memberPermissions: ['group.read'],
+        rolePermissions: ['group.read', 'group.settings.manage'],
+      }),
+    ).toBe(true)
   })
 })

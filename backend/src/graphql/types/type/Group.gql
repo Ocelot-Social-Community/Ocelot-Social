@@ -40,6 +40,8 @@ type Group {
   myGroupElevation: GroupElevation
   "Whether asking for an elevation here would grant the viewer anything beyond what they can already read."
   mayElevateInGroup: Boolean!
+  "Which role template this group was created from, or last put on. Stored, unlike `visibility`, which is derived: two templates can produce the same visibility (`channel` is public too), so this is what says which preset a group is running — and what the admin area counts when it asks how many groups an edit would reach."
+  template: String
   "How findable this group is — DERIVED from its rights, not chosen: `hidden` while its non-member role cannot read the profile, `closed` while it cannot read the content, `public` otherwise. Setting it through UpdateGroup applies the matching role template; the per-level network rights (group.create_*, group.administer.any_*, group.content.read.any_*) read it."
   visibility: GroupVisibility!
   actionRadius: GroupActionRadius!

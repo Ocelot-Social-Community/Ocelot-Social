@@ -971,6 +971,7 @@
       "messageOwner": "You are an <b>owner</b> of this group. If you leave, it may be left without one — and then only a network administrator can make it workable again.<br>Really leave the group <b>“{name}”</b>?",
       "title": "Do you really want to leave the group?"
     },
+    "memberOutranked": "You cannot change this person’s role — they hold at least as much as you do.",
     "memberRemoved": "User “{name}” was removed from group!",
     "members": "Members",
     "membersAdministrationList": {
@@ -1031,6 +1032,11 @@
         "nonmembers-members": "Outsiders may see the member list",
         "nonmembers-profile": "Outsiders may see that the group exists",
         "nonmembers-read": "Outsiders may read the posts"
+      },
+      "simpleGroups": {
+        "applicants": "Waiting applicants",
+        "members": "Members",
+        "outsiders": "Outsiders"
       },
       "systemRole": "System role: cannot be deleted or renamed",
       "title": "Rights",

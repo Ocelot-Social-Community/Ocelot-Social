@@ -971,6 +971,7 @@
       "messageOwner": "Sei <b>proprietario</b> di questo gruppo. Se esci, potrebbe restare senza, e allora solo un’amministrazione di rete potrà renderlo di nuovo operativo.<br>Vuoi davvero lasciare il gruppo <b>«{name}»</b>?",
       "title": "Vuoi davvero uscire dal gruppo?"
     },
+    "memberOutranked": "Non puoi cambiare il ruolo di questa persona: ha almeno quanto te.",
     "memberRemoved": "L'utente “{name}” è stato rimosso dal gruppo!",
     "members": "Membri",
     "membersAdministrationList": {
@@ -1031,6 +1032,11 @@
         "nonmembers-members": "Chi non è membro può vedere l’elenco dei membri",
         "nonmembers-profile": "Gli esterni possono vedere che il gruppo esiste",
         "nonmembers-read": "Chi non è membro può leggere le pubblicazioni"
+      },
+      "simpleGroups": {
+        "applicants": "Richieste in attesa",
+        "members": "Membri",
+        "outsiders": "Esterni"
       },
       "systemRole": "Ruolo di sistema: non può essere eliminato né rinominato",
       "title": "Permessi",

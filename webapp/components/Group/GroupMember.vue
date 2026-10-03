@@ -58,12 +58,22 @@
               </nuxt-link>
             </td>
             <td class="ds-table-col">
+              <!-- Disabled rather than absent where the viewer may not reshape this member at
+                   all: the role still has to be readable, and an empty cell would say nothing
+                   about why. -->
               <select
                 v-if="member.membership.role !== 'owner' && mayAssignRoles"
                 :value="`${member.membership.role}`"
+                :disabled="!mayReshape(member)"
+                :title="mayReshape(member) ? null : $t('group.memberOutranked')"
                 @change="changeMemberRole(member.user.id, $event)"
               >
-                <option v-for="role in selectableRoles" :key="role.name" :value="role.name">
+                <option
+                  v-for="role in selectableRoles"
+                  :key="role.name"
+                  :value="role.name"
+                  :disabled="!mayAssign(member, role)"
+                >
                   {{ roleLabel(role) }}
                 </option>
               </select>
@@ -120,6 +130,7 @@ import { OsBadge, OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { removeUserFromGroupMutation } from '~/graphql/groups.js'
 import { setGroupMemberRoleMutation } from '~/graphql/groupRoles.js'
+import { mayAssignGroupRole } from '~/utils/groupRoleRights'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import groupRights from '~/mixins/groupRights'
 
@@ -189,12 +200,43 @@ export default {
     // What the picker offers: the group's own definitions when they are readable, otherwise the
     // roles the members already carry. `none` is never offered — it means "no membership", and
     // removing somebody is the button next to it.
+    /** Every key any role in this group grants — what a protected role resolves to. */
+    catalogKeys() {
+      return [...new Set(this.groupRoles.flatMap((role) => role.permissions ?? []))]
+    },
     selectableRoles() {
       const roles = this.groupRoles.length ? this.groupRoles : rolesFromMembers(this.groupMembers)
       return roles.filter((role) => role.name !== 'none')
     },
   },
   methods: {
+    /**
+     * Whether this member can be put on that role at all — the same two conditions the server
+     * applies (utils/groupRoleRights, mirroring groupRole/authority.ts): the viewer must hold
+     * every right the role grants, and must outrank the member as they are now.
+     *
+     * Offered as a disabled option rather than hidden, so the picker still shows the whole
+     * ladder and where this person sits on it.
+     */
+    mayAssign(member, role) {
+      return mayAssignGroupRole({
+        viewerPermissions: this.group?.myGroupPermissions ?? [],
+        memberPermissions: this.permissionsOfMember(member),
+        rolePermissions: this.permissionsOfRole(role),
+      })
+    },
+    /** Whether the viewer may change this member's role at all — true for any role on offer. */
+    mayReshape(member) {
+      return this.selectableRoles.some((role) => this.mayAssign(member, role))
+    },
+    permissionsOfRole(role) {
+      // `owner` stores no list and means the whole catalog, so it is never coverable by
+      // anybody but another owner — which the server says too.
+      return role?.protected ? this.catalogKeys : (role?.permissions ?? [])
+    },
+    permissionsOfMember(member) {
+      return this.permissionsOfRole(this.roleByName(member.membership?.role))
+    },
     // The role a member carries, as a definition if the group's are known — so a custom role
     // renders with the label the group gave it rather than as its key.
     roleOf(member) {

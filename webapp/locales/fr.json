@@ -971,6 +971,7 @@
       "messageOwner": "Tu es <b>propriétaire</b> de ce groupe. Si tu le quittes, il risque de se retrouver sans propriétaire — et seule une administration du réseau pourra alors le rendre à nouveau opérationnel.<br>Quitter vraiment le groupe <b>« {name} »</b> ?",
       "title": "Veux-tu vraiment quitter le groupe ?"
     },
+    "memberOutranked": "Tu ne peux pas changer le rôle de cette personne : elle détient au moins autant que toi.",
     "memberRemoved": "L'utilisateur “{name}” a été retiré du groupe !",
     "members": "Membres",
     "membersAdministrationList": {
@@ -1031,6 +1032,11 @@
         "nonmembers-members": "Les non-membres peuvent voir la liste des membres",
         "nonmembers-profile": "Les personnes extérieures peuvent voir que le groupe existe",
         "nonmembers-read": "Les non-membres peuvent lire les publications"
+      },
+      "simpleGroups": {
+        "applicants": "Candidats en attente",
+        "members": "Membres",
+        "outsiders": "Personnes extérieures"
       },
       "systemRole": "Rôle système : ne peut être ni supprimé ni renommé",
       "title": "Permissions",

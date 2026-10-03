@@ -971,6 +971,7 @@
       "messageOwner": "Jesteś <b>właścicielem</b> tej grupy. Jeśli odejdziesz, może zostać bez właściciela — wtedy tylko administracja sieci przywróci jej sprawność.<br>Na pewno opuścić grupę <b>„{name}”</b>?",
       "title": "Czy na pewno chcesz opuścić grupę?"
     },
+    "memberOutranked": "Nie możesz zmienić roli tej osoby — ma co najmniej tyle, co ty.",
     "memberRemoved": "Użytkownik “{name}” został usunięty z grupy!",
     "members": "Członkowie",
     "membersAdministrationList": {
@@ -1031,6 +1032,11 @@
         "nonmembers-members": "Osoby niebędące członkami mogą widzieć listę członków",
         "nonmembers-profile": "Osoby spoza grupy widzą, że grupa istnieje",
         "nonmembers-read": "Osoby niebędące członkami mogą czytać wpisy"
+      },
+      "simpleGroups": {
+        "applicants": "Oczekujący",
+        "members": "Członkowie",
+        "outsiders": "Osoby spoza grupy"
       },
       "systemRole": "Rola systemowa: nie można jej usunąć ani zmienić jej nazwy",
       "title": "Uprawnienia",

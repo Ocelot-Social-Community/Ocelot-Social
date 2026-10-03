@@ -44,9 +44,6 @@
         </template>
 
         <template #actions>
-          <os-button :disabled="saving || !canManageRoles" data-test="reset" @click="confirmReset">
-            {{ $t('group.rights.reset') }}
-          </os-button>
           <!-- Guarded: the simple view holds a DRAFT now, and switching away from it used to
                throw that draft out without a word. -->
           <button
@@ -425,8 +422,14 @@ export default {
      * Confirmed, because it replaces every role rather than changing one right — and named in
      * the question, so "I meant the other one" is caught before the roles are gone.
      */
+    /**
+     * Picking a template — including the one the group already runs on, which is what "reset to
+     * defaults" used to be. Two controls for one act was one too many, and the old one was
+     * worse than redundant: it looked the template up by the group's VISIBILITY, so a group
+     * whose rights had drifted away from its preset was reset to a different preset than the
+     * one it came from.
+     */
     confirmApplyTemplate(name) {
-      if (name === this.group.template) return
       this.templateToApply = name
     },
     async applyTemplate(template) {
@@ -468,23 +471,6 @@ export default {
         })
         this.roles = this.roles.filter((role) => role.name !== this.activeRole.name)
         this.activeRoleName = USUAL_GROUP_ROLE
-      } catch (error) {
-        this.$toast.error(error.message)
-      } finally {
-        this.saving = false
-      }
-    },
-    async confirmReset() {
-      if (!window.confirm(this.$t('group.rights.confirmReset'))) return
-      this.saving = true
-      try {
-        const { data } = await this.$apollo.mutate({
-          mutation: resetGroupRolesMutation(),
-          variables: { groupId: this.group.id },
-        })
-        this.roles = data.resetGroupRoles
-        this.resetDraft()
-        this.$toast.success(this.$t('group.rights.saved'))
       } catch (error) {
         this.$toast.error(error.message)
       } finally {

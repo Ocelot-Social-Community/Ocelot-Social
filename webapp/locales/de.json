@@ -971,6 +971,7 @@
       "messageOwner": "Du bist <b>Inhaber</b> dieser Gruppe. Verlaesst du sie, bleibt sie moeglicherweise ohne Inhaber zurueck — dann kann nur noch eine Netzwerk-Administration sie wieder handlungsfaehig machen.<br>Gruppe <b>„{name}“</b> wirklich verlassen?",
       "title": "Möchtest du wirklich die Gruppe verlassen?"
     },
+    "memberOutranked": "Du kannst diese Person nicht umstufen — sie haelt mindestens so viel wie du.",
     "memberRemoved": "Nutzer „{name}“ wurde aus der Gruppe entfernt!",
     "members": "Mitglieder",
     "membersAdministrationList": {
@@ -1031,6 +1032,11 @@
         "nonmembers-members": "Aussenstehende duerfen die Mitgliederliste sehen",
         "nonmembers-profile": "Außenstehende sehen, dass es die Gruppe gibt",
         "nonmembers-read": "Aussenstehende duerfen die Beitraege lesen"
+      },
+      "simpleGroups": {
+        "applicants": "Wartende",
+        "members": "Mitglieder",
+        "outsiders": "Aussenstehende"
       },
       "systemRole": "Systemrolle: kann nicht geloescht oder umbenannt werden",
       "title": "Rechte",

@@ -155,12 +155,13 @@ describe(redeemInviteCode, () => {
       })
     })
 
-    // The same link into a group that HAS its roles: the rights decide, and this group's
-    // non-member role may only ask to join.
-    it('lands an invited person where the group`s own rights say', async () => {
+    // The same link into a group whose door is SHUT to strangers. An invitation is the
+    // approval, so it does not land the invited person in a waiting room — which is what it
+    // used to do, in the one kind of group where an invitation is the only way in at all.
+    it('lands an invited person as a member even where strangers must ask', async () => {
       await database.write({
         query: `MATCH (host:User { id: 'invite-host' })
-                MERGE (group:Group { id: 'rights-group', template: 'public' })
+                MERGE (group:Group { id: 'rights-group', template: 'closed' })
                 MERGE (group)-[:HAS_GROUP_ROLE]->(role:GroupRole { id: 'rights-group:none' })
                 SET role.name = 'none', role.permissions = $permissions
                 MERGE (host)-[:GENERATED]->(code:InviteCode { code: 'GRP002' })
@@ -174,9 +175,29 @@ describe(redeemInviteCode, () => {
         MATCH (user:User { id: 'invited-user' })
         RETURN head([(user)-[m:MEMBER_OF]->(:Group { id: 'rights-group' }) | m.role]) AS role`)
 
-      // Although the TEMPLATE is public: the group asked for approval, so the invited person
-      // waits. The rights outrank the preset a group started from.
-      expect(records[0].get('role')).toBe('pending')
+      expect(records[0].get('role')).toBe('usual')
+    })
+
+    it('lands them as a member in an unlisted group, where there is no other way in', async () => {
+      // The dead end this replaces: an unlisted group grants no join right, so the invitee
+      // became an applicant holding nothing but `group.leave` — able to leave something they
+      // could not see, waiting for an approval from the person who had already invited them.
+      await database.write({
+        query: `MATCH (host:User { id: 'invite-host' })
+                MERGE (group:Group { id: 'secret-group', template: 'hidden' })
+                MERGE (group)-[:HAS_GROUP_ROLE]->(role:GroupRole { id: 'secret-group:none' })
+                SET role.name = 'none', role.permissions = '[]'
+                MERGE (host)-[:GENERATED]->(code:InviteCode { code: 'GRP003' })
+                MERGE (code)-[:INVITES_TO]->(group)`,
+      })
+
+      await expect(redeemInviteCode(contextFor('invited-user'), 'GRP003', true)).resolves.toBe(true)
+
+      const records = await codesOf(`
+        MATCH (user:User { id: 'invited-user' })
+        RETURN head([(user)-[m:MEMBER_OF]->(:Group { id: 'secret-group' }) | m.role]) AS role`)
+
+      expect(records[0].get('role')).toBe('usual')
     })
   })
 })

@@ -127,7 +127,10 @@ export const DEFAULT_GROUP_ROLE_TEMPLATES: GroupRoleTemplates = {
     // Posting is what a channel withholds — COMMENTING is not. A channel where nobody may
     // answer is a broadcast, and that is a different product; whether somebody who is not a
     // member may comment is a further question this template does not answer.
-    systemRole(USUAL_ROLE, MEMBER_BASELINE.filter((key) => key !== 'group.post.create')),
+    systemRole(
+      USUAL_ROLE,
+      MEMBER_BASELINE.filter((key) => key !== 'group.post.create'),
+    ),
     systemRole(ADMIN_ROLE, [...MEMBER_BASELINE, ...ADMIN_EXTRAS]),
     ownerRole(),
   ],

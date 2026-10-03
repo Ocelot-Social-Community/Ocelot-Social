@@ -1288,7 +1288,12 @@ describe('redeemInviteCode', () => {
       })
     })
 
-    it('returns true for a hidden group inviteCode and makes the user a pending member', async () => {
+    it('returns true for a hidden group inviteCode and makes the user a MEMBER', async () => {
+      // Changed deliberately: an invitation IS the approval. An unlisted group grants no join
+      // right, so landing the invitee as an applicant left them holding nothing but
+      // `group.leave` — able to leave something they could not see, waiting for an approval
+      // from the person who had just invited them.
+
       await expect(
         mutate({ mutation: redeemInviteCode, variables: { code: 'GRPHDN' } }),
       ).resolves.toMatchObject({
@@ -1322,7 +1327,7 @@ describe('redeemInviteCode', () => {
                 slug: 'other-user',
               },
               membership: {
-                role: 'pending',
+                role: 'usual',
               },
             },
           ]),

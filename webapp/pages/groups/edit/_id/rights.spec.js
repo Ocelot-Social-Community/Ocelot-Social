@@ -452,13 +452,15 @@ describe('rights.vue', () => {
     })
   })
 
-  it('does not ask at all when somebody clicks the template they are already on', async () => {
+  it('re-applies the template the group is already on, which is what "reset" was', async () => {
+    // One control instead of two. The old reset button looked its template up by the group's
+    // VISIBILITY, so a group whose rights had drifted was reset to a different preset than the
+    // one it came from.
     const wrapper = await Wrapper()
 
     await at(wrapper, 'template-public').trigger('click')
 
-    expect(wrapper.vm.templateToApply).toBeNull()
-    expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+    expect(wrapper.vm.templateToApply).toBe('public')
   })
 
   describe('the advanced view', () => {
@@ -548,31 +550,6 @@ describe('rights.vue', () => {
           variables: { groupId: 'group-1', name: 'editors', reassignTo: 'usual' },
         }),
       )
-      delete window.confirm
-    })
-
-    it('resets the roles to the network template after asking', async () => {
-      window.confirm = jest.fn().mockReturnValue(true)
-      mocks.$apollo.mutate = jest.fn().mockResolvedValue({
-        data: { resetGroupRoles: ROLES },
-      })
-      const wrapper = await Wrapper()
-
-      await at(wrapper, 'reset').trigger('click')
-      await wrapper.vm.$nextTick()
-
-      expect(window.confirm).toHaveBeenCalled()
-      expect(mocks.$apollo.mutate).toHaveBeenCalled()
-      delete window.confirm
-    })
-
-    it('does not reset when the question is declined', async () => {
-      window.confirm = jest.fn().mockReturnValue(false)
-      const wrapper = await Wrapper()
-
-      await at(wrapper, 'reset').trigger('click')
-
-      expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
       delete window.confirm
     })
 

@@ -38,3 +38,27 @@ export const applyRightChange = (permissions, permissionKey, enabled) => {
 }
 
 export default applyRightChange
+
+/**
+ * Whether the viewer may put this member on that role — the webapp side of `mayAssignGroupRole`
+ * in backend/src/groupRole/authority.ts.
+ *
+ * Two conditions, and they are about different people: the viewer must **cover** the role being
+ * handed out (hold every right it grants, so assigning is never a way to climb), and must
+ * **dominate** the member as they are now (hold strictly more than they do, so nobody can be
+ * reshaped by an equal or by somebody below them).
+ *
+ * Mirrored rather than left to the server because the server already refuses it: without this
+ * the picker offers a moderator the option of demoting an admin and the refusal arrives as a
+ * toast, which reads as a fault rather than as a rule.
+ */
+export const mayAssignGroupRole = ({ viewerPermissions, memberPermissions, rolePermissions }) => {
+  const held = new Set(viewerPermissions ?? [])
+  if (!held.has('group.member.role.assign')) return false
+  const covers = (rolePermissions ?? []).every((key) => held.has(key))
+  if (!covers) return false
+  // Strictly more than the member: a superset, and not the same set.
+  const member = new Set(memberPermissions ?? [])
+  const dominates = [...member].every((key) => held.has(key)) && held.size > member.size
+  return dominates
+}

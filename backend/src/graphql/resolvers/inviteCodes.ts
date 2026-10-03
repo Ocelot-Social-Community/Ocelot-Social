@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { branding } from '@src/branding'
-import { PENDING_ROLE, USUAL_ROLE } from '@src/groupRole'
+import { USUAL_ROLE } from '@src/groupRole'
 
 import Resolver from './helpers/Resolver'
 
@@ -143,24 +143,22 @@ export const redeemInviteCode = async (context: Context, code, newUser = false) 
     })
     // Group Invite Link
   } else {
-    // Where an invited membership lands follows the group's RIGHTS, exactly as JoinGroup does
-    // it: whoever may enter without approval (`group.join`) becomes a member, everybody else
-    // waits as an applicant. The group type still decides — it just does so through the
-    // non-member role it seeded, so a group that opened or closed its own door is not overruled
-    // here. The authorization is resolved for the redeeming viewer, who has no membership yet
-    // and therefore sees the group's `none` role.
-    const authorization = await context.groupAuthorization.forGroup(group.id as string)
-    // A group with no role definitions at all — one that predates them, or a deployment between
-    // the code and its migration — falls back to the template it runs on. Failing closed here
-    // would be wrong in a way the read paths can afford and this cannot: it would quietly turn
-    // every invited person into an applicant until the migration runs.
-    const role = (
-      authorization?.hasRoleDefinition
-        ? authorization.has('group.join')
-        : group.template === 'public'
-    )
-      ? USUAL_ROLE
-      : PENDING_ROLE
+    // An invitation IS the approval, so an invited person lands as a MEMBER — whatever the
+    // group's door says about strangers.
+    //
+    // This used to read the door (`group.join` on the non-member role) exactly as JoinGroup
+    // does, which produced a dead end in the one group where an invitation is the ONLY way in:
+    // an unlisted group grants no join right, so the invitee became an applicant holding
+    // nothing but `group.leave` — able to leave something they could not see, and waiting for
+    // an approval from somebody who had already given it by inviting them.
+    //
+    // The door answers "may a stranger let themselves in". That question does not arise here:
+    // somebody who holds `group.invite` has already decided, and the two rights the door is
+    // made of say nothing about people who were asked to come.
+    //
+    // A deliberate behaviour change (#10356-era review): the `pending` role now only does
+    // anything in a group that asks to be asked, which is the `closed` preset.
+    const role = USUAL_ROLE
 
     const optionalInvited = newUser
       ? 'MERGE (host)-[:INVITED { createdAt: toString(datetime()) }]->(user)'

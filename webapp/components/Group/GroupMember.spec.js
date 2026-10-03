@@ -258,3 +258,58 @@ describe('GroupMember', () => {
     })
   })
 })
+
+describe('who may be put on which role', () => {
+  // The server refuses both of these (groupRole/authority.ts: coverage AND dominance). Offering
+  // them anyway turned a RULE into a toast that reads like a fault.
+  const ROLES = [
+    { name: 'usual', label: null, system: true, protected: false, permissions: ['group.read'] },
+    {
+      name: 'admin',
+      label: null,
+      system: true,
+      protected: false,
+      permissions: ['group.read', 'group.member.role.assign', 'group.settings.manage'],
+    },
+  ]
+
+  const rowFor = (viewerPermissions, memberRole) =>
+    mount(GroupMember, {
+      localVue,
+      stubs,
+      mocks: { $t: (key) => key, $apollo: { mutate: jest.fn() }, $toast: { error: jest.fn() } },
+      propsData: {
+        ...propsData,
+        group: { id: 'group-id', myGroupPermissions: viewerPermissions },
+        groupRoles: ROLES,
+        groupMembers: [{ user: { id: 'u2', slug: 'them' }, membership: { role: memberRole } }],
+      },
+    })
+
+  const them = (role) => ({ membership: { role } })
+
+  it('does not offer a role the viewer could not grant themselves', () => {
+    const wrapper = rowFor(['group.member.role.assign', 'group.read'], 'usual')
+
+    expect(wrapper.vm.mayAssign(them('usual'), ROLES[1])).toBe(false)
+  })
+
+  it('does not let somebody reshape a member who holds as much as they do', () => {
+    const viewer = ['group.member.role.assign', 'group.read', 'group.settings.manage']
+    const wrapper = rowFor(viewer, 'admin')
+
+    expect(wrapper.vm.mayReshape(them('admin'))).toBe(false)
+  })
+
+  it('allows it where the viewer outranks the member and covers the role', () => {
+    const viewer = [
+      'group.member.role.assign',
+      'group.read',
+      'group.settings.manage',
+      'group.member.remove',
+    ]
+    const wrapper = rowFor(viewer, 'usual')
+
+    expect(wrapper.vm.mayAssign(them('usual'), ROLES[1])).toBe(true)
+  })
+})

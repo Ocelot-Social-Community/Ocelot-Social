@@ -971,6 +971,7 @@
       "messageOwner": "Je bent <b>eigenaar</b> van deze groep. Als je vertrekt, blijft die mogelijk zonder eigenaar achter — dan kan alleen een netwerkbeheer de groep weer werkbaar maken.<br>Groep <b>“{name}”</b> echt verlaten?",
       "title": "Wil je de groep echt verlaten?"
     },
+    "memberOutranked": "Je kunt de rol van deze persoon niet wijzigen — die heeft minstens evenveel als jij.",
     "memberRemoved": "Gebruiker “{name}” is uit de groep verwijderd!",
     "members": "Leden",
     "membersAdministrationList": {
@@ -1031,6 +1032,11 @@
         "nonmembers-members": "Niet-leden mogen de ledenlijst zien",
         "nonmembers-profile": "Buitenstaanders kunnen zien dat de groep bestaat",
         "nonmembers-read": "Niet-leden mogen de berichten lezen"
+      },
+      "simpleGroups": {
+        "applicants": "Wachtende aanvragers",
+        "members": "Leden",
+        "outsiders": "Buitenstaanders"
       },
       "systemRole": "Systeemrol: kan niet worden verwijderd of hernoemd",
       "title": "Rechten",

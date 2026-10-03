@@ -266,6 +266,7 @@ export const groupEditQuery = () => {
         about
         description
         visibility
+        template
         actionRadius
         locationName
         categories {
