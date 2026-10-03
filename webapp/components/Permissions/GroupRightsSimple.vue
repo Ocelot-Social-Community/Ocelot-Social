@@ -7,99 +7,98 @@
     template new groups start from. Both states are derived from the same non-member role in both
     places, so stating them in two implementations is how the two came to disagree.
 
-    Edits are a DRAFT. A single tick here can open a group to the whole network, and that is too
-    much to happen on the way past — the cards preview what the draft would make the group, and
-    nothing is written until somebody says so.
+    Edits are a DRAFT, and the draft is the PAGE's: the matrix under this edits the same roles,
+    and one draft for both is what lets a tick in either show up in the other. This component
+    shows the roles it is handed and says what it would change — the page decides when that is
+    written. A single tick here can open a group to the whole network, and that is too much to
+    happen on the way past.
   -->
   <div class="simple-rights">
     <!--
-      Two halves: what the group IS, and what sets it. Each control carried its state's glyph
-      for a while, which tied the two together but let a wrapped description drag its buttons
-      out of line — so the statements keep the pictures and the controls stand as a list of
-      their own, each under its own heading.
+      Two columns, one per state, each with its control above it: the template decides how far
+      the group can be seen, the door how somebody gets in. One grid rather than two stacks, so
+      the two states always start on the same line — however many rows the template buttons
+      wrap into.
     -->
-    <div class="states">
-      <!-- Left: what the group IS, each statement with its glyph, the two as one unit. -->
-      <div class="states__facts">
-        <div class="state" :data-test="`visibility-${visibility}`">
-          <os-icon
-            :icon="icons[visibilityIcon]"
-            size="2xl"
-            class="state__icon"
-            aria-hidden="true"
-          />
-          <div class="state__text">
-            <p class="state__caption">{{ caption }}</p>
-            <strong class="state__title" data-test="visibility-title">
-              {{ $t(`group.types.${visibility}`) }}
-            </strong>
-            <p class="state__description" data-test="visibility-description">
-              {{ $t(`group.typeDescriptions.${visibility}`) }}
-            </p>
-          </div>
-        </div>
-
-        <div class="state" :data-test="`admission-${admission}`">
-          <os-icon :icon="icons[admissionIcon]" size="2xl" class="state__icon" aria-hidden="true" />
-          <div class="state__text">
-            <p class="state__caption">{{ $t('group.admission.caption') }}</p>
-            <strong class="state__title" data-test="admission-title">
-              {{ $t(`group.admission.${admission}.title`) }}
-            </strong>
-            <p class="state__description" data-test="admission-description">
-              {{ $t(`group.admission.${admission}.description`) }}
-            </p>
-            <p v-if="admissionLocked" class="state__reason" data-test="admission-locked">
-              {{ $t('group.admission.needsVisibility') }}
-            </p>
-          </div>
-        </div>
+    <div class="overview">
+      <div class="template-control">
+        <span class="control-label">{{ $t('admin.groupRoles.templateLabel') }}</span>
+        <slot name="template-control" />
       </div>
 
       <!--
-        Right: what SETS them, as a block of labelled rows of its own — read as a list of
-        controls rather than hung off the pictures beside it. Each row carries its own heading,
-        which is what lets it stand away from the statement it changes.
+        Three states of ONE question, so one control with three positions rather than three
+        checkboxes: two ticks would let somebody express "anybody may enter AND must ask", which
+        the model has no answer for. A row of buttons rather than a dropdown: all three answers
+        are readable at once, which matters for a setting whose options are opposite ends of one
+        scale.
       -->
-      <div class="states__controls">
-        <!-- The page's own way of picking this — the template tabs on both levels. The LABEL is
-             here rather than in the slot: the page used to bring its own, and the two then stood
-             above each other saying "Vorlage" twice. -->
-        <div class="state__control">
-          <span class="state__control-label">{{ $t('admin.groupRoles.templateLabel') }}</span>
-          <slot name="visibility-control" />
+      <div class="admission-control" role="radiogroup" :aria-label="$t('group.admission.label')">
+        <span class="control-label">{{ $t('group.admission.label') }}</span>
+        <div class="control-options">
+          <button
+            v-for="state in admissionStates"
+            v-show="!admissionLocked || state === admission"
+            :key="state"
+            type="button"
+            role="radio"
+            :aria-checked="String(state === admission)"
+            class="admission-option"
+            :class="{ 'admission-option--active': state === admission }"
+            :disabled="!admissionEditable"
+            :title="admissionEditable ? null : admissionHint"
+            :data-test="`admission-option-${state}`"
+            @click="setAdmission(state)"
+            @mouseenter="previewAdmission(state)"
+            @mouseleave="clearPreview"
+          >
+            {{ $t(`group.admission.${state}.title`) }}
+          </button>
         </div>
+      </div>
 
-        <!--
-          Three states of ONE question, so one control with three positions rather than three
-          checkboxes: two ticks would let somebody express "anybody may enter AND must ask",
-          which the model has no answer for.
+      <!-- What the group IS — a status, not a control, so it is set apart as one: framed, sunk
+           in, and saying what it would become while something under the cursor would change it. -->
+      <div
+        class="state state--visibility"
+        :class="{ 'state--changes': nextVisibility }"
+        :data-test="`visibility-${visibility}`"
+      >
+        <os-icon :icon="icons[visibilityIcon]" class="state__icon" aria-hidden="true" />
+        <div class="state__text">
+          <p class="state__caption">{{ caption }}</p>
+          <strong class="state__title" data-test="visibility-title">
+            {{ $t(`group.types.${visibility}`) }}
+            <span v-if="nextVisibility" class="state__next" data-test="visibility-next">
+              → {{ $t(`group.types.${nextVisibility}`) }}
+            </span>
+          </strong>
+          <p class="state__description" data-test="visibility-description">
+            {{ $t(`group.typeDescriptions.${visibility}`) }}
+          </p>
+        </div>
+      </div>
 
-          A row of buttons rather than a dropdown: all three answers are readable at once, which
-          matters for a setting whose options are opposite ends of one scale.
-        -->
-        <div class="state__control" role="radiogroup" :aria-label="$t('group.admission.label')">
-          <span class="state__control-label">{{ $t('group.admission.label') }}</span>
-          <div class="state__control-options">
-            <button
-              v-for="state in admissionStates"
-              v-show="!admissionLocked || state === admission"
-              :key="state"
-              type="button"
-              role="radio"
-              :aria-checked="String(state === admission)"
-              class="admission-option"
-              :class="{ 'admission-option--active': state === admission }"
-              :disabled="!admissionEditable"
-              :title="admissionEditable ? null : admissionHint"
-              :data-test="`admission-option-${state}`"
-              @click="setAdmission(state)"
-              @mouseenter="highlightAdmission"
-              @mouseleave="clearHighlight"
-            >
-              {{ $t(`group.admission.${state}.title`) }}
-            </button>
-          </div>
+      <div
+        class="state state--admission"
+        :class="{ 'state--changes': nextAdmission }"
+        :data-test="`admission-${admission}`"
+      >
+        <os-icon :icon="icons[admissionIcon]" class="state__icon" aria-hidden="true" />
+        <div class="state__text">
+          <p class="state__caption">{{ $t('group.admission.caption') }}</p>
+          <strong class="state__title" data-test="admission-title">
+            {{ $t(`group.admission.${admission}.title`) }}
+            <span v-if="nextAdmission" class="state__next" data-test="admission-next">
+              → {{ $t(`group.admission.${nextAdmission}.title`) }}
+            </span>
+          </strong>
+          <p class="state__description" data-test="admission-description">
+            {{ $t(`group.admission.${admission}.description`) }}
+          </p>
+          <p v-if="admissionLocked" class="state__reason" data-test="admission-locked">
+            {{ $t('group.admission.needsVisibility') }}
+          </p>
         </div>
       </div>
     </div>
@@ -108,7 +107,13 @@
          in: what members may do, then what the people waiting see, then what everybody else
          sees. Eight sentences in one list made the reader find that grouping themselves. -->
     <div class="switch-groups">
-      <fieldset v-for="group in switchGroups" :key="group.name" class="switch-group">
+      <fieldset
+        v-for="group in switchGroups"
+        :key="group.name"
+        class="switch-group"
+        :class="{ 'switch-group--changes': group.changes }"
+        :data-test="`switch-group-${group.name}`"
+      >
         <legend class="switch-group__title">
           {{ $t(`group.rights.simpleGroups.${group.name}`) }}
         </legend>
@@ -117,9 +122,10 @@
             v-for="item in group.items"
             :key="item.id"
             class="switch"
+            :class="item.change && `switch--will-${item.change}`"
             :data-test="`switch-row-${item.id}`"
-            @mouseenter="highlightSwitch(item)"
-            @mouseleave="clearHighlight"
+            @mouseenter="previewSwitch(item)"
+            @mouseleave="clearPreview"
           >
             <label :class="{ 'switch--disabled': !item.editable }" :title="item.hint">
               <input
@@ -135,35 +141,28 @@
         </ul>
       </fieldset>
     </div>
-
-    <div class="actions">
-      <os-button :disabled="!dirty || disabled" data-test="simple-save" @click="save">
-        {{ $t('actions.save') }}
-      </os-button>
-      <os-button :disabled="!dirty || disabled" data-test="simple-revert" @click="resetDraft">
-        {{ $t('actions.cancel') }}
-      </os-button>
-      <!-- The buttons differ per level — a group resets to defaults, the admin applies to
-           groups — so the rest of the row belongs to the page. -->
-      <slot name="actions" />
-    </div>
   </div>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsIcon } from '@ocelot-social/ui'
 import { NONE_GROUP_ROLE, PENDING_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
 import { ADMISSION_STATES, admissionOf, JOIN_RIGHTS, withAdmission } from '~/utils/groupAdmission'
 import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
 import { applyRightChange, rightsTouchedBy } from '~/utils/groupRoleRights'
 import { iconRegistry } from '~/utils/iconRegistry'
+import { samePermissions } from '~/utils/permissionDiff'
 
-// Declared rather than hand-written per row: one sentence, one role, one right. The order is the
-// reading order — what members may do, then what applicants see, then what outsiders see.
-// Which heading each sentence belongs under — the role it is about, read as a group of people
-// rather than as a role key.
-const SWITCH_GROUPS = ['members', 'applicants', 'outsiders']
+// Which heading each sentence belongs under, and whose rights the heading is about — the role a
+// sentence is about, read as a group of people rather than as a role key. The order is the
+// reading order: what members may do, then what applicants see, then what outsiders see.
+const SWITCH_GROUPS = [
+  { name: 'members', role: USUAL_GROUP_ROLE },
+  { name: 'applicants', role: PENDING_GROUP_ROLE },
+  { name: 'outsiders', role: NONE_GROUP_ROLE },
+]
 
+// Declared rather than hand-written per row: one sentence, one role, one right.
 const SIMPLE_SWITCHES = [
   { id: 'members-post', group: 'members', role: USUAL_GROUP_ROLE, permission: 'group.post.create' },
   {
@@ -206,11 +205,24 @@ const SIMPLE_SWITCHES = [
 const VISIBILITY_ICONS = { public: 'globe', closed: 'lock', hidden: 'eyeSlash' }
 const ADMISSION_ICONS = { open: 'signIn', onRequest: 'handPointer', closed: 'ban' }
 
+const permissionsIn = (roles, name) => roles.find((role) => role.name === name)?.permissions ?? []
+
+/**
+ * What a sentence would go through, read from how it stands now and how it would stand after:
+ * ticked or unticked first — that is the change somebody is about to make — and otherwise
+ * opened or closed for editing, which is what the door does to the applicant sentence.
+ */
+const changeBetween = (now, next) => {
+  if (now.enabled !== next.enabled) return next.enabled ? 'added' : 'removed'
+  if (now.editable !== next.editable) return next.editable ? 'enabled' : 'disabled'
+  return null
+}
+
 export default {
   name: 'GroupRightsSimple',
-  components: { OsButton, OsIcon },
+  components: { OsIcon },
   props: {
-    /** The group's (or template's) role definitions: `{ name, permissions, … }`. */
+    /** The group's (or template's) roles AS DRAFTED: `{ name, permissions, … }`. */
     roles: { type: Array, required: true },
     /** The group permission catalog, for the gate and prerequisite hints. */
     catalog: { type: Array, required: true },
@@ -224,20 +236,45 @@ export default {
     grantable: { type: Function, default: () => true },
     /** Why a single row cannot be ticked — a closed gate, a missing network right. */
     hintFor: { type: Function, default: () => null },
+    /**
+     * The roles as they would be after whatever the page has under the cursor — a template
+     * button, a matrix row — or null. Every sentence and state that would change says how.
+     */
+    preview: { type: Array, default: null },
   },
   data() {
-    return { icons: iconRegistry, admissionStates: ADMISSION_STATES, draft: {} }
+    return {
+      icons: iconRegistry,
+      admissionStates: ADMISSION_STATES,
+      /** The same, for this component's own controls under the cursor. */
+      ownPreview: null,
+    }
   },
   computed: {
+    /** What the cursor would do, wherever it is. */
+    previewRoles() {
+      return this.ownPreview ?? this.preview
+    },
     /**
-     * What the group would be if the draft were saved, read off the rights its NON-MEMBER role
-     * would then hold — the same two the backend derives it from.
+     * What the group would be with the roles as handed in, read off the rights its NON-MEMBER
+     * role holds — the same two the backend derives it from.
      */
     visibility() {
       return privacyLevelOf(this.permissionsOf(NONE_GROUP_ROLE))
     },
     admission() {
       return admissionOf(this.permissionsOf(NONE_GROUP_ROLE))
+    },
+    /** What the visibility would become, where the preview changes it. */
+    nextVisibility() {
+      if (!this.previewRoles) return null
+      const next = privacyLevelOf(permissionsIn(this.previewRoles, NONE_GROUP_ROLE))
+      return next === this.visibility ? null : next
+    },
+    nextAdmission() {
+      if (!this.previewRoles) return null
+      const next = admissionOf(permissionsIn(this.previewRoles, NONE_GROUP_ROLE))
+      return next === this.admission ? null : next
     },
     visibilityIcon() {
       return VISIBILITY_ICONS[this.visibility]
@@ -262,14 +299,42 @@ export default {
       return this.disabled ? this.disabledHint : null
     },
     switches() {
+      const now = this.switchesOf(this.roles)
+      const next = this.previewRoles && this.switchesOf(this.previewRoles)
+      return now.map((item, index) => ({
+        ...item,
+        change: next ? changeBetween(item, next[index]) : null,
+      }))
+    },
+    /**
+     * The sentences under their heading, in the order the headings are declared.
+     *
+     * A heading says so where the preview changes its role in a way none of its sentences can
+     * show — a template changing a right that has no sentence.
+     */
+    switchGroups() {
+      return SWITCH_GROUPS.map(({ name, role }) => {
+        const items = this.switches.filter((item) => item.group === name)
+        const changes =
+          !!this.previewRoles &&
+          !items.some((item) => item.change) &&
+          !samePermissions(this.permissionsOf(role), permissionsIn(this.previewRoles, role))
+        return { name, items, changes }
+      }).filter((group) => group.items.length > 0)
+    },
+  },
+  methods: {
+    /** Every sentence as it stands for these roles: ticked, editable, and why not. */
+    switchesOf(roles) {
+      const admission = admissionOf(permissionsIn(roles, NONE_GROUP_ROLE))
       return SIMPLE_SWITCHES.map((item) => {
-        const role = this.roleNamed(item.role)
+        const role = roles.find((candidate) => candidate.name === item.role)
         const permission = this.catalog.find((entry) => entry.key === item.permission)
         const allowed = !!role && !!permission && this.grantable(permission)
-        const moot = this.mootReasonFor(item)
+        const moot = this.mootReasonFor(item, admission)
         return {
           ...item,
-          enabled: this.permissionsOf(item.role).includes(item.permission),
+          enabled: permissionsIn(roles, item.role).includes(item.permission),
           editable: allowed && !this.disabled && !moot,
           // The reason it cannot be answered comes first: "you may not grant this" is true of a
           // locked row too, and the more specific answer is the useful one.
@@ -277,167 +342,137 @@ export default {
         }
       })
     },
-    /** The sentences under their heading, in the order the headings are declared. */
-    switchGroups() {
-      return SWITCH_GROUPS.map((name) => ({
-        name,
-        items: this.switches.filter((item) => item.group === name),
-      })).filter((group) => group.items.length > 0)
-    },
-    /** The roles the draft would change, and what it would change them to. */
-    changes() {
-      return this.roles
-        .filter((role) => this.draft[role.name])
-        .map((role) => ({ name: role.name, permissions: this.draft[role.name] }))
-        .filter(({ name, permissions }) => !this.same(permissions, this.storedPermissions(name)))
-    },
-    dirty() {
-      return this.changes.length > 0
-    },
-  },
-  watch: {
-    // A fresh answer from the server replaces the draft: what is on screen must be what is
-    // stored, or the next save would write an edit against a group that moved on.
-    roles() {
-      this.resetDraft()
-    },
-    // Announced so a page showing the matrix as well can lock it: both edit the same roles, and
-    // whichever saved second would discard the other without saying so.
-    dirty(value) {
-      this.$emit('dirty', value)
-    },
-  },
-  methods: {
     /**
      * Why a sentence has nothing to decide, or null.
      *
-     * Today only the applicant ones: a role nobody can hold answers no question. Which is read
-     * off the DRAFT's admission rather than off what is stored, so choosing "anybody may walk
-     * in" greys the applicant row under the cursor instead of one save later — the two controls
-     * are side by side, and a live setting with a stale consequence next to it is worse than no
-     * consequence at all.
+     * Today only the applicant ones: a role nobody can hold answers no question. Read off the
+     * door of the roles in question, so choosing "anybody may walk in" greys the applicant row
+     * under the cursor instead of one save later — and hovering that choice shows it coming.
      */
-    mootReasonFor(item) {
+    mootReasonFor(item, admission) {
       if (item.role !== PENDING_GROUP_ROLE) return null
-      return this.admission === 'onRequest' ? null : this.$t('group.rights.pendingBlocked')
+      return admission === 'onRequest' ? null : this.$t('group.rights.pendingBlocked')
     },
     roleNamed(name) {
       return this.roles.find((role) => role.name === name)
     },
-    storedPermissions(name) {
-      return this.roleNamed(name)?.permissions ?? []
-    },
-    /** What the role holds in the draft, falling back to what is stored. */
     permissionsOf(name) {
-      return this.draft[name] ?? this.storedPermissions(name)
+      return permissionsIn(this.roles, name)
     },
-    same(left, right) {
-      const a = new Set(left)
-      const b = new Set(right)
-      return a.size === b.size && [...a].every((key) => b.has(key))
+    /** These roles with one of them changed. */
+    rolesWith(name, permissions) {
+      return this.roles.map((role) => (role.name === name ? { ...role, permissions } : role))
     },
     toggle(item, enabled) {
       // Through the coupling: ticking "outsiders may read the posts" also grants the right to
       // see the group at all, and unticking that one takes the posts with it.
-      this.$set(
-        this.draft,
+      this.$emit(
+        'change',
         item.role,
         applyRightChange(this.permissionsOf(item.role), item.permission, enabled),
       )
     },
     setAdmission(state) {
-      this.$set(
-        this.draft,
+      this.$emit(
+        'change',
         NONE_GROUP_ROLE,
         withAdmission(this.permissionsOf(NONE_GROUP_ROLE), state),
       )
     },
     /**
-     * What the cursor is pointing at, as `{ roleName: [permissionKey] }`.
-     *
-     * One sentence here stands for one right on one role, and the matrix below states the same
-     * thing in the catalog's own vocabulary. Saying which is which costs a hover: the page marks
-     * the rows AND the role tab the sentence reaches, so the two views stop being two unrelated
-     * lists of the same facts. Emitted rather than rendered here — what the mark looks like
-     * belongs to whatever is showing the rights.
+     * The cursor on a sentence: what a click would do — the tick itself and whatever the
+     * coupling drags along — and, for the page, the rights it stands for in the matrix.
      */
-    highlightSwitch(item) {
+    previewSwitch(item) {
+      this.ownPreview = item.editable
+        ? this.rolesWith(
+            item.role,
+            applyRightChange(this.permissionsOf(item.role), item.permission, !item.enabled),
+          )
+        : null
       this.$emit('highlight', { [item.role]: rightsTouchedBy(item.permission) })
     },
     /**
-     * Both join rights, whichever of the three the cursor is on: picking a state REWRITES the
-     * pair (see `withAdmission`), so "closed" is as much about `group.join` as "open" is.
+     * The cursor on a door: what picking it would do — which reaches further than the door
+     * itself, since the applicant sentence only means something behind one that asks. For the
+     * page, both join rights (picking a state REWRITES the pair) and the applicant role.
      */
-    highlightAdmission() {
-      this.$emit('highlight', { [NONE_GROUP_ROLE]: [...JOIN_RIGHTS] })
+    previewAdmission(state) {
+      this.ownPreview =
+        this.admissionEditable && state !== this.admission
+          ? this.rolesWith(
+              NONE_GROUP_ROLE,
+              withAdmission(this.permissionsOf(NONE_GROUP_ROLE), state),
+            )
+          : null
+      this.$emit('highlight', { [NONE_GROUP_ROLE]: [...JOIN_RIGHTS], [PENDING_GROUP_ROLE]: [] })
     },
-    clearHighlight() {
+    clearPreview() {
+      this.ownPreview = null
       this.$emit('highlight', null)
-    },
-    resetDraft() {
-      this.draft = {}
-    },
-    save() {
-      this.$emit('save', this.changes)
     },
   },
 }
 </script>
 
 <style scoped>
-/*
- * Two halves, the way the sentences below are two columns: on the left what the group IS, each
- * statement with its glyph; on the right what SETS those two, as a labelled block of its own.
- *
- * The controls do NOT line up with the pictures. They used to, and then the longer of the two
- * statements pushed its row of buttons down and the two rows stopped reading as one list — the
- * row of buttons is a list of choices, so it starts at the top of the box and stacks.
- */
-.states {
-  display: grid;
-  gap: var(--space-base) var(--space-large);
-  margin-bottom: var(--space-large);
-
-  @media (--vp-desktop-up) {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-/* One rhythm for both halves, so a block on the left and a block on the right sit the same
-   distance apart — the two used to be spaced by whatever their contents happened to be. */
-.states__facts,
-.states__controls {
+.simple-rights {
   display: flex;
   flex-direction: column;
   gap: var(--space-large);
-  align-self: start;
 }
 
-/* Top-aligned, not centred: the glyph belongs beside the first line of what it illustrates. A
-   centred icon drifted half a statement down as soon as the description wrapped to four lines. */
-.state {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-base);
+/*
+ * Control above its state, the two pairs side by side. One grid, so row two starts at the same
+ * height in both columns however far either control wraps; on a phone the pairs stack.
+ */
+.overview {
+  display: grid;
+  gap: var(--space-small) var(--space-large);
+  grid-template-areas: 'template' 'visibility' 'door-control' 'door';
+
+  @media (--vp-desktop-up) {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'template door-control'
+      'visibility door';
+  }
+}
+
+.template-control {
+  grid-area: template;
+}
+
+.admission-control {
+  grid-area: door-control;
+}
+
+.state--visibility {
+  grid-area: visibility;
+}
+
+.state--admission {
+  grid-area: door;
 }
 
 /* The heading stands ABOVE its buttons, like the headings over the sentences below. Beside
    them it read as a first, unclickable option in the row. */
-.state__control {
+.template-control,
+.admission-control {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-xx-small);
 }
 
-.state__control-options {
+.control-options {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-xx-small);
 }
 
-.state__control-label {
+.control-label {
   color: var(--text-color-softer);
   font-size: 0.85em;
   text-transform: uppercase;
@@ -445,12 +480,34 @@ export default {
 }
 
 /*
- * OsIcon sizes itself in `em` (ICON_SIZES), so a width/height in pixels here was simply ignored
- * and the glyph came out at text size. The font-size is the handle; `2xl` is 2.5em of it.
+ * A status of the group rather than something to click: framed and sunk into the page, like a
+ * display set into a panel. Top-aligned, not centred — the glyph belongs beside the first line
+ * of what it illustrates.
  */
+.state {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-small);
+  padding: var(--space-small) var(--space-base);
+  border: 1px solid var(--border-color-softer);
+  border-radius: var(--border-radius-base);
+  background: var(--background-color-softer);
+  box-shadow: inset 0 1px 4px rgb(0 0 0 / 12%);
+  font-size: 0.9em;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color 0.1s ease;
+}
+
+/* Something under the cursor would change it — the line under the title says into what. */
+.state--changes {
+  outline-color: var(--color-primary);
+}
+
+/* OsIcon sizes itself in `em`, so the font-size is the handle. */
 .state__icon {
   flex: 0 0 auto;
-  font-size: 1.6rem;
+  font-size: 1.75rem;
   color: var(--text-color-soft);
 }
 
@@ -458,6 +515,21 @@ export default {
   display: flex;
   flex-direction: column;
   gap: var(--space-xxx-small);
+}
+
+.state__caption,
+.state__description,
+.state__reason {
+  margin: 0;
+}
+
+.state__caption {
+  color: var(--text-color-soft);
+}
+
+.state__next {
+  color: var(--color-primary);
+  white-space: nowrap;
 }
 
 /* The same pill the template tabs are, so the two rows read as the same kind of choice. */
@@ -526,14 +598,47 @@ export default {
   letter-spacing: 0.03em;
 }
 
+/* A right of this role would change, but none that a sentence here names. */
+.switch-group--changes .switch-group__title {
+  color: var(--color-primary);
+}
+
 .switches {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
+/*
+ * What a click under the cursor would do to this sentence, in the matrix's own marks: a bar on
+ * the left, green for ticked, red for unticked — and dashed where the box is not ticked but
+ * opened (green) or closed (grey) for editing. Reserved up front, so a mark moves nothing.
+ */
 .switch {
-  margin: var(--space-x-small) 0;
+  margin: var(--space-xxx-small) 0;
+  padding: var(--space-xxx-small) var(--space-xx-small);
+  border-left: 3px solid transparent;
+  border-radius: var(--border-radius-small);
+  transition: background-color 0.1s ease;
+}
+
+.switch--will-added {
+  border-left-color: var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 14%, transparent);
+}
+
+.switch--will-removed {
+  border-left-color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 14%, transparent);
+}
+
+.switch--will-enabled {
+  border-left: 3px dashed var(--color-success);
+}
+
+.switch--will-disabled {
+  border-left: 3px dashed var(--text-color-disabled);
+  background: var(--background-color-softer);
 }
 
 .switch label {
@@ -546,13 +651,5 @@ export default {
 .switch--disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-small);
-  margin-top: var(--space-base);
 }
 </style>

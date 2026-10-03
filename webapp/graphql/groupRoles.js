@@ -5,11 +5,18 @@ import gql from 'graphql-tag'
 // a role more than the person editing it holds themselves.
 export const groupRightsQuery = () => gql`
   query ($id: ID!) {
-    # Every template a group can be put on, with what it makes the group. The permission SETS
-    # stay behind group.roleTemplate.manage — this is the vocabulary, not the contents.
+    # Every template a group can be put on, with what it makes the group and the roles it would
+    # replace the group's with — so hovering one can show what applying it would change.
     groupTemplates {
       name
       visibility
+      roles {
+        name
+        label
+        system
+        protected
+        permissions
+      }
     }
     groupPermissionCatalog {
       key

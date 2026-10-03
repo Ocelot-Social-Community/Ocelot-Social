@@ -21,9 +21,28 @@ const rolesWith = (nonMember = [], usual = ['group.post.create']) => [
   { name: 'usual', permissions: usual },
 ]
 
+/**
+ * Mounted the way a page holds it: every change it reports comes straight back in as the roles
+ * it is handed — which is all a page's draft does, as far as this component can tell.
+ */
+const controlled = (component, options) => {
+  const wrapper = mount(component, {
+    ...options,
+    listeners: {
+      change: (name, permissions) =>
+        wrapper.setProps({
+          roles: wrapper
+            .props('roles')
+            .map((role) => (role.name === name ? { ...role, permissions } : role)),
+        }),
+    },
+  })
+  return wrapper
+}
+
 describe('GroupRightsSimple', () => {
   const Wrapper = (propsData = {}) =>
-    mount(GroupRightsSimple, {
+    controlled(GroupRightsSimple, {
       localVue,
       mocks: { $t: (key) => key },
       propsData: { roles: rolesWith(), catalog: CATALOG, caption: 'Resulting:', ...propsData },
@@ -81,26 +100,24 @@ describe('GroupRightsSimple', () => {
       expect(at(wrapper, 'switch-members-comment').element.checked).toBe(false)
     })
 
-    it('collects the ticks into a draft and writes nothing until it is saved', async () => {
-      // One tick here can open a group to the whole network. The component owns no mutation
-      // either: the group level writes a group role, the admin level a template role, and only
-      // the page knows which — so the save hands over WHAT changed, per role.
-      const wrapper = Wrapper()
+    it('reports a tick as the role it would leave behind, and writes nothing itself', async () => {
+      // The draft is the page's: the matrix under this edits the same roles, and one draft for
+      // both is what lets a tick in either show up in the other. The component owns no mutation
+      // either — the group level writes a group role, the admin level a template role.
+      const wrapper = mount(GroupRightsSimple, {
+        localVue,
+        mocks: { $t: (key) => key },
+        propsData: { roles: rolesWith(), catalog: CATALOG, caption: 'Resulting:' },
+      })
 
       await at(wrapper, 'switch-nonmembers-read').setChecked(true)
 
-      expect(wrapper.emitted('save')).toBeUndefined()
-
-      await at(wrapper, 'simple-save').trigger('click')
-
-      expect(wrapper.emitted('save')).toEqual([
-        [[{ name: 'none', permissions: ['group.content.read', 'group.read'] }]],
-      ])
+      expect(wrapper.emitted('change')).toEqual([['none', ['group.content.read', 'group.read']]])
     })
 
     it('previews what the draft would make the group, before it is saved', async () => {
-      // The whole reason the save exists: the consequence has to be readable while it is still
-      // a draft, not discovered after the fact.
+      // The whole reason a draft exists: the consequence has to be readable while it is still
+      // one, not discovered after the fact.
       const wrapper = Wrapper({ roles: rolesWith([]) })
 
       expect(at(wrapper, 'visibility-hidden').exists()).toBe(true)
@@ -110,14 +127,14 @@ describe('GroupRightsSimple', () => {
       expect(at(wrapper, 'visibility-public').exists()).toBe(true)
     })
 
-    it('throws the draft away on cancel', async () => {
+    it('shows the roles it is handed, so a change made elsewhere on the page shows up here', async () => {
+      // A tick in the matrix reaches this component the same way: as the roles it is handed.
       const wrapper = Wrapper({ roles: rolesWith([]) })
 
-      await at(wrapper, 'switch-nonmembers-read').setChecked(true)
-      await at(wrapper, 'simple-revert').trigger('click')
+      await wrapper.setProps({ roles: rolesWith(['group.read']) })
 
-      expect(at(wrapper, 'visibility-hidden').exists()).toBe(true)
-      expect(at(wrapper, 'simple-save').attributes('disabled')).toBeTruthy()
+      expect(at(wrapper, 'visibility-closed').exists()).toBe(true)
+      expect(at(wrapper, 'switch-nonmembers-profile').element.checked).toBe(true)
     })
 
     it('locks every row when the page says so, and says why', () => {
@@ -153,7 +170,7 @@ describe('GroupRightsSimple', () => {
     it('marks which of the three the group is on, all three readable at once', () => {
       // A row of buttons rather than a dropdown: the options are opposite ends of one scale,
       // and a closed dropdown shows neither of the others next to the one it has.
-      const wrapper = Wrapper({ roles: rolesWith(['group.join']) })
+      const wrapper = Wrapper({ roles: rolesWith(['group.read', 'group.join']) })
 
       expect(at(wrapper, 'admission-option-open').classes()).toContain('admission-option--active')
       expect(at(wrapper, 'admission-option-closed').classes()).not.toContain(
@@ -176,11 +193,8 @@ describe('GroupRightsSimple', () => {
       const wrapper = Wrapper({ roles: rolesWith(['group.read', 'group.join.request']) })
 
       await at(wrapper, 'admission-option-open').trigger('click')
-      await at(wrapper, 'simple-save').trigger('click')
 
-      expect(wrapper.emitted('save')).toEqual([
-        [[{ name: 'none', permissions: ['group.read', 'group.join'] }]],
-      ])
+      expect(wrapper.emitted('change')).toEqual([['none', ['group.read', 'group.join']]])
     })
 
     it('previews the new door before it is saved', async () => {
@@ -252,6 +266,15 @@ describe('what it points at', () => {
     expect(marked.none.sort()).toEqual(['group.join', 'group.join.request'])
   })
 
+  it('points at the applicant role from the door, which decides whether there are any', async () => {
+    const wrapper = Wrapper({ roles: rolesWith(['group.read']) })
+
+    await wrapper.find('[data-test="admission-option-onRequest"]').trigger('mouseenter')
+
+    const [marked] = wrapper.emitted('highlight').at(-1)
+    expect(marked.pending).toEqual([])
+  })
+
   it('points from a LOCKED sentence too, so a blocked right can still be found', async () => {
     // The handler sits on the row rather than on the input: a right one may not grant is the
     // one a reader most needs to locate in the matrix.
@@ -272,9 +295,117 @@ describe('what it points at', () => {
   })
 })
 
-describe('a sentence with nothing to decide', () => {
+describe('what a click would do', () => {
+  // Hovering anything that changes rights — a sentence, a door, a template, a matrix row — shows
+  // what clicking it would do to every sentence and both states, before anything changes.
   const Wrapper = (propsData = {}) =>
     mount(GroupRightsSimple, {
+      localVue,
+      mocks: { $t: (key) => key },
+      propsData: {
+        roles: rolesWith(['group.read', 'group.join.request']),
+        catalog: [...CATALOG, { key: 'group.join' }, { key: 'group.join.request' }],
+        caption: 'Resulting:',
+        ...propsData,
+      },
+    })
+
+  const row = (wrapper, id) => wrapper.find(`[data-test="switch-row-${id}"]`)
+
+  it('shows nothing while nothing is under the cursor', () => {
+    const wrapper = Wrapper()
+
+    expect(wrapper.findAll('[class*="switch--will-"]')).toHaveLength(0)
+    expect(wrapper.findAll('.state--changes')).toHaveLength(0)
+  })
+
+  it('marks a sentence the preview ticks green and one it unticks red', () => {
+    const wrapper = Wrapper({
+      preview: rolesWith(['group.read', 'group.join.request'], ['group.comment.create']),
+    })
+
+    expect(row(wrapper, 'members-comment').classes()).toContain('switch--will-added')
+    expect(row(wrapper, 'members-post').classes()).toContain('switch--will-removed')
+    expect(row(wrapper, 'members-chat').classes()).toEqual(['switch'])
+  })
+
+  it('says what a state would become', () => {
+    const wrapper = Wrapper({ preview: rolesWith(['group.read', 'group.content.read']) })
+
+    expect(wrapper.find('[data-test="visibility-closed"]').classes()).toContain('state--changes')
+    expect(wrapper.find('[data-test="visibility-next"]').text()).toContain('group.types.public')
+    expect(wrapper.find('[data-test="admission-next"]').text()).toContain(
+      'group.admission.closed.title',
+    )
+  })
+
+  it('shows the door opening the applicant sentence up, or closing it, as it would', async () => {
+    // Not a tick: the door decides whether the applicant sentence can be answered at all.
+    const wrapper = Wrapper()
+
+    await wrapper.find('[data-test="admission-option-open"]').trigger('mouseenter')
+
+    expect(row(wrapper, 'applicants-read').classes()).toContain('switch--will-disabled')
+    expect(wrapper.find('[data-test="admission-next"]').text()).toContain(
+      'group.admission.open.title',
+    )
+
+    await wrapper.find('[data-test="admission-option-open"]').trigger('mouseleave')
+    await wrapper.setProps({ roles: rolesWith(['group.read', 'group.join']) })
+    await wrapper.find('[data-test="admission-option-onRequest"]').trigger('mouseenter')
+
+    expect(row(wrapper, 'applicants-read').classes()).toContain('switch--will-enabled')
+  })
+
+  it('shows nothing for the door the group already has', async () => {
+    const wrapper = Wrapper()
+
+    await wrapper.find('[data-test="admission-option-onRequest"]').trigger('mouseenter')
+
+    expect(wrapper.findAll('[class*="switch--will-"]')).toHaveLength(0)
+  })
+
+  it('shows a sentence ticking what the coupling would tick along with it', async () => {
+    const wrapper = Wrapper({ roles: rolesWith([]) })
+
+    await row(wrapper, 'nonmembers-read').trigger('mouseenter')
+
+    expect(row(wrapper, 'nonmembers-read').classes()).toContain('switch--will-added')
+    expect(row(wrapper, 'nonmembers-profile').classes()).toContain('switch--will-added')
+    expect(wrapper.find('[data-test="visibility-next"]').text()).toContain('group.types.public')
+
+    await row(wrapper, 'nonmembers-read').trigger('mouseleave')
+
+    expect(wrapper.findAll('[class*="switch--will-"]')).toHaveLength(0)
+  })
+
+  it('previews nothing from a sentence that cannot be clicked', async () => {
+    const wrapper = Wrapper({ disabled: true })
+
+    await row(wrapper, 'members-post').trigger('mouseenter')
+
+    expect(wrapper.findAll('[class*="switch--will-"]')).toHaveLength(0)
+  })
+
+  it('marks the heading of a role whose change no sentence names', () => {
+    const wrapper = Wrapper({
+      preview: [...rolesWith(['group.read', 'group.join.request'])].map((role) =>
+        role.name === 'usual' ? { ...role, permissions: [...role.permissions, 'group.pin'] } : role,
+      ),
+    })
+
+    expect(wrapper.find('[data-test="switch-group-members"]').classes()).toContain(
+      'switch-group--changes',
+    )
+    expect(wrapper.find('[data-test="switch-group-outsiders"]').classes()).not.toContain(
+      'switch-group--changes',
+    )
+  })
+})
+
+describe('a sentence with nothing to decide', () => {
+  const Wrapper = (propsData = {}) =>
+    controlled(GroupRightsSimple, {
       localVue,
       mocks: { $t: (key) => key },
       propsData: {

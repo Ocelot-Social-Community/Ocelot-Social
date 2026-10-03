@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 
 import rights from './rights.vue'
 
@@ -87,6 +88,23 @@ const ROLES = [
   },
 ]
 
+// What each template would put on the group. `closed` differs from the fixture's roles in two
+// places: outsiders may see the profile, and members may comment.
+const withPermissions = (changes) =>
+  ROLES.map((role) => (changes[role.name] ? { ...role, permissions: changes[role.name] } : role))
+const TEMPLATES = [
+  { name: 'public', roles: ROLES },
+  {
+    name: 'closed',
+    roles: withPermissions({
+      none: ['group.read'],
+      usual: ['group.post.create', 'group.members.read', 'group.comment.create'],
+    }),
+  },
+  { name: 'hidden', roles: ROLES },
+  { name: 'channel', roles: ROLES },
+]
+
 describe('rights.vue', () => {
   let mocks
 
@@ -142,10 +160,9 @@ describe('rights.vue', () => {
     })
     wrapper.setData({
       catalog: CATALOG,
-      templateNames: ['public', 'closed', 'hidden', 'channel'],
+      templates: TEMPLATES,
       roles: ROLES,
       myGroupPermissions,
-      draft: ROLES.find((role) => role.name === 'usual').permissions,
     })
     await wrapper.vm.$nextTick()
     return wrapper
@@ -170,7 +187,7 @@ describe('rights.vue', () => {
     // What the SAVE wrote for the non-member role. Each tick is a draft now; nothing reaches
     // the server until somebody presses save.
     const noneRoleAfter = async (wrapper) => {
-      await at(wrapper, 'simple-save').trigger('click')
+      await at(wrapper, 'save').trigger('click')
       const call = mocks.$apollo.mutate.mock.calls.at(-1)[0]
       return call.variables.permissions
     }
@@ -212,28 +229,18 @@ describe('rights.vue', () => {
       expect(at(wrapper, 'visibility-title').text()).toContain('group.types.hidden')
     })
 
-    it("reads the matrix's unsaved draft while the non-member role is the one being edited", async () => {
-      // The two views are on screen together, and only one of them may hold a draft at a time.
-      // The card is the one statement of what the group is, so it has to follow whichever view
-      // is being edited — a card still saying "hidden" over a ticked, unsaved `group.read` is
-      // the one place this page can contradict itself.
+    it("reads the matrix's unsaved ticks, because both views edit one draft", async () => {
+      // The card is the one statement of what the group is, so it has to follow every edit —
+      // a card still saying "hidden" over a ticked, unsaved `group.read` is the one place this
+      // page could contradict itself.
       const wrapper = await Wrapper()
-      wrapper.setData({ advanced: true })
-      await wrapper.vm.$nextTick()
+      await at(wrapper, 'to-advanced').trigger('click')
+      await at(wrapper, 'role-tab-none').trigger('click')
 
-      // Switching the tab reloads the draft from the role, so the draft is set afterwards —
-      // the same order a click and a tick produce.
-      wrapper.setData({ activeRoleName: 'none' })
-      await wrapper.vm.$nextTick()
-      wrapper.setData({ draft: ['group.read', 'group.content.read'] })
-      await wrapper.vm.$nextTick()
-
-      expect(at(wrapper, 'visibility-title').text()).toContain('group.types.public')
-
-      wrapper.setData({ draft: ['group.read'] })
-      await wrapper.vm.$nextTick()
+      await at(wrapper, 'perm-group.read').setChecked(true)
 
       expect(at(wrapper, 'visibility-title').text()).toContain('group.types.closed')
+      expect(at(wrapper, 'switch-nonmembers-profile').element.checked).toBe(true)
     })
   })
 
@@ -255,20 +262,91 @@ describe('rights.vue', () => {
       expect(at(wrapper, 'role-tab-none').classes()).toContain('role-tab--touched')
     })
 
-    it('marks every role for a template button, because applying one replaces all of them', async () => {
-      // What a template would change TO cannot be shown here: its contents sit behind
-      // `group.roleTemplate.manage`, which a group owner does not hold. How FAR it reaches can.
+    it('marks what a template would change — sentences, states and role tabs', async () => {
+      // Putting a template on replaces every role, so what it would change has to be readable
+      // before the click: here, outsiders gain the profile and members gain comments.
       const wrapper = await Wrapper()
-      wrapper.setData({ advanced: true })
-      await wrapper.vm.$nextTick()
+      await at(wrapper, 'to-advanced').trigger('click')
 
       await at(wrapper, 'template-closed').trigger('mouseenter')
 
-      expect(wrapper.findAll('.role-tab--touched').length).toBe(ROLES.length)
+      expect(at(wrapper, 'switch-row-nonmembers-profile').classes()).toContain('switch--will-added')
+      expect(at(wrapper, 'switch-row-members-comment').classes()).toContain('switch--will-added')
+      expect(at(wrapper, 'switch-row-members-post').classes()).toEqual(['switch'])
+      expect(at(wrapper, 'visibility-next').text()).toContain('group.types.closed')
+      expect(at(wrapper, 'role-tab-none').classes()).toContain('role-tab--touched')
+      expect(at(wrapper, 'role-tab-pending').classes()).not.toContain('role-tab--touched')
+      // The matrix of the role on screen says added or removed, as for a hovered role.
+      expect(classesOf(wrapper, 'group.comment.create')).toContain('perm-row--added')
 
       await at(wrapper, 'template-closed').trigger('mouseleave')
 
       expect(wrapper.findAll('.role-tab--touched')).toHaveLength(0)
+      expect(wrapper.findAll('[class*="switch--will-"]')).toHaveLength(0)
+    })
+
+    it('marks nothing for the template the group already matches', async () => {
+      const wrapper = await Wrapper()
+
+      await at(wrapper, 'template-public').trigger('mouseenter')
+
+      expect(wrapper.findAll('[class*="switch--will-"]')).toHaveLength(0)
+      expect(wrapper.findAll('.state--changes')).toHaveLength(0)
+    })
+
+    it('points from a matrix row back at its sentence and the state it decides', async () => {
+      const wrapper = await Wrapper()
+      await at(wrapper, 'to-advanced').trigger('click')
+      await at(wrapper, 'role-tab-none').trigger('click')
+
+      const row = wrapper
+        .findAll('.perm-row')
+        .filter((candidate) => candidate.find('[data-test="perm-group.read"]').exists())
+      await row.at(0).trigger('mouseenter')
+
+      // What ticking that row would do, said in the sentences' own terms.
+      expect(at(wrapper, 'switch-row-nonmembers-profile').classes()).toContain('switch--will-added')
+      expect(at(wrapper, 'visibility-next').text()).toContain('group.types.closed')
+
+      await row.at(0).trigger('mouseleave')
+
+      expect(wrapper.findAll('[class*="switch--will-"]')).toHaveLength(0)
+    })
+
+    it('previews an untick from a matrix row whose right is held', async () => {
+      const wrapper = await Wrapper()
+      await at(wrapper, 'to-advanced').trigger('click')
+      const row = wrapper
+        .findAll('.perm-row')
+        .filter((candidate) => candidate.find('[data-test="perm-group.post.create"]').exists())
+
+      await row.at(0).trigger('mouseenter')
+
+      expect(at(wrapper, 'switch-row-members-post').classes()).toContain('switch--will-removed')
+    })
+
+    it('previews nothing from a matrix row that cannot be ticked', async () => {
+      const wrapper = await Wrapper()
+      await at(wrapper, 'to-advanced').trigger('click')
+      const row = wrapper
+        .findAll('.perm-row')
+        .filter((candidate) => candidate.find('[data-test="perm-group.leave"]').exists())
+
+      await row.at(0).trigger('mouseenter')
+
+      expect(wrapper.vm.previewRoles).toBeNull()
+    })
+
+    it('points from the door at the applicants, who exist only behind one', async () => {
+      const wrapper = await Wrapper()
+      wrapper.setData({ roles: withPermissions({ none: ['group.read'] }) })
+      await wrapper.vm.$nextTick()
+      await at(wrapper, 'to-advanced').trigger('click')
+
+      await at(wrapper, 'admission-option-onRequest').trigger('mouseenter')
+
+      expect(at(wrapper, 'admission-next').exists()).toBe(true)
+      expect(at(wrapper, 'role-tab-pending').classes()).toContain('role-tab--touched')
     })
   })
 
@@ -284,7 +362,7 @@ describe('rights.vue', () => {
     const wrapper = await Wrapper()
 
     await at(wrapper, 'switch-members-post').setChecked(false)
-    await at(wrapper, 'simple-save').trigger('click')
+    await at(wrapper, 'save').trigger('click')
     await wrapper.vm.$nextTick()
 
     expect(mocks.$toast.error).toHaveBeenCalled()
@@ -294,7 +372,7 @@ describe('rights.vue', () => {
     const wrapper = await Wrapper()
 
     await at(wrapper, 'switch-members-post').setChecked(false)
-    await at(wrapper, 'simple-save').trigger('click')
+    await at(wrapper, 'save').trigger('click')
 
     expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -306,6 +384,114 @@ describe('rights.vue', () => {
         }),
       }),
     )
+  })
+
+  describe('one draft for both views', () => {
+    // The sentences and the matrix used to keep a draft each, and each locked the other while
+    // it held one — whichever saved second would have thrown the other's edit away. One draft
+    // makes the lock unnecessary.
+    it('keeps the matrix editable while a sentence holds an unsaved edit', async () => {
+      const wrapper = await Wrapper()
+      await at(wrapper, 'switch-members-post').setChecked(false)
+      await at(wrapper, 'to-advanced').trigger('click')
+
+      expect(at(wrapper, 'perm-group.comment.create').element.disabled).toBe(false)
+      // …and the matrix shows the sentence's edit, because it is the same draft.
+      expect(at(wrapper, 'perm-group.post.create').element.checked).toBe(false)
+    })
+
+    it('keeps an edit when another role is opened, and the tab says so', async () => {
+      const wrapper = await Wrapper()
+      await at(wrapper, 'to-advanced').trigger('click')
+      await at(wrapper, 'perm-group.comment.create').setChecked(true)
+
+      await at(wrapper, 'role-tab-none').trigger('click')
+
+      expect(at(wrapper, 'role-tab-drafted-usual').exists()).toBe(true)
+      expect(at(wrapper, 'role-tab-drafted-none').exists()).toBe(false)
+
+      await at(wrapper, 'role-tab-usual').trigger('click')
+
+      expect(at(wrapper, 'perm-group.comment.create').element.checked).toBe(true)
+    })
+
+    it('drops a role from the draft once its edit is undone by hand', async () => {
+      const wrapper = await Wrapper()
+      await at(wrapper, 'switch-members-comment').setChecked(true)
+      await at(wrapper, 'switch-members-comment').setChecked(false)
+
+      expect(wrapper.vm.dirty).toBe(false)
+      expect(at(wrapper, 'save').element.disabled).toBe(true)
+    })
+
+    it('writes every changed role with one save, and says so once', async () => {
+      mocks.$apollo.mutate = jest.fn(({ variables }) =>
+        Promise.resolve({
+          data: {
+            updateGroupRole: {
+              ...ROLES.find((role) => role.name === variables.name),
+              permissions: variables.permissions,
+            },
+          },
+        }),
+      )
+      const wrapper = await Wrapper()
+      await at(wrapper, 'switch-nonmembers-profile').setChecked(true)
+      await at(wrapper, 'switch-members-comment').setChecked(true)
+
+      await at(wrapper, 'save').trigger('click')
+      await flushPromises()
+
+      expect(mocks.$apollo.mutate.mock.calls.map(([call]) => call.variables.name)).toEqual([
+        'none',
+        'usual',
+      ])
+      expect(mocks.$toast.success).toHaveBeenCalledTimes(1)
+      expect(wrapper.vm.dirty).toBe(false)
+    })
+
+    it('keeps what was not written yet when a write is refused', async () => {
+      mocks.$apollo.mutate = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: { updateGroupRole: { ...ROLES[0], permissions: ['group.read'] } },
+        })
+        .mockRejectedValueOnce(new Error('refused'))
+      const wrapper = await Wrapper()
+      await at(wrapper, 'switch-nonmembers-profile').setChecked(true)
+      await at(wrapper, 'switch-members-comment').setChecked(true)
+
+      await at(wrapper, 'save').trigger('click')
+      await flushPromises()
+
+      expect(mocks.$toast.error).toHaveBeenCalledWith('refused')
+      expect(Object.keys(wrapper.vm.drafts)).toEqual(['usual'])
+    })
+
+    it('shows no unsaved role once a template has replaced them all', async () => {
+      mocks.$apollo.mutate = jest.fn().mockResolvedValue({ data: { resetGroupRoles: ROLES } })
+      const wrapper = await Wrapper()
+      await at(wrapper, 'to-advanced').trigger('click')
+      await at(wrapper, 'switch-nonmembers-profile').setChecked(true)
+      expect(at(wrapper, 'role-tab-drafted-none').exists()).toBe(true)
+
+      await at(wrapper, 'template-channel').trigger('click')
+      await wrapper.vm.applyTemplateModalData.buttons.confirm.callback()
+      await flushPromises()
+
+      expect(wrapper.findAll('[data-test^="role-tab-drafted-"]')).toHaveLength(0)
+    })
+
+    it('says that a template replaces the unsaved edit too', async () => {
+      const wrapper = await Wrapper()
+      await at(wrapper, 'switch-members-comment').setChecked(true)
+
+      await at(wrapper, 'template-channel').trigger('click')
+
+      expect(wrapper.vm.applyTemplateModalData.messageIdent).toBe(
+        'group.rights.confirmApplyTemplateDiscards',
+      )
+    })
   })
 
   it('does not offer a right the editor does not hold', async () => {

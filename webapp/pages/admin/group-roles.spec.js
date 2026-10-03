@@ -1,10 +1,27 @@
 import { mount } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 
 import groupRoles from './group-roles.vue'
 
 const localVue = global.localVue
 
 const CATALOG = [
+  // The two rights the visibility is read from — a template hover can only mark what the
+  // catalog knows about.
+  {
+    key: 'group.read',
+    group: 'visibility',
+    description: 'See the group.',
+    gatedBy: [],
+    requiresNetworkPermission: null,
+  },
+  {
+    key: 'group.content.read',
+    group: 'visibility',
+    description: 'Read the posts.',
+    gatedBy: [],
+    requiresNetworkPermission: null,
+  },
   {
     key: 'group.post.create',
     group: 'content',
@@ -158,6 +175,17 @@ describe('admin/group-roles.vue', () => {
       expect(classesOf(wrapper, 'group.post.create')).not.toContain('perm-row--removed')
     })
 
+    it('shows the unsaved edit against the stored template, when that one is hovered', async () => {
+      // Hovering the open template compares the draft with what is stored — what saving
+      // would change.
+      const wrapper = await advanced()
+      await at(wrapper, 'perm-group.members.read').setChecked(true)
+
+      await at(wrapper, 'type-tab-public').trigger('mouseenter')
+
+      expect(classesOf(wrapper, 'group.members.read')).toContain('perm-row--removed')
+    })
+
     it('reads the protected owner role as the whole catalog', async () => {
       // `owner` stores no permission list at all — hovering it must read as "everything",
       // not as an empty role that would appear to strip the matrix.
@@ -196,14 +224,15 @@ describe('admin/group-roles.vue', () => {
 
   it('writes the template role the SENTENCE is about, once the draft is saved', async () => {
     // Not the role the matrix tabs happen to have selected — and not on the tick either: the
-    // simple view collects a draft and writes it when somebody says so.
+    // page collects a draft and writes it when somebody says so.
     const wrapper = await advanced()
+    await at(wrapper, 'role-tab-none').trigger('click')
 
     await at(wrapper, 'switch-members-post').setChecked(false)
 
     expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
 
-    await at(wrapper, 'simple-save').trigger('click')
+    await at(wrapper, 'save').trigger('click')
 
     expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -216,26 +245,65 @@ describe('admin/group-roles.vue', () => {
     )
   })
 
-  it('locks the matrix while the simple view has an unsaved draft, and says why', async () => {
-    // Both are on screen, so neither can be "the way in" that refuses — the lock has to be on
-    // the rows themselves. Whichever of the two saved second would discard the other's edit.
+  it('keeps the matrix editable while a sentence holds an edit, and shows that edit', async () => {
+    // One draft for both views: a sentence's tick is the matrix's tick, so there is nothing
+    // left for either to lock the other against.
     const wrapper = await advanced()
 
     await at(wrapper, 'switch-members-post').setChecked(false)
 
-    const row = at(wrapper, 'perm-group.post.create').element.closest('label')
-    expect(row.querySelector('input').disabled).toBe(true)
-    expect(row.getAttribute('title')).toBe('group.rights.saveFirst')
-    expect(at(wrapper, 'save').attributes('disabled')).toBeTruthy()
+    expect(at(wrapper, 'perm-group.post.create').element.disabled).toBe(false)
+    expect(at(wrapper, 'perm-group.post.create').element.checked).toBe(false)
+    expect(at(wrapper, 'save').attributes('disabled')).toBeFalsy()
   })
 
-  it('does not leave the matrix while ITS draft is unsaved', async () => {
+  it('leaves the matrix with its draft kept, because the sentences show the same one', async () => {
     const wrapper = await advanced()
+    await at(wrapper, 'perm-group.members.read').setChecked(true)
 
-    wrapper.setData({ draft: ['group.post.create', 'group.members.read'] })
-    await wrapper.vm.$nextTick()
+    await at(wrapper, 'to-simple').trigger('click')
 
-    expect(at(wrapper, 'to-simple').attributes('disabled')).toBeTruthy()
+    expect(at(wrapper, 'advanced').exists()).toBe(false)
+    expect(wrapper.vm.dirty).toBe(true)
+  })
+
+  describe('opening another template while the draft holds an edit', () => {
+    afterEach(() => {
+      delete window.confirm
+    })
+
+    it('asks, and stays where it is when declined', async () => {
+      window.confirm = jest.fn().mockReturnValue(false)
+      const wrapper = await advanced()
+      await at(wrapper, 'perm-group.members.read').setChecked(true)
+
+      await at(wrapper, 'type-tab-closed').trigger('click')
+
+      expect(window.confirm).toHaveBeenCalledWith('group.rights.discardDraft')
+      expect(wrapper.vm.activeTemplateName).toBe('public')
+      expect(wrapper.vm.dirty).toBe(true)
+    })
+
+    it('drops the draft when confirmed — it was an edit of the other template', async () => {
+      window.confirm = jest.fn().mockReturnValue(true)
+      const wrapper = await advanced()
+      await at(wrapper, 'perm-group.members.read').setChecked(true)
+
+      await at(wrapper, 'type-tab-closed').trigger('click')
+
+      expect(wrapper.vm.activeTemplateName).toBe('closed')
+      expect(wrapper.vm.dirty).toBe(false)
+    })
+
+    it('does not ask when there is nothing to lose', async () => {
+      window.confirm = jest.fn()
+      const wrapper = await advanced()
+
+      await at(wrapper, 'type-tab-closed').trigger('click')
+
+      expect(window.confirm).not.toHaveBeenCalled()
+      expect(wrapper.vm.activeTemplateName).toBe('closed')
+    })
   })
 
   it('calls the roles what the group screen calls them, not by their keys', async () => {
@@ -315,6 +383,7 @@ describe('admin/group-roles.vue', () => {
         }),
       }),
     )
+    await flushPromises()
     expect(mocks.$toast.success).toHaveBeenCalled()
   })
 
@@ -424,6 +493,18 @@ describe('admin/group-roles.vue', () => {
       await at(wrapper, 'type-tab-public').trigger('mouseenter')
 
       expect(wrapper.findAll('.role-tab--touched')).toHaveLength(0)
+    })
+
+    it('marks in the sentences and the states what another template would change', async () => {
+      // `closed` takes the posts away from outsiders, and the post right away from members.
+      const wrapper = await Wrapper()
+
+      await at(wrapper, 'type-tab-closed').trigger('mouseenter')
+
+      expect(at(wrapper, 'switch-row-members-post').classes()).toContain('switch--will-removed')
+      expect(at(wrapper, 'switch-row-nonmembers-read').classes()).toContain('switch--will-removed')
+      expect(at(wrapper, 'switch-row-nonmembers-profile').classes()).toEqual(['switch'])
+      expect(at(wrapper, 'visibility-next').text()).toContain('group.types.closed')
     })
   })
 

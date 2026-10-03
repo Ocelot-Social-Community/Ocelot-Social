@@ -7,16 +7,15 @@
       <!-- The same card and the same switches a group gets for its own rights, so a template is
            read the way the thing it produces is read. -->
       <group-rights-simple
-        :roles="rolesForSimple"
+        :roles="draftedRoles"
         :catalog="catalog"
         :caption="$t('admin.groupRoles.resultingVisibility')"
-        :disabled="saving || dirty"
-        :disabled-hint="$t('group.rights.saveFirst')"
-        @save="saveSimple"
-        @dirty="simpleDirty = $event"
+        :disabled="saving"
+        :preview="previewRoles"
+        @change="changeRole"
         @highlight="switchHighlight = $event"
       >
-        <template #visibility-control>
+        <template #template-control>
           <!-- One tab per TEMPLATE. What a template is CALLED and how findable the groups it creates
              are are two different things that used to share one vocabulary — the tab said "Public"
              and the line below said the groups are "Public", and the two can disagree the moment
@@ -30,27 +29,13 @@
               class="type-tab"
               :class="{ 'type-tab--active': template.name === activeTemplateName }"
               :data-test="`type-tab-${template.name}`"
-              @click="activeTemplateName = template.name"
+              @click="openTemplate(template.name)"
               @mouseenter="hoveredTemplateName = template.name"
               @mouseleave="hoveredTemplateName = null"
             >
               {{ $t(`group.types.${template.name}`) }}
             </button>
           </div>
-        </template>
-
-        <template #actions>
-          <!-- No guard on the way IN: the card stays on screen, so unfolding the matrix can no
-               longer throw its draft away. -->
-          <button
-            v-if="!advanced"
-            type="button"
-            class="link-button"
-            data-test="to-advanced"
-            @click="advanced = true"
-          >
-            {{ $t('group.rights.toAdvanced') }}
-          </button>
         </template>
       </group-rights-simple>
 
@@ -76,6 +61,8 @@
           :badge-for="(role) => isSystemGroupRole(role.name)"
           :blocked-for="blockedRole"
           :highlight-for="highlightsRole"
+          :drafted-for="isRoleDrafted"
+          :drafted-title="$t('group.rights.drafted')"
           :badge-title="$t('group.rights.systemRole')"
           @select="activeRoleName = $event"
           @hover="hoveredRoleName = $event"
@@ -106,33 +93,31 @@
           :diff="hoverDiff"
           :highlight="highlightedRights"
           :group-label="(name) => $t(`permissions.sections.${name}`)"
-          :disabled-for="
-            (permission) => saving || simpleDirty || isMandatory(permission) || isMoot(permission)
-          "
+          :disabled-for="rowDisabled"
           :hint-for="blockedHint"
           :note-for="blockedHint"
           @toggle="toggle"
+          @hover="hoveredRight = $event"
         />
-
-        <div class="actions">
-          <os-button :disabled="!dirty || saving || simpleDirty" data-test="save" @click="save">
-            {{ $t('actions.save') }}
-          </os-button>
-          <os-button :disabled="!dirty || saving" data-test="revert" @click="resetDraft">
-            {{ $t('actions.cancel') }}
-          </os-button>
-          <button
-            type="button"
-            class="link-button"
-            :disabled="dirty"
-            :title="dirty ? $t('group.rights.saveFirst') : null"
-            data-test="to-simple"
-            @click="advanced = false"
-          >
-            {{ $t('group.rights.hideAdvanced') }}
-          </button>
-        </div>
       </section>
+
+      <!-- One draft, so one Save: under whatever is unfolded, after everything it writes. -->
+      <div class="actions">
+        <os-button :disabled="!dirty || saving" data-test="save" @click="save">
+          {{ $t('actions.save') }}
+        </os-button>
+        <os-button :disabled="!dirty || saving" data-test="revert" @click="resetDraft">
+          {{ $t('actions.cancel') }}
+        </os-button>
+        <button
+          type="button"
+          class="link-button"
+          :data-test="advanced ? 'to-simple' : 'to-advanced'"
+          @click="advanced = !advanced"
+        >
+          {{ advanced ? $t('group.rights.hideAdvanced') : $t('group.rights.toAdvanced') }}
+        </button>
+      </div>
 
       <!--
         The one control on this page that reaches existing groups, with the sentence that says how
@@ -152,8 +137,10 @@
         </p>
         <!-- A template change reaches existing groups only when an admin asks for it, and then
              only the groups that never edited their own roles (concept E12). -->
+        <!-- It writes what is STORED, so an unsaved draft would not travel with it. -->
         <os-button
-          :disabled="saving || simpleDirty || dirty || !activeTemplate.untouchedGroupCount"
+          :disabled="saving || dirty || !activeTemplate.untouchedGroupCount"
+          :title="dirty ? $t('group.rights.saveFirst') : null"
           data-test="apply"
           @click="confirmApply"
         >
@@ -177,7 +164,6 @@ import {
   updateGroupRoleTemplateMutation,
 } from '~/graphql/adminGroups.js'
 import groupRightsEditor from '~/mixins/groupRightsEditor'
-import { samePermissions } from '~/utils/permissionDiff'
 
 export default {
   mixins: [groupRightsEditor],
@@ -186,10 +172,6 @@ export default {
     return {
       templates: [],
       activeTemplateName: 'public',
-      // The TEMPLATE tab under the cursor: hovering `closed` while editing the public one's
-      // member role previews what a closed group's member role does differently — the question
-      // these presets exist to answer.
-      hoveredTemplateName: null,
     }
   },
   computed: {
@@ -200,87 +182,26 @@ export default {
     editedRoles() {
       return this.activeTemplate?.roles ?? []
     },
-    /**
-     * What the cursor is previewing, or null: ANOTHER ROLE of this template, or the SAME role
-     * in another template. Two hovers, one comparison — the rows can only mark one difference
-     * at a time, and a template hover is the more specific of the two.
-     */
-    hoveredRole() {
-      if (this.hoveredTemplateName && this.hoveredTemplateName !== this.activeTemplateName) {
-        return (
-          this.templates
-            .find((template) => template.name === this.hoveredTemplateName)
-            ?.roles.find((role) => role.name === this.activeRoleName) ?? null
-        )
-      }
-      if (this.hoveredRoleName && this.hoveredRoleName !== this.activeRoleName) {
-        return this.editedRoles.find((role) => role.name === this.hoveredRoleName) ?? null
-      }
-      return null
-    },
-    /**
-     * What the matrix and the role tabs should point at: a sentence under the cursor, else the
-     * roles a hovered TEMPLATE would change. Both answer "what does this control reach", and the
-     * mark can only carry one answer — the sentence is the more specific of the two, so it wins.
-     */
-    highlight() {
-      return this.switchHighlight ?? this.templateHighlight
-    },
-    /**
-     * Every role the hovered template holds differently from the one being edited. Rights are
-     * left out: the matrix already paints those green and red through `hoverDiff`, and a role
-     * only has to be findable in the row of tabs.
-     */
-    templateHighlight() {
-      const hovered = this.templates.find((template) => template.name === this.hoveredTemplateName)
-      if (!hovered || hovered.name === this.activeTemplateName) return null
-      const marked = {}
-      for (const role of this.editedRoles) {
-        const other = hovered.roles.find((candidate) => candidate.name === role.name)
-        if (!other || !samePermissions(role.permissions, other.permissions)) {
-          marked[role.name] = []
-        }
-      }
-      return marked
-    },
-  },
-  watch: {
-    activeTemplateName() {
-      this.resetDraft()
+    savedMessage() {
+      return 'admin.groupRoles.saved'
     },
   },
   methods: {
-    save() {
-      return this.writeRole(this.activeRoleName, this.draft, this.draftLabel || null)
+    /** Another template's roles replace the ones on screen — and with them, the draft of these. */
+    openTemplate(name) {
+      if (name === this.activeTemplateName || !this.mayDiscardDraft()) return
+      this.resetDraft()
+      this.activeTemplateName = name
     },
-    /**
-     * The sentences' draft, written in one go.
-     *
-     * Sequentially rather than in parallel: each write answers with the role it stored and
-     * `mergeRole` folds it back in, and two answers landing at once would have the second
-     * overwrite the list the first just produced.
-     */
-    async saveSimple(changes) {
-      for (const change of changes) {
-        const role = this.editedRoles.find((candidate) => candidate.name === change.name)
-        if (!role) continue
-        await this.writeRole(role.name, change.permissions, role.label ?? null)
-      }
+    rowDisabled(permission) {
+      return this.saving || this.isMandatory(permission) || this.isMoot(permission)
     },
-    async writeRole(name, permissions, label) {
-      this.saving = true
-      try {
-        const { data } = await this.$apollo.mutate({
-          mutation: updateGroupRoleTemplateMutation(),
-          variables: { template: this.activeTemplateName, name, permissions, label },
-        })
-        this.mergeRole(data.updateGroupRoleTemplate)
-        this.$toast.success(this.$t('admin.groupRoles.saved'))
-      } catch (error) {
-        this.$toast.error(error.message)
-      } finally {
-        this.saving = false
-      }
+    async storeRole(name, permissions, label) {
+      const { data } = await this.$apollo.mutate({
+        mutation: updateGroupRoleTemplateMutation(),
+        variables: { template: this.activeTemplateName, name, permissions, label },
+      })
+      return data.updateGroupRoleTemplate
     },
     mergeRole(role) {
       this.templates = this.templates.map((template) =>
@@ -293,7 +214,6 @@ export default {
             }
           : template,
       )
-      this.resetDraft()
     },
     async confirmApply() {
       if (

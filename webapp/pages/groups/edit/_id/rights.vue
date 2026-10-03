@@ -9,62 +9,47 @@
          stands for. -->
     <section data-test="rights-simple">
       <group-rights-simple
-        :roles="rolesForSimple"
+        :roles="draftedRoles"
         :catalog="catalog"
         :caption="$t('group.rights.resultingType')"
-        :disabled="simpleDisabled"
-        :disabled-hint="simpleDisabledHint"
+        :disabled="!canEdit"
+        :disabled-hint="canManageRoles ? null : $t('group.rights.noRight')"
         :grantable="grantable"
         :hint-for="blockedHint"
-        @save="saveSimple"
-        @dirty="simpleDirty = $event"
+        :preview="previewRoles"
+        @change="changeRole"
         @highlight="switchHighlight = $event"
       >
         <!--
           The same presets the admin area edits, offered where a group picks one. "Turn this
           into a channel" used to be a button here that silently took two rights off the member
           role; a channel is a template now, so the choice is visible before and recognisable
-          after.
+          after — and hovering one shows what it would change, before anything is replaced.
         -->
-        <template #visibility-control>
+        <template #template-control>
           <div class="template-tabs" :title="$t('group.rights.applyTemplate')">
             <button
-              v-for="name in templateNames"
-              :key="name"
+              v-for="template in templates"
+              :key="template.name"
               type="button"
               class="template-tab"
-              :class="{ 'template-tab--active': name === group.template }"
-              :disabled="saving || !canManageRoles || simpleDirty"
-              :title="simpleDirty ? $t('group.rights.saveFirst') : null"
-              :data-test="`template-${name}`"
-              @click="confirmApplyTemplate(name)"
-              @mouseenter="hoveredTemplateName = name"
+              :class="{ 'template-tab--active': template.name === group.template }"
+              :disabled="!canEdit"
+              :data-test="`template-${template.name}`"
+              @click="confirmApplyTemplate(template.name)"
+              @mouseenter="hoveredTemplateName = template.name"
               @mouseleave="hoveredTemplateName = null"
             >
-              {{ $t(`group.types.${name}`) }}
+              {{ $t(`group.types.${template.name}`) }}
             </button>
           </div>
-        </template>
-
-        <template #actions>
-          <!-- No guard on the way IN: the simple view stays mounted, so opening the matrix can
-               no longer throw its draft away. -->
-          <button
-            v-if="!advanced"
-            type="button"
-            class="link-button"
-            data-test="to-advanced"
-            @click="advanced = true"
-          >
-            {{ $t('group.rights.toAdvanced') }}
-          </button>
         </template>
       </group-rights-simple>
     </section>
 
-    <!-- The full matrix, one tab per role, under the sentences rather than instead of them. The
-         card above already states the resulting visibility and follows this view's draft, so the
-         line that used to repeat it here is gone. -->
+    <!-- The full matrix, one tab per role, under the sentences rather than instead of them. Both
+         edit the same draft, so a tick here shows up above straight away, and a hovered row
+         points at the sentence and the state it decides. -->
     <section v-if="advanced" class="advanced" data-test="rights-advanced">
       <h3 class="advanced__title">{{ $t('group.rights.advancedTitle') }}</h3>
 
@@ -75,6 +60,8 @@
         :badge-for="(role) => isSystemGroupRole(role.name)"
         :blocked-for="blockedRole"
         :highlight-for="highlightsRole"
+        :drafted-for="isRoleDrafted"
+        :drafted-title="$t('group.rights.drafted')"
         :badge-title="$t('group.rights.systemRole')"
         @select="activeRoleName = $event"
         @hover="hoveredRoleName = $event"
@@ -86,17 +73,28 @@
 
       <template v-if="activeRole">
         <header class="role-header">
+          <!-- Also for the owner role: its RIGHTS cannot be edited (it holds the catalog), but
+               its name can — "Owner" is what a group calls the person, and some call it
+               something else. -->
           <ocelot-input
             v-model="draftLabel"
             class="role-label"
             :label="$t('group.rights.labelField')"
             :placeholder="roleLabel({ name: activeRole.name })"
-            :disabled="!canManageRoles || saving"
+            :disabled="!canEdit"
             data-test="role-label"
           />
           <span v-if="activeRole.memberCount !== null" class="role-members">
             {{ $t('group.rights.members', { count: activeRole.memberCount }) }}
           </span>
+          <os-button
+            v-if="!activeRole.system && canManageRoles"
+            :disabled="saving"
+            data-test="role-delete"
+            @click="confirmDelete"
+          >
+            {{ $t('group.rights.deleteRole') }}
+          </os-button>
         </header>
 
         <!-- A role nobody can reach: every right on it is editable and none of it applies to
@@ -121,56 +119,32 @@
           :diff="hoverDiff"
           :highlight="highlightedRights"
           :group-label="(name) => $t(`permissions.sections.${name}`)"
-          :disabled-for="
-            (permission) =>
-              !canManageRoles ||
-              !grantable(permission) ||
-              saving ||
-              simpleDirty ||
-              isMandatory(permission) ||
-              isMoot(permission)
-          "
+          :disabled-for="rowDisabled"
           :hint-for="blockedHint"
           :note-for="blockedHint"
           @toggle="toggle"
+          @hover="hoveredRight = $event"
         />
-
-        <div class="actions">
-          <!-- Also for the owner role: its RIGHTS cannot be edited (it holds the catalog), but
-               its name can — "Owner" is what a group calls the person, and some call it
-               something else. The backend takes a relabel of a protected role for the same
-               reason; the button being hidden was the only thing in the way. -->
-          <os-button
-            :disabled="!dirty || saving || simpleDirty || !canManageRoles"
-            data-test="save"
-            @click="save"
-          >
-            {{ $t('actions.save') }}
-          </os-button>
-          <os-button :disabled="!dirty || saving" data-test="revert" @click="resetDraft">
-            {{ $t('actions.cancel') }}
-          </os-button>
-          <os-button
-            v-if="!activeRole.system && canManageRoles"
-            :disabled="saving"
-            data-test="role-delete"
-            @click="confirmDelete"
-          >
-            {{ $t('group.rights.deleteRole') }}
-          </os-button>
-          <button
-            type="button"
-            class="link-button"
-            :disabled="dirty"
-            :title="dirty ? $t('group.rights.saveFirst') : null"
-            data-test="to-simple"
-            @click="advanced = false"
-          >
-            {{ $t('group.rights.hideAdvanced') }}
-          </button>
-        </div>
       </template>
     </section>
+
+    <!-- One draft, so one Save: under whatever is unfolded, after everything it writes. -->
+    <div class="actions">
+      <os-button :disabled="!dirty || !canEdit" data-test="save" @click="save">
+        {{ $t('actions.save') }}
+      </os-button>
+      <os-button :disabled="!dirty || saving" data-test="revert" @click="resetDraft">
+        {{ $t('actions.cancel') }}
+      </os-button>
+      <button
+        type="button"
+        class="link-button"
+        :data-test="advanced ? 'to-simple' : 'to-advanced'"
+        @click="advanced = !advanced"
+      >
+        {{ advanced ? $t('group.rights.hideAdvanced') : $t('group.rights.toAdvanced') }}
+      </button>
+    </div>
     <confirm-modal
       v-if="templateToApply"
       :modalData="applyTemplateModalData"
@@ -214,13 +188,12 @@ export default {
   data() {
     return {
       icons: iconRegistry,
-      templateNames: [],
+      /** The templates on offer, `{ name, roles }`. */
+      templates: [],
       // The template the viewer picked, waiting for them to confirm. Replacing every role of a
       // group is too much for a browser confirm box — the same modal that asks about leaving
       // an editor asks about this.
       templateToApply: null,
-      // The template button under the cursor.
-      hoveredTemplateName: null,
       roles: [],
       myGroupPermissions: [],
     }
@@ -233,21 +206,21 @@ export default {
     canManageRoles() {
       return this.myGroupPermissions.includes('group.role.manage')
     },
-    /**
-     * The two views edit the same roles, so only one of them may hold a draft at a time —
-     * whichever saved second would discard the other's edit without saying so.
-     */
-    simpleDisabled() {
-      return this.saving || !this.canManageRoles || this.dirty
+    /** Whether anything here can be changed right now. */
+    canEdit() {
+      return this.canManageRoles && !this.saving
     },
-    simpleDisabledHint() {
-      return this.dirty ? this.$t('group.rights.saveFirst') : this.$t('group.rights.noRight')
+    savedMessage() {
+      return 'group.rights.saved'
     },
     applyTemplateModalData() {
       const template = this.$t(`group.types.${this.templateToApply}`)
       return {
         titleIdent: 'group.rights.applyTemplate',
-        messageIdent: 'group.rights.confirmApplyTemplate',
+        // Said when it is true: the draft is part of what the template replaces.
+        messageIdent: this.dirty
+          ? 'group.rights.confirmApplyTemplateDiscards'
+          : 'group.rights.confirmApplyTemplate',
         messageParams: { template },
         buttons: {
           confirm: {
@@ -260,18 +233,6 @@ export default {
         },
       }
     },
-    /**
-     * What the matrix and the role tabs should point at: the sentence under the cursor, else —
-     * for a template button — every role, because putting a template on a group replaces all of
-     * them. What a template would change TO cannot be shown here: its contents sit behind
-     * `group.roleTemplate.manage`, which a group owner does not hold, so this page knows the
-     * names and nothing else.
-     */
-    highlight() {
-      if (this.switchHighlight) return this.switchHighlight
-      if (!this.hoveredTemplateName) return null
-      return Object.fromEntries(this.editedRoles.map((role) => [role.name, []]))
-    },
   },
   methods: {
     /**
@@ -281,6 +242,14 @@ export default {
      */
     grantable(permission) {
       return !!permission && this.myGroupPermissions.includes(permission.key)
+    },
+    rowDisabled(permission) {
+      return (
+        !this.canEdit ||
+        !this.grantable(permission) ||
+        this.isMandatory(permission) ||
+        this.isMoot(permission)
+      )
     },
     /** The reasons only a GROUP has: a right the network withholds, or a feature switched off. */
     gateHint(permission) {
@@ -295,23 +264,12 @@ export default {
       }
       return null
     },
-    async writeRole(name, permissions, label) {
-      this.saving = true
-      try {
-        const { data } = await this.$apollo.mutate({
-          mutation: updateGroupRoleMutation(),
-          variables: { groupId: this.group.id, name, permissions, label: label || null },
-        })
-        this.mergeRole(data.updateGroupRole)
-        this.$toast.success(this.$t('group.rights.saved'))
-      } catch (error) {
-        this.$toast.error(error.message)
-        // The checkbox is where the click left it, and `:checked` binds a value that did not
-        // change — so without this the switch keeps showing a right the group does not have.
-        this.$forceUpdate()
-      } finally {
-        this.saving = false
-      }
+    async storeRole(name, permissions, label) {
+      const { data } = await this.$apollo.mutate({
+        mutation: updateGroupRoleMutation(),
+        variables: { groupId: this.group.id, name, permissions, label },
+      })
+      return data.updateGroupRole
     },
     mergeRole(role) {
       const index = this.roles.findIndex((candidate) => candidate.name === role.name)
@@ -321,27 +279,6 @@ export default {
         this.roles = this.roles.map((candidate) =>
           candidate.name === role.name ? role : candidate,
         )
-      }
-      if (role.name === this.activeRoleName) this.resetDraft()
-    },
-    save() {
-      if (!this.activeRole) return
-      // The owner role keeps no list — only its label can move.
-      const permissions = this.activeRole.protected ? [] : this.draft
-      return this.writeRole(this.activeRole.name, permissions, this.draftLabel)
-    },
-    /**
-     * The sentences' draft, written in one go.
-     *
-     * Sequentially rather than in parallel: each write answers with the role it stored and the
-     * page merges it, and two answers landing at once would have the second merge overwrite the
-     * list the first just produced.
-     */
-    async saveSimple(changes) {
-      for (const change of changes) {
-        const role = this.editedRoles.find((candidate) => candidate.name === change.name)
-        if (!role) continue
-        await this.writeRole(role.name, change.permissions, role.label)
       }
     },
     /**
@@ -390,11 +327,13 @@ export default {
       }
       this.saving = true
       try {
+        const { name } = this.activeRole
         await this.$apollo.mutate({
           mutation: deleteGroupRoleMutation(),
-          variables: { groupId: this.group.id, name: this.activeRole.name, reassignTo },
+          variables: { groupId: this.group.id, name, reassignTo },
         })
-        this.roles = this.roles.filter((role) => role.name !== this.activeRole.name)
+        this.roles = this.roles.filter((role) => role.name !== name)
+        this.$delete(this.drafts, name)
         this.activeRoleName = USUAL_GROUP_ROLE
       } catch (error) {
         this.$toast.error(error.message)
@@ -415,7 +354,7 @@ export default {
       result({ data, loading }) {
         if (loading || !data) return
         this.catalog = data.groupPermissionCatalog ?? []
-        this.templateNames = (data.groupTemplates ?? []).map((template) => template.name)
+        this.templates = data.groupTemplates ?? []
         const group = data.Group?.[0]
         this.roles = group?.roles ?? []
         this.myGroupPermissions = group?.myGroupPermissions ?? []

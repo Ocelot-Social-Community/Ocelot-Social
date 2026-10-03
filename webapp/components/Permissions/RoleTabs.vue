@@ -35,6 +35,15 @@
         :aria-label="badgeTitle"
         class="role-tab__badge"
       />
+      <!-- An unsaved edit on a role one has moved away from: the draft keeps it, the tab says so. -->
+      <span
+        v-if="draftedFor(role)"
+        class="role-tab__drafted"
+        role="img"
+        :aria-label="draftedTitle"
+        :title="draftedTitle"
+        :data-test="`role-tab-drafted-${role.name}`"
+      />
     </button>
 
     <!-- Whatever the page adds at the end of the row: an add button, an inline name input. -->
@@ -85,6 +94,9 @@ export default {
      * so the tab says "this one" rather than leaving it to be worked out from the wording.
      */
     highlightFor: { type: Function, default: () => false },
+    /** Which roles hold an unsaved edit. */
+    draftedFor: { type: Function, default: () => false },
+    draftedTitle: { type: String, default: null },
   },
   data() {
     return { icons: iconRegistry }
@@ -114,6 +126,13 @@ export default {
   font-size: 0.9em;
   line-height: 1.4;
   cursor: pointer;
+}
+
+.role-tab__drafted {
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background: var(--color-warning);
 }
 
 .role-tab:hover:not(:disabled) {

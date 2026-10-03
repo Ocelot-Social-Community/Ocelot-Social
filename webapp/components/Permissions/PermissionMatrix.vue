@@ -5,7 +5,8 @@
     the group role templates so a right reads the same wherever it is granted.
 
     Presentational on purpose — it owns no state. The page says which rights are granted, which
-    are disabled and what differs; this decides how that looks.
+    are disabled and what differs; this decides how that looks. The row under the cursor is
+    reported (`hover`), so a page can point at whatever else on it that right decides.
   -->
   <div class="perm-groups">
     <fieldset v-for="group in grouped" :key="group.name" class="perm-group">
@@ -21,6 +22,8 @@
           'perm-row--touched': highlight.includes(permission.key),
         }"
         :title="hintFor(permission)"
+        @mouseenter="$emit('hover', permission.key)"
+        @mouseleave="$emit('hover', null)"
       >
         <input
           type="checkbox"

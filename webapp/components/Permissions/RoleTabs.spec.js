@@ -109,4 +109,14 @@ describe('the highlight', () => {
 
     expect(wrapper.findAll('.role-tab--touched')).toHaveLength(0)
   })
+
+  it('says which roles hold an unsaved edit, in words as well', () => {
+    // The draft outlives a tab click, so the edit on a role one moved away from is still there
+    // — and the tab is the only place left to see that.
+    const wrapper = Wrapper({ draftedFor: (role) => role.name === 'user', draftedTitle: 'Unsaved' })
+
+    const dot = wrapper.find('[data-test="role-tab-drafted-user"]')
+    expect(dot.attributes('aria-label')).toBe('Unsaved')
+    expect(wrapper.find('[data-test="role-tab-drafted-owner"]').exists()).toBe(false)
+  })
 })

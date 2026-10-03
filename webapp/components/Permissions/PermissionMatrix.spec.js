@@ -102,4 +102,15 @@ describe('the highlight', () => {
 
     expect(wrapper.findAll('.perm-row--touched')).toHaveLength(0)
   })
+
+  it('reports the row under the cursor, so the page can point back at what it decides', async () => {
+    const wrapper = Wrapper()
+    const label = wrapper.findAll('.perm-row').at(1)
+
+    await label.trigger('mouseenter')
+    expect(wrapper.emitted('hover').at(-1)).toEqual(['comment.create'])
+
+    await label.trigger('mouseleave')
+    expect(wrapper.emitted('hover').at(-1)).toEqual([null])
+  })
 })
