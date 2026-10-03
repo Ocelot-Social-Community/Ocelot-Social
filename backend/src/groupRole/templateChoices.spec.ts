@@ -32,7 +32,9 @@ describe(readTemplateChoices, () => {
       role('public', 'none', ['group.read', 'group.content.read']),
     ])
 
-    expect(await readTemplateChoices(db)).toEqual([
+    expect(
+      (await readTemplateChoices(db)).map(({ name, visibility }) => ({ name, visibility })),
+    ).toEqual([
       { name: 'channel', visibility: 'public' },
       { name: 'public', visibility: 'public' },
     ])
@@ -68,7 +70,23 @@ describe(readTemplateChoices, () => {
   it('reads a template whose non-member role is missing as the most private one', async () => {
     const db = fakeDb([role('odd', 'usual', ['group.post.create'])])
 
-    expect(await readTemplateChoices(db)).toEqual([{ name: 'odd', visibility: 'hidden' }])
+    expect((await readTemplateChoices(db))[0]).toMatchObject({ name: 'odd', visibility: 'hidden' })
+  })
+
+  it('hands out the roles each template would give a group', async () => {
+    // Putting a template on a group replaces every role it has — whoever does that has to be
+    // able to see what with, and these are the same lists the group will hold right after.
+    const db = fakeDb([
+      role('channel', 'none', ['group.read', 'group.content.read']),
+      role('channel', 'usual', ['group.comment.create']),
+    ])
+
+    const [channel] = await readTemplateChoices(db)
+
+    expect(channel.roles.map(({ name, permissions }) => ({ name, permissions }))).toEqual([
+      { name: 'none', permissions: ['group.read', 'group.content.read'] },
+      { name: 'usual', permissions: ['group.comment.create'] },
+    ])
   })
 })
 

@@ -293,7 +293,11 @@ export default {
       }))
     },
     groupTemplates: async (_parent, _args, context: Context) =>
-      readTemplateChoices(context.database),
+      (await readTemplateChoices(context.database)).map((choice) => ({
+        ...choice,
+        // A template's role belongs to no group, so nobody carries it.
+        roles: choice.roles.map((role) => ({ ...role, memberCount: null })),
+      })),
   },
   Group: {
     myGroupRole: async (parent: { id: string }, _args, context: Context) => {

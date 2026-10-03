@@ -10,18 +10,23 @@ import type databaseContext from '@context/database'
 type DbContext = ReturnType<typeof databaseContext>
 
 /**
- * A template a group can be CREATED from: what it is called, and what a group made from it
- * would be.
+ * A template a group can be CREATED from or put on: what it is called, what a group made from it
+ * would be, and the roles it would hand that group.
  *
- * The public half of `groupRoleTemplates`, which hands out the whole permission sets and sits
- * behind `group.roleTemplate.manage`. Picking what kind of group to make is not an operator's
- * job, so the names and their consequence are readable by anybody who may create one — and the
- * consequence has to travel with the name, because `group.create_<visibility>` is checked
+ * The readable half of `groupRoleTemplates`, which adds the group counts and sits behind
+ * `group.roleTemplate.manage` because it is where templates are EDITED. Picking what kind of
+ * group to make is not an operator's job, so this is readable by anybody who may create one.
+ * The consequence has to travel with the name, because `group.create_<visibility>` is checked
  * against the visibility and two templates can derive to the same one (`channel` is public).
+ *
+ * The roles travel too: a group owner putting a template on their group replaces every role it
+ * has, and has to be able to see what with before they do. They are no secret either — the
+ * moment the template is applied, they are the group's own roles, readable on its rights page.
  */
 export interface GroupTemplateChoice {
   name: string
   visibility: GroupPrivacyLevel
+  roles: GroupRoleDefinition[]
 }
 
 /** What a set of role definitions makes a group — the non-member role is what decides it. */
@@ -52,7 +57,7 @@ export async function readTemplateChoices(db: DbContext): Promise<GroupTemplateC
   const stored = await readGroupRoleTemplates(db)
   const templates = Object.keys(stored).length > 0 ? stored : DEFAULT_GROUP_ROLE_TEMPLATES
   return Object.entries(templates)
-    .map(([name, roles]) => ({ name, visibility: templateVisibilityOf(roles) }))
+    .map(([name, roles]) => ({ name, visibility: templateVisibilityOf(roles), roles }))
     .sort(byPrivacyThenName)
 }
 

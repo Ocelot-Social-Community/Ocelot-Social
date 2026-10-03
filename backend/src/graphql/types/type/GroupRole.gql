@@ -44,11 +44,13 @@ type GroupRoleTemplate {
   groupCount: Int!
 }
 
-"A template on offer, without its permission sets: what it is called, and what a group made from it would be. Two templates can derive to the same visibility — `channel` is public — so the name alone does not answer what creating one takes."
+"A template on offer: what it is called, what a group made from it would be, and the roles it would start with. Two templates can derive to the same visibility — `channel` is public — so the name alone does not answer what creating one takes."
 type GroupTemplateChoice {
   name: String!
   "The visibility a group created from this template starts with."
   visibility: GroupVisibility!
+  "The roles a group gets from this template — what putting it on a group would replace that group's roles with. `memberCount` is always null: a template's role belongs to no group."
+  roles: [GroupRole!]!
 }
 
 "A deliberate use of a network right inside one group. Holding `group.administer.any_<visibility>` is the power to rewrite any group of that kind; this is the act of picking it up, and it lapses on its own. Reading is not part of it — a moderator reviewing a report must not have to confirm anything to see what they were asked about."
@@ -65,7 +67,7 @@ type Query {
   groupPermissionCatalog: [GroupPermission!]!
   "The network-wide group role templates, one per group type. Requires `group.roleTemplate.manage`."
   groupRoleTemplates: [GroupRoleTemplate!]!
-  "The templates a group can be created from or put on, least private first. The permission SETS stay behind group.roleTemplate.manage; the names and what they make a group are the vocabulary a group owner picks from — and `group.create_<visibility>` is checked against that visibility, so it has to travel with the name."
+  "The templates a group can be created from or put on, least private first, with the roles each would give a group — a group owner replacing their roles with one has to see what with. Editing them stays behind group.roleTemplate.manage (`groupRoleTemplates`). `group.create_<visibility>` is checked against the visibility, so it travels with the name."
   groupTemplates: [GroupTemplateChoice!]!
 }
 

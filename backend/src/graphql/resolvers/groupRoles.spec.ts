@@ -351,10 +351,25 @@ describe('Query.groupTemplates', () => {
     })
     const { context } = contextFor()
 
-    expect(await Query.groupTemplates({}, {}, context)).toEqual([
+    const choices = await Query.groupTemplates({}, {}, context)
+
+    expect(choices.map(({ name, visibility }) => ({ name, visibility }))).toEqual([
       { name: 'channel', visibility: 'public' },
       { name: 'closed', visibility: 'closed' },
       { name: 'hidden', visibility: 'hidden' },
+    ])
+  })
+
+  it('carries each template`s roles, which no member holds', async () => {
+    mocked.readGroupRoleTemplates.mockResolvedValue({
+      channel: [role('none', ['group.read', 'group.content.read'])],
+    })
+    const { context } = contextFor()
+
+    const [channel] = await Query.groupTemplates({}, {}, context)
+
+    expect(channel.roles).toEqual([
+      { ...role('none', ['group.read', 'group.content.read']), memberCount: null },
     ])
   })
 })
