@@ -6,45 +6,36 @@
     something each page remembers to add.
   -->
   <div class="role-tabs" data-test="role-tabs">
-    <button
-      v-for="role in roles"
-      :key="role.name"
-      type="button"
-      class="role-tab"
-      :class="{
-        'role-tab--active': role.name === activeName,
-        'role-tab--touched': highlightFor(role),
-      }"
-      :disabled="!!blockedFor(role)"
-      :title="blockedFor(role)"
-      :data-test="`role-tab-${role.name}`"
-      @click="$emit('select', role.name)"
-      @mouseenter="$emit('hover', role.name)"
-      @mouseleave="$emit('hover', null)"
+    <toggle-group
+      :items="items"
+      :value="activeName"
+      @select="$emit('select', $event)"
+      @hover="$emit('hover', $event)"
     >
-      {{ labelFor(role) }}
-      <!--
-        A role nobody may reshape: the network's `owner`, a group's system roles. An icon with an
-        `aria-label` rather than the `★` with a `title` this was — a title on a span reaches a
-        sighted mouse user and nobody else, and the star said nothing about WHY the role is
-        special. OsIcon turns the label into `role="img"` and hides the glyph when there is none.
-      -->
-      <os-icon
-        v-if="badgeFor(role)"
-        :icon="icons.lock"
-        :aria-label="badgeTitle"
-        class="role-tab__badge"
-      />
-      <!-- An unsaved edit on a role one has moved away from: the draft keeps it, the tab says so. -->
-      <span
-        v-if="draftedFor(role)"
-        class="role-tab__drafted"
-        role="img"
-        :aria-label="draftedTitle"
-        :title="draftedTitle"
-        :data-test="`role-tab-drafted-${role.name}`"
-      />
-    </button>
+      <template #extra="{ item }">
+        <!--
+          A role nobody may reshape: the network's `owner`, a group's system roles. An icon with
+          an `aria-label` rather than the `★` with a `title` this was — a title on a span reaches
+          a sighted mouse user and nobody else, and the star said nothing about WHY the role is
+          special. OsIcon turns the label into `role="img"` and hides the glyph when there is none.
+        -->
+        <os-icon
+          v-if="badgeFor(item.role)"
+          :icon="icons.lock"
+          :aria-label="badgeTitle"
+          class="role-tab__badge"
+        />
+        <!-- An unsaved edit on this role: the draft keeps it across tabs, the tab says so. -->
+        <span
+          v-if="draftedFor(item.role)"
+          class="role-tab__drafted"
+          role="img"
+          :aria-label="draftedTitle"
+          :title="draftedTitle"
+          :data-test="`role-tab-drafted-${item.value}`"
+        />
+      </template>
+    </toggle-group>
 
     <!-- Whatever the page adds at the end of the row: an add button, an inline name input. -->
     <slot name="extra" />
@@ -53,11 +44,12 @@
 
 <script>
 import { OsIcon } from '@ocelot-social/ui'
+import ToggleGroup from '~/components/Permissions/ToggleGroup'
 import { iconRegistry } from '~/utils/iconRegistry'
 
 export default {
   name: 'RoleTabs',
-  components: { OsIcon },
+  components: { OsIcon, ToggleGroup },
   props: {
     roles: { type: Array, required: true },
     activeName: { type: String, default: null },
@@ -101,6 +93,19 @@ export default {
   data() {
     return { icons: iconRegistry }
   },
+  computed: {
+    items() {
+      return this.roles.map((role) => ({
+        value: role.name,
+        label: this.labelFor(role),
+        disabled: !!this.blockedFor(role),
+        title: this.blockedFor(role),
+        marked: this.highlightFor(role),
+        testId: `role-tab-${role.name}`,
+        role,
+      }))
+    },
+  },
 }
 </script>
 
@@ -114,18 +119,8 @@ export default {
   border-bottom: 1px solid var(--border-color-softer);
 }
 
-.role-tab {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xxx-small);
-  padding: var(--space-xx-small) var(--space-small);
-  border: 1px solid var(--border-color-soft);
-  border-radius: var(--border-radius-x-large);
-  background: var(--background-color-base);
-  color: var(--text-color-base);
+.role-tab__badge {
   font-size: 0.9em;
-  line-height: 1.4;
-  cursor: pointer;
 }
 
 .role-tab__drafted {
@@ -133,38 +128,5 @@ export default {
   height: 0.5em;
   border-radius: 50%;
   background: var(--color-warning);
-}
-
-.role-tab:hover:not(:disabled) {
-  background: var(--background-color-softer);
-}
-
-.role-tab:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/*
- * An outline rather than a colour, so it reads the same on the active tab (already filled with
- * the primary colour) and on an inactive one.
- */
-.role-tab--touched {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-.role-tab--active {
-  border-color: var(--color-primary);
-  background: var(--color-primary);
-  color: var(--color-primary-inverse);
-  font-weight: bold;
-}
-
-.role-tab--active:hover {
-  background: var(--color-primary);
-}
-
-.role-tab__badge {
-  font-size: 0.8em;
 }
 </style>

@@ -450,7 +450,7 @@ describe('admin/group-roles.vue', () => {
 
       expect(classesOf(wrapper, 'group.post.create')).toContain('perm-row--touched')
       expect(classesOf(wrapper, 'group.members.read')).not.toContain('perm-row--touched')
-      expect(at(wrapper, 'role-tab-usual').classes()).toContain('role-tab--touched')
+      expect(at(wrapper, 'role-tab-usual').classes()).toContain('toggle-group__item--marked')
     })
 
     it('marks the role but no row while another role is on screen', async () => {
@@ -461,8 +461,8 @@ describe('admin/group-roles.vue', () => {
 
       await at(wrapper, 'switch-row-members-post').trigger('mouseenter')
 
-      expect(at(wrapper, 'role-tab-usual').classes()).toContain('role-tab--touched')
-      expect(at(wrapper, 'role-tab-none').classes()).not.toContain('role-tab--touched')
+      expect(at(wrapper, 'role-tab-usual').classes()).toContain('toggle-group__item--marked')
+      expect(at(wrapper, 'role-tab-none').classes()).not.toContain('toggle-group__item--marked')
       expect(wrapper.findAll('.perm-row--touched')).toHaveLength(0)
     })
 
@@ -472,7 +472,7 @@ describe('admin/group-roles.vue', () => {
       await at(wrapper, 'switch-row-members-post').trigger('mouseenter')
       await at(wrapper, 'switch-row-members-post').trigger('mouseleave')
 
-      expect(wrapper.findAll('.role-tab--touched')).toHaveLength(0)
+      expect(wrapper.findAll('.toggle-group__item--marked')).toHaveLength(0)
     })
 
     it('marks every role another template would change, and no other', async () => {
@@ -482,9 +482,9 @@ describe('admin/group-roles.vue', () => {
 
       await at(wrapper, 'type-tab-closed').trigger('mouseenter')
 
-      expect(at(wrapper, 'role-tab-none').classes()).toContain('role-tab--touched')
-      expect(at(wrapper, 'role-tab-usual').classes()).toContain('role-tab--touched')
-      expect(at(wrapper, 'role-tab-owner').classes()).toContain('role-tab--touched')
+      expect(at(wrapper, 'role-tab-none').classes()).toContain('toggle-group__item--marked')
+      expect(at(wrapper, 'role-tab-usual').classes()).toContain('toggle-group__item--marked')
+      expect(at(wrapper, 'role-tab-owner').classes()).toContain('toggle-group__item--marked')
     })
 
     it('marks no role for the template already being edited', async () => {
@@ -492,7 +492,7 @@ describe('admin/group-roles.vue', () => {
 
       await at(wrapper, 'type-tab-public').trigger('mouseenter')
 
-      expect(wrapper.findAll('.role-tab--touched')).toHaveLength(0)
+      expect(wrapper.findAll('.toggle-group__item--marked')).toHaveLength(0)
     })
 
     it('marks in the sentences and the states what another template would change', async () => {

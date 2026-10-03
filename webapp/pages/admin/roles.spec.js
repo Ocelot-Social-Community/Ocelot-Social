@@ -6,7 +6,7 @@ const localVue = global.localVue
 const stubs = {
   // Render slot content so the inner role sections appear.
   OsCard: { template: '<div><slot /></div>' },
-  OsButton: { template: '<button><slot /></button>' },
+  OsButton: { template: '<button v-on="$listeners"><slot /></button>' },
   'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
 }
 

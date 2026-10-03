@@ -27,21 +27,14 @@
           after — and hovering one shows what it would change, before anything is replaced.
         -->
         <template #template-control>
-          <div class="template-tabs" :title="$t('group.rights.applyTemplate')">
-            <button
-              v-for="template in templates"
-              :key="template.name"
-              type="button"
-              class="template-tab"
-              :class="{ 'template-tab--active': template.name === group.template }"
-              :disabled="!canEdit"
-              :data-test="`template-${template.name}`"
-              @click="confirmApplyTemplate(template.name)"
-              @mouseenter="hoveredTemplateName = template.name"
-              @mouseleave="hoveredTemplateName = null"
-            >
-              {{ $t(`group.types.${template.name}`) }}
-            </button>
+          <div :title="$t('group.rights.applyTemplate')">
+            <toggle-group
+              :items="templateItems"
+              :value="group.template"
+              :label="$t('admin.groupRoles.templateLabel')"
+              @select="confirmApplyTemplate"
+              @hover="hoveredTemplateName = $event"
+            />
           </div>
         </template>
       </group-rights-simple>
@@ -160,6 +153,7 @@ import OcelotInput from '~/components/OcelotInput/OcelotInput'
 import GroupRightsSimple from '~/components/Permissions/GroupRightsSimple'
 import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
 import RoleTabs from '~/components/Permissions/RoleTabs'
+import ToggleGroup from '~/components/Permissions/ToggleGroup'
 
 import {
   deleteGroupRoleMutation,
@@ -181,6 +175,7 @@ export default {
     OsCard,
     PermissionMatrix,
     RoleTabs,
+    ToggleGroup,
   },
   props: {
     group: { type: Object, required: true },
@@ -212,6 +207,14 @@ export default {
     },
     savedMessage() {
       return 'group.rights.saved'
+    },
+    templateItems() {
+      return this.templates.map((template) => ({
+        value: template.name,
+        label: this.$t(`group.types.${template.name}`),
+        disabled: !this.canEdit,
+        testId: `template-${template.name}`,
+      }))
     },
     applyTemplateModalData() {
       const template = this.$t(`group.types.${this.templateToApply}`)
@@ -366,46 +369,8 @@ export default {
 </script>
 
 <style scoped>
-/* The pill row and the matrix are shared components now (components/Permissions/*); what is
+/* The button rows and the matrix are shared components (components/Permissions/*); what is
    left here is this page's own furniture. */
-.template-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-xx-small);
-}
-
-.template-tab {
-  border: 1px solid var(--border-color-soft);
-  border-radius: var(--border-radius-x-large);
-  background: var(--background-color-base);
-  color: var(--text-color-base);
-  padding: var(--space-xx-small) var(--space-small);
-  font-size: 0.9em;
-  line-height: 1.4;
-  cursor: pointer;
-}
-
-.template-tab:hover:not(:disabled) {
-  background: var(--background-color-softer);
-}
-
-.template-tab--active {
-  border-color: var(--color-primary);
-  background: var(--color-primary);
-  color: var(--color-primary-inverse);
-  font-weight: bold;
-}
-
-.template-tab--active:hover:not(:disabled) {
-  background: var(--color-primary);
-}
-
-.template-tab:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .title {
   margin-bottom: 0;
 }

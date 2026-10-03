@@ -29,8 +29,12 @@ describe('RoleTabs', () => {
   it('marks the active role', () => {
     const wrapper = Wrapper()
 
-    expect(wrapper.find('[data-test="role-tab-user"]').classes()).toContain('role-tab--active')
-    expect(wrapper.find('[data-test="role-tab-owner"]').classes()).not.toContain('role-tab--active')
+    expect(wrapper.find('[data-test="role-tab-user"]').classes()).toContain(
+      'toggle-group__item--active',
+    )
+    expect(wrapper.find('[data-test="role-tab-owner"]').classes()).not.toContain(
+      'toggle-group__item--active',
+    )
   })
 
   it('reports selection and hover, and clears the hover on leave', async () => {
@@ -100,14 +104,18 @@ describe('the highlight', () => {
   it('marks the roles something elsewhere on the page points at', () => {
     const wrapper = Wrapper({ highlightFor: (role) => role.name === 'owner' })
 
-    expect(wrapper.find('[data-test="role-tab-owner"]').classes()).toContain('role-tab--touched')
-    expect(wrapper.find('[data-test="role-tab-user"]').classes()).not.toContain('role-tab--touched')
+    expect(wrapper.find('[data-test="role-tab-owner"]').classes()).toContain(
+      'toggle-group__item--marked',
+    )
+    expect(wrapper.find('[data-test="role-tab-user"]').classes()).not.toContain(
+      'toggle-group__item--marked',
+    )
   })
 
   it('marks nothing by default, so a page that says nothing marks nothing', () => {
     const wrapper = Wrapper()
 
-    expect(wrapper.findAll('.role-tab--touched')).toHaveLength(0)
+    expect(wrapper.findAll('.toggle-group__item--marked')).toHaveLength(0)
   })
 
   it('says which roles hold an unsaved edit, in words as well', () => {

@@ -33,28 +33,15 @@
         are readable at once, which matters for a setting whose options are opposite ends of one
         scale.
       -->
-      <div class="admission-control" role="radiogroup" :aria-label="$t('group.admission.label')">
+      <div class="admission-control">
         <span class="control-label">{{ $t('group.admission.label') }}</span>
-        <div class="control-options">
-          <button
-            v-for="state in admissionStates"
-            v-show="!admissionLocked || state === admission"
-            :key="state"
-            type="button"
-            role="radio"
-            :aria-checked="String(state === admission)"
-            class="admission-option"
-            :class="{ 'admission-option--active': state === admission }"
-            :disabled="!admissionEditable"
-            :title="admissionEditable ? null : admissionHint"
-            :data-test="`admission-option-${state}`"
-            @click="setAdmission(state)"
-            @mouseenter="previewAdmission(state)"
-            @mouseleave="clearPreview"
-          >
-            {{ $t(`group.admission.${state}.title`) }}
-          </button>
-        </div>
+        <toggle-group
+          :items="admissionItems"
+          :value="admission"
+          :label="$t('group.admission.label')"
+          @select="setAdmission"
+          @hover="$event ? previewAdmission($event) : clearPreview()"
+        />
       </div>
 
       <!-- What the group IS, on the same card the create form offers its templates on — so the
@@ -143,6 +130,7 @@
 
 <script>
 import GroupStateCard from '~/components/Group/GroupStateCard'
+import ToggleGroup from '~/components/Permissions/ToggleGroup'
 import { NONE_GROUP_ROLE, PENDING_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
 import { ADMISSION_STATES, admissionOf, JOIN_RIGHTS, withAdmission } from '~/utils/groupAdmission'
 import { privacyLevelOf } from '~/utils/groupPrivacyLevel'
@@ -217,7 +205,7 @@ const changeBetween = (now, next) => {
 
 export default {
   name: 'GroupRightsSimple',
-  components: { GroupStateCard },
+  components: { GroupStateCard, ToggleGroup },
   props: {
     /** The group's (or template's) roles AS DRAFTED: `{ name, permissions, … }`. */
     roles: { type: Array, required: true },
@@ -290,6 +278,18 @@ export default {
     },
     admissionEditable() {
       return !this.disabled && !this.admissionLocked && !!this.roleNamed(NONE_GROUP_ROLE)
+    },
+    /** The three doors; on a hidden group only the one it has, since there is no door to pick. */
+    admissionItems() {
+      return this.admissionStates
+        .filter((state) => !this.admissionLocked || state === this.admission)
+        .map((state) => ({
+          value: state,
+          label: this.$t(`group.admission.${state}.title`),
+          disabled: !this.admissionEditable,
+          title: this.admissionEditable ? null : this.admissionHint,
+          testId: `admission-option-${state}`,
+        }))
     },
     admissionHint() {
       if (this.admissionLocked) return this.$t('group.admission.needsVisibility')
@@ -462,13 +462,6 @@ export default {
   gap: var(--space-xx-small);
 }
 
-.control-options {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-xx-small);
-}
-
 .control-label {
   color: var(--text-color-softer);
   font-size: 0.85em;
@@ -497,47 +490,6 @@ export default {
 .state__reason {
   display: block;
   margin-top: var(--space-xxx-small);
-}
-
-/* The same pill the template tabs are, so the two rows read as the same kind of choice. */
-.admission-option {
-  border: 1px solid var(--border-color-soft);
-  border-radius: var(--border-radius-x-large);
-  background: var(--background-color-base);
-  color: var(--text-color-base);
-  padding: var(--space-xx-small) var(--space-small);
-  font-size: 0.9em;
-  line-height: 1.4;
-  cursor: pointer;
-}
-
-.admission-option:hover:not(:disabled) {
-  background: var(--background-color-softer);
-}
-
-.admission-option--active {
-  border-color: var(--color-primary);
-  background: var(--color-primary);
-  color: var(--color-primary-inverse);
-  font-weight: bold;
-}
-
-/* Not the soft hover of an inactive pill: white on a light background is unreadable. */
-.admission-option--active:hover:not(:disabled) {
-  background: var(--color-primary);
-}
-
-.admission-option:disabled {
-  cursor: not-allowed;
-}
-
-/*
- * Greyed only while there is something to tell it apart FROM. On a hidden group the other two
- * are not rendered at all, and fading the one that is left put white text on a washed-out green
- * — the reason is already spelled out under the title, so the pill only has to stay readable.
- */
-.admission-option:disabled:not(.admission-option--active) {
-  opacity: 0.6;
 }
 
 /* Side by side on a wide screen, like the full matrix — eight sentences in one column is a

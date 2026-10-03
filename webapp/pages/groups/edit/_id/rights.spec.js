@@ -259,7 +259,7 @@ describe('rights.vue', () => {
       expect(classesOf(wrapper, 'group.content.read')).toContain('perm-row--touched')
       expect(classesOf(wrapper, 'group.read')).toContain('perm-row--touched')
       expect(classesOf(wrapper, 'group.post.create')).not.toContain('perm-row--touched')
-      expect(at(wrapper, 'role-tab-none').classes()).toContain('role-tab--touched')
+      expect(at(wrapper, 'role-tab-none').classes()).toContain('toggle-group__item--marked')
     })
 
     it('marks what a template would change — sentences, states and role tabs', async () => {
@@ -274,14 +274,14 @@ describe('rights.vue', () => {
       expect(at(wrapper, 'switch-row-members-comment').classes()).toContain('switch--will-added')
       expect(at(wrapper, 'switch-row-members-post').classes()).toEqual(['switch'])
       expect(at(wrapper, 'visibility-next').text()).toContain('group.types.closed')
-      expect(at(wrapper, 'role-tab-none').classes()).toContain('role-tab--touched')
-      expect(at(wrapper, 'role-tab-pending').classes()).not.toContain('role-tab--touched')
+      expect(at(wrapper, 'role-tab-none').classes()).toContain('toggle-group__item--marked')
+      expect(at(wrapper, 'role-tab-pending').classes()).not.toContain('toggle-group__item--marked')
       // The matrix of the role on screen says added or removed, as for a hovered role.
       expect(classesOf(wrapper, 'group.comment.create')).toContain('perm-row--added')
 
       await at(wrapper, 'template-closed').trigger('mouseleave')
 
-      expect(wrapper.findAll('.role-tab--touched')).toHaveLength(0)
+      expect(wrapper.findAll('.toggle-group__item--marked')).toHaveLength(0)
       expect(wrapper.findAll('[class*="switch--will-"]')).toHaveLength(0)
     })
 
@@ -346,7 +346,7 @@ describe('rights.vue', () => {
       await at(wrapper, 'admission-option-onRequest').trigger('mouseenter')
 
       expect(at(wrapper, 'admission-next').exists()).toBe(true)
-      expect(at(wrapper, 'role-tab-pending').classes()).toContain('role-tab--touched')
+      expect(at(wrapper, 'role-tab-pending').classes()).toContain('toggle-group__item--marked')
     })
   })
 
@@ -627,7 +627,8 @@ describe('rights.vue', () => {
     const tab = at(wrapper, 'role-tab-pending')
 
     expect(tab.attributes('disabled')).toBeTruthy()
-    expect(tab.attributes('title')).toBe('group.rights.pendingBlocked')
+    // On the wrapper: a disabled button takes no pointer events, so its own title never shows.
+    expect(tab.element.parentElement.getAttribute('title')).toBe('group.rights.pendingBlocked')
   })
 
   it('opens the applicant role again once somebody can ask to join', async () => {

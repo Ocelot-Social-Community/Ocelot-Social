@@ -172,9 +172,9 @@ describe('GroupRightsSimple', () => {
       // and a closed dropdown shows neither of the others next to the one it has.
       const wrapper = Wrapper({ roles: rolesWith(['group.read', 'group.join']) })
 
-      expect(at(wrapper, 'admission-option-open').classes()).toContain('admission-option--active')
+      expect(at(wrapper, 'admission-option-open').classes()).toContain('toggle-group__item--active')
       expect(at(wrapper, 'admission-option-closed').classes()).not.toContain(
-        'admission-option--active',
+        'toggle-group__item--active',
       )
       expect(at(wrapper, 'admission-option-open').attributes('aria-checked')).toBe('true')
     })
@@ -213,7 +213,9 @@ describe('GroupRightsSimple', () => {
       const wrapper = Wrapper({ roles: rolesWith([]) })
 
       expect(at(wrapper, 'admission-locked').exists()).toBe(true)
-      expect(at(wrapper, 'admission-option-open').element.disabled).toBe(true)
+      // Only the door it has is shown, and it cannot be changed.
+      expect(at(wrapper, 'admission-option-open').exists()).toBe(false)
+      expect(at(wrapper, 'admission-option-closed').element.disabled).toBe(true)
       expect(at(wrapper, 'admission-closed').exists()).toBe(true)
     })
 

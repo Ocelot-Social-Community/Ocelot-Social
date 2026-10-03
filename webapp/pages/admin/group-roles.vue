@@ -21,21 +21,13 @@
              and the line below said the groups are "Public", and the two can disagree the moment
              somebody edits the template's non-member role. The row is labelled as templates, and
              the visibility is stated below as a consequence. -->
-          <div class="type-tabs">
-            <button
-              v-for="template in templates"
-              :key="template.name"
-              type="button"
-              class="type-tab"
-              :class="{ 'type-tab--active': template.name === activeTemplateName }"
-              :data-test="`type-tab-${template.name}`"
-              @click="openTemplate(template.name)"
-              @mouseenter="hoveredTemplateName = template.name"
-              @mouseleave="hoveredTemplateName = null"
-            >
-              {{ $t(`group.types.${template.name}`) }}
-            </button>
-          </div>
+          <toggle-group
+            :items="templateItems"
+            :value="activeTemplateName"
+            :label="$t('admin.groupRoles.templateLabel')"
+            @select="openTemplate"
+            @hover="hoveredTemplateName = $event"
+          />
         </template>
       </group-rights-simple>
 
@@ -157,6 +149,7 @@ import GroupRightsSimple from '~/components/Permissions/GroupRightsSimple'
 import OcelotInput from '~/components/OcelotInput/OcelotInput'
 import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
 import RoleTabs from '~/components/Permissions/RoleTabs'
+import ToggleGroup from '~/components/Permissions/ToggleGroup'
 
 import {
   applyGroupRoleTemplatesMutation,
@@ -167,7 +160,15 @@ import groupRightsEditor from '~/mixins/groupRightsEditor'
 
 export default {
   mixins: [groupRightsEditor],
-  components: { GroupRightsSimple, OcelotInput, OsButton, OsCard, PermissionMatrix, RoleTabs },
+  components: {
+    GroupRightsSimple,
+    OcelotInput,
+    OsButton,
+    OsCard,
+    PermissionMatrix,
+    RoleTabs,
+    ToggleGroup,
+  },
   data() {
     return {
       templates: [],
@@ -184,6 +185,13 @@ export default {
     },
     savedMessage() {
       return 'admin.groupRoles.saved'
+    },
+    templateItems() {
+      return this.templates.map((template) => ({
+        value: template.name,
+        label: this.$t(`group.types.${template.name}`),
+        testId: `type-tab-${template.name}`,
+      }))
     },
   },
   methods: {
@@ -266,35 +274,6 @@ export default {
 .untouched,
 .note {
   color: var(--text-color-soft);
-}
-.type-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-xx-small);
-  margin-bottom: var(--space-small);
-}
-.type-tab {
-  border: 1px solid var(--border-color-soft);
-  border-radius: var(--border-radius-x-large);
-  background: var(--background-color-base);
-  padding: var(--space-xx-small) var(--space-small);
-  font-size: 0.9em;
-  cursor: pointer;
-}
-.type-tab:hover {
-  background: var(--background-color-softer);
-}
-.type-tab--active {
-  border-color: var(--color-primary);
-  background: var(--color-primary);
-  color: var(--color-primary-inverse);
-  font-weight: bold;
-}
-/* The hover rule above would otherwise lighten the ACTIVE tab's background while its text
-   stays the inverse colour — white on near-white, unreadable. */
-.type-tab--active:hover {
-  background: var(--color-primary);
 }
 .role-label {
   max-width: 24rem;
