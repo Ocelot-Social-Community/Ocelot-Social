@@ -117,7 +117,7 @@
         <permission-matrix
           v-else
           :permissions="catalog"
-          :granted="draftPermissions"
+          :granted="draft"
           :diff="hoverDiff"
           :highlight="highlightedRights"
           :group-label="(name) => $t(`permissions.sections.${name}`)"
@@ -132,7 +132,7 @@
           "
           :hint-for="blockedHint"
           :note-for="blockedHint"
-          @toggle="togglePermission"
+          @toggle="toggle"
         />
 
         <div class="actions">
@@ -193,21 +193,12 @@ import {
   resetGroupRolesMutation,
   updateGroupRoleMutation,
 } from '~/graphql/groupRoles.js'
-import {
-  isMootRight,
-  mootReasonFor,
-  isSystemGroupRole,
-  MANDATORY_GROUP_RIGHTS,
-  PENDING_GROUP_ROLE,
-} from '~/constants/groups'
-import { NONE_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
+import { USUAL_GROUP_ROLE } from '~/constants/groups'
+import groupRightsEditor from '~/mixins/groupRightsEditor'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { orderRolesByPrivilege } from '~/utils/groupRights'
-import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
-import groupRights from '~/mixins/groupRights'
 
 export default {
-  mixins: [groupRights],
+  mixins: [groupRightsEditor],
   components: {
     ConfirmModal,
     GroupRightsSimple,
@@ -223,31 +214,22 @@ export default {
   data() {
     return {
       icons: iconRegistry,
-      catalog: [],
       templateNames: [],
       // The template the viewer picked, waiting for them to confirm. Replacing every role of a
       // group is too much for a browser confirm box — the same modal that asks about leaving
       // an editor asks about this.
       templateToApply: null,
+      // The template button under the cursor.
+      hoveredTemplateName: null,
       roles: [],
       myGroupPermissions: [],
-      advanced: false,
-      // Whether the simple view has an unsaved draft — it owns the draft, the page owns the
-      // view toggle, and the toggle must not throw the draft away silently.
-      simpleDirty: false,
-      activeRoleName: USUAL_GROUP_ROLE,
-      // The role tab under the cursor, to preview what it would change about the one being
-      // edited — the same affordance the network and template role pages have.
-      hoveredRoleName: null,
-      // The template button under the cursor, and what the simple view says it is pointing at.
-      hoveredTemplateName: null,
-      switchHighlight: null,
-      draftPermissions: [],
-      draftLabel: '',
-      saving: false,
     }
   },
   computed: {
+    /** What this screen edits: the group's own roles. */
+    editedRoles() {
+      return this.roles
+    },
     canManageRoles() {
       return this.myGroupPermissions.includes('group.role.manage')
     },
@@ -260,9 +242,6 @@ export default {
     },
     simpleDisabledHint() {
       return this.dirty ? this.$t('group.rights.saveFirst') : this.$t('group.rights.noRight')
-    },
-    orderedRoles() {
-      return orderRolesByPrivilege(this.roles)
     },
     applyTemplateModalData() {
       const template = this.$t(`group.types.${this.templateToApply}`)
@@ -281,148 +260,40 @@ export default {
         },
       }
     },
-    /** The applicant role is being edited, and nothing can produce an applicant. */
-    pendingUnreachable() {
-      return (
-        this.activeRoleName === PENDING_GROUP_ROLE &&
-        !this.roles.some((role) => role.permissions?.includes('group.join.request'))
-      )
-    },
-    activeRole() {
-      return this.roles.find((role) => role.name === this.activeRoleName) ?? null
-    },
-    // Hovering another role marks every right it would change against the DRAFT: 'added'
-    // where the hovered role grants what this one does not, 'removed' the other way round.
-    hoverDiff() {
-      if (!this.hoveredRoleName || this.hoveredRoleName === this.activeRoleName) return {}
-      const hovered = this.roles.find((role) => role.name === this.hoveredRoleName)
-      if (!hovered) return {}
-      return diffBetween(
-        this.catalog,
-        new Set(this.draftPermissions),
-        this.permissionSetOf(hovered),
-      )
-    },
-    dirty() {
-      return isRoleDirty(this.activeRole, this.draftPermissions, this.draftLabel)
-    },
     /**
      * What the matrix and the role tabs should point at: the sentence under the cursor, else —
      * for a template button — every role, because putting a template on a group replaces all of
-     * them. What a template would change to cannot be shown here: its contents sit behind
+     * them. What a template would change TO cannot be shown here: its contents sit behind
      * `group.roleTemplate.manage`, which a group owner does not hold, so this page knows the
      * names and nothing else.
      */
     highlight() {
       if (this.switchHighlight) return this.switchHighlight
       if (!this.hoveredTemplateName) return null
-      return Object.fromEntries(this.roles.map((role) => [role.name, []]))
-    },
-    /** The highlighted rights OF THE ROLE ON SCREEN — a sentence about another role marks none. */
-    highlightedRights() {
-      return this.highlight?.[this.activeRoleName] ?? []
-    },
-    /**
-     * The roles as the card above should read them: what is stored, with the matrix's UNSAVED
-     * edit folded in. The two views are on screen together now, so without this the card would
-     * go on calling a group hidden while the row that makes it public sits ticked just below.
-     *
-     * Only while that edit exists — the card's own switches are locked then, so handing the
-     * component a new array (which resets its draft) costs nothing. Doing it unconditionally
-     * would reset that draft on every role tab click instead.
-     */
-    rolesForSimple() {
-      if (!this.dirty || !this.activeRole) return this.roles
-      return this.roles.map((role) =>
-        role.name === this.activeRoleName ? { ...role, permissions: this.draftPermissions } : role,
-      )
-    },
-  },
-  watch: {
-    activeRoleName() {
-      this.resetDraft()
+      return Object.fromEntries(this.editedRoles.map((role) => [role.name, []]))
     },
   },
   methods: {
-    isSystemGroupRole,
-    /** Whether anything under the cursor reaches this role. */
-    highlightsRole(role) {
-      return !!this.highlight && role.name in this.highlight
-    },
-    /**
-     * Why a role tab cannot be opened — today only the applicant role, when nothing lets
-     * anybody ask to join. Blocked rather than left to open onto an explanation: a role nobody
-     * can hold has nothing to configure, and the cursor is already on the tab.
-     */
-    blockedRole(role) {
-      if (role.name !== PENDING_GROUP_ROLE) return null
-      const reachable = this.roles.some((candidate) =>
-        candidate.permissions?.includes('group.join.request'),
-      )
-      return reachable ? null : this.$t('group.rights.pendingBlocked')
-    },
     /**
      * A right can only be handed out by somebody who holds it — the same coverage rule the
      * backend enforces. Showing an ineffective checkbox would promise an effect that the save
      * would then refuse.
      */
-    /**
-     * A right the role cannot be written without, so the box is ticked and locked rather than
-     * offered: `group.leave` on anything that IS a membership. Without it the only way out of
-     * the group would be somebody else removing you (see groupRole/mandatoryRights.ts).
-     */
-    /**
-     * A right that means nothing for this role: `group.leave` on the non-member role, which has
-     * no membership to end. Greyed rather than offered — a checkbox that changes nothing is
-     * worse than one that is not there.
-     */
-    isMoot(permission) {
-      return isMootRight(this.activeRoleName, permission?.key)
-    },
-    isMandatory(permission) {
-      // The simple view asks about rights the catalog may not carry yet, so a missing entry is
-      // a legitimate argument here and answers "no" rather than throwing.
-      return (
-        this.activeRoleName !== NONE_GROUP_ROLE && MANDATORY_GROUP_RIGHTS.includes(permission?.key)
-      )
-    },
     grantable(permission) {
       return !!permission && this.myGroupPermissions.includes(permission.key)
     },
-    blockedHint(permission) {
-      // The lock between the two views, said where the cursor is: the card above holds an
-      // unsaved edit, and whichever of the two saved second would discard the other's.
-      if (this.simpleDirty) return this.$t('group.rights.saveFirst')
-      if (this.isMoot(permission)) {
-        return this.$t(mootReasonFor(this.activeRoleName, permission?.key))
-      }
-      if (this.isMandatory(permission)) {
-        return this.$t('group.rights.mandatory')
-      }
-      if (!permission) return null
-      if (permission.requiresNetworkPermission && !this.grantable(permission)) {
+    /** The reasons only a GROUP has: a right the network withholds, or a feature switched off. */
+    gateHint(permission) {
+      if (!permission || this.grantable(permission)) return null
+      if (permission.requiresNetworkPermission) {
         return this.$t('group.rights.blockedByNetwork', {
           permission: permission.requiresNetworkPermission,
         })
       }
-      if (permission.gatedBy?.length && !this.grantable(permission)) {
+      if (permission.gatedBy?.length) {
         return this.$t('group.rights.blockedByFeature', { feature: permission.gatedBy.join(', ') })
       }
       return null
-    },
-    // What a role effectively grants. `owner` stores no list and resolves to the whole
-    // catalog, so hovering it has to show that rather than an empty role.
-    permissionSetOf(role) {
-      return permissionSetOf(role, this.catalog)
-    },
-    resetDraft() {
-      this.draftPermissions = this.activeRole ? [...this.activeRole.permissions] : []
-      this.draftLabel = this.activeRole?.label ?? ''
-    },
-    togglePermission(key, enabled) {
-      this.draftPermissions = enabled
-        ? [...this.draftPermissions, key]
-        : this.draftPermissions.filter((candidate) => candidate !== key)
     },
     async writeRole(name, permissions, label) {
       this.saving = true
@@ -456,11 +327,11 @@ export default {
     save() {
       if (!this.activeRole) return
       // The owner role keeps no list — only its label can move.
-      const permissions = this.activeRole.protected ? [] : this.draftPermissions
+      const permissions = this.activeRole.protected ? [] : this.draft
       return this.writeRole(this.activeRole.name, permissions, this.draftLabel)
     },
     /**
-     * The simple view's draft, written in one go.
+     * The sentences' draft, written in one go.
      *
      * Sequentially rather than in parallel: each write answers with the role it stored and the
      * page merges it, and two answers landing at once would have the second merge overwrite the
@@ -468,27 +339,20 @@ export default {
      */
     async saveSimple(changes) {
       for (const change of changes) {
-        const role = this.roles.find((candidate) => candidate.name === change.name)
+        const role = this.editedRoles.find((candidate) => candidate.name === change.name)
         if (!role) continue
         await this.writeRole(role.name, change.permissions, role.label)
       }
     },
-    /**
-     * The read-only channel from #5588: members read, only admins write. Expressed as the
-     * three rights it actually is rather than as a mode the backend would have to know about.
-     */
-    /**
-     * Put a whole template on this group.
-     *
-     * Confirmed, because it replaces every role rather than changing one right — and named in
-     * the question, so "I meant the other one" is caught before the roles are gone.
-     */
     /**
      * Picking a template — including the one the group already runs on, which is what "reset to
      * defaults" used to be. Two controls for one act was one too many, and the old one was
      * worse than redundant: it looked the template up by the group's VISIBILITY, so a group
      * whose rights had drifted away from its preset was reset to a different preset than the
      * one it came from.
+     *
+     * Confirmed, because it replaces every role rather than changing one right — and named in
+     * the question, so "I meant the other one" is caught before the roles are gone.
      */
     confirmApplyTemplate(name) {
       this.templateToApply = name

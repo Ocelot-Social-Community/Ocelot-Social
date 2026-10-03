@@ -231,7 +231,6 @@
       "ownerHoldsEverything": "Die Inhaber-Rolle hält immer alle Rechte und ist nicht bearbeitbar.",
       "resultingVisibility": "Gruppen aus dieser Vorlage sind:",
       "saved": "Vorlage gespeichert",
-      "saveFirst": "Erst speichern oder verwerfen — es gibt ungesicherte Änderungen.",
       "templateLabel": "Vorlage",
       "title": "Gruppen-Vorlagen",
       "untouched": "Eine Änderung hier erreicht {untouched} der {total} aus dieser Vorlage erstellten Gruppen — die, die ihre Rechte nie selbst geändert haben — und nur, wenn du sie anwendest."

@@ -231,7 +231,6 @@
       "ownerHoldsEverything": "A função de proprietário tem sempre todas as permissões e não pode ser editada.",
       "resultingVisibility": "Os grupos criados a partir deste modelo são:",
       "saved": "Modelo guardado",
-      "saveFirst": "Guarde ou descarte primeiro: há alterações não guardadas.",
       "templateLabel": "Modelo",
       "title": "Modelos de grupo",
       "untouched": "Uma alteração aqui atinge {untouched} dos {total} grupos criados a partir deste modelo — os que nunca alteraram os seus próprios direitos — e apenas quando a aplicar."

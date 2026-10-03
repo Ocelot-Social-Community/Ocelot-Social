@@ -231,7 +231,6 @@
       "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten en kan niet worden aangepast.",
       "resultingVisibility": "Groepen uit dit sjabloon zijn:",
       "saved": "Sjabloon opgeslagen",
-      "saveFirst": "Eerst opslaan of verwerpen — er zijn niet-opgeslagen wijzigingen.",
       "templateLabel": "Sjabloon",
       "title": "Groepssjablonen",
       "untouched": "Een wijziging hier bereikt {untouched} van de {total} groepen die met dit sjabloon zijn gemaakt — de groepen die hun eigen rechten nooit hebben gewijzigd — en alleen als je die toepast."

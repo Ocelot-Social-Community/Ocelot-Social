@@ -231,7 +231,6 @@
       "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos y no se puede editar.",
       "resultingVisibility": "Los grupos creados con esta plantilla son:",
       "saved": "Plantilla guardada",
-      "saveFirst": "Guarda o descarta primero: hay cambios sin guardar.",
       "templateLabel": "Plantilla",
       "title": "Plantillas de grupo",
       "untouched": "Una edición aquí alcanza {untouched} de los {total} grupos creados a partir de esta plantilla —los que nunca cambiaron sus propios derechos— y solo cuando la aplicas."

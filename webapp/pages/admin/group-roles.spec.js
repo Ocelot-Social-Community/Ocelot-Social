@@ -225,7 +225,7 @@ describe('admin/group-roles.vue', () => {
 
     const row = at(wrapper, 'perm-group.post.create').element.closest('label')
     expect(row.querySelector('input').disabled).toBe(true)
-    expect(row.getAttribute('title')).toBe('admin.groupRoles.saveFirst')
+    expect(row.getAttribute('title')).toBe('group.rights.saveFirst')
     expect(at(wrapper, 'save').attributes('disabled')).toBeTruthy()
   })
 

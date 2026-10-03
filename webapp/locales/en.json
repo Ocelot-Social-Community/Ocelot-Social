@@ -231,7 +231,6 @@
       "ownerHoldsEverything": "The owner role always holds every right and cannot be edited.",
       "resultingVisibility": "Groups created from this template are:",
       "saved": "Template saved",
-      "saveFirst": "Save or discard first — there are unsaved changes.",
       "templateLabel": "Template",
       "title": "Group templates",
       "untouched": "An edit here reaches {untouched} of the {total} groups created from this template — the ones that never changed their own rights — and only when you apply it."

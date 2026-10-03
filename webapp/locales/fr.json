@@ -231,7 +231,6 @@
       "ownerHoldsEverything": "Le rôle de propriétaire détient toujours toutes les permissions et ne peut pas être modifié.",
       "resultingVisibility": "Les groupes créés à partir de ce modèle sont :",
       "saved": "Modèle enregistré",
-      "saveFirst": "Enregistrez ou annulez d'abord : il y a des modifications non enregistrées.",
       "templateLabel": "Modèle",
       "title": "Modèles de groupe",
       "untouched": "Une modification ici touche {untouched} des {total} groupes créés à partir de ce modèle — ceux qui n'ont jamais modifié leurs propres droits — et seulement lorsque vous l'appliquez."

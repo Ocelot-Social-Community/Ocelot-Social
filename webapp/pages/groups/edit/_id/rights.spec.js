@@ -145,7 +145,7 @@ describe('rights.vue', () => {
       templateNames: ['public', 'closed', 'hidden', 'channel'],
       roles: ROLES,
       myGroupPermissions,
-      draftPermissions: ROLES.find((role) => role.name === 'usual').permissions,
+      draft: ROLES.find((role) => role.name === 'usual').permissions,
     })
     await wrapper.vm.$nextTick()
     return wrapper
@@ -225,12 +225,12 @@ describe('rights.vue', () => {
       // the same order a click and a tick produce.
       wrapper.setData({ activeRoleName: 'none' })
       await wrapper.vm.$nextTick()
-      wrapper.setData({ draftPermissions: ['group.read', 'group.content.read'] })
+      wrapper.setData({ draft: ['group.read', 'group.content.read'] })
       await wrapper.vm.$nextTick()
 
       expect(at(wrapper, 'visibility-title').text()).toContain('group.types.public')
 
-      wrapper.setData({ draftPermissions: ['group.read'] })
+      wrapper.setData({ draft: ['group.read'] })
       await wrapper.vm.$nextTick()
 
       expect(at(wrapper, 'visibility-title').text()).toContain('group.types.closed')

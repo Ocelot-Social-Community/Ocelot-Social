@@ -231,7 +231,6 @@
       "ownerHoldsEverything": "Il ruolo di proprietario ha sempre tutti i permessi e non è modificabile.",
       "resultingVisibility": "I gruppi creati da questo modello sono:",
       "saved": "Modello salvato",
-      "saveFirst": "Prima salva o annulla: ci sono modifiche non salvate.",
       "templateLabel": "Modello",
       "title": "Modelli di gruppo",
       "untouched": "Una modifica qui raggiunge {untouched} dei {total} gruppi creati da questo modello — quelli che non hanno mai cambiato i propri diritti — e solo quando la applichi."
