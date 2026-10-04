@@ -52,6 +52,8 @@ exports[`invites.vue renders 1`] = `
         invite-codes.redeemed-count-0
       
                   </span>
+                   
+                  <!---->
                 </div>
               </div>
                

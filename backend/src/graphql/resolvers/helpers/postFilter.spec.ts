@@ -141,19 +141,77 @@ describe('postFilterToCypher boolean composition', () => {
 describe('postFilterToCypher access control operators', () => {
   // The visibility rule, read off the group rather than from a stored CANNOT_SEE edge.
   //
-  // Asserted as three separate claims instead of one string match, because each one fails in a
-  // different direction: a missing `NOT` on the group type serves only the private posts, a
-  // missing group-list check hides the viewer's own groups, and a missing author clause loses
-  // the one exception the rule grants.
-  it('excludes posts in non-public groups the viewer is not a member of', () => {
+  // Asserted as separate claims instead of one string match, because each one fails in a
+  // different direction: a missing check on the group's own non-member flag serves every
+  // closed group's posts, a missing group-list check hides the viewer's own groups, and a
+  // missing author clause loses the one exception the rule grants.
+  it('excludes posts in groups that are open neither to the viewer nor to strangers', () => {
     const { where, params } = postFilterToCypher({
-      filter: { invisibleTo: { viewerId: 'viewer-id', groupIds: ['group-a', 'group-b'] } },
+      filter: {
+        invisibleTo: {
+          viewerId: 'viewer-id',
+          contentGroupIds: ['group-a', 'group-b'],
+          moderatorVisibilities: [],
+        },
+      },
     })
 
-    expect(where).toContain("WHERE NOT g.groupType = 'public' AND NOT g.id IN $pf1")
+    // The group's own answer first — the mirrored `group.content.read` of its non-member role,
+    // failing closed for a node the backfill has not reached yet.
+    expect(where).toContain('NOT (coalesce(g.nonMemberContentRead, false) = true)')
+    expect(where).toContain('AND NOT g.id IN $pf1')
+    // …then the network side, which quantifies over VISIBILITIES — derived from the columns
+    // rather than read from one, so there is a CASE here and not a property.
+    expect(where).toContain('IN $pf2')
+    expect(where).toContain("WHEN coalesce(g.nonMemberRead, false) <> true THEN 'hidden'")
     expect(where).toContain('NOT EXISTS {')
     expect(where).toContain('OR EXISTS { MATCH (post)<-[:WROTE]-(:User { id: $pf0 }) }')
-    expect(params).toEqual({ pf0: 'viewer-id', pf1: ['group-a', 'group-b'] })
+    expect(params).toEqual({
+      pf0: 'viewer-id',
+      pf1: ['group-a', 'group-b'],
+      pf2: [],
+    })
+  })
+
+  // The point of reading the group instead of its type: a PUBLIC group that took
+  // `group.content.read` away from its non-member role is not readable by a stranger, and no
+  // part of this clause may hand it back. The flag is a node property, so what this pins is
+  // that the type is not consulted for it at all.
+  it('does not let the visibility decide what the group decided', () => {
+    const { where } = postFilterToCypher({
+      filter: { invisibleTo: { viewerId: null, contentGroupIds: [], moderatorVisibilities: [] } },
+    })
+
+    expect(where).not.toContain("g.visibility = 'public' AND")
+    expect(where).not.toContain("NOT g.visibility IN ['public']")
+  })
+
+  // What #9405 asked for: a network moderator holding group.content.read.any_closed brings the
+  // type along, so the reported content they are supposed to review stops being invisible —
+  // without a per-row lookup, and with visibility still the axis.
+  it('lets a viewer read into the visibilities their network rights cover', () => {
+    const { params } = postFilterToCypher({
+      filter: {
+        invisibleTo: {
+          viewerId: 'moderator-id',
+          contentGroupIds: [],
+          moderatorVisibilities: ['closed'],
+        },
+      },
+    })
+
+    expect(params).toEqual({ pf0: 'moderator-id', pf1: [], pf2: ['closed'] })
+  })
+
+  // A caller that does not know about the field must widen NOTHING. It used to default to
+  // ['public'], which was right while the type carried the statement "strangers may read
+  // this"; now the group carries it, so the default is the empty list.
+  it('widens nothing when no moderator visibilities are given', () => {
+    const { params } = postFilterToCypher({
+      filter: { invisibleTo: { viewerId: null, contentGroupIds: [] } },
+    })
+
+    expect(params).toEqual({ pf0: null, pf1: [], pf2: [] })
   })
 
   // One expression covers the anonymous visitor too: an empty group list makes `NOT g.id IN []`
@@ -163,11 +221,12 @@ describe('postFilterToCypher access control operators', () => {
   // than the clause being allowed to drop out.
   it('keeps constraining for an anonymous viewer', () => {
     const { where, params } = postFilterToCypher({
-      filter: { invisibleTo: { viewerId: null, groupIds: [] } },
+      filter: { invisibleTo: { viewerId: null, contentGroupIds: [] } },
     })
 
-    expect(where).toContain("WHERE NOT g.groupType = 'public' AND NOT g.id IN $pf1")
-    expect(params).toEqual({ pf0: null, pf1: [] })
+    expect(where).toContain('NOT (coalesce(g.nonMemberContentRead, false) = true)')
+    expect(where).toContain('AND NOT g.id IN $pf1')
+    expect(params).toEqual({ pf0: null, pf1: [], pf2: [] })
   })
 
   it('excludes posts written by an author the viewer muted', () => {
@@ -452,7 +511,11 @@ describe('postFilterToCypher parameter binding', () => {
     id_not_in: [payload],
     language_in: [payload],
     postType_in: [payload],
-    invisibleTo: { viewerId: payload, groupIds: [payload] },
+    invisibleTo: {
+      viewerId: payload,
+      contentGroupIds: [payload],
+      moderatorVisibilities: [payload],
+    },
     mutedBy: payload,
     inGroupsOf: [payload],
     eventStart_gte: payload,

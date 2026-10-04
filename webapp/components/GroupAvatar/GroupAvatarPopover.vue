@@ -24,9 +24,9 @@
         class="location-info"
       />
       <div class="chips">
-        <os-badge variant="primary">{{ $t(`group.types.${resolvedGroup.groupType}`) }}</os-badge>
-        <os-badge v-if="resolvedGroup.myRole" variant="primary">
-          {{ $t(`group.roles.${resolvedGroup.myRole}`) }}
+        <os-badge variant="primary">{{ $t(`group.types.${resolvedGroup.visibility}`) }}</os-badge>
+        <os-badge v-if="resolvedGroup.myGroupRole" variant="primary">
+          {{ roleLabel(resolvedGroup.myGroupRole) }}
         </os-badge>
         <os-badge v-if="resolvedGroup.actionRadius" variant="primary">
           {{ $t(`group.actionRadii.${resolvedGroup.actionRadius}`) }}
@@ -69,9 +69,11 @@ import Empty from '~/components/Empty/Empty'
 import LocationInfo from '~/components/LocationInfo/LocationInfo'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import { groupTeaserQuery } from '~/graphql/groups'
+import groupRights from '~/mixins/groupRights'
 
 export default {
   name: 'GroupAvatarPopover',
+  mixins: [groupRights],
   components: {
     Empty,
     LocationInfo,

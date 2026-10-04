@@ -184,7 +184,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
       name: 'The Best Group',
       about: 'We will change the world!',
       description: 'Some description' + descriptionAdditional100,
-      groupType: 'public',
+      template: 'public',
       actionRadius: 'regional',
       categoryIds,
     },
@@ -212,7 +212,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
       name: 'Uninteresting Group',
       about: 'We will change nothing!',
       description: 'We love it like it is!?' + descriptionAdditional100,
-      groupType: 'closed',
+      template: 'closed',
       actionRadius: 'national',
       categoryIds,
     },
@@ -225,7 +225,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
       name: 'Investigative Journalism Group',
       about: 'We will change all.',
       description: 'We research …' + descriptionAdditional100,
-      groupType: 'hidden',
+      template: 'hidden',
       actionRadius: 'global',
       categoryIds,
     },
@@ -315,7 +315,7 @@ describe('in mode', () => {
           slug: 'the-group',
           about: 'We will change the world!',
           description: 'Some description' + descriptionAdditional100,
-          groupType: 'public',
+          template: 'public',
           actionRadius: 'regional',
           categoryIds,
           locationName: 'Hamburg, Germany',
@@ -343,7 +343,7 @@ describe('in mode', () => {
                 slug: 'the-group',
                 about: 'We will change the world!',
                 description: 'Some description' + descriptionAdditional100,
-                groupType: 'public',
+                visibility: 'public',
                 actionRadius: 'regional',
                 locationName: 'Hamburg, Germany',
                 location: expect.objectContaining({
@@ -614,7 +614,7 @@ describe('in mode', () => {
               name: 'Uninteresting Group',
               about: 'We will change nothing!',
               description: 'We love it like it is!?' + descriptionAdditional100,
-              groupType: 'closed',
+              template: 'closed',
               actionRadius: 'global',
               categoryIds,
             },
@@ -627,7 +627,7 @@ describe('in mode', () => {
               name: 'Investigative Journalism Group',
               about: 'We will change all.',
               description: 'We research …' + descriptionAdditional100,
-              groupType: 'hidden',
+              template: 'hidden',
               actionRadius: 'global',
               categoryIds,
             },
@@ -639,7 +639,7 @@ describe('in mode', () => {
               name: 'Second Investigative Journalism Group',
               about: 'We will change all.',
               description: 'We research …' + descriptionAdditional100,
-              groupType: 'hidden',
+              template: 'hidden',
               actionRadius: 'global',
               categoryIds,
             },
@@ -659,7 +659,7 @@ describe('in mode', () => {
               name: 'Third Investigative Journalism Group',
               about: 'We will change all.',
               description: 'We research …' + descriptionAdditional100,
-              groupType: 'hidden',
+              template: 'hidden',
               actionRadius: 'global',
               categoryIds,
             },
@@ -680,7 +680,7 @@ describe('in mode', () => {
               name: 'The Best Group',
               about: 'We will change the world!',
               description: 'Some description' + descriptionAdditional100,
-              groupType: 'public',
+              template: 'public',
               actionRadius: 'regional',
               categoryIds,
               locationName: 'Hamburg, Germany',
@@ -901,7 +901,12 @@ describe('in mode', () => {
             })
 
             describe('isMember = true', () => {
-              it('finds only listed groups where user is member', async () => {
+              // "The groups I am in" asks about MEMBERSHIPS, not about what the viewer may
+              // read — which is why the hidden group they are waiting in is here too: an
+              // applicant has to be able to see that they applied. The group's own fields stay
+              // blank for them (its `pending` role grants no `group.read`), and the discovery
+              // list above does not show it.
+              it('finds every group the viewer has a membership in, waiting included', async () => {
                 const result = await query({ query: groupQuery, variables: { isMember: true } })
 
                 expect(result).toMatchObject({
@@ -917,11 +922,30 @@ describe('in mode', () => {
                         slug: 'third-investigative-journalism-group',
                         myRole: 'usual',
                       }),
+                      expect.objectContaining({
+                        id: 'second-hidden-group',
+                        myRole: 'pending',
+                      }),
                     ]),
                   },
                   errors: undefined,
                 })
-                expect(result.data?.Group.length).toBe(2)
+                expect(result.data?.Group.length).toBe(3)
+              })
+
+              it('tells the applicant nothing about that group beyond their own status', async () => {
+                const result = await query({ query: groupQuery, variables: { isMember: true } })
+                const waiting = result.data?.Group.find(
+                  (group) => group.id === 'second-hidden-group',
+                )
+
+                // The name is what they were invited with; the profile is not theirs to read.
+                expect(waiting).toMatchObject({
+                  myRole: 'pending',
+                  description: '',
+                  about: '',
+                })
+                expect(result.errors).toBeUndefined()
               })
             })
 
@@ -1010,7 +1034,7 @@ describe('in mode', () => {
               name: 'Uninteresting Group',
               about: 'We will change nothing!',
               description: 'We love it like it is!?' + descriptionAdditional100,
-              groupType: 'closed',
+              template: 'closed',
               actionRadius: 'national',
               categoryIds,
             },
@@ -1023,7 +1047,7 @@ describe('in mode', () => {
               name: 'Investigative Journalism Group',
               about: 'We will change all.',
               description: 'We research …' + descriptionAdditional100,
-              groupType: 'hidden',
+              template: 'hidden',
               actionRadius: 'global',
               categoryIds,
             },
@@ -1036,7 +1060,7 @@ describe('in mode', () => {
               name: 'The Best Group',
               about: 'We will change the world!',
               description: 'Some description' + descriptionAdditional100,
-              groupType: 'public',
+              template: 'public',
               actionRadius: 'regional',
               categoryIds,
             },
@@ -1129,6 +1153,11 @@ describe('in mode', () => {
           describe('joined by its owner', () => {
             describe('does not create additional "MEMBER_OF" relation and therefore', () => {
               it('has still "owner" as membership role', async () => {
+                // The point of this case is the MERGE semantics (no second edge, role
+                // untouched), so the owner joins THEMSELVES: adding another person gives them
+                // a role in the group and needs group.member.role.assign.
+                authenticatedUser = await ownerOfClosedGroupUser.toJson()
+
                 await expect(
                   mutate({
                     mutation: JoinGroup,
@@ -1173,6 +1202,10 @@ describe('in mode', () => {
           describe('joined by its owner', () => {
             describe('does not create additional "MEMBER_OF" relation and therefore', () => {
               it('has still "owner" as membership role', async () => {
+                // Same as above: the owner joins themselves, which is what makes this a test of
+                // MERGE and not of who may add whom.
+                authenticatedUser = await ownerOfHiddenGroupUser.toJson()
+
                 await expect(
                   mutate({
                     mutation: JoinGroup,
@@ -1283,7 +1316,7 @@ describe('in mode', () => {
               name: 'The Best Group',
               about: 'We will change the world!',
               description: 'Some description' + descriptionAdditional100,
-              groupType: 'public',
+              template: 'public',
               actionRadius: 'regional',
               categoryIds,
             },
@@ -1311,11 +1344,15 @@ describe('in mode', () => {
               name: 'Uninteresting Group',
               about: 'We will change nothing!',
               description: 'We love it like it is!?' + descriptionAdditional100,
-              groupType: 'closed',
+              template: 'closed',
               actionRadius: 'national',
               categoryIds,
             },
           })
+          // A join request has to be made BY the applicant: an owner adding somebody assigns
+          // them a role (group.member.role.assign) and lands them as a member,
+          // which is what "add a user to the group" has always meant in the UI.
+          authenticatedUser = await user.toJson()
           await mutate({
             mutation: JoinGroup,
             variables: {
@@ -1323,6 +1360,7 @@ describe('in mode', () => {
               userId: 'current-user',
             },
           })
+          authenticatedUser = await ownerOfClosedGroupUser.toJson()
           await mutate({
             mutation: ChangeGroupMemberRole,
             variables: {
@@ -1340,7 +1378,7 @@ describe('in mode', () => {
               name: 'Investigative Journalism Group',
               about: 'We will change all.',
               description: 'We research …' + descriptionAdditional100,
-              groupType: 'hidden',
+              template: 'hidden',
               actionRadius: 'global',
               categoryIds,
             },
@@ -2135,7 +2173,7 @@ describe('in mode', () => {
       })
 
       describe('authenticated', () => {
-        describe('in all group types – here "closed-group" for example', () => {
+        describe('in all visibilitys – here "closed-group" for example', () => {
           beforeEach(async () => {
             variables = {
               groupId: 'closed-group',
@@ -2302,13 +2340,30 @@ describe('in mode', () => {
                     }
                   })
 
-                  it('throws authorization error', async () => {
-                    const { errors } = await mutate({
+                  // Demoting yourself needs no dominance (nobody dominates themselves) and no
+                  // second owner: it only has to stay within what you already hold. This is
+                  // exactly what #6173 asked for.
+                  it('degrades themself', async () => {
+                    const { data, errors } = await mutate({
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
 
-                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors).toBeUndefined()
+                    expect(data?.ChangeGroupMemberRole).toMatchObject({
+                      user: { id: 'owner-member-user' },
+                      membership: { role: 'admin' },
+                    })
+
+                    // This describe block builds its state up, so hand the role back: the
+                    // cases after this one expect an owner to act on. The second owner can do
+                    // it — they hold everything the owner role holds.
+                    authenticatedUser = await secondOwnerMemberUser.toJson()
+                    await mutate({
+                      mutation: ChangeGroupMemberRole,
+                      variables: { ...variables, roleInGroup: 'owner' },
+                    })
+                    authenticatedUser = await ownerMemberUser.toJson()
                   })
                 })
               })
@@ -2833,6 +2888,10 @@ describe('in mode', () => {
               })
             })
 
+            // THIS is the approve path: promoting a pending membership to a member role is
+            // what "accept the join request" means, and `group.member.role.assign` is the
+            // right that guards it (there is no separate approve key — see #10352 for the
+            // affordance the members tab still lacks).
             describe('of still pending member "pending-member-user"', () => {
               beforeEach(async () => {
                 variables = {
@@ -3044,7 +3103,7 @@ describe('in mode', () => {
       })
 
       describe('authenticated', () => {
-        describe('in all group types', () => {
+        describe('in all visibilitys', () => {
           describe('here "closed-group" for example', () => {
             const memberInGroup = async (userId, groupId) => {
               const result = await query({
@@ -3176,10 +3235,13 @@ describe('in mode', () => {
               })
             })
 
+            // An owner may leave now: the group is allowed to end up without one, and its
+            // admins keep it running while a network admin can appoint a new owner. That is
+            // what removes the "provided another owner exists" condition #6173 asked about.
             describe('left by "owner-member-user"', () => {
-              it('throws authorization error', async () => {
+              it('leaves the group', async () => {
                 authenticatedUser = await ownerMemberUser.toJson()
-                const { errors } = await mutate({
+                const { data, errors } = await mutate({
                   mutation: LeaveGroup,
                   variables: {
                     ...variables,
@@ -3187,14 +3249,15 @@ describe('in mode', () => {
                   },
                 })
 
-                expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+                expect(errors).toBeUndefined()
+                expect(data?.LeaveGroup).toMatchObject({ user: { id: 'owner-member-user' } })
               })
             })
 
             describe('left by "second-owner-member-user"', () => {
-              it('throws authorization error', async () => {
+              it('leaves the group', async () => {
                 authenticatedUser = await secondOwnerMemberUser.toJson()
-                const { errors } = await mutate({
+                const { data, errors } = await mutate({
                   mutation: LeaveGroup,
                   variables: {
                     ...variables,
@@ -3202,7 +3265,10 @@ describe('in mode', () => {
                   },
                 })
 
-                expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+                expect(errors).toBeUndefined()
+                expect(data?.LeaveGroup).toMatchObject({
+                  user: { id: 'second-owner-member-user' },
+                })
               })
             })
 
@@ -3312,7 +3378,7 @@ describe('in mode', () => {
               name: 'Uninteresting Group',
               about: 'We will change nothing!',
               description: 'We love it like it is!?' + descriptionAdditional100,
-              groupType: 'closed',
+              template: 'closed',
               actionRadius: 'global',
               categoryIds,
             },
@@ -3325,7 +3391,7 @@ describe('in mode', () => {
               name: 'The Best Group',
               about: 'We will change the world!',
               description: 'Some description' + descriptionAdditional100,
-              groupType: 'public',
+              template: 'public',
               actionRadius: 'regional',
               categoryIds,
               locationName: 'Berlin, Germany',
@@ -3675,7 +3741,7 @@ describe('in mode', () => {
             })
           })
 
-          describe('groupType', () => {
+          describe('visibility', () => {
             let adminGroupTypeTestUser
 
             beforeAll(async () => {
@@ -3687,7 +3753,7 @@ describe('in mode', () => {
               authenticatedUser = await user.toJson()
               await mutate({
                 mutation: UpdateGroup,
-                variables: { id: 'my-group', groupType: 'public' },
+                variables: { id: 'my-group', visibility: 'public' },
               })
               await mutate({
                 mutation: ChangeGroupMemberRole,
@@ -3702,22 +3768,22 @@ describe('in mode', () => {
                 variables: {
                   id: 'group-type-test-post',
                   title: 'Group Type Test Post',
-                  content: 'Content for group type change test',
+                  content: 'Content for visibility change test',
                   postType: 'Article',
                   groupId: 'my-group',
                 },
               })
             })
 
-            it('can change groupType from public to hidden', async () => {
+            it('can change visibility from public to hidden', async () => {
               await expect(
                 mutate({
                   mutation: UpdateGroup,
-                  variables: { id: 'my-group', groupType: 'hidden' },
+                  variables: { id: 'my-group', visibility: 'hidden' },
                 }),
               ).resolves.toMatchObject({
                 data: {
-                  UpdateGroup: { id: 'my-group', groupType: 'hidden', myRole: 'owner' },
+                  UpdateGroup: { id: 'my-group', visibility: 'hidden', myRole: 'owner' },
                 },
                 errors: undefined,
               })
@@ -3731,17 +3797,17 @@ describe('in mode', () => {
               expect(postIds).not.toContain('group-type-test-post')
             })
 
-            it('can change groupType from hidden back to public', async () => {
+            it('can change visibility from hidden back to public', async () => {
               authenticatedUser = await user.toJson()
 
               await expect(
                 mutate({
                   mutation: UpdateGroup,
-                  variables: { id: 'my-group', groupType: 'public' },
+                  variables: { id: 'my-group', visibility: 'public' },
                 }),
               ).resolves.toMatchObject({
                 data: {
-                  UpdateGroup: { id: 'my-group', groupType: 'public', myRole: 'owner' },
+                  UpdateGroup: { id: 'my-group', visibility: 'public', myRole: 'owner' },
                 },
                 errors: undefined,
               })
@@ -3755,31 +3821,31 @@ describe('in mode', () => {
               expect(postIds).toContain('group-type-test-post')
             })
 
-            it('usual member cannot change groupType', async () => {
+            it('usual member cannot change visibility', async () => {
               authenticatedUser = await usualMemberUser.toJson()
               const { errors } = await mutate({
                 mutation: UpdateGroup,
-                variables: { id: 'my-group', groupType: 'hidden' },
+                variables: { id: 'my-group', visibility: 'hidden' },
               })
 
               expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
             })
 
-            it('non-member cannot change groupType', async () => {
+            it('non-member cannot change visibility', async () => {
               authenticatedUser = await noMemberUser.toJson()
               const { errors } = await mutate({
                 mutation: UpdateGroup,
-                variables: { id: 'my-group', groupType: 'hidden' },
+                variables: { id: 'my-group', visibility: 'hidden' },
               })
 
               expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
             })
 
-            it('admin member cannot change groupType', async () => {
+            it('admin member cannot change visibility', async () => {
               authenticatedUser = await adminGroupTypeTestUser.toJson()
               const { errors } = await mutate({
                 mutation: UpdateGroup,
-                variables: { id: 'my-group', groupType: 'hidden' },
+                variables: { id: 'my-group', visibility: 'hidden' },
               })
 
               expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -4041,7 +4107,7 @@ describe('in mode', () => {
             about: 'A group for counting',
             description:
               'This is a test group for counting purposes, with enough description length to pass validation',
-            groupType: 'public',
+            template: 'public',
             actionRadius: 'national',
             categoryIds: ['cat9'],
           },
@@ -4079,7 +4145,7 @@ describe('in mode', () => {
             about: 'A group for muting',
             description:
               'This is a test group for muting purposes, with enough description length to pass validation',
-            groupType: 'public',
+            template: 'public',
             actionRadius: 'national',
             categoryIds: ['cat9'],
           },
@@ -4150,7 +4216,7 @@ describe('in mode', () => {
             about: 'A group for visibility tests',
             description:
               'This is a test group for visibility purposes, with enough description length to pass validation',
-            groupType: 'public',
+            template: 'public',
             actionRadius: 'national',
             categoryIds: ['cat9'],
           },
@@ -4201,7 +4267,7 @@ describe('in mode', () => {
             about: 'About A',
             description:
               'A test group with enough description length to pass the validation requirement check',
-            groupType: 'public',
+            template: 'public',
             actionRadius: 'national',
             categoryIds: ['cat9'],
           },
@@ -4215,7 +4281,7 @@ describe('in mode', () => {
             about: 'About B',
             description:
               'A test group with enough description length to pass the validation requirement check',
-            groupType: 'public',
+            template: 'public',
             actionRadius: 'national',
             categoryIds: ['cat9'],
           },
@@ -4245,7 +4311,7 @@ describe('in mode', () => {
             about: 'About',
             description:
               'A test group with enough description length to pass the validation requirement check',
-            groupType: 'public',
+            template: 'public',
             actionRadius: 'national',
             categoryIds: ['cat9'],
           },
@@ -4262,7 +4328,7 @@ describe('in mode', () => {
               about: 'About',
               description:
                 'A test group with enough description length to pass the validation requirement check',
-              groupType: 'public',
+              template: 'public',
               actionRadius: 'national',
               categoryIds: ['cat9'],
             },
@@ -4284,7 +4350,7 @@ describe('in mode', () => {
             about: 'A group to test postsCount',
             description:
               'A test group with enough description length to pass the validation requirement check',
-            groupType: 'public',
+            template: 'public',
             actionRadius: 'national',
             categoryIds: ['cat9'],
           },
@@ -4357,7 +4423,7 @@ describe('in mode', () => {
             about: 'Viewer is not a member',
             description:
               'A test group with enough description length to pass the validation requirement check',
-            groupType: 'public',
+            template: 'public',
             actionRadius: 'national',
             categoryIds: ['cat9'],
           },
@@ -4370,7 +4436,7 @@ describe('in mode', () => {
             about: 'Viewer is also a member',
             description:
               'A test group with enough description length to pass the validation requirement check',
-            groupType: 'public',
+            template: 'public',
             actionRadius: 'national',
             categoryIds: ['cat9'],
           },
@@ -4430,7 +4496,7 @@ describe('in mode', () => {
               about: 'Test group',
               description:
                 'A test group with enough description length to pass the validation requirement check',
-              groupType: 'public',
+              template: 'public',
               actionRadius: 'national',
               categoryIds: ['cat9'],
             },
@@ -4528,7 +4594,7 @@ describe('in mode', () => {
               name: 'Group Without Location',
               about: 'No location at all',
               description: 'Some description' + descriptionAdditional100,
-              groupType: 'public',
+              template: 'public',
               actionRadius: 'global',
               categoryIds: ['cat9'],
               locationName: '',
@@ -4578,7 +4644,7 @@ describe('in mode', () => {
               name,
               about: 'Paging test group',
               description: 'Some description' + descriptionAdditional100,
-              groupType: 'public',
+              template: 'public',
               actionRadius: 'global',
               categoryIds: ['cat9'],
             },
@@ -4624,7 +4690,7 @@ describe('in mode', () => {
             name: 'Avatar Group',
             about: 'A group without an avatar',
             description: 'Some description' + descriptionAdditional100,
-            groupType: 'public',
+            template: 'public',
             actionRadius: 'global',
             categoryIds: ['cat9'],
           },
@@ -4675,7 +4741,7 @@ describe('in mode', () => {
               {
                 name: 'Anonymous Group',
                 description: 'Some description' + descriptionAdditional100,
-                groupType: 'public',
+                template: 'public',
                 actionRadius: 'global',
               },
               context,
@@ -4739,7 +4805,7 @@ describe('in mode', () => {
             name: 'Anon Members Group',
             about: 'A public group',
             description: 'Some description' + descriptionAdditional100,
-            groupType: 'public',
+            template: 'public',
             actionRadius: 'global',
             categoryIds: ['cat9'],
           },
@@ -4777,7 +4843,7 @@ describe('in mode', () => {
 
     describe('setGroupMembershipVisibility for a pending membership', () => {
       beforeEach(async () => {
-        await Factory.build(
+        const applicant = await Factory.build(
           'user',
           { id: 'visibility-pending-user', name: 'Visibility Pending User' },
           { email: 'visibility-pending-user@example.org', password: '1234' },
@@ -4790,15 +4856,18 @@ describe('in mode', () => {
             name: 'Visibility Closed Group',
             about: 'A closed group',
             description: 'Some description' + descriptionAdditional100,
-            groupType: 'closed',
+            template: 'closed',
             actionRadius: 'global',
             categoryIds: ['cat9'],
           },
         })
+        // The applicant asks themselves — an owner adding somebody makes them a member now.
+        authenticatedUser = await applicant.toJson()
         await mutate({
           mutation: JoinGroup,
           variables: { groupId: 'visibility-closed-group', userId: 'visibility-pending-user' },
         })
+        authenticatedUser = await user.toJson()
       })
 
       // A pending join request is not a membership: it must not be publishable on a profile.
@@ -4835,7 +4904,7 @@ describe('in mode', () => {
             name: 'Leave Group Target',
             about: 'A public group',
             description: 'Some description' + descriptionAdditional100,
-            groupType: 'public',
+            template: 'public',
             actionRadius: 'global',
             categoryIds: ['cat9'],
           },

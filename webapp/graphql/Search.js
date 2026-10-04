@@ -89,7 +89,7 @@ export const searchGroups = (i18n) => {
           deleted
           about
           description
-          groupType
+          visibility
           actionRadius
           categories {
             id
@@ -104,7 +104,11 @@ export const searchGroups = (i18n) => {
           location {
             name(lang: "${lang}")
           }
-          myRole
+          myGroupRole {
+            name
+            label
+          }
+          myGroupPermissions
         }
       }
     }
@@ -158,7 +162,11 @@ export const searchChatTargets = gql`
         avatar {
           ...imageUrls
         }
-        myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
       }
     }
   }

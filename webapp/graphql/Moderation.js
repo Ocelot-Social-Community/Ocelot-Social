@@ -21,6 +21,9 @@ export const reportsListQuery = () => {
         createdAt
         updatedAt
         closed
+        # True when the reported content sits in a group this moderator may not read: the
+        # queue then carries the metadata only, and deciding is refused server-side too.
+        resourceHidden
         reviewed {
           createdAt
           updatedAt

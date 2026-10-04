@@ -279,7 +279,7 @@ describe('following users notifications', () => {
           id: 'g-1',
           name: 'A group',
           description: 'A group to test the follow user notification',
-          groupType: 'public',
+          template: 'public',
           actionRadius: 'national',
         },
       })
@@ -351,7 +351,7 @@ describe('following users notifications', () => {
           id: 'g-2',
           name: 'A closed group',
           description: 'A group to test the follow user notification',
-          groupType: 'closed',
+          template: 'closed',
           actionRadius: 'national',
         },
       })
@@ -423,7 +423,7 @@ describe('following users notifications', () => {
           id: 'g-3',
           name: 'A hidden group',
           description: 'A hidden group to test the follow user notification',
-          groupType: 'hidden',
+          template: 'hidden',
           actionRadius: 'national',
         },
       })

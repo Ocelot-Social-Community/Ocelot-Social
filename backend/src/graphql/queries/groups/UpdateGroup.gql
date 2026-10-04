@@ -4,7 +4,7 @@ mutation UpdateGroup(
   $slug: String
   $about: String
   $description: String
-  $groupType: GroupType
+  $visibility: GroupVisibility
   $actionRadius: GroupActionRadius
   $categoryIds: [ID]
   $avatar: ImageInput
@@ -19,7 +19,7 @@ mutation UpdateGroup(
     slug: $slug
     about: $about
     description: $description
-    groupType: $groupType
+    visibility: $visibility
     actionRadius: $actionRadius
     categoryIds: $categoryIds
     avatar: $avatar
@@ -37,7 +37,7 @@ mutation UpdateGroup(
     deleted
     about
     description
-    groupType
+    visibility
     actionRadius
     categories {
       id
@@ -53,6 +53,7 @@ mutation UpdateGroup(
       lat
       lng
     }
+    # eslint-disable-next-line @graphql-eslint/no-deprecated -- deliberately still selected: the deprecated field stays part of the contract until the next major, and the specs assert it keeps working
     myRole
   }
 }

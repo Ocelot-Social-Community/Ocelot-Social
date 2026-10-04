@@ -20,7 +20,7 @@ mutation generatePersonalInviteCode($expiresAt: String, $comment: String) {
     comment
     invitedTo {
       id
-      groupType
+      visibility
       name
       about
       avatar {
@@ -28,5 +28,6 @@ mutation generatePersonalInviteCode($expiresAt: String, $comment: String) {
       }
     }
     isValid
+    allowsRegistration
   }
 }

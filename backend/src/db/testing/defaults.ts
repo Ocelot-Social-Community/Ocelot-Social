@@ -122,7 +122,7 @@ const defaults = new Map<string, Defaults>([
     },
   ],
   ['Comment', () => ({ id: uuid(), deleted: false, disabled: false })],
-  ['Group', () => ({ id: uuid(), deleted: false, disabled: false, groupType: 'public' })],
+  ['Group', () => ({ id: uuid(), deleted: false, disabled: false, template: 'public' })],
   ['Tag', () => ({ deleted: false, disabled: false })],
   ['Report', () => ({ id: uuid(), rule: 'latestReviewUpdatedAtRules', closed: false })],
   ['Badge', () => ({ type: 'trophy' })],

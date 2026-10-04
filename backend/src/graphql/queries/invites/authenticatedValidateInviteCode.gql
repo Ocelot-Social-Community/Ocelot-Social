@@ -3,7 +3,7 @@ query authenticatedValidateInviteCode($code: String!) {
     code
     invitedTo {
       id
-      groupType
+      visibility
       name
       about
       avatar {
@@ -18,5 +18,6 @@ query authenticatedValidateInviteCode($code: String!) {
       }
     }
     isValid
+    allowsRegistration
   }
 }

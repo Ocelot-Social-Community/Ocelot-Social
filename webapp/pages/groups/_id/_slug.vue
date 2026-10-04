@@ -1,6 +1,10 @@
 <template>
   <div class="group-profile" v-if="isGroupVisible">
     <div class="ds-mb-large"></div>
+    <!-- Where a moderator or admin LANDS when a report points them at a group they are not in.
+         Picking the network rights up is a decision, and this is where it is offered — the
+         settings pages are behind the very rights it unlocks. -->
+    <group-elevation :group="group" @changed="reloadGroup" />
     <div v-if="group" class="ds-flex ds-flex-gap-base group-layout">
       <div class="group-layout__sidebar">
         <os-card
@@ -8,7 +12,7 @@
           style="position: relative; height: auto; overflow: visible"
         >
           <avatar-uploader
-            v-if="isGroupOwner"
+            v-if="canManageGroup"
             :profile="group"
             :updateMutation="updateGroupMutation"
           >
@@ -79,15 +83,15 @@
             <join-leave-button
               :group="group"
               :userId="currentUser.id"
-              :isMember="isGroupMember"
+              :isMember="hasGroupMembership"
               :isNonePendingMember="isGroupMemberNonePending"
-              :disabled="isGroupOwner"
+              :disabled="hasGroupMembership && !canInGroup('group.leave', group)"
               :loading="hydrated && $apollo.loading"
               @update="updateJoinLeave"
             />
             <!-- Group chat -->
             <os-button
-              v-if="isGroupMemberNonePending"
+              v-if="canParticipateInChat"
               data-test="chat-btn"
               variant="primary"
               appearance="outline"
@@ -129,13 +133,13 @@
           <hr />
           <div class="ds-mt-small ds-mb-small">
             <!-- group my role in group -->
-            <template v-if="isGroupMember">
+            <template v-if="hasGroupMembership">
               <p class="ds-text ds-text-soft ds-text-size-small centered-text hyphenate-text">
                 {{ $t('group.role') }}
               </p>
               <div class="chip" align="center">
                 <os-badge variant="primary">
-                  {{ group && group.myRole ? $t('group.roles.' + group.myRole) : '' }}
+                  {{ roleLabel(group && group.myGroupRole) }}
                 </os-badge>
               </div>
             </template>
@@ -145,7 +149,7 @@
             </p>
             <div class="chip" align="center">
               <os-badge variant="primary">
-                {{ group && group.groupType ? $t('group.types.' + group.groupType) : '' }}
+                {{ group && group.visibility ? $t('group.types.' + group.visibility) : '' }}
               </os-badge>
             </div>
             <!-- group action radius -->
@@ -284,22 +288,20 @@
         </div>
         <div v-if="isGroupMemberNonePending" class="ds-mt-small ds-mb-small ds-space-centered">
           <os-button
-            :as="$can('post.create') ? 'nuxt-link' : 'button'"
+            :as="canPostInGroup ? 'nuxt-link' : 'button'"
             :to="{
               name: 'post-create-type',
               query: { groupId: group.id },
             }"
-            :class="{ 'permission-denied': !$can('post.create') }"
-            :aria-disabled="!$can('post.create')"
+            :class="{ 'permission-denied': !canPostInGroup }"
+            :aria-disabled="!canPostInGroup"
             class="profile-post-add-button"
             variant="primary"
             appearance="filled"
             circle
             :aria-label="$t('contribution.newPost')"
             v-tooltip="{
-              content: $can('post.create')
-                ? $t('contribution.newPost')
-                : $t('permissions.deniedHint'),
+              content: canPostInGroup ? $t('contribution.newPost') : $t('permissions.deniedHint'),
               placement: 'left',
             }"
           >
@@ -325,6 +327,7 @@
                 @unpinPost="unpinPost(post, refetchPostList)"
                 @pinGroupPost="pinGroupPost(post, refetchPostList)"
                 @unpinGroupPost="unpinGroupPost(post, refetchPostList)"
+                @removeFromGroup="removePostFromGroup(post, refetchPostList)"
                 @pushPost="pushPost(post, refetchPostList)"
                 @unpushPost="unpushPost(post, refetchPostList)"
                 @toggleObservePost="
@@ -374,6 +377,7 @@ import {
   groupQuery,
   groupShowMembersChangedSubscription,
 } from '~/graphql/groups'
+import { groupPermissionsChangedSubscription } from '~/graphql/groupRoles'
 import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import {
   videoCallParticipantCountQuery,
@@ -387,6 +391,7 @@ import Category from '~/components/Category'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import Empty from '~/components/Empty/Empty'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
+import GroupElevation from '~/components/Group/GroupElevation'
 import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 import LocationPickerMap from '~/components/Map/LocationPickerMap'
@@ -399,6 +404,7 @@ import SortCategories from '~/mixins/sortCategoriesMixin.js'
 import { mapGetters, mapMutations } from 'vuex'
 import { branding } from '@ocelot-social/branding'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
+import groupRights from '~/mixins/groupRights'
 // import SocialMedia from '~/components/SocialMedia/SocialMedia'
 // import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 
@@ -424,6 +430,7 @@ export default {
     ContentViewer,
     Empty,
     GroupContentMenu,
+    GroupElevation,
     JoinLeaveButton,
     LocationInfo,
     LocationPickerMap,
@@ -435,7 +442,7 @@ export default {
     // SocialMedia,
     // TabNavigation,
   },
-  mixins: [postListActions, SortCategories, GetCategories],
+  mixins: [postListActions, SortCategories, GetCategories, groupRights],
   transition: {
     name: 'slide-up',
     mode: 'out-in',
@@ -478,15 +485,14 @@ export default {
       return (this.chatRoom && this.chatRoom.unreadCount) || 0
     },
     canShowVideoCallButton() {
-      // Shown to members of ANY group type: joining an existing call is open to all
-      // members. Opening one (no active call) is gated per group type below.
-      return this.videoCallEnabled && this.isGroupMemberNonePending && !!this.group
+      return this.videoCallEnabled && this.canInGroup('group.videoCall.join', this.group)
     },
-    // Network permission to OPEN (start) a call in this group's type.
     canOpenVideoCall() {
-      return this.group ? this.$can(`videoCall.create_${this.group.groupType}`) : false
+      // Opening a call is its own group right, capped server-side by the network
+      // videoCall.create_<door> — whether a stranger could walk into this group — where this
+      // used to ask for a per-group-type right directly.
+      return this.canInGroup('group.videoCall.create', this.group)
     },
-    // No call running and the viewer may not start one → the button is a dead end.
     videoCallOpenDenied() {
       return this.videoCallParticipantCount === 0 && !this.canOpenVideoCall
     },
@@ -513,30 +519,51 @@ export default {
         overflow: 'hidden',
       }
     },
-    isGroupOwner() {
-      return this.group ? this.group.myRole === 'owner' : false
+    // "May I administer this group" rather than "am I the owner": the rights are granted
+    // independently now, so an admin can hold the settings right without being an owner.
+    canManageGroup() {
+      return this.canInGroup('group.settings.manage', this.group)
     },
-    isGroupMember() {
-      return this.group ? !!this.group.myRole : false
+    hasGroupMembership() {
+      return !!this.group?.myGroupRole
+    },
+    // Chat, calls and posting are rights now, not consequences of being a member: a group may
+    // close its chat for members or open a channel's posting to nobody. The backend decides on
+    // exactly these keys, so the button that triggers it has to ask the same question —
+    // otherwise the only feedback is the shield's error toast.
+    canParticipateInChat() {
+      return this.canInGroup('group.chat.participate', this.group)
+    },
+    canPostInGroup() {
+      // No separate $can('post.create'): myGroupPermissions is already capped by the viewer's
+      // network rights, so the group key cannot be held without the network one.
+      return this.canInGroup('group.post.create', this.group)
     },
     isGroupMemberNonePending() {
-      return this.group ? ['usual', 'admin', 'owner'].includes(this.group.myRole) : false
+      return this.isGroupMember(this.group)
     },
     isGroupVisible() {
-      return this.group && !(this.group.groupType === 'hidden' && !this.isGroupMemberNonePending)
+      // The one right that governs the profile, rather than the visibility/membership cascade
+      // this used to be. It holds for a member, for a stranger to a listed group, and for a
+      // moderator whose network right reaches in — the last of which the cascade got wrong,
+      // leaving them on an empty page. An applicant to an unlisted group still sees nothing
+      // but their own status: `pending` there grants no `group.read`.
+      return Boolean(this.group?.id) && this.canInGroup('group.read', this.group)
     },
     isAllowedSeeingGroupMembers() {
+      // One right instead of the visibility/showMembers/membership cascade this used to be.
+      if (this.canInGroup('group.members.read', this.group)) return true
       if (!this.group) return false
-      if (this.group.groupType === 'public') return true
-      if (['closed', 'hidden'].includes(this.group.groupType) && this.isGroupMemberNonePending)
+      if (this.group.visibility === 'public') return true
+      if (['closed', 'hidden'].includes(this.group.visibility) && this.isGroupMemberNonePending)
         return true
       // non-members can see the member list of a closed group when the owner enabled showMembers
-      if (this.group.groupType === 'closed' && this.group.showMembers === true) return true
+      if (this.group.visibility === 'closed' && this.group.showMembers === true) return true
       return false
     },
     membersListSubtitle() {
       if (!this.group || !this.isGroupMemberNonePending) return null
-      if (this.group.groupType === 'public' || this.group.showMembers === true) {
+      if (this.group.visibility === 'public' || this.group.showMembers === true) {
         return this.$t('group.membersListVisibleToNonMembers')
       }
       return this.$t('group.membersListNotVisibleToNonMembers')
@@ -574,30 +601,33 @@ export default {
     this._roomUpdatedSub = null
     this._videoCallCountSub = null
     this._groupShowMembersSub = null
+    this._groupPermissionsSub = null
     this.setupDescriptionOverflowObserver()
-    if (this.isGroupMemberNonePending) this.setupRoomUpdatedSubscription()
+    if (this.canParticipateInChat) this.setupRoomUpdatedSubscription()
     if (this.canShowVideoCallButton) this.setupVideoCallCountSubscription()
-    if (this.group?.myRole) this.setupGroupShowMembersSubscription()
+    if (this.group?.myGroupRole) this.setupGroupShowMembersSubscription()
+    this.setupGroupPermissionsSubscription()
   },
   beforeDestroy() {
     this._roomUpdatedSub?.unsubscribe()
     this._videoCallCountSub?.unsubscribe()
     this._groupShowMembersSub?.unsubscribe()
+    this._groupPermissionsSub?.unsubscribe()
     this.teardownDescriptionOverflowObserver()
   },
   watch: {
-    isGroupMemberNonePending(isMember) {
-      // Group membership is derived from the Apollo-populated group.myRole, which
-      // isn't available synchronously on first visits (no SSR cache). Set up the
-      // subscription reactively when membership becomes known.
-      if (isMember) this.setupRoomUpdatedSubscription()
+    canParticipateInChat(mayChat) {
+      // The right is derived from the Apollo-populated group.myGroupPermissions, which isn't
+      // available synchronously on first visits (no SSR cache). Set up the subscription
+      // reactively once the answer is known.
+      if (mayChat) this.setupRoomUpdatedSubscription()
     },
     canShowVideoCallButton(can) {
       if (can) this.setupVideoCallCountSubscription()
       else this.teardownVideoCallCountSubscription()
     },
-    'group.myRole'(myRole) {
-      if (myRole) this.setupGroupShowMembersSubscription()
+    'group.myGroupRole'(myGroupRole) {
+      if (myGroupRole) this.setupGroupShowMembersSubscription()
     },
     // The group usually arrives from Apollo AFTER mount, so the first measurement
     // ran against an empty card. ResizeObserver catches this too, but not everywhere
@@ -611,6 +641,14 @@ export default {
     },
   },
   methods: {
+    /**
+     * After picking the network rights up (or putting them down) everything on this page that
+     * depends on them has to be asked again — the smart query is the source, and
+     * `$nuxt.refresh()` does not touch it, which is why only a browser reload showed the change.
+     */
+    async reloadGroup() {
+      await this.$apollo.queries.Group.refetch()
+    },
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
       openVideoCall: 'videoCall/OPEN',
@@ -663,6 +701,33 @@ export default {
         error: (err) => {
           // eslint-disable-next-line no-console
           console.error('groupShowMembersChanged subscription error:', err)
+        },
+      })
+    },
+    /**
+     * Every button, tab and menu entry on this page is drawn from `myGroupPermissions`, so a
+     * right that changes while somebody is looking has to reach them — an owner editing the
+     * roles, a visibility switch, or a member being promoted. No membership guard: a
+     * NON-member's rights live in the group's `none` role and change with it, which is exactly
+     * the case (a group opening or closing its door) where a stale page is wrong about what the
+     * viewer may do.
+     */
+    setupGroupPermissionsSubscription() {
+      if (this._groupPermissionsSub) return
+      const groupId = this.$route.params.id
+      if (!groupId) return
+      const observer = this.$apollo.subscribe({
+        query: groupPermissionsChangedSubscription(),
+        variables: { groupId },
+        fetchPolicy: 'no-cache',
+      })
+      this._groupPermissionsSub = observer.subscribe({
+        next: () => {
+          this.reloadGroup()
+        },
+        error: (err) => {
+          // eslint-disable-next-line no-console
+          console.error('groupPermissionsChanged subscription error:', err)
         },
       })
     },

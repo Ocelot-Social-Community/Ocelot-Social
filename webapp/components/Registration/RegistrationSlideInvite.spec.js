@@ -28,7 +28,9 @@ describe('RegistrationSlideInvite', () => {
     mocks = {
       $t: jest.fn((key) => key),
       $apollo: {
-        query: jest.fn().mockResolvedValue({ data: { validateInviteCode: { isValid: true } } }),
+        query: jest.fn().mockResolvedValue({
+          data: { validateInviteCode: { isValid: true, allowsRegistration: true } },
+        }),
       },
       $toast: { error: jest.fn() },
     }
@@ -89,7 +91,7 @@ describe('RegistrationSlideInvite', () => {
               response: {
                 validateInviteCode: {
                   generatedBy: { name: 'Host' },
-                  invitedTo: { name: 'Group', groupType: 'public' },
+                  invitedTo: { name: 'Group', visibility: 'public' },
                 },
               },
             },
@@ -99,7 +101,7 @@ describe('RegistrationSlideInvite', () => {
       const wrapper = Wrapper()
       await wrapper.setData({ formData: { inviteCode: 'ABCDEF' } })
       expect(wrapper.vm.invitedBy).toEqual({ name: 'Host' })
-      expect(wrapper.vm.invitedTo).toEqual({ name: 'Group', groupType: 'public' })
+      expect(wrapper.vm.invitedTo).toEqual({ name: 'Group', visibility: 'public' })
     })
   })
 
@@ -121,14 +123,14 @@ describe('RegistrationSlideInvite', () => {
     }
 
     it('shows the hidden-group message for a hidden group invite', async () => {
-      const wrapper = mountWithInvite({ name: 'Secret', groupType: 'hidden' })
+      const wrapper = mountWithInvite({ name: 'Secret', visibility: 'hidden' })
       await flushPromises()
       await wrapper.vm.$nextTick()
       expect(wrapper.text()).toContain('invited-to-hidden-group')
     })
 
     it('shows the invited-by-and-to message for a normal group invite', async () => {
-      const wrapper = mountWithInvite({ name: 'Group', groupType: 'public' })
+      const wrapper = mountWithInvite({ name: 'Group', visibility: 'public' })
       await flushPromises()
       await wrapper.vm.$nextTick()
       expect(wrapper.text()).toContain('invited-by-and-to')
@@ -189,8 +191,25 @@ describe('RegistrationSlideInvite', () => {
       expect(propsData.sliderData.sliderSelectorCallback).not.toHaveBeenCalled()
     })
 
+    it('toasts and returns false for a code that may not open an account', async () => {
+      // A group invite issued with `group.invite` alone brings existing accounts INTO a group;
+      // registering with it needs `group.invite.external`, and the shield behind this screen
+      // refuses it. So the screen asks the registration question, not "is the code alive".
+      mocks.$apollo.query.mockResolvedValue({
+        data: { validateInviteCode: { isValid: true, allowsRegistration: false } },
+      })
+      propsData.sliderData = baseSliderData({ collectedInputData: { inviteCode: 'GRPINT' } })
+      const wrapper = mountQuiet()
+
+      expect(await wrapper.vm.handleSubmitVerify()).toBe(false)
+      expect(mocks.$toast.error).toHaveBeenCalled()
+      expect(propsData.sliderData.sliderSelectorCallback).not.toHaveBeenCalled()
+    })
+
     it('toasts and returns false on an invalid code', async () => {
-      mocks.$apollo.query.mockResolvedValue({ data: { validateInviteCode: { isValid: false } } })
+      mocks.$apollo.query.mockResolvedValue({
+        data: { validateInviteCode: { isValid: false, allowsRegistration: false } },
+      })
       propsData.sliderData = baseSliderData({ collectedInputData: { inviteCode: 'ABCDEF' } })
       const wrapper = mountQuiet()
       const result = await wrapper.vm.handleSubmitVerify()

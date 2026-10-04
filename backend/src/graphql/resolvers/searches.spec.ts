@@ -714,7 +714,12 @@ describe('resolvers/searches — typed entry points', () => {
       ),
       Factory.build(
         'group',
-        { id: 'qg-own', name: 'Quokka Owners', groupType: 'public', description: groupDescription },
+        {
+          id: 'qg-own',
+          name: 'Quokka Owners',
+          template: 'public',
+          description: groupDescription,
+        },
         { ownerId: 'quokka-author' },
       ),
       Factory.build(
@@ -722,7 +727,7 @@ describe('resolvers/searches — typed entry points', () => {
         {
           id: 'qg-foreign',
           name: 'Quokka Strangers',
-          groupType: 'public',
+          template: 'public',
           description: groupDescription,
         },
         { ownerId: 'quokka-fan' },

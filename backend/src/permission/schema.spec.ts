@@ -27,6 +27,10 @@ const EXPECTED_KEYS: PermissionKey[] = [
   'user.delete.any',
   'badge.manage',
   'content.moderate',
+  'group.content.read.any_closed',
+  'group.content.read.any_hidden',
+  'group.moderate.any_closed',
+  'group.moderate.any_hidden',
   'user.disable',
   'post.pin',
   'post.push',
@@ -37,11 +41,14 @@ const EXPECTED_KEYS: PermissionKey[] = [
   'group.create_closed',
   'group.create_hidden',
   'user.invite',
-  'videoCall.create_public',
-  'videoCall.create_closed',
-  'videoCall.create_hidden',
+  'videoCall.create_open',
+  'videoCall.create_restricted',
   'apiKey.create',
   'branding.manage',
+  'group.administer.any_public',
+  'group.administer.any_closed',
+  'group.administer.any_hidden',
+  'group.roleTemplate.manage',
 ]
 
 describe('permission catalog', () => {
@@ -69,9 +76,8 @@ describe('permission catalog', () => {
     it('gates the feature-dependent rights, leaves the rest ungated', () => {
       // Group video calls need BOTH the video feature AND the groups feature on — multi-gate
       // (AND), normalised to a list. gatedBy is a list now; ungated rights get [].
-      expect(gatesFor('videoCall.create_public')).toEqual(['videoConference', 'groupsEnabled'])
-      expect(gatesFor('videoCall.create_closed')).toEqual(['videoConference', 'groupsEnabled'])
-      expect(gatesFor('videoCall.create_hidden')).toEqual(['videoConference', 'groupsEnabled'])
+      expect(gatesFor('videoCall.create_open')).toEqual(['videoConference', 'groupsEnabled'])
+      expect(gatesFor('videoCall.create_restricted')).toEqual(['videoConference', 'groupsEnabled'])
       expect(gatesFor('apiKey.create')).toEqual(['apiKeysEnabled'])
       // Creating groups is gated by the groups feature; badge.manage is inert while badges
       // are disabled; user.invite while invite registration is off (codes couldn't be
@@ -83,13 +89,23 @@ describe('permission catalog', () => {
       expect(gatesFor('badge.manage')).toEqual(['badgesEnabled'])
       expect(gatesFor('user.invite')).toEqual(['inviteRegistration'])
       expect(gatesFor('apiKey.administer')).toEqual([])
+      // Reaching into groups, and the templates they are seeded from, is inert while the
+      // groups feature is off.
+      expect(gatesFor('group.content.read.any_closed')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.content.read.any_hidden')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.moderate.any_closed')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.moderate.any_hidden')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.administer.any_public')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.administer.any_closed')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.administer.any_hidden')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.roleTemplate.manage')).toEqual(['groupsEnabled'])
       // A representative ungated right.
       expect(gatesFor('post.create')).toEqual([])
 
       // The projection carries the (multi-)gate through.
-      const publicCall = permissionCatalog().find((e) => e.key === 'videoCall.create_public')
+      const openCall = permissionCatalog().find((e) => e.key === 'videoCall.create_open')
 
-      expect(publicCall?.gatedBy).toEqual(['videoConference', 'groupsEnabled'])
+      expect(openCall?.gatedBy).toEqual(['videoConference', 'groupsEnabled'])
     })
 
     it('derives the distinct permission gates from the catalog, in declaration order', () => {
@@ -99,8 +115,10 @@ describe('permission catalog', () => {
       // then apiKey.create.
       expect(allPermissionGates()).toEqual([
         'badgesEnabled',
-        'socialMediaEnabled',
+        // groupsEnabled moved up: the group-access rights that sit next to content.moderate
+        // declare it before group.create_* does.
         'groupsEnabled',
+        'socialMediaEnabled',
         'inviteRegistration',
         'videoConference',
         'apiKeysEnabled',
@@ -115,8 +133,13 @@ describe('permission catalog', () => {
     })
 
     it('only uses known groups', () => {
+      // The two group-shaped sections are their own: a right that reaches INTO somebody else's
+      // group is not the same kind of thing as administering the network, and an admin reading
+      // a flat "administration" list could not tell them apart.
       const knownGroups = [
         'administration',
+        'groupAdministration',
+        'groupModeration',
         'moderation',
         'content',
         'membership',

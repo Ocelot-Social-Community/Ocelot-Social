@@ -8,6 +8,7 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 import { NOTIFICATION_ADDED, ROOM_UPDATED, CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
+import { visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { getRoomProperties } from '@graphql/resolvers/rooms'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
@@ -250,7 +251,7 @@ const notifyFollowingUsers = async (postId, context) => {
     WITH post, author, user, emailAddress
     WHERE NOT EXISTS {
       MATCH (post)-[:IN]->(group:Group)
-      WHERE NOT group.groupType = 'public'
+      WHERE NOT ${visibilityOf('group')} = 'public'
     }
     MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
       SET notification.read = FALSE
@@ -443,7 +444,7 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
         // again on every edit, which is the whole bug this guard exists for. Verified by
         // removing them: the group cases stay green, the three edit cases in
         // notificationsMiddleware.spec.ts fail.
-        WHERE (group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner'])
+        WHERE (group IS NULL OR ${visibilityOf('group')} = 'public' OR membership.role <> 'pending')
         // Already told about this post — see the note on this function.
         AND NOT EXISTS { MATCH (post)-[:NOTIFIED { reason: $reason }]->(user) }
         MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
@@ -466,7 +467,7 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
       // \`membership\` projected for the same reason as in the post branch above.
       WITH comment, user, group, emailAddress, membership
       // Parenthesised for the same reason as in the post branch above.
-      WHERE (group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner'])
+      WHERE (group IS NULL OR ${visibilityOf('group')} = 'public' OR membership.role <> 'pending')
       // Already told about this comment — see the note on this function.
       AND NOT EXISTS { MATCH (comment)-[:NOTIFIED { reason: $reason }]->(user) }
       MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(user)

@@ -9,7 +9,7 @@ export const group = gql`
     deleted
     about
     description
-    groupType
+    visibility
     actionRadius
     categories {
       id
@@ -18,6 +18,5 @@ export const group = gql`
       icon
     }
     locationName
-    myRole
   }
 `

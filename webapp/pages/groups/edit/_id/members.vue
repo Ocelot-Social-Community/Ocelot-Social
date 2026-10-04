@@ -1,15 +1,19 @@
 <template>
   <div>
     <add-group-member
+      v-if="canInGroup('group.member.role.assign', group)"
       :groupId="group.id"
       :groupMembers="groupMembers"
+      :groupRoles="assignableRoles"
       @loadGroupMembers="loadGroupMembers"
     />
     <div class="ds-mb-small"></div>
     <os-card>
       <group-member
         :groupId="group.id"
+        :group="group"
         :groupMembers="groupMembers"
+        :groupRoles="assignableRoles"
         @loadGroupMembers="loadGroupMembers"
       />
     </os-card>
@@ -21,8 +25,12 @@ import { OsCard } from '@ocelot-social/ui'
 import GroupMember from '~/components/Group/GroupMember'
 import AddGroupMember from '~/components/Group/AddGroupMember'
 import { groupMembersQuery } from '~/graphql/groups.js'
+import { groupRightsQuery } from '~/graphql/groupRoles.js'
+import groupRights from '~/mixins/groupRights'
+import { NONE_GROUP_ROLE } from '~/constants/groups'
 
 export default {
+  mixins: [groupRights],
   components: {
     OsCard,
     GroupMember,
@@ -34,12 +42,40 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      roles: [],
+    }
+  },
   computed: {
     groupMembers() {
       return this.GroupMembers ? this.GroupMembers : []
     },
+    // The roles a member can actually be given: everything the group defines except `none`,
+    // which is the absence of a membership rather than something to assign.
+    assignableRoles() {
+      return this.roles.filter((role) => role.name !== NONE_GROUP_ROLE)
+    },
   },
   apollo: {
+    groupRoles: {
+      query() {
+        return groupRightsQuery()
+      },
+      variables() {
+        return { id: this.group.id }
+      },
+      manual: true,
+      result({ data, loading }) {
+        if (loading || !data) return
+        this.roles = data.Group?.[0]?.roles ?? []
+      },
+      error() {
+        // Reading the definitions needs group.role.manage; without it the picker falls back to
+        // the roles the members already carry, which is all this view needs to render them.
+        this.roles = []
+      },
+    },
     GroupMembers: {
       query() {
         return groupMembersQuery()

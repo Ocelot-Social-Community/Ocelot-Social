@@ -13,6 +13,16 @@
         <span v-else>
           {{ $t('invite-codes.redeemed-count', { count: inviteCode.redeemedByCount }) }}
         </span>
+        <!-- A group invite issued with `group.invite` alone: it brings people who already have
+             an account into the group, but it does not open an account. Worth saying, because
+             the two are the same link from the outside. -->
+        <span
+          v-if="inviteCode.allowsRegistration === false"
+          class="members-only"
+          data-test="members-only"
+        >
+          {{ $t('invite-codes.members-only') }}
+        </span>
       </div>
     </div>
     <div class="actions">
@@ -115,6 +125,12 @@ export default {
 </script>
 
 <style scoped>
+.invitation .members-only {
+  display: block;
+  color: var(--text-color-soft);
+  font-size: var(--font-size-small);
+}
+
 .invitation {
   display: flex;
   padding: calc(var(--space-base) / 2);

@@ -220,6 +220,44 @@
       "showDonationsCheckboxLabel": "Shfaq shiritin e progresit të dhurimeve",
       "successfulUpdate": "Informacioni mbi dhurimet u përditësua me sukses!"
     },
+    "groupRoles": {
+      "applied": "{count} grupe të përditësuara",
+      "apply": "Zbato në grupet e paprekura",
+      "confirmApply": "Të zbatohen shabllonet në {count} grupe që nuk i kanë përshtatur kurrë rolet e tyre? Grupet e përshtatura nuk preken.",
+      "description": "Këtu redakton modelet nga të cilat krijohen grupet e reja — asnjë grup ekzistues nuk ndryshon prej kësaj. Vetëm butoni më poshtë e zbaton një ndryshim te grupet, dhe vetëm te ato që nuk i kanë ndryshuar kurrë të drejtat e veta.",
+      "editingTemplate": "Po redaktoni shabllonin „{template}“",
+      "labelField": "Emri",
+      "name": "Modelet e grupeve",
+      "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet dhe nuk mund të redaktohet.",
+      "resultingVisibility": "Grupet e krijuara nga ky shabllon janë:",
+      "saved": "Shablloni u ruajt",
+      "templateLabel": "Model",
+      "title": "Modelet e grupeve",
+      "untouched": "Një ndryshim këtu arrin {untouched} nga {total} grupet e krijuara nga ky model — ato që nuk i kanë ndryshuar kurrë të drejtat e veta — dhe vetëm kur e zbaton."
+    },
+    "groups": {
+      "active": "aktiv",
+      "allTypes": "Të gjitha llojet",
+      "columns": {
+        "members": "Anëtarë",
+        "name": "Grup",
+        "owners": "Pronarë",
+        "state": "Gjendja",
+        "type": "Lloji"
+      },
+      "count": "{shown} nga {total}",
+      "description": "Të gjitha grupet që mund të administrosh — përfshirë ato sekrete, që nuk shfaqen në asnjë listë tjetër. Grupet pa pronar i gjen këtu me filtrin.",
+      "disabled": "i çaktivizuar",
+      "disabledOnly": "vetëm të çaktivizuarat",
+      "empty": "Asnjë grup nuk përputhet me këta filtra.",
+      "name": "Grupet",
+      "next": "Tjetra",
+      "noOwner": "pa pronar",
+      "ownerlessOnly": "vetëm pa pronar",
+      "previous": "E mëparshmja",
+      "searchPlaceholder": "emri ose emri i shkurtër",
+      "title": "Administro grupet"
+    },
     "hashtags": {
       "name": "Hashtag-ët",
       "nameOfHashtag": "Emri",
@@ -235,9 +273,6 @@
     "name": "Admin",
     "notifications": {
       "name": "Njoftimet"
-    },
-    "organizations": {
-      "name": "Organizatat"
     },
     "pages": {
       "name": "Faqet"
@@ -319,17 +354,9 @@
       "delete": "Fshi",
       "deleteError": "Roli nuk u fshi dot: {message}",
       "deleteSuccess": "Roli u fshi.",
-      "description": "Krijo role dhe cakto leje. Ndryshimet zbatohen menjëherë.",
-      "groups": {
-        "account": "Llogaria",
-        "administration": "Administrim",
-        "communication": "Komunikim",
-        "content": "Përmbajtje",
-        "membership": "Anëtarësia",
-        "moderation": "Moderim"
-      },
+      "description": "Kush mund të bëjë çfarë në të gjithë rrjetin. Krijo role dhe cakto të drejta — ndryshimet veprojnë menjëherë.",
       "members": "{count} anëtarë",
-      "name": "Rolet dhe lejet",
+      "name": "Rolet dhe të drejtat",
       "nameLabel": "Emri",
       "perm": {
         "apiKey_administer": "Administro çelësat API të përdoruesve të tjerë.",
@@ -351,9 +378,8 @@
         "user_delete_any": "Fshi llogarinë e çdo përdoruesi.",
         "user_email_readAny": "Lexo adresën e email-it të çdo përdoruesi.",
         "user_invite": "Gjenero kode ftese personale.",
-        "videoCall_create_closed": "Nis një thirrje video në një grup të mbyllur.",
-        "videoCall_create_hidden": "Nis një thirrje video në një grup të fshehur.",
-        "videoCall_create_public": "Nis një thirrje video në një grup publik."
+        "videoCall_create_open": "Nis një thirrje video në një grup ku kushdo mund të hyjë — që gjendet lehtë dhe pranon anëtarë pa miratim.",
+        "videoCall_create_restricted": "Nis një thirrje video në një grup ku nuk hyn kushdo: bashkimi kërkon miratim ose ftesë, ose grupi është i fshehur."
       },
       "permUnavailable": "Funksioni nuk është konfiguruar — dhënia e kësaj të drejte nuk ka efekt.",
       "permUnavailableLink": "Shiko konfigurimin",
@@ -371,7 +397,7 @@
         "message": "Po hiqni lejen „menaxho rolet“ nga <strong>{role}</strong> — roli juaj. Pas kësaj nuk do të mund të menaxhoni më rolet; vetëm një pronar mund ta rivendosë. Të vazhdohet?",
         "title": "Të hiqet menaxhimi i rolit tuaj?"
       },
-      "title": "Rolet dhe lejet"
+      "title": "Rolet dhe të drejtat"
     },
     "settings": {
       "name": "Cilësimet"
@@ -868,6 +894,23 @@
     "addUser": "Shto përdorues",
     "addUserNoOptions": "Nuk u gjetën përdorues!",
     "addUserPlaceholder": "Emri i përdoruesit",
+    "admission": {
+      "caption": "Hyhet:",
+      "closed": {
+        "description": "Nga jashtë askush nuk mund të bashkohet apo të kërkojë — vetëm një ftesë të fut brenda.",
+        "title": "Vetëm me ftesë"
+      },
+      "label": "Onboarding",
+      "needsVisibility": "Në një grup që askush nga jashtë nuk e gjen dot, askush nuk mund të hyjë — vetëm një ftesë të fut brenda.",
+      "onRequest": {
+        "description": "Mund të kërkohet bashkimi; dikush nga grupi duhet të pranojë.",
+        "title": "Me kërkesë"
+      },
+      "open": {
+        "description": "Kush e sheh grupin mund të bashkohet menjëherë.",
+        "title": "Pa pyetur"
+      }
+    },
     "allGroups": "Të gjitha grupet",
     "categories": "Temë ::: Tema",
     "categoriesTitle": "Temat e grupit",
@@ -891,6 +934,16 @@
       "groupTitle": "Cilësimet e ",
       "title": "Ndrysho grupin tim"
     },
+    "elevation": {
+      "actingAsMember": "Këtu vepron si {role}.",
+      "actingAsNonMember": "Nuk je anëtar i këtij grupi.",
+      "activeTitle": "Qasja si administrator është aktive.",
+      "activeUntil": "Përfundon në {time}, ose kur ta mbyllësh ti.",
+      "end": "Mbyll qasjen si administrator",
+      "offerBody": "Përveç kësaj ke të drejta rrjeti mbi të. Leximi është i hapur; çdo ndryshim kërkon këtë konfirmim, i cili regjistrohet te grupi.",
+      "reasonPlaceholder": "Për çfarë bëhet fjalë? (opsionale)",
+      "start": "Përdor qasjen si administrator"
+    },
     "errors": {
       "userAlreadyMember": "Përdoruesi „{name}“ është tashmë anëtar!"
     },
@@ -907,14 +960,18 @@
       "join": "Bashkohu",
       "leave": "Largohu",
       "pendingMember": "Anëtar në pritje",
+      "requestJoin": "Kërko t’i bashkohesh",
       "tooltip": "Pronari i grupit duhet ende të të konfirmojë."
     },
     "labelSlug": "Emri unik i grupit",
     "leaveModal": {
       "confirmButton": "Largohu",
       "message": "Largimi nga një grup mund të jetë i pakthyeshëm!<br>Largohu nga grupi <b>„{name}“</b>!",
+      "messageAdmin": "Ti e <b>administron</b> këtë grup. Nëse largohesh, heq dorë nga kjo.<br>Vërtet ta lësh grupin <b>„{name}“</b>?",
+      "messageOwner": "Je <b>pronar</b> i këtij grupi. Nëse largohesh, ai mund të mbetet pa pronar — dhe atëherë vetëm një administrim rrjeti mund ta bëjë sërish funksional.<br>Vërtet ta lësh grupin <b>„{name}“</b>?",
       "title": "A dëshiron vërtet të largohesh nga grupi?"
     },
+    "memberOutranked": "Nuk mund ta ndryshosh rolin e kësaj personi — ka të paktën aq sa ti.",
     "memberRemoved": "Përdoruesi „{name}“ u hoq nga grupi!",
     "members": "Anëtarët",
     "membersAdministrationList": {
@@ -943,10 +1000,60 @@
     "removeMemberButton": "Hiq",
     "removeMemberConfirmText": "Hiq përdoruesin „{name}“ nga grupi?",
     "removeMemberTitle": "Hiq anëtarin",
+    "rights": {
+      "addRole": "Shto një rol",
+      "advancedTitle": "Të gjitha të drejtat në detaje",
+      "applyTemplate": "Zbato një model — zëvendëson të gjitha rolet e këtij grupi me ato të modelit.",
+      "blockedByFeature": "Kjo funksion është e çaktivizuar në rrjet ({feature}).",
+      "blockedByNetwork": "E kufizuar në të gjithë rrjetin: për këtë duhet leja {permission}.",
+      "confirmApplyTemplate": "Të zbatohet modeli „{template}“ për këtë grup? Të gjitha rolet zëvendësohen me ato të modelit.",
+      "confirmApplyTemplateDiscards": "Të zbatohet modeli „{template}“ për këtë grup? Të gjitha rolet zëvendësohen me ato të modelit — dhe ndryshimet e paruajtura humbasin.",
+      "confirmDelete": "Të fshihet roli „{role}“? Anëtarët e tij do të bëhen „{target}“.",
+      "confirmReset": "Të rikthehen të gjitha rolet e këtij grupi në parazgjedhjet? Rolet që shtuat hiqen dhe anëtarët e tyre bëhen anëtarë të zakonshëm.",
+      "deleteRole": "Fshi rolin",
+      "description": "Vendosni kush çfarë mund të bëjë në këtë grup — nga të jashtmit deri te administratorët.",
+      "discardDraft": "Ndryshimet e paruajtura do të humbasin. Të vazhdohet gjithsesi?",
+      "drafted": "Ndryshime të paruajtura",
+      "hideAdvanced": "Fshih pamjen e detajuar",
+      "labelField": "Emri i shfaqur",
+      "mandatory": "Gjithmonë e dhënë: një anëtarësim që nuk mund të përfundohet nuk është një rregullim.",
+      "members": "{count} anëtarë",
+      "mootJoin": "Kush e ka tashmë një anëtarësi nuk bashkohet sërish.",
+      "mootLeave": "Kush nuk është anëtar, nuk ka anëtarësi për të lënë.",
+      "noRight": "Nuk mund të dhurosh një leje që ti vetë nuk e ke.",
+      "ownerHoldsEverything": "Roli i pronarit ka gjithmonë të gjitha lejet e këtij grupi. Mund të ndryshohet vetëm emri i shfaqur.",
+      "pendingBlocked": "Askush nuk e ka këtë rol për momentin: askush nuk mund të kërkojë të bashkohet.",
+      "pendingUnreachable": "Askush nuk mund të kërkojë të bashkohet për momentin, prandaj askush nuk e ka këtë rol. Këtë e vendos pranimi.",
+      "reset": "Rikthe parazgjedhjet",
+      "resultingType": "Me këto leje grupi është:",
+      "roleKeyPlaceholder": "çelës, p.sh. redaksia",
+      "roleLabelPlaceholder": "emri i shfaqur, p.sh. Redaksia",
+      "saved": "Lejet u ruajtën",
+      "saveFirst": "Fillimisht ruaj ose hidh poshtë — ka ndryshime të paruajtura.",
+      "simple": {
+        "applicants-read": "Aplikuesit në pritje mund të lexojnë postimet",
+        "members-chat": "Anëtarët mund të shkruajnë në chat-in e grupit",
+        "members-comment": "Anëtarët mund të komentojnë",
+        "members-invite": "Anëtarët mund të ftojnë të tjerë",
+        "members-post": "Anëtarët mund të shkruajnë postime",
+        "nonmembers-members": "Jo-anëtarët mund të shohin listën e anëtarëve",
+        "nonmembers-profile": "Të jashtmit mund të shohin se grupi ekziston",
+        "nonmembers-read": "Jo-anëtarët mund të lexojnë postimet"
+      },
+      "simpleGroups": {
+        "applicants": "Aplikantë në pritje",
+        "members": "Anëtarët",
+        "outsiders": "Të jashtmit"
+      },
+      "systemRole": "Rol i sistemit: nuk mund të fshihet ose riemërtohet",
+      "title": "Lejet",
+      "toAdvanced": "Të avancuara: të gjitha lejet në detaje"
+    },
     "role": "Roli yt në grup",
     "roles": {
       "admin": "Administrator",
       "members": "Anëtarë",
+      "none": "Nuk është anëtar",
       "owner": "Pronar",
       "pending": "Anëtar në pritje",
       "usual": "Anëtar"
@@ -954,11 +1061,25 @@
     "save": "Krijo grup të ri",
     "showMembers": "Lista e anëtarëve e dukshme për të gjithë",
     "teaser": {
+      "notReadable": "Këtë grup nuk mund ta hapësh ende — kërkesa jote është në pritje",
       "openGroup": "Hap grupin",
       "unavailable": "Grupi nuk është më i disponueshëm"
     },
+    "templateChoice": "Çfarë lloj grupi është ky?",
+    "templateDescriptions": {
+      "channel": "Publik — por vetëm drejtimi i grupit shkruan postime",
+      "closed": "Të gjitha postimet janë të dukshme vetëm për anëtarët e grupit",
+      "hidden": "Grupi (përfshirë emrin) është plotësisht i padukshëm",
+      "public": "Grupi dhe të gjitha postimet janë të dukshme për të gjithë përdoruesit e regjistruar"
+    },
     "type": "Dukshmëria e grupit",
+    "typeDescriptions": {
+      "closed": "Të gjitha postimet janë të dukshme vetëm për anëtarët e grupit",
+      "hidden": "Grupi (përfshirë emrin) është plotësisht i padukshëm",
+      "public": "Grupi dhe të gjitha postimet janë të dukshme për të gjithë përdoruesit e regjistruar"
+    },
     "types": {
+      "channel": "Kanal",
       "closed": "I mbyllur",
       "hidden": "Sekret",
       "public": "Publik"
@@ -976,6 +1097,7 @@
       "actionRadiusRequired": "Ju lutem zgjidhni një rreze veprimi.",
       "descriptionLength": "Përshkrimi duhet të ketë të paktën {min} karaktere.",
       "descriptionNotEmpty": "Ju lutem shkruani një përshkrim.",
+      "groupTypeNotAllowed": "Nuk mund ta krijoni këtë lloj grupi.",
       "groupTypeRequired": "Ju lutem zgjidhni një lloj grupi.",
       "nameNotEmpty": "Ju lutem shkruani një emër grupi.",
       "slugInvalidCharacters": "Lejohen vetëm shkronja të vogla, shifra, viza dhe nënvija.",
@@ -1040,6 +1162,7 @@
     "invite-link-message-personal": "Je ftuar të bashkohesh me {network}.",
     "invited-count": "Ke ftuar tashmë {count} persona.",
     "limit-reached": "Ke arritur numrin maksimal të lidhjeve të ftesës.",
+    "members-only": "vetëm për ata që kanë një llogari",
     "my-invite-links": "Lidhjet e mia të ftesës",
     "no-links": "Nuk janë krijuar ende lidhje ftese.",
     "redeemed-count": "Ky kod është përdorur {count} herë.",
@@ -1170,6 +1293,8 @@
         "reviewed": "Rishikuar",
         "unreviewed": "Pa rishikuar"
       },
+      "hiddenContent": "Përmbajtje nga një grup që nuk ke leje ta lexosh",
+      "hiddenDecision": "Nuk vendoset këtu",
       "moreDetails": "Shiko detajet",
       "name": "Raportimet",
       "noDecision": "Asnjë vendim!",
@@ -1208,6 +1333,7 @@
       "mentioned_in_post": "Të përmendi në një postim",
       "on_date": "më",
       "post_in_group": "Postoi në një grup",
+      "post_removed_from_group": "Hoqi postimin tënd nga grupi",
       "removed_user_from_group": "Të hoqi nga grupi",
       "user_joined_group": "U bashkua me grupin tënd",
       "user_left_group": "U largua nga grupi yt"
@@ -1223,7 +1349,18 @@
     "previous": "Mëparshëm"
   },
   "permissions": {
-    "deniedHint": "Nuk ke leje për këtë."
+    "deniedHint": "Nuk ke leje për këtë.",
+    "sections": {
+      "account": "Llogari",
+      "administration": "Administrim",
+      "communication": "Komunikim",
+      "content": "Përmbajtje",
+      "groupAdministration": "Grupe — administrim",
+      "groupModeration": "Grupe — moderim",
+      "membership": "Anëtarësi",
+      "moderation": "Moderim",
+      "visibility": "Dukshmëri"
+    }
   },
   "post": {
     "article": "Artikull",
@@ -1264,6 +1401,9 @@
       "push": "Shtyj lart",
       "pushed": "Shtytur lart",
       "pushedSuccessfully": "Postimi u shty lart me sukses!",
+      "removedFromGroupSuccessfully": "Postimi u hoq nga grupi",
+      "removeFromGroup": "Hiq nga grupi",
+      "removeFromGroupConfirm": "Të hiqet ky postim nga grupi „{group}“? Postimi mbetet i autorit, por humb vendin e tij në grup.",
       "unobserve": "Ndalo observimin e postimit",
       "unobservedSuccessfully": "Nuk po observon më këtë postim!",
       "unpin": "Çngul postimin (Rrjeti)",

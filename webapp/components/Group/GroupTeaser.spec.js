@@ -21,7 +21,7 @@ const group = {
   id: 'g1',
   name: 'Yoga Practice',
   slug: 'yoga-practice',
-  groupType: 'public',
+  visibility: 'public',
   actionRadius: 'regional',
   about: 'Yoga',
   description:
@@ -32,6 +32,8 @@ const group = {
 describe('GroupTeaser', () => {
   let wrapper
 
+  const toastInfo = jest.fn()
+
   const Wrapper = (overrides = {}) => {
     return mount(GroupTeaser, {
       localVue,
@@ -40,6 +42,7 @@ describe('GroupTeaser', () => {
       mocks: {
         $t: jest.fn((key) => key),
         $filters: Filters({ app: {} }).$filters,
+        $toast: { info: toastInfo },
       },
       stubs: {
         'nuxt-link': true,
@@ -64,6 +67,47 @@ describe('GroupTeaser', () => {
 
   it('renders the group name', () => {
     expect(wrapper.find('.title').text()).toBe('Yoga Practice')
+  })
+
+  // A group the viewer may not read still appears on their own list — an applicant has to see
+  // THAT they applied — but there is no page behind it: the Group query answers with nothing
+  // without `group.read`. So the card names the status and the click goes nowhere.
+  describe('a group the viewer may not read', () => {
+    const preventDefault = jest.fn()
+    const clickOn = (teaser) => {
+      preventDefault.mockClear()
+      toastInfo.mockClear()
+      teaser.vm.guardNavigation({ target: { closest: () => null }, preventDefault })
+    }
+
+    it('still shows the name and the viewer`s role', () => {
+      const teaser = Wrapper({
+        myGroupRole: { name: 'pending', label: null },
+        myGroupPermissions: ['group.leave'],
+      })
+
+      expect(teaser.find('.title').text()).toBe('Yoga Practice')
+      // $t echoes keys here, so roleLabel() falls back to the role's own name.
+      expect(teaser.text()).toContain('pending')
+    })
+
+    it('does not navigate, and says why', () => {
+      const teaser = Wrapper({ myGroupPermissions: ['group.leave'] })
+      clickOn(teaser)
+
+      expect(preventDefault).toHaveBeenCalled()
+      expect(toastInfo).toHaveBeenCalledWith('group.teaser.notReadable')
+      expect(teaser.classes()).toContain('group-teaser--not-readable')
+    })
+
+    it('navigates as usual once the viewer may read it', () => {
+      const teaser = Wrapper({ myGroupPermissions: ['group.read'] })
+      clickOn(teaser)
+
+      expect(preventDefault).not.toHaveBeenCalled()
+      expect(toastInfo).not.toHaveBeenCalled()
+      expect(teaser.classes()).not.toContain('group-teaser--not-readable')
+    })
   })
 
   // The whole card is a <nuxt-link>; an <a> nested in an <a> is invalid HTML, so the

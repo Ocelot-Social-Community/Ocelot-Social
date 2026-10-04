@@ -59,6 +59,7 @@ import ReportModal from '~/components/Modal/ReportModal'
 import { reviewMutation } from '~/graphql/Moderation.js'
 import { disableUserMutation } from '~/graphql/User'
 import PinnedPostsMixin from '~/mixins/pinnedPosts'
+import groupRights from '~/mixins/groupRights'
 
 export default {
   name: 'ContentMenu',
@@ -71,7 +72,7 @@ export default {
     OsMenuItem,
     ReportModal,
   },
-  mixins: [PinnedPostsMixin],
+  mixins: [PinnedPostsMixin, groupRights],
   props: {
     placement: { type: String, default: 'top-end' },
     resource: { type: Object, required: true },
@@ -126,7 +127,7 @@ export default {
 
         if (
           this.$can('post.pin') &&
-          (!this.resource.group || this.resource.group.groupType === 'public')
+          (!this.resource.group || this.resource.group.visibility === 'public')
         ) {
           if (!this.resource.pinnedBy && this.canBePinned) {
             routes.push({
@@ -292,7 +293,7 @@ export default {
       if (
         this.resourceType === 'contribution' &&
         this.resource.group &&
-        ['admin', 'owner'].includes(this.resource.group.myRole) &&
+        this.canInGroup('group.post.pin', this.resource.group) &&
         (this.canBeGroupPinned || this.resource.groupPinned)
       ) {
         routes.push({
@@ -303,6 +304,24 @@ export default {
             this.$emit(this.resource.groupPinned ? 'unpinGroupPost' : 'pinGroupPost', this.resource)
           },
           icon: this.resource.groupPinned ? this.icons.unlink : this.icons.mapPin,
+        })
+      }
+
+      // Taking a post out of a group: neither deleting it nor disabling it — the post stays
+      // with its author, it just loses its place here. Its own right, so a group can grant it
+      // without granting anything else.
+      if (
+        this.resourceType === 'contribution' &&
+        this.resource.group &&
+        this.canInGroup('group.post.moderate', this.resource.group) &&
+        !this.isOwner
+      ) {
+        routes.push({
+          label: this.$t('post.menu.removeFromGroup'),
+          callback: () => {
+            this.$emit('removeFromGroup', this.resource)
+          },
+          icon: this.icons.unlink,
         })
       }
 

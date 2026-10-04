@@ -10,6 +10,7 @@ defineStep('I see all the reported posts including the one from above', () => {
     createdAt
     updatedAt
     closed
+    resourceHidden
     reviewed {
       createdAt
       updatedAt

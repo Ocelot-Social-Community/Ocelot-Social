@@ -161,6 +161,42 @@ describe('ReportRow', () => {
       })
     })
 
+    describe('concerns content in a group the moderator may not read', () => {
+      beforeEach(() => {
+        // The server blanked the content and said so with `resourceHidden`. The row must not
+        // render a link to a post it cannot show, and must not offer a decision the shield
+        // refuses on the very same condition.
+        propsData = {
+          ...propsData,
+          report: {
+            ...reports[1],
+            resourceHidden: true,
+            resource: { ...reports[1].resource, title: null, content: null },
+          },
+        }
+        wrapper = Wrapper()
+      })
+
+      it('says that the content sits in a group it may not read', () => {
+        expect(wrapper.find('[data-test="report-hidden"]').text()).toBe(
+          'moderation.reports.hiddenContent',
+        )
+        expect(wrapper.find('.title').exists()).toBe(false)
+      })
+
+      it('offers no decision, because the server would refuse it', () => {
+        expect(wrapper.find('[data-test="confirm"]').exists()).toBe(false)
+        expect(wrapper.find('[data-test="report-undecidable"]').text()).toBe(
+          'moderation.reports.hiddenDecision',
+        )
+      })
+
+      it('still shows the metadata the report is escalated with', () => {
+        expect(wrapper.find('[data-test="report-author"]').text()).toContain('Dagobert')
+        expect(wrapper.find('[data-test="report-reviewer"]').exists()).toBe(true)
+      })
+    })
+
     describe('concerns a User', () => {
       beforeEach(() => {
         propsData = { ...propsData, report: reports[2] }

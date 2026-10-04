@@ -6,8 +6,8 @@ const localVue = global.localVue
 
 const ITEMS = [
   { value: 'public', label: 'Public', testId: 'option-public' },
-  { value: 'closed', label: 'Closed', testId: 'option-closed' },
-  { value: 'hidden', label: 'Secret', testId: 'option-hidden' },
+  { value: 'closed', label: 'Closed', testId: 'option-closed', marked: true },
+  { value: 'hidden', label: 'Secret', testId: 'option-hidden', disabled: true, title: 'Not yours' },
 ]
 
 describe('ToggleGroup', () => {
@@ -38,6 +38,13 @@ describe('ToggleGroup', () => {
     expect(at(wrapper, 'option-closed').attributes('data-appearance')).toBe('outline')
   })
 
+  it('marks what something elsewhere on the page points at', () => {
+    const wrapper = Wrapper()
+
+    expect(at(wrapper, 'option-closed').classes()).toContain('toggle-group__item--marked')
+    expect(at(wrapper, 'option-public').classes()).not.toContain('toggle-group__item--marked')
+  })
+
   it('reports a pick and the button under the cursor', async () => {
     const wrapper = Wrapper()
 
@@ -47,6 +54,15 @@ describe('ToggleGroup', () => {
 
     expect(wrapper.emitted('select')).toEqual([['closed']])
     expect(wrapper.emitted('hover')).toEqual([['closed'], [null]])
+  })
+
+  it('says why a button is disabled where the cursor can still reach it', () => {
+    // A disabled OsButton takes no pointer events, so a title on it would never show.
+    const wrapper = Wrapper()
+    const button = at(wrapper, 'option-hidden')
+
+    expect(button.attributes('disabled')).toBeDefined()
+    expect(button.element.parentElement.getAttribute('title')).toBe('Not yours')
   })
 
   it('lets a row add to its buttons', () => {

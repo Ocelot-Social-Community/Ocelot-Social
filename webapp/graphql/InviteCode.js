@@ -9,7 +9,7 @@ export const validateInviteCode = () => gql`
       code
       invitedTo {
         slug
-        groupType
+        visibility
         name
         about
         avatar {
@@ -23,6 +23,7 @@ export const validateInviteCode = () => gql`
         }
       }
       isValid
+      allowsRegistration
     }
   }
 `
@@ -52,7 +53,7 @@ export const generatePersonalInviteCode = () => gql`
       expiresAt
       comment
       invitedTo {
-        groupType
+        visibility
         name
         about
         avatar {
@@ -60,6 +61,7 @@ export const generatePersonalInviteCode = () => gql`
         }
       }
       isValid
+      allowsRegistration
     }
   }
 `
@@ -90,7 +92,7 @@ export const generateGroupInviteCode = () => gql`
       comment
       invitedTo {
         id
-        groupType
+        visibility
         name
         about
         avatar {
@@ -98,6 +100,7 @@ export const generateGroupInviteCode = () => gql`
         }
       }
       isValid
+      allowsRegistration
     }
   }
 `
@@ -128,7 +131,7 @@ export const invalidateInviteCode = () => gql`
       comment
       invitedTo {
         id
-        groupType
+        visibility
         name
         about
         avatar {
@@ -136,6 +139,7 @@ export const invalidateInviteCode = () => gql`
         }
       }
       isValid
+      allowsRegistration
     }
   }
 `

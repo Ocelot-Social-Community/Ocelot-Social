@@ -36,55 +36,99 @@
 
         <div v-if="update" class="ds-mb-base"></div>
 
-        <!-- groupType -->
-        <p class="ds-text select-label">
-          {{ $t('group.type') }}
-        </p>
-        <div
-          class="select-wrap"
-          :class="{
-            'ds-input-has-error':
-              visibleErrors && visibleErrors.groupType && formData.groupType === '',
-          }"
-        >
-          <select
-            class="select ds-input appearance--auto"
-            name="groupType"
-            model="groupType"
-            :value="formData.groupType"
-            :disabled="update && (!group || group.myRole !== 'owner')"
-            @change="changeGroupType($event)"
-            @blur="touchField('groupType')"
+        <!-- visibility -->
+        <!--
+          Creating: ONE question, one card per template, over all of them. The old control was a
+          select over the three VISIBILITIES, which left `channel` — a template that derives to
+          `public` — with no way of being asked for at all. Everything else about the group is
+          what the template brings, and is edited afterwards under Rights.
+        -->
+        <template v-if="!update">
+          <p class="ds-text select-label">{{ $t('group.templateChoice') }}</p>
+          <ul class="template-cards" data-test="template-cards">
+            <li v-for="choice in templateChoices" :key="choice.name" class="template-cards__item">
+              <group-state-card
+                tag="button"
+                type="button"
+                :icon="icons[choice.icon]"
+                :active="choice.name === formData.template"
+                :disabled="!choice.allowed"
+                :title="choice.allowed ? null : $t('group.validations.groupTypeNotAllowed')"
+                :aria-describedby="
+                  choice.name === describedTemplate ? 'template-description' : null
+                "
+                :data-test="`template-card-${choice.name}`"
+                @click="chooseTemplate(choice)"
+                @mouseenter="hoveredTemplate = choice.name"
+                @mouseleave="hoveredTemplate = null"
+                @focus="hoveredTemplate = choice.name"
+                @blur="hoveredTemplate = null"
+              >
+                <template #title>{{ $t(`group.types.${choice.name}`) }}</template>
+              </group-state-card>
+            </li>
+          </ul>
+          <!-- The cards only NAME the templates; what one means stands here — for the card under
+               the cursor (or keyboard focus), else for the one picked. Four cards each carrying
+               their own sentence were as tall as the longest of them. -->
+          <p
+            v-if="describedTemplate"
+            id="template-description"
+            class="template-description"
+            data-test="template-description"
           >
-            <option
-              v-for="groupType in groupTypeOptions"
-              :key="groupType"
-              :value="groupType"
-              :disabled="groupType !== group.groupType && !$can(`group.create_${groupType}`)"
-            >
-              {{ $t(`group.typesOptions.${groupType}`) }}
-            </option>
-          </select>
-        </div>
-        <os-validation-hint
-          v-if="visibleErrors && visibleErrors.groupType && formData.groupType === ''"
-          variant="error"
-          :text="$t('group.validations.groupTypeRequired')"
-        />
-
-        <!-- showMembers -->
-        <div class="show-members-control">
-          <input
-            id="show-members"
-            type="checkbox"
-            :checked="effectiveShowMembers"
-            :disabled="formData.groupType !== 'closed'"
-            @change="updateFormField('showMembers', $event.target.checked)"
+            {{ $t(`group.templateDescriptions.${describedTemplate}`) }}
+          </p>
+          <os-validation-hint
+            v-if="visibleErrors && visibleErrors.template && formData.template === ''"
+            variant="error"
+            :text="$t('group.validations.groupTypeRequired')"
           />
-          <label for="show-members" :class="{ 'is-disabled': formData.groupType !== 'closed' }">
-            {{ $t('group.showMembers') }}
-          </label>
-        </div>
+        </template>
+
+        <!-- Editing: the visibility stays a visibility here. Which template the group RUNS on is
+             a different question with its own screen (Rights), where changing it replaces every
+             role rather than the two non-member ones this writes. -->
+        <template v-else>
+          <p class="ds-text select-label">
+            {{ $t('group.type') }}
+          </p>
+          <div
+            class="select-wrap visibility-wrap"
+            :class="{
+              'ds-input-has-error':
+                visibleErrors && visibleErrors.visibility && formData.visibility === '',
+            }"
+          >
+            <select
+              class="select ds-input appearance--auto"
+              name="visibility"
+              model="visibility"
+              :value="formData.visibility"
+              :disabled="!canInGroup('group.role.manage', group)"
+              @change="changeGroupType($event)"
+              @blur="touchField('visibility')"
+            >
+              <option
+                v-for="visibility in visibilityOptions"
+                :key="visibility"
+                :value="visibility"
+                :disabled="visibility !== group.visibility && !$can(`group.create_${visibility}`)"
+              >
+                {{ $t(`group.typesOptions.${visibility}`) }}
+              </option>
+            </select>
+          </div>
+          <os-validation-hint
+            v-if="visibleErrors && visibleErrors.visibility && formData.visibility === ''"
+            variant="error"
+            :text="$t('group.validations.groupTypeRequired')"
+          />
+        </template>
+
+        <!-- No member-list checkbox here any more: who may see the members is a right of the
+             non-member role, set under Rights. A second control for it wrote that right on
+             EVERY save of this form, and so quietly undid what had been set there. -->
 
         <!-- goal -->
         <ocelot-input name="about" :label="$t('group.goal')" v-model="formData.about" rows="3" />
@@ -213,7 +257,18 @@ import LocationSelect from '~/components/Select/LocationSelect'
 import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
+import GroupStateCard from '~/components/Group/GroupStateCard'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
+import groupRights from '~/mixins/groupRights'
+
+// One glyph per template, falling back to the one for the visibility it derives to — so a
+// template nobody has drawn an icon for still shows what kind of group it makes.
+const TEMPLATE_ICONS = {
+  public: 'globe',
+  closed: 'lock',
+  hidden: 'eyeSlash',
+  channel: 'volumeUp',
+}
 
 // Shared by both the location-select text search and the location-picker-map
 // below it, so a group's location can land on a city district — deliberately
@@ -226,9 +281,10 @@ const GROUP_LOCATION_TYPES = 'neighborhood,locality,place,region,country'
 
 export default {
   name: 'GroupForm',
-  mixins: [GetCategories, formValidation],
+  mixins: [GetCategories, formValidation, groupRights],
   components: {
     CategoriesSelect,
+    GroupStateCard,
     Editor,
     ActionRadiusSelect,
     LocationSelect,
@@ -244,6 +300,16 @@ export default {
       required: false,
       default: false,
     },
+    /**
+     * The templates a new group can start from, `{ name, visibility }` — runtime data, so the
+     * page fetches it and hands it over rather than this component carrying a list that goes
+     * stale the moment an operator adds one. Empty while editing, where no template is picked.
+     */
+    templates: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
     group: {
       type: Object,
       required: false,
@@ -251,22 +317,17 @@ export default {
     },
   },
   data() {
-    const {
-      name,
-      slug,
-      groupType,
-      about,
-      description,
-      actionRadius,
-      locationName,
-      categories,
-      showMembers,
-    } = this.group
+    const { name, slug, visibility, about, description, actionRadius, locationName, categories } =
+      this.group
     const initialCategoryIds = categories ? categories.map((category) => category.id) : []
     return {
       disabled: false,
       loading: false,
-      groupTypeOptions: ['public', 'closed', 'hidden'],
+      // The three VISIBILITIES, which the edit form offers as a preset to write onto the
+      // non-member role. They double as the names of three templates — a backend drift guard
+      // keeps one template per visibility — which is why the create form can fall back to them
+      // while `groupTemplates` has not answered.
+      visibilityOptions: ['public', 'closed', 'hidden'],
       loadingGeo: false,
       cities: [],
       // Whether the location has actually been changed by the user (map
@@ -292,19 +353,26 @@ export default {
       // hint would keep comparing against the value from when the form was
       // first opened and never clear once saved.
       savedLocationName: locationName || '',
+      // The template card under the cursor or focus, whose meaning is spelled out under the row.
+      hoveredTemplate: null,
       // Exposed for the template (see the category validation hint below) —
       // bare module-scope reads don't resolve there, unlike in the script.
       branding,
       formData: {
         name: name || '',
         slug: slug || '',
-        groupType: groupType || '',
+        // Which preset a NEW group starts from. Empty while editing: the group already runs on
+        // one, and changing it belongs to the rights screen.
+        template: '',
+        // What the group can be seen as. On create this is DERIVED from the template picked
+        // above, so everything keyed off it — the create cap, the member-list rule — keeps
+        // reading one visibility rather than learning about templates.
+        visibility: visibility || '',
         about: about || '',
         description: description || '',
         locationName: locationName || '',
         actionRadius: actionRadius || '',
         categoryIds: [...initialCategoryIds],
-        showMembers: showMembers ?? false,
       },
       formSchema: {
         name: {
@@ -359,7 +427,12 @@ export default {
             return []
           },
         },
-        groupType: { required: true, min: 1 },
+        // One of the two, never both: creating asks for a TEMPLATE, editing for a VISIBILITY.
+        // Requiring both would report an empty create form as missing two choices when it is
+        // missing one — the visibility is derived from the template the moment it is picked.
+        ...(this.update
+          ? { visibility: { required: true, min: 1 } }
+          : { template: { required: true, min: 1 } }),
         about: { required: false },
         description: {
           type: 'string',
@@ -462,11 +535,37 @@ export default {
             max: this.formSchema.name.max,
           })
     },
+    /**
+     * The cards on the create form: every template, with the glyph and the right it costs.
+     *
+     * The cost is read off the VISIBILITY the template derives to, not off its name — the same
+     * rule the server applies, and the reason the visibility travels with the name in the query.
+     * A template the viewer may not create is shown and refused rather than hidden: "there is a
+     * kind of group I am not allowed to make" is information, an absent card is not.
+     *
+     * Falls back to the three visibility-named templates while the query has not answered, so a
+     * slow or failed request leaves the form usable rather than empty. Those three always exist
+     * — a drift guard in the backend keeps one template per visibility.
+     */
+    /** Which template the line under the cards explains: the one pointed at, else the one picked. */
+    describedTemplate() {
+      return this.hoveredTemplate || this.formData.template || null
+    },
+    templateChoices() {
+      const choices = this.templates.length
+        ? this.templates
+        : this.visibilityOptions.map((name) => ({ name, visibility: name }))
+      return choices.map((choice) => ({
+        ...choice,
+        icon: TEMPLATE_ICONS[choice.name] ?? TEMPLATE_ICONS[choice.visibility],
+        allowed: this.$can(`group.create_${choice.visibility}`),
+      }))
+    },
     // Flat per-type create rights (mirrors the backend group.create_* shield): the
     // "create group" entry point is open if the user may create at least one type, and
     // the submit gate keys off the currently selected type.
     canCreateAnyGroup() {
-      return this.groupTypeOptions.some((type) => this.$can(`group.create_${type}`))
+      return this.templateChoices.some((choice) => choice.allowed)
     },
     // Switching an existing group TO hidden additionally needs
     // group.create_hidden (the privacy-raising transition); editing an
@@ -477,7 +576,7 @@ export default {
     // the submit button looking fully enabled while clicking it silently
     // did nothing).
     canSubmitHiddenTransition() {
-      if (this.formData.groupType !== 'hidden' || this.group.groupType === 'hidden') return true
+      if (this.formData.visibility !== 'hidden' || this.group.visibility === 'hidden') return true
       return this.$can('group.create_hidden')
     },
     canCreateSelectedGroup() {
@@ -487,18 +586,13 @@ export default {
       // would wrongly flag "denied" for someone who can create every
       // type, just hasn't picked one. Fall back to "can create at least
       // one type" until they do.
-      if (!this.formData.groupType) return this.canCreateAnyGroup
-      return this.$can(`group.create_${this.formData.groupType}`) && this.canSubmitHiddenTransition
-    },
-    effectiveShowMembers() {
-      if (this.formData.groupType === 'public') return true
-      if (this.formData.groupType === 'hidden') return false
-      return this.formData.showMembers
+      if (!this.formData.visibility) return this.canCreateAnyGroup
+      return this.$can(`group.create_${this.formData.visibility}`) && this.canSubmitHiddenTransition
     },
     // Exposed (via $refs) for the page component's own beforeRouteLeave
     // guard, and used below for the native beforeunload prompt. dirtyFields
     // covers every field wired through updateFormField()/$parentForm.update
-    // (name, slug, groupType, about, description, actionRadius, showMembers,
+    // (name, slug, visibility, about, description, actionRadius,
     // categoryIds) — locationChangedByUser covers the location field
     // separately, since it's set directly rather than through
     // updateFormField (see onLocationSelectInput/onLocationPickerMapInput;
@@ -512,7 +606,7 @@ export default {
     // actual :disabled, deliberately: hasUnsavedChanges only tracks whether
     // something was TOUCHED, not whether it truly differs from what's
     // saved, so a gap in that tracking (a future field that forgets to wire
-    // itself up, the way the location and showMembers ones once did) must
+    // itself up, the way the location one once did) must
     // never make a real save unreachable. Worst case here is an invitingly-
     // styled click that just re-saves the same values — never a blocked one.
     // Deliberately NOT reflected in aria-disabled (see the template) — the
@@ -547,7 +641,17 @@ export default {
       event.returnValue = ''
     },
     changeGroupType(event) {
-      this.updateFormField('groupType', event.target.value)
+      this.updateFormField('visibility', event.target.value)
+    },
+    /**
+     * Picking a template on the create form also fixes the visibility, because the template's
+     * rights are what the visibility is read from. Both are written: the template is what gets
+     * sent, the visibility is what every rule on this form already asks about.
+     */
+    chooseTemplate(choice) {
+      this.updateFormField('template', choice.name)
+      this.updateFormField('visibility', choice.visibility)
+      this.touchField('template')
     },
     changeActionRadius(event) {
       this.updateFormField('actionRadius', event.target.value)
@@ -577,16 +681,16 @@ export default {
       // Block creating a group of a type the user may not create (the button is grayed;
       // this also guards keyboard Enter and direct navigation to the form). Only once a
       // type is actually chosen — same fix as canCreateSelectedGroup: checking
-      // `$can('group.create_')` (empty suffix) for an untouched, still-empty groupType
+      // `$can('group.create_')` (empty suffix) for an untouched, still-empty visibility
       // is never true for anyone, so this used to silently block every submit attempt
       // on a fresh form (no validation, no toast, nothing) even for an admin who can
       // create every type. Submitting with no type chosen should fall through to
-      // formSubmit() instead, so the schema's own "groupType is required" catches it
+      // formSubmit() instead, so the schema's own "visibility is required" catches it
       // and shows the usual error + toast like any other invalid field.
       if (
         !this.update &&
-        this.formData.groupType &&
-        !this.$can(`group.create_${this.formData.groupType}`)
+        this.formData.visibility &&
+        !this.$can(`group.create_${this.formData.visibility}`)
       )
         return
       // Switching an existing group TO hidden additionally needs group.create_hidden
@@ -599,11 +703,16 @@ export default {
     },
     submit() {
       this.loading = true
-      const { name, slug, about, description, groupType, actionRadius, categoryIds } = this.formData
+      const { name, slug, about, description, template, visibility, actionRadius, categoryIds } =
+        this.formData
       const variables = {
         name,
         slug,
-        groupType,
+        // Creating names a TEMPLATE, editing writes a VISIBILITY: one picks the whole set of
+        // roles a group starts with, the other rewrites the two non-member ones of a group that
+        // already has them. The two mutations ask for exactly that, so the form sends exactly
+        // that rather than one value standing in for both.
+        ...(this.update ? { visibility } : { template }),
         about,
         description,
         actionRadius,
@@ -611,7 +720,6 @@ export default {
         lat: this.formLocationCoordinates?.lat ?? null,
         lng: this.formLocationCoordinates?.lng ?? null,
         categoryIds,
-        showMembers: this.effectiveShowMembers,
       }
       // Snapshot exactly what's being submitted — submit() to done() is a
       // real network round-trip (not instantaneous), so the user may touch
@@ -662,6 +770,36 @@ export default {
 </script>
 
 <style>
+/* One card per template (GroupStateCard): a glyph, what it is called and what it makes the
+   group — the same card the rights screen states the group with, so the choice made here is
+   recognisable there. In one row on a wide screen however many templates there are: they are
+   one scale, and a second row read as a second, lesser set. */
+.template-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--space-x-small);
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-base);
+
+  @media (--vp-desktop-up) {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+  }
+}
+
+.template-cards:has(+ .template-description),
+.template-cards:has(+ .os-validation-hint) {
+  margin-bottom: 0;
+}
+
+.template-description {
+  margin: var(--space-xx-small) 0 var(--space-base);
+  color: var(--text-color-soft);
+  font-size: 0.9em;
+}
+
 .appearance--auto {
   -webkit-appearance: auto;
   -moz-appearance: auto;
@@ -692,25 +830,12 @@ export default {
   display: flex;
   flex-direction: column;
 
-  > .show-members-control {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: var(--space-x-small);
-    margin-top: var(--space-x-small);
-    margin-bottom: var(--space-base);
-
-    label.is-disabled {
-      opacity: 0.5;
-    }
-  }
-
   > .ds-form-item {
     margin: 0;
   }
 
   /* Same zeroed margin as .ds-form-item above (OcelotInput's own root) —
-     without it, the groupType/actionRadius selects sat noticeably further
+     without it, the visibility/actionRadius selects sat noticeably further
      from their validation hint below than name/description do, since
      those two are the only fields wrapped in an extra div (for the
      ds-input-has-error red border; see the template) and that div had no
@@ -719,11 +844,10 @@ export default {
     margin: 0;
   }
 
-  /* Unlike groupType's select-wrap (whose next sibling is the checkbox and
-     stays deliberately tight, handled above), actionRadius's next sibling
-     is the next field group (location) and should keep the same
+  /* Both selects are followed by the next field and keep the same
      space-base gap every other field-to-field transition uses — there is
-     no explicit spacer div for it any more (see template). */
+     no explicit spacer div for either (see template). */
+  > .visibility-wrap,
   > .action-radius-wrap {
     margin-bottom: var(--space-base);
   }
@@ -733,6 +857,7 @@ export default {
      the space-base gap to the next field comes from the hint's own
      margin-bottom below. Without this, the two would add up and push the
      hint away from its select. */
+  > .visibility-wrap:has(+ .os-validation-hint),
   > .action-radius-wrap:has(+ .os-validation-hint) {
     margin-bottom: 0;
   }
@@ -740,19 +865,6 @@ export default {
   > .os-validation-hint {
     margin-bottom: var(--space-base);
     cursor: default;
-  }
-
-  /* .show-members-control's own margin-top (8px, above) assumes it's
-     sitting right after the groupType select directly. When the select's
-     validation hint is showing instead (error state), that hint's own
-     margin-bottom (16px, from the rule above — meant for the general case
-     of one field's hint to the next field) adds to those 8px instead of
-     collapsing with them (flex containers never collapse sibling
-     margins), pulling the checkbox noticeably further down than in the
-     no-error case. Cancel just the hint's margin here so the gap stays
-     the same small size either way. */
-  > .os-validation-hint + .show-members-control {
-    margin-top: calc(var(--space-x-small) - var(--space-base));
   }
 
   /* Same double-margin problem as above, one field over: the slug field's
@@ -776,7 +888,7 @@ export default {
      spreading them left/right across the row. Not something
      ContributionForm.vue hits: its fields sit inside plain-block
      os-card__content, not a div matched by a rule like this one. */
-  > div:not(.buttons):not(.show-members-control):not(.os-validation-hint) {
+  > div:not(.buttons):not(.os-validation-hint) {
     display: flex;
     flex-direction: column;
 

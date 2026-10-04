@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ocelot.social/schemas/group-permission-catalog.json",
+  "title": "GroupPermissionCatalog",
+  "description": "Closed, code-owned catalog of GROUP-SCOPED permissions. Same discipline as the network catalog (permission/permission.catalog.json): each key names a real enforcement point, roles bundle the keys as DATA, and a new key ships with its gate. Separate from the network catalog because these keys are only ever evaluated relative to one group, never globally. `requiresNetworkPermission` is the hard cap: where a capability also exists network-wide, BOTH must hold, so a group can never become a way around network policy. A `<type>` placeholder in it is resolved against the group's groupType (see ../groupPermission/prerequisites.ts). The `groupsEnabled` policy gates every key and is therefore applied in code rather than repeated in each entry.",
+  "permissions": {
+    "group.read": {
+      "group": "visibility",
+      "description": "See the group's profile beyond the always-public fields."
+    },
+    "group.content.read": {
+      "group": "visibility",
+      "description": "Read the group's posts and comments."
+    },
+    "group.members.read": {
+      "group": "visibility",
+      "description": "See the group's member list and its member count."
+    },
+    "group.post.create": {
+      "group": "content",
+      "requiresNetworkPermission": "post.create",
+      "description": "Create posts in the group."
+    },
+    "group.comment.create": {
+      "group": "content",
+      "requiresNetworkPermission": "comment.create",
+      "description": "Comment on posts in the group."
+    },
+    "group.post.pin": {
+      "group": "moderation",
+      "description": "Pin and unpin posts within the group."
+    },
+    "group.post.moderate": {
+      "group": "moderation",
+      "description": "Remove someone else's post from this group. The post itself stays with its author — what is taken away is its place in the group."
+    },
+    "group.join": {
+      "group": "membership",
+      "description": "Join the group directly, without approval."
+    },
+    "group.join.request": {
+      "group": "membership",
+      "description": "Ask to join the group, becoming a pending applicant."
+    },
+    "group.leave": {
+      "group": "membership",
+      "description": "Leave the group."
+    },
+    "group.member.remove": {
+      "group": "administration",
+      "description": "Remove a member from the group, subject to the act-on hierarchy."
+    },
+    "group.member.role.assign": {
+      "group": "administration",
+      "description": "Change a member's role in the group, subject to the act-on hierarchy and to holding every right the assigned role holds."
+    },
+    "group.invite": {
+      "group": "membership",
+      "description": "Generate group invite codes for people who already have an account on this network."
+    },
+    "group.invite.external": {
+      "group": "membership",
+      "gatedBy": "inviteRegistration",
+      "description": "Generate group invite codes that also entitle their holder to register an account."
+    },
+    "group.settings.manage": {
+      "group": "administration",
+      "description": "Change the group's settings: name, about, description, avatar, location, categories and member-list visibility."
+    },
+    "group.role.manage": {
+      "group": "administration",
+      "description": "Edit this group's own role definitions."
+    },
+    "group.chat.participate": {
+      "group": "communication",
+      "description": "Read and write the group's chat room."
+    },
+    "group.videoCall.create": {
+      "group": "communication",
+      "requiresNetworkPermission": "videoCall.create_<door>",
+      "gatedBy": "videoConference",
+      "description": "Open a video call in the group. Capped network-side by whether the group is one a stranger can walk into (videoCall.create_open) or not (videoCall.create_restricted)."
+    },
+    "group.videoCall.join": {
+      "group": "communication",
+      "gatedBy": "videoConference",
+      "description": "Join a video call already running in the group."
+    }
+  }
+}

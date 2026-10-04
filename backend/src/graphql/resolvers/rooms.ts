@@ -240,14 +240,14 @@ export default {
           // Step 1: Create/merge the room and add all active group members to it
           const createGroupRoomCypher = `
             MATCH (currentUser:User { id: $currentUserId })-[membership:MEMBER_OF]->(group:Group { id: $groupId })
-            WHERE membership.role IN ['usual', 'admin', 'owner']
+            WHERE membership.role <> 'pending'
             MERGE (room:Room)-[:ROOM_FOR]->(group)
             ON CREATE SET
               room.createdAt = toString(datetime()),
               room.id = apoc.create.uuid()
             WITH room, group, currentUser
             MATCH (member:User)-[m:MEMBER_OF]->(group)
-            WHERE m.role IN ['usual', 'admin', 'owner']
+            WHERE m.role <> 'pending'
             MERGE (member)-[:CHATS_IN]->(room)
             WITH room, group, currentUser, collect(properties(member)) AS members
             OPTIONAL MATCH (currentUser)-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room)

@@ -32,6 +32,7 @@ import { createNode, findNode } from '@db/testing/create'
 import { generateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { isUniqueFor } from '@middleware/sluggifyMiddleware'
 import uniqueSlug, { toSlug } from '@middleware/slugify/uniqueSlug'
+import { seedRolesForNewGroup } from '@src/groupRole/repository'
 import { seedDefaultRoleNodes } from '@src/role'
 
 import { getDriver } from './neo4j'
@@ -414,7 +415,11 @@ Factory.define('group')
     name: faker.company.name,
     about: faker.lorem.sentence,
     description: faker.lorem.paragraphs,
-    groupType: 'public',
+    // Which role template the group starts from — the same thing `CreateGroup(template:)`
+    // picks, and the one thing about the preset that is stored. How findable the group ends up
+    // is NOT set here: it is derived from the roles this seeds (privacyLevel.ts), so a spec
+    // that wants a closed group asks for the closed template and reads the visibility back.
+    template: 'public',
     actionRadius: 'regional',
     deleted: false,
     disabled: false,
@@ -442,6 +447,12 @@ Factory.define('group')
           `,
           { ownerId: owner.get('id'), groupId: buildObject.id },
         ),
+      )
+      // The group's role definitions, in the same transaction — a factory-built group has to
+      // be as usable as one created through the API, or every spec that builds a group would
+      // get a group whose members hold no rights at all.
+      await session.writeTransaction(async (txc) =>
+        seedRolesForNewGroup(txc, buildObject.id, buildObject.template, new Date().toISOString()),
       )
     } finally {
       await session.close()

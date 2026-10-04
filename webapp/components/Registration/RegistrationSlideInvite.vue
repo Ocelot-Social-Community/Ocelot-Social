@@ -13,7 +13,7 @@
     </p>
     <div class="invitation-info" v-if="invitedBy">
       <avatar-image :profile="invitedBy" size="small" />
-      <span v-if="invitedTo && invitedTo.groupType === 'hidden'">
+      <span v-if="invitedTo && invitedTo.visibility === 'hidden'">
         {{
           $t('components.registration.invite-code.invited-to-hidden-group', {
             invitedBy: invitedBy.name,
@@ -140,7 +140,10 @@ export default {
 
           const validationResult = response.data.validateInviteCode
 
-          if (validationResult && validationResult.isValid) {
+          // `allowsRegistration`, not `isValid`: a group invite that only brings existing
+          // accounts into a group is a valid code — it just cannot open an account here, and
+          // the shield would refuse the signup behind this screen.
+          if (validationResult && validationResult.allowsRegistration) {
             // Auto-advance to next slide
             const currentIndex = this.sliderData.sliderIndex
             const nextIndex = currentIndex + 1

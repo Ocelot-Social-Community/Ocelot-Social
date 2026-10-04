@@ -53,6 +53,7 @@ import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import GroupAvatar from '~/components/GroupAvatar/GroupAvatar'
 import InfiniteScrollList from './InfiniteScrollList.vue'
+import groupRights from '~/mixins/groupRights'
 import {
   profileUserGroupsQuery,
   setGroupMembershipVisibilityMutation,
@@ -64,6 +65,7 @@ const GROUP_SECTIONS_BY_MEMBERSHIP = ['shared', 'other']
 const PAGE_SIZE = 25
 
 export default {
+  mixins: [groupRights],
   name: 'GroupMemberList',
   components: {
     OsIcon,
@@ -142,13 +144,13 @@ export default {
     groupsByType() {
       if (this.myProfile) {
         return GROUP_SECTIONS_BY_TYPE.reduce((acc, type) => {
-          acc[type] = (this.groups || []).filter((g) => g.groupType === type)
+          acc[type] = (this.groups || []).filter((g) => g.visibility === type)
           return acc
         }, {})
       }
       return {
-        shared: (this.groups || []).filter((g) => g.myRole !== null && g.myRole !== 'pending'),
-        other: (this.groups || []).filter((g) => g.myRole === null || g.myRole === 'pending'),
+        shared: (this.groups || []).filter((g) => this.isGroupMember(g)),
+        other: (this.groups || []).filter((g) => !this.isGroupMember(g)),
       }
     },
     typesWithGroups() {

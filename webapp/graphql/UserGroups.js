@@ -16,11 +16,15 @@ export const profileUserGroupsQuery = (i18n) => {
           name
           slug
           about
-          groupType
+          visibility
           actionRadius
           membersCount
           postsCount
-          myRole
+          myGroupRole {
+            name
+            label
+          }
+          myGroupPermissions
           showOnProfile
           ...locationOnGroup
           avatar {

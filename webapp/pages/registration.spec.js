@@ -420,7 +420,7 @@ describe('Registration', () => {
                 invitedTo: {
                   id: 'public-group',
                   slug: 'public-group',
-                  groupType: 'public',
+                  visibility: 'public',
                 },
               },
             },
@@ -466,7 +466,7 @@ describe('Registration', () => {
                 invitedTo: {
                   id: 'closed-group',
                   slug: 'closed-group',
-                  groupType: 'closed',
+                  visibility: 'closed',
                 },
               },
             },
@@ -512,7 +512,7 @@ describe('Registration', () => {
                 invitedTo: {
                   id: 'public-group',
                   slug: 'public-group',
-                  groupType: 'public',
+                  visibility: 'public',
                 },
               },
             },

@@ -118,7 +118,7 @@ describe('admin/roles.vue', () => {
     const gatedCatalog = [
       { key: 'post.create', group: 'content', description: 'Create posts', available: true },
       {
-        key: 'videoCall.create_public',
+        key: 'videoCall.create_open',
         group: 'communication',
         description: 'Start a public call',
         gatedBy: 'videoConference',
@@ -144,7 +144,7 @@ describe('admin/roles.vue', () => {
       wrapper
         .findAll('.perm-row')
         .wrappers.find((row) => row.find(`[data-test="role-user-perm-${key}"]`).exists())
-    const gatedRow = rowOf('videoCall.create_public')
+    const gatedRow = rowOf('videoCall.create_open')
     const openRow = rowOf('post.create')
     // The gated right is disabled and carries the "not configured" note…
     expect(gatedRow.find('input').attributes('disabled')).toBeDefined()
@@ -392,7 +392,9 @@ describe('admin/roles.vue', () => {
     // Translation present: look it up by the sanitised (dot-free) key.
     wrapper.vm.$t = (path) => `T:${path}`
     expect(wrapper.vm.permLabel(perm)).toBe('T:admin.roles.perm.badge_manage')
-    expect(wrapper.vm.groupLabel('moderation')).toBe('T:admin.roles.groups.moderation')
+    // One namespace for both catalogs: a section heading reads the same whether the right is
+    // network-wide or inside a group.
+    expect(wrapper.vm.groupLabel('moderation')).toBe('T:permissions.sections.moderation')
   })
 
   it('links the member count to the user list filtered by that role', async () => {

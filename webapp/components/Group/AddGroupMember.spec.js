@@ -129,7 +129,7 @@ describe('AddGroupMember', () => {
       await flushPromises()
       expect(mutate).toHaveBeenCalledWith(
         expect.objectContaining({
-          variables: { groupId: 'g1', userId: 'u1', roleInGroup: 'usual' },
+          variables: { groupId: 'g1', userId: 'u1', roleName: 'usual' },
         }),
       )
       expect($toast.success).toHaveBeenCalled()

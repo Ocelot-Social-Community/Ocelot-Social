@@ -149,6 +149,32 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
               >
                 <a
                   class="os-menu-item-link"
+                  href="/groups/edit/groupid/rights"
+                >
+                  <span
+                    aria-hidden="true"
+                    class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  >
+                    <svg
+                      fill="currentColor"
+                      viewBox="0 0 32 32"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M15 3c3.845 0 7 3.155 7 7v3h3v16h-20v-16h3v-3c0-3.845 3.155-7 7-7zM15 5c-2.755 0-5 2.245-5 5v3h10v-3c0-2.755-2.245-5-5-5zM7 15v12h16v-12h-16z"
+                      />
+                    </svg>
+                  </span>
+                  
+              group.rights.title
+            
+                </a>
+              </li>
+              <li
+                class="os-menu-item os-menu-item-level-0"
+              >
+                <a
+                  class="os-menu-item-link"
                   href="/groups/edit/groupid/invites"
                 >
                   <span

@@ -249,7 +249,7 @@ describe('RegistrationSlideCreate', () => {
 
     it('on success with a public-group invite: redirects to the group', async () => {
       propsData.sliderData.sliders[0].data.response = {
-        validateInviteCode: { invitedTo: { groupType: 'public', slug: 'my-group' } },
+        validateInviteCode: { invitedTo: { visibility: 'public', slug: 'my-group' } },
       }
       const wrapper = Wrapper()
       await wrapper.vm.submit()
