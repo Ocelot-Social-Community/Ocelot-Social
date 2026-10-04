@@ -36,11 +36,55 @@
 
         <div v-if="update" class="ds-mb-base"></div>
 
-        <!-- groupType -->
-        <p class="ds-text select-label">
+        <!--
+          Creating: one card per group type — a glyph, its name, and under the row what it means
+          for the one pointed at, else for the one picked. All three are readable at once, which a
+          closed select hides; the cards only NAME the types so the row stays one line high.
+        -->
+        <template v-if="!update">
+          <p class="ds-text select-label">{{ $t('group.type') }}</p>
+          <ul class="type-cards" data-test="type-cards">
+            <li v-for="groupType in groupTypeOptions" :key="groupType">
+              <group-state-card
+                tag="button"
+                type="button"
+                :icon="icons[typeIcons[groupType]]"
+                :active="groupType === formData.groupType"
+                :disabled="!$can(`group.create_${groupType}`)"
+                :title="
+                  $can(`group.create_${groupType}`)
+                    ? null
+                    : $t('group.validations.groupTypeNotAllowed')
+                "
+                :aria-describedby="groupType === describedType ? 'type-description' : null"
+                :data-test="`type-card-${groupType}`"
+                @click="chooseGroupType(groupType)"
+                @mouseenter="hoveredType = groupType"
+                @mouseleave="hoveredType = null"
+                @focus="hoveredType = groupType"
+                @blur="hoveredType = null"
+              >
+                <template #title>{{ $t(`group.types.${groupType}`) }}</template>
+              </group-state-card>
+            </li>
+          </ul>
+          <p
+            v-if="describedType"
+            id="type-description"
+            class="type-description"
+            data-test="type-description"
+          >
+            {{ $t(`group.typeDescriptions.${describedType}`) }}
+          </p>
+        </template>
+
+        <!-- Editing keeps the select: changing the type of a group that exists is a rarer act
+             with its own rules (who may, and the hidden transition below). -->
+        <p v-if="update" class="ds-text select-label">
           {{ $t('group.type') }}
         </p>
         <div
+          v-if="update"
           class="select-wrap"
           :class="{
             'ds-input-has-error':
@@ -213,6 +257,7 @@ import LocationSelect from '~/components/Select/LocationSelect'
 import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
+import GroupStateCard from '~/components/Group/GroupStateCard'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 // Shared by both the location-select text search and the location-picker-map
@@ -228,6 +273,7 @@ export default {
   name: 'GroupForm',
   mixins: [GetCategories, formValidation],
   components: {
+    GroupStateCard,
     CategoriesSelect,
     Editor,
     ActionRadiusSelect,
@@ -267,6 +313,10 @@ export default {
       disabled: false,
       loading: false,
       groupTypeOptions: ['public', 'closed', 'hidden'],
+      // One glyph per type, from the icons the app already ships.
+      typeIcons: { public: 'globe', closed: 'lock', hidden: 'eyeSlash' },
+      // The type card under the cursor or focus, whose meaning is spelled out under the row.
+      hoveredType: null,
       loadingGeo: false,
       cities: [],
       // Whether the location has actually been changed by the user (map
@@ -465,6 +515,10 @@ export default {
     // Flat per-type create rights (mirrors the backend group.create_* shield): the
     // "create group" entry point is open if the user may create at least one type, and
     // the submit gate keys off the currently selected type.
+    /** Which type the line under the cards explains: the one pointed at, else the one picked. */
+    describedType() {
+      return this.hoveredType || this.formData.groupType || null
+    },
     canCreateAnyGroup() {
       return this.groupTypeOptions.some((type) => this.$can(`group.create_${type}`))
     },
@@ -545,6 +599,10 @@ export default {
       // the actual string is ignored by every modern browser.
       event.preventDefault()
       event.returnValue = ''
+    },
+    chooseGroupType(groupType) {
+      this.updateFormField('groupType', groupType)
+      this.touchField('groupType')
     },
     changeGroupType(event) {
       this.updateFormField('groupType', event.target.value)
@@ -666,6 +724,28 @@ export default {
   -webkit-appearance: auto;
   -moz-appearance: auto;
   appearance: auto;
+}
+
+/* One card per group type (GroupStateCard), in one row on a wide screen: the three are one
+   scale, and the line under them explains the one in question. */
+.type-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-x-small);
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-base);
+}
+
+.type-cards:has(+ .type-description),
+.type-cards:has(+ .os-validation-hint) {
+  margin-bottom: 0;
+}
+
+.type-description {
+  margin: var(--space-xx-small) 0 var(--space-base);
+  color: var(--text-color-soft);
+  font-size: 0.9em;
 }
 
 .select-label {

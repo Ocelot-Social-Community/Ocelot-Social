@@ -958,6 +958,11 @@
       "unavailable": "Groep niet meer beschikbaar"
     },
     "type": "Zichtbaarheid van de groep",
+    "typeDescriptions": {
+      "closed": "Alle berichten alleen zichtbaar voor groepsleden",
+      "hidden": "Groep (inclusief de naam) is volledig onzichtbaar",
+      "public": "Groep en alle berichten zijn zichtbaar voor alle geregistreerde gebruikers"
+    },
     "types": {
       "closed": "Gesloten",
       "hidden": "Geheim",
@@ -976,6 +981,7 @@
       "actionRadiusRequired": "Kies een actieradius.",
       "descriptionLength": "De beschrijving moet minstens {min} tekens lang zijn.",
       "descriptionNotEmpty": "Voer een beschrijving in.",
+      "groupTypeNotAllowed": "Je mag dit soort groep niet aanmaken.",
       "groupTypeRequired": "Kies een groepstype.",
       "nameNotEmpty": "Voer een groepsnaam in.",
       "slugInvalidCharacters": "Alleen kleine letters, cijfers, koppeltekens en underscores zijn toegestaan.",
