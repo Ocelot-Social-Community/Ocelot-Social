@@ -1,5 +1,7 @@
 import { ref } from 'vue'
 
+import { OsIcon } from '#src/components/OsIcon'
+
 import OsToggleGroup from './OsToggleGroup.vue'
 
 import type { ToggleGroupActivation, ToggleGroupOption } from './types'
@@ -93,7 +95,7 @@ export const Highlighted: Story = {
 
 export const WithExtraContent: Story = {
   render: () => ({
-    components: { OsToggleGroup },
+    components: { OsToggleGroup, OsIcon },
     setup() {
       const value = ref('member')
       const options: ToggleGroupOption[] = [
@@ -107,7 +109,9 @@ export const WithExtraContent: Story = {
       <div data-testid="with-extra-content">
         <OsToggleGroup :options="options" :value="value" label="Role" @select="value = $event">
           <template #option="{ option }">
-            <span v-if="option.value === 'owner'" aria-hidden="true">★</span>
+            <!-- An icon, not a text glyph: a character like a star is drawn from whatever fallback
+                 font the machine has, and the screenshot then differs between machines. -->
+            <OsIcon v-if="option.value === 'owner'" name="check" size="xs" aria-hidden="true" />
           </template>
         </OsToggleGroup>
       </div>
