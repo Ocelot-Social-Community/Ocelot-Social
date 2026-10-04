@@ -7,9 +7,19 @@
   import type { ToggleGroupActivation, ToggleGroupOption } from './types'
   import type { Component, PropType } from 'vue-demi'
 
+  /** Attributes OsToggleGroup sets on an option's button itself; `option.attrs` cannot override them. */
+  const MANAGED_ATTRS = new Set([
+    'role',
+    'aria-checked',
+    'tabindex',
+    'disabled',
+    'data-os-toggle-value',
+  ])
+
   /**
    * A row of buttons of which one is the current one — role tabs, a type picker, a three-way
-   * switch. Built on OsButton: the current option is filled primary, the rest are outlined.
+   * switch. Built on OsButton, primary throughout: the current option filled, the rest outlined —
+   * the look of a choice row in the consuming app, not of a row of default buttons.
    *
    * Keyboard follows the WAI-ARIA radio group pattern: the group is ONE tab stop (the current
    * option, else the first enabled one); the arrow keys and Home/End move between the enabled
@@ -80,6 +90,17 @@
         ;(buttons[props.options.indexOf(target)] as HTMLElement).focus()
       }
 
+      /**
+       * The caller's attributes for an option's button, without the ones the group manages: a
+       * `role`, `aria-checked` or `tabindex` of the caller's would break the keyboard pattern, and a
+       * `disabled` would disagree with `option.disabled`, which the navigation reads.
+       */
+      function ownAttrs(option: ToggleGroupOption): Record<string, string> {
+        return Object.fromEntries(
+          Object.entries(option.attrs ?? {}).filter(([name]) => !MANAGED_ATTRS.has(name)),
+        )
+      }
+
       // A disabled option never gets here: its button takes no click, and the arrow keys skip it.
       function pick(option: ToggleGroupOption) {
         emit('select', option.value)
@@ -142,14 +163,14 @@
               'os-toggle-group__option--highlighted outline-2 outline-solid outline-[var(--color-primary)] outline-offset-2',
           )
           const buttonAttrs = {
+            ...ownAttrs(option),
             role: 'radio',
             'aria-checked': String(selected),
             tabindex: option.value === stop ? 0 : -1,
             'data-os-toggle-value': option.value,
-            ...option.attrs,
           }
           const buttonProps = {
-            variant: selected ? 'primary' : 'default',
+            variant: 'primary',
             appearance: selected ? 'filled' : 'outline',
             size: 'sm',
             disabled: !!option.disabled,

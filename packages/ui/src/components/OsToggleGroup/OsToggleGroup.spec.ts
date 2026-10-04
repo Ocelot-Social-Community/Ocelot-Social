@@ -43,6 +43,53 @@ describe('osToggleGroup', () => {
       expect(at(wrapper, 'option-public').attributes('data-appearance')).toBe('outline')
     })
 
+    it('keeps the attributes the group manages, whatever the caller passes', () => {
+      // A caller's role, aria-checked or tabindex would break the keyboard pattern, and a
+      // disabled would disagree with `option.disabled`, which the navigation reads.
+      wrapper = mount(OsToggleGroup, {
+        props: {
+          options: [
+            {
+              ...OPTIONS[0],
+              attrs: {
+                'data-testid': 'option-public',
+                role: 'button',
+                'aria-checked': 'false',
+                tabindex: '5',
+                disabled: 'disabled',
+              },
+            },
+            OPTIONS[1],
+          ],
+          value: 'public',
+        },
+      })
+
+      const pub = at(wrapper, 'option-public')
+
+      expect(pub.attributes('role')).toBe('radio')
+      expect(pub.attributes('aria-checked')).toBe('true')
+      expect(pub.attributes('tabindex')).toBe('0')
+      expect(pub.attributes('disabled')).toBeUndefined()
+    })
+
+    it('is primary throughout, like a choice row in the app', () => {
+      // Not a row of default buttons: those outline in the text colour and hover dark grey.
+      wrapper = mount(OsToggleGroup, { props: { options: OPTIONS, value: 'closed' } })
+
+      for (const testId of ['option-public', 'option-closed', 'option-hidden']) {
+        expect(at(wrapper, testId).attributes('data-variant')).toBe('primary')
+      }
+    })
+
+    it('renders an option that brings no attributes of its own', () => {
+      wrapper = mount(OsToggleGroup, {
+        props: { options: [{ value: 'plain', label: 'Plain' }], value: 'plain' },
+      })
+
+      expect(wrapper.find('[role="radio"]').text()).toBe('Plain')
+    })
+
     it('renders every option as a button with its label', () => {
       wrapper = mount(OsToggleGroup, { props: { options: OPTIONS, value: null } })
 
