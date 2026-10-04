@@ -96,7 +96,9 @@ export async function down(_next) {
         // `_restricted` maps back to BOTH closed and hidden, which is the honest reverse: a role
         // that may open a call in a group one cannot walk into could do so in either kind.
         .flatMap((permission) => {
-          if (permission === 'videoCall.create_open') return ['videoCall.create_public']
+          if (permission === 'videoCall.create_open') {
+            return ['videoCall.create_public']
+          }
           if (permission === 'videoCall.create_restricted') {
             return ['videoCall.create_closed', 'videoCall.create_hidden']
           }
