@@ -868,6 +868,27 @@ describe('GroupForm', () => {
       expect(wrapper.vm.describedType).toBe('closed')
     })
 
+    it('keeps explaining the card under the cursor when focus leaves it, and vice versa', async () => {
+      const wrapper = mountWith(() => true)
+      const card = (name) => wrapper.find(`[data-test="type-card-${name}"]`)
+      await card('public').trigger('click')
+
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseenter'))
+      card('hidden').element.dispatchEvent(new Event('focus'))
+      card('hidden').element.dispatchEvent(new Event('blur'))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedType).toBe('hidden')
+
+      card('closed').element.dispatchEvent(new Event('focus'))
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseleave'))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedType).toBe('closed')
+
+      card('closed').element.dispatchEvent(new Event('blur'))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedType).toBe('public')
+    })
+
     it('keeps the select when editing', () => {
       const wrapper = mountWith(() => true, { update: true })
 

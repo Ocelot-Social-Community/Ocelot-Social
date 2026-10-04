@@ -67,8 +67,8 @@
                 :aria-describedby="groupType === describedType ? 'type-description' : null"
                 :data-test="`type-card-${groupType}`"
                 @click="chooseGroupType(groupType)"
-                @focus="hoveredType = groupType"
-                @blur="hoveredType = null"
+                @focus="focusedType = groupType"
+                @blur="focusedType = null"
               >
                 <template #title>{{ $t(`group.types.${groupType}`) }}</template>
               </group-state-card>
@@ -328,8 +328,11 @@ export default {
       groupTypeOptions: ['public', 'closed', 'hidden'],
       // One glyph per type, from the icons the app already ships.
       typeIcons: { public: 'globe', closed: 'lock', hidden: 'eyeSlash' },
-      // The type card under the cursor or focus, whose meaning is spelled out under the row.
+      // The type cards under the cursor and under keyboard focus, whose meaning is spelled out
+      // under the row. Two fields, not one: focus leaving a card must not forget the cursor
+      // still resting on it, nor the cursor leaving forget the focus.
       hoveredType: null,
+      focusedType: null,
       loadingGeo: false,
       cities: [],
       // Whether the location has actually been changed by the user (map
@@ -528,9 +531,12 @@ export default {
     // Flat per-type create rights (mirrors the backend group.create_* shield): the
     // "create group" entry point is open if the user may create at least one type, and
     // the submit gate keys off the currently selected type.
-    /** Which type the line under the cards explains: the one pointed at, else the one picked. */
+    /**
+     * Which type the line under the cards explains: the one pointed at, else the one focused,
+     * else the one picked.
+     */
     describedType() {
-      return this.hoveredType || this.formData.groupType || null
+      return this.hoveredType || this.focusedType || this.formData.groupType || null
     },
     canCreateAnyGroup() {
       return this.groupTypeOptions.some((type) => this.$can(`group.create_${type}`))
