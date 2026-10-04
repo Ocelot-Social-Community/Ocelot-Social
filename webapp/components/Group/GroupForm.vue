@@ -44,7 +44,14 @@
         <template v-if="!update">
           <p class="ds-text select-label">{{ $t('group.type') }}</p>
           <ul class="type-cards" data-test="type-cards">
-            <li v-for="groupType in groupTypeOptions" :key="groupType">
+            <!-- The hover sits on the item, not the card: a disabled button takes no mouse events,
+                 and a refused card is the one whose explanation matters most. -->
+            <li
+              v-for="groupType in groupTypeOptions"
+              :key="groupType"
+              @mouseenter="hoveredType = groupType"
+              @mouseleave="hoveredType = null"
+            >
               <group-state-card
                 tag="button"
                 type="button"
@@ -59,8 +66,6 @@
                 :aria-describedby="groupType === describedType ? 'type-description' : null"
                 :data-test="`type-card-${groupType}`"
                 @click="chooseGroupType(groupType)"
-                @mouseenter="hoveredType = groupType"
-                @mouseleave="hoveredType = null"
                 @focus="hoveredType = groupType"
                 @blur="hoveredType = null"
               >
@@ -75,6 +80,13 @@
             data-test="type-description"
           >
             {{ $t(`group.typeDescriptions.${describedType}`) }}
+            <span
+              v-if="!$can(`group.create_${describedType}`)"
+              class="type-description__refused"
+              data-test="type-description-refused"
+            >
+              {{ $t('group.validations.groupTypeNotAllowed') }}
+            </span>
           </p>
         </template>
 
@@ -746,6 +758,13 @@ export default {
   margin: var(--space-xx-small) 0 var(--space-base);
   color: var(--text-color-soft);
   font-size: 0.9em;
+}
+
+/* Why the type in question cannot be picked — said where its meaning is, not only in a tooltip
+   that keyboard and touch never see. */
+.type-description__refused {
+  display: block;
+  color: var(--color-danger);
 }
 
 .select-label {

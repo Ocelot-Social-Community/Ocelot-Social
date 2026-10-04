@@ -19,6 +19,7 @@ describe('GroupStateCard', () => {
     const wrapper = Wrapper()
 
     expect(wrapper.element.tagName).toBe('DIV')
+    expect(wrapper.attributes('aria-pressed')).toBeUndefined()
     expect(wrapper.find('.group-state-card__title').text()).toBe('Public')
     expect(wrapper.find('.group-state-card__description').text()).toBe('Visible to everybody')
     expect(wrapper.find('.group-state-card__caption').exists()).toBe(false)
@@ -47,6 +48,8 @@ describe('GroupStateCard', () => {
     await wrapper.trigger('click')
 
     expect(wrapper.element.tagName).toBe('BUTTON')
+    // The picked one says so to assistive tech too, not only with its border.
+    expect(wrapper.attributes('aria-pressed')).toBe('true')
     expect(wrapper.attributes('data-test')).toBe('card')
     expect(wrapper.classes()).toEqual(
       expect.arrayContaining(['group-state-card--interactive', 'group-state-card--active']),

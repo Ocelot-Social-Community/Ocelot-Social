@@ -785,6 +785,25 @@ describe('GroupForm', () => {
       expect(wrapper.find('[data-test="type-card-public"]').attributes('disabled')).toBeUndefined()
     })
 
+    it('says why a refused type cannot be picked, where its meaning is explained', async () => {
+      // Keyboard and touch never see a tooltip, and a disabled button takes no mouse events —
+      // so the hover sits on the item around the card, and the reason is text.
+      const wrapper = mountWith(canExceptHidden)
+      const hiddenItem = wrapper.find('[data-test="type-card-hidden"]').element.parentElement
+
+      hiddenItem.dispatchEvent(new Event('mouseenter'))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-test="type-description-refused"]').text()).toBe(
+        'group.validations.groupTypeNotAllowed',
+      )
+
+      hiddenItem.dispatchEvent(new Event('mouseleave'))
+      await wrapper.find('[data-test="type-card-public"]').trigger('click')
+
+      expect(wrapper.find('[data-test="type-description-refused"]').exists()).toBe(false)
+    })
+
     it('disables the closed card when not permitted', () => {
       const wrapper = mountWith((p) => p !== 'group.create_closed')
       expect(wrapper.find('[data-test="type-card-closed"]').attributes('disabled')).toBeDefined()
@@ -813,11 +832,15 @@ describe('GroupForm', () => {
       expect(wrapper.vm.describedType).toBe('public')
       expect(card('public').attributes('aria-describedby')).toBe('type-description')
 
-      await card('hidden').trigger('mouseenter')
+      await card('hidden').element.parentElement.dispatchEvent(new Event('mouseenter'))
       expect(wrapper.vm.describedType).toBe('hidden')
 
-      await card('hidden').trigger('mouseleave')
+      await card('hidden').element.parentElement.dispatchEvent(new Event('mouseleave'))
       expect(wrapper.vm.describedType).toBe('public')
+
+      card('closed').element.dispatchEvent(new Event('focus'))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedType).toBe('closed')
     })
 
     it('keeps the select when editing', () => {

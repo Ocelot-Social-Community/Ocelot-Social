@@ -16,6 +16,7 @@
       'group-state-card--active': active,
     }"
     v-bind="$attrs"
+    :aria-pressed="tag === 'button' ? String(active) : null"
     v-on="$listeners"
   >
     <os-icon :icon="icon" size="2xl" class="group-state-card__icon" aria-hidden="true" />
