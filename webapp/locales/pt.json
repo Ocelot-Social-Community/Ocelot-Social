@@ -958,6 +958,11 @@
       "unavailable": "Grupo não disponível"
     },
     "type": "Visibilidade do grupo",
+    "typeDescriptions": {
+      "closed": "Todas as publicações visíveis apenas para os membros do grupo",
+      "hidden": "O grupo (incluindo o nome) é completamente invisível",
+      "public": "O grupo e todas as publicações são visíveis para todos os usuários registrados"
+    },
     "types": {
       "closed": "Fechado",
       "hidden": "Secreto",
@@ -976,6 +981,7 @@
       "actionRadiusRequired": "Por favor, selecione um raio de ação.",
       "descriptionLength": "A descrição deve ter pelo menos {min} caracteres.",
       "descriptionNotEmpty": "Por favor, insira uma descrição.",
+      "groupTypeNotAllowed": "Não podes criar este tipo de grupo.",
       "groupTypeRequired": "Por favor, escolha um tipo de grupo.",
       "nameNotEmpty": "Por favor, insira um nome de grupo.",
       "slugInvalidCharacters": "Só são permitidas letras minúsculas, números, hífens e sublinhados.",
