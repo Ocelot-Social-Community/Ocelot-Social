@@ -56,6 +56,18 @@ describe('admin/roles.vue', () => {
     return wrapper
   }
 
+  it('locks the tabs of the roles that cannot be renamed or deleted: owner and user', () => {
+    // `user` is the baseline everybody holds — as fixed as `owner`, which is the only one that
+    // is `protected`. The lock follows the rename rule rather than that flag.
+    const wrapper = Wrapper()
+    const locked = (name) =>
+      wrapper.find(`[data-test="role-tab-${name}"] .role-tab__badge`).exists()
+
+    expect(locked('owner')).toBe(true)
+    expect(locked('user')).toBe(true)
+    expect(locked('badge-setter')).toBe(false)
+  })
+
   it('renders a switcher tab for every role', () => {
     const wrapper = Wrapper()
     expect(wrapper.find('[data-test="role-tab-owner"]').exists()).toBe(true)
