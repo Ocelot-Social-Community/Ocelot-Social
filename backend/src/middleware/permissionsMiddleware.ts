@@ -22,6 +22,7 @@ import {
   isMorePrivate,
   mayAssignGroupRole,
   mayRemoveGroupMember,
+  NONE_ROLE,
   templateVisibility,
 } from '@src/groupRole'
 import { isPermissionAvailable } from '@src/permission'
@@ -473,6 +474,40 @@ const groupRolesAreFixed = rule({ cache: 'no_cache' })(
   () => new UserInputError('Groups cannot define their own roles yet!'),
 )
 
+/**
+ * The deprecated `showMembers` argument of UpdateGroup is a write to the non-member role: it
+ * adds or takes away `group.members.read` there. So it asks what editing that role asks —
+ * `group.role.manage`, and, to open the list, holding the right oneself (the coverage rule of
+ * updateGroupRole). It used to need only `group.settings.manage`, which admins hold and
+ * `group.role.manage` they do not: a way to change a right without the right to change rights.
+ *
+ * Sending the value the group already has is not a change. Older clients post every field of
+ * the form on every save, and demanding the right for an unchanged value would stop an admin
+ * from renaming the group.
+ */
+const canChangeMemberListAccess = rule({ cache: 'no_cache' })(async (
+  _parent,
+  args,
+  ctx: Context,
+) => {
+  if (args.showMembers === undefined || args.showMembers === null) {
+    return true
+  }
+  const authorization = await ctx.groupAuthorization.forGroup(args.id)
+  if (!authorization) {
+    return false
+  }
+  const nonMember = await ctx.groupAuthorization.rolePermissions(args.id, NONE_ROLE)
+  const open = nonMember?.has('group.members.read') ?? false
+  if (open === (args.showMembers === true)) {
+    return true
+  }
+  if (!authorization.has('group.role.manage')) {
+    return false
+  }
+  return args.showMembers !== true || authorization.has('group.members.read')
+})
+
 const canChangeGroupType = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
   const requested = requestedVisibility(args)
   if (requested === null) {
@@ -602,6 +637,7 @@ export const groupAuthorizationRules = {
   hasGroupPermission,
   parentHasGroupPermission,
   canChangeGroupType,
+  canChangeMemberListAccess,
   canJoinGroup,
   isLeavingSelf,
   canAssignGroupRole,
@@ -629,7 +665,15 @@ export default shield(
       statistics: hasPermission('network.statistics.read'),
       currentUser: isAuthenticated,
       Group: and(groupsEnabled, isAuthenticated),
-      GroupMembers: and(groupsEnabled, hasGroupPermission('group.members.read', byArg('id'))),
+      // `group.read` as well: a member list belongs to a group one can see. The rights matrix
+      // keeps the two together (members.read implies read), but a list stored without it — by
+      // hand, a restore, an older write path — must not open the members of a hidden group to
+      // anybody who knows its id.
+      GroupMembers: and(
+        groupsEnabled,
+        hasGroupPermission('group.read', byArg('id')),
+        hasGroupPermission('group.members.read', byArg('id')),
+      ),
       GroupCount: and(groupsEnabled, isAuthenticated),
       Post: allow,
       profilePagePosts: allow,
@@ -704,6 +748,7 @@ export default shield(
         groupsEnabled,
         hasGroupPermission('group.settings.manage', byArg('id')),
         canChangeGroupType,
+        canChangeMemberListAccess,
       ),
       JoinGroup: and(groupsEnabled, canJoinGroup),
       LeaveGroup: and(groupsEnabled, isLeavingSelf, hasGroupPermission('group.leave')),

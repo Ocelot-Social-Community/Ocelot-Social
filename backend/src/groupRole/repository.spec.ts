@@ -552,7 +552,8 @@ const fakeDatabase = (
         return Promise.resolve({
           records: query.includes('NOT (g)-[:HAS_GROUP_ROLE]')
             ? groups.map((group) => ({
-                get: (key: string) => (key === 'showMembers' ? (group.showMembers ?? false) : group[key as 'groupId']),
+                get: (key: string) =>
+                  key === 'showMembers' ? (group.showMembers ?? false) : group[key as 'groupId'],
               }))
             : rowsFor(query),
         })
@@ -599,7 +600,9 @@ describe(seedRolesForGroupsWithoutRoles, () => {
     // `showMembers` was the setting; the right on the non-member role is what decides now.
     const memberListWrites = (statements: Array<{ variables?: Record<string, unknown> }>) =>
       statements.filter((statement) =>
-        String(statement.variables?.permissions ?? '').includes('group.members.read'),
+        ((statement.variables?.permissions as string | undefined) ?? '').includes(
+          'group.members.read',
+        ),
       )
 
     it('stays open on a group outsiders can see', async () => {

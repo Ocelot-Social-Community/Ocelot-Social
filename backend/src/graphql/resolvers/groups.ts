@@ -18,7 +18,13 @@ import {
 import { UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 import { branding } from '@src/branding'
-import { NONE_ROLE, PENDING_ROLE, privacyLevelFrom, USUAL_ROLE } from '@src/groupRole'
+import {
+  NONE_ROLE,
+  PENDING_ROLE,
+  privacyLevelFrom,
+  templateVisibility,
+  USUAL_ROLE,
+} from '@src/groupRole'
 import {
   applyTemplateToNonMemberRoles,
   readGroupRoles,
@@ -458,6 +464,20 @@ export default {
         removeHtmlTags(params.description).length < branding.group.descriptionMinLength
       ) {
         throw new UserInputError('Description too short!')
+      }
+      // Opening the member list of a group outsiders cannot find: `group.members.read` without
+      // `group.read` on the non-member role, which would hand the members of a hidden group to
+      // anybody who knows its id. Judged on the group as it will be — a request may switch the
+      // visibility in the same breath — and before anything is written.
+      if (params.showMembers === true) {
+        const seenAfter = requestedTemplate
+          ? (await templateVisibility(context.database, requestedTemplate)) !== 'hidden'
+          : ((await readGroupRoles(context.database, groupId))
+              .find((role) => role.name === NONE_ROLE)
+              ?.permissions.includes('group.read') ?? false)
+        if (!seenAfter) {
+          throw new UserInputError('A group outsiders cannot find has no member list to open.')
+        }
       }
       if (!context.user) {
         throw new Error('Missing authenticated user.')

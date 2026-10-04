@@ -265,67 +265,6 @@ export async function seedRolesForNewGroup(
   await syncNonMemberAccess(transaction, groupId)
 }
 
-const GROUPS_WITHOUT_ROLES_CYPHER = `
-  MATCH (g:Group)
-  WHERE NOT (g)-[:HAS_GROUP_ROLE]->(:GroupRole)
-  // Which template to seed from is the group's own, stored, because — unlike its visibility —
-  // nothing derives it. A row that has lost even that is seeded from the most private template:
-  // a group nobody can read is repairable, a group accidentally opened is not.
-  RETURN g.id AS groupId, coalesce(g.template, 'hidden') AS template,
-         coalesce(g.showMembers, false) AS showMembers
-`
-
-/**
- * Give every group that has NO role definitions the template for its type.
- *
- * The invariant this repairs is "a group always has its roles": they are written in the same
- * transaction as the group itself, and a migration seeded the ones that predate them. Neither
- * covers a database restored from an older dump, a group created while the migration had not
- * run, or a row deleted by hand — and a group without roles is one where the shield lets
- * nobody do anything, including its own owner.
- *
- * Runs on boot, right after the template seeding it depends on (a group copies the templates).
- * Idempotent, and bounded by the number of groups in that state — normally zero, so one scan.
- */
-export async function seedRolesForGroupsWithoutRoles(
-  db: DbContext,
-  now: string,
-): Promise<{ seeded: string[]; skipped: string[] }> {
-  const result = await db.query({ query: GROUPS_WITHOUT_ROLES_CYPHER, variables: {} })
-  const seeded: string[] = []
-  const skipped: string[] = []
-  for (const record of result.records) {
-    const groupId = record.get('groupId') as string
-    const template = record.get('template') as string
-    // A name the code has no template for is reported rather than thrown: one odd row must not
-    // stop a deployment, and leaving it alone changes nothing about it.
-    if (!defaultTemplateFor(template)) {
-      skipped.push(groupId)
-      continue
-    }
-    await seedRolesForNewGroup(runnerFor(db), groupId, template, now)
-    if (record.get('showMembers') === true) {
-      await keepMemberListOpen(db, groupId, now)
-    }
-    seeded.push(groupId)
-  }
-  return { seeded, skipped }
-}
-
-/**
- * A group that predates the roles and had its member list opened (`showMembers`, the setting
- * before the rights existed) keeps it open: its non-member role gets `group.members.read`.
- *
- * Only where outsiders can see the group at all. The right implies `group.read`, so granting it
- * on a hidden group would make that group visible — a member list nobody can find was not
- * open, whatever the old flag said.
- */
-async function keepMemberListOpen(db: DbContext, groupId: string, now: string): Promise<void> {
-  const none = (await readGroupRoles(db, groupId)).find((role) => role.name === NONE_ROLE)
-  if (!none?.permissions.includes('group.read')) return
-  await setNonMemberMemberListAccess(db, groupId, true, now)
-}
-
 /** How many members carry each role of a group. `none` never appears: it is the absence of an edge. */
 export async function memberCountsByRole(
   db: DbContext,
@@ -564,6 +503,70 @@ export async function setNonMemberMemberListAccess(
     variables: { groupId, permissions: JSON.stringify(sanitizeGroupPermissions(permissions)), now },
   })
   await syncNonMemberAccess(runnerFor(db), groupId)
+}
+
+/**
+ * A group that predates the roles and had its member list opened (`showMembers`, the setting
+ * before the rights existed) keeps it open: its non-member role gets `group.members.read`.
+ *
+ * Only where outsiders can see the group at all. On a hidden group the right would be stored
+ * without `group.read` and hand its members to anybody who knows the group's id — a member list
+ * nobody can find was not open, whatever the old flag said. (GroupMembers now asks for both
+ * rights as well; this keeps the stored list from claiming otherwise.)
+ */
+async function keepMemberListOpen(db: DbContext, groupId: string, now: string): Promise<void> {
+  const none = (await readGroupRoles(db, groupId)).find((role) => role.name === NONE_ROLE)
+  if (!none?.permissions.includes('group.read')) {
+    return
+  }
+  await setNonMemberMemberListAccess(db, groupId, true, now)
+}
+
+const GROUPS_WITHOUT_ROLES_CYPHER = `
+  MATCH (g:Group)
+  WHERE NOT (g)-[:HAS_GROUP_ROLE]->(:GroupRole)
+  // Which template to seed from is the group's own, stored, because — unlike its visibility —
+  // nothing derives it. A row that has lost even that is seeded from the most private template:
+  // a group nobody can read is repairable, a group accidentally opened is not.
+  RETURN g.id AS groupId, coalesce(g.template, 'hidden') AS template,
+         coalesce(g.showMembers, false) AS showMembers
+`
+
+/**
+ * Give every group that has NO role definitions the template for its type.
+ *
+ * The invariant this repairs is "a group always has its roles": they are written in the same
+ * transaction as the group itself, and a migration seeded the ones that predate them. Neither
+ * covers a database restored from an older dump, a group created while the migration had not
+ * run, or a row deleted by hand — and a group without roles is one where the shield lets
+ * nobody do anything, including its own owner.
+ *
+ * Runs on boot, right after the template seeding it depends on (a group copies the templates).
+ * Idempotent, and bounded by the number of groups in that state — normally zero, so one scan.
+ */
+export async function seedRolesForGroupsWithoutRoles(
+  db: DbContext,
+  now: string,
+): Promise<{ seeded: string[]; skipped: string[] }> {
+  const result = await db.query({ query: GROUPS_WITHOUT_ROLES_CYPHER, variables: {} })
+  const seeded: string[] = []
+  const skipped: string[] = []
+  for (const record of result.records) {
+    const groupId = record.get('groupId') as string
+    const template = record.get('template') as string
+    // A name the code has no template for is reported rather than thrown: one odd row must not
+    // stop a deployment, and leaving it alone changes nothing about it.
+    if (!defaultTemplateFor(template)) {
+      skipped.push(groupId)
+      continue
+    }
+    await seedRolesForNewGroup(runnerFor(db), groupId, template, now)
+    if (record.get('showMembers') === true) {
+      await keepMemberListOpen(db, groupId, now)
+    }
+    seeded.push(groupId)
+  }
+  return { seeded, skipped }
 }
 
 /** Write one template role, creating it when it is not there yet (the admin edit path). */

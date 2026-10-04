@@ -483,6 +483,32 @@ export default {
       // "apply the secret template" would be the way around `group.create_hidden`.
       const nonMember = template.find((role) => role.name === NONE_ROLE)
       requirePrivacyCap(context, authorization, [...(nonMember?.permissions ?? [])])
+      // And the coverage rule of updateGroupRole, role by role: a template may not hand out a
+      // right the actor does not hold. Otherwise somebody given `group.role.manage` in a role the
+      // owner had trimmed could apply a template and so restore their own role — and every
+      // other — to the template's fuller set. What is checked is what each role GAINS, as there.
+      // The owner holds the whole catalog by definition and is not asked: their effective set
+      // lacks the rights switched off network-wide, and asking would stop them from applying
+      // any template on a network without, say, LiveKit.
+      if (authorization.roleName !== OWNER_ROLE) {
+        const current = new Map(
+          (await readGroupRoles(context.database, groupId)).map((role) => [
+            role.name,
+            role.permissions,
+          ]),
+        )
+        for (const role of template) {
+          if (role.name === OWNER_ROLE) {
+            continue
+          }
+          await requireCoverage(
+            context,
+            groupId,
+            [...role.permissions],
+            current.get(role.name) ?? [],
+          )
+        }
+      }
       const now = new Date().toISOString()
       await replaceGroupRoles(
         context.database,

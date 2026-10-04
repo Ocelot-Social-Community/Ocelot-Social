@@ -18,6 +18,7 @@ const {
   hasGroupPermission,
   parentHasGroupPermission,
   canChangeGroupType,
+  canChangeMemberListAccess,
   canJoinGroup,
   isLeavingSelf,
   canAssignGroupRole,
@@ -276,6 +277,86 @@ describe('canChangeGroupType', () => {
     expect(await resolve(canChangeGroupType, {}, { id: 'g1', visibility: 'closed' }, without)).toBe(
       false,
     )
+  })
+})
+
+describe('canChangeMemberListAccess', () => {
+  // The deprecated `showMembers` writes `group.members.read` on the non-member role, so it asks
+  // what editing that role asks. It used to need only `group.settings.manage`.
+  const closedGroup = (effective: string[]) => ({ visibility: 'closed', effective })
+
+  it('allows a request that does not touch the member list', async () => {
+    const context = contextFor({ group: closedGroup([]) })
+
+    expect(await resolve(canChangeMemberListAccess, {}, { id: 'g1' }, context)).toBe(true)
+  })
+
+  it('denies for a group that does not exist', async () => {
+    const context = contextFor({ group: null })
+
+    expect(
+      await resolve(canChangeMemberListAccess, {}, { id: 'g1', showMembers: true }, context),
+    ).toBe(false)
+  })
+
+  it('allows sending the value the group already has', async () => {
+    // Older clients post every field of the form on every save.
+    const context = contextFor({
+      group: closedGroup(['group.settings.manage']),
+      rolePermissions: ['group.read', 'group.members.read'],
+    })
+
+    expect(
+      await resolve(canChangeMemberListAccess, {}, { id: 'g1', showMembers: true }, context),
+    ).toBe(true)
+  })
+
+  it('needs group.role.manage for an actual change, not group.settings.manage', async () => {
+    const admin = contextFor({
+      group: closedGroup(['group.settings.manage', 'group.members.read']),
+      rolePermissions: ['group.read'],
+    })
+
+    expect(
+      await resolve(canChangeMemberListAccess, {}, { id: 'g1', showMembers: true }, admin),
+    ).toBe(false)
+  })
+
+  it('needs the right itself to open the list, as handing out any right does', async () => {
+    const without = contextFor({
+      group: closedGroup(['group.role.manage']),
+      rolePermissions: ['group.read'],
+    })
+    const holder = contextFor({
+      group: closedGroup(['group.role.manage', 'group.members.read']),
+      rolePermissions: ['group.read'],
+    })
+
+    expect(
+      await resolve(canChangeMemberListAccess, {}, { id: 'g1', showMembers: true }, without),
+    ).toBe(false)
+    expect(
+      await resolve(canChangeMemberListAccess, {}, { id: 'g1', showMembers: true }, holder),
+    ).toBe(true)
+  })
+
+  it('closes the list with group.role.manage alone — taking a right away grants nothing', async () => {
+    const context = contextFor({
+      group: closedGroup(['group.role.manage']),
+      rolePermissions: ['group.read', 'group.members.read'],
+    })
+
+    expect(
+      await resolve(canChangeMemberListAccess, {}, { id: 'g1', showMembers: false }, context),
+    ).toBe(true)
+  })
+
+  it('reads a group without a non-member role as one with a closed list', async () => {
+    const context = contextFor({ group: closedGroup([]), rolePermissions: null })
+
+    expect(
+      await resolve(canChangeMemberListAccess, {}, { id: 'g1', showMembers: false }, context),
+    ).toBe(true)
   })
 })
 

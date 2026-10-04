@@ -983,6 +983,61 @@ describe('Mutation.resetGroupRoles', () => {
     expect(mocked.writeGroupTemplate).toHaveBeenCalledWith(context.database, 'g1', 'channel')
   })
 
+  describe('the coverage rule', () => {
+    // A template may not hand out a right the actor does not hold — or somebody given
+    // `group.role.manage` in a trimmed role could restore their own role to the template's set.
+    // Public, like the group, so the privacy cap has nothing to say and coverage is what decides.
+    const nonMember = role('none', ['group.read', 'group.content.read'])
+    const template = [nonMember, role('usual', ['group.invite'])]
+
+    it('refuses a template that would give a role a right the actor lacks', async () => {
+      mocked.readGroupRoleTemplates.mockResolvedValue({ public: template })
+      mocked.readGroupTemplate.mockResolvedValue('public')
+      mocked.readGroupRoles.mockResolvedValue([nonMember, role('usual')])
+      const { context } = contextFor({
+        authorization: {
+          visibility: 'public',
+          roleName: 'admin',
+          effective: ['group.read', 'group.content.read'],
+        },
+      })
+
+      await expect(Mutation.resetGroupRoles({}, { groupId: 'g1' }, context)).rejects.toThrow(
+        'You cannot grant rights you do not hold yourself: group.invite',
+      )
+      expect(mocked.replaceGroupRoles).not.toHaveBeenCalled()
+    })
+
+    it('does not ask for a right a role already has', async () => {
+      // Keeping a right grants nobody anything — the same reading updateGroupRole takes.
+      mocked.readGroupRoleTemplates.mockResolvedValue({ public: template })
+      mocked.readGroupTemplate.mockResolvedValue('public')
+      mocked.readGroupRoles.mockResolvedValue(template)
+      const { context } = contextFor({
+        authorization: { visibility: 'public', roleName: 'admin', effective: [] },
+      })
+
+      await Mutation.resetGroupRoles({}, { groupId: 'g1' }, context)
+
+      expect(mocked.replaceGroupRoles).toHaveBeenCalled()
+    })
+
+    it('does not ask the owner, who holds the whole catalog by definition', async () => {
+      // Their effective set lacks what is switched off network-wide; asking would stop an owner
+      // from applying any template on a network without, say, LiveKit.
+      mocked.readGroupRoleTemplates.mockResolvedValue({ public: template })
+      mocked.readGroupTemplate.mockResolvedValue('public')
+      mocked.readGroupRoles.mockResolvedValue([])
+      const { context } = contextFor({
+        authorization: { visibility: 'public', roleName: 'owner', effective: [] },
+      })
+
+      await Mutation.resetGroupRoles({}, { groupId: 'g1' }, context)
+
+      expect(mocked.replaceGroupRoles).toHaveBeenCalled()
+    })
+  })
+
   it('refuses a template that would make the group more private than one may create', async () => {
     // Applying a template rewrites the non-member role, which IS the visibility — so the same
     // cap guards it as guards editing that role by hand (E10). Without it, "apply the secret
