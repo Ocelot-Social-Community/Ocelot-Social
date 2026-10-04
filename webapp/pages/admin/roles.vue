@@ -11,7 +11,7 @@
       :roles="orderedRoles"
       :active-name="activeRoleName"
       :label-for="(role) => role.name"
-      :badge-for="(role) => role.protected"
+      :badge-for="(role) => !canRename(role)"
       :badge-title="$t('admin.roles.protected')"
       :label="$t('admin.roles.title')"
       @select="setActive"
@@ -536,6 +536,9 @@ export default {
     },
     // Mandatory roles are load-bearing by name (owner ⇒ full catalog, user ⇒ the
     // baseline fallback) and cannot be renamed — mirrors the backend guard.
+    // Fixed roles: `owner` (protected) and `user` (the baseline everybody holds) cannot be renamed
+    // or deleted — the backend refuses both (MANDATORY_ROLE_NAMES). The lock on their tabs reads
+    // this, so the two cannot disagree again; it used to follow `protected` and left `user` bare.
     canRename(role) {
       return !role.protected && role.name !== 'user'
     },
