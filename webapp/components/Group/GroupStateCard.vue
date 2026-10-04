@@ -85,7 +85,7 @@ export default {
   cursor: pointer;
 }
 
-.group-state-card--interactive:hover:not(:disabled) {
+.group-state-card--interactive:hover:not(:disabled):not([aria-disabled='true']) {
   background: var(--background-color-softer);
 }
 
@@ -100,7 +100,9 @@ export default {
   background: var(--background-color-base);
 }
 
-.group-state-card:disabled {
+/* `aria-disabled` as well: a refusal that stays focusable, so it can still say why. */
+.group-state-card:disabled,
+.group-state-card[aria-disabled='true'] {
   opacity: 0.6;
   cursor: not-allowed;
 }

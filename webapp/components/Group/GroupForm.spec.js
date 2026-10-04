@@ -775,19 +775,42 @@ describe('GroupForm', () => {
       expect(formSubmit).toHaveBeenCalled()
     })
 
-    it('disables the hidden card when not permitted, and says why', () => {
+    it('refuses the hidden card when not permitted, and stays reachable to say why', () => {
       // Shown and refused rather than hidden: "there is a kind of group I may not make" is
-      // information, an absent card is not.
+      // information, an absent card is not. aria-disabled rather than disabled: a disabled
+      // button leaves the tab order, and with it the only way a keyboard reaches the reason.
       const wrapper = mountWith(canExceptHidden)
       const hidden = wrapper.find('[data-test="type-card-hidden"]')
-      expect(hidden.attributes('disabled')).toBeDefined()
+      expect(hidden.attributes('aria-disabled')).toBe('true')
+      expect(hidden.attributes('disabled')).toBeUndefined()
       expect(hidden.attributes('title')).toBe('group.validations.groupTypeNotAllowed')
-      expect(wrapper.find('[data-test="type-card-public"]').attributes('disabled')).toBeUndefined()
+      expect(wrapper.find('[data-test="type-card-public"]').attributes('aria-disabled')).toBe(
+        'false',
+      )
+    })
+
+    it('picks nothing when a refused card is clicked', async () => {
+      const wrapper = mountWith(canExceptHidden)
+
+      await wrapper.find('[data-test="type-card-hidden"]').trigger('click')
+
+      expect(wrapper.vm.formData.groupType).toBe('')
+    })
+
+    it('tells the keyboard why a refused type cannot be picked, when it focuses the card', async () => {
+      const wrapper = mountWith(canExceptHidden)
+
+      wrapper.find('[data-test="type-card-hidden"]').element.dispatchEvent(new Event('focus'))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-test="type-description-refused"]').text()).toBe(
+        'group.validations.groupTypeNotAllowed',
+      )
     })
 
     it('says why a refused type cannot be picked, where its meaning is explained', async () => {
-      // Keyboard and touch never see a tooltip, and a disabled button takes no mouse events —
-      // so the hover sits on the item around the card, and the reason is text.
+      // Keyboard and touch never see a tooltip — the reason is text, shown for the card pointed at
+      // (here) or focused (above).
       const wrapper = mountWith(canExceptHidden)
       const hiddenItem = wrapper.find('[data-test="type-card-hidden"]').element.parentElement
 
@@ -804,9 +827,11 @@ describe('GroupForm', () => {
       expect(wrapper.find('[data-test="type-description-refused"]').exists()).toBe(false)
     })
 
-    it('disables the closed card when not permitted', () => {
+    it('refuses the closed card when not permitted', () => {
       const wrapper = mountWith((p) => p !== 'group.create_closed')
-      expect(wrapper.find('[data-test="type-card-closed"]').attributes('disabled')).toBeDefined()
+      expect(wrapper.find('[data-test="type-card-closed"]').attributes('aria-disabled')).toBe(
+        'true',
+      )
     })
 
     it('picking a card sets the group type', async () => {

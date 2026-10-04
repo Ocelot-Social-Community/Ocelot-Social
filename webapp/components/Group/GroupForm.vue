@@ -44,8 +44,9 @@
         <template v-if="!update">
           <p class="ds-text select-label">{{ $t('group.type') }}</p>
           <ul class="type-cards" data-test="type-cards">
-            <!-- The hover sits on the item, not the card: a disabled button takes no mouse events,
-                 and a refused card is the one whose explanation matters most. -->
+            <!-- The hover sits on the item, not the card, and a refused card is aria-disabled
+                 rather than disabled: a disabled button takes neither mouse events nor focus, and
+                 a refused card is the one whose explanation matters most — to the keyboard too. -->
             <li
               v-for="groupType in groupTypeOptions"
               :key="groupType"
@@ -57,7 +58,7 @@
                 type="button"
                 :icon="icons[typeIcons[groupType]]"
                 :active="groupType === formData.groupType"
-                :disabled="!$can(`group.create_${groupType}`)"
+                :aria-disabled="String(!$can(`group.create_${groupType}`))"
                 :title="
                   $can(`group.create_${groupType}`)
                     ? null
@@ -613,6 +614,9 @@ export default {
       event.returnValue = ''
     },
     chooseGroupType(groupType) {
+      // Refused cards stay focusable (aria-disabled, not disabled) so the keyboard reaches the
+      // reason under the row; picking one is what is refused, here.
+      if (!this.$can(`group.create_${groupType}`)) return
       this.updateFormField('groupType', groupType)
       this.touchField('groupType')
     },
