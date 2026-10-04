@@ -394,7 +394,7 @@ type FiledReport {
 }
 
 """
-A group: a space where members share posts, chat and optionally hold video calls. Discoverability and joining are governed by its groupType.
+A group: a space where members share posts, chat and optionally hold video calls. Discoverability and joining are governed by its visibility.
 """
 type Group {
   """Short statement of the group's goal."""
@@ -413,7 +413,9 @@ type Group {
   """Full group description (rich text)."""
   description: String!
   disabled: Boolean
-  groupType: GroupType!
+
+  """The same value as `visibility`, under its old name."""
+  groupType: GroupType! @deprecated(reason: "Use `visibility`.")
   id: ID!
 
   """Invite codes to this group the current user has generated."""
@@ -452,6 +454,11 @@ type Group {
 
   """ISO 8601 date-time string of the last update."""
   updatedAt: String!
+
+  """
+  How findable this group is: `hidden` groups are unlisted, `closed` ones are findable but keep their content to members, `public` ones are open.
+  """
+  visibility: GroupVisibility!
 }
 
 """The geographic reach a group intends its activities to have."""
@@ -511,6 +518,20 @@ enum GroupType {
   hidden
 
   """Anyone can find the group and join without approval."""
+  public
+}
+
+"""How findable a group is, and therefore how private."""
+enum GroupVisibility {
+  """The group is findable, its content is not."""
+  closed
+
+  """
+  Unlisted: the group is not findable at all, and reachable only through an invite.
+  """
+  hidden
+
+  """Profile and content are open to everybody, members or not."""
   public
 }
 

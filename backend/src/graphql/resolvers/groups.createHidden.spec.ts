@@ -101,7 +101,7 @@ describe('group.create_hidden backend enforcement', () => {
       })
 
       expect(errors).toBeUndefined()
-      expect(data?.CreateGroup).toMatchObject({ id: 'public-ok', groupType: 'public' })
+      expect(data?.CreateGroup).toMatchObject({ id: 'public-ok', visibility: 'public' })
     })
 
     it('allows creating a hidden group for an owner (has group.create_hidden)', async () => {
@@ -112,7 +112,7 @@ describe('group.create_hidden backend enforcement', () => {
       })
 
       expect(errors).toBeUndefined()
-      expect(data?.CreateGroup).toMatchObject({ id: 'hidden-by-owner', groupType: 'hidden' })
+      expect(data?.CreateGroup).toMatchObject({ id: 'hidden-by-owner', visibility: 'hidden' })
     })
   })
 
@@ -143,7 +143,7 @@ describe('group.create_hidden backend enforcement', () => {
       })
 
       expect(errors).toBeUndefined()
-      expect(data?.UpdateGroup).toMatchObject({ id: 'owner-to-hide', groupType: 'hidden' })
+      expect(data?.UpdateGroup).toMatchObject({ id: 'owner-to-hide', visibility: 'hidden' })
     })
 
     it('lets a restricted owner edit an already-hidden group (no type change)', async () => {
@@ -169,7 +169,7 @@ describe('group.create_hidden backend enforcement', () => {
       expect(errors).toBeUndefined()
       expect(data?.UpdateGroup).toMatchObject({
         id: 'already-hidden',
-        groupType: 'hidden',
+        visibility: 'hidden',
         name: 'Renamed Hidden',
       })
     })

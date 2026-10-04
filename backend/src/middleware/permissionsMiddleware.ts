@@ -808,6 +808,7 @@ export default shield(
       avatar: allow,
       name: allow,
       about: allow,
+      visibility: allow,
       groupType: allow,
     },
     InviteCode: {

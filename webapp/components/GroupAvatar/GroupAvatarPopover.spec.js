@@ -8,7 +8,7 @@ const group = {
   id: 'g1',
   name: 'Journalism Collective',
   slug: 'journalism-collective',
-  groupType: 'public',
+  visibility: 'public',
   membersCount: 12,
   postsCount: 4,
 }

@@ -721,7 +721,7 @@ describe('ContributionForm.vue', () => {
       it('re-runs validation when group prop changes', async () => {
         wrapper = Wrapper()
         const spy = jest.spyOn(wrapper.vm, '$validateForm')
-        wrapper.setProps({ group: { id: 'g1', groupType: 'public' } })
+        wrapper.setProps({ group: { id: 'g1', visibility: 'public' } })
         await wrapper.vm.$nextTick()
         expect(spy).toHaveBeenCalled()
       })

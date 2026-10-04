@@ -15,7 +15,7 @@
 #   updatedAt_desc
 # }
 
-"A group: a space where members share posts, chat and optionally hold video calls. Discoverability and joining are governed by its groupType."
+"A group: a space where members share posts, chat and optionally hold video calls. Discoverability and joining are governed by its visibility."
 type Group {
   id: ID!
   "The group's title."
@@ -36,7 +36,10 @@ type Group {
   about: String
   "Full group description (rich text)."
   description: String!
-  groupType: GroupType!
+  "How findable this group is: `hidden` groups are unlisted, `closed` ones are findable but keep their content to members, `public` ones are open."
+  visibility: GroupVisibility!
+  "The same value as `visibility`, under its old name."
+  groupType: GroupType! @deprecated(reason: "Use `visibility`.")
   actionRadius: GroupActionRadius!
 
   locationName: String

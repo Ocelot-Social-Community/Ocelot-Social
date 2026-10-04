@@ -4,7 +4,7 @@ query UserGroups($id: ID!, $first: Int, $offset: Int, $nameFilter: String) {
     groups(first: $first, offset: $offset, nameFilter: $nameFilter) {
       id
       name
-      groupType
+      visibility
       myRole
       membersCount
       postsCount
