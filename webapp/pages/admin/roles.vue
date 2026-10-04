@@ -11,7 +11,7 @@
       :roles="orderedRoles"
       :active-name="activeRoleName"
       :label-for="(role) => role.name"
-      :badge-for="(role) => role.protected"
+      :badge-for="(role) => !canRename(role)"
       :badge-title="$t('admin.roles.protected')"
       :label="$t('admin.roles.title')"
       @select="setActive"
@@ -19,10 +19,14 @@
     >
       <template #extra>
         <!-- Add a role: the + button morphs into a name input -->
+        <!-- Ghost, like the page's other secondary actions — it is not a role, so it does not
+             look like one of the tabs beside it — and primary like them, so it hovers the same
+             green rather than the dark grey of the default variant. -->
         <os-button
           v-if="!creating"
+          variant="primary"
           size="sm"
-          appearance="outline"
+          appearance="ghost"
           class="role-tab--add"
           :title="$t('admin.roles.create')"
           :aria-label="$t('admin.roles.create')"
@@ -532,6 +536,9 @@ export default {
     },
     // Mandatory roles are load-bearing by name (owner ⇒ full catalog, user ⇒ the
     // baseline fallback) and cannot be renamed — mirrors the backend guard.
+    // Fixed roles: `owner` (protected) and `user` (the baseline everybody holds) cannot be renamed
+    // or deleted — the backend refuses both (MANDATORY_ROLE_NAMES). The lock on their tabs reads
+    // this, so the two cannot disagree again; it used to follow `protected` and left `user` bare.
     canRename(role) {
       return !role.protected && role.name !== 'user'
     },
@@ -762,11 +769,6 @@ export default {
 .description {
   margin-bottom: var(--space-base);
   color: var(--text-color-soft);
-}
-
-/* An outlined OsButton like the role tabs beside it, dashed because it is not a role. */
-.role-tab--add {
-  border-style: dashed;
 }
 
 /* The name field the + turns into, sized and framed like the buttons in the row. */

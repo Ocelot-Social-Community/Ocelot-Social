@@ -1,6 +1,8 @@
 <template>
   <!--
-    A row of buttons of which one is the current one — the role tabs, for one. Hand-made rows
+    A row of buttons of which one is the current one — the role tabs, for one. It looks like
+    every other choice row in the app (category filter, event filter, category picker): primary,
+    the current one filled, the rest outlined. Hand-made rows
     like that keep their own active and hover rules, and the role tabs got one wrong: hovering
     the current tab put its white text on the light hover background. Built on OsButton, so how a button looks in each state is the
     library's business and the same as everywhere else in the app.
@@ -9,7 +11,7 @@
     <os-button
       v-for="item in items"
       :key="item.value"
-      :variant="item.value === value ? 'primary' : 'default'"
+      variant="primary"
       :appearance="item.value === value ? 'filled' : 'outline'"
       size="sm"
       :aria-pressed="String(item.value === value)"
