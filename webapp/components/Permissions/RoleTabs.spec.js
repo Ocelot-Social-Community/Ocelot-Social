@@ -81,6 +81,12 @@ describe('RoleTabs', () => {
     expect(wrapper.find('[data-test="role-tab-user"] .role-tab__badge').exists()).toBe(false)
   })
 
+  it('names the row for assistive tech', () => {
+    const wrapper = Wrapper({ label: 'Roles' })
+
+    expect(wrapper.find('[role="group"]').attributes('aria-label')).toBe('Roles')
+  })
+
   it('renders whatever the page adds at the end of the row', () => {
     const wrapper = Wrapper({}, { extra: '<button data-test="add">+</button>' })
 

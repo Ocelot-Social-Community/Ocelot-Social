@@ -13,22 +13,24 @@
       :label-for="(role) => role.name"
       :badge-for="(role) => role.protected"
       :badge-title="$t('admin.roles.protected')"
+      :label="$t('admin.roles.title')"
       @select="setActive"
       @hover="hoveredRoleName = $event"
     >
       <template #extra>
         <!-- Add a role: the + button morphs into a name input -->
-        <button
+        <os-button
           v-if="!creating"
-          type="button"
-          class="role-tab role-tab--add"
+          size="sm"
+          appearance="outline"
+          class="role-tab--add"
           :title="$t('admin.roles.create')"
           :aria-label="$t('admin.roles.create')"
           data-test="role-add"
           @click="startCreate"
         >
           <os-icon :icon="icons.plus" />
-        </button>
+        </os-button>
         <span v-else class="role-tab role-tab--input" data-test="role-create">
           <input
             ref="newRoleInput"
@@ -762,14 +764,22 @@ export default {
   color: var(--text-color-soft);
 }
 
+/* An outlined OsButton like the role tabs beside it, dashed because it is not a role. */
 .role-tab--add {
-  font-weight: bold;
   border-style: dashed;
 }
 
+/* The name field the + turns into, sized and framed like the buttons in the row. */
 .role-tab--input {
-  padding: var(--space-xxx-small) var(--space-xx-small);
-  cursor: default;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xxx-small);
+  height: 26px;
+  padding: 0 var(--space-xx-small);
+  border: 1px solid var(--border-color-soft);
+  border-radius: 5px;
+  background: var(--background-color-base);
+  font-size: 12px;
 }
 
 .role-tab__input {

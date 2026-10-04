@@ -9,6 +9,7 @@
     <toggle-group
       :items="items"
       :value="activeName"
+      :label="label"
       @select="$emit('select', $event)"
       @hover="$emit('hover', $event)"
     >
@@ -89,6 +90,8 @@ export default {
     /** Which roles hold an unsaved edit. */
     draftedFor: { type: Function, default: () => false },
     draftedTitle: { type: String, default: null },
+    /** What the row as a whole chooses, for assistive tech. */
+    label: { type: String, default: null },
   },
   data() {
     return { icons: iconRegistry }

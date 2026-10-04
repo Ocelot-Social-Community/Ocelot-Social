@@ -10,7 +10,7 @@
     while disabled, which would swallow the very tooltip that says WHY. The hover stays on the
     button — a disabled one has nothing to preview, since clicking it does nothing.
   -->
-  <div class="toggle-group" role="radiogroup" :aria-label="label">
+  <div class="toggle-group" role="group" :aria-label="label">
     <span
       v-for="item in items"
       :key="item.value"
@@ -21,8 +21,7 @@
         :variant="item.value === value ? 'primary' : 'default'"
         :appearance="item.value === value ? 'filled' : 'outline'"
         size="sm"
-        role="radio"
-        :aria-checked="String(item.value === value)"
+        :aria-pressed="String(item.value === value)"
         class="toggle-group__item"
         :class="{
           'toggle-group__item--active': item.value === value,

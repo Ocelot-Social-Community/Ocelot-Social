@@ -22,10 +22,12 @@ describe('ToggleGroup', () => {
   it('is one choice among several, said as such', () => {
     const wrapper = Wrapper()
 
-    expect(wrapper.attributes('role')).toBe('radiogroup')
+    // Toggle buttons rather than radios: native buttons, so the keyboard works as announced —
+    // a radiogroup promises arrow keys and a single tab stop it would not deliver.
+    expect(wrapper.attributes('role')).toBe('group')
     expect(wrapper.attributes('aria-label')).toBe('Template')
-    expect(at(wrapper, 'option-public').attributes('aria-checked')).toBe('true')
-    expect(at(wrapper, 'option-closed').attributes('aria-checked')).toBe('false')
+    expect(at(wrapper, 'option-public').attributes('aria-pressed')).toBe('true')
+    expect(at(wrapper, 'option-closed').attributes('aria-pressed')).toBe('false')
   })
 
   it('fills the current one and outlines the rest', () => {

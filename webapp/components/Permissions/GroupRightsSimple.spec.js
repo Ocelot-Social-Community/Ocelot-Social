@@ -176,7 +176,7 @@ describe('GroupRightsSimple', () => {
       expect(at(wrapper, 'admission-option-closed').classes()).not.toContain(
         'toggle-group__item--active',
       )
-      expect(at(wrapper, 'admission-option-open').attributes('aria-checked')).toBe('true')
+      expect(at(wrapper, 'admission-option-open').attributes('aria-pressed')).toBe('true')
     })
 
     it('names the state the non-member role puts the group in', () => {
