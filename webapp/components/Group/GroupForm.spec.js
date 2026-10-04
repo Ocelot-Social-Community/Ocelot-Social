@@ -121,7 +121,7 @@ describe('GroupForm', () => {
     id: '1',
     name: 'Test Group',
     slug: 'test-group',
-    groupType: 'public',
+    visibility: 'public',
     about: 'About',
     description: 'Description text',
     actionRadius: 'local',
@@ -256,7 +256,7 @@ describe('GroupForm', () => {
     })
 
     it('becomes true once showMembers is toggled', () => {
-      const wrapper = mountWith({ update: true, group: { ...group, groupType: 'closed' } })
+      const wrapper = mountWith({ update: true, group: { ...group, visibility: 'closed' } })
       wrapper.find('#show-members').setChecked(true)
       expect(wrapper.vm.hasUnsavedChanges).toBe(true)
     })
@@ -942,7 +942,7 @@ describe('GroupForm', () => {
       })
 
     it('blocks switching an existing public group to hidden without group.create_hidden', () => {
-      const wrapper = mountEdit(() => false, { groupType: 'public' })
+      const wrapper = mountEdit(() => false, { visibility: 'public' })
       const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
       wrapper.vm.formData.groupType = 'hidden'
       wrapper.vm.onSubmit()
@@ -950,7 +950,7 @@ describe('GroupForm', () => {
     })
 
     it('allows editing an already-hidden group without group.create_hidden', () => {
-      const wrapper = mountEdit(() => false, { groupType: 'hidden' })
+      const wrapper = mountEdit(() => false, { visibility: 'hidden' })
       const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
       wrapper.vm.formData.groupType = 'hidden'
       wrapper.vm.onSubmit()
@@ -958,7 +958,7 @@ describe('GroupForm', () => {
     })
 
     it('keeps the hidden option enabled when the group is already hidden', () => {
-      const wrapper = mountEdit(() => false, { groupType: 'hidden' })
+      const wrapper = mountEdit(() => false, { visibility: 'hidden' })
       const hiddenOption = wrapper
         .findAll('option')
         .wrappers.find((o) => o.attributes('value') === 'hidden')
@@ -969,7 +969,7 @@ describe('GroupForm', () => {
   describe('effectiveShowMembers', () => {
     const mountWithType = (groupType, showMembers = false) =>
       mount(GroupForm, {
-        propsData: { update: false, group: { groupType, showMembers } },
+        propsData: { update: false, group: { visibility: groupType, showMembers } },
         mocks: { $t: jest.fn(), $can: () => true },
         localVue,
         stubs,

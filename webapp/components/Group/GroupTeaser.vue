@@ -36,7 +36,7 @@
           </os-badge>
           <!-- group type -->
           <os-badge variant="primary">
-            {{ group && group.groupType ? $t('group.types.' + group.groupType) : '' }}
+            {{ group && group.visibility ? $t('group.types.' + group.visibility) : '' }}
           </os-badge>
           <!-- group action radius -->
           <os-badge variant="primary">

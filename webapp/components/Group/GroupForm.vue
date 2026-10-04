@@ -117,7 +117,7 @@
               v-for="groupType in groupTypeOptions"
               :key="groupType"
               :value="groupType"
-              :disabled="groupType !== group.groupType && !$can(`group.create_${groupType}`)"
+              :disabled="groupType !== group.visibility && !$can(`group.create_${groupType}`)"
             >
               {{ $t(`group.typesOptions.${groupType}`) }}
             </option>
@@ -313,7 +313,7 @@ export default {
     const {
       name,
       slug,
-      groupType,
+      visibility,
       about,
       description,
       actionRadius,
@@ -364,7 +364,7 @@ export default {
       formData: {
         name: name || '',
         slug: slug || '',
-        groupType: groupType || '',
+        groupType: visibility || '',
         about: about || '',
         description: description || '',
         locationName: locationName || '',
@@ -550,7 +550,7 @@ export default {
     // the submit button looking fully enabled while clicking it silently
     // did nothing).
     canSubmitHiddenTransition() {
-      if (this.formData.groupType !== 'hidden' || this.group.groupType === 'hidden') return true
+      if (this.formData.groupType !== 'hidden' || this.group.visibility === 'hidden') return true
       return this.$can('group.create_hidden')
     },
     canCreateSelectedGroup() {

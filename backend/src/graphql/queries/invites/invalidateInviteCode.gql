@@ -20,7 +20,7 @@ mutation invalidateInviteCode($code: String!) {
     comment
     invitedTo {
       id
-      groupType
+      visibility
       name
       about
       avatar {

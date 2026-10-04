@@ -343,7 +343,7 @@ describe('in mode', () => {
                 slug: 'the-group',
                 about: 'We will change the world!',
                 description: 'Some description' + descriptionAdditional100,
-                groupType: 'public',
+                visibility: 'public',
                 actionRadius: 'regional',
                 locationName: 'Hamburg, Germany',
                 location: expect.objectContaining({
@@ -3717,7 +3717,7 @@ describe('in mode', () => {
                 }),
               ).resolves.toMatchObject({
                 data: {
-                  UpdateGroup: { id: 'my-group', groupType: 'hidden', myRole: 'owner' },
+                  UpdateGroup: { id: 'my-group', visibility: 'hidden', myRole: 'owner' },
                 },
                 errors: undefined,
               })
@@ -3741,7 +3741,7 @@ describe('in mode', () => {
                 }),
               ).resolves.toMatchObject({
                 data: {
-                  UpdateGroup: { id: 'my-group', groupType: 'public', myRole: 'owner' },
+                  UpdateGroup: { id: 'my-group', visibility: 'public', myRole: 'owner' },
                 },
                 errors: undefined,
               })
@@ -5076,5 +5076,13 @@ describe('Subscription.groupMembershipVisibilityChanged filter', () => {
     expect(await deliveredWithin(next)).toBe('pending')
 
     await iterator.return?.()
+  })
+})
+
+describe('Group.visibility', () => {
+  // The value is stored as `groupType`, which stays in the schema, deprecated, for clients that
+  // still ask for it; `visibility` serves the same value under the name it goes by now.
+  it.each(['public', 'closed', 'hidden'])('serves the stored groupType %s', (groupType) => {
+    expect(groupsResolver.Group.visibility({ groupType })).toBe(groupType)
   })
 })
