@@ -271,7 +271,8 @@ const GROUPS_WITHOUT_ROLES_CYPHER = `
   // Which template to seed from is the group's own, stored, because — unlike its visibility —
   // nothing derives it. A row that has lost even that is seeded from the most private template:
   // a group nobody can read is repairable, a group accidentally opened is not.
-  RETURN g.id AS groupId, coalesce(g.template, 'hidden') AS template
+  RETURN g.id AS groupId, coalesce(g.template, 'hidden') AS template,
+         coalesce(g.showMembers, false) AS showMembers
 `
 
 /**
@@ -303,9 +304,26 @@ export async function seedRolesForGroupsWithoutRoles(
       continue
     }
     await seedRolesForNewGroup(runnerFor(db), groupId, template, now)
+    if (record.get('showMembers') === true) {
+      await keepMemberListOpen(db, groupId, now)
+    }
     seeded.push(groupId)
   }
   return { seeded, skipped }
+}
+
+/**
+ * A group that predates the roles and had its member list opened (`showMembers`, the setting
+ * before the rights existed) keeps it open: its non-member role gets `group.members.read`.
+ *
+ * Only where outsiders can see the group at all. The right implies `group.read`, so granting it
+ * on a hidden group would make that group visible — a member list nobody can find was not
+ * open, whatever the old flag said.
+ */
+async function keepMemberListOpen(db: DbContext, groupId: string, now: string): Promise<void> {
+  const none = (await readGroupRoles(db, groupId)).find((role) => role.name === NONE_ROLE)
+  if (!none?.permissions.includes('group.read')) return
+  await setNonMemberMemberListAccess(db, groupId, true, now)
 }
 
 /** How many members carry each role of a group. `none` never appears: it is the absence of an edge. */

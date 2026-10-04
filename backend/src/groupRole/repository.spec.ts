@@ -513,9 +513,27 @@ describe(untouchedGroupIdsByTemplate, () => {
 
 // The boot repair. A fake db context rather than a database: what matters is which groups it
 // picks up and which statements it sends for each, and both are visible here.
-const fakeDatabase = (groups: Array<{ groupId: string; template: string }>) => {
+const fakeDatabase = (
+  groups: Array<{ groupId: string; template: string; showMembers?: boolean }>,
+  // What the group's non-member role holds once seeded — what the member-list carry-over reads.
+  seededNonMember: string[] = ['group.read'],
+) => {
   const statements: Array<{ query: string; variables?: Record<string, unknown> }> = []
   const rowsFor = (query: string) => {
+    if (query.includes('ORDER BY r.name')) {
+      return [
+        {
+          get: (key: string) =>
+            ({
+              name: NONE_ROLE,
+              label: null,
+              system: true,
+              protected: false,
+              permissions: JSON.stringify(seededNonMember),
+            })[key],
+        },
+      ]
+    }
     // The template copy answers with the names it copied; an empty list sends the caller to
     // the code defaults. The permission read-back feeds the derived columns.
     if (query.includes('GroupRoleTemplate')) {
@@ -534,7 +552,7 @@ const fakeDatabase = (groups: Array<{ groupId: string; template: string }>) => {
         return Promise.resolve({
           records: query.includes('NOT (g)-[:HAS_GROUP_ROLE]')
             ? groups.map((group) => ({
-                get: (key: string) => group[key as 'groupId'],
+                get: (key: string) => (key === 'showMembers' ? (group.showMembers ?? false) : group[key as 'groupId']),
               }))
             : rowsFor(query),
         })
@@ -575,6 +593,44 @@ describe(seedRolesForGroupsWithoutRoles, () => {
     const copies = statements.filter((statement) => statement.query.includes('GroupRoleTemplate'))
 
     expect(copies.map((statement) => statement.variables?.template)).toEqual(['closed', 'public'])
+  })
+
+  describe('a member list opened before the rights existed', () => {
+    // `showMembers` was the setting; the right on the non-member role is what decides now.
+    const memberListWrites = (statements: Array<{ variables?: Record<string, unknown> }>) =>
+      statements.filter((statement) =>
+        String(statement.variables?.permissions ?? '').includes('group.members.read'),
+      )
+
+    it('stays open on a group outsiders can see', async () => {
+      const { db, statements } = fakeDatabase(
+        [{ groupId: 'closed-group', template: 'closed', showMembers: true }],
+        ['group.read'],
+      )
+
+      await seedRolesForGroupsWithoutRoles(db as never, NOW)
+
+      expect(memberListWrites(statements)).toHaveLength(1)
+    })
+
+    it('opens nothing on a hidden group — the right would make the group visible', async () => {
+      const { db, statements } = fakeDatabase(
+        [{ groupId: 'hidden-group', template: 'hidden', showMembers: true }],
+        [],
+      )
+
+      await seedRolesForGroupsWithoutRoles(db as never, NOW)
+
+      expect(memberListWrites(statements)).toHaveLength(0)
+    })
+
+    it('is left alone where it was never opened', async () => {
+      const { db, statements } = fakeDatabase([{ groupId: 'closed-group', template: 'closed' }])
+
+      await seedRolesForGroupsWithoutRoles(db as never, NOW)
+
+      expect(memberListWrites(statements)).toHaveLength(0)
+    })
   })
 
   it('reports a group whose template name is unknown instead of throwing', async () => {

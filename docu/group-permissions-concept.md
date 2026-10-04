@@ -437,12 +437,23 @@ Randfaelle:
 
 ## 4. Migration
 
-1. **Katalog + Templates seeden**, idempotent mit `ON CREATE`-Semantik wie
-   `seedRole` — eine Betreiber-Anpassung wird nie ueberschrieben.
-2. **Pro bestehende Gruppe** 5 `GroupRole`-Knoten aus der Template-Variante des
-   `groupType` anlegen. Die Default-Mengen sind ein **Audit der heutigen Regeln**
-   (Abschnitt 5) → Upgrade ohne Verhaltensaenderung. Gleiche Disziplin wie bei
-   `role/defaults.ts` ("The sets are an audit of the pre-RBAC shield").
+**Grundsatz:** Eine Migration enthaelt nie eine Kopie von Katalog oder Templates — sie
+beschreibt eine Aenderung als **Regel** ("wer X hat, bekommt Y"). Was in einem Template steht,
+bestimmt allein der Boot-Code; so kann eine alte Migration nicht still etwas anderes tun, wenn
+sich ein Default spaeter aendert. Zwei Migrationen tragen den Umstieg:
+`20261004100000-groups-run-on-templates` (`Group.groupType` → `Group.template`, Zugangs-Spalten
+bis zum Boot aus dem Typ vorbelegt) und `20261004110000-network-group-rights` (Punkt 5, als Regel
+auf den gespeicherten Netzwerkrollen).
+
+1. **Templates seeden** beim Boot (`seedGroupRoleTemplates`), idempotent mit
+   `ON CREATE`-Semantik wie `seedRole` — eine Betreiber-Anpassung wird nie ueberschrieben.
+2. **Pro bestehende Gruppe** die Rollen ihres Templates anlegen — ebenfalls beim Boot
+   (`seedRolesForGroupsWithoutRoles`), der jede Gruppe ohne Rollen repariert und die
+   Zugangs-Spalten aus den Rollen schreibt. Eine geschlossene Gruppe mit `showMembers` behaelt
+   ihre offene Mitgliederliste (`group.members.read` auf `none`); eine versteckte nicht — das
+   Recht impliziert `group.read` und wuerde sie sichtbar machen. Die Default-Mengen sind ein
+   **Audit der heutigen Regeln** (Abschnitt 5) → Upgrade ohne Verhaltensaenderung. Gleiche
+   Disziplin wie bei `role/defaults.ts` ("The sets are an audit of the pre-RBAC shield").
 3. **Enum-Ausstieg zweistufig, ohne Hard-Break:**
    `Group.myRole: GroupMemberRole` bleibt (deprecated) und liefert den Namen,
    solange er einer der Seed-Namen ist, sonst `null`; neu ist
@@ -462,6 +473,11 @@ Randfaelle:
    (Liste und Defaults in 7.3): `group.content.read.any_{closed,hidden}`,
    `group.moderate.any_{closed,hidden}`, `group.administer.any_{public,closed,hidden}`.
    Keines im Baseline.
+   Bestehende Rollen bekommen sie per Regel: `content.moderate` → die `any_closed`-Lese- und
+   Moderationsrechte; `role.manage` → zusaetzlich die `any_hidden`-Rechte, alle drei
+   `administer.any_*` und `group.roleTemplate.manage`. Im selben Schritt werden die
+   Videocall-Rechte von Typ auf Tuer umgestellt (`create_public` → `create_open`,
+   `create_closed`/`_hidden` → `create_restricted`).
 
 ---
 
