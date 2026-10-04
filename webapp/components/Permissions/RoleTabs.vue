@@ -5,14 +5,14 @@
     difference is part of the contract, not something each page remembers to add.
   -->
   <div class="role-tabs" data-test="role-tabs">
-    <toggle-group
-      :items="items"
+    <os-toggle-group
+      :options="options"
       :value="activeName"
       :label="label"
       @select="$emit('select', $event)"
       @hover="$emit('hover', $event)"
     >
-      <template #extra="{ item }">
+      <template #option="{ option }">
         <!--
           A role nobody may reshape: the network's `owner`, a group's system roles. An icon with
           an `aria-label` rather than the `★` with a `title` this was — a title on a span reaches
@@ -20,13 +20,13 @@
           special. OsIcon turns the label into `role="img"` and hides the glyph when there is none.
         -->
         <os-icon
-          v-if="badgeFor(item.role)"
+          v-if="badgeFor(rolesByName[option.value])"
           :icon="icons.lock"
           :aria-label="badgeTitle"
           class="role-tab__badge"
         />
       </template>
-    </toggle-group>
+    </os-toggle-group>
 
     <!-- Whatever the page adds at the end of the row: an add button, an inline name input. -->
     <slot name="extra" />
@@ -34,13 +34,12 @@
 </template>
 
 <script>
-import { OsIcon } from '@ocelot-social/ui'
-import ToggleGroup from '~/components/Permissions/ToggleGroup'
+import { OsIcon, OsToggleGroup } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 
 export default {
   name: 'RoleTabs',
-  components: { OsIcon, ToggleGroup },
+  components: { OsIcon, OsToggleGroup },
   props: {
     roles: { type: Array, required: true },
     activeName: { type: String, default: null },
@@ -62,13 +61,16 @@ export default {
     return { icons: iconRegistry }
   },
   computed: {
-    items() {
+    options() {
       return this.roles.map((role) => ({
         value: role.name,
         label: this.labelFor(role),
-        testId: `role-tab-${role.name}`,
-        role,
+        attrs: { 'data-test': `role-tab-${role.name}` },
       }))
+    },
+    /** The option slot hands back the option; the badge asks about the role behind it. */
+    rolesByName() {
+      return Object.fromEntries(this.roles.map((role) => [role.name, role]))
     },
   },
 }
