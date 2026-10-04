@@ -19,10 +19,14 @@
     >
       <template #extra>
         <!-- Add a role: the + button morphs into a name input -->
+        <!-- Ghost, like the page's other secondary actions — it is not a role, so it does not
+             look like one of the tabs beside it — and primary like them, so it hovers the same
+             green rather than the dark grey of the default variant. -->
         <os-button
           v-if="!creating"
+          variant="primary"
           size="sm"
-          appearance="outline"
+          appearance="ghost"
           class="role-tab--add"
           :title="$t('admin.roles.create')"
           :aria-label="$t('admin.roles.create')"
@@ -762,11 +766,6 @@ export default {
 .description {
   margin-bottom: var(--space-base);
   color: var(--text-color-soft);
-}
-
-/* An outlined OsButton like the role tabs beside it, dashed because it is not a role. */
-.role-tab--add {
-  border-style: dashed;
 }
 
 /* The name field the + turns into, sized and framed like the buttons in the row. */
