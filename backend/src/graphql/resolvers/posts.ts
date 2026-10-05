@@ -7,7 +7,6 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { v4 as uuid } from 'uuid'
 
-import { ErrorCode } from '@graphql/errorCodes'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError, UserInputError } from '@graphql/errors'
 
@@ -622,9 +621,7 @@ export default {
           })
         ).records.map((r) => Number(r.get('count').toString()))
         if (currentPinnedPostCount >= maxPinnedPosts) {
-          throw new UserInputError('Max number of pinned posts is reached!', {
-            code: ErrorCode.MAX_PINNED_POSTS_REACHED,
-          })
+          throw new AppError(Errors.POST_PIN_LIMIT_REACHED)
         }
         const [pinPostResult] = (
           await context.database.write({
@@ -691,9 +688,7 @@ export default {
           variables: { user: context.user, params },
         })
         if (Number(result.records[0].get('count')) >= maxGroupPinnedPosts) {
-          throw new UserInputError('Reached maxed pinned posts already. Unpin a post first.', {
-            code: ErrorCode.MAX_PINNED_POSTS_REACHED,
-          })
+          throw new AppError(Errors.POST_PIN_LIMIT_REACHED)
         }
       }
 

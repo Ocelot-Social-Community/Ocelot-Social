@@ -110,6 +110,10 @@ const definitions = {
     text: 'Event venue must be between {min} and {max} characters long!',
   },
   POST_PIN_FEATURE_DISABLED: { type: 'FORBIDDEN', text: 'Pinned posts are not allowed!' },
+  POST_PIN_LIMIT_REACHED: {
+    type: 'BAD_USER_INPUT',
+    text: 'Maximum number of pinned posts reached. Unpin a post first.',
+  },
   POST_SAVE_SLUG_ALREADY_TAKEN: {
     type: 'BAD_USER_INPUT',
     text: 'Post with this slug already exists!',

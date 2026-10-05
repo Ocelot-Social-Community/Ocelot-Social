@@ -2300,7 +2300,9 @@ describe('pin posts', () => {
               it('throws with max pinned posts is reached', () => {
                 expect(result).toMatchObject({
                   data: { pinPost: null },
-                  errors: [{ message: 'Max number of pinned posts is reached!' }],
+                  errors: [
+                    { message: 'Maximum number of pinned posts reached. Unpin a post first.' },
+                  ],
                 })
               })
             })
