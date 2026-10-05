@@ -1,6 +1,6 @@
 import { ErrorCode } from '@graphql/errorCodes'
 import { Errors } from '@graphql/errorRegistry'
-import { AppError, ForbiddenError, UserInputError } from '@graphql/errors'
+import { AppError, ForbiddenError } from '@graphql/errors'
 import {
   blockingGateFor,
   groupFor,
@@ -290,7 +290,7 @@ export default {
       })
       const user = result.records[0]?.get('user') as unknown
       if (!user) {
-        throw new UserInputError('Could not find User', { code: ErrorCode.USER_NOT_FOUND })
+        throw new AppError(Errors.USER_DOES_NOT_EXIST)
       }
       // The target user's effective permissions changed → they must refetch.
       publishPermissionsChanged(context, roleName)

@@ -469,8 +469,9 @@
     "ROLE_DOES_NOT_EXIST": "A função “{name}” não existe.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "A função “{name}” já existe.",
     "ROLE_SAVE_NAME_INVALID": "O nome da função é inválido.",
-    "USER_NOT_FOUND": "O usuário não foi encontrado.",
+    "USER_DOES_NOT_EXIST": "O usuário não foi encontrado.",
     "USER_PROFILE_NAME_TOO_SHORT": "O nome deve ter pelo menos {min} caracteres.",
+    "USER_UNBLOCK_USER_NOT_BLOCKED": "Este usuário não está bloqueado.",
     "VIDEO_CALL_FEATURE_DISABLED": "As videochamadas não estão ativadas.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Você não pode iniciar uma videochamada neste grupo."
   },

@@ -469,8 +469,9 @@
     "ROLE_DOES_NOT_EXIST": "Ролі «{name}» не існує.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "Роль «{name}» вже існує.",
     "ROLE_SAVE_NAME_INVALID": "Недійсна назва ролі.",
-    "USER_NOT_FOUND": "Користувача не знайдено.",
+    "USER_DOES_NOT_EXIST": "Користувача не знайдено.",
     "USER_PROFILE_NAME_TOO_SHORT": "Ім’я має містити щонайменше {min} символів.",
+    "USER_UNBLOCK_USER_NOT_BLOCKED": "Цей користувач не заблокований.",
     "VIDEO_CALL_FEATURE_DISABLED": "Відеовиклики не увімкнено.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Ти не можеш почати відеовиклик у цій групі."
   },

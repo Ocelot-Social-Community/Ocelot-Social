@@ -9,7 +9,6 @@ export const ErrorCode = {
   NOT_AUTHORIZED: 'NOT_AUTHORIZED',
   // e-mail & registration
   // users & badges
-  USER_NOT_FOUND: 'USER_NOT_FOUND',
   // groups
   NOT_GROUP_MEMBER: 'NOT_GROUP_MEMBER',
   // posts, comments & events

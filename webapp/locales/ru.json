@@ -469,8 +469,9 @@
     "ROLE_DOES_NOT_EXIST": "Роли «{name}» не существует.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "Роль «{name}» уже существует.",
     "ROLE_SAVE_NAME_INVALID": "Недопустимое название роли.",
-    "USER_NOT_FOUND": "Пользователь не найден.",
+    "USER_DOES_NOT_EXIST": "Пользователь не найден.",
     "USER_PROFILE_NAME_TOO_SHORT": "Имя должно содержать не менее {min} символов.",
+    "USER_UNBLOCK_USER_NOT_BLOCKED": "Этот пользователь не заблокирован.",
     "VIDEO_CALL_FEATURE_DISABLED": "Видеозвонки не включены.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Ты не можешь начать видеозвонок в этой группе."
   },

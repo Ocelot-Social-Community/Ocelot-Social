@@ -4,9 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UnverifiedEmailAddress } from '@db/schema/entities/UnverifiedEmailAddress'
 import { validateProperty } from '@db/schema/validate'
-import { ErrorCode } from '@graphql/errorCodes'
 import { Errors } from '@graphql/errorRegistry'
-import { AppError, UserInputError } from '@graphql/errors'
+import { AppError } from '@graphql/errors'
 
 import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'
@@ -73,7 +72,7 @@ export default {
         })
         const response = txResult[0]
         if (!response) {
-          throw new UserInputError('User not found.', { code: ErrorCode.USER_NOT_FOUND })
+          throw new AppError(Errors.USER_DOES_NOT_EXIST)
         }
         return response
       } finally {

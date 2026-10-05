@@ -469,8 +469,9 @@
     "ROLE_DOES_NOT_EXIST": "De rol “{name}” bestaat niet.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "De rol “{name}” bestaat al.",
     "ROLE_SAVE_NAME_INVALID": "De rolnaam is ongeldig.",
-    "USER_NOT_FOUND": "De gebruiker is niet gevonden.",
+    "USER_DOES_NOT_EXIST": "De gebruiker is niet gevonden.",
     "USER_PROFILE_NAME_TOO_SHORT": "De naam moet minimaal {min} tekens lang zijn.",
+    "USER_UNBLOCK_USER_NOT_BLOCKED": "Deze gebruiker is niet geblokkeerd.",
     "VIDEO_CALL_FEATURE_DISABLED": "Videogesprekken zijn niet ingeschakeld.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Je mag in deze groep geen videogesprek starten."
   },

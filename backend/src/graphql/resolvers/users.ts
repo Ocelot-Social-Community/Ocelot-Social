@@ -332,7 +332,7 @@ export default {
           return blockUserResponse.records.map((record) => record.get('blockedUser'))[0]
         })
         if (!blockedUser) {
-          throw new UserInputError('Could not find User', { code: ErrorCode.USER_NOT_FOUND })
+          throw new AppError(Errors.USER_DOES_NOT_EXIST)
         }
         return blockedUser
       } finally {
@@ -359,9 +359,7 @@ export default {
           return unblockUserResponse.records.map((record) => record.get('blockedUser'))[0]
         })
         if (!unblockedUser) {
-          throw new UserInputError('Could not find blocked User', {
-            code: ErrorCode.USER_NOT_FOUND,
-          })
+          throw new AppError(Errors.USER_UNBLOCK_USER_NOT_BLOCKED)
         }
         return unblockedUser
       } finally {

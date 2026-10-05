@@ -469,8 +469,9 @@
     "ROLE_DOES_NOT_EXIST": "Die Rolle „{name}“ gibt es nicht.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "Die Rolle „{name}“ gibt es bereits.",
     "ROLE_SAVE_NAME_INVALID": "Der Rollenname ist ungültig.",
-    "USER_NOT_FOUND": "Der Nutzer wurde nicht gefunden.",
+    "USER_DOES_NOT_EXIST": "Der Nutzer wurde nicht gefunden.",
     "USER_PROFILE_NAME_TOO_SHORT": "Der Name muss mindestens {min} Zeichen lang sein.",
+    "USER_UNBLOCK_USER_NOT_BLOCKED": "Dieser Nutzer ist nicht blockiert.",
     "VIDEO_CALL_FEATURE_DISABLED": "Videoanrufe sind nicht aktiviert.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Du darfst in dieser Gruppe keinen Videoanruf starten."
   },

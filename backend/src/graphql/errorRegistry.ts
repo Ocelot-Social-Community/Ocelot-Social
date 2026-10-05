@@ -55,6 +55,8 @@ const definitions = {
     text: 'User with this slug already exists!',
   },
   // users & badges
+  USER_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'Could not find user.' },
+  USER_UNBLOCK_USER_NOT_BLOCKED: { type: 'BAD_USER_INPUT', text: 'Could not find blocked user.' },
   USER_PROFILE_NAME_TOO_SHORT: {
     type: 'BAD_USER_INPUT',
     text: 'Username must be at least {min} character long!',

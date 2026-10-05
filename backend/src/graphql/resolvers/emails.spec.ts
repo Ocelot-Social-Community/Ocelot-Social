@@ -99,7 +99,7 @@ describe('AddEmailAddress', () => {
       it('throws UserInputError', async () => {
         await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({
           data: { AddEmailAddress: null },
-          errors: [{ message: 'User not found.' }],
+          errors: [{ message: 'Could not find user.' }],
         })
       })
 

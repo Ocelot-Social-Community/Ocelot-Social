@@ -469,8 +469,9 @@
     "ROLE_DOES_NOT_EXIST": "Roli „{name}“ nuk ekziston.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "Roli „{name}“ ekziston tashmë.",
     "ROLE_SAVE_NAME_INVALID": "Emri i rolit është i pavlefshëm.",
-    "USER_NOT_FOUND": "Përdoruesi nuk u gjet.",
+    "USER_DOES_NOT_EXIST": "Përdoruesi nuk u gjet.",
     "USER_PROFILE_NAME_TOO_SHORT": "Emri duhet të ketë të paktën {min} karaktere.",
+    "USER_UNBLOCK_USER_NOT_BLOCKED": "Ky përdorues nuk është i bllokuar.",
     "VIDEO_CALL_FEATURE_DISABLED": "Telefonatat me video nuk janë aktivizuar.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Nuk mund të nisësh një telefonatë me video në këtë grup."
   },

@@ -825,7 +825,7 @@ describe('role management', () => {
         variables: { userId: 'no-such-user', roleName: 'moderator' },
       })
 
-      expect(errors?.[0].message).toMatch(/Could not find User/)
+      expect(errors?.[0].message).toMatch(/Could not find user\./)
     })
 
     it('forbids a (non-owner) admin from assigning the owner role', async () => {

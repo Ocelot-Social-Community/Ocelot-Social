@@ -469,8 +469,9 @@
     "ROLE_DOES_NOT_EXIST": "Le rôle « {name} » n'existe pas.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "Le rôle « {name} » existe déjà.",
     "ROLE_SAVE_NAME_INVALID": "Le nom du rôle n'est pas valide.",
-    "USER_NOT_FOUND": "L'utilisateur est introuvable.",
+    "USER_DOES_NOT_EXIST": "L'utilisateur est introuvable.",
     "USER_PROFILE_NAME_TOO_SHORT": "Le nom doit comporter au moins {min} caractères.",
+    "USER_UNBLOCK_USER_NOT_BLOCKED": "Cet utilisateur n'est pas bloqué.",
     "VIDEO_CALL_FEATURE_DISABLED": "Les appels vidéo ne sont pas activés.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Tu n'as pas le droit de démarrer un appel vidéo dans ce groupe."
   },

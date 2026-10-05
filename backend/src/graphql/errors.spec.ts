@@ -23,13 +23,13 @@ describe('GraphQL error classes', () => {
 
   it('adds the params the translation interpolates', () => {
     expect(
-      new UserInputError('Could not find User', {
-        code: ErrorCode.USER_NOT_FOUND,
+      new UserInputError('Could not find Post', {
+        code: ErrorCode.POST_NOT_FOUND,
         params: { email: 'a@b.c' },
       }).extensions,
     ).toEqual({
       code: 'BAD_USER_INPUT',
-      errorCode: 'USER_NOT_FOUND',
+      errorCode: 'POST_NOT_FOUND',
       params: { email: 'a@b.c' },
     })
   })
