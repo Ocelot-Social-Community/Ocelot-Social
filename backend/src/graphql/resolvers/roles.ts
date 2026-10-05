@@ -144,10 +144,10 @@ export default {
       context: Context,
     ) => {
       if (!ROLE_NAME_RE.test(args.name)) {
-        throw new AppError(Errors.ROLE_NAME_INVALID)
+        throw new AppError(Errors.ROLE_SAVE_NAME_INVALID)
       }
       if (context.role.getRole(args.name)) {
-        throw new AppError(Errors.ROLE_ALREADY_EXISTS, { name: args.name })
+        throw new AppError(Errors.ROLE_SAVE_NAME_ALREADY_TAKEN, { name: args.name })
       }
       try {
         const def = await context.role.upsertRole(
@@ -174,7 +174,7 @@ export default {
       context: Context,
     ) => {
       if (!context.role.getRole(args.name)) {
-        throw new AppError(Errors.ROLE_UNKNOWN, { name: args.name })
+        throw new AppError(Errors.ROLE_DOES_NOT_EXIST, { name: args.name })
       }
       try {
         const def = await context.role.upsertRole(
@@ -202,13 +202,13 @@ export default {
       context: Context,
     ) => {
       if (!ROLE_NAME_RE.test(newName)) {
-        throw new AppError(Errors.ROLE_NAME_INVALID)
+        throw new AppError(Errors.ROLE_SAVE_NAME_INVALID)
       }
       if (!context.role.getRole(name)) {
-        throw new AppError(Errors.ROLE_UNKNOWN, { name })
+        throw new AppError(Errors.ROLE_DOES_NOT_EXIST, { name })
       }
       if (name !== newName && context.role.getRole(newName)) {
-        throw new AppError(Errors.ROLE_ALREADY_EXISTS, { name: newName })
+        throw new AppError(Errors.ROLE_SAVE_NAME_ALREADY_TAKEN, { name: newName })
       }
       try {
         const def = await context.role.renameRole(name, newName, context.user?.id ?? 'unknown')
@@ -225,7 +225,7 @@ export default {
         // `newName` between our getRole(newName) snapshot and the write. Surface the same
         // stable conflict as the pre-check, not a raw driver error.
         if (isRoleNameConflict(err)) {
-          throw new AppError(Errors.ROLE_ALREADY_EXISTS, { name: newName })
+          throw new AppError(Errors.ROLE_SAVE_NAME_ALREADY_TAKEN, { name: newName })
         }
         throw err
       }
@@ -253,7 +253,7 @@ export default {
       context: Context,
     ) => {
       if (!context.role.getRole(roleName)) {
-        throw new AppError(Errors.ROLE_UNKNOWN, { name: roleName })
+        throw new AppError(Errors.ROLE_DOES_NOT_EXIST, { name: roleName })
       }
       // Owner status is owner-controlled. Look up whether the target is currently an
       // owner and how many owners exist.
@@ -271,11 +271,11 @@ export default {
       // role.manage admin manages non-owner roles only (no escalating to owner, no
       // demoting an owner).
       if ((roleName === OWNER_ROLE || targetIsOwner) && !actorIsOwner(context)) {
-        throw new AppError(Errors.OWNER_ROLE_OWNER_ONLY)
+        throw new AppError(Errors.ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER)
       }
       // Never demote the last owner — keep the instance failsafe.
       if (targetIsOwner && roleName !== OWNER_ROLE && ownerCount <= 1) {
-        throw new AppError(Errors.LAST_OWNER)
+        throw new AppError(Errors.ROLE_ASSIGNMENT_LAST_OWNER_NOT_REMOVABLE)
       }
       // Replace the user's single HAS_ROLE edge.
       const result = await context.database.write({

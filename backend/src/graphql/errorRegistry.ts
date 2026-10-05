@@ -117,14 +117,17 @@ const definitions = {
     text: 'You cannot report yourself or your own content!',
   },
   // roles
-  LAST_OWNER: { type: 'FORBIDDEN', text: 'Cannot remove the last owner.' },
-  OWNER_ROLE_OWNER_ONLY: {
+  ROLE_ASSIGNMENT_LAST_OWNER_NOT_REMOVABLE: {
+    type: 'FORBIDDEN',
+    text: 'Cannot remove the last owner.',
+  },
+  ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER: {
     type: 'FORBIDDEN',
     text: 'Only an owner may assign or change the owner role.',
   },
-  ROLE_ALREADY_EXISTS: { type: 'BAD_USER_INPUT', text: "Role '{name}' already exists." },
-  ROLE_NAME_INVALID: { type: 'BAD_USER_INPUT', text: 'Invalid role name.' },
-  ROLE_UNKNOWN: { type: 'BAD_USER_INPUT', text: 'Unknown role: {name}' },
+  ROLE_SAVE_NAME_ALREADY_TAKEN: { type: 'BAD_USER_INPUT', text: "Role '{name}' already exists." },
+  ROLE_SAVE_NAME_INVALID: { type: 'BAD_USER_INPUT', text: 'Invalid role name.' },
+  ROLE_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'Unknown role: {name}' },
   // API keys
   API_KEY_EXPIRY_INVALID: {
     type: 'BAD_USER_INPUT',
