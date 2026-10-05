@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.5...ui-v0.0.6) (2026-10-05)
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump the size-limit group across 1 directory with 2 updates ([#10373](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10373)) ([f226a5b](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/f226a5b42cc1c4533710c7f057175a89641ac3e9))
+
 ## [0.0.5](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.4...ui-v0.0.5) (2026-10-05)
 
 
