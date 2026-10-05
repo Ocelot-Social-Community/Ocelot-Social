@@ -425,8 +425,8 @@
     "API_KEY_DOES_NOT_EXIST": "Nie znaleziono API Key.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Możesz wybrać tylko odznaki, które zostały Ci przyznane.",
     "CANNOT_REVIEW_OWN": "Nie możesz decydować o zgłoszeniu dotyczącym Ciebie lub Twoich własnych treści.",
-    "CHAT_MESSAGE_EMPTY": "Wiadomość musi zawierać tekst lub plik.",
-    "CHAT_ROOM_WITH_SELF": "Nie możesz rozpocząć czatu z samym/samą sobą.",
+    "CHAT_MESSAGE_CONTENT_MISSING": "Wiadomość musi zawierać tekst lub plik.",
+    "CHAT_ROOM_PARTNER_IS_SELF": "Nie możesz rozpocząć czatu z samym/samą sobą.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "Komentarz musi mieć co najmniej {min} znaków.",
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Konto z tym adresem e-mail już istnieje.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Podaj prawidłowy adres e-mail.",
@@ -471,8 +471,8 @@
     "ROLE_SAVE_NAME_INVALID": "Nazwa roli jest nieprawidłowa.",
     "USER_NOT_FOUND": "Nie znaleziono użytkownika.",
     "USER_PROFILE_NAME_TOO_SHORT": "Nazwa musi mieć co najmniej {min} znaków.",
-    "VIDEO_CALLS_DISABLED": "Rozmowy wideo nie są włączone.",
-    "VIDEO_CALL_NOT_ALLOWED": "Nie możesz rozpocząć rozmowy wideo w tej grupie."
+    "VIDEO_CALL_FEATURE_DISABLED": "Rozmowy wideo nie są włączone.",
+    "VIDEO_CALL_START_NOT_PERMITTED": "Nie możesz rozpocząć rozmowy wideo w tej grupie."
   },
   "chat": {
     "addGroupRoomHeadline": "Szukaj grupy do nowego czatu",

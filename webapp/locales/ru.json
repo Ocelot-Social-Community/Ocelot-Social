@@ -425,8 +425,8 @@
     "API_KEY_DOES_NOT_EXIST": "API Key не найден.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Ты можешь выбрать только те награды, которые были тебе присуждены.",
     "CANNOT_REVIEW_OWN": "Ты не можешь принимать решение по жалобе на себя или на свой собственный контент.",
-    "CHAT_MESSAGE_EMPTY": "Сообщение должно содержать текст или файл.",
-    "CHAT_ROOM_WITH_SELF": "Ты не можешь начать чат с самим собой.",
+    "CHAT_MESSAGE_CONTENT_MISSING": "Сообщение должно содержать текст или файл.",
+    "CHAT_ROOM_PARTNER_IS_SELF": "Ты не можешь начать чат с самим собой.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "Комментарий должен содержать не менее {min} символов.",
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Уже есть учётная запись пользователя с этим адресом электронной почты.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Пожалуйста, введи действительный адрес электронной почты.",
@@ -471,8 +471,8 @@
     "ROLE_SAVE_NAME_INVALID": "Недопустимое название роли.",
     "USER_NOT_FOUND": "Пользователь не найден.",
     "USER_PROFILE_NAME_TOO_SHORT": "Имя должно содержать не менее {min} символов.",
-    "VIDEO_CALLS_DISABLED": "Видеозвонки не включены.",
-    "VIDEO_CALL_NOT_ALLOWED": "Ты не можешь начать видеозвонок в этой группе."
+    "VIDEO_CALL_FEATURE_DISABLED": "Видеозвонки не включены.",
+    "VIDEO_CALL_START_NOT_PERMITTED": "Ты не можешь начать видеозвонок в этой группе."
   },
   "chat": {
     "addGroupRoomHeadline": "Поиск группы для нового чата",

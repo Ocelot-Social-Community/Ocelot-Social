@@ -107,16 +107,8 @@ describe('Errors', () => {
     }
   })
 
-  // Moved over with their old names; each leaves this list once it is renamed.
-  const notYetRenamed = [
-    'CHAT_MESSAGE_EMPTY',
-    'CHAT_ROOM_WITH_SELF',
-    'VIDEO_CALL_NOT_ALLOWED',
-    'VIDEO_CALLS_DISABLED',
-  ]
-
   it('names every code <AREA>_<OBJECT>_<PROBLEM> in capitals', () => {
-    for (const name of Object.keys(Errors).filter((code) => !notYetRenamed.includes(code))) {
+    for (const name of Object.keys(Errors)) {
       const words = name.split('_')
 
       expect(words.length).toBeGreaterThanOrEqual(3)
@@ -124,12 +116,6 @@ describe('Errors', () => {
       for (const word of words) {
         expect(word).toMatch(/^[A-Z]+$/)
       }
-    }
-  })
-
-  it('lists only codes that still exist as not yet renamed', () => {
-    for (const name of notYetRenamed) {
-      expect(Object.keys(Errors)).toContain(name)
     }
   })
 })

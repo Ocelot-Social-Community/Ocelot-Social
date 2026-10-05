@@ -37,7 +37,7 @@ const httpUrlFor = (livekitUrl: string) =>
 // to have the secrets the RoomService below needs.
 const ensureEnabled = (enabled: boolean) => {
   if (!enabled) {
-    throw new AppError(Errors.VIDEO_CALLS_DISABLED)
+    throw new AppError(Errors.VIDEO_CALL_FEATURE_DISABLED)
   }
 }
 
@@ -217,7 +217,7 @@ export default {
       if (participantCount === 0) {
         const permission = openPermissionForGroupType(groupType)
         if (!permission || !context.effectivePermissions.has(permission)) {
-          throw new AppError(Errors.VIDEO_CALL_NOT_ALLOWED)
+          throw new AppError(Errors.VIDEO_CALL_START_NOT_PERMITTED)
         }
       }
       // LiveKit treats `identity` as a unique key in a room; two connections

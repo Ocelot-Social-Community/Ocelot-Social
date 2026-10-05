@@ -425,8 +425,8 @@
     "API_KEY_DOES_NOT_EXIST": "API Key не знайдено.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Ти можеш вибрати лише ті значки, які тобі було присуджено.",
     "CANNOT_REVIEW_OWN": "Ти не можеш ухвалювати рішення щодо скарги на себе або на свій власний вміст.",
-    "CHAT_MESSAGE_EMPTY": "Повідомлення має містити текст або файл.",
-    "CHAT_ROOM_WITH_SELF": "Ти не можеш почати чат із самим собою.",
+    "CHAT_MESSAGE_CONTENT_MISSING": "Повідомлення має містити текст або файл.",
+    "CHAT_ROOM_PARTNER_IS_SELF": "Ти не можеш почати чат із самим собою.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "Коментар має містити щонайменше {min} символів.",
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Обліковий запис з цією електронною адресою вже існує.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Будь ласка, введи дійсну електронну адресу.",
@@ -471,8 +471,8 @@
     "ROLE_SAVE_NAME_INVALID": "Недійсна назва ролі.",
     "USER_NOT_FOUND": "Користувача не знайдено.",
     "USER_PROFILE_NAME_TOO_SHORT": "Ім’я має містити щонайменше {min} символів.",
-    "VIDEO_CALLS_DISABLED": "Відеовиклики не увімкнено.",
-    "VIDEO_CALL_NOT_ALLOWED": "Ти не можеш почати відеовиклик у цій групі."
+    "VIDEO_CALL_FEATURE_DISABLED": "Відеовиклики не увімкнено.",
+    "VIDEO_CALL_START_NOT_PERMITTED": "Ти не можеш почати відеовиклик у цій групі."
   },
   "chat": {
     "addGroupRoomHeadline": "Пошук групи для нового чату",

@@ -425,8 +425,8 @@
     "API_KEY_DOES_NOT_EXIST": "L'API Key est introuvable.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Tu ne peux sélectionner que des badges qui t'ont été attribués.",
     "CANNOT_REVIEW_OWN": "Tu ne peux pas statuer sur un signalement te concernant ou concernant ton propre contenu.",
-    "CHAT_MESSAGE_EMPTY": "Le message doit contenir un texte ou un fichier.",
-    "CHAT_ROOM_WITH_SELF": "Tu ne peux pas démarrer un chat avec toi-même.",
+    "CHAT_MESSAGE_CONTENT_MISSING": "Le message doit contenir un texte ou un fichier.",
+    "CHAT_ROOM_PARTNER_IS_SELF": "Tu ne peux pas démarrer un chat avec toi-même.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "Le commentaire doit comporter au moins {min} caractères.",
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Il existe déjà un compte utilisateur avec cette adresse mail.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Saisis une adresse mail valide.",
@@ -471,8 +471,8 @@
     "ROLE_SAVE_NAME_INVALID": "Le nom du rôle n'est pas valide.",
     "USER_NOT_FOUND": "L'utilisateur est introuvable.",
     "USER_PROFILE_NAME_TOO_SHORT": "Le nom doit comporter au moins {min} caractères.",
-    "VIDEO_CALLS_DISABLED": "Les appels vidéo ne sont pas activés.",
-    "VIDEO_CALL_NOT_ALLOWED": "Tu n'as pas le droit de démarrer un appel vidéo dans ce groupe."
+    "VIDEO_CALL_FEATURE_DISABLED": "Les appels vidéo ne sont pas activés.",
+    "VIDEO_CALL_START_NOT_PERMITTED": "Tu n'as pas le droit de démarrer un appel vidéo dans ce groupe."
   },
   "chat": {
     "addGroupRoomHeadline": "Chercher un groupe pour un nouveau chat",

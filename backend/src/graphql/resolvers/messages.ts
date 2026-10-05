@@ -180,7 +180,7 @@ export default {
       } = context
 
       if (userId && userId === currentUserId) {
-        throw new AppError(Errors.CHAT_ROOM_WITH_SELF)
+        throw new AppError(Errors.CHAT_ROOM_PARTNER_IS_SELF)
       }
 
       if (!roomId && !userId) {
@@ -188,7 +188,7 @@ export default {
       }
 
       if (!content?.trim() && files.length === 0) {
-        throw new AppError(Errors.CHAT_MESSAGE_EMPTY)
+        throw new AppError(Errors.CHAT_MESSAGE_CONTENT_MISSING)
       }
 
       const session = context.driver.session()

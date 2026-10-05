@@ -425,8 +425,8 @@
     "API_KEY_DOES_NOT_EXIST": "L'API Key non è stata trovata.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Puoi selezionare solo i badge che ti sono stati assegnati.",
     "CANNOT_REVIEW_OWN": "Non puoi decidere su una segnalazione che riguarda te o i tuoi contenuti.",
-    "CHAT_MESSAGE_EMPTY": "Il messaggio deve contenere un testo o un file.",
-    "CHAT_ROOM_WITH_SELF": "Non puoi avviare una chat con te stesso.",
+    "CHAT_MESSAGE_CONTENT_MISSING": "Il messaggio deve contenere un testo o un file.",
+    "CHAT_ROOM_PARTNER_IS_SELF": "Non puoi avviare una chat con te stesso.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "Il commento deve contenere almeno {min} caratteri.",
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Esiste già un account utente con questo indirizzo e-mail.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Inserisci un indirizzo e-mail valido.",
@@ -471,8 +471,8 @@
     "ROLE_SAVE_NAME_INVALID": "Il nome del ruolo non è valido.",
     "USER_NOT_FOUND": "L'utente non è stato trovato.",
     "USER_PROFILE_NAME_TOO_SHORT": "Il nome deve contenere almeno {min} caratteri.",
-    "VIDEO_CALLS_DISABLED": "Le videochiamate non sono attivate.",
-    "VIDEO_CALL_NOT_ALLOWED": "Non puoi avviare una videochiamata in questo gruppo."
+    "VIDEO_CALL_FEATURE_DISABLED": "Le videochiamate non sono attivate.",
+    "VIDEO_CALL_START_NOT_PERMITTED": "Non puoi avviare una videochiamata in questo gruppo."
   },
   "chat": {
     "addGroupRoomHeadline": "Cerca gruppo per nuova chat",

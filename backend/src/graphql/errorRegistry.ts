@@ -140,13 +140,19 @@ const definitions = {
     text: 'Maximum of {max} active API keys reached',
   },
   // chat & video calls
-  CHAT_MESSAGE_EMPTY: { type: 'BAD_USER_INPUT', text: 'Message must have content or files' },
-  CHAT_ROOM_WITH_SELF: { type: 'BAD_USER_INPUT', text: 'Cannot create a room with self' },
-  VIDEO_CALL_NOT_ALLOWED: {
+  CHAT_MESSAGE_CONTENT_MISSING: {
+    type: 'BAD_USER_INPUT',
+    text: 'Message must have content or files',
+  },
+  CHAT_ROOM_PARTNER_IS_SELF: {
+    type: 'BAD_USER_INPUT',
+    text: 'You cannot create a chat with yourself.',
+  },
+  VIDEO_CALL_START_NOT_PERMITTED: {
     type: 'FORBIDDEN',
     text: 'You may not start a video call in this group.',
   },
-  VIDEO_CALLS_DISABLED: { type: 'FORBIDDEN', text: 'Video calls are disabled.' },
+  VIDEO_CALL_FEATURE_DISABLED: { type: 'FORBIDDEN', text: 'Video calls are disabled.' },
 } as const satisfies Record<string, ErrorDefinition>
 
 export type ErrorName = keyof typeof definitions

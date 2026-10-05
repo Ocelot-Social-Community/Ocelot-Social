@@ -425,8 +425,8 @@
     "API_KEY_DOES_NOT_EXIST": "API Key nuk u gjet.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Mund të zgjedhësh vetëm emblema që të janë dhënë ty.",
     "CANNOT_REVIEW_OWN": "Nuk mund të vendosësh për një raportim për veten ose për përmbajtjen tënde.",
-    "CHAT_MESSAGE_EMPTY": "Mesazhi ka nevojë për një tekst ose një skedar.",
-    "CHAT_ROOM_WITH_SELF": "Nuk mund të nisësh një bisedë me veten.",
+    "CHAT_MESSAGE_CONTENT_MISSING": "Mesazhi ka nevojë për një tekst ose një skedar.",
+    "CHAT_ROOM_PARTNER_IS_SELF": "Nuk mund të nisësh një bisedë me veten.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "Komenti duhet të ketë të paktën {min} karaktere.",
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Ekziston tashmë një llogari përdoruesi me këtë adresë e-maili.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Fut një adresë e-maili të vlefshme.",
@@ -471,8 +471,8 @@
     "ROLE_SAVE_NAME_INVALID": "Emri i rolit është i pavlefshëm.",
     "USER_NOT_FOUND": "Përdoruesi nuk u gjet.",
     "USER_PROFILE_NAME_TOO_SHORT": "Emri duhet të ketë të paktën {min} karaktere.",
-    "VIDEO_CALLS_DISABLED": "Telefonatat me video nuk janë aktivizuar.",
-    "VIDEO_CALL_NOT_ALLOWED": "Nuk mund të nisësh një telefonatë me video në këtë grup."
+    "VIDEO_CALL_FEATURE_DISABLED": "Telefonatat me video nuk janë aktivizuar.",
+    "VIDEO_CALL_START_NOT_PERMITTED": "Nuk mund të nisësh një telefonatë me video në këtë grup."
   },
   "chat": {
     "addGroupRoomHeadline": "Kërko grup për bisedë të re",

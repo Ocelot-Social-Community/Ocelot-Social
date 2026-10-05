@@ -425,8 +425,8 @@
     "API_KEY_DOES_NOT_EXIST": "De API Key is niet gevonden.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Je kunt alleen badges kiezen die aan jou zijn toegekend.",
     "CANNOT_REVIEW_OWN": "Je kunt niet beslissen over een melding over jezelf of je eigen inhoud.",
-    "CHAT_MESSAGE_EMPTY": "Het bericht heeft een tekst of een bestand nodig.",
-    "CHAT_ROOM_WITH_SELF": "Je kunt geen chat met jezelf starten.",
+    "CHAT_MESSAGE_CONTENT_MISSING": "Het bericht heeft een tekst of een bestand nodig.",
+    "CHAT_ROOM_PARTNER_IS_SELF": "Je kunt geen chat met jezelf starten.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "De reactie moet minimaal {min} tekens lang zijn.",
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Er bestaat al een gebruikersaccount met dit e-mailadres.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Voer een geldig e-mailadres in.",
@@ -471,8 +471,8 @@
     "ROLE_SAVE_NAME_INVALID": "De rolnaam is ongeldig.",
     "USER_NOT_FOUND": "De gebruiker is niet gevonden.",
     "USER_PROFILE_NAME_TOO_SHORT": "De naam moet minimaal {min} tekens lang zijn.",
-    "VIDEO_CALLS_DISABLED": "Videogesprekken zijn niet ingeschakeld.",
-    "VIDEO_CALL_NOT_ALLOWED": "Je mag in deze groep geen videogesprek starten."
+    "VIDEO_CALL_FEATURE_DISABLED": "Videogesprekken zijn niet ingeschakeld.",
+    "VIDEO_CALL_START_NOT_PERMITTED": "Je mag in deze groep geen videogesprek starten."
   },
   "chat": {
     "addGroupRoomHeadline": "Zoek groep voor nieuwe chat",

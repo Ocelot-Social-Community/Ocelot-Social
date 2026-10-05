@@ -425,8 +425,8 @@
     "API_KEY_DOES_NOT_EXIST": "The API key could not be found.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "You can only select badges that have been awarded to you.",
     "CANNOT_REVIEW_OWN": "You cannot decide on a report about yourself or your own content.",
-    "CHAT_MESSAGE_EMPTY": "The message needs a text or a file.",
-    "CHAT_ROOM_WITH_SELF": "You cannot start a chat with yourself.",
+    "CHAT_MESSAGE_CONTENT_MISSING": "The message needs a text or a file.",
+    "CHAT_ROOM_PARTNER_IS_SELF": "You cannot start a chat with yourself.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "The comment must be at least {min} characters long.",
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "A user account with this email address already exists.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Please enter a valid email address.",
@@ -471,8 +471,8 @@
     "ROLE_SAVE_NAME_INVALID": "The role name is invalid.",
     "USER_NOT_FOUND": "The user could not be found.",
     "USER_PROFILE_NAME_TOO_SHORT": "The name must be at least {min} characters long.",
-    "VIDEO_CALLS_DISABLED": "Video calls are not enabled.",
-    "VIDEO_CALL_NOT_ALLOWED": "You may not start a video call in this group."
+    "VIDEO_CALL_FEATURE_DISABLED": "Video calls are not enabled.",
+    "VIDEO_CALL_START_NOT_PERMITTED": "You may not start a video call in this group."
   },
   "chat": {
     "addGroupRoomHeadline": "Search group for new chat",

@@ -952,7 +952,7 @@ describe('Message', () => {
       })
 
       expect(result.errors).toBeDefined()
-      expect(result.errors?.[0].message).toContain('Cannot create a room with self')
+      expect(result.errors?.[0].message).toContain('You cannot create a chat with yourself.')
     })
 
     it('rejects missing roomId and userId', async () => {
