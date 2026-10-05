@@ -4,8 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import bcrypt from 'bcryptjs'
 
-import { ErrorCode } from '@graphql/errorCodes'
-import { AuthenticationError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError } from '@graphql/errors'
 import { encode } from '@jwt/encode'
 
 import normalizeEmail from './helpers/normalizeEmail'
@@ -58,13 +58,9 @@ export default {
           delete currentUser.encryptedPassword
           return encode(context)(currentUser)
         } else if (currentUser?.disabled) {
-          throw new AuthenticationError('Your account has been disabled.', {
-            code: ErrorCode.ACCOUNT_DISABLED,
-          })
+          throw new AppError(Errors.LOGIN_ACCOUNT_DISABLED)
         } else {
-          throw new AuthenticationError('Incorrect email address or password.', {
-            code: ErrorCode.INVALID_CREDENTIALS,
-          })
+          throw new AppError(Errors.LOGIN_CREDENTIALS_INCORRECT)
         }
       } finally {
         await session.close()
@@ -81,21 +77,15 @@ export default {
       })
       const encryptedPassword = stored.records[0]?.get('encryptedPassword') as string | undefined
       if (!encryptedPassword) {
-        throw new AuthenticationError('Old password is not correct', {
-          code: ErrorCode.OLD_PASSWORD_INCORRECT,
-        })
+        throw new AppError(Errors.PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT)
       }
 
       if (!(await bcrypt.compare(oldPassword, encryptedPassword))) {
-        throw new AuthenticationError('Old password is not correct', {
-          code: ErrorCode.OLD_PASSWORD_INCORRECT,
-        })
+        throw new AppError(Errors.PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT)
       }
 
       if (await bcrypt.compare(newPassword, encryptedPassword)) {
-        throw new AuthenticationError('Old password and new password should be different', {
-          code: ErrorCode.PASSWORD_UNCHANGED,
-        })
+        throw new AppError(Errors.PASSWORD_CHANGE_NEW_PASSWORD_EQUALS_OLD)
       }
 
       const newEncryptedPassword = await bcrypt.hash(newPassword, 10)

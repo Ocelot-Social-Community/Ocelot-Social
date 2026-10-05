@@ -1,5 +1,6 @@
 import { ErrorCode } from '@graphql/errorCodes'
-import { ForbiddenError, UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError, ForbiddenError, UserInputError } from '@graphql/errors'
 import {
   blockingGateFor,
   groupFor,
@@ -143,13 +144,10 @@ export default {
       context: Context,
     ) => {
       if (!ROLE_NAME_RE.test(args.name)) {
-        throw new UserInputError('Invalid role name.', { code: ErrorCode.ROLE_NAME_INVALID })
+        throw new AppError(Errors.ROLE_NAME_INVALID)
       }
       if (context.role.getRole(args.name)) {
-        throw new UserInputError(`Role '${args.name}' already exists.`, {
-          code: ErrorCode.ROLE_ALREADY_EXISTS,
-          params: { name: args.name },
-        })
+        throw new AppError(Errors.ROLE_ALREADY_EXISTS, { name: args.name })
       }
       try {
         const def = await context.role.upsertRole(
@@ -176,10 +174,7 @@ export default {
       context: Context,
     ) => {
       if (!context.role.getRole(args.name)) {
-        throw new UserInputError(`Unknown role: ${args.name}`, {
-          code: ErrorCode.ROLE_UNKNOWN,
-          params: { name: args.name },
-        })
+        throw new AppError(Errors.ROLE_UNKNOWN, { name: args.name })
       }
       try {
         const def = await context.role.upsertRole(
@@ -207,19 +202,13 @@ export default {
       context: Context,
     ) => {
       if (!ROLE_NAME_RE.test(newName)) {
-        throw new UserInputError('Invalid role name.', { code: ErrorCode.ROLE_NAME_INVALID })
+        throw new AppError(Errors.ROLE_NAME_INVALID)
       }
       if (!context.role.getRole(name)) {
-        throw new UserInputError(`Unknown role: ${name}`, {
-          code: ErrorCode.ROLE_UNKNOWN,
-          params: { name },
-        })
+        throw new AppError(Errors.ROLE_UNKNOWN, { name })
       }
       if (name !== newName && context.role.getRole(newName)) {
-        throw new UserInputError(`Role '${newName}' already exists.`, {
-          code: ErrorCode.ROLE_ALREADY_EXISTS,
-          params: { name: newName },
-        })
+        throw new AppError(Errors.ROLE_ALREADY_EXISTS, { name: newName })
       }
       try {
         const def = await context.role.renameRole(name, newName, context.user?.id ?? 'unknown')
@@ -236,10 +225,7 @@ export default {
         // `newName` between our getRole(newName) snapshot and the write. Surface the same
         // stable conflict as the pre-check, not a raw driver error.
         if (isRoleNameConflict(err)) {
-          throw new UserInputError(`Role '${newName}' already exists.`, {
-            code: ErrorCode.ROLE_ALREADY_EXISTS,
-            params: { name: newName },
-          })
+          throw new AppError(Errors.ROLE_ALREADY_EXISTS, { name: newName })
         }
         throw err
       }
@@ -267,10 +253,7 @@ export default {
       context: Context,
     ) => {
       if (!context.role.getRole(roleName)) {
-        throw new UserInputError(`Unknown role: ${roleName}`, {
-          code: ErrorCode.ROLE_UNKNOWN,
-          params: { name: roleName },
-        })
+        throw new AppError(Errors.ROLE_UNKNOWN, { name: roleName })
       }
       // Owner status is owner-controlled. Look up whether the target is currently an
       // owner and how many owners exist.
@@ -288,13 +271,11 @@ export default {
       // role.manage admin manages non-owner roles only (no escalating to owner, no
       // demoting an owner).
       if ((roleName === OWNER_ROLE || targetIsOwner) && !actorIsOwner(context)) {
-        throw new ForbiddenError('Only an owner may assign or change the owner role.', {
-          code: ErrorCode.OWNER_ROLE_OWNER_ONLY,
-        })
+        throw new AppError(Errors.OWNER_ROLE_OWNER_ONLY)
       }
       // Never demote the last owner — keep the instance failsafe.
       if (targetIsOwner && roleName !== OWNER_ROLE && ownerCount <= 1) {
-        throw new ForbiddenError('Cannot remove the last owner.', { code: ErrorCode.LAST_OWNER })
+        throw new AppError(Errors.LAST_OWNER)
       }
       // Replace the user's single HAS_ROLE edge.
       const result = await context.database.write({

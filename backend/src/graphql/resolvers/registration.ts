@@ -7,8 +7,8 @@ import { hash } from 'bcryptjs'
 
 import { EmailAddress } from '@db/schema/entities/EmailAddress'
 import { validateProperties } from '@db/schema/validate'
-import { ErrorCode } from '@graphql/errorCodes'
-import { UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError, UserInputError } from '@graphql/errors'
 
 import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'
@@ -119,9 +119,7 @@ export default {
         const [record] = createUserTransactionResponse.records
         const user = record?.get('user')
         if (!user) {
-          throw new UserInputError('Invalid email or nonce', {
-            code: ErrorCode.EMAIL_NONCE_INVALID,
-          })
+          throw new AppError(Errors.REGISTRATION_CONFIRMATION_CODE_INVALID)
         }
         // The single-role model requires exactly one HAS_ROLE edge. If the baseline
         // 'user' role node is not seeded, fail hard (rolls back this transaction)
@@ -149,13 +147,11 @@ export default {
         return user
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
-          throw new UserInputError('User with this slug already exists!', {
-            code: ErrorCode.USER_SLUG_TAKEN,
-          })
+          throw new AppError(Errors.REGISTRATION_USER_SLUG_ALREADY_TAKEN)
         }
         // Already a coded input error (e.g. an invalid nonce from the transaction above): keep it,
         // re-wrapping would drop its errorCode.
-        if (e instanceof UserInputError) {
+        if (e instanceof AppError || e instanceof UserInputError) {
           throw e
         }
         throw new UserInputError(e.message)

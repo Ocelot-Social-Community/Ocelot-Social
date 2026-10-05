@@ -8,7 +8,8 @@
 import { v4 as uuid } from 'uuid'
 
 import { ErrorCode } from '@graphql/errorCodes'
-import { ForbiddenError, UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError, UserInputError } from '@graphql/errors'
 
 import { runBatch } from './helpers/batch'
 import cypherFields, { unwrap } from './helpers/cypherField'
@@ -384,9 +385,7 @@ export default {
         return post
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
-          throw new UserInputError('Post with this slug already exists!', {
-            code: ErrorCode.POST_SLUG_TAKEN,
-          })
+          throw new AppError(Errors.POST_SAVE_SLUG_ALREADY_TAKEN)
         }
         throw e
       } finally {
@@ -464,9 +463,7 @@ export default {
         return post
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
-          throw new UserInputError('Post with this slug already exists!', {
-            code: ErrorCode.POST_SLUG_TAKEN,
-          })
+          throw new AppError(Errors.POST_SAVE_SLUG_ALREADY_TAKEN)
         }
         throw e
       } finally {
@@ -562,9 +559,7 @@ export default {
       const { policy } = context
       const maxPinnedPosts = policy.get('maxPinnedPosts')
       if (maxPinnedPosts === 0) {
-        throw new ForbiddenError('Pinned posts are not allowed!', {
-          code: ErrorCode.PINNED_POSTS_DISABLED,
-        })
+        throw new AppError(Errors.POST_PIN_FEATURE_DISABLED)
       }
       let pinnedPostWithNestedAttributes
       const { driver, user } = context
@@ -673,9 +668,7 @@ export default {
       const maxGroupPinnedPosts = policy.get('maxGroupPinnedPosts')
 
       if (maxGroupPinnedPosts === 0) {
-        throw new ForbiddenError('Pinned posts are not allowed!', {
-          code: ErrorCode.PINNED_POSTS_DISABLED,
-        })
+        throw new AppError(Errors.POST_PIN_FEATURE_DISABLED)
       }
 
       // If maxGroupPinnedPosts === 1 -> Delete old pin

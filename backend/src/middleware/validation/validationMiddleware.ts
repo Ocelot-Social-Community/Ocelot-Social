@@ -5,7 +5,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ErrorCode } from '@graphql/errorCodes'
-import { UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError, UserInputError } from '@graphql/errors'
 
 import type { IMiddlewareResolver } from 'graphql-middleware/types'
 
@@ -17,10 +18,7 @@ const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, c
   const { postId } = args
 
   if (!args.content || content.length < COMMENT_MIN_LENGTH) {
-    throw new UserInputError(`Comment must be at least ${COMMENT_MIN_LENGTH} character long!`, {
-      code: ErrorCode.COMMENT_TOO_SHORT,
-      params: { min: COMMENT_MIN_LENGTH },
-    })
+    throw new AppError(Errors.COMMENT_SAVE_CONTENT_TOO_SHORT, { min: COMMENT_MIN_LENGTH })
   }
   const session = context.driver.session()
   try {
@@ -50,10 +48,7 @@ const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, c
 const validateUpdateComment: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const content = args.content.replace(/<(?:.|\n)*?>/gm, '').trim()
   if (!args.content || content.length < COMMENT_MIN_LENGTH) {
-    throw new UserInputError(`Comment must be at least ${COMMENT_MIN_LENGTH} character long!`, {
-      code: ErrorCode.COMMENT_TOO_SHORT,
-      params: { min: COMMENT_MIN_LENGTH },
-    })
+    throw new AppError(Errors.COMMENT_SAVE_CONTENT_TOO_SHORT, { min: COMMENT_MIN_LENGTH })
   }
 
   return resolve(root, args, context, info)
@@ -61,9 +56,28 @@ const validateUpdateComment: IMiddlewareResolver = async (resolve, root, args, c
 
 const validateReport: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const { resourceId } = args
-  const { user } = context
+  const { user, driver } = context
   if (resourceId === user.id) {
-    throw new UserInputError('You cannot report yourself!', { code: ErrorCode.CANNOT_REPORT_SELF })
+    throw new AppError(Errors.REPORT_TARGET_IS_OWN)
+  }
+  // Nor their own posts and comments. The webapp hides "Report" on them, the API refuses them too.
+  const session = driver.session()
+  try {
+    const result = await session.readTransaction((transaction) =>
+      transaction.run(
+        `
+          OPTIONAL MATCH (:User {id: $userId})-[:WROTE]->(resource {id: $resourceId})
+          WHERE resource:Post OR resource:Comment
+          RETURN resource IS NOT NULL AS isOwn
+        `,
+        { userId: user.id, resourceId },
+      ),
+    )
+    if (result.records[0]?.get('isOwn')) {
+      throw new AppError(Errors.REPORT_TARGET_IS_OWN)
+    }
+  } finally {
+    await session.close()
   }
   return resolve(root, args, context, info)
 }
@@ -145,10 +159,7 @@ export const validateNotifyUsers = async (label: string, reason: string): Promis
 const validateUpdateUser: IMiddlewareResolver = async (resolve, root, params, context, info) => {
   const { name } = params
   if (typeof name === 'string' && name.trim().length < USERNAME_MIN_LENGTH) {
-    throw new UserInputError(`Username must be at least ${USERNAME_MIN_LENGTH} character long!`, {
-      code: ErrorCode.USERNAME_TOO_SHORT,
-      params: { min: USERNAME_MIN_LENGTH },
-    })
+    throw new AppError(Errors.USER_PROFILE_NAME_TOO_SHORT, { min: USERNAME_MIN_LENGTH })
   }
   return resolve(root, params, context, info)
 }

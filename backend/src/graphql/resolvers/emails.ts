@@ -5,7 +5,8 @@
 import { UnverifiedEmailAddress } from '@db/schema/entities/UnverifiedEmailAddress'
 import { validateProperty } from '@db/schema/validate'
 import { ErrorCode } from '@graphql/errorCodes'
-import { UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError, UserInputError } from '@graphql/errors'
 
 import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'
@@ -38,7 +39,7 @@ export default {
       // Was neode's Joi validator, called for its throw and nothing else. Only the address is
       // checked here — the node is written further down, with its own nonce and timestamp.
       if (validateProperty(UnverifiedEmailAddress, 'email', args.email)) {
-        throw new UserInputError('must be a valid email', { code: ErrorCode.EMAIL_INVALID })
+        throw new AppError(Errors.EMAIL_CHANGE_ADDRESS_INVALID)
       }
 
       // check email does not belong to anybody
@@ -109,18 +110,14 @@ export default {
         response = txResult[0]
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
-          throw new UserInputError('A user account with this email already exists.', {
-            code: ErrorCode.EMAIL_ALREADY_EXISTS,
-          })
+          throw new AppError(Errors.EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE)
         }
         throw e
       } finally {
         await session.close()
       }
       if (!response) {
-        throw new UserInputError('Invalid nonce or no email address found.', {
-          code: ErrorCode.EMAIL_NONCE_INVALID,
-        })
+        throw new AppError(Errors.EMAIL_CHANGE_CONFIRMATION_CODE_INVALID)
       }
       return response
     },

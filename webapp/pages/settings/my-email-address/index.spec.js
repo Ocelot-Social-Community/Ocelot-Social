@@ -106,7 +106,7 @@ describe('EmailSettingsIndexPage', () => {
           beforeEach(() => {
             mocks.$apollo.mutate = jest.fn().mockRejectedValue({
               message: 'GraphQL error: A user account with this email already exists.',
-              graphQLErrors: [{ extensions: { errorCode: 'EMAIL_ALREADY_EXISTS' } }],
+              graphQLErrors: [{ extensions: { errorCode: 'EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE' } }],
             })
             wrapper = Wrapper()
             wrapper.find('#email').setValue('already-taken@example.org')

@@ -71,7 +71,9 @@ describe('LoginForm', () => {
         }
 
         it('shows the generic failure for wrong credentials', async () => {
-          const cause = { graphQLErrors: [{ extensions: { errorCode: 'INVALID_CREDENTIALS' } }] }
+          const cause = {
+            graphQLErrors: [{ extensions: { errorCode: 'LOGIN_CREDENTIALS_INCORRECT' } }],
+          }
           await fillIn(failWith(new Error('GraphQL error: Incorrect', { cause })))
           await Vue.nextTick()
           expect(mocks.$toast.error).toHaveBeenCalledWith('login.failure')
@@ -80,7 +82,7 @@ describe('LoginForm', () => {
         it('shows why for a disabled account', async () => {
           const cause = {
             message: 'GraphQL error: Your account has been disabled.',
-            graphQLErrors: [{ extensions: { errorCode: 'ACCOUNT_DISABLED' } }],
+            graphQLErrors: [{ extensions: { errorCode: 'LOGIN_ACCOUNT_DISABLED' } }],
           }
           await fillIn(failWith(new Error('GraphQL error: disabled', { cause })))
           await Vue.nextTick()

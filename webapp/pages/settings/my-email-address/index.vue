@@ -119,7 +119,7 @@ export default {
           })
         }, 3000)
       } catch (err) {
-        if (backendErrorCode(err) === 'EMAIL_ALREADY_EXISTS') {
+        if (backendErrorCode(err) === 'EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE') {
           // We cannot use form validation errors here, the backend does not
           // have a query to filter for email addresses. This is a privacy
           // consideration. We could implement a dedicated query to check that

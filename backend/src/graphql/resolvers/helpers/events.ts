@@ -4,7 +4,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { ErrorCode } from '@graphql/errorCodes'
-import { UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError, UserInputError } from '@graphql/errors'
+
+// Same limits as the event form in the webapp (ContributionForm.vue). Every event needs a venue
+// description, with or without an address.
+const EVENT_VENUE_MIN_LENGTH = 3
+const EVENT_VENUE_MAX_LENGTH = 100
 
 export const validateEventParams = (params) => {
   let locationName: string | null | undefined
@@ -26,9 +32,14 @@ export const validateEventParams = (params) => {
       params.eventEnd = null
     }
 
-    if (eventInput.eventLocationName && !eventInput.eventVenue) {
-      throw new UserInputError('Event venue must be present if event location is given!', {
-        code: ErrorCode.EVENT_VENUE_REQUIRED,
+    const venue = typeof eventInput.eventVenue === 'string' ? eventInput.eventVenue.trim() : ''
+    if (!venue) {
+      throw new AppError(Errors.POST_EVENT_VENUE_REQUIRED)
+    }
+    if (venue.length < EVENT_VENUE_MIN_LENGTH || venue.length > EVENT_VENUE_MAX_LENGTH) {
+      throw new AppError(Errors.POST_EVENT_VENUE_LENGTH_INVALID, {
+        min: EVENT_VENUE_MIN_LENGTH,
+        max: EVENT_VENUE_MAX_LENGTH,
       })
     }
     params.eventVenue = eventInput.eventVenue
@@ -109,8 +120,6 @@ const validateEventEnd = (start, end) => {
   }
   const startDate = new Date(start)
   if (endDate < startDate) {
-    throw new UserInputError('Event end date must be a after event start date!', {
-      code: ErrorCode.EVENT_END_BEFORE_START,
-    })
+    throw new AppError(Errors.POST_EVENT_END_BEFORE_START)
   }
 }

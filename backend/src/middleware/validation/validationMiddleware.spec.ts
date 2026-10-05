@@ -194,6 +194,11 @@ describe('validateCreateComment', () => {
 })
 
 describe('validateReport', () => {
+  const ownTargetError = {
+    message: 'You cannot report yourself or your own content!',
+    extensions: { errorCode: 'REPORT_TARGET_IS_OWN' },
+  }
+
   it('throws an error if a user tries to report themself', async () => {
     authenticatedUser = await reportingUser.toJson()
     reportVariables = { ...reportVariables, resourceId: 'reporting-user' }
@@ -202,7 +207,48 @@ describe('validateReport', () => {
       mutate({ mutation: fileReport, variables: reportVariables }),
     ).resolves.toMatchObject({
       data: { fileReport: null },
-      errors: [{ message: 'You cannot report yourself!' }],
+      errors: [ownTargetError],
+    })
+  })
+
+  it('throws an error if a user tries to report their own post', async () => {
+    authenticatedUser = await commentingUser.toJson()
+    reportVariables = { ...reportVariables, resourceId: 'post-4-commenting' }
+
+    await expect(
+      mutate({ mutation: fileReport, variables: reportVariables }),
+    ).resolves.toMatchObject({
+      data: { fileReport: null },
+      errors: [ownTargetError],
+    })
+  })
+
+  it('throws an error if a user tries to report their own comment', async () => {
+    await Factory.build(
+      'comment',
+      { id: 'own-comment' },
+      { postId: 'offensive-post', authorId: 'commenting-user' },
+    )
+    authenticatedUser = await commentingUser.toJson()
+    reportVariables = { ...reportVariables, resourceId: 'own-comment' }
+
+    await expect(
+      mutate({ mutation: fileReport, variables: reportVariables }),
+    ).resolves.toMatchObject({
+      data: { fileReport: null },
+      errors: [ownTargetError],
+    })
+  })
+
+  it("lets a user report somebody else's post", async () => {
+    authenticatedUser = await reportingUser.toJson()
+    reportVariables = { ...reportVariables, resourceId: 'offensive-post' }
+
+    await expect(
+      mutate({ mutation: fileReport, variables: reportVariables }),
+    ).resolves.toMatchObject({
+      data: { fileReport: { reportId: expect.any(String) } },
+      errors: undefined,
     })
   })
 })

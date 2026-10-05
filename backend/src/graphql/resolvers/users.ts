@@ -10,7 +10,8 @@
 /* eslint-disable security/detect-object-injection */
 import { GROUP_MEMBERSHIP_VISIBILITY_CHANGED } from '@constants/subscriptions'
 import { ErrorCode } from '@graphql/errorCodes'
-import { ForbiddenError, UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError, ForbiddenError, UserInputError } from '@graphql/errors'
 import { branding } from '@src/branding'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
@@ -611,9 +612,7 @@ export default {
           return result.records.map((record) => record.get('user'))[0]
         })
         if (!user) {
-          throw new UserInputError('You cannot set badges not rewarded to you.', {
-            code: ErrorCode.BADGE_NOT_REWARDED,
-          })
+          throw new AppError(Errors.BADGE_SELECTION_BADGE_NOT_REWARDED)
         }
         return user
       } finally {

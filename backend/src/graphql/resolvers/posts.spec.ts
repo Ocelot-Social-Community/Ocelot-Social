@@ -291,7 +291,7 @@ describe('Post', () => {
             content: 'Some content',
             categoryIds,
             postType: 'Event',
-            eventInput,
+            eventInput: { eventVenue: 'Brandenburger Tor', ...eventInput },
           },
         })
       }
@@ -580,6 +580,7 @@ describe('CreatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() - 1).toISOString(),
+                  eventVenue: 'Brandenburger Tor',
                 },
               },
             }),
@@ -662,7 +663,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event end date must be a after event start date!',
+                message: 'The end date must be after the start date.',
               },
             ],
           })
@@ -682,6 +683,7 @@ describe('CreatePost', () => {
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
                   eventEnd: new Date(now.getFullYear(), now.getMonth() + 2).toISOString(),
+                  eventVenue: 'Brandenburger Tor',
                 },
               },
             }),
@@ -712,6 +714,7 @@ describe('CreatePost', () => {
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
                   eventIsOnline: true,
+                  eventVenue: 'Brandenburger Tor',
                 },
               },
             }),
@@ -747,7 +750,83 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event venue must be present if event location is given!',
+                message: 'Event venue must be present!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('event venue is missing without an event location', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [{ message: 'Event venue must be present!' }],
+          })
+        })
+      })
+
+      describe('event venue is only whitespace', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventVenue: '   ',
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [{ message: 'Event venue must be present!' }],
+          })
+        })
+      })
+
+      describe.each([
+        ['too short', 'ab'],
+        ['too long', 'x'.repeat(101)],
+      ])('event venue is %s', (_, eventVenue) => {
+        it('throws an error with the allowed length', async () => {
+          const now = new Date()
+
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventVenue,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event venue must be between 3 and 100 characters long!',
+                extensions: {
+                  errorCode: 'POST_EVENT_VENUE_LENGTH_INVALID',
+                  params: { min: 3, max: 100 },
+                },
               },
             ],
           })
@@ -848,6 +927,7 @@ describe('CreatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventVenue: 'Brandenburger Tor',
                 },
               },
             }),
@@ -1163,6 +1243,7 @@ describe('UpdatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() - 1).toISOString(),
+                  eventVenue: 'Brandenburger Tor',
                 },
               },
             }),
@@ -1192,7 +1273,7 @@ describe('UpdatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event venue must be present if event location is given!',
+                message: 'Event venue must be present!',
               },
             ],
           })
@@ -1211,6 +1292,7 @@ describe('UpdatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventVenue: 'Brandenburger Tor',
                 },
               },
             }),

@@ -1,66 +1,28 @@
-// Stable, machine-readable codes for errors a user can trigger through the webapp. The English
-// `message` of an error stays for logs and API clients; the webapp translates by this code instead,
-// from the `backendErrors.<CODE>` key in webapp/locales/*.json. A code is therefore a contract:
-// rename one only together with its locale keys (scripts/translations/backend-error-codes.sh checks
-// that every code here has an English translation).
+// TRANSITIONAL — errorRegistry.ts is the single source of truth for user-facing errors. What is
+// left here are the codes still thrown with more than one text or error class, so they do not fit
+// one registry entry yet. Each moves there once its text and type are decided; then this file goes.
 //
 // Errors without a code (developer-facing input like filter syntax or paging arguments, and every
 // internal failure) are shown by the webapp with the generic message for their `extensions.code`.
 export const ErrorCode = {
   // authentication & account
-  ACCOUNT_DISABLED: 'ACCOUNT_DISABLED',
-  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
   NOT_AUTHORIZED: 'NOT_AUTHORIZED',
-  OLD_PASSWORD_INCORRECT: 'OLD_PASSWORD_INCORRECT',
-  PASSWORD_UNCHANGED: 'PASSWORD_UNCHANGED',
   // e-mail & registration
-  EMAIL_ALREADY_EXISTS: 'EMAIL_ALREADY_EXISTS',
-  EMAIL_INVALID: 'EMAIL_INVALID',
-  EMAIL_NONCE_INVALID: 'EMAIL_NONCE_INVALID',
-  USER_SLUG_TAKEN: 'USER_SLUG_TAKEN',
-  USERNAME_TOO_SHORT: 'USERNAME_TOO_SHORT',
   // users & badges
-  BADGE_NOT_REWARDED: 'BADGE_NOT_REWARDED',
   USER_NOT_FOUND: 'USER_NOT_FOUND',
   // groups
-  GROUP_DESCRIPTION_TOO_SHORT: 'GROUP_DESCRIPTION_TOO_SHORT',
-  GROUP_NOT_FOUND: 'GROUP_NOT_FOUND',
-  GROUP_SLUG_TAKEN: 'GROUP_SLUG_TAKEN',
-  GROUP_TOO_FEW_CATEGORIES: 'GROUP_TOO_FEW_CATEGORIES',
-  GROUP_TOO_MANY_CATEGORIES: 'GROUP_TOO_MANY_CATEGORIES',
   NOT_GROUP_MEMBER: 'NOT_GROUP_MEMBER',
-  USER_NOT_GROUP_MEMBER: 'USER_NOT_GROUP_MEMBER',
   // posts, comments & events
-  COMMENT_TOO_SHORT: 'COMMENT_TOO_SHORT',
   EVENT_DATE_INVALID: 'EVENT_DATE_INVALID',
-  EVENT_END_BEFORE_START: 'EVENT_END_BEFORE_START',
-  EVENT_VENUE_REQUIRED: 'EVENT_VENUE_REQUIRED',
   LOCATION_INVALID: 'LOCATION_INVALID',
   MAX_PINNED_POSTS_REACHED: 'MAX_PINNED_POSTS_REACHED',
-  PINNED_POSTS_DISABLED: 'PINNED_POSTS_DISABLED',
   POST_NOT_FOUND: 'POST_NOT_FOUND',
-  POST_SLUG_TAKEN: 'POST_SLUG_TAKEN',
   // moderation
-  CANNOT_REPORT_SELF: 'CANNOT_REPORT_SELF',
   CANNOT_REVIEW_OWN: 'CANNOT_REVIEW_OWN',
   // roles
-  LAST_OWNER: 'LAST_OWNER',
-  OWNER_ROLE_OWNER_ONLY: 'OWNER_ROLE_OWNER_ONLY',
-  ROLE_ALREADY_EXISTS: 'ROLE_ALREADY_EXISTS',
   ROLE_CHANGE_NOT_ALLOWED: 'ROLE_CHANGE_NOT_ALLOWED',
-  ROLE_NAME_INVALID: 'ROLE_NAME_INVALID',
-  ROLE_UNKNOWN: 'ROLE_UNKNOWN',
-  // invite codes & API keys
-  API_KEY_EXPIRY_INVALID: 'API_KEY_EXPIRY_INVALID',
-  API_KEY_NOT_FOUND: 'API_KEY_NOT_FOUND',
-  API_KEYS_DISABLED: 'API_KEYS_DISABLED',
-  API_KEYS_LIMIT_REACHED: 'API_KEYS_LIMIT_REACHED',
+  // invite codes
   INVITE_CODES_LIMIT_REACHED: 'INVITE_CODES_LIMIT_REACHED',
-  // chat & video calls
-  CHAT_MESSAGE_EMPTY: 'CHAT_MESSAGE_EMPTY',
-  CHAT_ROOM_WITH_SELF: 'CHAT_ROOM_WITH_SELF',
-  VIDEO_CALL_NOT_ALLOWED: 'VIDEO_CALL_NOT_ALLOWED',
-  VIDEO_CALLS_DISABLED: 'VIDEO_CALLS_DISABLED',
 } as const
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode]

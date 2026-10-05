@@ -15,7 +15,8 @@ import {
   GROUP_SHOW_MEMBERS_CHANGED,
 } from '@constants/subscriptions'
 import { ErrorCode } from '@graphql/errorCodes'
-import { ForbiddenError, UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError, ForbiddenError, UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 import { branding } from '@src/branding'
 
@@ -217,29 +218,22 @@ export default {
       // category DB (mirrors the frontend gating in getCategoriesMixin).
       const enforceCategories = policy.get('categoriesActive') && (await categoriesExist(context))
       if (enforceCategories && (!categoryIds || categoryIds.length < branding.category.min)) {
-        throw new UserInputError('Too few categories!', {
-          code: ErrorCode.GROUP_TOO_FEW_CATEGORIES,
-          params: { min: branding.category.min },
-        })
+        throw new AppError(Errors.GROUP_SAVE_TOO_FEW_CATEGORIES, { min: branding.category.min })
       }
       if (
         policy.get('categoriesActive') &&
         categoryIds &&
         categoryIds.length > branding.category.max
       ) {
-        throw new UserInputError('Too many categories!', {
-          code: ErrorCode.GROUP_TOO_MANY_CATEGORIES,
-          params: { max: branding.category.max },
-        })
+        throw new AppError(Errors.GROUP_SAVE_TOO_MANY_CATEGORIES, { max: branding.category.max })
       }
       if (
         params.description === undefined ||
         params.description === null ||
         removeHtmlTags(params.description).length < branding.group.descriptionMinLength
       ) {
-        throw new UserInputError('Description too short!', {
-          code: ErrorCode.GROUP_DESCRIPTION_TOO_SHORT,
-          params: { min: branding.group.descriptionMinLength },
+        throw new AppError(Errors.GROUP_SAVE_DESCRIPTION_TOO_SHORT, {
+          min: branding.group.descriptionMinLength,
         })
       }
       params.id = params.id || uuid()
@@ -300,9 +294,7 @@ export default {
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
-          throw new UserInputError('Group with this slug already exists!', {
-            code: ErrorCode.GROUP_SLUG_TAKEN,
-          })
+          throw new AppError(Errors.GROUP_SAVE_SLUG_ALREADY_TAKEN)
         }
         throw error
       } finally {
@@ -320,25 +312,18 @@ export default {
 
       if (policy.get('categoriesActive') && categoryIds) {
         if (categoryIds.length < branding.category.min) {
-          throw new UserInputError('Too few categories!', {
-            code: ErrorCode.GROUP_TOO_FEW_CATEGORIES,
-            params: { min: branding.category.min },
-          })
+          throw new AppError(Errors.GROUP_SAVE_TOO_FEW_CATEGORIES, { min: branding.category.min })
         }
         if (categoryIds.length > branding.category.max) {
-          throw new UserInputError('Too many categories!', {
-            code: ErrorCode.GROUP_TOO_MANY_CATEGORIES,
-            params: { max: branding.category.max },
-          })
+          throw new AppError(Errors.GROUP_SAVE_TOO_MANY_CATEGORIES, { max: branding.category.max })
         }
       }
       if (
         params.description &&
         removeHtmlTags(params.description).length < branding.group.descriptionMinLength
       ) {
-        throw new UserInputError('Description too short!', {
-          code: ErrorCode.GROUP_DESCRIPTION_TOO_SHORT,
-          params: { min: branding.group.descriptionMinLength },
+        throw new AppError(Errors.GROUP_SAVE_DESCRIPTION_TOO_SHORT, {
+          min: branding.group.descriptionMinLength,
         })
       }
       const session = context.driver.session()
@@ -429,9 +414,7 @@ export default {
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
-          throw new UserInputError('Group with this slug already exists!', {
-            code: ErrorCode.GROUP_SLUG_TAKEN,
-          })
+          throw new AppError(Errors.GROUP_SAVE_SLUG_ALREADY_TAKEN)
         }
         throw error
       } finally {
@@ -586,9 +569,7 @@ export default {
           )
           const [membership] = result.records.map((r) => r.get('membership'))
           if (!membership) {
-            throw new UserInputError('User is not a member of this group', {
-              code: ErrorCode.USER_NOT_GROUP_MEMBER,
-            })
+            throw new AppError(Errors.GROUP_MEMBERSHIP_USER_NOT_A_MEMBER)
           }
           void context.pubsub.publish(GROUP_MEMBERSHIP_VISIBILITY_CHANGED, {
             groupMembershipVisibilityChanged: { userId },
@@ -698,9 +679,7 @@ export default {
   Group: {
     myRole: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.id) {
-        throw new UserInputError('Can not identify selected Group!', {
-          code: ErrorCode.GROUP_NOT_FOUND,
-        })
+        throw new AppError(Errors.GROUP_FIELD_GROUP_ID_MISSING)
       }
       return (
         await context.database.query({
@@ -717,9 +696,7 @@ export default {
     },
     inviteCodes: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.id) {
-        throw new UserInputError('Can not identify selected Group!', {
-          code: ErrorCode.GROUP_NOT_FOUND,
-        })
+        throw new AppError(Errors.GROUP_FIELD_GROUP_ID_MISSING)
       }
       return (
         await context.database.query({
@@ -737,9 +714,7 @@ export default {
     },
     postsCount: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.id) {
-        throw new UserInputError('Can not identify selected Group!', {
-          code: ErrorCode.GROUP_NOT_FOUND,
-        })
+        throw new AppError(Errors.GROUP_FIELD_GROUP_ID_MISSING)
       }
       const result = await context.database.query({
         query: `
@@ -752,9 +727,7 @@ export default {
     },
     currentlyPinnedPostsCount: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.id) {
-        throw new UserInputError('Can not identify selected Group!', {
-          code: ErrorCode.GROUP_NOT_FOUND,
-        })
+        throw new AppError(Errors.GROUP_FIELD_GROUP_ID_MISSING)
       }
       const result = await context.database.query({
         query: `
@@ -914,9 +887,7 @@ const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId)
       return { user: record.get('user'), membership: record.get('membership') }
     })
     if (!result) {
-      throw new UserInputError('User is not a member of this group', {
-        code: ErrorCode.USER_NOT_GROUP_MEMBER,
-      })
+      throw new AppError(Errors.GROUP_MEMBERSHIP_USER_NOT_A_MEMBER)
     }
     // Remove user from group chat room
     await removeUserFromGroupChatRoom(transaction, groupId, userId)

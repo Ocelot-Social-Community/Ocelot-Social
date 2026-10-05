@@ -11,7 +11,8 @@ import { AccessToken, RoomServiceClient, TwirpError } from 'livekit-server-sdk'
 
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@constants/subscriptions'
 import { ErrorCode } from '@graphql/errorCodes'
-import { ForbiddenError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError, ForbiddenError } from '@graphql/errors'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
@@ -36,7 +37,7 @@ const httpUrlFor = (livekitUrl: string) =>
 // to have the secrets the RoomService below needs.
 const ensureEnabled = (enabled: boolean) => {
   if (!enabled) {
-    throw new ForbiddenError('Video calls are disabled.', { code: ErrorCode.VIDEO_CALLS_DISABLED })
+    throw new AppError(Errors.VIDEO_CALLS_DISABLED)
   }
 }
 
@@ -216,9 +217,7 @@ export default {
       if (participantCount === 0) {
         const permission = openPermissionForGroupType(groupType)
         if (!permission || !context.effectivePermissions.has(permission)) {
-          throw new ForbiddenError('You may not start a video call in this group.', {
-            code: ErrorCode.VIDEO_CALL_NOT_ALLOWED,
-          })
+          throw new AppError(Errors.VIDEO_CALL_NOT_ALLOWED)
         }
       }
       // LiveKit treats `identity` as a unique key in a room; two connections
