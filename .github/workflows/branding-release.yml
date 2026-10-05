@@ -253,25 +253,31 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # The release itself is created by release-please, with the changelog entry it generated as the
-  # body. Appended here is the one thing release-please cannot know: where the published artefact
-  # actually lives. Mirrors the `## Container images` block that publish.yml appends to the
-  # application's releases.
+  # The release itself is created by release-please as a DRAFT (draft: true in its config), with
+  # the changelog entry it generated as the body. Appended here is the one thing release-please
+  # cannot know: where the published artefact actually lives — mirroring the `## Container images`
+  # block publish.yml appends to the application's releases — and then the release is published.
   #
-  # `always()` together with the explicit `needs.publish.result` gate keeps publish-gpr's deliberate
-  # independence intact: GitHub Packages is the mirror, a failure there must not hold back the
-  # release notes for a successful npm publish. It is still listed in `needs` so this job waits for
-  # it and can tell the truth about it — the mirror line is only written when it actually succeeded.
+  # A draft because GitHub hands the "Latest" badge to every newly published release by default.
+  # Created public, each package release took the badge from the application, and declining it
+  # afterwards (`--latest=false`) never gave it back: the badge can only be handed TO a release,
+  # not returned to the one before. Published here with `--latest=false`, it never takes it.
+  #
+  # Gated on the npm publish: a release that names a package npm does not have is not published,
+  # it stays a draft — the same reason the application's release waits for its images. `always()`
+  # together with that explicit gate keeps publish-gpr's deliberate independence intact: GitHub
+  # Packages is the mirror, a failure there must not hold back a release whose npm package exists.
+  # It is still listed in `needs` so this job waits for it and can tell the truth about it — the
+  # mirror line is only written when it actually succeeded.
   release_notes:
-    name: Append install instructions to the release
+    name: Append install instructions and publish the release
     needs: [release-please, publish, publish-gpr]
-    # Runs whenever a release was cut, even if publishing failed: the "Latest" demotion below has
-    # to happen either way, or a half-finished package release keeps the badge that belongs to the
-    # application. Only the notes append is conditional on a successful npm publish.
-    if: ${{ always() && needs.release-please.outputs.release_created == 'true' }}
+    if: >-
+      ${{ always() && needs.release-please.outputs.release_created == 'true'
+      && needs.publish.result == 'success' }}
     runs-on: ubuntu-latest
     # The only write in this workflow that uses GITHUB_TOKEN rather than the app token or OIDC:
-    # editing the release body. Nothing is checked out and nothing is executed.
+    # editing the release body and publishing it. Nothing is checked out and nothing is executed.
     permissions:
       contents: write
     env:
@@ -286,7 +292,6 @@ jobs:
       # Values arrive through the environment, not through `${{ }}` interpolation into the script
       # text: an expression is pasted in before the shell starts and would be parsed as shell source.
       - name: Append install instructions to the release notes
-        if: ${{ needs.publish.result == 'success' }}
         run: |
           set -euo pipefail
 
@@ -315,16 +320,13 @@ jobs:
 
           gh release edit "${TAG_NAME}" --notes-file notes.md
 
-      # GitHub has no pin for releases; the "Latest" badge is the mechanism, and it otherwise
-      # follows whichever release was published most recently — which is a package release far more
-      # often than the application. Declining it here, and claiming it in publish.yml, keeps the
-      # badge on ocelot.social itself. Unconditional: a release that skipped the notes above must
-      # not hold on to it either.
-      - name: Decline the "Latest" badge
+      # Public, and NOT the latest: the "Latest" badge belongs to ocelot.social itself, which
+      # publish.yml claims for each application release. Publishing the draft with the flag set is
+      # what keeps a package release from ever taking it.
+      - name: Publish the release
         # `!cancelled()`, because a step carries an implicit `if: success()`: had the append above
-        # FAILED rather than been skipped, this would not run and the package release would keep a
-        # badge that belongs to the application. The job-level `always()` does not cover that — it
-        # governs whether the job starts, not whether a later step survives an earlier failure.
-        # `!cancelled()` rather than `always()` so a cancelled run still stops promptly.
+        # failed, this would not run and the release would stay a draft although its package is on
+        # npm. The notes are the cosmetic part. `!cancelled()` rather than `always()` so a cancelled
+        # run still stops promptly.
         if: ${{ !cancelled() }}
-        run: gh release edit "${TAG_NAME}" --latest=false
+        run: gh release edit "${TAG_NAME}" --draft=false --latest=false
