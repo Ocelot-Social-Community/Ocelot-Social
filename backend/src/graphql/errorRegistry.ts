@@ -119,6 +119,18 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'You cannot report yourself or your own content!',
   },
+  REVIEW_TARGET_IS_OWN: {
+    type: 'BAD_USER_INPUT',
+    text: 'You cannot review a report about yourself or your own content!',
+  },
+  REVIEW_TARGET_DOES_NOT_EXIST: {
+    type: 'BAD_USER_INPUT',
+    text: 'Resource not found or is not a Post|Comment|User!',
+  },
+  REVIEW_TARGET_NOT_REPORTED: {
+    type: 'BAD_USER_INPUT',
+    text: 'Before starting the review process, please report the {label}!',
+  },
   // roles
   ROLE_ASSIGNMENT_LAST_OWNER_NOT_REMOVABLE: {
     type: 'FORBIDDEN',

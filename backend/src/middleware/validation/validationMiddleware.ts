@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ErrorCode } from '@graphql/errorCodes'
 import { Errors } from '@graphql/errorRegistry'
-import { AppError, UserInputError } from '@graphql/errors'
+import { AppError } from '@graphql/errors'
 
 import type { IMiddlewareResolver } from 'graphql-middleware/types'
 
@@ -86,7 +85,7 @@ const validateReview: IMiddlewareResolver = async (resolve, root, args, context,
   let existingReportedResource
   const { user, driver } = context
   if (resourceId === user.id) {
-    throw new UserInputError('You cannot review yourself!', { code: ErrorCode.CANNOT_REVIEW_OWN })
+    throw new AppError(Errors.REVIEW_TARGET_IS_OWN)
   }
   const session = driver.session()
   try {
@@ -112,22 +111,20 @@ const validateReview: IMiddlewareResolver = async (resolve, root, args, context,
     })
     existingReportedResource = txResult
     if (!existingReportedResource?.length) {
-      throw new Error(`Resource not found or is not a Post|Comment|User!`)
+      throw new AppError(Errors.REVIEW_TARGET_DOES_NOT_EXIST)
     }
     existingReportedResource = existingReportedResource[0]
     if (!existingReportedResource.filed) {
-      throw new Error(
-        `Before starting the review process, please report the ${existingReportedResource.label}!`,
-      )
+      throw new AppError(Errors.REVIEW_TARGET_NOT_REPORTED, {
+        label: existingReportedResource.label,
+      })
     }
     const authorId =
       existingReportedResource.label !== 'User' && existingReportedResource.author
         ? existingReportedResource.author.properties.id
         : null
     if (authorId && authorId === user.id) {
-      throw new UserInputError(`You cannot review your own ${existingReportedResource.label}!`, {
-        code: ErrorCode.CANNOT_REVIEW_OWN,
-      })
+      throw new AppError(Errors.REVIEW_TARGET_IS_OWN)
     }
   } finally {
     await session.close()

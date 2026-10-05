@@ -271,7 +271,7 @@ describe('validateReview', () => {
 
     await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
-      errors: [{ message: 'You cannot review yourself!' }],
+      errors: [{ message: 'You cannot review a report about yourself or your own content!' }],
     })
   })
 
@@ -280,7 +280,12 @@ describe('validateReview', () => {
 
     await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
-      errors: [{ message: 'Resource not found or is not a Post|Comment|User!' }],
+      errors: [
+        {
+          message: 'Resource not found or is not a Post|Comment|User!',
+          extensions: { errorCode: 'REVIEW_TARGET_DOES_NOT_EXIST' },
+        },
+      ],
     })
   })
 
@@ -289,7 +294,12 @@ describe('validateReview', () => {
 
     await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
-      errors: [{ message: 'Before starting the review process, please report the Post!' }],
+      errors: [
+        {
+          message: 'Before starting the review process, please report the Post!',
+          extensions: { errorCode: 'REVIEW_TARGET_NOT_REPORTED', params: { label: 'Post' } },
+        },
+      ],
     })
   })
 
@@ -306,7 +316,7 @@ describe('validateReview', () => {
 
     await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
-      errors: [{ message: 'You cannot review your own Post!' }],
+      errors: [{ message: 'You cannot review a report about yourself or your own content!' }],
     })
   })
 
