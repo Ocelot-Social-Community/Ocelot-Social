@@ -17,7 +17,6 @@ export const ErrorCode = {
   // roles
   ROLE_CHANGE_NOT_ALLOWED: 'ROLE_CHANGE_NOT_ALLOWED',
   // invite codes
-  INVITE_CODES_LIMIT_REACHED: 'INVITE_CODES_LIMIT_REACHED',
 } as const
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode]

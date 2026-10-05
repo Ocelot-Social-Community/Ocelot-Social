@@ -445,7 +445,7 @@
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Este nome único de grupo já está em uso.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Poucos tópicos selecionados (pelo menos {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Tópicos demais selecionados (no máximo {max}).",
-    "INVITE_CODES_LIMIT_REACHED": "Você atingiu o número máximo de links de convite.",
+    "INVITE_CODE_CREATE_LIMIT_REACHED": "Você atingiu o número máximo de links de convite.",
     "LOCATION_INVALID": "A localização é inválida. Escolha uma localização entre as sugestões.",
     "LOGIN_ACCOUNT_DISABLED": "Sua conta foi desativada.",
     "LOGIN_CREDENTIALS_INCORRECT": "Endereço de e-mail ou senha incorretos.",

@@ -491,7 +491,7 @@ describe('generatePersonalInviteCode', () => {
       await expect(mutate({ mutation: generatePersonalInviteCode })).resolves.toMatchObject({
         errors: [
           {
-            message: 'You have reached the maximum of Invite Codes you can generate',
+            message: 'You have reached the maximum of invite codes you can generate.',
           },
         ],
       })
@@ -785,7 +785,7 @@ describe('generateGroupInviteCode', () => {
       ).resolves.toMatchObject({
         errors: [
           {
-            message: 'You have reached the maximum of Invite Codes you can generate for this group',
+            message: 'You have reached the maximum of invite codes you can generate.',
           },
         ],
       })

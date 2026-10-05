@@ -158,6 +158,11 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'Maximum of {max} active API keys reached',
   },
+  // invite codes
+  INVITE_CODE_CREATE_LIMIT_REACHED: {
+    type: 'BAD_USER_INPUT',
+    text: 'You have reached the maximum of invite codes you can generate.',
+  },
   // chat & video calls
   CHAT_GROUP_ROOM_NOT_CREATED: {
     type: 'FORBIDDEN',

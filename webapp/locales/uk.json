@@ -445,7 +445,7 @@
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Ця унікальна назва групи вже зайнята.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Вибрано замало тем (щонайменше {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Вибрано забагато тем (щонайбільше {max}).",
-    "INVITE_CODES_LIMIT_REACHED": "Ти досяг максимальної кількості посилань для запрошення.",
+    "INVITE_CODE_CREATE_LIMIT_REACHED": "Ти досяг максимальної кількості посилань для запрошення.",
     "LOCATION_INVALID": "Місце недійсне. Будь ласка, вибери місце із запропонованих варіантів.",
     "LOGIN_ACCOUNT_DISABLED": "Твій обліковий запис деактивовано.",
     "LOGIN_CREDENTIALS_INCORRECT": "Невірна електронна адреса або пароль.",

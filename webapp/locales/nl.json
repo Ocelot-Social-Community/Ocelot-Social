@@ -445,7 +445,7 @@
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Deze unieke groepsnaam is al in gebruik.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Te weinig onderwerpen geselecteerd (minimaal {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Te veel onderwerpen geselecteerd (maximaal {max}).",
-    "INVITE_CODES_LIMIT_REACHED": "Je hebt het maximale aantal uitnodigingslinks bereikt.",
+    "INVITE_CODE_CREATE_LIMIT_REACHED": "Je hebt het maximale aantal uitnodigingslinks bereikt.",
     "LOCATION_INVALID": "De locatie is ongeldig. Kies een locatie uit de suggesties.",
     "LOGIN_ACCOUNT_DISABLED": "Je account is gedeactiveerd.",
     "LOGIN_CREDENTIALS_INCORRECT": "Onjuist e-mailadres of wachtwoord.",

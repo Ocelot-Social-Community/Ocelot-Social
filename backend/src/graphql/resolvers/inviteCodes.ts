@@ -3,7 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
 import { ErrorCode } from '@graphql/errorCodes'
-import { ForbiddenError, UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError, ForbiddenError } from '@graphql/errors'
 import { branding } from '@src/branding'
 
 import Resolver from './helpers/Resolver'
@@ -169,9 +170,7 @@ export default {
       if (
         parseInt(userInviteCodeAmount as string) >= context.policy.get('inviteCodesPersonalPerUser')
       ) {
-        throw new UserInputError('You have reached the maximum of Invite Codes you can generate', {
-          code: ErrorCode.INVITE_CODES_LIMIT_REACHED,
-        })
+        throw new AppError(Errors.INVITE_CODE_CREATE_LIMIT_REACHED)
       }
 
       let code = generateInviteCode()
@@ -212,10 +211,7 @@ export default {
       if (
         parseInt(userInviteCodeAmount as string) >= context.policy.get('inviteCodesGroupPerUser')
       ) {
-        throw new UserInputError(
-          'You have reached the maximum of Invite Codes you can generate for this group',
-          { code: ErrorCode.INVITE_CODES_LIMIT_REACHED },
-        )
+        throw new AppError(Errors.INVITE_CODE_CREATE_LIMIT_REACHED)
       }
 
       let code = generateInviteCode()
