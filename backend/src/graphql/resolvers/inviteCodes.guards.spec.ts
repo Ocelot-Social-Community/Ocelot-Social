@@ -8,8 +8,8 @@
 // arrive at a follow edge would test the registration flow, not this file — so the helper is
 // called the way registration calls it.
 //
-// Plus the field-resolver fallbacks for a parent without a code, and the defensive row check in
-// redeemInviteCode.
+// Plus the field-resolver fallbacks for a parent without a code, the defensive row check in
+// redeemInviteCode, and the membership check generateGroupInviteCode makes in its own write.
 import { beforeAll, afterAll, beforeEach, describe, it, expect } from 'vitest'
 
 import databaseContext from '@context/database'
@@ -151,5 +151,49 @@ describe('InviteCode field resolvers for a parent without a code', () => {
     await expect(
       inviteCodesResolvers.InviteCode.isValid({}, {}, contextFor('someone'), null),
     ).resolves.toBe(false)
+  })
+})
+
+// generateGroupInviteCode checks the membership a second time, in the MATCH that writes the code.
+// isAllowedToGenerateGroupInviteCode refuses first, so no request gets that far without one — but
+// a membership can end between the shield and the write, and the shield is the one place that
+// once let everybody through (#10334). So the second check is held to its contract here, without
+// the shield in front of it.
+describe('generateGroupInviteCode without the shield in front of it', () => {
+  const generateFor = async (id: string): Promise<unknown> =>
+    inviteCodesResolvers.Mutation.generateGroupInviteCode(
+      null,
+      { groupId: 'the-group' },
+      { ...contextFor(id), policy: { get: () => 7 } } as unknown as Context,
+      null,
+    )
+
+  const codesCount = async () => {
+    const records = await codesOf(`
+      MATCH (:Group { id: 'the-group' })<-[:INVITES_TO]-(code:InviteCode)
+      RETURN toString(count(code)) AS count`)
+    return records[0].get('count') as string
+  }
+
+  beforeAll(async () => {
+    await cleanDatabase()
+    await Factory.build('user', { id: 'owner' })
+    await Factory.build('user', { id: 'stranger' })
+    await Factory.build('user', { id: 'applicant' })
+    await Factory.build('group', { id: 'the-group', groupType: 'closed' }, { ownerId: 'owner' })
+    await database.write({
+      query: `MATCH (user:User { id: 'applicant' }), (group:Group { id: 'the-group' })
+              MERGE (user)-[:MEMBER_OF { role: 'pending' }]->(group)`,
+    })
+  })
+
+  it.each(['stranger', 'applicant'])('refuses a %s and writes no code', async (id) => {
+    await expect(generateFor(id)).rejects.toThrow('Not Authorized!')
+    expect(await codesCount()).toBe('0')
+  })
+
+  it('writes a code for a member', async () => {
+    await expect(generateFor('owner')).resolves.toHaveProperty('code')
+    expect(await codesCount()).toBe('1')
   })
 })
