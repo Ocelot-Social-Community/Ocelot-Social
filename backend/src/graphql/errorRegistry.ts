@@ -143,6 +143,14 @@ const definitions = {
     text: 'Maximum of {max} active API keys reached',
   },
   // chat & video calls
+  CHAT_GROUP_ROOM_NOT_CREATED: {
+    type: 'FORBIDDEN',
+    text: 'Could not create group room. User may not be a member of the group.',
+  },
+  VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND: {
+    type: 'FORBIDDEN',
+    text: 'No active membership in this group found for the video call: not a member, membership still pending, or the group does not exist.',
+  },
   CHAT_MESSAGE_CONTENT_MISSING: {
     type: 'BAD_USER_INPUT',
     text: 'Message must have content or files',

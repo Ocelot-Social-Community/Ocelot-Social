@@ -23,13 +23,13 @@ describe('GraphQL error classes', () => {
 
   it('adds the params the translation interpolates', () => {
     expect(
-      new UserInputError('Not a member of this group.', {
-        code: ErrorCode.NOT_GROUP_MEMBER,
+      new UserInputError('You have reached the maximum of Invite Codes you can generate', {
+        code: ErrorCode.INVITE_CODES_LIMIT_REACHED,
         params: { email: 'a@b.c' },
       }).extensions,
     ).toEqual({
       code: 'BAD_USER_INPUT',
-      errorCode: 'NOT_GROUP_MEMBER',
+      errorCode: 'INVITE_CODES_LIMIT_REACHED',
       params: { email: 'a@b.c' },
     })
   })

@@ -10,7 +10,6 @@ export const ErrorCode = {
   // e-mail & registration
   // users & badges
   // groups
-  NOT_GROUP_MEMBER: 'NOT_GROUP_MEMBER',
   // posts, comments & events
   EVENT_DATE_INVALID: 'EVENT_DATE_INVALID',
   LOCATION_INVALID: 'LOCATION_INVALID',

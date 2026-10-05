@@ -425,6 +425,7 @@
     "API_KEY_DOES_NOT_EXIST": "API Key nuk u gjet.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Mund të zgjedhësh vetëm emblema që të janë dhënë ty.",
     "CANNOT_REVIEW_OWN": "Nuk mund të vendosësh për një raportim për veten ose për përmbajtjen tënde.",
+    "CHAT_GROUP_ROOM_NOT_CREATED": "Biseda e grupit nuk mund të krijohej.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Mesazhi ka nevojë për një tekst ose një skedar.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Nuk mund të nisësh një bisedë me veten.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "Komenti duhet të ketë të paktën {min} karaktere.",
@@ -451,7 +452,6 @@
     "LOGIN_CREDENTIALS_INCORRECT": "Adresë e-maili ose fjalëkalim i pasaktë.",
     "MAX_PINNED_POSTS_REACHED": "Është arritur numri maksimal i postimeve të ngulura. Hiq fillimisht një postim tjetër të ngulur.",
     "NOT_AUTHORIZED": "Nuk ke leje ta bësh këtë.",
-    "NOT_GROUP_MEMBER": "Për këtë duhet të jesh anëtar i grupit.",
     "PASSWORD_CHANGE_NEW_PASSWORD_EQUALS_OLD": "Fjalëkalimi i ri duhet të jetë i ndryshëm nga i vjetri.",
     "PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT": "Fjalëkalimi yt i vjetër nuk është i saktë.",
     "POST_DOES_NOT_EXIST": "Postimi nuk u gjet.",
@@ -473,6 +473,7 @@
     "USER_PROFILE_NAME_TOO_SHORT": "Emri duhet të ketë të paktën {min} karaktere.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Ky përdorues nuk është i bllokuar.",
     "VIDEO_CALL_FEATURE_DISABLED": "Telefonatat me video nuk janë aktivizuar.",
+    "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Për telefonatën me video nuk u gjet asnjë anëtarësim aktiv në këtë grup.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Nuk mund të nisësh një telefonatë me video në këtë grup."
   },
   "chat": {

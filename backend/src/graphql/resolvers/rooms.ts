@@ -8,8 +8,8 @@
 import { withFilter } from 'graphql-subscriptions'
 
 import { ROOM_UPDATED } from '@constants/subscriptions'
-import { ErrorCode } from '@graphql/errorCodes'
-import { ForbiddenError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError } from '@graphql/errors'
 
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import Resolver from './helpers/Resolver'
@@ -273,12 +273,7 @@ export default {
           return room
         })
         if (!room) {
-          throw new ForbiddenError(
-            'Could not create group room. User may not be a member of the group.',
-            {
-              code: ErrorCode.NOT_GROUP_MEMBER,
-            },
-          )
+          throw new AppError(Errors.CHAT_GROUP_ROOM_NOT_CREATED)
         }
         room.roomId = room.id
         return room

@@ -10,9 +10,8 @@ import { withFilter } from 'graphql-subscriptions'
 import { AccessToken, RoomServiceClient, TwirpError } from 'livekit-server-sdk'
 
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@constants/subscriptions'
-import { ErrorCode } from '@graphql/errorCodes'
 import { Errors } from '@graphql/errorRegistry'
-import { AppError, ForbiddenError } from '@graphql/errors'
+import { AppError } from '@graphql/errors'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
@@ -57,7 +56,7 @@ const openPermissionForGroupType = (groupType: string): PermissionKey | null => 
 }
 
 // Returns the group's type if the user is a member with a participating role
-// (usual/admin/owner); throws ForbiddenError otherwise. Video calls are available in
+// (usual/admin/owner); throws VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND otherwise. Video calls are available in
 // every group type now — who may OPEN one is gated per type by permission (above),
 // while joining stays open to any member.
 const getGroupMembershipType = async (
@@ -78,7 +77,7 @@ const getGroupMembershipType = async (
       ),
     )
     if (result.records.length === 0) {
-      throw new ForbiddenError('Not a member of this group.', { code: ErrorCode.NOT_GROUP_MEMBER })
+      throw new AppError(Errors.VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND)
     }
     return result.records[0].get('groupType') as string
   } finally {

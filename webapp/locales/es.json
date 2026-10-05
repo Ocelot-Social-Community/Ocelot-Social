@@ -425,6 +425,7 @@
     "API_KEY_DOES_NOT_EXIST": "No se ha encontrado la API Key.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Solo puedes seleccionar insignias que te hayan sido otorgadas.",
     "CANNOT_REVIEW_OWN": "No puedes decidir sobre una denuncia sobre ti mismo o tu propio contenido.",
+    "CHAT_GROUP_ROOM_NOT_CREATED": "No se ha podido crear el chat del grupo.",
     "CHAT_MESSAGE_CONTENT_MISSING": "El mensaje necesita un texto o un archivo.",
     "CHAT_ROOM_PARTNER_IS_SELF": "No puedes iniciar un chat contigo mismo.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "El comentario debe tener al menos {min} caracteres.",
@@ -451,7 +452,6 @@
     "LOGIN_CREDENTIALS_INCORRECT": "Dirección de correo electrónico o contraseña incorrecta.",
     "MAX_PINNED_POSTS_REACHED": "Se ha alcanzado el número máximo de contribuciones ancladas. Desancla primero otra contribución.",
     "NOT_AUTHORIZED": "No tienes permiso para hacer esto.",
-    "NOT_GROUP_MEMBER": "Para ello tienes que ser miembro del grupo.",
     "PASSWORD_CHANGE_NEW_PASSWORD_EQUALS_OLD": "La nueva contraseña debe ser diferente de la antigua.",
     "PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT": "Tu contraseña antigua no es correcta.",
     "POST_DOES_NOT_EXIST": "No se ha encontrado la contribución.",
@@ -473,6 +473,7 @@
     "USER_PROFILE_NAME_TOO_SHORT": "El nombre debe tener al menos {min} caracteres.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Este usuario no está bloqueado.",
     "VIDEO_CALL_FEATURE_DISABLED": "Las videollamadas no están activadas.",
+    "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "No se ha encontrado ninguna membresía activa en este grupo para la videollamada.",
     "VIDEO_CALL_START_NOT_PERMITTED": "No puedes iniciar una videollamada en este grupo."
   },
   "chat": {

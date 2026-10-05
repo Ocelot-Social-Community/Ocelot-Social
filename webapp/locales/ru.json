@@ -425,6 +425,7 @@
     "API_KEY_DOES_NOT_EXIST": "API Key не найден.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Ты можешь выбрать только те награды, которые были тебе присуждены.",
     "CANNOT_REVIEW_OWN": "Ты не можешь принимать решение по жалобе на себя или на свой собственный контент.",
+    "CHAT_GROUP_ROOM_NOT_CREATED": "Не удалось создать групповой чат.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Сообщение должно содержать текст или файл.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Ты не можешь начать чат с самим собой.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "Комментарий должен содержать не менее {min} символов.",
@@ -451,7 +452,6 @@
     "LOGIN_CREDENTIALS_INCORRECT": "Неверный адрес электронной почты или пароль.",
     "MAX_PINNED_POSTS_REACHED": "Достигнуто максимальное количество закреплённых постов. Сначала открепи другой пост.",
     "NOT_AUTHORIZED": "У тебя нет прав на это действие.",
-    "NOT_GROUP_MEMBER": "Для этого нужно быть участником группы.",
     "PASSWORD_CHANGE_NEW_PASSWORD_EQUALS_OLD": "Новый пароль должен отличаться от старого.",
     "PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT": "Старый пароль неверен.",
     "POST_DOES_NOT_EXIST": "Пост не найден.",
@@ -473,6 +473,7 @@
     "USER_PROFILE_NAME_TOO_SHORT": "Имя должно содержать не менее {min} символов.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Этот пользователь не заблокирован.",
     "VIDEO_CALL_FEATURE_DISABLED": "Видеозвонки не включены.",
+    "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Для видеозвонка не найдено активное участие в этой группе.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Ты не можешь начать видеозвонок в этой группе."
   },
   "chat": {

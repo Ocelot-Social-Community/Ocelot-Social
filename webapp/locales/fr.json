@@ -425,6 +425,7 @@
     "API_KEY_DOES_NOT_EXIST": "L'API Key est introuvable.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Tu ne peux sélectionner que des badges qui t'ont été attribués.",
     "CANNOT_REVIEW_OWN": "Tu ne peux pas statuer sur un signalement te concernant ou concernant ton propre contenu.",
+    "CHAT_GROUP_ROOM_NOT_CREATED": "Le chat de groupe n'a pas pu être créé.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Le message doit contenir un texte ou un fichier.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Tu ne peux pas démarrer un chat avec toi-même.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "Le commentaire doit comporter au moins {min} caractères.",
@@ -451,7 +452,6 @@
     "LOGIN_CREDENTIALS_INCORRECT": "Adresse mail ou mot de passe incorrect.",
     "MAX_PINNED_POSTS_REACHED": "Le nombre maximum de posts épinglés est atteint. Désépingle d'abord un autre post.",
     "NOT_AUTHORIZED": "Tu n'as pas l'autorisation de faire cela.",
-    "NOT_GROUP_MEMBER": "Pour cela, tu dois être membre du groupe.",
     "PASSWORD_CHANGE_NEW_PASSWORD_EQUALS_OLD": "Le nouveau mot de passe doit être différent de l'ancien.",
     "PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT": "Ton ancien mot de passe n'est pas correct.",
     "POST_DOES_NOT_EXIST": "Le post est introuvable.",
@@ -473,6 +473,7 @@
     "USER_PROFILE_NAME_TOO_SHORT": "Le nom doit comporter au moins {min} caractères.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Cet utilisateur n'est pas bloqué.",
     "VIDEO_CALL_FEATURE_DISABLED": "Les appels vidéo ne sont pas activés.",
+    "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Aucune adhésion active à ce groupe n'a été trouvée pour l'appel vidéo.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Tu n'as pas le droit de démarrer un appel vidéo dans ce groupe."
   },
   "chat": {
