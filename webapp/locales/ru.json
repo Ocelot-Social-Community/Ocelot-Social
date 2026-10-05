@@ -420,9 +420,9 @@
   },
   "backendErrors": {
     "API_KEYS_FEATURE_DISABLED": "API Keys не включены в этой сети.",
-    "API_KEYS_LIMIT_REACHED": "Ты достиг максимума в {max} активных API Keys. Отзови существующий key, чтобы создать новый.",
-    "API_KEY_EXPIRY_INVALID": "Срок действия должен составлять не менее одного дня.",
-    "API_KEY_NOT_FOUND": "API Key не найден.",
+    "API_KEY_CREATE_EXPIRY_INVALID": "Срок действия должен составлять не менее одного дня.",
+    "API_KEY_CREATE_LIMIT_REACHED": "Ты достиг максимума в {max} активных API Keys. Отзови существующий key, чтобы создать новый.",
+    "API_KEY_DOES_NOT_EXIST": "API Key не найден.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Ты можешь выбрать только те награды, которые были тебе присуждены.",
     "CANNOT_REVIEW_OWN": "Ты не можешь принимать решение по жалобе на себя или на свой собственный контент.",
     "CHAT_MESSAGE_EMPTY": "Сообщение должно содержать текст или файл.",

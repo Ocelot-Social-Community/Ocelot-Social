@@ -129,13 +129,13 @@ const definitions = {
   ROLE_SAVE_NAME_INVALID: { type: 'BAD_USER_INPUT', text: 'Invalid role name.' },
   ROLE_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'Unknown role: {name}' },
   // API keys
-  API_KEY_EXPIRY_INVALID: {
+  API_KEY_CREATE_EXPIRY_INVALID: {
     type: 'BAD_USER_INPUT',
-    text: 'expiresInDays must be a positive integer',
+    text: 'The validity must be at least one day (expiresInDays ≥ 1).',
   },
-  API_KEY_NOT_FOUND: { type: 'BAD_USER_INPUT', text: 'API key not found' },
+  API_KEY_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'API key not found' },
   API_KEYS_FEATURE_DISABLED: { type: 'FORBIDDEN', text: 'API keys are not enabled' },
-  API_KEYS_LIMIT_REACHED: {
+  API_KEY_CREATE_LIMIT_REACHED: {
     type: 'BAD_USER_INPUT',
     text: 'Maximum of {max} active API keys reached',
   },

@@ -420,9 +420,9 @@
   },
   "backendErrors": {
     "API_KEYS_FEATURE_DISABLED": "API Keys sind in diesem Netzwerk nicht aktiviert.",
-    "API_KEYS_LIMIT_REACHED": "Du hast das Maximum von {max} aktiven API Keys erreicht. Widerrufe einen bestehenden Key, um einen neuen zu erstellen.",
-    "API_KEY_EXPIRY_INVALID": "Die Gültigkeit muss mindestens einen Tag betragen.",
-    "API_KEY_NOT_FOUND": "Der API Key wurde nicht gefunden.",
+    "API_KEY_CREATE_EXPIRY_INVALID": "Die Gültigkeit muss mindestens einen Tag betragen.",
+    "API_KEY_CREATE_LIMIT_REACHED": "Du hast das Maximum von {max} aktiven API Keys erreicht. Widerrufe einen bestehenden Key, um einen neuen zu erstellen.",
+    "API_KEY_DOES_NOT_EXIST": "Der API Key wurde nicht gefunden.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Du kannst nur Badges auswählen, die dir verliehen wurden.",
     "CANNOT_REVIEW_OWN": "Du kannst keine Meldung über dich selbst oder deine eigenen Inhalte entscheiden.",
     "CHAT_MESSAGE_EMPTY": "Die Nachricht braucht einen Text oder eine Datei.",

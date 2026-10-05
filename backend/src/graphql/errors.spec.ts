@@ -59,12 +59,12 @@ describe(AppError, () => {
   })
 
   it('fills the placeholders and sends the params along', () => {
-    const error = new AppError(Errors.API_KEYS_LIMIT_REACHED, { max: 3 })
+    const error = new AppError(Errors.API_KEY_CREATE_LIMIT_REACHED, { max: 3 })
 
     expect(error.message).toBe('Maximum of 3 active API keys reached')
     expect(error.extensions).toEqual({
       code: 'BAD_USER_INPUT',
-      errorCode: 'API_KEYS_LIMIT_REACHED',
+      errorCode: 'API_KEY_CREATE_LIMIT_REACHED',
       params: { max: 3 },
     })
   })
@@ -82,7 +82,7 @@ describe(AppError, () => {
 
   it('lets the compiler check the params against the entry', () => {
     // @ts-expect-error a text with placeholders requires its params
-    expect(new AppError(Errors.API_KEYS_LIMIT_REACHED).message).toBe(
+    expect(new AppError(Errors.API_KEY_CREATE_LIMIT_REACHED).message).toBe(
       'Maximum of {max} active API keys reached',
     )
     // @ts-expect-error declared params are required as well
@@ -90,7 +90,7 @@ describe(AppError, () => {
       'params',
     )
     // @ts-expect-error a param the entry does not use is rejected
-    expect(new AppError(Errors.API_KEYS_LIMIT_REACHED, { max: 3, min: 1 }).message).toBe(
+    expect(new AppError(Errors.API_KEY_CREATE_LIMIT_REACHED, { max: 3, min: 1 }).message).toBe(
       'Maximum of 3 active API keys reached',
     )
     // @ts-expect-error an entry without params takes none
@@ -109,9 +109,6 @@ describe('Errors', () => {
 
   // Moved over with their old names; each leaves this list once it is renamed.
   const notYetRenamed = [
-    'API_KEY_EXPIRY_INVALID',
-    'API_KEY_NOT_FOUND',
-    'API_KEYS_LIMIT_REACHED',
     'CHAT_MESSAGE_EMPTY',
     'CHAT_ROOM_WITH_SELF',
     'VIDEO_CALL_NOT_ALLOWED',

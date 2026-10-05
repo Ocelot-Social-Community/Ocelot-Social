@@ -149,7 +149,10 @@ describe('createApiKey', () => {
         variables: { name: 'Zero Expiry', expiresInDays: 0 },
       })
 
-      expect(errors?.[0].message).toContain('expiresInDays must be a positive integer')
+      expect(errors?.[0]).toMatchObject({
+        message: 'The validity must be at least one day (expiresInDays ≥ 1).',
+        extensions: { errorCode: 'API_KEY_CREATE_EXPIRY_INVALID' },
+      })
     })
 
     it('rejects negative expiresInDays', async () => {
@@ -158,7 +161,10 @@ describe('createApiKey', () => {
         variables: { name: 'Negative Expiry', expiresInDays: -5 },
       })
 
-      expect(errors?.[0].message).toContain('expiresInDays must be a positive integer')
+      expect(errors?.[0]).toMatchObject({
+        message: 'The validity must be at least one day (expiresInDays ≥ 1).',
+        extensions: { errorCode: 'API_KEY_CREATE_EXPIRY_INVALID' },
+      })
     })
 
     it('does not count revoked keys towards the limit', async () => {

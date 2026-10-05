@@ -114,7 +114,7 @@ export default {
       }
 
       if (args.expiresInDays != null && args.expiresInDays < 1) {
-        throw new AppError(Errors.API_KEY_EXPIRY_INVALID)
+        throw new AppError(Errors.API_KEY_CREATE_EXPIRY_INVALID)
       }
 
       let expiresAt: string | null = null
@@ -164,7 +164,7 @@ export default {
       })
 
       if (result.records.length === 0) {
-        throw new AppError(Errors.API_KEYS_LIMIT_REACHED, {
+        throw new AppError(Errors.API_KEY_CREATE_LIMIT_REACHED, {
           max: context.policy.get('apiKeysMaxPerUser'),
         })
       }
@@ -185,7 +185,7 @@ export default {
         variables: { userId: context.user?.id, keyId: args.id, name: args.name },
       })
       if (result.records.length === 0) {
-        throw new AppError(Errors.API_KEY_NOT_FOUND)
+        throw new AppError(Errors.API_KEY_DOES_NOT_EXIST)
       }
       return normalizeApiKey(getRecord(result.records[0], 'k'))
     },

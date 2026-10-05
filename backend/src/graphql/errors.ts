@@ -38,7 +38,7 @@ const fillPlaceholders = (text: string, params?: ErrorParams) => {
 
 // An error from the registry (errorRegistry.ts). Its type, code and English text come from there:
 //   throw new AppError(Errors.API_KEYS_FEATURE_DISABLED)
-//   throw new AppError(Errors.API_KEYS_LIMIT_REACHED, { max })
+//   throw new AppError(Errors.API_KEY_CREATE_LIMIT_REACHED, { max })
 export class AppError<Entry extends ErrorEntry = ErrorEntry> extends GraphQLError {
   constructor(error: Entry, ...[params]: ParamsFor<Entry>) {
     super(fillPlaceholders(error.text, params), {
