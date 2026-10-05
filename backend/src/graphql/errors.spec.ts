@@ -23,13 +23,13 @@ describe('GraphQL error classes', () => {
 
   it('adds the params the translation interpolates', () => {
     expect(
-      new UserInputError('Could not find Post', {
-        code: ErrorCode.POST_NOT_FOUND,
+      new UserInputError('Not a member of this group.', {
+        code: ErrorCode.NOT_GROUP_MEMBER,
         params: { email: 'a@b.c' },
       }).extensions,
     ).toEqual({
       code: 'BAD_USER_INPUT',
-      errorCode: 'POST_NOT_FOUND',
+      errorCode: 'NOT_GROUP_MEMBER',
       params: { email: 'a@b.c' },
     })
   })

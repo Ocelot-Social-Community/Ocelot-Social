@@ -1541,7 +1541,7 @@ describe('push posts', () => {
       // as "pushed, nothing to show".
       const { errors } = await mutate({ mutation: pushPost, variables: { id: 'no-such-post' } })
 
-      expect(errors?.[0]).toHaveProperty('message', 'Could not find Post')
+      expect(errors?.[0]).toHaveProperty('message', 'Could not find post.')
     })
   })
 })
@@ -1692,7 +1692,7 @@ describe('unpush posts', () => {
 
       const { errors } = await mutate({ mutation: unpushPost, variables: { id: 'no-such-post' } })
 
-      expect(errors?.[0]).toHaveProperty('message', 'Could not find Post')
+      expect(errors?.[0]).toHaveProperty('message', 'Could not find post.')
     })
   })
 })

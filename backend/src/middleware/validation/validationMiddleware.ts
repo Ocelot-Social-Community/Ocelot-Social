@@ -11,7 +11,6 @@ import { AppError, UserInputError } from '@graphql/errors'
 import type { IMiddlewareResolver } from 'graphql-middleware/types'
 
 const COMMENT_MIN_LENGTH = 1
-const NO_POST_ERR_MESSAGE = 'Comment cannot be created without a post!'
 const USERNAME_MIN_LENGTH = 3
 const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const content = args.content.replace(/<(?:.|\n)*?>/gm, '').trim()
@@ -36,7 +35,7 @@ const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, c
     })
 
     if (!post) {
-      throw new UserInputError(NO_POST_ERR_MESSAGE, { code: ErrorCode.POST_NOT_FOUND })
+      throw new AppError(Errors.POST_DOES_NOT_EXIST)
     } else {
       return resolve(root, args, context, info)
     }

@@ -145,7 +145,7 @@ describe('validateCreateComment', () => {
       mutate({ mutation: CreateComment, variables: createCommentVariables }),
     ).resolves.toMatchObject({
       data: { CreateComment: null },
-      errors: [{ message: 'Comment cannot be created without a post!' }],
+      errors: [{ message: 'Could not find post.' }],
     })
   })
 

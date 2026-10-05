@@ -791,7 +791,7 @@ export default {
       ).records.map((record) => record.get('post'))
 
       if (posts.length !== 1) {
-        throw new UserInputError('Could not find Post', { code: ErrorCode.POST_NOT_FOUND })
+        throw new AppError(Errors.POST_DOES_NOT_EXIST)
       }
 
       return posts[0]
@@ -808,7 +808,7 @@ export default {
       ).records.map((record) => record.get('post'))
 
       if (posts.length !== 1) {
-        throw new UserInputError('Could not find Post', { code: ErrorCode.POST_NOT_FOUND })
+        throw new AppError(Errors.POST_DOES_NOT_EXIST)
       }
 
       return posts[0]

@@ -95,6 +95,7 @@ const definitions = {
     text: 'User is not a member of this group',
   },
   // posts, comments & events
+  POST_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'Could not find post.' },
   COMMENT_SAVE_CONTENT_TOO_SHORT: {
     type: 'BAD_USER_INPUT',
     text: 'Comment must be at least {min} character long!',
