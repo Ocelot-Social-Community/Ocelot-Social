@@ -126,7 +126,7 @@ export default {
 
         if (
           this.$can('post.pin') &&
-          (!this.resource.group || this.resource.group.groupType === 'public')
+          (!this.resource.group || this.resource.group.visibility === 'public')
         ) {
           if (!this.resource.pinnedBy && this.canBePinned) {
             routes.push({

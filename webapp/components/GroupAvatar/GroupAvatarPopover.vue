@@ -24,7 +24,7 @@
         class="location-info"
       />
       <div class="chips">
-        <os-badge variant="primary">{{ $t(`group.types.${resolvedGroup.groupType}`) }}</os-badge>
+        <os-badge variant="primary">{{ $t(`group.types.${resolvedGroup.visibility}`) }}</os-badge>
         <os-badge v-if="resolvedGroup.myRole" variant="primary">
           {{ $t(`group.roles.${resolvedGroup.myRole}`) }}
         </os-badge>

@@ -1012,6 +1012,11 @@
       "unavailable": "Group no longer available"
     },
     "type": "Visibility of the group",
+    "typeDescriptions": {
+      "closed": "All posts only visible to the group's members",
+      "hidden": "Group (including the name) is completely invisible",
+      "public": "Group and all posts are visible for all registered users"
+    },
     "types": {
       "closed": "Closed",
       "hidden": "Secret",
@@ -1030,6 +1035,7 @@
       "actionRadiusRequired": "Please choose an action radius.",
       "descriptionLength": "The description must be at least {min} characters.",
       "descriptionNotEmpty": "Please enter a description.",
+      "groupTypeNotAllowed": "You may not create this kind of group.",
       "groupTypeRequired": "Please choose a group type.",
       "nameNotEmpty": "Please enter a group name.",
       "slugInvalidCharacters": "Only lowercase letters, digits, hyphens and underscores are allowed.",

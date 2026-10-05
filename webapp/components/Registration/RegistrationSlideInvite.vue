@@ -13,7 +13,7 @@
     </p>
     <div class="invitation-info" v-if="invitedBy">
       <avatar-image :profile="invitedBy" size="small" />
-      <span v-if="invitedTo && invitedTo.groupType === 'hidden'">
+      <span v-if="invitedTo && invitedTo.visibility === 'hidden'">
         {{
           $t('components.registration.invite-code.invited-to-hidden-group', {
             invitedBy: invitedBy.name,

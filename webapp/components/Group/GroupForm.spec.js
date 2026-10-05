@@ -121,7 +121,7 @@ describe('GroupForm', () => {
     id: '1',
     name: 'Test Group',
     slug: 'test-group',
-    groupType: 'public',
+    visibility: 'public',
     about: 'About',
     description: 'Description text',
     actionRadius: 'local',
@@ -256,7 +256,7 @@ describe('GroupForm', () => {
     })
 
     it('becomes true once showMembers is toggled', () => {
-      const wrapper = mountWith({ update: true, group: { ...group, groupType: 'closed' } })
+      const wrapper = mountWith({ update: true, group: { ...group, visibility: 'closed' } })
       wrapper.find('#show-members').setChecked(true)
       expect(wrapper.vm.hasUnsavedChanges).toBe(true)
     })
@@ -573,11 +573,11 @@ describe('GroupForm', () => {
       })
       const errorWraps = wrapper.findAll('.ds-input-has-error')
       // OcelotInput (name) applies this class to its own root itself; the
-      // other three (groupType <select>, description <editor>,
-      // actionRadius <action-radius-select>) get it from the wrapping div
-      // added around each, since none of those components track/apply it
-      // on their own the way OcelotInput does.
-      expect(errorWraps).toHaveLength(4)
+      // other two (description <editor>, actionRadius <action-radius-select>)
+      // get it from the wrapping div added around each, since neither tracks
+      // it on its own the way OcelotInput does. The type picker is a row of
+      // cards rather than an input, and says so with its own hint.
+      expect(errorWraps).toHaveLength(3)
     })
 
     it('saves once the form becomes valid', async () => {
@@ -727,10 +727,10 @@ describe('GroupForm', () => {
   })
 
   describe('per-type create permissions (group.create_*)', () => {
-    const mountWith = (can) =>
+    const mountWith = (can, props = {}) =>
       mount(GroupForm, {
-        propsData: { update: false, group: {} },
-        mocks: { $t: jest.fn(), $can: can },
+        propsData: { update: false, group: {}, ...props },
+        mocks: { $t: jest.fn((key) => key), $can: can },
         localVue,
         stubs,
         store,
@@ -775,20 +775,125 @@ describe('GroupForm', () => {
       expect(formSubmit).toHaveBeenCalled()
     })
 
-    it('disables the hidden option in the type select when not permitted', () => {
+    it('refuses the hidden card when not permitted, and stays reachable to say why', () => {
+      // Shown and refused rather than hidden: "there is a kind of group I may not make" is
+      // information, an absent card is not. aria-disabled rather than disabled: a disabled
+      // button leaves the tab order, and with it the only way a keyboard reaches the reason.
       const wrapper = mountWith(canExceptHidden)
-      const hiddenOption = wrapper
-        .findAll('option')
-        .wrappers.find((o) => o.attributes('value') === 'hidden')
-      expect(hiddenOption.attributes('disabled')).toBeDefined()
+      const hidden = wrapper.find('[data-test="type-card-hidden"]')
+      expect(hidden.attributes('aria-disabled')).toBe('true')
+      expect(hidden.attributes('disabled')).toBeUndefined()
+      expect(hidden.attributes('title')).toBe('group.validations.groupTypeNotAllowed')
+      expect(wrapper.find('[data-test="type-card-public"]').attributes('aria-disabled')).toBe(
+        'false',
+      )
     })
 
-    it('disables the closed option in the type select when not permitted', () => {
+    it('picks nothing when a refused card is clicked', async () => {
+      const wrapper = mountWith(canExceptHidden)
+
+      await wrapper.find('[data-test="type-card-hidden"]').trigger('click')
+
+      expect(wrapper.vm.formData.groupType).toBe('')
+    })
+
+    it('tells the keyboard why a refused type cannot be picked, when it focuses the card', async () => {
+      const wrapper = mountWith(canExceptHidden)
+
+      wrapper.find('[data-test="type-card-hidden"]').element.dispatchEvent(new Event('focus'))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-test="type-description-refused"]').text()).toBe(
+        'group.validations.groupTypeNotAllowed',
+      )
+    })
+
+    it('says why a refused type cannot be picked, where its meaning is explained', async () => {
+      // Keyboard and touch never see a tooltip — the reason is text, shown for the card pointed at
+      // (here) or focused (above).
+      const wrapper = mountWith(canExceptHidden)
+      const hiddenItem = wrapper.find('[data-test="type-card-hidden"]').element.parentElement
+
+      hiddenItem.dispatchEvent(new Event('mouseenter'))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-test="type-description-refused"]').text()).toBe(
+        'group.validations.groupTypeNotAllowed',
+      )
+
+      hiddenItem.dispatchEvent(new Event('mouseleave'))
+      await wrapper.find('[data-test="type-card-public"]').trigger('click')
+
+      expect(wrapper.find('[data-test="type-description-refused"]').exists()).toBe(false)
+    })
+
+    it('refuses the closed card when not permitted', () => {
       const wrapper = mountWith((p) => p !== 'group.create_closed')
-      const closedOption = wrapper
-        .findAll('option')
-        .wrappers.find((o) => o.attributes('value') === 'closed')
-      expect(closedOption.attributes('disabled')).toBeDefined()
+      expect(wrapper.find('[data-test="type-card-closed"]').attributes('aria-disabled')).toBe(
+        'true',
+      )
+    })
+
+    it('picking a card sets the group type', async () => {
+      const wrapper = mountWith(() => true)
+
+      await wrapper.find('[data-test="type-card-closed"]').trigger('click')
+
+      expect(wrapper.vm.formData.groupType).toBe('closed')
+      expect(wrapper.find('[data-test="type-card-closed"]').classes()).toContain(
+        'group-state-card--active',
+      )
+    })
+
+    it('names the types and explains the one pointed at, else the one picked', async () => {
+      // Three cards each carrying their own sentence were as tall as the longest of them.
+      const wrapper = mountWith(() => true)
+      const description = () => wrapper.find('[data-test="type-description"]')
+      const card = (name) => wrapper.find(`[data-test="type-card-${name}"]`)
+
+      expect(description().exists()).toBe(false)
+
+      await card('public').trigger('click')
+      expect(wrapper.vm.describedType).toBe('public')
+      expect(card('public').attributes('aria-describedby')).toBe('type-description')
+
+      await card('hidden').element.parentElement.dispatchEvent(new Event('mouseenter'))
+      expect(wrapper.vm.describedType).toBe('hidden')
+
+      await card('hidden').element.parentElement.dispatchEvent(new Event('mouseleave'))
+      expect(wrapper.vm.describedType).toBe('public')
+
+      card('closed').element.dispatchEvent(new Event('focus'))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedType).toBe('closed')
+    })
+
+    it('keeps explaining the card under the cursor when focus leaves it, and vice versa', async () => {
+      const wrapper = mountWith(() => true)
+      const card = (name) => wrapper.find(`[data-test="type-card-${name}"]`)
+      await card('public').trigger('click')
+
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseenter'))
+      card('hidden').element.dispatchEvent(new Event('focus'))
+      card('hidden').element.dispatchEvent(new Event('blur'))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedType).toBe('hidden')
+
+      card('closed').element.dispatchEvent(new Event('focus'))
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseleave'))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedType).toBe('closed')
+
+      card('closed').element.dispatchEvent(new Event('blur'))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedType).toBe('public')
+    })
+
+    it('keeps the select when editing', () => {
+      const wrapper = mountWith(() => true, { update: true })
+
+      expect(wrapper.find('[data-test="type-cards"]').exists()).toBe(false)
+      expect(wrapper.find('select[name="groupType"]').exists()).toBe(true)
     })
 
     it('canCreateAnyGroup is false only when no type is permitted', () => {
@@ -837,7 +942,7 @@ describe('GroupForm', () => {
       })
 
     it('blocks switching an existing public group to hidden without group.create_hidden', () => {
-      const wrapper = mountEdit(() => false, { groupType: 'public' })
+      const wrapper = mountEdit(() => false, { visibility: 'public' })
       const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
       wrapper.vm.formData.groupType = 'hidden'
       wrapper.vm.onSubmit()
@@ -845,7 +950,7 @@ describe('GroupForm', () => {
     })
 
     it('allows editing an already-hidden group without group.create_hidden', () => {
-      const wrapper = mountEdit(() => false, { groupType: 'hidden' })
+      const wrapper = mountEdit(() => false, { visibility: 'hidden' })
       const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
       wrapper.vm.formData.groupType = 'hidden'
       wrapper.vm.onSubmit()
@@ -853,7 +958,7 @@ describe('GroupForm', () => {
     })
 
     it('keeps the hidden option enabled when the group is already hidden', () => {
-      const wrapper = mountEdit(() => false, { groupType: 'hidden' })
+      const wrapper = mountEdit(() => false, { visibility: 'hidden' })
       const hiddenOption = wrapper
         .findAll('option')
         .wrappers.find((o) => o.attributes('value') === 'hidden')
@@ -864,7 +969,7 @@ describe('GroupForm', () => {
   describe('effectiveShowMembers', () => {
     const mountWithType = (groupType, showMembers = false) =>
       mount(GroupForm, {
-        propsData: { update: false, group: { groupType, showMembers } },
+        propsData: { update: false, group: { visibility: groupType, showMembers } },
         mocks: { $t: jest.fn(), $can: () => true },
         localVue,
         stubs,

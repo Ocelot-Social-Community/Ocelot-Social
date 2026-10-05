@@ -536,7 +536,7 @@ export default {
       return (this.formData && this.formData.groupId) || (this.group && this.group.id) || null
     },
     showGroupHint() {
-      return this.groupId && this.group && ['closed', 'hidden'].includes(this.group.groupType)
+      return this.groupId && this.group && ['closed', 'hidden'].includes(this.group.visibility)
     },
     groupName() {
       return this.group && this.group.name

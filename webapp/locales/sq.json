@@ -1012,6 +1012,11 @@
       "unavailable": "Grupi nuk është më i disponueshëm"
     },
     "type": "Dukshmëria e grupit",
+    "typeDescriptions": {
+      "closed": "Të gjitha postimet janë të dukshme vetëm për anëtarët e grupit",
+      "hidden": "Grupi (përfshirë emrin) është plotësisht i padukshëm",
+      "public": "Grupi dhe të gjitha postimet janë të dukshme për të gjithë përdoruesit e regjistruar"
+    },
     "types": {
       "closed": "I mbyllur",
       "hidden": "Sekret",
@@ -1030,6 +1035,7 @@
       "actionRadiusRequired": "Ju lutem zgjidhni një rreze veprimi.",
       "descriptionLength": "Përshkrimi duhet të ketë të paktën {min} karaktere.",
       "descriptionNotEmpty": "Ju lutem shkruani një përshkrim.",
+      "groupTypeNotAllowed": "Nuk mund ta krijoni këtë lloj grupi.",
       "groupTypeRequired": "Ju lutem zgjidhni një lloj grupi.",
       "nameNotEmpty": "Ju lutem shkruani një emër grupi.",
       "slugInvalidCharacters": "Lejohen vetëm shkronja të vogla, shifra, viza dhe nënvija.",

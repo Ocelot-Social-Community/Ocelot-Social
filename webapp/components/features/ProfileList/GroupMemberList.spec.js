@@ -46,7 +46,7 @@ describe('GroupMemberList.vue', () => {
     })
 
     it('returns true when groups has entries', () => {
-      const wrapper = Wrapper({}, [{ id: '1', groupType: 'public', myRole: 'usual' }])
+      const wrapper = Wrapper({}, [{ id: '1', visibility: 'public', myRole: 'usual' }])
       expect(wrapper.vm.hasGroups).toBe(true)
     })
   })
@@ -138,12 +138,12 @@ describe('GroupMemberList.vue', () => {
 
   describe('groupsByType', () => {
     describe('when myProfile = true', () => {
-      it('groups by groupType into public, closed, hidden', () => {
+      it('groups by visibility into public, closed, hidden', () => {
         const groups = [
-          { id: '1', groupType: 'public', myRole: 'owner' },
-          { id: '2', groupType: 'closed', myRole: 'usual' },
-          { id: '3', groupType: 'hidden', myRole: 'admin' },
-          { id: '4', groupType: 'public', myRole: 'usual' },
+          { id: '1', visibility: 'public', myRole: 'owner' },
+          { id: '2', visibility: 'closed', myRole: 'usual' },
+          { id: '3', visibility: 'hidden', myRole: 'admin' },
+          { id: '4', visibility: 'public', myRole: 'usual' },
         ]
         const { groupsByType } = Wrapper({ myProfile: true }, groups).vm
         expect(groupsByType.public).toHaveLength(2)
@@ -152,7 +152,7 @@ describe('GroupMemberList.vue', () => {
       })
 
       it('returns empty arrays for types without groups', () => {
-        const groups = [{ id: '1', groupType: 'public', myRole: 'owner' }]
+        const groups = [{ id: '1', visibility: 'public', myRole: 'owner' }]
         const { groupsByType } = Wrapper({ myProfile: true }, groups).vm
         expect(groupsByType.closed).toHaveLength(0)
         expect(groupsByType.hidden).toHaveLength(0)
@@ -162,9 +162,9 @@ describe('GroupMemberList.vue', () => {
     describe('when myProfile = false', () => {
       it('puts groups with active membership (usual/admin/owner) into shared', () => {
         const groups = [
-          { id: '1', groupType: 'public', myRole: 'usual' },
-          { id: '2', groupType: 'closed', myRole: 'admin' },
-          { id: '3', groupType: 'hidden', myRole: 'owner' },
+          { id: '1', visibility: 'public', myRole: 'usual' },
+          { id: '2', visibility: 'closed', myRole: 'admin' },
+          { id: '3', visibility: 'hidden', myRole: 'owner' },
         ]
         const { groupsByType } = Wrapper({ myProfile: false }, groups).vm
         expect(groupsByType.shared).toHaveLength(3)
@@ -173,8 +173,8 @@ describe('GroupMemberList.vue', () => {
 
       it('puts groups with myRole = null into other', () => {
         const groups = [
-          { id: '1', groupType: 'public', myRole: null },
-          { id: '2', groupType: 'closed', myRole: null },
+          { id: '1', visibility: 'public', myRole: null },
+          { id: '2', visibility: 'closed', myRole: null },
         ]
         const { groupsByType } = Wrapper({ myProfile: false }, groups).vm
         expect(groupsByType.shared).toHaveLength(0)
@@ -183,8 +183,8 @@ describe('GroupMemberList.vue', () => {
 
       it('puts groups with myRole = pending into other, not shared', () => {
         const groups = [
-          { id: '1', groupType: 'closed', myRole: 'pending' },
-          { id: '2', groupType: 'public', myRole: 'usual' },
+          { id: '1', visibility: 'closed', myRole: 'pending' },
+          { id: '2', visibility: 'public', myRole: 'usual' },
         ]
         const { groupsByType } = Wrapper({ myProfile: false }, groups).vm
         expect(groupsByType.shared).toHaveLength(1)
@@ -195,10 +195,10 @@ describe('GroupMemberList.vue', () => {
 
       it('correctly splits a mixed list', () => {
         const groups = [
-          { id: '1', groupType: 'public', myRole: 'usual' },
-          { id: '2', groupType: 'closed', myRole: null },
-          { id: '3', groupType: 'hidden', myRole: 'pending' },
-          { id: '4', groupType: 'public', myRole: 'owner' },
+          { id: '1', visibility: 'public', myRole: 'usual' },
+          { id: '2', visibility: 'closed', myRole: null },
+          { id: '3', visibility: 'hidden', myRole: 'pending' },
+          { id: '4', visibility: 'public', myRole: 'owner' },
         ]
         const { groupsByType } = Wrapper({ myProfile: false }, groups).vm
         expect(groupsByType.shared.map((g) => g.id)).toEqual(['1', '4'])
@@ -210,7 +210,7 @@ describe('GroupMemberList.vue', () => {
   describe('toggleVisibility', () => {
     it('optimistically toggles showOnProfile and calls mutate', async () => {
       mockApollo.mutate.mockResolvedValue({})
-      const group = { id: 'g1', groupType: 'public', myRole: 'usual', showOnProfile: true }
+      const group = { id: 'g1', visibility: 'public', myRole: 'usual', showOnProfile: true }
       const wrapper = Wrapper({}, [group])
       await wrapper.vm.toggleVisibility(group)
       expect(group.showOnProfile).toBe(false)
@@ -224,7 +224,7 @@ describe('GroupMemberList.vue', () => {
 
     it('rolls back showOnProfile and resets _skipNextSubscriptionReload on error', async () => {
       mockApollo.mutate.mockRejectedValue(new Error('Server error'))
-      const group = { id: 'g1', groupType: 'public', myRole: 'usual', showOnProfile: false }
+      const group = { id: 'g1', visibility: 'public', myRole: 'usual', showOnProfile: false }
       const wrapper = Wrapper({}, [group])
       await wrapper.vm.toggleVisibility(group)
       expect(group.showOnProfile).toBe(false)
@@ -236,19 +236,19 @@ describe('GroupMemberList.vue', () => {
   describe('typesWithGroups', () => {
     describe('when myProfile = false', () => {
       it('returns only "other" when viewer has no shared groups', () => {
-        const groups = [{ id: '1', groupType: 'public', myRole: null }]
+        const groups = [{ id: '1', visibility: 'public', myRole: null }]
         expect(Wrapper({ myProfile: false }, groups).vm.typesWithGroups).toEqual(['other'])
       })
 
       it('returns only "shared" when all groups are shared', () => {
-        const groups = [{ id: '1', groupType: 'public', myRole: 'usual' }]
+        const groups = [{ id: '1', visibility: 'public', myRole: 'usual' }]
         expect(Wrapper({ myProfile: false }, groups).vm.typesWithGroups).toEqual(['shared'])
       })
 
       it('returns ["shared", "other"] when both sections have groups', () => {
         const groups = [
-          { id: '1', groupType: 'public', myRole: 'usual' },
-          { id: '2', groupType: 'closed', myRole: null },
+          { id: '1', visibility: 'public', myRole: 'usual' },
+          { id: '2', visibility: 'closed', myRole: null },
         ]
         expect(Wrapper({ myProfile: false }, groups).vm.typesWithGroups).toEqual([
           'shared',
@@ -264,17 +264,17 @@ describe('GroupMemberList.vue', () => {
     describe('when myProfile = true', () => {
       it('returns only the types that have groups', () => {
         const groups = [
-          { id: '1', groupType: 'public', myRole: 'owner' },
-          { id: '2', groupType: 'public', myRole: 'usual' },
+          { id: '1', visibility: 'public', myRole: 'owner' },
+          { id: '2', visibility: 'public', myRole: 'usual' },
         ]
         expect(Wrapper({ myProfile: true }, groups).vm.typesWithGroups).toEqual(['public'])
       })
 
       it('returns all three types when each has at least one group', () => {
         const groups = [
-          { id: '1', groupType: 'public', myRole: 'owner' },
-          { id: '2', groupType: 'closed', myRole: 'usual' },
-          { id: '3', groupType: 'hidden', myRole: 'admin' },
+          { id: '1', visibility: 'public', myRole: 'owner' },
+          { id: '2', visibility: 'closed', myRole: 'usual' },
+          { id: '3', visibility: 'hidden', myRole: 'admin' },
         ]
         expect(Wrapper({ myProfile: true }, groups).vm.typesWithGroups).toEqual([
           'public',
@@ -348,7 +348,7 @@ describe('GroupMemberList.vue', () => {
 
       mockApollo.query.mockResolvedValueOnce({
         data: {
-          User: [{ id: 'user-1', groups: [{ id: 'g2', groupType: 'public', myRole: 'usual' }] }],
+          User: [{ id: 'user-1', groups: [{ id: 'g2', visibility: 'public', myRole: 'usual' }] }],
         },
       })
       await wrapper.vm.loadGroups(0)
@@ -362,10 +362,10 @@ describe('GroupMemberList.vue', () => {
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
 
-      wrapper.setData({ groups: [{ id: 'g1', groupType: 'public', myRole: 'usual' }] })
+      wrapper.setData({ groups: [{ id: 'g1', visibility: 'public', myRole: 'usual' }] })
       mockApollo.query.mockResolvedValueOnce({
         data: {
-          User: [{ id: 'user-1', groups: [{ id: 'g2', groupType: 'public', myRole: 'usual' }] }],
+          User: [{ id: 'user-1', groups: [{ id: 'g2', visibility: 'public', myRole: 'usual' }] }],
         },
       })
       await wrapper.vm.loadGroups(1)
@@ -379,7 +379,7 @@ describe('GroupMemberList.vue', () => {
     it('sets showFilter when groups.length >= PAGE_SIZE', async () => {
       const groups = Array.from({ length: 25 }, (_, i) => ({
         id: `g${i}`,
-        groupType: 'public',
+        visibility: 'public',
         myRole: 'usual',
       }))
       const wrapper = Wrapper({}, groups)
@@ -397,7 +397,7 @@ describe('GroupMemberList.vue', () => {
     it('does not set showFilter when groups.length < PAGE_SIZE', async () => {
       const groups = Array.from({ length: 5 }, (_, i) => ({
         id: `g${i}`,
-        groupType: 'public',
+        visibility: 'public',
         myRole: 'usual',
       }))
       const wrapper = Wrapper({}, groups)

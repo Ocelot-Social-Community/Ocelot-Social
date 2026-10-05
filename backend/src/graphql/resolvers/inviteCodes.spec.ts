@@ -211,7 +211,7 @@ describe('validateInviteCode', () => {
                 name: 'Inviting User',
               },
               invitedTo: {
-                groupType: 'public',
+                visibility: 'public',
                 name: 'Public Group',
                 about: 'We are public',
                 avatar: null,
@@ -239,7 +239,7 @@ describe('validateInviteCode', () => {
                 name: 'Inviting User',
               },
               invitedTo: {
-                groupType: 'hidden',
+                visibility: 'hidden',
                 name: '',
                 about: '',
                 avatar: null,
@@ -296,7 +296,7 @@ describe('validateInviteCode', () => {
             },
             invitedTo: {
               id: 'public-group',
-              groupType: 'public',
+              visibility: 'public',
               name: 'Public Group',
               about: 'We are public',
               avatar: null,
@@ -643,7 +643,7 @@ describe('generateGroupInviteCode', () => {
             },
             invitedTo: {
               id: 'public-group',
-              groupType: 'public',
+              visibility: 'public',
               name: 'Public Group',
               about: 'We are public',
               avatar: null,
@@ -678,7 +678,7 @@ describe('generateGroupInviteCode', () => {
             },
             invitedTo: {
               id: 'public-group',
-              groupType: 'public',
+              visibility: 'public',
               name: 'Public Group',
               about: 'We are public',
               avatar: null,
@@ -716,7 +716,7 @@ describe('generateGroupInviteCode', () => {
             },
             invitedTo: {
               id: 'public-group',
-              groupType: 'public',
+              visibility: 'public',
               name: 'Public Group',
               about: 'We are public',
               avatar: null,
@@ -754,7 +754,7 @@ describe('generateGroupInviteCode', () => {
             },
             invitedTo: {
               id: 'public-group',
-              groupType: 'public',
+              visibility: 'public',
               name: 'Public Group',
               about: 'We are public',
               avatar: null,

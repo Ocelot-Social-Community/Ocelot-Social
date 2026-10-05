@@ -43,7 +43,7 @@ export const createGroupMutation = () => {
         deleted
         about
         description
-        groupType
+        visibility
         actionRadius
         categories {
           id
@@ -102,7 +102,7 @@ export const updateGroupMutation = () => {
         deleted
         about
         description
-        groupType
+        visibility
         actionRadius
         categories {
           id
@@ -197,7 +197,7 @@ export const myGroupsForPostCreation = () => gql`
       id
       name
       slug
-      groupType
+      visibility
       categories {
         id
         slug
@@ -223,7 +223,7 @@ export const groupQuery = (i18n) => {
         deleted
         about
         description
-        groupType
+        visibility
         actionRadius
         isMutedByMe
         categories {
@@ -255,7 +255,7 @@ export const groupEditQuery = () => {
         slug
         about
         description
-        groupType
+        visibility
         actionRadius
         locationName
         categories {
@@ -342,7 +342,7 @@ export const groupTeaserQuery = (i18n) => {
         name
         slug
         about
-        groupType
+        visibility
         actionRadius
         myRole
         membersCount

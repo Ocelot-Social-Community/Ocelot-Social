@@ -145,7 +145,7 @@
             </p>
             <div class="chip" align="center">
               <os-badge variant="primary">
-                {{ group && group.groupType ? $t('group.types.' + group.groupType) : '' }}
+                {{ group && group.visibility ? $t('group.types.' + group.visibility) : '' }}
               </os-badge>
             </div>
             <!-- group action radius -->
@@ -484,7 +484,7 @@ export default {
     },
     // Network permission to OPEN (start) a call in this group's type.
     canOpenVideoCall() {
-      return this.group ? this.$can(`videoCall.create_${this.group.groupType}`) : false
+      return this.group ? this.$can(`videoCall.create_${this.group.visibility}`) : false
     },
     // No call running and the viewer may not start one → the button is a dead end.
     videoCallOpenDenied() {
@@ -523,20 +523,20 @@ export default {
       return this.group ? ['usual', 'admin', 'owner'].includes(this.group.myRole) : false
     },
     isGroupVisible() {
-      return this.group && !(this.group.groupType === 'hidden' && !this.isGroupMemberNonePending)
+      return this.group && !(this.group.visibility === 'hidden' && !this.isGroupMemberNonePending)
     },
     isAllowedSeeingGroupMembers() {
       if (!this.group) return false
-      if (this.group.groupType === 'public') return true
-      if (['closed', 'hidden'].includes(this.group.groupType) && this.isGroupMemberNonePending)
+      if (this.group.visibility === 'public') return true
+      if (['closed', 'hidden'].includes(this.group.visibility) && this.isGroupMemberNonePending)
         return true
       // non-members can see the member list of a closed group when the owner enabled showMembers
-      if (this.group.groupType === 'closed' && this.group.showMembers === true) return true
+      if (this.group.visibility === 'closed' && this.group.showMembers === true) return true
       return false
     },
     membersListSubtitle() {
       if (!this.group || !this.isGroupMemberNonePending) return null
-      if (this.group.groupType === 'public' || this.group.showMembers === true) {
+      if (this.group.visibility === 'public' || this.group.showMembers === true) {
         return this.$t('group.membersListVisibleToNonMembers')
       }
       return this.$t('group.membersListNotVisibleToNonMembers')

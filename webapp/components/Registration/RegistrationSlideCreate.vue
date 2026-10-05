@@ -348,7 +348,7 @@ export default {
           if (
             validateInviteCode &&
             validateInviteCode.invitedTo &&
-            validateInviteCode.invitedTo.groupType === 'public'
+            validateInviteCode.invitedTo.visibility === 'public'
           ) {
             const { invitedTo } = validateInviteCode
             this.$router.push(`/groups/${invitedTo.slug}`)

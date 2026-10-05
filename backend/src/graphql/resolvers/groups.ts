@@ -810,6 +810,8 @@ export default {
       }
       return parent.about
     },
+    // Stored as `groupType`; served as `visibility`, the name the field goes by from now on.
+    visibility: (parent) => parent.groupType,
     showMembers: (parent) => {
       if (parent.groupType === 'public') {
         return true

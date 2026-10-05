@@ -10,7 +10,7 @@
         :inviteCodes="group.inviteCodes"
         :loading="loadingGenerateCode"
         :copy-message="
-          group.groupType === 'hidden'
+          group.visibility === 'hidden'
             ? $t('invite-codes.invite-link-message-hidden-group', {
                 network: $env.NETWORK_NAME,
               })

@@ -343,7 +343,7 @@ describe('in mode', () => {
                 slug: 'the-group',
                 about: 'We will change the world!',
                 description: 'Some description' + descriptionAdditional100,
-                groupType: 'public',
+                visibility: 'public',
                 actionRadius: 'regional',
                 locationName: 'Hamburg, Germany',
                 location: expect.objectContaining({
@@ -1046,6 +1046,8 @@ describe('in mode', () => {
         describe('public group', () => {
           describe('joined by "owner-of-closed-group"', () => {
             it('has "usual" as membership role', async () => {
+              authenticatedUser = await ownerOfClosedGroupUser.toJson()
+
               await expect(
                 mutate({
                   mutation: JoinGroup,
@@ -1073,6 +1075,8 @@ describe('in mode', () => {
           describe('joined by its owner', () => {
             describe('does not create additional "MEMBER_OF" relation and therefore', () => {
               it('has still "owner" as membership role', async () => {
+                authenticatedUser = await user.toJson()
+
                 await expect(
                   mutate({
                     mutation: JoinGroup,
@@ -1099,9 +1103,68 @@ describe('in mode', () => {
           })
         })
 
+        describe('joined on behalf of somebody else', () => {
+          let bystander
+
+          beforeAll(async () => {
+            bystander = await Factory.build('user', { id: 'bystander', name: 'Bystander' })
+          })
+
+          const joinBystander = async () =>
+            mutate({
+              mutation: JoinGroup,
+              variables: { groupId: 'public-group', userId: 'bystander' },
+            })
+
+          it('is refused to somebody outside the group', async () => {
+            authenticatedUser = await ownerOfHiddenGroupUser.toJson()
+            const { errors } = await joinBystander()
+
+            expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+          })
+
+          it('is refused to a usual member', async () => {
+            // "owner-of-closed-group" joined the public group as a usual member above.
+            authenticatedUser = await ownerOfClosedGroupUser.toJson()
+            const { errors } = await joinBystander()
+
+            expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+          })
+
+          it('is refused for a closed group too, where it would file a request in their name', async () => {
+            authenticatedUser = await bystander.toJson()
+            const { errors } = await mutate({
+              mutation: JoinGroup,
+              variables: { groupId: 'closed-group', userId: 'owner-of-hidden-group' },
+            })
+
+            expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+          })
+
+          it('is allowed to an admin of the group', async () => {
+            authenticatedUser = await user.toJson()
+            await mutate({
+              mutation: ChangeGroupMemberRole,
+              variables: {
+                groupId: 'public-group',
+                userId: 'owner-of-closed-group',
+                roleInGroup: 'admin',
+              },
+            })
+            authenticatedUser = await ownerOfClosedGroupUser.toJson()
+
+            await expect(joinBystander()).resolves.toMatchObject({
+              data: { JoinGroup: { user: { id: 'bystander' }, membership: { role: 'usual' } } },
+              errors: undefined,
+            })
+          })
+        })
+
         describe('closed group', () => {
           describe('joined by "current-user"', () => {
             it('has "pending" as membership role', async () => {
+              authenticatedUser = await user.toJson()
+
               await expect(
                 mutate({
                   mutation: JoinGroup,
@@ -1129,6 +1192,8 @@ describe('in mode', () => {
           describe('joined by its owner', () => {
             describe('does not create additional "MEMBER_OF" relation and therefore', () => {
               it('has still "owner" as membership role', async () => {
+                authenticatedUser = await ownerOfClosedGroupUser.toJson()
+
                 await expect(
                   mutate({
                     mutation: JoinGroup,
@@ -1158,6 +1223,7 @@ describe('in mode', () => {
         describe('hidden group', () => {
           describe('joined by "owner-of-closed-group"', () => {
             it('throws authorization error', async () => {
+              authenticatedUser = await ownerOfClosedGroupUser.toJson()
               const { errors } = await query({
                 query: JoinGroup,
                 variables: {
@@ -1173,6 +1239,8 @@ describe('in mode', () => {
           describe('joined by its owner', () => {
             describe('does not create additional "MEMBER_OF" relation and therefore', () => {
               it('has still "owner" as membership role', async () => {
+                authenticatedUser = await ownerOfHiddenGroupUser.toJson()
+
                 await expect(
                   mutate({
                     mutation: JoinGroup,
@@ -3717,7 +3785,7 @@ describe('in mode', () => {
                 }),
               ).resolves.toMatchObject({
                 data: {
-                  UpdateGroup: { id: 'my-group', groupType: 'hidden', myRole: 'owner' },
+                  UpdateGroup: { id: 'my-group', visibility: 'hidden', myRole: 'owner' },
                 },
                 errors: undefined,
               })
@@ -3741,7 +3809,7 @@ describe('in mode', () => {
                 }),
               ).resolves.toMatchObject({
                 data: {
-                  UpdateGroup: { id: 'my-group', groupType: 'public', myRole: 'owner' },
+                  UpdateGroup: { id: 'my-group', visibility: 'public', myRole: 'owner' },
                 },
                 errors: undefined,
               })
@@ -5076,5 +5144,13 @@ describe('Subscription.groupMembershipVisibilityChanged filter', () => {
     expect(await deliveredWithin(next)).toBe('pending')
 
     await iterator.return?.()
+  })
+})
+
+describe('Group.visibility', () => {
+  // The value is stored as `groupType`, which stays in the schema, deprecated, for clients that
+  // still ask for it; `visibility` serves the same value under the name it goes by now.
+  it.each(['public', 'closed', 'hidden'])('serves the stored groupType %s', (groupType) => {
+    expect(groupsResolver.Group.visibility({ groupType })).toBe(groupType)
   })
 })
