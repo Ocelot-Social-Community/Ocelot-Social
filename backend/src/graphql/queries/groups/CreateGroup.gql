@@ -33,7 +33,7 @@ mutation CreateGroup(
     deleted
     about
     description
-    groupType
+    visibility
     actionRadius
     categories {
       id

@@ -286,7 +286,7 @@ describe('ContentMenu.vue', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 pinnedBy: null,
                 group: {
-                  groupType: 'public',
+                  visibility: 'public',
                 },
               },
             })
@@ -301,7 +301,7 @@ describe('ContentMenu.vue', () => {
                   id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                   pinnedBy: null,
                   group: {
-                    groupType: 'public',
+                    visibility: 'public',
                   },
                 },
               ],
@@ -319,7 +319,7 @@ describe('ContentMenu.vue', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 pinnedBy: null,
                 group: {
-                  groupType: 'closed',
+                  visibility: 'closed',
                 },
               },
             })
@@ -339,7 +339,7 @@ describe('ContentMenu.vue', () => {
                 id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
                 pinnedBy: null,
                 group: {
-                  groupType: 'hidden',
+                  visibility: 'hidden',
                 },
               },
             })

@@ -30,10 +30,10 @@ describe('RoleTabs', () => {
     const wrapper = Wrapper()
 
     expect(wrapper.find('[data-test="role-tab-user"]').classes()).toContain(
-      'toggle-group__item--active',
+      'os-toggle-group__option--selected',
     )
     expect(wrapper.find('[data-test="role-tab-owner"]').classes()).not.toContain(
-      'toggle-group__item--active',
+      'os-toggle-group__option--selected',
     )
   })
 
@@ -84,7 +84,7 @@ describe('RoleTabs', () => {
   it('names the row for assistive tech', () => {
     const wrapper = Wrapper({ label: 'Roles' })
 
-    expect(wrapper.find('[role="group"]').attributes('aria-label')).toBe('Roles')
+    expect(wrapper.find('[role="radiogroup"]').attributes('aria-label')).toBe('Roles')
   })
 
   it('renders whatever the page adds at the end of the row', () => {

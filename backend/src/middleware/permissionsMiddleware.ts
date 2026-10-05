@@ -275,6 +275,10 @@ const isAllowedToChangeGroupMemberRole = rule({
   }
 })
 
+// Joining for oneself follows the group's join rules. Joining SOMEBODY ELSE — the `userId`
+// argument is free — additionally takes the group's admin or owner: without that check any
+// authenticated user could make anybody a member of a public group (and of its chat room), or
+// file a join request in their name for a closed one.
 const isAllowedToJoinGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }: Context) => {
@@ -288,17 +292,24 @@ const isAllowedToJoinGroup = rule({
       `
         MATCH (group:Group {id: $groupId})
         OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(member:User {id: $userId})
-        RETURN group {.*}, member {.*, myRoleInGroup: membership.role}
+        OPTIONAL MATCH (group)<-[callerMembership:MEMBER_OF]-(:User {id: $callerId})
+        RETURN group {.*}, member {.*, myRoleInGroup: membership.role},
+          callerMembership.role AS callerRole
       `,
-      { groupId, userId },
+      { groupId, userId, callerId: user.id },
     )
+    const [record] = transactionResponse.records
     return {
-      group: transactionResponse.records.map((record) => record.get('group'))[0],
-      member: transactionResponse.records.map((record) => record.get('member'))[0],
+      group: record?.get('group'),
+      member: record?.get('member'),
+      callerRole: record?.get('callerRole') as string | null | undefined,
     }
   })
   try {
-    const { group, member } = await readTxPromise
+    const { group, member, callerRole } = await readTxPromise
+    if (userId !== user.id && !['admin', 'owner'].includes(callerRole ?? '')) {
+      return false
+    }
     return !!group && (group.groupType !== 'hidden' || (!!member && !!member.myRoleInGroup))
   } finally {
     await session.close()
@@ -808,6 +819,7 @@ export default shield(
       avatar: allow,
       name: allow,
       about: allow,
+      visibility: allow,
       groupType: allow,
     },
     InviteCode: {

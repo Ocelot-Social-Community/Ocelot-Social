@@ -78,7 +78,7 @@ mutation {
     deleted
     about
     description
-    groupType
+    visibility
     actionRadius
     myRole
   }
@@ -100,7 +100,7 @@ You will receive the answer:
       "deleted": false,
       "about": "We will save the world",
       "description": "<p class=\"\"><em>English:</em></p><p class=\"\">This group is hidden.</p><h3>What is our group for?</h3><p>This group was created to allow investigative journalists to share and collaborate.</p><h3>How does it work?</h3><p>Here you can internally share posts and comments about them.</p><p><br></p><p><em>Deutsch:</em></p><p class=\"\">Diese Gruppe ist verborgen.</p><h3>Wofür ist unsere Gruppe?</h3><p class=\"\">Diese Gruppe wurde geschaffen, um investigativen Journalisten den Austausch und die Zusammenarbeit zu ermöglichen.</p><h3>Wie funktioniert das?</h3><p class=\"\">Hier könnt ihr euch intern über Beiträge und Kommentare zu ihnen austauschen.</p>",
-      "groupType": "hidden",
+      "visibility": "hidden",
       "actionRadius": "interplanetary",
       "myRole": "owner"
     }

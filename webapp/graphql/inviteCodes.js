@@ -6,7 +6,7 @@ export const validateInviteCodeQuery = gql`
       invitedTo {
         id
         slug
-        groupType
+        visibility
       }
     }
   }
