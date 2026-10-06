@@ -133,9 +133,8 @@ export default {
       } catch (err) {
         if (err.message === 'Error: no-cookie') {
           this.$toast.error(this.$t('login.no-cookie'))
-        } else if (backendErrorCode(err.cause) === 'LOGIN_ACCOUNT_DISABLED') {
-          // The store wraps the backend error; `cause` is the Apollo error itself.
-          this.$toast.error(this.$backendError(err.cause))
+        } else if (backendErrorCode(err) === 'LOGIN_ACCOUNT_DISABLED') {
+          this.$toast.error(this.$backendError(err))
         } else {
           this.$toast.error(this.$t('login.failure'))
         }
