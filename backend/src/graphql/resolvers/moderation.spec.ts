@@ -162,22 +162,30 @@ describe('moderate resources', () => {
       })
 
       it('updates the updatedAt attribute', async () => {
-        const [firstReview, secondReview] = await Promise.all([
-          mutate({
-            mutation: review,
-            variables: { ...disableVariables, resourceId: 'should-i-be-disabled' },
-          }),
-          mutate({
-            mutation: review,
-            variables: { ...enableVariables, resourceId: 'should-i-be-disabled' },
-          }),
-        ])
+        const firstReview = await mutate({
+          mutation: review,
+          variables: { ...disableVariables, resourceId: 'should-i-be-disabled' },
+        })
+        // Backdate the first review: two reviews can land in the same millisecond, and then
+        // their timestamps would be equal although the second one did update the attribute.
+        const backdatedUpdatedAt = '2020-01-01T00:00:00.000Z'
+        await database.neode.cypher(
+          `MATCH (:Report)<-[review:REVIEWED]-(:User {id: "moderator-id"})
+           SET review.updatedAt = $backdatedUpdatedAt`,
+          { backdatedUpdatedAt },
+        )
+        const secondReview = await mutate({
+          mutation: review,
+          variables: { ...enableVariables, resourceId: 'should-i-be-disabled' },
+        })
 
         expect(firstReview.data.review.updatedAt).toBeTruthy()
         expect(Date.parse(firstReview.data.review.updatedAt)).toEqual(expect.any(Number))
         expect(secondReview.data.review.updatedAt).toBeTruthy()
-        expect(Date.parse(secondReview.data.review.updatedAt)).toEqual(expect.any(Number))
-        expect(firstReview.data.review.updatedAt).not.toEqual(secondReview.data.review.updatedAt)
+        expect(Date.parse(secondReview.data.review.updatedAt)).toBeGreaterThan(
+          Date.parse(backdatedUpdatedAt),
+        )
+        expect(secondReview.data.review.createdAt).toEqual(firstReview.data.review.createdAt)
       })
     })
   })

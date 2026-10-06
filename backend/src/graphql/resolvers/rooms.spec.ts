@@ -558,6 +558,67 @@ describe('Room', () => {
       expect(dates.every((date: string) => date < cursor)).toBe(true)
     })
 
+    // Neo4j's toString(datetime()) drops trailing zeros of the fraction, so 890 ms is stored as
+    // "….89Z" — which as a string sorts AFTER "….895Z". The list and its cursor have to compare
+    // the timestamps as points in time, or one message in ten puts its room in the wrong place.
+    describe('with a last message timestamp whose fraction ends in zero', () => {
+      const earlier = '2099-01-01T00:00:00.89Z'
+      const later = '2099-01-01T00:00:00.895Z'
+      const setLastMessageAt = `
+        MATCH (:User { id: 'chatting-user' })-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(:User { id: $userId })
+        WITH room, room.lastMessageAt AS previous
+        SET room.lastMessageAt = $lastMessageAt
+        RETURN previous`
+      let previousSecond: string, previousThird: string
+
+      beforeAll(async () => {
+        const [second, third] = await Promise.all([
+          database.neode.cypher(setLastMessageAt, {
+            userId: 'second-chatting-user',
+            lastMessageAt: earlier,
+          }),
+          database.neode.cypher(setLastMessageAt, {
+            userId: 'third-chatting-user',
+            lastMessageAt: later,
+          }),
+        ])
+        previousSecond = second.records[0].get('previous')
+        previousThird = third.records[0].get('previous')
+      })
+
+      afterAll(async () => {
+        await Promise.all([
+          database.neode.cypher(setLastMessageAt, {
+            userId: 'second-chatting-user',
+            lastMessageAt: previousSecond,
+          }),
+          database.neode.cypher(setLastMessageAt, {
+            userId: 'third-chatting-user',
+            lastMessageAt: previousThird,
+          }),
+        ])
+      })
+
+      it('sorts the rooms chronologically', async () => {
+        const result = await query({ query: Room, variables: { first: 2 } })
+
+        expect(result.errors).toBeUndefined()
+        expect(result.data.Room.map((room: { roomName: string }) => room.roomName)).toEqual([
+          'Third Chatting User',
+          'Second Chatting User',
+        ])
+      })
+
+      it('pages backwards chronologically', async () => {
+        const result = await query({ query: Room, variables: { first: 1, before: later } })
+
+        expect(result.errors).toBeUndefined()
+        expect(result.data.Room.map((room: { roomName: string }) => room.roomName)).toEqual([
+          'Second Chatting User',
+        ])
+      })
+    })
+
     // The chat list's search box. It matches on the room NAME, which for a direct message is the
     // other participant's name — a room the current user does not chat in must not surface
     // through it, so the filter is added to the same authorised match rather than applied after.
