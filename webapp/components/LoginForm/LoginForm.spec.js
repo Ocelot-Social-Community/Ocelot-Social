@@ -47,6 +47,7 @@ describe('LoginForm', () => {
       const store = new Vuex.Store(storeMocks)
       mocks = {
         $t: (key) => key,
+        $i18n: { keyExists: (key) => key === 'backendErrors.LOGIN_ACCOUNT_DISABLED' },
         $toast: {
           success: jest.fn(),
           error: jest.fn(),
@@ -86,9 +87,7 @@ describe('LoginForm', () => {
           }
           await fillIn(failWith(new Error('GraphQL error: disabled', { cause })))
           await Vue.nextTick()
-          expect(mocks.$toast.error).toHaveBeenCalledWith(
-            'GraphQL error: Your account has been disabled.',
-          )
+          expect(mocks.$toast.error).toHaveBeenCalledWith('backendErrors.LOGIN_ACCOUNT_DISABLED')
         })
 
         it('shows the cookie hint when no cookie can be set', async () => {
