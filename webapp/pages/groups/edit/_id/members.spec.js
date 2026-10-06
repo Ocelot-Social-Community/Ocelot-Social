@@ -100,7 +100,9 @@ describe('pages/groups/edit/_id/members.vue', () => {
       const ctx = {
         GroupMembers: [{ id: 'x' }],
         $toast: { error: jest.fn() },
-        $backendError: (error) => error.message,
+        $toastBackendError(error) {
+          this.$toast.error(error.message)
+        },
       }
       apollo.error.call(ctx, new Error('boom'))
       expect(ctx.GroupMembers).toEqual([])

@@ -109,7 +109,7 @@ export default {
         this.showPublicGroups = this.currentUser.showPublicGroupsOnProfile !== false
         this.showClosedGroups = this.currentUser.showClosedGroupsOnProfile !== false
         this.showHiddenGroups = this.currentUser.showHiddenGroupsOnProfile !== false
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       }
     },
   },

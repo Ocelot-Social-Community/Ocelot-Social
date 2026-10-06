@@ -269,7 +269,7 @@ export default {
         const label = formatCoordinates(lat, lng)
         this.pinRevision += 1
         this.$emit('input', { label, value: label, id: null, lat, lng })
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       }
     },
     onViewOnMap({ lat, lng }) {

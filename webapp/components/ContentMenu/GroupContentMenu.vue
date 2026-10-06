@@ -169,7 +169,7 @@ export default {
         this.$emit('profileVisibilityChanged', this.group.id, showOnProfile)
         this.$toast.success(this.$t('group.contentMenu.profileVisibilityUpdated'))
       } catch (error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       }
     },
   },

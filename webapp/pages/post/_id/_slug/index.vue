@@ -549,7 +549,7 @@ export default {
         this.$toast.success(this.$t('delete.contribution.success'))
         this.$router.push('/') // Redirect to index (main) page
       } catch (err) {
-        this.$toast.error(this.$backendError(err))
+        this.$toastBackendError(err)
       }
     },
     async createComment(comment) {
@@ -570,7 +570,7 @@ export default {
         this.$toast.success(message)
         await this.$apollo.queries.Post.refetch()
       } catch (error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       } finally {
         this.observeLoading = false
       }

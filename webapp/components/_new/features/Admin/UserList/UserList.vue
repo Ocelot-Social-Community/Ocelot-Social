@@ -517,7 +517,7 @@ export default {
           // DOM showing the rejected choice. Reset it to the real role so the UI stays
           // truthful even when no refetch runs (e.g. a network error).
           event.target.value = user.roleName
-          this.$toast.error(this.$backendError(error))
+          this.$toastBackendError(error)
         })
     },
   },

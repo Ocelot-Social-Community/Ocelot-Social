@@ -175,7 +175,7 @@ export default {
           })
           this.setButtonValues()
 
-          this.$toast.error(this.$backendError(err))
+          this.$toastBackendError(err)
           return false
         }
       }

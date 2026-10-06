@@ -196,7 +196,7 @@ export default {
 
         return true
       } catch (err) {
-        thisList.$toast.error(thisList.$backendError(err))
+        thisList.$toastBackendError(err)
 
         return false
       }
@@ -221,7 +221,7 @@ export default {
 
         thisList.$toast.success(thisList.$t('settings.social-media.successDelete'))
       } catch (err) {
-        thisList.$toast.error(thisList.$backendError(err))
+        thisList.$toastBackendError(err)
       }
     },
   },

@@ -86,7 +86,7 @@ export default {
         .then(() => {
           this.$toast.success(this.$t('profile.avatar.submitted'))
         })
-        .catch((error) => this.$toast.error(this.$backendError(error)))
+        .catch((error) => this.$toastBackendError(error))
     },
     verror(file, message) {
       if (file.status === 'error') {

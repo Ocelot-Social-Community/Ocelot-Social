@@ -114,7 +114,7 @@ export default {
         }
         this.reloadGroups()
       },
-      error: (err) => this.$toast.error(this.$backendError(err)),
+      error: (err) => this.$toastBackendError(err),
     })
 
     await this.loadGroups(0)
@@ -183,7 +183,7 @@ export default {
         }
         if (newGroups.length < PAGE_SIZE) this.allGroupsLoaded = true
       } catch (error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       } finally {
         this.loadingGroups = false
         this.loadingMore = false
@@ -216,7 +216,7 @@ export default {
       } catch (error) {
         group.showOnProfile = !newValue
         this._skipNextSubscriptionReload = false
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       }
     },
   },
