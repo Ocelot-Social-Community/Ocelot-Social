@@ -209,53 +209,6 @@ describe('apollo client config', () => {
       ])
     })
 
-    describe('backend errors in the console', () => {
-      const body = {
-        errors: [
-          {
-            message: 'Variable "$orderBy" got invalid value "nonsense"',
-            extensions: { code: 'BAD_USER_INPUT' },
-          },
-        ],
-      }
-      let consoleError
-
-      beforeEach(() => {
-        consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
-      })
-
-      afterEach(() => {
-        consoleError.mockRestore()
-        delete process.client
-      })
-
-      it('are logged in the browser — including those of a 4xx answer', async () => {
-        // Proves the ORDER of the two links: only outside the response link does the log link get
-        // to see what that one recovers from the 400.
-        process.client = true
-        respondWith(400, body)
-
-        await buildClient()
-          .apolloClient.query({ query: QUERY })
-          .catch((caught) => caught)
-
-        expect(consoleError).toHaveBeenCalledWith(
-          '[backend error] BAD_USER_INPUT: Variable "$orderBy" got invalid value "nonsense"',
-          expect.any(Object),
-        )
-      })
-
-      it('are not logged during SSR', async () => {
-        respondWith(400, body)
-
-        await buildClient()
-          .apolloClient.query({ query: QUERY })
-          .catch((caught) => caught)
-
-        expect(consoleError).not.toHaveBeenCalled()
-      })
-    })
-
     it('still fails loudly when the transport itself breaks', async () => {
       // The other half of the contract: a 5xx carrying an errors array must NOT be laundered into a
       // field error, or every backend crash hides behind a message about the user's input.

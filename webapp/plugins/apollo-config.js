@@ -1,6 +1,4 @@
 import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
-import { ApolloLink } from 'apollo-link'
-import { createBackendErrorLogLink } from './apollo-config/backendErrorLogLink'
 import introspectionQueryResultData from './apollo-config/fragmentTypes.json'
 import { createGraphqlResponseLink } from './apollo-config/graphqlResponseLink'
 import { createAuthCookie } from '~/utils/authCookie'
@@ -44,13 +42,7 @@ export default (context) => {
     // A NON-terminating link: vue-cli-plugin-apollo's createApolloClient combines it as
     // `from([link, httpLink])` while `defaultHttpLink` stays on, so it wraps HTTP requests only —
     // subscriptions are split off to the websocket link further down and never pass through it.
-    //
-    // In the browser the log link comes first, i.e. outermost: it has to see the results the
-    // response link recovers from a 400. Not during SSR — those lines belong in the browser console,
-    // not in the server's log.
-    link: process.client
-      ? ApolloLink.from([createBackendErrorLogLink(), createGraphqlResponseLink()])
-      : createGraphqlResponseLink(),
+    link: createGraphqlResponseLink(),
     cache: new InMemoryCache({ fragmentMatcher }),
   }
 }

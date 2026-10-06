@@ -1,6 +1,10 @@
 import Vue from 'vue'
 
-import backendErrorPlugin, { backendErrorCode, backendErrorMessage } from './backend-error.js'
+import backendErrorPlugin, {
+  backendErrorCode,
+  backendErrorMessage,
+  logBackendError,
+} from './backend-error.js'
 
 const translations = {
   'backendErrors.GROUP_SLUG_TAKEN': 'slug taken',
@@ -149,5 +153,99 @@ describe('backend-error plugin', () => {
     vm.$toast = { error: jest.fn() }
     vm.$toastBackendError(graphQLError({ code: 'FORBIDDEN' }))
     expect(vm.$toast.error).toHaveBeenCalledWith('generic forbidden')
+  })
+})
+
+describe('the backend error in the console', () => {
+  let consoleError
+
+  beforeEach(() => {
+    consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    consoleError.mockRestore()
+    delete process.client
+  })
+
+  describe('logBackendError', () => {
+    it('logs the errorCode, the error class and the untranslated backend text', () => {
+      logBackendError({
+        graphQLErrors: [
+          {
+            message: 'Incorrect email address or password.',
+            path: ['login'],
+            extensions: { code: 'UNAUTHENTICATED', errorCode: 'LOGIN_CREDENTIALS_INCORRECT' },
+          },
+        ],
+      })
+      expect(consoleError).toHaveBeenCalledTimes(1)
+      expect(consoleError).toHaveBeenCalledWith(
+        '[backend error] LOGIN_CREDENTIALS_INCORRECT / UNAUTHENTICATED: Incorrect email address or password.',
+        { path: ['login'] },
+      )
+    })
+
+    it('logs the params of an error that has some', () => {
+      logBackendError(
+        graphQLError({
+          code: 'BAD_USER_INPUT',
+          errorCode: 'GROUP_TOO_MANY_CATEGORIES',
+          params: { max: 3 },
+        }),
+      )
+      expect(consoleError).toHaveBeenCalledWith(
+        '[backend error] GROUP_TOO_MANY_CATEGORIES / BAD_USER_INPUT: English text',
+        { params: { max: 3 } },
+      )
+    })
+
+    it('logs an error without any code as such', () => {
+      logBackendError({ graphQLErrors: [{ message: 'x' }] })
+      expect(consoleError).toHaveBeenCalledWith('[backend error] no code: x', {})
+    })
+
+    it('finds the backend error inside a wrapping error', () => {
+      logBackendError(new Error('wrapped', { cause: graphQLError({ code: 'FORBIDDEN' }) }))
+      expect(consoleError).toHaveBeenCalledWith('[backend error] FORBIDDEN: English text', {})
+    })
+
+    it.each([[{ networkError: {}, message: 'down' }], [new Error('Ouch!')], ['plain string']])(
+      'stays silent for %p — it carries no backend error',
+      (other) => {
+        logBackendError(other)
+        expect(consoleError).not.toHaveBeenCalled()
+      },
+    )
+  })
+
+  describe('$backendError', () => {
+    const component = () => {
+      backendErrorPlugin()
+      const vm = new Vue()
+      vm.$t = i18n.$t
+      vm.$i18n = i18n.$i18n
+      vm.$toast = { error: jest.fn() }
+      return vm
+    }
+
+    it('logs the error it turns into a message, in the browser', () => {
+      process.client = true
+      expect(component().$backendError(graphQLError({ code: 'FORBIDDEN' }))).toBe(
+        'generic forbidden',
+      )
+      expect(consoleError).toHaveBeenCalledWith('[backend error] FORBIDDEN: English text', {})
+    })
+
+    it('logs once for $toastBackendError', () => {
+      process.client = true
+      component().$toastBackendError(graphQLError({ code: 'FORBIDDEN' }))
+      expect(consoleError).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not log during SSR', () => {
+      component().$backendError(graphQLError({ code: 'FORBIDDEN' }))
+      expect(consoleError).not.toHaveBeenCalled()
+    })
   })
 })

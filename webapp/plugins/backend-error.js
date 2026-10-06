@@ -48,8 +48,28 @@ export const backendErrorMessage = (caught, i18n) => {
   return error?.message ?? String(error)
 }
 
+// What the user gets to see of a backend error is its translation — which does not tell a developer
+// or a supporter WHICH error it was. So the error behind a message that is shown is also written to
+// the browser console as the backend sent it: its stable `errorCode`, its error class and its
+// untranslated English text. Only those: an error that the code catches and deliberately does not
+// show leaves no trace here either.
+export const logBackendError = (caught) => {
+  const [graphQLError] = apolloErrorOf(caught)?.graphQLErrors ?? []
+  if (!graphQLError) return
+  const { message, path, extensions = {} } = graphQLError
+  const { code, errorCode, params } = extensions
+  const codes = [errorCode, code].filter(Boolean).join(' / ') || 'no code'
+  // eslint-disable-next-line no-console
+  console.error(`[backend error] ${codes}: ${message}`, {
+    ...(path && { path }),
+    ...(params && { params }),
+  })
+}
+
 export default () => {
   Vue.prototype.$backendError = function (error) {
+    // In the browser only — those lines belong in its console, not in the server's log.
+    if (process.client) logBackendError(error)
     return backendErrorMessage(error, this)
   }
   // The usual reaction to a failed request: show that message as an error toast. Where the message
