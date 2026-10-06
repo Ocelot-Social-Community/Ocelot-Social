@@ -365,7 +365,7 @@ describe('Location.distanceToMe', () => {
     const noContext = {} as unknown as Context
 
     await expect(locationsResolvers.Location.distanceToMe({}, {}, noContext, null)).rejects.toThrow(
-      'Can not identify selected Location!',
+      'Can not identify selected Location.',
     )
   })
 })

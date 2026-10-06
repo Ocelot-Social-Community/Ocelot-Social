@@ -12,6 +12,8 @@
 // writes resolve last-writer-wins (same trade-off as policy).
 
 import databaseContext from '@context/database'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError } from '@graphql/errors'
 import { allPermissionKeys, sanitizePermissions } from '@src/permission'
 
 import { DEFAULT_ROLES, MANDATORY_ROLE_NAMES } from './defaults'
@@ -20,6 +22,7 @@ import { OWNER_ROLE, USER_ROLE } from './types'
 import { seedDefaultRoleNodes } from './userRoleEdges'
 
 import type { RoleChangeEvent, RoleDefinition, RolePubSub } from './types'
+import type { ErrorEntry } from '@graphql/errors'
 import type { PermissionKey } from '@src/permission'
 
 type DbContext = ReturnType<typeof databaseContext>
@@ -36,7 +39,9 @@ export const PERMISSIONS_CHANGED_CHANNEL = 'permissions.changed'
 
 // Domain-level error (protected-role edit, unknown role, …). Free of any GraphQL
 // dependency — the resolver translates it at the transport boundary.
-export class RoleValidationError extends Error {}
+// A rule of the role model forbids the change. An AppError carrying its registry entry, so the
+// resolvers can pass it on unchanged.
+export class RoleValidationError<Entry extends ErrorEntry = ErrorEntry> extends AppError<Entry> {}
 
 export class RoleService {
   private readonly cache = new Map<string, RoleDefinition>()
@@ -168,10 +173,10 @@ export class RoleService {
   ): Promise<RoleDefinition> {
     const existing = this.cache.get(input.name)
     if (existing?.protected) {
-      throw new RoleValidationError(`Role '${input.name}' is protected and cannot be edited.`)
+      throw new RoleValidationError(Errors.ROLE_EDIT_ROLE_PROTECTED, { name: input.name })
     }
     if (input.protected) {
-      throw new RoleValidationError('Cannot create or flag a protected role.')
+      throw new RoleValidationError(Errors.ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED)
     }
 
     const definition: RoleDefinition = {
@@ -196,20 +201,20 @@ export class RoleService {
   async renameRole(oldName: string, newName: string, actor: string): Promise<RoleDefinition> {
     const existing = this.cache.get(oldName)
     if (!existing) {
-      throw new RoleValidationError(`Unknown role: ${oldName}`)
+      throw new RoleValidationError(Errors.ROLE_DOES_NOT_EXIST, { name: oldName })
     }
     if (existing.protected) {
-      throw new RoleValidationError(`Role '${oldName}' is protected and cannot be renamed.`)
+      throw new RoleValidationError(Errors.ROLE_RENAME_SYSTEM_ROLE, { name: oldName })
     }
     if (MANDATORY_ROLE_NAMES.includes(oldName)) {
-      throw new RoleValidationError(`Role '${oldName}' is mandatory and cannot be renamed.`)
+      throw new RoleValidationError(Errors.ROLE_RENAME_SYSTEM_ROLE, { name: oldName })
     }
     // A no-op rename (same name) is idempotent success — nothing to persist or broadcast.
     if (oldName === newName) {
       return existing
     }
     if (this.cache.get(newName)) {
-      throw new RoleValidationError(`Role '${newName}' already exists.`)
+      throw new RoleValidationError(Errors.ROLE_SAVE_NAME_ALREADY_TAKEN, { name: newName })
     }
 
     const definition: RoleDefinition = { ...existing, name: newName }
@@ -224,24 +229,23 @@ export class RoleService {
   async deleteRole(name: string, actor: string): Promise<void> {
     const existing = this.cache.get(name)
     if (!existing) {
-      throw new RoleValidationError(`Unknown role: ${name}`)
+      throw new RoleValidationError(Errors.ROLE_DOES_NOT_EXIST, { name })
     }
     if (existing.protected) {
-      throw new RoleValidationError(`Role '${name}' is protected and cannot be deleted.`)
+      throw new RoleValidationError(Errors.ROLE_DELETE_SYSTEM_ROLE, { name })
     }
     // The baseline role is the default for new users; deleting it would leave
     // signups without a role. It stays editable but not deletable.
     if (name === USER_ROLE) {
-      throw new RoleValidationError(
-        `Role '${USER_ROLE}' is the baseline role and cannot be deleted.`,
-      )
+      throw new RoleValidationError(Errors.ROLE_DELETE_SYSTEM_ROLE, { name: USER_ROLE })
     }
     // A role currently assigned to users cannot be deleted (would orphan them).
     const members = await this.countMembers(name)
     if (members > 0) {
-      throw new RoleValidationError(
-        `Role '${name}' is assigned to ${String(members)} user(s) and cannot be deleted.`,
-      )
+      throw new RoleValidationError(Errors.ROLE_DELETE_ROLE_HAS_MEMBERS, {
+        name,
+        count: members,
+      })
     }
 
     await dbDeleteRole(this.db, name)

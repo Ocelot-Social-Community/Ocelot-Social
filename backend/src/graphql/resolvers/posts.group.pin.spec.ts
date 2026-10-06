@@ -246,7 +246,7 @@ describe('pin groupPosts', () => {
       await expect(
         mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
       ).resolves.toMatchObject({
-        errors: [{ message: 'Pinned posts are not allowed!' }],
+        errors: [{ message: 'Pinned posts are not allowed.' }],
         data: { pinGroupPost: null },
       })
     })
@@ -381,7 +381,7 @@ describe('pin groupPosts', () => {
       await expect(
         mutate({ mutation: pinGroupPost, variables: { id: 'post-3-to-public-group' } }),
       ).resolves.toMatchObject({
-        errors: [{ message: 'Reached maxed pinned posts already. Unpin a post first.' }],
+        errors: [{ message: 'Maximum number of pinned posts reached. Unpin a post first.' }],
         data: {
           pinGroupPost: null,
         },

@@ -360,9 +360,9 @@ describe('change password', () => {
         variables = { ...variables, oldPassword: '1234', newPassword: '1234' }
       })
 
-      it('responds with "Old password and new password should be different"', async () => {
+      it('responds with "Old password and new password should be different."', async () => {
         await respondsWith({
-          errors: [{ message: 'Old password and new password should be different' }],
+          errors: [{ message: 'Old password and new password should be different.' }],
         })
       })
     })
@@ -377,7 +377,7 @@ describe('change password', () => {
       })
 
       it('responds with "Old password isn\'t valid"', async () => {
-        await respondsWith({ errors: [{ message: 'Old password is not correct' }] })
+        await respondsWith({ errors: [{ message: 'Old password is not correct.' }] })
       })
     })
 
@@ -393,8 +393,8 @@ describe('change password', () => {
         variables = { ...variables, oldPassword: '1234', newPassword: '12345' }
       })
 
-      it('responds with the same "Old password is not correct" as any wrong password', async () => {
-        await respondsWith({ errors: [{ message: 'Old password is not correct' }] })
+      it('responds with the same "Old password is not correct." as any wrong password', async () => {
+        await respondsWith({ errors: [{ message: 'Old password is not correct.' }] })
       })
     })
 

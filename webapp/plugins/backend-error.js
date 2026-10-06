@@ -1,0 +1,42 @@
+import Vue from 'vue'
+
+// The error classes the backend sets as `extensions.code` (see backend/src/graphql/errors.ts).
+// Each has a generic translation for errors that carry no `errorCode` of their own; any other
+// class — Apollo's INTERNAL_SERVER_ERROR, GRAPHQL_VALIDATION_FAILED, … — gets the DEFAULT one.
+const GENERIC_CODES = ['BAD_USER_INPUT', 'UNAUTHENTICATED', 'FORBIDDEN']
+
+// The stable `errorCode` of an error from an Apollo call, for code that reacts to one specific
+// failure (e.g. showing it next to a form field) instead of only toasting it.
+export const backendErrorCode = (error) => error?.graphQLErrors?.[0]?.extensions?.errorCode ?? null
+
+// Turns an error from an Apollo call into the message to show the user, in their language:
+//  1. the translation of its stable `errorCode` (backend/src/graphql/errorRegistry.ts), with its
+//     `params` interpolated,
+//  2. otherwise the generic translation of its error class, or of a network failure — so the user
+//     never sees the backend's English text or an internal detail,
+//  3. otherwise (an error that never came from the backend) its own message, as before.
+// `i18n` is the component, for its `$t` and `$i18n.keyExists`.
+export const backendErrorMessage = (error, i18n) => {
+  const exists = (key) => Boolean(i18n.$i18n?.keyExists?.(key))
+  const translate = (key, params) => (exists(key) ? i18n.$t(key, params) : null)
+
+  const [graphQLError] = error?.graphQLErrors ?? []
+  if (graphQLError) {
+    const { code, errorCode, params } = graphQLError.extensions ?? {}
+    const generic = GENERIC_CODES.includes(code) ? code : 'DEFAULT'
+    const message =
+      (errorCode && translate(`backendErrors.${errorCode}`, params)) ||
+      translate(`backendErrors.generic.${generic}`)
+    if (message) return message
+  } else if (error?.networkError) {
+    const message = translate('backendErrors.generic.NETWORK_ERROR')
+    if (message) return message
+  }
+  return error?.message ?? String(error)
+}
+
+export default () => {
+  Vue.prototype.$backendError = function (error) {
+    return backendErrorMessage(error, this)
+  }
+}
