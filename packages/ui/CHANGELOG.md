@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.0.6](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.5...ui-v0.0.6) (2026-10-05)
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump the size-limit group across 1 directory with 2 updates ([#10373](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10373)) ([f226a5b](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/f226a5b42cc1c4533710c7f057175a89641ac3e9))
+
+## [0.0.5](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.4...ui-v0.0.5) (2026-10-05)
+
+
+### Features
+
+* **ui:** OsToggleGroup — a row of buttons of which one is current, with radio keyboard ([#10388](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10388)) ([9c290b6](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/9c290b6192bee0cb352d19b86188ad2c0e787c62))
+
+
+### Bug Fixes
+
+* **other:** fix some little bugs in release v3.19.0 ([#10345](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10345)) ([9c8e238](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/9c8e238ae6ed1ebbd5de99f883c6c1ed7fed8d6c))
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump @types/node from 26.6.1 to 26.6.2 in /packages/ui ([#10321](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10321)) ([31db7e1](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/31db7e18328c4b687a8761cc164b78e932d6605d))
+* **deps-dev:** bump eslint from 10.10.0 to 10.11.0 in /packages/ui ([#10320](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10320)) ([2260d2d](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/2260d2de17ea0d5a3769e79eeb17fd38cb193e94))
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.5.3 to 64.5.4 in /packages/ui ([#10317](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10317)) ([6a3e2de](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/6a3e2de2ae721c3ea1fd239803b352ed6160fa86))
+* **deps-dev:** bump jsdom from 30.0.1 to 30.1.1 in /packages/ui ([#10319](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10319)) ([2bab5b6](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/2bab5b65f07e858e91c45fd72275d2eea41fe173))
+* **deps-dev:** bump tailwind-csstree from 0.4.0 to 0.4.1 in /packages/ui ([#10380](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10380)) ([2250030](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/2250030f887b4def46b415b9d6eabcdea2a0f776))
+* **deps-dev:** bump the vue group across 1 directory with 2 updates ([#10316](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10316)) ([2ab3d65](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/2ab3d655e9c73d70352609a4e038b70445add7f2))
+* **deps-dev:** bump tsx from 4.23.13 to 4.23.15 in /packages/ui ([#10318](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10318)) ([da0441f](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/da0441fc7bfaa87f1b13478a0daf01733b9cc22d))
+* **deps:** bump node from 26.8.2-alpine to 26.10.0-alpine in /packages/ui ([#10323](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10323)) ([8678670](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/86786706cf9293f3e1ea9d180e0b520d85b1e92f))
+
 ## [0.0.4](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.3...ui-v0.0.4) (2026-09-22)
 
 

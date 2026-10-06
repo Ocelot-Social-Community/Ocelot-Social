@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.2.2](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.2.1...branding-v0.2.2) (2026-10-04)
+
+
+### Bug Fixes
+
+* **webapp:** filled primary and danger buttons darken on hover instead of fading ([#10384](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10384)) ([91b854d](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/91b854dcbfeceae37ad705452dff6516821c8c0c))
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump @types/node from 26.6.2 to 26.6.3 in /packages/branding ([#10383](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10383)) ([ab9cb25](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/ab9cb250c6d3d48854a0b60e5f0a826e6a839830))
+* **deps-dev:** bump eslint from 10.10.0 to 10.11.0 in /packages/branding ([#10324](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10324)) ([5a17c9b](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/5a17c9b50b9aed86883f4a8c3b6a802193ddcbf5))
+* **deps-dev:** bump typescript-eslint from 8.70.0 to 8.70.1 in /packages/branding ([#10325](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10325)) ([0dd6902](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/0dd6902b1373ad860e635da49b7a43c785d07325))
+* **deps-dev:** bump typescript-eslint from 8.70.1 to 8.71.0 in /packages/branding ([#10382](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10382)) ([b88edcd](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/b88edcd5afd346c1a2e285d071b23c7363c5c353))
+
 ## [0.2.1](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.2.0...branding-v0.2.1) (2026-09-23)
 
 
