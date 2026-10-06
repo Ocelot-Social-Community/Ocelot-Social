@@ -10,7 +10,7 @@ const GENERIC_CODES = ['BAD_USER_INPUT', 'UNAUTHENTICATED', 'FORBIDDEN']
 export const backendErrorCode = (error) => error?.graphQLErrors?.[0]?.extensions?.errorCode ?? null
 
 // Turns an error from an Apollo call into the message to show the user, in their language:
-//  1. the translation of its stable `errorCode` (backend/src/graphql/errorCodes.ts), with its
+//  1. the translation of its stable `errorCode` (backend/src/graphql/errorRegistry.ts), with its
 //     `params` interpolated,
 //  2. otherwise the generic translation of its error class, or of a network failure — so the user
 //     never sees the backend's English text or an internal detail,

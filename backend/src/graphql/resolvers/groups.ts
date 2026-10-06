@@ -14,9 +14,8 @@ import {
   GROUP_MEMBERSHIP_VISIBILITY_CHANGED,
   GROUP_SHOW_MEMBERS_CHANGED,
 } from '@constants/subscriptions'
-import { ErrorCode } from '@graphql/errorCodes'
 import { Errors } from '@graphql/errorRegistry'
-import { AppError, ForbiddenError, UserInputError } from '@graphql/errors'
+import { AppError, UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 import { branding } from '@src/branding'
 
@@ -346,7 +345,7 @@ export default {
             previousGroupType !== 'hidden' &&
             !context.effectivePermissions.has('group.create_hidden')
           ) {
-            throw new ForbiddenError('Not Authorized!', { code: ErrorCode.NOT_AUTHORIZED })
+            throw new AppError(Errors.GROUP_SAVE_HIDDEN_TYPE_NOT_PERMITTED)
           }
           if (policy.get('categoriesActive') && categoryIds?.length) {
             await transaction.run(

@@ -9,7 +9,6 @@
 // never from request data.
 /* eslint-disable security/detect-object-injection */
 import { GROUP_MEMBERSHIP_VISIBILITY_CHANGED } from '@constants/subscriptions'
-import { ErrorCode } from '@graphql/errorCodes'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError, ForbiddenError, UserInputError } from '@graphql/errors'
 import { branding } from '@src/branding'
@@ -114,7 +113,7 @@ export default {
           'user.email.readAny',
         ].some((permission) => context.effectivePermissions.has(permission))
         if (!mayAdministerUsers) {
-          throw new ForbiddenError('Not Authorized!', { code: ErrorCode.NOT_AUTHORIZED })
+          throw new AppError(Errors.USER_ADMIN_SEARCH_NOT_PERMITTED)
         }
         // This specialised path honours only roleName/search + pagination + ordering.
         // Other filter args the schema advertises do NOT compose here, so reject them

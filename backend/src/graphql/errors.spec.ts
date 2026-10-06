@@ -1,7 +1,6 @@
 import { GraphQLError } from 'graphql'
 import { describe, it, expect } from 'vitest'
 
-import { ErrorCode } from './errorCodes'
 import { Errors } from './errorRegistry'
 import { AppError, AuthenticationError, ForbiddenError, UserInputError } from './errors'
 
@@ -13,39 +12,6 @@ describe('GraphQL error classes', () => {
   ])('%o keeps only the error class code without details', (ErrorClass, code) => {
     expect(new ErrorClass('Ouch!')).toMatchObject({ message: 'Ouch!', extensions: { code } })
     expect(new ErrorClass('Ouch!').extensions).toEqual({ code })
-  })
-
-  it('adds the errorCode next to the error class code', () => {
-    expect(
-      new ForbiddenError('Not Authorized!', { code: ErrorCode.NOT_AUTHORIZED }).extensions,
-    ).toEqual({ code: 'FORBIDDEN', errorCode: 'NOT_AUTHORIZED' })
-  })
-
-  it('adds the params the translation interpolates', () => {
-    expect(
-      new UserInputError('Not Authorized!', {
-        code: ErrorCode.NOT_AUTHORIZED,
-        params: { email: 'a@b.c' },
-      }).extensions,
-    ).toEqual({
-      code: 'BAD_USER_INPUT',
-      errorCode: 'NOT_AUTHORIZED',
-      params: { email: 'a@b.c' },
-    })
-  })
-})
-
-describe('ErrorCode', () => {
-  it('maps every code to itself, so the webapp can use the value as the locale key', () => {
-    for (const [key, value] of Object.entries(ErrorCode)) {
-      expect(value).toBe(key)
-    }
-  })
-
-  it('shares no code with the registry', () => {
-    for (const code of Object.keys(ErrorCode)) {
-      expect(Object.keys(Errors)).not.toContain(code)
-    }
   })
 })
 

@@ -1,6 +1,5 @@
 import { GraphQLError } from 'graphql'
 
-import type { ErrorCode } from './errorCodes'
 import type { ErrorName, ErrorType } from './errorRegistry'
 
 type ErrorParams = Record<string, string | number>
@@ -47,33 +46,23 @@ export class AppError<Entry extends ErrorEntry = ErrorEntry> extends GraphQLErro
   }
 }
 
-// What the webapp needs to show a translated message: the stable `errorCode` (see errorCodes.ts)
-// and the values its translation interpolates. Both land in `extensions` next to Apollo's own
-// error class `code`, which stays untouched.
-export interface ErrorDetails {
-  code: ErrorCode
-  params?: Record<string, string | number>
-}
-
-const extensionsFor = (code: string, details?: ErrorDetails) => ({
-  code,
-  ...(details && { errorCode: details.code, ...(details.params && { params: details.params }) }),
-})
-
+// Errors without a code: developer-facing input (filter syntax, paging arguments, …) that no user
+// can trigger through the webapp. The webapp shows the generic message for their class. Every
+// error a user can trigger belongs in errorRegistry.ts and is thrown as an AppError instead.
 export class UserInputError extends GraphQLError {
-  constructor(message: string, details?: ErrorDetails) {
-    super(message, { extensions: extensionsFor('BAD_USER_INPUT', details) })
+  constructor(message: string) {
+    super(message, { extensions: { code: 'BAD_USER_INPUT' } })
   }
 }
 
 export class AuthenticationError extends GraphQLError {
-  constructor(message: string, details?: ErrorDetails) {
-    super(message, { extensions: extensionsFor('UNAUTHENTICATED', details) })
+  constructor(message: string) {
+    super(message, { extensions: { code: 'UNAUTHENTICATED' } })
   }
 }
 
 export class ForbiddenError extends GraphQLError {
-  constructor(message: string, details?: ErrorDetails) {
-    super(message, { extensions: extensionsFor('FORBIDDEN', details) })
+  constructor(message: string) {
+    super(message, { extensions: { code: 'FORBIDDEN' } })
   }
 }

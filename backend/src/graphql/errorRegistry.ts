@@ -23,6 +23,11 @@ interface ErrorDefinition {
 
 const definitions = {
   // authentication & account
+  // graphql-shield's answer to every denied permission rule.
+  PERMISSION_RULE_ACCESS_DENIED: {
+    type: 'UNAUTHENTICATED',
+    text: 'Not Authorized!',
+  },
   LOGIN_ACCOUNT_DISABLED: { type: 'UNAUTHENTICATED', text: 'Your account has been disabled.' },
   LOGIN_CREDENTIALS_INCORRECT: {
     type: 'UNAUTHENTICATED',
@@ -55,6 +60,10 @@ const definitions = {
     text: 'User with this slug already exists!',
   },
   // users & badges
+  USER_ADMIN_SEARCH_NOT_PERMITTED: {
+    type: 'FORBIDDEN',
+    text: 'You are not allowed to search the user administration.',
+  },
   USER_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'Could not find user.' },
   USER_UNBLOCK_USER_NOT_BLOCKED: { type: 'BAD_USER_INPUT', text: 'Could not find blocked user.' },
   USER_PROFILE_NAME_TOO_SHORT: {
@@ -70,6 +79,10 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'Description too short!',
     params: ['min'],
+  },
+  GROUP_SAVE_HIDDEN_TYPE_NOT_PERMITTED: {
+    type: 'FORBIDDEN',
+    text: 'You are not allowed to make this group secret.',
   },
   // A query selected a computed Group field (myRole, postsCount, …) without the group's id.
   GROUP_FIELD_GROUP_ID_MISSING: {
@@ -237,11 +250,23 @@ const definitions = {
     text: 'Maximum of {max} active API keys reached',
   },
   // invite codes
+  INVITE_CODE_CREATE_GROUP_MEMBERSHIP_REQUIRED: {
+    type: 'FORBIDDEN',
+    text: 'You must be a member of this group to create an invite link for it.',
+  },
+  INVITE_CODE_INVALIDATE_CODE_NOT_FOUND: {
+    type: 'FORBIDDEN',
+    text: 'Invite link not found.',
+  },
   INVITE_CODE_CREATE_LIMIT_REACHED: {
     type: 'BAD_USER_INPUT',
     text: 'You have reached the maximum of invite codes you can generate.',
   },
   // chat & video calls
+  CHAT_GROUP_ROOM_FEATURE_DISABLED: {
+    type: 'FORBIDDEN',
+    text: 'Group chats are not enabled.',
+  },
   CHAT_GROUP_ROOM_NOT_CREATED: {
     type: 'FORBIDDEN',
     text: 'Could not create group room. User may not be a member of the group.',
