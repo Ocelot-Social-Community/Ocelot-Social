@@ -109,7 +109,7 @@ export default {
           variables: { id: notificationSourceId },
         })
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       }
     },
     async toggleNotificationRead({ resourceId, read }) {
@@ -122,7 +122,7 @@ export default {
           refetchQueries: ['Notifications'],
         })
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       }
     },
     back() {
@@ -142,7 +142,7 @@ export default {
         })
         this.$apollo.queries.notifications.refresh()
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       }
     },
   },
@@ -170,7 +170,7 @@ export default {
       },
       fetchPolicy: 'cache-and-network',
       error(error) {
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       },
     },
   },

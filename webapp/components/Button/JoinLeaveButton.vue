@@ -119,6 +119,7 @@ export default {
     const { joinLeaveGroup } = useJoinLeaveGroup({
       apollo: this.$apollo,
       toast: this.$toast,
+      backendError: (error) => this.$backendError(error),
     })
     this._joinLeaveGroup = joinLeaveGroup
   },

@@ -283,7 +283,7 @@ export default {
         this.userKeys = result.data.apiKeysForUser
       } catch (error) {
         if (this.expandedUserId !== userId) return
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       } finally {
         if (this.expandedUserId === userId) {
           this.detailLoading = false
@@ -343,7 +343,7 @@ export default {
         this.userKeys = null
         this.$toast.success(this.$t('admin.api-keys.revoke.success'))
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
         throw error
       }
     },
@@ -359,7 +359,7 @@ export default {
         this.userKeys = null
         this.$toast.success(this.$t('admin.api-keys.revoke-all-success', { count, user: userName }))
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
         throw error
       }
     },

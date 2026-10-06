@@ -72,6 +72,7 @@ import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
+import { backendErrorCode } from '~/plugins/backend-error'
 
 export default {
   components: {
@@ -132,6 +133,9 @@ export default {
       } catch (err) {
         if (err.message === 'Error: no-cookie') {
           this.$toast.error(this.$t('login.no-cookie'))
+        } else if (backendErrorCode(err.cause) === 'LOGIN_ACCOUNT_DISABLED') {
+          // The store wraps the backend error; `cause` is the Apollo error itself.
+          this.$toast.error(this.$backendError(err.cause))
         } else {
           this.$toast.error(this.$t('login.failure'))
         }

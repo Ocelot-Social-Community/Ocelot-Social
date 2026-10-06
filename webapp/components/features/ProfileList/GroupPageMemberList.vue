@@ -145,7 +145,7 @@ export default {
         this.offset = reset ? newMembers.length : this.offset + newMembers.length
         this.allLoaded = newMembers.length < PAGE_SIZE
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toast.error(this.$backendError(error))
       } finally {
         this.loadingInitial = false
         this.loadingMore = false

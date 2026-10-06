@@ -24,7 +24,7 @@ Feature: User profile - change password
     And I submit the form
     And I see a "failure toaster" message:
     """
-    Old password is not correct
+    Your old password is not correct.
     """
 
   Scenario: Incorrect Password Repeat
