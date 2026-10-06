@@ -119,7 +119,7 @@ describe('validateCreateComment', () => {
       mutate({ mutation: CreateComment, variables: createCommentVariables }),
     ).resolves.toMatchObject({
       data: { CreateComment: null },
-      errors: [{ message: 'Comment must be at least 1 character long!' }],
+      errors: [{ message: 'The comment must be at least 1 characters long.' }],
     })
   })
 
@@ -130,7 +130,7 @@ describe('validateCreateComment', () => {
       mutate({ mutation: CreateComment, variables: createCommentVariables }),
     ).resolves.toMatchObject({
       data: { CreateComment: null },
-      errors: [{ message: 'Comment must be at least 1 character long!' }],
+      errors: [{ message: 'The comment must be at least 1 characters long.' }],
     })
   })
 
@@ -176,7 +176,7 @@ describe('validateCreateComment', () => {
         mutate({ mutation: UpdateComment, variables: updateCommentVariables }),
       ).resolves.toMatchObject({
         data: { UpdateComment: null },
-        errors: [{ message: 'Comment must be at least 1 character long!' }],
+        errors: [{ message: 'The comment must be at least 1 characters long.' }],
       })
     })
 
@@ -187,7 +187,7 @@ describe('validateCreateComment', () => {
         mutate({ mutation: UpdateComment, variables: updateCommentVariables }),
       ).resolves.toMatchObject({
         data: { UpdateComment: null },
-        errors: [{ message: 'Comment must be at least 1 character long!' }],
+        errors: [{ message: 'The comment must be at least 1 characters long.' }],
       })
     })
   })
@@ -195,7 +195,7 @@ describe('validateCreateComment', () => {
 
 describe('validateReport', () => {
   const ownTargetError = {
-    message: 'You cannot report yourself or your own content!',
+    message: 'You cannot report yourself or your own content.',
     extensions: { errorCode: 'REPORT_TARGET_IS_OWN' },
   }
 
@@ -271,7 +271,7 @@ describe('validateReview', () => {
 
     await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
-      errors: [{ message: 'You cannot review a report about yourself or your own content!' }],
+      errors: [{ message: 'You cannot review a report about yourself or your own content.' }],
     })
   })
 
@@ -282,7 +282,7 @@ describe('validateReview', () => {
       data: { review: null },
       errors: [
         {
-          message: 'Resource not found or is not a Post|Comment|User!',
+          message: 'Resource not found or is not a Post|Comment|User.',
           extensions: { errorCode: 'REVIEW_TARGET_DOES_NOT_EXIST' },
         },
       ],
@@ -296,7 +296,7 @@ describe('validateReview', () => {
       data: { review: null },
       errors: [
         {
-          message: 'Before starting the review process, please report the Post!',
+          message: 'Before starting the review process, please report the Post.',
           extensions: { errorCode: 'REVIEW_TARGET_NOT_REPORTED', params: { label: 'Post' } },
         },
       ],
@@ -316,7 +316,7 @@ describe('validateReview', () => {
 
     await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
-      errors: [{ message: 'You cannot review a report about yourself or your own content!' }],
+      errors: [{ message: 'You cannot review a report about yourself or your own content.' }],
     })
   })
 
@@ -335,7 +335,7 @@ describe('validateReview', () => {
         mutate({ mutation: review, variables: disableVariables }),
       ).resolves.toMatchObject({
         data: { review: null },
-        errors: [{ message: 'Resource not found or is not a Post|Comment|User!' }],
+        errors: [{ message: 'Resource not found or is not a Post|Comment|User.' }],
       })
     })
   })
@@ -365,7 +365,7 @@ describe('validateReview', () => {
 
       await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
         data: { UpdateUser: null },
-        errors: [{ message: 'Username must be at least 3 character long!' }],
+        errors: [{ message: 'The name must be at least 3 characters long.' }],
       })
     })
   })

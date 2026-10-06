@@ -168,7 +168,9 @@ describe('User', () => {
 
       await expect(
         query({ query: searchQuery, variables: { roleName: 'moderator' } }),
-      ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
+      ).resolves.toMatchObject({
+        errors: [{ message: 'You are not allowed to search the user administration.' }],
+      })
     })
 
     it('is reachable by a moderation user-admin capability (default moderator holds badge.manage)', async () => {
@@ -479,7 +481,7 @@ describe('UpdateUser', () => {
 
           expect(errors?.[0]).toHaveProperty(
             'message',
-            'User location latitude must be a finite number between -90 and 90!',
+            'User location latitude must be a finite number between -90 and 90.',
           )
         })
 
@@ -491,7 +493,7 @@ describe('UpdateUser', () => {
 
           expect(errors?.[0]).toHaveProperty(
             'message',
-            'User location longitude must be a finite number between -180 and 180!',
+            'User location longitude must be a finite number between -180 and 180.',
           )
         })
 
@@ -503,7 +505,7 @@ describe('UpdateUser', () => {
 
           expect(errors?.[0]).toHaveProperty(
             'message',
-            'User location requires both lat and lng, or neither!',
+            'User location requires both lat and lng, or neither.',
           )
         })
 
@@ -515,7 +517,7 @@ describe('UpdateUser', () => {
 
           expect(errors?.[0]).toHaveProperty(
             'message',
-            'User location requires both lat and lng, or neither!',
+            'User location requires both lat and lng, or neither.',
           )
         })
 

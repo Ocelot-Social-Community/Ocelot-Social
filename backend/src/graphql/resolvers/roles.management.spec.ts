@@ -351,7 +351,7 @@ describe('role management', () => {
         variables: { name: 'has spaces!', permissions: [] },
       })
 
-      expect(errors?.[0].message).toMatch(/Invalid role name/)
+      expect(errors?.[0].message).toMatch(/The role name must be 2 to 50 characters long/)
     })
 
     it('surfaces an infrastructure failure as such, not as a permission problem', async () => {
@@ -535,13 +535,13 @@ describe('role management', () => {
     it('refuses to delete the protected owner role', async () => {
       const { errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'owner' } })
 
-      expect(errors?.[0].message).toMatch(/protected/)
+      expect(errors?.[0].message).toMatch(/is a system role and cannot be deleted/)
     })
 
     it('refuses to delete the baseline user role', async () => {
       const { errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'user' } })
 
-      expect(errors?.[0].message).toMatch(/baseline/)
+      expect(errors?.[0].message).toMatch(/is a system role and cannot be deleted/)
     })
 
     it('deletes a custom role that no user holds', async () => {
@@ -632,7 +632,7 @@ describe('role management', () => {
         variables: { name: 'owner', newName: 'boss' },
       })
 
-      expect(errors?.[0].message).toMatch(/protected/)
+      expect(errors?.[0].message).toMatch(/is a system role and cannot be renamed/)
     })
 
     it('forbids renaming the mandatory user role', async () => {
@@ -641,7 +641,7 @@ describe('role management', () => {
         variables: { name: 'user', newName: 'member' },
       })
 
-      expect(errors?.[0].message).toMatch(/mandatory/)
+      expect(errors?.[0].message).toMatch(/is a system role and cannot be renamed/)
     })
 
     it('rejects renaming an unknown role', async () => {
@@ -670,7 +670,7 @@ describe('role management', () => {
         variables: { name: 'editor', newName: 'Not Valid!' },
       })
 
-      expect(errors?.[0].message).toMatch(/Invalid role name/)
+      expect(errors?.[0].message).toMatch(/The role name must be 2 to 50 characters long/)
     })
 
     it('maps a uniqueness-constraint race on the write to a stable conflict error', async () => {
@@ -929,7 +929,7 @@ describe('role management', () => {
       authenticatedUser = await plain.toJson()
       const { errors } = await query({ query: SEARCH, variables: { roleName: 'admin' } })
 
-      expect(errors?.[0].message).toMatch(/Not Authorized/)
+      expect(errors?.[0].message).toMatch(/You are not allowed to search the user administration/)
     })
   })
 })

@@ -972,7 +972,7 @@ describe('Message', () => {
       })
 
       expect(result.errors).toBeDefined()
-      expect(result.errors?.[0].message).toContain('Message must have content or files')
+      expect(result.errors?.[0].message).toContain('Message must have content or files.')
     })
   })
 

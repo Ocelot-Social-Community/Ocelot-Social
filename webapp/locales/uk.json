@@ -489,7 +489,7 @@
     "ROLE_EDIT_ROLE_PROTECTED": "Роль «{name}» захищена й не може бути змінена.",
     "ROLE_RENAME_SYSTEM_ROLE": "Роль «{name}» є системною й не може бути перейменована.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "Роль «{name}» вже існує.",
-    "ROLE_SAVE_NAME_INVALID": "Недійсна назва ролі.",
+    "ROLE_SAVE_NAME_INVALID": "Назва ролі має містити від 2 до 50 символів і може складатися лише з літер, цифр, «_» і «-»; перший символ має бути літерою або цифрою.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "Роль не можна створити або позначити як захищену.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Ти не можеш шукати в адмініструванні користувачів.",
     "USER_DOES_NOT_EXIST": "Користувача не знайдено.",

@@ -140,7 +140,7 @@ describe('createApiKey', () => {
         variables: { name: 'Key 4' },
       })
 
-      expect(errors?.[0].message).toContain('Maximum of 3 active API keys reached')
+      expect(errors?.[0].message).toContain('Maximum of 3 active API keys reached.')
     })
 
     it('rejects expiresInDays of 0', async () => {
@@ -285,7 +285,7 @@ describe('updateApiKey', () => {
       variables: { id: 'nonexistent', name: 'Fail' },
     })
 
-    expect(errors?.[0].message).toContain('API key not found')
+    expect(errors?.[0].message).toContain('API key not found.')
   })
 
   it("throws error for another user's key", async () => {
@@ -301,7 +301,7 @@ describe('updateApiKey', () => {
       variables: { id: keyId, name: 'Stolen' },
     })
 
-    expect(errors?.[0].message).toContain('API key not found')
+    expect(errors?.[0].message).toContain('API key not found.')
   })
 })
 

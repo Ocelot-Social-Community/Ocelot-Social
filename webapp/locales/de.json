@@ -489,7 +489,7 @@
     "ROLE_EDIT_ROLE_PROTECTED": "Die Rolle „{name}“ ist geschützt und kann nicht bearbeitet werden.",
     "ROLE_RENAME_SYSTEM_ROLE": "Die Rolle „{name}“ ist eine Systemrolle und kann nicht umbenannt werden.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "Die Rolle „{name}“ gibt es bereits.",
-    "ROLE_SAVE_NAME_INVALID": "Der Rollenname ist ungültig.",
+    "ROLE_SAVE_NAME_INVALID": "Der Rollenname muss 2 bis 50 Zeichen lang sein und darf nur Buchstaben, Ziffern, „_“ und „-“ enthalten; das erste Zeichen muss ein Buchstabe oder eine Ziffer sein.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "Eine Rolle kann nicht als geschützt angelegt oder markiert werden.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Du darfst die Nutzerverwaltung nicht durchsuchen.",
     "USER_DOES_NOT_EXIST": "Der Nutzer wurde nicht gefunden.",

@@ -20,14 +20,14 @@ describe(AppError, () => {
     const error = new AppError(Errors.API_KEYS_FEATURE_DISABLED)
 
     expect(error).toBeInstanceOf(GraphQLError)
-    expect(error.message).toBe('API keys are not enabled')
+    expect(error.message).toBe('API keys are not enabled.')
     expect(error.extensions).toEqual({ code: 'FORBIDDEN', errorCode: 'API_KEYS_FEATURE_DISABLED' })
   })
 
   it('fills the placeholders and sends the params along', () => {
     const error = new AppError(Errors.API_KEY_CREATE_LIMIT_REACHED, { max: 3 })
 
-    expect(error.message).toBe('Maximum of 3 active API keys reached')
+    expect(error.message).toBe('Maximum of 3 active API keys reached.')
     expect(error.extensions).toEqual({
       code: 'BAD_USER_INPUT',
       errorCode: 'API_KEY_CREATE_LIMIT_REACHED',
@@ -38,7 +38,7 @@ describe(AppError, () => {
   it('sends declared params along that the English text leaves out', () => {
     const error = new AppError(Errors.GROUP_SAVE_TOO_MANY_CATEGORIES, { max: 3 })
 
-    expect(error.message).toBe('Too many categories!')
+    expect(error.message).toBe('Too many categories.')
     expect(error.extensions).toEqual({
       code: 'BAD_USER_INPUT',
       errorCode: 'GROUP_SAVE_TOO_MANY_CATEGORIES',
@@ -49,7 +49,7 @@ describe(AppError, () => {
   it('lets the compiler check the params against the entry', () => {
     // @ts-expect-error a text with placeholders requires its params
     expect(new AppError(Errors.API_KEY_CREATE_LIMIT_REACHED).message).toBe(
-      'Maximum of {max} active API keys reached',
+      'Maximum of {max} active API keys reached.',
     )
     // @ts-expect-error declared params are required as well
     expect(new AppError(Errors.GROUP_SAVE_TOO_MANY_CATEGORIES).extensions).not.toHaveProperty(
@@ -57,7 +57,7 @@ describe(AppError, () => {
     )
     // @ts-expect-error a param the entry does not use is rejected
     expect(new AppError(Errors.API_KEY_CREATE_LIMIT_REACHED, { max: 3, min: 1 }).message).toBe(
-      'Maximum of 3 active API keys reached',
+      'Maximum of 3 active API keys reached.',
     )
     // @ts-expect-error an entry without params takes none
     expect(new AppError(Errors.API_KEYS_FEATURE_DISABLED, { max: 3 }).extensions).toMatchObject({

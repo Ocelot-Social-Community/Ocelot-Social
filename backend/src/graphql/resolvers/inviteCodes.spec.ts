@@ -819,7 +819,9 @@ describe('generateGroupInviteCode', () => {
         }),
       ).resolves.toMatchObject({
         data: null,
-        errors: [{ message: 'Not Authorized!' }],
+        errors: [
+          { message: 'You must be a member of this group to create an invite link for it.' },
+        ],
       })
     })
   })
@@ -837,7 +839,9 @@ describe('generateGroupInviteCode', () => {
         }),
       ).resolves.toMatchObject({
         data: null,
-        errors: [{ message: 'Not Authorized!' }],
+        errors: [
+          { message: 'You must be a member of this group to create an invite link for it.' },
+        ],
       })
     })
   })
@@ -933,7 +937,7 @@ describe('invalidateInviteCode', () => {
           data: {
             invalidateInviteCode: null,
           },
-          errors: [{ message: 'Not Authorized!' }],
+          errors: [{ message: 'Invite link not found.' }],
         })
       })
     })

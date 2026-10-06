@@ -246,7 +246,7 @@ describe('pin groupPosts', () => {
       await expect(
         mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
       ).resolves.toMatchObject({
-        errors: [{ message: 'Pinned posts are not allowed!' }],
+        errors: [{ message: 'Pinned posts are not allowed.' }],
         data: { pinGroupPost: null },
       })
     })

@@ -376,7 +376,7 @@ describe('in mode', () => {
         describe('description', () => {
           describe('length without HTML', () => {
             describe('less then 3 chars', () => {
-              it('throws error: "Description too short!"', async () => {
+              it('throws error: "Description too short."', async () => {
                 const { errors } = await mutate({
                   mutation: CreateGroup,
                   variables: {
@@ -387,7 +387,7 @@ describe('in mode', () => {
                   },
                 })
 
-                expect(errors?.[0]).toHaveProperty('message', 'Description too short!')
+                expect(errors?.[0]).toHaveProperty('message', 'Description too short.')
               })
             })
           })
@@ -421,36 +421,36 @@ describe('in mode', () => {
 
           describe('not even one', () => {
             describe('by "categoryIds: null"', () => {
-              it('throws error: "Too few categories!"', async () => {
+              it('throws error: "Too few categories."', async () => {
                 const { errors } = await mutate({
                   mutation: CreateGroup,
                   variables: { ...variables, categoryIds: null },
                 })
 
-                expect(errors?.[0]).toHaveProperty('message', 'Too few categories!')
+                expect(errors?.[0]).toHaveProperty('message', 'Too few categories.')
               })
             })
 
             describe('by "categoryIds: []"', () => {
-              it('throws error: "Too few categories!"', async () => {
+              it('throws error: "Too few categories."', async () => {
                 const { errors } = await mutate({
                   mutation: CreateGroup,
                   variables: { ...variables, categoryIds: [] },
                 })
 
-                expect(errors?.[0]).toHaveProperty('message', 'Too few categories!')
+                expect(errors?.[0]).toHaveProperty('message', 'Too few categories.')
               })
             })
           })
 
           describe('four', () => {
-            it('throws error: "Too many categories!"', async () => {
+            it('throws error: "Too many categories."', async () => {
               const { errors } = await mutate({
                 mutation: CreateGroup,
                 variables: { ...variables, categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'] },
               })
 
-              expect(errors?.[0]).toHaveProperty('message', 'Too many categories!')
+              expect(errors?.[0]).toHaveProperty('message', 'Too many categories.')
             })
           })
 
@@ -464,7 +464,7 @@ describe('in mode', () => {
               }
             })
 
-            it('creates the group without categories instead of throwing "Too few categories!"', async () => {
+            it('creates the group without categories instead of throwing "Too few categories."', async () => {
               await expect(
                 mutate({ mutation: CreateGroup, variables: { ...variables, categoryIds: null } }),
               ).resolves.toMatchObject({
@@ -500,7 +500,7 @@ describe('in mode', () => {
 
             expect(errors?.[0]).toHaveProperty(
               'message',
-              'Group location latitude must be a finite number between -90 and 90!',
+              'Group location latitude must be a finite number between -90 and 90.',
             )
           })
 
@@ -512,7 +512,7 @@ describe('in mode', () => {
 
             expect(errors?.[0]).toHaveProperty(
               'message',
-              'Group location longitude must be a finite number between -180 and 180!',
+              'Group location longitude must be a finite number between -180 and 180.',
             )
           })
 
@@ -524,7 +524,7 @@ describe('in mode', () => {
 
             expect(errors?.[0]).toHaveProperty(
               'message',
-              'Group location requires both lat and lng, or neither!',
+              'Group location requires both lat and lng, or neither.',
             )
           })
 
@@ -536,7 +536,7 @@ describe('in mode', () => {
 
             expect(errors?.[0]).toHaveProperty(
               'message',
-              'Group location requires both lat and lng, or neither!',
+              'Group location requires both lat and lng, or neither.',
             )
           })
 
@@ -3585,7 +3585,7 @@ describe('in mode', () => {
 
                 expect(errors?.[0]).toHaveProperty(
                   'message',
-                  'Group location latitude must be a finite number between -90 and 90!',
+                  'Group location latitude must be a finite number between -90 and 90.',
                 )
               })
 
@@ -3597,7 +3597,7 @@ describe('in mode', () => {
 
                 expect(errors?.[0]).toHaveProperty(
                   'message',
-                  'Group location longitude must be a finite number between -180 and 180!',
+                  'Group location longitude must be a finite number between -180 and 180.',
                 )
               })
 
@@ -3609,7 +3609,7 @@ describe('in mode', () => {
 
                 expect(errors?.[0]).toHaveProperty(
                   'message',
-                  'Group location requires both lat and lng, or neither!',
+                  'Group location requires both lat and lng, or neither.',
                 )
               })
 
@@ -3621,7 +3621,7 @@ describe('in mode', () => {
 
                 expect(errors?.[0]).toHaveProperty(
                   'message',
-                  'Group location requires both lat and lng, or neither!',
+                  'Group location requires both lat and lng, or neither.',
                 )
               })
 
@@ -3651,7 +3651,7 @@ describe('in mode', () => {
             describe('description', () => {
               describe('length without HTML', () => {
                 describe('less then 3 chars', () => {
-                  it('throws error: "Description too short!"', async () => {
+                  it('throws error: "Description too short."', async () => {
                     const { errors } = await mutate({
                       mutation: UpdateGroup,
                       variables: {
@@ -3662,7 +3662,7 @@ describe('in mode', () => {
                       },
                     })
 
-                    expect(errors?.[0]).toHaveProperty('message', 'Description too short!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Description too short.')
                   })
                 })
               })
@@ -3697,7 +3697,7 @@ describe('in mode', () => {
 
               describe('not even one', () => {
                 describe('by "categoryIds: []"', () => {
-                  it('throws error: "Too few categories!"', async () => {
+                  it('throws error: "Too few categories."', async () => {
                     const { errors } = await mutate({
                       mutation: UpdateGroup,
                       variables: {
@@ -3706,13 +3706,13 @@ describe('in mode', () => {
                       },
                     })
 
-                    expect(errors?.[0]).toHaveProperty('message', 'Too few categories!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Too few categories.')
                   })
                 })
               })
 
               describe('four', () => {
-                it('throws error: "Too many categories!"', async () => {
+                it('throws error: "Too many categories."', async () => {
                   const { errors } = await mutate({
                     mutation: UpdateGroup,
                     variables: {
@@ -3721,7 +3721,7 @@ describe('in mode', () => {
                     },
                   })
 
-                  expect(errors?.[0]).toHaveProperty('message', 'Too many categories!')
+                  expect(errors?.[0]).toHaveProperty('message', 'Too many categories.')
                 })
               })
             })
@@ -4297,7 +4297,7 @@ describe('in mode', () => {
             variables: { id: 'group-b', slug: 'group-a' },
           }),
         ).resolves.toMatchObject({
-          errors: [expect.objectContaining({ message: 'Group with this slug already exists!' })],
+          errors: [expect.objectContaining({ message: 'Group with this slug already exists.' })],
         })
       })
     })
@@ -4336,7 +4336,7 @@ describe('in mode', () => {
             },
           }),
         ).resolves.toMatchObject({
-          errors: [expect.objectContaining({ message: 'Group with this slug already exists!' })],
+          errors: [expect.objectContaining({ message: 'Group with this slug already exists.' })],
         })
       })
     })
@@ -4884,7 +4884,7 @@ describe('in mode', () => {
             context,
             null,
           ),
-        ).rejects.toThrow('User is not a member of this group')
+        ).rejects.toThrow('User is not a member of this group.')
       })
     })
 
@@ -4923,7 +4923,7 @@ describe('in mode', () => {
             context,
             null,
           ),
-        ).rejects.toThrow('User is not a member of this group')
+        ).rejects.toThrow('User is not a member of this group.')
       })
     })
 
@@ -4961,7 +4961,7 @@ describe('in mode', () => {
       it.each(fieldResolverCalls)('%s throws for a parent without an id', async (_name, call) => {
         const context = { database, user: { id: 'current-user' } } as unknown as Context
 
-        await expect(call(context)).rejects.toThrow('Can not identify selected Group!')
+        await expect(call(context)).rejects.toThrow('Can not identify selected Group.')
       })
     })
 

@@ -489,7 +489,7 @@
     "ROLE_EDIT_ROLE_PROTECTED": "De rol “{name}” is beschermd en kan niet worden bewerkt.",
     "ROLE_RENAME_SYSTEM_ROLE": "De rol “{name}” is een systeemrol en kan niet worden hernoemd.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "De rol “{name}” bestaat al.",
-    "ROLE_SAVE_NAME_INVALID": "De rolnaam is ongeldig.",
+    "ROLE_SAVE_NAME_INVALID": "De rolnaam moet 2 tot 50 tekens lang zijn en mag alleen letters, cijfers, “_” en “-” bevatten; het eerste teken moet een letter of cijfer zijn.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "Een rol kan niet als beschermd worden aangemaakt of gemarkeerd.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Je mag niet zoeken in het gebruikersbeheer.",
     "USER_DOES_NOT_EXIST": "De gebruiker is niet gevonden.",

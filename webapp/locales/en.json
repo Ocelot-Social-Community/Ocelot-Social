@@ -489,7 +489,7 @@
     "ROLE_EDIT_ROLE_PROTECTED": "The role “{name}” is protected and cannot be edited.",
     "ROLE_RENAME_SYSTEM_ROLE": "The role “{name}” is a system role and cannot be renamed.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "The role “{name}” already exists.",
-    "ROLE_SAVE_NAME_INVALID": "The role name is invalid.",
+    "ROLE_SAVE_NAME_INVALID": "The role name must be 2 to 50 characters long and may only contain letters, digits, “_” and “-”; the first character must be a letter or a digit.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "A role cannot be created or marked as protected.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "You are not allowed to search the user administration.",
     "USER_DOES_NOT_EXIST": "The user could not be found.",

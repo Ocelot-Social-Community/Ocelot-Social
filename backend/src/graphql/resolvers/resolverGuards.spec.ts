@@ -69,7 +69,7 @@ describe('createApiKey while the apiKeysEnabled policy is off', () => {
 
     await expect(
       apiKeysResolvers.Mutation.createApiKey(null, { name: 'a key' }, context),
-    ).rejects.toThrow('API keys are not enabled')
+    ).rejects.toThrow('API keys are not enabled.')
   })
 })
 

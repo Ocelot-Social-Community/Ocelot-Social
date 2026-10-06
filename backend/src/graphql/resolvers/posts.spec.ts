@@ -535,7 +535,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event start date must be a valid date!',
+                message: 'Event start date must be a valid date.',
               },
             ],
           })
@@ -561,7 +561,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event start date must be in ISO format!',
+                message: 'Event start date must be in ISO format.',
               },
             ],
           })
@@ -610,7 +610,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event end date must be a valid date!',
+                message: 'Event end date must be a valid date.',
               },
             ],
           })
@@ -637,7 +637,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event end date must be in ISO format!',
+                message: 'Event end date must be in ISO format.',
               },
             ],
           })
@@ -750,7 +750,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event venue must be present!',
+                message: 'Event venue must be present.',
               },
             ],
           })
@@ -773,7 +773,7 @@ describe('CreatePost', () => {
               },
             }),
           ).resolves.toMatchObject({
-            errors: [{ message: 'Event venue must be present!' }],
+            errors: [{ message: 'Event venue must be present.' }],
           })
         })
       })
@@ -795,7 +795,7 @@ describe('CreatePost', () => {
               },
             }),
           ).resolves.toMatchObject({
-            errors: [{ message: 'Event venue must be present!' }],
+            errors: [{ message: 'Event venue must be present.' }],
           })
         })
       })
@@ -822,7 +822,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event venue must be between 3 and 100 characters long!',
+                message: 'Event venue must be between 3 and 100 characters long.',
                 extensions: {
                   errorCode: 'POST_EVENT_VENUE_LENGTH_INVALID',
                   params: { min: 3, max: 100 },
@@ -855,7 +855,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event location latitude must be a finite number between -90 and 90!',
+                message: 'Event location latitude must be a finite number between -90 and 90.',
               },
             ],
           })
@@ -882,7 +882,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event location longitude must be a finite number between -180 and 180!',
+                message: 'Event location longitude must be a finite number between -180 and 180.',
               },
             ],
           })
@@ -908,7 +908,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event location requires both lat and lng, or neither!',
+                message: 'Event location requires both lat and lng, or neither.',
               },
             ],
           })
@@ -1224,7 +1224,7 @@ describe('UpdatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event start date must be a valid date!',
+                message: 'Event start date must be a valid date.',
               },
             ],
           })
@@ -1273,7 +1273,7 @@ describe('UpdatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event venue must be present!',
+                message: 'Event venue must be present.',
               },
             ],
           })
@@ -1786,7 +1786,7 @@ describe('pin posts', () => {
       it('throws with error that pinning posts is not allowed', async () => {
         await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
           data: { pinPost: null },
-          errors: [{ message: 'Pinned posts are not allowed!' }],
+          errors: [{ message: 'Pinned posts are not allowed.' }],
         })
       })
     })

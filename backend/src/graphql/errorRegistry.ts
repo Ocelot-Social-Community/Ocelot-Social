@@ -35,29 +35,29 @@ const definitions = {
   },
   PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT: {
     type: 'BAD_USER_INPUT',
-    text: 'Old password is not correct',
+    text: 'Old password is not correct.',
   },
   PASSWORD_CHANGE_NEW_PASSWORD_EQUALS_OLD: {
     type: 'BAD_USER_INPUT',
-    text: 'Old password and new password should be different',
+    text: 'Old password and new password should be different.',
   },
   // e-mail & registration
   EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE: {
     type: 'BAD_USER_INPUT',
     text: 'A user account with this email already exists.',
   },
-  EMAIL_CHANGE_ADDRESS_INVALID: { type: 'BAD_USER_INPUT', text: 'must be a valid email' },
+  EMAIL_CHANGE_ADDRESS_INVALID: { type: 'BAD_USER_INPUT', text: 'Must be a valid email.' },
   EMAIL_CHANGE_CONFIRMATION_CODE_INVALID: {
     type: 'BAD_USER_INPUT',
     text: 'Invalid nonce or no email address found.',
   },
   REGISTRATION_CONFIRMATION_CODE_INVALID: {
     type: 'BAD_USER_INPUT',
-    text: 'Invalid email or nonce',
+    text: 'Invalid email or nonce.',
   },
   REGISTRATION_USER_SLUG_ALREADY_TAKEN: {
     type: 'BAD_USER_INPUT',
-    text: 'User with this slug already exists!',
+    text: 'User with this slug already exists.',
   },
   // users & badges
   USER_ADMIN_SEARCH_NOT_PERMITTED: {
@@ -68,7 +68,7 @@ const definitions = {
   USER_UNBLOCK_USER_NOT_BLOCKED: { type: 'BAD_USER_INPUT', text: 'Could not find blocked user.' },
   USER_PROFILE_NAME_TOO_SHORT: {
     type: 'BAD_USER_INPUT',
-    text: 'Username must be at least {min} character long!',
+    text: 'The name must be at least {min} characters long.',
   },
   BADGE_SELECTION_BADGE_NOT_REWARDED: {
     type: 'BAD_USER_INPUT',
@@ -77,7 +77,7 @@ const definitions = {
   // groups
   GROUP_SAVE_DESCRIPTION_TOO_SHORT: {
     type: 'BAD_USER_INPUT',
-    text: 'Description too short!',
+    text: 'Description too short.',
     params: ['min'],
   },
   GROUP_SAVE_HIDDEN_TYPE_NOT_PERMITTED: {
@@ -87,124 +87,124 @@ const definitions = {
   // A query selected a computed Group field (myRole, postsCount, …) without the group's id.
   GROUP_FIELD_GROUP_ID_MISSING: {
     type: 'BAD_USER_INPUT',
-    text: 'Can not identify selected Group!',
+    text: 'Can not identify selected Group.',
   },
   GROUP_SAVE_SLUG_ALREADY_TAKEN: {
     type: 'BAD_USER_INPUT',
-    text: 'Group with this slug already exists!',
+    text: 'Group with this slug already exists.',
   },
   GROUP_SAVE_TOO_FEW_CATEGORIES: {
     type: 'BAD_USER_INPUT',
-    text: 'Too few categories!',
+    text: 'Too few categories.',
     params: ['min'],
   },
   GROUP_SAVE_TOO_MANY_CATEGORIES: {
     type: 'BAD_USER_INPUT',
-    text: 'Too many categories!',
+    text: 'Too many categories.',
     params: ['max'],
   },
   GROUP_MEMBERSHIP_USER_NOT_A_MEMBER: {
     type: 'BAD_USER_INPUT',
-    text: 'User is not a member of this group',
+    text: 'User is not a member of this group.',
   },
   // posts, comments & events
   POST_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'Could not find post.' },
   COMMENT_SAVE_CONTENT_TOO_SHORT: {
     type: 'BAD_USER_INPUT',
-    text: 'Comment must be at least {min} character long!',
+    text: 'The comment must be at least {min} characters long.',
   },
   POST_EVENT_LOCATION_COORDINATES_INCOMPLETE: {
     type: 'BAD_USER_INPUT',
-    text: 'Event location requires both lat and lng, or neither!',
+    text: 'Event location requires both lat and lng, or neither.',
   },
   POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE: {
     type: 'BAD_USER_INPUT',
-    text: 'Event location latitude must be a finite number between -90 and 90!',
+    text: 'Event location latitude must be a finite number between -90 and 90.',
   },
   POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE: {
     type: 'BAD_USER_INPUT',
-    text: 'Event location longitude must be a finite number between -180 and 180!',
+    text: 'Event location longitude must be a finite number between -180 and 180.',
   },
   POST_EVENT_START_DATE_INVALID: {
     type: 'BAD_USER_INPUT',
-    text: 'Event start date must be a valid date!',
+    text: 'Event start date must be a valid date.',
   },
   POST_EVENT_START_DATE_NOT_ISO_FORMAT: {
     type: 'BAD_USER_INPUT',
-    text: 'Event start date must be in ISO format!',
+    text: 'Event start date must be in ISO format.',
   },
   POST_EVENT_END_DATE_INVALID: {
     type: 'BAD_USER_INPUT',
-    text: 'Event end date must be a valid date!',
+    text: 'Event end date must be a valid date.',
   },
   POST_EVENT_END_DATE_NOT_ISO_FORMAT: {
     type: 'BAD_USER_INPUT',
-    text: 'Event end date must be in ISO format!',
+    text: 'Event end date must be in ISO format.',
   },
   POST_EVENT_END_BEFORE_START: {
     type: 'BAD_USER_INPUT',
     text: 'The end date must be after the start date.',
   },
-  POST_EVENT_VENUE_REQUIRED: { type: 'BAD_USER_INPUT', text: 'Event venue must be present!' },
+  POST_EVENT_VENUE_REQUIRED: { type: 'BAD_USER_INPUT', text: 'Event venue must be present.' },
   POST_EVENT_VENUE_LENGTH_INVALID: {
     type: 'BAD_USER_INPUT',
-    text: 'Event venue must be between {min} and {max} characters long!',
+    text: 'Event venue must be between {min} and {max} characters long.',
   },
-  POST_PIN_FEATURE_DISABLED: { type: 'FORBIDDEN', text: 'Pinned posts are not allowed!' },
+  POST_PIN_FEATURE_DISABLED: { type: 'FORBIDDEN', text: 'Pinned posts are not allowed.' },
   POST_PIN_LIMIT_REACHED: {
     type: 'BAD_USER_INPUT',
     text: 'Maximum number of pinned posts reached. Unpin a post first.',
   },
   POST_SAVE_SLUG_ALREADY_TAKEN: {
     type: 'BAD_USER_INPUT',
-    text: 'Post with this slug already exists!',
+    text: 'Post with this slug already exists.',
   },
   // locations
   // A query selected Location.distanceToMe without the location's id.
   LOCATION_FIELD_LOCATION_ID_MISSING: {
     type: 'BAD_USER_INPUT',
-    text: 'Can not identify selected Location!',
+    text: 'Can not identify selected Location.',
   },
   LOCATION_COORDINATES_INCOMPLETE: {
     type: 'BAD_USER_INPUT',
-    text: '{entity} location requires both lat and lng, or neither!',
+    text: '{entity} location requires both lat and lng, or neither.',
   },
   LOCATION_LATITUDE_OUT_OF_RANGE: {
     type: 'BAD_USER_INPUT',
-    text: '{entity} location latitude must be a finite number between -90 and 90!',
+    text: '{entity} location latitude must be a finite number between -90 and 90.',
   },
   LOCATION_LONGITUDE_OUT_OF_RANGE: {
     type: 'BAD_USER_INPUT',
-    text: '{entity} location longitude must be a finite number between -180 and 180!',
+    text: '{entity} location longitude must be a finite number between -180 and 180.',
   },
   LOCATION_COORDINATES_NOT_RESOLVABLE: {
     type: 'BAD_USER_INPUT',
-    text: 'location coordinates are invalid',
+    text: 'Location coordinates are invalid.',
   },
   LOCATION_NAME_NOT_FOUND: {
     type: 'BAD_USER_INPUT',
-    text: 'locationName is invalid',
+    text: 'The locationName is invalid.',
   },
   LOCATION_NAME_NO_EXACT_MATCH: {
     type: 'BAD_USER_INPUT',
-    text: 'locationName is invalid',
+    text: 'The locationName is invalid.',
   },
   // moderation
   REPORT_TARGET_IS_OWN: {
     type: 'BAD_USER_INPUT',
-    text: 'You cannot report yourself or your own content!',
+    text: 'You cannot report yourself or your own content.',
   },
   REVIEW_TARGET_IS_OWN: {
     type: 'BAD_USER_INPUT',
-    text: 'You cannot review a report about yourself or your own content!',
+    text: 'You cannot review a report about yourself or your own content.',
   },
   REVIEW_TARGET_DOES_NOT_EXIST: {
     type: 'BAD_USER_INPUT',
-    text: 'Resource not found or is not a Post|Comment|User!',
+    text: 'Resource not found or is not a Post|Comment|User.',
   },
   REVIEW_TARGET_NOT_REPORTED: {
     type: 'BAD_USER_INPUT',
-    text: 'Before starting the review process, please report the {label}!',
+    text: 'Before starting the review process, please report the {label}.',
   },
   // roles
   ROLE_ASSIGNMENT_LAST_OWNER_NOT_REMOVABLE: {
@@ -216,8 +216,11 @@ const definitions = {
     text: 'Only an owner may assign or change the owner role.',
   },
   ROLE_SAVE_NAME_ALREADY_TAKEN: { type: 'BAD_USER_INPUT', text: "Role '{name}' already exists." },
-  ROLE_SAVE_NAME_INVALID: { type: 'BAD_USER_INPUT', text: 'Invalid role name.' },
-  ROLE_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'Unknown role: {name}' },
+  ROLE_SAVE_NAME_INVALID: {
+    type: 'BAD_USER_INPUT',
+    text: 'The role name must be 2 to 50 characters long, contain only letters, digits, _ and -, and start with a letter or digit.',
+  },
+  ROLE_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'Unknown role: {name}.' },
   ROLE_EDIT_ROLE_PROTECTED: {
     type: 'FORBIDDEN',
     text: "Role '{name}' is protected and cannot be edited.",
@@ -243,11 +246,11 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'The validity must be at least one day (expiresInDays ≥ 1).',
   },
-  API_KEY_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'API key not found' },
-  API_KEYS_FEATURE_DISABLED: { type: 'FORBIDDEN', text: 'API keys are not enabled' },
+  API_KEY_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'API key not found.' },
+  API_KEYS_FEATURE_DISABLED: { type: 'FORBIDDEN', text: 'API keys are not enabled.' },
   API_KEY_CREATE_LIMIT_REACHED: {
     type: 'BAD_USER_INPUT',
-    text: 'Maximum of {max} active API keys reached',
+    text: 'Maximum of {max} active API keys reached.',
   },
   // invite codes
   INVITE_CODE_CREATE_GROUP_MEMBERSHIP_REQUIRED: {
@@ -277,7 +280,7 @@ const definitions = {
   },
   CHAT_MESSAGE_CONTENT_MISSING: {
     type: 'BAD_USER_INPUT',
-    text: 'Message must have content or files',
+    text: 'Message must have content or files.',
   },
   CHAT_ROOM_PARTNER_IS_SELF: {
     type: 'BAD_USER_INPUT',

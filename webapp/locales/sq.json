@@ -489,7 +489,7 @@
     "ROLE_EDIT_ROLE_PROTECTED": "Roli „{name}“ është i mbrojtur dhe nuk mund të ndryshohet.",
     "ROLE_RENAME_SYSTEM_ROLE": "Roli „{name}“ është rol sistemi dhe nuk mund të riemërtohet.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "Roli „{name}“ ekziston tashmë.",
-    "ROLE_SAVE_NAME_INVALID": "Emri i rolit është i pavlefshëm.",
+    "ROLE_SAVE_NAME_INVALID": "Emri i rolit duhet të ketë 2 deri në 50 karaktere dhe mund të përmbajë vetëm shkronja, shifra, „_“ dhe „-“; karakteri i parë duhet të jetë shkronjë ose shifër.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "Një rol nuk mund të krijohet ose të shënohet si i mbrojtur.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Nuk mund të kërkosh në administrimin e përdoruesve.",
     "USER_DOES_NOT_EXIST": "Përdoruesi nuk u gjet.",
