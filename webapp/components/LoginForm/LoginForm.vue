@@ -134,7 +134,7 @@ export default {
         if (err.message === 'Error: no-cookie') {
           this.$toast.error(this.$t('login.no-cookie'))
         } else if (backendErrorCode(err) === 'LOGIN_ACCOUNT_DISABLED') {
-          this.$toast.error(this.$backendError(err))
+          this.$toastBackendError(err)
         } else {
           this.$toast.error(this.$t('login.failure'))
         }

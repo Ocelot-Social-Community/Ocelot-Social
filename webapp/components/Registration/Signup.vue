@@ -128,7 +128,7 @@ export default {
           this.$emit('submit', { email: this.data.Signup.email })
         }, 3000)
       } catch (err) {
-        this.$toast.error(this.$backendError(err))
+        this.$toastBackendError(err)
       }
     },
   },

@@ -142,7 +142,7 @@ export default {
         })
         this.$toast.success(this.$t('settings.notifications.success-update'))
       } catch (error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       }
     },
   },

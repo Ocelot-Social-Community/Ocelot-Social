@@ -52,4 +52,9 @@ export default () => {
   Vue.prototype.$backendError = function (error) {
     return backendErrorMessage(error, this)
   }
+  // The usual reaction to a failed request: show that message as an error toast. Where the message
+  // goes into a sentence of the component's own, `$backendError` is still the one to use.
+  Vue.prototype.$toastBackendError = function (error) {
+    this.$toast.error(this.$backendError(error))
+  }
 }

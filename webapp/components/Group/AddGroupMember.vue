@@ -103,7 +103,7 @@ export default {
         )
         this.$emit('loadGroupMembers')
       } catch (error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       }
     },
   },

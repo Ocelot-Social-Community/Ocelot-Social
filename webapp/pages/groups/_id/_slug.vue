@@ -761,7 +761,7 @@ export default {
         })
         this.$toast.success(this.$t('group.muted'))
       } catch (error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       }
     },
     async unmuteGroup() {
@@ -774,7 +774,7 @@ export default {
         })
         this.$toast.success(this.$t('group.unmuted'))
       } catch (error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       }
     },
     uniq(items, field = 'id') {
@@ -908,7 +908,7 @@ export default {
         this.group = Group && Group[0] ? Group[0] : {}
       },
       error(error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       },
       fetchPolicy: 'cache-and-network',
     },

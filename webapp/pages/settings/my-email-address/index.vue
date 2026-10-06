@@ -129,7 +129,7 @@ export default {
           }
           return
         }
-        this.$toast.error(this.$backendError(err))
+        this.$toastBackendError(err)
       } finally {
         this.loadingData = false
       }

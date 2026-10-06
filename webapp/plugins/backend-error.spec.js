@@ -140,4 +140,14 @@ describe('backend-error plugin', () => {
     vm.$i18n = i18n.$i18n
     expect(vm.$backendError(graphQLError({ code: 'FORBIDDEN' }))).toBe('generic forbidden')
   })
+
+  it('injects $toastBackendError, which shows that message as an error toast', () => {
+    backendErrorPlugin()
+    const vm = new Vue()
+    vm.$t = i18n.$t
+    vm.$i18n = i18n.$i18n
+    vm.$toast = { error: jest.fn() }
+    vm.$toastBackendError(graphQLError({ code: 'FORBIDDEN' }))
+    expect(vm.$toast.error).toHaveBeenCalledWith('generic forbidden')
+  })
 })

@@ -75,7 +75,7 @@ export default {
         this.$toast.success(this.$t('group.updatedGroup'))
         done(true)
       } catch (error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
         done()
       }
     },

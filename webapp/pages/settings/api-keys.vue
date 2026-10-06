@@ -332,7 +332,7 @@ export default {
         this.$apollo.queries.myApiKeys.refetch()
         this.$toast.success(this.$t('settings.api-keys.create.success'))
       } catch (error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       } finally {
         this.creating = false
       }
@@ -376,7 +376,7 @@ export default {
         this.$apollo.queries.myApiKeys.refetch()
         this.$toast.success(this.$t('settings.api-keys.revoke.success', { name: key.name }))
       } catch (error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
         throw error
       } finally {
         this.revokingKeyId = null

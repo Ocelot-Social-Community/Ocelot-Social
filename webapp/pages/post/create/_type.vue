@@ -295,7 +295,7 @@ export default {
         return Group || []
       },
       error(error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       },
       fetchPolicy: 'cache-and-network',
     },

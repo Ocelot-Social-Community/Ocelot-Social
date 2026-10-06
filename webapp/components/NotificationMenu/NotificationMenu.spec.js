@@ -387,7 +387,7 @@ describe('NotificationMenu.vue', () => {
       it('reports query errors via $toast.error', () => {
         const toast = { error: jest.fn() }
         apollo.error.call(
-          { $toast: toast, $backendError: (error) => error.message },
+          { $toast: toast, $toastBackendError: (error) => toast.error(error.message) },
           { message: 'query broke' },
         )
         expect(toast.error).toHaveBeenCalledWith('query broke')

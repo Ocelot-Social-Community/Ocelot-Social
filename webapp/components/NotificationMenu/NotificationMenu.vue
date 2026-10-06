@@ -143,7 +143,7 @@ export default {
 
         closeMenu?.()
       } catch (error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       }
     },
     async toggleNotificationRead({ resourceId, read }) {
@@ -158,7 +158,7 @@ export default {
         // the row stays visible in the filtered dropdown list until this refetch.
         this.scheduleNotificationsRefetch()
       } catch (error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       }
     },
     scheduleNotificationsRefetch() {
@@ -177,7 +177,7 @@ export default {
           mutation: markAllAsReadMutation(this.$i18n),
         })
       } catch (error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       }
     },
   },
@@ -223,7 +223,7 @@ export default {
         },
       },
       error(error) {
-        this.$toast.error(this.$backendError(error))
+        this.$toastBackendError(error)
       },
     },
   },
