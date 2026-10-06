@@ -431,7 +431,6 @@
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Ya hay una cuenta de usuario con esta dirección de correo electrónico.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Por favor, introduce una dirección de correo electrónico válida.",
     "EMAIL_CHANGE_CONFIRMATION_CODE_INVALID": "El código de confirmación no es válido.",
-    "EVENT_DATE_INVALID": "La fecha del evento no es válida.",
     "generic": {
       "BAD_USER_INPUT": "La entrada no es válida. Por favor, revísala e inténtalo de nuevo.",
       "DEFAULT": "Algo ha salido mal. Por favor, inténtalo de nuevo más tarde.",
@@ -454,6 +453,10 @@
     "PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT": "Tu contraseña antigua no es correcta.",
     "POST_DOES_NOT_EXIST": "No se ha encontrado la contribución.",
     "POST_EVENT_END_BEFORE_START": "La fecha de finalización debe ser posterior a la fecha de inicio.",
+    "POST_EVENT_END_DATE_INVALID": "La fecha de finalización no es una fecha válida.",
+    "POST_EVENT_END_DATE_NOT_ISO_FORMAT": "La fecha de finalización debe estar en formato ISO.",
+    "POST_EVENT_START_DATE_INVALID": "La fecha de inicio no es una fecha válida.",
+    "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "La fecha de inicio debe estar en formato ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "La descripción del lugar debe tener entre {min} y {max} caracteres.",
     "POST_EVENT_VENUE_REQUIRED": "Por favor, añade una descripción del lugar.",
     "POST_PIN_FEATURE_DISABLED": "Anclar contribuciones no está activado.",

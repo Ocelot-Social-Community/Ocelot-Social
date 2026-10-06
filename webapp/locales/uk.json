@@ -431,7 +431,6 @@
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Обліковий запис з цією електронною адресою вже існує.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Будь ласка, введи дійсну електронну адресу.",
     "EMAIL_CHANGE_CONFIRMATION_CODE_INVALID": "Код підтвердження недійсний.",
-    "EVENT_DATE_INVALID": "Дата події недійсна.",
     "generic": {
       "BAD_USER_INPUT": "Введені дані недійсні. Перевір їх і спробуй ще раз.",
       "DEFAULT": "Щось пішло не так. Спробуй ще раз пізніше.",
@@ -454,6 +453,10 @@
     "PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT": "Твій старий пароль неправильний.",
     "POST_DOES_NOT_EXIST": "Допис не знайдено.",
     "POST_EVENT_END_BEFORE_START": "Дата завершення має бути пізніше дати початку.",
+    "POST_EVENT_END_DATE_INVALID": "Дата завершення не є дійсною датою.",
+    "POST_EVENT_END_DATE_NOT_ISO_FORMAT": "Дата завершення має бути у форматі ISO.",
+    "POST_EVENT_START_DATE_INVALID": "Дата початку не є дійсною датою.",
+    "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "Дата початку має бути у форматі ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "Опис місця повинен містити від {min} до {max} символів.",
     "POST_EVENT_VENUE_REQUIRED": "Будь ласка, додай опис місця.",
     "POST_PIN_FEATURE_DISABLED": "Закріплення дописів не увімкнено.",

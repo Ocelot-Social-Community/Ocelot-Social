@@ -431,7 +431,6 @@
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Konto z tym adresem e-mail już istnieje.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Podaj prawidłowy adres e-mail.",
     "EMAIL_CHANGE_CONFIRMATION_CODE_INVALID": "Kod potwierdzający jest nieprawidłowy.",
-    "EVENT_DATE_INVALID": "Data wydarzenia jest nieprawidłowa.",
     "generic": {
       "BAD_USER_INPUT": "Wprowadzone dane są nieprawidłowe. Sprawdź je i spróbuj ponownie.",
       "DEFAULT": "Coś poszło nie tak. Spróbuj ponownie później.",
@@ -454,6 +453,10 @@
     "PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT": "Twoje stare hasło jest nieprawidłowe.",
     "POST_DOES_NOT_EXIST": "Nie znaleziono wpisu.",
     "POST_EVENT_END_BEFORE_START": "Data zakończenia musi być późniejsza niż data rozpoczęcia.",
+    "POST_EVENT_END_DATE_INVALID": "Data zakończenia nie jest prawidłową datą.",
+    "POST_EVENT_END_DATE_NOT_ISO_FORMAT": "Data zakończenia musi być w formacie ISO.",
+    "POST_EVENT_START_DATE_INVALID": "Data rozpoczęcia nie jest prawidłową datą.",
+    "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "Data rozpoczęcia musi być w formacie ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "Opis miejsca musi mieć od {min} do {max} znaków.",
     "POST_EVENT_VENUE_REQUIRED": "Podaj opis lokalizacji.",
     "POST_PIN_FEATURE_DISABLED": "Przypinanie wpisów nie jest włączone.",

@@ -431,7 +431,6 @@
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Já existe uma conta de usuário com este endereço de e-mail.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Por favor, insira um endereço de e-mail válido.",
     "EMAIL_CHANGE_CONFIRMATION_CODE_INVALID": "O código de confirmação é inválido.",
-    "EVENT_DATE_INVALID": "A data do evento é inválida.",
     "generic": {
       "BAD_USER_INPUT": "A entrada é inválida. Verifique-a e tente novamente.",
       "DEFAULT": "Algo deu errado. Tente novamente mais tarde.",
@@ -454,6 +453,10 @@
     "PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT": "Sua senha antiga não está correta.",
     "POST_DOES_NOT_EXIST": "A publicação não foi encontrada.",
     "POST_EVENT_END_BEFORE_START": "A data de término deve ser posterior à data de início.",
+    "POST_EVENT_END_DATE_INVALID": "A data de término não é uma data válida.",
+    "POST_EVENT_END_DATE_NOT_ISO_FORMAT": "A data de término deve estar no formato ISO.",
+    "POST_EVENT_START_DATE_INVALID": "A data de início não é uma data válida.",
+    "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "A data de início deve estar no formato ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "A descrição do local deve ter entre {min} e {max} caracteres.",
     "POST_EVENT_VENUE_REQUIRED": "Adicione uma descrição do local.",
     "POST_PIN_FEATURE_DISABLED": "A fixação de publicações não está ativada.",

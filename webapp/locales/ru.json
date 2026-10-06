@@ -431,7 +431,6 @@
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Уже есть учётная запись пользователя с этим адресом электронной почты.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Пожалуйста, введи действительный адрес электронной почты.",
     "EMAIL_CHANGE_CONFIRMATION_CODE_INVALID": "Код подтверждения недействителен.",
-    "EVENT_DATE_INVALID": "Дата мероприятия недействительна.",
     "generic": {
       "BAD_USER_INPUT": "Введённые данные недействительны. Проверь их и попробуй ещё раз.",
       "DEFAULT": "Что-то пошло не так. Попробуй ещё раз позже.",
@@ -454,6 +453,10 @@
     "PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT": "Старый пароль неверен.",
     "POST_DOES_NOT_EXIST": "Пост не найден.",
     "POST_EVENT_END_BEFORE_START": "Дата окончания должна быть позже даты начала.",
+    "POST_EVENT_END_DATE_INVALID": "Дата окончания не является допустимой датой.",
+    "POST_EVENT_END_DATE_NOT_ISO_FORMAT": "Дата окончания должна быть в формате ISO.",
+    "POST_EVENT_START_DATE_INVALID": "Дата начала не является допустимой датой.",
+    "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "Дата начала должна быть в формате ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "Описание места должно содержать от {min} до {max} символов.",
     "POST_EVENT_VENUE_REQUIRED": "Пожалуйста, добавь описание места.",
     "POST_PIN_FEATURE_DISABLED": "Закрепление постов не включено.",

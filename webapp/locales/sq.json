@@ -431,7 +431,6 @@
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Ekziston tashmë një llogari përdoruesi me këtë adresë e-maili.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Fut një adresë e-maili të vlefshme.",
     "EMAIL_CHANGE_CONFIRMATION_CODE_INVALID": "Kodi i konfirmimit është i pavlefshëm.",
-    "EVENT_DATE_INVALID": "Data e eventit është e pavlefshme.",
     "generic": {
       "BAD_USER_INPUT": "Të dhënat janë të pavlefshme. Kontrolloji dhe provo përsëri.",
       "DEFAULT": "Diçka shkoi keq. Provo përsëri më vonë.",
@@ -454,6 +453,10 @@
     "PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT": "Fjalëkalimi yt i vjetër nuk është i saktë.",
     "POST_DOES_NOT_EXIST": "Postimi nuk u gjet.",
     "POST_EVENT_END_BEFORE_START": "Data e mbarimit duhet të jetë pas datës së fillimit.",
+    "POST_EVENT_END_DATE_INVALID": "Data e mbarimit nuk është një datë e vlefshme.",
+    "POST_EVENT_END_DATE_NOT_ISO_FORMAT": "Data e mbarimit duhet të jetë në formatin ISO.",
+    "POST_EVENT_START_DATE_INVALID": "Data e fillimit nuk është një datë e vlefshme.",
+    "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "Data e fillimit duhet të jetë në formatin ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "Përshkrimi i vendit duhet të ketë midis {min} dhe {max} karaktere.",
     "POST_EVENT_VENUE_REQUIRED": "Shto një përshkrim të vendndodhjes.",
     "POST_PIN_FEATURE_DISABLED": "Ngulja e postimeve nuk është aktivizuar.",

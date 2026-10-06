@@ -431,7 +431,6 @@
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Esiste già un account utente con questo indirizzo e-mail.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Inserisci un indirizzo e-mail valido.",
     "EMAIL_CHANGE_CONFIRMATION_CODE_INVALID": "Il codice di conferma non è valido.",
-    "EVENT_DATE_INVALID": "La data dell'evento non è valida.",
     "generic": {
       "BAD_USER_INPUT": "L'inserimento non è valido. Controllalo e riprova.",
       "DEFAULT": "Qualcosa è andato storto. Riprova più tardi.",
@@ -454,6 +453,10 @@
     "PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT": "La tua vecchia password non è corretta.",
     "POST_DOES_NOT_EXIST": "La pubblicazione non è stata trovata.",
     "POST_EVENT_END_BEFORE_START": "La data di fine deve essere successiva alla data di inizio.",
+    "POST_EVENT_END_DATE_INVALID": "La data di fine non è una data valida.",
+    "POST_EVENT_END_DATE_NOT_ISO_FORMAT": "La data di fine deve essere in formato ISO.",
+    "POST_EVENT_START_DATE_INVALID": "La data di inizio non è una data valida.",
+    "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "La data di inizio deve essere in formato ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "La descrizione del luogo deve essere compresa tra {min} e {max} caratteri.",
     "POST_EVENT_VENUE_REQUIRED": "Aggiungi una descrizione del luogo.",
     "POST_PIN_FEATURE_DISABLED": "Fissare le pubblicazioni non è attivato.",

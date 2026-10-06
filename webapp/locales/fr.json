@@ -431,7 +431,6 @@
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Il existe déjà un compte utilisateur avec cette adresse mail.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Saisis une adresse mail valide.",
     "EMAIL_CHANGE_CONFIRMATION_CODE_INVALID": "Le code de confirmation n'est pas valide.",
-    "EVENT_DATE_INVALID": "La date de l'événement n'est pas valide.",
     "generic": {
       "BAD_USER_INPUT": "La saisie n'est pas valide. Vérifie-la et réessaie.",
       "DEFAULT": "Une erreur s'est produite. Réessaie plus tard.",
@@ -454,6 +453,10 @@
     "PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT": "Ton ancien mot de passe n'est pas correct.",
     "POST_DOES_NOT_EXIST": "Le post est introuvable.",
     "POST_EVENT_END_BEFORE_START": "La date de fin doit être postérieure à la date de début.",
+    "POST_EVENT_END_DATE_INVALID": "La date de fin n'est pas une date valide.",
+    "POST_EVENT_END_DATE_NOT_ISO_FORMAT": "La date de fin doit être au format ISO.",
+    "POST_EVENT_START_DATE_INVALID": "La date de début n'est pas une date valide.",
+    "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "La date de début doit être au format ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "La description du lieu doit comporter entre {min} et {max} caractères.",
     "POST_EVENT_VENUE_REQUIRED": "Ajoute une description du lieu.",
     "POST_PIN_FEATURE_DISABLED": "L'épinglage de posts n'est pas activé.",

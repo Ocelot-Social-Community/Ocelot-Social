@@ -95,28 +95,20 @@ const validateEventCoordinates = (lat: number, lng: number) => {
 const validateEventDate = (dateString) => {
   const date = new Date(dateString)
   if (date.toString() === 'Invalid Date') {
-    throw new UserInputError('Event start date must be a valid date!', {
-      code: ErrorCode.EVENT_DATE_INVALID,
-    })
+    throw new AppError(Errors.POST_EVENT_START_DATE_INVALID)
   }
   if (date.toISOString() !== dateString) {
-    throw new UserInputError('Event start date must be in ISO format!', {
-      code: ErrorCode.EVENT_DATE_INVALID,
-    })
+    throw new AppError(Errors.POST_EVENT_START_DATE_NOT_ISO_FORMAT)
   }
 }
 
 const validateEventEnd = (start, end) => {
   const endDate = new Date(end)
   if (endDate.toString() === 'Invalid Date') {
-    throw new UserInputError('Event end date must be a valid date!', {
-      code: ErrorCode.EVENT_DATE_INVALID,
-    })
+    throw new AppError(Errors.POST_EVENT_END_DATE_INVALID)
   }
   if (endDate.toISOString() !== end) {
-    throw new UserInputError('Event end date must be in ISO format!', {
-      code: ErrorCode.EVENT_DATE_INVALID,
-    })
+    throw new AppError(Errors.POST_EVENT_END_DATE_NOT_ISO_FORMAT)
   }
   const startDate = new Date(start)
   if (endDate < startDate) {

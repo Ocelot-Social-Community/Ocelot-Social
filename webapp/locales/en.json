@@ -431,7 +431,6 @@
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "A user account with this email address already exists.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Please enter a valid email address.",
     "EMAIL_CHANGE_CONFIRMATION_CODE_INVALID": "The confirmation code is invalid.",
-    "EVENT_DATE_INVALID": "The event date is invalid.",
     "generic": {
       "BAD_USER_INPUT": "The input is invalid. Please check it and try again.",
       "DEFAULT": "Something went wrong. Please try again later.",
@@ -454,6 +453,10 @@
     "PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT": "Your old password is not correct.",
     "POST_DOES_NOT_EXIST": "The post could not be found.",
     "POST_EVENT_END_BEFORE_START": "The end date must be after the start date.",
+    "POST_EVENT_END_DATE_INVALID": "The end date is not a valid date.",
+    "POST_EVENT_END_DATE_NOT_ISO_FORMAT": "The end date must be in ISO format.",
+    "POST_EVENT_START_DATE_INVALID": "The start date is not a valid date.",
+    "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "The start date must be in ISO format.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "The venue description must be between {min} and {max} characters long.",
     "POST_EVENT_VENUE_REQUIRED": "Please enter a location description.",
     "POST_PIN_FEATURE_DISABLED": "Pinning posts is not enabled.",

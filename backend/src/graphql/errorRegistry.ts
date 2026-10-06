@@ -100,6 +100,22 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'Comment must be at least {min} character long!',
   },
+  POST_EVENT_START_DATE_INVALID: {
+    type: 'BAD_USER_INPUT',
+    text: 'Event start date must be a valid date!',
+  },
+  POST_EVENT_START_DATE_NOT_ISO_FORMAT: {
+    type: 'BAD_USER_INPUT',
+    text: 'Event start date must be in ISO format!',
+  },
+  POST_EVENT_END_DATE_INVALID: {
+    type: 'BAD_USER_INPUT',
+    text: 'Event end date must be a valid date!',
+  },
+  POST_EVENT_END_DATE_NOT_ISO_FORMAT: {
+    type: 'BAD_USER_INPUT',
+    text: 'Event end date must be in ISO format!',
+  },
   POST_EVENT_END_BEFORE_START: {
     type: 'BAD_USER_INPUT',
     text: 'The end date must be after the start date.',

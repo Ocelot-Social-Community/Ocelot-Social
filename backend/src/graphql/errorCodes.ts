@@ -11,7 +11,6 @@ export const ErrorCode = {
   // users & badges
   // groups
   // posts, comments & events
-  EVENT_DATE_INVALID: 'EVENT_DATE_INVALID',
   LOCATION_INVALID: 'LOCATION_INVALID',
   // moderation
   // roles

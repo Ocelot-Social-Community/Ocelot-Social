@@ -431,7 +431,6 @@
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Er bestaat al een gebruikersaccount met dit e-mailadres.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Voer een geldig e-mailadres in.",
     "EMAIL_CHANGE_CONFIRMATION_CODE_INVALID": "De bevestigingscode is ongeldig.",
-    "EVENT_DATE_INVALID": "De datum van het evenement is ongeldig.",
     "generic": {
       "BAD_USER_INPUT": "De invoer is ongeldig. Controleer deze en probeer het opnieuw.",
       "DEFAULT": "Er is iets misgegaan. Probeer het later opnieuw.",
@@ -454,6 +453,10 @@
     "PASSWORD_CHANGE_OLD_PASSWORD_INCORRECT": "Je oude wachtwoord is niet juist.",
     "POST_DOES_NOT_EXIST": "Het bericht is niet gevonden.",
     "POST_EVENT_END_BEFORE_START": "De einddatum moet na de startdatum liggen.",
+    "POST_EVENT_END_DATE_INVALID": "De einddatum is geen geldige datum.",
+    "POST_EVENT_END_DATE_NOT_ISO_FORMAT": "De einddatum moet in ISO-formaat zijn.",
+    "POST_EVENT_START_DATE_INVALID": "De startdatum is geen geldige datum.",
+    "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "De startdatum moet in ISO-formaat zijn.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "De plaatsbeschrijving moet tussen {min} en {max} tekens lang zijn.",
     "POST_EVENT_VENUE_REQUIRED": "Voeg een locatiebeschrijving toe.",
     "POST_PIN_FEATURE_DISABLED": "Het vastpinnen van berichten is niet ingeschakeld.",
