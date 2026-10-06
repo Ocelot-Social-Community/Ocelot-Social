@@ -471,7 +471,7 @@
     "POST_EVENT_START_DATE_INVALID": "The start date is not a valid date.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "The start date must be in ISO format.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "The venue description must be between {min} and {max} characters long.",
-    "POST_EVENT_VENUE_REQUIRED": "Please enter a location description.",
+    "POST_EVENT_VENUE_REQUIRED": "Please enter a venue description.",
     "POST_PIN_FEATURE_DISABLED": "Pinning posts is not enabled.",
     "POST_PIN_LIMIT_REACHED": "The maximum number of pinned posts has been reached. Unpin another post first.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "A post with this slug already exists.",
@@ -1377,7 +1377,7 @@
       "eventStartInPast": "The event start is in the past.",
       "eventStartNotEmpty": "Please enter a start date.",
       "eventVenue": "e.g. Café Chrysander, at Bergedorf Castle",
-      "eventVenueLabel": "Location description",
+      "eventVenueLabel": "Venue description",
       "pickLocationOnMap": "Pick location on map",
       "title": "Event",
       "viewOnMainMap": "View on main map"
