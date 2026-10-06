@@ -205,6 +205,26 @@ const definitions = {
   ROLE_SAVE_NAME_ALREADY_TAKEN: { type: 'BAD_USER_INPUT', text: "Role '{name}' already exists." },
   ROLE_SAVE_NAME_INVALID: { type: 'BAD_USER_INPUT', text: 'Invalid role name.' },
   ROLE_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'Unknown role: {name}' },
+  ROLE_EDIT_ROLE_PROTECTED: {
+    type: 'FORBIDDEN',
+    text: "Role '{name}' is protected and cannot be edited.",
+  },
+  ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED: {
+    type: 'FORBIDDEN',
+    text: 'Cannot create or flag a protected role.',
+  },
+  ROLE_RENAME_SYSTEM_ROLE: {
+    type: 'FORBIDDEN',
+    text: "Role '{name}' is a system role and cannot be renamed.",
+  },
+  ROLE_DELETE_SYSTEM_ROLE: {
+    type: 'FORBIDDEN',
+    text: "Role '{name}' is a system role and cannot be deleted.",
+  },
+  ROLE_DELETE_ROLE_HAS_MEMBERS: {
+    type: 'FORBIDDEN',
+    text: "Role '{name}' is assigned to {count} user(s) and cannot be deleted.",
+  },
   // API keys
   API_KEY_CREATE_EXPIRY_INVALID: {
     type: 'BAD_USER_INPUT',

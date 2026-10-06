@@ -1,6 +1,5 @@
-import { ErrorCode } from '@graphql/errorCodes'
 import { Errors } from '@graphql/errorRegistry'
-import { AppError, ForbiddenError } from '@graphql/errors'
+import { AppError } from '@graphql/errors'
 import {
   blockingGateFor,
   groupFor,
@@ -162,7 +161,7 @@ export default {
       } catch (err) {
         // A protected/baseline violation is a client error, not internal.
         if (err instanceof RoleValidationError) {
-          throw new ForbiddenError(err.message, { code: ErrorCode.ROLE_CHANGE_NOT_ALLOWED })
+          throw err
         }
         throw err
       }
@@ -190,7 +189,7 @@ export default {
         return toGraphqlRole(def, await countMembers(context, def.name))
       } catch (err) {
         if (err instanceof RoleValidationError) {
-          throw new ForbiddenError(err.message, { code: ErrorCode.ROLE_CHANGE_NOT_ALLOWED })
+          throw err
         }
         throw err
       }
@@ -219,7 +218,7 @@ export default {
         return toGraphqlRole(def, await countMembers(context, def.name))
       } catch (err) {
         if (err instanceof RoleValidationError) {
-          throw new ForbiddenError(err.message, { code: ErrorCode.ROLE_CHANGE_NOT_ALLOWED })
+          throw err
         }
         // Lost the uniqueness-constraint race on Role.id: a concurrent rename claimed
         // `newName` between our getRole(newName) snapshot and the write. Surface the same
@@ -239,7 +238,7 @@ export default {
         return name
       } catch (err) {
         if (err instanceof RoleValidationError) {
-          throw new ForbiddenError(err.message, { code: ErrorCode.ROLE_CHANGE_NOT_ALLOWED })
+          throw err
         }
         throw err
       }

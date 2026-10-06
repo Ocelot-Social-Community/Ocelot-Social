@@ -13,7 +13,6 @@ export const ErrorCode = {
   // posts, comments & events
   // moderation
   // roles
-  ROLE_CHANGE_NOT_ALLOWED: 'ROLE_CHANGE_NOT_ALLOWED',
   // invite codes
 } as const
 

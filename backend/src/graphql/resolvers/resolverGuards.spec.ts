@@ -14,6 +14,7 @@ import { setImmediate } from 'node:timers/promises'
 
 import { describe, it, expect } from 'vitest'
 
+import { Errors } from '@graphql/errorRegistry'
 import { RoleValidationError } from '@src/role'
 
 import apiKeysResolvers from './apiKeys'
@@ -120,7 +121,7 @@ describe('error translation', () => {
         getRole: () => undefined,
         upsertRole: vi
           .fn()
-          .mockRejectedValue(new RoleValidationError('Cannot create or flag a protected role.')),
+          .mockRejectedValue(new RoleValidationError(Errors.ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED)),
       },
       user: { id: 'admin-id' },
     } as unknown as Context

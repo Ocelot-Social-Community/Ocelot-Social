@@ -23,13 +23,13 @@ describe('GraphQL error classes', () => {
 
   it('adds the params the translation interpolates', () => {
     expect(
-      new UserInputError('Invalid role name.', {
-        code: ErrorCode.ROLE_CHANGE_NOT_ALLOWED,
+      new UserInputError('Not Authorized!', {
+        code: ErrorCode.NOT_AUTHORIZED,
         params: { email: 'a@b.c' },
       }).extensions,
     ).toEqual({
       code: 'BAD_USER_INPUT',
-      errorCode: 'ROLE_CHANGE_NOT_ALLOWED',
+      errorCode: 'NOT_AUTHORIZED',
       params: { email: 'a@b.c' },
     })
   })

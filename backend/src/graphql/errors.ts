@@ -10,7 +10,7 @@ type Placeholders<Text extends string> = Text extends `${string}{${infer Name}}$
   ? Name | Placeholders<Rest>
   : never
 
-interface ErrorEntry {
+export interface ErrorEntry {
   code: ErrorName
   type: ErrorType
   text: string
