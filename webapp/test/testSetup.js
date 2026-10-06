@@ -61,7 +61,7 @@ Vue.prototype.$env = defaultEnv
 // with `mocks: { $can: () => false }` or `(p) => allowed.includes(p)`.
 Vue.prototype.$can = () => true
 
-// Mirror the $backendError inject (plugins/backend-error.js) on the prototype, for the same reason.
+// Mirror the $backendError / $toastBackendError injects (plugins/backend-error.js) on the prototype, for the same reason.
 // The real one: with no $i18n.keyExists in a spec's mocks it shows the error's own message, which
 // is what those specs assert.
 BackendError()

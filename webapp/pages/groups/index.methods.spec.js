@@ -188,7 +188,13 @@ describe('pages/groups/index.vue — apollo definitions', () => {
     })
 
     it('error handler clears the list and toasts the message', () => {
-      const ctx = { Group: [{ id: 'g1' }], $toast: { error: jest.fn() } }
+      const ctx = {
+        Group: [{ id: 'g1' }],
+        $toast: { error: jest.fn() },
+        $toastBackendError(error) {
+          this.$toast.error(error.message)
+        },
+      }
       apollo.Group.error.call(ctx, new Error('boom'))
       expect(ctx.Group).toEqual([])
       expect(ctx.$toast.error).toHaveBeenCalledWith('boom')

@@ -3,7 +3,13 @@ import {
   invalidateInviteCode as invalidateMutation,
 } from '~/graphql/InviteCode'
 
-export function useInviteCode({ apollo, toast, t, store }) {
+export function useInviteCode({
+  apollo,
+  toast,
+  t,
+  store,
+  backendError = (error) => error.message,
+}) {
   async function generatePersonalInviteCode(comment) {
     try {
       await apollo.mutate({
@@ -20,7 +26,7 @@ export function useInviteCode({ apollo, toast, t, store }) {
       toast.success(t('invite-codes.create-success'))
       return { success: true }
     } catch (error) {
-      toast.error(t('invite-codes.create-error', { error: error.message }))
+      toast.error(t('invite-codes.create-error', { error: backendError(error) }))
       return { success: false }
     }
   }
@@ -44,7 +50,7 @@ export function useInviteCode({ apollo, toast, t, store }) {
       toast.success(t('invite-codes.invalidate-success'))
       return { success: true }
     } catch (error) {
-      toast.error(t('invite-codes.invalidate-error', { error: error.message }))
+      toast.error(t('invite-codes.invalidate-error', { error: backendError(error) }))
       return { success: false }
     }
   }

@@ -138,7 +138,7 @@ export default {
         const { name } = user
         this.$toast.success(this.$t('settings.muted-users.unmuted', { name }))
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toastBackendError(error)
       } finally {
         this.unmutingUserId = null
       }

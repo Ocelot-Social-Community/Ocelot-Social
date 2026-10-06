@@ -596,7 +596,7 @@ export default {
         this.cancelRename()
         this.$toast.success(this.$t('admin.roles.renameSuccess'))
       } catch (err) {
-        this.$toast.error(this.$t('admin.roles.renameError', { message: err.message }))
+        this.$toast.error(this.$t('admin.roles.renameError', { message: this.$backendError(err) }))
         return
       } finally {
         this.saving = false
@@ -715,7 +715,7 @@ export default {
         await this.$apollo.queries.roles.refetch()
         this.$toast.success(this.$t('admin.roles.saveSuccess'))
       } catch (err) {
-        this.$toast.error(this.$t('admin.roles.saveError', { message: err.message }))
+        this.$toast.error(this.$t('admin.roles.saveError', { message: this.$backendError(err) }))
       } finally {
         this.saving = false
       }
@@ -732,7 +732,7 @@ export default {
         await this.$apollo.queries.roles.refetch()
         this.$toast.success(this.$t('admin.roles.deleteSuccess'))
       } catch (err) {
-        this.$toast.error(this.$t('admin.roles.deleteError', { message: err.message }))
+        this.$toast.error(this.$t('admin.roles.deleteError', { message: this.$backendError(err) }))
       } finally {
         this.saving = false
       }
@@ -753,7 +753,7 @@ export default {
         this.cancelCreate()
         this.$toast.success(this.$t('admin.roles.saveSuccess'))
       } catch (err) {
-        this.$toast.error(this.$t('admin.roles.saveError', { message: err.message }))
+        this.$toast.error(this.$t('admin.roles.saveError', { message: this.$backendError(err) }))
       } finally {
         this.saving = false
       }

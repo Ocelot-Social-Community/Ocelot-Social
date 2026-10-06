@@ -165,8 +165,7 @@ export default {
             sliderData: { response: { isValidInviteCode: false } },
           })
 
-          const { message } = err
-          this.$toast.error(message)
+          this.$toastBackendError(err)
           return false
         } finally {
           this.dbRequestInProgress = false

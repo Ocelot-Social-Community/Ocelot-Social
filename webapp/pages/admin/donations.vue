@@ -83,7 +83,7 @@ export default {
         .then(() => {
           this.$toast.success(this.$t('admin.donations.successfulUpdate'))
         })
-        .catch((error) => this.$toast.error(error.message))
+        .catch((error) => this.$toastBackendError(error))
     },
   },
   apollo: {

@@ -1,6 +1,6 @@
 import { resetPasswordMutation } from '~/graphql/Password'
 
-export function useResetPassword({ apollo, toast }) {
+export function useResetPassword({ apollo, toast, backendError = (error) => error.message }) {
   async function resetPassword({ password, email, nonce }) {
     try {
       const { data } = await apollo.mutate({
@@ -10,7 +10,7 @@ export function useResetPassword({ apollo, toast }) {
       const success = !!data.resetPassword
       return { success, result: success ? 'success' : 'error' }
     } catch (err) {
-      toast.error(err.message)
+      toast.error(backendError(err))
       return { success: false, result: null }
     }
   }

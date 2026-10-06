@@ -186,7 +186,7 @@ export default {
               this.$toast.error(this.$t('report.comment.error'))
               break
             default:
-              this.$toast.error(err.message)
+              this.$toastBackendError(err)
           }
           this.isOpen = false
           this.loading = false

@@ -473,7 +473,9 @@ export default {
         await this.$apollo.queries.User.refetch()
         this.$toast.success(this.$t('admin.users.delete.success'))
       } catch (error) {
-        this.$toast.error(this.$t('admin.users.delete.error', { message: error.message }))
+        this.$toast.error(
+          this.$t('admin.users.delete.error', { message: this.$backendError(error) }),
+        )
         throw error
       }
     },
@@ -497,7 +499,9 @@ export default {
             : this.$t('admin.users.disable.enabledSuccess'),
         )
       } catch (error) {
-        this.$toast.error(this.$t('admin.users.disable.error', { message: error.message }))
+        this.$toast.error(
+          this.$t('admin.users.disable.error', { message: this.$backendError(error) }),
+        )
       }
     },
     // Set a user's single role (replaces their current one). Owner assignment is
@@ -513,7 +517,7 @@ export default {
           // DOM showing the rejected choice. Reset it to the real role so the UI stays
           // truthful even when no refetch runs (e.g. a network error).
           event.target.value = user.roleName
-          this.$toast.error(error.message)
+          this.$toastBackendError(error)
         })
     },
   },

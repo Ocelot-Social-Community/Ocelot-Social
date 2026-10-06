@@ -53,7 +53,7 @@ export default {
       },
       error(error) {
         this.GroupMembers = []
-        this.$toast.error(error.message)
+        this.$toastBackendError(error)
       },
       fetchPolicy: 'cache-and-network',
     },

@@ -97,7 +97,13 @@ describe('pages/groups/edit/_id/members.vue', () => {
     })
 
     it('clears the list and toasts on error', () => {
-      const ctx = { GroupMembers: [{ id: 'x' }], $toast: { error: jest.fn() } }
+      const ctx = {
+        GroupMembers: [{ id: 'x' }],
+        $toast: { error: jest.fn() },
+        $toastBackendError(error) {
+          this.$toast.error(error.message)
+        },
+      }
       apollo.error.call(ctx, new Error('boom'))
       expect(ctx.GroupMembers).toEqual([])
       expect(ctx.$toast.error).toHaveBeenCalledWith('boom')
