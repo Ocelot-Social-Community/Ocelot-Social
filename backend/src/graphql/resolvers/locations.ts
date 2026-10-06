@@ -3,8 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
-import { ErrorCode } from '@graphql/errorCodes'
-import { UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError } from '@graphql/errors'
 
 import cypherFields from './helpers/cypherField'
 import { queryLocations } from './users/location'
@@ -38,9 +38,7 @@ export default {
     }),
     distanceToMe: async (parent, _params, context: Context, _resolveInfo) => {
       if (!parent.id) {
-        throw new UserInputError('Can not identify selected Location!', {
-          code: ErrorCode.LOCATION_INVALID,
-        })
+        throw new AppError(Errors.LOCATION_FIELD_LOCATION_ID_MISSING)
       }
       const session = context.driver.session()
 

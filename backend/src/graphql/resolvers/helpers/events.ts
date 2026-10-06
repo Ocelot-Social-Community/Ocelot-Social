@@ -3,9 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { ErrorCode } from '@graphql/errorCodes'
 import { Errors } from '@graphql/errorRegistry'
-import { AppError, UserInputError } from '@graphql/errors'
+import { AppError } from '@graphql/errors'
 
 // Same limits as the event form in the webapp (ContributionForm.vue). Every event needs a venue
 // description, with or without an address.
@@ -49,9 +48,7 @@ export const validateEventParams = (params) => {
       const hasLat = typeof eventInput.lat === 'number'
       const hasLng = typeof eventInput.lng === 'number'
       if (hasLat !== hasLng) {
-        throw new UserInputError('Event location requires both lat and lng, or neither!', {
-          code: ErrorCode.LOCATION_INVALID,
-        })
+        throw new AppError(Errors.POST_EVENT_LOCATION_COORDINATES_INCOMPLETE)
       }
       if (hasLat && hasLng) {
         validateEventCoordinates(eventInput.lat, eventInput.lng)
@@ -77,18 +74,10 @@ export const validateEventParams = (params) => {
 
 const validateEventCoordinates = (lat: number, lng: number) => {
   if (!Number.isFinite(lat) || lat < -90 || lat > 90) {
-    throw new UserInputError(
-      'Event location latitude must be a finite number between -90 and 90!',
-      {
-        code: ErrorCode.LOCATION_INVALID,
-      },
-    )
+    throw new AppError(Errors.POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE)
   }
   if (!Number.isFinite(lng) || lng < -180 || lng > 180) {
-    throw new UserInputError(
-      'Event location longitude must be a finite number between -180 and 180!',
-      { code: ErrorCode.LOCATION_INVALID },
-    )
+    throw new AppError(Errors.POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE)
   }
 }
 

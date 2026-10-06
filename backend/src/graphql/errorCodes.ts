@@ -11,7 +11,6 @@ export const ErrorCode = {
   // users & badges
   // groups
   // posts, comments & events
-  LOCATION_INVALID: 'LOCATION_INVALID',
   // moderation
   // roles
   ROLE_CHANGE_NOT_ALLOWED: 'ROLE_CHANGE_NOT_ALLOWED',

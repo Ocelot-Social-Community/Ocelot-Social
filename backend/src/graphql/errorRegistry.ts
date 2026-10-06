@@ -100,6 +100,18 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'Comment must be at least {min} character long!',
   },
+  POST_EVENT_LOCATION_COORDINATES_INCOMPLETE: {
+    type: 'BAD_USER_INPUT',
+    text: 'Event location requires both lat and lng, or neither!',
+  },
+  POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE: {
+    type: 'BAD_USER_INPUT',
+    text: 'Event location latitude must be a finite number between -90 and 90!',
+  },
+  POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE: {
+    type: 'BAD_USER_INPUT',
+    text: 'Event location longitude must be a finite number between -180 and 180!',
+  },
   POST_EVENT_START_DATE_INVALID: {
     type: 'BAD_USER_INPUT',
     text: 'Event start date must be a valid date!',
@@ -133,6 +145,36 @@ const definitions = {
   POST_SAVE_SLUG_ALREADY_TAKEN: {
     type: 'BAD_USER_INPUT',
     text: 'Post with this slug already exists!',
+  },
+  // locations
+  // A query selected Location.distanceToMe without the location's id.
+  LOCATION_FIELD_LOCATION_ID_MISSING: {
+    type: 'BAD_USER_INPUT',
+    text: 'Can not identify selected Location!',
+  },
+  LOCATION_COORDINATES_INCOMPLETE: {
+    type: 'BAD_USER_INPUT',
+    text: '{entity} location requires both lat and lng, or neither!',
+  },
+  LOCATION_LATITUDE_OUT_OF_RANGE: {
+    type: 'BAD_USER_INPUT',
+    text: '{entity} location latitude must be a finite number between -90 and 90!',
+  },
+  LOCATION_LONGITUDE_OUT_OF_RANGE: {
+    type: 'BAD_USER_INPUT',
+    text: '{entity} location longitude must be a finite number between -180 and 180!',
+  },
+  LOCATION_COORDINATES_NOT_RESOLVABLE: {
+    type: 'BAD_USER_INPUT',
+    text: 'location coordinates are invalid',
+  },
+  LOCATION_NAME_NOT_FOUND: {
+    type: 'BAD_USER_INPUT',
+    text: 'locationName is invalid',
+  },
+  LOCATION_NAME_NO_EXACT_MATCH: {
+    type: 'BAD_USER_INPUT',
+    text: 'locationName is invalid',
   },
   // moderation
   REPORT_TARGET_IS_OWN: {
