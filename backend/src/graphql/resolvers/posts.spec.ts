@@ -754,6 +754,118 @@ describe('CreatePost', () => {
         })
       })
 
+      describe('event location name is given but event venue is only whitespace', () => {
+        it('throws an error, same as if it were missing entirely', async () => {
+          const now = new Date()
+
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                  eventVenue: '   ',
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event venue must be present if event location is given!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('event venue is shorter than 3 characters after trimming', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                  eventVenue: ' a ',
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event venue must be between 3 and 100 characters!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('event venue is longer than 100 characters after trimming', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                  eventVenue: `  ${'a'.repeat(101)}  `,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event venue must be between 3 and 100 characters!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('event venue is padded with whitespace but otherwise valid', () => {
+        it('stores it trimmed, not padded', async () => {
+          const now = new Date()
+
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                  eventVenue: '  Brandenburger Tor  ',
+                  lat: 52.5,
+                  lng: 13.4,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              CreatePost: {
+                postType: ['Event'],
+                eventVenue: 'Brandenburger Tor',
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+
       describe('event location coordinates are out of range', () => {
         it('rejects an out-of-range latitude before any reverse-geocoding happens', async () => {
           const now = new Date()

@@ -25,10 +25,21 @@ export const validateEventParams = (params) => {
       params.eventEnd = null
     }
 
-    if (eventInput.eventLocationName && !eventInput.eventVenue) {
+    // Trimmed before either check below — a whitespace-only venue is not
+    // "present" for the first one, and raw (untrimmed) length would let a
+    // padded string slip past the second one, both contradicting the
+    // frontend's own trim-aware 3-100 character validation for this field.
+    const trimmedVenue =
+      typeof eventInput.eventVenue === 'string'
+        ? eventInput.eventVenue.trim()
+        : eventInput.eventVenue
+    if (eventInput.eventLocationName && !trimmedVenue) {
       throw new UserInputError('Event venue must be present if event location is given!')
     }
-    params.eventVenue = eventInput.eventVenue
+    if (trimmedVenue && (trimmedVenue.length < 3 || trimmedVenue.length > 100)) {
+      throw new UserInputError('Event venue must be between 3 and 100 characters!')
+    }
+    params.eventVenue = trimmedVenue
     params.eventLocationName = eventInput.eventLocationName?.trim()
     if (params.eventLocationName) {
       locationName = params.eventLocationName
