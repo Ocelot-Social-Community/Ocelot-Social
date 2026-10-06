@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError } from '@graphql/errors'
 
 import type { IMiddlewareResolver } from 'graphql-middleware/types'
 
 const COMMENT_MIN_LENGTH = 1
-const NO_POST_ERR_MESSAGE = 'Comment cannot be created without a post!'
 const USERNAME_MIN_LENGTH = 3
 const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const content = args.content.replace(/<(?:.|\n)*?>/gm, '').trim()
   const { postId } = args
 
   if (!args.content || content.length < COMMENT_MIN_LENGTH) {
-    throw new UserInputError(`Comment must be at least ${COMMENT_MIN_LENGTH} character long!`)
+    throw new AppError(Errors.COMMENT_SAVE_CONTENT_TOO_SHORT, { min: COMMENT_MIN_LENGTH })
   }
   const session = context.driver.session()
   try {
@@ -34,7 +34,7 @@ const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, c
     })
 
     if (!post) {
-      throw new UserInputError(NO_POST_ERR_MESSAGE)
+      throw new AppError(Errors.POST_DOES_NOT_EXIST)
     } else {
       return resolve(root, args, context, info)
     }
@@ -46,7 +46,7 @@ const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, c
 const validateUpdateComment: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const content = args.content.replace(/<(?:.|\n)*?>/gm, '').trim()
   if (!args.content || content.length < COMMENT_MIN_LENGTH) {
-    throw new UserInputError(`Comment must be at least ${COMMENT_MIN_LENGTH} character long!`)
+    throw new AppError(Errors.COMMENT_SAVE_CONTENT_TOO_SHORT, { min: COMMENT_MIN_LENGTH })
   }
 
   return resolve(root, args, context, info)
@@ -54,9 +54,28 @@ const validateUpdateComment: IMiddlewareResolver = async (resolve, root, args, c
 
 const validateReport: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const { resourceId } = args
-  const { user } = context
+  const { user, driver } = context
   if (resourceId === user.id) {
-    throw new Error('You cannot report yourself!')
+    throw new AppError(Errors.REPORT_TARGET_IS_OWN)
+  }
+  // Nor their own posts and comments. The webapp hides "Report" on them, the API refuses them too.
+  const session = driver.session()
+  try {
+    const result = await session.readTransaction((transaction) =>
+      transaction.run(
+        `
+          OPTIONAL MATCH (:User {id: $userId})-[:WROTE]->(resource {id: $resourceId})
+          WHERE resource:Post OR resource:Comment
+          RETURN resource IS NOT NULL AS isOwn
+        `,
+        { userId: user.id, resourceId },
+      ),
+    )
+    if (result.records[0]?.get('isOwn')) {
+      throw new AppError(Errors.REPORT_TARGET_IS_OWN)
+    }
+  } finally {
+    await session.close()
   }
   return resolve(root, args, context, info)
 }
@@ -66,7 +85,7 @@ const validateReview: IMiddlewareResolver = async (resolve, root, args, context,
   let existingReportedResource
   const { user, driver } = context
   if (resourceId === user.id) {
-    throw new Error('You cannot review yourself!')
+    throw new AppError(Errors.REVIEW_TARGET_IS_OWN)
   }
   const session = driver.session()
   try {
@@ -92,20 +111,20 @@ const validateReview: IMiddlewareResolver = async (resolve, root, args, context,
     })
     existingReportedResource = txResult
     if (!existingReportedResource?.length) {
-      throw new Error(`Resource not found or is not a Post|Comment|User!`)
+      throw new AppError(Errors.REVIEW_TARGET_DOES_NOT_EXIST)
     }
     existingReportedResource = existingReportedResource[0]
     if (!existingReportedResource.filed) {
-      throw new Error(
-        `Before starting the review process, please report the ${existingReportedResource.label}!`,
-      )
+      throw new AppError(Errors.REVIEW_TARGET_NOT_REPORTED, {
+        label: existingReportedResource.label,
+      })
     }
     const authorId =
       existingReportedResource.label !== 'User' && existingReportedResource.author
         ? existingReportedResource.author.properties.id
         : null
     if (authorId && authorId === user.id) {
-      throw new Error(`You cannot review your own ${existingReportedResource.label}!`)
+      throw new AppError(Errors.REVIEW_TARGET_IS_OWN)
     }
   } finally {
     await session.close()
@@ -136,7 +155,7 @@ export const validateNotifyUsers = async (label: string, reason: string): Promis
 const validateUpdateUser: IMiddlewareResolver = async (resolve, root, params, context, info) => {
   const { name } = params
   if (typeof name === 'string' && name.trim().length < USERNAME_MIN_LENGTH) {
-    throw new UserInputError(`Username must be at least ${USERNAME_MIN_LENGTH} character long!`)
+    throw new AppError(Errors.USER_PROFILE_NAME_TOO_SHORT, { min: USERNAME_MIN_LENGTH })
   }
   return resolve(root, params, context, info)
 }

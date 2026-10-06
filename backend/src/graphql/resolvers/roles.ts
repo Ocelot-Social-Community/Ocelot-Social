@@ -1,4 +1,5 @@
-import { ForbiddenError, UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError } from '@graphql/errors'
 import {
   blockingGateFor,
   groupFor,
@@ -142,10 +143,10 @@ export default {
       context: Context,
     ) => {
       if (!ROLE_NAME_RE.test(args.name)) {
-        throw new UserInputError('Invalid role name.')
+        throw new AppError(Errors.ROLE_SAVE_NAME_INVALID)
       }
       if (context.role.getRole(args.name)) {
-        throw new UserInputError(`Role '${args.name}' already exists.`)
+        throw new AppError(Errors.ROLE_SAVE_NAME_ALREADY_TAKEN, { name: args.name })
       }
       try {
         const def = await context.role.upsertRole(
@@ -160,7 +161,7 @@ export default {
       } catch (err) {
         // A protected/baseline violation is a client error, not internal.
         if (err instanceof RoleValidationError) {
-          throw new ForbiddenError(err.message)
+          throw err
         }
         throw err
       }
@@ -172,7 +173,7 @@ export default {
       context: Context,
     ) => {
       if (!context.role.getRole(args.name)) {
-        throw new UserInputError(`Unknown role: ${args.name}`)
+        throw new AppError(Errors.ROLE_DOES_NOT_EXIST, { name: args.name })
       }
       try {
         const def = await context.role.upsertRole(
@@ -188,7 +189,7 @@ export default {
         return toGraphqlRole(def, await countMembers(context, def.name))
       } catch (err) {
         if (err instanceof RoleValidationError) {
-          throw new ForbiddenError(err.message)
+          throw err
         }
         throw err
       }
@@ -200,13 +201,13 @@ export default {
       context: Context,
     ) => {
       if (!ROLE_NAME_RE.test(newName)) {
-        throw new UserInputError('Invalid role name.')
+        throw new AppError(Errors.ROLE_SAVE_NAME_INVALID)
       }
       if (!context.role.getRole(name)) {
-        throw new UserInputError(`Unknown role: ${name}`)
+        throw new AppError(Errors.ROLE_DOES_NOT_EXIST, { name })
       }
       if (name !== newName && context.role.getRole(newName)) {
-        throw new UserInputError(`Role '${newName}' already exists.`)
+        throw new AppError(Errors.ROLE_SAVE_NAME_ALREADY_TAKEN, { name: newName })
       }
       try {
         const def = await context.role.renameRole(name, newName, context.user?.id ?? 'unknown')
@@ -217,13 +218,13 @@ export default {
         return toGraphqlRole(def, await countMembers(context, def.name))
       } catch (err) {
         if (err instanceof RoleValidationError) {
-          throw new ForbiddenError(err.message)
+          throw err
         }
         // Lost the uniqueness-constraint race on Role.id: a concurrent rename claimed
         // `newName` between our getRole(newName) snapshot and the write. Surface the same
         // stable conflict as the pre-check, not a raw driver error.
         if (isRoleNameConflict(err)) {
-          throw new UserInputError(`Role '${newName}' already exists.`)
+          throw new AppError(Errors.ROLE_SAVE_NAME_ALREADY_TAKEN, { name: newName })
         }
         throw err
       }
@@ -237,7 +238,7 @@ export default {
         return name
       } catch (err) {
         if (err instanceof RoleValidationError) {
-          throw new ForbiddenError(err.message)
+          throw err
         }
         throw err
       }
@@ -251,7 +252,7 @@ export default {
       context: Context,
     ) => {
       if (!context.role.getRole(roleName)) {
-        throw new UserInputError(`Unknown role: ${roleName}`)
+        throw new AppError(Errors.ROLE_DOES_NOT_EXIST, { name: roleName })
       }
       // Owner status is owner-controlled. Look up whether the target is currently an
       // owner and how many owners exist.
@@ -269,11 +270,11 @@ export default {
       // role.manage admin manages non-owner roles only (no escalating to owner, no
       // demoting an owner).
       if ((roleName === OWNER_ROLE || targetIsOwner) && !actorIsOwner(context)) {
-        throw new ForbiddenError('Only an owner may assign or change the owner role.')
+        throw new AppError(Errors.ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER)
       }
       // Never demote the last owner — keep the instance failsafe.
       if (targetIsOwner && roleName !== OWNER_ROLE && ownerCount <= 1) {
-        throw new ForbiddenError('Cannot remove the last owner.')
+        throw new AppError(Errors.ROLE_ASSIGNMENT_LAST_OWNER_NOT_REMOVABLE)
       }
       // Replace the user's single HAS_ROLE edge.
       const result = await context.database.write({
@@ -288,7 +289,7 @@ export default {
       })
       const user = result.records[0]?.get('user') as unknown
       if (!user) {
-        throw new UserInputError('Could not find User')
+        throw new AppError(Errors.USER_DOES_NOT_EXIST)
       }
       // The target user's effective permissions changed → they must refetch.
       publishPermissionsChanged(context, roleName)
