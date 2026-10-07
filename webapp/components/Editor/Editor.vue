@@ -245,7 +245,24 @@ export default {
         }
       })
     },
+    // tiptap's Suggestions plugin announces a suggestion once more right after one was inserted:
+    // the inserted mention/hashtag carries its own "@…"/"#…" text, the plugin takes that for a
+    // suggestion that has moved, and hands over the range of the text that was just replaced
+    // (measured: typed "@bo", picked a user — onEnter again with query "bo", cursor far behind the
+    // range). Nothing was ever shown for it, because no decoration follows; but it must not start
+    // a request for suggestions either. A suggestion being typed has the cursor inside its range.
+    isBeingTyped({ range, view }) {
+      if (!view) return true
+      const { from } = view.state.selection
+      return from >= range.from && from <= range.to
+    },
     openSuggestionList({ items, query, range, command, view }, suggestionType) {
+      if (!this.isBeingTyped({ range, view })) return
+      // Every list starts from scratch — nothing of a previous one carries over.
+      clearTimeout(this._mentionTimer)
+      this._mentionCache.clear()
+      this.filteredItems = []
+      this.suggestionsLoading = false
       this.suggestionType = suggestionType
       this.query = this.sanitizeQuery(query)
       this.suggestionRange = range
@@ -254,6 +271,8 @@ export default {
       this.insertMentionOrHashtag = command
     },
     updateSuggestionList({ items, query, range, view }) {
+      // No list was opened for it — see isBeingTyped.
+      if (!this.suggestionType) return
       this.query = this.sanitizeQuery(query)
       this.suggestionRange = range
       this.navigatedItemIndex = 0

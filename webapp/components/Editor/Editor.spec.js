@@ -303,6 +303,39 @@ describe('Editor.vue', () => {
         expect(wrapper.vm.suggestionsLoading).toBe(false)
       })
 
+      // The plugin announces a suggestion once more right after one was inserted, with the range
+      // of the replaced text — the cursor is no longer in it.
+      describe('announced with the cursor outside its range', () => {
+        const viewWithCursorAt = (from) => ({ state: { selection: { from } } })
+
+        it('does not open a list or ask for suggestions', () => {
+          wrapper.vm.openSuggestionList({ ...props('pe'), view: viewWithCursorAt(20) }, 'mention')
+
+          expect(wrapper.vm.suggestionType).toBe('')
+          expect(propsData.mentionSuggestions).not.toHaveBeenCalled()
+        })
+
+        it('ignores the changes that follow it', () => {
+          wrapper.vm.openSuggestionList({ ...props('pe'), view: viewWithCursorAt(20) }, 'mention')
+          wrapper.vm.updateSuggestionList({ ...props('pet'), view: viewWithCursorAt(21) })
+          jest.advanceTimersByTime(150)
+
+          expect(wrapper.vm.suggestionRange).toBeNull()
+          expect(propsData.mentionSuggestions).not.toHaveBeenCalled()
+        })
+      })
+
+      it('starts every list from scratch', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        answers[''].resolve([peter, jenny])
+        await flushPromises()
+
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+
+        expect(wrapper.vm.filteredItems).toEqual([])
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(2)
+      })
+
       it('leaves hashtags to the items the plugin filtered', () => {
         wrapper.vm.openSuggestionList({ ...props('fr'), items: [{ id: 'Frieden' }] }, 'hashtag')
 
