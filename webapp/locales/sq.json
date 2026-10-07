@@ -861,7 +861,14 @@
       "unorderedList": "Listë pa numra"
     },
     "mention": {
-      "noUsersFound": "Nuk u gjetën përdorues"
+      "noUsersFound": "Nuk u gjetën përdorues",
+      "relation": {
+        "follower": "Ata që më ndjekin",
+        "following": "Ata që ndjek",
+        "groupMember": "Anëtarët e grupit",
+        "other": "Përdorues të tjerë",
+        "participant": "Të përfshirë në postim"
+      }
     },
     "placeholder": "Lër mendimet tuaja frymëzuese …"
   },

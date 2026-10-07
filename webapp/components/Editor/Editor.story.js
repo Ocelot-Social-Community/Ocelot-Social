@@ -32,7 +32,7 @@ storiesOf('Editor', module)
     data: () => ({
       users,
     }),
-    template: `<hc-editor :users="users" />`,
+    template: `<hc-editor :mention-suggestions="() => users" />`,
   }))
   .add('Basic formatting', () => ({
     components: { HcEditor },
@@ -90,7 +90,7 @@ storiesOf('Editor', module)
         </ol>
       `,
     }),
-    template: `<hc-editor :users="users" :value="content" />`,
+    template: `<hc-editor :mention-suggestions="() => users" :value="content" />`,
   }))
   .add('@Mentions', () => ({
     components: { HcEditor },
@@ -105,7 +105,7 @@ storiesOf('Editor', module)
         </p>
       `,
     }),
-    template: `<hc-editor :users="users" :value="content" />`,
+    template: `<hc-editor :mention-suggestions="() => users" :value="content" />`,
   }))
   .add('#Hashtags', () => ({
     components: { HcEditor },
@@ -119,7 +119,7 @@ storiesOf('Editor', module)
         </p>
       `,
     }),
-    template: `<hc-editor :users="users" :value="content" />`,
+    template: `<hc-editor :mention-suggestions="() => users" :value="content" />`,
   }))
   .add('Embeds with iframe', () => ({
     components: { HcEditor },
@@ -132,7 +132,7 @@ storiesOf('Editor', module)
         </a>
       `,
     }),
-    template: `<hc-editor :users="users" :value="content" />`,
+    template: `<hc-editor :mention-suggestions="() => users" :value="content" />`,
   }))
   .add('Embeds with plain link', () => ({
     components: { HcEditor },
@@ -145,5 +145,5 @@ storiesOf('Editor', module)
        </a>
       `,
     }),
-    template: `<hc-editor :users="users" :value="content" />`,
+    template: `<hc-editor :mention-suggestions="() => users" :value="content" />`,
   }))

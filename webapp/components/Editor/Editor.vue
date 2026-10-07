@@ -7,6 +7,7 @@
       ref="suggestions"
       :suggestion-type="suggestionType"
       :filtered-items="filteredItems"
+      :loading="suggestionsLoading"
       :navigated-item-index="navigatedItemIndex"
       :query="query"
       :select-item="selectItem"
@@ -40,7 +41,11 @@ import Mention from './nodes/Mention'
 import MenuBar from './MenuBar'
 import ContextMenu from './ContextMenu'
 import SuggestionList from './SuggestionList'
+import { matchesMentionQuery } from './mentionSuggestions'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
+
+// How long typing has to pause before the mention suggestions are asked for.
+const MENTION_DEBOUNCE_MS = 150
 
 export default {
   components: {
@@ -51,7 +56,10 @@ export default {
     OcelotInput,
   },
   props: {
-    users: { type: Array, default: () => null }, // If 'null', than the Mention extention is not assigned.
+    // Loads the users to offer for an @-mention: `async (query) => [{ id, slug, name, avatar,
+    // relation }]`, already filtered and ordered — see ./mentionSuggestions.js. If 'null', than the
+    // Mention extention is not assigned.
+    mentionSuggestions: { type: Function, default: null },
     hashtags: { type: Array, default: () => null }, // If 'null', than the Hashtag extention is not assigned.
     value: { type: String, default: '' },
     doc: { type: Object, default: () => {} },
@@ -72,6 +80,7 @@ export default {
       query: null,
       suggestionRange: null,
       filteredItems: [],
+      suggestionsLoading: false,
       navigatedItemIndex: 0,
       insertMentionOrHashtag: () => {},
       observer: null,
@@ -84,17 +93,19 @@ export default {
     optionalExtensions() {
       const extensions = []
       // Don't change the following line. The functionallity is in danger!
-      if (this.users) {
+      if (this.mentionSuggestions) {
         extensions.push(
           new Mention({
-            items: () => {
-              return this.users
-            },
+            // The plugin gets no items of its own: the list is loaded from the backend per typed
+            // query, in loadMentionSuggestions. Doing that inside `onFilter` (the plugin does await
+            // it) would hand the ordering of open/change/exit to the network — a slow answer to
+            // the opening "@" would re-open a list that was closed long ago.
+            items: () => [],
             onEnter: (props) => this.openSuggestionList(props, MENTION),
             onChange: this.updateSuggestionList,
             onExit: this.closeSuggestionList,
             onKeyDown: this.navigateSuggestionList,
-            onFilter: this.filterSuggestionList,
+            onFilter: () => [],
           }),
         )
       }
@@ -129,6 +140,8 @@ export default {
   },
   mounted() {
     this._throttleTimer = undefined
+    this._mentionTimer = undefined
+    this._mentionCache = new Map()
     this.editor = new Editor({
       content: this.value || '',
       doc: this.doc,
@@ -163,6 +176,7 @@ export default {
   },
   beforeDestroy() {
     clearTimeout(this._throttleTimer)
+    clearTimeout(this._mentionTimer)
     this.editor.destroy()
   },
   methods: {
@@ -222,25 +236,76 @@ export default {
     openSuggestionList({ items, query, range, command, view }, suggestionType) {
       this.suggestionType = suggestionType
       this.query = this.sanitizeQuery(query)
-      this.filteredItems = items
       this.suggestionRange = range
+      this.setSuggestionItems(items)
       this.showSuggestionMenu(view)
       this.insertMentionOrHashtag = command
     },
     updateSuggestionList({ items, query, range, view }) {
       this.query = this.sanitizeQuery(query)
-      this.filteredItems = items
       this.suggestionRange = range
       this.navigatedItemIndex = 0
+      this.setSuggestionItems(items)
       this.showSuggestionMenu(view)
     },
     closeSuggestionList() {
+      clearTimeout(this._mentionTimer)
+      // Follows, comments and mentions change; the next list starts from fresh answers.
+      this._mentionCache.clear()
+      this.suggestionsLoading = false
       this.suggestionType = ''
       this.query = null
       this.filteredItems = []
       this.suggestionRange = null
       this.navigatedItemIndex = 0
       this.$refs.contextMenu.hideContextMenu()
+    },
+    // Hashtags arrive filtered from the plugin; mentions are loaded.
+    setSuggestionItems(items) {
+      if (this.suggestionType === MENTION) {
+        this.loadMentionSuggestions()
+      } else {
+        this.filteredItems = items
+      }
+    },
+    // Asks the backend for the users matching what has been typed after the "@".
+    loadMentionSuggestions() {
+      const query = this.query || ''
+      clearTimeout(this._mentionTimer)
+
+      const cached = this._mentionCache.get(query)
+      if (cached) {
+        this.filteredItems = cached
+        this.suggestionsLoading = false
+        return
+      }
+
+      // Until the answer is in, keep those on screen that still fit — so the list neither
+      // flickers empty on every keystroke nor offers (to Enter!) someone who no longer matches.
+      const isOpening = !this.filteredItems.length && !this.suggestionsLoading
+      this.filteredItems = this.filteredItems.filter((item) => matchesMentionQuery(item, query))
+      this.suggestionsLoading = true
+
+      const load = async () => {
+        let items = null
+        try {
+          items = await this.mentionSuggestions(query)
+          this._mentionCache.set(query, items)
+        } catch {
+          // The list is a convenience: without an answer it shows "no users found".
+        }
+        // Answers can overtake each other, and the list may have been closed in the meantime.
+        if (this.suggestionType !== MENTION || (this.query || '') !== query) return
+        this.filteredItems = items || []
+        this.navigatedItemIndex = 0
+        this.suggestionsLoading = false
+      }
+      // The opening "@" is not typing yet — nothing to wait for.
+      if (isOpening) {
+        load()
+      } else {
+        this._mentionTimer = setTimeout(load, MENTION_DEBOUNCE_MS)
+      }
     },
     navigateSuggestionList({ event }) {
       const item = this.filteredItems[this.navigatedItemIndex]

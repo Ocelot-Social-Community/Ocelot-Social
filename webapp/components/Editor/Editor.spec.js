@@ -9,6 +9,13 @@ global.MutationObserver = MutationObserver
 
 const localVue = global.localVue
 
+const peter = { id: 'u1', slug: 'peter-lustig', name: 'Peter Lustig', relation: 'following' }
+const jenny = { id: 'u2', slug: 'jenny-rostock', name: 'Jenny Rostock', relation: 'other' }
+
+// UserAvatar (the rows of the mention list) brings a dropdown and <client-only> along; what is
+// under test here is the editor around the list.
+const stubs = { transition: false, UserAvatar: true }
+
 describe('Editor.vue', () => {
   let wrapper
   let propsData
@@ -20,9 +27,7 @@ describe('Editor.vue', () => {
       propsData,
       localVue,
       sync: false,
-      stubs: {
-        transition: false,
-      },
+      stubs,
     }))
   }
 
@@ -75,13 +80,13 @@ describe('Editor.vue', () => {
       }
 
       it('anchors the popup even when the plugin has no decoration node yet', async () => {
-        propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
         wrapper = mount(Editor, {
           mocks,
           propsData,
           localVue,
           sync: false,
-          stubs: { transition: false },
+          stubs,
           attachTo: document.body,
         })
 
@@ -100,13 +105,13 @@ describe('Editor.vue', () => {
       // document — a 0/0 rect, i.e. the top left corner of the page. The reference has to follow
       // whichever span is in the document right now.
       it('measures the decoration that is currently in the document', async () => {
-        propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
         wrapper = mount(Editor, {
           mocks,
           propsData,
           localVue,
           sync: false,
-          stubs: { transition: false },
+          stubs,
           attachTo: document.body,
         })
         const { view } = wrapper.vm.editor
@@ -128,13 +133,13 @@ describe('Editor.vue', () => {
 
       // Between two redraws the span may be gone for a moment. Measuring then must not jump to 0/0.
       it('stays on the last known position while there is no decoration', async () => {
-        propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
         wrapper = mount(Editor, {
           mocks,
           propsData,
           localVue,
           sync: false,
-          stubs: { transition: false },
+          stubs,
           attachTo: document.body,
         })
         const { view } = wrapper.vm.editor
@@ -152,13 +157,13 @@ describe('Editor.vue', () => {
       })
 
       it('does not open a popup for a list that was closed before the anchor arrived', async () => {
-        propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
         wrapper = mount(Editor, {
           mocks,
           propsData,
           localVue,
           sync: false,
-          stubs: { transition: false },
+          stubs,
           attachTo: document.body,
         })
         const { view } = wrapper.vm.editor
@@ -182,18 +187,140 @@ describe('Editor.vue', () => {
       })
     })
 
-    describe('optional extensions', () => {
-      it('sets the Mention items to the users', () => {
-        propsData.users = [
-          {
-            id: 'u345',
-          },
-        ]
+    // The users offered for a mention are not handed in any more: the editor asks for them per
+    // typed query. Driven through the handlers the Suggestions plugin calls, in the order it calls
+    // them.
+    describe('loading mention suggestions', () => {
+      const props = (query) => ({
+        items: [],
+        query,
+        range: { from: 1, to: 2 + query.length },
+        command: jest.fn(),
+      })
+      let answers
+
+      beforeEach(() => {
+        jest.useFakeTimers()
+        answers = {}
+        // Each query gets a promise the test resolves by hand, to decide which answer arrives when.
+        propsData.mentionSuggestions = jest.fn(
+          (query) =>
+            new Promise((resolve, reject) => {
+              answers[query] = { resolve, reject }
+            }),
+        )
         wrapper = Wrapper()
-        expect(wrapper.vm.editor.extensions.options.mention.items()).toEqual(propsData.users)
       })
 
-      it('mentions is not an option when there are no users', () => {
+      afterEach(() => {
+        jest.useRealTimers()
+      })
+
+      it('asks for the opening "@" right away', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        expect(propsData.mentionSuggestions).toHaveBeenCalledWith('')
+        expect(wrapper.vm.suggestionsLoading).toBe(true)
+
+        answers[''].resolve([peter, jenny])
+        await flushPromises()
+
+        expect(wrapper.vm.filteredItems).toEqual([peter, jenny])
+        expect(wrapper.vm.suggestionsLoading).toBe(false)
+      })
+
+      it('waits for a pause in typing before it asks again', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        answers[''].resolve([peter, jenny])
+        await flushPromises()
+
+        wrapper.vm.updateSuggestionList(props('p'))
+        wrapper.vm.updateSuggestionList(props('pe'))
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(1)
+
+        jest.advanceTimersByTime(150)
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(2)
+        expect(propsData.mentionSuggestions).toHaveBeenLastCalledWith('pe')
+      })
+
+      // Enter picks the highlighted entry — it must not be someone the typed text has ruled out.
+      it('narrows the list on screen until the answer is in', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        answers[''].resolve([peter, jenny])
+        await flushPromises()
+
+        wrapper.vm.updateSuggestionList(props('je'))
+
+        expect(wrapper.vm.filteredItems).toEqual([jenny])
+        expect(wrapper.vm.suggestionsLoading).toBe(true)
+      })
+
+      it('drops an answer that was overtaken by a later query', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        wrapper.vm.updateSuggestionList(props('je'))
+        jest.advanceTimersByTime(150)
+
+        answers.je.resolve([jenny])
+        await flushPromises()
+        answers[''].resolve([peter, jenny])
+        await flushPromises()
+
+        expect(wrapper.vm.filteredItems).toEqual([jenny])
+      })
+
+      it('drops an answer that arrives after the list was closed', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        wrapper.vm.closeSuggestionList()
+
+        answers[''].resolve([peter])
+        await flushPromises()
+
+        expect(wrapper.vm.filteredItems).toEqual([])
+        expect(wrapper.vm.suggestionsLoading).toBe(false)
+      })
+
+      it('does not ask twice for the same query while the list is open', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        answers[''].resolve([peter, jenny])
+        await flushPromises()
+        wrapper.vm.updateSuggestionList(props('p'))
+        jest.advanceTimersByTime(150)
+        answers.p.resolve([peter])
+        await flushPromises()
+
+        // Backspace: back to the empty query.
+        wrapper.vm.updateSuggestionList(props(''))
+
+        expect(wrapper.vm.filteredItems).toEqual([peter, jenny])
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(2)
+      })
+
+      it('shows an empty list when loading fails', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        answers[''].reject(new Error('network'))
+        await flushPromises()
+
+        expect(wrapper.vm.filteredItems).toEqual([])
+        expect(wrapper.vm.suggestionsLoading).toBe(false)
+      })
+
+      it('leaves hashtags to the items the plugin filtered', () => {
+        wrapper.vm.openSuggestionList({ ...props('fr'), items: [{ id: 'Frieden' }] }, 'hashtag')
+
+        expect(wrapper.vm.filteredItems).toEqual([{ id: 'Frieden' }])
+        expect(propsData.mentionSuggestions).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('optional extensions', () => {
+      it('assigns the Mention extension when it can load suggestions', () => {
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([])
+        wrapper = Wrapper()
+        expect(wrapper.vm.editor.extensions.options).toEqual(
+          expect.objectContaining({ mention: expect.anything() }),
+        )
+      })
+
+      it('mentions is not an option when suggestions cannot be loaded', () => {
         expect(wrapper.vm.editor.extensions.options).toEqual(
           expect.not.objectContaining({
             mention: expect.anything(),
@@ -201,58 +328,35 @@ describe('Editor.vue', () => {
         )
       })
 
-      describe('limists suggestion list to 15 users', () => {
-        beforeEach(() => {
-          const manyUsersList = []
-          for (let i = 0; i < 25; i++) {
-            manyUsersList.push({ id: `user${i}` })
-          }
-          propsData.users = manyUsersList
-          wrapper = Wrapper()
-        })
-
-        it('when query is empty', () => {
-          expect(
-            wrapper.vm.editor.extensions.options.mention.onFilter(propsData.users),
-          ).toHaveLength(15)
-        })
-
-        it('when query is present', () => {
-          expect(
-            wrapper.vm.editor.extensions.options.mention.onFilter(propsData.users, 'user'),
-          ).toHaveLength(15)
-        })
-      })
-
       it('suggestion list returns results prefixed by query', () => {
-        const manyUsersList = []
+        const manyHashtagsList = []
         for (let i = 0; i < 10; i++) {
-          manyUsersList.push({ id: `user${i}` })
-          manyUsersList.push({ id: `admin${i}` })
-          manyUsersList.push({ id: `moderator${i}` })
+          manyHashtagsList.push({ id: `nature${i}` })
+          manyHashtagsList.push({ id: `peace${i}` })
+          manyHashtagsList.push({ id: `democracy${i}` })
         }
-        propsData.users = manyUsersList
+        propsData.hashtags = manyHashtagsList
         wrapper = Wrapper()
-        const suggestionList = wrapper.vm.editor.extensions.options.mention.onFilter(
-          propsData.users,
-          'moderator',
+        const suggestionList = wrapper.vm.editor.extensions.options.hashtag.onFilter(
+          propsData.hashtags,
+          'democracy',
         )
         expect(suggestionList).toHaveLength(10)
         for (var i = 0; i < suggestionList.length; i++) {
-          expect(suggestionList[i].id).toMatch(/^moderator.*/)
+          expect(suggestionList[i].id).toMatch(/^democracy.*/)
         }
       })
 
       it('exact match appears at the top of suggestion list', () => {
-        const manyUsersList = []
+        const manyHashtagsList = []
         for (let i = 0; i < 25; i++) {
-          manyUsersList.push({ id: `user${i}` })
+          manyHashtagsList.push({ id: `peace${i}` })
         }
-        propsData.users = manyUsersList
+        propsData.hashtags = manyHashtagsList
         wrapper = Wrapper()
         expect(
-          wrapper.vm.editor.extensions.options.mention.onFilter(propsData.users, 'user7')[0].id,
-        ).toMatch('user7')
+          wrapper.vm.editor.extensions.options.hashtag.onFilter(propsData.hashtags, 'peace7')[0].id,
+        ).toMatch('peace7')
       })
 
       it('sets the Hashtag items to the hashtags', () => {

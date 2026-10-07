@@ -861,7 +861,14 @@
       "unorderedList": "Ongenummerde lijst"
     },
     "mention": {
-      "noUsersFound": "Geen gebruikers gevonden"
+      "noUsersFound": "Geen gebruikers gevonden",
+      "relation": {
+        "follower": "Wie mij volgt",
+        "following": "Wie ik volg",
+        "groupMember": "Groepsleden",
+        "other": "Andere gebruikers",
+        "participant": "Betrokken bij dit bericht"
+      }
     },
     "placeholder": "Laat je inspirerende gedachten achter …"
   },

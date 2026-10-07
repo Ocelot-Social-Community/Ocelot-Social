@@ -861,7 +861,14 @@
       "unorderedList": "Unordered list"
     },
     "mention": {
-      "noUsersFound": "No users found"
+      "noUsersFound": "No users found",
+      "relation": {
+        "follower": "People following me",
+        "following": "People I follow",
+        "groupMember": "Group members",
+        "other": "Other users",
+        "participant": "Involved in this post"
+      }
     },
     "placeholder": "Leave your inspirational thoughts …"
   },

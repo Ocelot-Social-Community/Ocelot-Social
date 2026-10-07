@@ -156,7 +156,6 @@
           <editor
             name="description"
             model="description"
-            :users="null"
             :value="formData.description"
             :hashtags="null"
             @input="updateEditorDescription"

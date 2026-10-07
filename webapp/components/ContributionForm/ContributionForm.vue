@@ -66,7 +66,7 @@
           </p>
           <div :class="{ 'ds-input-has-error': visibleErrors && visibleErrors.content }">
             <editor
-              :users="users"
+              :mention-suggestions="mentionSuggestions"
               :value="formData.content"
               :hashtags="hashtags"
               :aria-labelledby="`content-label-${_uid}`"
@@ -268,6 +268,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
 import Editor from '~/components/Editor/Editor'
+import { fetchMentionSuggestions } from '~/components/Editor/mentionSuggestions'
 import PostMutations from '~/graphql/PostMutations.js'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import ImageUploader from '~/components/Uploader/ImageUploader'
@@ -337,7 +338,6 @@ export default {
       links,
       formData,
       loading: false,
-      users: [],
       hashtags: [],
       // eventLocationName and the hero image are set directly rather than
       // through updateFormField()/$parentForm.update, so dirtyFields has no
@@ -622,6 +622,13 @@ export default {
     this.icons = iconRegistry
   },
   methods: {
+    mentionSuggestions(query) {
+      return fetchMentionSuggestions(this.$apollo, {
+        query,
+        postId: this.contribution.id,
+        groupId: this.groupId,
+      })
+    },
     buildInitialFormData() {
       const {
         title,
@@ -883,21 +890,6 @@ export default {
     },
   },
   apollo: {
-    User: {
-      query() {
-        return gql`
-          query {
-            User(orderBy: slug_asc) {
-              id
-              slug
-            }
-          }
-        `
-      },
-      result({ data: { User } }) {
-        this.users = User
-      },
-    },
     Tag: {
       query() {
         return gql`

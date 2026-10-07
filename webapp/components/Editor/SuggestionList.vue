@@ -1,14 +1,29 @@
 <template>
   <ul v-show="showSuggestions" class="suggestion-list">
-    <li
-      v-for="(item, index) in filteredItems"
-      :key="item.id"
-      class="suggestion-list__item"
-      :class="{ 'is-selected': navigatedItemIndex === index }"
-      @click="selectItem(item)"
-    >
-      {{ createItemLabel(item) | truncate(50) }}
-    </li>
+    <template v-for="(item, index) in filteredItems">
+      <li
+        v-if="startsRelation(index)"
+        :key="`relation-${item.relation}`"
+        class="suggestion-list__item hint"
+      >
+        {{ relationLabels[item.relation] }}
+      </li>
+      <li
+        :key="item.id"
+        class="suggestion-list__item"
+        :class="{ 'is-selected': navigatedItemIndex === index }"
+        @click="selectItem(item)"
+      >
+        <user-avatar
+          v-if="isMention"
+          :user="item"
+          :link-to-profile="false"
+          :show-popover="false"
+          show-slug
+        />
+        <template v-else>{{ createItemLabel(item) | truncate(50) }}</template>
+      </li>
+    </template>
     <template v-if="isHashtag">
       <li v-if="!query" class="suggestion-list__item hint">{{ $t('editor.hashtag.addLetter') }}</li>
       <template v-else-if="!filteredItems.find((el) => el.id === query)">
@@ -19,7 +34,7 @@
       </template>
     </template>
     <template v-else-if="isMention">
-      <li v-if="!hasResults" class="suggestion-list__item hint">
+      <li v-if="!hasResults && !loading" class="suggestion-list__item hint">
         {{ $t('editor.mention.noUsersFound') }}
       </li>
     </template>
@@ -28,11 +43,17 @@
 
 <script>
 import { HASHTAG, MENTION } from '../../constants/editor'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 
 export default {
+  components: {
+    UserAvatar,
+  },
   props: {
     suggestionType: String,
     filteredItems: Array,
+    // Mention suggestions are on their way: no "no users found" yet.
+    loading: { type: Boolean, default: false },
     query: String,
     navigatedItemIndex: Number,
     selectItem: Function,
@@ -48,10 +69,27 @@ export default {
       return this.suggestionType === HASHTAG
     },
     showSuggestions() {
-      return this.query || this.hasResults
+      return this.hasResults || (this.query && !this.loading)
+    },
+    // Spelled out rather than built from the relation, so the keys stay findable.
+    relationLabels() {
+      return {
+        participant: this.$t('editor.mention.relation.participant'),
+        groupMember: this.$t('editor.mention.relation.groupMember'),
+        following: this.$t('editor.mention.relation.following'),
+        follower: this.$t('editor.mention.relation.follower'),
+        other: this.$t('editor.mention.relation.other'),
+      }
     },
   },
   methods: {
+    // Mention suggestions come grouped by their relation to the writer; the first of each group
+    // gets a heading — the same non-selectable "hint" row the hashtag menu divides itself with.
+    startsRelation(index) {
+      const { relation } = this.filteredItems[index]
+      if (!this.isMention || !relation) return false
+      return index === 0 || this.filteredItems[index - 1].relation !== relation
+    },
     createItemLabel(item) {
       if (this.isMention) {
         return `@${item.slug}`
@@ -92,6 +130,19 @@ export default {
   &.hint {
     opacity: var(--opacity-soft);
     pointer-events: none;
+  }
+
+  /* UserAvatar brings the colors it has on a light card; on the popup's primary background the
+     slug (primary on primary) would vanish. */
+  .user-avatar .info {
+    .slug,
+    .name {
+      color: inherit;
+    }
+
+    .name {
+      font-weight: normal;
+    }
   }
 }
 </style>

@@ -655,6 +655,7 @@ export default shield(
       PostsEmotionsByCurrentUser: isAuthenticated,
       mutedUsers: isAuthenticated,
       blockedUsers: isAuthenticated,
+      mentionSuggestions: isAuthenticated,
       notifications: isAuthenticated,
       Donations: isAuthenticated,
       userData: isAuthenticated,
