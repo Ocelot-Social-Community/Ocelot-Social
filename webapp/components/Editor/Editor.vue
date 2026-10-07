@@ -168,21 +168,45 @@ export default {
   methods: {
     // Anchors the suggestion popup and shows it.
     //
-    // tiptap's Suggestions plugin hands us a `virtualNode` built from the decoration span it wraps
-    // around the typed "@"/"#". It looks that span up with a `document.querySelector` inside its own
-    // `update()`, and since prosemirror-view 1.42 that runs BEFORE the decoration reaches the DOM —
-    // so on the keystroke that OPENS the list, `virtualNode` is null (measured: the plugin searches
-    // for id "00s5p" while the document still holds no `[data-decoration-id]` at all). Handing that
-    // null to `tippy()` is what produced "this.menu.show is not a function": for anything that is
-    // not an element tippy returns a list of instances — an empty one — instead of an instance.
+    // The anchor is the decoration span tiptap's Suggestions plugin wraps around the typed "@"/"#".
+    // Two things rule out handing that element (or the plugin's own `virtualNode`, which closes over
+    // one) to tippy directly:
     //
-    // So when the plugin comes up empty we look the same span up ourselves one tick later, once
-    // prosemirror has written it. Every following keystroke still takes the plugin's shortcut.
-    showSuggestionMenu(virtualNode, view) {
-      const display = (anchor) =>
-        this.$refs.contextMenu.displayContextMenu(anchor, this.$refs.suggestions.$el)
-      if (virtualNode) {
-        display(virtualNode)
+    // - prosemirror-view REPLACES the span when it redraws (measured: right after the list opens).
+    //   The popup is created once and keeps its first reference (see displayContextMenu), so it
+    //   would go on measuring an element that is no longer in the document — a 0/0 rect, which put
+    //   the list in the top left corner of the page.
+    // - On the keystroke that OPENS the list the span is not in the DOM yet: since prosemirror-view
+    //   1.42 the plugin's `update()` runs before the decoration is written, so its `virtualNode` is
+    //   null. Handing that null to `tippy()` is what produced "this.menu.show is not a function":
+    //   for anything that is not an element tippy returns a list of instances — an empty one.
+    //
+    // So the popup gets a virtual reference that looks the CURRENT span up on every measurement, and
+    // when the span is not there yet we wait one tick for prosemirror to write it.
+    suggestionAnchor(view) {
+      let rect = null
+      return {
+        getBoundingClientRect() {
+          const decoration = view.dom.querySelector('[data-decoration-id]')
+          // Between two redraws there may be no span for a moment: stay where we were.
+          if (decoration) rect = decoration.getBoundingClientRect()
+          return rect
+        },
+        // An inline span has no client box; popper falls back to the rect's size for 0.
+        clientWidth: 0,
+        clientHeight: 0,
+      }
+    },
+    showSuggestionMenu(view) {
+      if (!view) return
+      const hasDecoration = () => !!view.dom.querySelector('[data-decoration-id]')
+      const display = () =>
+        this.$refs.contextMenu.displayContextMenu(
+          this.suggestionAnchor(view),
+          this.$refs.suggestions.$el,
+        )
+      if (hasDecoration()) {
+        display()
         return
       }
       this.$nextTick(() => {
@@ -190,26 +214,25 @@ export default {
         // dismissed within the same tick (Escape, or a keystroke that ends the match) would still
         // pop open here.
         if (!this.suggestionRange) return
-        const decoration = view && view.dom.querySelector('[data-decoration-id]')
-        if (decoration) {
-          display(decoration)
+        if (hasDecoration()) {
+          display()
         }
       })
     },
-    openSuggestionList({ items, query, range, command, virtualNode, view }, suggestionType) {
+    openSuggestionList({ items, query, range, command, view }, suggestionType) {
       this.suggestionType = suggestionType
       this.query = this.sanitizeQuery(query)
       this.filteredItems = items
       this.suggestionRange = range
-      this.showSuggestionMenu(virtualNode, view)
+      this.showSuggestionMenu(view)
       this.insertMentionOrHashtag = command
     },
-    updateSuggestionList({ items, query, range, virtualNode, view }) {
+    updateSuggestionList({ items, query, range, view }) {
       this.query = this.sanitizeQuery(query)
       this.filteredItems = items
       this.suggestionRange = range
       this.navigatedItemIndex = 0
-      this.showSuggestionMenu(virtualNode, view)
+      this.showSuggestionMenu(view)
     },
     closeSuggestionList() {
       this.suggestionType = ''

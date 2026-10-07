@@ -94,11 +94,12 @@ describe('Editor.vue', () => {
         expect(typeof menu.show).toBe('function')
       })
 
-      // The other half of showSuggestionMenu: once the decoration IS in the DOM, the plugin builds
-      // the anchor itself and hands it over as `virtualNode` — a popper-style virtual reference
-      // rather than an element. That path must not wait for a tick, and tippy has to accept the
-      // object as a single instance (the same call answers with an array for anything invalid).
-      it('uses the plugin anchor directly when it comes with one', async () => {
+      // Regression: the popup used to be anchored on the decoration span ITSELF — the one found in
+      // the tick after the opening keystroke. prosemirror-view redraws that span right afterwards
+      // (measured: once, in that same tick), so the popup measured an element that had left the
+      // document — a 0/0 rect, i.e. the top left corner of the page. The reference has to follow
+      // whichever span is in the document right now.
+      it('measures the decoration that is currently in the document', async () => {
         propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
         wrapper = mount(Editor, {
           mocks,
@@ -108,72 +109,25 @@ describe('Editor.vue', () => {
           stubs: { transition: false },
           attachTo: document.body,
         })
-        const rect = { top: 10, bottom: 30, left: 20, right: 40, width: 20, height: 20 }
-        const virtualNode = {
-          getBoundingClientRect: () => rect,
-          clientWidth: rect.width,
-          clientHeight: rect.height,
-        }
+        const { view } = wrapper.vm.editor
+        const current = () => view.dom.querySelector('[data-decoration-id]')
+        const rect = { top: 10, bottom: 30, left: 20, right: 40 }
 
-        wrapper.vm.openSuggestionList(
-          {
-            items: propsData.users,
-            query: '',
-            range: { from: 1, to: 2 },
-            command: jest.fn(),
-            virtualNode,
-          },
-          'mention',
-        )
+        view.dispatch(view.state.tr.insertText('@'))
+        const early = current()
+        await settle(wrapper.vm)
+        const redrawn = current()
+        // jsdom has no layout: only the span that is in the document gets a real rect.
+        redrawn.getBoundingClientRect = () => rect
 
-        // No $nextTick in between: the anchor was there, so the popup is up already.
-        const { menu } = wrapper.vm.$refs.contextMenu
-        expect(menu).toBeTruthy()
-        expect(typeof menu.show).toBe('function')
+        // The premise of the test — if prosemirror ever stops replacing the span, this goes first.
+        expect(redrawn).not.toBe(early)
+        expect(early.isConnected).toBe(false)
+        expect(wrapper.vm.$refs.contextMenu.menu.reference.getBoundingClientRect()).toBe(rect)
       })
 
-      // Typing on: the plugin re-runs, finds its decoration, and the follow-up keystrokes take the
-      // direct path — with a filtered list behind it.
-      it('anchors the popup on the reference the plugin passes while typing', () => {
-        propsData.users = [
-          { id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' },
-          { id: 'u2', slug: 'jenny-rostock', label: 'Jenny Rostock' },
-        ]
-        wrapper = mount(Editor, {
-          mocks,
-          propsData,
-          localVue,
-          sync: false,
-          stubs: { transition: false },
-          attachTo: document.body,
-        })
-        const rect = { top: 10, bottom: 30, left: 20, right: 40, width: 20, height: 20 }
-        const virtualNode = {
-          getBoundingClientRect: () => rect,
-          clientWidth: rect.width,
-          clientHeight: rect.height,
-        }
-
-        wrapper.vm.updateSuggestionList({
-          items: [propsData.users[1]],
-          query: 'jenny',
-          range: { from: 1, to: 7 },
-          virtualNode,
-          view: wrapper.vm.editor.view,
-        })
-
-        expect(wrapper.vm.filteredItems).toEqual([propsData.users[1]])
-        expect(wrapper.vm.navigatedItemIndex).toBe(0)
-        // The reference itself, not just "some popup exists": this fails if showSuggestionMenu ever
-        // drops the handed-in `virtualNode` and anchors somewhere else.
-        expect(wrapper.vm.$refs.contextMenu.menu.reference).toBe(virtualNode)
-      })
-
-      // Worth pinning down because it reads like a bug and is not one: displayContextMenu returns
-      // early while a menu is open, so a later keystroke does NOT move the popup to the new
-      // reference. It stays on the first one and popper repositions it from there — that is what
-      // the MutationObserver in ContextMenu.vue is for.
-      it('keeps an open popup on its first reference', () => {
+      // Between two redraws the span may be gone for a moment. Measuring then must not jump to 0/0.
+      it('stays on the last known position while there is no decoration', async () => {
         propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
         wrapper = mount(Editor, {
           mocks,
@@ -183,32 +137,18 @@ describe('Editor.vue', () => {
           stubs: { transition: false },
           attachTo: document.body,
         })
-        const nodeAt = (top) => ({
-          getBoundingClientRect: () => ({
-            top,
-            bottom: top + 20,
-            left: 20,
-            right: 40,
-            width: 20,
-            height: 20,
-          }),
-          clientWidth: 20,
-          clientHeight: 20,
-        })
-        const first = nodeAt(10)
-        const second = nodeAt(100)
-        const args = (virtualNode, query) => ({
-          items: propsData.users,
-          query,
-          range: { from: 1, to: 1 + query.length + 1 },
-          virtualNode,
-          view: wrapper.vm.editor.view,
-        })
+        const { view } = wrapper.vm.editor
+        const rect = { top: 10, bottom: 30, left: 20, right: 40 }
 
-        wrapper.vm.updateSuggestionList(args(first, ''))
-        wrapper.vm.updateSuggestionList(args(second, 'p'))
+        view.dispatch(view.state.tr.insertText('@'))
+        await settle(wrapper.vm)
+        const span = view.dom.querySelector('[data-decoration-id]')
+        span.getBoundingClientRect = () => rect
+        const { reference } = wrapper.vm.$refs.contextMenu.menu
+        reference.getBoundingClientRect()
+        span.removeAttribute('data-decoration-id')
 
-        expect(wrapper.vm.$refs.contextMenu.menu.reference).toBe(first)
+        expect(reference.getBoundingClientRect()).toBe(rect)
       })
 
       it('does not open a popup for a list that was closed before the anchor arrived', async () => {
@@ -234,7 +174,7 @@ describe('Editor.vue', () => {
         // Driven through showSuggestionMenu directly because since prosemirror-view 1.42 the
         // plugin's update() runs asynchronously after `dispatch`, so a close placed right after a
         // keystroke lands BEFORE the list even opens (measured) and would prove nothing.
-        wrapper.vm.showSuggestionMenu(null, view)
+        wrapper.vm.showSuggestionMenu(view)
         wrapper.vm.closeSuggestionList()
         await settle(wrapper.vm)
 
