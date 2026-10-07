@@ -25,7 +25,7 @@ const ACTIVE_MEMBER_ROLES = `['usual', 'admin', 'owner']`
 // yields no row at all, so neither statement can be used to read the members of a closed or
 // hidden group off the list.
 const contextCypher = `
-  MATCH (me:User {id: $userId})
+  MATCH (me:User {id: $user.id})
   OPTIONAL MATCH (post:Post {id: $postId})
   OPTIONAL MATCH (post)<-[:WROTE]-(postAuthor:User)
   OPTIONAL MATCH (postGroup:Group)<-[:IN]-(post)
@@ -117,7 +117,7 @@ const relatedCypher = `
       OR size([(user)-[membership:MEMBER_OF]->(group)
                WHERE membership.role IN ${ACTIVE_MEMBER_ROLES} | 1]) > 0
     )
-  RETURN user {.*} AS user, rank
+  RETURN user {.*} AS user, $relations[rank] AS relation
   ${orderAndLimit}
 `
 
@@ -131,15 +131,12 @@ const othersCypher = `
   WHERE ${candidateFilter}
     AND NOT user.id IN $relatedIds
   WITH user, mutedIds, 4 AS rank
-  RETURN user {.*} AS user, rank
+  RETURN user {.*} AS user, $relations[rank] AS relation
   ${orderAndLimit}
 `
 
-// Index = the rank the statements return.
+// Index = the rank the statements compute; they look the name up themselves ($relations[rank]).
 const RELATIONS = ['participant', 'groupMember', 'following', 'follower', 'other']
-
-const toNumber = (value: unknown): number =>
-  typeof value === 'number' ? value : (value as { toNumber: () => number }).toNumber()
 
 interface Suggestion {
   user: Record<string, unknown>
@@ -159,12 +156,11 @@ export default {
       context: Context,
       _resolveInfo,
     ): Promise<Suggestion[]> => {
-      if (!context.user) {
-        return []
-      }
       const limit = Math.min(Math.max(args.first ?? DEFAULT_LIMIT, 1), MAX_LIMIT)
       const variables = {
-        userId: context.user.id,
+        // Always set — the shield rule for this query is isAuthenticated.
+        user: context.user,
+        relations: RELATIONS,
         term: (args.query ?? '').trim().toLowerCase(),
         postId: args.postId ?? null,
         groupId: args.groupId ?? null,
@@ -174,7 +170,7 @@ export default {
           await context.database.query({ query, variables: { ...variables, ...extra } })
         ).records.map((record): Suggestion => ({
           user: record.get('user') as Record<string, unknown>,
-          relation: RELATIONS[toNumber(record.get('rank'))],
+          relation: record.get('relation') as string,
         }))
 
       const related = await suggestions(relatedCypher, { limit })
