@@ -844,7 +844,11 @@
     "hashtag": {
       "addHashtag": "Новый хэштег",
       "addLetter": "Введите букву",
-      "noHashtagsFound": "Хэштеги не найдены"
+      "noHashtagsFound": "Хэштеги не найдены",
+      "relation": {
+        "popular": "Популярные",
+        "usedByMe": "Использованные мной"
+      }
     },
     "legend": {
       "bold": "Полужирный",

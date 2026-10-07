@@ -35,13 +35,9 @@
       </li>
     </template>
     <template v-if="isHashtag">
-      <li v-if="!query" class="suggestion-list__item hint">{{ $t('editor.hashtag.addLetter') }}</li>
-      <template v-else-if="!filteredItems.find((el) => el.id === query)">
-        <li class="suggestion-list__item hint">{{ $t('editor.hashtag.addHashtag') }}</li>
-        <li class="suggestion-list__item" @click="selectItem({ id: query })">
-          #{{ query | truncate(50) }}
-        </li>
-      </template>
+      <li v-if="!query && !loading" class="suggestion-list__item hint">
+        {{ $t('editor.hashtag.addLetter') }}
+      </li>
     </template>
     <template v-else-if="isMention">
       <li v-if="!hasResults && !loading" class="suggestion-list__item hint">
@@ -66,7 +62,7 @@ export default {
   props: {
     suggestionType: String,
     filteredItems: Array,
-    // Mention suggestions are on their way: no "no users found" yet.
+    // Suggestions are on their way: no "no users found" yet.
     loading: { type: Boolean, default: false },
     query: String,
     navigatedItemIndex: Number,
@@ -112,6 +108,10 @@ export default {
         following: this.$t('editor.mention.relation.following'),
         follower: this.$t('editor.mention.relation.follower'),
         other: this.$t('editor.mention.relation.other'),
+        usedByMe: this.$t('editor.hashtag.relation.usedByMe'),
+        popular: this.$t('editor.hashtag.relation.popular'),
+        // The entry that creates the typed tag — an item like the others, see withNewHashtag.
+        new: this.$t('editor.hashtag.addHashtag'),
       }
     },
   },
@@ -152,11 +152,11 @@ export default {
       }
       this.updateScrollFades()
     },
-    // Mention suggestions come grouped by their relation to the writer; the first of each group
-    // gets a heading — the same non-selectable "hint" row the hashtag menu divides itself with.
+    // Suggestions come grouped by their relation to the writer; the first of each group gets a
+    // heading — the same non-selectable "hint" row the hashtag menu always divided itself with.
     startsRelation(index) {
       const { relation } = this.filteredItems[index]
-      if (!this.isMention || !relation) return false
+      if (!relation) return false
       return index === 0 || this.filteredItems[index - 1].relation !== relation
     },
     createItemLabel(item) {

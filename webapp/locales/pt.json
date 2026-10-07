@@ -844,7 +844,11 @@
     "hashtag": {
       "addHashtag": "Nova hashtag",
       "addLetter": "Digite uma letra",
-      "noHashtagsFound": "Nenhuma hashtag encontrada"
+      "noHashtagsFound": "Nenhuma hashtag encontrada",
+      "relation": {
+        "popular": "Populares",
+        "usedByMe": "Usadas por mim"
+      }
     },
     "legend": {
       "bold": "Negrito",

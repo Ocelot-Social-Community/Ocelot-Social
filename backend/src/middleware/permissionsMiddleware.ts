@@ -656,6 +656,7 @@ export default shield(
       mutedUsers: isAuthenticated,
       blockedUsers: isAuthenticated,
       mentionSuggestions: isAuthenticated,
+      hashtagSuggestions: isAuthenticated,
       notifications: isAuthenticated,
       Donations: isAuthenticated,
       userData: isAuthenticated,

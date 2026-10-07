@@ -68,7 +68,7 @@
             <editor
               :mention-suggestions="mentionSuggestions"
               :value="formData.content"
-              :hashtags="hashtags"
+              :hashtag-suggestions="hashtagSuggestions"
               :aria-labelledby="`content-label-${_uid}`"
               @input="updateEditorContent"
               @blur.native.capture="dirtyFields.content && touchField('content')"
@@ -265,10 +265,10 @@
 <script>
 import { OsButton, OsCard, OsIcon, OsValidationHint } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
 import Editor from '~/components/Editor/Editor'
 import { fetchMentionSuggestions } from '~/components/Editor/mentionSuggestions'
+import { fetchHashtagSuggestions } from '~/components/Editor/hashtagSuggestions'
 import PostMutations from '~/graphql/PostMutations.js'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import ImageUploader from '~/components/Uploader/ImageUploader'
@@ -338,7 +338,6 @@ export default {
       links,
       formData,
       loading: false,
-      hashtags: [],
       // eventLocationName and the hero image are set directly rather than
       // through updateFormField()/$parentForm.update, so dirtyFields has no
       // equivalent for them — same reasoning as GroupForm.vue's own
@@ -622,6 +621,9 @@ export default {
     this.icons = iconRegistry
   },
   methods: {
+    hashtagSuggestions(query) {
+      return fetchHashtagSuggestions(this.$apollo, { query })
+    },
     mentionSuggestions(query) {
       return fetchMentionSuggestions(this.$apollo, {
         query,
@@ -887,22 +889,6 @@ export default {
     addImageType(imageType) {
       this.imageChangedByUser = true
       this.formData.imageType = imageType
-    },
-  },
-  apollo: {
-    Tag: {
-      query() {
-        return gql`
-          query {
-            Tag(orderBy: id_asc) {
-              id
-            }
-          }
-        `
-      },
-      result({ data: { Tag } }) {
-        this.hashtags = Tag
-      },
     },
   },
 }

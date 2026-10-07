@@ -42,10 +42,11 @@ import MenuBar from './MenuBar'
 import ContextMenu from './ContextMenu'
 import SuggestionList from './SuggestionList'
 import { matchesMentionQuery } from './mentionSuggestions'
+import { matchesHashtagQuery, withNewHashtag } from './hashtagSuggestions'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
-// How long typing has to pause before the mention suggestions are asked for.
-const MENTION_DEBOUNCE_MS = 150
+// How long typing has to pause before the suggestions are asked for.
+const SUGGESTION_DEBOUNCE_MS = 150
 
 export default {
   components: {
@@ -60,7 +61,9 @@ export default {
     // relation }]`, already filtered and ordered — see ./mentionSuggestions.js. If 'null', than the
     // Mention extention is not assigned.
     mentionSuggestions: { type: Function, default: null },
-    hashtags: { type: Array, default: () => null }, // If 'null', than the Hashtag extention is not assigned.
+    // The same for hashtags: `async (query) => [{ id, relation }]` — see ./hashtagSuggestions.js.
+    // If 'null', than the Hashtag extention is not assigned.
+    hashtagSuggestions: { type: Function, default: null },
     value: { type: String, default: '' },
     doc: { type: Object, default: () => {} },
     // Id of an element (e.g. the visible "Content"/"Description" label
@@ -97,7 +100,7 @@ export default {
         extensions.push(
           new Mention({
             // The plugin gets no items of its own: the list is loaded from the backend per typed
-            // query, in loadMentionSuggestions. Doing that inside `onFilter` (the plugin does await
+            // query, in loadSuggestions. Doing that inside `onFilter` (the plugin does await
             // it) would hand the ordering of open/change/exit to the network — a slow answer to
             // the opening "@" would re-open a list that was closed long ago.
             items: () => [],
@@ -110,17 +113,16 @@ export default {
         )
       }
       // Don't change the following line. The functionallity is in danger!
-      if (this.hashtags) {
+      if (this.hashtagSuggestions) {
         extensions.push(
           new Hashtag({
-            items: () => {
-              return this.hashtags
-            },
+            // Loaded like the mentions, see above.
+            items: () => [],
             onEnter: (props) => this.openSuggestionList(props, HASHTAG),
             onChange: this.updateSuggestionList,
             onExit: this.closeSuggestionList,
             onKeyDown: this.navigateSuggestionList,
-            onFilter: this.filterSuggestionList,
+            onFilter: () => [],
           }),
         )
       }
@@ -140,11 +142,11 @@ export default {
   },
   mounted() {
     this._throttleTimer = undefined
-    this._mentionTimer = undefined
-    this._mentionCache = new Map()
+    this._suggestionTimer = undefined
+    this._suggestionCache = new Map()
     // Counts the lists opened and closed, so an answer can tell whether the list it was asked for
     // is still the one on screen.
-    this._mentionSession = 0
+    this._suggestionSession = 0
     this.editor = new Editor({
       content: this.value || '',
       doc: this.doc,
@@ -191,7 +193,7 @@ export default {
   },
   beforeDestroy() {
     clearTimeout(this._throttleTimer)
-    clearTimeout(this._mentionTimer)
+    clearTimeout(this._suggestionTimer)
     this.editor.destroy()
   },
   methods: {
@@ -259,35 +261,36 @@ export default {
       const { from } = view.state.selection
       return from >= range.from && from <= range.to
     },
-    openSuggestionList({ items, query, range, command, view }, suggestionType) {
+    openSuggestionList({ query, range, command, view }, suggestionType) {
       if (!this.isBeingTyped({ range, view })) return
-      // Every list starts from scratch — nothing of a previous one carries over.
-      clearTimeout(this._mentionTimer)
-      this._mentionCache.clear()
-      this._mentionSession += 1
+      // Every list starts from scratch — nothing of a previous one, of whichever kind, carries
+      // over (the cache is keyed by the typed query alone).
+      clearTimeout(this._suggestionTimer)
+      this._suggestionCache.clear()
+      this._suggestionSession += 1
       this.filteredItems = []
       this.suggestionsLoading = false
       this.suggestionType = suggestionType
       this.query = this.sanitizeQuery(query)
       this.suggestionRange = range
-      this.setSuggestionItems(items)
+      this.loadSuggestions()
       this.showSuggestionMenu(view)
       this.insertMentionOrHashtag = command
     },
-    updateSuggestionList({ items, query, range, view }) {
+    updateSuggestionList({ query, range, view }) {
       // No list was opened for it — see isBeingTyped.
       if (!this.suggestionType) return
       this.query = this.sanitizeQuery(query)
       this.suggestionRange = range
       this.navigatedItemIndex = 0
-      this.setSuggestionItems(items)
+      this.loadSuggestions()
       this.showSuggestionMenu(view)
     },
     closeSuggestionList() {
-      clearTimeout(this._mentionTimer)
-      this._mentionSession += 1
-      // Follows, comments and mentions change; the next list starts from fresh answers.
-      this._mentionCache.clear()
+      clearTimeout(this._suggestionTimer)
+      this._suggestionSession += 1
+      // Follows, comments, mentions and tags change; the next list starts from fresh answers.
+      this._suggestionCache.clear()
       this.suggestionsLoading = false
       this.suggestionType = ''
       this.query = null
@@ -296,20 +299,25 @@ export default {
       this.navigatedItemIndex = 0
       this.$refs.contextMenu.hideContextMenu()
     },
-    // Hashtags arrive filtered from the plugin; mentions are loaded.
-    setSuggestionItems(items) {
-      if (this.suggestionType === MENTION) {
-        this.loadMentionSuggestions()
-      } else {
-        this.filteredItems = items
-      }
+    // Who answers for the kind of list that is open, the rule its answers follow, and what the
+    // editor adds to an answer of its own accord.
+    suggestionSource() {
+      return this.suggestionType === MENTION
+        ? {
+            load: this.mentionSuggestions,
+            matches: matchesMentionQuery,
+            complete: (items) => items,
+          }
+        : { load: this.hashtagSuggestions, matches: matchesHashtagQuery, complete: withNewHashtag }
     },
-    // Asks the backend for the users matching what has been typed after the "@".
-    loadMentionSuggestions() {
+    // Asks the backend for the users or hashtags matching what has been typed after the "@"/"#".
+    loadSuggestions() {
+      const type = this.suggestionType
       const query = this.query || ''
-      clearTimeout(this._mentionTimer)
+      const { load, matches, complete } = this.suggestionSource()
+      clearTimeout(this._suggestionTimer)
 
-      const cached = this._mentionCache.get(query)
+      const cached = this._suggestionCache.get(query)
       if (cached) {
         this.filteredItems = cached
         this.suggestionsLoading = false
@@ -317,34 +325,35 @@ export default {
       }
 
       // Until the answer is in, keep those on screen that still fit — so the list neither
-      // flickers empty on every keystroke nor offers (to Enter!) someone who no longer matches.
+      // flickers empty on every keystroke nor offers (to Enter!) an entry that no longer matches.
       const isOpening = !this.filteredItems.length && !this.suggestionsLoading
-      this.filteredItems = this.filteredItems.filter((item) => matchesMentionQuery(item, query))
+      this.filteredItems = this.filteredItems.filter((item) => matches(item, query))
       this.suggestionsLoading = true
 
-      const session = this._mentionSession
-      const load = async () => {
+      const session = this._suggestionSession
+      const request = async () => {
         let items = null
         try {
-          items = await this.mentionSuggestions(query)
+          items = complete(await load(query), query)
         } catch {
-          // The list is a convenience: without an answer it shows "no users found".
+          // The list is a convenience: without an answer it shows that nothing was found.
         }
-        // The list this was asked for is gone — closed, or closed and opened again. Its answer
-        // belongs neither on screen nor in the cache of the list that is open now.
-        if (session !== this._mentionSession) return
-        if (items) this._mentionCache.set(query, items)
+        // The list this was asked for is gone — closed, or closed and opened again, possibly as
+        // the other kind. Its answer belongs neither on screen nor in the cache of the list that
+        // is open now (which is keyed by the typed query alone).
+        if (session !== this._suggestionSession) return
+        if (items) this._suggestionCache.set(query, items)
         // Answers can overtake each other within a list, too.
-        if (this.suggestionType !== MENTION || (this.query || '') !== query) return
+        if (this.suggestionType !== type || (this.query || '') !== query) return
         this.filteredItems = items || []
         this.navigatedItemIndex = 0
         this.suggestionsLoading = false
       }
-      // The opening "@" is not typing yet — nothing to wait for.
+      // The opening "@"/"#" is not typing yet — nothing to wait for.
       if (isOpening) {
-        load()
+        request()
       } else {
-        this._mentionTimer = setTimeout(load, MENTION_DEBOUNCE_MS)
+        this._suggestionTimer = setTimeout(request, SUGGESTION_DEBOUNCE_MS)
       }
     },
     navigateSuggestionList({ event }) {
@@ -378,23 +387,6 @@ export default {
         default:
           return false
       }
-    },
-    filterSuggestionList(items, query) {
-      query = this.sanitizeQuery(query)
-      if (!query) {
-        return items.slice(0, 15)
-      }
-
-      const filteredList = items.filter((item) => {
-        const itemString = item.slug || item.id
-        return itemString.toLowerCase().startsWith(query.toLowerCase())
-      })
-      const sortedList = filteredList.sort((itemA, itemB) => {
-        const aString = itemA.slug || itemA.id
-        const bString = itemB.slug || itemB.id
-        return aString.length - bString.length
-      })
-      return sortedList.slice(0, 15)
     },
     sanitizeQuery(query) {
       if (this.suggestionType === HASHTAG) {

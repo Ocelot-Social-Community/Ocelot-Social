@@ -844,7 +844,11 @@
     "hashtag": {
       "addHashtag": "Nuovo hashtag",
       "addLetter": "Digita una lettera",
-      "noHashtagsFound": "Nessun hashtag trovato"
+      "noHashtagsFound": "Nessun hashtag trovato",
+      "relation": {
+        "popular": "Popolari",
+        "usedByMe": "Usati da me"
+      }
     },
     "legend": {
       "bold": "Grassetto",

@@ -844,7 +844,11 @@
     "hashtag": {
       "addHashtag": "Nowy hashtag",
       "addLetter": "Wpisz literę",
-      "noHashtagsFound": "Nie znaleziono hashtagów"
+      "noHashtagsFound": "Nie znaleziono hashtagów",
+      "relation": {
+        "popular": "Popularne",
+        "usedByMe": "Używane przeze mnie"
+      }
     },
     "legend": {
       "bold": "Pogrubienie",
