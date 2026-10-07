@@ -1,6 +1,7 @@
 import Vuex from 'vuex'
 import VTooltip from 'v-tooltip'
 import { mount, createLocalVue } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 import VideoCall from './VideoCall.vue'
 
 // connect() does `await import('livekit-client')` — mock it with a fake Room that
@@ -19,7 +20,13 @@ jest.mock('livekit-client', () => {
     LocalTrackPublished: 'LocalTrackPublished',
     LocalTrackUnpublished: 'LocalTrackUnpublished',
     Disconnected: 'Disconnected',
+    AudioPlaybackStatusChanged: 'AudioPlaybackStatusChanged',
+    Reconnecting: 'Reconnecting',
+    Reconnected: 'Reconnected',
+    LocalAudioSilenceDetected: 'LocalAudioSilenceDetected',
+    MediaDevicesChanged: 'MediaDevicesChanged',
   }
+  const TrackEvent = { UpstreamPaused: 'upstreamPaused', UpstreamResumed: 'upstreamResumed' }
   const Track = {
     Source: { Microphone: 'microphone', Camera: 'camera', ScreenShare: 'screen_share' },
   }
@@ -37,7 +44,11 @@ jest.mock('livekit-client', () => {
         setMicrophoneEnabled: jest.fn().mockResolvedValue(),
         setCameraEnabled: jest.fn().mockResolvedValue(),
         setScreenShareEnabled: jest.fn().mockResolvedValue(),
+        getTrackPublication: jest.fn(),
       }
+      // Tests flip the static to start a room whose audio is already blocked.
+      this.canPlaybackAudio = Room.initialCanPlaybackAudio
+      this.startAudio = jest.fn().mockResolvedValue()
       this.remoteParticipants = new Map()
       this.connect = jest.fn().mockResolvedValue()
       this.disconnect = jest.fn().mockResolvedValue()
@@ -48,7 +59,8 @@ jest.mock('livekit-client', () => {
       return this
     }
   }
-  return { __esModule: true, Room, RoomEvent, Track, DisconnectReason }
+  Room.initialCanPlaybackAudio = true
+  return { __esModule: true, Room, RoomEvent, Track, TrackEvent, DisconnectReason }
 })
 
 const localVue = createLocalVue()
@@ -1082,6 +1094,221 @@ describe('VideoCall', () => {
       await wrapper.vm.connect()
       expect(wrapper.vm.phase).toBe('idle')
       expect(close).toHaveBeenCalled()
+    })
+  })
+
+  describe('audio that silently goes missing', () => {
+    const connected = async (state = {}) => {
+      const built = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', ...state })
+      built.wrapper.vm.$apollo = {
+        mutate: jest
+          .fn()
+          .mockResolvedValue({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } }),
+      }
+      await built.wrapper.vm.connect()
+      return { ...built, room: built.wrapper.vm.room }
+    }
+
+    const fakeMicTrack = (overrides = {}) => {
+      const handlers = {}
+      return {
+        handlers,
+        isUpstreamPaused: false,
+        on: jest.fn((evt, cb) => {
+          handlers[evt] = cb
+        }),
+        restartTrack: jest.fn().mockResolvedValue(),
+        resumeUpstream: jest.fn().mockResolvedValue(),
+        ...overrides,
+      }
+    }
+
+    describe('blocked playback', () => {
+      it('offers to enable the sound once the browser refuses to play it', async () => {
+        const { wrapper, room } = await connected()
+        expect(wrapper.find('[data-test="video-call-audio-blocked"]').exists()).toBe(false)
+
+        room.canPlaybackAudio = false
+        room.handlers.AudioPlaybackStatusChanged(false)
+        await wrapper.vm.$nextTick()
+        expect(wrapper.find('[data-test="video-call-audio-blocked"]').exists()).toBe(true)
+
+        // The gesture: startAudio() replays the elements and LiveKit flips back.
+        room.startAudio.mockImplementation(async () => {
+          room.canPlaybackAudio = true
+        })
+        await wrapper.find('[data-test="video-call-enable-audio"]').trigger('click')
+        await flushPromises()
+        expect(room.startAudio).toHaveBeenCalled()
+        expect(wrapper.find('[data-test="video-call-audio-blocked"]').exists()).toBe(false)
+      })
+
+      it('picks up a block that happened during the handshake', async () => {
+        const { Room } = await import('livekit-client')
+        Room.initialCanPlaybackAudio = false
+        try {
+          const { wrapper } = await connected()
+          expect(wrapper.vm.audioBlocked).toBe(true)
+        } finally {
+          Room.initialCanPlaybackAudio = true
+        }
+      })
+
+      it('keeps the notice when the browser still refuses', async () => {
+        const { wrapper, room } = await connected()
+        room.canPlaybackAudio = false
+        room.handlers.AudioPlaybackStatusChanged(false)
+        room.startAudio.mockRejectedValue(new Error('NotAllowedError'))
+        await wrapper.vm.enableAudio()
+        expect(wrapper.vm.audioBlocked).toBe(true)
+      })
+
+      it('enableAudio is a no-op without a room', async () => {
+        const { wrapper } = factory({ show: true })
+        await expect(wrapper.vm.enableAudio()).resolves.toBeUndefined()
+      })
+    })
+
+    describe('reconnects', () => {
+      it('shows the reconnect, then rebuilds the tiles and re-reads the playback state', async () => {
+        const { wrapper, room } = await connected()
+        room.handlers.Reconnecting()
+        await wrapper.vm.$nextTick()
+        expect(wrapper.find('[data-test="video-call-reconnecting"]').exists()).toBe(true)
+
+        const refreshTiles = jest.spyOn(wrapper.vm, 'refreshTiles')
+        // Re-attaching the re-subscribed tracks ran play() outside a gesture.
+        room.canPlaybackAudio = false
+        room.handlers.Reconnected()
+        await wrapper.vm.$nextTick()
+        expect(refreshTiles).toHaveBeenCalled()
+        expect(wrapper.find('[data-test="video-call-reconnecting"]').exists()).toBe(false)
+        expect(wrapper.vm.audioBlocked).toBe(true)
+      })
+    })
+
+    describe('a microphone that delivers nothing', () => {
+      it('warns when the published microphone only yields silence', async () => {
+        const { wrapper, room } = await connected()
+        room.handlers.LocalAudioSilenceDetected()
+        await wrapper.vm.$nextTick()
+        expect(wrapper.find('[data-test="video-call-mic-problem"]').exists()).toBe(true)
+      })
+
+      it('ignores silence while the microphone is muted on purpose', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ micEnabled: false })
+        room.handlers.LocalAudioSilenceDetected()
+        expect(wrapper.vm.micProblem).toBe(false)
+      })
+
+      it('follows LiveKit pausing and resuming the microphone upstream', async () => {
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack()
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
+
+        track.handlers.upstreamPaused()
+        expect(wrapper.vm.micProblem).toBe(true)
+        track.handlers.upstreamResumed()
+        expect(wrapper.vm.micProblem).toBe(false)
+
+        // A deliberately muted mic has no problem to report.
+        wrapper.setData({ micEnabled: false })
+        track.handlers.upstreamPaused()
+        expect(wrapper.vm.micProblem).toBe(false)
+      })
+
+      it('does not watch tracks other than the microphone', async () => {
+        const { room } = await connected()
+        const track = fakeMicTrack()
+        room.handlers.LocalTrackPublished({ source: 'camera', track })
+        room.handlers.LocalTrackPublished({ source: 'microphone', track: null })
+        expect(track.on).not.toHaveBeenCalled()
+      })
+
+      it('restarts the capture and resumes the paused upstream on request', async () => {
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack({ isUpstreamPaused: true })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        wrapper.setData({ micProblem: true })
+        await wrapper.vm.$nextTick()
+
+        await wrapper.find('[data-test="video-call-restart-mic"]').trigger('click')
+        await flushPromises()
+        expect(room.localParticipant.getTrackPublication).toHaveBeenCalledWith('microphone')
+        expect(track.restartTrack).toHaveBeenCalled()
+        expect(track.resumeUpstream).toHaveBeenCalled()
+        expect(wrapper.vm.micProblem).toBe(false)
+      })
+
+      it('does not resume an upstream that was never paused', async () => {
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack()
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        await wrapper.vm.restartMic()
+        expect(track.restartTrack).toHaveBeenCalled()
+        expect(track.resumeUpstream).not.toHaveBeenCalled()
+      })
+
+      it('keeps the warning and toasts when the capture cannot be restarted', async () => {
+        const { wrapper, room } = await connected()
+        const $toast = { error: jest.fn() }
+        wrapper.vm.$toast = $toast
+        const track = fakeMicTrack({
+          restartTrack: jest
+            .fn()
+            .mockRejectedValue(Object.assign(new Error(), { name: 'NotReadableError' })),
+        })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        wrapper.setData({ micProblem: true })
+        await wrapper.vm.restartMic()
+        expect($toast.error).toHaveBeenCalledWith('videoCall.errors.mic.busy')
+        expect(wrapper.vm.micProblem).toBe(true)
+      })
+
+      it('restartMic is a no-op without a room or a published microphone', async () => {
+        const { wrapper, room } = await connected()
+        room.localParticipant.getTrackPublication.mockReturnValue(undefined)
+        await expect(wrapper.vm.restartMic()).resolves.toBeUndefined()
+        wrapper.setData({ room: null })
+        await expect(wrapper.vm.restartMic()).resolves.toBeUndefined()
+      })
+
+      it('retries a dead microphone when the devices change', async () => {
+        const { wrapper, room } = await connected()
+        const restartMic = jest.spyOn(wrapper.vm, 'restartMic').mockResolvedValue()
+        room.handlers.MediaDevicesChanged()
+        expect(restartMic).not.toHaveBeenCalled()
+        wrapper.setData({ micProblem: true })
+        room.handlers.MediaDevicesChanged()
+        expect(restartMic).toHaveBeenCalled()
+      })
+
+      it('drops the warning when the user mutes the microphone', async () => {
+        const { wrapper } = await connected()
+        wrapper.setData({ micProblem: true })
+        await wrapper.vm.toggleMic()
+        expect(wrapper.vm.micEnabled).toBe(false)
+        expect(wrapper.vm.micProblem).toBe(false)
+        // Unmuting again does not invent a problem.
+        await wrapper.vm.toggleMic()
+        expect(wrapper.vm.micProblem).toBe(false)
+      })
+    })
+
+    it('starts every call without leftover warnings', async () => {
+      const { wrapper } = await connected()
+      wrapper.setData({ audioBlocked: true, micProblem: true, reconnecting: true })
+      await wrapper.vm.cleanup()
+      expect(wrapper.vm.audioBlocked).toBe(false)
+      expect(wrapper.vm.micProblem).toBe(false)
+      expect(wrapper.vm.reconnecting).toBe(false)
+
+      wrapper.setData({ audioBlocked: true, micProblem: true, reconnecting: true })
+      await wrapper.vm.connect()
+      expect(wrapper.vm.audioBlocked).toBe(false)
+      expect(wrapper.vm.micProblem).toBe(false)
+      expect(wrapper.vm.reconnecting).toBe(false)
     })
   })
 
