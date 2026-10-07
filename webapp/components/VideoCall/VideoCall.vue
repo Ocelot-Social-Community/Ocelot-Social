@@ -1098,9 +1098,12 @@ export default {
       // A click and a device change can ask at the same time; one fresh
       // capture is enough, so later callers share the running attempt.
       if (!this.micRestart) {
-        this.micRestart = this.doRestartMic().finally(() => {
-          this.micRestart = null
+        const attempt = this.doRestartMic().finally(() => {
+          // cleanup() may have let go of this attempt and a new call started
+          // its own — don't release that one.
+          if (this.micRestart === attempt) this.micRestart = null
         })
+        this.micRestart = attempt
       }
       return this.micRestart
     },
@@ -1119,9 +1122,12 @@ export default {
         // The new capture can be just as silent as the old one — only drop the
         // warning once it is shown to deliver a signal.
         const silent = await track.checkForSilence()
+        // The call may have ended (or been retried) while we waited; its
+        // outcome must not leak into the next one.
+        if (this.room !== room) return
         this.micProblem = this.micEnabled && silent
       } catch (err) {
-        this.showDeviceErrorToast('mic', err)
+        if (this.room === room) this.showDeviceErrorToast('mic', err)
       }
     },
     async toggleMic() {
@@ -1270,6 +1276,8 @@ export default {
       this.audioBlocked = false
       this.micProblem = false
       this.reconnecting = false
+      // A restart still running belongs to the room just torn down.
+      this.micRestart = null
       // CRITICAL: do NOT set phase = 'prejoin' here. leave() runs cleanup()
       // BEFORE close(), so the Vuex `show` flag is still true when cleanup
       // finishes. A prejoin phase would make the template re-mount <pre-join>

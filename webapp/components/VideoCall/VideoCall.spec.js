@@ -1306,6 +1306,75 @@ describe('VideoCall', () => {
         expect(wrapper.vm.micProblem).toBe(true)
       })
 
+      it('lets a restart outlived by its call change nothing', async () => {
+        const { wrapper, room } = await connected()
+        const $toast = { error: jest.fn() }
+        wrapper.vm.$toast = $toast
+        let finish
+        const track = fakeMicTrack({
+          restartTrack: jest.fn(
+            () =>
+              new Promise((resolve, reject) => {
+                finish = { resolve, reject }
+              }),
+          ),
+          checkForSilence: jest.fn().mockResolvedValue(true),
+        })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        const pending = wrapper.vm.restartMic()
+        await wrapper.vm.cleanup()
+        finish.resolve()
+        await pending
+        // cleanup() reset micEnabled to true — a stale result would read as
+        // "silent mic" and warn in the next call.
+        expect(wrapper.vm.micProblem).toBe(false)
+
+        // Same for a failure: no toast about a call that is gone.
+        wrapper.setData({ room })
+        const failing = wrapper.vm.restartMic()
+        await wrapper.vm.cleanup()
+        finish.reject(Object.assign(new Error(), { name: 'NotReadableError' }))
+        await failing
+        expect($toast.error).not.toHaveBeenCalled()
+      })
+
+      it('starts a fresh restart in a new call while the old one still runs', async () => {
+        const { wrapper, room } = await connected()
+        let finishOld
+        const oldTrack = fakeMicTrack({
+          restartTrack: jest.fn(
+            () =>
+              new Promise((resolve) => {
+                finishOld = resolve
+              }),
+          ),
+        })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track: oldTrack })
+        const stale = wrapper.vm.restartMic()
+        await wrapper.vm.cleanup()
+
+        await wrapper.vm.connect()
+        const newTrack = fakeMicTrack()
+        wrapper.vm.room.localParticipant.getTrackPublication.mockReturnValue({ track: newTrack })
+        let finishNew
+        newTrack.restartTrack.mockImplementation(
+          () =>
+            new Promise((resolve) => {
+              finishNew = resolve
+            }),
+        )
+        const fresh = wrapper.vm.restartMic()
+        expect(fresh).not.toBe(stale)
+        expect(newTrack.restartTrack).toHaveBeenCalled()
+
+        // The old attempt settling must not release the new one's lock.
+        finishOld()
+        await stale
+        expect(wrapper.vm.restartMic()).toBe(fresh)
+        finishNew()
+        await fresh
+      })
+
       it('restartMic is a no-op without a room or a published microphone', async () => {
         const { wrapper, room } = await connected()
         room.localParticipant.getTrackPublication.mockReturnValue(undefined)
