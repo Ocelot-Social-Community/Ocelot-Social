@@ -228,6 +228,33 @@ describe('Editor.vue', () => {
         expect(wrapper.vm.suggestionsLoading).toBe(false)
       })
 
+      // An empty list looks like one that is just opening; typing on must still be debounced.
+      it('still waits for a pause in typing after an answer without matches', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        answers[''].resolve([])
+        await flushPromises()
+
+        wrapper.vm.updateSuggestionList(props('x'))
+        wrapper.vm.updateSuggestionList(props('xy'))
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(1)
+
+        jest.advanceTimersByTime(150)
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(2)
+        expect(propsData.mentionSuggestions).toHaveBeenLastCalledWith('xy')
+      })
+
+      it('still waits for a pause in typing after a failed request', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        answers[''].reject(new Error('network'))
+        await flushPromises()
+
+        wrapper.vm.updateSuggestionList(props('x'))
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(1)
+
+        jest.advanceTimersByTime(150)
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(2)
+      })
+
       it('waits for a pause in typing before it asks again', async () => {
         wrapper.vm.openSuggestionList(props(''), 'mention')
         answers[''].resolve([peter, jenny])

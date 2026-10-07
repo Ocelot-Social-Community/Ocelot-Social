@@ -147,6 +147,8 @@ export default {
     // Counts the lists opened and closed, so an answer can tell whether the list it was asked for
     // is still the one on screen.
     this._suggestionSession = 0
+    // Set while a list has been opened but not yet asked for — see loadSuggestions.
+    this._suggestionOpening = false
     this.editor = new Editor({
       content: this.value || '',
       doc: this.doc,
@@ -273,6 +275,7 @@ export default {
       this.suggestionType = suggestionType
       this.query = this.sanitizeQuery(query)
       this.suggestionRange = range
+      this._suggestionOpening = true
       this.loadSuggestions()
       this.showSuggestionMenu(view)
       this.insertMentionOrHashtag = command
@@ -289,6 +292,7 @@ export default {
     closeSuggestionList() {
       clearTimeout(this._suggestionTimer)
       this._suggestionSession += 1
+      this._suggestionOpening = false
       // Follows, comments, mentions and tags change; the next list starts from fresh answers.
       this._suggestionCache.clear()
       this.suggestionsLoading = false
@@ -316,6 +320,11 @@ export default {
       const query = this.query || ''
       const { load, matches, complete } = this.suggestionSource()
       clearTimeout(this._suggestionTimer)
+      // Told by openSuggestionList, not read off the list being empty: it is just as empty after
+      // an answer without matches or a failed request, and every keystroke that follows would
+      // then skip the debounce.
+      const isOpening = this._suggestionOpening
+      this._suggestionOpening = false
 
       const cached = this._suggestionCache.get(query)
       if (cached) {
@@ -326,7 +335,6 @@ export default {
 
       // Until the answer is in, keep those on screen that still fit — so the list neither
       // flickers empty on every keystroke nor offers (to Enter!) an entry that no longer matches.
-      const isOpening = !this.filteredItems.length && !this.suggestionsLoading
       this.filteredItems = this.filteredItems.filter((item) => matches(item, query))
       this.suggestionsLoading = true
 
