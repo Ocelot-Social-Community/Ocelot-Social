@@ -314,13 +314,13 @@ const SPEAKER_HOLD_MS = 1500
 // whether this user may OPEN a call (nobody in it yet) — a token kept for long
 // would carry that decision past the moment it was true. Older ones are
 // fetched anew on join; the preloaded client library still saves its share.
-const PREFETCHED_TOKEN_MAX_AGE_MS = 60_000
+const PREFETCHED_TOKEN_MAX_AGE_MS = 60000
 
 // LiveKit rates every participant's connection several times a minute. Videos
 // are paused once ours stays weak this long, and come back only after it has
 // been fine for clearly longer, so a flaky line doesn't make them flicker.
-const WEAK_CONNECTION_MS = 5_000
-const RECOVERED_CONNECTION_MS = 20_000
+const WEAK_CONNECTION_MS = 5000
+const RECOVERED_CONNECTION_MS = 20000
 const WEAK_QUALITIES = ['poor', 'lost']
 const STRONG_QUALITIES = ['excellent', 'good']
 
