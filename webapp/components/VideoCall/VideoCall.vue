@@ -83,6 +83,50 @@
           {{ $t('videoCall.connecting') }}
         </div>
         <template v-else>
+          <!--
+            Problems the call cannot fix on its own. They show in the parked
+            window too: a blocked speaker or a silent microphone matters there
+            just as much.
+          -->
+          <div
+            v-if="audioBlocked || micProblem || reconnecting"
+            class="video-call__notices"
+            role="status"
+          >
+            <div v-if="reconnecting" class="video-call__notice" data-test="video-call-reconnecting">
+              {{ $t('videoCall.reconnecting') }}
+            </div>
+            <div
+              v-if="audioBlocked"
+              class="video-call__notice video-call__notice--warning"
+              data-test="video-call-audio-blocked"
+            >
+              <span>{{ $t('videoCall.audioBlocked') }}</span>
+              <os-button
+                data-test="video-call-enable-audio"
+                variant="primary"
+                size="sm"
+                @click="enableAudio"
+              >
+                {{ $t('videoCall.enableAudio') }}
+              </os-button>
+            </div>
+            <div
+              v-if="micProblem"
+              class="video-call__notice video-call__notice--warning"
+              data-test="video-call-mic-problem"
+            >
+              <span>{{ $t('videoCall.micNoSignal') }}</span>
+              <os-button
+                data-test="video-call-restart-mic"
+                variant="primary"
+                size="sm"
+                @click="restartMic"
+              >
+                {{ $t('videoCall.restartMic') }}
+              </os-button>
+            </div>
+          </div>
           <div
             v-if="isFullscreen && activeSpeakers.length"
             class="video-call__speakers"
@@ -291,6 +335,13 @@ export default {
       spotlightKey: null,
       stageWidth: 0,
       stageHeight: 0,
+      // The browser refused to start remote audio without a fresh user gesture
+      // (autoplay policy). Remote audio stays silent until enableAudio() runs.
+      audioBlocked: false,
+      // Our microphone is published but delivers nothing: the OS took the device
+      // away (LiveKit then pauses the upstream) or it only yields digital silence.
+      micProblem: false,
+      reconnecting: false,
     }
   },
   computed: {
@@ -552,6 +603,7 @@ export default {
     // who keeps talking never jumps around the chip row.
     this.speakerSeenAt = new Map()
     this.speakerHoldTimer = null
+    this.micRestart = null
     this.stageObserver = null
     this.observedStage = null
   },
@@ -732,6 +784,9 @@ export default {
       this.phase = 'connecting'
       this.error = null
       this.tiles = []
+      this.audioBlocked = false
+      this.micProblem = false
+      this.reconnecting = false
       try {
         if (!this.groupId) throw new Error('Missing group id')
         const { data } = await this.$apollo.mutate({
@@ -742,7 +797,7 @@ export default {
         if (!payload) throw new Error('No token returned')
 
         const livekit = await import('livekit-client')
-        const { Room, RoomEvent, Track, DisconnectReason } = livekit
+        const { Room, RoomEvent, Track, TrackEvent, DisconnectReason } = livekit
         this.Track = Track
 
         const room = new Room({
@@ -776,8 +831,11 @@ export default {
           // SPEAKER_HOLD_MS.
           this.noteActiveSpeakers((speakers || []).map((p) => p.identity))
         })
-        room.on(RoomEvent.LocalTrackPublished, () => {
+        room.on(RoomEvent.LocalTrackPublished, (pub) => {
           this.screenShareEnabled = !!room.localParticipant.isScreenShareEnabled
+          if (pub && pub.source === Track.Source.Microphone && pub.track) {
+            this.watchMicTrack(pub.track, TrackEvent)
+          }
           onAny()
         })
         room.on(RoomEvent.LocalTrackUnpublished, () => {
@@ -798,6 +856,34 @@ export default {
           this.leave()
         })
 
+        // LiveKit plays remote audio through the <audio> elements the tiles
+        // attach. When the browser's autoplay policy rejects play() — Safari
+        // does so whenever the page itself is not capturing, and any browser
+        // once the click that started the call is too long ago — the call
+        // carries on with video only and nothing tells the user. Mirror the
+        // state so the template can offer the gesture that unblocks it.
+        room.on(RoomEvent.AudioPlaybackStatusChanged, () => {
+          this.audioBlocked = !room.canPlaybackAudio
+        })
+        // A full reconnect re-subscribes every remote track as a new object.
+        // Rebuild the tiles so each <audio> element gets the live one, and
+        // re-read the playback state: the re-attach runs play() again, outside
+        // any user gesture.
+        room.on(RoomEvent.Reconnecting, () => {
+          this.reconnecting = true
+        })
+        room.on(RoomEvent.Reconnected, () => {
+          this.reconnecting = false
+          this.refreshTiles()
+          this.audioBlocked = !room.canPlaybackAudio
+        })
+        // A device came or went (headset plugged in, AirPods reconnected).
+        // LiveKit already follows the system default; if our microphone was
+        // dead, this is the moment a fresh capture has a chance to work.
+        room.on(RoomEvent.MediaDevicesChanged, () => {
+          if (this.micProblem) this.restartMic()
+        })
+
         // LiveKit defaults to a 15 s WebSocket + 15 s peer-connection timeout
         // plus retries — that's a long time to leave the user staring at
         // "Connecting…" when the URL is unreachable, and it explodes the
@@ -816,6 +902,7 @@ export default {
           await room.localParticipant.setCameraEnabled(true)
         }
         this.refreshTiles()
+        this.audioBlocked = !room.canPlaybackAudio
         this.phase = 'in-call'
       } catch (err) {
         const message = this.$backendError(err)
@@ -975,12 +1062,82 @@ export default {
         this.$toast.error(message)
       }
     },
+    watchMicTrack(track, TrackEvent) {
+      // When the OS takes the microphone away (another app, a Bluetooth profile
+      // switch, macOS muting the capture) the MediaStreamTrack fires `mute`
+      // and LiveKit stops sending after a few seconds — while the participant
+      // still counts as "microphone enabled", so our button keeps saying the
+      // mic is on and nobody hears a thing.
+      track.on(TrackEvent.UpstreamPaused, () => {
+        if (this.micEnabled) this.micProblem = true
+      })
+      track.on(TrackEvent.UpstreamResumed, () => {
+        this.micProblem = false
+      })
+      // LiveKit checks the track for pure digital silence right after
+      // publishing and after every restart — on macOS typically a browser that
+      // lacks the system's microphone permission, or a device held by another
+      // app. Listening on the track rather than the room keeps a silent
+      // screen-share audio track from raising a microphone warning.
+      track.on(TrackEvent.AudioSilenceDetected, () => {
+        if (this.micEnabled) this.micProblem = true
+      })
+    },
+    async enableAudio() {
+      if (!this.room) return
+      // Must run inside the click handler: startAudio() replays every attached
+      // <audio> element and only counts as user-initiated from a gesture.
+      try {
+        await this.room.startAudio()
+      } catch (_e) {
+        /* still blocked — the notice stays and the user can try again */
+      }
+      this.audioBlocked = !this.room.canPlaybackAudio
+    },
+    restartMic() {
+      // A click and a device change can ask at the same time; one fresh
+      // capture is enough, so later callers share the running attempt.
+      if (!this.micRestart) {
+        const attempt = this.doRestartMic().finally(() => {
+          // cleanup() may have let go of this attempt and a new call started
+          // its own — don't release that one.
+          if (this.micRestart === attempt) this.micRestart = null
+        })
+        this.micRestart = attempt
+      }
+      return this.micRestart
+    },
+    async doRestartMic() {
+      const room = this.room
+      const Track = this.Track
+      if (!room || !Track) return
+      const pub = room.localParticipant.getTrackPublication(Track.Source.Microphone)
+      const track = pub && pub.track
+      if (!track) return
+      try {
+        // A fresh getUserMedia capture replaces the dead MediaStreamTrack on the
+        // same publication; LiveKit resumes a paused upstream on its own, keeps
+        // a muted track disabled and stops a track that was stopped meanwhile.
+        await track.restartTrack()
+        // The new capture can be just as silent as the old one — only drop the
+        // warning once it is shown to deliver a signal.
+        const silent = await track.checkForSilence()
+        // The call may have ended (or been retried) while we waited; its
+        // outcome must not leak into the next one.
+        if (this.room !== room) return
+        this.micProblem = this.micEnabled && silent
+      } catch (err) {
+        if (this.room === room) this.showDeviceErrorToast('mic', err)
+      }
+    },
     async toggleMic() {
       if (!this.room) return
       const next = !this.micEnabled
       try {
         await this.room.localParticipant.setMicrophoneEnabled(next)
         this.micEnabled = next
+        // A muted microphone is silent on purpose.
+        if (!next) this.micProblem = false
       } catch (err) {
         // Re-sync from LiveKit — a partial failure (track published, then
         // permission revoked) can leave the real state out of sync with what
@@ -1116,6 +1273,11 @@ export default {
       this.micEnabled = true
       this.cameraEnabled = true
       this.screenShareEnabled = false
+      this.audioBlocked = false
+      this.micProblem = false
+      this.reconnecting = false
+      // A restart still running belongs to the room just torn down.
+      this.micRestart = null
       // CRITICAL: do NOT set phase = 'prejoin' here. leave() runs cleanup()
       // BEFORE close(), so the Vuex `show` flag is still true when cleanup
       // finishes. A prejoin phase would make the template re-mount <pre-join>
@@ -1386,6 +1548,38 @@ export default {
   padding: var(--space-small);
   text-align: center;
   color: var(--text-color-inverse);
+}
+
+/*  Overlay like the speaker chips, but at the bottom: the body is a row */
+/*  (stage | chat sidebar), so an in-flow banner would become a column. */
+.video-call__notices {
+  position: absolute;
+  bottom: var(--space-x-small);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xx-small);
+  max-width: calc(100% - var(--space-base));
+  z-index: 3;
+}
+
+.video-call__notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-x-small);
+  padding: var(--space-xx-small) var(--space-small);
+  border-radius: var(--border-radius-base);
+  text-align: center;
+  color: var(--text-color-inverse);
+  background: var(--color-neutral-10);
+}
+
+.video-call__notice--warning {
+  color: var(--color-warning-inverse);
+  background: var(--color-warning);
 }
 
 .video-call__error {
