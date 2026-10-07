@@ -89,7 +89,7 @@
             just as much.
           -->
           <div
-            v-if="audioBlocked || micProblem || reconnecting"
+            v-if="audioBlocked || micProblem || reconnecting || audioOnly"
             class="video-call__notices"
             role="status"
           >
@@ -124,6 +124,18 @@
                 @click="restartMic"
               >
                 {{ $t('videoCall.restartMic') }}
+              </os-button>
+            </div>
+            <div v-if="audioOnly" class="video-call__notice" data-test="video-call-audio-only">
+              <span>{{ $t('videoCall.audioOnly') }}</span>
+              <os-button
+                data-test="video-call-show-videos"
+                variant="primary"
+                appearance="outline"
+                size="sm"
+                @click="showVideos"
+              >
+                {{ $t('videoCall.showVideos') }}
               </os-button>
             </div>
           </div>
@@ -297,6 +309,21 @@ import PreJoin from './PreJoin.vue'
 // strobe while someone is simply talking.
 const SPEAKER_HOLD_MS = 1500
 
+// The join token is fetched while the user is still in the pre-join dialog, so
+// the click only has to open the socket. The backend decides on the spot
+// whether this user may OPEN a call (nobody in it yet) — a token kept for long
+// would carry that decision past the moment it was true. Older ones are
+// fetched anew on join; the preloaded client library still saves its share.
+const PREFETCHED_TOKEN_MAX_AGE_MS = 60_000
+
+// LiveKit rates every participant's connection several times a minute. Videos
+// are paused once ours stays weak this long, and come back only after it has
+// been fine for clearly longer, so a flaky line doesn't make them flicker.
+const WEAK_CONNECTION_MS = 5_000
+const RECOVERED_CONNECTION_MS = 20_000
+const WEAK_QUALITIES = ['poor', 'lost']
+const STRONG_QUALITIES = ['excellent', 'good']
+
 // Cameras publish 16:9, so the grid aims for cells of that shape: the closer a
 // cell matches, the less `object-fit: cover` has to crop off the sides.
 const TILE_ASPECT_RATIO = 16 / 9
@@ -342,6 +369,11 @@ export default {
       // away (LiveKit then pauses the upstream) or it only yields digital silence.
       micProblem: false,
       reconnecting: false,
+      // Remote cameras are unsubscribed because our connection is weak — the
+      // sound gets the bandwidth. audioOnlyDismissed: the user asked for the
+      // videos back, so we stop deciding for them until the next call.
+      audioOnly: false,
+      audioOnlyDismissed: false,
     }
   },
   computed: {
@@ -553,6 +585,7 @@ export default {
         if (open) {
           this.phase = 'prejoin'
           this.error = null
+          this.prefetchJoin()
         } else if (wasOpen) {
           // Only tear down if we were actually open before — on the initial
           // mount with show=false there is nothing to clean up, and the
@@ -596,6 +629,11 @@ export default {
       else if (!onCall && !this.minimized) this.setMinimized(true)
     },
   },
+  beforeCreate() {
+    // Set before the immediate `show` watcher runs — it does so ahead of
+    // created() and may already store a prefetched join token here.
+    this.prefetched = null
+  },
   created() {
     this.icons = iconRegistry
     // Non-reactive bookkeeping: identity -> timestamp of the last report from
@@ -606,6 +644,7 @@ export default {
     this.micRestart = null
     this.stageObserver = null
     this.observedStage = null
+    this.qualityTimer = null
   },
   mounted() {
     this.observeStage()
@@ -787,14 +826,10 @@ export default {
       this.audioBlocked = false
       this.micProblem = false
       this.reconnecting = false
+      this.resetAudioOnly()
       try {
         if (!this.groupId) throw new Error('Missing group id')
-        const { data } = await this.$apollo.mutate({
-          mutation: joinGroupVideoCallMutation(),
-          variables: { groupId: this.groupId },
-        })
-        const payload = data && data.joinGroupVideoCall
-        if (!payload) throw new Error('No token returned')
+        const payload = await this.takeJoinPayload(this.groupId)
 
         const livekit = await import('livekit-client')
         const { Room, RoomEvent, Track, TrackEvent, DisconnectReason } = livekit
@@ -811,7 +846,22 @@ export default {
         const onAny = () => this.refreshTiles()
         room.on(RoomEvent.ParticipantConnected, onAny)
         room.on(RoomEvent.ParticipantDisconnected, onAny)
-        room.on(RoomEvent.TrackSubscribed, onAny)
+        room.on(RoomEvent.TrackSubscribed, () => {
+          // Subscribed before the unsubscribe of audio-only mode took hold.
+          if (this.audioOnly) this.applyAudioOnly()
+          onAny()
+        })
+        // A camera published while we are in audio-only mode would otherwise
+        // be auto-subscribed and eat the bandwidth we just freed.
+        room.on(RoomEvent.TrackPublished, () => {
+          if (this.audioOnly) this.applyAudioOnly()
+        })
+        // Every tile shows a warning while its owner's connection is weak, our
+        // own included — which tells at a glance whose line is the problem.
+        room.on(RoomEvent.ConnectionQualityChanged, (quality, participant) => {
+          if (participant === room.localParticipant) this.onLocalConnectionQuality(quality)
+          onAny()
+        })
         room.on(RoomEvent.TrackUnsubscribed, onAny)
         // A remote participant withdrawing a track — most visibly, ending a
         // screen share. Without this the tile can outlive its track and keep
@@ -1026,6 +1076,7 @@ export default {
           isLocal,
           isScreen: false,
           micEnabled,
+          connectionQuality: participant.connectionQuality || 'unknown',
         })
         if (screenPub) {
           tiles.push({
@@ -1061,6 +1112,88 @@ export default {
       if (this.$toast && typeof this.$toast.error === 'function') {
         this.$toast.error(message)
       }
+    },
+    prefetchJoin() {
+      const groupId = this.groupId
+      if (!groupId) return
+      const promise = (async () => {
+        // Loads the client library chunk as well, the other half of the wait.
+        await import('livekit-client')
+        return this.fetchJoinPayload(groupId)
+      })()
+      // A failure here is not the user's business yet: connect() asks again
+      // and reports whatever the real attempt runs into.
+      promise.catch(() => {})
+      this.prefetched = { groupId, requestedAt: Date.now(), promise }
+    },
+    async takeJoinPayload(groupId) {
+      const prefetched = this.prefetched
+      // A token is good for one join; a retry has to ask for a new one.
+      this.prefetched = null
+      if (
+        prefetched &&
+        prefetched.groupId === groupId &&
+        Date.now() - prefetched.requestedAt < PREFETCHED_TOKEN_MAX_AGE_MS
+      ) {
+        try {
+          return await prefetched.promise
+        } catch (_e) {
+          /* fall through to a fresh request */
+        }
+      }
+      return this.fetchJoinPayload(groupId)
+    },
+    async fetchJoinPayload(groupId) {
+      const { data } = await this.$apollo.mutate({
+        mutation: joinGroupVideoCallMutation(),
+        variables: { groupId },
+      })
+      const payload = data && data.joinGroupVideoCall
+      if (!payload) throw new Error('No token returned')
+      return payload
+    },
+    onLocalConnectionQuality(quality) {
+      this.clearQualityTimer()
+      if (WEAK_QUALITIES.includes(quality) && !this.audioOnly && !this.audioOnlyDismissed) {
+        this.qualityTimer = setTimeout(() => this.setAudioOnly(true), WEAK_CONNECTION_MS)
+      } else if (STRONG_QUALITIES.includes(quality) && this.audioOnly) {
+        this.qualityTimer = setTimeout(() => this.setAudioOnly(false), RECOVERED_CONNECTION_MS)
+      }
+    },
+    clearQualityTimer() {
+      if (this.qualityTimer) {
+        clearTimeout(this.qualityTimer)
+        this.qualityTimer = null
+      }
+    },
+    setAudioOnly(on) {
+      this.qualityTimer = null
+      this.audioOnly = on
+      this.applyAudioOnly()
+    },
+    applyAudioOnly() {
+      const room = this.room
+      const Track = this.Track
+      if (!room || !Track) return
+      // Unsubscribing (rather than setEnabled(false)) hands the track back to
+      // adaptiveStream untouched once it is subscribed again. Screen shares
+      // stay: they are usually what the call is about, and mostly static.
+      for (const participant of room.remoteParticipants.values()) {
+        for (const pub of participant.videoTrackPublications.values()) {
+          if (pub.source === Track.Source.Camera) pub.setSubscribed(!this.audioOnly)
+        }
+      }
+      this.refreshTiles()
+    },
+    showVideos() {
+      this.clearQualityTimer()
+      this.audioOnlyDismissed = true
+      this.setAudioOnly(false)
+    },
+    resetAudioOnly() {
+      this.clearQualityTimer()
+      this.audioOnly = false
+      this.audioOnlyDismissed = false
     },
     watchMicTrack(track, TrackEvent) {
       // When the OS takes the microphone away (another app, a Bluetooth profile
@@ -1278,6 +1411,8 @@ export default {
       this.reconnecting = false
       // A restart still running belongs to the room just torn down.
       this.micRestart = null
+      this.resetAudioOnly()
+      this.prefetched = null
       // CRITICAL: do NOT set phase = 'prejoin' here. leave() runs cleanup()
       // BEFORE close(), so the Vuex `show` flag is still true when cleanup
       // finishes. A prejoin phase would make the template re-mount <pre-join>

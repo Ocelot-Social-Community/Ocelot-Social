@@ -104,6 +104,38 @@ describe('VideoTile', () => {
     })
   })
 
+  describe('connection warning', () => {
+    const badge = (wrapper) => wrapper.find('[data-test="video-tile-weak-connection"]')
+    const tFactory = (tile) =>
+      mount(VideoTile, {
+        propsData: { tile: buildTile(tile) },
+        localVue,
+        stubs,
+        mocks: { $t: (k, vars) => (vars ? `${k}:${vars.name}` : k) },
+      })
+
+    it.each(['excellent', 'good', 'unknown', undefined])('stays out of the way when %s', (q) => {
+      expect(badge(tFactory({ connectionQuality: q })).exists()).toBe(false)
+    })
+
+    it('warns about a weak connection, naming whose it is', () => {
+      const el = badge(tFactory({ connectionQuality: 'poor', name: 'Bob' }))
+      expect(el.attributes('aria-label')).toBe('videoCall.connectionPoor:Bob')
+      expect(el.attributes('title')).toBe('videoCall.connectionPoor:Bob')
+      expect(el.classes()).not.toContain('video-tile__connection--lost')
+    })
+
+    it('marks a lost connection more urgently', () => {
+      const el = badge(tFactory({ connectionQuality: 'lost', name: 'Bob' }))
+      expect(el.attributes('aria-label')).toBe('videoCall.connectionLost:Bob')
+      expect(el.classes()).toContain('video-tile__connection--lost')
+    })
+
+    it('leaves it to the camera tile, not the screen share', () => {
+      expect(badge(tFactory({ connectionQuality: 'poor', isScreen: true })).exists()).toBe(false)
+    })
+  })
+
   describe('clickability', () => {
     it('emits select when clicked and clickable', async () => {
       const wrapper = factory({ clickable: true })
