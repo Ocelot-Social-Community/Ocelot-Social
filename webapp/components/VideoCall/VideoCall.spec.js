@@ -1549,7 +1549,14 @@ describe('VideoCall', () => {
       audioTrackPublications: new Map(),
       videoTrackPublications: new Map(pubs.map((pub, i) => [`${identity}-${i}`, pub])),
     })
-    const videoPub = (source) => ({ source, track: { sid: source }, setSubscribed: jest.fn() })
+    // isDesired mirrors LiveKit: true until setSubscribed(false), then whatever was asked.
+    const videoPub = (source) => {
+      const pub = { source, track: { sid: source }, isDesired: true }
+      pub.setSubscribed = jest.fn((subscribed) => {
+        pub.isDesired = subscribed
+      })
+      return pub
+    }
 
     const connected = async () => {
       const built = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
@@ -1655,9 +1662,29 @@ describe('VideoCall', () => {
       wrapper.setData({ audioOnly: true })
       room.handlers.TrackPublished()
       expect(camera.setSubscribed).toHaveBeenCalledTimes(1)
-      room.handlers.TrackSubscribed()
-      expect(camera.setSubscribed).toHaveBeenCalledTimes(2)
       expect(camera.setSubscribed).toHaveBeenLastCalledWith(false)
+
+      // Someone else's camera arrives: only that one is unsubscribed — the
+      // one already paused costs no further signalling on a weak line.
+      const late = videoPub('camera')
+      room.remoteParticipants.set('carol', remoteParticipant('carol', [late]))
+      room.handlers.TrackSubscribed()
+      expect(late.setSubscribed).toHaveBeenCalledWith(false)
+      expect(camera.setSubscribed).toHaveBeenCalledTimes(1)
+    })
+
+    it('leaves cameras that were never paused alone when the videos come back', async () => {
+      jest.useFakeTimers()
+      const { wrapper, room, camera } = await connected()
+      room.handlers.ConnectionQualityChanged('poor', room.localParticipant)
+      jest.advanceTimersByTime(5000)
+      // Published meanwhile but never paused — nothing to undo for it.
+      const untouched = videoPub('camera')
+      room.remoteParticipants.set('carol', remoteParticipant('carol', [untouched]))
+
+      wrapper.vm.showVideos()
+      expect(camera.setSubscribed).toHaveBeenLastCalledWith(true)
+      expect(untouched.setSubscribed).not.toHaveBeenCalled()
     })
 
     it('applyAudioOnly is a no-op without a room', () => {

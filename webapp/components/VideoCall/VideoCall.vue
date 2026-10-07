@@ -1181,9 +1181,15 @@ export default {
       // Unsubscribing (rather than setEnabled(false)) hands the track back to
       // adaptiveStream untouched once it is subscribed again. Screen shares
       // stay: they are usually what the call is about, and mostly static.
+      // setSubscribed() signals the server on every call, changed or not, and
+      // this runs on each published/subscribed track — so only touch the ones
+      // whose wish actually differs, sparing a weak line the chatter.
+      const wanted = !this.audioOnly
       for (const participant of room.remoteParticipants.values()) {
         for (const pub of participant.videoTrackPublications.values()) {
-          if (pub.source === Track.Source.Camera) pub.setSubscribed(!this.audioOnly)
+          if (pub.source === Track.Source.Camera && pub.isDesired !== wanted) {
+            pub.setSubscribed(wanted)
+          }
         }
       }
       this.refreshTiles()
