@@ -387,7 +387,10 @@ describe('in mode', () => {
                   },
                 })
 
-                expect(errors?.[0]).toHaveProperty('message', 'Description too short.')
+                expect(errors?.[0]).toHaveProperty(
+                  'message',
+                  'Description too short (at least 3 characters).',
+                )
               })
             })
           })
@@ -427,7 +430,7 @@ describe('in mode', () => {
                   variables: { ...variables, categoryIds: null },
                 })
 
-                expect(errors?.[0]).toHaveProperty('message', 'Too few categories.')
+                expect(errors?.[0]).toHaveProperty('message', 'Too few categories (at least 1).')
               })
             })
 
@@ -438,7 +441,7 @@ describe('in mode', () => {
                   variables: { ...variables, categoryIds: [] },
                 })
 
-                expect(errors?.[0]).toHaveProperty('message', 'Too few categories.')
+                expect(errors?.[0]).toHaveProperty('message', 'Too few categories (at least 1).')
               })
             })
           })
@@ -450,7 +453,7 @@ describe('in mode', () => {
                 variables: { ...variables, categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'] },
               })
 
-              expect(errors?.[0]).toHaveProperty('message', 'Too many categories.')
+              expect(errors?.[0]).toHaveProperty('message', 'Too many categories (at most 3).')
             })
           })
 
@@ -3662,7 +3665,10 @@ describe('in mode', () => {
                       },
                     })
 
-                    expect(errors?.[0]).toHaveProperty('message', 'Description too short.')
+                    expect(errors?.[0]).toHaveProperty(
+                      'message',
+                      'Description too short (at least 3 characters).',
+                    )
                   })
                 })
               })
@@ -3706,7 +3712,10 @@ describe('in mode', () => {
                       },
                     })
 
-                    expect(errors?.[0]).toHaveProperty('message', 'Too few categories.')
+                    expect(errors?.[0]).toHaveProperty(
+                      'message',
+                      'Too few categories (at least 1).',
+                    )
                   })
                 })
               })
@@ -3721,7 +3730,7 @@ describe('in mode', () => {
                     },
                   })
 
-                  expect(errors?.[0]).toHaveProperty('message', 'Too many categories.')
+                  expect(errors?.[0]).toHaveProperty('message', 'Too many categories (at most 3).')
                 })
               })
             })
