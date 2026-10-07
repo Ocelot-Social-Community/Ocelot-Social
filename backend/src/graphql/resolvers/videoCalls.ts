@@ -138,6 +138,14 @@ const getUserAvatarUrl = async (driver: Driver, userId: string): Promise<string 
 
 const LIVEKIT_API_TIMEOUT_MS = 4000
 
+// A join token only has to get its holder INTO the room: once connected, the LiveKit
+// server keeps pushing fresh tokens to the client, which uses them for reconnects. So the
+// lifetime is not the call's length but how long a token kept aside stays a valid ticket —
+// and with it the decisions taken when it was issued (membership, and whether the user may
+// open a call nobody is in yet). Ten minutes leave room for a reconnect before the first
+// refresh arrives; two hours used to let a copied token outlive both decisions.
+const JOIN_TOKEN_TTL = '10m'
+
 export const getLiveParticipantCount = async (
   config: { LIVEKIT_URL: string; LIVEKIT_API_KEY: string; LIVEKIT_API_SECRET: string },
   roomName: string,
@@ -230,7 +238,7 @@ export default {
         {
           identity,
           name: context.user.name,
-          ttl: '2h',
+          ttl: JOIN_TOKEN_TTL,
           // Token metadata is forwarded to every other participant in the room
           // (as `participant.metadata` on the client). The frontend uses it to
           // render the real avatar instead of just initials for remote tiles.
