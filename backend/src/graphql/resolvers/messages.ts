@@ -13,7 +13,8 @@ import {
   CHAT_MESSAGE_STATUS_UPDATED,
   ROOM_UPDATED,
 } from '@constants/subscriptions'
-import { ForbiddenError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError } from '@graphql/errors'
 
 import { attachments } from './attachments/attachments'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
@@ -178,7 +179,7 @@ export default {
       } = context
 
       if (userId && userId === currentUserId) {
-        throw new Error('Cannot create a room with self')
+        throw new AppError(Errors.CHAT_ROOM_PARTNER_IS_SELF)
       }
 
       if (!roomId && !userId) {
@@ -186,7 +187,7 @@ export default {
       }
 
       if (!content?.trim() && files.length === 0) {
-        throw new Error('Message must have content or files')
+        throw new AppError(Errors.CHAT_MESSAGE_CONTENT_MISSING)
       }
 
       const session = context.driver.session()
@@ -196,7 +197,7 @@ export default {
         // can never resolve a group room, so only the roomId path needs the check). Inside the
         // try so the finally closes the session even if roomIsGroupRoom() throws on a DB error.
         if (roomId && groupChatGated(context) && (await roomIsGroupRoom(roomId, session))) {
-          throw new ForbiddenError('Not Authorized!')
+          throw new AppError(Errors.CHAT_GROUP_ROOM_FEATURE_DISABLED)
         }
 
         return await session.writeTransaction(async (transaction) => {

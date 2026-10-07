@@ -7,7 +7,8 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { v4 as uuid } from 'uuid'
 
-import { UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError, UserInputError } from '@graphql/errors'
 
 import { runBatch } from './helpers/batch'
 import cypherFields, { unwrap } from './helpers/cypherField'
@@ -383,7 +384,7 @@ export default {
         return post
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
-          throw new UserInputError('Post with this slug already exists!')
+          throw new AppError(Errors.POST_SAVE_SLUG_ALREADY_TAKEN)
         }
         throw e
       } finally {
@@ -461,7 +462,7 @@ export default {
         return post
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
-          throw new UserInputError('Post with this slug already exists!')
+          throw new AppError(Errors.POST_SAVE_SLUG_ALREADY_TAKEN)
         }
         throw e
       } finally {
@@ -557,7 +558,7 @@ export default {
       const { policy } = context
       const maxPinnedPosts = policy.get('maxPinnedPosts')
       if (maxPinnedPosts === 0) {
-        throw new Error('Pinned posts are not allowed!')
+        throw new AppError(Errors.POST_PIN_FEATURE_DISABLED)
       }
       let pinnedPostWithNestedAttributes
       const { driver, user } = context
@@ -620,7 +621,7 @@ export default {
           })
         ).records.map((r) => Number(r.get('count').toString()))
         if (currentPinnedPostCount >= maxPinnedPosts) {
-          throw new Error('Max number of pinned posts is reached!')
+          throw new AppError(Errors.POST_PIN_LIMIT_REACHED)
         }
         const [pinPostResult] = (
           await context.database.write({
@@ -664,7 +665,7 @@ export default {
       const maxGroupPinnedPosts = policy.get('maxGroupPinnedPosts')
 
       if (maxGroupPinnedPosts === 0) {
-        throw new Error('Pinned posts are not allowed!')
+        throw new AppError(Errors.POST_PIN_FEATURE_DISABLED)
       }
 
       // If maxGroupPinnedPosts === 1 -> Delete old pin
@@ -687,7 +688,7 @@ export default {
           variables: { user: context.user, params },
         })
         if (Number(result.records[0].get('count')) >= maxGroupPinnedPosts) {
-          throw new Error('Reached maxed pinned posts already. Unpin a post first.')
+          throw new AppError(Errors.POST_PIN_LIMIT_REACHED)
         }
       }
 
@@ -785,7 +786,7 @@ export default {
       ).records.map((record) => record.get('post'))
 
       if (posts.length !== 1) {
-        throw new Error('Could not find Post')
+        throw new AppError(Errors.POST_DOES_NOT_EXIST)
       }
 
       return posts[0]
@@ -802,7 +803,7 @@ export default {
       ).records.map((record) => record.get('post'))
 
       if (posts.length !== 1) {
-        throw new Error('Could not find Post')
+        throw new AppError(Errors.POST_DOES_NOT_EXIST)
       }
 
       return posts[0]

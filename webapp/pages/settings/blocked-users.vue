@@ -139,7 +139,7 @@ export default {
         const { name } = user
         this.$toast.success(this.$t('settings.blocked-users.unblocked', { name }))
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toastBackendError(error)
       } finally {
         this.unblockingUserId = null
       }

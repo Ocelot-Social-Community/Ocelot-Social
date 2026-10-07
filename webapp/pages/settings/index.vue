@@ -423,7 +423,7 @@ export default {
           this.locationChangedByUser = false
         }
       } catch (err) {
-        this.$toast.error(err.message)
+        this.$toastBackendError(err)
       } finally {
         this.loadingData = false
       }

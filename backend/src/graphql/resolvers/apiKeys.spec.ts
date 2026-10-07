@@ -140,7 +140,7 @@ describe('createApiKey', () => {
         variables: { name: 'Key 4' },
       })
 
-      expect(errors?.[0].message).toContain('Maximum of 3 active API keys reached')
+      expect(errors?.[0].message).toContain('Maximum of 3 active API keys reached.')
     })
 
     it('rejects expiresInDays of 0', async () => {
@@ -149,7 +149,10 @@ describe('createApiKey', () => {
         variables: { name: 'Zero Expiry', expiresInDays: 0 },
       })
 
-      expect(errors?.[0].message).toContain('expiresInDays must be a positive integer')
+      expect(errors?.[0]).toMatchObject({
+        message: 'The validity must be at least one day (expiresInDays ≥ 1).',
+        extensions: { errorCode: 'API_KEY_CREATE_EXPIRY_INVALID' },
+      })
     })
 
     it('rejects negative expiresInDays', async () => {
@@ -158,7 +161,10 @@ describe('createApiKey', () => {
         variables: { name: 'Negative Expiry', expiresInDays: -5 },
       })
 
-      expect(errors?.[0].message).toContain('expiresInDays must be a positive integer')
+      expect(errors?.[0]).toMatchObject({
+        message: 'The validity must be at least one day (expiresInDays ≥ 1).',
+        extensions: { errorCode: 'API_KEY_CREATE_EXPIRY_INVALID' },
+      })
     })
 
     it('does not count revoked keys towards the limit', async () => {
@@ -279,7 +285,7 @@ describe('updateApiKey', () => {
       variables: { id: 'nonexistent', name: 'Fail' },
     })
 
-    expect(errors?.[0].message).toContain('API key not found')
+    expect(errors?.[0].message).toContain('API key not found.')
   })
 
   it("throws error for another user's key", async () => {
@@ -295,7 +301,7 @@ describe('updateApiKey', () => {
       variables: { id: keyId, name: 'Stolen' },
     })
 
-    expect(errors?.[0].message).toContain('API key not found')
+    expect(errors?.[0].message).toContain('API key not found.')
   })
 })
 

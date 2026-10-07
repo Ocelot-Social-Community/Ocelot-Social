@@ -291,7 +291,7 @@ describe('Post', () => {
             content: 'Some content',
             categoryIds,
             postType: 'Event',
-            eventInput,
+            eventInput: { eventVenue: 'Brandenburger Tor', ...eventInput },
           },
         })
       }
@@ -535,7 +535,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event start date must be a valid date!',
+                message: 'Event start date must be a valid date.',
               },
             ],
           })
@@ -561,7 +561,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event start date must be in ISO format!',
+                message: 'Event start date must be in ISO format.',
               },
             ],
           })
@@ -580,6 +580,7 @@ describe('CreatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() - 1).toISOString(),
+                  eventVenue: 'Brandenburger Tor',
                 },
               },
             }),
@@ -609,7 +610,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event end date must be a valid date!',
+                message: 'Event end date must be a valid date.',
               },
             ],
           })
@@ -636,7 +637,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event end date must be in ISO format!',
+                message: 'Event end date must be in ISO format.',
               },
             ],
           })
@@ -662,7 +663,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event end date must be a after event start date!',
+                message: 'The end date must be after the start date.',
               },
             ],
           })
@@ -682,6 +683,7 @@ describe('CreatePost', () => {
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
                   eventEnd: new Date(now.getFullYear(), now.getMonth() + 2).toISOString(),
+                  eventVenue: 'Brandenburger Tor',
                 },
               },
             }),
@@ -712,6 +714,7 @@ describe('CreatePost', () => {
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
                   eventIsOnline: true,
+                  eventVenue: 'Brandenburger Tor',
                 },
               },
             }),
@@ -747,7 +750,83 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event venue must be present if event location is given!',
+                message: 'Event venue must be present.',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('event venue is missing without an event location', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [{ message: 'Event venue must be present.' }],
+          })
+        })
+      })
+
+      describe('event venue is only whitespace', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventVenue: '   ',
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [{ message: 'Event venue must be present.' }],
+          })
+        })
+      })
+
+      describe.each([
+        ['too short', 'ab'],
+        ['too long', 'x'.repeat(101)],
+      ])('event venue is %s', (_, eventVenue) => {
+        it('throws an error with the allowed length', async () => {
+          const now = new Date()
+
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventVenue,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event venue must be between 3 and 100 characters long.',
+                extensions: {
+                  errorCode: 'POST_EVENT_VENUE_LENGTH_INVALID',
+                  params: { min: 3, max: 100 },
+                },
               },
             ],
           })
@@ -774,7 +853,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event venue must be present if event location is given!',
+                message: 'Event venue must be present.',
               },
             ],
           })
@@ -801,7 +880,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event venue must be between 3 and 100 characters!',
+                message: 'Event venue must be between 3 and 100 characters long.',
               },
             ],
           })
@@ -828,7 +907,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event venue must be between 3 and 100 characters!',
+                message: 'Event venue must be between 3 and 100 characters long.',
               },
             ],
           })
@@ -888,7 +967,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event location latitude must be a finite number between -90 and 90!',
+                message: 'Event location latitude must be a finite number between -90 and 90.',
               },
             ],
           })
@@ -915,7 +994,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event location longitude must be a finite number between -180 and 180!',
+                message: 'Event location longitude must be a finite number between -180 and 180.',
               },
             ],
           })
@@ -941,7 +1020,7 @@ describe('CreatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event location requires both lat and lng, or neither!',
+                message: 'Event location requires both lat and lng, or neither.',
               },
             ],
           })
@@ -960,6 +1039,7 @@ describe('CreatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventVenue: 'Brandenburger Tor',
                 },
               },
             }),
@@ -1256,7 +1336,7 @@ describe('UpdatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event start date must be a valid date!',
+                message: 'Event start date must be a valid date.',
               },
             ],
           })
@@ -1275,6 +1355,7 @@ describe('UpdatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() - 1).toISOString(),
+                  eventVenue: 'Brandenburger Tor',
                 },
               },
             }),
@@ -1304,7 +1385,7 @@ describe('UpdatePost', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Event venue must be present if event location is given!',
+                message: 'Event venue must be present.',
               },
             ],
           })
@@ -1323,6 +1404,7 @@ describe('UpdatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventVenue: 'Brandenburger Tor',
                 },
               },
             }),
@@ -1571,7 +1653,7 @@ describe('push posts', () => {
       // as "pushed, nothing to show".
       const { errors } = await mutate({ mutation: pushPost, variables: { id: 'no-such-post' } })
 
-      expect(errors?.[0]).toHaveProperty('message', 'Could not find Post')
+      expect(errors?.[0]).toHaveProperty('message', 'Could not find post.')
     })
   })
 })
@@ -1722,7 +1804,7 @@ describe('unpush posts', () => {
 
       const { errors } = await mutate({ mutation: unpushPost, variables: { id: 'no-such-post' } })
 
-      expect(errors?.[0]).toHaveProperty('message', 'Could not find Post')
+      expect(errors?.[0]).toHaveProperty('message', 'Could not find post.')
     })
   })
 })
@@ -1816,7 +1898,7 @@ describe('pin posts', () => {
       it('throws with error that pinning posts is not allowed', async () => {
         await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
           data: { pinPost: null },
-          errors: [{ message: 'Pinned posts are not allowed!' }],
+          errors: [{ message: 'Pinned posts are not allowed.' }],
         })
       })
     })
@@ -2330,7 +2412,9 @@ describe('pin posts', () => {
               it('throws with max pinned posts is reached', () => {
                 expect(result).toMatchObject({
                   data: { pinPost: null },
-                  errors: [{ message: 'Max number of pinned posts is reached!' }],
+                  errors: [
+                    { message: 'Maximum number of pinned posts reached. Unpin a post first.' },
+                  ],
                 })
               })
             })

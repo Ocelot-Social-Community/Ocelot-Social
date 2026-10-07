@@ -128,7 +128,7 @@ describe('group.create_hidden backend enforcement', () => {
         variables: { id: 'to-hide', groupType: 'hidden' },
       })
 
-      expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+      expect(errors![0]).toHaveProperty('message', 'You are not allowed to make this group secret.')
     })
 
     it('allows owners (with group.create_hidden) to switch a group to hidden', async () => {

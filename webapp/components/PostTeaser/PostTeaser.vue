@@ -270,7 +270,7 @@ export default {
         this.$toast.success(this.$t('delete.contribution.success'))
         this.$emit('removePostFromList', DeletePost)
       } catch (err) {
-        this.$toast.error(err.message)
+        this.$toastBackendError(err)
       }
     },
     pinPost(post) {
@@ -301,7 +301,7 @@ export default {
             mutation: PostMutations().markTeaserAsViewed,
             variables: { id },
           })
-          .catch((error) => this.$toast.error(error.message))
+          .catch((error) => this.$toastBackendError(error))
         this.post.viewedTeaserByCurrentUser = true
         this.post.viewedTeaserCount++
       }

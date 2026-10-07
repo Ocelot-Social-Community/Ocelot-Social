@@ -541,7 +541,7 @@ describe(createOrUpdateLocations, () => {
           lng: 0,
         }),
       ),
-    ).rejects.toThrow('location coordinates are invalid')
+    ).rejects.toThrow('Location coordinates are invalid.')
 
     // One request per type, none skipped: giving up after the first empty answer would refuse
     // every pin that sits on a POI or a place but not on an addressed building.
@@ -575,7 +575,7 @@ describe(createOrUpdateLocations, () => {
           ['place', 'region', 'country'],
         ),
       ),
-    ).rejects.toThrow('location coordinates are invalid')
+    ).rejects.toThrow('Location coordinates are invalid.')
 
     const requestedTypes = fetchSpy.mock.calls.map(([input]) =>
       new URL(input as string).searchParams.get('types'),
@@ -593,7 +593,7 @@ describe(createOrUpdateLocations, () => {
       withSession(async (session) =>
         createOrUpdateLocations('User', 'located-user', 'Absurdistan', session, locationContext()),
       ),
-    ).rejects.toThrow('locationName is invalid')
+    ).rejects.toThrow('The locationName is invalid.')
   })
 
   // A feature CAN come back without place_type (Mapbox returns those for some interpolated
@@ -606,7 +606,7 @@ describe(createOrUpdateLocations, () => {
       withSession(async (session) =>
         createOrUpdateLocations('User', 'located-user', 'Typeless', session, locationContext()),
       ),
-    ).rejects.toThrow('locationName is invalid')
+    ).rejects.toThrow('The locationName is invalid.')
   })
 
   describe('given a user to attach the location to', () => {
@@ -673,7 +673,7 @@ describe(createOrUpdateLocations, () => {
             true,
           ),
         ),
-      ).rejects.toThrow('locationName is invalid')
+      ).rejects.toThrow('The locationName is invalid.')
     })
 
     // Mapbox omits `context` for the broadest features (a country has nothing above it). The

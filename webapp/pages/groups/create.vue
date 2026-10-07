@@ -114,7 +114,7 @@ export default {
           params: { id: responseId, slug: responseSlug },
         })
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toastBackendError(error)
         done()
       }
     },

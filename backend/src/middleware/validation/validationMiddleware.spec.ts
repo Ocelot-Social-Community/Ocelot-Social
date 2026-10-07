@@ -119,7 +119,7 @@ describe('validateCreateComment', () => {
       mutate({ mutation: CreateComment, variables: createCommentVariables }),
     ).resolves.toMatchObject({
       data: { CreateComment: null },
-      errors: [{ message: 'Comment must be at least 1 character long!' }],
+      errors: [{ message: 'The comment must be at least 1 characters long.' }],
     })
   })
 
@@ -130,7 +130,7 @@ describe('validateCreateComment', () => {
       mutate({ mutation: CreateComment, variables: createCommentVariables }),
     ).resolves.toMatchObject({
       data: { CreateComment: null },
-      errors: [{ message: 'Comment must be at least 1 character long!' }],
+      errors: [{ message: 'The comment must be at least 1 characters long.' }],
     })
   })
 
@@ -145,7 +145,7 @@ describe('validateCreateComment', () => {
       mutate({ mutation: CreateComment, variables: createCommentVariables }),
     ).resolves.toMatchObject({
       data: { CreateComment: null },
-      errors: [{ message: 'Comment cannot be created without a post!' }],
+      errors: [{ message: 'Could not find post.' }],
     })
   })
 
@@ -176,7 +176,7 @@ describe('validateCreateComment', () => {
         mutate({ mutation: UpdateComment, variables: updateCommentVariables }),
       ).resolves.toMatchObject({
         data: { UpdateComment: null },
-        errors: [{ message: 'Comment must be at least 1 character long!' }],
+        errors: [{ message: 'The comment must be at least 1 characters long.' }],
       })
     })
 
@@ -187,13 +187,18 @@ describe('validateCreateComment', () => {
         mutate({ mutation: UpdateComment, variables: updateCommentVariables }),
       ).resolves.toMatchObject({
         data: { UpdateComment: null },
-        errors: [{ message: 'Comment must be at least 1 character long!' }],
+        errors: [{ message: 'The comment must be at least 1 characters long.' }],
       })
     })
   })
 })
 
 describe('validateReport', () => {
+  const ownTargetError = {
+    message: 'You cannot report yourself or your own content.',
+    extensions: { errorCode: 'REPORT_TARGET_IS_OWN' },
+  }
+
   it('throws an error if a user tries to report themself', async () => {
     authenticatedUser = await reportingUser.toJson()
     reportVariables = { ...reportVariables, resourceId: 'reporting-user' }
@@ -202,7 +207,48 @@ describe('validateReport', () => {
       mutate({ mutation: fileReport, variables: reportVariables }),
     ).resolves.toMatchObject({
       data: { fileReport: null },
-      errors: [{ message: 'You cannot report yourself!' }],
+      errors: [ownTargetError],
+    })
+  })
+
+  it('throws an error if a user tries to report their own post', async () => {
+    authenticatedUser = await commentingUser.toJson()
+    reportVariables = { ...reportVariables, resourceId: 'post-4-commenting' }
+
+    await expect(
+      mutate({ mutation: fileReport, variables: reportVariables }),
+    ).resolves.toMatchObject({
+      data: { fileReport: null },
+      errors: [ownTargetError],
+    })
+  })
+
+  it('throws an error if a user tries to report their own comment', async () => {
+    await Factory.build(
+      'comment',
+      { id: 'own-comment' },
+      { postId: 'offensive-post', authorId: 'commenting-user' },
+    )
+    authenticatedUser = await commentingUser.toJson()
+    reportVariables = { ...reportVariables, resourceId: 'own-comment' }
+
+    await expect(
+      mutate({ mutation: fileReport, variables: reportVariables }),
+    ).resolves.toMatchObject({
+      data: { fileReport: null },
+      errors: [ownTargetError],
+    })
+  })
+
+  it("lets a user report somebody else's post", async () => {
+    authenticatedUser = await reportingUser.toJson()
+    reportVariables = { ...reportVariables, resourceId: 'offensive-post' }
+
+    await expect(
+      mutate({ mutation: fileReport, variables: reportVariables }),
+    ).resolves.toMatchObject({
+      data: { fileReport: { reportId: expect.any(String) } },
+      errors: undefined,
     })
   })
 })
@@ -225,7 +271,7 @@ describe('validateReview', () => {
 
     await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
-      errors: [{ message: 'You cannot review yourself!' }],
+      errors: [{ message: 'You cannot review a report about yourself or your own content.' }],
     })
   })
 
@@ -234,7 +280,12 @@ describe('validateReview', () => {
 
     await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
-      errors: [{ message: 'Resource not found or is not a Post|Comment|User!' }],
+      errors: [
+        {
+          message: 'Resource not found or is not a Post|Comment|User.',
+          extensions: { errorCode: 'REVIEW_TARGET_DOES_NOT_EXIST' },
+        },
+      ],
     })
   })
 
@@ -243,7 +294,12 @@ describe('validateReview', () => {
 
     await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
-      errors: [{ message: 'Before starting the review process, please report the Post!' }],
+      errors: [
+        {
+          message: 'Before starting the review process, please report the Post.',
+          extensions: { errorCode: 'REVIEW_TARGET_NOT_REPORTED', params: { label: 'Post' } },
+        },
+      ],
     })
   })
 
@@ -260,7 +316,7 @@ describe('validateReview', () => {
 
     await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
-      errors: [{ message: 'You cannot review your own Post!' }],
+      errors: [{ message: 'You cannot review a report about yourself or your own content.' }],
     })
   })
 
@@ -279,7 +335,7 @@ describe('validateReview', () => {
         mutate({ mutation: review, variables: disableVariables }),
       ).resolves.toMatchObject({
         data: { review: null },
-        errors: [{ message: 'Resource not found or is not a Post|Comment|User!' }],
+        errors: [{ message: 'Resource not found or is not a Post|Comment|User.' }],
       })
     })
   })
@@ -309,7 +365,7 @@ describe('validateReview', () => {
 
       await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
         data: { UpdateUser: null },
-        errors: [{ message: 'Username must be at least 3 character long!' }],
+        errors: [{ message: 'The name must be at least 3 characters long.' }],
       })
     })
   })

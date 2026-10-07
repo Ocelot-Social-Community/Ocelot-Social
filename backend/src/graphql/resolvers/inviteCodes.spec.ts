@@ -491,7 +491,7 @@ describe('generatePersonalInviteCode', () => {
       await expect(mutate({ mutation: generatePersonalInviteCode })).resolves.toMatchObject({
         errors: [
           {
-            message: 'You have reached the maximum of Invite Codes you can generate',
+            message: 'You have reached the maximum of invite codes you can generate.',
           },
         ],
       })
@@ -785,7 +785,7 @@ describe('generateGroupInviteCode', () => {
       ).resolves.toMatchObject({
         errors: [
           {
-            message: 'You have reached the maximum of Invite Codes you can generate for this group',
+            message: 'You have reached the maximum of invite codes you can generate.',
           },
         ],
       })
@@ -819,7 +819,9 @@ describe('generateGroupInviteCode', () => {
         }),
       ).resolves.toMatchObject({
         data: null,
-        errors: [{ message: 'Not Authorized!' }],
+        errors: [
+          { message: 'You must be a member of this group to create an invite link for it.' },
+        ],
       })
     })
   })
@@ -837,7 +839,9 @@ describe('generateGroupInviteCode', () => {
         }),
       ).resolves.toMatchObject({
         data: null,
-        errors: [{ message: 'Not Authorized!' }],
+        errors: [
+          { message: 'You must be a member of this group to create an invite link for it.' },
+        ],
       })
     })
   })
@@ -933,7 +937,7 @@ describe('invalidateInviteCode', () => {
           data: {
             invalidateInviteCode: null,
           },
-          errors: [{ message: 'Not Authorized!' }],
+          errors: [{ message: 'Invite link not found.' }],
         })
       })
     })
