@@ -41,7 +41,7 @@ export const validateEventParams = (params) => {
         max: EVENT_VENUE_MAX_LENGTH,
       })
     }
-    params.eventVenue = eventInput.eventVenue
+    params.eventVenue = venue
     params.eventLocationName = eventInput.eventLocationName?.trim()
     if (params.eventLocationName) {
       locationName = params.eventLocationName

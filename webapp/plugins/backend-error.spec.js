@@ -7,8 +7,8 @@ import backendErrorPlugin, {
 } from './backend-error.js'
 
 const translations = {
-  'backendErrors.GROUP_SLUG_TAKEN': 'slug taken',
-  'backendErrors.GROUP_TOO_MANY_CATEGORIES': 'at most {max}',
+  'backendErrors.GROUP_SAVE_SLUG_ALREADY_TAKEN': 'slug taken',
+  'backendErrors.GROUP_SAVE_TOO_MANY_CATEGORIES': 'at most {max}',
   'backendErrors.generic.BAD_USER_INPUT': 'generic input',
   'backendErrors.generic.FORBIDDEN': 'generic forbidden',
   'backendErrors.generic.UNAUTHENTICATED': 'generic unauthenticated',
@@ -16,7 +16,10 @@ const translations = {
   'backendErrors.generic.NETWORK_ERROR': 'generic network',
 }
 const i18n = {
-  $t: jest.fn((key, params) => `${translations[key]}${params ? ` ${JSON.stringify(params)}` : ''}`),
+  // Fills `{placeholder}`s from the params, as vue-i18n does.
+  $t: jest.fn((key, params = {}) =>
+    translations[key].replace(/{(\w+)}/g, (placeholder, name) => params[name] ?? placeholder),
+  ),
   $i18n: { keyExists: (key) => key in translations },
 }
 
@@ -29,7 +32,7 @@ describe('backendErrorMessage', () => {
   it('translates the errorCode', () => {
     expect(
       backendErrorMessage(
-        graphQLError({ code: 'BAD_USER_INPUT', errorCode: 'GROUP_SLUG_TAKEN' }),
+        graphQLError({ code: 'BAD_USER_INPUT', errorCode: 'GROUP_SAVE_SLUG_ALREADY_TAKEN' }),
         i18n,
       ),
     ).toBe('slug taken')
@@ -40,12 +43,12 @@ describe('backendErrorMessage', () => {
       backendErrorMessage(
         graphQLError({
           code: 'BAD_USER_INPUT',
-          errorCode: 'GROUP_TOO_MANY_CATEGORIES',
+          errorCode: 'GROUP_SAVE_TOO_MANY_CATEGORIES',
           params: { max: 3 },
         }),
         i18n,
       ),
-    ).toBe('at most {max} {"max":3}')
+    ).toBe('at most 3')
   })
 
   it.each([
@@ -80,7 +83,10 @@ describe('backendErrorMessage', () => {
   })
 
   it('keeps the message when no translations are available', () => {
-    const error = graphQLError({ code: 'BAD_USER_INPUT', errorCode: 'GROUP_SLUG_TAKEN' })
+    const error = graphQLError({
+      code: 'BAD_USER_INPUT',
+      errorCode: 'GROUP_SAVE_SLUG_ALREADY_TAKEN',
+    })
     expect(backendErrorMessage(error, { $t: jest.fn() })).toBe('GraphQL error: English text')
     expect(backendErrorMessage({ networkError: {}, message: 'down' }, { $t: jest.fn() })).toBe(
       'down',
@@ -96,7 +102,10 @@ describe('backendErrorMessage', () => {
     const wrapped = (cause) => new Error('Error: GraphQL error: English text', { cause })
 
     it('translates the errorCode of the cause', () => {
-      const cause = graphQLError({ code: 'BAD_USER_INPUT', errorCode: 'GROUP_SLUG_TAKEN' })
+      const cause = graphQLError({
+        code: 'BAD_USER_INPUT',
+        errorCode: 'GROUP_SAVE_SLUG_ALREADY_TAKEN',
+      })
       expect(backendErrorMessage(wrapped(cause), i18n)).toBe('slug taken')
     })
 
@@ -118,14 +127,16 @@ describe('backendErrorMessage', () => {
 })
 
 describe('backendErrorCode', () => {
-  const error = graphQLError({ code: 'BAD_USER_INPUT', errorCode: 'GROUP_SLUG_TAKEN' })
+  const error = graphQLError({ code: 'BAD_USER_INPUT', errorCode: 'GROUP_SAVE_SLUG_ALREADY_TAKEN' })
 
   it('is the errorCode of the first GraphQL error', () => {
-    expect(backendErrorCode(error)).toBe('GROUP_SLUG_TAKEN')
+    expect(backendErrorCode(error)).toBe('GROUP_SAVE_SLUG_ALREADY_TAKEN')
   })
 
   it('is found on the cause of a wrapping error', () => {
-    expect(backendErrorCode(new Error('wrapped', { cause: error }))).toBe('GROUP_SLUG_TAKEN')
+    expect(backendErrorCode(new Error('wrapped', { cause: error }))).toBe(
+      'GROUP_SAVE_SLUG_ALREADY_TAKEN',
+    )
   })
 
   it.each([[new Error('Ouch!')], [graphQLError({ code: 'FORBIDDEN' })], [undefined], [null]])(
@@ -190,12 +201,12 @@ describe('the backend error in the console', () => {
       logBackendError(
         graphQLError({
           code: 'BAD_USER_INPUT',
-          errorCode: 'GROUP_TOO_MANY_CATEGORIES',
+          errorCode: 'GROUP_SAVE_TOO_MANY_CATEGORIES',
           params: { max: 3 },
         }),
       )
       expect(consoleError).toHaveBeenCalledWith(
-        '[backend error] GROUP_TOO_MANY_CATEGORIES / BAD_USER_INPUT: English text',
+        '[backend error] GROUP_SAVE_TOO_MANY_CATEGORIES / BAD_USER_INPUT: English text',
         { params: { max: 3 } },
       )
     })

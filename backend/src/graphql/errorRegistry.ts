@@ -8,8 +8,7 @@
 // - `type` is Apollo's standard error class, sent as `extensions.code`.
 // - `text` is the English message for logs and API clients. A `{placeholder}` in it is filled from
 //   the params the error is thrown with; the same params go to the webapp for its translation.
-// - `params` lists values only the translation uses (e.g. a limit the English text leaves out).
-//   The compiler requires a throw site to pass exactly the placeholders plus these.
+//   The compiler requires a throw site to pass exactly the placeholders.
 //
 // Thrown as `throw new AppError(Errors.API_KEYS_FEATURE_DISABLED)` (see errors.ts).
 export type ErrorType = 'BAD_USER_INPUT' | 'FORBIDDEN' | 'UNAUTHENTICATED'
@@ -17,8 +16,6 @@ export type ErrorType = 'BAD_USER_INPUT' | 'FORBIDDEN' | 'UNAUTHENTICATED'
 interface ErrorDefinition {
   type: ErrorType
   text: string
-  // Values only the translation uses, on top of the placeholders in `text`.
-  params?: readonly string[]
 }
 
 const definitions = {
@@ -77,8 +74,7 @@ const definitions = {
   // groups
   GROUP_SAVE_DESCRIPTION_TOO_SHORT: {
     type: 'BAD_USER_INPUT',
-    text: 'Description too short.',
-    params: ['min'],
+    text: 'Description too short (at least {min} characters).',
   },
   GROUP_SAVE_HIDDEN_TYPE_NOT_PERMITTED: {
     type: 'FORBIDDEN',
@@ -95,13 +91,11 @@ const definitions = {
   },
   GROUP_SAVE_TOO_FEW_CATEGORIES: {
     type: 'BAD_USER_INPUT',
-    text: 'Too few categories.',
-    params: ['min'],
+    text: 'Too few categories (at least {min}).',
   },
   GROUP_SAVE_TOO_MANY_CATEGORIES: {
     type: 'BAD_USER_INPUT',
-    text: 'Too many categories.',
-    params: ['max'],
+    text: 'Too many categories (at most {max}).',
   },
   GROUP_MEMBERSHIP_USER_NOT_A_MEMBER: {
     type: 'BAD_USER_INPUT',

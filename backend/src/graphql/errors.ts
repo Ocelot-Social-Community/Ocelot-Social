@@ -13,14 +13,10 @@ export interface ErrorEntry {
   code: ErrorName
   type: ErrorType
   text: string
-  // Values only the translation uses, on top of the placeholders in the English text.
-  params?: readonly string[]
 }
 
-// The params an entry is thrown with: the placeholders in its text plus its declared `params`.
-type ParamNames<Entry extends ErrorEntry> =
-  | Placeholders<Entry['text']>
-  | (Entry extends { params: readonly (infer Name extends string)[] } ? Name : never)
+// The params an entry is thrown with: the placeholders in its text.
+type ParamNames<Entry extends ErrorEntry> = Placeholders<Entry['text']>
 
 // An entry without params takes none, one with params requires exactly those — so a throw site
 // cannot forget a value or pass one that nothing uses.
