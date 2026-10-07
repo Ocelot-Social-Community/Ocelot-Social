@@ -844,7 +844,11 @@
     "hashtag": {
       "addHashtag": "Hashtag i ri",
       "addLetter": "Shkruaj një shkronjë",
-      "noHashtagsFound": "Nuk u gjetën hashtag-ë"
+      "noHashtagsFound": "Nuk u gjetën hashtag-ë",
+      "relation": {
+        "popular": "Të njohura",
+        "usedByMe": "Të përdorura nga unë"
+      }
     },
     "legend": {
       "bold": "I trashë",

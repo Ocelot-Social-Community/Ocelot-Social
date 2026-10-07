@@ -157,7 +157,6 @@
             name="description"
             model="description"
             :value="formData.description"
-            :hashtags="null"
             @input="updateEditorDescription"
             @blur.native.capture="dirtyFields.description && touchField('description')"
           />

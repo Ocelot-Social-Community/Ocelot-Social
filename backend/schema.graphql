@@ -535,6 +535,21 @@ enum GroupVisibility {
   public
 }
 
+"""A hashtag offered while typing one, with the reason it is offered."""
+type HashtagSuggestion {
+  relation: HashtagSuggestionRelation!
+  tag: Tag!
+}
+
+"""Why a hashtag is suggested, most relevant first."""
+enum HashtagSuggestionRelation {
+  """Any other hashtag; ordered by how many posts carry it."""
+  popular
+
+  """The current user has tagged a post of their own with it."""
+  usedByMe
+}
+
 """An image asset (avatar, hero image, etc.) with rendering metadata."""
 type Image {
   """Alternative text for accessibility."""
@@ -1646,13 +1661,28 @@ type Query {
   embedProviders: [EmbedProvider!]!
 
   """
+  Hashtags to offer while the current user types one, ordered by `HashtagSuggestionRelation` and then by the number of posts carrying the tag. Requires authentication. Deleted and disabled tags are left out.
+  """
+  hashtagSuggestions(
+    """Maximum number of suggestions, 1–25. Default 10."""
+    first: Int
+
+    """
+    What was typed after the #. Matches the start of the tag, case-insensitively. Empty or omitted: no filter.
+    """
+    query: String
+  ): [HashtagSuggestion!]!
+
+  """
   Users to offer while the current user types an @-mention, ordered by `MentionSuggestionRelation`. Requires authentication. Leaves out everyone a mention would not reach: the current user, deleted and disabled accounts, anyone in a block with the current user (or with the post's author), and — for a post in a closed or hidden group — everyone who is not an active member.
   """
   mentionSuggestions(
     """Maximum number of suggestions, 1–25. Default 10."""
     first: Int
 
-    """The group a NEW post is written in. Ignored when `postId` is given."""
+    """
+    The group a NEW post is written in. Ignored when the post given by `postId` exists.
+    """
     groupId: ID
 
     """

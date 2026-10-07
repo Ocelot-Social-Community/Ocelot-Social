@@ -844,7 +844,11 @@
     "hashtag": {
       "addHashtag": "Новий хештег",
       "addLetter": "Введіть літеру",
-      "noHashtagsFound": "Хештеги не знайдено"
+      "noHashtagsFound": "Хештеги не знайдено",
+      "relation": {
+        "popular": "Популярні",
+        "usedByMe": "Використані мною"
+      }
     },
     "legend": {
       "bold": "Жирний",

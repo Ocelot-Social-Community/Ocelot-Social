@@ -160,13 +160,50 @@ describe('SuggestionList.vue', () => {
   })
 
   describe('hashtags', () => {
-    it('lists the tags without headings and offers to add the typed one', () => {
-      const wrapper = Wrapper({
-        suggestionType: 'hashtag',
-        filteredItems: [{ id: 'Frieden' }],
-        query: 'Frie',
+    const frieden = { id: 'Frieden', relation: 'usedByMe' }
+    const freiheit = { id: 'Freiheit', relation: 'popular' }
+    const frei = { id: 'Frei', relation: 'popular' }
+    const hashtags = (propsData) => Wrapper({ suggestionType: 'hashtag', ...propsData })
+
+    it('puts a heading before the first tag of each relation', () => {
+      const wrapper = hashtags({ filteredItems: [frieden, freiheit, frei], query: 'Fr' })
+      expect(rows(wrapper)).toEqual([
+        'editor.hashtag.relation.usedByMe',
+        '#Frieden',
+        'editor.hashtag.relation.popular',
+        '#Freiheit',
+        '#Frei',
+      ])
+    })
+
+    // The typed tag arrives as an entry (see withNewHashtag), so the arrow keys reach it.
+    it('lists the entry for a new tag under its own heading and lets it be highlighted', () => {
+      const wrapper = hashtags({
+        filteredItems: [frieden, { id: 'Fr', relation: 'new' }],
+        query: 'Fr',
+        navigatedItemIndex: 1,
       })
-      expect(rows(wrapper)).toEqual(['#Frieden', 'editor.hashtag.addHashtag', '#Frie'])
+      expect(rows(wrapper)).toEqual([
+        'editor.hashtag.relation.usedByMe',
+        '#Frieden',
+        'editor.hashtag.addHashtag',
+        '#Fr',
+      ])
+      expect(wrapper.find('.is-selected').text()).toBe('#Fr')
+    })
+
+    it('asks for a letter while nothing is typed', () => {
+      const wrapper = hashtags({ filteredItems: [frieden], query: '' })
+      expect(rows(wrapper)).toEqual([
+        'editor.hashtag.relation.usedByMe',
+        '#Frieden',
+        'editor.hashtag.addLetter',
+      ])
+    })
+
+    it('lists tags without a relation without headings', () => {
+      const wrapper = hashtags({ filteredItems: [{ id: 'Frieden' }], query: 'Frieden' })
+      expect(rows(wrapper)).toEqual(['#Frieden'])
     })
   })
 })

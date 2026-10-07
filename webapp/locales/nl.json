@@ -844,7 +844,11 @@
     "hashtag": {
       "addHashtag": "Nieuwe hashtag",
       "addLetter": "Typ een letter",
-      "noHashtagsFound": "Geen hashtags gevonden"
+      "noHashtagsFound": "Geen hashtags gevonden",
+      "relation": {
+        "popular": "Populair",
+        "usedByMe": "Door mij gebruikt"
+      }
     },
     "legend": {
       "bold": "Vet",

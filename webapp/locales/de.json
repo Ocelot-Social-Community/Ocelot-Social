@@ -844,7 +844,11 @@
     "hashtag": {
       "addHashtag": "Neuer Hashtag",
       "addLetter": "Tippe einen Buchstaben",
-      "noHashtagsFound": "Keine Hashtags gefunden"
+      "noHashtagsFound": "Keine Hashtags gefunden",
+      "relation": {
+        "popular": "Beliebt",
+        "usedByMe": "Von mir verwendet"
+      }
     },
     "legend": {
       "bold": "Fett",

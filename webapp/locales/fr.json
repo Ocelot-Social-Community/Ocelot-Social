@@ -844,7 +844,11 @@
     "hashtag": {
       "addHashtag": "Nouveau hashtag",
       "addLetter": "Tapez une lettre",
-      "noHashtagsFound": "Aucun hashtag trouvé"
+      "noHashtagsFound": "Aucun hashtag trouvé",
+      "relation": {
+        "popular": "Populaires",
+        "usedByMe": "Utilisés par moi"
+      }
     },
     "legend": {
       "bold": "Gras",

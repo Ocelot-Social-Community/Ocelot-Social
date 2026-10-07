@@ -228,6 +228,33 @@ describe('Editor.vue', () => {
         expect(wrapper.vm.suggestionsLoading).toBe(false)
       })
 
+      // An empty list looks like one that is just opening; typing on must still be debounced.
+      it('still waits for a pause in typing after an answer without matches', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        answers[''].resolve([])
+        await flushPromises()
+
+        wrapper.vm.updateSuggestionList(props('x'))
+        wrapper.vm.updateSuggestionList(props('xy'))
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(1)
+
+        jest.advanceTimersByTime(150)
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(2)
+        expect(propsData.mentionSuggestions).toHaveBeenLastCalledWith('xy')
+      })
+
+      it('still waits for a pause in typing after a failed request', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        answers[''].reject(new Error('network'))
+        await flushPromises()
+
+        wrapper.vm.updateSuggestionList(props('x'))
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(1)
+
+        jest.advanceTimersByTime(150)
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(2)
+      })
+
       it('waits for a pause in typing before it asks again', async () => {
         wrapper.vm.openSuggestionList(props(''), 'mention')
         answers[''].resolve([peter, jenny])
@@ -319,6 +346,29 @@ describe('Editor.vue', () => {
         expect(wrapper.vm.filteredItems).toEqual([])
         expect(wrapper.vm.suggestionsLoading).toBe(false)
       })
+    })
+
+    describe('loading hashtag suggestions', () => {
+      const frieden = { id: 'Frieden', relation: 'usedByMe' }
+      const freiheit = { id: 'Freiheit', relation: 'popular' }
+      const natur = { id: 'Natur', relation: 'popular' }
+      const props = (query) => ({
+        items: [],
+        query,
+        range: { from: 1, to: 2 + query.length },
+        command: jest.fn(),
+      })
+
+      beforeEach(() => {
+        jest.useFakeTimers()
+        propsData.hashtagSuggestions = jest.fn().mockResolvedValue([frieden, freiheit, natur])
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
+        wrapper = Wrapper()
+      })
+
+      afterEach(() => {
+        jest.useRealTimers()
+      })
 
       // The plugin announces a suggestion once more right after one was inserted, with the range
       // of the replaced text — the cursor is no longer in it.
@@ -326,38 +376,111 @@ describe('Editor.vue', () => {
         const viewWithCursorAt = (from) => ({ state: { selection: { from } } })
 
         it('does not open a list or ask for suggestions', () => {
-          wrapper.vm.openSuggestionList({ ...props('pe'), view: viewWithCursorAt(20) }, 'mention')
+          wrapper.vm.openSuggestionList({ ...props('fr'), view: viewWithCursorAt(20) }, 'hashtag')
 
           expect(wrapper.vm.suggestionType).toBe('')
-          expect(propsData.mentionSuggestions).not.toHaveBeenCalled()
+          expect(propsData.hashtagSuggestions).not.toHaveBeenCalled()
         })
 
         it('ignores the changes that follow it', () => {
-          wrapper.vm.openSuggestionList({ ...props('pe'), view: viewWithCursorAt(20) }, 'mention')
-          wrapper.vm.updateSuggestionList({ ...props('pet'), view: viewWithCursorAt(21) })
+          wrapper.vm.openSuggestionList({ ...props('fr'), view: viewWithCursorAt(20) }, 'hashtag')
+          wrapper.vm.updateSuggestionList({ ...props('fri'), view: viewWithCursorAt(21) })
           jest.advanceTimersByTime(150)
 
           expect(wrapper.vm.suggestionRange).toBeNull()
-          expect(propsData.mentionSuggestions).not.toHaveBeenCalled()
+          expect(propsData.hashtagSuggestions).not.toHaveBeenCalled()
         })
       })
 
+      // The cache is keyed by what was typed: "#p" must not answer for "@p".
       it('starts every list from scratch', async () => {
-        wrapper.vm.openSuggestionList(props(''), 'mention')
-        answers[''].resolve([peter, jenny])
+        propsData.mentionSuggestions.mockResolvedValue([peter])
+        wrapper.vm.openSuggestionList(props(''), 'hashtag')
         await flushPromises()
 
         wrapper.vm.openSuggestionList(props(''), 'mention')
-
         expect(wrapper.vm.filteredItems).toEqual([])
-        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(2)
+        await flushPromises()
+
+        expect(propsData.mentionSuggestions).toHaveBeenCalledWith('')
+        expect(wrapper.vm.filteredItems).toEqual([peter])
       })
 
-      it('leaves hashtags to the items the plugin filtered', () => {
-        wrapper.vm.openSuggestionList({ ...props('fr'), items: [{ id: 'Frieden' }] }, 'hashtag')
+      // Both kinds of list share one cache, keyed by what was typed.
+      it('keeps a late answer for hashtags out of the cache of a mention list', async () => {
+        let answerTags
+        propsData.hashtagSuggestions.mockImplementation(
+          () =>
+            new Promise((resolve) => {
+              answerTags = resolve
+            }),
+        )
+        wrapper.vm.openSuggestionList(props(''), 'hashtag')
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        await flushPromises()
+        answerTags([frieden])
+        await flushPromises()
 
-        expect(wrapper.vm.filteredItems).toEqual([{ id: 'Frieden' }])
+        // Typing and deleting a letter comes back to the query the tags were asked for.
+        wrapper.vm.updateSuggestionList(props('p'))
+        wrapper.vm.updateSuggestionList(props(''))
+
+        expect(wrapper.vm.filteredItems).toEqual([peter])
+      })
+
+      it('asks the hashtag loader, not the one for mentions', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'hashtag')
+        await flushPromises()
+
+        expect(propsData.hashtagSuggestions).toHaveBeenCalledWith('')
         expect(propsData.mentionSuggestions).not.toHaveBeenCalled()
+        expect(wrapper.vm.filteredItems).toEqual([frieden, freiheit, natur])
+      })
+
+      // The typed tag becomes an entry of the list, so arrow keys and Enter reach it.
+      it('appends the typed tag as an entry when it does not exist yet', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'hashtag')
+        await flushPromises()
+        propsData.hashtagSuggestions.mockResolvedValue([frieden])
+
+        wrapper.vm.updateSuggestionList(props('Frie'))
+        jest.advanceTimersByTime(150)
+        await flushPromises()
+
+        expect(wrapper.vm.filteredItems).toEqual([frieden, { id: 'Frie', relation: 'new' }])
+      })
+
+      it('creates the typed tag on Enter when it is highlighted', async () => {
+        const command = jest.fn()
+        propsData.hashtagSuggestions.mockResolvedValue([])
+        wrapper.vm.openSuggestionList({ ...props('Neu'), command }, 'hashtag')
+        await flushPromises()
+
+        wrapper.vm.navigateSuggestionList({ event: { keyCode: 13 } })
+
+        expect(command).toHaveBeenCalledWith(
+          expect.objectContaining({ attrs: { id: 'Neu', label: 'Neu' } }),
+        )
+      })
+
+      it('narrows the list on screen by the start of the tag until the answer is in', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'hashtag')
+        await flushPromises()
+
+        wrapper.vm.updateSuggestionList(props('fr'))
+
+        expect(wrapper.vm.filteredItems).toEqual([frieden, freiheit])
+      })
+
+      // The query the plugin hands over is sanitized first — only letters and digits make a tag.
+      it('asks for the sanitized query', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'hashtag')
+        await flushPromises()
+
+        wrapper.vm.updateSuggestionList(props('fr-ie!'))
+        jest.advanceTimersByTime(150)
+
+        expect(propsData.hashtagSuggestions).toHaveBeenLastCalledWith('frie')
       })
     })
 
@@ -427,76 +550,20 @@ describe('Editor.vue', () => {
         )
       })
 
-      it('suggestion list returns results prefixed by query', () => {
-        const manyHashtagsList = []
-        for (let i = 0; i < 10; i++) {
-          manyHashtagsList.push({ id: `nature${i}` })
-          manyHashtagsList.push({ id: `peace${i}` })
-          manyHashtagsList.push({ id: `democracy${i}` })
-        }
-        propsData.hashtags = manyHashtagsList
+      it('assigns the Hashtag extension when it can load suggestions', () => {
+        propsData.hashtagSuggestions = jest.fn().mockResolvedValue([])
         wrapper = Wrapper()
-        const suggestionList = wrapper.vm.editor.extensions.options.hashtag.onFilter(
-          propsData.hashtags,
-          'democracy',
+        expect(wrapper.vm.editor.extensions.options).toEqual(
+          expect.objectContaining({ hashtag: expect.anything() }),
         )
-        expect(suggestionList).toHaveLength(10)
-        for (var i = 0; i < suggestionList.length; i++) {
-          expect(suggestionList[i].id).toMatch(/^democracy.*/)
-        }
       })
 
-      it('exact match appears at the top of suggestion list', () => {
-        const manyHashtagsList = []
-        for (let i = 0; i < 25; i++) {
-          manyHashtagsList.push({ id: `peace${i}` })
-        }
-        propsData.hashtags = manyHashtagsList
-        wrapper = Wrapper()
-        expect(
-          wrapper.vm.editor.extensions.options.hashtag.onFilter(propsData.hashtags, 'peace7')[0].id,
-        ).toMatch('peace7')
-      })
-
-      it('sets the Hashtag items to the hashtags', () => {
-        propsData.hashtags = [
-          {
-            id: 'Frieden',
-          },
-        ]
-        wrapper = Wrapper()
-        expect(wrapper.vm.editor.extensions.options.hashtag.items()).toEqual(propsData.hashtags)
-      })
-
-      it('hashtags is not an option when there are no hashtags', () => {
+      it('hashtags is not an option when suggestions cannot be loaded', () => {
         expect(wrapper.vm.editor.extensions.options).toEqual(
           expect.not.objectContaining({
             hashtag: expect.anything(),
           }),
         )
-      })
-
-      describe('limists suggestion list to 15 hashtags', () => {
-        beforeEach(() => {
-          const manyHashtagsList = []
-          for (let i = 0; i < 25; i++) {
-            manyHashtagsList.push({ id: `hashtag${i}` })
-          }
-          propsData.hashtags = manyHashtagsList
-          wrapper = Wrapper()
-        })
-
-        it('when query is empty', () => {
-          expect(
-            wrapper.vm.editor.extensions.options.hashtag.onFilter(propsData.hashtags),
-          ).toHaveLength(15)
-        })
-
-        it('when query is present', () => {
-          expect(
-            wrapper.vm.editor.extensions.options.hashtag.onFilter(propsData.hashtags, 'hashtag'),
-          ).toHaveLength(15)
-        })
       })
     })
   })
