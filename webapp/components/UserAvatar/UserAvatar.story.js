@@ -96,6 +96,16 @@ storiesOf('UserAvatar', module)
     }),
     template: '<user-avatar :user="user" :show-slug="true" />',
   }))
+  // The two lines swapped: the name on the prominent one, the slug below — as the mention
+  // suggestions in the editor list their users.
+  .add('name first', () => ({
+    components: { UserAvatar },
+    store: helpers.store,
+    data: () => ({
+      user,
+    }),
+    template: '<user-avatar :user="user" :show-slug="true" name-first />',
+  }))
   .add('with date', () => ({
     components: { UserAvatar },
     store: helpers.store,

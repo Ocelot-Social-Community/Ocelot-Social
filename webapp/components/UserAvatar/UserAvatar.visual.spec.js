@@ -7,6 +7,11 @@ test.describe('UserAvatar visual regression', () => {
     await expect(root).toHaveScreenshot('user-only.png')
   })
 
+  test('name first', async ({ page }) => {
+    const root = await gotoStory(page, 'useravatar--name-first')
+    await expect(root).toHaveScreenshot('name-first.png')
+  })
+
   test('with date', async ({ page }) => {
     const root = await gotoStory(page, 'useravatar--with-date')
     await expect(root).toHaveScreenshot('with-date.png')
