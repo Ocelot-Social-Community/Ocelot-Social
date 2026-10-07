@@ -173,7 +173,7 @@ describe('slugifyMiddleware', () => {
             ).resolves.toMatchObject({
               errors: [
                 {
-                  message: 'Group with this slug already exists!',
+                  message: 'Group with this slug already exists.',
                 },
               ],
             })
@@ -279,7 +279,7 @@ describe('slugifyMiddleware', () => {
               ).resolves.toMatchObject({
                 errors: [
                   {
-                    message: 'Group with this slug already exists!',
+                    message: 'Group with this slug already exists.',
                   },
                 ],
               })
@@ -408,7 +408,7 @@ describe('slugifyMiddleware', () => {
             ).resolves.toMatchObject({
               errors: [
                 {
-                  message: 'Post with this slug already exists!',
+                  message: 'Post with this slug already exists.',
                 },
               ],
             })
@@ -548,7 +548,7 @@ describe('slugifyMiddleware', () => {
             ).resolves.toMatchObject({
               errors: [
                 {
-                  message: 'Post with this slug already exists!',
+                  message: 'Post with this slug already exists.',
                 },
               ],
             })
@@ -675,7 +675,7 @@ describe('slugifyMiddleware', () => {
             ).resolves.toMatchObject({
               errors: [
                 {
-                  message: 'User with this slug already exists!',
+                  message: 'User with this slug already exists.',
                 },
               ],
             })

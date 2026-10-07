@@ -4,7 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UnverifiedEmailAddress } from '@db/schema/entities/UnverifiedEmailAddress'
 import { validateProperty } from '@db/schema/validate'
-import { UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError } from '@graphql/errors'
 
 import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'
@@ -37,7 +38,7 @@ export default {
       // Was neode's Joi validator, called for its throw and nothing else. Only the address is
       // checked here — the node is written further down, with its own nonce and timestamp.
       if (validateProperty(UnverifiedEmailAddress, 'email', args.email)) {
-        throw new UserInputError('must be a valid email')
+        throw new AppError(Errors.EMAIL_CHANGE_ADDRESS_INVALID)
       }
 
       // check email does not belong to anybody
@@ -71,7 +72,7 @@ export default {
         })
         const response = txResult[0]
         if (!response) {
-          throw new UserInputError('User not found.')
+          throw new AppError(Errors.USER_DOES_NOT_EXIST)
         }
         return response
       } finally {
@@ -108,14 +109,14 @@ export default {
         response = txResult[0]
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
-          throw new UserInputError('A user account with this email already exists.')
+          throw new AppError(Errors.EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE)
         }
         throw e
       } finally {
         await session.close()
       }
       if (!response) {
-        throw new UserInputError('Invalid nonce or no email address found.')
+        throw new AppError(Errors.EMAIL_CHANGE_CONFIRMATION_CODE_INVALID)
       }
       return response
     },

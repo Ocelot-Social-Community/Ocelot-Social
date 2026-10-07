@@ -8,7 +8,8 @@
 import { createRequire } from 'node:module'
 
 import CONFIG from '@config/index'
-import { AuthenticationError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError } from '@graphql/errors'
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { isPermissionAvailable } from '@src/permission'
 import { dominates } from '@src/role'
@@ -539,8 +540,8 @@ const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
   // Self-review is a conflict-of-interest case, not a privilege-escalation one: you can
   // never strictly dominate your own permission set, so the dominance check below would
   // reject it with a generic "Not Authorized!". Let it pass here and leave it to
-  // validateReview, which rejects self-review with the specific "You cannot review
-  // yourself!" message. Self stays blocked — just by the rule that owns that concern.
+  // validateReview, which rejects self-review with the specific REVIEW_TARGET_IS_OWN
+  // error. Self stays blocked — just by the rule that owns that concern.
   if (resourceId === context.user?.id) {
     return true
   }
@@ -839,6 +840,6 @@ export default shield(
     debug,
     allowExternalErrors,
     fallbackRule: allow,
-    fallbackError: new AuthenticationError('Not Authorized!'),
+    fallbackError: new AppError(Errors.PERMISSION_RULE_ACCESS_DENIED),
   },
 )

@@ -811,7 +811,7 @@ export default {
           })
         })
         .catch((err) => {
-          this.$toast.error(err.message)
+          this.$toastBackendError(err)
           this.loading = false
         })
     },

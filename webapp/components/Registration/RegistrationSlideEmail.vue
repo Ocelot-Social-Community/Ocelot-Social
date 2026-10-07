@@ -30,7 +30,6 @@
 import gql from 'graphql-tag'
 import metadata from '~/constants/metadata'
 import { isEmail } from 'validator'
-import translateErrorMessage from '~/components/utils/TranslateErrorMessage'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
@@ -176,16 +175,7 @@ export default {
           })
           this.setButtonValues()
 
-          this.$toast.error(
-            translateErrorMessage(
-              err.message,
-              {
-                'A user account with this email already exists':
-                  'components.registration.signup.form.errors.email-exists',
-              },
-              this.$t,
-            ),
-          )
+          this.$toastBackendError(err)
           return false
         }
       }

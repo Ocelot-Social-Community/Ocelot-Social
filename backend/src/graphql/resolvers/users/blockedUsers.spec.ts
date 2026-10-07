@@ -132,7 +132,7 @@ describe('blockUser', () => {
         ).resolves.toMatchObject({
           errors: [
             {
-              message: 'Could not find User',
+              message: 'Could not find user.',
             },
           ],
         })
@@ -411,7 +411,7 @@ describe('unblockUser', () => {
         ).resolves.toMatchObject({
           errors: [
             {
-              message: 'Could not find blocked User',
+              message: 'Could not find blocked user.',
             },
           ],
         })
@@ -433,7 +433,7 @@ describe('unblockUser', () => {
           ).resolves.toMatchObject({
             errors: [
               {
-                message: 'Could not find blocked User',
+                message: 'Could not find blocked user.',
               },
             ],
           })
@@ -464,7 +464,7 @@ describe('unblockUser', () => {
             ).resolves.toMatchObject({
               errors: [
                 {
-                  message: 'Could not find blocked User',
+                  message: 'Could not find blocked user.',
                 },
               ],
             })

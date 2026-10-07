@@ -126,7 +126,7 @@ describe('Room', () => {
               },
             }),
           ).resolves.toMatchObject({
-            errors: [{ message: 'Cannot create a room with self' }],
+            errors: [{ message: 'You cannot create a chat with yourself.' }],
           })
         })
       })

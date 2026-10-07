@@ -14,7 +14,8 @@ import {
   GROUP_MEMBERSHIP_VISIBILITY_CHANGED,
   GROUP_SHOW_MEMBERS_CHANGED,
 } from '@constants/subscriptions'
-import { ForbiddenError, UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError, UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 import { branding } from '@src/branding'
 
@@ -216,21 +217,23 @@ export default {
       // category DB (mirrors the frontend gating in getCategoriesMixin).
       const enforceCategories = policy.get('categoriesActive') && (await categoriesExist(context))
       if (enforceCategories && (!categoryIds || categoryIds.length < branding.category.min)) {
-        throw new UserInputError('Too few categories!')
+        throw new AppError(Errors.GROUP_SAVE_TOO_FEW_CATEGORIES, { min: branding.category.min })
       }
       if (
         policy.get('categoriesActive') &&
         categoryIds &&
         categoryIds.length > branding.category.max
       ) {
-        throw new UserInputError('Too many categories!')
+        throw new AppError(Errors.GROUP_SAVE_TOO_MANY_CATEGORIES, { max: branding.category.max })
       }
       if (
         params.description === undefined ||
         params.description === null ||
         removeHtmlTags(params.description).length < branding.group.descriptionMinLength
       ) {
-        throw new UserInputError('Description too short!')
+        throw new AppError(Errors.GROUP_SAVE_DESCRIPTION_TOO_SHORT, {
+          min: branding.group.descriptionMinLength,
+        })
       }
       params.id = params.id || uuid()
       const session = context.driver.session()
@@ -290,7 +293,7 @@ export default {
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
-          throw new UserInputError('Group with this slug already exists!')
+          throw new AppError(Errors.GROUP_SAVE_SLUG_ALREADY_TAKEN)
         }
         throw error
       } finally {
@@ -308,17 +311,19 @@ export default {
 
       if (policy.get('categoriesActive') && categoryIds) {
         if (categoryIds.length < branding.category.min) {
-          throw new UserInputError('Too few categories!')
+          throw new AppError(Errors.GROUP_SAVE_TOO_FEW_CATEGORIES, { min: branding.category.min })
         }
         if (categoryIds.length > branding.category.max) {
-          throw new UserInputError('Too many categories!')
+          throw new AppError(Errors.GROUP_SAVE_TOO_MANY_CATEGORIES, { max: branding.category.max })
         }
       }
       if (
         params.description &&
         removeHtmlTags(params.description).length < branding.group.descriptionMinLength
       ) {
-        throw new UserInputError('Description too short!')
+        throw new AppError(Errors.GROUP_SAVE_DESCRIPTION_TOO_SHORT, {
+          min: branding.group.descriptionMinLength,
+        })
       }
       const session = context.driver.session()
       try {
@@ -340,7 +345,7 @@ export default {
             previousGroupType !== 'hidden' &&
             !context.effectivePermissions.has('group.create_hidden')
           ) {
-            throw new ForbiddenError('Not Authorized!')
+            throw new AppError(Errors.GROUP_SAVE_HIDDEN_TYPE_NOT_PERMITTED)
           }
           if (policy.get('categoriesActive') && categoryIds?.length) {
             await transaction.run(
@@ -408,7 +413,7 @@ export default {
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
-          throw new UserInputError('Group with this slug already exists!')
+          throw new AppError(Errors.GROUP_SAVE_SLUG_ALREADY_TAKEN)
         }
         throw error
       } finally {
@@ -563,7 +568,7 @@ export default {
           )
           const [membership] = result.records.map((r) => r.get('membership'))
           if (!membership) {
-            throw new UserInputError('User is not a member of this group')
+            throw new AppError(Errors.GROUP_MEMBERSHIP_USER_NOT_A_MEMBER)
           }
           void context.pubsub.publish(GROUP_MEMBERSHIP_VISIBILITY_CHANGED, {
             groupMembershipVisibilityChanged: { userId },
@@ -673,7 +678,7 @@ export default {
   Group: {
     myRole: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.id) {
-        throw new Error('Can not identify selected Group!')
+        throw new AppError(Errors.GROUP_FIELD_GROUP_ID_MISSING)
       }
       return (
         await context.database.query({
@@ -690,7 +695,7 @@ export default {
     },
     inviteCodes: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.id) {
-        throw new Error('Can not identify selected Group!')
+        throw new AppError(Errors.GROUP_FIELD_GROUP_ID_MISSING)
       }
       return (
         await context.database.query({
@@ -708,7 +713,7 @@ export default {
     },
     postsCount: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.id) {
-        throw new Error('Can not identify selected Group!')
+        throw new AppError(Errors.GROUP_FIELD_GROUP_ID_MISSING)
       }
       const result = await context.database.query({
         query: `
@@ -721,7 +726,7 @@ export default {
     },
     currentlyPinnedPostsCount: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.id) {
-        throw new Error('Can not identify selected Group!')
+        throw new AppError(Errors.GROUP_FIELD_GROUP_ID_MISSING)
       }
       const result = await context.database.query({
         query: `
@@ -881,7 +886,7 @@ const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId)
       return { user: record.get('user'), membership: record.get('membership') }
     })
     if (!result) {
-      throw new UserInputError('User is not a member of this group')
+      throw new AppError(Errors.GROUP_MEMBERSHIP_USER_NOT_A_MEMBER)
     }
     // Remove user from group chat room
     await removeUserFromGroupChatRoom(transaction, groupId, userId)

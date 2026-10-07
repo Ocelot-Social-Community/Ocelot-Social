@@ -76,7 +76,9 @@ export default {
         })
         this.$toast.success(this.$t('invite-codes.create-success'))
       } catch (error) {
-        this.$toast.error(this.$t('invite-codes.create-error', { error: error.message }))
+        this.$toast.error(
+          this.$t('invite-codes.create-error', { error: this.$backendError(error) }),
+        )
       } finally {
         this.loadingGenerateCode = false
       }
@@ -102,7 +104,9 @@ export default {
         })
         this.$toast.success(this.$t('invite-codes.invalidate-success'))
       } catch (error) {
-        this.$toast.error(this.$t('invite-codes.invalidate-error', { error: error.message }))
+        this.$toast.error(
+          this.$t('invite-codes.invalidate-error', { error: this.$backendError(error) }),
+        )
       } finally {
         this.invalidatingCodes.delete(code)
       }

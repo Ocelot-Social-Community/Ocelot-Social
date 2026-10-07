@@ -248,7 +248,7 @@ describe('SignupVerification', () => {
             await expect(
               mutate({ mutation: SignupVerification, variables }),
             ).resolves.toMatchObject({
-              errors: [{ message: 'Invalid email or nonce' }],
+              errors: [{ message: 'Invalid email or nonce.' }],
             })
           })
         })
@@ -488,7 +488,7 @@ describe('SignupVerification', () => {
             await expect(
               mutate({ mutation: SignupVerification, variables }),
             ).resolves.toMatchObject({
-              errors: [{ message: 'Invalid email or nonce' }],
+              errors: [{ message: 'Invalid email or nonce.' }],
             })
           })
         })

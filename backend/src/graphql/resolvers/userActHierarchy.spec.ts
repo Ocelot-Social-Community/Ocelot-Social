@@ -137,7 +137,7 @@ describe('act-on hierarchy', () => {
         mutate({ mutation: DISABLE_USER, variables: { id: 'no-such-user', disable: true } }),
       ).resolves.toMatchObject({
         data: { disableUser: null },
-        errors: [{ message: 'Could not find User' }],
+        errors: [{ message: 'Could not find user.' }],
       })
     })
   })

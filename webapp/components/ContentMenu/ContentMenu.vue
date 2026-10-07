@@ -394,7 +394,7 @@ export default {
                 this.$toast.success(this.$t(`${action}.success`))
                 this.$set(this.resource, 'disabled', disable)
               } catch (err) {
-                this.$toast.error(err.message)
+                this.$toastBackendError(err)
                 throw err
               }
             },

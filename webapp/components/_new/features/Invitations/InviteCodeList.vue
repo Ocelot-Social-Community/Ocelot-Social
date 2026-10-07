@@ -142,6 +142,7 @@ export default {
       toast: this.$toast,
       t: (key, ...args) => this.$t(key, ...args),
       store: this.$store,
+      backendError: (error) => this.$backendError(error),
     })
     this._generateInviteCode = generatePersonalInviteCode
     this._invalidateInviteCode = invalidateInviteCode
