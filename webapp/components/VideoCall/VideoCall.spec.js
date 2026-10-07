@@ -1341,6 +1341,22 @@ describe('VideoCall', () => {
         expect($toast.error).not.toHaveBeenCalled()
       })
 
+      it('starts a fresh restart after a retry while the old one still runs', async () => {
+        // retryConnect() disconnects the failed room without going through cleanup().
+        const { wrapper, room } = await connected()
+        const oldTrack = fakeMicTrack({ restartTrack: jest.fn(() => new Promise(() => {})) })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track: oldTrack })
+        const stale = wrapper.vm.restartMic()
+
+        await wrapper.vm.retryConnect()
+        const newTrack = fakeMicTrack()
+        wrapper.vm.room.localParticipant.getTrackPublication.mockReturnValue({ track: newTrack })
+        const fresh = wrapper.vm.restartMic()
+        expect(fresh).not.toBe(stale)
+        await fresh
+        expect(newTrack.restartTrack).toHaveBeenCalled()
+      })
+
       it('starts a fresh restart in a new call while the old one still runs', async () => {
         const { wrapper, room } = await connected()
         let finishOld

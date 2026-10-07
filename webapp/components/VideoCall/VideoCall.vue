@@ -826,6 +826,9 @@ export default {
       this.audioBlocked = false
       this.micProblem = false
       this.reconnecting = false
+      // A restart still running belongs to the previous attempt's room — retryConnect()
+      // tears that down without cleanup(), so let go of it here for every way in.
+      this.micRestart = null
       this.resetAudioOnly()
       try {
         if (!this.groupId) throw new Error('Missing group id')
