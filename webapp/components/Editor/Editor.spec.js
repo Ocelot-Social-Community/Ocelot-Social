@@ -311,6 +311,55 @@ describe('Editor.vue', () => {
       })
     })
 
+    // Regression: with the list open, moving the focus elsewhere hid it for good — tippy hid its
+    // instance on the outside click, the editor still held one and so never showed it again.
+    describe('leaving and re-entering the editor with the list open', () => {
+      let menu
+
+      beforeEach(async () => {
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
+        wrapper = mount(Editor, {
+          mocks,
+          propsData,
+          localVue,
+          sync: false,
+          stubs,
+          attachTo: document.body,
+        })
+        const { view } = wrapper.vm.editor
+        view.dispatch(view.state.tr.insertText('@'))
+        await wrapper.vm.$nextTick()
+        await wrapper.vm.$nextTick()
+        await flushPromises()
+        menu = wrapper.vm.$refs.contextMenu.menu
+        jest.spyOn(menu, 'hide')
+        jest.spyOn(menu, 'show')
+      })
+
+      it('does not leave hiding to a click outside', () => {
+        expect(menu.props.hideOnClick).toBe(false)
+      })
+
+      it('hides the list on blur and keeps it', () => {
+        wrapper.vm.editor.emit('blur', {})
+        expect(menu.hide).toHaveBeenCalled()
+        expect(wrapper.vm.$refs.contextMenu.menu).toBe(menu)
+      })
+
+      it('shows the list again on focus', () => {
+        wrapper.vm.editor.emit('blur', {})
+        wrapper.vm.editor.emit('focus', {})
+        expect(menu.show).toHaveBeenCalled()
+      })
+
+      it('shows nothing on focus once the list was closed', () => {
+        wrapper.vm.closeSuggestionList()
+        wrapper.vm.editor.emit('focus', {})
+        expect(menu.show).not.toHaveBeenCalled()
+        expect(wrapper.vm.$refs.contextMenu.menu).toBeFalsy()
+      })
+    })
+
     describe('optional extensions', () => {
       it('assigns the Mention extension when it can load suggestions', () => {
         propsData.mentionSuggestions = jest.fn().mockResolvedValue([])

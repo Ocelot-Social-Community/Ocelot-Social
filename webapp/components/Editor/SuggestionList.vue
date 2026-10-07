@@ -1,10 +1,13 @@
 <template>
-  <!-- The edges fade where the list goes on — see scrollMaskStyle. -->
+  <!-- The edges fade where the list goes on — see scrollMaskStyle.
+       mousedown.prevent: pressing the mouse on the list must not take the focus out of the editor,
+       which hides the list (Editor.vue, onBlur) before the click on an entry lands. -->
   <ul
     v-show="showSuggestions"
     class="suggestion-list"
     :style="scrollMaskStyle"
     @scroll="updateScrollFades"
+    @mousedown.prevent
   >
     <template v-for="(item, index) in filteredItems">
       <li

@@ -133,6 +133,15 @@ describe('SuggestionList.vue', () => {
       })
     })
 
+    // Pressing the mouse on the list must not blur the editor: that would hide the list before
+    // the click on an entry lands.
+    it('keeps the focus where it is when the mouse is pressed on the list', () => {
+      const wrapper = Wrapper({ filteredItems: [peter] })
+      const mousedown = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
+      wrapper.findAll('li').at(1).element.dispatchEvent(mousedown)
+      expect(mousedown.defaultPrevented).toBe(true)
+    })
+
     it('shows no heading for users without a relation', () => {
       const wrapper = Wrapper({ filteredItems: [{ id: 'u9', slug: 'nobody', name: 'Nobody' }] })
       expect(rows(wrapper)).toEqual(['Nobody @nobody'])

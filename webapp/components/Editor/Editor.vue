@@ -163,7 +163,19 @@ export default {
           this.onUpdate(e)
         }, 300)
       },
+      onFocus: () => {
+        // Back in the editor with the cursor still in the "@…"/"#…" it left: the list returns.
+        // (A click elsewhere in the text moves the cursor out, and the plugin closes the list.)
+        if (this.suggestionRange) {
+          this.$refs.contextMenu.resume()
+        }
+      },
       onBlur: () => {
+        // The list belongs to what is being typed; without the focus it would hang over whatever
+        // the user turned to. Suspended, not closed — see onFocus.
+        if (this.suggestionRange) {
+          this.$refs.contextMenu.suspend()
+        }
         // Flush any pending throttled update immediately so formData is
         // in sync before the form validates on submit.
         if (this._throttleTimer !== undefined) {
