@@ -565,6 +565,24 @@ describe('joinGroupVideoCall', () => {
       expect(second).toMatch(/^member-1#[0-9a-f]{8}$/)
       expect(second).not.toBe(first)
     })
+
+    it('issues a short-lived ticket, not one that outlives the decisions behind it', async () => {
+      // The webapp fetches the token while the pre-join dialog is still open. Its own
+      // 60 s reuse limit is no security boundary — the expiry is: a token copied aside
+      // must not open a call, or let an ex-member in, hours later. In-call reconnects
+      // use the fresh tokens LiveKit pushes to connected clients.
+      livekitConfig = ENABLED_LIVEKIT
+      authenticatedUser = memberJson
+      await Factory.build(
+        'group',
+        { id: 'meta-4', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+        { ownerId: 'member-1' },
+      )
+
+      await mutate({ mutation: JoinGroupVideoCall, variables: { groupId: 'meta-4' } })
+
+      expect(vi.mocked(AccessToken).mock.calls.at(-1)?.[2]).toMatchObject({ ttl: '10m' })
+    })
   })
 })
 

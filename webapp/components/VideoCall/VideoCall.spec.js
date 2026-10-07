@@ -24,6 +24,8 @@ jest.mock('livekit-client', () => {
     Reconnecting: 'Reconnecting',
     Reconnected: 'Reconnected',
     MediaDevicesChanged: 'MediaDevicesChanged',
+    TrackPublished: 'TrackPublished',
+    ConnectionQualityChanged: 'ConnectionQualityChanged',
   }
   const TrackEvent = {
     UpstreamPaused: 'upstreamPaused',
@@ -131,6 +133,7 @@ const factory = (state = {}) => {
       $route,
       $router,
       $t: (k, vars) => (vars ? `${k}:${JSON.stringify(vars)}` : k),
+      ...(state.apollo ? { $apollo: state.apollo } : {}),
     },
     stubs,
   })
@@ -1338,6 +1341,22 @@ describe('VideoCall', () => {
         expect($toast.error).not.toHaveBeenCalled()
       })
 
+      it('starts a fresh restart after a retry while the old one still runs', async () => {
+        // retryConnect() disconnects the failed room without going through cleanup().
+        const { wrapper, room } = await connected()
+        const oldTrack = fakeMicTrack({ restartTrack: jest.fn(() => new Promise(() => {})) })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track: oldTrack })
+        const stale = wrapper.vm.restartMic()
+
+        await wrapper.vm.retryConnect()
+        const newTrack = fakeMicTrack()
+        wrapper.vm.room.localParticipant.getTrackPublication.mockReturnValue({ track: newTrack })
+        const fresh = wrapper.vm.restartMic()
+        expect(fresh).not.toBe(stale)
+        await fresh
+        expect(newTrack.restartTrack).toHaveBeenCalled()
+      })
+
       it('starts a fresh restart in a new call while the old one still runs', async () => {
         const { wrapper, room } = await connected()
         let finishOld
@@ -1418,6 +1437,293 @@ describe('VideoCall', () => {
       expect(wrapper.vm.audioBlocked).toBe(false)
       expect(wrapper.vm.micProblem).toBe(false)
       expect(wrapper.vm.reconnecting).toBe(false)
+    })
+  })
+
+  describe('join token fetched during the pre-join dialog', () => {
+    const payload = { url: 'ws://lk', token: 'tok' }
+    const apolloResolving = () => ({
+      mutate: jest.fn().mockResolvedValue({ data: { joinGroupVideoCall: payload } }),
+    })
+
+    it('asks for the token as soon as the dialog opens and joins with it', async () => {
+      const apollo = apolloResolving()
+      const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
+      await flushPromises()
+      expect(apollo.mutate).toHaveBeenCalledTimes(1)
+      expect(apollo.mutate.mock.calls[0][0].variables).toEqual({ groupId: 'g1' })
+
+      await wrapper.vm.connect()
+      // The click only opens the socket — no second round trip.
+      expect(apollo.mutate).toHaveBeenCalledTimes(1)
+      expect(wrapper.vm.room.connect).toHaveBeenCalledWith('ws://lk', 'tok', expect.any(Object))
+      expect(wrapper.vm.phase).toBe('in-call')
+    })
+
+    it('waits for a request that is still under way', async () => {
+      let resolve
+      const apollo = {
+        mutate: jest.fn().mockReturnValue(
+          new Promise((r) => {
+            resolve = r
+          }),
+        ),
+      }
+      const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
+      const joining = wrapper.vm.connect()
+      await flushPromises()
+      resolve({ data: { joinGroupVideoCall: payload } })
+      await joining
+      expect(apollo.mutate).toHaveBeenCalledTimes(1)
+      expect(wrapper.vm.phase).toBe('in-call')
+    })
+
+    it('asks again once the token is too old to vouch for the open-call right', async () => {
+      const apollo = apolloResolving()
+      const now = jest.spyOn(Date, 'now').mockReturnValue(1_000_000)
+      try {
+        const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
+        await flushPromises()
+        now.mockReturnValue(1_000_000 + 60_000)
+        await wrapper.vm.connect()
+        expect(apollo.mutate).toHaveBeenCalledTimes(2)
+      } finally {
+        now.mockRestore()
+      }
+    })
+
+    it('lets the join report the error instead of the background request', async () => {
+      const apollo = {
+        mutate: jest
+          .fn()
+          .mockRejectedValueOnce(new Error('prefetch failed'))
+          .mockRejectedValueOnce(new Error('join failed')),
+      }
+      const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
+      await flushPromises()
+      await wrapper.vm.connect()
+      expect(apollo.mutate).toHaveBeenCalledTimes(2)
+      expect(wrapper.vm.error).toBe('join failed')
+    })
+
+    it('uses a token only once, so a retry asks for a fresh one', async () => {
+      const apollo = apolloResolving()
+      const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
+      await flushPromises()
+      await wrapper.vm.connect()
+      await wrapper.vm.retryConnect()
+      expect(apollo.mutate).toHaveBeenCalledTimes(2)
+    })
+
+    it('never hands out a token fetched for another group', async () => {
+      const apollo = apolloResolving()
+      const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
+      await flushPromises()
+      await wrapper.vm.takeJoinPayload('g2')
+      expect(apollo.mutate).toHaveBeenCalledTimes(2)
+      expect(apollo.mutate.mock.calls[1][0].variables).toEqual({ groupId: 'g2' })
+    })
+
+    it('does not ask without a group', async () => {
+      const apollo = apolloResolving()
+      factory({ show: true, groupId: null, apollo })
+      await flushPromises()
+      expect(apollo.mutate).not.toHaveBeenCalled()
+    })
+
+    it('forgets the token when the call is closed', async () => {
+      const apollo = apolloResolving()
+      const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
+      await flushPromises()
+      await wrapper.vm.cleanup()
+      expect(wrapper.vm.prefetched).toBeNull()
+    })
+  })
+
+  describe('connection quality', () => {
+    const remoteParticipant = (identity, pubs = []) => ({
+      identity,
+      name: identity,
+      connectionQuality: 'excellent',
+      isCameraEnabled: true,
+      audioTrackPublications: new Map(),
+      videoTrackPublications: new Map(pubs.map((pub, i) => [`${identity}-${i}`, pub])),
+    })
+    // isDesired mirrors LiveKit: true until setSubscribed(false), then whatever was asked.
+    const videoPub = (source) => {
+      const pub = { source, track: { sid: source }, isDesired: true }
+      pub.setSubscribed = jest.fn((subscribed) => {
+        pub.isDesired = subscribed
+      })
+      return pub
+    }
+
+    const connected = async () => {
+      const built = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
+      built.wrapper.vm.$apollo = {
+        mutate: jest
+          .fn()
+          .mockResolvedValue({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } }),
+      }
+      await built.wrapper.vm.connect()
+      const room = built.wrapper.vm.room
+      const camera = videoPub('camera')
+      const screen = videoPub('screen_share')
+      room.remoteParticipants.set('bob', remoteParticipant('bob', [camera, screen]))
+      return { ...built, room, camera, screen }
+    }
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it("puts every participant's rating on their tile", async () => {
+      const { wrapper, room } = await connected()
+      room.remoteParticipants.get('bob').connectionQuality = 'poor'
+      room.handlers.ConnectionQualityChanged('poor', room.remoteParticipants.get('bob'))
+      const bob = wrapper.vm.tiles.find((t) => t.identity === 'bob' && !t.isScreen)
+      expect(bob.connectionQuality).toBe('poor')
+      // The local participant of the mock carries no rating yet.
+      expect(wrapper.vm.tiles.find((t) => t.isLocal).connectionQuality).toBe('unknown')
+      // Someone else's weak line is no reason to drop our videos.
+      expect(wrapper.vm.qualityTimer).toBeNull()
+    })
+
+    it('pauses the cameras once our own connection stays weak', async () => {
+      jest.useFakeTimers()
+      const { wrapper, room, camera, screen } = await connected()
+      room.handlers.ConnectionQualityChanged('poor', room.localParticipant)
+      jest.advanceTimersByTime(4_999)
+      expect(wrapper.vm.audioOnly).toBe(false)
+      jest.advanceTimersByTime(1)
+      expect(wrapper.vm.audioOnly).toBe(true)
+      expect(camera.setSubscribed).toHaveBeenCalledWith(false)
+      // Screen shares are what the call is about — they keep running.
+      expect(screen.setSubscribed).not.toHaveBeenCalled()
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('[data-test="video-call-audio-only"]').exists()).toBe(true)
+    })
+
+    it('keeps counting while a weak line flips between poor and lost', async () => {
+      jest.useFakeTimers()
+      const { wrapper, room } = await connected()
+      room.handlers.ConnectionQualityChanged('poor', room.localParticipant)
+      jest.advanceTimersByTime(3000)
+      room.handlers.ConnectionQualityChanged('lost', room.localParticipant)
+      jest.advanceTimersByTime(2000)
+      expect(wrapper.vm.audioOnly).toBe(true)
+    })
+
+    it('keeps counting while a recovered line flips between good and excellent', async () => {
+      jest.useFakeTimers()
+      const { wrapper, room } = await connected()
+      room.handlers.ConnectionQualityChanged('poor', room.localParticipant)
+      jest.advanceTimersByTime(5000)
+      room.handlers.ConnectionQualityChanged('good', room.localParticipant)
+      jest.advanceTimersByTime(15000)
+      room.handlers.ConnectionQualityChanged('excellent', room.localParticipant)
+      jest.advanceTimersByTime(5000)
+      expect(wrapper.vm.audioOnly).toBe(false)
+    })
+
+    it('ignores a dip that recovers within the grace period', async () => {
+      jest.useFakeTimers()
+      const { wrapper, room } = await connected()
+      room.handlers.ConnectionQualityChanged('lost', room.localParticipant)
+      jest.advanceTimersByTime(3_000)
+      room.handlers.ConnectionQualityChanged('good', room.localParticipant)
+      jest.advanceTimersByTime(10_000)
+      expect(wrapper.vm.audioOnly).toBe(false)
+    })
+
+    it('brings the cameras back only after the connection has been fine for a while', async () => {
+      jest.useFakeTimers()
+      const { wrapper, room, camera } = await connected()
+      room.handlers.ConnectionQualityChanged('poor', room.localParticipant)
+      jest.advanceTimersByTime(5_000)
+      room.handlers.ConnectionQualityChanged('excellent', room.localParticipant)
+      jest.advanceTimersByTime(19_999)
+      expect(wrapper.vm.audioOnly).toBe(true)
+      jest.advanceTimersByTime(1)
+      expect(wrapper.vm.audioOnly).toBe(false)
+      expect(camera.setSubscribed).toHaveBeenLastCalledWith(true)
+    })
+
+    it('stays in audio-only mode while the rating is unknown', async () => {
+      jest.useFakeTimers()
+      const { wrapper, room } = await connected()
+      room.handlers.ConnectionQualityChanged('poor', room.localParticipant)
+      jest.advanceTimersByTime(5_000)
+      room.handlers.ConnectionQualityChanged('unknown', room.localParticipant)
+      jest.advanceTimersByTime(60_000)
+      expect(wrapper.vm.audioOnly).toBe(true)
+    })
+
+    it('respects a user who wants the videos back', async () => {
+      jest.useFakeTimers()
+      const { wrapper, room, camera } = await connected()
+      room.handlers.ConnectionQualityChanged('poor', room.localParticipant)
+      jest.advanceTimersByTime(5_000)
+      await wrapper.vm.$nextTick()
+      await wrapper.find('[data-test="video-call-show-videos"]').trigger('click')
+      expect(wrapper.vm.audioOnly).toBe(false)
+      expect(camera.setSubscribed).toHaveBeenLastCalledWith(true)
+
+      room.handlers.ConnectionQualityChanged('good', room.localParticipant)
+      room.handlers.ConnectionQualityChanged('poor', room.localParticipant)
+      jest.advanceTimersByTime(60_000)
+      expect(wrapper.vm.audioOnly).toBe(false)
+    })
+
+    it('keeps cameras that arrive during audio-only mode paused', async () => {
+      const { wrapper, room, camera } = await connected()
+      room.handlers.TrackPublished()
+      room.handlers.TrackSubscribed()
+      expect(camera.setSubscribed).not.toHaveBeenCalled()
+
+      wrapper.setData({ audioOnly: true })
+      room.handlers.TrackPublished()
+      expect(camera.setSubscribed).toHaveBeenCalledTimes(1)
+      expect(camera.setSubscribed).toHaveBeenLastCalledWith(false)
+
+      // Someone else's camera arrives: only that one is unsubscribed — the
+      // one already paused costs no further signalling on a weak line.
+      const late = videoPub('camera')
+      room.remoteParticipants.set('carol', remoteParticipant('carol', [late]))
+      room.handlers.TrackSubscribed()
+      expect(late.setSubscribed).toHaveBeenCalledWith(false)
+      expect(camera.setSubscribed).toHaveBeenCalledTimes(1)
+    })
+
+    it('leaves cameras that were never paused alone when the videos come back', async () => {
+      jest.useFakeTimers()
+      const { wrapper, room, camera } = await connected()
+      room.handlers.ConnectionQualityChanged('poor', room.localParticipant)
+      jest.advanceTimersByTime(5000)
+      // Published meanwhile but never paused — nothing to undo for it.
+      const untouched = videoPub('camera')
+      room.remoteParticipants.set('carol', remoteParticipant('carol', [untouched]))
+
+      wrapper.vm.showVideos()
+      expect(camera.setSubscribed).toHaveBeenLastCalledWith(true)
+      expect(untouched.setSubscribed).not.toHaveBeenCalled()
+    })
+
+    it('applyAudioOnly is a no-op without a room', () => {
+      const { wrapper } = factory({ show: true })
+      expect(() => wrapper.vm.applyAudioOnly()).not.toThrow()
+    })
+
+    it('starts every call with videos on', async () => {
+      jest.useFakeTimers()
+      const { wrapper, room } = await connected()
+      room.handlers.ConnectionQualityChanged('poor', room.localParticipant)
+      wrapper.setData({ audioOnly: true, audioOnlyDismissed: true })
+      await wrapper.vm.cleanup()
+      expect(wrapper.vm.audioOnly).toBe(false)
+      expect(wrapper.vm.audioOnlyDismissed).toBe(false)
+      jest.advanceTimersByTime(60_000)
+      expect(wrapper.vm.audioOnly).toBe(false)
     })
   })
 

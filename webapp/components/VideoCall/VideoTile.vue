@@ -51,6 +51,17 @@
         :class="{ 'video-tile__mic-status--muted': !tile.micEnabled }"
         :aria-label="tile.micEnabled ? $t('videoCall.micUnmuted') : $t('videoCall.micMuted')"
       />
+      <span
+        v-if="weakConnectionLabel"
+        class="video-tile__connection"
+        :class="{ 'video-tile__connection--lost': tile.connectionQuality === 'lost' }"
+        role="img"
+        :title="weakConnectionLabel"
+        :aria-label="weakConnectionLabel"
+        data-test="video-tile-weak-connection"
+      >
+        <os-icon :icon="icons.warning" />
+      </span>
       <span v-if="tile.isLocal" class="video-tile__local-tag">({{ $t('videoCall.you') }})</span>
       <span v-if="tile.isScreen" class="video-tile__screen-tag">
         — {{ $t('videoCall.screenShare') }}
@@ -116,6 +127,15 @@ export default {
     this.onTrackEnded = null
   },
   computed: {
+    weakConnectionLabel() {
+      // Only the bad states are worth the space: a badge on every healthy
+      // tile would just be noise. LiveKit rates the participant, so the own
+      // tile tells whether the trouble is on this side of the call.
+      if (this.tile.isScreen) return null
+      const key = { poor: 'connectionPoor', lost: 'connectionLost' }[this.tile.connectionQuality]
+      if (!key) return null
+      return this.$t(`videoCall.${key}`, { name: this.tile.name })
+    },
     showOwnScreenPlaceholder() {
       // Rendering the local screen share back to the user creates an infinite
       // mirror (the tab being captured shows the captured tab…). Show a
@@ -425,6 +445,15 @@ export default {
 }
 
 .video-tile__mic-status--muted {
+  color: var(--color-danger);
+}
+
+.video-tile__connection {
+  display: inline-flex;
+  color: var(--color-warning);
+}
+
+.video-tile__connection--lost {
   color: var(--color-danger);
 }
 </style>
