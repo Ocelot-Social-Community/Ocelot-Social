@@ -1,5 +1,11 @@
 <template>
-  <ul v-show="showSuggestions" class="suggestion-list">
+  <!-- The edges fade where the list goes on — see scrollMaskStyle. -->
+  <ul
+    v-show="showSuggestions"
+    class="suggestion-list"
+    :style="scrollMaskStyle"
+    @scroll="updateScrollFades"
+  >
     <template v-for="(item, index) in filteredItems">
       <li
         v-if="startsRelation(index)"
@@ -46,6 +52,10 @@
 import { HASHTAG, MENTION } from '../../constants/editor'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 
+// How far into the list an edge fades out when there is more to scroll to in that direction.
+// The same size InfiniteScrollList (the follower lists) uses.
+const SCROLL_FADE_SIZE = 56
+
 export default {
   components: {
     UserAvatar,
@@ -59,7 +69,26 @@ export default {
     navigatedItemIndex: Number,
     selectItem: Function,
   },
+  data() {
+    return {
+      canScrollUp: false,
+      canScrollDown: false,
+    }
+  },
+  updated() {
+    this.$nextTick(this.updateScrollFades)
+  },
   computed: {
+    // The technique of InfiniteScrollList: a mask fades the list's own content to transparent at
+    // whichever edge still has more to scroll to, and only there — a fade at an edge the list is
+    // already scrolled to would promise entries that do not exist. `black` means "fully visible"
+    // in a mask, it is not a colour.
+    scrollMaskStyle() {
+      const top = this.canScrollUp ? `${SCROLL_FADE_SIZE}px` : '0px'
+      const bottom = this.canScrollDown ? `${SCROLL_FADE_SIZE}px` : '0px'
+      const mask = `linear-gradient(to bottom, transparent, black ${top}, black calc(100% - ${bottom}), transparent)`
+      return { maskImage: mask, WebkitMaskImage: mask }
+    },
     hasResults() {
       return this.filteredItems.length > 0
     },
@@ -93,6 +122,12 @@ export default {
     },
   },
   methods: {
+    updateScrollFades() {
+      const list = this.$el
+      this.canScrollUp = list.scrollTop > 0
+      // 1px tolerance for sub-pixel scroll position rounding.
+      this.canScrollDown = list.scrollTop + list.clientHeight < list.scrollHeight - 1
+    },
     // By hand rather than scrollIntoView(), which would also scroll the page when the popup
     // reaches beyond the viewport.
     scrollToSelected() {
@@ -105,11 +140,14 @@ export default {
       if (this.navigatedItemIndex === 0) {
         // All the way up, so the heading above the first entry stays readable.
         list.scrollTop = 0
-      } else if (top < list.scrollTop) {
-        list.scrollTop = top
-      } else if (bottom > list.scrollTop + list.clientHeight) {
-        list.scrollTop = bottom - list.clientHeight
+      } else if (top - SCROLL_FADE_SIZE < list.scrollTop) {
+        // Clear of the fading edge, not just inside the list: the highlighted entry is the one
+        // that must stay readable. The browser clamps at either end of the list.
+        list.scrollTop = top - SCROLL_FADE_SIZE
+      } else if (bottom + SCROLL_FADE_SIZE > list.scrollTop + list.clientHeight) {
+        list.scrollTop = bottom + SCROLL_FADE_SIZE - list.clientHeight
       }
+      this.updateScrollFades()
     },
     // Mention suggestions come grouped by their relation to the writer; the first of each group
     // gets a heading — the same non-selectable "hint" row the hashtag menu divides itself with.
