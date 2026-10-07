@@ -1646,9 +1646,7 @@ type Query {
   embedProviders: [EmbedProvider!]!
 
   """
-  Users to offer while the current user types an @-mention, ordered by `MentionSuggestionRelation`. Requires authentication.
-  
-  Leaves out everyone a mention would not reach: the current user, deleted and disabled accounts, anyone in a block with the current user (or with the post's author), and — for a post in a closed or hidden group — everyone who is not an active member.
+  Users to offer while the current user types an @-mention, ordered by `MentionSuggestionRelation`. Requires authentication. Leaves out everyone a mention would not reach: the current user, deleted and disabled accounts, anyone in a block with the current user (or with the post's author), and — for a post in a closed or hidden group — everyone who is not an active member.
   """
   mentionSuggestions(
     """Maximum number of suggestions, 1–25. Default 10."""
