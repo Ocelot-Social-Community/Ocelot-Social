@@ -3,7 +3,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { UserInputError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError } from '@graphql/errors'
+
+// Same limits as the event form in the webapp (ContributionForm.vue). Every event needs a venue
+// description, with or without an address.
+const EVENT_VENUE_MIN_LENGTH = 3
+const EVENT_VENUE_MAX_LENGTH = 100
 
 export const validateEventParams = (params) => {
   let locationName: string | null | undefined
@@ -25,17 +31,24 @@ export const validateEventParams = (params) => {
       params.eventEnd = null
     }
 
-    if (eventInput.eventLocationName && !eventInput.eventVenue) {
-      throw new UserInputError('Event venue must be present if event location is given!')
+    const venue = typeof eventInput.eventVenue === 'string' ? eventInput.eventVenue.trim() : ''
+    if (!venue) {
+      throw new AppError(Errors.POST_EVENT_VENUE_REQUIRED)
     }
-    params.eventVenue = eventInput.eventVenue
+    if (venue.length < EVENT_VENUE_MIN_LENGTH || venue.length > EVENT_VENUE_MAX_LENGTH) {
+      throw new AppError(Errors.POST_EVENT_VENUE_LENGTH_INVALID, {
+        min: EVENT_VENUE_MIN_LENGTH,
+        max: EVENT_VENUE_MAX_LENGTH,
+      })
+    }
+    params.eventVenue = venue
     params.eventLocationName = eventInput.eventLocationName?.trim()
     if (params.eventLocationName) {
       locationName = params.eventLocationName
       const hasLat = typeof eventInput.lat === 'number'
       const hasLng = typeof eventInput.lng === 'number'
       if (hasLat !== hasLng) {
-        throw new UserInputError('Event location requires both lat and lng, or neither!')
+        throw new AppError(Errors.POST_EVENT_LOCATION_COORDINATES_INCOMPLETE)
       }
       if (hasLat && hasLng) {
         validateEventCoordinates(eventInput.lat, eventInput.lng)
@@ -61,35 +74,33 @@ export const validateEventParams = (params) => {
 
 const validateEventCoordinates = (lat: number, lng: number) => {
   if (!Number.isFinite(lat) || lat < -90 || lat > 90) {
-    throw new UserInputError('Event location latitude must be a finite number between -90 and 90!')
+    throw new AppError(Errors.POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE)
   }
   if (!Number.isFinite(lng) || lng < -180 || lng > 180) {
-    throw new UserInputError(
-      'Event location longitude must be a finite number between -180 and 180!',
-    )
+    throw new AppError(Errors.POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE)
   }
 }
 
 const validateEventDate = (dateString) => {
   const date = new Date(dateString)
   if (date.toString() === 'Invalid Date') {
-    throw new UserInputError('Event start date must be a valid date!')
+    throw new AppError(Errors.POST_EVENT_START_DATE_INVALID)
   }
   if (date.toISOString() !== dateString) {
-    throw new UserInputError('Event start date must be in ISO format!')
+    throw new AppError(Errors.POST_EVENT_START_DATE_NOT_ISO_FORMAT)
   }
 }
 
 const validateEventEnd = (start, end) => {
   const endDate = new Date(end)
   if (endDate.toString() === 'Invalid Date') {
-    throw new UserInputError('Event end date must be a valid date!')
+    throw new AppError(Errors.POST_EVENT_END_DATE_INVALID)
   }
   if (endDate.toISOString() !== end) {
-    throw new UserInputError('Event end date must be in ISO format!')
+    throw new AppError(Errors.POST_EVENT_END_DATE_NOT_ISO_FORMAT)
   }
   const startDate = new Date(start)
   if (endDate < startDate) {
-    throw new UserInputError('Event end date must be a after event start date!')
+    throw new AppError(Errors.POST_EVENT_END_BEFORE_START)
   }
 }

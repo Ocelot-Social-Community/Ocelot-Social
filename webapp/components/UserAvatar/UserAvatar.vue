@@ -14,6 +14,7 @@
         :wide="wide"
         :show-avatar="showAvatar"
         :show-slug="showSlug"
+        :name-first="nameFirst"
         :date-time="dateTime"
         :show-popover="showPopover"
         :injected-text="injectedText"
@@ -46,6 +47,7 @@ export default {
     wide: { type: Boolean, default: false },
     showAvatar: { type: Boolean, default: true },
     showSlug: { type: Boolean, default: false },
+    nameFirst: { type: Boolean, default: false },
     dateTime: { type: [Date, String], default: null },
     showPopover: { type: Boolean, default: true },
     injectedText: { type: String, default: null },

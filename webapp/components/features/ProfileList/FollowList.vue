@@ -129,7 +129,7 @@ export default {
           if (newItems.length < PAGE_SIZE) this.allLoaded = true
         }
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toastBackendError(error)
       } finally {
         this.loadingConnections = false
         this.loadingMore = false

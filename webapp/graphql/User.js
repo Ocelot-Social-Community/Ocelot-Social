@@ -66,17 +66,21 @@ export const followConnectionsQuery = (type, i18n) => {
   `
 }
 
-export const minimisedUserQuery = () => {
+// Users to offer while typing an @-mention; see components/Editor/mentionSuggestions.js.
+export const mentionSuggestionsQuery = () => {
   return gql`
     ${imageUrls}
 
-    query ($slug: String) {
-      User(slug: $slug, orderBy: slug_asc) {
-        id
-        slug
-        name
-        avatar {
-          ...imageUrls
+    query ($query: String, $postId: ID, $groupId: ID, $first: Int) {
+      mentionSuggestions(query: $query, postId: $postId, groupId: $groupId, first: $first) {
+        relation
+        user {
+          id
+          slug
+          name
+          avatar {
+            ...imageUrls
+          }
         }
       }
     }

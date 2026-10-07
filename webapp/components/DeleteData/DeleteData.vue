@@ -133,7 +133,7 @@ export default {
           this.$router.push('/')
         })
         .catch((error) => {
-          this.$toast.error(error.message)
+          this.$toastBackendError(error)
           this.loading = false
         })
     },

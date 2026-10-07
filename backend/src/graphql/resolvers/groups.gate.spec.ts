@@ -236,7 +236,7 @@ describe('groups feature gate (groupsEnabled)', () => {
       authenticatedUser = ownerAuth
       const result = await mutate({ mutation: CreateMessage, variables: { roomId, content: 'no' } })
 
-      expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
+      expect(result.errors![0]).toHaveProperty('message', 'Group chats are not enabled.')
     })
 
     it('excludes the group room from the unread-rooms count', async () => {

@@ -1,0 +1,8 @@
+query hashtagSuggestions($query: String, $first: Int) {
+  hashtagSuggestions(query: $query, first: $first) {
+    relation
+    tag {
+      id
+    }
+  }
+}

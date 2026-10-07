@@ -175,6 +175,9 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
         },
       },
       $toast: { error: jest.fn() },
+      $toastBackendError(error) {
+        this.$toast.error(error.message)
+      },
       offset: 5,
       posts: [{ id: 'p1' }],
       hasMore: false,

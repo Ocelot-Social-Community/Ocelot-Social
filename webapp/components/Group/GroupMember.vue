@@ -170,7 +170,7 @@ export default {
           this.$t('group.changeMemberRole', { role: this.$t(`group.roles.${newRole}`) }),
         )
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toastBackendError(error)
       }
     },
     removeUser() {
@@ -186,7 +186,7 @@ export default {
           )
         })
         .catch((error) => {
-          this.$toast.error(error.message)
+          this.$toastBackendError(error)
         })
         .finally(() => {
           this.userId = null

@@ -21,7 +21,7 @@ export default {
           this.storePinPost()
           refetchPostList()
         })
-        .catch((error) => this.$toast.error(error.message))
+        .catch((error) => this.$toastBackendError(error))
     },
     unpinPost(post, refetchPostList = () => {}) {
       this.$apollo
@@ -36,7 +36,7 @@ export default {
           this.storeUnpinPost()
           refetchPostList()
         })
-        .catch((error) => this.$toast.error(error.message))
+        .catch((error) => this.$toastBackendError(error))
     },
     pinGroupPost(post, refetchPostList = () => {}) {
       this.$apollo
@@ -51,7 +51,7 @@ export default {
           // this.storePinGroupPost()
           refetchPostList()
         })
-        .catch((error) => this.$toast.error(error.message))
+        .catch((error) => this.$toastBackendError(error))
     },
     unpinGroupPost(post, refetchPostList = () => {}) {
       this.$apollo
@@ -66,7 +66,7 @@ export default {
           // this.storeUnpinGroupPost()
           refetchPostList()
         })
-        .catch((error) => this.$toast.error(error.message))
+        .catch((error) => this.$toastBackendError(error))
     },
     pushPost(post, refetchPostList = () => {}) {
       this.$apollo
@@ -80,7 +80,7 @@ export default {
           this.$toast.success(this.$t('post.menu.pushedSuccessfully'))
           refetchPostList()
         })
-        .catch((error) => this.$toast.error(error.message))
+        .catch((error) => this.$toastBackendError(error))
     },
     unpushPost(post, refetchPostList = () => {}) {
       this.$apollo
@@ -94,7 +94,7 @@ export default {
           this.$toast.success(this.$t('post.menu.unpushedSuccessfully'))
           refetchPostList()
         })
-        .catch((error) => this.$toast.error(error.message))
+        .catch((error) => this.$toastBackendError(error))
     },
     toggleObservePost(postId, value, refetchPostList = () => {}) {
       this.$apollo
@@ -112,7 +112,7 @@ export default {
           this.$toast.success(message)
           refetchPostList()
         })
-        .catch((error) => this.$toast.error(error.message))
+        .catch((error) => this.$toastBackendError(error))
     },
     ...mapMutations({
       storePinPost: 'pinnedPosts/pinPost',

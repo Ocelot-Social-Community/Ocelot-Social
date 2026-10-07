@@ -140,8 +140,7 @@ export default {
             sliderData: { response: { VerifyNonce: false } },
           })
 
-          const { message } = err
-          this.$toast.error(message)
+          this.$toastBackendError(err)
         } finally {
           this.dbRequestInProgress = false
         }

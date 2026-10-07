@@ -424,7 +424,7 @@ describe('reports', () => {
                 title: 'This is a post that is going to be reported',
               },
               {
-                author: currentUser,
+                authorId: 'abusive-user-id',
                 categoryIds,
               },
             )
@@ -495,7 +495,7 @@ describe('reports', () => {
                 content: 'Post comment to be reported.',
               },
               {
-                author: currentUser,
+                authorId: 'abusive-user-id',
                 postId: 'p1',
               },
             )
@@ -656,7 +656,7 @@ describe('reports', () => {
           },
           {
             postId: 'post-2',
-            author: currentUser,
+            author: abusiveUser,
           },
         ),
       ])

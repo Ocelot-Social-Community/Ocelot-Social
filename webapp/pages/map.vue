@@ -526,7 +526,7 @@ export default {
           if (match.id) query.locationId = match.id
         }
       } catch (error) {
-        this.$toast.error(error.message)
+        this.$toastBackendError(error)
       } finally {
         this.map.getCanvas().style.cursor = ''
         if (this.eventPinToolToggle) {
@@ -1386,7 +1386,7 @@ export default {
         })
         return users && users[0] && users[0].location ? users[0].location : null
       } catch (err) {
-        this.$toast.error(err.message)
+        this.$toastBackendError(err)
         return null
       }
     },

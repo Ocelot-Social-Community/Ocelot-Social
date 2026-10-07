@@ -1,0 +1,33 @@
+"How a suggested user relates to the writer and to the post being written, most relevant first. A user is listed once, under the first relation that applies."
+enum MentionSuggestionRelation {
+  "Takes part in the post already: its author, a commenter, or someone mentioned in the post or in one of its comments."
+  participant
+  "Active member of the group the post is in."
+  groupMember
+  "Someone the current user follows."
+  following
+  "Someone who follows the current user."
+  follower
+  "Anyone else."
+  other
+}
+
+"A user offered for an @-mention, with the reason they are offered."
+type MentionSuggestion {
+  user: User!
+  relation: MentionSuggestionRelation!
+}
+
+type Query {
+  "Users to offer while the current user types an @-mention, ordered by `MentionSuggestionRelation`. Requires authentication. Leaves out everyone a mention would not reach: the current user, deleted and disabled accounts, anyone in a block with the current user (or with the post's author), and — for a post in a closed or hidden group — everyone who is not an active member."
+  mentionSuggestions(
+    "What was typed after the @. Matches the start of the slug or of a word of the name, case-insensitively. Empty or omitted: no filter."
+    query: String
+    "The post being edited or commented on, if there is one. Supplies the participants and the group."
+    postId: ID
+    "The group a NEW post is written in. Ignored when the post given by `postId` exists."
+    groupId: ID
+    "Maximum number of suggestions, 1–25. Default 10."
+    first: Int
+  ): [MentionSuggestion!]!
+}

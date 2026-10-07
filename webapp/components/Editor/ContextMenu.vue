@@ -29,6 +29,10 @@ export default {
         duration: [400, 200],
         inertia: true,
         interactive: true,
+        // The suggestion list is hidden and brought back with the editor's focus (suspend/resume
+        // below). Left to tippy, a click anywhere else would hide it for good: the instance stays,
+        // so displayContextMenu() above sees a menu and never shows it again.
+        hideOnClick: type === 'link',
         placement,
         theme: 'ocelot-social',
         trigger,
@@ -52,6 +56,17 @@ export default {
           subtree: true,
           characterData: true,
         })
+      }
+    },
+    // Hides the menu without giving it up — resume() brings it back as it was.
+    suspend() {
+      if (this.menu) {
+        this.menu.hide()
+      }
+    },
+    resume() {
+      if (this.menu) {
+        this.menu.show()
       }
     },
     hideContextMenu() {

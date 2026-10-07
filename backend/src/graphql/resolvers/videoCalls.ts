@@ -10,7 +10,8 @@ import { withFilter } from 'graphql-subscriptions'
 import { AccessToken, RoomServiceClient, TwirpError } from 'livekit-server-sdk'
 
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@constants/subscriptions'
-import { ForbiddenError } from '@graphql/errors'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError } from '@graphql/errors'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
@@ -35,7 +36,7 @@ const httpUrlFor = (livekitUrl: string) =>
 // to have the secrets the RoomService below needs.
 const ensureEnabled = (enabled: boolean) => {
   if (!enabled) {
-    throw new Error('Video calls are disabled.')
+    throw new AppError(Errors.VIDEO_CALL_FEATURE_DISABLED)
   }
 }
 
@@ -55,7 +56,7 @@ const openPermissionForGroupType = (groupType: string): PermissionKey | null => 
 }
 
 // Returns the group's type if the user is a member with a participating role
-// (usual/admin/owner); throws ForbiddenError otherwise. Video calls are available in
+// (usual/admin/owner); throws VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND otherwise. Video calls are available in
 // every group type now — who may OPEN one is gated per type by permission (above),
 // while joining stays open to any member.
 const getGroupMembershipType = async (
@@ -76,7 +77,7 @@ const getGroupMembershipType = async (
       ),
     )
     if (result.records.length === 0) {
-      throw new ForbiddenError('Not a member of this group.')
+      throw new AppError(Errors.VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND)
     }
     return result.records[0].get('groupType') as string
   } finally {
@@ -136,6 +137,14 @@ const getUserAvatarUrl = async (driver: Driver, userId: string): Promise<string 
 }
 
 const LIVEKIT_API_TIMEOUT_MS = 4000
+
+// A join token only has to get its holder INTO the room: once connected, the LiveKit
+// server keeps pushing fresh tokens to the client, which uses them for reconnects. So the
+// lifetime is not the call's length but how long a token kept aside stays a valid ticket —
+// and with it the decisions taken when it was issued (membership, and whether the user may
+// open a call nobody is in yet). Ten minutes leave room for a reconnect before the first
+// refresh arrives; two hours used to let a copied token outlive both decisions.
+const JOIN_TOKEN_TTL = '10m'
 
 export const getLiveParticipantCount = async (
   config: { LIVEKIT_URL: string; LIVEKIT_API_KEY: string; LIVEKIT_API_SECRET: string },
@@ -215,7 +224,7 @@ export default {
       if (participantCount === 0) {
         const permission = openPermissionForGroupType(groupType)
         if (!permission || !context.effectivePermissions.has(permission)) {
-          throw new ForbiddenError('You may not start a video call in this group.')
+          throw new AppError(Errors.VIDEO_CALL_START_NOT_PERMITTED)
         }
       }
       // LiveKit treats `identity` as a unique key in a room; two connections
@@ -229,7 +238,7 @@ export default {
         {
           identity,
           name: context.user.name,
-          ttl: '2h',
+          ttl: JOIN_TOKEN_TTL,
           // Token metadata is forwarded to every other participant in the room
           // (as `participant.metadata` on the client). The frontend uses it to
           // render the real avatar instead of just initials for remote tiles.

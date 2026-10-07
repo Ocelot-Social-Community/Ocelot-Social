@@ -8,6 +8,8 @@
 import { withFilter } from 'graphql-subscriptions'
 
 import { ROOM_UPDATED } from '@constants/subscriptions'
+import { Errors } from '@graphql/errorRegistry'
+import { AppError } from '@graphql/errors'
 
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import Resolver from './helpers/Resolver'
@@ -169,7 +171,7 @@ export default {
         const result = await session.readTransaction(async (transaction) => {
           const conditions: string[] = []
           if (before) {
-            conditions.push('sortDate < $before')
+            conditions.push('sortDate < datetime($before)')
           }
           if (search) {
             conditions.push('toLower(roomName) CONTAINS toLower($search)')
@@ -185,7 +187,10 @@ export default {
             OPTIONAL MATCH (room)-[:ROOM_FOR]->(g:Group)
             OPTIONAL MATCH (room)<-[:CHATS_IN]-(otherUser:User)
               WHERE g IS NULL AND otherUser.id <> $currentUserId
-            WITH room, g, COALESCE(room.lastMessageAt, room.createdAt) AS sortDate,
+            // sortDate is compared as a datetime, not as the stored string: toString(datetime())
+            // drops trailing zeros of the fraction ("…04.89Z" for 890 ms, "…04Z" for 0 ms), and
+            // since "Z" > any digit > "." such a string sorts after later ones of the same prefix.
+            WITH room, g, datetime(COALESCE(room.lastMessageAt, room.createdAt)) AS sortDate,
                  COALESCE(g.name, otherUser.name) AS roomName
             ${whereClause}
             // roomName is projected, not just computed: this query already derives it for
@@ -271,7 +276,7 @@ export default {
           return room
         })
         if (!room) {
-          throw new Error('Could not create group room. User may not be a member of the group.')
+          throw new AppError(Errors.CHAT_GROUP_ROOM_NOT_CREATED)
         }
         room.roomId = room.id
         return room

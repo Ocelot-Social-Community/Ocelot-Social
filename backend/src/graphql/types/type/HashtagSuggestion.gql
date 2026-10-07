@@ -1,0 +1,23 @@
+"Why a hashtag is suggested, most relevant first."
+enum HashtagSuggestionRelation {
+  "The current user has tagged a post of their own with it."
+  usedByMe
+  "Any other hashtag; ordered by how many posts carry it."
+  popular
+}
+
+"A hashtag offered while typing one, with the reason it is offered."
+type HashtagSuggestion {
+  tag: Tag!
+  relation: HashtagSuggestionRelation!
+}
+
+type Query {
+  "Hashtags to offer while the current user types one, ordered by `HashtagSuggestionRelation` and then by the number of posts carrying the tag. Requires authentication. Deleted and disabled tags are left out."
+  hashtagSuggestions(
+    "What was typed after the #. Matches the start of the tag, case-insensitively. Empty or omitted: no filter."
+    query: String
+    "Maximum number of suggestions, 1–25. Default 10."
+    first: Int
+  ): [HashtagSuggestion!]!
+}
