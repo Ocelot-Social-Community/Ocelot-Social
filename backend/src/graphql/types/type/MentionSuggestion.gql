@@ -25,7 +25,7 @@ type Query {
     query: String
     "The post being edited or commented on, if there is one. Supplies the participants and the group."
     postId: ID
-    "The group a NEW post is written in. Ignored when `postId` is given."
+    "The group a NEW post is written in. Ignored when the post given by `postId` exists."
     groupId: ID
     "Maximum number of suggestions, 1–25. Default 10."
     first: Int

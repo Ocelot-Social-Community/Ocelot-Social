@@ -1680,7 +1680,9 @@ type Query {
     """Maximum number of suggestions, 1–25. Default 10."""
     first: Int
 
-    """The group a NEW post is written in. Ignored when `postId` is given."""
+    """
+    The group a NEW post is written in. Ignored when the post given by `postId` exists.
+    """
     groupId: ID
 
     """
