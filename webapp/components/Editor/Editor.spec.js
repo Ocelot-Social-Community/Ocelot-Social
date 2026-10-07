@@ -278,6 +278,23 @@ describe('Editor.vue', () => {
         expect(wrapper.vm.suggestionsLoading).toBe(false)
       })
 
+      // Same kind of list, same query — but the answer was asked for by a list that is gone.
+      it('drops an answer that arrives after the list was closed and opened again', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        const first = answers['']
+        wrapper.vm.closeSuggestionList()
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+
+        first.resolve([peter])
+        await flushPromises()
+        expect(wrapper.vm.filteredItems).toEqual([])
+        expect(wrapper.vm.suggestionsLoading).toBe(true)
+
+        answers[''].resolve([jenny])
+        await flushPromises()
+        expect(wrapper.vm.filteredItems).toEqual([jenny])
+      })
+
       it('does not ask twice for the same query while the list is open', async () => {
         wrapper.vm.openSuggestionList(props(''), 'mention')
         answers[''].resolve([peter, jenny])

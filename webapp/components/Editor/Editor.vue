@@ -142,6 +142,9 @@ export default {
     this._throttleTimer = undefined
     this._mentionTimer = undefined
     this._mentionCache = new Map()
+    // Counts the lists opened and closed, so an answer can tell whether the list it was asked for
+    // is still the one on screen.
+    this._mentionSession = 0
     this.editor = new Editor({
       content: this.value || '',
       doc: this.doc,
@@ -261,6 +264,7 @@ export default {
       // Every list starts from scratch — nothing of a previous one carries over.
       clearTimeout(this._mentionTimer)
       this._mentionCache.clear()
+      this._mentionSession += 1
       this.filteredItems = []
       this.suggestionsLoading = false
       this.suggestionType = suggestionType
@@ -281,6 +285,7 @@ export default {
     },
     closeSuggestionList() {
       clearTimeout(this._mentionTimer)
+      this._mentionSession += 1
       // Follows, comments and mentions change; the next list starts from fresh answers.
       this._mentionCache.clear()
       this.suggestionsLoading = false
@@ -317,15 +322,19 @@ export default {
       this.filteredItems = this.filteredItems.filter((item) => matchesMentionQuery(item, query))
       this.suggestionsLoading = true
 
+      const session = this._mentionSession
       const load = async () => {
         let items = null
         try {
           items = await this.mentionSuggestions(query)
-          this._mentionCache.set(query, items)
         } catch {
           // The list is a convenience: without an answer it shows "no users found".
         }
-        // Answers can overtake each other, and the list may have been closed in the meantime.
+        // The list this was asked for is gone — closed, or closed and opened again. Its answer
+        // belongs neither on screen nor in the cache of the list that is open now.
+        if (session !== this._mentionSession) return
+        if (items) this._mentionCache.set(query, items)
+        // Answers can overtake each other within a list, too.
         if (this.suggestionType !== MENTION || (this.query || '') !== query) return
         this.filteredItems = items || []
         this.navigatedItemIndex = 0
