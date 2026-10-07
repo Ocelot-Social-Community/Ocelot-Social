@@ -1604,6 +1604,28 @@ describe('VideoCall', () => {
       expect(wrapper.find('[data-test="video-call-audio-only"]').exists()).toBe(true)
     })
 
+    it('keeps counting while a weak line flips between poor and lost', async () => {
+      jest.useFakeTimers()
+      const { wrapper, room } = await connected()
+      room.handlers.ConnectionQualityChanged('poor', room.localParticipant)
+      jest.advanceTimersByTime(3000)
+      room.handlers.ConnectionQualityChanged('lost', room.localParticipant)
+      jest.advanceTimersByTime(2000)
+      expect(wrapper.vm.audioOnly).toBe(true)
+    })
+
+    it('keeps counting while a recovered line flips between good and excellent', async () => {
+      jest.useFakeTimers()
+      const { wrapper, room } = await connected()
+      room.handlers.ConnectionQualityChanged('poor', room.localParticipant)
+      jest.advanceTimersByTime(5000)
+      room.handlers.ConnectionQualityChanged('good', room.localParticipant)
+      jest.advanceTimersByTime(15000)
+      room.handlers.ConnectionQualityChanged('excellent', room.localParticipant)
+      jest.advanceTimersByTime(5000)
+      expect(wrapper.vm.audioOnly).toBe(false)
+    })
+
     it('ignores a dip that recovers within the grace period', async () => {
       jest.useFakeTimers()
       const { wrapper, room } = await connected()

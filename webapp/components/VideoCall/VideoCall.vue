@@ -645,6 +645,7 @@ export default {
     this.stageObserver = null
     this.observedStage = null
     this.qualityTimer = null
+    this.qualityClass = null
   },
   mounted() {
     this.observeStage()
@@ -1156,6 +1157,16 @@ export default {
       return payload
     },
     onLocalConnectionQuality(quality) {
+      // LiveKit reports every change, so a shaky line flips between poor and
+      // lost (or good and excellent) well within the grace periods. Only a
+      // change of class restarts the clock — otherwise it never runs out.
+      const qualityClass = WEAK_QUALITIES.includes(quality)
+        ? 'weak'
+        : STRONG_QUALITIES.includes(quality)
+          ? 'strong'
+          : 'unknown'
+      if (qualityClass === this.qualityClass) return
+      this.qualityClass = qualityClass
       this.clearQualityTimer()
       if (WEAK_QUALITIES.includes(quality) && !this.audioOnly && !this.audioOnlyDismissed) {
         this.qualityTimer = setTimeout(() => this.setAudioOnly(true), WEAK_CONNECTION_MS)
@@ -1201,6 +1212,7 @@ export default {
     },
     resetAudioOnly() {
       this.clearQualityTimer()
+      this.qualityClass = null
       this.audioOnly = false
       this.audioOnlyDismissed = false
     },
