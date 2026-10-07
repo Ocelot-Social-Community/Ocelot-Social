@@ -25,7 +25,7 @@ describe('fetchMentionSuggestions', () => {
     await fetchMentionSuggestions(apollo, { query: 'pe', postId: 'p1', groupId: 'g1' })
     expect(apollo.query).toHaveBeenCalledWith(
       expect.objectContaining({
-        variables: { query: 'pe', postId: 'p1', groupId: 'g1' },
+        variables: { query: 'pe', postId: 'p1', groupId: 'g1', first: 20 },
         fetchPolicy: 'no-cache',
       }),
     )
@@ -34,7 +34,9 @@ describe('fetchMentionSuggestions', () => {
   it('sends null for a missing post or group', async () => {
     await fetchMentionSuggestions(apollo, { query: '' })
     expect(apollo.query).toHaveBeenCalledWith(
-      expect.objectContaining({ variables: { query: '', postId: null, groupId: null } }),
+      expect.objectContaining({
+        variables: { query: '', postId: null, groupId: null, first: 20 },
+      }),
     )
   })
 })

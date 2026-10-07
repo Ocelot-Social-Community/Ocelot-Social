@@ -60,6 +60,36 @@ describe('SuggestionList.vue', () => {
       expect(selectItem).toHaveBeenCalledWith(jenny)
     })
 
+    describe('scrolling', () => {
+      // jsdom has no layout: the rows get the geometry the scrolling is computed from.
+      const layout = (wrapper, { height, rowHeight }) => {
+        Object.defineProperty(wrapper.element, 'clientHeight', { value: height })
+        wrapper.findAll('li').wrappers.forEach((li, position) => {
+          Object.defineProperty(li.element, 'offsetTop', { value: position * rowHeight })
+          Object.defineProperty(li.element, 'offsetHeight', { value: rowHeight })
+        })
+      }
+
+      it('follows the highlight down and back up', async () => {
+        const wrapper = Wrapper({ filteredItems: [peter, jenny, bob] })
+        // Rows: heading, peter, heading, jenny, bob — 50px each, two visible.
+        layout(wrapper, { height: 100, rowHeight: 50 })
+
+        await wrapper.setProps({ navigatedItemIndex: 2 })
+        await wrapper.vm.$nextTick()
+        expect(wrapper.element.scrollTop).toBe(150)
+
+        await wrapper.setProps({ navigatedItemIndex: 1 })
+        await wrapper.vm.$nextTick()
+        expect(wrapper.element.scrollTop).toBe(150)
+
+        // The first entry scrolls all the way up, heading included.
+        await wrapper.setProps({ navigatedItemIndex: 0 })
+        await wrapper.vm.$nextTick()
+        expect(wrapper.element.scrollTop).toBe(0)
+      })
+    })
+
     it('shows no heading for users without a relation', () => {
       const wrapper = Wrapper({ filteredItems: [{ id: 'u9', slug: 'nobody', name: 'Nobody' }] })
       expect(rows(wrapper)).toEqual(['Nobody @nobody'])

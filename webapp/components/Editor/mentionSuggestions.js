@@ -6,10 +6,18 @@ import { mentionSuggestionsQuery } from '~/graphql/User'
 //
 // 'no-cache': who follows whom, who commented and who was mentioned changes while the page is
 // open, and the Editor keeps its own short-lived cache per typed query anyway.
+// The list scrolls, so it may hold more than fits on screen.
+const MENTION_SUGGESTIONS_LIMIT = 20
+
 export const fetchMentionSuggestions = async (apollo, { query, postId, groupId }) => {
   const { data } = await apollo.query({
     query: mentionSuggestionsQuery(),
-    variables: { query, postId: postId || null, groupId: groupId || null },
+    variables: {
+      query,
+      postId: postId || null,
+      groupId: groupId || null,
+      first: MENTION_SUGGESTIONS_LIMIT,
+    },
     fetchPolicy: 'no-cache',
   })
   return data.mentionSuggestions.map(({ relation, user }) => ({ ...user, relation }))

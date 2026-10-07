@@ -20,6 +20,7 @@
           :link-to-profile="false"
           :show-popover="false"
           show-slug
+          name-first
         />
         <template v-else>{{ createItemLabel(item) | truncate(50) }}</template>
       </li>
@@ -82,7 +83,34 @@ export default {
       }
     },
   },
+  watch: {
+    // The list scrolls; arrow keys must not move the highlight out of sight.
+    navigatedItemIndex() {
+      this.$nextTick(this.scrollToSelected)
+    },
+    filteredItems() {
+      this.$nextTick(this.scrollToSelected)
+    },
+  },
   methods: {
+    // By hand rather than scrollIntoView(), which would also scroll the page when the popup
+    // reaches beyond the viewport.
+    scrollToSelected() {
+      const list = this.$el
+      const row = list.querySelector('.is-selected')
+      if (!row) return
+      // offsetTop counts from the list: it is the row's offsetParent (position: relative).
+      const top = row.offsetTop
+      const bottom = top + row.offsetHeight
+      if (this.navigatedItemIndex === 0) {
+        // All the way up, so the heading above the first entry stays readable.
+        list.scrollTop = 0
+      } else if (top < list.scrollTop) {
+        list.scrollTop = top
+      } else if (bottom > list.scrollTop + list.clientHeight) {
+        list.scrollTop = bottom - list.clientHeight
+      }
+    },
     // Mention suggestions come grouped by their relation to the writer; the first of each group
     // gets a heading — the same non-selectable "hint" row the hashtag menu divides itself with.
     startsRelation(index) {
@@ -109,6 +137,10 @@ export default {
   border: 2px solid var(--color-primary);
   font-size: 0.8rem;
   font-weight: bold;
+  /* About six users; the rest is reached by scrolling. Relative for scrollToSelected(). */
+  position: relative;
+  max-height: min(22rem, 50vh);
+  overflow-y: auto;
 }
 
 .suggestion-list__item {
