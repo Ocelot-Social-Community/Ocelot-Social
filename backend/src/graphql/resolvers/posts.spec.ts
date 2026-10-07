@@ -914,6 +914,32 @@ describe('CreatePost', () => {
         })
       })
 
+      describe.each([
+        ['exactly 3 characters', 'abc'],
+        ['exactly 100 characters', 'x'.repeat(100)],
+      ])('event venue is %s after trimming', (_, trimmedVenue) => {
+        it('creates the event', async () => {
+          const now = new Date()
+
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventVenue: `  ${trimmedVenue}  `,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: { CreatePost: { postType: ['Event'], eventVenue: trimmedVenue } },
+            errors: undefined,
+          })
+        })
+      })
+
       describe('event venue is padded with whitespace but otherwise valid', () => {
         it('stores it trimmed, not padded', async () => {
           const now = new Date()
