@@ -63,6 +63,7 @@ describe('UserAvatar', () => {
     onTouchScreen = false,
     withAvatar = true,
     showSlug = true,
+    nameFirst = false,
     user = userTilda,
     withPopoverEnabled = true,
   }) => {
@@ -88,6 +89,7 @@ describe('UserAvatar', () => {
         linkToProfile: withLinkToProfile,
         showAvatar: withAvatar,
         showSlug: showSlug,
+        nameFirst,
         showPopover: withPopoverEnabled,
       },
       stubs: {
@@ -116,6 +118,21 @@ describe('UserAvatar', () => {
   })
 
   describe('given an user', () => {
+    // The two lines keep their styling; only what they show is swapped.
+    describe('with nameFirst', () => {
+      it('shows the name on the prominent line and the slug below', () => {
+        const wrapper = Wrapper({ nameFirst: true })
+        expect(wrapper.container.querySelector('.slug').textContent).toBe('Tilda Swinton')
+        expect(wrapper.container.querySelector('.name').textContent).toBe('@tilda-swinton')
+      })
+
+      it('shows just the name when the slug is hidden', () => {
+        const wrapper = Wrapper({ nameFirst: true, showSlug: false })
+        expect(wrapper.container.querySelector('.slug')).toBeNull()
+        expect(wrapper.container.querySelector('.name').textContent).toBe('Tilda Swinton')
+      })
+    })
+
     describe('without linkToProfile, on touch screen', () => {
       let wrapper
       beforeEach(() => {

@@ -861,7 +861,14 @@
       "unorderedList": "Ungeordnete Liste"
     },
     "mention": {
-      "noUsersFound": "Keine Nutzer gefunden"
+      "noUsersFound": "Keine Nutzer gefunden",
+      "relation": {
+        "follower": "Die mir folgen",
+        "following": "Denen ich folge",
+        "groupMember": "Gruppenmitglieder",
+        "other": "Weitere Nutzer",
+        "participant": "Am Beitrag beteiligt"
+      }
     },
     "placeholder": "Schreib etwas Inspirierendes …"
   },

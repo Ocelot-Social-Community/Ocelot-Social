@@ -861,7 +861,14 @@
       "unorderedList": "Lista nienumerowana"
     },
     "mention": {
-      "noUsersFound": "Nie znaleziono użytkowników"
+      "noUsersFound": "Nie znaleziono użytkowników",
+      "relation": {
+        "follower": "Osoby, które mnie obserwują",
+        "following": "Osoby, które obserwuję",
+        "groupMember": "Członkowie grupy",
+        "other": "Inni użytkownicy",
+        "participant": "Uczestnicy wpisu"
+      }
     },
     "placeholder": "Napisz coś inspirującego..."
   },

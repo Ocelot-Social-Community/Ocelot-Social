@@ -23,8 +23,8 @@
             @open-menu="loadPopover(openMenu)"
             @close-menu="cancelAndClose(closeMenu)"
           >
-            <span v-if="showSlug" class="slug">{{ userSlug }}</span>
-            <span class="name">{{ userName }}</span>
+            <span v-if="showSlug" class="slug">{{ nameFirst ? userName : userSlug }}</span>
+            <span class="name">{{ nameFirst && showSlug ? userSlug : userName }}</span>
           </user-avatar-helper>
           <span v-if="wide">&nbsp;</span>
           <span v-if="group" class="group-info">
@@ -98,6 +98,8 @@ export default {
     wide: { type: Boolean, default: false },
     showAvatar: { type: Boolean, default: true },
     showSlug: { type: Boolean, default: false },
+    // With showSlug: swaps the two lines — the name on the prominent first one, the slug below.
+    nameFirst: { type: Boolean, default: false },
     dateTime: { type: [Date, String], default: null },
     showPopover: { type: Boolean, default: true },
     injectedText: { type: String, default: null },

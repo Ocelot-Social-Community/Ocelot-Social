@@ -861,7 +861,14 @@
       "unorderedList": "Lista sin orden"
     },
     "mention": {
-      "noUsersFound": "No se han encontrado usuarios"
+      "noUsersFound": "No se han encontrado usuarios",
+      "relation": {
+        "follower": "Quienes me siguen",
+        "following": "A quienes sigo",
+        "groupMember": "Miembros del grupo",
+        "other": "Otros usuarios",
+        "participant": "Participan en la publicación"
+      }
     },
     "placeholder": "Deje sus pensamientos inspiradores...."
   },

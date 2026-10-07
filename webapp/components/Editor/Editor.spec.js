@@ -9,6 +9,13 @@ global.MutationObserver = MutationObserver
 
 const localVue = global.localVue
 
+const peter = { id: 'u1', slug: 'peter-lustig', name: 'Peter Lustig', relation: 'following' }
+const jenny = { id: 'u2', slug: 'jenny-rostock', name: 'Jenny Rostock', relation: 'other' }
+
+// UserAvatar (the rows of the mention list) brings a dropdown and <client-only> along; what is
+// under test here is the editor around the list.
+const stubs = { transition: false, UserAvatar: true }
+
 describe('Editor.vue', () => {
   let wrapper
   let propsData
@@ -20,9 +27,7 @@ describe('Editor.vue', () => {
       propsData,
       localVue,
       sync: false,
-      stubs: {
-        transition: false,
-      },
+      stubs,
     }))
   }
 
@@ -75,13 +80,13 @@ describe('Editor.vue', () => {
       }
 
       it('anchors the popup even when the plugin has no decoration node yet', async () => {
-        propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
         wrapper = mount(Editor, {
           mocks,
           propsData,
           localVue,
           sync: false,
-          stubs: { transition: false },
+          stubs,
           attachTo: document.body,
         })
 
@@ -94,131 +99,71 @@ describe('Editor.vue', () => {
         expect(typeof menu.show).toBe('function')
       })
 
-      // The other half of showSuggestionMenu: once the decoration IS in the DOM, the plugin builds
-      // the anchor itself and hands it over as `virtualNode` — a popper-style virtual reference
-      // rather than an element. That path must not wait for a tick, and tippy has to accept the
-      // object as a single instance (the same call answers with an array for anything invalid).
-      it('uses the plugin anchor directly when it comes with one', async () => {
-        propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
+      // Regression: the popup used to be anchored on the decoration span ITSELF — the one found in
+      // the tick after the opening keystroke. prosemirror-view redraws that span right afterwards
+      // (measured: once, in that same tick), so the popup measured an element that had left the
+      // document — a 0/0 rect, i.e. the top left corner of the page. The reference has to follow
+      // whichever span is in the document right now.
+      it('measures the decoration that is currently in the document', async () => {
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
         wrapper = mount(Editor, {
           mocks,
           propsData,
           localVue,
           sync: false,
-          stubs: { transition: false },
+          stubs,
           attachTo: document.body,
         })
-        const rect = { top: 10, bottom: 30, left: 20, right: 40, width: 20, height: 20 }
-        const virtualNode = {
-          getBoundingClientRect: () => rect,
-          clientWidth: rect.width,
-          clientHeight: rect.height,
-        }
+        const { view } = wrapper.vm.editor
+        const current = () => view.dom.querySelector('[data-decoration-id]')
+        const rect = { top: 10, bottom: 30, left: 20, right: 40 }
 
-        wrapper.vm.openSuggestionList(
-          {
-            items: propsData.users,
-            query: '',
-            range: { from: 1, to: 2 },
-            command: jest.fn(),
-            virtualNode,
-          },
-          'mention',
-        )
+        view.dispatch(view.state.tr.insertText('@'))
+        const early = current()
+        await settle(wrapper.vm)
+        const redrawn = current()
+        // jsdom has no layout: only the span that is in the document gets a real rect.
+        redrawn.getBoundingClientRect = () => rect
 
-        // No $nextTick in between: the anchor was there, so the popup is up already.
-        const { menu } = wrapper.vm.$refs.contextMenu
-        expect(menu).toBeTruthy()
-        expect(typeof menu.show).toBe('function')
+        // The premise of the test — if prosemirror ever stops replacing the span, this goes first.
+        expect(redrawn).not.toBe(early)
+        expect(early.isConnected).toBe(false)
+        expect(wrapper.vm.$refs.contextMenu.menu.reference.getBoundingClientRect()).toBe(rect)
       })
 
-      // Typing on: the plugin re-runs, finds its decoration, and the follow-up keystrokes take the
-      // direct path — with a filtered list behind it.
-      it('anchors the popup on the reference the plugin passes while typing', () => {
-        propsData.users = [
-          { id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' },
-          { id: 'u2', slug: 'jenny-rostock', label: 'Jenny Rostock' },
-        ]
+      // Between two redraws the span may be gone for a moment. Measuring then must not jump to 0/0.
+      it('stays on the last known position while there is no decoration', async () => {
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
         wrapper = mount(Editor, {
           mocks,
           propsData,
           localVue,
           sync: false,
-          stubs: { transition: false },
+          stubs,
           attachTo: document.body,
         })
-        const rect = { top: 10, bottom: 30, left: 20, right: 40, width: 20, height: 20 }
-        const virtualNode = {
-          getBoundingClientRect: () => rect,
-          clientWidth: rect.width,
-          clientHeight: rect.height,
-        }
+        const { view } = wrapper.vm.editor
+        const rect = { top: 10, bottom: 30, left: 20, right: 40 }
 
-        wrapper.vm.updateSuggestionList({
-          items: [propsData.users[1]],
-          query: 'jenny',
-          range: { from: 1, to: 7 },
-          virtualNode,
-          view: wrapper.vm.editor.view,
-        })
+        view.dispatch(view.state.tr.insertText('@'))
+        await settle(wrapper.vm)
+        const span = view.dom.querySelector('[data-decoration-id]')
+        span.getBoundingClientRect = () => rect
+        const { reference } = wrapper.vm.$refs.contextMenu.menu
+        reference.getBoundingClientRect()
+        span.removeAttribute('data-decoration-id')
 
-        expect(wrapper.vm.filteredItems).toEqual([propsData.users[1]])
-        expect(wrapper.vm.navigatedItemIndex).toBe(0)
-        // The reference itself, not just "some popup exists": this fails if showSuggestionMenu ever
-        // drops the handed-in `virtualNode` and anchors somewhere else.
-        expect(wrapper.vm.$refs.contextMenu.menu.reference).toBe(virtualNode)
-      })
-
-      // Worth pinning down because it reads like a bug and is not one: displayContextMenu returns
-      // early while a menu is open, so a later keystroke does NOT move the popup to the new
-      // reference. It stays on the first one and popper repositions it from there — that is what
-      // the MutationObserver in ContextMenu.vue is for.
-      it('keeps an open popup on its first reference', () => {
-        propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
-        wrapper = mount(Editor, {
-          mocks,
-          propsData,
-          localVue,
-          sync: false,
-          stubs: { transition: false },
-          attachTo: document.body,
-        })
-        const nodeAt = (top) => ({
-          getBoundingClientRect: () => ({
-            top,
-            bottom: top + 20,
-            left: 20,
-            right: 40,
-            width: 20,
-            height: 20,
-          }),
-          clientWidth: 20,
-          clientHeight: 20,
-        })
-        const first = nodeAt(10)
-        const second = nodeAt(100)
-        const args = (virtualNode, query) => ({
-          items: propsData.users,
-          query,
-          range: { from: 1, to: 1 + query.length + 1 },
-          virtualNode,
-          view: wrapper.vm.editor.view,
-        })
-
-        wrapper.vm.updateSuggestionList(args(first, ''))
-        wrapper.vm.updateSuggestionList(args(second, 'p'))
-
-        expect(wrapper.vm.$refs.contextMenu.menu.reference).toBe(first)
+        expect(reference.getBoundingClientRect()).toBe(rect)
       })
 
       it('does not open a popup for a list that was closed before the anchor arrived', async () => {
-        propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
         wrapper = mount(Editor, {
           mocks,
           propsData,
           localVue,
           sync: false,
-          stubs: { transition: false },
+          stubs,
           attachTo: document.body,
         })
         const { view } = wrapper.vm.editor
@@ -234,7 +179,7 @@ describe('Editor.vue', () => {
         // Driven through showSuggestionMenu directly because since prosemirror-view 1.42 the
         // plugin's update() runs asynchronously after `dispatch`, so a close placed right after a
         // keystroke lands BEFORE the list even opens (measured) and would prove nothing.
-        wrapper.vm.showSuggestionMenu(null, view)
+        wrapper.vm.showSuggestionMenu(view)
         wrapper.vm.closeSuggestionList()
         await settle(wrapper.vm)
 
@@ -242,18 +187,239 @@ describe('Editor.vue', () => {
       })
     })
 
-    describe('optional extensions', () => {
-      it('sets the Mention items to the users', () => {
-        propsData.users = [
-          {
-            id: 'u345',
-          },
-        ]
+    // The users offered for a mention are not handed in any more: the editor asks for them per
+    // typed query. Driven through the handlers the Suggestions plugin calls, in the order it calls
+    // them.
+    describe('loading mention suggestions', () => {
+      const props = (query) => ({
+        items: [],
+        query,
+        range: { from: 1, to: 2 + query.length },
+        command: jest.fn(),
+      })
+      let answers
+
+      beforeEach(() => {
+        jest.useFakeTimers()
+        answers = {}
+        // Each query gets a promise the test resolves by hand, to decide which answer arrives when.
+        propsData.mentionSuggestions = jest.fn(
+          (query) =>
+            new Promise((resolve, reject) => {
+              answers[query] = { resolve, reject }
+            }),
+        )
         wrapper = Wrapper()
-        expect(wrapper.vm.editor.extensions.options.mention.items()).toEqual(propsData.users)
       })
 
-      it('mentions is not an option when there are no users', () => {
+      afterEach(() => {
+        jest.useRealTimers()
+      })
+
+      it('asks for the opening "@" right away', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        expect(propsData.mentionSuggestions).toHaveBeenCalledWith('')
+        expect(wrapper.vm.suggestionsLoading).toBe(true)
+
+        answers[''].resolve([peter, jenny])
+        await flushPromises()
+
+        expect(wrapper.vm.filteredItems).toEqual([peter, jenny])
+        expect(wrapper.vm.suggestionsLoading).toBe(false)
+      })
+
+      it('waits for a pause in typing before it asks again', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        answers[''].resolve([peter, jenny])
+        await flushPromises()
+
+        wrapper.vm.updateSuggestionList(props('p'))
+        wrapper.vm.updateSuggestionList(props('pe'))
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(1)
+
+        jest.advanceTimersByTime(150)
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(2)
+        expect(propsData.mentionSuggestions).toHaveBeenLastCalledWith('pe')
+      })
+
+      // Enter picks the highlighted entry — it must not be someone the typed text has ruled out.
+      it('narrows the list on screen until the answer is in', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        answers[''].resolve([peter, jenny])
+        await flushPromises()
+
+        wrapper.vm.updateSuggestionList(props('je'))
+
+        expect(wrapper.vm.filteredItems).toEqual([jenny])
+        expect(wrapper.vm.suggestionsLoading).toBe(true)
+      })
+
+      it('drops an answer that was overtaken by a later query', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        wrapper.vm.updateSuggestionList(props('je'))
+        jest.advanceTimersByTime(150)
+
+        answers.je.resolve([jenny])
+        await flushPromises()
+        answers[''].resolve([peter, jenny])
+        await flushPromises()
+
+        expect(wrapper.vm.filteredItems).toEqual([jenny])
+      })
+
+      it('drops an answer that arrives after the list was closed', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        wrapper.vm.closeSuggestionList()
+
+        answers[''].resolve([peter])
+        await flushPromises()
+
+        expect(wrapper.vm.filteredItems).toEqual([])
+        expect(wrapper.vm.suggestionsLoading).toBe(false)
+      })
+
+      // Same kind of list, same query — but the answer was asked for by a list that is gone.
+      it('drops an answer that arrives after the list was closed and opened again', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        const first = answers['']
+        wrapper.vm.closeSuggestionList()
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+
+        first.resolve([peter])
+        await flushPromises()
+        expect(wrapper.vm.filteredItems).toEqual([])
+        expect(wrapper.vm.suggestionsLoading).toBe(true)
+
+        answers[''].resolve([jenny])
+        await flushPromises()
+        expect(wrapper.vm.filteredItems).toEqual([jenny])
+      })
+
+      it('does not ask twice for the same query while the list is open', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        answers[''].resolve([peter, jenny])
+        await flushPromises()
+        wrapper.vm.updateSuggestionList(props('p'))
+        jest.advanceTimersByTime(150)
+        answers.p.resolve([peter])
+        await flushPromises()
+
+        // Backspace: back to the empty query.
+        wrapper.vm.updateSuggestionList(props(''))
+
+        expect(wrapper.vm.filteredItems).toEqual([peter, jenny])
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(2)
+      })
+
+      it('shows an empty list when loading fails', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        answers[''].reject(new Error('network'))
+        await flushPromises()
+
+        expect(wrapper.vm.filteredItems).toEqual([])
+        expect(wrapper.vm.suggestionsLoading).toBe(false)
+      })
+
+      // The plugin announces a suggestion once more right after one was inserted, with the range
+      // of the replaced text — the cursor is no longer in it.
+      describe('announced with the cursor outside its range', () => {
+        const viewWithCursorAt = (from) => ({ state: { selection: { from } } })
+
+        it('does not open a list or ask for suggestions', () => {
+          wrapper.vm.openSuggestionList({ ...props('pe'), view: viewWithCursorAt(20) }, 'mention')
+
+          expect(wrapper.vm.suggestionType).toBe('')
+          expect(propsData.mentionSuggestions).not.toHaveBeenCalled()
+        })
+
+        it('ignores the changes that follow it', () => {
+          wrapper.vm.openSuggestionList({ ...props('pe'), view: viewWithCursorAt(20) }, 'mention')
+          wrapper.vm.updateSuggestionList({ ...props('pet'), view: viewWithCursorAt(21) })
+          jest.advanceTimersByTime(150)
+
+          expect(wrapper.vm.suggestionRange).toBeNull()
+          expect(propsData.mentionSuggestions).not.toHaveBeenCalled()
+        })
+      })
+
+      it('starts every list from scratch', async () => {
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+        answers[''].resolve([peter, jenny])
+        await flushPromises()
+
+        wrapper.vm.openSuggestionList(props(''), 'mention')
+
+        expect(wrapper.vm.filteredItems).toEqual([])
+        expect(propsData.mentionSuggestions).toHaveBeenCalledTimes(2)
+      })
+
+      it('leaves hashtags to the items the plugin filtered', () => {
+        wrapper.vm.openSuggestionList({ ...props('fr'), items: [{ id: 'Frieden' }] }, 'hashtag')
+
+        expect(wrapper.vm.filteredItems).toEqual([{ id: 'Frieden' }])
+        expect(propsData.mentionSuggestions).not.toHaveBeenCalled()
+      })
+    })
+
+    // Regression: with the list open, moving the focus elsewhere hid it for good — tippy hid its
+    // instance on the outside click, the editor still held one and so never showed it again.
+    describe('leaving and re-entering the editor with the list open', () => {
+      let menu
+
+      beforeEach(async () => {
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
+        wrapper = mount(Editor, {
+          mocks,
+          propsData,
+          localVue,
+          sync: false,
+          stubs,
+          attachTo: document.body,
+        })
+        const { view } = wrapper.vm.editor
+        view.dispatch(view.state.tr.insertText('@'))
+        await wrapper.vm.$nextTick()
+        await wrapper.vm.$nextTick()
+        await flushPromises()
+        menu = wrapper.vm.$refs.contextMenu.menu
+        jest.spyOn(menu, 'hide')
+        jest.spyOn(menu, 'show')
+      })
+
+      it('does not leave hiding to a click outside', () => {
+        expect(menu.props.hideOnClick).toBe(false)
+      })
+
+      it('hides the list on blur and keeps it', () => {
+        wrapper.vm.editor.emit('blur', {})
+        expect(menu.hide).toHaveBeenCalled()
+        expect(wrapper.vm.$refs.contextMenu.menu).toBe(menu)
+      })
+
+      it('shows the list again on focus', () => {
+        wrapper.vm.editor.emit('blur', {})
+        wrapper.vm.editor.emit('focus', {})
+        expect(menu.show).toHaveBeenCalled()
+      })
+
+      it('shows nothing on focus once the list was closed', () => {
+        wrapper.vm.closeSuggestionList()
+        wrapper.vm.editor.emit('focus', {})
+        expect(menu.show).not.toHaveBeenCalled()
+        expect(wrapper.vm.$refs.contextMenu.menu).toBeFalsy()
+      })
+    })
+
+    describe('optional extensions', () => {
+      it('assigns the Mention extension when it can load suggestions', () => {
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([])
+        wrapper = Wrapper()
+        expect(wrapper.vm.editor.extensions.options).toEqual(
+          expect.objectContaining({ mention: expect.anything() }),
+        )
+      })
+
+      it('mentions is not an option when suggestions cannot be loaded', () => {
         expect(wrapper.vm.editor.extensions.options).toEqual(
           expect.not.objectContaining({
             mention: expect.anything(),
@@ -261,58 +427,35 @@ describe('Editor.vue', () => {
         )
       })
 
-      describe('limists suggestion list to 15 users', () => {
-        beforeEach(() => {
-          const manyUsersList = []
-          for (let i = 0; i < 25; i++) {
-            manyUsersList.push({ id: `user${i}` })
-          }
-          propsData.users = manyUsersList
-          wrapper = Wrapper()
-        })
-
-        it('when query is empty', () => {
-          expect(
-            wrapper.vm.editor.extensions.options.mention.onFilter(propsData.users),
-          ).toHaveLength(15)
-        })
-
-        it('when query is present', () => {
-          expect(
-            wrapper.vm.editor.extensions.options.mention.onFilter(propsData.users, 'user'),
-          ).toHaveLength(15)
-        })
-      })
-
       it('suggestion list returns results prefixed by query', () => {
-        const manyUsersList = []
+        const manyHashtagsList = []
         for (let i = 0; i < 10; i++) {
-          manyUsersList.push({ id: `user${i}` })
-          manyUsersList.push({ id: `admin${i}` })
-          manyUsersList.push({ id: `moderator${i}` })
+          manyHashtagsList.push({ id: `nature${i}` })
+          manyHashtagsList.push({ id: `peace${i}` })
+          manyHashtagsList.push({ id: `democracy${i}` })
         }
-        propsData.users = manyUsersList
+        propsData.hashtags = manyHashtagsList
         wrapper = Wrapper()
-        const suggestionList = wrapper.vm.editor.extensions.options.mention.onFilter(
-          propsData.users,
-          'moderator',
+        const suggestionList = wrapper.vm.editor.extensions.options.hashtag.onFilter(
+          propsData.hashtags,
+          'democracy',
         )
         expect(suggestionList).toHaveLength(10)
         for (var i = 0; i < suggestionList.length; i++) {
-          expect(suggestionList[i].id).toMatch(/^moderator.*/)
+          expect(suggestionList[i].id).toMatch(/^democracy.*/)
         }
       })
 
       it('exact match appears at the top of suggestion list', () => {
-        const manyUsersList = []
+        const manyHashtagsList = []
         for (let i = 0; i < 25; i++) {
-          manyUsersList.push({ id: `user${i}` })
+          manyHashtagsList.push({ id: `peace${i}` })
         }
-        propsData.users = manyUsersList
+        propsData.hashtags = manyHashtagsList
         wrapper = Wrapper()
         expect(
-          wrapper.vm.editor.extensions.options.mention.onFilter(propsData.users, 'user7')[0].id,
-        ).toMatch('user7')
+          wrapper.vm.editor.extensions.options.hashtag.onFilter(propsData.hashtags, 'peace7')[0].id,
+        ).toMatch('peace7')
       })
 
       it('sets the Hashtag items to the hashtags', () => {

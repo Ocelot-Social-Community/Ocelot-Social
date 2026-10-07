@@ -1,7 +1,12 @@
 <template>
   <form @submit.prevent="handleSubmit" class="comment-form" novalidate>
     <os-card>
-      <hc-editor ref="editor" :users="users" :value="form.content" @input="updateEditorContent" />
+      <hc-editor
+        ref="editor"
+        :mention-suggestions="mentionSuggestions"
+        :value="form.content"
+        @input="updateEditorContent"
+      />
       <div class="buttons">
         <os-button
           variant="primary"
@@ -34,7 +39,7 @@ import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import HcEditor from '~/components/Editor/Editor'
 import { branding } from '@ocelot-social/branding'
-import { minimisedUserQuery } from '~/graphql/User'
+import { fetchMentionSuggestions } from '~/components/Editor/mentionSuggestions'
 import CommentMutations from '~/graphql/CommentMutations'
 
 export default {
@@ -47,6 +52,8 @@ export default {
   props: {
     update: { type: Boolean, default: () => false },
     post: { type: Object, default: () => {} },
+    // Editing a comment (CommentCard) comes with the id only, not with the post.
+    postId: { type: String, default: null },
     comment: {
       type: Object,
       default: () => {},
@@ -71,10 +78,15 @@ export default {
       form: {
         content: !this.update || !this.comment.content ? '' : this.comment.content,
       },
-      users: [],
     }
   },
   methods: {
+    mentionSuggestions(query) {
+      return fetchMentionSuggestions(this.$apollo, {
+        query,
+        postId: (this.post && this.post.id) || this.postId,
+      })
+    },
     reply(message) {
       this.$refs.editor.insertReply(message)
     },
@@ -150,16 +162,6 @@ export default {
       } finally {
         this.loading = false
       }
-    },
-  },
-  apollo: {
-    User: {
-      query() {
-        return minimisedUserQuery()
-      },
-      update({ User }) {
-        this.users = User
-      },
     },
   },
 }
