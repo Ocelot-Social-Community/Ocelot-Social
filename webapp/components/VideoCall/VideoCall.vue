@@ -603,6 +603,7 @@ export default {
     // who keeps talking never jumps around the chip row.
     this.speakerSeenAt = new Map()
     this.speakerHoldTimer = null
+    this.micRestart = null
     this.stageObserver = null
     this.observedStage = null
   },
@@ -876,12 +877,6 @@ export default {
           this.refreshTiles()
           this.audioBlocked = !room.canPlaybackAudio
         })
-        // Fires right after publishing when the microphone yields pure digital
-        // silence — on macOS typically a browser that lacks the system's
-        // microphone permission, or a device held by another app.
-        room.on(RoomEvent.LocalAudioSilenceDetected, () => {
-          if (this.micEnabled) this.micProblem = true
-        })
         // A device came or went (headset plugged in, AirPods reconnected).
         // LiveKit already follows the system default; if our microphone was
         // dead, this is the moment a fresh capture has a chance to work.
@@ -1079,6 +1074,14 @@ export default {
       track.on(TrackEvent.UpstreamResumed, () => {
         this.micProblem = false
       })
+      // LiveKit checks the track for pure digital silence right after
+      // publishing and after every restart — on macOS typically a browser that
+      // lacks the system's microphone permission, or a device held by another
+      // app. Listening on the track rather than the room keeps a silent
+      // screen-share audio track from raising a microphone warning.
+      track.on(TrackEvent.AudioSilenceDetected, () => {
+        if (this.micEnabled) this.micProblem = true
+      })
     },
     async enableAudio() {
       if (!this.room) return
@@ -1091,7 +1094,17 @@ export default {
       }
       this.audioBlocked = !this.room.canPlaybackAudio
     },
-    async restartMic() {
+    restartMic() {
+      // A click and a device change can ask at the same time; one fresh
+      // capture is enough, so later callers share the running attempt.
+      if (!this.micRestart) {
+        this.micRestart = this.doRestartMic().finally(() => {
+          this.micRestart = null
+        })
+      }
+      return this.micRestart
+    },
+    async doRestartMic() {
       const room = this.room
       const Track = this.Track
       if (!room || !Track) return
@@ -1100,11 +1113,13 @@ export default {
       if (!track) return
       try {
         // A fresh getUserMedia capture replaces the dead MediaStreamTrack on the
-        // same publication. restartTrack() swaps the sender's track but leaves
-        // LiveKit's paused flag set, so resume explicitly as well.
+        // same publication; LiveKit resumes a paused upstream on its own, keeps
+        // a muted track disabled and stops a track that was stopped meanwhile.
         await track.restartTrack()
-        if (track.isUpstreamPaused) await track.resumeUpstream()
-        this.micProblem = false
+        // The new capture can be just as silent as the old one — only drop the
+        // warning once it is shown to deliver a signal.
+        const silent = await track.checkForSilence()
+        this.micProblem = this.micEnabled && silent
       } catch (err) {
         this.showDeviceErrorToast('mic', err)
       }

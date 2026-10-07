@@ -23,10 +23,13 @@ jest.mock('livekit-client', () => {
     AudioPlaybackStatusChanged: 'AudioPlaybackStatusChanged',
     Reconnecting: 'Reconnecting',
     Reconnected: 'Reconnected',
-    LocalAudioSilenceDetected: 'LocalAudioSilenceDetected',
     MediaDevicesChanged: 'MediaDevicesChanged',
   }
-  const TrackEvent = { UpstreamPaused: 'upstreamPaused', UpstreamResumed: 'upstreamResumed' }
+  const TrackEvent = {
+    UpstreamPaused: 'upstreamPaused',
+    UpstreamResumed: 'upstreamResumed',
+    AudioSilenceDetected: 'audioSilenceDetected',
+  }
   const Track = {
     Source: { Microphone: 'microphone', Camera: 'camera', ScreenShare: 'screen_share' },
   }
@@ -1113,12 +1116,11 @@ describe('VideoCall', () => {
       const handlers = {}
       return {
         handlers,
-        isUpstreamPaused: false,
         on: jest.fn((evt, cb) => {
           handlers[evt] = cb
         }),
         restartTrack: jest.fn().mockResolvedValue(),
-        resumeUpstream: jest.fn().mockResolvedValue(),
+        checkForSilence: jest.fn().mockResolvedValue(false),
         ...overrides,
       }
     }
@@ -1190,15 +1192,19 @@ describe('VideoCall', () => {
     describe('a microphone that delivers nothing', () => {
       it('warns when the published microphone only yields silence', async () => {
         const { wrapper, room } = await connected()
-        room.handlers.LocalAudioSilenceDetected()
+        const track = fakeMicTrack()
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
+        track.handlers.audioSilenceDetected()
         await wrapper.vm.$nextTick()
         expect(wrapper.find('[data-test="video-call-mic-problem"]').exists()).toBe(true)
       })
 
       it('ignores silence while the microphone is muted on purpose', async () => {
         const { wrapper, room } = await connected()
+        const track = fakeMicTrack()
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
         wrapper.setData({ micEnabled: false })
-        room.handlers.LocalAudioSilenceDetected()
+        track.handlers.audioSilenceDetected()
         expect(wrapper.vm.micProblem).toBe(false)
       })
 
@@ -1226,9 +1232,9 @@ describe('VideoCall', () => {
         expect(track.on).not.toHaveBeenCalled()
       })
 
-      it('restarts the capture and resumes the paused upstream on request', async () => {
+      it('restarts the capture on request and drops the warning once it carries sound', async () => {
         const { wrapper, room } = await connected()
-        const track = fakeMicTrack({ isUpstreamPaused: true })
+        const track = fakeMicTrack()
         room.localParticipant.getTrackPublication.mockReturnValue({ track })
         wrapper.setData({ micProblem: true })
         await wrapper.vm.$nextTick()
@@ -1237,17 +1243,51 @@ describe('VideoCall', () => {
         await flushPromises()
         expect(room.localParticipant.getTrackPublication).toHaveBeenCalledWith('microphone')
         expect(track.restartTrack).toHaveBeenCalled()
-        expect(track.resumeUpstream).toHaveBeenCalled()
+        expect(track.checkForSilence).toHaveBeenCalled()
         expect(wrapper.vm.micProblem).toBe(false)
       })
 
-      it('does not resume an upstream that was never paused', async () => {
+      it('keeps the warning when the new capture is just as silent', async () => {
         const { wrapper, room } = await connected()
-        const track = fakeMicTrack()
+        const track = fakeMicTrack({ checkForSilence: jest.fn().mockResolvedValue(true) })
         room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        wrapper.setData({ micProblem: true })
         await wrapper.vm.restartMic()
-        expect(track.restartTrack).toHaveBeenCalled()
-        expect(track.resumeUpstream).not.toHaveBeenCalled()
+        expect(wrapper.vm.micProblem).toBe(true)
+      })
+
+      it('reports no problem when the user muted while the capture restarted', async () => {
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack({ checkForSilence: jest.fn().mockResolvedValue(true) })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        wrapper.setData({ micProblem: true, micEnabled: false })
+        await wrapper.vm.restartMic()
+        expect(wrapper.vm.micProblem).toBe(false)
+      })
+
+      it('runs one restart at a time, sharing it with callers who ask meanwhile', async () => {
+        const { wrapper, room } = await connected()
+        let finish
+        const track = fakeMicTrack({
+          restartTrack: jest.fn(
+            () =>
+              new Promise((resolve) => {
+                finish = resolve
+              }),
+          ),
+        })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        const first = wrapper.vm.restartMic()
+        const second = wrapper.vm.restartMic()
+        expect(second).toBe(first)
+        finish()
+        await first
+        expect(track.restartTrack).toHaveBeenCalledTimes(1)
+        // Once settled, the next request starts a fresh attempt.
+        const third = wrapper.vm.restartMic()
+        finish()
+        await third
+        expect(track.restartTrack).toHaveBeenCalledTimes(2)
       })
 
       it('keeps the warning and toasts when the capture cannot be restarted', async () => {
