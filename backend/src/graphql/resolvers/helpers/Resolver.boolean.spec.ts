@@ -51,7 +51,7 @@ beforeAll(async () => {
 
   await Factory.build(
     'group',
-    { id: SHARED_ID, name: 'Muted Group', slug: 'muted-group', template: 'public' },
+    { id: SHARED_ID, name: 'Muted Group', slug: 'muted-group', groupType: 'public' },
     { creator: viewer },
   )
   // A node of a DIFFERENT type carrying the same id. It has no MUTED edge, so an unlabelled
