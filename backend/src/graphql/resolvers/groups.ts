@@ -31,6 +31,7 @@ import {
   readGroupRoles,
   seedRolesForNewGroup,
   setNonMemberMemberListAccess,
+  withinTransaction,
 } from '@src/groupRole/repository'
 
 import {
@@ -450,6 +451,16 @@ export default {
           // In the same transaction as the group itself: a group without roles is a group
           // nobody can act in, so the two commit together or not at all.
           await seedRolesForNewGroup(transaction, params.id, template, new Date().toISOString())
+          // Opened after the seeding, which sets the list from the template, and in the same
+          // transaction: a group created with its member list open is never committed closed.
+          if (requestedShowMembers === true && createdVisibility === 'closed') {
+            await setNonMemberMemberListAccess(
+              withinTransaction(transaction),
+              params.id,
+              true,
+              new Date().toISOString(),
+            )
+          }
           // The answer is read AFTER the roles, not captured from the CREATE above: seeding
           // writes the derived columns and the visibility is computed from them, so the earlier
           // row would answer `hidden` for every group ever created. The node is matched inside
@@ -471,21 +482,6 @@ export default {
           GROUP_REVERSE_GEOCODE_TYPES,
           true,
         )
-        if (requestedShowMembers === true && createdVisibility === 'closed') {
-          await setNonMemberMemberListAccess(
-            context.database,
-            params.id,
-            true,
-            new Date().toISOString(),
-          )
-          // Read back: the member list is a right of the non-member role now, and the answer
-          // has to say what was saved.
-          const { records } = await context.database.query({
-            query: `MATCH (group:Group {id: $groupId}) RETURN group {.*} AS group`,
-            variables: { groupId: params.id },
-          })
-          return records[0].get('group')
-        }
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
@@ -555,6 +551,8 @@ export default {
       // translated into the roles that carry it (see applyTemplateToNonMemberRoles), and that
       // needs to know whether the type actually changed.
       let previousVisibility: string | undefined
+      let permissionsChanged = false
+      let memberListChanged = false
       try {
         // The row this transaction produces is NOT the answer — the answer is read back below,
         // after the role writes that the visibility is computed from. It is still returned
@@ -615,8 +613,44 @@ export default {
               transaction,
             })
           }
+          // The rights below are written in THIS transaction: the template, both non-member
+          // roles and the columns mirrored from them are several statements, and committed one
+          // by one a failure halfway would leave a group whose stored template and rights
+          // disagree. The events go out only once all of it is committed (below).
+          const db = withinTransaction(transaction)
+          const now = new Date().toISOString()
+          if (requestedTemplate && requestedTemplate !== previousVisibility) {
+            // A template is a preset for what outsiders may do, so applying one writes those
+            // rights. Nothing stores the visibility any more — which is why the switch has to
+            // land in the `none` and `pending` roles to have any effect at all.
+            await applyTemplateToNonMemberRoles(db, groupId, requestedTemplate, actor, now)
+            permissionsChanged = true
+          }
+          // The deprecated argument keeps the meaning it always had: whether a CLOSED group
+          // shows its members to outsiders. The current form sends it on every save — `false`
+          // included, for a public group whose list it never governed — so outside a closed
+          // group it changes nothing. (Opening a hidden group's list was refused above.)
+          if (
+            typeof params.showMembers === 'boolean' &&
+            (requestedTemplate ?? previousVisibility) === 'closed'
+          ) {
+            // Keep the right and the (deprecated) property in step: the property is what older
+            // clients still read, the right is what actually decides.
+            await setNonMemberMemberListAccess(db, groupId, params.showMembers === true, now)
+            memberListChanged = true
+          }
           return group
         })
+        if (permissionsChanged) {
+          void context.pubsub.publish(GROUP_PERMISSIONS_CHANGED, {
+            groupPermissionsChanged: { groupId },
+          })
+        }
+        if (memberListChanged) {
+          void context.pubsub.publish(GROUP_SHOW_MEMBERS_CHANGED, {
+            groupShowMembersChanged: { groupId },
+          })
+        }
         // TODO: put in a middleware, see "CreateGroup", "UpdateUser"
         await createOrUpdateLocations(
           'Group',
@@ -628,41 +662,6 @@ export default {
           GROUP_REVERSE_GEOCODE_TYPES,
           true,
         )
-        if (requestedTemplate && requestedTemplate !== previousVisibility) {
-          // A template is a preset for what outsiders may do, so applying one writes those
-          // rights. Nothing stores the visibility any more — which is why the switch has to
-          // land in the `none` and `pending` roles to have any effect at all.
-          await applyTemplateToNonMemberRoles(
-            context.database,
-            groupId,
-            requestedTemplate,
-            actor,
-            new Date().toISOString(),
-          )
-          void context.pubsub.publish(GROUP_PERMISSIONS_CHANGED, {
-            groupPermissionsChanged: { groupId },
-          })
-        }
-        // The deprecated argument keeps the meaning it always had: whether a CLOSED group shows
-        // its members to outsiders. The current form sends it on every save — `false` included,
-        // for a public group whose list it never governed — so outside a closed group it changes
-        // nothing. (Opening a hidden group's list was refused above.)
-        if (
-          typeof params.showMembers === 'boolean' &&
-          (requestedTemplate ?? previousVisibility) === 'closed'
-        ) {
-          // Keep the right and the (deprecated) property in step: the property is what older
-          // clients still read, the right is what actually decides.
-          await setNonMemberMemberListAccess(
-            context.database,
-            groupId,
-            params.showMembers === true,
-            new Date().toISOString(),
-          )
-          void context.pubsub.publish(GROUP_SHOW_MEMBERS_CHANGED, {
-            groupShowMembersChanged: { groupId },
-          })
-        }
         // Read back last: both writes above land in the ROLES, and the visibility is computed
         // from the columns they keep in step — the row captured before them would report the
         // group as it was, which is the one thing a mutation's answer must not do.

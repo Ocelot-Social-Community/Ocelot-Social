@@ -3,7 +3,15 @@ import { describe, beforeEach, afterAll, it, expect } from 'vitest'
 import databaseContext from '@context/database'
 import { cleanDatabase } from '@db/factories'
 
-import { readGroupTemplate, seedRolesForGroupsWithoutRoles, writeGroupTemplate } from './repository'
+import {
+  applyTemplateToNonMemberRoles,
+  readGroupRoles,
+  readGroupTemplate,
+  seedRolesForGroupsWithoutRoles,
+  seedRolesForNewGroup,
+  withinTransaction,
+  writeGroupTemplate,
+} from './repository'
 import { seedGroupRoleTemplates } from './seedTemplates'
 
 const NOW = '2026-10-08T12:00:00.000Z'
@@ -69,5 +77,39 @@ describe('groups from before the templates', () => {
     })
 
     expect(await readGroupTemplate(database, 'both')).toBe('closed')
+  })
+})
+
+describe(withinTransaction, () => {
+  it('lets several writes commit or roll back as one', async () => {
+    // Applying a template is a handful of statements (the template, both non-member roles, the
+    // mirrored columns). Run through the transaction, a failure after them takes all of them
+    // back: the group is left as it was, not with a template its rights do not match.
+    const session = database.driver.session()
+    try {
+      await session.writeTransaction(async (transaction) => {
+        await transaction.run(`CREATE (:Group {id: 'g1'})`)
+        await seedRolesForNewGroup(transaction, 'g1', 'public', NOW)
+      })
+      const before = await readGroupRoles(database, 'g1')
+
+      await expect(
+        session.writeTransaction(async (transaction) => {
+          await applyTemplateToNonMemberRoles(
+            withinTransaction(transaction),
+            'g1',
+            'hidden',
+            'actor',
+            NOW,
+          )
+          throw new Error('a later write fails')
+        }),
+      ).rejects.toThrow('a later write fails')
+
+      expect(await readGroupTemplate(database, 'g1')).toBe('public')
+      expect(await readGroupRoles(database, 'g1')).toEqual(before)
+    } finally {
+      await session.close()
+    }
   })
 })

@@ -18,9 +18,21 @@ import { parseStoredPermissions } from './storedPermissions'
 import { NONE_ROLE, PENDING_ROLE } from './types'
 
 import type { GroupRoleDefinition, GroupRoleTemplates } from './types'
-import type databaseContext from '@context/database'
 
-type DbContext = ReturnType<typeof databaseContext>
+type Statement = (args: {
+  query: string
+  variables?: Record<string, unknown>
+}) => Promise<{ records: Array<{ get: (key: string) => unknown }> }>
+
+/**
+ * What this module needs of the database: a statement to read with and one to write with.
+ * Structural, so the request's database context fits — and so does a running transaction
+ * (see withinTransaction), which is how a caller makes several writes below ONE commit.
+ */
+interface DbContext {
+  query: Statement
+  write: Statement
+}
 
 /**
  * The bit of a Neo4j transaction this module needs. Structural rather than the driver's
@@ -189,6 +201,20 @@ const WRITE_NON_MEMBER_ACCESS_CYPHER = `
       g.showMembers = $showMembers,
       g.nonMemberJoin = $nonMemberJoin
 `
+
+/**
+ * A running transaction, as the db context the functions here take.
+ *
+ * Every function in this module writes through `db.write`, which is a transaction of its own
+ * when `db` is the request's database context. Several of them in a row — the template, both
+ * non-member roles, the mirrored columns — would then commit one by one, and a failure halfway
+ * leaves a group whose stored template and rights disagree. Handed this instead, they all run
+ * in the caller's transaction and commit or roll back together.
+ */
+export const withinTransaction = (transaction: RoleSeedTransaction): DbContext => ({
+  query: async ({ query, variables }) => transaction.run(query, variables),
+  write: async ({ query, variables }) => transaction.run(query, variables),
+})
 
 /** A db context, as the runner the seeding path already speaks. */
 const runnerFor = (db: DbContext): RoleSeedTransaction => ({
