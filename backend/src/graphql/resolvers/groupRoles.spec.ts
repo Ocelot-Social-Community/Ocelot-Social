@@ -8,6 +8,7 @@ import {
   clearElevation,
   deleteGroupRole,
   markGroupRolesCustomized,
+  markGroupRolesUncustomized,
   memberCountsByRole,
   readElevation,
   readGroupRoles,
@@ -41,6 +42,7 @@ vi.mock('@src/groupRole/repository', () => ({
   deleteGroupRole: vi.fn(),
   replaceGroupRoles: vi.fn(),
   markGroupRolesCustomized: vi.fn(),
+  markGroupRolesUncustomized: vi.fn(),
   untouchedGroupIdsByTemplate: vi.fn(),
   readGroupTemplate: vi.fn(),
   writeGroupTemplate: vi.fn(),
@@ -56,6 +58,7 @@ const mocked = {
   clearElevation: vi.mocked(clearElevation),
   deleteGroupRole: vi.mocked(deleteGroupRole),
   markGroupRolesCustomized: vi.mocked(markGroupRolesCustomized),
+  markGroupRolesUncustomized: vi.mocked(markGroupRolesUncustomized),
   memberCountsByRole: vi.mocked(memberCountsByRole),
   readElevation: vi.mocked(readElevation),
   readGroupRoles: vi.mocked(readGroupRoles),
@@ -138,6 +141,20 @@ const contextFor = (options: ContextOptions = {}) => {
       write: vi.fn(async (args: { query: string; variables?: Record<string, unknown> }) => {
         queries.push(args)
         return Promise.resolve({ records: options.writeRecords ?? [] })
+      }),
+    },
+    // The writes that have to commit together go through a session; this one records them
+    // with the rest and answers as the database context does.
+    driver: {
+      session: () => ({
+        writeTransaction: async (work: (transaction: unknown) => Promise<unknown>) =>
+          work({
+            run: vi.fn(async (query: string, variables?: Record<string, unknown>) => {
+              queries.push({ query, variables })
+              return Promise.resolve({ records: options.writeRecords ?? [] })
+            }),
+          }),
+        close: async () => Promise.resolve(),
       }),
     },
     groupAuthorization: { forGroup: vi.fn(async () => Promise.resolve(authorization)) },
@@ -433,8 +450,10 @@ describe('Group.myGroupRole', () => {
     const { context } = contextFor({ authorization: { roleName: 'admin' } })
     mocked.readGroupRoles.mockResolvedValue([role('admin', ['group.invite'])])
 
+    // With its group, or effectivePermissions could not tell it from a template role.
     expect(await Group.myGroupRole({ id: 'g1' }, {}, context)).toEqual({
       ...role('admin', ['group.invite']),
+      groupId: 'g1',
       memberCount: null,
     })
     expect(mocked.memberCountsByRole).not.toHaveBeenCalled()
@@ -507,7 +526,12 @@ describe('Mutation.updateGroupRole', () => {
       context,
     )
 
-    expect(updated).toMatchObject({ name: 'owner', label: 'Founder', memberCount: null })
+    expect(updated).toMatchObject({
+      name: 'owner',
+      label: 'Founder',
+      groupId: 'g1',
+      memberCount: null,
+    })
     expect(mocked.markGroupRolesCustomized).toHaveBeenCalled()
     expect(published).toHaveLength(1)
   })
@@ -829,6 +853,7 @@ describe('Mutation.createGroupRole', () => {
       protected: false,
       // A new role is a membership too, so the right to end it comes with it.
       permissions: ['group.invite', 'group.leave'],
+      groupId: 'g1',
       memberCount: 0,
     })
     expect(published).toHaveLength(1)
@@ -941,6 +966,37 @@ describe('Mutation.deleteGroupRole', () => {
     ).rejects.toThrow('Unknown group role!')
   })
 
+  it.each(['none', 'pending'])(
+    'refuses to move the members into %s, which is no membership',
+    async (reassignTo) => {
+      mocked.readGroupRoles.mockResolvedValue([role('steward'), role(reassignTo)])
+      const { context } = contextFor()
+
+      await expect(
+        Mutation.deleteGroupRole({}, { groupId: 'g1', name: 'steward', reassignTo }, context),
+      ).rejects.toMatchObject({ extensions: { errorCode: 'GROUP_ROLE_REASSIGN_TARGET_INVALID' } })
+    },
+  )
+
+  it('refuses to move the members into a role the actor could not hand out', async () => {
+    // Moving everybody into a role is handing that role out. Read off the EFFECTIVE set: the
+    // owner's stored list is empty, and would otherwise be covered by anybody.
+    mocked.readGroupRoles.mockResolvedValue([
+      role('steward'),
+      role('owner', [], { system: true, protected: true }),
+    ])
+    const { context } = contextFor({ authorization: { effective: ['group.role.manage'] } })
+
+    await expect(
+      Mutation.deleteGroupRole(
+        {},
+        { groupId: 'g1', name: 'steward', reassignTo: 'owner' },
+        context,
+      ),
+    ).rejects.toMatchObject({ extensions: { errorCode: 'GROUP_ROLE_PERMISSIONS_NOT_HELD' } })
+    expect(mocked.deleteGroupRole).not.toHaveBeenCalled()
+  })
+
   it('deletes it and names what it deleted', async () => {
     mocked.readGroupRoles.mockResolvedValue([role('steward'), role('usual', [], { system: true })])
     const { context, published } = contextFor()
@@ -1017,6 +1073,8 @@ describe('Mutation.resetGroupRoles', () => {
     await Mutation.resetGroupRoles({}, { groupId: 'g1', template: 'channel' }, context)
 
     expect(mocked.writeGroupTemplate).toHaveBeenCalledWith(context.database, 'g1', 'channel')
+    // ...and runs on it unedited, or every later change to that template would pass it by.
+    expect(mocked.markGroupRolesUncustomized).toHaveBeenCalledWith(context.database, 'g1')
   })
 
   describe('the coverage rule', () => {
@@ -1047,6 +1105,23 @@ describe('Mutation.resetGroupRoles', () => {
     it('does not ask for a right a role already has', async () => {
       // Keeping a right grants nobody anything — the same reading updateGroupRole takes.
       mocked.readGroupRoleTemplates.mockResolvedValue({ public: template })
+      mocked.readGroupTemplate.mockResolvedValue('public')
+      mocked.readGroupRoles.mockResolvedValue(template)
+      const { context } = contextFor({
+        authorization: { visibility: 'public', roleName: 'admin', effective: [] },
+      })
+
+      await Mutation.resetGroupRoles({}, { groupId: 'g1' }, context)
+
+      expect(mocked.replaceGroupRoles).toHaveBeenCalled()
+    })
+
+    it('does not ask an admin to cover the owner role of the template', async () => {
+      // The owner role resolves to the whole catalog; nobody but an owner could cover it, and
+      // putting a template back must not be an owner-only act for that reason alone.
+      mocked.readGroupRoleTemplates.mockResolvedValue({
+        public: [...template, role('owner', [], { system: true, protected: true })],
+      })
       mocked.readGroupTemplate.mockResolvedValue('public')
       mocked.readGroupRoles.mockResolvedValue(template)
       const { context } = contextFor({
@@ -1119,6 +1194,35 @@ describe('Mutation.setGroupMemberRole', () => {
     ).rejects.toThrow('Unknown group role!')
   })
 
+  it('refuses none, which is the absence of a membership rather than a role on one', async () => {
+    mocked.readGroupRoles.mockResolvedValue([role('none')])
+    const { context, queries } = contextFor()
+
+    await expect(
+      Mutation.setGroupMemberRole({}, { groupId: 'g1', userId: 'u1', roleName: 'none' }, context),
+    ).rejects.toMatchObject({ extensions: { errorCode: 'GROUP_ROLE_NAME_INVALID' } })
+    expect(queries).toHaveLength(0)
+  })
+
+  it.each([
+    ['usual', 'into', /MERGE \(user\)-\[:CHATS_IN\]->\(room\)/],
+    ['pending', 'out of', /DELETE/],
+  ])(
+    'moves a member set to %s %s the group chat, in the same transaction',
+    async (roleName, _direction, statement) => {
+      // As ChangeGroupMemberRole keeps it: an applicant is not in the group's chat room, every
+      // other role is.
+      mocked.readGroupRoles.mockResolvedValue([role(roleName)])
+      const { context, queries } = contextFor({
+        writeRecords: [record({ user: { id: 'u1' }, membership: { role: roleName } })],
+      })
+
+      await Mutation.setGroupMemberRole({}, { groupId: 'g1', userId: 'u1', roleName }, context)
+
+      expect(queries.map(({ query }) => query).some((query) => statement.test(query))).toBe(true)
+    },
+  )
+
   it('refuses when neither the user nor the group is there', async () => {
     mocked.readGroupRoles.mockResolvedValue([role('usual')])
     const { context } = contextFor({ writeRecords: [] })
@@ -1169,6 +1273,19 @@ describe('Mutation.removePostFromGroup', () => {
 })
 
 describe('Mutation.updateGroupRoleTemplate', () => {
+  it('refuses a template that does not exist at all', async () => {
+    mocked.readGroupRoleTemplates.mockResolvedValue({ public: [role('none')] })
+    const { context } = contextFor()
+
+    await expect(
+      Mutation.updateGroupRoleTemplate(
+        {},
+        { template: 'archived', name: 'none', permissions: [] },
+        context,
+      ),
+    ).rejects.toMatchObject({ extensions: { errorCode: 'GROUP_TEMPLATE_ROLE_UNKNOWN' } })
+  })
+
   it('refuses a template role that does not exist', async () => {
     mocked.readGroupRoleTemplates.mockResolvedValue({ public: [role('none')] })
     const { context } = contextFor()
@@ -1212,11 +1329,14 @@ describe('Mutation.updateGroupRoleTemplate', () => {
     expect(updated).toMatchObject({ permissions: [], label: 'Founder' })
   })
 
-  it('refuses a non-member role that contradicts the template`s own name', async () => {
-    // The name of a template IS a privacy level, and the level comes from these two rights. A
-    // `public` template whose non-member role cannot read would create groups listed as
-    // public that nobody can find — the operator who wants that has the `closed` template.
-    mocked.readGroupRoleTemplates.mockResolvedValue({ public: [role('none', ['group.read'])] })
+  it('refuses a non-member role that changes what the template derives to', async () => {
+    // The level a template derives to comes from these two rights, and the three standard
+    // templates are named after it. A `public` template whose non-member role cannot read
+    // would create groups listed as public that nobody can find — the operator who wants that
+    // has the `closed` template.
+    mocked.readGroupRoleTemplates.mockResolvedValue({
+      public: [role('none', ['group.read', 'group.content.read'])],
+    })
     const { context } = contextFor()
 
     await expect(
@@ -1226,6 +1346,29 @@ describe('Mutation.updateGroupRoleTemplate', () => {
         context,
       ),
     ).rejects.toThrow('a different visibility than it is named')
+  })
+
+  it('lets a template not named after its level be edited within that level', async () => {
+    // `channel` derives to public without being called `public`: compared with its NAME, every
+    // edit of its non-member role was refused.
+    mocked.readGroupRoleTemplates.mockResolvedValue({
+      channel: [role('none', ['group.read', 'group.content.read', 'group.join'])],
+    })
+    const { context } = contextFor()
+
+    await Mutation.updateGroupRoleTemplate(
+      {},
+      { template: 'channel', name: 'none', permissions: ['group.read', 'group.content.read'] },
+      context,
+    )
+
+    expect(mocked.writeGroupRoleTemplate).toHaveBeenCalledWith(
+      context.database,
+      'channel',
+      expect.objectContaining({ name: 'none' }),
+      'actor',
+      expect.any(String),
+    )
   })
 
   it('accepts a non-member role that matches the name', async () => {
@@ -1414,6 +1557,25 @@ describe('Group.mayElevateInGroup', () => {
 })
 
 describe('Mutation.elevateInGroup', () => {
+  it('takes a reason longer than a role label, up to its own limit', async () => {
+    // It used to be checked as a role's display name: 64 characters, and a message about the
+    // wrong field.
+    mocked.writeElevation.mockResolvedValue({ groupId: 'g1', expiresAt: 'x', reason: 'r' })
+    const { context } = contextFor({ authorization: { mayElevate: true } })
+
+    await expect(
+      Mutation.elevateInGroup({}, { groupId: 'g1', reason: 'x'.repeat(280) }, context),
+    ).resolves.toBeTruthy()
+
+    for (const reason of ['x'.repeat(281), ' padded']) {
+      await expect(
+        Mutation.elevateInGroup({}, { groupId: 'g1', reason }, context),
+      ).rejects.toMatchObject({
+        extensions: { errorCode: 'GROUP_ELEVATION_REASON_INVALID', params: { max: 280 } },
+      })
+    }
+  })
+
   it('writes the record with the reason, announces it, and logs who did it where', async () => {
     const elevation = { groupId: 'g1', expiresAt: '2026-10-02T17:00:00.000Z', reason: 'Report #12' }
     mocked.writeElevation.mockResolvedValue(elevation)
@@ -1467,13 +1629,13 @@ describe('Mutation.elevateInGroup', () => {
   })
 
   it('refuses a reason that is not one', async () => {
-    // The reason is shown to whoever reads the group's record later, so it goes through the
-    // same validation as a role label rather than straight into the graph.
+    // The reason is shown to whoever reads the group's record later, so it is validated rather
+    // than going straight into the graph — with a message about the reason, not a role label.
     const { context } = contextFor({ authorization: { mayElevate: true } })
 
     await expect(
       Mutation.elevateInGroup({}, { groupId: 'g1', reason: ' padded ' }, context),
-    ).rejects.toThrow('Invalid role label!')
+    ).rejects.toMatchObject({ extensions: { errorCode: 'GROUP_ELEVATION_REASON_INVALID' } })
     expect(mocked.writeElevation).not.toHaveBeenCalled()
   })
 

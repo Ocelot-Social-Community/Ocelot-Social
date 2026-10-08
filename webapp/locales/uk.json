@@ -441,6 +441,7 @@
       "UNAUTHENTICATED": "Будь ласка, увійди, щоб продовжити."
     },
     "GROUPS_FEATURE_DISABLED": "Групи в цій мережі не ввімкнено.",
+    "GROUP_ELEVATION_REASON_INVALID": "Причина може містити не більше {max} символів і не повинна починатися чи закінчуватися пробілом.",
     "GROUP_ELEVATION_REASON_MISSING": "Вкажи, чим ти тут займаєшся.",
     "GROUP_ELEVATION_RIGHTS_MISSING": "Твої дозволи в мережі дозволяють тут лише читати.",
     "GROUP_FIELD_GROUP_ID_MISSING": "Групу не знайдено.",

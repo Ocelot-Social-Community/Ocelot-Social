@@ -1185,7 +1185,7 @@ export default {
   },
 }
 
-const addUserToGroupChatRoom = async (transaction, groupId, userId) => {
+export const addUserToGroupChatRoom = async (transaction, groupId, userId) => {
   await transaction.run(
     `
     OPTIONAL MATCH (room:Room)-[:ROOM_FOR]->(group:Group {id: $groupId})
@@ -1198,7 +1198,7 @@ const addUserToGroupChatRoom = async (transaction, groupId, userId) => {
   )
 }
 
-const removeUserFromGroupChatRoom = async (transaction, groupId, userId) => {
+export const removeUserFromGroupChatRoom = async (transaction, groupId, userId) => {
   await transaction.run(
     `
     OPTIONAL MATCH (user:User {id: $userId})-[chatsIn:CHATS_IN]->(room:Room)-[:ROOM_FOR]->(group:Group {id: $groupId})

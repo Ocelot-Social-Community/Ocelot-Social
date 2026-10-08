@@ -441,6 +441,7 @@
       "UNAUTHENTICATED": "Por favor, inicia sesión para continuar."
     },
     "GROUPS_FEATURE_DISABLED": "Los grupos no están activados en esta red.",
+    "GROUP_ELEVATION_REASON_INVALID": "El motivo puede tener como máximo {max} caracteres y no debe empezar ni terminar con un espacio.",
     "GROUP_ELEVATION_REASON_MISSING": "Indica qué estás haciendo aquí.",
     "GROUP_ELEVATION_RIGHTS_MISSING": "Tus permisos de red solo te permiten leer aquí.",
     "GROUP_FIELD_GROUP_ID_MISSING": "No se ha encontrado el grupo.",

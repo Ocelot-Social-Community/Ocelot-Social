@@ -166,6 +166,10 @@ const definitions = {
   },
   // acting with network rights inside a group
   GROUP_ELEVATION_REASON_MISSING: { type: 'BAD_USER_INPUT', text: 'A reason is required!' },
+  GROUP_ELEVATION_REASON_INVALID: {
+    type: 'BAD_USER_INPUT',
+    text: 'The reason may be at most {max} characters and must not begin or end with a space.',
+  },
   GROUP_ELEVATION_RIGHTS_MISSING: {
     type: 'BAD_USER_INPUT',
     text: 'You hold nothing here beyond reading!',

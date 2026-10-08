@@ -441,6 +441,7 @@
       "UNAUTHENTICATED": "Zaloguj się, aby kontynuować."
     },
     "GROUPS_FEATURE_DISABLED": "Grupy nie są włączone w tej sieci.",
+    "GROUP_ELEVATION_REASON_INVALID": "Powód może mieć najwyżej {max} znaków i nie może zaczynać się ani kończyć spacją.",
     "GROUP_ELEVATION_REASON_MISSING": "Napisz, czym się tu zajmujesz.",
     "GROUP_ELEVATION_RIGHTS_MISSING": "Twoje uprawnienia w sieci pozwalają ci tu tylko czytać.",
     "GROUP_FIELD_GROUP_ID_MISSING": "Nie znaleziono grupy.",

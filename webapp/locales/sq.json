@@ -441,6 +441,7 @@
       "UNAUTHENTICATED": "Hyr për të vazhduar."
     },
     "GROUPS_FEATURE_DISABLED": "Grupet nuk janë aktivizuar në këtë rrjet.",
+    "GROUP_ELEVATION_REASON_INVALID": "Arsyeja mund të ketë më së shumti {max} karaktere dhe nuk duhet të fillojë ose të mbarojë me hapësirë.",
     "GROUP_ELEVATION_REASON_MISSING": "Thuaj se çfarë po bën këtu.",
     "GROUP_ELEVATION_RIGHTS_MISSING": "Lejet e tua në rrjet të lejojnë këtu vetëm të lexosh.",
     "GROUP_FIELD_GROUP_ID_MISSING": "Grupi nuk u gjet.",

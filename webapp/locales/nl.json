@@ -441,6 +441,7 @@
       "UNAUTHENTICATED": "Log in om verder te gaan."
     },
     "GROUPS_FEATURE_DISABLED": "Groepen zijn in dit netwerk niet ingeschakeld.",
+    "GROUP_ELEVATION_REASON_INVALID": "De reden mag maximaal {max} tekens lang zijn en niet met een spatie beginnen of eindigen.",
     "GROUP_ELEVATION_REASON_MISSING": "Geef aan waar het om gaat.",
     "GROUP_ELEVATION_RIGHTS_MISSING": "Je netwerkrechten laten je hier alleen lezen.",
     "GROUP_FIELD_GROUP_ID_MISSING": "De groep is niet gevonden.",
@@ -453,7 +454,7 @@
     "GROUP_ROLE_NAME_ALREADY_TAKEN": "Deze groep heeft al een rol met deze sleutel.",
     "GROUP_ROLE_NAME_INVALID": "Deze sleutel is niet geldig voor een rol.",
     "GROUP_ROLE_NAME_RESERVED": "Deze sleutel hoort bij een systeemrol.",
-    "GROUP_ROLE_NAME_UNKNOWN": "Deze rol bestaat (niet meer) in de groep.",
+    "GROUP_ROLE_NAME_UNKNOWN": "Deze rol bestaat niet (meer) in de groep.",
     "GROUP_ROLE_OWNER_NOT_EDITABLE": "De eigenaarsrol heeft altijd alle rechten en kan niet worden bewerkt.",
     "GROUP_ROLE_PERMISSIONS_NOT_HELD": "Je kunt geen rechten toekennen die je zelf niet hebt: {permissions}",
     "GROUP_ROLE_REASSIGN_TARGET_INVALID": "Verplaats de leden naar een andere rol.",

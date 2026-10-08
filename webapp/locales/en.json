@@ -441,6 +441,7 @@
       "UNAUTHENTICATED": "Please log in to continue."
     },
     "GROUPS_FEATURE_DISABLED": "Groups are not enabled on this network.",
+    "GROUP_ELEVATION_REASON_INVALID": "The reason may be at most {max} characters long and must not begin or end with a space.",
     "GROUP_ELEVATION_REASON_MISSING": "Please say what you are doing here.",
     "GROUP_ELEVATION_RIGHTS_MISSING": "Your network rights only let you read here.",
     "GROUP_FIELD_GROUP_ID_MISSING": "The group could not be found.",

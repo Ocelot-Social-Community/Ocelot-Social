@@ -441,6 +441,7 @@
       "UNAUTHENTICATED": "Bitte melde dich an, um fortzufahren."
     },
     "GROUPS_FEATURE_DISABLED": "Gruppen sind in diesem Netzwerk nicht aktiviert.",
+    "GROUP_ELEVATION_REASON_INVALID": "Der Grund darf höchstens {max} Zeichen lang sein und nicht mit einem Leerzeichen beginnen oder enden.",
     "GROUP_ELEVATION_REASON_MISSING": "Bitte gib an, worum es geht.",
     "GROUP_ELEVATION_RIGHTS_MISSING": "Deine Netzwerkrechte erlauben dir hier nur das Lesen.",
     "GROUP_FIELD_GROUP_ID_MISSING": "Die Gruppe wurde nicht gefunden.",

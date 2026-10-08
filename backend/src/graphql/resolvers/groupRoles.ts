@@ -3,6 +3,7 @@ import { withFilter } from 'graphql-subscriptions'
 import { GROUP_PERMISSIONS_CHANGED } from '@constants/subscriptions'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError, UserInputError } from '@graphql/errors'
+import { addUserToGroupChatRoom, removeUserFromGroupChatRoom } from '@graphql/resolvers/groups'
 import { visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { groupPermissionCatalog, sanitizeGroupPermissions } from '@src/groupPermission'
 import {
@@ -13,6 +14,8 @@ import {
   isMorePrivate,
   NONE_ROLE,
   OWNER_ROLE,
+  PENDING_ROLE,
+  permissionsForGroupRole,
   privacyLevelOfPermissions,
   SYSTEM_ROLE_NAMES,
   USUAL_ROLE,
@@ -21,6 +24,7 @@ import {
   clearElevation,
   deleteGroupRole,
   markGroupRolesCustomized,
+  markGroupRolesUncustomized,
   memberCountsByRole,
   readElevation,
   readGroupRoles,
@@ -53,6 +57,9 @@ import type { PermissionKey } from '@src/permission'
 const ROLE_NAME_PATTERN = /^[a-z][a-z0-9_-]{1,31}$/
 
 const MAX_LABEL_LENGTH = 64
+// A sentence, not a name: long enough to say what one is doing, short enough to be shown with
+// the record of the intervention.
+const MAX_REASON_LENGTH = 280
 
 const withMemberCounts = async (
   context: Context,
@@ -100,13 +107,17 @@ const validateLabel = (label: string | null | undefined): string | null => {
 /**
  * Why somebody acts with their network rights in a group. Required: the elevation IS the record
  * of an intervention (concept E18), and "who, where, until when" without the why is a record the
- * group cannot make sense of later. Otherwise validated like a role label, since both are shown.
+ * group cannot make sense of later. Its own limit and its own message — told it is a role's
+ * display name that is too long, somebody would look for the wrong field.
  */
 const validateReason = (reason: string | null | undefined): string => {
   if (!reason?.trim()) {
     throw new AppError(Errors.GROUP_ELEVATION_REASON_MISSING)
   }
-  return validateLabel(reason) as string
+  if (reason.length > MAX_REASON_LENGTH || reason.trim() !== reason) {
+    throw new AppError(Errors.GROUP_ELEVATION_REASON_INVALID, { max: MAX_REASON_LENGTH })
+  }
+  return reason
 }
 
 /** The network side of a right, gate-aware — the same reading the shield's rules use. */
@@ -348,7 +359,8 @@ export default {
       )
       // memberCount is deliberately not counted here: this field answers "what am I", and a
       // count would turn every group teaser into an aggregation.
-      return role ? { ...role, memberCount: null } : null
+      // With the group it is in, or effectivePermissions could not tell it from a template role.
+      return role ? { ...role, groupId: parent.id, memberCount: null } : null
     },
     myGroupElevation: async (parent: { id: string }, _args, context: Context) => {
       const authorization = await context.groupAuthorization.forGroup(parent.id)
@@ -391,7 +403,7 @@ export default {
           new Date().toISOString(),
         )
         await touched(context, groupId, new Date().toISOString())
-        return { ...relabelled, memberCount: null }
+        return { ...relabelled, groupId, memberCount: null }
       }
       // The implications come FIRST: reading the content of a group one may not see is not a
       // state the product has, so granting it is also granting `group.read` — and both the
@@ -445,7 +457,7 @@ export default {
       }
       await writeGroupRole(context.database, groupId, created, actorId(context), now)
       await touched(context, groupId, now)
-      return { ...created, memberCount: 0 }
+      return { ...created, groupId, memberCount: 0 }
     },
     renameGroupRole: async (
       _parent,
@@ -480,12 +492,18 @@ export default {
       if (existing.system) {
         throw new AppError(Errors.GROUP_ROLE_SYSTEM_NOT_DELETABLE)
       }
-      if (reassignTo === name) {
+      // The members move to another MEMBERSHIP: `none` is the absence of one and `pending` is
+      // waiting for one, so neither can take them in.
+      if (reassignTo === name || reassignTo === NONE_ROLE || reassignTo === PENDING_ROLE) {
         throw new AppError(Errors.GROUP_ROLE_REASSIGN_TARGET_INVALID)
       }
       // Must exist, or its members would end up holding a role that is not there — which fails
       // closed to no rights at all, i.e. members silently locked out of their own group.
-      await requireRole(context, groupId, reassignTo)
+      const target = await requireRole(context, groupId, reassignTo)
+      // Moving everybody into a role is handing that role out, so it asks what handing out a role
+      // asks: that the actor holds all of it. Read off the role's EFFECTIVE set — the owner's
+      // stored list is empty on purpose and would cover anybody.
+      await requireCoverage(context, groupId, [...permissionsForGroupRole(target)])
       const now = new Date().toISOString()
       await deleteGroupRole(context.database, groupId, name, reassignTo, now)
       await touched(context, groupId, now)
@@ -560,6 +578,8 @@ export default {
       // The group now runs on the template it was given, which is what the admin area counts
       // when it says how many groups an edit would reach.
       await writeGroupTemplate(context.database, groupId, name)
+      // ...and runs on it unedited, so a later change to that template reaches it again.
+      await markGroupRolesUncustomized(context.database, groupId)
       announce(context, groupId)
       return groupRoles(context, groupId)
     },
@@ -569,22 +589,43 @@ export default {
       context: Context,
     ) => {
       const { groupId, userId, roleName } = params
+      // `none` is the absence of a membership, not a role to hold on one: written onto an edge it
+      // would count as a membership everywhere while answering as none.
+      if (roleName === NONE_ROLE) {
+        throw new AppError(Errors.GROUP_ROLE_NAME_INVALID)
+      }
       // Authorization (the right, dominance, coverage) is the shield's job; what is left here
       // is that the role exists, and keeping the group's chat room in step with membership.
       await requireRole(context, groupId, roleName)
       const now = new Date().toISOString()
-      const result = await context.database.write({
-        query: `
-          MATCH (member:User {id: $userId})
-          MATCH (group:Group {id: $groupId})
-          MERGE (member)-[membership:MEMBER_OF]->(group)
-          ON CREATE SET membership.createdAt = $now
-          SET membership.role = $roleName, membership.updatedAt = $now
-          RETURN member {.*} AS user, membership {.*} AS membership
-        `,
-        variables: { groupId, userId, roleName, now },
-      })
-      const record = result.records[0]
+      const session = context.driver.session()
+      let record: { get: (key: string) => unknown } | undefined
+      try {
+        record = await session.writeTransaction(async (transaction) => {
+          const result = await transaction.run(
+            `
+              MATCH (member:User {id: $userId})
+              MATCH (group:Group {id: $groupId})
+              MERGE (member)-[membership:MEMBER_OF]->(group)
+              ON CREATE SET membership.createdAt = $now
+              SET membership.role = $roleName, membership.updatedAt = $now
+              RETURN member {.*} AS user, membership {.*} AS membership
+            `,
+            { groupId, userId, roleName, now },
+          )
+          const row = result.records[0]
+          // The group's chat room follows the membership, in the same transaction: an applicant
+          // is not in it, every other role is (as ChangeGroupMemberRole keeps it).
+          if (row) {
+            await (roleName === PENDING_ROLE
+              ? removeUserFromGroupChatRoom(transaction, groupId, userId)
+              : addUserToGroupChatRoom(transaction, groupId, userId))
+          }
+          return row
+        })
+      } finally {
+        await session.close()
+      }
       if (!record) {
         throw new AppError(Errors.GROUP_MEMBERSHIP_USER_OR_GROUP_NOT_FOUND)
       }
@@ -633,9 +674,8 @@ export default {
     ) => {
       const { name, template: visibility } = params
       const templates = await readGroupRoleTemplates(context.database)
-      const existing = new Map(Object.entries(templates))
-        .get(visibility)
-        ?.find((role) => role.name === name)
+      const templateRoles = new Map(Object.entries(templates)).get(visibility) ?? []
+      const existing = templateRoles.find((role) => role.name === name)
       if (!existing) {
         throw new AppError(Errors.GROUP_TEMPLATE_ROLE_UNKNOWN)
       }
@@ -652,11 +692,13 @@ export default {
               withImpliedRights(sanitizeGroupPermissions(params.permissions)),
             ),
       }
-      // A template's NAME is a privacy level, and the level is derived from exactly these
-      // rights — so a `public` template whose non-member role cannot read is a contradiction,
-      // and every group created from it would be listed as something it is not. The operator
-      // who wants that has the `closed` template for it.
-      if (name === NONE_ROLE && privacyLevelOfPermissions(updated.permissions) !== visibility) {
+      // A template derives to a privacy level from exactly these rights, and the three named
+      // after one say so in their name — so a `public` template whose non-member role cannot
+      // read is a contradiction, and every group created from it would be listed as something it
+      // is not. The level is the one the template derives to NOW, not its name: `channel` is a
+      // public template that is not called `public`, and editing it must not be refused for that.
+      const derivedNow = templateVisibilityOf(templateRoles)
+      if (name === NONE_ROLE && privacyLevelOfPermissions(updated.permissions) !== derivedNow) {
         throw new AppError(Errors.GROUP_TEMPLATE_PERMISSIONS_VISIBILITY_MISMATCH)
       }
       await writeGroupRoleTemplate(

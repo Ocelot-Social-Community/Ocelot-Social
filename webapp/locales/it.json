@@ -441,6 +441,7 @@
       "UNAUTHENTICATED": "Accedi per continuare."
     },
     "GROUPS_FEATURE_DISABLED": "I gruppi non sono attivati in questa rete.",
+    "GROUP_ELEVATION_REASON_INVALID": "Il motivo può contenere al massimo {max} caratteri e non deve iniziare o finire con uno spazio.",
     "GROUP_ELEVATION_REASON_MISSING": "Indica cosa stai facendo qui.",
     "GROUP_ELEVATION_RIGHTS_MISSING": "I tuoi permessi di rete ti consentono solo di leggere qui.",
     "GROUP_FIELD_GROUP_ID_MISSING": "Il gruppo non è stato trovato.",
