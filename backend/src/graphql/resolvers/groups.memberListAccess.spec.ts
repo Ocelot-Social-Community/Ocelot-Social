@@ -263,6 +263,24 @@ describe('showMembers as the current form sends it', () => {
     expect(await nonMemberRights('closed-group')).not.toContain('group.members.read')
   })
 
+  it('does not open the list of a group whose non-member role is missing', async () => {
+    // A damaged or half-migrated row: nothing says outsiders can even see this group, so its
+    // members are not opened to them on the strength of a missing answer.
+    await database.write({
+      query: `MATCH (:Group {id: 'closed-group'})-[:HAS_GROUP_ROLE]->(none:GroupRole {name: 'none'})
+              DETACH DELETE none`,
+    })
+
+    const { errors } = await mutate({
+      mutation: UpdateGroup,
+      variables: { id: 'closed-group', showMembers: true },
+    })
+
+    expect(errors?.[0]).toMatchObject({
+      extensions: { errorCode: 'GROUP_SAVE_MEMBER_LIST_UNAVAILABLE' },
+    })
+  })
+
   it('reads null as no change', async () => {
     await setNonMemberRights('closed-group', ['group.read', 'group.members.read'])
 
