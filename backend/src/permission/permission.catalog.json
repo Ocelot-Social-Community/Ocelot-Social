@@ -41,6 +41,26 @@
       "group": "moderation",
       "description": "Access reports and review (decide) on reported content."
     },
+    "group.content.read.any_closed": {
+      "group": "groupModeration",
+      "gatedBy": "groupsEnabled",
+      "description": "Read the content of any CLOSED group without being a member — what a network moderator needs to moderate what they were never shown."
+    },
+    "group.content.read.any_hidden": {
+      "group": "groupModeration",
+      "gatedBy": "groupsEnabled",
+      "description": "Read the content of any HIDDEN group without being a member. Deliberately separate from the closed variant: an unlisted group is the stricter case."
+    },
+    "group.moderate.any_closed": {
+      "group": "groupModeration",
+      "gatedBy": "groupsEnabled",
+      "description": "Moderate inside any CLOSED group without being a member: take a post out of the group. Folds group.post.moderate into the group scope."
+    },
+    "group.moderate.any_hidden": {
+      "group": "groupModeration",
+      "gatedBy": "groupsEnabled",
+      "description": "Moderate inside any HIDDEN group without being a member: take a post out of the group. Folds group.post.moderate into the group scope."
+    },
     "user.disable": {
       "group": "moderation",
       "description": "Disable (deactivate) and re-enable user accounts (reversible), subject to the act-on hierarchy — you can only disable a user whose permissions are a strict subset of yours."
@@ -101,6 +121,16 @@
       "gatedBy": ["videoConference", "groupsEnabled"],
       "description": "Start (open) a video call in a hidden group. Joining an existing call stays open to any member."
     },
+    "videoCall.create_open": {
+      "group": "communication",
+      "gatedBy": ["videoConference", "groupsEnabled"],
+      "description": "Start (open) a video call in a group a stranger may walk into — one whose non-member role may both find it and join it without approval. Joining an existing call stays a group right."
+    },
+    "videoCall.create_restricted": {
+      "group": "communication",
+      "gatedBy": ["videoConference", "groupsEnabled"],
+      "description": "Start (open) a video call in a group one cannot simply walk into: joining it needs approval, an invite, or the group is unlisted. The stronger of the two, because such a call cannot be looked in on."
+    },
     "apiKey.create": {
       "group": "account",
       "gatedBy": "apiKeysEnabled",
@@ -109,6 +139,26 @@
     "branding.manage": {
       "group": "administration",
       "description": "View the available baked-in brandings and switch the active branding network-wide."
+    },
+    "group.administer.any_public": {
+      "group": "groupAdministration",
+      "gatedBy": "groupsEnabled",
+      "description": "Administer any PUBLIC group as if owning it: settings, roles and member management. The recovery path for a group left without an owner; it may only promote EXISTING members, never the holder themselves."
+    },
+    "group.administer.any_closed": {
+      "group": "groupAdministration",
+      "gatedBy": "groupsEnabled",
+      "description": "Administer any CLOSED group as if owning it: settings, roles and member management. The recovery path for a group left without an owner; it may only promote EXISTING members, never the holder themselves."
+    },
+    "group.administer.any_hidden": {
+      "group": "groupAdministration",
+      "gatedBy": "groupsEnabled",
+      "description": "Administer any HIDDEN group as if owning it: settings, roles and member management. The recovery path for a group left without an owner; it may only promote EXISTING members, never the holder themselves."
+    },
+    "group.roleTemplate.manage": {
+      "group": "groupAdministration",
+      "gatedBy": "groupsEnabled",
+      "description": "View and edit the network-wide group role templates that every new group is seeded from."
     }
   }
 }

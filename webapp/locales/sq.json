@@ -325,6 +325,8 @@
         "administration": "Administrim",
         "communication": "Komunikim",
         "content": "Përmbajtje",
+        "groupAdministration": "Grupe — administrim",
+        "groupModeration": "Grupe — moderim",
         "membership": "Anëtarësia",
         "moderation": "Moderim"
       },

@@ -325,6 +325,8 @@
         "administration": "Administracja",
         "communication": "Komunikacja",
         "content": "Treści",
+        "groupAdministration": "Grupy — administracja",
+        "groupModeration": "Grupy — moderacja",
         "membership": "Członkostwo",
         "moderation": "Moderacja"
       },

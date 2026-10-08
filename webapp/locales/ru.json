@@ -325,6 +325,8 @@
         "administration": "Администрирование",
         "communication": "Общение",
         "content": "Контент",
+        "groupAdministration": "Группы — администрирование",
+        "groupModeration": "Группы — модерация",
         "membership": "Участники",
         "moderation": "Модерация"
       },
