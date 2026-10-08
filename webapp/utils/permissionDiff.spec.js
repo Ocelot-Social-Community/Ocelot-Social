@@ -1,4 +1,4 @@
-import { diffBetween, permissionSetOf, samePermissions } from '~/utils/permissionDiff'
+import { diffBetween, isRoleDirty, permissionSetOf, samePermissions } from '~/utils/permissionDiff'
 
 const catalog = [
   { key: 'group.read', group: 'visibility' },
@@ -66,5 +66,32 @@ describe('samePermissions', () => {
 
   it('treats a missing list as an empty one', () => {
     expect(samePermissions(undefined, [])).toBe(true)
+  })
+})
+
+describe('isRoleDirty', () => {
+  const role = { permissions: ['a'], label: 'Guests' }
+
+  it('is false while the draft matches', () => {
+    expect(isRoleDirty(role, ['a'], 'Guests')).toBe(false)
+  })
+
+  it('is true for a changed right', () => {
+    expect(isRoleDirty(role, ['a', 'b'], 'Guests')).toBe(true)
+  })
+
+  it('is true for a changed LABEL alone', () => {
+    // Renaming a role without touching a right still has to be saveable.
+    expect(isRoleDirty(role, ['a'], 'Visitors')).toBe(true)
+  })
+
+  it('reads a role without a label and an empty field as agreeing', () => {
+    // The field holds '' for "no label", the role holds null. Without this the save button
+    // stays lit on every role that never had one.
+    expect(isRoleDirty({ permissions: [], label: null }, [], '')).toBe(false)
+  })
+
+  it('is false when there is no role at all', () => {
+    expect(isRoleDirty(null, ['a'], 'x')).toBe(false)
   })
 })

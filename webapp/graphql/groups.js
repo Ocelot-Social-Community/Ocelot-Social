@@ -53,6 +53,17 @@ export const createGroupMutation = () => {
         }
         locationName
         myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+          outranksMembers
+        }
         showMembers
       }
     }
@@ -115,6 +126,17 @@ export const updateGroupMutation = () => {
         }
         locationName
         myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+          outranksMembers
+        }
         showMembers
       }
     }
@@ -238,6 +260,17 @@ export const groupQuery = (i18n) => {
         ...locationOnGroup
         membersCount
         myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+          outranksMembers
+        }
         showMembers
       }
     }
@@ -256,6 +289,7 @@ export const groupEditQuery = () => {
         about
         description
         visibility
+        template
         actionRadius
         locationName
         categories {
@@ -268,6 +302,17 @@ export const groupEditQuery = () => {
           ...imageUrls
         }
         myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+          outranksMembers
+        }
         showMembers
         inviteCodes {
           createdAt
@@ -345,6 +390,17 @@ export const groupTeaserQuery = (i18n) => {
         visibility
         actionRadius
         myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+          outranksMembers
+        }
         membersCount
         postsCount
         avatar {
