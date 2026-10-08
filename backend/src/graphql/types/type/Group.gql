@@ -38,6 +38,10 @@ type Group {
   description: String!
   "Which role template this group was created from, or last put on. Stored, unlike `visibility`, which is derived: two templates can produce the same visibility (`channel` is public too), so this is what says which preset a group is running — and what the admin area counts when it asks how many groups an edit would reach."
   template: String
+  "The live elevation of the viewer in this group, or null when they are acting on their membership alone (see GroupElevation)."
+  myGroupElevation: GroupElevation
+  "Whether asking for an elevation here would grant the viewer anything beyond what they can already read."
+  mayElevateInGroup: Boolean!
   "How findable this group is — DERIVED from its rights, not chosen: `hidden` while its non-member role cannot read the profile, `closed` while it cannot read the content, `public` otherwise. Setting it through UpdateGroup applies the matching role template; the per-level network rights (group.create_*, group.administer.any_*, group.content.read.any_*) read it."
   visibility: GroupVisibility!
   "The same value as `visibility`, under its old name."
@@ -52,8 +56,15 @@ type Group {
   "Number of members, excluding those with a pending join request. Null when the viewer may not see the member list (`group.members.read`): in a small group the number plus a known owner is nearly the list itself. Nullable rather than refused, so a group teaser renders without an error for a viewer who simply may not count."
   membersCount: Int
 
-  "The current user's role in this group, or null if they are not a member."
+  "The current user's role in this group, or null if they are not a member. Deprecated: a group defines its own roles, so the value is not an enum any more — use myGroupRole. Returns null for a role the enum cannot express."
   myRole: GroupMemberRole
+    @deprecated(reason: "Group roles are group-defined; use myGroupRole instead.")
+  "The current user's role in this group, or null when they have no membership. Unlike myRole this carries any role the group defined, with the label it chose for it."
+  myGroupRole: GroupRole
+  "The group rights the current user effectively holds here: their role's set, capped by their network permissions and by the runtime feature gates. Drives the webapp's canInGroup()."
+  myGroupPermissions: [String!]!
+  "The group's own role definitions. Requires `group.role.manage` in this group."
+  roles: [GroupRole!]!
   "Whether the profile owner has chosen to show this group on their public profile."
   showOnProfile: Boolean
   "For closed groups: whether non-members can see the member list. Derived: it is true exactly when the group's non-member role holds `group.members.read`, which is where that setting now lives."
@@ -101,6 +112,25 @@ type Query {
 
   "Count groups, optionally restricted to the current user's memberships. Requires authentication."
   GroupCount(isMember: Boolean): Int
+
+  "Every group the viewer may administer, for the admin area — including the hidden ones, which are reachable no other way. Restricted to the visibilities the viewer holds `group.administer.any_<visibility>` for. Set `ownerless` to find the groups that have no owner left."
+  adminGroups(
+    "Free-text match on name and slug."
+    search: String
+    visibility: GroupVisibility
+    "Only groups whose owner role has no members."
+    ownerless: Boolean
+    disabled: Boolean
+    first: Int
+    offset: Int
+  ): [Group!]!
+  "How many groups the same filters match, for paging the admin list."
+  adminGroupCount(
+    search: String
+    visibility: GroupVisibility
+    ownerless: Boolean
+    disabled: Boolean
+  ): Int!
 
 
   # AvailableGroupActionRadii: [GroupActionRadius]!

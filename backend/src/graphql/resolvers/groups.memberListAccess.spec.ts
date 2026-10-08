@@ -6,12 +6,14 @@ import { beforeAll, afterAll, beforeEach, describe, it, expect } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
+import elevateInGroup from '@graphql/queries/groups/elevateInGroup.gql'
 import GroupMembers from '@graphql/queries/groups/GroupMembers.gql'
 import UpdateGroup from '@graphql/queries/groups/UpdateGroup.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { PermissionKey } from '@src/permission'
 import type { RoleDefinition } from '@src/role'
 
 // The member list of a group, as the deprecated `showMembers` argument of UpdateGroup reaches it.
@@ -184,12 +186,59 @@ describe('reading the member list of a hidden group', () => {
   })
 })
 
+describe('the member list of a hidden group, for somebody acting on a network right', () => {
+  // A network admin repairing a group left without an owner reaches it through the admin group
+  // list, without a membership. The shield lets them in on their network right; the list itself
+  // used to ask for a membership again, and came back empty — nobody to hand the group to.
+  const asNetworkRight = async (permission: PermissionKey) => {
+    rolesOverride = [{ name: 'user', protected: false, permissions: [permission] }]
+    authenticatedUser = await stranger.toJson()
+  }
+
+  const members = async (): Promise<string[]> => {
+    const { data, errors } = await query({
+      query: GroupMembers,
+      variables: { id: 'hidden-group', includePending: true },
+    })
+
+    expect(errors?.[0]?.message).toBeUndefined()
+
+    const listed = (data?.GroupMembers ?? []) as {
+      user: { id: string }
+      membership: { role: string }
+    }[]
+    return listed.map((member) => `${member.user.id}:${member.membership.role}`)
+  }
+
+  beforeEach(async () => {
+    await setMembership('group-admin', 'hidden-group', 'pending')
+  })
+
+  it('is the whole list, applicants included, once an administrator has picked their rights up', async () => {
+    await asNetworkRight('group.administer.any_hidden')
+    await mutate({
+      mutation: elevateInGroup,
+      variables: { groupId: 'hidden-group', reason: 'Repairing the group' },
+    })
+
+    expect(await members()).toEqual(['group-owner:owner', 'group-admin:pending'])
+  })
+
+  it('is what an outsider would see for a moderator, who only reads', async () => {
+    // Reading stays open without an elevation (groupRole/elevation.ts) — the members, not the
+    // applicants, who are not part of the group yet.
+    await asNetworkRight('group.content.read.any_hidden')
+
+    expect(await members()).toEqual(['group-owner:owner'])
+  })
+})
+
 // The deprecated argument the way the current webapp form sends it: on EVERY save, `false`
 // included, and on create as well. It means what it always meant — whether a CLOSED group shows
 // its members to outsiders — and must not reach any further than that.
 describe('showMembers as the current form sends it', () => {
   const CreateGroupWithMemberList = parse(`
-    mutation ($id: ID, $template: String, $showMembers: Boolean) {
+    mutation ($id: ID, $template: String!, $showMembers: Boolean) {
       CreateGroup(
         id: $id
         name: "A group"

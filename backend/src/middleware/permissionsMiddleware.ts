@@ -515,6 +515,17 @@ const parentHasGroupPermission = (permission: GroupPermissionKey) =>
 // applicant roles — so it asks for the right that governs roles, capped by the network right to
 // CREATE a group that private (E10): switching is never a way around group.create_<visibility>.
 /**
+ * Creating a group-defined role is switched off for now (#10356).
+ *
+ * Returns the reason rather than `false`: graphql-shield passes an Error through as the
+ * message, and "Not Authorized!" would send an owner looking for a right they are missing
+ * instead of telling them the capability is not there yet.
+ */
+const groupRolesAreFixed = rule({ cache: 'no_cache' })(
+  () => new AppError(Errors.GROUP_ROLE_CREATE_NOT_AVAILABLE),
+)
+
+/**
  * The deprecated `showMembers` argument of UpdateGroup is a write to the non-member role: it
  * adds or takes away `group.members.read` there. So it asks what editing that role asks —
  * `group.role.manage`, and, to open the list, holding the right oneself (the coverage rule of
@@ -752,6 +763,19 @@ export default shield(
       roles: hasPermission('role.manage'),
       userRoles: hasPermission('role.manage'),
       myPermissions: isAuthenticated,
+      // The group rights catalog is the same for everybody and drives the group rights UI;
+      // which of them a viewer holds is Group.myGroupPermissions, resolved per group.
+      groupPermissionCatalog: and(groupsEnabled, isAuthenticated),
+      groupRoleTemplates: hasPermission('group.roleTemplate.manage'),
+      // The NAMES only. Which presets exist is product vocabulary, not a secret — and a group
+      // owner has to be able to name one to put it on their group, without being handed the
+      // network's template editor.
+      groupTemplates: and(groupsEnabled, isAuthenticated),
+      // The admin group list. One rule for "may administer groups at all"; WHICH groups come
+      // back is decided in the resolver by the per-type rights, so a viewer who may only
+      // administer public groups cannot enumerate the hidden ones.
+      adminGroups: canAdministerSomeGroup,
+      adminGroupCount: canAdministerSomeGroup,
       Room: isAuthenticated,
       Message: isAuthenticated,
       UnreadRooms: isAuthenticated,
@@ -886,6 +910,37 @@ export default shield(
       deleteRole: hasPermission('role.manage'),
       setUserRole: hasPermission('role.manage'),
 
+      // Group roles: editing a group's own role definitions is the group's meta right, and
+      // every one of these additionally requires that the actor holds what they hand out
+      // (checked in the resolver, which is where the resulting set is known).
+      updateGroupRole: and(groupsEnabled, hasGroupPermission('group.role.manage')),
+      // Parked rather than removed (#10356). A group inventing its OWN roles is the corner of
+      // this model with the least product around it: nothing tells the owner what a new role is
+      // for, the simple view cannot express one, and the matrix is the only way to reach it — so
+      // it produces roles whose purpose nobody can read afterwards. The five system roles carry
+      // every case the product currently names.
+      //
+      // In the shield rather than in the resolver, so the resolver stays whole and tested: when
+      // the UI has an answer for the sixth role, this line is the only thing to take back out.
+      createGroupRole: groupRolesAreFixed,
+      renameGroupRole: and(groupsEnabled, hasGroupPermission('group.role.manage')),
+      deleteGroupRole: and(groupsEnabled, hasGroupPermission('group.role.manage')),
+      resetGroupRoles: and(groupsEnabled, hasGroupPermission('group.role.manage')),
+      setGroupMemberRole: and(groupsEnabled, canAssignGroupRole),
+
+      // The network-wide defaults new groups are seeded from, and the bulk application of them
+      // to groups that never touched their own roles.
+      // Taking a post out of a group: the group's own right, or the network-wide one folded in
+      // for a moderator who is not a member.
+      removePostFromGroup: and(groupsEnabled, hasGroupPermission('group.post.moderate')),
+      // Picking up a network right needs no right of its own: the resolver refuses unless the
+      // viewer actually holds something beyond reading in that group, which is the only thing
+      // there is to pick up. Authentication is what the shield has to insist on.
+      elevateInGroup: and(groupsEnabled, isAuthenticated),
+      endGroupElevation: and(groupsEnabled, isAuthenticated),
+      updateGroupRoleTemplate: hasPermission('group.roleTemplate.manage'),
+      applyGroupRoleTemplates: hasPermission('group.roleTemplate.manage'),
+
       markTeaserAsViewed: allow,
 
       // Network Policy
@@ -958,6 +1013,10 @@ export default shield(
       // instead of refusing (see resolvers/groups.ts, mayReadGroup). A rule would null the
       // whole group out of the one list where a group the viewer may not read legitimately
       // appears — their own, with an applicant to a hidden group seeing that they applied.
+      //
+      // A group's role definitions are its own business; reading them is the same right as
+      // editing them, because the matrix IS the editing UI.
+      roles: and(isAuthenticated, parentHasGroupPermission('group.role.manage')),
     },
     InviteCode: {
       '*': allow,

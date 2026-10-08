@@ -1,0 +1,9 @@
+query GroupPosts($id: ID!) {
+  Group(id: $id) {
+    id
+    postsCount
+    posts {
+      id
+    }
+  }
+}
