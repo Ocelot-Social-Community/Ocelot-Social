@@ -92,7 +92,7 @@ describe('hasLocation filter', () => {
       const groupWithLocation = await Factory.build('group', {
         id: 'g-with-loc',
         name: 'Group With Location',
-        groupType: 'public',
+        template: 'public',
         ownerId: 'group-owner',
       })
       await groupWithLocation.relateTo(location, 'isIn')
@@ -100,7 +100,7 @@ describe('hasLocation filter', () => {
       await Factory.build('group', {
         id: 'g-without-loc',
         name: 'Group Without Location',
-        groupType: 'public',
+        template: 'public',
         ownerId: 'group-owner',
       })
     })

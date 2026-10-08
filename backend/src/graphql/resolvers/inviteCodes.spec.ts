@@ -2,10 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { beforeAll, afterAll, describe, beforeEach, it, expect } from 'vitest'
+import { beforeAll, afterAll, describe, beforeEach, it, expect, afterEach } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import currentUser from '@graphql/queries/auth/currentUser.gql'
+import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
 import Group from '@graphql/queries/groups/Group.gql'
 import GroupMembers from '@graphql/queries/groups/GroupMembers.gql'
@@ -20,6 +21,7 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { RoleDefinition } from '@src/role'
 
 // The invite-code limits are network policy now; pin them explicitly so the
 // "max reached" loops below are deterministic regardless of the schema default.
@@ -27,12 +29,18 @@ const INVITE_CODES_PERSONAL_PER_USER = 7
 const INVITE_CODES_GROUP_PER_USER = 7
 
 let authenticatedUser: Context['user']
+// Per-test role override, for the one case where the network side reaches into a group.
+let rolesOverride: RoleDefinition[] | undefined
+// The network's own invite-registration switch. `group.invite.external` is gated by it, so
+// turning it off has to take the external half of a group invite with it.
+let inviteRegistration = true
 const context = () => ({
   authenticatedUser,
+  roles: rolesOverride,
   policy: {
     // user.invite is gated by inviteRegistration; pin it on so generatePersonalInviteCode
     // stays available here regardless of the schema default (the gate is unit-covered).
-    inviteRegistration: true,
+    inviteRegistration,
     inviteCodesPersonalPerUser: INVITE_CODES_PERSONAL_PER_USER,
     inviteCodesGroupPerUser: INVITE_CODES_GROUP_PER_USER,
   },
@@ -81,7 +89,7 @@ describe('validateInviteCode', () => {
         name: 'Hidden Group',
         about: 'We are hidden',
         description: 'anything',
-        groupType: 'hidden',
+        template: 'hidden',
         actionRadius: 'global',
         categoryIds: ['cat6', 'cat12', 'cat16'],
         locationName: 'Hamburg, Germany',
@@ -95,7 +103,7 @@ describe('validateInviteCode', () => {
         name: 'Public Group',
         about: 'We are public',
         description: 'anything',
-        groupType: 'public',
+        template: 'public',
         actionRadius: 'interplanetary',
         categoryIds: ['cat4', 'cat5', 'cat17'],
       },
@@ -189,6 +197,7 @@ describe('validateInviteCode', () => {
               },
               invitedTo: null,
               isValid: true,
+              allowsRegistration: true,
             },
           },
           errors: undefined,
@@ -217,6 +226,8 @@ describe('validateInviteCode', () => {
                 avatar: null,
               },
               isValid: true,
+              // The owner issued it, so it carries group.invite.external and opens an account.
+              allowsRegistration: true,
             },
           },
           errors: undefined,
@@ -224,7 +235,7 @@ describe('validateInviteCode', () => {
       )
     })
 
-    it('returns the inviteCode with redacted group details if the code invites to a hidden group', async () => {
+    it('names the hidden group a code invites to, because holding the code is the entitlement', async () => {
       await expect(
         query({ query: unauthenticatedValidateInviteCode, variables: { code: 'GRPHDN' } }),
       ).resolves.toEqual(
@@ -238,13 +249,18 @@ describe('validateInviteCode', () => {
                 },
                 name: 'Inviting User',
               },
+              // Not blanked, although the viewer is logged out and the group is unlisted:
+              // somebody in that group handed them this code, and the registration screen has
+              // to be able to say what they are signing up for. Everything beyond name and
+              // summary still follows `group.read`.
               invitedTo: {
                 visibility: 'hidden',
-                name: '',
-                about: '',
+                name: 'Hidden Group',
+                about: 'We are hidden',
                 avatar: null,
               },
               isValid: true,
+              allowsRegistration: true,
             },
           },
           errors: undefined,
@@ -509,7 +525,7 @@ describe('generatePersonalInviteCode', () => {
 })
 
 describe('generateGroupInviteCode', () => {
-  let invitingUser, notMemberUser, pendingMemberUser
+  let invitingUser, notMemberUser, pendingMemberUser, usualMemberUser
 
   beforeEach(async () => {
     await cleanDatabase()
@@ -531,6 +547,12 @@ describe('generateGroupInviteCode', () => {
       name: 'Pending Member User',
     })
 
+    usualMemberUser = await Factory.build('user', {
+      id: 'usual-member-user',
+      role: 'user',
+      name: 'Usual Member User',
+    })
+
     authenticatedUser = await invitingUser.toJson()
     await mutate({
       mutation: CreateGroup,
@@ -539,7 +561,7 @@ describe('generateGroupInviteCode', () => {
         name: 'Hidden Group',
         about: 'We are hidden',
         description: 'anything',
-        groupType: 'hidden',
+        template: 'hidden',
         actionRadius: 'global',
         categoryIds: ['cat6', 'cat12', 'cat16'],
         locationName: 'Hamburg, Germany',
@@ -553,7 +575,7 @@ describe('generateGroupInviteCode', () => {
         name: 'Public Group',
         about: 'We are public',
         description: 'anything',
-        groupType: 'public',
+        template: 'public',
         actionRadius: 'interplanetary',
         categoryIds: ['cat4', 'cat5', 'cat17'],
       },
@@ -566,12 +588,15 @@ describe('generateGroupInviteCode', () => {
         name: 'Closed Group',
         about: 'We are closed',
         description: 'anything',
-        groupType: 'closed',
+        template: 'closed',
         actionRadius: 'interplanetary',
         categoryIds: ['cat4', 'cat5', 'cat17'],
       },
     })
 
+    // Asking to join themselves: somebody ADDED by another member lands as a full member, so
+    // only their own request leaves them waiting for approval.
+    authenticatedUser = await pendingMemberUser.toJson()
     await mutate({
       mutation: JoinGroup,
       variables: {
@@ -589,6 +614,166 @@ describe('generateGroupInviteCode', () => {
     it('throws authorization error', async () => {
       await expect(
         mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'public-group' } }),
+      ).resolves.toMatchObject({
+        data: null,
+        errors: [{ message: 'Not Authorized!' }],
+      })
+    })
+  })
+
+  // The cases below are the ones that were missing while the guard passed everyone: only the
+  // unauthenticated path was covered, and that one is short-circuited before the query runs.
+  describe('as a user who is not a member of the group', () => {
+    beforeEach(async () => {
+      authenticatedUser = await notMemberUser.toJson()
+    })
+
+    // Told what is missing — the same answer for every visibility, and for a group that is not
+    // there, so it gives nothing away about which hidden groups exist.
+    it.each(['public-group', 'closed-group', 'hidden-group'])(
+      'is told a membership is needed for the %s',
+      async (groupId) => {
+        await expect(
+          mutate({ mutation: generateGroupInviteCode, variables: { groupId } }),
+        ).resolves.toMatchObject({
+          data: null,
+          errors: [
+            { message: 'You must be a member of this group to create an invite link for it.' },
+          ],
+        })
+      },
+    )
+  })
+
+  describe('as a network administrator who is not a member', () => {
+    beforeEach(async () => {
+      // `group.administer.any_public` folds the whole group catalog in, so the shield lets the
+      // request through on the strength of a network right alone.
+      rolesOverride = [
+        { name: 'user', protected: false, permissions: ['group.administer.any_public'] },
+      ] as RoleDefinition[]
+      authenticatedUser = await notMemberUser.toJson()
+    })
+
+    afterEach(() => {
+      rolesOverride = undefined
+    })
+
+    it('still cannot hand out an invite code for a group it is not in', async () => {
+      // The code is issued BY a member: it hangs off their GENERATED edge and counts against
+      // their per-group quota. The recovery path (concept E16) promotes existing members, it
+      // does not turn a network admin into one — so the statement finds no membership and the
+      // resolver refuses rather than creating a code nobody in the group handed out.
+      await expect(
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'public-group' } }),
+      ).resolves.toMatchObject({
+        data: null,
+        errors: [
+          { message: 'You must be a member of this group to create an invite link for it.' },
+        ],
+      })
+    })
+  })
+
+  describe('as a pending member', () => {
+    beforeEach(async () => {
+      authenticatedUser = await pendingMemberUser.toJson()
+    })
+
+    it('throws authorization error', async () => {
+      await expect(
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'closed-group' } }),
+      ).resolves.toMatchObject({
+        data: null,
+        errors: [
+          { message: 'You must be a member of this group to create an invite link for it.' },
+        ],
+      })
+    })
+  })
+
+  describe('while the network has invite registration switched off', () => {
+    // Restored here rather than at the end of the test body, so a failing expectation cannot
+    // leave the switch off for everything that follows.
+    afterEach(() => {
+      inviteRegistration = true
+    })
+
+    it('leaves the group invite usable but strips its external half', async () => {
+      // `group.invite.external` is gated by the `inviteRegistration` policy (E11): a network
+      // that does not let people register by invitation must not be undercut through groups.
+      // The group invite itself keeps working — it brings existing accounts in.
+      inviteRegistration = false
+      authenticatedUser = await invitingUser.toJson()
+
+      const { data, errors } = await mutate({
+        mutation: generateGroupInviteCode,
+        variables: { groupId: 'public-group' },
+      })
+
+      expect(errors).toBeUndefined()
+      expect(data.generateGroupInviteCode).toMatchObject({
+        isValid: true,
+        allowsRegistration: false,
+      })
+    })
+  })
+
+  describe('as a usual member', () => {
+    beforeEach(async () => {
+      // Joining is done by the owner on behalf of the member, as in the setup above. A closed
+      // group admits everyone as `pending`, so the owner promotes them to a full member.
+      authenticatedUser = await invitingUser.toJson()
+      await mutate({
+        mutation: JoinGroup,
+        variables: { groupId: 'public-group', userId: 'usual-member-user' },
+      })
+      await mutate({
+        mutation: JoinGroup,
+        variables: { groupId: 'closed-group', userId: 'usual-member-user' },
+      })
+      await mutate({
+        mutation: ChangeGroupMemberRole,
+        variables: {
+          groupId: 'closed-group',
+          userId: 'usual-member-user',
+          roleInGroup: 'usual',
+        },
+      })
+      authenticatedUser = await usualMemberUser.toJson()
+    })
+
+    it('generates a code for the public group', async () => {
+      await expect(
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'public-group' } }),
+      ).resolves.toMatchObject({
+        data: { generateGroupInviteCode: { code: expect.any(String) } },
+        errors: undefined,
+      })
+    })
+
+    it('generates a code that is valid but does not open an account', async () => {
+      // A member of a public group holds `group.invite`, not `group.invite.external` (E11):
+      // their link brings people who already have an account into the group. That is a
+      // perfectly usable code — it used to be reported as invalid, because `isValid` asked
+      // the registration question instead of the redemption one.
+      const { data, errors } = await mutate({
+        mutation: generateGroupInviteCode,
+        variables: { groupId: 'public-group' },
+      })
+
+      expect(errors).toBeUndefined()
+      expect(data.generateGroupInviteCode).toMatchObject({
+        isValid: true,
+        allowsRegistration: false,
+      })
+    })
+
+    it('throws authorization error for the closed group, where only admins invite', async () => {
+      // A member who merely lacks the right is told no more than that: what a role may do is
+      // the group's business.
+      await expect(
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'closed-group' } }),
       ).resolves.toMatchObject({
         data: null,
         errors: [{ message: 'Not Authorized!' }],
@@ -969,7 +1154,7 @@ describe('redeemInviteCode', () => {
         name: 'Hidden Group',
         about: 'We are hidden',
         description: 'anything',
-        groupType: 'hidden',
+        template: 'hidden',
         actionRadius: 'global',
         categoryIds: ['cat6', 'cat12', 'cat16'],
         locationName: 'Hamburg, Germany',
@@ -983,7 +1168,7 @@ describe('redeemInviteCode', () => {
         name: 'Public Group',
         about: 'We are public',
         description: 'anything',
-        groupType: 'public',
+        template: 'public',
         actionRadius: 'interplanetary',
         categoryIds: ['cat4', 'cat5', 'cat17'],
       },
@@ -1120,7 +1305,12 @@ describe('redeemInviteCode', () => {
       })
     })
 
-    it('returns true for a hidden group inviteCode and makes the user a pending member', async () => {
+    it('returns true for a hidden group inviteCode and makes the user a MEMBER', async () => {
+      // Changed deliberately: an invitation IS the approval. An unlisted group grants no join
+      // right, so landing the invitee as an applicant left them holding nothing but
+      // `group.leave` — able to leave something they could not see, waiting for an approval
+      // from the person who had just invited them.
+
       await expect(
         mutate({ mutation: redeemInviteCode, variables: { code: 'GRPHDN' } }),
       ).resolves.toMatchObject({
@@ -1154,7 +1344,7 @@ describe('redeemInviteCode', () => {
                 slug: 'other-user',
               },
               membership: {
-                role: 'pending',
+                role: 'usual',
               },
             },
           ]),

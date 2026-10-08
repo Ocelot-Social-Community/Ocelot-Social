@@ -44,6 +44,7 @@ describe('DEFAULT_ROLES', () => {
     'group.create_closed',
     'group.create_hidden',
     'user.invite',
+    'videoCall.create_open',
     'videoCall.create_public',
     'apiKey.create',
   ]
@@ -53,6 +54,16 @@ describe('DEFAULT_ROLES', () => {
   // (not a subset), so any added/removed privilege turns red and must be reviewed.
   const ADMIN_EXTRAS = [
     'content.moderate',
+    // Reaching into groups: reading them for moderation, administering them when they have no
+    // owner left, and the templates new groups are seeded from.
+    'group.content.read.any_closed',
+    'group.content.read.any_hidden',
+    'group.moderate.any_closed',
+    'group.moderate.any_hidden',
+    'group.administer.any_public',
+    'group.administer.any_closed',
+    'group.administer.any_hidden',
+    'group.roleTemplate.manage',
     'badge.manage',
     'user.disable',
     'network.statistics.read',
@@ -79,9 +90,17 @@ describe('DEFAULT_ROLES', () => {
 
   // Single-role model: each role's permission set is self-contained, so the
   // higher roles include the baseline rather than relying on a union.
-  it('gives moderator EXACTLY baseline + content.moderate + badge.manage + user.disable', () => {
+  it('gives moderator EXACTLY baseline + moderation, incl. reading closed groups', () => {
+    // Closed groups only: an unlisted group stays an admin matter (#9405).
     expect(permsOf(MODERATOR_ROLE)).toEqual(
-      exactly(...BASELINE, 'content.moderate', 'badge.manage', 'user.disable'),
+      exactly(
+        ...BASELINE,
+        'content.moderate',
+        'group.content.read.any_closed',
+        'group.moderate.any_closed',
+        'badge.manage',
+        'user.disable',
+      ),
     )
   })
 

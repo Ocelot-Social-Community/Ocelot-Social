@@ -16,6 +16,7 @@ import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
+import { nonMemberReadsContent } from './helpers/groupAccessCypher'
 import { orderClause } from './helpers/ordering'
 import { pagingClause } from './helpers/paging'
 import { postFilterToCypher, postOrderClause } from './helpers/postFilter'
@@ -569,8 +570,11 @@ export default {
       const pinPostCypher = `
         MATCH (user:User {id: $userId})
         MATCH (post:Post {id: $params.id})
-        WHERE NOT EXISTS((post)-[:IN]->(:Group)) OR 
-          (post)-[:IN]->(:Group { groupType: 'public'})
+        WHERE NOT EXISTS((post)-[:IN]->(:Group))
+          OR EXISTS {
+            MATCH (post)-[:IN]->(g:Group)
+            WHERE ${nonMemberReadsContent('g')}
+          }
         MERGE (user)-[pinned:PINNED {createdAt: toString(datetime())}]->(post)
         SET post.pinned = true
         RETURN post, pinned.createdAt as pinnedAt`

@@ -18,5 +18,6 @@ query authenticatedValidateInviteCode($code: String!) {
       }
     }
     isValid
+    allowsRegistration
   }
 }

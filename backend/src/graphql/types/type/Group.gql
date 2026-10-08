@@ -15,7 +15,7 @@
 #   updatedAt_desc
 # }
 
-"A group: a space where members share posts, chat and optionally hold video calls. Discoverability and joining are governed by its visibility."
+"A group: a space where members share posts, chat and optionally hold video calls. How findable it is follows from its rights (`visibility`); who may do what inside it follows from its roles."
 type Group {
   id: ID!
   "The group's title."
@@ -36,7 +36,9 @@ type Group {
   about: String
   "Full group description (rich text)."
   description: String!
-  "How findable this group is: `hidden` groups are unlisted, `closed` ones are findable but keep their content to members, `public` ones are open."
+  "Which role template this group was created from, or last put on. Stored, unlike `visibility`, which is derived: two templates can produce the same visibility (`channel` is public too), so this is what says which preset a group is running — and what the admin area counts when it asks how many groups an edit would reach."
+  template: String
+  "How findable this group is — DERIVED from its rights, not chosen: `hidden` while its non-member role cannot read the profile, `closed` while it cannot read the content, `public` otherwise. Setting it through UpdateGroup applies the matching role template; the per-level network rights (group.create_*, group.administer.any_*, group.content.read.any_*) read it."
   visibility: GroupVisibility!
   "The same value as `visibility`, under its old name."
   groupType: GroupType! @deprecated(reason: "Use `visibility`.")
@@ -47,14 +49,14 @@ type Group {
 
   categories: [Category]
 
-  "Number of members, excluding those with a pending join request."
-  membersCount: Int!
+  "Number of members, excluding those with a pending join request. Null when the viewer may not see the member list (`group.members.read`): in a small group the number plus a known owner is nearly the list itself. Nullable rather than refused, so a group teaser renders without an error for a viewer who simply may not count."
+  membersCount: Int
 
   "The current user's role in this group, or null if they are not a member."
   myRole: GroupMemberRole
   "Whether the profile owner has chosen to show this group on their public profile."
   showOnProfile: Boolean
-  "For closed groups: whether non-members can see the member list."
+  "For closed groups: whether non-members can see the member list. Derived: it is true exactly when the group's non-member role holds `group.members.read`, which is where that setting now lives."
   showMembers: Boolean
   posts: [Post]
 
@@ -64,10 +66,12 @@ type Group {
   "Invite codes to this group the current user has generated."
   inviteCodes: [InviteCode]!
 
+  "How many members hold the owner role. Zero means the group has no owner left — legal, and the criterion the admin group list filters by. Null when the viewer may not see the member list."
+  ownerCount: Int
   "Number of posts currently pinned within this group."
   currentlyPinnedPostsCount: Int!
-  "Total number of non-deleted, non-disabled posts in this group."
-  postsCount: Int!
+  "Total number of non-deleted, non-disabled posts in this group. Null when the viewer may not read the content (`group.content.read`) — counting the posts is reading them, the same way counting members is reading the member list. Nullable rather than refused, so a teaser renders for a viewer who simply may not count."
+  postsCount: Int
 }
 
 "A group member paired with their membership relationship (role, join date)."
@@ -98,7 +102,6 @@ type Query {
   "Count groups, optionally restricted to the current user's memberships. Requires authentication."
   GroupCount(isMember: Boolean): Int
 
-  # AvailableGroupTypes: [GroupType]!
 
   # AvailableGroupActionRadii: [GroupActionRadius]!
 
@@ -106,14 +109,17 @@ type Query {
 }
 
 type Mutation {
-  "Create a group. Requires authentication and the `group.create_<type>` permission matching the chosen groupType."
+  "Create a group from one of the role templates (`groupTemplates`). Requires authentication and the `group.create_<visibility>` permission for the visibility that template derives to — which is not the name of the template: `channel` is a public group. The template is stored on the group; its visibility is not, because the rights it starts with are what the visibility is read from."
   CreateGroup(
     id: ID
     name: String!
     slug: String
     about: String
     description: String!
-    groupType: GroupType!
+    "Which role template the group starts from — not a visibility, which is what the rights of that template derive to. Required unless the deprecated `groupType` is given."
+    template: String
+    "The template by the name of the visibility it derives to."
+    groupType: GroupType @deprecated(reason: "Use `template`.")
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
 
@@ -136,7 +142,10 @@ type Mutation {
     about: String
     description: String
 
-    groupType: GroupType
+    "Applying a visibility writes the matching role template onto the `none` and `pending` roles — the rights ARE the visibility, so this is a preset rather than a label."
+    visibility: GroupVisibility
+    "The same as `visibility`, under its old name."
+    groupType: GroupType @deprecated(reason: "Use `visibility`.")
 
     actionRadius: GroupActionRadius
     categoryIds: [ID]

@@ -394,7 +394,7 @@ type FiledReport {
 }
 
 """
-A group: a space where members share posts, chat and optionally hold video calls. Discoverability and joining are governed by its visibility.
+A group: a space where members share posts, chat and optionally hold video calls. How findable it is follows from its rights (`visibility`); who may do what inside it follows from its roles.
 """
 type Group {
   """Short statement of the group's goal."""
@@ -426,8 +426,10 @@ type Group {
   location: Location
   locationName: String
 
-  """Number of members, excluding those with a pending join request."""
-  membersCount: Int!
+  """
+  Number of members, excluding those with a pending join request. Null when the viewer may not see the member list (`group.members.read`): in a small group the number plus a known owner is nearly the list itself. Nullable rather than refused, so a group teaser renders without an error for a viewer who simply may not count.
+  """
+  membersCount: Int
 
   """
   The current user's role in this group, or null if they are not a member.
@@ -436,12 +438,21 @@ type Group {
 
   """The group's title."""
   name: String!
+
+  """
+  How many members hold the owner role. Zero means the group has no owner left — legal, and the criterion the admin group list filters by. Null when the viewer may not see the member list.
+  """
+  ownerCount: Int
   posts: [Post]
 
-  """Total number of non-deleted, non-disabled posts in this group."""
-  postsCount: Int!
+  """
+  Total number of non-deleted, non-disabled posts in this group. Null when the viewer may not read the content (`group.content.read`) — counting the posts is reading them, the same way counting members is reading the member list. Nullable rather than refused, so a teaser renders for a viewer who simply may not count.
+  """
+  postsCount: Int
 
-  """For closed groups: whether non-members can see the member list."""
+  """
+  For closed groups: whether non-members can see the member list. Derived: it is true exactly when the group's non-member role holds `group.members.read`, which is where that setting now lives.
+  """
   showMembers: Boolean
 
   """
@@ -452,11 +463,16 @@ type Group {
   """URL-safe unique handle for the group."""
   slug: String!
 
+  """
+  Which role template this group was created from, or last put on. Stored, unlike `visibility`, which is derived: two templates can produce the same visibility (`channel` is public too), so this is what says which preset a group is running — and what the admin area counts when it asks how many groups an edit would reach.
+  """
+  template: String
+
   """ISO 8601 date-time string of the last update."""
   updatedAt: String!
 
   """
-  How findable this group is: `hidden` groups are unlisted, `closed` ones are findable but keep their content to members, `public` ones are open.
+  How findable this group is — DERIVED from its rights, not chosen: `hidden` while its non-member role cannot read the profile, `closed` while it cannot read the content, `public` otherwise. Setting it through UpdateGroup applies the matching role template; the per-level network rights (group.create_*, group.administer.any_*, group.content.read.any_*) read it.
   """
   visibility: GroupVisibility!
 }
@@ -588,6 +604,11 @@ input ImageInput {
 An invite code. A personal code lets its holder register on the instance; a group code additionally grants membership in a specific group. May be limited by an expiry and a redemption limit.
 """
 type InviteCode {
+  """
+  Whether somebody without an account may register with this code. False for a group invite whose issuer holds `group.invite` but not `group.invite.external`: such a code brings an existing account into the group and nothing more.
+  """
+  allowsRegistration: Boolean!
+
   """The code string, which also serves as its identifier."""
   code: ID!
 
@@ -607,7 +628,7 @@ type InviteCode {
   invitedTo: Group
 
   """
-  Whether the code can still be redeemed (not expired, invalidated, or over its redemption limit).
+  Whether the code can still be redeemed (not expired, invalidated, or over its redemption limit). A group code that does not entitle its holder to REGISTER is still valid — see allowsRegistration.
   """
   isValid: Boolean!
 
@@ -763,14 +784,16 @@ type Mutation {
   CreateComment(content: String!, id: ID, postId: ID!): Comment
 
   """
-  Create a group. Requires authentication and the `group.create_<type>` permission matching the chosen groupType.
+  Create a group from one of the role templates (`groupTemplates`). Requires authentication and the `group.create_<visibility>` permission for the visibility that template derives to — which is not the name of the template: `channel` is a public group. The template is stored on the group; its visibility is not, because the rights it starts with are what the visibility is read from.
   """
   CreateGroup(
     about: String
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
     description: String!
-    groupType: GroupType!
+
+    """The template by the name of the visibility it derives to."""
+    groupType: GroupType @deprecated(reason: "Use `template`.")
     id: ID
 
     """
@@ -786,6 +809,11 @@ type Mutation {
     name: String!
     showMembers: Boolean
     slug: String
+
+    """
+    Which role template the group starts from — not a visibility, which is what the rights of that template derive to. Required unless the deprecated `groupType` is given.
+    """
+    template: String
   ): Group
 
   """Create (or fetch) the chat room for a group. Requires authentication."""
@@ -884,7 +912,9 @@ type Mutation {
     avatar: ImageInput
     categoryIds: [ID]
     description: String
-    groupType: GroupType
+
+    """The same as `visibility`, under its old name."""
+    groupType: GroupType @deprecated(reason: "Use `visibility`.")
     id: ID!
 
     """
@@ -900,6 +930,11 @@ type Mutation {
     name: String
     showMembers: Boolean
     slug: String
+
+    """
+    Applying a visibility writes the matching role template onto the `none` and `pending` roles — the rights ARE the visibility, so this is a preset rather than a label.
+    """
+    visibility: GroupVisibility
   ): Group
 
   """Update one of your own posts. Restricted to the author."""
@@ -1227,6 +1262,11 @@ enum NotificationReason {
 
   """A new post was created in a group the recipient belongs to."""
   post_in_group
+
+  """
+  The recipient's post was taken out of a group by somebody who moderates it. The post itself still exists.
+  """
+  post_removed_from_group
   removed_user_from_group
   user_joined_group
   user_left_group
@@ -1873,6 +1913,11 @@ type Report {
   filed: [FILED]!
   id: ID!
   resource: ReportedResource!
+
+  """
+  Whether the reported content was blanked because it lives in a group the viewer may not read (`group.content.read.any_<type>`). Metadata and the filings are still there so the report can be escalated; reviewing it is refused.
+  """
+  resourceHidden: Boolean!
 
   """All moderator reviews of the report."""
   reviewed: [REVIEWED]!

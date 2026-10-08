@@ -224,7 +224,19 @@ describe('mentionSuggestions', () => {
   })
 
   describe('given a group', () => {
-    const createGroup = async (groupType: string, myRole: string | null) => {
+    // What each role may do in the group. Who can be mentioned follows `group.content.read`, not
+    // the role's name, so the roles are real nodes with real rights here.
+    const MEMBER_RIGHTS = {
+      usual: ['group.read', 'group.content.read'],
+      pending: ['group.read'],
+    }
+
+    // The visibility is not stored: it is what the two non-member columns say.
+    const createGroup = async (
+      visibility: 'public' | 'closed' | 'hidden',
+      myRole: string | null,
+      rights: Record<string, string[]> = MEMBER_RIGHTS,
+    ) => {
       await database.write({
         query: `
           CREATE
@@ -233,15 +245,32 @@ describe('mentionSuggestions', () => {
             (pending:User {id: 'pending', slug: 'pat-pending'}),
             (noMember:User {id: 'no-member', slug: 'nora-no-member'}),
             (followed:User {id: 'followed', slug: 'fred-followed'}),
-            (group:Group {id: 'group', groupType: $groupType}),
+            (group:Group {
+              id: 'group',
+              nonMemberRead: $nonMemberRead,
+              nonMemberContentRead: $nonMemberContentRead
+            }),
             (post:Post {id: 'group-post'}),
             (member)-[:MEMBER_OF {role: 'usual'}]->(group),
             (pending)-[:MEMBER_OF {role: 'pending'}]->(group),
             (member)-[:WROTE]->(post)-[:IN]->(group),
             (me)-[:FOLLOWS]->(followed)
           FOREACH (role IN $myRoles | CREATE (me)-[:MEMBER_OF {role: role}]->(group))
+          FOREACH (role IN $roles |
+            CREATE (group)-[:HAS_GROUP_ROLE]->(:GroupRole {
+              name: role.name,
+              permissions: role.permissions
+            }))
         `,
-        variables: { groupType, myRoles: myRole ? [myRole] : [] },
+        variables: {
+          nonMemberRead: visibility !== 'hidden',
+          nonMemberContentRead: visibility === 'public',
+          myRoles: myRole ? [myRole] : [],
+          roles: Object.entries(rights).map(([name, permissions]) => ({
+            name,
+            permissions: JSON.stringify(permissions),
+          })),
+        },
       })
       loginAs('me')
     }
@@ -270,10 +299,10 @@ describe('mentionSuggestions', () => {
       })
     })
 
-    describe.each(['closed', 'hidden'])('that is %s', (groupType) => {
+    describe.each(['closed', 'hidden'] as const)('that is %s', (visibility) => {
       // Nobody else would be notified of the mention.
       it('offers only active members to a member', async () => {
-        await createGroup(groupType, 'usual')
+        await createGroup(visibility, 'usual')
 
         await expect(suggest({ groupId: 'group' })).resolves.toEqual(['groupMember:mel-member'])
         await expect(suggest({ postId: 'group-post' })).resolves.toEqual(['participant:mel-member'])
@@ -281,14 +310,33 @@ describe('mentionSuggestions', () => {
 
       // Otherwise the list would give the members away.
       it('offers nobody to someone who is not a member', async () => {
-        await createGroup(groupType, null)
+        await createGroup(visibility, null)
 
         await expect(suggest({ groupId: 'group' })).resolves.toEqual([])
         await expect(suggest({ postId: 'group-post' })).resolves.toEqual([])
       })
 
       it('offers nobody to a pending member', async () => {
-        await createGroup(groupType, 'pending')
+        await createGroup(visibility, 'pending')
+
+        await expect(suggest({ groupId: 'group' })).resolves.toEqual([])
+      })
+
+      // The group decides who reads its posts, role by role — the name of the role says nothing.
+      it('offers an applicant whose role may read the posts', async () => {
+        await createGroup(visibility, 'usual', {
+          ...MEMBER_RIGHTS,
+          pending: ['group.read', 'group.content.read'],
+        })
+
+        await expect(suggest({ groupId: 'group' })).resolves.toEqual([
+          'groupMember:mel-member',
+          'groupMember:pat-pending',
+        ])
+      })
+
+      it('offers nobody to a member whose role may not read the posts', async () => {
+        await createGroup(visibility, 'usual', { ...MEMBER_RIGHTS, usual: ['group.read'] })
 
         await expect(suggest({ groupId: 'group' })).resolves.toEqual([])
       })

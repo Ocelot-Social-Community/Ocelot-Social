@@ -20,17 +20,21 @@ const BASELINE: RoleDefinition['permissions'] = [
   'post.create',
   'comment.create',
   'socialMedia.create',
-  // Flat per-group-type creation rights (mirrors videoCall.create_*). The baseline
+  // Flat per-visibility creation rights. The baseline
   // grants all three for parity with the prior model (group.create covered public +
   // closed, group.create_hidden added hidden) — i.e. every member could create any
-  // group type. Tightening a type out of the baseline is a per-role opt-in.
+  // visibility. Tightening one out of the baseline is a per-role opt-in.
   'group.create_public',
   'group.create_closed',
   'group.create_hidden',
   'user.invite',
-  // Only public-group video calls are baseline (parity with the prior public-only
-  // implementation). videoCall.create_closed / _hidden are NOT granted by default —
-  // they are opt-in per role (owner still holds them via full-catalog expansion).
+  // Only calls in a group anybody may walk into are baseline — which is what the prior
+  // public-only implementation meant by "public" (see groupRole/callDoor.ts).
+  // videoCall.create_restricted is NOT granted by default: a call nobody can look in on is
+  // opt-in per role (owner still holds it via full-catalog expansion).
+  'videoCall.create_open',
+  // The per-type predecessor, still what the current webapp reads to decide whether the call
+  // button may open a call. Goes with the webapp part, together with the catalog entries.
   'videoCall.create_public',
   // Creating personal API keys was open to any authenticated user (when the feature
   // is enabled) — baseline preserves that. NOTE: group 'account', NOT 'administration',
@@ -58,6 +62,13 @@ export const DEFAULT_ROLES: RoleDefinition[] = [
     permissions: [
       ...BASELINE,
       'content.moderate',
+      // Reading into groups one is not a member of, so a report about content in a closed or
+      // hidden group can actually be reviewed (#9405). Admin must hold everything moderator
+      // holds, hence both variants here as well.
+      'group.content.read.any_closed',
+      'group.content.read.any_hidden',
+      'group.moderate.any_closed',
+      'group.moderate.any_hidden',
       'badge.manage',
       // admin MUST hold every moderator capability (incl. user.disable) so the
       // act-on dominance rule keeps the intuitive chain owner ⊋ admin ⊋ moderator
@@ -73,6 +84,12 @@ export const DEFAULT_ROLES: RoleDefinition[] = [
       'post.pin',
       'post.push',
       'branding.manage',
+      // Administering a group one does not own: the recovery path for a group left without an
+      // owner (#6751), and the only way to reach a hidden group at all.
+      'group.administer.any_public',
+      'group.administer.any_closed',
+      'group.administer.any_hidden',
+      'group.roleTemplate.manage',
     ],
   },
   {
@@ -82,7 +99,16 @@ export const DEFAULT_ROLES: RoleDefinition[] = [
     // so the default moderator can grant/revoke badges via the moderation area.
     // user.disable lets a moderator deactivate (reversible) abusive accounts — the
     // moderator-grade alternative to the admin-only, irreversible user.delete.any.
-    permissions: [...BASELINE, 'content.moderate', 'badge.manage', 'user.disable'],
+    permissions: [
+      ...BASELINE,
+      'content.moderate',
+      // Closed groups only: an unlisted group stays an admin matter, which is the
+      // distinction #9405 asks about.
+      'group.content.read.any_closed',
+      'group.moderate.any_closed',
+      'badge.manage',
+      'user.disable',
+    ],
   },
   {
     name: USER_ROLE,

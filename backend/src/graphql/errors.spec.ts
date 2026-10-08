@@ -1,8 +1,26 @@
+import fs from 'node:fs/promises'
+import { join } from 'node:path'
+
 import { GraphQLError } from 'graphql'
 import { describe, it, expect } from 'vitest'
 
 import { Errors } from './errorRegistry'
 import { AppError, AuthenticationError, ForbiddenError, UserInputError } from './errors'
+
+// The backend's own source, without the registry and the specs: where a code has to be thrown.
+const readBackendSource = async (): Promise<string> => {
+  const sourceDir = join(import.meta.dirname, '..')
+  const files = (await fs.readdir(sourceDir, { recursive: true })).filter(
+    (file) =>
+      file.endsWith('.ts') && !file.endsWith('.spec.ts') && !file.endsWith('errorRegistry.ts'),
+  )
+  const contents = await Promise.all(
+    // The paths come from readdir over the source tree, not from any input.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    files.map(async (file) => fs.readFile(join(sourceDir, file), 'utf8')),
+  )
+  return contents.join('\n')
+}
 
 describe('GraphQL error classes', () => {
   it.each([
@@ -56,6 +74,16 @@ describe('Errors', () => {
     for (const [name, error] of Object.entries(Errors)) {
       expect(error.code).toBe(name)
     }
+  })
+
+  // A code nothing throws any more is a translation in eleven languages for a message nobody can
+  // see — and scripts/translations/backend-error-codes.sh keeps it alive, since it only holds the
+  // locales to the registry. Removing the last throw site has to remove the code with it.
+  it('is thrown somewhere, every code of it', async () => {
+    const source = await readBackendSource()
+    const unused = Object.keys(Errors).filter((name) => !source.includes(`Errors.${name}`))
+
+    expect(unused).toEqual([])
   })
 
   it('names every code <AREA>_<OBJECT>_<PROBLEM> in capitals', () => {

@@ -78,7 +78,7 @@ beforeEach(async () => {
       name: 'The Public Group',
       about: 'The public group!',
       description: 'Anyone can see the posts of this group.',
-      groupType: 'public',
+      template: 'public',
       actionRadius: 'regional',
     },
   })

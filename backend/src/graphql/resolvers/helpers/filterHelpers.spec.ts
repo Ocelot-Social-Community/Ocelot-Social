@@ -203,7 +203,7 @@ describe('filterInvisiblePosts', () => {
       await Factory.build('group', {
         id: 'closed-group',
         name: 'Closed Group',
-        groupType: 'closed',
+        template: 'closed',
         ownerId: 'group-owner',
       })
 

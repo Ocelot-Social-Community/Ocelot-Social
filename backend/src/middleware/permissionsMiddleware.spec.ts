@@ -10,7 +10,7 @@ import UserEmail from '@graphql/queries/users/UserEmail.gql'
 import schema from '@graphql/schema'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-import { groupCreatePermissionForType } from './permissionsMiddleware'
+import { groupCreatePermissionFor } from './permissionsMiddleware'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -318,32 +318,32 @@ describe('authorization', () => {
   })
 })
 
-// Group creation is gated per TYPE, and the mapping from GroupType to permission is a hand-written
-// switch. Its `default` arm exists for one situation only: a group type added to the schema and
-// forgotten here — which must refuse creation rather than allow it unguarded. The enum currently
-// has no such value, so the arm is unreachable through a request; asserting it against the LIVE
-// schema enum is what turns it from an untested fallback into a checked invariant.
-describe(groupCreatePermissionForType, () => {
-  const groupTypes = (schema.getType('GroupType') as GraphQLEnumType)
+// Group creation is gated per VISIBILITY, and the mapping from the enum to a permission is a
+// hand-written switch. Its `default` arm exists for one situation only: a visibility added to the
+// schema and forgotten here — which must refuse creation rather than allow it unguarded. The enum
+// currently has no such value, so the arm is unreachable through a request; asserting it against
+// the LIVE schema enum is what turns it from an untested fallback into a checked invariant.
+describe(groupCreatePermissionFor, () => {
+  const visibilities = (schema.getType('GroupVisibility') as GraphQLEnumType)
     .getValues()
     .map((value) => value.name)
 
-  it('covers every group type the schema offers', () => {
-    expect(groupTypes.length).toBeGreaterThan(0)
+  it('covers every visibility the schema offers', () => {
+    expect(visibilities.length).toBeGreaterThan(0)
     expect(
-      groupTypes.filter((groupType) => groupCreatePermissionForType(groupType) === null),
+      visibilities.filter((visibility) => groupCreatePermissionFor(visibility) === null),
     ).toEqual([])
   })
 
-  it('maps each group type to its own permission', () => {
+  it('maps each visibility to its own permission', () => {
     // Distinct per type — a mapping that collapsed two types onto one permission would let a
     // member who may only create public groups create hidden ones.
-    const permissions = groupTypes.map(groupCreatePermissionForType)
+    const permissions = visibilities.map(groupCreatePermissionFor)
 
-    expect(new Set(permissions).size).toBe(groupTypes.length)
+    expect(new Set(permissions).size).toBe(visibilities.length)
   })
 
   it('refuses a group type it does not know', () => {
-    expect(groupCreatePermissionForType('federated')).toBeNull()
+    expect(groupCreatePermissionFor('federated')).toBeNull()
   })
 })
