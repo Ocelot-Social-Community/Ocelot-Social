@@ -387,3 +387,28 @@ describe('Subscription.groupMembershipVisibilityChanged', () => {
 
   void filter
 })
+
+describe('GroupMembers past the shield', () => {
+  // The shield asks group.members.read before this resolver runs. The resolver asks again when
+  // it has an authorization at hand, so a caller that reaches it some other way — a test, a
+  // future internal use — gets the list the right allows rather than the whole one.
+  it('lists nobody to a non-member whose rights do not include the member list', async () => {
+    const run = vi.fn(async () => Promise.resolve({ records: [] }))
+    const context = {
+      user: { id: 'viewer' },
+      driver: {
+        session: () => ({
+          readTransaction: async (work: (txc: unknown) => Promise<unknown>) => work({ run }),
+          close: async () => Promise.resolve(),
+        }),
+      },
+      groupAuthorization: {
+        forGroup: vi.fn(async () => Promise.resolve({ has: () => false })),
+      },
+    } as unknown as Context
+
+    await expect(resolvers.Query.GroupMembers({}, { id: 'g1' }, context, null)).resolves.toEqual([])
+    // Only the membership check ran: the list itself was never asked for.
+    expect(run).toHaveBeenCalledTimes(1)
+  })
+})
