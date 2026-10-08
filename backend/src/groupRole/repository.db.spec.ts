@@ -3,25 +3,38 @@ import { describe, beforeEach, afterAll, it, expect } from 'vitest'
 import databaseContext from '@context/database'
 import { cleanDatabase } from '@db/factories'
 
-import { readGroupTemplate, seedRolesForGroupsWithoutRoles } from './repository'
+import { readGroupTemplate, seedRolesForGroupsWithoutRoles, writeGroupTemplate } from './repository'
 import { seedGroupRoleTemplates } from './seedTemplates'
 
 const NOW = '2026-10-08T12:00:00.000Z'
 const database = databaseContext()
 
-// Against the database, because what is under test is a Cypher fallback: which template a group
-// from before the templates is repaired from. A fake database would only echo the answer back.
+// Against the database, because what is under test is what Cypher reads back: a fake database
+// would only echo the answer it was given.
+beforeEach(async () => {
+  await cleanDatabase()
+  await seedGroupRoleTemplates(database, NOW)
+})
+
+afterAll(async () => {
+  await cleanDatabase()
+  await database.driver.close()
+})
+
+describe(writeGroupTemplate, () => {
+  it('records the template a group runs on, over a type left behind from before', async () => {
+    // What `untouchedGroupIdsByTemplate` counts by: a group put on the channel template has to
+    // be counted under it, not under the type it was created with.
+    await database.write({ query: `CREATE (:Group {id: 'g1', groupType: 'public'})` })
+
+    await writeGroupTemplate(database, 'g1', 'channel')
+
+    expect(await readGroupTemplate(database, 'g1')).toBe('channel')
+  })
+})
+
+// Which template a group from before the templates is repaired from.
 describe('groups from before the templates', () => {
-  beforeEach(async () => {
-    await cleanDatabase()
-    await seedGroupRoleTemplates(database, NOW)
-  })
-
-  afterAll(async () => {
-    await cleanDatabase()
-    await database.driver.close()
-  })
-
   it('are repaired from the template their old type names, not the strictest one', async () => {
     // A restored dump, or a group created by an instance that had not been upgraded yet: no
     // template, no roles — but a groupType, whose values are the template names.
@@ -43,6 +56,11 @@ describe('groups from before the templates', () => {
     await seedRolesForGroupsWithoutRoles(database, NOW)
 
     expect(await readGroupTemplate(database, 'bare')).toBe('hidden')
+  })
+
+  it('read as the strictest template when the group is not there at all', async () => {
+    // Nothing to go by — and the answer that can only ever cost rights, never invent them.
+    expect(await readGroupTemplate(database, 'no-such-group')).toBe('hidden')
   })
 
   it('keep the template they run on over a type left behind', async () => {
