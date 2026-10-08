@@ -5,7 +5,7 @@
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
 import { branding } from '@src/branding'
-import { USUAL_ROLE } from '@src/groupRole'
+import { PENDING_ROLE, USUAL_ROLE } from '@src/groupRole'
 
 import Resolver from './helpers/Resolver'
 
@@ -172,13 +172,25 @@ export const redeemInviteCode = async (context: Context, code, newUser = false) 
       MATCH (user:User {id: $user.id}), (group:Group)<-[:INVITES_TO]-(inviteCode:InviteCode {code: toUpper($code)})<-[:GENERATED]-(host:User)
       MERGE (user)-[:REDEEMED { createdAt: toString(datetime()) }]->(inviteCode)
       ${optionalInvited}
-      MERGE (user)-[membership:MEMBER_OF]->(group) 
+      MERGE (user)-[membership:MEMBER_OF]->(group)
         ON CREATE SET
           membership.createdAt = toString(datetime()),
           membership.updatedAt = toString(datetime()),
           membership.role = $role
+        // Somebody who had already asked to join is let in by the invitation, which is the
+        // approval they were waiting for. Only pending moves: a member or an admin
+        // redeeming a code to their own group keeps the role they have.
+        ON MATCH SET
+          membership.updatedAt = CASE
+            WHEN membership.role = $pendingRole THEN toString(datetime())
+            ELSE membership.updatedAt
+          END,
+          membership.role = CASE
+            WHEN membership.role = $pendingRole THEN $role
+            ELSE membership.role
+          END
       `,
-      variables: { user: context.user, code, role },
+      variables: { user: context.user, code, role, pendingRole: PENDING_ROLE },
     })
   }
   return true

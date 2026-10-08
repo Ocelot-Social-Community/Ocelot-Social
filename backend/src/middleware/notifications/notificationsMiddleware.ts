@@ -8,7 +8,11 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 import { NOTIFICATION_ADDED, ROOM_UPDATED, CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
-import { visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
+import {
+  memberHoldsInGroup,
+  nonMemberReadsContent,
+  visibilityOf,
+} from '@graphql/resolvers/helpers/groupAccessCypher'
 import { getRoomProperties } from '@graphql/resolvers/rooms'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
@@ -17,6 +21,10 @@ import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 
 import type { IMiddlewareResolver } from 'graphql-middleware/types'
+
+/** Whether the user bound as `user` may read the posts of the group bound as `group`. */
+const readsGroupContent = (group: string, user: string): string =>
+  `(${nonMemberReadsContent(group)} OR ${memberHoldsInGroup(group, 'group.content.read', `${user}.id`)})`
 
 const publishNotifications = async (
   context,
@@ -428,15 +436,7 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
           AND NOT (user)-[:MUTED]->(author)
         OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
         OPTIONAL MATCH (post)-[:IN]->(group:Group)
-        OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(user)
-        // \`membership\` is projected because the WHERE below reads it. Neo4j 4.4 resolves it
-        // even when the WITH drops it — the closed-group cases in
-        // notificationsMiddleware.mentions-in-groups.spec.ts only pass because it evaluates
-        // per user there (member notified, pending member not, non-member not, all three
-        // decided by \`membership.role\` alone) — but that is a tolerance, not a guarantee, and
-        // every other query in this codebase carries the variable explicitly. Relying on it
-        // would hand the Neo4j 5 upgrade a silent \`Variable not defined\`.
-        WITH post, author, user, group, emailAddress, membership
+        WITH post, author, user, group, emailAddress
         // The parentheses are load-bearing, and they protect the GUARD, not the group rule:
         // unparenthesised, \`A OR B OR C AND D\` binds as \`A OR B OR (C AND D)\`, so for a post
         // outside any group \`group IS NULL\` alone satisfies the disjunction and the
@@ -444,7 +444,11 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
         // again on every edit, which is the whole bug this guard exists for. Verified by
         // removing them: the group cases stay green, the three edit cases in
         // notificationsMiddleware.spec.ts fail.
-        WHERE (group IS NULL OR ${visibilityOf('group')} = 'public' OR membership.role <> 'pending')
+        //
+        // In a group, a mention reaches whoever may read the post: as a non-member, or through
+        // their own role there (group.content.read) — the question the mention suggestions ask,
+        // so the list offers exactly the people a mention will notify.
+        WHERE (group IS NULL OR ${readsGroupContent('group', 'user')})
         // Already told about this post — see the note on this function.
         AND NOT EXISTS { MATCH (post)-[:NOTIFIED { reason: $reason }]->(user) }
         MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
@@ -463,11 +467,9 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
         AND NOT (user)-[:MUTED]->(postAuthor)
       OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
       OPTIONAL MATCH (post)-[:IN]->(group:Group)
-      OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(user)
-      // \`membership\` projected for the same reason as in the post branch above.
-      WITH comment, user, group, emailAddress, membership
-      // Parenthesised for the same reason as in the post branch above.
-      WHERE (group IS NULL OR ${visibilityOf('group')} = 'public' OR membership.role <> 'pending')
+      WITH comment, user, group, emailAddress
+      // Parenthesised, and asked, for the same reasons as in the post branch above.
+      WHERE (group IS NULL OR ${readsGroupContent('group', 'user')})
       // Already told about this comment — see the note on this function.
       AND NOT EXISTS { MATCH (comment)-[:NOTIFIED { reason: $reason }]->(user) }
       MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(user)

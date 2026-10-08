@@ -370,6 +370,10 @@ export default {
       const template = templateFromArgs(params) as string
       delete params.template
       withoutGroupTypeAlias(params)
+      // Not written with the other properties: the role seeding below sets the member list from
+      // the template, and a request that asks for it open has to win over that.
+      const requestedShowMembers = params.showMembers as boolean | null | undefined
+      delete params.showMembers
       const { categoryIds } = params
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
@@ -396,6 +400,12 @@ export default {
         throw new AppError(Errors.GROUP_SAVE_DESCRIPTION_TOO_SHORT, {
           min: branding.group.descriptionMinLength,
         })
+      }
+      // Same meaning as on UpdateGroup: the setting of a CLOSED group. Asking for the list of a
+      // group outsiders cannot find is refused; everywhere else the template decides.
+      const createdVisibility = await templateVisibility(context.database, template)
+      if (requestedShowMembers === true && createdVisibility === 'hidden') {
+        throw new AppError(Errors.GROUP_SAVE_MEMBER_LIST_UNAVAILABLE)
       }
       params.id = params.id || uuid()
       const session = context.driver.session()
@@ -461,6 +471,21 @@ export default {
           GROUP_REVERSE_GEOCODE_TYPES,
           true,
         )
+        if (requestedShowMembers === true && createdVisibility === 'closed') {
+          await setNonMemberMemberListAccess(
+            context.database,
+            params.id,
+            true,
+            new Date().toISOString(),
+          )
+          // Read back: the member list is a right of the non-member role now, and the answer
+          // has to say what was saved.
+          const { records } = await context.database.query({
+            query: `MATCH (group:Group {id: $groupId}) RETURN group {.*} AS group`,
+            variables: { groupId: params.id },
+          })
+          return records[0].get('group')
+        }
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
@@ -476,6 +501,10 @@ export default {
       const requestedTemplate = visibilityFromArgs(params) ?? undefined
       delete params.visibility
       withoutGroupTypeAlias(params)
+      // A nullable Boolean may arrive as null, which asks for no change — not for a closed list.
+      if (params.showMembers === null) {
+        delete params.showMembers
+      }
       const { policy } = context
       const { categoryIds } = params
       delete params.categoryIds
@@ -614,7 +643,14 @@ export default {
             groupPermissionsChanged: { groupId },
           })
         }
-        if ('showMembers' in params) {
+        // The deprecated argument keeps the meaning it always had: whether a CLOSED group shows
+        // its members to outsiders. The current form sends it on every save — `false` included,
+        // for a public group whose list it never governed — so outside a closed group it changes
+        // nothing. (Opening a hidden group's list was refused above.)
+        if (
+          typeof params.showMembers === 'boolean' &&
+          (requestedTemplate ?? previousVisibility) === 'closed'
+        ) {
           // Keep the right and the (deprecated) property in step: the property is what older
           // clients still read, the right is what actually decides.
           await setNonMemberMemberListAccess(

@@ -199,6 +199,39 @@ describe(redeemInviteCode, () => {
 
       expect(records[0].get('role')).toBe('usual')
     })
+
+    describe('for somebody who is in the group already', () => {
+      const roleAfterRedeeming = async (roleBefore: string) => {
+        await database.write({
+          query: `MATCH (host:User { id: 'invite-host' }), (invited:User { id: 'invited-user' })
+                  MERGE (group:Group { id: 'asked-group', template: 'closed' })
+                  MERGE (host)-[:GENERATED]->(code:InviteCode { code: 'GRP004' })
+                  MERGE (code)-[:INVITES_TO]->(group)
+                  MERGE (invited)-[m:MEMBER_OF]->(group)
+                  SET m.role = $roleBefore, m.updatedAt = '2020-01-01T00:00:00.000Z'`,
+          variables: { roleBefore },
+        })
+        await redeemInviteCode(contextFor('invited-user'), 'GRP004')
+        const records = await codesOf(`
+          MATCH (:User { id: 'invited-user' })-[m:MEMBER_OF]->(:Group { id: 'asked-group' })
+          RETURN m.role AS role, m.updatedAt AS updatedAt`)
+        return records[0].toObject() as { role: string; updatedAt: string }
+      }
+
+      it('lets in an applicant, whose invitation is the approval they were waiting for', async () => {
+        const { role, updatedAt } = await roleAfterRedeeming('pending')
+
+        expect(role).toBe('usual')
+        expect(updatedAt).not.toBe('2020-01-01T00:00:00.000Z')
+      })
+
+      it('leaves a higher role exactly as it was', async () => {
+        await expect(roleAfterRedeeming('admin')).resolves.toEqual({
+          role: 'admin',
+          updatedAt: '2020-01-01T00:00:00.000Z',
+        })
+      })
+    })
   })
 })
 

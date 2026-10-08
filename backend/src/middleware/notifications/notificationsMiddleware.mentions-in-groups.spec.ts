@@ -489,6 +489,74 @@ describe('mentions in groups', () => {
     })
   })
 
+  // Who a mention reaches is a RIGHT of the group, not a role name: a closed group may let its
+  // applicants read along, and then they are told about a mention like any member.
+  describe('post in a closed group that lets its applicants read', () => {
+    beforeEach(async () => {
+      vi.clearAllMocks()
+      await database.write({
+        query: `MATCH (:Group {id: 'closed-group'})-[:HAS_GROUP_ROLE]->(pending:GroupRole {name: 'pending'})
+                SET pending.permissions = $permissions`,
+        variables: {
+          permissions: JSON.stringify(['group.read', 'group.content.read', 'group.leave']),
+        },
+      })
+      authenticatedUser = await postAuthor.toJson()
+      await mutate({
+        mutation: CreatePost,
+        variables: {
+          id: 'closed-post-read-along',
+          title: 'This is the post in the closed group',
+          content: `Hey members ${mentionString}! Please read this`,
+          groupId: 'closed-group',
+        },
+      })
+    })
+
+    it('sends a notification to the pending member', async () => {
+      authenticatedUser = await pendingMember.toJson()
+
+      await expect(
+        query({
+          query: notifications,
+          variables: {
+            orderBy: 'updatedAt_desc',
+            read: false,
+          },
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          notifications: expect.arrayContaining([
+            expect.objectContaining({
+              reason: 'mentioned_in_post',
+              from: expect.objectContaining({ id: 'closed-post-read-along' }),
+            }),
+          ]),
+        },
+        errors: undefined,
+      })
+    })
+
+    it('still sends NO notification to the no member', async () => {
+      authenticatedUser = await noMember.toJson()
+
+      await expect(
+        query({
+          query: notifications,
+          variables: {
+            orderBy: 'updatedAt_desc',
+            read: false,
+          },
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          notifications: [],
+        },
+        errors: undefined,
+      })
+    })
+  })
+
   describe('post in hidden group', () => {
     beforeEach(async () => {
       vi.clearAllMocks()

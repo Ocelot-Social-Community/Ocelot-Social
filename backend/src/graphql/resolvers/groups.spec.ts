@@ -5221,13 +5221,16 @@ describe('Subscription.groupMembershipVisibilityChanged filter', () => {
   })
 })
 
-describe('Group.visibility', () => {
-  // Derived from what the non-member role may read, not stored.
+describe('Group.visibility and its deprecated name groupType', () => {
+  // Derived from what the non-member role may read, not stored. `groupType` stays in the schema,
+  // deprecated, for clients that still ask for it — and has to answer exactly what `visibility`
+  // answers, or the two names for one value would quietly disagree.
   it.each([
     [{ nonMemberRead: true, nonMemberContentRead: true }, 'public'],
     [{ nonMemberRead: true, nonMemberContentRead: false }, 'closed'],
     [{ nonMemberRead: false, nonMemberContentRead: false }, 'hidden'],
-  ])('reads %o as %s', (group, visibility) => {
+  ])('reads %o as %s, under both names', (group, visibility) => {
     expect(groupsResolver.Group.visibility(group)).toBe(visibility)
+    expect(groupsResolver.Group.groupType(group)).toBe(visibility)
   })
 })

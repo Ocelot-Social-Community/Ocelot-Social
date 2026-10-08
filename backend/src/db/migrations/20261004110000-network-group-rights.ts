@@ -1,7 +1,7 @@
 import { getDriver } from '@db/neo4j'
 
 export const description =
-  'Bring the stored network roles up to the group rights system, by rule rather than by list — the boot seed is edit-respecting (ON CREATE only) and does not touch an existing role. A role with content.moderate may read and moderate CLOSED groups it is not a member of (group.content.read.any_closed, group.moderate.any_closed: a report about content in a closed group could not be reviewed before, #9405). A role with role.manage also gets that, plus the hidden-group read and moderation, group.administer.any_public/_closed/_hidden and group.roleTemplate.manage (#6751, and the recovery path for a group left without an owner). The video call rights are asked per door rather than per type: videoCall.create_public becomes videoCall.create_open, videoCall.create_closed and _hidden become videoCall.create_restricted (groupRole/callDoor.ts). Nothing is granted to the baseline; owner expands to the full catalog and stores nothing. Idempotent.'
+  'Bring the stored network roles up to the group rights system, by rule rather than by list — the boot seed is edit-respecting (ON CREATE only) and does not touch an existing role. A role with content.moderate may read and moderate CLOSED groups it is not a member of (group.content.read.any_closed, group.moderate.any_closed: a report about content in a closed group could not be reviewed before, #9405). A role with role.manage also gets that, plus the hidden-group read and moderation, group.administer.any_public/_closed/_hidden and group.roleTemplate.manage (#6751, and the recovery path for a group left without an owner). The video call rights are asked per door rather than per type: a role holding videoCall.create_public also gets videoCall.create_open, one holding _closed or _hidden gets videoCall.create_restricted (groupRole/callDoor.ts). The per-type keys stay for now — the current webapp still reads them — and are removed by a later migration. Nothing is granted to the baseline; owner expands to the full catalog and stores nothing. Idempotent.'
 
 const FOR_MODERATION = ['group.content.read.any_closed', 'group.moderate.any_closed']
 const FOR_ADMINISTRATION = [
@@ -13,9 +13,11 @@ const FOR_ADMINISTRATION = [
   'group.roleTemplate.manage',
 ]
 const ALL_ADDED = [...FOR_MODERATION, ...FOR_ADMINISTRATION]
+const VIDEO_CALL_SUCCESSOR_KEYS = ['videoCall.create_open', 'videoCall.create_restricted']
 
-// What the call was really about was never the type but whether a stranger can walk in.
-const VIDEO_CALL_RENAMES = new Map([
+// What the call was really about was never the type but whether a stranger can walk in. Added
+// next to the per-type key rather than in its place, while the webapp still reads that one.
+const VIDEO_CALL_SUCCESSORS = new Map([
   ['videoCall.create_public', 'videoCall.create_open'],
   ['videoCall.create_closed', 'videoCall.create_restricted'],
   ['videoCall.create_hidden', 'videoCall.create_restricted'],
@@ -75,7 +77,10 @@ const add = (permissions: string[], keys: string[]) => unique([...permissions, .
 
 export async function up(_next) {
   await rewriteRolePermissions((permissions) => {
-    let next = unique(permissions.map((key) => VIDEO_CALL_RENAMES.get(key) ?? key))
+    let next = add(
+      permissions,
+      permissions.flatMap((key) => VIDEO_CALL_SUCCESSORS.get(key) ?? []),
+    )
     if (permissions.includes('content.moderate')) {
       next = add(next, FOR_MODERATION)
     }
@@ -91,19 +96,12 @@ export async function up(_next) {
 export async function down(_next) {
   await rewriteRolePermissions((permissions) =>
     unique(
-      permissions
-        .filter((permission) => !ALL_ADDED.includes(permission))
-        // `_restricted` maps back to BOTH closed and hidden, which is the honest reverse: a role
-        // that may open a call in a group one cannot walk into could do so in either kind.
-        .flatMap((permission) => {
-          if (permission === 'videoCall.create_open') {
-            return ['videoCall.create_public']
-          }
-          if (permission === 'videoCall.create_restricted') {
-            return ['videoCall.create_closed', 'videoCall.create_hidden']
-          }
-          return [permission]
-        }),
+      // The per-type video call keys were never taken away, so dropping their successors is
+      // the whole way back.
+      permissions.filter(
+        (permission) =>
+          !ALL_ADDED.includes(permission) && !VIDEO_CALL_SUCCESSOR_KEYS.includes(permission),
+      ),
     ),
   )
 }

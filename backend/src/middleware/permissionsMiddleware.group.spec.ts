@@ -17,6 +17,7 @@ import type { PermissionKey } from '@src/permission'
 const {
   byArg,
   byPost,
+  byGroupPost,
   byRoom,
   hasGroupPermission,
   parentHasGroupPermission,
@@ -155,6 +156,18 @@ describe('the locators', () => {
     expect((await byArg('groupId')({ groupId: 'g1' }, context)).type).toBe('group')
     expect((await byPost('postId')({ postId: 'p1' }, context)).type).toBe('group')
     expect((await byRoom('roomId')({ roomId: 'r1' }, context)).type).toBe('group')
+  })
+
+  it('report "not found" for an operation that only exists for a GROUP post', async () => {
+    // Unpinning from a group: a post that is not there, or not in a group, is nothing it can
+    // be authorized on — where byPost would let the network decide, as it does for a comment.
+    const context = contextFor({ post: null })
+
+    expect(await byGroupPost('id')({ id: 'p1' }, context)).toEqual({ type: 'notFound' })
+    expect(await byGroupPost('id')({}, context)).toEqual({ type: 'notFound' })
+    expect(
+      (await byGroupPost('id')({ id: 'p1' }, contextFor({ post: { effective: [] } }))).type,
+    ).toBe('group')
   })
 })
 
@@ -376,6 +389,35 @@ describe('canChangeMemberListAccess', () => {
     expect(
       await resolve(canChangeMemberListAccess, {}, { id: 'g1', showMembers: true }, context),
     ).toBe(true)
+  })
+
+  it('leaves a group that is not closed to the setting it never governed', async () => {
+    // The current form sends `showMembers: false` on every save. On a public group that never
+    // closed anything, so it must not cost an admin a right they do not hold.
+    const admin = contextFor({
+      group: { visibility: 'public', effective: ['group.settings.manage'] },
+      rolePermissions: ['group.read', 'group.content.read', 'group.members.read'],
+    })
+
+    expect(
+      await resolve(canChangeMemberListAccess, {}, { id: 'g1', showMembers: false }, admin),
+    ).toBe(true)
+  })
+
+  it('judges the group as it will be, when the same request makes it closed', async () => {
+    const admin = contextFor({
+      group: { visibility: 'public', effective: ['group.settings.manage'] },
+      rolePermissions: ['group.read', 'group.content.read', 'group.members.read'],
+    })
+
+    expect(
+      await resolve(
+        canChangeMemberListAccess,
+        {},
+        { id: 'g1', visibility: 'closed', showMembers: false },
+        admin,
+      ),
+    ).toBe(false)
   })
 
   it('needs group.role.manage for an actual change, not group.settings.manage', async () => {

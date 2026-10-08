@@ -433,6 +433,18 @@ const byPost =
     return authorization ? { type: 'group', authorization } : { type: 'noGroup' }
   }
 
+/**
+ * The group a post lives in, for an operation that only exists for GROUP posts: a post that is
+ * not there, or not in a group, is nothing it can be authorized on — rather than the "no group,
+ * the network decides" that byPost answers for a comment.
+ */
+const byGroupPost =
+  (argument: string): GroupLocator =>
+  async (args, ctx) => {
+    const location = await byPost(argument)(args, ctx)
+    return location.type === 'noGroup' ? { type: 'notFound' } : location
+  }
+
 /** The group a chat room belongs to. A direct-message room belongs to none. */
 const byRoom =
   (argument: string): GroupLocator =>
@@ -524,6 +536,13 @@ const canChangeMemberListAccess = rule({ cache: 'no_cache' })(async (
   const authorization = await ctx.groupAuthorization.forGroup(args.id)
   if (!authorization) {
     return false
+  }
+  // The deprecated argument means what it always meant: the member-list setting of a CLOSED
+  // group (see UpdateGroup). The current form sends it on every save, so for any other group it
+  // is no change and needs no right — or saving a public group's name would cost
+  // `group.role.manage`. Opening a hidden group's list is refused by the resolver, with a reason.
+  if ((visibilityFromArgs(args) ?? authorization.visibility) !== 'closed') {
+    return true
   }
   const nonMember = await ctx.groupAuthorization.rolePermissions(args.id, NONE_ROLE)
   const open = nonMember?.has('group.members.read') ?? false
@@ -670,6 +689,7 @@ const canRemoveGroupMember = rule({ cache: 'no_cache' })(async (_parent, args, c
 export const groupAuthorizationRules = {
   byArg,
   byPost,
+  byGroupPost,
   byRoom,
   hasGroupPermission,
   parentHasGroupPermission,
@@ -832,7 +852,7 @@ export default shield(
       pinPost: hasPermission('post.pin'),
       unpinPost: hasPermission('post.pin'),
       pinGroupPost: and(groupsEnabled, hasGroupPermission('group.post.pin', byPost('id'))),
-      unpinGroupPost: and(groupsEnabled, hasGroupPermission('group.post.pin', byPost('id'))),
+      unpinGroupPost: and(groupsEnabled, hasGroupPermission('group.post.pin', byGroupPost('id'))),
       pushPost: hasPermission('post.push'),
       unpushPost: hasPermission('post.push'),
       UpdateDonations: hasPermission('donation.manage'),

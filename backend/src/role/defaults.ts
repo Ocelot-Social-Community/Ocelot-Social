@@ -33,6 +33,9 @@ const BASELINE: RoleDefinition['permissions'] = [
   // videoCall.create_restricted is NOT granted by default: a call nobody can look in on is
   // opt-in per role (owner still holds it via full-catalog expansion).
   'videoCall.create_open',
+  // The per-type predecessor, still what the current webapp reads to decide whether the call
+  // button may open a call. Goes with the webapp part, together with the catalog entries.
+  'videoCall.create_public',
   // Creating personal API keys was open to any authenticated user (when the feature
   // is enabled) — baseline preserves that. NOTE: group 'account', NOT 'administration',
   // so holding it does not make a user count as an admin (isAdmin is group-driven).
