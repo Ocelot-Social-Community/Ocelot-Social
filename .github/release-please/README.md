@@ -117,6 +117,15 @@ fact. Two settings follow from that:
   creates the tag when the draft is published. This flag makes release-please create
   `refs/tags/<version>` outright, before the release, so the tag is there from the merge on.
 
+The packages (`ui`, `branding`) are released the same way, for a reason of their own: GitHub hands
+the **"Latest" badge** to every newly published release by default, and it can only be handed *to*
+a release — `--latest=false` on the one holding it does not give it back to the one before. Created
+public, each package release took the badge from the application for good (3.19.0 lost it to the
+`ui`/`branding` releases of 2026-10-05). As drafts they never hold it: their workflows publish
+them with `--draft=false --latest=false` once the npm publish has succeeded, and only
+`publish.yml` ever claims the badge, for the application. A package whose npm publish failed stays
+a draft, for the same reason the application's release waits for its images.
+
 `publish.yml` does **not** gate on the action's `release_created` output, even though that is the
 obvious thing to read. It is true exactly once, because release-please refuses to create an existing
 release a second time — the same property that lost `@ocelot-social/ui@0.0.2` below. A re-run after

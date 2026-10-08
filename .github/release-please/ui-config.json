@@ -9,7 +9,8 @@
       "component": "ui",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
-      "draft": false,
+      "draft": true,
+      "force-tag-creation": true,
       "prerelease": false,
       "component-no-space": true
     }
