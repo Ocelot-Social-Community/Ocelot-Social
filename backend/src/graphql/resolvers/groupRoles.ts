@@ -502,8 +502,13 @@ export default {
       const target = await requireRole(context, groupId, reassignTo)
       // Moving everybody into a role is handing that role out, so it asks what handing out a role
       // asks: that the actor holds all of it. Read off the role's EFFECTIVE set — the owner's
-      // stored list is empty on purpose and would cover anybody.
-      await requireCoverage(context, groupId, [...permissionsForGroupRole(target)])
+      // stored list is empty on purpose and would cover anybody. Not asked of the owner, as in
+      // resetGroupRoles: they hold the whole catalog by definition, and their effective set lacks
+      // only what is switched off network-wide — which would stop them for no reason at all.
+      const authorization = await context.groupAuthorization.forGroup(groupId)
+      if (authorization?.roleName !== OWNER_ROLE) {
+        await requireCoverage(context, groupId, [...permissionsForGroupRole(target)])
+      }
       const now = new Date().toISOString()
       await deleteGroupRole(context.database, groupId, name, reassignTo, now)
       await touched(context, groupId, now)

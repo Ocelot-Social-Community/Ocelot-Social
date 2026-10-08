@@ -997,6 +997,24 @@ describe('Mutation.deleteGroupRole', () => {
     expect(mocked.deleteGroupRole).not.toHaveBeenCalled()
   })
 
+  it('lets the owner move them into the owner role, whatever is switched off network-wide', async () => {
+    // The owner's effective set lacks the rights a network gate takes away (a call right on a
+    // network without LiveKit); covering the whole catalog would stop them for that alone.
+    mocked.readGroupRoles.mockResolvedValue([
+      role('steward'),
+      role('owner', [], { system: true, protected: true }),
+    ])
+    const { context } = contextFor({ authorization: { roleName: 'owner', effective: [] } })
+
+    await expect(
+      Mutation.deleteGroupRole(
+        {},
+        { groupId: 'g1', name: 'steward', reassignTo: 'owner' },
+        context,
+      ),
+    ).resolves.toBe('steward')
+  })
+
   it('deletes it and names what it deleted', async () => {
     mocked.readGroupRoles.mockResolvedValue([role('steward'), role('usual', [], { system: true })])
     const { context, published } = contextFor()
