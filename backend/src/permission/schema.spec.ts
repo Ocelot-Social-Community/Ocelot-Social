@@ -27,6 +27,10 @@ const EXPECTED_KEYS: PermissionKey[] = [
   'user.delete.any',
   'badge.manage',
   'content.moderate',
+  'group.content.read.any_closed',
+  'group.content.read.any_hidden',
+  'group.moderate.any_closed',
+  'group.moderate.any_hidden',
   'user.disable',
   'post.pin',
   'post.push',
@@ -40,8 +44,14 @@ const EXPECTED_KEYS: PermissionKey[] = [
   'videoCall.create_public',
   'videoCall.create_closed',
   'videoCall.create_hidden',
+  'videoCall.create_open',
+  'videoCall.create_restricted',
   'apiKey.create',
   'branding.manage',
+  'group.administer.any_public',
+  'group.administer.any_closed',
+  'group.administer.any_hidden',
+  'group.roleTemplate.manage',
 ]
 
 describe('permission catalog', () => {
@@ -72,6 +82,18 @@ describe('permission catalog', () => {
       expect(gatesFor('videoCall.create_public')).toEqual(['videoConference', 'groupsEnabled'])
       expect(gatesFor('videoCall.create_closed')).toEqual(['videoConference', 'groupsEnabled'])
       expect(gatesFor('videoCall.create_hidden')).toEqual(['videoConference', 'groupsEnabled'])
+      expect(gatesFor('videoCall.create_open')).toEqual(['videoConference', 'groupsEnabled'])
+      expect(gatesFor('videoCall.create_restricted')).toEqual(['videoConference', 'groupsEnabled'])
+      // Reaching into groups, and the templates they are seeded from, is inert while the
+      // groups feature is off.
+      expect(gatesFor('group.content.read.any_closed')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.content.read.any_hidden')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.moderate.any_closed')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.moderate.any_hidden')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.administer.any_public')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.administer.any_closed')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.administer.any_hidden')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.roleTemplate.manage')).toEqual(['groupsEnabled'])
       expect(gatesFor('apiKey.create')).toEqual(['apiKeysEnabled'])
       // Creating groups is gated by the groups feature; badge.manage is inert while badges
       // are disabled; user.invite while invite registration is off (codes couldn't be
@@ -99,8 +121,10 @@ describe('permission catalog', () => {
       // then apiKey.create.
       expect(allPermissionGates()).toEqual([
         'badgesEnabled',
-        'socialMediaEnabled',
+        // groupsEnabled first among the rest: the group-access rights that sit next to
+        // content.moderate declare it before group.create_* does.
         'groupsEnabled',
+        'socialMediaEnabled',
         'inviteRegistration',
         'videoConference',
         'apiKeysEnabled',
@@ -122,6 +146,11 @@ describe('permission catalog', () => {
         'membership',
         'communication',
         'account',
+        // The two group-shaped sections are their own: a right that reaches INTO somebody else's
+        // group is not the same kind of thing as administering the network, and an admin reading
+        // a flat "administration" list could not tell them apart.
+        'groupAdministration',
+        'groupModeration',
       ]
       for (const key of allPermissionKeys()) {
         expect(knownGroups).toContain(groupFor(key))

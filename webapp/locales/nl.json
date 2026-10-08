@@ -325,6 +325,8 @@
         "administration": "Beheer",
         "communication": "Communicatie",
         "content": "Inhoud",
+        "groupAdministration": "Groepen — beheer",
+        "groupModeration": "Groepen — moderatie",
         "membership": "Lidmaatschap",
         "moderation": "Moderatie"
       },
