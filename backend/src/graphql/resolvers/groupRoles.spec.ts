@@ -1134,6 +1134,27 @@ describe('Mutation.resetGroupRoles', () => {
       expect(mocked.replaceGroupRoles).toHaveBeenCalled()
     })
 
+    it('asks for the whole of a role the group does not have yet', async () => {
+      // Nothing of it is kept, so all of it is handed out.
+      mocked.readGroupRoleTemplates.mockResolvedValue({ public: template })
+      mocked.readGroupTemplate.mockResolvedValue('public')
+      mocked.readGroupRoles.mockResolvedValue([nonMember])
+      const { context } = contextFor({
+        authorization: {
+          visibility: 'public',
+          roleName: 'admin',
+          effective: ['group.read', 'group.content.read'],
+        },
+      })
+
+      await expect(Mutation.resetGroupRoles({}, { groupId: 'g1' }, context)).rejects.toMatchObject({
+        extensions: {
+          errorCode: 'GROUP_ROLE_PERMISSIONS_NOT_HELD',
+          params: { permissions: 'group.invite' },
+        },
+      })
+    })
+
     it('does not ask an admin to cover the owner role of the template', async () => {
       // The owner role resolves to the whole catalog; nobody but an owner could cover it, and
       // putting a template back must not be an owner-only act for that reason alone.
@@ -1164,6 +1185,18 @@ describe('Mutation.resetGroupRoles', () => {
       await Mutation.resetGroupRoles({}, { groupId: 'g1' }, context)
 
       expect(mocked.replaceGroupRoles).toHaveBeenCalled()
+    })
+  })
+
+  it('reads a template without a non-member role as the most private one', async () => {
+    // A damaged template: nothing says strangers may read, so applying it is making the group
+    // unlisted, and capped as that — rather than a way past the cap.
+    mocked.readGroupRoleTemplates.mockResolvedValue({ public: [role('usual')] })
+    mocked.readGroupTemplate.mockResolvedValue('public')
+    const { context } = contextFor({ authorization: { visibility: 'public' } })
+
+    await expect(Mutation.resetGroupRoles({}, { groupId: 'g1' }, context)).rejects.toMatchObject({
+      extensions: { errorCode: 'GROUP_VISIBILITY_RAISE_NOT_PERMITTED' },
     })
   })
 

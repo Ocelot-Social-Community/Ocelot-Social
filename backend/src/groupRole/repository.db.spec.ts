@@ -5,6 +5,8 @@ import { cleanDatabase } from '@db/factories'
 
 import {
   applyTemplateToNonMemberRoles,
+  markGroupRolesCustomized,
+  markGroupRolesUncustomized,
   readGroupRoles,
   readGroupTemplate,
   seedRolesForGroupsWithoutRoles,
@@ -123,5 +125,20 @@ describe(withinTransaction, () => {
     } finally {
       await session.close()
     }
+  })
+})
+
+describe(markGroupRolesUncustomized, () => {
+  it('puts a customised group back among the ones a template change reaches', async () => {
+    await database.write({ query: `CREATE (:Group {id: 'g1', template: 'public'})` })
+    await markGroupRolesCustomized(database, 'g1', NOW)
+
+    await markGroupRolesUncustomized(database, 'g1')
+
+    const { records } = await database.query({
+      query: `MATCH (g:Group {id: 'g1'}) RETURN g.rolesCustomizedAt AS customizedAt`,
+    })
+
+    expect(records[0].get('customizedAt')).toBeNull()
   })
 })
