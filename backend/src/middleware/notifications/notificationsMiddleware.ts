@@ -671,6 +671,8 @@ export default {
     JoinGroup: handleJoinGroup,
     LeaveGroup: handleLeaveGroup,
     ChangeGroupMemberRole: handleChangeGroupMemberRole,
+    // The same act through the roles API: the member is told their role changed.
+    setGroupMemberRole: handleChangeGroupMemberRole,
     RemoveUserFromGroup: handleRemoveUserFromGroup,
     CreateMessage: handleCreateMessage,
   },

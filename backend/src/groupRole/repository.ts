@@ -484,6 +484,18 @@ export async function applyTemplateToNonMemberRoles(
  * never touched their roles" admin action selects by, so it must not move every time somebody
  * flips a checkbox.
  */
+/**
+ * The group runs on its template again, unedited — after its roles were reset to it. Without
+ * this, a group that was once customised would be left out of every later
+ * applyGroupRoleTemplates, although it holds exactly what the template says.
+ */
+export async function markGroupRolesUncustomized(db: DbContext, groupId: string): Promise<void> {
+  await db.write({
+    query: `MATCH (g:Group {id: $groupId}) REMOVE g.rolesCustomizedAt`,
+    variables: { groupId },
+  })
+}
+
 export async function markGroupRolesCustomized(
   db: DbContext,
   groupId: string,

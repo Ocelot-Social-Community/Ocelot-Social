@@ -99,6 +99,11 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'User is not a member of this group.',
   },
+  GROUP_MEMBERSHIP_USER_OR_GROUP_NOT_FOUND: {
+    type: 'BAD_USER_INPUT',
+    text: 'Could not find user or group!',
+  },
+  GROUP_RIGHTS_GROUP_NOT_FOUND: { type: 'BAD_USER_INPUT', text: 'Group not found!' },
   // Making a group more private is the same act as creating it that private: the network right
   // group.create_<visibility> caps both ways there — the visibility switch and the rights editor.
   GROUP_VISIBILITY_RAISE_NOT_PERMITTED: {
@@ -109,9 +114,65 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'A group outsiders cannot find has no member list to open.',
   },
+  GROUP_POST_REMOVE_POST_NOT_IN_GROUP: {
+    type: 'BAD_USER_INPUT',
+    text: 'That post is not in this group!',
+  },
+  // group roles & templates
+  GROUP_ROLE_NAME_UNKNOWN: { type: 'BAD_USER_INPUT', text: 'Unknown group role!' },
+  GROUP_ROLE_NAME_INVALID: { type: 'BAD_USER_INPUT', text: 'Invalid role name!' },
+  GROUP_ROLE_NAME_RESERVED: {
+    type: 'BAD_USER_INPUT',
+    text: 'That name belongs to a system role!',
+  },
+  GROUP_ROLE_NAME_ALREADY_TAKEN: {
+    type: 'BAD_USER_INPUT',
+    text: 'A role with that name already exists in this group!',
+  },
+  GROUP_ROLE_LABEL_INVALID: { type: 'BAD_USER_INPUT', text: 'Invalid role label!' },
+  GROUP_ROLE_PERMISSIONS_NOT_HELD: {
+    type: 'BAD_USER_INPUT',
+    text: 'You cannot grant rights you do not hold yourself: {permissions}',
+  },
+  GROUP_ROLE_OWNER_NOT_EDITABLE: {
+    type: 'BAD_USER_INPUT',
+    text: 'The owner role holds every right and cannot be edited!',
+  },
+  GROUP_ROLE_SYSTEM_NOT_RENAMEABLE: {
+    type: 'BAD_USER_INPUT',
+    text: 'A system role keeps its name; set its label instead!',
+  },
+  GROUP_ROLE_SYSTEM_NOT_DELETABLE: {
+    type: 'BAD_USER_INPUT',
+    text: 'A system role cannot be deleted!',
+  },
+  GROUP_ROLE_REASSIGN_TARGET_INVALID: {
+    type: 'BAD_USER_INPUT',
+    text: 'Members must be moved to a different role!',
+  },
+  // Parked in the shield (#10356); the resolver behind it stays whole.
+  GROUP_ROLE_CREATE_NOT_AVAILABLE: {
+    type: 'BAD_USER_INPUT',
+    text: 'Groups cannot define their own roles yet!',
+  },
   GROUP_TEMPLATE_NAME_UNKNOWN: {
     type: 'BAD_USER_INPUT',
     text: "No group role template named '{template}'",
+  },
+  GROUP_TEMPLATE_ROLE_UNKNOWN: { type: 'BAD_USER_INPUT', text: 'Unknown group role template!' },
+  GROUP_TEMPLATE_PERMISSIONS_VISIBILITY_MISMATCH: {
+    type: 'BAD_USER_INPUT',
+    text: 'These rights would make this template a different visibility than it is named!',
+  },
+  // acting with network rights inside a group
+  GROUP_ELEVATION_REASON_MISSING: { type: 'BAD_USER_INPUT', text: 'A reason is required!' },
+  GROUP_ELEVATION_REASON_INVALID: {
+    type: 'BAD_USER_INPUT',
+    text: 'The reason may be at most {max} characters and must not begin or end with a space.',
+  },
+  GROUP_ELEVATION_RIGHTS_MISSING: {
+    type: 'BAD_USER_INPUT',
+    text: 'You hold nothing here beyond reading!',
   },
   // posts, comments & events
   POST_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'Could not find post.' },

@@ -427,14 +427,34 @@ type Group {
   locationName: String
 
   """
+  Whether asking for an elevation here would grant the viewer anything beyond what they can already read.
+  """
+  mayElevateInGroup: Boolean!
+
+  """
   Number of members, excluding those with a pending join request. Null when the viewer may not see the member list (`group.members.read`): in a small group the number plus a known owner is nearly the list itself. Nullable rather than refused, so a group teaser renders without an error for a viewer who simply may not count.
   """
   membersCount: Int
 
   """
-  The current user's role in this group, or null if they are not a member.
+  The live elevation of the viewer in this group, or null when they are acting on their membership alone (see GroupElevation).
   """
-  myRole: GroupMemberRole
+  myGroupElevation: GroupElevation
+
+  """
+  The group rights the current user effectively holds here: their role's set, capped by their network permissions and by the runtime feature gates. Drives the webapp's canInGroup().
+  """
+  myGroupPermissions: [String!]!
+
+  """
+  The current user's role in this group, or null when they have no membership. Unlike myRole this carries any role the group defined, with the label it chose for it.
+  """
+  myGroupRole: GroupRole
+
+  """
+  The current user's role in this group, or null if they are not a member. Deprecated: a group defines its own roles, so the value is not an enum any more — use myGroupRole. Returns null for a role the enum cannot express.
+  """
+  myRole: GroupMemberRole @deprecated(reason: "Group roles are group-defined; use myGroupRole instead.")
 
   """The group's title."""
   name: String!
@@ -449,6 +469,11 @@ type Group {
   Total number of non-deleted, non-disabled posts in this group. Null when the viewer may not read the content (`group.content.read`) — counting the posts is reading them, the same way counting members is reading the member list. Nullable rather than refused, so a teaser renders for a viewer who simply may not count.
   """
   postsCount: Int
+
+  """
+  The group's own role definitions. Requires `group.role.manage` in this group.
+  """
+  roles: [GroupRole!]!
 
   """
   For closed groups: whether non-members can see the member list. Derived: it is true exactly when the group's non-member role holds `group.members.read`, which is where that setting now lives.
@@ -489,6 +514,23 @@ enum GroupActionRadius {
 }
 
 """
+A deliberate use of a network right inside one group. Holding `group.administer.any_<visibility>` is the power to rewrite any group of that kind; this is the act of picking it up, and it lapses on its own. Reading is not part of it — a moderator reviewing a report must not have to confirm anything to see what they were asked about.
+"""
+type GroupElevation {
+  """When it lapses. ISO 8601."""
+  expiresAt: String!
+  groupId: ID!
+
+  """
+  Whether it puts the holder above every member, owners included — true when it rests on `group.administer.any_<visibility>`, which is what lets a network admin re-role or remove an owner.
+  """
+  outranksMembers: Boolean!
+
+  """What the holder said they are doing, kept with the record."""
+  reason: String
+}
+
+"""
 A group member paired with their membership relationship (role, join date).
 """
 type GroupMember {
@@ -519,8 +561,113 @@ type GroupMembershipVisibilityChanged {
   userId: ID!
 }
 
+"""
+A single entry in the group permission catalog: a right that can be granted inside a group.
+"""
+type GroupPermission {
+  description: String!
+
+  """
+  Further runtime feature gates beyond the groups feature itself (e.g. videoConference). Empty when the right depends on nothing else.
+  """
+  gatedBy: [String!]!
+
+  """
+  The catalog group this right belongs to, for sectioning the rights UI: visibility, content, membership, administration, communication.
+  """
+  group: String!
+  key: String!
+
+  """
+  The network permission that must ALSO be held for this right to be effective, with `<type>` standing in for the group's type. Null when the capability is purely group-scoped.
+  """
+  requiresNetworkPermission: String
+}
+
+"""
+A signal that the rights inside a group may have changed — a role's permission set, a rename, a reset or a member's role. Clients refetch the group's myGroupPermissions on receipt; the payload carries no actor.
+"""
+type GroupPermissionsChanged {
+  groupId: ID!
+}
+
+"""A role definition owned by one group."""
+type GroupRole {
+  """
+  What this role grants in its group as it counts for the viewer: its permissions capped by the runtime feature gates and by the viewer's network rights — the set the server compares when the viewer assigns the role to somebody, or acts on somebody who holds it. Null for a role that belongs to no group (a template's).
+  """
+  effectivePermissions: [String!]
+
+  """
+  The group's own display name for the role, or null for the translated default.
+  """
+  label: String
+
+  """
+  How many members currently carry this role. Null for `none`, which is the absence of a membership rather than a role somebody has.
+  """
+  memberCount: Int
+
+  """
+  The internal key. Memberships point at it, and for a system role it never changes.
+  """
+  name: String!
+
+  """The group permission keys this role grants."""
+  permissions: [String!]!
+
+  """
+  Only `owner`: its permission set cannot be edited, because it resolves to the whole catalog.
+  """
+  protected: Boolean!
+
+  """
+  A role the code's behaviour depends on — none (no membership), pending (applicant), usual (where a new member lands) and owner (the failsafe). Its label and permissions are the group's business; its key and its existence are not.
+  """
+  system: Boolean!
+}
+
+"""
+A named set of roles a new group starts from. Its NAME and the visibility it results in are two different things, and the type says so: the name identifies the template an operator edits and groups are created from, `visibility` is what the rights in its non-member role derive to (groupRole/privacyLevel.ts). They agree for the three shipped templates — a drift guard keeps them agreeing — but a template is a starting point and a visibility is a property of a group, and only one of them changes when a group edits its rights.
+"""
+type GroupRoleTemplate {
+  """
+  How many groups run on this template at all, so the count above can be read as a share rather than as an absolute.
+  """
+  groupCount: Int!
+
+  """
+  What this template is called. The three shipped ones are named after the visibility they produce.
+  """
+  name: String!
+  roles: [GroupRole!]!
+
+  """
+  How many groups still run on this template untouched — the ones an `applyGroupRoleTemplates` would reach.
+  """
+  untouchedGroupCount: Int!
+
+  """The visibility a group created from this template starts with."""
+  visibility: GroupVisibility!
+}
+
 type GroupShowMembersChanged {
   groupId: ID!
+}
+
+"""
+A template on offer: what it is called, what a group made from it would be, and the roles it would start with. Two templates can derive to the same visibility — `channel` is public — so the name alone does not answer what creating one takes.
+"""
+type GroupTemplateChoice {
+  name: String!
+
+  """
+  The roles a group gets from this template — what putting it on a group would replace that group's roles with. `memberCount` is always null: a template's role belongs to no group.
+  """
+  roles: [GroupRole!]!
+
+  """The visibility a group created from this template starts with."""
+  visibility: GroupVisibility!
 }
 
 """Determines a group's discoverability and how users become members."""
@@ -989,6 +1136,11 @@ type Mutation {
   adminRevokeUserApiKeys(userId: ID!): Int!
 
   """
+  Apply the templates to every group that has never edited its own roles, and return how many groups were changed. A group that customised its roles is left alone — its edit is not overwritten by a network default. Requires `group.roleTemplate.manage`.
+  """
+  applyGroupRoleTemplates: Int!
+
+  """
   Block a user, cutting off interaction in both directions. Requires authentication.
   """
   blockUser(id: ID!): User
@@ -1002,9 +1154,19 @@ type Mutation {
   createApiKey(expiresInDays: Int, name: String!): ApiKeyWithSecret!
 
   """
+  Add a role to a group. The name is a key (lower-case, no spaces) and must not collide with a system role. Requires `group.role.manage`, and the new set must be covered by the actor's own rights.
+  """
+  createGroupRole(groupId: ID!, label: String, name: String!, permissions: [String!]!): GroupRole!
+
+  """
   Create a new role with the given permission bundle. Requires the `role.manage` permission.
   """
   createRole(name: String!, permissions: [String!]!): Role!
+
+  """
+  Delete a non-system role. Its members move to `reassignTo`, so no membership is left pointing at a role that no longer exists. Returns the deleted name.
+  """
+  deleteGroupRole(groupId: ID!, name: String!, reassignTo: String!): String!
 
   """
   Delete a role. Returns the deleted role's name (the input name echoed back on success). Requires the `role.manage` permission.
@@ -1015,6 +1177,16 @@ type Mutation {
   Reversibly deactivate (disable: true) or reactivate (disable: false) a user account. Moderator-grade, subject to the act-on hierarchy.
   """
   disableUser(disable: Boolean!, id: ID!): User
+
+  """
+  Pick up the network rights one holds over this group, for a while. Without it a network right gives reading and nothing else, whatever it folds in — so settings, roles, memberships and moderation inside a group one is not a member of all wait for this. Requires that the viewer actually holds something beyond reading there, and a reason: the record says who acted as the network here and why.
+  """
+  elevateInGroup(groupId: ID!, reason: String!): GroupElevation!
+
+  """
+  Put them down again before they lapse. Returns true when there was something to end.
+  """
+  endGroupElevation(groupId: ID!): Boolean!
 
   """
   File a moderation report against a user, post or comment. Requires authentication.
@@ -1090,12 +1262,27 @@ type Mutation {
   redeemInviteCode(code: String!): Boolean!
 
   """
+  Take a post out of a group without deleting it: the post stays with its author, it just loses its place in the group. Requires `group.post.moderate` in that group (or `group.moderate.any_<type>` network-wide). The author is notified.
+  """
+  removePostFromGroup(groupId: ID!, postId: ID!): Post
+
+  """
+  Rename a non-system role, carrying its members with it. To change how a system role reads, set its label instead.
+  """
+  renameGroupRole(groupId: ID!, name: String!, newName: String!): GroupRole!
+
+  """
   Rename a role, keeping its permission bundle and all its members (its HAS_ROLE edges are preserved). The mandatory owner and user roles cannot be renamed. Requires the `role.manage` permission.
   """
   renameRole(name: String!, newName: String!): Role!
 
   """Request a password-reset email for the given address. Public."""
   requestPasswordReset(email: String!, locale: String!): Boolean!
+
+  """
+  Put a whole network template on a group: the one it was created from, or the one named. Roles the template does not have are removed and their members become ordinary members.
+  """
+  resetGroupRoles(groupId: ID!, template: String): [GroupRole!]!
 
   """Reset a password using the nonce from the reset email. Public."""
   resetPassword(email: String!, newPassword: String!, nonce: String!): Boolean!
@@ -1148,6 +1335,11 @@ type Mutation {
   Set the per-bucket branding composition — a JSON-encoded object mapping a bucket slot (theme/identity/logos/legal/navigation/behavior) to a source 'id[@version][/instance]', layered over `activeBranding`. The empty string clears all per-slot overrides. Persisted as the `brandingComposition` policy value and broadcast live via `policyChanged`, so clients reload the recomposed branding. Requires the `branding.manage` permission. Returns the applied JSON string.
   """
   setBrandingComposition(composition: String!): String!
+
+  """
+  Set a member's role by name. Subject to the act-on rules: the actor must outrank the member and must hold every right the assigned role grants.
+  """
+  setGroupMemberRole(groupId: ID!, roleName: String!, userId: ID!): GroupMember!
 
   """
   Toggle whether a group membership is shown on the current user's profile.
@@ -1210,6 +1402,23 @@ type Mutation {
 
   """Rename one of your own API keys. Requires authentication."""
   updateApiKey(id: ID!, name: String!): ApiKey!
+
+  """
+  Replace a group role's permission set, and optionally its display label (null resets it to the translated default). The owner role's permissions cannot be changed, a system role's key cannot. Requires `group.role.manage` in that group, and the resulting set must be covered by the actor's own rights.
+  """
+  updateGroupRole(groupId: ID!, label: String, name: String!, permissions: [String!]!): GroupRole!
+
+  """
+  Change one role of a network-wide template. Existing groups are NOT touched — that is what applyGroupRoleTemplates is for. Requires `group.roleTemplate.manage`.
+  """
+  updateGroupRoleTemplate(
+    label: String
+    name: String!
+    permissions: [String!]!
+
+    """Which template to change."""
+    template: String!
+  ): GroupRole!
 
   """Update the current user's online/away status. Requires authentication."""
   updateOnlineStatus(status: OnlineStatus!): Boolean!
@@ -1678,6 +1887,25 @@ type Query {
   """
   VerifyNonce(email: String!, nonce: String!): Boolean!
 
+  """How many groups the same filters match, for paging the admin list."""
+  adminGroupCount(disabled: Boolean, ownerless: Boolean, search: String, visibility: GroupVisibility): Int!
+
+  """
+  Every group the viewer may administer, for the admin area — including the hidden ones, which are reachable no other way. Restricted to the visibilities the viewer holds `group.administer.any_<visibility>` for. Set `ownerless` to find the groups that have no owner left.
+  """
+  adminGroups(
+    disabled: Boolean
+    first: Int
+    offset: Int
+
+    """Only groups whose owner role has no members."""
+    ownerless: Boolean
+
+    """Free-text match on name and slug."""
+    search: String
+    visibility: GroupVisibility
+  ): [Group!]!
+
   """
   Administration overview of API-key usage per user. Requires the `apiKey.administer` permission.
   """
@@ -1699,6 +1927,21 @@ type Query {
 
   """The oEmbed providers this instance resolves link previews for. Public."""
   embedProviders: [EmbedProvider!]!
+
+  """
+  The closed catalog of group-scoped rights. Requires authentication; it is the same for every group.
+  """
+  groupPermissionCatalog: [GroupPermission!]!
+
+  """
+  The network-wide group role templates a group can run on. Requires `group.roleTemplate.manage`.
+  """
+  groupRoleTemplates: [GroupRoleTemplate!]!
+
+  """
+  The templates a group can be created from or put on, least private first, with the roles each would give a group — a group owner replacing their roles with one has to see what with. Editing them stays behind group.roleTemplate.manage (`groupRoleTemplates`). `group.create_<visibility>` is checked against the visibility, so it travels with the name.
+  """
+  groupTemplates: [GroupTemplateChoice!]!
 
   """
   Hashtags to offer while the current user types one, ordered by `HashtagSuggestionRelation` and then by the number of posts carrying the tag. Requires authentication. Deleted and disabled tags are left out.
@@ -2056,6 +2299,9 @@ type Subscription {
   Fires when a user changes which group memberships are visible on their profile.
   """
   groupMembershipVisibilityChanged(userId: ID!): GroupMembershipVisibilityChanged!
+
+  """Fires when a group's role definitions or a member's role change."""
+  groupPermissionsChanged(groupId: ID!): GroupPermissionsChanged!
 
   """Fires when a closed group's showMembers setting changes."""
   groupShowMembersChanged(groupId: ID!): GroupShowMembersChanged!

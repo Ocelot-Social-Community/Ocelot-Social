@@ -1,0 +1,6 @@
+mutation elevateInGroup($groupId: ID!, $reason: String!) {
+  elevateInGroup(groupId: $groupId, reason: $reason) {
+    groupId
+    expiresAt
+  }
+}

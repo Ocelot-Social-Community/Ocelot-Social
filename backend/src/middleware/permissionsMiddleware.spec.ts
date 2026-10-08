@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { parse } from 'graphql'
 import { beforeEach, beforeAll, afterAll, describe, afterEach, it, expect } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
@@ -315,6 +316,36 @@ describe('authorization', () => {
         })
       })
     })
+  })
+})
+
+describe('creating a group-defined role', () => {
+  it('is refused with the reason, not with "Not Authorized!"', async () => {
+    // Parked (#10356). The message matters: an owner reading "Not Authorized!" goes looking for
+    // a right they are missing, and there is none to find — the capability is simply not there
+    // yet. graphql-shield passes an Error through as the message, which is why the rule returns
+    // one instead of `false`.
+    const roleMaker = await Factory.build(
+      'user',
+      { id: 'role-maker', name: 'Role Maker' },
+      { email: 'role-maker@example.org', password: '1234' },
+    )
+    authenticatedUser = await roleMaker.toJson()
+
+    const { errors } = await mutate({
+      mutation: parse(`
+        mutation ($groupId: ID!, $name: String!, $permissions: [String!]!) {
+          createGroupRole(groupId: $groupId, name: $name, permissions: $permissions) { name }
+        }
+      `),
+      variables: { groupId: 'any-group', name: 'steward', permissions: [] },
+    })
+
+    expect(errors?.[0]).toHaveProperty('message', 'Groups cannot define their own roles yet!')
+  })
+
+  afterEach(async () => {
+    await cleanDatabase()
   })
 })
 
