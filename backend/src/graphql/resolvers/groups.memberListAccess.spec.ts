@@ -243,6 +243,26 @@ describe('showMembers as the current form sends it', () => {
     expect(await nonMemberRights('open-public')).toContain('group.members.read')
   })
 
+  it('judges the group as it will be, when the same save changes its visibility', async () => {
+    // Opening the list and making the group findable in one request is fine; opening it and
+    // making the group unlisted in one request is the hidden case, and refused as such.
+    const { errors: opened } = await mutate({
+      mutation: UpdateGroup,
+      variables: { id: 'hidden-group', visibility: 'closed', showMembers: true },
+    })
+    const { errors: refused } = await mutate({
+      mutation: UpdateGroup,
+      variables: { id: 'closed-group', visibility: 'hidden', showMembers: true },
+    })
+
+    expect(opened).toBeUndefined()
+    expect(await nonMemberRights('hidden-group')).toContain('group.members.read')
+    expect(refused?.[0]).toMatchObject({
+      extensions: { errorCode: 'GROUP_SAVE_MEMBER_LIST_UNAVAILABLE' },
+    })
+    expect(await nonMemberRights('closed-group')).not.toContain('group.members.read')
+  })
+
   it('reads null as no change', async () => {
     await setNonMemberRights('closed-group', ['group.read', 'group.members.read'])
 

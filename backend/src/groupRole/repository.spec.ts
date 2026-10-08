@@ -609,7 +609,7 @@ describe(seedRolesForGroupsWithoutRoles, () => {
         ['group.read'],
       )
 
-      await seedRolesForGroupsWithoutRoles(db as never, NOW)
+      await seedRolesForGroupsWithoutRoles(db, NOW)
 
       expect(memberListWrites(statements)).toHaveLength(1)
     })
@@ -620,7 +620,7 @@ describe(seedRolesForGroupsWithoutRoles, () => {
         [],
       )
 
-      await seedRolesForGroupsWithoutRoles(db as never, NOW)
+      await seedRolesForGroupsWithoutRoles(db, NOW)
 
       expect(memberListWrites(statements)).toHaveLength(0)
     })
@@ -628,7 +628,7 @@ describe(seedRolesForGroupsWithoutRoles, () => {
     it('is left alone where it was never opened', async () => {
       const { db, statements } = fakeDatabase([{ groupId: 'closed-group', template: 'closed' }])
 
-      await seedRolesForGroupsWithoutRoles(db as never, NOW)
+      await seedRolesForGroupsWithoutRoles(db, NOW)
 
       expect(memberListWrites(statements)).toHaveLength(0)
     })
