@@ -224,6 +224,7 @@ export function createGroupAuthorizationScope({
     const networkAuthority = withElevation(fullNetworkAuthority, elevated)
     const effective = effectiveGroupPermissions({
       role,
+      roleName,
       networkAuthority,
       networkEffective: effectivePermissions,
       nonMemberPermissions,
@@ -251,6 +252,7 @@ export function createGroupAuthorizationScope({
       }
       const withRights = effectiveGroupPermissions({
         role,
+        roleName,
         networkAuthority: fullNetworkAuthority,
         networkEffective: effectivePermissions,
         nonMemberPermissions,
@@ -283,7 +285,7 @@ export function createGroupAuthorizationScope({
       effective: effectiveWithEscape,
       has: (permission) => effectiveWithEscape.has(permission),
       sourceOf: (permission) =>
-        authoritySourceFor(permission, role, networkAuthority, nonMemberPermissions),
+        authoritySourceFor(permission, role, networkAuthority, nonMemberPermissions, roleName),
     }
   }
 
@@ -369,6 +371,7 @@ export function createGroupAuthorizationScope({
     }
     return effectiveGroupPermissions({
       role: definitionFrom(record),
+      roleName: record.get('roleName') as string,
       networkEffective: effectivePermissions,
       ...scope,
       gateContext,

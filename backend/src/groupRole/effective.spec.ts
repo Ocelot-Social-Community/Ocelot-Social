@@ -218,6 +218,12 @@ describe(authoritySourceFor, () => {
     ).toBe('membership')
   })
 
+  it('reads a membership without a definition as a membership', () => {
+    // The edge name decides who the floor applies to, as it does for the effective set.
+    expect(authoritySourceFor('group.join', null, network, ['group.join'], 'usual')).toBeNull()
+    expect(authoritySourceFor('group.join', null, network, ['group.join'])).toBe('membership')
+  })
+
   it('works without a network set at all', () => {
     expect(authoritySourceFor('group.leave', role)).toBe('membership')
     expect(authoritySourceFor('group.role.manage', role)).toBeNull()
@@ -283,5 +289,30 @@ describe('the floor from the non-member role', () => {
     })
 
     expect([...effective]).toEqual(['group.leave'])
+  })
+
+  it('reads a membership the group has no definition for as a membership, not a stranger', () => {
+    // A half-applied migration: the edge says `usual`, no GroupRole of that name exists. The
+    // floor still applies — but as to a member, so the stranger's way in is not part of it.
+    const effective = effectiveGroupPermissions({
+      role: null,
+      roleName: 'usual',
+      networkEffective: new Set(),
+      nonMemberPermissions: ['group.read', 'group.join', 'group.join.request'],
+      gateContext: ALL_GATES_OPEN,
+    })
+
+    expect([...effective]).toEqual(['group.read'])
+  })
+
+  it('takes the name off the definition when no edge name is given', () => {
+    const effective = effectiveGroupPermissions({
+      role: { name: 'usual', label: null, system: true, protected: false, permissions: [] },
+      networkEffective: new Set(),
+      nonMemberPermissions: ['group.read', 'group.join'],
+      gateContext: ALL_GATES_OPEN,
+    })
+
+    expect([...effective]).toEqual(['group.read'])
   })
 })

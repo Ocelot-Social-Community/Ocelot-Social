@@ -142,7 +142,7 @@ on `feat/group-permissions`:
   roles, capped by `group.create_<visibility>` (E10) on both paths. The separate
   `group.type.change` key was dropped: changing the visibility *is* editing those
   roles, and `group.role.manage` already covers it.
-- The per-type network rights kept their names (`group.read.any_hidden`, …):
+- The per-type network rights kept their names (`group.content.read.any_hidden`, …):
   their suffix always named a privacy level, which is exactly what `visibility`
   is. No compatibility layer was kept anywhere else — there are no foreign
   clients, so the old names are simply gone.

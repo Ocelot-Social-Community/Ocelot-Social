@@ -526,9 +526,12 @@ const GROUPS_WITHOUT_ROLES_CYPHER = `
   MATCH (g:Group)
   WHERE NOT (g)-[:HAS_GROUP_ROLE]->(:GroupRole)
   // Which template to seed from is the group's own, stored, because — unlike its visibility —
-  // nothing derives it. A row that has lost even that is seeded from the most private template:
-  // a group nobody can read is repairable, a group accidentally opened is not.
-  RETURN g.id AS groupId, coalesce(g.template, 'hidden') AS template,
+  // nothing derives it. A row from before the templates still carries its groupType, whose
+  // values ARE the template names (a restored dump, a group created by an instance that had not
+  // been upgraded yet) — that keeps it as private as it was. A row that has lost both is seeded
+  // from the most private template: a group nobody can read is repairable, one accidentally
+  // opened is not.
+  RETURN g.id AS groupId, coalesce(g.template, g.groupType, 'hidden') AS template,
          coalesce(g.showMembers, false) AS showMembers
 `
 
@@ -626,7 +629,7 @@ export async function untouchedGroupIdsByTemplate(
     // group created from `closed` and later opened up still runs on that template, and this
     // counts the groups an `applyGroupRoleTemplates` would reach.
     query: `MATCH (g:Group)
-            RETURN coalesce(g.template, 'hidden') AS template,
+            RETURN coalesce(g.template, g.groupType, 'hidden') AS template,
                    collect(CASE WHEN g.rolesCustomizedAt IS NULL THEN g.id END) AS ids,
                    toString(count(g)) AS total`,
   })
@@ -711,10 +714,14 @@ export async function clearElevation(
   return (result.records[0]?.get('found') as string | undefined) !== undefined
 }
 
-/** Which template a group runs on, falling back to the strictest one for a row without it. */
+/**
+ * Which template a group runs on: a row from before the templates by its `groupType` (whose
+ * values are the template names), and the strictest one for a row that has neither.
+ */
 export async function readGroupTemplate(db: DbContext, groupId: string): Promise<string> {
   const result = await db.query({
-    query: `MATCH (g:Group {id: $groupId}) RETURN coalesce(g.template, 'hidden') AS template`,
+    query: `MATCH (g:Group {id: $groupId})
+            RETURN coalesce(g.template, g.groupType, 'hidden') AS template`,
     variables: { groupId },
   })
   return (result.records[0]?.get('template') as string | undefined) ?? 'hidden'

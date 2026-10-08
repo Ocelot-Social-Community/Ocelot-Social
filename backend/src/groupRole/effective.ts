@@ -47,8 +47,16 @@ export function permissionsForGroupRole(
 }
 
 export interface EffectiveGroupPermissionsInput {
-  /** The viewer's role in this group; null/undefined ⇒ no membership at all. */
+  /** The definition of the viewer's role in this group; null/undefined ⇒ none to go by. */
   role?: GroupRoleDefinition | null
+  /**
+   * The role name on the viewer's membership edge — `none` without one. Given apart from the
+   * definition because the two can disagree: a membership whose role the group does not define
+   * (a half-applied migration) has a name but no definition, and it is still a MEMBERSHIP. The
+   * floor below needs to know that, or such a member would hold the join rights of a stranger.
+   * Falls back to the definition's name.
+   */
+  roleName?: string
   /**
    * What the viewer may do in this group by virtue of a network right rather than
    * membership — the folded `*.any_<type>` rights. Empty for an ordinary user.
@@ -78,6 +86,7 @@ export interface EffectiveGroupPermissionsInput {
  */
 export function effectiveGroupPermissions({
   role,
+  roleName,
   networkAuthority,
   networkEffective,
   nonMemberPermissions,
@@ -88,7 +97,7 @@ export function effectiveGroupPermissions({
     ...permissionsForGroupRole(role),
     // The group's own floor: what it grants to strangers, it grants to everybody. An applicant
     // to an open group used to hold LESS than somebody who never asked.
-    ...floorFromNonMemberRole(role?.name ?? NONE_ROLE, nonMemberPermissions ?? []),
+    ...floorFromNonMemberRole(roleName ?? role?.name ?? NONE_ROLE, nonMemberPermissions ?? []),
     ...(networkAuthority ?? []),
   ])
   const effective = new Set<GroupPermissionKey>()
@@ -116,12 +125,17 @@ export function authoritySourceFor(
   role: GroupRoleDefinition | null | undefined,
   networkAuthority?: ReadonlySet<GroupPermissionKey>,
   nonMemberPermissions?: readonly GroupPermissionKey[],
+  /** The membership edge's role name; see EffectiveGroupPermissionsInput.roleName. */
+  roleName?: string,
 ): AuthoritySource | null {
   // The floor counts as membership: it comes from the group's own role definitions, which is
   // what this answer distinguishes from a `*.any_*` right carried in from the network.
   const fromMembership =
     permissionsForGroupRole(role).has(key) ||
-    floorFromNonMemberRole(role?.name ?? NONE_ROLE, nonMemberPermissions ?? []).includes(key)
+    floorFromNonMemberRole(
+      roleName ?? role?.name ?? NONE_ROLE,
+      nonMemberPermissions ?? [],
+    ).includes(key)
   const fromNetwork = networkAuthority?.has(key) ?? false
   if (fromMembership && fromNetwork) {
     return 'both'

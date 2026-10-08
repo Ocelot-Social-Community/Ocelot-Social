@@ -152,6 +152,34 @@ describe(createGroupAuthorizationScope, () => {
       expect(authorization?.has('group.read')).toBe(false)
     })
 
+    it('applies the floor to such a membership as to a member, without the way in', async () => {
+      // The edge name, not the missing definition, says who the floor is for: the stranger's
+      // rights reach the member, the join rights do not.
+      const { scope } = scopeFor({
+        group: {
+          visibility: 'public',
+          roleName: 'usual',
+          name: null,
+          permissions: null,
+          nonMemberPermissions: JSON.stringify(['group.read', 'group.join']),
+        },
+      })
+      const authorization = await scope.forGroup('g1')
+
+      expect(authorization?.has('group.read')).toBe(true)
+      expect(authorization?.has('group.join')).toBe(false)
+      expect(authorization?.sourceOf('group.join')).toBeNull()
+    })
+
+    it('reads the edge name for the rights of another member too', async () => {
+      const { scope } = scopeFor({
+        group: { visibility: 'public', nonMemberPermissions: JSON.stringify(['group.join']) },
+        memberRole: { roleName: 'usual', name: null, protected: false, permissions: null },
+      })
+
+      expect([...(await scope.memberPermissions('g1', 'member'))]).toEqual([])
+    })
+
     it('does not hand that escape to somebody without a membership', async () => {
       const { scope } = scopeFor({
         group: { visibility: 'public', roleName: 'none', name: null, permissions: null },

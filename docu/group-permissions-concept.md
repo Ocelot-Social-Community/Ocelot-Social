@@ -15,7 +15,7 @@
 > | Invite gesplittet (E11) | umgesetzt |
 > | Admin-Gruppenliste statt `organizations.vue` (E17) | umgesetzt |
 > | Owner-los erlaubt (E8) | umgesetzt |
-> | `groupType` bleibt autoritatives Preset (E2) | **abgewichen, inzwischen vollstaendig** — die Lesewege fragen die Rechte ueber abgeleitete Spalten am Gruppenknoten, und der Typ selbst ist jetzt *abgeleitet* (`groupRole/privacyLevel.ts`, Handlungsoption A aus `group-type-from-rights-concept.md`): er wird vom Sync geschrieben, nicht gewaehlt |
+> | `groupType` bleibt autoritatives Preset (E2) | **abgewichen, inzwischen vollstaendig** — die Lesewege fragen die Rechte ueber abgeleitete Spalten am Gruppenknoten, und der Typ selbst ist jetzt *abgeleitet* (`groupRole/privacyLevel.ts`, Handlungsoption A aus `group-type-from-rights-concept.md`): er wird aus den Rechten der `none`-Rolle abgeleitet, weder gewaehlt noch gespeichert |
 > | `videoCall.create_<type>` (E5-Muster) | **ersetzt** — gekoppelt an die *Tuer* statt an den Typ: `videoCall.create_open` fuer eine Gruppe, in die ein Fremder hineinlaufen kann (`group.read` + `group.join` auf `none`), `videoCall.create_restricted` sonst (`groupRole/callDoor.ts`). Auf den drei Presets verhaltensgleich |
 > | `group.type.change` | **entfernt** — der Typ ist abgeleitet, also IST seine Aenderung das Bearbeiten der `none`/`pending`-Rollen: `group.role.manage` deckelt beides, ein eigener Key war ein zweiter Name fuer einen Weg dorthin |
 > | Netzwerk-Rechte in fremden Gruppen (E18) | **abgewichen (Variante B), umgesetzt** — `group.administer.any_*` & Co. geben ohne explizite Freischaltung nur **Lesen**; alles Weitere wartet auf `elevateInGroup` (`groupRole/elevation.ts`), das nach 60 Minuten von selbst verfaellt und bei der Gruppe vermerkt wird. Ausserdem: ein Netzwerk-Recht macht eine Gruppe **erreichbar, nicht gelistet** (3.9) |
@@ -27,7 +27,7 @@
 > `visibility` — `Group.visibility` ist abgeleitet (`groupRole/privacyLevel.ts`)
 > und wird nicht gespeichert; gespeichert ist allein `Group.template`, das
 > Rollen-Preset, aus dem die Gruppe entstand. Die Netzwerk-Keys behalten ihre
-> Namen (`group.read.any_hidden`, …), weil ihr Suffix eine Sichtbarkeit benennt.
+> Namen (`group.content.read.any_hidden`, …), weil ihr Suffix eine Sichtbarkeit benennt.
 > Die Abschnitte unten verwenden `groupType` dort weiter, wo sie den
 > **Ist-Zustand vor dem Umbau** oder die Entscheidung in ihrem Wortlaut
 > beschreiben.
@@ -171,6 +171,7 @@ Katalog, nicht Doku.
 | `group.members.read` | visibility | — | — | `Query.GroupMembers`, `Group.membersCount` (E7) | Mitgliederliste und Mitgliederzahl sehen |
 | `group.post.create` | content | `post.create` | — | `CreatePost` (mit `groupId`) | In der Gruppe posten |
 | `group.comment.create` | content | `comment.create` | — | `CreateComment` auf einen Gruppen-Post | In der Gruppe kommentieren |
+| `group.post.moderate` | moderation | — | — | `removePostFromGroup` | Fremden Post aus der Gruppe entfernen; der Post bleibt beim Autor (kam mit Teil-Issue 8, s. E9) |
 | `group.post.pin` | content | — | — | `pinGroupPost`, `unpinGroupPost` | Post innerhalb der Gruppe anpinnen |
 | `group.join` | membership | — | — | `JoinGroup` (direkt) | Direkt beitreten (Preset `public`) |
 | `group.join.request` | membership | — | — | `JoinGroup` (→ `pending`) | Beitritt anfragen (Preset `closed`) |
@@ -185,11 +186,10 @@ Katalog, nicht Doku.
 | `group.videoCall.create` | communication | `videoCall.create_<door>` | `videoConference` | Start eines Calls in der Gruppe | Video-Call eroeffnen |
 | `group.videoCall.join` | communication | — | `videoConference` | `joinGroupVideoCall` | Laufendem Call beitreten |
 
-**20 Keys.** Bewusst *nicht* enthalten (E9):
+**19 Keys.** Bewusst *nicht* enthalten (E9):
 
 | Nicht enthalten | Warum | Wohin |
 |---|---|---|
-| `group.post.moderate` | es gibt heute keinen Resolver, der fremde Posts aus einer Gruppe entfernt — der Key haette keinen Konsumenten | eigenes Feature-Issue am EPIC, an #7702 |
 | `group.delete` | `DeleteGroup` ist im Schema auskommentiert | kommt mit #5388, das die Datenschutz-Fragen ohnehin klaeren muss |
 | `group.owner.transfer` | **redundant**: die Deckungsregel aus 3.4 (`actor ⊇ zugewiesene Rolle`) laesst die Owner-Rolle ohnehin nur von jemandem vergeben, der alles haelt, was Owner haelt. Ein eigener Key koennte nur noch *mehr* erlauben — was #8537 explizit nicht will ("aber nicht Inhaber bestimmen koennen") | entfaellt |
 
@@ -399,7 +399,7 @@ Resolver**, sondern drei vorhandene Teile. Zwei Regeln begrenzen dabei, was ein
 Netzwerk-Recht ueberhaupt bedeutet:
 
 > **Ein Netzwerk-Recht macht eine Gruppe erreichbar, nicht gelistet.** Wer
-> `group.read.any_hidden` haelt, bekommt die versteckten Gruppen des Netzwerks
+> `group.content.read.any_hidden` haelt, bekommt die versteckten Gruppen des Netzwerks
 > *nicht* in Gruppenliste, Suche oder Sidebar — er kann eine **benannte** Gruppe
 > oeffnen. Technisch loest `Query.Group` den Netzwerk-Zweig nur auf, wenn
 > `id` oder `slug` genau eine Gruppe benennt (`namesOneGroup`); ohne das bleibt
