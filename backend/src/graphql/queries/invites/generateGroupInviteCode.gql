@@ -28,5 +28,6 @@ mutation generateGroupInviteCode($groupId: ID!, $expiresAt: String, $comment: St
       }
     }
     isValid
+    allowsRegistration
   }
 }

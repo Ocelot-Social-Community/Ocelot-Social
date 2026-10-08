@@ -4,7 +4,7 @@ mutation UpdateGroup(
   $slug: String
   $about: String
   $description: String
-  $groupType: GroupType
+  $visibility: GroupVisibility
   $actionRadius: GroupActionRadius
   $categoryIds: [ID]
   $avatar: ImageInput
@@ -19,7 +19,7 @@ mutation UpdateGroup(
     slug: $slug
     about: $about
     description: $description
-    groupType: $groupType
+    visibility: $visibility
     actionRadius: $actionRadius
     categoryIds: $categoryIds
     avatar: $avatar

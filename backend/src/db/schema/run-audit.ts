@@ -13,6 +13,7 @@ import {
 import { allRules } from '@db/schema/derive/rules'
 import { runnerFor } from '@db/schema/derive/runner'
 import { entities, labels, relationships, relationshipTypes } from '@db/schema/index'
+import { GROUP_ROLE_INTEGRITY_AUDITS } from '@src/groupRole/integrity'
 
 import type { Enforcement } from '@db/schema/derive/apply'
 import type { BackendProfile } from '@db/schema/derive/ddl'
@@ -110,7 +111,13 @@ const presentObjects = async (session: Session): Promise<SchemaObject[]> => {
 
 const reportAudits = async (session: Session, profile: BackendProfile): Promise<number> => {
   heading(`1. Declared rules that ${profile} cannot enforce`)
-  const audits = auditsFor(allRules(entities, relationships), profile)
+  // The derived audits, plus the ones no declaration can express: a group membership names its
+  // role by string, so nothing in the database stops that string from pointing at nothing
+  // (see groupRole/integrity.ts).
+  const audits = [
+    ...auditsFor(allRules(entities, relationships), profile),
+    ...GROUP_ROLE_INTEGRITY_AUDITS,
+  ]
   const runner = runnerFor(session)
   let findings = 0
 

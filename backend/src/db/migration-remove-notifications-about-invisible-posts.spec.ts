@@ -25,7 +25,7 @@ const recipientsOf = async (resourceId: string): Promise<string[]> => {
   return result.records.map((record) => record.get('id') as string)
 }
 
-// The graph the live bug produced, in miniature. One author, one post per group type, and a set
+// The graph the live bug produced, in miniature. One author, one post per visibility, and a set
 // of readers that differ ONLY in their relationship to the group — so every assertion below
 // isolates the membership rule and nothing else.
 //
@@ -41,6 +41,8 @@ describe('migration: remove-notifications-about-invisible-posts', () => {
       CREATE (pending:User {id: 'pending', slug: 'pending', deleted: false})
       CREATE (outsider:User {id: 'outsider', slug: 'outsider', deleted: false})
 
+      // groupType on purpose: this migration ran when the group type was a stored property,
+      // and a migration spec sets its data up as it looked then. A later migration removes it.
       CREATE (hidden:Group {id: 'hidden-group', slug: 'hidden-group', groupType: 'hidden'})
       CREATE (open:Group {id: 'public-group', slug: 'public-group', groupType: 'public'})
 

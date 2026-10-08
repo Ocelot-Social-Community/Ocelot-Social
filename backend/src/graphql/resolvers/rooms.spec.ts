@@ -17,10 +17,13 @@ import roomsResolvers, { roomUpdatedFilter } from './rooms'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { RoleDefinition } from '@src/role'
 
 let chattingUser, otherChattingUser, notChattingUser
 let authenticatedUser: Context['user']
-const context = () => ({ authenticatedUser })
+// Per-test role override, for the one case where the network side reaches into a group.
+let rolesOverride: RoleDefinition[] | undefined
+const context = () => ({ authenticatedUser, roles: rolesOverride })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -802,6 +805,33 @@ describe('Room', () => {
 
         expect(result.errors).toBeDefined()
 
+        authenticatedUser = await chattingUser.toJson()
+      })
+
+      it('fails for a network administrator who is not a member either', async () => {
+        // `group.administer.any_public` folds the whole group catalog in — but only once it has
+        // been picked up (groupRole/elevation.ts), and reading is all it gives before that. So
+        // the shield refuses here, and even elevated it would get no further: a group room is
+        // built FROM the group's members, and somebody who is not one has nothing to build it
+        // from. The recovery path promotes existing members (concept E16); it does not make a
+        // network admin a chat participant.
+        rolesOverride = [
+          {
+            name: 'user',
+            protected: false,
+            permissions: ['group.administer.any_public'],
+          },
+        ]
+        authenticatedUser = await notChattingUser.toJson()
+
+        const result = await mutate({
+          mutation: CreateGroupRoom,
+          variables: { groupId: 'test-group' },
+        })
+
+        expect(result.errors?.[0].message).toMatch(/Not Authorized!|Could not create group room/)
+
+        rolesOverride = undefined
         authenticatedUser = await chattingUser.toJson()
       })
     })

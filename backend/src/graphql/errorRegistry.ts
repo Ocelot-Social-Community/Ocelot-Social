@@ -72,13 +72,11 @@ const definitions = {
     text: 'You cannot set badges not rewarded to you.',
   },
   // groups
+  // The groups feature is switched off network-wide; nothing group-related is reachable.
+  GROUPS_FEATURE_DISABLED: { type: 'FORBIDDEN', text: 'Groups are not enabled.' },
   GROUP_SAVE_DESCRIPTION_TOO_SHORT: {
     type: 'BAD_USER_INPUT',
     text: 'Description too short (at least {min} characters).',
-  },
-  GROUP_SAVE_HIDDEN_TYPE_NOT_PERMITTED: {
-    type: 'FORBIDDEN',
-    text: 'You are not allowed to make this group secret.',
   },
   // A query selected a computed Group field (myRole, postsCount, …) without the group's id.
   GROUP_FIELD_GROUP_ID_MISSING: {
@@ -100,6 +98,20 @@ const definitions = {
   GROUP_MEMBERSHIP_USER_NOT_A_MEMBER: {
     type: 'BAD_USER_INPUT',
     text: 'User is not a member of this group.',
+  },
+  // Making a group more private is the same act as creating it that private: the network right
+  // group.create_<visibility> caps both ways there — the visibility switch and the rights editor.
+  GROUP_VISIBILITY_RAISE_NOT_PERMITTED: {
+    type: 'FORBIDDEN',
+    text: 'You cannot make this group more private than you may create one!',
+  },
+  GROUP_SAVE_MEMBER_LIST_UNAVAILABLE: {
+    type: 'BAD_USER_INPUT',
+    text: 'A group outsiders cannot find has no member list to open.',
+  },
+  GROUP_TEMPLATE_NAME_UNKNOWN: {
+    type: 'BAD_USER_INPUT',
+    text: "No group role template named '{template}'",
   },
   // posts, comments & events
   POST_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'Could not find post.' },
@@ -260,10 +272,6 @@ const definitions = {
     text: 'You have reached the maximum of invite codes you can generate.',
   },
   // chat & video calls
-  CHAT_GROUP_ROOM_FEATURE_DISABLED: {
-    type: 'FORBIDDEN',
-    text: 'Group chats are not enabled.',
-  },
   CHAT_GROUP_ROOM_NOT_CREATED: {
     type: 'FORBIDDEN',
     text: 'Could not create group room. User may not be a member of the group.',
@@ -284,7 +292,6 @@ const definitions = {
     type: 'FORBIDDEN',
     text: 'You may not start a video call in this group.',
   },
-  VIDEO_CALL_FEATURE_DISABLED: { type: 'FORBIDDEN', text: 'Video calls are disabled.' },
 } as const satisfies Record<string, ErrorDefinition>
 
 export type ErrorName = keyof typeof definitions

@@ -15,6 +15,7 @@ import { beforeAll, afterAll, beforeEach, describe, it, expect } from 'vitest'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { closeDriver } from '@db/neo4j'
+import { createGroupAuthorizationScope } from '@src/groupRole/requestScope'
 
 import inviteCodesResolvers, { redeemInviteCode } from './inviteCodes'
 
@@ -22,8 +23,21 @@ import type { Context } from '@src/context'
 
 let database: ReturnType<typeof databaseContext>
 
+// The real authorization scope, not a stub: where an invited membership lands follows the
+// group's own rights (`group.join` on its non-member role), so a stub would be deciding the
+// outcome instead of the code under test. No network permissions and an open groups gate — the
+// group read rights have no network prerequisite.
 const contextFor = (id: string | null) =>
-  ({ user: id ? { id } : null, database }) as unknown as Context
+  ({
+    user: id ? { id } : null,
+    database,
+    groupAuthorization: createGroupAuthorizationScope({
+      database,
+      userId: id,
+      effectivePermissions: new Set(),
+      policy: { getEffective: () => true },
+    }),
+  }) as unknown as Context
 
 const codesOf = async (query: string, variables: Record<string, unknown> = {}) => {
   const { records } = await database.query({ query, variables })
@@ -112,10 +126,16 @@ describe(redeemInviteCode, () => {
     // The group-link branch differs from the personal one: it does NOT create follow edges, only
     // the membership — but on signup it still has to record who invited whom, which is the one
     // statement `newUser` switches on here.
+    //
+    // The group below is a bare node with no role definitions, which is also the mid-migration
+    // state: where the membership lands then falls back to the TEMPLATE the group runs on
+    // (`Group.template`, the one thing about the preset that is stored — the visibility itself is
+    // derived from the roles and a group without them has none), so a deployment between the code
+    // and its migration does not quietly turn invited people into applicants.
     it('records the invitation alongside the membership for a group invite link', async () => {
       await database.write({
         query: `MATCH (host:User { id: 'invite-host' })
-                MERGE (group:Group { id: 'invite-group', groupType: 'public' })
+                MERGE (group:Group { id: 'invite-group', template: 'public' })
                 MERGE (host)-[:GENERATED]->(code:InviteCode { code: 'GRP001' })
                 MERGE (code)-[:INVITES_TO]->(group)`,
       })
@@ -134,6 +154,51 @@ describe(redeemInviteCode, () => {
         role: 'usual',
       })
     })
+
+    // The same link into a group whose door is SHUT to strangers. An invitation is the
+    // approval, so it does not land the invited person in a waiting room — which is what it
+    // used to do, in the one kind of group where an invitation is the only way in at all.
+    it('lands an invited person as a member even where strangers must ask', async () => {
+      await database.write({
+        query: `MATCH (host:User { id: 'invite-host' })
+                MERGE (group:Group { id: 'rights-group', template: 'closed' })
+                MERGE (group)-[:HAS_GROUP_ROLE]->(role:GroupRole { id: 'rights-group:none' })
+                SET role.name = 'none', role.permissions = $permissions
+                MERGE (host)-[:GENERATED]->(code:InviteCode { code: 'GRP002' })
+                MERGE (code)-[:INVITES_TO]->(group)`,
+        variables: { permissions: JSON.stringify(['group.read', 'group.join.request']) },
+      })
+
+      await expect(redeemInviteCode(contextFor('invited-user'), 'GRP002', true)).resolves.toBe(true)
+
+      const records = await codesOf(`
+        MATCH (user:User { id: 'invited-user' })
+        RETURN head([(user)-[m:MEMBER_OF]->(:Group { id: 'rights-group' }) | m.role]) AS role`)
+
+      expect(records[0].get('role')).toBe('usual')
+    })
+
+    it('lands them as a member in an unlisted group, where there is no other way in', async () => {
+      // The dead end this replaces: an unlisted group grants no join right, so the invitee
+      // became an applicant holding nothing but `group.leave` — able to leave something they
+      // could not see, waiting for an approval from the person who had already invited them.
+      await database.write({
+        query: `MATCH (host:User { id: 'invite-host' })
+                MERGE (group:Group { id: 'secret-group', template: 'hidden' })
+                MERGE (group)-[:HAS_GROUP_ROLE]->(role:GroupRole { id: 'secret-group:none' })
+                SET role.name = 'none', role.permissions = '[]'
+                MERGE (host)-[:GENERATED]->(code:InviteCode { code: 'GRP003' })
+                MERGE (code)-[:INVITES_TO]->(group)`,
+      })
+
+      await expect(redeemInviteCode(contextFor('invited-user'), 'GRP003', true)).resolves.toBe(true)
+
+      const records = await codesOf(`
+        MATCH (user:User { id: 'invited-user' })
+        RETURN head([(user)-[m:MEMBER_OF]->(:Group { id: 'secret-group' }) | m.role]) AS role`)
+
+      expect(records[0].get('role')).toBe('usual')
+    })
   })
 })
 
@@ -150,6 +215,14 @@ describe('InviteCode field resolvers for a parent without a code', () => {
   it('resolves isValid to false', async () => {
     await expect(
       inviteCodesResolvers.InviteCode.isValid({}, {}, contextFor('someone'), null),
+    ).resolves.toBe(false)
+  })
+
+  it('resolves allowsRegistration to false', async () => {
+    // The stricter of the two answers: an unknown code must not be read as one that opens the
+    // network's door.
+    await expect(
+      inviteCodesResolvers.InviteCode.allowsRegistration({}, {}, contextFor('someone'), null),
     ).resolves.toBe(false)
   })
 })
