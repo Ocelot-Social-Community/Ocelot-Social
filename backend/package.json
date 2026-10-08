@@ -109,7 +109,7 @@
     "uuid": "^14.0.2",
     "validator": "^13.15.35",
     "ws": "^8.22.0",
-    "xregexp": "^5.1.2"
+    "xregexp": "^5.1.3"
   },
   "devDependencies": {
     "@faker-js/faker": "10.6.0",
