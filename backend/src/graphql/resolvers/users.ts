@@ -20,6 +20,7 @@ import normalizeEmail from './helpers/normalizeEmail'
 import { orderClause } from './helpers/ordering'
 import { pagingClause } from './helpers/paging'
 import Resolver from './helpers/Resolver'
+import { shoutsVisibleTo } from './helpers/shoutVisibility'
 import { images } from './images/images'
 import {
   attachLocationFeature,
@@ -857,7 +858,9 @@ export default {
         followingCount: '-[:FOLLOWS]->(related:User)',
         followedByCount: '<-[:FOLLOWS]-(related:User)',
         commentedCount: `-[:WROTE]->(c:Comment)-[:COMMENTS]->(related:Post) ${visiblePostFilter}`,
-        shoutedCount: `-[:SHOUTED]->(related:Post) ${visiblePostFilter}`,
+        // The parent here is the shouter: their setting decides whether others see these.
+        shoutedCount: `-[:SHOUTED]->(related:Post) ${visiblePostFilter}
+          AND ${shoutsVisibleTo('parent', '$cypherParams.currentUserId')}`,
         badgeTrophiesCount: '<-[:REWARDED]-(related:Badge)',
       },
       hasOne: {
@@ -870,7 +873,7 @@ export default {
         friends: '-[:FRIENDS]-(related:User)',
         contributions: '-[:WROTE]->(related:Post)',
         comments: '-[:WROTE]->(related:Comment)',
-        shouted: '-[:SHOUTED]->(related:Post)',
+        shouted: `-[:SHOUTED]->(related:Post) WHERE ${shoutsVisibleTo('parent', '$cypherParams.currentUserId')}`,
         categories: '-[:CATEGORIZED]->(related:Category)',
         badgeTrophies: '<-[:REWARDED]-(related:Badge)',
         // Counterpart of the invitedBy hasOne above.

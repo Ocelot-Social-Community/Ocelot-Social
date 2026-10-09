@@ -449,6 +449,7 @@ describe('pages/profile/_id/_slug.vue — computed', () => {
     it('builds 3 tabs with counts and disables tabs at count 0', () => {
       const ctx = {
         user: { contributionsCount: 0, commentedCount: 3, shoutedCount: 0 },
+        showsShouts: true,
         $t: (k) => k,
       }
       const result = computed.tabOptions.call(ctx)
@@ -456,6 +457,24 @@ describe('pages/profile/_id/_slug.vue — computed', () => {
       expect(result[0]).toMatchObject({ type: 'post', count: 0, disabled: true })
       expect(result[1]).toMatchObject({ type: 'comment', count: 3, disabled: false })
       expect(result[2]).toMatchObject({ type: 'shout', count: 0, disabled: true })
+    })
+
+    it('leaves out the shouts of somebody who keeps them private', () => {
+      const ctx = { user: { shoutedCount: 0 }, showsShouts: false, $t: (k) => k }
+
+      expect(computed.tabOptions.call(ctx).map((tab) => tab.type)).toEqual(['post', 'comment'])
+    })
+  })
+
+  describe('showsShouts', () => {
+    // Public unless switched off — an unset setting counts as public, like on the server.
+    it.each([
+      [false, true, true],
+      [false, undefined, true],
+      [false, false, false],
+      [true, false, true],
+    ])('myProfile %s, showShoutsPublicly %s → %s', (myProfile, showShoutsPublicly, shown) => {
+      expect(computed.showsShouts.call({ myProfile, user: { showShoutsPublicly } })).toBe(shown)
     })
   })
 })

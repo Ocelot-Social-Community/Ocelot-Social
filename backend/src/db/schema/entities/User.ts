@@ -42,6 +42,9 @@ export const User = defineEntity({
     termsAndConditionsAgreedAt: { type: ['string', 'null'], pattern: ISO_DATE_TIME },
     allowEmbedIframes: { type: 'boolean' },
     showShoutsPublicly: { type: 'boolean' },
+    // What showShoutsPublicly was before 20261009120000-shouts-public-by-default made it true for
+    // everybody — kept so that migration's down can restore it exactly.
+    showShoutsPubliclyBeforeMigration: { type: 'string', enum: ['true', 'false', 'unset'] },
     locale: { type: ['string', 'null'] },
     // Not in db/models/User.ts and present on exactly one seeded node, same as on Post and
     // Comment. Looks like moderation writes `closed` onto the reported resource rather than

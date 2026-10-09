@@ -63,7 +63,7 @@ const createUserNode = async (buildObject) => {
     deleted: false,
     disabled: false,
     allowEmbedIframes: false,
-    showShoutsPublicly: false,
+    showShoutsPublicly: true,
     emailNotificationsCommentOnObservedPost: true,
     emailNotificationsMention: true,
     emailNotificationsChatMessage: true,
@@ -236,7 +236,7 @@ Factory.define('basicUser')
     termsAndConditionsAgreedVersion: '0.0.1',
     termsAndConditionsAgreedAt: '2019-08-01T10:47:19.212Z',
     allowEmbedIframes: false,
-    showShoutsPublicly: false,
+    showShoutsPublicly: true,
     locale: 'en',
   })
   .attr('slug', null)
