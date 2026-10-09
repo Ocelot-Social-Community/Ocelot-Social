@@ -946,7 +946,8 @@ describe('admin/roles.vue', () => {
 
     it('asks before leaving with a rename typed but not confirmed', async () => {
       const wrapper = await Wrapper()
-      wrapper.vm.setActive('user')
+      // A role an admin can actually rename — the baseline `user` role offers no rename.
+      wrapper.vm.setActive('badge-setter')
       wrapper.vm.startRename()
       wrapper.vm.renameValue = 'member'
 
@@ -958,7 +959,8 @@ describe('admin/roles.vue', () => {
 
     it('lets the user leave with the create or rename field open but nothing typed', async () => {
       const wrapper = await Wrapper()
-      wrapper.vm.setActive('user')
+      // A role an admin can actually rename — the baseline `user` role offers no rename.
+      wrapper.vm.setActive('badge-setter')
       wrapper.vm.startRename()
 
       expect(leave(wrapper)).toHaveBeenCalledWith()
