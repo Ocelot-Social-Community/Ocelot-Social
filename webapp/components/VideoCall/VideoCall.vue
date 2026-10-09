@@ -743,6 +743,7 @@ export default {
     this.qualityTimer = null
     this.qualityClass = null
     this.leaving = false
+    this.deviceSwitches = this.newDeviceSwitches()
   },
   mounted() {
     this.observeStage()
@@ -1306,7 +1307,15 @@ export default {
       const room = this.room
       const field = DEVICE_FIELDS[kind]
       if (!room || !field || !deviceId || this[field] === deviceId) return
-      const previous = this[field]
+      // The user may pick again before this switch is through. Per kind, only
+      // the latest pick owns the selection; and what to go back to after a
+      // refusal is the device that ran before any switch still on its way —
+      // not the selection as it is right now, which may be an earlier pick
+      // that has yet to prove itself.
+      const switching = this.deviceSwitches[kind]
+      const ticket = ++switching.latest
+      if (switching.inFlight === 0) switching.settled = this[field]
+      switching.inFlight++
       // Shown as selected at once; taken back below if the device refuses.
       this[field] = deviceId
       // A capture that is switched off right now is noted by LiveKit and used
@@ -1319,28 +1328,38 @@ export default {
         }
       } catch (err) {
         if (this.room !== room) return
-        this[field] = previous
         this.showSwitchErrorToast(kind, err)
+        // Overtaken by a newer pick: the selection and LiveKit are that one's
+        // business now. Taking them back here would undo it.
+        if (ticket !== switching.latest) return
+        const settled = switching.settled
+        this[field] = settled
         // LiveKit stops the running capture before it opens the new one, so a
         // refused switch leaves none — go back to the one that worked.
-        if (previous) {
+        if (settled) {
           try {
-            await room.switchActiveDevice(kind, previous)
+            await room.switchActiveDevice(kind, settled)
           } catch (_e) {
             /* the toast above already says the device is in trouble */
           }
         }
         return
       } finally {
+        switching.inFlight--
         this.deviceStarted(kind)
       }
       if (this.room !== room) return
+      switching.settled = deviceId
       saveDevicePreference(kind, { deviceId, label })
       if (kind === 'videoinput') this.refreshTiles()
       if (kind === 'audioinput') {
         this.refreshMicMeter()
         await this.recheckMicProblem(room)
       }
+    },
+    newDeviceSwitches() {
+      const none = () => ({ latest: 0, inFlight: 0, settled: null })
+      return { videoinput: none(), audioinput: none(), audiooutput: none() }
     },
     deviceStarts(kind) {
       this.devicesStarting[kind]++
@@ -1696,6 +1715,7 @@ export default {
       this.closeDeviceSettings()
       this.knownDevices = []
       this.devicesStarting = { videoinput: 0, audioinput: 0, audiooutput: 0 }
+      this.deviceSwitches = this.newDeviceSwitches()
       this.tiles = []
       this.activeSpeakerIds = []
       this.spotlightKey = null

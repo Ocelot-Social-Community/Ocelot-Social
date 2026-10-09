@@ -1927,6 +1927,81 @@ describe('VideoCall', () => {
         expect(wrapper.vm.devicesStarting.audioinput).toBe(0)
       })
 
+      describe('picking again before the first switch is through', () => {
+        const pickTwice = async () => {
+          const built = await connected()
+          built.wrapper.setData({ cameraDeviceId: 'cam-1' })
+          built.wrapper.vm.showDeviceErrorToast = jest.fn()
+          const first = pendingSwitch(built.room)
+          const second = pendingSwitch(built.room)
+          const one = built.wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+          const two = built.wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-3' })
+          return { ...built, first, second, one, two }
+        }
+        const refused = () => deviceError('NotReadableError')
+
+        it('keeps the later pick when the earlier one is refused, and still says so', async () => {
+          const { wrapper, room, first, second, one, two } = await pickTwice()
+          first.fail(refused())
+          await one
+          expect(wrapper.vm.showDeviceErrorToast).toHaveBeenCalledWith('camera', expect.any(Error))
+          expect(wrapper.vm.cameraDeviceId).toBe('cam-3')
+          // LiveKit is not sent back to the first camera underneath the later pick.
+          expect(room.switchActiveDevice).toHaveBeenCalledTimes(2)
+
+          second.finish()
+          await two
+          expect(wrapper.vm.cameraDeviceId).toBe('cam-3')
+        })
+
+        it('goes back to the camera that ran before both when both are refused', async () => {
+          const { wrapper, room, first, second, one, two } = await pickTwice()
+          first.fail(refused())
+          await one
+          second.fail(refused())
+          await two
+          // Not to cam-2, the earlier pick that never ran.
+          expect(wrapper.vm.cameraDeviceId).toBe('cam-1')
+          expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-1')
+          expect(wrapper.vm.showDeviceErrorToast).toHaveBeenCalledTimes(2)
+        })
+
+        it('goes back to the earlier pick when that one ran and the later is refused', async () => {
+          const { wrapper, room, first, second, one, two } = await pickTwice()
+          first.finish()
+          await one
+          second.fail(refused())
+          await two
+          expect(wrapper.vm.cameraDeviceId).toBe('cam-2')
+          expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-2')
+        })
+
+        it('does not let a pick of another kind count as the later one', async () => {
+          const { wrapper, room } = await connected()
+          wrapper.setData({ cameraDeviceId: 'cam-1', micDeviceId: 'mic-1' })
+          wrapper.vm.showDeviceErrorToast = jest.fn()
+          const camera = pendingSwitch(room)
+          const mic = pendingSwitch(room)
+          const one = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+          const two = wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2' })
+          camera.fail(refused())
+          await one
+          expect(wrapper.vm.cameraDeviceId).toBe('cam-1')
+          mic.finish()
+          await two
+          expect(wrapper.vm.micDeviceId).toBe('mic-2')
+        })
+
+        it('starts afresh with the next call', async () => {
+          const { wrapper, first, second, one, two } = await pickTwice()
+          await wrapper.vm.cleanup()
+          first.finish()
+          second.finish()
+          await Promise.all([one, two])
+          expect(wrapper.vm.deviceSwitches.videoinput).toMatchObject({ latest: 0, settled: null })
+        })
+      })
+
       it('keeps saying so while a second pick follows the first', async () => {
         const { wrapper, room } = await opened()
         const first = pendingSwitch(room)
