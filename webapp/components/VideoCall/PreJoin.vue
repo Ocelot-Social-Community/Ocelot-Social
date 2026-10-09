@@ -642,7 +642,9 @@ export default {
   display: flex;
   background: var(--background-color-base);
   color: var(--text-color-base);
-  overflow: auto;
+  /*  Never sideways — see DeviceSettings.vue for what would cause it. */
+  overflow-x: hidden;
+  overflow-y: auto;
   font-family: var(--font-family-text);
   min-height: 0;
 }

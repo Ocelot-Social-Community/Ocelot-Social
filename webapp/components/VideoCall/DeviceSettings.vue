@@ -137,6 +137,11 @@ export default {
   border: 1px solid var(--color-neutral-85);
   border-radius: var(--border-radius-base);
   box-shadow: var(--box-shadow-large);
+  /*  Scrolls down when the parked window is too low for it, never sideways: */
+  /*  Safari counts the cut-off rest of a device name longer than its field */
+  /*  ("Desk View Camera of …") as content, and the field itself cannot be */
+  /*  told to clip it. */
+  overflow-x: hidden;
   overflow-y: auto;
   /*  The panel takes the focus when it opens so Escape and Tab start from it; */
   /*  a focus ring around the whole panel would only be noise. */
