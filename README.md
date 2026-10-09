@@ -13,7 +13,7 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/LICENSE.md)
 [![Discord](https://img.shields.io/discord/489522408076738561.svg?label=discord)](https://discord.gg/AJSX9DCSUA)
 
-[Ocelot.social](https://ocelot.social) is free and open source software to run your own social network — for a community, an association, a movement or a region. It is developed by a community of programmers and the operators of the networks running on it.
+[Ocelot.social](https://ocelot.social) is free and open-source software to run your own social network — for a community, an association, a movement or a region. It is developed by a community of programmers and the operators of the networks running on it.
 
 <!-- markdownlint-disable MD033 -->
 <!-- `align`, not CSS: GitHub strips `style` attributes from rendered markdown. -->

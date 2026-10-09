@@ -74,15 +74,23 @@ Make sure your database is running on `http://localhost:7474/browser/`.
 Prepare database once before you start by running the following command in a second terminal:
 
 ```bash
-# in main folder while docker compose is up
+# in main folder while docker compose is up — development
 $ docker compose exec backend npm run db:migrate -- init
 $ docker compose exec backend npm run db:migrate -- up
 ```
 
-Then clear and seed database by running the following command as well in the second terminal:
+The production image carries only the compiled backend, so it migrates from the build — and it has no reset or seed:
 
 ```bash
-# in main folder while docker compose is up
+# in main folder while docker compose -f docker-compose.yml is up — production
+$ docker compose exec backend npm run prod:migrate -- init
+$ docker compose exec backend npm run prod:migrate -- up
+```
+
+In development, clear and seed the database with demo data by running the following command as well in the second terminal:
+
+```bash
+# in main folder while docker compose is up — development only
 $ docker compose exec backend npm run db:reset
 $ docker compose exec backend npm run db:seed
 ```
