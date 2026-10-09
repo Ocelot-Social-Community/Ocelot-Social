@@ -469,22 +469,21 @@ export default {
   color: var(--text-color-inverse);
   text-align: center;
   pointer-events: none;
-  animation: video-tile-starting 150ms ease 300ms both;
+  animation: video-tile-starting 150ms ease both;
 }
 
 .video-tile__starting-text {
   font-size: var(--font-size-small);
 }
 
+/*  Bottom right: the name sits bottom left, the pin badge top right. */
 .video-tile__mic-starting {
   position: absolute;
-  top: var(--space-xxx-small);
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: var(--space-xxx-small);
+  right: var(--space-xxx-small);
   display: flex;
   align-items: center;
   gap: var(--space-xx-small);
-  max-width: calc(100% - var(--space-base));
   padding: 2px var(--space-x-small);
   border-radius: var(--border-radius-base);
   background: rgba(0, 0, 0, 0.6);
@@ -493,11 +492,9 @@ export default {
   font-size: var(--font-size-small);
   white-space: nowrap;
   pointer-events: none;
-  animation: video-tile-starting 150ms ease 300ms both;
+  animation: video-tile-starting 150ms ease both;
 }
 
-/*  Held back for a moment: switching a device on is usually done at once, and */
-/*  a sign that only flashes up would be noise. */
 @keyframes video-tile-starting {
   from {
     opacity: 0;

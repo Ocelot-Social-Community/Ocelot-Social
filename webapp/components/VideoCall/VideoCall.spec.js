@@ -1897,43 +1897,34 @@ describe('VideoCall', () => {
         )
         return { finish: () => finish(), fail: (err) => fail(err) }
       }
-      const panel = (wrapper) => wrapper.findComponent({ name: 'DeviceSettings' })
-
-      it('tells the device settings that the camera is starting, until it runs', async () => {
-        const { wrapper, room } = await opened()
+      it('counts the camera as starting until it runs', async () => {
+        const { wrapper, room } = await connected()
         const pending = pendingSwitch(room)
         const switching = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
-        await wrapper.vm.$nextTick()
-        expect(panel(wrapper).props('cameraStarting')).toBe(true)
-        expect(panel(wrapper).props('micStarting')).toBe(false)
+        expect(wrapper.vm.devicesStarting).toMatchObject({ videoinput: 1, audioinput: 0 })
 
         pending.finish()
         await switching
-        await wrapper.vm.$nextTick()
-        expect(panel(wrapper).props('cameraStarting')).toBe(false)
-        wrapper.destroy()
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
       })
 
-      it('tells them about a starting microphone, also while it falls back after a refusal', async () => {
-        const { wrapper, room } = await opened()
+      it('counts the microphone as starting also while it falls back after a refusal', async () => {
+        const { wrapper, room } = await connected()
         wrapper.setData({ micDeviceId: 'mic-1' })
         wrapper.vm.showDeviceErrorToast = jest.fn()
         const first = pendingSwitch(room)
         const back = pendingSwitch(room)
         const switching = wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2' })
-        await wrapper.vm.$nextTick()
-        expect(panel(wrapper).props('micStarting')).toBe(true)
+        expect(wrapper.vm.devicesStarting.audioinput).toBe(1)
 
         first.fail(deviceError('NotReadableError'))
         await flushPromises()
         // The previous microphone is on its way back.
-        expect(panel(wrapper).props('micStarting')).toBe(true)
+        expect(wrapper.vm.devicesStarting.audioinput).toBe(1)
 
         back.finish()
         await switching
-        await wrapper.vm.$nextTick()
-        expect(panel(wrapper).props('micStarting')).toBe(false)
-        wrapper.destroy()
+        expect(wrapper.vm.devicesStarting.audioinput).toBe(0)
       })
 
       it('keeps saying so while a second pick follows the first', async () => {
@@ -2022,8 +2013,49 @@ describe('VideoCall', () => {
         await toggling
         expect(wrapper.vm.devicesStarting).toMatchObject({ videoinput: 0, audioinput: 0 })
       })
+    })
 
-      it('shows on the own camera tile only', async () => {
+    describe('saying that a device is starting', () => {
+      const starting = (wrapper, kinds) =>
+        wrapper.setData({
+          devicesStarting: { videoinput: 0, audioinput: 0, audiooutput: 0, ...kinds },
+        })
+
+      it('says nothing any more once the call has ended', async () => {
+        const { wrapper } = factory({ show: true })
+        wrapper.vm.deviceStarts('videoinput')
+        wrapper.vm.deviceStarts('audioinput')
+        await wrapper.vm.cleanup()
+        expect(wrapper.vm.devicesStarting).toEqual({ videoinput: 0, audioinput: 0, audiooutput: 0 })
+      })
+
+      it('shows it on the button of that device, which waits meanwhile', async () => {
+        const { wrapper } = await connected()
+        const button = (label) =>
+          wrapper.findAll('.stub-button').wrappers.find((b) => b.attributes('aria-label') === label)
+        expect(button('videoCall.muteMic').attributes('loading')).toBeUndefined()
+        expect(button('videoCall.disableCamera').attributes('loading')).toBeUndefined()
+
+        await starting(wrapper, { videoinput: 1 })
+        expect(button('videoCall.disableCamera').attributes('loading')).toBe('true')
+        expect(button('videoCall.muteMic').attributes('loading')).toBeUndefined()
+
+        await starting(wrapper, { audioinput: 1 })
+        expect(button('videoCall.muteMic').attributes('loading')).toBe('true')
+        expect(button('videoCall.disableCamera').attributes('loading')).toBeUndefined()
+      })
+
+      it('shows it in the device settings', async () => {
+        const { wrapper } = await opened()
+        const panel = wrapper.findComponent({ name: 'DeviceSettings' })
+        expect(panel.props('cameraStarting')).toBe(false)
+        await starting(wrapper, { videoinput: 1, audioinput: 1 })
+        expect(panel.props('cameraStarting')).toBe(true)
+        expect(panel.props('micStarting')).toBe(true)
+        wrapper.destroy()
+      })
+
+      it('shows it on the own camera tile only', async () => {
         const { wrapper } = await connected()
         const tile = (overrides) => ({
           key: `${overrides.identity}/${overrides.isScreen ? 'screen' : 'main'}`,
@@ -2038,9 +2070,8 @@ describe('VideoCall', () => {
             tile({ identity: 'me', isLocal: true, isScreen: true }),
             tile({ identity: 'bob' }),
           ],
-          devicesStarting: { videoinput: 1, audioinput: 1, audiooutput: 0 },
         })
-        await wrapper.vm.$nextTick()
+        await starting(wrapper, { videoinput: 1, audioinput: 1 })
         const shown = wrapper
           .findAllComponents({ name: 'VideoTile' })
           .wrappers.map((t) => [t.props('cameraStarting'), t.props('micStarting')])

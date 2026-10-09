@@ -212,6 +212,7 @@
           :size="iconOnly ? 'sm' : 'md'"
           :circle="iconOnly"
           :aria-label="micLabel"
+          :loading="devicesStarting.audioinput > 0"
           @click="toggleMic"
         >
           <template #icon>
@@ -228,6 +229,7 @@
           :size="iconOnly ? 'sm' : 'md'"
           :circle="iconOnly"
           :aria-label="cameraLabel"
+          :loading="devicesStarting.videoinput > 0"
           @click="toggleCamera"
         >
           <template #icon>
@@ -428,8 +430,9 @@ export default {
       // What the browser lists, to put a name to the devices in use.
       knownDevices: [],
       // Devices on their way, per kind — a camera can take seconds to start,
-      // and the device settings and the own tile say so meanwhile. Counted,
-      // as the user may pick again before the first switch is through.
+      // and its button, the own tile and the device settings say so
+      // meanwhile. Counted, as the user may pick again before the first
+      // switch is through.
       devicesStarting: { videoinput: 0, audioinput: 0, audiooutput: 0 },
       // What the level meter in the device settings listens to: the very
       // microphone track the others hear.
