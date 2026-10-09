@@ -2,12 +2,32 @@
   <div class="prejoin">
     <div class="prejoin__preview">
       <video v-show="hasVideo" ref="previewEl" autoplay muted playsinline class="prejoin__video" />
-      <div v-if="!hasVideo" class="prejoin__placeholder">
-        <avatar-image :profile="currentUser" size="large" class="prejoin__avatar" />
+      <div v-if="!hasVideo" class="prejoin__placeholder" :role="cameraStarting ? 'status' : null">
+        <os-spinner v-if="cameraStarting" size="2xl" data-test="prejoin-camera-starting" />
+        <avatar-image v-else :profile="currentUser" size="large" class="prejoin__avatar" />
         <span class="prejoin__placeholder-text">
-          {{
-            cameraActive ? $t('videoCall.prejoin.noCamera') : $t('videoCall.prejoin.cameraDisabled')
-          }}
+          {{ placeholderText }}
+        </span>
+        <span
+          v-if="startingCameraName"
+          class="prejoin__starting-device"
+          data-test="prejoin-camera-starting-name"
+        >
+          {{ startingCameraName }}
+        </span>
+      </div>
+      <div
+        v-if="micStarting"
+        class="prejoin__mic-starting"
+        role="status"
+        data-test="prejoin-mic-starting"
+      >
+        <os-spinner size="sm" />
+        <span class="prejoin__mic-starting-text">
+          {{ $t('videoCall.prejoin.micStarting') }}
+          <span v-if="startingMicName" class="prejoin__starting-device">
+            {{ startingMicName }}
+          </span>
         </span>
       </div>
     </div>
@@ -96,7 +116,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import DeviceSelectors from './DeviceSelectors.vue'
@@ -108,7 +128,7 @@ import {
 
 export default {
   name: 'PreJoin',
-  components: { OsButton, OsIcon, AvatarImage, DeviceSelectors },
+  components: { OsButton, OsIcon, OsSpinner, AvatarImage, DeviceSelectors },
   data() {
     return {
       cameras: [],
@@ -123,6 +143,10 @@ export default {
       // but the user can opt out before joining (silent observer is valid).
       cameraActive: true,
       micActive: true,
+      // A camera needs up to several seconds to start. Without a sign of that,
+      // the empty preview reads as a failed attempt.
+      cameraStarting: false,
+      micStarting: false,
       permissionError: null,
       stream: null,
     }
@@ -140,6 +164,20 @@ export default {
         typeof HTMLMediaElement !== 'undefined' &&
         typeof HTMLMediaElement.prototype.setSinkId === 'function'
       )
+    },
+    placeholderText() {
+      if (this.cameraStarting) return this.$t('videoCall.prejoin.cameraStarting')
+      return this.cameraActive
+        ? this.$t('videoCall.prejoin.noCamera')
+        : this.$t('videoCall.prejoin.cameraDisabled')
+    },
+    // Which device is on its way. Unknown on the very first start: the
+    // browser only names the devices once one was granted.
+    startingCameraName() {
+      return this.cameraStarting ? this.deviceLabel(this.cameras, this.selectedCamera) : ''
+    },
+    startingMicName() {
+      return this.micStarting ? this.deviceLabel(this.mics, this.selectedMic) : ''
     },
     meterStream() {
       return this.micActive ? this.stream : null
@@ -159,11 +197,17 @@ export default {
     // and doesn't proxy them onto the instance, so initialize them here under
     // plain names to follow the project's convention (see `this.icons`).
     this.permListeners = null
+    this.streamRequests = { video: 0, audio: 0 }
+    this.starting = { video: 0, audio: 0 }
+    this.remembered = {}
   },
   async mounted() {
     await this.initDevices()
   },
   beforeDestroy() {
+    // A capture still starting must not switch the camera on after we left.
+    this.streamRequests.video++
+    this.streamRequests.audio++
     this.stopStream()
     this.detachPermissionListeners()
     if (navigator.mediaDevices && navigator.mediaDevices.removeEventListener) {
@@ -185,6 +229,7 @@ export default {
       // out if permission is denied (toggle is disabled in that case too).
       this.cameraActive = this.cameraStatus !== 'denied'
       this.micActive = this.micStatus !== 'denied'
+      this.remembered = loadDevicePreferences()
       try {
         await this.acquireStream()
       } catch (err) {
@@ -194,31 +239,70 @@ export default {
       if (this.cameraStatus === 'denied') this.cameraActive = false
       if (this.micStatus === 'denied') this.micActive = false
       await this.enumerate()
-      // The preview above started on the browser's default devices — the list,
-      // and with it the choice remembered from an earlier call, is only known
-      // now.
-      if (this.applyRememberedDevices()) {
+      this.selectRunningDevices()
+      // The preview above already asked for the devices remembered from an
+      // earlier call, so it usually runs on them. Where the browser did not
+      // know them by their id any more (Safari), the list tells which they
+      // are — only then, and only for that kind, the capture starts anew.
+      const remembered = this.applyRememberedDevices()
+      const elsewhere = ['video', 'audio'].filter(
+        (kind) => remembered[kind] && this.previewsOtherDevice(kind),
+      )
+      if (elsewhere.length) {
         try {
-          await this.acquireStream()
+          await this.acquireStream(elsewhere.length === 1 ? elsewhere[0] : undefined)
         } catch (err) {
           this.permissionError = this.permissionMessage(err)
         }
       }
       navigator.mediaDevices.addEventListener('devicechange', this.onDeviceChange)
     },
+    setDevices(devices) {
+      this.cameras = devices.filter((d) => d.kind === 'videoinput')
+      this.mics = devices.filter((d) => d.kind === 'audioinput')
+      this.speakers = devices.filter((d) => d.kind === 'audiooutput')
+    },
+    // What the capture really runs on beats any guess at it — the first entry
+    // of the list is not necessarily the browser's default.
+    selectRunningDevices() {
+      const running = (kind) => {
+        const track = this.stream && this.stream.getTracks().find((t) => t.kind === kind)
+        return (track && track.getSettings && track.getSettings().deviceId) || ''
+      }
+      const select = (devices, trackKind, field) => {
+        const deviceId = running(trackKind)
+        if (!devices.some((d) => d.deviceId === deviceId)) return
+        this[field] = deviceId
+      }
+      select(this.cameras, 'video', 'selectedCamera')
+      select(this.mics, 'audio', 'selectedMic')
+    },
     applyRememberedDevices() {
-      const remembered = loadDevicePreferences()
       const apply = (devices, kind, field) => {
-        const device = findPreferredDevice(devices, remembered[kind])
+        const device = findPreferredDevice(devices, this.remembered[kind])
         if (!device || device.deviceId === this[field]) return false
         this[field] = device.deviceId
         return true
       }
-      const cameraChanged = apply(this.cameras, 'videoinput', 'selectedCamera')
-      const micChanged = apply(this.mics, 'audioinput', 'selectedMic')
+      const video = apply(this.cameras, 'videoinput', 'selectedCamera')
+      const audio = apply(this.mics, 'audioinput', 'selectedMic')
       apply(this.speakers, 'audiooutput', 'selectedSpeaker')
-      // Only the inputs feed the preview; the speaker needs no new stream.
-      return cameraChanged || micChanged
+      return { video, audio }
+    },
+    previewsOtherDevice(kind) {
+      const track = this.stream && this.stream.getTracks().find((t) => t.kind === kind)
+      const actual = track && track.getSettings && track.getSettings().deviceId
+      const selected = kind === 'video' ? this.selectedCamera : this.selectedMic
+      return !!actual && actual !== selected
+    },
+    deviceConstraint(kind, selected) {
+      if (selected) return { deviceId: { exact: selected } }
+      // Nothing is selected before the first capture: browsers only list the
+      // devices once one was granted. The remembered device goes along as a
+      // wish, so the capture starts on it where the browser still knows it,
+      // and on the default where not.
+      const remembered = this.remembered[kind]
+      return remembered ? { deviceId: { ideal: remembered.deviceId } } : true
     },
     rememberDevice(kind, devices, deviceId) {
       saveDevicePreference(
@@ -283,14 +367,21 @@ export default {
     async onPermissionChange(kind, newState) {
       if (kind === 'camera') this.cameraStatus = newState
       if (kind === 'microphone') this.micStatus = newState
-      // The user just granted the permission in the browser UI (lock icon /
-      // settings) — re-acquire the stream and clear the error in place.
+      const trackKind = kind === 'camera' ? 'video' : 'audio'
       if (newState === 'granted') {
+        // A browser that grants per capture (Firefox) also reports the grant
+        // our own request has just obtained. That capture is running, or about
+        // to: starting it once more would cut it off again — and a camera that
+        // is slow to start then needs several attempts to show up at all.
+        if (this.captures(trackKind)) return
+        // Otherwise the user granted the permission in the browser UI (lock
+        // icon / settings) — acquire what was missing and clear the error in
+        // place.
         if (kind === 'camera') this.cameraActive = true
         if (kind === 'microphone') this.micActive = true
+        this.permissionError = null
         try {
-          await this.acquireStream()
-          this.permissionError = null
+          await this.acquireStream(trackKind)
         } catch (err) {
           this.permissionError = this.permissionMessage(err)
         }
@@ -299,11 +390,17 @@ export default {
         if (kind === 'camera') this.cameraActive = false
         if (kind === 'microphone') this.micActive = false
         try {
-          await this.acquireStream()
+          await this.acquireStream(trackKind)
         } catch (_e) {
           /* noop */
         }
       }
+    },
+    captures(kind) {
+      return (
+        this.starting[kind] > 0 ||
+        !!(this.stream && this.stream.getTracks().some((t) => t.kind === kind))
+      )
     },
     async retry() {
       this.permissionError = null
@@ -333,9 +430,7 @@ export default {
     async enumerate() {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices()
-        this.cameras = devices.filter((d) => d.kind === 'videoinput')
-        this.mics = devices.filter((d) => d.kind === 'audioinput')
-        this.speakers = devices.filter((d) => d.kind === 'audiooutput')
+        this.setDevices(devices)
         // Drop selections that point at devices that have been unplugged —
         // otherwise getUserMedia({ deviceId: { exact: staleId } }) raises
         // OverconstrainedError on the next acquireStream().
@@ -348,50 +443,108 @@ export default {
         /* noop */
       }
     },
-    async acquireStream() {
-      this.stopStream()
-      const wantVideo = this.cameraActive && this.cameraStatus !== 'denied'
-      const wantAudio = this.micActive && this.micStatus !== 'denied'
-      if (!wantVideo && !wantAudio) {
-        // Nothing to preview — explicitly opted out of both.
-        this.stream = null
-        return
-      }
+    // `only` ('video' | 'audio') leaves the capture of the other kind alone:
+    // switching the microphone must not restart the camera, nor the other way
+    // round — browsers that grant per capture (Firefox, Safari) would ask for
+    // the untouched device all over again.
+    // Resolves to false when a newer request overtook this one — its outcome
+    // then says nothing about what is on show.
+    async acquireStream(only) {
+      const kinds = only ? [only] : ['video', 'audio']
+      // A camera can take seconds to start (an iPhone has to wake up first),
+      // long enough for the user to pick another one meanwhile. Only the
+      // latest request for a kind may put its track on show; one that was
+      // overtaken hands its device straight back.
+      const tickets = {}
+      for (const kind of kinds) tickets[kind] = ++this.streamRequests[kind]
+      const overtaken = (kind) => kind in tickets && tickets[kind] !== this.streamRequests[kind]
+      const allOvertaken = () => kinds.every(overtaken)
+      this.stopTracks(kinds)
+      const wantVideo =
+        kinds.includes('video') && this.cameraActive && this.cameraStatus !== 'denied'
+      const wantAudio = kinds.includes('audio') && this.micActive && this.micStatus !== 'denied'
+      // Nothing to capture — explicitly opted out.
+      if (!wantVideo && !wantAudio) return true
+      const requestedCamera = this.selectedCamera
       const constraints = {
-        video: wantVideo
-          ? this.selectedCamera
-            ? { deviceId: { exact: this.selectedCamera } }
-            : true
-          : false,
-        audio: wantAudio
-          ? this.selectedMic
-            ? { deviceId: { exact: this.selectedMic } }
-            : true
-          : false,
+        video: wantVideo && this.deviceConstraint('videoinput', requestedCamera),
+        audio: wantAudio && this.deviceConstraint('audioinput', this.selectedMic),
       }
       let stream
+      let cameraError = null
+      const starting = kinds.filter((kind) => (kind === 'video' ? wantVideo : wantAudio))
+      for (const kind of starting) this.starting[kind]++
+      this.showStarting()
       try {
         stream = await navigator.mediaDevices.getUserMedia(constraints)
       } catch (videoErr) {
+        if (allOvertaken()) return false
         // If video failed but audio was wanted, try audio-only as fallback.
         if (wantAudio && wantVideo) {
           try {
-            stream = await navigator.mediaDevices.getUserMedia({
-              audio: this.selectedMic ? { deviceId: { exact: this.selectedMic } } : true,
-            })
+            stream = await navigator.mediaDevices.getUserMedia({ audio: constraints.audio })
           } catch (_audioErr) {
+            if (allOvertaken()) return false
             throw videoErr
           }
+          cameraError = videoErr
         } else {
           throw videoErr
         }
+      } finally {
+        for (const kind of starting) this.starting[kind]--
+        this.showStarting()
       }
-      this.stream = stream
-      this.permissionError = null
+      if (allOvertaken()) {
+        stream.getTracks().forEach((t) => t.stop())
+        return false
+      }
+      // What is on show already: the kind this request left alone, or one
+      // that a newer request has put there in the meantime.
+      const shown = this.stream ? this.stream.getTracks() : []
+      const fresh = stream.getTracks().filter((t) => {
+        if (!overtaken(t.kind)) return true
+        t.stop()
+        return false
+      })
+      const complete = shown.length === 0 && !kinds.some(overtaken)
+      this.stream = complete ? stream : new MediaStream([...shown, ...fresh])
+      // The microphone alone beats no preview at all, but a camera the user
+      // asked for by name and did not get must not fail in silence. Without a
+      // chosen camera there may simply be none, which is no error.
+      this.permissionError =
+        cameraError && requestedCamera ? this.permissionMessage(cameraError) : null
       this.$nextTick(() => {
         const v = this.$refs.previewEl
-        if (v) v.srcObject = stream
+        // A new microphone is no reason to restart the picture.
+        if (v && (kinds.includes('video') || !v.srcObject)) v.srcObject = this.stream
       })
+      return !kinds.some(overtaken)
+    },
+    showStarting() {
+      this.cameraStarting = this.starting.video > 0
+      this.micStarting = this.starting.audio > 0
+    },
+    deviceLabel(devices, deviceId) {
+      const device = devices.find((d) => d.deviceId === deviceId)
+      return (device && device.label) || ''
+    },
+    stopTracks(kinds) {
+      if (kinds.length > 1) {
+        this.stopStream()
+        return
+      }
+      if (kinds[0] === 'video') {
+        const v = this.$refs.previewEl
+        if (v) v.srcObject = null
+      }
+      if (!this.stream) return
+      const staying = []
+      for (const track of this.stream.getTracks()) {
+        if (track.kind === kinds[0]) track.stop()
+        else staying.push(track)
+      }
+      this.stream = staying.length ? new MediaStream(staying) : null
     },
     stopStream() {
       if (this.stream) {
@@ -404,8 +557,12 @@ export default {
     async onCameraChange(deviceId) {
       this.selectedCamera = deviceId
       try {
-        await this.acquireStream()
-        this.rememberDevice('videoinput', this.cameras, deviceId)
+        const shown = await this.acquireStream('video')
+        // Not one that was overtaken by a later choice, nor one that left the
+        // preview without a picture.
+        if (shown && (!this.cameraActive || this.hasVideo)) {
+          this.rememberDevice('videoinput', this.cameras, deviceId)
+        }
       } catch (err) {
         this.permissionError = this.permissionMessage(err)
       }
@@ -413,8 +570,9 @@ export default {
     async onMicChange(deviceId) {
       this.selectedMic = deviceId
       try {
-        await this.acquireStream()
-        this.rememberDevice('audioinput', this.mics, deviceId)
+        if (await this.acquireStream('audio')) {
+          this.rememberDevice('audioinput', this.mics, deviceId)
+        }
       } catch (err) {
         this.permissionError = this.permissionMessage(err)
       }
@@ -425,7 +583,7 @@ export default {
       this.micActive = next
       this.permissionError = null
       try {
-        await this.acquireStream()
+        await this.acquireStream('audio')
         if (next) await this.refreshPermissionStatus()
         if (this.micStatus === 'denied') this.micActive = false
       } catch (err) {
@@ -439,7 +597,7 @@ export default {
       this.cameraActive = next
       this.permissionError = null
       try {
-        await this.acquireStream()
+        await this.acquireStream('video')
         if (next) await this.refreshPermissionStatus()
         if (this.cameraStatus === 'denied') this.cameraActive = false
       } catch (err) {
@@ -526,6 +684,34 @@ export default {
 
 .prejoin__placeholder-text {
   font-size: var(--font-size-small);
+}
+
+.prejoin__starting-device {
+  display: block;
+  font-size: var(--font-size-x-small);
+  opacity: 0.85;
+}
+
+/*  Overlay at the bottom edge, so it stays readable on top of a running */
+/*  picture as well as on the empty preview. */
+.prejoin__mic-starting {
+  position: absolute;
+  bottom: var(--space-x-small);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-x-small);
+  max-width: calc(100% - var(--space-base));
+  padding: var(--space-xx-small) var(--space-small);
+  border-radius: var(--border-radius-base);
+  background: rgba(0, 0, 0, 0.65);
+  color: var(--text-color-inverse);
+  font-size: var(--font-size-small);
+}
+
+.prejoin__mic-starting-text {
+  min-width: 0;
 }
 
 .prejoin__panel {

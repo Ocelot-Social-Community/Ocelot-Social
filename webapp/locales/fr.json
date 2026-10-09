@@ -1981,6 +1981,7 @@
     "connectionPoor": "Connexion faible : {name}",
     "deviceSettings": {
       "button": "Appareils",
+      "speakerError": "Impossible de changer de haut-parleur.",
       "title": "Réglages des appareils"
     },
     "dialogLabel": "Appel vidéo de groupe",
@@ -2028,6 +2029,7 @@
       "cameraDisabled": "La caméra est désactivée.",
       "cameraOff": "Caméra : Désactivée",
       "cameraOn": "Caméra : Activée",
+      "cameraStarting": "Démarrage de la caméra…",
       "cancel": "Annuler",
       "description": "Vous êtes sur le point de rejoindre l'appel vidéo de ce groupe. Vérifiez votre caméra, votre microphone et votre haut-parleur, puis rejoignez l'appel.",
       "errorBusy": "Le périphérique est utilisé par une autre application.",
@@ -2043,6 +2045,7 @@
       "micOff": "Micro : Désactivé",
       "micOn": "Micro : Activé",
       "microphone": "Microphone",
+      "micStarting": "Démarrage du microphone…",
       "noCamera": "L'aperçu de la caméra n'est pas disponible.",
       "noDevices": "Aucun périphérique détecté",
       "permission": {

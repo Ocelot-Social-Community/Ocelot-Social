@@ -19,7 +19,12 @@
         <option v-if="cameras.length === 0" value="">
           {{ $t('videoCall.prejoin.noDevices') }}
         </option>
-        <option v-for="d in cameras" :key="d.deviceId" :value="d.deviceId">
+        <option
+          v-for="d in cameras"
+          :key="d.deviceId"
+          :value="d.deviceId"
+          :selected="d.deviceId === selectedCamera"
+        >
           {{ d.label || $t('videoCall.prejoin.unnamedCamera') }}
         </option>
       </select>
@@ -44,7 +49,12 @@
         <option v-if="mics.length === 0" value="">
           {{ $t('videoCall.prejoin.noDevices') }}
         </option>
-        <option v-for="d in mics" :key="d.deviceId" :value="d.deviceId">
+        <option
+          v-for="d in mics"
+          :key="d.deviceId"
+          :value="d.deviceId"
+          :selected="d.deviceId === selectedMic"
+        >
           {{ d.label || $t('videoCall.prejoin.unnamedMic') }}
         </option>
       </select>
@@ -53,7 +63,7 @@
         class="device-selectors__meter"
         :aria-label="$t('videoCall.prejoin.micLevel')"
       >
-        <div class="device-selectors__meter-fill" :style="{ width: micLevelPercent + '%' }" />
+        <div ref="meterFill" class="device-selectors__meter-fill" />
       </div>
     </div>
 
@@ -74,7 +84,12 @@
           <option v-if="speakers.length === 0" value="">
             {{ $t('videoCall.prejoin.noDevices') }}
           </option>
-          <option v-for="d in speakers" :key="d.deviceId" :value="d.deviceId">
+          <option
+            v-for="d in speakers"
+            :key="d.deviceId"
+            :value="d.deviceId"
+            :selected="d.deviceId === selectedSpeaker"
+          >
             {{ d.label || $t('videoCall.prejoin.unnamedSpeaker') }}
           </option>
         </select>
@@ -94,6 +109,11 @@
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 
+// Every <option> carries its own `selected`: the list and the selection
+// usually arrive in one update, and Vue sets the <select>'s `value` before it
+// has rendered the new options — the browser then shows the first entry
+// instead, which can no longer be picked because it looks picked already.
+//
 // The three device rows shared by the pre-join dialog and the in-call device
 // settings. Which devices exist and which one is selected is the parent's
 // business; the level meter and the test tone live here.
@@ -149,7 +169,6 @@ export default {
   },
   data() {
     return {
-      micLevelPercent: 0,
       testingTone: false,
     }
   },
@@ -176,6 +195,8 @@ export default {
     // watcher runs — it does so ahead of created().
     this.audioCtx = null
     this.meterRaf = null
+    // Deliberately not reactive, see setMicLevel().
+    this.micLevelPercent = 0
   },
   created() {
     this.icons = iconRegistry
@@ -205,7 +226,7 @@ export default {
           sumSq += v * v
         }
         const rms = Math.sqrt(sumSq / buffer.length)
-        this.micLevelPercent = Math.min(100, Math.round(rms * 200))
+        this.setMicLevel(Math.min(100, Math.round(rms * 200)))
         this.meterRaf = requestAnimationFrame(tick)
       }
       tick()
@@ -223,7 +244,17 @@ export default {
         }
         this.audioCtx = null
       }
-      this.micLevelPercent = 0
+      this.setMicLevel(0)
+    },
+    setMicLevel(percent) {
+      // Written straight to the element instead of through a render: the level
+      // changes many times a second, and every render also patches the
+      // <select>s and their options. Firefox rebuilds an open dropdown on each
+      // such change and then drops the user's click on an entry — with sound in
+      // the room the device could not be switched at all.
+      this.micLevelPercent = percent
+      const fill = this.$refs.meterFill
+      if (fill) fill.style.width = `${percent}%`
     },
     async playTestTone() {
       if (this.testingTone) return
@@ -397,6 +428,7 @@ export default {
 }
 
 .device-selectors__meter-fill {
+  width: 0;
   height: 100%;
   background: linear-gradient(
     90deg,

@@ -1555,10 +1555,10 @@ describe('VideoCall', () => {
         expect(JSON.parse(localStorage.getItem(STORAGE_KEY)).audioinput.deviceId).toBe('mic-2')
       })
 
-      it('routes the tiles to a new speaker without involving LiveKit', async () => {
+      it('hands a new speaker to LiveKit and remembers it', async () => {
         const { wrapper, room } = await connected()
         await wrapper.vm.switchDevice({ kind: 'audiooutput', deviceId: 'spk-2', label: 'Box' })
-        expect(room.switchActiveDevice).not.toHaveBeenCalled()
+        expect(room.switchActiveDevice).toHaveBeenCalledWith('audiooutput', 'spk-2')
         expect(wrapper.vm.speakerDeviceId).toBe('spk-2')
         expect(JSON.parse(localStorage.getItem(STORAGE_KEY)).audiooutput.deviceId).toBe('spk-2')
       })
@@ -1588,6 +1588,41 @@ describe('VideoCall', () => {
         expect(wrapper.vm.showDeviceErrorToast).toHaveBeenCalledWith('camera', err)
         expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-1')
         expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
+      })
+
+      it('treats a capture that restarted on another device as refused', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ micDeviceId: 'mic-1' })
+        wrapper.vm.showDeviceErrorToast = jest.fn()
+        room.switchActiveDevice.mockResolvedValueOnce(false)
+
+        await wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2' })
+        expect(wrapper.vm.micDeviceId).toBe('mic-1')
+        expect(wrapper.vm.showDeviceErrorToast).toHaveBeenCalledWith('mic', expect.any(Error))
+        expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
+      })
+
+      it('says so when the speaker refuses', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ speakerDeviceId: 'spk-1' })
+        wrapper.vm.$toast = { error: jest.fn() }
+        room.switchActiveDevice.mockRejectedValueOnce(deviceError('NotFoundError'))
+
+        await wrapper.vm.switchDevice({ kind: 'audiooutput', deviceId: 'spk-2' })
+        expect(wrapper.vm.speakerDeviceId).toBe('spk-1')
+        expect(wrapper.vm.$toast.error).toHaveBeenCalledWith(
+          'videoCall.deviceSettings.speakerError',
+        )
+        expect(room.switchActiveDevice).toHaveBeenLastCalledWith('audiooutput', 'spk-1')
+      })
+
+      it('survives a refusing speaker without a toast plugin', async () => {
+        const { wrapper, room } = await connected()
+        room.switchActiveDevice.mockRejectedValueOnce(deviceError('NotFoundError'))
+        await expect(
+          wrapper.vm.switchDevice({ kind: 'audiooutput', deviceId: 'spk-2' }),
+        ).resolves.toBeUndefined()
+        expect(wrapper.vm.speakerDeviceId).toBeNull()
       })
 
       it('survives the previous device refusing as well', async () => {
@@ -1656,22 +1691,37 @@ describe('VideoCall', () => {
     })
 
     describe('devices LiveKit changes on its own', () => {
-      it('follows a capture device LiveKit moved to', async () => {
+      it('follows a device LiveKit moved to', async () => {
         const { wrapper, room } = await connected()
         room.handlers.ActiveDeviceChanged('videoinput', 'cam-9')
         room.handlers.ActiveDeviceChanged('audioinput', 'mic-9')
+        room.handlers.ActiveDeviceChanged('audiooutput', 'spk-9')
         expect(wrapper.vm.cameraDeviceId).toBe('cam-9')
         expect(wrapper.vm.micDeviceId).toBe('mic-9')
+        expect(wrapper.vm.speakerDeviceId).toBe('spk-9')
       })
 
-      it('leaves the speaker and unknown kinds alone', async () => {
+      it('ignores unknown kinds and a missing device', async () => {
         const { wrapper, room } = await connected()
-        wrapper.setData({ speakerDeviceId: 'spk-1', cameraDeviceId: 'cam-1' })
-        room.handlers.ActiveDeviceChanged('audiooutput', 'spk-9')
+        wrapper.setData({ cameraDeviceId: 'cam-1' })
         room.handlers.ActiveDeviceChanged('nonsense', 'x')
         room.handlers.ActiveDeviceChanged('videoinput', '')
-        expect(wrapper.vm.speakerDeviceId).toBe('spk-1')
         expect(wrapper.vm.cameraDeviceId).toBe('cam-1')
+      })
+
+      it('tells LiveKit the speaker chosen before the call, so it does not reset it', async () => {
+        const built = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
+        built.wrapper.vm.$apollo = {
+          mutate: jest.fn().mockResolvedValue({
+            data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } },
+          }),
+        }
+        built.wrapper.setData({ speakerDeviceId: 'spk-2' })
+        await built.wrapper.vm.connect()
+        expect(built.wrapper.vm.room.opts.audioOutput).toEqual({ deviceId: 'spk-2' })
+
+        const { room } = await connected()
+        expect(room.opts).not.toHaveProperty('audioOutput')
       })
     })
 

@@ -898,6 +898,10 @@ export default {
           dynacast: true,
           videoCaptureDefaults: this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : {},
           audioCaptureDefaults: this.micDeviceId ? { deviceId: this.micDeviceId } : {},
+          // LiveKit picks the speaker anew whenever a device comes or goes.
+          // Unless it knows ours, that puts everyone back on the system
+          // default without a word.
+          ...(this.speakerDeviceId ? { audioOutput: { deviceId: this.speakerDeviceId } } : {}),
         })
         this.room = room
 
@@ -991,11 +995,10 @@ export default {
         room.on(RoomEvent.MediaDevicesChanged, () => {
           if (this.micProblem) this.restartMic()
         })
-        // LiveKit moved a capture to another device — because we asked for it,
-        // or on its own once the one in use was unplugged. The speaker is not
-        // among these: its routing is ours alone (see switchDevice).
+        // LiveKit moved to another device — because we asked for it, or on its
+        // own once the one in use was unplugged.
         room.on(RoomEvent.ActiveDeviceChanged, (kind, deviceId) => {
-          if (kind === 'audiooutput' || !DEVICE_FIELDS[kind] || !deviceId) return
+          if (!DEVICE_FIELDS[kind] || !deviceId) return
           this[DEVICE_FIELDS[kind]] = deviceId
           if (kind === 'audioinput') this.refreshMicMeter()
         })
@@ -1233,34 +1236,43 @@ export default {
       const previous = this[field]
       // Shown as selected at once; taken back below if the device refuses.
       this[field] = deviceId
-      // The speaker needs nothing from LiveKit: every tile routes its own
-      // <audio> element to speakerDeviceId. A device that is switched off
-      // right now is noted by LiveKit and used the next time it is turned on.
-      if (kind !== 'audiooutput') {
-        try {
-          await room.switchActiveDevice(kind, deviceId)
-        } catch (err) {
-          if (this.room !== room) return
-          this[field] = previous
-          this.showDeviceErrorToast(kind === 'videoinput' ? 'camera' : 'mic', err)
-          // LiveKit stops the running capture before it opens the new one, so
-          // a refused switch leaves none — go back to the one that worked.
-          if (previous) {
-            try {
-              await room.switchActiveDevice(kind, previous)
-            } catch (_e) {
-              /* the toast above already says the device is in trouble */
-            }
-          }
-          return
+      // A capture that is switched off right now is noted by LiveKit and used
+      // the next time it is turned on.
+      try {
+        // false: the capture was restarted, but not on the device asked for.
+        if ((await room.switchActiveDevice(kind, deviceId)) === false) {
+          throw new Error('Device not switched')
         }
+      } catch (err) {
         if (this.room !== room) return
+        this[field] = previous
+        this.showSwitchErrorToast(kind, err)
+        // LiveKit stops the running capture before it opens the new one, so a
+        // refused switch leaves none — go back to the one that worked.
+        if (previous) {
+          try {
+            await room.switchActiveDevice(kind, previous)
+          } catch (_e) {
+            /* the toast above already says the device is in trouble */
+          }
+        }
+        return
       }
+      if (this.room !== room) return
       saveDevicePreference(kind, { deviceId, label })
       if (kind === 'videoinput') this.refreshTiles()
       if (kind === 'audioinput') {
         this.refreshMicMeter()
         await this.recheckMicProblem(room)
+      }
+    },
+    showSwitchErrorToast(kind, err) {
+      if (kind !== 'audiooutput') {
+        this.showDeviceErrorToast(kind === 'videoinput' ? 'camera' : 'mic', err)
+        return
+      }
+      if (this.$toast && typeof this.$toast.error === 'function') {
+        this.$toast.error(this.$t('videoCall.deviceSettings.speakerError'))
       }
     },
     async recheckMicProblem(room) {

@@ -1981,6 +1981,7 @@
     "connectionPoor": "Conexão fraca: {name}",
     "deviceSettings": {
       "button": "Dispositivos",
+      "speakerError": "Não foi possível trocar o alto-falante.",
       "title": "Configurações dos dispositivos"
     },
     "dialogLabel": "Videochamada de grupo",
@@ -2028,6 +2029,7 @@
       "cameraDisabled": "A câmera está desativada.",
       "cameraOff": "Câmera: Desligada",
       "cameraOn": "Câmera: Ligada",
+      "cameraStarting": "Iniciando a câmera…",
       "cancel": "Cancelar",
       "description": "Você está prestes a entrar na chamada de vídeo deste grupo. Verifique a câmera, o microfone e o alto-falante e depois entre na chamada.",
       "errorBusy": "O dispositivo está sendo usado por outro aplicativo.",
@@ -2043,6 +2045,7 @@
       "micOff": "Microfone: Desligado",
       "micOn": "Microfone: Ligado",
       "microphone": "Microfone",
+      "micStarting": "Iniciando o microfone…",
       "noCamera": "Pré-visualização da câmera não disponível.",
       "noDevices": "Nenhum dispositivo detectado",
       "permission": {

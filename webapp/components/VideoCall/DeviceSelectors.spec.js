@@ -44,6 +44,24 @@ describe('DeviceSelectors', () => {
       expect(wrapper.find('#test-speaker option').text()).toBe('videoCall.prejoin.unnamedSpeaker')
     })
 
+    it('shows the selected device when the list and the selection arrive together', async () => {
+      // The way both dialogs get them: mounted empty, then the browser's list
+      // and the device in use at once. The selection must not fall back to
+      // the first entry of the list.
+      const { wrapper } = mountWith()
+      await wrapper.setProps({
+        cameras: devices.cameras,
+        selectedCamera: 'cam-2',
+        mics: [...devices.mics, { deviceId: 'mic-2', label: 'Headset' }],
+        selectedMic: 'mic-2',
+        speakers: [...devices.speakers, { deviceId: 'spk-2', label: 'Headset' }],
+        selectedSpeaker: 'spk-2',
+      })
+      expect(wrapper.find('#test-camera').element.value).toBe('cam-2')
+      expect(wrapper.find('#test-mic').element.value).toBe('mic-2')
+      expect(wrapper.find('#test-speaker').element.value).toBe('spk-2')
+    })
+
     it('disables a selection without devices', () => {
       const { wrapper } = mountWith()
       for (const id of ['#test-camera', '#test-mic', '#test-speaker']) {
@@ -99,6 +117,29 @@ describe('DeviceSelectors', () => {
       await wrapper.setProps({ meterStream: null })
       expect(stopMeter).toHaveBeenCalled()
       expect(wrapper.find('.device-selectors__meter').exists()).toBe(false)
+    })
+
+    it('moves the level bar without rendering the selections anew', async () => {
+      const { wrapper } = mountWith({
+        meterStream: { getAudioTracks: () => [] },
+        cameras: [{ deviceId: 'cam-1', label: 'Built-in camera' }],
+        selectedCamera: 'cam-1',
+      })
+      await wrapper.vm.$nextTick()
+      const rendered = jest.fn()
+      wrapper.vm.$on('hook:updated', rendered)
+
+      wrapper.vm.setMicLevel(42)
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('.device-selectors__meter-fill').element.style.width).toBe('42%')
+      expect(wrapper.vm.micLevelPercent).toBe(42)
+      expect(rendered).not.toHaveBeenCalled()
+    })
+
+    it('keeps the level to itself while there is no bar to show it on', () => {
+      const { wrapper } = mountWith()
+      expect(() => wrapper.vm.setMicLevel(10)).not.toThrow()
+      expect(wrapper.vm.micLevelPercent).toBe(10)
     })
 
     it('stops the meter on destroy', () => {
