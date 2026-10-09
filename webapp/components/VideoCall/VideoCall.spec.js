@@ -88,7 +88,7 @@ const stubs = {
   AvatarImage: Stub('AvatarImage'),
   PreJoin: Stub('PreJoin'),
   DeviceSettings: Stub('DeviceSettings', { props: ['cameraStarting', 'micStarting'] }),
-  VideoTile: Stub('VideoTile'),
+  VideoTile: Stub('VideoTile', { props: ['tile', 'cameraStarting', 'micStarting'] }),
   Chat: Stub('Chat'),
   RoomTitleLink: Stub('RoomTitleLink'),
   ClientOnly: Stub('ClientOnly'),
@@ -1960,6 +1960,95 @@ describe('VideoCall', () => {
         pending.finish()
         await switching
         expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+      })
+    })
+
+    describe('a device switched on with its button', () => {
+      const pendingToggle = (fn) => {
+        let finish, fail
+        fn.mockImplementationOnce(
+          () =>
+            new Promise((resolve, reject) => {
+              finish = resolve
+              fail = reject
+            }),
+        )
+        return { finish: () => finish(), fail: (err) => fail(err) }
+      }
+
+      it('counts as starting until the camera runs — switching it off does not', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: false })
+        const pending = pendingToggle(room.localParticipant.setCameraEnabled)
+        const toggling = wrapper.vm.toggleCamera()
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(1)
+        pending.finish()
+        await toggling
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+
+        const off = pendingToggle(room.localParticipant.setCameraEnabled)
+        const switchingOff = wrapper.vm.toggleCamera()
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+        off.finish()
+        await switchingOff
+      })
+
+      it('counts as starting until the microphone runs — muting does not', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ micEnabled: false })
+        const pending = pendingToggle(room.localParticipant.setMicrophoneEnabled)
+        const toggling = wrapper.vm.toggleMic()
+        expect(wrapper.vm.devicesStarting.audioinput).toBe(1)
+        pending.finish()
+        await toggling
+        expect(wrapper.vm.devicesStarting.audioinput).toBe(0)
+
+        const mute = pendingToggle(room.localParticipant.setMicrophoneEnabled)
+        const muting = wrapper.vm.toggleMic()
+        expect(wrapper.vm.devicesStarting.audioinput).toBe(0)
+        mute.finish()
+        await muting
+      })
+
+      it('stops counting when the device refuses', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: false, micEnabled: false })
+        wrapper.vm.showDeviceErrorToast = jest.fn()
+        const camera = pendingToggle(room.localParticipant.setCameraEnabled)
+        const mic = pendingToggle(room.localParticipant.setMicrophoneEnabled)
+        const toggling = Promise.all([wrapper.vm.toggleCamera(), wrapper.vm.toggleMic()])
+        camera.fail(deviceError('NotReadableError'))
+        mic.fail(deviceError('NotReadableError'))
+        await toggling
+        expect(wrapper.vm.devicesStarting).toMatchObject({ videoinput: 0, audioinput: 0 })
+      })
+
+      it('shows on the own camera tile only', async () => {
+        const { wrapper } = await connected()
+        const tile = (overrides) => ({
+          key: `${overrides.identity}/${overrides.isScreen ? 'screen' : 'main'}`,
+          name: overrides.identity,
+          isLocal: false,
+          isScreen: false,
+          ...overrides,
+        })
+        wrapper.setData({
+          tiles: [
+            tile({ identity: 'me', isLocal: true }),
+            tile({ identity: 'me', isLocal: true, isScreen: true }),
+            tile({ identity: 'bob' }),
+          ],
+          devicesStarting: { videoinput: 1, audioinput: 1, audiooutput: 0 },
+        })
+        await wrapper.vm.$nextTick()
+        const shown = wrapper
+          .findAllComponents({ name: 'VideoTile' })
+          .wrappers.map((t) => [t.props('cameraStarting'), t.props('micStarting')])
+        expect(shown).toEqual([
+          [true, true],
+          [false, false],
+          [false, false],
+        ])
       })
     })
 

@@ -174,6 +174,8 @@
               :sink-id="speakerDeviceId"
               :is-active-speaker="activeSpeakerSet.has(tile.identity)"
               :is-spotlighted="!!(spotlightTile && tile.key === spotlightTile.key)"
+              :camera-starting="isOwnCameraTile(tile) && devicesStarting.videoinput > 0"
+              :mic-starting="isOwnCameraTile(tile) && devicesStarting.audioinput > 0"
               :avatar-size="tileAvatarSize(tile)"
               :clickable="isFullscreen"
               :class="{
@@ -425,9 +427,9 @@ export default {
       showDeviceSettings: false,
       // What the browser lists, to put a name to the devices in use.
       knownDevices: [],
-      // Switches under way, per kind — a camera can take seconds to start,
-      // and the device settings say so meanwhile. Counted, as the user may
-      // pick again before the first switch is through.
+      // Devices on their way, per kind — a camera can take seconds to start,
+      // and the device settings and the own tile say so meanwhile. Counted,
+      // as the user may pick again before the first switch is through.
       devicesStarting: { videoinput: 0, audioinput: 0, audiooutput: 0 },
       // What the level meter in the device settings listens to: the very
       // microphone track the others hear.
@@ -1306,7 +1308,7 @@ export default {
       this[field] = deviceId
       // A capture that is switched off right now is noted by LiveKit and used
       // the next time it is turned on.
-      this.devicesStarting[kind]++
+      this.deviceStarts(kind)
       try {
         // false: the capture was restarted, but not on the device asked for.
         if ((await room.switchActiveDevice(kind, deviceId)) === false) {
@@ -1327,9 +1329,7 @@ export default {
         }
         return
       } finally {
-        // Not below zero: the call may have ended, and been cleaned up, while
-        // this switch was still out.
-        this.devicesStarting[kind] = Math.max(0, this.devicesStarting[kind] - 1)
+        this.deviceStarted(kind)
       }
       if (this.room !== room) return
       saveDevicePreference(kind, { deviceId, label })
@@ -1338,6 +1338,17 @@ export default {
         this.refreshMicMeter()
         await this.recheckMicProblem(room)
       }
+    },
+    deviceStarts(kind) {
+      this.devicesStarting[kind]++
+    },
+    deviceStarted(kind) {
+      // Not below zero: the call may have ended, and been cleaned up, while
+      // the device was still on its way.
+      this.devicesStarting[kind] = Math.max(0, this.devicesStarting[kind] - 1)
+    },
+    isOwnCameraTile(tile) {
+      return tile.isLocal && !tile.isScreen
     },
     showSwitchErrorToast(kind, err) {
       if (kind !== 'audiooutput') {
@@ -1529,6 +1540,7 @@ export default {
     async toggleMic() {
       if (!this.room) return
       const next = !this.micEnabled
+      if (next) this.deviceStarts('audioinput')
       try {
         await this.room.localParticipant.setMicrophoneEnabled(next)
         this.micEnabled = next
@@ -1544,11 +1556,14 @@ export default {
         // we'd otherwise leave in `this.micEnabled`.
         this.micEnabled = !!this.room.localParticipant.isMicrophoneEnabled
         this.showDeviceErrorToast('mic', err)
+      } finally {
+        if (next) this.deviceStarted('audioinput')
       }
     },
     async toggleCamera() {
       if (!this.room) return
       const next = !this.cameraEnabled
+      if (next) this.deviceStarts('videoinput')
       try {
         await this.room.localParticipant.setCameraEnabled(next)
         this.cameraEnabled = next
@@ -1558,6 +1573,8 @@ export default {
         this.cameraEnabled = !!this.room.localParticipant.isCameraEnabled
         this.refreshTiles()
         this.showDeviceErrorToast('camera', err)
+      } finally {
+        if (next) this.deviceStarted('videoinput')
       }
     },
     async toggleScreenShare() {

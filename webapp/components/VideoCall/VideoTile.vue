@@ -42,6 +42,35 @@
         {{ $t('videoCall.prejoin.cameraDisabled') }}
       </span>
     </div>
+    <!--
+      A camera or microphone of one's own that is on its way — it can take
+      seconds, and without a sign the tile just looks stuck. Before the label
+      in the DOM, so the name stays readable on top of the dimmed picture.
+    -->
+    <div
+      v-if="cameraStarting"
+      class="video-tile__starting"
+      role="status"
+      :aria-label="$t('videoCall.prejoin.cameraStarting')"
+      data-test="video-tile-camera-starting"
+    >
+      <os-spinner :size="avatarSize === 'small' ? 'lg' : '2xl'" />
+      <span v-if="avatarSize !== 'small'" class="video-tile__starting-text">
+        {{ $t('videoCall.prejoin.cameraStarting') }}
+      </span>
+    </div>
+    <div
+      v-if="micStarting"
+      class="video-tile__mic-starting"
+      role="status"
+      :aria-label="$t('videoCall.prejoin.micStarting')"
+      data-test="video-tile-mic-starting"
+    >
+      <os-spinner size="sm" />
+      <span v-if="avatarSize !== 'small'">
+        {{ $t('videoCall.prejoin.micStarting') }}
+      </span>
+    </div>
     <div class="video-tile__label">
       {{ tile.name }}
       <os-icon
@@ -74,13 +103,13 @@
 </template>
 
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import { OsIcon, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 
 export default {
   name: 'VideoTile',
-  components: { AvatarImage, OsIcon },
+  components: { AvatarImage, OsIcon, OsSpinner },
   props: {
     tile: {
       type: Object,
@@ -99,6 +128,14 @@ export default {
       default: false,
     },
     isSpotlighted: {
+      type: Boolean,
+      default: false,
+    },
+    cameraStarting: {
+      type: Boolean,
+      default: false,
+    },
+    micStarting: {
       type: Boolean,
       default: false,
     },
@@ -417,6 +454,58 @@ export default {
 .video-tile__fallback-text {
   font-size: var(--font-size-small);
   opacity: 0.85;
+}
+
+.video-tile__starting {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-x-small);
+  padding: var(--space-small);
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--text-color-inverse);
+  text-align: center;
+  pointer-events: none;
+  animation: video-tile-starting 150ms ease 300ms both;
+}
+
+.video-tile__starting-text {
+  font-size: var(--font-size-small);
+}
+
+.video-tile__mic-starting {
+  position: absolute;
+  top: var(--space-xxx-small);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xx-small);
+  max-width: calc(100% - var(--space-base));
+  padding: 2px var(--space-x-small);
+  border-radius: var(--border-radius-base);
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--text-color-inverse);
+  font-family: var(--font-family-text);
+  font-size: var(--font-size-small);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: video-tile-starting 150ms ease 300ms both;
+}
+
+/*  Held back for a moment: switching a device on is usually done at once, and */
+/*  a sign that only flashes up would be noise. */
+@keyframes video-tile-starting {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .video-tile__label {
