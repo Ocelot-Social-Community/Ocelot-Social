@@ -33,16 +33,8 @@ const login = (email) => {
   }
 }
 
-// The viewport, not the whole page: a README picture shows what a visitor sees first. Without the
-// scrollbars, which belong to the test browser rather than to the page.
-const shoot = (name) => {
-  cy.document().then((doc) => {
-    const style = doc.createElement('style')
-    style.textContent = '::-webkit-scrollbar { display: none } html { scrollbar-width: none }'
-    doc.head.appendChild(style)
-  })
-  cy.screenshot(name, { capture: 'viewport', overwrite: true })
-}
+// The viewport, not the whole page: a README picture shows what a visitor sees first.
+const shoot = (name) => cy.screenshot(name, { capture: 'viewport', overwrite: true })
 
 // Fonts, images and avatars arrive after the content; a picture taken at the first paint shows
 // placeholders.
@@ -50,8 +42,9 @@ const settle = () => cy.wait(1500)
 
 describe('README screenshots', () => {
   beforeEach(() => {
-    // The headless browser window is 1280×720; a larger viewport would be cut off at its edge.
-    cy.viewport(1280, 720)
+    // Narrower than a desktop, so the README's scaled-down pictures stay readable; the window it
+    // needs is set in cypress.config.js (README_SCREENSHOTS).
+    cy.viewport(1024, 640)
     cy.setCookie('locale', 'en')
   })
 

@@ -123,6 +123,14 @@ async function setupNodeEvents(on, config) {
       if (process.env.E2E_NETLOG_PATH) {
         launchOptions.args.push(`--log-net-log=${process.env.E2E_NETLOG_PATH}`)
       }
+      // The README screenshots (cypress/readme): a window with room for the viewport next to
+      // Cypress's own UI. In the default 1280×720 Cypress shrinks the page to fit, which adds its
+      // container's scrollbars to every picture, cuts the height, and leaves the map's WebGL canvas
+      // blank. Twice the pixel density keeps the pictures sharp where the README scales them down.
+      if (process.env.README_SCREENSHOTS) {
+        launchOptions.args.push('--window-size=1920,1080')
+        launchOptions.args.push('--force-device-scale-factor=2')
+      }
     }
     return launchOptions
   })
