@@ -220,6 +220,11 @@
       :modalData="confirmModalData"
       @close="showConfirmModal = false"
     />
+    <confirm-modal
+      v-if="showLeaveConfirmModal"
+      :modalData="leaveConfirmModalData"
+      @close="showLeaveConfirmModal = false"
+    />
   </os-card>
 </template>
 
@@ -240,11 +245,14 @@ import {
   rolesQuery,
   updateRoleMutation,
 } from '~/graphql/admin/Roles.js'
+import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
+import warnBeforeUnload from '~/mixins/warnBeforeUnload'
 
 const emptyPermissionMap = (catalog) =>
   catalog.reduce((map, permission) => ({ ...map, [permission.key]: false }), {})
 
 export default {
+  mixins: [confirmLeaveIfUnsavedChanges, warnBeforeUnload],
   components: {
     ConfirmModal,
     ConflictBanner,
@@ -377,6 +385,11 @@ export default {
     },
   },
   methods: {
+    // Asked by confirmLeaveIfUnsavedChanges and warnBeforeUnload: any role whose draft differs
+    // from the server — a tab switch keeps drafts, so not only the open one counts.
+    hasUnsavedChanges() {
+      return this.roles.some((role) => this.isDirty(role))
+    },
     // A permissionsChanged signal arrived: a role's permission set, a user's role
     // assignment, a permission-gating policy toggle, OR a rename (here or elsewhere).
     // On a rename, follow the selection to the new name and patch this client's cache
@@ -623,7 +636,9 @@ export default {
     },
     isDirty(role) {
       const form = this.forms[role.name]
-      if (!form) return false
+      // A protected role (owner) is read-only: its form shows the whole catalog while the server
+      // stores none, so comparing the two would call it changed forever.
+      if (!form || role.protected) return false
       return !samePermissions(this.selectedPermissions(form.permissions), role.permissions)
     },
     // Whether the draft differs from the server set it was BUILT from (its baseline),
