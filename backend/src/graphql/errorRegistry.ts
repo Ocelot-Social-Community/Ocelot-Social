@@ -256,6 +256,18 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'The locationName is invalid.',
   },
+  LOCATION_ID_INVALID: {
+    type: 'BAD_USER_INPUT',
+    text: 'The locationId is invalid.',
+  },
+  LOCATION_ID_COORDINATES_MISSING: {
+    type: 'BAD_USER_INPUT',
+    text: 'A locationId needs the lat and lng it was picked with.',
+  },
+  LOCATION_ID_NOT_CONFIRMED: {
+    type: 'BAD_USER_INPUT',
+    text: 'The locationId does not lie at the given coordinates.',
+  },
   // moderation
   REPORT_TARGET_IS_OWN: {
     type: 'BAD_USER_INPUT',

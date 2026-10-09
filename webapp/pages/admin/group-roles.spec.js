@@ -356,13 +356,17 @@ describe('admin/group-roles.vue', () => {
     expect(at(wrapper, 'apply').element.disabled).toBe(true)
   })
 
-  it('explains the owner role rather than offering checkboxes', async () => {
+  // Like the network owner on the roles page: the note says why, the matrix shows what — every
+  // right ticked, none of them editable. The owner template stores no list of its own.
+  it('shows the owner role with every right ticked and none editable', async () => {
     const wrapper = await advanced()
 
     await at(wrapper, 'role-tab-owner').trigger('click')
 
     expect(at(wrapper, 'owner-note').exists()).toBe(true)
-    expect(at(wrapper, 'perm-group.post.create').exists()).toBe(false)
+    const boxes = wrapper.findAll('[data-test^="perm-"]').wrappers
+    expect(boxes.length).toBeGreaterThan(0)
+    expect(boxes.every((box) => box.element.checked && box.element.disabled)).toBe(true)
   })
 
   it('saves a changed permission set', async () => {
@@ -547,5 +551,48 @@ describe('admin/group-roles.vue', () => {
     wrapper.vm.$options.apollo.templatesQuery.error.call(wrapper.vm, { message: 'boom' })
 
     expect(mocks.$toast.error).toHaveBeenCalledWith('boom')
+  })
+
+  // Leaving with an unsaved change asks first — in the app (the router guard) and when the tab is
+  // closed or reloaded (the browser's own dialog).
+  describe('leaving with unsaved changes', () => {
+    const leave = (wrapper) => {
+      const next = jest.fn()
+      ;[]
+        .concat(wrapper.vm.$options.beforeRouteLeave)
+        .forEach((hook) => hook.call(wrapper.vm, {}, {}, next))
+      return next
+    }
+
+    // This page's own handler, not a window event: other tests in this file leave pages with
+    // changes mounted, and their listeners would answer too. mixins/warnBeforeUnload.spec.js
+    // covers the listener itself.
+    const unload = (wrapper) => {
+      const event = new Event('beforeunload', { cancelable: true })
+      wrapper.vm.warnBeforeUnload(event)
+      return event
+    }
+
+    it('lets the user leave while nothing is changed', async () => {
+      const wrapper = await Wrapper()
+      const next = leave(wrapper)
+
+      expect(next).toHaveBeenCalledWith()
+      expect(unload(wrapper).defaultPrevented).toBe(false)
+      wrapper.destroy()
+    })
+
+    it('asks before leaving with an unsaved change', async () => {
+      const wrapper = await Wrapper()
+      await at(wrapper, 'switch-members-post').setChecked(false)
+
+      const next = leave(wrapper)
+      await wrapper.vm.$nextTick()
+
+      expect(next).not.toHaveBeenCalled()
+      expect(wrapper.vm.showLeaveConfirmModal).toBe(true)
+      expect(unload(wrapper).defaultPrevented).toBe(true)
+      wrapper.destroy()
+    })
   })
 })

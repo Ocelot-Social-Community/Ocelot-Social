@@ -87,7 +87,11 @@ jobs:
         with:
           target_branch: gh-pages
           build_dir: .vuepress/dist
-          author: Wolfgang Huß <vorstand@busfaktor.org>
+          # The Actions bot, not a person: GitHub attributes a commit to whichever account has its
+          # author email verified, so a personal or organisation address here puts that account into
+          # the repository's statistics with every deploy. Not the action's default either — that is
+          # `github.actor`, i.e. whoever pushed to master.
+          author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
           fqdn: docs.ocelot.social
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

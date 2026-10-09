@@ -117,6 +117,12 @@ async function setupNodeEvents(on, config) {
       // Force English locale so i18n-dependent assertions in feature files
       // match English strings regardless of the host system language.
       launchOptions.args.push('--lang=en-US')
+      // Diagnostics for the page-load hang (see support/step_definitions/common/
+      // no_service_worker.js): Chrome's own record of every request, uploaded by the workflow
+      // when a job fails. The default capture mode leaves out cookies and credentials.
+      if (process.env.E2E_NETLOG_PATH) {
+        launchOptions.args.push(`--log-net-log=${process.env.E2E_NETLOG_PATH}`)
+      }
     }
     return launchOptions
   })

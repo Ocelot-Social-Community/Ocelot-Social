@@ -651,15 +651,27 @@ describe('rights.vue', () => {
     )
   })
 
-  it('shows the matrix on demand, with the owner role explained rather than editable', async () => {
+  it('shows the matrix on demand, with the owner role holding every right, none editable', async () => {
     const wrapper = await Wrapper()
 
     await at(wrapper, 'to-advanced').trigger('click')
     expect(at(wrapper, 'rights-advanced').exists()).toBe(true)
 
+    // Like the network owner on the roles page: the note says why, the matrix shows what.
     await at(wrapper, 'role-tab-owner').trigger('click')
     expect(at(wrapper, 'owner-note').exists()).toBe(true)
-    expect(at(wrapper, 'perm-group.post.create').exists()).toBe(false)
+    const boxes = wrapper.findAll('[data-test^="perm-"]').wrappers
+    expect(boxes.length).toBeGreaterThan(0)
+    expect(boxes.every((box) => box.element.checked && box.element.disabled)).toBe(true)
+  })
+
+  // Read-only, so it can never turn into an unsaved change.
+  it('leaves the draft alone when the owner role is shown', async () => {
+    const wrapper = await Wrapper()
+    await at(wrapper, 'to-advanced').trigger('click')
+    await at(wrapper, 'role-tab-owner').trigger('click')
+
+    expect(wrapper.vm.dirty).toBe(false)
   })
 
   it('says WHY a row cannot be ticked, on the row rather than in a tooltip', async () => {
@@ -876,6 +888,49 @@ describe('rights.vue', () => {
       await wrapper.vm.$nextTick()
 
       expect(mocks.$toast.error).toHaveBeenCalledWith('refused')
+    })
+  })
+
+  // Leaving with an unsaved change asks first — in the app (the router guard) and when the tab is
+  // closed or reloaded (the browser's own dialog).
+  describe('leaving with unsaved changes', () => {
+    const leave = (wrapper) => {
+      const next = jest.fn()
+      ;[]
+        .concat(wrapper.vm.$options.beforeRouteLeave)
+        .forEach((hook) => hook.call(wrapper.vm, {}, {}, next))
+      return next
+    }
+
+    // This page's own handler, not a window event: other tests in this file leave pages with
+    // changes mounted, and their listeners would answer too. mixins/warnBeforeUnload.spec.js
+    // covers the listener itself.
+    const unload = (wrapper) => {
+      const event = new Event('beforeunload', { cancelable: true })
+      wrapper.vm.warnBeforeUnload(event)
+      return event
+    }
+
+    it('lets the user leave while nothing is changed', async () => {
+      const wrapper = await Wrapper()
+      const next = leave(wrapper)
+
+      expect(next).toHaveBeenCalledWith()
+      expect(unload(wrapper).defaultPrevented).toBe(false)
+      wrapper.destroy()
+    })
+
+    it('asks before leaving with an unsaved change', async () => {
+      const wrapper = await Wrapper()
+      await at(wrapper, 'switch-members-post').setChecked(false)
+
+      const next = leave(wrapper)
+      await wrapper.vm.$nextTick()
+
+      expect(next).not.toHaveBeenCalled()
+      expect(wrapper.vm.showLeaveConfirmModal).toBe(true)
+      expect(unload(wrapper).defaultPrevented).toBe(true)
+      wrapper.destroy()
     })
   })
 })
