@@ -172,7 +172,7 @@ describe('GroupMemberList.vue', () => {
         expect(groupsByType.other).toHaveLength(0)
       })
 
-      it('puts groups with myRole = null into other', () => {
+      it('puts groups the viewer is not a member of into other', () => {
         const groups = [
           { id: '1', visibility: 'public', ...groupRights(null) },
           { id: '2', visibility: 'closed', ...groupRights(null) },
@@ -182,7 +182,7 @@ describe('GroupMemberList.vue', () => {
         expect(groupsByType.other).toHaveLength(2)
       })
 
-      it('puts groups with myRole = pending into other, not shared', () => {
+      it('puts groups the viewer only applied to into other, not shared', () => {
         const groups = [
           { id: '1', visibility: 'closed', ...groupRights('pending') },
           { id: '2', visibility: 'public', ...groupRights('usual') },

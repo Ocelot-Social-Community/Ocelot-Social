@@ -1,27 +1,34 @@
 import { getDriver } from '@db/neo4j'
 
 export const description =
-  'Retire the per-type video call rights. Since 20261004110000-network-group-rights every role that held videoCall.create_public also holds videoCall.create_open, and one that held _closed or _hidden also holds videoCall.create_restricted; the per-type keys stayed only while the webapp still read them. They are removed from every stored role now. Down derives them back from their successors. Idempotent.'
+  'Retire the per-type video call rights. Since 20261004110000-network-group-rights every role that held videoCall.create_public also holds videoCall.create_open, and one that held _closed or _hidden also holds videoCall.create_restricted; the per-type keys stayed only while the webapp still read them. They are removed from every stored role now, and which of them a role held is kept on the role (retiredVideoCallPermissions) for the way back. Down restores exactly those, as far as the role still holds their successor; a role without that record gets videoCall.create_public back from _open and nothing from _restricted, which cannot say whether it stood for closed, hidden or both. Idempotent.'
 
 const RETIRED = ['videoCall.create_public', 'videoCall.create_closed', 'videoCall.create_hidden']
 
-// The way back: a role that may open a call a stranger can walk into could do so in a public
-// group; one that may open a restricted call could do so in a closed or a hidden one.
-const PREDECESSORS = new Map([
-  ['videoCall.create_open', ['videoCall.create_public']],
-  ['videoCall.create_restricted', ['videoCall.create_closed', 'videoCall.create_hidden']],
+// Which per-door key took over from which per-type one (20261004110000-network-group-rights).
+const SUCCESSOR = new Map([
+  ['videoCall.create_public', 'videoCall.create_open'],
+  ['videoCall.create_closed', 'videoCall.create_restricted'],
+  ['videoCall.create_hidden', 'videoCall.create_restricted'],
 ])
+
+interface RoleRights {
+  permissions: string[]
+  /** The per-type keys `up` took from this role, or null where it took none. */
+  retired: string[] | null
+}
 
 // Roles store their permission keys JSON-stringified on the node; Cypher can't rewrite that
 // cleanly, so parse, change and write back in JS within one transaction.
-async function rewriteRolePermissions(transform: (permissions: string[]) => string[]) {
+async function rewriteRolePermissions(transform: (rights: RoleRights) => RoleRights) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
   try {
     const result = await transaction.run(
       `MATCH (r:Role) WHERE coalesce(r.protected, false) = false
-       RETURN r.id AS id, r.permissions AS permissions`,
+       RETURN r.id AS id, r.permissions AS permissions,
+              r.retiredVideoCallPermissions AS retired`,
     )
     const now = new Date().toISOString()
     for (const record of result.records) {
@@ -40,14 +47,26 @@ async function rewriteRolePermissions(transform: (permissions: string[]) => stri
           `Migration aborted: role ${id} has non-array permissions JSON; fix it manually before re-running.`,
         )
       }
-      const permissions = parsed as string[]
-      const next = transform(permissions)
-      if (JSON.stringify(next) === JSON.stringify(permissions)) {
+      const storedRetired = record.get('retired') as string | null
+      const current: RoleRights = {
+        permissions: parsed as string[],
+        retired: storedRetired ? (JSON.parse(storedRetired) as string[]) : null,
+      }
+      const next = transform(current)
+      if (JSON.stringify(next) === JSON.stringify(current)) {
         continue
       }
+      // A null `retired` removes the property, as SET does with null.
       await transaction.run(
-        `MATCH (r:Role {id: $id}) SET r.permissions = $permissions, r.updatedAt = $now`,
-        { id, permissions: JSON.stringify(next), now },
+        `MATCH (r:Role {id: $id})
+         SET r.permissions = $permissions, r.retiredVideoCallPermissions = $retired,
+             r.updatedAt = $now`,
+        {
+          id,
+          permissions: JSON.stringify(next.permissions),
+          retired: next.retired ? JSON.stringify(next.retired) : null,
+          now,
+        },
       )
     }
     await transaction.commit()
@@ -63,13 +82,22 @@ async function rewriteRolePermissions(transform: (permissions: string[]) => stri
 const unique = (keys: string[]) => keys.filter((key, index) => keys.indexOf(key) === index)
 
 export async function up(_next) {
-  await rewriteRolePermissions((permissions) =>
-    permissions.filter((permission) => !RETIRED.includes(permission)),
-  )
+  await rewriteRolePermissions(({ permissions, retired }) => {
+    const removed = permissions.filter((permission) => RETIRED.includes(permission))
+    const kept = unique([...(retired ?? []), ...removed])
+    return {
+      permissions: permissions.filter((permission) => !RETIRED.includes(permission)),
+      retired: kept.length ? kept : null,
+    }
+  })
 }
 
 export async function down(_next) {
-  await rewriteRolePermissions((permissions) =>
-    unique([...permissions, ...permissions.flatMap((key) => PREDECESSORS.get(key) ?? [])]),
-  )
+  await rewriteRolePermissions(({ permissions, retired }) => {
+    // What up took, or — for a role it never saw — the one derivation that is unambiguous.
+    const candidates = retired ?? ['videoCall.create_public']
+    // Only where the successor is still held: a right taken away since must stay away.
+    const restored = candidates.filter((key) => permissions.includes(SUCCESSOR.get(key) ?? ''))
+    return { permissions: unique([...permissions, ...restored]), retired: null }
+  })
 }

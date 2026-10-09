@@ -846,7 +846,7 @@ describe('GroupProfileSlug', () => {
     })
 
     it('does not subscribe to the member list for non-members', () => {
-      mountWithGroup({ ...yogaPractice, myRole: null })
+      mountWithGroup({ ...yogaPractice, ...groupRights(null) })
       expect(callsFor(groupShowMembersChangedSubscription())).toHaveLength(0)
     })
 
@@ -880,7 +880,7 @@ describe('GroupProfileSlug', () => {
     // role, somebody is promoted, the group's door opens or closes. Non-members included —
     // their rights live in the group's `none` role.
     it('subscribes to the rights of the group, membership or not', () => {
-      mountWithGroup({ ...yogaPractice, myRole: null })
+      mountWithGroup({ ...yogaPractice, ...groupRights(null) })
 
       expect(callsFor(groupPermissionsChangedSubscription())).toHaveLength(1)
       expect(callsFor(groupPermissionsChangedSubscription())[0][0]).toMatchObject({
@@ -1231,7 +1231,7 @@ describe('GroupProfileSlug', () => {
     })
 
     it('hides the video-call button for non-members', () => {
-      const wrapper = mountWithGroup({ ...yogaPractice, myRole: null })
+      const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights(null) })
       expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(false)
     })
 

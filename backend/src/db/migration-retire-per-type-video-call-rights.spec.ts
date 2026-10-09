@@ -21,6 +21,15 @@ const permissionsOf = async (id: string): Promise<string[]> => {
   return JSON.parse(result.records[0].get('permissions') as string) as string[]
 }
 
+const retiredOf = async (id: string): Promise<string[] | null> => {
+  const result = await run(
+    `MATCH (r:Role {id: $id}) RETURN r.retiredVideoCallPermissions AS retired`,
+    { id },
+  )
+  const retired = result.records[0].get('retired') as string | null
+  return retired ? (JSON.parse(retired) as string[]) : null
+}
+
 const role = async (id: string, permissions: string[], isProtected = false) =>
   run(`CREATE (:Role {id: $id, protected: $isProtected, permissions: $permissions})`, {
     id,
@@ -66,7 +75,42 @@ describe('migration: retire-per-type-video-call-rights', () => {
     expect(await permissionsOf('retire-user')).toEqual(['post.create'])
   })
 
-  it('goes back by deriving the per-type keys from their successors', async () => {
+  it('remembers on the role which per-type keys it took', async () => {
+    await role('retire-caller', ['videoCall.create_open', 'videoCall.create_public'])
+    await role('retire-user', ['post.create'])
+
+    await up(noop)
+    await up(noop)
+
+    expect(await retiredOf('retire-caller')).toEqual(['videoCall.create_public'])
+    expect(await retiredOf('retire-user')).toBeNull()
+  })
+
+  it('goes back to exactly the keys it took, not to every type a successor covers', async () => {
+    // Only closed calls before: restricted alone cannot say so, the record can.
+    await role('retire-caller', ['videoCall.create_restricted', 'videoCall.create_closed'])
+    await up(noop)
+
+    await down(noop)
+
+    expect(await permissionsOf('retire-caller')).toEqual([
+      'videoCall.create_restricted',
+      'videoCall.create_closed',
+    ])
+    expect(await retiredOf('retire-caller')).toBeNull()
+  })
+
+  it('does not bring back a key whose successor was taken away since', async () => {
+    await role('retire-caller', ['videoCall.create_restricted', 'videoCall.create_hidden'])
+    await up(noop)
+    await run(`MATCH (r:Role {id: 'retire-caller'}) SET r.permissions = '[]'`)
+
+    await down(noop)
+
+    expect(await permissionsOf('retire-caller')).toEqual([])
+  })
+
+  it('derives only the unambiguous key for a role created after the way forward', async () => {
     await role('retire-caller', ['videoCall.create_open', 'videoCall.create_restricted'])
 
     await down(noop)
@@ -75,8 +119,6 @@ describe('migration: retire-per-type-video-call-rights', () => {
       'videoCall.create_open',
       'videoCall.create_restricted',
       'videoCall.create_public',
-      'videoCall.create_closed',
-      'videoCall.create_hidden',
     ])
   })
 })
