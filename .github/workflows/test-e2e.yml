@@ -501,6 +501,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd screenshots
+          # The artifact keeps the folder Cypress names after the spec; the README links the root.
+          find . -mindepth 2 -type f -name '*.png' -exec mv -t . -- {} +
           git init -q -b readme-screenshots
           git add -- *.png
           # The Actions bot as author, like the documentation deploy — not whoever pushed to master.
