@@ -28,6 +28,19 @@
           {{ d.label || $t('videoCall.prejoin.unnamedCamera') }}
         </option>
       </select>
+      <div v-if="startingSigns" class="device-selectors__slot">
+        <transition name="device-selectors-fade">
+          <div
+            v-if="cameraStarting"
+            class="device-selectors__starting"
+            role="status"
+            data-test="device-camera-starting"
+          >
+            <os-spinner size="sm" />
+            {{ $t('videoCall.prejoin.cameraStarting') }}
+          </div>
+        </transition>
+      </div>
     </div>
 
     <div class="device-selectors__row">
@@ -58,8 +71,30 @@
           {{ d.label || $t('videoCall.prejoin.unnamedMic') }}
         </option>
       </select>
+      <div v-if="startingSigns" class="device-selectors__slot">
+        <transition name="device-selectors-fade" mode="out-in">
+          <div
+            v-if="micStarting"
+            key="starting"
+            class="device-selectors__starting"
+            role="status"
+            data-test="device-mic-starting"
+          >
+            <os-spinner size="sm" />
+            {{ $t('videoCall.prejoin.micStarting') }}
+          </div>
+          <div
+            v-else-if="meterStream"
+            key="meter"
+            class="device-selectors__meter"
+            :aria-label="$t('videoCall.prejoin.micLevel')"
+          >
+            <div ref="meterFill" class="device-selectors__meter-fill" />
+          </div>
+        </transition>
+      </div>
       <div
-        v-if="meterStream"
+        v-else-if="meterStream"
         class="device-selectors__meter"
         :aria-label="$t('videoCall.prejoin.micLevel')"
       >
@@ -106,7 +141,7 @@
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 
 // Every <option> carries its own `selected`: the list and the selection
@@ -119,7 +154,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 // business; the level meter and the test tone live here.
 export default {
   name: 'DeviceSelectors',
-  components: { OsButton, OsIcon },
+  components: { OsButton, OsIcon, OsSpinner },
   props: {
     // Both users are never on screen together, but their ids must not collide
     // with anything else on the page either.
@@ -150,6 +185,23 @@ export default {
     selectedSpeaker: {
       type: String,
       default: '',
+    },
+    // Shows a sign below the camera and the microphone field while the device
+    // just picked is on its way — for where nothing else shows it (the pre-join
+    // dialog has its preview). No more than the height of the level bar is
+    // kept free for it, from the start, so the sign fades in and out without
+    // the layout around it moving.
+    startingSigns: {
+      type: Boolean,
+      default: false,
+    },
+    cameraStarting: {
+      type: Boolean,
+      default: false,
+    },
+    micStarting: {
+      type: Boolean,
+      default: false,
     },
     // granted | prompt | denied | unsupported — no badge when left out.
     cameraStatus: {
@@ -418,6 +470,39 @@ export default {
 .device-selectors__status--info {
   background: transparent;
   color: var(--text-color-softer);
+}
+
+/*  As high as the level bar, which shares the microphone's. The sign itself */
+/*  is taller than that: it hangs down into the gap between the rows, which */
+/*  is empty anyway. */
+.device-selectors__slot {
+  position: relative;
+  height: 6px;
+}
+
+.device-selectors__starting {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xx-small);
+  font-size: var(--font-size-small);
+  line-height: 1.2;
+  color: var(--text-color-soft);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.device-selectors-fade-enter-active,
+.device-selectors-fade-leave-active {
+  transition: opacity 150ms ease;
+}
+
+.device-selectors-fade-enter,
+.device-selectors-fade-leave-to {
+  opacity: 0;
 }
 
 .device-selectors__meter {

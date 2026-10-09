@@ -284,6 +284,8 @@
             :mic-device-id="micDeviceId"
             :speaker-device-id="speakerDeviceId"
             :meter-stream="micMeterStream"
+            :camera-starting="devicesStarting.videoinput > 0"
+            :mic-starting="devicesStarting.audioinput > 0"
             @switch="switchDevice"
             @close="closeDeviceSettings({ restoreFocus: true })"
           />
@@ -423,6 +425,10 @@ export default {
       showDeviceSettings: false,
       // What the browser lists, to put a name to the devices in use.
       knownDevices: [],
+      // Switches under way, per kind — a camera can take seconds to start,
+      // and the device settings say so meanwhile. Counted, as the user may
+      // pick again before the first switch is through.
+      devicesStarting: { videoinput: 0, audioinput: 0, audiooutput: 0 },
       // What the level meter in the device settings listens to: the very
       // microphone track the others hear.
       micMeterStream: null,
@@ -1300,6 +1306,7 @@ export default {
       this[field] = deviceId
       // A capture that is switched off right now is noted by LiveKit and used
       // the next time it is turned on.
+      this.devicesStarting[kind]++
       try {
         // false: the capture was restarted, but not on the device asked for.
         if ((await room.switchActiveDevice(kind, deviceId)) === false) {
@@ -1319,6 +1326,10 @@ export default {
           }
         }
         return
+      } finally {
+        // Not below zero: the call may have ended, and been cleaned up, while
+        // this switch was still out.
+        this.devicesStarting[kind] = Math.max(0, this.devicesStarting[kind] - 1)
       }
       if (this.room !== room) return
       saveDevicePreference(kind, { deviceId, label })
@@ -1664,6 +1675,7 @@ export default {
       this.speakerSeenAt.clear()
       this.closeDeviceSettings()
       this.knownDevices = []
+      this.devicesStarting = { videoinput: 0, audioinput: 0, audiooutput: 0 }
       this.tiles = []
       this.activeSpeakerIds = []
       this.spotlightKey = null

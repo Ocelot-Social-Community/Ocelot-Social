@@ -14,7 +14,16 @@ const stubs = {
   }),
   OsIcon: Stub('OsIcon'),
   DeviceSelectors: Stub('DeviceSelectors', {
-    props: ['cameras', 'mics', 'speakers', 'selectedCamera', 'selectedMic', 'selectedSpeaker'],
+    props: [
+      'cameras',
+      'mics',
+      'speakers',
+      'selectedCamera',
+      'selectedMic',
+      'selectedSpeaker',
+      'cameraStarting',
+      'micStarting',
+    ],
   }),
 }
 
@@ -85,6 +94,16 @@ describe('DeviceSettings', () => {
       { kind: 'audioinput', deviceId: 'mic-2', label: '' },
       { kind: 'audiooutput', deviceId: 'gone', label: '' },
     ])
+    wrapper.destroy()
+  })
+
+  it('passes on which device is starting', async () => {
+    const { wrapper, selectors } = await mountWith({ propsData: { cameraStarting: true } })
+    expect(selectors.props('cameraStarting')).toBe(true)
+    expect(selectors.props('micStarting')).toBe(false)
+    await wrapper.setProps({ cameraStarting: false, micStarting: true })
+    expect(selectors.props('cameraStarting')).toBe(false)
+    expect(selectors.props('micStarting')).toBe(true)
     wrapper.destroy()
   })
 

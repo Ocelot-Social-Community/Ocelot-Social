@@ -33,6 +33,9 @@
       :selected-mic="selectedMic"
       :selected-speaker="selectedSpeaker"
       :meter-stream="meterStream"
+      starting-signs
+      :camera-starting="cameraStarting"
+      :mic-starting="micStarting"
       @camera-change="emitSwitch('videoinput', cameras, $event)"
       @mic-change="emitSwitch('audioinput', mics, $event)"
       @speaker-change="emitSwitch('audiooutput', speakers, $event)"
@@ -67,6 +70,14 @@ export default {
     meterStream: {
       type: null,
       default: null,
+    },
+    cameraStarting: {
+      type: Boolean,
+      default: false,
+    },
+    micStarting: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

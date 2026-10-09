@@ -12,6 +12,7 @@ const stubs = {
     template: '<button class="stub-button" @click="$emit(\'click\')"><slot /></button>',
   }),
   OsIcon: Stub('OsIcon'),
+  OsSpinner: Stub('OsSpinner'),
 }
 
 const mountWith = (propsData = {}) => ({
@@ -99,6 +100,66 @@ describe('DeviceSelectors', () => {
         'videoCall.prejoin.permission.granted',
       )
       expect(wrapper.find('.device-selectors__status--denied').exists()).toBe(true)
+    })
+  })
+
+  describe('a device that is starting', () => {
+    const CAMERA = '[data-test="device-camera-starting"]'
+    const MIC = '[data-test="device-mic-starting"]'
+    const SLOT = '.device-selectors__slot'
+
+    it('keeps no line free and says nothing unless asked to', () => {
+      const { wrapper } = mountWith({ cameraStarting: true, micStarting: true })
+      expect(wrapper.find(SLOT).exists()).toBe(false)
+      expect(wrapper.find(CAMERA).exists()).toBe(false)
+      expect(wrapper.find(MIC).exists()).toBe(false)
+    })
+
+    it('keeps a line free below the camera and the microphone field from the start', () => {
+      const { wrapper } = mountWith({ startingSigns: true })
+      const slots = wrapper.findAll(SLOT)
+      expect(slots).toHaveLength(2)
+      expect(slots.at(0).element.previousElementSibling.id).toBe('test-camera')
+      expect(slots.at(1).element.previousElementSibling.id).toBe('test-mic')
+      expect(wrapper.find(CAMERA).exists()).toBe(false)
+      expect(wrapper.find(MIC).exists()).toBe(false)
+    })
+
+    it('says in the line of the camera that it is starting', async () => {
+      const { wrapper } = mountWith({ startingSigns: true, cameraStarting: true })
+      expect(wrapper.findAll(SLOT).at(0).find(CAMERA).text()).toBe(
+        'videoCall.prejoin.cameraStarting',
+      )
+      expect(wrapper.find(MIC).exists()).toBe(false)
+
+      await wrapper.setProps({ cameraStarting: false })
+      expect(wrapper.find(CAMERA).exists()).toBe(false)
+      expect(wrapper.findAll(SLOT)).toHaveLength(2)
+    })
+
+    it('says so in place of the level bar of the microphone, which returns afterwards', async () => {
+      const { wrapper } = mountWith({
+        startingSigns: true,
+        micStarting: true,
+        meterStream: { getAudioTracks: () => [] },
+      })
+      const slot = wrapper.findAll(SLOT).at(1)
+      expect(slot.find(MIC).text()).toBe('videoCall.prejoin.micStarting')
+      expect(wrapper.find('.device-selectors__meter').exists()).toBe(false)
+
+      await wrapper.setProps({ micStarting: false })
+      expect(wrapper.find(MIC).exists()).toBe(false)
+      expect(slot.find('.device-selectors__meter').exists()).toBe(true)
+
+      wrapper.vm.setMicLevel(30)
+      expect(slot.find('.device-selectors__meter-fill').element.style.width).toBe('30%')
+    })
+
+    it('keeps the line of the microphone free while it is muted', () => {
+      const { wrapper } = mountWith({ startingSigns: true })
+      const slot = wrapper.findAll(SLOT).at(1)
+      expect(slot.find(MIC).exists()).toBe(false)
+      expect(slot.find('.device-selectors__meter').exists()).toBe(false)
     })
   })
 

@@ -87,7 +87,7 @@ const stubs = {
   OsIcon: Stub('OsIcon'),
   AvatarImage: Stub('AvatarImage'),
   PreJoin: Stub('PreJoin'),
-  DeviceSettings: Stub('DeviceSettings'),
+  DeviceSettings: Stub('DeviceSettings', { props: ['cameraStarting', 'micStarting'] }),
   VideoTile: Stub('VideoTile'),
   Chat: Stub('Chat'),
   RoomTitleLink: Stub('RoomTitleLink'),
@@ -1882,6 +1882,84 @@ describe('VideoCall', () => {
         room.localParticipant.getTrackPublication.mockReturnValue(null)
         await wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-3' })
         expect(wrapper.vm.micProblem).toBe(true)
+      })
+    })
+
+    describe('a switch that takes its time', () => {
+      const pendingSwitch = (room) => {
+        let finish, fail
+        room.switchActiveDevice.mockImplementationOnce(
+          () =>
+            new Promise((resolve, reject) => {
+              finish = () => resolve(true)
+              fail = reject
+            }),
+        )
+        return { finish: () => finish(), fail: (err) => fail(err) }
+      }
+      const panel = (wrapper) => wrapper.findComponent({ name: 'DeviceSettings' })
+
+      it('tells the device settings that the camera is starting, until it runs', async () => {
+        const { wrapper, room } = await opened()
+        const pending = pendingSwitch(room)
+        const switching = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        await wrapper.vm.$nextTick()
+        expect(panel(wrapper).props('cameraStarting')).toBe(true)
+        expect(panel(wrapper).props('micStarting')).toBe(false)
+
+        pending.finish()
+        await switching
+        await wrapper.vm.$nextTick()
+        expect(panel(wrapper).props('cameraStarting')).toBe(false)
+        wrapper.destroy()
+      })
+
+      it('tells them about a starting microphone, also while it falls back after a refusal', async () => {
+        const { wrapper, room } = await opened()
+        wrapper.setData({ micDeviceId: 'mic-1' })
+        wrapper.vm.showDeviceErrorToast = jest.fn()
+        const first = pendingSwitch(room)
+        const back = pendingSwitch(room)
+        const switching = wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2' })
+        await wrapper.vm.$nextTick()
+        expect(panel(wrapper).props('micStarting')).toBe(true)
+
+        first.fail(deviceError('NotReadableError'))
+        await flushPromises()
+        // The previous microphone is on its way back.
+        expect(panel(wrapper).props('micStarting')).toBe(true)
+
+        back.finish()
+        await switching
+        await wrapper.vm.$nextTick()
+        expect(panel(wrapper).props('micStarting')).toBe(false)
+        wrapper.destroy()
+      })
+
+      it('keeps saying so while a second pick follows the first', async () => {
+        const { wrapper, room } = await opened()
+        const first = pendingSwitch(room)
+        const second = pendingSwitch(room)
+        const one = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        const two = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-3' })
+        first.finish()
+        await one
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(1)
+        second.finish()
+        await two
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+        wrapper.destroy()
+      })
+
+      it('starts from zero again after a call that ended mid-switch', async () => {
+        const { wrapper, room } = await connected()
+        const pending = pendingSwitch(room)
+        const switching = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        await wrapper.vm.cleanup()
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+        pending.finish()
+        await switching
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
       })
     })
 
