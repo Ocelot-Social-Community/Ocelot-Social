@@ -10,7 +10,8 @@
 [Ocelot.social](https://ocelot.social) is free and open source software to run your own social network — for a community, an association, a movement or a region. It is developed by a community of programmers and the operators of the networks running on it.
 
 <!-- markdownlint-disable MD033 -->
-<p style="text-align: center;">
+<!-- `align`, not CSS: GitHub strips `style` attributes from rendered markdown. -->
+<p align="center">
   <a href="https://ocelot.social" target="_blank"><img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/master/webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%"></a>
 </p>
 <!-- markdownlint-enable MD033 -->
