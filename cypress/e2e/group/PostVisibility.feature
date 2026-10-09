@@ -35,9 +35,9 @@ Feature: Posts in a closed group
 
   Scenario: An outsider cannot open it by its link
     Given I am logged in as "outsider"
-    When I navigate to page "/post/p-inside/inside-the-circle"
+    When I open the link "/post/p-inside/inside-the-circle"
     Then the page shows no post "Inside the circle"
 
   Scenario: A visitor cannot open it by its link
-    When I navigate to page "/post/p-inside/inside-the-circle"
+    When I open the link "/post/p-inside/inside-the-circle"
     Then the page shows no post "Inside the circle"
