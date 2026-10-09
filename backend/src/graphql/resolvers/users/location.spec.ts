@@ -820,15 +820,30 @@ describe('a location picked by its Mapbox id', () => {
 
     // A group or a user is in a town or a region, not at an address: the type list is the same
     // granularity their search offers, and an id of another kind never reaches Mapbox.
-    it.each([['address.123'], ['poi.123'], ['place'], ['place.abc'], ['Friesack'], ['']])(
-      'refuses %j without asking Mapbox',
-      async (locationId) => {
-        await expect(
-          resolveLocationId(locationId, friesackCentre, locationContext(), groupTypes),
-        ).rejects.toThrow('The locationId is invalid.')
-        expect(fetchSpy).not.toHaveBeenCalled()
-      },
-    )
+    it.each([
+      ['address.123'],
+      ['poi.123'],
+      ['place'],
+      ['place.'],
+      ['place.a b'],
+      ['Friesack'],
+      [''],
+    ])('refuses %j without asking Mapbox', async (locationId) => {
+      await expect(
+        resolveLocationId(locationId, friesackCentre, locationContext(), groupTypes),
+      ).rejects.toThrow('The locationId is invalid.')
+      expect(fetchSpy).not.toHaveBeenCalled()
+    })
+
+    // Numeric today, opaque by contract: the shape check must not turn away an id Mapbox issues,
+    // the confirmation is what decides.
+    it('accepts an opaque, non-numeric identifier and leaves it to the confirmation', async () => {
+      respondWith({ features: [{ ...friesack, id: 'place.berlin-de' }] })
+
+      await expect(
+        resolveLocationId('place.berlin-de', friesackCentre, locationContext(), groupTypes),
+      ).resolves.toMatchObject({ id: 'place.berlin-de' })
+    })
 
     it('needs the coordinates the place was picked with', async () => {
       await expect(

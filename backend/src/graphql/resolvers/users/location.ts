@@ -314,8 +314,10 @@ export const createOrUpdateLocations = async (
   await attachLocation(session, nodeLabel, nodeId, locationId)
 }
 
-// A Mapbox feature id: its type, a dot, a number (`place.23259194`). Linear-time, no nesting.
-const MAPBOX_FEATURE_ID = /^([a-z]+)\.[0-9]+$/
+// A Mapbox feature id: its type, a dot, an identifier — a number today (`place.23259194`), but
+// opaque by contract, so only its shape is checked here; what confirms it is Mapbox naming it at
+// its coordinates. Linear-time, no nesting.
+const MAPBOX_FEATURE_ID = /^([a-z]+)\.[\w-]+$/
 
 /**
  * The Mapbox feature the user picked, by its id — confirmed, not trusted.

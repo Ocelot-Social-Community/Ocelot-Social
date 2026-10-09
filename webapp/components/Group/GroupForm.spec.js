@@ -616,6 +616,24 @@ describe('GroupForm', () => {
         })
       })
 
+      it('sends no id for a place Mapbox returned without coordinates', async () => {
+        wrapper = mountFresh()
+        setValidFields(wrapper.vm)
+        wrapper.vm.$set(wrapper.vm.formData, 'locationName', {
+          label: 'Berlin',
+          value: 'Berlin',
+          id: 'place.berlin',
+          lat: null,
+          lng: null,
+        })
+        wrapper.find('form').trigger('submit')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.emitted('createGroup')[0][0]).toMatchObject({
+          locationName: 'Berlin',
+          locationId: null,
+        })
+      })
+
       it('sends no id for a map point nothing was found at', async () => {
         wrapper = mountFresh()
         setValidFields(wrapper.vm)

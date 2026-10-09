@@ -676,6 +676,29 @@ describe('index.vue', () => {
         )
       })
 
+      it('sends no id for a place Mapbox returned without coordinates', () => {
+        const wrapper = Wrapper()
+        wrapper.setData({
+          formData: {
+            locationName: {
+              label: 'Berlin',
+              value: 'Berlin',
+              id: 'place.berlin',
+              lat: null,
+              lng: null,
+            },
+          },
+        })
+        wrapper.find('#name').setValue('Peter')
+        wrapper.find('form').trigger('submit')
+
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            variables: expect.objectContaining({ locationName: 'Berlin', locationId: null }),
+          }),
+        )
+      })
+
       it('sends null lat/lng for unresolved, plain-text locationName', () => {
         const wrapper = Wrapper()
         wrapper.findComponent(LocationSelect).vm.$emit('input', 'Berlin')

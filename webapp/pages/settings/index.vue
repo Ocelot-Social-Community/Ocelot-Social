@@ -255,9 +255,12 @@ export default {
     // Null while the field holds typed text or a map point nothing was found at.
     formLocationId() {
       const locationValue = this.formData.locationName
+      // Only together with coordinates: the backend confirms the id at them, and a feature Mapbox
+      // returned without a centre leaves the id unconfirmable — the name path still takes it.
       return typeof locationValue === 'object' &&
         locationValue !== null &&
-        typeof locationValue.id === 'string'
+        typeof locationValue.id === 'string' &&
+        this.formLocationCoordinates
         ? locationValue.id
         : null
     },
