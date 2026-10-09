@@ -16,6 +16,7 @@ import CONFIG from '@src/config'
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@src/constants/subscriptions'
 import { serverPubsub } from '@src/context'
 import { groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
+import { markRoomTold, takeToldRooms } from '@src/livekit/toldRooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
@@ -52,12 +53,21 @@ const pollOnce = async () => {
   }
   polling = true
   try {
+    // Rooms a client was told a running call for (see toldRooms.ts): they get the truth
+    // published below even without a change. Taken BEFORE the list is fetched, so that
+    // everything told is older than the list it is corrected with — the other way round, a
+    // count told a moment after the snapshot would be "corrected" with the older state.
+    const told = takeToldRooms()
     let rooms
     try {
       rooms = await withTimeout(client.listRooms(), POLL_TIMEOUT_MS, 'listRooms')
       consecutiveFailures = 0
       // eslint-disable-next-line no-catch-all/no-catch-all
     } catch (err: unknown) {
+      // No list, no correction — keep them for the next poll.
+      for (const roomName of told) {
+        markRoomTold(roomName)
+      }
       consecutiveFailures += 1
       // Only log first few failures to avoid log spam if LiveKit is down.
       if (consecutiveFailures <= 3) {
@@ -78,7 +88,7 @@ const pollOnce = async () => {
       }
       // room.numParticipants is a number; gracefully coerce in case of bigint
       const count = Number(room.numParticipants ?? 0) || 0
-      if (lastSeenCounts.get(room.name) !== count) {
+      if (lastSeenCounts.get(room.name) !== count || told.has(room.name)) {
         lastSeenCounts.set(room.name, count)
         await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count })
       }
@@ -86,17 +96,19 @@ const pollOnce = async () => {
     // Rooms that disappeared from LiveKit's list since the last poll — emit a
     // final count: 0 so the badge clears even if the webhook room_finished
     // event never made it to us, then drop the entry so the map doesn't grow
-    // unbounded across long-lived servers with many short-lived rooms.
-    for (const [roomName, lastCount] of lastSeenCounts) {
+    // unbounded across long-lived servers with many short-lived rooms. The same goes for a
+    // room a client was told a running call for, even if this poller never saw it.
+    for (const roomName of new Set([...lastSeenCounts.keys(), ...told])) {
       if (seen.has(roomName)) {
         continue
       }
-      if (lastCount > 0) {
+      if ((lastSeenCounts.get(roomName) ?? 0) > 0 || told.has(roomName)) {
         const groupId = groupIdFromRoomName(roomName)
         // Always a group id here: only names that already yielded one are recorded in
-        // lastSeenCounts (the loop above `continue`s on a falsy groupId), so the same name cannot
-        // fail to parse on the way out.
-        /* v8 ignore next -- unreachable: lastSeenCounts only holds names with a parsable group id */
+        // lastSeenCounts (the loop above `continue`s on a falsy groupId), and the rooms a client
+        // was told about are named by roomNameForGroup — so the name cannot fail to parse on the
+        // way out.
+        /* v8 ignore next -- unreachable: both sources only hold names with a parsable group id */
         if (groupId) {
           await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count: 0 })
         }
@@ -162,4 +174,5 @@ export const stopLiveKitPoller = () => {
   client = null
   consecutiveFailures = 0
   lastSeenCounts.clear()
+  takeToldRooms()
 }

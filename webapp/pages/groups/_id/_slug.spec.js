@@ -92,6 +92,7 @@ describe('GroupProfileSlug', () => {
     'auth/isModerator': () => false,
     'categories/categories': () => [{ id: 'cat1' }],
     'videoCall/enabled': () => false,
+    'videoCall/showVideoCall': () => false,
   }
 
   const actions = {
@@ -1324,6 +1325,40 @@ describe('GroupProfileSlug', () => {
       expect(mocks.$toast.error).toHaveBeenCalledWith('permissions.deniedHint')
       expect(consoleError).toHaveBeenCalled()
       consoleError.mockRestore()
+    })
+
+    describe('after the viewer hung up', () => {
+      const hangUp = (wrapper) =>
+        wrapper.vm.$options.watch.videoCallOpen.call(wrapper.vm, false, true)
+
+      it('fetches the count anew: the one from arriving here still included the viewer', async () => {
+        const wrapper = mountWithGroup(yogaPractice)
+        const refetch = jest.fn().mockResolvedValue()
+        wrapper.vm.$apollo.queries.videoCallParticipantCount = { refetch }
+        await hangUp(wrapper)
+        expect(refetch).toHaveBeenCalledTimes(1)
+      })
+
+      it('leaves the count alone when a call opens', async () => {
+        const wrapper = mountWithGroup(yogaPractice)
+        const refetch = jest.fn().mockResolvedValue()
+        wrapper.vm.$apollo.queries.videoCallParticipantCount = { refetch }
+        await wrapper.vm.$options.watch.videoCallOpen.call(wrapper.vm, true, false)
+        expect(refetch).not.toHaveBeenCalled()
+      })
+
+      it('keeps the count it has when fetching fails', async () => {
+        const wrapper = mountWithGroup(yogaPractice)
+        wrapper.setData({ videoCallParticipantCount: 1 })
+        wrapper.vm.$apollo.queries.videoCallParticipantCount = {
+          refetch: jest.fn().mockRejectedValue(new Error('network down')),
+        }
+        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+        await hangUp(wrapper)
+        expect(wrapper.vm.videoCallParticipantCount).toBe(1)
+        expect(consoleError).toHaveBeenCalled()
+        consoleError.mockRestore()
+      })
     })
 
     // Regression guard: even with the "happy" combination (public group,

@@ -67,6 +67,7 @@ vi.mock('@src/config', () => ({
 // Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
 // registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { startLiveKitPoller, stopLiveKitPoller } = await import('./poller')
+const { noteCountTold, takeToldRooms } = await import('./toldRooms')
 
 const setEnabled = () => {
   mockConfig.LIVEKIT_ENABLED = true
@@ -280,6 +281,96 @@ describe('poll tick', () => {
     await vi.advanceTimersByTimeAsync(15_000)
 
     expect(mockPublish).not.toHaveBeenCalled()
+  })
+
+  // A client can be told a count this poller never sees: it asks while someone is in a room
+  // that is gone again before the next poll. toldRooms.ts explains why that needs correcting.
+  describe('rooms a client was told a running call for', () => {
+    it('publishes count: 0 for one that is gone, although the poller never saw it', async () => {
+      startLiveKitPoller()
+      await vi.advanceTimersByTimeAsync(5_000)
+
+      expect(mockPublish).not.toHaveBeenCalled()
+
+      noteCountTold('group-a', 1)
+      mockListRooms.mockResolvedValueOnce([])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockPublish).toHaveBeenCalledTimes(1)
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'a',
+        count: 0,
+      })
+
+      // Corrected once, not on every poll from then on.
+      mockPublish.mockClear()
+      mockListRooms.mockResolvedValueOnce([])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockPublish).not.toHaveBeenCalled()
+    })
+
+    it('publishes count: 0 for one the poller had seen empty', async () => {
+      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 0 }])
+      startLiveKitPoller()
+      await vi.advanceTimersByTimeAsync(5_000)
+      mockPublish.mockClear()
+
+      // Someone joined, a client asked, and they left again — all between two polls.
+      noteCountTold('group-a', 1)
+      mockListRooms.mockResolvedValueOnce([])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'a',
+        count: 0,
+      })
+    })
+
+    it('publishes the current count of one that is still there, changed or not', async () => {
+      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 1 }])
+      startLiveKitPoller()
+      await vi.advanceTimersByTimeAsync(5_000)
+      mockPublish.mockClear()
+
+      // The client was told 2; one of the two left before this poll.
+      noteCountTold('group-a', 2)
+      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 1 }])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockPublish).toHaveBeenCalledTimes(1)
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'a',
+        count: 1,
+      })
+    })
+
+    it('keeps them for the next poll when LiveKit cannot be asked', async () => {
+      startLiveKitPoller()
+      await vi.advanceTimersByTimeAsync(5_000)
+
+      noteCountTold('group-a', 1)
+      mockListRooms.mockRejectedValueOnce(new Error('down'))
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockPublish).not.toHaveBeenCalled()
+
+      mockListRooms.mockResolvedValueOnce([])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'a',
+        count: 0,
+      })
+    })
+
+    it('forgets them when the poller stops', () => {
+      startLiveKitPoller()
+      noteCountTold('group-a', 1)
+      stopLiveKitPoller()
+
+      expect(takeToldRooms().size).toBe(0)
+    })
   })
 
   it('coerces undefined numParticipants to 0', async () => {
