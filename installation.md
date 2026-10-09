@@ -69,7 +69,7 @@ $ docker compose -f docker-compose.yml up
 ```
 
 This will start all required Docker containers.  
-Make sure your database is running on `http://localhost:7474/browser/`.
+In development, make sure your database is running on `http://localhost:7474/browser/` — production publishes only the Bolt port `7687`, not the Neo4j Browser.
 
 Prepare database once before you start by running the following command in a second terminal:
 
