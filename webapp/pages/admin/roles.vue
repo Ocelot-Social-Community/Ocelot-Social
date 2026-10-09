@@ -386,9 +386,13 @@ export default {
   },
   methods: {
     // Asked by confirmLeaveIfUnsavedChanges and warnBeforeUnload: any role whose draft differs
-    // from the server — a tab switch keeps drafts, so not only the open one counts.
+    // from the server — a tab switch keeps drafts, so not only the open one counts — and a name
+    // typed for a new role or for a rename that was not confirmed yet.
     hasUnsavedChanges() {
-      return this.roles.some((role) => this.isDirty(role))
+      const namingNewRole = this.creating && this.newRole.name.trim() !== ''
+      const renamingRole =
+        this.renaming && !!this.activeRole && this.renameValue.trim() !== this.activeRole.name
+      return namingNewRole || renamingRole || this.roles.some((role) => this.isDirty(role))
     },
     // A permissionsChanged signal arrived: a role's permission set, a user's role
     // assignment, a permission-gating policy toggle, OR a rename (here or elsewhere).
