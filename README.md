@@ -1,11 +1,17 @@
 # Ocelot.Social
 
-[![Backend Test CI](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-backend.yml/badge.svg?branch=master)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-backend.yml)
-[![Webapp Test CI](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-webapp.yml/badge.svg?branch=master)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-webapp.yml)
-[![E2E Test CI](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-e2e.yml/badge.svg?branch=master)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-e2e.yml)
-[![Build Status Publish](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/publish.yml/badge.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions)
+[![Backend](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-backend.yml/badge.svg?branch=master)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-backend.yml?query=branch%3Amaster)
+[![Webapp](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-webapp.yml/badge.svg?branch=master)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-webapp.yml?query=branch%3Amaster)
+[![End-to-end](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-e2e.yml/badge.svg?branch=master)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-e2e.yml?query=branch%3Amaster)
+[![UI library](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/ui-test.yml/badge.svg?branch=master)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/ui-test.yml?query=branch%3Amaster)
+[![Publish](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/publish.yml/badge.svg?branch=master)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/publish.yml?query=branch%3Amaster)
+
+[![Release](https://img.shields.io/github/v/release/Ocelot-Social-Community/Ocelot-Social?label=release)](https://github.com/Ocelot-Social-Community/Ocelot-Social/releases/latest)
+[![@ocelot-social/ui](https://img.shields.io/npm/v/@ocelot-social/ui?label=%40ocelot-social%2Fui)](https://www.npmjs.com/package/@ocelot-social/ui)
+[![@ocelot-social/branding](https://img.shields.io/npm/v/@ocelot-social/branding?label=%40ocelot-social%2Fbranding)](https://www.npmjs.com/package/@ocelot-social/branding)
+[![Documentation](https://img.shields.io/badge/docs-docs.ocelot.social-blue)](https://docs.ocelot.social)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/LICENSE.md)
-[![Discord Channel](https://img.shields.io/discord/489522408076738561.svg)](https://discord.gg/AJSX9DCSUA)
+[![Discord](https://img.shields.io/discord/489522408076738561.svg?label=discord)](https://discord.gg/AJSX9DCSUA)
 
 [Ocelot.social](https://ocelot.social) is free and open source software to run your own social network — for a community, an association, a movement or a region. It is developed by a community of programmers and the operators of the networks running on it.
 
