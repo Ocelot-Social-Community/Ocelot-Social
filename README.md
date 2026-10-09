@@ -118,7 +118,7 @@ Would you like to run a network of your own, or join one?
 
 ## For Developers
 
-New here? Have a look at our short [developer welcome video](https://www.youtube.com/watch?v=gZSL6KvBIiY&list=PLFMD5liPP01kbuReHxYXxv_1fI5rIgS1f&index=1).
+New here? The [documentation](https://docs.ocelot.social) covers the backend, the webapp, testing and deployment; questions are welcome on [Discord](https://discord.gg/AJSX9DCSUA).
 
 ### Quick Start
 
