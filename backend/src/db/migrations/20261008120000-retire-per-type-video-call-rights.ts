@@ -14,7 +14,7 @@ const SUCCESSOR = new Map([
 
 interface RoleRights {
   permissions: string[]
-  /** The per-type keys `up` took from this role, or null where it took none. */
+  /** The per-type keys `up` took from this role ([] for none), or null for a role it never saw. */
   retired: string[] | null
 }
 
@@ -50,7 +50,7 @@ async function rewriteRolePermissions(transform: (rights: RoleRights) => RoleRig
       const storedRetired = record.get('retired') as string | null
       const current: RoleRights = {
         permissions: parsed as string[],
-        retired: storedRetired ? (JSON.parse(storedRetired) as string[]) : null,
+        retired: storedRetired === null ? null : (JSON.parse(storedRetired) as string[]),
       }
       const next = transform(current)
       if (JSON.stringify(next) === JSON.stringify(current)) {
@@ -64,7 +64,7 @@ async function rewriteRolePermissions(transform: (rights: RoleRights) => RoleRig
         {
           id,
           permissions: JSON.stringify(next.permissions),
-          retired: next.retired ? JSON.stringify(next.retired) : null,
+          retired: next.retired === null ? null : JSON.stringify(next.retired),
           now,
         },
       )
@@ -84,10 +84,11 @@ const unique = (keys: string[]) => keys.filter((key, index) => keys.indexOf(key)
 export async function up(_next) {
   await rewriteRolePermissions(({ permissions, retired }) => {
     const removed = permissions.filter((permission) => RETIRED.includes(permission))
-    const kept = unique([...(retired ?? []), ...removed])
+    // Recorded on every role up has seen, empty or not: an empty record says "held none of
+    // them", where a missing one would let down fall back to deriving _public.
     return {
       permissions: permissions.filter((permission) => !RETIRED.includes(permission)),
-      retired: kept.length ? kept : null,
+      retired: unique([...(retired ?? []), ...removed]),
     }
   })
 }

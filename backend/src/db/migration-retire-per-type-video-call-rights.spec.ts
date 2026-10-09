@@ -27,7 +27,7 @@ const retiredOf = async (id: string): Promise<string[] | null> => {
     { id },
   )
   const retired = result.records[0].get('retired') as string | null
-  return retired ? (JSON.parse(retired) as string[]) : null
+  return retired === null ? null : (JSON.parse(retired) as string[])
 }
 
 const role = async (id: string, permissions: string[], isProtected = false) =>
@@ -83,7 +83,7 @@ describe('migration: retire-per-type-video-call-rights', () => {
     await up(noop)
 
     expect(await retiredOf('retire-caller')).toEqual(['videoCall.create_public'])
-    expect(await retiredOf('retire-user')).toBeNull()
+    expect(await retiredOf('retire-user')).toEqual([])
   })
 
   it('goes back to exactly the keys it took, not to every type a successor covers', async () => {
@@ -108,6 +108,18 @@ describe('migration: retire-per-type-video-call-rights', () => {
     await down(noop)
 
     expect(await permissionsOf('retire-caller')).toEqual([])
+  })
+
+  it('brings back nothing for a role that held no per-type key when it went forward', async () => {
+    // _open without _public: given by hand after 20261004110000. The empty record keeps the
+    // fallback for unseen roles from granting it _public on the way back.
+    await role('retire-caller', ['videoCall.create_open'])
+    await up(noop)
+
+    await down(noop)
+
+    expect(await permissionsOf('retire-caller')).toEqual(['videoCall.create_open'])
+    expect(await retiredOf('retire-caller')).toBeNull()
   })
 
   it('derives only the unambiguous key for a role created after the way forward', async () => {
