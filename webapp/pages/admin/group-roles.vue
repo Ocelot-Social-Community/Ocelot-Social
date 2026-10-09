@@ -76,14 +76,15 @@
           {{ $t('group.rights.pendingUnreachable') }}
         </p>
 
+        <!-- The owner role is shown like the network owner: every right ticked, none editable. -->
         <p v-if="activeRole && activeRole.protected" class="note" data-test="owner-note">
           {{ $t('admin.groupRoles.ownerHoldsEverything') }}
         </p>
 
         <permission-matrix
-          v-else-if="activeRole"
+          v-if="activeRole"
           :permissions="catalog"
-          :granted="draft"
+          :granted="grantedOnScreen"
           :diff="hoverDiff"
           :highlight="highlightedRights"
           :group-label="(name) => $t(`permissions.sections.${name}`)"
@@ -217,7 +218,12 @@ export default {
       this.activeTemplateName = name
     },
     rowDisabled(permission) {
-      return this.saving || this.isMandatory(permission) || this.isMoot(permission)
+      return (
+        this.saving ||
+        !!this.activeRole?.protected ||
+        this.isMandatory(permission) ||
+        this.isMoot(permission)
+      )
     },
     async storeRole(name, permissions, label) {
       const { data } = await this.$apollo.mutate({

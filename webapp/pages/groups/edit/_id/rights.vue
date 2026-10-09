@@ -95,23 +95,19 @@
 
         <!-- A role nobody can reach: every right on it is editable and none of it applies to
              anybody. Said here rather than left to the greyed rows, which showed WHAT was
-             blocked and never why.
-
-             Above the owner note on purpose: that one and the matrix are a v-if/v-else pair,
-             and anything between them breaks the pairing — which is how the matrix briefly
-             rendered for the owner role as well. -->
+             blocked and never why. -->
         <p v-if="pendingUnreachable" class="role-note" data-test="pending-unreachable">
           {{ $t('group.rights.pendingUnreachable') }}
         </p>
 
+        <!-- The owner role is shown like the network owner: every right ticked, none editable. -->
         <p v-if="activeRole.protected" class="role-note" data-test="owner-note">
           {{ $t('group.rights.ownerHoldsEverything') }}
         </p>
 
         <permission-matrix
-          v-else
           :permissions="catalog"
-          :granted="draft"
+          :granted="grantedOnScreen"
           :diff="hoverDiff"
           :highlight="highlightedRights"
           :group-label="(name) => $t(`permissions.sections.${name}`)"
@@ -271,6 +267,7 @@ export default {
     rowDisabled(permission) {
       return (
         !this.canEdit ||
+        this.activeRole?.protected ||
         !this.grantable(permission) ||
         this.isMandatory(permission) ||
         this.isMoot(permission)

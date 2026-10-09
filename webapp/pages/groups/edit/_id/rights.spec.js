@@ -651,15 +651,27 @@ describe('rights.vue', () => {
     )
   })
 
-  it('shows the matrix on demand, with the owner role explained rather than editable', async () => {
+  it('shows the matrix on demand, with the owner role holding every right, none editable', async () => {
     const wrapper = await Wrapper()
 
     await at(wrapper, 'to-advanced').trigger('click')
     expect(at(wrapper, 'rights-advanced').exists()).toBe(true)
 
+    // Like the network owner on the roles page: the note says why, the matrix shows what.
     await at(wrapper, 'role-tab-owner').trigger('click')
     expect(at(wrapper, 'owner-note').exists()).toBe(true)
-    expect(at(wrapper, 'perm-group.post.create').exists()).toBe(false)
+    const boxes = wrapper.findAll('[data-test^="perm-"]').wrappers
+    expect(boxes.length).toBeGreaterThan(0)
+    expect(boxes.every((box) => box.element.checked && box.element.disabled)).toBe(true)
+  })
+
+  // Read-only, so it can never turn into an unsaved change.
+  it('leaves the draft alone when the owner role is shown', async () => {
+    const wrapper = await Wrapper()
+    await at(wrapper, 'to-advanced').trigger('click')
+    await at(wrapper, 'role-tab-owner').trigger('click')
+
+    expect(wrapper.vm.dirty).toBe(false)
   })
 
   it('says WHY a row cannot be ticked, on the row rather than in a tooltip', async () => {
