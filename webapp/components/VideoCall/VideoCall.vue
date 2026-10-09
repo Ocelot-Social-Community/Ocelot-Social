@@ -252,6 +252,42 @@
             {{ screenShareLabel }}
           </template>
         </os-button>
+        <!--
+          Button and panel share one wrapper so a click on either counts as
+          "inside" for the click-outside handling. The wrapper is not
+          positioned: the panel anchors to the whole control bar.
+        -->
+        <div ref="deviceSettingsEl" class="video-call__device-settings">
+          <os-button
+            ref="deviceSettingsToggle"
+            v-tooltip="iconOnlyTooltip(deviceSettingsLabel)"
+            data-test="video-call-device-settings-toggle"
+            :variant="showDeviceSettings ? 'primary' : 'default'"
+            appearance="outline"
+            :size="iconOnly ? 'sm' : 'md'"
+            :circle="iconOnly"
+            :aria-label="deviceSettingsLabel"
+            :aria-expanded="showDeviceSettings.toString()"
+            @click="toggleDeviceSettings"
+          >
+            <template #icon>
+              <os-icon :icon="icons.cogs" />
+            </template>
+            <template v-if="!iconOnly">
+              {{ deviceSettingsLabel }}
+            </template>
+          </os-button>
+          <device-settings
+            v-if="showDeviceSettings"
+            class="video-call__device-settings-panel"
+            :camera-device-id="cameraDeviceId"
+            :mic-device-id="micDeviceId"
+            :speaker-device-id="speakerDeviceId"
+            :meter-stream="micMeterStream"
+            @switch="switchDevice"
+            @close="closeDeviceSettings({ restoreFocus: true })"
+          />
+        </div>
         <os-button
           v-if="!isMobile"
           v-tooltip="iconOnlyTooltip(chatLabel)"
@@ -302,6 +338,8 @@ import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import RoomTitleLink from '~/components/_new/generic/RoomTitleLink/RoomTitleLink'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
+import DeviceSettings from './DeviceSettings.vue'
+import { saveDevicePreference } from './devicePreferences'
 
 // How long a participant keeps the speaking treatment after LiveKit drops them
 // from the active-speaker list. LiveKit reports raw audio activity, so it lets
@@ -333,11 +371,19 @@ const TILE_ASPECT_RATIO = 16 / 9
 const LARGE_AVATAR_MIN_CELL_HEIGHT = 200
 const LARGE_AVATAR_MIN_CELL_WIDTH = 160
 
+// Which piece of our state holds the device of each MediaDeviceKind.
+const DEVICE_FIELDS = {
+  videoinput: 'cameraDeviceId',
+  audioinput: 'micDeviceId',
+  audiooutput: 'speakerDeviceId',
+}
+
 export default {
   name: 'VideoCall',
   components: {
     VideoTile,
     PreJoin,
+    DeviceSettings,
     OsButton,
     OsIcon,
     Chat,
@@ -374,6 +420,10 @@ export default {
       // videos back, so we stop deciding for them until the next call.
       audioOnly: false,
       audioOnlyDismissed: false,
+      showDeviceSettings: false,
+      // What the level meter in the device settings listens to: the very
+      // microphone track the others hear.
+      micMeterStream: null,
     }
   },
   computed: {
@@ -420,6 +470,9 @@ export default {
       return this.screenShareEnabled
         ? this.$t('videoCall.stopScreenShare')
         : this.$t('videoCall.startScreenShare')
+    },
+    deviceSettingsLabel() {
+      return this.$t('videoCall.deviceSettings.button')
     },
     chatLabel() {
       return this.chatOpenForThisGroup
@@ -659,6 +712,7 @@ export default {
   },
   beforeDestroy() {
     this.disconnectStageObserver()
+    this.closeDeviceSettings()
     this.cleanup()
   },
   methods: {
@@ -937,6 +991,14 @@ export default {
         room.on(RoomEvent.MediaDevicesChanged, () => {
           if (this.micProblem) this.restartMic()
         })
+        // LiveKit moved a capture to another device — because we asked for it,
+        // or on its own once the one in use was unplugged. The speaker is not
+        // among these: its routing is ours alone (see switchDevice).
+        room.on(RoomEvent.ActiveDeviceChanged, (kind, deviceId) => {
+          if (kind === 'audiooutput' || !DEVICE_FIELDS[kind] || !deviceId) return
+          this[DEVICE_FIELDS[kind]] = deviceId
+          if (kind === 'audioinput') this.refreshMicMeter()
+        })
 
         // LiveKit defaults to a 15 s WebSocket + 15 s peer-connection timeout
         // plus retries — that's a long time to leave the user staring at
@@ -1117,6 +1179,99 @@ export default {
         this.$toast.error(message)
       }
     },
+    toggleDeviceSettings() {
+      if (this.showDeviceSettings) this.closeDeviceSettings()
+      else this.openDeviceSettings()
+    },
+    openDeviceSettings() {
+      this.showDeviceSettings = true
+      this.refreshMicMeter()
+      // Capture phase: a click that something else swallows still closes the
+      // panel.
+      document.addEventListener('click', this.onDocumentClick, true)
+      document.addEventListener('keydown', this.onDocumentKeydown)
+    },
+    closeDeviceSettings({ restoreFocus = false } = {}) {
+      document.removeEventListener('click', this.onDocumentClick, true)
+      document.removeEventListener('keydown', this.onDocumentKeydown)
+      this.showDeviceSettings = false
+      this.micMeterStream = null
+      if (!restoreFocus) return
+      const toggle = this.$refs.deviceSettingsToggle
+      const el = toggle && toggle.$el
+      if (el && typeof el.focus === 'function') el.focus()
+    },
+    onDocumentClick(event) {
+      const el = this.$refs.deviceSettingsEl
+      if (el && el.contains(event.target)) return
+      this.closeDeviceSettings()
+    },
+    onDocumentKeydown(event) {
+      if (event.key === 'Escape') this.closeDeviceSettings({ restoreFocus: true })
+    },
+    localMicTrack() {
+      const room = this.room
+      const Track = this.Track
+      if (!room || !Track) return null
+      const pub = room.localParticipant.getTrackPublication(Track.Source.Microphone)
+      return (pub && pub.track) || null
+    },
+    refreshMicMeter() {
+      if (!this.showDeviceSettings) return
+      const track = this.localMicTrack()
+      const mediaTrack = track && track.mediaStreamTrack
+      // A muted microphone has no level worth showing.
+      this.micMeterStream =
+        this.micEnabled && mediaTrack && typeof MediaStream !== 'undefined'
+          ? new MediaStream([mediaTrack])
+          : null
+    },
+    async switchDevice({ kind, deviceId, label }) {
+      const room = this.room
+      const field = DEVICE_FIELDS[kind]
+      if (!room || !field || !deviceId || this[field] === deviceId) return
+      const previous = this[field]
+      // Shown as selected at once; taken back below if the device refuses.
+      this[field] = deviceId
+      // The speaker needs nothing from LiveKit: every tile routes its own
+      // <audio> element to speakerDeviceId. A device that is switched off
+      // right now is noted by LiveKit and used the next time it is turned on.
+      if (kind !== 'audiooutput') {
+        try {
+          await room.switchActiveDevice(kind, deviceId)
+        } catch (err) {
+          if (this.room !== room) return
+          this[field] = previous
+          this.showDeviceErrorToast(kind === 'videoinput' ? 'camera' : 'mic', err)
+          // LiveKit stops the running capture before it opens the new one, so
+          // a refused switch leaves none — go back to the one that worked.
+          if (previous) {
+            try {
+              await room.switchActiveDevice(kind, previous)
+            } catch (_e) {
+              /* the toast above already says the device is in trouble */
+            }
+          }
+          return
+        }
+        if (this.room !== room) return
+      }
+      saveDevicePreference(kind, { deviceId, label })
+      if (kind === 'videoinput') this.refreshTiles()
+      if (kind === 'audioinput') {
+        this.refreshMicMeter()
+        await this.recheckMicProblem(room)
+      }
+    },
+    async recheckMicProblem(room) {
+      // LiveKit reports a new microphone that is silent, but not one that
+      // works — without this the warning about the old one would stay.
+      if (!this.micProblem || !this.micEnabled) return
+      const track = this.localMicTrack()
+      if (!track) return
+      const silent = await track.checkForSilence()
+      if (this.room === room) this.micProblem = this.micEnabled && silent
+    },
     prefetchJoin() {
       const groupId = this.groupId
       if (!groupId) return
@@ -1280,6 +1435,8 @@ export default {
         // outcome must not leak into the next one.
         if (this.room !== room) return
         this.micProblem = this.micEnabled && silent
+        // The restart swapped the MediaStreamTrack under the publication.
+        this.refreshMicMeter()
       } catch (err) {
         if (this.room === room) this.showDeviceErrorToast('mic', err)
       }
@@ -1292,6 +1449,7 @@ export default {
         this.micEnabled = next
         // A muted microphone is silent on purpose.
         if (!next) this.micProblem = false
+        this.refreshMicMeter()
       } catch (err) {
         // Re-sync from LiveKit — a partial failure (track published, then
         // permission revoked) can leave the real state out of sync with what
@@ -1421,6 +1579,7 @@ export default {
         this.speakerHoldTimer = null
       }
       this.speakerSeenAt.clear()
+      this.closeDeviceSettings()
       this.tiles = []
       this.activeSpeakerIds = []
       this.spotlightKey = null
@@ -1757,6 +1916,8 @@ export default {
 }
 
 .video-call__controls {
+  /*  Anchor for the device settings panel. */
+  position: relative;
   display: flex;
   gap: var(--space-x-small);
   padding: var(--space-x-small) var(--space-small);
@@ -1766,10 +1927,33 @@ export default {
   justify-content: center;
 }
 
+.video-call__device-settings {
+  display: flex;
+}
+
+.video-call__device-settings-panel {
+  position: absolute;
+  bottom: calc(100% + var(--space-x-small));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(380px, calc(100% - 2 * var(--space-x-small)));
+  /*  Whatever the page header, the call header and the control bar leave. */
+  max-height: calc(100vh - var(--header-height, 0px) - var(--footer-height, 0px) - 140px);
+  /*  Above the notices and speaker chips that overlay the stage. */
+  z-index: 10;
+}
+
 .video-call--minimized .video-call__controls {
   /*  Tighter spacing for the icon-only row in the parked window. */
   padding: var(--space-xxx-small) var(--space-x-small);
   gap: var(--space-xxx-small);
+}
+
+.video-call--minimized .video-call__device-settings-panel {
+  /*  The parked window clips its content, so the panel has to fit between */
+  /*  the window's top edge and the control bar: 280px minus the bar. */
+  bottom: calc(100% + var(--space-xxx-small));
+  max-height: 232px;
 }
 
 @media (--vp-mobile) {

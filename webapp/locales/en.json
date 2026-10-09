@@ -1979,6 +1979,10 @@
     "connecting": "Connecting…",
     "connectionLost": "Connection lost: {name}",
     "connectionPoor": "Weak connection: {name}",
+    "deviceSettings": {
+      "button": "Devices",
+      "title": "Device settings"
+    },
     "dialogLabel": "Group video call",
     "disableCamera": "Turn camera off",
     "enableAudio": "Enable sound",

@@ -149,6 +149,27 @@ describe('PreJoin', () => {
       expect(payload.micEnabled).toBe(true)
     })
 
+    it('passes the selected devices along even while they are switched off', async () => {
+      const { wrapper } = mountWith()
+      wrapper.setData({
+        cameraActive: false,
+        micActive: false,
+        cameraStatus: 'granted',
+        micStatus: 'granted',
+        selectedCamera: 'cam-1',
+        selectedMic: 'mic-1',
+      })
+      await wrapper.vm.$nextTick()
+      wrapper.vm.emitJoin()
+      expect(wrapper.emitted('join')[0][0]).toMatchObject({
+        cameraDeviceId: 'cam-1',
+        micDeviceId: 'mic-1',
+        speakerDeviceId: null,
+        cameraEnabled: false,
+        micEnabled: false,
+      })
+    })
+
     it('disables when status is denied', async () => {
       const { wrapper } = mountWith()
       wrapper.setData({
@@ -510,7 +531,7 @@ describe('PreJoin', () => {
     it('onCameraChange updates selectedCamera and triggers acquireStream', async () => {
       const { wrapper } = mountWith()
       wrapper.vm.acquireStream = jest.fn().mockResolvedValue()
-      await wrapper.vm.onCameraChange({ target: { value: 'cam-2' } })
+      await wrapper.vm.onCameraChange('cam-2')
       expect(wrapper.vm.selectedCamera).toBe('cam-2')
       expect(wrapper.vm.acquireStream).toHaveBeenCalled()
     })
@@ -520,14 +541,14 @@ describe('PreJoin', () => {
       wrapper.vm.acquireStream = jest
         .fn()
         .mockRejectedValue(Object.assign(new Error('x'), { name: 'NotFoundError' }))
-      await wrapper.vm.onCameraChange({ target: { value: 'cam-2' } })
+      await wrapper.vm.onCameraChange('cam-2')
       expect(wrapper.vm.permissionError).toBe('videoCall.prejoin.errorNoDevice')
     })
 
     it('onMicChange updates selectedMic and triggers acquireStream', async () => {
       const { wrapper } = mountWith()
       wrapper.vm.acquireStream = jest.fn().mockResolvedValue()
-      await wrapper.vm.onMicChange({ target: { value: 'mic-2' } })
+      await wrapper.vm.onMicChange('mic-2')
       expect(wrapper.vm.selectedMic).toBe('mic-2')
     })
 
@@ -536,56 +557,109 @@ describe('PreJoin', () => {
       wrapper.vm.acquireStream = jest
         .fn()
         .mockRejectedValue(Object.assign(new Error('x'), { name: 'NotAllowedError' }))
-      await wrapper.vm.onMicChange({ target: { value: 'mic-2' } })
+      await wrapper.vm.onMicChange('mic-2')
       expect(wrapper.vm.permissionError).toBe('videoCall.prejoin.errorDenied')
     })
 
-    it('onSpeakerChange forwards setSinkId when supported', async () => {
-      // Stub the prototype BEFORE mount so the speakerSupported computed
-      // sees the function on its first (cached) evaluation.
-      const originalSetSinkId = HTMLMediaElement.prototype.setSinkId
-      HTMLMediaElement.prototype.setSinkId = function () {
-        return Promise.resolve()
-      }
-      try {
-        const { wrapper } = mountWith()
-        const setSinkId = jest.fn().mockResolvedValue()
-        wrapper.vm.$refs.speakerTestEl = { setSinkId }
-        wrapper.setData({ selectedSpeaker: '' })
-        await wrapper.vm.onSpeakerChange({ target: { value: 'spk-1' } })
-        expect(wrapper.vm.selectedSpeaker).toBe('spk-1')
-        expect(setSinkId).toHaveBeenCalledWith('spk-1')
-      } finally {
-        if (originalSetSinkId === undefined) {
-          delete HTMLMediaElement.prototype.setSinkId
-        } else {
-          HTMLMediaElement.prototype.setSinkId = originalSetSinkId
-        }
-      }
+    it('onSpeakerChange updates selectedSpeaker', () => {
+      const { wrapper } = mountWith()
+      wrapper.vm.onSpeakerChange('spk-1')
+      expect(wrapper.vm.selectedSpeaker).toBe('spk-1')
+    })
+  })
+
+  describe('remembered devices', () => {
+    const STORAGE_KEY = 'ocelot-video-call-devices'
+    const DEVICES = [
+      { kind: 'videoinput', deviceId: 'cam-1', label: 'Built-in camera' },
+      { kind: 'videoinput', deviceId: 'cam-2', label: 'Webcam' },
+      { kind: 'audioinput', deviceId: 'mic-1', label: 'Built-in microphone' },
+      { kind: 'audioinput', deviceId: 'mic-2', label: 'Headset' },
+      { kind: 'audiooutput', deviceId: 'spk-1', label: 'Built-in speaker' },
+      { kind: 'audiooutput', deviceId: 'spk-2', label: 'Headset' },
+    ]
+    const stream = { getTracks: () => [], getAudioTracks: () => [], getVideoTracks: () => [] }
+    const mediaDevicesWith = (overrides = {}) => ({
+      getUserMedia: jest.fn().mockResolvedValue(stream),
+      enumerateDevices: jest.fn().mockResolvedValue(DEVICES),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      ...overrides,
+    })
+    const remember = (preferences) => localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences))
+    const remembered = () => JSON.parse(localStorage.getItem(STORAGE_KEY))
+
+    beforeEach(() => {
+      localStorage.clear()
     })
 
-    it('onSpeakerChange swallows setSinkId rejection', async () => {
-      const originalSetSinkId = HTMLMediaElement.prototype.setSinkId
-      HTMLMediaElement.prototype.setSinkId = function () {
-        return Promise.resolve()
-      }
-      try {
-        const { wrapper } = mountWith()
-        wrapper.vm.$refs.speakerTestEl = {
-          setSinkId: jest.fn().mockRejectedValue(new Error('boom')),
-        }
-        wrapper.setData({ selectedSpeaker: '' })
-        await expect(
-          wrapper.vm.onSpeakerChange({ target: { value: 'spk-1' } }),
-        ).resolves.toBeUndefined()
-        expect(wrapper.vm.selectedSpeaker).toBe('spk-1')
-      } finally {
-        if (originalSetSinkId === undefined) {
-          delete HTMLMediaElement.prototype.setSinkId
-        } else {
-          HTMLMediaElement.prototype.setSinkId = originalSetSinkId
-        }
-      }
+    it('starts on the devices of the last call and previews them', async () => {
+      remember({
+        videoinput: { deviceId: 'cam-2', label: 'Webcam' },
+        audioinput: { deviceId: 'mic-2', label: 'Headset' },
+        audiooutput: { deviceId: 'spk-2', label: 'Headset' },
+      })
+      const { wrapper, mediaDevices } = mountWith(mediaDevicesWith(), { runMounted: true })
+      await flushPromises()
+      expect(wrapper.vm.selectedCamera).toBe('cam-2')
+      expect(wrapper.vm.selectedMic).toBe('mic-2')
+      expect(wrapper.vm.selectedSpeaker).toBe('spk-2')
+      expect(mediaDevices.getUserMedia).toHaveBeenLastCalledWith({
+        video: { deviceId: { exact: 'cam-2' } },
+        audio: { deviceId: { exact: 'mic-2' } },
+      })
+    })
+
+    it('keeps the first preview when nothing is remembered', async () => {
+      const { wrapper, mediaDevices } = mountWith(mediaDevicesWith(), { runMounted: true })
+      await flushPromises()
+      expect(wrapper.vm.selectedCamera).toBe('cam-1')
+      expect(mediaDevices.getUserMedia).toHaveBeenCalledTimes(1)
+    })
+
+    it('needs no new preview for a remembered speaker alone', async () => {
+      remember({ audiooutput: { deviceId: 'spk-2', label: 'Headset' } })
+      const { wrapper, mediaDevices } = mountWith(mediaDevicesWith(), { runMounted: true })
+      await flushPromises()
+      expect(wrapper.vm.selectedSpeaker).toBe('spk-2')
+      expect(mediaDevices.getUserMedia).toHaveBeenCalledTimes(1)
+    })
+
+    it('reports a remembered device that fails to start', async () => {
+      remember({ videoinput: { deviceId: 'cam-2', label: 'Webcam' } })
+      const getUserMedia = jest
+        .fn()
+        .mockResolvedValueOnce(stream)
+        .mockRejectedValue(Object.assign(new Error(), { name: 'NotReadableError' }))
+      const { wrapper } = mountWith(mediaDevicesWith({ getUserMedia }), { runMounted: true })
+      await flushPromises()
+      expect(wrapper.vm.permissionError).toBe('videoCall.prejoin.errorBusy')
+    })
+
+    it('remembers a device the user picks', async () => {
+      const { wrapper } = mountWith()
+      wrapper.setData({
+        cameras: DEVICES.slice(0, 2),
+        mics: DEVICES.slice(2, 4),
+        speakers: DEVICES.slice(4),
+      })
+      wrapper.vm.acquireStream = jest.fn().mockResolvedValue()
+      await wrapper.vm.onCameraChange('cam-2')
+      await wrapper.vm.onMicChange('mic-2')
+      wrapper.vm.onSpeakerChange('spk-2')
+      expect(remembered()).toEqual({
+        videoinput: { deviceId: 'cam-2', label: 'Webcam' },
+        audioinput: { deviceId: 'mic-2', label: 'Headset' },
+        audiooutput: { deviceId: 'spk-2', label: 'Headset' },
+      })
+    })
+
+    it('does not remember a device that failed to start', async () => {
+      const { wrapper } = mountWith()
+      wrapper.setData({ cameras: DEVICES.slice(0, 2) })
+      wrapper.vm.acquireStream = jest.fn().mockRejectedValue(new Error('boom'))
+      await wrapper.vm.onCameraChange('cam-2')
+      expect(remembered()).toBeNull()
     })
   })
 
@@ -651,229 +725,6 @@ describe('PreJoin', () => {
       wrapper.vm.stopStream()
       expect(stop).toHaveBeenCalledTimes(2)
       expect(wrapper.vm.stream).toBeNull()
-    })
-  })
-
-  describe('startMeter / stopMeter', () => {
-    it('is a no-op when the stream has no audio tracks', () => {
-      const { wrapper } = mountWith()
-      expect(() =>
-        wrapper.vm.startMeter({ getAudioTracks: () => [], getVideoTracks: () => [] }),
-      ).not.toThrow()
-    })
-
-    it('stopMeter closes the audio context and resets the meter', async () => {
-      const { wrapper } = mountWith()
-      const close = jest.fn()
-      wrapper.vm.audioCtx = { close }
-      wrapper.vm.meterRaf = 1
-      // Polyfill cancelAnimationFrame if needed.
-      const original = global.cancelAnimationFrame
-      global.cancelAnimationFrame = jest.fn()
-      wrapper.vm.stopMeter()
-      expect(close).toHaveBeenCalled()
-      expect(wrapper.vm.audioCtx).toBeNull()
-      expect(wrapper.vm.meterRaf).toBeNull()
-      expect(wrapper.vm.micLevelPercent).toBe(0)
-      global.cancelAnimationFrame = original
-    })
-
-    it('stopMeter swallows close errors', () => {
-      const { wrapper } = mountWith()
-      wrapper.vm.audioCtx = {
-        close: () => {
-          throw new Error('boom')
-        },
-      }
-      expect(() => wrapper.vm.stopMeter()).not.toThrow()
-    })
-  })
-
-  describe('playTestTone', () => {
-    it('exits early on a re-entry', async () => {
-      const { wrapper } = mountWith()
-      const ACSpy = jest.fn()
-      const originalAC = window.AudioContext
-      window.AudioContext = ACSpy
-      try {
-        wrapper.setData({ testingTone: true })
-        await wrapper.vm.playTestTone()
-        // testingTone should remain true (no reset) and no AudioContext built.
-        expect(wrapper.vm.testingTone).toBe(true)
-        expect(ACSpy).not.toHaveBeenCalled()
-      } finally {
-        window.AudioContext = originalAC
-      }
-    })
-
-    it('exits when AudioContext is unavailable', async () => {
-      const { wrapper } = mountWith()
-      const originalAC = window.AudioContext
-      const originalWAC = window.webkitAudioContext
-      window.AudioContext = undefined
-      window.webkitAudioContext = undefined
-      await wrapper.vm.playTestTone()
-      expect(wrapper.vm.testingTone).toBe(false)
-      window.AudioContext = originalAC
-      window.webkitAudioContext = originalWAC
-    })
-
-    const buildToneCtx = (state = 'running') => {
-      const node = { connect: jest.fn(() => node) }
-      return {
-        state,
-        currentTime: 0,
-        resume: jest.fn().mockResolvedValue(),
-        createOscillator: jest.fn(() => ({
-          type: '',
-          frequency: { setValueAtTime: jest.fn() },
-          connect: jest.fn(() => node),
-          start: jest.fn(),
-          stop: jest.fn(),
-          onended: null,
-        })),
-        createGain: jest.fn(() => ({
-          gain: { setValueAtTime: jest.fn(), linearRampToValueAtTime: jest.fn() },
-          connect: jest.fn(() => node),
-        })),
-        createMediaStreamDestination: jest.fn(() => ({ stream: {} })),
-        destination: {},
-        close: jest.fn().mockResolvedValue(),
-      }
-    }
-
-    it('routes the tone to the selected speaker and cleans up when it ends', async () => {
-      const originalSetSinkId = HTMLMediaElement.prototype.setSinkId
-      HTMLMediaElement.prototype.setSinkId = function () {
-        return Promise.resolve()
-      }
-      const originalAC = window.AudioContext
-      const ctx = buildToneCtx('suspended')
-      let createdOsc
-      ctx.createOscillator.mockImplementation(() => {
-        createdOsc = {
-          type: '',
-          frequency: { setValueAtTime: jest.fn() },
-          connect: jest.fn(() => ({ connect: jest.fn() })),
-          start: jest.fn(),
-          stop: jest.fn(),
-          onended: null,
-        }
-        return createdOsc
-      })
-      window.AudioContext = jest.fn(() => ctx)
-      try {
-        const { wrapper } = mountWith()
-        const audio = {
-          setSinkId: jest.fn().mockResolvedValue(),
-          play: jest.fn().mockResolvedValue(),
-          pause: jest.fn(),
-          srcObject: null,
-        }
-        wrapper.vm.$refs.speakerTestEl = audio
-        wrapper.setData({ selectedSpeaker: 'spk-1' })
-        await wrapper.vm.playTestTone()
-        expect(ctx.resume).toHaveBeenCalled()
-        expect(ctx.createMediaStreamDestination).toHaveBeenCalled()
-        expect(audio.setSinkId).toHaveBeenCalledWith('spk-1')
-        expect(audio.play).toHaveBeenCalled()
-        // Drive the oscillator's end callback to cover the cleanup path.
-        createdOsc.onended()
-        expect(audio.pause).toHaveBeenCalled()
-        expect(ctx.close).toHaveBeenCalled()
-        expect(wrapper.vm.testingTone).toBe(false)
-      } finally {
-        window.AudioContext = originalAC
-        if (originalSetSinkId === undefined) {
-          delete HTMLMediaElement.prototype.setSinkId
-        } else {
-          HTMLMediaElement.prototype.setSinkId = originalSetSinkId
-        }
-      }
-    })
-
-    it('falls back to the default output when no speaker is selected', async () => {
-      const originalAC = window.AudioContext
-      const ctx = buildToneCtx('running')
-      window.AudioContext = jest.fn(() => ctx)
-      try {
-        const { wrapper } = mountWith()
-        wrapper.setData({ selectedSpeaker: '' })
-        await wrapper.vm.playTestTone()
-        expect(ctx.createMediaStreamDestination).not.toHaveBeenCalled()
-      } finally {
-        window.AudioContext = originalAC
-      }
-    })
-
-    it('closes the context and resets when setup throws (even if close also throws)', async () => {
-      const originalAC = window.AudioContext
-      const ctx = buildToneCtx('running')
-      ctx.createOscillator = jest.fn(() => {
-        throw new Error('boom')
-      })
-      ctx.close = jest.fn(() => {
-        throw new Error('close')
-      })
-      window.AudioContext = jest.fn(() => ctx)
-      try {
-        const { wrapper } = mountWith()
-        await wrapper.vm.playTestTone()
-        expect(ctx.close).toHaveBeenCalled()
-        expect(wrapper.vm.testingTone).toBe(false)
-      } finally {
-        window.AudioContext = originalAC
-      }
-    })
-
-    it('tolerates failures from every media call during playback', async () => {
-      const originalSetSinkId = HTMLMediaElement.prototype.setSinkId
-      HTMLMediaElement.prototype.setSinkId = function () {
-        return Promise.resolve()
-      }
-      const originalAC = window.AudioContext
-      const ctx = buildToneCtx('suspended')
-      ctx.resume = jest.fn().mockRejectedValue(new Error('resume'))
-      ctx.close = jest.fn(() => {
-        throw new Error('close')
-      })
-      let createdOsc
-      ctx.createOscillator.mockImplementation(() => {
-        createdOsc = {
-          type: '',
-          frequency: { setValueAtTime: jest.fn() },
-          connect: jest.fn(() => ({ connect: jest.fn() })),
-          start: jest.fn(),
-          stop: jest.fn(),
-          onended: null,
-        }
-        return createdOsc
-      })
-      window.AudioContext = jest.fn(() => ctx)
-      try {
-        const { wrapper } = mountWith()
-        const audio = {
-          setSinkId: jest.fn().mockRejectedValue(new Error('sink')),
-          play: jest.fn().mockRejectedValue(new Error('play')),
-          pause: jest.fn(() => {
-            throw new Error('pause')
-          }),
-          srcObject: null,
-        }
-        wrapper.vm.$refs.speakerTestEl = audio
-        wrapper.setData({ selectedSpeaker: 'spk-1' })
-        await wrapper.vm.playTestTone()
-        expect(ctx.resume).toHaveBeenCalled()
-        createdOsc.onended()
-        expect(wrapper.vm.testingTone).toBe(false)
-      } finally {
-        window.AudioContext = originalAC
-        if (originalSetSinkId === undefined) {
-          delete HTMLMediaElement.prototype.setSinkId
-        } else {
-          HTMLMediaElement.prototype.setSinkId = originalSetSinkId
-        }
-      }
     })
   })
 
@@ -965,38 +816,6 @@ describe('PreJoin', () => {
       const { wrapper } = mountWith(mediaDevices)
       wrapper.setData({ cameraActive: true, micActive: false, cameraStatus: 'granted' })
       await expect(wrapper.vm.acquireStream()).rejects.toBe(err)
-    })
-  })
-
-  describe('startMeter (full meter loop)', () => {
-    it('drives the level meter from audio samples', () => {
-      const { wrapper } = mountWith()
-      const analyser = {
-        fftSize: 0,
-        frequencyBinCount: 8,
-        connect: jest.fn(),
-        getByteTimeDomainData: (buf) => {
-          for (let i = 0; i < buf.length; i++) buf[i] = 200
-        },
-      }
-      const ctx = {
-        createMediaStreamSource: jest.fn(() => ({ connect: jest.fn() })),
-        createAnalyser: jest.fn(() => analyser),
-        close: jest.fn(),
-      }
-      const originalAC = window.AudioContext
-      const originalRAF = global.requestAnimationFrame
-      window.AudioContext = jest.fn(() => ctx)
-      global.requestAnimationFrame = jest.fn(() => 99)
-      try {
-        wrapper.vm.startMeter({ getAudioTracks: () => [{}] })
-        expect(wrapper.vm.micLevelPercent).toBeGreaterThan(0)
-        expect(wrapper.vm.meterRaf).toBe(99)
-      } finally {
-        window.AudioContext = originalAC
-        global.requestAnimationFrame = originalRAF
-        wrapper.vm.stopMeter()
-      }
     })
   })
 })

@@ -1979,6 +1979,10 @@
     "connecting": "З'єднання…",
     "connectionLost": "З'єднання втрачено: {name}",
     "connectionPoor": "Слабке з'єднання: {name}",
+    "deviceSettings": {
+      "button": "Пристрої",
+      "title": "Налаштування пристроїв"
+    },
     "dialogLabel": "Груповий відеовиклик",
     "disableCamera": "Вимкнути камеру",
     "enableAudio": "Увімкнути звук",

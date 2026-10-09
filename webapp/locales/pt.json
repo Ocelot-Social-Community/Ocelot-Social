@@ -1979,6 +1979,10 @@
     "connecting": "Conectando…",
     "connectionLost": "Conexão perdida: {name}",
     "connectionPoor": "Conexão fraca: {name}",
+    "deviceSettings": {
+      "button": "Dispositivos",
+      "title": "Configurações dos dispositivos"
+    },
     "dialogLabel": "Videochamada de grupo",
     "disableCamera": "Desligar a câmera",
     "enableAudio": "Ativar som",

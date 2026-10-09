@@ -1979,6 +1979,10 @@
     "connecting": "Po lidhet…",
     "connectionLost": "Lidhja u humb: {name}",
     "connectionPoor": "Lidhje e dobët: {name}",
+    "deviceSettings": {
+      "button": "Pajisjet",
+      "title": "Cilësimet e pajisjeve"
+    },
     "dialogLabel": "Telefonatë me video në grup",
     "disableCamera": "Fik kamerën",
     "enableAudio": "Aktivizo zërin",

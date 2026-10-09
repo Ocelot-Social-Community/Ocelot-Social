@@ -1979,6 +1979,10 @@
     "connecting": "Łączenie…",
     "connectionLost": "Utracono połączenie: {name}",
     "connectionPoor": "Słabe połączenie: {name}",
+    "deviceSettings": {
+      "button": "Urządzenia",
+      "title": "Ustawienia urządzeń"
+    },
     "dialogLabel": "Rozmowa wideo grupowa",
     "disableCamera": "Wyłącz kamerę",
     "enableAudio": "Włącz dźwięk",

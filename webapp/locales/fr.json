@@ -1979,6 +1979,10 @@
     "connecting": "Connexion…",
     "connectionLost": "Connexion perdue : {name}",
     "connectionPoor": "Connexion faible : {name}",
+    "deviceSettings": {
+      "button": "Appareils",
+      "title": "Réglages des appareils"
+    },
     "dialogLabel": "Appel vidéo de groupe",
     "disableCamera": "Désactiver la caméra",
     "enableAudio": "Activer le son",

@@ -1979,6 +1979,10 @@
     "connecting": "Connessione in corso…",
     "connectionLost": "Connessione persa: {name}",
     "connectionPoor": "Connessione debole: {name}",
+    "deviceSettings": {
+      "button": "Dispositivi",
+      "title": "Impostazioni dei dispositivi"
+    },
     "dialogLabel": "Videochiamata di gruppo",
     "disableCamera": "Disattiva la fotocamera",
     "enableAudio": "Attiva audio",

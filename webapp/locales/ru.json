@@ -1979,6 +1979,10 @@
     "connecting": "Подключение…",
     "connectionLost": "Соединение потеряно: {name}",
     "connectionPoor": "Слабое соединение: {name}",
+    "deviceSettings": {
+      "button": "Устройства",
+      "title": "Настройки устройств"
+    },
     "dialogLabel": "Групповой видеозвонок",
     "disableCamera": "Выключить камеру",
     "enableAudio": "Включить звук",

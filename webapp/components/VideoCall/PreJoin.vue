@@ -20,83 +20,21 @@
         {{ $t('videoCall.prejoin.description') }}
       </p>
 
-      <div class="prejoin__row">
-        <label class="prejoin__label" for="prejoin-camera">
-          {{ $t('videoCall.prejoin.camera') }}
-          <span :class="['prejoin__status', `prejoin__status--${cameraStatus}`]">
-            {{ $t(`videoCall.prejoin.permission.${cameraStatus}`) }}
-          </span>
-        </label>
-        <select
-          id="prejoin-camera"
-          :value="selectedCamera"
-          :disabled="cameras.length === 0"
-          @change="onCameraChange"
-        >
-          <option v-if="cameras.length === 0" value="">
-            {{ $t('videoCall.prejoin.noDevices') }}
-          </option>
-          <option v-for="d in cameras" :key="d.deviceId" :value="d.deviceId">
-            {{ d.label || $t('videoCall.prejoin.unnamedCamera') }}
-          </option>
-        </select>
-      </div>
-
-      <div class="prejoin__row">
-        <label class="prejoin__label" for="prejoin-mic">
-          {{ $t('videoCall.prejoin.microphone') }}
-          <span :class="['prejoin__status', `prejoin__status--${micStatus}`]">
-            {{ $t(`videoCall.prejoin.permission.${micStatus}`) }}
-          </span>
-        </label>
-        <select
-          id="prejoin-mic"
-          :value="selectedMic"
-          :disabled="mics.length === 0"
-          @change="onMicChange"
-        >
-          <option v-if="mics.length === 0" value="">
-            {{ $t('videoCall.prejoin.noDevices') }}
-          </option>
-          <option v-for="d in mics" :key="d.deviceId" :value="d.deviceId">
-            {{ d.label || $t('videoCall.prejoin.unnamedMic') }}
-          </option>
-        </select>
-        <div v-if="micActive" class="prejoin__meter" :aria-label="$t('videoCall.prejoin.micLevel')">
-          <div class="prejoin__meter-fill" :style="{ width: micLevelPercent + '%' }" />
-        </div>
-      </div>
-
-      <div class="prejoin__row">
-        <label class="prejoin__label" for="prejoin-speaker">
-          {{ $t('videoCall.prejoin.speaker') }}
-          <span class="prejoin__status prejoin__status--info">
-            {{ speakerSupported ? '' : $t('videoCall.prejoin.speakerUnsupported') }}
-          </span>
-        </label>
-        <div class="prejoin__speaker-row">
-          <select
-            id="prejoin-speaker"
-            :value="selectedSpeaker"
-            :disabled="!speakerSupported || speakers.length === 0"
-            @change="onSpeakerChange"
-          >
-            <option v-if="speakers.length === 0" value="">
-              {{ $t('videoCall.prejoin.noDevices') }}
-            </option>
-            <option v-for="d in speakers" :key="d.deviceId" :value="d.deviceId">
-              {{ d.label || $t('videoCall.prejoin.unnamedSpeaker') }}
-            </option>
-          </select>
-          <os-button appearance="outline" size="sm" :disabled="testingTone" @click="playTestTone">
-            <template #icon><os-icon :icon="icons.headphones" /></template>
-            {{
-              testingTone ? $t('videoCall.prejoin.testingSound') : $t('videoCall.prejoin.testSound')
-            }}
-          </os-button>
-        </div>
-        <audio ref="speakerTestEl" preload="auto" />
-      </div>
+      <device-selectors
+        id-prefix="prejoin"
+        :cameras="cameras"
+        :mics="mics"
+        :speakers="speakers"
+        :selected-camera="selectedCamera"
+        :selected-mic="selectedMic"
+        :selected-speaker="selectedSpeaker"
+        :camera-status="cameraStatus"
+        :mic-status="micStatus"
+        :meter-stream="meterStream"
+        @camera-change="onCameraChange"
+        @mic-change="onMicChange"
+        @speaker-change="onSpeakerChange"
+      />
 
       <div v-if="permissionError" class="prejoin__error" role="alert">
         <span class="prejoin__error-text">{{ permissionError }}</span>
@@ -161,10 +99,16 @@ import { mapGetters } from 'vuex'
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
+import DeviceSelectors from './DeviceSelectors.vue'
+import {
+  findPreferredDevice,
+  loadDevicePreferences,
+  saveDevicePreference,
+} from './devicePreferences'
 
 export default {
   name: 'PreJoin',
-  components: { OsButton, OsIcon, AvatarImage },
+  components: { OsButton, OsIcon, AvatarImage, DeviceSelectors },
   data() {
     return {
       cameras: [],
@@ -179,8 +123,6 @@ export default {
       // but the user can opt out before joining (silent observer is valid).
       cameraActive: true,
       micActive: true,
-      micLevelPercent: 0,
-      testingTone: false,
       permissionError: null,
       stream: null,
     }
@@ -199,6 +141,9 @@ export default {
         typeof HTMLMediaElement.prototype.setSinkId === 'function'
       )
     },
+    meterStream() {
+      return this.micActive ? this.stream : null
+    },
     joinHint() {
       if (!this.micActive && !this.cameraActive) {
         return this.$t('videoCall.prejoin.hintBoth')
@@ -214,14 +159,11 @@ export default {
     // and doesn't proxy them onto the instance, so initialize them here under
     // plain names to follow the project's convention (see `this.icons`).
     this.permListeners = null
-    this.audioCtx = null
-    this.meterRaf = null
   },
   async mounted() {
     await this.initDevices()
   },
   beforeDestroy() {
-    this.stopMeter()
     this.stopStream()
     this.detachPermissionListeners()
     if (navigator.mediaDevices && navigator.mediaDevices.removeEventListener) {
@@ -252,7 +194,37 @@ export default {
       if (this.cameraStatus === 'denied') this.cameraActive = false
       if (this.micStatus === 'denied') this.micActive = false
       await this.enumerate()
+      // The preview above started on the browser's default devices — the list,
+      // and with it the choice remembered from an earlier call, is only known
+      // now.
+      if (this.applyRememberedDevices()) {
+        try {
+          await this.acquireStream()
+        } catch (err) {
+          this.permissionError = this.permissionMessage(err)
+        }
+      }
       navigator.mediaDevices.addEventListener('devicechange', this.onDeviceChange)
+    },
+    applyRememberedDevices() {
+      const remembered = loadDevicePreferences()
+      const apply = (devices, kind, field) => {
+        const device = findPreferredDevice(devices, remembered[kind])
+        if (!device || device.deviceId === this[field]) return false
+        this[field] = device.deviceId
+        return true
+      }
+      const cameraChanged = apply(this.cameras, 'videoinput', 'selectedCamera')
+      const micChanged = apply(this.mics, 'audioinput', 'selectedMic')
+      apply(this.speakers, 'audiooutput', 'selectedSpeaker')
+      // Only the inputs feed the preview; the speaker needs no new stream.
+      return cameraChanged || micChanged
+    },
+    rememberDevice(kind, devices, deviceId) {
+      saveDevicePreference(
+        kind,
+        devices.find((d) => d.deviceId === deviceId),
+      )
     },
     onDeviceChange() {
       this.enumerate()
@@ -419,14 +391,9 @@ export default {
       this.$nextTick(() => {
         const v = this.$refs.previewEl
         if (v) v.srcObject = stream
-        // Drive the meter from the actual track shape, not the initial intent —
-        // covers the audio-only fallback above and any future code path that
-        // produces a different stream than what was requested.
-        if (stream.getAudioTracks().length) this.startMeter(stream)
       })
     },
     stopStream() {
-      this.stopMeter()
       if (this.stream) {
         this.stream.getTracks().forEach((t) => t.stop())
         this.stream = null
@@ -434,59 +401,20 @@ export default {
       const v = this.$refs.previewEl
       if (v) v.srcObject = null
     },
-    startMeter(stream) {
-      this.stopMeter()
-      const audioTracks = stream.getAudioTracks()
-      if (audioTracks.length === 0) return
-      const AC = window.AudioContext || window.webkitAudioContext
-      if (!AC) return
-      const ctx = new AC()
-      const source = ctx.createMediaStreamSource(stream)
-      const analyser = ctx.createAnalyser()
-      analyser.fftSize = 512
-      source.connect(analyser)
-      const buffer = new Uint8Array(analyser.frequencyBinCount)
-      this.audioCtx = ctx
-      const tick = () => {
-        analyser.getByteTimeDomainData(buffer)
-        let sumSq = 0
-        for (let i = 0; i < buffer.length; i++) {
-          const v = (buffer[i] - 128) / 128
-          sumSq += v * v
-        }
-        const rms = Math.sqrt(sumSq / buffer.length)
-        this.micLevelPercent = Math.min(100, Math.round(rms * 200))
-        this.meterRaf = requestAnimationFrame(tick)
-      }
-      tick()
-    },
-    stopMeter() {
-      if (this.meterRaf) {
-        cancelAnimationFrame(this.meterRaf)
-        this.meterRaf = null
-      }
-      if (this.audioCtx) {
-        try {
-          this.audioCtx.close()
-        } catch (_e) {
-          /* noop */
-        }
-        this.audioCtx = null
-      }
-      this.micLevelPercent = 0
-    },
-    async onCameraChange(e) {
-      this.selectedCamera = e.target.value
+    async onCameraChange(deviceId) {
+      this.selectedCamera = deviceId
       try {
         await this.acquireStream()
+        this.rememberDevice('videoinput', this.cameras, deviceId)
       } catch (err) {
         this.permissionError = this.permissionMessage(err)
       }
     },
-    async onMicChange(e) {
-      this.selectedMic = e.target.value
+    async onMicChange(deviceId) {
+      this.selectedMic = deviceId
       try {
         await this.acquireStream()
+        this.rememberDevice('audioinput', this.mics, deviceId)
       } catch (err) {
         this.permissionError = this.permissionMessage(err)
       }
@@ -519,113 +447,9 @@ export default {
         this.cameraActive = false
       }
     },
-    async onSpeakerChange(e) {
-      this.selectedSpeaker = e.target.value
-      const audio = this.$refs.speakerTestEl
-      if (audio && this.speakerSupported && this.selectedSpeaker) {
-        try {
-          await audio.setSinkId(this.selectedSpeaker)
-        } catch (_e) {
-          /* ignore */
-        }
-      }
-    },
-    async playTestTone() {
-      if (this.testingTone) return
-      this.testingTone = true
-      const AC = window.AudioContext || window.webkitAudioContext
-      if (!AC) {
-        this.testingTone = false
-        return
-      }
-      // Declared outside the try so the outer catch can close it on any
-      // failure between creation and oscillator.onended — otherwise each
-      // failed test tone leaks an AudioContext (browsers cap at ~6).
-      let ctx = null
-      try {
-        ctx = new AC()
-        if (ctx.state === 'suspended') {
-          try {
-            await ctx.resume()
-          } catch (_e) {
-            /* noop */
-          }
-        }
-        const oscillator = ctx.createOscillator()
-        const gain = ctx.createGain()
-        oscillator.type = 'sine'
-
-        // Small ascending arpeggio: C4 — E4 — G4 — C5 (major chord).
-        const NOTES = [261.63, 329.63, 392.0, 523.25]
-        const NOTE_LEN = 0.18
-        const GAP = 0.02
-        const PEAK = 0.25
-        const now = ctx.currentTime
-        const totalDuration = NOTES.length * (NOTE_LEN + GAP)
-
-        gain.gain.setValueAtTime(0, now)
-        NOTES.forEach((freq, i) => {
-          const start = now + i * (NOTE_LEN + GAP)
-          oscillator.frequency.setValueAtTime(freq, start)
-          gain.gain.setValueAtTime(0, start)
-          gain.gain.linearRampToValueAtTime(PEAK, start + 0.03)
-          gain.gain.setValueAtTime(PEAK, start + NOTE_LEN - 0.04)
-          gain.gain.linearRampToValueAtTime(0, start + NOTE_LEN)
-        })
-
-        const audio = this.$refs.speakerTestEl
-        const canRouteToSink =
-          audio &&
-          this.speakerSupported &&
-          this.selectedSpeaker &&
-          typeof ctx.createMediaStreamDestination === 'function'
-
-        if (canRouteToSink) {
-          const dest = ctx.createMediaStreamDestination()
-          oscillator.connect(gain).connect(dest)
-          audio.srcObject = dest.stream
-          try {
-            await audio.setSinkId(this.selectedSpeaker)
-          } catch (_e) {
-            /* fall back to default output */
-          }
-          try {
-            await audio.play()
-          } catch (_e) {
-            /* noop */
-          }
-        } else {
-          oscillator.connect(gain).connect(ctx.destination)
-        }
-
-        oscillator.start(now)
-        oscillator.stop(now + totalDuration)
-        oscillator.onended = () => {
-          if (audio) {
-            try {
-              audio.pause()
-              audio.srcObject = null
-            } catch (_e) {
-              /* noop */
-            }
-          }
-          try {
-            ctx.close()
-          } catch (_e) {
-            /* noop */
-          }
-          this.testingTone = false
-        }
-      } catch (_e) {
-        if (ctx) {
-          try {
-            await ctx.close()
-          } catch (_closeErr) {
-            /* noop */
-          }
-        }
-        this.testingTone = false
-      }
+    onSpeakerChange(deviceId) {
+      this.selectedSpeaker = deviceId
+      this.rememberDevice('audiooutput', this.speakers, deviceId)
     },
     emitJoin() {
       // Browsers without navigator.permissions report 'prompt' as a fallback
@@ -636,10 +460,13 @@ export default {
         this.micActive && this.micStatus !== 'denied' && this.micStatus !== 'unsupported'
       const cameraEnabled =
         this.cameraActive && this.cameraStatus !== 'denied' && this.cameraStatus !== 'unsupported'
+      // A device that is merely switched off for now still goes along: it is
+      // the one to start once the user turns it on during the call.
+      const usable = (status) => status !== 'denied' && status !== 'unsupported'
       const payload = {
-        cameraDeviceId: cameraEnabled ? this.selectedCamera : null,
-        micDeviceId: micEnabled ? this.selectedMic : null,
-        speakerDeviceId: this.speakerSupported ? this.selectedSpeaker : null,
+        cameraDeviceId: (usable(this.cameraStatus) && this.selectedCamera) || null,
+        micDeviceId: (usable(this.micStatus) && this.selectedMic) || null,
+        speakerDeviceId: (this.speakerSupported && this.selectedSpeaker) || null,
         cameraEnabled,
         micEnabled,
       }
@@ -725,90 +552,6 @@ export default {
   font-size: var(--font-size-small);
   color: var(--text-color-soft);
   line-height: 1.4;
-}
-
-.prejoin__row {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xxx-small);
-
-  select {
-    background: var(--background-color-base);
-    color: var(--text-color-base);
-    border: 1px solid var(--color-neutral-70);
-    padding: var(--space-xx-small) var(--space-x-small);
-    border-radius: var(--border-radius-base);
-    width: 100%;
-    font-family: var(--font-family-text);
-    font-size: var(--font-size-base);
-  }
-}
-
-.prejoin__label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: var(--text-weight-bold);
-  font-size: var(--font-size-base);
-  color: var(--text-color-base);
-}
-
-.prejoin__status {
-  font-weight: var(--text-weight-regular);
-  font-size: var(--font-size-x-small);
-  padding: 2px var(--space-x-small);
-  border-radius: var(--border-radius-rounded);
-  background: var(--color-neutral-80);
-  color: var(--text-color-base);
-}
-
-.prejoin__status--granted {
-  background: var(--color-primary);
-  color: var(--color-primary-inverse);
-}
-
-.prejoin__status--prompt {
-  background: var(--color-warning);
-  color: var(--color-warning-inverse);
-}
-
-.prejoin__status--denied {
-  background: var(--color-danger);
-  color: var(--color-danger-inverse);
-}
-
-.prejoin__status--unsupported,
-.prejoin__status--info {
-  background: transparent;
-  color: var(--text-color-softer);
-}
-
-.prejoin__meter {
-  height: 6px;
-  background: var(--color-neutral-85);
-  border-radius: var(--border-radius-rounded);
-  overflow: hidden;
-}
-
-.prejoin__meter-fill {
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--color-primary) 0%,
-    var(--color-warning) 70%,
-    var(--color-danger) 100%
-  );
-  transition: width 80ms linear;
-}
-
-.prejoin__speaker-row {
-  display: flex;
-  gap: var(--space-x-small);
-  align-items: center;
-
-  select {
-    flex: 1;
-  }
 }
 
 .prejoin__device-toggles {
