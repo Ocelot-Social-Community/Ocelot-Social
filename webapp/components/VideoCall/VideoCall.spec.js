@@ -572,6 +572,177 @@ describe('VideoCall', () => {
     })
   })
 
+  describe('device names on the buttons', () => {
+    const DEVICES = [
+      { kind: 'videoinput', deviceId: 'cam-1', label: 'Built-in camera' },
+      { kind: 'videoinput', deviceId: 'cam-2', label: 'Webcam' },
+      { kind: 'audioinput', deviceId: 'mic-1', label: 'Built-in microphone' },
+      { kind: 'audioinput', deviceId: 'mic-2', label: 'Headset' },
+      { kind: 'audiooutput', deviceId: 'spk-1', label: 'Built-in speaker' },
+    ]
+    const originalMediaDevices = Object.getOwnPropertyDescriptor(global.navigator, 'mediaDevices')
+    const setMediaDevices = (value) =>
+      Object.defineProperty(global.navigator, 'mediaDevices', { value, configurable: true })
+
+    afterEach(() => {
+      if (originalMediaDevices) {
+        Object.defineProperty(global.navigator, 'mediaDevices', originalMediaDevices)
+      } else {
+        delete global.navigator.mediaDevices
+      }
+    })
+
+    const inCall = (state = {}) => {
+      const built = factory({ show: true, groupId: 'g1', ...state })
+      built.wrapper.setData({ phase: 'in-call', knownDevices: DEVICES })
+      return built
+    }
+
+    it('names the devices in use', () => {
+      const { wrapper } = inCall()
+      wrapper.setData({ cameraDeviceId: 'cam-2', micDeviceId: 'mic-2', speakerDeviceId: 'spk-1' })
+      expect(wrapper.vm.deviceNames).toEqual({
+        camera: 'Webcam',
+        mic: 'Headset',
+        speaker: 'Built-in speaker',
+      })
+    })
+
+    it('reads an unknown device as the first of its kind, like the device settings do', () => {
+      const { wrapper } = inCall()
+      wrapper.setData({ cameraDeviceId: 'unplugged', micDeviceId: null })
+      expect(wrapper.vm.deviceNames).toMatchObject({
+        camera: 'Built-in camera',
+        mic: 'Built-in microphone',
+      })
+    })
+
+    it('has no names before the browser listed any device', () => {
+      const { wrapper } = factory({ show: true })
+      expect(wrapper.vm.deviceNames).toEqual({ camera: '', mic: '', speaker: '' })
+      wrapper.setData({ knownDevices: [{ kind: 'videoinput', deviceId: 'cam-1', label: '' }] })
+      expect(wrapper.vm.deviceNames.camera).toBe('')
+    })
+
+    it('shows the device alone next to a captioned button', () => {
+      const { wrapper } = inCall()
+      expect(wrapper.vm.deviceTooltip('Mute', ['Headset'])).toEqual({
+        content: 'Headset',
+        html: false,
+        classes: 'tooltip--multiline',
+      })
+    })
+
+    it('shows the caption and the device on a button that lost its caption', () => {
+      const { wrapper } = inCall({ minimized: true })
+      expect(wrapper.vm.deviceTooltip('Mute', ['Headset']).content).toBe('Mute\nHeadset')
+      // Still the plain caption when there is no device to name.
+      expect(wrapper.vm.deviceTooltip('Mute', ['']).content).toBe('Mute')
+    })
+
+    it('shows nothing when there is neither a caption to repeat nor a device to name', () => {
+      const { wrapper } = inCall()
+      expect(wrapper.vm.deviceTooltip('Mute', [''])).toBe('')
+    })
+
+    it('lists all devices in use on the device settings button', () => {
+      const { wrapper } = inCall()
+      wrapper.setData({ cameraDeviceId: 'cam-2', micDeviceId: 'mic-2' })
+      expect(wrapper.vm.deviceSettingsTooltip.content).toBe(
+        [
+          'videoCall.prejoin.camera: Webcam',
+          'videoCall.prejoin.microphone: Headset',
+          'videoCall.prejoin.speaker: Built-in speaker',
+        ].join('\n'),
+      )
+    })
+
+    it('leaves out what has no name, and steps aside for the open panel', () => {
+      const { wrapper } = inCall()
+      wrapper.setData({ knownDevices: DEVICES.filter((d) => d.kind !== 'audiooutput') })
+      expect(wrapper.vm.deviceSettingsTooltip.content).not.toContain('videoCall.prejoin.speaker')
+
+      wrapper.setData({ showDeviceSettings: true })
+      expect(wrapper.vm.deviceSettingsTooltip).toBe('')
+    })
+
+    describe('refreshKnownDevices', () => {
+      it('takes over what the browser lists', async () => {
+        setMediaDevices({ enumerateDevices: jest.fn().mockResolvedValue(DEVICES) })
+        const { wrapper } = factory({ show: true })
+        await wrapper.vm.refreshKnownDevices()
+        expect(wrapper.vm.knownDevices).toEqual(DEVICES)
+      })
+
+      it('goes without names in a browser that cannot list devices, or fails to', async () => {
+        const { wrapper } = factory({ show: true })
+        setMediaDevices(undefined)
+        await expect(wrapper.vm.refreshKnownDevices()).resolves.toBeUndefined()
+        setMediaDevices({})
+        await expect(wrapper.vm.refreshKnownDevices()).resolves.toBeUndefined()
+        setMediaDevices({ enumerateDevices: jest.fn().mockRejectedValue(new Error('boom')) })
+        await expect(wrapper.vm.refreshKnownDevices()).resolves.toBeUndefined()
+        expect(wrapper.vm.knownDevices).toEqual([])
+      })
+
+      it('drops a list that arrives after the call ended', async () => {
+        const { wrapper } = factory({ show: true })
+        wrapper.setData({ room: { name: 'the call' } })
+        setMediaDevices({
+          enumerateDevices: jest.fn(async () => {
+            wrapper.setData({ room: null })
+            return DEVICES
+          }),
+        })
+        await wrapper.vm.refreshKnownDevices()
+        expect(wrapper.vm.knownDevices).toEqual([])
+      })
+
+      it('runs once the call is connected, and again when devices come or go', async () => {
+        const enumerateDevices = jest.fn().mockResolvedValue(DEVICES)
+        setMediaDevices({ enumerateDevices })
+        const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
+        wrapper.vm.$apollo = {
+          mutate: jest.fn().mockResolvedValue({
+            data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } },
+          }),
+        }
+        await wrapper.vm.connect()
+        await flushPromises()
+        expect(wrapper.vm.knownDevices).toEqual(DEVICES)
+
+        wrapper.vm.room.handlers.MediaDevicesChanged()
+        expect(enumerateDevices).toHaveBeenCalledTimes(2)
+
+        await wrapper.vm.cleanup()
+        expect(wrapper.vm.knownDevices).toEqual([])
+      })
+
+      it('runs when a device is switched on during the call, not when it is switched off', async () => {
+        const enumerateDevices = jest.fn().mockResolvedValue(DEVICES)
+        setMediaDevices({ enumerateDevices })
+        const { wrapper } = factory({ show: true })
+        const room = {
+          localParticipant: {
+            isMicrophoneEnabled: true,
+            isCameraEnabled: true,
+            setMicrophoneEnabled: jest.fn().mockResolvedValue(),
+            setCameraEnabled: jest.fn().mockResolvedValue(),
+          },
+        }
+        wrapper.vm.refreshTiles = jest.fn()
+        wrapper.setData({ room, micEnabled: true, cameraEnabled: true })
+        await wrapper.vm.toggleMic()
+        await wrapper.vm.toggleCamera()
+        expect(enumerateDevices).not.toHaveBeenCalled()
+
+        await wrapper.vm.toggleMic()
+        await wrapper.vm.toggleCamera()
+        expect(enumerateDevices).toHaveBeenCalledTimes(2)
+      })
+    })
+  })
+
   describe('onTileSelect', () => {
     it('toggles the spotlight on the same tile', () => {
       const { wrapper } = factory({ show: true })

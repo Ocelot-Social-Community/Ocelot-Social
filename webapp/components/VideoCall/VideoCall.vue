@@ -204,7 +204,7 @@
       -->
       <div v-if="phase === 'in-call' && !error" class="video-call__controls">
         <os-button
-          v-tooltip="iconOnlyTooltip(micLabel)"
+          v-tooltip="deviceTooltip(micLabel, [deviceNames.mic])"
           :variant="micEnabled ? 'default' : 'danger'"
           appearance="outline"
           :size="iconOnly ? 'sm' : 'md'"
@@ -220,7 +220,7 @@
           </template>
         </os-button>
         <os-button
-          v-tooltip="iconOnlyTooltip(cameraLabel)"
+          v-tooltip="deviceTooltip(cameraLabel, [deviceNames.camera])"
           :variant="cameraEnabled ? 'default' : 'danger'"
           appearance="outline"
           :size="iconOnly ? 'sm' : 'md'"
@@ -260,7 +260,7 @@
         <div ref="deviceSettingsEl" class="video-call__device-settings">
           <os-button
             ref="deviceSettingsToggle"
-            v-tooltip="iconOnlyTooltip(deviceSettingsLabel)"
+            v-tooltip="deviceSettingsTooltip"
             data-test="video-call-device-settings-toggle"
             :variant="showDeviceSettings ? 'primary' : 'default'"
             appearance="outline"
@@ -421,6 +421,8 @@ export default {
       audioOnly: false,
       audioOnlyDismissed: false,
       showDeviceSettings: false,
+      // What the browser lists, to put a name to the devices in use.
+      knownDevices: [],
       // What the level meter in the device settings listens to: the very
       // microphone track the others hear.
       micMeterStream: null,
@@ -473,6 +475,33 @@ export default {
     },
     deviceSettingsLabel() {
       return this.$t('videoCall.deviceSettings.button')
+    },
+    deviceNames() {
+      // Without a known device the browser uses its default, which it lists
+      // first — the same reading the device settings show as selected.
+      const name = (kind, deviceId) => {
+        const ofKind = this.knownDevices.filter((d) => d.kind === kind)
+        const device = ofKind.find((d) => d.deviceId === deviceId) || ofKind[0]
+        return (device && device.label) || ''
+      }
+      return {
+        camera: name('videoinput', this.cameraDeviceId),
+        mic: name('audioinput', this.micDeviceId),
+        speaker: name('audiooutput', this.speakerDeviceId),
+      }
+    },
+    deviceSettingsTooltip() {
+      // The open panel sits right where the tooltip would, and says it all.
+      if (this.showDeviceSettings) return ''
+      const names = this.deviceNames
+      const details = [
+        ['camera', 'videoCall.prejoin.camera'],
+        ['mic', 'videoCall.prejoin.microphone'],
+        ['speaker', 'videoCall.prejoin.speaker'],
+      ]
+        .filter(([device]) => names[device])
+        .map(([device, key]) => `${this.$t(key)}: ${names[device]}`)
+      return this.deviceTooltip(this.deviceSettingsLabel, details)
     },
     chatLabel() {
       return this.chatOpenForThisGroup
@@ -819,6 +848,33 @@ export default {
       if (width && width < LARGE_AVATAR_MIN_CELL_WIDTH) return 'small'
       return 'large'
     },
+    deviceTooltip(label, details) {
+      // Names the device(s) behind a button on hover — below the button's own
+      // label where that is not spelled out next to the icon already.
+      const lines = [this.iconOnlyTooltip(label), ...details].filter(Boolean)
+      if (!lines.length) return ''
+      // Plain text: a device name comes from outside and must not be read as
+      // markup, which is what v-tooltip does with its content by default.
+      return { content: lines.join('\n'), html: false, classes: 'tooltip--multiline' }
+    },
+    async refreshKnownDevices() {
+      if (
+        typeof navigator === 'undefined' ||
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.enumerateDevices
+      ) {
+        return
+      }
+      const room = this.room
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices()
+        // The call may have ended while the browser was listing.
+        if (this.room !== room) return
+        this.knownDevices = devices.map(({ kind, deviceId, label }) => ({ kind, deviceId, label }))
+      } catch (_e) {
+        /* the buttons simply go without device names */
+      }
+    },
     iconOnlyTooltip(label) {
       // v-tooltip renders nothing for an empty string — exactly what we want
       // once the button spells its label out next to the icon.
@@ -998,6 +1054,7 @@ export default {
         // dead, this is the moment a fresh capture has a chance to work.
         room.on(RoomEvent.MediaDevicesChanged, () => {
           if (this.micProblem) this.restartMic()
+          this.refreshKnownDevices()
         })
         // LiveKit moved to another device — because we asked for it, or on its
         // own once the one in use was unplugged.
@@ -1027,6 +1084,7 @@ export default {
         this.refreshTiles()
         this.audioBlocked = !room.canPlaybackAudio
         this.phase = 'in-call'
+        this.refreshKnownDevices()
       } catch (err) {
         const message = this.$backendError(err)
         // The user navigated away while the handshake was still running, so
@@ -1466,6 +1524,9 @@ export default {
         // A muted microphone is silent on purpose.
         if (!next) this.micProblem = false
         this.refreshMicMeter()
+        // The browser names its devices only once one was granted — which may
+        // be just now.
+        if (next) this.refreshKnownDevices()
       } catch (err) {
         // Re-sync from LiveKit — a partial failure (track published, then
         // permission revoked) can leave the real state out of sync with what
@@ -1481,6 +1542,7 @@ export default {
         await this.room.localParticipant.setCameraEnabled(next)
         this.cameraEnabled = next
         this.refreshTiles()
+        if (next) this.refreshKnownDevices()
       } catch (err) {
         this.cameraEnabled = !!this.room.localParticipant.isCameraEnabled
         this.refreshTiles()
@@ -1601,6 +1663,7 @@ export default {
       }
       this.speakerSeenAt.clear()
       this.closeDeviceSettings()
+      this.knownDevices = []
       this.tiles = []
       this.activeSpeakerIds = []
       this.spotlightKey = null
