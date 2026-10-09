@@ -364,6 +364,57 @@ describe('poll tick', () => {
       })
     })
 
+    // Publishing can fail as well (the pubsub backend being down). The told rooms were taken
+    // off the list before, and for one the poller never saw itself nothing else remembers
+    // that a client is waiting for the correction.
+    it('keeps one for the next poll when publishing its correction fails', async () => {
+      startLiveKitPoller()
+      await vi.advanceTimersByTimeAsync(5_000)
+
+      noteCountTold('group-a', 1)
+      mockListRooms.mockResolvedValueOnce([])
+      mockPublish.mockRejectedValueOnce(new Error('pubsub down'))
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      mockPublish.mockClear()
+      mockListRooms.mockResolvedValueOnce([])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockPublish).toHaveBeenCalledTimes(1)
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'a',
+        count: 0,
+      })
+    })
+
+    it('keeps the ones not reached yet when publishing fails halfway through', async () => {
+      startLiveKitPoller()
+      await vi.advanceTimersByTimeAsync(5_000)
+
+      noteCountTold('group-a', 1)
+      noteCountTold('group-b', 1)
+      noteCountTold('group-c', 1)
+      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 1 }])
+      // group-a goes through, the first of the vanished rooms fails, the other is never reached.
+      mockPublish.mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error('pubsub down'))
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      mockPublish.mockClear()
+      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 1 }])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      // Not group-a again: it got its correction, and nothing about it changed since.
+      expect(mockPublish).toHaveBeenCalledTimes(2)
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'b',
+        count: 0,
+      })
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'c',
+        count: 0,
+      })
+    })
+
     it('forgets them when the poller stops', () => {
       startLiveKitPoller()
       noteCountTold('group-a', 1)

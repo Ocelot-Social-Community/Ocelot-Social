@@ -1149,14 +1149,21 @@ describe('GroupProfileSlug', () => {
       openVideoCallMock = jest.fn()
       currentUserMock.mockReturnValue(peterLustig)
       const enabledStore = new Vuex.Store({
+        // Real state behind the getter, so a test can open and close the call and the page's
+        // watcher fires the way it does in the app.
+        state: { videoCallOpen: false },
         getters: {
           ...getters,
           'videoCall/enabled': () => true,
+          'videoCall/showVideoCall': (state) => state.videoCallOpen,
         },
         actions,
         mutations: {
           ...mutations,
           'videoCall/OPEN': openVideoCallMock,
+          SET_VIDEO_CALL_OPEN(state, open) {
+            state.videoCallOpen = open
+          },
         },
       })
       return mount(GroupProfileSlug, {
@@ -1328,8 +1335,14 @@ describe('GroupProfileSlug', () => {
     })
 
     describe('after the viewer hung up', () => {
-      const hangUp = (wrapper) =>
-        wrapper.vm.$options.watch.videoCallOpen.call(wrapper.vm, false, true)
+      const setCallOpen = async (wrapper, open) => {
+        wrapper.vm.$store.commit('SET_VIDEO_CALL_OPEN', open)
+        await wrapper.vm.$nextTick()
+      }
+      const hangUp = async (wrapper) => {
+        await setCallOpen(wrapper, true)
+        await setCallOpen(wrapper, false)
+      }
 
       it('fetches the count anew: the one from arriving here still included the viewer', async () => {
         const wrapper = mountWithGroup(yogaPractice)
@@ -1343,7 +1356,7 @@ describe('GroupProfileSlug', () => {
         const wrapper = mountWithGroup(yogaPractice)
         const refetch = jest.fn().mockResolvedValue()
         wrapper.vm.$apollo.queries.videoCallParticipantCount = { refetch }
-        await wrapper.vm.$options.watch.videoCallOpen.call(wrapper.vm, true, false)
+        await setCallOpen(wrapper, true)
         expect(refetch).not.toHaveBeenCalled()
       })
 
@@ -1355,6 +1368,8 @@ describe('GroupProfileSlug', () => {
         }
         const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
         await hangUp(wrapper)
+        // The rejection is handled a turn after the watcher fired.
+        await wrapper.vm.$nextTick()
         expect(wrapper.vm.videoCallParticipantCount).toBe(1)
         expect(consoleError).toHaveBeenCalled()
         consoleError.mockRestore()

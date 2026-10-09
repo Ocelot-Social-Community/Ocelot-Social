@@ -52,22 +52,26 @@ const pollOnce = async () => {
     return
   }
   polling = true
+  // The told rooms (see below) still owed their correction. Whatever is left when this poll
+  // ends — because LiveKit could not be asked, or because publishing failed halfway through —
+  // goes back, so the next poll makes up for it. Without that, a room this poller never saw
+  // itself would be forgotten: nothing else remembers that a client was told about it.
+  const owed = new Set<string>()
   try {
     // Rooms a client was told a running call for (see toldRooms.ts): they get the truth
     // published below even without a change. Taken BEFORE the list is fetched, so that
     // everything told is older than the list it is corrected with — the other way round, a
     // count told a moment after the snapshot would be "corrected" with the older state.
     const told = takeToldRooms()
+    for (const roomName of told) {
+      owed.add(roomName)
+    }
     let rooms
     try {
       rooms = await withTimeout(client.listRooms(), POLL_TIMEOUT_MS, 'listRooms')
       consecutiveFailures = 0
       // eslint-disable-next-line no-catch-all/no-catch-all
     } catch (err: unknown) {
-      // No list, no correction — keep them for the next poll.
-      for (const roomName of told) {
-        markRoomTold(roomName)
-      }
       consecutiveFailures += 1
       // Only log first few failures to avoid log spam if LiveKit is down.
       if (consecutiveFailures <= 3) {
@@ -84,6 +88,7 @@ const pollOnce = async () => {
       seen.add(room.name)
       const groupId = groupIdFromRoomName(room.name)
       if (!groupId) {
+        owed.delete(room.name)
         continue
       }
       // room.numParticipants is a number; gracefully coerce in case of bigint
@@ -92,6 +97,7 @@ const pollOnce = async () => {
         lastSeenCounts.set(room.name, count)
         await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count })
       }
+      owed.delete(room.name)
     }
     // Rooms that disappeared from LiveKit's list since the last poll — emit a
     // final count: 0 so the badge clears even if the webhook room_finished
@@ -114,8 +120,12 @@ const pollOnce = async () => {
         }
       }
       lastSeenCounts.delete(roomName)
+      owed.delete(roomName)
     }
   } finally {
+    for (const roomName of owed) {
+      markRoomTold(roomName)
+    }
     polling = false
   }
 }
