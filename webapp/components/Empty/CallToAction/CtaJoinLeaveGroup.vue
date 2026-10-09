@@ -18,7 +18,7 @@
     <join-leave-button
       :group="group"
       :userId="$store.getters['auth/user'].id"
-      :isMember="isGroupMember"
+      :isMember="hasMembership"
       :isNonePendingMember="isGroupMemberNonePending"
       :filled="true"
       :full-width="false"
@@ -29,8 +29,10 @@
 
 <script>
 import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
+import groupRights from '~/mixins/groupRights'
 
 export default {
+  mixins: [groupRights],
   name: 'CtaJoinLeaveGroup',
   components: {
     JoinLeaveButton,
@@ -42,11 +44,13 @@ export default {
     },
   },
   computed: {
-    isGroupMember() {
-      return this.group ? !!this.group.myRole : false
+    // "Has a membership at all" — an applicant counts here, because the button they need is
+    // "withdraw", not "join".
+    hasMembership() {
+      return !!this.group?.myGroupRole
     },
     isGroupMemberNonePending() {
-      return this.group ? ['usual', 'admin', 'owner'].includes(this.group.myRole) : false
+      return this.isGroupMember(this.group)
     },
   },
   methods: {

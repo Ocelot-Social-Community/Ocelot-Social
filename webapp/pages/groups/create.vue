@@ -15,7 +15,7 @@
       <div class="group-create-layout__main">
         <os-card>
           <div class="ds-my-large">
-            <group-form ref="groupForm" @createGroup="createGroup" />
+            <group-form ref="groupForm" :templates="templates" @createGroup="createGroup" />
           </div>
         </os-card>
       </div>
@@ -33,6 +33,7 @@ import { OsCard, OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
 import GroupForm from '~/components/Group/GroupForm'
 import { createGroupMutation } from '~/graphql/groups.js'
+import { groupTemplatesQuery } from '~/graphql/groupRoles.js'
 import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
 
 export default {
@@ -48,6 +49,9 @@ export default {
   data() {
     return {
       createGroupData: {},
+      // Which presets a new group can start from. Runtime data rather than a list in the
+      // client: an operator edits these, and `channel` only exists because one was added.
+      templates: [],
     }
   },
   computed: {
@@ -64,6 +68,16 @@ export default {
       ]
     },
   },
+  apollo: {
+    templates: {
+      query() {
+        return groupTemplatesQuery()
+      },
+      update(data) {
+        return data.groupTemplates ?? []
+      },
+    },
+  },
   methods: {
     hasUnsavedChanges() {
       return !!this.$refs.groupForm?.hasUnsavedChanges
@@ -73,25 +87,23 @@ export default {
         name,
         about,
         description,
-        groupType,
+        template,
         actionRadius,
         locationName,
         lat,
         lng,
         categoryIds,
-        showMembers,
       } = value
       const variables = {
         name,
         about,
         description,
-        groupType,
+        template,
         actionRadius,
         locationName,
         lat,
         lng,
         categoryIds,
-        showMembers,
       }
       let responseId, responseSlug
       try {

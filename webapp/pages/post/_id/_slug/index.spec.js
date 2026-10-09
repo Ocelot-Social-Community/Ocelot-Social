@@ -717,12 +717,14 @@ describe('PostSlug', () => {
         expect(result).toBeDefined()
       })
 
-      it('commentingAllowedByGroupRole reflects the current membership role', async () => {
+      it('commentingAllowedByGroupRole follows the group right, not the role name', async () => {
         wrapper = await Wrapper()
         expect(wrapper.vm.commentingAllowedByGroupRole).toBeFalsy()
-        wrapper.setData({ group: { myRole: 'usual' } })
+        // A group may open commenting to applicants or close it for members, so what decides is
+        // the right the viewer holds in that group.
+        wrapper.setData({ group: { myGroupPermissions: ['group.comment.create'] } })
         expect(wrapper.vm.commentingAllowedByGroupRole).toBe(true)
-        wrapper.setData({ group: { myRole: 'pending' } })
+        wrapper.setData({ group: { myGroupPermissions: ['group.content.read'] } })
         expect(wrapper.vm.commentingAllowedByGroupRole).toBe(false)
       })
 

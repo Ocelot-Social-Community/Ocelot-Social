@@ -9,14 +9,13 @@ import { createRequire } from 'node:module'
 
 import CONFIG from '@config/index'
 import { Errors } from '@graphql/errorRegistry'
-import { AppError, UserInputError } from '@graphql/errors'
+import { AppError } from '@graphql/errors'
 import {
   memberRoleHolds,
   nonMemberReadsContent,
   optionalMemberRoleMatch,
   visibilityOf,
 } from '@graphql/resolvers/helpers/groupAccessCypher'
-import { templateFromArgs, visibilityFromArgs } from '@graphql/resolvers/helpers/groupTypeAlias'
 import { inviteCodeAllowsRegistration } from '@graphql/resolvers/inviteCodes'
 import {
   coversRole,
@@ -108,6 +107,9 @@ export const groupCreatePermissionFor = (visibility: string): PermissionKey | nu
   }
 }
 /** The visibility a request asks for, where it asks for one at all. */
+const requestedVisibility = (args: Record<string, unknown>): string | null =>
+  (args.visibility as string | null) ?? null
+
 const canCreateGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
   // The create rights are gated by the feature; said here, as `groupsEnabled` says it elsewhere.
   if (!ctx.policy.getEffective('groupsEnabled')) {
@@ -116,13 +118,9 @@ const canCreateGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Co
   // `template` is a free String — the set of templates is runtime data, not an enum — so an
   // unknown name is a possible request and gets said back as one. "Not Authorised" for a typo
   // would send somebody looking for a missing right instead of a missing template.
-  const template = templateFromArgs(args)
-  if (!template) {
-    return new UserInputError('CreateGroup needs a template.')
-  }
-  const visibility = await templateVisibility(ctx.database, template)
+  const visibility = await templateVisibility(ctx.database, args.template as string)
   if (!visibility) {
-    return new AppError(Errors.GROUP_TEMPLATE_NAME_UNKNOWN, { template })
+    return new AppError(Errors.GROUP_TEMPLATE_NAME_UNKNOWN, { template: String(args.template) })
   }
   // What creating costs is read off the VISIBILITY the template derives to, not off its name:
   // a `channel` is a public group, and making one has to cost `group.create_public`.
@@ -552,7 +550,7 @@ const canChangeMemberListAccess = rule({ cache: 'no_cache' })(async (
   // group (see UpdateGroup). The current form sends it on every save, so for any other group it
   // is no change and needs no right — or saving a public group's name would cost
   // `group.role.manage`. Opening a hidden group's list is refused by the resolver, with a reason.
-  if ((visibilityFromArgs(args) ?? authorization.visibility) !== 'closed') {
+  if ((requestedVisibility(args) ?? authorization.visibility) !== 'closed') {
     return true
   }
   const nonMember = await ctx.groupAuthorization.rolePermissions(args.id, NONE_ROLE)
@@ -567,7 +565,7 @@ const canChangeMemberListAccess = rule({ cache: 'no_cache' })(async (
 })
 
 const canChangeVisibility = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
-  const requested = visibilityFromArgs(args)
+  const requested = requestedVisibility(args)
   if (requested === null) {
     return true
   }
@@ -940,7 +938,6 @@ export default shield(
       endGroupElevation: and(groupsEnabled, isAuthenticated),
       updateGroupRoleTemplate: hasPermission('group.roleTemplate.manage'),
       applyGroupRoleTemplates: hasPermission('group.roleTemplate.manage'),
-
       markTeaserAsViewed: allow,
 
       // Network Policy
@@ -1008,7 +1005,6 @@ export default shield(
       name: allow,
       about: allow,
       visibility: allow,
-      groupType: allow,
       // The two READ rights are not enforced here but in the field resolvers, which blank
       // instead of refusing (see resolvers/groups.ts, mayReadGroup). A rule would null the
       // whole group out of the one list where a group the viewer may not read legitimately

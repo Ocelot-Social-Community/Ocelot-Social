@@ -34,7 +34,11 @@ export const post = gql`
       name
       slug
       visibility
-      myRole
+      myGroupRole {
+        name
+        label
+      }
+      myGroupPermissions
       currentlyPinnedPostsCount
     }
   }

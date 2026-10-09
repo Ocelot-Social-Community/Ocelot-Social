@@ -36,16 +36,14 @@ type Group {
   about: String
   "Full group description (rich text)."
   description: String!
-  "Which role template this group was created from, or last put on. Stored, unlike `visibility`, which is derived: two templates can produce the same visibility (`channel` is public too), so this is what says which preset a group is running — and what the admin area counts when it asks how many groups an edit would reach."
-  template: String
   "The live elevation of the viewer in this group, or null when they are acting on their membership alone (see GroupElevation)."
   myGroupElevation: GroupElevation
   "Whether asking for an elevation here would grant the viewer anything beyond what they can already read."
   mayElevateInGroup: Boolean!
+  "Which role template this group was created from, or last put on. Stored, unlike `visibility`, which is derived: two templates can produce the same visibility (`channel` is public too), so this is what says which preset a group is running — and what the admin area counts when it asks how many groups an edit would reach."
+  template: String
   "How findable this group is — DERIVED from its rights, not chosen: `hidden` while its non-member role cannot read the profile, `closed` while it cannot read the content, `public` otherwise. Setting it through UpdateGroup applies the matching role template; the per-level network rights (group.create_*, group.administer.any_*, group.content.read.any_*) read it."
   visibility: GroupVisibility!
-  "The same value as `visibility`, under its old name."
-  groupType: GroupType! @deprecated(reason: "Use `visibility`.")
   actionRadius: GroupActionRadius!
 
   locationName: String
@@ -132,7 +130,6 @@ type Query {
     disabled: Boolean
   ): Int!
 
-
   # AvailableGroupActionRadii: [GroupActionRadius]!
 
   # AvailableGroupMemberRoles: [GroupMemberRole]!
@@ -146,10 +143,8 @@ type Mutation {
     slug: String
     about: String
     description: String!
-    "Which role template the group starts from — not a visibility, which is what the rights of that template derive to. Required unless the deprecated `groupType` is given."
-    template: String
-    "The template by the name of the visibility it derives to."
-    groupType: GroupType @deprecated(reason: "Use `template`.")
+    "Which role template the group starts from. A name from `groupTemplates` — not a visibility, which is what the rights of that template derive to."
+    template: String!
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
 
@@ -174,8 +169,6 @@ type Mutation {
 
     "Applying a visibility writes the matching role template onto the `none` and `pending` roles — the rights ARE the visibility, so this is a preset rather than a label."
     visibility: GroupVisibility
-    "The same as `visibility`, under its old name."
-    groupType: GroupType @deprecated(reason: "Use `visibility`.")
 
     actionRadius: GroupActionRadius
     categoryIds: [ID]

@@ -29,6 +29,12 @@
         <client-only v-if="isUser">
           <user-avatar :user="report.resource" :showAvatar="false" :showPopover="false" />
         </client-only>
+        <!-- Content in a group this moderator may not read: the report stays here to be
+             escalated, but neither its text nor a link to it is shown. The server blanked the
+             content already — this is what says why instead of rendering an empty link. -->
+        <span v-else-if="isHidden" class="hidden-content" data-test="report-hidden">
+          {{ $t('moderation.reports.hiddenContent') }}
+        </span>
         <nuxt-link v-else class="title" :to="linkTarget">
           {{ $filters.truncate(linkText, 50) }}
         </nuxt-link>
@@ -62,6 +68,12 @@
       <td class="ds-table-col">
         <span v-if="report.closed" class="title">
           {{ $t('moderation.reports.decided') }}
+        </span>
+        <!-- The shield refuses `review` on exactly this condition, so offering the button
+             would only produce an error. The report can still be escalated by somebody who
+             may read the group. -->
+        <span v-else-if="isHidden" class="hidden-content" data-test="report-undecidable">
+          {{ $t('moderation.reports.hiddenDecision') }}
         </span>
         <os-button
           v-else
@@ -124,6 +136,11 @@ export default {
     },
     isUser() {
       return this.report.resource.__typename === 'User'
+    },
+    // The server's answer, not a guess: `resourceHidden` is true when the reported content
+    // lives in a group this moderator holds no reading right in.
+    isHidden() {
+      return this.report.resourceHidden === true
     },
     isDisabled() {
       return this.report.resource.disabled
@@ -192,6 +209,11 @@ export default {
   .user-count {
     display: block;
     margin-bottom: var(--space-xx-small);
+  }
+
+  .hidden-content {
+    color: var(--text-color-soft);
+    font-style: italic;
   }
 
   .--disabled {

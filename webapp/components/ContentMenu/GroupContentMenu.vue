@@ -1,5 +1,7 @@
 <template>
-  <div class="content-menu" @click.stop.prevent>
+  <!-- Nothing to offer, no button: the menu decides that itself, from its own entries, so a
+       page does not have to guess who would find something in it. -->
+  <div v-if="routes.length" class="content-menu" @click.stop.prevent>
     <dropdown class="group-content-menu" :placement="placement" offset="5">
       <template #default="{ toggleMenu }">
         <slot name="button" :toggleMenu="toggleMenu">
@@ -43,8 +45,10 @@ import { OsButton, OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
 import { setGroupMembershipVisibilityMutation } from '~/graphql/UserGroups'
+import groupRights from '~/mixins/groupRights'
 
 export default {
+  mixins: [groupRights],
   name: 'GroupContentMenu',
   components: {
     Dropdown,
@@ -80,7 +84,7 @@ export default {
   },
   computed: {
     isMember() {
-      return ['usual', 'admin', 'owner'].includes(this.group.myRole)
+      return this.isGroupMember(this.group)
     },
     routes() {
       const routes = []
@@ -94,7 +98,9 @@ export default {
         })
       }
 
-      if (this.usage === 'groupProfile') {
+      // Muting is a member's choice about their own feed; a network admin acting in the group
+      // has no feed from it to mute.
+      if (this.usage === 'groupProfile' && this.isMember) {
         if (this.group.isMutedByMe) {
           routes.push({
             label: this.$t('group.contentMenu.unmuteGroup'),
@@ -134,12 +140,23 @@ export default {
         }
       }
 
-      if (this.group.myRole === 'owner') {
+      // Two separate rights, not "is the owner": editing the group and handing out invite
+      // links are granted independently now, and an admin may well hold one without the other.
+      if (this.canInGroup('group.settings.manage', this.group)) {
         routes.push({
           label: this.$t('admin.settings.name'),
           path: `/groups/edit/${this.group.id}`,
           icon: this.icons.edit,
         })
+      }
+      if (this.canInGroup('group.role.manage', this.group)) {
+        routes.push({
+          label: this.$t('group.rights.title'),
+          path: `/groups/edit/${this.group.id}/rights`,
+          icon: this.icons.lock ?? this.icons.edit,
+        })
+      }
+      if (this.canInGroup('group.invite', this.group)) {
         routes.push({
           label: this.$t('group.contentMenu.inviteLinks'),
           path: `/groups/edit/${this.group.id}/invites`,

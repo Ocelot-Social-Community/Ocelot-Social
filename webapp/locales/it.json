@@ -274,9 +274,6 @@
     "notifications": {
       "name": "Notifiche"
     },
-    "organizations": {
-      "name": "Organizzazioni"
-    },
     "pages": {
       "name": "Pagine"
     },
@@ -358,16 +355,6 @@
       "deleteError": "Impossibile eliminare il ruolo: {message}",
       "deleteSuccess": "Ruolo eliminato.",
       "description": "Chi può fare cosa in tutta la rete. Crea ruoli e assegna permessi: le modifiche hanno effetto subito.",
-      "groups": {
-        "account": "Account",
-        "administration": "Amministrazione",
-        "communication": "Comunicazione",
-        "content": "Contenuti",
-        "groupAdministration": "Gruppi — amministrazione",
-        "groupModeration": "Gruppi — moderazione",
-        "membership": "Iscrizione",
-        "moderation": "Moderazione"
-      },
       "members": "{count} membri",
       "name": "Ruoli e permessi",
       "nameLabel": "Nome",
@@ -391,10 +378,7 @@
         "user_delete_any": "Eliminare l’account di qualsiasi utente.",
         "user_email_readAny": "Leggere l’indirizzo e-mail di qualsiasi utente.",
         "user_invite": "Generare codici di invito personali.",
-        "videoCall_create_closed": "Avviare una videochiamata in un gruppo chiuso.",
-        "videoCall_create_hidden": "Avviare una videochiamata in un gruppo nascosto.",
         "videoCall_create_open": "Avviare una videochiamata in un gruppo in cui chiunque può entrare: trovabile e accessibile senza approvazione.",
-        "videoCall_create_public": "Avviare una videochiamata in un gruppo pubblico.",
         "videoCall_create_restricted": "Avviare una videochiamata in un gruppo in cui non si può entrare liberamente: iscriversi richiede approvazione o invito, oppure il gruppo è nascosto."
       },
       "permUnavailable": "Funzionalità non configurata: concedere questo permesso non ha effetto.",
@@ -1225,8 +1209,6 @@
       "actionRadiusRequired": "Selezionare un raggio d'azione.",
       "descriptionLength": "La descrizione deve contenere almeno {min} caratteri.",
       "descriptionNotEmpty": "Inserire una descrizione.",
-      "groupTypeNotAllowed": "Non puoi creare questo tipo di gruppo.",
-      "groupTypeRequired": "Selezionare un tipo di gruppo.",
       "nameNotEmpty": "Inserire un nome del gruppo.",
       "slugInvalidCharacters": "Sono ammessi solo lettere minuscole, numeri, trattini e trattini bassi.",
       "slugNotEmpty": "Inserire un nome unico del gruppo.",

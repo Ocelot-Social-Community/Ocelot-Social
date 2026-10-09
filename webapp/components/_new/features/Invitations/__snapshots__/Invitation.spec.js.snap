@@ -33,6 +33,8 @@ exports[`Invitation.vue when the invite code was not redeemed renders 1`] = `
         invite-codes.redeemed-count-0
       
         </span>
+         
+        <!---->
       </div>
     </div>
      
@@ -138,6 +140,8 @@ exports[`Invitation.vue when the invite code was redeemed renders 1`] = `
         invite-codes.redeemed-count
       
         </span>
+         
+        <!---->
       </div>
     </div>
      

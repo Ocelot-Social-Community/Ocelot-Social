@@ -274,9 +274,6 @@
     "notifications": {
       "name": "Powiadomienia"
     },
-    "organizations": {
-      "name": "Organizacje"
-    },
     "pages": {
       "name": "Strony"
     },
@@ -358,16 +355,6 @@
       "deleteError": "Nie można usunąć roli: {message}",
       "deleteSuccess": "Rola usunięta.",
       "description": "Kto co może w całej sieci. Twórz role i przypisuj uprawnienia — zmiany działają natychmiast.",
-      "groups": {
-        "account": "Konto",
-        "administration": "Administracja",
-        "communication": "Komunikacja",
-        "content": "Treści",
-        "groupAdministration": "Grupy — administracja",
-        "groupModeration": "Grupy — moderacja",
-        "membership": "Członkostwo",
-        "moderation": "Moderacja"
-      },
       "members": "{count} członków",
       "name": "Role i uprawnienia",
       "nameLabel": "Nazwa",
@@ -391,10 +378,7 @@
         "user_delete_any": "Usuwanie konta dowolnego użytkownika.",
         "user_email_readAny": "Odczyt adresu e-mail dowolnego użytkownika.",
         "user_invite": "Generowanie osobistych kodów zaproszeń.",
-        "videoCall_create_closed": "Rozpoczynanie rozmowy wideo w grupie zamkniętej.",
-        "videoCall_create_hidden": "Rozpoczynanie rozmowy wideo w grupie ukrytej.",
         "videoCall_create_open": "Rozpoczęcie rozmowy wideo w grupie, do której każdy może wejść — widocznej i dostępnej bez zatwierdzenia.",
-        "videoCall_create_public": "Rozpoczynanie rozmowy wideo w grupie publicznej.",
         "videoCall_create_restricted": "Rozpoczęcie rozmowy wideo w grupie, do której nie można po prostu wejść: dołączenie wymaga zatwierdzenia lub zaproszenia, albo grupa jest ukryta."
       },
       "permUnavailable": "Funkcja nieskonfigurowana — przyznanie tego uprawnienia nie ma efektu.",
@@ -1225,8 +1209,6 @@
       "actionRadiusRequired": "Proszę wybrać zasięg działania.",
       "descriptionLength": "Opis musi mieć co najmniej {min} znaków.",
       "descriptionNotEmpty": "Proszę podać opis.",
-      "groupTypeNotAllowed": "Nie możesz utworzyć grupy tego rodzaju.",
-      "groupTypeRequired": "Proszę wybrać typ grupy.",
       "nameNotEmpty": "Proszę podać nazwę grupy.",
       "slugInvalidCharacters": "Dozwolone są tylko małe litery, cyfry, myślniki i podkreślenia.",
       "slugNotEmpty": "Proszę podać unikalną nazwę grupy.",

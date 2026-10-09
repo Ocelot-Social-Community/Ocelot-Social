@@ -45,7 +45,6 @@ describe('DEFAULT_ROLES', () => {
     'group.create_hidden',
     'user.invite',
     'videoCall.create_open',
-    'videoCall.create_public',
     'apiKey.create',
   ]
 

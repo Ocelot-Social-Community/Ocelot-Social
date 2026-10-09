@@ -4,6 +4,10 @@ import { mount } from '@vue/test-utils'
 import { branding as brandingDefaults } from '@ocelot-social/branding'
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { groupRights, groupRightsWithout } from '~/test/groupRightsFixture'
+import { groupPermissionsChangedSubscription } from '~/graphql/groupRoles'
+import { groupShowMembersChangedSubscription } from '~/graphql/groups'
+import { roomUpdated } from '~/graphql/Rooms'
 
 const localVue = global.localVue
 
@@ -179,7 +183,7 @@ describe('GroupProfileSlug', () => {
       location: null,
       isMutedByMe: false,
       membersCount: 4,
-      // myRole: 'usual',
+      // ...groupRights('usual'),
     }
     schoolForCitizens = {
       id: 'g1',
@@ -211,7 +215,7 @@ describe('GroupProfileSlug', () => {
       },
       isMutedByMe: true,
       membersCount: 0,
-      // myRole: 'usual',
+      // ...groupRights('usual'),
     }
     investigativeJournalism = {
       id: 'g0',
@@ -251,7 +255,7 @@ describe('GroupProfileSlug', () => {
       },
       isMutedByMe: false,
       membersCount: 0,
-      // myRole: 'usual',
+      // ...groupRights('usual'),
     }
     peterLustig = {
       id: 'u1',
@@ -298,7 +302,7 @@ describe('GroupProfileSlug', () => {
             return {
               group: {
                 ...yogaPractice,
-                myRole: 'owner',
+                ...groupRights('owner'),
               },
             }
           })
@@ -342,7 +346,7 @@ describe('GroupProfileSlug', () => {
             return {
               group: {
                 ...yogaPractice,
-                myRole: 'owner',
+                ...groupRights('owner'),
                 description: linkedDescription,
               },
             }
@@ -404,7 +408,7 @@ describe('GroupProfileSlug', () => {
           // The overflow verdict only reaches the DOM on the next tick, so re-render
           // and wait rather than reusing the wrapper from the enclosing beforeEach.
           const renderGroup = async (group = yogaPractice) => {
-            wrapper = Wrapper(() => ({ group: { ...group, myRole: 'owner' } }))
+            wrapper = Wrapper(() => ({ group: { ...group, ...groupRights('owner') } }))
             await Vue.nextTick()
           }
 
@@ -459,7 +463,7 @@ describe('GroupProfileSlug', () => {
             return {
               group: {
                 ...yogaPractice,
-                myRole: 'usual',
+                ...groupRights('usual'),
               },
             }
           })
@@ -477,7 +481,7 @@ describe('GroupProfileSlug', () => {
             return {
               group: {
                 ...yogaPractice,
-                myRole: 'pending',
+                ...groupRights('pending'),
               },
             }
           })
@@ -495,7 +499,7 @@ describe('GroupProfileSlug', () => {
             return {
               group: {
                 ...yogaPractice,
-                myRole: null,
+                ...groupRights(null),
               },
             }
           })
@@ -516,7 +520,7 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...schoolForCitizens,
-                  myRole: 'owner',
+                  ...groupRights('owner'),
                 },
               }
             })
@@ -562,7 +566,7 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...schoolForCitizens,
-                  myRole: 'usual',
+                  ...groupRights('usual'),
                 },
               }
             })
@@ -603,7 +607,7 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...schoolForCitizens,
-                  myRole: 'pending',
+                  ...groupRights('pending'),
                 },
               }
             })
@@ -621,7 +625,10 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...schoolForCitizens,
-                  myRole: null,
+                  // A closed group asks rather than admits: its `none` role holds
+                  // group.join.request, not group.join, so the button offers "ask to join".
+                  myGroupRole: null,
+                  myGroupPermissions: ['group.read', 'group.join.request'],
                 },
               }
             })
@@ -643,7 +650,7 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...investigativeJournalism,
-                  myRole: 'owner',
+                  ...groupRights('owner'),
                 },
               }
             })
@@ -661,7 +668,7 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...investigativeJournalism,
-                  myRole: 'usual',
+                  ...groupRights('usual'),
                 },
               }
             })
@@ -679,7 +686,9 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...investigativeJournalism,
-                  myRole: 'pending',
+                  // An applicant to an UNLISTED group sees that they applied and nothing else:
+                  // its `pending` role holds no `group.read`, where a listed group's does.
+                  ...groupRightsWithout('pending', 'group.read'),
                 },
               }
             })
@@ -697,7 +706,9 @@ describe('GroupProfileSlug', () => {
               return {
                 group: {
                   ...investigativeJournalism,
-                  myRole: null,
+                  // A hidden group's `none` role holds nothing: no door, no button.
+                  myGroupRole: null,
+                  myGroupPermissions: [],
                 },
               }
             })
@@ -753,7 +764,7 @@ describe('GroupProfileSlug', () => {
           },
         },
         mocks,
-        data: () => ({ group: { ...yogaPractice, myRole: 'owner', description: '' } }),
+        data: () => ({ group: { ...yogaPractice, ...groupRights('owner'), description: '' } }),
       })
       await Vue.nextTick()
       expect(wrapper.find('.collaps-button').exists()).toBe(false)
@@ -761,7 +772,7 @@ describe('GroupProfileSlug', () => {
       await wrapper.setData({
         group: {
           ...yogaPractice,
-          myRole: 'owner',
+          ...groupRights('owner'),
           description: '<p>Now there is something to read.</p>',
         },
       })
@@ -823,18 +834,25 @@ describe('GroupProfileSlug', () => {
       })
     }
 
-    it('does not subscribe when group membership is unknown at mount', () => {
+    // Which document a call carries, rather than how many calls there were: the page sets up
+    // several subscriptions under different conditions, and counting them couples every test
+    // here to all of them.
+    const callsFor = (document) =>
+      subscribeMock.mock.calls.filter(([options]) => options.query === document)
+
+    it('does not subscribe to the member list when group membership is unknown at mount', () => {
       mountWithGroup({})
-      expect(subscribeMock).not.toHaveBeenCalled()
+      expect(callsFor(groupShowMembersChangedSubscription())).toHaveLength(0)
     })
 
-    it('does not subscribe for non-members', () => {
+    it('does not subscribe to the member list for non-members', () => {
       mountWithGroup({ ...yogaPractice, myRole: null })
-      expect(subscribeMock).not.toHaveBeenCalled()
+      expect(callsFor(groupShowMembersChangedSubscription())).toHaveLength(0)
     })
 
-    it('subscribes when group membership is already known at mount', () => {
-      mountWithGroup({ ...yogaPractice, myRole: 'usual' })
+    it('subscribes to the member list when group membership is already known at mount', () => {
+      mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
+      expect(callsFor(groupShowMembersChangedSubscription())).toHaveLength(1)
       expect(subscribeMock).toHaveBeenCalledWith(
         expect.objectContaining({ fetchPolicy: 'no-cache' }),
       )
@@ -842,20 +860,121 @@ describe('GroupProfileSlug', () => {
 
     it('subscribes reactively when membership becomes known after mount', async () => {
       const wrapper = mountWithGroup({})
-      expect(subscribeMock).not.toHaveBeenCalled()
-      wrapper.setData({ group: { ...yogaPractice, myRole: 'usual' } })
+      expect(callsFor(groupShowMembersChangedSubscription())).toHaveLength(0)
+      wrapper.setData({ group: { ...yogaPractice, ...groupRights('usual') } })
       await wrapper.vm.$nextTick()
-      expect(subscribeMock).toHaveBeenCalled()
+      expect(callsFor(groupShowMembersChangedSubscription())).toHaveLength(1)
     })
 
     it('does not double-subscribe if membership signal fires multiple times', async () => {
-      const wrapper = mountWithGroup({ ...yogaPractice, myRole: 'usual' })
-      // roomUpdated + groupShowMembers are both set up on mount for members
-      expect(subscribeMock).toHaveBeenCalledTimes(2)
-      wrapper.setData({ group: { ...yogaPractice, myRole: 'admin' } })
+      const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
+      // roomUpdated + groupShowMembers + groupPermissions are set up on mount for members
+      expect(subscribeMock).toHaveBeenCalledTimes(3)
+      wrapper.setData({ group: { ...yogaPractice, ...groupRights('admin') } })
       await wrapper.vm.$nextTick()
-      // neither subscription is set up again after role change
-      expect(subscribeMock).toHaveBeenCalledTimes(2)
+      // no subscription is set up again after a role change
+      expect(subscribeMock).toHaveBeenCalledTimes(3)
+    })
+
+    // The rights behind every button on this page can change under the viewer: an owner edits a
+    // role, somebody is promoted, the group's door opens or closes. Non-members included —
+    // their rights live in the group's `none` role.
+    it('subscribes to the rights of the group, membership or not', () => {
+      mountWithGroup({ ...yogaPractice, myRole: null })
+
+      expect(callsFor(groupPermissionsChangedSubscription())).toHaveLength(1)
+      expect(callsFor(groupPermissionsChangedSubscription())[0][0]).toMatchObject({
+        variables: { groupId: 'g1' },
+        fetchPolicy: 'no-cache',
+      })
+    })
+
+    it('refetches the group when its rights change', () => {
+      const capturedCallbacks = []
+      subscribeMock = jest.fn().mockImplementation(({ query }) => ({
+        subscribe: jest.fn().mockImplementation((callbacks) => {
+          capturedCallbacks.push({ query, callbacks })
+          return { unsubscribe: jest.fn() }
+        }),
+      }))
+      const refetch = jest.fn()
+      currentUserMock.mockReturnValue(peterLustig)
+      mount(GroupProfileSlug, {
+        localVue,
+        store,
+        stubs: {
+          ...stubs,
+          'infinite-loading': true,
+          'masonry-grid': true,
+          'masonry-grid-item': true,
+          'post-teaser': true,
+          'content-viewer': true,
+        },
+        mocks: {
+          ...mocks,
+          $apollo: {
+            loading: false,
+            mutate: jest.fn().mockResolvedValue(),
+            subscribe: subscribeMock,
+            queries: { chatRoom: { refetch: jest.fn() }, Group: { refetch } },
+          },
+        },
+        data: () => ({ group: { ...yogaPractice, ...groupRights('usual') } }),
+      })
+
+      const entry = capturedCallbacks.find(
+        ({ query }) => query === groupPermissionsChangedSubscription(),
+      )
+      expect(entry).toBeDefined()
+      entry.callbacks.next({})
+
+      expect(refetch).toHaveBeenCalled()
+    })
+
+    it('logs errors from the groupPermissionsChanged subscription', () => {
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const capturedCallbacks = []
+      subscribeMock = jest.fn().mockImplementation(({ query }) => ({
+        subscribe: jest.fn().mockImplementation((callbacks) => {
+          capturedCallbacks.push({ query, callbacks })
+          return { unsubscribe: jest.fn() }
+        }),
+      }))
+      currentUserMock.mockReturnValue(peterLustig)
+      mount(GroupProfileSlug, {
+        localVue,
+        store,
+        stubs: {
+          ...stubs,
+          'infinite-loading': true,
+          'masonry-grid': true,
+          'masonry-grid-item': true,
+          'post-teaser': true,
+          'content-viewer': true,
+        },
+        mocks: {
+          ...mocks,
+          $apollo: {
+            loading: false,
+            mutate: jest.fn().mockResolvedValue(),
+            subscribe: subscribeMock,
+            queries: { chatRoom: { refetch: jest.fn() }, Group: { refetch: jest.fn() } },
+          },
+        },
+        data: () => ({ group: { ...yogaPractice, ...groupRights('usual') } }),
+      })
+
+      const entry = capturedCallbacks.find(
+        ({ query }) => query === groupPermissionsChangedSubscription(),
+      )
+      const mockError = new Error('subscription failed')
+      entry.callbacks.error(mockError)
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'groupPermissionsChanged subscription error:',
+        mockError,
+      )
+      consoleSpy.mockRestore()
     })
 
     it('logs errors from the groupShowMembersChanged subscription', () => {
@@ -889,7 +1008,7 @@ describe('GroupProfileSlug', () => {
             queries: { chatRoom: { refetch: jest.fn() }, Group: { refetch: jest.fn() } },
           },
         },
-        data: () => ({ group: { ...yogaPractice, myRole: 'usual' } }),
+        data: () => ({ group: { ...yogaPractice, ...groupRights('usual') } }),
       })
       // subscribe is called twice: roomUpdated (index 0) and groupShowMembers (index 1)
       const groupShowMembersError = capturedCallbacks[1]?.error
@@ -901,6 +1020,110 @@ describe('GroupProfileSlug', () => {
         mockError,
       )
       consoleSpy.mockRestore()
+    })
+  })
+
+  describe("group action buttons follow the group's rights", () => {
+    let subscribeMock
+    let savedErrorHandler
+    let savedWarnHandler
+
+    beforeEach(() => {
+      savedErrorHandler = Vue.config.errorHandler
+      savedWarnHandler = Vue.config.warnHandler
+      Vue.config.errorHandler = null
+      Vue.config.warnHandler = null
+    })
+
+    afterEach(() => {
+      Vue.config.errorHandler = savedErrorHandler
+      Vue.config.warnHandler = savedWarnHandler
+    })
+
+    const mountWithGroup = (group) => {
+      subscribeMock = jest.fn().mockReturnValue({
+        subscribe: jest.fn().mockReturnValue({ unsubscribe: jest.fn() }),
+      })
+      currentUserMock.mockReturnValue(peterLustig)
+      return mount(GroupProfileSlug, {
+        localVue,
+        store,
+        stubs: {
+          ...stubs,
+          'infinite-loading': true,
+          'masonry-grid': true,
+          'masonry-grid-item': true,
+          'post-teaser': true,
+          'content-viewer': true,
+          OsCounterIcon: { props: ['icon', 'count'], template: '<i class="stub-counter-icon" />' },
+          OsIcon: { props: ['icon'], template: '<i class="stub-icon" />' },
+        },
+        mocks: {
+          ...mocks,
+          $apollo: {
+            loading: false,
+            mutate: jest.fn().mockResolvedValue(),
+            subscribe: subscribeMock,
+            queries: { chatRoom: { refetch: jest.fn() } },
+          },
+        },
+        data: () => ({ group }),
+      })
+    }
+
+    it('offers the chat to a member who holds group.chat.participate', () => {
+      const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
+      expect(wrapper.find('[data-test="chat-btn"]').exists()).toBe(true)
+    })
+
+    it('hides the chat when the group withheld the right from its members', () => {
+      // Being a member is no longer the question: the backend decides CreateGroupRoom and
+      // CreateMessage on group.chat.participate, so a button offered without it would only
+      // produce an error toast.
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        ...groupRightsWithout('usual', 'group.chat.participate'),
+      })
+      expect(wrapper.find('[data-test="chat-btn"]').exists()).toBe(false)
+    })
+
+    const subscribedTo = (document) =>
+      subscribeMock.mock.calls.filter(([options]) => options.query === document)
+
+    it('does not subscribe to room updates without the chat right', () => {
+      mountWithGroup({
+        ...yogaPractice,
+        ...groupRightsWithout('usual', 'group.chat.participate'),
+      })
+      // The other two still subscribe — one follows the membership, one the group's rights.
+      expect(subscribedTo(roomUpdated())).toHaveLength(0)
+      expect(subscribedTo(groupShowMembersChangedSubscription())).toHaveLength(1)
+    })
+
+    it('subscribes to room updates once the chat right arrives after mount', async () => {
+      const wrapper = mountWithGroup({})
+      expect(subscribedTo(roomUpdated())).toHaveLength(0)
+      wrapper.setData({ group: { ...yogaPractice, ...groupRights('usual') } })
+      await wrapper.vm.$nextTick()
+      expect(subscribedTo(roomUpdated())).toHaveLength(1)
+    })
+
+    it('marks the new-post button denied when the group withheld group.post.create', () => {
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        ...groupRightsWithout('usual', 'group.post.create'),
+      })
+      const button = wrapper.find('.profile-post-add-button')
+      expect(button.exists()).toBe(true)
+      expect(button.classes()).toContain('permission-denied')
+      expect(button.attributes('aria-disabled')).toBe('true')
+    })
+
+    it('leaves the new-post button alone for a member who may post', () => {
+      const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
+      const button = wrapper.find('.profile-post-add-button')
+      expect(button.exists()).toBe(true)
+      expect(button.classes()).not.toContain('permission-denied')
     })
   })
 
@@ -969,32 +1192,38 @@ describe('GroupProfileSlug', () => {
     }
 
     it('renders the video-call button for a public group member', () => {
-      const wrapper = mountWithGroup({ ...yogaPractice, myRole: 'usual' })
+      const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
       expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(true)
     })
 
     it('renders the video-call button for a non-public group member (joining is open to all)', () => {
-      const wrapper = mountWithGroup({ ...yogaPractice, visibility: 'closed', myRole: 'usual' })
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        visibility: 'closed',
+        ...groupRights('usual'),
+      })
       expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(true)
     })
 
     it('grays out the button (permission-denied) when the role may not open a call and none is running', () => {
-      // No per-type open permission ($can → false) and no active call (count 0): the
-      // button is shown but marked denied; joining-only would re-enable it.
-      const wrapper = mountWithGroup(
-        { ...yogaPractice, visibility: 'closed', myRole: 'usual' },
-        { $can: () => false },
-      )
+      // The group withheld group.videoCall.create from its members and no call is running
+      // (count 0): the button is shown but marked denied; joining-only would re-enable it.
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        visibility: 'closed',
+        ...groupRightsWithout('usual', 'group.videoCall.create'),
+      })
       const button = wrapper.find('[data-test="video-call-btn"]')
       expect(button.exists()).toBe(true)
       expect(button.classes()).toContain('permission-denied')
     })
 
     it('does not gray out the button when a call is already running (join is allowed)', async () => {
-      const wrapper = mountWithGroup(
-        { ...yogaPractice, visibility: 'closed', myRole: 'usual' },
-        { $can: () => false },
-      )
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        visibility: 'closed',
+        ...groupRightsWithout('usual', 'group.videoCall.create'),
+      })
       wrapper.setData({ videoCallParticipantCount: 2 })
       await wrapper.vm.$nextTick()
       const button = wrapper.find('[data-test="video-call-btn"]')
@@ -1007,14 +1236,14 @@ describe('GroupProfileSlug', () => {
     })
 
     it('hides the video-call button for pending members', () => {
-      const wrapper = mountWithGroup({ ...yogaPractice, myRole: 'pending' })
+      const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('pending') })
       expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(false)
     })
 
     it('dispatches videoCall/OPEN with the group payload when clicked', async () => {
       const group = {
         ...yogaPractice,
-        myRole: 'usual',
+        ...groupRights('usual'),
         avatar: { url: 'http://example.test/avatar.png' },
       }
       const wrapper = mountWithGroup(group)
@@ -1029,24 +1258,26 @@ describe('GroupProfileSlug', () => {
     })
 
     it('does not dispatch videoCall/OPEN but shows a toast when the viewer may not open a call', async () => {
-      // No open permission ($can → false) and no running call (count 0): clicking the
+      // No group.videoCall.create and no running call (count 0): clicking the
       // (still-clickable) button must short-circuit with feedback instead of an OPEN.
-      const wrapper = mountWithGroup(
-        { ...yogaPractice, visibility: 'closed', myRole: 'usual' },
-        { $can: () => false },
-      )
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        visibility: 'closed',
+        ...groupRightsWithout('usual', 'group.videoCall.create'),
+      })
       await wrapper.find('[data-test="video-call-btn"]').trigger('click')
       expect(openVideoCallMock).not.toHaveBeenCalled()
       expect(mocks.$toast.error).toHaveBeenCalledWith('permissions.deniedHint')
     })
 
     it('dispatches videoCall/OPEN (no toast) when a call is already running, even without open permission', async () => {
-      // Counter > 0 → this is a JOIN, allowed for any member regardless of the open
-      // permission: the click must dispatch and not surface the denied feedback.
-      const wrapper = mountWithGroup(
-        { ...yogaPractice, visibility: 'closed', myRole: 'usual' },
-        { $can: () => false },
-      )
+      // Counter > 0 → this is a JOIN, allowed for anybody holding group.videoCall.join
+      // whether or not they may open one: the click must dispatch and not surface the toast.
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        visibility: 'closed',
+        ...groupRightsWithout('usual', 'group.videoCall.create'),
+      })
       wrapper.setData({ videoCallParticipantCount: 2 })
       await wrapper.vm.$nextTick()
       await wrapper.find('[data-test="video-call-btn"]').trigger('click')
@@ -1057,10 +1288,11 @@ describe('GroupProfileSlug', () => {
     it('refetches the count before denying, then proceeds with the JOIN when a call turns out to be running', async () => {
       // Stale snapshot: count is 0 at click time, but a refetch reveals a live call.
       // The client must re-check and not hard-block the JOIN on the stale value.
-      const wrapper = mountWithGroup(
-        { ...yogaPractice, visibility: 'closed', myRole: 'usual' },
-        { $can: () => false },
-      )
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        visibility: 'closed',
+        ...groupRightsWithout('usual', 'group.videoCall.create'),
+      })
       const refetch = jest.fn().mockImplementation(() => {
         wrapper.vm.videoCallParticipantCount = 2
         return Promise.resolve()
@@ -1077,10 +1309,11 @@ describe('GroupProfileSlug', () => {
       // Refetch rejects (network/load race): the failure must be swallowed (no unhandled
       // rejection / raw backend error) and the decision falls back to the stale count we
       // already have — which here is 0, so the JOIN stays denied with the usual toast.
-      const wrapper = mountWithGroup(
-        { ...yogaPractice, visibility: 'closed', myRole: 'usual' },
-        { $can: () => false },
-      )
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        visibility: 'closed',
+        ...groupRightsWithout('usual', 'group.videoCall.create'),
+      })
       const refetch = jest.fn().mockRejectedValue(new Error('network down'))
       wrapper.vm.$apollo.queries.videoCallParticipantCount = { refetch }
       const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
@@ -1137,7 +1370,7 @@ describe('GroupProfileSlug', () => {
             queries: { chatRoom: { refetch: jest.fn() } },
           },
         },
-        data: () => ({ group: { ...yogaPractice, myRole: 'usual' } }),
+        data: () => ({ group: { ...yogaPractice, ...groupRights('usual') } }),
       })
       expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(false)
     })

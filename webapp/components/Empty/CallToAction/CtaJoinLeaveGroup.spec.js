@@ -13,7 +13,8 @@ describe('CtaJoinLeaveGroup.vue', () => {
         id: 'g-123',
         slug: 'group-123',
         name: 'Group 123',
-        myRole: null,
+        myGroupRole: null,
+        myGroupPermissions: ['group.read', 'group.join'],
       },
     }
     mocks = {

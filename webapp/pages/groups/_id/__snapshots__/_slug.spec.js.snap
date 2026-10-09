@@ -9,6 +9,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
       class="ds-mb-large"
     />
      
+    <!---->
+     
     <div
       class="ds-flex ds-flex-gap-base group-layout"
     >
@@ -209,6 +211,32 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                         >
                           <a
                             class="os-menu-item-link"
+                            href="/groups/edit/g1/rights"
+                          >
+                            <span
+                              aria-hidden="true"
+                              class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                            >
+                              <svg
+                                fill="currentColor"
+                                viewBox="0 0 32 32"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M15 3c3.845 0 7 3.155 7 7v3h3v16h-20v-16h3v-3c0-3.845 3.155-7 7-7zM15 5c-2.755 0-5 2.245-5 5v3h10v-3c0-2.755-2.245-5-5-5zM7 15v12h16v-12h-16z"
+                                />
+                              </svg>
+                            </span>
+                            
+              group.rights.title
+            
+                          </a>
+                        </li>
+                        <li
+                          class="os-menu-item os-menu-item-level-0"
+                        >
+                          <a
+                            class="os-menu-item-link"
                             href="/groups/edit/g1/invites"
                           >
                             <span
@@ -378,7 +406,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 data-original-title="null"
                 data-test="join-leave-btn"
                 data-variant="primary"
-                disabled="disabled"
                 type="button"
               >
                 <span
@@ -477,7 +504,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                group.roles.owner
+                owner
               
               </span>
             </div>
@@ -923,6 +950,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
       class="ds-mb-large"
     />
      
+    <!---->
+     
     <div
       class="ds-flex ds-flex-gap-base group-layout"
     >
@@ -1082,13 +1111,13 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
-                          d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
+                          d="M16 4c6.616 0 12 5.384 12 12s-5.384 12-12 12-12-5.384-12-12 5.384-12 12-12zM16 6c-5.535 0-10 4.465-10 10s4.465 10 10 10 10-4.465 10-10-4.465-10-10-10zM16 10c2.197 0 4 1.803 4 4 0 1.621-1.055 3.082-2.594 3.594l-0.406 0.125v1.281h-2v-1.281c0-0.856 0.56-1.635 1.375-1.906l0.406-0.125c0.727-0.242 1.219-0.92 1.219-1.688 0-1.117-0.883-2-2-2s-2 0.883-2 2h-2c0-2.197 1.803-4 4-4zM15 20h2v2h-2v-2z"
                         />
                       </svg>
                     </span>
                   </span>
                   
-    group.joinLeaveButton.join
+    group.joinLeaveButton.requestJoin
   
                 </span>
               </button>
@@ -1513,6 +1542,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
       class="ds-mb-large"
     />
      
+    <!---->
+     
     <div
       class="ds-flex ds-flex-gap-base group-layout"
     >
@@ -1712,7 +1743,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                group.roles.pending
+                pending
               
               </span>
             </div>
@@ -2122,6 +2153,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
       class="ds-mb-large"
     />
      
+    <!---->
+     
     <div
       class="ds-flex ds-flex-gap-base group-layout"
     >
@@ -2509,7 +2542,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                group.roles.usual
+                usual
               
               </span>
             </div>
@@ -2955,6 +2988,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
       class="ds-mb-large"
     />
      
+    <!---->
+     
     <div
       class="ds-flex ds-flex-gap-base group-layout"
     >
@@ -3155,6 +3190,32 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         >
                           <a
                             class="os-menu-item-link"
+                            href="/groups/edit/g2/rights"
+                          >
+                            <span
+                              aria-hidden="true"
+                              class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                            >
+                              <svg
+                                fill="currentColor"
+                                viewBox="0 0 32 32"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M15 3c3.845 0 7 3.155 7 7v3h3v16h-20v-16h3v-3c0-3.845 3.155-7 7-7zM15 5c-2.755 0-5 2.245-5 5v3h10v-3c0-2.755-2.245-5-5-5zM7 15v12h16v-12h-16z"
+                                />
+                              </svg>
+                            </span>
+                            
+              group.rights.title
+            
+                          </a>
+                        </li>
+                        <li
+                          class="os-menu-item os-menu-item-level-0"
+                        >
+                          <a
+                            class="os-menu-item-link"
                             href="/groups/edit/g2/invites"
                           >
                             <span
@@ -3255,7 +3316,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 data-original-title="null"
                 data-test="join-leave-btn"
                 data-variant="primary"
-                disabled="disabled"
                 type="button"
               >
                 <span
@@ -3354,7 +3414,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                group.roles.owner
+                owner
               
               </span>
             </div>
@@ -3732,6 +3792,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
     <div
       class="ds-mb-large"
     />
+     
+    <!---->
      
     <div
       class="ds-flex ds-flex-gap-base group-layout"
@@ -4215,6 +4277,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
       class="ds-mb-large"
     />
      
+    <!---->
+     
     <div
       class="ds-flex ds-flex-gap-base group-layout"
     >
@@ -4372,7 +4436,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                group.roles.pending
+                pending
               
               </span>
             </div>
@@ -4716,6 +4780,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
       class="ds-mb-large"
     />
      
+    <!---->
+     
     <div
       class="ds-flex ds-flex-gap-base group-layout"
     >
@@ -5034,7 +5100,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                group.roles.usual
+                usual
               
               </span>
             </div>
@@ -5413,6 +5479,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
       class="ds-mb-large"
     />
      
+    <!---->
+     
     <div
       class="ds-flex ds-flex-gap-base group-layout"
     >
@@ -5613,6 +5681,32 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                         >
                           <a
                             class="os-menu-item-link"
+                            href="/groups/edit/g0/rights"
+                          >
+                            <span
+                              aria-hidden="true"
+                              class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                            >
+                              <svg
+                                fill="currentColor"
+                                viewBox="0 0 32 32"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M15 3c3.845 0 7 3.155 7 7v3h3v16h-20v-16h3v-3c0-3.845 3.155-7 7-7zM15 5c-2.755 0-5 2.245-5 5v3h10v-3c0-2.755-2.245-5-5-5zM7 15v12h16v-12h-16z"
+                                />
+                              </svg>
+                            </span>
+                            
+              group.rights.title
+            
+                          </a>
+                        </li>
+                        <li
+                          class="os-menu-item os-menu-item-level-0"
+                        >
+                          <a
+                            class="os-menu-item-link"
                             href="/groups/edit/g0/invites"
                           >
                             <span
@@ -5751,7 +5845,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 data-original-title="null"
                 data-test="join-leave-btn"
                 data-variant="primary"
-                disabled="disabled"
                 type="button"
               >
                 <span
@@ -5850,7 +5943,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                group.roles.owner
+                owner
               
               </span>
             </div>
@@ -6344,6 +6437,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
       class="ds-mb-large"
     />
      
+    <!---->
+     
     <div
       class="ds-flex ds-flex-gap-base group-layout"
     >
@@ -6700,7 +6795,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                group.roles.usual
+                usual
               
               </span>
             </div>

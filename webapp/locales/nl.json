@@ -274,9 +274,6 @@
     "notifications": {
       "name": "Meldingen"
     },
-    "organizations": {
-      "name": "Organisaties"
-    },
     "pages": {
       "name": "Pages"
     },
@@ -358,16 +355,6 @@
       "deleteError": "Kon rol niet verwijderen: {message}",
       "deleteSuccess": "Rol verwijderd.",
       "description": "Wie wat mag in het hele netwerk. Maak rollen aan en wijs rechten toe — wijzigingen gelden meteen.",
-      "groups": {
-        "account": "Account",
-        "administration": "Beheer",
-        "communication": "Communicatie",
-        "content": "Inhoud",
-        "groupAdministration": "Groepen — beheer",
-        "groupModeration": "Groepen — moderatie",
-        "membership": "Lidmaatschap",
-        "moderation": "Moderatie"
-      },
       "members": "{count} leden",
       "name": "Rollen & rechten",
       "nameLabel": "Naam",
@@ -391,10 +378,7 @@
         "user_delete_any": "Het account van elke gebruiker verwijderen.",
         "user_email_readAny": "Het e-mailadres van elke gebruiker lezen.",
         "user_invite": "Persoonlijke uitnodigingscodes genereren.",
-        "videoCall_create_closed": "Een videogesprek starten in een gesloten groep.",
-        "videoCall_create_hidden": "Een videogesprek starten in een verborgen groep.",
         "videoCall_create_open": "Een videogesprek starten in een groep waar iedereen binnen kan lopen — vindbaar en zonder goedkeuring te betreden.",
-        "videoCall_create_public": "Een videogesprek starten in een openbare groep.",
         "videoCall_create_restricted": "Een videogesprek starten in een groep waar je niet zomaar binnen kunt: lid worden vraagt goedkeuring of een uitnodiging, of de groep is verborgen."
       },
       "permUnavailable": "Functie niet geconfigureerd — dit recht heeft geen effect.",
@@ -1225,8 +1209,6 @@
       "actionRadiusRequired": "Kies een actieradius.",
       "descriptionLength": "De beschrijving moet minstens {min} tekens lang zijn.",
       "descriptionNotEmpty": "Voer een beschrijving in.",
-      "groupTypeNotAllowed": "Je mag dit soort groep niet aanmaken.",
-      "groupTypeRequired": "Kies een groepstype.",
       "nameNotEmpty": "Voer een groepsnaam in.",
       "slugInvalidCharacters": "Alleen kleine letters, cijfers, koppeltekens en underscores zijn toegestaan.",
       "slugNotEmpty": "Voer een unieke groepsnaam in.",
