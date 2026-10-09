@@ -33,8 +33,16 @@ const login = (email) => {
   }
 }
 
-// The viewport, not the whole page: a README picture shows what a visitor sees first.
-const shoot = (name) => cy.screenshot(name, { capture: 'viewport', overwrite: true })
+// The viewport, not the whole page: a README picture shows what a visitor sees first. Without the
+// scrollbars, which belong to the test browser rather than to the page.
+const shoot = (name) => {
+  cy.document().then((doc) => {
+    const style = doc.createElement('style')
+    style.textContent = '::-webkit-scrollbar { display: none } html { scrollbar-width: none }'
+    doc.head.appendChild(style)
+  })
+  cy.screenshot(name, { capture: 'viewport', overwrite: true })
+}
 
 // Fonts, images and avatars arrive after the content; a picture taken at the first paint shows
 // placeholders.
@@ -57,10 +65,15 @@ describe('README screenshots', () => {
 
   it('a post with its comments', () => {
     login(USER)
-    cy.visit('/')
-    // The title's link — the first link of a teaser is its author.
-    cy.get('.post-teaser a[href^="/post/"]', { timeout: 60000 }).first().click()
-    cy.location('pathname', { timeout: 60000 }).should('match', /^\/post\//)
+    // The post with the most comments, so the picture shows a conversation. Asked of the API: a
+    // teaser opens its post through a click handler, not a link.
+    cy.request('POST', GRAPHQL_URI, {
+      query: '{ Post(first: 50) { id slug commentsCount } }',
+    }).then(({ body }) => {
+      const [post] = [...body.data.Post].sort((a, b) => b.commentsCount - a.commentsCount)
+      cy.visit(`/post/${post.id}/${post.slug}`)
+    })
+    cy.get('.post-page', { timeout: 60000 }).should('be.visible')
     settle()
     shoot('post')
   })
