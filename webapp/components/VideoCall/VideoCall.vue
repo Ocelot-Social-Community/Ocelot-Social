@@ -1321,7 +1321,20 @@ export default {
       // A capture that is switched off right now is noted by LiveKit and used
       // the next time it is turned on.
       this.deviceStarts(kind)
+      // One switch of a kind at a time, in the order they were asked for.
+      // Handed to LiveKit side by side, an earlier one can finish after a later
+      // one and leave its device behind — or be answered "not switched" for no
+      // other reason than the later one having changed the target meanwhile.
+      const turn = switching.queue
+      let done
+      switching.queue = new Promise((resolve) => {
+        done = resolve
+      })
       try {
+        await turn
+        // The call ended, or a newer pick came in, while this one was waiting
+        // its turn: there is nothing left for it to start.
+        if (this.room !== room || ticket !== switching.latest) return
         // false: the capture was restarted, but not on the device asked for.
         if ((await room.switchActiveDevice(kind, deviceId)) === false) {
           throw new Error('Device not switched')
@@ -1347,6 +1360,7 @@ export default {
       } finally {
         switching.inFlight--
         this.deviceStarted(kind)
+        done()
       }
       if (this.room !== room) return
       switching.settled = deviceId
@@ -1358,7 +1372,7 @@ export default {
       }
     },
     newDeviceSwitches() {
-      const none = () => ({ latest: 0, inFlight: 0, settled: null })
+      const none = () => ({ latest: 0, inFlight: 0, settled: null, queue: Promise.resolve() })
       return { videoinput: none(), audioinput: none(), audiooutput: none() }
     },
     deviceStarts(kind) {

@@ -1886,17 +1886,20 @@ describe('VideoCall', () => {
     })
 
     describe('a switch that takes its time', () => {
+      // Made up front and handed out when LiveKit is asked: switches of one kind wait
+      // their turn, so the second is only asked for once the first is through.
       const pendingSwitch = (room) => {
         let finish, fail
-        room.switchActiveDevice.mockImplementationOnce(
-          () =>
-            new Promise((resolve, reject) => {
-              finish = () => resolve(true)
-              fail = reject
-            }),
-        )
-        return { finish: () => finish(), fail: (err) => fail(err) }
+        const outcome = new Promise((resolve, reject) => {
+          finish = () => resolve(true)
+          fail = reject
+        })
+        // Refusing before LiveKit was asked must not count as an unhandled rejection.
+        outcome.catch(() => {})
+        room.switchActiveDevice.mockImplementationOnce(() => outcome)
+        return { finish, fail }
       }
+
       it('counts the camera as starting until it runs', async () => {
         const { wrapper, room } = await connected()
         const pending = pendingSwitch(room)
@@ -1935,10 +1938,53 @@ describe('VideoCall', () => {
           const first = pendingSwitch(built.room)
           const second = pendingSwitch(built.room)
           const one = built.wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
-          const two = built.wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-3' })
+          // The first is with LiveKit by the time the user picks again.
+          await flushPromises()
+          const two = built.wrapper.vm.switchDevice({
+            kind: 'videoinput',
+            deviceId: 'cam-3',
+            label: 'Third',
+          })
           return { ...built, first, second, one, two }
         }
         const refused = () => deviceError('NotReadableError')
+
+        it('asks LiveKit for one at a time, in the order they were picked', async () => {
+          const { wrapper, room, first, second, one, two } = await pickTwice()
+          // The later pick waits: handed over side by side, the earlier one could finish
+          // last and leave its camera behind.
+          expect(room.switchActiveDevice).toHaveBeenCalledTimes(1)
+          expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-2')
+
+          // Even with the later one's answer ready first, the order stays.
+          second.finish()
+          await flushPromises()
+          expect(room.switchActiveDevice).toHaveBeenCalledTimes(1)
+
+          first.finish()
+          await Promise.all([one, two])
+          expect(room.switchActiveDevice).toHaveBeenCalledTimes(2)
+          expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-3')
+          expect(wrapper.vm.cameraDeviceId).toBe('cam-3')
+          expect(JSON.parse(localStorage.getItem(STORAGE_KEY)).videoinput).toEqual({
+            deviceId: 'cam-3',
+            label: 'Third',
+          })
+        })
+
+        it('never starts a pick that was overtaken while it waited its turn', async () => {
+          const { wrapper, room, first, second, one, two } = await pickTwice()
+          const three = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-4' })
+          first.finish()
+          // LiveKit's second answer goes to the third pick: the second never asked.
+          second.finish()
+          await Promise.all([one, two, three])
+
+          const asked = room.switchActiveDevice.mock.calls.map(([, deviceId]) => deviceId)
+          expect(asked).toEqual(['cam-2', 'cam-4'])
+          expect(wrapper.vm.cameraDeviceId).toBe('cam-4')
+          expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+        })
 
         it('keeps the later pick when the earlier one is refused, and still says so', async () => {
           const { wrapper, room, first, second, one, two } = await pickTwice()
@@ -1946,8 +1992,11 @@ describe('VideoCall', () => {
           await one
           expect(wrapper.vm.showDeviceErrorToast).toHaveBeenCalledWith('camera', expect.any(Error))
           expect(wrapper.vm.cameraDeviceId).toBe('cam-3')
-          // LiveKit is not sent back to the first camera underneath the later pick.
+          // LiveKit is not sent back to the first camera underneath the later pick: the
+          // only thing asked of it next is that later pick.
+          await flushPromises()
           expect(room.switchActiveDevice).toHaveBeenCalledTimes(2)
+          expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-3')
 
           second.finish()
           await two
