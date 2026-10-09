@@ -904,9 +904,9 @@ type Mutation {
   AddPostEmotions(data: _EMOTEDInput!, to: _PostInput!): EMOTED
 
   """
-  Change a member's role in a group. Restricted to admins/owners, subject to the role hierarchy.
+  Change a member's role in a group. Deprecated: it takes the GroupMemberRole enum, so it cannot assign a role the group defined itself — use setGroupMemberRole. Needs group.member.role.assign, subject to the same dominance and coverage rules.
   """
-  ChangeGroupMemberRole(groupId: ID!, roleInGroup: GroupMemberRole!, userId: ID!): GroupMember
+  ChangeGroupMemberRole(groupId: ID!, roleInGroup: GroupMemberRole!, userId: ID!): GroupMember @deprecated(reason: "Group roles are group-defined; use setGroupMemberRole instead.")
 
   """
   Write a comment on a post. Requires authentication, the `comment.create` permission, and permission to comment on that post.

@@ -190,8 +190,9 @@ type Mutation {
   "Leave a group, or (for admins/owners) let a member leave."
   LeaveGroup(groupId: ID!, userId: ID!): GroupMember
 
-  "Change a member's role in a group. Restricted to admins/owners, subject to the role hierarchy."
+  "Change a member's role in a group. Deprecated: it takes the GroupMemberRole enum, so it cannot assign a role the group defined itself — use setGroupMemberRole. Needs group.member.role.assign, subject to the same dominance and coverage rules."
   ChangeGroupMemberRole(groupId: ID!, userId: ID!, roleInGroup: GroupMemberRole!): GroupMember
+    @deprecated(reason: "Group roles are group-defined; use setGroupMemberRole instead.")
 
   "Remove a user from a group. Restricted to those allowed to manage the group's members."
   RemoveUserFromGroup(groupId: ID!, userId: ID!): GroupMember
