@@ -22,10 +22,7 @@ Feature: User profile - change password
       | Your new password    | secure    |
       | Confirm new password | secure    |
     And I submit the form
-    And I see a "failure toaster" message:
-    """
-    Your old password is not correct.
-    """
+    Then I see a toaster with status "error" saying "Your old password is not correct."
 
   Scenario: Incorrect Password Repeat
     When I fill the password form with:
@@ -42,10 +39,7 @@ Feature: User profile - change password
       | Your new password    | secure  |
       | Confirm new password | secure  |
     And I submit the form
-    And I see a "success toaster" message:
-    """
-    Password successfully changed!
-    """
+    Then I see a toaster with status "success" saying "Password successfully changed!"
     And I log out
     Then I fill in my credentials "peterpan@example.org" "exposed"
     And I click on "submit button"
