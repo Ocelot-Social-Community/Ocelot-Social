@@ -33,7 +33,7 @@
             <os-toggle-group
               :options="templateOptions"
               activation="manual"
-              :value="group.template"
+              :value="currentTemplate"
               :label="$t('admin.groupRoles.templateLabel')"
               @select="confirmApplyTemplate"
               @hover="hoveredTemplateName = $event"
@@ -184,6 +184,8 @@ export default {
   },
   data() {
     return {
+      /** The template the group runs on, as this page last knows it. */
+      currentTemplate: this.group.template,
       icons: iconRegistry,
       /** The templates on offer, `{ name, roles }`. */
       templates: [],
@@ -237,6 +239,12 @@ export default {
           cancel: { icon: this.icons.close, textIdent: 'actions.cancel', callback: () => {} },
         },
       }
+    },
+  },
+  watch: {
+    // A reload of the group by the parent is the latest word on it.
+    'group.template'(template) {
+      this.currentTemplate = template
     },
   },
   methods: {
@@ -307,7 +315,9 @@ export default {
           variables: { groupId: this.group.id, template },
         })
         this.roles = data.resetGroupRoles
-        this.group.template = template
+        // Held here rather than written into the parent's group: the page owns what it just
+        // did, and the parent's next load of the group says it again.
+        this.currentTemplate = template
         this.resetDraft()
         this.$toast.success(this.$t('group.rights.saved'))
       } catch (error) {

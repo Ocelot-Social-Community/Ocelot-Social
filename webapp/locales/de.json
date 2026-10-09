@@ -223,7 +223,7 @@
     "groupRoles": {
       "applied": "{count} Gruppen aktualisiert",
       "apply": "Auf unveränderte Gruppen anwenden",
-      "confirmApply": "Vorlagen auf {count} Gruppen anwenden, die ihre Rollen nie angepasst haben? Angepasste Gruppen bleiben unberührt.",
+      "confirmApply": "Vorlage „{template}“ auf die {count} Gruppen anwenden, die auf ihr laufen und ihre Rollen nie angepasst haben? Angepasste Gruppen und die Gruppen der anderen Vorlagen bleiben unberührt.",
       "description": "Hier bearbeitest du die Vorlagen, aus denen neue Gruppen entstehen — keine bestehende Gruppe ändert sich dadurch. Nur der Knopf unten wendet eine Änderung auf Gruppen an, und auch dann nur auf die, die ihre Rechte nie selbst geändert haben.",
       "editingTemplate": "Du bearbeitest die Vorlage „{template}“",
       "labelField": "Name",
@@ -246,7 +246,7 @@
         "type": "Typ"
       },
       "count": "{shown} von {total}",
-      "description": "Alle Gruppen, die du verwalten darfst — auch die geheimen, die es sonst nirgends in einer Liste gibt. Gruppen ohne Inhaber findest du hier ueber den Filter.",
+      "description": "Alle Gruppen, die du verwalten darfst — auch die geheimen, die es sonst nirgends in einer Liste gibt. Gruppen ohne Inhaber findest du hier über den Filter.",
       "disabled": "deaktiviert",
       "disabledOnly": "nur deaktivierte",
       "empty": "Keine Gruppe passt zu diesen Filtern.",
@@ -254,7 +254,7 @@
       "next": "Weiter",
       "noOwner": "kein Inhaber",
       "ownerlessOnly": "nur ohne Inhaber",
-      "previous": "Zurueck",
+      "previous": "Zurück",
       "searchPlaceholder": "Name oder Kurzname",
       "title": "Gruppen verwalten"
     },

@@ -113,6 +113,9 @@ export default {
       const at = this.elevation?.expiresAt
       if (!at || typeof window === 'undefined') return
       const remaining = new Date(at).getTime() - Date.now()
+      // A date that does not parse would read as "already past" and ask straight away, over
+      // and over; there is nothing to wait for then.
+      if (!Number.isFinite(remaining)) return
       // Already past: ask straight away rather than waiting out a negative delay, which
       // setTimeout would fire immediately anyway but less obviously.
       this._lapseTimer = window.setTimeout(

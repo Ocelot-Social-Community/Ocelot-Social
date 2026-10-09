@@ -379,7 +379,8 @@ describe('admin/group-roles.vue', () => {
         variables: expect.objectContaining({
           template: 'public',
           name: 'usual',
-          permissions: ['group.post.create', 'group.members.read'],
+          // Seeing the member list cannot be held without seeing the group: it comes along.
+          permissions: ['group.post.create', 'group.members.read', 'group.read'],
         }),
       }),
     )
@@ -422,7 +423,14 @@ describe('admin/group-roles.vue', () => {
       await at(wrapper, 'apply').trigger('click')
       await wrapper.vm.$nextTick()
 
-      expect(window.confirm).toHaveBeenCalled()
+      // The template on screen, by name in the question and as the only one sent: the count
+      // the admin confirms is the count of that template's groups.
+      expect(window.confirm).toHaveBeenCalledWith(
+        expect.stringContaining('admin.groupRoles.confirmApply'),
+      )
+      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({ variables: { template: 'public' } }),
+      )
       expect(mocks.$toast.success).toHaveBeenCalledWith(
         expect.stringContaining('admin.groupRoles.applied'),
       )

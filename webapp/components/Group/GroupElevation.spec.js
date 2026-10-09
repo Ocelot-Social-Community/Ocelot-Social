@@ -63,6 +63,21 @@ describe('GroupElevation', () => {
     expect(at(wrapper, 'elevation-active').exists()).toBe(false)
   })
 
+  it('waits for nothing when the end of the elevation does not parse', () => {
+    // Otherwise it would read as "already past" and tell the page to refetch at once.
+    jest.useFakeTimers()
+    const wrapper = Wrapper({
+      id: 'g1',
+      mayElevateInGroup: true,
+      myGroupElevation: { expiresAt: 'not a date', reason: 'r', outranksMembers: false },
+    })
+
+    jest.runAllTimers()
+
+    expect(wrapper.emitted('changed')).toBeUndefined()
+    jest.useRealTimers()
+  })
+
   it('stops the reason at the length the server takes', () => {
     const wrapper = Wrapper({ id: 'g1', mayElevateInGroup: true, myGroupElevation: null })
 

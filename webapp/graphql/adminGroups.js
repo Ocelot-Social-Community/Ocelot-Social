@@ -81,7 +81,7 @@ export const updateGroupRoleTemplateMutation = () => gql`
 `
 
 export const applyGroupRoleTemplatesMutation = () => gql`
-  mutation {
-    applyGroupRoleTemplates
+  mutation ($template: String!) {
+    applyGroupRoleTemplates(template: $template)
   }
 `

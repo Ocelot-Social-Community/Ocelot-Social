@@ -223,7 +223,7 @@
     "groupRoles": {
       "applied": "{count} groups updated",
       "apply": "Apply to untouched groups",
-      "confirmApply": "Apply the templates to {count} groups that never customised their roles? Customised groups are left alone.",
+      "confirmApply": "Apply the template “{template}” to the {count} groups that run on it and never customised their roles? Customised groups and the other templates’ groups are left alone.",
       "description": "Here you edit the templates new groups are created from — no existing group changes because of it. Only the button below applies a change to groups, and then only to the ones that never changed their own rights.",
       "editingTemplate": "You are editing the “{template}” template",
       "labelField": "Name",

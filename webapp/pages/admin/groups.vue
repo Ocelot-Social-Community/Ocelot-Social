@@ -5,13 +5,19 @@
 
     <form class="filters" @submit.prevent="reload">
       <input
-        v-model="groupFilter.search"
+        v-model="searchInput"
         type="search"
         :placeholder="$t('admin.groups.searchPlaceholder')"
+        :aria-label="$t('admin.groups.searchPlaceholder')"
         data-test="search"
-        @input="debouncedReload"
+        @input="debouncedSearch"
       />
-      <select v-model="groupFilter.visibility" data-test="filter-type" @change="reload">
+      <select
+        v-model="groupFilter.visibility"
+        :aria-label="$t('permissions.sections.visibility')"
+        data-test="filter-type"
+        @change="firstPage"
+      >
         <option :value="null">{{ $t('admin.groups.allTypes') }}</option>
         <option v-for="type in visibilitys" :key="type" :value="type">
           {{ $t(`group.types.${type}`) }}
@@ -22,7 +28,7 @@
           v-model="groupFilter.ownerless"
           type="checkbox"
           data-test="filter-ownerless"
-          @change="reload"
+          @change="firstPage"
         />
         {{ $t('admin.groups.ownerlessOnly') }}
       </label>
@@ -31,7 +37,7 @@
           v-model="groupFilter.disabled"
           type="checkbox"
           data-test="filter-disabled"
-          @change="reload"
+          @change="firstPage"
         />
         {{ $t('admin.groups.disabledOnly') }}
       </label>
@@ -120,6 +126,9 @@ export default {
       // Named groupFilter, not filter: the schema contract test reads every `filter: {`
       // in the webapp as a post filter, and this one is about groups.
       groupFilter: { search: '', visibility: null, ownerless: false, disabled: false },
+      // What is typed, apart from what is searched for: the query variables follow the field
+      // only once typing pauses, or every keystroke would be a request.
+      searchInput: '',
     }
   },
   computed: {
@@ -139,23 +148,35 @@ export default {
       }
     },
   },
+  beforeDestroy() {
+    clearTimeout(this.searchTimeout)
+  },
   methods: {
-    debouncedReload() {
+    // The filters, the search and the paging only move the state the reactive `variables()`
+    // below reads: vue-apollo re-runs the query when they change, so a refetch() on top of it
+    // would be a second request for the same answer. Never pass variables to refetch(): it
+    // REPLACES that function with a plain object (`variables && (this.options.variables =
+    // variables)`), and the watcher it registered then throws on the next change and takes the
+    // page down to Nuxt's error screen.
+    debouncedSearch() {
       clearTimeout(this.searchTimeout)
-      this.searchTimeout = setTimeout(() => this.reload(), 300)
+      this.searchTimeout = setTimeout(() => {
+        this.offset = 0
+        this.groupFilter.search = this.searchInput
+      }, 300)
     },
-    // Both of these only move the state the `variables()` function below reads. Passing the
-    // variables to refetch() instead would REPLACE that function with a plain object
-    // (vue-apollo: `variables && (this.options.variables = variables)`), and the watcher it
-    // registered still calls `options.variables.call(vm)` on the next change — which then
-    // throws, takes the smart query down with it, and leaves the page on Nuxt's error screen.
-    reload() {
+    firstPage() {
       this.offset = 0
+    },
+    /** Enter in the search field: now, and asked again even when nothing changed. */
+    reload() {
+      clearTimeout(this.searchTimeout)
+      this.offset = 0
+      this.groupFilter.search = this.searchInput
       return this.$apollo.queries.adminGroups.refetch()
     },
     page(direction) {
       this.offset = Math.max(0, this.offset + direction * this.pageSize)
-      return this.$apollo.queries.adminGroups.refetch()
     },
   },
   apollo: {

@@ -223,7 +223,7 @@
     "groupRoles": {
       "applied": "{count} grupos actualizados",
       "apply": "Aplicar a los grupos sin cambios",
-      "confirmApply": "¿Aplicar las plantillas a {count} grupos que nunca personalizaron sus roles? Los grupos personalizados quedan intactos.",
+      "confirmApply": "¿Aplicar la plantilla «{template}» a los {count} grupos que la usan y nunca han personalizado sus roles? Los grupos personalizados y los de las demás plantillas no se modifican.",
       "description": "Aquí editas las plantillas con las que se crean los grupos nuevos: ningún grupo existente cambia por ello. Solo el botón de abajo aplica un cambio a los grupos, y solo a los que nunca cambiaron sus propios derechos.",
       "editingTemplate": "Estás editando la plantilla «{template}»",
       "labelField": "Nombre",

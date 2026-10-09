@@ -128,31 +128,53 @@ describe('admin/groups.vue', () => {
       })
     })
 
-    it('refetches from the first page when a filter changes', async () => {
+    it('goes back to the first page when a filter changes, through the variables alone', async () => {
       const wrapper = await Wrapper()
       wrapper.setData({ offset: 50 })
 
       await at(wrapper, 'filter-ownerless').trigger('change')
 
       expect(wrapper.vm.offset).toBe(0)
+      // The reactive variables re-run the query; a refetch on top would ask twice.
+      expect(wrapper.vm.variables).toMatchObject({ offset: 0 })
+      expect(refetch).not.toHaveBeenCalled()
+    })
+
+    it('searches only once typing pauses', async () => {
+      jest.useFakeTimers()
+      const wrapper = await Wrapper()
+      wrapper.setData({ offset: 50 })
+
+      await at(wrapper, 'search').setValue('yo')
+      await at(wrapper, 'search').setValue('yoga')
+      expect(wrapper.vm.variables).toMatchObject({ search: null, offset: 50 })
+
+      jest.advanceTimersByTime(300)
+      expect(wrapper.vm.variables).toMatchObject({ search: 'yoga', offset: 0 })
+      expect(refetch).not.toHaveBeenCalled()
+      jest.useRealTimers()
+    })
+
+    it('searches at once, and asks again, on Enter', async () => {
       // Without an argument, deliberately: vue-apollo would REPLACE the reactive `variables()`
       // function with the object handed to refetch, and the watcher it keeps calling would
       // then throw on the next change — which is how every filter ended on the error page.
+      const wrapper = await Wrapper()
+      await at(wrapper, 'search').setValue('yoga')
+
+      await wrapper.find('form').trigger('submit')
+
+      expect(wrapper.vm.variables).toMatchObject({ search: 'yoga', offset: 0 })
       expect(refetch).toHaveBeenCalledWith()
-      // The variables the query will read are the computed ones, which the reset above moved.
-      expect(wrapper.vm.variables).toMatchObject({ offset: 0 })
     })
 
-    it('debounces the search field', async () => {
-      jest.useFakeTimers()
+    it('names both filter controls for a screen reader', async () => {
       const wrapper = await Wrapper()
 
-      await at(wrapper, 'search').trigger('input')
-      expect(refetch).not.toHaveBeenCalled()
-
-      jest.runAllTimers()
-      expect(refetch).toHaveBeenCalled()
-      jest.useRealTimers()
+      expect(at(wrapper, 'search').attributes('aria-label')).toBe('admin.groups.searchPlaceholder')
+      expect(at(wrapper, 'filter-type').attributes('aria-label')).toBe(
+        'permissions.sections.visibility',
+      )
     })
   })
 
@@ -168,7 +190,8 @@ describe('admin/groups.vue', () => {
 
       await at(wrapper, 'next-button').trigger('click')
       expect(wrapper.vm.offset).toBe(25)
-      expect(refetch).toHaveBeenCalledWith()
+      // The offset is a variable of the query: moving it is what fetches the page.
+      expect(wrapper.vm.variables).toMatchObject({ offset: 25 })
 
       await at(wrapper, 'previous-button').trigger('click')
       expect(wrapper.vm.offset).toBe(0)

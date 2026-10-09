@@ -223,7 +223,7 @@
     "groupRoles": {
       "applied": "Zaktualizowano {count} grup",
       "apply": "Zastosuj do niezmienionych grup",
-      "confirmApply": "Zastosować szablony do {count} grup, które nigdy nie zmieniały swoich ról? Grupy z własnymi ustawieniami pozostaną nietknięte.",
+      "confirmApply": "Zastosować szablon „{template}” do {count} grup, które z niego korzystają i nigdy nie dostosowały swoich ról? Dostosowane grupy i grupy pozostałych szablonów pozostają bez zmian.",
       "description": "Tutaj edytujesz szablony, z których powstają nowe grupy — żadna istniejąca grupa się przez to nie zmienia. Dopiero przycisk poniżej stosuje zmianę do grup, i tylko do tych, które nigdy nie zmieniły własnych uprawnień.",
       "editingTemplate": "Edytujesz szablon „{template}”",
       "labelField": "Nazwa",

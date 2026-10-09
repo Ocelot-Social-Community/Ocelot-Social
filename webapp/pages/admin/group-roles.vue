@@ -229,6 +229,7 @@ export default {
         !window.confirm(
           this.$t('admin.groupRoles.confirmApply', {
             count: this.activeTemplate.untouchedGroupCount,
+            template: this.$t(`group.types.${this.activeTemplateName}`),
           }),
         )
       ) {
@@ -236,7 +237,11 @@ export default {
       }
       this.saving = true
       try {
-        const { data } = await this.$apollo.mutate({ mutation: applyGroupRoleTemplatesMutation() })
+        // The template on screen, and only that one: it is what the confirmation counted.
+        const { data } = await this.$apollo.mutate({
+          mutation: applyGroupRoleTemplatesMutation(),
+          variables: { template: this.activeTemplateName },
+        })
         this.$toast.success(
           this.$t('admin.groupRoles.applied', { count: data.applyGroupRoleTemplates }),
         )

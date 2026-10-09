@@ -1136,9 +1136,12 @@ type Mutation {
   adminRevokeUserApiKeys(userId: ID!): Int!
 
   """
-  Apply the templates to every group that has never edited its own roles, and return how many groups were changed. A group that customised its roles is left alone — its edit is not overwritten by a network default. Requires `group.roleTemplate.manage`.
+  Apply one template to every group that runs on it and has never edited its own roles, and return how many groups were changed. A group that customised its roles is left alone — its edit is not overwritten by a network default. One template at a time, so what is confirmed is what is changed. Requires `group.roleTemplate.manage`.
   """
-  applyGroupRoleTemplates: Int!
+  applyGroupRoleTemplates(
+    """The template to apply, by name (see groupRoleTemplates)."""
+    template: String!
+  ): Int!
 
   """
   Block a user, cutting off interaction in both directions. Requires authentication.

@@ -9,7 +9,7 @@ import {
 } from '~/constants/groups'
 import groupRights from '~/mixins/groupRights'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
-import { rightsTouchedBy } from '~/utils/groupRoleRights'
+import { applyRightChange, rightsTouchedBy } from '~/utils/groupRoleRights'
 import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
 
 /**
@@ -188,9 +188,12 @@ export default {
       }
       const permission = this.catalog.find((entry) => entry.key === this.hoveredRight)
       if (!permission || this.rowDisabled(permission)) return null
-      const permissions = this.draft.includes(permission.key)
-        ? this.draft.filter((held) => held !== permission.key)
-        : [...this.draft, permission.key]
+      // What the click would do, implications included — the same change toggle() makes.
+      const permissions = applyRightChange(
+        this.draft,
+        permission.key,
+        !this.draft.includes(permission.key),
+      )
       return this.draftedRoles.map((role) =>
         role.name === this.activeRoleName ? { ...role, permissions } : role,
       )
@@ -230,9 +233,14 @@ export default {
     changeRole(name, permissions) {
       this.setDraft(name, { permissions })
     },
-    /** A matrix row ticked or unticked, on the role on screen. */
+    /**
+     * A matrix row ticked or unticked, on the role on screen — with the implications closed both
+     * ways, as the sentences close them: both views edit the same draft, and a row that ticks
+     * `group.content.read` without `group.read` (or unticks `group.read` under it) would show a
+     * state the server then corrects behind the user's back.
+     */
     toggle(key, enabled) {
-      const permissions = enabled ? [...this.draft, key] : this.draft.filter((held) => held !== key)
+      const permissions = applyRightChange(this.draft, key, enabled)
       this.setDraft(this.activeRoleName, { permissions })
     },
     resetDraft() {

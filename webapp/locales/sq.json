@@ -223,7 +223,7 @@
     "groupRoles": {
       "applied": "{count} grupe të përditësuara",
       "apply": "Zbato në grupet e paprekura",
-      "confirmApply": "Të zbatohen shabllonet në {count} grupe që nuk i kanë përshtatur kurrë rolet e tyre? Grupet e përshtatura nuk preken.",
+      "confirmApply": "Të zbatohet modeli „{template}” në {count} grupet që e përdorin dhe nuk i kanë ndryshuar kurrë rolet e tyre? Grupet e ndryshuara dhe grupet e modeleve të tjera mbeten të paprekura.",
       "description": "Këtu redakton modelet nga të cilat krijohen grupet e reja — asnjë grup ekzistues nuk ndryshon prej kësaj. Vetëm butoni më poshtë e zbaton një ndryshim te grupet, dhe vetëm te ato që nuk i kanë ndryshuar kurrë të drejtat e veta.",
       "editingTemplate": "Po redaktoni shabllonin „{template}“",
       "labelField": "Emri",

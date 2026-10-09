@@ -223,7 +223,7 @@
     "groupRoles": {
       "applied": "{count} grupos atualizados",
       "apply": "Aplicar aos grupos sem alterações",
-      "confirmApply": "Aplicar os modelos a {count} grupos que nunca personalizaram as suas funções? Os grupos personalizados não são tocados.",
+      "confirmApply": "Aplicar o modelo “{template}” aos {count} grupos que o usam e nunca personalizaram as suas funções? Os grupos personalizados e os dos outros modelos não são alterados.",
       "description": "Aqui editas os modelos a partir dos quais os novos grupos são criados — nenhum grupo existente muda por causa disso. Só o botão abaixo aplica uma alteração aos grupos, e apenas aos que nunca alteraram os seus próprios direitos.",
       "editingTemplate": "Estás a editar o modelo “{template}”",
       "labelField": "Nome",

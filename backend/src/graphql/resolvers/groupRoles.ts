@@ -756,34 +756,35 @@ export default {
       }
       return ended
     },
-    applyGroupRoleTemplates: async (_parent, _args, context: Context) => {
+    applyGroupRoleTemplates: async (_parent, params: { template: string }, context: Context) => {
+      // One template, the one the admin is looking at: the confirmation they were shown names
+      // its groups, and a bulk rewrite of every other template's groups as well is not what they
+      // agreed to.
       const [templates, untouched] = await Promise.all([
         readGroupRoleTemplates(context.database),
         untouchedGroupIdsByTemplate(context.database),
       ])
-      const byType = new Map(Object.entries(templates))
+      const template = new Map(Object.entries(templates)).get(params.template)
+      if (!template || template.length === 0) {
+        throw new AppError(Errors.GROUP_TEMPLATE_NAME_UNKNOWN, { template: params.template })
+      }
+      const groups = new Map(untouched).get(params.template)
       const now = new Date().toISOString()
       let changed = 0
-      for (const [visibility, groups] of untouched) {
-        const template = byType.get(visibility)
-        if (!template || template.length === 0) {
-          continue
-        }
-        for (const groupId of groups.untouchedIds) {
-          await replaceGroupRoles(
-            context.database,
-            groupId,
-            template,
-            USUAL_ROLE,
-            actorId(context),
-            now,
-          )
-          // The group's rights may well have changed, so its members need to refetch — but its
-          // rolesCustomizedAt stays null: the group still runs on the template, it did not
-          // choose anything.
-          announce(context, groupId)
-          changed += 1
-        }
+      for (const groupId of groups?.untouchedIds ?? []) {
+        await replaceGroupRoles(
+          context.database,
+          groupId,
+          template,
+          USUAL_ROLE,
+          actorId(context),
+          now,
+        )
+        // The group's rights may well have changed, so its members need to refetch — but its
+        // rolesCustomizedAt stays null: the group still runs on the template, it did not
+        // choose anything.
+        announce(context, groupId)
+        changed += 1
       }
       return changed
     },

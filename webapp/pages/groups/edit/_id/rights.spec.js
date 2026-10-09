@@ -242,6 +242,23 @@ describe('rights.vue', () => {
       expect(at(wrapper, 'visibility-title').text()).toContain('group.types.closed')
       expect(at(wrapper, 'switch-nonmembers-profile').element.checked).toBe(true)
     })
+
+    it('closes the implications in the matrix as the sentences do', async () => {
+      // Reading the posts cannot be held without seeing the group: ticking the one brings the
+      // other, and unticking the group takes what depended on it — or the server would put it
+      // back and the untick would look like it did nothing.
+      const wrapper = await Wrapper()
+      await at(wrapper, 'to-advanced').trigger('click')
+      await at(wrapper, 'role-tab-none').trigger('click')
+
+      await at(wrapper, 'perm-group.content.read').setChecked(true)
+
+      expect(at(wrapper, 'perm-group.read').element.checked).toBe(true)
+
+      await at(wrapper, 'perm-group.read').setChecked(false)
+
+      expect(at(wrapper, 'perm-group.content.read').element.checked).toBe(false)
+    })
   })
 
   describe('what a hovered control points at', () => {
@@ -688,6 +705,22 @@ describe('rights.vue', () => {
         variables: { groupId: 'group-1', template: 'channel' },
       }),
     )
+  })
+
+  it('shows the applied template without writing into the group it was given', async () => {
+    // The group belongs to the parent page; this page holds what it just did, and takes the
+    // parent's word again once the parent loads the group anew.
+    mocks.$apollo.mutate = jest.fn().mockResolvedValue({ data: { resetGroupRoles: ROLES } })
+    const wrapper = await Wrapper()
+    await at(wrapper, 'template-channel').trigger('click')
+    await wrapper.vm.applyTemplateModalData.buttons.confirm.callback()
+
+    expect(wrapper.vm.currentTemplate).toBe('channel')
+    expect(wrapper.props('group').template).toBe('public')
+
+    await wrapper.setProps({ group: { ...wrapper.props('group'), template: 'closed' } })
+
+    expect(wrapper.vm.currentTemplate).toBe('closed')
   })
 
   it('names the template in the question, so the wrong one is caught before the roles are gone', async () => {

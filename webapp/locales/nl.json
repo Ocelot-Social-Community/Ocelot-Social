@@ -223,7 +223,7 @@
     "groupRoles": {
       "applied": "{count} groepen bijgewerkt",
       "apply": "Toepassen op ongewijzigde groepen",
-      "confirmApply": "De sjablonen toepassen op {count} groepen die hun rollen nooit hebben aangepast? Aangepaste groepen blijven ongemoeid.",
+      "confirmApply": "Het sjabloon ‘{template}’ toepassen op de {count} groepen die het gebruiken en hun rollen nooit hebben aangepast? Aangepaste groepen en de groepen van de andere sjablonen blijven ongewijzigd.",
       "description": "Hier bewerk je de sjablonen waaruit nieuwe groepen ontstaan — geen bestaande groep verandert daardoor. Alleen de knop hieronder past een wijziging toe op groepen, en dan alleen op de groepen die hun eigen rechten nooit hebben gewijzigd.",
       "editingTemplate": "Je bewerkt het sjabloon “{template}”",
       "labelField": "Naam",
