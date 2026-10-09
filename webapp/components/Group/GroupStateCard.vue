@@ -1,7 +1,9 @@
 <template>
   <!--
-    A glyph, a name and what it means — how a kind of group is shown, so it is recognised by its
-    picture wherever it appears. The create form offers the group types as these.
+    A glyph, a name and what it means — the one way this app shows what kind of group something is
+    or would be. The create form offers its templates as these, the rights screen states the
+    group's visibility and door as these, so a choice made in one place is recognised in the
+    other by its picture.
 
     A `div` where it states something, a `button` where it is picked; whatever the caller binds
     (type, disabled, title, data-test, click) lands on that element. The description is optional:

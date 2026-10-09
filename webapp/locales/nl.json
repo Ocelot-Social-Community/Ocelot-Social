@@ -220,6 +220,44 @@
       "showDonationsCheckboxLabel": "Toon donatie-voortgangsbalk",
       "successfulUpdate": "Donatie-informatie succesvol bijgewerkt!"
     },
+    "groupRoles": {
+      "applied": "{count} groepen bijgewerkt",
+      "apply": "Toepassen op ongewijzigde groepen",
+      "confirmApply": "Het sjabloon ‘{template}’ toepassen op de {count} groepen die het gebruiken en hun rollen nooit hebben aangepast? Aangepaste groepen en de groepen van de andere sjablonen blijven ongewijzigd.",
+      "description": "Hier bewerk je de sjablonen waaruit nieuwe groepen ontstaan — geen bestaande groep verandert daardoor. Alleen de knop hieronder past een wijziging toe op groepen, en dan alleen op de groepen die hun eigen rechten nooit hebben gewijzigd.",
+      "editingTemplate": "Je bewerkt het sjabloon “{template}”",
+      "labelField": "Naam",
+      "name": "Groepssjablonen",
+      "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten en kan niet worden aangepast.",
+      "resultingVisibility": "Groepen uit dit sjabloon zijn:",
+      "saved": "Sjabloon opgeslagen",
+      "templateLabel": "Sjabloon",
+      "title": "Groepssjablonen",
+      "untouched": "Een wijziging hier bereikt {untouched} van de {total} groepen die met dit sjabloon zijn gemaakt — de groepen die hun eigen rechten nooit hebben gewijzigd — en alleen als je die toepast."
+    },
+    "groups": {
+      "active": "actief",
+      "allTypes": "Alle types",
+      "columns": {
+        "members": "Leden",
+        "name": "Groep",
+        "owners": "Eigenaren",
+        "state": "Status",
+        "type": "Type"
+      },
+      "count": "{shown} van {total}",
+      "description": "Alle groepen die je mag beheren — ook de geheime, die in geen enkele andere lijst staan. Groepen zonder eigenaar vind je hier met het filter.",
+      "disabled": "uitgeschakeld",
+      "disabledOnly": "alleen uitgeschakelde",
+      "empty": "Geen groep past bij deze filters.",
+      "name": "Groepen",
+      "next": "Volgende",
+      "noOwner": "geen eigenaar",
+      "ownerlessOnly": "alleen zonder eigenaar",
+      "previous": "Vorige",
+      "searchPlaceholder": "naam of korte naam",
+      "title": "Groepen beheren"
+    },
     "hashtags": {
       "name": "Hashtags",
       "nameOfHashtag": "Naam",
@@ -319,7 +357,7 @@
       "delete": "Verwijderen",
       "deleteError": "Kon rol niet verwijderen: {message}",
       "deleteSuccess": "Rol verwijderd.",
-      "description": "Maak rollen aan en wijs rechten toe. Wijzigingen worden direct toegepast.",
+      "description": "Wie wat mag in het hele netwerk. Maak rollen aan en wijs rechten toe — wijzigingen gelden meteen.",
       "groups": {
         "account": "Account",
         "administration": "Beheer",
@@ -331,7 +369,7 @@
         "moderation": "Moderatie"
       },
       "members": "{count} leden",
-      "name": "Rollen en rechten",
+      "name": "Rollen & rechten",
       "nameLabel": "Naam",
       "perm": {
         "apiKey_administer": "API-sleutels van andere gebruikers beheren.",
@@ -355,7 +393,9 @@
         "user_invite": "Persoonlijke uitnodigingscodes genereren.",
         "videoCall_create_closed": "Een videogesprek starten in een gesloten groep.",
         "videoCall_create_hidden": "Een videogesprek starten in een verborgen groep.",
-        "videoCall_create_public": "Een videogesprek starten in een openbare groep."
+        "videoCall_create_open": "Een videogesprek starten in een groep waar iedereen binnen kan lopen — vindbaar en zonder goedkeuring te betreden.",
+        "videoCall_create_public": "Een videogesprek starten in een openbare groep.",
+        "videoCall_create_restricted": "Een videogesprek starten in een groep waar je niet zomaar binnen kunt: lid worden vraagt goedkeuring of een uitnodiging, of de groep is verborgen."
       },
       "permUnavailable": "Functie niet geconfigureerd — dit recht heeft geen effect.",
       "permUnavailableLink": "Configuratie bekijken",
@@ -373,7 +413,7 @@
         "message": "Je staat op het punt de rechten “rollen beheren” te verwijderen van <strong>{role}</strong> — je eigen rol. Je kunt dan geen rollen meer beheren; alleen een eigenaar kan dit herstellen. Doorgaan?",
         "title": "Je eigen rolbeheer verwijderen?"
       },
-      "title": "Rollen en rechten"
+      "title": "Rollen & rechten"
     },
     "settings": {
       "name": "Instellingen"
@@ -982,6 +1022,23 @@
     "addUser": "Gebruiker toevoegen",
     "addUserNoOptions": "Geen gebruikers gevonden!",
     "addUserPlaceholder": "Gebruikersnaam",
+    "admission": {
+      "caption": "Je komt binnen:",
+      "closed": {
+        "description": "Van buitenaf kan niemand lid worden of het vragen — alleen een uitnodiging geeft toegang.",
+        "title": "Alleen op uitnodiging"
+      },
+      "label": "Onboarding",
+      "needsVisibility": "Een groep die niemand van buitenaf kan vinden, kan ook niemand betreden — alleen een uitnodiging geeft toegang.",
+      "onRequest": {
+        "description": "Je kunt lidmaatschap aanvragen; iemand uit de groep moet akkoord gaan.",
+        "title": "Op verzoek"
+      },
+      "open": {
+        "description": "Wie de groep ziet, kan er meteen lid van worden.",
+        "title": "Zonder te vragen"
+      }
+    },
     "allGroups": "Alle groepen",
     "categories": "Onderwerp ::: Onderwerpen",
     "categoriesTitle": "Onderwerpen van de groep",
@@ -1005,6 +1062,16 @@
       "groupTitle": "Instellingen van ",
       "title": "Mijn groep bewerken"
     },
+    "elevation": {
+      "actingAsMember": "Je handelt hier als {role}.",
+      "actingAsNonMember": "Je bent geen lid van deze groep.",
+      "activeTitle": "Beheerderstoegang is actief.",
+      "activeUntil": "Hij eindigt om {time}, of wanneer je hem beëindigt.",
+      "end": "Beheerderstoegang beëindigen",
+      "offerBody": "Daarnaast heb je netwerkrechten over de groep. Lezen staat open; iets wijzigen vraagt om deze bevestiging, en die wordt bij de groep vastgelegd.",
+      "reasonPlaceholder": "Waar gaat het om?",
+      "start": "Beheerderstoegang gebruiken"
+    },
     "errors": {
       "userAlreadyMember": "Gebruiker “{name}” is al lid!"
     },
@@ -1021,14 +1088,18 @@
       "join": "Lid worden",
       "leave": "Verlaten",
       "pendingMember": "In afwachting",
+      "requestJoin": "Verzoek om lid te worden",
       "tooltip": "De groepseigenaar moet je nog bevestigen."
     },
     "labelSlug": "Unieke groepsnaam",
     "leaveModal": {
       "confirmButton": "Verlaten",
       "message": "Een groep verlaten kan onomkeerbaar zijn!<br>Groep <b>“{name}”</b> verlaten!",
+      "messageAdmin": "Je <b>beheert</b> deze groep. Als je vertrekt, geef je dat op.<br>Groep <b>“{name}”</b> echt verlaten?",
+      "messageOwner": "Je bent <b>eigenaar</b> van deze groep. Als je vertrekt, blijft die mogelijk zonder eigenaar achter — dan kan alleen een netwerkbeheer de groep weer werkbaar maken.<br>Groep <b>“{name}”</b> echt verlaten?",
       "title": "Wil je de groep echt verlaten?"
     },
+    "memberOutranked": "Je kunt de rol van deze persoon niet wijzigen — die heeft minstens evenveel als jij.",
     "memberRemoved": "Gebruiker “{name}” is uit de groep verwijderd!",
     "members": "Leden",
     "membersAdministrationList": {
@@ -1057,10 +1128,60 @@
     "removeMemberButton": "Verwijderen",
     "removeMemberConfirmText": "Gebruiker “{name}” uit de groep verwijderen?",
     "removeMemberTitle": "Lid verwijderen",
+    "rights": {
+      "addRole": "Rol toevoegen",
+      "advancedTitle": "Alle rechten in detail",
+      "applyTemplate": "Sjabloon toepassen — vervangt alle rollen van deze groep door die van het sjabloon.",
+      "blockedByFeature": "Deze functie is uitgeschakeld in dit netwerk ({feature}).",
+      "blockedByNetwork": "Netwerkbreed begrensd: hiervoor is het recht {permission} nodig.",
+      "confirmApplyTemplate": "Sjabloon “{template}” op deze groep toepassen? Alle rollen worden vervangen door die van het sjabloon.",
+      "confirmApplyTemplateDiscards": "Sjabloon “{template}” op deze groep toepassen? Alle rollen worden vervangen door die van het sjabloon — en de niet-opgeslagen wijzigingen gaan verloren.",
+      "confirmDelete": "De rol “{role}” verwijderen? De leden worden “{target}”.",
+      "confirmReset": "Alle rollen van deze groep terugzetten naar de standaard? Rollen die jullie hebben toegevoegd verdwijnen en hun leden worden gewone leden.",
+      "deleteRole": "Rol verwijderen",
+      "description": "Bepaal wie wat mag in deze groep — van buitenstaanders tot beheerders.",
+      "discardDraft": "De niet-opgeslagen wijzigingen gaan verloren. Toch doorgaan?",
+      "drafted": "Niet-opgeslagen wijzigingen",
+      "hideAdvanced": "Gedetailleerde weergave verbergen",
+      "labelField": "Weergavenaam",
+      "mandatory": "Altijd toegekend: een lidmaatschap dat je niet kunt beëindigen is geen instelling.",
+      "members": "{count} leden",
+      "mootJoin": "Wie al lid is, wordt niet nog een keer lid.",
+      "mootLeave": "Wie geen lid is, heeft geen lidmaatschap om te beëindigen.",
+      "noRight": "Je kunt geen recht geven dat je zelf niet hebt.",
+      "ownerHoldsEverything": "De rol eigenaar heeft altijd alle rechten in deze groep. Alleen de weergavenaam kan worden aangepast.",
+      "pendingBlocked": "Niemand heeft deze rol op dit moment: niemand kan lidmaatschap aanvragen.",
+      "pendingUnreachable": "Niemand kan op dit moment lidmaatschap aanvragen, dus niemand heeft deze rol. De toelating bepaalt dat.",
+      "reset": "Terug naar de standaard",
+      "resultingType": "Met deze rechten is de groep:",
+      "roleKeyPlaceholder": "sleutel, bijv. redactie",
+      "roleLabelPlaceholder": "weergavenaam, bijv. Redactie",
+      "saved": "Rechten opgeslagen",
+      "saveFirst": "Eerst opslaan of verwerpen — er zijn niet-opgeslagen wijzigingen.",
+      "simple": {
+        "applicants-read": "Wachtende aanvragers mogen de berichten lezen",
+        "members-chat": "Leden mogen in de groepschat schrijven",
+        "members-comment": "Leden mogen reageren",
+        "members-invite": "Leden mogen anderen uitnodigen",
+        "members-post": "Leden mogen berichten schrijven",
+        "nonmembers-members": "Niet-leden mogen de ledenlijst zien",
+        "nonmembers-profile": "Buitenstaanders kunnen zien dat de groep bestaat",
+        "nonmembers-read": "Niet-leden mogen de berichten lezen"
+      },
+      "simpleGroups": {
+        "applicants": "Wachtende aanvragers",
+        "members": "Leden",
+        "outsiders": "Buitenstaanders"
+      },
+      "systemRole": "Systeemrol: kan niet worden verwijderd of hernoemd",
+      "title": "Rechten",
+      "toAdvanced": "Geavanceerd: alle rechten in detail"
+    },
     "role": "Jouw rol in de groep",
     "roles": {
       "admin": "Beheerder",
       "members": "Leden",
+      "none": "Geen lid",
       "owner": "Eigenaar",
       "pending": "In afwachting",
       "usual": "Lid"
@@ -1068,8 +1189,16 @@
     "save": "Nieuwe groep aanmaken",
     "showMembers": "Ledenlijst zichtbaar voor iedereen",
     "teaser": {
+      "notReadable": "Je kunt deze groep nog niet openen — je aanvraag loopt nog",
       "openGroup": "Groep openen",
       "unavailable": "Groep niet meer beschikbaar"
+    },
+    "templateChoice": "Wat voor groep wordt dit?",
+    "templateDescriptions": {
+      "channel": "Openbaar — maar alleen de groepsleiding schrijft berichten",
+      "closed": "Alle berichten alleen zichtbaar voor groepsleden",
+      "hidden": "Groep (inclusief de naam) is volledig onzichtbaar",
+      "public": "Groep en alle berichten zijn zichtbaar voor alle geregistreerde gebruikers"
     },
     "type": "Zichtbaarheid van de groep",
     "typeDescriptions": {
@@ -1078,6 +1207,7 @@
       "public": "Groep en alle berichten zijn zichtbaar voor alle geregistreerde gebruikers"
     },
     "types": {
+      "channel": "Kanaal",
       "closed": "Gesloten",
       "hidden": "Geheim",
       "public": "Openbaar"
@@ -1099,7 +1229,9 @@
       "groupTypeRequired": "Kies een groepstype.",
       "nameNotEmpty": "Voer een groepsnaam in.",
       "slugInvalidCharacters": "Alleen kleine letters, cijfers, koppeltekens en underscores zijn toegestaan.",
-      "slugNotEmpty": "Voer een unieke groepsnaam in."
+      "slugNotEmpty": "Voer een unieke groepsnaam in.",
+      "typeNotAllowed": "Je mag dit soort groep niet aanmaken.",
+      "typeRequired": "Kies een groepstype."
     }
   },
   "hashtags-filter": {
@@ -1160,6 +1292,7 @@
     "invite-link-message-personal": "Je bent uitgenodigd om lid te worden van {network}.",
     "invited-count": "Je hebt al {count} mensen uitgenodigd.",
     "limit-reached": "Je hebt het maximale aantal uitnodigingslinks bereikt.",
+    "members-only": "alleen voor mensen die al een account hebben",
     "my-invite-links": "Mijn uitnodigingslinks",
     "no-links": "Nog geen uitnodigingslinks aangemaakt.",
     "redeemed-count": "Deze code is {count} keer gebruikt.",
@@ -1290,6 +1423,8 @@
         "reviewed": "Beoordeeld",
         "unreviewed": "Niet beoordeeld"
       },
+      "hiddenContent": "Inhoud uit een groep die je niet mag lezen",
+      "hiddenDecision": "Hier niet te beslissen",
       "moreDetails": "Details bekijken",
       "name": "Meldingen",
       "noDecision": "Geen beslissing!",
@@ -1328,6 +1463,7 @@
       "mentioned_in_post": "Heeft je genoemd in een bericht",
       "on_date": "op",
       "post_in_group": "Heeft gepost in een groep",
+      "post_removed_from_group": "Heeft je bericht uit de groep verwijderd",
       "removed_user_from_group": "Heeft je uit de groep verwijderd",
       "user_joined_group": "Is lid geworden van je groep",
       "user_left_group": "Heeft je groep verlaten"
@@ -1343,7 +1479,18 @@
     "previous": "Vorige"
   },
   "permissions": {
-    "deniedHint": "Je hebt hiervoor geen rechten."
+    "deniedHint": "Je hebt hiervoor geen rechten.",
+    "sections": {
+      "account": "Account",
+      "administration": "Beheer",
+      "communication": "Communicatie",
+      "content": "Inhoud",
+      "groupAdministration": "Groepen — beheer",
+      "groupModeration": "Groepen — moderatie",
+      "membership": "Lidmaatschap",
+      "moderation": "Moderatie",
+      "visibility": "Zichtbaarheid"
+    }
   },
   "post": {
     "article": "Artikel",
@@ -1384,6 +1531,9 @@
       "push": "Naar boven duwen",
       "pushed": "Naar boven geduwd",
       "pushedSuccessfully": "Bericht succesvol naar boven geduwd!",
+      "removedFromGroupSuccessfully": "Bericht uit de groep verwijderd",
+      "removeFromGroup": "Uit de groep verwijderen",
+      "removeFromGroupConfirm": "Dit bericht uit de groep “{group}” verwijderen? Het bericht blijft bij de auteur, maar verliest zijn plek in de groep.",
       "unobserve": "Bericht niet meer observeren",
       "unobservedSuccessfully": "Je observeert dit bericht niet meer!",
       "unpin": "Bericht losmaken (Netwerk)",

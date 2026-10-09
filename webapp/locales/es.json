@@ -220,6 +220,44 @@
       "showDonationsCheckboxLabel": "Mostrar barra de progreso de donaciones",
       "successfulUpdate": "¡Información de donaciones actualizada con éxito!"
     },
+    "groupRoles": {
+      "applied": "{count} grupos actualizados",
+      "apply": "Aplicar a los grupos sin cambios",
+      "confirmApply": "¿Aplicar la plantilla «{template}» a los {count} grupos que la usan y nunca han personalizado sus roles? Los grupos personalizados y los de las demás plantillas no se modifican.",
+      "description": "Aquí editas las plantillas con las que se crean los grupos nuevos: ningún grupo existente cambia por ello. Solo el botón de abajo aplica un cambio a los grupos, y solo a los que nunca cambiaron sus propios derechos.",
+      "editingTemplate": "Estás editando la plantilla «{template}»",
+      "labelField": "Nombre",
+      "name": "Plantillas de grupo",
+      "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos y no se puede editar.",
+      "resultingVisibility": "Los grupos creados con esta plantilla son:",
+      "saved": "Plantilla guardada",
+      "templateLabel": "Plantilla",
+      "title": "Plantillas de grupo",
+      "untouched": "Una edición aquí alcanza {untouched} de los {total} grupos creados a partir de esta plantilla —los que nunca cambiaron sus propios derechos— y solo cuando la aplicas."
+    },
+    "groups": {
+      "active": "activo",
+      "allTypes": "Todos los tipos",
+      "columns": {
+        "members": "Miembros",
+        "name": "Grupo",
+        "owners": "Propietarios",
+        "state": "Estado",
+        "type": "Tipo"
+      },
+      "count": "{shown} de {total}",
+      "description": "Todos los grupos que puedes administrar — incluidos los secretos, que no aparecen en ninguna otra lista. Los grupos sin propietario están a un filtro de distancia.",
+      "disabled": "desactivado",
+      "disabledOnly": "solo desactivados",
+      "empty": "Ningún grupo coincide con estos filtros.",
+      "name": "Grupos",
+      "next": "Siguiente",
+      "noOwner": "sin propietario",
+      "ownerlessOnly": "solo sin propietario",
+      "previous": "Anterior",
+      "searchPlaceholder": "nombre o nombre corto",
+      "title": "Administrar grupos"
+    },
     "hashtags": {
       "name": "Hashtags",
       "nameOfHashtag": "Nombre",
@@ -319,7 +357,7 @@
       "delete": "Eliminar",
       "deleteError": "No se pudo eliminar el rol: {message}",
       "deleteSuccess": "Rol eliminado.",
-      "description": "Crea roles y asigna permisos. Los cambios se aplican de inmediato.",
+      "description": "Quién puede hacer qué en toda la red. Crea roles y asigna permisos: los cambios se aplican de inmediato.",
       "groups": {
         "account": "Cuenta",
         "administration": "Administración",
@@ -355,7 +393,9 @@
         "user_invite": "Generar códigos de invitación personales.",
         "videoCall_create_closed": "Iniciar una videollamada en un grupo cerrado.",
         "videoCall_create_hidden": "Iniciar una videollamada en un grupo oculto.",
-        "videoCall_create_public": "Iniciar una videollamada en un grupo público."
+        "videoCall_create_open": "Iniciar una videollamada en un grupo al que cualquiera puede entrar: localizable y al que se puede unir sin aprobación.",
+        "videoCall_create_public": "Iniciar una videollamada en un grupo público.",
+        "videoCall_create_restricted": "Iniciar una videollamada en un grupo al que no se puede entrar sin más: unirse requiere aprobación o invitación, o el grupo está oculto."
       },
       "permUnavailable": "Función no configurada: conceder este permiso no tiene efecto.",
       "permUnavailableLink": "Ver configuración",
@@ -982,6 +1022,23 @@
     "addUser": "Añadir usuario",
     "addUserNoOptions": "¡No se encontraron usuarios!",
     "addUserPlaceholder": "Nombre de usuario",
+    "admission": {
+      "caption": "Se entra:",
+      "closed": {
+        "description": "Desde fuera nadie puede unirse ni solicitarlo: solo una invitación da acceso.",
+        "title": "Solo por invitación"
+      },
+      "label": "Onboarding",
+      "needsVisibility": "A un grupo que nadie de fuera puede encontrar tampoco puede entrar nadie: solo una invitación da acceso.",
+      "onRequest": {
+        "description": "Se puede solicitar la entrada; alguien del grupo debe aceptarla.",
+        "title": "Previa solicitud"
+      },
+      "open": {
+        "description": "Quien ve el grupo puede unirse directamente.",
+        "title": "Sin preguntar"
+      }
+    },
     "allGroups": "Todos los grupos",
     "categories": "Tema ::: Temas",
     "categoriesTitle": "Temas del grupo",
@@ -1005,6 +1062,16 @@
       "groupTitle": "Configuración de ",
       "title": "Editar mi grupo"
     },
+    "elevation": {
+      "actingAsMember": "Aquí actúas como {role}.",
+      "actingAsNonMember": "No eres miembro de este grupo.",
+      "activeTitle": "El acceso de administrador está activo.",
+      "activeUntil": "Termina a las {time}, o cuando lo finalices.",
+      "end": "Finalizar el acceso de administrador",
+      "offerBody": "Además tienes permisos de red sobre él. Leer está abierto; cambiar algo requiere esta confirmación, que queda registrada en el grupo.",
+      "reasonPlaceholder": "¿De qué se trata?",
+      "start": "Usar acceso de administrador"
+    },
     "errors": {
       "userAlreadyMember": "¡El usuario «{name}» ya es miembro!"
     },
@@ -1021,14 +1088,18 @@
       "join": "Unirse",
       "leave": "Salir",
       "pendingMember": "Miembro pendiente",
+      "requestJoin": "Solicitar unirse",
       "tooltip": "El propietario del grupo aún debe confirmarte."
     },
     "labelSlug": "Nombre único del grupo",
     "leaveModal": {
       "confirmButton": "Salir",
       "message": "¡Salir de un grupo puede ser irreversible!<br>¡Salir del grupo <b>«{name}»</b>!",
+      "messageAdmin": "<b>Administras</b> este grupo. Si te vas, renuncias a ello.<br>¿Salir realmente del grupo <b>«{name}»</b>?",
+      "messageOwner": "Eres <b>propietario</b> de este grupo. Si te vas, puede quedarse sin ninguno, y entonces solo una administración de red podrá volver a hacerlo operativo.<br>¿Salir realmente del grupo <b>«{name}»</b>?",
       "title": "¿Realmente quieres salir del grupo?"
     },
+    "memberOutranked": "No puedes cambiar el rol de esta persona: tiene al menos tanto como tú.",
     "memberRemoved": "¡El usuario «{name}» fue eliminado del grupo!",
     "members": "Miembros",
     "membersAdministrationList": {
@@ -1057,10 +1128,60 @@
     "removeMemberButton": "Eliminar",
     "removeMemberConfirmText": "¿Eliminar al usuario «{name}» del grupo?",
     "removeMemberTitle": "Eliminar miembro",
+    "rights": {
+      "addRole": "Añadir un rol",
+      "advancedTitle": "Todos los permisos en detalle",
+      "applyTemplate": "Aplicar una plantilla: reemplaza todos los roles de este grupo por los de la plantilla.",
+      "blockedByFeature": "Esta función está desactivada en la red ({feature}).",
+      "blockedByNetwork": "Limitado en toda la red: para esto hace falta el permiso {permission}.",
+      "confirmApplyTemplate": "¿Aplicar la plantilla «{template}» a este grupo? Todos los roles se reemplazan por los de la plantilla.",
+      "confirmApplyTemplateDiscards": "¿Aplicar la plantilla «{template}» a este grupo? Todos los roles se reemplazan por los de la plantilla, y los cambios sin guardar se pierden.",
+      "confirmDelete": "¿Eliminar el rol «{role}»? Sus miembros pasarán a «{target}».",
+      "confirmReset": "¿Restablecer todos los roles de este grupo a los valores predeterminados? Los roles que hayáis añadido se eliminan y sus miembros pasan a ser miembros normales.",
+      "deleteRole": "Eliminar rol",
+      "description": "Decidid quién puede hacer qué en este grupo — desde quienes no son miembros hasta los administradores.",
+      "discardDraft": "Los cambios sin guardar se perderán. ¿Continuar de todos modos?",
+      "drafted": "Cambios sin guardar",
+      "hideAdvanced": "Ocultar la vista detallada",
+      "labelField": "Nombre visible",
+      "mandatory": "Siempre concedido: una membresía que no se puede terminar no es una opción.",
+      "members": "{count} miembros",
+      "mootJoin": "Quien ya tiene una membresía no vuelve a unirse.",
+      "mootLeave": "Quien no es miembro no tiene ninguna membresía que abandonar.",
+      "noRight": "No puedes conceder un permiso que tú misma no tienes.",
+      "ownerHoldsEverything": "El rol de propietario tiene siempre todos los permisos de este grupo. Solo se puede cambiar su nombre visible.",
+      "pendingBlocked": "Nadie tiene este rol ahora mismo: nadie puede solicitar unirse.",
+      "pendingUnreachable": "Por ahora nadie puede solicitar unirse, así que nadie tiene este rol. Lo decide la admisión.",
+      "reset": "Restablecer los valores predeterminados",
+      "resultingType": "Con estos permisos el grupo es:",
+      "roleKeyPlaceholder": "clave, p. ej. redaccion",
+      "roleLabelPlaceholder": "nombre visible, p. ej. Redacción",
+      "saved": "Permisos guardados",
+      "saveFirst": "Guarda o descarta primero: hay cambios sin guardar.",
+      "simple": {
+        "applicants-read": "Los solicitantes en espera pueden leer las publicaciones",
+        "members-chat": "Los miembros pueden escribir en el chat del grupo",
+        "members-comment": "Los miembros pueden comentar",
+        "members-invite": "Los miembros pueden invitar a otras personas",
+        "members-post": "Los miembros pueden escribir publicaciones",
+        "nonmembers-members": "Quienes no son miembros pueden ver la lista de miembros",
+        "nonmembers-profile": "Los externos pueden ver que el grupo existe",
+        "nonmembers-read": "Quienes no son miembros pueden leer las publicaciones"
+      },
+      "simpleGroups": {
+        "applicants": "Solicitantes en espera",
+        "members": "Miembros",
+        "outsiders": "Externos"
+      },
+      "systemRole": "Rol del sistema: no se puede eliminar ni renombrar",
+      "title": "Permisos",
+      "toAdvanced": "Avanzado: todos los permisos en detalle"
+    },
     "role": "Tu rol en el grupo",
     "roles": {
       "admin": "Administrador",
       "members": "Miembros",
+      "none": "No es miembro",
       "owner": "Propietario",
       "pending": "Miembro pendiente",
       "usual": "Miembro"
@@ -1068,8 +1189,16 @@
     "save": "Crear nuevo grupo",
     "showMembers": "Lista de miembros visible para todos",
     "teaser": {
+      "notReadable": "Todavía no puedes abrir este grupo — tu solicitud sigue pendiente",
       "openGroup": "Abrir grupo",
       "unavailable": "Grupo no disponible"
+    },
+    "templateChoice": "¿Qué tipo de grupo es este?",
+    "templateDescriptions": {
+      "channel": "Público — pero solo la dirección del grupo publica",
+      "closed": "Todas las publicaciones solo visibles para los miembros del grupo",
+      "hidden": "El grupo (incluido el nombre) es completamente invisible",
+      "public": "El grupo y todas las publicaciones son visibles para todos los usuarios registrados"
     },
     "type": "Visibilidad del grupo",
     "typeDescriptions": {
@@ -1078,6 +1207,7 @@
       "public": "El grupo y todas las publicaciones son visibles para todos los usuarios registrados"
     },
     "types": {
+      "channel": "Canal",
       "closed": "Cerrado",
       "hidden": "Secreto",
       "public": "Público"
@@ -1099,7 +1229,9 @@
       "groupTypeRequired": "Por favor, elija un tipo de grupo.",
       "nameNotEmpty": "Por favor, ingrese un nombre de grupo.",
       "slugInvalidCharacters": "Solo se permiten letras minúsculas, números, guiones y guiones bajos.",
-      "slugNotEmpty": "Por favor, ingrese un nombre único de grupo."
+      "slugNotEmpty": "Por favor, ingrese un nombre único de grupo.",
+      "typeNotAllowed": "No puedes crear este tipo de grupo.",
+      "typeRequired": "Por favor, elija un tipo de grupo."
     }
   },
   "hashtags-filter": {
@@ -1160,6 +1292,7 @@
     "invite-link-message-personal": "Has sido invitado a unirte a {network}.",
     "invited-count": "Ya has invitado a {count} personas.",
     "limit-reached": "Has alcanzado el número máximo de enlaces de invitación.",
+    "members-only": "solo para personas que ya tienen una cuenta",
     "my-invite-links": "Mis enlaces de invitación",
     "no-links": "Aún no se han creado enlaces de invitación.",
     "redeemed-count": "Este código se ha usado {count} veces.",
@@ -1290,6 +1423,8 @@
         "reviewed": "Revisado",
         "unreviewed": "Sin revisar"
       },
+      "hiddenContent": "Contenido de un grupo que no puedes leer",
+      "hiddenDecision": "No se puede decidir aquí",
       "moreDetails": "Ver Detalles",
       "name": "Informes",
       "noDecision": "¡No hay decisión!",
@@ -1328,6 +1463,7 @@
       "mentioned_in_post": "Le mencionó en una contribución",
       "on_date": "de",
       "post_in_group": "Publicó en un grupo",
+      "post_removed_from_group": "Quitó tu publicación del grupo",
       "removed_user_from_group": "Te eliminó del grupo",
       "user_joined_group": "Se unió a tu grupo",
       "user_left_group": "Abandonó tu grupo"
@@ -1343,7 +1479,18 @@
     "previous": "Anterior"
   },
   "permissions": {
-    "deniedHint": "No tienes permiso para esto."
+    "deniedHint": "No tienes permiso para esto.",
+    "sections": {
+      "account": "Cuenta",
+      "administration": "Administración",
+      "communication": "Comunicación",
+      "content": "Contenido",
+      "groupAdministration": "Grupos — administración",
+      "groupModeration": "Grupos — moderación",
+      "membership": "Membresía",
+      "moderation": "Moderación",
+      "visibility": "Visibilidad"
+    }
   },
   "post": {
     "article": "Artículo",
@@ -1384,6 +1531,9 @@
       "push": "Subir al inicio",
       "pushed": "Subido arriba",
       "pushedSuccessfully": "¡Publicación subida al inicio con éxito!",
+      "removedFromGroupSuccessfully": "Publicación quitada del grupo",
+      "removeFromGroup": "Quitar del grupo",
+      "removeFromGroupConfirm": "¿Quitar esta publicación del grupo «{group}»? La publicación sigue siendo de su autora, pero pierde su lugar en el grupo.",
       "unobserve": "Dejar de observar contribución",
       "unobservedSuccessfully": "¡Ya no estás observando esta publicación!",
       "unpin": "Desanclar contribución (Red)",

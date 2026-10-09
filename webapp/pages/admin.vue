@@ -117,6 +117,24 @@ export default {
           permissions: ['role.manage'],
         },
         {
+          // Next to the network roles, because the two are the same job at two scopes: who may
+          // do what, here for every group rather than for the network.
+          name: this.$t('admin.groupRoles.name'),
+          path: '/admin/group-roles',
+          permissions: ['group.roleTemplate.manage'],
+        },
+        {
+          // Groups the admin may administer — the only route to a hidden group, and where a
+          // group left without an owner is found.
+          name: this.$t('admin.groups.name'),
+          path: '/admin/groups',
+          permissions: [
+            'group.administer.any_public',
+            'group.administer.any_closed',
+            'group.administer.any_hidden',
+          ],
+        },
+        {
           name: this.$t('admin.api-keys.name'),
           path: '/admin/api-keys',
           permissions: ['apiKey.administer'],

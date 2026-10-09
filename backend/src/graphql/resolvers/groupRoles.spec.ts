@@ -1457,7 +1457,8 @@ describe('Mutation.updateGroupRoleTemplate', () => {
 })
 
 describe('Mutation.applyGroupRoleTemplates', () => {
-  it('applies each type`s template to the groups that never touched their roles', async () => {
+  it('applies the one template asked for, to its groups that never touched their roles', async () => {
+    // The admin confirms the groups of the template on screen; the others stay as they are.
     mocked.readGroupRoleTemplates.mockResolvedValue({
       public: [role('none')],
       closed: [role('none')],
@@ -1470,34 +1471,37 @@ describe('Mutation.applyGroupRoleTemplates', () => {
     )
     const { context, published } = contextFor()
 
-    expect(await Mutation.applyGroupRoleTemplates({}, {}, context)).toBe(3)
-    expect(mocked.replaceGroupRoles).toHaveBeenCalledTimes(3)
+    expect(await Mutation.applyGroupRoleTemplates({}, { template: 'public' }, context)).toBe(2)
+    expect(mocked.replaceGroupRoles.mock.calls.map(([, groupId]) => groupId)).toEqual(['a', 'b'])
     // Each of those groups has to refetch, because its rights may well have changed.
-    expect(published).toHaveLength(3)
+    expect(published).toHaveLength(2)
   })
 
-  it('skips a visibility whose template is missing or empty', async () => {
-    mocked.readGroupRoleTemplates.mockResolvedValue({ public: [] })
+  it.each([
+    ['missing', {}],
+    ['empty', { public: [] }],
+  ])('refuses a template that is %s', async (_case, templates) => {
+    mocked.readGroupRoleTemplates.mockResolvedValue(templates)
     mocked.untouchedGroupIdsByTemplate.mockResolvedValue(
-      new Map([
-        ['public', groupsOfTemplate(['a'])],
-        ['hidden', groupsOfTemplate(['b'])],
-      ]),
+      new Map([['public', groupsOfTemplate(['a'])]]),
     )
     const { context } = contextFor()
 
-    expect(await Mutation.applyGroupRoleTemplates({}, {}, context)).toBe(0)
+    await expect(
+      Mutation.applyGroupRoleTemplates({}, { template: 'public' }, context),
+    ).rejects.toMatchObject({ extensions: { errorCode: 'GROUP_TEMPLATE_NAME_UNKNOWN' } })
     expect(mocked.replaceGroupRoles).not.toHaveBeenCalled()
   })
 
   it('leaves a group that customised its roles untouched', async () => {
     // The whole point of rolesCustomizedAt: a bulk update never overwrites a group's own
-    // decision.
+    // decision — such a group is not among the untouched ones at all.
     mocked.readGroupRoleTemplates.mockResolvedValue({ public: [role('none')] })
     mocked.untouchedGroupIdsByTemplate.mockResolvedValue(new Map())
     const { context } = contextFor()
 
-    expect(await Mutation.applyGroupRoleTemplates({}, {}, context)).toBe(0)
+    expect(await Mutation.applyGroupRoleTemplates({}, { template: 'public' }, context)).toBe(0)
+    expect(mocked.replaceGroupRoles).not.toHaveBeenCalled()
   })
 })
 
