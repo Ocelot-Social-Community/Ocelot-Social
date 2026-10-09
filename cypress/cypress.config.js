@@ -58,11 +58,6 @@ async function setupNodeEvents(on, config) {
   );
 
   on('task', {
-    // Prints to the job output, where the browser's console does not reach.
-    log(message) {
-      console.log(message)
-      return null
-    },
     pushValue({ name, value }) {
       testStore[name] = value
       return true

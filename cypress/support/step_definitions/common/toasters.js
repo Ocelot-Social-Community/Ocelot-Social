@@ -1,4 +1,4 @@
-import { After, BeforeStep, defineStep } from '@badeball/cypress-cucumber-preprocessor'
+import { Before, BeforeStep, defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 // Every toaster step asserts against one record of the toasts raised, never against the live DOM.
 //
@@ -20,9 +20,8 @@ const TOAST_CLASS = {
 }
 
 const toastLog = []
-// The error toasts of the whole scenario, printed to the job output after it (see below) — a
-// failing scenario's real cause is often an error toast a few steps before the assertion that
-// broke.
+// The error toasts of the whole scenario, appended to its failure (see below) — a failing
+// scenario's real cause is often an error toast a few steps before the assertion that broke.
 const errorToasts = []
 
 const capture = (element) => {
@@ -79,21 +78,35 @@ const classFor = (status) => {
 // later, at the reload check.
 //
 // The error toasts are taken out of the log first, so clearing it loses none of them.
-BeforeStep(({ pickleStep }) => {
+const collectErrorToasts = () => {
   toastLog
     .filter((element) => statusOf(element) === 'error')
     .map(textOf)
     .forEach((text) => {
       if (!errorToasts.includes(text)) errorToasts.push(text)
     })
+}
+
+BeforeStep(({ pickleStep }) => {
+  collectErrorToasts()
   if (!pickleStep.text.startsWith(TOAST_STEP_PREFIX)) toastLog.length = 0
 })
 
-After(() => {
-  if (errorToasts.length) {
-    cy.task('log', `error toasts in this scenario: ${errorToasts.join(' | ')}`)
-  }
+// Both, or the first BeforeStep would take the previous scenario's last toasts for this one's.
+Before(() => {
+  toastLog.length = 0
   errorToasts.length = 0
+})
+
+// On the failure itself, not in an After hook: the preprocessor runs After hooks as the last steps
+// of the scenario, so a failed step skips them. Collected once more here, since no BeforeStep
+// follows the step that failed.
+Cypress.on('fail', (error) => {
+  collectErrorToasts()
+  if (errorToasts.length) {
+    error.message += `\n\nError toasts in this scenario: ${errorToasts.join(' | ')}`
+  }
+  throw error
 })
 
 const expectToast = (description, matches) => {
