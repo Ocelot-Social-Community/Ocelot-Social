@@ -152,7 +152,9 @@ type Mutation {
 
     "Empty string '' clears the location (sets it to null)."
     locationName: String
-    "Coordinates for locationName (e.g. a dropped map pin), given together or not at all. Not stored on the group itself — the server reverse-geocodes them (to a coarser place/region/country match, deliberately less precise than an event's exact pin) instead of forward-geocoding locationName's text, so the saved location matches the general area the user picked rather than a text-search approximation."
+    "The Mapbox feature id of the picked place (e.g. `place.23259194`, as `queryLocations` returns it). Decides the location when given — the same in every language, unlike a place name. Needs lat and lng, the coordinates it was picked with: the server confirms the id lies there."
+    locationId: ID
+    "The coordinates the place was picked with (the centre `queryLocations` returned for it), given together or not at all. With locationId they confirm it; without, they only bias the lookup of locationName's text towards same-named places nearby. Not stored on the group itself."
     lat: Float
     "See lat."
     lng: Float
@@ -175,7 +177,9 @@ type Mutation {
     avatar: ImageInput # test this as result
     "Empty string '' clears the location (sets it to null)."
     locationName: String
-    "Coordinates for locationName (e.g. a dropped map pin), given together or not at all. Not stored on the group itself — the server reverse-geocodes them (to a coarser place/region/country match, deliberately less precise than an event's exact pin) instead of forward-geocoding locationName's text, so the saved location matches the general area the user picked rather than a text-search approximation."
+    "The Mapbox feature id of the picked place (e.g. `place.23259194`, as `queryLocations` returns it). Decides the location when given — the same in every language, unlike a place name. Needs lat and lng, the coordinates it was picked with: the server confirms the id lies there."
+    locationId: ID
+    "The coordinates the place was picked with (the centre `queryLocations` returned for it), given together or not at all. With locationId they confirm it; without, they only bias the lookup of locationName's text towards same-named places nearby. Not stored on the group itself."
     lat: Float
     "See lat."
     lng: Float

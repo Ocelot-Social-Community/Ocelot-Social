@@ -543,6 +543,45 @@ describe('in mode', () => {
             )
           })
 
+          // Against the real geocoder, like the cases around it. The name is the German one the
+          // form shows to a German user; Mapbox's multi-language answer calls the district
+          // "Havelland District", so matching by name refused the group (LOCATION_NAME_NO_EXACT_MATCH).
+          describe('picked by its Mapbox id', () => {
+            const friesack = {
+              locationName: 'Friesack, Kreis Havelland, Brandenburg, Deutschland',
+              locationId: 'place.23259194',
+              lat: 52.742332,
+              lng: 12.579309,
+            }
+
+            it('creates the group in the picked place, whatever language its name is in', async () => {
+              await expect(
+                mutate({ mutation: CreateGroup, variables: { ...variables, ...friesack } }),
+              ).resolves.toMatchObject({
+                data: { CreateGroup: { location: { id: 'place.23259194' } } },
+                errors: undefined,
+              })
+            })
+
+            it('refuses an id that does not lie at its coordinates, and creates no group', async () => {
+              const { errors } = await mutate({
+                mutation: CreateGroup,
+                variables: { ...variables, ...friesack, locationId: 'place.9274' },
+              })
+
+              expect(errors?.[0]).toHaveProperty(
+                'message',
+                'The locationId does not lie at the given coordinates.',
+              )
+
+              const { records } = await database.query({
+                query: "MATCH (g:Group { id: 'g589' }) RETURN g",
+              })
+
+              expect(records).toHaveLength(0)
+            })
+          })
+
           it('accepts valid coordinates and resolves them to a location, without storing lat/lng on the group itself', async () => {
             await expect(
               mutate({
@@ -3635,6 +3674,27 @@ describe('in mode', () => {
                     },
                     errors: undefined,
                   })
+                })
+              })
+            })
+
+            // UpdateGroup resolves the id on its own, like it extracts its coordinates on its own.
+            describe('a place picked by its Mapbox id', () => {
+              it('moves the group there, whatever language its name is in', async () => {
+                await expect(
+                  mutate({
+                    mutation: UpdateGroup,
+                    variables: {
+                      id: 'my-group',
+                      locationName: 'Friesack, Kreis Havelland, Brandenburg, Deutschland',
+                      locationId: 'place.23259194',
+                      lat: 52.742332,
+                      lng: 12.579309,
+                    },
+                  }),
+                ).resolves.toMatchObject({
+                  data: { UpdateGroup: { id: 'my-group', location: { id: 'place.23259194' } } },
+                  errors: undefined,
                 })
               })
             })

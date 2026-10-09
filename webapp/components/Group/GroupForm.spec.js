@@ -607,7 +607,46 @@ describe('GroupForm', () => {
         })
         wrapper.find('form').trigger('submit')
         await wrapper.vm.$nextTick()
-        expect(wrapper.emitted('createGroup')[0][0]).toMatchObject({ lat: 52.5, lng: 13.4 })
+        // The id decides the place on the server; the name only labels it, in the language it
+        // was shown in.
+        expect(wrapper.emitted('createGroup')[0][0]).toMatchObject({
+          locationId: 'place.berlin',
+          lat: 52.5,
+          lng: 13.4,
+        })
+      })
+
+      it('sends no id for a place Mapbox returned without coordinates', async () => {
+        wrapper = mountFresh()
+        setValidFields(wrapper.vm)
+        wrapper.vm.$set(wrapper.vm.formData, 'locationName', {
+          label: 'Berlin',
+          value: 'Berlin',
+          id: 'place.berlin',
+          lat: null,
+          lng: null,
+        })
+        wrapper.find('form').trigger('submit')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.emitted('createGroup')[0][0]).toMatchObject({
+          locationName: 'Berlin',
+          locationId: null,
+        })
+      })
+
+      it('sends no id for a map point nothing was found at', async () => {
+        wrapper = mountFresh()
+        setValidFields(wrapper.vm)
+        wrapper.vm.$set(wrapper.vm.formData, 'locationName', {
+          label: '52.5, 13.4',
+          value: '52.5, 13.4',
+          id: null,
+          lat: 52.5,
+          lng: 13.4,
+        })
+        wrapper.find('form').trigger('submit')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.emitted('createGroup')[0][0]).toMatchObject({ locationId: null })
       })
 
       it('sends null coordinates while locationName is still a plain, unresolved string', async () => {
@@ -616,7 +655,11 @@ describe('GroupForm', () => {
         wrapper.vm.$set(wrapper.vm.formData, 'locationName', 'Berlin')
         wrapper.find('form').trigger('submit')
         await wrapper.vm.$nextTick()
-        expect(wrapper.emitted('createGroup')[0][0]).toMatchObject({ lat: null, lng: null })
+        expect(wrapper.emitted('createGroup')[0][0]).toMatchObject({
+          locationId: null,
+          lat: null,
+          lng: null,
+        })
       })
     })
 
