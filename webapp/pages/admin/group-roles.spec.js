@@ -356,13 +356,17 @@ describe('admin/group-roles.vue', () => {
     expect(at(wrapper, 'apply').element.disabled).toBe(true)
   })
 
-  it('explains the owner role rather than offering checkboxes', async () => {
+  // Like the network owner on the roles page: the note says why, the matrix shows what — every
+  // right ticked, none of them editable. The owner template stores no list of its own.
+  it('shows the owner role with every right ticked and none editable', async () => {
     const wrapper = await advanced()
 
     await at(wrapper, 'role-tab-owner').trigger('click')
 
     expect(at(wrapper, 'owner-note').exists()).toBe(true)
-    expect(at(wrapper, 'perm-group.post.create').exists()).toBe(false)
+    const boxes = wrapper.findAll('[data-test^="perm-"]').wrappers
+    expect(boxes.length).toBeGreaterThan(0)
+    expect(boxes.every((box) => box.element.checked && box.element.disabled)).toBe(true)
   })
 
   it('saves a changed permission set', async () => {
