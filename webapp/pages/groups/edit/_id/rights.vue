@@ -373,7 +373,9 @@ export default {
         const group = data.Group?.[0]
         this.roles = group?.roles ?? []
         this.myGroupPermissions = group?.myGroupPermissions ?? []
-        this.resetDraft()
+        // A refetch (another tab saved, the page re-entered) must not throw away what the user
+        // is still editing; the draft follows the server only while it holds nothing of its own.
+        if (!this.dirty) this.resetDraft()
       },
     },
   },

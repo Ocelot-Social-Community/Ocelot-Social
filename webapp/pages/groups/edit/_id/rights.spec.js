@@ -425,6 +425,38 @@ describe('rights.vue', () => {
       expect(at(wrapper, 'perm-group.post.create').element.checked).toBe(false)
     })
 
+    describe('when the query comes back again', () => {
+      const refetched = (wrapper) =>
+        rights.apollo.rights.result.call(wrapper.vm, {
+          loading: false,
+          data: {
+            groupPermissionCatalog: CATALOG,
+            groupTemplates: TEMPLATES,
+            Group: [{ roles: ROLES, myGroupPermissions: held }],
+          },
+        })
+
+      it('keeps the unsaved edit', async () => {
+        const wrapper = await Wrapper()
+        await at(wrapper, 'switch-members-post').setChecked(false)
+
+        refetched(wrapper)
+        await wrapper.vm.$nextTick()
+
+        expect(wrapper.vm.dirty).toBe(true)
+        expect(at(wrapper, 'switch-members-post').element.checked).toBe(false)
+      })
+
+      it('follows the server while nothing is edited', async () => {
+        const wrapper = await Wrapper()
+        const resetDraft = jest.spyOn(wrapper.vm, 'resetDraft')
+
+        refetched(wrapper)
+
+        expect(resetDraft).toHaveBeenCalled()
+      })
+    })
+
     it('keeps an edit when another role is opened, and the tab says so', async () => {
       const wrapper = await Wrapper()
       await at(wrapper, 'to-advanced').trigger('click')

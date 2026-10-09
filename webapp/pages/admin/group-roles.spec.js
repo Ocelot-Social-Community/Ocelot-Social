@@ -428,6 +428,10 @@ describe('admin/group-roles.vue', () => {
       expect(window.confirm).toHaveBeenCalledWith(
         expect.stringContaining('admin.groupRoles.confirmApply'),
       )
+      expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining('"count":4'))
+      expect(window.confirm).toHaveBeenCalledWith(
+        expect.stringContaining('"template":"group.types.public"'),
+      )
       expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
         expect.objectContaining({ variables: { template: 'public' } }),
       )
