@@ -274,9 +274,6 @@
     "notifications": {
       "name": "Notificações"
     },
-    "organizations": {
-      "name": "Organizações"
-    },
     "pages": {
       "name": "Páginas"
     },
@@ -358,16 +355,6 @@
       "deleteError": "Não foi possível excluir a função: {message}",
       "deleteSuccess": "Função excluída.",
       "description": "Quem pode fazer o quê em toda a rede. Crie funções e atribua permissões — as alterações são aplicadas de imediato.",
-      "groups": {
-        "account": "Conta",
-        "administration": "Administração",
-        "communication": "Comunicação",
-        "content": "Conteúdo",
-        "groupAdministration": "Grupos — administração",
-        "groupModeration": "Grupos — moderação",
-        "membership": "Adesão",
-        "moderation": "Moderação"
-      },
       "members": "{count} membros",
       "name": "Funções e permissões",
       "nameLabel": "Nome",
@@ -391,10 +378,7 @@
         "user_delete_any": "Excluir a conta de qualquer usuário.",
         "user_email_readAny": "Ler o endereço de e-mail de qualquer usuário.",
         "user_invite": "Gerar códigos de convite pessoais.",
-        "videoCall_create_closed": "Iniciar uma chamada de vídeo em um grupo fechado.",
-        "videoCall_create_hidden": "Iniciar uma chamada de vídeo em um grupo oculto.",
         "videoCall_create_open": "Iniciar uma videochamada num grupo em que qualquer pessoa pode entrar — localizável e acessível sem aprovação.",
-        "videoCall_create_public": "Iniciar uma chamada de vídeo em um grupo público.",
         "videoCall_create_restricted": "Iniciar uma videochamada num grupo em que não se pode simplesmente entrar: entrar exige aprovação ou convite, ou o grupo está oculto."
       },
       "permUnavailable": "Recurso não configurado — conceder esta permissão não tem efeito.",
@@ -1225,8 +1209,6 @@
       "actionRadiusRequired": "Por favor, selecione um raio de ação.",
       "descriptionLength": "A descrição deve ter pelo menos {min} caracteres.",
       "descriptionNotEmpty": "Por favor, insira uma descrição.",
-      "groupTypeNotAllowed": "Não podes criar este tipo de grupo.",
-      "groupTypeRequired": "Por favor, escolha um tipo de grupo.",
       "nameNotEmpty": "Por favor, insira um nome de grupo.",
       "slugInvalidCharacters": "Só são permitidas letras minúsculas, números, hífens e sublinhados.",
       "slugNotEmpty": "Por favor, insira um nome único de grupo.",

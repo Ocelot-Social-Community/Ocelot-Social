@@ -255,12 +255,6 @@ describe('GroupForm', () => {
       expect(wrapper.vm.hasUnsavedChanges).toBe(true)
     })
 
-    it('becomes true once showMembers is toggled', () => {
-      const wrapper = mountWith({ update: true, group: { ...group, visibility: 'closed' } })
-      wrapper.find('#show-members').setChecked(true)
-      expect(wrapper.vm.hasUnsavedChanges).toBe(true)
-    })
-
     it('becomes true once the location is genuinely changed (map)', () => {
       const wrapper = mountWith({ update: true, group })
       wrapper
@@ -435,7 +429,7 @@ describe('GroupForm', () => {
 
     it('still greys out for a genuinely missing permission, distinct from "no changes", and marks it aria-disabled', () => {
       const wrapper = mountWith({ update: false, group: {} }, () => false)
-      wrapper.vm.$set(wrapper.vm.formData, 'groupType', 'public')
+      wrapper.vm.$set(wrapper.vm.formData, 'visibility', 'public')
 
       const submitButton = wrapper.find('button[type="submit"]')
       expect(submitButton.classes()).toContain('permission-denied')
@@ -453,7 +447,7 @@ describe('GroupForm', () => {
         { update: true, group },
         (permission) => permission !== 'group.create_hidden',
       )
-      wrapper.vm.updateFormField('groupType', 'hidden')
+      wrapper.vm.updateFormField('visibility', 'hidden')
       await wrapper.vm.$nextTick()
 
       const submitButton = wrapper.find('button[type="submit"]')
@@ -567,7 +561,9 @@ describe('GroupForm', () => {
       await wrapper.vm.$nextTick()
       expect(wrapper.vm.visibleErrors).toEqual({
         name: expect.any(String),
-        groupType: expect.any(String),
+        // The CREATE form asks for a template; the visibility it results in is derived from it
+        // and is never a field of its own here.
+        template: expect.any(String),
         description: expect.any(String),
         actionRadius: expect.any(String),
       })
@@ -575,15 +571,15 @@ describe('GroupForm', () => {
       // OcelotInput (name) applies this class to its own root itself; the
       // other two (description <editor>, actionRadius <action-radius-select>)
       // get it from the wrapping div added around each, since neither tracks
-      // it on its own the way OcelotInput does. The type picker is a row of
-      // cards rather than an input, and says so with its own hint.
+      // it on its own the way OcelotInput does. The template picker is a row
+      // of cards rather than an input, and says so with its own hint.
       expect(errorWraps).toHaveLength(3)
     })
 
     it('saves once the form becomes valid', async () => {
       wrapper = mountFresh()
       await wrapper.vm.$set(wrapper.vm.formData, 'name', 'A valid name')
-      await wrapper.vm.$set(wrapper.vm.formData, 'groupType', 'public')
+      await wrapper.vm.$set(wrapper.vm.formData, 'template', 'public')
       await wrapper.vm.$set(wrapper.vm.formData, 'description', 'A long enough description text.')
       await wrapper.vm.$set(wrapper.vm.formData, 'actionRadius', 'regional')
       wrapper.find('form').trigger('submit')
@@ -594,7 +590,7 @@ describe('GroupForm', () => {
     describe('lat/lng on submit', () => {
       const setValidFields = (vm) => {
         vm.$set(vm.formData, 'name', 'A valid name')
-        vm.$set(vm.formData, 'groupType', 'public')
+        vm.$set(vm.formData, 'template', 'public')
         vm.$set(vm.formData, 'description', 'A long enough description text.')
         vm.$set(vm.formData, 'actionRadius', 'regional')
       }
@@ -743,10 +739,10 @@ describe('GroupForm', () => {
     it('does not block onSubmit for someone who can create every type but has not picked one yet', () => {
       const wrapper = mountWith(() => true)
       const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
-      expect(wrapper.vm.formData.groupType).toBe('')
+      expect(wrapper.vm.formData.visibility).toBe('')
       wrapper.vm.onSubmit()
       // Falls through to formSubmit()/validation instead of silently
-      // returning — the schema's own "groupType is required" is what
+      // returning — the schema's own "visibility is required" is what
       // should catch and report the still-missing type, not this guard.
       expect(formSubmit).toHaveBeenCalled()
     })
@@ -754,7 +750,7 @@ describe('GroupForm', () => {
     it('blocks onSubmit for a hidden group without group.create_hidden', () => {
       const wrapper = mountWith(canExceptHidden)
       const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
-      wrapper.vm.formData.groupType = 'hidden'
+      wrapper.vm.formData.visibility = 'hidden'
       wrapper.vm.onSubmit()
       expect(formSubmit).not.toHaveBeenCalled()
     })
@@ -762,7 +758,7 @@ describe('GroupForm', () => {
     it('blocks onSubmit for a public group without group.create_public', () => {
       const wrapper = mountWith((p) => p !== 'group.create_public')
       const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
-      wrapper.vm.formData.groupType = 'public'
+      wrapper.vm.formData.visibility = 'public'
       wrapper.vm.onSubmit()
       expect(formSubmit).not.toHaveBeenCalled()
     })
@@ -770,21 +766,29 @@ describe('GroupForm', () => {
     it('allows onSubmit for a hidden group with group.create_hidden', () => {
       const wrapper = mountWith(() => true)
       const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
-      wrapper.vm.formData.groupType = 'hidden'
+      wrapper.vm.formData.visibility = 'hidden'
       wrapper.vm.onSubmit()
       expect(formSubmit).toHaveBeenCalled()
     })
 
-    it('refuses the hidden card when not permitted, and stays reachable to say why', () => {
-      // Shown and refused rather than hidden: "there is a kind of group I may not make" is
-      // information, an absent card is not. aria-disabled rather than disabled: a disabled
-      // button leaves the tab order, and with it the only way a keyboard reaches the reason.
+    const twoTemplates = {
+      templates: [
+        { name: 'channel', visibility: 'public' },
+        { name: 'hidden', visibility: 'hidden' },
+      ],
+    }
+
+    it('refuses, rather than hides, a template the viewer may not create, and stays reachable to say why', () => {
+      // Shown and refused: "there is a kind of group I am not allowed to make" is information,
+      // an absent card is not. aria-disabled rather than disabled: a disabled button leaves the
+      // tab order, and with it the only way a keyboard reaches the reason.
       const wrapper = mountWith(canExceptHidden)
-      const hidden = wrapper.find('[data-test="type-card-hidden"]')
+      const hidden = wrapper.find('[data-test="template-card-hidden"]')
+
       expect(hidden.attributes('aria-disabled')).toBe('true')
       expect(hidden.attributes('disabled')).toBeUndefined()
-      expect(hidden.attributes('title')).toBe('group.validations.groupTypeNotAllowed')
-      expect(wrapper.find('[data-test="type-card-public"]').attributes('aria-disabled')).toBe(
+      expect(hidden.attributes('title')).toBe('group.validations.typeNotAllowed')
+      expect(wrapper.find('[data-test="template-card-public"]').attributes('aria-disabled')).toBe(
         'false',
       )
     })
@@ -792,108 +796,135 @@ describe('GroupForm', () => {
     it('picks nothing when a refused card is clicked', async () => {
       const wrapper = mountWith(canExceptHidden)
 
-      await wrapper.find('[data-test="type-card-hidden"]').trigger('click')
+      await wrapper.find('[data-test="template-card-hidden"]').trigger('click')
 
-      expect(wrapper.vm.formData.groupType).toBe('')
+      expect(wrapper.vm.formData.template).toBe('')
     })
 
-    it('tells the keyboard why a refused type cannot be picked, when it focuses the card', async () => {
-      const wrapper = mountWith(canExceptHidden)
+    it('reads the cost off the visibility a template derives to, not off its name', () => {
+      // A channel IS a public group, so making one takes group.create_public — the whole point
+      // of carrying the visibility alongside the name.
+      const wrapper = mountWith((p) => p !== 'group.create_public', {
+        templates: [
+          { name: 'channel', visibility: 'public' },
+          { name: 'closed', visibility: 'closed' },
+        ],
+      })
 
-      wrapper.find('[data-test="type-card-hidden"]').element.dispatchEvent(new Event('focus'))
-      await wrapper.vm.$nextTick()
-
-      expect(wrapper.find('[data-test="type-description-refused"]').text()).toBe(
-        'group.validations.groupTypeNotAllowed',
-      )
-    })
-
-    it('says why a refused type cannot be picked, where its meaning is explained', async () => {
-      // Keyboard and touch never see a tooltip — the reason is text, shown for the card pointed at
-      // (here) or focused (above).
-      const wrapper = mountWith(canExceptHidden)
-      const hiddenItem = wrapper.find('[data-test="type-card-hidden"]').element.parentElement
-
-      hiddenItem.dispatchEvent(new Event('mouseenter'))
-      await wrapper.vm.$nextTick()
-
-      expect(wrapper.find('[data-test="type-description-refused"]').text()).toBe(
-        'group.validations.groupTypeNotAllowed',
-      )
-
-      hiddenItem.dispatchEvent(new Event('mouseleave'))
-      await wrapper.find('[data-test="type-card-public"]').trigger('click')
-
-      expect(wrapper.find('[data-test="type-description-refused"]').exists()).toBe(false)
-    })
-
-    it('refuses the closed card when not permitted', () => {
-      const wrapper = mountWith((p) => p !== 'group.create_closed')
-      expect(wrapper.find('[data-test="type-card-closed"]').attributes('aria-disabled')).toBe(
+      expect(wrapper.find('[data-test="template-card-channel"]').attributes('aria-disabled')).toBe(
         'true',
       )
+      expect(wrapper.find('[data-test="template-card-closed"]').attributes('aria-disabled')).toBe(
+        'false',
+      )
     })
 
-    it('picking a card sets the group type', async () => {
-      const wrapper = mountWith(() => true)
+    it('picking a template sets the visibility it derives to', async () => {
+      const wrapper = mountWith(() => true, {
+        templates: [{ name: 'channel', visibility: 'public' }],
+      })
 
-      await wrapper.find('[data-test="type-card-closed"]').trigger('click')
+      await wrapper.find('[data-test="template-card-channel"]').trigger('click')
 
-      expect(wrapper.vm.formData.groupType).toBe('closed')
-      expect(wrapper.find('[data-test="type-card-closed"]').classes()).toContain(
+      expect(wrapper.vm.formData.template).toBe('channel')
+      expect(wrapper.vm.formData.visibility).toBe('public')
+      expect(wrapper.find('[data-test="template-card-channel"]').classes()).toContain(
         'group-state-card--active',
       )
     })
 
-    it('names the types and explains the one pointed at, else the one picked', async () => {
-      // Three cards each carrying their own sentence were as tall as the longest of them.
-      const wrapper = mountWith(() => true)
-      const description = () => wrapper.find('[data-test="type-description"]')
-      const card = (name) => wrapper.find(`[data-test="type-card-${name}"]`)
+    it('tells the keyboard why a refused template cannot be picked, when it focuses the card', async () => {
+      const wrapper = mountWith(canExceptHidden)
+
+      wrapper.find('[data-test="template-card-hidden"]').element.dispatchEvent(new Event('focus'))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-test="template-description-refused"]').text()).toBe(
+        'group.validations.typeNotAllowed',
+      )
+    })
+
+    it('says why a refused template cannot be picked, where its meaning is explained', async () => {
+      // Keyboard and touch never see a tooltip — the reason is text, shown for the card pointed
+      // at (here) or focused (above).
+      const wrapper = mountWith(canExceptHidden)
+      const hiddenItem = wrapper.find('[data-test="template-card-hidden"]').element.parentElement
+
+      hiddenItem.dispatchEvent(new Event('mouseenter'))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-test="template-description-refused"]').text()).toBe(
+        'group.validations.typeNotAllowed',
+      )
+
+      hiddenItem.dispatchEvent(new Event('mouseleave'))
+      await wrapper.find('[data-test="template-card-public"]').trigger('click')
+
+      expect(wrapper.find('[data-test="template-description-refused"]').exists()).toBe(false)
+    })
+
+    it('names the templates and explains the one pointed at, else focused, else picked', async () => {
+      // Four cards each carrying their own sentence were as tall as the longest of them.
+      const wrapper = mountWith(() => true, twoTemplates)
+      const description = () => wrapper.find('[data-test="template-description"]')
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
 
       expect(description().exists()).toBe(false)
 
-      await card('public').trigger('click')
-      expect(wrapper.vm.describedType).toBe('public')
-      expect(card('public').attributes('aria-describedby')).toBe('type-description')
+      await card('channel').trigger('click')
+      expect(wrapper.vm.describedTemplate).toBe('channel')
+      expect(description().exists()).toBe(true)
+      expect(card('channel').attributes('aria-describedby')).toBe('template-description')
 
       await card('hidden').element.parentElement.dispatchEvent(new Event('mouseenter'))
-      expect(wrapper.vm.describedType).toBe('hidden')
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
 
       await card('hidden').element.parentElement.dispatchEvent(new Event('mouseleave'))
-      expect(wrapper.vm.describedType).toBe('public')
+      expect(wrapper.vm.describedTemplate).toBe('channel')
 
-      card('closed').element.dispatchEvent(new Event('focus'))
+      card('hidden').element.dispatchEvent(new Event('focus'))
       await wrapper.vm.$nextTick()
-      expect(wrapper.vm.describedType).toBe('closed')
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
+    })
+
+    it('holds every description in place, so pointing at a card does not move the form', async () => {
+      // All of them stacked in one cell, the meant one visible: the line is as tall as the
+      // longest before anything is pointed at, and stays that tall.
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const items = () => wrapper.findAll('.template-description__item')
+      const shown = () => wrapper.findAll('.template-description__item--shown')
+
+      expect(items()).toHaveLength(2)
+      expect(shown()).toHaveLength(0)
+
+      await wrapper
+        .find('[data-test="template-card-hidden"]')
+        .element.parentElement.dispatchEvent(new Event('mouseenter'))
+
+      expect(items()).toHaveLength(2)
+      expect(shown()).toHaveLength(1)
+      expect(shown().at(0).attributes('id')).toBe('template-description')
     })
 
     it('keeps explaining the card under the cursor when focus leaves it, and vice versa', async () => {
-      const wrapper = mountWith(() => true)
-      const card = (name) => wrapper.find(`[data-test="type-card-${name}"]`)
-      await card('public').trigger('click')
+      const wrapper = mountWith(() => true, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      await card('channel').trigger('click')
 
       card('hidden').element.parentElement.dispatchEvent(new Event('mouseenter'))
       card('hidden').element.dispatchEvent(new Event('focus'))
       card('hidden').element.dispatchEvent(new Event('blur'))
       await wrapper.vm.$nextTick()
-      expect(wrapper.vm.describedType).toBe('hidden')
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
 
-      card('closed').element.dispatchEvent(new Event('focus'))
+      card('hidden').element.dispatchEvent(new Event('focus'))
       card('hidden').element.parentElement.dispatchEvent(new Event('mouseleave'))
       await wrapper.vm.$nextTick()
-      expect(wrapper.vm.describedType).toBe('closed')
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
 
-      card('closed').element.dispatchEvent(new Event('blur'))
+      card('hidden').element.dispatchEvent(new Event('blur'))
       await wrapper.vm.$nextTick()
-      expect(wrapper.vm.describedType).toBe('public')
-    })
-
-    it('keeps the select when editing', () => {
-      const wrapper = mountWith(() => true, { update: true })
-
-      expect(wrapper.find('[data-test="type-cards"]').exists()).toBe(false)
-      expect(wrapper.find('select[name="groupType"]').exists()).toBe(true)
+      expect(wrapper.vm.describedTemplate).toBe('channel')
     })
 
     it('canCreateAnyGroup is false only when no type is permitted', () => {
@@ -901,16 +932,16 @@ describe('GroupForm', () => {
       expect(mountWith((p) => p === 'group.create_closed').vm.canCreateAnyGroup).toBe(true)
     })
 
-    describe('canCreateSelectedGroup before any type is chosen (formData.groupType === "")', () => {
+    describe('canCreateSelectedGroup before any type is chosen (formData.visibility === "")', () => {
       it('is true for someone who can create at least one type, e.g. an admin with every permission', () => {
         const wrapper = mountWith(() => true)
-        expect(wrapper.vm.formData.groupType).toBe('')
+        expect(wrapper.vm.formData.visibility).toBe('')
         expect(wrapper.vm.canCreateSelectedGroup).toBe(true)
       })
 
       it('is false only for someone who cannot create any type at all', () => {
         const wrapper = mountWith(() => false)
-        expect(wrapper.vm.formData.groupType).toBe('')
+        expect(wrapper.vm.formData.visibility).toBe('')
         expect(wrapper.vm.canCreateSelectedGroup).toBe(false)
       })
 
@@ -926,9 +957,9 @@ describe('GroupForm', () => {
 
     it('canCreateSelectedGroup checks the chosen type specifically once one is picked', () => {
       const wrapper = mountWith((p) => p === 'group.create_closed')
-      wrapper.vm.formData.groupType = 'closed'
+      wrapper.vm.formData.visibility = 'closed'
       expect(wrapper.vm.canCreateSelectedGroup).toBe(true)
-      wrapper.vm.formData.groupType = 'public'
+      wrapper.vm.formData.visibility = 'public'
       expect(wrapper.vm.canCreateSelectedGroup).toBe(false)
     })
 
@@ -944,7 +975,7 @@ describe('GroupForm', () => {
     it('blocks switching an existing public group to hidden without group.create_hidden', () => {
       const wrapper = mountEdit(() => false, { visibility: 'public' })
       const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
-      wrapper.vm.formData.groupType = 'hidden'
+      wrapper.vm.formData.visibility = 'hidden'
       wrapper.vm.onSubmit()
       expect(formSubmit).not.toHaveBeenCalled()
     })
@@ -952,7 +983,7 @@ describe('GroupForm', () => {
     it('allows editing an already-hidden group without group.create_hidden', () => {
       const wrapper = mountEdit(() => false, { visibility: 'hidden' })
       const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
-      wrapper.vm.formData.groupType = 'hidden'
+      wrapper.vm.formData.visibility = 'hidden'
       wrapper.vm.onSubmit()
       expect(formSubmit).toHaveBeenCalled()
     })
@@ -966,38 +997,29 @@ describe('GroupForm', () => {
     })
   })
 
-  describe('effectiveShowMembers', () => {
-    const mountWithType = (groupType, showMembers = false) =>
+  describe('who may see the members', () => {
+    // A right of the non-member role, set under Rights. The checkbox this form had for it wrote
+    // that right on every save — so renaming a group undid a member list opened up there.
+    const mountWithType = (update) =>
       mount(GroupForm, {
-        propsData: { update: false, group: { visibility: groupType, showMembers } },
+        propsData: { update, group: { ...group, visibility: 'closed', showMembers: true } },
         mocks: { $t: jest.fn(), $can: () => true },
         localVue,
         stubs,
         store,
       })
 
-    it('returns true for public groups regardless of showMembers', () => {
-      expect(mountWithType('public', false).vm.effectiveShowMembers).toBe(true)
-      expect(mountWithType('public', true).vm.effectiveShowMembers).toBe(true)
+    it('is not asked here, on either form', () => {
+      expect(mountWithType(false).find('#show-members').exists()).toBe(false)
+      expect(mountWithType(true).find('#show-members').exists()).toBe(false)
     })
 
-    it('returns false for hidden groups regardless of showMembers', () => {
-      expect(mountWithType('hidden', true).vm.effectiveShowMembers).toBe(false)
-      expect(mountWithType('hidden', false).vm.effectiveShowMembers).toBe(false)
-    })
+    it('is not written by a save of this form', () => {
+      const wrapper = mountWithType(true)
 
-    it('returns the actual showMembers value for closed groups', () => {
-      expect(mountWithType('closed', false).vm.effectiveShowMembers).toBe(false)
-      expect(mountWithType('closed', true).vm.effectiveShowMembers).toBe(true)
-    })
+      wrapper.vm.submit()
 
-    it('disables the checkbox when groupType is not closed', async () => {
-      const wrapper = mountWithType('public')
-      expect(wrapper.find('#show-members').attributes('disabled')).toBeDefined()
-      await wrapper.vm.$set(wrapper.vm.formData, 'groupType', 'closed')
-      expect(wrapper.find('#show-members').attributes('disabled')).toBeUndefined()
-      await wrapper.vm.$set(wrapper.vm.formData, 'groupType', 'hidden')
-      expect(wrapper.find('#show-members').attributes('disabled')).toBeDefined()
+      expect(wrapper.emitted('updateGroup')[0][0]).not.toHaveProperty('showMembers')
     })
   })
 })

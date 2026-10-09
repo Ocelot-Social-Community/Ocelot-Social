@@ -39,11 +39,6 @@ import {
   nonMemberReadsMembers,
   visibilityOf,
 } from './helpers/groupAccessCypher'
-import {
-  templateFromArgs,
-  visibilityFromArgs,
-  withoutGroupTypeAlias,
-} from './helpers/groupTypeAlias'
 import Resolver from './helpers/Resolver'
 import { groupReadScope } from './helpers/viewerGroups'
 import { images } from './images/images'
@@ -367,10 +362,8 @@ export default {
       // it derives to — `channel` is a public group, and under the old argument there was no
       // way to ask for one. Stored on the group, because that half is the one nothing
       // computes back; the visibility is read from the rights the seeding writes.
-      // The shield has already refused a request that names neither (canCreateGroup).
-      const template = templateFromArgs(params) as string
+      const template = params.template as string
       delete params.template
-      withoutGroupTypeAlias(params)
       // Not written with the other properties: the role seeding below sets the member list from
       // the template, and a request that asks for it open has to win over that.
       const requestedShowMembers = params.showMembers as boolean | null | undefined
@@ -494,9 +487,8 @@ export default {
     },
     UpdateGroup: async (_parent, params, context: Context, _resolveInfo) => {
       // Applying a visibility means applying the template of that name, below.
-      const requestedTemplate = visibilityFromArgs(params) ?? undefined
+      const requestedTemplate = params.visibility as string | undefined
       delete params.visibility
-      withoutGroupTypeAlias(params)
       // A nullable Boolean may arrive as null, which asks for no change — not for a closed list.
       if (params.showMembers === null) {
         delete params.showMembers
@@ -1096,8 +1088,6 @@ export default {
     // The visibility, from the columns the group carries — never from a column of its own, so
     // the API and the rights cannot drift (groupRole/privacyLevel.ts, `visibilityOf` in Cypher).
     visibility: (parent) => visibilityOfGroup(parent),
-    // The same value under the name the API used before; deprecated (see helpers/groupTypeAlias).
-    groupType: (parent) => visibilityOfGroup(parent),
     name: async (parent, _args, context: Context, _resolveInfo) => {
       // An unlisted group keeps its name from a logged-out visitor: an id that leaks somewhere
       // must not leak a name with it. The one exception is an invite code — holding it IS the

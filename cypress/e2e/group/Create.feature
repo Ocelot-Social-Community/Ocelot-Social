@@ -14,7 +14,7 @@ Feature: Create a group
     When I click on "create group button"
     Then I am on page "groups/create"
     When I choose "My group " as the name
-    And I choose "public" as the visibility
+    And I choose the "public" template
     And I choose "to invite my friends" as the about
     And I choose the following text as description:
       """

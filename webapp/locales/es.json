@@ -274,9 +274,6 @@
     "notifications": {
       "name": "Notificaciones"
     },
-    "organizations": {
-      "name": "Organizaciones"
-    },
     "pages": {
       "name": "Páginas"
     },
@@ -358,16 +355,6 @@
       "deleteError": "No se pudo eliminar el rol: {message}",
       "deleteSuccess": "Rol eliminado.",
       "description": "Quién puede hacer qué en toda la red. Crea roles y asigna permisos: los cambios se aplican de inmediato.",
-      "groups": {
-        "account": "Cuenta",
-        "administration": "Administración",
-        "communication": "Comunicación",
-        "content": "Contenido",
-        "groupAdministration": "Grupos — administración",
-        "groupModeration": "Grupos — moderación",
-        "membership": "Membresía",
-        "moderation": "Moderación"
-      },
       "members": "{count} miembros",
       "name": "Roles y permisos",
       "nameLabel": "Nombre",
@@ -391,10 +378,7 @@
         "user_delete_any": "Eliminar la cuenta de cualquier usuario.",
         "user_email_readAny": "Leer la dirección de correo de cualquier usuario.",
         "user_invite": "Generar códigos de invitación personales.",
-        "videoCall_create_closed": "Iniciar una videollamada en un grupo cerrado.",
-        "videoCall_create_hidden": "Iniciar una videollamada en un grupo oculto.",
         "videoCall_create_open": "Iniciar una videollamada en un grupo al que cualquiera puede entrar: localizable y al que se puede unir sin aprobación.",
-        "videoCall_create_public": "Iniciar una videollamada en un grupo público.",
         "videoCall_create_restricted": "Iniciar una videollamada en un grupo al que no se puede entrar sin más: unirse requiere aprobación o invitación, o el grupo está oculto."
       },
       "permUnavailable": "Función no configurada: conceder este permiso no tiene efecto.",
@@ -1225,8 +1209,6 @@
       "actionRadiusRequired": "Por favor, seleccione un radio de acción.",
       "descriptionLength": "La descripción debe tener al menos {min} caracteres.",
       "descriptionNotEmpty": "Por favor, ingrese una descripción.",
-      "groupTypeNotAllowed": "No puedes crear este tipo de grupo.",
-      "groupTypeRequired": "Por favor, elija un tipo de grupo.",
       "nameNotEmpty": "Por favor, ingrese un nombre de grupo.",
       "slugInvalidCharacters": "Solo se permiten letras minúsculas, números, guiones y guiones bajos.",
       "slugNotEmpty": "Por favor, ingrese un nombre único de grupo.",

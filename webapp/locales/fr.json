@@ -274,9 +274,6 @@
     "notifications": {
       "name": "Notifications"
     },
-    "organizations": {
-      "name": "Organisations"
-    },
     "pages": {
       "name": "Pages"
     },
@@ -358,16 +355,6 @@
       "deleteError": "Impossible de supprimer le rôle : {message}",
       "deleteSuccess": "Rôle supprimé.",
       "description": "Qui peut faire quoi sur l'ensemble du réseau. Créez des rôles et attribuez des droits — les modifications s'appliquent immédiatement.",
-      "groups": {
-        "account": "Compte",
-        "administration": "Administration",
-        "communication": "Communication",
-        "content": "Contenu",
-        "groupAdministration": "Groupes — administration",
-        "groupModeration": "Groupes — modération",
-        "membership": "Adhésion",
-        "moderation": "Modération"
-      },
       "members": "{count} membres",
       "name": "Rôles et droits",
       "nameLabel": "Nom",
@@ -391,10 +378,7 @@
         "user_delete_any": "Supprimer le compte de n’importe quel utilisateur.",
         "user_email_readAny": "Lire l’adresse e-mail de n’importe quel utilisateur.",
         "user_invite": "Générer des codes d’invitation personnels.",
-        "videoCall_create_closed": "Démarrer un appel vidéo dans un groupe fermé.",
-        "videoCall_create_hidden": "Démarrer un appel vidéo dans un groupe caché.",
         "videoCall_create_open": "Démarrer un appel vidéo dans un groupe où tout le monde peut entrer : trouvable et rejoignable sans approbation.",
-        "videoCall_create_public": "Démarrer un appel vidéo dans un groupe public.",
         "videoCall_create_restricted": "Démarrer un appel vidéo dans un groupe où l'on ne peut pas simplement entrer : rejoindre demande une approbation ou une invitation, ou le groupe est masqué."
       },
       "permUnavailable": "Fonctionnalité non configurée — accorder ce droit n'a aucun effet.",
@@ -1225,8 +1209,6 @@
       "actionRadiusRequired": "Veuillez choisir un rayon d'action.",
       "descriptionLength": "La description doit comporter au moins {min} caractères.",
       "descriptionNotEmpty": "Veuillez saisir une description.",
-      "groupTypeNotAllowed": "Vous ne pouvez pas créer ce type de groupe.",
-      "groupTypeRequired": "Veuillez choisir un type de groupe.",
       "nameNotEmpty": "Veuillez saisir un nom de groupe.",
       "slugInvalidCharacters": "Seuls les lettres minuscules, les chiffres, les tirets et les underscores sont autorisés.",
       "slugNotEmpty": "Veuillez saisir un nom de groupe unique.",

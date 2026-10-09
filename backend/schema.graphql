@@ -413,9 +413,6 @@ type Group {
   """Full group description (rich text)."""
   description: String!
   disabled: Boolean
-
-  """The same value as `visibility`, under its old name."""
-  groupType: GroupType! @deprecated(reason: "Use `visibility`.")
   id: ID!
 
   """Invite codes to this group the current user has generated."""
@@ -670,20 +667,6 @@ type GroupTemplateChoice {
   visibility: GroupVisibility!
 }
 
-"""Determines a group's discoverability and how users become members."""
-enum GroupType {
-  """
-  Anyone can find the group, but joining requires approval by a group admin/owner.
-  """
-  closed
-
-  """The group is unlisted; it can only be found and joined via invite."""
-  hidden
-
-  """Anyone can find the group and join without approval."""
-  public
-}
-
 """How findable a group is, and therefore how private."""
 enum GroupVisibility {
   """The group is findable, its content is not."""
@@ -921,9 +904,9 @@ type Mutation {
   AddPostEmotions(data: _EMOTEDInput!, to: _PostInput!): EMOTED
 
   """
-  Change a member's role in a group. Restricted to admins/owners, subject to the role hierarchy.
+  Change a member's role in a group. Deprecated: it takes the GroupMemberRole enum, so it cannot assign a role the group defined itself — use setGroupMemberRole. Needs group.member.role.assign, subject to the same dominance and coverage rules.
   """
-  ChangeGroupMemberRole(groupId: ID!, roleInGroup: GroupMemberRole!, userId: ID!): GroupMember
+  ChangeGroupMemberRole(groupId: ID!, roleInGroup: GroupMemberRole!, userId: ID!): GroupMember @deprecated(reason: "Group roles are group-defined; use setGroupMemberRole instead.")
 
   """
   Write a comment on a post. Requires authentication, the `comment.create` permission, and permission to comment on that post.
@@ -938,9 +921,6 @@ type Mutation {
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
     description: String!
-
-    """The template by the name of the visibility it derives to."""
-    groupType: GroupType @deprecated(reason: "Use `template`.")
     id: ID
 
     """
@@ -958,9 +938,9 @@ type Mutation {
     slug: String
 
     """
-    Which role template the group starts from — not a visibility, which is what the rights of that template derive to. Required unless the deprecated `groupType` is given.
+    Which role template the group starts from. A name from `groupTemplates` — not a visibility, which is what the rights of that template derive to.
     """
-    template: String
+    template: String!
   ): Group
 
   """Create (or fetch) the chat room for a group. Requires authentication."""
@@ -1059,9 +1039,6 @@ type Mutation {
     avatar: ImageInput
     categoryIds: [ID]
     description: String
-
-    """The same as `visibility`, under its old name."""
-    groupType: GroupType @deprecated(reason: "Use `visibility`.")
     id: ID!
 
     """

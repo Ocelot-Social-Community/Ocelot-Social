@@ -133,6 +133,7 @@
             @unpinPost="unpinPost"
             @pinGroupPost="pinGroupPost"
             @unpinGroupPost="unpinGroupPost"
+            @removeFromGroup="removeFromGroup"
             @pushPost="pushPost"
             @unpushPost="unpushPost"
             @toggleObservePost="toggleObservePost"
@@ -281,6 +282,9 @@ export default {
     },
     pinGroupPost(post) {
       this.$emit('pinGroupPost', post)
+    },
+    removeFromGroup(post) {
+      this.$emit('removeFromGroup', post)
     },
     unpinGroupPost(post) {
       this.$emit('unpinGroupPost', post)

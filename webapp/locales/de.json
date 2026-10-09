@@ -274,9 +274,6 @@
     "notifications": {
       "name": "Benachrichtigungen"
     },
-    "organizations": {
-      "name": "Organisationen"
-    },
     "pages": {
       "name": "Seiten"
     },
@@ -358,16 +355,6 @@
       "deleteError": "Rolle konnte nicht gelöscht werden: {message}",
       "deleteSuccess": "Rolle gelöscht.",
       "description": "Wer im Netzwerk was darf. Rollen anlegen und Rechte zuweisen — Änderungen gelten sofort.",
-      "groups": {
-        "account": "Konto",
-        "administration": "Administration",
-        "communication": "Kommunikation",
-        "content": "Inhalte",
-        "groupAdministration": "Gruppen — Administration",
-        "groupModeration": "Gruppen — Moderation",
-        "membership": "Mitgliedschaft",
-        "moderation": "Moderation"
-      },
       "members": "{count} Mitglieder",
       "name": "Rollen & Rechte",
       "nameLabel": "Name",
@@ -391,10 +378,7 @@
         "user_delete_any": "Beliebiges Nutzerkonto löschen.",
         "user_email_readAny": "E-Mail-Adresse beliebiger Nutzer lesen.",
         "user_invite": "Persönliche Einladungscodes erzeugen.",
-        "videoCall_create_closed": "Videoanruf in einer geschlossenen Gruppe starten.",
-        "videoCall_create_hidden": "Videoanruf in einer verborgenen Gruppe starten.",
         "videoCall_create_open": "Einen Video-Call in einer Gruppe starten, die jeder betreten kann — die also auffindbar ist und ohne Freigabe beigetreten werden kann.",
-        "videoCall_create_public": "Videoanruf in einer öffentlichen Gruppe starten.",
         "videoCall_create_restricted": "Einen Video-Call in einer Gruppe starten, die man nicht einfach betreten kann: Der Beitritt braucht eine Freigabe oder Einladung, oder die Gruppe ist unsichtbar."
       },
       "permUnavailable": "Funktion nicht konfiguriert – das Recht hat keine Wirkung.",
@@ -1225,8 +1209,6 @@
       "actionRadiusRequired": "Bitte einen Aktionsradius wählen.",
       "descriptionLength": "Die Beschreibung muss mindestens {min} Zeichen lang sein.",
       "descriptionNotEmpty": "Bitte eine Beschreibung eingeben.",
-      "groupTypeNotAllowed": "Diese Art Gruppe darfst du nicht anlegen.",
-      "groupTypeRequired": "Bitte einen Gruppentyp wählen.",
       "nameNotEmpty": "Bitte einen Gruppennamen eingeben.",
       "slugInvalidCharacters": "Nur Kleinbuchstaben, Ziffern, Bindestriche und Unterstriche sind erlaubt.",
       "slugNotEmpty": "Bitte einen eindeutigen Gruppennamen eingeben.",
