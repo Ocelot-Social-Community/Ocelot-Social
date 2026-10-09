@@ -11,7 +11,11 @@ Feature: Register and recover an account
   # Optional fields of the last slide, off so every scenario fills the same form — the policy cache
   # survives the database wipe between scenarios, so they are set rather than assumed.
   Background:
-    Given the network policy "askForRealName" is "false"
+    # The policy step sets policies as this admin.
+    Given the following "users" are in the database:
+      | slug  | email             | password | id    | name  | role  | termsAndConditionsAgreedVersion |
+      | admin | admin@example.org | 1234     | admin | Admin | admin | 0.0.4                           |
+    And the network policy "askForRealName" is "false"
     And the network policy "requireLocation" is "false"
 
   Scenario: Register on an open network
