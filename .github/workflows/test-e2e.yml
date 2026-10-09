@@ -401,13 +401,25 @@ jobs:
 
       - name: Full stack tests | run tests
         id: e2e-tests
-        run: npm run cypress:run -- --spec "cypress/e2e/${{ matrix.feature }}"
+        env:
+          # Chrome's net log of the run, for the page-load hang; uploaded below only on failure.
+          # Not CYPRESS_-prefixed: Cypress would read that as a config override.
+          E2E_NETLOG_PATH: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/diagnostics/netlog.json
+        run: |
+          mkdir -p cypress/reports/diagnostics
+          npm run cypress:run -- --spec "cypress/e2e/${{ matrix.feature }}"
 
       - name: Full stack tests | if tests failed, compile html report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         run: |
           cd cypress/
           node create-cucumber-html-report.js
+
+      - name: Full stack tests | if tests failed, collect diagnostics
+        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.test.yml logs --no-color --timestamps webapp backend > cypress/reports/diagnostics/compose.log 2>&1 || true
+          cp -r cypress/screenshots cypress/reports/diagnostics/ 2>/dev/null || true
 
       - name: Full stack tests | if tests failed, compute artifact name
         id: artifact-name
@@ -420,7 +432,9 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ steps.artifact-name.outputs.name }}
-          path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
+          path: |
+            /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
+            /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/diagnostics
 
   e2e_status:
     name: E2E | Status
