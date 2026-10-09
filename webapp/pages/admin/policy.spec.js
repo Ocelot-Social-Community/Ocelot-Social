@@ -809,4 +809,50 @@ describe('admin/policy.vue', () => {
       jest.useRealTimers()
     })
   })
+
+  // Leaving with an unsaved change asks first — in the app (the router guard) and when the tab is
+  // closed or reloaded (the browser's own dialog).
+  describe('leaving with unsaved changes', () => {
+    const leave = (wrapper) => {
+      const next = jest.fn()
+      ;[]
+        .concat(wrapper.vm.$options.beforeRouteLeave)
+        .forEach((hook) => hook.call(wrapper.vm, {}, {}, next))
+      return next
+    }
+
+    // This page's own handler, not a window event: other tests in this file leave pages with
+    // changes mounted, and their listeners would answer too. mixins/warnBeforeUnload.spec.js
+    // covers the listener itself.
+    const unload = (wrapper) => {
+      const event = new Event('beforeunload', { cancelable: true })
+      wrapper.vm.warnBeforeUnload(event)
+      return event
+    }
+
+    it('lets the user leave while nothing is changed', async () => {
+      const wrapper = await Wrapper()
+      // The form is filled from the store on mount; before that it is empty, not changed.
+      await flushPromises()
+      const next = leave(wrapper)
+
+      expect(next).toHaveBeenCalledWith()
+      expect(unload(wrapper).defaultPrevented).toBe(false)
+      wrapper.destroy()
+    })
+
+    it('asks before leaving with an unsaved change', async () => {
+      const wrapper = await Wrapper()
+      await flushPromises()
+      await wrapper.find('#policy-publicRegistration').setChecked(true)
+
+      const next = leave(wrapper)
+      await wrapper.vm.$nextTick()
+
+      expect(next).not.toHaveBeenCalled()
+      expect(wrapper.vm.showLeaveConfirmModal).toBe(true)
+      expect(unload(wrapper).defaultPrevented).toBe(true)
+      wrapper.destroy()
+    })
+  })
 })

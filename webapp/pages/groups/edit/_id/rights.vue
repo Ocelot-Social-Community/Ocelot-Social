@@ -142,6 +142,11 @@
       :modalData="applyTemplateModalData"
       @close="templateToApply = null"
     />
+    <confirm-modal
+      v-if="showLeaveConfirmModal"
+      :modalData="leaveConfirmModalData"
+      @close="showLeaveConfirmModal = false"
+    />
   </os-card>
 </template>
 
@@ -161,10 +166,12 @@ import {
 } from '~/graphql/groupRoles.js'
 import { USUAL_GROUP_ROLE } from '~/constants/groups'
 import groupRightsEditor from '~/mixins/groupRightsEditor'
+import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
+import warnBeforeUnload from '~/mixins/warnBeforeUnload'
 import { iconRegistry } from '~/utils/iconRegistry'
 
 export default {
-  mixins: [groupRightsEditor],
+  mixins: [groupRightsEditor, confirmLeaveIfUnsavedChanges, warnBeforeUnload],
   components: {
     ConfirmModal,
     GroupRightsSimple,
@@ -244,6 +251,11 @@ export default {
     },
   },
   methods: {
+    // Asked by confirmLeaveIfUnsavedChanges and warnBeforeUnload: the rights draft (both views
+    // edit one) holds a change nobody saved.
+    hasUnsavedChanges() {
+      return this.dirty
+    },
     /**
      * A right can only be handed out by somebody who holds it — the same coverage rule the
      * backend enforces. Showing an ineffective checkbox would promise an effect that the save

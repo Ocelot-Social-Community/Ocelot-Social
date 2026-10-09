@@ -143,11 +143,17 @@
         </os-button>
       </section>
     </template>
+    <confirm-modal
+      v-if="showLeaveConfirmModal"
+      :modalData="leaveConfirmModalData"
+      @close="showLeaveConfirmModal = false"
+    />
   </os-card>
 </template>
 
 <script>
 import { OsButton, OsCard, OsToggleGroup } from '@ocelot-social/ui'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 import GroupRightsSimple from '~/components/Permissions/GroupRightsSimple'
 import OcelotInput from '~/components/OcelotInput/OcelotInput'
 import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
@@ -159,10 +165,13 @@ import {
   updateGroupRoleTemplateMutation,
 } from '~/graphql/adminGroups.js'
 import groupRightsEditor from '~/mixins/groupRightsEditor'
+import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
+import warnBeforeUnload from '~/mixins/warnBeforeUnload'
 
 export default {
-  mixins: [groupRightsEditor],
+  mixins: [groupRightsEditor, confirmLeaveIfUnsavedChanges, warnBeforeUnload],
   components: {
+    ConfirmModal,
     GroupRightsSimple,
     OcelotInput,
     OsButton,
@@ -197,6 +206,11 @@ export default {
     },
   },
   methods: {
+    // Asked by confirmLeaveIfUnsavedChanges and warnBeforeUnload: the template being edited
+    // holds a change nobody saved.
+    hasUnsavedChanges() {
+      return this.dirty
+    },
     /** Another template's roles replace the ones on screen — and with them, the draft of these. */
     openTemplate(name) {
       if (name === this.activeTemplateName || !this.mayDiscardDraft()) return
