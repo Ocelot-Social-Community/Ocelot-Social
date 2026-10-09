@@ -666,6 +666,9 @@ export default {
       // Keep the minimized/maximized state in sync with the URL when the user
       // navigates via links, browser back/forward, or our own routing helpers.
       if (!this.show) return
+      // leave() navigates away from the call URL before it hangs up. That is
+      // no reason to park the window for the moment the hanging up takes.
+      if (this.leaving) return
       const onCall = to.name === 'call-id-slug'
       // A failed connect holds no session worth preserving — minimizing only
       // exists so a *live* room survives navigation. Parking an error card in
@@ -699,6 +702,7 @@ export default {
     this.observedStage = null
     this.qualityTimer = null
     this.qualityClass = null
+    this.leaving = false
   },
   mounted() {
     this.observeStage()
@@ -1525,21 +1529,26 @@ export default {
       // Capture before close() clears the store.
       const groupId = this.groupId
       const groupSlug = this.groupSlug
-      // Navigate away from the call URL *before* clearing the store, otherwise
-      // the call page's watcher sees showVideoCall flip to false while it's
-      // still mounted and re-opens the prejoin popover for the same group.
-      if (this.$route.name === 'call-id-slug' && groupId && groupSlug) {
-        try {
-          await this.$router.replace({
-            name: 'groups-id-slug',
-            params: { id: groupId, slug: groupSlug },
-          })
-        } catch (_e) {
-          /* ignore navigation duplicates / aborts */
+      this.leaving = true
+      try {
+        // Navigate away from the call URL *before* clearing the store, otherwise
+        // the call page's watcher sees showVideoCall flip to false while it's
+        // still mounted and re-opens the prejoin popover for the same group.
+        if (this.$route.name === 'call-id-slug' && groupId && groupSlug) {
+          try {
+            await this.$router.replace({
+              name: 'groups-id-slug',
+              params: { id: groupId, slug: groupSlug },
+            })
+          } catch (_e) {
+            /* ignore navigation duplicates / aborts */
+          }
         }
+        await this.cleanup()
+        this.close()
+      } finally {
+        this.leaving = false
       }
-      await this.cleanup()
-      this.close()
     },
     async cleanup() {
       if (this.room) {

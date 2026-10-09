@@ -795,6 +795,30 @@ describe('VideoCall', () => {
       wrapper.vm.cleanup = jest.fn().mockResolvedValue()
       await expect(wrapper.vm.leave()).resolves.toBeUndefined()
     })
+
+    it('does not park the window on its way out', async () => {
+      const { wrapper, setMinimized } = factory({
+        show: true,
+        groupId: 'g1',
+        groupSlug: 'yoga',
+        routeName: 'call-id-slug',
+      })
+      wrapper.setData({ phase: 'in-call' })
+      const navigatedTo = () =>
+        wrapper.vm.$options.watch.$route.call(wrapper.vm, { name: 'groups-id-slug' })
+      // The navigation of leave() reaches the route watcher while the call
+      // is still up.
+      wrapper.vm.$router.replace = jest.fn(async () => {
+        await navigatedTo()
+      })
+      wrapper.vm.cleanup = jest.fn().mockResolvedValue()
+      await wrapper.vm.leave()
+      expect(setMinimized).not.toHaveBeenCalled()
+
+      // Any other navigation away from the call parks it as before.
+      await navigatedTo()
+      expect(setMinimized).toHaveBeenCalled()
+    })
   })
 
   describe('retryConnect', () => {
