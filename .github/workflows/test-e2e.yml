@@ -409,7 +409,7 @@ jobs:
 
       - name: README screenshots | capture
         if: matrix.feature == 'readme-screenshots'
-        run: npm run cypress:run -- --config 'specPattern=readme/*.cy.js' --spec cypress/readme/screenshots.cy.js
+        run: npm run cypress:run -- --config 'specPattern=cypress/readme/*.cy.js' --spec cypress/readme/screenshots.cy.js
 
       # On every push, so a pull request shows how its change looks; published from master only
       # (publish_readme_screenshots below).
