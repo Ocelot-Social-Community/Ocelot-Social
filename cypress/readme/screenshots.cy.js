@@ -42,7 +42,8 @@ const settle = () => cy.wait(1500)
 
 describe('README screenshots', () => {
   beforeEach(() => {
-    cy.viewport(1440, 900)
+    // The headless browser window is 1280×720; a larger viewport would be cut off at its edge.
+    cy.viewport(1280, 720)
     cy.setCookie('locale', 'en')
   })
 
@@ -57,7 +58,8 @@ describe('README screenshots', () => {
   it('a post with its comments', () => {
     login(USER)
     cy.visit('/')
-    cy.get('.post-teaser a', { timeout: 60000 }).first().click()
+    // The title's link — the first link of a teaser is its author.
+    cy.get('.post-teaser a[href^="/post/"]', { timeout: 60000 }).first().click()
     cy.location('pathname', { timeout: 60000 }).should('match', /^\/post\//)
     settle()
     shoot('post')
@@ -93,6 +95,11 @@ describe('README screenshots', () => {
     login(USER)
     cy.visit('/chat')
     cy.get('.chat-page', { timeout: 60000 }).should('be.visible')
+    // The chat is a web component; its messages arrive after the room list.
+    cy.get('vue-advanced-chat', { timeout: 60000 })
+      .shadow()
+      .find('.vac-message-wrapper', { timeout: 60000 })
+      .should('have.length.greaterThan', 0)
     settle()
     shoot('chat')
   })
