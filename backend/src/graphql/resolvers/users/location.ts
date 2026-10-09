@@ -150,6 +150,62 @@ const reverseGeocodeCoordinates = async (
   return null
 }
 
+// Writes the feature and the chain of places it lies in (its `context`), and returns the id the
+// node is linked to.
+const storeLocation = async (session, data): Promise<string> => {
+  if (data.place_type.length > 1) {
+    data.id = 'region.' + data.id.split('.')[1]
+  }
+  await createLocation(session, data)
+
+  let parent = data
+
+  if (parent.address) {
+    parent.id += `-${parent.address}`
+  }
+
+  if (data.context) {
+    for await (const ctx of data.context) {
+      await createLocation(session, ctx)
+      await session.writeTransaction((transaction) => {
+        return transaction.run(
+          `
+              MATCH (parent:Location {id: $parentId}), (child:Location {id: $childId})
+              MERGE (child)<-[:IS_IN]-(parent)
+              RETURN child.id, parent.id
+            `,
+          {
+            parentId: parent.id,
+            childId: ctx.id,
+          },
+        )
+      })
+      parent = ctx
+    }
+  }
+
+  return data.id
+}
+
+// Deletes all current locations from the node and adds the new one — none for an id no Location
+// carries, which is how a location is cleared.
+const attachLocation = async (session, nodeLabel, nodeId, locationId: string) => {
+  await session.writeTransaction((transaction) => {
+    return transaction.run(
+      `
+        MATCH (node:${nodeLabel} {id: $nodeId})
+        OPTIONAL MATCH (node)-[relationship:IS_IN]->(:Location)
+        DELETE relationship
+        WITH node
+        MATCH (location:Location {id: $locationId})
+        MERGE (node)-[:IS_IN]->(location)
+        RETURN location.id, node.id
+      `,
+      { nodeId, locationId },
+    )
+  })
+}
+
 export const createOrUpdateLocations = async (
   nodeLabel,
   nodeId,
@@ -250,57 +306,78 @@ export const createOrUpdateLocations = async (
       }
     }
 
-    if (data.place_type.length > 1) {
-      data.id = 'region.' + data.id.split('.')[1]
-    }
-    await createLocation(session, data)
-
-    let parent = data
-
-    if (parent.address) {
-      parent.id += `-${parent.address}`
-    }
-
-    if (data.context) {
-      for await (const ctx of data.context) {
-        await createLocation(session, ctx)
-        await session.writeTransaction((transaction) => {
-          return transaction.run(
-            `
-                MATCH (parent:Location {id: $parentId}), (child:Location {id: $childId})
-                MERGE (child)<-[:IS_IN]-(parent)
-                RETURN child.id, parent.id
-              `,
-            {
-              parentId: parent.id,
-              childId: ctx.id,
-            },
-          )
-        })
-        parent = ctx
-      }
-    }
-
-    locationId = data.id
+    locationId = await storeLocation(session, data)
   } else {
     locationId = 'non-existent-id'
   }
 
-  // delete all current locations from node and add new location
-  await session.writeTransaction((transaction) => {
-    return transaction.run(
-      `
-        MATCH (node:${nodeLabel} {id: $nodeId})
-        OPTIONAL MATCH (node)-[relationship:IS_IN]->(:Location)
-        DELETE relationship
-        WITH node
-        MATCH (location:Location {id: $locationId})
-        MERGE (node)-[:IS_IN]->(location)
-        RETURN location.id, node.id
-      `,
-      { nodeId, locationId },
-    )
-  })
+  await attachLocation(session, nodeLabel, nodeId, locationId)
+}
+
+// A Mapbox feature id: its type, a dot, an identifier — a number today (`place.23259194`), but
+// opaque by contract, so only its shape is checked here; what confirms it is Mapbox naming it at
+// its coordinates. Linear-time, no nesting.
+const MAPBOX_FEATURE_ID = /^([a-z]+)\.[\w-]+$/
+
+/**
+ * The Mapbox feature the user picked, by its id — confirmed, not trusted.
+ *
+ * A place NAME is no identifier: it is what Mapbox calls the place in the language it was asked
+ * in, so the text the form showed ("Friesack, Kreis Havelland, Brandenburg, Deutschland") is not
+ * the text a second, multi-language search returns ("Friesack, Havelland District, …"), and
+ * matching the two refused every place whose name has a translated part. The feature id is the
+ * same in every language, and it is what the Location node is stored under anyway.
+ *
+ * The geocoding API has no lookup by id, so the id is confirmed instead: the coordinates the
+ * place was picked with (its centre, as the search returned it) are reverse-geocoded with the
+ * id's own type, and Mapbox has to name that very feature. That also keeps a client from
+ * attaching a node to a place it made up — an id that does not lie at its coordinates is refused.
+ *
+ * Separate from attaching it (attachLocationFeature) so a resolver can refuse a bad location
+ * BEFORE it writes anything, instead of leaving a half-saved node behind.
+ */
+export const resolveLocationId = async (
+  locationId: string,
+  coordinates: { lat: number; lng: number } | null,
+  context: Context,
+  // Which kinds of place the node may be in — the same granularity its search offers.
+  allowedTypes: string[],
+) => {
+  const type = MAPBOX_FEATURE_ID.exec(locationId)?.[1]
+  if (!type || !allowedTypes.includes(type)) {
+    throw new AppError(Errors.LOCATION_ID_INVALID)
+  }
+  if (!coordinates) {
+    throw new AppError(Errors.LOCATION_ID_COORDINATES_MISSING)
+  }
+  const data = await reverseGeocodeCoordinates(coordinates.lat, coordinates.lng, context, [type])
+  if (data?.id !== locationId || !data.place_type?.length) {
+    throw new AppError(Errors.LOCATION_ID_NOT_CONFIRMED)
+  }
+  return data
+}
+
+/**
+ * Pulls `locationId` off a mutation's params (it is no property of the node) and resolves it.
+ * Null when none was given — the node's location then follows `locationName` as before.
+ */
+export const extractLocationFeature = async (
+  params,
+  coordinates: { lat: number; lng: number } | null,
+  context: Context,
+  allowedTypes: string[],
+) => {
+  const { locationId } = params
+  delete params.locationId
+  if (locationId === undefined || locationId === null || locationId === '') {
+    return null
+  }
+  return resolveLocationId(locationId, coordinates, context, allowedTypes)
+}
+
+/** Stores a feature resolveLocationId confirmed and makes it the node's only location. */
+export const attachLocationFeature = async (session, nodeLabel: string, nodeId: string, data) => {
+  await attachLocation(session, nodeLabel, nodeId, await storeLocation(session, data))
 }
 
 const ALLOWED_LOCATION_TYPES = [
