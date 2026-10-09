@@ -250,6 +250,17 @@ export default {
           ? this.formData.locationName
           : ''
     },
+    // The Mapbox feature id of a place picked from the search or the map — what the backend
+    // decides the location by, since a place name differs with the language it was shown in.
+    // Null while the field holds typed text or a map point nothing was found at.
+    formLocationId() {
+      const locationValue = this.formData.locationName
+      return typeof locationValue === 'object' &&
+        locationValue !== null &&
+        typeof locationValue.id === 'string'
+        ? locationValue.id
+        : null
+    },
     formLocationCoordinates() {
       const locationValue = this.formData.locationName
       const hasCoordinates =
@@ -400,6 +411,7 @@ export default {
             name,
             slug,
             locationName: this.formLocationName,
+            locationId: this.formLocationId,
             lat: this.formLocationCoordinates?.lat ?? null,
             lng: this.formLocationCoordinates?.lng ?? null,
             about,

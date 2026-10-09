@@ -8,6 +8,7 @@ mutation CreateGroup(
   $actionRadius: GroupActionRadius!
   $categoryIds: [ID]
   $locationName: String # empty string '' sets it to null
+  $locationId: ID
   $lat: Float
   $lng: Float
 ) {
@@ -21,6 +22,7 @@ mutation CreateGroup(
     actionRadius: $actionRadius
     categoryIds: $categoryIds
     locationName: $locationName
+    locationId: $locationId
     lat: $lat
     lng: $lng
   ) {

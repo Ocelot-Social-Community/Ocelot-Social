@@ -924,12 +924,17 @@ type Mutation {
     id: ID
 
     """
-    Coordinates for locationName (e.g. a dropped map pin), given together or not at all. Not stored on the group itself — the server reverse-geocodes them (to a coarser place/region/country match, deliberately less precise than an event's exact pin) instead of forward-geocoding locationName's text, so the saved location matches the general area the user picked rather than a text-search approximation.
+    The coordinates the place was picked with (the centre `queryLocations` returned for it), given together or not at all. With locationId they confirm it; without, they only bias the lookup of locationName's text towards same-named places nearby. Not stored on the group itself.
     """
     lat: Float
 
     """See lat."""
     lng: Float
+
+    """
+    The Mapbox feature id of the picked place (e.g. `place.23259194`, as `queryLocations` returns it). Decides the location when given — the same in every language, unlike a place name. Needs lat and lng, the coordinates it was picked with: the server confirms the id lies there.
+    """
+    locationId: ID
 
     """Empty string '' clears the location (sets it to null)."""
     locationName: String
@@ -1042,12 +1047,17 @@ type Mutation {
     id: ID!
 
     """
-    Coordinates for locationName (e.g. a dropped map pin), given together or not at all. Not stored on the group itself — the server reverse-geocodes them (to a coarser place/region/country match, deliberately less precise than an event's exact pin) instead of forward-geocoding locationName's text, so the saved location matches the general area the user picked rather than a text-search approximation.
+    The coordinates the place was picked with (the centre `queryLocations` returned for it), given together or not at all. With locationId they confirm it; without, they only bias the lookup of locationName's text towards same-named places nearby. Not stored on the group itself.
     """
     lat: Float
 
     """See lat."""
     lng: Float
+
+    """
+    The Mapbox feature id of the picked place (e.g. `place.23259194`, as `queryLocations` returns it). Decides the location when given — the same in every language, unlike a place name. Needs lat and lng, the coordinates it was picked with: the server confirms the id lies there.
+    """
+    locationId: ID
 
     """Empty string '' clears the location (sets it to null)."""
     locationName: String
@@ -1077,13 +1087,18 @@ type Mutation {
     id: ID!
 
     """
-    Coordinates for locationName (e.g. a dropped map pin), given together or not at all. Not stored on the user themselves — the server reverse-geocodes them (to a coarser place/region/country match, deliberately less precise than an event's exact pin) instead of forward-geocoding locationName's text, so the saved location matches the general area the user picked rather than a text-search approximation.
+    The coordinates the place was picked with (the centre `queryLocations` returned for it), given together or not at all. With locationId they confirm it; without, they only bias the lookup of locationName's text towards same-named places nearby. Not stored on the user itself.
     """
     lat: Float
 
     """See lat."""
     lng: Float
     locale: String
+
+    """
+    The Mapbox feature id of the picked place (e.g. `place.23259194`, as `queryLocations` returns it). Decides the location when given — the same in every language, unlike a place name. Needs lat and lng, the coordinates it was picked with: the server confirms the id lies there.
+    """
+    locationId: ID
 
     """Empty string '' clears the location (sets it to null)."""
     locationName: String
