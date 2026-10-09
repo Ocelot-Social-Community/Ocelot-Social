@@ -413,12 +413,26 @@ jobs:
 
       # On every push, so a pull request shows how its change looks; published from master only
       # (publish_readme_screenshots below).
+      # A failed capture leaves Cypress's own failure screenshots instead — uploaded too (under
+      # another name, so the publish job never picks them up), because they show what went wrong.
+      - name: README screenshots | upload failure screenshots
+        if: failure() && matrix.feature == 'readme-screenshots'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: readme-screenshots-failed
+          path: cypress/screenshots
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: README screenshots | upload
         if: matrix.feature == 'readme-screenshots'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: readme-screenshots
-          path: cypress/screenshots/screenshots.cy.js/*.png
+          # Whatever folder Cypress names after the spec; never a failure screenshot.
+          path: |
+            cypress/screenshots/**/*.png
+            !cypress/screenshots/**/*(failed).png
           if-no-files-found: error
           retention-days: 7
 

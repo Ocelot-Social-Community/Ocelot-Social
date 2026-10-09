@@ -11,6 +11,11 @@ const GRAPHQL_URI = 'http://localhost:4000'
 const USER = 'user@example.org'
 const ADMIN = 'admin@example.org'
 
+// The seed's accounts agreed to an older version of the terms than the branding asks for, so every
+// page would send them to the confirmation first. Agreed once per account, through the page, so
+// this keeps working whatever the current version is.
+const agreed = new Set()
+
 const login = (email) => {
   cy.request('POST', GRAPHQL_URI, {
     query: 'mutation ($email: String!, $password: String!) { login(email: $email, password: $password) }',
@@ -19,6 +24,13 @@ const login = (email) => {
     expect(body.errors, `login of ${email}`).to.be.undefined
     cy.setCookie('ocelot-social-token', body.data.login)
   })
+  if (!agreed.has(email)) {
+    cy.visit('/terms-and-conditions-confirm')
+    cy.get('#checkbox', { timeout: 60000 }).check()
+    cy.get('label[for="checkbox"] ~ button').click()
+    cy.location('pathname', { timeout: 60000 }).should('not.include', 'terms-and-conditions')
+    cy.then(() => agreed.add(email))
+  }
 }
 
 // The viewport, not the whole page: a README picture shows what a visitor sees first.
