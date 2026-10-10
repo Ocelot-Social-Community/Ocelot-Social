@@ -33,19 +33,19 @@ The pictures are taken from our demo data by the CI on every change to `master`,
 <!-- markdownlint-disable MD033 -->
 <table>
   <tr>
-    <td><img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/readme-screenshots/feed.png" alt="News feed" title="News feed" /></td>
+    <td colspan="2"><img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/readme-screenshots/feed.png" alt="News feed" title="News feed" /></td>
+  </tr>
+  <tr>
     <td><img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/readme-screenshots/post.png" alt="A post with its comments" title="A post with its comments" /></td>
-  </tr>
-  <tr>
     <td><img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/readme-screenshots/groups.png" alt="Groups" title="Groups" /></td>
+  </tr>
+  <tr>
     <td><img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/readme-screenshots/group.png" alt="A group" title="A group" /></td>
-  </tr>
-  <tr>
     <td><img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/readme-screenshots/map.png" alt="Map" title="Map" /></td>
-    <td><img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/readme-screenshots/chat.png" alt="Chat" title="Chat" /></td>
   </tr>
   <tr>
-    <td colspan="2"><img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/readme-screenshots/group-rights.png" alt="Rights a network gives its groups" title="Rights a network gives its groups" /></td>
+    <td><img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/readme-screenshots/chat.png" alt="Chat" title="Chat" /></td>
+    <td><img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/readme-screenshots/group-rights.png" alt="Rights a network gives its groups" title="Rights a network gives its groups" /></td>
   </tr>
 </table>
 <!-- markdownlint-enable MD033 -->

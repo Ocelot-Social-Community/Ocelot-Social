@@ -34,7 +34,7 @@ const login = (email) => {
 }
 
 // The viewport, not the whole page: a README picture shows what a visitor sees first. Without the
-// scrollbars, which belong to the test browser rather than to the page.
+// page's own scrollbar, which only says that there is more below.
 const shoot = (name) => {
   cy.document().then((doc) => {
     const style = doc.createElement('style')
@@ -50,8 +50,9 @@ const settle = () => cy.wait(1500)
 
 describe('README screenshots', () => {
   beforeEach(() => {
-    // The headless browser window is 1280×720; a larger viewport would be cut off at its edge.
-    cy.viewport(1280, 720)
+    // Narrower than a desktop, so the README's scaled-down pictures stay readable; the window it
+    // needs is set in cypress.config.js (README_SCREENSHOTS).
+    cy.viewport(1024, 640)
     cy.setCookie('locale', 'en')
   })
 
@@ -74,6 +75,13 @@ describe('README screenshots', () => {
       cy.visit(`/post/${post.id}/${post.slug}`)
     })
     cy.get('.post-page', { timeout: 60000 }).should('be.visible')
+    settle()
+    // Its title image alone fills the viewport. Scrolled to the title, with the end of the image and
+    // the author still above it, so the picture shows the text and the conversation.
+    cy.get('.post-page h1.title').then(([title]) => {
+      const win = title.ownerDocument.defaultView
+      win.scrollTo(0, title.getBoundingClientRect().top + win.scrollY - 220)
+    })
     settle()
     shoot('post')
   })
