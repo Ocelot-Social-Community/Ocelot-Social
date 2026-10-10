@@ -23,6 +23,7 @@ import {
   NONE_ROLE,
   PENDING_ROLE,
   privacyLevelFrom,
+  syncGroupChatRoom,
   templateVisibility,
   USUAL_ROLE,
 } from '@src/groupRole'
@@ -742,9 +743,9 @@ export default {
           const records = transactionResponse.records.map((record) => {
             return { user: record.get('user'), membership: record.get('membership') }
           })
-          // Add user to group chat room if they are an active member (not pending)
-          if (records[0]?.membership?.role && records[0].membership.role !== 'pending') {
-            await addUserToGroupChatRoom(transaction, groupId, userId)
+          // Into the group's chat room if the role they landed in may read it.
+          if (records[0]?.membership) {
+            await syncGroupChatRoom(transaction, groupId, userId)
           }
           return records
         })
@@ -797,12 +798,8 @@ export default {
           const [member] = transactionResponse.records.map((record) => {
             return { user: record.get('user'), membership: record.get('membership') }
           })
-          // Manage group chat room membership based on role
-          if (roleInGroup !== 'pending') {
-            await addUserToGroupChatRoom(transaction, groupId, userId)
-          } else {
-            await removeUserFromGroupChatRoom(transaction, groupId, userId)
-          }
+          // The chat room follows the new role's right to read it.
+          await syncGroupChatRoom(transaction, groupId, userId)
           return member
         })
       } finally {
@@ -1197,19 +1194,6 @@ export default {
       ),
     },
   },
-}
-
-export const addUserToGroupChatRoom = async (transaction, groupId, userId) => {
-  await transaction.run(
-    `
-    OPTIONAL MATCH (room:Room)-[:ROOM_FOR]->(group:Group {id: $groupId})
-    WITH room
-    WHERE room IS NOT NULL
-    MATCH (user:User {id: $userId})
-    MERGE (user)-[:CHATS_IN]->(room)
-    `,
-    { groupId, userId },
-  )
 }
 
 export const removeUserFromGroupChatRoom = async (transaction, groupId, userId) => {

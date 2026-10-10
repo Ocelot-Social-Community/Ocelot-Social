@@ -532,8 +532,10 @@ export default {
     // close its chat for members or open a channel's posting to nobody. The backend decides on
     // exactly these keys, so the button that triggers it has to ask the same question —
     // otherwise the only feedback is the shield's error toast.
+    // Reading is enough to open it: a member who may only read gets the conversation without
+    // the input field (see Chat.vue).
     canParticipateInChat() {
-      return this.canInGroup('group.chat.participate', this.group)
+      return this.canInGroup('group.chat.read', this.group)
     },
     canPostInGroup() {
       // No separate $can('post.create'): myGroupPermissions is already capped by the viewer's

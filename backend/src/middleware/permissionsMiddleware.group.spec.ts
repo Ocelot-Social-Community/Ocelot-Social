@@ -150,7 +150,7 @@ describe('the locators', () => {
     const context = contextFor({
       group: { effective: ['group.read'] },
       post: { effective: ['group.content.read'] },
-      room: { effective: ['group.chat.participate'] },
+      room: { effective: ['group.chat.write'] },
     })
 
     expect((await byArg('groupId')({ groupId: 'g1' }, context)).type).toBe('group')
@@ -187,8 +187,8 @@ describe(hasGroupPermission, () => {
   it('takes the locator it is given, not only the default one', async () => {
     // The shield map names the locator per entry — `byPost` for a comment, `byRoom` for a chat
     // message — so the default is only one of the two ways this is called.
-    const rule = hasGroupPermission('group.chat.participate', byRoom('roomId'))
-    const context = contextFor({ room: { effective: ['group.chat.participate'] } })
+    const rule = hasGroupPermission('group.chat.write', byRoom('roomId'))
+    const context = contextFor({ room: { effective: ['group.chat.write'] } })
 
     expect(await resolve(rule, {}, { roomId: 'r1' }, context)).toBe(true)
   })
@@ -205,7 +205,7 @@ describe(hasGroupPermission, () => {
   it('says so when the groups feature is off', async () => {
     // Posting to a room cannot put `groupsEnabled` in front — it may be a direct message — so the
     // reason has to come from here once the room turns out to belong to a group.
-    const rule = hasGroupPermission('group.chat.participate', byRoom('roomId'))
+    const rule = hasGroupPermission('group.chat.write', byRoom('roomId'))
     const context = contextFor({ room: { effective: [] }, groupsEnabled: false })
 
     expect(await resolve(rule, {}, { roomId: 'r1' }, context)).toMatchObject({

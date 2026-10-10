@@ -1133,6 +1133,7 @@
       "labelField": "Nome visível",
       "mandatory": "Sempre concedido: uma adesão que não se pode terminar não é uma opção.",
       "members": "{count} membros",
+      "mootChat": "O chat do grupo é só para membros: quem não é membro não tem acesso a ele.",
       "mootJoin": "Quem já tem adesão não entra outra vez.",
       "mootLeave": "Quem não é membro não tem nenhuma adesão para terminar.",
       "noRight": "Não podes conceder uma permissão que tu mesmo não tens.",
@@ -1148,6 +1149,7 @@
       "simple": {
         "applicants-read": "Os candidatos pendentes podem ler as publicações",
         "members-chat": "Os membros podem escrever no chat do grupo",
+        "members-chat-read": "Os membros podem ler o chat do grupo",
         "members-comment": "Os membros podem comentar",
         "members-invite": "Os membros podem convidar outras pessoas",
         "members-post": "Os membros podem escrever publicações",

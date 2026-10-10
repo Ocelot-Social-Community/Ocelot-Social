@@ -1133,6 +1133,7 @@
       "labelField": "Nome visualizzato",
       "mandatory": "Sempre concesso: un'iscrizione che non si può terminare non è un'impostazione.",
       "members": "{count} membri",
+      "mootChat": "La chat del gruppo è riservata agli iscritti: chi non è iscritto non vi ha accesso.",
       "mootJoin": "Chi ha già un’iscrizione non si unisce una seconda volta.",
       "mootLeave": "Chi non è iscritto non ha nessuna iscrizione da lasciare.",
       "noRight": "Non puoi concedere un permesso che tu stesso non hai.",
@@ -1148,6 +1149,7 @@
       "simple": {
         "applicants-read": "I richiedenti in attesa possono leggere le pubblicazioni",
         "members-chat": "I membri possono scrivere nella chat del gruppo",
+        "members-chat-read": "I membri possono leggere la chat del gruppo",
         "members-comment": "I membri possono commentare",
         "members-invite": "I membri possono invitare altre persone",
         "members-post": "I membri possono scrivere pubblicazioni",

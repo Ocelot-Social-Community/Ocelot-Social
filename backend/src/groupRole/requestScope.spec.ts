@@ -374,9 +374,9 @@ describe(createGroupAuthorizationScope, () => {
     })
 
     it('resolves the group a chat room belongs to', async () => {
-      const { scope } = scopeFor({ ...memberOf(['group.chat.participate']), groupOfRoom: 'g1' })
+      const { scope } = scopeFor({ ...memberOf(['group.chat.write']), groupOfRoom: 'g1' })
 
-      expect((await scope.forRoom('r1'))?.has('group.chat.participate')).toBe(true)
+      expect((await scope.forRoom('r1'))?.has('group.chat.write')).toBe(true)
     })
 
     it('answers null for a direct-message room', async () => {

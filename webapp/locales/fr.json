@@ -1133,6 +1133,7 @@
       "labelField": "Nom affiché",
       "mandatory": "Toujours accordé : une adhésion qu'on ne peut pas quitter n'est pas un réglage.",
       "members": "{count} membres",
+      "mootChat": "Le chat du groupe est réservé aux membres : qui n'est pas membre n'y a pas accès.",
       "mootJoin": "Qui a déjà une adhésion ne rejoint pas une seconde fois.",
       "mootLeave": "Qui n'est pas membre n'a pas d'adhésion à quitter.",
       "noRight": "Vous ne pouvez pas accorder une permission que vous n’avez pas vous-même.",
@@ -1148,6 +1149,7 @@
       "simple": {
         "applicants-read": "Les candidats en attente peuvent lire les publications",
         "members-chat": "Les membres peuvent écrire dans le chat du groupe",
+        "members-chat-read": "Les membres peuvent lire le chat du groupe",
         "members-comment": "Les membres peuvent commenter",
         "members-invite": "Les membres peuvent inviter d’autres personnes",
         "members-post": "Les membres peuvent écrire des publications",

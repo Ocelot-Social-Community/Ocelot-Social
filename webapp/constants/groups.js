@@ -48,6 +48,12 @@ export const isSystemGroupRole = (roleName) => SYSTEM_GROUP_ROLES.includes(roleN
 export const NON_MEMBER_ONLY_RIGHTS = ['group.join', 'group.join.request']
 
 /**
+ * Rights that only mean something inside the group — the webapp side of `MEMBER_ONLY_RIGHTS` in
+ * backend/src/groupRole/mandatoryRights.ts. The chat room is entered through the membership.
+ */
+export const MEMBER_ONLY_RIGHTS = ['group.chat.read', 'group.chat.write']
+
+/**
  * Rights over one's OWN membership — joining, asking to, leaving. Eligibility, not authority: the
  * webapp side of `SELF_SERVICE_PERMISSIONS` in backend/src/groupRole/authority.ts, which leaves
  * them out wherever who-may-act-on-whom is compared.
@@ -61,7 +67,8 @@ export const SELF_SERVICE_RIGHTS = [...NON_MEMBER_ONLY_RIGHTS, ...MANDATORY_GROU
 export const PARTICIPATION_RIGHTS = [
   'group.post.create',
   'group.comment.create',
-  'group.chat.participate',
+  'group.chat.read',
+  'group.chat.write',
   'group.videoCall.create',
   'group.videoCall.join',
 ]
@@ -69,7 +76,7 @@ export const PARTICIPATION_RIGHTS = [
 /** Whether the right means anything for this role at all. Mirrors the backend's `isMootFor`. */
 export const isMootRight = (roleName, permissionKey) =>
   roleName === NONE_GROUP_ROLE
-    ? MANDATORY_GROUP_RIGHTS.includes(permissionKey)
+    ? MANDATORY_GROUP_RIGHTS.includes(permissionKey) || MEMBER_ONLY_RIGHTS.includes(permissionKey)
     : NON_MEMBER_ONLY_RIGHTS.includes(permissionKey)
 
 /**
@@ -81,5 +88,8 @@ export const isMootRight = (roleName, permissionKey) =>
  */
 export const mootReasonFor = (roleName, permissionKey) => {
   if (!isMootRight(roleName, permissionKey)) return null
-  return roleName === NONE_GROUP_ROLE ? 'group.rights.mootLeave' : 'group.rights.mootJoin'
+  if (roleName !== NONE_GROUP_ROLE) return 'group.rights.mootJoin'
+  return MEMBER_ONLY_RIGHTS.includes(permissionKey)
+    ? 'group.rights.mootChat'
+    : 'group.rights.mootLeave'
 }

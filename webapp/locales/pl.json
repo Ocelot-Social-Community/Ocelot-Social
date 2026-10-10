@@ -1133,6 +1133,7 @@
       "labelField": "Nazwa wyświetlana",
       "mandatory": "Zawsze przyznane: członkostwo, którego nie można zakończyć, nie jest ustawieniem.",
       "members": "{count} członków",
+      "mootChat": "Czat grupy jest tylko dla członków: kto nie jest członkiem, nie ma do niego dostępu.",
       "mootJoin": "Kto już należy, nie dołącza po raz drugi.",
       "mootLeave": "Kto nie jest członkiem, nie ma członkostwa do opuszczenia.",
       "noRight": "Nie możesz nadać uprawnienia, którego sam nie masz.",
@@ -1148,6 +1149,7 @@
       "simple": {
         "applicants-read": "Oczekujący kandydaci mogą czytać wpisy",
         "members-chat": "Członkowie mogą pisać na czacie grupy",
+        "members-chat-read": "Członkowie mogą czytać czat grupy",
         "members-comment": "Członkowie mogą komentować",
         "members-invite": "Członkowie mogą zapraszać innych",
         "members-post": "Członkowie mogą pisać wpisy",

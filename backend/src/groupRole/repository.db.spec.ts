@@ -11,10 +11,13 @@ import {
   readGroupTemplate,
   seedRolesForGroupsWithoutRoles,
   seedRolesForNewGroup,
+  syncGroupChatRoom,
   withinTransaction,
   writeGroupTemplate,
 } from './repository'
 import { seedGroupRoleTemplates } from './seedTemplates'
+
+import type { RoleSeedTransaction } from './repository'
 
 const NOW = '2026-10-08T12:00:00.000Z'
 const database = databaseContext()
@@ -140,5 +143,85 @@ describe(markGroupRolesUncustomized, () => {
     })
 
     expect(records[0].get('customizedAt')).toBeNull()
+  })
+})
+
+describe(syncGroupChatRoom, () => {
+  // A group with a room and a role per case; every member starts in the room, as the old rule
+  // (every role but `pending`) left them.
+  const groupWithRoom = async () => {
+    await database.write({
+      query: `CREATE (g:Group {id: 'g1'})<-[:ROOM_FOR]-(:Room {id: 'room1'})
+              WITH g
+              UNWIND $roles AS role
+              CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole {id: 'g1:' + role.name, name: role.name, permissions: role.permissions})`,
+      variables: {
+        roles: [
+          { name: 'owner', permissions: '[]' },
+          { name: 'usual', permissions: '["group.read","group.chat.read","group.chat.write"]' },
+          { name: 'listener', permissions: '["group.read","group.chat.read"]' },
+          { name: 'mute', permissions: '["group.read","group.chat.write"]' },
+          { name: 'outsider', permissions: '["group.read","group.content.read"]' },
+          { name: 'pending', permissions: '["group.read"]' },
+        ],
+      },
+    })
+  }
+  const member = async (userId: string, role: string, inRoom = true) =>
+    database.write({
+      query: `MATCH (g:Group {id: 'g1'}), (room:Room {id: 'room1'})
+              CREATE (u:User {id: $userId})-[:MEMBER_OF {role: $role}]->(g)
+              FOREACH (_ IN CASE WHEN $inRoom THEN [1] ELSE [] END | CREATE (u)-[:CHATS_IN]->(room))`,
+      variables: { userId, role, inRoom },
+    })
+  const participants = async () => {
+    const result = await database.query({
+      query: `MATCH (u:User)-[:CHATS_IN]->(:Room {id: 'room1'}) RETURN u.id AS id ORDER BY id`,
+    })
+    return result.records.map((record) => record.get('id') as string)
+  }
+  const runner: RoleSeedTransaction = {
+    run: async (query, variables) => database.write({ query, variables }),
+  }
+
+  it('puts exactly the members whose role may read the chat into its room', async () => {
+    await groupWithRoom()
+    await member('boss', 'owner', false)
+    await member('talker', 'usual', false)
+    await member('listener', 'listener', false)
+    // Writing implies reading, should a list have been stored without the implication.
+    await member('mute', 'mute', false)
+    await member('outsider', 'outsider')
+    await member('applicant', 'pending')
+    // A membership whose role the group does not define holds nothing.
+    await member('ghost', 'gone')
+
+    await syncGroupChatRoom(runner, 'g1')
+
+    expect(await participants()).toEqual(['boss', 'listener', 'mute', 'talker'])
+  })
+
+  it('touches only the one member it is asked about', async () => {
+    await groupWithRoom()
+    await member('newcomer', 'usual', false)
+    await member('other', 'usual', false)
+    await member('stale', 'outsider')
+
+    await syncGroupChatRoom(runner, 'g1', 'newcomer')
+
+    expect(await participants()).toEqual(['newcomer', 'stale'])
+  })
+
+  it('does nothing for a group that has no room yet', async () => {
+    await database.write({
+      query: `CREATE (g:Group {id: 'g1'})-[:HAS_GROUP_ROLE]->(:GroupRole {id: 'g1:usual', name: 'usual', permissions: '["group.chat.read"]'})
+              CREATE (:User {id: 'u1'})-[:MEMBER_OF {role: 'usual'}]->(g)`,
+    })
+
+    await syncGroupChatRoom(runner, 'g1')
+
+    const rooms = await database.query({ query: `MATCH (r:Room) RETURN count(r) = 0 AS none` })
+
+    expect(rooms.records[0].get('none') as boolean).toBe(true)
   })
 })

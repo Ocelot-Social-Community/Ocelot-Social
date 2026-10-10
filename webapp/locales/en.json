@@ -1133,6 +1133,7 @@
       "labelField": "Display name",
       "mandatory": "Always granted: a membership one cannot end is not a setting.",
       "members": "{count} members",
+      "mootChat": "The group chat is for members only: a non-member has no way into it.",
       "mootJoin": "Somebody who already has a membership does not join again.",
       "mootLeave": "A non-member has no membership to leave.",
       "noRight": "You cannot grant a right you do not hold yourself.",
@@ -1148,6 +1149,7 @@
       "simple": {
         "applicants-read": "Waiting applicants may read the posts",
         "members-chat": "Members may write in the group chat",
+        "members-chat-read": "Members may read the group chat",
         "members-comment": "Members may comment",
         "members-invite": "Members may invite others",
         "members-post": "Members may write posts",

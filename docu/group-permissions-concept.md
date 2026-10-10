@@ -182,7 +182,8 @@ Katalog, nicht Doku.
 | `group.invite.external` | membership | — | `inviteRegistration` | `generateGroupInviteCode` (Flag `externalAllowed`), `validateInviteCode` im Signup-Pfad | Code erzeugen, der auch zur **Registrierung** berechtigt (E11) |
 | `group.settings.manage` | administration | — | — | `UpdateGroup` | Name, About, Description, Avatar, Ort, Kategorien, `showMembers` |
 | `group.role.manage` | administration | — | — | `updateGroupRole` / `createGroupRole` / `renameGroupRole` / `deleteGroupRole` / `resetGroupRoles`, `Group.roles` | **Meta-Recht:** Rollendefinitionen dieser Gruppe bearbeiten |
-| `group.chat.participate` | communication | — | — | `CreateGroupRoom`, `CreateMessage`, `MarkMessagesAsSeen` (Gruppen-Room) | Gruppen-Room lesen/schreiben — schliesst die heutige Luecke |
+| `group.chat.read` | communication | — | — | `CreateGroupRoom`; die `CHATS_IN`-Kante folgt dem Recht (`syncGroupChatRoom`), und an ihr haengen Raumliste, Nachrichten, Ungelesen-Zaehler, Live-Updates und Mails | Gruppen-Room lesen (#10355). Nur fuer Mitgliedschaften — auf `none` moot |
+| `group.chat.write` | communication | — | — | `CreateMessage` (Gruppen-Room; Text, Dateien, Sprachnachrichten) | In den Gruppen-Room schreiben; impliziert `group.chat.read` |
 | `group.videoCall.create` | communication | `videoCall.create_<door>` | `videoConference` | Start eines Calls in der Gruppe | Video-Call eroeffnen |
 | `group.videoCall.join` | communication | — | `videoConference` | `joinGroupVideoCall` | Laufendem Call beitreten |
 
@@ -502,7 +503,8 @@ auf den gespeicherten Netzwerkrollen).
 | `group.leave` | · | · | · | ✓ | ✓ | ✓ | ✓ ⚠ |
 | `group.post.create` | · | · | · | · | ✓ | ✓ | ✓ |
 | `group.comment.create` | · | · | · | · | ✓ | ✓ | ✓ |
-| `group.chat.participate` | · | · | · | · | ✓ | ✓ | ✓ |
+| `group.chat.read` | · | · | · | · | ✓ | ✓ | ✓ |
+| `group.chat.write` | · | · | · | · | ✓ | ✓ | ✓ |
 | `group.videoCall.join` | · | · | · | · | ✓ | ✓ | ✓ |
 | `group.videoCall.create` | · | · | · | · | ✓ | ✓ | ✓ |
 | `group.invite` | · | · | · | · | ✓ (public) | ✓ | ✓ |
@@ -522,7 +524,7 @@ koennen. Aber nicht Inhaber bestimmen koennen."):
 * `group.settings.manage` und `group.member.remove` gehen an `admin`. Heute
   owner-only, obwohl die Schema-Doku Admins nennt und Admins Rollen aendern
   duerfen. Wer Rollen setzen darf, kann ohnehin faktisch entfernen.
-* `group.chat.participate` / `group.videoCall.*` werden **nicht enger, sondern
+* `group.chat.read` / `group.chat.write` / `group.videoCall.*` werden **nicht enger, sondern
   sichtbar**: die Mitgliedschaftspruefung existiert heute, steckt aber je Operation in
   einer anderen Schicht (Resolver-Cypher, JS-Guard, `CHATS_IN`-Kante). Sie wandert in
   den Shield, damit dieselbe Frage dieselbe Antwortstelle hat.
@@ -545,7 +547,9 @@ koennen. Aber nicht Inhaber bestimmen koennen."):
 | `canCommentPost` | `hasGroupPermission('group.comment.create')` |
 | `isAllowedToPinGroupPost` | `hasGroupPermission('group.post.pin')` |
 | `isAllowedToGenerateGroupInviteCode` | `hasGroupPermission('group.invite')`, fuer einen registrierungsfaehigen Code zusaetzlich `group.invite.external` (E11); der Bug aus 1.3 verschwindet mit der Regel |
-| `CreateGroupRoom`, `CreateMessage`, `MarkMessagesAsSeen` (Gruppen-Room) | `hasGroupPermission('group.chat.participate')` |
+| `CreateGroupRoom` | `hasGroupPermission('group.chat.read')` |
+| `CreateMessage` (Gruppen-Room) | `hasGroupPermission('group.chat.write')` |
+| `MarkMessagesAsSeen` | nur `isAuthenticated`: die Mutation nennt Nachrichten, keinen Room, ein `byRoom`-Locator fand nichts (Gate nur dem Anschein nach); entfernt ohnehin nur die eigenen Ungelesen-Marker |
 | `joinGroupVideoCall` | `hasGroupPermission('group.videoCall.join')`, Start `group.videoCall.create` |
 | `muteGroup`, `unmuteGroup`, `setGroupMembershipVisibility` | `hasGroupPermission('group.content.read')` (Mitgliedschaft implizit) |
 | `Group: { '*': isAuthenticated }` + TODO im Shield | Feldregeln gegen `group.read` / `group.content.read` — erledigt das dortige "TODO — only those who are allowed to see the group" |

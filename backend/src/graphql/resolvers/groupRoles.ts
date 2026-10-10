@@ -3,7 +3,6 @@ import { withFilter } from 'graphql-subscriptions'
 import { GROUP_PERMISSIONS_CHANGED } from '@constants/subscriptions'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError, UserInputError } from '@graphql/errors'
-import { addUserToGroupChatRoom, removeUserFromGroupChatRoom } from '@graphql/resolvers/groups'
 import { visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { groupPermissionCatalog, sanitizeGroupPermissions } from '@src/groupPermission'
 import {
@@ -32,6 +31,7 @@ import {
   readGroupTemplate,
   renameGroupRole,
   replaceGroupRoles,
+  syncGroupChatRoom,
   untouchedGroupIdsByTemplate,
   writeElevation,
   writeGroupRole,
@@ -619,12 +619,10 @@ export default {
             { groupId, userId, roleName, now },
           )
           const row = result.records[0]
-          // The group's chat room follows the membership, in the same transaction: an applicant
-          // is not in it, every other role is (as ChangeGroupMemberRole keeps it).
+          // The group's chat room follows the membership, in the same transaction: in it while
+          // the role may read it (as ChangeGroupMemberRole keeps it).
           if (row) {
-            await (roleName === PENDING_ROLE
-              ? removeUserFromGroupChatRoom(transaction, groupId, userId)
-              : addUserToGroupChatRoom(transaction, groupId, userId))
+            await syncGroupChatRoom(transaction, groupId, userId)
           }
           return row
         })

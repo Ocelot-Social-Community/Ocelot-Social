@@ -55,3 +55,21 @@ Feature: Group Chat
     When I navigate to page "/groups/second-group/second-group"
     And I click on the group chat button
     Then I see the group chat popup with name "Second Group"
+
+  Scenario: A member who may only read sees the conversation without a way to write
+    Given "bob" is a member of group "test-group"
+    And the members of group "test-group" may "only read" its chat
+    And "alice" opens the group chat for "test-group"
+    And "alice" sends a group chat message "Read me" to "test-group"
+    And I am logged in as "bob"
+    And I navigate to page "/chat"
+    When I open the group chat for "test-group"
+    Then I see the message "Read me" in the chat
+    And I see no message input in the chat
+
+  Scenario: A member the group withholds its chat from is not offered it
+    Given "bob" is a member of group "test-group"
+    And the members of group "test-group" may "not read" its chat
+    And I am logged in as "bob"
+    When I navigate to page "/groups/test-group/test-group"
+    Then I am not offered the group chat

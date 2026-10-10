@@ -1133,6 +1133,7 @@
       "labelField": "Weergavenaam",
       "mandatory": "Altijd toegekend: een lidmaatschap dat je niet kunt beëindigen is geen instelling.",
       "members": "{count} leden",
+      "mootChat": "De groepschat is alleen voor leden: wie geen lid is, komt er niet in.",
       "mootJoin": "Wie al lid is, wordt niet nog een keer lid.",
       "mootLeave": "Wie geen lid is, heeft geen lidmaatschap om te beëindigen.",
       "noRight": "Je kunt geen recht geven dat je zelf niet hebt.",
@@ -1148,6 +1149,7 @@
       "simple": {
         "applicants-read": "Wachtende aanvragers mogen de berichten lezen",
         "members-chat": "Leden mogen in de groepschat schrijven",
+        "members-chat-read": "Leden mogen de groepschat lezen",
         "members-comment": "Leden mogen reageren",
         "members-invite": "Leden mogen anderen uitnodigen",
         "members-post": "Leden mogen berichten schrijven",
