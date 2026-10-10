@@ -95,23 +95,19 @@
 
         <!-- A role nobody can reach: every right on it is editable and none of it applies to
              anybody. Said here rather than left to the greyed rows, which showed WHAT was
-             blocked and never why.
-
-             Above the owner note on purpose: that one and the matrix are a v-if/v-else pair,
-             and anything between them breaks the pairing — which is how the matrix briefly
-             rendered for the owner role as well. -->
+             blocked and never why. -->
         <p v-if="pendingUnreachable" class="role-note" data-test="pending-unreachable">
           {{ $t('group.rights.pendingUnreachable') }}
         </p>
 
+        <!-- The owner role is shown like the network owner: every right ticked, none editable. -->
         <p v-if="activeRole.protected" class="role-note" data-test="owner-note">
           {{ $t('group.rights.ownerHoldsEverything') }}
         </p>
 
         <permission-matrix
-          v-else
           :permissions="catalog"
-          :granted="draft"
+          :granted="grantedOnScreen"
           :diff="hoverDiff"
           :highlight="highlightedRights"
           :group-label="(name) => $t(`permissions.sections.${name}`)"
@@ -146,6 +142,11 @@
       :modalData="applyTemplateModalData"
       @close="templateToApply = null"
     />
+    <confirm-modal
+      v-if="showLeaveConfirmModal"
+      :modalData="leaveConfirmModalData"
+      @close="showLeaveConfirmModal = false"
+    />
   </os-card>
 </template>
 
@@ -165,10 +166,12 @@ import {
 } from '~/graphql/groupRoles.js'
 import { USUAL_GROUP_ROLE } from '~/constants/groups'
 import groupRightsEditor from '~/mixins/groupRightsEditor'
+import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
+import warnBeforeUnload from '~/mixins/warnBeforeUnload'
 import { iconRegistry } from '~/utils/iconRegistry'
 
 export default {
-  mixins: [groupRightsEditor],
+  mixins: [groupRightsEditor, confirmLeaveIfUnsavedChanges, warnBeforeUnload],
   components: {
     ConfirmModal,
     GroupRightsSimple,
@@ -248,6 +251,11 @@ export default {
     },
   },
   methods: {
+    // Asked by confirmLeaveIfUnsavedChanges and warnBeforeUnload: the rights draft (both views
+    // edit one) holds a change nobody saved.
+    hasUnsavedChanges() {
+      return this.dirty
+    },
     /**
      * A right can only be handed out by somebody who holds it — the same coverage rule the
      * backend enforces. Showing an ineffective checkbox would promise an effect that the save
@@ -259,6 +267,7 @@ export default {
     rowDisabled(permission) {
       return (
         !this.canEdit ||
+        this.activeRole?.protected ||
         !this.grantable(permission) ||
         this.isMandatory(permission) ||
         this.isMoot(permission)

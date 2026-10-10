@@ -16,16 +16,12 @@ Feature: Event posts
       This event has no start date set.
       """
     And I click on "save button"
-    Then I see a toaster with status "error"
-    And I see a toaster with "Please fill in all required fields."
+    Then I see a toaster with status "error" saying "Please fill in all required fields."
 
   Scenario: Entering a past start date shows the past-start warning
     When I navigate to page "/post/create/event"
     And I enter the date "15.01.2020 10:00" in the event start date picker
-    Then I see a "warning" message:
-      """
-      The event start is in the past.
-      """
+    Then I see the hint "The event start is in the past."
 
   Scenario: Create an online event
     When I navigate to page "/post/create/event"
