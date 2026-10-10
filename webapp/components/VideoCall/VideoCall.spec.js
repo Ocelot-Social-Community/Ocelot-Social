@@ -1459,6 +1459,23 @@ describe('VideoCall', () => {
         expect(wrapper.vm.micProblem).toBe(false)
       })
 
+      it('reports no silence when the capture cannot be checked', async () => {
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack({
+          checkForSilence: jest
+            .fn()
+            .mockResolvedValueOnce(true)
+            .mockRejectedValue(new Error('no audio context')),
+        })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
+        track.handlers.audioSilenceDetected()
+        await flushPromises()
+        expect(wrapper.vm.micProblem).toBe(false)
+        // Free for the next look: the failed one did not get stuck.
+        expect(wrapper.vm.micSilenceProbe).toBeNull()
+      })
+
       it('gives up on the silence once the microphone is muted or gone', async () => {
         const { wrapper, room } = await connected()
         const track = fakeMicTrack({ checkForSilence: jest.fn().mockResolvedValue(true) })

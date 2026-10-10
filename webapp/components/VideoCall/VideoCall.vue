@@ -1440,12 +1440,16 @@ export default {
       return probe.promise
     },
     async probeMicSilence(probe) {
-      while (await probe.track.checkForSilence()) {
-        if (probe.heard) return false
-        if (probe.left-- <= 0) return true
-        await this.micSilencePause()
-        // Muted, unpublished or the call over: no silence left to report.
-        if (!this.micEnabled || this.localMicTrack() !== probe.track) return false
+      try {
+        while (await probe.track.checkForSilence()) {
+          if (probe.heard) return false
+          if (probe.left-- <= 0) return true
+          await this.micSilencePause()
+          // Muted, unpublished or the call over: no silence left to report.
+          if (!this.micEnabled || this.localMicTrack() !== probe.track) return false
+        }
+      } catch (_e) {
+        /* the capture could not be read: no silence to be told of */
       }
       return false
     },
