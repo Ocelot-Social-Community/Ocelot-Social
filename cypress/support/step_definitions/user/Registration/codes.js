@@ -45,19 +45,23 @@ defineStep('I enter the e-mail address {string}', (email) => {
   next()
 })
 
+// The slide checks the code as soon as it is complete — no button to press. A valid one moves on
+// to the next slide by itself; pressing "next" there would hit the NEXT slide's button, still
+// disabled while its form is empty.
 defineStep('I enter the code that was sent to {string}', (email) => {
   cy.get('input#nonce', { timeout: 15000 }).should('be.visible')
   registrationCode(email).then((code) => {
     cy.get('input#nonce').type(code)
-    next()
   })
+  cy.get('input#nonce', { timeout: 15000 }).should('not.exist')
 })
 
 defineStep('I enter a wrong code for {string}', (email) => {
   cy.get('input#nonce', { timeout: 15000 }).should('be.visible')
+  // Refused right away, with an error toast — the button stays disabled, so there is nothing to
+  // press either.
   registrationCode(email).then((code) => {
     cy.get('input#nonce').type(otherThan(code))
-    next()
   })
 })
 
@@ -70,7 +74,7 @@ defineStep('I create my account as {string} with the password {string}', (name, 
   cy.get('input#name', { timeout: 15000 }).type(name)
   cy.get('input#password').type(password)
   cy.get('input#passwordConfirmation').type(password)
-  // The terms and the data protection declaration — both required.
+  // The terms and data protection, and the consent to e-mails and notifications — both required.
   cy.get('input#checkbox0').check()
   cy.get('input#checkbox1').check()
   next()
