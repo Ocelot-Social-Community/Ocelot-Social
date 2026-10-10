@@ -408,11 +408,28 @@ describe('postFilterToCypher relation operators', () => {
     expect(params).toEqual({ pf0: 'u1' })
   })
 
-  it('matches posts the given user shouted', () => {
+  it('matches posts the given user shouted, as far as they show their shouts', () => {
     const { where, params } = postFilterToCypher({ filter: { shoutedBy_some: { id: 'u1' } } })
 
-    expect(where).toBe('EXISTS { MATCH (post)<-[:SHOUTED]-(:User { id: $pf0 }) }')
-    expect(params).toEqual({ pf0: 'u1' })
+    expect(where).toContain('MATCH (post)<-[:SHOUTED]-(shouter:User { id: $pf0 })')
+    expect(where).toContain(
+      'WHERE (coalesce(shouter.showShoutsPublicly, true) OR shouter.id = $pf1)',
+    )
+    // No viewer: a visitor, who sees only the shouts that are shown.
+    expect(params).toEqual({ pf0: 'u1', pf1: null })
+  })
+
+  // The shouter always sees their own; the viewer comes from the access-control filter that
+  // filterInvisiblePosts puts into every feed query.
+  it('takes the viewer from invisibleTo', () => {
+    const { params } = postFilterToCypher({
+      filter: {
+        invisibleTo: { viewerId: 'me', contentGroupIds: [] },
+        shoutedBy_some: { id: 'u1' },
+      },
+    })
+
+    expect(Object.values(params)).toEqual(expect.arrayContaining(['u1', 'me']))
   })
 
   it('matches posts by a given author', () => {
