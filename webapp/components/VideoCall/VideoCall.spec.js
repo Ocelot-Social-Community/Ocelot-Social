@@ -24,6 +24,7 @@ jest.mock('livekit-client', () => {
     Reconnecting: 'Reconnecting',
     Reconnected: 'Reconnected',
     MediaDevicesChanged: 'MediaDevicesChanged',
+    ActiveDeviceChanged: 'ActiveDeviceChanged',
     TrackPublished: 'TrackPublished',
     ConnectionQualityChanged: 'ConnectionQualityChanged',
   }
@@ -57,6 +58,7 @@ jest.mock('livekit-client', () => {
       this.remoteParticipants = new Map()
       this.connect = jest.fn().mockResolvedValue()
       this.disconnect = jest.fn().mockResolvedValue()
+      this.switchActiveDevice = jest.fn().mockResolvedValue(true)
     }
 
     on(evt, cb) {
@@ -85,7 +87,8 @@ const stubs = {
   OsIcon: Stub('OsIcon'),
   AvatarImage: Stub('AvatarImage'),
   PreJoin: Stub('PreJoin'),
-  VideoTile: Stub('VideoTile'),
+  DeviceSettings: Stub('DeviceSettings', { props: ['cameraStarting', 'micStarting'] }),
+  VideoTile: Stub('VideoTile', { props: ['tile', 'cameraStarting', 'micStarting'] }),
   Chat: Stub('Chat'),
   RoomTitleLink: Stub('RoomTitleLink'),
   ClientOnly: Stub('ClientOnly'),
@@ -569,6 +572,177 @@ describe('VideoCall', () => {
     })
   })
 
+  describe('device names on the buttons', () => {
+    const DEVICES = [
+      { kind: 'videoinput', deviceId: 'cam-1', label: 'Built-in camera' },
+      { kind: 'videoinput', deviceId: 'cam-2', label: 'Webcam' },
+      { kind: 'audioinput', deviceId: 'mic-1', label: 'Built-in microphone' },
+      { kind: 'audioinput', deviceId: 'mic-2', label: 'Headset' },
+      { kind: 'audiooutput', deviceId: 'spk-1', label: 'Built-in speaker' },
+    ]
+    const originalMediaDevices = Object.getOwnPropertyDescriptor(global.navigator, 'mediaDevices')
+    const setMediaDevices = (value) =>
+      Object.defineProperty(global.navigator, 'mediaDevices', { value, configurable: true })
+
+    afterEach(() => {
+      if (originalMediaDevices) {
+        Object.defineProperty(global.navigator, 'mediaDevices', originalMediaDevices)
+      } else {
+        delete global.navigator.mediaDevices
+      }
+    })
+
+    const inCall = (state = {}) => {
+      const built = factory({ show: true, groupId: 'g1', ...state })
+      built.wrapper.setData({ phase: 'in-call', knownDevices: DEVICES })
+      return built
+    }
+
+    it('names the devices in use', () => {
+      const { wrapper } = inCall()
+      wrapper.setData({ cameraDeviceId: 'cam-2', micDeviceId: 'mic-2', speakerDeviceId: 'spk-1' })
+      expect(wrapper.vm.deviceNames).toEqual({
+        camera: 'Webcam',
+        mic: 'Headset',
+        speaker: 'Built-in speaker',
+      })
+    })
+
+    it('reads an unknown device as the first of its kind, like the device settings do', () => {
+      const { wrapper } = inCall()
+      wrapper.setData({ cameraDeviceId: 'unplugged', micDeviceId: null })
+      expect(wrapper.vm.deviceNames).toMatchObject({
+        camera: 'Built-in camera',
+        mic: 'Built-in microphone',
+      })
+    })
+
+    it('has no names before the browser listed any device', () => {
+      const { wrapper } = factory({ show: true })
+      expect(wrapper.vm.deviceNames).toEqual({ camera: '', mic: '', speaker: '' })
+      wrapper.setData({ knownDevices: [{ kind: 'videoinput', deviceId: 'cam-1', label: '' }] })
+      expect(wrapper.vm.deviceNames.camera).toBe('')
+    })
+
+    it('shows the device alone next to a captioned button', () => {
+      const { wrapper } = inCall()
+      expect(wrapper.vm.deviceTooltip('Mute', ['Headset'])).toEqual({
+        content: 'Headset',
+        html: false,
+        classes: 'tooltip--multiline',
+      })
+    })
+
+    it('shows the caption and the device on a button that lost its caption', () => {
+      const { wrapper } = inCall({ minimized: true })
+      expect(wrapper.vm.deviceTooltip('Mute', ['Headset']).content).toBe('Mute\nHeadset')
+      // Still the plain caption when there is no device to name.
+      expect(wrapper.vm.deviceTooltip('Mute', ['']).content).toBe('Mute')
+    })
+
+    it('shows nothing when there is neither a caption to repeat nor a device to name', () => {
+      const { wrapper } = inCall()
+      expect(wrapper.vm.deviceTooltip('Mute', [''])).toBe('')
+    })
+
+    it('lists all devices in use on the device settings button', () => {
+      const { wrapper } = inCall()
+      wrapper.setData({ cameraDeviceId: 'cam-2', micDeviceId: 'mic-2' })
+      expect(wrapper.vm.deviceSettingsTooltip.content).toBe(
+        [
+          'videoCall.prejoin.camera: Webcam',
+          'videoCall.prejoin.microphone: Headset',
+          'videoCall.prejoin.speaker: Built-in speaker',
+        ].join('\n'),
+      )
+    })
+
+    it('leaves out what has no name, and steps aside for the open panel', () => {
+      const { wrapper } = inCall()
+      wrapper.setData({ knownDevices: DEVICES.filter((d) => d.kind !== 'audiooutput') })
+      expect(wrapper.vm.deviceSettingsTooltip.content).not.toContain('videoCall.prejoin.speaker')
+
+      wrapper.setData({ showDeviceSettings: true })
+      expect(wrapper.vm.deviceSettingsTooltip).toBe('')
+    })
+
+    describe('refreshKnownDevices', () => {
+      it('takes over what the browser lists', async () => {
+        setMediaDevices({ enumerateDevices: jest.fn().mockResolvedValue(DEVICES) })
+        const { wrapper } = factory({ show: true })
+        await wrapper.vm.refreshKnownDevices()
+        expect(wrapper.vm.knownDevices).toEqual(DEVICES)
+      })
+
+      it('goes without names in a browser that cannot list devices, or fails to', async () => {
+        const { wrapper } = factory({ show: true })
+        setMediaDevices(undefined)
+        await expect(wrapper.vm.refreshKnownDevices()).resolves.toBeUndefined()
+        setMediaDevices({})
+        await expect(wrapper.vm.refreshKnownDevices()).resolves.toBeUndefined()
+        setMediaDevices({ enumerateDevices: jest.fn().mockRejectedValue(new Error('boom')) })
+        await expect(wrapper.vm.refreshKnownDevices()).resolves.toBeUndefined()
+        expect(wrapper.vm.knownDevices).toEqual([])
+      })
+
+      it('drops a list that arrives after the call ended', async () => {
+        const { wrapper } = factory({ show: true })
+        wrapper.setData({ room: { name: 'the call' } })
+        setMediaDevices({
+          enumerateDevices: jest.fn(async () => {
+            wrapper.setData({ room: null })
+            return DEVICES
+          }),
+        })
+        await wrapper.vm.refreshKnownDevices()
+        expect(wrapper.vm.knownDevices).toEqual([])
+      })
+
+      it('runs once the call is connected, and again when devices come or go', async () => {
+        const enumerateDevices = jest.fn().mockResolvedValue(DEVICES)
+        setMediaDevices({ enumerateDevices })
+        const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
+        wrapper.vm.$apollo = {
+          mutate: jest.fn().mockResolvedValue({
+            data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } },
+          }),
+        }
+        await wrapper.vm.connect()
+        await flushPromises()
+        expect(wrapper.vm.knownDevices).toEqual(DEVICES)
+
+        wrapper.vm.room.handlers.MediaDevicesChanged()
+        expect(enumerateDevices).toHaveBeenCalledTimes(2)
+
+        await wrapper.vm.cleanup()
+        expect(wrapper.vm.knownDevices).toEqual([])
+      })
+
+      it('runs when a device is switched on during the call, not when it is switched off', async () => {
+        const enumerateDevices = jest.fn().mockResolvedValue(DEVICES)
+        setMediaDevices({ enumerateDevices })
+        const { wrapper } = factory({ show: true })
+        const room = {
+          localParticipant: {
+            isMicrophoneEnabled: true,
+            isCameraEnabled: true,
+            setMicrophoneEnabled: jest.fn().mockResolvedValue(),
+            setCameraEnabled: jest.fn().mockResolvedValue(),
+          },
+        }
+        wrapper.vm.refreshTiles = jest.fn()
+        wrapper.setData({ room, micEnabled: true, cameraEnabled: true })
+        await wrapper.vm.toggleMic()
+        await wrapper.vm.toggleCamera()
+        expect(enumerateDevices).not.toHaveBeenCalled()
+
+        await wrapper.vm.toggleMic()
+        await wrapper.vm.toggleCamera()
+        expect(enumerateDevices).toHaveBeenCalledTimes(2)
+      })
+    })
+  })
+
   describe('onTileSelect', () => {
     it('toggles the spotlight on the same tile', () => {
       const { wrapper } = factory({ show: true })
@@ -791,6 +965,30 @@ describe('VideoCall', () => {
       wrapper.vm.$router.replace = jest.fn().mockRejectedValue(new Error('aborted'))
       wrapper.vm.cleanup = jest.fn().mockResolvedValue()
       await expect(wrapper.vm.leave()).resolves.toBeUndefined()
+    })
+
+    it('does not park the window on its way out', async () => {
+      const { wrapper, setMinimized } = factory({
+        show: true,
+        groupId: 'g1',
+        groupSlug: 'yoga',
+        routeName: 'call-id-slug',
+      })
+      wrapper.setData({ phase: 'in-call' })
+      const navigatedTo = () =>
+        wrapper.vm.$options.watch.$route.call(wrapper.vm, { name: 'groups-id-slug' })
+      // The navigation of leave() reaches the route watcher while the call
+      // is still up.
+      wrapper.vm.$router.replace = jest.fn(async () => {
+        await navigatedTo()
+      })
+      wrapper.vm.cleanup = jest.fn().mockResolvedValue()
+      await wrapper.vm.leave()
+      expect(setMinimized).not.toHaveBeenCalled()
+
+      // Any other navigation away from the call parks it as before.
+      await navigatedTo()
+      expect(setMinimized).toHaveBeenCalled()
     })
   })
 
@@ -1112,6 +1310,8 @@ describe('VideoCall', () => {
           .mockResolvedValue({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } }),
       }
       await built.wrapper.vm.connect()
+      // No real waiting between the checks of a silent microphone.
+      jest.spyOn(built.wrapper.vm, 'micSilencePause').mockResolvedValue()
       return { ...built, room: built.wrapper.vm.room }
     }
 
@@ -1195,11 +1395,102 @@ describe('VideoCall', () => {
     describe('a microphone that delivers nothing', () => {
       it('warns when the published microphone only yields silence', async () => {
         const { wrapper, room } = await connected()
-        const track = fakeMicTrack()
+        const track = fakeMicTrack({ checkForSilence: jest.fn().mockResolvedValue(true) })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
         room.handlers.LocalTrackPublished({ source: 'microphone', track })
         track.handlers.audioSilenceDetected()
-        await wrapper.vm.$nextTick()
+        await flushPromises()
         expect(wrapper.find('[data-test="video-call-mic-problem"]').exists()).toBe(true)
+      })
+
+      it('does not warn about a capture that is merely slow to start', async () => {
+        // Firefox: silent at LiveKit's check right after a switch, sound a moment later.
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack({
+          checkForSilence: jest
+            .fn()
+            .mockResolvedValueOnce(true)
+            .mockResolvedValueOnce(true)
+            .mockResolvedValue(false),
+        })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
+        track.handlers.audioSilenceDetected()
+        await flushPromises()
+        expect(track.checkForSilence).toHaveBeenCalledTimes(3)
+        expect(wrapper.vm.micProblem).toBe(false)
+      })
+
+      it('takes the silence its own checks report as part of the same look', async () => {
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack()
+        // LiveKit emits the event from within checkForSilence().
+        track.checkForSilence = jest.fn(async () => {
+          track.handlers.audioSilenceDetected()
+          return true
+        })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
+        track.handlers.audioSilenceDetected()
+        await flushPromises()
+        // The first check and the five after it — no check started by a check.
+        expect(track.checkForSilence).toHaveBeenCalledTimes(6)
+        expect(wrapper.vm.micProblem).toBe(true)
+      })
+
+      it('drops the warning once the server hears us speak', async () => {
+        // Firefox can read silence off a microphone that works.
+        const { wrapper, room } = await connected()
+        wrapper.setData({ micProblem: true })
+        room.handlers.ActiveSpeakersChanged([{ identity: 'someone-else' }])
+        expect(wrapper.vm.micProblem).toBe(true)
+        room.handlers.ActiveSpeakersChanged([room.localParticipant])
+        expect(wrapper.vm.micProblem).toBe(false)
+      })
+
+      it('does not warn after a look during which the server heard us', async () => {
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack({ checkForSilence: jest.fn().mockResolvedValue(true) })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
+        track.handlers.audioSilenceDetected()
+        room.handlers.ActiveSpeakersChanged([room.localParticipant])
+        await flushPromises()
+        expect(wrapper.vm.micProblem).toBe(false)
+      })
+
+      it('reports no silence when the capture cannot be checked', async () => {
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack({
+          checkForSilence: jest
+            .fn()
+            .mockResolvedValueOnce(true)
+            .mockRejectedValue(new Error('no audio context')),
+        })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
+        track.handlers.audioSilenceDetected()
+        await flushPromises()
+        expect(wrapper.vm.micProblem).toBe(false)
+        // Free for the next look: the failed one did not get stuck.
+        expect(wrapper.vm.micSilenceProbe).toBeNull()
+      })
+
+      it('gives up on the silence once the microphone is muted or gone', async () => {
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack({ checkForSilence: jest.fn().mockResolvedValue(true) })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
+        track.handlers.audioSilenceDetected()
+        wrapper.setData({ micEnabled: false })
+        await flushPromises()
+        expect(wrapper.vm.micProblem).toBe(false)
+
+        wrapper.setData({ micEnabled: true })
+        track.handlers.audioSilenceDetected()
+        room.localParticipant.getTrackPublication.mockReturnValue(null)
+        await flushPromises()
+        expect(wrapper.vm.micProblem).toBe(false)
       })
 
       it('ignores silence while the microphone is muted on purpose', async () => {
@@ -1437,6 +1728,693 @@ describe('VideoCall', () => {
       expect(wrapper.vm.audioBlocked).toBe(false)
       expect(wrapper.vm.micProblem).toBe(false)
       expect(wrapper.vm.reconnecting).toBe(false)
+    })
+  })
+
+  describe('device settings during the call', () => {
+    const STORAGE_KEY = 'ocelot-video-call-devices'
+    const TOGGLE = '[data-test="video-call-device-settings-toggle"]'
+    const PANEL = '.stub-devicesettings'
+
+    const connected = async (state = {}) => {
+      const built = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', ...state })
+      built.wrapper.vm.$apollo = {
+        mutate: jest
+          .fn()
+          .mockResolvedValue({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } }),
+      }
+      await built.wrapper.vm.connect()
+      // No real waiting between the checks of a silent microphone.
+      jest.spyOn(built.wrapper.vm, 'micSilencePause').mockResolvedValue()
+      return { ...built, room: built.wrapper.vm.room }
+    }
+
+    const opened = async (state) => {
+      const built = await connected(state)
+      await built.wrapper.find(TOGGLE).trigger('click')
+      return built
+    }
+
+    const deviceError = (name) => Object.assign(new Error(name), { name })
+
+    beforeEach(() => {
+      localStorage.clear()
+    })
+
+    describe('the panel', () => {
+      it('stays closed until its button is clicked, and closes on the next click', async () => {
+        const { wrapper } = await connected()
+        await wrapper.vm.$nextTick()
+        expect(wrapper.find(PANEL).exists()).toBe(false)
+        expect(wrapper.find(TOGGLE).attributes('aria-expanded')).toBe('false')
+
+        await wrapper.find(TOGGLE).trigger('click')
+        expect(wrapper.find(PANEL).exists()).toBe(true)
+        expect(wrapper.find(TOGGLE).attributes('aria-expanded')).toBe('true')
+
+        await wrapper.find(TOGGLE).trigger('click')
+        expect(wrapper.find(PANEL).exists()).toBe(false)
+        wrapper.destroy()
+      })
+
+      it('closes on a click anywhere else, but not on one inside', async () => {
+        const { wrapper } = await opened()
+        wrapper.vm.onDocumentClick({ target: wrapper.find(PANEL).element })
+        expect(wrapper.vm.showDeviceSettings).toBe(true)
+
+        document.body.click()
+        await wrapper.vm.$nextTick()
+        expect(wrapper.find(PANEL).exists()).toBe(false)
+        wrapper.destroy()
+      })
+
+      it('closes on Escape only', async () => {
+        const { wrapper } = await opened()
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }))
+        expect(wrapper.vm.showDeviceSettings).toBe(true)
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+        expect(wrapper.vm.showDeviceSettings).toBe(false)
+        wrapper.destroy()
+      })
+
+      it('closes when the panel asks for it', async () => {
+        const { wrapper } = await opened()
+        wrapper.findComponent({ name: 'DeviceSettings' }).vm.$emit('close')
+        expect(wrapper.vm.showDeviceSettings).toBe(false)
+        wrapper.destroy()
+      })
+
+      it('stops listening to the document once closed or destroyed', async () => {
+        const remove = jest.spyOn(document, 'removeEventListener')
+        const { wrapper } = await opened()
+        wrapper.destroy()
+        expect(remove).toHaveBeenCalledWith('click', expect.any(Function), true)
+        expect(remove).toHaveBeenCalledWith('keydown', expect.any(Function))
+        remove.mockRestore()
+      })
+
+      it('is gone after the call ended', async () => {
+        const { wrapper } = await opened()
+        await wrapper.vm.cleanup()
+        expect(wrapper.vm.showDeviceSettings).toBe(false)
+        wrapper.destroy()
+      })
+    })
+
+    describe('switching', () => {
+      it('hands a new camera to LiveKit and remembers it', async () => {
+        const { wrapper, room } = await opened()
+        wrapper
+          .findComponent({ name: 'DeviceSettings' })
+          .vm.$emit('switch', { kind: 'videoinput', deviceId: 'cam-2', label: 'Webcam' })
+        await flushPromises()
+        expect(room.switchActiveDevice).toHaveBeenCalledWith('videoinput', 'cam-2')
+        expect(wrapper.vm.cameraDeviceId).toBe('cam-2')
+        expect(JSON.parse(localStorage.getItem(STORAGE_KEY)).videoinput).toEqual({
+          deviceId: 'cam-2',
+          label: 'Webcam',
+        })
+        wrapper.destroy()
+      })
+
+      it('hands a new microphone to LiveKit and remembers it', async () => {
+        const { wrapper, room } = await connected()
+        await wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2', label: 'Headset' })
+        expect(room.switchActiveDevice).toHaveBeenCalledWith('audioinput', 'mic-2')
+        expect(wrapper.vm.micDeviceId).toBe('mic-2')
+        expect(JSON.parse(localStorage.getItem(STORAGE_KEY)).audioinput.deviceId).toBe('mic-2')
+      })
+
+      it('hands a new speaker to LiveKit and remembers it', async () => {
+        const { wrapper, room } = await connected()
+        await wrapper.vm.switchDevice({ kind: 'audiooutput', deviceId: 'spk-2', label: 'Box' })
+        expect(room.switchActiveDevice).toHaveBeenCalledWith('audiooutput', 'spk-2')
+        expect(wrapper.vm.speakerDeviceId).toBe('spk-2')
+        expect(JSON.parse(localStorage.getItem(STORAGE_KEY)).audiooutput.deviceId).toBe('spk-2')
+      })
+
+      it('does nothing without a room, for an unknown kind or for the device in use', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraDeviceId: 'cam-1' })
+        await wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-1' })
+        await wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: '' })
+        await wrapper.vm.switchDevice({ kind: 'nonsense', deviceId: 'x' })
+        expect(room.switchActiveDevice).not.toHaveBeenCalled()
+
+        wrapper.setData({ room: null })
+        await wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        expect(wrapper.vm.cameraDeviceId).toBe('cam-1')
+      })
+
+      it('goes back to the previous device and says why when the new one refuses', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraDeviceId: 'cam-1' })
+        wrapper.vm.showDeviceErrorToast = jest.fn()
+        const err = deviceError('NotReadableError')
+        room.switchActiveDevice.mockRejectedValueOnce(err)
+
+        await wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2', label: 'Webcam' })
+        expect(wrapper.vm.cameraDeviceId).toBe('cam-1')
+        expect(wrapper.vm.showDeviceErrorToast).toHaveBeenCalledWith('camera', err)
+        expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-1')
+        expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
+      })
+
+      it('treats a capture that restarted on another device as refused', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ micDeviceId: 'mic-1' })
+        wrapper.vm.showDeviceErrorToast = jest.fn()
+        room.switchActiveDevice.mockResolvedValueOnce(false)
+
+        await wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2' })
+        expect(wrapper.vm.micDeviceId).toBe('mic-1')
+        expect(wrapper.vm.showDeviceErrorToast).toHaveBeenCalledWith('mic', expect.any(Error))
+        expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
+      })
+
+      it('says so when the speaker refuses', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ speakerDeviceId: 'spk-1' })
+        wrapper.vm.$toast = { error: jest.fn() }
+        room.switchActiveDevice.mockRejectedValueOnce(deviceError('NotFoundError'))
+
+        await wrapper.vm.switchDevice({ kind: 'audiooutput', deviceId: 'spk-2' })
+        expect(wrapper.vm.speakerDeviceId).toBe('spk-1')
+        expect(wrapper.vm.$toast.error).toHaveBeenCalledWith(
+          'videoCall.deviceSettings.speakerError',
+        )
+        expect(room.switchActiveDevice).toHaveBeenLastCalledWith('audiooutput', 'spk-1')
+      })
+
+      it('survives a refusing speaker without a toast plugin', async () => {
+        const { wrapper, room } = await connected()
+        room.switchActiveDevice.mockRejectedValueOnce(deviceError('NotFoundError'))
+        await expect(
+          wrapper.vm.switchDevice({ kind: 'audiooutput', deviceId: 'spk-2' }),
+        ).resolves.toBeUndefined()
+        expect(wrapper.vm.speakerDeviceId).toBeNull()
+      })
+
+      it('survives the previous device refusing as well', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ micDeviceId: 'mic-1' })
+        wrapper.vm.showDeviceErrorToast = jest.fn()
+        room.switchActiveDevice.mockRejectedValue(deviceError('NotFoundError'))
+
+        await expect(
+          wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2' }),
+        ).resolves.toBeUndefined()
+        expect(wrapper.vm.micDeviceId).toBe('mic-1')
+        expect(wrapper.vm.showDeviceErrorToast).toHaveBeenCalledWith('mic', expect.any(Error))
+      })
+
+      it('has no previous device to go back to when none was known', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.vm.showDeviceErrorToast = jest.fn()
+        room.switchActiveDevice.mockRejectedValueOnce(deviceError('NotReadableError'))
+        await wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        expect(room.switchActiveDevice).toHaveBeenCalledTimes(1)
+        expect(wrapper.vm.cameraDeviceId).toBeNull()
+      })
+
+      it('drops the outcome of a switch that outlived the call', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.vm.showDeviceErrorToast = jest.fn()
+        room.switchActiveDevice.mockImplementationOnce(async () => {
+          wrapper.setData({ room: null })
+        })
+        await wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
+
+        wrapper.setData({ room })
+        room.switchActiveDevice.mockImplementationOnce(async () => {
+          wrapper.setData({ room: null })
+          throw deviceError('NotReadableError')
+        })
+        await wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2' })
+        expect(wrapper.vm.showDeviceErrorToast).not.toHaveBeenCalled()
+      })
+
+      it('drops a stale microphone warning once the new microphone carries sound', async () => {
+        const { wrapper, room } = await connected()
+        const checkForSilence = jest.fn().mockResolvedValue(false)
+        room.localParticipant.getTrackPublication.mockReturnValue({ track: { checkForSilence } })
+        wrapper.setData({ micProblem: true })
+        await wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2' })
+        expect(checkForSilence).toHaveBeenCalled()
+        expect(wrapper.vm.micProblem).toBe(false)
+      })
+
+      it('starts a running look at the microphone over for the new one', async () => {
+        const { wrapper, room } = await connected()
+        const handlers = {}
+        const track = {
+          on: jest.fn((evt, cb) => {
+            handlers[evt] = cb
+          }),
+          checkForSilence: jest.fn().mockResolvedValue(true),
+        }
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
+        let goOn
+        wrapper.vm.micSilencePause.mockImplementationOnce(
+          () =>
+            new Promise((resolve) => {
+              goOn = resolve
+            }),
+        )
+        handlers.audioSilenceDetected()
+        await flushPromises()
+        // Still looking at the old microphone, no warning yet — and the new one works.
+        track.checkForSilence.mockResolvedValue(false)
+        const switched = wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2' })
+        await flushPromises()
+        goOn()
+        await switched
+        await flushPromises()
+        expect(wrapper.vm.micProblem).toBe(false)
+      })
+
+      it('keeps the warning when the new microphone is silent too, or has no track', async () => {
+        const { wrapper, room } = await connected()
+        room.localParticipant.getTrackPublication.mockReturnValue({
+          track: { checkForSilence: jest.fn().mockResolvedValue(true) },
+        })
+        wrapper.setData({ micProblem: true })
+        await wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2' })
+        expect(wrapper.vm.micProblem).toBe(true)
+
+        room.localParticipant.getTrackPublication.mockReturnValue(null)
+        await wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-3' })
+        expect(wrapper.vm.micProblem).toBe(true)
+      })
+    })
+
+    describe('a switch that takes its time', () => {
+      // Made up front and handed out when LiveKit is asked: switches of one kind wait
+      // their turn, so the second is only asked for once the first is through.
+      const pendingSwitch = (room) => {
+        let finish, fail
+        const outcome = new Promise((resolve, reject) => {
+          finish = () => resolve(true)
+          fail = reject
+        })
+        // Refusing before LiveKit was asked must not count as an unhandled rejection.
+        outcome.catch(() => {})
+        room.switchActiveDevice.mockImplementationOnce(() => outcome)
+        return { finish, fail }
+      }
+
+      it('counts the camera as starting until it runs', async () => {
+        const { wrapper, room } = await connected()
+        const pending = pendingSwitch(room)
+        const switching = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        expect(wrapper.vm.devicesStarting).toMatchObject({ videoinput: 1, audioinput: 0 })
+
+        pending.finish()
+        await switching
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+      })
+
+      it('counts the microphone as starting also while it falls back after a refusal', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ micDeviceId: 'mic-1' })
+        wrapper.vm.showDeviceErrorToast = jest.fn()
+        const first = pendingSwitch(room)
+        const back = pendingSwitch(room)
+        const switching = wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2' })
+        expect(wrapper.vm.devicesStarting.audioinput).toBe(1)
+
+        first.fail(deviceError('NotReadableError'))
+        await flushPromises()
+        // The previous microphone is on its way back.
+        expect(wrapper.vm.devicesStarting.audioinput).toBe(1)
+
+        back.finish()
+        await switching
+        expect(wrapper.vm.devicesStarting.audioinput).toBe(0)
+      })
+
+      describe('picking again before the first switch is through', () => {
+        const pickTwice = async () => {
+          const built = await connected()
+          built.wrapper.setData({ cameraDeviceId: 'cam-1' })
+          built.wrapper.vm.showDeviceErrorToast = jest.fn()
+          const first = pendingSwitch(built.room)
+          const second = pendingSwitch(built.room)
+          const one = built.wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+          // The first is with LiveKit by the time the user picks again.
+          await flushPromises()
+          const two = built.wrapper.vm.switchDevice({
+            kind: 'videoinput',
+            deviceId: 'cam-3',
+            label: 'Third',
+          })
+          return { ...built, first, second, one, two }
+        }
+        const refused = () => deviceError('NotReadableError')
+
+        it('asks LiveKit for one at a time, in the order they were picked', async () => {
+          const { wrapper, room, first, second, one, two } = await pickTwice()
+          // The later pick waits: handed over side by side, the earlier one could finish
+          // last and leave its camera behind.
+          expect(room.switchActiveDevice).toHaveBeenCalledTimes(1)
+          expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-2')
+
+          // Even with the later one's answer ready first, the order stays.
+          second.finish()
+          await flushPromises()
+          expect(room.switchActiveDevice).toHaveBeenCalledTimes(1)
+
+          first.finish()
+          await Promise.all([one, two])
+          expect(room.switchActiveDevice).toHaveBeenCalledTimes(2)
+          expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-3')
+          expect(wrapper.vm.cameraDeviceId).toBe('cam-3')
+          expect(JSON.parse(localStorage.getItem(STORAGE_KEY)).videoinput).toEqual({
+            deviceId: 'cam-3',
+            label: 'Third',
+          })
+        })
+
+        it('never starts a pick that was overtaken while it waited its turn', async () => {
+          const { wrapper, room, first, second, one, two } = await pickTwice()
+          const three = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-4' })
+          first.finish()
+          // LiveKit's second answer goes to the third pick: the second never asked.
+          second.finish()
+          await Promise.all([one, two, three])
+
+          const asked = room.switchActiveDevice.mock.calls.map(([, deviceId]) => deviceId)
+          expect(asked).toEqual(['cam-2', 'cam-4'])
+          expect(wrapper.vm.cameraDeviceId).toBe('cam-4')
+          expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+        })
+
+        it('keeps the later pick when the earlier one is refused, and still says so', async () => {
+          const { wrapper, room, first, second, one, two } = await pickTwice()
+          first.fail(refused())
+          await one
+          expect(wrapper.vm.showDeviceErrorToast).toHaveBeenCalledWith('camera', expect.any(Error))
+          expect(wrapper.vm.cameraDeviceId).toBe('cam-3')
+          // LiveKit is not sent back to the first camera underneath the later pick: the
+          // only thing asked of it next is that later pick.
+          await flushPromises()
+          expect(room.switchActiveDevice).toHaveBeenCalledTimes(2)
+          expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-3')
+
+          second.finish()
+          await two
+          expect(wrapper.vm.cameraDeviceId).toBe('cam-3')
+        })
+
+        it('goes back to the camera that ran before both when both are refused', async () => {
+          const { wrapper, room, first, second, one, two } = await pickTwice()
+          first.fail(refused())
+          await one
+          second.fail(refused())
+          await two
+          // Not to cam-2, the earlier pick that never ran.
+          expect(wrapper.vm.cameraDeviceId).toBe('cam-1')
+          expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-1')
+          expect(wrapper.vm.showDeviceErrorToast).toHaveBeenCalledTimes(2)
+        })
+
+        it('goes back to the earlier pick when that one ran and the later is refused', async () => {
+          const { wrapper, room, first, second, one, two } = await pickTwice()
+          first.finish()
+          await one
+          second.fail(refused())
+          await two
+          expect(wrapper.vm.cameraDeviceId).toBe('cam-2')
+          expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-2')
+        })
+
+        it('does not let a pick of another kind count as the later one', async () => {
+          const { wrapper, room } = await connected()
+          wrapper.setData({ cameraDeviceId: 'cam-1', micDeviceId: 'mic-1' })
+          wrapper.vm.showDeviceErrorToast = jest.fn()
+          const camera = pendingSwitch(room)
+          const mic = pendingSwitch(room)
+          const one = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+          const two = wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2' })
+          camera.fail(refused())
+          await one
+          expect(wrapper.vm.cameraDeviceId).toBe('cam-1')
+          mic.finish()
+          await two
+          expect(wrapper.vm.micDeviceId).toBe('mic-2')
+        })
+
+        it('starts afresh with the next call', async () => {
+          const { wrapper, first, second, one, two } = await pickTwice()
+          await wrapper.vm.cleanup()
+          first.finish()
+          second.finish()
+          await Promise.all([one, two])
+          expect(wrapper.vm.deviceSwitches.videoinput).toMatchObject({ latest: 0, settled: null })
+        })
+      })
+
+      it('keeps saying so while a second pick follows the first', async () => {
+        const { wrapper, room } = await opened()
+        const first = pendingSwitch(room)
+        const second = pendingSwitch(room)
+        const one = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        const two = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-3' })
+        first.finish()
+        await one
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(1)
+        second.finish()
+        await two
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+        wrapper.destroy()
+      })
+
+      it('starts from zero again after a call that ended mid-switch', async () => {
+        const { wrapper, room } = await connected()
+        const pending = pendingSwitch(room)
+        const switching = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        await wrapper.vm.cleanup()
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+        pending.finish()
+        await switching
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+      })
+    })
+
+    describe('a device switched on with its button', () => {
+      const pendingToggle = (fn) => {
+        let finish, fail
+        fn.mockImplementationOnce(
+          () =>
+            new Promise((resolve, reject) => {
+              finish = resolve
+              fail = reject
+            }),
+        )
+        return { finish: () => finish(), fail: (err) => fail(err) }
+      }
+
+      it('counts as starting until the camera runs — switching it off does not', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: false })
+        const pending = pendingToggle(room.localParticipant.setCameraEnabled)
+        const toggling = wrapper.vm.toggleCamera()
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(1)
+        pending.finish()
+        await toggling
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+
+        const off = pendingToggle(room.localParticipant.setCameraEnabled)
+        const switchingOff = wrapper.vm.toggleCamera()
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+        off.finish()
+        await switchingOff
+      })
+
+      it('counts as starting until the microphone runs — muting does not', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ micEnabled: false })
+        const pending = pendingToggle(room.localParticipant.setMicrophoneEnabled)
+        const toggling = wrapper.vm.toggleMic()
+        expect(wrapper.vm.devicesStarting.audioinput).toBe(1)
+        pending.finish()
+        await toggling
+        expect(wrapper.vm.devicesStarting.audioinput).toBe(0)
+
+        const mute = pendingToggle(room.localParticipant.setMicrophoneEnabled)
+        const muting = wrapper.vm.toggleMic()
+        expect(wrapper.vm.devicesStarting.audioinput).toBe(0)
+        mute.finish()
+        await muting
+      })
+
+      it('stops counting when the device refuses', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: false, micEnabled: false })
+        wrapper.vm.showDeviceErrorToast = jest.fn()
+        const camera = pendingToggle(room.localParticipant.setCameraEnabled)
+        const mic = pendingToggle(room.localParticipant.setMicrophoneEnabled)
+        const toggling = Promise.all([wrapper.vm.toggleCamera(), wrapper.vm.toggleMic()])
+        camera.fail(deviceError('NotReadableError'))
+        mic.fail(deviceError('NotReadableError'))
+        await toggling
+        expect(wrapper.vm.devicesStarting).toMatchObject({ videoinput: 0, audioinput: 0 })
+      })
+    })
+
+    describe('saying that a device is starting', () => {
+      const starting = (wrapper, kinds) =>
+        wrapper.setData({
+          devicesStarting: { videoinput: 0, audioinput: 0, audiooutput: 0, ...kinds },
+        })
+
+      it('says nothing any more once the call has ended', async () => {
+        const { wrapper } = factory({ show: true })
+        wrapper.vm.deviceStarts('videoinput')
+        wrapper.vm.deviceStarts('audioinput')
+        await wrapper.vm.cleanup()
+        expect(wrapper.vm.devicesStarting).toEqual({ videoinput: 0, audioinput: 0, audiooutput: 0 })
+      })
+
+      it('shows it on the button of that device, which waits meanwhile', async () => {
+        const { wrapper } = await connected()
+        const button = (label) =>
+          wrapper.findAll('.stub-button').wrappers.find((b) => b.attributes('aria-label') === label)
+        expect(button('videoCall.muteMic').attributes('loading')).toBeUndefined()
+        expect(button('videoCall.disableCamera').attributes('loading')).toBeUndefined()
+
+        await starting(wrapper, { videoinput: 1 })
+        expect(button('videoCall.disableCamera').attributes('loading')).toBe('true')
+        expect(button('videoCall.muteMic').attributes('loading')).toBeUndefined()
+
+        await starting(wrapper, { audioinput: 1 })
+        expect(button('videoCall.muteMic').attributes('loading')).toBe('true')
+        expect(button('videoCall.disableCamera').attributes('loading')).toBeUndefined()
+      })
+
+      it('shows it in the device settings', async () => {
+        const { wrapper } = await opened()
+        const panel = wrapper.findComponent({ name: 'DeviceSettings' })
+        expect(panel.props('cameraStarting')).toBe(false)
+        await starting(wrapper, { videoinput: 1, audioinput: 1 })
+        expect(panel.props('cameraStarting')).toBe(true)
+        expect(panel.props('micStarting')).toBe(true)
+        wrapper.destroy()
+      })
+
+      it('shows it on the own camera tile only', async () => {
+        const { wrapper } = await connected()
+        const tile = (overrides) => ({
+          key: `${overrides.identity}/${overrides.isScreen ? 'screen' : 'main'}`,
+          name: overrides.identity,
+          isLocal: false,
+          isScreen: false,
+          ...overrides,
+        })
+        wrapper.setData({
+          tiles: [
+            tile({ identity: 'me', isLocal: true }),
+            tile({ identity: 'me', isLocal: true, isScreen: true }),
+            tile({ identity: 'bob' }),
+          ],
+        })
+        await starting(wrapper, { videoinput: 1, audioinput: 1 })
+        const shown = wrapper
+          .findAllComponents({ name: 'VideoTile' })
+          .wrappers.map((t) => [t.props('cameraStarting'), t.props('micStarting')])
+        expect(shown).toEqual([
+          [true, true],
+          [false, false],
+          [false, false],
+        ])
+      })
+    })
+
+    describe('devices LiveKit changes on its own', () => {
+      it('follows a device LiveKit moved to', async () => {
+        const { wrapper, room } = await connected()
+        room.handlers.ActiveDeviceChanged('videoinput', 'cam-9')
+        room.handlers.ActiveDeviceChanged('audioinput', 'mic-9')
+        room.handlers.ActiveDeviceChanged('audiooutput', 'spk-9')
+        expect(wrapper.vm.cameraDeviceId).toBe('cam-9')
+        expect(wrapper.vm.micDeviceId).toBe('mic-9')
+        expect(wrapper.vm.speakerDeviceId).toBe('spk-9')
+      })
+
+      it('ignores unknown kinds and a missing device', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraDeviceId: 'cam-1' })
+        room.handlers.ActiveDeviceChanged('nonsense', 'x')
+        room.handlers.ActiveDeviceChanged('videoinput', '')
+        expect(wrapper.vm.cameraDeviceId).toBe('cam-1')
+      })
+
+      it('tells LiveKit the speaker chosen before the call, so it does not reset it', async () => {
+        const built = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
+        built.wrapper.vm.$apollo = {
+          mutate: jest.fn().mockResolvedValue({
+            data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } },
+          }),
+        }
+        built.wrapper.setData({ speakerDeviceId: 'spk-2' })
+        await built.wrapper.vm.connect()
+        expect(built.wrapper.vm.room.opts.audioOutput).toEqual({ deviceId: 'spk-2' })
+
+        const { room } = await connected()
+        expect(room.opts).not.toHaveProperty('audioOutput')
+      })
+    })
+
+    describe('microphone level', () => {
+      const originalMediaStream = global.MediaStream
+
+      beforeEach(() => {
+        global.MediaStream = jest.fn(function (tracks) {
+          this.tracks = tracks
+        })
+      })
+
+      afterEach(() => {
+        global.MediaStream = originalMediaStream
+      })
+
+      it('listens to the published microphone while the panel is open', async () => {
+        const { wrapper, room } = await connected()
+        const mediaStreamTrack = { kind: 'audio' }
+        room.localParticipant.getTrackPublication.mockReturnValue({ track: { mediaStreamTrack } })
+
+        wrapper.vm.refreshMicMeter()
+        expect(wrapper.vm.micMeterStream).toBeNull()
+
+        await wrapper.find(TOGGLE).trigger('click')
+        expect(wrapper.vm.micMeterStream.tracks).toEqual([mediaStreamTrack])
+
+        wrapper.vm.closeDeviceSettings()
+        expect(wrapper.vm.micMeterStream).toBeNull()
+      })
+
+      it('shows no level for a muted microphone or without a track', async () => {
+        const { wrapper, room } = await connected()
+        room.localParticipant.getTrackPublication.mockReturnValue({
+          track: { mediaStreamTrack: {} },
+        })
+        wrapper.setData({ micEnabled: false })
+        await wrapper.find(TOGGLE).trigger('click')
+        expect(wrapper.vm.micMeterStream).toBeNull()
+
+        wrapper.setData({ micEnabled: true })
+        room.localParticipant.getTrackPublication.mockReturnValue(null)
+        wrapper.vm.refreshMicMeter()
+        expect(wrapper.vm.micMeterStream).toBeNull()
+        wrapper.destroy()
+      })
+
+      it('has no track to offer before the call is connected', () => {
+        const { wrapper } = factory({ show: true })
+        expect(wrapper.vm.localMicTrack()).toBeNull()
+      })
     })
   })
 

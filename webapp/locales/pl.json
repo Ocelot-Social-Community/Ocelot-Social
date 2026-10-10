@@ -1982,6 +1982,11 @@
     "connecting": "Łączenie…",
     "connectionLost": "Utracono połączenie: {name}",
     "connectionPoor": "Słabe połączenie: {name}",
+    "deviceSettings": {
+      "button": "Urządzenia",
+      "speakerError": "Nie udało się przełączyć głośnika.",
+      "title": "Ustawienia urządzeń"
+    },
     "dialogLabel": "Rozmowa wideo grupowa",
     "disableCamera": "Wyłącz kamerę",
     "enableAudio": "Włącz dźwięk",
@@ -2027,6 +2032,7 @@
       "cameraDisabled": "Kamera jest wyłączona.",
       "cameraOff": "Kamera: Wyłączona",
       "cameraOn": "Kamera: Włączona",
+      "cameraStarting": "Uruchamianie kamery…",
       "cancel": "Anuluj",
       "description": "Za chwilę dołączysz do rozmowy wideo tej grupy. Sprawdź kamerę, mikrofon i głośnik, a następnie dołącz do połączenia.",
       "errorBusy": "Urządzenie jest używane przez inną aplikację.",
@@ -2042,6 +2048,7 @@
       "micOff": "Mikrofon: Wyłączony",
       "micOn": "Mikrofon: Włączony",
       "microphone": "Mikrofon",
+      "micStarting": "Uruchamianie mikrofonu…",
       "noCamera": "Podgląd kamery niedostępny.",
       "noDevices": "Brak urządzenia",
       "permission": {
