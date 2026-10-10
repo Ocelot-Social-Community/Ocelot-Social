@@ -91,7 +91,7 @@ jobs:
       # repo's 10 GB cache budget and evicts by LRU the caches that COULD hit — the buildx `type=gha`
       # scopes and the npm cache. `compression-level: 0` because the payload is already zstd-compressed.
       - name: Upload images for the test jobs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-backend-environment
           path: /tmp/*.tar.zst
@@ -136,7 +136,7 @@ jobs:
         run: docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" | zstd -T0 -3 > /tmp/webapp.tar.zst
 
       - name: Upload image for the test jobs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-webapp-image
           path: /tmp/webapp.tar.zst
@@ -217,7 +217,7 @@ jobs:
             "${HOME#/}/.cache/Cypress"
 
       - name: Upload installed workspace for the test jobs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-cypress-workspace
           path: /tmp/e2e-workspace.tar.zst
@@ -419,7 +419,7 @@ jobs:
       # another name, so the publish job never picks them up), because they show what went wrong.
       - name: README screenshots | upload failure screenshots
         if: failure() && matrix.feature == 'readme-screenshots'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: readme-screenshots-failed
           path: cypress/screenshots
@@ -428,7 +428,7 @@ jobs:
 
       - name: README screenshots | upload
         if: matrix.feature == 'readme-screenshots'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: readme-screenshots
           # Whatever folder Cypress names after the spec; never a failure screenshot.
@@ -469,7 +469,7 @@ jobs:
       - name: Full stack tests | if tests failed, upload report
         id: e2e-report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ steps.artifact-name.outputs.name }}
           path: |

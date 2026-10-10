@@ -81,7 +81,7 @@ jobs:
       # zstd because `docker save` writes an UNCOMPRESSED layer tar; `compression-level: 0` because
       # the upload would otherwise compress the already-compressed payload a second time.
       - name: Upload image for the test job
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: neo4j-image
           path: /tmp/neo4j.tar.zst
@@ -122,7 +122,7 @@ jobs:
       # zstd because `docker save` writes an UNCOMPRESSED layer tar; `compression-level: 0` because
       # the upload would otherwise compress the already-compressed payload a second time.
       - name: Upload image for the test job
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: backend-test-image
           path: /tmp/backend.tar.zst
@@ -339,7 +339,7 @@ jobs:
       # `./coverage` is bind-mounted to `/app/coverage` (docker-compose.test.yml), so the blob the
       # container just wrote is already on the runner — no `docker compose cp` needed.
       - name: backend | Upload coverage blob
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: backend-coverage-blob-${{ matrix.shardIndex }}
           path: coverage/blobs/blob-${{ matrix.shardIndex }}.json
@@ -436,7 +436,7 @@ jobs:
       # vitest-coverage-report-action and similar tools read.
       - name: backend | Upload coverage report
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: backend-coverage-report
           path: |
