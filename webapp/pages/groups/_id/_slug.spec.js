@@ -92,6 +92,7 @@ describe('GroupProfileSlug', () => {
     'auth/isModerator': () => false,
     'categories/categories': () => [{ id: 'cat1' }],
     'videoCall/enabled': () => false,
+    'videoCall/showVideoCall': () => false,
   }
 
   const actions = {
@@ -1148,14 +1149,21 @@ describe('GroupProfileSlug', () => {
       openVideoCallMock = jest.fn()
       currentUserMock.mockReturnValue(peterLustig)
       const enabledStore = new Vuex.Store({
+        // Real state behind the getter, so a test can open and close the call and the page's
+        // watcher fires the way it does in the app.
+        state: { videoCallOpen: false },
         getters: {
           ...getters,
           'videoCall/enabled': () => true,
+          'videoCall/showVideoCall': (state) => state.videoCallOpen,
         },
         actions,
         mutations: {
           ...mutations,
           'videoCall/OPEN': openVideoCallMock,
+          SET_VIDEO_CALL_OPEN(state, open) {
+            state.videoCallOpen = open
+          },
         },
       })
       return mount(GroupProfileSlug, {
@@ -1324,6 +1332,48 @@ describe('GroupProfileSlug', () => {
       expect(mocks.$toast.error).toHaveBeenCalledWith('permissions.deniedHint')
       expect(consoleError).toHaveBeenCalled()
       consoleError.mockRestore()
+    })
+
+    describe('after the viewer hung up', () => {
+      const setCallOpen = async (wrapper, open) => {
+        wrapper.vm.$store.commit('SET_VIDEO_CALL_OPEN', open)
+        await wrapper.vm.$nextTick()
+      }
+      const hangUp = async (wrapper) => {
+        await setCallOpen(wrapper, true)
+        await setCallOpen(wrapper, false)
+      }
+
+      it('fetches the count anew: the one from arriving here still included the viewer', async () => {
+        const wrapper = mountWithGroup(yogaPractice)
+        const refetch = jest.fn().mockResolvedValue()
+        wrapper.vm.$apollo.queries.videoCallParticipantCount = { refetch }
+        await hangUp(wrapper)
+        expect(refetch).toHaveBeenCalledTimes(1)
+      })
+
+      it('leaves the count alone when a call opens', async () => {
+        const wrapper = mountWithGroup(yogaPractice)
+        const refetch = jest.fn().mockResolvedValue()
+        wrapper.vm.$apollo.queries.videoCallParticipantCount = { refetch }
+        await setCallOpen(wrapper, true)
+        expect(refetch).not.toHaveBeenCalled()
+      })
+
+      it('keeps the count it has when fetching fails', async () => {
+        const wrapper = mountWithGroup(yogaPractice)
+        wrapper.setData({ videoCallParticipantCount: 1 })
+        wrapper.vm.$apollo.queries.videoCallParticipantCount = {
+          refetch: jest.fn().mockRejectedValue(new Error('network down')),
+        }
+        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+        await hangUp(wrapper)
+        // The rejection is handled a turn after the watcher fired.
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.videoCallParticipantCount).toBe(1)
+        expect(consoleError).toHaveBeenCalled()
+        consoleError.mockRestore()
+      })
     })
 
     // Regression guard: even with the "happy" combination (public group,
