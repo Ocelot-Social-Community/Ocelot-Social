@@ -62,6 +62,10 @@ jobs:
       #     bump along with it.
       #   • `--squash` matches how these have been landing so far (see the `build(deps): bump …(#…)`
       #     commits on master), which keeps the conventional-commit prefix that release-please reads.
+      #     Once master requires a merge queue the flag is ignored: `--auto` then puts the pull
+      #     request INTO THE QUEUE when its checks have passed, and the merge method is the one set
+      #     on the queue itself (ruleset → "Require merge queue" → merge method). That setting has
+      #     to stay on squash for the same reason.
       #   • GitHub performs that later merge ON BEHALF OF THE ACTOR THAT ARMED IT, so the identity
       #     used here decides who pushes to master — and with GITHUB_TOKEN that pusher was
       #     github-actions[bot], whose pushes create no workflow runs. The bumps therefore landed on

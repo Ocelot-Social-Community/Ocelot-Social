@@ -1,7 +1,8 @@
 name: Cache cleanup
 
-# Caches are scoped to the ref that created them, and a pull request leaves two of those behind: the
-# merge ref the checks ran on (refs/pull/<n>/merge) and the head branch itself. Neither is reachable
+# Caches are scoped to the ref that created them, and a pull request leaves three kinds of those
+# behind: the merge ref the checks ran on (refs/pull/<n>/merge), the head branch itself, and the
+# merge queue's temporary branches (gh-readonly-queue/master/pr-<n>-<sha>). None is reachable
 # from master once the pull request is closed — a cache created on a child branch is invisible to the
 # parent — so from that moment on they are pure LRU ballast in the repository's 10 GB budget.
 #
@@ -48,6 +49,17 @@ jobs:
                 deleted=$((deleted + 1))
               done
             done
+          done
+
+          # The merge queue adds a third kind of ref: every time the pull request is queued, its
+          # checks run on a temporary branch `gh-readonly-queue/<base>/pr-<n>-<base sha>`. The sha
+          # is not known here and a requeued pull request leaves several of them, so they are
+          # matched by prefix over the whole cache list instead of asked for by exact ref.
+          ids=$(gh api --paginate "repos/${GH_REPO}/actions/caches?per_page=100" \
+            --jq ".actions_caches[] | select(.ref | test(\"^refs/heads/gh-readonly-queue/.+/pr-${PR_NUMBER}-\")) | .id")
+          for id in $ids; do
+            gh cache delete "$id"
+            deleted=$((deleted + 1))
           done
 
           echo "deleted ${deleted} cache entries for PR #${PR_NUMBER} (${HEAD_REF})"
