@@ -15,6 +15,8 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  # The merge queue runs the required checks on its temporary gh-readonly-queue/master/* branch.
+  merge_group:
 
 # Same reasoning as the other workflows: one run per workflow and branch, keyed by pull request
 # NUMBER rather than head_ref, so two forks using the same branch name do not cancel each other.

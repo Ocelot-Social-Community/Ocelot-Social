@@ -1,6 +1,17 @@
 name: ocelot.social end-to-end test CI
 
-on: push
+on:
+  # Every branch and every tag, as a bare `on: push` gave — except the merge queue's temporary
+  # branch. Creating it raises a push event too, and the `merge_group` run below already covers it;
+  # without the exclusion every queue entry would run this workflow twice. `tags` has to be spelled
+  # out because naming `branches-ignore` alone would stop the workflow from running for tags.
+  push:
+    branches-ignore:
+      - 'gh-readonly-queue/**'
+    tags:
+      - '**'
+  # The merge queue runs the required checks on its temporary gh-readonly-queue/master/* branch.
+  merge_group:
 
 # One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
 # cancelled instead of holding a runner. `event_name` is part of the group on purpose: a branch
