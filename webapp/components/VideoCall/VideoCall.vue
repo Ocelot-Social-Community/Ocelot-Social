@@ -366,6 +366,12 @@ const PREFETCHED_TOKEN_MAX_AGE_MS = 60000
 const WEAK_CONNECTION_MS = 5000
 const RECOVERED_CONNECTION_MS = 20000
 const WEAK_QUALITIES = ['poor', 'lost']
+// A capture that was just opened may deliver nothing but silence for a moment
+// — Firefox takes noticeably longer than LiveKit's single check 200 ms after
+// the start allows for. Only silence that lasts through this many further
+// checks, this far apart, counts as a microphone that delivers nothing.
+const MIC_SILENCE_RECHECKS = 5
+const MIC_SILENCE_RECHECK_MS = 400
 const STRONG_QUALITIES = ['excellent', 'good']
 
 // Cameras publish 16:9, so the grid aims for cells of that shape: the closer a
@@ -738,6 +744,7 @@ export default {
     this.speakerSeenAt = new Map()
     this.speakerHoldTimer = null
     this.micRestart = null
+    this.micSilenceProbe = null
     this.stageObserver = null
     this.observedStage = null
     this.qualityTimer = null
@@ -956,6 +963,7 @@ export default {
       // A restart still running belongs to the previous attempt's room — retryConnect()
       // tears that down without cleanup(), so let go of it here for every way in.
       this.micRestart = null
+      this.micSilenceProbe = null
       this.resetAudioOnly()
       try {
         if (!this.groupId) throw new Error('Missing group id')
@@ -1014,6 +1022,10 @@ export default {
           // between words. Highlighting is applied at once, removal waits out
           // SPEAKER_HOLD_MS.
           this.noteActiveSpeakers((speakers || []).map((p) => p.identity))
+          // The server hears us speak: whatever the check of the capture says
+          // — in Firefox it can read silence off a microphone that works —
+          // the others hear us as well.
+          if ((speakers || []).includes(room.localParticipant)) this.micHeard()
         })
         room.on(RoomEvent.LocalTrackPublished, (pub) => {
           this.screenShareEnabled = !!room.localParticipant.isScreenShareEnabled
@@ -1397,12 +1409,54 @@ export default {
     },
     async recheckMicProblem(room) {
       // LiveKit reports a new microphone that is silent, but not one that
-      // works — without this the warning about the old one would stay.
-      if (!this.micProblem || !this.micEnabled) return
+      // works — without this the warning about the old one would stay. A check
+      // still running on the old one starts over, too: its patience was spent
+      // on a capture that is gone.
+      if (!this.micEnabled) return
       const track = this.localMicTrack()
-      if (!track) return
-      const silent = await track.checkForSilence()
+      if (!track || !(this.micProblem || this.isProbingMicSilence(track))) return
+      const silent = await this.micStaysSilent(track)
       if (this.room === room) this.micProblem = this.micEnabled && silent
+    },
+    isProbingMicSilence(track) {
+      return !!this.micSilenceProbe && this.micSilenceProbe.track === track
+    },
+    micStaysSilent(track) {
+      // One check per track at a time. Whoever asks while it runs just changed
+      // the capture (a restart, another device) or wants the same answer: the
+      // check starts counting anew and they all get its outcome.
+      const running = this.micSilenceProbe
+      if (running && running.track === track) {
+        running.left = MIC_SILENCE_RECHECKS
+        running.heard = false
+        return running.promise
+      }
+      const probe = { track, left: MIC_SILENCE_RECHECKS, heard: false }
+      // Known as running before its first check, which may report at once.
+      this.micSilenceProbe = probe
+      probe.promise = this.probeMicSilence(probe).finally(() => {
+        if (this.micSilenceProbe === probe) this.micSilenceProbe = null
+      })
+      return probe.promise
+    },
+    async probeMicSilence(probe) {
+      while (await probe.track.checkForSilence()) {
+        if (probe.heard) return false
+        if (probe.left-- <= 0) return true
+        await this.micSilencePause()
+        // Muted, unpublished or the call over: no silence left to report.
+        if (!this.micEnabled || this.localMicTrack() !== probe.track) return false
+      }
+      return false
+    },
+    micHeard() {
+      // Also settles a check still running, which would otherwise bring the
+      // warning right back.
+      if (this.micSilenceProbe) this.micSilenceProbe.heard = true
+      this.micProblem = false
+    },
+    micSilencePause() {
+      return new Promise((resolve) => setTimeout(resolve, MIC_SILENCE_RECHECK_MS))
     },
     prefetchJoin() {
       const groupId = this.groupId
@@ -1520,8 +1574,14 @@ export default {
       // lacks the system's microphone permission, or a device held by another
       // app. Listening on the track rather than the room keeps a silent
       // screen-share audio track from raising a microphone warning.
-      track.on(TrackEvent.AudioSilenceDetected, () => {
-        if (this.micEnabled) this.micProblem = true
+      //
+      // That check comes 200 ms after the capture started, too early to tell a
+      // dead microphone from one that is still starting up — so it only makes
+      // us look closer. While we do, the event is our own checks reporting.
+      track.on(TrackEvent.AudioSilenceDetected, async () => {
+        if (!this.micEnabled || this.isProbingMicSilence(track)) return
+        const silent = await this.micStaysSilent(track)
+        if (silent && this.micEnabled && this.localMicTrack() === track) this.micProblem = true
       })
     },
     async enableAudio() {
@@ -1562,7 +1622,7 @@ export default {
         await track.restartTrack()
         // The new capture can be just as silent as the old one — only drop the
         // warning once it is shown to deliver a signal.
-        const silent = await track.checkForSilence()
+        const silent = await this.micStaysSilent(track)
         // The call may have ended (or been retried) while we waited; its
         // outcome must not leak into the next one.
         if (this.room !== room) return
@@ -1741,6 +1801,7 @@ export default {
       this.reconnecting = false
       // A restart still running belongs to the room just torn down.
       this.micRestart = null
+      this.micSilenceProbe = null
       this.resetAudioOnly()
       this.prefetched = null
       // CRITICAL: do NOT set phase = 'prejoin' here. leave() runs cleanup()

@@ -1310,6 +1310,8 @@ describe('VideoCall', () => {
           .mockResolvedValue({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } }),
       }
       await built.wrapper.vm.connect()
+      // No real waiting between the checks of a silent microphone.
+      jest.spyOn(built.wrapper.vm, 'micSilencePause').mockResolvedValue()
       return { ...built, room: built.wrapper.vm.room }
     }
 
@@ -1393,11 +1395,85 @@ describe('VideoCall', () => {
     describe('a microphone that delivers nothing', () => {
       it('warns when the published microphone only yields silence', async () => {
         const { wrapper, room } = await connected()
-        const track = fakeMicTrack()
+        const track = fakeMicTrack({ checkForSilence: jest.fn().mockResolvedValue(true) })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
         room.handlers.LocalTrackPublished({ source: 'microphone', track })
         track.handlers.audioSilenceDetected()
-        await wrapper.vm.$nextTick()
+        await flushPromises()
         expect(wrapper.find('[data-test="video-call-mic-problem"]').exists()).toBe(true)
+      })
+
+      it('does not warn about a capture that is merely slow to start', async () => {
+        // Firefox: silent at LiveKit's check right after a switch, sound a moment later.
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack({
+          checkForSilence: jest
+            .fn()
+            .mockResolvedValueOnce(true)
+            .mockResolvedValueOnce(true)
+            .mockResolvedValue(false),
+        })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
+        track.handlers.audioSilenceDetected()
+        await flushPromises()
+        expect(track.checkForSilence).toHaveBeenCalledTimes(3)
+        expect(wrapper.vm.micProblem).toBe(false)
+      })
+
+      it('takes the silence its own checks report as part of the same look', async () => {
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack()
+        // LiveKit emits the event from within checkForSilence().
+        track.checkForSilence = jest.fn(async () => {
+          track.handlers.audioSilenceDetected()
+          return true
+        })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
+        track.handlers.audioSilenceDetected()
+        await flushPromises()
+        // The first check and the five after it — no check started by a check.
+        expect(track.checkForSilence).toHaveBeenCalledTimes(6)
+        expect(wrapper.vm.micProblem).toBe(true)
+      })
+
+      it('drops the warning once the server hears us speak', async () => {
+        // Firefox can read silence off a microphone that works.
+        const { wrapper, room } = await connected()
+        wrapper.setData({ micProblem: true })
+        room.handlers.ActiveSpeakersChanged([{ identity: 'someone-else' }])
+        expect(wrapper.vm.micProblem).toBe(true)
+        room.handlers.ActiveSpeakersChanged([room.localParticipant])
+        expect(wrapper.vm.micProblem).toBe(false)
+      })
+
+      it('does not warn after a look during which the server heard us', async () => {
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack({ checkForSilence: jest.fn().mockResolvedValue(true) })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
+        track.handlers.audioSilenceDetected()
+        room.handlers.ActiveSpeakersChanged([room.localParticipant])
+        await flushPromises()
+        expect(wrapper.vm.micProblem).toBe(false)
+      })
+
+      it('gives up on the silence once the microphone is muted or gone', async () => {
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack({ checkForSilence: jest.fn().mockResolvedValue(true) })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
+        track.handlers.audioSilenceDetected()
+        wrapper.setData({ micEnabled: false })
+        await flushPromises()
+        expect(wrapper.vm.micProblem).toBe(false)
+
+        wrapper.setData({ micEnabled: true })
+        track.handlers.audioSilenceDetected()
+        room.localParticipant.getTrackPublication.mockReturnValue(null)
+        await flushPromises()
+        expect(wrapper.vm.micProblem).toBe(false)
       })
 
       it('ignores silence while the microphone is muted on purpose', async () => {
@@ -1651,6 +1727,8 @@ describe('VideoCall', () => {
           .mockResolvedValue({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } }),
       }
       await built.wrapper.vm.connect()
+      // No real waiting between the checks of a silent microphone.
+      jest.spyOn(built.wrapper.vm, 'micSilencePause').mockResolvedValue()
       return { ...built, room: built.wrapper.vm.room }
     }
 
@@ -1867,6 +1945,36 @@ describe('VideoCall', () => {
         wrapper.setData({ micProblem: true })
         await wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2' })
         expect(checkForSilence).toHaveBeenCalled()
+        expect(wrapper.vm.micProblem).toBe(false)
+      })
+
+      it('starts a running look at the microphone over for the new one', async () => {
+        const { wrapper, room } = await connected()
+        const handlers = {}
+        const track = {
+          on: jest.fn((evt, cb) => {
+            handlers[evt] = cb
+          }),
+          checkForSilence: jest.fn().mockResolvedValue(true),
+        }
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        room.handlers.LocalTrackPublished({ source: 'microphone', track })
+        let goOn
+        wrapper.vm.micSilencePause.mockImplementationOnce(
+          () =>
+            new Promise((resolve) => {
+              goOn = resolve
+            }),
+        )
+        handlers.audioSilenceDetected()
+        await flushPromises()
+        // Still looking at the old microphone, no warning yet — and the new one works.
+        track.checkForSilence.mockResolvedValue(false)
+        const switched = wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2' })
+        await flushPromises()
+        goOn()
+        await switched
+        await flushPromises()
         expect(wrapper.vm.micProblem).toBe(false)
       })
 
