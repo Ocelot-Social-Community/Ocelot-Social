@@ -5,6 +5,8 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  # The merge queue runs the required checks on its temporary gh-readonly-queue/master/* branch.
+  merge_group:
 
 # Least privilege. pull-requests:read is required by dorny/paths-filter, which lists a PR's changed
 # files via the API (the fetch-depth:1 checkout has no base history for a local diff).

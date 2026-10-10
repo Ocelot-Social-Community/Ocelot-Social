@@ -6,6 +6,12 @@ on:
       - opened
       - edited
       - synchronize
+  # "Validate PR title" is a required check, and the merge queue waits for every required check to
+  # be reported on its temporary gh-readonly-queue/master/* branch. A merge group has no title to
+  # validate — that happened on the pull request, before it could be queued — so the job below is
+  # skipped for this event, and a skipped job reports as passing. Without the trigger the check
+  # would never be reported at all and every queue entry would time out.
+  merge_group:
 
 # One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
 # cancelled instead of holding a runner. `event_name` is part of the group on purpose: a branch
@@ -26,7 +32,7 @@ jobs:
   main:
     name: Validate PR title
     runs-on: ubuntu-latest
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    if: ${{ github.event_name != 'merge_group' && github.actor != 'dependabot[bot]' }}
     steps:
       - uses: amannn/action-semantic-pull-request@069817c298f23fab00a8f29a2e556a5eac0f6390 # v5.5.3
         env:
