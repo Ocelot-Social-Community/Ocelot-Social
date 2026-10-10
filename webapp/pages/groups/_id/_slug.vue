@@ -481,6 +481,7 @@ export default {
       currentUser: 'auth/user',
       getShowChat: 'chat/showChat',
       videoCallEnabled: 'videoCall/enabled',
+      videoCallOpen: 'videoCall/showVideoCall',
     }),
     chatRoomUnreadCount() {
       return (this.chatRoom && this.chatRoom.unreadCount) || 0
@@ -627,6 +628,13 @@ export default {
       if (can) this.setupVideoCallCountSubscription()
       else this.teardownVideoCallCountSubscription()
     },
+    videoCallOpen(open, wasOpen) {
+      // The viewer just hung up. Leaving a call brings them here BEFORE it
+      // disconnects, so the count this page fetched on arrival still included
+      // them — and nothing is bound to correct it: the backend only pushes the
+      // changes it has noticed itself, and a short call can pass it by.
+      if (wasOpen && !open) this.refetchVideoCallParticipantCount()
+    },
     'group.myGroupRole'(myGroupRole) {
       if (myGroupRole) this.setupGroupShowMembersSubscription()
     },
@@ -758,6 +766,15 @@ export default {
       this._videoCallCountSub?.unsubscribe()
       this._videoCallCountSub = null
       this.videoCallParticipantCount = 0
+    },
+    async refetchVideoCallParticipantCount() {
+      try {
+        await this.$apollo.queries.videoCallParticipantCount?.refetch()
+      } catch (err) {
+        // The count we have stays; the subscription may still correct it.
+        // eslint-disable-next-line no-console
+        console.error('videoCallParticipantCount refetch failed:', err)
+      }
     },
     async openGroupVideoCall(groupId) {
       // Button stays clickable (so the tooltip works); give feedback instead of a
