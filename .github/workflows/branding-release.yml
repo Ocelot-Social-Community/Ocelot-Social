@@ -96,7 +96,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'packages/branding/.tool-versions'
           cache: 'npm'
@@ -178,7 +178,7 @@ jobs:
           sparse-checkout-cone-mode: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           # Trusted publishing needs npm >= 11.5.1, whose own floor is Node >= 22.14.0. npm is
           # taken from Node's bundle here, and that is the tighter of the two constraints: Node 22
@@ -231,7 +231,7 @@ jobs:
           sparse-checkout-cone-mode: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'packages/branding/.tool-versions'
           # `scope` is what makes npm route `@ocelot-social-community/*` at GitHub rather than at
