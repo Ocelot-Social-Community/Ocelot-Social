@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.0.7](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.6...ui-v0.0.7) (2026-10-10)
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump @types/node from 26.6.2 to 26.6.4 in /packages/ui ([#10378](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10378)) ([8c2e14c](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/8c2e14c2f6973227c94d4137adff74d56a388d5f))
+* **deps-dev:** bump the storybook group across 1 directory with 3 updates ([#10375](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10375)) ([c18bb02](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/c18bb02df588f26e6ad810f901c9cadcffae165f))
+* **deps-dev:** bump the vitest group across 1 directory with 2 updates ([#10377](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10377)) ([8d770d5](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/8d770d5c4301f534e14d4bac2f92983ecb93f700))
+* **other:** bump eslint-plugin-jsdoc from 64.5.4 to 65.1.0 in /packages/ui ([#10448](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10448)) ([db67202](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/db672020967f2b412dc059d0d65a1babd2f45f5e))
+
 ## [0.0.6](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.5...ui-v0.0.6) (2026-10-05)
 
 
