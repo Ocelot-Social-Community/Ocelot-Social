@@ -60,6 +60,46 @@ describe('migration: shouts-public-by-default', () => {
     expect((await settingsOf())[0]).toEqual({ id: 'a-private', shown: true, before: 'false' })
   })
 
+  // An opt-out made under the enforced setting is the user's own choice; neither the rollback nor
+  // a later `up` may undo it.
+  describe('a user who opted out after the migration', () => {
+    const optOut = async (id: string) =>
+      run(`MATCH (u:User {id: $id}) SET u.showShoutsPublicly = false`, { id })
+
+    it('stays private when it is rolled back', async () => {
+      await up(noop)
+      await optOut('b-public')
+
+      await down(noop)
+
+      expect((await settingsOf())[1]).toEqual({ id: 'b-public', shown: false, before: 'true' })
+    })
+
+    it('stays private when it is applied again', async () => {
+      await up(noop)
+      await optOut('b-public')
+      await down(noop)
+
+      await up(noop)
+
+      expect((await settingsOf())[1]).toEqual({ id: 'b-public', shown: false, before: 'true' })
+    })
+
+    it('does not keep the others from going back', async () => {
+      await up(noop)
+      await optOut('b-public')
+
+      await down(noop)
+
+      const settings = await settingsOf()
+
+      expect([settings[0], settings[2]]).toEqual([
+        { id: 'a-private', shown: false, before: null },
+        { id: 'c-unset', shown: null, before: null },
+      ])
+    })
+  })
+
   it('goes back to exactly what each user had', async () => {
     await up(noop)
 
