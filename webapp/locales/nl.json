@@ -1982,6 +1982,11 @@
     "connecting": "Verbinden…",
     "connectionLost": "Verbinding verbroken: {name}",
     "connectionPoor": "Zwakke verbinding: {name}",
+    "deviceSettings": {
+      "button": "Apparaten",
+      "speakerError": "De luidspreker kon niet worden gewisseld.",
+      "title": "Apparaatinstellingen"
+    },
     "dialogLabel": "Groepsvideogesprek",
     "disableCamera": "Camera uitschakelen",
     "enableAudio": "Geluid inschakelen",
@@ -2027,6 +2032,7 @@
       "cameraDisabled": "De camera is uitgeschakeld.",
       "cameraOff": "Camera: Uit",
       "cameraOn": "Camera: Aan",
+      "cameraStarting": "Camera wordt gestart…",
       "cancel": "Annuleren",
       "description": "Je staat op het punt deel te nemen aan de videogesprek van deze groep. Controleer je camera, microfoon en luidspreker en neem dan deel aan het gesprek.",
       "errorBusy": "Het apparaat wordt gebruikt door een andere toepassing.",
@@ -2042,6 +2048,7 @@
       "micOff": "Mic: Uit",
       "micOn": "Mic: Aan",
       "microphone": "Microfoon",
+      "micStarting": "Microfoon wordt gestart…",
       "noCamera": "Camera-voorvertoning is niet beschikbaar.",
       "noDevices": "Geen apparaat gedetecteerd",
       "permission": {

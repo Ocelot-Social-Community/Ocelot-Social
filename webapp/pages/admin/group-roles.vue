@@ -76,14 +76,15 @@
           {{ $t('group.rights.pendingUnreachable') }}
         </p>
 
+        <!-- The owner role is shown like the network owner: every right ticked, none editable. -->
         <p v-if="activeRole && activeRole.protected" class="note" data-test="owner-note">
           {{ $t('admin.groupRoles.ownerHoldsEverything') }}
         </p>
 
         <permission-matrix
-          v-else-if="activeRole"
+          v-if="activeRole"
           :permissions="catalog"
-          :granted="draft"
+          :granted="grantedOnScreen"
           :diff="hoverDiff"
           :highlight="highlightedRights"
           :group-label="(name) => $t(`permissions.sections.${name}`)"
@@ -142,11 +143,17 @@
         </os-button>
       </section>
     </template>
+    <confirm-modal
+      v-if="showLeaveConfirmModal"
+      :modalData="leaveConfirmModalData"
+      @close="showLeaveConfirmModal = false"
+    />
   </os-card>
 </template>
 
 <script>
 import { OsButton, OsCard, OsToggleGroup } from '@ocelot-social/ui'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 import GroupRightsSimple from '~/components/Permissions/GroupRightsSimple'
 import OcelotInput from '~/components/OcelotInput/OcelotInput'
 import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
@@ -158,10 +165,13 @@ import {
   updateGroupRoleTemplateMutation,
 } from '~/graphql/adminGroups.js'
 import groupRightsEditor from '~/mixins/groupRightsEditor'
+import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
+import warnBeforeUnload from '~/mixins/warnBeforeUnload'
 
 export default {
-  mixins: [groupRightsEditor],
+  mixins: [groupRightsEditor, confirmLeaveIfUnsavedChanges, warnBeforeUnload],
   components: {
+    ConfirmModal,
     GroupRightsSimple,
     OcelotInput,
     OsButton,
@@ -196,6 +206,11 @@ export default {
     },
   },
   methods: {
+    // Asked by confirmLeaveIfUnsavedChanges and warnBeforeUnload: the template being edited
+    // holds a change nobody saved.
+    hasUnsavedChanges() {
+      return this.dirty
+    },
     /** Another template's roles replace the ones on screen — and with them, the draft of these. */
     openTemplate(name) {
       if (name === this.activeTemplateName || !this.mayDiscardDraft()) return
@@ -203,7 +218,12 @@ export default {
       this.activeTemplateName = name
     },
     rowDisabled(permission) {
-      return this.saving || this.isMandatory(permission) || this.isMoot(permission)
+      return (
+        this.saving ||
+        !!this.activeRole?.protected ||
+        this.isMandatory(permission) ||
+        this.isMoot(permission)
+      )
     },
     async storeRole(name, permissions, label) {
       const { data } = await this.$apollo.mutate({

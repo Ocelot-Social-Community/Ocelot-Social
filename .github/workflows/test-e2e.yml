@@ -91,7 +91,7 @@ jobs:
       # repo's 10 GB cache budget and evicts by LRU the caches that COULD hit — the buildx `type=gha`
       # scopes and the npm cache. `compression-level: 0` because the payload is already zstd-compressed.
       - name: Upload images for the test jobs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-backend-environment
           path: /tmp/*.tar.zst
@@ -136,7 +136,7 @@ jobs:
         run: docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" | zstd -T0 -3 > /tmp/webapp.tar.zst
 
       - name: Upload image for the test jobs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-webapp-image
           path: /tmp/webapp.tar.zst
@@ -158,7 +158,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'backend/.nvmrc'
           cache: 'npm'
@@ -217,7 +217,7 @@ jobs:
             "${HOME#/}/.cache/Cypress"
 
       - name: Upload installed workspace for the test jobs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-cypress-workspace
           path: /tmp/e2e-workspace.tar.zst
@@ -240,7 +240,9 @@ jobs:
       - name: List feature files
         id: list
         run: |
-          FEATURES=$(cd cypress && find e2e/ -name "*.feature" -printf '%P\n' | sort | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          # Plus one entry that is not a feature: the README screenshots (cypress/readme/), taken
+          # on the same stack, but seeded with the demo network instead of per-scenario fixtures.
+          FEATURES=$(cd cypress && { find e2e/ -name "*.feature" -printf '%P\n' | sort; echo readme-screenshots; } | jq -R -s -c 'split("\n") | map(select(length > 0))')
           echo "features=$FEATURES" >> $GITHUB_OUTPUT
 
   fullstack_tests:
@@ -252,6 +254,11 @@ jobs:
       fail-fast: false
       matrix:
         feature: ${{ fromJson(needs.list_features.outputs.features) }}
+    env:
+      # Cypress smoke-tests its binary before the first run in a job and gives it 30 s by default.
+      # That usually takes 1–7 s, but a slow runner has blown the 30 s and failed a job before a
+      # single scenario ran. Generous rather than tight: it only bounds a hang, never a test.
+      CYPRESS_VERIFY_TIMEOUT: 120000
     steps:
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
@@ -264,12 +271,12 @@ jobs:
       # and unpacking the npm download cache on top of it is a few hundred megabytes that nothing
       # reads — 40 times per run.
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'backend/.nvmrc'
 
       - name: Download images and installed workspace
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: e2e-*
           merge-multiple: true
@@ -399,8 +406,46 @@ jobs:
       - name: Migrate database
         run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend npm run db:migrate -- up
 
+      # The README's pictures want a network with people, posts and groups in it — the demo seed,
+      # which the features never use (they build what each scenario needs and wipe it after).
+      - name: README screenshots | seed the demo network
+        if: matrix.feature == 'readme-screenshots'
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend npm run db:seed
+
+      - name: README screenshots | capture
+        if: matrix.feature == 'readme-screenshots'
+        env:
+          README_SCREENSHOTS: 'true'
+        run: npm run cypress:run -- --config 'specPattern=cypress/readme/*.cy.js' --spec cypress/readme/screenshots.cy.js
+
+      # On every push, so a pull request shows how its change looks; published from master only
+      # (publish_readme_screenshots below).
+      # A failed capture leaves Cypress's own failure screenshots instead — uploaded too (under
+      # another name, so the publish job never picks them up), because they show what went wrong.
+      - name: README screenshots | upload failure screenshots
+        if: failure() && matrix.feature == 'readme-screenshots'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: readme-screenshots-failed
+          path: cypress/screenshots
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: README screenshots | upload
+        if: matrix.feature == 'readme-screenshots'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: readme-screenshots
+          # Whatever folder Cypress names after the spec; never a failure screenshot.
+          path: |
+            cypress/screenshots/**/*.png
+            !cypress/screenshots/**/*(failed).png
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Full stack tests | run tests
         id: e2e-tests
+        if: matrix.feature != 'readme-screenshots'
         env:
           # Chrome's net log of the run, for the page-load hang; uploaded below only on failure.
           # Not CYPRESS_-prefixed: Cypress would read that as a config override.
@@ -429,12 +474,53 @@ jobs:
       - name: Full stack tests | if tests failed, upload report
         id: e2e-report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ steps.artifact-name.outputs.name }}
           path: |
             /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
             /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/diagnostics
+
+  # The README links its screenshots from the `readme-screenshots` branch, which holds exactly one
+  # commit: the pictures of master's latest push. Force-pushed, so old pictures never pile up in
+  # the history. Not gh-pages: the documentation deploy replaces that branch's whole content.
+  publish_readme_screenshots:
+    name: README | publish screenshots
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: [fullstack_tests]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # Missing when the screenshot entry failed — then the published pictures simply stay as they
+      # were, instead of this job failing for a reason the e2e status already reports.
+      - name: Download screenshots
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: readme-screenshots
+          path: screenshots
+
+      - name: Push to the readme-screenshots branch
+        if: steps.download.outcome == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd screenshots
+          # The artifact keeps the folder Cypress names after the spec; the README links the root.
+          find . -mindepth 2 -type f -name '*.png' -exec mv -t . -- {} +
+          git init -q -b readme-screenshots
+          git add -- *.png
+          # Author and committer as the documentation deploy has them (crazy-max/ghaction-github-pages):
+          # the Actions bot as author — not whoever pushed to master — and GitHub itself as committer,
+          # which GitHub shows as web-flow. With the bot as committer too, every publish counted as a
+          # commit of github-actions[bot] in the repository's Pulse; the docs deploys do not.
+          GIT_COMMITTER_NAME='GitHub' GIT_COMMITTER_EMAIL='noreply@github.com' \
+            git -c user.name='github-actions[bot]' \
+            -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            commit -q -m "README screenshots of ${GITHUB_SHA}"
+          git push -q -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" readme-screenshots
 
   e2e_status:
     name: E2E | Status

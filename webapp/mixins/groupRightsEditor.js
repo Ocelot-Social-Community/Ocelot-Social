@@ -86,6 +86,16 @@ export default {
     draft() {
       return this.draftOf(this.activeRoleName).permissions
     },
+    /**
+     * What the matrix shows as held. The owner role stores nothing and stands for the whole
+     * catalog, so it is shown with every right ticked — as the network roles page shows its
+     * owner — rather than as an empty column or no matrix at all.
+     */
+    grantedOnScreen() {
+      return this.activeRole?.protected
+        ? this.catalog.map((permission) => permission.key)
+        : this.draft
+    },
     /** The name the role on screen goes by in the draft. */
     draftLabel: {
       get() {

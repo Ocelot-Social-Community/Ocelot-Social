@@ -1982,6 +1982,11 @@
     "connecting": "Conectando…",
     "connectionLost": "Conexión perdida: {name}",
     "connectionPoor": "Conexión débil: {name}",
+    "deviceSettings": {
+      "button": "Dispositivos",
+      "speakerError": "No se pudo cambiar el altavoz.",
+      "title": "Ajustes de dispositivos"
+    },
     "dialogLabel": "Videollamada de grupo",
     "disableCamera": "Apagar la cámara",
     "enableAudio": "Activar sonido",
@@ -2027,6 +2032,7 @@
       "cameraDisabled": "La cámara está desactivada.",
       "cameraOff": "Cámara: Apagada",
       "cameraOn": "Cámara: Encendida",
+      "cameraStarting": "Iniciando la cámara…",
       "cancel": "Cancelar",
       "description": "Estás a punto de unirte a la videollamada de este grupo. Comprueba tu cámara, micrófono y altavoz, y luego únete a la llamada.",
       "errorBusy": "El dispositivo está siendo utilizado por otra aplicación.",
@@ -2042,6 +2048,7 @@
       "micOff": "Micro: Apagado",
       "micOn": "Micro: Encendido",
       "microphone": "Micrófono",
+      "micStarting": "Iniciando el micrófono…",
       "noCamera": "La vista previa de la cámara no está disponible.",
       "noDevices": "Ningún dispositivo detectado",
       "permission": {
