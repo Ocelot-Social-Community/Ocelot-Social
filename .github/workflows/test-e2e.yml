@@ -507,8 +507,12 @@ jobs:
           find . -mindepth 2 -type f -name '*.png' -exec mv -t . -- {} +
           git init -q -b readme-screenshots
           git add -- *.png
-          # The Actions bot as author, like the documentation deploy — not whoever pushed to master.
-          git -c user.name='github-actions[bot]' \
+          # Author and committer as the documentation deploy has them (crazy-max/ghaction-github-pages):
+          # the Actions bot as author — not whoever pushed to master — and GitHub itself as committer,
+          # which GitHub shows as web-flow. With the bot as committer too, every publish counted as a
+          # commit of github-actions[bot] in the repository's Pulse; the docs deploys do not.
+          GIT_COMMITTER_NAME='GitHub' GIT_COMMITTER_EMAIL='noreply@github.com' \
+            git -c user.name='github-actions[bot]' \
             -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
             commit -q -m "README screenshots of ${GITHUB_SHA}"
           git push -q -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" readme-screenshots
