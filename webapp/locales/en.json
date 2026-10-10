@@ -1982,6 +1982,11 @@
     "connecting": "Connecting…",
     "connectionLost": "Connection lost: {name}",
     "connectionPoor": "Weak connection: {name}",
+    "deviceSettings": {
+      "button": "Devices",
+      "speakerError": "Could not switch the speaker.",
+      "title": "Device settings"
+    },
     "dialogLabel": "Group video call",
     "disableCamera": "Turn camera off",
     "enableAudio": "Enable sound",
@@ -2027,6 +2032,7 @@
       "cameraDisabled": "Camera is disabled.",
       "cameraOff": "Camera: Off",
       "cameraOn": "Camera: On",
+      "cameraStarting": "Starting camera…",
       "cancel": "Cancel",
       "description": "You're about to join this group's video call. Check your camera, microphone and speaker, then join the call.",
       "errorBusy": "The device is in use by another application.",
@@ -2042,6 +2048,7 @@
       "micOff": "Mic: Off",
       "micOn": "Mic: On",
       "microphone": "Microphone",
+      "micStarting": "Starting microphone…",
       "noCamera": "Camera preview is not available.",
       "noDevices": "No device detected",
       "permission": {

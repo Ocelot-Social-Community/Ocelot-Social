@@ -1982,6 +1982,11 @@
     "connecting": "Verbinde…",
     "connectionLost": "Verbindung verloren: {name}",
     "connectionPoor": "Schwache Verbindung: {name}",
+    "deviceSettings": {
+      "button": "Geräte",
+      "speakerError": "Der Lautsprecher konnte nicht gewechselt werden.",
+      "title": "Geräte-Einstellungen"
+    },
     "dialogLabel": "Gruppen-Videoanruf",
     "disableCamera": "Kamera ausschalten",
     "enableAudio": "Ton aktivieren",
@@ -2027,6 +2032,7 @@
       "cameraDisabled": "Kamera ist deaktiviert.",
       "cameraOff": "Kamera: Aus",
       "cameraOn": "Kamera: An",
+      "cameraStarting": "Kamera wird gestartet…",
       "cancel": "Abbrechen",
       "description": "Du trittst gleich der Videokonferenz dieser Gruppe bei. Prüfe Kamera, Mikrofon und Lautsprecher, bevor du dem Anruf beitrittst.",
       "errorBusy": "Das Gerät wird bereits von einer anderen Anwendung verwendet.",
@@ -2042,6 +2048,7 @@
       "micOff": "Mikro: Aus",
       "micOn": "Mikro: An",
       "microphone": "Mikrofon",
+      "micStarting": "Mikrofon wird gestartet…",
       "noCamera": "Kamera-Vorschau nicht verfügbar.",
       "noDevices": "Kein Gerät erkannt",
       "permission": {

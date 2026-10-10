@@ -1,0 +1,12 @@
+// Image tables (the README screenshots) fit the content width instead of
+// scrolling sideways: the theme makes tables scroll blocks and lets images
+// inside them keep their natural size.
+.theme-hope-content table:has(img) {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+
+  img {
+    max-width: 100%;
+  }
+}

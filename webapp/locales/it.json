@@ -1982,6 +1982,11 @@
     "connecting": "Connessione in corso…",
     "connectionLost": "Connessione persa: {name}",
     "connectionPoor": "Connessione debole: {name}",
+    "deviceSettings": {
+      "button": "Dispositivi",
+      "speakerError": "Impossibile cambiare l'altoparlante.",
+      "title": "Impostazioni dei dispositivi"
+    },
     "dialogLabel": "Videochiamata di gruppo",
     "disableCamera": "Disattiva la fotocamera",
     "enableAudio": "Attiva audio",
@@ -2027,6 +2032,7 @@
       "cameraDisabled": "La fotocamera è disattivata.",
       "cameraOff": "Fotocamera: Disattivata",
       "cameraOn": "Fotocamera: Attivata",
+      "cameraStarting": "Avvio della fotocamera…",
       "cancel": "Annulla",
       "description": "Stai per partecipare alla videochiamata di questo gruppo. Controlla fotocamera, microfono e altoparlante, poi entra nella chiamata.",
       "errorBusy": "Il dispositivo è in uso da un'altra applicazione.",
@@ -2042,6 +2048,7 @@
       "micOff": "Microfono: Disattivato",
       "micOn": "Microfono: Attivato",
       "microphone": "Microfono",
+      "micStarting": "Avvio del microfono…",
       "noCamera": "Anteprima della fotocamera non disponibile.",
       "noDevices": "Nessun dispositivo rilevato",
       "permission": {
