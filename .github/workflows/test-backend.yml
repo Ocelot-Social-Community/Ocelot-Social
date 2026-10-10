@@ -81,7 +81,7 @@ jobs:
       # zstd because `docker save` writes an UNCOMPRESSED layer tar; `compression-level: 0` because
       # the upload would otherwise compress the already-compressed payload a second time.
       - name: Upload image for the test job
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: neo4j-image
           path: /tmp/neo4j.tar.zst
@@ -122,7 +122,7 @@ jobs:
       # zstd because `docker save` writes an UNCOMPRESSED layer tar; `compression-level: 0` because
       # the upload would otherwise compress the already-compressed payload a second time.
       - name: Upload image for the test job
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: backend-test-image
           path: /tmp/backend.tar.zst
@@ -139,7 +139,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'backend/.nvmrc'
           cache: 'npm'
@@ -193,13 +193,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Download Neo4J image
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: neo4j-image
           path: /tmp
 
       - name: Download backend image
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: backend-test-image
           path: /tmp
@@ -339,7 +339,7 @@ jobs:
       # `./coverage` is bind-mounted to `/app/coverage` (docker-compose.test.yml), so the blob the
       # container just wrote is already on the runner — no `docker compose cp` needed.
       - name: backend | Upload coverage blob
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: backend-coverage-blob-${{ matrix.shardIndex }}
           path: coverage/blobs/blob-${{ matrix.shardIndex }}.json
@@ -398,7 +398,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Download backend image
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: backend-test-image
           path: /tmp
@@ -409,7 +409,7 @@ jobs:
       # `merge-multiple` flattens all four artifacts into the one directory `--merge-reports`
       # expects. Nothing else may land in it — see the note on the shard test step.
       - name: Download coverage blobs
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: backend-coverage-blob-*
           merge-multiple: true
@@ -436,7 +436,7 @@ jobs:
       # vitest-coverage-report-action and similar tools read.
       - name: backend | Upload coverage report
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: backend-coverage-report
           path: |
