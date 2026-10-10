@@ -48,7 +48,7 @@
     "@aws-sdk/client-s3": "^3.1147.0",
     "@aws-sdk/lib-storage": "^3.1146.0",
     "@graphql-tools/load-files": "^7.0.0",
-    "@graphql-tools/merge": "^9.2.4",
+    "@graphql-tools/merge": "^9.2.6",
     "@graphql-tools/schema": "^10.1.1",
     "@ocelot-social/branding": "file:../packages/branding",
     "@sentry/node": "^11.4.0",
