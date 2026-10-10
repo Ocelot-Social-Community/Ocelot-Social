@@ -254,6 +254,11 @@ jobs:
       fail-fast: false
       matrix:
         feature: ${{ fromJson(needs.list_features.outputs.features) }}
+    env:
+      # Cypress smoke-tests its binary before the first run in a job and gives it 30 s by default.
+      # That usually takes 1–7 s, but a slow runner has blown the 30 s and failed a job before a
+      # single scenario ran. Generous rather than tight: it only bounds a hang, never a test.
+      CYPRESS_VERIFY_TIMEOUT: 120000
     steps:
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
