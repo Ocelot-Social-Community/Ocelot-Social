@@ -15,6 +15,7 @@ import {
   readGroupRoleTemplates,
   renameGroupRole,
   replaceGroupRoles,
+  syncGroupChatRoom,
   readGroupTemplate,
   untouchedGroupIdsByTemplate,
   writeElevation,
@@ -50,6 +51,7 @@ vi.mock('@src/groupRole/repository', () => ({
   readElevation: vi.fn(),
   writeElevation: vi.fn(),
   clearElevation: vi.fn(),
+  syncGroupChatRoom: vi.fn(),
 }))
 
 // The mocked repository, named once so the tests read as `mocked.writeGroupRole` rather than
@@ -65,6 +67,7 @@ const mocked = {
   readGroupRoleTemplates: vi.mocked(readGroupRoleTemplates),
   renameGroupRole: vi.mocked(renameGroupRole),
   replaceGroupRoles: vi.mocked(replaceGroupRoles),
+  syncGroupChatRoom: vi.mocked(syncGroupChatRoom),
   untouchedGroupIdsByTemplate: vi.mocked(untouchedGroupIdsByTemplate),
   readGroupTemplate: vi.mocked(readGroupTemplate),
   writeGroupTemplate: vi.mocked(writeGroupTemplate),
@@ -1255,24 +1258,23 @@ describe('Mutation.setGroupMemberRole', () => {
     expect(queries).toHaveLength(0)
   })
 
-  it.each([
-    ['usual', 'into', /MERGE \(user\)-\[:CHATS_IN\]->\(room\)/],
-    ['pending', 'out of', /DELETE/],
-  ])(
-    'moves a member set to %s %s the group chat, in the same transaction',
-    async (roleName, _direction, statement) => {
-      // As ChangeGroupMemberRole keeps it: an applicant is not in the group's chat room, every
-      // other role is.
-      mocked.readGroupRoles.mockResolvedValue([role(roleName)])
-      const { context, queries } = contextFor({
-        writeRecords: [record({ user: { id: 'u1' }, membership: { role: roleName } })],
-      })
+  it('lets the group chat follow the new role, in the same transaction', async () => {
+    // As ChangeGroupMemberRole keeps it: in the room while the role may read the chat. Which
+    // roles those are is the sync's business (repository.db.spec.ts); here it is that this
+    // member's room membership is recomputed inside the transaction that changed the role.
+    mocked.readGroupRoles.mockResolvedValue([role('pending')])
+    const { context } = contextFor({
+      writeRecords: [record({ user: { id: 'u1' }, membership: { role: 'pending' } })],
+    })
 
-      await Mutation.setGroupMemberRole({}, { groupId: 'g1', userId: 'u1', roleName }, context)
+    await Mutation.setGroupMemberRole(
+      {},
+      { groupId: 'g1', userId: 'u1', roleName: 'pending' },
+      context,
+    )
 
-      expect(queries.map(({ query }) => query).some((query) => statement.test(query))).toBe(true)
-    },
-  )
+    expect(mocked.syncGroupChatRoom).toHaveBeenCalledWith(expect.anything(), 'g1', 'u1')
+  })
 
   it('refuses when neither the user nor the group is there', async () => {
     mocked.readGroupRoles.mockResolvedValue([role('usual')])

@@ -1071,18 +1071,26 @@ describe('GroupProfileSlug', () => {
       })
     }
 
-    it('offers the chat to a member who holds group.chat.participate', () => {
+    it('offers the chat to a member who holds group.chat.read', () => {
       const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
       expect(wrapper.find('[data-test="chat-btn"]').exists()).toBe(true)
     })
 
-    it('hides the chat when the group withheld the right from its members', () => {
-      // Being a member is no longer the question: the backend decides CreateGroupRoom and
-      // CreateMessage on group.chat.participate, so a button offered without it would only
-      // produce an error toast.
+    it('offers the chat to a member who may read it but not write in it', () => {
+      // Opening the chat is reading it; the input row is the chat's own business (Chat.vue).
       const wrapper = mountWithGroup({
         ...yogaPractice,
-        ...groupRightsWithout('usual', 'group.chat.participate'),
+        ...groupRightsWithout('usual', 'group.chat.write'),
+      })
+      expect(wrapper.find('[data-test="chat-btn"]').exists()).toBe(true)
+    })
+
+    it('hides the chat when the group withheld the right from its members', () => {
+      // Being a member is no longer the question: the backend decides CreateGroupRoom on
+      // group.chat.read, so a button offered without it would only produce an error toast.
+      const wrapper = mountWithGroup({
+        ...yogaPractice,
+        ...groupRightsWithout('usual', 'group.chat.read', 'group.chat.write'),
       })
       expect(wrapper.find('[data-test="chat-btn"]').exists()).toBe(false)
     })
@@ -1093,7 +1101,7 @@ describe('GroupProfileSlug', () => {
     it('does not subscribe to room updates without the chat right', () => {
       mountWithGroup({
         ...yogaPractice,
-        ...groupRightsWithout('usual', 'group.chat.participate'),
+        ...groupRightsWithout('usual', 'group.chat.read', 'group.chat.write'),
       })
       // The other two still subscribe — one follows the membership, one the group's rights.
       expect(subscribedTo(roomUpdated())).toHaveLength(0)

@@ -31,7 +31,8 @@ describe(networkAuthorityIn, () => {
       'group.leave',
       'group.post.create',
       'group.comment.create',
-      'group.chat.participate',
+      'group.chat.read',
+      'group.chat.write',
       'group.videoCall.create',
       'group.videoCall.join',
     ]) {

@@ -867,6 +867,37 @@ describe('resolvers/searches — typed entry points', () => {
       expect(data.searchChatTargets).not.toContainEqual({ __typename: 'Group', id: 'qg-foreign' })
     })
 
+    it('leaves out a group whose role withholds its chat from the caller', async () => {
+      // Being a member is not the question: the chat is opened with group.chat.read, so a group
+      // that withholds it would only be a target that answers the click with an error.
+      authenticatedUser = authorJson
+      await database.write({
+        query: `MATCH (author:User {id: 'quokka-author'})
+                CREATE (g:Group {id: 'qg-silent', name: 'Quokka Silent', slug: 'quokka-silent',
+                                 deleted: false, disabled: false})
+                CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole {id: 'qg-silent:usual', name: 'usual',
+                                 permissions: '["group.read","group.content.read","group.leave"]'})
+                CREATE (author)-[:MEMBER_OF {role: 'usual'}]->(g)`,
+        variables: {},
+      })
+
+      try {
+        const { data, errors } = await query({
+          query: searchChatTargetsQuery,
+          variables: { query: 'quokka', limit: 10 },
+        })
+
+        expect(errors).toBeUndefined()
+        expect(data.searchChatTargets).toContainEqual({ __typename: 'Group', id: 'qg-own' })
+        expect(data.searchChatTargets).not.toContainEqual({ __typename: 'Group', id: 'qg-silent' })
+      } finally {
+        await database.write({
+          query: `MATCH (g:Group {id: 'qg-silent'}) OPTIONAL MATCH (g)-[:HAS_GROUP_ROLE]->(r) DETACH DELETE g, r`,
+          variables: {},
+        })
+      }
+    })
+
     it('drops group targets while the groups feature is off', async () => {
       // Mirrors searchGroups being gated away entirely; direct-message targets must
       // survive, otherwise switching groups off breaks chat as a whole.

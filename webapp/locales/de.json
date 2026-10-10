@@ -1133,6 +1133,7 @@
       "labelField": "Anzeigename",
       "mandatory": "Immer vergeben: eine Mitgliedschaft, die man nicht beenden kann, ist keine Einstellung.",
       "members": "{count} Mitglieder",
+      "mootChat": "Der Gruppen-Chat ist nur für Mitglieder: Wer nicht Mitglied ist, kommt nicht hinein.",
       "mootJoin": "Wer schon eine Mitgliedschaft hat, tritt nicht noch einmal bei.",
       "mootLeave": "Wer nicht Mitglied ist, hat keine Mitgliedschaft zu beenden.",
       "noRight": "Dieses Recht kannst du nicht vergeben, weil du es selbst nicht hast.",
@@ -1148,6 +1149,7 @@
       "simple": {
         "applicants-read": "Wartende Bewerber dürfen die Beiträge lesen",
         "members-chat": "Mitglieder dürfen im Gruppen-Chat schreiben",
+        "members-chat-read": "Mitglieder dürfen den Gruppen-Chat lesen",
         "members-comment": "Mitglieder dürfen kommentieren",
         "members-invite": "Mitglieder dürfen andere einladen",
         "members-post": "Mitglieder dürfen Beiträge schreiben",

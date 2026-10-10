@@ -956,24 +956,20 @@ export default shield(
 
       saveCategorySettings: isAuthenticated,
       updateOnlineStatus: isAuthenticated,
-      CreateGroupRoom: and(
-        groupsEnabled,
-        isAuthenticated,
-        hasGroupPermission('group.chat.participate'),
-      ),
-      CreateMessage: and(
-        isAuthenticated,
-        hasGroupPermission('group.chat.participate', byRoom('roomId')),
-      ),
+      // Setting the room up is part of reading it: a member who may only read opens the chat
+      // through this mutation too (the webapp falls back to it when the room does not exist).
+      CreateGroupRoom: and(groupsEnabled, isAuthenticated, hasGroupPermission('group.chat.read')),
+      CreateMessage: and(isAuthenticated, hasGroupPermission('group.chat.write', byRoom('roomId'))),
       joinGroupVideoCall: and(
         groupsEnabled,
         isAuthenticated,
         hasGroupPermission('group.videoCall.join'),
       ),
-      MarkMessagesAsSeen: and(
-        isAuthenticated,
-        hasGroupPermission('group.chat.participate', byRoom('roomId')),
-      ),
+      // No group gate: the mutation names messages, not a room, so a `byRoom('roomId')` locator
+      // finds nothing and the check passed for everybody — a gate in appearance only. What the
+      // resolver does is bounded by the caller anyway: it removes their OWN unread markers, which
+      // only exist on messages in rooms they are in (CHATS_IN follows group.chat.read).
+      MarkMessagesAsSeen: isAuthenticated,
       toggleObservePost: isAuthenticated,
       muteGroup: and(groupsEnabled, isAuthenticated, hasGroupPermission('group.content.read')),
       unmuteGroup: and(groupsEnabled, isAuthenticated, hasGroupPermission('group.content.read')),

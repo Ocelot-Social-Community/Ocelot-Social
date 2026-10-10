@@ -12,7 +12,8 @@ const MEMBER = [
   'group.post.create',
   'group.comment.create',
   'group.leave',
-  'group.chat.participate',
+  'group.chat.read',
+  'group.chat.write',
   'group.videoCall.join',
   'group.videoCall.create',
 ]

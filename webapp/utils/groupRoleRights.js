@@ -7,12 +7,13 @@ const NOT_AUTHORITY = [...SELF_SERVICE_RIGHTS, ...PARTICIPATION_RIGHTS]
  *
  * The webapp side of `withImpliedRights` in backend/src/groupRole/mandatoryRights.ts: reading a
  * group's content or its member list without being able to see the group itself is not a state
- * the product has. The backend closes this on every write; the client closes it too, so a tick
+ * the product has, and neither is writing into a chat one cannot read. The backend closes this on every write; the client closes it too, so a tick
  * shows its full effect immediately instead of after the answer comes back.
  */
 const IMPLIED_BY = {
   'group.content.read': ['group.read'],
   'group.members.read': ['group.read'],
+  'group.chat.write': ['group.chat.read'],
 }
 
 /**

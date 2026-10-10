@@ -1133,6 +1133,7 @@
       "labelField": "Nombre visible",
       "mandatory": "Siempre concedido: una membresía que no se puede terminar no es una opción.",
       "members": "{count} miembros",
+      "mootChat": "El chat del grupo es solo para miembros: quien no es miembro no tiene acceso a él.",
       "mootJoin": "Quien ya tiene una membresía no vuelve a unirse.",
       "mootLeave": "Quien no es miembro no tiene ninguna membresía que abandonar.",
       "noRight": "No puedes conceder un permiso que tú misma no tienes.",
@@ -1148,6 +1149,7 @@
       "simple": {
         "applicants-read": "Los solicitantes en espera pueden leer las publicaciones",
         "members-chat": "Los miembros pueden escribir en el chat del grupo",
+        "members-chat-read": "Los miembros pueden leer el chat del grupo",
         "members-comment": "Los miembros pueden comentar",
         "members-invite": "Los miembros pueden invitar a otras personas",
         "members-post": "Los miembros pueden escribir publicaciones",

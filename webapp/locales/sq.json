@@ -1133,6 +1133,7 @@
       "labelField": "Emri i shfaqur",
       "mandatory": "Gjithmonë e dhënë: një anëtarësim që nuk mund të përfundohet nuk është një rregullim.",
       "members": "{count} anëtarë",
+      "mootChat": "Chat-i i grupit është vetëm për anëtarët: kush nuk është anëtar, nuk ka qasje në të.",
       "mootJoin": "Kush e ka tashmë një anëtarësi nuk bashkohet sërish.",
       "mootLeave": "Kush nuk është anëtar, nuk ka anëtarësi për të lënë.",
       "noRight": "Nuk mund të dhurosh një leje që ti vetë nuk e ke.",
@@ -1148,6 +1149,7 @@
       "simple": {
         "applicants-read": "Aplikuesit në pritje mund të lexojnë postimet",
         "members-chat": "Anëtarët mund të shkruajnë në chat-in e grupit",
+        "members-chat-read": "Anëtarët mund të lexojnë chat-in e grupit",
         "members-comment": "Anëtarët mund të komentojnë",
         "members-invite": "Anëtarët mund të ftojnë të tjerë",
         "members-post": "Anëtarët mund të shkruajnë postime",

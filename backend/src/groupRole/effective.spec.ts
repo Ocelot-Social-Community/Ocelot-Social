@@ -152,7 +152,8 @@ describe(effectiveGroupPermissions, () => {
 
     expect(effective.has('group.videoCall.create')).toBe(false)
     expect(effective.has('group.videoCall.join')).toBe(false)
-    expect(effective.has('group.chat.participate')).toBe(true)
+    expect(effective.has('group.chat.read')).toBe(true)
+    expect(effective.has('group.chat.write')).toBe(true)
   })
 
   it('drops the registration-capable invite while invite registration is off', () => {
