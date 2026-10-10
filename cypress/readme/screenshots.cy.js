@@ -6,6 +6,11 @@
 // database before every scenario, and these pictures need the seeded network. Nothing here
 // asserts behaviour beyond "the page has rendered its content"; the features do that.
 
+// The features' service-worker experiment (page-load hang, #10414) lives among their step
+// definitions, which a plain spec does not load — so this one still ran with the worker, open to
+// the hang the experiment is about. The pictures do not show the worker either way.
+import '../support/step_definitions/common/no_service_worker'
+
 const GRAPHQL_URI = 'http://localhost:4000'
 // The seed's accounts, all with the factory password (backend/src/db/seed.ts).
 const USER = 'user@example.org'

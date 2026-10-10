@@ -127,3 +127,10 @@
   opacity: 1;
   transition: opacity 60ms;
 }
+
+/* A tooltip whose plain-text content carries line breaks (v-tooltip option
+ * `classes: 'tooltip--multiline'`, together with `html: false`). */
+.tooltip.tooltip--multiline .tooltip-inner {
+  white-space: pre-line;
+  text-align: left;
+}

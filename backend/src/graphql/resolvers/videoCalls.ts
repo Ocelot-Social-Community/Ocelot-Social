@@ -13,6 +13,7 @@ import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@constants/subscriptions'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
 import { visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
+import { noteCountTold } from '@src/livekit/toldRooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
@@ -187,7 +188,12 @@ export default {
       // Who may see the count is `group.videoCall.join`, enforced in the shield. No second
       // membership query here: the right IS the answer, and a group that decided to open
       // (or close) its calls for a role must not be overruled by a role-name check.
-      return getLiveParticipantCount(context.config, roomNameForGroup(params.groupId))
+      const roomName = roomNameForGroup(params.groupId)
+      const count = await getLiveParticipantCount(context.config, roomName)
+      // This count may be one the poller never sees; noting it makes the next poll publish the
+      // truth for the room, so the client is not left with it for good (see toldRooms.ts).
+      noteCountTold(roomName, count)
+      return count
     },
   },
   Mutation: {

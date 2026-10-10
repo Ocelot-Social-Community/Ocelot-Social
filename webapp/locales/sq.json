@@ -1982,6 +1982,11 @@
     "connecting": "Po lidhet…",
     "connectionLost": "Lidhja u humb: {name}",
     "connectionPoor": "Lidhje e dobët: {name}",
+    "deviceSettings": {
+      "button": "Pajisjet",
+      "speakerError": "Altoparlanti nuk mund të ndërrohej.",
+      "title": "Cilësimet e pajisjeve"
+    },
     "dialogLabel": "Telefonatë me video në grup",
     "disableCamera": "Fik kamerën",
     "enableAudio": "Aktivizo zërin",
@@ -2027,6 +2032,7 @@
       "cameraDisabled": "Kamera është e fikur.",
       "cameraOff": "Kamera: E fikur",
       "cameraOn": "Kamera: E ndezur",
+      "cameraStarting": "Kamera po niset…",
       "cancel": "Anulo",
       "description": "Po bashkohesh me thirrjen video të këtij grupi. Kontrollo kamerën, mikrofonin dhe altoparlantin, pastaj bashkohu me thirrjen.",
       "errorBusy": "Pajisja është në përdorim nga një aplikacion tjetër.",
@@ -2042,6 +2048,7 @@
       "micOff": "Mikrofoni: I fikur",
       "micOn": "Mikrofoni: I ndezur",
       "microphone": "Mikrofoni",
+      "micStarting": "Mikrofoni po niset…",
       "noCamera": "Pamja paraprake e kamerës nuk është e disponueshme.",
       "noDevices": "Nuk u zbulua pajisje",
       "permission": {

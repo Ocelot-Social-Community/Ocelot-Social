@@ -174,6 +174,8 @@
               :sink-id="speakerDeviceId"
               :is-active-speaker="activeSpeakerSet.has(tile.identity)"
               :is-spotlighted="!!(spotlightTile && tile.key === spotlightTile.key)"
+              :camera-starting="isOwnCameraTile(tile) && devicesStarting.videoinput > 0"
+              :mic-starting="isOwnCameraTile(tile) && devicesStarting.audioinput > 0"
               :avatar-size="tileAvatarSize(tile)"
               :clickable="isFullscreen"
               :class="{
@@ -204,12 +206,13 @@
       -->
       <div v-if="phase === 'in-call' && !error" class="video-call__controls">
         <os-button
-          v-tooltip="iconOnlyTooltip(micLabel)"
+          v-tooltip="deviceTooltip(micLabel, [deviceNames.mic])"
           :variant="micEnabled ? 'default' : 'danger'"
           appearance="outline"
           :size="iconOnly ? 'sm' : 'md'"
           :circle="iconOnly"
           :aria-label="micLabel"
+          :loading="devicesStarting.audioinput > 0"
           @click="toggleMic"
         >
           <template #icon>
@@ -220,12 +223,13 @@
           </template>
         </os-button>
         <os-button
-          v-tooltip="iconOnlyTooltip(cameraLabel)"
+          v-tooltip="deviceTooltip(cameraLabel, [deviceNames.camera])"
           :variant="cameraEnabled ? 'default' : 'danger'"
           appearance="outline"
           :size="iconOnly ? 'sm' : 'md'"
           :circle="iconOnly"
           :aria-label="cameraLabel"
+          :loading="devicesStarting.videoinput > 0"
           @click="toggleCamera"
         >
           <template #icon>
@@ -252,6 +256,44 @@
             {{ screenShareLabel }}
           </template>
         </os-button>
+        <!--
+          Button and panel share one wrapper so a click on either counts as
+          "inside" for the click-outside handling. The wrapper is not
+          positioned: the panel anchors to the whole control bar.
+        -->
+        <div ref="deviceSettingsEl" class="video-call__device-settings">
+          <os-button
+            ref="deviceSettingsToggle"
+            v-tooltip="deviceSettingsTooltip"
+            data-test="video-call-device-settings-toggle"
+            :variant="showDeviceSettings ? 'primary' : 'default'"
+            appearance="outline"
+            :size="iconOnly ? 'sm' : 'md'"
+            :circle="iconOnly"
+            :aria-label="deviceSettingsLabel"
+            :aria-expanded="showDeviceSettings.toString()"
+            @click="toggleDeviceSettings"
+          >
+            <template #icon>
+              <os-icon :icon="icons.cogs" />
+            </template>
+            <template v-if="!iconOnly">
+              {{ deviceSettingsLabel }}
+            </template>
+          </os-button>
+          <device-settings
+            v-if="showDeviceSettings"
+            class="video-call__device-settings-panel"
+            :camera-device-id="cameraDeviceId"
+            :mic-device-id="micDeviceId"
+            :speaker-device-id="speakerDeviceId"
+            :meter-stream="micMeterStream"
+            :camera-starting="devicesStarting.videoinput > 0"
+            :mic-starting="devicesStarting.audioinput > 0"
+            @switch="switchDevice"
+            @close="closeDeviceSettings({ restoreFocus: true })"
+          />
+        </div>
         <os-button
           v-if="!isMobile"
           v-tooltip="iconOnlyTooltip(chatLabel)"
@@ -302,6 +344,8 @@ import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import RoomTitleLink from '~/components/_new/generic/RoomTitleLink/RoomTitleLink'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
+import DeviceSettings from './DeviceSettings.vue'
+import { saveDevicePreference } from './devicePreferences'
 
 // How long a participant keeps the speaking treatment after LiveKit drops them
 // from the active-speaker list. LiveKit reports raw audio activity, so it lets
@@ -322,6 +366,12 @@ const PREFETCHED_TOKEN_MAX_AGE_MS = 60000
 const WEAK_CONNECTION_MS = 5000
 const RECOVERED_CONNECTION_MS = 20000
 const WEAK_QUALITIES = ['poor', 'lost']
+// A capture that was just opened may deliver nothing but silence for a moment
+// — Firefox takes noticeably longer than LiveKit's single check 200 ms after
+// the start allows for. Only silence that lasts through this many further
+// checks, this far apart, counts as a microphone that delivers nothing.
+const MIC_SILENCE_RECHECKS = 5
+const MIC_SILENCE_RECHECK_MS = 400
 const STRONG_QUALITIES = ['excellent', 'good']
 
 // Cameras publish 16:9, so the grid aims for cells of that shape: the closer a
@@ -333,11 +383,19 @@ const TILE_ASPECT_RATIO = 16 / 9
 const LARGE_AVATAR_MIN_CELL_HEIGHT = 200
 const LARGE_AVATAR_MIN_CELL_WIDTH = 160
 
+// Which piece of our state holds the device of each MediaDeviceKind.
+const DEVICE_FIELDS = {
+  videoinput: 'cameraDeviceId',
+  audioinput: 'micDeviceId',
+  audiooutput: 'speakerDeviceId',
+}
+
 export default {
   name: 'VideoCall',
   components: {
     VideoTile,
     PreJoin,
+    DeviceSettings,
     OsButton,
     OsIcon,
     Chat,
@@ -374,6 +432,17 @@ export default {
       // videos back, so we stop deciding for them until the next call.
       audioOnly: false,
       audioOnlyDismissed: false,
+      showDeviceSettings: false,
+      // What the browser lists, to put a name to the devices in use.
+      knownDevices: [],
+      // Devices on their way, per kind — a camera can take seconds to start,
+      // and its button, the own tile and the device settings say so
+      // meanwhile. Counted, as the user may pick again before the first
+      // switch is through.
+      devicesStarting: { videoinput: 0, audioinput: 0, audiooutput: 0 },
+      // What the level meter in the device settings listens to: the very
+      // microphone track the others hear.
+      micMeterStream: null,
     }
   },
   computed: {
@@ -420,6 +489,36 @@ export default {
       return this.screenShareEnabled
         ? this.$t('videoCall.stopScreenShare')
         : this.$t('videoCall.startScreenShare')
+    },
+    deviceSettingsLabel() {
+      return this.$t('videoCall.deviceSettings.button')
+    },
+    deviceNames() {
+      // Without a known device the browser uses its default, which it lists
+      // first — the same reading the device settings show as selected.
+      const name = (kind, deviceId) => {
+        const ofKind = this.knownDevices.filter((d) => d.kind === kind)
+        const device = ofKind.find((d) => d.deviceId === deviceId) || ofKind[0]
+        return (device && device.label) || ''
+      }
+      return {
+        camera: name('videoinput', this.cameraDeviceId),
+        mic: name('audioinput', this.micDeviceId),
+        speaker: name('audiooutput', this.speakerDeviceId),
+      }
+    },
+    deviceSettingsTooltip() {
+      // The open panel sits right where the tooltip would, and says it all.
+      if (this.showDeviceSettings) return ''
+      const names = this.deviceNames
+      const details = [
+        ['camera', 'videoCall.prejoin.camera'],
+        ['mic', 'videoCall.prejoin.microphone'],
+        ['speaker', 'videoCall.prejoin.speaker'],
+      ]
+        .filter(([device]) => names[device])
+        .map(([device, key]) => `${this.$t(key)}: ${names[device]}`)
+      return this.deviceTooltip(this.deviceSettingsLabel, details)
     },
     chatLabel() {
       return this.chatOpenForThisGroup
@@ -613,6 +712,9 @@ export default {
       // Keep the minimized/maximized state in sync with the URL when the user
       // navigates via links, browser back/forward, or our own routing helpers.
       if (!this.show) return
+      // leave() navigates away from the call URL before it hangs up. That is
+      // no reason to park the window for the moment the hanging up takes.
+      if (this.leaving) return
       const onCall = to.name === 'call-id-slug'
       // A failed connect holds no session worth preserving — minimizing only
       // exists so a *live* room survives navigation. Parking an error card in
@@ -642,10 +744,13 @@ export default {
     this.speakerSeenAt = new Map()
     this.speakerHoldTimer = null
     this.micRestart = null
+    this.micSilenceProbe = null
     this.stageObserver = null
     this.observedStage = null
     this.qualityTimer = null
     this.qualityClass = null
+    this.leaving = false
+    this.deviceSwitches = this.newDeviceSwitches()
   },
   mounted() {
     this.observeStage()
@@ -659,6 +764,7 @@ export default {
   },
   beforeDestroy() {
     this.disconnectStageObserver()
+    this.closeDeviceSettings()
     this.cleanup()
   },
   methods: {
@@ -761,6 +867,33 @@ export default {
       if (width && width < LARGE_AVATAR_MIN_CELL_WIDTH) return 'small'
       return 'large'
     },
+    deviceTooltip(label, details) {
+      // Names the device(s) behind a button on hover — below the button's own
+      // label where that is not spelled out next to the icon already.
+      const lines = [this.iconOnlyTooltip(label), ...details].filter(Boolean)
+      if (!lines.length) return ''
+      // Plain text: a device name comes from outside and must not be read as
+      // markup, which is what v-tooltip does with its content by default.
+      return { content: lines.join('\n'), html: false, classes: 'tooltip--multiline' }
+    },
+    async refreshKnownDevices() {
+      if (
+        typeof navigator === 'undefined' ||
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.enumerateDevices
+      ) {
+        return
+      }
+      const room = this.room
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices()
+        // The call may have ended while the browser was listing.
+        if (this.room !== room) return
+        this.knownDevices = devices.map(({ kind, deviceId, label }) => ({ kind, deviceId, label }))
+      } catch (_e) {
+        /* the buttons simply go without device names */
+      }
+    },
     iconOnlyTooltip(label) {
       // v-tooltip renders nothing for an empty string — exactly what we want
       // once the button spells its label out next to the icon.
@@ -830,6 +963,7 @@ export default {
       // A restart still running belongs to the previous attempt's room — retryConnect()
       // tears that down without cleanup(), so let go of it here for every way in.
       this.micRestart = null
+      this.micSilenceProbe = null
       this.resetAudioOnly()
       try {
         if (!this.groupId) throw new Error('Missing group id')
@@ -844,6 +978,10 @@ export default {
           dynacast: true,
           videoCaptureDefaults: this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : {},
           audioCaptureDefaults: this.micDeviceId ? { deviceId: this.micDeviceId } : {},
+          // LiveKit picks the speaker anew whenever a device comes or goes.
+          // Unless it knows ours, that puts everyone back on the system
+          // default without a word.
+          ...(this.speakerDeviceId ? { audioOutput: { deviceId: this.speakerDeviceId } } : {}),
         })
         this.room = room
 
@@ -884,6 +1022,10 @@ export default {
           // between words. Highlighting is applied at once, removal waits out
           // SPEAKER_HOLD_MS.
           this.noteActiveSpeakers((speakers || []).map((p) => p.identity))
+          // The server hears us speak: whatever the check of the capture says
+          // — in Firefox it can read silence off a microphone that works —
+          // the others hear us as well.
+          if ((speakers || []).includes(room.localParticipant)) this.micHeard()
         })
         room.on(RoomEvent.LocalTrackPublished, (pub) => {
           this.screenShareEnabled = !!room.localParticipant.isScreenShareEnabled
@@ -936,6 +1078,14 @@ export default {
         // dead, this is the moment a fresh capture has a chance to work.
         room.on(RoomEvent.MediaDevicesChanged, () => {
           if (this.micProblem) this.restartMic()
+          this.refreshKnownDevices()
+        })
+        // LiveKit moved to another device — because we asked for it, or on its
+        // own once the one in use was unplugged.
+        room.on(RoomEvent.ActiveDeviceChanged, (kind, deviceId) => {
+          if (!DEVICE_FIELDS[kind] || !deviceId) return
+          this[DEVICE_FIELDS[kind]] = deviceId
+          if (kind === 'audioinput') this.refreshMicMeter()
         })
 
         // LiveKit defaults to a 15 s WebSocket + 15 s peer-connection timeout
@@ -958,6 +1108,7 @@ export default {
         this.refreshTiles()
         this.audioBlocked = !room.canPlaybackAudio
         this.phase = 'in-call'
+        this.refreshKnownDevices()
       } catch (err) {
         const message = this.$backendError(err)
         // The user navigated away while the handshake was still running, so
@@ -1117,6 +1268,200 @@ export default {
         this.$toast.error(message)
       }
     },
+    toggleDeviceSettings() {
+      if (this.showDeviceSettings) this.closeDeviceSettings()
+      else this.openDeviceSettings()
+    },
+    openDeviceSettings() {
+      this.showDeviceSettings = true
+      this.refreshMicMeter()
+      // Capture phase: a click that something else swallows still closes the
+      // panel.
+      document.addEventListener('click', this.onDocumentClick, true)
+      document.addEventListener('keydown', this.onDocumentKeydown)
+    },
+    closeDeviceSettings({ restoreFocus = false } = {}) {
+      document.removeEventListener('click', this.onDocumentClick, true)
+      document.removeEventListener('keydown', this.onDocumentKeydown)
+      this.showDeviceSettings = false
+      this.micMeterStream = null
+      if (!restoreFocus) return
+      const toggle = this.$refs.deviceSettingsToggle
+      const el = toggle && toggle.$el
+      if (el && typeof el.focus === 'function') el.focus()
+    },
+    onDocumentClick(event) {
+      const el = this.$refs.deviceSettingsEl
+      if (el && el.contains(event.target)) return
+      this.closeDeviceSettings()
+    },
+    onDocumentKeydown(event) {
+      if (event.key === 'Escape') this.closeDeviceSettings({ restoreFocus: true })
+    },
+    localMicTrack() {
+      const room = this.room
+      const Track = this.Track
+      if (!room || !Track) return null
+      const pub = room.localParticipant.getTrackPublication(Track.Source.Microphone)
+      return (pub && pub.track) || null
+    },
+    refreshMicMeter() {
+      if (!this.showDeviceSettings) return
+      const track = this.localMicTrack()
+      const mediaTrack = track && track.mediaStreamTrack
+      // A muted microphone has no level worth showing.
+      this.micMeterStream =
+        this.micEnabled && mediaTrack && typeof MediaStream !== 'undefined'
+          ? new MediaStream([mediaTrack])
+          : null
+    },
+    async switchDevice({ kind, deviceId, label }) {
+      const room = this.room
+      const field = DEVICE_FIELDS[kind]
+      if (!room || !field || !deviceId || this[field] === deviceId) return
+      // The user may pick again before this switch is through. Per kind, only
+      // the latest pick owns the selection; and what to go back to after a
+      // refusal is the device that ran before any switch still on its way —
+      // not the selection as it is right now, which may be an earlier pick
+      // that has yet to prove itself.
+      const switching = this.deviceSwitches[kind]
+      const ticket = ++switching.latest
+      if (switching.inFlight === 0) switching.settled = this[field]
+      switching.inFlight++
+      // Shown as selected at once; taken back below if the device refuses.
+      this[field] = deviceId
+      // A capture that is switched off right now is noted by LiveKit and used
+      // the next time it is turned on.
+      this.deviceStarts(kind)
+      // One switch of a kind at a time, in the order they were asked for.
+      // Handed to LiveKit side by side, an earlier one can finish after a later
+      // one and leave its device behind — or be answered "not switched" for no
+      // other reason than the later one having changed the target meanwhile.
+      const turn = switching.queue
+      let done
+      switching.queue = new Promise((resolve) => {
+        done = resolve
+      })
+      try {
+        await turn
+        // The call ended, or a newer pick came in, while this one was waiting
+        // its turn: there is nothing left for it to start.
+        if (this.room !== room || ticket !== switching.latest) return
+        // false: the capture was restarted, but not on the device asked for.
+        if ((await room.switchActiveDevice(kind, deviceId)) === false) {
+          throw new Error('Device not switched')
+        }
+      } catch (err) {
+        if (this.room !== room) return
+        this.showSwitchErrorToast(kind, err)
+        // Overtaken by a newer pick: the selection and LiveKit are that one's
+        // business now. Taking them back here would undo it.
+        if (ticket !== switching.latest) return
+        const settled = switching.settled
+        this[field] = settled
+        // LiveKit stops the running capture before it opens the new one, so a
+        // refused switch leaves none — go back to the one that worked.
+        if (settled) {
+          try {
+            await room.switchActiveDevice(kind, settled)
+          } catch (_e) {
+            /* the toast above already says the device is in trouble */
+          }
+        }
+        return
+      } finally {
+        switching.inFlight--
+        this.deviceStarted(kind)
+        done()
+      }
+      if (this.room !== room) return
+      switching.settled = deviceId
+      saveDevicePreference(kind, { deviceId, label })
+      if (kind === 'videoinput') this.refreshTiles()
+      if (kind === 'audioinput') {
+        this.refreshMicMeter()
+        await this.recheckMicProblem(room)
+      }
+    },
+    newDeviceSwitches() {
+      const none = () => ({ latest: 0, inFlight: 0, settled: null, queue: Promise.resolve() })
+      return { videoinput: none(), audioinput: none(), audiooutput: none() }
+    },
+    deviceStarts(kind) {
+      this.devicesStarting[kind]++
+    },
+    deviceStarted(kind) {
+      // Not below zero: the call may have ended, and been cleaned up, while
+      // the device was still on its way.
+      this.devicesStarting[kind] = Math.max(0, this.devicesStarting[kind] - 1)
+    },
+    isOwnCameraTile(tile) {
+      return tile.isLocal && !tile.isScreen
+    },
+    showSwitchErrorToast(kind, err) {
+      if (kind !== 'audiooutput') {
+        this.showDeviceErrorToast(kind === 'videoinput' ? 'camera' : 'mic', err)
+        return
+      }
+      if (this.$toast && typeof this.$toast.error === 'function') {
+        this.$toast.error(this.$t('videoCall.deviceSettings.speakerError'))
+      }
+    },
+    async recheckMicProblem(room) {
+      // LiveKit reports a new microphone that is silent, but not one that
+      // works — without this the warning about the old one would stay. A check
+      // still running on the old one starts over, too: its patience was spent
+      // on a capture that is gone.
+      if (!this.micEnabled) return
+      const track = this.localMicTrack()
+      if (!track || !(this.micProblem || this.isProbingMicSilence(track))) return
+      const silent = await this.micStaysSilent(track)
+      if (this.room === room) this.micProblem = this.micEnabled && silent
+    },
+    isProbingMicSilence(track) {
+      return !!this.micSilenceProbe && this.micSilenceProbe.track === track
+    },
+    micStaysSilent(track) {
+      // One check per track at a time. Whoever asks while it runs just changed
+      // the capture (a restart, another device) or wants the same answer: the
+      // check starts counting anew and they all get its outcome.
+      const running = this.micSilenceProbe
+      if (running && running.track === track) {
+        running.left = MIC_SILENCE_RECHECKS
+        running.heard = false
+        return running.promise
+      }
+      const probe = { track, left: MIC_SILENCE_RECHECKS, heard: false }
+      // Known as running before its first check, which may report at once.
+      this.micSilenceProbe = probe
+      probe.promise = this.probeMicSilence(probe).finally(() => {
+        if (this.micSilenceProbe === probe) this.micSilenceProbe = null
+      })
+      return probe.promise
+    },
+    async probeMicSilence(probe) {
+      try {
+        while (await probe.track.checkForSilence()) {
+          if (probe.heard) return false
+          if (probe.left-- <= 0) return true
+          await this.micSilencePause()
+          // Muted, unpublished or the call over: no silence left to report.
+          if (!this.micEnabled || this.localMicTrack() !== probe.track) return false
+        }
+      } catch (_e) {
+        /* the capture could not be read: no silence to be told of */
+      }
+      return false
+    },
+    micHeard() {
+      // Also settles a check still running, which would otherwise bring the
+      // warning right back.
+      if (this.micSilenceProbe) this.micSilenceProbe.heard = true
+      this.micProblem = false
+    },
+    micSilencePause() {
+      return new Promise((resolve) => setTimeout(resolve, MIC_SILENCE_RECHECK_MS))
+    },
     prefetchJoin() {
       const groupId = this.groupId
       if (!groupId) return
@@ -1233,8 +1578,14 @@ export default {
       // lacks the system's microphone permission, or a device held by another
       // app. Listening on the track rather than the room keeps a silent
       // screen-share audio track from raising a microphone warning.
-      track.on(TrackEvent.AudioSilenceDetected, () => {
-        if (this.micEnabled) this.micProblem = true
+      //
+      // That check comes 200 ms after the capture started, too early to tell a
+      // dead microphone from one that is still starting up — so it only makes
+      // us look closer. While we do, the event is our own checks reporting.
+      track.on(TrackEvent.AudioSilenceDetected, async () => {
+        if (!this.micEnabled || this.isProbingMicSilence(track)) return
+        const silent = await this.micStaysSilent(track)
+        if (silent && this.micEnabled && this.localMicTrack() === track) this.micProblem = true
       })
     },
     async enableAudio() {
@@ -1275,11 +1626,13 @@ export default {
         await track.restartTrack()
         // The new capture can be just as silent as the old one — only drop the
         // warning once it is shown to deliver a signal.
-        const silent = await track.checkForSilence()
+        const silent = await this.micStaysSilent(track)
         // The call may have ended (or been retried) while we waited; its
         // outcome must not leak into the next one.
         if (this.room !== room) return
         this.micProblem = this.micEnabled && silent
+        // The restart swapped the MediaStreamTrack under the publication.
+        this.refreshMicMeter()
       } catch (err) {
         if (this.room === room) this.showDeviceErrorToast('mic', err)
       }
@@ -1287,30 +1640,41 @@ export default {
     async toggleMic() {
       if (!this.room) return
       const next = !this.micEnabled
+      if (next) this.deviceStarts('audioinput')
       try {
         await this.room.localParticipant.setMicrophoneEnabled(next)
         this.micEnabled = next
         // A muted microphone is silent on purpose.
         if (!next) this.micProblem = false
+        this.refreshMicMeter()
+        // The browser names its devices only once one was granted — which may
+        // be just now.
+        if (next) this.refreshKnownDevices()
       } catch (err) {
         // Re-sync from LiveKit — a partial failure (track published, then
         // permission revoked) can leave the real state out of sync with what
         // we'd otherwise leave in `this.micEnabled`.
         this.micEnabled = !!this.room.localParticipant.isMicrophoneEnabled
         this.showDeviceErrorToast('mic', err)
+      } finally {
+        if (next) this.deviceStarted('audioinput')
       }
     },
     async toggleCamera() {
       if (!this.room) return
       const next = !this.cameraEnabled
+      if (next) this.deviceStarts('videoinput')
       try {
         await this.room.localParticipant.setCameraEnabled(next)
         this.cameraEnabled = next
         this.refreshTiles()
+        if (next) this.refreshKnownDevices()
       } catch (err) {
         this.cameraEnabled = !!this.room.localParticipant.isCameraEnabled
         this.refreshTiles()
         this.showDeviceErrorToast('camera', err)
+      } finally {
+        if (next) this.deviceStarted('videoinput')
       }
     },
     async toggleScreenShare() {
@@ -1355,21 +1719,26 @@ export default {
       // Capture before close() clears the store.
       const groupId = this.groupId
       const groupSlug = this.groupSlug
-      // Navigate away from the call URL *before* clearing the store, otherwise
-      // the call page's watcher sees showVideoCall flip to false while it's
-      // still mounted and re-opens the prejoin popover for the same group.
-      if (this.$route.name === 'call-id-slug' && groupId && groupSlug) {
-        try {
-          await this.$router.replace({
-            name: 'groups-id-slug',
-            params: { id: groupId, slug: groupSlug },
-          })
-        } catch (_e) {
-          /* ignore navigation duplicates / aborts */
+      this.leaving = true
+      try {
+        // Navigate away from the call URL *before* clearing the store, otherwise
+        // the call page's watcher sees showVideoCall flip to false while it's
+        // still mounted and re-opens the prejoin popover for the same group.
+        if (this.$route.name === 'call-id-slug' && groupId && groupSlug) {
+          try {
+            await this.$router.replace({
+              name: 'groups-id-slug',
+              params: { id: groupId, slug: groupSlug },
+            })
+          } catch (_e) {
+            /* ignore navigation duplicates / aborts */
+          }
         }
+        await this.cleanup()
+        this.close()
+      } finally {
+        this.leaving = false
       }
-      await this.cleanup()
-      this.close()
     },
     async cleanup() {
       if (this.room) {
@@ -1421,6 +1790,10 @@ export default {
         this.speakerHoldTimer = null
       }
       this.speakerSeenAt.clear()
+      this.closeDeviceSettings()
+      this.knownDevices = []
+      this.devicesStarting = { videoinput: 0, audioinput: 0, audiooutput: 0 }
+      this.deviceSwitches = this.newDeviceSwitches()
       this.tiles = []
       this.activeSpeakerIds = []
       this.spotlightKey = null
@@ -1432,6 +1805,7 @@ export default {
       this.reconnecting = false
       // A restart still running belongs to the room just torn down.
       this.micRestart = null
+      this.micSilenceProbe = null
       this.resetAudioOnly()
       this.prefetched = null
       // CRITICAL: do NOT set phase = 'prejoin' here. leave() runs cleanup()
@@ -1757,6 +2131,8 @@ export default {
 }
 
 .video-call__controls {
+  /*  Anchor for the device settings panel. */
+  position: relative;
   display: flex;
   gap: var(--space-x-small);
   padding: var(--space-x-small) var(--space-small);
@@ -1766,10 +2142,33 @@ export default {
   justify-content: center;
 }
 
+.video-call__device-settings {
+  display: flex;
+}
+
+.video-call__device-settings-panel {
+  position: absolute;
+  bottom: calc(100% + var(--space-x-small));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(380px, calc(100% - 2 * var(--space-x-small)));
+  /*  Whatever the page header, the call header and the control bar leave. */
+  max-height: calc(100vh - var(--header-height, 0px) - var(--footer-height, 0px) - 140px);
+  /*  Above the notices and speaker chips that overlay the stage. */
+  z-index: 10;
+}
+
 .video-call--minimized .video-call__controls {
   /*  Tighter spacing for the icon-only row in the parked window. */
   padding: var(--space-xxx-small) var(--space-x-small);
   gap: var(--space-xxx-small);
+}
+
+.video-call--minimized .video-call__device-settings-panel {
+  /*  The parked window clips its content, so the panel has to fit between */
+  /*  the window's top edge and the control bar: 280px minus the bar. */
+  bottom: calc(100% + var(--space-xxx-small));
+  max-height: 232px;
 }
 
 @media (--vp-mobile) {
