@@ -478,6 +478,22 @@ describe('poll tick', () => {
     expect(mockLogger.warn).toHaveBeenCalledWith('LiveKit poll tick failed:', 'pubsub down')
   })
 
+  it('publishes a count again on the next poll when publishing it failed', async () => {
+    mockListRooms.mockResolvedValue([{ name: 'group-a', numParticipants: 1 }])
+    mockPublish.mockRejectedValueOnce(new Error('pubsub down'))
+    startLiveKitPoller()
+    await vi.advanceTimersByTimeAsync(5_000)
+
+    // Second tick, same count: still owed, as the first publish never went out.
+    mockPublish.mockClear()
+    await vi.advanceTimersByTimeAsync(15_000)
+
+    expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+      groupId: 'a',
+      count: 1,
+    })
+  })
+
   it('logs non-Error rejections from listRooms without crashing', async () => {
     // Rejections that aren't Errors (SDK/fetch layers occasionally reject with a
     // string or a plain object) must not blow up the `err.message` read, or the

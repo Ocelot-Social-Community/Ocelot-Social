@@ -94,8 +94,10 @@ const pollOnce = async () => {
       // room.numParticipants is a number; gracefully coerce in case of bigint
       const count = Number(room.numParticipants ?? 0) || 0
       if (lastSeenCounts.get(room.name) !== count || told.has(room.name)) {
-        lastSeenCounts.set(room.name, count)
         await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count })
+        // Only once it is out: a count noted before a publish that failed would look published
+        // to the next poll, which would then keep quiet about it.
+        lastSeenCounts.set(room.name, count)
       }
       owed.delete(room.name)
     }
