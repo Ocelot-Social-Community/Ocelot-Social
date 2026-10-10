@@ -33,8 +33,16 @@ const login = (email) => {
   }
 }
 
-// The viewport, not the whole page: a README picture shows what a visitor sees first.
-const shoot = (name) => cy.screenshot(name, { capture: 'viewport', overwrite: true })
+// The viewport, not the whole page: a README picture shows what a visitor sees first. Without the
+// page's own scrollbar, which only says that there is more below.
+const shoot = (name) => {
+  cy.document().then((doc) => {
+    const style = doc.createElement('style')
+    style.textContent = '::-webkit-scrollbar { display: none } html { scrollbar-width: none }'
+    doc.head.appendChild(style)
+  })
+  cy.screenshot(name, { capture: 'viewport', overwrite: true })
+}
 
 // Fonts, images and avatars arrive after the content; a picture taken at the first paint shows
 // placeholders.
@@ -67,6 +75,13 @@ describe('README screenshots', () => {
       cy.visit(`/post/${post.id}/${post.slug}`)
     })
     cy.get('.post-page', { timeout: 60000 }).should('be.visible')
+    settle()
+    // Its title image alone fills the viewport. Scrolled to the title, with the end of the image and
+    // the author still above it, so the picture shows the text and the conversation.
+    cy.get('.post-page h1.title').then(([title]) => {
+      const win = title.ownerDocument.defaultView
+      win.scrollTo(0, title.getBoundingClientRect().top + win.scrollY - 220)
+    })
     settle()
     shoot('post')
   })
