@@ -76,7 +76,13 @@ jobs:
           target: development
           push: false
           tags: ocelot-social/maintenance:development
-          cache-from: type=gha,scope=maintenance-development
+          # Reads the scopes of the other builds of this Dockerfile too (maintenance, maintenance-production): the stages
+          # they share (base image, dependencies, branding) are then built once, not once per
+          # workflow. Writes only its own, so builds running side by side never race for a key.
+          cache-from: |
+            type=gha,scope=maintenance-development
+            type=gha,scope=maintenance
+            type=gha,scope=maintenance-production
           cache-to: type=gha,mode=max,scope=maintenance-development
 
       - name: Build production image
@@ -87,5 +93,11 @@ jobs:
           target: production
           push: false
           tags: ocelot-social/maintenance:latest
-          cache-from: type=gha,scope=maintenance-production
+          # Reads the scopes of the other builds of this Dockerfile too (maintenance, maintenance-development): the stages
+          # they share (base image, dependencies, branding) are then built once, not once per
+          # workflow. Writes only its own, so builds running side by side never race for a key.
+          cache-from: |
+            type=gha,scope=maintenance-production
+            type=gha,scope=maintenance
+            type=gha,scope=maintenance-development
           cache-to: type=gha,mode=max,scope=maintenance-production

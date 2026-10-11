@@ -206,7 +206,17 @@ jobs:
           # not just noise — `publish` waits for this workflow to succeed before it retags those
           # images into the version tags, so a cache hiccup would hold up a release. A failed export
           # only costs the next build its cache hits, which is the cheaper failure by a wide margin.
-          cache-from: type=gha,scope=${{ matrix.app.cacheScope }}
+          #
+          # Reads the scopes the test workflows build the same Dockerfile under too (backend-test,
+          # webapp-test/-e2e, maintenance-development/-production): the stages they share are then
+          # built once, not once per workflow. An empty line, for the other Dockerfiles, is ignored.
+          cache-from: |
+            type=gha,scope=${{ matrix.app.cacheScope }}
+            ${{ matrix.app.cacheScope == 'backend' && 'type=gha,scope=backend-test' || '' }}
+            ${{ matrix.app.cacheScope == 'webapp' && 'type=gha,scope=webapp-test' || '' }}
+            ${{ matrix.app.cacheScope == 'webapp' && 'type=gha,scope=webapp-e2e' || '' }}
+            ${{ matrix.app.cacheScope == 'maintenance' && 'type=gha,scope=maintenance-development' || '' }}
+            ${{ matrix.app.cacheScope == 'maintenance' && 'type=gha,scope=maintenance-production' || '' }}
           cache-to: ${{ matrix.app.cacheTo && format('type=gha,mode=max,ignore-error=true,scope={0}', matrix.app.cacheScope) || '' }}
 
       # The moving branch tag (`master`, or the branch's name), written only by the build of the

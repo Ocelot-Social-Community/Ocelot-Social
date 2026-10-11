@@ -86,7 +86,12 @@ jobs:
           target: test
           load: true
           tags: ghcr.io/ocelot-social-community/ocelot-social/backend:test
-          cache-from: type=gha,scope=backend-test
+          # Reads the scopes of the other builds of this Dockerfile too (backend): the stages
+          # they share (base image, dependencies, branding) are then built once, not once per
+          # workflow. Writes only its own, so builds running side by side never race for a key.
+          cache-from: |
+            type=gha,scope=backend-test
+            type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend-test
 
       - name: Pull third-party images
@@ -157,7 +162,13 @@ jobs:
           target: e2e
           load: true
           tags: ghcr.io/ocelot-social-community/ocelot-social/webapp:test
-          cache-from: type=gha,scope=webapp-e2e
+          # Reads the scopes of the other builds of this Dockerfile too (webapp, webapp-test): the stages
+          # they share (base image, dependencies, branding) are then built once, not once per
+          # workflow. Writes only its own, so builds running side by side never race for a key.
+          cache-from: |
+            type=gha,scope=webapp-e2e
+            type=gha,scope=webapp
+            type=gha,scope=webapp-test
           cache-to: type=gha,mode=max,scope=webapp-e2e
 
       - name: Save image for test jobs

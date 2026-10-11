@@ -109,7 +109,13 @@ jobs:
           target: test
           load: true
           tags: ghcr.io/ocelot-social-community/ocelot-social/webapp:test
-          cache-from: type=gha,scope=webapp-test
+          # Reads the scopes of the other builds of this Dockerfile too (webapp, webapp-e2e): the stages
+          # they share (base image, dependencies, branding) are then built once, not once per
+          # workflow. Writes only its own, so builds running side by side never race for a key.
+          cache-from: |
+            type=gha,scope=webapp-test
+            type=gha,scope=webapp
+            type=gha,scope=webapp-e2e
           cache-to: type=gha,mode=max,scope=webapp-test
 
       - name: Save image for test job
