@@ -112,3 +112,14 @@ defineStep('I choose the new password {string}', (password) => {
   cy.get('input#passwordConfirmation').type(password)
   cy.get('button[type="submit"]').click()
 })
+
+// The page shows the server's answer once the mutation is back — a success or an error icon. The
+// login checks that follow ask the API directly, so they have to wait for it: without, a refused
+// reset would also pass if it was merely slower than the check.
+defineStep('the new password is accepted', () => {
+  cy.get('.sa-success', { timeout: 15000 }).should('be.visible')
+})
+
+defineStep('the new password is refused', () => {
+  cy.get('.sa-error', { timeout: 15000 }).should('be.visible')
+})

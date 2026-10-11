@@ -5,7 +5,7 @@ import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 const login = (email, password) =>
   cy.request({
     method: 'POST',
-    url: 'http://localhost:4000',
+    url: Cypress.expose('GRAPHQL_URI'),
     body: {
       query: 'mutation ($email: String!, $password: String!) { login(email: $email, password: $password) }',
       variables: { email, password },

@@ -62,7 +62,8 @@ Feature: Register and recover an account
     And I request a password reset for "forgetful@example.org"
     And I enter the reset code that was sent to "forgetful@example.org"
     And I choose the new password "NewPass1234"
-    Then I can log in as "forgetful@example.org" with "NewPass1234"
+    Then the new password is accepted
+    And I can log in as "forgetful@example.org" with "NewPass1234"
     And I cannot log in as "forgetful@example.org" with "OldPass1"
 
   Scenario: A wrong reset code does not change the password
@@ -73,5 +74,6 @@ Feature: Register and recover an account
     And I request a password reset for "forgetful@example.org"
     And I enter a wrong reset code for "forgetful@example.org"
     And I choose the new password "NewPass1234"
-    Then I cannot log in as "forgetful@example.org" with "NewPass1234"
+    Then the new password is refused
+    And I cannot log in as "forgetful@example.org" with "NewPass1234"
     And I can log in as "forgetful@example.org" with "OldPass1"
