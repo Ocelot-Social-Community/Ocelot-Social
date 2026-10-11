@@ -26,6 +26,7 @@ export const profileUserQuery = (i18n) => {
         about
         createdAt
         followedByCurrentUser
+        outrankedByCurrentUser
         isMuted
         isBlocked
         blocked
@@ -108,6 +109,7 @@ export const adminUserQuery = ({ withEmail = true, withRole = true } = {}) => {
         ${withRole ? 'roleName' : ''}
         createdAt
         disabled
+        outrankedByCurrentUser
         contributionsCount
         commentedCount
         shoutedCount
@@ -117,8 +119,9 @@ export const adminUserQuery = ({ withEmail = true, withRole = true } = {}) => {
 }
 
 // Delete a user account (and optionally their posts/comments via `resource`). Gated
-// server-side by `or(isDeletingOwnAccount, user.delete.any)`; the admin/moderation
-// user list uses it for other accounts, passing an empty `resource` (account only).
+// server-side by `or(isDeletingOwnAccount, user.delete.any + act-on hierarchy)`; the
+// admin/moderation user list uses it for other accounts, passing an empty `resource`
+// (account only).
 export const deleteUserMutation = () => {
   return gql`
     mutation ($id: ID!, $resource: [Deletable]) {

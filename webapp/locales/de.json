@@ -541,6 +541,7 @@
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "Die Rolle „{name}“ gibt es bereits.",
     "ROLE_SAVE_NAME_INVALID": "Der Rollenname muss 2 bis 50 Zeichen lang sein und darf nur Buchstaben, Ziffern, „_“ und „-“ enthalten; das erste Zeichen muss ein Buchstabe oder eine Ziffer sein.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "Eine Rolle kann nicht als geschützt angelegt oder markiert werden.",
+    "USER_ACTION_TARGET_NOT_OUTRANKED": "Das kannst du nur bei Nutzern tun, deren Rolle weniger Befugnisse gewährt als deine.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Du darfst die Nutzerverwaltung nicht durchsuchen.",
     "USER_DOES_NOT_EXIST": "Der Nutzer wurde nicht gefunden.",
     "USER_PROFILE_NAME_TOO_SHORT": "Der Name muss mindestens {min} Zeichen lang sein.",

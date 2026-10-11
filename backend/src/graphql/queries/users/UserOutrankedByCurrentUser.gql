@@ -1,0 +1,6 @@
+query UserOutrankedByCurrentUser($id: ID!) {
+  User(id: $id) {
+    id
+    outrankedByCurrentUser
+  }
+}

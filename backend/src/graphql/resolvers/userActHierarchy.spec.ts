@@ -3,11 +3,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
-// Act-on hierarchy (role/dominance.ts): a destructive per-user action is allowed only
-// when the actor's effective permissions are a STRICT SUPERSET of the target's. These
-// integration tests assert the shield enforces it for disableUser, DeleteUser, and the
-// report `review` (which can disable a reported User) — closing the privilege-escalation
-// hole where a holder could act on a peer or a higher-privileged user.
+// Act-on hierarchy (role/authority.ts): a destructive per-user action is allowed only
+// when the actor's role grants STRICTLY MORE AUTHORITY than the target's — participation
+// rights (posting, commenting, inviting, …) do not count. These integration tests assert the
+// shield enforces it for disableUser, DeleteUser, and the report `review` (which can disable a
+// reported User) — closing the privilege-escalation hole where a holder could act on a peer or
+// a higher-privileged user — and that User.outrankedByCurrentUser answers the same way.
 
 import { describe, beforeAll, afterAll, beforeEach, afterEach, it, expect } from 'vitest'
 
@@ -15,26 +16,60 @@ import Factory, { cleanDatabase } from '@db/factories'
 import review from '@graphql/queries/moderation/review.gql'
 import DELETE_USER from '@graphql/queries/users/DeleteUser.gql'
 import DISABLE_USER from '@graphql/queries/users/disableUser.gql'
+import OUTRANKED from '@graphql/queries/users/UserOutrankedByCurrentUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { DEFAULT_ROLES } from '@src/role'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { RoleDefinition } from '@src/role'
 
 let authenticatedUser: Context['user']
+let query: ApolloTestSetup['query']
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
-const contextFn = () => ({ authenticatedUser })
+// A role made for administration only, as networks build them: it may delete and disable
+// accounts, but not post. Under the old full-set comparison it outranked nobody — not even
+// a plain user, who holds post.create — while the webapp still offered both actions.
+const OFFICE: RoleDefinition = {
+  name: 'office',
+  protected: false,
+  permissions: ['user.delete.any', 'user.disable'],
+}
+
+const contextFn = () => ({ authenticatedUser, roles: [...DEFAULT_ROLES, OFFICE] })
+
+// The refusal a holder of the right gets; somebody without the right still gets the generic
+// 'Not Authorized!' and learns nothing about the target's role.
+const NOT_OUTRANKED = 'You can only do this to users whose role grants less authority than yours.'
 
 const buildUser = (id: string, role: string) =>
   Factory.build('user', { id, name: id, role }, { email: `${id}@example.org`, password: '1234' })
+
+// Custom roles are not seeded: build the user without one and link a real Role node, so the
+// role resolves through an actual HAS_ROLE edge exactly like in production.
+const buildOfficeUser = async (id: string) => {
+  await Factory.build(
+    'user',
+    { id, name: id, role: null },
+    { email: `${id}@example.org`, password: '1234' },
+  )
+  await database.write({
+    query: `MATCH (u:User {id: $id})
+            MERGE (r:Role {id: 'office', name: 'office'})
+            MERGE (u)-[:HAS_ROLE]->(r)`,
+    variables: { id },
+  })
+}
 
 describe('act-on hierarchy', () => {
   beforeAll(async () => {
     await cleanDatabase()
     authenticatedUser = null
     const apolloSetup = await createApolloTestSetup({ context: contextFn })
+    query = apolloSetup.query
     mutate = apolloSetup.mutate
     database = apolloSetup.database
     server = apolloSetup.server
@@ -57,6 +92,8 @@ describe('act-on hierarchy', () => {
       buildUser('other-moderator', 'moderator'),
       buildUser('plain-user', 'user'),
     ])
+    await buildOfficeUser('the-office')
+    await buildOfficeUser('other-office')
   })
 
   afterEach(async () => {
@@ -97,7 +134,7 @@ describe('act-on hierarchy', () => {
 
       await expect(
         mutate({ mutation: DISABLE_USER, variables: { id: 'other-moderator', disable: true } }),
-      ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
+      ).resolves.toMatchObject({ errors: [{ message: NOT_OUTRANKED }] })
     })
 
     it('forbids a moderator disabling an admin (target holds more)', async () => {
@@ -105,7 +142,7 @@ describe('act-on hierarchy', () => {
 
       await expect(
         mutate({ mutation: DISABLE_USER, variables: { id: 'the-admin', disable: true } }),
-      ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
+      ).resolves.toMatchObject({ errors: [{ message: NOT_OUTRANKED }] })
     })
 
     it('lets an admin disable a moderator (admin ⊋ moderator)', async () => {
@@ -159,7 +196,7 @@ describe('act-on hierarchy', () => {
 
       await expect(
         mutate({ mutation: DELETE_USER, variables: { id: 'other-admin', resource: [] } }),
-      ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
+      ).resolves.toMatchObject({ errors: [{ message: NOT_OUTRANKED }] })
     })
 
     it('lets an owner delete an admin (owner = full catalog ⊋ admin)', async () => {
@@ -217,6 +254,18 @@ describe('act-on hierarchy', () => {
           mutation: review,
           variables: { resourceId: 'the-admin', disable: true, closed: false },
         }),
+      ).resolves.toMatchObject({ errors: [{ message: NOT_OUTRANKED }] })
+    })
+
+    it('tells a non-moderator nothing about the target (generic refusal)', async () => {
+      await reportAgainst('the-admin')
+      await as('the-office')
+
+      await expect(
+        mutate({
+          mutation: review,
+          variables: { resourceId: 'the-admin', disable: true, closed: false },
+        }),
       ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
     })
 
@@ -233,6 +282,100 @@ describe('act-on hierarchy', () => {
         data: { review: { resource: { __typename: 'User', id: 'plain-user', disabled: true } } },
         errors: undefined,
       })
+    })
+  })
+
+  describe('an administration-only role (authority, not participation, decides)', () => {
+    it('lets it delete a plain user, although the user may post and it may not', async () => {
+      await as('the-office')
+
+      await expect(
+        mutate({ mutation: DELETE_USER, variables: { id: 'plain-user', resource: [] } }),
+      ).resolves.toMatchObject({
+        data: { DeleteUser: { id: 'plain-user', deleted: true } },
+        errors: undefined,
+      })
+    })
+
+    it('lets it disable a plain user', async () => {
+      await as('the-office')
+
+      await expect(
+        mutate({ mutation: DISABLE_USER, variables: { id: 'plain-user', disable: true } }),
+      ).resolves.toMatchObject({
+        data: { disableUser: { id: 'plain-user', disabled: true } },
+        errors: undefined,
+      })
+    })
+
+    it('forbids it deleting a moderator (holds content.moderate, which it lacks)', async () => {
+      await as('the-office')
+
+      await expect(
+        mutate({ mutation: DELETE_USER, variables: { id: 'the-moderator', resource: [] } }),
+      ).resolves.toMatchObject({ errors: [{ message: NOT_OUTRANKED }] })
+    })
+
+    it('forbids it deleting a peer of the same role', async () => {
+      await as('the-office')
+
+      await expect(
+        mutate({ mutation: DELETE_USER, variables: { id: 'other-office', resource: [] } }),
+      ).resolves.toMatchObject({ errors: [{ message: NOT_OUTRANKED }] })
+    })
+
+    it('lets an admin delete it (admin holds all of its authority and more)', async () => {
+      await as('the-admin')
+
+      await expect(
+        mutate({ mutation: DELETE_USER, variables: { id: 'the-office', resource: [] } }),
+      ).resolves.toMatchObject({
+        data: { DeleteUser: { id: 'the-office', deleted: true } },
+        errors: undefined,
+      })
+    })
+  })
+
+  describe('owner over admin', () => {
+    // The default admin role holds every authority right in the catalog; only the owner rule
+    // in dominatesInNetwork keeps the owner above it once participation stops counting.
+    it('lets an owner disable an admin', async () => {
+      await as('the-owner')
+
+      await expect(
+        mutate({ mutation: DISABLE_USER, variables: { id: 'the-admin', disable: true } }),
+      ).resolves.toMatchObject({
+        data: { disableUser: { id: 'the-admin', disabled: true } },
+        errors: undefined,
+      })
+    })
+  })
+
+  describe('User.outrankedByCurrentUser (what the webapp offers)', () => {
+    const outranks = async (viewer: string, target: string) => {
+      await as(viewer)
+      const { data, errors } = await query({ query: OUTRANKED, variables: { id: target } })
+
+      expect(errors).toBeUndefined()
+
+      return data.User[0].outrankedByCurrentUser as boolean
+    }
+
+    it('answers exactly as the shield decides', async () => {
+      await expect(outranks('the-office', 'plain-user')).resolves.toBe(true)
+      await expect(outranks('the-office', 'the-moderator')).resolves.toBe(false)
+      await expect(outranks('the-office', 'other-office')).resolves.toBe(false)
+      await expect(outranks('the-admin', 'the-office')).resolves.toBe(true)
+      await expect(outranks('the-owner', 'the-admin')).resolves.toBe(true)
+      await expect(outranks('the-moderator', 'the-admin')).resolves.toBe(false)
+    })
+
+    it('is false for oneself', async () => {
+      await expect(outranks('the-owner', 'the-owner')).resolves.toBe(false)
+    })
+
+    it('is false for a viewer without any authority', async () => {
+      await expect(outranks('plain-user', 'the-office')).resolves.toBe(false)
     })
   })
 })

@@ -21,9 +21,11 @@
 // order, not the total list index.
 //
 // Generic in the key type so the identical rule serves both layers: network permissions
-// for who may disable/delete whom, and GROUP permissions for who may remove or re-role
-// whom inside a group (see groupRole/authority.ts). The rule is set math — duplicating it
-// per key type would be two places for one invariant.
+// for who may disable/delete whom (see role/authority.ts), and GROUP permissions for who may
+// remove or re-role whom inside a group (see groupRole/authority.ts). Both layers compare
+// AUTHORITY only — they take participation rights out of the sets before asking — so the
+// bullets above hold for what remains. The rule is set math — duplicating it per key type
+// would be two places for one invariant.
 export function dominates<Key>(actor: ReadonlySet<Key>, target: ReadonlySet<Key>): boolean {
   // Strict: must have strictly more. Combined with target ⊆ actor below, a larger
   // size guarantees a proper superset (equal sets share the same size → blocked).
