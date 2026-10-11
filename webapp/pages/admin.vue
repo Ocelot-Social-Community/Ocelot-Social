@@ -18,7 +18,7 @@
       />
       <div class="admin-layout__main">
         <transition name="slide-up" appear>
-          <nuxt-child />
+          <nuxt-child v-if="currentRouteAccessible" />
         </transition>
       </div>
     </div>
