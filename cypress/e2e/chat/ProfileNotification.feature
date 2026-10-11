@@ -9,7 +9,7 @@ Feature: Chat notification badge on profile pages
       | alice   | alice@example.org  | 1234     | alice  | Alice | 0.0.4                           |
       | bob     | bob@example.org    | 4321     | bob    | Bob   | 0.0.4                           |
     And the following "groups" are in the database:
-      | id         | name       | slug       | ownerId | groupType | description                                                                                                   |
+      | id         | name       | slug       | ownerId | template  | description                                                                                                   |
       | test-group | Test Group | test-group | alice   | public    | This is a test group for e2e testing of the group chat feature. It needs to be long enough to pass validation. |
 
   Scenario: Receive chat notification live on a user profile

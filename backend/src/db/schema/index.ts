@@ -6,6 +6,8 @@ import { Donations } from './entities/Donations'
 import { EmailAddress } from './entities/EmailAddress'
 import { File } from './entities/File'
 import { Group } from './entities/Group'
+import { GroupRole } from './entities/GroupRole'
+import { GroupRoleTemplate } from './entities/GroupRoleTemplate'
 import { Image } from './entities/Image'
 import { InviteCode } from './entities/InviteCode'
 import { Location } from './entities/Location'
@@ -58,6 +60,8 @@ export const entities: readonly EntityDefinition[] = [
   EmailAddress,
   File,
   Group,
+  GroupRole,
+  GroupRoleTemplate,
   Image,
   InviteCode,
   Location,

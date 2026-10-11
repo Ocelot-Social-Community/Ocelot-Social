@@ -13,6 +13,8 @@ type Report {
   "All moderator reviews of the report."
   reviewed: [REVIEWED]!
   resource: ReportedResource!
+  "Whether the reported content was blanked because it lives in a group the viewer may not read (`group.content.read.any_<type>`). Metadata and the filings are still there so the report can be escalated; reviewing it is refused."
+  resourceHidden: Boolean!
 }
 
 "The kind of node a report can target."

@@ -72,13 +72,11 @@ const definitions = {
     text: 'You cannot set badges not rewarded to you.',
   },
   // groups
+  // The groups feature is switched off network-wide; nothing group-related is reachable.
+  GROUPS_FEATURE_DISABLED: { type: 'FORBIDDEN', text: 'Groups are not enabled.' },
   GROUP_SAVE_DESCRIPTION_TOO_SHORT: {
     type: 'BAD_USER_INPUT',
     text: 'Description too short (at least {min} characters).',
-  },
-  GROUP_SAVE_HIDDEN_TYPE_NOT_PERMITTED: {
-    type: 'FORBIDDEN',
-    text: 'You are not allowed to make this group secret.',
   },
   // A query selected a computed Group field (myRole, postsCount, …) without the group's id.
   GROUP_FIELD_GROUP_ID_MISSING: {
@@ -100,6 +98,81 @@ const definitions = {
   GROUP_MEMBERSHIP_USER_NOT_A_MEMBER: {
     type: 'BAD_USER_INPUT',
     text: 'User is not a member of this group.',
+  },
+  GROUP_MEMBERSHIP_USER_OR_GROUP_NOT_FOUND: {
+    type: 'BAD_USER_INPUT',
+    text: 'Could not find user or group!',
+  },
+  GROUP_RIGHTS_GROUP_NOT_FOUND: { type: 'BAD_USER_INPUT', text: 'Group not found!' },
+  // Making a group more private is the same act as creating it that private: the network right
+  // group.create_<visibility> caps both ways there — the visibility switch and the rights editor.
+  GROUP_VISIBILITY_RAISE_NOT_PERMITTED: {
+    type: 'FORBIDDEN',
+    text: 'You cannot make this group more private than you may create one!',
+  },
+  GROUP_SAVE_MEMBER_LIST_UNAVAILABLE: {
+    type: 'BAD_USER_INPUT',
+    text: 'A group outsiders cannot find has no member list to open.',
+  },
+  GROUP_POST_REMOVE_POST_NOT_IN_GROUP: {
+    type: 'BAD_USER_INPUT',
+    text: 'That post is not in this group!',
+  },
+  // group roles & templates
+  GROUP_ROLE_NAME_UNKNOWN: { type: 'BAD_USER_INPUT', text: 'Unknown group role!' },
+  GROUP_ROLE_NAME_INVALID: { type: 'BAD_USER_INPUT', text: 'Invalid role name!' },
+  GROUP_ROLE_NAME_RESERVED: {
+    type: 'BAD_USER_INPUT',
+    text: 'That name belongs to a system role!',
+  },
+  GROUP_ROLE_NAME_ALREADY_TAKEN: {
+    type: 'BAD_USER_INPUT',
+    text: 'A role with that name already exists in this group!',
+  },
+  GROUP_ROLE_LABEL_INVALID: { type: 'BAD_USER_INPUT', text: 'Invalid role label!' },
+  GROUP_ROLE_PERMISSIONS_NOT_HELD: {
+    type: 'BAD_USER_INPUT',
+    text: 'You cannot grant rights you do not hold yourself: {permissions}',
+  },
+  GROUP_ROLE_OWNER_NOT_EDITABLE: {
+    type: 'BAD_USER_INPUT',
+    text: 'The owner role holds every right and cannot be edited!',
+  },
+  GROUP_ROLE_SYSTEM_NOT_RENAMEABLE: {
+    type: 'BAD_USER_INPUT',
+    text: 'A system role keeps its name; set its label instead!',
+  },
+  GROUP_ROLE_SYSTEM_NOT_DELETABLE: {
+    type: 'BAD_USER_INPUT',
+    text: 'A system role cannot be deleted!',
+  },
+  GROUP_ROLE_REASSIGN_TARGET_INVALID: {
+    type: 'BAD_USER_INPUT',
+    text: 'Members must be moved to a different role!',
+  },
+  // Parked in the shield (#10356); the resolver behind it stays whole.
+  GROUP_ROLE_CREATE_NOT_AVAILABLE: {
+    type: 'BAD_USER_INPUT',
+    text: 'Groups cannot define their own roles yet!',
+  },
+  GROUP_TEMPLATE_NAME_UNKNOWN: {
+    type: 'BAD_USER_INPUT',
+    text: "No group role template named '{template}'",
+  },
+  GROUP_TEMPLATE_ROLE_UNKNOWN: { type: 'BAD_USER_INPUT', text: 'Unknown group role template!' },
+  GROUP_TEMPLATE_PERMISSIONS_VISIBILITY_MISMATCH: {
+    type: 'BAD_USER_INPUT',
+    text: 'These rights would make this template a different visibility than it is named!',
+  },
+  // acting with network rights inside a group
+  GROUP_ELEVATION_REASON_MISSING: { type: 'BAD_USER_INPUT', text: 'A reason is required!' },
+  GROUP_ELEVATION_REASON_INVALID: {
+    type: 'BAD_USER_INPUT',
+    text: 'The reason may be at most {max} characters and must not begin or end with a space.',
+  },
+  GROUP_ELEVATION_RIGHTS_MISSING: {
+    type: 'BAD_USER_INPUT',
+    text: 'You hold nothing here beyond reading!',
   },
   // posts, comments & events
   POST_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'Could not find post.' },
@@ -183,6 +256,18 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'The locationName is invalid.',
   },
+  LOCATION_ID_INVALID: {
+    type: 'BAD_USER_INPUT',
+    text: 'The locationId is invalid.',
+  },
+  LOCATION_ID_COORDINATES_MISSING: {
+    type: 'BAD_USER_INPUT',
+    text: 'A locationId needs the lat and lng it was picked with.',
+  },
+  LOCATION_ID_NOT_CONFIRMED: {
+    type: 'BAD_USER_INPUT',
+    text: 'The locationId does not lie at the given coordinates.',
+  },
   // moderation
   REPORT_TARGET_IS_OWN: {
     type: 'BAD_USER_INPUT',
@@ -260,10 +345,6 @@ const definitions = {
     text: 'You have reached the maximum of invite codes you can generate.',
   },
   // chat & video calls
-  CHAT_GROUP_ROOM_FEATURE_DISABLED: {
-    type: 'FORBIDDEN',
-    text: 'Group chats are not enabled.',
-  },
   CHAT_GROUP_ROOM_NOT_CREATED: {
     type: 'FORBIDDEN',
     text: 'Could not create group room. User may not be a member of the group.',
@@ -284,7 +365,6 @@ const definitions = {
     type: 'FORBIDDEN',
     text: 'You may not start a video call in this group.',
   },
-  VIDEO_CALL_FEATURE_DISABLED: { type: 'FORBIDDEN', text: 'Video calls are disabled.' },
 } as const satisfies Record<string, ErrorDefinition>
 
 export type ErrorName = keyof typeof definitions

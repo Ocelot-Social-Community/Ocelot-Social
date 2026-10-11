@@ -7,6 +7,10 @@
 import { withFilter } from 'graphql-subscriptions'
 
 import { NOTIFICATION_ADDED } from '@constants/subscriptions'
+import {
+  memberHoldsInGroup,
+  nonMemberReadsContent,
+} from '@graphql/resolvers/helpers/groupAccessCypher'
 
 const NOTIFICATION_PROJECTION = `
   WITH user, notification, resource
@@ -101,19 +105,26 @@ export default {
           // Never hand out a notification about something the recipient may not open. A
           // notification is not a pointer, it is CONTENT: it carries the title, the author and
           // the group of its resource. Listing one for an unreachable post leaks exactly what
-          // the group's visibility exists to withhold, and offers a dead link on top.
+          // the group's rights exist to withhold, and offers a dead link on top.
           //
-          // The condition is the one every post query applies (helpers/postFilter.ts,
-          // \`invisibleTo\`), reached through the parent post when the resource is a comment —
-          // CANNOT_SEE points at posts, and a comment is as unreachable as the post carrying it.
+          // The condition is the group's read right (group.content.read, as a non-member or
+          // through the recipient's role), asked of the group the post is in — reached through
+          // the parent post when the resource is a comment, which is as unreachable as the post
+          // carrying it. Asked HERE, at reading time, because rights change: a notification that
+          // was fine when it was written is not, once the recipient's role can no longer read.
           //
           // Defence in depth, not the fix: notifications like these should not be WRITTEN, and
           // notificationsMiddleware no longer writes them. This is what keeps the next such bug
           // from reaching a bell, and what makes the ones already in the database harmless.
-          WHERE NOT EXISTS {
-            MATCH (user)-[:CANNOT_SEE]->(post:Post)
-            WHERE post = resource OR (resource)-[:COMMENTS]->(post)
-          }
+          OPTIONAL MATCH (resource)-[:COMMENTS]->(parentPost:Post)
+          WITH resource, notification, user, coalesce(parentPost, resource) AS readable
+          OPTIONAL MATCH (readable)-[:IN]->(readableIn:Group)
+          WITH resource, notification, user, readableIn
+          WHERE (
+            readableIn IS NULL
+            OR ${nonMemberReadsContent('readableIn')}
+            OR ${memberHoldsInGroup('readableIn', 'group.content.read', 'user.id')}
+          )
           ${readCondition}
           OPTIONAL MATCH (relatedUser:User { id: notification.relatedUserId })
           OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)

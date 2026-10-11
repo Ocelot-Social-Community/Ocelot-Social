@@ -38,6 +38,8 @@ enum NotificationReason {
   followed_user_posted
   "A new post was created in a group the recipient belongs to."
   post_in_group
+  "The recipient's post was taken out of a group by somebody who moderates it. The post itself still exists."
+  post_removed_from_group
 }
 
 type Query {

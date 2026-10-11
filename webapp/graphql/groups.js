@@ -12,13 +12,13 @@ export const createGroupMutation = () => {
       $slug: String
       $about: String
       $description: String!
-      $groupType: GroupType!
+      $template: String!
       $actionRadius: GroupActionRadius!
       $categoryIds: [ID]
       $locationName: String # empty string '' sets it to null
+      $locationId: ID
       $lat: Float
       $lng: Float
-      $showMembers: Boolean
     ) {
       CreateGroup(
         id: $id
@@ -26,13 +26,13 @@ export const createGroupMutation = () => {
         slug: $slug
         about: $about
         description: $description
-        groupType: $groupType
+        template: $template
         actionRadius: $actionRadius
         categoryIds: $categoryIds
         locationName: $locationName
+        locationId: $locationId
         lat: $lat
         lng: $lng
-        showMembers: $showMembers
       ) {
         id
         name
@@ -52,7 +52,17 @@ export const createGroupMutation = () => {
           icon
         }
         locationName
-        myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+          outranksMembers
+        }
         showMembers
       }
     }
@@ -69,14 +79,14 @@ export const updateGroupMutation = () => {
       $slug: String
       $about: String
       $description: String
-      $groupType: GroupType
+      $visibility: GroupVisibility
       $actionRadius: GroupActionRadius
       $categoryIds: [ID]
       $avatar: ImageInput
       $locationName: String # empty string '' sets it to null
+      $locationId: ID
       $lat: Float
       $lng: Float
-      $showMembers: Boolean
     ) {
       UpdateGroup(
         id: $id
@@ -84,14 +94,14 @@ export const updateGroupMutation = () => {
         slug: $slug
         about: $about
         description: $description
-        groupType: $groupType
+        visibility: $visibility
         actionRadius: $actionRadius
         categoryIds: $categoryIds
         avatar: $avatar
         locationName: $locationName
+        locationId: $locationId
         lat: $lat
         lng: $lng
-        showMembers: $showMembers
       ) {
         id
         name
@@ -114,7 +124,17 @@ export const updateGroupMutation = () => {
           ...imageUrls
         }
         locationName
-        myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+          outranksMembers
+        }
         showMembers
       }
     }
@@ -142,23 +162,6 @@ export const leaveGroupMutation = () => {
   return gql`
     mutation ($groupId: ID!, $userId: ID!) {
       LeaveGroup(groupId: $groupId, userId: $userId) {
-        user {
-          id
-          name
-          slug
-        }
-        membership {
-          role
-        }
-      }
-    }
-  `
-}
-
-export const changeGroupMemberRoleMutation = () => {
-  return gql`
-    mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
-      ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
         user {
           id
           name
@@ -237,7 +240,17 @@ export const groupQuery = (i18n) => {
         }
         ...locationOnGroup
         membersCount
-        myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+          outranksMembers
+        }
         showMembers
       }
     }
@@ -256,6 +269,7 @@ export const groupEditQuery = () => {
         about
         description
         visibility
+        template
         actionRadius
         locationName
         categories {
@@ -267,7 +281,17 @@ export const groupEditQuery = () => {
         avatar {
           ...imageUrls
         }
-        myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+          outranksMembers
+        }
         showMembers
         inviteCodes {
           createdAt
@@ -344,7 +368,17 @@ export const groupTeaserQuery = (i18n) => {
         about
         visibility
         actionRadius
-        myRole
+        myGroupRole {
+          name
+          label
+        }
+        myGroupPermissions
+        mayElevateInGroup
+        myGroupElevation {
+          expiresAt
+          reason
+          outranksMembers
+        }
         membersCount
         postsCount
         avatar {

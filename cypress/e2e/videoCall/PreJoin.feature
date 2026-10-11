@@ -9,7 +9,7 @@ Feature: Video call pre-join
       | alice   | alice@example.org | 1234     | alice | Alice | 0.0.4                           |
       | outsider| outsider@example.org | 4321  | out   | Outsider | 0.0.4                        |
     And the following "groups" are in the database:
-      | id         | name        | slug        | ownerId | groupType | description                                                                                                              |
+      | id         | name        | slug        | ownerId | template  | description                                                                                                              |
       | call-group | Call Group  | call-group  | alice   | public    | This is a public group for end-to-end testing of the video call PreJoin flow. The description must be over 100 chars.    |
 
   Scenario: Non-members do not see the video-call button

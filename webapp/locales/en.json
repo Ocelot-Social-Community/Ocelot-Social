@@ -220,6 +220,44 @@
       "showDonationsCheckboxLabel": "Show donations progress bar",
       "successfulUpdate": "Donations info updated successfully!"
     },
+    "groupRoles": {
+      "applied": "{count} groups updated",
+      "apply": "Apply to untouched groups",
+      "confirmApply": "Apply the template “{template}” to the {count} groups that run on it and never customised their roles? Customised groups and the other templates’ groups are left alone.",
+      "description": "Here you edit the templates new groups are created from — no existing group changes because of it. Only the button below applies a change to groups, and then only to the ones that never changed their own rights.",
+      "editingTemplate": "You are editing the “{template}” template",
+      "labelField": "Name",
+      "name": "Group templates",
+      "ownerHoldsEverything": "The owner role always holds every right and cannot be edited.",
+      "resultingVisibility": "Groups created from this template are:",
+      "saved": "Template saved",
+      "templateLabel": "Template",
+      "title": "Group templates",
+      "untouched": "An edit here reaches {untouched} of the {total} groups created from this template — the ones that never changed their own rights — and only when you apply it."
+    },
+    "groups": {
+      "active": "active",
+      "allTypes": "All types",
+      "columns": {
+        "members": "Members",
+        "name": "Group",
+        "owners": "Owners",
+        "state": "State",
+        "type": "Type"
+      },
+      "count": "{shown} of {total}",
+      "description": "Every group you may administer — including the hidden ones, which appear in no other listing. Groups left without an owner are one filter away.",
+      "disabled": "disabled",
+      "disabledOnly": "disabled only",
+      "empty": "No group matches these filters.",
+      "name": "Groups",
+      "next": "Next",
+      "noOwner": "no owner",
+      "ownerlessOnly": "without an owner only",
+      "previous": "Previous",
+      "searchPlaceholder": "name or slug",
+      "title": "Manage groups"
+    },
     "hashtags": {
       "name": "Hashtags",
       "nameOfHashtag": "Name",
@@ -235,9 +273,6 @@
     "name": "Admin",
     "notifications": {
       "name": "Notifications"
-    },
-    "organizations": {
-      "name": "Organizations"
     },
     "pages": {
       "name": "Pages"
@@ -319,15 +354,7 @@
       "delete": "Delete",
       "deleteError": "Could not delete role: {message}",
       "deleteSuccess": "Role deleted.",
-      "description": "Create roles and assign permissions. Changes apply immediately.",
-      "groups": {
-        "account": "Account",
-        "administration": "Administration",
-        "communication": "Communication",
-        "content": "Content",
-        "membership": "Membership",
-        "moderation": "Moderation"
-      },
+      "description": "Who may do what across the network. Create roles and assign permissions — changes apply immediately.",
       "members": "{count} members",
       "name": "Roles & permissions",
       "nameLabel": "Name",
@@ -351,9 +378,8 @@
         "user_delete_any": "Delete any user’s account.",
         "user_email_readAny": "Read any user’s email address.",
         "user_invite": "Generate personal invite codes.",
-        "videoCall_create_closed": "Start a video call in a closed group.",
-        "videoCall_create_hidden": "Start a video call in a hidden group.",
-        "videoCall_create_public": "Start a video call in a public group."
+        "videoCall_create_open": "Start a video call in a group a stranger can walk into — one anybody may find and join without approval.",
+        "videoCall_create_restricted": "Start a video call in a group one cannot simply walk into: joining needs approval, an invite, or the group is unlisted."
       },
       "permUnavailable": "Feature not configured — granting this has no effect.",
       "permUnavailableLink": "View configuration",
@@ -424,7 +450,6 @@
     "API_KEY_CREATE_LIMIT_REACHED": "You have reached the maximum of {max} active API keys. Revoke an existing key to create a new one.",
     "API_KEY_DOES_NOT_EXIST": "The API key could not be found.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "You can only select badges that have been awarded to you.",
-    "CHAT_GROUP_ROOM_FEATURE_DISABLED": "Group chats are not enabled.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "The group chat could not be created.",
     "CHAT_MESSAGE_CONTENT_MISSING": "The message needs a text or a file.",
     "CHAT_ROOM_PARTNER_IS_SELF": "You cannot start a chat with yourself.",
@@ -439,19 +464,44 @@
       "NETWORK_ERROR": "The server cannot be reached. Please check your internet connection and try again.",
       "UNAUTHENTICATED": "Please log in to continue."
     },
+    "GROUPS_FEATURE_DISABLED": "Groups are not enabled on this network.",
+    "GROUP_ELEVATION_REASON_INVALID": "The reason may be at most {max} characters long and must not begin or end with a space.",
+    "GROUP_ELEVATION_REASON_MISSING": "Please say what you are doing here.",
+    "GROUP_ELEVATION_RIGHTS_MISSING": "Your network rights only let you read here.",
     "GROUP_FIELD_GROUP_ID_MISSING": "The group could not be found.",
     "GROUP_MEMBERSHIP_USER_NOT_A_MEMBER": "The user is not a member of this group.",
+    "GROUP_MEMBERSHIP_USER_OR_GROUP_NOT_FOUND": "The user or the group could not be found.",
+    "GROUP_POST_REMOVE_POST_NOT_IN_GROUP": "This post is not in this group.",
+    "GROUP_RIGHTS_GROUP_NOT_FOUND": "The group could not be found.",
+    "GROUP_ROLE_CREATE_NOT_AVAILABLE": "Groups cannot define their own roles yet.",
+    "GROUP_ROLE_LABEL_INVALID": "The display name is too long, or begins or ends with a space.",
+    "GROUP_ROLE_NAME_ALREADY_TAKEN": "This group already has a role with this key.",
+    "GROUP_ROLE_NAME_INVALID": "This key is not valid for a role.",
+    "GROUP_ROLE_NAME_RESERVED": "This key belongs to a system role.",
+    "GROUP_ROLE_NAME_UNKNOWN": "This role does not exist in the group (any more).",
+    "GROUP_ROLE_OWNER_NOT_EDITABLE": "The owner role always holds every right and cannot be edited.",
+    "GROUP_ROLE_PERMISSIONS_NOT_HELD": "You cannot grant rights you do not hold yourself: {permissions}",
+    "GROUP_ROLE_REASSIGN_TARGET_INVALID": "Move the members to a different role.",
+    "GROUP_ROLE_SYSTEM_NOT_DELETABLE": "A system role cannot be deleted.",
+    "GROUP_ROLE_SYSTEM_NOT_RENAMEABLE": "A system role keeps its key; change its display name instead.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "The description must be at least {min} characters long.",
-    "GROUP_SAVE_HIDDEN_TYPE_NOT_PERMITTED": "You are not allowed to make this group secret.",
+    "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "A group that outsiders cannot find cannot show them its members either.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "This unique group name is already taken.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Too few topics selected (at least {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Too many topics selected (at most {max}).",
+    "GROUP_TEMPLATE_NAME_UNKNOWN": "There is no template named “{template}”.",
+    "GROUP_TEMPLATE_PERMISSIONS_VISIBILITY_MISMATCH": "With these rights, the template would no longer match the visibility it is named after.",
+    "GROUP_TEMPLATE_ROLE_UNKNOWN": "This role does not exist in the template.",
+    "GROUP_VISIBILITY_RAISE_NOT_PERMITTED": "You may not make this group more private than you are allowed to create groups.",
     "INVITE_CODE_CREATE_GROUP_MEMBERSHIP_REQUIRED": "You need to be a member of the group to create an invite link.",
     "INVITE_CODE_CREATE_LIMIT_REACHED": "You have reached the maximum number of invite links.",
     "INVITE_CODE_INVALIDATE_CODE_NOT_FOUND": "The invite link could not be found.",
     "LOCATION_COORDINATES_INCOMPLETE": "A coordinate is missing for the location.",
     "LOCATION_COORDINATES_NOT_RESOLVABLE": "No place was found for this point on the map.",
     "LOCATION_FIELD_LOCATION_ID_MISSING": "The location could not be found.",
+    "LOCATION_ID_COORDINATES_MISSING": "The selected place is missing its coordinates. Please choose it again from the suggestions.",
+    "LOCATION_ID_INVALID": "The selected place is not valid.",
+    "LOCATION_ID_NOT_CONFIRMED": "The selected place could not be confirmed. Please choose it again from the suggestions.",
     "LOCATION_LATITUDE_OUT_OF_RANGE": "The latitude of the location is invalid.",
     "LOCATION_LONGITUDE_OUT_OF_RANGE": "The longitude of the location is invalid.",
     "LOCATION_NAME_NOT_FOUND": "This place could not be found.",
@@ -495,7 +545,6 @@
     "USER_DOES_NOT_EXIST": "The user could not be found.",
     "USER_PROFILE_NAME_TOO_SHORT": "The name must be at least {min} characters long.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "This user is not blocked.",
-    "VIDEO_CALL_FEATURE_DISABLED": "Video calls are not enabled.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "No active membership in this group was found for the video call.",
     "VIDEO_CALL_START_NOT_PERMITTED": "You may not start a video call in this group."
   },
@@ -960,6 +1009,23 @@
     "addUser": "Add User",
     "addUserNoOptions": "No users found!",
     "addUserPlaceholder": "User name",
+    "admission": {
+      "caption": "People get in:",
+      "closed": {
+        "description": "Nobody outside can join or even ask — an invitation is the only way in.",
+        "title": "By invitation only"
+      },
+      "label": "Onboarding",
+      "needsVisibility": "A group nobody outside can find is a group nobody can enter — an invitation is the only way in.",
+      "onRequest": {
+        "description": "People may ask to join; somebody in the group has to agree.",
+        "title": "On request"
+      },
+      "open": {
+        "description": "Whoever can see the group can join it straight away.",
+        "title": "Without asking"
+      }
+    },
     "allGroups": "All Groups",
     "categories": "Topic ::: Topics",
     "categoriesTitle": "Topics of the group",
@@ -983,6 +1049,16 @@
       "groupTitle": "Settings of ",
       "title": "Edit My Group"
     },
+    "elevation": {
+      "actingAsMember": "You are acting here as {role}.",
+      "actingAsNonMember": "You are not a member of this group.",
+      "activeTitle": "Administrator access is active.",
+      "activeUntil": "It ends at {time}, or when you end it.",
+      "end": "End administrator access",
+      "offerBody": "You also hold network rights over it. Reading is open; changing anything asks for this, and the request is recorded with the group.",
+      "reasonPlaceholder": "What are you doing?",
+      "start": "Use administrator access"
+    },
     "errors": {
       "userAlreadyMember": "User “{name}” is already a member!"
     },
@@ -999,14 +1075,18 @@
       "join": "Join",
       "leave": "Leave",
       "pendingMember": "Pending member",
+      "requestJoin": "Ask to join",
       "tooltip": "The group owner has yet to confirm you."
     },
     "labelSlug": "Unique group name",
     "leaveModal": {
       "confirmButton": "Leave",
       "message": "Leaving a group may be irreversible!<br>Leave group <b>“{name}”</b>!",
+      "messageAdmin": "You <b>administer</b> this group. If you leave, you give that up.<br>Really leave the group <b>“{name}”</b>?",
+      "messageOwner": "You are an <b>owner</b> of this group. If you leave, it may be left without one — and then only a network administrator can make it workable again.<br>Really leave the group <b>“{name}”</b>?",
       "title": "Do you really want to leave the group?"
     },
+    "memberOutranked": "You cannot change this person’s role — they hold at least as much as you do.",
     "memberRemoved": "User “{name}” was removed from group!",
     "members": "Members",
     "membersAdministrationList": {
@@ -1035,10 +1115,60 @@
     "removeMemberButton": "Remove",
     "removeMemberConfirmText": "Remove user “{name}” from the group?",
     "removeMemberTitle": "Remove Member",
+    "rights": {
+      "addRole": "Add a role",
+      "advancedTitle": "Every right in detail",
+      "applyTemplate": "Apply a template — replaces every role of this group with the template’s.",
+      "blockedByFeature": "That feature is switched off for this network ({feature}).",
+      "blockedByNetwork": "Capped network-wide: this needs the {permission} permission.",
+      "confirmApplyTemplate": "Apply the template “{template}” to this group? Every role is replaced by the template’s.",
+      "confirmApplyTemplateDiscards": "Apply the template “{template}” to this group? Every role is replaced by the template’s — and the unsaved changes are lost.",
+      "confirmDelete": "Delete the role “{role}”? Its members become “{target}”.",
+      "confirmReset": "Reset every role of this group to the defaults? Roles you added are removed and their members become ordinary members.",
+      "deleteRole": "Delete role",
+      "description": "Decide who may do what in this group — from outsiders to administrators.",
+      "discardDraft": "The unsaved changes will be lost. Continue anyway?",
+      "drafted": "Unsaved changes",
+      "hideAdvanced": "Hide the detailed view",
+      "labelField": "Display name",
+      "mandatory": "Always granted: a membership one cannot end is not a setting.",
+      "members": "{count} members",
+      "mootJoin": "Somebody who already has a membership does not join again.",
+      "mootLeave": "A non-member has no membership to leave.",
+      "noRight": "You cannot grant a right you do not hold yourself.",
+      "ownerHoldsEverything": "The owner role always holds every right in this group. Only its display name can be changed.",
+      "pendingBlocked": "Nobody holds this role at the moment: nobody can ask to join.",
+      "pendingUnreachable": "Nobody can ask to join at the moment, so nobody holds this role. The admission setting decides that.",
+      "reset": "Reset to defaults",
+      "resultingType": "With these rights the group is:",
+      "roleKeyPlaceholder": "key, e.g. editors",
+      "roleLabelPlaceholder": "display name, e.g. Editors",
+      "saved": "Rights saved",
+      "saveFirst": "Save or discard first — there are unsaved changes.",
+      "simple": {
+        "applicants-read": "Waiting applicants may read the posts",
+        "members-chat": "Members may write in the group chat",
+        "members-comment": "Members may comment",
+        "members-invite": "Members may invite others",
+        "members-post": "Members may write posts",
+        "nonmembers-members": "Outsiders may see the member list",
+        "nonmembers-profile": "Outsiders may see that the group exists",
+        "nonmembers-read": "Outsiders may read the posts"
+      },
+      "simpleGroups": {
+        "applicants": "Waiting applicants",
+        "members": "Members",
+        "outsiders": "Outsiders"
+      },
+      "systemRole": "System role: cannot be deleted or renamed",
+      "title": "Rights",
+      "toAdvanced": "Advanced: every right in detail"
+    },
     "role": "Your role in the group",
     "roles": {
       "admin": "Administrator",
       "members": "Members",
+      "none": "Not a member",
       "owner": "Owner",
       "pending": "Pending Member",
       "usual": "Member"
@@ -1046,8 +1176,16 @@
     "save": "Create new group",
     "showMembers": "Member list visible to everyone",
     "teaser": {
+      "notReadable": "You cannot open this group yet — your request is still pending",
       "openGroup": "Open group",
       "unavailable": "Group no longer available"
+    },
+    "templateChoice": "What kind of group is this?",
+    "templateDescriptions": {
+      "channel": "Public — but only the group’s leadership writes posts",
+      "closed": "All posts only visible to the group's members",
+      "hidden": "Group (including the name) is completely invisible",
+      "public": "Group and all posts are visible for all registered users"
     },
     "type": "Visibility of the group",
     "typeDescriptions": {
@@ -1056,6 +1194,7 @@
       "public": "Group and all posts are visible for all registered users"
     },
     "types": {
+      "channel": "Channel",
       "closed": "Closed",
       "hidden": "Secret",
       "public": "Public"
@@ -1073,11 +1212,11 @@
       "actionRadiusRequired": "Please choose an action radius.",
       "descriptionLength": "The description must be at least {min} characters.",
       "descriptionNotEmpty": "Please enter a description.",
-      "groupTypeNotAllowed": "You may not create this kind of group.",
-      "groupTypeRequired": "Please choose a group type.",
       "nameNotEmpty": "Please enter a group name.",
       "slugInvalidCharacters": "Only lowercase letters, digits, hyphens and underscores are allowed.",
-      "slugNotEmpty": "Please enter a unique group name."
+      "slugNotEmpty": "Please enter a unique group name.",
+      "typeNotAllowed": "You may not create this kind of group.",
+      "typeRequired": "Please choose a group type."
     }
   },
   "hashtags-filter": {
@@ -1138,6 +1277,7 @@
     "invite-link-message-personal": "You have been invited to join {network}.",
     "invited-count": "You have already invited {count} people.",
     "limit-reached": "You have reached the maximum number of invite links.",
+    "members-only": "only for people who already have an account",
     "my-invite-links": "My invite links",
     "no-links": "No invite links created yet.",
     "redeemed-count": "This code has been used {count} times.",
@@ -1268,6 +1408,8 @@
         "reviewed": "Reviewed",
         "unreviewed": "Unreviewed"
       },
+      "hiddenContent": "Content in a group you may not read",
+      "hiddenDecision": "Not decidable here",
       "moreDetails": "View Details",
       "name": "Reports",
       "noDecision": "No decision!",
@@ -1306,6 +1448,7 @@
       "mentioned_in_post": "Mentioned you in a post",
       "on_date": "on",
       "post_in_group": "Posted in a group",
+      "post_removed_from_group": "Removed your post from the group",
       "removed_user_from_group": "Removed you from group",
       "user_joined_group": "Joined your group",
       "user_left_group": "Left your group"
@@ -1321,7 +1464,18 @@
     "previous": "Previous"
   },
   "permissions": {
-    "deniedHint": "You don't have permission for this."
+    "deniedHint": "You don't have permission for this.",
+    "sections": {
+      "account": "Account",
+      "administration": "Administration",
+      "communication": "Communication",
+      "content": "Content",
+      "groupAdministration": "Groups — administration",
+      "groupModeration": "Groups — moderation",
+      "membership": "Membership",
+      "moderation": "Moderation",
+      "visibility": "Visibility"
+    }
   },
   "post": {
     "article": "Article",
@@ -1362,6 +1516,9 @@
       "push": "Push to top",
       "pushed": "Pushed to top",
       "pushedSuccessfully": "Post pushed to top successfully!",
+      "removedFromGroupSuccessfully": "Post removed from the group",
+      "removeFromGroup": "Remove from group",
+      "removeFromGroupConfirm": "Remove this post from the group “{group}”? The post stays with its author but loses its place in the group.",
       "unobserve": "Stop to observe post",
       "unobservedSuccessfully": "You are no longer observing this post!",
       "unpin": "Unpin post (Network)",
@@ -1825,6 +1982,11 @@
     "connecting": "Connecting…",
     "connectionLost": "Connection lost: {name}",
     "connectionPoor": "Weak connection: {name}",
+    "deviceSettings": {
+      "button": "Devices",
+      "speakerError": "Could not switch the speaker.",
+      "title": "Device settings"
+    },
     "dialogLabel": "Group video call",
     "disableCamera": "Turn camera off",
     "enableAudio": "Enable sound",
@@ -1870,6 +2032,7 @@
       "cameraDisabled": "Camera is disabled.",
       "cameraOff": "Camera: Off",
       "cameraOn": "Camera: On",
+      "cameraStarting": "Starting camera…",
       "cancel": "Cancel",
       "description": "You're about to join this group's video call. Check your camera, microphone and speaker, then join the call.",
       "errorBusy": "The device is in use by another application.",
@@ -1885,6 +2048,7 @@
       "micOff": "Mic: Off",
       "micOn": "Mic: On",
       "microphone": "Microphone",
+      "micStarting": "Starting microphone…",
       "noCamera": "Camera preview is not available.",
       "noDevices": "No device detected",
       "permission": {

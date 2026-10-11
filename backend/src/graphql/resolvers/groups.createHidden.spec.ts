@@ -87,7 +87,7 @@ describe('group.create_hidden backend enforcement', () => {
       authenticatedUser = await restrictedUser.toJson()
       const { errors } = await mutate({
         mutation: CreateGroup,
-        variables: { ...baseVariables, id: 'hidden-attempt', groupType: 'hidden' },
+        variables: { ...baseVariables, id: 'hidden-attempt', template: 'hidden' },
       })
 
       expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
@@ -97,7 +97,7 @@ describe('group.create_hidden backend enforcement', () => {
       authenticatedUser = await restrictedUser.toJson()
       const { data, errors } = await mutate({
         mutation: CreateGroup,
-        variables: { ...baseVariables, id: 'public-ok', groupType: 'public' },
+        variables: { ...baseVariables, id: 'public-ok', template: 'public' },
       })
 
       expect(errors).toBeUndefined()
@@ -108,11 +108,43 @@ describe('group.create_hidden backend enforcement', () => {
       authenticatedUser = await ownerUser.toJson()
       const { data, errors } = await mutate({
         mutation: CreateGroup,
-        variables: { ...baseVariables, id: 'hidden-by-owner', groupType: 'hidden' },
+        variables: { ...baseVariables, id: 'hidden-by-owner', template: 'hidden' },
       })
 
       expect(errors).toBeUndefined()
       expect(data?.CreateGroup).toMatchObject({ id: 'hidden-by-owner', visibility: 'hidden' })
+    })
+  })
+
+  describe('the template it is created from', () => {
+    it('reads what creating costs off the visibility the template derives to', async () => {
+      // A `channel` IS a public group. Its name appears in no create permission at all, so if
+      // the cap were read off the name the whole template would be uncreatable — and if it were
+      // read off nothing, a restricted user would get a way around group.create_hidden.
+      authenticatedUser = await restrictedUser.toJson()
+      const { data, errors } = await mutate({
+        mutation: CreateGroup,
+        variables: { ...baseVariables, id: 'a-channel', template: 'channel' },
+      })
+
+      expect(errors).toBeUndefined()
+      expect(data?.CreateGroup).toMatchObject({
+        id: 'a-channel',
+        template: 'channel',
+        visibility: 'public',
+      })
+    })
+
+    it('says an unknown template is unknown rather than refusing a right', async () => {
+      // The argument is a free String — the set of templates is runtime data — so a typo is a
+      // possible request. "Not Authorised" would send somebody looking for a missing permission.
+      authenticatedUser = await ownerUser.toJson()
+      const { errors } = await mutate({
+        mutation: CreateGroup,
+        variables: { ...baseVariables, id: 'no-such-template', template: 'secret-society' },
+      })
+
+      expect(errors![0]).toHaveProperty('message', "No group role template named 'secret-society'")
     })
   })
 
@@ -121,25 +153,30 @@ describe('group.create_hidden backend enforcement', () => {
       authenticatedUser = await restrictedUser.toJson()
       await mutate({
         mutation: CreateGroup,
-        variables: { ...baseVariables, id: 'to-hide', groupType: 'public' },
+        variables: { ...baseVariables, id: 'to-hide', template: 'public' },
       })
       const { errors } = await mutate({
         mutation: UpdateGroup,
-        variables: { id: 'to-hide', groupType: 'hidden' },
+        variables: { id: 'to-hide', visibility: 'hidden' },
       })
 
-      expect(errors![0]).toHaveProperty('message', 'You are not allowed to make this group secret.')
+      // Said, not just refused: the owner holds every group right, so "Not Authorized!" would
+      // send them looking for one — what is missing is the network right to create it hidden.
+      expect(errors![0]).toMatchObject({
+        message: 'You cannot make this group more private than you may create one!',
+        extensions: { errorCode: 'GROUP_VISIBILITY_RAISE_NOT_PERMITTED' },
+      })
     })
 
     it('allows owners (with group.create_hidden) to switch a group to hidden', async () => {
       authenticatedUser = await ownerUser.toJson()
       await mutate({
         mutation: CreateGroup,
-        variables: { ...baseVariables, id: 'owner-to-hide', groupType: 'public' },
+        variables: { ...baseVariables, id: 'owner-to-hide', template: 'public' },
       })
       const { data, errors } = await mutate({
         mutation: UpdateGroup,
-        variables: { id: 'owner-to-hide', groupType: 'hidden' },
+        variables: { id: 'owner-to-hide', visibility: 'hidden' },
       })
 
       expect(errors).toBeUndefined()
@@ -151,7 +188,7 @@ describe('group.create_hidden backend enforcement', () => {
       authenticatedUser = await ownerUser.toJson()
       await mutate({
         mutation: CreateGroup,
-        variables: { ...baseVariables, id: 'already-hidden', groupType: 'hidden' },
+        variables: { ...baseVariables, id: 'already-hidden', template: 'hidden' },
       })
       await mutate({
         mutation: ChangeGroupMemberRole,
@@ -163,7 +200,7 @@ describe('group.create_hidden backend enforcement', () => {
       authenticatedUser = await restrictedUser.toJson()
       const { data, errors } = await mutate({
         mutation: UpdateGroup,
-        variables: { id: 'already-hidden', groupType: 'hidden', name: 'Renamed Hidden' },
+        variables: { id: 'already-hidden', visibility: 'hidden', name: 'Renamed Hidden' },
       })
 
       expect(errors).toBeUndefined()

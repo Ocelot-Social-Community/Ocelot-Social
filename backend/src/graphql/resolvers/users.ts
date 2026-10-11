@@ -15,14 +15,18 @@ import { branding } from '@src/branding'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
+import { memberHoldsInGroup, nonMemberReadsContent } from './helpers/groupAccessCypher'
 import normalizeEmail from './helpers/normalizeEmail'
 import { orderClause } from './helpers/ordering'
 import { pagingClause } from './helpers/paging'
 import Resolver from './helpers/Resolver'
+import { shoutsVisibleTo } from './helpers/shoutVisibility'
 import { images } from './images/images'
 import {
+  attachLocationFeature,
   createOrUpdateLocations,
   extractCoordinates,
+  extractLocationFeature,
   NEIGHBORHOOD_REVERSE_GEOCODE_TYPES,
 } from './users/location'
 
@@ -41,11 +45,8 @@ const visiblePostFilter = `WHERE NOT related.disabled = true AND NOT related.del
   AND (
     NOT EXISTS {
       MATCH (related)-[:IN]->(g:Group)
-      WHERE NOT g.groupType = 'public'
-        AND NOT EXISTS {
-          MATCH (g)<-[membership:MEMBER_OF]-(:User {id: $cypherParams.currentUserId})
-          WHERE membership.role IN ['usual', 'admin', 'owner']
-        }
+      WHERE NOT (${nonMemberReadsContent('g')})
+        AND NOT ${memberHoldsInGroup('g', 'group.content.read', '$cypherParams.currentUserId')}
     }
     OR EXISTS { MATCH (related)<-[:WROTE]-(:User {id: $cypherParams.currentUserId}) }
   )`
@@ -373,6 +374,13 @@ export default {
       // a user has no lat/lng fields of its own, unlike Post) and validated,
       // same as Group's own coordinate handling.
       const coordinates = extractCoordinates(params, 'User')
+      // Resolved before anything is written: a refused place must not leave the user half-saved.
+      const locationFeature = await extractLocationFeature(
+        params,
+        coordinates,
+        context,
+        NEIGHBORHOOD_REVERSE_GEOCODE_TYPES,
+      )
       const { termsAndConditionsAgreedVersion } = params
       if (termsAndConditionsAgreedVersion) {
         const regEx = /^[0-9]+\.[0-9]+\.[0-9]+$/g
@@ -415,16 +423,20 @@ export default {
           return user
         })
         // TODO: put in a middleware, see "CreateGroup", "UpdateGroup"
-        await createOrUpdateLocations(
-          'User',
-          params.id,
-          params.locationName,
-          session,
-          context,
-          coordinates,
-          NEIGHBORHOOD_REVERSE_GEOCODE_TYPES,
-          true,
-        )
+        if (locationFeature) {
+          await attachLocationFeature(session, 'User', params.id, locationFeature)
+        } else {
+          await createOrUpdateLocations(
+            'User',
+            params.id,
+            params.locationName,
+            session,
+            context,
+            coordinates,
+            NEIGHBORHOOD_REVERSE_GEOCODE_TYPES,
+            true,
+          )
+        }
         if (
           'showPublicGroupsOnProfile' in params ||
           'showClosedGroupsOnProfile' in params ||
@@ -846,7 +858,9 @@ export default {
         followingCount: '-[:FOLLOWS]->(related:User)',
         followedByCount: '<-[:FOLLOWS]-(related:User)',
         commentedCount: `-[:WROTE]->(c:Comment)-[:COMMENTS]->(related:Post) ${visiblePostFilter}`,
-        shoutedCount: `-[:SHOUTED]->(related:Post) ${visiblePostFilter}`,
+        // The parent here is the shouter: their setting decides whether others see these.
+        shoutedCount: `-[:SHOUTED]->(related:Post) ${visiblePostFilter}
+          AND ${shoutsVisibleTo('parent', '$cypherParams.currentUserId')}`,
         badgeTrophiesCount: '<-[:REWARDED]-(related:Badge)',
       },
       hasOne: {
@@ -859,7 +873,7 @@ export default {
         friends: '-[:FRIENDS]-(related:User)',
         contributions: '-[:WROTE]->(related:Post)',
         comments: '-[:WROTE]->(related:Comment)',
-        shouted: '-[:SHOUTED]->(related:Post)',
+        shouted: `-[:SHOUTED]->(related:Post) WHERE ${shoutsVisibleTo('parent', '$cypherParams.currentUserId')}`,
         categories: '-[:CATEGORIZED]->(related:Category)',
         badgeTrophies: '<-[:REWARDED]-(related:Badge)',
         // Counterpart of the invitedBy hasOne above.

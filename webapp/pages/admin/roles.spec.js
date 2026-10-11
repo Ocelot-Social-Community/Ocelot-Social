@@ -130,7 +130,7 @@ describe('admin/roles.vue', () => {
     const gatedCatalog = [
       { key: 'post.create', group: 'content', description: 'Create posts', available: true },
       {
-        key: 'videoCall.create_public',
+        key: 'videoCall.create_open',
         group: 'communication',
         description: 'Start a public call',
         gatedBy: 'videoConference',
@@ -156,7 +156,7 @@ describe('admin/roles.vue', () => {
       wrapper
         .findAll('.perm-row')
         .wrappers.find((row) => row.find(`[data-test="role-user-perm-${key}"]`).exists())
-    const gatedRow = rowOf('videoCall.create_public')
+    const gatedRow = rowOf('videoCall.create_open')
     const openRow = rowOf('post.create')
     // The gated right is disabled and carries the "not configured" note…
     expect(gatedRow.find('input').attributes('disabled')).toBeDefined()
@@ -404,7 +404,9 @@ describe('admin/roles.vue', () => {
     // Translation present: look it up by the sanitised (dot-free) key.
     wrapper.vm.$t = (path) => `T:${path}`
     expect(wrapper.vm.permLabel(perm)).toBe('T:admin.roles.perm.badge_manage')
-    expect(wrapper.vm.groupLabel('moderation')).toBe('T:admin.roles.groups.moderation')
+    // One namespace for both catalogs: a section heading reads the same whether the right is
+    // network-wide or inside a group.
+    expect(wrapper.vm.groupLabel('moderation')).toBe('T:permissions.sections.moderation')
   })
 
   it('links the member count to the user list filtered by that role', async () => {
@@ -897,6 +899,89 @@ describe('admin/roles.vue', () => {
       wrapper.vm.startCreate()
       expect(wrapper.vm.renaming).toBe(false)
       expect(wrapper.vm.creating).toBe(true)
+    })
+  })
+
+  // Leaving with an unsaved change asks first — in the app (the router guard) and when the tab is
+  // closed or reloaded (the browser's own dialog).
+  describe('leaving with unsaved changes', () => {
+    const leave = (wrapper) => {
+      const next = jest.fn()
+      ;[]
+        .concat(wrapper.vm.$options.beforeRouteLeave)
+        .forEach((hook) => hook.call(wrapper.vm, {}, {}, next))
+      return next
+    }
+
+    // This page's own handler, not a window event: other tests in this file leave pages with
+    // changes mounted, and their listeners would answer too. mixins/warnBeforeUnload.spec.js
+    // covers the listener itself.
+    const unload = (wrapper) => {
+      const event = new Event('beforeunload', { cancelable: true })
+      wrapper.vm.warnBeforeUnload(event)
+      return event
+    }
+
+    it('lets the user leave while nothing is changed', async () => {
+      const wrapper = await Wrapper()
+      const next = leave(wrapper)
+
+      expect(next).toHaveBeenCalledWith()
+      expect(unload(wrapper).defaultPrevented).toBe(false)
+      wrapper.destroy()
+    })
+
+    // Typed but not confirmed is as lost on leaving as an unsaved tick.
+    it('asks before leaving with the name of a new role typed but not created', async () => {
+      const wrapper = await Wrapper()
+      wrapper.vm.startCreate()
+      wrapper.vm.newRole.name = 'editor'
+
+      const next = leave(wrapper)
+
+      expect(next).not.toHaveBeenCalled()
+      expect(wrapper.vm.showLeaveConfirmModal).toBe(true)
+      wrapper.destroy()
+    })
+
+    it('asks before leaving with a rename typed but not confirmed', async () => {
+      const wrapper = await Wrapper()
+      // A role an admin can actually rename — the baseline `user` role offers no rename.
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.vm.renameValue = 'member'
+
+      const next = leave(wrapper)
+
+      expect(next).not.toHaveBeenCalled()
+      wrapper.destroy()
+    })
+
+    it('lets the user leave with the create or rename field open but nothing typed', async () => {
+      const wrapper = await Wrapper()
+      // A role an admin can actually rename — the baseline `user` role offers no rename.
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+
+      expect(leave(wrapper)).toHaveBeenCalledWith()
+      wrapper.vm.cancelRename()
+      wrapper.vm.startCreate()
+      expect(leave(wrapper)).toHaveBeenCalledWith()
+      wrapper.destroy()
+    })
+
+    it('asks before leaving with an unsaved change', async () => {
+      const wrapper = await Wrapper()
+      wrapper.vm.setActive('user')
+      wrapper.vm.forms.user.permissions['badge.manage'] = true
+
+      const next = leave(wrapper)
+      await wrapper.vm.$nextTick()
+
+      expect(next).not.toHaveBeenCalled()
+      expect(wrapper.vm.showLeaveConfirmModal).toBe(true)
+      expect(unload(wrapper).defaultPrevented).toBe(true)
+      wrapper.destroy()
     })
   })
 })

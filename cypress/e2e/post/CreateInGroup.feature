@@ -8,7 +8,7 @@ Feature: Create a post in a group
       | slug | email           | password | id  | name | termsAndConditionsAgreedVersion |
       | bob  | bob@example.org | 1234     | bob | Bob  | 0.0.4                           |
     And the following "groups" are in the database:
-      | id         | name       | slug       | ownerId | groupType | description                                                                                                          |
+      | id         | name       | slug       | ownerId | template  | description                                                                                                          |
       | test-group | Test Group | test-group | bob     | public    | This is a test group used by the e2e tests for post creation. It needs to be long enough to pass validation.         |
     And "bob" is a member of group "test-group"
     And I am logged in as "bob"

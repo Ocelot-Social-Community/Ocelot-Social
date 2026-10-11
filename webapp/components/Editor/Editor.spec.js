@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
+import { TextSelection } from 'prosemirror-state'
 import Editor from './Editor'
 
 import MutationObserver from 'mutation-observer'
@@ -345,6 +346,90 @@ describe('Editor.vue', () => {
 
         expect(wrapper.vm.filteredItems).toEqual([])
         expect(wrapper.vm.suggestionsLoading).toBe(false)
+      })
+    })
+
+    // Regression: replying to a comment inserts a mention of its author. It came without a space,
+    // so what was typed next looked like part of the link, and the Suggestions plugin took the
+    // mention for an "@…" being typed — the list opened with "Keine Nutzer gefunden" (it asked for
+    // "jenny-rostock\0") and swallowed every Space and Enter. Driven through the real plugin, since
+    // the bug lived in what it announces.
+    describe('replying', () => {
+      beforeEach(async () => {
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
+        wrapper = Wrapper()
+        await flushPromises()
+        wrapper.vm.insertReply({ id: jenny.id, slug: jenny.slug })
+        await flushPromises()
+      })
+
+      const paragraph = () => wrapper.vm.editor.view.state.doc.firstChild
+
+      it('follows the mention with a space', () => {
+        expect(paragraph().firstChild.type.name).toBe('mention')
+        expect(paragraph().lastChild.text).toBe(' ')
+      })
+
+      it('does not take the mention for one being typed', () => {
+        expect(wrapper.vm.suggestionType).toBe('')
+        expect(propsData.mentionSuggestions).not.toHaveBeenCalled()
+      })
+
+      it('does not paint what is typed next as part of the mention', async () => {
+        const { view } = wrapper.vm.editor
+        view.dispatch(view.state.tr.insertText('hello'))
+        await flushPromises()
+
+        expect(view.dom.querySelector('.mention-suggestion')).toBeNull()
+      })
+
+      it('still opens a list for the next "@" typed', async () => {
+        const { view } = wrapper.vm.editor
+        view.dispatch(view.state.tr.insertText('@pe'))
+        await flushPromises()
+
+        expect(wrapper.vm.suggestionType).toBe('mention')
+        expect(propsData.mentionSuggestions).toHaveBeenCalledWith('pe')
+      })
+
+      // A click right behind the mention, before the space: the plugin reads the mention's text up
+      // to the cursor as an "@…" again.
+      describe('with the cursor put back right behind the mention', () => {
+        beforeEach(async () => {
+          const { view } = wrapper.vm.editor
+          const behindMention = 1 + paragraph().firstChild.nodeSize
+          view.dispatch(
+            view.state.tr.setSelection(TextSelection.create(view.state.doc, behindMention)),
+          )
+          await flushPromises()
+        })
+
+        const pressKey = (keyCode, key) => {
+          const event = new KeyboardEvent('keydown', {
+            keyCode,
+            key,
+            bubbles: true,
+            cancelable: true,
+          })
+          wrapper.vm.editor.view.dom.dispatchEvent(event)
+          return event
+        }
+
+        it('does not open a list', () => {
+          expect(wrapper.vm.suggestionType).toBe('')
+          expect(propsData.mentionSuggestions).not.toHaveBeenCalled()
+        })
+
+        // The browser types the space itself, unless the keydown is prevented.
+        it('leaves Space to the text', () => {
+          expect(pressKey(32, ' ').defaultPrevented).toBe(false)
+        })
+
+        it('starts a new paragraph on Enter', () => {
+          pressKey(13, 'Enter')
+
+          expect(wrapper.vm.editor.view.state.doc.childCount).toBe(2)
+        })
       })
     })
 

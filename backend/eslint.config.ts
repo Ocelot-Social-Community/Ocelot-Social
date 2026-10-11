@@ -69,7 +69,7 @@ export default [
       '@graphql-eslint/naming-convention': 'off',
       // Many types (Image, File, InviteCode, etc.) intentionally lack id: ID!
       '@graphql-eslint/strict-id-in-types': 'off',
-      // Fields like groupType, queryLocations match parent type name by coincidence
+      // Fields like queryLocations match parent type name by coincidence
       '@graphql-eslint/no-typename-prefix': 'off',
       // neo4j-graphql-js adds arguments (first, offset) at runtime not present in static schema
       '@graphql-eslint/known-argument-names': 'off',

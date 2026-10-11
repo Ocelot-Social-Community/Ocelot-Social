@@ -258,10 +258,17 @@ export default {
     // (measured: typed "@bo", picked a user — onEnter again with query "bo", cursor far behind the
     // range). Nothing was ever shown for it, because no decoration follows; but it must not start
     // a request for suggestions either. A suggestion being typed has the cursor inside its range.
+    //
+    // The same text also matches with the cursor right BEHIND an existing mention/hashtag — after
+    // "reply" inserted one, or after a click there. The plugin reads the node's closing boundary as
+    // a "\0" and takes it into the query (measured: "jenny-rostock\0"), so nothing was found, and
+    // the open list swallowed Space and Enter. Its range starts inside that node; a typed "@"/"#"
+    // is plain text in the paragraph.
     isBeingTyped({ range, view }) {
       if (!view) return true
       const { from } = view.state.selection
-      return from >= range.from && from <= range.to
+      if (from < range.from || from > range.to) return false
+      return !view.state.doc.resolve(range.from).parent.isInline
     },
     openSuggestionList({ query, range, command, view }, suggestionType) {
       if (!this.isBeingTyped({ range, view })) return
@@ -365,6 +372,9 @@ export default {
       }
     },
     navigateSuggestionList({ event }) {
+      // The plugin passes the keys on whenever IT sees a suggestion, including the ones
+      // isBeingTyped turned away — with no list open, Space and Enter must reach the text.
+      if (!this.suggestionType) return false
       const item = this.filteredItems[this.navigatedItemIndex]
 
       switch (event.keyCode) {
@@ -429,8 +439,13 @@ export default {
       const content = e.getHTML()
       this.$emit('input', content)
     },
+    // Followed by a space, like a mention picked from the list (the plugin appends one there).
+    // Without it the reply went on right behind the mention, and the Suggestions plugin took
+    // what was typed for part of an "@…": it painted it green as if the link grew.
     insertReply(message) {
       this.editor.commands.mention({ id: message.id, label: message.slug })
+      const { view } = this.editor
+      view.dispatch(view.state.tr.insertText(' '))
     },
     enterLink() {
       this.setLinkUrl(this.linkUrl)

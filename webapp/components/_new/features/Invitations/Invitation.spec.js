@@ -19,13 +19,14 @@ describe('Invitation.vue', () => {
     navigator.clipboard.writeText.mockClear()
   })
 
-  const Wrapper = ({ wasRedeemed = false, withCopymessage = false }) => {
+  const Wrapper = ({ wasRedeemed = false, withCopymessage = false, allowsRegistration } = {}) => {
     const store = new Vuex.Store({})
     const propsData = {
       inviteCode: {
         code: 'test-invite-code',
         comment: 'test-comment',
         redeemedByCount: wasRedeemed ? 1 : 0,
+        ...(allowsRegistration === undefined ? {} : { allowsRegistration }),
       },
       copyMessage: withCopymessage ? 'test-copy-message' : undefined,
     }
@@ -123,6 +124,22 @@ describe('Invitation.vue', () => {
       modalData.buttons.confirm.callback()
       expect(wrapper.emitted()['invalidate-invite-code']).toBeTruthy()
       expect(wrapper.emitted()['invalidate-invite-code'][0][0]).toBe('test-invite-code')
+    })
+  })
+
+  describe('a code that may not open an account', () => {
+    it('says that it only works for people who already have one', () => {
+      // The same link from the outside, two different things: `group.invite` brings existing
+      // accounts into a group, `group.invite.external` also entitles its holder to register.
+      Wrapper({ allowsRegistration: false })
+
+      expect(screen.getByText('invite-codes.members-only')).toBeInTheDocument()
+    })
+
+    it('says nothing for a code that does open an account', () => {
+      Wrapper({ allowsRegistration: true })
+
+      expect(screen.queryByText('invite-codes.members-only')).not.toBeInTheDocument()
     })
   })
 })

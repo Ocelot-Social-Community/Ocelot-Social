@@ -1,14 +1,17 @@
 /**
- * The comparisons a rights screen makes between roles.
+ * The comparisons every rights screen makes — network roles, a group's own roles and the group
+ * role templates.
  *
- * Pure functions rather than component methods: none of them needs a component, and a
- * comparison is testable without mounting anything.
+ * All three pages had their own copy of each of these, which is how the three came to disagree in
+ * small ways: one compared the hovered role against the SAVED set, the others against the draft.
+ * Pure functions rather than a mixin, because none of them needs a component — `utils/groupRights`
+ * sets the same precedent, and a comparison is testable without mounting anything.
  */
 
 /**
  * The rights a role effectively holds.
  *
- * A protected role — the network's `owner` — stores NO list and means the
+ * A protected role — the network's `owner`, a group's `owner` — stores NO list and means the
  * whole catalog. Reading its stored list would report it as holding nothing, which is how a
  * hover over `owner` once marked every right as "removed".
  */
@@ -50,4 +53,14 @@ export function samePermissions(left, right) {
   const a = new Set(left ?? [])
   const b = new Set(right ?? [])
   return a.size === b.size && [...a].every((key) => b.has(key))
+}
+
+/**
+ * Whether an edit is pending against what is stored — the rights OR the role's own label, since
+ * the save writes both and a changed label alone still has to be saveable.
+ */
+export function isRoleDirty(role, draftPermissions, draftLabel) {
+  if (!role) return false
+  if (!samePermissions(role.permissions, draftPermissions)) return true
+  return (role.label ?? '') !== (draftLabel ?? '')
 }

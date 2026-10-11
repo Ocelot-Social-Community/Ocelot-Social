@@ -289,6 +289,7 @@ import links from '~/constants/links.js'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import postListActions from '~/mixins/postListActions'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
+import groupRights from '~/mixins/groupRights'
 
 export default {
   name: 'PostSlug',
@@ -322,7 +323,7 @@ export default {
     UserAvatar,
     UserAvatarHelper,
   },
-  mixins: [GetCategories, postListActions, SortCategories],
+  mixins: [GetCategories, postListActions, SortCategories, groupRights],
   beforeCreate() {
     // Initialised before `created()` because Apollo `cache-and-network` can fire
     // update() synchronously during SmartQuery launch, which runs before our
@@ -453,7 +454,8 @@ export default {
       }
     },
     commentingAllowedByGroupRole() {
-      return this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole)
+      // The right itself: a group may open commenting to applicants or close it for members.
+      return this.canInGroup('group.comment.create', this.group)
     },
     // Prefers the post's own precise pin (Post.lat/lng — the exact point
     // picked on the map) over eventLocation's coordinates (the shared

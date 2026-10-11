@@ -16,6 +16,7 @@ import CONFIG from '@src/config'
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@src/constants/subscriptions'
 import { serverPubsub } from '@src/context'
 import { groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
+import { markRoomTold, takeToldRooms } from '@src/livekit/toldRooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
@@ -51,7 +52,20 @@ const pollOnce = async () => {
     return
   }
   polling = true
+  // The told rooms (see below) still owed their correction. Whatever is left when this poll
+  // ends — because LiveKit could not be asked, or because publishing failed halfway through —
+  // goes back, so the next poll makes up for it. Without that, a room this poller never saw
+  // itself would be forgotten: nothing else remembers that a client was told about it.
+  const owed = new Set<string>()
   try {
+    // Rooms a client was told a running call for (see toldRooms.ts): they get the truth
+    // published below even without a change. Taken BEFORE the list is fetched, so that
+    // everything told is older than the list it is corrected with — the other way round, a
+    // count told a moment after the snapshot would be "corrected" with the older state.
+    const told = takeToldRooms()
+    for (const roomName of told) {
+      owed.add(roomName)
+    }
     let rooms
     try {
       rooms = await withTimeout(client.listRooms(), POLL_TIMEOUT_MS, 'listRooms')
@@ -74,36 +88,46 @@ const pollOnce = async () => {
       seen.add(room.name)
       const groupId = groupIdFromRoomName(room.name)
       if (!groupId) {
+        owed.delete(room.name)
         continue
       }
       // room.numParticipants is a number; gracefully coerce in case of bigint
       const count = Number(room.numParticipants ?? 0) || 0
-      if (lastSeenCounts.get(room.name) !== count) {
-        lastSeenCounts.set(room.name, count)
+      if (lastSeenCounts.get(room.name) !== count || told.has(room.name)) {
         await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count })
+        // Only once it is out: a count noted before a publish that failed would look published
+        // to the next poll, which would then keep quiet about it.
+        lastSeenCounts.set(room.name, count)
       }
+      owed.delete(room.name)
     }
     // Rooms that disappeared from LiveKit's list since the last poll — emit a
     // final count: 0 so the badge clears even if the webhook room_finished
     // event never made it to us, then drop the entry so the map doesn't grow
-    // unbounded across long-lived servers with many short-lived rooms.
-    for (const [roomName, lastCount] of lastSeenCounts) {
+    // unbounded across long-lived servers with many short-lived rooms. The same goes for a
+    // room a client was told a running call for, even if this poller never saw it.
+    for (const roomName of new Set([...lastSeenCounts.keys(), ...told])) {
       if (seen.has(roomName)) {
         continue
       }
-      if (lastCount > 0) {
+      if ((lastSeenCounts.get(roomName) ?? 0) > 0 || told.has(roomName)) {
         const groupId = groupIdFromRoomName(roomName)
         // Always a group id here: only names that already yielded one are recorded in
-        // lastSeenCounts (the loop above `continue`s on a falsy groupId), so the same name cannot
-        // fail to parse on the way out.
-        /* v8 ignore next -- unreachable: lastSeenCounts only holds names with a parsable group id */
+        // lastSeenCounts (the loop above `continue`s on a falsy groupId), and the rooms a client
+        // was told about are named by roomNameForGroup — so the name cannot fail to parse on the
+        // way out.
+        /* v8 ignore next -- unreachable: both sources only hold names with a parsable group id */
         if (groupId) {
           await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count: 0 })
         }
       }
       lastSeenCounts.delete(roomName)
+      owed.delete(roomName)
     }
   } finally {
+    for (const roomName of owed) {
+      markRoomTold(roomName)
+    }
     polling = false
   }
 }
@@ -162,4 +186,5 @@ export const stopLiveKitPoller = () => {
   client = null
   consecutiveFailures = 0
   lastSeenCounts.clear()
+  takeToldRooms()
 }

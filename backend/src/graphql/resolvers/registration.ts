@@ -98,7 +98,7 @@ export default {
             SET user.createdAt = toString(datetime())
             SET user.updatedAt = toString(datetime())
             SET user.allowEmbedIframes = false
-            SET user.showShoutsPublicly = false
+            SET user.showShoutsPublicly = true
             SET user.locationName = $locationName
             SET email.verifiedAt = toString(datetime())
             WITH user

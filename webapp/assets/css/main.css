@@ -242,3 +242,27 @@ body.dropdown-open {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/*
+ * A button that reads as a link.
+ *
+ * Global rather than per page: it lived in one page's scoped styles while two pages used the
+ * class, so the same control was a link on one screen and unstyled dark text on the other.
+ * Scoped styles do reach slot content, but only the slot content of the page that wrote them —
+ * which is exactly the trap, because the markup looks identical at both call sites.
+ */
+.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-primary);
+  cursor: pointer;
+  text-decoration: underline;
+  font: inherit;
+}
+
+.link-button:disabled {
+  color: var(--text-color-softer);
+  cursor: not-allowed;
+  text-decoration: none;
+}

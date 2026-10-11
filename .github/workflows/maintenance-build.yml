@@ -5,6 +5,8 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  # The merge queue runs the required checks on its temporary gh-readonly-queue/master/* branch.
+  merge_group:
 
 defaults:
   run:
@@ -17,8 +19,13 @@ defaults:
 # within this repository but not across forks — two contributors using GitHub's "edit this file"
 # flow both get `patch-1`, and their pull requests would then cancel each other's runs. `github.ref`
 # stays as the fallback for events that carry no pull request (a push gives refs/heads/<branch>).
+#
+# master is the exception: one group per COMMIT there, so a merge never cancels the run of the
+# commit before it. Every master commit gets its full result instead of a red "cancelled" — a
+# Dependabot wave merging every few minutes otherwise left hardly one commit with complete checks.
+# Runs of different master commits may overlap; nothing here depends on their order.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || (github.ref == 'refs/heads/master' && github.sha) || github.ref }}
   cancel-in-progress: true
 
 # Least privilege for GITHUB_TOKEN: without this block the jobs inherit whatever the repository or
@@ -33,13 +40,26 @@ jobs:
   files-changed:
     name: Detect File Changes
     runs-on: ubuntu-latest
+    # actions: read for the merge-queue lookup below; a job-level block replaces the workflow's,
+    # so the rest is restated.
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: read
     outputs:
       maintenance: ${{ steps.changes.outputs.maintenance }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # On master, a commit the merge queue already tested here reports no changes: every job
+      # below is then skipped (which counts as passed), instead of running the same tree twice.
+      - name: Already verified by the merge queue?
+        id: queue
+        uses: ./.github/actions/merge-queue-verified
+
       - name: Check for file changes
+        if: steps.queue.outputs.verified != 'true'
         uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: changes
         with:
@@ -57,7 +77,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'maintenance/.tool-versions'
           cache: 'npm'
@@ -89,7 +109,7 @@ jobs:
           ls -la .output/public/
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: maintenance-site
           path: maintenance/.output/public/

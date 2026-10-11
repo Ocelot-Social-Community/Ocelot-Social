@@ -2,6 +2,7 @@ import databaseContext from '@context/database'
 import { createLoaders } from '@context/loaders'
 import pubsubContext from '@context/pubsub'
 import CONFIG from '@src/config'
+import { createGroupAuthorizationScope } from '@src/groupRole/requestScope'
 import { decode } from '@src/jwt/decode'
 import ocelotLogger from '@src/logger'
 import { getPolicyService } from '@src/policy'
@@ -67,6 +68,15 @@ export const getContext =
       // Built per request, so the batching cache never outlives the request and cannot
       // serve one viewer's data to another (the loaders close over this user's id).
       loaders: createLoaders(driver, user ? user.id : null),
+      // "What may this viewer do in that group", resolved once per group per request. Built
+      // here for the same reason as the loaders: it closes over this viewer's id, so the memo
+      // can never outlive the request or answer for somebody else.
+      groupAuthorization: createGroupAuthorizationScope({
+        database,
+        userId: user ? user.id : null,
+        effectivePermissions,
+        policy,
+      }),
     }
     return result
   }

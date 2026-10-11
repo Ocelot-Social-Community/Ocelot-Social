@@ -1,6 +1,17 @@
 name: ocelot.social end-to-end test CI
 
-on: push
+on:
+  # Every branch and every tag, as a bare `on: push` gave — except the merge queue's temporary
+  # branch. Creating it raises a push event too, and the `merge_group` run below already covers it;
+  # without the exclusion every queue entry would run this workflow twice. `tags` has to be spelled
+  # out because naming `branches-ignore` alone would stop the workflow from running for tags.
+  push:
+    branches-ignore:
+      - 'gh-readonly-queue/**'
+    tags:
+      - '**'
+  # The merge queue runs the required checks on its temporary gh-readonly-queue/master/* branch.
+  merge_group:
 
 # One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
 # cancelled instead of holding a runner. `event_name` is part of the group on purpose: a branch
@@ -9,8 +20,13 @@ on: push
 # within this repository but not across forks — two contributors using GitHub's "edit this file"
 # flow both get `patch-1`, and their pull requests would then cancel each other's runs. `github.ref`
 # stays as the fallback for events that carry no pull request (a push gives refs/heads/<branch>).
+#
+# master is the exception: one group per COMMIT there, so a merge never cancels the run of the
+# commit before it. Every master commit gets its full result instead of a red "cancelled" — a
+# Dependabot wave merging every few minutes otherwise left hardly one commit with complete checks.
+# Runs of different master commits may overlap; nothing here depends on their order.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || (github.ref == 'refs/heads/master' && github.sha) || github.ref }}
   cancel-in-progress: true
 
 # Least privilege for GITHUB_TOKEN: without this block the jobs inherit whatever the repository or
@@ -30,8 +46,33 @@ defaults:
     shell: bash
 
 jobs:
+  # On master, a commit the merge queue already tested here is not tested a second time: the queue
+  # fast-forwards master to the very commit it ran this workflow on. The prepare jobs below are
+  # then skipped (which counts as passed), the matrix with them, and the status job accepts it.
+  queue:
+    name: Already verified by the merge queue?
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      verified: ${{ steps.queue.outputs.verified }}
+      run-id: ${{ steps.queue.outputs.run-id }}
+    steps:
+      - name: Checkout the action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .github/actions
+          persist-credentials: false
+
+      - name: Already verified by the merge queue?
+        id: queue
+        uses: ./.github/actions/merge-queue-verified
+
   prepare_backend_environment:
     name: Fullstack | prepare backend environment
+    needs: [queue]
+    if: needs.queue.outputs.verified != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -39,6 +80,12 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        # Base images from Docker Hub through Google's mirror of it first: a 503 from Docker Hub
+        # failed whole builds. BuildKit falls back to docker.io whenever the mirror has nothing.
+        with:
+          buildkitd-config-inline: |
+            [registry."docker.io"]
+              mirrors = ["mirror.gcr.io"]
 
       - name: Copy backend env file
         run: |
@@ -64,7 +111,12 @@ jobs:
           target: test
           load: true
           tags: ghcr.io/ocelot-social-community/ocelot-social/backend:test
-          cache-from: type=gha,scope=backend-test
+          # Reads the scopes of the other builds of this Dockerfile too (backend): the stages
+          # they share (base image, dependencies, branding) are then built once, not once per
+          # workflow. Writes only its own, so builds running side by side never race for a key.
+          cache-from: |
+            type=gha,scope=backend-test
+            type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend-test
 
       - name: Pull third-party images
@@ -91,7 +143,7 @@ jobs:
       # repo's 10 GB cache budget and evicts by LRU the caches that COULD hit — the buildx `type=gha`
       # scopes and the npm cache. `compression-level: 0` because the payload is already zstd-compressed.
       - name: Upload images for the test jobs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-backend-environment
           path: /tmp/*.tar.zst
@@ -104,6 +156,8 @@ jobs:
 
   prepare_webapp_image:
     name: Fullstack | prepare webapp image
+    needs: [queue]
+    if: needs.queue.outputs.verified != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -111,6 +165,12 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        # Base images from Docker Hub through Google's mirror of it first: a 503 from Docker Hub
+        # failed whole builds. BuildKit falls back to docker.io whenever the mirror has nothing.
+        with:
+          buildkitd-config-inline: |
+            [registry."docker.io"]
+              mirrors = ["mirror.gcr.io"]
 
       # `e2e`, not `test`: same build, but assembled `FROM base` around the finished /build and started
       # with nuxt-start instead of the dev server (see webapp/Dockerfile). `test` stays what the webapp
@@ -129,14 +189,20 @@ jobs:
           target: e2e
           load: true
           tags: ghcr.io/ocelot-social-community/ocelot-social/webapp:test
-          cache-from: type=gha,scope=webapp-e2e
+          # Reads the scopes of the other builds of this Dockerfile too (webapp, webapp-test): the stages
+          # they share (base image, dependencies, branding) are then built once, not once per
+          # workflow. Writes only its own, so builds running side by side never race for a key.
+          cache-from: |
+            type=gha,scope=webapp-e2e
+            type=gha,scope=webapp
+            type=gha,scope=webapp-test
           cache-to: type=gha,mode=max,scope=webapp-e2e
 
       - name: Save image for test jobs
         run: docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" | zstd -T0 -3 > /tmp/webapp.tar.zst
 
       - name: Upload image for the test jobs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-webapp-image
           path: /tmp/webapp.tar.zst
@@ -149,6 +215,8 @@ jobs:
 
   prepare_cypress:
     name: Fullstack | prepare cypress
+    needs: [queue]
+    if: needs.queue.outputs.verified != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Delete huge unnecessary tools folder
@@ -158,7 +226,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'backend/.nvmrc'
           cache: 'npm'
@@ -217,7 +285,7 @@ jobs:
             "${HOME#/}/.cache/Cypress"
 
       - name: Upload installed workspace for the test jobs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-cypress-workspace
           path: /tmp/e2e-workspace.tar.zst
@@ -230,6 +298,8 @@ jobs:
 
   list_features:
     name: List Feature Files
+    needs: [queue]
+    if: needs.queue.outputs.verified != 'true'
     runs-on: ubuntu-latest
     outputs:
       features: ${{ steps.list.outputs.features }}
@@ -240,7 +310,9 @@ jobs:
       - name: List feature files
         id: list
         run: |
-          FEATURES=$(cd cypress && find e2e/ -name "*.feature" -printf '%P\n' | sort | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          # Plus one entry that is not a feature: the README screenshots (cypress/readme/), taken
+          # on the same stack, but seeded with the demo network instead of per-scenario fixtures.
+          FEATURES=$(cd cypress && { find e2e/ -name "*.feature" -printf '%P\n' | sort; echo readme-screenshots; } | jq -R -s -c 'split("\n") | map(select(length > 0))')
           echo "features=$FEATURES" >> $GITHUB_OUTPUT
 
   fullstack_tests:
@@ -252,6 +324,11 @@ jobs:
       fail-fast: false
       matrix:
         feature: ${{ fromJson(needs.list_features.outputs.features) }}
+    env:
+      # Cypress smoke-tests its binary before the first run in a job and gives it 30 s by default.
+      # That usually takes 1–7 s, but a slow runner has blown the 30 s and failed a job before a
+      # single scenario ran. Generous rather than tight: it only bounds a hang, never a test.
+      CYPRESS_VERIFY_TIMEOUT: 120000
     steps:
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
@@ -264,12 +341,12 @@ jobs:
       # and unpacking the npm download cache on top of it is a few hundred megabytes that nothing
       # reads — 40 times per run.
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'backend/.nvmrc'
 
       - name: Download images and installed workspace
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: e2e-*
           merge-multiple: true
@@ -399,15 +476,65 @@ jobs:
       - name: Migrate database
         run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend npm run db:migrate -- up
 
+      # The README's pictures want a network with people, posts and groups in it — the demo seed,
+      # which the features never use (they build what each scenario needs and wipe it after).
+      - name: README screenshots | seed the demo network
+        if: matrix.feature == 'readme-screenshots'
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend npm run db:seed
+
+      - name: README screenshots | capture
+        if: matrix.feature == 'readme-screenshots'
+        env:
+          README_SCREENSHOTS: 'true'
+        run: npm run cypress:run -- --config 'specPattern=cypress/readme/*.cy.js' --spec cypress/readme/screenshots.cy.js
+
+      # On every push, so a pull request shows how its change looks; published from master only
+      # (publish_readme_screenshots below).
+      # A failed capture leaves Cypress's own failure screenshots instead — uploaded too (under
+      # another name, so the publish job never picks them up), because they show what went wrong.
+      - name: README screenshots | upload failure screenshots
+        if: failure() && matrix.feature == 'readme-screenshots'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: readme-screenshots-failed
+          path: cypress/screenshots
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: README screenshots | upload
+        if: matrix.feature == 'readme-screenshots'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: readme-screenshots
+          # Whatever folder Cypress names after the spec; never a failure screenshot.
+          path: |
+            cypress/screenshots/**/*.png
+            !cypress/screenshots/**/*(failed).png
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Full stack tests | run tests
         id: e2e-tests
-        run: npm run cypress:run -- --spec "cypress/e2e/${{ matrix.feature }}"
+        if: matrix.feature != 'readme-screenshots'
+        env:
+          # Chrome's net log of the run, for the page-load hang; uploaded below only on failure.
+          # Not CYPRESS_-prefixed: Cypress would read that as a config override.
+          E2E_NETLOG_PATH: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/diagnostics/netlog.json
+        run: |
+          mkdir -p cypress/reports/diagnostics
+          npm run cypress:run -- --spec "cypress/e2e/${{ matrix.feature }}"
 
       - name: Full stack tests | if tests failed, compile html report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         run: |
           cd cypress/
           node create-cucumber-html-report.js
+
+      - name: Full stack tests | if tests failed, collect diagnostics
+        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.test.yml logs --no-color --timestamps webapp backend > cypress/reports/diagnostics/compose.log 2>&1 || true
+          cp -r cypress/screenshots cypress/reports/diagnostics/ 2>/dev/null || true
 
       - name: Full stack tests | if tests failed, compute artifact name
         id: artifact-name
@@ -417,19 +544,91 @@ jobs:
       - name: Full stack tests | if tests failed, upload report
         id: e2e-report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ steps.artifact-name.outputs.name }}
-          path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
+          path: |
+            /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
+            /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/diagnostics
+
+  # The README links its screenshots from the `readme-screenshots` branch, which holds exactly one
+  # commit: the pictures of master's latest push. Force-pushed, so old pictures never pile up in
+  # the history. Not gh-pages: the documentation deploy replaces that branch's whole content.
+  publish_readme_screenshots:
+    name: README | publish screenshots
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: [queue, fullstack_tests]
+    # One publish at a time, never torn in half: the head check below and the force-push are two
+    # steps, and two publishes interleaving between them could still leave the older pictures on
+    # top. `queue: max`, not the default `queue: single`: master commits run side by side, so an
+    # OLDER commit's publish can reach this group after a newer one is already pending — with
+    # `single` it would replace that newer one, then find master moved on and skip, and nothing
+    # would be published at all. Queued in order, every publish gets its turn and the head check
+    # lets only the newest commit's through.
+    concurrency:
+      group: publish-readme-screenshots
+      queue: max
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      # To download the screenshots from the merge queue's run (see the step below).
+      actions: read
+    steps:
+      # Missing when the screenshot entry failed — then the published pictures simply stay as they
+      # were, instead of this job failing for a reason the e2e status already reports.
+      - name: Download screenshots
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: readme-screenshots
+          path: screenshots
+          # A commit the merge queue already tested took its pictures there, not in this run.
+          run-id: ${{ needs.queue.outputs.run-id || github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push to the readme-screenshots branch
+        if: steps.download.outcome == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # master commits run side by side (see the concurrency block), so an older run can finish
+          # after a newer one — and would then force-push its older pictures over the newer ones.
+          # Checked right before the push: whatever run finishes, only the newest commit publishes.
+          head="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/master" --jq .object.sha)"
+          if [ "${head}" != "${GITHUB_SHA}" ]; then
+            echo "::notice::master is at ${head} now, not ${GITHUB_SHA} — its own run publishes the screenshots"
+            exit 0
+          fi
+          cd screenshots
+          # The artifact keeps the folder Cypress names after the spec; the README links the root.
+          find . -mindepth 2 -type f -name '*.png' -exec mv -t . -- {} +
+          git init -q -b readme-screenshots
+          git add -- *.png
+          # Author and committer as the documentation deploy has them (crazy-max/ghaction-github-pages):
+          # the Actions bot as author — not whoever pushed to master — and GitHub itself as committer,
+          # which GitHub shows as web-flow. With the bot as committer too, every publish counted as a
+          # commit of github-actions[bot] in the repository's Pulse; the docs deploys do not.
+          GIT_COMMITTER_NAME='GitHub' GIT_COMMITTER_EMAIL='noreply@github.com' \
+            git -c user.name='github-actions[bot]' \
+            -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            commit -q -m "README screenshots of ${GITHUB_SHA}"
+          git push -q -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" readme-screenshots
 
   e2e_status:
     name: E2E | Status
     if: always()
-    needs: [fullstack_tests]
+    needs: [queue, fullstack_tests]
     runs-on: ubuntu-latest
     steps:
       - name: Check E2E results
         run: |
+          if [ "${{ needs.queue.outputs.verified }}" = 'true' ] && [ "${{ needs.fullstack_tests.result }}" = 'skipped' ]; then
+            echo "Passed in the merge queue on this very commit (run ${{ needs.queue.outputs.run-id }}) — not repeated"
+            exit 0
+          fi
           if [ "${{ needs.fullstack_tests.result }}" != "success" ]; then
             echo "E2E tests failed or were cancelled (result: ${{ needs.fullstack_tests.result }})"
             exit 1

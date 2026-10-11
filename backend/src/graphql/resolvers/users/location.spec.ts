@@ -9,7 +9,12 @@ import queryLocations from '@graphql/queries/queryLocations.gql'
 import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-import { createOrUpdateLocations } from './location'
+import {
+  attachLocationFeature,
+  createOrUpdateLocations,
+  extractLocationFeature,
+  resolveLocationId,
+} from './location'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -733,6 +738,171 @@ describe(createOrUpdateLocations, () => {
   })
 })
 
+describe('a location picked by its Mapbox id', () => {
+  const locationContext = () => ({ config: { MAPBOX_TOKEN: 'test-token' } }) as unknown as Context
+  const groupTypes = ['neighborhood', 'locality', 'place', 'region', 'country']
+  const friesackCentre = { lat: 52.742332, lng: 12.579309 }
+
+  // Mapbox names a place after the language it was asked in; the id is the same in all of them.
+  const friesack = {
+    id: 'place.23259194',
+    place_type: ['place'],
+    place_name: 'Friesack, Havelland District, Brandenburg, Germany',
+    center: [friesackCentre.lng, friesackCentre.lat],
+    text_en: 'Friesack',
+    text_de: 'Friesack',
+    text_fr: 'Friesack',
+    text_nl: 'Friesack',
+    text_it: 'Friesack',
+    text_es: 'Friesack',
+    text_pt: 'Friesack',
+    text_pl: 'Friesack',
+    text_ru: 'Фризак',
+    text_sq: 'Friesack',
+  }
+
+  const respondWith = (body: unknown) => {
+    fetchSpy.mockResolvedValue(mockJsonResponse(body))
+  }
+
+  const requestedUrls = () => fetchSpy.mock.calls.map(([input]) => new URL(input as string))
+
+  describe(resolveLocationId, () => {
+    it('confirms the id by reverse-geocoding its coordinates with its own type only', async () => {
+      respondWith({ features: [friesack] })
+
+      await expect(
+        resolveLocationId('place.23259194', friesackCentre, locationContext(), groupTypes),
+      ).resolves.toMatchObject({ id: 'place.23259194' })
+
+      // One request, at the coordinates, for the id's type: asking the most specific type first
+      // (as a dropped pin does) would name the district around the centre instead of the town.
+      const [url] = requestedUrls()
+
+      expect(requestedUrls()).toHaveLength(1)
+      expect(decodeURIComponent(url.pathname)).toContain('12.579309,52.742332')
+      expect(url.searchParams.get('types')).toBe('place')
+    })
+
+    // The whole point: whatever language the form searched in, the id needs no name to match.
+    it('does not depend on the name the place was picked by', async () => {
+      respondWith({ features: [friesack] })
+
+      await expect(
+        resolveLocationId('place.23259194', friesackCentre, locationContext(), groupTypes),
+      ).resolves.toMatchObject({ place_name: friesack.place_name })
+      expect(requestedUrls()[0].pathname).not.toContain('Friesack')
+    })
+
+    it('refuses an id that does not lie at its coordinates', async () => {
+      respondWith({ features: [{ ...friesack, id: 'place.9274' }] })
+
+      await expect(
+        resolveLocationId('place.23259194', friesackCentre, locationContext(), groupTypes),
+      ).rejects.toThrow('The locationId does not lie at the given coordinates.')
+    })
+
+    it('refuses coordinates where Mapbox knows no place of that type', async () => {
+      respondWith({ features: [] })
+
+      await expect(
+        resolveLocationId('place.23259194', friesackCentre, locationContext(), groupTypes),
+      ).rejects.toThrow('The locationId does not lie at the given coordinates.')
+    })
+
+    it('refuses a confirmed feature that carries no place_type', async () => {
+      respondWith({ features: [{ ...friesack, place_type: undefined }] })
+
+      await expect(
+        resolveLocationId('place.23259194', friesackCentre, locationContext(), groupTypes),
+      ).rejects.toThrow('The locationId does not lie at the given coordinates.')
+    })
+
+    // A group or a user is in a town or a region, not at an address: the type list is the same
+    // granularity their search offers, and an id of another kind never reaches Mapbox.
+    it.each([
+      ['address.123'],
+      ['poi.123'],
+      ['place'],
+      ['place.'],
+      ['place.a b'],
+      ['Friesack'],
+      [''],
+    ])('refuses %j without asking Mapbox', async (locationId) => {
+      await expect(
+        resolveLocationId(locationId, friesackCentre, locationContext(), groupTypes),
+      ).rejects.toThrow('The locationId is invalid.')
+      expect(fetchSpy).not.toHaveBeenCalled()
+    })
+
+    // Numeric today, opaque by contract: the shape check must not turn away an id Mapbox issues,
+    // the confirmation is what decides.
+    it('accepts an opaque, non-numeric identifier and leaves it to the confirmation', async () => {
+      respondWith({ features: [{ ...friesack, id: 'place.berlin-de' }] })
+
+      await expect(
+        resolveLocationId('place.berlin-de', friesackCentre, locationContext(), groupTypes),
+      ).resolves.toMatchObject({ id: 'place.berlin-de' })
+    })
+
+    it('needs the coordinates the place was picked with', async () => {
+      await expect(
+        resolveLocationId('place.23259194', null, locationContext(), groupTypes),
+      ).rejects.toThrow('A locationId needs the lat and lng it was picked with.')
+      expect(fetchSpy).not.toHaveBeenCalled()
+    })
+  })
+
+  describe(extractLocationFeature, () => {
+    // Not a property of the node: left in, `SET node += $params` would write it there.
+    it('takes locationId off the params and resolves it', async () => {
+      respondWith({ features: [friesack] })
+      const params: Record<string, unknown> = { id: 'g', locationId: 'place.23259194' }
+
+      await expect(
+        extractLocationFeature(params, friesackCentre, locationContext(), groupTypes),
+      ).resolves.toMatchObject({ id: 'place.23259194' })
+      expect(params).toEqual({ id: 'g' })
+    })
+
+    it.each([[undefined], [null], ['']])(
+      'leaves the location to locationName for %j',
+      async (locationId) => {
+        const params: Record<string, unknown> = { id: 'g', locationId }
+
+        await expect(
+          extractLocationFeature(params, friesackCentre, locationContext(), groupTypes),
+        ).resolves.toBeNull()
+        expect(params).toEqual({ id: 'g' })
+        expect(fetchSpy).not.toHaveBeenCalled()
+      },
+    )
+  })
+
+  describe(attachLocationFeature, () => {
+    beforeEach(async () => {
+      await Factory.build('user', { id: 'located-user' })
+    })
+
+    it("stores the feature and makes it the node's only location", async () => {
+      const session = database.driver.session()
+      try {
+        await attachLocationFeature(session, 'User', 'located-user', { ...friesack })
+      } finally {
+        await session.close()
+      }
+
+      const { records } = await database.query({
+        query: `MATCH (:User { id: "located-user" })-[:IS_IN]->(l:Location)
+                RETURN l.id AS id, l.nameRU AS nameRU`,
+      })
+
+      expect(records.map((record) => record.get('id') as string)).toEqual(['place.23259194'])
+      expect(records[0].get('nameRU')).toBe('Фризак')
+    })
+  })
+})
+
 describe('userMiddleware', () => {
   describe('UpdateUser', () => {
     beforeEach(async () => {
@@ -740,6 +910,75 @@ describe('userMiddleware', () => {
         id: 'updating-user',
       })
       authenticatedUser = await user.toJson()
+    })
+
+    describe('with a locationId', () => {
+      const picked = {
+        id: 'place.23259194',
+        place_type: ['place'],
+        place_name: 'Friesack, Havelland District, Brandenburg, Germany',
+        center: [12.579309, 52.742332],
+        ...Object.fromEntries(
+          ['en', 'de', 'fr', 'nl', 'it', 'es', 'pt', 'pl', 'ru', 'sq'].map((lang) => [
+            `text_${lang}`,
+            'Friesack',
+          ]),
+        ),
+      }
+
+      const locationOf = async () => {
+        const { records } = await database.query({
+          query: 'MATCH (:User { id: "updating-user" })-[:IS_IN]->(l:Location) RETURN l.id AS id',
+        })
+        return records.map((record) => record.get('id') as string)
+      }
+
+      // The name the settings page showed is German, Mapbox's multi-language answer is English:
+      // matched by name, the two never met.
+      it('sets the picked place, whatever language its name was shown in', async () => {
+        fetchSpy.mockResolvedValue(mockJsonResponse({ features: [picked] }))
+
+        const { errors } = await mutate({
+          mutation: UpdateUser,
+          variables: {
+            id: 'updating-user',
+            locationName: 'Friesack, Kreis Havelland, Brandenburg, Deutschland',
+            locationId: 'place.23259194',
+            lat: 52.742332,
+            lng: 12.579309,
+          },
+        })
+
+        expect(errors).toBeUndefined()
+        expect(await locationOf()).toEqual(['place.23259194'])
+      })
+
+      it('refuses a place it cannot confirm before writing anything', async () => {
+        fetchSpy.mockResolvedValue(mockJsonResponse({ features: [] }))
+
+        const { errors } = await mutate({
+          mutation: UpdateUser,
+          variables: {
+            id: 'updating-user',
+            name: 'Renamed',
+            locationId: 'place.23259194',
+            lat: 52.742332,
+            lng: 12.579309,
+          },
+        })
+
+        expect(errors?.[0]).toHaveProperty(
+          'message',
+          'The locationId does not lie at the given coordinates.',
+        )
+
+        const { records } = await database.query({
+          query: 'MATCH (u:User { id: "updating-user" }) RETURN u.name AS name',
+        })
+
+        expect(records[0].get('name')).not.toBe('Renamed')
+        expect(await locationOf()).toEqual([])
+      })
     })
 
     it('creates a Location node with localized city/state/country names', async () => {

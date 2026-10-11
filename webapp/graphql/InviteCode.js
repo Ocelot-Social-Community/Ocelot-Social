@@ -23,6 +23,7 @@ export const validateInviteCode = () => gql`
         }
       }
       isValid
+      allowsRegistration
     }
   }
 `
@@ -60,6 +61,7 @@ export const generatePersonalInviteCode = () => gql`
         }
       }
       isValid
+      allowsRegistration
     }
   }
 `
@@ -98,6 +100,7 @@ export const generateGroupInviteCode = () => gql`
         }
       }
       isValid
+      allowsRegistration
     }
   }
 `
@@ -136,6 +139,7 @@ export const invalidateInviteCode = () => gql`
         }
       }
       isValid
+      allowsRegistration
     }
   }
 `

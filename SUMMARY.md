@@ -1,6 +1,7 @@
 # Table of contents
 
 * [Introduction](README.md)
+* [Installation](installation.md)
 * [Neo4J](neo4j/README.md)
 * [Backend](backend/README.md)
   * [GraphQL](backend/graphql.md)

@@ -648,13 +648,14 @@ describe('index.vue', () => {
         options = { computed: { formSchema: () => ({}) } }
       })
 
-      it('sends lat/lng alongside locationName when a map pin/search result carries them', () => {
+      it('sends the id and lat/lng alongside locationName when a map pin/search result carries them', () => {
         const wrapper = Wrapper()
         wrapper.setData({
           formData: {
             locationName: {
               label: 'Berlin, Germany',
               value: 'Berlin, Germany',
+              id: 'place.berlin',
               lat: 52.5,
               lng: 13.4,
             },
@@ -667,9 +668,33 @@ describe('index.vue', () => {
           expect.objectContaining({
             variables: expect.objectContaining({
               locationName: 'Berlin, Germany',
+              locationId: 'place.berlin',
               lat: 52.5,
               lng: 13.4,
             }),
+          }),
+        )
+      })
+
+      it('sends no id for a place Mapbox returned without coordinates', () => {
+        const wrapper = Wrapper()
+        wrapper.setData({
+          formData: {
+            locationName: {
+              label: 'Berlin',
+              value: 'Berlin',
+              id: 'place.berlin',
+              lat: null,
+              lng: null,
+            },
+          },
+        })
+        wrapper.find('#name').setValue('Peter')
+        wrapper.find('form').trigger('submit')
+
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            variables: expect.objectContaining({ locationName: 'Berlin', locationId: null }),
           }),
         )
       })
@@ -682,7 +707,12 @@ describe('index.vue', () => {
 
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
           expect.objectContaining({
-            variables: expect.objectContaining({ locationName: 'Berlin', lat: null, lng: null }),
+            variables: expect.objectContaining({
+              locationName: 'Berlin',
+              locationId: null,
+              lat: null,
+              lng: null,
+            }),
           }),
         )
       })

@@ -48,7 +48,7 @@ const createGroupVariables = (id: string, name: string) => ({
   name,
   about: 'About the group',
   description,
-  groupType: 'public',
+  template: 'public',
   actionRadius: 'national',
 })
 
@@ -122,13 +122,13 @@ describe('groups feature gate (groupsEnabled)', () => {
     it('denies the Group query', async () => {
       const result = await query({ query: groupQuery, variables: { id: 'g1' } })
 
-      expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
+      expect(result.errors![0]).toHaveProperty('message', 'Groups are not enabled.')
     })
 
     it('denies searching groups', async () => {
       const result = await query({ query: searchGroupsQuery, variables: { query: 'Group' } })
 
-      expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
+      expect(result.errors![0]).toHaveProperty('message', 'Groups are not enabled.')
     })
 
     it('denies creating a group', async () => {
@@ -137,7 +137,7 @@ describe('groups feature gate (groupsEnabled)', () => {
         variables: createGroupVariables('g2', 'Group Two'),
       })
 
-      expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
+      expect(result.errors![0]).toHaveProperty('message', 'Groups are not enabled.')
     })
 
     it('denies joining a group', async () => {
@@ -146,7 +146,7 @@ describe('groups feature gate (groupsEnabled)', () => {
         variables: { groupId: 'g1', userId: 'group-owner' },
       })
 
-      expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
+      expect(result.errors![0]).toHaveProperty('message', 'Groups are not enabled.')
     })
 
     it('denies updating a group', async () => {
@@ -155,7 +155,7 @@ describe('groups feature gate (groupsEnabled)', () => {
         variables: { id: 'g1', name: 'Renamed' },
       })
 
-      expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
+      expect(result.errors![0]).toHaveProperty('message', 'Groups are not enabled.')
     })
 
     it('denies leaving a group', async () => {
@@ -164,7 +164,7 @@ describe('groups feature gate (groupsEnabled)', () => {
         variables: { groupId: 'g1', userId: 'group-owner' },
       })
 
-      expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
+      expect(result.errors![0]).toHaveProperty('message', 'Groups are not enabled.')
     })
 
     it('serves the profile but folds its groups field to an empty list', async () => {
@@ -236,7 +236,10 @@ describe('groups feature gate (groupsEnabled)', () => {
       authenticatedUser = ownerAuth
       const result = await mutate({ mutation: CreateMessage, variables: { roomId, content: 'no' } })
 
-      expect(result.errors![0]).toHaveProperty('message', 'Group chats are not enabled.')
+      expect(result.errors![0]).toMatchObject({
+        message: 'Groups are not enabled.',
+        extensions: { errorCode: 'GROUPS_FEATURE_DISABLED' },
+      })
     })
 
     it('excludes the group room from the unread-rooms count', async () => {

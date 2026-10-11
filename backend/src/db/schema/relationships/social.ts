@@ -1,4 +1,5 @@
 import { Group } from '@db/schema/entities/Group'
+import { GroupRole } from '@db/schema/entities/GroupRole'
 import { User } from '@db/schema/entities/User'
 import { defineRelationship } from '@db/schema/types'
 
@@ -55,9 +56,20 @@ export const social: readonly RelationshipDefinition[] = [
     cardinality: 'many',
     properties: {
       ...timestamps,
-      role: { type: 'string', enum: ['pending', 'usual', 'admin', 'owner'] },
+      // The NAME of a GroupRole of that group — no enum any more: a group defines its own
+      // roles, so the set of valid values is per group and cannot be stated here. The
+      // reference is kept honest where it can be: renaming a role rewrites the edges that
+      // point at it, and deleting one reassigns them (groupRole/repository.ts).
+      role: { type: 'string' },
       showOnProfile: { type: 'boolean' },
     },
     required: ['createdAt', 'role'],
+  }),
+  defineRelationship({
+    // A group owns its role definitions. Deleting the group takes them with it.
+    type: 'HAS_GROUP_ROLE',
+    from: Group,
+    to: GroupRole,
+    cardinality: 'many',
   }),
 ]

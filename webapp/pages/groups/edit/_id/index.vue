@@ -45,13 +45,13 @@ export default {
         name,
         about,
         description,
-        groupType,
+        visibility,
         actionRadius,
         locationName,
+        locationId,
         lat,
         lng,
         categoryIds,
-        showMembers,
       } = value
       const variables = {
         id,
@@ -59,13 +59,13 @@ export default {
         slug,
         about,
         description,
-        groupType,
+        visibility,
         actionRadius,
         locationName,
+        locationId,
         lat,
         lng,
         categoryIds,
-        showMembers,
       }
       try {
         await this.$apollo.mutate({

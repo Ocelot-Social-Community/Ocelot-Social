@@ -136,22 +136,35 @@
         </os-button>
       </div>
     </form>
+    <confirm-modal
+      v-if="showLeaveConfirmModal"
+      :modalData="leaveConfirmModalData"
+      @close="showLeaveConfirmModal = false"
+    />
   </os-card>
 </template>
 
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
 import { mapActions, mapGetters } from 'vuex'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 import ConflictBanner from '~/components/ConflictBanner.vue'
 import deepLinkHighlight from '~/mixins/deepLinkHighlight'
+import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
+import warnBeforeUnload from '~/mixins/warnBeforeUnload'
 import { policyConfigQuery } from '~/graphql/admin/PolicyConfig'
 
 export default {
-  components: { ConflictBanner, OsButton, OsCard },
+  components: {
+    ConfirmModal,
+    ConflictBanner,
+    OsButton,
+    OsCard,
+  },
   // Deep-link highlight (highlightedKey, applyHashHighlight, hash watcher, fade timer) is
   // shared with the config tab. Rows are derived from policyConfig (async), so the highlight
   // is re-applied from the policyConfig watcher below once the rows exist.
-  mixins: [deepLinkHighlight],
+  mixins: [deepLinkHighlight, confirmLeaveIfUnsavedChanges, warnBeforeUnload],
   middleware: ['isAdmin'],
   apollo: {
     // Per-key config layers + env availability. Drives the env-dependency UI: a key
@@ -260,6 +273,11 @@ export default {
     },
   },
   methods: {
+    // Asked by confirmLeaveIfUnsavedChanges and warnBeforeUnload: a setting was changed and
+    // not saved.
+    hasUnsavedChanges() {
+      return this.isDirty
+    },
     ...mapActions({
       fetchPolicy: 'policy/init',
       fetchDefaults: 'policy/fetchDefaults',

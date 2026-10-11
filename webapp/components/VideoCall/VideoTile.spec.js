@@ -6,6 +6,7 @@ const localVue = createLocalVue()
 const Stub = (name) => ({ name, template: `<div class="${name.toLowerCase()}" />` })
 const stubs = {
   OsIcon: Stub('OsIcon'),
+  OsSpinner: Stub('OsSpinner'),
   AvatarImage: Stub('AvatarImage'),
 }
 
@@ -41,6 +42,51 @@ const factory = (props = {}) =>
   })
 
 describe('VideoTile', () => {
+  describe("a device of one's own that is starting", () => {
+    const CAMERA = '[data-test="video-tile-camera-starting"]'
+    const MIC = '[data-test="video-tile-mic-starting"]'
+
+    it('shows no sign by default', () => {
+      const wrapper = factory({ tile: buildTile({ isLocal: true }) })
+      expect(wrapper.find(CAMERA).exists()).toBe(false)
+      expect(wrapper.find(MIC).exists()).toBe(false)
+    })
+
+    it('says that the camera is starting, across the tile', () => {
+      const wrapper = factory({ tile: buildTile({ isLocal: true }), cameraStarting: true })
+      expect(wrapper.find(CAMERA).text()).toBe('videoCall.prejoin.cameraStarting')
+      expect(wrapper.find(CAMERA).attributes('role')).toBe('status')
+      expect(wrapper.find(MIC).exists()).toBe(false)
+    })
+
+    it('says that the microphone is starting', () => {
+      const wrapper = factory({ tile: buildTile({ isLocal: true }), micStarting: true })
+      expect(wrapper.find(MIC).text()).toBe('videoCall.prejoin.micStarting')
+      expect(wrapper.find(CAMERA).exists()).toBe(false)
+    })
+
+    it('keeps the name readable on top of the camera sign', () => {
+      const wrapper = factory({ tile: buildTile({ isLocal: true }), cameraStarting: true })
+      const children = [...wrapper.element.children]
+      expect(children.indexOf(wrapper.find(CAMERA).element)).toBeLessThan(
+        children.indexOf(wrapper.find('.video-tile__label').element),
+      )
+    })
+
+    it('drops the wording on a tile too small for it, but still says it to screen readers', () => {
+      const wrapper = factory({
+        tile: buildTile({ isLocal: true }),
+        avatarSize: 'small',
+        cameraStarting: true,
+        micStarting: true,
+      })
+      expect(wrapper.find(CAMERA).text()).toBe('')
+      expect(wrapper.find(CAMERA).attributes('aria-label')).toBe('videoCall.prejoin.cameraStarting')
+      expect(wrapper.find(MIC).text()).toBe('')
+      expect(wrapper.find(MIC).attributes('aria-label')).toBe('videoCall.prejoin.micStarting')
+    })
+  })
+
   describe('rendering', () => {
     it('renders the participant name', () => {
       const wrapper = factory({ tile: buildTile({ name: 'Bob' }) })

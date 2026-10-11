@@ -1,9 +1,13 @@
+import {
+  memberHoldsInGroup,
+  nonMemberReadsContent,
+  roleHoldsPermission,
+} from './helpers/groupAccessCypher'
+
 import type { Context } from '@src/context'
 
 const DEFAULT_LIMIT = 10
 const MAX_LIMIT = 25
-
-const ACTIVE_MEMBER_ROLES = `['usual', 'admin', 'owner']`
 
 // The suggestions come from two statements, because ranking EVERY user against the post, the
 // group and the follow edges costs a handful of pattern checks per user — measured at 140–250 ms
@@ -20,6 +24,10 @@ const ACTIVE_MEMBER_ROLES = `['usual', 'admin', 'owner']`
 // in notificationsMiddleware.ts (blocks, non-public groups), with one deliberate exception: users
 // who have MUTED the current user stay in. They are not notified either, but dropping them would
 // let anyone read off the list who has muted them.
+//
+// In a group, "reached" is a right, not a role name: whoever may read the group's posts
+// (`group.content.read`), as a non-member or through their own role in it. A group decides that
+// per role, so an applicant may hold it in one group and a full member may lack it in another.
 
 // The post (if any), its author and the group. A post or group the current user may not see
 // yields no row at all, so neither statement can be used to read the members of a closed or
@@ -31,11 +39,9 @@ const contextCypher = `
   OPTIONAL MATCH (postGroup:Group)<-[:IN]-(post)
   OPTIONAL MATCH (givenGroup:Group {id: $groupId})
   WITH me, post, postAuthor, CASE WHEN post IS NULL THEN givenGroup ELSE postGroup END AS group
-  OPTIONAL MATCH (me)-[myMembership:MEMBER_OF]->(group)
-  WITH me, post, postAuthor, group, myMembership
   WHERE group IS NULL
-    OR group.groupType = 'public'
-    OR coalesce(myMembership.role IN ${ACTIVE_MEMBER_ROLES}, false)
+    OR ${nonMemberReadsContent('group')}
+    OR ${memberHoldsInGroup('group', 'group.content.read', 'me.id')}
     OR postAuthor = me
   // Collected once from the few edges of the current user (and the post's author), instead of
   // being checked as a pattern for every candidate.
@@ -97,8 +103,10 @@ const relatedCypher = `
     RETURN user, 0 AS rank
     UNION
     WITH group
-    MATCH (group)<-[membership:MEMBER_OF]-(user:User)
-    WHERE membership.role IN ${ACTIVE_MEMBER_ROLES}
+    MATCH (group)<-[membership:MEMBER_OF]-(user:User),
+          (group)-[:HAS_GROUP_ROLE]->(role:GroupRole)
+    WHERE role.name = membership.role
+      AND ${roleHoldsPermission('role', 'group.content.read')}
     RETURN user, 1 AS rank
     UNION
     WITH me
@@ -113,20 +121,20 @@ const relatedCypher = `
   WHERE ${candidateFilter}
     AND (
       group IS NULL
-      OR group.groupType = 'public'
-      OR size([(user)-[membership:MEMBER_OF]->(group)
-               WHERE membership.role IN ${ACTIVE_MEMBER_ROLES} | 1]) > 0
+      OR ${nonMemberReadsContent('group')}
+      OR ${memberHoldsInGroup('group', 'group.content.read', 'user.id')}
     )
   RETURN user {.*} AS user, $relations[rank] AS relation
   ${orderAndLimit}
 `
 
-// In a closed or hidden group only active members can be mentioned, and those are all related —
-// so there is nobody left to fill up with, and the statement returns nothing.
+// In a group whose posts non-members may not read, only those holding the right through their
+// role can be mentioned, and those are all related — so there is nobody left to fill up with, and
+// the statement returns nothing.
 const othersCypher = `
   ${contextCypher}
   WITH me, group, blockedIds, mutedIds
-  WHERE group IS NULL OR group.groupType = 'public'
+  WHERE group IS NULL OR ${nonMemberReadsContent('group')}
   MATCH (user:User)
   WHERE ${candidateFilter}
     AND NOT user.id IN $relatedIds

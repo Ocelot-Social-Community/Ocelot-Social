@@ -17,8 +17,11 @@ type InviteCode {
   invitedTo: Group
   # invitedFrom: User! # -> see generatedBy
 
-  "Whether the code can still be redeemed (not expired, invalidated, or over its redemption limit)."
+  "Whether the code can still be redeemed (not expired, invalidated, or over its redemption limit). A group code that does not entitle its holder to REGISTER is still valid — see allowsRegistration."
   isValid: Boolean!
+
+  "Whether somebody without an account may register with this code. False for a group invite whose issuer holds `group.invite` but not `group.invite.external`: such a code brings an existing account into the group and nothing more."
+  allowsRegistration: Boolean!
 }
 
 type Query {

@@ -93,3 +93,44 @@ describe('RoleTabs', () => {
     expect(wrapper.find('[data-test="add"]').exists()).toBe(true)
   })
 })
+
+describe('the highlight', () => {
+  const Wrapper = (propsData = {}) =>
+    mount(RoleTabs, {
+      localVue,
+      propsData: {
+        roles: ROLES,
+        activeName: 'user',
+        labelFor: (role) => role.name,
+        badgeFor: (role) => Boolean(role.protected),
+        ...propsData,
+      },
+    })
+
+  it('marks the roles something elsewhere on the page points at', () => {
+    const wrapper = Wrapper({ highlightFor: (role) => role.name === 'owner' })
+
+    expect(wrapper.find('[data-test="role-tab-owner"]').classes()).toContain(
+      'os-toggle-group__option--highlighted',
+    )
+    expect(wrapper.find('[data-test="role-tab-user"]').classes()).not.toContain(
+      'os-toggle-group__option--highlighted',
+    )
+  })
+
+  it('marks nothing by default, so a page that says nothing marks nothing', () => {
+    const wrapper = Wrapper()
+
+    expect(wrapper.findAll('.os-toggle-group__option--highlighted')).toHaveLength(0)
+  })
+
+  it('says which roles hold an unsaved edit, in words as well', () => {
+    // The draft outlives a tab click, so the edit on a role one moved away from is still there
+    // — and the tab is the only place left to see that.
+    const wrapper = Wrapper({ draftedFor: (role) => role.name === 'user', draftedTitle: 'Unsaved' })
+
+    const dot = wrapper.find('[data-test="role-tab-drafted-user"]')
+    expect(dot.attributes('aria-label')).toBe('Unsaved')
+    expect(wrapper.find('[data-test="role-tab-drafted-owner"]').exists()).toBe(false)
+  })
+})

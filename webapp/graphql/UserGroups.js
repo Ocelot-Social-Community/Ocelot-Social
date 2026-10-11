@@ -20,7 +20,11 @@ export const profileUserGroupsQuery = (i18n) => {
           actionRadius
           membersCount
           postsCount
-          myRole
+          myGroupRole {
+            name
+            label
+          }
+          myGroupPermissions
           showOnProfile
           ...locationOnGroup
           avatar {

@@ -115,9 +115,50 @@ describe('GroupPageMemberList.vue', () => {
       expect(wrapper.vm.sectionsWithMembers).toEqual([])
     })
 
-    it('resolves section label via i18n key', async () => {
+    it('resolves a section label through the role-label rules', async () => {
+      // $t echoes the key here, which is how "no translation" looks: the heading then falls
+      // back to the role name itself rather than showing an i18n path.
       const wrapper = await Wrapper({}, { members: [{ id: '1', membershipRole: 'owner' }] })
-      expect(wrapper.vm.sectionsWithMembers[0].label).toBe('group.roles.owner')
+      expect(wrapper.vm.$t).toHaveBeenCalledWith('group.roles.owner')
+      expect(wrapper.vm.sectionsWithMembers[0].label).toBe('owner')
+    })
+
+    it('gives a role the group invented a section of its own, after the known ones', async () => {
+      // Without this, a member whose role matches none of the known names was in no section
+      // and therefore simply not listed.
+      const wrapper = await Wrapper(
+        {},
+        {
+          members: [
+            { id: '1', membershipRole: 'owner' },
+            { id: '2', membershipRole: 'moderator' },
+            { id: '3', membershipRole: 'usual' },
+            { id: '4', membershipRole: 'curator' },
+          ],
+        },
+      )
+      expect(wrapper.vm.sectionsWithMembers.map((section) => section.key)).toEqual([
+        'owner',
+        'members',
+        'curator',
+        'moderator',
+      ])
+      expect(wrapper.vm.sectionsWithMembers[2].members.map((m) => m.id)).toEqual(['4'])
+      expect(wrapper.vm.sectionsWithMembers[2].label).toBe('curator')
+    })
+
+    it('keeps applicants with the members section', async () => {
+      const wrapper = await Wrapper(
+        {},
+        {
+          members: [
+            { id: '1', membershipRole: 'usual' },
+            { id: '2', membershipRole: 'pending' },
+          ],
+        },
+      )
+      expect(wrapper.vm.sectionsWithMembers.map((section) => section.key)).toEqual(['members'])
+      expect(wrapper.vm.sectionsWithMembers[0].members).toHaveLength(2)
     })
   })
 

@@ -81,3 +81,36 @@ describe('PermissionMatrix', () => {
     expect(wrapper.find('[data-test="role-user-perm-post.create"]').exists()).toBe(true)
   })
 })
+
+describe('the highlight', () => {
+  const Wrapper = (propsData = {}) =>
+    mount(PermissionMatrix, {
+      localVue,
+      propsData: { permissions: PERMISSIONS, granted: ['post.create'], ...propsData },
+    })
+  const row = (wrapper, key) => wrapper.find(`[data-test="perm-${key}"]`).element.closest('label')
+
+  it('marks the rows something elsewhere on the page points at', () => {
+    const wrapper = Wrapper({ highlight: ['post.create'] })
+
+    expect(row(wrapper, 'post.create').className).toContain('perm-row--touched')
+    expect(row(wrapper, 'comment.create').className).not.toContain('perm-row--touched')
+  })
+
+  it('marks nothing when nothing is pointing', () => {
+    const wrapper = Wrapper()
+
+    expect(wrapper.findAll('.perm-row--touched')).toHaveLength(0)
+  })
+
+  it('reports the row under the cursor, so the page can point back at what it decides', async () => {
+    const wrapper = Wrapper()
+    const label = wrapper.findAll('.perm-row').at(1)
+
+    await label.trigger('mouseenter')
+    expect(wrapper.emitted('hover').at(-1)).toEqual(['comment.create'])
+
+    await label.trigger('mouseleave')
+    expect(wrapper.emitted('hover').at(-1)).toEqual([null])
+  })
+})

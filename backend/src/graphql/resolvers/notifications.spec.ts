@@ -612,14 +612,28 @@ describe('given some notifications', () => {
 // the mutation for that reason: this describes what the read path does with such an edge no
 // matter how it got there, which is the half that has to hold when the next writer gets it wrong.
 describe('given a notification about a post the recipient may not see', () => {
-  const invisibleTo = async (userId: string, postId: string) => {
+  // What makes a post unreadable is the group it is in: a closed group whose non-members may
+  // not read its content, and whose `usual` role may. Membership decides through the role.
+  const inClosedGroup = async (postId: string, memberIds: string[] = []) => {
     const session = database.driver.session()
     try {
       await session.writeTransaction((transaction) =>
         transaction.run(
-          `MATCH (user:User { id: $userId }), (post:Post { id: $postId })
-           MERGE (user)-[:CANNOT_SEE]->(post)`,
-          { userId, postId },
+          `MATCH (post:Post { id: $postId })
+           MERGE (group:Group { id: 'secret-group' })
+           SET group.nonMemberRead = true, group.nonMemberContentRead = false
+           MERGE (group)-[:HAS_GROUP_ROLE]->(usual:GroupRole { id: 'secret-group:usual' })
+           SET usual.name = 'usual', usual.permissions = $usualPermissions
+           MERGE (post)-[:IN]->(group)
+           WITH group
+           UNWIND $memberIds AS memberId
+           MATCH (member:User { id: memberId })
+           MERGE (member)-[:MEMBER_OF { role: 'usual' }]->(group)`,
+          {
+            postId,
+            memberIds,
+            usualPermissions: JSON.stringify(['group.read', 'group.content.read']),
+          },
         ),
       )
     } finally {
@@ -651,7 +665,7 @@ describe('given a notification about a post the recipient may not see', () => {
       read: false,
       reason: 'commented_on_post',
     })
-    await invisibleTo('you', 'secret-post')
+    await inClosedGroup('secret-post')
     authenticatedUser = await user.toJson()
   })
 
@@ -663,8 +677,8 @@ describe('given a notification about a post the recipient may not see', () => {
   })
 
   it('does not list the notification about a COMMENT on that post either', async () => {
-    // CANNOT_SEE points at posts. A comment has no such edge of its own and is exactly as
-    // unreachable as the post carrying it, so the filter has to reach through `:COMMENTS`.
+    // A comment is not IN a group itself and is exactly as unreachable as the post carrying
+    // it, so the filter has to reach through `:COMMENTS`.
     // Covered by the assertion above only as long as both notifications exist — hence its own
     // test, which fails loudly if the comment slips through while the post does not.
     const { data } = await query({ query: notifications, variables })
@@ -675,11 +689,11 @@ describe('given a notification about a post the recipient may not see', () => {
   })
 
   describe('and a second notification about a comment on a post the recipient may see', () => {
-    // The reach-through has to bind the parent post to the CANNOT_SEE edge. A version that asked
-    // only whether the resource is *a* comment, or a comment on *any* post, passes every
-    // assertion above — there the single comment sits under the single hidden post, so the
+    // The reach-through has to bind the parent post to its group. A version that asked only
+    // whether the resource is *a* comment, or a comment on *any* post, passes every assertion
+    // above — there the single comment sits under the single unreadable post, so the
     // over-broad and the correct condition are indistinguishable. This is what separates them:
-    // same recipient, same CANNOT_SEE edge, but a comment whose post is reachable.
+    // same recipient, but a comment whose post is outside the group.
     beforeEach(async () => {
       await Factory.build(
         'post',
@@ -712,8 +726,10 @@ describe('given a notification about a post the recipient may not see', () => {
 
   it('still lists it for someone who may see the post', async () => {
     // The filter is per recipient, not per post: the same notification must survive for a
-    // reader without the edge. Without this, a filter that dropped everything would pass.
+    // member whose role may read the group. Without this, a filter that dropped everything
+    // would pass.
     const neighbor = await Factory.build('user', { id: 'neighbor' })
+    await inClosedGroup('secret-post', ['neighbor'])
     const session = database.driver.session()
     try {
       await session.writeTransaction((transaction) =>
@@ -736,6 +752,29 @@ describe('given a notification about a post the recipient may not see', () => {
           expect.objectContaining({ from: expect.objectContaining({ id: 'secret-post' }) }),
         ],
       },
+      errors: undefined,
+    })
+  })
+
+  it('stops listing it once the role of the member may no longer read the group', async () => {
+    // Asked at reading time, because rights change: the notification was fine when it was
+    // written, and is not once the group took the right away from that role.
+    const neighbor = await Factory.build('user', { id: 'neighbor' })
+    await inClosedGroup('secret-post', ['neighbor'])
+    await database.write({
+      query: `MATCH (post:Post { id: 'secret-post' }), (user:User { id: 'neighbor' })
+              MERGE (post)-[notification:NOTIFIED { reason: 'followed_user_posted' }]->(user)
+              SET notification.read = FALSE,
+                  notification.createdAt = '2026-09-16T10:00:00.000Z',
+                  notification.updatedAt = '2026-09-16T10:00:00.000Z'
+              WITH post
+              MATCH (role:GroupRole { id: 'secret-group:usual' })
+              SET role.permissions = '["group.read"]'`,
+    })
+    authenticatedUser = await neighbor.toJson()
+
+    await expect(query({ query: notifications, variables })).resolves.toMatchObject({
+      data: { notifications: [] },
       errors: undefined,
     })
   })

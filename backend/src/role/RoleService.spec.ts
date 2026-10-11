@@ -23,7 +23,7 @@ const BASELINE = [
   'group.create_closed',
   'group.create_hidden',
   'user.invite',
-  'videoCall.create_public',
+  'videoCall.create_open',
   'apiKey.create',
 ]
 

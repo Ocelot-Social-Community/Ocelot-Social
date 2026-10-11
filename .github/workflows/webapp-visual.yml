@@ -5,6 +5,8 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  # The merge queue runs the required checks on its temporary gh-readonly-queue/master/* branch.
+  merge_group:
 
 # Least privilege. pull-requests:read is required by dorny/paths-filter, which lists a PR's changed
 # files via the API (the fetch-depth:1 checkout has no base history for a local diff).
@@ -20,6 +22,12 @@ jobs:
   files-changed:
     name: Detect File Changes
     runs-on: ubuntu-latest
+    # actions: read for the merge-queue lookup below; a job-level block replaces the workflow's,
+    # so the rest is restated.
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: read
     outputs:
       webapp: ${{ steps.changes.outputs.webapp }}
     steps:
@@ -28,7 +36,14 @@ jobs:
         with:
           persist-credentials: false
 
+      # On master, a commit the merge queue already tested here reports no changes: every job
+      # below is then skipped (which counts as passed), instead of running the same tree twice.
+      - name: Already verified by the merge queue?
+        id: queue
+        uses: ./.github/actions/merge-queue-verified
+
       - name: Check for file changes
+        if: steps.queue.outputs.verified != 'true'
         uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: changes
         with:
@@ -48,7 +63,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'webapp/.nvmrc'
           cache: 'npm'
@@ -86,7 +101,7 @@ jobs:
         run: npm run test:visual
 
       - name: Upload test results
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
           name: webapp-visual-test-results

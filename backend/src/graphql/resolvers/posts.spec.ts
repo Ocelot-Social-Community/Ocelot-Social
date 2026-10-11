@@ -2110,7 +2110,7 @@ describe('pin posts', () => {
               name: 'Public Group',
               id: 'public-group',
               about: 'This is a public group',
-              groupType: 'public',
+              template: 'public',
               actionRadius: 'regional',
               description:
                 'This is a public group to test if the posts of this group can be pinned.',
@@ -2158,7 +2158,7 @@ describe('pin posts', () => {
               name: 'Closed Group',
               id: 'closed-group',
               about: 'This is a closed group',
-              groupType: 'closed',
+              template: 'closed',
               actionRadius: 'regional',
               description:
                 'This is a closed group to test if the posts of this group can be pinned.',
@@ -2196,7 +2196,7 @@ describe('pin posts', () => {
               name: 'Hidden Group',
               id: 'hidden-group',
               about: 'This is a hidden group',
-              groupType: 'hidden',
+              template: 'hidden',
               actionRadius: 'regional',
               description:
                 'This is a hidden group to test if the posts of this group can be pinned.',

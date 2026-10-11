@@ -119,7 +119,7 @@ describe('Posts in Groups', () => {
         name: 'The Public Group',
         about: 'The public group!',
         description: 'Anyone can see the posts of this group.',
-        groupType: 'public',
+        template: 'public',
         actionRadius: 'regional',
       },
     })
@@ -147,7 +147,7 @@ describe('Posts in Groups', () => {
         name: 'The Closed Group',
         about: 'The closed group!',
         description: 'Only members of this group can see the posts of this group.',
-        groupType: 'closed',
+        template: 'closed',
         actionRadius: 'regional',
       },
     })
@@ -175,7 +175,7 @@ describe('Posts in Groups', () => {
         name: 'The Hidden Group',
         about: 'The hidden group!',
         description: 'Only members of this group can see the posts of this group.',
-        groupType: 'hidden',
+        template: 'hidden',
         actionRadius: 'regional',
       },
     })

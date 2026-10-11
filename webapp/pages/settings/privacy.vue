@@ -59,7 +59,7 @@ export default {
     }),
     disabled() {
       return (
-        this.shoutsAllowed === this.currentUser.showShoutsPublicly &&
+        this.shoutsAllowed === (this.currentUser.showShoutsPublicly !== false) &&
         this.showPublicGroups === (this.currentUser.showPublicGroupsOnProfile !== false) &&
         this.showClosedGroups === (this.currentUser.showClosedGroupsOnProfile !== false) &&
         this.showHiddenGroups === (this.currentUser.showHiddenGroupsOnProfile !== false)
@@ -67,7 +67,7 @@ export default {
     },
   },
   created() {
-    this.shoutsAllowed = this.currentUser.showShoutsPublicly || false
+    this.shoutsAllowed = this.currentUser.showShoutsPublicly !== false
     this.showPublicGroups = this.currentUser.showPublicGroupsOnProfile !== false
     this.showClosedGroups = this.currentUser.showClosedGroupsOnProfile !== false
     this.showHiddenGroups = this.currentUser.showHiddenGroupsOnProfile !== false
@@ -105,7 +105,7 @@ export default {
           },
         })
       } catch (error) {
-        this.shoutsAllowed = this.currentUser.showShoutsPublicly || false
+        this.shoutsAllowed = this.currentUser.showShoutsPublicly !== false
         this.showPublicGroups = this.currentUser.showPublicGroupsOnProfile !== false
         this.showClosedGroups = this.currentUser.showClosedGroupsOnProfile !== false
         this.showHiddenGroups = this.currentUser.showHiddenGroupsOnProfile !== false

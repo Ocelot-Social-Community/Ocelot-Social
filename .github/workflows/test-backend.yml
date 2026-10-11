@@ -1,7 +1,18 @@
 name: ocelot.social backend test CI
 
 
-on: push
+on:
+  # Every branch and every tag, as a bare `on: push` gave — except the merge queue's temporary
+  # branch. Creating it raises a push event too, and the `merge_group` run below already covers it;
+  # without the exclusion every queue entry would run this workflow twice. `tags` has to be spelled
+  # out because naming `branches-ignore` alone would stop the workflow from running for tags.
+  push:
+    branches-ignore:
+      - 'gh-readonly-queue/**'
+    tags:
+      - '**'
+  # The merge queue runs the required checks on its temporary gh-readonly-queue/master/* branch.
+  merge_group:
 
 # One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
 # cancelled instead of holding a runner. `event_name` is part of the group on purpose: a branch
@@ -10,8 +21,13 @@ on: push
 # within this repository but not across forks — two contributors using GitHub's "edit this file"
 # flow both get `patch-1`, and their pull requests would then cancel each other's runs. `github.ref`
 # stays as the fallback for events that carry no pull request (a push gives refs/heads/<branch>).
+#
+# master is the exception: one group per COMMIT there, so a merge never cancels the run of the
+# commit before it. Every master commit gets its full result instead of a red "cancelled" — a
+# Dependabot wave merging every few minutes otherwise left hardly one commit with complete checks.
+# Runs of different master commits may overlap; nothing here depends on their order.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || (github.ref == 'refs/heads/master' && github.sha) || github.ref }}
   cancel-in-progress: true
 
 # Workflow-wide floor for GITHUB_TOKEN, so no job silently inherits the repository or organisation
@@ -33,13 +49,26 @@ jobs:
   files-changed:
     name: Detect File Changes - Backend
     runs-on: ubuntu-latest
+    # actions: read for the merge-queue lookup below; a job-level block replaces the workflow's,
+    # so the rest is restated.
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: read
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
       docker: ${{ steps.changes.outputs.docker }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # On master, a commit the merge queue already tested here reports no changes: every job
+      # below is then skipped (which counts as passed), instead of running the same tree twice.
+      - name: Already verified by the merge queue?
+        id: queue
+        uses: ./.github/actions/merge-queue-verified
+
       - name: Check for backend file changes
+        if: steps.queue.outputs.verified != 'true'
         uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: changes
         with:
@@ -58,6 +87,12 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        # Base images from Docker Hub through Google's mirror of it first: a 503 from Docker Hub
+        # failed whole builds. BuildKit falls back to docker.io whenever the mirror has nothing.
+        with:
+          buildkitd-config-inline: |
+            [registry."docker.io"]
+              mirrors = ["mirror.gcr.io"]
 
       - name: Neo4J | Build 'community' image
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
@@ -81,7 +116,7 @@ jobs:
       # zstd because `docker save` writes an UNCOMPRESSED layer tar; `compression-level: 0` because
       # the upload would otherwise compress the already-compressed payload a second time.
       - name: Upload image for the test job
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: neo4j-image
           path: /tmp/neo4j.tar.zst
@@ -99,6 +134,12 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        # Base images from Docker Hub through Google's mirror of it first: a 503 from Docker Hub
+        # failed whole builds. BuildKit falls back to docker.io whenever the mirror has nothing.
+        with:
+          buildkitd-config-inline: |
+            [registry."docker.io"]
+              mirrors = ["mirror.gcr.io"]
 
       - name: backend | Build 'test' image
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
@@ -108,7 +149,12 @@ jobs:
           target: test
           load: true
           tags: ghcr.io/ocelot-social-community/ocelot-social/backend:test
-          cache-from: type=gha,scope=backend-test
+          # Reads the scopes of the other builds of this Dockerfile too (backend): the stages
+          # they share (base image, dependencies, branding) are then built once, not once per
+          # workflow. Writes only its own, so builds running side by side never race for a key.
+          cache-from: |
+            type=gha,scope=backend-test
+            type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend-test
 
       - name: Save image for test job
@@ -122,7 +168,7 @@ jobs:
       # zstd because `docker save` writes an UNCOMPRESSED layer tar; `compression-level: 0` because
       # the upload would otherwise compress the already-compressed payload a second time.
       - name: Upload image for the test job
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: backend-test-image
           path: /tmp/backend.tar.zst
@@ -139,7 +185,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'backend/.nvmrc'
           cache: 'npm'
@@ -193,13 +239,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Download Neo4J image
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: neo4j-image
           path: /tmp
 
       - name: Download backend image
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: backend-test-image
           path: /tmp
@@ -339,7 +385,7 @@ jobs:
       # `./coverage` is bind-mounted to `/app/coverage` (docker-compose.test.yml), so the blob the
       # container just wrote is already on the runner — no `docker compose cp` needed.
       - name: backend | Upload coverage blob
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: backend-coverage-blob-${{ matrix.shardIndex }}
           path: coverage/blobs/blob-${{ matrix.shardIndex }}.json
@@ -398,7 +444,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Download backend image
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: backend-test-image
           path: /tmp
@@ -409,7 +455,7 @@ jobs:
       # `merge-multiple` flattens all four artifacts into the one directory `--merge-reports`
       # expects. Nothing else may land in it — see the note on the shard test step.
       - name: Download coverage blobs
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: backend-coverage-blob-*
           merge-multiple: true
@@ -436,7 +482,7 @@ jobs:
       # vitest-coverage-report-action and similar tools read.
       - name: backend | Upload coverage report
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: backend-coverage-report
           path: |

@@ -10,7 +10,7 @@ Feature: Floating Chat Switching
       | bob     | bob@example.org     | 1234     | bob     | Bob     | 0.0.4                           |
       | charlie | charlie@example.org | 1234     | charlie | Charlie | 0.0.4                           |
     And the following "groups" are in the database:
-      | id         | name       | slug       | ownerId | groupType | description                                                                                                         |
+      | id         | name       | slug       | ownerId | template  | description                                                                                                         |
       | test-group | Test Group | test-group | alice   | public    | This is a test group for e2e testing of floating chat switching. It needs to be long enough to pass validation here. |
 
   Scenario: Switch floating chat from one user to another

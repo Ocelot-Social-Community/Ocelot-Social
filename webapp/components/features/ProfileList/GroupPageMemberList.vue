@@ -35,14 +35,22 @@
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import InfiniteScrollList from './InfiniteScrollList.vue'
 import { groupMembersQuery } from '~/graphql/groups'
+import { OWNER_GROUP_ROLE, PENDING_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
+import { groupRoleLabel } from '~/utils/groupRights'
 
 const PAGE_SIZE = 25
 
+// The sections that have a heading of their own, in the order they read. `admin` is matched by
+// name rather than named as a constant: it is an ordinary, editable role now, so a group may
+// relabel, rename or drop it — this list says "if a role by that name is here, head it", not
+// "these are the roles".
 const ROLE_SECTIONS = [
-  { key: 'owner', roleMatch: (r) => r === 'owner' },
-  { key: 'admin', roleMatch: (r) => r === 'admin' },
-  { key: 'members', roleMatch: (r) => r === 'usual' || r === 'pending' },
+  { key: OWNER_GROUP_ROLE, roles: [OWNER_GROUP_ROLE] },
+  { key: 'admin', roles: ['admin'] },
+  { key: 'members', roles: [USUAL_GROUP_ROLE, PENDING_GROUP_ROLE] },
 ]
+
+const SECTIONED_ROLES = new Set(ROLE_SECTIONS.flatMap((section) => section.roles))
 
 export default {
   name: 'GroupPageMemberList',
@@ -80,20 +88,34 @@ export default {
     popoverEnabled() {
       return !this.isScrolling && !this.isLoading && !this.loadingCooldown
     },
+    // Every role a group invented for itself and at least one member carries. Without these
+    // sections such a member would be in no section at all and simply not be listed.
+    customRoleSections() {
+      const names = this.members.map((m) => m.membershipRole).filter(Boolean)
+      return [...new Set(names)]
+        .filter((name) => !SECTIONED_ROLES.has(name))
+        .sort()
+        .map((name) => ({ key: name, roles: [name] }))
+    },
+    sections() {
+      return [...ROLE_SECTIONS, ...this.customRoleSections]
+    },
     membersByRole() {
-      return ROLE_SECTIONS.reduce((acc, section) => {
-        acc[section.key] = this.members.filter((m) => section.roleMatch(m.membershipRole))
+      return this.sections.reduce((acc, section) => {
+        acc[section.key] = this.members.filter((m) => section.roles.includes(m.membershipRole))
         return acc
       }, {})
     },
     sectionsWithMembers() {
-      return ROLE_SECTIONS.filter((section) => this.membersByRole[section.key].length > 0).map(
-        (section) => ({
+      return this.sections
+        .filter((section) => this.membersByRole[section.key].length > 0)
+        .map((section) => ({
           key: section.key,
-          label: this.$t(`group.roles.${section.key}`),
+          // A group's own label is not readable here (Group.roles needs group.role.manage), so
+          // the heading is the translation of a known role name and otherwise the name itself.
+          label: groupRoleLabel({ name: section.key }, (key) => this.$t(key)),
           members: this.membersByRole[section.key],
-        }),
-      )
+        }))
     },
   },
   watch: {

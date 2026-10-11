@@ -33,10 +33,13 @@
 <script>
 import { OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { changeGroupMemberRoleMutation } from '~/graphql/groups.js'
+import { setGroupMemberRoleMutation } from '~/graphql/groupRoles.js'
 import SelectUserSearch from '~/components/generic/SelectUserSearch/SelectUserSearch'
+import { USUAL_GROUP_ROLE } from '~/constants/groups'
+import groupRights from '~/mixins/groupRights'
 
 export default {
+  mixins: [groupRights],
   name: 'AddGroupMember',
   components: {
     OsButton,
@@ -52,6 +55,13 @@ export default {
     groupMembers: {
       type: Array,
       required: false,
+    },
+    // The group's own role definitions, for naming the role somebody is added as. Optional:
+    // reading them needs group.role.manage, and adding a member does not.
+    groupRoles: {
+      type: Array,
+      required: false,
+      default: () => [],
     },
   },
   created() {
@@ -88,16 +98,21 @@ export default {
       this.isOpen = true
     },
     async addMemberToGroup() {
-      const newRole = 'usual'
+      // Somebody added by hand lands in the group's member role. `usual` by name because it is
+      // a system role: a group may relabel it, never rename or delete it — which is also why
+      // the label comes from the definition when the page could read one.
+      const newRole = USUAL_GROUP_ROLE
       const username = this.user.name
       try {
         await this.$apollo.mutate({
-          mutation: changeGroupMemberRoleMutation(),
-          variables: { groupId: this.groupId, userId: this.user.id, roleInGroup: newRole },
+          mutation: setGroupMemberRoleMutation(),
+          variables: { groupId: this.groupId, userId: this.user.id, roleName: newRole },
         })
         this.$toast.success(
           this.$t('group.addMemberToGroupSuccess', {
-            role: this.$t(`group.roles.${newRole}`),
+            role: this.roleLabel(
+              this.groupRoles.find((role) => role.name === newRole) ?? { name: newRole },
+            ),
             name: username,
           }),
         )

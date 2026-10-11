@@ -220,6 +220,44 @@
       "showDonationsCheckboxLabel": "Mostra barra di progresso delle donazioni",
       "successfulUpdate": "Informazioni sulle donazioni aggiornate con successo!"
     },
+    "groupRoles": {
+      "applied": "{count} gruppi aggiornati",
+      "apply": "Applica ai gruppi non modificati",
+      "confirmApply": "Applicare il modello «{template}» ai {count} gruppi che lo usano e non hanno mai personalizzato i propri ruoli? I gruppi personalizzati e quelli degli altri modelli non vengono modificati.",
+      "description": "Qui modifichi i modelli da cui nascono i nuovi gruppi: nessun gruppo esistente cambia per questo. Solo il pulsante qui sotto applica una modifica ai gruppi, e solo a quelli che non hanno mai cambiato i propri diritti.",
+      "editingTemplate": "Stai modificando il modello «{template}»",
+      "labelField": "Nome",
+      "name": "Modelli di gruppo",
+      "ownerHoldsEverything": "Il ruolo di proprietario ha sempre tutti i permessi e non è modificabile.",
+      "resultingVisibility": "I gruppi creati da questo modello sono:",
+      "saved": "Modello salvato",
+      "templateLabel": "Modello",
+      "title": "Modelli di gruppo",
+      "untouched": "Una modifica qui raggiunge {untouched} dei {total} gruppi creati da questo modello — quelli che non hanno mai cambiato i propri diritti — e solo quando la applichi."
+    },
+    "groups": {
+      "active": "attivo",
+      "allTypes": "Tutti i tipi",
+      "columns": {
+        "members": "Membri",
+        "name": "Gruppo",
+        "owners": "Proprietari",
+        "state": "Stato",
+        "type": "Tipo"
+      },
+      "count": "{shown} di {total}",
+      "description": "Tutti i gruppi che puoi amministrare — compresi quelli segreti, che non compaiono in nessun altro elenco. I gruppi rimasti senza proprietario sono a un filtro di distanza.",
+      "disabled": "disattivato",
+      "disabledOnly": "solo disattivati",
+      "empty": "Nessun gruppo corrisponde a questi filtri.",
+      "name": "Gruppi",
+      "next": "Avanti",
+      "noOwner": "senza proprietario",
+      "ownerlessOnly": "solo senza proprietario",
+      "previous": "Indietro",
+      "searchPlaceholder": "nome o nome breve",
+      "title": "Gestisci i gruppi"
+    },
     "hashtags": {
       "name": "Hashtag",
       "nameOfHashtag": "Nome",
@@ -235,9 +273,6 @@
     "name": "Admin",
     "notifications": {
       "name": "Notifiche"
-    },
-    "organizations": {
-      "name": "Organizzazioni"
     },
     "pages": {
       "name": "Pagine"
@@ -319,15 +354,7 @@
       "delete": "Elimina",
       "deleteError": "Impossibile eliminare il ruolo: {message}",
       "deleteSuccess": "Ruolo eliminato.",
-      "description": "Crea ruoli e assegna i permessi. Le modifiche si applicano immediatamente.",
-      "groups": {
-        "account": "Account",
-        "administration": "Amministrazione",
-        "communication": "Comunicazione",
-        "content": "Contenuti",
-        "membership": "Iscrizione",
-        "moderation": "Moderazione"
-      },
+      "description": "Chi può fare cosa in tutta la rete. Crea ruoli e assegna permessi: le modifiche hanno effetto subito.",
       "members": "{count} membri",
       "name": "Ruoli e permessi",
       "nameLabel": "Nome",
@@ -351,9 +378,8 @@
         "user_delete_any": "Eliminare l’account di qualsiasi utente.",
         "user_email_readAny": "Leggere l’indirizzo e-mail di qualsiasi utente.",
         "user_invite": "Generare codici di invito personali.",
-        "videoCall_create_closed": "Avviare una videochiamata in un gruppo chiuso.",
-        "videoCall_create_hidden": "Avviare una videochiamata in un gruppo nascosto.",
-        "videoCall_create_public": "Avviare una videochiamata in un gruppo pubblico."
+        "videoCall_create_open": "Avviare una videochiamata in un gruppo in cui chiunque può entrare: trovabile e accessibile senza approvazione.",
+        "videoCall_create_restricted": "Avviare una videochiamata in un gruppo in cui non si può entrare liberamente: iscriversi richiede approvazione o invito, oppure il gruppo è nascosto."
       },
       "permUnavailable": "Funzionalità non configurata: concedere questo permesso non ha effetto.",
       "permUnavailableLink": "Visualizza configurazione",
@@ -424,7 +450,6 @@
     "API_KEY_CREATE_LIMIT_REACHED": "Hai raggiunto il massimo di {max} API Keys attive. Revoca una key esistente per crearne una nuova.",
     "API_KEY_DOES_NOT_EXIST": "L'API Key non è stata trovata.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Puoi selezionare solo i badge che ti sono stati assegnati.",
-    "CHAT_GROUP_ROOM_FEATURE_DISABLED": "Le chat di gruppo non sono attivate.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "Non è stato possibile creare la chat di gruppo.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Il messaggio deve contenere un testo o un file.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Non puoi avviare una chat con te stesso.",
@@ -439,19 +464,44 @@
       "NETWORK_ERROR": "Il server non è raggiungibile. Controlla la tua connessione internet e riprova.",
       "UNAUTHENTICATED": "Accedi per continuare."
     },
+    "GROUPS_FEATURE_DISABLED": "I gruppi non sono attivati in questa rete.",
+    "GROUP_ELEVATION_REASON_INVALID": "Il motivo può contenere al massimo {max} caratteri e non deve iniziare o finire con uno spazio.",
+    "GROUP_ELEVATION_REASON_MISSING": "Indica cosa stai facendo qui.",
+    "GROUP_ELEVATION_RIGHTS_MISSING": "I tuoi permessi di rete ti consentono solo di leggere qui.",
     "GROUP_FIELD_GROUP_ID_MISSING": "Il gruppo non è stato trovato.",
     "GROUP_MEMBERSHIP_USER_NOT_A_MEMBER": "L'utente non è membro di questo gruppo.",
+    "GROUP_MEMBERSHIP_USER_OR_GROUP_NOT_FOUND": "Utente o gruppo non trovato.",
+    "GROUP_POST_REMOVE_POST_NOT_IN_GROUP": "Questa pubblicazione non è in questo gruppo.",
+    "GROUP_RIGHTS_GROUP_NOT_FOUND": "Gruppo non trovato.",
+    "GROUP_ROLE_CREATE_NOT_AVAILABLE": "I gruppi non possono ancora definire ruoli propri.",
+    "GROUP_ROLE_LABEL_INVALID": "Il nome visualizzato è troppo lungo oppure inizia o finisce con uno spazio.",
+    "GROUP_ROLE_NAME_ALREADY_TAKEN": "Questo gruppo ha già un ruolo con questa chiave.",
+    "GROUP_ROLE_NAME_INVALID": "Questa chiave non è valida per un ruolo.",
+    "GROUP_ROLE_NAME_RESERVED": "Questa chiave appartiene a un ruolo di sistema.",
+    "GROUP_ROLE_NAME_UNKNOWN": "Questo ruolo non esiste (più) nel gruppo.",
+    "GROUP_ROLE_OWNER_NOT_EDITABLE": "Il ruolo di proprietario ha sempre tutti i permessi e non può essere modificato.",
+    "GROUP_ROLE_PERMISSIONS_NOT_HELD": "Non puoi concedere permessi che non hai tu stesso: {permissions}",
+    "GROUP_ROLE_REASSIGN_TARGET_INVALID": "Sposta i membri in un altro ruolo.",
+    "GROUP_ROLE_SYSTEM_NOT_DELETABLE": "Un ruolo di sistema non può essere eliminato.",
+    "GROUP_ROLE_SYSTEM_NOT_RENAMEABLE": "Un ruolo di sistema mantiene la sua chiave; modifica invece il nome visualizzato.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "La descrizione deve contenere almeno {min} caratteri.",
-    "GROUP_SAVE_HIDDEN_TYPE_NOT_PERMITTED": "Non puoi rendere segreto questo gruppo.",
+    "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Un gruppo che gli esterni non possono trovare non può nemmeno mostrare loro i suoi membri.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Questo nome unico del gruppo è già in uso.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Sono stati selezionati troppo pochi argomenti (almeno {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Sono stati selezionati troppi argomenti (al massimo {max}).",
+    "GROUP_TEMPLATE_NAME_UNKNOWN": "Non esiste alcun modello chiamato «{template}».",
+    "GROUP_TEMPLATE_PERMISSIONS_VISIBILITY_MISMATCH": "Con questi permessi il modello non corrisponderebbe più alla visibilità da cui prende il nome.",
+    "GROUP_TEMPLATE_ROLE_UNKNOWN": "Questo ruolo non esiste nel modello.",
+    "GROUP_VISIBILITY_RAISE_NOT_PERMITTED": "Non puoi rendere questo gruppo più privato di quanto ti sia consentito crearne.",
     "INVITE_CODE_CREATE_GROUP_MEMBERSHIP_REQUIRED": "Per creare un link di invito devi essere membro del gruppo.",
     "INVITE_CODE_CREATE_LIMIT_REACHED": "Hai raggiunto il numero massimo di link di invito.",
     "INVITE_CODE_INVALIDATE_CODE_NOT_FOUND": "Il link di invito non è stato trovato.",
     "LOCATION_COORDINATES_INCOMPLETE": "Manca una coordinata per il luogo.",
     "LOCATION_COORDINATES_NOT_RESOLVABLE": "Non è stato trovato alcun luogo per questo punto della mappa.",
     "LOCATION_FIELD_LOCATION_ID_MISSING": "Il luogo non è stato trovato.",
+    "LOCATION_ID_COORDINATES_MISSING": "Mancano le coordinate del luogo selezionato. Sceglilo di nuovo tra i suggerimenti.",
+    "LOCATION_ID_INVALID": "Il luogo selezionato non è valido.",
+    "LOCATION_ID_NOT_CONFIRMED": "Non è stato possibile confermare il luogo selezionato. Sceglilo di nuovo tra i suggerimenti.",
     "LOCATION_LATITUDE_OUT_OF_RANGE": "La latitudine del luogo non è valida.",
     "LOCATION_LONGITUDE_OUT_OF_RANGE": "La longitudine del luogo non è valida.",
     "LOCATION_NAME_NOT_FOUND": "Questo luogo non è stato trovato.",
@@ -495,7 +545,6 @@
     "USER_DOES_NOT_EXIST": "L'utente non è stato trovato.",
     "USER_PROFILE_NAME_TOO_SHORT": "Il nome deve contenere almeno {min} caratteri.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Questo utente non è bloccato.",
-    "VIDEO_CALL_FEATURE_DISABLED": "Le videochiamate non sono attivate.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Non è stata trovata alcuna iscrizione attiva a questo gruppo per la videochiamata.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Non puoi avviare una videochiamata in questo gruppo."
   },
@@ -960,6 +1009,23 @@
     "addUser": "Aggiungi utente",
     "addUserNoOptions": "Nessun utente trovato!",
     "addUserPlaceholder": "Nome utente",
+    "admission": {
+      "caption": "Si entra:",
+      "closed": {
+        "description": "Da fuori nessuno può unirsi né chiedere: solo un invito apre la porta.",
+        "title": "Solo su invito"
+      },
+      "label": "Onboarding",
+      "needsVisibility": "In un gruppo che nessuno da fuori può trovare non può entrare nessuno: solo un invito apre la porta.",
+      "onRequest": {
+        "description": "Si può chiedere di unirsi; qualcuno del gruppo deve acconsentire.",
+        "title": "Su richiesta"
+      },
+      "open": {
+        "description": "Chi vede il gruppo può unirsi subito.",
+        "title": "Senza chiedere"
+      }
+    },
     "allGroups": "Tutti i gruppi",
     "categories": "Argomento ::: Argomenti",
     "categoriesTitle": "Argomenti del gruppo",
@@ -983,6 +1049,16 @@
       "groupTitle": "Impostazioni di ",
       "title": "Modifica il mio gruppo"
     },
+    "elevation": {
+      "actingAsMember": "Qui agisci come {role}.",
+      "actingAsNonMember": "Non sei iscritto a questo gruppo.",
+      "activeTitle": "L'accesso da amministratore è attivo.",
+      "activeUntil": "Termina alle {time}, o quando lo chiudi tu.",
+      "end": "Termina l'accesso da amministratore",
+      "offerBody": "In più hai diritti di rete su di esso. La lettura è aperta; per modificare serve questa conferma, che resta registrata presso il gruppo.",
+      "reasonPlaceholder": "Di cosa si tratta?",
+      "start": "Usa l'accesso da amministratore"
+    },
     "errors": {
       "userAlreadyMember": "L'utente «{name}» è già membro!"
     },
@@ -999,14 +1075,18 @@
       "join": "Unisciti",
       "leave": "Esci",
       "pendingMember": "Membro in attesa",
+      "requestJoin": "Chiedi di unirti",
       "tooltip": "Il proprietario del gruppo deve ancora confermarti."
     },
     "labelSlug": "Nome unico del gruppo",
     "leaveModal": {
       "confirmButton": "Esci",
       "message": "Uscire da un gruppo potrebbe essere irreversibile!<br>Esci dal gruppo <b>«{name}»</b>!",
+      "messageAdmin": "<b>Amministri</b> questo gruppo. Se esci, vi rinunci.<br>Vuoi davvero lasciare il gruppo <b>«{name}»</b>?",
+      "messageOwner": "Sei <b>proprietario</b> di questo gruppo. Se esci, potrebbe restare senza, e allora solo un’amministrazione di rete potrà renderlo di nuovo operativo.<br>Vuoi davvero lasciare il gruppo <b>«{name}»</b>?",
       "title": "Vuoi davvero uscire dal gruppo?"
     },
+    "memberOutranked": "Non puoi cambiare il ruolo di questa persona: ha almeno quanto te.",
     "memberRemoved": "L'utente «{name}» è stato rimosso dal gruppo!",
     "members": "Membri",
     "membersAdministrationList": {
@@ -1035,10 +1115,60 @@
     "removeMemberButton": "Rimuovi",
     "removeMemberConfirmText": "Rimuovere l'utente «{name}» dal gruppo?",
     "removeMemberTitle": "Rimuovi membro",
+    "rights": {
+      "addRole": "Aggiungi un ruolo",
+      "advancedTitle": "Tutti i permessi in dettaglio",
+      "applyTemplate": "Applica un modello: sostituisce tutti i ruoli di questo gruppo con quelli del modello.",
+      "blockedByFeature": "Questa funzione è disattivata nella rete ({feature}).",
+      "blockedByNetwork": "Limitato a livello di rete: serve il permesso {permission}.",
+      "confirmApplyTemplate": "Applicare il modello «{template}» a questo gruppo? Tutti i ruoli vengono sostituiti da quelli del modello.",
+      "confirmApplyTemplateDiscards": "Applicare il modello «{template}» a questo gruppo? Tutti i ruoli vengono sostituiti da quelli del modello e le modifiche non salvate vanno perse.",
+      "confirmDelete": "Eliminare il ruolo «{role}»? I suoi membri diventeranno «{target}».",
+      "confirmReset": "Ripristinare tutti i ruoli di questo gruppo ai valori predefiniti? I ruoli che avete aggiunto vengono rimossi e i loro membri diventano membri ordinari.",
+      "deleteRole": "Elimina ruolo",
+      "description": "Decidete chi può fare cosa in questo gruppo — da chi non è membro fino agli amministratori.",
+      "discardDraft": "Le modifiche non salvate andranno perse. Continuare comunque?",
+      "drafted": "Modifiche non salvate",
+      "hideAdvanced": "Nascondi la vista dettagliata",
+      "labelField": "Nome visualizzato",
+      "mandatory": "Sempre concesso: un'iscrizione che non si può terminare non è un'impostazione.",
+      "members": "{count} membri",
+      "mootJoin": "Chi ha già un’iscrizione non si unisce una seconda volta.",
+      "mootLeave": "Chi non è iscritto non ha nessuna iscrizione da lasciare.",
+      "noRight": "Non puoi concedere un permesso che tu stesso non hai.",
+      "ownerHoldsEverything": "Il ruolo di proprietario ha sempre tutti i permessi di questo gruppo. Si può cambiare solo il suo nome visualizzato.",
+      "pendingBlocked": "Al momento nessuno ha questo ruolo: nessuno può chiedere di unirsi.",
+      "pendingUnreachable": "Al momento nessuno può chiedere di unirsi, quindi nessuno ha questo ruolo. Lo decide l’ammissione.",
+      "reset": "Ripristina i valori predefiniti",
+      "resultingType": "Con questi permessi il gruppo è:",
+      "roleKeyPlaceholder": "chiave, ad es. redazione",
+      "roleLabelPlaceholder": "nome visualizzato, ad es. Redazione",
+      "saved": "Permessi salvati",
+      "saveFirst": "Prima salva o annulla: ci sono modifiche non salvate.",
+      "simple": {
+        "applicants-read": "I richiedenti in attesa possono leggere le pubblicazioni",
+        "members-chat": "I membri possono scrivere nella chat del gruppo",
+        "members-comment": "I membri possono commentare",
+        "members-invite": "I membri possono invitare altre persone",
+        "members-post": "I membri possono scrivere pubblicazioni",
+        "nonmembers-members": "Chi non è membro può vedere l’elenco dei membri",
+        "nonmembers-profile": "Gli esterni possono vedere che il gruppo esiste",
+        "nonmembers-read": "Chi non è membro può leggere le pubblicazioni"
+      },
+      "simpleGroups": {
+        "applicants": "Richieste in attesa",
+        "members": "Membri",
+        "outsiders": "Esterni"
+      },
+      "systemRole": "Ruolo di sistema: non può essere eliminato né rinominato",
+      "title": "Permessi",
+      "toAdvanced": "Avanzate: tutti i permessi in dettaglio"
+    },
     "role": "Il tuo ruolo nel gruppo",
     "roles": {
       "admin": "Amministratore",
       "members": "Membri",
+      "none": "Non è membro",
       "owner": "Proprietario",
       "pending": "Membro in attesa",
       "usual": "Membro"
@@ -1046,8 +1176,16 @@
     "save": "Crea nuovo gruppo",
     "showMembers": "Elenco membri visibile a tutti",
     "teaser": {
+      "notReadable": "Non puoi ancora aprire questo gruppo — la tua richiesta è in attesa",
       "openGroup": "Apri gruppo",
       "unavailable": "Gruppo non disponibile"
+    },
+    "templateChoice": "Che tipo di gruppo è questo?",
+    "templateDescriptions": {
+      "channel": "Pubblico — ma solo la direzione del gruppo scrive i post",
+      "closed": "Tutte le pubblicazioni visibili solo ai membri del gruppo",
+      "hidden": "Il gruppo (compreso il nome) è completamente invisibile",
+      "public": "Il gruppo e tutte le pubblicazioni sono visibili a tutti gli utenti registrati"
     },
     "type": "Visibilità del gruppo",
     "typeDescriptions": {
@@ -1056,6 +1194,7 @@
       "public": "Il gruppo e tutte le pubblicazioni sono visibili a tutti gli utenti registrati"
     },
     "types": {
+      "channel": "Canale",
       "closed": "Chiuso",
       "hidden": "Segreto",
       "public": "Pubblico"
@@ -1073,11 +1212,11 @@
       "actionRadiusRequired": "Selezionare un raggio d'azione.",
       "descriptionLength": "La descrizione deve contenere almeno {min} caratteri.",
       "descriptionNotEmpty": "Inserire una descrizione.",
-      "groupTypeNotAllowed": "Non puoi creare questo tipo di gruppo.",
-      "groupTypeRequired": "Selezionare un tipo di gruppo.",
       "nameNotEmpty": "Inserire un nome del gruppo.",
       "slugInvalidCharacters": "Sono ammessi solo lettere minuscole, numeri, trattini e trattini bassi.",
-      "slugNotEmpty": "Inserire un nome unico del gruppo."
+      "slugNotEmpty": "Inserire un nome unico del gruppo.",
+      "typeNotAllowed": "Non puoi creare questo tipo di gruppo.",
+      "typeRequired": "Selezionare un tipo di gruppo."
     }
   },
   "hashtags-filter": {
@@ -1138,6 +1277,7 @@
     "invite-link-message-personal": "Sei stato invitato a unirti a {network}.",
     "invited-count": "Hai già invitato {count} persone.",
     "limit-reached": "Hai raggiunto il numero massimo di link di invito.",
+    "members-only": "solo per chi ha già un account",
     "my-invite-links": "I miei link di invito",
     "no-links": "Nessun link di invito creato ancora.",
     "redeemed-count": "Questo codice è stato usato {count} volte.",
@@ -1268,6 +1408,8 @@
         "reviewed": "Revisionati",
         "unreviewed": "Non revisionati"
       },
+      "hiddenContent": "Contenuto di un gruppo che non puoi leggere",
+      "hiddenDecision": "Non decidibile qui",
       "moreDetails": "Vedi dettagli",
       "name": "Segnalazioni",
       "noDecision": "Nessuna decisione!",
@@ -1306,6 +1448,7 @@
       "mentioned_in_post": "Ti ha menzionato in una pubblicazione",
       "on_date": "il",
       "post_in_group": "Ha pubblicato in un gruppo",
+      "post_removed_from_group": "Ha rimosso la tua pubblicazione dal gruppo",
       "removed_user_from_group": "Ti ha rimosso dal gruppo",
       "user_joined_group": "Si è unito al tuo gruppo",
       "user_left_group": "Ha lasciato il tuo gruppo"
@@ -1321,7 +1464,18 @@
     "previous": "Precedente"
   },
   "permissions": {
-    "deniedHint": "Non hai il permesso per questo."
+    "deniedHint": "Non hai il permesso per questo.",
+    "sections": {
+      "account": "Account",
+      "administration": "Amministrazione",
+      "communication": "Comunicazione",
+      "content": "Contenuti",
+      "groupAdministration": "Gruppi — amministrazione",
+      "groupModeration": "Gruppi — moderazione",
+      "membership": "Iscrizione",
+      "moderation": "Moderazione",
+      "visibility": "Visibilità"
+    }
   },
   "post": {
     "article": "Articolo",
@@ -1362,6 +1516,9 @@
       "push": "Porta in cima",
       "pushed": "Spostato in alto",
       "pushedSuccessfully": "Pubblicazione portata in cima con successo!",
+      "removedFromGroupSuccessfully": "Pubblicazione rimossa dal gruppo",
+      "removeFromGroup": "Rimuovi dal gruppo",
+      "removeFromGroupConfirm": "Rimuovere questa pubblicazione dal gruppo «{group}»? La pubblicazione resta al suo autore ma perde il suo posto nel gruppo.",
       "unobserve": "Smetti di osservare",
       "unobservedSuccessfully": "Non stai più osservando questa pubblicazione!",
       "unpin": "Rimuovi fissaggio (Rete)",
@@ -1825,6 +1982,11 @@
     "connecting": "Connessione in corso…",
     "connectionLost": "Connessione persa: {name}",
     "connectionPoor": "Connessione debole: {name}",
+    "deviceSettings": {
+      "button": "Dispositivi",
+      "speakerError": "Impossibile cambiare l'altoparlante.",
+      "title": "Impostazioni dei dispositivi"
+    },
     "dialogLabel": "Videochiamata di gruppo",
     "disableCamera": "Disattiva la fotocamera",
     "enableAudio": "Attiva audio",
@@ -1870,6 +2032,7 @@
       "cameraDisabled": "La fotocamera è disattivata.",
       "cameraOff": "Fotocamera: Disattivata",
       "cameraOn": "Fotocamera: Attivata",
+      "cameraStarting": "Avvio della fotocamera…",
       "cancel": "Annulla",
       "description": "Stai per partecipare alla videochiamata di questo gruppo. Controlla fotocamera, microfono e altoparlante, poi entra nella chiamata.",
       "errorBusy": "Il dispositivo è in uso da un'altra applicazione.",
@@ -1885,6 +2048,7 @@
       "micOff": "Microfono: Disattivato",
       "micOn": "Microfono: Attivato",
       "microphone": "Microfono",
+      "micStarting": "Avvio del microfono…",
       "noCamera": "Anteprima della fotocamera non disponibile.",
       "noDevices": "Nessun dispositivo rilevato",
       "permission": {

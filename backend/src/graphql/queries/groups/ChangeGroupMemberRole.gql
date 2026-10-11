@@ -1,4 +1,5 @@
 mutation ChangeGroupMemberRole($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
+  # eslint-disable-next-line @graphql-eslint/no-deprecated -- deliberately still called: the deprecated mutation stays part of the contract until the next major, and the specs assert it keeps working
   ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
     user {
       id
