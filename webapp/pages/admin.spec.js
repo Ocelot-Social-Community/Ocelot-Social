@@ -103,4 +103,36 @@ describe('admin.vue', () => {
       expect(mocks.$router.replace).not.toHaveBeenCalled()
     })
   })
+
+  describe('rendering the current page', () => {
+    // The redirect is client-only. On the server, rendering an inaccessible page would run
+    // its queries, which the backend refuses — and that fails the whole server render.
+    it('does not render a page the viewer cannot use, also not on the server', () => {
+      mocks.$can = (permission) => permission === 'policy.manage'
+      mocks.$route = { path: '/admin' }
+      mocks.$router = { replace: jest.fn() }
+      const original = process.server
+      process.server = true
+      try {
+        wrapper = Wrapper()
+      } finally {
+        process.server = original
+      }
+      expect(mocks.$router.replace).not.toHaveBeenCalled()
+      expect(wrapper.find('nuxt-child-stub').exists()).toBe(false)
+    })
+
+    it('renders a page the viewer can use', () => {
+      mocks.$route = { path: '/admin/roles' }
+      wrapper = Wrapper()
+      expect(wrapper.find('nuxt-child-stub').exists()).toBe(true)
+    })
+
+    it('renders an unknown sub-route, which guards itself', () => {
+      mocks.$can = () => false
+      mocks.$route = { path: '/admin/users/some-id' }
+      wrapper = Wrapper()
+      expect(wrapper.find('nuxt-child-stub').exists()).toBe(true)
+    })
+  })
 })

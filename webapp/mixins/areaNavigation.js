@@ -9,6 +9,10 @@
 // they can't use (e.g. the admin dashboard without network.statistics.read). If NO
 // route is accessible (possible in moderation), `areaHasNoAccessibleRoute` is true and
 // the layout shows an error state instead.
+//
+// The redirect is client-only, so the layout must not render an inaccessible page
+// (`currentRouteAccessible`): on the server it would run that page's queries, the backend
+// refuses them, and vue-apollo (since 3.1) fails the whole server render with a 500.
 export default {
   computed: {
     // The routes the current viewer may actually open — drives the sidebar.
@@ -17,6 +21,12 @@ export default {
     },
     areaHasNoAccessibleRoute() {
       return this.accessibleRoutes.length === 0
+    },
+    // Whether the page at the current path may be rendered: a known area page only if the
+    // viewer can use it; unknown sub-routes (detail pages) are left to their own checks.
+    currentRouteAccessible() {
+      const current = this.allRoutes.find((route) => route.path === this.$route?.path)
+      return !current || this.canAccessRoute(current)
     },
   },
   created() {
@@ -44,8 +54,7 @@ export default {
       if (process.server) return
       const accessible = this.accessibleRoutes
       if (!accessible.length) return
-      const current = this.allRoutes.find((route) => route.path === this.$route?.path)
-      if (current && !this.canAccessRoute(current) && this.$route.path !== accessible[0].path) {
+      if (!this.currentRouteAccessible && this.$route.path !== accessible[0].path) {
         this.$router.replace(accessible[0].path).catch(() => {})
       }
     },

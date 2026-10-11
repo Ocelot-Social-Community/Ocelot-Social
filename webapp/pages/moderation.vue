@@ -15,7 +15,7 @@
       <area-menu :routes="accessibleRoutes" :aria-label="$t('moderation.name')" />
       <div class="moderation-layout__main">
         <transition name="slide-up" appear>
-          <nuxt-child />
+          <nuxt-child v-if="currentRouteAccessible" />
         </transition>
       </div>
     </div>

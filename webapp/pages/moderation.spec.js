@@ -71,6 +71,24 @@ describe('moderation.vue', () => {
     expect(replace).not.toHaveBeenCalled()
   })
 
+  it('does not render the inaccessible page during server-side rendering', () => {
+    // Its queries would be refused, failing the whole server render.
+    const original = process.server
+    process.server = true
+    let wrapper
+    try {
+      wrapper = Wrapper({ can: (p) => p === 'user.delete.any', route: { path: '/moderation' } })
+    } finally {
+      process.server = original
+    }
+    expect(wrapper.find('nuxt-child-stub').exists()).toBe(false)
+  })
+
+  it('renders the page when the viewer can use it', () => {
+    const wrapper = Wrapper({ route: { path: '/moderation/users' } })
+    expect(wrapper.find('nuxt-child-stub').exists()).toBe(true)
+  })
+
   it('shows the error (and no menu) when no sub-page is accessible', () => {
     // e.g. a post.pin-only holder: in the moderation group, but no moderation PAGE.
     const wrapper = Wrapper({ can: () => false })
