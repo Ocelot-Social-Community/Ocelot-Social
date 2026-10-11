@@ -80,7 +80,7 @@ export default defineNuxtConfig({
       link: [
         { rel: "icon", href: favicon, ...(faviconType ? { type: faviconType } : {}) },
         ...brandStylesheets.map((href) => ({
-          rel: "stylesheet",
+          rel: "stylesheet" as const,
           href,
           tagPriority: "low" as const,
         })),
@@ -126,9 +126,6 @@ export default defineNuxtConfig({
       fs: {
         allow: ["/packages/ui"],
       },
-    },
-    build: {
-      minify: 'esbuild',
     },
   },
   eslint: {
