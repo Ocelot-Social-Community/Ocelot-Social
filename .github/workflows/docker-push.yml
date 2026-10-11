@@ -17,8 +17,8 @@ on:
 # The `publish` workflow retags them by commit sha (`sha-<40 hex>` below) into the version tags, so
 # a master commit without its images leaves a `publish` run that waits for them in vain — and, as
 # `publish` queues its runs, holds up every run behind it for its whole wait. Every commit's images
-# also make each state of master deployable on its own, to test or bisect. In order, because the
-# moving `master` tag must end up on the newest commit, not on whichever build finished last.
+# also make each state of master deployable on its own, to test or bisect. (The moving `master` tag
+# does not rely on that order — see the last step of the build job.)
 #
 # `cancel-in-progress: false` alone did NOT achieve that: the default `queue: single` holds exactly
 # ONE pending run, and the next arrival cancels it. A Dependabot wave merging ten pull requests
@@ -136,22 +136,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      # The queue processes runs in the order they ENTERED it, which is not guaranteed to be push
-      # order — so an older commit's build can come after a newer one's. Its `sha-` tags are right
-      # either way; the moving `master` tag must not be pulled back onto it.
-      - name: Check whether this is master's newest commit
-        id: newest
-        if: github.ref == 'refs/heads/master'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          head="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/master" --jq .object.sha)"
-          if [ "${head}" = "${GITHUB_SHA}" ]; then
-            echo "newest=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::master is at ${head} now — tagging ${GITHUB_SHA} by sha only, not as master"
-            echo "newest=false" >> "$GITHUB_OUTPUT"
-          fi
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302
@@ -164,6 +148,10 @@ jobs:
           # human or an app token; the version tags that actually reach the registry are applied
           # by the retag job in `publish`, which copies the manifest of `sha-<40 hex>` below.
           #
+          # No branch tag here: it MOVES, and the build is minutes long — by the time it pushes, a
+          # newer commit of the branch may already have pushed its own. The step after the build sets
+          # it, checked right before writing.
+          #
           # `type=sha` is listed twice on purpose: the short form is what a human reads in the
           # registry UI, the long form is what a deployment references. Helm charts get the full
           # commit sha from the dispatch payload, not an abbreviated one, and abbreviating it in
@@ -173,7 +161,6 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-            type=ref,event=branch,enable=${{ github.ref != 'refs/heads/master' || steps.newest.outputs.newest == 'true' }}
             type=ref,event=pr
             type=sha
             type=sha,format=long
@@ -215,3 +202,39 @@ jobs:
           # only costs the next build its cache hits, which is the cheaper failure by a wide margin.
           cache-from: type=gha,scope=${{ matrix.app.cacheScope }}
           cache-to: ${{ matrix.app.cacheTo && format('type=gha,mode=max,ignore-error=true,scope={0}', matrix.app.cacheScope) || '' }}
+
+      # The moving branch tag (`master`, or the branch's name), written only by the build of the
+      # commit that is the branch's head RIGHT NOW. master queues its runs in the order they entered
+      # the queue, which is not guaranteed to be push order; branches run their commits side by side.
+      # Either way an older build can finish last, and if it wrote the tag with its push, the tag
+      # would point back at older images. Checked here, seconds before writing, instead of before the
+      # build; the `sha-` tags are pushed by every build regardless.
+      - name: Branch tag for this branch's newest commit
+        id: branchtag
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: type=ref,event=branch
+      - name: Point the branch tag at this build
+        if: steps.branchtag.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH_TAG: ${{ steps.branchtag.outputs.tags }}
+          SOURCE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+        run: |
+          # Only a confirmed 404 (branch deleted meanwhile) is a reason to skip quietly.
+          if ! head="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/${GITHUB_REF_NAME}" --jq .object.sha 2> "${RUNNER_TEMP}/api-error.txt")"; then
+            if grep -q 'HTTP 404' "${RUNNER_TEMP}/api-error.txt"; then
+              echo "::notice::${GITHUB_REF_NAME} is gone — no branch tag"
+              exit 0
+            fi
+            cat "${RUNNER_TEMP}/api-error.txt" >&2
+            exit 1
+          fi
+          if [ "${head}" != "${GITHUB_SHA}" ]; then
+            echo "::notice::${GITHUB_REF_NAME} is at ${head} now — ${GITHUB_SHA} keeps its sha tags, the branch tag stays with the newer build"
+            exit 0
+          fi
+          # Registry paths are lowercase; metadata-action lowercased BRANCH_TAG already.
+          docker buildx imagetools create --tag "${BRANCH_TAG}" "$(echo "${SOURCE}" | tr '[:upper:]' '[:lower:]')"
