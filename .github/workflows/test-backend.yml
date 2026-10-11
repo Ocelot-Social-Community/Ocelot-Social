@@ -49,13 +49,26 @@ jobs:
   files-changed:
     name: Detect File Changes - Backend
     runs-on: ubuntu-latest
+    # actions: read for the merge-queue lookup below; a job-level block replaces the workflow's,
+    # so the rest is restated.
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: read
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
       docker: ${{ steps.changes.outputs.docker }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # On master, a commit the merge queue already tested here reports no changes: every job
+      # below is then skipped (which counts as passed), instead of running the same tree twice.
+      - name: Already verified by the merge queue?
+        id: queue
+        uses: ./.github/actions/merge-queue-verified
+
       - name: Check for backend file changes
+        if: steps.queue.outputs.verified != 'true'
         uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: changes
         with:

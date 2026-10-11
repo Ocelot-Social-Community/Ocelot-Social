@@ -46,8 +46,33 @@ defaults:
     shell: bash
 
 jobs:
+  # On master, a commit the merge queue already tested here is not tested a second time: the queue
+  # fast-forwards master to the very commit it ran this workflow on. The prepare jobs below are
+  # then skipped (which counts as passed), the matrix with them, and the status job accepts it.
+  queue:
+    name: Already verified by the merge queue?
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      verified: ${{ steps.queue.outputs.verified }}
+      run-id: ${{ steps.queue.outputs.run-id }}
+    steps:
+      - name: Checkout the action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .github/actions
+          persist-credentials: false
+
+      - name: Already verified by the merge queue?
+        id: queue
+        uses: ./.github/actions/merge-queue-verified
+
   prepare_backend_environment:
     name: Fullstack | prepare backend environment
+    needs: [queue]
+    if: needs.queue.outputs.verified != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -131,6 +156,8 @@ jobs:
 
   prepare_webapp_image:
     name: Fullstack | prepare webapp image
+    needs: [queue]
+    if: needs.queue.outputs.verified != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -188,6 +215,8 @@ jobs:
 
   prepare_cypress:
     name: Fullstack | prepare cypress
+    needs: [queue]
+    if: needs.queue.outputs.verified != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Delete huge unnecessary tools folder
@@ -269,6 +298,8 @@ jobs:
 
   list_features:
     name: List Feature Files
+    needs: [queue]
+    if: needs.queue.outputs.verified != 'true'
     runs-on: ubuntu-latest
     outputs:
       features: ${{ steps.list.outputs.features }}
@@ -526,7 +557,7 @@ jobs:
   publish_readme_screenshots:
     name: README | publish screenshots
     if: always() && github.event_name == 'push' && github.ref == 'refs/heads/master'
-    needs: [fullstack_tests]
+    needs: [queue, fullstack_tests]
     # One publish at a time, never torn in half: the head check below and the force-push are two
     # steps, and two publishes interleaving between them could still leave the older pictures on
     # top. `queue: max`, not the default `queue: single`: master commits run side by side, so an
@@ -541,6 +572,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      # To download the screenshots from the merge queue's run (see the step below).
+      actions: read
     steps:
       # Missing when the screenshot entry failed — then the published pictures simply stay as they
       # were, instead of this job failing for a reason the e2e status already reports.
@@ -551,6 +584,9 @@ jobs:
         with:
           name: readme-screenshots
           path: screenshots
+          # A commit the merge queue already tested took its pictures there, not in this run.
+          run-id: ${{ needs.queue.outputs.run-id || github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push to the readme-screenshots branch
         if: steps.download.outcome == 'success'
@@ -584,11 +620,15 @@ jobs:
   e2e_status:
     name: E2E | Status
     if: always()
-    needs: [fullstack_tests]
+    needs: [queue, fullstack_tests]
     runs-on: ubuntu-latest
     steps:
       - name: Check E2E results
         run: |
+          if [ "${{ needs.queue.outputs.verified }}" = 'true' ] && [ "${{ needs.fullstack_tests.result }}" = 'skipped' ]; then
+            echo "Passed in the merge queue on this very commit (run ${{ needs.queue.outputs.run-id }}) — not repeated"
+            exit 0
+          fi
           if [ "${{ needs.fullstack_tests.result }}" != "success" ]; then
             echo "E2E tests failed or were cancelled (result: ${{ needs.fullstack_tests.result }})"
             exit 1
