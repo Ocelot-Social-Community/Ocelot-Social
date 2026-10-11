@@ -72,7 +72,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          head="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/${GITHUB_REF_NAME}" --jq .object.sha 2>/dev/null || true)"
+          # Only a confirmed 404 means the branch is gone. Any other API error fails the step: read as
+          # "gone" it would skip the build of a commit that is still the branch's head.
+          if ! head="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/${GITHUB_REF_NAME}" --jq .object.sha 2> "${RUNNER_TEMP}/api-error.txt")"; then
+            if grep -q 'HTTP 404' "${RUNNER_TEMP}/api-error.txt"; then
+              head=''
+            else
+              cat "${RUNNER_TEMP}/api-error.txt" >&2
+              exit 1
+            fi
+          fi
           if [ "${head}" = "${GITHUB_SHA}" ]; then
             echo "superseded=false" >> "$GITHUB_OUTPUT"
           else
@@ -127,6 +136,22 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      # The queue processes runs in the order they ENTERED it, which is not guaranteed to be push
+      # order — so an older commit's build can come after a newer one's. Its `sha-` tags are right
+      # either way; the moving `master` tag must not be pulled back onto it.
+      - name: Check whether this is master's newest commit
+        id: newest
+        if: github.ref == 'refs/heads/master'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          head="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/master" --jq .object.sha)"
+          if [ "${head}" = "${GITHUB_SHA}" ]; then
+            echo "newest=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::master is at ${head} now — tagging ${GITHUB_SHA} by sha only, not as master"
+            echo "newest=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302
@@ -148,7 +173,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-            type=ref,event=branch
+            type=ref,event=branch,enable=${{ github.ref != 'refs/heads/master' || steps.newest.outputs.newest == 'true' }}
             type=ref,event=pr
             type=sha
             type=sha,format=long
