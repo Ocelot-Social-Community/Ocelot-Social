@@ -1,7 +1,9 @@
 // ATTENTION: DO NOT PUT ANY SECRETS IN HERE (or the .env)
 
 import dotenv from 'dotenv'
-dotenv.config() // we want to synchronize @nuxt-dotenv and nuxt-env
+// quiet: since v17 dotenv reports every load, since v18 through console.error — which the tests
+// turn into a failure, and which says nothing worth knowing here.
+dotenv.config({ quiet: true }) // we want to synchronize @nuxt-dotenv and nuxt-env
 
 // Load Package Details for some default values
 const pkg = require('../package')
