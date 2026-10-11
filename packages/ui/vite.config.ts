@@ -24,8 +24,8 @@ export default defineConfig({
     tsconfigPaths(),
     dts({
       include: ['src/**/*.ts', 'src/**/*.vue', 'src/**/*.d.ts'],
-      outDir: 'dist',
-      rollupTypes: true,
+      outDirs: 'dist',
+      bundleTypes: true,
       copyDtsFiles: true,
       afterBuild: async () => {
         // Generate .d.cts files for CJS compatibility
