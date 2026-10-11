@@ -51,6 +51,12 @@ jobs:
   files-changed:
     name: Detect File Changes
     runs-on: ubuntu-latest
+    # actions: read for the merge-queue lookup below; a job-level block replaces the workflow's,
+    # so the rest is restated.
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: read
     outputs:
       release-please: ${{ steps.changes.outputs.release-please }}
     steps:
@@ -63,7 +69,14 @@ jobs:
       # finally to the `release-please` rule inside it, and then checks that the rule still matches
       # every file the lint opens. Rewiring any link of that chain fails the lint loudly rather than
       # leaving the job gated on a list nobody maintains.
+      # On master, a commit the merge queue already tested here reports no changes: every job
+      # below is then skipped (which counts as passed), instead of running the same tree twice.
+      - name: Already verified by the merge queue?
+        id: queue
+        uses: ./.github/actions/merge-queue-verified
+
       - name: Check for file changes
+        if: steps.queue.outputs.verified != 'true'
         uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: changes
         with:
