@@ -57,6 +57,12 @@ const definitions = {
     text: 'User with this slug already exists.',
   },
   // users & badges
+  // The act-on hierarchy (role/authority.ts): disabling or deleting another account needs a role
+  // with strictly more authority than the target's.
+  USER_ACTION_TARGET_NOT_OUTRANKED: {
+    type: 'FORBIDDEN',
+    text: 'You can only do this to users whose role grants less authority than yours.',
+  },
   USER_ADMIN_SEARCH_NOT_PERMITTED: {
     type: 'FORBIDDEN',
     text: 'You are not allowed to search the user administration.',

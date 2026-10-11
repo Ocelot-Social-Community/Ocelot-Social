@@ -541,6 +541,7 @@
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "Il ruolo «{name}» esiste già.",
     "ROLE_SAVE_NAME_INVALID": "Il nome del ruolo deve avere da 2 a 50 caratteri e può contenere solo lettere, cifre, «_» e «-»; il primo carattere deve essere una lettera o una cifra.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "Un ruolo non può essere creato o contrassegnato come protetto.",
+    "USER_ACTION_TARGET_NOT_OUTRANKED": "Puoi farlo solo con utenti il cui ruolo concede meno poteri del tuo.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Non puoi cercare nell'amministrazione degli utenti.",
     "USER_DOES_NOT_EXIST": "L'utente non è stato trovato.",
     "USER_PROFILE_NAME_TOO_SHORT": "Il nome deve contenere almeno {min} caratteri.",
