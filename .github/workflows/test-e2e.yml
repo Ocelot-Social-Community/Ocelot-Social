@@ -55,6 +55,12 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        # Base images from Docker Hub through Google's mirror of it first: a 503 from Docker Hub
+        # failed whole builds. BuildKit falls back to docker.io whenever the mirror has nothing.
+        with:
+          buildkitd-config-inline: |
+            [registry."docker.io"]
+              mirrors = ["mirror.gcr.io"]
 
       - name: Copy backend env file
         run: |
@@ -127,6 +133,12 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        # Base images from Docker Hub through Google's mirror of it first: a 503 from Docker Hub
+        # failed whole builds. BuildKit falls back to docker.io whenever the mirror has nothing.
+        with:
+          buildkitd-config-inline: |
+            [registry."docker.io"]
+              mirrors = ["mirror.gcr.io"]
 
       # `e2e`, not `test`: same build, but assembled `FROM base` around the finished /build and started
       # with nuxt-start instead of the dev server (see webapp/Dockerfile). `test` stays what the webapp
