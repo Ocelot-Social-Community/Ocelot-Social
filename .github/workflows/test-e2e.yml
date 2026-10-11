@@ -504,6 +504,13 @@ jobs:
     name: README | publish screenshots
     if: always() && github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: [fullstack_tests]
+    # One publish at a time, never torn in half: the head check below and the force-push are two
+    # steps, and two publishes interleaving between them could still leave the older pictures on
+    # top. A newer publish replacing a pending older one (the default `queue: single`) is right —
+    # the older one would only find master moved on and skip.
+    concurrency:
+      group: publish-readme-screenshots
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     permissions:
       contents: write
