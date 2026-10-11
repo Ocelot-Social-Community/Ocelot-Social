@@ -506,10 +506,14 @@ jobs:
     needs: [fullstack_tests]
     # One publish at a time, never torn in half: the head check below and the force-push are two
     # steps, and two publishes interleaving between them could still leave the older pictures on
-    # top. A newer publish replacing a pending older one (the default `queue: single`) is right —
-    # the older one would only find master moved on and skip.
+    # top. `queue: max`, not the default `queue: single`: master commits run side by side, so an
+    # OLDER commit's publish can reach this group after a newer one is already pending — with
+    # `single` it would replace that newer one, then find master moved on and skip, and nothing
+    # would be published at all. Queued in order, every publish gets its turn and the head check
+    # lets only the newest commit's through.
     concurrency:
       group: publish-readme-screenshots
+      queue: max
       cancel-in-progress: false
     runs-on: ubuntu-latest
     permissions:
