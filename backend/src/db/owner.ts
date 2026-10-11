@@ -45,7 +45,7 @@ const createDefaultOwnerUser = async () => {
           u.slug = $slug,
           u.createdAt = toString(datetime()),
           u.allowEmbedIframes = false,
-          u.showShoutsPublicly = false,
+          u.showShoutsPublicly = true,
           u.deleted = false,
           u.disabled = false
         MERGE (e)-[:BELONGS_TO]->(u)

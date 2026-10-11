@@ -75,7 +75,7 @@ const defaults = new Map<string, Defaults>([
         deleted: false,
         disabled: false,
         allowEmbedIframes: false,
-        showShoutsPublicly: false,
+        showShoutsPublicly: true,
         emailNotificationsCommentOnObservedPost: true,
         emailNotificationsMention: true,
         emailNotificationsChatMessage: true,

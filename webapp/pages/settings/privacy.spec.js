@@ -53,6 +53,21 @@ describe('privacy.vue', () => {
       expect(wrapper.classes('os-card')).toBe(true)
     })
 
+    // Public is the default users opt out of; an account that never saved the setting has none.
+    it.each([
+      [undefined, true],
+      [null, true],
+      [false, false],
+    ])('shows the shouts as shared for a stored %s: %s', (stored, shared) => {
+      const ownStore = new Vuex.Store({
+        getters: { 'auth/user': () => ({ id: 'u343', showShoutsPublicly: stored }) },
+      })
+      const own = mount(Privacy, { store: ownStore, mocks, localVue })
+
+      expect(own.vm.shoutsAllowed).toBe(shared)
+      expect(own.find('#allow-shouts').element.checked).toBe(shared)
+    })
+
     it('clicking on submit changes shoutsAllowed to false', async () => {
       await wrapper.find('#allow-shouts').setChecked(false)
       await wrapper.find('button').trigger('click')
