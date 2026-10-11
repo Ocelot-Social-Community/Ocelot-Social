@@ -13,22 +13,31 @@ on:
   # The merge queue runs the required checks on its temporary gh-readonly-queue/master/* branch.
   merge_group:
 
-# One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
-# cancelled instead of holding a runner. `event_name` is part of the group on purpose: a branch
-# push and its pull_request run are separate required checks — they must not cancel each other.
-# Keyed by pull request NUMBER, not `head_ref`: head_ref is only the branch NAME, which is unique
-# within this repository but not across forks — two contributors using GitHub's "edit this file"
-# flow both get `patch-1`, and their pull requests would then cancel each other's runs. `github.ref`
-# stays as the fallback for events that carry no pull request (a push gives refs/heads/<branch>).
+# master builds EVERY commit, one after the other, in order: its images are the release artefacts.
+# The `publish` workflow retags them by commit sha (`sha-<40 hex>` below) into the version tags, so
+# a master commit without its images leaves a `publish` run that waits for them in vain — and, as
+# `publish` queues its runs, holds up every run behind it for its whole wait. Every commit's images
+# also make each state of master deployable on its own, to test or bisect. (The moving `master` tag
+# does not rely on that order — see the last step of the build job.)
 #
-# master is the exception and is NEVER cancelled: its images are the release artefacts. The
-# `publish` workflow retags them by commit sha (`sha-<40 hex>` below) into the version tags, so a
-# cancelled master build leaves a commit whose images never exist and a `publish` run that waits
-# for them in vain. Two master merges in quick succession are exactly the case that would trigger
-# it, which is why the cost of a few extra runner minutes is the cheaper side of this trade.
+# `cancel-in-progress: false` alone did NOT achieve that: the default `queue: single` holds exactly
+# ONE pending run, and the next arrival cancels it. A Dependabot wave merging ten pull requests
+# within seconds therefore built the first and the last commit only — the eight in between never
+# got images, and their `publish` runs failed one by one, 40 minutes each. `queue: max` keeps a real
+# backlog instead (up to 100 runs, processed in order).
+#
+# `queue` takes no expression, and `queue: max` with cancelling is a workflow validation error, so
+# branches cannot keep the old cancelling in this block. They get their own group per commit instead:
+# a new push starts at once rather than waiting behind the previous one, and the `superseded` check
+# in the first job ends a run whose branch has moved on before any image is built. What remains is a
+# build that was already running when the next push came — it runs to its end.
+#
+# The merge queue's runs and tags are per commit anyway. `event_name` stays part of the group, so a
+# push and a merge_group run of the same commit do not share one.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref == 'refs/heads/master' && github.ref || github.sha }}
+  queue: max
+  cancel-in-progress: false
 
 # Workflow-wide floor for GITHUB_TOKEN, so no job silently inherits the repository or organisation
 # default. A job that needs more overrides it locally — note that a job-level block REPLACES this one
@@ -50,7 +59,35 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.load.outputs.matrix }}
+      superseded: ${{ steps.superseded.outputs.superseded }}
     steps:
+      # What cancelling did for branches before (see the concurrency block): a push whose branch has
+      # moved on — or is gone — builds nothing. Its images would only be replaced by the newer push's,
+      # and the pull request's checks are decided on its head commit anyway. With the free plan's
+      # limited parallel jobs a run often waits for a runner, so by the time this runs a newer push
+      # is common. Never for master (every commit counts there), tags or the merge queue.
+      - name: Check whether the branch has moved on
+        id: superseded
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/') && github.ref != 'refs/heads/master'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Only a confirmed 404 means the branch is gone. Any other API error fails the step: read as
+          # "gone" it would skip the build of a commit that is still the branch's head.
+          if ! head="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/${GITHUB_REF_NAME}" --jq .object.sha 2> "${RUNNER_TEMP}/api-error.txt")"; then
+            if grep -q 'HTTP 404' "${RUNNER_TEMP}/api-error.txt"; then
+              head=''
+            else
+              cat "${RUNNER_TEMP}/api-error.txt" >&2
+              exit 1
+            fi
+          fi
+          if [ "${head}" = "${GITHUB_SHA}" ]; then
+            echo "superseded=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::${GITHUB_REF_NAME} is at ${head:-nothing} now, not ${GITHUB_SHA} — not building superseded images"
+            echo "superseded=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Checkout repository
         # actions/checkout leaves GITHUB_TOKEN in the workspace's .git/config unless told not to.
         # No job in this workflow runs an authenticated git operation, so there is nothing to keep
@@ -72,6 +109,7 @@ jobs:
     # interpolates every matrix key, so adding a field to images.json would rename all ten checks.
     name: build-and-push-images (${{ matrix.app.name }})
     needs: images
+    if: needs.images.outputs.superseded != 'true'
     strategy:
       matrix:
         app: ${{ fromJSON(needs.images.outputs.matrix) }}
@@ -110,6 +148,10 @@ jobs:
           # human or an app token; the version tags that actually reach the registry are applied
           # by the retag job in `publish`, which copies the manifest of `sha-<40 hex>` below.
           #
+          # No branch tag here: it MOVES, and the build is minutes long — by the time it pushes, a
+          # newer commit of the branch may already have pushed its own. The step after the build sets
+          # it, checked right before writing.
+          #
           # `type=sha` is listed twice on purpose: the short form is what a human reads in the
           # registry UI, the long form is what a deployment references. Helm charts get the full
           # commit sha from the dispatch payload, not an abbreviated one, and abbreviating it in
@@ -119,7 +161,6 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-            type=ref,event=branch
             type=ref,event=pr
             type=sha
             type=sha,format=long
@@ -161,3 +202,39 @@ jobs:
           # only costs the next build its cache hits, which is the cheaper failure by a wide margin.
           cache-from: type=gha,scope=${{ matrix.app.cacheScope }}
           cache-to: ${{ matrix.app.cacheTo && format('type=gha,mode=max,ignore-error=true,scope={0}', matrix.app.cacheScope) || '' }}
+
+      # The moving branch tag (`master`, or the branch's name), written only by the build of the
+      # commit that is the branch's head RIGHT NOW. master queues its runs in the order they entered
+      # the queue, which is not guaranteed to be push order; branches run their commits side by side.
+      # Either way an older build can finish last, and if it wrote the tag with its push, the tag
+      # would point back at older images. Checked here, seconds before writing, instead of before the
+      # build; the `sha-` tags are pushed by every build regardless.
+      - name: Branch tag for this branch's newest commit
+        id: branchtag
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: type=ref,event=branch
+      - name: Point the branch tag at this build
+        if: steps.branchtag.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH_TAG: ${{ steps.branchtag.outputs.tags }}
+          SOURCE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+        run: |
+          # Only a confirmed 404 (branch deleted meanwhile) is a reason to skip quietly.
+          if ! head="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/${GITHUB_REF_NAME}" --jq .object.sha 2> "${RUNNER_TEMP}/api-error.txt")"; then
+            if grep -q 'HTTP 404' "${RUNNER_TEMP}/api-error.txt"; then
+              echo "::notice::${GITHUB_REF_NAME} is gone — no branch tag"
+              exit 0
+            fi
+            cat "${RUNNER_TEMP}/api-error.txt" >&2
+            exit 1
+          fi
+          if [ "${head}" != "${GITHUB_SHA}" ]; then
+            echo "::notice::${GITHUB_REF_NAME} is at ${head} now — ${GITHUB_SHA} keeps its sha tags, the branch tag stays with the newer build"
+            exit 0
+          fi
+          # Registry paths are lowercase; metadata-action lowercased BRANCH_TAG already.
+          docker buildx imagetools create --tag "${BRANCH_TAG}" "$(echo "${SOURCE}" | tr '[:upper:]' '[:lower:]')"
