@@ -20,8 +20,13 @@ on:
 
 # Same reasoning as the other workflows: one run per workflow and branch, keyed by pull request
 # NUMBER rather than head_ref, so two forks using the same branch name do not cancel each other.
+#
+# master is the exception: one group per COMMIT there, so a merge never cancels the run of the
+# commit before it. Every master commit gets its full result instead of a red "cancelled" — a
+# Dependabot wave merging every few minutes otherwise left hardly one commit with complete checks.
+# Runs of different master commits may overlap; nothing here depends on their order.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || (github.ref == 'refs/heads/master' && github.sha) || github.ref }}
   cancel-in-progress: true
 
 # pull-requests:read is what dorny/paths-filter needs to list a pull request's changed files via the
