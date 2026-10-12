@@ -196,14 +196,18 @@
               once the server has confirmed the participation — until then, and if
               it never does, the sidebar is the group's chat as it always was.
             -->
-            <os-toggle-group
-              v-if="chatRoomId"
-              class="video-call__chat-tabs"
-              :options="chatTabs"
-              :value="activeChatTab"
-              :label="$t('videoCall.chatTabs.label')"
-              @select="selectChatTab"
-            />
+            <!--
+              A wrapper of this component's own: OsToggleGroup's root carries no
+              scoped-style attribute, so the sidebar's layout rules would miss it.
+            -->
+            <div v-if="chatRoomId" class="video-call__chat-tabs">
+              <os-toggle-group
+                :options="chatTabs"
+                :value="activeChatTab"
+                :label="$t('videoCall.chatTabs.label')"
+                @select="selectChatTab"
+              />
+            </div>
             <client-only>
               <chat
                 :key="activeChatTab"

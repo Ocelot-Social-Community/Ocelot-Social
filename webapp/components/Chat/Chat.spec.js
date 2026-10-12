@@ -1716,7 +1716,7 @@ describe('Chat.vue', () => {
           await wrapper.vm.exportRoom()
           expect(createObjectURL).toHaveBeenCalledWith(expect.any(Blob))
           expect(click).toHaveBeenCalledTimes(1)
-          expect(click.mock.instances[0].download).toBe('chat-2026-01-01.txt')
+          expect(click.mock.instances[0].download).toMatch(/^chat_Yoga_\d{4}-\d\d-\d\d_.+\.txt$/)
           expect(revokeObjectURL).toHaveBeenCalledWith('blob:export')
           expect(wrapper.vm.exporting).toBe(false)
         } finally {
@@ -1724,6 +1724,47 @@ describe('Chat.vue', () => {
           URL.createObjectURL = original.create
           URL.revokeObjectURL = original.revoke
         }
+      })
+
+      describe('file name', () => {
+        // Local time, so the expectation holds in whatever zone the tests run.
+        const at = (day, hours, minutes) => new Date(2026, 9, day, hours, minutes)
+
+        it('names the group and the span from the start of the chat to the saving', () => {
+          wrapper = Wrapper()
+          const name = wrapper.vm.exportFileName(
+            { roomName: 'Yoga', createdAt: at(12, 14, 3).toISOString() },
+            at(12, 15, 10),
+          )
+          expect(name).toBe('chat_Yoga_2026-10-12_14-03--15-10.txt')
+        })
+
+        it('repeats the day when the chat ran past midnight', () => {
+          wrapper = Wrapper()
+          const name = wrapper.vm.exportFileName(
+            { roomName: 'Yoga', createdAt: at(12, 23, 50).toISOString() },
+            at(13, 0, 20),
+          )
+          expect(name).toBe('chat_Yoga_2026-10-12_23-50--2026-10-13_00-20.txt')
+        })
+
+        it('keeps the group name to characters a file name takes', () => {
+          wrapper = Wrapper()
+          const name = wrapper.vm.exportFileName(
+            { roomName: ' Yoga / Köln: "Anfänger"? ', createdAt: at(12, 14, 3).toISOString() },
+            at(12, 15, 10),
+          )
+          expect(name).toBe('chat_Yoga-Köln-Anfänger_2026-10-12_14-03--15-10.txt')
+        })
+
+        it('does without a name the room does not have', () => {
+          wrapper = Wrapper()
+          const name = wrapper.vm.exportFileName(
+            { roomName: '', createdAt: at(12, 14, 3).toISOString() },
+            at(12, 15, 10),
+          )
+          expect(name).toBe('chat_2026-10-12_14-03--15-10.txt')
+        })
       })
 
       it('reports a failure and is ready for another try', async () => {

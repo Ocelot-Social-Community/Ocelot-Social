@@ -1234,6 +1234,27 @@ export default {
       return lines.join('\n') + '\n'
     },
 
+    // "chat_<group>_<day>_<from>--<until>.txt": the group the call took place in, and the
+    // span the file covers — from the start of the chat to the moment it is saved, in the
+    // viewer's own time. Kept to characters every file system takes.
+    exportFileName(room, savedAt = new Date()) {
+      const pad = (n) => String(n).padStart(2, '0')
+      const day = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+      const time = (d) => `${pad(d.getHours())}-${pad(d.getMinutes())}`
+      const startedAt = room.createdAt ? new Date(room.createdAt) : savedAt
+      const name = (room.roomName || '')
+        .replace(/[\\/:*?"<>|\p{Cc}]/gu, ' ')
+        .trim()
+        .replace(/\s+/g, '-')
+      // The day is only repeated when the chat ran past midnight.
+      const until =
+        day(savedAt) === day(startedAt) ? time(savedAt) : `${day(savedAt)}_${time(savedAt)}`
+      return ['chat', name, `${day(startedAt)}_${time(startedAt)}--${until}`]
+        .filter(Boolean)
+        .join('_')
+        .concat('.txt')
+    },
+
     async exportRoom() {
       const room = this.selectedRoom
       if (!room?.id || this.exporting) return
@@ -1245,9 +1266,8 @@ export default {
         })
         const url = URL.createObjectURL(blob)
         const link = document.createElement('a')
-        const day = new Date(room.createdAt || Date.now()).toISOString().slice(0, 10)
         link.href = url
-        link.download = `chat-${day}.txt`
+        link.download = this.exportFileName(room)
         document.body.appendChild(link)
         link.click()
         link.remove()
