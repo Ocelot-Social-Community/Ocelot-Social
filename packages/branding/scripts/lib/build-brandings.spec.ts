@@ -770,6 +770,21 @@ describe('metadata.ogImage', () => {
       )
     })
 
+    // A crawler fetches og:image by URL; an inline logo is no URL, whatever image it holds.
+    test('never follows a data: URL logo', async () => {
+      const inline = (url) =>
+        brandDir({ config: `export default (d) => d({ logos: { signupPath: '${url}' } })\n` })
+
+      for (const url of [
+        'data:image/svg+xml;base64,PHN2Zy8+',
+        'data:image/png;base64,iVBORw0KGgo=',
+      ]) {
+        const metadata = await metadataOf(inline(url))
+        assert.equal(metadata.ogImage, '/img/custom/logo-squared.png')
+        assert.equal(metadata.ogImageWidth, '1200') // still the vanilla picture
+      }
+    })
+
     test('leaves the vanilla image alone when the brand keeps the vanilla logo', async () => {
       const dir = brandDir({
         config: `export default (d) => d({ metadata: { applicationName: 'X' } })\n`,
@@ -815,6 +830,18 @@ describe('metadata.ogImage', () => {
       assert.match(
         await ogWarnings(dir),
         /metadata\.ogImage 'assets\/og\.svg' is SVG, which link previews do not render — ship a PNG or JPEG/,
+      )
+    })
+
+    test("warns about a data: URL but keeps it — the choice is the brand's", async () => {
+      const dir = brandDir({
+        config: `export default (d) => d({ metadata: { ogImage: 'data:image/png;base64,iVBORw0KGgo=' } })\n`,
+      })
+
+      assert.equal((await metadataOf(dir)).ogImage, 'data:image/png;base64,iVBORw0KGgo=')
+      assert.match(
+        await ogWarnings(dir),
+        /metadata\.ogImage is a data: URL — link previews fetch the image from a URL/,
       )
     })
 

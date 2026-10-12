@@ -569,10 +569,19 @@ function resolveOgImage(dir: string, id: string, config: BrandingConfig, warning
     dropInheritedOgFields(config, false)
   }
   const rel = ownImage ? metadata.ogImage : logo
+  // A data: URL is no address a link preview can fetch — whatever image it holds, the crawler gets
+  // nothing, and the page would carry the whole payload in a <meta> tag.
+  const inline = /^data:/i.test(rel)
   if (!isRelativeAsset(rel)) {
-    // Nothing to measure. An own image is the brand's call; a logo elsewhere can only be judged by its
-    // name, and an .svg one is exactly the file this function exists to keep out of the previews.
-    if (!ownImage && !/\.svg([?#]|$)/i.test(rel)) {
+    // Nothing to measure. An own image is the brand's call, only flagged when it cannot work; a logo
+    // elsewhere can only be judged by its name, and an .svg one is exactly the file this function
+    // exists to keep out of the previews.
+    if (ownImage && inline) {
+      warnings.push(
+        `  ! ${id}: metadata.ogImage is a data: URL — link previews fetch the image from a URL, so ` +
+          `they show none; ship a PNG or JPEG file, ideally 1200×630`,
+      )
+    } else if (!ownImage && !inline && !/\.svg([?#]|$)/i.test(rel)) {
       metadata.ogImage = rel
       dropInheritedOgFields(config, true)
     }
