@@ -5,6 +5,8 @@ import { parse } from 'graphql'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
+import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
+import LeaveGroup from '@graphql/queries/groups/LeaveGroup.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import Message from '@graphql/queries/messaging/Message.gql'
 import UnreadRooms from '@graphql/queries/messaging/UnreadRooms.gql'
@@ -78,6 +80,7 @@ beforeEach(async () => {
       userId,
       livekitRoom: 'group-yoga',
       livekitSid: 'RM_1',
+      presentUserIds: ['anna', 'ben'],
     })
   callRoomId = (await join('anna')) as string
   await join('ben')
@@ -192,6 +195,51 @@ describe('the conference chat of a video call', () => {
       const { data } = await setup.query({ query: roomWithUser, variables: { userId: 'ben' } })
 
       expect(data.Room).toEqual([{ id: direct.data.CreateMessage.room.id }])
+    })
+  })
+
+  describe('when a participant leaves the group', () => {
+    beforeEach(async () => {
+      as(ben)
+      await setup.mutate({ mutation: JoinGroup, variables: { groupId: 'yoga', userId: 'ben' } })
+      as(anna)
+      await send({ roomId: callRoomId, content: 'said in the call' })
+    })
+
+    it('still shows them the chat while they are a member', async () => {
+      as(ben)
+
+      const { data } = await setup.query({ query: Message, variables: { roomId: callRoomId } })
+
+      expect(data.Message).toHaveLength(1)
+    })
+
+    it('shows them the chat no longer, and takes no message from them', async () => {
+      as(ben)
+      const left = await setup.mutate({
+        mutation: LeaveGroup,
+        variables: { groupId: 'yoga', userId: 'ben' },
+      })
+
+      expect(left.errors).toBeUndefined()
+
+      const room = await setup.query({ query: roomById, variables: { id: callRoomId } })
+      const messages = await setup.query({ query: Message, variables: { roomId: callRoomId } })
+      const sent = await send({ roomId: callRoomId, content: 'one more thing' })
+
+      expect(room.data.Room).toEqual([])
+      expect(messages.data.Message).toEqual([])
+      expect(sent.data.CreateMessage).toBeNull()
+    })
+
+    it('leaves the chat to those who stay', async () => {
+      as(ben)
+      await setup.mutate({ mutation: LeaveGroup, variables: { groupId: 'yoga', userId: 'ben' } })
+
+      as(anna)
+      const { data } = await setup.query({ query: Message, variables: { roomId: callRoomId } })
+
+      expect(data.Message).toHaveLength(1)
     })
   })
 

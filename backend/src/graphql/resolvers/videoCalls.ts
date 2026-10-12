@@ -259,6 +259,7 @@ export default {
         userId: context.user.id,
         livekitRoom: roomName,
         livekitSid: call.sid,
+        presentUserIds: [...call.userIds],
       })
     },
     joinGroupVideoCall: async (_root, params: { groupId: string }, context) => {

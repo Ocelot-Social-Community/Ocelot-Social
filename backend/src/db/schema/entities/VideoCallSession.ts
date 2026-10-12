@@ -14,7 +14,9 @@ import { ISO_DATE_TIME } from './patterns'
  * the name is `group-<id>`, but nothing here assumes it.
  *
  * `livekitSid` is what tells one call from the next. The name is reused by every call of a
- * group; the sid is given by the media server to each room it opens, and never again.
+ * group; the sid is given by the media server to each room it opens, and never again. It is
+ * not unique here: a room everybody has left and somebody new walks into gets a new session
+ * under the same sid (see joinCallSession).
  *
  * `endedAt` is null while the call runs. A session that is over keeps its chat, read-only.
  */
@@ -28,6 +30,6 @@ export const VideoCallSession = defineEntity({
     endedAt: { type: ['string', 'null'], pattern: ISO_DATE_TIME },
   },
   required: ['id', 'livekitRoom', 'livekitSid', 'createdAt'],
-  unique: ['id', 'livekitSid'],
-  indexed: ['livekitRoom'],
+  unique: ['id'],
+  indexed: ['livekitRoom', 'livekitSid'],
 })

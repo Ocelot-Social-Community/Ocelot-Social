@@ -4,6 +4,7 @@
 
 import { setTimeout as delay } from 'node:timers/promises'
 
+import { parse } from 'graphql'
 import { PubSub } from 'graphql-subscriptions'
 import { beforeAll, beforeEach, afterAll, describe, it, expect } from 'vitest'
 
@@ -60,6 +61,7 @@ const { AccessToken, RoomServiceClient, TwirpError } = await import('livekit-ser
 const { default: Factory, cleanDatabase } = await import('@db/factories')
 const { default: JoinGroupVideoCall } =
   await import('@graphql/queries/videoCalls/JoinGroupVideoCall.gql')
+const { default: JoinGroup } = await import('@graphql/queries/groups/JoinGroup.gql')
 const { default: JoinGroupVideoCallChat } =
   await import('@graphql/queries/videoCalls/JoinGroupVideoCallChat.gql')
 const { default: VideoCallConfig } = await import('@graphql/queries/videoCalls/VideoCallConfig.gql')
@@ -769,6 +771,84 @@ describe('joinGroupVideoCallChat', () => {
     })
 
     expect(second.data.joinGroupVideoCallChat).not.toBe(first.data.joinGroupVideoCallChat)
+  })
+
+  // The media server keeps a room for a while after the last participant has left. Whoever
+  // walks in then was not part of what was written there, and must not be shown it.
+  describe('in a room everybody else has left', () => {
+    const roomParticipants = parse(`query ($id: ID) { Room(id: $id) { id } }`)
+
+    beforeEach(async () => {
+      listRoomsMock.mockResolvedValue([{ name: 'group-chat-1', sid: 'RM_1' }])
+      // The second person is a member too: the chat is kept from them by the call they were
+      // not in, not by the group.
+      authenticatedUser = outsiderJson
+      await mutate({
+        mutation: JoinGroup,
+        variables: { groupId: 'chat-1', userId: 'outsider-1' },
+      })
+      authenticatedUser = memberJson
+    })
+
+    it('gives a member who was not in the call a chat of their own, without the old one', async () => {
+      listParticipantsMock.mockResolvedValue([{ identity: 'member-1#abcd1234' }])
+      const earlier = await mutate({
+        mutation: JoinGroupVideoCallChat,
+        variables: { groupId: 'chat-1' },
+      })
+
+      // The member has left; somebody else comes into the same, still open room.
+      authenticatedUser = outsiderJson
+      listParticipantsMock.mockResolvedValue([{ identity: 'outsider-1#abcd1234' }])
+      const next = await mutate({
+        mutation: JoinGroupVideoCallChat,
+        variables: { groupId: 'chat-1' },
+      })
+      const old = await query({
+        query: roomParticipants,
+        variables: { id: earlier.data.joinGroupVideoCallChat as string },
+      })
+
+      expect(next.errors).toBeUndefined()
+      expect(next.data.joinGroupVideoCallChat).not.toBe(earlier.data.joinGroupVideoCallChat)
+      expect(old.data.Room).toEqual([])
+    })
+
+    it('lets the member who was in the call carry on with the chat', async () => {
+      listParticipantsMock.mockResolvedValue([{ identity: 'member-1#abcd1234' }])
+      const earlier = await mutate({
+        mutation: JoinGroupVideoCallChat,
+        variables: { groupId: 'chat-1' },
+      })
+      // Left and back again, on a new connection.
+      listParticipantsMock.mockResolvedValue([{ identity: 'member-1#ffff0000' }])
+      const again = await mutate({
+        mutation: JoinGroupVideoCallChat,
+        variables: { groupId: 'chat-1' },
+      })
+
+      expect(again.data.joinGroupVideoCallChat).toBe(earlier.data.joinGroupVideoCallChat)
+    })
+
+    it('lets somebody new in on the chat while a participant of it is in the call', async () => {
+      listParticipantsMock.mockResolvedValue([{ identity: 'member-1#abcd1234' }])
+      const earlier = await mutate({
+        mutation: JoinGroupVideoCallChat,
+        variables: { groupId: 'chat-1' },
+      })
+
+      authenticatedUser = outsiderJson
+      listParticipantsMock.mockResolvedValue([
+        { identity: 'member-1#abcd1234' },
+        { identity: 'outsider-1#abcd1234' },
+      ])
+      const next = await mutate({
+        mutation: JoinGroupVideoCallChat,
+        variables: { groupId: 'chat-1' },
+      })
+
+      expect(next.data.joinGroupVideoCallChat).toBe(earlier.data.joinGroupVideoCallChat)
+    })
   })
 
   it('refuses a member who is not in the call', async () => {
