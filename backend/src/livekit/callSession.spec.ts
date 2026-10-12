@@ -208,6 +208,10 @@ describe(joinCallSession, () => {
     ])
   })
 
+  it('returns null for a user that does not exist', async () => {
+    await expect(join('nobody', 'RM_1')).resolves.toBeNull()
+  })
+
   it('returns null for a group that does not exist', async () => {
     await expect(join('anna', 'RM_1', ['anna'], 'no-such-group')).resolves.toBeNull()
     expect(await sessions()).toEqual([])

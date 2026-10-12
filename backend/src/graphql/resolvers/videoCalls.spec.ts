@@ -932,6 +932,15 @@ describe('getLiveCall', () => {
     await expect(getLiveCall(ENABLED_LIVEKIT, 'group-x')).resolves.toBeNull()
   })
 
+  it('takes the "not found" code for a missing room as well, whatever the status', async () => {
+    listRoomsMock.mockResolvedValue([{ name: 'group-x', sid: 'RM_x' }])
+    listParticipantsMock.mockRejectedValue(
+      new TwirpError('twirp', 'room not found', 400, 'not_found'),
+    )
+
+    await expect(getLiveCall(ENABLED_LIVEKIT, 'group-x')).resolves.toBeNull()
+  })
+
   it('rethrows any other failure rather than passing it off as "no call"', async () => {
     listRoomsMock.mockRejectedValue(new Error('upstream down'))
 

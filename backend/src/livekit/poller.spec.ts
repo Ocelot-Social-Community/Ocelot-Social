@@ -317,6 +317,21 @@ describe('poll tick', () => {
     })
   })
 
+  it('names a failure of ending the call session that is not an Error', async () => {
+    mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 3 }])
+    startLiveKitPoller()
+    await vi.advanceTimersByTimeAsync(5_000)
+
+    mockEndOfMissingRoom.mockRejectedValueOnce('connection refused')
+    mockListRooms.mockResolvedValueOnce([])
+    await vi.advanceTimersByTimeAsync(15_000)
+
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('Ending the call session of group-a failed'),
+      'connection refused',
+    )
+  })
+
   it('does not emit a duplicate zero when the disappeared room was already at 0', async () => {
     mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 0 }])
     startLiveKitPoller()
