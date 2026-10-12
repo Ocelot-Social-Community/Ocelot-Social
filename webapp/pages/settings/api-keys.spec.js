@@ -10,6 +10,12 @@ Vue.filter('dateTime', (value) => value || '')
 
 describe('settings/api-keys.vue', () => {
   let wrapper, mocks
+
+  it('is guarded by the apiKeysEnabled middleware', () => {
+    // Opened directly while the policy is off, the page would query myApiKeys, which the server
+    // refuses — during server-side rendering that was the whole page failing with a 500.
+    expect(ApiKeys.middleware).toEqual(['apiKeysEnabled'])
+  })
   const originalClipboard = navigator.clipboard
 
   const mutateMock = jest.fn()
