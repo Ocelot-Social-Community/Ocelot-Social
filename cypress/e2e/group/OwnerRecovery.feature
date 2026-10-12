@@ -25,6 +25,13 @@ Feature: A network admin hands a group back from its owner
     Then I see the element with test id "elevation-offer"
     And the member "olga" offers no role picker and no remove button
 
+  # Loaded from the server on purpose: the rights tab asked for the group's roles, which need
+  # group.role.manage, and that refusal during server-side rendering was a bare "Server error".
+  Scenario: The rights tab loads for an admin who has not elevated yet
+    Given I am logged in as "admin"
+    When I navigate to page "/groups/edit/secret-circle/rights"
+    Then I see the element with test id "elevation-offer"
+
   Scenario: The admin elevates, appoints a new owner and removes the old one
     Given I am logged in as "admin"
     When I navigate to page "/groups/edit/secret-circle/members"

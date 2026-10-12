@@ -19,7 +19,7 @@
              is where it is made and shown (components/Group/GroupElevation.vue). -->
         <group-elevation :group="group" @changed="$nuxt.refresh()" />
         <transition name="slide-up" appear>
-          <nuxt-child v-if="mayOpenTab" :group="group" @update-invite-codes="updateInviteCodes" />
+          <nuxt-child :group="group" @update-invite-codes="updateInviteCodes" />
         </transition>
       </div>
     </div>
@@ -64,17 +64,6 @@ const tabForPath = (path, groupId) => {
   return TABS.find((tab) => tab.path === suffix)
 }
 
-/**
- * Whether the viewer holds the right of the tab a path asks for — or, for a path no tab
- * claims, the right of any tab at all.
- */
-const mayOpenPath = (group, path, groupId) => {
-  const tab = tabForPath(path, groupId)
-  return tab
-    ? holdsAnyOf(group, tab.permissions)
-    : TABS.some((candidate) => holdsAnyOf(group, candidate.permissions))
-}
-
 export default {
   middleware: ['groupsEnabled'],
   components: {
@@ -97,13 +86,6 @@ export default {
         name: this.$t(tab.label),
         path: `/groups/edit/${this.group.id}${tab.path}`,
       }))
-    },
-    // Somebody let in only because they COULD elevate gets the elevation card and nothing
-    // else. The tab itself would ask the server for what they may not read yet — the rights
-    // tab for the group's roles — and during server-side rendering that refusal is not a
-    // toast but the whole page failing with "Server error".
-    mayOpenTab() {
-      return mayOpenPath(this.group, this.$route?.path ?? '', this.group.id)
     },
   },
   async asyncData(context) {
@@ -131,11 +113,16 @@ export default {
     // The right of the TAB that was asked for, not one right for the whole area: these are
     // granted independently, so a member who may only hand out invite links has to be able to
     // open that one tab — and must not be able to open the others.
+    const tab = tabForPath(route?.path ?? '', id)
     // Somebody who COULD pick their network rights up here is let in to do exactly that: the
     // page then shows the elevation card and no tabs. Refusing them would be the chicken and
     // the egg — the rights that open these tabs are the ones they have not picked up yet.
     const mayElevate = group?.mayElevateInGroup === true
-    const allowed = mayElevate || mayOpenPath(group, route?.path ?? '', id)
+    const allowed =
+      mayElevate ||
+      (tab
+        ? holdsAnyOf(group, tab.permissions)
+        : TABS.some((candidate) => holdsAnyOf(group, candidate.permissions)))
     if (!allowed) {
       error({ statusCode: 403, message: 'NONONNNO' })
     }

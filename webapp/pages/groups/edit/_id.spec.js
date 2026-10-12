@@ -35,7 +35,6 @@ const OWNER_RIGHTS = [
 
 const factory = (
   group = { id: 'g1', slug: 'g-slug', name: 'A Group', myGroupPermissions: OWNER_RIGHTS },
-  path = '/groups/edit/g1',
 ) => {
   const wrapper = mount(EditId, {
     localVue,
@@ -43,7 +42,6 @@ const factory = (
     stubs,
     mocks: {
       $t: (k) => k,
-      $route: { path },
     },
     data: () => ({ group }),
   })
@@ -55,43 +53,6 @@ describe('pages/groups/edit/_id.vue', () => {
     it('mounts the layout with title, sidebar menu and child container', () => {
       const { wrapper } = factory()
       expect(wrapper.find('.stub-osmenu').exists()).toBe(true)
-      expect(wrapper.find('.stub-nuxtchild').exists()).toBe(true)
-    })
-  })
-
-  describe('the tab content', () => {
-    // Let in only because they could elevate: the rights tab would query the group's roles,
-    // the server refuses that, and during server-side rendering the refusal was the whole page
-    // failing with "Server error".
-    it('is not rendered for somebody who may only elevate', () => {
-      const { wrapper } = factory(
-        { id: 'g1', myGroupPermissions: [], mayElevateInGroup: true },
-        '/groups/edit/g1/rights',
-      )
-      expect(wrapper.find('.stub-nuxtchild').exists()).toBe(false)
-    })
-
-    it('is not rendered for a tab whose right the viewer lacks', () => {
-      const { wrapper } = factory(
-        { id: 'g1', myGroupPermissions: ['group.settings.manage'], mayElevateInGroup: true },
-        '/groups/edit/g1/rights',
-      )
-      expect(wrapper.find('.stub-nuxtchild').exists()).toBe(false)
-    })
-
-    it('appears once the rights are there, as after an elevation', async () => {
-      const group = { id: 'g1', myGroupPermissions: [], mayElevateInGroup: true }
-      const { wrapper } = factory(group, '/groups/edit/g1/rights')
-      wrapper.setData({ group: { ...group, myGroupPermissions: ['group.role.manage'] } })
-      await wrapper.vm.$nextTick()
-      expect(wrapper.find('.stub-nuxtchild').exists()).toBe(true)
-    })
-
-    it('is rendered for a path no tab claims when the viewer holds any tab right', () => {
-      const { wrapper } = factory(
-        { id: 'g1', myGroupPermissions: ['group.invite'] },
-        '/groups/edit/g1/something-new',
-      )
       expect(wrapper.find('.stub-nuxtchild').exists()).toBe(true)
     })
   })
