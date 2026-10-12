@@ -61,12 +61,8 @@ useHead({
     { name: "theme-color", content: metadata.THEME_COLOR },
     { property: "og:title", content: pageTitle },
     { property: "og:description", content: metadata.APPLICATION_DESCRIPTION },
-    { property: "og:image", content: metadata.OG_IMAGE },
-    { property: "og:image:alt", content: metadata.OG_IMAGE_ALT },
-    { property: "og:image:width", content: metadata.OG_IMAGE_WIDTH },
-    { property: "og:image:height", content: metadata.OG_IMAGE_HEIGHT },
-    { property: "og:image:type", content: metadata.OG_IMAGE_TYPE },
-    { property: "og:type", content: "website" },
+    // og:image* and og:type are static, in nuxt.config.ts — they have to be in the prerendered
+    // markup, and nothing about them changes with the locale.
   ],
 });
 </script>
