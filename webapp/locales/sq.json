@@ -555,7 +555,7 @@
     "addGroupRoomHeadline": "Kërko grup për bisedë të re",
     "addRoomHeadline": "Kërko përdorues për bisedë të re",
     "callRoomEmpty": "Ende nuk ka mesazhe. Kjo bisedë është e dukshme vetëm për pjesëmarrësit e kësaj telefonate me video.",
-    "callRoomName": "{name} · telefonatë",
+    "callRoomName": "Telefonata · {name}",
     "cancelSelectMessage": "Anulo",
     "closeChat": "Mbyll bisedën",
     "conversationStarted": "Biseda filloi më:",

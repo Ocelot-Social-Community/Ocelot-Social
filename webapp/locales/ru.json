@@ -555,7 +555,7 @@
     "addGroupRoomHeadline": "Поиск группы для нового чата",
     "addRoomHeadline": "Поиск пользователя для нового чата",
     "callRoomEmpty": "Сообщений пока нет. Этот чат виден только участникам этого видеозвонка.",
-    "callRoomName": "{name} · звонок",
+    "callRoomName": "Звонок · {name}",
     "cancelSelectMessage": "Отмена",
     "closeChat": "Закрыть чат",
     "conversationStarted": "Беседа начата:",

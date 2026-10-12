@@ -555,7 +555,7 @@
     "addGroupRoomHeadline": "Cerca gruppo per nuova chat",
     "addRoomHeadline": "Cerca utente per nuova chat",
     "callRoomEmpty": "Ancora nessun messaggio. Questa chat è visibile solo ai partecipanti di questa videochiamata.",
-    "callRoomName": "{name} · chiamata",
+    "callRoomName": "Chiamata · {name}",
     "cancelSelectMessage": "Annulla",
     "closeChat": "Chiudi chat",
     "conversationStarted": "Conversazione iniziata il:",

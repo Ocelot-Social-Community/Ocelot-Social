@@ -555,7 +555,7 @@
     "addGroupRoomHeadline": "Szukaj grupy do nowego czatu",
     "addRoomHeadline": "Szukaj użytkownika do nowego czatu",
     "callRoomEmpty": "Brak wiadomości. Ten czat jest widoczny tylko dla uczestników tej rozmowy wideo.",
-    "callRoomName": "{name} · rozmowa",
+    "callRoomName": "Rozmowa · {name}",
     "cancelSelectMessage": "Anuluj",
     "closeChat": "Zamknij czat",
     "conversationStarted": "Rozmowa rozpoczęta:",

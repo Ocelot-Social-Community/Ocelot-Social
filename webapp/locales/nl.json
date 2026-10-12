@@ -555,7 +555,7 @@
     "addGroupRoomHeadline": "Zoek groep voor nieuwe chat",
     "addRoomHeadline": "Zoek gebruiker voor nieuwe chat",
     "callRoomEmpty": "Nog geen berichten. Deze chat is alleen zichtbaar voor de deelnemers aan dit videogesprek.",
-    "callRoomName": "{name} · gesprek",
+    "callRoomName": "Gesprek · {name}",
     "cancelSelectMessage": "Annuleren",
     "closeChat": "Chat sluiten",
     "conversationStarted": "Gesprek gestart op:",
