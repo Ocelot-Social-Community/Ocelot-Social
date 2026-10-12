@@ -61,6 +61,8 @@ type Group {
   myGroupRole: GroupRole
   "The group rights the current user effectively holds here: their role's set, capped by their network permissions and by the runtime feature gates. Drives the webapp's canInGroup()."
   myGroupPermissions: [String!]!
+  "For every group right capped by a network right: which network right that is in THIS group. The catalog states some of them as a family (`videoCall.create_<door>`); here the placeholder is resolved, so a hint can name the right that is actually missing."
+  networkPrerequisites: [GroupNetworkPrerequisite!]!
   "The group's own role definitions. Requires `group.role.manage` in this group."
   roles: [GroupRole!]!
   "Whether the profile owner has chosen to show this group on their public profile."

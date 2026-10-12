@@ -858,6 +858,41 @@ describe('rights.vue', () => {
     expect(wrapper.vm.templateToApply).toBe('public')
   })
 
+  describe('the network hint on a capped right', () => {
+    const CALL = CATALOG.find((permission) => permission.key === 'group.videoCall.create')
+    const answer = (wrapper, networkPrerequisites) =>
+      rights.apollo.rights.result.call(wrapper.vm, {
+        loading: false,
+        data: {
+          groupPermissionCatalog: CATALOG,
+          groupTemplates: TEMPLATES,
+          Group: [{ roles: ROLES, myGroupPermissions: [], networkPrerequisites }],
+        },
+      })
+
+    // The catalog names the call cap as a family; the hint read "videoCall.create_<door>", a
+    // right nobody can have. The group resolves it to the one that is actually missing.
+    it('names the network right this group needs, not the catalog placeholder', async () => {
+      const wrapper = await Wrapper()
+      answer(wrapper, [
+        { key: 'group.videoCall.create', requiresNetworkPermission: 'videoCall.create_open' },
+      ])
+
+      expect(wrapper.vm.gateHint(CALL)).toBe(
+        'group.rights.blockedByNetwork:{"permission":"videoCall.create_open"}',
+      )
+    })
+
+    it('falls back to the catalog entry when the group resolved nothing for the right', async () => {
+      const wrapper = await Wrapper()
+      answer(wrapper, undefined)
+
+      expect(wrapper.vm.gateHint(CATALOG.find(({ key }) => key === 'group.post.create'))).toBe(
+        'group.rights.blockedByNetwork:{"permission":"post.create"}',
+      )
+    })
+  })
+
   describe('the advanced view', () => {
     const advanced = async (permissions) => {
       const wrapper = await Wrapper(permissions)

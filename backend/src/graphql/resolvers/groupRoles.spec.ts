@@ -101,6 +101,7 @@ interface ContextOptions {
     mayElevate?: boolean
     administersByNetwork?: boolean
     outranksMembers?: boolean
+    callDoor?: 'open' | 'restricted'
   } | null
   queryRecords?: Array<ReturnType<typeof record>>
   writeRecords?: Array<ReturnType<typeof record>>
@@ -126,6 +127,7 @@ const contextFor = (options: ContextOptions = {}) => {
           mayElevate: options.authorization?.mayElevate ?? false,
           administersByNetwork: options.authorization?.administersByNetwork ?? false,
           outranksMembers: options.authorization?.outranksMembers ?? false,
+          callDoor: options.authorization?.callDoor ?? 'restricted',
         }
   const context = {
     user: options.user === undefined ? { id: 'actor' } : options.user,
@@ -471,6 +473,40 @@ describe('Group.myGroupPermissions', () => {
     const { context } = contextFor({ authorization: null })
 
     expect(await Group.myGroupPermissions({ id: 'g1' }, {}, context)).toEqual([])
+  })
+})
+
+describe('Group.networkPrerequisites', () => {
+  // The catalog states the call cap as a family, `videoCall.create_<door>`; the rights page
+  // showed the placeholder literally. Here it is resolved for the group at hand.
+  it.each([
+    ['open', 'videoCall.create_open'],
+    ['restricted', 'videoCall.create_restricted'],
+  ] as const)('names the call right of a group whose door is %s', async (callDoor, expected) => {
+    const { context } = contextFor({ authorization: { callDoor } })
+
+    const prerequisites = await Group.networkPrerequisites({ id: 'g1' }, {}, context)
+
+    expect(prerequisites).toContainEqual({
+      key: 'group.videoCall.create',
+      requiresNetworkPermission: expected,
+    })
+  })
+
+  it('lists every capped right, and only those', async () => {
+    const { context } = contextFor({ authorization: { callDoor: 'open' } })
+
+    expect(await Group.networkPrerequisites({ id: 'g1' }, {}, context)).toEqual([
+      { key: 'group.post.create', requiresNetworkPermission: 'post.create' },
+      { key: 'group.comment.create', requiresNetworkPermission: 'comment.create' },
+      { key: 'group.videoCall.create', requiresNetworkPermission: 'videoCall.create_open' },
+    ])
+  })
+
+  it('is empty for a group that does not exist', async () => {
+    const { context } = contextFor({ authorization: null })
+
+    expect(await Group.networkPrerequisites({ id: 'g1' }, {}, context)).toEqual([])
   })
 })
 
