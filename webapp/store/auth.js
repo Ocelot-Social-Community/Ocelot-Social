@@ -38,6 +38,9 @@ const apolloClient = (ctx) => ctx.app.apolloProvider.defaultClient
 let permissionsSubscription = null
 
 const openPermissionsSubscription = (store, commit, dispatch) => {
+  // Only in the browser, same as the policy subscription: on the server there is no websocket,
+  // and the operation failed against the backend over HTTP.
+  if (process.server) return
   const observable = apolloClient(store).subscribe({ query: PermissionsSubscription() })
   permissionsSubscription = observable.subscribe({
     next() {

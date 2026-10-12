@@ -392,6 +392,33 @@ describe('auth store', () => {
         expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS_SUBSCRIPTION_ACTIVE', false)
       })
 
+      describe('during server-side rendering', () => {
+        let previousServer
+        beforeEach(() => {
+          previousServer = process.server
+          process.server = true
+        })
+        afterEach(() => {
+          process.server = previousServer
+        })
+
+        // logout() re-opens the subscription, and an anonymous visit to a protected page runs
+        // logout() on the server — where the operation went to the backend over HTTP and failed.
+        it('subscribePermissions opens nothing', () => {
+          const { store, subscribe, commit } = makeStore(false)
+          actions.subscribePermissions.call(store, store)
+          expect(subscribe).not.toHaveBeenCalled()
+          expect(commit).not.toHaveBeenCalledWith('SET_PERMISSIONS_SUBSCRIPTION_ACTIVE', true)
+        })
+
+        it('resubscribePermissions opens nothing', () => {
+          const { store, subscribe, commit } = makeStore(false)
+          actions.resubscribePermissions.call(store, store)
+          expect(subscribe).not.toHaveBeenCalled()
+          expect(commit).not.toHaveBeenCalledWith('SET_PERMISSIONS_SUBSCRIPTION_ACTIVE', true)
+        })
+      })
+
       it('resubscribePermissions tears down and re-opens', () => {
         const { store, subscribe, commit } = makeStore(true)
         actions.resubscribePermissions.call(store, store)
