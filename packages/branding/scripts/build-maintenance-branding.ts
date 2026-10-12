@@ -138,7 +138,7 @@ function servedUrl(path: string | null | undefined, label: string): string | nul
   if (!path) {
     return null
   }
-  if (/^(?:https?:|data:)/.test(path)) {
+  if (/^(?:https?:|data:)/i.test(path)) {
     return path
   }
   if (path.startsWith(`/branding/${id}/`)) {

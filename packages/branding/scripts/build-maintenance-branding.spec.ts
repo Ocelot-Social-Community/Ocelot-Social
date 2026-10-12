@@ -612,6 +612,16 @@ describe('build-maintenance-branding', () => {
       assert.equal(stderr, '')
     })
 
+    // URL schemes are case-insensitive, so an upper-case one is just as external.
+    test('keeps an external url verbatim whatever the case of its scheme', () => {
+      const to = maintenanceDir()
+      const { status, stderr } = run(brandPointingAt('HTTPS://cdn.example/brand.ico'), to)
+
+      assert.equal(status, 0)
+      assert.equal(overlay(to).LOGO, 'HTTPS://cdn.example/brand.ico')
+      assert.equal(stderr, '')
+    })
+
     // An absolute path into the framework's own tree is served BY THE WEBAPP. This page renders
     // precisely when that is down, so linking it would 404 on every request — the vanilla asset is
     // the better outcome, and the warning is what stops it being a mystery.

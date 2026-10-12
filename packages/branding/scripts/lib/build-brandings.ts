@@ -67,9 +67,12 @@ function collectFiles(dir: string, prefix: string, entries: TarEntry[]): void {
 }
 
 // A brand-relative asset path (namespaced to /branding/<id>/…). Absolute /… and http(s):/data:/
-// mailto: paths are framework/external and left untouched.
+// mailto: paths are framework/external and left untouched — in any case, as URL schemes are (RFC 3986).
 const isRelativeAsset = (v: unknown): v is string =>
-  typeof v === 'string' && v.length > 0 && !v.startsWith('/') && !/^(https?:|data:|mailto:)/.test(v)
+  typeof v === 'string' &&
+  v.length > 0 &&
+  !v.startsWith('/') &&
+  !/^(https?:|data:|mailto:)/i.test(v)
 
 function namespacePath(value: string, id: string, brandDir: string, warnings: string[]): string {
   if (!isRelativeAsset(value)) {

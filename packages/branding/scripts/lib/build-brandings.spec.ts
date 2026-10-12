@@ -189,6 +189,23 @@ test('buildBrandArchive namespaces asset paths', async () => {
   )
 })
 
+// URL schemes are case-insensitive: an upper-case one is still external, not a file in the brand's root.
+test('buildBrandArchive leaves an external path alone whatever the case of its scheme', async () => {
+  const built = await buildBrandArchive(
+    brandDir({
+      config: `export default (d) => d({ logos: { signupPath: 'DATA:image/png;base64,iVBORw0KGgo=', headerPath: 'HTTPS://cdn.example/logo.svg' } })\n`,
+    }),
+  )
+  const config = composeArchive(readTarGz(built.gz))
+  assert.equal(config.logos.signupPath, 'DATA:image/png;base64,iVBORw0KGgo=')
+  assert.equal(config.logos.headerPath, 'HTTPS://cdn.example/logo.svg')
+  assert.equal(config.metadata.ogImage, '/img/custom/logo-squared.png') // a data: logo stands in for nothing
+  assert.deepEqual(
+    built.warnings.filter((w) => !w.includes('assets.icon')),
+    [],
+  )
+})
+
 test('buildBrandArchive warns when a referenced asset is missing (but still builds)', async () => {
   const built = await buildBrandArchive(brandDir({ config: ACME_CONFIG })) // no asset file written
   assert.equal(built.warnings.length > 0, true)
