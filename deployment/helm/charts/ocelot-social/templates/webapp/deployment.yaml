@@ -51,6 +51,8 @@ spec:
         env:
         - name: WEBSOCKETS_URI
           value: "wss://{{ .Values.domain }}/api/graphql"
+        - name: CLIENT_URI
+          value: "https://{{ .Values.domain }}"
         - name: HOST
           value: "0.0.0.0"
         - name: GRAPHQL_URI

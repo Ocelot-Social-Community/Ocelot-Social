@@ -20,8 +20,13 @@ on:
 # within this repository but not across forks — two contributors using GitHub's "edit this file"
 # flow both get `patch-1`, and their pull requests would then cancel each other's runs. `github.ref`
 # stays as the fallback for events that carry no pull request (a push gives refs/heads/<branch>).
+#
+# master is the exception: one group per COMMIT there, so a merge never cancels the run of the
+# commit before it. Every master commit gets its full result instead of a red "cancelled" — a
+# Dependabot wave merging every few minutes otherwise left hardly one commit with complete checks.
+# Runs of different master commits may overlap; nothing here depends on their order.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || (github.ref == 'refs/heads/master' && github.sha) || github.ref }}
   cancel-in-progress: true
 
 # Least privilege for GITHUB_TOKEN: without this block the jobs inherit whatever the repository or
@@ -41,8 +46,33 @@ defaults:
     shell: bash
 
 jobs:
+  # On master, a commit the merge queue already tested here is not tested a second time: the queue
+  # fast-forwards master to the very commit it ran this workflow on. The prepare jobs below are
+  # then skipped (which counts as passed), the matrix with them, and the status job accepts it.
+  queue:
+    name: Already verified by the merge queue?
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      verified: ${{ steps.queue.outputs.verified }}
+      run-id: ${{ steps.queue.outputs.run-id }}
+    steps:
+      - name: Checkout the action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .github/actions
+          persist-credentials: false
+
+      - name: Already verified by the merge queue?
+        id: queue
+        uses: ./.github/actions/merge-queue-verified
+
   prepare_backend_environment:
     name: Fullstack | prepare backend environment
+    needs: [queue]
+    if: needs.queue.outputs.verified != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -50,6 +80,12 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        # Base images from Docker Hub through Google's mirror of it first: a 503 from Docker Hub
+        # failed whole builds. BuildKit falls back to docker.io whenever the mirror has nothing.
+        with:
+          buildkitd-config-inline: |
+            [registry."docker.io"]
+              mirrors = ["mirror.gcr.io"]
 
       - name: Copy backend env file
         run: |
@@ -75,7 +111,12 @@ jobs:
           target: test
           load: true
           tags: ghcr.io/ocelot-social-community/ocelot-social/backend:test
-          cache-from: type=gha,scope=backend-test
+          # Reads the scopes of the other builds of this Dockerfile too (backend): the stages
+          # they share (base image, dependencies, branding) are then built once, not once per
+          # workflow. Writes only its own, so builds running side by side never race for a key.
+          cache-from: |
+            type=gha,scope=backend-test
+            type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend-test
 
       - name: Pull third-party images
@@ -115,6 +156,8 @@ jobs:
 
   prepare_webapp_image:
     name: Fullstack | prepare webapp image
+    needs: [queue]
+    if: needs.queue.outputs.verified != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -122,6 +165,12 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        # Base images from Docker Hub through Google's mirror of it first: a 503 from Docker Hub
+        # failed whole builds. BuildKit falls back to docker.io whenever the mirror has nothing.
+        with:
+          buildkitd-config-inline: |
+            [registry."docker.io"]
+              mirrors = ["mirror.gcr.io"]
 
       # `e2e`, not `test`: same build, but assembled `FROM base` around the finished /build and started
       # with nuxt-start instead of the dev server (see webapp/Dockerfile). `test` stays what the webapp
@@ -140,7 +189,13 @@ jobs:
           target: e2e
           load: true
           tags: ghcr.io/ocelot-social-community/ocelot-social/webapp:test
-          cache-from: type=gha,scope=webapp-e2e
+          # Reads the scopes of the other builds of this Dockerfile too (webapp, webapp-test): the stages
+          # they share (base image, dependencies, branding) are then built once, not once per
+          # workflow. Writes only its own, so builds running side by side never race for a key.
+          cache-from: |
+            type=gha,scope=webapp-e2e
+            type=gha,scope=webapp
+            type=gha,scope=webapp-test
           cache-to: type=gha,mode=max,scope=webapp-e2e
 
       - name: Save image for test jobs
@@ -160,6 +215,8 @@ jobs:
 
   prepare_cypress:
     name: Fullstack | prepare cypress
+    needs: [queue]
+    if: needs.queue.outputs.verified != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Delete huge unnecessary tools folder
@@ -241,6 +298,8 @@ jobs:
 
   list_features:
     name: List Feature Files
+    needs: [queue]
+    if: needs.queue.outputs.verified != 'true'
     runs-on: ubuntu-latest
     outputs:
       features: ${{ steps.list.outputs.features }}
@@ -498,10 +557,23 @@ jobs:
   publish_readme_screenshots:
     name: README | publish screenshots
     if: always() && github.event_name == 'push' && github.ref == 'refs/heads/master'
-    needs: [fullstack_tests]
+    needs: [queue, fullstack_tests]
+    # One publish at a time, never torn in half: the head check below and the force-push are two
+    # steps, and two publishes interleaving between them could still leave the older pictures on
+    # top. `queue: max`, not the default `queue: single`: master commits run side by side, so an
+    # OLDER commit's publish can reach this group after a newer one is already pending — with
+    # `single` it would replace that newer one, then find master moved on and skip, and nothing
+    # would be published at all. Queued in order, every publish gets its turn and the head check
+    # lets only the newest commit's through.
+    concurrency:
+      group: publish-readme-screenshots
+      queue: max
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      # To download the screenshots from the merge queue's run (see the step below).
+      actions: read
     steps:
       # Missing when the screenshot entry failed — then the published pictures simply stay as they
       # were, instead of this job failing for a reason the e2e status already reports.
@@ -512,12 +584,24 @@ jobs:
         with:
           name: readme-screenshots
           path: screenshots
+          # A commit the merge queue already tested took its pictures there, not in this run.
+          run-id: ${{ needs.queue.outputs.run-id || github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push to the readme-screenshots branch
         if: steps.download.outcome == 'success'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # master commits run side by side (see the concurrency block), so an older run can finish
+          # after a newer one — and would then force-push its older pictures over the newer ones.
+          # Checked right before the push: whatever run finishes, only the newest commit publishes.
+          head="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/master" --jq .object.sha)"
+          if [ "${head}" != "${GITHUB_SHA}" ]; then
+            echo "::notice::master is at ${head} now, not ${GITHUB_SHA} — its own run publishes the screenshots"
+            exit 0
+          fi
           cd screenshots
           # The artifact keeps the folder Cypress names after the spec; the README links the root.
           find . -mindepth 2 -type f -name '*.png' -exec mv -t . -- {} +
@@ -536,11 +620,15 @@ jobs:
   e2e_status:
     name: E2E | Status
     if: always()
-    needs: [fullstack_tests]
+    needs: [queue, fullstack_tests]
     runs-on: ubuntu-latest
     steps:
       - name: Check E2E results
         run: |
+          if [ "${{ needs.queue.outputs.verified }}" = 'true' ] && [ "${{ needs.fullstack_tests.result }}" = 'skipped' ]; then
+            echo "Passed in the merge queue on this very commit (run ${{ needs.queue.outputs.run-id }}) — not repeated"
+            exit 0
+          fi
           if [ "${{ needs.fullstack_tests.result }}" != "success" ]; then
             echo "E2E tests failed or were cancelled (result: ${{ needs.fullstack_tests.result }})"
             exit 1

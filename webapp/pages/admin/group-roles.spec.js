@@ -113,6 +113,63 @@ describe('admin/group-roles.vue', () => {
     return wrapper
   }
 
+  // Re-entering the page has to show what was saved, not what the cache held before (#10490).
+  describe('loading the templates', () => {
+    it('asks the server on every visit rather than answering from the cache', () => {
+      expect(groupRoles.apollo.templatesQuery.fetchPolicy).toBe('cache-and-network')
+    })
+
+    it('skips the cached answer that arrives before the server has answered', async () => {
+      const wrapper = await Wrapper()
+      const stale = TEMPLATES.map((template) => ({ ...template, roles: [] }))
+
+      wrapper.vm.$options.apollo.templatesQuery.result.call(wrapper.vm, {
+        loading: true,
+        data: { groupPermissionCatalog: CATALOG, groupRoleTemplates: stale },
+      })
+
+      expect(wrapper.vm.templates).toEqual(TEMPLATES)
+    })
+
+    // The whole round of #10490: save, leave, come back. The cache answers first with the roles
+    // from before the save; what the page shows in the end has to be the server's answer.
+    it('shows what was saved when the page is entered again', async () => {
+      const first = await advanced()
+      at(first, 'perm-group.members.read').element.checked = true
+      await at(first, 'perm-group.members.read').trigger('change')
+      await at(first, 'save').trigger('click')
+      await flushPromises()
+      const saved = mocks.$apollo.mutate.mock.calls.at(-1)[0].variables.permissions
+      first.destroy()
+
+      const again = await advanced()
+      const answer = (loading, templates) =>
+        again.vm.$options.apollo.templatesQuery.result.call(again.vm, {
+          loading,
+          data: { groupPermissionCatalog: CATALOG, groupRoleTemplates: templates },
+        })
+      answer(true, TEMPLATES)
+      answer(
+        false,
+        TEMPLATES.map((template) =>
+          template.name === 'public'
+            ? {
+                ...template,
+                roles: template.roles.map((r) =>
+                  r.name === 'usual' ? { ...r, permissions: saved } : r,
+                ),
+              }
+            : template,
+        ),
+      )
+      await again.vm.$nextTick()
+
+      expect(saved).toContain('group.members.read')
+      expect(at(again, 'perm-group.members.read').element.checked).toBe(true)
+      expect(again.vm.dirty).toBe(false)
+    })
+  })
+
   // The matrix unfolds UNDER the sentences rather than replacing them, so a hovered sentence can
   // point at the rows it stands for. Only one of the two may hold a draft at a time.
   const advanced = async () => {

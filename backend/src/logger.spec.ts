@@ -49,4 +49,15 @@ describe('logger', () => {
     expect(first).toBe(second)
     expect(first.settings.name).toBe('mainLogger')
   })
+
+  // tslog 5 dropped the implicit password masking of tslog 4; losing it would print plaintext
+  // passwords wherever an object holding one is logged.
+  it('masks passwords in logged objects', async () => {
+    const logger = await importLoggerWith('SILLY')
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    const record = logger.info('login', { email: 'user@example.org', password: 'hunter2' })
+
+    expect(record?.[1]).toEqual({ email: 'user@example.org', password: '[***]' })
+  })
 })

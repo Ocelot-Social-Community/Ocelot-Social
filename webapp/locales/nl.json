@@ -541,6 +541,7 @@
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "De rol “{name}” bestaat al.",
     "ROLE_SAVE_NAME_INVALID": "De rolnaam moet 2 tot 50 tekens lang zijn en mag alleen letters, cijfers, “_” en “-” bevatten; het eerste teken moet een letter of cijfer zijn.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "Een rol kan niet als beschermd worden aangemaakt of gemarkeerd.",
+    "USER_ACTION_TARGET_NOT_OUTRANKED": "Dit kun je alleen doen bij gebruikers van wie de rol minder bevoegdheden geeft dan de jouwe.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Je mag niet zoeken in het gebruikersbeheer.",
     "USER_DOES_NOT_EXIST": "De gebruiker is niet gevonden.",
     "USER_PROFILE_NAME_TOO_SHORT": "De naam moet minimaal {min} tekens lang zijn.",

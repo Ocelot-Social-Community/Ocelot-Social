@@ -2497,6 +2497,11 @@ type User {
   locationName: String
   name: String
 
+  """
+  Whether the current user's role grants strictly more authority than this user's — the act-on hierarchy that disableUser and DeleteUser enforce on top of user.disable / user.delete.any. Always false for oneself.
+  """
+  outrankedByCurrentUser: Boolean!
+
   """The user's public key, for federation/verification."""
   publicKey: String
 

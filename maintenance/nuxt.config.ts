@@ -3,7 +3,9 @@ import { fileURLToPath } from "node:url";
 
 import tailwindcss from "@tailwindcss/vite";
 
+import { CLIENT_URI_PLACEHOLDER } from "./app/constants/clientUri";
 import { SUPPORT_EMAIL_PLACEHOLDER } from "./app/constants/emails";
+import metadataDefaults from "./app/constants/metadataDefaults";
 
 // Branding is applied at BUILD time by build-maintenance-branding.ts (the page is static and is shown
 // precisely when the backend is unreachable, so it cannot fetch anything at runtime). Everything the
@@ -50,6 +52,25 @@ const ICON_TYPES: Record<string, string> = {
 };
 const faviconType = ICON_TYPES[/\.([a-z0-9]+)(?:[?#]|$)/i.exec(favicon)?.[1]?.toLowerCase() ?? ""];
 
+// The Open Graph tags, for the same reason as the favicon: a link preview crawler runs no JavaScript,
+// so what useHead adds in app.vue never reaches it — while the page is up, every shared link of the
+// instance points here. Written into the built markup instead, from the same overlay.
+//
+// A path served by this page gets the CLIENT_URI token in front (see app/constants/clientUri.ts): the
+// crawlers need an absolute URL, and the origin is only known when the container starts. An external
+// URL is used as is.
+const og = { ...metadataDefaults, ...brandMetadata };
+const ogImage = og.OG_IMAGE.startsWith("/") ? `${CLIENT_URI_PLACEHOLDER}${og.OG_IMAGE}` : og.OG_IMAGE;
+// The English title, as app.vue renders it before a visitor's locale applies — brand overlay first.
+type Messages = { maintenance?: { title?: string } };
+const englishMessages = (rel: string): Messages =>
+  has(rel) ? (JSON.parse(readFileSync(file(rel), "utf8")) as Messages) : {};
+const ogTitle = (
+  englishMessages("app/locales/en.json").maintenance?.title ??
+  englishMessages("locales/en.json").maintenance?.title ??
+  "{APPLICATION_NAME}"
+).replace("{APPLICATION_NAME}", og.APPLICATION_NAME);
+
 // Per-locale overlays holding just the namespaces this page renders. `files` is a merge list: the
 // vanilla file first, the brand's on top, so an untranslated key keeps its default.
 const localeFiles = (code: string): string[] =>
@@ -74,13 +95,25 @@ export default defineNuxtConfig({
   css: ["~/assets/css/branding.css", "~/assets/css/main.css", "@ocelot-social/ui/style.css"],
   app: {
     head: {
+      meta: [
+        { property: "og:title", content: ogTitle },
+        { property: "og:description", content: og.APPLICATION_DESCRIPTION },
+        { property: "og:site_name", content: og.APPLICATION_NAME },
+        { property: "og:type", content: "website" },
+        { property: "og:image", content: ogImage },
+        { property: "og:image:alt", content: og.OG_IMAGE_ALT },
+        { property: "og:image:width", content: og.OG_IMAGE_WIDTH },
+        { property: "og:image:height", content: og.OG_IMAGE_HEIGHT },
+        { property: "og:image:type", content: og.OG_IMAGE_TYPE },
+        // A field the brand build cleared (it would describe the vanilla image) is omitted, not empty.
+      ].filter((tag) => tag.content),
       // `tagPriority: "low"` puts these AFTER the bundled css above — the position the brand sheet
       // held while it was the last entry in `css`. Without it unhead emits config head tags before
       // the build's own stylesheet links, and a brand rule would lose every tie on specificity.
       link: [
         { rel: "icon", href: favicon, ...(faviconType ? { type: faviconType } : {}) },
         ...brandStylesheets.map((href) => ({
-          rel: "stylesheet",
+          rel: "stylesheet" as const,
           href,
           tagPriority: "low" as const,
         })),
@@ -126,9 +159,6 @@ export default defineNuxtConfig({
       fs: {
         allow: ["/packages/ui"],
       },
-    },
-    build: {
-      minify: 'esbuild',
     },
   },
   eslint: {

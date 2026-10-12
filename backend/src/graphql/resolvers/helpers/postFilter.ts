@@ -5,6 +5,7 @@ import { UserInputError } from '@graphql/errors'
 
 import { nonMemberReadsContent, visibilityOf } from './groupAccessCypher'
 import { orderClause } from './ordering'
+import { shoutsVisibleTo } from './shoutVisibility'
 
 // Translates the `_PostFilter` tree into a Cypher WHERE clause — the part neo4j-graphql-js
 // used to do for the Post and profilePagePosts queries (migration stage C2).
@@ -114,6 +115,10 @@ const translate = (
   filter: Record<string, unknown>,
   alias: string,
   next: () => string,
+  // Who is asking — the id filterInvisiblePosts puts into `invisibleTo`, null for a visitor.
+  // Read once at the top, since a filter about someone ELSE (whose shouts) needs it anywhere in
+  // the tree.
+  viewer: string | null,
 ): CypherFragment => {
   const fragments: CypherFragment[] = []
 
@@ -125,7 +130,7 @@ const translate = (
     // --- boolean composition -------------------------------------------------------
     if (key === 'OR' || key === 'AND') {
       const branches = (value as Record<string, unknown>[]).map((branch) =>
-        translate(branch, alias, next),
+        translate(branch, alias, next, viewer),
       )
       fragments.push(combine(branches, key))
       continue
@@ -368,9 +373,16 @@ const translate = (
         if (!shouterId) {
           throw new UserInputError('shoutedBy_some supports only `id`.')
         }
+        // Only what the shouter shows: their own setting decides (`showShoutsPublicly`, public
+        // unless switched off), and they always see their own. Without this the profile tab could
+        // be hidden while the same list stayed one feed query away.
+        const viewerParameter = next()
         fragments.push({
-          where: `EXISTS { MATCH (${alias})<-[:SHOUTED]-(:User { id: $${parameter} }) }`,
-          params: { [parameter]: shouterId },
+          where: `EXISTS {
+            MATCH (${alias})<-[:SHOUTED]-(shouter:User { id: $${parameter} })
+            WHERE ${shoutsVisibleTo('shouter', `$${viewerParameter}`)}
+          }`,
+          params: { [parameter]: shouterId, [viewerParameter]: viewer },
         })
         continue
       }
@@ -448,11 +460,12 @@ export const postFilterToCypher = (params: PostQueryParams, alias = 'post'): Cyp
       .map((field) => [field, params[field]]),
   )
 
+  const filter = (params.filter as Record<string, unknown>) ?? {}
+  const viewerId =
+    (filter.invisibleTo as { viewerId?: string | null } | undefined)?.viewerId ?? null
+
   return combine(
-    [
-      translate(scalarArgs, alias, next),
-      translate((params.filter as Record<string, unknown>) ?? {}, alias, next),
-    ],
+    [translate(scalarArgs, alias, next, viewerId), translate(filter, alias, next, viewerId)],
     'AND',
   )
 }

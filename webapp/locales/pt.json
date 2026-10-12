@@ -541,6 +541,7 @@
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "A função “{name}” já existe.",
     "ROLE_SAVE_NAME_INVALID": "O nome da função deve ter de 2 a 50 caracteres e só pode conter letras, dígitos, “_” e “-”; o primeiro caractere deve ser uma letra ou um dígito.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "Uma função não pode ser criada ou marcada como protegida.",
+    "USER_ACTION_TARGET_NOT_OUTRANKED": "Você só pode fazer isso com usuários cuja função concede menos poderes do que a sua.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Você não pode pesquisar na administração de usuários.",
     "USER_DOES_NOT_EXIST": "O usuário não foi encontrado.",
     "USER_PROFILE_NAME_TOO_SHORT": "O nome deve ter pelo menos {min} caracteres.",

@@ -466,6 +466,7 @@ describe('ContentMenu.vue', () => {
           resource: {
             id: 'another-user',
             slug: 'another-user',
+            outrankedByCurrentUser: true,
           },
         })
         wrapper
@@ -478,9 +479,32 @@ describe('ContentMenu.vue', () => {
             {
               id: 'another-user',
               slug: 'another-user',
+              outrankedByCurrentUser: true,
             },
           ],
         ])
+      })
+
+      it('can not delete a user whose role the viewer does not outrank', async () => {
+        // The act-on hierarchy: holding user.delete.any is not enough, the backend refuses
+        // peers and higher roles, so the menu must not offer what would fail.
+        granted.add('user.delete.any')
+        getters['auth/user'] = () => {
+          return { id: 'some-user', slug: 'some-user' }
+        }
+        const wrapper = await openContentMenu({
+          resourceType: 'user',
+          resource: {
+            id: 'another-user',
+            slug: 'another-user',
+            outrankedByCurrentUser: false,
+          },
+        })
+        expect(
+          wrapper
+            .findAll('.os-menu-item')
+            .filter((item) => item.text() === 'settings.deleteUserAccount.name'),
+        ).toHaveLength(0)
       })
 
       it('can not delete the own account', async () => {
@@ -647,6 +671,7 @@ describe('ContentMenu.vue', () => {
           resource: {
             id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
             disabled: false,
+            outrankedByCurrentUser: true,
           },
         })
         openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
@@ -656,6 +681,23 @@ describe('ContentMenu.vue', () => {
           .at(0)
           .trigger('click')
         expect(openModalSpy).toHaveBeenCalledWith('confirm', 'disable')
+      })
+
+      it('does NOT offer user disable on a user the viewer does not outrank', async () => {
+        granted.add('user.disable')
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'user',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            disabled: false,
+            outrankedByCurrentUser: false,
+          },
+        })
+        const disableItems = wrapper
+          .findAll('.os-menu-item')
+          .filter((item) => item.text() === 'disable.user.title')
+        expect(disableItems).toHaveLength(0)
       })
 
       it('does NOT offer user disable to a content.moderate-only holder (no user.disable)', async () => {
@@ -784,6 +826,7 @@ describe('ContentMenu.vue', () => {
           resource: {
             id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
             disabled: true,
+            outrankedByCurrentUser: true,
           },
         })
         openModalSpy = jest.spyOn(wrapper.vm, 'openModal')

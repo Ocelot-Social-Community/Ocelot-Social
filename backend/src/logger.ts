@@ -36,7 +36,14 @@ const minLevel = logLevelsMap[LOG_LEVEL] // eslint-disable-line security/detect-
  * only ever run once, because the single call site was the module body below it. An ES module is
  * already evaluated exactly once per process, so the module-level binding IS the singleton.
  */
-const logger: Logger<ILogObj> = new Logger({ minLevel, name: 'mainLogger' })
+//
+// `mask.keys` keeps what tslog 4 did by default: a logged object's `password` is printed as
+// `[***]`. tslog 5 masks nothing unless told to, which would put plaintext passwords in the log.
+const logger: Logger<ILogObj> = new Logger({
+  minLevel,
+  name: 'mainLogger',
+  mask: { keys: ['password'] },
+})
 export default logger
 type OcelotLogger = typeof logger
 export type { OcelotLogger as Logger }

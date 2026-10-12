@@ -21,6 +21,7 @@ import { orderClause } from './helpers/ordering'
 import { pagingClause } from './helpers/paging'
 import { postFilterToCypher, postOrderClause } from './helpers/postFilter'
 import Resolver from './helpers/Resolver'
+import { shoutsVisibleTo } from './helpers/shoutVisibility'
 import { viewerScope } from './helpers/viewerGroups'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
@@ -820,7 +821,9 @@ export default {
       hasMany: {
         tags: '-[:TAGGED]->(related:Tag)',
         categories: '-[:CATEGORIZED]->(related:Category)',
-        shoutedBy: '<-[:SHOUTED]-(related:User)',
+        // Who shouted it, minus those who keep their shouts to themselves. The count below stays
+        // whole: a number names nobody.
+        shoutedBy: `<-[:SHOUTED]-(related:User) WHERE ${shoutsVisibleTo('related', '$cypherParams.currentUserId')}`,
       },
       hasOne: {
         author: '<-[:WROTE]-(related:User)',

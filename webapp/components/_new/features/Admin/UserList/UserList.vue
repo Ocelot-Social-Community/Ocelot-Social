@@ -165,7 +165,7 @@
               </td>
               <td v-if="canDisableUsers" class="ds-table-col ds-table-col-right">
                 <os-button
-                  v-if="user.id !== currentUser.id"
+                  v-if="user.outrankedByCurrentUser"
                   :variant="user.disabled ? 'primary' : 'danger'"
                   appearance="ghost"
                   circle
@@ -184,7 +184,7 @@
               </td>
               <td v-if="canDeleteUsers" class="ds-table-col ds-table-col-right">
                 <os-button
-                  v-if="user.id !== currentUser.id"
+                  v-if="user.outrankedByCurrentUser"
                   variant="danger"
                   appearance="ghost"
                   circle
@@ -310,16 +310,16 @@ export default {
     canManageBadges() {
       return this.$can('badge.manage')
     },
-    // Delete column is shown to user.delete.any holders; the per-row button is hidden
-    // for one's own account (self-deletion lives in settings, and the backend blocks
-    // it here anyway via the same gate).
+    // Delete column is shown to user.delete.any holders; the per-row button only where the
+    // backend will allow it — on users whose role grants less authority than the viewer's
+    // (outrankedByCurrentUser, the act-on hierarchy). That also hides it on one's own row:
+    // self-deletion lives in settings.
     canDeleteUsers() {
       return this.$can('user.delete.any')
     },
     // Disable/enable column — shown to user.disable holders. The reversible, moderator-grade
-    // counterpart to delete; the per-row button is hidden for one's own account, and the
-    // backend additionally enforces the act-on hierarchy (you can only disable a user whose
-    // permissions are a strict subset of yours).
+    // counterpart to delete; the per-row button follows the same act-on hierarchy as delete
+    // (outrankedByCurrentUser), which also hides it on one's own row.
     canDisableUsers() {
       return this.$can('user.disable')
     },

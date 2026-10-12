@@ -1,7 +1,9 @@
 // ATTENTION: DO NOT PUT ANY SECRETS IN HERE (or the .env)
 
 import dotenv from 'dotenv'
-dotenv.config() // we want to synchronize @nuxt-dotenv and nuxt-env
+// quiet: since v17 dotenv reports every load, since v18 through console.error — which the tests
+// turn into a failure, and which says nothing worth knowing here.
+dotenv.config({ quiet: true }) // we want to synchronize @nuxt-dotenv and nuxt-env
 
 // Load Package Details for some default values
 const pkg = require('../package')
@@ -44,6 +46,11 @@ const environment = {
 const server = {
   GRAPHQL_URI: process.env.GRAPHQL_URI || 'http://localhost:4000',
   WEBSOCKETS_URI: process.env.WEBSOCKETS_URI || 'ws://localhost:3000/api/graphql',
+  // The instance's public origin (https://<domain>), the same value the backend's CLIENT_URI holds.
+  // Exposed at runtime as `$env.CLIENT_URI` (nuxt-env), so the pre-built image picks it up per
+  // deployment. Absolute URLs that leave the browser need it — og:image (mixins/seo.js) above all,
+  // because link previews do not resolve a relative one against the page. Unset, those stay relative.
+  CLIENT_URI: process.env.CLIENT_URI,
 }
 
 const sentry = {

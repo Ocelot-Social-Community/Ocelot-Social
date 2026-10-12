@@ -54,6 +54,8 @@ type User {
   disabled: Boolean
   "The user's single dynamic role name (HAS_ROLE), incl. custom roles. Visible with role.manage."
   roleName: String
+  "Whether the current user's role grants strictly more authority than this user's — the act-on hierarchy that disableUser and DeleteUser enforce on top of user.disable / user.delete.any. Always false for oneself."
+  outrankedByCurrentUser: Boolean!
   "The user's public key, for federation/verification."
   publicKey: String
   "The user who invited this user, if any."

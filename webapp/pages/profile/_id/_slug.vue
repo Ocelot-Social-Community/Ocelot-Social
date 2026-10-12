@@ -465,6 +465,11 @@ export default {
       const { slug } = this.user || {}
       return slug
     },
+    // Somebody else's shouts only when they show them (public unless switched off, the same rule
+    // the backend applies); one's own always.
+    showsShouts() {
+      return this.myProfile || this.user.showShoutsPublicly !== false
+    },
     tabOptions() {
       return [
         {
@@ -479,12 +484,16 @@ export default {
           count: this.user.commentedCount,
           disabled: this.user.commentedCount === 0,
         },
-        {
-          type: 'shout',
-          title: this.$t('profile.shouted'),
-          count: this.user.shoutedCount,
-          disabled: this.user.shoutedCount === 0,
-        },
+        ...(this.showsShouts
+          ? [
+              {
+                type: 'shout',
+                title: this.$t('profile.shouted'),
+                count: this.user.shoutedCount,
+                disabled: this.user.shoutedCount === 0,
+              },
+            ]
+          : []),
       ]
     },
   },

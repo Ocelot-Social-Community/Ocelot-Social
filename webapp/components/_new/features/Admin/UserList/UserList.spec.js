@@ -62,6 +62,7 @@ describe('UserList', () => {
             name: 'User',
             roleName: 'moderator',
             slug: 'user',
+            outrankedByCurrentUser: true,
           },
           {
             id: 'user2',
@@ -69,6 +70,7 @@ describe('UserList', () => {
             name: 'User',
             roleName: 'user',
             slug: 'user',
+            outrankedByCurrentUser: true,
           },
         ],
       }),
@@ -134,6 +136,10 @@ describe('UserList', () => {
         const fields = userFields(wrapper)
         expect(fields).toContain('email')
         expect(fields).toContain('roleName')
+      })
+
+      it('requests outrankedByCurrentUser, which decides the per-row actions', () => {
+        expect(userFields(wrapper)).toContain('outrankedByCurrentUser')
       })
 
       it('does not skip the roles query', () => {
@@ -217,10 +223,20 @@ describe('UserList', () => {
       const w = Wrapper({
         data: () => ({
           allRoleNames: [],
-          User: [{ id: 'admin', name: 'Admin', slug: 'admin' }],
+          User: [{ id: 'admin', name: 'Admin', slug: 'admin', outrankedByCurrentUser: false }],
         }),
       })
       expect(w.find('[data-test="user-delete-admin"]').exists()).toBe(false)
+    })
+
+    it('hides the delete button on a user the viewer does not outrank', () => {
+      const w = Wrapper({
+        data: () => ({
+          allRoleNames: [],
+          User: [{ id: 'peer', name: 'Peer', slug: 'peer', outrankedByCurrentUser: false }],
+        }),
+      })
+      expect(w.find('[data-test="user-delete-peer"]').exists()).toBe(false)
     })
 
     it('opens a confirmation modal instead of deleting immediately', () => {
@@ -250,10 +266,20 @@ describe('UserList', () => {
       const w = Wrapper({
         data: () => ({
           allRoleNames: [],
-          User: [{ id: 'admin', name: 'Admin', slug: 'admin' }],
+          User: [{ id: 'admin', name: 'Admin', slug: 'admin', outrankedByCurrentUser: false }],
         }),
       })
       expect(w.find('[data-test="user-disable-admin"]').exists()).toBe(false)
+    })
+
+    it('hides the disable toggle on a user the viewer does not outrank', () => {
+      const w = Wrapper({
+        data: () => ({
+          allRoleNames: [],
+          User: [{ id: 'peer', name: 'Peer', slug: 'peer', outrankedByCurrentUser: false }],
+        }),
+      })
+      expect(w.find('[data-test="user-disable-peer"]').exists()).toBe(false)
     })
 
     it('disables an enabled user (disable: true) and toasts success', async () => {

@@ -1,0 +1,42 @@
+name: Already verified by the merge queue
+description: >
+  On a push to master, tells whether the merge queue already ran this workflow successfully on the
+  very same commit. The queue fast-forwards master to the commit it tested, so re-running a test
+  workflow there checks the same tree a second time.
+outputs:
+  verified:
+    description: "'true' when this workflow's merge_group run for this commit succeeded, else 'false'"
+    value: ${{ steps.check.outputs.verified }}
+  run-id:
+    description: The id of that merge_group run (empty unless verified), e.g. to fetch its artifacts
+    value: ${{ steps.check.outputs.run-id }}
+runs:
+  using: composite
+  steps:
+    - id: check
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        # Only a push to master can have been through the queue. Pull requests, branches and the
+        # merge group itself always run in full.
+        if [ "${GITHUB_EVENT_NAME}" != 'push' ] || [ "${GITHUB_REF}" != 'refs/heads/master' ]; then
+          echo 'verified=false' >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        # GITHUB_WORKFLOW_REF is owner/repo/.github/workflows/<file>@<ref>; the runs API takes the file.
+        workflow="${GITHUB_WORKFLOW_REF%@*}"
+        workflow="${workflow##*/}"
+        # Fails OPEN: an API error means "not verified", and the full suite runs. A commit that never
+        # went through the queue (a direct push, an admin merge) finds no run and runs in full, too.
+        if ! run_id="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/${workflow}/runs?event=merge_group&head_sha=${GITHUB_SHA}&status=success&per_page=1" --jq '.workflow_runs[0].id // empty')"; then
+          echo "::warning::could not ask for the merge queue's run of ${workflow} — running in full"
+          run_id=''
+        fi
+        if [ -n "${run_id}" ]; then
+          echo "::notice::${workflow} already passed in the merge queue on ${GITHUB_SHA} (run ${run_id}) — not repeated on master"
+          echo 'verified=true' >> "$GITHUB_OUTPUT"
+          echo "run-id=${run_id}" >> "$GITHUB_OUTPUT"
+        else
+          echo 'verified=false' >> "$GITHUB_OUTPUT"
+        fi

@@ -10,6 +10,7 @@ import { createRequire } from 'node:module'
 import CONFIG from '@config/index'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
+import { viewerOutranksUser } from '@graphql/resolvers/helpers/actOnHierarchy'
 import {
   memberRoleHolds,
   nonMemberReadsContent,
@@ -27,7 +28,7 @@ import {
   templateVisibility,
 } from '@src/groupRole'
 import { isPermissionAvailable } from '@src/permission'
-import { dominates } from '@src/role'
+import { dominatesInNetwork } from '@src/role'
 
 import type { Context } from '@src/context'
 import type { GroupPermissionKey } from '@src/groupPermission'
@@ -235,43 +236,34 @@ const isDeletingOwnAccount = rule({
   return context.user?.id === args.id
 })
 
-// The target user's effective permission set, resolved from their single role
-// (owner ⇒ full catalog, edgeless/unknown ⇒ baseline) — the same resolution the
-// request context applies to the actor (context/index.ts).
-const effectivePermissionsOfUser = async (
-  context: Context,
-  userId: string,
-): Promise<Set<PermissionKey>> => {
-  const result = await context.database.query({
-    query: `OPTIONAL MATCH (u:User {id: $userId})-[:HAS_ROLE]->(r:Role)
-            RETURN coalesce(r.name, 'user') AS roleName`,
-    variables: { userId },
+// Act-on hierarchy guard for per-user destructive actions (delete, disable): the actor may only
+// act on a target whose role grants strictly less AUTHORITY than theirs (dominatesInNetwork() —
+// see role/authority.ts). Closes the privilege-escalation hole where a holder of
+// user.delete.any / user.disable could act on a peer or a higher-privileged user (admin/owner).
+//
+// Takes the gating permission and checks it itself rather than leaving it to a sibling
+// hasPermission() under `and`: only a holder of the right is told WHY the target is out of
+// reach. `and` answers with the first custom error among ALL refusals, so a sibling check would
+// not stop the explanation reaching somebody who may not act on anybody at all (and `chain`
+// cannot run on this Node, see hasGroupPermission).
+const canActOnTargetUser = (permission: PermissionKey) =>
+  rule({ cache: 'no_cache' })(async (_parent, args, context: Context) => {
+    if (!hasPermissionEffective(context, permission)) {
+      return false
+    }
+    const targetId = args.id as string | undefined
+    // Fail closed. Every mutation this rule is attached to today declares `id: ID!`, so the schema
+    // makes this unreachable — it is here so that attaching the rule to a mutation whose target
+    // argument is named differently DENIES rather than silently skipping the hierarchy check.
+    /* v8 ignore next 3 -- unreachable while every guarded mutation declares a non-null id */
+    if (!targetId) {
+      return false
+    }
+    return (
+      (await viewerOutranksUser(context, targetId)) ||
+      new AppError(Errors.USER_ACTION_TARGET_NOT_OUTRANKED)
+    )
   })
-  // Exactly one row, always: an OPTIONAL MATCH that finds nothing still returns a row with a null
-  // `r`, and the coalesce turns that into 'user'. No JS-side fallback needed — the two that used
-  // to be here could not run.
-  const roleName = result.records[0].get('roleName') as string
-  return context.role.permissionsForRole(roleName)
-}
-
-// Act-on hierarchy guard for per-user destructive actions (delete, disable): the
-// actor may only act on a target whose permissions are a STRICT SUBSET of theirs
-// (dominates() — see role/dominance.ts). Closes the privilege-escalation hole
-// where a holder of user.delete.any / user.disable could act on a peer or a
-// higher-privileged user (admin/owner). The gating permission itself is checked
-// separately via hasPermission(); this rule only enforces the relative ranking.
-const canActOnTargetUser = rule({ cache: 'no_cache' })(async (_parent, args, context: Context) => {
-  const targetId = args.id as string | undefined
-  // Fail closed. Every mutation this rule is attached to today declares `id: ID!`, so the schema
-  // makes this unreachable — it is here so that attaching the rule to a mutation whose target
-  // argument is named differently DENIES rather than silently skipping the hierarchy check.
-  /* v8 ignore next 3 -- unreachable while every guarded mutation declares a non-null id */
-  if (!targetId) {
-    return false
-  }
-  const targetPermissions = await effectivePermissionsOfUser(context, targetId)
-  return dominates(context.effectivePermissions, targetPermissions)
-})
 
 // Same hierarchy guard for the report `review` mutation, which can disable the
 // reported resource. Only Users carry a role, so Posts/Comments pass through; a
@@ -312,9 +304,15 @@ const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
     return true
   }
   // coalesce() in the statement above already guarantees a name, same as in
-  // effectivePermissionsOfUser.
+  // viewerOutranksUser.
   const targetPermissions = context.role.permissionsForRole(row.get('roleName') as string)
-  return dominates(context.effectivePermissions, targetPermissions)
+  if (dominatesInNetwork(context.effectivePermissions, targetPermissions)) {
+    return true
+  }
+  // Explained to a moderator only, for the reason given at canActOnTargetUser.
+  return hasPermissionEffective(context, 'content.moderate')
+    ? new AppError(Errors.USER_ACTION_TARGET_NOT_OUTRANKED)
+    : false
 })
 
 // No blind moderation: a report whose subject sits in a group this moderator may not read is
@@ -853,11 +851,8 @@ export default shield(
       ),
       UpdateComment: isAuthor,
       DeleteComment: isAuthor,
-      DeleteUser: or(
-        isDeletingOwnAccount,
-        and(hasPermission('user.delete.any'), canActOnTargetUser),
-      ),
-      disableUser: and(hasPermission('user.disable'), canActOnTargetUser),
+      DeleteUser: or(isDeletingOwnAccount, canActOnTargetUser('user.delete.any')),
+      disableUser: canActOnTargetUser('user.disable'),
       requestPasswordReset: allow,
       resetPassword: allow,
       AddPostEmotions: isAuthenticated,

@@ -30,7 +30,7 @@
     },
     "user.delete.any": {
       "group": "administration",
-      "description": "Delete any user's account, subject to the act-on hierarchy — you can only delete a user whose permissions are a strict subset of yours (own-account deletion stays self-allowed)."
+      "description": "Delete any user's account, subject to the act-on hierarchy — you can only delete a user whose role grants strictly less authority than yours; rights to take part (posting, commenting, inviting, creating groups, …) do not count (own-account deletion stays self-allowed)."
     },
     "badge.manage": {
       "group": "moderation",
@@ -63,7 +63,7 @@
     },
     "user.disable": {
       "group": "moderation",
-      "description": "Disable (deactivate) and re-enable user accounts (reversible), subject to the act-on hierarchy — you can only disable a user whose permissions are a strict subset of yours."
+      "description": "Disable (deactivate) and re-enable user accounts (reversible), subject to the act-on hierarchy — you can only disable a user whose role grants strictly less authority than yours; rights to take part (posting, commenting, inviting, creating groups, …) do not count."
     },
     "post.pin": {
       "group": "moderation",

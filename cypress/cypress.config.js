@@ -23,6 +23,9 @@ async function setupNodeEvents(on, config) {
         resolve: {
           extensions: ['.js', '.json'],
           fallback: {
+            // dotenv 18 bundles its CLI into the main entry; its lazily evaluated `child_process`
+            // requires never run in the browser, but webpack still has to resolve them.
+            child_process: false,
             fs: false,
             net: false,
             tls: false,

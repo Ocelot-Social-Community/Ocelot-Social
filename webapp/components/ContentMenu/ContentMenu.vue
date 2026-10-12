@@ -278,7 +278,7 @@ export default {
               icon: this.icons.userTimes,
             })
           }
-          if (this.$can('user.delete.any')) {
+          if (this.$can('user.delete.any') && this.resource.outrankedByCurrentUser) {
             routes.push({
               label: this.$t(`settings.deleteUserAccount.name`),
               callback: () => {
@@ -332,10 +332,11 @@ export default {
     // disableUser mutation — same as the admin/moderation user list. Disabling
     // CONTENT (post/comment/organization) stays content.moderate via the report
     // `review` mutation. So the gate (and the mutation, see reviewModalData) depend
-    // on the resource type.
+    // on the resource type. A user is offered only when the viewer outranks them
+    // (outrankedByCurrentUser) — the act-on hierarchy disableUser enforces, same as delete.
     canDisableResource() {
       return this.resourceType === 'user'
-        ? this.$can('user.disable')
+        ? this.$can('user.disable') && this.resource.outrankedByCurrentUser
         : this.$can('content.moderate')
     },
     canBePinned() {

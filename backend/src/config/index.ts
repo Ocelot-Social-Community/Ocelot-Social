@@ -15,8 +15,8 @@ import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
 import type * as SMTPTransport from 'nodemailer/lib/smtp-pool'
 
-// Load env file
-config()
+// Load env file. quiet: since v17 dotenv reports every load, since v18 through console.error.
+config({ quiet: true })
 
 // Use the Cypress-exposed values or process.env. `Cypress.expose()` (no argument) returns the whole
 // map, which is what makes it a drop-in for the `Cypress.env()` that Cypress 16 removed. The other

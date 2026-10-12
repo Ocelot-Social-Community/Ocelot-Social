@@ -14,7 +14,8 @@ export const loggerPlugin = {
     const isIntrospectionQuery = requestContext.request.operationName === 'IntrospectionQuery'
     const qID = randomBytes(4).toString('hex')
     if (!isIntrospectionQuery) {
-      const logRequest = ['Apollo Request', qID]
+      // tslog 5 takes the message first, so it stays out of the spread arguments.
+      const logRequest = [qID]
       logRequest.push(JSON.stringify(requestContext.request.query))
       if (requestContext.request.variables) {
         const variables = cloneDeep(requestContext.request.variables)
@@ -23,16 +24,16 @@ export const loggerPlugin = {
         }
         logRequest.push(JSON.stringify(variables))
       }
-      ocelotLogger.debug(...logRequest)
+      ocelotLogger.debug('Apollo Request', ...logRequest)
     }
     return {
       // eslint-disable-next-line @typescript-eslint/require-await
       async willSendResponse(requestContext) {
         if (!isIntrospectionQuery) {
-          const logResponse = ['Apollo Response', qID]
+          const logResponse = [qID]
           const errors = requestContext.response.body?.singleResult?.errors
           if (errors?.length) {
-            ocelotLogger.error(...logResponse, JSON.stringify(errors))
+            ocelotLogger.error('Apollo Response', ...logResponse, JSON.stringify(errors))
             return
           }
           if (requestContext.response.body?.singleResult?.data?.login) {
@@ -43,7 +44,7 @@ export const loggerPlugin = {
           } else if (requestContext.response.body?.singleResult?.data) {
             logResponse.push(JSON.stringify(requestContext.response.body.singleResult.data))
           }
-          ocelotLogger.debug(...logResponse)
+          ocelotLogger.debug('Apollo Response', ...logResponse)
         }
       },
     }

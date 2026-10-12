@@ -13,6 +13,8 @@ import {
   effectiveRoleName,
 } from '@src/role'
 
+import { viewerOutranksUser } from './helpers/actOnHierarchy'
+
 import type { Context } from '@src/context'
 import type { RoleDefinition } from '@src/role'
 
@@ -320,5 +322,9 @@ export default {
       })
       return (result.records[0]?.get('name') as string | undefined) ?? 'user'
     },
+    // Lets the webapp offer disable/delete only where the shield will allow them — the same
+    // function decides both (see helpers/actOnHierarchy.ts).
+    outrankedByCurrentUser: async (parent: { id: string }, _args: unknown, context: Context) =>
+      viewerOutranksUser(context, parent.id),
   },
 }
