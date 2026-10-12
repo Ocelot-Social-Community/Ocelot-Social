@@ -288,9 +288,35 @@ describe('build-maintenance-branding', () => {
     // there being no metadata.themeColor field. resolveThemeColor is unit-tested elsewhere; what is
     // only observable here is that its result actually reaches the overlay.
     assert.equal(meta.THEME_COLOR, 'rebeccapurple')
-    // The composed ogImage is a /branding/<id>/… path this static site never serves — it has to be
-    // rewritten to the copy that IS served, or every link preview 404s.
-    assert.equal(meta.OG_IMAGE, '/brand/logo-squared.svg')
+    // An SVG logo does not stand in as OG image — link previews render none — so the page keeps its
+    // vanilla one: the key is absent, not pointed at the logo.
+    assert.ok(!('OG_IMAGE' in meta))
+  })
+
+  // A raster logo does stand in. The composed ogImage is then a /branding/<id>/… path this static site
+  // never serves — it has to be rewritten to the copy that IS served, or every link preview 404s.
+  test('serves a raster squared logo as OG image, with its measured size', () => {
+    const from = brandDir()
+    const png = Buffer.alloc(24)
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(png)
+    png.write('IHDR', 12, 'ascii')
+    png.writeUInt32BE(600, 16)
+    png.writeUInt32BE(600, 20)
+    write(join(from, 'assets/logo-squared.png'), png)
+    write(
+      join(from, 'brand.config.mjs'),
+      `export default (d) => d({ metadata: { applicationName: 'Acme' }, logos: { signupPath: 'assets/logo-squared.png' } })\n`,
+    )
+    const to = maintenanceDir()
+    brand(from, to)
+
+    const meta = readJson(to, 'app/constants/metadata.brand.json') as unknown as Record<
+      string,
+      string
+    >
+    assert.equal(meta.OG_IMAGE, '/brand/logo-squared.png')
+    assert.equal(meta.OG_IMAGE_WIDTH, '600')
+    assert.equal(meta.OG_IMAGE_TYPE, 'image/png')
   })
 
   // Without this the page kept its own committed public/favicon.ico — the vanilla ocelot icon — for

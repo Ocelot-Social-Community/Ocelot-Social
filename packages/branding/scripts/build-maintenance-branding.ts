@@ -24,6 +24,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
 
+import { brandingDefaults } from '../dist/defaults.js'
 import { composeArchive } from '../dist/discover.js'
 import { readTarGz } from '../dist/tar.js'
 import { resolveThemeColor } from '../dist/theme.js'
@@ -219,7 +220,12 @@ function serveArchived(namespaced: string, label: string): string | null {
 }
 
 const logoUrl = servedUrl(config.logos.signupPath, 'logo')
-const ogImageUrl = servedUrl(config.metadata.ogImage, 'og image')
+// The vanilla path is not a gap to warn about: this page ships the same file, and the omission below
+// is what keeps it.
+const ogImageUrl =
+  config.metadata.ogImage === brandingDefaults.metadata.ogImage
+    ? null
+    : servedUrl(config.metadata.ogImage, 'og image')
 // The browser-tab icon. It travels exactly like the logo — and it has to travel at all, because this
 // page ships its own vanilla public/favicon.ico and nothing else would ever replace it: the built
 // index.html carries no icon link (Nuxt 4 adds none, and useHead cannot help with `ssr: false`), so
@@ -229,10 +235,12 @@ const ogImageUrl = servedUrl(config.metadata.ogImage, 'og image')
 // Only `assets.favicon`, not `assets.icon`: apple-touch and PWA install icons exist for a site being
 // added to a home screen, which is not something anyone does with a maintenance page.
 const faviconUrl = servedUrl(config.assets.favicon, 'favicon')
-// Falling back to the logo covers the usual case, where a brand sets no separate OG image and the
-// build derived it from the squared logo. null means the brand's OG image is unusable here — not in
-// the archive, or a webapp path — and the logo could not stand in either: see the omission below.
-const ogImage = ogImageUrl ?? logoUrl
+// No fallback to the logo: the archive's ogImage already IS the squared logo wherever that can serve
+// as one (a raster image — see resolveOgImage in lib/build-brandings.ts). Where it is not, the
+// archive keeps the vanilla path, and so does this page: an SVG logo previews as nothing at all.
+// null means the brand's OG image is unusable here — not in the archive, or a webapp path — and the
+// page keeps its vanilla one: see the omission below.
+const ogImage = ogImageUrl
 
 // --- 4. Metadata: identity + OG for the <head>, as an overlay the app deep-merges ------------------
 // `config` is fully merged, so every field is present (the ocelot vanilla defaults when the brand
