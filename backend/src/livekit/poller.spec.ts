@@ -42,7 +42,7 @@ vi.mock('@src/graphql/resolvers/videoCalls', () => ({
 
 // Ending the call session is the database's business (callSession.spec.ts); here it only
 // has to be asked for, and must not reach a real database.
-const mockEndOfMissingRoom = vi.fn<(...args: unknown[]) => Promise<void>>()
+const mockEndOfMissingRoom = vi.fn<(...args: unknown[]) => Promise<boolean>>()
 vi.mock('@src/livekit/callSession', () => ({
   __esModule: true,
   endCallSessionsOfMissingRoom: async (...args: unknown[]) => mockEndOfMissingRoom(...args),
@@ -97,7 +97,8 @@ beforeEach(() => {
   mockListRooms.mockReset().mockResolvedValue([])
   mockRoomServiceCtor.mockReset()
   mockPublish.mockReset().mockResolvedValue(undefined)
-  mockEndOfMissingRoom.mockReset().mockResolvedValue(undefined)
+  // Settled at once, unless a test says otherwise.
+  mockEndOfMissingRoom.mockReset().mockResolvedValue(true)
   mockLogger.info.mockReset()
   mockLogger.warn.mockReset()
   mockLogger.error.mockReset()
@@ -314,6 +315,79 @@ describe('poll tick', () => {
     expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
       groupId: 'a',
       count: 0,
+    })
+  })
+
+  describe('a call session that cannot be ended yet', () => {
+    const roomGone = async () => {
+      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 3 }])
+      startLiveKitPoller()
+      await vi.advanceTimersByTimeAsync(5_000)
+      mockListRooms.mockResolvedValueOnce([])
+      await vi.advanceTimersByTimeAsync(15_000)
+    }
+
+    it('is asked for again on the next poll when it was spared', async () => {
+      mockEndOfMissingRoom.mockResolvedValueOnce(false)
+      await roomGone()
+
+      expect(mockEndOfMissingRoom).toHaveBeenCalledTimes(1)
+
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockEndOfMissingRoom).toHaveBeenCalledTimes(2)
+      expect(mockEndOfMissingRoom).toHaveBeenLastCalledWith('driver', 'group-a')
+    })
+
+    it('is asked for again on the next poll when ending it failed', async () => {
+      mockEndOfMissingRoom.mockRejectedValueOnce(new Error('database down'))
+      await roomGone()
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockEndOfMissingRoom).toHaveBeenCalledTimes(2)
+    })
+
+    it('is left alone once it is settled', async () => {
+      mockEndOfMissingRoom.mockResolvedValueOnce(false)
+      await roomGone()
+      // Second poll settles it (the default) …
+      await vi.advanceTimersByTimeAsync(15_000)
+      // … so the third has nothing left to ask for.
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockEndOfMissingRoom).toHaveBeenCalledTimes(2)
+    })
+
+    it('does not have the count: 0 published again while waiting', async () => {
+      mockEndOfMissingRoom.mockResolvedValue(false)
+      await roomGone()
+
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'a',
+        count: 0,
+      })
+
+      mockPublish.mockClear()
+      await vi.advanceTimersByTimeAsync(30_000)
+
+      expect(mockPublish).not.toHaveBeenCalled()
+    })
+
+    it('makes way for a new call in a room of the same name', async () => {
+      mockEndOfMissingRoom.mockResolvedValue(false)
+      await roomGone()
+      mockEndOfMissingRoom.mockClear()
+      mockPublish.mockClear()
+
+      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 1 }])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      // The room is there again: nothing to end, and its count goes out as usual.
+      expect(mockEndOfMissingRoom).not.toHaveBeenCalled()
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'a',
+        count: 1,
+      })
     })
   })
 

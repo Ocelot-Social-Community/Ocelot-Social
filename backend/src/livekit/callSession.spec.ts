@@ -241,17 +241,57 @@ describe(endCallSessionsOfMissingRoom, () => {
     const roomId = await join('anna', 'RM_1')
     await ageSessions()
 
-    await endCallSessionsOfMissingRoom(driver, 'group-group-1')
+    const settled = await endCallSessionsOfMissingRoom(driver, 'group-group-1')
 
+    expect(settled).toBe(true)
     expect(await sessions()).toEqual([{ roomId, sid: 'RM_1', running: false, users: ['anna'] }])
   })
 
   it('spares a session just opened, which belongs to a room opened since', async () => {
     const roomId = await join('anna', 'RM_1')
 
-    await endCallSessionsOfMissingRoom(driver, 'group-group-1')
+    const settled = await endCallSessionsOfMissingRoom(driver, 'group-group-1')
 
+    // Not settled: the caller is to ask again.
+    expect(settled).toBe(false)
     expect(await sessions()).toEqual([{ roomId, sid: 'RM_1', running: true, users: ['anna'] }])
+  })
+
+  it('settles a spared session when asked again later', async () => {
+    const roomId = await join('anna', 'RM_1')
+    await endCallSessionsOfMissingRoom(driver, 'group-group-1')
+    await ageSessions()
+
+    const settled = await endCallSessionsOfMissingRoom(driver, 'group-group-1')
+
+    expect(settled).toBe(true)
+    expect(await sessions()).toEqual([{ roomId, sid: 'RM_1', running: false, users: ['anna'] }])
+  })
+
+  it('reports a room without any running session as settled', async () => {
+    await expect(endCallSessionsOfMissingRoom(driver, 'group-group-1')).resolves.toBe(true)
+  })
+
+  it('ends the sessions that are due and still reports the one it spared', async () => {
+    // Two sessions under one room name: an old one left running, and one just opened.
+    await join('anna', 'RM_1')
+    await ageSessions()
+    await run(`
+      MATCH (group:Group { id: 'group-1' })
+      CREATE (:Room { id: 'young-room', createdAt: toString(datetime()) })
+        -[:ROOM_FOR]->(:VideoCallSession {
+          id: 'young', livekitRoom: 'group-group-1', livekitSid: 'RM_2',
+          createdAt: toString(datetime())
+        })-[:CALL_IN]->(group)
+    `)
+
+    const settled = await endCallSessionsOfMissingRoom(driver, 'group-group-1')
+
+    expect(settled).toBe(false)
+    expect((await sessions()).map(({ sid, running }) => ({ sid, running }))).toEqual([
+      { sid: 'RM_1', running: false },
+      { sid: 'RM_2', running: true },
+    ])
   })
 
   it('leaves the sessions of other rooms alone', async () => {

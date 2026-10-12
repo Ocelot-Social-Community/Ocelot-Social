@@ -167,28 +167,37 @@ export const MISSING_ROOM_GRACE_SECONDS = 30
 /**
  * Marks the sessions running under that room NAME as over — for the case where all that is
  * known is that no such room exists any more, and its sid with it. Sessions only just opened
- * are spared (see MISSING_ROOM_GRACE_SECONDS); should one of those really be over, it is
- * ended when the group's next call begins.
+ * are spared (see MISSING_ROOM_GRACE_SECONDS).
+ *
+ * Returns whether that settles the room: true if no session is left running under the name,
+ * false if one was spared. The caller is to ask again then — by that time the session is
+ * either old enough to be ended, or its room has shown up in the list.
  */
 export const endCallSessionsOfMissingRoom = async (
   driver: Driver,
   livekitRoom: string,
-): Promise<void> => {
+): Promise<boolean> => {
   const session = driver.session()
   try {
-    await session.writeTransaction(async (transaction) =>
+    const result = await session.writeTransaction(async (transaction) =>
       transaction.run(
         `
-          MATCH (session:VideoCallSession { livekitRoom: $livekitRoom })
-          WHERE session.endedAt IS NULL
-            // Compared as datetimes, not as the stored strings: toString(datetime()) drops
-            // trailing zeros of the fraction, so the strings do not sort chronologically.
-            AND datetime(session.createdAt) <= datetime() - duration({ seconds: $graceSeconds })
-          SET session.endedAt = toString(datetime())
+          OPTIONAL MATCH (session:VideoCallSession { livekitRoom: $livekitRoom })
+            WHERE session.endedAt IS NULL
+          // Compared as datetimes, not as the stored strings: toString(datetime()) drops
+          // trailing zeros of the fraction, so the strings do not sort chronologically.
+          WITH session,
+               datetime(session.createdAt) <= datetime() - duration({ seconds: $graceSeconds }) AS due
+          FOREACH (ended IN CASE WHEN due THEN [session] ELSE [] END |
+            SET ended.endedAt = toString(datetime())
+          )
+          // Counts the sessions found running and not due; none found counts as none spared.
+          RETURN count(CASE WHEN session IS NOT NULL AND NOT due THEN 1 END) = 0 AS settled
         `,
         { livekitRoom, graceSeconds: MISSING_ROOM_GRACE_SECONDS },
       ),
     )
+    return result.records[0].get('settled') === true
   } finally {
     await session.close()
   }
