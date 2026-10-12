@@ -441,6 +441,15 @@ describe('rights.vue', () => {
     })
 
     // Re-entering the page has to show what was saved, not what the cache held before (#10490).
+    // The rights read in the viewer's language — they used to be the catalog's English (#10492).
+    it("describes each right in the viewer's language, falling back to the catalog text", async () => {
+      const wrapper = await Wrapper()
+      const permission = { key: 'group.leave', description: 'Leave the group.' }
+      expect(wrapper.vm.permLabel(permission)).toBe('Leave the group.')
+      wrapper.vm.$t = (path) => `T:${path}`
+      expect(wrapper.vm.permLabel(permission)).toBe('T:group.rights.perm.group_leave')
+    })
+
     it('asks the server on every visit rather than answering from the cache', () => {
       expect(rights.apollo.rights.fetchPolicy).toBe('cache-and-network')
     })

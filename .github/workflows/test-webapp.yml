@@ -95,6 +95,7 @@ jobs:
           scripts/translations/sort.sh
           scripts/translations/missing-keys.sh
           scripts/translations/backend-error-codes.sh
+          scripts/translations/permission-catalogs.sh
 
   build_test_webapp:
     name: Docker Build Test - Webapp

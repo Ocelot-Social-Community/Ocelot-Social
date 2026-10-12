@@ -236,6 +236,7 @@ import PermissionMatrix from '~/components/Permissions/PermissionMatrix'
 import RoleTabs from '~/components/Permissions/RoleTabs'
 import permissionsChangedSubscription from '~/graphql/PermissionsSubscription'
 import { iconRegistry } from '~/utils/iconRegistry'
+import { NETWORK_PERMISSIONS, permissionLabel } from '~/utils/permissionLabel'
 import { diffBetween, permissionSetOf, samePermissions } from '~/utils/permissionDiff'
 import {
   createRoleMutation,
@@ -522,9 +523,7 @@ export default {
     // sanitised to a flat i18n key; falls back to the catalog's English description
     // (e.g. for a permission added before its translation exists).
     permLabel(permission) {
-      const path = `admin.roles.perm.${permission.key.replace(/\./g, '_')}`
-      const label = this.$t(path)
-      return label && label !== path ? label : permission.description
+      return permissionLabel(this.$t.bind(this), NETWORK_PERMISSIONS, permission)
     },
     // The effective permission key set of a role (full catalog for protected roles).
     permissionSetOf(role) {
