@@ -130,6 +130,44 @@ describe('admin/group-roles.vue', () => {
 
       expect(wrapper.vm.templates).toEqual(TEMPLATES)
     })
+
+    // The whole round of #10490: save, leave, come back. The cache answers first with the roles
+    // from before the save; what the page shows in the end has to be the server's answer.
+    it('shows what was saved when the page is entered again', async () => {
+      const first = await advanced()
+      at(first, 'perm-group.members.read').element.checked = true
+      await at(first, 'perm-group.members.read').trigger('change')
+      await at(first, 'save').trigger('click')
+      await flushPromises()
+      const saved = mocks.$apollo.mutate.mock.calls.at(-1)[0].variables.permissions
+      first.destroy()
+
+      const again = await advanced()
+      const answer = (loading, templates) =>
+        again.vm.$options.apollo.templatesQuery.result.call(again.vm, {
+          loading,
+          data: { groupPermissionCatalog: CATALOG, groupRoleTemplates: templates },
+        })
+      answer(true, TEMPLATES)
+      answer(
+        false,
+        TEMPLATES.map((template) =>
+          template.name === 'public'
+            ? {
+                ...template,
+                roles: template.roles.map((r) =>
+                  r.name === 'usual' ? { ...r, permissions: saved } : r,
+                ),
+              }
+            : template,
+        ),
+      )
+      await again.vm.$nextTick()
+
+      expect(saved).toContain('group.members.read')
+      expect(at(again, 'perm-group.members.read').element.checked).toBe(true)
+      expect(again.vm.dirty).toBe(false)
+    })
   })
 
   // The matrix unfolds UNDER the sentences rather than replacing them, so a hovered sentence can

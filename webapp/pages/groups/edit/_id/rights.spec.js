@@ -470,6 +470,38 @@ describe('rights.vue', () => {
         expect(wrapper.vm.roles).toEqual(ROLES)
       })
 
+      // The whole round of #10490: save, leave, come back. The cache answers first with the roles
+      // from before the save; what the page shows in the end has to be the server's answer.
+      it('shows what was saved when the page is entered again', async () => {
+        const first = await Wrapper()
+        await at(first, 'switch-members-post').setChecked(false)
+        await at(first, 'save').trigger('click')
+        await flushPromises()
+        const saved = mocks.$apollo.mutate.mock.calls.at(-1)[0].variables.permissions
+        first.destroy()
+
+        const again = await Wrapper()
+        const answer = (loading, roles) =>
+          rights.apollo.rights.result.call(again.vm, {
+            loading,
+            data: {
+              groupPermissionCatalog: CATALOG,
+              groupTemplates: TEMPLATES,
+              Group: [{ roles, myGroupPermissions: held }],
+            },
+          })
+        answer(true, ROLES)
+        answer(
+          false,
+          ROLES.map((role) => (role.name === 'usual' ? { ...role, permissions: saved } : role)),
+        )
+        await again.vm.$nextTick()
+
+        expect(saved).not.toContain('group.post.create')
+        expect(at(again, 'switch-members-post').element.checked).toBe(false)
+        expect(again.vm.dirty).toBe(false)
+      })
+
       it('follows the server while nothing is edited', async () => {
         const wrapper = await Wrapper()
         const resetDraft = jest.spyOn(wrapper.vm, 'resetDraft')
