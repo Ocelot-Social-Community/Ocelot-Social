@@ -1,4 +1,4 @@
-import seo from './seo.js'
+import seo, { absoluteUrl } from './seo.js'
 
 // Mock the metadata adapter with fixed, DISTINCT values per field so the assertions are independent of
 // the real branding proxy AND a cross-wiring bug (e.g. og:title reading the description) is caught.
@@ -22,6 +22,7 @@ describe('seo mixin', () => {
     const ctx = {
       $i18n: { locale: () => 'de' },
       $route: { name: 'profile' },
+      $env: { CLIENT_URI: 'https://network.example' },
     }
     const head = seo.head.call(ctx)
     expect(head.htmlAttrs).toEqual({ lang: 'de' })
@@ -37,7 +38,7 @@ describe('seo mixin', () => {
         { hid: 'og:title', property: 'og:title', content: 'Test Network' },
         { hid: 'og:description', property: 'og:description', content: 'Test network description' },
         { hid: 'og:site_name', property: 'og:site_name', content: 'Test Network' },
-        { hid: 'og:image', property: 'og:image', content: '/test/og.png' },
+        { hid: 'og:image', property: 'og:image', content: 'https://network.example/test/og.png' },
       ]),
     )
   })
@@ -47,9 +48,43 @@ describe('seo mixin', () => {
     const ctx = {
       $i18n: { locale: () => 'en' },
       $route: { name: undefined },
+      $env: {},
     }
     const head = seo.head.call(ctx)
     expect(head.htmlAttrs).toEqual({ lang: 'en' })
     expect(head.bodyAttrs).toEqual({ class: 'page-name-undefined' })
+  })
+
+  it('leaves og:image relative when no public origin is configured', () => {
+    const ctx = { $i18n: { locale: () => 'en' }, $route: { name: 'index' }, $env: {} }
+    const ogImage = seo.head.call(ctx).meta.find((tag) => tag.hid === 'og:image')
+    expect(ogImage.content).toBe('/test/og.png')
+  })
+})
+
+describe('absoluteUrl', () => {
+  it('resolves a path against the origin', () => {
+    expect(absoluteUrl('/branding/stage/assets/og.png', 'https://stage.ocelot.social')).toBe(
+      'https://stage.ocelot.social/branding/stage/assets/og.png',
+    )
+  })
+
+  // An origin given with a trailing slash or a path must not double or keep anything of it.
+  it('takes only the origin from a base with a path', () => {
+    expect(absoluteUrl('/og.png', 'https://network.example/sub/')).toBe(
+      'https://network.example/og.png',
+    )
+  })
+
+  it('keeps an already absolute URL', () => {
+    expect(absoluteUrl('https://cdn.example/og.png', 'https://network.example')).toBe(
+      'https://cdn.example/og.png',
+    )
+  })
+
+  it('returns the path unchanged without a path, an origin, or with an invalid origin', () => {
+    expect(absoluteUrl(undefined, 'https://network.example')).toBeUndefined()
+    expect(absoluteUrl('/og.png', undefined)).toBe('/og.png')
+    expect(absoluteUrl('/og.png', 'not a url')).toBe('/og.png')
   })
 })

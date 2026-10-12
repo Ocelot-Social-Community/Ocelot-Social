@@ -1,5 +1,18 @@
 import metadata from '~/constants/metadata'
 
+// Link previews (Discord, Facebook, X, the messengers) do not resolve a relative og:image against the
+// page — they show no image at all. The origin is the CONFIGURED one rather than the request's Host
+// header: a client controls that header, and a cache in front of the webapp would replay the image URL
+// it injected to everybody else. Without a configured origin the path stays as it is.
+export const absoluteUrl = (path, origin) => {
+  if (!path || !origin) return path
+  try {
+    return new URL(path, origin).href
+  } catch {
+    return path
+  }
+}
+
 // Applied to the layouts, so it runs on every page (SSR + client). Besides the html lang / body
 // class it emits the RUNTIME-branded document title + SEO / Open-Graph meta: these were baked at
 // build time in nuxt.config.js (from constants/manifest.js + metadata); reading the metadata adapter
@@ -26,7 +39,11 @@ export default {
         { hid: 'og:title', property: 'og:title', content: name },
         { hid: 'og:description', property: 'og:description', content: description },
         { hid: 'og:site_name', property: 'og:site_name', content: name },
-        { hid: 'og:image', property: 'og:image', content: metadata.OG_IMAGE },
+        {
+          hid: 'og:image',
+          property: 'og:image',
+          content: absoluteUrl(metadata.OG_IMAGE, this.$env.CLIENT_URI),
+        },
         { hid: 'og:image:alt', property: 'og:image:alt', content: metadata.OG_IMAGE_ALT },
         { hid: 'og:image:width', property: 'og:image:width', content: metadata.OG_IMAGE_WIDTH },
         { hid: 'og:image:height', property: 'og:image:height', content: metadata.OG_IMAGE_HEIGHT },
