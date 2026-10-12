@@ -67,9 +67,12 @@ function collectFiles(dir: string, prefix: string, entries: TarEntry[]): void {
 }
 
 // A brand-relative asset path (namespaced to /branding/<id>/…). Absolute /… and http(s):/data:/
-// mailto: paths are framework/external and left untouched.
+// mailto: paths are framework/external and left untouched — in any case, as URL schemes are (RFC 3986).
 const isRelativeAsset = (v: unknown): v is string =>
-  typeof v === 'string' && v.length > 0 && !v.startsWith('/') && !/^(https?:|data:|mailto:)/.test(v)
+  typeof v === 'string' &&
+  v.length > 0 &&
+  !v.startsWith('/') &&
+  !/^(https?:|data:|mailto:)/i.test(v)
 
 function namespacePath(value: string, id: string, brandDir: string, warnings: string[]): string {
   if (!isRelativeAsset(value)) {
@@ -503,6 +506,118 @@ function resolveIconAsset(
   }
 }
 
+/** The MIME type each raster format is announced under in `og:image:type`. */
+const OG_IMAGE_TYPES: Record<string, string> = {
+  png: 'image/png',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  webp: 'image/webp',
+}
+
+/** A brand-relative file's bytes, or null when there is no readable file to inspect. */
+function readBrandFile(dir: string, rel: string): Buffer | null {
+  try {
+    return readFileSync(join(dir, rel))
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Settle the Open Graph image: which file a link preview shows, and the size and type it is announced
+ * with. MUTATES the config, so it runs before namespaceConfig, like resolveIconAsset.
+ *
+ * A brand that sets no ogImage of its own gets its squared logo (logos.signupPath). The old deploy
+ * baked the brand's `static/img/custom/logo-squared.*` over the vanilla file; at runtime the brand's
+ * logo lives under /branding/<id>/… instead, so without this a brand's previews would show the vanilla
+ * ocelot logo. But only a RASTER logo can stand in: Discord, Facebook, X and the messengers render no
+ * SVG preview at all — and squared logos are usually SVG. Such a brand keeps the vanilla image, which
+ * previews at least, and is told to ship one.
+ *
+ * Width, height and type are measured from the file whenever this build can read it, never inherited:
+ * the defaults describe the vanilla PNG, and kept next to a brand's image they announce the wrong
+ * picture. For a file this build cannot inspect (an external URL, a framework path) only what the
+ * brand set itself stays; the inherited values are dropped (see dropInheritedOgFields).
+ */
+/**
+ * Clear what the vanilla defaults say about the vanilla picture once another image takes its place.
+ * Only fields still AT the default: a value the brand set is its own statement about its image. An
+ * empty field makes the consumers omit the tag — the Open Graph size and type are optional, and a
+ * preview that measures the image itself beats one that trusts a wrong size. The alt text of a logo
+ * standing in can still be written truthfully; for a brand's own image only the brand knows it.
+ */
+function dropInheritedOgFields(config: BrandingConfig, logoStandsIn: boolean): void {
+  const metadata = config.metadata
+  const defaults = brandingDefaults.metadata
+  for (const key of ['ogImageWidth', 'ogImageHeight', 'ogImageType'] as const) {
+    if (metadata[key] === defaults[key]) {
+      metadata[key] = ''
+    }
+  }
+  if (metadata.ogImageAlt === defaults.ogImageAlt) {
+    metadata.ogImageAlt = logoStandsIn ? `${metadata.applicationName} Logo` : ''
+  }
+}
+
+function resolveOgImage(dir: string, id: string, config: BrandingConfig, warnings: string[]): void {
+  const metadata = config.metadata
+  const ownImage = metadata.ogImage !== brandingDefaults.metadata.ogImage
+  const logo = config.logos.signupPath
+  if (!ownImage && (!logo || logo === brandingDefaults.logos.signupPath)) {
+    return
+  }
+  // An own image replaces the vanilla one whatever its file turns out to be (a broken one is warned
+  // about below, not swapped back), so the defaults describe nothing on the page any more.
+  if (ownImage) {
+    dropInheritedOgFields(config, false)
+  }
+  const rel = ownImage ? metadata.ogImage : logo
+  // A data: URL is no address a link preview can fetch — whatever image it holds, the crawler gets
+  // nothing, and the page would carry the whole payload in a <meta> tag.
+  const inline = /^data:/i.test(rel)
+  if (!isRelativeAsset(rel)) {
+    // Nothing to measure. An own image is the brand's call, only flagged when it cannot work; a logo
+    // elsewhere can only be judged by its name, and an .svg one is exactly the file this function
+    // exists to keep out of the previews.
+    if (ownImage && inline) {
+      warnings.push(
+        `  ! ${id}: metadata.ogImage is a data: URL — link previews fetch the image from a URL, so ` +
+          `they show none; ship a PNG or JPEG file, ideally 1200×630`,
+      )
+    } else if (!ownImage && !inline && !/\.svg([?#]|$)/i.test(rel)) {
+      metadata.ogImage = rel
+      dropInheritedOgFields(config, true)
+    }
+    return
+  }
+  const bytes = readBrandFile(dir, rel)
+  if (!bytes) {
+    return
+  } // a missing file is already reported by namespacePath as "referenced asset not found"
+  const image = readImage(bytes)
+  if (!image || !image.raster || image.width === null || image.height === null) {
+    const what = !image
+      ? 'is not an image format this build recognises'
+      : !image.raster
+        ? `is ${image.format.toUpperCase()}, which link previews do not render`
+        : `is a truncated ${image.format.toUpperCase()} file`
+    warnings.push(
+      ownImage
+        ? `  ! ${id}: metadata.ogImage '${rel}' ${what} — ship a PNG or JPEG, ideally 1200×630`
+        : `  ! ${id}: no metadata.ogImage, and the squared logo '${rel}' ${what} — link previews ` +
+            `show the vanilla ocelot image; ship a PNG or JPEG, ideally 1200×630, as metadata.ogImage`,
+    )
+    return
+  }
+  metadata.ogImage = rel
+  if (!ownImage) {
+    dropInheritedOgFields(config, true)
+  }
+  metadata.ogImageWidth = String(image.width)
+  metadata.ogImageHeight = String(image.height)
+  metadata.ogImageType = OG_IMAGE_TYPES[image.format]
+}
+
 /**
  * Warn on a leftover `public/` folder. That bucket used to be overlaid onto the BACKEND's on-disk
  * `public/` at bootstrap, and every brand used it for exactly one thing: badge SVGs. It is gone —
@@ -538,18 +653,7 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   // lifted out of them into the config; the declarations themselves stay in the files.
   const declaredTokens = loadThemeFromStylesheets(dir, id, config, warnings)
   warnThemeTokenTypos(declaredTokens, id, warnings)
-  // OG image: if the brand didn't set its own, follow its squared logo (logos.signupPath). The old
-  // deploy baked the brand's `static/img/custom/logo-squared.*` over the vanilla file; at runtime the
-  // brand's logo lives under /branding/<id>/… instead, so derive the OG image from it — otherwise a
-  // brand's link previews would show the vanilla ocelot logo (the untouched default path).
-  const defaults = brandingDefaults
-  if (
-    config.metadata.ogImage === defaults.metadata.ogImage &&
-    config.logos.signupPath &&
-    config.logos.signupPath !== defaults.logos.signupPath
-  ) {
-    config.metadata.ogImage = config.logos.signupPath
-  }
+  resolveOgImage(dir, id, config, warnings)
   // Before namespacing: this READS a brand-relative path off disk and WRITES the measured size back
   // into the config, so it has to see the authored path and be seen by the config that gets packed.
   resolveIconAsset(dir, id, config, warnings)

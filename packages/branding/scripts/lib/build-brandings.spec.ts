@@ -68,6 +68,16 @@ function brandDir({
   return dir
 }
 
+/** A minimal but genuine PNG header — enough for the checks, which read only the IHDR chunk. */
+function pngBytes(width, height) {
+  const data = Buffer.alloc(24)
+  Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(data)
+  data.write('IHDR', 12, 'ascii')
+  data.writeUInt32BE(width, 16)
+  data.writeUInt32BE(height, 20)
+  return data
+}
+
 const ACME_CONFIG = `export default (defineBranding) =>
   defineBranding({
     metadata: { applicationName: 'Acme' },
@@ -161,19 +171,35 @@ test('buildBrandArchive emits a PARTIAL library: only customised buckets get a f
   assert.deepEqual(types, ['identity', 'logos'])
 })
 
-test('buildBrandArchive namespaces asset paths and derives ogImage from the squared logo', async () => {
+test('buildBrandArchive namespaces asset paths', async () => {
   const built = await buildBrandArchive(
     brandDir({ config: ACME_CONFIG, assets: { 'logo-squared.svg': '<svg/>' } }),
   )
   const files = readTarGz(built.gz)
   const config = composeArchive(files)
   assert.equal(config.logos.signupPath, '/branding/acme/assets/logo-squared.svg')
-  // ogImage was left at the default → follows the brand's squared logo (namespaced).
-  assert.equal(config.metadata.ogImage, '/branding/acme/assets/logo-squared.svg')
   // the referenced asset is bundled into the archive
   assert.ok(files.has('assets/logo-squared.svg'))
-  // The one warning this fixture draws is about the icon slot it leaves empty — pinned in the
-  // `assets.icon` block below, and orthogonal to the namespacing this test is about.
+  // The two warnings this fixture draws are about the icon slot it leaves empty and the SVG logo that
+  // cannot stand in as OG image — both pinned in their own blocks below, and orthogonal to the
+  // namespacing this test is about.
+  assert.deepEqual(
+    built.warnings.filter((w) => !w.includes('assets.icon') && !w.includes('ogImage')),
+    [],
+  )
+})
+
+// URL schemes are case-insensitive: an upper-case one is still external, not a file in the brand's root.
+test('buildBrandArchive leaves an external path alone whatever the case of its scheme', async () => {
+  const built = await buildBrandArchive(
+    brandDir({
+      config: `export default (d) => d({ logos: { signupPath: 'DATA:image/png;base64,iVBORw0KGgo=', headerPath: 'HTTPS://cdn.example/logo.svg' } })\n`,
+    }),
+  )
+  const config = composeArchive(readTarGz(built.gz))
+  assert.equal(config.logos.signupPath, 'DATA:image/png;base64,iVBORw0KGgo=')
+  assert.equal(config.logos.headerPath, 'HTTPS://cdn.example/logo.svg')
+  assert.equal(config.metadata.ogImage, '/img/custom/logo-squared.png') // a data: logo stands in for nothing
   assert.deepEqual(
     built.warnings.filter((w) => !w.includes('assets.icon')),
     [],
@@ -543,16 +569,6 @@ test('a stylesheet listed in assets.css that does not exist is reported', async 
 // else's phone. The build is the last place it is cheap to notice. (See lib/imageSize.spec.ts for the
 // header reading itself; what these pin is which files draw which warning.)
 describe('assets.icon', () => {
-  /** A minimal but genuine PNG header — enough for the check, which reads only the IHDR chunk. */
-  function pngBytes(width, height) {
-    const data = Buffer.alloc(24)
-    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(data)
-    data.write('IHDR', 12, 'ascii')
-    data.writeUInt32BE(width, 16)
-    data.writeUInt32BE(height, 20)
-    return data
-  }
-
   const withIcon = (body, name = 'icon.png') =>
     brandDir({
       config: `export default (d) => d({ assets: { icon: 'assets/${name}' } })\n`,
@@ -692,6 +708,176 @@ describe('assets.icon', () => {
       })
 
       assert.equal(await iconSizes(dir), '225x225')
+    })
+  })
+})
+
+// metadata.ogImage is what a shared link shows in Discord, Facebook, X and the messengers — none of
+// which render SVG, and all of which take the announced size and type at their word. Like the icon, a
+// wrong file only shows up on somebody else's screen.
+describe('metadata.ogImage', () => {
+  const metadataOf = async (dir) =>
+    composeArchive(readTarGz((await buildBrandArchive(dir)).gz)).metadata
+  const ogWarnings = async (dir) =>
+    (await buildBrandArchive(dir)).warnings.filter((w) => w.includes('ogImage')).join('\n')
+
+  const withLogo = (body, name) =>
+    brandDir({
+      config: `export default (d) => d({ metadata: { applicationName: 'Acme' }, logos: { signupPath: 'assets/${name}' } })\n`,
+      assets: { [name]: body },
+    })
+
+  const withOgImage = (body, name, extra = '') =>
+    brandDir({
+      config: `export default (d) => d({ metadata: { ogImage: 'assets/${name}'${extra} } })\n`,
+      assets: { [name]: body },
+    })
+
+  describe('without an own ogImage', () => {
+    test('follows a raster squared logo and announces its measured size and type', async () => {
+      const metadata = await metadataOf(withLogo(pngBytes(600, 600), 'logo-squared.png'))
+
+      assert.equal(metadata.ogImage, '/branding/acme/assets/logo-squared.png')
+      assert.equal(metadata.ogImageWidth, '600')
+      assert.equal(metadata.ogImageHeight, '600')
+      assert.equal(metadata.ogImageType, 'image/png')
+      // The vanilla alt text names the ocelot logo; the brand's logo is the brand's.
+      assert.equal(metadata.ogImageAlt, 'Acme Logo')
+    })
+
+    // The stage brand's case: its squared logo is an SVG, the previews showed nothing at all.
+    test('keeps the vanilla image when the squared logo is an SVG, and says so', async () => {
+      const dir = withLogo('<svg viewBox="0 0 10 10"></svg>', 'logo-squared.svg')
+      const metadata = await metadataOf(dir)
+
+      assert.equal(metadata.ogImage, '/img/custom/logo-squared.png')
+      assert.equal(metadata.ogImageType, 'image/png')
+      assert.equal(metadata.ogImageAlt, 'ocelot.social Logo') // still the vanilla picture
+      assert.match(
+        await ogWarnings(dir),
+        /no metadata\.ogImage, and the squared logo 'assets\/logo-squared\.svg' is SVG, which link previews do not render/,
+      )
+    })
+
+    test('keeps the vanilla image when the squared logo is truncated or unrecognised', async () => {
+      const truncated = withLogo(pngBytes(600, 600).subarray(0, 12), 'logo-squared.png')
+      const unknown = withLogo('plain text', 'logo-squared.png')
+
+      assert.equal((await metadataOf(truncated)).ogImage, '/img/custom/logo-squared.png')
+      assert.match(await ogWarnings(truncated), /is a truncated PNG file/)
+      assert.equal((await metadataOf(unknown)).ogImage, '/img/custom/logo-squared.png')
+      assert.match(await ogWarnings(unknown), /is not an image format this build recognises/)
+    })
+
+    // Hosted elsewhere, so only the name can tell: an .svg one stays out, anything else is followed.
+    test('judges a logo it cannot read by its extension', async () => {
+      const external = (url) =>
+        brandDir({ config: `export default (d) => d({ logos: { signupPath: '${url}' } })\n` })
+
+      const followed = await metadataOf(external('https://cdn.example/logo.png'))
+      assert.equal(followed.ogImage, 'https://cdn.example/logo.png')
+      // Unmeasured, so unannounced: the vanilla 1200×1140 PNG says nothing about this file.
+      assert.equal(followed.ogImageWidth, '')
+      assert.equal(followed.ogImageHeight, '')
+      assert.equal(followed.ogImageType, '')
+      assert.equal(followed.ogImageAlt, 'ocelot.social Logo') // applicationName left at the default
+      assert.equal(
+        (await metadataOf(external('https://cdn.example/logo.svg?v=2'))).ogImage,
+        '/img/custom/logo-squared.png',
+      )
+    })
+
+    // A crawler fetches og:image by URL; an inline logo is no URL, whatever image it holds.
+    test('never follows a data: URL logo', async () => {
+      const inline = (url) =>
+        brandDir({ config: `export default (d) => d({ logos: { signupPath: '${url}' } })\n` })
+
+      for (const url of [
+        'data:image/svg+xml;base64,PHN2Zy8+',
+        'data:image/png;base64,iVBORw0KGgo=',
+      ]) {
+        const metadata = await metadataOf(inline(url))
+        assert.equal(metadata.ogImage, '/img/custom/logo-squared.png')
+        assert.equal(metadata.ogImageWidth, '1200') // still the vanilla picture
+      }
+    })
+
+    test('leaves the vanilla image alone when the brand keeps the vanilla logo', async () => {
+      const dir = brandDir({
+        config: `export default (d) => d({ metadata: { applicationName: 'X' } })\n`,
+      })
+
+      assert.equal((await metadataOf(dir)).ogImage, '/img/custom/logo-squared.png')
+      assert.equal(await ogWarnings(dir), '')
+    })
+  })
+
+  describe('with an own ogImage', () => {
+    // The defaults describe the vanilla 1200×1140 PNG; next to a brand's file they would be wrong.
+    test('announces the measured size and type, over whatever the brand wrote', async () => {
+      const dir = withOgImage(
+        pngBytes(1200, 630),
+        'og.png',
+        `, ogImageWidth: '1', ogImageHeight: '1', ogImageType: 'image/gif'`,
+      )
+      const metadata = await metadataOf(dir)
+
+      assert.equal(metadata.ogImage, '/branding/acme/assets/og.png')
+      assert.equal(metadata.ogImageWidth, '1200')
+      assert.equal(metadata.ogImageHeight, '630')
+      assert.equal(metadata.ogImageType, 'image/png')
+      // Only the brand can describe its own picture; the vanilla text describes the ocelot logo.
+      assert.equal(metadata.ogImageAlt, '')
+      assert.equal(await ogWarnings(dir), '')
+    })
+
+    test('warns about a truncated file', async () => {
+      const dir = withOgImage(pngBytes(1200, 630).subarray(0, 12), 'og.png')
+
+      assert.match(
+        await ogWarnings(dir),
+        /metadata\.ogImage 'assets\/og\.png' is a truncated PNG file/,
+      )
+    })
+
+    test("warns about an SVG but keeps it — the choice is the brand's", async () => {
+      const dir = withOgImage('<svg viewBox="0 0 10 10"></svg>', 'og.svg')
+
+      assert.equal((await metadataOf(dir)).ogImage, '/branding/acme/assets/og.svg')
+      assert.match(
+        await ogWarnings(dir),
+        /metadata\.ogImage 'assets\/og\.svg' is SVG, which link previews do not render — ship a PNG or JPEG/,
+      )
+    })
+
+    test("warns about a data: URL but keeps it — the choice is the brand's", async () => {
+      const dir = brandDir({
+        config: `export default (d) => d({ metadata: { ogImage: 'data:image/png;base64,iVBORw0KGgo=' } })\n`,
+      })
+
+      assert.equal((await metadataOf(dir)).ogImage, 'data:image/png;base64,iVBORw0KGgo=')
+      assert.match(
+        await ogWarnings(dir),
+        /metadata\.ogImage is a data: URL — link previews fetch the image from a URL/,
+      )
+    })
+
+    test('keeps what the brand set for a file it cannot read, and drops what it inherited', async () => {
+      const external = brandDir({
+        config: `export default (d) => d({ metadata: { ogImage: 'https://cdn.example/og.png', ogImageWidth: '800', ogImageAlt: 'Our banner' } })\n`,
+      })
+      const missing = brandDir({
+        config: `export default (d) => d({ metadata: { ogImage: 'assets/og.png' } })\n`,
+      })
+
+      const fromCdn = await metadataOf(external)
+      assert.equal(fromCdn.ogImage, 'https://cdn.example/og.png')
+      assert.equal(fromCdn.ogImageWidth, '800')
+      assert.equal(fromCdn.ogImageAlt, 'Our banner')
+      assert.equal(fromCdn.ogImageHeight, '')
+      assert.equal(fromCdn.ogImageType, '')
+      assert.equal((await metadataOf(missing)).ogImageWidth, '')
+      assert.equal(await ogWarnings(missing), '') // reported once, as "referenced asset not found"
     })
   })
 })

@@ -26,6 +26,10 @@ spec:
         env:
           - name: HOST
             value: 0.0.0.0
+          # The public origin, as the backend and webapp get it: nginx/41-client-uri.sh writes it in
+          # front of og:image, which link previews need absolute.
+          - name: CLIENT_URI
+            value: "https://{{ .Values.domain }}"
         # `maintenance.env`, the same route every other workload takes. It carries SUPPORT_EMAIL: the
         # page is static, so its nginx entrypoint substitutes the address into the built files at
         # startup (maintenance/nginx/40-support-email.sh) rather than it being baked into a per-brand

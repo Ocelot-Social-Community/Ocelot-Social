@@ -135,4 +135,6 @@ COPY maintenance/nginx/custom.conf /etc/nginx/conf.d/default.conf
 # deployment/configurations/*/docker/maintenance.Dockerfile) — so the address stays deployment config
 # (helm chart) and not one build arg per brand repo's CI.
 COPY --chmod=755 maintenance/nginx/40-support-email.sh /docker-entrypoint.d/40-support-email.sh
+# Same reason: puts $CLIENT_URI in front of og:image, which link previews need absolute.
+COPY --chmod=755 maintenance/nginx/41-client-uri.sh /docker-entrypoint.d/41-client-uri.sh
 EXPOSE 8080
