@@ -479,12 +479,22 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
+      networkPermissions: 'auth/permissions',
       getShowChat: 'chat/showChat',
       videoCallEnabled: 'videoCall/enabled',
       videoCallOpen: 'videoCall/showVideoCall',
     }),
     chatRoomUnreadCount() {
       return (this.chatRoom && this.chatRoom.unreadCount) || 0
+    },
+    // The viewer's network rights as one value, so a watcher fires on a real change only:
+    // the store replaces the list on every "permissions may have changed" signal, which is
+    // sent for any role of the network, mostly ones the viewer does not hold.
+    networkPermissionKeys() {
+      return (this.networkPermissions || [])
+        .map((permission) => permission.key)
+        .sort()
+        .join(',')
     },
     canShowVideoCallButton() {
       return this.videoCallEnabled && this.canInGroup('group.videoCall.join', this.group)
@@ -618,6 +628,14 @@ export default {
     this.teardownDescriptionOverflowObserver()
   },
   watch: {
+    // What the viewer may do in this group comes with the group, already capped by their
+    // network rights (opening a video call, for one). The group signals changes to its own
+    // roles (setupGroupPermissionsSubscription); a change to the viewer's NETWORK role arrives
+    // through the store only, and without this the page kept showing what was true before —
+    // a call button that stayed disabled until the page was loaded anew.
+    networkPermissionKeys() {
+      this.reloadGroup()
+    },
     canParticipateInChat(mayChat) {
       // The right is derived from the Apollo-populated group.myGroupPermissions, which isn't
       // available synchronously on first visits (no SSR cache). Set up the subscription

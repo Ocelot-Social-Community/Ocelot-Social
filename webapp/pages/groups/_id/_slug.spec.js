@@ -89,6 +89,7 @@ describe('GroupProfileSlug', () => {
 
   const getters = {
     'auth/user': currentUserMock,
+    'auth/permissions': () => [],
     'auth/isModerator': () => false,
     'categories/categories': () => [{ id: 'cat1' }],
     'videoCall/enabled': () => false,
@@ -930,6 +931,39 @@ describe('GroupProfileSlug', () => {
       entry.callbacks.next({})
 
       expect(refetch).toHaveBeenCalled()
+    })
+
+    // What the viewer may do in the group is capped by their NETWORK rights. A change to those
+    // reaches the page through the store, not through the group's own signal.
+    describe("the viewer's network rights", () => {
+      const keys = (networkPermissions) =>
+        GroupProfileSlug.computed.networkPermissionKeys.call({ networkPermissions })
+
+      it('refetches the group when they change', () => {
+        const reloadGroup = jest.fn()
+        GroupProfileSlug.watch.networkPermissionKeys.call({ reloadGroup })
+        expect(reloadGroup).toHaveBeenCalledTimes(1)
+      })
+
+      it('count as changed when a right is gained or lost', () => {
+        const before = keys([{ key: 'videoCall.create_open', group: 'communication' }])
+        const gained = keys([
+          { key: 'videoCall.create_open', group: 'communication' },
+          { key: 'videoCall.create_restricted', group: 'communication' },
+        ])
+        expect(gained).not.toBe(before)
+        expect(keys([])).not.toBe(before)
+      })
+
+      it('count as unchanged when the same rights arrive again, in whatever order', () => {
+        const one = keys([{ key: 'a' }, { key: 'b' }])
+        const again = keys([{ key: 'b' }, { key: 'a' }])
+        expect(again).toBe(one)
+      })
+
+      it('are no rights at all before the store has any', () => {
+        expect(keys(undefined)).toBe('')
+      })
     })
 
     it('logs errors from the groupPermissionsChanged subscription', () => {
