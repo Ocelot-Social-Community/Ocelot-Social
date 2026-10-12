@@ -14,10 +14,18 @@
       v-if="getShowChat.showChat && !isMobile && !chatRenderedElsewhere"
       :class="['chat-modul', { 'chat-modul--with-video': showVideoCall && videoCallMinimized }]"
     >
+      <!--
+        Beside a parked call the window shows one of the call's two chats; the tabs
+        switch between them, as they do in the call's own sidebar.
+      -->
+      <div v-if="showCallChatTabs" class="chat-modul__tabs">
+        <call-chat-tabs />
+      </div>
       <client-only>
         <chat
           :key="getShowChat.roomId || getShowChat.groupId || getShowChat.chatUserId"
           singleRoom
+          :reservedHeight="showCallChatTabs ? CALL_CHAT_TABS_HEIGHT : 0"
           :userId="getShowChat.chatUserId"
           :groupId="getShowChat.groupId"
           :roomId="getShowChat.roomId"
@@ -38,15 +46,26 @@ import mobile from '~/mixins/mobile'
 import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
 import PageFooter from '~/components/PageFooter/PageFooter'
 import Chat from '~/components/Chat/Chat.vue'
+import CallChatTabs from '~/components/VideoCall/CallChatTabs.vue'
+import { activeCallChatTab } from '~/components/VideoCall/callChat'
 import VideoCall from '~/components/VideoCall/VideoCall.vue'
 import { videoCallConfigQuery } from '~/graphql/VideoCalls'
+
+// Height of the tab row above the floating chat, in px. The chat is told, so it gives up
+// that much and the window does not grow under the page header. Kept in step with the
+// `.chat-modul__tabs` rule below.
+const CALL_CHAT_TABS_HEIGHT = 52
 
 export default {
   components: {
     HeaderMenu,
     PageFooter,
     Chat,
+    CallChatTabs,
     VideoCall,
+  },
+  data() {
+    return { CALL_CHAT_TABS_HEIGHT }
   },
   mixins: [seo, mobile()],
   computed: {
@@ -74,6 +93,19 @@ export default {
         (this.videoCallPhase === 'in-call' || this.videoCallPhase === 'connecting') &&
         ((!!this.getShowChat.groupId && this.getShowChat.groupId === this.videoCallGroupId) ||
           (!!this.getShowChat.roomId && this.getShowChat.roomId === this.videoCallChatRoomId))
+      )
+    },
+    showCallChatTabs() {
+      // Only where there is a choice: in a call whose conference chat the server has
+      // confirmed, and for a chat that is one of the call's two.
+      return (
+        this.showVideoCall &&
+        this.videoCallPhase === 'in-call' &&
+        !!this.videoCallChatRoomId &&
+        activeCallChatTab(this.getShowChat, {
+          groupId: this.videoCallGroupId,
+          chatRoomId: this.videoCallChatRoomId,
+        }) !== null
       )
     },
     chatRenderedElsewhere() {
@@ -181,6 +213,18 @@ export default {
 /*  The inner chat content keeps its own height; whatever extends above the */
 /*  viewport gets clipped by the browser, leaving the message input and the */
 /*  latest messages visible — which is what the user interacts with. */
+/*  The tabs between the two chats of a running call. Height fixed, as the chat below is */
+/*  told how much room they take (CALL_CHAT_TABS_HEIGHT). */
+.chat-modul__tabs {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 52px;
+  padding: 0 var(--space-small);
+  background: var(--background-color-base);
+  border-bottom: 1px solid var(--color-neutral-85);
+}
+
 .chat-modul--with-video {
   bottom: 333px; /*  45 (video bottom) + 280 (video height) + 8 (gap) */
 }

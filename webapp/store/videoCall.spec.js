@@ -19,6 +19,7 @@ describe('videoCall store', () => {
         groupAvatar: null,
         participantCount: 0,
         chatRoomId: null,
+        conferenceUnread: 0,
         phase: 'idle',
       })
     })
@@ -154,6 +155,39 @@ describe('videoCall store', () => {
         state.chatRoomId = 'room-2'
         mutations.CLOSE(state)
         expect(state.chatRoomId).toBeNull()
+      })
+    })
+
+    describe('SET_CONFERENCE_UNREAD', () => {
+      it('stores the number of unread messages in the conference chat', () => {
+        mutations.SET_CONFERENCE_UNREAD(state, 3)
+        expect(state.conferenceUnread).toBe(3)
+        expect(getters.conferenceUnread(state)).toBe(3)
+      })
+
+      it('coerces what is not a number to 0', () => {
+        mutations.SET_CONFERENCE_UNREAD(state, undefined)
+        expect(state.conferenceUnread).toBe(0)
+      })
+
+      it('is forgotten with the room it belongs to', () => {
+        mutations.SET_CHAT_ROOM_ID(state, 'room-1')
+        mutations.SET_CONFERENCE_UNREAD(state, 3)
+        // The same room confirmed again: nothing has been read.
+        mutations.SET_CHAT_ROOM_ID(state, 'room-1')
+        expect(state.conferenceUnread).toBe(3)
+        mutations.SET_CHAT_ROOM_ID(state, 'room-2')
+        expect(state.conferenceUnread).toBe(0)
+      })
+
+      it('is forgotten when a call is opened or closed', () => {
+        state.conferenceUnread = 3
+        mutations.OPEN(state, { groupId: 'g2' })
+        expect(state.conferenceUnread).toBe(0)
+
+        state.conferenceUnread = 3
+        mutations.CLOSE(state)
+        expect(state.conferenceUnread).toBe(0)
       })
     })
 

@@ -11,6 +11,9 @@ export const state = () => {
     // The conference chat of the call the user is in: the room only its participants
     // share. Null outside a call, and until the server has confirmed the participation.
     chatRoomId: null,
+    // Unread messages in that conference chat. It is kept out of the header's chat badge,
+    // so the call shows the number itself: on its chat button and on the "Call" tab.
+    conferenceUnread: 0,
     // 'idle' | 'prejoin' | 'connecting' | 'in-call' — mirrors VideoCall's local
     // phase so the layout can decide where the chat lives.
     phase: 'idle',
@@ -32,6 +35,7 @@ export const mutations = {
     // another group's participant number before the query/subscription updates.
     state.participantCount = 0
     state.chatRoomId = null
+    state.conferenceUnread = 0
   },
   // Update group info post-hoc (e.g. after fetching by ID for a direct URL).
   SET_GROUP_INFO(state, { groupId, groupName, groupSlug, groupAvatar }) {
@@ -50,6 +54,7 @@ export const mutations = {
     state.phase = 'idle'
     state.participantCount = 0
     state.chatRoomId = null
+    state.conferenceUnread = 0
   },
   SET_MINIMIZED(state, minimized) {
     state.minimized = !!minimized
@@ -61,7 +66,13 @@ export const mutations = {
     state.participantCount = Number(count) || 0
   },
   SET_CHAT_ROOM_ID(state, roomId) {
-    state.chatRoomId = roomId || null
+    const next = roomId || null
+    // Another room, or none: what was unread belongs to the room before.
+    if (next !== state.chatRoomId) state.conferenceUnread = 0
+    state.chatRoomId = next
+  },
+  SET_CONFERENCE_UNREAD(state, count) {
+    state.conferenceUnread = Number(count) || 0
   },
 }
 
@@ -92,6 +103,9 @@ export const getters = {
   },
   chatRoomId(state) {
     return state.chatRoomId
+  },
+  conferenceUnread(state) {
+    return state.conferenceUnread
   },
   phase(state) {
     return state.phase

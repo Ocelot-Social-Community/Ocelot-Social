@@ -86,7 +86,7 @@ const stubs = {
   }),
   OsIcon: Stub('OsIcon'),
   OsCounterIcon: Stub('OsCounterIcon', { props: ['count'] }),
-  OsToggleGroup: Stub('OsToggleGroup', { props: ['options', 'value'] }),
+  CallChatTabs: Stub('CallChatTabs'),
   AvatarImage: Stub('AvatarImage'),
   PreJoin: Stub('PreJoin'),
   DeviceSettings: Stub('DeviceSettings', { props: ['cameraStarting', 'micStarting'] }),
@@ -102,6 +102,7 @@ const buildStore = (state = {}) => {
   const setStorePhase = jest.fn()
   const showChat = jest.fn()
   const setChatRoomId = jest.fn()
+  const setConferenceUnread = jest.fn()
   return {
     store: new Vuex.Store({
       getters: {
@@ -112,6 +113,7 @@ const buildStore = (state = {}) => {
         'videoCall/groupSlug': () => state.groupSlug ?? null,
         'videoCall/groupAvatar': () => state.groupAvatar ?? null,
         'videoCall/chatRoomId': () => state.chatRoomId ?? null,
+        'videoCall/conferenceUnread': () => state.conferenceUnread ?? 0,
         'chat/showChat': () => state.chat ?? { showChat: false, chatUserId: null, groupId: null },
         'auth/user': () => state.user ?? { id: 'u1', name: 'Alice', avatar: { url: 'a.png' } },
       },
@@ -121,6 +123,7 @@ const buildStore = (state = {}) => {
         'videoCall/SET_PHASE': setStorePhase,
         'videoCall/SET_PARTICIPANT_COUNT': jest.fn(),
         'videoCall/SET_CHAT_ROOM_ID': setChatRoomId,
+        'videoCall/SET_CONFERENCE_UNREAD': setConferenceUnread,
         'chat/SET_OPEN_CHAT': showChat,
       },
     }),
@@ -3005,29 +3008,24 @@ describe('VideoCall', () => {
       expect(wrapper.vm.chatOpenForThisCall).toBe(false)
     })
 
-    it('chatTabs shows the unread count on the conference chat', () => {
-      const { wrapper } = factory({ show: true, groupId: 'g1', chatRoomId: 'room-1' })
-      wrapper.setData({ conferenceUnread: 3 })
-      expect(wrapper.vm.chatTabs.map((tab) => tab.label)).toEqual([
-        'videoCall.chatTabs.call (3)',
-        'videoCall.chatTabs.group',
-      ])
-    })
-
     it('chatButtonUnread is silent while the conference chat is on screen', () => {
       const { wrapper } = factory({
         show: true,
         groupId: 'g1',
         chatRoomId: 'room-1',
+        conferenceUnread: 3,
         chat: { showChat: true, chatUserId: null, groupId: null, roomId: 'room-1' },
       })
-      wrapper.setData({ conferenceUnread: 3 })
       expect(wrapper.vm.chatButtonUnread).toBe(0)
     })
 
     it('chatButtonUnread shows the unread count while another chat or none is open', () => {
-      const { wrapper } = factory({ show: true, groupId: 'g1', chatRoomId: 'room-1' })
-      wrapper.setData({ conferenceUnread: 3 })
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        conferenceUnread: 3,
+      })
       expect(wrapper.vm.chatButtonUnread).toBe(3)
     })
   })
@@ -3201,17 +3199,17 @@ describe('VideoCall', () => {
 
     it('counts the unread messages of its own room only', () => {
       const { handlers, $apollo } = subscription()
-      const ctx = { conferenceChatSub: null, conferenceUnread: 0, $apollo }
+      const ctx = { conferenceChatSub: null, setConferenceUnread: jest.fn(), $apollo }
       VideoCall.methods.watchConferenceChat.call(ctx, 'room-1')
       handlers.next({ data: { roomUpdated: { id: 'another-room', unreadCount: 7 } } })
-      expect(ctx.conferenceUnread).toBe(0)
+      expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
       handlers.next({ data: { roomUpdated: { id: 'room-1', unreadCount: 2 } } })
-      expect(ctx.conferenceUnread).toBe(2)
+      expect(ctx.setConferenceUnread).toHaveBeenCalledWith(2)
     })
 
     it('stops listening once there is no conference chat', () => {
       const { unsubscribe, $apollo } = subscription()
-      const ctx = { conferenceChatSub: null, conferenceUnread: 0, $apollo }
+      const ctx = { conferenceChatSub: null, setConferenceUnread: jest.fn(), $apollo }
       VideoCall.methods.watchConferenceChat.call(ctx, 'room-1')
       VideoCall.methods.watchConferenceChat.call(ctx, null)
       expect(unsubscribe).toHaveBeenCalled()

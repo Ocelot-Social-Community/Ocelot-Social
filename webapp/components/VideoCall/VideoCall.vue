@@ -206,13 +206,7 @@
               tabs say. What its header offered besides sits at the end of this row.
             -->
             <div class="video-call__chat-tabs">
-              <os-toggle-group
-                v-if="chatRoomId"
-                :options="chatTabs"
-                :value="activeChatTab"
-                :label="$t('videoCall.chatTabs.label')"
-                @select="selectChatTab"
-              />
+              <call-chat-tabs v-if="chatRoomId" />
               <div class="video-call__chat-actions">
                 <os-button
                   v-if="activeChatTab === 'call'"
@@ -400,12 +394,14 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-import { OsButton, OsCounterIcon, OsIcon, OsToggleGroup } from '@ocelot-social/ui'
+import { OsButton, OsCounterIcon, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import mobile from '~/mixins/mobile'
 import { joinGroupVideoCallMutation, joinGroupVideoCallChatMutation } from '~/graphql/VideoCalls'
 import { roomUpdated } from '~/graphql/Rooms'
 import Chat from '~/components/Chat/Chat.vue'
+import CallChatTabs from '~/components/VideoCall/CallChatTabs.vue'
+import { activeCallChatTab, callChatTarget } from '~/components/VideoCall/callChat'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import RoomTitleLink from '~/components/_new/generic/RoomTitleLink/RoomTitleLink'
 import VideoTile from './VideoTile.vue'
@@ -468,7 +464,7 @@ export default {
     OsButton,
     OsCounterIcon,
     OsIcon,
-    OsToggleGroup,
+    CallChatTabs,
     Chat,
     AvatarImage,
     RoomTitleLink,
@@ -514,9 +510,6 @@ export default {
       // What the level meter in the device settings listens to: the very
       // microphone track the others hear.
       micMeterStream: null,
-      // Unread messages in the call's conference chat. It is kept out of the
-      // header's chat badge, so the call's own chat button is where they show.
-      conferenceUnread: 0,
       chatExporting: false,
       // The remote participant heard last. Whoever spoke stays on screen next to
       // the chat on a phone until somebody else speaks (see speakerTile).
@@ -532,6 +525,7 @@ export default {
       groupSlug: 'videoCall/groupSlug',
       groupAvatar: 'videoCall/groupAvatar',
       chatRoomId: 'videoCall/chatRoomId',
+      conferenceUnread: 'videoCall/conferenceUnread',
       getShowChat: 'chat/showChat',
       currentUser: 'auth/user',
     }),
@@ -545,11 +539,7 @@ export default {
     // Which of the call's two chats is open, if any: 'call' is the conference chat
     // only the participants share, 'group' the group's own.
     activeChatTab() {
-      const chat = this.getShowChat
-      if (!chat || !chat.showChat) return null
-      if (this.chatRoomId && chat.roomId === this.chatRoomId) return 'call'
-      if (chat.groupId && chat.groupId === this.groupId) return 'group'
-      return null
+      return activeCallChatTab(this.getShowChat, this)
     },
     chatOpenForThisCall() {
       return this.activeChatTab !== null
@@ -581,21 +571,6 @@ export default {
         (t) => t.identity === this.lastRemoteSpeakerId && !t.isScreen && !t.isLocal,
       )
       return speaker || this.primaryTile
-    },
-    chatTabs() {
-      const callLabel = this.$t('videoCall.chatTabs.call')
-      return [
-        {
-          value: 'call',
-          label: this.conferenceUnread > 0 ? `${callLabel} (${this.conferenceUnread})` : callLabel,
-          title: this.$t('videoCall.chatTabs.callHint'),
-        },
-        {
-          value: 'group',
-          label: this.$t('videoCall.chatTabs.group'),
-          title: this.$t('videoCall.chatTabs.groupHint'),
-        },
-      ]
     },
     chatButtonUnread() {
       // Nothing to point at while the conference chat is the one on screen.
@@ -839,7 +814,6 @@ export default {
       if (remote) this.lastRemoteSpeakerId = remote
     },
     chatRoomId(next, previous) {
-      this.conferenceUnread = 0
       this.watchConferenceChat(next)
       // An open conference chat follows the call: to the room of the call the
       // client is in now (it can change when a lost connection comes back into a
@@ -923,6 +897,7 @@ export default {
       setParticipantCount: 'videoCall/SET_PARTICIPANT_COUNT',
       setStorePhase: 'videoCall/SET_PHASE',
       setChatRoomId: 'videoCall/SET_CHAT_ROOM_ID',
+      setConferenceUnread: 'videoCall/SET_CONFERENCE_UNREAD',
       setShowChat: 'chat/SET_OPEN_CHAT',
     }),
     observeStage() {
@@ -1021,16 +996,7 @@ export default {
       }
     },
     selectChatTab(tab) {
-      if (tab === 'call' && this.chatRoomId) {
-        this.setShowChat({
-          showChat: true,
-          chatUserId: null,
-          groupId: null,
-          roomId: this.chatRoomId,
-        })
-      } else {
-        this.setShowChat({ showChat: true, chatUserId: null, groupId: this.groupId })
-      }
+      this.setShowChat(callChatTarget(tab, this))
     },
     // The conference chat is for those IN the call, so the server is asked for it
     // only now that the client is connected — it checks that with the media
@@ -1067,7 +1033,7 @@ export default {
         .subscribe({
           next: ({ data }) => {
             const room = data && data.roomUpdated
-            if (room && room.id === roomId) this.conferenceUnread = Number(room.unreadCount) || 0
+            if (room && room.id === roomId) this.setConferenceUnread(room.unreadCount)
           },
           // The count is a convenience; the chat itself reports its own errors.
           error: () => {},

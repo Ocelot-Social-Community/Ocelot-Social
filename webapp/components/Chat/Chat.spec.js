@@ -1638,6 +1638,35 @@ describe('Chat.vue', () => {
       expect(wrapper.vm.rooms).toEqual([])
     })
 
+    describe('"no messages" text of a room opened on its own', () => {
+      // The library holds the text back while the rooms are loading.
+      it('is not held back for the chat of a group', async () => {
+        mocks.$apollo.query.mockResolvedValue({
+          data: { Room: [callRoom({ isCallRoom: false, isGroupRoom: true })], Message: [] },
+        })
+        wrapper = Wrapper({ singleRoom: true, groupId: 'g1' })
+        expect(wrapper.vm.loadingRooms).toBe(true)
+        await flushPromises()
+        expect(wrapper.vm.loadingRooms).toBe(false)
+      })
+
+      it('is not held back for a room opened by its id', async () => {
+        mocks.$apollo.query.mockResolvedValue({ data: { Room: [callRoom()], Message: [] } })
+        wrapper = Wrapper({ singleRoom: true, roomId: 'call-room' })
+        await flushPromises()
+        expect(wrapper.vm.loadingRooms).toBe(false)
+      })
+    })
+
+    describe('height in the floating chat window', () => {
+      it('gives up the room something above it takes', () => {
+        expect(Wrapper({ singleRoom: true }).vm.chatHeight).toBe('calc(100dvh - 190px)')
+        expect(Wrapper({ singleRoom: true, reservedHeight: 52 }).vm.chatHeight).toBe(
+          'calc(100dvh - 242px)',
+        )
+      })
+    })
+
     describe('room header', () => {
       const injectedStyles = (propsData) => {
         wrapper = Wrapper(propsData)

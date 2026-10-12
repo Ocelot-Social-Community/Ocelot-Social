@@ -192,6 +192,13 @@ export default {
       type: Boolean,
       default: true,
     },
+    // Height in px that something above the chat takes inside the floating chat window —
+    // the tab row beside a parked video call. The chat gives up that much, so the window
+    // keeps its place below the page header.
+    reservedHeight: {
+      type: Number,
+      default: 0,
+    },
     // Leaves out the room's header — avatar, name and the room's buttons. For a host that
     // already says which room this is and offers the buttons itself: the video call does
     // both in its own header and tab row, right above the chat.
@@ -305,9 +312,9 @@ export default {
         // bottom: 333px (45 + 280 + 8) — clamp the chat height so it stays
         // below the page header instead of running off the top of the viewport.
         if (this.videoCallShown && this.videoCallMinimized) {
-          return 'calc(100dvh - 420px)'
+          return `calc(100dvh - ${420 + this.reservedHeight}px)`
         }
-        return 'calc(100dvh - 190px)'
+        return `calc(100dvh - ${190 + this.reservedHeight}px)`
       }
       return '100%'
     },
@@ -1078,6 +1085,10 @@ export default {
     },
 
     bringRoomToTopAndSelect(room) {
+      // A room is there, so the rooms are no longer loading. The library holds back its
+      // "no messages" text while they are, and the paths that open ONE room (a group's
+      // chat, a room by its id) never went through fetchRooms, which is what used to say so.
+      this.loadingRooms = false
       room.index = new Date().toISOString()
       this.moveRoomToTop(room)
       this.$nextTick(() => {

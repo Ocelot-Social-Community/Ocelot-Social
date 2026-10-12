@@ -118,6 +118,39 @@ describe('default.vue', () => {
       ).toBe(true)
     })
 
+    describe('tabs in the floating chat window', () => {
+      const shows = (overrides = {}) =>
+        Default.computed.showCallChatTabs.call({
+          showVideoCall: true,
+          videoCallPhase: 'in-call',
+          videoCallGroupId: 'g1',
+          videoCallChatRoomId: 'room-1',
+          getShowChat: { showChat: true, chatUserId: null, groupId: null, roomId: 'room-1' },
+          ...overrides,
+        })
+
+      it('are offered for the conference chat and for the chat of the group', () => {
+        expect(shows()).toBe(true)
+        expect(shows({ getShowChat: { showChat: true, groupId: 'g1', roomId: null } })).toBe(true)
+      })
+
+      it('are not offered for a chat that is not one of the call', () => {
+        expect(shows({ getShowChat: { showChat: true, groupId: 'g2', roomId: null } })).toBe(false)
+        expect(shows({ getShowChat: { showChat: true, chatUserId: 'u1' } })).toBe(false)
+      })
+
+      it('are not offered while the call has no conference chat, or there is no call', () => {
+        expect(
+          shows({
+            videoCallChatRoomId: null,
+            getShowChat: { showChat: true, groupId: 'g1', roomId: null },
+          }),
+        ).toBe(false)
+        expect(shows({ showVideoCall: false })).toBe(false)
+        expect(shows({ videoCallPhase: 'prejoin' })).toBe(false)
+      })
+    })
+
     describe('opening a chat on a phone', () => {
       const open = (chatLivesInVideoSidebar) => {
         const ctx = {
