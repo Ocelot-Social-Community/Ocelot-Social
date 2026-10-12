@@ -165,6 +165,7 @@ import {
   updateGroupRoleMutation,
 } from '~/graphql/groupRoles.js'
 import { USUAL_GROUP_ROLE } from '~/constants/groups'
+import { canInGroup } from '~/utils/groupRights'
 import groupRightsEditor from '~/mixins/groupRightsEditor'
 import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
 import warnBeforeUnload from '~/mixins/warnBeforeUnload'
@@ -379,6 +380,14 @@ export default {
       // default cache-first, re-entering the page showed the roles as they were BEFORE the last
       // save (#10490). The cached answer still arrives first, flagged loading, and is skipped below.
       fetchPolicy: 'cache-and-network',
+      // Reading a group's roles needs group.role.manage, and the settings let in a network admin
+      // who could only elevate yet. Asked anyway, the server refused, and during server-side
+      // rendering that refusal failed the whole page with "Server error". Skipped instead, and
+      // reactive: elevating refreshes the group, and only then does the query run (as on the
+      // members tab).
+      skip() {
+        return !canInGroup('group.role.manage', this.group)
+      },
       manual: true,
       result({ data, loading }) {
         if (loading || !data) return

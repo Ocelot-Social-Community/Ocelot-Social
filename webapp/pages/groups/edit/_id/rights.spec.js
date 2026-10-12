@@ -425,6 +425,21 @@ describe('rights.vue', () => {
       expect(at(wrapper, 'perm-group.post.create').element.checked).toBe(false)
     })
 
+    // A network admin who could only elevate yet is let into the settings. The server refuses
+    // them the roles, and during server-side rendering that refusal was the whole page failing.
+    it('does not ask for the roles before the viewer holds group.role.manage', () => {
+      const { skip } = rights.apollo.rights
+      expect(skip.call({ group: { id: 'g1', myGroupPermissions: [] } })).toBe(true)
+      expect(skip.call({ group: { id: 'g1' } })).toBe(true)
+    })
+
+    it('asks for the roles once the viewer holds group.role.manage, as after elevating', () => {
+      const { skip } = rights.apollo.rights
+      expect(skip.call({ group: { id: 'g1', myGroupPermissions: ['group.role.manage'] } })).toBe(
+        false,
+      )
+    })
+
     // Re-entering the page has to show what was saved, not what the cache held before (#10490).
     it('asks the server on every visit rather than answering from the cache', () => {
       expect(rights.apollo.rights.fetchPolicy).toBe('cache-and-network')

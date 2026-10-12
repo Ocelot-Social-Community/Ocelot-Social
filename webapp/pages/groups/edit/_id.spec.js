@@ -208,6 +208,15 @@ describe('pages/groups/edit/_id.vue', () => {
       expect(ctx.errorFn).toHaveBeenCalledWith({ statusCode: 403, message: 'NONONNNO' })
     })
 
+    it('lets somebody in who may only elevate, to pick their rights up here', async () => {
+      const ctx = buildContext({
+        group: { id: 'g1', myGroupPermissions: [], mayElevateInGroup: true },
+        path: '/groups/edit/g1/rights',
+      })
+      await EditId.asyncData(ctx)
+      expect(ctx.errorFn).not.toHaveBeenCalled()
+    })
+
     it('falls back to "any tab at all" for a path it does not recognise', async () => {
       // A trailing slash, a nested route added later: the shell must not 403 somebody who
       // clearly may be here, and must still refuse somebody who may not.
