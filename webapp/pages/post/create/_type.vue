@@ -254,6 +254,9 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+    groupsEnabled() {
+      return this.$policy.get('groupsEnabled') === true
+    },
     selectedGroup() {
       if (!this.draft.groupId) return null
       return this.myGroups.find((g) => g.id === this.draft.groupId) || null
@@ -296,7 +299,7 @@ export default {
       // With groups switched off the server refuses the query — and during server-side
       // rendering that refusal is the whole page failing, not an empty group list.
       skip() {
-        return this.$policy.get('groupsEnabled') !== true
+        return !this.groupsEnabled
       },
       update({ Group }) {
         return Group || []
@@ -308,6 +311,17 @@ export default {
     },
   },
   watch: {
+    // The draft outlives a remount (switching article/event), and groups can be switched off
+    // live in between. myGroups is skipped then, so the check below never runs — and the
+    // submit would still send the group id. Immediate, for the remount.
+    groupsEnabled: {
+      immediate: true,
+      handler(enabled) {
+        if (enabled || !this.draft.groupId) return
+        this.draft.groupId = null
+        this.syncUrlQuery()
+      },
+    },
     myGroups(groups) {
       // 1) Drop stale/unauthorized groupIds. ?groupId=… is accepted blindly
       //    in data() — if the server's list of groups the user is a member

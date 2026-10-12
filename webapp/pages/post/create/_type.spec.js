@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import { mount } from '@vue/test-utils'
 import create, { __resetSharedDraftForTests, __resetCancelReturnPathForTests } from './_type.vue'
 import Vuex from 'vuex'
@@ -606,17 +607,46 @@ describe('create.vue', () => {
     })
   })
 
+  describe('groups switched off while a draft names a group', () => {
+    it('drops the group from a draft that survived a remount, and from the URL', () => {
+      const first = Wrapper()
+      first.vm.draft.groupId = 'g1'
+      first.destroy()
+      routerReplace.mockClear()
+
+      mocks = makeMocks({ query: { groupId: 'g1' }, groupsEnabled: false })
+      wrapper = Wrapper()
+
+      expect(wrapper.vm.draft.groupId).toBe(null)
+      expect(routerReplace).toHaveBeenCalledWith({ path: '/post/create/article', query: {} })
+    })
+
+    it('drops it when groups are switched off live', async () => {
+      const policy = Vue.observable({ groupsEnabled: true })
+      mocks = makeMocks({ query: { groupId: 'g1' } })
+      mocks.$policy = { get: (key) => key === 'groupsEnabled' && policy.groupsEnabled }
+      wrapper = Wrapper()
+      expect(wrapper.vm.draft.groupId).toBe('g1')
+
+      policy.groupsEnabled = false
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.draft.groupId).toBe(null)
+      expect(routerReplace).toHaveBeenCalledWith({ path: '/post/create/article', query: {} })
+    })
+  })
+
   describe('apollo myGroups', () => {
     const { skip } = create.apollo.myGroups
 
     // The server refuses Group while groups are off, and during server-side rendering that
     // refusal failed every /post/create page.
     it('skips the query while groups are switched off', () => {
-      expect(skip.call({ $policy: { get: () => false } })).toBe(true)
+      expect(skip.call({ groupsEnabled: false })).toBe(true)
     })
 
     it('runs the query while groups are switched on', () => {
-      expect(skip.call({ $policy: { get: (key) => key === 'groupsEnabled' } })).toBe(false)
+      expect(skip.call({ groupsEnabled: true })).toBe(false)
     })
   })
 })
