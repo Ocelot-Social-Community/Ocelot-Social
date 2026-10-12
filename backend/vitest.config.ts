@@ -130,6 +130,15 @@ export default defineConfig({
     // keeps the spec files free of per-file imports for them.
     globals: true,
     environment: 'node',
+    // The address the web app is reached at goes into every link a mail carries, and so into
+    // the mail snapshots. They were recorded where the suite runs in CI — in the compose setup,
+    // which sets `http://webapp:3000` — so a run on a developer machine, whose `.env` says
+    // `http://localhost:3000`, failed all of them over nothing but the host. Pinned here, the
+    // suite renders the same mails wherever it runs. It takes precedence over `.env` because
+    // dotenv leaves a variable alone that is already set.
+    env: {
+      CLIENT_URI: 'http://webapp:3000',
+    },
     // These have to run through Vite rather than being externalised, for two separate reasons.
     //
     // load-files reaches the resolver modules through a dynamic import with an absolute path;
