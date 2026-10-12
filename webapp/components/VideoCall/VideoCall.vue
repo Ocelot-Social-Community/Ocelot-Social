@@ -200,19 +200,59 @@
               A wrapper of this component's own: OsToggleGroup's root carries no
               scoped-style attribute, so the sidebar's layout rules would miss it.
             -->
-            <div v-if="chatRoomId" class="video-call__chat-tabs">
+            <!--
+              The chat brings no header of its own here (hideHeader): group and
+              avatar are in the call's header right above, and which chat it is the
+              tabs say. What its header offered besides sits at the end of this row.
+            -->
+            <div class="video-call__chat-tabs">
               <os-toggle-group
+                v-if="chatRoomId"
                 :options="chatTabs"
                 :value="activeChatTab"
                 :label="$t('videoCall.chatTabs.label')"
                 @select="selectChatTab"
               />
+              <div class="video-call__chat-actions">
+                <os-button
+                  v-if="activeChatTab === 'call'"
+                  data-test="video-call-export-chat"
+                  variant="primary"
+                  appearance="outline"
+                  circle
+                  size="sm"
+                  :loading="chatExporting"
+                  :aria-label="$t('chat.exportChat')"
+                  :title="$t('chat.exportChat')"
+                  @click="exportCallChat"
+                >
+                  <template #icon>
+                    <os-icon :icon="icons.download" />
+                  </template>
+                </os-button>
+                <os-button
+                  data-test="video-call-close-chat"
+                  variant="primary"
+                  appearance="outline"
+                  circle
+                  size="sm"
+                  :aria-label="$t('chat.closeChat')"
+                  :title="$t('chat.closeChat')"
+                  @click="closeInCallChat"
+                >
+                  <template #icon>
+                    <os-icon :icon="icons.close" />
+                  </template>
+                </os-button>
+              </div>
             </div>
             <client-only>
               <chat
+                ref="inCallChat"
                 :key="activeChatTab"
                 singleRoom
                 fitParent
+                hideHeader
                 :groupId="activeChatTab === 'group' ? groupId : null"
                 :roomId="activeChatTab === 'call' ? chatRoomId : null"
                 :autoFocus="!isMobile"
@@ -235,7 +275,7 @@
           v-tooltip="deviceTooltip(micLabel, [deviceNames.mic])"
           :variant="micEnabled ? 'default' : 'danger'"
           appearance="outline"
-          :size="iconOnly ? 'sm' : 'md'"
+          :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           :aria-label="micLabel"
           :loading="devicesStarting.audioinput > 0"
@@ -252,14 +292,14 @@
           v-tooltip="deviceTooltip(cameraLabel, [deviceNames.camera])"
           :variant="cameraEnabled ? 'default' : 'danger'"
           appearance="outline"
-          :size="iconOnly ? 'sm' : 'md'"
+          :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           :aria-label="cameraLabel"
           :loading="devicesStarting.videoinput > 0"
           @click="toggleCamera"
         >
           <template #icon>
-            <os-icon :icon="icons.videoCamera" />
+            <os-icon :icon="cameraEnabled ? icons.videoCamera : icons.videoCameraSlash" />
           </template>
           <template v-if="!iconOnly">
             {{ cameraLabel }}
@@ -270,7 +310,7 @@
           v-tooltip="iconOnlyTooltip(screenShareLabel)"
           :variant="screenShareEnabled ? 'primary' : 'default'"
           appearance="outline"
-          :size="iconOnly ? 'sm' : 'md'"
+          :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           :aria-label="screenShareLabel"
           @click="toggleScreenShare"
@@ -294,7 +334,7 @@
             data-test="video-call-device-settings-toggle"
             :variant="showDeviceSettings ? 'primary' : 'default'"
             appearance="outline"
-            :size="iconOnly ? 'sm' : 'md'"
+            :size="parked ? 'sm' : 'md'"
             :circle="iconOnly"
             :aria-label="deviceSettingsLabel"
             :aria-expanded="showDeviceSettings.toString()"
@@ -324,7 +364,7 @@
           v-tooltip="iconOnlyTooltip(chatLabel)"
           :variant="chatOpenForThisCall ? 'primary' : 'default'"
           appearance="outline"
-          :size="iconOnly ? 'sm' : 'md'"
+          :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           :aria-label="chatLabel"
           @click="toggleChat"
@@ -340,7 +380,7 @@
           v-tooltip="iconOnlyTooltip(leaveLabel)"
           variant="danger"
           appearance="filled"
-          :size="iconOnly ? 'sm' : 'md'"
+          :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           class="video-call__leave"
           :aria-label="leaveLabel"
@@ -477,6 +517,7 @@ export default {
       // Unread messages in the call's conference chat. It is kept out of the
       // header's chat badge, so the call's own chat button is where they show.
       conferenceUnread: 0,
+      chatExporting: false,
       // The remote participant heard last. Whoever spoke stays on screen next to
       // the chat on a phone until somebody else speaks (see speakerTile).
       lastRemoteSpeakerId: null,
@@ -518,7 +559,7 @@ export default {
       // chat continues to live in the chat-modul (layouts/default.vue). On a
       // phone the call is always full screen and the chat takes the place below
       // a single small tile (see mobileChatOpen).
-      return this.phase === 'in-call' && this.chatOpenForThisCall && !this.iconOnly
+      return this.phase === 'in-call' && this.chatOpenForThisCall && !this.parked
     },
     // On a phone there is no room for the chat beside the videos: it goes below,
     // and the stage shrinks to one small tile, the person speaking.
@@ -651,10 +692,18 @@ export default {
     onCallRoute() {
       return this.$route.name === 'call-id-slug'
     },
-    iconOnly() {
-      // Compact icon-only buttons only when the call is parked in the corner
-      // during an active call — not during the prejoin modal.
+    parked() {
+      // The call sits in the corner as a small window: during an active call —
+      // not during the prejoin modal — and never on a phone, where the call is
+      // always full screen.
       return this.phase === 'in-call' && this.minimized && !this.isMobile
+    },
+    iconOnly() {
+      // Buttons without their label where there is no room for it: in the parked
+      // window, and on a phone, where six spelled-out controls fill half the
+      // screen. In the parked window they are small as well (see `parked`); on a
+      // phone they keep the size a finger needs.
+      return this.parked || (this.isMobile && this.phase === 'in-call')
     },
     uniqueParticipantCount() {
       // A single participant publishing both camera and screen share still counts
@@ -959,6 +1008,18 @@ export default {
     closeInCallChat() {
       this.setShowChat({ showChat: false, chatUserId: null, groupId: null })
     },
+    // The export is the chat's own doing (it knows the room and fetches every message);
+    // only its button sits here, in the tab row.
+    async exportCallChat() {
+      const chat = this.$refs.inCallChat
+      if (!chat || this.chatExporting) return
+      this.chatExporting = true
+      try {
+        await chat.exportRoom()
+      } finally {
+        this.chatExporting = false
+      }
+    },
     selectChatTab(tab) {
       if (tab === 'call' && this.chatRoomId) {
         this.setShowChat({
@@ -1052,8 +1113,10 @@ export default {
     },
     iconOnlyTooltip(label) {
       // v-tooltip renders nothing for an empty string — exactly what we want
-      // once the button spells its label out next to the icon.
-      return this.iconOnly ? label : ''
+      // once the button spells its label out next to the icon. Nor on a phone:
+      // there is no pointer to hover with, and a tap would open the tooltip on
+      // top of doing what the button does.
+      return this.parked ? label : ''
     },
     onTileSelect(tile) {
       if (!tile) return
@@ -2259,11 +2322,22 @@ export default {
   bottom: auto;
 }
 
-/*  The choice between the call's two chats sits above the chat, at its own height. */
+/*  The choice between the call's two chats sits above the chat, at its own height, */
+/*  with the chat's buttons at its end. */
 .video-call__sidebar > .video-call__chat-tabs {
   flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-x-small);
   padding: var(--space-x-small) var(--space-small);
   border-bottom: 1px solid var(--color-neutral-85);
+}
+
+.video-call__chat-actions {
+  display: flex;
+  gap: var(--space-xx-small);
+  /*  At the end of the row, also when there are no tabs before it. */
+  margin-left: auto;
 }
 
 .video-call__status,

@@ -1638,6 +1638,30 @@ describe('Chat.vue', () => {
       expect(wrapper.vm.rooms).toEqual([])
     })
 
+    describe('room header', () => {
+      const injectedStyles = (propsData) => {
+        wrapper = Wrapper(propsData)
+        const appended = []
+        Object.defineProperty(wrapper.vm.$el, 'shadowRoot', {
+          configurable: true,
+          value: { appendChild: (style) => appended.push(style.textContent) },
+        })
+        wrapper.vm._shadowStylesInjected = false
+        wrapper.vm.injectShadowStyles()
+        return appended.join('')
+      }
+
+      it('is shown by default', () => {
+        expect(injectedStyles({})).not.toContain('display: none')
+      })
+
+      it('is left out, with the room it reserves, for a host that brings its own', () => {
+        const styles = injectedStyles({ hideHeader: true })
+        expect(styles).toContain('.vac-room-header { display: none !important; }')
+        expect(styles).toContain('.vac-container-scroll { margin-top: 0 !important; }')
+      })
+    })
+
     describe('cursor in the message field on opening a room', () => {
       const openRoomWith = async (propsData) => {
         wrapper = Wrapper(propsData)

@@ -192,6 +192,13 @@ export default {
       type: Boolean,
       default: true,
     },
+    // Leaves out the room's header — avatar, name and the room's buttons. For a host that
+    // already says which room this is and offers the buttons itself: the video call does
+    // both in its own header and tab row, right above the chat.
+    hideHeader: {
+      type: Boolean,
+      default: false,
+    },
     // When true the chat fills its parent container instead of using the
     // chat-modul's viewport-based height calc. Used by the in-call sidebar.
     fitParent: {
@@ -254,6 +261,10 @@ export default {
     } else {
       this.fetchRooms()
     }
+
+    // Not left to the first batch of messages (see setupMessageVisibilityTracking): a
+    // header that is to be left out must not show until then.
+    this.$nextTick(() => this.injectShadowStyles())
 
     // Subscriptions
     this._subscriptions = []
@@ -455,6 +466,16 @@ export default {
            already matches the video header's $space-small (16px). */
         .vac-room-header { height: 60px !important; }
         .vac-room-header .vac-avatar-profile--header { margin-right: 8px; }
+        ${
+          // The library has no switch for its header, and reserves the header's height
+          // above the messages with a margin of their own — both have to go.
+          this.hideHeader
+            ? `
+        .vac-room-header { display: none !important; }
+        .vac-container-scroll { margin-top: 0 !important; }
+        `
+            : ''
+        }
         ${
           this.singleRoom
             ? `

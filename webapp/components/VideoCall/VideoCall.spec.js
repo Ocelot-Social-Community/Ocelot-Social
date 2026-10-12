@@ -3041,15 +3041,42 @@ describe('VideoCall', () => {
     const bensScreen = tile({ key: 'ben-screen', identity: 'ben', isScreen: true })
 
     it('shows the chat inside the call on a phone as well', () => {
-      const ctx = { phase: 'in-call', chatOpenForThisCall: true, iconOnly: false }
+      const ctx = { phase: 'in-call', chatOpenForThisCall: true, parked: false }
       expect(computed.showChatSidebar.call(ctx)).toBe(true)
       expect(computed.mobileChatOpen.call({ isMobile: true, showChatSidebar: true })).toBe(true)
       expect(computed.mobileChatOpen.call({ isMobile: false, showChatSidebar: true })).toBe(false)
       expect(computed.mobileChatOpen.call({ isMobile: true, showChatSidebar: false })).toBe(false)
     })
 
+    it('drops the labels of the controls on a phone, but not their size', () => {
+      const phone = { parked: false, isMobile: true, phase: 'in-call' }
+      expect(computed.iconOnly.call(phone)).toBe(true)
+      expect(VideoCall.methods.iconOnlyTooltip.call(phone, 'Mute')).toBe('')
+    })
+
+    it('drops the labels in the parked window, and offers them as tooltips', () => {
+      const parkedWindow = { parked: true, isMobile: false, phase: 'in-call' }
+      expect(computed.iconOnly.call(parkedWindow)).toBe(true)
+      expect(VideoCall.methods.iconOnlyTooltip.call(parkedWindow, 'Mute')).toBe('Mute')
+    })
+
+    it('spells the controls out on a desktop with the call maximized', () => {
+      expect(computed.iconOnly.call({ parked: false, isMobile: false, phase: 'in-call' })).toBe(
+        false,
+      )
+    })
+
+    it('never parks the call on a phone', () => {
+      expect(computed.parked.call({ phase: 'in-call', minimized: true, isMobile: true })).toBe(
+        false,
+      )
+      expect(computed.parked.call({ phase: 'in-call', minimized: true, isMobile: false })).toBe(
+        true,
+      )
+    })
+
     it('keeps the chat out of the parked window', () => {
-      const ctx = { phase: 'in-call', chatOpenForThisCall: true, iconOnly: true }
+      const ctx = { phase: 'in-call', chatOpenForThisCall: true, parked: true }
       expect(computed.showChatSidebar.call(ctx)).toBe(false)
     })
 
@@ -3189,6 +3216,34 @@ describe('VideoCall', () => {
       VideoCall.methods.watchConferenceChat.call(ctx, null)
       expect(unsubscribe).toHaveBeenCalled()
       expect(ctx.conferenceChatSub).toBeNull()
+    })
+
+    describe('export from the tab row', () => {
+      it('has the chat export its room, and shows it is busy meanwhile', async () => {
+        let finish
+        const exportRoom = jest.fn(() => new Promise((resolve) => (finish = resolve)))
+        const ctx = { chatExporting: false, $refs: { inCallChat: { exportRoom } } }
+        const exporting = VideoCall.methods.exportCallChat.call(ctx)
+        expect(exportRoom).toHaveBeenCalledTimes(1)
+        expect(ctx.chatExporting).toBe(true)
+        finish()
+        await exporting
+        expect(ctx.chatExporting).toBe(false)
+      })
+
+      it('does not start a second export on top of a running one', async () => {
+        const exportRoom = jest.fn()
+        const ctx = { chatExporting: true, $refs: { inCallChat: { exportRoom } } }
+        await VideoCall.methods.exportCallChat.call(ctx)
+        expect(exportRoom).not.toHaveBeenCalled()
+      })
+
+      it('is ready again after an export that failed', async () => {
+        const exportRoom = jest.fn().mockRejectedValue(new Error('offline'))
+        const ctx = { chatExporting: false, $refs: { inCallChat: { exportRoom } } }
+        await expect(VideoCall.methods.exportCallChat.call(ctx)).rejects.toThrow('offline')
+        expect(ctx.chatExporting).toBe(false)
+      })
     })
 
     it('selectChatTab opens the chat of the group for the group tab', () => {
