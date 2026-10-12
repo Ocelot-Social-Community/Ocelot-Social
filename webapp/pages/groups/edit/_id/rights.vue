@@ -374,6 +374,11 @@ export default {
       variables() {
         return { id: this.group.id }
       },
+      // Always ask the server when the page is entered. A group's roles carry no id, so the cache
+      // keeps them embedded in the group and no save on this page can reach them there: with the
+      // default cache-first, re-entering the page showed the roles as they were BEFORE the last
+      // save (#10490). The cached answer still arrives first, flagged loading, and is skipped below.
+      fetchPolicy: 'cache-and-network',
       manual: true,
       result({ data, loading }) {
         if (loading || !data) return

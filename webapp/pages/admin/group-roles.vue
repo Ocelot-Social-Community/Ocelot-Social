@@ -277,6 +277,9 @@ export default {
       query() {
         return groupRoleTemplatesQuery()
       },
+      // The template roles carry no id either, so a save never reaches their cached copy; the
+      // server is asked on every visit, as on a group's own rights page (#10490).
+      fetchPolicy: 'cache-and-network',
       manual: true,
       result({ data, loading }) {
         if (loading || !data) return

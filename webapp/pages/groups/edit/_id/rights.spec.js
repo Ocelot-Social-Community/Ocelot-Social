@@ -425,6 +425,11 @@ describe('rights.vue', () => {
       expect(at(wrapper, 'perm-group.post.create').element.checked).toBe(false)
     })
 
+    // Re-entering the page has to show what was saved, not what the cache held before (#10490).
+    it('asks the server on every visit rather than answering from the cache', () => {
+      expect(rights.apollo.rights.fetchPolicy).toBe('cache-and-network')
+    })
+
     describe('when the query comes back again', () => {
       const refetched = (wrapper) =>
         rights.apollo.rights.result.call(wrapper.vm, {
@@ -445,6 +450,56 @@ describe('rights.vue', () => {
 
         expect(wrapper.vm.dirty).toBe(true)
         expect(at(wrapper, 'switch-members-post').element.checked).toBe(false)
+      })
+
+      // cache-and-network answers from the cache first, flagged loading — and that copy is the one
+      // a save on this page could not reach (#10490). Taking it would put the old roles back.
+      it('skips the cached answer that arrives before the server has answered', async () => {
+        const wrapper = await Wrapper()
+        const stale = ROLES.map((role) => ({ ...role, permissions: [] }))
+
+        rights.apollo.rights.result.call(wrapper.vm, {
+          loading: true,
+          data: {
+            groupPermissionCatalog: CATALOG,
+            groupTemplates: TEMPLATES,
+            Group: [{ roles: stale, myGroupPermissions: held }],
+          },
+        })
+
+        expect(wrapper.vm.roles).toEqual(ROLES)
+      })
+
+      // The whole round of #10490: save, leave, come back. The cache answers first with the roles
+      // from before the save; what the page shows in the end has to be the server's answer.
+      it('shows what was saved when the page is entered again', async () => {
+        const first = await Wrapper()
+        await at(first, 'switch-members-post').setChecked(false)
+        await at(first, 'save').trigger('click')
+        await flushPromises()
+        const saved = mocks.$apollo.mutate.mock.calls.at(-1)[0].variables.permissions
+        first.destroy()
+
+        const again = await Wrapper()
+        const answer = (loading, roles) =>
+          rights.apollo.rights.result.call(again.vm, {
+            loading,
+            data: {
+              groupPermissionCatalog: CATALOG,
+              groupTemplates: TEMPLATES,
+              Group: [{ roles, myGroupPermissions: held }],
+            },
+          })
+        answer(true, ROLES)
+        answer(
+          false,
+          ROLES.map((role) => (role.name === 'usual' ? { ...role, permissions: saved } : role)),
+        )
+        await again.vm.$nextTick()
+
+        expect(saved).not.toContain('group.post.create')
+        expect(at(again, 'switch-members-post').element.checked).toBe(false)
+        expect(again.vm.dirty).toBe(false)
       })
 
       it('follows the server while nothing is edited', async () => {
