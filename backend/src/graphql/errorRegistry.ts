@@ -363,9 +363,17 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'Message must have content or files.',
   },
+  CHAT_CALL_ROOM_CLOSED: {
+    type: 'FORBIDDEN',
+    text: 'This video call is over. Its chat can still be read, but no longer written to.',
+  },
   CHAT_ROOM_PARTNER_IS_SELF: {
     type: 'BAD_USER_INPUT',
     text: 'You cannot create a chat with yourself.',
+  },
+  VIDEO_CALL_CHAT_NOT_IN_CALL: {
+    type: 'FORBIDDEN',
+    text: 'The chat of a video call is open to those taking part in it. Join the call first.',
   },
   VIDEO_CALL_START_NOT_PERMITTED: {
     type: 'FORBIDDEN',

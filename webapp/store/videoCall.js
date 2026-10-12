@@ -8,6 +8,9 @@ export const state = () => {
     groupSlug: null,
     groupAvatar: null,
     participantCount: 0,
+    // The conference chat of the call the user is in: the room only its participants
+    // share. Null outside a call, and until the server has confirmed the participation.
+    chatRoomId: null,
     // 'idle' | 'prejoin' | 'connecting' | 'in-call' — mirrors VideoCall's local
     // phase so the layout can decide where the chat lives.
     phase: 'idle',
@@ -28,6 +31,7 @@ export const mutations = {
     // Reset stale count from a previous call so the badge doesn't briefly show
     // another group's participant number before the query/subscription updates.
     state.participantCount = 0
+    state.chatRoomId = null
   },
   // Update group info post-hoc (e.g. after fetching by ID for a direct URL).
   SET_GROUP_INFO(state, { groupId, groupName, groupSlug, groupAvatar }) {
@@ -45,6 +49,7 @@ export const mutations = {
     state.groupAvatar = null
     state.phase = 'idle'
     state.participantCount = 0
+    state.chatRoomId = null
   },
   SET_MINIMIZED(state, minimized) {
     state.minimized = !!minimized
@@ -54,6 +59,9 @@ export const mutations = {
   },
   SET_PARTICIPANT_COUNT(state, count) {
     state.participantCount = Number(count) || 0
+  },
+  SET_CHAT_ROOM_ID(state, roomId) {
+    state.chatRoomId = roomId || null
   },
 }
 
@@ -81,6 +89,9 @@ export const getters = {
   },
   participantCount(state) {
     return state.participantCount
+  },
+  chatRoomId(state) {
+    return state.chatRoomId
   },
   phase(state) {
     return state.phase

@@ -18,6 +18,7 @@ describe('videoCall store', () => {
         groupSlug: null,
         groupAvatar: null,
         participantCount: 0,
+        chatRoomId: null,
         phase: 'idle',
       })
     })
@@ -133,6 +134,29 @@ describe('videoCall store', () => {
       })
     })
 
+    describe('SET_CHAT_ROOM_ID', () => {
+      it('stores the conference chat room of the call', () => {
+        mutations.SET_CHAT_ROOM_ID(state, 'room-1')
+        expect(state.chatRoomId).toBe('room-1')
+      })
+
+      it('falls back to null when called without a value', () => {
+        state.chatRoomId = 'room-1'
+        mutations.SET_CHAT_ROOM_ID(state)
+        expect(state.chatRoomId).toBeNull()
+      })
+
+      it('is forgotten when a call is opened or closed', () => {
+        state.chatRoomId = 'room-1'
+        mutations.OPEN(state, { groupId: 'g2' })
+        expect(state.chatRoomId).toBeNull()
+
+        state.chatRoomId = 'room-2'
+        mutations.CLOSE(state)
+        expect(state.chatRoomId).toBeNull()
+      })
+    })
+
     describe('SET_MINIMIZED', () => {
       it('coerces to a boolean', () => {
         mutations.SET_MINIMIZED(state, 'yes')
@@ -179,6 +203,7 @@ describe('videoCall store', () => {
         groupSlug: 'yoga',
         groupAvatar: { url: 'a' },
         participantCount: 7,
+        chatRoomId: 'room-1',
         phase: 'in-call',
       }
       expect(getters.enabled(state)).toBe(true)
@@ -189,6 +214,7 @@ describe('videoCall store', () => {
       expect(getters.groupSlug(state)).toBe('yoga')
       expect(getters.groupAvatar(state)).toEqual({ url: 'a' })
       expect(getters.participantCount(state)).toBe(7)
+      expect(getters.chatRoomId(state)).toBe('room-1')
       expect(getters.phase(state)).toBe('in-call')
     })
   })

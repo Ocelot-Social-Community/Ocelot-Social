@@ -450,6 +450,7 @@
     "API_KEY_CREATE_LIMIT_REACHED": "You have reached the maximum of {max} active API keys. Revoke an existing key to create a new one.",
     "API_KEY_DOES_NOT_EXIST": "The API key could not be found.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "You can only select badges that have been awarded to you.",
+    "CHAT_CALL_ROOM_CLOSED": "This video call is over. Its chat can still be read, but no longer written to.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "The group chat could not be created.",
     "CHAT_MESSAGE_CONTENT_MISSING": "The message needs a text or a file.",
     "CHAT_ROOM_PARTNER_IS_SELF": "You cannot start a chat with yourself.",
@@ -546,16 +547,25 @@
     "USER_DOES_NOT_EXIST": "The user could not be found.",
     "USER_PROFILE_NAME_TOO_SHORT": "The name must be at least {min} characters long.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "This user is not blocked.",
+    "VIDEO_CALL_CHAT_NOT_IN_CALL": "The chat of a video call is open to those taking part in it. Join the call first.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "No active membership in this group was found for the video call.",
     "VIDEO_CALL_START_NOT_PERMITTED": "You may not start a video call in this group."
   },
   "chat": {
     "addGroupRoomHeadline": "Search group for new chat",
     "addRoomHeadline": "Search User for new Chat",
+    "callRoomEmpty": "No messages yet. This chat is visible only to the participants of this video call.",
+    "callRoomName": "{name} · call",
     "cancelSelectMessage": "Cancel",
     "closeChat": "Close chat",
     "conversationStarted": "Conversation started on:",
     "expandChat": "Expand chat",
+    "export": {
+      "attachment": "Attachment",
+      "exportedAt": "Exported on {date}",
+      "title": "Chat of the video call in “{name}”"
+    },
+    "exportChat": "Download chat as text file",
     "groupChatButton": {
       "label": "Group Chat",
       "tooltip": "Chat with group “{name}”"
@@ -1979,6 +1989,13 @@
     "activeSpeakers": "Active speakers",
     "audioBlocked": "Your browser is blocking the sound of this call.",
     "audioOnly": "Weak connection — videos are paused so you can keep hearing everyone.",
+    "chatTabs": {
+      "call": "Call",
+      "callHint": "Visible only to the participants of this video call",
+      "group": "Group",
+      "groupHint": "Visible to all members of the group",
+      "label": "Choose chat"
+    },
     "closeChat": "Close chat",
     "connecting": "Connecting…",
     "connectionLost": "Connection lost: {name}",

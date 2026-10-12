@@ -450,6 +450,7 @@
     "API_KEY_CREATE_LIMIT_REACHED": "Osiągnąłeś/aś maksymalną liczbę {max} aktywnych API Keys. Unieważnij istniejący key, aby utworzyć nowy.",
     "API_KEY_DOES_NOT_EXIST": "Nie znaleziono API Key.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Możesz wybrać tylko odznaki, które zostały Ci przyznane.",
+    "CHAT_CALL_ROOM_CLOSED": "Ta rozmowa wideo się zakończyła. Jej czat można nadal czytać, ale nie można już w nim pisać.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "Nie udało się utworzyć czatu grupowego.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Wiadomość musi zawierać tekst lub plik.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Nie możesz rozpocząć czatu z samym/samą sobą.",
@@ -546,16 +547,25 @@
     "USER_DOES_NOT_EXIST": "Nie znaleziono użytkownika.",
     "USER_PROFILE_NAME_TOO_SHORT": "Nazwa musi mieć co najmniej {min} znaków.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Ten użytkownik nie jest zablokowany.",
+    "VIDEO_CALL_CHAT_NOT_IN_CALL": "Czat rozmowy wideo jest dostępny tylko dla jej uczestników. Najpierw dołącz do rozmowy.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Nie znaleziono aktywnego członkostwa w tej grupie dla rozmowy wideo.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Nie możesz rozpocząć rozmowy wideo w tej grupie."
   },
   "chat": {
     "addGroupRoomHeadline": "Szukaj grupy do nowego czatu",
     "addRoomHeadline": "Szukaj użytkownika do nowego czatu",
+    "callRoomEmpty": "Brak wiadomości. Ten czat jest widoczny tylko dla uczestników tej rozmowy wideo.",
+    "callRoomName": "{name} · rozmowa",
     "cancelSelectMessage": "Anuluj",
     "closeChat": "Zamknij czat",
     "conversationStarted": "Rozmowa rozpoczęta:",
     "expandChat": "Rozwiń czat",
+    "export": {
+      "attachment": "Załącznik",
+      "exportedAt": "Wyeksportowano {date}",
+      "title": "Czat rozmowy wideo w „{name}”"
+    },
+    "exportChat": "Pobierz czat jako plik tekstowy",
     "groupChatButton": {
       "label": "Czat grupowy",
       "tooltip": "Czat z grupą „{name}”"
@@ -1979,6 +1989,13 @@
     "activeSpeakers": "Aktywni mówcy",
     "audioBlocked": "Twoja przeglądarka blokuje dźwięk tej rozmowy.",
     "audioOnly": "Słabe połączenie — wideo wstrzymano, abyś nadal słyszał wszystkich.",
+    "chatTabs": {
+      "call": "Rozmowa",
+      "callHint": "Widoczny tylko dla uczestników tej rozmowy wideo",
+      "group": "Grupa",
+      "groupHint": "Widoczny dla wszystkich członków grupy",
+      "label": "Wybierz czat"
+    },
     "closeChat": "Zamknij czat",
     "connecting": "Łączenie…",
     "connectionLost": "Utracono połączenie: {name}",

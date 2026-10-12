@@ -19,7 +19,7 @@
     capture-files="true"
     :height="chatHeight"
     :styles="JSON.stringify(computedChatStyle)"
-    :show-footer="true"
+    :show-footer="selectedRoomWritable ? 'true' : 'false'"
     :responsive-breakpoint="600"
     :single-room="singleRoom"
     show-reaction-emojis="false"
@@ -34,8 +34,25 @@
     @open-file="openFile($event.detail[0].file.file)"
   >
     <div v-if="selectedRoom && selectedRoom.roomId" slot="room-options" class="chat-room-options">
-      <div v-if="singleRoom" class="chat-room-options__buttons">
+      <div v-if="singleRoom || selectedRoom.isCallRoom" class="chat-room-options__buttons">
         <os-button
+          v-if="selectedRoom.isCallRoom"
+          variant="primary"
+          appearance="outline"
+          circle
+          size="sm"
+          :loading="exporting"
+          :aria-label="$t('chat.exportChat')"
+          :title="$t('chat.exportChat')"
+          @click="exportRoom"
+        >
+          <template #icon>
+            <os-icon :icon="icons.download" />
+          </template>
+        </os-button>
+        <!-- No larger view for a call's conference chat: it is reached from the call only. -->
+        <os-button
+          v-if="singleRoom && !selectedRoom.isCallRoom"
           as="nuxt-link"
           :to="expandChatLink"
           variant="primary"
@@ -49,6 +66,7 @@
           </template>
         </os-button>
         <os-button
+          v-if="singleRoom"
           variant="primary"
           appearance="outline"
           circle
@@ -81,7 +99,7 @@
     <div slot="room-header-info" class="chat-room-header-info">
       <div class="vac-room-name vac-text-ellipsis">
         <room-title-link
-          :name="selectedRoom ? selectedRoom.roomName : ''"
+          :name="selectedRoomTitle"
           :to="roomHeaderLink"
           :show-group-icon="!!(selectedRoom && selectedRoom.isGroupRoom)"
         />
@@ -140,6 +158,7 @@ import { mapGetters, mapMutations } from 'vuex'
 const EMPTY_ACTIONS = JSON.stringify([])
 const ROOM_PAGE_SIZE = 10
 const MESSAGE_PAGE_SIZE = 20
+const EXPORT_PAGE_SIZE = 100
 
 export default {
   name: 'Chat',
@@ -158,6 +177,12 @@ export default {
       default: null,
     },
     groupId: {
+      type: String,
+      default: null,
+    },
+    // A room opened by its id — the conference chat of a video call, which belongs to
+    // neither one user nor the group as a whole.
+    roomId: {
       type: String,
       default: null,
     },
@@ -184,6 +209,7 @@ export default {
       messages: [],
       unseenMessageIds: new Set(),
       pendingStatusUpdates: {},
+      exporting: false,
     }
   },
   created() {
@@ -200,6 +226,11 @@ export default {
         this.newRoom(newUserId)
       }
     },
+    roomId(newRoomId) {
+      if (this.singleRoom && newRoomId) {
+        this.openRoom(newRoomId)
+      }
+    },
     currentLocaleIso() {
       this.messages = this.messages.map((m) => {
         this.formatMessageDate(m)
@@ -208,7 +239,9 @@ export default {
     },
   },
   mounted() {
-    if (this.singleRoom && this.groupId) {
+    if (this.singleRoom && this.roomId) {
+      this.openRoom(this.roomId)
+    } else if (this.singleRoom && this.groupId) {
       this.newGroupRoom(this.groupId)
     } else if (this.singleRoom && this.userId) {
       this.newRoom(this.userId)
@@ -311,13 +344,27 @@ export default {
       }
       return null
     },
+    selectedRoomTitle() {
+      if (!this.selectedRoom) return ''
+      // A call's conference chat carries the group's name; say which of the two chats it is.
+      return this.selectedRoom.isCallRoom
+        ? this.$t('chat.callRoomName', { name: this.selectedRoom.roomName })
+        : this.selectedRoom.roomName
+    },
+    selectedRoomWritable() {
+      // Only the conference chat of a video call that is over is read-only.
+      return !this.selectedRoom || this.selectedRoom.isWritable !== false
+    },
     textMessages() {
       return {
         ROOMS_EMPTY: this.$t('chat.roomsEmpty'),
         ROOM_EMPTY: this.$t('chat.roomEmpty'),
         NEW_MESSAGES: this.$t('chat.newMessages'),
         MESSAGE_DELETED: this.$t('chat.messageDeleted'),
-        MESSAGES_EMPTY: this.$t('chat.messagesEmpty'),
+        MESSAGES_EMPTY:
+          this.selectedRoom && this.selectedRoom.isCallRoom
+            ? this.$t('chat.callRoomEmpty')
+            : this.$t('chat.messagesEmpty'),
         CONVERSATION_STARTED: this.$t('chat.conversationStarted'),
         TYPE_MESSAGE: this.$t('chat.typeMessage'),
         SEARCH: this.$t('chat.search'),
@@ -772,6 +819,10 @@ export default {
             variables: { id: msg.room.id },
             fetchPolicy: 'no-cache',
           })
+          // The conference chat of a video call is no conversation of its own: it is
+          // shown where the call opens it (and is then in the list already), never
+          // because a message happens to arrive for it.
+          if (Room?.length && Room[0].isCallRoom) return
           if (Room?.length) {
             const newRoom = this.fixRoomObject(Room[0])
             if (!this._externalRoomIds) this._externalRoomIds = new Set()
@@ -1115,7 +1166,11 @@ export default {
     },
 
     async newGroupRoom(groupId) {
-      if (this.findLocalRoom((r) => r.isGroupRoom && r.groupProfile?.id === groupId)) return
+      // Not a call's conference chat: it carries the group too, but is not the group's chat.
+      if (
+        this.findLocalRoom((r) => r.isGroupRoom && !r.isCallRoom && r.groupProfile?.id === groupId)
+      )
+        return
       if (await this.fetchServerRoom({ groupId })) return
 
       try {
@@ -1129,6 +1184,78 @@ export default {
         this.bringRoomToTopAndSelect(room)
       } catch (error) {
         this.$toastBackendError(error)
+      }
+    },
+
+    async openRoom(roomId) {
+      if (this.findLocalRoom((r) => r.id === roomId)) return
+      const room = await this.fetchServerRoom({ id: roomId })
+      this.loadingRooms = false
+      return room
+    },
+
+    // Everything written in the room, oldest first — not only what has been scrolled into
+    // view so far.
+    async fetchAllMessages(roomId) {
+      const all = []
+      let beforeIndex = null
+      for (;;) {
+        const variables = { roomId, first: EXPORT_PAGE_SIZE }
+        if (beforeIndex !== null) variables.beforeIndex = beforeIndex
+        const {
+          data: { Message },
+        } = await this.$apollo.query({
+          query: messageQuery(),
+          variables,
+          fetchPolicy: 'no-cache',
+        })
+        all.unshift(...Message)
+        if (Message.length < EXPORT_PAGE_SIZE) return all
+        beforeIndex = Math.min(...Message.map((m) => m.indexId))
+      }
+    },
+
+    buildExportText(room, messages) {
+      const locale = this.currentLocaleIso
+      const lines = [
+        this.$t('chat.export.title', { name: room.roomName }),
+        this.$t('chat.export.exportedAt', { date: new Date().toLocaleString(locale) }),
+        '',
+      ]
+      for (const message of messages) {
+        const sentAt = new Date(message.date).toLocaleString(locale)
+        const content = (message.content || '').trim()
+        lines.push(`[${sentAt}] ${message.username}:${content ? ` ${content}` : ''}`)
+        for (const file of message.files || []) {
+          const name = file.extension ? `${file.name}.${file.extension}` : file.name
+          lines.push(`    ${this.$t('chat.export.attachment')}: ${name}`)
+        }
+      }
+      return lines.join('\n') + '\n'
+    },
+
+    async exportRoom() {
+      const room = this.selectedRoom
+      if (!room?.id || this.exporting) return
+      this.exporting = true
+      try {
+        const messages = await this.fetchAllMessages(room.id)
+        const blob = new Blob([this.buildExportText(room, messages)], {
+          type: 'text/plain;charset=utf-8',
+        })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        const day = new Date(room.createdAt || Date.now()).toISOString().slice(0, 10)
+        link.href = url
+        link.download = `chat-${day}.txt`
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        URL.revokeObjectURL(url)
+      } catch (error) {
+        this.$toastBackendError(error)
+      } finally {
+        this.exporting = false
       }
     },
 

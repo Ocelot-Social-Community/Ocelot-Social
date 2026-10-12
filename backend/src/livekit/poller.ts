@@ -15,7 +15,9 @@ import { RoomServiceClient } from 'livekit-server-sdk'
 import CONFIG from '@src/config'
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@src/constants/subscriptions'
 import { serverPubsub } from '@src/context'
+import { getDriver } from '@src/db/neo4j'
 import { groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
+import { endCallSessionsOfMissingRoom } from '@src/livekit/callSession'
 import { markRoomTold, takeToldRooms } from '@src/livekit/toldRooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
@@ -109,6 +111,17 @@ const pollOnce = async () => {
     for (const roomName of new Set([...lastSeenCounts.keys(), ...told])) {
       if (seen.has(roomName)) {
         continue
+      }
+      // The room is gone, so the call is over: its session ends here too, for the setups
+      // this poller exists for — the ones the webhook's "room finished" never reaches. A
+      // failure is no reason to hold back the count below; the session is ended at the latest
+      // when the next call is opened (see callSession.ts).
+      try {
+        await endCallSessionsOfMissingRoom(getDriver(), roomName)
+        // eslint-disable-next-line no-catch-all/no-catch-all
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err)
+        logger.warn(`Ending the call session of ${roomName} failed:`, message)
       }
       if ((lastSeenCounts.get(roomName) ?? 0) > 0 || told.has(roomName)) {
         const groupId = groupIdFromRoomName(roomName)

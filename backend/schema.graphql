@@ -1211,6 +1211,11 @@ type Mutation {
   """
   joinGroupVideoCall(groupId: ID!): VideoCallJoinPayload!
 
+  """
+  Join the conference chat of the group's running video call — the chat room only the participants of this one call share — and return its room id. Requires taking part in the call.
+  """
+  joinGroupVideoCallChat(groupId: ID!): ID
+
   """Get a JWT Token for the given Email and password"""
   login(email: String!, password: String!): String!
 
@@ -2194,7 +2199,7 @@ type Role {
 }
 
 """
-A chat room, either a one-to-one direct conversation between two users or the shared chat room of a group.
+A chat room: a one-to-one direct conversation between two users, the shared chat room of a group, or the conference chat of a video call.
 """
 type Room {
   """
@@ -2203,17 +2208,29 @@ type Room {
   _id: String @deprecated(reason: "Use `id`.")
 
   """
-  Display avatar URL: the group's avatar for a group room, otherwise the other participant's avatar.
+  Display avatar URL: the group's avatar for a group room or a call's conference chat, otherwise the other participant's avatar.
   """
   avatar: String
   createdAt: String
 
-  """The group this room belongs to, or null for a direct room."""
+  """
+  The group this room belongs to — for the conference chat of a video call, the group the call takes place in — or null for a direct room.
+  """
   group: Group
   id: ID!
 
+  """
+  True if this is the conference chat of a video call, shared only by the participants of that call.
+  """
+  isCallRoom: Boolean!
+
   """True if this is a group room, false for a direct room."""
   isGroupRoom: Boolean!
+
+  """
+  False once the room no longer takes messages: the conference chat of a video call that is over.
+  """
+  isWritable: Boolean!
 
   """The most recent message in the room."""
   lastMessage: Message
@@ -2225,7 +2242,7 @@ type Room {
   roomId: String!
 
   """
-  Display name: the group's name for a group room, otherwise the other participant's name.
+  Display name: the group's name for a group room or a call's conference chat, otherwise the other participant's name.
   """
   roomName: String!
 

@@ -16,12 +16,15 @@ import Resolver from './helpers/Resolver'
 
 // excludeGroupRooms: when the groups feature is off, group rooms must not count towards the
 // unread badge (they are hidden everywhere else too). The rest of the query is unchanged.
+//
+// The conference chat of a video call never counts: it is read inside the call, and the badge
+// would otherwise call back everybody who has left one that is still running.
 export const getUnreadRoomsCount = async (userId, session, excludeGroupRooms = false) => {
   return session.readTransaction(async (transaction) => {
     const groupRoomFilter = excludeGroupRooms ? 'AND NOT (room)-[:ROOM_FOR]->(:Group)' : ''
     const unreadRoomsCypher = `
       MATCH (user:User { id: $userId })-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room:Room)<-[:CHATS_IN]-(user)
-      WHERE true ${groupRoomFilter}
+      WHERE NOT (room)-[:ROOM_FOR]->(:VideoCallSession) ${groupRoomFilter}
       OPTIONAL MATCH (message)<-[:CREATED]-(sender:User)
       WHERE (user)-[:BLOCKED]->(sender) OR (user)-[:MUTED]->(sender)
       WITH room, message, sender
@@ -37,6 +40,12 @@ export const getUnreadRoomsCount = async (userId, session, excludeGroupRooms = f
 // messages, unread counts, chat-target search) is hidden/blocked while it is. Default false
 // (feature on) if no policy service is on the context, so chat never breaks on a missing policy.
 export const groupChatGated = (context) => context.policy?.getEffective('groupsEnabled') === false
+
+// What makes a room a direct conversation: it is for nothing else. A group's chat points at
+// the group, the conference chat of a video call at the call — and that one must be named
+// here, because two people alone in a call share a room exactly as two people in a direct
+// conversation do. Asking only "not a group room" would take their conference chat for it.
+export const DIRECT_ROOM = 'NOT (room)-[:ROOM_FOR]->()'
 
 // Whether a room is a group room (has a ROOM_FOR edge to a Group). Used to block messaging in
 // a group room while the groups feature is off, without denying DM rooms (shared mutations).
@@ -97,7 +106,7 @@ export default {
             `
             : `
               MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user:User { id: $userId })
-              WHERE NOT (room)-[:ROOM_FOR]->(:Group)
+              WHERE ${DIRECT_ROOM}
               RETURN room { .* } AS room
             `
           const result = await session.readTransaction(async (transaction) => {
@@ -184,6 +193,9 @@ export default {
           const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
           const cypher = `
             MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)
+              // The conference chats of video calls are not conversations of their own: they
+              // are reached from the call, not from the chat list.
+              WHERE NOT (room)-[:ROOM_FOR]->(:VideoCallSession)
             OPTIONAL MATCH (room)-[:ROOM_FOR]->(g:Group)
             OPTIONAL MATCH (room)<-[:CHATS_IN]-(otherUser:User)
               WHERE g IS NULL AND otherUser.id <> $currentUserId
@@ -292,7 +304,9 @@ export default {
         users: '<-[:CHATS_IN]-(related:User)',
       },
       hasOne: {
-        group: '-[:ROOM_FOR]->(related:Group)',
+        // One hop for a group's chat, two for the conference chat of a video call: that
+        // one is for the call, and the call takes place in the group.
+        group: '-[:ROOM_FOR|CALL_IN*1..2]->(related:Group)',
       },
       count: {
         // Unread messages for the current viewer, ignoring blocked and muted senders.
@@ -321,12 +335,24 @@ export default {
         OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
         RETURN g IS NOT NULL
       `,
+      isCallRoom: 'RETURN EXISTS((this)-[:ROOM_FOR]->(:VideoCallSession))',
+      // Whether the room still takes messages: every room does, except the conference chat of
+      // a video call that is over.
+      isWritable: `
+        OPTIONAL MATCH (this)-[:ROOM_FOR]->(call:VideoCallSession)
+        RETURN call IS NULL OR call.endedAt IS NULL
+      `,
+      // The conference chat of a video call carries the name and avatar of the group the call
+      // takes place in; \`g\` is that group there. Its participants are not looked at, which is
+      // what the \`call IS NULL\` guards: they are no "other participant" to name a room after.
       roomName: {
         statement: `
-          OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
-          WITH this, g
+          OPTIONAL MATCH (this)-[:ROOM_FOR]->(call:VideoCallSession)
+          OPTIONAL MATCH (call)-[:CALL_IN]->(callGroup:Group)
+          OPTIONAL MATCH (this)-[:ROOM_FOR]->(roomGroup:Group)
+          WITH this, call, COALESCE(roomGroup, callGroup) AS g
           OPTIONAL MATCH (this)<-[:CHATS_IN]-(user:User)
-          WHERE g IS NULL AND NOT user.id = $cypherParams.currentUserId
+          WHERE g IS NULL AND call IS NULL AND NOT user.id = $cypherParams.currentUserId
           RETURN COALESCE(g.name, user.name)
         `,
         // A direct room whose other participant was deleted has neither a group name nor a
@@ -336,11 +362,14 @@ export default {
         fallback: '',
       },
       avatar: `
-        OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
+        OPTIONAL MATCH (this)-[:ROOM_FOR]->(call:VideoCallSession)
+        OPTIONAL MATCH (call)-[:CALL_IN]->(callGroup:Group)
+        OPTIONAL MATCH (this)-[:ROOM_FOR]->(roomGroup:Group)
+        WITH this, call, COALESCE(roomGroup, callGroup) AS g
         OPTIONAL MATCH (g)-[:AVATAR_IMAGE]->(groupImg:Image)
-        WITH this, g, groupImg
+        WITH this, call, g, groupImg
         OPTIONAL MATCH (this)<-[:CHATS_IN]-(user:User)
-        WHERE g IS NULL AND NOT user.id = $cypherParams.currentUserId
+        WHERE g IS NULL AND call IS NULL AND NOT user.id = $cypherParams.currentUserId
         OPTIONAL MATCH (user)-[:AVATAR_IMAGE]->(userImg:Image)
         RETURN COALESCE(groupImg.url, userImg.url)
       `,

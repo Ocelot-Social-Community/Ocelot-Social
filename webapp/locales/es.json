@@ -450,6 +450,7 @@
     "API_KEY_CREATE_LIMIT_REACHED": "Has alcanzado el máximo de {max} API Keys activas. Revoca una key existente para crear una nueva.",
     "API_KEY_DOES_NOT_EXIST": "No se ha encontrado la API Key.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Solo puedes seleccionar insignias que te hayan sido otorgadas.",
+    "CHAT_CALL_ROOM_CLOSED": "Esta videollamada ha terminado. Su chat aún se puede leer, pero ya no se puede escribir en él.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "No se ha podido crear el chat del grupo.",
     "CHAT_MESSAGE_CONTENT_MISSING": "El mensaje necesita un texto o un archivo.",
     "CHAT_ROOM_PARTNER_IS_SELF": "No puedes iniciar un chat contigo mismo.",
@@ -546,16 +547,25 @@
     "USER_DOES_NOT_EXIST": "No se ha encontrado el usuario.",
     "USER_PROFILE_NAME_TOO_SHORT": "El nombre debe tener al menos {min} caracteres.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Este usuario no está bloqueado.",
+    "VIDEO_CALL_CHAT_NOT_IN_CALL": "El chat de una videollamada solo está abierto a quienes participan en ella. Únete primero a la llamada.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "No se ha encontrado ninguna membresía activa en este grupo para la videollamada.",
     "VIDEO_CALL_START_NOT_PERMITTED": "No puedes iniciar una videollamada en este grupo."
   },
   "chat": {
     "addGroupRoomHeadline": "Buscar grupo para nuevo chat",
     "addRoomHeadline": "Buscar usuario para nuevo chat",
+    "callRoomEmpty": "Aún no hay mensajes. Este chat solo es visible para los participantes de esta videollamada.",
+    "callRoomName": "{name} · llamada",
     "cancelSelectMessage": "Cancelar",
     "closeChat": "Cerrar chat",
     "conversationStarted": "Conversación iniciada el:",
     "expandChat": "Expandir chat",
+    "export": {
+      "attachment": "Adjunto",
+      "exportedAt": "Exportado el {date}",
+      "title": "Chat de la videollamada en «{name}»"
+    },
+    "exportChat": "Descargar el chat como archivo de texto",
     "groupChatButton": {
       "label": "Chat grupal",
       "tooltip": "Chat con el grupo «{name}»"
@@ -1979,6 +1989,13 @@
     "activeSpeakers": "Hablantes activos",
     "audioBlocked": "Tu navegador está bloqueando el sonido de esta llamada.",
     "audioOnly": "Conexión débil: los vídeos están en pausa para que sigas oyendo a todos.",
+    "chatTabs": {
+      "call": "Llamada",
+      "callHint": "Visible solo para los participantes de esta videollamada",
+      "group": "Grupo",
+      "groupHint": "Visible para todos los miembros del grupo",
+      "label": "Elegir chat"
+    },
     "closeChat": "Cerrar chat",
     "connecting": "Conectando…",
     "connectionLost": "Conexión perdida: {name}",

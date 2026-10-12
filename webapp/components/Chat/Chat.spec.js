@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 import Vuex from 'vuex'
 import Chat from './Chat.vue'
 
@@ -1584,6 +1585,155 @@ describe('Chat.vue', () => {
         fetchMoreSpy.mockClear()
         intersectionInstances[0].callback([{ isIntersecting: false }])
         expect(fetchMoreSpy).not.toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('conference chat of a video call', () => {
+    const callRoom = (overrides = {}) => ({
+      id: 'call-room',
+      roomId: 'call-room',
+      roomName: 'Yoga',
+      avatar: null,
+      isGroupRoom: false,
+      isCallRoom: true,
+      isWritable: true,
+      createdAt: '2026-01-01T00:00:00Z',
+      lastMessageAt: null,
+      unreadCount: 0,
+      group: { id: 'g1', slug: 'yoga', name: 'Yoga', avatar: null },
+      lastMessage: null,
+      users: [{ _id: 'current-user', id: 'current-user', slug: 'me', name: 'Me', avatar: null }],
+      ...overrides,
+    })
+
+    it('opens the room given by its id', async () => {
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [callRoom()], Message: [] } })
+      wrapper = Wrapper({ singleRoom: true, roomId: 'call-room' })
+      await flushPromises()
+      expect(mocks.$apollo.query.mock.calls[0][0].variables).toEqual({ id: 'call-room' })
+      expect(wrapper.vm.rooms.map((r) => r.id)).toEqual(['call-room'])
+      expect(wrapper.vm.rooms[0].isCallRoom).toBe(true)
+    })
+
+    it('does not take it for the chat of the group it carries', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      wrapper.vm.rooms = [wrapper.vm.fixRoomObject(callRoom())]
+      mocks.$apollo.query.mockClear()
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      await wrapper.vm.newGroupRoom('g1')
+      // Not found locally, so the server is asked for the group's own room.
+      expect(mocks.$apollo.query.mock.calls[0][0].variables).toEqual({ groupId: 'g1' })
+    })
+
+    it('ignores a message for a conference chat that is not open here', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      wrapper.vm.rooms = []
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [callRoom()] } })
+      await wrapper.vm.chatMessageAdded({
+        data: { chatMessageAdded: mockMessage({ room: { id: 'call-room' } }) },
+      })
+      expect(wrapper.vm.rooms).toEqual([])
+    })
+
+    it('says in the title which of the two chats it is', () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = wrapper.vm.fixRoomObject(callRoom())
+      expect(wrapper.vm.selectedRoomTitle).toBe('chat.callRoomName')
+      expect(mocks.$t).toHaveBeenCalledWith('chat.callRoomName', { name: 'Yoga' })
+    })
+
+    it('keeps the plain name for every other room', () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = mockRoom()
+      expect(wrapper.vm.selectedRoomTitle).toBe('Test Room')
+    })
+
+    it('is read-only once the call is over', () => {
+      wrapper = Wrapper()
+      expect(wrapper.vm.selectedRoomWritable).toBe(true)
+      wrapper.vm.selectedRoom = wrapper.vm.fixRoomObject(callRoom())
+      expect(wrapper.vm.selectedRoomWritable).toBe(true)
+      wrapper.vm.selectedRoom = wrapper.vm.fixRoomObject(callRoom({ isWritable: false }))
+      expect(wrapper.vm.selectedRoomWritable).toBe(false)
+    })
+
+    describe('export', () => {
+      it('fetches every message, page by page, oldest first', async () => {
+        wrapper = Wrapper()
+        await flushPromises()
+        const page = (from, count) =>
+          Array.from({ length: count }, (_, i) =>
+            mockMessage({ id: `m${from + i}`, _id: `m${from + i}`, indexId: from + i }),
+          )
+        mocks.$apollo.query.mockReset()
+        mocks.$apollo.query
+          .mockResolvedValueOnce({ data: { Message: page(30, 100) } })
+          .mockResolvedValueOnce({ data: { Message: page(0, 30) } })
+        const all = await wrapper.vm.fetchAllMessages('call-room')
+        expect(mocks.$apollo.query.mock.calls.map(([arg]) => arg.variables)).toEqual([
+          { roomId: 'call-room', first: 100 },
+          { roomId: 'call-room', first: 100, beforeIndex: 30 },
+        ])
+        expect(all.map((m) => m.indexId)).toEqual(Array.from({ length: 130 }, (_, i) => i))
+      })
+
+      it('writes one line per message, and one per attachment', () => {
+        wrapper = Wrapper()
+        const text = wrapper.vm.buildExportText({ roomName: 'Yoga' }, [
+          mockMessage({ username: 'Anna', content: ' Hello ' }),
+          mockMessage({
+            username: 'Ben',
+            content: '',
+            files: [{ name: 'plan', extension: 'pdf' }, { name: 'notes' }],
+          }),
+        ])
+        const lines = text.split('\n')
+        expect(lines[0]).toBe('chat.export.title')
+        expect(lines[1]).toBe('chat.export.exportedAt')
+        expect(lines[2]).toBe('')
+        expect(lines[3]).toMatch(/^\[.+\] Anna: Hello$/)
+        expect(lines[4]).toMatch(/^\[.+\] Ben:$/)
+        expect(lines[5]).toBe('    chat.export.attachment: plan.pdf')
+        expect(lines[6]).toBe('    chat.export.attachment: notes')
+        expect(mocks.$t).toHaveBeenCalledWith('chat.export.title', { name: 'Yoga' })
+      })
+
+      it('hands the text to the browser as a file', async () => {
+        wrapper = Wrapper()
+        await flushPromises()
+        wrapper.vm.selectedRoom = wrapper.vm.fixRoomObject(callRoom())
+        mocks.$apollo.query.mockResolvedValue({ data: { Message: [mockMessage()] } })
+        const createObjectURL = jest.fn(() => 'blob:export')
+        const revokeObjectURL = jest.fn()
+        const original = { create: URL.createObjectURL, revoke: URL.revokeObjectURL }
+        URL.createObjectURL = createObjectURL
+        URL.revokeObjectURL = revokeObjectURL
+        const click = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+        try {
+          await wrapper.vm.exportRoom()
+          expect(createObjectURL).toHaveBeenCalledWith(expect.any(Blob))
+          expect(click).toHaveBeenCalledTimes(1)
+          expect(click.mock.instances[0].download).toBe('chat-2026-01-01.txt')
+          expect(revokeObjectURL).toHaveBeenCalledWith('blob:export')
+          expect(wrapper.vm.exporting).toBe(false)
+        } finally {
+          click.mockRestore()
+          URL.createObjectURL = original.create
+          URL.revokeObjectURL = original.revoke
+        }
+      })
+
+      it('reports a failure and is ready for another try', async () => {
+        wrapper = Wrapper()
+        await flushPromises()
+        wrapper.vm.selectedRoom = wrapper.vm.fixRoomObject(callRoom())
+        mocks.$apollo.query.mockRejectedValue(new Error('offline'))
+        await wrapper.vm.exportRoom()
+        expect(mocks.$toast.error).toHaveBeenCalled()
+        expect(wrapper.vm.exporting).toBe(false)
       })
     })
   })

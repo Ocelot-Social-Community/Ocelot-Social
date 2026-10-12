@@ -450,6 +450,7 @@
     "API_KEY_CREATE_LIMIT_REACHED": "Je hebt het maximum van {max} actieve API Keys bereikt. Trek een bestaande key in om een nieuwe aan te maken.",
     "API_KEY_DOES_NOT_EXIST": "De API Key is niet gevonden.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Je kunt alleen badges kiezen die aan jou zijn toegekend.",
+    "CHAT_CALL_ROOM_CLOSED": "Dit videogesprek is afgelopen. De chat kan nog worden gelezen, maar er kan niet meer in worden geschreven.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "De groepschat kon niet worden aangemaakt.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Het bericht heeft een tekst of een bestand nodig.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Je kunt geen chat met jezelf starten.",
@@ -546,16 +547,25 @@
     "USER_DOES_NOT_EXIST": "De gebruiker is niet gevonden.",
     "USER_PROFILE_NAME_TOO_SHORT": "De naam moet minimaal {min} tekens lang zijn.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Deze gebruiker is niet geblokkeerd.",
+    "VIDEO_CALL_CHAT_NOT_IN_CALL": "De chat van een videogesprek is alleen open voor de deelnemers. Neem eerst deel aan het gesprek.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Er is geen actief lidmaatschap van deze groep gevonden voor het videogesprek.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Je mag in deze groep geen videogesprek starten."
   },
   "chat": {
     "addGroupRoomHeadline": "Zoek groep voor nieuwe chat",
     "addRoomHeadline": "Zoek gebruiker voor nieuwe chat",
+    "callRoomEmpty": "Nog geen berichten. Deze chat is alleen zichtbaar voor de deelnemers aan dit videogesprek.",
+    "callRoomName": "{name} · gesprek",
     "cancelSelectMessage": "Annuleren",
     "closeChat": "Chat sluiten",
     "conversationStarted": "Gesprek gestart op:",
     "expandChat": "Chat uitvouwen",
+    "export": {
+      "attachment": "Bijlage",
+      "exportedAt": "Geëxporteerd op {date}",
+      "title": "Chat van het videogesprek in “{name}”"
+    },
+    "exportChat": "Chat downloaden als tekstbestand",
     "groupChatButton": {
       "label": "Groepschat",
       "tooltip": "Chat met groep “{name}”"
@@ -1979,6 +1989,13 @@
     "activeSpeakers": "Actieve sprekers",
     "audioBlocked": "Je browser blokkeert het geluid van dit gesprek.",
     "audioOnly": "Zwakke verbinding — video's zijn gepauzeerd zodat je iedereen blijft horen.",
+    "chatTabs": {
+      "call": "Gesprek",
+      "callHint": "Alleen zichtbaar voor de deelnemers aan dit videogesprek",
+      "group": "Groep",
+      "groupHint": "Zichtbaar voor alle leden van de groep",
+      "label": "Chat kiezen"
+    },
     "closeChat": "Chat sluiten",
     "connecting": "Verbinden…",
     "connectionLost": "Verbinding verbroken: {name}",

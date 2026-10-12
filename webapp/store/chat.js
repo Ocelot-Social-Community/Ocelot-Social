@@ -3,6 +3,9 @@ export const state = () => {
     showChat: false,
     chatUserId: null,
     groupId: null,
+    // A room opened by its id: the conference chat of a video call, which belongs to
+    // neither one user nor the group as a whole.
+    roomId: null,
     unreadRoomCount: 0,
   }
 }
@@ -12,6 +15,7 @@ export const mutations = {
     state.showChat = ctx.showChat || false
     state.chatUserId = ctx.chatUserId || null
     state.groupId = ctx.groupId || null
+    state.roomId = ctx.roomId || null
   },
   UPDATE_ROOM_COUNT(state, count) {
     state.unreadRoomCount = count

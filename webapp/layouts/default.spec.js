@@ -43,6 +43,7 @@ describe('default.vue', () => {
         'videoCall/minimized': () => false,
         'videoCall/groupId': () => null,
         'videoCall/phase': () => 'idle',
+        'videoCall/chatRoomId': () => null,
       },
       mutations: {
         'chat/SET_OPEN_CHAT': jest.fn(),

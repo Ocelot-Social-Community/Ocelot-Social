@@ -20,7 +20,7 @@ import { attachments } from './attachments/attachments'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import { pagingClause } from './helpers/paging'
 import Resolver from './helpers/Resolver'
-import { getRoomProperties, groupChatGated, roomIsGroupRoom } from './rooms'
+import { DIRECT_ROOM, getRoomProperties, groupChatGated, roomIsGroupRoom } from './rooms'
 
 import type { File } from './attachments/attachments'
 
@@ -200,9 +200,9 @@ export default {
               `
               MATCH (currentUser:User { id: $currentUserId })
               MATCH (user:User { id: $userId })
-              OPTIONAL MATCH (currentUser)-[:CHATS_IN]->(existingRoom:Room)<-[:CHATS_IN]-(user)
-              WHERE NOT (existingRoom)-[:ROOM_FOR]->(:Group)
-              WITH currentUser, user, collect(existingRoom)[0] AS existingRoom
+              OPTIONAL MATCH (currentUser)-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user)
+              WHERE ${DIRECT_ROOM}
+              WITH currentUser, user, collect(room)[0] AS existingRoom
               WITH currentUser, user, existingRoom
               WHERE existingRoom IS NULL
               CREATE (currentUser)-[:CHATS_IN]->(:Room {
@@ -216,9 +216,15 @@ export default {
 
           // Resolve the room — either by roomId or by finding the DM room with userId
           const matchRoom = roomId
-            ? `MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })`
+            ? // The conference chat of a video call that is over is kept, but no longer
+              // written to. Refused in the match, so no check can come apart from the write.
+              `MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+               WHERE NOT EXISTS {
+                 MATCH (room)-[:ROOM_FOR]->(call:VideoCallSession)
+                 WHERE call.endedAt IS NOT NULL
+               }`
             : `MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user:User { id: $userId })
-               WHERE NOT (room)-[:ROOM_FOR]->(:Group)`
+               WHERE ${DIRECT_ROOM}`
 
           const createMessageCypher = `
             ${matchRoom}
@@ -265,6 +271,22 @@ export default {
           const [message] = txResponse.records.map((record) => record.get('message'))
 
           if (!message) {
+            // No room matched. For a participant of a video call that is over, that is the
+            // read-only conference chat — say so, instead of leaving the message unanswered.
+            if (roomId) {
+              const closed = await transaction.run(
+                `
+                  MATCH (:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+                  MATCH (room)-[:ROOM_FOR]->(call:VideoCallSession)
+                  WHERE call.endedAt IS NOT NULL
+                  RETURN count(room) > 0 AS closed
+                `,
+                { currentUserId, roomId },
+              )
+              if (closed.records[0]?.get('closed') === true) {
+                throw new AppError(Errors.CHAT_CALL_ROOM_CLOSED)
+              }
+            }
             return null
           }
 

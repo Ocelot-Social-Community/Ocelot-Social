@@ -40,6 +40,20 @@ vi.mock('@src/graphql/resolvers/videoCalls', () => ({
     roomName?.startsWith('group-') ? roomName.slice('group-'.length) : null,
 }))
 
+// Ending the call session is the database's business (callSession.spec.ts); here it only
+// has to be asked for, and must not reach a real database.
+const mockEndCallSession = vi.fn<(...args: unknown[]) => Promise<void>>()
+const mockEndOfMissingRoom = vi.fn<(...args: unknown[]) => Promise<void>>()
+vi.mock('@src/livekit/callSession', () => ({
+  __esModule: true,
+  endCallSession: async (...args: unknown[]) => mockEndCallSession(...args),
+  endCallSessionsOfMissingRoom: async (...args: unknown[]) => mockEndOfMissingRoom(...args),
+}))
+vi.mock('@src/db/neo4j', () => ({
+  __esModule: true,
+  getDriver: () => 'driver',
+}))
+
 const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
 // vi.mock factories are hoisted above the const/let declarations they
 // reference, so `default: mockLogger` / `default: mockConfig` would read a
@@ -120,6 +134,8 @@ beforeEach(() => {
   mockWebhookReceiverCtor.mockReset()
   mockPublish.mockReset().mockResolvedValue(undefined)
   mockGetCount.mockReset().mockResolvedValue(0)
+  mockEndCallSession.mockReset().mockResolvedValue(undefined)
+  mockEndOfMissingRoom.mockReset().mockResolvedValue(undefined)
   mockLogger.info.mockReset()
   mockLogger.warn.mockReset()
   mockLogger.error.mockReset()
@@ -280,6 +296,59 @@ describe('registerLiveKitWebhook', () => {
         groupId: 'finished',
         count: 0,
       })
+      expect(res.status).toHaveBeenCalledWith(204)
+    })
+
+    it('ends the call session of a finished room by the sid of that room', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished', sid: 'RM_finished' },
+      })
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect(mockEndCallSession).toHaveBeenCalledWith('driver', 'RM_finished')
+      expect(mockEndOfMissingRoom).not.toHaveBeenCalled()
+    })
+
+    it('falls back to the room name when the event carries no sid', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished' },
+      })
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect(mockEndOfMissingRoom).toHaveBeenCalledWith('driver', 'group-finished')
+      expect(mockEndCallSession).not.toHaveBeenCalled()
+    })
+
+    it('leaves the call session alone while the room is still there', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'participant_left',
+        room: { name: 'group-running', sid: 'RM_running' },
+      })
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect(mockEndCallSession).not.toHaveBeenCalled()
+      expect(mockEndOfMissingRoom).not.toHaveBeenCalled()
+    })
+
+    it('logs but still acknowledges when ending the call session fails', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished', sid: 'RM_finished' },
+      })
+      mockEndCallSession.mockRejectedValueOnce(new Error('database down'))
+      const res = makeRes()
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), res)
+      await flushPromises()
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to end the call session'),
+        expect.any(Error),
+      )
       expect(res.status).toHaveBeenCalledWith(204)
     })
 

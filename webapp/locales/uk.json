@@ -450,6 +450,7 @@
     "API_KEY_CREATE_LIMIT_REACHED": "Ти досяг максимуму в {max} активних API Keys. Відклич існуючий key, щоб створити новий.",
     "API_KEY_DOES_NOT_EXIST": "API Key не знайдено.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Ти можеш вибрати лише ті значки, які тобі було присуджено.",
+    "CHAT_CALL_ROOM_CLOSED": "Цей відеовиклик завершено. Його чат ще можна читати, але писати в нього вже не можна.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "Не вдалося створити груповий чат.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Повідомлення має містити текст або файл.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Ти не можеш почати чат із самим собою.",
@@ -546,16 +547,25 @@
     "USER_DOES_NOT_EXIST": "Користувача не знайдено.",
     "USER_PROFILE_NAME_TOO_SHORT": "Ім’я має містити щонайменше {min} символів.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Цей користувач не заблокований.",
+    "VIDEO_CALL_CHAT_NOT_IN_CALL": "Чат відеовиклику відкритий лише для його учасників. Спершу приєднайся до виклику.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Для відеовиклику не знайдено активного членства в цій групі.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Ти не можеш почати відеовиклик у цій групі."
   },
   "chat": {
     "addGroupRoomHeadline": "Пошук групи для нового чату",
     "addRoomHeadline": "Пошук користувача для нового чату",
+    "callRoomEmpty": "Повідомлень ще немає. Цей чат бачать лише учасники цього відеовиклику.",
+    "callRoomName": "{name} · виклик",
     "cancelSelectMessage": "Скасувати",
     "closeChat": "Закрити чат",
     "conversationStarted": "Розмову розпочато:",
     "expandChat": "Розгорнути чат",
+    "export": {
+      "attachment": "Вкладення",
+      "exportedAt": "Експортовано {date}",
+      "title": "Чат відеовиклику в «{name}»"
+    },
+    "exportChat": "Завантажити чат як текстовий файл",
     "groupChatButton": {
       "label": "Груповий чат",
       "tooltip": "Чат з групою «{name}»"
@@ -1979,6 +1989,13 @@
     "activeSpeakers": "Активні мовці",
     "audioBlocked": "Ваш браузер блокує звук цього дзвінка.",
     "audioOnly": "Слабке з'єднання — відео призупинено, щоб ви й далі чули всіх.",
+    "chatTabs": {
+      "call": "Виклик",
+      "callHint": "Бачать лише учасники цього відеовиклику",
+      "group": "Група",
+      "groupHint": "Бачать усі учасники групи",
+      "label": "Вибрати чат"
+    },
     "closeChat": "Закрити чат",
     "connecting": "З'єднання…",
     "connectionLost": "З'єднання втрачено: {name}",

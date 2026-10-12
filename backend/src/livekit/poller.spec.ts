@@ -40,6 +40,18 @@ vi.mock('@src/graphql/resolvers/videoCalls', () => ({
     roomName?.startsWith('group-') ? roomName.slice('group-'.length) : null,
 }))
 
+// Ending the call session is the database's business (callSession.spec.ts); here it only
+// has to be asked for, and must not reach a real database.
+const mockEndOfMissingRoom = vi.fn<(...args: unknown[]) => Promise<void>>()
+vi.mock('@src/livekit/callSession', () => ({
+  __esModule: true,
+  endCallSessionsOfMissingRoom: async (...args: unknown[]) => mockEndOfMissingRoom(...args),
+}))
+vi.mock('@src/db/neo4j', () => ({
+  __esModule: true,
+  getDriver: () => 'driver',
+}))
+
 const mockLogger = {
   info: vi.fn<(...args: unknown[]) => void>(),
   warn: vi.fn<(...args: unknown[]) => void>(),
@@ -85,6 +97,7 @@ beforeEach(() => {
   mockListRooms.mockReset().mockResolvedValue([])
   mockRoomServiceCtor.mockReset()
   mockPublish.mockReset().mockResolvedValue(undefined)
+  mockEndOfMissingRoom.mockReset().mockResolvedValue(undefined)
   mockLogger.info.mockReset()
   mockLogger.warn.mockReset()
   mockLogger.error.mockReset()
@@ -269,6 +282,39 @@ describe('poll tick', () => {
     await vi.advanceTimersByTimeAsync(15_000)
 
     expect(mockPublish).not.toHaveBeenCalled()
+  })
+
+  it('ends the call session of a room that disappeared from the list', async () => {
+    mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 3 }])
+    startLiveKitPoller()
+    await vi.advanceTimersByTimeAsync(5_000)
+
+    expect(mockEndOfMissingRoom).not.toHaveBeenCalled()
+
+    mockListRooms.mockResolvedValueOnce([])
+    await vi.advanceTimersByTimeAsync(15_000)
+
+    expect(mockEndOfMissingRoom).toHaveBeenCalledWith('driver', 'group-a')
+  })
+
+  it('still publishes count: 0 when ending the call session fails', async () => {
+    mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 3 }])
+    startLiveKitPoller()
+    await vi.advanceTimersByTimeAsync(5_000)
+    mockPublish.mockClear()
+
+    mockEndOfMissingRoom.mockRejectedValueOnce(new Error('database down'))
+    mockListRooms.mockResolvedValueOnce([])
+    await vi.advanceTimersByTimeAsync(15_000)
+
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('Ending the call session of group-a failed'),
+      'database down',
+    )
+    expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+      groupId: 'a',
+      count: 0,
+    })
   })
 
   it('does not emit a duplicate zero when the disappeared room was already at 0', async () => {

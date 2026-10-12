@@ -13,6 +13,7 @@ describe('chat store', () => {
         showChat: false,
         chatUserId: null,
         groupId: null,
+        roomId: null,
         unreadRoomCount: 0,
       })
     })
@@ -24,12 +25,23 @@ describe('chat store', () => {
       expect(state).toMatchObject({ showChat: true, chatUserId: 'u1', groupId: 'g1' })
     })
 
+    it('stores a room opened by its id', () => {
+      mutations.SET_OPEN_CHAT(state, { showChat: true, roomId: 'r1' })
+      expect(state).toMatchObject({ showChat: true, chatUserId: null, groupId: null, roomId: 'r1' })
+    })
+
     it('falls back to safe defaults for missing values', () => {
       state.showChat = true
       state.chatUserId = 'u1'
       state.groupId = 'g1'
+      state.roomId = 'r1'
       mutations.SET_OPEN_CHAT(state, {})
-      expect(state).toMatchObject({ showChat: false, chatUserId: null, groupId: null })
+      expect(state).toMatchObject({
+        showChat: false,
+        chatUserId: null,
+        groupId: null,
+        roomId: null,
+      })
     })
   })
 

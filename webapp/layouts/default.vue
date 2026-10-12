@@ -16,10 +16,11 @@
     >
       <client-only>
         <chat
-          :key="getShowChat.groupId || getShowChat.chatUserId"
+          :key="getShowChat.roomId || getShowChat.groupId || getShowChat.chatUserId"
           singleRoom
           :userId="getShowChat.chatUserId"
           :groupId="getShowChat.groupId"
+          :roomId="getShowChat.roomId"
           @close-single-room="closeSingleRoom"
         />
       </client-only>
@@ -55,12 +56,14 @@ export default {
       videoCallMinimized: 'videoCall/minimized',
       videoCallGroupId: 'videoCall/groupId',
       videoCallPhase: 'videoCall/phase',
+      videoCallChatRoomId: 'videoCall/chatRoomId',
     }),
     chatLivesInVideoSidebar() {
       // Move the chat into the call's sidebar **only when the chat is for the
-      // very same group as the video call**. Otherwise (different group or no
-      // group, e.g. user chat) keep the floating chat-modul so the user
-      // doesn't lose their conversation when the video gets maximized.
+      // very same group as the video call** — or is the call's own conference
+      // chat. Otherwise (different group or no group, e.g. user chat) keep the
+      // floating chat-modul so the user doesn't lose their conversation when
+      // the video gets maximized.
       // The phase check (instead of a route check) lets the modul → sidebar
       // hand-off happen in the same reactive tick as the maximize click,
       // avoiding a brief moment with two chats visible side by side.
@@ -68,8 +71,8 @@ export default {
         this.showVideoCall &&
         !this.videoCallMinimized &&
         (this.videoCallPhase === 'in-call' || this.videoCallPhase === 'connecting') &&
-        !!this.getShowChat.groupId &&
-        this.getShowChat.groupId === this.videoCallGroupId
+        ((!!this.getShowChat.groupId && this.getShowChat.groupId === this.videoCallGroupId) ||
+          (!!this.getShowChat.roomId && this.getShowChat.roomId === this.videoCallChatRoomId))
       )
     },
     chatRenderedElsewhere() {
