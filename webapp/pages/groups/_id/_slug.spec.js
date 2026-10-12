@@ -939,10 +939,79 @@ describe('GroupProfileSlug', () => {
       const keys = (networkPermissions) =>
         GroupProfileSlug.computed.networkPermissionKeys.call({ networkPermissions })
 
-      it('refetches the group when they change', () => {
-        const reloadGroup = jest.fn()
-        GroupProfileSlug.watch.networkPermissionKeys.call({ reloadGroup })
+      // Real state behind the getter, so the rights change in the store the way they do in the
+      // app — on a permissionsChanged signal — and the page's watcher fires on its own.
+      const mountWithPermissions = (permissions) => {
+        const refetch = jest.fn()
+        currentUserMock.mockReturnValue(peterLustig)
+        const permissionStore = new Vuex.Store({
+          state: { permissions },
+          getters: { ...getters, 'auth/permissions': (state) => state.permissions },
+          actions,
+          mutations: {
+            ...mutations,
+            SET_PERMISSIONS(state, next) {
+              state.permissions = next
+            },
+          },
+        })
+        const wrapper = mount(GroupProfileSlug, {
+          localVue,
+          store: permissionStore,
+          stubs: {
+            ...stubs,
+            'infinite-loading': true,
+            'masonry-grid': true,
+            'masonry-grid-item': true,
+            'post-teaser': true,
+            'content-viewer': true,
+          },
+          mocks: {
+            ...mocks,
+            $apollo: {
+              loading: false,
+              mutate: jest.fn().mockResolvedValue(),
+              subscribe: jest.fn().mockReturnValue({
+                subscribe: jest.fn().mockReturnValue({ unsubscribe: jest.fn() }),
+              }),
+              queries: { chatRoom: { refetch: jest.fn() }, Group: { refetch } },
+            },
+          },
+          data: () => ({ group: { ...yogaPractice, ...groupRights('usual') } }),
+        })
+        const reloadGroup = jest.spyOn(wrapper.vm, 'reloadGroup')
+        return { wrapper, refetch, reloadGroup }
+      }
+
+      it('refetches the group when they change', async () => {
+        const { wrapper, refetch, reloadGroup } = mountWithPermissions([
+          { key: 'videoCall.create_open', group: 'communication' },
+        ])
+        expect(refetch).not.toHaveBeenCalled()
+
+        wrapper.vm.$store.commit('SET_PERMISSIONS', [
+          { key: 'videoCall.create_open', group: 'communication' },
+          { key: 'videoCall.create_restricted', group: 'communication' },
+        ])
+        await Vue.nextTick()
+
         expect(reloadGroup).toHaveBeenCalledTimes(1)
+        expect(refetch).toHaveBeenCalledTimes(1)
+      })
+
+      it('leaves the group alone when the same rights arrive again', async () => {
+        const { wrapper, refetch } = mountWithPermissions([
+          { key: 'videoCall.create_open', group: 'communication' },
+        ])
+
+        // A new list with the same content: what the store commits when the signal was about
+        // a role the viewer does not hold.
+        wrapper.vm.$store.commit('SET_PERMISSIONS', [
+          { key: 'videoCall.create_open', group: 'communication' },
+        ])
+        await Vue.nextTick()
+
+        expect(refetch).not.toHaveBeenCalled()
       })
 
       it('count as changed when a right is gained or lost', () => {
