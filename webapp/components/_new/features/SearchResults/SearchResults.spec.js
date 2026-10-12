@@ -32,6 +32,7 @@ describe('SearchResults', () => {
   beforeEach(() => {
     mocks = {
       $t: jest.fn(),
+      $policy: { get: (key) => key === 'groupsEnabled' },
       // Non-moderator viewer (children now gate via $can, not auth/isModerator).
       $can: (permission) =>
         [
@@ -256,6 +257,20 @@ describe('SearchResults', () => {
     })
   })
 
+  describe('tabs', () => {
+    const tabTypes = () => wrapper.vm.tabOptions.map((tab) => tab.type)
+
+    it('offers a group tab while groups are switched on', () => {
+      expect(tabTypes()).toEqual(['Post', 'User', 'Group', 'Hashtag'])
+    })
+
+    it('offers no group tab while groups are switched off', () => {
+      mocks.$policy = { get: () => false }
+      wrapper = Wrapper()
+      expect(tabTypes()).toEqual(['Post', 'User', 'Hashtag'])
+    })
+  })
+
   describe('searchGroups apollo wiring', () => {
     const { apollo } = SearchResults
 
@@ -285,12 +300,22 @@ describe('SearchResults', () => {
       })
     })
 
+    const groupsOn = { get: (key) => key === 'groupsEnabled' }
+
     it.each([
       ['', true],
       [undefined, true],
       ['berlin', false],
     ])('skip() gates the query on a present search term (search=%s -> skip=%s)', (search, skip) => {
-      expect(apollo.searchGroups.skip.call({ search })).toBe(skip)
+      expect(apollo.searchGroups.skip.call({ search, $policy: groupsOn })).toBe(skip)
+    })
+
+    // The server refuses searchGroups while groups are off, and during server-side rendering
+    // that refusal failed the whole search page.
+    it('skip() leaves the query out while groups are switched off', () => {
+      expect(
+        apollo.searchGroups.skip.call({ search: 'berlin', $policy: { get: () => false } }),
+      ).toBe(true)
     })
 
     it('update() maps groups + count and auto-selects the Group tab when only groups match', () => {

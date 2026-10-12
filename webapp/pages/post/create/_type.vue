@@ -161,7 +161,9 @@ export default {
     // First-time arrival via /post/create/:type?groupId=x — seed the draft.
     // A non-null draft.groupId (from a prior remount) wins to avoid clobbering
     // a user choice with a stale URL parameter.
-    if (!draft.groupId && this.$route.query.groupId) {
+    // Not while groups are switched off: there is no group to post into then, and nothing
+    // (myGroups stays empty) would clear the id again before a submit.
+    if (!draft.groupId && this.$route.query.groupId && this.$policy.get('groupsEnabled') === true) {
       draft.groupId = this.$route.query.groupId
     }
     // First-time arrival via the main map's "place a new event here" pin tool
@@ -290,6 +292,11 @@ export default {
     myGroups: {
       query() {
         return myGroupsForPostCreation()
+      },
+      // With groups switched off the server refuses the query — and during server-side
+      // rendering that refusal is the whole page failing, not an empty group list.
+      skip() {
+        return this.$policy.get('groupsEnabled') !== true
       },
       update({ Group }) {
         return Group || []

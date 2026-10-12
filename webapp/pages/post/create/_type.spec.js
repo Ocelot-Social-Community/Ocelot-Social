@@ -9,8 +9,9 @@ describe('create.vue', () => {
   let routerReplace
   let mocks
 
-  const makeMocks = ({ type = 'article', query = {} } = {}) => ({
+  const makeMocks = ({ type = 'article', query = {}, groupsEnabled = true } = {}) => ({
     $t: jest.fn((key) => key),
+    $policy: { get: (key) => key === 'groupsEnabled' && groupsEnabled },
     $route: {
       path: `/post/create/${type}`,
       params: { type },
@@ -67,6 +68,12 @@ describe('create.vue', () => {
       mocks = makeMocks({ query: { groupId: 'g1' } })
       wrapper = Wrapper()
       expect(wrapper.vm.draft.groupId).toBe('g1')
+    })
+
+    it('ignores a URL groupId while groups are switched off', () => {
+      mocks = makeMocks({ query: { groupId: 'g1' }, groupsEnabled: false })
+      wrapper = Wrapper()
+      expect(wrapper.vm.draft.groupId).toBe(null)
     })
 
     it('does not overwrite an existing draft.groupId with a stale URL query', () => {
@@ -596,6 +603,20 @@ describe('create.vue', () => {
       wrapper.vm.draft.groupId = 'g-unknown'
       await wrapper.vm.$nextTick()
       expect(wrapper.vm.selectedGroup).toBeNull()
+    })
+  })
+
+  describe('apollo myGroups', () => {
+    const { skip } = create.apollo.myGroups
+
+    // The server refuses Group while groups are off, and during server-side rendering that
+    // refusal failed every /post/create page.
+    it('skips the query while groups are switched off', () => {
+      expect(skip.call({ $policy: { get: () => false } })).toBe(true)
+    })
+
+    it('runs the query while groups are switched on', () => {
+      expect(skip.call({ $policy: { get: (key) => key === 'groupsEnabled' } })).toBe(false)
     })
   })
 })
