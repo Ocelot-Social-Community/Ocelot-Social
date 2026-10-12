@@ -2,7 +2,7 @@
   <div class="admin-users">
     <os-card>
       <h2 class="title">{{ $t('admin.users.name') }}</h2>
-      <form @submit.prevent="onSubmit" novalidate>
+      <form v-if="canSearch" @submit.prevent="onSubmit" novalidate>
         <div class="ds-flex ds-flex-gap-small">
           <!-- Input grows to fill so the search button sits flush right, aligning with
                the badge edit-button column in the results table below. -->
@@ -233,6 +233,12 @@ import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 // - status  → user.disable        (reversible disable/enable toggle; moderation-grade)
 // - delete  → user.delete.any     (irreversible; administration-grade)
 // A default moderator holds badge.manage + user.disable; delete is admin-only.
+
+// The rights the backend opens the role/free-text search to (resolvers/users.ts,
+// USER_ADMIN_SEARCH_NOT_PERMITTED otherwise). The list itself is open to more — a viewer
+// holding only user.disable reaches it through the moderation area.
+const SEARCH_PERMISSIONS = ['role.manage', 'badge.manage', 'user.delete.any', 'user.email.readAny']
+
 export default {
   mixins: [formValidation],
   components: {
@@ -323,6 +329,12 @@ export default {
     canDisableUsers() {
       return this.$can('user.disable')
     },
+    // Without one of these the search is refused. Not sending it matters most for a deep link
+    // (?q=…): the list is then fetched during server-side rendering, where the refusal is not
+    // a toast but the whole page failing with "Server error".
+    canSearch() {
+      return SEARCH_PERMISSIONS.some((permission) => this.$can(permission))
+    },
     // Only an owner may grant the owner role (mirrors the backend rule).
     isOwner() {
       return !!this.currentUser && this.currentUser.roleName === 'owner'
@@ -359,6 +371,7 @@ export default {
       variables() {
         const { offset, first, roleFilter, searchText } = this
         const variables = { first, offset }
+        if (!this.canSearch) return variables
         // Role + free text combine; the free text is a substring match across
         // name/slug/about/email (partial e-mail included) — no exact-e-mail case.
         if (roleFilter) variables.roleName = roleFilter

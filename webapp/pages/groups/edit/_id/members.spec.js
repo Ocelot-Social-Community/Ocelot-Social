@@ -170,6 +170,22 @@ describe('pages/groups/edit/_id/members.vue', () => {
       expect(variables).toEqual({ id: 'g1', first: 999999, includePending: true })
     })
 
+    it('asks only with both rights the backend checks for the list', () => {
+      // The tab opens for removing members or assigning roles; neither implies reading the
+      // list. Asked without it, the backend refused — during SSR the page was a "Server error".
+      const removeOnly = factory({ myGroupPermissions: ['group.member.remove'] })
+      const withoutRead = factory({
+        myGroupPermissions: ['group.member.remove', 'group.members.read'],
+      })
+      const reader = factory({
+        myGroupPermissions: ['group.member.remove', 'group.read', 'group.members.read'],
+      })
+
+      expect(apollo.skip.call(removeOnly.wrapper.vm)).toBe(true)
+      expect(apollo.skip.call(withoutRead.wrapper.vm)).toBe(true)
+      expect(apollo.skip.call(reader.wrapper.vm)).toBe(false)
+    })
+
     it('clears the list and toasts on error', () => {
       const ctx = {
         GroupMembers: [{ id: 'x' }],
