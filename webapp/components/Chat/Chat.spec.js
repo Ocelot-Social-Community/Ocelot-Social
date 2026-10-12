@@ -1638,6 +1638,35 @@ describe('Chat.vue', () => {
       expect(wrapper.vm.rooms).toEqual([])
     })
 
+    describe('cursor in the message field on opening a room', () => {
+      const openRoomWith = async (propsData) => {
+        wrapper = Wrapper(propsData)
+        await flushPromises()
+        const focus = jest.fn()
+        Object.defineProperty(wrapper.vm.$el, 'shadowRoot', {
+          configurable: true,
+          value: {
+            activeElement: null,
+            querySelector: (selector) => (selector === 'textarea#roomTextarea' ? { focus } : null),
+            appendChild: jest.fn(),
+          },
+        })
+        await wrapper.vm.fetchMessages({ room: mockRoom() })
+        await flushPromises()
+        return focus
+      }
+
+      it('is set by default', async () => {
+        const focus = await openRoomWith({})
+        expect(focus).toHaveBeenCalled()
+      })
+
+      it('is left alone where the keyboard would be in the way', async () => {
+        const focus = await openRoomWith({ autoFocus: false })
+        expect(focus).not.toHaveBeenCalled()
+      })
+    })
+
     it('says in the title which of the two chats it is', () => {
       wrapper = Wrapper()
       wrapper.vm.selectedRoom = wrapper.vm.fixRoomObject(callRoom())

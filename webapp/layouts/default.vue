@@ -69,7 +69,8 @@ export default {
       // avoiding a brief moment with two chats visible side by side.
       return (
         this.showVideoCall &&
-        !this.videoCallMinimized &&
+        // A phone has no parked call window: the call is always full screen there.
+        (!this.videoCallMinimized || this.isMobile) &&
         (this.videoCallPhase === 'in-call' || this.videoCallPhase === 'connecting') &&
         ((!!this.getShowChat.groupId && this.getShowChat.groupId === this.videoCallGroupId) ||
           (!!this.getShowChat.roomId && this.getShowChat.roomId === this.videoCallChatRoomId))
@@ -84,7 +85,9 @@ export default {
   },
   watch: {
     'getShowChat.showChat'(open) {
-      if (open && this.isMobile) {
+      // On a phone a chat opens on the chat page — except the chats of the call one is
+      // in, which the call shows itself, below the video.
+      if (open && this.isMobile && !this.chatLivesInVideoSidebar) {
         const { chatUserId, groupId } = this.getShowChat
         const query = {}
         if (chatUserId) query.userId = chatUserId

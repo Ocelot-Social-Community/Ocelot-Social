@@ -3032,6 +3032,83 @@ describe('VideoCall', () => {
     })
   })
 
+  describe('chat on a phone', () => {
+    const { computed } = VideoCall
+    const tile = (overrides) => ({ isLocal: false, isScreen: false, ...overrides })
+    const me = tile({ key: 'me', identity: 'me', isLocal: true })
+    const anna = tile({ key: 'anna', identity: 'anna' })
+    const ben = tile({ key: 'ben', identity: 'ben' })
+    const bensScreen = tile({ key: 'ben-screen', identity: 'ben', isScreen: true })
+
+    it('shows the chat inside the call on a phone as well', () => {
+      const ctx = { phase: 'in-call', chatOpenForThisCall: true, iconOnly: false }
+      expect(computed.showChatSidebar.call(ctx)).toBe(true)
+      expect(computed.mobileChatOpen.call({ isMobile: true, showChatSidebar: true })).toBe(true)
+      expect(computed.mobileChatOpen.call({ isMobile: false, showChatSidebar: true })).toBe(false)
+      expect(computed.mobileChatOpen.call({ isMobile: true, showChatSidebar: false })).toBe(false)
+    })
+
+    it('keeps the chat out of the parked window', () => {
+      const ctx = { phase: 'in-call', chatOpenForThisCall: true, iconOnly: true }
+      expect(computed.showChatSidebar.call(ctx)).toBe(false)
+    })
+
+    it('shrinks the stage to a single tile beside the chat', () => {
+      expect(computed.singleTile.call({ isFullscreen: true, mobileChatOpen: true })).toBe(true)
+      expect(computed.singleTile.call({ isFullscreen: true, mobileChatOpen: false })).toBe(false)
+      expect(computed.singleTile.call({ isFullscreen: false, mobileChatOpen: false })).toBe(true)
+      expect(computed.stageLayoutClass.call({ singleTile: true, spotlightTile: anna })).toBe(
+        'video-call__single',
+      )
+      expect(computed.gridStyleConditional.call({ singleTile: true, gridStyle: {} })).toBeNull()
+    })
+
+    it('keeps the grid and the spotlight for the full stage', () => {
+      expect(computed.stageLayoutClass.call({ singleTile: false, spotlightTile: null })).toBe(
+        'video-call__grid',
+      )
+      expect(computed.stageLayoutClass.call({ singleTile: false, spotlightTile: anna })).toBe(
+        'video-call__stage--spotlight',
+      )
+    })
+
+    it('shows whoever spoke last, by their camera rather than their screen', () => {
+      const ctx = {
+        tiles: [me, anna, bensScreen, ben],
+        lastRemoteSpeakerId: 'ben',
+        primaryTile: anna,
+      }
+      expect(computed.speakerTile.call(ctx)).toBe(ben)
+    })
+
+    it('shows what the parked window would before anybody has spoken', () => {
+      const ctx = { tiles: [me, anna, ben], lastRemoteSpeakerId: null, primaryTile: anna }
+      expect(computed.speakerTile.call(ctx)).toBe(anna)
+    })
+
+    it('falls back when the last speaker has left', () => {
+      const ctx = { tiles: [me, anna], lastRemoteSpeakerId: 'ben', primaryTile: anna }
+      expect(computed.speakerTile.call(ctx)).toBe(anna)
+    })
+
+    it('picks the speaker beside the chat and the primary tile in the parked window', () => {
+      const ctx = { speakerTile: ben, primaryTile: anna }
+      expect(computed.soloTile.call({ ...ctx, mobileChatOpen: true })).toBe(ben)
+      expect(computed.soloTile.call({ ...ctx, mobileChatOpen: false })).toBe(anna)
+    })
+
+    it('remembers the remote participant heard last, not the user themselves', () => {
+      const ctx = { tiles: [me, anna, ben], lastRemoteSpeakerId: null }
+      VideoCall.watch.activeSpeakerIds.call(ctx, ['me'])
+      expect(ctx.lastRemoteSpeakerId).toBeNull()
+      VideoCall.watch.activeSpeakerIds.call(ctx, ['me', 'ben'])
+      expect(ctx.lastRemoteSpeakerId).toBe('ben')
+      // Silence does not take the face away.
+      VideoCall.watch.activeSpeakerIds.call(ctx, [])
+      expect(ctx.lastRemoteSpeakerId).toBe('ben')
+    })
+  })
+
   describe('joinCallChat', () => {
     const room = { name: 'the room' }
     const context = (mutate, overrides = {}) => ({

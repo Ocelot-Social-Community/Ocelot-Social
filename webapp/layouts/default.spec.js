@@ -70,4 +70,78 @@ describe('default.vue', () => {
       expect(wrapper.classes('layout-default')).toBe(true)
     })
   })
+
+  describe('chat of the running video call', () => {
+    const lives = (overrides = {}) =>
+      Default.computed.chatLivesInVideoSidebar.call({
+        showVideoCall: true,
+        videoCallMinimized: false,
+        videoCallPhase: 'in-call',
+        videoCallGroupId: 'g1',
+        videoCallChatRoomId: 'room-1',
+        isMobile: false,
+        getShowChat: { showChat: true, chatUserId: null, groupId: null, roomId: null },
+        ...overrides,
+      })
+
+    it('is shown by the call for the chat of its group', () => {
+      expect(lives({ getShowChat: { showChat: true, groupId: 'g1', roomId: null } })).toBe(true)
+    })
+
+    it('is shown by the call for its conference chat', () => {
+      expect(lives({ getShowChat: { showChat: true, groupId: null, roomId: 'room-1' } })).toBe(true)
+    })
+
+    it('is not shown by the call for any other chat', () => {
+      expect(lives({ getShowChat: { showChat: true, groupId: 'g2', roomId: null } })).toBe(false)
+      expect(lives({ getShowChat: { showChat: true, groupId: null, roomId: 'room-2' } })).toBe(
+        false,
+      )
+    })
+
+    it('moves to the floating window while the call is parked', () => {
+      expect(
+        lives({
+          videoCallMinimized: true,
+          getShowChat: { showChat: true, groupId: null, roomId: 'room-1' },
+        }),
+      ).toBe(false)
+    })
+
+    it('stays with the call on a phone, which has no parked window', () => {
+      expect(
+        lives({
+          videoCallMinimized: true,
+          isMobile: true,
+          getShowChat: { showChat: true, groupId: null, roomId: 'room-1' },
+        }),
+      ).toBe(true)
+    })
+
+    describe('opening a chat on a phone', () => {
+      const open = (chatLivesInVideoSidebar) => {
+        const ctx = {
+          isMobile: true,
+          chatLivesInVideoSidebar,
+          getShowChat: { showChat: true, chatUserId: null, groupId: 'g1', roomId: null },
+          showChat: jest.fn(),
+          $route: { path: '/groups/g1/yoga' },
+          $router: { push: jest.fn(), replace: jest.fn() },
+        }
+        Default.watch['getShowChat.showChat'].call(ctx, true)
+        return ctx
+      }
+
+      it('leaves the chats of the call to the call', () => {
+        const ctx = open(true)
+        expect(ctx.$router.push).not.toHaveBeenCalled()
+        expect(ctx.showChat).not.toHaveBeenCalled()
+      })
+
+      it('takes every other chat to the chat page', () => {
+        const ctx = open(false)
+        expect(ctx.$router.push).toHaveBeenCalledWith({ path: '/chat', query: { groupId: 'g1' } })
+      })
+    })
+  })
 })

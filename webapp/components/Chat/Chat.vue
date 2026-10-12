@@ -186,6 +186,12 @@ export default {
       type: String,
       default: null,
     },
+    // Whether opening a room puts the cursor into the message field. Off where that would
+    // be unwelcome: on a phone it brings up the keyboard over what one came to read.
+    autoFocus: {
+      type: Boolean,
+      default: true,
+    },
     // When true the chat fills its parent container instead of using the
     // chat-modul's viewport-based height calc. Used by the in-call sidebar.
     fitParent: {
@@ -751,7 +757,7 @@ export default {
       // the user is actively typing in the filter.
       const shadowRoot = this.$el?.shadowRoot
       const userIsFiltering = shadowRoot?.activeElement?.matches?.('input[type="search"].vac-input')
-      if (!userIsFiltering) {
+      if (!userIsFiltering && this.autoFocus) {
         this.$nextTick(() => {
           this.$el?.shadowRoot?.querySelector('textarea#roomTextarea')?.focus()
         })

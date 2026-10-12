@@ -78,7 +78,7 @@
         </div>
       </div>
 
-      <div v-else class="video-call__body">
+      <div v-else :class="['video-call__body', { 'video-call__body--chat-below': mobileChatOpen }]">
         <div v-if="phase === 'connecting'" class="video-call__status">
           {{ $t('videoCall.connecting') }}
         </div>
@@ -140,7 +140,7 @@
             </div>
           </div>
           <div
-            v-if="isFullscreen && activeSpeakers.length"
+            v-if="isFullscreen && !mobileChatOpen && activeSpeakers.length"
             class="video-call__speakers"
             :aria-label="$t('videoCall.activeSpeakers')"
           >
@@ -177,9 +177,9 @@
               :camera-starting="isOwnCameraTile(tile) && devicesStarting.videoinput > 0"
               :mic-starting="isOwnCameraTile(tile) && devicesStarting.audioinput > 0"
               :avatar-size="tileAvatarSize(tile)"
-              :clickable="isFullscreen"
+              :clickable="isFullscreen && !mobileChatOpen"
               :class="{
-                'video-tile--hidden': !isFullscreen && primaryTile && tile.key !== primaryTile.key,
+                'video-tile--hidden': singleTile && soloTile && tile.key !== soloTile.key,
                 'video-tile--spotlighted': !!(spotlightTile && tile.key === spotlightTile.key),
               }"
               @select="onTileSelect"
@@ -215,6 +215,7 @@
                 fitParent
                 :groupId="activeChatTab === 'group' ? groupId : null"
                 :roomId="activeChatTab === 'call' ? chatRoomId : null"
+                :autoFocus="!isMobile"
                 @close-single-room="closeInCallChat"
               />
             </client-only>
@@ -320,7 +321,6 @@
           />
         </div>
         <os-button
-          v-if="!isMobile"
           v-tooltip="iconOnlyTooltip(chatLabel)"
           :variant="chatOpenForThisCall ? 'primary' : 'default'"
           appearance="outline"
@@ -477,6 +477,9 @@ export default {
       // Unread messages in the call's conference chat. It is kept out of the
       // header's chat badge, so the call's own chat button is where they show.
       conferenceUnread: 0,
+      // The remote participant heard last. Whoever spoke stays on screen next to
+      // the chat on a phone until somebody else speaks (see speakerTile).
+      lastRemoteSpeakerId: null,
     }
   },
   computed: {
@@ -512,10 +515,31 @@ export default {
     },
     showChatSidebar() {
       // Embedded in the maximized call view. In the minimized/parked state the
-      // chat continues to live in the chat-modul (layouts/default.vue).
-      return (
-        this.phase === 'in-call' && this.chatOpenForThisCall && !this.iconOnly && !this.isMobile
+      // chat continues to live in the chat-modul (layouts/default.vue). On a
+      // phone the call is always full screen and the chat takes the place below
+      // a single small tile (see mobileChatOpen).
+      return this.phase === 'in-call' && this.chatOpenForThisCall && !this.iconOnly
+    },
+    // On a phone there is no room for the chat beside the videos: it goes below,
+    // and the stage shrinks to one small tile, the person speaking.
+    mobileChatOpen() {
+      return this.isMobile && this.showChatSidebar
+    },
+    // Whether the stage shows one tile only: in the parked window, and next to the
+    // chat on a phone. The others stay mounted, so their sound keeps playing.
+    singleTile() {
+      return !this.isFullscreen || this.mobileChatOpen
+    },
+    soloTile() {
+      return this.mobileChatOpen ? this.speakerTile : this.primaryTile
+    },
+    speakerTile() {
+      // The camera of whoever spoke last — a face to go with the voice while one
+      // reads and writes. Before anybody has spoken, what the parked window shows.
+      const speaker = this.tiles.find(
+        (t) => t.identity === this.lastRemoteSpeakerId && !t.isScreen && !t.isLocal,
       )
+      return speaker || this.primaryTile
     },
     chatTabs() {
       const callLabel = this.$t('videoCall.chatTabs.call')
@@ -658,13 +682,14 @@ export default {
       return this.tiles.find((t) => t.key === this.spotlightKey) || null
     },
     stageLayoutClass() {
-      if (this.spotlightTile && this.isFullscreen) return 'video-call__stage--spotlight'
-      return this.isFullscreen ? 'video-call__grid' : 'video-call__single'
+      if (this.singleTile) return 'video-call__single'
+      return this.spotlightTile ? 'video-call__stage--spotlight' : 'video-call__grid'
     },
     gridStyleConditional() {
       // The grid template only applies for the regular grid view. Spotlight
-      // and single (minimized) modes have their own static layouts.
-      if (this.spotlightTile || !this.isFullscreen) return null
+      // and single (minimized, or beside the chat on a phone) modes have their
+      // own static layouts.
+      if (this.spotlightTile || this.singleTile) return null
       return this.gridStyle
     },
     screenShareSupported() {
@@ -759,6 +784,10 @@ export default {
         // the same reactive tick as the local phase change.
         this.setStorePhase(next || 'idle')
       },
+    },
+    activeSpeakerIds(ids) {
+      const remote = ids.find((id) => this.tiles.some((t) => t.identity === id && !t.isLocal))
+      if (remote) this.lastRemoteSpeakerId = remote
     },
     chatRoomId(next, previous) {
       this.conferenceUnread = 0
@@ -1940,6 +1969,7 @@ export default {
       this.prefetched = null
       // The conference chat belongs to the call just left (see the chatRoomId watcher).
       this.setChatRoomId(null)
+      this.lastRemoteSpeakerId = null
       // CRITICAL: do NOT set phase = 'prejoin' here. leave() runs cleanup()
       // BEFORE close(), so the Vuex `show` flag is still true when cleanup
       // finishes. A prejoin phase would make the template re-mount <pre-join>
@@ -2199,6 +2229,34 @@ export default {
 .video-call__sidebar > * {
   flex: 1;
   min-height: 0;
+}
+
+/*  On a phone the chat goes below the videos instead of beside them, and the stage */
+/*  shrinks to one small tile — the person speaking — so the voice keeps a face */
+/*  while the rest of the screen is for reading and writing. */
+.video-call__body--chat-below {
+  flex-direction: column;
+}
+
+.video-call__body--chat-below .video-call__stage {
+  flex: 0 0 auto;
+  height: 22vh;
+  min-height: 110px;
+}
+
+.video-call__body--chat-below .video-call__sidebar {
+  flex: 1 1 0;
+  max-width: none;
+  min-height: 0;
+  border-left: 0;
+  border-top: 1px solid var(--color-neutral-85);
+}
+
+/*  The notices sit at the bottom of the body, which is the chat here: keep them */
+/*  on the videos. */
+.video-call__body--chat-below .video-call__notices {
+  top: var(--space-x-small);
+  bottom: auto;
 }
 
 /*  The choice between the call's two chats sits above the chat, at its own height. */
