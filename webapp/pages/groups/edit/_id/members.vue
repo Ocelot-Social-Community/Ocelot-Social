@@ -98,6 +98,17 @@ export default {
           includePending: true,
         }
       },
+      // The tab opens for removing members OR for assigning roles, and neither implies reading
+      // the list, which the backend asks for on its own (group.read and group.members.read). A
+      // role edited to hold one without the other got a refusal — during server-side rendering
+      // the whole page failing with "Server error". Without the list the tab still offers
+      // what the viewer may do: adding a member.
+      skip() {
+        return !(
+          this.canInGroup('group.read', this.group) &&
+          this.canInGroup('group.members.read', this.group)
+        )
+      },
       error(error) {
         this.GroupMembers = []
         this.$toastBackendError(error)

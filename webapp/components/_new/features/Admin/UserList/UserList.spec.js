@@ -206,7 +206,38 @@ describe('UserList', () => {
         expect(wrapper.find('[data-test="user-disable-user"]').exists()).toBe(true)
         expect(wrapper.find('[data-test="user-delete-user"]').exists()).toBe(false)
       })
+
+      // The backend refuses the search without a user-administration right. A deep link
+      // (?q=…) sent it anyway, and during server-side rendering the refusal was the whole
+      // page failing with "Server error".
+      it('offers no search', () => {
+        expect(wrapper.find('form').exists()).toBe(false)
+      })
+
+      it('does not send a deep-linked search', () => {
+        mocks.$route = { query: { q: 'role:admin anna' } }
+        const deepLinked = Wrapper()
+        const variables = deepLinked.vm.$options.apollo.User.variables.call(deepLinked.vm)
+        expect(variables).toEqual({ first: 15, offset: 0 })
+      })
     })
+
+    describe.each(['role.manage', 'badge.manage', 'user.delete.any', 'user.email.readAny'])(
+      'a viewer holding %s',
+      (right) => {
+        beforeEach(() => {
+          mocks.$can = jest.fn((permission) => permission === right)
+          mocks.$route = { query: { q: 'anna' } }
+          wrapper = Wrapper()
+        })
+
+        it('may search, deep-linked too', () => {
+          expect(wrapper.find('form').exists()).toBe(true)
+          const variables = wrapper.vm.$options.apollo.User.variables.call(wrapper.vm)
+          expect(variables).toEqual({ first: 15, offset: 0, search: 'anna' })
+        })
+      },
+    )
   })
 
   describe('delete user', () => {
