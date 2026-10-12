@@ -256,6 +256,9 @@ import {
 import scrollToContent from './scroll-to-content.js'
 
 export default {
+  // A bookmark outlives the policy: without the guard, opening this page while API keys are off
+  // asks the server for myApiKeys, which it refuses.
+  middleware: ['apiKeysEnabled'],
   mixins: [scrollToContent],
   components: {
     OsButton,
