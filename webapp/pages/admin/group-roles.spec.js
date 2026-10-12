@@ -113,6 +113,25 @@ describe('admin/group-roles.vue', () => {
     return wrapper
   }
 
+  // Re-entering the page has to show what was saved, not what the cache held before (#10490).
+  describe('loading the templates', () => {
+    it('asks the server on every visit rather than answering from the cache', () => {
+      expect(groupRoles.apollo.templatesQuery.fetchPolicy).toBe('cache-and-network')
+    })
+
+    it('skips the cached answer that arrives before the server has answered', async () => {
+      const wrapper = await Wrapper()
+      const stale = TEMPLATES.map((template) => ({ ...template, roles: [] }))
+
+      wrapper.vm.$options.apollo.templatesQuery.result.call(wrapper.vm, {
+        loading: true,
+        data: { groupPermissionCatalog: CATALOG, groupRoleTemplates: stale },
+      })
+
+      expect(wrapper.vm.templates).toEqual(TEMPLATES)
+    })
+  })
+
   // The matrix unfolds UNDER the sentences rather than replacing them, so a hovered sentence can
   // point at the rows it stands for. Only one of the two may hold a draft at a time.
   const advanced = async () => {
