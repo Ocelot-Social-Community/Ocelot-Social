@@ -706,7 +706,7 @@ describe('metadata.ogImage', () => {
 
   const withLogo = (body, name) =>
     brandDir({
-      config: `export default (d) => d({ logos: { signupPath: 'assets/${name}' } })\n`,
+      config: `export default (d) => d({ metadata: { applicationName: 'Acme' }, logos: { signupPath: 'assets/${name}' } })\n`,
       assets: { [name]: body },
     })
 
@@ -724,6 +724,8 @@ describe('metadata.ogImage', () => {
       assert.equal(metadata.ogImageWidth, '600')
       assert.equal(metadata.ogImageHeight, '600')
       assert.equal(metadata.ogImageType, 'image/png')
+      // The vanilla alt text names the ocelot logo; the brand's logo is the brand's.
+      assert.equal(metadata.ogImageAlt, 'Acme Logo')
     })
 
     // The stage brand's case: its squared logo is an SVG, the previews showed nothing at all.
@@ -733,6 +735,7 @@ describe('metadata.ogImage', () => {
 
       assert.equal(metadata.ogImage, '/img/custom/logo-squared.png')
       assert.equal(metadata.ogImageType, 'image/png')
+      assert.equal(metadata.ogImageAlt, 'ocelot.social Logo') // still the vanilla picture
       assert.match(
         await ogWarnings(dir),
         /no metadata\.ogImage, and the squared logo 'assets\/logo-squared\.svg' is SVG, which link previews do not render/,
@@ -754,10 +757,13 @@ describe('metadata.ogImage', () => {
       const external = (url) =>
         brandDir({ config: `export default (d) => d({ logos: { signupPath: '${url}' } })\n` })
 
-      assert.equal(
-        (await metadataOf(external('https://cdn.example/logo.png'))).ogImage,
-        'https://cdn.example/logo.png',
-      )
+      const followed = await metadataOf(external('https://cdn.example/logo.png'))
+      assert.equal(followed.ogImage, 'https://cdn.example/logo.png')
+      // Unmeasured, so unannounced: the vanilla 1200×1140 PNG says nothing about this file.
+      assert.equal(followed.ogImageWidth, '')
+      assert.equal(followed.ogImageHeight, '')
+      assert.equal(followed.ogImageType, '')
+      assert.equal(followed.ogImageAlt, 'ocelot.social Logo') // applicationName left at the default
       assert.equal(
         (await metadataOf(external('https://cdn.example/logo.svg?v=2'))).ogImage,
         '/img/custom/logo-squared.png',
@@ -788,6 +794,8 @@ describe('metadata.ogImage', () => {
       assert.equal(metadata.ogImageWidth, '1200')
       assert.equal(metadata.ogImageHeight, '630')
       assert.equal(metadata.ogImageType, 'image/png')
+      // Only the brand can describe its own picture; the vanilla text describes the ocelot logo.
+      assert.equal(metadata.ogImageAlt, '')
       assert.equal(await ogWarnings(dir), '')
     })
 
@@ -810,17 +818,21 @@ describe('metadata.ogImage', () => {
       )
     })
 
-    test('keeps what is set for a file it cannot read', async () => {
+    test('keeps what the brand set for a file it cannot read, and drops what it inherited', async () => {
       const external = brandDir({
-        config: `export default (d) => d({ metadata: { ogImage: 'https://cdn.example/og.png', ogImageWidth: '800' } })\n`,
+        config: `export default (d) => d({ metadata: { ogImage: 'https://cdn.example/og.png', ogImageWidth: '800', ogImageAlt: 'Our banner' } })\n`,
       })
       const missing = brandDir({
         config: `export default (d) => d({ metadata: { ogImage: 'assets/og.png' } })\n`,
       })
 
-      assert.equal((await metadataOf(external)).ogImage, 'https://cdn.example/og.png')
-      assert.equal((await metadataOf(external)).ogImageWidth, '800')
-      assert.equal((await metadataOf(missing)).ogImageWidth, '1200')
+      const fromCdn = await metadataOf(external)
+      assert.equal(fromCdn.ogImage, 'https://cdn.example/og.png')
+      assert.equal(fromCdn.ogImageWidth, '800')
+      assert.equal(fromCdn.ogImageAlt, 'Our banner')
+      assert.equal(fromCdn.ogImageHeight, '')
+      assert.equal(fromCdn.ogImageType, '')
+      assert.equal((await metadataOf(missing)).ogImageWidth, '')
       assert.equal(await ogWarnings(missing), '') // reported once, as "referenced asset not found"
     })
   })

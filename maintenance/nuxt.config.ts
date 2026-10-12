@@ -105,7 +105,8 @@ export default defineNuxtConfig({
         { property: "og:image:width", content: og.OG_IMAGE_WIDTH },
         { property: "og:image:height", content: og.OG_IMAGE_HEIGHT },
         { property: "og:image:type", content: og.OG_IMAGE_TYPE },
-      ],
+        // A field the brand build cleared (it would describe the vanilla image) is omitted, not empty.
+      ].filter((tag) => tag.content),
       // `tagPriority: "low"` puts these AFTER the bundled css above — the position the brand sheet
       // held while it was the last entry in `css`. Without it unhead emits config head tags before
       // the build's own stylesheet links, and a brand rule would lose every tie on specificity.

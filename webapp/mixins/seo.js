@@ -1,7 +1,8 @@
 import metadata from '~/constants/metadata'
 
-// Link previews (Discord, Facebook, X, the messengers) do not resolve a relative og:image against the
-// page — they show no image at all. The origin is the CONFIGURED one rather than the request's Host
+// The Open Graph spec asks for an absolute og:image URL. Discord resolves a relative one against the
+// page, but a link preview cannot count on every crawler doing so — one that does not shows no image
+// at all. The origin is the CONFIGURED one rather than the request's Host
 // header: a client controls that header, and a cache in front of the webapp would replay the image URL
 // it injected to everybody else. Without a configured origin the path stays as it is.
 export const absoluteUrl = (path, origin) => {
@@ -48,7 +49,11 @@ export default {
         { hid: 'og:image:width', property: 'og:image:width', content: metadata.OG_IMAGE_WIDTH },
         { hid: 'og:image:height', property: 'og:image:height', content: metadata.OG_IMAGE_HEIGHT },
         { hid: 'og:image:type', property: 'og:image:type', content: metadata.OG_IMAGE_TYPE },
-      ].filter((tag) => tag.content),
+        // An empty value is SKIPPED, not filtered out: nuxt.config.js carries a build-time tag under the
+        // same hid, holding the vanilla value — dropping ours would let that one through, and a brand
+        // that clears a field (branding's resolveOgImage drops the vanilla image size) would announce
+        // the vanilla one again. vue-meta merges by hid first, then renders no tag marked `skip`.
+      ].map((tag) => (tag.content ? tag : { ...tag, skip: true })),
     }
   },
 }

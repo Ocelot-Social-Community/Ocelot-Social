@@ -533,8 +533,29 @@ function readBrandFile(dir: string, rel: string): Buffer | null {
  *
  * Width, height and type are measured from the file whenever this build can read it, never inherited:
  * the defaults describe the vanilla PNG, and kept next to a brand's image they announce the wrong
- * picture. A file this build cannot inspect (an external URL, a framework path) keeps what is set.
+ * picture. For a file this build cannot inspect (an external URL, a framework path) only what the
+ * brand set itself stays; the inherited values are dropped (see dropInheritedOgFields).
  */
+/**
+ * Clear what the vanilla defaults say about the vanilla picture once another image takes its place.
+ * Only fields still AT the default: a value the brand set is its own statement about its image. An
+ * empty field makes the consumers omit the tag — the Open Graph size and type are optional, and a
+ * preview that measures the image itself beats one that trusts a wrong size. The alt text of a logo
+ * standing in can still be written truthfully; for a brand's own image only the brand knows it.
+ */
+function dropInheritedOgFields(config: BrandingConfig, logoStandsIn: boolean): void {
+  const metadata = config.metadata
+  const defaults = brandingDefaults.metadata
+  for (const key of ['ogImageWidth', 'ogImageHeight', 'ogImageType'] as const) {
+    if (metadata[key] === defaults[key]) {
+      metadata[key] = ''
+    }
+  }
+  if (metadata.ogImageAlt === defaults.ogImageAlt) {
+    metadata.ogImageAlt = logoStandsIn ? `${metadata.applicationName} Logo` : ''
+  }
+}
+
 function resolveOgImage(dir: string, id: string, config: BrandingConfig, warnings: string[]): void {
   const metadata = config.metadata
   const ownImage = metadata.ogImage !== brandingDefaults.metadata.ogImage
@@ -542,12 +563,18 @@ function resolveOgImage(dir: string, id: string, config: BrandingConfig, warning
   if (!ownImage && (!logo || logo === brandingDefaults.logos.signupPath)) {
     return
   }
+  // An own image replaces the vanilla one whatever its file turns out to be (a broken one is warned
+  // about below, not swapped back), so the defaults describe nothing on the page any more.
+  if (ownImage) {
+    dropInheritedOgFields(config, false)
+  }
   const rel = ownImage ? metadata.ogImage : logo
   if (!isRelativeAsset(rel)) {
     // Nothing to measure. An own image is the brand's call; a logo elsewhere can only be judged by its
     // name, and an .svg one is exactly the file this function exists to keep out of the previews.
     if (!ownImage && !/\.svg([?#]|$)/i.test(rel)) {
       metadata.ogImage = rel
+      dropInheritedOgFields(config, true)
     }
     return
   }
@@ -571,6 +598,9 @@ function resolveOgImage(dir: string, id: string, config: BrandingConfig, warning
     return
   }
   metadata.ogImage = rel
+  if (!ownImage) {
+    dropInheritedOgFields(config, true)
+  }
   metadata.ogImageWidth = String(image.width)
   metadata.ogImageHeight = String(image.height)
   metadata.ogImageType = OG_IMAGE_TYPES[image.format]

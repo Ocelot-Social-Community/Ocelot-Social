@@ -17,6 +17,8 @@ jest.mock('~/constants/metadata', () => ({
   },
 }))
 
+const mockMetadata = jest.requireMock('~/constants/metadata').default
+
 describe('seo mixin', () => {
   it('returns locale, route body class, and runtime-branded title + OG meta via head()', () => {
     const ctx = {
@@ -53,6 +55,25 @@ describe('seo mixin', () => {
     const head = seo.head.call(ctx)
     expect(head.htmlAttrs).toEqual({ lang: 'en' })
     expect(head.bodyAttrs).toEqual({ class: 'page-name-undefined' })
+  })
+
+  // nuxt.config.js holds a build-time tag under the same hid with the VANILLA value. Filtering an empty
+  // field out would let that one through — the brand build clears the vanilla image size on purpose.
+  it('skips an empty field instead of dropping it, so the build-time fallback cannot resurface', () => {
+    const width = mockMetadata.OG_IMAGE_WIDTH
+    mockMetadata.OG_IMAGE_WIDTH = ''
+    try {
+      const ctx = { $i18n: { locale: () => 'en' }, $route: { name: 'index' }, $env: {} }
+      const tag = seo.head.call(ctx).meta.find((t) => t.hid === 'og:image:width')
+      expect(tag).toEqual({
+        hid: 'og:image:width',
+        property: 'og:image:width',
+        content: '',
+        skip: true,
+      })
+    } finally {
+      mockMetadata.OG_IMAGE_WIDTH = width
+    }
   })
 
   it('leaves og:image relative when no public origin is configured', () => {

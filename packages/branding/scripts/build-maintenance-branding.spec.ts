@@ -297,6 +297,8 @@ describe('build-maintenance-branding', () => {
   // never serves — it has to be rewritten to the copy that IS served, or every link preview 404s.
   test('serves a raster squared logo as OG image, with its measured size', () => {
     const from = brandDir()
+    // Signature + IHDR only: the build reads dimensions from the header and decodes nothing, so a
+    // longer file would test nothing more (see lib/imageSize.ts).
     const png = Buffer.alloc(24)
     Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(png)
     png.write('IHDR', 12, 'ascii')
@@ -317,6 +319,7 @@ describe('build-maintenance-branding', () => {
     assert.equal(meta.OG_IMAGE, '/brand/logo-squared.png')
     assert.equal(meta.OG_IMAGE_WIDTH, '600')
     assert.equal(meta.OG_IMAGE_TYPE, 'image/png')
+    assert.equal(meta.OG_IMAGE_ALT, 'Acme Logo')
   })
 
   // Without this the page kept its own committed public/favicon.ico — the vanilla ocelot icon — for
