@@ -43,7 +43,7 @@ vi.mock('@src/graphql/resolvers/videoCalls', () => ({
 // Ending the call session is the database's business (callSession.spec.ts); here it only
 // has to be asked for, and must not reach a real database.
 const mockEndCallSession = vi.fn<(...args: unknown[]) => Promise<void>>()
-const mockEndOfMissingRoom = vi.fn<(...args: unknown[]) => Promise<void>>()
+const mockEndOfMissingRoom = vi.fn<(...args: unknown[]) => Promise<boolean>>()
 vi.mock('@src/livekit/callSession', () => ({
   __esModule: true,
   endCallSession: async (...args: unknown[]) => mockEndCallSession(...args),
@@ -78,6 +78,8 @@ vi.mock('@src/config', () => ({
 // Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
 // registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { registerLiveKitWebhook } = await import('./webhook')
+// The real one: what the webhook hands to the poller is read back from it.
+const { takeToldRooms } = await import('./toldRooms')
 
 type CapturedHandler = (req: any, res: any) => void
 
@@ -135,7 +137,9 @@ beforeEach(() => {
   mockPublish.mockReset().mockResolvedValue(undefined)
   mockGetCount.mockReset().mockResolvedValue(0)
   mockEndCallSession.mockReset().mockResolvedValue(undefined)
-  mockEndOfMissingRoom.mockReset().mockResolvedValue(undefined)
+  // Settled at once, unless a test says otherwise.
+  mockEndOfMissingRoom.mockReset().mockResolvedValue(true)
+  takeToldRooms()
   mockLogger.info.mockReset()
   mockLogger.warn.mockReset()
   mockLogger.error.mockReset()
@@ -321,6 +325,35 @@ describe('registerLiveKitWebhook', () => {
 
       expect(mockEndOfMissingRoom).toHaveBeenCalledWith('driver', 'group-finished')
       expect(mockEndCallSession).not.toHaveBeenCalled()
+    })
+
+    it('leaves a session spared by name to the poller', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished' },
+      })
+      mockEndOfMissingRoom.mockResolvedValueOnce(false)
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect([...takeToldRooms()]).toEqual(['group-finished'])
+    })
+
+    it('does not bother the poller when the session is settled, by name or by sid', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished' },
+      })
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished', sid: 'RM_finished' },
+      })
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect([...takeToldRooms()]).toEqual([])
     })
 
     it('leaves the call session alone while the room is still there', async () => {
