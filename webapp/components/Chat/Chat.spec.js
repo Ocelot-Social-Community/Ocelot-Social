@@ -1794,14 +1794,20 @@ describe('Chat.vue', () => {
         URL.createObjectURL = createObjectURL
         URL.revokeObjectURL = revokeObjectURL
         const click = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+        jest.useFakeTimers()
         try {
           await wrapper.vm.exportRoom()
           expect(createObjectURL).toHaveBeenCalledWith(expect.any(Blob))
           expect(click).toHaveBeenCalledTimes(1)
+          // The blob is kept until the browser has had time to start the download …
+          expect(revokeObjectURL).not.toHaveBeenCalled()
+          jest.runOnlyPendingTimers()
+          // … and released then.
           expect(click.mock.instances[0].download).toMatch(/^chat_Yoga_\d{4}-\d\d-\d\d_.+\.txt$/)
           expect(revokeObjectURL).toHaveBeenCalledWith('blob:export')
           expect(wrapper.vm.exporting).toBe(false)
         } finally {
+          jest.useRealTimers()
           click.mockRestore()
           URL.createObjectURL = original.create
           URL.revokeObjectURL = original.revoke

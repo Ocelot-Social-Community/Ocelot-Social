@@ -385,6 +385,30 @@ describe('registerLiveKitWebhook', () => {
       expect(res.status).toHaveBeenCalledWith(204)
     })
 
+    it('leaves a session it failed to end to the poller, by sid', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished', sid: 'RM_finished' },
+      })
+      mockEndCallSession.mockRejectedValueOnce(new Error('database down'))
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect([...takeToldRooms()]).toEqual(['group-finished'])
+    })
+
+    it('leaves a session it failed to end to the poller, by name', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished' },
+      })
+      mockEndOfMissingRoom.mockRejectedValueOnce(new Error('database down'))
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect([...takeToldRooms()]).toEqual(['group-finished'])
+    })
+
     it('ignores unrelated event names', async () => {
       mockReceive.mockResolvedValueOnce({
         event: 'track_published',

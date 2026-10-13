@@ -115,6 +115,9 @@ export const registerLiveKitWebhook = (app: Express) => {
         // eslint-disable-next-line no-catch-all/no-catch-all
       } catch (err: unknown) {
         logger.error('Failed to end the call session of a finished LiveKit room', err)
+        // Left to the poller as well: it asks again on its next run, by which time whatever
+        // failed here may be over.
+        markRoomTold(roomName)
       }
     }
     res.status(204).end()

@@ -159,6 +159,8 @@ const EMPTY_ACTIONS = JSON.stringify([])
 const ROOM_PAGE_SIZE = 10
 const MESSAGE_PAGE_SIZE = 20
 const EXPORT_PAGE_SIZE = 100
+// How long the exported file's blob URL is kept after the download was asked for.
+const EXPORT_URL_RELEASE_MS = 1000
 
 export default {
   name: 'Chat',
@@ -1309,7 +1311,9 @@ export default {
         document.body.appendChild(link)
         link.click()
         link.remove()
-        URL.revokeObjectURL(url)
+        // Not at once: the click only asks the browser to start the download, and some
+        // browsers have not picked the blob up yet when it returns.
+        setTimeout(() => URL.revokeObjectURL(url), EXPORT_URL_RELEASE_MS)
       } catch (error) {
         this.$toastBackendError(error)
       } finally {
