@@ -8,11 +8,17 @@
 //
 // What needs asking, and what does not:
 //
-//   reading    `group.content.read.any_*` and `group.moderate.any_*` bring the reading rights,
-//              and reading IS the moderation work — a report queue that demands a confirmation
-//              per reported post would be answered by clicking it away. Stays open.
-//   acting     everything else a network right folds in — editing roles, settings, memberships,
-//              taking posts out — waits for an explicit elevation, which expires on its own.
+//   finding    `group.read` stays open: the group page is where the elevation is offered, and
+//              the admin group list and the report queue have to be able to point at it.
+//   everything else a network right folds in — reading the content and the member list,
+//              editing roles, settings, memberships, taking posts out — waits for an explicit
+//              elevation, which expires on its own.
+//
+// Reading used to be on the open side ("reading IS the moderation work"). That made a network
+// admin a silent reader of every hidden group: their feed carried the content of groups they had
+// never opened (#10506). Looking inside a group nobody invited you into is an intervention like
+// any other, so it is asked for and recorded like any other. The report queue still shows that a
+// report exists and where — the content follows the elevation (concept E19).
 //
 // The elevation is stored, not inferred: `(:User)-[:ELEVATED_IN]->(:Group)` carries when it was
 // asked for, why, and when it lapses. That makes it both the switch and the record.
@@ -22,19 +28,15 @@ import type { GroupPermissionKey } from '@src/groupPermission'
 export const ELEVATION_MINUTES = 60
 
 /**
- * What a network right gives WITHOUT an elevation: looking, and nothing else.
+ * What a network right gives WITHOUT an elevation: finding the group, and nothing else.
  *
- * Deliberately the same three keys `group.content.read.any_*` folds in, so a moderator reviewing
- * a report sees exactly what they were asked about and has to say so before changing anything.
+ * The profile only — name, description, the elevation offer. Its content and its member list are
+ * what the elevation is asked for (#10506).
  */
-export const UNELEVATED_NETWORK_RIGHTS: readonly GroupPermissionKey[] = [
-  'group.read',
-  'group.content.read',
-  'group.members.read',
-]
+export const UNELEVATED_NETWORK_RIGHTS: readonly GroupPermissionKey[] = ['group.read']
 
 /**
- * The network authority as it counts right now. Without an elevation it is narrowed to reading;
+ * The network authority as it counts right now. Without an elevation it is narrowed to finding;
  * with one it is whatever the rights fold in.
  */
 export function withElevation(

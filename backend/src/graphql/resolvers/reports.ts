@@ -5,6 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import {
+  elevatedIn,
   memberRoleHolds,
   nonMemberReadsContent,
   optionalMemberRoleMatch,
@@ -25,8 +26,11 @@ import type { PermissionKey } from '@src/permission'
  * Three ways the content stays visible, and the first two come from the query because they are
  * about the GROUP rather than about the network role: the group opened its content to
  * non-members, or the moderator's own role in that group lets them read it. Only then does the
- * per-visibility network right decide. `visibility = 'public'` is deliberately NOT a shortcut any
- * more — a public group that closed its content closed it here too.
+ * network side decide, and it takes both halves: the per-visibility right AND a live elevation in
+ * that very group (`elevatedHere`). Holding the right is not reading with it — the moderator
+ * follows the report to the group, elevates there, and the content is back (#10506).
+ * `visibility = 'public'` is deliberately NOT a shortcut any more — a public group that closed its
+ * content closed it here too.
  *
  * A reported USER carries no group, so nothing is masked for them.
  *
@@ -38,6 +42,7 @@ export interface ReportRow {
   [field: string]: unknown
   visibility?: string | null
   readableHere?: boolean
+  elevatedHere?: boolean
   resource?: Record<string, unknown> | null
 }
 
@@ -49,7 +54,9 @@ export const maskUnreadableGroupContent = (
   if (!visibility || report.readableHere === true) {
     return { ...report, resourceHidden: false }
   }
-  const readable = effectivePermissions.has(`group.content.read.any_${visibility}` as PermissionKey)
+  const readable =
+    report.elevatedHere === true &&
+    effectivePermissions.has(`group.content.read.any_${visibility}` as PermissionKey)
   if (readable) {
     return { ...report, resourceHidden: false }
   }
@@ -60,8 +67,10 @@ export const maskUnreadableGroupContent = (
     resource: resource
       ? {
           ...resource,
-          title: null,
-          content: null,
+          // Empty, not null: `Post.title` and `Post/Comment.content` are non-null, and a null there
+          // fails the whole queue.
+          title: '',
+          content: '',
           contentExcerpt: null,
           image: null,
           post: null,
@@ -171,14 +180,19 @@ export default {
             coalesce(directGroup, commentedGroup) as group,
             resourceWithType {.*, post: optionalCommentedPosts[0], author: optionalAuthors[0] } as finalResource
             // Whether the content is readable BY THE GROUP's own answer: it opened its content
-            // to non-members, or this moderator's role in it grants reading. The network-side
-            // per-type right is folded in afterwards, in maskUnreadableGroupContent.
+            // to non-members, or this moderator's role in it grants reading. The network side —
+            // the per-type right, only together with a live elevation here — is folded in
+            // afterwards, in maskUnreadableGroupContent.
             ${optionalMemberRoleMatch('group', '$viewerId')}
             WITH report, reviewed, filed, finalResource, group,
             (group IS NULL
               OR ${nonMemberReadsContent('group')}
-              OR ${memberRoleHolds('group.content.read')}) as readableHere
-            RETURN report {.*, resource: finalResource, filed: filed, reviewed: reviewed, visibility: ${visibilityOf('group')}, readableHere: readableHere }
+              OR ${memberRoleHolds('group.content.read')}) as readableHere,
+            ${elevatedIn('group', '$viewerId')} as elevatedHere
+            RETURN report {.*, resource: finalResource, filed: filed, reviewed: reviewed, visibility: ${visibilityOf('group')}, readableHere: readableHere, elevatedHere: elevatedHere,
+              // Where to go to elevate when the content is masked — and where the content lives
+              // when it is not. A moderator with the network right may find any such group.
+              group: CASE WHEN group IS NULL THEN null ELSE group {.id, .slug, .name} END }
             ${orderByClause}
             ${offset} ${limit}
           `,

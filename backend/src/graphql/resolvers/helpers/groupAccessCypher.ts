@@ -104,6 +104,19 @@ export const optionalMemberRoleMatch = (group: string, viewerIdExpression: strin
    OPTIONAL MATCH (${group})-[:HAS_GROUP_ROLE]->(roleForRight:GroupRole)
    WHERE roleForRight.name = membershipForRight.role`
 
+/**
+ * Whether the viewer has a live elevation in that group (groupRole/elevation.ts) — the condition a
+ * network right needs before it reads into a group the viewer is not a member of (#10506).
+ * Null-safe: a pattern over an unbound (null) group matches nothing.
+ */
+export const elevatedIn = (group: string, viewerIdExpression: string): string =>
+  // A pattern comprehension, not `EXISTS { … }`: this lands in RETURN, where Neo4j 4 refuses the
+  // subclause.
+  `coalesce(size([
+     (:User { id: ${viewerIdExpression} })-[elevation:ELEVATED_IN]->(${group})
+     WHERE elevation.expiresAt > datetime() | elevation
+   ]) > 0, false)`
+
 /** The right, read off the role {@link optionalMemberRoleMatch} bound. Null-safe. */
 export const memberRoleHolds = (permission: GroupPermissionKey): string =>
   `coalesce(${roleHoldsPermission('roleForRight', permission)}, false)`

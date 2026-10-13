@@ -1066,7 +1066,7 @@
       "activeTitle": "Administratorzugriff ist aktiv.",
       "activeUntil": "Er endet um {time} oder wenn du ihn beendest.",
       "end": "Administratorzugriff beenden",
-      "offerBody": "Zusätzlich hältst du Netzwerkrechte über sie. Lesen ist offen; für Änderungen braucht es diese Bestätigung, und sie wird bei der Gruppe vermerkt.",
+      "offerBody": "Zusätzlich hältst du Netzwerkrechte über sie. Ihre Inhalte zu lesen oder etwas zu ändern braucht diese Bestätigung, und sie wird bei der Gruppe vermerkt.",
       "reasonPlaceholder": "Worum geht es?",
       "start": "Administratorzugriff nutzen"
     },
@@ -1442,6 +1442,7 @@
       },
       "hiddenContent": "Inhalt in einer Gruppe, die du nicht lesen darfst",
       "hiddenDecision": "Hier nicht entscheidbar",
+      "hiddenGroupLink": "Zu {name}, um Administratorzugriff zu nutzen",
       "moreDetails": "Details öffnen",
       "name": "Meldungen",
       "noDecision": "Keine Entscheidung!",

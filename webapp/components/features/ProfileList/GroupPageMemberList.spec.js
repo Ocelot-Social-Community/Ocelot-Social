@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 import GroupPageMemberList from './GroupPageMemberList.vue'
 
 const localVue = global.localVue
@@ -219,6 +220,32 @@ describe('GroupPageMemberList.vue', () => {
       wrapper.vm.onFilterChange('alice')
       expect(wrapper.vm.activeFilter).toBe('alice')
       expect(spy).toHaveBeenCalledWith(true)
+    })
+  })
+
+  describe('when the right to see the members changes', () => {
+    // A network moderator elevates in the group, or the elevation ends (#10506).
+    it('loads the list once it is granted', async () => {
+      const wrapper = await Wrapper({ allowedToSee: false })
+      expect(mockApollo.query).not.toHaveBeenCalled()
+      mockApollo.query.mockResolvedValueOnce(
+        makeQueryResult([{ id: '1', name: 'Member', role: 'usual' }]),
+      )
+      await wrapper.setProps({ allowedToSee: true })
+      await flushPromises()
+      expect(mockApollo.query).toHaveBeenCalledTimes(1)
+      expect(wrapper.vm.members.map((member) => member.id)).toEqual(['1'])
+    })
+
+    it('drops the list once it is withdrawn', async () => {
+      const wrapper = await Wrapper(
+        {},
+        { members: [{ id: '1', membershipRole: 'usual' }], offset: 1, allLoaded: true },
+      )
+      await wrapper.setProps({ allowedToSee: false })
+      expect(wrapper.vm.members).toEqual([])
+      expect(wrapper.vm.offset).toBe(0)
+      expect(wrapper.vm.allLoaded).toBe(false)
     })
   })
 

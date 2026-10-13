@@ -1066,7 +1066,7 @@
       "activeTitle": "O acesso de administrador está ativo.",
       "activeUntil": "Termina às {time}, ou quando o encerrares.",
       "end": "Encerrar o acesso de administrador",
-      "offerBody": "Além disso tens direitos de rede sobre ele. Ler está aberto; alterar algo pede esta confirmação, que fica registada junto do grupo.",
+      "offerBody": "Além disso tens direitos de rede sobre ele. Ler o seu conteúdo ou alterar algo pede esta confirmação, que fica registada junto do grupo.",
       "reasonPlaceholder": "Do que se trata?",
       "start": "Usar acesso de administrador"
     },
@@ -1442,6 +1442,7 @@
       },
       "hiddenContent": "Conteúdo de um grupo que não podes ler",
       "hiddenDecision": "Não decidível aqui",
+      "hiddenGroupLink": "Ir para {name} para usar o acesso de administrador",
       "moreDetails": "Ver detalhes",
       "name": "Denúncias",
       "noDecision": "Sem decisão!",

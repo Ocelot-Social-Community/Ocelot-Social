@@ -1066,7 +1066,7 @@
       "activeTitle": "L'accès administrateur est actif.",
       "activeUntil": "Il se termine à {time}, ou quand tu y mets fin.",
       "end": "Terminer l'accès administrateur",
-      "offerBody": "Tu disposes en plus de droits réseau sur lui. La lecture est ouverte ; toute modification demande cette confirmation, qui est consignée auprès du groupe.",
+      "offerBody": "Tu disposes en plus de droits réseau sur lui. Lire son contenu ou modifier quoi que ce soit demande cette confirmation, qui est consignée auprès du groupe.",
       "reasonPlaceholder": "De quoi s'agit-il ?",
       "start": "Utiliser l'accès administrateur"
     },
@@ -1442,6 +1442,7 @@
       },
       "hiddenContent": "Contenu d’un groupe que vous n’avez pas le droit de lire",
       "hiddenDecision": "Pas décidable ici",
+      "hiddenGroupLink": "Aller à {name} pour utiliser l’accès administrateur",
       "moreDetails": "Voir les détails",
       "name": "Signalisations",
       "noDecision": "Pas de décision !",

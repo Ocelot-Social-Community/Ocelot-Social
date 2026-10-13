@@ -24,6 +24,12 @@ export const reportsListQuery = () => {
         # True when the reported content sits in a group this moderator may not read: the
         # queue then carries the metadata only, and deciding is refused server-side too.
         resourceHidden
+        # Where the reported content lives — the place to elevate when it is hidden.
+        group {
+          id
+          slug
+          name
+        }
         reviewed {
           createdAt
           updatedAt

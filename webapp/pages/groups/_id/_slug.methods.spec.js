@@ -31,4 +31,16 @@ describe('pages/groups/_id/_slug.vue — methods', () => {
       expect(showChat).toHaveBeenCalledWith({ showChat: false, chatUserId: null, groupId: null })
     })
   })
+
+  describe('onElevationChanged', () => {
+    it('reloads the group and then its posts, which follow the elevation (#10506)', async () => {
+      const order = []
+      const ctx = {
+        reloadGroup: jest.fn(async () => order.push('group')),
+        refetchPostList: jest.fn(() => order.push('posts')),
+      }
+      await methods.onElevationChanged.call(ctx)
+      expect(order).toEqual(['group', 'posts'])
+    })
+  })
 })

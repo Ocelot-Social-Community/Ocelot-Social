@@ -11,6 +11,12 @@ defineStep('I see all the reported posts including the one from above', () => {
     updatedAt
     closed
     resourceHidden
+    group {
+      id
+      slug
+      name
+      __typename
+    }
     reviewed {
       createdAt
       updatedAt

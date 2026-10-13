@@ -19,11 +19,13 @@ Feature: A network admin hands a group back from its owner
       | secret-circle | Secret Circle | secret-circle | hidden   | olga    | A group nobody can find | A hidden group whose owner is about to be replaced by the network administration. | global       |
     And "max" is a member of group "secret-circle"
 
-  Scenario: The owner rows are out of reach until the admin elevates
+  # Not even the member list: reading into a group on a network right is asked for like any other
+  # use of it (#10506).
+  Scenario: The members are out of sight until the admin elevates
     Given I am logged in as "admin"
     When I navigate to page "/groups/edit/secret-circle/members"
     Then I see the element with test id "elevation-offer"
-    And the member "olga" offers no role picker and no remove button
+    And the member "olga" is not listed
 
   # Loaded from the server on purpose: the rights tab asked for the group's roles, which need
   # group.role.manage, and that refusal during server-side rendering was a bare "Server error".

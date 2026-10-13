@@ -1066,7 +1066,7 @@
       "activeTitle": "L'accesso da amministratore è attivo.",
       "activeUntil": "Termina alle {time}, o quando lo chiudi tu.",
       "end": "Termina l'accesso da amministratore",
-      "offerBody": "In più hai diritti di rete su di esso. La lettura è aperta; per modificare serve questa conferma, che resta registrata presso il gruppo.",
+      "offerBody": "In più hai diritti di rete su di esso. Per leggerne i contenuti o modificare qualcosa serve questa conferma, che resta registrata presso il gruppo.",
       "reasonPlaceholder": "Di cosa si tratta?",
       "start": "Usa l'accesso da amministratore"
     },
@@ -1442,6 +1442,7 @@
       },
       "hiddenContent": "Contenuto di un gruppo che non puoi leggere",
       "hiddenDecision": "Non decidibile qui",
+      "hiddenGroupLink": "Vai a {name} per usare l’accesso da amministratore",
       "moreDetails": "Vedi dettagli",
       "name": "Segnalazioni",
       "noDecision": "Nessuna decisione!",

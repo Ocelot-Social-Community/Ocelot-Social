@@ -1066,7 +1066,7 @@
       "activeTitle": "Administrator access is active.",
       "activeUntil": "It ends at {time}, or when you end it.",
       "end": "End administrator access",
-      "offerBody": "You also hold network rights over it. Reading is open; changing anything asks for this, and the request is recorded with the group.",
+      "offerBody": "You also hold network rights over it. Reading its content or changing anything asks for this, and the request is recorded with the group.",
       "reasonPlaceholder": "What are you doing?",
       "start": "Use administrator access"
     },
@@ -1442,6 +1442,7 @@
       },
       "hiddenContent": "Content in a group you may not read",
       "hiddenDecision": "Not decidable here",
+      "hiddenGroupLink": "Go to {name} to use administrator access",
       "moreDetails": "View Details",
       "name": "Reports",
       "noDecision": "No decision!",

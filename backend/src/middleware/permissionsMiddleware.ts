@@ -12,6 +12,7 @@ import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
 import { viewerOutranksUser } from '@graphql/resolvers/helpers/actOnHierarchy'
 import {
+  elevatedIn,
   memberRoleHolds,
   nonMemberReadsContent,
   optionalMemberRoleMatch,
@@ -317,7 +318,8 @@ const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
 
 // No blind moderation: a report whose subject sits in a group this moderator may not read is
 // masked in the queue (concept E19), so deciding it would mean deciding about something they
-// cannot see. It needs escalating to somebody who holds group.content.read.any_<type>.
+// cannot see. A moderator holding group.content.read.any_<type> elevates in that group first
+// (#10506) — or it is escalated to somebody who does.
 const canReviewReportedContent = rule({ cache: 'no_cache' })(async (
   _parent,
   args,
@@ -331,7 +333,7 @@ const canReviewReportedContent = rule({ cache: 'no_cache' })(async (
     // The same question the moderation queue asks when it decides what to blank (see
     // resolvers/reports.ts): the group's own answer first — it opened its content to
     // non-members, or this moderator's role in it grants reading — and only then the
-    // per-type network right below.
+    // per-type network right below, together with a live elevation in this group.
     query: `MATCH (resource {id: $resourceId})
             OPTIONAL MATCH (resource)-[:IN]->(direct:Group)
             OPTIONAL MATCH (resource)-[:COMMENTS]->(:Post)-[:IN]->(viaPost:Group)
@@ -340,7 +342,8 @@ const canReviewReportedContent = rule({ cache: 'no_cache' })(async (
             RETURN ${visibilityOf('group')} AS visibility,
                    (group IS NULL
                      OR ${nonMemberReadsContent('group')}
-                     OR ${memberRoleHolds('group.content.read')}) AS readableHere`,
+                     OR ${memberRoleHolds('group.content.read')}) AS readableHere,
+                   ${elevatedIn('group', '$viewerId')} AS elevatedHere`,
     variables: { resourceId, viewerId: ctx.user?.id ?? null },
   })
   const record = result.records[0]
@@ -348,7 +351,10 @@ const canReviewReportedContent = rule({ cache: 'no_cache' })(async (
   if (!visibility || record?.get('readableHere') === true) {
     return true
   }
-  return hasPermissionEffective(ctx, `group.content.read.any_${visibility}` as PermissionKey)
+  return (
+    record.get('elevatedHere') === true &&
+    hasPermissionEffective(ctx, `group.content.read.any_${visibility}` as PermissionKey)
+  )
 })
 
 // Holding any of the per-type administration rights is what opens the admin group list; the

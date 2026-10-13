@@ -5,6 +5,8 @@ import {
   permissionsForGroupRole,
 } from '@src/groupRole'
 
+import { visibilityOf } from './groupAccessCypher'
+
 import type { Context } from '@src/context'
 import type { GroupPermissionKey } from '@src/groupPermission'
 
@@ -131,32 +133,60 @@ export interface ViewerScope {
   /** The groups whose content the viewer's own role opens (see {@link groupReadScope}). */
   contentGroupIds: string[]
   /**
-   * The VISIBILITIES whose content this viewer may read into WITHOUT a membership and without
-   * the group granting it — the folded `group.content.read.any_<type>` network rights.
+   * The groups this viewer may read into WITHOUT a membership and without the group granting
+   * it: a network right covers the group (`group.content.read.any_<type>`, or the
+   * `group.moderate` / `group.administer` families that fold it in) AND the viewer has a live
+   * elevation there (`ELEVATED_IN`, groupRole/elevation.ts).
    *
-   * `public` is deliberately NOT in here any more. It used to be, because "public" WAS the
-   * statement "strangers may read this"; that statement is now the group's own
-   * `group.content.read` for non-members, mirrored onto the node as `nonMemberContentRead`
-   * (see groupRole/nonMemberAccess.ts). Keeping `public` in this list would override a public
-   * group that closed its content — the type would decide again, which is the thing the rights
-   * replace.
+   * Ids, not visibilities. This used to be the list of TYPES a network right covers, which made
+   * every hidden group's content part of a network admin's feed without them ever opening one
+   * (#10506). Reading into a group is asked for group by group, so the list is bounded by the
+   * elevations a viewer holds at once, not by the database.
+   *
+   * This is what the viewer MAY read, not what every list shows: `filterInvisiblePosts` applies
+   * it only to a request that names one group or one post, so the content does not travel into
+   * the feed even while the elevation lasts.
    */
-  moderatorVisibilities: string[]
+  elevatedGroupIds: string[]
 }
 
-// Only what the viewer's network rights open up; bounded by the number of visibilitys, not by
-// anything the database holds. A moderator holds `group.content.read.any_closed`, an admin
-// additionally `_hidden` (#9405): the reported content they are asked to review stops being
-// invisible to them, without a per-row lookup.
-export const moderatorVisibilities = (context: Context): string[] =>
-  visibilitiesWithNetworkAuthority('group.content.read', context.effectivePermissions).filter(
-    // `public` cannot come from here: a public group that closed its content must not be
-    // reopened by a right that quantifies over types (see the field doc above).
-    (visibility) => visibility !== 'public',
-  )
+const ELEVATED_READ_SCOPE_QUERY = `
+  MATCH (:User {id: $userId})-[e:ELEVATED_IN]->(group:Group)
+  WHERE e.expiresAt > datetime()
+    AND ${visibilityOf('group')} IN $visibilities
+  RETURN group.id AS groupId
+`
 
-export const viewerScope = async (context: Context): Promise<ViewerScope> => ({
-  viewerId: context.user?.id ?? null,
-  contentGroupIds: (await groupReadScope(context)).contentGroupIds,
-  moderatorVisibilities: moderatorVisibilities(context),
-})
+/**
+ * The groups with a live elevation whose content the viewer's network rights cover.
+ *
+ * Both halves are needed. The elevation alone is not enough: it outlives a right withdrawn from
+ * the viewer's role, and a group can turn hidden while it runs. The right alone is what this
+ * replaces. Without a right that could read anything, the query is skipped — which is everybody
+ * but the moderators and admins.
+ */
+export const elevatedReadScope = async (context: Context): Promise<string[]> => {
+  if (!context.user) {
+    return []
+  }
+  const visibilities = visibilitiesWithNetworkAuthority(
+    'group.content.read',
+    context.effectivePermissions,
+  )
+  if (visibilities.length === 0) {
+    return []
+  }
+  const result = await context.database.query({
+    query: ELEVATED_READ_SCOPE_QUERY,
+    variables: { userId: context.user.id, visibilities },
+  })
+  return result.records.map((record) => record.get('groupId') as string)
+}
+
+export const viewerScope = async (context: Context): Promise<ViewerScope> => {
+  const [{ contentGroupIds }, elevatedGroupIds] = await Promise.all([
+    groupReadScope(context),
+    elevatedReadScope(context),
+  ])
+  return { viewerId: context.user?.id ?? null, contentGroupIds, elevatedGroupIds }
+}

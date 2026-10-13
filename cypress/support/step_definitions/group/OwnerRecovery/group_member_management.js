@@ -9,10 +9,8 @@ defineStep('I elevate in the group with the reason {string}', (reason) => {
   cy.get('[data-test="elevation-start"]').click()
 })
 
-defineStep('the member {string} offers no role picker and no remove button', (userId) => {
-  memberRow(userId).should('exist')
-  memberRow(userId).find('[data-test="group-member-role"]').should('not.exist')
-  memberRow(userId).find('[data-test="group-member-remove"]').should('not.exist')
+defineStep('the member {string} is not listed', (userId) => {
+  memberRow(userId).should('not.exist')
 })
 
 defineStep('I give the member {string} the group role {string}', (userId, roleName) => {
