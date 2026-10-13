@@ -140,10 +140,11 @@ export default {
   justify-content: center;
   min-width: 1.7em;
   height: 1.7em;
-  /*  In the logical properties the badge itself uses: a physical `padding` against its */
-  /*  `padding-inline` is a contest some browsers do not settle by specificity. */
-  padding-block: 0;
-  padding-inline: 0.45em;
+  /*  `!important`, because no selector written here outranks the badge's own padding: */
+  /*  the app's build lifts every utility class of the UI library to the weight of an id */
+  /*  (`.px-\[0\.8em\]:not(#\#)`, the cascade-layers polyfill), so the pill's padding */
+  /*  won against this rule and the count stayed wider than high. */
+  padding: 0 0.45em !important;
   line-height: 1;
   font-weight: var(--text-weight-bold);
 }
