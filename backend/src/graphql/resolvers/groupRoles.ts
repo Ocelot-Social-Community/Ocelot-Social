@@ -9,7 +9,6 @@ import {
   allGroupPermissionKeys,
   groupPermissionCatalog,
   networkPrerequisiteFor,
-  networkPrerequisiteTemplateFor,
   sanitizeGroupPermissions,
 } from '@src/groupPermission'
 import {
@@ -386,9 +385,7 @@ export default {
         return []
       }
       return allGroupPermissionKeys().flatMap((key) => {
-        if (networkPrerequisiteTemplateFor(key) === null) {
-          return []
-        }
+        // Null for a right with no network counterpart, which therefore has no hint.
         const requiresNetworkPermission = networkPrerequisiteFor(key, {
           callDoor: authorization.callDoor,
         })
