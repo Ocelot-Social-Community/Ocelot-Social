@@ -873,6 +873,7 @@ export default {
     this.leaving = false
     this.deviceSwitches = this.newDeviceSwitches()
     this.conferenceChatSub = null
+    this.callChatRetryTimer = null
   },
   mounted() {
     this.observeStage()
@@ -1016,11 +1017,21 @@ export default {
         if (this.room !== room || this.groupId !== groupId) return
         // The media server can take a moment to list a participant it just let in.
         if (attempt < CALL_CHAT_JOIN_ATTEMPTS) {
-          setTimeout(() => {
+          // Kept, so leaving the call can call it off (see cleanup): hanging up takes a
+          // moment during which `this.room` is still the room, and a retry due just then
+          // would ask for the chat of a call that is being left.
+          this.cancelCallChatRetry()
+          this.callChatRetryTimer = setTimeout(() => {
+            this.callChatRetryTimer = null
             if (this.room === room) this.joinCallChat(room, attempt + 1)
           }, CALL_CHAT_JOIN_RETRY_MS)
         }
       }
+    },
+    cancelCallChatRetry() {
+      if (!this.callChatRetryTimer) return
+      clearTimeout(this.callChatRetryTimer)
+      this.callChatRetryTimer = null
     },
     watchConferenceChat(roomId) {
       if (this.conferenceChatSub) {
@@ -1929,6 +1940,9 @@ export default {
       }
     },
     async cleanup() {
+      // First, before the disconnect below is awaited: nothing may ask for the call's chat
+      // any more once the call is being left.
+      this.cancelCallChatRetry()
       if (this.room) {
         // Belt-and-braces: stop every local track ourselves before asking
         // LiveKit to disconnect. LiveKit's room.disconnect(stopTracks=true)

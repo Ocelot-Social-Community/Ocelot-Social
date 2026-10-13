@@ -1783,6 +1783,20 @@ describe('Chat.vue', () => {
         expect(mocks.$t).toHaveBeenCalledWith('chat.export.title', { name: 'Yoga' })
       })
 
+      it('indents the further lines of a message written over several', () => {
+        wrapper = Wrapper()
+        const text = wrapper.vm.buildExportText({ roomName: 'Yoga' }, [
+          mockMessage({ username: 'Anna', content: 'First line\nsecond line\r\nthird line' }),
+          mockMessage({ username: 'Ben', content: 'Next message' }),
+        ])
+        const lines = text.split('\n')
+        expect(lines[3]).toMatch(/^\[.+\] Anna: First line$/)
+        expect(lines[4]).toBe('    second line')
+        expect(lines[5]).toBe('    third line')
+        // Only a new message starts at the beginning of a line.
+        expect(lines[6]).toMatch(/^\[.+\] Ben: Next message$/)
+      })
+
       it('hands the text to the browser as a file', async () => {
         wrapper = Wrapper()
         await flushPromises()

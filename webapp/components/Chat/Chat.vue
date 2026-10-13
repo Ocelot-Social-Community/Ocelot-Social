@@ -161,6 +161,9 @@ const MESSAGE_PAGE_SIZE = 20
 const EXPORT_PAGE_SIZE = 100
 // How long the exported file's blob URL is kept after the download was asked for.
 const EXPORT_URL_RELEASE_MS = 1000
+// What belongs to the message above it in an exported chat is set in by this much: the
+// further lines of a message written over several, and its attachments.
+const EXPORT_INDENT = '    '
 
 export default {
   name: 'Chat',
@@ -1264,11 +1267,13 @@ export default {
       ]
       for (const message of messages) {
         const sentAt = new Date(message.date).toLocaleString(locale)
-        const content = (message.content || '').trim()
+        // A line break inside a message stays one, but what follows it is indented:
+        // at the start of a line it would read as a message of its own, without sender.
+        const content = (message.content || '').trim().replace(/\r?\n/g, `\n${EXPORT_INDENT}`)
         lines.push(`[${sentAt}] ${message.username}:${content ? ` ${content}` : ''}`)
         for (const file of message.files || []) {
           const name = file.extension ? `${file.name}.${file.extension}` : file.name
-          lines.push(`    ${this.$t('chat.export.attachment')}: ${name}`)
+          lines.push(`${EXPORT_INDENT}${this.$t('chat.export.attachment')}: ${name}`)
         }
       }
       return lines.join('\n') + '\n'

@@ -3142,6 +3142,8 @@ describe('VideoCall', () => {
       $apollo: { mutate },
       setChatRoomId: jest.fn(),
       joinCallChat: jest.fn(),
+      callChatRetryTimer: null,
+      cancelCallChatRetry: VideoCall.methods.cancelCallChatRetry,
       ...overrides,
     })
 
@@ -3179,6 +3181,50 @@ describe('VideoCall', () => {
       jest.runOnlyPendingTimers()
       expect(ctx.joinCallChat).not.toHaveBeenCalled()
       expect(ctx.setChatRoomId).not.toHaveBeenCalled()
+    })
+
+    it('does not ask again once the retry has been called off', async () => {
+      jest.useFakeTimers()
+      const ctx = context(jest.fn().mockRejectedValue(new Error('not in call yet')))
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      expect(ctx.callChatRetryTimer).not.toBeNull()
+
+      VideoCall.methods.cancelCallChatRetry.call(ctx)
+      jest.runOnlyPendingTimers()
+
+      expect(ctx.callChatRetryTimer).toBeNull()
+      expect(ctx.joinCallChat).not.toHaveBeenCalled()
+    })
+
+    it('keeps one retry pending, not one per failure', async () => {
+      jest.useFakeTimers()
+      const ctx = context(jest.fn().mockRejectedValue(new Error('not in call yet')))
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      jest.runOnlyPendingTimers()
+
+      expect(ctx.joinCallChat).toHaveBeenCalledTimes(1)
+    })
+
+    it('calls a pending retry off when the call is left, before hanging up', async () => {
+      jest.useFakeTimers()
+      const { wrapper } = factory({ show: false })
+      const retry = jest.fn()
+      wrapper.vm.callChatRetryTimer = setTimeout(retry, 2000)
+      // Hanging up takes a moment; the retry must be gone before that moment begins.
+      let pendingWhileHangingUp
+      wrapper.vm.room = {
+        localParticipant: null,
+        disconnect: jest.fn(async () => {
+          pendingWhileHangingUp = wrapper.vm.callChatRetryTimer
+        }),
+      }
+
+      await wrapper.vm.cleanup()
+      jest.runOnlyPendingTimers()
+
+      expect(pendingWhileHangingUp).toBeNull()
+      expect(retry).not.toHaveBeenCalled()
     })
   })
 
