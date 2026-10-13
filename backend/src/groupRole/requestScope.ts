@@ -216,8 +216,8 @@ export function createGroupAuthorizationScope({
     })
     // What a network right grants in a group of this visibility — the shared fold, so the
     // per-request answer and the list queries cannot disagree about it (networkAuthority.ts).
-    // Narrowed to reading until the viewer has asked for it HERE (elevation.ts): holding the
-    // right is not the same as using it.
+    // Narrowed to finding the group until the viewer has asked for it HERE (elevation.ts):
+    // holding the right is not the same as using it, and that includes reading (#10506).
     const elevated = record.get('elevated') === true
     const fullNetworkAuthority = networkAuthorityIn(visibility, effectivePermissions)
     const administers = administersByNetwork(visibility, effectivePermissions)

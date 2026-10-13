@@ -1066,7 +1066,7 @@
       "activeTitle": "Dostęp administratora jest aktywny.",
       "activeUntil": "Kończy się o {time} albo kiedy go zakończysz.",
       "end": "Zakończ dostęp administratora",
-      "offerBody": "Dodatkowo masz uprawnienia sieciowe do tej grupy. Czytanie jest otwarte; zmiany wymagają tego potwierdzenia, które zostaje odnotowane przy grupie.",
+      "offerBody": "Dodatkowo masz uprawnienia sieciowe do tej grupy. Czytanie jej treści i wszelkie zmiany wymagają tego potwierdzenia, które zostaje odnotowane przy grupie.",
       "reasonPlaceholder": "O co chodzi?",
       "start": "Użyj dostępu administratora"
     },
@@ -1442,6 +1442,7 @@
       },
       "hiddenContent": "Treść z grupy, której nie możesz czytać",
       "hiddenDecision": "Tu nie da się rozstrzygnąć",
+      "hiddenGroupLink": "Przejdź do {name}, aby użyć dostępu administratora",
       "moreDetails": "Zobacz szczegóły",
       "name": "Raporty",
       "noDecision": "Brak decyzji!",

@@ -13,8 +13,10 @@ type Report {
   "All moderator reviews of the report."
   reviewed: [REVIEWED]!
   resource: ReportedResource!
-  "Whether the reported content was blanked because it lives in a group the viewer may not read (`group.content.read.any_<type>`). Metadata and the filings are still there so the report can be escalated; reviewing it is refused."
+  "Whether the reported content was blanked because it lives in a group the viewer may not read: neither the group nor their role in it opens it, and their network right (`group.content.read.any_<type>`) only counts while they are elevated in that group. Metadata and the filings are still there so the report can be escalated; reviewing it is refused."
   resourceHidden: Boolean!
+  "The group the reported content lives in — where to elevate when it is hidden. Null for a reported user and for content outside any group."
+  group: Group
 }
 
 "The kind of node a report can target."

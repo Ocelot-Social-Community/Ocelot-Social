@@ -1066,7 +1066,7 @@
       "activeTitle": "Qasja si administrator është aktive.",
       "activeUntil": "Përfundon në {time}, ose kur ta mbyllësh ti.",
       "end": "Mbyll qasjen si administrator",
-      "offerBody": "Përveç kësaj ke të drejta rrjeti mbi të. Leximi është i hapur; çdo ndryshim kërkon këtë konfirmim, i cili regjistrohet te grupi.",
+      "offerBody": "Përveç kësaj ke të drejta rrjeti mbi të. Leximi i përmbajtjes ose çdo ndryshim kërkon këtë konfirmim, i cili regjistrohet te grupi.",
       "reasonPlaceholder": "Për çfarë bëhet fjalë?",
       "start": "Përdor qasjen si administrator"
     },
@@ -1442,6 +1442,7 @@
       },
       "hiddenContent": "Përmbajtje nga një grup që nuk ke leje ta lexosh",
       "hiddenDecision": "Nuk vendoset këtu",
+      "hiddenGroupLink": "Shko te {name} për të përdorur qasjen si administrator",
       "moreDetails": "Shiko detajet",
       "name": "Raportimet",
       "noDecision": "Asnjë vendim!",

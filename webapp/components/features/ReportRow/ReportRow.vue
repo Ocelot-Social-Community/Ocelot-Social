@@ -31,10 +31,22 @@
         </client-only>
         <!-- Content in a group this moderator may not read: the report stays here to be
              escalated, but neither its text nor a link to it is shown. The server blanked the
-             content already — this is what says why instead of rendering an empty link. -->
-        <span v-else-if="isHidden" class="hidden-content" data-test="report-hidden">
-          {{ $t('moderation.reports.hiddenContent') }}
-        </span>
+             content already — this is what says why instead of rendering an empty link. A
+             moderator whose network right covers the group reads it after elevating there, so
+             the group is where this points (#10506). -->
+        <template v-else-if="isHidden">
+          <span class="hidden-content" data-test="report-hidden">
+            {{ $t('moderation.reports.hiddenContent') }}
+          </span>
+          <nuxt-link
+            v-if="report.group"
+            class="hidden-content__group"
+            :to="groupLinkTarget"
+            data-test="report-hidden-group"
+          >
+            {{ $t('moderation.reports.hiddenGroupLink', { name: report.group.name }) }}
+          </nuxt-link>
+        </template>
         <nuxt-link v-else class="title" :to="linkTarget">
           {{ $filters.truncate(linkText, 50) }}
         </nuxt-link>
@@ -169,6 +181,10 @@ export default {
         hash: this.isComment ? `#commentId-${this.report.resource.id}` : '',
       }
     },
+    groupLinkTarget() {
+      const { id, slug } = this.report.group
+      return { name: 'groups-id-slug', params: { id, slug } }
+    },
     linkText() {
       return this.report.resource.title || this.$filters.removeHtml(this.report.resource.content)
     },
@@ -214,6 +230,11 @@ export default {
   .hidden-content {
     color: var(--text-color-soft);
     font-style: italic;
+  }
+
+  .hidden-content__group {
+    display: block;
+    margin-top: var(--space-xx-small);
   }
 
   .--disabled {

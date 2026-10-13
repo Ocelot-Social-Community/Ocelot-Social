@@ -4,7 +4,7 @@
     <!-- Where a moderator or admin LANDS when a report points them at a group they are not in.
          Picking the network rights up is a decision, and this is where it is offered — the
          settings pages are behind the very rights it unlocks. -->
-    <group-elevation :group="group" @changed="reloadGroup" />
+    <group-elevation :group="group" @changed="onElevationChanged" />
     <div v-if="group" class="ds-flex ds-flex-gap-base group-layout">
       <div class="group-layout__sidebar">
         <os-card
@@ -675,6 +675,13 @@ export default {
      */
     async reloadGroup() {
       await this.$apollo.queries.Group.refetch()
+    },
+    // Reading a group's content on a network right waits for the elevation (#10506): starting
+    // it opens the posts, ending it — or its running out — closes them again. The member list
+    // follows the group's rights on its own.
+    async onElevationChanged() {
+      await this.reloadGroup()
+      this.refetchPostList()
     },
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',

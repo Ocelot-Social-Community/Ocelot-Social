@@ -119,6 +119,17 @@ export default {
     },
   },
   watch: {
+    // The right can change while the page is open: a network moderator elevates in the group and
+    // may read its members from then on, or the elevation ends and they may not (#10506).
+    allowedToSee(allowed) {
+      if (allowed) {
+        this.loadMembers(true)
+      } else {
+        this.members = []
+        this.offset = 0
+        this.allLoaded = false
+      }
+    },
     isLoading(newVal, oldVal) {
       if (oldVal && !newVal) {
         clearTimeout(this._loadingCooldownTimer)

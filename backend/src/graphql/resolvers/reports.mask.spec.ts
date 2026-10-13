@@ -50,19 +50,40 @@ describe(maskUnreadableGroupContent, () => {
     expect(masked.resource).toMatchObject({ title: 'A title' })
   })
 
-  it('leaves it alone for a moderator who may read into that visibility', () => {
+  it('leaves it alone for a moderator who may read into that visibility and elevated there', () => {
     const masked = maskUnreadableGroupContent(
-      reportOf({ visibility: 'closed' }),
+      reportOf({ visibility: 'closed', elevatedHere: true }),
       holding('group.content.read.any_closed'),
     )
 
     expect(masked.resourceHidden).toBe(false)
   })
 
+  it('blanks it for that moderator until they elevated in the group (#10506)', () => {
+    // Holding the right is not reading with it: the queue says where the report lives, the
+    // content follows the elevation there.
+    const masked = maskUnreadableGroupContent(
+      reportOf({ visibility: 'closed', elevatedHere: false }),
+      holding('group.content.read.any_closed'),
+    )
+
+    expect(masked.resourceHidden).toBe(true)
+  })
+
+  it('does not let an elevation read without the right', () => {
+    // An elevation outlives a right withdrawn from the role.
+    const masked = maskUnreadableGroupContent(
+      reportOf({ visibility: 'closed', elevatedHere: true }),
+      holding(),
+    )
+
+    expect(masked.resourceHidden).toBe(true)
+  })
+
   it('does not let the right for one type open another', () => {
     // Two separate rights, because an unlisted group is the stricter case.
     const masked = maskUnreadableGroupContent(
-      reportOf({ visibility: 'hidden' }),
+      reportOf({ visibility: 'hidden', elevatedHere: true }),
       holding('group.content.read.any_closed'),
     )
 
@@ -82,8 +103,8 @@ describe(maskUnreadableGroupContent, () => {
     expect(masked.resource).toMatchObject({
       __typename: 'Post',
       id: 'p1',
-      title: null,
-      content: null,
+      title: '',
+      content: '',
       contentExcerpt: null,
       image: null,
       post: null,

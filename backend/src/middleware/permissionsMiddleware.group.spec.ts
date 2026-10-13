@@ -727,8 +727,8 @@ describe('canReviewReportedContent', () => {
     expect(await resolve(canReviewReportedContent, {}, { resourceId: 'p1' }, context)).toBe(true)
   })
 
-  it('falls back to the per-type network right', async () => {
-    const records = [row({ visibility: 'closed', readableHere: false })]
+  it('falls back to the per-type network right, once the moderator elevated in the group', async () => {
+    const records = [row({ visibility: 'closed', readableHere: false, elevatedHere: true })]
     const moderator = contextFor({
       queryRecords: records,
       network: ['group.content.read.any_closed'],
@@ -737,6 +737,17 @@ describe('canReviewReportedContent', () => {
 
     expect(await resolve(canReviewReportedContent, {}, { resourceId: 'p1' }, moderator)).toBe(true)
     expect(await resolve(canReviewReportedContent, {}, { resourceId: 'p1' }, other)).toBe(false)
+  })
+
+  it('refuses the network right without an elevation in the group (#10506)', async () => {
+    // The queue masks this content until the moderator elevated there, so deciding it would be
+    // deciding blind.
+    const context = contextFor({
+      queryRecords: [row({ visibility: 'closed', readableHere: false, elevatedHere: false })],
+      network: ['group.content.read.any_closed'],
+    })
+
+    expect(await resolve(canReviewReportedContent, {}, { resourceId: 'p1' }, context)).toBe(false)
   })
 
   it('allows a review when the resource is not there at all', async () => {
