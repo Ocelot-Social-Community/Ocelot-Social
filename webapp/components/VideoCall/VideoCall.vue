@@ -197,10 +197,6 @@
               it never does, the sidebar is the group's chat as it always was.
             -->
             <!--
-              A wrapper of this component's own: OsToggleGroup's root carries no
-              scoped-style attribute, so the sidebar's layout rules would miss it.
-            -->
-            <!--
               The chat brings no header of its own here (hideHeader): group and
               avatar are in the call's header right above, and which chat it is the
               tabs say. What its header offered besides sits at the end of this row.
@@ -398,7 +394,7 @@ import { OsButton, OsCounterIcon, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import mobile from '~/mixins/mobile'
 import { joinGroupVideoCallMutation, joinGroupVideoCallChatMutation } from '~/graphql/VideoCalls'
-import { roomUpdated } from '~/graphql/Rooms'
+import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import Chat from '~/components/Chat/Chat.vue'
 import CallChatTabs from '~/components/VideoCall/CallChatTabs.vue'
 import { activeCallChatTab, callChatTarget } from '~/components/VideoCall/callChat'
@@ -526,6 +522,8 @@ export default {
       groupAvatar: 'videoCall/groupAvatar',
       chatRoomId: 'videoCall/chatRoomId',
       conferenceUnread: 'videoCall/conferenceUnread',
+      groupChatUnread: 'videoCall/groupChatUnread',
+      lastChatTab: 'videoCall/lastChatTab',
       getShowChat: 'chat/showChat',
       currentUser: 'auth/user',
     }),
@@ -573,8 +571,11 @@ export default {
       return speaker || this.primaryTile
     },
     chatButtonUnread() {
-      // Nothing to point at while the conference chat is the one on screen.
-      return this.activeChatTab === 'call' ? 0 : this.conferenceUnread
+      // Both of the call's chats, added up — less the one on screen, which has nothing
+      // left to point at.
+      const call = this.activeChatTab === 'call' ? 0 : this.conferenceUnread
+      const group = this.activeChatTab === 'group' ? 0 : this.groupChatUnread
+      return call + group
     },
     micLabel() {
       return this.micEnabled ? this.$t('videoCall.muteMic') : this.$t('videoCall.unmuteMic')
@@ -813,8 +814,13 @@ export default {
       const remote = ids.find((id) => this.tiles.some((t) => t.identity === id && !t.isLocal))
       if (remote) this.lastRemoteSpeakerId = remote
     },
+    // Where the chat button opens next time: the tab looked at last. Only while there is
+    // a choice — without a conference chat the group's is all there is, which says nothing
+    // about what the user would pick.
+    activeChatTab(tab) {
+      if (tab && this.chatRoomId) this.setLastChatTab(tab)
+    },
     chatRoomId(next, previous) {
-      this.watchConferenceChat(next)
       // An open conference chat follows the call: to the room of the call the
       // client is in now (it can change when a lost connection comes back into a
       // call opened anew), and away with it when the call is left.
@@ -872,7 +878,8 @@ export default {
     this.qualityClass = null
     this.leaving = false
     this.deviceSwitches = this.newDeviceSwitches()
-    this.conferenceChatSub = null
+    this.callChatsSub = null
+    this.groupChatRoomId = null
     this.callChatRetryTimer = null
   },
   mounted() {
@@ -889,7 +896,7 @@ export default {
     this.disconnectStageObserver()
     this.closeDeviceSettings()
     this.cleanup()
-    this.watchConferenceChat(null)
+    this.watchCallChats(false)
   },
   methods: {
     ...mapMutations({
@@ -899,6 +906,8 @@ export default {
       setStorePhase: 'videoCall/SET_PHASE',
       setChatRoomId: 'videoCall/SET_CHAT_ROOM_ID',
       setConferenceUnread: 'videoCall/SET_CONFERENCE_UNREAD',
+      setGroupChatUnread: 'videoCall/SET_GROUP_CHAT_UNREAD',
+      setLastChatTab: 'videoCall/SET_LAST_CHAT_TAB',
       setShowChat: 'chat/SET_OPEN_CHAT',
     }),
     observeStage() {
@@ -974,9 +983,10 @@ export default {
         this.setShowChat({ showChat: false, chatUserId: null, groupId: null })
         return
       }
-      // The call's own chat first: it is the one that disturbs nobody outside the
-      // call. Without it (see joinCallChat) the button opens the group's chat.
-      this.selectChatTab(this.chatRoomId ? 'call' : 'group')
+      // Where it was left: the tab looked at last, which starts out as the call's own
+      // chat — the one that disturbs nobody outside the call. Without a conference chat
+      // (see joinCallChat) either choice opens the group's chat.
+      this.selectChatTab(this.lastChatTab)
       // Chat renders inside the call sidebar when maximized, or in the
       // chat-modul (layouts/default.vue) when the call is parked. Either
       // way no navigation is needed.
@@ -1033,22 +1043,57 @@ export default {
       clearTimeout(this.callChatRetryTimer)
       this.callChatRetryTimer = null
     },
-    watchConferenceChat(roomId) {
-      if (this.conferenceChatSub) {
-        this.conferenceChatSub.unsubscribe()
-        this.conferenceChatSub = null
+    // The unread counts of the call's two chats, for their tabs: one subscription for the
+    // length of the call, sorted by room below.
+    watchCallChats(active) {
+      if (this.callChatsSub) {
+        this.callChatsSub.unsubscribe()
+        this.callChatsSub = null
       }
-      if (!roomId) return
-      this.conferenceChatSub = this.$apollo
-        .subscribe({ query: roomUpdated(), fetchPolicy: 'no-cache' })
-        .subscribe({
-          next: ({ data }) => {
-            const room = data && data.roomUpdated
-            if (room && room.id === roomId) this.setConferenceUnread(room.unreadCount)
-          },
-          // The count is a convenience; the chat itself reports its own errors.
-          error: () => {},
+      if (!active) return
+      // The counts are a convenience: whatever goes wrong here, at once or later, must not
+      // touch the call this runs in. The chat itself reports its own errors.
+      try {
+        this.callChatsSub = this.$apollo
+          .subscribe({ query: roomUpdated(), fetchPolicy: 'no-cache' })
+          .subscribe({
+            next: ({ data }) => this.onCallChatUpdated(data && data.roomUpdated),
+            error: () => {},
+          })
+      } catch (_e) {
+        this.callChatsSub = null
+      }
+    },
+    onCallChatUpdated(room) {
+      if (!room) return
+      if (this.chatRoomId && room.id === this.chatRoomId) {
+        this.setConferenceUnread(room.unreadCount)
+      } else if (this.groupChatRoomId && room.id === this.groupChatRoomId) {
+        this.setGroupChatUnread(room.unreadCount)
+      } else if (!this.groupChatRoomId) {
+        // The group's chat room is not known yet. It may not have existed when the call
+        // began, and this may be the message that brought it about — ask again.
+        this.loadGroupChatUnread()
+      }
+    },
+    // The room of the group's chat and what is unread in it. The room is asked for by the
+    // group, as it need not exist; updates then arrive by its id.
+    async loadGroupChatUnread() {
+      const groupId = this.groupId
+      try {
+        const { data } = await this.$apollo.query({
+          query: roomUnreadQuery(),
+          variables: { groupId },
+          fetchPolicy: 'network-only',
         })
+        // The call may have been left, or swapped for another, in the meantime.
+        if (this.groupId !== groupId || this.phase !== 'in-call') return
+        const room = data && data.Room && data.Room[0]
+        this.groupChatRoomId = room ? room.id : null
+        this.setGroupChatUnread(room ? room.unreadCount : 0)
+      } catch (_e) {
+        /* the tab simply goes without a count */
+      }
     },
     tileAvatarSize(tile) {
       // Spotlight thumbnails are too short for the large avatar — it gets
@@ -1307,6 +1352,8 @@ export default {
         this.audioBlocked = !room.canPlaybackAudio
         this.phase = 'in-call'
         this.joinCallChat(room)
+        this.watchCallChats(true)
+        this.loadGroupChatUnread()
         this.refreshKnownDevices()
       } catch (err) {
         const message = this.$backendError(err)
@@ -2012,6 +2059,9 @@ export default {
       this.prefetched = null
       // The conference chat belongs to the call just left (see the chatRoomId watcher).
       this.setChatRoomId(null)
+      this.watchCallChats(false)
+      this.groupChatRoomId = null
+      this.setGroupChatUnread(0)
       this.lastRemoteSpeakerId = null
       // CRITICAL: do NOT set phase = 'prejoin' here. leave() runs cleanup()
       // BEFORE close(), so the Vuex `show` flag is still true when cleanup
@@ -2309,7 +2359,10 @@ export default {
   display: flex;
   align-items: center;
   gap: var(--space-x-small);
-  padding: var(--space-x-small) var(--space-small);
+  /*  No padding above and below: the tabs reach the row's lower edge, where the */
+  /*  underline of the active one belongs. The buttons bring the row's height. */
+  min-height: 44px;
+  padding: 0 var(--space-small);
   border-bottom: 1px solid var(--color-neutral-85);
 }
 

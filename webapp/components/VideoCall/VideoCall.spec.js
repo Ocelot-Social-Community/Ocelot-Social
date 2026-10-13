@@ -103,6 +103,7 @@ const buildStore = (state = {}) => {
   const showChat = jest.fn()
   const setChatRoomId = jest.fn()
   const setConferenceUnread = jest.fn()
+  const setLastChatTab = jest.fn()
   return {
     store: new Vuex.Store({
       getters: {
@@ -114,6 +115,8 @@ const buildStore = (state = {}) => {
         'videoCall/groupAvatar': () => state.groupAvatar ?? null,
         'videoCall/chatRoomId': () => state.chatRoomId ?? null,
         'videoCall/conferenceUnread': () => state.conferenceUnread ?? 0,
+        'videoCall/groupChatUnread': () => state.groupChatUnread ?? 0,
+        'videoCall/lastChatTab': () => state.lastChatTab ?? 'call',
         'chat/showChat': () => state.chat ?? { showChat: false, chatUserId: null, groupId: null },
         'auth/user': () => state.user ?? { id: 'u1', name: 'Alice', avatar: { url: 'a.png' } },
       },
@@ -124,6 +127,8 @@ const buildStore = (state = {}) => {
         'videoCall/SET_PARTICIPANT_COUNT': jest.fn(),
         'videoCall/SET_CHAT_ROOM_ID': setChatRoomId,
         'videoCall/SET_CONFERENCE_UNREAD': setConferenceUnread,
+        'videoCall/SET_GROUP_CHAT_UNREAD': jest.fn(),
+        'videoCall/SET_LAST_CHAT_TAB': setLastChatTab,
         'chat/SET_OPEN_CHAT': showChat,
       },
     }),
@@ -132,6 +137,7 @@ const buildStore = (state = {}) => {
     setStorePhase,
     showChat,
     setChatRoomId,
+    setLastChatTab,
   }
 }
 
@@ -312,6 +318,7 @@ describe('VideoCall', () => {
         chatOpenForThisCall: false,
         groupId: 'g1',
         chatRoomId: 'room-1',
+        lastChatTab: 'call',
         setShowChat,
         selectChatTab,
       }
@@ -324,12 +331,31 @@ describe('VideoCall', () => {
       })
     })
 
+    it('opens the chat that was looked at last', () => {
+      const setShowChat = jest.fn()
+      const ctx = {
+        chatOpenForThisCall: false,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        lastChatTab: 'group',
+        setShowChat,
+        selectChatTab,
+      }
+      VideoCall.methods.toggleChat.call(ctx)
+      expect(setShowChat).toHaveBeenCalledWith({
+        showChat: true,
+        chatUserId: null,
+        groupId: 'g1',
+      })
+    })
+
     it('opens the chat of the group while the call has no conference chat', () => {
       const setShowChat = jest.fn()
       const ctx = {
         chatOpenForThisCall: false,
         groupId: 'g1',
         chatRoomId: null,
+        lastChatTab: 'call',
         setShowChat,
         selectChatTab,
       }
@@ -3019,6 +3045,38 @@ describe('VideoCall', () => {
       expect(wrapper.vm.chatButtonUnread).toBe(0)
     })
 
+    it('chatButtonUnread adds up both chats while neither is on screen', () => {
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        conferenceUnread: 3,
+        groupChatUnread: 4,
+      })
+      expect(wrapper.vm.chatButtonUnread).toBe(7)
+    })
+
+    it('chatButtonUnread leaves out the chat that is on screen', () => {
+      const unread = { conferenceUnread: 3, groupChatUnread: 4 }
+      const callOpen = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        ...unread,
+        chat: { showChat: true, chatUserId: null, groupId: null, roomId: 'room-1' },
+      })
+      expect(callOpen.wrapper.vm.chatButtonUnread).toBe(4)
+
+      const groupOpen = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        ...unread,
+        chat: { showChat: true, chatUserId: null, groupId: 'g1', roomId: null },
+      })
+      expect(groupOpen.wrapper.vm.chatButtonUnread).toBe(3)
+    })
+
     it('chatButtonUnread shows the unread count while another chat or none is open', () => {
       const { wrapper } = factory({
         show: true,
@@ -3243,23 +3301,137 @@ describe('VideoCall', () => {
       return { handlers, unsubscribe, $apollo }
     }
 
-    it('counts the unread messages of its own room only', () => {
-      const { handlers, $apollo } = subscription()
-      const ctx = { conferenceChatSub: null, setConferenceUnread: jest.fn(), $apollo }
-      VideoCall.methods.watchConferenceChat.call(ctx, 'room-1')
-      handlers.next({ data: { roomUpdated: { id: 'another-room', unreadCount: 7 } } })
-      expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
+    it('listens for the length of the call, and stops when told to', () => {
+      const { handlers, unsubscribe, $apollo } = subscription()
+      const ctx = { callChatsSub: null, onCallChatUpdated: jest.fn(), $apollo }
+      VideoCall.methods.watchCallChats.call(ctx, true)
       handlers.next({ data: { roomUpdated: { id: 'room-1', unreadCount: 2 } } })
-      expect(ctx.setConferenceUnread).toHaveBeenCalledWith(2)
+      expect(ctx.onCallChatUpdated).toHaveBeenCalledWith({ id: 'room-1', unreadCount: 2 })
+
+      VideoCall.methods.watchCallChats.call(ctx, false)
+      expect(unsubscribe).toHaveBeenCalled()
+      expect(ctx.callChatsSub).toBeNull()
     })
 
-    it('stops listening once there is no conference chat', () => {
-      const { unsubscribe, $apollo } = subscription()
-      const ctx = { conferenceChatSub: null, setConferenceUnread: jest.fn(), $apollo }
-      VideoCall.methods.watchConferenceChat.call(ctx, 'room-1')
-      VideoCall.methods.watchConferenceChat.call(ctx, null)
-      expect(unsubscribe).toHaveBeenCalled()
-      expect(ctx.conferenceChatSub).toBeNull()
+    it('leaves the call alone when listening cannot be set up', () => {
+      const ctx = {
+        callChatsSub: null,
+        $apollo: {
+          subscribe: () => {
+            throw new Error('no socket')
+          },
+        },
+      }
+      expect(() => VideoCall.methods.watchCallChats.call(ctx, true)).not.toThrow()
+      expect(ctx.callChatsSub).toBeNull()
+    })
+
+    describe('unread counts of the two chats', () => {
+      const context = (overrides = {}) => ({
+        chatRoomId: 'room-1',
+        groupChatRoomId: 'group-room',
+        setConferenceUnread: jest.fn(),
+        setGroupChatUnread: jest.fn(),
+        loadGroupChatUnread: jest.fn(),
+        ...overrides,
+      })
+      const update = (ctx, room) => VideoCall.methods.onCallChatUpdated.call(ctx, room)
+
+      it('counts the conference chat by its room', () => {
+        const ctx = context()
+        update(ctx, { id: 'room-1', unreadCount: 2 })
+        expect(ctx.setConferenceUnread).toHaveBeenCalledWith(2)
+        expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+      })
+
+      it('counts the chat of the group by its room', () => {
+        const ctx = context()
+        update(ctx, { id: 'group-room', unreadCount: 5 })
+        expect(ctx.setGroupChatUnread).toHaveBeenCalledWith(5)
+        expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
+      })
+
+      it('leaves every other room alone', () => {
+        const ctx = context()
+        update(ctx, { id: 'another-room', unreadCount: 7 })
+        update(ctx, null)
+        expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
+        expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+        expect(ctx.loadGroupChatUnread).not.toHaveBeenCalled()
+      })
+
+      it('asks for the room of the group while it is not known yet', () => {
+        const ctx = context({ groupChatRoomId: null })
+        update(ctx, { id: 'maybe-the-new-group-room', unreadCount: 1 })
+        expect(ctx.loadGroupChatUnread).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('loading the chat of the group', () => {
+      const context = (query, overrides = {}) => ({
+        groupId: 'g1',
+        phase: 'in-call',
+        groupChatRoomId: null,
+        $apollo: { query },
+        setGroupChatUnread: jest.fn(),
+        ...overrides,
+      })
+      const load = (ctx) => VideoCall.methods.loadGroupChatUnread.call(ctx)
+
+      it('takes the room and what is unread in it', async () => {
+        const ctx = context(
+          jest.fn().mockResolvedValue({ data: { Room: [{ id: 'group-room', unreadCount: 4 }] } }),
+        )
+        await load(ctx)
+        expect(ctx.$apollo.query.mock.calls[0][0].variables).toEqual({ groupId: 'g1' })
+        expect(ctx.groupChatRoomId).toBe('group-room')
+        expect(ctx.setGroupChatUnread).toHaveBeenCalledWith(4)
+      })
+
+      it('counts nothing for a group that has no chat room yet', async () => {
+        const ctx = context(jest.fn().mockResolvedValue({ data: { Room: [] } }))
+        await load(ctx)
+        expect(ctx.groupChatRoomId).toBeNull()
+        expect(ctx.setGroupChatUnread).toHaveBeenCalledWith(0)
+      })
+
+      it('drops an answer that arrives after the call was left', async () => {
+        const ctx = context(
+          jest.fn().mockResolvedValue({ data: { Room: [{ id: 'group-room', unreadCount: 4 }] } }),
+          { phase: 'prejoin' },
+        )
+        await load(ctx)
+        expect(ctx.groupChatRoomId).toBeNull()
+        expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+      })
+
+      it('goes without a count when the request fails', async () => {
+        const ctx = context(jest.fn().mockRejectedValue(new Error('offline')))
+        await expect(load(ctx)).resolves.toBeUndefined()
+        expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('remembering the tab', () => {
+      const remember = (ctx, tab) => VideoCall.watch.activeChatTab.call(ctx, tab)
+
+      it('notes the tab that is looked at', () => {
+        const ctx = { chatRoomId: 'room-1', setLastChatTab: jest.fn() }
+        remember(ctx, 'group')
+        expect(ctx.setLastChatTab).toHaveBeenCalledWith('group')
+      })
+
+      it('keeps what it has when the chat is closed', () => {
+        const ctx = { chatRoomId: 'room-1', setLastChatTab: jest.fn() }
+        remember(ctx, null)
+        expect(ctx.setLastChatTab).not.toHaveBeenCalled()
+      })
+
+      it('does not take the chat of the group for a choice while it is the only one', () => {
+        const ctx = { chatRoomId: null, setLastChatTab: jest.fn() }
+        remember(ctx, 'group')
+        expect(ctx.setLastChatTab).not.toHaveBeenCalled()
+      })
     })
 
     describe('export from the tab row', () => {

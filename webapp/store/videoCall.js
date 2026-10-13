@@ -14,6 +14,12 @@ export const state = () => {
     // Unread messages in that conference chat. It is kept out of the header's chat badge,
     // so the call shows the number itself: on its chat button and on the "Call" tab.
     conferenceUnread: 0,
+    // Unread messages in the chat of the group the call takes place in — the other of the
+    // call's two chats, counted here for the tab that leads to it.
+    groupChatUnread: 0,
+    // Which of the call's two chats was looked at last: 'call' or 'group'. Kept across
+    // closing the chat and across calls, so the chat button opens where one left off.
+    lastChatTab: 'call',
     // 'idle' | 'prejoin' | 'connecting' | 'in-call' — mirrors VideoCall's local
     // phase so the layout can decide where the chat lives.
     phase: 'idle',
@@ -36,6 +42,7 @@ export const mutations = {
     state.participantCount = 0
     state.chatRoomId = null
     state.conferenceUnread = 0
+    state.groupChatUnread = 0
   },
   // Update group info post-hoc (e.g. after fetching by ID for a direct URL).
   SET_GROUP_INFO(state, { groupId, groupName, groupSlug, groupAvatar }) {
@@ -55,6 +62,7 @@ export const mutations = {
     state.participantCount = 0
     state.chatRoomId = null
     state.conferenceUnread = 0
+    state.groupChatUnread = 0
   },
   SET_MINIMIZED(state, minimized) {
     state.minimized = !!minimized
@@ -73,6 +81,12 @@ export const mutations = {
   },
   SET_CONFERENCE_UNREAD(state, count) {
     state.conferenceUnread = Number(count) || 0
+  },
+  SET_GROUP_CHAT_UNREAD(state, count) {
+    state.groupChatUnread = Number(count) || 0
+  },
+  SET_LAST_CHAT_TAB(state, tab) {
+    state.lastChatTab = tab === 'group' ? 'group' : 'call'
   },
 }
 
@@ -106,6 +120,12 @@ export const getters = {
   },
   conferenceUnread(state) {
     return state.conferenceUnread
+  },
+  groupChatUnread(state) {
+    return state.groupChatUnread
+  },
+  lastChatTab(state) {
+    return state.lastChatTab
   },
   phase(state) {
     return state.phase

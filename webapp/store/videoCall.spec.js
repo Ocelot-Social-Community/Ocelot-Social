@@ -20,6 +20,8 @@ describe('videoCall store', () => {
         participantCount: 0,
         chatRoomId: null,
         conferenceUnread: 0,
+        groupChatUnread: 0,
+        lastChatTab: 'call',
         phase: 'idle',
       })
     })
@@ -188,6 +190,51 @@ describe('videoCall store', () => {
         state.conferenceUnread = 3
         mutations.CLOSE(state)
         expect(state.conferenceUnread).toBe(0)
+      })
+    })
+
+    describe('SET_GROUP_CHAT_UNREAD', () => {
+      it('stores the number of unread messages in the chat of the group', () => {
+        mutations.SET_GROUP_CHAT_UNREAD(state, 4)
+        expect(state.groupChatUnread).toBe(4)
+        expect(getters.groupChatUnread(state)).toBe(4)
+      })
+
+      it('coerces what is not a number to 0', () => {
+        mutations.SET_GROUP_CHAT_UNREAD(state, null)
+        expect(state.groupChatUnread).toBe(0)
+      })
+
+      it('is forgotten when a call is opened or closed', () => {
+        state.groupChatUnread = 4
+        mutations.OPEN(state, { groupId: 'g2' })
+        expect(state.groupChatUnread).toBe(0)
+
+        state.groupChatUnread = 4
+        mutations.CLOSE(state)
+        expect(state.groupChatUnread).toBe(0)
+      })
+    })
+
+    describe('SET_LAST_CHAT_TAB', () => {
+      it('remembers which of the two chats was looked at last', () => {
+        mutations.SET_LAST_CHAT_TAB(state, 'group')
+        expect(getters.lastChatTab(state)).toBe('group')
+        mutations.SET_LAST_CHAT_TAB(state, 'call')
+        expect(getters.lastChatTab(state)).toBe('call')
+      })
+
+      it('falls back to the chat of the call for anything else', () => {
+        state.lastChatTab = 'group'
+        mutations.SET_LAST_CHAT_TAB(state, undefined)
+        expect(state.lastChatTab).toBe('call')
+      })
+
+      it('is kept across calls', () => {
+        mutations.SET_LAST_CHAT_TAB(state, 'group')
+        mutations.CLOSE(state)
+        mutations.OPEN(state, { groupId: 'g2' })
+        expect(state.lastChatTab).toBe('group')
       })
     })
 
