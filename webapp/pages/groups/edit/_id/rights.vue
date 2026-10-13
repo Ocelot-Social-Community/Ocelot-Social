@@ -200,6 +200,8 @@ export default {
       templateToApply: null,
       roles: [],
       myGroupPermissions: [],
+      /** The network right each capped group right needs in THIS group, by group right. */
+      networkPrerequisites: {},
     }
   },
   computed: {
@@ -279,8 +281,11 @@ export default {
     gateHint(permission) {
       if (!permission || this.grantable(permission)) return null
       if (permission.requiresNetworkPermission) {
+        // Resolved for this group where the server said so: the catalog's own entry may still
+        // carry a placeholder (videoCall.create_<door>), which read as a right nobody has.
         return this.$t('group.rights.blockedByNetwork', {
-          permission: permission.requiresNetworkPermission,
+          permission:
+            this.networkPrerequisites[permission.key] ?? permission.requiresNetworkPermission,
         })
       }
       if (permission.gatedBy?.length) {
@@ -397,6 +402,12 @@ export default {
         const group = data.Group?.[0]
         this.roles = group?.roles ?? []
         this.myGroupPermissions = group?.myGroupPermissions ?? []
+        this.networkPrerequisites = Object.fromEntries(
+          (group?.networkPrerequisites ?? []).map((entry) => [
+            entry.key,
+            entry.requiresNetworkPermission,
+          ]),
+        )
         // A refetch (another tab saved, the page re-entered) must not throw away what the user
         // is still editing; the draft follows the server only while it holds nothing of its own.
         if (!this.dirty) this.resetDraft()

@@ -11,8 +11,16 @@ type GroupPermission {
   description: String!
   "Further runtime feature gates beyond the groups feature itself (e.g. videoConference). Empty when the right depends on nothing else."
   gatedBy: [String!]!
-  "The network permission that must ALSO be held for this right to be effective, with `<type>` standing in for the group's type. Null when the capability is purely group-scoped."
+  "The network permission that must ALSO be held for this right to be effective. It may carry the `<door>` placeholder, which stands for whether a stranger can walk into the group (`open` or `restricted`) — resolved for one concrete group in Group.networkPrerequisites. Null when the capability is purely group-scoped."
   requiresNetworkPermission: String
+}
+
+"A group right's network prerequisite, resolved for one group: the catalog's placeholder replaced by what this group is."
+type GroupNetworkPrerequisite {
+  "The group right."
+  key: String!
+  "The network permission that must also be held for the right to be effective in this group."
+  requiresNetworkPermission: String!
 }
 
 "A role definition owned by one group."

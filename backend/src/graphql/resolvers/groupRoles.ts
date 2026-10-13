@@ -5,7 +5,12 @@ import { Errors } from '@graphql/errorRegistry'
 import { AppError, UserInputError } from '@graphql/errors'
 import { addUserToGroupChatRoom, removeUserFromGroupChatRoom } from '@graphql/resolvers/groups'
 import { visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
-import { groupPermissionCatalog, sanitizeGroupPermissions } from '@src/groupPermission'
+import {
+  allGroupPermissionKeys,
+  groupPermissionCatalog,
+  networkPrerequisiteFor,
+  sanitizeGroupPermissions,
+} from '@src/groupPermission'
 import {
   coversRole,
   storableRightsFor,
@@ -372,6 +377,21 @@ export default {
     },
     mayElevateInGroup: async (parent: { id: string }, _args, context: Context) =>
       (await context.groupAuthorization.forGroup(parent.id))?.mayElevate ?? false,
+    // Resolved against the group's call door, the same resolution the cap itself uses
+    // (groupRole/effective.ts), so a hint names exactly the right the server checks.
+    networkPrerequisites: async (parent: { id: string }, _args, context: Context) => {
+      const authorization = await context.groupAuthorization.forGroup(parent.id)
+      if (!authorization) {
+        return []
+      }
+      return allGroupPermissionKeys().flatMap((key) => {
+        // Null for a right with no network counterpart, which therefore has no hint.
+        const requiresNetworkPermission = networkPrerequisiteFor(key, {
+          callDoor: authorization.callDoor,
+        })
+        return requiresNetworkPermission ? [{ key, requiresNetworkPermission }] : []
+      })
+    },
     myGroupPermissions: async (parent: { id: string }, _args, context: Context) => {
       const authorization = await context.groupAuthorization.forGroup(parent.id)
       return [...(authorization?.effective ?? [])]
