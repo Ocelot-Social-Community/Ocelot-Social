@@ -9,6 +9,25 @@ verbatim; only its version headings were lifted to `##`, because release-please 
 in front of the first `##`/`###` version heading it finds and would otherwise have written it into
 the middle of the file.
 
+## [3.21.1](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/3.21.0...3.21.1) (2026-10-13)
+
+
+### Bug Fixes
+
+* **webapp:** ask only for user search and group members the viewer may read ([#10500](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10500)) ([70c94e9](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/70c94e9dc062c631aba8f46ecda5e438bcd97025))
+* **webapp:** group page follows a change to the viewer's network rights ([#10502](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10502)) ([7dca14e](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/7dca14e87ab5b7682304cfe4fbc76581315b1864))
+* **webapp:** group rights tab no longer fails server-side for a viewer who may only elevate ([#10496](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10496)) ([15b3790](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/15b3790fa668a45561dc4d05650d8f0fe4fedb19))
+* **webapp:** name the concrete network right in the group rights hint ([#10504](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10504)) ([2546995](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/2546995e11530a9bab2226478103091ff3239e48))
+* **webapp:** open the policy and permissions subscriptions only in the browser ([#10503](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10503)) ([9092f3f](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/9092f3f02ddd8608471ac44296c481f0887fac09))
+* **webapp:** search, map, post creation and call page survive groups switched off ([#10501](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10501)) ([794f40d](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/794f40d8c59fa7356a3b67054b846a57c81756a5))
+* **webapp:** send /settings/api-keys back to the settings when API keys are off ([#10499](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10499)) ([1878fb1](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/1878fb108f98c40ebd1dec0c25bf82dabf3f165d))
+* **webapp:** translate every network and group right in all locales ([#10505](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10505)) ([15a74b6](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/15a74b64ad6f7a7ba8388b9cdbb81cddaf0e1ec8))
+
+
+### Tests
+
+* **backend:** pin the client URL so mail snapshots pass outside Docker ([#10493](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10493)) ([ea7eb5d](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/ea7eb5dfc2508446be7144f2f6b92439a5526c10))
+
 ## [3.21.0](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/3.20.0...3.21.0) (2026-10-12)
 
 
