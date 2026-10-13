@@ -1067,6 +1067,7 @@
       "activeUntil": "Termina a las {time}, o cuando lo finalices.",
       "end": "Finalizar el acceso de administrador",
       "offerBody": "Además tienes permisos de red sobre él. Leer su contenido o cambiar algo requiere esta confirmación, que queda registrada en el grupo.",
+      "offerBodyOwner": "Tus permisos de red también te permiten degradar o quitar a los demás propietarios de este grupo. Eso requiere esta confirmación, que queda registrada en el grupo.",
       "reasonPlaceholder": "¿De qué se trata?",
       "start": "Usar acceso de administrador"
     },

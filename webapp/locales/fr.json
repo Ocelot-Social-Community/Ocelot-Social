@@ -1067,6 +1067,7 @@
       "activeUntil": "Il se termine à {time}, ou quand tu y mets fin.",
       "end": "Terminer l'accès administrateur",
       "offerBody": "Tu disposes en plus de droits réseau sur lui. Lire son contenu ou modifier quoi que ce soit demande cette confirmation, qui est consignée auprès du groupe.",
+      "offerBodyOwner": "Tes droits réseau te permettent aussi de rétrograder ou de retirer les autres propriétaires de ce groupe. Cela demande cette confirmation, qui est consignée auprès du groupe.",
       "reasonPlaceholder": "De quoi s'agit-il ?",
       "start": "Utiliser l'accès administrateur"
     },

@@ -56,6 +56,23 @@ describe('GroupElevation', () => {
     expect(at(asStranger, 'elevation-offer').text()).toContain('group.elevation.actingAsNonMember')
   })
 
+  it('tells an owner what asking adds for them: the standing over their co-owners', () => {
+    // They already hold every right, so "changing anything asks for this" would be untrue.
+    const asOwner = Wrapper({
+      id: 'g1',
+      mayElevateInGroup: true,
+      myGroupElevation: null,
+      myGroupRole: { name: 'owner', label: null },
+    })
+
+    expect(at(asOwner, 'elevation-offer').text()).toContain('group.elevation.offerBodyOwner')
+
+    const asStranger = Wrapper({ id: 'g1', mayElevateInGroup: true, myGroupElevation: null })
+
+    expect(at(asStranger, 'elevation-offer').text()).toContain('group.elevation.offerBody')
+    expect(at(asStranger, 'elevation-offer').text()).not.toContain('offerBodyOwner')
+  })
+
   it('offers the access to somebody who holds network rights here', () => {
     const wrapper = Wrapper({ id: 'g1', mayElevateInGroup: true, myGroupElevation: null })
 
