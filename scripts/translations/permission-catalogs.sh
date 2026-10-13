@@ -5,7 +5,8 @@
 # - network rights (backend/src/permission/permission.catalog.json) under `admin.roles.perm`,
 # - group rights (backend/src/groupPermission/groupPermission.catalog.json) under `group.rights.perm`,
 # each keyed by the catalog key with its dots as underscores (see webapp/utils/permissionLabel.js).
-# The other languages are held to en.json's keys by missing-keys.sh.
+# The other languages are held to en.json's keys by missing-keys.sh; an empty translation fails in
+# every locale.
 
 ROOT_DIR=$(dirname "$0")/../..
 ENGLISH="$ROOT_DIR/webapp/locales/en.json"
@@ -37,7 +38,24 @@ check() {
   fi
 }
 
+# An empty translation counts as none: permissionLabel falls back to the catalog's English for it,
+# so the key being present proves nothing. Checked in every locale, not only en.json.
+check_empty() {
+  local namespace=$1 file empty
+  for file in "$ROOT_DIR"/webapp/locales/*.json; do
+    empty=$(jq -r --arg ns "$namespace" \
+      'getpath($ns | split(".")) // {} | to_entries[] | select((.value | type) != "string" or (.value | test("^\\s*$"))) | .key' \
+      "$file")
+    if [ -n "$empty" ]; then
+      printf "Empty translations in %s (%s):\n%s\n\n" "$file" "$namespace" "$empty"
+      has_error=1
+    fi
+  done
+}
+
 check "$ROOT_DIR/backend/src/permission/permission.catalog.json" "admin.roles.perm"
 check "$ROOT_DIR/backend/src/groupPermission/groupPermission.catalog.json" "group.rights.perm"
+check_empty "admin.roles.perm"
+check_empty "group.rights.perm"
 
 exit $has_error
