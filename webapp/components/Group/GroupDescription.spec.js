@@ -2,7 +2,15 @@ import { mount } from '@vue/test-utils'
 import { branding } from '@ocelot-social/branding'
 import Vue from 'vue'
 
+import { contentAtoms } from '~/utils/cleanCut'
+
 import GroupDescription from './GroupDescription.vue'
+
+// The geometry itself is utils/cleanCut.spec.js's; here only what the component does with it.
+jest.mock('~/utils/cleanCut', () => ({
+  ...jest.requireActual('~/utils/cleanCut'),
+  contentAtoms: jest.fn(() => []),
+}))
 
 const localVue = global.localVue
 
@@ -148,6 +156,50 @@ describe('GroupDescription', () => {
     await Vue.nextTick()
 
     expect(toggle(wrapper).exists()).toBe(true)
+  })
+
+  describe('the cut (#10487)', () => {
+    // Lines of 30px under a 100px cap: the fourth line would be sliced at 90–120.
+    const thirtyPixelLines = Array.from({ length: 10 }, (_, i) => ({
+      top: i * 30,
+      bottom: (i + 1) * 30,
+    }))
+
+    afterEach(() => contentAtoms.mockReturnValue([]))
+
+    it('ends the preview below the last whole line, not at the cap', async () => {
+      contentAtoms.mockReturnValue(thirtyPixelLines)
+      const wrapper = Wrapper()
+      await Vue.nextTick()
+
+      expect(clamp(wrapper).element.style.height).toBe('90px')
+    })
+
+    it('leaves the cap alone where there is no line to stop at', async () => {
+      const wrapper = Wrapper()
+      await Vue.nextTick()
+
+      expect(clamp(wrapper).element.style.height).toBe('')
+    })
+
+    it('does not cut a description that fits', async () => {
+      contentHeight = 40
+      contentAtoms.mockReturnValue(thirtyPixelLines)
+      const wrapper = Wrapper('<p>Short.</p>')
+      await Vue.nextTick()
+
+      expect(clamp(wrapper).element.style.height).toBe('')
+    })
+
+    it('shows everything once expanded', async () => {
+      contentAtoms.mockReturnValue(thirtyPixelLines)
+      const wrapper = Wrapper()
+      await Vue.nextTick()
+
+      await toggle(wrapper).trigger('click')
+
+      expect(clamp(wrapper).element.style.height).toBe('')
+    })
   })
 
   it('watches the inner element, the one that grows', () => {

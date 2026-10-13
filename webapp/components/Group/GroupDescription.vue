@@ -39,6 +39,7 @@
 import { OsButton, OsCard } from '@ocelot-social/ui'
 import { branding } from '@ocelot-social/branding'
 import ContentViewer from '~/components/Editor/ContentViewer'
+import { cleanCutHeight, contentAtoms } from '~/utils/cleanCut'
 
 /**
  * A group's description, collapsed to a few lines with a toggle when it is longer.
@@ -65,6 +66,10 @@ export default {
       // Whether this browser can tell us when the content changes size. Assumed until
       // mounted, so the server-rendered first paint is capped like the hydrated one.
       measurable: true,
+      // Where the collapsed preview ends, in px: below the last line or image that fits whole
+      // under the cap (#10487). Null until a browser has measured, and where no such line
+      // exists — then the cap itself stands.
+      cut: null,
       hydrated: false,
     }
   },
@@ -80,11 +85,15 @@ export default {
     //
     // Not capped at all where the size cannot be watched: text cut off with no way to
     // expand it is worse than a long card.
+    //
+    // The clean cut goes into `height`, not over the cap: max-height keeps saying where the
+    // cap is, which is what the next measurement compares against.
     clampStyle() {
       if (!this.collapsed || !this.measurable) return {}
       return {
         maxHeight: `calc(${branding.group.descriptionCollapsedLines} * var(--line-height-base, 1.3) * 1em)`,
         overflow: 'hidden',
+        ...(this.cut === null ? {} : { height: `${this.cut}px` }),
       }
     },
   },
@@ -126,9 +135,15 @@ export default {
       if (!this.collapsed) return
       const { clamp, content } = this.$refs
       if (!clamp || !content) return
+      // The cap as the browser resolved it. Read off max-height rather than the element's
+      // height, which is the cut once there is one. Where it does not resolve to pixels
+      // (jsdom), the rendered height is the cap: nothing else shortens it before a cut.
+      const resolved = parseFloat(getComputedStyle(clamp).maxHeight)
+      const cap = Number.isFinite(resolved) ? resolved : clamp.clientHeight
       // 1px of slack: sub-pixel line heights otherwise report a permanent overflow and show
       // a toggle that expands to nothing.
-      this.overflows = content.scrollHeight > clamp.clientHeight + 1
+      this.overflows = content.scrollHeight > cap + 1
+      this.cut = this.overflows ? cleanCutHeight(contentAtoms(content), cap) : null
     },
   },
 }
