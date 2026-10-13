@@ -1,7 +1,6 @@
 import GroupProfileSlug from './_slug.vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { mount } from '@vue/test-utils'
-import { branding as brandingDefaults } from '@ocelot-social/branding'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { groupRights, groupRightsWithout } from '~/test/groupRightsFixture'
@@ -29,6 +28,14 @@ Object.assign(Math, {
 })
 
 jest.mock('vue-infinite-loading', () => ({}))
+
+// jsdom has no ResizeObserver, and without one GroupDescription does not cap the text at all
+// (it could never tell the reader there is more). A browser has one; give jsdom one that
+// observes nothing, so the description measures once on mount as it does there.
+global.ResizeObserver = class {
+  observe() {}
+  disconnect() {}
+}
 
 // jsdom does no layout, so every element reports height 0 and the description would
 // always measure as "fits". Fake just the two numbers the overflow check reads: the
@@ -400,62 +407,6 @@ describe('GroupProfileSlug', () => {
             ).toEqual(['https://ocelot.social', 'https://example.org'])
           })
         })
-
-        // The collapsed height is a CSS cap on the full description, not a character
-        // cut — that is what makes it independent of whether the text starts with a
-        // heading and a list or with a paragraph.
-        describe('collapsed description height', () => {
-          const clamp = () => wrapper.container.querySelector('.description-clamp')
-          const toggle = () => wrapper.container.querySelector('.collaps-button')
-          // The overflow verdict only reaches the DOM on the next tick, so re-render
-          // and wait rather than reusing the wrapper from the enclosing beforeEach.
-          const renderGroup = async (group = yogaPractice) => {
-            wrapper = Wrapper(() => ({ group: { ...group, ...groupRights('owner') } }))
-            await Vue.nextTick()
-          }
-
-          // Inline, not via a class: it has to hold on the first paint, before the
-          // page's stylesheet is necessarily there.
-          it('caps the height at the branded number of lines while collapsed', async () => {
-            await renderGroup()
-
-            expect(clamp().style.maxHeight).toBe(
-              `calc(${brandingDefaults.group.descriptionCollapsedLines} * var(--line-height-base, 1.3) * 1em)`,
-            )
-            expect(clamp().style.overflow).toBe('hidden')
-          })
-
-          it('offers the toggle and fades the cut edge when the description exceeds the cap', async () => {
-            await renderGroup()
-
-            expect(toggle()).not.toBeNull()
-            expect(clamp().classList).toContain('description-clamp--faded')
-          })
-
-          it('lifts the cap and the fade once expanded', async () => {
-            await renderGroup()
-
-            await fireEvent.click(toggle())
-
-            expect(clamp().style.maxHeight).toBe('')
-            expect(clamp().classList).not.toContain('description-clamp--faded')
-          })
-
-          // An always-visible toggle on a description that already fits is a dead end
-          // — this is what the character-count excerpt could not tell us.
-          it('hides the toggle and the fade when the description fits', async () => {
-            restoreDescriptionHeights()
-            restoreDescriptionHeights = stubDescriptionHeights({
-              contentHeight: 40,
-              clampHeight: 100,
-            })
-
-            await renderGroup()
-
-            expect(toggle()).toBeNull()
-            expect(clamp().classList).not.toContain('description-clamp--faded')
-          })
-        })
       })
 
       describe('as usual member – "jenny-rostock"', () => {
@@ -724,9 +675,8 @@ describe('GroupProfileSlug', () => {
     })
   })
 
-  // The group arrives from Apollo AFTER mount, so the first overflow measurement runs
-  // against an empty card. ResizeObserver covers this in a browser, but not where it is
-  // missing — and not in jsdom, which is exactly why this is asserted here.
+  // A description that changes while the page is open (an owner editing it in place) is
+  // measured again, without waiting for the observer.
   describe('description overflow re-measurement', () => {
     let savedErrorHandler
     let savedWarnHandler
@@ -757,9 +707,8 @@ describe('GroupProfileSlug', () => {
           'post-teaser': true,
           // A stub that actually renders its content: the measurement reads the
           // rendered text, and the default empty stub would report every description
-          // as empty. Real tiptap is no use here either — it attaches its DOM
-          // imperatively, so in jsdom the text is not there yet when the watcher
-          // measures, which is a quirk of the editor and not of this wiring.
+          // as empty. Real tiptap attaches its DOM a tick after it renders — in a browser
+          // too, which is what the ResizeObserver is for (#10488).
           'content-viewer': {
             props: ['content'],
             template: '<div>{{ content }}</div>',
@@ -785,6 +734,33 @@ describe('GroupProfileSlug', () => {
 
       expect(wrapper.find('.collaps-button').exists()).toBe(true)
     })
+  })
+
+  // The first visit by client-side navigation (#10488): the page mounts before Apollo has the
+  // group, so there is no description to measure yet. Measuring from the page's own mount
+  // missed it for good; the description now measures from ITS mount.
+  it('offers "show more" for a group that arrives after the page mounted', async () => {
+    currentUserMock.mockReturnValue(peterLustig)
+    const wrapper = mount(GroupProfileSlug, {
+      localVue,
+      store,
+      stubs: {
+        ...stubs,
+        'infinite-loading': true,
+        'masonry-grid': true,
+        'masonry-grid-item': true,
+        'post-teaser': true,
+      },
+      mocks,
+      data: () => ({ group: {} }),
+    })
+    await Vue.nextTick()
+    expect(wrapper.find('.group-description').exists()).toBe(false)
+
+    await wrapper.setData({ group: { ...yogaPractice, ...groupRights('owner') } })
+    await Vue.nextTick()
+
+    expect(wrapper.find('.collaps-button').exists()).toBe(true)
   })
 
   describe('roomUpdated subscription setup', () => {

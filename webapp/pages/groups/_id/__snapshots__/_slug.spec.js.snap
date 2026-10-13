@@ -713,7 +713,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--faded"
+              class="content hyphenate-text description-clamp"
+              data-test="description-clamp"
               style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
@@ -772,6 +773,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             <button
               class="collaps-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
               data-appearance="ghost"
+              data-test="description-toggle"
               data-variant="primary"
               type="button"
             >
@@ -779,8 +781,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="inline-flex items-center"
               >
                 
-            comment.show.more
-          
+    comment.show.more
+  
               </span>
             </button>
           </div>
@@ -1339,7 +1341,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--faded"
+              class="content hyphenate-text description-clamp"
+              data-test="description-clamp"
               style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
@@ -1398,6 +1401,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             <button
               class="collaps-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
               data-appearance="ghost"
+              data-test="description-toggle"
               data-variant="primary"
               type="button"
             >
@@ -1405,8 +1409,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="inline-flex items-center"
               >
                 
-            comment.show.more
-          
+    comment.show.more
+  
               </span>
             </button>
           </div>
@@ -1950,7 +1954,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--faded"
+              class="content hyphenate-text description-clamp"
+              data-test="description-clamp"
               style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
@@ -2009,6 +2014,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             <button
               class="collaps-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
               data-appearance="ghost"
+              data-test="description-toggle"
               data-variant="primary"
               type="button"
             >
@@ -2016,8 +2022,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="inline-flex items-center"
               >
                 
-            comment.show.more
-          
+    comment.show.more
+  
               </span>
             </button>
           </div>
@@ -2751,7 +2757,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--faded"
+              class="content hyphenate-text description-clamp"
+              data-test="description-clamp"
               style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
@@ -2810,6 +2817,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             <button
               class="collaps-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
               data-appearance="ghost"
+              data-test="description-toggle"
               data-variant="primary"
               type="button"
             >
@@ -2817,8 +2825,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="inline-flex items-center"
               >
                 
-            comment.show.more
-          
+    comment.show.more
+  
               </span>
             </button>
           </div>
@@ -3574,7 +3582,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--faded"
+              class="content hyphenate-text description-clamp"
+              data-test="description-clamp"
               style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
@@ -3615,6 +3624,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <button
               class="collaps-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
               data-appearance="ghost"
+              data-test="description-toggle"
               data-variant="primary"
               type="button"
             >
@@ -3622,8 +3632,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class="inline-flex items-center"
               >
                 
-            comment.show.more
-          
+    comment.show.more
+  
               </span>
             </button>
           </div>
@@ -4092,7 +4102,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--faded"
+              class="content hyphenate-text description-clamp"
+              data-test="description-clamp"
               style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
@@ -4133,6 +4144,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <button
               class="collaps-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
               data-appearance="ghost"
+              data-test="description-toggle"
               data-variant="primary"
               type="button"
             >
@@ -4140,8 +4152,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class="inline-flex items-center"
               >
                 
-            comment.show.more
-          
+    comment.show.more
+  
               </span>
             </button>
           </div>
@@ -4595,7 +4607,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--faded"
+              class="content hyphenate-text description-clamp"
+              data-test="description-clamp"
               style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
@@ -4636,6 +4649,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <button
               class="collaps-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
               data-appearance="ghost"
+              data-test="description-toggle"
               data-variant="primary"
               type="button"
             >
@@ -4643,8 +4657,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class="inline-flex items-center"
               >
                 
-            comment.show.more
-          
+    comment.show.more
+  
               </span>
             </button>
           </div>
@@ -5260,7 +5274,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--faded"
+              class="content hyphenate-text description-clamp"
+              data-test="description-clamp"
               style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
@@ -5301,6 +5316,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <button
               class="collaps-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
               data-appearance="ghost"
+              data-test="description-toggle"
               data-variant="primary"
               type="button"
             >
@@ -5308,8 +5324,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class="inline-flex items-center"
               >
                 
-            comment.show.more
-          
+    comment.show.more
+  
               </span>
             </button>
           </div>
@@ -6182,7 +6198,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--faded"
+              class="content hyphenate-text description-clamp"
+              data-test="description-clamp"
               style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
@@ -6247,6 +6264,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             <button
               class="collaps-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
               data-appearance="ghost"
+              data-test="description-toggle"
               data-variant="primary"
               type="button"
             >
@@ -6254,8 +6272,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class="inline-flex items-center"
               >
                 
-            comment.show.more
-          
+    comment.show.more
+  
               </span>
             </button>
           </div>
@@ -7034,7 +7052,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--faded"
+              class="content hyphenate-text description-clamp"
+              data-test="description-clamp"
               style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
@@ -7099,6 +7118,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             <button
               class="collaps-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
               data-appearance="ghost"
+              data-test="description-toggle"
               data-variant="primary"
               type="button"
             >
@@ -7106,8 +7126,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class="inline-flex items-center"
               >
                 
-            comment.show.more
-          
+    comment.show.more
+  
               </span>
             </button>
           </div>

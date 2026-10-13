@@ -250,42 +250,7 @@
       <div class="group-layout__main">
         <!-- Group description -->
         <div class="ds-mb-large">
-          <os-card class="group-description">
-            <!-- The collapsed preview is capped by CSS, not by a character count: an
-                 excerpt cut to N characters is a heading and a list here and a single
-                 paragraph there, so its rendered height varied wildly between groups.
-                 The cap is applied to the outer element; the inner one keeps its
-                 natural height and is what we measure against. -->
-            <div
-              ref="descriptionClamp"
-              class="content hyphenate-text description-clamp"
-              :class="{
-                'description-clamp--faded': isDescriptionCollapsed && descriptionOverflows,
-              }"
-              :style="descriptionClampStyle"
-            >
-              <!-- Both states go through the same tiptap viewer so links, hashtags and
-                   mentions render identically. ContentViewer builds its editor in
-                   data() and needs `document`, so before hydration we emit the
-                   backend-sanitized HTML as-is — same markup, SSR-safe, and the server
-                   response still carries the description for crawlers. -->
-              <div ref="descriptionContent">
-                <content-viewer v-if="hydrated" :content="group.description" />
-                <!-- eslint-disable-next-line vue/no-v-html -->
-                <div v-else v-html="group.description" />
-              </div>
-            </div>
-            <os-button
-              v-if="descriptionOverflows"
-              class="collaps-button"
-              variant="primary"
-              appearance="ghost"
-              size="sm"
-              @click="isDescriptionCollapsed = !isDescriptionCollapsed"
-            >
-              {{ isDescriptionCollapsed ? $t('comment.show.more') : $t('comment.show.less') }}
-            </os-button>
-          </os-card>
+          <group-description :description="group.description" />
         </div>
         <div v-if="isGroupMemberNonePending" class="ds-mt-small ds-mb-small ds-space-centered">
           <os-button
@@ -389,9 +354,9 @@ import UpdateQuery from '~/components/utils/UpdateQuery'
 import postListActions from '~/mixins/postListActions'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
 import Category from '~/components/Category'
-import ContentViewer from '~/components/Editor/ContentViewer'
 import Empty from '~/components/Empty/Empty'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
+import GroupDescription from '~/components/Group/GroupDescription'
 import GroupElevation from '~/components/Group/GroupElevation'
 import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
@@ -403,7 +368,6 @@ import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import GroupPageMemberList from '~/components/features/ProfileList/GroupPageMemberList'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
 import { mapGetters, mapMutations } from 'vuex'
-import { branding } from '@ocelot-social/branding'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import groupRights from '~/mixins/groupRights'
 // import SocialMedia from '~/components/SocialMedia/SocialMedia'
@@ -428,9 +392,9 @@ export default {
     OsSpinner,
     AvatarUploader,
     Category,
-    ContentViewer,
     Empty,
     GroupContentMenu,
+    GroupDescription,
     GroupElevation,
     JoinLeaveButton,
     LocationInfo,
@@ -464,12 +428,6 @@ export default {
       // tabActive: 'post',
       filter,
       updateGroupMutation,
-      isDescriptionCollapsed: true,
-      // Whether the description is actually taller than the collapsed cap. Starts
-      // false so the toggle is absent until measured — an always-visible button on
-      // a two-line description is a dead end (CommentCard gates it too, see its
-      // `hasLongContent`). Only a browser can answer this, so SSR renders no button.
-      descriptionOverflows: false,
       group: {},
       chatRoom: null,
       hydrated: false,
@@ -515,21 +473,6 @@ export default {
     groupSlug() {
       const { slug } = this.group || {}
       return slug
-    },
-    // Inline rather than in a class, because this has to hold on the FIRST paint. The
-    // page's scoped stylesheet is not necessarily there yet — under Nuxt's dev server
-    // it is injected by JS after hydration — and until it arrives a class-based cap
-    // does nothing, so the full description flashed up and then collapsed. An inline
-    // style ships inside the server-rendered HTML and applies before any stylesheet.
-    //
-    // Only the line COUNT is ours; the line height itself comes from the design tokens,
-    // with the token's own value as the fallback for the same first-paint reason.
-    descriptionClampStyle() {
-      if (!this.isDescriptionCollapsed) return {}
-      return {
-        maxHeight: `calc(${branding.group.descriptionCollapsedLines} * var(--line-height-base, 1.3) * 1em)`,
-        overflow: 'hidden',
-      }
     },
     // "May I administer this group" rather than "am I the owner": the rights are granted
     // independently now, so an admin can hold the settings right without being an owner.
@@ -614,7 +557,6 @@ export default {
     this._videoCallCountSub = null
     this._groupShowMembersSub = null
     this._groupPermissionsSub = null
-    this.setupDescriptionOverflowObserver()
     if (this.canParticipateInChat) this.setupRoomUpdatedSubscription()
     if (this.canShowVideoCallButton) this.setupVideoCallCountSubscription()
     if (this.group?.myGroupRole) this.setupGroupShowMembersSubscription()
@@ -625,7 +567,6 @@ export default {
     this._videoCallCountSub?.unsubscribe()
     this._groupShowMembersSub?.unsubscribe()
     this._groupPermissionsSub?.unsubscribe()
-    this.teardownDescriptionOverflowObserver()
   },
   watch: {
     // What the viewer may do in this group comes with the group, already capped by their
@@ -656,16 +597,6 @@ export default {
     'group.myGroupRole'(myGroupRole) {
       if (myGroupRole) this.setupGroupShowMembersSubscription()
     },
-    // The group usually arrives from Apollo AFTER mount, so the first measurement
-    // ran against an empty card. ResizeObserver catches this too, but not everywhere
-    // it is missing (and not in jsdom), and this keeps the toggle correct when an
-    // owner edits the description in place.
-    'group.description'() {
-      this.$nextTick(this.measureDescriptionOverflow)
-    },
-    isDescriptionCollapsed(collapsed) {
-      if (collapsed) this.$nextTick(this.measureDescriptionOverflow)
-    },
   },
   methods: {
     /**
@@ -682,35 +613,6 @@ export default {
     }),
     scrollToLocationMap() {
       this.$refs.locationMapCard?.$el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    },
-    setupDescriptionOverflowObserver() {
-      this.measureDescriptionOverflow()
-      if (typeof ResizeObserver === 'undefined') return
-      // The inner element is the one that grows: it swaps from the pre-hydration
-      // HTML to the tiptap render, reflows when the column narrows, and grows again
-      // when the webfont replaces the fallback. A window resize listener would miss
-      // the first two.
-      const content = this.$refs.descriptionContent
-      if (!content) return
-      this._descriptionObserver = new ResizeObserver(() => this.measureDescriptionOverflow())
-      this._descriptionObserver.observe(content)
-    },
-    teardownDescriptionOverflowObserver() {
-      this._descriptionObserver?.disconnect()
-      this._descriptionObserver = null
-    },
-    measureDescriptionOverflow() {
-      // Only meaningful while collapsed: expanded, the outer element has no cap, so
-      // the comparison would always say "fits" and pull the "show less" button out
-      // from under the reader. The last collapsed measurement stays valid — the
-      // content cannot have shrunk below the cap by being revealed.
-      if (!this.isDescriptionCollapsed) return
-      const clamp = this.$refs.descriptionClamp
-      const content = this.$refs.descriptionContent
-      if (!clamp || !content) return
-      // 1px of slack: sub-pixel line heights otherwise report a permanent overflow
-      // and show a toggle that expands to nothing.
-      this.descriptionOverflows = content.scrollHeight > clamp.clientHeight + 1
     },
     setupGroupShowMembersSubscription() {
       if (this._groupShowMembersSub) return
@@ -1125,30 +1027,6 @@ export default {
 }
 .chip {
   margin-bottom: var(--space-x-small);
-}
-::v-deep .group-description.os-card {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding-bottom: var(--space-base) !important;
-
-  .content {
-    flex-grow: 1;
-    margin-bottom: var(--space-small);
-  }
-}
-
-/* The collapsed height itself is an inline style (see descriptionClampStyle) so it
-   survives the first paint. Only the fade lives here — it has no first-paint job,
-   because it depends on a measurement that a browser can only make after hydration.
-
-   Fades the last lines out instead of slicing through them. A mask rather than a
-   gradient overlay, so it does not have to know the card's background colour.
-   Gated on the measured overflow: a description that ends well above the cap must
-   not fade out its own last line for no reason. */
-.description-clamp--faded {
-  mask-image: linear-gradient(to bottom, black calc(100% - 3em), transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 3em), transparent 100%);
 }
 .word-break-all {
   overflow-wrap: anywhere;
