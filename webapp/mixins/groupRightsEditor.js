@@ -11,6 +11,7 @@ import groupRights from '~/mixins/groupRights'
 import { orderRolesByPrivilege } from '~/utils/groupRights'
 import { applyRightChange, rightsTouchedBy } from '~/utils/groupRoleRights'
 import { diffBetween, isRoleDirty, permissionSetOf } from '~/utils/permissionDiff'
+import { GROUP_PERMISSIONS, permissionLabel } from '~/utils/permissionLabel'
 
 /**
  * A rights screen: the sentences, the matrix under them, and the one draft they share.
@@ -215,6 +216,10 @@ export default {
   },
   methods: {
     isSystemGroupRole,
+    /** What the matrix says about a right, in the viewer's language. */
+    permLabel(permission) {
+      return permissionLabel(this.$t.bind(this), GROUP_PERMISSIONS, permission)
+    },
     /** A role's rights and name as the draft has them, falling back to what is stored. */
     draftOf(name) {
       const role = this.editedRoles.find((candidate) => candidate.name === name)

@@ -111,6 +111,7 @@
           :diff="hoverDiff"
           :highlight="highlightedRights"
           :group-label="(name) => $t(`permissions.sections.${name}`)"
+          :description-for="permLabel"
           :disabled-for="rowDisabled"
           :hint-for="blockedHint"
           :note-for="blockedHint"

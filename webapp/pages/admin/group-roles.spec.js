@@ -255,6 +255,17 @@ describe('admin/group-roles.vue', () => {
     })
   })
 
+  // The rights read in the viewer's language — they used to be the catalog's English (#10492).
+  it('hands the matrix the translated description of each right', async () => {
+    const wrapper = await Wrapper()
+    await at(wrapper, 'to-advanced').trigger('click')
+    const matrix = wrapper.findComponent({ name: 'PermissionMatrix' })
+    const permission = { key: 'group.leave', description: 'Leave the group.' }
+    expect(matrix.props('descriptionFor')(permission)).toBe('Leave the group.')
+    wrapper.vm.$t = (path) => `T:${path}`
+    expect(matrix.props('descriptionFor')(permission)).toBe('T:group.rights.perm.group_leave')
+  })
+
   it('reads the untouched count as a share of the type`s groups', async () => {
     // A bare "4 groups still run on this template" reads as "only 4" — the denominator is
     // what tells an admin whether that is all of them.

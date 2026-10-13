@@ -80,6 +80,15 @@ describe('PermissionMatrix', () => {
     expect(wrapper.find('.perm-row__desc').text()).toBe('DESC:post.create')
     expect(wrapper.find('[data-test="role-user-perm-post.create"]').exists()).toBe(true)
   })
+
+  // People granting a right think in what it does, not in its key — the key stays, below.
+  it('leads with the description and puts the key under it', () => {
+    const wrapper = Wrapper({ descriptionFor: (permission) => `DESC:${permission.key}` })
+    const parts = wrapper.find('.perm-row__text').element.children
+    expect(parts[0].className).toBe('perm-row__desc')
+    expect(parts[1].className).toBe('perm-row__key')
+    expect(parts[1].textContent).toBe('post.create')
+  })
 })
 
 describe('the highlight', () => {
