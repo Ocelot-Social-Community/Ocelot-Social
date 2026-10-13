@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import VueMeta from 'vue-meta'
 import Vuex from 'vuex'
+import { print } from 'graphql'
 import Map from './map'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 
@@ -198,6 +199,7 @@ describe('map', () => {
     mocks = {
       $t: (t) => t,
       $i18n: { locale: () => 'en' },
+      $policy: { get: (key) => key === 'groupsEnabled' },
       $route: { path: '/map', query: {} },
       $router: { replace: jest.fn(), push: jest.fn() },
       $env: {
@@ -261,6 +263,13 @@ describe('map', () => {
     it('renders legend with all marker types', () => {
       const items = wrapper.findAll('[data-test="marker-type-item"]')
       expect(items.length).toBe(4)
+    })
+
+    it('leaves groups out of the legend while groups are switched off', () => {
+      mocks.$policy = { get: () => false }
+      const items = createWrapper().findAll('[data-test="marker-type-item"]')
+      expect(items.length).toBe(3)
+      expect(items.wrappers.map((item) => item.text())).not.toContain('map.legend.group')
     })
 
     it('renders a "show past events" toggle button in the legend', () => {
@@ -1896,6 +1905,33 @@ describe('map', () => {
         expect(vars.postFilter.postType_in).toEqual(['Event'])
         expect(vars.postFilter.hasLocation).toBe(true)
         expect(vars.postFilter.eventStart_gte).toBeInstanceOf(Date)
+      })
+
+      it('asks for groups while they are switched on', () => {
+        const variablesFn = wrapper.vm.$options.apollo.mapData.variables.bind(wrapper.vm)
+        expect(variablesFn().withGroups).toBe(true)
+      })
+
+      // The server refuses Group while groups are off, and during server-side rendering that
+      // refusal failed the whole map page.
+      it('leaves groups out of the query while they are switched off', () => {
+        mocks.$policy = { get: () => false }
+        const w = createWrapper()
+        const variablesFn = w.vm.$options.apollo.mapData.variables.bind(w.vm)
+        expect(variablesFn().withGroups).toBe(false)
+      })
+
+      it('includes Group only under the withGroups variable', () => {
+        const queryFn = wrapper.vm.$options.apollo.mapData.query.bind(wrapper.vm)
+        expect(print(queryFn())).toMatch(
+          /Group\(hasLocation: \$groupHasLocation\) @include\(if: \$withGroups\)/,
+        )
+      })
+
+      it('update treats a missing Group as an empty list, so markers still get drawn', () => {
+        const updateFn = wrapper.vm.$options.apollo.mapData.update.bind(wrapper.vm)
+        updateFn({ User: otherUsers, Post: posts })
+        expect(wrapper.vm.groups).toEqual([])
       })
 
       it('variables omits eventStart_gte when showPastEvents is true', () => {

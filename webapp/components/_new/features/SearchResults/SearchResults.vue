@@ -220,6 +220,7 @@ export default {
       return 0
     },
     tabOptions() {
+      const groupsEnabled = this.$policy.get('groupsEnabled') === true
       return [
         {
           type: 'Post',
@@ -233,7 +234,7 @@ export default {
           count: this.userCount,
           disabled: this.userCount === 0,
         },
-        {
+        groupsEnabled && {
           type: 'Group',
           title: this.$t('search.heading.Group', {}, this.groupCount),
           count: this.groupCount,
@@ -245,7 +246,7 @@ export default {
           count: this.hashtagCount,
           disabled: this.hashtagCount === 0,
         },
-      ]
+      ].filter(Boolean)
     },
     hasPrevious() {
       if (this.activeTab === 'Post') return this.postsOffset > 0
@@ -415,7 +416,9 @@ export default {
         }
       },
       skip() {
-        return !this.search
+        // With groups switched off the server refuses the query — and during server-side
+        // rendering that refusal is the whole page failing, not an empty tab.
+        return !this.search || this.$policy.get('groupsEnabled') !== true
       },
       update({ searchGroups }) {
         if (!searchGroups) return
