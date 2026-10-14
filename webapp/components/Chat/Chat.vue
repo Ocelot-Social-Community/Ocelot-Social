@@ -572,6 +572,16 @@ export default {
         .vac-room-header { height: 60px !important; }
         .vac-room-header .vac-avatar-profile--header { margin-right: 8px; }
         ${
+          // A chat on its own — the floating window, the call's sidebar — has little height,
+          // and the library puts 10px above and below the input (7px on a narrow screen).
+          // Less of it there; the input itself keeps its size.
+          this.singleRoom
+            ? `
+        .vac-box-footer { padding-top: 4px !important; padding-bottom: 4px !important; }
+        `
+            : ''
+        }
+        ${
           // The library has no switch for its header, and reserves the header's height
           // above the messages with a margin of their own — both have to go.
           this.hideHeader
