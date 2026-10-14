@@ -405,6 +405,13 @@ export default {
       css: ({ isDev }) => (isDev ? '[name].css' : `css/[contenthash:7]_${CONFIG.VERSION}.css`),
     },
     cache: true,
+    // CSS as files instead of a <style> block in every server-rendered page (#5762). Inlined, the
+    // global stylesheets (tokens, ds-compat, the UI library: ~79 kB) were shipped again with every
+    // full page load and could not be cached; as content-hashed files (`filenames.css` above) the
+    // browser loads them once. Per chunk, so a page brings only its own components' styles.
+    // `ignoreOrder`: the components' styles are scoped, so the order mini-css-extract-plugin
+    // warns about between chunks does not decide anything.
+    extractCSS: { ignoreOrder: true },
     /*
      ** PostCSS: only ADDING a plugin, never replacing the defaults.
      **
