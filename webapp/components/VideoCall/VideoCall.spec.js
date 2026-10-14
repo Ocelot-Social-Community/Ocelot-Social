@@ -3292,9 +3292,27 @@ describe('VideoCall', () => {
     })
 
     it('spells the controls out on a desktop with the call maximized', () => {
-      expect(computed.iconOnly.call({ parked: false, isMobile: false, phase: 'in-call' })).toBe(
-        false,
-      )
+      expect(
+        computed.iconOnly.call({
+          parked: false,
+          isMobile: false,
+          phase: 'in-call',
+          controlsCrowded: false,
+        }),
+      ).toBe(false)
+    })
+
+    it('drops the labels on a desktop where they would take a second row', () => {
+      const desktop = { parked: false, isMobile: false, phase: 'in-call', controlsCrowded: true }
+      expect(computed.iconOnly.call(desktop)).toBe(true)
+      const crowded = (controlsWidth, labeledControlsWidth, isMobile = false) =>
+        computed.controlsCrowded.call({ controlsWidth, labeledControlsWidth, isMobile })
+      expect(crowded(500, 640)).toBe(true)
+      expect(crowded(700, 640)).toBe(false)
+      // Not measured yet, or a phone, which has its own rule.
+      expect(crowded(500, 0)).toBe(false)
+      expect(crowded(0, 640)).toBe(false)
+      expect(crowded(500, 640, true)).toBe(false)
     })
 
     it('never parks the call on a phone', () => {

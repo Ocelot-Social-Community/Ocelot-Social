@@ -529,6 +529,10 @@ export default {
       lastRemoteSpeakerId: null,
       // The bars lying on the videos have moved out of the way (see barsOverlay).
       barsHidden: false,
+      // The control bar: how wide it is, and how wide it was the last time its buttons
+      // had their labels (see controlsCrowded).
+      controlsWidth: 0,
+      labeledControlsWidth: 0,
     }
   },
   computed: {
@@ -719,10 +723,20 @@ export default {
     },
     iconOnly() {
       // Buttons without their label where there is no room for it: in the parked
-      // window, and on a phone, where six spelled-out controls fill half the
-      // screen. In the parked window they are small as well (see `parked`); on a
-      // phone they keep the size a finger needs.
-      return this.parked || (this.isMobile && this.phase === 'in-call')
+      // window, on a phone, where six spelled-out controls fill half the
+      // screen, and where the labels would take a second row. In the parked window
+      // they are small as well (see `parked`); on a phone they keep the size a
+      // finger needs.
+      return this.parked || (this.isMobile && this.phase === 'in-call') || this.controlsCrowded
+    },
+    // The control bar lies on the videos only, so the chat beside them narrows it.
+    controlsCrowded() {
+      return (
+        !this.isMobile &&
+        this.controlsWidth > 0 &&
+        this.labeledControlsWidth > 0 &&
+        this.controlsWidth < this.labeledControlsWidth
+      )
     },
     uniqueParticipantCount() {
       // A single participant publishing both camera and screen share still counts
@@ -955,6 +969,7 @@ export default {
     // element is unchanged, which also keeps the observer's own updates from
     // looping.
     this.observeStage()
+    this.measureControls()
   },
   beforeDestroy() {
     this.watchBarActivity(false)
@@ -1087,6 +1102,24 @@ export default {
       if (width === this.stageWidth && height === this.stageHeight) return
       this.stageWidth = width
       this.stageHeight = height
+    },
+    // How wide the control bar is, and — while its buttons have their labels — how wide
+    // they need it in one row. Run after every render: the bar changes with the stage
+    // (whose observer re-renders) and with the labels (muted or not).
+    measureControls() {
+      const bar = this.$el?.querySelector?.('.video-call__controls')
+      if (!bar) return
+      if (bar.clientWidth !== this.controlsWidth) this.controlsWidth = bar.clientWidth
+      if (this.iconOnly) return
+      const style = window.getComputedStyle(bar)
+      const items = Array.from(bar.children)
+      const needed = Math.ceil(
+        items.reduce((sum, item) => sum + item.offsetWidth, 0) +
+          (parseFloat(style.columnGap) || 0) * Math.max(items.length - 1, 0) +
+          (parseFloat(style.paddingLeft) || 0) +
+          (parseFloat(style.paddingRight) || 0),
+      )
+      if (needed !== this.labeledControlsWidth) this.labeledControlsWidth = needed
     },
     disconnectStageObserver() {
       if (this.stageObserver) {
@@ -1294,7 +1327,7 @@ export default {
       // once the button spells its label out next to the icon. Nor on a phone:
       // there is no pointer to hover with, and a tap would open the tooltip on
       // top of doing what the button does.
-      return this.parked ? label : ''
+      return this.parked || this.controlsCrowded ? label : ''
     },
     onTileSelect(tile) {
       if (this.swallowTileSelect) {
