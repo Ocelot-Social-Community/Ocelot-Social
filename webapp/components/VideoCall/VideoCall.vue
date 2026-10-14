@@ -438,6 +438,9 @@ const BARS_HIDE_MS = 4000
 const BARS_EDGE_PX = 50
 // What brings the bars back. Focus too, for whoever moves through the controls by keyboard.
 const BARS_ACTIVITY_EVENTS = ['mousemove', 'pointerdown', 'keydown', 'wheel', 'focusin']
+// A tap is followed by the mouse events and the focus the browser makes up for it; they
+// come within this time and are no activity of their own.
+const TOUCH_ECHO_MS = 800
 
 // Cameras publish 16:9, so the grid aims for cells of that shape: the closer a
 // cell matches, the less `object-fit: cover` has to crop off the sides.
@@ -684,12 +687,13 @@ export default {
       if (this.isPreJoinModal) return false
       return this.isMobile || !this.minimized || this.phase !== 'in-call'
     },
-    // On a desktop with the call maximized the call fills the window: its header and
-    // control bar lie on the videos, as the page's header and footer do, all four
-    // see-through, and they move out of the way while the mouse rests. On a phone, in the
-    // parked window and in the dialog before joining they stay where they are.
+    // With the call maximized it fills the window: its header and control bar lie on the
+    // videos, as the page's header and footer do, all four see-through, and they move out
+    // of the way while the mouse rests — on a phone after a while without a touch, or at a
+    // tap. Not with the chat open on a phone, where one writes beneath a small tile, nor
+    // in the parked window or the dialog before joining.
     barsOverlay() {
-      return this.isFullscreen && !this.isMobile
+      return this.isFullscreen && !this.mobileChatOpen
     },
     // Only once there are videos to make room for.
     autoHideBars() {
@@ -919,6 +923,9 @@ export default {
     // Ahead of the immediate `autoHideBars` watcher as well.
     this.barsTimer = null
     this.barsWatched = false
+    this.lastTouchAt = 0
+    // The tap that brought the bars back is not meant for the tile it landed on.
+    this.swallowTileSelect = false
   },
   created() {
     this.icons = iconRegistry
@@ -986,6 +993,11 @@ export default {
       }
     },
     onBarActivity(event) {
+      if (event.type === 'pointerdown' && event.pointerType === 'touch') {
+        this.onBarTouch(event)
+        return
+      }
+      if (Date.now() - this.lastTouchAt < TOUCH_ECHO_MS) return
       // Reading and writing in the chat beside the videos is no reason to put the bars
       // back on them; going for the page's header or footer at the window's edge is.
       const inChat = event.target?.closest?.('.video-call__sidebar')
@@ -995,6 +1007,24 @@ export default {
       if (inChat && !atEdge) return
       this.barsHidden = false
       this.scheduleBarsHide()
+    },
+    // On a touch screen a tap on the videos switches the bars: back when they are gone —
+    // without spotlighting the tile it landed on — and away when they are there, unless
+    // the tap is on a tile, which spotlights it as ever. Other taps keep them a while.
+    onBarTouch(event) {
+      this.lastTouchAt = Date.now()
+      this.swallowTileSelect = false
+      const onStage = event.target?.closest?.('.video-call__stage')
+      if (this.barsHidden) {
+        this.barsHidden = false
+        this.swallowTileSelect = !!onStage
+        this.scheduleBarsHide()
+      } else if (onStage && !event.target.closest('.video-tile')) {
+        clearTimeout(this.barsTimer)
+        this.barsHidden = true
+      } else {
+        this.scheduleBarsHide()
+      }
     },
     scheduleBarsHide() {
       clearTimeout(this.barsTimer)
@@ -1016,11 +1046,18 @@ export default {
       ].filter(Boolean)
       const focused = document.activeElement
       const keyboardFocus = focused && matchesSafely(focused, ':focus-visible')
+      // A touch screen keeps the last tapped element as hovered; that says nothing there.
+      const hovers = window.matchMedia?.('(hover: hover)')?.matches ?? true
       if (
-        bars.some((bar) => matchesSafely(bar, ':hover') || (keyboardFocus && bar.contains(focused)))
+        bars.some(
+          (bar) =>
+            (hovers && matchesSafely(bar, ':hover')) || (keyboardFocus && bar.contains(focused)),
+        )
       ) {
         return true
       }
+      // The page's menu on a phone covers the screen from its header.
+      if (document.querySelector('.mobil-header-box--open')) return true
       // The menus of the page's header (avatar, notifications) are popovers, put at the
       // end of the page.
       return !!document.querySelector('.popover[aria-hidden="false"]')
@@ -1260,6 +1297,10 @@ export default {
       return this.parked ? label : ''
     },
     onTileSelect(tile) {
+      if (this.swallowTileSelect) {
+        this.swallowTileSelect = false
+        return
+      }
       if (!tile) return
       // Only spotlight in fullscreen — minimized window already shows one tile.
       if (!this.isFullscreen) return

@@ -3093,13 +3093,13 @@ describe('VideoCall', () => {
   describe('bars on the videos', () => {
     const { computed } = VideoCall
 
-    it('lie on the videos on a desktop with the call maximized', () => {
-      expect(computed.barsOverlay.call({ isFullscreen: true, isMobile: false })).toBe(true)
+    it('lie on the videos with the call maximized', () => {
+      expect(computed.barsOverlay.call({ isFullscreen: true, mobileChatOpen: false })).toBe(true)
     })
 
-    it('stay where they are on a phone, in the parked window and before joining', () => {
-      expect(computed.barsOverlay.call({ isFullscreen: true, isMobile: true })).toBe(false)
-      expect(computed.barsOverlay.call({ isFullscreen: false, isMobile: false })).toBe(false)
+    it('stay where they are with the chat open on a phone, in the parked window and before joining', () => {
+      expect(computed.barsOverlay.call({ isFullscreen: true, mobileChatOpen: true })).toBe(false)
+      expect(computed.barsOverlay.call({ isFullscreen: false, mobileChatOpen: false })).toBe(false)
     })
 
     it('tell the page what its header and footer are to do', () => {
@@ -3195,6 +3195,65 @@ describe('VideoCall', () => {
         await wrapper.setData({ error: 'broken' })
         jest.advanceTimersByTime(4000)
         expect(wrapper.vm.barsHidden).toBe(false)
+      })
+
+      describe('on a touch screen', () => {
+        // The call is not attached to the document here, so what lands on its videos is
+        // handed to the listener directly, as the document would.
+        const tap = (target) =>
+          wrapper.vm.onBarActivity({ type: 'pointerdown', pointerType: 'touch', target })
+        let stage
+        let tile
+
+        beforeEach(() => {
+          stage = wrapper.find('.video-call__stage').element
+          tile = document.createElement('div')
+          tile.className = 'video-tile'
+          stage.appendChild(tile)
+        })
+
+        it('are switched away by a tap beside the tiles, and back by the next', () => {
+          tap(stage)
+          expect(wrapper.vm.barsHidden).toBe(true)
+          tap(stage)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          jest.advanceTimersByTime(4000)
+          expect(wrapper.vm.barsHidden).toBe(true)
+        })
+
+        it('come back at a tap on a tile, which then is not spotlighted', () => {
+          jest.advanceTimersByTime(4000)
+          tap(tile)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          wrapper.vm.onTileSelect({ key: 'anna' })
+          expect(wrapper.vm.spotlightKey).toBeNull()
+        })
+
+        it('stay at a tap on a tile, which is spotlighted as ever', () => {
+          tap(tile)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          wrapper.vm.onTileSelect({ key: 'anna' })
+          expect(wrapper.vm.spotlightKey).toBe('anna')
+        })
+
+        it('ignore the mouse events the browser makes up after a tap', () => {
+          tap(stage)
+          move()
+          wrapper.vm.onBarActivity({ type: 'focusin', target: tile })
+          expect(wrapper.vm.barsHidden).toBe(true)
+          jest.advanceTimersByTime(800)
+          move()
+          expect(wrapper.vm.barsHidden).toBe(false)
+        })
+
+        it("stay while the page's menu is open", () => {
+          const menu = document.createElement('div')
+          menu.className = 'mobil-header-box--open'
+          document.body.appendChild(menu)
+          jest.advanceTimersByTime(8000)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          menu.remove()
+        })
       })
 
       it("leave the page's header and footer as they were when the call goes", () => {
