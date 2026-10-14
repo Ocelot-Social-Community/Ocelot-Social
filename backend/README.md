@@ -74,10 +74,8 @@ your `.env` configuration file.
 
 Your backend is up and running at [http://localhost:4000/](http://localhost:4000/)
 This will start the GraphQL service \(by default on localhost:4000\) where you
-can issue GraphQL requests or access GraphQL Playground in the browser.
-More details about our GraphQL playground and how to use it with ocelot.social can be found [here](./src/graphql/GraphQL-Playground.md).
-
-![GraphQL Playground](../docu/gitbook/graphql-playground.png)
+can issue GraphQL requests, and with `DEBUG=true` explore the API in the browser.
+More details about that and how to use it with ocelot.social can be found [here](./src/graphql/GraphQL-Playground.md).
 
 ## Database
 
