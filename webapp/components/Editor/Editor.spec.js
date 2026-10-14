@@ -1,3 +1,6 @@
+import { readFileSync } from 'fs'
+import { join } from 'path'
+
 import { mount } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import { TextSelection } from 'prosemirror-state'
@@ -55,6 +58,37 @@ describe('Editor.vue', () => {
         await Vue.nextTick().then(() => {
           expect(wrapper.find('.editor-content').text()).toContain(propsData.value)
         })
+      })
+    })
+
+    // The placeholder rule of Editor.vue's own stylesheet, matched against the rendered lines: it
+    // shows on an empty editor, not on an empty first line above some text (#4254) — tiptap marks
+    // that line is-empty as well, only an empty editor is-editor-empty.
+    describe('placeholder', () => {
+      const placeholderSelector = (() => {
+        const source = readFileSync(join(__dirname, 'Editor.vue'), 'utf8')
+        const [, selector] = source.match(
+          /^([^{}\n]+)::before\s*{\s*content: attr\(data-empty-text\)/m,
+        )
+        return selector.trim()
+      })()
+      const showsPlaceholder = () =>
+        wrapper.find('.editor-content p').element.matches(placeholderSelector)
+
+      it('shows on an empty editor', async () => {
+        wrapper = Wrapper()
+        await Vue.nextTick()
+        expect(showsPlaceholder()).toBe(true)
+      })
+
+      it('does not show on an empty first line above some text', async () => {
+        propsData.value = '<p></p><p>Some text below</p>'
+        wrapper = Wrapper()
+        await Vue.nextTick()
+        const { view } = wrapper.vm.editor
+        view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, 1)))
+        await Vue.nextTick()
+        expect(showsPlaceholder()).toBe(false)
       })
     })
 
