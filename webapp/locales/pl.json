@@ -1789,6 +1789,7 @@
     },
     "blocked-users": {
       "block": "Zablokuj użytkownika",
+      "blocked": "{name} jest zablokowany",
       "columns": {
         "name": "Nazwa",
         "slug": "Slug",
@@ -1901,6 +1902,7 @@
       },
       "how-to": "Możesz wyciszać innych użytkowników na ich stronie profilu przez menu treści.",
       "mute": "Wycisz użytkownika",
+      "muted": "{name} jest wyciszony",
       "name": "Wyciszeni użytkownicy",
       "unmute": "Cofnij wyciszenie użytkownika",
       "unmuted": "{name} nie jest już wyciszony/a"

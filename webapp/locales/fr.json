@@ -1789,6 +1789,7 @@
     },
     "blocked-users": {
       "block": "Bloquer l'utilisateur",
+      "blocked": "{name} est bloqué",
       "columns": {
         "name": "Nom",
         "slug": "Slug",
@@ -1901,6 +1902,7 @@
       },
       "how-to": "Tu peux mettre d'autres utilisateurs en sourdine sur leur page de profil via le menu de contenu.",
       "mute": "Mettre en sourdine",
+      "muted": "{name} est mis en sourdine",
       "name": "Utilisateurs en sourdine",
       "unmute": "Réactiver l'utilisateur",
       "unmuted": "{name} n'est plus en sourdine"

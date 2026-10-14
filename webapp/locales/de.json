@@ -1789,6 +1789,7 @@
     },
     "blocked-users": {
       "block": "Nutzer blockieren",
+      "blocked": "{name} ist blockiert",
       "columns": {
         "name": "Name",
         "slug": "Alias",
@@ -1901,6 +1902,7 @@
       },
       "how-to": "Du kannst andere Nutzer auf deren Profilseite über das Inhaltsmenü stummschalten.",
       "mute": "Stumm schalten",
+      "muted": "{name} ist stummgeschaltet",
       "name": "Stummgeschaltete Nutzer",
       "unmute": "Stummschaltung aufheben",
       "unmuted": "{name} ist nicht mehr stummgeschaltet"

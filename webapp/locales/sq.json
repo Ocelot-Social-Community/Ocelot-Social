@@ -1789,6 +1789,7 @@
     },
     "blocked-users": {
       "block": "Blloko përdoruesin",
+      "blocked": "{name} është bllokuar",
       "columns": {
         "name": "Emri",
         "slug": "Slug",
@@ -1901,6 +1902,7 @@
       },
       "how-to": "Mund të heshtësh përdorues të tjerë në faqen e tyre të profilit përmes menusë së përmbajtjes.",
       "mute": "Hesht përdoruesin",
+      "muted": "{name} është heshtur",
       "name": "Përdorues të heshtur",
       "unmute": "Çhesht përdoruesin",
       "unmuted": "{name} nuk është më i heshtur"

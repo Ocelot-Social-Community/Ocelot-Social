@@ -1789,6 +1789,7 @@
     },
     "blocked-users": {
       "block": "Block user",
+      "blocked": "{name} is blocked",
       "columns": {
         "name": "Name",
         "slug": "Slug",
@@ -1901,6 +1902,7 @@
       },
       "how-to": "You can mute other users on their profile page via the content menu.",
       "mute": "Mute user",
+      "muted": "{name} is muted",
       "name": "Muted users",
       "unmute": "Unmute user",
       "unmuted": "{name} is unmuted again"

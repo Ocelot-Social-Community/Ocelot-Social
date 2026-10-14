@@ -1789,6 +1789,7 @@
     },
     "blocked-users": {
       "block": "Bloquear usuario",
+      "blocked": "{name} está bloqueado",
       "columns": {
         "name": "Nombre",
         "slug": "Alias",
@@ -1901,6 +1902,7 @@
       },
       "how-to": "Puede silenciar a otros usuarios en su página de perfil a través del menú de contenido.",
       "mute": "Silenciar usuario",
+      "muted": "{name} está silenciado",
       "name": "Usuarios silenciados",
       "unmute": "Dejar de silenciar al usuario",
       "unmuted": "{name} no está silenciado ahora"
