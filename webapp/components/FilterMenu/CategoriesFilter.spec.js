@@ -14,18 +14,18 @@ describe('CategoriesFilter.vue', () => {
   const getters = {
     'posts/filteredCategoryIds': jest.fn(() => []),
     'categories/categories': jest.fn().mockReturnValue([
-      { id: 'cat4', name: 'Environment & Nature', icon: 'tree', slug: 'environment-nature' },
+      { id: 'cat4', name: 'Environment & Nature', icon: 'tree', slug: 'nature' },
       {
         id: 'cat15',
         name: 'Consumption & Sustainability',
         icon: 'shopping-cart',
-        slug: 'consumption-sustainability',
+        slug: 'economy',
       },
       {
         id: 'cat9',
         name: 'Democracy & Politics',
         icon: 'university',
-        slug: 'democracy-politics',
+        slug: 'politics',
       },
     ]),
   }

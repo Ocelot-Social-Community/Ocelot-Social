@@ -34,8 +34,8 @@ describe('error.vue', () => {
     })
 
     it('renders error message to given custom key', () => {
-      wrapper = Wrapper({ error: { statusCode: 404, key: 'my-custom-key' } })
-      expect(wrapper.find('.error-message').text()).toBe('my-custom-key')
+      wrapper = Wrapper({ error: { statusCode: 404, key: 'error-pages.post-not-found' } })
+      expect(wrapper.find('.error-message').text()).toBe('error-pages.post-not-found')
     })
 
     it('has a link to index page', () => {

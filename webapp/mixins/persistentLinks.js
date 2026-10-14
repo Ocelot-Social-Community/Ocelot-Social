@@ -1,5 +1,5 @@
 export default function (options = {}) {
-  const { queryId, querySlug, path, message = 'Page not found.' } = options
+  const { queryId, querySlug, path, message = 'error-pages.404-default' } = options
   return {
     asyncData: async (context) => {
       const {

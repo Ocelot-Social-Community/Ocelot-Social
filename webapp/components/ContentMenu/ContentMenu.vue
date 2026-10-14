@@ -81,7 +81,7 @@ export default {
       type: String,
       required: true,
       validator: (value) => {
-        return value.match(/(contribution|comment|organization|user)/)
+        return value.match(/(contribution|comment|user)/)
       },
     },
     modalsData: {
@@ -330,7 +330,7 @@ export default {
     // Disabling a USER account is a user.disable capability (the moderator-grade,
     // reversible counterpart to user.delete.any), routed through the dedicated
     // disableUser mutation — same as the admin/moderation user list. Disabling
-    // CONTENT (post/comment/organization) stays content.moderate via the report
+    // CONTENT (post/comment) stays content.moderate via the report
     // `review` mutation. So the gate (and the mutation, see reviewModalData) depend
     // on the resource type. A user is offered only when the viewer outranks them
     // (outrankedByCurrentUser) — the act-on hierarchy disableUser enforces, same as delete.
@@ -395,7 +395,7 @@ export default {
             callback: async () => {
               try {
                 // Users go through the dedicated disableUser mutation (user.disable);
-                // content (post/comment/organization) through the report review
+                // content (post/comment) through the report review
                 // mutation (content.moderate). Mirrors the gate in canDisableResource.
                 const mutationOptions =
                   this.resourceType === 'user'
@@ -430,7 +430,6 @@ export default {
     getResourceName() {
       switch (this.resourceType) {
         case 'user':
-        case 'organization':
           return this.resource.name || ''
         case 'contribution':
           return this.resource.title || ''

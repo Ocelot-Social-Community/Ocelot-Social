@@ -69,7 +69,7 @@ describe('GroupForm', () => {
         stubs,
         store: new Vuex.Store({
           getters: {
-            'categories/categories': () => [{ id: 'cat-1', slug: 'family' }],
+            'categories/categories': () => [{ id: 'cat-1', slug: 'children' }],
             'categories/isInitialized': () => true,
           },
           actions: { 'categories/init': jest.fn() },
@@ -127,8 +127,8 @@ describe('GroupForm', () => {
     actionRadius: 'local',
     locationName: '',
     categories: [
-      { id: 'cat-1', slug: 'family' },
-      { id: 'cat-2', slug: 'work' },
+      { id: 'cat-1', slug: 'children' },
+      { id: 'cat-2', slug: 'economy' },
       { id: 'cat-3', slug: 'psyche' },
     ],
   }

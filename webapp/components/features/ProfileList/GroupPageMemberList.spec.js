@@ -117,11 +117,23 @@ describe('GroupPageMemberList.vue', () => {
     })
 
     it('resolves a section label through the role-label rules', async () => {
-      // $t echoes the key here, which is how "no translation" looks: the heading then falls
-      // back to the role name itself rather than showing an i18n path.
-      const wrapper = await Wrapper({}, { members: [{ id: '1', membershipRole: 'owner' }] })
-      expect(wrapper.vm.$t).toHaveBeenCalledWith('group.roles.owner')
-      expect(wrapper.vm.sectionsWithMembers[0].label).toBe('owner')
+      // $t echoes the key here: a system role is translated, a role the group invented is
+      // named by itself, and the members section has a heading of its own.
+      const wrapper = await Wrapper(
+        {},
+        {
+          members: [
+            { id: '1', membershipRole: 'owner' },
+            { id: '2', membershipRole: 'usual' },
+            { id: '3', membershipRole: 'curator' },
+          ],
+        },
+      )
+      expect(wrapper.vm.sectionsWithMembers.map((section) => section.label)).toEqual([
+        'group.roles.owner',
+        'group.roles.members',
+        'curator',
+      ])
     })
 
     it('gives a role the group invented a section of its own, after the known ones', async () => {

@@ -9,6 +9,8 @@ import Directives from '~/plugins/vue-directives'
 import BackendError from '~/plugins/backend-error'
 import VueObserveVisibility from '~/plugins/vue-observe-visibility'
 import PermissionGate from '~/components/_new/generic/PermissionGate/PermissionGate.vue'
+// Before createLocalVue below, which copies the global mixins it finds.
+import './knownTranslationKeys'
 
 // jsdom-only harness bits. A spec may opt into the plain `node` environment via the
 // `@jest-environment node` docblock — utils/themeTokens.spec.js does, because the SSR branch it

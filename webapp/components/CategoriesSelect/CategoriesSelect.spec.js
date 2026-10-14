@@ -17,20 +17,24 @@ describe('CategoriesSelect.vue', () => {
       id: 'cat9',
       name: 'Democracy & Politics',
       icon: 'university',
+      slug: 'politics',
     },
     {
       id: 'cat4',
       name: 'Environment & Nature',
       icon: 'tree',
+      slug: 'nature',
     },
     {
       id: 'cat15',
       name: 'Consumption & Sustainability',
       icon: 'shopping-cart',
+      slug: 'economy',
     },
     {
       name: 'Cooperation & Development',
       icon: 'users',
+      slug: 'networking',
       id: 'cat8',
     },
   ]

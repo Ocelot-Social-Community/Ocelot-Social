@@ -605,23 +605,6 @@ describe('ContentMenu.vue', () => {
           .trigger('click')
         expect(openModalSpy).toHaveBeenCalledWith('report')
       })
-
-      it('another organization is possible', async () => {
-        const wrapper = await openContentMenu({
-          isOwner: false,
-          resourceType: 'organization',
-          resource: {
-            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
-          },
-        })
-        openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
-        wrapper
-          .findAll('.os-menu-item')
-          .filter((item) => item.text() === 'report.organization.title')
-          .at(0)
-          .trigger('click')
-        expect(openModalSpy).toHaveBeenCalledWith('report')
-      })
     })
 
     describe('moderator', () => {
@@ -761,25 +744,6 @@ describe('ContentMenu.vue', () => {
         expect(resource.disabled).toBe(false)
       })
 
-      it('can disable organizations', async () => {
-        granted.add('content.moderate')
-        const wrapper = await openContentMenu({
-          isOwner: false,
-          resourceType: 'organization',
-          resource: {
-            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
-            disabled: false,
-          },
-        })
-        openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
-        wrapper
-          .findAll('.os-menu-item')
-          .filter((item) => item.text() === 'disable.organization.title')
-          .at(0)
-          .trigger('click')
-        expect(openModalSpy).toHaveBeenCalledWith('confirm', 'disable')
-      })
-
       it('can release posts', async () => {
         granted.add('content.moderate')
         const wrapper = await openContentMenu({
@@ -833,25 +797,6 @@ describe('ContentMenu.vue', () => {
         wrapper
           .findAll('.os-menu-item')
           .filter((item) => item.text() === 'release.user.title')
-          .at(0)
-          .trigger('click')
-        expect(openModalSpy).toHaveBeenCalledWith('confirm', 'release')
-      })
-
-      it('can release organizations', async () => {
-        granted.add('content.moderate')
-        const wrapper = await openContentMenu({
-          isOwner: false,
-          resourceType: 'organization',
-          resource: {
-            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
-            disabled: true,
-          },
-        })
-        openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
-        wrapper
-          .findAll('.os-menu-item')
-          .filter((item) => item.text() === 'release.organization.title')
           .at(0)
           .trigger('click')
         expect(openModalSpy).toHaveBeenCalledWith('confirm', 'release')
