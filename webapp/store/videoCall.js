@@ -11,6 +11,9 @@ export const state = () => {
     // 'idle' | 'prejoin' | 'connecting' | 'in-call' — mirrors VideoCall's local
     // phase so the layout can decide where the chat lives.
     phase: 'idle',
+    // A full reload is due (a new branding, #10353) but waits for this call to end:
+    // utils/reloadWhenIdle.js sets it, the call shows it as a notice.
+    reloadPending: false,
   }
 }
 
@@ -55,6 +58,9 @@ export const mutations = {
   SET_PARTICIPANT_COUNT(state, count) {
     state.participantCount = Number(count) || 0
   },
+  SET_RELOAD_PENDING(state, pending) {
+    state.reloadPending = !!pending
+  },
 }
 
 export const getters = {
@@ -84,5 +90,8 @@ export const getters = {
   },
   phase(state) {
     return state.phase
+  },
+  reloadPending(state) {
+    return state.reloadPending
   },
 }

@@ -77,6 +77,7 @@
       "verificationBadges": "Vérifications"
     },
     "branding": {
+      "appliedAfterCall": "Enregistré – le nouveau design sera appliqué dès que vous quitterez l’appel.",
       "available": {
         "active": "Base active",
         "default": "Repli",
@@ -1977,6 +1978,7 @@
       "unsupportedBrowser": "Votre navigateur ne prend pas en charge l'audio/vidéo."
     },
     "reconnecting": "Connexion perdue — reconnexion…",
+    "reloadPending": "La plateforme a un nouveau design. Il sera appliqué dès que vous quitterez l’appel.",
     "restartMic": "Redémarrer le microphone",
     "screenShare": "Écran",
     "screenShareEnded": "Partage d'écran terminé",

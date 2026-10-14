@@ -15,7 +15,12 @@
 // mid-mount and surfaces as unrelated crashes (e.g. vue-infinite-loading's getScrollParent reading
 // a detached node). We therefore reload at most ONCE per requested target: if we already reloaded
 // for this exact target and the render still didn't honour it, the server cannot reach it — stop.
-import { reloadPage } from '~/utils/reloadPage'
+//
+// Never during a video call (#10353): the call lives in the layout, a reload would drop it for
+// every participant on the network. utils/reloadWhenIdle.js defers the reload until the call has
+// ended, and the call tells its participants why. The loop guard is written only when the reload
+// really happens, or a deferred switch would use up the one attempt.
+import { cancelPendingReload, reloadWhenIdle } from '~/utils/reloadWhenIdle'
 
 const RELOAD_TARGET_KEY = 'ocelot-branding-reload-target'
 // Explicit "framework defaults" as a base (see plugins/branding.js). Resolves to the same empty base
@@ -77,9 +82,11 @@ export default ({ store }) => {
       if (target === undefined) return
 
       // The effective (re)composition already matches what this page was rendered with → nothing to
-      // do, and clear any pending reload attempt (a switch has fully taken effect).
+      // do, and clear any pending reload attempt (a switch has fully taken effect, or one switched
+      // back while its reload waited for a call to end).
       if (target === loaded) {
         clearAttemptedTarget()
+        cancelPendingReload(store)
         return
       }
 
@@ -88,8 +95,7 @@ export default ({ store }) => {
       // on a baked-default image, or an ops pin overriding the policy), reloading again would loop
       // forever. Break instead.
       if (readAttemptedTarget() === target) return
-      writeAttemptedTarget(target)
-      reloadPage()
+      reloadWhenIdle(store, { beforeReload: () => writeAttemptedTarget(target) })
     },
   )
 }

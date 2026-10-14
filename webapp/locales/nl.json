@@ -77,6 +77,7 @@
       "verificationBadges": "Verificaties"
     },
     "branding": {
+      "appliedAfterCall": "Opgeslagen – het nieuwe ontwerp wordt toegepast zodra je het gesprek verlaat.",
       "available": {
         "active": "Actieve basis",
         "default": "Terugval",
@@ -1977,6 +1978,7 @@
       "unsupportedBrowser": "Je browser ondersteunt geen audio/video."
     },
     "reconnecting": "Verbinding verbroken — opnieuw verbinden…",
+    "reloadPending": "Het platform heeft een nieuw ontwerp. Het wordt toegepast zodra je het gesprek verlaat.",
     "restartMic": "Microfoon opnieuw starten",
     "screenShare": "Scherm",
     "screenShareEnded": "Schermdelen beëindigd",
