@@ -18,7 +18,7 @@ describe('cleanCutHeight', () => {
   })
 
   it('tolerates the fractional edges line boxes report', () => {
-    expect(cleanCutHeight(lines(6, { height: 19.8 }), 59.5)).toBe(60)
+    expect(cleanCutHeight(lines(6, { height: 19.8 }), 59.5)).toBeCloseTo(59.4)
   })
 
   it('does not cut through an image beside the last fitting line', () => {
@@ -43,8 +43,11 @@ describe('cleanCutHeight', () => {
     expect(cleanCutHeight([], 60)).toBeNull()
   })
 
-  it('rounds the cut up to a whole pixel, so the last line is not clipped by rounding', () => {
-    expect(cleanCutHeight([{ top: 0, bottom: 19.2 }], 60)).toBe(20)
+  // Rounded up, 59.4 became 60: past the cap of 59.5, into the line that starts at 59.4.
+  it('cuts at the edge as measured, without rounding it past the next line', () => {
+    const cut = cleanCutHeight(lines(6, { height: 19.8 }), 59.5)
+
+    expect(cut).toBeLessThanOrEqual(lines(6, { height: 19.8 })[3].top)
   })
 })
 

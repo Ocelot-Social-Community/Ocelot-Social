@@ -98,9 +98,12 @@ export default {
     },
   },
   watch: {
-    // Edited in place by an owner. The observer sees the new height too; this keeps the
-    // toggle right without waiting for it.
+    // Edited in place by an owner, or the network's answer after the cached one. A new text
+    // starts as a new preview, collapsed: measuring happens only while collapsed, so an
+    // expanded reader would otherwise keep a "show less" on a text that now fits. The
+    // observer sees the new height too; this keeps the toggle right without waiting for it.
     description() {
+      this.collapsed = true
       this.$nextTick(this.measure)
     },
     collapsed(collapsed) {

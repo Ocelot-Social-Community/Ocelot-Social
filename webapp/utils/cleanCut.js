@@ -41,7 +41,8 @@ export function contentAtoms(content) {
  * cap has to stand.
  *
  * Half a pixel of slack on both comparisons: line boxes report fractional edges, and two
- * lines that touch must not count as one crossing the other.
+ * lines that touch must not count as one crossing the other. The edge is returned as measured,
+ * fractions included: rounded up, it could reach past the cap into the next line.
  */
 export function cleanCutHeight(atoms, cap) {
   const SLACK = 0.5
@@ -51,5 +52,5 @@ export function cleanCutHeight(atoms, cap) {
     .sort((a, b) => b - a)
   const crosses = (cut) => atoms.some((atom) => atom.top < cut - SLACK && atom.bottom > cut + SLACK)
   const cut = candidates.find((candidate) => !crosses(candidate))
-  return cut === undefined ? null : Math.ceil(cut)
+  return cut === undefined ? null : cut
 }

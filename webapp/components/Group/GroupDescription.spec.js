@@ -221,6 +221,20 @@ describe('GroupDescription', () => {
     expect(toggle(wrapper).exists()).toBe(true)
   })
 
+  it('starts a new description collapsed, so a toggle never outlives a text that fits', async () => {
+    const wrapper = Wrapper()
+    await Vue.nextTick()
+    await toggle(wrapper).trigger('click')
+    expect(toggle(wrapper).text()).toBe('comment.show.less')
+
+    contentHeight = 40
+    await wrapper.setProps({ description: '<p>Short.</p>' })
+    await Vue.nextTick()
+
+    expect(clamp(wrapper).element.style.maxHeight).not.toBe('')
+    expect(toggle(wrapper).exists()).toBe(false)
+  })
+
   it('stops watching when it goes away', () => {
     const wrapper = Wrapper()
 
