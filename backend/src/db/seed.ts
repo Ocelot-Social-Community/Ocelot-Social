@@ -38,6 +38,18 @@ const requireNode = (node: TestNode | null, what: string): TestNode => {
   return node
 }
 
+// The media type of an external image, by its extension: the seeded group avatars are JPEG,
+// PNG and WebP.
+const imageTypeOf = (url: string): string => {
+  if (url.endsWith('.png')) {
+    return 'image/png'
+  }
+  if (url.endsWith('.webp')) {
+    return 'image/webp'
+  }
+  return 'image/jpeg'
+}
+
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
 }
@@ -1392,24 +1404,27 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     // eslint-disable-next-line no-console
     console.log('seed', 'group avatars')
+    // External images, so their ratio and type are written down rather than measured on upload.
+    // The ratios are measured off the images (#9288); a guessed one makes every consumer that
+    // sizes a group avatar by it reserve the wrong space.
     for (const { groupId, url, alt, aspectRatio } of [
       {
         groupId: 'g3',
-        url: 'http://nsosp.org/share/images/FrQFT/FrQFT_header_v01_3.jpg',
+        url: 'https://nsosp.org/share/images/FrQFT/FrQFT_header_v01_3.jpg',
         alt: 'Quantum Flow Theory',
-        aspectRatio: 1.78,
+        aspectRatio: 5.25,
       },
       {
         groupId: 'g4',
-        url: 'http://nsosp.org/share/images/NSOSP/NSOSP_header_v01_9.jpg',
+        url: 'https://nsosp.org/share/images/NSOSP/NSOSP_header_v01_9.jpg',
         alt: 'New Soul Of Science Project',
-        aspectRatio: 1.78,
+        aspectRatio: 5.25,
       },
       {
         groupId: 'g5',
         url: 'https://nsosp.org/share/images/SN/SN_header_v04-01.jpg',
         alt: 'Superial Numbers',
-        aspectRatio: 1.0,
+        aspectRatio: 5.25,
       },
       {
         groupId: 'g6',
@@ -1421,7 +1436,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         groupId: 'g7',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/Mikrobiom-Biozyklische-Humuserde-gesund.jpg',
         alt: 'Gesundheit im Boden',
-        aspectRatio: 1.5,
+        aspectRatio: 1.31,
       },
       {
         groupId: 'g8',
@@ -1433,37 +1448,37 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         groupId: 'g9',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/IT4C-Website-Bild-ohne-Text.webp',
         alt: 'IT4C Team',
-        aspectRatio: 1.5,
+        aspectRatio: 1.99,
       },
       {
         groupId: 'g10',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/Logo_Linux_Werkstatt.jpg',
         alt: 'Linux Werkstatt Logo',
-        aspectRatio: 1.0,
+        aspectRatio: 1.55,
       },
       {
         groupId: 'g11',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/TerraNova-Rittergut.jpg',
         alt: 'Terra Nova Rittergut',
-        aspectRatio: 1.5,
+        aspectRatio: 1.33,
       },
       {
         groupId: 'g12',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/Lehren-2_0-fortbildung-modular.jpg',
         alt: 'Lehren 2.0 Fortbildung',
-        aspectRatio: 1.5,
+        aspectRatio: 1.62,
       },
       {
         groupId: 'g13',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/Gruppenfoto-e1738164285204.jpg',
         alt: 'Montessori Nordzypern Gruppe',
-        aspectRatio: 1.33,
+        aspectRatio: 1.5,
       },
       {
         groupId: 'g14',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/Kersten-Pfaff-header-chateau-neu1.jpg',
         alt: 'Lebenswege Potenzialentfaltung',
-        aspectRatio: 1.78,
+        aspectRatio: 3.69,
       },
       {
         groupId: 'g15',
@@ -1499,7 +1514,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         groupId: 'g20',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/Logo_MWM_Star_4C_Schutzraum.jpg',
         alt: 'Menschliche Werte Medien Logo',
-        aspectRatio: 1.0,
+        aspectRatio: 1.56,
       },
       {
         groupId: 'g21',
@@ -1517,65 +1532,65 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         groupId: 'g23',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/Sonja_Schuerger_IMG_Abb_11_2.jpg',
         alt: 'Naturwahrnehmung und Gemeinschaftsbildung',
-        aspectRatio: 1.33,
+        aspectRatio: 1.5,
       },
       {
         groupId: 'g24',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/Hermesstab-schwarzweisseFluegel-v01-clip-3-2.jpg',
         alt: 'Konstitutionstherapie Hermesstab',
-        aspectRatio: 1.0,
+        aspectRatio: 1.5,
       },
       {
         groupId: 'g27',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/Natur-und-Imkerhof-Zingst.jpg',
         alt: 'Naturerlebnis Zingst Imkerhof',
-        aspectRatio: 1.5,
+        aspectRatio: 0.56,
       },
       {
         groupId: 'g28',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/ef_logo_primary-1.png',
         alt: 'Eisenfeustel Logo',
-        aspectRatio: 1.0,
+        aspectRatio: 1.41,
       },
       {
         groupId: 'g29',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/Landladen-Rullstorf.jpg',
         alt: 'Landladen Rullstorf',
-        aspectRatio: 1.5,
+        aspectRatio: 0.75,
       },
       {
         groupId: 'g30',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/Seelenschatz_ScheuneWohnhaus-1.jpg',
         alt: 'Hofgemeinschaft Seelenschatz Scheune',
-        aspectRatio: 1.5,
+        aspectRatio: 1.78,
       },
       {
         groupId: 'g31',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/AllmendeLand-Felder-Beispiel-2.jpg',
         alt: 'AllmendeLand Felder',
-        aspectRatio: 1.5,
+        aspectRatio: 1.0,
       },
       {
         groupId: 'g32',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/Foto-Jugend-scaled.jpg',
         alt: 'Wanderjahr Jugendliche',
-        aspectRatio: 1.33,
+        aspectRatio: 1.78,
       },
       {
         groupId: 'g33',
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/pregnant-6189040_640.jpg',
         alt: 'Unterstützung von Hebammen',
-        aspectRatio: 1.0,
+        aspectRatio: 1.5,
       },
     ]) {
       await database.write({
         query: `
           MATCH (group:Group {id: $groupId})
           MERGE (img:Image {url: $url})
-          SET img.alt = $alt, img.aspectRatio = $aspectRatio, img.type = 'image/jpeg'
+          SET img.alt = $alt, img.aspectRatio = $aspectRatio, img.type = $type
           MERGE (group)-[:AVATAR_IMAGE]->(img)
         `,
-        variables: { groupId, url, alt, aspectRatio },
+        variables: { groupId, url, alt, aspectRatio, type: imageTypeOf(url) },
       })
     }
 
