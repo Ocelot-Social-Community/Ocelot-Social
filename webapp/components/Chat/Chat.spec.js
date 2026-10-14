@@ -1727,6 +1727,13 @@ describe('Chat.vue', () => {
           '.vac-box-footer { padding-top: 4px !important; padding-bottom: 4px !important; }',
         )
       })
+
+      it("has an input as high as the call's buttons in a chat on its own", () => {
+        expect(injectedStyles({ singleRoom: true })).toContain(
+          '.vac-textarea { padding-top: 7px !important; padding-bottom: 7px !important; line-height: 20px !important; }',
+        )
+        expect(injectedStyles({})).not.toContain('.vac-textarea')
+      })
     })
 
     describe('room header', () => {
