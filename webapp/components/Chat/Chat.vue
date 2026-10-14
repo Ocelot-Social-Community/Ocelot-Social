@@ -578,15 +578,15 @@ export default {
           align-items: flex-start;
           gap: 8px;
           padding: 8px 8px 8px 12px;
-          background: var(--background-color-base);
-          color: var(--text-color-base);
-          border: 1px solid var(--color-neutral-85);
+          /* Its colours are tokens (root-tokens.css, --chat-hint-*), for a brand to change. */
+          background: var(--chat-hint-background);
+          color: var(--chat-hint-color);
           border-radius: var(--border-radius-base);
-          box-shadow: var(--box-shadow-base);
+          box-shadow: var(--chat-hint-shadow);
           font-size: 14px;
           line-height: 1.4;
         }
-        .chat-hint > svg { flex-shrink: 0; margin-top: 2px; color: var(--color-primary); }
+        .chat-hint > svg { flex-shrink: 0; margin-top: 2px; color: var(--chat-hint-icon-color); }
         .chat-hint__text { flex: 1 1 auto; min-width: 0; white-space: pre-line; }
         .chat-hint__close {
           flex-shrink: 0;
@@ -598,8 +598,8 @@ export default {
           cursor: pointer;
           border-radius: var(--border-radius-base);
         }
-        .chat-hint__close:hover { background: var(--background-color-soft); }
-        .chat-hint__close:focus-visible { outline: 2px solid var(--color-primary); }
+        .chat-hint__close:hover { background: var(--chat-hint-close-hover-background); }
+        .chat-hint__close:focus-visible { outline: 2px solid var(--chat-hint-color); }
         ${
           this.singleRoom
             ? `

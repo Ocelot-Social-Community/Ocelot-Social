@@ -388,6 +388,14 @@
   --chat-message-checkmark: var(--text-color-soft);
   --chat-room-color-counter-badge: var(--text-color-inverse);
   --chat-room-background-counter-badge: var(--color-danger);
+  /* The hint floating above a chat's messages (Chat.vue renderHint). Dark like the app's
+     tooltips, which carry the same text on the chat's tab: their background, text colour and
+     shadow (tooltip.css), and a hover for its close button that stays on the dark side. */
+  --chat-hint-background: var(--background-color-inverse-soft);
+  --chat-hint-color: var(--text-color-inverse);
+  --chat-hint-icon-color: var(--text-color-inverse);
+  --chat-hint-shadow: var(--box-shadow-large);
+  --chat-hint-close-hover-background: rgba(255, 255, 255, 0.15);
   /* The room name next to its icon (Chat.vue .room-name-with-icon). Was referenced without ever being
      declared and without a fallback, so `color` resolved to nothing and the browser dropped the whole
      declaration — the name rendered in the inherited colour. Same family and same value as
