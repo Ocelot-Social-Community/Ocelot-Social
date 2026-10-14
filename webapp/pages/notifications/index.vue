@@ -100,6 +100,9 @@ export default {
     filter(option) {
       this.notificationRead = option.value
       this.selected = option.label
+      // A filtered list starts on its first page: kept at page 2+, the query asks for an offset
+      // the filtered list may not reach, and update() then keeps the unfiltered page (#9673).
+      this.offset = 0
       this.$apollo.queries.notifications.refresh()
     },
     async markNotificationAsRead(notificationSourceId) {
