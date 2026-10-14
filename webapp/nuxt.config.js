@@ -5,11 +5,9 @@ import metadata from './constants/metadata.js'
 import locales from './locales/index.js'
 import { brandingHeadHtml } from './utils/brandingHead.js'
 import brandIcons from './server-middleware/brand-icons.js'
+import workbox from './server-middleware/workbox.js'
 
 const CONFIG = require('./config').default // we need to use require since this is only evaluated at compile time.
-
-// Where the build puts Workbox under static/ (see the build:before hook and pwa.workbox).
-const WORKBOX_PATH = 'workbox'
 
 // Map language code (e.g. 'de') to Open Graph locale (e.g. 'de_DE') using existing locales definition
 const toOgLocale = (code) => {
@@ -179,6 +177,8 @@ export default {
     // Dynamic PWA manifest generated from the active brand's metadata (replaces the static
     // @nuxtjs/pwa manifest, disabled below) so app name / theme colour follow a live brand switch.
     { path: '/manifest.webmanifest', handler: '~/server-middleware/manifest.js' },
+    // Workbox for the service worker, from our own origin instead of jsdelivr (see pwa.workbox).
+    { path: '/workbox', handler: '~/server-middleware/workbox.js' },
   ],
 
   /*
@@ -211,14 +211,6 @@ export default {
     // the handler falls through to it whenever the active brand has no file for the slot.
     'render:setupMiddleware'(app) {
       app.use(brandIcons)
-    },
-
-    // Serve Workbox ourselves (#5761): see pwa.workbox below. Copied next to the generated sw.js,
-    // so it is part of the build wherever static/ goes, in the version @nuxtjs/pwa was installed
-    // with.
-    'build:before'() {
-      const source = path.join(path.dirname(require.resolve('workbox-cdn/package.json')), 'workbox')
-      fs.cpSync(source, path.resolve(__dirname, 'static', WORKBOX_PATH), { recursive: true })
     },
   },
 
@@ -386,12 +378,12 @@ export default {
     // above instead, with hids, so branding-favicon.js can rewrite them.
     icon: false,
     // The service worker would load Workbox from cdn.jsdelivr.net — every visitor's browser
-    // asking a third party, by default (#5761). It is served from our own origin instead (copied
-    // by the build:before hook above). workboxURL alone is not enough: workbox-sw loads its modules
+    // asking a third party, by default (#5761). It is served from our own origin instead, by
+    // server-middleware/workbox.js. workboxURL alone is not enough: workbox-sw loads its modules
     // (core, precaching, routing, …) from the CDN, too, unless modulePathPrefix says otherwise.
     workbox: {
-      workboxURL: `/${WORKBOX_PATH}/workbox-sw.js`,
-      config: { modulePathPrefix: `/${WORKBOX_PATH}` },
+      workboxURL: `${workbox.urlPrefix}/workbox-sw.js`,
+      config: { modulePathPrefix: workbox.urlPrefix },
     },
     meta: {
       // Prevent @nuxtjs/pwa from auto-generating description from package.json;
