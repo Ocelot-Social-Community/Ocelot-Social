@@ -3352,9 +3352,12 @@ describe('VideoCall', () => {
         value: { brands: [{ brand: 'Chromium', version: '140' }] },
         configurable: true,
       })
-      const chromium = await parkedCall()
-      expect(chromium.wrapper.find('.video-call').classes()).toContain('video-call--chromium')
-      delete global.navigator.userAgentData
+      try {
+        const chromium = await parkedCall()
+        expect(chromium.wrapper.find('.video-call').classes()).toContain('video-call--chromium')
+      } finally {
+        delete global.navigator.userAgentData
+      }
     })
 
     it('are not those of a maximized call', async () => {
