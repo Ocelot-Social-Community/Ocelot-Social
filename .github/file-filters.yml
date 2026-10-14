@@ -62,10 +62,12 @@ schema-contract: &schema-contract
   - 'webapp/mixins/**/*'
   - 'webapp/composables/**/*'
   # backend/src/graphql/webappTranslations.spec.ts: a translation for every error code (in
-  # backend/src/graphql/ above) and a label for every right of both permission catalogs.
+  # backend/src/graphql/ above), a label for every right of both permission catalogs and a heading
+  # for every admin config category.
   - 'webapp/locales/**/*'
   - 'backend/src/permission/**/*'
   - 'backend/src/groupPermission/**/*'
+  - 'backend/src/config/categories.ts'
 
 docker: &docker
   - 'docker-compose.*'
