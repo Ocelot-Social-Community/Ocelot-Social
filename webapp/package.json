@@ -12,7 +12,6 @@
     "build-storybook": "node scripts/fix-storybook-webpack.js && cross-env NODE_OPTIONS=--openssl-legacy-provider storybook build -c storybook/",
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt build",
     "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt-start",
-    "generate": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt generate",
     "lint": "eslint .",
     "locales": "../scripts/translations/missing-keys.sh && ../scripts/translations/sort.sh",
     "locales:normalize": "../scripts/translations/normalize.sh",
