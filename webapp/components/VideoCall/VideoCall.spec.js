@@ -219,13 +219,13 @@ describe('VideoCall', () => {
     })
   })
 
-  describe('modeClass / isFullscreen / isPreJoinModal', () => {
+  describe('modeClass / isMaximized / isPreJoinModal', () => {
     it('reports modal during prejoin', () => {
       const { wrapper } = factory({ show: true })
       wrapper.setData({ phase: 'prejoin' })
       expect(wrapper.vm.isPreJoinModal).toBe(true)
       expect(wrapper.vm.modeClass).toBe('video-call--modal')
-      expect(wrapper.vm.isFullscreen).toBe(false)
+      expect(wrapper.vm.isMaximized).toBe(false)
     })
 
     it('reports maximized when in-call and not minimized', () => {
@@ -470,7 +470,7 @@ describe('VideoCall', () => {
     })
 
     it('gives the whole stage to the single tile of the parked window', () => {
-      const ctx = { stageWidth: 355, stageHeight: 200, isFullscreen: false, spotlightTile: null }
+      const ctx = { stageWidth: 355, stageHeight: 200, isMaximized: false, spotlightTile: null }
       expect(VideoCall.computed.cellSize.call(ctx)).toEqual({ width: 355, height: 200 })
     })
 
@@ -478,7 +478,7 @@ describe('VideoCall', () => {
       const ctx = {
         stageWidth: 1600,
         stageHeight: 900,
-        isFullscreen: true,
+        isMaximized: true,
         spotlightTile: { key: 'a' },
       }
       expect(VideoCall.computed.cellSize.call(ctx)).toEqual({ width: 1600, height: 900 })
@@ -488,7 +488,7 @@ describe('VideoCall', () => {
       const ctx = {
         stageWidth: 1600,
         stageHeight: 900,
-        isFullscreen: true,
+        isMaximized: true,
         spotlightTile: null,
         gridDimensions: { columns: 2, rows: 2 },
       }
@@ -885,7 +885,7 @@ describe('VideoCall', () => {
       expect(wrapper.vm.spotlightKey).toBe('a')
     })
 
-    it('is a no-op when not fullscreen', () => {
+    it('is a no-op when not maximized', () => {
       const { wrapper } = factory({ show: true, minimized: true })
       wrapper.setData({ phase: 'in-call', spotlightKey: 'a' })
       wrapper.vm.onTileSelect({ key: 'b' })
@@ -1397,7 +1397,7 @@ describe('VideoCall', () => {
       expect(wrapper.vm.phase).toBe('error')
     })
 
-    it('toasts and closes instead of erroring full screen when parked mid-handshake', async () => {
+    it('toasts and closes instead of erroring maximized when parked mid-handshake', async () => {
       // The user navigated away while the handshake was still running, so the
       // window is minimized. The error phase would blow it back up to full
       // screen over the page they moved to.
@@ -3147,12 +3147,12 @@ describe('VideoCall', () => {
     const { computed } = VideoCall
 
     it('lie on the videos with the call maximized', () => {
-      expect(computed.barsOverlay.call({ isFullscreen: true, mobileChatOpen: false })).toBe(true)
+      expect(computed.barsOverlay.call({ isMaximized: true, mobileChatOpen: false })).toBe(true)
     })
 
     it('stay where they are with the chat open on a phone, in the parked window and before joining', () => {
-      expect(computed.barsOverlay.call({ isFullscreen: true, mobileChatOpen: true })).toBe(false)
-      expect(computed.barsOverlay.call({ isFullscreen: false, mobileChatOpen: false })).toBe(false)
+      expect(computed.barsOverlay.call({ isMaximized: true, mobileChatOpen: true })).toBe(false)
+      expect(computed.barsOverlay.call({ isMaximized: false, mobileChatOpen: false })).toBe(false)
     })
 
     it('tell the page what its header and footer are to do', () => {
@@ -3433,9 +3433,9 @@ describe('VideoCall', () => {
     })
 
     it('shrinks the stage to a single tile beside the chat', () => {
-      expect(computed.singleTile.call({ isFullscreen: true, mobileChatOpen: true })).toBe(true)
-      expect(computed.singleTile.call({ isFullscreen: true, mobileChatOpen: false })).toBe(false)
-      expect(computed.singleTile.call({ isFullscreen: false, mobileChatOpen: false })).toBe(true)
+      expect(computed.singleTile.call({ isMaximized: true, mobileChatOpen: true })).toBe(true)
+      expect(computed.singleTile.call({ isMaximized: true, mobileChatOpen: false })).toBe(false)
+      expect(computed.singleTile.call({ isMaximized: false, mobileChatOpen: false })).toBe(true)
       expect(computed.stageLayoutClass.call({ singleTile: true, spotlightTile: anna })).toBe(
         'video-call__single',
       )

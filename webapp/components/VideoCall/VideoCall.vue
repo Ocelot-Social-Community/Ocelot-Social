@@ -162,7 +162,7 @@
             </div>
           </div>
           <div
-            v-if="isFullscreen && !mobileChatOpen && activeSpeakers.length"
+            v-if="isMaximized && !mobileChatOpen && activeSpeakers.length"
             class="video-call__speakers"
             :aria-label="$t('videoCall.activeSpeakers')"
           >
@@ -199,7 +199,7 @@
               :camera-starting="isOwnCameraTile(tile) && devicesStarting.videoinput > 0"
               :mic-starting="isOwnCameraTile(tile) && devicesStarting.audioinput > 0"
               :avatar-size="tileAvatarSize(tile)"
-              :clickable="isFullscreen && !mobileChatOpen"
+              :clickable="isMaximized && !mobileChatOpen"
               :class="{
                 'video-tile--hidden': singleTile && soloTile && tile.key !== soloTile.key,
                 'video-tile--spotlighted': !!(spotlightTile && tile.key === spotlightTile.key),
@@ -594,7 +594,7 @@ export default {
     showChatSidebar() {
       // Embedded in the maximized call view. In the minimized/parked state the
       // chat continues to live in the chat-modul (layouts/default.vue). On a
-      // phone the call is always full screen and the chat takes the place below
+      // phone the call is always maximized and the chat takes the place below
       // a single small tile (see mobileChatOpen).
       return this.phase === 'in-call' && this.chatOpenForThisCall && !this.parked
     },
@@ -606,7 +606,7 @@ export default {
     // Whether the stage shows one tile only: in the parked window, and next to the
     // chat on a phone. The others stay mounted, so their sound keeps playing.
     singleTile() {
-      return !this.isFullscreen || this.mobileChatOpen
+      return !this.isMaximized || this.mobileChatOpen
     },
     soloTile() {
       return this.mobileChatOpen ? this.speakerTile : this.primaryTile
@@ -738,8 +738,8 @@ export default {
     isPreJoinModal() {
       return this.phase === 'prejoin'
     },
-    isFullscreen() {
-      // During prejoin we render as a centered modal — not full screen.
+    isMaximized() {
+      // During prejoin we render as a centered modal — not maximized.
       if (this.isPreJoinModal) return false
       return this.isMobile || !this.minimized || this.phase !== 'in-call'
     },
@@ -749,7 +749,7 @@ export default {
     // tap. Not with the chat open on a phone, where one writes beneath a small tile, nor
     // in the parked window or the dialog before joining.
     barsOverlay() {
-      return this.isFullscreen && !this.mobileChatOpen
+      return this.isMaximized && !this.mobileChatOpen
     },
     // Only once there are videos to make room for.
     autoHideBars() {
@@ -762,7 +762,7 @@ export default {
     },
     modeClass() {
       if (this.isPreJoinModal) return 'video-call--modal'
-      return this.isFullscreen ? 'video-call--maximized' : 'video-call--minimized'
+      return this.isMaximized ? 'video-call--maximized' : 'video-call--minimized'
     },
     onCallRoute() {
       return this.$route.name === 'call-id-slug'
@@ -770,7 +770,7 @@ export default {
     parked() {
       // The call sits in the corner as a small window: during an active call —
       // not during the prejoin modal — and never on a phone, where the call is
-      // always full screen.
+      // always maximized.
       return this.phase === 'in-call' && this.minimized && !this.isMobile
     },
     iconOnly() {
@@ -879,7 +879,7 @@ export default {
       // Outside the regular grid a tile owns the whole stage: the minimized
       // window shows exactly one, and the spotlight tile fills the wide cell
       // (its thumbnails are sized separately in tileAvatarSize).
-      if (!this.isFullscreen || this.spotlightTile) {
+      if (!this.isMaximized || this.spotlightTile) {
         return { width: this.stageWidth, height: this.stageHeight }
       }
       const { columns, rows } = this.gridDimensions
@@ -970,7 +970,7 @@ export default {
       // A failed connect holds no session worth preserving — minimizing only
       // exists so a *live* room survives navigation. Parking an error card in
       // the corner would be litter the user still has to dismiss, and leaving
-      // it full screen blocks the page they just navigated to. Close instead.
+      // it maximized blocks the page they just navigated to. Close instead.
       // Deliberately not leave(): its router.replace would hijack the
       // navigation that is running right now.
       if (this.phase === 'error') {
@@ -1394,8 +1394,8 @@ export default {
         return
       }
       if (!tile) return
-      // Only spotlight in fullscreen — minimized window already shows one tile.
-      if (!this.isFullscreen) return
+      // Only spotlight when maximized — minimized window already shows one tile.
+      if (!this.isMaximized) return
       this.spotlightKey = this.spotlightKey === tile.key ? null : tile.key
     },
     toggleMinimize() {
@@ -1610,8 +1610,8 @@ export default {
       } catch (err) {
         const message = this.$backendError(err)
         // The user navigated away while the handshake was still running, so
-        // the window is parked in the corner. Since isFullscreen treats every
-        // non-'in-call' phase as full screen, showing the error block here
+        // the window is parked in the corner. Since isMaximized treats every
+        // non-'in-call' phase as maximized, showing the error block here
         // would blow the parked window back up over the page they moved to.
         // There is no session to park either — toast the reason and close.
         if (this.minimized) {
