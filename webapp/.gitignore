@@ -85,6 +85,8 @@ cypress.env.json
 .DS_Store
 
 sw.*
+# Workbox, copied by nuxt.config.js's build:before hook
+static/workbox/
 
 # Playwright visual-regression testing (playwright.config.js) — baseline images under
 # __screenshots__/ are committed, everything else here is a rebuildable artifact.
