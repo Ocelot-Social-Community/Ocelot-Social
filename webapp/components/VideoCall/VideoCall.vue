@@ -1090,19 +1090,32 @@ export default {
     // page's header and footer are kept away meanwhile (pageBars).
     async toggleFullscreen() {
       try {
-        if (document.fullscreenElement) await document.exitFullscreen()
-        else await document.documentElement.requestFullscreen()
+        if (this.pageInFullscreen()) {
+          await document.exitFullscreen()
+          return
+        }
+        await document.documentElement.requestFullscreen()
+        // The browser takes a moment. Parked or left meanwhile, the call has no use for it
+        // any more — and the watcher that ends it found nothing to end yet.
+        if (!this.showFullscreenButton) this.exitFullscreen()
       } catch {
         // Refused by the browser (no user gesture, a policy): the call stays as it is.
       }
     },
+    // Only the page's own fullscreen is the call's: one of, say, a video embedded in a
+    // post is neither taken for it nor ended by it.
+    pageInFullscreen() {
+      return (
+        typeof document !== 'undefined' && document.fullscreenElement === document.documentElement
+      )
+    },
     exitFullscreen() {
-      if (typeof document === 'undefined' || !document.fullscreenElement) return
+      if (!this.pageInFullscreen()) return
       document.exitFullscreen().catch(() => {})
     },
     // Also when the browser ends it (Esc).
     onFullscreenChange() {
-      this.inFullscreen = !!document.fullscreenElement
+      this.inFullscreen = this.pageInFullscreen()
     },
     watchBarActivity(on) {
       if (typeof document === 'undefined' || on === this.barsWatched) return

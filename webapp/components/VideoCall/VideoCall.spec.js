@@ -3414,6 +3414,40 @@ describe('VideoCall', () => {
       expect(document.exitFullscreen).toHaveBeenCalled()
     })
 
+    it('ends again when the call was parked while the browser was still entering it', async () => {
+      const { wrapper } = await maximizedCall()
+      let enter
+      document.documentElement.requestFullscreen = jest.fn(
+        () =>
+          new Promise((resolve) => {
+            enter = () => {
+              fullscreenElement = document.documentElement
+              fullscreenChanged()
+              resolve()
+            }
+          }),
+      )
+      const entering = wrapper.vm.toggleFullscreen()
+      await wrapper.setData({ phase: 'connecting' })
+      expect(document.exitFullscreen).not.toHaveBeenCalled()
+      enter()
+      await entering
+      expect(document.exitFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+
+    it('neither takes nor ends the fullscreen of something else on the page', async () => {
+      const { wrapper } = await maximizedCall()
+      fullscreenElement = document.createElement('video')
+      fullscreenChanged()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+      wrapper.vm.exitFullscreen()
+      expect(document.exitFullscreen).not.toHaveBeenCalled()
+      await wrapper.vm.toggleFullscreen()
+      expect(document.documentElement.requestFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(true)
+    })
+
     it('stays as it is when the browser refuses', async () => {
       const { wrapper } = await maximizedCall()
       document.documentElement.requestFullscreen = jest.fn(() => Promise.reject(new Error('no')))
