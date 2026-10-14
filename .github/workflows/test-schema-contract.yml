@@ -5,9 +5,14 @@ name: Schema Contract Test
 # (backend/src/graphql/webappQueries.spec.ts, webappPostFilters.spec.ts), so a WEBAPP-only pull
 # request skipped them via the `backend` path filter and merged a query the schema does not answer.
 #
+# The same holds for what the webapp must be able to say about what the backend sends: a translation
+# for every error code and a label for every right of both permission catalogs
+# (backend/src/graphql/webappTranslations.spec.ts). It replaces two jq scripts the webapp workflow
+# ran, which only a webapp change triggered.
+#
 # Kept out of test-backend.yml deliberately. That workflow builds the Neo4j and backend images before
 # it can run anything, and attaching webapp paths to it would pay that price on every webapp pull
-# request — the commonest kind in this repository. These two specs read files and call graphql-js
+# request — the commonest kind in this repository. These specs read files and call graphql-js
 # `validate`; they need no database, no image and no services.
 
 on:
@@ -106,8 +111,8 @@ jobs:
       #
       # --coverage=false (inside that script) is required, not a preference. jest.config.ts sets
       # collectCoverage: true with a global 95% line threshold, which is a statement about the
-      # WHOLE backend suite — this job deliberately runs two specs, so the measurement is
+      # WHOLE backend suite — this job deliberately runs three specs, so the measurement is
       # meaningless here and the threshold fails on principle (2.19% of the backend, all 19 tests
       # green). Coverage stays enforced where it means something: the full run in test-backend.yml.
-      - name: Validate the webapp's GraphQL documents against the schema
+      - name: Validate the webapp's GraphQL documents and translations against the backend
         run: cd backend && npm run test:schema-contract

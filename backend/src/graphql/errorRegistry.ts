@@ -3,8 +3,8 @@
 //
 // - The name is the stable, machine-readable code. The webapp translates by it, from the
 //   `backendErrors.<NAME>` key in webapp/locales/*.json, so rename one only together with its
-//   locale keys (scripts/translations/backend-error-codes.sh checks that every name has an English
-//   translation). Names read `<AREA>_<OBJECT>_<PROBLEM>`, spelled out.
+//   locale keys (webappTranslations.spec.ts checks that every name has an English translation).
+//   Names read `<AREA>_<OBJECT>_<PROBLEM>`, spelled out.
 // - `type` is Apollo's standard error class, sent as `extensions.code`.
 // - `text` is the English message for logs and API clients. A `{placeholder}` in it is filled from
 //   the params the error is thrown with; the same params go to the webapp for its translation.
