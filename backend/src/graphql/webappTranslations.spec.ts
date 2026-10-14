@@ -8,13 +8,15 @@ import path from 'node:path'
 
 import { describe, it, expect } from 'vitest'
 
+import { ENV_CATEGORIES } from '@src/config/categories'
 import { allGroupPermissionKeys } from '@src/groupPermission'
 import { allPermissionKeys } from '@src/permission'
 
 import { Errors } from './errorRegistry'
 
 // What the webapp must be able to say about what the backend sends: a translation for every
-// error code, and a label for every right in both permission catalogs. Neither side can see the
+// error code, a label for every right in both permission catalogs, and a heading for every
+// category the admin config and policy tabs group their rows by. Neither side can see the
 // other, so a code or right added here, or a translation removed there, used to show the user the
 // raw key — and a translation left behind once its code is gone is dead weight in 11 languages.
 //
@@ -22,8 +24,9 @@ import { Errors } from './errorRegistry'
 // emptiness check reads all of them, since an empty string is a key present in each and a label
 // in none.
 //
-// The webapp builds these keys at runtime (`backendErrors.${code}`, utils/permissionLabel.js), so
-// no check of the webapp's sources alone can tell whether they are all there, or all still needed.
+// The webapp builds these keys at runtime (`backendErrors.${code}`, utils/permissionLabel.js,
+// `admin.config.category.${category}`), so no check of the webapp's sources alone can tell
+// whether they are all there, or all still needed.
 
 const LOCALES_DIR = path.resolve(import.meta.dirname, '../../../webapp/locales')
 
@@ -80,5 +83,15 @@ describe.each([
       .map(([key]) => key)
 
     expect(empty).toEqual([])
+  })
+})
+
+describe('the webapp names every category of the admin config and policy tabs', () => {
+  // `branding` holds only activeBranding, which has an admin page of its own and is hidden from
+  // the policy tab (pages/admin/policy.vue, hiddenKeys), so it never becomes a heading.
+  const headed = ENV_CATEGORIES.filter((category) => category !== 'branding')
+
+  it('under admin.config.category.<category>, and no heading outlives its category', () => {
+    expect(sorted(Object.keys(namespace(english, 'admin.config.category')))).toEqual(sorted(headed))
   })
 })
