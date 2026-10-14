@@ -3316,6 +3316,55 @@ describe('VideoCall', () => {
     })
   })
 
+  describe('bars of the parked window', () => {
+    const parkedCall = async () => {
+      const built = factory({ show: true, minimized: true })
+      await built.wrapper.setData({ phase: 'in-call' })
+      return built
+    }
+
+    it('lie on the videos, and the number of participants stays in their place', async () => {
+      const { wrapper } = await parkedCall()
+      expect(wrapper.find('.video-call').classes()).toContain('video-call--parked-bars')
+      expect(wrapper.find('[data-test="video-call-parked-count"]').exists()).toBe(true)
+    })
+
+    it('are held while the device settings are open', async () => {
+      const { wrapper } = await parkedCall()
+      expect(wrapper.find('.video-call').classes()).not.toContain('video-call--bars-held')
+      await wrapper.setData({ showDeviceSettings: true })
+      expect(wrapper.find('.video-call').classes()).toContain('video-call--bars-held')
+    })
+
+    it('are held while the mouse is on the window', async () => {
+      const { wrapper } = await parkedCall()
+      const call = wrapper.find('.video-call')
+      await call.trigger('mouseenter')
+      expect(call.classes()).toContain('video-call--bars-held')
+      await call.trigger('mouseleave')
+      expect(call.classes()).not.toContain('video-call--bars-held')
+    })
+
+    it('know whether they are drawn by Chromium, which slides them without blur', async () => {
+      const { wrapper } = await parkedCall()
+      expect(wrapper.find('.video-call').classes()).not.toContain('video-call--chromium')
+      Object.defineProperty(global.navigator, 'userAgentData', {
+        value: { brands: [{ brand: 'Chromium', version: '140' }] },
+        configurable: true,
+      })
+      const chromium = await parkedCall()
+      expect(chromium.wrapper.find('.video-call').classes()).toContain('video-call--chromium')
+      delete global.navigator.userAgentData
+    })
+
+    it('are not those of a maximized call', async () => {
+      const { wrapper } = factory({ show: true, minimized: false })
+      await wrapper.setData({ phase: 'in-call' })
+      expect(wrapper.find('.video-call').classes()).not.toContain('video-call--parked-bars')
+      expect(wrapper.find('[data-test="video-call-parked-count"]').exists()).toBe(false)
+    })
+  })
+
   describe('chat on a phone', () => {
     const { computed } = VideoCall
     const tile = (overrides) => ({ isLocal: false, isScreen: false, ...overrides })

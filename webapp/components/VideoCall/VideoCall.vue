@@ -8,12 +8,17 @@
         {
           'video-call--bars-overlay': barsOverlay,
           'video-call--bars-hidden': barsOverlay && barsHidden,
+          'video-call--parked-bars': parked,
+          'video-call--chromium': isChromium,
+          'video-call--bars-held': parked && (showDeviceSettings || pointerOnParked),
         },
       ]"
       role="dialog"
       :aria-modal="isPreJoinModal ? 'true' : null"
       :aria-label="$t('videoCall.dialogLabel')"
       @click.stop
+      @mouseenter="pointerOnParked = true"
+      @mouseleave="pointerOnParked = false"
     >
       <room-header
         class="video-call__header"
@@ -62,6 +67,19 @@
           </os-button>
         </div>
       </room-header>
+
+      <!--
+        In the parked window header and control bar show only while the mouse is on it,
+        and the number of participants stays in their place meanwhile.
+      -->
+      <span
+        v-if="parked"
+        class="video-call__parked-count"
+        data-test="video-call-parked-count"
+        aria-hidden="true"
+      >
+        {{ uniqueParticipantCount }}
+      </span>
 
       <pre-join v-if="phase === 'prejoin'" @join="onPreJoinReady" @cancel="leave" />
 
@@ -531,6 +549,12 @@ export default {
       lastRemoteSpeakerId: null,
       // The bars lying on the videos have moved out of the way (see barsOverlay).
       barsHidden: false,
+      // The mouse is on the call's window: in the parked one that shows its bars. Not
+      // :hover, which Safari does not set on it.
+      pointerOnParked: false,
+      // Only Chromium-based browsers (Chrome, Edge, Opera, …) know navigator.userAgentData.
+      // Set once mounted: the server renders no browser.
+      isChromium: false,
       // The control bar: how wide it is, and how wide it was the last time its buttons
       // had their labels (see controlsCrowded).
       controlsWidth: 0,
@@ -989,6 +1013,7 @@ export default {
     this.callChatRetryTimer = null
   },
   mounted() {
+    this.isChromium = typeof navigator !== 'undefined' && !!navigator.userAgentData
     this.observeStage()
   },
   updated() {
@@ -2770,6 +2795,95 @@ export default {
   .video-call--bars-overlay .video-call__speakers,
   .video-call--bars-overlay .video-call__notices,
   .video-call--bars-overlay .video-call__sidebar {
+    transition: none;
+  }
+}
+
+/*  The parked window: the videos fill it, and its header and control bar lie on them, */
+/*  see-through like the maximized call's, while the mouse is on the window or the device */
+/*  settings are open (.video-call--bars-held), or the keyboard moves in it. Otherwise only */
+/*  the number of participants stays, in a corner. */
+.video-call--parked-bars {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.video-call--parked-bars .video-call__body {
+  display: contents;
+}
+
+.video-call--parked-bars > *,
+.video-call--parked-bars .video-call__body > * {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.video-call--parked-bars .video-call__header,
+.video-call--parked-bars .video-call__controls {
+  z-index: 4;
+  backdrop-filter: blur(var(--video-call-bar-blur));
+  transition: transform 0.3s ease;
+}
+
+/*  Chromium draws the blur behind a bar sliding in this small window a step ahead of the */
+/*  bar, as a line running in front of the header's lower edge. Without the blur there is */
+/*  none; they stay see-through. */
+.video-call--chromium.video-call--parked-bars .video-call__header,
+.video-call--chromium.video-call--parked-bars .video-call__controls {
+  backdrop-filter: none;
+}
+
+.video-call--parked-bars .video-call__header {
+  align-self: start;
+  background: color-mix(
+    in srgb,
+    var(--video-call-bar-header-color) var(--video-call-bar-opacity),
+    transparent
+  );
+}
+
+.video-call--parked-bars .video-call__controls {
+  align-self: end;
+  background: color-mix(
+    in srgb,
+    var(--video-call-bar-controls-color) var(--video-call-bar-opacity),
+    transparent
+  );
+}
+
+.video-call--parked-bars:not(:has(:focus-visible), .video-call--bars-held) .video-call__header {
+  transform: translateY(-100%);
+}
+
+.video-call--parked-bars:not(:has(:focus-visible), .video-call--bars-held) .video-call__controls {
+  transform: translateY(100%);
+}
+
+.video-call__parked-count {
+  z-index: 3;
+  align-self: start;
+  justify-self: start;
+  margin: var(--space-x-small);
+  background: var(--color-primary);
+  color: var(--color-primary-inverse);
+  padding: 2px var(--space-x-small);
+  border-radius: var(--border-radius-rounded);
+  font-size: var(--font-size-small);
+  min-width: 28px;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+.video-call--parked-bars:is(:has(:focus-visible), .video-call--bars-held)
+  .video-call__parked-count {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .video-call--parked-bars .video-call__header,
+  .video-call--parked-bars .video-call__controls,
+  .video-call__parked-count {
     transition: none;
   }
 }
