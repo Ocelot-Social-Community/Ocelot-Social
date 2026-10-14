@@ -68,6 +68,8 @@
           :key="getShowChat.roomId || getShowChat.groupId || getShowChat.chatUserId"
           singleRoom
           :hideHeader="showCallChatTabs"
+          :hint="callChatHint"
+          :hintKey="showCallChatTabs ? 'call-chat-' + callChatTab : null"
           :reservedHeight="showCallChatTabs ? CALL_CHAT_TABS_HEIGHT + CALL_CHAT_HEADER_HEIGHT : 0"
           :userId="getShowChat.chatUserId"
           :groupId="getShowChat.groupId"
@@ -170,6 +172,14 @@ export default {
         !!this.videoCallChatRoomId &&
         this.callChatTab !== null
       )
+    },
+    // The hint above the messages, for the two chats of a running call only: the same as
+    // the hint on their tabs. A chat outside a call has nothing to be told apart from.
+    callChatHint() {
+      if (!this.showCallChatTabs) return null
+      return this.callChatTab === 'call'
+        ? this.$t('videoCall.chatTabs.callHint')
+        : this.$t('videoCall.chatTabs.groupHint')
     },
     // Both of the call's chats are the group's, so the header above them names the group —
     // as the call's own header does.

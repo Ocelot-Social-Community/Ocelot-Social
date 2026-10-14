@@ -230,6 +230,8 @@
                 hideHeader
                 :groupId="activeChatTab === 'group' ? groupId : null"
                 :roomId="activeChatTab === 'call' ? chatRoomId : null"
+                :hint="chatHint"
+                :hintKey="activeChatTab ? 'call-chat-' + activeChatTab : null"
                 :autoFocus="!isMobile"
                 @close-single-room="closeInCallChat"
               />
@@ -552,6 +554,13 @@ export default {
         (t) => t.identity === this.lastRemoteSpeakerId && !t.isScreen && !t.isLocal,
       )
       return speaker || this.primaryTile
+    },
+    // What the chat on screen is, said once above its messages: who reads along, and
+    // whether it notifies — the same as the hint on its tab.
+    chatHint() {
+      if (this.activeChatTab === 'call') return this.$t('videoCall.chatTabs.callHint')
+      if (this.activeChatTab === 'group') return this.$t('videoCall.chatTabs.groupHint')
+      return null
     },
     chatButtonUnread() {
       // Both of the call's chats, added up — less the one on screen, which has nothing

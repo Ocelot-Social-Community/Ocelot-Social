@@ -3411,6 +3411,20 @@ describe('VideoCall', () => {
       })
     })
 
+    describe('hint above the chat', () => {
+      const hintFor = (activeChatTab) =>
+        VideoCall.computed.chatHint.call({ activeChatTab, $t: (key) => key })
+
+      it('says what the chat on screen is, as its tab does', () => {
+        expect(hintFor('call')).toBe('videoCall.chatTabs.callHint')
+        expect(hintFor('group')).toBe('videoCall.chatTabs.groupHint')
+      })
+
+      it('has nothing to say while neither of the call chats is open', () => {
+        expect(hintFor(null)).toBeNull()
+      })
+    })
+
     describe('remembering the tab', () => {
       const remember = (ctx, tab) => VideoCall.watch.activeChatTab.call(ctx, tab)
 

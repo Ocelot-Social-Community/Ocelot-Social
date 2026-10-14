@@ -102,9 +102,15 @@ describe('Chat.vue', () => {
         },
         chat: {
           namespaced: true,
-          state: { unreadRoomCount: 0 },
+          state: { unreadRoomCount: 0, dismissedHints: [] },
+          getters: {
+            dismissedHints: (state) => state.dismissedHints,
+          },
           mutations: {
             UPDATE_ROOM_COUNT: jest.fn(),
+            DISMISS_HINT(state, key) {
+              state.dismissedHints = [...state.dismissedHints, key]
+            },
           },
         },
         videoCall: {
@@ -1712,6 +1718,90 @@ describe('Chat.vue', () => {
         // The earlier styles are replaced, not added to.
         expect(live).toHaveLength(1)
         expect(live[0].textContent).toContain('.vac-room-header { display: none !important; }')
+      })
+    })
+
+    describe('hint above the messages', () => {
+      // A real shadow root with the library's message column in it, as the browser has it.
+      const withMessageColumn = (propsData) => {
+        wrapper = Wrapper(propsData)
+        const shadow = wrapper.vm.$el.attachShadow({ mode: 'open' })
+        const column = document.createElement('div')
+        column.className = 'vac-col-messages'
+        shadow.appendChild(column)
+        wrapper.vm.renderHint()
+        return { shadow, column }
+      }
+      const hint = 'Visible only to the participants\n(without notifications)'
+
+      it('floats above the messages, with its line breaks kept', () => {
+        const { column } = withMessageColumn({ hint, hintKey: 'call' })
+        const bubble = column.querySelector('[data-test="chat-hint"]')
+        expect(bubble).not.toBeNull()
+        expect(bubble.getAttribute('role')).toBe('note')
+        expect(bubble.querySelector('.chat-hint__text').textContent).toBe(hint)
+      })
+
+      it('takes its text as text, never as markup', () => {
+        const { column } = withMessageColumn({ hint: '<b>bold</b>', hintKey: 'x' })
+        expect(column.querySelector('b')).toBeNull()
+        expect(column.querySelector('.chat-hint__text').textContent).toBe('<b>bold</b>')
+      })
+
+      it('goes away with its X, and stays away for that key', async () => {
+        const { column } = withMessageColumn({ hint, hintKey: 'call' })
+        const close = column.querySelector('[data-test="chat-hint-close"]')
+        expect(close.getAttribute('aria-label')).toBe('actions.close')
+
+        close.click()
+        await wrapper.vm.$nextTick()
+
+        expect(column.querySelector('[data-test="chat-hint"]')).toBeNull()
+        expect(store.state.chat.dismissedHints).toEqual(['call'])
+
+        // Another chat with the same hint: still dismissed.
+        const second = withMessageColumn({ hint, hintKey: 'call' })
+        expect(second.column.querySelector('[data-test="chat-hint"]')).toBeNull()
+      })
+
+      it('is shown in a chat whose hint has another key', () => {
+        store.state.chat.dismissedHints = ['call']
+        const { column } = withMessageColumn({ hint, hintKey: 'group' })
+        expect(column.querySelector('[data-test="chat-hint"]')).not.toBeNull()
+      })
+
+      it('is not there in a chat without a hint', () => {
+        const { column } = withMessageColumn({})
+        expect(column.querySelector('[data-test="chat-hint"]')).toBeNull()
+      })
+
+      it('is put back into a message column drawn anew, once only', () => {
+        const { shadow, column } = withMessageColumn({ hint, hintKey: 'call' })
+        column.remove()
+        const redrawn = document.createElement('div')
+        redrawn.className = 'vac-col-messages'
+        shadow.appendChild(redrawn)
+
+        wrapper.vm.renderHint()
+        wrapper.vm.renderHint()
+
+        expect(redrawn.querySelectorAll('[data-test="chat-hint"]')).toHaveLength(1)
+      })
+
+      it('sits at the top where the host brings its own header, below the built-in one otherwise', () => {
+        const styles = (propsData) => {
+          wrapper = Wrapper(propsData)
+          const appended = []
+          Object.defineProperty(wrapper.vm.$el, 'shadowRoot', {
+            configurable: true,
+            value: { appendChild: (style) => appended.push(style.textContent) },
+          })
+          wrapper.vm._shadowStylesInjected = false
+          wrapper.vm.injectShadowStyles()
+          return appended.join('')
+        }
+        expect(styles({ hideHeader: true })).toMatch(/\.chat-hint \{[^}]*top: 8px/)
+        expect(styles({})).toMatch(/\.chat-hint \{[^}]*top: 68px/)
       })
     })
 

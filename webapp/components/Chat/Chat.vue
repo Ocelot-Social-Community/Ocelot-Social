@@ -156,6 +156,12 @@ import chatStyle from '~/constants/chat.js'
 import { mapGetters, mapMutations } from 'vuex'
 
 const EMPTY_ACTIONS = JSON.stringify([])
+// The app's info-circle and close icons, as paths: the hint lives inside the chat library's
+// markup, where no component of the app can be put.
+const INFO_ICON_PATH =
+  'M16 3c7.168 0 13 5.832 13 13s-5.832 13-13 13-13-5.832-13-13 5.832-13 13-13zM16 5c-6.087 0-11 4.913-11 11s4.913 11 11 11 11-4.913 11-11-4.913-11-11-11zM15 10h2v2h-2v-2zM15 14h2v8h-2v-8z'
+const CLOSE_ICON_PATH =
+  'M7.219 5.781l8.781 8.781 8.781-8.781 1.438 1.438-8.781 8.781 8.781 8.781-1.438 1.438-8.781-8.781-8.781 8.781-1.438-1.438 8.781-8.781-8.781-8.781z'
 const ROOM_PAGE_SIZE = 10
 const MESSAGE_PAGE_SIZE = 20
 const EXPORT_PAGE_SIZE = 100
@@ -211,6 +217,17 @@ export default {
       type: Boolean,
       default: false,
     },
+    // A hint shown above the messages when the chat opens, until it is dismissed with its X
+    // (for as long as the page is not reloaded). Line breaks in the text are kept. `hintKey`
+    // names the hint for that dismissal: a hint with the same key stays away in every chat.
+    hint: {
+      type: String,
+      default: null,
+    },
+    hintKey: {
+      type: String,
+      default: null,
+    },
     // When true the chat fills its parent container instead of using the
     // chat-modul's viewport-based height calc. Used by the in-call sidebar.
     fitParent: {
@@ -256,6 +273,12 @@ export default {
         this.openRoom(newRoomId)
       }
     },
+    showHint() {
+      this.renderHint()
+    },
+    hint() {
+      this.renderHint()
+    },
     // The host can start or stop bringing its own header while this chat stays the same —
     // beside a video call, once the call's conference chat is confirmed. The styles that
     // take the built-in header out are written once, so they are written anew.
@@ -285,7 +308,10 @@ export default {
 
     // Not left to the first batch of messages (see setupMessageVisibilityTracking): a
     // header that is to be left out must not show until then.
-    this.$nextTick(() => this.injectShadowStyles())
+    this.$nextTick(() => {
+      this.injectShadowStyles()
+      this.renderHint()
+    })
 
     // Subscriptions
     this._subscriptions = []
@@ -315,7 +341,11 @@ export default {
       currentUser: 'auth/user',
       videoCallShown: 'videoCall/showVideoCall',
       videoCallMinimized: 'videoCall/minimized',
+      dismissedHints: 'chat/dismissedHints',
     }),
+    showHint() {
+      return !!this.hint && !(this.dismissedHints || []).includes(this.hintKey || this.hint)
+    },
     chatHeight() {
       // When embedded in another container (e.g. video-call sidebar), let the
       // parent dictate the size.
@@ -416,7 +446,46 @@ export default {
   methods: {
     ...mapMutations({
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
+      dismissHint: 'chat/DISMISS_HINT',
     }),
+
+    // The hint floats above the messages, inside the chat library's own markup: the library
+    // offers no place there to put anything into, so it is added to its message column from
+    // outside, as the styles in injectShadowStyles are. Called again whenever the column may
+    // have been drawn anew (a room opened) and whenever the hint changes or is dismissed.
+    renderHint() {
+      const shadowRoot = this.$el?.shadowRoot
+      // Only real elements count: whatever else answers to a selector is not markup to add to.
+      const find = (selector) => {
+        const node = shadowRoot?.querySelector?.(selector)
+        return node instanceof Element ? node : null
+      }
+      const column = find('.vac-col-messages')
+      const existing = find('.chat-hint')
+      if (!this.showHint) {
+        existing?.remove()
+        return
+      }
+      if (!column) return
+      if (existing && existing.parentNode === column) {
+        existing.querySelector('.chat-hint__text').textContent = this.hint
+        return
+      }
+      existing?.remove()
+      const bubble = document.createElement('div')
+      bubble.className = 'chat-hint'
+      bubble.setAttribute('role', 'note')
+      bubble.dataset.test = 'chat-hint'
+      const svg = (path) =>
+        `<svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="${path}"/></svg>`
+      bubble.innerHTML = `${svg(INFO_ICON_PATH)}<span class="chat-hint__text"></span><button type="button" class="chat-hint__close" data-test="chat-hint-close">${svg(CLOSE_ICON_PATH)}</button>`
+      // The text as text: it comes from the locales, but has no business being markup.
+      bubble.querySelector('.chat-hint__text').textContent = this.hint
+      const close = bubble.querySelector('.chat-hint__close')
+      close.setAttribute('aria-label', this.$t('actions.close'))
+      close.addEventListener('click', () => this.dismissHint(this.hintKey || this.hint))
+      column.appendChild(bubble)
+    },
 
     buildLastMessage(msg) {
       const content = (msg.content || '').trim()
@@ -497,6 +566,40 @@ export default {
         `
             : ''
         }
+        /* The hint above the messages (see renderHint). Below the room's header where there
+           is one, at the top where the host brings its own. */
+        .chat-hint {
+          position: absolute;
+          top: ${this.hideHeader ? 8 : 68}px;
+          left: 12px;
+          right: 12px;
+          z-index: 20;
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          padding: 8px 8px 8px 12px;
+          background: var(--background-color-base);
+          color: var(--text-color-base);
+          border: 1px solid var(--color-neutral-85);
+          border-radius: var(--border-radius-base);
+          box-shadow: var(--box-shadow-base);
+          font-size: 14px;
+          line-height: 1.4;
+        }
+        .chat-hint > svg { flex-shrink: 0; margin-top: 2px; color: var(--color-primary); }
+        .chat-hint__text { flex: 1 1 auto; min-width: 0; white-space: pre-line; }
+        .chat-hint__close {
+          flex-shrink: 0;
+          display: flex;
+          padding: 2px;
+          border: 0;
+          background: none;
+          color: inherit;
+          cursor: pointer;
+          border-radius: var(--border-radius-base);
+        }
+        .chat-hint__close:hover { background: var(--background-color-soft); }
+        .chat-hint__close:focus-visible { outline: 2px solid var(--color-primary); }
         ${
           this.singleRoom
             ? `
@@ -847,7 +950,11 @@ export default {
           this.messagesLoaded = true
         }
         // Ensure visibility tracking is running
-        this.$nextTick(() => this.setupMessageVisibilityTracking())
+        this.$nextTick(() => {
+          this.setupMessageVisibilityTracking()
+          // A room opened may have had its message column drawn anew.
+          this.renderHint()
+        })
       } catch (error) {
         this.messages = []
         this.$toastBackendError(error)

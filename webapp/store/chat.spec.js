@@ -15,6 +15,7 @@ describe('chat store', () => {
         groupId: null,
         roomId: null,
         unreadRoomCount: 0,
+        dismissedHints: [],
       })
     })
   })
@@ -42,6 +43,19 @@ describe('chat store', () => {
         groupId: null,
         roomId: null,
       })
+    })
+  })
+
+  describe('DISMISS_HINT', () => {
+    it('remembers a dismissed hint by its key, once', () => {
+      mutations.DISMISS_HINT(state, 'call-chat-call')
+      mutations.DISMISS_HINT(state, 'call-chat-call')
+      expect(getters.dismissedHints(state)).toEqual(['call-chat-call'])
+    })
+
+    it('ignores a hint without a key', () => {
+      mutations.DISMISS_HINT(state, null)
+      expect(state.dismissedHints).toEqual([])
     })
   })
 

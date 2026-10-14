@@ -159,6 +159,20 @@ describe('default.vue', () => {
       })
     })
 
+    describe('hint above the floating chat', () => {
+      const hintFor = (showCallChatTabs, callChatTab) =>
+        Default.computed.callChatHint.call({ showCallChatTabs, callChatTab, $t: (key) => key })
+
+      it('is the hint of the call chat on screen', () => {
+        expect(hintFor(true, 'call')).toBe('videoCall.chatTabs.callHint')
+        expect(hintFor(true, 'group')).toBe('videoCall.chatTabs.groupHint')
+      })
+
+      it('is not there for a chat outside a call', () => {
+        expect(hintFor(false, null)).toBeNull()
+      })
+    })
+
     describe('header above the tabs', () => {
       const group = {
         videoCallGroupId: 'g1',
