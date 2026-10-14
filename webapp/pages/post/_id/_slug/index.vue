@@ -28,7 +28,7 @@
                 appearance="filled"
                 circle
                 :aria-label="
-                  $t(blurred ? 'post.sensitiveContent.show' : 'post.sensitiveContent.hide')
+                  blurred ? $t('post.sensitiveContent.show') : $t('post.sensitiveContent.hide')
                 "
                 @click="blurred = !blurred"
               >
@@ -566,9 +566,9 @@ export default {
           mutation: PostMutations().toggleObservePost,
           variables: { value, id: postId },
         })
-        const message = this.$t(
-          `post.menu.${value ? 'observedSuccessfully' : 'unobservedSuccessfully'}`,
-        )
+        const message = value
+          ? this.$t('post.menu.observedSuccessfully')
+          : this.$t('post.menu.unobservedSuccessfully')
         this.$toast.success(message)
         await this.$apollo.queries.Post.refetch()
       } catch (error) {

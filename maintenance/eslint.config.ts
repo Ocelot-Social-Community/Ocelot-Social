@@ -7,6 +7,7 @@ import {
   css,
   prettier,
   vue3 as it4cVue3,
+  vueI18n,
   importX as it4cImportX,
 } from 'eslint-config-it4c'
 
@@ -86,6 +87,8 @@ export default withNuxt(
   ...comments,
   ...json,
   ...yaml,
+  // Translation keys: missing, unused, out of step between the locales, unsorted.
+  ...vueI18n,
   ...css,
   {
     files: ['**/*.css'],

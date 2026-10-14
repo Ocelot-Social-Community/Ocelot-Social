@@ -3,11 +3,8 @@
     "cancel": "Anulo",
     "clear": "Pastro",
     "close": "Mbyll",
-    "create": "Krijo",
     "delete": "Fshi",
     "edit": "Ndrysho",
-    "loading": "duke u ngarkuar",
-    "loadMore": "ngarko më shumë",
     "menu": "Hap menunë",
     "reset": "Rivendos",
     "save": "Ruaj",
@@ -29,12 +26,6 @@
       "empty": "Nuk u gjetën përdorues me API Keys.",
       "name": "API Keys",
       "never": "kurrë",
-      "order": {
-        "active-keys": "Keys aktive",
-        "comments": "Numri i komenteve",
-        "last-used": "Aktiviteti i fundit",
-        "posts": "Numri i postimeve"
-      },
       "revoke": {
         "confirm": "Revoko",
         "message": "A je i sigurt që dëshiron të revokosh API Key „{name}“ të {user}?",
@@ -50,7 +41,6 @@
       "revoke-key": "Revoko key",
       "revoked-at": "Revokuar më",
       "show-keys": "Shfaq keys",
-      "sort-by": "Rendit sipas",
       "table": {
         "actions": "Veprime",
         "active": "Aktive",
@@ -87,7 +77,6 @@
       "verificationBadges": "Verifikimet"
     },
     "branding": {
-      "activate": "Aktivizo",
       "available": {
         "active": "Baza aktive",
         "default": "Rezervë",
@@ -116,32 +105,17 @@
         "unprovidedInherit": "Fushat që nuk përfshihen trashëgojnë parazgjedhjen e framework-ut.",
         "wholePackage": "Paketa e plotë (të gjitha fushat)"
       },
-      "current": "Aktiv",
-      "description": "Zgjidh cili branding i integruar është aktiv në të gjithë rrjetin. Ndërrimi e ringarkon aplikacionin për të gjithë.",
       "detail": {
-        "appDescription": "Përshkrimi",
-        "colors": "Ngjyrat",
-        "favicon": "Favicon",
-        "footer": "Faqet e fundit",
-        "logos": "Logot",
-        "noPages": "asnjë",
-        "organization": "Organizata",
-        "pages": "Faqe statike",
-        "pagesSummary": "{pages} faqe ({locales})",
-        "reuse": "Ripërdorim",
-        "themeColor": "Ngjyra e temës"
+        "organization": "Organizata"
       },
       "error": "Brandingu nuk u ndërrua dot.",
       "loading": "Po ngarkohen brandingjet…",
       "name": "Branding",
-      "none": "Në këtë instancë nuk është integruar asnjë branding.",
       "noneExtra": "Në këtë instancë nuk janë integruar brandingje të tjera — disponohet vetëm parazgjedhja e framework-ut.",
       "schema": "skema",
       "schemaTitle": "Versioni i paketës @ocelot-social/branding me të cilin u ndërtua ky arkiv.",
-      "stylesheets": "Fletë stili të veta",
       "stylesheetUnreadable": "nuk mund të lexohet",
       "stylesheetVars": "{count} veti e temës ::: {count} veti të temës",
-      "title": "Branding",
       "vanilla": "Parazgjedhja e framework-ut (pa branding)"
     },
     "categories": {
@@ -251,10 +225,8 @@
       "disabledOnly": "vetëm të çaktivizuarat",
       "empty": "Asnjë grup nuk përputhet me këta filtra.",
       "name": "Grupet",
-      "next": "Tjetra",
       "noOwner": "pa pronar",
       "ownerlessOnly": "vetëm pa pronar",
-      "previous": "E mëparshmja",
       "searchPlaceholder": "emri ose emri i shkurtër",
       "title": "Administro grupet"
     },
@@ -350,7 +322,6 @@
         "message": "Ky rol u ndryshua diku tjetër ndërkohë që po e ndryshoje. Ndryshimet e tua të paruajtura ruhen — shqyrto lejet e theksuara."
       },
       "create": "Krijo rol",
-      "createTitle": "Krijo një rol të ri",
       "delete": "Fshi",
       "deleteError": "Roli nuk u fshi dot: {message}",
       "deleteSuccess": "Roli u fshi.",
@@ -415,8 +386,6 @@
       "name": "Cilësimet"
     },
     "users": {
-      "addRole": "Cakto rol…",
-      "allRoles": "Të gjitha rolet",
       "delete": {
         "error": "Përdoruesi nuk u fshi dot: {message}",
         "message": "Doni vërtet ta fshini përgjithmonë <strong>{name}</strong>? Ky veprim nuk mund të zhbëhet.",
@@ -436,7 +405,6 @@
         "placeholder": "email, emër, përshkrim ose role:moderator"
       },
       "name": "Përdoruesit",
-      "removeRole": "Hiq rolin {role}",
       "roleChanged": "Roli u ndryshua me sukses!",
       "table": {
         "columns": {
@@ -457,10 +425,10 @@
     }
   },
   "backendErrors": {
-    "API_KEYS_FEATURE_DISABLED": "API Keys nuk janë aktivizuar në këtë rrjet.",
     "API_KEY_CREATE_EXPIRY_INVALID": "Vlefshmëria duhet të jetë të paktën një ditë.",
     "API_KEY_CREATE_LIMIT_REACHED": "Ke arritur maksimumin e {max} API Keys aktive. Revoko një key ekzistues për të krijuar një të ri.",
     "API_KEY_DOES_NOT_EXIST": "API Key nuk u gjet.",
+    "API_KEYS_FEATURE_DISABLED": "API Keys nuk janë aktivizuar në këtë rrjet.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Mund të zgjedhësh vetëm emblema që të janë dhënë ty.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "Biseda e grupit nuk mund të krijohej.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Mesazhi ka nevojë për një tekst ose një skedar.",
@@ -476,7 +444,6 @@
       "NETWORK_ERROR": "Serveri nuk është i arritshëm. Kontrollo lidhjen me internetin dhe provo përsëri.",
       "UNAUTHENTICATED": "Hyr për të vazhduar."
     },
-    "GROUPS_FEATURE_DISABLED": "Grupet nuk janë aktivizuar në këtë rrjet.",
     "GROUP_ELEVATION_REASON_INVALID": "Arsyeja mund të ketë më së shumti {max} karaktere dhe nuk duhet të fillojë ose të mbarojë me hapësirë.",
     "GROUP_ELEVATION_REASON_MISSING": "Thuaj se çfarë po bën këtu.",
     "GROUP_ELEVATION_RIGHTS_MISSING": "Lejet e tua në rrjet të lejojnë këtu vetëm të lexosh.",
@@ -505,6 +472,7 @@
     "GROUP_TEMPLATE_PERMISSIONS_VISIBILITY_MISMATCH": "Me këto leje, modeli nuk do të përputhej më me dukshmërinë sipas së cilës është emërtuar.",
     "GROUP_TEMPLATE_ROLE_UNKNOWN": "Ky rol nuk ekziston në model.",
     "GROUP_VISIBILITY_RAISE_NOT_PERMITTED": "Nuk mund ta bësh këtë grup më privat se sa të lejohet të krijosh grupe.",
+    "GROUPS_FEATURE_DISABLED": "Grupet nuk janë aktivizuar në këtë rrjet.",
     "INVITE_CODE_CREATE_GROUP_MEMBERSHIP_REQUIRED": "Për të krijuar një lidhje ftese duhet të jesh anëtar i grupit.",
     "INVITE_CODE_CREATE_LIMIT_REACHED": "Ke arritur numrin maksimal të lidhjeve të ftesës.",
     "INVITE_CODE_INVALIDATE_CODE_NOT_FOUND": "Lidhja e ftesës nuk u gjet.",
@@ -516,8 +484,8 @@
     "LOCATION_ID_NOT_CONFIRMED": "Vendi i zgjedhur nuk mund të konfirmohej. Zgjidhe përsëri nga sugjerimet.",
     "LOCATION_LATITUDE_OUT_OF_RANGE": "Gjerësia gjeografike e vendndodhjes është e pavlefshme.",
     "LOCATION_LONGITUDE_OUT_OF_RANGE": "Gjatësia gjeografike e vendndodhjes është e pavlefshme.",
-    "LOCATION_NAME_NOT_FOUND": "Ky vend nuk u gjet.",
     "LOCATION_NAME_NO_EXACT_MATCH": "Vendi i zgjedhur nuk mund të përcaktohej saktësisht. Zgjidhe përsëri nga sugjerimet.",
+    "LOCATION_NAME_NOT_FOUND": "Ky vend nuk u gjet.",
     "LOGIN_ACCOUNT_DISABLED": "Llogaria jote është çaktivizuar.",
     "LOGIN_CREDENTIALS_INCORRECT": "Adresë e-maili ose fjalëkalim i pasaktë.",
     "PASSWORD_CHANGE_NEW_PASSWORD_EQUALS_OLD": "Fjalëkalimi i ri duhet të jetë i ndryshëm nga i vjetri.",
@@ -567,7 +535,6 @@
     "VIDEO_CALL_START_NOT_PERMITTED": "Nuk mund të nisësh një telefonatë me video në këtë grup."
   },
   "chat": {
-    "addGroupRoomHeadline": "Kërko grup për bisedë të re",
     "addRoomHeadline": "Kërko përdorues për bisedë të re",
     "cancelSelectMessage": "Anulo",
     "closeChat": "Mbyll bisedën",
@@ -583,18 +550,12 @@
     "messageDeleted": "Ky mesazh u fshi",
     "messagesEmpty": "Nuk ka mesazhe",
     "newMessages": "Mesazhe të reja",
-    "noGroupsFound": "Nuk u gjetën grupe",
-    "page": {
-      "headline": "Biseda"
-    },
     "roomEmpty": "Asnjë dhomë e zgjedhur",
     "roomsEmpty": "Nuk ka dhoma",
     "search": "Filtro dhomat e bisedës",
     "searchBadgeGroup": "Grup",
     "searchBadgeUser": "Përdorues",
-    "searchGroupPlaceholder": "Kërko grup…",
     "searchPlaceholder": "Kërko përdorues ose grup…",
-    "transmitting": "Duke dërguar mesazhin …",
     "typeMessage": "Shkruaj mesazh",
     "userProfileButton": {
       "label": "Biseda",
@@ -603,9 +564,6 @@
   },
   "client-only": {
     "loading": "Duke u ngarkuar …"
-  },
-  "code-of-conduct": {
-    "subheader": "për rrjetin social të {ORGANIZATION_NAME}"
   },
   "comment": {
     "content": {
@@ -622,24 +580,12 @@
     }
   },
   "common": {
-    "category": "Temë ::: Tema",
     "comment": "Koment ::: Komente",
     "filter": "Filtro …",
-    "letsTalk": "Le të flasim",
-    "loading": "duke u ngarkuar",
-    "loadMore": "ngarko më shumë",
-    "name": "Emri",
     "noChangesHint": "Ende nuk ka asgjë për të ruajtur.",
-    "organization": "Organizatë ::: Organizata",
     "post": "Postim ::: Postime",
     "previousLocation": "Vendndodhja e mëparshme: {location}",
-    "project": "Projekt ::: Projekte",
-    "reportContent": "Raporto",
     "scrollToLocationMap": "Rrëshqit te harta",
-    "shout": "Thirrje ::: Thirrje",
-    "tag": "Etiketë ::: Etiketa",
-    "takeAction": "Merr masa",
-    "user": "Përdorues ::: Përdorues",
     "validations": {
       "categories": "Ju lutem zgjidhni midis një dhe tre temave.",
       "contentNotEmpty": "Ju lutem shkruani përmbajtje.",
@@ -653,8 +599,7 @@
       "nameLength": "Emri duhet të ketë midis {min} dhe {max} karaktere.",
       "titleLength": "Titulli duhet të ketë midis {min} dhe {max} karaktere.",
       "titleNotEmpty": "Ju lutem shkruani një titull."
-    },
-    "versus": "Kundër"
+    }
   },
   "component-slider": {
     "step": "Hapi {current} nga {total}"
@@ -662,7 +607,6 @@
   "components": {
     "dateTimeRange": {
       "hourMinute": "HH:mm",
-      "monthDay": "dd.MM.",
       "yearMonthDay": "dd.MM.yyyy"
     },
     "password-reset": {
@@ -676,8 +620,7 @@
           "description": "Një e-mail për rivendosjen e fjalëkalimit do të dërgohet në adresën e dhënë.",
           "submit": "Kërko e-mail",
           "submitted": "Një e-mail me udhëzime të mëtejshme u dërgua në <b>{email}</b>"
-        },
-        "title": "Rivendos fjalëkalimin tënd"
+        }
       }
     },
     "registration": {
@@ -715,8 +658,7 @@
           "nonce": "Kodi i e-mailit: 32143",
           "validations": {
             "error": "Kod verifikimi i pavlefshëm <b>{nonce}</b> për e-mailin <b>{email}</b>!",
-            "length": "duhet të jetë {nonceLength} karaktere i gjatë",
-            "success": "Kod verifikimi i vlefshëm <b>{nonce}</b> për e-mailin <b>{email}</b>!"
+            "length": "duhet të jetë {nonceLength} karaktere i gjatë"
           }
         },
         "title": "Konfirmimi i e-mailit"
@@ -726,11 +668,9 @@
         "form": {
           "description": "Fut kodin e ftesës që ke marrë.",
           "invite-code": "Kodi i ftesës: ACJERB",
-          "next": "Vazhdo",
           "validations": {
             "error": "Kod ftese i pavlefshëm <b>{inviteCode}</b>!",
-            "length": "duhet të jetë {inviteCodeLength} karaktere i gjatë",
-            "success": "Kod ftese i vlefshëm <b>{inviteCode}</b>!"
+            "length": "duhet të jetë {inviteCodeLength} karaktere i gjatë"
           }
         },
         "invited-by": "Ftuar nga {invitedBy}.",
@@ -742,14 +682,12 @@
       },
       "signup": {
         "form": {
-          "data-privacy": "Kam lexuar dhe kuptuar deklaratën e privatësisë.",
           "description": "Për të filluar, mund të regjistrohesh këtu falas:",
           "errors": {
             "email-exists": "Ekziston tashmë një llogari përdoruesi me këtë adresë e-maili!"
           },
           "submit": "Krijo një llogari",
-          "success": "Një e-mail me një lidhje për të përfunduar regjistrimin tënd u dërgua në <b>{email}</b>",
-          "terms-and-condition": "Pranoj <a href=\"/terms-and-conditions\" target=\"_blank\"><ds-text bold color=\"primary\">Kushtet dhe rregullat</ds-text></a>."
+          "success": "Një e-mail me një lidhje për të përfunduar regjistrimin tënd u dërgua në <b>{email}</b>"
         },
         "title": "Bashkohu me {APPLICATION_NAME}!",
         "unavailable": "Fatkeqësisht, regjistrimi publik i llogarive të përdoruesve nuk është i disponueshëm aktualisht në këtë server."
@@ -761,9 +699,6 @@
     "amount-comments": "{amount} komente",
     "amount-shouts": "{amount} rekomandime",
     "amount-views": "{amount} shikime",
-    "categories": {
-      "infoSelectedNoOfMaxCategories": "{chosen} nga {max} tema të zgjedhura"
-    },
     "categoriesTitle": "Temat",
     "category": {
       "description": {
@@ -823,14 +758,6 @@
       }
     },
     "content": "Përmbajtja",
-    "emotions-label": {
-      "angry": "I zemëruar",
-      "cry": "Qaj",
-      "funny": "Qesharak",
-      "happy": "I lumtur",
-      "surprised": "I habitur"
-    },
-    "filterFollow": "Përdoruesit që ndjek",
     "filterMasonryGrid": {
       "myFriends": "Përdoruesit që ndjek",
       "myGroups": "Nga grupet e mia",
@@ -841,9 +768,6 @@
     },
     "filterMyGroups": "Grupet e mia",
     "inappropriatePicture": "Kjo imazh mund të jetë e papërshtatshme për disa njerëz.",
-    "languageSelectLabel": "Gjuha e kontributit tënd",
-    "languageSelectText": "Zgjidh gjuhën",
-    "newEvent": "Krijo një ngjarje të re",
     "newPost": "Krijo një postim të ri",
     "postIn": "Postoni në",
     "postInGroupOption": "Grupi: {name}",
@@ -866,14 +790,12 @@
     "comment": {
       "message": "A dëshiron vërtet të fshish komentin „<b>{name}</b>“?",
       "success": "Komenti u fshi me sukses!",
-      "title": "Fshi komentin",
-      "type": "Koment"
+      "title": "Fshi komentin"
     },
     "contribution": {
       "message": "A dëshiron vërtet të fshish postimin „<b>{name}</b>“?",
       "success": "Postimi u fshi me sukses!",
-      "title": "Fshi postimin",
-      "type": "Kontribut"
+      "title": "Fshi postimin"
     },
     "submit": "Fshi"
   },
@@ -881,20 +803,17 @@
     "cancel": "Anulo",
     "comment": {
       "message": "A dëshiron vërtet të çaktivizosh komentin nga „<b>{name}</b>“?",
-      "title": "Çaktivizo komentin",
-      "type": "Koment"
+      "title": "Çaktivizo komentin"
     },
     "contribution": {
       "message": "A dëshiron vërtet të çaktivizosh kontributin „<b>{name}</b>“?",
-      "title": "Çaktivizo kontributin",
-      "type": "Kontribut"
+      "title": "Çaktivizo kontributin"
     },
     "submit": "Çaktivizo",
     "success": "U çaktivizua me sukses!",
     "user": {
       "message": "A dëshiron vërtet të çaktivizosh përdoruesin „<b>{name}</b>“?",
-      "title": "Çaktivizo përdoruesin",
-      "type": "Përdorues"
+      "title": "Çaktivizo përdoruesin"
     }
   },
   "donations": {
@@ -911,7 +830,6 @@
     "hashtag": {
       "addHashtag": "Hashtag i ri",
       "addLetter": "Shkruaj një shkronjë",
-      "noHashtagsFound": "Nuk u gjetën hashtag-ë",
       "relation": {
         "popular": "Të njohura",
         "usedByMe": "Të përdorura nga unë"
@@ -961,7 +879,6 @@
     "categories": "Temat",
     "creationDate": "Data e krijimit",
     "deleteFilter": "Fshi filtrin",
-    "emotions": "Emocione",
     "ended": {
       "all": {
         "hint": "Shfaq të gjitha, edhe të përfunduarat",
@@ -974,12 +891,9 @@
     },
     "event": "Ngjarje",
     "eventsBy": "Ngjarjet – shfaq ...",
-    "eventsEnded": "Përfunduar",
     "filter-by": "Filtro sipas ...",
     "following": "Përdoruesit që ndjek",
     "following-title": "Burimet",
-    "languages": "Gjuhët",
-    "my-groups": "Grupet e mia",
     "order": {
       "last": {
         "hint": "Rendit postimet nga të fundit",
@@ -1022,7 +936,6 @@
     },
     "actionRadius": "Rrezja e veprimit të grupit",
     "addMember": "Shto anëtar",
-    "addMemberToGroup": "Shto në grup",
     "addMemberToGroupSuccess": "„{name}“ u shtua në grup me rolin „{role}“!",
     "addUser": "Shto përdorues",
     "addUserNoOptions": "Nuk u gjetën përdorues!",
@@ -1081,7 +994,6 @@
     "errors": {
       "userAlreadyMember": "Përdoruesi „{name}“ është tashmë anëtar!"
     },
-    "follow": "Ndiq",
     "foundation": "Themelimi",
     "general": "Përgjithshme",
     "goal": "Qëllimi i grupit",
@@ -1123,19 +1035,16 @@
     "modal": {
       "cancel": "Anulo",
       "confirm": "Konfirmo",
-      "confirmAddGroupMemberText": "Shto përdoruesin „{name}“ në grup?",
-      "confirmAddGroupMemberTitle": "Konfirmo"
+      "confirmAddGroupMemberText": "Shto përdoruesin „{name}“ në grup?"
     },
     "muted": "Grupi u hesht",
     "myGroups": "Grupet e mia",
     "name": "Emri i grupit",
-    "radius": "Rrezja",
     "removeMember": "Hiq anëtarin",
     "removeMemberButton": "Hiq",
     "removeMemberConfirmText": "Hiq përdoruesin „{name}“ nga grupi?",
     "removeMemberTitle": "Hiq anëtarin",
     "rights": {
-      "addRole": "Shto një rol",
       "advancedTitle": "Të gjitha të drejtat në detaje",
       "applyTemplate": "Zbato një model — zëvendëson të gjitha rolet e këtij grupi me ato të modelit.",
       "blockedByFeature": "Kjo funksion është e çaktivizuar në rrjet ({feature}).",
@@ -1143,7 +1052,6 @@
       "confirmApplyTemplate": "Të zbatohet modeli „{template}“ për këtë grup? Të gjitha rolet zëvendësohen me ato të modelit.",
       "confirmApplyTemplateDiscards": "Të zbatohet modeli „{template}“ për këtë grup? Të gjitha rolet zëvendësohen me ato të modelit — dhe ndryshimet e paruajtura humbasin.",
       "confirmDelete": "Të fshihet roli „{role}“? Anëtarët e tij do të bëhen „{target}“.",
-      "confirmReset": "Të rikthehen të gjitha rolet e këtij grupi në parazgjedhjet? Rolet që shtuat hiqen dhe anëtarët e tyre bëhen anëtarë të zakonshëm.",
       "deleteRole": "Fshi rolin",
       "description": "Vendosni kush çfarë mund të bëjë në këtë grup — nga të jashtmit deri te administratorët.",
       "discardDraft": "Ndryshimet e paruajtura do të humbasin. Të vazhdohet gjithsesi?",
@@ -1167,9 +1075,9 @@
         "group_join": "Bashkohu me grupin drejtpërdrejt, pa miratim.",
         "group_join_request": "Kërko të bashkohesh me grupin dhe prit miratimin.",
         "group_leave": "Largohu nga grupi.",
-        "group_members_read": "Shiko listën e anëtarëve dhe numrin e tyre.",
         "group_member_remove": "Hiq anëtarë nga grupi.",
         "group_member_role_assign": "Ndrysho rolet e anëtarëve.",
+        "group_members_read": "Shiko listën e anëtarëve dhe numrin e tyre.",
         "group_post_create": "Shkruaj postime në grup.",
         "group_post_moderate": "Hiq nga grupi postimin e dikujt tjetër. Postimi mbetet i autorit të tij.",
         "group_post_pin": "Fiksoji dhe hiqua fiksimin postimeve në grup.",
@@ -1179,10 +1087,7 @@
         "group_videoCall_create": "Nis një thirrje video në grup.",
         "group_videoCall_join": "Merr pjesë në një thirrje video që po zhvillohet në grup."
       },
-      "reset": "Rikthe parazgjedhjet",
       "resultingType": "Me këto leje grupi është:",
-      "roleKeyPlaceholder": "çelës, p.sh. redaksia",
-      "roleLabelPlaceholder": "emri i shfaqur, p.sh. Redaksia",
       "saved": "Lejet u ruajtën",
       "saveFirst": "Fillimisht ruaj ose hidh poshtë — ka ndryshime të paruajtura.",
       "simple": {
@@ -1214,7 +1119,6 @@
       "usual": "Anëtar"
     },
     "save": "Krijo grup të ri",
-    "showMembers": "Lista e anëtarëve e dukshme për të gjithë",
     "teaser": {
       "notReadable": "Këtë grup nuk mund ta hapësh ende — kërkesa jote është në pritje",
       "openGroup": "Hap grupin",
@@ -1261,8 +1165,7 @@
   },
   "hashtags-filter": {
     "clearSearch": "Pastro kërkimin",
-    "hashtag-search": "Duke kërkuar për #{hashtag}",
-    "title": "Flluskja jote e filtrit"
+    "hashtag-search": "Duke kërkuar për #{hashtag}"
   },
   "header": {
     "avatarMenu": {
@@ -1316,7 +1219,6 @@
     "invite-link-message-hidden-group": "Je ftuar të bashkohesh me një grup të fshehur në {APPLICATION_NAME}.",
     "invite-link-message-personal": "Je ftuar të bashkohesh me {APPLICATION_NAME}.",
     "invited-count": "Ke ftuar tashmë {count} persona.",
-    "limit-reached": "Ke arritur numrin maksimal të lidhjeve të ftesës.",
     "members-only": "vetëm për ata që kanë një llogari",
     "my-invite-links": "Lidhjet e mia të ftesës",
     "no-links": "Nuk janë krijuar ende lidhje ftese.",
@@ -1345,7 +1247,6 @@
     "login": "Hyr",
     "logout": "Dil",
     "moreInfo": "Çfarë është {APPLICATION_NAME}?",
-    "moreInfoHint": "tek faqja e prezantimit",
     "no-account": "Nuk ke llogari?",
     "no-cookie": "Nuk mund të vendoset cookie. Duhet të pranosh cookie-t.",
     "password": "Fjalëkalimi yt",
@@ -1371,12 +1272,6 @@
       "theUser": "Pozicioni im",
       "title": "Legjenda",
       "user": "Përdorues"
-    },
-    "markerTypes": {
-      "event": "ngjarje",
-      "group": "grup",
-      "theUser": "pozicioni im",
-      "user": "përdorues"
     },
     "pageTitle": "Harta",
     "styles": {
@@ -1435,12 +1330,9 @@
       },
       "decision": "Vendimi",
       "DecisionSuccess": "U vendos me sukses!",
-      "disabled": "I çaktivizuar",
-      "disabledAt": "Çaktivizuar më",
       "disabledBy": "Çaktivizuar nga",
       "empty": "Urime, nuk ka asgjë për të moderuar.",
       "enabled": "I aktivizuar",
-      "enabledAt": "Aktivizuar më",
       "enabledBy": "Aktivizuar nga",
       "filterLabel": {
         "all": "Të gjitha",
@@ -1453,9 +1345,7 @@
       "hiddenGroupLink": "Shko te {name} për të përdorur qasjen si administrator",
       "moreDetails": "Shiko detajet",
       "name": "Raportimet",
-      "noDecision": "Asnjë vendim!",
       "numberOfUsers": "{count} përdorues",
-      "previousDecision": "Vendimi i mëparshëm:",
       "reasonCategory": "Tema",
       "reasonDescription": "Përshkrimi",
       "reportedOn": "Data",
@@ -1468,14 +1358,12 @@
   },
   "notifications": {
     "comment": "Koment",
-    "content": "Përmbajtja ose përshkrimi",
     "empty": "Na vjen keq, nuk ke asnjë njoftim për momentin.",
     "filterLabel": {
       "all": "Të gjitha",
       "read": "Lexuar",
       "unread": "Pa lexuar"
     },
-    "group": "Përshkrimi",
     "markAllAsRead": "Shëno të gjitha si të lexuara",
     "markAsRead": "Shëno si të lexuar",
     "markAsUnread": "Shëno si të palexuar",
@@ -1572,9 +1460,6 @@
       "hide": "Fshih përmbajtjen e ndjeshme",
       "show": "Shfaq përmbajtjen e ndjeshme"
     },
-    "takeAction": {
-      "name": "Merr masa"
-    },
     "viewEvent": {
       "eventEnd": "Fundi",
       "eventEndBeforeStart": "Data e mbarimit duhet të jetë pas datës së fillimit.",
@@ -1588,14 +1473,12 @@
       "eventVenue": "p.sh. Kafe Chrysander, pranë Kalasë së Bergedorfit",
       "eventVenueLabel": "Përshkrimi i vendndodhjes",
       "pickLocationOnMap": "Zgjidh vendndodhjen në hartë",
-      "title": "Ngjarje",
       "viewOnMainMap": "Shiko në hartën kryesore"
     },
     "viewPost": {
       "forGroup": {
         "title": "Në grupin "
-      },
-      "title": "Postim"
+      }
     }
   },
   "profile": {
@@ -1603,7 +1486,6 @@
       "submitted": "Ngarkimi u krye me sukses!"
     },
     "commented": "Komentuar",
-    "follow": "Ndiq",
     "followers": "Ndjekës",
     "following": "Duke ndjekur",
     "groups": {
@@ -1645,24 +1527,18 @@
   "release": {
     "cancel": "Anulo",
     "comment": {
-      "error": "E ke raportuar tashmë këtë koment!",
       "message": "A dëshiron vërtet të lirosh komentin nga „<b>{name}</b>“?",
-      "title": "Liro komentin",
-      "type": "Koment"
+      "title": "Liro komentin"
     },
     "contribution": {
-      "error": "E ke raportuar tashmë këtë kontribut!",
       "message": "A dëshiron vërtet të lirosh kontributin „<b>{name}</b>“?",
-      "title": "Liro kontributin",
-      "type": "Kontribut"
+      "title": "Liro kontributin"
     },
     "submit": "Liro",
     "success": "U lirua me sukses!",
     "user": {
-      "error": "E ke raportuar tashmë këtë përdorues!",
       "message": "A dëshiron vërtet të lirosh përdoruesin „<b>{name}</b>“?",
-      "title": "Liro përdoruesin",
-      "type": "Përdorues"
+      "title": "Liro përdoruesin"
     }
   },
   "report": {
@@ -1692,8 +1568,7 @@
           "intentional_intimidation_stalking_persecution": "Frikësim i qëllimshëm, ndjekje ose persekutim.",
           "other": "Tjetër …",
           "pornographic_content_links": "Postimi ose lidhja e materialit qartësisht pornografik."
-        },
-        "placeholder": "Tema …"
+        }
       },
       "description": {
         "label": "Ju lutem shpjegoni: Pse dëshironi ta raportoni këtë?",
@@ -1722,7 +1597,6 @@
     "no-results": "Nuk u gjetën rezultate për „{search}“. Provo një term tjetër kërkimi!",
     "page": "Faqja",
     "placeholder": "Kërko",
-    "results": "rezultat i gjetur ::: rezultate të gjetura",
     "title": "Rezultatet e kërkimit"
   },
   "settings": {
@@ -1796,7 +1670,6 @@
       },
       "empty": "Deri tani, nuk ke bllokuar askënd.",
       "explanation": {
-        "closing": "Kjo duhet të jetë e mjaftueshme për momentin që përdoruesit e bllokuar të mos mund të të shqetësojnë më.",
         "commenting-disabled": "Nuk mund të komentosh në këtë postim për momentin.",
         "intro": "Nëse një përdorues tjetër është bllokuar nga ti, ja çfarë ndodh:",
         "notifications": "Përdoruesit e bllokuar nuk do të marrin më njoftimet nëse e përmendin njëri-tjetrin.",
@@ -1813,7 +1686,6 @@
       "givenNamePlaceholder": "Femanon",
       "labelBio": "Rreth teje",
       "labelCity": "Qyteti ose rajoni yt",
-      "labelCityHint": "(shfaq pozicionin e përafërt në hartë)",
       "labelName": "Emri yt",
       "labelSlug": "Emri yt unik i përdoruesit",
       "name": "Të dhënat tuaja",
@@ -1826,10 +1698,8 @@
     "deleteUserAccount": {
       "accountDescription": "Ki parasysh se postimet dhe komentet tuaja janë të rëndësishme për komunitetin tonë. Nëse vendos ende t'i fshish, duhet t'i shënosh më poshtë.",
       "accountWarning": "NUK MUND TA MENAXHOSH dhe NUK MUND TA RIKTHESH llogarinë, postimet ose komentet pasi të fshish llogarinë tënde!",
-      "accountWarningAdmin": "Llogaria, kontributet ose komentet NUK MUND TË ADMINISTROHEN OSE RIKTHEHEN pas fshirjes!",
       "accountWarningIsAdmin": "Kujdes! Je duke fshirë një llogari përdoruesi!",
       "commentedCount": "Fshi {count} komentin tim ::: Fshi {count} komentet e mia",
-      "confirmDeleting": "Fshi llogarinë e përdoruesit tani",
       "contributionsCount": "Fshi {count} postimin tim ::: Fshi {count} postimet e mia",
       "infoAdmin": "Të gjitha kontributet dhe komentet e përdoruesit do të fshihen gjithashtu!",
       "name": "Fshi llogarinë e përdoruesit",
@@ -1988,18 +1858,14 @@
   },
   "site": {
     "back-to-login": "Kthehu në faqen e hyrjes",
-    "bank": "llogari bankare",
     "code-of-conduct": "Kodi i sjelljes",
-    "contact": "Kontakti",
     "data-privacy": "Privatësia e të dhënave",
     "donate": "Dhuro",
     "error-occurred": "Ndodhi një gabim.",
     "faq": "FAQ",
-    "germany": "Gjermani",
     "imprint": "Impresi",
     "made": "Bërë me ❤️",
     "navigation": "Navigimi",
-    "register": "Numri i regjistrit",
     "support": "Mbështetje",
     "termsAndConditions": "Kushtet dhe rregullat",
     "thanks": "Faleminderit!"
@@ -2067,7 +1933,6 @@
     "minimize": "Minimizo",
     "muteMic": "Heshtëzo mikrofonin",
     "openChat": "Hap bisedën",
-    "participants": "Pjesëmarrësit",
     "prejoin": {
       "camera": "Kamera",
       "cameraDisabled": "Kamera është e fikur.",

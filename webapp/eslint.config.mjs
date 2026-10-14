@@ -18,6 +18,9 @@ import js from '@eslint/js'
 import pluginJest from 'eslint-plugin-jest'
 import prettierRecommended from 'eslint-plugin-prettier/recommended'
 import pluginVue from 'eslint-plugin-vue'
+// The subpath, not the package root: the root loads every module, and its GraphQL plugin needs a
+// newer `graphql` than the webapp's 14.
+import vueI18n from 'eslint-config-it4c/modules/vue-i18n'
 import globals from 'globals'
 
 export default [
@@ -99,6 +102,75 @@ export default [
         {
           selector: 'Program',
           message: 'Rename this file to *.spec.* — test files use the .spec suffix in this repo.',
+        },
+      ],
+    },
+  },
+  // Translation keys (#10386): the code asks only for keys en.json defines, every locale has the
+  // same keys, no key outlives its last use, and the keys are sorted (`--fix` sorts). Only this
+  // module of eslint-config-it4c: see the top of the file for why the rest does not fit yet.
+  ...vueI18n,
+  {
+    files: ['locales/*.json'],
+    rules: {
+      '@intlify/vue-i18n/no-unused-keys': [
+        'error',
+        {
+          extensions: ['.js', '.vue'],
+          // Keys the code builds at runtime, which no lint can see used. Each pattern is the shape
+          // the code builds, not a whole namespace, so the rest of a namespace stays checked.
+          ignores: [
+            // the backend's codes and catalogs; backend/src/graphql/webappTranslations.spec.ts
+            // checks these against their source
+            '/^backendErrors\\./',
+            '/^admin\\.roles\\.perm\\./',
+            '/^group\\.rights\\.perm\\./',
+            '/^admin\\.config\\.category\\./',
+            // data the brand or the database decides (categories, policies, dashboard counters)
+            '/^contribution\\.category\\.(name|description)\\./',
+            '/^admin\\.policy\\.(keys|descriptions)\\./',
+            '/^admin\\.config\\.state\\./',
+            '/^admin\\.dashboard\\./',
+            '/^admin\\.branding\\.composition\\.bucket\\./',
+            // enums: one key per value
+            '/^notifications\\.reason\\./',
+            '/^report\\.reason\\.category\\.options\\./',
+            '/^settings\\.notifications\\./',
+            '/^settings\\.security\\.change-password\\.passwordStrength\\d$/',
+            '/^group\\.(actionRadii|templateDescriptions|typeDescriptions|types|typesOptions)\\./',
+            '/^group\\.admission\\.[^.]+\\.(title|description)$/',
+            '/^group\\.rights\\.simple(Groups)?\\./',
+            '/^group\\.roles\\./',
+            '/^permissions\\.sections\\./',
+            '/^profile\\.(groups|network)\\./',
+            '/^map\\.legend\\.(event|group|theUser|user)$/',
+            '/^videoCall\\.(errors|prejoin\\.permission)\\./',
+            // one key per resource type (ContentMenu, ReportModal, ReportList)
+            '/^(report|disable|release)\\.[^.]+\\.(title|message)$/',
+            '/^(disable|release)\\.(submit|success|cancel)$/',
+            '/^moderation\\.reports\\.decideModal\\.(Post|Comment|User)\\./',
+            // Keys handed over as data and translated elsewhere: the ConfirmModal's titleIdent,
+            // messageIdent and textIdent, the registration slider's steps, the error page's `key`,
+            // the internal pages' idents, form validators. The lint sees only `$t('…')` calls.
+            '/^actions\\.unsavedChanges\\./',
+            '/^(admin|settings)\\.api-keys\\.revoke/',
+            '/^admin\\.groupRoles\\.saved$/',
+            '/^admin\\.roles\\.selfLockout\\./',
+            '/^admin\\.users\\.delete\\.(message|submit)$/',
+            '/^components\\.registration\\.[^.]+\\.(title|buttonTitle)/',
+            '/^delete\\.((comment|contribution)\\.(title|message)|cancel|submit)$/',
+            '/^error-pages\\./',
+            '/^group\\.(invite-links|members)$/',
+            '/^group\\.leaveModal\\./',
+            '/^group\\.rights\\.(confirmApplyTemplate|confirmApplyTemplateDiscards|mootJoin|mootLeave)$/',
+            '/^invite-codes\\.delete-modal\\./',
+            '/^moderation\\.reports\\.decideModal\\.(cancel|submit)$/',
+            '/^report\\.reason\\.category\\.invalid$/',
+            '/^settings\\.security\\.change-password\\.message-new-password-/',
+            '/^settings\\.social-media\\.delete-modal\\./',
+            '/^settings\\.validation\\.slug\\./',
+            '/^site\\.(code-of-conduct|donate|faq|imprint|made|support)$/',
+          ],
         },
       ],
     },
