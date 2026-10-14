@@ -2031,9 +2031,9 @@
     "audioOnly": "Conexión débil: los vídeos están en pausa para que sigas oyendo a todos.",
     "chatTabs": {
       "call": "Llamada",
-      "callHint": "Visible solo para los participantes de esta videollamada\n(sin notificaciones)",
+      "callHint": "Visible solo para los participantes de esta videollamada (sin notificaciones)",
       "group": "Grupo",
-      "groupHint": "Visible para todos los miembros del grupo\n(con notificaciones)",
+      "groupHint": "Visible para todos los miembros del grupo (con notificaciones)",
       "label": "Elegir chat"
     },
     "closeChat": "Cerrar chat",

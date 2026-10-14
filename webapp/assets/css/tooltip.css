@@ -128,6 +128,12 @@
   transition: opacity 60ms;
 }
 
+/* A tooltip held to a narrow width, so a sentence wraps into a short block instead of one
+ * long line (v-tooltip option `classes: 'tooltip--narrow'`). */
+.tooltip.tooltip--narrow .tooltip-inner {
+  max-width: 15em;
+}
+
 /* A tooltip whose plain-text content carries line breaks (v-tooltip option
  * `classes: 'tooltip--multiline'`, together with `html: false`). */
 .tooltip.tooltip--multiline .tooltip-inner {

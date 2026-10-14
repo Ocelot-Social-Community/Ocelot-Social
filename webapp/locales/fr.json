@@ -2031,9 +2031,9 @@
     "audioOnly": "Connexion faible — les vidéos sont en pause pour que vous continuiez à entendre tout le monde.",
     "chatTabs": {
       "call": "Appel",
-      "callHint": "Visible uniquement par les participants de cet appel vidéo\n(sans notifications)",
+      "callHint": "Visible uniquement par les participants de cet appel vidéo (sans notifications)",
       "group": "Groupe",
-      "groupHint": "Visible par tous les membres du groupe\n(avec notifications)",
+      "groupHint": "Visible par tous les membres du groupe (avec notifications)",
       "label": "Choisir le chat"
     },
     "closeChat": "Fermer le chat",

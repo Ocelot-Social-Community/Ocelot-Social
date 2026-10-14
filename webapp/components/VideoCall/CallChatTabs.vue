@@ -16,12 +16,7 @@
     >
       <button
         ref="tabs"
-        v-tooltip="{
-          content: tab.hint,
-          placement: 'bottom',
-          html: false,
-          classes: 'tooltip--multiline',
-        }"
+        v-tooltip="{ content: tab.hint, placement: 'bottom', classes: 'tooltip--narrow' }"
         type="button"
         role="tab"
         class="call-chat-tabs__tab"
@@ -147,8 +142,8 @@ export default {
         {
           value: 'call',
           label: this.$t('videoCall.chatTabs.call'),
-          // The hints come in two lines — who sees the chat, then whether it notifies —
-          // so the tooltip stays narrow; the line break is part of the text.
+          // Held to a narrow tooltip, the hint wraps by itself. The same text is the note
+          // above the chat's messages, where it wraps to the chat's width.
           hint: this.$t('videoCall.chatTabs.callHint'),
           count: this.unread,
         },
