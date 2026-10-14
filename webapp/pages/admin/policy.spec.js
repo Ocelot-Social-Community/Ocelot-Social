@@ -177,20 +177,21 @@ describe('admin/policy.vue', () => {
     expect(wrapper.text()).toContain('admin.config.category.video')
   })
 
-  it('appends an unknown backend category as its own group instead of dropping its keys', () => {
-    // Graceful degradation: a category the FE order list doesn't know about must still be
-    // rendered (never silently vanish), so a new backend category needs no FE change.
+  it('groups a key under whatever category the backend gives it', () => {
+    // The groups come from policyConfig alone, so a key the backend moves to another category
+    // (here `general`, which no policy key uses today) shows up there without a webapp change.
+    // That every category has a heading translation is the backend's webappTranslations.spec.ts.
     wrapper = mount(Policy, {
       mocks,
       localVue,
       store,
       data() {
         return {
-          policyConfig: [{ key: 'publicRegistration', category: 'brandNewGroup', type: 'boolean' }],
+          policyConfig: [{ key: 'publicRegistration', category: 'general', type: 'boolean' }],
         }
       },
     })
-    expect(wrapper.find('[data-test="policy-group-brandNewGroup"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="policy-group-general"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="policy-publicRegistration"]').exists()).toBe(true)
   })
 

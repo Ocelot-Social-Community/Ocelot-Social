@@ -93,6 +93,7 @@ describe('NotificationMenu.vue', () => {
               {
                 id: 'notification-41',
                 read: false,
+                reason: 'commented_on_post',
                 post: {
                   id: 'post-1',
                   title: 'some post title',
@@ -115,6 +116,7 @@ describe('NotificationMenu.vue', () => {
               {
                 id: 'notification-42',
                 read: false,
+                reason: 'commented_on_post',
                 post: {
                   id: 'post-2',
                   title: 'another post title',
@@ -137,6 +139,7 @@ describe('NotificationMenu.vue', () => {
               {
                 id: 'notification-43',
                 read: true,
+                reason: 'commented_on_post',
                 post: {
                   id: 'post-3',
                   title: 'read post title',

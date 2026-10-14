@@ -1,4 +1,9 @@
-import { NONE_GROUP_ROLE, PENDING_GROUP_ROLE, USUAL_GROUP_ROLE } from '~/constants/groups'
+import {
+  NONE_GROUP_ROLE,
+  PENDING_GROUP_ROLE,
+  SYSTEM_GROUP_ROLES,
+  USUAL_GROUP_ROLE,
+} from '~/constants/groups'
 
 /**
  * Whether the viewer holds a right INSIDE a group.
@@ -25,14 +30,14 @@ export const isGroupApplicant = (group) => group?.myGroupRole?.name === PENDING_
 
 /**
  * How a group role should read: the label the group chose, otherwise the translation of a
- * seeded name, otherwise the key — a group may invent a role and leave it unlabelled.
+ * system role's name, otherwise the name — a group may invent a role and leave it unlabelled.
+ * Only the system roles have translations, so only they are looked up: asking for any other
+ * name would ask for a key no locale defines (#10386).
  */
 export const groupRoleLabel = (role, translate) => {
   if (!role) return ''
   if (role.label) return role.label
-  const key = `group.roles.${role.name}`
-  const translated = translate(key)
-  return translated === key ? role.name : translated
+  return SYSTEM_GROUP_ROLES.includes(role.name) ? translate(`group.roles.${role.name}`) : role.name
 }
 
 // The role ladder, least privileged first: the three system roles in their fixed order, then

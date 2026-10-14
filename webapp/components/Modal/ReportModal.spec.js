@@ -83,11 +83,11 @@ describe('ReportModal.vue', () => {
       })
     })
 
-    describe('given a post', () => {
+    describe('given a contribution', () => {
       beforeEach(() => {
         propsData = {
           ...propsData,
-          type: 'post',
+          type: 'contribution',
           id: 'p23',
           name: 'It is a post',
         }
@@ -98,7 +98,7 @@ describe('ReportModal.vue', () => {
         const calls = mocks.$t.mock.calls
         const expected = [
           [
-            'report.post.message',
+            'report.contribution.message',
             {
               name: 'It is a post',
             },

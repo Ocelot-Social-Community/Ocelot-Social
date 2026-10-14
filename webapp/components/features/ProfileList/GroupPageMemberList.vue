@@ -47,7 +47,12 @@ const PAGE_SIZE = 25
 const ROLE_SECTIONS = [
   { key: OWNER_GROUP_ROLE, roles: [OWNER_GROUP_ROLE] },
   { key: 'admin', roles: ['admin'] },
-  { key: 'members', roles: [USUAL_GROUP_ROLE, PENDING_GROUP_ROLE] },
+  // Members and applicants together, under a heading of their own rather than a role's name.
+  {
+    key: 'members',
+    roles: [USUAL_GROUP_ROLE, PENDING_GROUP_ROLE],
+    labelKey: 'group.roles.members',
+  },
 ]
 
 const SECTIONED_ROLES = new Set(ROLE_SECTIONS.flatMap((section) => section.roles))
@@ -113,7 +118,9 @@ export default {
           key: section.key,
           // A group's own label is not readable here (Group.roles needs group.role.manage), so
           // the heading is the translation of a known role name and otherwise the name itself.
-          label: groupRoleLabel({ name: section.key }, (key) => this.$t(key)),
+          label: section.labelKey
+            ? this.$t(section.labelKey)
+            : groupRoleLabel({ name: section.key }, (key) => this.$t(key)),
           members: this.membersByRole[section.key],
         }))
     },
