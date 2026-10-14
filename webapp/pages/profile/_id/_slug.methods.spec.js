@@ -210,7 +210,14 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
 
   // #10520: on the profile these used to confirm nothing — only an error got a toast.
   describe('blocking, unblocking, muting and unmuting confirm themselves', () => {
-    const buildCtx = (mutate) => ({
+    const buildCtx = (mutate, user = { id: 'u9', name: 'Bob' }) => ({
+      User: [user],
+      get user() {
+        return computed.user.call(this)
+      },
+      get userName() {
+        return computed.userName.call(this)
+      },
       $apollo: {
         mutate,
         queries: {
@@ -219,7 +226,7 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
         },
       },
       $toast: { error: jest.fn(), success: jest.fn() },
-      $t: (key, params) => `${key} ${JSON.stringify(params)}`,
+      $t: (key, params) => (params ? `${key} ${JSON.stringify(params)}` : key),
       $toastBackendError(error) {
         this.$toast.error(error.message)
       },
@@ -237,6 +244,20 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
       await methods[method].call(ctx, { id: 'u9', name: 'Bob' })
 
       expect(ctx.$toast.success).toHaveBeenCalledWith(`${key} {"name":"Bob"}`)
+    })
+
+    it.each([
+      ['muteUser', 'settings.muted-users.muted'],
+      ['unmuteUser', 'settings.muted-users.unmuted'],
+      ['blockUser', 'settings.blocked-users.blocked'],
+      ['unblockUser', 'settings.blocked-users.unblocked'],
+    ])('%s names a user without a name as the profile does', async (method, key) => {
+      const user = { id: 'u9', name: null }
+      const ctx = buildCtx(jest.fn().mockResolvedValue(), user)
+
+      await methods[method].call(ctx, user)
+
+      expect(ctx.$toast.success).toHaveBeenCalledWith(`${key} {"name":"profile.userAnonym"}`)
     })
 
     it.each([['blockUser'], ['unblockUser']])(

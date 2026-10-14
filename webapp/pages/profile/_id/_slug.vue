@@ -544,11 +544,12 @@ export default {
       this.$apollo.queries.profilePagePosts.refetch()
     },
     // Each confirms itself (#10520), like unmuting/unblocking in the settings and muting a group:
-    // the profile changes as well, but a toast says what happened, and to whom.
+    // the profile changes as well, but a toast says what happened, and to whom — by the name
+    // the profile shows, so one without a name is not confirmed as "undefined".
     async muteUser(user) {
       try {
         await this.$apollo.mutate({ mutation: muteUser(), variables: { id: user.id } })
-        this.$toast.success(this.$t('settings.muted-users.muted', { name: user.name }))
+        this.$toast.success(this.$t('settings.muted-users.muted', { name: this.userName }))
       } catch (error) {
         this.$toastBackendError(error)
       } finally {
@@ -560,7 +561,7 @@ export default {
     async unmuteUser(user) {
       try {
         await this.$apollo.mutate({ mutation: unmuteUser(), variables: { id: user.id } })
-        this.$toast.success(this.$t('settings.muted-users.unmuted', { name: user.name }))
+        this.$toast.success(this.$t('settings.muted-users.unmuted', { name: this.userName }))
       } catch (error) {
         this.$toastBackendError(error)
       } finally {
@@ -572,7 +573,7 @@ export default {
     async blockUser(user) {
       try {
         await this.$apollo.mutate({ mutation: blockUser(), variables: { id: user.id } })
-        this.$toast.success(this.$t('settings.blocked-users.blocked', { name: user.name }))
+        this.$toast.success(this.$t('settings.blocked-users.blocked', { name: this.userName }))
       } catch (error) {
         this.$toastBackendError(error)
       } finally {
@@ -582,7 +583,7 @@ export default {
     async unblockUser(user) {
       try {
         await this.$apollo.mutate({ mutation: unblockUser(), variables: { id: user.id } })
-        this.$toast.success(this.$t('settings.blocked-users.unblocked', { name: user.name }))
+        this.$toast.success(this.$t('settings.blocked-users.unblocked', { name: this.userName }))
       } catch (error) {
         this.$toastBackendError(error)
       } finally {
