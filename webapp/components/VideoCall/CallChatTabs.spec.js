@@ -110,32 +110,38 @@ describe('CallChatTabs', () => {
     expect(count(wrapper, 'call').text()).toBe('99+')
   })
 
-  describe('download of the conference chat', () => {
-    const exportButton = (wrapper) => wrapper.find('[data-test="call-chat-tab-export"]')
+  describe('menu of the conference chat', () => {
+    const menuButton = (wrapper) => wrapper.find('[data-test="call-chat-tab-menu"]')
+    const entries = (wrapper) => wrapper.findAll('.os-menu-item')
 
     it('sits in the tab of the conference chat while that chat is open', () => {
       wrapper = Wrapper({}, { exportable: true })
-      expect(exportButton(wrapper).exists()).toBe(true)
-      expect(
-        tab(wrapper, 'call').element.parentElement.contains(exportButton(wrapper).element),
-      ).toBe(true)
+      expect(menuButton(wrapper).exists()).toBe(true)
+      expect(menuButton(wrapper).attributes('aria-label')).toBe('actions.menu')
+      const cell = tab(wrapper, 'call').element.parentElement
+      expect(cell.contains(menuButton(wrapper).element)).toBe(true)
     })
 
     it('is not offered while the chat of the group is open', () => {
       wrapper = Wrapper({ chat: groupChat }, { exportable: true })
-      expect(exportButton(wrapper).exists()).toBe(false)
+      expect(menuButton(wrapper).exists()).toBe(false)
     })
 
     it('is not offered where the host does not do downloads', () => {
       wrapper = Wrapper()
-      expect(exportButton(wrapper).exists()).toBe(false)
+      expect(menuButton(wrapper).exists()).toBe(false)
     })
 
-    it('leaves the download to the host, which holds the chat', async () => {
+    it('offers the download, and leaves it to the host, which holds the chat', async () => {
       wrapper = Wrapper({}, { exportable: true })
-      await exportButton(wrapper).trigger('click')
+      await menuButton(wrapper).trigger('click')
+      const download = entries(wrapper).filter((entry) => entry.text() === 'chat.exportChat')
+      expect(download).toHaveLength(1)
+
+      await download.at(0).trigger('click')
+
       expect(wrapper.emitted('export')).toHaveLength(1)
-      // Not a tab: pressing it opens no chat.
+      // Not a tab: nothing in the menu opens a chat.
       expect(opened()).toEqual([])
     })
   })

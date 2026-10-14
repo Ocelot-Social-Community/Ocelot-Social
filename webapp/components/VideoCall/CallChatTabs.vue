@@ -44,30 +44,55 @@
           {{ tab.count > 99 ? '99+' : tab.count }}
         </os-badge>
       </button>
-      <os-button
+      <!--
+        What can be done with the conference chat, behind the app's three dots: calmer
+        than a row of icons in the tab, and room for what is still to come.
+      -->
+      <dropdown
         v-if="exportable && tab.value === 'call' && active === 'call'"
-        v-tooltip="{ content: $t('chat.exportChat'), placement: 'bottom' }"
-        class="call-chat-tabs__export"
-        data-test="call-chat-tab-export"
-        variant="primary"
-        appearance="ghost"
-        circle
-        size="sm"
-        :loading="exporting"
-        :aria-label="$t('chat.exportChat')"
-        @click="$emit('export')"
+        class="call-chat-tabs__menu"
+        placement="bottom-end"
+        offset="5"
       >
-        <template #icon>
-          <os-icon :icon="icons.download" />
+        <template #default="{ toggleMenu }">
+          <os-button
+            data-test="call-chat-tab-menu"
+            variant="primary"
+            appearance="ghost"
+            circle
+            size="sm"
+            :loading="exporting"
+            :aria-label="$t('actions.menu')"
+            @click.prevent="toggleMenu()"
+          >
+            <template #icon>
+              <os-icon :icon="icons.ellipsisV" />
+            </template>
+          </os-button>
         </template>
-      </os-button>
+        <template #popover="{ toggleMenu }">
+          <os-menu dropdown :routes="callChatActions">
+            <template #menuitem="item">
+              <os-menu-item
+                :route="item.route"
+                :parents="item.parents"
+                @click.stop.prevent="runAction(item.route, toggleMenu)"
+              >
+                <os-icon :icon="item.route.icon" />
+                {{ item.route.label }}
+              </os-menu-item>
+            </template>
+          </os-menu>
+        </template>
+      </dropdown>
     </div>
   </div>
 </template>
 
 <script>
-import { OsBadge, OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsBadge, OsButton, OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
+import Dropdown from '~/components/Dropdown'
 import { mapGetters, mapMutations } from 'vuex'
 import { activeCallChatTab, callChatTarget } from '~/components/VideoCall/callChat'
 
@@ -77,10 +102,11 @@ import { activeCallChatTab, callChatTarget } from '~/components/VideoCall/callCh
 // parked call — so it reads and writes the stores rather than taking props from either.
 export default {
   name: 'CallChatTabs',
-  components: { OsBadge, OsButton, OsIcon },
+  components: { Dropdown, OsBadge, OsButton, OsIcon, OsMenu, OsMenuItem },
   props: {
-    // Whether the conference chat's tab offers its download. The download is the chat's
-    // own doing, so the host, which holds the chat, does it on `export`.
+    // Whether the conference chat's tab offers its menu, with the chat's download. The
+    // download is the chat's own doing, so the host, which holds the chat, does it on
+    // `export`.
     exportable: { type: Boolean, default: false },
     // Whether a download asked for is still under way.
     exporting: { type: Boolean, default: false },
@@ -99,6 +125,18 @@ export default {
     }),
     active() {
       return activeCallChatTab(this.chat, this)
+    },
+    // The entries of the conference chat's menu. One so far; others, such as who may write,
+    // are meant to join it.
+    callChatActions() {
+      return [
+        {
+          name: 'export',
+          label: this.$t('chat.exportChat'),
+          icon: this.icons.download,
+          callback: () => this.$emit('export'),
+        },
+      ]
     },
     // The one tab in the tab order, as the tab pattern asks: the active one, else the first.
     focusable() {
@@ -129,6 +167,10 @@ export default {
     }),
     select(tab) {
       this.openChat(callChatTarget(tab, this))
+    },
+    runAction(action, toggleMenu) {
+      action.callback()
+      toggleMenu()
     },
     // Arrow keys move to the neighbouring tab and open it, wrapping at the ends.
     step(direction) {
@@ -189,7 +231,7 @@ export default {
   font-weight: var(--text-weight-bold);
 }
 
-.call-chat-tabs__export {
+.call-chat-tabs__menu {
   flex-shrink: 0;
 }
 
