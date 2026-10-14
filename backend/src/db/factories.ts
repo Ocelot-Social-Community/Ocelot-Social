@@ -302,8 +302,12 @@ Factory.define('user')
   .option('email', null)
   .option('roleName', null)
   .option('avatar', () =>
+    // faker's avatars are GitHub's, which are square; the image factory's 400×300 default
+    // would store them as 4:3.
     Factory.build('image', {
       url: faker.image.avatar(),
+      width: 400,
+      height: 400,
     }),
   )
   .after(async (buildObject, options) => {
