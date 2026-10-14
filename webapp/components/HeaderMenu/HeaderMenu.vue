@@ -107,11 +107,7 @@
                       <div class="invite-list">
                         <invite-code-list
                           :inviteCodes="user.inviteCodes"
-                          :copy-message="
-                            $t('invite-codes.invite-link-message-personal', {
-                              network: $env.NETWORK_NAME,
-                            })
-                          "
+                          :copy-message="$t('invite-codes.invite-link-message-personal', metadata)"
                         />
                       </div>
                     </template>
@@ -593,6 +589,7 @@ import Logo from '~/components/Logo/Logo'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
 import links from '~/constants/links.js'
+import metadata from '~/constants/metadata.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
@@ -624,6 +621,7 @@ export default {
       navbarRevealedByHover: false,
       isEmpty,
       links,
+      metadata,
       LOGOS: {
         LOGO_HEADER_CLICK: branding.logos.headerClick,
         LOGO_HEADER_WIDTH: branding.logos.headerWidth,

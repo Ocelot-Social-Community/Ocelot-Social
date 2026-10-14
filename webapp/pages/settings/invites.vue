@@ -2,11 +2,7 @@
   <os-card>
     <invite-code-list
       :inviteCodes="user.inviteCodes || []"
-      :copy-message="
-        $t('invite-codes.invite-link-message-personal', {
-          network: $env.NETWORK_NAME,
-        })
-      "
+      :copy-message="$t('invite-codes.invite-link-message-personal', metadata)"
       showInvitedUsers
     />
   </os-card>
@@ -16,6 +12,7 @@
 import { mapGetters } from 'vuex'
 import { OsCard } from '@ocelot-social/ui'
 import InviteCodeList from '~/components/_new/features/Invitations/InviteCodeList.vue'
+import metadata from '~/constants/metadata.js'
 import scrollToContent from './scroll-to-content.js'
 
 export default {
@@ -23,6 +20,11 @@ export default {
   components: {
     OsCard,
     InviteCodeList,
+  },
+  data() {
+    return {
+      metadata,
+    }
   },
   computed: {
     ...mapGetters({
