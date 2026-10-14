@@ -71,9 +71,13 @@
       "group": "administration",
       "description": "Edit this group's own role definitions."
     },
-    "group.chat.participate": {
+    "group.chat.read": {
       "group": "communication",
-      "description": "Read and write the group's chat room."
+      "description": "Read the group's chat room: have it in one's chat list, read its messages and be notified of new ones. A membership right — the non-member role cannot hold it."
+    },
+    "group.chat.write": {
+      "group": "communication",
+      "description": "Write in the group's chat room — text, files and voice messages. Implies reading it."
     },
     "group.videoCall.create": {
       "group": "communication",

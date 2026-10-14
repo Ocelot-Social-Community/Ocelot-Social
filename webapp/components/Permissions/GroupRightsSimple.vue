@@ -158,10 +158,16 @@ const SIMPLE_SWITCHES = [
     permission: 'group.comment.create',
   },
   {
+    id: 'members-chat-read',
+    group: 'members',
+    role: USUAL_GROUP_ROLE,
+    permission: 'group.chat.read',
+  },
+  {
     id: 'members-chat',
     group: 'members',
     role: USUAL_GROUP_ROLE,
-    permission: 'group.chat.participate',
+    permission: 'group.chat.write',
   },
   { id: 'members-invite', group: 'members', role: USUAL_GROUP_ROLE, permission: 'group.invite' },
   {

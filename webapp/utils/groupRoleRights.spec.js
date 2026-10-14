@@ -19,6 +19,11 @@ describe('applyRightChange', () => {
       'group.members.read',
       'group.read',
     ])
+    // Writing into a chat one cannot read is not a state the chat has either.
+    expect(applyRightChange([], 'group.chat.write', true)).toEqual([
+      'group.chat.write',
+      'group.chat.read',
+    ])
   })
 
   it('takes the dependants with it when the right they need is removed', () => {
@@ -30,6 +35,9 @@ describe('applyRightChange', () => {
         'group.read',
         false,
       ),
+    ).toEqual([])
+    expect(
+      applyRightChange(['group.chat.read', 'group.chat.write'], 'group.chat.read', false),
     ).toEqual([])
   })
 
@@ -105,7 +113,7 @@ describe('mayAssignGroupRole', () => {
     expect(
       mayAssignGroupRole({
         viewerPermissions: networkAdmin,
-        memberPermissions: ['group.read', 'group.chat.participate', 'group.leave'],
+        memberPermissions: ['group.read', 'group.chat.write', 'group.leave'],
         rolePermissions: [assign, 'group.read', 'group.leave', 'group.join'],
       }),
     ).toBe(true)

@@ -41,7 +41,8 @@ export const SELF_SERVICE_PERMISSIONS: readonly GroupPermissionKey[] = [
 ]
 
 /**
- * Taking part in a group: writing in it and talking in it. Excluded from both comparisons, for
+ * Taking part in a group: writing in it and talking in it — reading its chat included, which is
+ * being in the conversation rather than looking at the group. Excluded from both comparisons, for
  * the same reason as the self-service rights — they are what a member DOES, not power over
  * anybody — and because they are exactly what a network admin acting in a group does not get
  * (networkAuthority.ts): to post or talk there, they have to join it like anybody else. Counting
@@ -53,7 +54,8 @@ export const SELF_SERVICE_PERMISSIONS: readonly GroupPermissionKey[] = [
 export const PARTICIPATION_PERMISSIONS: readonly GroupPermissionKey[] = [
   'group.post.create',
   'group.comment.create',
-  'group.chat.participate',
+  'group.chat.read',
+  'group.chat.write',
   'group.videoCall.create',
   'group.videoCall.join',
 ]

@@ -109,6 +109,9 @@ const searchGroupsSetup = {
   limit: 'LIMIT toInteger($limit)',
 }
 
+// The groups whose chat the viewer may open — the chat search's other half. Asked of the right
+// the room follows (group.chat.read) rather than of the role name: a member whose group
+// withholds its chat would otherwise find it here and get an error for clicking it.
 const searchMyGroupsSetup = {
   fulltextIndex: 'group_fulltext_search',
   match: `MATCH (resource:Group)
@@ -116,7 +119,8 @@ const searchMyGroupsSetup = {
           WITH user, resource, membership, score`,
   whereClause: `WHERE score >= 0.0
                 AND NOT (resource.deleted = true OR resource.disabled = true)
-                AND membership.role <> 'pending'`,
+                AND (${memberHoldsInGroup('resource', 'group.chat.read', 'user.id')}
+                  OR ${memberHoldsInGroup('resource', 'group.chat.write', 'user.id')})`,
   withClause: 'WITH resource, membership, score',
   returnClause: `resource { .*, myRole: membership.role, __typename: 'Group' }`,
   limit: 'LIMIT toInteger($limit)',

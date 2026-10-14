@@ -345,7 +345,21 @@ describe(writeGroupRole, () => {
 
     await writeGroupRole(db, 'g1', definition('admin', ['group.invite']), 'editor', NOW)
 
-    expect(sent).toHaveLength(1)
+    expect(sent.some((statement) => statement.query.includes('SET g.nonMemberRead'))).toBe(false)
+  })
+
+  it('lets the chat room follow the role, whichever role it is', async () => {
+    // Taking the read right off `usual` has to take its members out of the room right away —
+    // the room is what every chat path reads by.
+    const { db, sent } = fakeDb()
+
+    await writeGroupRole(db, 'g1', definition('usual', ['group.chat.read']), 'editor', NOW)
+
+    const sync = sent.find((statement) =>
+      statement.query.includes('MERGE (reader)-[:CHATS_IN]->(room)'),
+    )
+
+    expect(sync?.variables).toEqual({ groupId: 'g1', userId: null })
   })
 })
 
@@ -371,6 +385,15 @@ describe(deleteGroupRole, () => {
     expect(sent[0].query).toContain('SET m.role = $reassignTo')
     expect(sent[0].query).toContain('DETACH DELETE r')
     expect(sent[0].variables).toMatchObject({ name: 'steward', reassignTo: 'usual' })
+  })
+
+  it('lets the chat room follow the role the members were moved to', async () => {
+    const { db, sent } = fakeDb()
+
+    await deleteGroupRole(db, 'g1', 'steward', 'usual', NOW)
+
+    expect(sent[1].query).toContain('MERGE (reader)-[:CHATS_IN]->(room)')
+    expect(sent[1].variables).toEqual({ groupId: 'g1', userId: null })
   })
 })
 
