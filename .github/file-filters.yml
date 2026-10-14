@@ -48,7 +48,7 @@ backend: &backend
 # backend/src/graphql/webappQueries.spec.ts validates every gql`` template the WEBAPP sends against
 # the backend schema, so either side can break it — but `webapp/**/*` in `backend` would build the
 # Neo4j and backend images for every webapp pull request, which is the commonest kind there is.
-# These two specs need no database and no image, so they get a job of their own (test-schema-
+# These specs need no database and no image, so they get a job of their own (test-schema-
 # contract.yml) and this filter, listing exactly the directories the specs read (SEARCH_DIRS) plus
 # the schema they are checked against.
 schema-contract: &schema-contract
@@ -61,6 +61,13 @@ schema-contract: &schema-contract
   - 'webapp/store/**/*'
   - 'webapp/mixins/**/*'
   - 'webapp/composables/**/*'
+  # backend/src/graphql/webappTranslations.spec.ts: a translation for every error code (in
+  # backend/src/graphql/ above), a label for every right of both permission catalogs and a heading
+  # for every admin config category.
+  - 'webapp/locales/**/*'
+  - 'backend/src/permission/**/*'
+  - 'backend/src/groupPermission/**/*'
+  - 'backend/src/config/categories.ts'
 
 docker: &docker
   - 'docker-compose.*'
@@ -73,9 +80,6 @@ webapp: &webapp
   - 'styleguide/**/*'
   - 'package.json'
   - *ui
-  # scripts/translations/backend-error-codes.sh checks webapp/locales/en.json against the backend's
-  # error codes, so adding a code there without its translation must fail the webapp check
-  - 'backend/src/graphql/errorRegistry.ts'
   - 'scripts/translations/**/*'
   # webapp consumes @ocelot-social/branding (file: dep) → a branding change can break it
   - *branding

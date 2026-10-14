@@ -127,4 +127,10 @@ describe('persistentLinks', () => {
       key: 'error-pages.group-not-found',
     })
   })
+
+  it('falls back to the generic not-found text, a translation key like the page-specific ones', async () => {
+    const { context, error } = setup({ params: {} })
+    await persistentLinks({ queryId, querySlug, path: 'groups' }).asyncData(context)
+    expect(error).toHaveBeenCalledWith({ statusCode: 404, key: 'error-pages.404-default' })
+  })
 })

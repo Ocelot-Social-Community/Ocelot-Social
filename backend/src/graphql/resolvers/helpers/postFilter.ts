@@ -3,7 +3,7 @@
 /* eslint-disable security/detect-object-injection */
 import { UserInputError } from '@graphql/errors'
 
-import { nonMemberReadsContent, visibilityOf } from './groupAccessCypher'
+import { nonMemberReadsContent } from './groupAccessCypher'
 import { orderClause } from './ordering'
 import { shoutsVisibleTo } from './shoutVisibility'
 
@@ -176,20 +176,20 @@ const translate = (
       // control with fewer branches is worth more than the handful of db hits the unused
       // author clause costs a logged-out request.
       case 'invisibleTo': {
-        const { viewerId, contentGroupIds, moderatorVisibilities } = value as {
+        const { viewerId, contentGroupIds, elevatedGroupIds } = value as {
           viewerId: string | null
           contentGroupIds: string[]
-          moderatorVisibilities?: string[]
+          elevatedGroupIds?: string[]
         }
         const groupsParameter = next()
-        const typesParameter = next()
+        const elevatedParameter = next()
         fragments.push({
           // Three ways a post in a group can be visible, and none of them is the group TYPE any
           // more: the group opened its content to non-members (`group.content.read` on its
           // `none` role, mirrored onto the node as `nonMemberContentRead` — see
           // groupRole/nonMemberAccess.ts), or the viewer's own role in that group opens it, or
-          // a network right lets them read into that type (#9405: a moderator sees what they
-          // are asked to review).
+          // the viewer elevated in that very group with a network right that reads into it
+          // (#10506) — and the request names it (filterInvisiblePosts).
           //
           // The mirrored column is what keeps this one expression with no per-row role lookup.
           // `coalesce` carries a group whose column is not written yet — the window between
@@ -200,16 +200,15 @@ const translate = (
               MATCH (${alias})-[:IN]->(g:Group)
               WHERE NOT (${nonMemberReadsContent('g')})
                 AND NOT g.id IN $${groupsParameter}
-                AND NOT ${visibilityOf('g')} IN $${typesParameter}
+                AND NOT g.id IN $${elevatedParameter}
             }
             OR EXISTS { MATCH (${alias})<-[:WROTE]-(:User { id: $${parameter} }) }
           )`,
           params: {
             [parameter]: viewerId,
             [groupsParameter]: contentGroupIds,
-            // No `?? ['public']` any more: a caller that does not know about the field must
-            // widen NOTHING, and `public` is the group's statement to make, not the type's.
-            [typesParameter]: moderatorVisibilities ?? [],
+            // A caller that does not know about the field must widen NOTHING.
+            [elevatedParameter]: elevatedGroupIds ?? [],
           },
         })
         continue

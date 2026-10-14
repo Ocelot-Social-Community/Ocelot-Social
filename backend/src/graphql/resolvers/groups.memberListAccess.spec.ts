@@ -224,10 +224,25 @@ describe('the member list of a hidden group, for somebody acting on a network ri
     expect(await members()).toEqual(['group-owner:owner', 'group-admin:pending'])
   })
 
-  it('is what an outsider would see for a moderator, who only reads', async () => {
-    // Reading stays open without an elevation (groupRole/elevation.ts) — the members, not the
-    // applicants, who are not part of the group yet.
+  it('is refused to a moderator who has not elevated', async () => {
+    // Reading into a group is asked for like any other use of a network right (#10506).
     await asNetworkRight('group.content.read.any_hidden')
+    const { data, errors } = await query({
+      query: GroupMembers,
+      variables: { id: 'hidden-group', includePending: true },
+    })
+
+    expect(errors?.[0]?.message).toBeDefined()
+    expect(data?.GroupMembers ?? null).toBeNull()
+  })
+
+  it('is what an outsider would see for a moderator who elevated, who only reads', async () => {
+    // The members, not the applicants, who are not part of the group yet.
+    await asNetworkRight('group.content.read.any_hidden')
+    await mutate({
+      mutation: elevateInGroup,
+      variables: { groupId: 'hidden-group', reason: 'Looking at a report' },
+    })
 
     expect(await members()).toEqual(['group-owner:owner'])
   })

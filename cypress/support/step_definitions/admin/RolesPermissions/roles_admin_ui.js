@@ -49,6 +49,10 @@ defineStep('I delete the role {string}', (roleName) => {
   cy.get(`[data-test="role-${roleName}-delete"]`).click()
 })
 
+defineStep('the save button for role {string} is disabled', (roleName) => {
+  cy.get(`[data-test="role-${roleName}-save"]`).should('be.disabled')
+})
+
 defineStep('the delete button for role {string} is disabled', (roleName) => {
   cy.get(`[data-test="role-${roleName}-delete"]`).should('be.disabled')
 })

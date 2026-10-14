@@ -501,6 +501,29 @@ describe('policy store', () => {
       })
     })
 
+    describe('during server-side rendering', () => {
+      let previousServer
+      beforeEach(() => {
+        previousServer = process.server
+        process.server = true
+      })
+      afterEach(() => {
+        process.server = previousServer
+      })
+
+      // logout() re-subscribes, and an anonymous visit to a protected page runs logout() on the
+      // server — where the operation went to the backend over HTTP and failed.
+      it.each(['subscribe', 'resubscribe'])('%s opens nothing', (action) => {
+        const clientSubscribe = jest.fn()
+        bindAction(actions[action], { subscribe: clientSubscribe })({
+          commit,
+          state: { subscriptionActive: false },
+        })
+        expect(clientSubscribe).not.toHaveBeenCalled()
+        expect(commit).not.toHaveBeenCalledWith('SET_SUBSCRIPTION_ACTIVE', true)
+      })
+    })
+
     describe('resubscribe', () => {
       it('tears down the stale subscription and opens a fresh one on the new socket', () => {
         // restartWebsockets() on login/logout drops the operation handler, so the

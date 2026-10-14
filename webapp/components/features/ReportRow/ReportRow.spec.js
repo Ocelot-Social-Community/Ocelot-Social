@@ -195,6 +195,35 @@ describe('ReportRow', () => {
         expect(wrapper.find('[data-test="report-author"]').text()).toContain('Dagobert')
         expect(wrapper.find('[data-test="report-reviewer"]').exists()).toBe(true)
       })
+
+      it('offers no way to the group when the server did not name one', () => {
+        expect(wrapper.find('[data-test="report-hidden-group"]').exists()).toBe(false)
+      })
+
+      describe('in a group the server names', () => {
+        beforeEach(() => {
+          // A moderator whose network right covers the group reads it after elevating there
+          // (#10506), so the row points at the group page, where the elevation is offered.
+          propsData = {
+            ...propsData,
+            report: {
+              ...propsData.report,
+              group: { id: 'g1', slug: 'the-group', name: 'The Group' },
+            },
+          }
+          mocks.$t = jest.fn((key, values) => (values ? `${key} ${values.name}` : key))
+          wrapper = Wrapper()
+        })
+
+        it('links to the group page to elevate there', () => {
+          const link = wrapper.find('[data-test="report-hidden-group"]')
+          expect(link.text()).toBe('moderation.reports.hiddenGroupLink The Group')
+          expect(link.findComponent(RouterLinkStub).props().to).toEqual({
+            name: 'groups-id-slug',
+            params: { id: 'g1', slug: 'the-group' },
+          })
+        })
+      })
     })
 
     describe('concerns a User', () => {

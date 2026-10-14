@@ -75,7 +75,7 @@ export function allGroupPermissionGates(): GroupPermissionGate[] {
 }
 
 // The raw network prerequisite as the catalog declares it — possibly still carrying the
-// '<type>' placeholder. Resolve it with networkPrerequisiteFor() in ./prerequisites.ts;
+// '<door>' placeholder. Resolve it with networkPrerequisiteFor() in ./prerequisites.ts;
 // this accessor exists for the catalog projection and the drift guards.
 export function networkPrerequisiteTemplateFor(
   key: GroupPermissionKey,

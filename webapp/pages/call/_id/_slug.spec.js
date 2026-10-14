@@ -178,6 +178,12 @@ describe('CallPage', () => {
     })
   })
 
+  // The page queries the group, which the server refuses while groups are off — during
+  // server-side rendering that refusal failed the whole page.
+  it('is guarded by the groupsEnabled middleware', () => {
+    expect(CallPage.middleware).toEqual(['groupsEnabled'])
+  })
+
   describe('apollo Group', () => {
     const apollo = CallPage.apollo.Group
 

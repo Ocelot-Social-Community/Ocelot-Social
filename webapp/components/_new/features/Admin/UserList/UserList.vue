@@ -2,7 +2,7 @@
   <div class="admin-users">
     <os-card>
       <h2 class="title">{{ $t('admin.users.name') }}</h2>
-      <form @submit.prevent="onSubmit" novalidate>
+      <form v-if="canSearch" @submit.prevent="onSubmit" novalidate>
         <div class="ds-flex ds-flex-gap-small">
           <!-- Input grows to fill so the search button sits flush right, aligning with
                the badge edit-button column in the results table below. -->
@@ -141,7 +141,7 @@
                   :data-test="`user-role-select-${user.id}`"
                   @change="setRole(user, $event)"
                 >
-                  <option v-for="rn in assignableRoleNames" :key="rn" :value="rn">{{ rn }}</option>
+                  <option v-for="rn in roleOptionsFor(user)" :key="rn" :value="rn">{{ rn }}</option>
                 </select>
                 <span v-else class="ds-text">{{ user.roleName }}</span>
               </td>
@@ -233,6 +233,12 @@ import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 // - status  → user.disable        (reversible disable/enable toggle; moderation-grade)
 // - delete  → user.delete.any     (irreversible; administration-grade)
 // A default moderator holds badge.manage + user.disable; delete is admin-only.
+
+// The rights the backend opens the role/free-text search to (resolvers/users.ts,
+// USER_ADMIN_SEARCH_NOT_PERMITTED otherwise). The list itself is open to more — a viewer
+// holding only user.disable reaches it through the moderation area.
+const SEARCH_PERMISSIONS = ['role.manage', 'badge.manage', 'user.delete.any', 'user.email.readAny']
+
 export default {
   mixins: [formValidation],
   components: {
@@ -285,6 +291,7 @@ export default {
       searchText: term || null,
       roleFilter: roleName,
       allRoleNames: [],
+      unassignableRoleNames: [],
       formData: {
         query,
       },
@@ -323,15 +330,20 @@ export default {
     canDisableUsers() {
       return this.$can('user.disable')
     },
-    // Only an owner may grant the owner role (mirrors the backend rule).
+    // Without one of these the search is refused. Not sending it matters most for a deep link
+    // (?q=…): the list is then fetched during server-side rendering, where the refusal is not
+    // a toast but the whole page failing with "Server error".
+    canSearch() {
+      return SEARCH_PERMISSIONS.some((permission) => this.$can(permission))
+    },
+    // Owners re-role anybody, other owners included (the backend's owner-only path).
     isOwner() {
       return !!this.currentUser && this.currentUser.roleName === 'owner'
     },
-    // Role options offered in the dropdown — owner only for owners.
+    // The roles the viewer may hand out (#10485): they hold the role's rights, and the owner
+    // role only an owner — the backend's answer (Role.assignableByCurrentUser).
     assignableRoleNames() {
-      return this.isOwner
-        ? this.allRoleNames
-        : this.allRoleNames.filter((roleName) => roleName !== 'owner')
+      return this.allRoleNames.filter((roleName) => !this.unassignableRoleNames.includes(roleName))
     },
     ...mapGetters({
       currentUser: 'auth/user',
@@ -359,6 +371,7 @@ export default {
       variables() {
         const { offset, first, roleFilter, searchText } = this
         const variables = { first, offset }
+        if (!this.canSearch) return variables
         // Role + free text combine; the free text is a substring match across
         // name/slug/about/email (partial e-mail included) — no exact-e-mail case.
         if (roleFilter) variables.roleName = roleFilter
@@ -381,6 +394,18 @@ export default {
       },
       update({ roles }) {
         return (roles || []).map((role) => role.name)
+      },
+    },
+    // Same query, so read from the cache: which of those roles the viewer may not hand out.
+    unassignableRoleNames: {
+      query: rolesQuery,
+      skip() {
+        return !this.canManageRoles
+      },
+      update({ roles }) {
+        return (roles || [])
+          .filter((role) => role.assignableByCurrentUser === false)
+          .map((role) => role.name)
       },
     },
   },
@@ -435,10 +460,19 @@ export default {
     },
     // Whether the current user may change this user's role: not your own role, and
     // only an owner may change an owner (mirrors the backend rule).
+    // Only on users the backend lets the viewer re-role (#10485): those their role outranks,
+    // or anybody for an owner. Not on one's own row — stepping down is allowed, but a select
+    // in a list is no place for it.
     canEditRole(user) {
       if (!this.currentUser || user.id === this.currentUser.id) return false
-      if (user.roleName === 'owner' && !this.isOwner) return false
-      return true
+      return this.isOwner || user.outrankedByCurrentUser === true
+    },
+    // The roles offered for this user, with the one they hold even where the viewer could not
+    // hand it out, so the select shows it instead of silently showing another.
+    roleOptionsFor(user) {
+      return this.assignableRoleNames.includes(user.roleName) || !user.roleName
+        ? this.assignableRoleNames
+        : [user.roleName, ...this.assignableRoleNames]
     },
     // Open a confirmation dialog before deleting a user (reuses the shared ConfirmModal,
     // whose confirm button runs the callback). Danger-styled.

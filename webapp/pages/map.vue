@@ -36,7 +36,7 @@
             :aria-label="$t('map.legend.title')"
           >
             <div
-              v-for="type in markers.types"
+              v-for="type in legendTypes"
               :key="type.id"
               class="map-legend-item"
               data-test="marker-type-item"
@@ -313,6 +313,13 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+    groupsEnabled() {
+      return this.$policy.get('groupsEnabled') === true
+    },
+    // The legend explains the markers on the map; with groups switched off there are none.
+    legendTypes() {
+      return this.markers.types.filter((type) => type.id !== 'group' || this.groupsEnabled)
+    },
     isPreparedForMarkers() {
       return (
         !this.markers.isGeoJSON &&
@@ -1400,6 +1407,7 @@ export default {
         return {
           userFilter: { hasLocation: true },
           groupHasLocation: true,
+          withGroups: this.groupsEnabled,
           postFilter: {
             postType_in: ['Event'],
             ...(this.showPastEvents ? {} : { eventStart_gte: new Date() }),
@@ -1410,7 +1418,9 @@ export default {
       },
       update({ User, Group, Post }) {
         this.users = User
-        this.groups = Group
+        // No groups asked for while they are switched off — an empty list, so the markers
+        // still get drawn (they wait for all three lists).
+        this.groups = Group ?? []
         this.posts = Post
         if (this.markers.isSourceAndLayerAdded) {
           this.refreshMarkersData()

@@ -33,8 +33,10 @@
           @change="$emit('toggle', permission.key, $event.target.checked)"
         />
         <span class="perm-row__text">
-          <span class="perm-row__key">{{ permission.key }}</span>
+          <!-- What the right does comes first: the people granting it think in "may comment",
+               not in `group.comment.create`. The key stays below, for support and the docs. -->
           <span class="perm-row__desc">{{ descriptionFor(permission) }}</span>
+          <span class="perm-row__key">{{ permission.key }}</span>
           <span v-if="noteFor(permission)" class="perm-row__note">
             {{ noteFor(permission) }}
             <!-- Whatever the page wants to offer about this row: a link to the gate's policy. -->
@@ -171,14 +173,14 @@ export default {
   line-height: 1.25;
 }
 
-.perm-row__key {
-  font-family: monospace;
-  font-size: 0.85em;
+.perm-row__desc {
+  font-size: 0.9em;
 }
 
-.perm-row__desc {
+.perm-row__key {
   color: var(--text-color-soft);
-  font-size: 0.8em;
+  font-family: monospace;
+  font-size: 0.75em;
 }
 
 .perm-row__note {

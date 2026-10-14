@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social-webapp",
-  "version": "3.21.0",
+  "version": "3.21.1",
   "description": "ocelot.social Frontend",
   "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
   "author": "ocelot.social Community",
@@ -14,7 +14,7 @@
     "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt-start",
     "generate": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt generate",
     "lint": "eslint .",
-    "locales": "../scripts/translations/missing-keys.sh && ../scripts/translations/backend-error-codes.sh && ../scripts/translations/sort.sh",
+    "locales": "../scripts/translations/missing-keys.sh && ../scripts/translations/sort.sh",
     "locales:normalize": "../scripts/translations/normalize.sh",
     "precommit": "npm run lint",
     "test": "cross-env NODE_ENV=test jest --coverage",

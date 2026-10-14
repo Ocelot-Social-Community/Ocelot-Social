@@ -38,7 +38,7 @@ describe('isGroupApplicant', () => {
 })
 
 describe('groupRoleLabel', () => {
-  const translate = (key) => (key === 'group.roles.usual' ? 'Mitglied' : key)
+  const translate = jest.fn((key) => (key === 'group.roles.usual' ? 'Mitglied' : key))
 
   it('prefers the label the group chose', () => {
     expect(groupRoleLabel({ name: 'editors', label: 'Redaktion' }, translate)).toBe('Redaktion')
@@ -48,9 +48,11 @@ describe('groupRoleLabel', () => {
     expect(groupRoleLabel({ name: 'usual', label: null }, translate)).toBe('Mitglied')
   })
 
-  it('falls back to the key for a role the group invented and did not label', () => {
-    // Translating it would render the i18n key itself, which is worse than the key.
+  it('names a role the group invented and did not label by its name, without a lookup', () => {
+    // No locale translates it: asking would ask for a key that does not exist.
+    translate.mockClear()
     expect(groupRoleLabel({ name: 'editors', label: null }, translate)).toBe('editors')
+    expect(translate).not.toHaveBeenCalled()
   })
 
   it('renders nothing for no role', () => {

@@ -89,7 +89,7 @@ const options = {
   // The network-policy flags (BADGES_ENABLED, ASK_FOR_REAL_NAME, REQUIRE_LOCATION,
   // INVITE_LINK_LIMIT, INVITE_CODES_*, MAX_PINNED_POSTS, MAX_GROUP_PINNED_POSTS,
   // API_KEYS_MAX_PER_USER) moved to the runtime network policy (read via $policy.get).
-  NETWORK_NAME: process.env.NETWORK_NAME || 'Ocelot.social',
+  // NETWORK_NAME is gone: the network is named by the brand's metadata.applicationName.
 }
 
 const language = {
@@ -98,9 +98,9 @@ const language = {
 }
 
 // Support contact address — set per deployment via env. In CONFIG so nuxt-env exposes it at
-// runtime as `$env.SUPPORT_EMAIL` (same channel as NETWORK_NAME); default mirrors the backend's
-// software default. The organisation/support LINKS live only in the backend (email templates) —
-// the webapp's footer links come from ~/constants/links, so they are not duplicated here.
+// runtime as `$env.SUPPORT_EMAIL`; default mirrors the backend's software default. The
+// organisation/support LINKS live only in the backend (email templates) — the webapp's footer
+// links come from ~/constants/links, so they are not duplicated here.
 const organization = {
   SUPPORT_EMAIL: process.env.SUPPORT_EMAIL || 'hello@ocelot.social',
 }

@@ -2,10 +2,16 @@ import { describe, it, expect } from 'vitest'
 
 import { allPermissionKeys } from '@src/permission'
 
-import { PARTICIPATION_PERMISSIONS, dominatesInNetwork } from './authority'
+import {
+  PARTICIPATION_PERMISSIONS,
+  coversInNetwork,
+  dominatesInNetwork,
+  mayAssignNetworkRole,
+  mayChangeNetworkRole,
+} from './authority'
 import { DEFAULT_ROLES } from './defaults'
 import { dominates } from './dominance'
-import { ADMIN_ROLE, MODERATOR_ROLE, USER_ROLE } from './types'
+import { ADMIN_ROLE, MODERATOR_ROLE, OWNER_ROLE, USER_ROLE } from './types'
 
 import type { PermissionKey } from '@src/permission'
 
@@ -78,5 +84,127 @@ describe('dominatesInNetwork (act-on hierarchy over authority)', () => {
     for (const key of role(USER_ROLE)) {
       expect(PARTICIPATION_PERMISSIONS).toContain(key)
     }
+  })
+})
+
+describe(coversInNetwork, () => {
+  it('holds when the actor has every authority right handed out', () => {
+    expect(coversInNetwork(role(ADMIN_ROLE), role(MODERATOR_ROLE))).toBe(true)
+  })
+
+  it('fails on a single authority right the actor lacks', () => {
+    expect(coversInNetwork(role(MODERATOR_ROLE), ['policy.manage'])).toBe(false)
+  })
+
+  // An administrative role without `post.create` must still be able to hand out `user`.
+  it('does not count participation', () => {
+    expect(coversInNetwork(office, role(USER_ROLE))).toBe(true)
+  })
+})
+
+describe('mayAssignNetworkRole (#10485)', () => {
+  const moderator = { permissions: role(MODERATOR_ROLE), roleName: MODERATOR_ROLE }
+  const assign = (
+    actor: { permissions: Set<PermissionKey>; roleName: string },
+    target: string,
+    assigned: string,
+    self = false,
+  ) =>
+    mayAssignNetworkRole({
+      actor,
+      self,
+      targetRoleName: target,
+      targetPermissions: target === OWNER_ROLE ? set(...allPermissionKeys()) : role(target),
+      assignedRoleName: assigned,
+      assignedPermissions: assigned === OWNER_ROLE ? set(...allPermissionKeys()) : role(assigned),
+    })
+
+  it('refuses re-roling somebody the actor does not outrank', () => {
+    expect(assign(moderator, ADMIN_ROLE, USER_ROLE)).toBe('notOutranked')
+  })
+
+  it('refuses handing out a role the actor does not cover', () => {
+    expect(assign(moderator, USER_ROLE, ADMIN_ROLE)).toBe('notCovered')
+  })
+
+  it('asks only for coverage on oneself: stepping down, not up', () => {
+    expect(assign(moderator, MODERATOR_ROLE, USER_ROLE, true)).toBeNull()
+    expect(assign(moderator, MODERATOR_ROLE, ADMIN_ROLE, true)).toBe('notCovered')
+  })
+
+  it('gives and takes the owner role by owners only', () => {
+    const admin = { permissions: role(ADMIN_ROLE), roleName: ADMIN_ROLE }
+
+    expect(assign(admin, USER_ROLE, OWNER_ROLE)).toBe('ownerOnly')
+    expect(assign(admin, OWNER_ROLE, USER_ROLE)).toBe('ownerOnly')
+  })
+
+  // A request without a user resolves to the baseline, never to an owner.
+  it('refuses the owner role to an actor without a role of their own', () => {
+    expect(assign({ permissions: set(), roleName: USER_ROLE }, USER_ROLE, OWNER_ROLE)).toBe(
+      'ownerOnly',
+    )
+  })
+
+  it('lets an owner re-role another owner', () => {
+    const owner = { permissions: set(...allPermissionKeys()), roleName: OWNER_ROLE }
+
+    expect(assign(owner, OWNER_ROLE, USER_ROLE)).toBeNull()
+  })
+})
+
+describe('mayChangeNetworkRole (#10485)', () => {
+  const others = [ADMIN_ROLE, MODERATOR_ROLE, USER_ROLE].map((name) => ({
+    name,
+    permissions: role(name),
+  }))
+  const change = (
+    actorRole: string,
+    roleName: string,
+    newPermissions?: PermissionKey[],
+    actorPermissions = role(actorRole),
+  ) =>
+    mayChangeNetworkRole({
+      actor: { permissions: actorPermissions, roleName: actorRole },
+      roleName,
+      rolePermissions: role(roleName),
+      newPermissions,
+      otherRoles: others,
+    })
+
+  it('refuses a role the actor neither holds nor outranks', () => {
+    expect(change(MODERATOR_ROLE, ADMIN_ROLE)).toBe('notOutranked')
+  })
+
+  it('lets the actor shape their own role, giving it a right they lacked', () => {
+    expect(change(ADMIN_ROLE, ADMIN_ROLE, [...role(ADMIN_ROLE)])).toBeNull()
+    expect(change(MODERATOR_ROLE, MODERATOR_ROLE, [...role(MODERATOR_ROLE), 'post.pin'])).toBeNull()
+  })
+
+  it('renames or deletes their own role without a rights check', () => {
+    expect(change(MODERATOR_ROLE, MODERATOR_ROLE)).toBeNull()
+  })
+
+  it('refuses raising their own role above a role it does not outrank today', () => {
+    // An admin role short of one right is outranked by every admin right plus that one.
+    const shortAdmin = new Set([...role(ADMIN_ROLE)].filter((key) => key !== 'branding.manage'))
+    const result = mayChangeNetworkRole({
+      actor: { permissions: role(MODERATOR_ROLE), roleName: MODERATOR_ROLE },
+      roleName: MODERATOR_ROLE,
+      rolePermissions: role(MODERATOR_ROLE),
+      newPermissions: [...shortAdmin, 'branding.manage'],
+      otherRoles: [{ name: ADMIN_ROLE, permissions: shortAdmin }],
+    })
+
+    expect(result).toBe('wouldOutrank')
+  })
+
+  it('ignores roles it outranks already when raising their own', () => {
+    expect(change(ADMIN_ROLE, ADMIN_ROLE, [...role(ADMIN_ROLE)])).toBeNull()
+  })
+
+  it('fills a role the actor outranks only with rights they hold', () => {
+    expect(change(MODERATOR_ROLE, USER_ROLE, [...role(USER_ROLE), 'badge.manage'])).toBeNull()
+    expect(change(MODERATOR_ROLE, USER_ROLE, ['policy.manage'])).toBe('notCovered')
   })
 })

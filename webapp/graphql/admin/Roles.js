@@ -10,6 +10,7 @@ export const permissionCatalogQuery = gql`
       description
       gatedBy
       available
+      grantableByCurrentUser
     }
   }
 `
@@ -21,6 +22,8 @@ export const rolesQuery = gql`
       protected
       permissions
       memberCount
+      editableByCurrentUser
+      assignableByCurrentUser
     }
   }
 `

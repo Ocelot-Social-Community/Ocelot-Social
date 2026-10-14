@@ -8,7 +8,9 @@ import type { Context } from '@src/context'
 //
 // The target's role is resolved the way the request context resolves the viewer's: their
 // single HAS_ROLE edge, edgeless ⇒ the baseline `user` role, owner ⇒ the full catalog.
-export const viewerOutranksUser = async (context: Context, userId: string): Promise<boolean> => {
+
+/** The role a user resolves to: their single HAS_ROLE edge, or the baseline `user` without one. */
+export const roleNameOfUser = async (context: Context, userId: string): Promise<string> => {
   const result = await context.database.query({
     query: `OPTIONAL MATCH (u:User {id: $userId})-[:HAS_ROLE]->(r:Role)
             RETURN coalesce(r.name, 'user') AS roleName`,
@@ -16,6 +18,11 @@ export const viewerOutranksUser = async (context: Context, userId: string): Prom
   })
   // Exactly one row, always: an OPTIONAL MATCH that finds nothing still returns a row with a null
   // `r`, and the coalesce turns that into 'user'.
-  const roleName = result.records[0].get('roleName') as string
-  return dominatesInNetwork(context.effectivePermissions, context.role.permissionsForRole(roleName))
+  return result.records[0].get('roleName') as string
 }
+
+export const viewerOutranksUser = async (context: Context, userId: string): Promise<boolean> =>
+  dominatesInNetwork(
+    context.effectivePermissions,
+    context.role.permissionsForRole(await roleNameOfUser(context, userId)),
+  )

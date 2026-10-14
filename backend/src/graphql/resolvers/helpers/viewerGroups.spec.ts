@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { groupReadScope, moderatorVisibilities, viewerScope } from './viewerGroups'
+import { elevatedReadScope, groupReadScope, viewerScope } from './viewerGroups'
 
 import type { Context } from '@src/context'
 import type { PermissionKey } from '@src/permission'
@@ -23,42 +23,64 @@ const contextWithMemberships = (
     database: { query: vi.fn().mockResolvedValue({ records: rows }) },
   }) as unknown as Context
 
-describe(moderatorVisibilities, () => {
-  it('is empty without a network right, because `public` is the group`s own statement now', () => {
-    // It used to start at ['public']: the type WAS the statement "strangers may read this".
-    // That statement is the group's `group.content.read` for non-members today, so keeping
-    // public in here would let the type override a public group that closed its content.
-    expect(moderatorVisibilities(contextHolding())).toEqual([])
+// What the elevation query sees: an `ELEVATED_IN` lookup answers with these group ids, the
+// membership lookup with nothing.
+const contextElevatedIn = (groupIds: string[], ...permissions: string[]) => {
+  const query = vi.fn(async ({ query: statement }: { query: string }) =>
+    Promise.resolve({
+      records: statement.includes('ELEVATED_IN')
+        ? groupIds.map((groupId) => ({ get: () => groupId }))
+        : [],
+    }),
+  )
+  return {
+    context: {
+      user: { id: 'viewer' },
+      effectivePermissions: new Set(permissions as PermissionKey[]),
+      database: { query },
+    } as unknown as Context,
+    query,
+  }
+}
+
+describe(elevatedReadScope, () => {
+  it('asks nothing for an anonymous visitor', async () => {
+    const context = contextHolding('group.content.read.any_hidden')
+
+    expect(await elevatedReadScope(context)).toEqual([])
   })
 
-  it('adds the types a network right covers', () => {
-    // The fix for #9405: a moderator brings the closed type along, so the content they are
-    // asked to review stops being invisible to them.
-    expect(moderatorVisibilities(contextHolding('group.content.read.any_closed'))).toEqual([
-      'closed',
-    ])
-    expect(
-      moderatorVisibilities(
-        contextHolding('group.content.read.any_closed', 'group.content.read.any_hidden'),
-      ),
-    ).toEqual(['closed', 'hidden'])
+  it('asks nothing of a viewer whose network rights read into no group', async () => {
+    // Everybody but the moderators and admins: an elevation without a right to read with it
+    // opens nothing, so the lookup is not worth a round trip.
+    const { context, query } = contextElevatedIn(['g1'], 'content.moderate', 'post.create')
+
+    expect(await elevatedReadScope(context)).toEqual([])
+    expect(query).not.toHaveBeenCalled()
   })
 
-  it('does not let the hidden right alone open closed groups, or the other way round', () => {
-    // Two separate rights, because an unlisted group is the stricter case — that distinction
-    // would be lost if one implied the other.
-    expect(moderatorVisibilities(contextHolding('group.content.read.any_hidden'))).toEqual([
-      'hidden',
-    ])
+  it('answers with the groups the viewer elevated in, not with the types a right covers', async () => {
+    // #10506: the right alone used to open every group of its type, in every list.
+    const { context, query } = contextElevatedIn(['g1', 'g2'], 'group.content.read.any_hidden')
+
+    expect(await elevatedReadScope(context)).toEqual(['g1', 'g2'])
+    expect(query).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variables: { userId: 'viewer', visibilities: ['hidden'] },
+      }),
+    )
   })
 
-  it('counts administering a type as reading into it, and ignores the rest', () => {
-    // Administering folds the whole group catalog, moderating brings the reading rights along
-    // — one fold for every shape (groupRole/networkAuthority.ts), so the post filter cannot
-    // disagree with the per-group answer about who may see what.
-    expect(moderatorVisibilities(contextHolding('group.administer.any_closed'))).toEqual(['closed'])
-    expect(moderatorVisibilities(contextHolding('group.moderate.any_hidden'))).toEqual(['hidden'])
-    expect(moderatorVisibilities(contextHolding('content.moderate', 'post.create'))).toEqual([])
+  it('only counts a live elevation in a group the right still covers', async () => {
+    // Both halves in the query: the elevation outlives a right withdrawn from the role, and a
+    // group can turn hidden while it runs.
+    const { context, query } = contextElevatedIn([], 'group.moderate.any_closed')
+    await elevatedReadScope(context)
+
+    const [[{ query: cypher }]] = query.mock.calls
+
+    expect(cypher).toContain('e.expiresAt > datetime()')
+    expect(cypher).toContain('IN $visibilities')
   })
 })
 
@@ -131,16 +153,24 @@ describe(groupReadScope, () => {
 })
 
 describe(viewerScope, () => {
-  it('carries the viewer, their content groups and the types a right opens', async () => {
-    const context = contextWithMemberships(
-      [membershipRow('mine', 'usual', '["group.read","group.content.read"]')],
-      ['group.content.read.any_closed'],
+  it('carries the viewer, their content groups and the groups they elevated in', async () => {
+    const query = vi.fn(async ({ query: statement }: { query: string }) =>
+      Promise.resolve({
+        records: statement.includes('ELEVATED_IN')
+          ? [{ get: () => 'elevated' }]
+          : [membershipRow('mine', 'usual', '["group.read","group.content.read"]')],
+      }),
     )
+    const context = {
+      user: { id: 'viewer' },
+      effectivePermissions: new Set(['group.content.read.any_closed'] as PermissionKey[]),
+      database: { query },
+    } as unknown as Context
 
     expect(await viewerScope(context)).toEqual({
       viewerId: 'viewer',
       contentGroupIds: ['mine'],
-      moderatorVisibilities: ['closed'],
+      elevatedGroupIds: ['elevated'],
     })
   })
 
@@ -150,7 +180,7 @@ describe(viewerScope, () => {
     expect(await viewerScope(context)).toEqual({
       viewerId: null,
       contentGroupIds: [],
-      moderatorVisibilities: [],
+      elevatedGroupIds: [],
     })
   })
 })

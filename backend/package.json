@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social-backend",
-  "version": "3.21.0",
+  "version": "3.21.1",
   "description": "GraphQL Backend for ocelot.social",
   "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
   "author": "ocelot.social Community",
@@ -19,7 +19,7 @@
     "test": "cross-env NODE_ENV=test vitest run --coverage",
     "test:shard": "cross-env NODE_ENV=test VITEST_BLOB_REPORT=true vitest run --coverage --coverage.thresholds.lines=0 --coverage.thresholds.statements=0 --coverage.thresholds.branches=0 --coverage.thresholds.functions=0",
     "test:merge": "cross-env NODE_ENV=test vitest --merge-reports=coverage/blobs --coverage",
-    "test:schema-contract": "cross-env NODE_ENV=test vitest run --coverage=false src/graphql/webappQueries.spec.ts src/graphql/webappPostFilters.spec.ts",
+    "test:schema-contract": "cross-env NODE_ENV=test vitest run --coverage=false src/graphql/webappQueries.spec.ts src/graphql/webappPostFilters.spec.ts src/graphql/webappTranslations.spec.ts",
     "db:schema:check": "tsx src/db/schema/run-audit.ts check",
     "db:schema:apply": "tsx src/db/schema/run-audit.ts apply",
     "db:reset": "tsx src/db/reset.ts",

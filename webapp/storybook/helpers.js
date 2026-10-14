@@ -62,7 +62,6 @@ const helpers = {
     // matched by hand, enough for components whose data()/mounted() read $env.* unconditionally.
     Vue.prototype.$env = {
       SUPPORT_EMAIL: 'hello@ocelot.social',
-      NETWORK_NAME: 'Ocelot.social',
       LANGUAGE_DEFAULT: 'en',
       LANGUAGE_FALLBACK: 'en',
       NODE_ENV: 'development',

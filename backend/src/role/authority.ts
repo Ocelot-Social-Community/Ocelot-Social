@@ -13,6 +13,7 @@
 import { allPermissionKeys } from '@src/permission'
 
 import { dominates } from './dominance'
+import { OWNER_ROLE } from './types'
 
 import type { PermissionKey } from '@src/permission'
 
@@ -64,4 +65,127 @@ export function dominatesInNetwork(
     return true
   }
   return dominates(authorityOf(actor), authorityOf(target))
+}
+
+/**
+ * Whether the actor's rights cover a set they hand out: every AUTHORITY right in it is one the
+ * actor holds. Nobody may give away power they do not have — to somebody else, to themselves,
+ * or by writing it into a role. Participation is left out for the reason it is left out of the
+ * ranking: an administrative role without `post.create` must still be able to hand out `user`.
+ */
+export function coversInNetwork(
+  actor: ReadonlySet<PermissionKey>,
+  granted: Iterable<PermissionKey>,
+): boolean {
+  for (const key of authorityOf(new Set(granted))) {
+    if (!actor.has(key)) {
+      return false
+    }
+  }
+  return true
+}
+
+/** Why a role change is refused, or `null` when it is allowed. */
+export type NetworkRoleRefusal = 'notOutranked' | 'notCovered' | 'ownerOnly' | 'wouldOutrank'
+
+interface Actor {
+  permissions: ReadonlySet<PermissionKey>
+  roleName: string
+}
+
+/**
+ * Whether the actor may give a user a role (#10485). The same three rules the groups follow
+ * (groupRole/authority.ts):
+ *
+ *   - they outrank the user they act on — a moderator does not re-role an admin;
+ *   - their rights cover the role they hand out — a moderator does not make anybody an admin;
+ *   - on themselves, coverage only: stepping down is fine, stepping up is not.
+ *
+ * Plus the owner rule: the owner role is given and taken by owners only — and among each
+ * other owners are not peers here: an owner may re-role another owner.
+ */
+export function mayAssignNetworkRole({
+  actor,
+  self,
+  targetPermissions,
+  targetRoleName,
+  assignedRoleName,
+  assignedPermissions,
+}: {
+  actor: Actor
+  self: boolean
+  targetPermissions: ReadonlySet<PermissionKey>
+  targetRoleName: string
+  assignedRoleName: string
+  assignedPermissions: ReadonlySet<PermissionKey>
+}): NetworkRoleRefusal | null {
+  if (
+    (assignedRoleName === OWNER_ROLE || targetRoleName === OWNER_ROLE) &&
+    actor.roleName !== OWNER_ROLE
+  ) {
+    return 'ownerOnly'
+  }
+  // Owners act on everybody, other owners included: that is the owner-only way to take the
+  // owner role away (./dominance.ts). The last owner is the resolver's to keep.
+  if (
+    !self &&
+    actor.roleName !== OWNER_ROLE &&
+    !dominatesInNetwork(actor.permissions, targetPermissions)
+  ) {
+    return 'notOutranked'
+  }
+  if (!coversInNetwork(actor.permissions, assignedPermissions)) {
+    return 'notCovered'
+  }
+  return null
+}
+
+/**
+ * Whether the actor may change a role itself — its rights, its name, whether it exists.
+ *
+ * Changing a role acts on everybody who holds it, so it needs the standing to act on them: the
+ * actor outranks the role, or it is the actor's OWN role. An admin edits the admin role; a
+ * moderator who may manage roles does not.
+ *
+ * Their own role they shape freely — that is what `role.manage` is for, and it includes giving
+ * themselves a right. With one limit: it must not come to outrank a role it does not outrank
+ * today (`otherRoles`). Otherwise a moderator would add every admin right plus one and then
+ * re-role the admins after all.
+ *
+ * A role they outrank they can only fill with rights they hold (`newPermissions`): editing it
+ * must not lift its holders above the actor.
+ */
+export function mayChangeNetworkRole({
+  actor,
+  roleName,
+  rolePermissions,
+  newPermissions,
+  otherRoles = [],
+}: {
+  actor: Actor
+  roleName: string
+  rolePermissions: ReadonlySet<PermissionKey>
+  newPermissions?: Iterable<PermissionKey>
+  otherRoles?: readonly { name: string; permissions: ReadonlySet<PermissionKey> }[]
+}): NetworkRoleRefusal | null {
+  if (roleName === actor.roleName) {
+    if (!newPermissions) {
+      return null
+    }
+    const raised = new Set(newPermissions)
+    const overtaken = otherRoles.some(
+      (other) =>
+        other.name !== roleName &&
+        !dominatesInNetwork(actor.permissions, other.permissions) &&
+        dominatesInNetwork(raised, other.permissions),
+    )
+    return overtaken ? 'wouldOutrank' : null
+  }
+  if (!dominatesInNetwork(actor.permissions, rolePermissions)) {
+    return 'notOutranked'
+  }
+  if (newPermissions && !coversInNetwork(actor.permissions, newPermissions)) {
+    return 'notCovered'
+  }
+  return null
 }

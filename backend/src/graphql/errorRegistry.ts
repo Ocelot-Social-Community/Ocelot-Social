@@ -3,8 +3,8 @@
 //
 // - The name is the stable, machine-readable code. The webapp translates by it, from the
 //   `backendErrors.<NAME>` key in webapp/locales/*.json, so rename one only together with its
-//   locale keys (scripts/translations/backend-error-codes.sh checks that every name has an English
-//   translation). Names read `<AREA>_<OBJECT>_<PROBLEM>`, spelled out.
+//   locale keys (webappTranslations.spec.ts checks that every name has an English translation).
+//   Names read `<AREA>_<OBJECT>_<PROBLEM>`, spelled out.
 // - `type` is Apollo's standard error class, sent as `extensions.code`.
 // - `text` is the English message for logs and API clients. A `{placeholder}` in it is filled from
 //   the params the error is thrown with; the same params go to the webapp for its translation.
@@ -299,6 +299,26 @@ const definitions = {
   ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER: {
     type: 'FORBIDDEN',
     text: 'Only an owner may assign or change the owner role.',
+  },
+  ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED: {
+    type: 'FORBIDDEN',
+    text: 'You can only change the role of users whose role grants less authority than yours.',
+  },
+  ROLE_ASSIGNMENT_NOT_COVERED: {
+    type: 'FORBIDDEN',
+    text: 'You cannot hand out a role with rights you do not hold yourself.',
+  },
+  ROLE_CHANGE_NOT_OUTRANKED: {
+    type: 'FORBIDDEN',
+    text: 'You can only change your own role or roles that grant less authority than yours.',
+  },
+  ROLE_SAVE_WOULD_OUTRANK: {
+    type: 'FORBIDDEN',
+    text: 'Your own role cannot be raised above a role that yours does not outrank today.',
+  },
+  ROLE_SAVE_NOT_COVERED: {
+    type: 'FORBIDDEN',
+    text: 'A role can only contain rights you hold yourself.',
   },
   ROLE_SAVE_NAME_ALREADY_TAKEN: { type: 'BAD_USER_INPUT', text: "Role '{name}' already exists." },
   ROLE_SAVE_NAME_INVALID: {

@@ -504,7 +504,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                owner
+                group.roles.owner
               
               </span>
             </div>
@@ -1743,7 +1743,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                pending
+                group.roles.pending
               
               </span>
             </div>
@@ -2542,7 +2542,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                usual
+                group.roles.usual
               
               </span>
             </div>
@@ -3414,7 +3414,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                owner
+                group.roles.owner
               
               </span>
             </div>
@@ -4436,7 +4436,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                pending
+                group.roles.pending
               
               </span>
             </div>
@@ -5100,7 +5100,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                usual
+                group.roles.usual
               
               </span>
             </div>
@@ -5943,7 +5943,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                owner
+                group.roles.owner
               
               </span>
             </div>
@@ -6795,7 +6795,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
               >
                 
-                usual
+                group.roles.usual
               
               </span>
             </div>

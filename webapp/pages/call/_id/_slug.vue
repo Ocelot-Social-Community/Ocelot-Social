@@ -14,6 +14,9 @@ import { groupQuery } from '~/graphql/groups'
 
 export default {
   name: 'CallPage',
+  // A call belongs to a group. With groups switched off the group query below is refused,
+  // and during server-side rendering that refusal failed the whole page.
+  middleware: ['groupsEnabled'],
   head() {
     return {
       title: this.callTitle,

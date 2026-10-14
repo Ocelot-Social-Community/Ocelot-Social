@@ -1,18 +1,38 @@
 import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
+import './../../../factories'
 
 // The member list on /groups/edit/<id>/members renders one row per member
 // (data-test="group-member-<userId>"), with the role picker and the remove button inside it.
 const memberRow = (userId) => cy.get(`[data-test="group-member-${userId}"]`)
+
+// A second owner beside the one the group factory makes.
+defineStep('{string} is an owner of group {string}', (userSlug, groupId) => {
+  cy.fixtures().then((fixtures) =>
+    fixtures.cypher(
+      `MATCH (user:User {slug: $userSlug}), (group:Group {id: $groupId})
+       MERGE (user)-[membership:MEMBER_OF]->(group)
+       SET membership.createdAt = toString(datetime()),
+           membership.updatedAt = toString(datetime()),
+           membership.role = 'owner'`,
+      { userSlug, groupId },
+    ),
+  )
+})
 
 defineStep('I elevate in the group with the reason {string}', (reason) => {
   cy.get('[data-test="elevation-reason"] input').type(reason)
   cy.get('[data-test="elevation-start"]').click()
 })
 
+// The row is there — the viewer may read the members — but it is out of their reach.
 defineStep('the member {string} offers no role picker and no remove button', (userId) => {
   memberRow(userId).should('exist')
   memberRow(userId).find('[data-test="group-member-role"]').should('not.exist')
   memberRow(userId).find('[data-test="group-member-remove"]').should('not.exist')
+})
+
+defineStep('the member {string} is not listed', (userId) => {
+  memberRow(userId).should('not.exist')
 })
 
 defineStep('I give the member {string} the group role {string}', (userId, roleName) => {

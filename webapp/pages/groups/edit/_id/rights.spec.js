@@ -425,7 +425,31 @@ describe('rights.vue', () => {
       expect(at(wrapper, 'perm-group.post.create').element.checked).toBe(false)
     })
 
+    // A network admin who could only elevate yet is let into the settings. The server refuses
+    // them the roles, and during server-side rendering that refusal was the whole page failing.
+    it('does not ask for the roles before the viewer holds group.role.manage', () => {
+      const { skip } = rights.apollo.rights
+      expect(skip.call({ group: { id: 'g1', myGroupPermissions: [] } })).toBe(true)
+      expect(skip.call({ group: { id: 'g1' } })).toBe(true)
+    })
+
+    it('asks for the roles once the viewer holds group.role.manage, as after elevating', () => {
+      const { skip } = rights.apollo.rights
+      expect(skip.call({ group: { id: 'g1', myGroupPermissions: ['group.role.manage'] } })).toBe(
+        false,
+      )
+    })
+
     // Re-entering the page has to show what was saved, not what the cache held before (#10490).
+    // The rights read in the viewer's language — they used to be the catalog's English (#10492).
+    it("describes each right in the viewer's language, falling back to the catalog text", async () => {
+      const wrapper = await Wrapper()
+      const permission = { key: 'group.leave', description: 'Leave the group.' }
+      expect(wrapper.vm.permLabel(permission)).toBe('Leave the group.')
+      wrapper.vm.$t = (path) => `T:${path}`
+      expect(wrapper.vm.permLabel(permission)).toBe('T:group.rights.perm.group_leave')
+    })
+
     it('asks the server on every visit rather than answering from the cache', () => {
       expect(rights.apollo.rights.fetchPolicy).toBe('cache-and-network')
     })
@@ -841,6 +865,41 @@ describe('rights.vue', () => {
     await at(wrapper, 'template-public').trigger('click')
 
     expect(wrapper.vm.templateToApply).toBe('public')
+  })
+
+  describe('the network hint on a capped right', () => {
+    const CALL = CATALOG.find((permission) => permission.key === 'group.videoCall.create')
+    const answer = (wrapper, networkPrerequisites) =>
+      rights.apollo.rights.result.call(wrapper.vm, {
+        loading: false,
+        data: {
+          groupPermissionCatalog: CATALOG,
+          groupTemplates: TEMPLATES,
+          Group: [{ roles: ROLES, myGroupPermissions: [], networkPrerequisites }],
+        },
+      })
+
+    // The catalog names the call cap as a family; the hint read "videoCall.create_<door>", a
+    // right nobody can have. The group resolves it to the one that is actually missing.
+    it('names the network right this group needs, not the catalog placeholder', async () => {
+      const wrapper = await Wrapper()
+      answer(wrapper, [
+        { key: 'group.videoCall.create', requiresNetworkPermission: 'videoCall.create_open' },
+      ])
+
+      expect(wrapper.vm.gateHint(CALL)).toBe(
+        'group.rights.blockedByNetwork:{"permission":"videoCall.create_open"}',
+      )
+    })
+
+    it('falls back to the catalog entry when the group resolved nothing for the right', async () => {
+      const wrapper = await Wrapper()
+      answer(wrapper, undefined)
+
+      expect(wrapper.vm.gateHint(CATALOG.find(({ key }) => key === 'group.post.create'))).toBe(
+        'group.rights.blockedByNetwork:{"permission":"post.create"}',
+      )
+    })
   })
 
   describe('the advanced view', () => {

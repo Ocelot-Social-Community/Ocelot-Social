@@ -151,7 +151,7 @@ describe('postFilterToCypher access control operators', () => {
         invisibleTo: {
           viewerId: 'viewer-id',
           contentGroupIds: ['group-a', 'group-b'],
-          moderatorVisibilities: [],
+          elevatedGroupIds: [],
         },
       },
     })
@@ -160,10 +160,10 @@ describe('postFilterToCypher access control operators', () => {
     // failing closed for a node the backfill has not reached yet.
     expect(where).toContain('NOT (coalesce(g.nonMemberContentRead, false) = true)')
     expect(where).toContain('AND NOT g.id IN $pf1')
-    // …then the network side, which quantifies over VISIBILITIES — derived from the columns
-    // rather than read from one, so there is a CASE here and not a property.
-    expect(where).toContain('IN $pf2')
-    expect(where).toContain("WHEN coalesce(g.nonMemberRead, false) <> true THEN 'hidden'")
+    // …then the network side, which names GROUPS — the ones the viewer elevated in — and never
+    // the type: a type list is what put every hidden group into a network admin's feed (#10506).
+    expect(where).toContain('AND NOT g.id IN $pf2')
+    expect(where).not.toContain("THEN 'hidden'")
     expect(where).toContain('NOT EXISTS {')
     expect(where).toContain('OR EXISTS { MATCH (post)<-[:WROTE]-(:User { id: $pf0 }) }')
     expect(params).toEqual({
@@ -179,34 +179,33 @@ describe('postFilterToCypher access control operators', () => {
   // that the type is not consulted for it at all.
   it('does not let the visibility decide what the group decided', () => {
     const { where } = postFilterToCypher({
-      filter: { invisibleTo: { viewerId: null, contentGroupIds: [], moderatorVisibilities: [] } },
+      filter: { invisibleTo: { viewerId: null, contentGroupIds: [], elevatedGroupIds: [] } },
     })
 
     expect(where).not.toContain("g.visibility = 'public' AND")
     expect(where).not.toContain("NOT g.visibility IN ['public']")
   })
 
-  // What #9405 asked for: a network moderator holding group.content.read.any_closed brings the
-  // type along, so the reported content they are supposed to review stops being invisible —
-  // without a per-row lookup, and with visibility still the axis.
-  it('lets a viewer read into the visibilities their network rights cover', () => {
+  // What #9405 asked for, the way #10506 keeps it: a network moderator sees the reported content
+  // they are supposed to review — in the group they elevated in, without a per-row lookup.
+  it('lets a viewer read into the groups they elevated in', () => {
     const { params } = postFilterToCypher({
       filter: {
         invisibleTo: {
           viewerId: 'moderator-id',
           contentGroupIds: [],
-          moderatorVisibilities: ['closed'],
+          elevatedGroupIds: ['elevated-group'],
         },
       },
     })
 
-    expect(params).toEqual({ pf0: 'moderator-id', pf1: [], pf2: ['closed'] })
+    expect(params).toEqual({ pf0: 'moderator-id', pf1: [], pf2: ['elevated-group'] })
   })
 
   // A caller that does not know about the field must widen NOTHING. It used to default to
   // ['public'], which was right while the type carried the statement "strangers may read
   // this"; now the group carries it, so the default is the empty list.
-  it('widens nothing when no moderator visibilities are given', () => {
+  it('widens nothing when no elevated groups are given', () => {
     const { params } = postFilterToCypher({
       filter: { invisibleTo: { viewerId: null, contentGroupIds: [] } },
     })
@@ -531,7 +530,7 @@ describe('postFilterToCypher parameter binding', () => {
     invisibleTo: {
       viewerId: payload,
       contentGroupIds: [payload],
-      moderatorVisibilities: [payload],
+      elevatedGroupIds: [payload],
     },
     mutedBy: payload,
     inGroupsOf: [payload],

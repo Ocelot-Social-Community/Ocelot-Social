@@ -134,6 +134,12 @@ const apolloClient = (ctx) => ctx.app.apolloProvider.defaultClient
 let policySubscription = null
 
 const openPolicySubscription = (store, commit) => {
+  // Only in the browser. On the server the apollo client has no websocket link, so the
+  // operation went to the backend over HTTP and failed there with "Cannot read properties of
+  // undefined" — reached by logout() during server-side rendering, which an anonymous visit to
+  // a protected page runs (the authenticated middleware's auth/check). The browser opens its
+  // own subscription through the client-only plugins.
+  if (process.server) return
   const observable = apolloClient(store).subscribe({ query: PolicySubscription() })
   policySubscription = observable.subscribe({
     next({ data }) {

@@ -31,6 +31,12 @@ export const groupRightsQuery = () => gql`
       name
       visibility
       myGroupPermissions
+      # Which network right caps a group right HERE — the catalog's own entry may be a family
+      # (videoCall.create_<door>) that only the group can resolve.
+      networkPrerequisites {
+        key
+        requiresNetworkPermission
+      }
       roles {
         name
         label

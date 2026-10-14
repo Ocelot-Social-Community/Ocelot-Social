@@ -111,6 +111,7 @@
           :diff="hoverDiff"
           :highlight="highlightedRights"
           :group-label="(name) => $t(`permissions.sections.${name}`)"
+          :description-for="permLabel"
           :disabled-for="rowDisabled"
           :hint-for="blockedHint"
           :note-for="blockedHint"
@@ -165,6 +166,7 @@ import {
   updateGroupRoleMutation,
 } from '~/graphql/groupRoles.js'
 import { USUAL_GROUP_ROLE } from '~/constants/groups'
+import { canInGroup } from '~/utils/groupRights'
 import groupRightsEditor from '~/mixins/groupRightsEditor'
 import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
 import warnBeforeUnload from '~/mixins/warnBeforeUnload'
@@ -198,6 +200,8 @@ export default {
       templateToApply: null,
       roles: [],
       myGroupPermissions: [],
+      /** The network right each capped group right needs in THIS group, by group right. */
+      networkPrerequisites: {},
     }
   },
   computed: {
@@ -277,8 +281,11 @@ export default {
     gateHint(permission) {
       if (!permission || this.grantable(permission)) return null
       if (permission.requiresNetworkPermission) {
+        // Resolved for this group where the server said so: the catalog's own entry may still
+        // carry a placeholder (videoCall.create_<door>), which read as a right nobody has.
         return this.$t('group.rights.blockedByNetwork', {
-          permission: permission.requiresNetworkPermission,
+          permission:
+            this.networkPrerequisites[permission.key] ?? permission.requiresNetworkPermission,
         })
       }
       if (permission.gatedBy?.length) {
@@ -379,6 +386,14 @@ export default {
       // default cache-first, re-entering the page showed the roles as they were BEFORE the last
       // save (#10490). The cached answer still arrives first, flagged loading, and is skipped below.
       fetchPolicy: 'cache-and-network',
+      // Reading a group's roles needs group.role.manage, and the settings let in a network admin
+      // who could only elevate yet. Asked anyway, the server refused, and during server-side
+      // rendering that refusal failed the whole page with "Server error". Skipped instead, and
+      // reactive: elevating refreshes the group, and only then does the query run (as on the
+      // members tab).
+      skip() {
+        return !canInGroup('group.role.manage', this.group)
+      },
       manual: true,
       result({ data, loading }) {
         if (loading || !data) return
@@ -387,6 +402,12 @@ export default {
         const group = data.Group?.[0]
         this.roles = group?.roles ?? []
         this.myGroupPermissions = group?.myGroupPermissions ?? []
+        this.networkPrerequisites = Object.fromEntries(
+          (group?.networkPrerequisites ?? []).map((entry) => [
+            entry.key,
+            entry.requiresNetworkPermission,
+          ]),
+        )
         // A refetch (another tab saved, the page re-entered) must not throw away what the user
         // is still editing; the draft follows the server only while it holds nothing of its own.
         if (!this.dirty) this.resetDraft()

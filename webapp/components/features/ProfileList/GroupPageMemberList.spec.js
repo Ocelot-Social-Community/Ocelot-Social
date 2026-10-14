@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 import GroupPageMemberList from './GroupPageMemberList.vue'
 
 const localVue = global.localVue
@@ -116,11 +117,23 @@ describe('GroupPageMemberList.vue', () => {
     })
 
     it('resolves a section label through the role-label rules', async () => {
-      // $t echoes the key here, which is how "no translation" looks: the heading then falls
-      // back to the role name itself rather than showing an i18n path.
-      const wrapper = await Wrapper({}, { members: [{ id: '1', membershipRole: 'owner' }] })
-      expect(wrapper.vm.$t).toHaveBeenCalledWith('group.roles.owner')
-      expect(wrapper.vm.sectionsWithMembers[0].label).toBe('owner')
+      // $t echoes the key here: a system role is translated, a role the group invented is
+      // named by itself, and the members section has a heading of its own.
+      const wrapper = await Wrapper(
+        {},
+        {
+          members: [
+            { id: '1', membershipRole: 'owner' },
+            { id: '2', membershipRole: 'usual' },
+            { id: '3', membershipRole: 'curator' },
+          ],
+        },
+      )
+      expect(wrapper.vm.sectionsWithMembers.map((section) => section.label)).toEqual([
+        'group.roles.owner',
+        'group.roles.members',
+        'curator',
+      ])
     })
 
     it('gives a role the group invented a section of its own, after the known ones', async () => {
@@ -219,6 +232,32 @@ describe('GroupPageMemberList.vue', () => {
       wrapper.vm.onFilterChange('alice')
       expect(wrapper.vm.activeFilter).toBe('alice')
       expect(spy).toHaveBeenCalledWith(true)
+    })
+  })
+
+  describe('when the right to see the members changes', () => {
+    // A network moderator elevates in the group, or the elevation ends (#10506).
+    it('loads the list once it is granted', async () => {
+      const wrapper = await Wrapper({ allowedToSee: false })
+      expect(mockApollo.query).not.toHaveBeenCalled()
+      mockApollo.query.mockResolvedValueOnce(
+        makeQueryResult([{ id: '1', name: 'Member', role: 'usual' }]),
+      )
+      await wrapper.setProps({ allowedToSee: true })
+      await flushPromises()
+      expect(mockApollo.query).toHaveBeenCalledTimes(1)
+      expect(wrapper.vm.members.map((member) => member.id)).toEqual(['1'])
+    })
+
+    it('drops the list once it is withdrawn', async () => {
+      const wrapper = await Wrapper(
+        {},
+        { members: [{ id: '1', membershipRole: 'usual' }], offset: 1, allLoaded: true },
+      )
+      await wrapper.setProps({ allowedToSee: false })
+      expect(wrapper.vm.members).toEqual([])
+      expect(wrapper.vm.offset).toBe(0)
+      expect(wrapper.vm.allLoaded).toBe(false)
     })
   })
 

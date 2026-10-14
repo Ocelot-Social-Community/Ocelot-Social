@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import { mount } from '@vue/test-utils'
 import create, { __resetSharedDraftForTests, __resetCancelReturnPathForTests } from './_type.vue'
 import Vuex from 'vuex'
@@ -9,8 +10,9 @@ describe('create.vue', () => {
   let routerReplace
   let mocks
 
-  const makeMocks = ({ type = 'article', query = {} } = {}) => ({
+  const makeMocks = ({ type = 'article', query = {}, groupsEnabled = true } = {}) => ({
     $t: jest.fn((key) => key),
+    $policy: { get: (key) => key === 'groupsEnabled' && groupsEnabled },
     $route: {
       path: `/post/create/${type}`,
       params: { type },
@@ -67,6 +69,12 @@ describe('create.vue', () => {
       mocks = makeMocks({ query: { groupId: 'g1' } })
       wrapper = Wrapper()
       expect(wrapper.vm.draft.groupId).toBe('g1')
+    })
+
+    it('ignores a URL groupId while groups are switched off', () => {
+      mocks = makeMocks({ query: { groupId: 'g1' }, groupsEnabled: false })
+      wrapper = Wrapper()
+      expect(wrapper.vm.draft.groupId).toBe(null)
     })
 
     it('does not overwrite an existing draft.groupId with a stale URL query', () => {
@@ -596,6 +604,49 @@ describe('create.vue', () => {
       wrapper.vm.draft.groupId = 'g-unknown'
       await wrapper.vm.$nextTick()
       expect(wrapper.vm.selectedGroup).toBeNull()
+    })
+  })
+
+  describe('groups switched off while a draft names a group', () => {
+    it('drops the group from a draft that survived a remount, and from the URL', () => {
+      const first = Wrapper()
+      first.vm.draft.groupId = 'g1'
+      first.destroy()
+      routerReplace.mockClear()
+
+      mocks = makeMocks({ query: { groupId: 'g1' }, groupsEnabled: false })
+      wrapper = Wrapper()
+
+      expect(wrapper.vm.draft.groupId).toBe(null)
+      expect(routerReplace).toHaveBeenCalledWith({ path: '/post/create/article', query: {} })
+    })
+
+    it('drops it when groups are switched off live', async () => {
+      const policy = Vue.observable({ groupsEnabled: true })
+      mocks = makeMocks({ query: { groupId: 'g1' } })
+      mocks.$policy = { get: (key) => key === 'groupsEnabled' && policy.groupsEnabled }
+      wrapper = Wrapper()
+      expect(wrapper.vm.draft.groupId).toBe('g1')
+
+      policy.groupsEnabled = false
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.draft.groupId).toBe(null)
+      expect(routerReplace).toHaveBeenCalledWith({ path: '/post/create/article', query: {} })
+    })
+  })
+
+  describe('apollo myGroups', () => {
+    const { skip } = create.apollo.myGroups
+
+    // The server refuses Group while groups are off, and during server-side rendering that
+    // refusal failed every /post/create page.
+    it('skips the query while groups are switched off', () => {
+      expect(skip.call({ groupsEnabled: false })).toBe(true)
+    })
+
+    it('runs the query while groups are switched on', () => {
+      expect(skip.call({ groupsEnabled: true })).toBe(false)
     })
   })
 })
