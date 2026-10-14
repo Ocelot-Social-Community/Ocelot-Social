@@ -76,7 +76,7 @@ describe('HeaderMenu', () => {
     mocks = {
       $t: jest.fn((key) => key),
       $can: jest.fn(() => true),
-      $env: { NETWORK_NAME: 'Test', MAPBOX_TOKEN: '' },
+      $env: { MAPBOX_TOKEN: '' },
       $policy: { get: (key) => policyValues[key] },
       $route: { matched: [{ name: 'index' }], path: '/' },
       $i18n: { locale: () => 'en', set: jest.fn() },

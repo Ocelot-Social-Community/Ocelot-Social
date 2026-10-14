@@ -11,13 +11,8 @@
         :loading="loadingGenerateCode"
         :copy-message="
           group.visibility === 'hidden'
-            ? $t('invite-codes.invite-link-message-hidden-group', {
-                network: $env.NETWORK_NAME,
-              })
-            : $t('invite-codes.invite-link-message-group', {
-                groupName: group.name,
-                network: $env.NETWORK_NAME,
-              })
+            ? $t('invite-codes.invite-link-message-hidden-group', metadata)
+            : $t('invite-codes.invite-link-message-group', { ...metadata, groupName: group.name })
         "
       />
     </os-card>
@@ -33,6 +28,7 @@
 import { OsCard } from '@ocelot-social/ui'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
 import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
+import metadata from '~/constants/metadata.js'
 import { generateGroupInviteCode, invalidateInviteCode } from '~/graphql/InviteCode'
 
 export default {
@@ -47,6 +43,7 @@ export default {
       currentModalData: null,
       loadingGenerateCode: false,
       invalidatingCodes: new Set(),
+      metadata,
     }
   },
   props: {
