@@ -1789,6 +1789,7 @@
     },
     "blocked-users": {
       "block": "Gebruiker blokkeren",
+      "blocked": "{name} is geblokkeerd",
       "columns": {
         "name": "Naam",
         "slug": "Slug",
@@ -1901,6 +1902,7 @@
       },
       "how-to": "Je kunt andere gebruikers dempen op hun profielpagina via het inhoudsmenu.",
       "mute": "Gebruiker dempen",
+      "muted": "{name} is gedempt",
       "name": "Gedempte gebruikers",
       "unmute": "Gebruiker niet meer dempen",
       "unmuted": "{name} is niet meer gedempt"

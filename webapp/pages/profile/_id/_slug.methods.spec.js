@@ -174,7 +174,8 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
           profilePagePosts: { refetch: jest.fn() },
         },
       },
-      $toast: { error: jest.fn() },
+      $toast: { error: jest.fn(), success: jest.fn() },
+      $t: (key, params) => `${key} ${JSON.stringify(params)}`,
       $toastBackendError(error) {
         this.$toast.error(error.message)
       },
@@ -202,8 +203,75 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
       const ctx = buildMuteCtx(mutate)
       await methods[method].call(ctx, { id: 'u9' })
       expect(ctx.$toast.error).toHaveBeenCalledWith('mute-fail')
+      expect(ctx.$toast.success).not.toHaveBeenCalled()
       expect(ctx.$apollo.queries.User.refetch).toHaveBeenCalled()
     })
+  })
+
+  // #10520: on the profile these used to confirm nothing — only an error got a toast.
+  describe('blocking, unblocking, muting and unmuting confirm themselves', () => {
+    const buildCtx = (mutate, user = { id: 'u9', name: 'Bob' }) => ({
+      User: [user],
+      get user() {
+        return computed.user.call(this)
+      },
+      get userName() {
+        return computed.userName.call(this)
+      },
+      $apollo: {
+        mutate,
+        queries: {
+          User: { refetch: jest.fn() },
+          profilePagePosts: { refetch: jest.fn() },
+        },
+      },
+      $toast: { error: jest.fn(), success: jest.fn() },
+      $t: (key, params) => (params ? `${key} ${JSON.stringify(params)}` : key),
+      $toastBackendError(error) {
+        this.$toast.error(error.message)
+      },
+      resetPostList: jest.fn(),
+    })
+
+    it.each([
+      ['muteUser', 'settings.muted-users.muted'],
+      ['unmuteUser', 'settings.muted-users.unmuted'],
+      ['blockUser', 'settings.blocked-users.blocked'],
+      ['unblockUser', 'settings.blocked-users.unblocked'],
+    ])('%s says so, naming the user', async (method, key) => {
+      const ctx = buildCtx(jest.fn().mockResolvedValue())
+
+      await methods[method].call(ctx, { id: 'u9', name: 'Bob' })
+
+      expect(ctx.$toast.success).toHaveBeenCalledWith(`${key} {"name":"Bob"}`)
+    })
+
+    it.each([
+      ['muteUser', 'settings.muted-users.muted'],
+      ['unmuteUser', 'settings.muted-users.unmuted'],
+      ['blockUser', 'settings.blocked-users.blocked'],
+      ['unblockUser', 'settings.blocked-users.unblocked'],
+    ])('%s names a user without a name as the profile does', async (method, key) => {
+      const user = { id: 'u9', name: null }
+      const ctx = buildCtx(jest.fn().mockResolvedValue(), user)
+
+      await methods[method].call(ctx, user)
+
+      expect(ctx.$toast.success).toHaveBeenCalledWith(`${key} {"name":"profile.userAnonym"}`)
+    })
+
+    it.each([['blockUser'], ['unblockUser']])(
+      '%s confirms nothing when it failed, and says why',
+      async (method) => {
+        const ctx = buildCtx(jest.fn().mockRejectedValue(new Error('block-fail')))
+
+        await methods[method].call(ctx, { id: 'u9', name: 'Bob' })
+
+        expect(ctx.$toast.success).not.toHaveBeenCalled()
+        expect(ctx.$toast.error).toHaveBeenCalledWith('block-fail')
+        expect(ctx.$apollo.queries.User.refetch).toHaveBeenCalled()
+      },
+    )
   })
 
   describe('onFollowHover', () => {
