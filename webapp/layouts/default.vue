@@ -312,7 +312,7 @@ export default {
 .layout-default--call-bars-overlay .main-navigation {
   background-color: color-mix(
     in srgb,
-    var(--color-header-background) var(--video-call-bar-opacity),
+    var(--video-call-bar-page-header-color) var(--video-call-bar-opacity),
     transparent
   );
 }
@@ -320,7 +320,7 @@ export default {
 .layout-default--call-bars-overlay .desktop-footer.ds-footer {
   background-color: color-mix(
     in srgb,
-    var(--color-footer-background) var(--video-call-bar-opacity),
+    var(--video-call-bar-page-footer-color) var(--video-call-bar-opacity),
     transparent
   );
 }

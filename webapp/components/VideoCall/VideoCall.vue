@@ -2601,7 +2601,7 @@ export default {
   margin-top: var(--header-height);
   background: color-mix(
     in srgb,
-    var(--color-header-background) var(--video-call-bar-opacity),
+    var(--video-call-bar-header-color) var(--video-call-bar-opacity),
     transparent
   );
 }
@@ -2611,7 +2611,7 @@ export default {
   margin-bottom: var(--footer-height);
   background: color-mix(
     in srgb,
-    var(--background-color-soft) var(--video-call-bar-opacity),
+    var(--video-call-bar-controls-color) var(--video-call-bar-opacity),
     transparent
   );
 }
