@@ -198,24 +198,13 @@
               tabs say. What its header offered besides sits at the end of this row.
             -->
             <div class="video-call__chat-tabs">
-              <call-chat-tabs v-if="chatRoomId" />
+              <call-chat-tabs
+                v-if="chatRoomId"
+                exportable
+                :exporting="chatExporting"
+                @export="exportCallChat"
+              />
               <div class="video-call__chat-actions">
-                <os-button
-                  v-if="activeChatTab === 'call'"
-                  data-test="video-call-export-chat"
-                  variant="primary"
-                  appearance="outline"
-                  circle
-                  size="sm"
-                  :loading="chatExporting"
-                  :aria-label="$t('chat.exportChat')"
-                  :title="$t('chat.exportChat')"
-                  @click="exportCallChat"
-                >
-                  <template #icon>
-                    <os-icon :icon="icons.download" />
-                  </template>
-                </os-button>
                 <os-button
                   data-test="video-call-close-chat"
                   variant="primary"

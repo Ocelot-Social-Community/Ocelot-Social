@@ -2031,9 +2031,9 @@
     "audioOnly": "Connessione debole — i video sono in pausa così continui a sentire tutti.",
     "chatTabs": {
       "call": "Chiamata",
-      "callHint": "Visibile solo ai partecipanti di questa videochiamata",
+      "callHint": "Visibile solo ai partecipanti di questa videochiamata\n(senza notifiche)",
       "group": "Gruppo",
-      "groupHint": "Visibile a tutti i membri del gruppo",
+      "groupHint": "Visibile a tutti i membri del gruppo\n(con notifiche)",
       "label": "Scegli la chat"
     },
     "closeChat": "Chiudi chat",

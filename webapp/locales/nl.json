@@ -2031,9 +2031,9 @@
     "audioOnly": "Zwakke verbinding — video's zijn gepauzeerd zodat je iedereen blijft horen.",
     "chatTabs": {
       "call": "Gesprek",
-      "callHint": "Alleen zichtbaar voor de deelnemers aan dit videogesprek",
+      "callHint": "Alleen zichtbaar voor de deelnemers aan dit videogesprek\n(zonder meldingen)",
       "group": "Groep",
-      "groupHint": "Zichtbaar voor alle leden van de groep",
+      "groupHint": "Zichtbaar voor alle leden van de groep\n(met meldingen)",
       "label": "Chat kiezen"
     },
     "closeChat": "Chat sluiten",

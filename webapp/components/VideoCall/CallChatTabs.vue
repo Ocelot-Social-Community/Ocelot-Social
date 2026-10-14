@@ -2,39 +2,72 @@
   <!--
     Tabs in the look of the app's tab navigation — the active one underlined — but one line
     high: the place is the top of a narrow chat, shared with the chat's buttons.
+
+    The underline sits on a cell around each tab, as the cell of the conference chat also
+    holds its download button while it is open: the button belongs to that chat, and a
+    button cannot sit inside the tab's own.
   -->
   <div class="call-chat-tabs" role="tablist" :aria-label="$t('videoCall.chatTabs.label')">
-    <button
+    <div
       v-for="tab in tabs"
       :key="tab.value"
-      ref="tabs"
-      type="button"
-      role="tab"
-      :class="['call-chat-tabs__tab', { 'call-chat-tabs__tab--active': tab.value === active }]"
-      :aria-selected="tab.value === active ? 'true' : 'false'"
-      :tabindex="tab.value === focusable ? 0 : -1"
-      :title="tab.title"
-      :data-test="'call-chat-tab-' + tab.value"
-      @click="select(tab.value)"
-      @keydown.left.prevent="step(-1)"
-      @keydown.right.prevent="step(1)"
+      role="presentation"
+      :class="['call-chat-tabs__cell', { 'call-chat-tabs__cell--active': tab.value === active }]"
     >
-      <span class="call-chat-tabs__label">{{ tab.label }}</span>
-      <!-- Unread messages, as the red count the app shows on its icons. -->
-      <os-badge
-        v-if="tab.count > 0"
-        variant="danger"
-        class="call-chat-tabs__count"
-        :data-test="'call-chat-tab-count-' + tab.value"
+      <button
+        ref="tabs"
+        v-tooltip="{
+          content: tab.hint,
+          placement: 'bottom',
+          html: false,
+          classes: 'tooltip--multiline',
+        }"
+        type="button"
+        role="tab"
+        class="call-chat-tabs__tab"
+        :aria-selected="tab.value === active ? 'true' : 'false'"
+        :aria-description="tab.hint"
+        :tabindex="tab.value === focusable ? 0 : -1"
+        :data-test="'call-chat-tab-' + tab.value"
+        @click="select(tab.value)"
+        @keydown.left.prevent="step(-1)"
+        @keydown.right.prevent="step(1)"
       >
-        {{ tab.count > 99 ? '99+' : tab.count }}
-      </os-badge>
-    </button>
+        <span class="call-chat-tabs__label">{{ tab.label }}</span>
+        <!-- Unread messages, as the red count the app shows on its icons. -->
+        <os-badge
+          v-if="tab.count > 0"
+          variant="danger"
+          class="call-chat-tabs__count"
+          :data-test="'call-chat-tab-count-' + tab.value"
+        >
+          {{ tab.count > 99 ? '99+' : tab.count }}
+        </os-badge>
+      </button>
+      <os-button
+        v-if="exportable && tab.value === 'call' && active === 'call'"
+        v-tooltip="{ content: $t('chat.exportChat'), placement: 'bottom' }"
+        class="call-chat-tabs__export"
+        data-test="call-chat-tab-export"
+        variant="primary"
+        appearance="ghost"
+        circle
+        size="sm"
+        :loading="exporting"
+        :aria-label="$t('chat.exportChat')"
+        @click="$emit('export')"
+      >
+        <template #icon>
+          <os-icon :icon="icons.download" />
+        </template>
+      </os-button>
+    </div>
   </div>
 </template>
 
 <script>
-import { OsBadge } from '@ocelot-social/ui'
+import { OsBadge, OsButton, OsIcon } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import { activeCallChatTab, callChatTarget } from '~/components/VideoCall/callChat'
 
@@ -44,7 +77,18 @@ import { activeCallChatTab, callChatTarget } from '~/components/VideoCall/callCh
 // parked call — so it reads and writes the stores rather than taking props from either.
 export default {
   name: 'CallChatTabs',
-  components: { OsBadge },
+  components: { OsBadge, OsButton, OsIcon },
+  props: {
+    // Whether the conference chat's tab offers its download. The download is the chat's
+    // own doing, so the host, which holds the chat, does it on `export`.
+    exportable: { type: Boolean, default: false },
+    // Whether a download asked for is still under way.
+    exporting: { type: Boolean, default: false },
+  },
+  emits: ['export'],
+  created() {
+    this.icons = iconRegistry
+  },
   computed: {
     ...mapGetters({
       groupId: 'videoCall/groupId',
@@ -65,13 +109,15 @@ export default {
         {
           value: 'call',
           label: this.$t('videoCall.chatTabs.call'),
-          title: this.$t('videoCall.chatTabs.callHint'),
+          // The hints come in two lines — who sees the chat, then whether it notifies —
+          // so the tooltip stays narrow; the line break is part of the text.
+          hint: this.$t('videoCall.chatTabs.callHint'),
           count: this.unread,
         },
         {
           value: 'group',
           label: this.$t('videoCall.chatTabs.group'),
-          title: this.$t('videoCall.chatTabs.groupHint'),
+          hint: this.$t('videoCall.chatTabs.groupHint'),
           count: this.groupUnread,
         },
       ]
@@ -105,6 +151,24 @@ export default {
   min-width: 0;
 }
 
+.call-chat-tabs__cell {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  /*  The same three states as the app's tab navigation. */
+  border-bottom: 2px solid transparent;
+}
+
+.call-chat-tabs__cell:hover {
+  border-bottom-color: var(--color-neutral-70);
+}
+
+.call-chat-tabs__cell--active,
+.call-chat-tabs__cell--active:hover {
+  border-bottom-color: var(--color-primary);
+}
+
 .call-chat-tabs__tab {
   flex: 1 1 0;
   min-width: 0;
@@ -112,14 +176,21 @@ export default {
   align-items: center;
   justify-content: center;
   gap: var(--space-xx-small);
+  align-self: stretch;
   padding: var(--space-x-small) var(--space-xx-small);
   border: 0;
-  /*  The same three states as the app's tab navigation. */
-  border-bottom: 2px solid transparent;
   background: none;
   color: var(--text-color-base);
   font: inherit;
   cursor: pointer;
+}
+
+.call-chat-tabs__cell--active .call-chat-tabs__tab {
+  font-weight: var(--text-weight-bold);
+}
+
+.call-chat-tabs__export {
+  flex-shrink: 0;
 }
 
 /*  The label gives way when the row gets narrow; the count beside it does not. */
@@ -146,16 +217,6 @@ export default {
   /*  won against this rule and the count stayed wider than high. */
   padding: 0 0.45em !important;
   line-height: 1;
-  font-weight: var(--text-weight-bold);
-}
-
-.call-chat-tabs__tab:hover {
-  border-bottom-color: var(--color-neutral-70);
-}
-
-.call-chat-tabs__tab--active,
-.call-chat-tabs__tab--active:hover {
-  border-bottom-color: var(--color-primary);
   font-weight: var(--text-weight-bold);
 }
 

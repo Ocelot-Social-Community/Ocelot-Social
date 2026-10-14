@@ -28,25 +28,9 @@
           :to="callGroupRoute"
           show-group-icon
         >
-          <os-button
-            v-if="callChatTab === 'call'"
-            data-test="chat-modul-export"
-            variant="primary"
-            appearance="outline"
-            circle
-            size="sm"
-            :loading="chatExporting"
-            :aria-label="$t('chat.exportChat')"
-            :title="$t('chat.exportChat')"
-            @click="exportChat"
-          >
-            <template #icon>
-              <os-icon :icon="icons.download" />
-            </template>
-          </os-button>
           <!-- No larger view for the call's conference chat: it is reached from the call only. -->
           <os-button
-            v-else
+            v-if="callChatTab === 'group'"
             data-test="chat-modul-expand"
             as="nuxt-link"
             :to="{ name: 'chat', query: { groupId: videoCallGroupId } }"
@@ -75,7 +59,7 @@
           </os-button>
         </room-header>
         <div class="chat-modul__tabs">
-          <call-chat-tabs />
+          <call-chat-tabs exportable :exporting="chatExporting" @export="exportChat" />
         </div>
       </template>
       <client-only>

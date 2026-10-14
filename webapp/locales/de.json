@@ -2031,9 +2031,9 @@
     "audioOnly": "Schwache Verbindung – Videos sind pausiert, damit du alle weiter hörst.",
     "chatTabs": {
       "call": "Anruf",
-      "callHint": "Nur für die Teilnehmer dieses Videoanrufs sichtbar",
+      "callHint": "Nur für die Teilnehmer dieses Videoanrufs sichtbar\n(ohne Benachrichtigung)",
       "group": "Gruppe",
-      "groupHint": "Für alle Mitglieder der Gruppe sichtbar",
+      "groupHint": "Für alle Mitglieder der Gruppe sichtbar\n(mit Benachrichtigung)",
       "label": "Chat auswählen"
     },
     "closeChat": "Chat schließen",

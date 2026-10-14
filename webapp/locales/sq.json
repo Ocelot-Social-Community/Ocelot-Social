@@ -2031,9 +2031,9 @@
     "audioOnly": "Lidhje e dobët — videot janë ndalur që të vazhdoni t'i dëgjoni të gjithë.",
     "chatTabs": {
       "call": "Telefonata",
-      "callHint": "E dukshme vetëm për pjesëmarrësit e kësaj telefonate me video",
+      "callHint": "E dukshme vetëm për pjesëmarrësit e kësaj telefonate me video\n(pa njoftime)",
       "group": "Grupi",
-      "groupHint": "E dukshme për të gjithë anëtarët e grupit",
+      "groupHint": "E dukshme për të gjithë anëtarët e grupit\n(me njoftime)",
       "label": "Zgjidh bisedën"
     },
     "closeChat": "Mbylle bisedën",

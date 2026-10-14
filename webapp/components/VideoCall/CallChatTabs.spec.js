@@ -7,7 +7,7 @@ const localVue = global.localVue
 describe('CallChatTabs', () => {
   let openChat
 
-  const Wrapper = (state = {}) => {
+  const Wrapper = (state = {}, propsData = {}) => {
     openChat = jest.fn()
     const store = new Vuex.Store({
       getters: {
@@ -23,6 +23,7 @@ describe('CallChatTabs', () => {
     return mount(CallChatTabs, {
       localVue,
       store,
+      propsData,
       mocks: { $t: (key) => key },
       attachTo: document.body,
     })
@@ -46,19 +47,26 @@ describe('CallChatTabs', () => {
       'videoCall.chatTabs.call',
       'videoCall.chatTabs.group',
     ])
-    expect(tabs.wrappers.map((t) => t.attributes('title'))).toEqual([
+    // Shown as the app's tooltip, and read out to assistive technology.
+    expect(tabs.wrappers.map((t) => t.attributes('aria-description'))).toEqual([
       'videoCall.chatTabs.callHint',
       'videoCall.chatTabs.groupHint',
     ])
+    // Not as the browser's own tooltip as well.
+    expect(tabs.wrappers.map((t) => t.attributes('title'))).toEqual([undefined, undefined])
   })
 
   it('marks the chat that is open, and keeps only that tab in the tab order', () => {
     wrapper = Wrapper()
     expect(tab(wrapper, 'call').attributes('aria-selected')).toBe('true')
-    expect(tab(wrapper, 'call').classes()).toContain('call-chat-tabs__tab--active')
+    expect(tab(wrapper, 'call').element.parentElement.classList).toContain(
+      'call-chat-tabs__cell--active',
+    )
     expect(tab(wrapper, 'call').attributes('tabindex')).toBe('0')
     expect(tab(wrapper, 'group').attributes('aria-selected')).toBe('false')
-    expect(tab(wrapper, 'group').classes()).not.toContain('call-chat-tabs__tab--active')
+    expect(tab(wrapper, 'group').element.parentElement.classList).not.toContain(
+      'call-chat-tabs__cell--active',
+    )
     expect(tab(wrapper, 'group').attributes('tabindex')).toBe('-1')
   })
 
@@ -100,6 +108,36 @@ describe('CallChatTabs', () => {
   it('caps the count where it would no longer fit', () => {
     wrapper = Wrapper({ unread: 120 })
     expect(count(wrapper, 'call').text()).toBe('99+')
+  })
+
+  describe('download of the conference chat', () => {
+    const exportButton = (wrapper) => wrapper.find('[data-test="call-chat-tab-export"]')
+
+    it('sits in the tab of the conference chat while that chat is open', () => {
+      wrapper = Wrapper({}, { exportable: true })
+      expect(exportButton(wrapper).exists()).toBe(true)
+      expect(
+        tab(wrapper, 'call').element.parentElement.contains(exportButton(wrapper).element),
+      ).toBe(true)
+    })
+
+    it('is not offered while the chat of the group is open', () => {
+      wrapper = Wrapper({ chat: groupChat }, { exportable: true })
+      expect(exportButton(wrapper).exists()).toBe(false)
+    })
+
+    it('is not offered where the host does not do downloads', () => {
+      wrapper = Wrapper()
+      expect(exportButton(wrapper).exists()).toBe(false)
+    })
+
+    it('leaves the download to the host, which holds the chat', async () => {
+      wrapper = Wrapper({}, { exportable: true })
+      await exportButton(wrapper).trigger('click')
+      expect(wrapper.emitted('export')).toHaveLength(1)
+      // Not a tab: pressing it opens no chat.
+      expect(opened()).toEqual([])
+    })
   })
 
   it('opens the chat of the group when its tab is clicked', async () => {

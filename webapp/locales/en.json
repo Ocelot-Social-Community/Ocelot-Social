@@ -2031,9 +2031,9 @@
     "audioOnly": "Weak connection — videos are paused so you can keep hearing everyone.",
     "chatTabs": {
       "call": "Call",
-      "callHint": "Visible only to the participants of this video call",
+      "callHint": "Visible only to the participants of this video call\n(without notifications)",
       "group": "Group",
-      "groupHint": "Visible to all members of the group",
+      "groupHint": "Visible to all members of the group\n(with notifications)",
       "label": "Choose chat"
     },
     "closeChat": "Close chat",

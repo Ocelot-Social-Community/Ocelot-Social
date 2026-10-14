@@ -2031,9 +2031,9 @@
     "audioOnly": "Conexão fraca — os vídeos estão pausados para você continuar ouvindo todos.",
     "chatTabs": {
       "call": "Chamada",
-      "callHint": "Visível apenas para os participantes desta videochamada",
+      "callHint": "Visível apenas para os participantes desta videochamada\n(sem notificações)",
       "group": "Grupo",
-      "groupHint": "Visível para todos os membros do grupo",
+      "groupHint": "Visível para todos os membros do grupo\n(com notificações)",
       "label": "Escolher chat"
     },
     "closeChat": "Fechar chat",

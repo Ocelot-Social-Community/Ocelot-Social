@@ -2031,9 +2031,9 @@
     "audioOnly": "Słabe połączenie — wideo wstrzymano, abyś nadal słyszał wszystkich.",
     "chatTabs": {
       "call": "Rozmowa",
-      "callHint": "Widoczny tylko dla uczestników tej rozmowy wideo",
+      "callHint": "Widoczny tylko dla uczestników tej rozmowy wideo\n(bez powiadomień)",
       "group": "Grupa",
-      "groupHint": "Widoczny dla wszystkich członków grupy",
+      "groupHint": "Widoczny dla wszystkich członków grupy\n(z powiadomieniami)",
       "label": "Wybierz czat"
     },
     "closeChat": "Zamknij czat",
