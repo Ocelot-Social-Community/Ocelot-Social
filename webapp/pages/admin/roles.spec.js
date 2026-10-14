@@ -208,6 +208,79 @@ describe('admin/roles.vue', () => {
     expect(wrapper.vm.conflicts['badge-setter']).toBeFalsy()
   })
 
+  // #10485: the page offers what the backend accepts — a role the viewer may change (their own,
+  // or one they outrank), and in another role only rights they hold themselves.
+  describe('what the viewer may change', () => {
+    const mountAs = (ownRoleName) => {
+      const wrapper = mount(Roles, {
+        localVue,
+        stubs,
+        mocks: {
+          $t: jest.fn((key) => key),
+          $toast: { error: jest.fn(), success: jest.fn() },
+          $apollo: { mutate: jest.fn(), queries: { roles: { refetch: jest.fn() } } },
+          $store: { getters: { 'auth/user': { roleName: ownRoleName } } },
+        },
+        data: () => ({ roles, permissionCatalog }),
+      })
+      wrapper.vm.buildForms()
+      return wrapper
+    }
+    const outranked = { name: 'helper', protected: false, permissions: [], memberCount: 0 }
+    const above = {
+      name: 'admin',
+      protected: false,
+      permissions: ['badge.manage'],
+      memberCount: 1,
+      editableByCurrentUser: false,
+    }
+    const held = { key: 'badge.manage', available: true, grantableByCurrentUser: true }
+    const notHeld = { key: 'policy.manage', available: true, grantableByCurrentUser: false }
+
+    it('leaves a role above the viewer untouched: no save, rename or delete, with a reason', () => {
+      const { vm } = mountAs('moderator')
+
+      expect(vm.mayChange(above)).toBe(false)
+      expect(vm.canRename(above)).toBe(false)
+      expect(vm.canDelete({ ...above, memberCount: 0 })).toBe(false)
+      expect(vm.saveDisabled(above)).toBe(true)
+      expect(vm.saveHint(above)).toBe('admin.roles.notEditableHint')
+      expect(vm.mayToggle(above, held)).toBe(false)
+      expect(vm.permissionHint(above, notHeld)).toBeNull()
+    })
+
+    it('lets the viewer grant in a role they outrank only what they hold', () => {
+      const { vm } = mountAs('moderator')
+
+      expect(vm.mayToggle(outranked, held)).toBe(true)
+      expect(vm.mayToggle(outranked, notHeld)).toBe(false)
+      expect(vm.permissionHint(outranked, notHeld)).toBe('admin.roles.permNotHeld')
+      expect(vm.permissionHint(outranked, held)).toBeNull()
+    })
+
+    it('lets the viewer shape their own role freely', () => {
+      const { vm } = mountAs('moderator')
+      const own = { ...outranked, name: 'moderator' }
+
+      expect(vm.mayToggle(own, notHeld)).toBe(true)
+      expect(vm.permissionHint(own, notHeld)).toBeNull()
+    })
+
+    it('still switches off a right whose feature is not there, with that reason', () => {
+      const { vm } = mountAs('moderator')
+      const unavailable = { ...held, available: false }
+
+      expect(vm.mayToggle(outranked, unavailable)).toBe(false)
+      expect(vm.permissionHint(outranked, unavailable)).toBe('admin.roles.permUnavailable')
+    })
+
+    it('keeps the protected hint for the owner role', () => {
+      const { vm } = mountAs('moderator')
+
+      expect(vm.saveHint(roles[0])).toBe('admin.roles.protectedHint')
+    })
+  })
+
   describe('concurrent-edit conflicts', () => {
     // Put badge-setter into a conflict: locally edit it, then a refetch brings a server
     // set that another admin moved (badge.manage removed) under the edit.

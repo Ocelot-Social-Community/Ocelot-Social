@@ -11,7 +11,13 @@ export { DEFAULT_ROLES } from './defaults'
 export { ensureUserRoleEdges, seedDefaultRoleNodes, promoteToOwner } from './userRoleEdges'
 export { effectiveRoleName, resolveRoleName } from './effectiveRoleNames'
 export { dominates } from './dominance'
-export { dominatesInNetwork } from './authority'
+export {
+  coversInNetwork,
+  dominatesInNetwork,
+  mayAssignNetworkRole,
+  mayChangeNetworkRole,
+} from './authority'
+export type { NetworkRoleRefusal } from './authority'
 export { OWNER_ROLE, ADMIN_ROLE, MODERATOR_ROLE, USER_ROLE } from './types'
 export type { RoleDefinition, RoleChangeEvent, RolePubSub } from './types'
 export type { RoleBearer } from './effectiveRoleNames'

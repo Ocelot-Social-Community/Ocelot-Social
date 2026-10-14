@@ -1172,7 +1172,7 @@ type Mutation {
   createGroupRole(groupId: ID!, label: String, name: String!, permissions: [String!]!): GroupRole!
 
   """
-  Create a new role with the given permission bundle. Requires the `role.manage` permission.
+  Create a new role with the given permission bundle. Requires the `role.manage` permission and holding every right in the bundle.
   """
   createRole(name: String!, permissions: [String!]!): Role!
 
@@ -1182,7 +1182,7 @@ type Mutation {
   deleteGroupRole(groupId: ID!, name: String!, reassignTo: String!): String!
 
   """
-  Delete a role. Returns the deleted role's name (the input name echoed back on success). Requires the `role.manage` permission.
+  Delete a role. Returns the deleted role's name (the input name echoed back on success). Requires the `role.manage` permission and the viewer's own role or one they outrank.
   """
   deleteRole(name: String!): String!
 
@@ -1285,7 +1285,7 @@ type Mutation {
   renameGroupRole(groupId: ID!, name: String!, newName: String!): GroupRole!
 
   """
-  Rename a role, keeping its permission bundle and all its members (its HAS_ROLE edges are preserved). The mandatory owner and user roles cannot be renamed. Requires the `role.manage` permission.
+  Rename a role, keeping its permission bundle and all its members (its HAS_ROLE edges are preserved). The mandatory owner and user roles cannot be renamed. Requires the `role.manage` permission and the viewer's own role or one they outrank.
   """
   renameRole(name: String!, newName: String!): Role!
 
@@ -1370,7 +1370,7 @@ type Mutation {
   setTrophyBadgeSelected(badgeId: ID, slot: Int!): User
 
   """
-  Set a user's single role (replaces their current role). Requires the `role.manage` permission.
+  Set a user's single role (replaces their current role). Requires the `role.manage` permission, outranking the user (unless it is the viewer themselves), and holding every right of the role; the owner role only by an owner.
   """
   setUserRole(roleName: String!, userId: ID!): User!
 
@@ -1437,7 +1437,7 @@ type Mutation {
   updateOnlineStatus(status: OnlineStatus!): Boolean!
 
   """
-  Replace an existing role's permission bundle. Requires the `role.manage` permission.
+  Replace an existing role's permission bundle. Requires the `role.manage` permission, and either the viewer's own role (then not raised above a role it does not outrank today) or a role they outrank, filled only with rights they hold.
   """
   updateRole(name: String!, permissions: [String!]!): Role!
 }
@@ -1517,6 +1517,11 @@ type Permission {
   The runtime feature gate this permission depends on (e.g. videoCall, apiKeys), or null when it is always effective.
   """
   gatedBy: String
+
+  """
+  Whether the requesting viewer may put this right into a role they did not hold it in: they hold it themselves, or it is a participation right that gives no power over others. Their own role is exempt — role.manage lets them shape it freely.
+  """
+  grantableByCurrentUser: Boolean!
   group: String!
   key: String!
 }
@@ -2200,6 +2205,16 @@ union ReviewedResource = Comment | Post | User
 
 """A named bundle of permissions that can be assigned to users."""
 type Role {
+  """
+  Whether the requesting viewer may give this role to somebody they outrank: they hold its rights themselves, and the owner role only to an owner.
+  """
+  assignableByCurrentUser: Boolean!
+
+  """
+  Whether the requesting viewer may change this role (its rights, its name, whether it exists): it is their own role, or their role outranks it.
+  """
+  editableByCurrentUser: Boolean!
+
   """Number of users currently assigned this role."""
   memberCount: Int
   name: String!

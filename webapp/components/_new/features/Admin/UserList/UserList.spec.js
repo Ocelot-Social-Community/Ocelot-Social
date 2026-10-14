@@ -55,6 +55,8 @@ describe('UserList', () => {
       stubs,
       data: () => ({
         allRoleNames: ['user', 'moderator', 'admin', 'owner', 'badge-setter'],
+        // What the backend says a non-owner admin may not hand out (Role.assignableByCurrentUser).
+        unassignableRoleNames: ['owner'],
         User: [
           {
             id: 'user',
@@ -144,6 +146,18 @@ describe('UserList', () => {
 
       it('does not skip the roles query', () => {
         expect(wrapper.vm.$options.apollo.allRoleNames.skip.call(wrapper.vm)).toBe(false)
+        expect(wrapper.vm.$options.apollo.unassignableRoleNames.skip.call(wrapper.vm)).toBe(false)
+      })
+
+      it('reads the roles the viewer may not hand out off the same query', () => {
+        const { update } = wrapper.vm.$options.apollo.unassignableRoleNames
+        const roles = [
+          { name: 'user', assignableByCurrentUser: true },
+          { name: 'admin', assignableByCurrentUser: false },
+        ]
+
+        expect(update({ roles })).toEqual(['admin'])
+        expect(update({ roles: null })).toEqual([])
       })
     })
 
@@ -170,6 +184,7 @@ describe('UserList', () => {
 
       it('skips the role.manage-gated roles query', () => {
         expect(wrapper.vm.$options.apollo.allRoleNames.skip.call(wrapper.vm)).toBe(true)
+        expect(wrapper.vm.$options.apollo.unassignableRoleNames.skip.call(wrapper.vm)).toBe(true)
       })
 
       it('hides the badge column (no badge.manage)', () => {
@@ -409,9 +424,35 @@ describe('UserList', () => {
     const optionValues = (select) =>
       select.findAll('option').wrappers.map((option) => option.attributes('value'))
 
-    it('hides the owner option from a non-owner admin', () => {
+    it('offers only the roles the backend lets the viewer hand out (#10485)', () => {
       const select = wrapper.find('[data-test="user-role-select-user"]')
       expect(optionValues(select)).not.toContain('owner')
+      expect(optionValues(select)).toContain('admin')
+    })
+
+    it('keeps a role the viewer could not hand out on the user who holds it', () => {
+      const store = new Vuex.Store({ getters })
+      const w = mount(UserList, {
+        mocks,
+        localVue,
+        store,
+        stubs,
+        data: () => ({
+          allRoleNames: ['user', 'moderator', 'admin'],
+          unassignableRoleNames: ['admin'],
+          User: [
+            {
+              id: 'held',
+              name: 'Held',
+              roleName: 'admin',
+              slug: 'held',
+              outrankedByCurrentUser: true,
+            },
+          ],
+        }),
+      })
+      const select = w.find('[data-test="user-role-select-held"]')
+      expect(optionValues(select)).toEqual(['admin', 'user', 'moderator'])
     })
 
     it('does not let a non-owner admin change an owner', () => {
@@ -427,6 +468,31 @@ describe('UserList', () => {
         }),
       })
       expect(w.find('[data-test="user-role-select-theowner"]').exists()).toBe(false)
+    })
+
+    // A moderator who may manage roles demoted an admin on stage: the select is only where the
+    // backend accepts it, on users the viewer outranks.
+    it('offers no role select on a user the viewer does not outrank', () => {
+      const store = new Vuex.Store({ getters })
+      const w = mount(UserList, {
+        mocks,
+        localVue,
+        store,
+        stubs,
+        data: () => ({
+          allRoleNames: ['user', 'admin'],
+          User: [
+            {
+              id: 'peer',
+              name: 'Peer',
+              roleName: 'admin',
+              slug: 'peer',
+              outrankedByCurrentUser: false,
+            },
+          ],
+        }),
+      })
+      expect(w.find('[data-test="user-role-select-peer"]').exists()).toBe(false)
     })
 
     it('parses a role:<name> token from the search box, combinable with free text', () => {

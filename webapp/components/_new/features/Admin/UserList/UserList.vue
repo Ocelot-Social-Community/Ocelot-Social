@@ -141,7 +141,7 @@
                   :data-test="`user-role-select-${user.id}`"
                   @change="setRole(user, $event)"
                 >
-                  <option v-for="rn in assignableRoleNames" :key="rn" :value="rn">{{ rn }}</option>
+                  <option v-for="rn in roleOptionsFor(user)" :key="rn" :value="rn">{{ rn }}</option>
                 </select>
                 <span v-else class="ds-text">{{ user.roleName }}</span>
               </td>
@@ -291,6 +291,7 @@ export default {
       searchText: term || null,
       roleFilter: roleName,
       allRoleNames: [],
+      unassignableRoleNames: [],
       formData: {
         query,
       },
@@ -335,15 +336,14 @@ export default {
     canSearch() {
       return SEARCH_PERMISSIONS.some((permission) => this.$can(permission))
     },
-    // Only an owner may grant the owner role (mirrors the backend rule).
+    // Owners re-role anybody, other owners included (the backend's owner-only path).
     isOwner() {
       return !!this.currentUser && this.currentUser.roleName === 'owner'
     },
-    // Role options offered in the dropdown — owner only for owners.
+    // The roles the viewer may hand out (#10485): they hold the role's rights, and the owner
+    // role only an owner — the backend's answer (Role.assignableByCurrentUser).
     assignableRoleNames() {
-      return this.isOwner
-        ? this.allRoleNames
-        : this.allRoleNames.filter((roleName) => roleName !== 'owner')
+      return this.allRoleNames.filter((roleName) => !this.unassignableRoleNames.includes(roleName))
     },
     ...mapGetters({
       currentUser: 'auth/user',
@@ -394,6 +394,18 @@ export default {
       },
       update({ roles }) {
         return (roles || []).map((role) => role.name)
+      },
+    },
+    // Same query, so read from the cache: which of those roles the viewer may not hand out.
+    unassignableRoleNames: {
+      query: rolesQuery,
+      skip() {
+        return !this.canManageRoles
+      },
+      update({ roles }) {
+        return (roles || [])
+          .filter((role) => role.assignableByCurrentUser === false)
+          .map((role) => role.name)
       },
     },
   },
@@ -448,10 +460,19 @@ export default {
     },
     // Whether the current user may change this user's role: not your own role, and
     // only an owner may change an owner (mirrors the backend rule).
+    // Only on users the backend lets the viewer re-role (#10485): those their role outranks,
+    // or anybody for an owner. Not on one's own row — stepping down is allowed, but a select
+    // in a list is no place for it.
     canEditRole(user) {
       if (!this.currentUser || user.id === this.currentUser.id) return false
-      if (user.roleName === 'owner' && !this.isOwner) return false
-      return true
+      return this.isOwner || user.outrankedByCurrentUser === true
+    },
+    // The roles offered for this user, with the one they hold even where the viewer could not
+    // hand it out, so the select shows it instead of silently showing another.
+    roleOptionsFor(user) {
+      return this.assignableRoleNames.includes(user.roleName) || !user.roleName
+        ? this.assignableRoleNames
+        : [user.roleName, ...this.assignableRoleNames]
     },
     // Open a confirmation dialog before deleting a user (reuses the shared ConfirmModal,
     // whose confirm button runs the callback). Danger-styled.

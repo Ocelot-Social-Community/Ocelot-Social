@@ -11,6 +11,8 @@ type Permission {
   gatedBy: String
   "Whether the permission is effective right now for the requesting viewer's config/policy. False ⇒ the feature is not configured/enabled; the admin UI disables granting it."
   available: Boolean!
+  "Whether the requesting viewer may put this right into a role they did not hold it in: they hold it themselves, or it is a participation right that gives no power over others. Their own role is exempt — role.manage lets them shape it freely."
+  grantableByCurrentUser: Boolean!
 }
 
 "A permission the current viewer effectively holds, carrying its catalog group so the webapp can gate UI areas by group (e.g. show the admin area for ANY administration-group permission) without a hard-coded key list."
@@ -28,6 +30,10 @@ type Role {
   permissions: [String!]!
   "Number of users currently assigned this role."
   memberCount: Int
+  "Whether the requesting viewer may change this role (its rights, its name, whether it exists): it is their own role, or their role outranks it."
+  editableByCurrentUser: Boolean!
+  "Whether the requesting viewer may give this role to somebody they outrank: they hold its rights themselves, and the owner role only to an owner."
+  assignableByCurrentUser: Boolean!
 }
 
 type Query {
@@ -42,15 +48,15 @@ type Query {
 }
 
 type Mutation {
-  "Create a new role with the given permission bundle. Requires the `role.manage` permission."
+  "Create a new role with the given permission bundle. Requires the `role.manage` permission and holding every right in the bundle."
   createRole(name: String!, permissions: [String!]!): Role!
-  "Replace an existing role's permission bundle. Requires the `role.manage` permission."
+  "Replace an existing role's permission bundle. Requires the `role.manage` permission, and either the viewer's own role (then not raised above a role it does not outrank today) or a role they outrank, filled only with rights they hold."
   updateRole(name: String!, permissions: [String!]!): Role!
-  "Rename a role, keeping its permission bundle and all its members (its HAS_ROLE edges are preserved). The mandatory owner and user roles cannot be renamed. Requires the `role.manage` permission."
+  "Rename a role, keeping its permission bundle and all its members (its HAS_ROLE edges are preserved). The mandatory owner and user roles cannot be renamed. Requires the `role.manage` permission and the viewer's own role or one they outrank."
   renameRole(name: String!, newName: String!): Role!
-  "Delete a role. Returns the deleted role's name (the input name echoed back on success). Requires the `role.manage` permission."
+  "Delete a role. Returns the deleted role's name (the input name echoed back on success). Requires the `role.manage` permission and the viewer's own role or one they outrank."
   deleteRole(name: String!): String!
-  "Set a user's single role (replaces their current role). Requires the `role.manage` permission."
+  "Set a user's single role (replaces their current role). Requires the `role.manage` permission, outranking the user (unless it is the viewer themselves), and holding every right of the role; the owner role only by an owner."
   setUserRole(userId: ID!, roleName: String!): User!
 }
 
