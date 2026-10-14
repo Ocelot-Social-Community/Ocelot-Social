@@ -276,6 +276,11 @@ export default {
     showHint() {
       this.renderHint()
     },
+    // For a host that offers something depending on it — the download in a call's menu says
+    // when there is nothing to download.
+    knownEmpty(empty) {
+      this.$emit('empty-change', empty)
+    },
     hint() {
       this.renderHint()
     },
@@ -418,6 +423,16 @@ export default {
       return this.selectedRoom.isCallRoom
         ? this.$t('chat.callRoomName', { name: this.selectedRoom.roomName })
         : this.selectedRoom.roomName
+    },
+    // Known to hold no message at all: every message is loaded, and there is none. Not just
+    // "none loaded yet", which a chat whose older messages are still to come would also be.
+    knownEmpty() {
+      return (
+        !!this.selectedRoom?.id &&
+        !this.selectedRoom.id.startsWith('temp-') &&
+        this.messagesLoaded &&
+        this.messages.length === 0
+      )
     },
     selectedRoomWritable() {
       // Only the conference chat of a video call that is over is read-only.
@@ -1377,11 +1392,19 @@ export default {
 
     buildExportText(room, messages) {
       const locale = this.currentLocaleIso
-      const lines = [
-        this.$t('chat.export.title', { name: room.roomName }),
-        this.$t('chat.export.exportedAt', { date: new Date().toLocaleString(locale) }),
-        '',
-      ]
+      // The span the file covers: from the start of the call — when its chat came about, with
+      // the first to join — to the moment it is saved.
+      const lines = [this.$t('chat.export.title', { name: room.roomName })]
+      if (room.createdAt) {
+        lines.push(
+          this.$t('chat.export.callStarted', {
+            date: new Date(room.createdAt).toLocaleString(locale),
+          }),
+        )
+      }
+      lines.push(this.$t('chat.export.savedAt', { date: new Date().toLocaleString(locale) }), '')
+      // Said in so many words, so the file is understood on its own.
+      if (messages.length === 0) lines.push(this.$t('chat.messagesEmpty'))
       for (const message of messages) {
         const sentAt = new Date(message.date).toLocaleString(locale)
         // A line break inside a message stays one, but what follows it is indented:

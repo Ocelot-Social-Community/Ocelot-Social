@@ -579,7 +579,8 @@
     "expandChat": "Развернуть чат",
     "export": {
       "attachment": "Вложение",
-      "exportedAt": "Экспортировано {date}",
+      "callStarted": "Начало звонка: {date}",
+      "savedAt": "Сохранено: {date}",
       "title": "Чат видеозвонка в «{name}»"
     },
     "exportChat": "Скачать чат как текстовый файл",

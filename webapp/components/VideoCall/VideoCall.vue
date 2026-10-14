@@ -202,6 +202,7 @@
                 v-if="chatRoomId"
                 exportable
                 :exporting="chatExporting"
+                :exportEmpty="callChatEmpty"
                 @export="exportCallChat"
               />
               <div class="video-call__chat-actions">
@@ -231,6 +232,7 @@
                 :groupId="activeChatTab === 'group' ? groupId : null"
                 :roomId="activeChatTab === 'call' ? chatRoomId : null"
                 :hint="chatHint"
+                @empty-change="onChatEmptyChange"
                 :hintKey="activeChatTab ? 'call-chat-' + activeChatTab : null"
                 :autoFocus="!isMobile"
                 @close-single-room="closeInCallChat"
@@ -492,6 +494,8 @@ export default {
       // microphone track the others hear.
       micMeterStream: null,
       chatExporting: false,
+      // Whether the conference chat on screen is known to hold no message (see Chat.vue).
+      callChatEmpty: false,
       // The remote participant heard last. Whoever spoke stays on screen next to
       // the chat on a phone until somebody else speaks (see speakerTile).
       lastRemoteSpeakerId: null,
@@ -809,7 +813,10 @@ export default {
     // Where the chat button opens next time: the tab looked at last. Only while there is
     // a choice — without a conference chat the group's is all there is, which says nothing
     // about what the user would pick.
-    activeChatTab(tab) {
+    activeChatTab(tab, previous) {
+      // Another chat on screen: what was known of the conference chat's messages is the
+      // instance's that is gone; the new one reports again.
+      if (tab !== previous) this.callChatEmpty = false
       if (tab && this.chatRoomId) this.setLastChatTab(tab)
     },
     chatRoomId(next, previous) {
@@ -997,6 +1004,10 @@ export default {
       } finally {
         this.chatExporting = false
       }
+    },
+    onChatEmptyChange(empty) {
+      // Only the conference chat's emptiness bears on its download.
+      if (this.activeChatTab === 'call') this.callChatEmpty = empty
     },
     selectChatTab(tab) {
       this.setShowChat(callChatTarget(tab, this))

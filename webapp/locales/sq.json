@@ -579,7 +579,8 @@
     "expandChat": "Zgjero bisedën",
     "export": {
       "attachment": "Bashkëngjitje",
-      "exportedAt": "Eksportuar më {date}",
+      "callStarted": "Fillimi i telefonatës: {date}",
+      "savedAt": "Ruajtur: {date}",
       "title": "Biseda e telefonatës me video në „{name}“"
     },
     "exportChat": "Shkarko bisedën si skedar teksti",

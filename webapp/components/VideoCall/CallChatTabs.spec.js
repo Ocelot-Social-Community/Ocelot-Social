@@ -127,6 +127,19 @@ describe('CallChatTabs', () => {
       expect(menuButton(wrapper).exists()).toBe(false)
     })
 
+    it('says when there is nothing to download, and offers it all the same', async () => {
+      wrapper = Wrapper({}, { exportable: true, exportEmpty: true })
+      await menuButton(wrapper).trigger('click')
+      const download = entries(wrapper).filter(
+        (entry) => entry.text() === 'chat.exportChat (chat.messagesEmpty)',
+      )
+      expect(download).toHaveLength(1)
+
+      await download.at(0).trigger('click')
+
+      expect(wrapper.emitted('export')).toHaveLength(1)
+    })
+
     it('is not offered where the host does not do downloads', () => {
       wrapper = Wrapper()
       expect(menuButton(wrapper).exists()).toBe(false)

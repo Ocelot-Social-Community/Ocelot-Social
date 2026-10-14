@@ -3425,6 +3425,24 @@ describe('VideoCall', () => {
       })
     })
 
+    describe('whether the conference chat is empty', () => {
+      it('takes what the conference chat reports, and nothing the group chat does', () => {
+        const ctx = { activeChatTab: 'call', callChatEmpty: false }
+        VideoCall.methods.onChatEmptyChange.call(ctx, true)
+        expect(ctx.callChatEmpty).toBe(true)
+
+        const group = { activeChatTab: 'group', callChatEmpty: false }
+        VideoCall.methods.onChatEmptyChange.call(group, true)
+        expect(group.callChatEmpty).toBe(false)
+      })
+
+      it('forgets it when another chat comes on screen', () => {
+        const ctx = { callChatEmpty: true, chatRoomId: 'room-1', setLastChatTab: jest.fn() }
+        VideoCall.watch.activeChatTab.call(ctx, 'group', 'call')
+        expect(ctx.callChatEmpty).toBe(false)
+      })
+    })
+
     describe('remembering the tab', () => {
       const remember = (ctx, tab) => VideoCall.watch.activeChatTab.call(ctx, tab)
 

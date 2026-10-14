@@ -105,6 +105,9 @@ export default {
     exportable: { type: Boolean, default: false },
     // Whether a download asked for is still under way.
     exporting: { type: Boolean, default: false },
+    // Whether the conference chat is known to hold no message: its download says so, and can
+    // still be had.
+    exportEmpty: { type: Boolean, default: false },
   },
   emits: ['export'],
   created() {
@@ -127,7 +130,9 @@ export default {
       return [
         {
           name: 'export',
-          label: this.$t('chat.exportChat'),
+          label: this.exportEmpty
+            ? `${this.$t('chat.exportChat')} (${this.$t('chat.messagesEmpty')})`
+            : this.$t('chat.exportChat'),
           icon: this.icons.download,
           callback: () => this.$emit('export'),
         },

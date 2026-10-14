@@ -579,7 +579,8 @@
     "expandChat": "Espandi chat",
     "export": {
       "attachment": "Allegato",
-      "exportedAt": "Esportato il {date}",
+      "callStarted": "Inizio della chiamata: {date}",
+      "savedAt": "Salvato: {date}",
       "title": "Chat della videochiamata in «{name}»"
     },
     "exportChat": "Scarica la chat come file di testo",

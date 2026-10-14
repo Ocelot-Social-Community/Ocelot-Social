@@ -59,7 +59,12 @@
           </os-button>
         </room-header>
         <div class="chat-modul__tabs">
-          <call-chat-tabs exportable :exporting="chatExporting" @export="exportChat" />
+          <call-chat-tabs
+            exportable
+            :exporting="chatExporting"
+            :exportEmpty="chatEmpty"
+            @export="exportChat"
+          />
         </div>
       </template>
       <client-only>
@@ -70,6 +75,7 @@
           :hideHeader="showCallChatTabs"
           :hint="callChatHint"
           :hintKey="showCallChatTabs ? 'call-chat-' + callChatTab : null"
+          @empty-change="chatEmpty = $event"
           :reservedHeight="showCallChatTabs ? CALL_CHAT_TABS_HEIGHT + CALL_CHAT_HEADER_HEIGHT : 0"
           :userId="getShowChat.chatUserId"
           :groupId="getShowChat.groupId"
@@ -119,7 +125,14 @@ export default {
     VideoCall,
   },
   data() {
-    return { CALL_CHAT_TABS_HEIGHT, CALL_CHAT_HEADER_HEIGHT, chatExporting: false }
+    return {
+      CALL_CHAT_TABS_HEIGHT,
+      CALL_CHAT_HEADER_HEIGHT,
+      chatExporting: false,
+      // Whether the chat in the window is known to hold no message (see Chat.vue). Reset with
+      // every chat put there, which then reports anew.
+      chatEmpty: false,
+    }
   },
   created() {
     this.icons = iconRegistry
@@ -205,6 +218,12 @@ export default {
     },
   },
   watch: {
+    'getShowChat.roomId'() {
+      this.chatEmpty = false
+    },
+    'getShowChat.groupId'() {
+      this.chatEmpty = false
+    },
     'getShowChat.showChat'(open) {
       // On a phone a chat opens on the chat page — except the chats of the call one is
       // in, which the call shows itself, below the video.

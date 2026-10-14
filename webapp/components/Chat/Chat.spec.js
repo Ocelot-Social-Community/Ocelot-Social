@@ -1673,6 +1673,38 @@ describe('Chat.vue', () => {
       })
     })
 
+    describe('telling whether it holds no message', () => {
+      const emitted = () => (wrapper.emitted('empty-change') || []).map(([value]) => value)
+
+      it('says so once every message is loaded and there is none', async () => {
+        wrapper = Wrapper()
+        wrapper.vm.selectedRoom = mockRoom({ id: 'room-1' })
+        wrapper.vm.messages = []
+        wrapper.vm.messagesLoaded = true
+        await wrapper.vm.$nextTick()
+        expect(emitted()).toEqual([true])
+      })
+
+      it('does not take "nothing loaded yet" for empty', async () => {
+        wrapper = Wrapper()
+        wrapper.vm.selectedRoom = mockRoom({ id: 'room-1' })
+        wrapper.vm.messages = []
+        wrapper.vm.messagesLoaded = false
+        await wrapper.vm.$nextTick()
+        expect(emitted()).toEqual([])
+      })
+
+      it('takes it back when the first message arrives', async () => {
+        wrapper = Wrapper()
+        wrapper.vm.selectedRoom = mockRoom({ id: 'room-1' })
+        wrapper.vm.messagesLoaded = true
+        await wrapper.vm.$nextTick()
+        wrapper.vm.messages = [mockMessage()]
+        await wrapper.vm.$nextTick()
+        expect(emitted()).toEqual([true, false])
+      })
+    })
+
     describe('room header', () => {
       const injectedStyles = (propsData) => {
         wrapper = Wrapper(propsData)
@@ -1888,13 +1920,40 @@ describe('Chat.vue', () => {
         ])
         const lines = text.split('\n')
         expect(lines[0]).toBe('chat.export.title')
-        expect(lines[1]).toBe('chat.export.exportedAt')
+        expect(lines[1]).toBe('chat.export.savedAt')
         expect(lines[2]).toBe('')
         expect(lines[3]).toMatch(/^\[.+\] Anna: Hello$/)
         expect(lines[4]).toMatch(/^\[.+\] Ben:$/)
         expect(lines[5]).toBe('    chat.export.attachment: plan.pdf')
         expect(lines[6]).toBe('    chat.export.attachment: notes')
         expect(mocks.$t).toHaveBeenCalledWith('chat.export.title', { name: 'Yoga' })
+      })
+
+      it('heads the file with the start of the call and the moment it is saved', () => {
+        wrapper = Wrapper()
+        const text = wrapper.vm.buildExportText(
+          { roomName: 'Yoga', createdAt: '2026-10-14T12:03:00Z' },
+          [mockMessage({ username: 'Anna', content: 'Hello' })],
+        )
+        const lines = text.split('\n')
+        expect(lines.slice(0, 4)).toEqual([
+          'chat.export.title',
+          'chat.export.callStarted',
+          'chat.export.savedAt',
+          '',
+        ])
+        expect(mocks.$t).toHaveBeenCalledWith('chat.export.callStarted', {
+          date: new Date('2026-10-14T12:03:00Z').toLocaleString('en-US'),
+        })
+      })
+
+      it('says so in the file when the chat has no message', () => {
+        wrapper = Wrapper()
+        const text = wrapper.vm.buildExportText(
+          { roomName: 'Yoga', createdAt: '2026-10-14T12:03:00Z' },
+          [],
+        )
+        expect(text.split('\n').slice(4)).toEqual(['chat.messagesEmpty', ''])
       })
 
       it('indents the further lines of a message written over several', () => {

@@ -579,7 +579,8 @@
     "expandChat": "Розгорнути чат",
     "export": {
       "attachment": "Вкладення",
-      "exportedAt": "Експортовано {date}",
+      "callStarted": "Початок виклику: {date}",
+      "savedAt": "Збережено: {date}",
       "title": "Чат відеовиклику в «{name}»"
     },
     "exportChat": "Завантажити чат як текстовий файл",

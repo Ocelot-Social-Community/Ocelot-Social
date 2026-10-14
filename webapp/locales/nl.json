@@ -579,7 +579,8 @@
     "expandChat": "Chat uitvouwen",
     "export": {
       "attachment": "Bijlage",
-      "exportedAt": "Geëxporteerd op {date}",
+      "callStarted": "Begin van het gesprek: {date}",
+      "savedAt": "Opgeslagen: {date}",
       "title": "Chat van het videogesprek in “{name}”"
     },
     "exportChat": "Chat downloaden als tekstbestand",

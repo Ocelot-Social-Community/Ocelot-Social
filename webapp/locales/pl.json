@@ -579,7 +579,8 @@
     "expandChat": "Rozwiń czat",
     "export": {
       "attachment": "Załącznik",
-      "exportedAt": "Wyeksportowano {date}",
+      "callStarted": "Początek rozmowy: {date}",
+      "savedAt": "Zapisano: {date}",
       "title": "Czat rozmowy wideo w „{name}”"
     },
     "exportChat": "Pobierz czat jako plik tekstowy",
