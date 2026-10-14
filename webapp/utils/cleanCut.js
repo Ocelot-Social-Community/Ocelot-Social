@@ -35,22 +35,30 @@ export function contentAtoms(content) {
   return atoms
 }
 
+// A cut may lie above the cap only by the browser's layout rounding: it lays boxes out in 1/64 px,
+// so a line that ends exactly at the cap can report an edge a fraction past it. Any more, and the
+// cap (max-height with overflow hidden) would clip what the cut promised to show whole.
+const LAYOUT_UNIT = 1 / 64
+
+// Two lines that touch must not count as one crossing the other: line boxes report fractional
+// edges, so their shared edge can differ by a fraction of a pixel.
+const TOUCHING = 0.5
+
 /**
- * The height to cut at: the lowest bottom edge at or above `cap` that no atom crosses.
+ * The height to cut at: the lowest bottom edge at or below `cap` that no atom crosses.
  * Null when there is none — the first line or image is already taller than the cap — and the
  * cap has to stand.
  *
- * Half a pixel of slack on both comparisons: line boxes report fractional edges, and two
- * lines that touch must not count as one crossing the other. The edge is returned as measured,
- * fractions included: rounded up, it could reach past the cap into the next line.
+ * The edge is returned as measured, fractions included: rounded up, it could reach past the
+ * cap into the next line.
  */
 export function cleanCutHeight(atoms, cap) {
-  const SLACK = 0.5
   const candidates = atoms
     .map((atom) => atom.bottom)
-    .filter((bottom) => bottom <= cap + SLACK)
+    .filter((bottom) => bottom <= cap + LAYOUT_UNIT)
     .sort((a, b) => b - a)
-  const crosses = (cut) => atoms.some((atom) => atom.top < cut - SLACK && atom.bottom > cut + SLACK)
+  const crosses = (cut) =>
+    atoms.some((atom) => atom.top < cut - TOUCHING && atom.bottom > cut + TOUCHING)
   const cut = candidates.find((candidate) => !crosses(candidate))
   return cut === undefined ? null : cut
 }

@@ -43,6 +43,16 @@ describe('cleanCutHeight', () => {
     expect(cleanCutHeight([], 60)).toBeNull()
   })
 
+  // The cap clips everything below it: a line ending half a pixel past it would lose its bottom.
+  it('does not cut below the cap, beyond layout rounding', () => {
+    expect(cleanCutHeight(lines(6), 59.7)).toBe(40)
+  })
+
+  // Browsers lay out in 1/64 px, so a line ending at the cap can report an edge just past it.
+  it('keeps a line that ends at the cap within layout rounding', () => {
+    expect(cleanCutHeight(lines(3, { height: 20.8 }), 62.39)).toBeCloseTo(62.4)
+  })
+
   // Rounded up, 59.4 became 60: past the cap of 59.5, into the line that starts at 59.4.
   it('cuts at the edge as measured, without rounding it past the next line', () => {
     const cut = cleanCutHeight(lines(6, { height: 19.8 }), 59.5)
