@@ -411,7 +411,11 @@ export default {
     // browser loads them once. Per chunk, so a page brings only its own components' styles.
     // `ignoreOrder`: the components' styles are scoped, so the order mini-css-extract-plugin
     // warns about between chunks does not decide anything.
-    extractCSS: { ignoreOrder: true },
+    //
+    // Production builds only, like `modern` above. In `nuxt dev` the renderer links just the
+    // entry's app.css, not the stylesheets of the chunks the global and component styles are split
+    // into — every page rendered unstyled — and style-loader is what hot-reloads CSS there anyway.
+    extractCSS: CONFIG.PRODUCTION ? { ignoreOrder: true } : false,
     /*
      ** PostCSS: only ADDING a plugin, never replacing the defaults.
      **
