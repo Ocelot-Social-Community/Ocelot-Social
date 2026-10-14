@@ -10,7 +10,7 @@
           'video-call--bars-hidden': barsOverlay && barsHidden,
           'video-call--parked-bars': parked,
           'video-call--chromium': isChromium,
-          'video-call--fullscreen': barsOverlay && inFullscreen,
+          'video-call--fullscreen': inFullscreen,
           'video-call--bars-held': parked && (showDeviceSettings || pointerOnParked),
         },
       ]"
@@ -775,15 +775,17 @@ export default {
       return this.barsOverlay && this.phase === 'in-call' && !this.error
     },
     // What the page's header and footer do meanwhile (layouts/default.vue). In fullscreen
-    // they stay away: the call is all there is.
+    // they stay away, also with the chat open on a phone: the call is all there is.
     pageBars() {
+      if (this.inFullscreen) return 'hidden'
       if (!this.barsOverlay) return 'normal'
-      return this.barsHidden || this.inFullscreen ? 'hidden' : 'overlay'
+      return this.barsHidden ? 'hidden' : 'overlay'
     },
-    // Fullscreen is offered for the maximized call on a desktop. On a phone the call
-    // fills the screen already.
+    // Fullscreen is offered for the maximized call wherever the browser can show it —
+    // on a phone too (Android), where it also hides the browser's own bars. An iPhone
+    // cannot, and gets no button.
     showFullscreenButton() {
-      return this.canFullscreen && !this.isMobile && this.isMaximized && this.phase === 'in-call'
+      return this.canFullscreen && this.isMaximized && this.phase === 'in-call'
     },
     fullscreenLabel() {
       return this.inFullscreen
@@ -955,7 +957,7 @@ export default {
         this.setPageBars(pageBars)
       },
     },
-    // Parked, left, or no longer on a desktop: the call leaves fullscreen with it.
+    // Parked or left: the call leaves fullscreen with it.
     showFullscreenButton(offered) {
       if (!offered) this.exitFullscreen()
     },

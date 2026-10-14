@@ -3159,6 +3159,10 @@ describe('VideoCall', () => {
       expect(computed.pageBars.call({ barsOverlay: false, barsHidden: true })).toBe('normal')
       expect(computed.pageBars.call({ barsOverlay: true, barsHidden: false })).toBe('overlay')
       expect(computed.pageBars.call({ barsOverlay: true, barsHidden: true })).toBe('hidden')
+      // In fullscreen they stay away, also where the bars lie in no overlay (chat open on a phone).
+      expect(
+        computed.pageBars.call({ inFullscreen: true, barsOverlay: false, barsHidden: false }),
+      ).toBe('hidden')
     })
 
     describe('during a call', () => {
@@ -3355,6 +3359,17 @@ describe('VideoCall', () => {
       const { wrapper } = await maximizedCall()
       expect(button(wrapper).exists()).toBe(true)
       expect(wrapper.vm.fullscreenLabel).toBe('videoCall.enterFullscreen')
+    })
+
+    it('is offered on a phone whose browser can, and keeps the page header away', async () => {
+      const { wrapper, setPageBars } = await maximizedCall()
+      await wrapper.setData({ windowWidth: 400 })
+      expect(wrapper.vm.isMobile).toBe(true)
+      expect(button(wrapper).exists()).toBe(true)
+      await wrapper.vm.toggleFullscreen()
+      await wrapper.setData({ barsHidden: false })
+      expect(wrapper.vm.pageBars).toBe('hidden')
+      expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'hidden')
     })
 
     it('is not offered where the browser cannot, nor before joining', async () => {
