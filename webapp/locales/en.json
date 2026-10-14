@@ -3,11 +3,8 @@
     "cancel": "Cancel",
     "clear": "Clear",
     "close": "Close",
-    "create": "Create",
     "delete": "Delete",
     "edit": "Edit",
-    "loading": "loading",
-    "loadMore": "load more",
     "menu": "Open menu",
     "reset": "Reset",
     "save": "Save",
@@ -29,12 +26,6 @@
       "empty": "No users with API keys found.",
       "name": "API Keys",
       "never": "never",
-      "order": {
-        "active-keys": "Active keys",
-        "comments": "Comments count",
-        "last-used": "Last activity",
-        "posts": "Posts count"
-      },
       "revoke": {
         "confirm": "Revoke",
         "message": "Are you sure you want to revoke the API key “{name}” of {user}?",
@@ -50,7 +41,6 @@
       "revoke-key": "Revoke key",
       "revoked-at": "Revoked at",
       "show-keys": "Show keys",
-      "sort-by": "Sort by",
       "table": {
         "actions": "Actions",
         "active": "Active",
@@ -87,7 +77,6 @@
       "verificationBadges": "Verifications"
     },
     "branding": {
-      "activate": "Activate",
       "available": {
         "active": "Active base",
         "default": "Fallback",
@@ -116,32 +105,17 @@
         "unprovidedInherit": "Buckets not provided inherit the framework default.",
         "wholePackage": "Complete package (all buckets)"
       },
-      "current": "Active",
-      "description": "Choose which baked-in branding is active network-wide. Switching reloads the app for everyone.",
       "detail": {
-        "appDescription": "Description",
-        "colors": "Colours",
-        "favicon": "Favicon",
-        "footer": "Footer pages",
-        "logos": "Logos",
-        "noPages": "none",
-        "organization": "Organization",
-        "pages": "Static pages",
-        "pagesSummary": "{pages} pages ({locales})",
-        "reuse": "Reuse",
-        "themeColor": "Theme colour"
+        "organization": "Organization"
       },
       "error": "Could not switch the branding.",
       "loading": "Loading brandings…",
       "name": "Branding",
-      "none": "No brandings are baked into this instance.",
       "noneExtra": "No additional brandings are baked into this instance — only the framework default is available.",
       "schema": "schema",
       "schemaTitle": "The @ocelot-social/branding package version this archive was built with.",
-      "stylesheets": "Own stylesheets",
       "stylesheetUnreadable": "could not be read",
       "stylesheetVars": "{count} theme property ::: {count} theme properties",
-      "title": "Branding",
       "vanilla": "Framework default (no branding)"
     },
     "categories": {
@@ -251,10 +225,8 @@
       "disabledOnly": "disabled only",
       "empty": "No group matches these filters.",
       "name": "Groups",
-      "next": "Next",
       "noOwner": "no owner",
       "ownerlessOnly": "without an owner only",
-      "previous": "Previous",
       "searchPlaceholder": "name or slug",
       "title": "Manage groups"
     },
@@ -350,7 +322,6 @@
         "message": "This role was changed elsewhere while you were editing. Your unsaved changes are kept — review the highlighted permissions."
       },
       "create": "Create role",
-      "createTitle": "Create a new role",
       "delete": "Delete",
       "deleteError": "Could not delete role: {message}",
       "deleteSuccess": "Role deleted.",
@@ -415,8 +386,6 @@
       "name": "Settings"
     },
     "users": {
-      "addRole": "Assign role…",
-      "allRoles": "All roles",
       "delete": {
         "error": "Could not delete user: {message}",
         "message": "Do you really want to permanently delete <strong>{name}</strong>? This cannot be undone.",
@@ -436,7 +405,6 @@
         "placeholder": "e-mail, name, description, or role:moderator"
       },
       "name": "Users",
-      "removeRole": "Remove role {role}",
       "roleChanged": "Role changed successfully!",
       "table": {
         "columns": {
@@ -457,10 +425,10 @@
     }
   },
   "backendErrors": {
-    "API_KEYS_FEATURE_DISABLED": "API keys are not enabled on this network.",
     "API_KEY_CREATE_EXPIRY_INVALID": "The validity must be at least one day.",
     "API_KEY_CREATE_LIMIT_REACHED": "You have reached the maximum of {max} active API keys. Revoke an existing key to create a new one.",
     "API_KEY_DOES_NOT_EXIST": "The API key could not be found.",
+    "API_KEYS_FEATURE_DISABLED": "API keys are not enabled on this network.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "You can only select badges that have been awarded to you.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "The group chat could not be created.",
     "CHAT_MESSAGE_CONTENT_MISSING": "The message needs a text or a file.",
@@ -476,7 +444,6 @@
       "NETWORK_ERROR": "The server cannot be reached. Please check your internet connection and try again.",
       "UNAUTHENTICATED": "Please log in to continue."
     },
-    "GROUPS_FEATURE_DISABLED": "Groups are not enabled on this network.",
     "GROUP_ELEVATION_REASON_INVALID": "The reason may be at most {max} characters long and must not begin or end with a space.",
     "GROUP_ELEVATION_REASON_MISSING": "Please say what you are doing here.",
     "GROUP_ELEVATION_RIGHTS_MISSING": "Your network rights only let you read here.",
@@ -505,6 +472,7 @@
     "GROUP_TEMPLATE_PERMISSIONS_VISIBILITY_MISMATCH": "With these rights, the template would no longer match the visibility it is named after.",
     "GROUP_TEMPLATE_ROLE_UNKNOWN": "This role does not exist in the template.",
     "GROUP_VISIBILITY_RAISE_NOT_PERMITTED": "You may not make this group more private than you are allowed to create groups.",
+    "GROUPS_FEATURE_DISABLED": "Groups are not enabled on this network.",
     "INVITE_CODE_CREATE_GROUP_MEMBERSHIP_REQUIRED": "You need to be a member of the group to create an invite link.",
     "INVITE_CODE_CREATE_LIMIT_REACHED": "You have reached the maximum number of invite links.",
     "INVITE_CODE_INVALIDATE_CODE_NOT_FOUND": "The invite link could not be found.",
@@ -516,8 +484,8 @@
     "LOCATION_ID_NOT_CONFIRMED": "The selected place could not be confirmed. Please choose it again from the suggestions.",
     "LOCATION_LATITUDE_OUT_OF_RANGE": "The latitude of the location is invalid.",
     "LOCATION_LONGITUDE_OUT_OF_RANGE": "The longitude of the location is invalid.",
-    "LOCATION_NAME_NOT_FOUND": "This place could not be found.",
     "LOCATION_NAME_NO_EXACT_MATCH": "The selected place could not be matched exactly. Please choose it again from the suggestions.",
+    "LOCATION_NAME_NOT_FOUND": "This place could not be found.",
     "LOGIN_ACCOUNT_DISABLED": "Your account has been disabled.",
     "LOGIN_CREDENTIALS_INCORRECT": "Incorrect email address or password.",
     "PASSWORD_CHANGE_NEW_PASSWORD_EQUALS_OLD": "The new password must be different from the old one.",
@@ -567,7 +535,6 @@
     "VIDEO_CALL_START_NOT_PERMITTED": "You may not start a video call in this group."
   },
   "chat": {
-    "addGroupRoomHeadline": "Search group for new chat",
     "addRoomHeadline": "Search User for new Chat",
     "cancelSelectMessage": "Cancel",
     "closeChat": "Close chat",
@@ -583,18 +550,12 @@
     "messageDeleted": "This message was deleted",
     "messagesEmpty": "No messages",
     "newMessages": "New Messages",
-    "noGroupsFound": "No groups found",
-    "page": {
-      "headline": "Chat"
-    },
     "roomEmpty": "No room selected",
     "roomsEmpty": "No rooms",
     "search": "Filter chat rooms",
     "searchBadgeGroup": "Group",
     "searchBadgeUser": "User",
-    "searchGroupPlaceholder": "Search group…",
     "searchPlaceholder": "Search user or group…",
-    "transmitting": "Transmitting message ...",
     "typeMessage": "Type message",
     "userProfileButton": {
       "label": "Chat",
@@ -603,9 +564,6 @@
   },
   "client-only": {
     "loading": "Loading …"
-  },
-  "code-of-conduct": {
-    "subheader": "for the social network of {ORGANIZATION_NAME}"
   },
   "comment": {
     "content": {
@@ -622,24 +580,12 @@
     }
   },
   "common": {
-    "category": "Topic ::: Topics",
     "comment": "Comment ::: Comments",
     "filter": "Filter …",
-    "letsTalk": "Let`s Talk",
-    "loading": "loading",
-    "loadMore": "load more",
-    "name": "Name",
     "noChangesHint": "There's nothing to save yet.",
-    "organization": "Organization ::: Organizations",
     "post": "Post ::: Posts",
     "previousLocation": "Previous location: {location}",
-    "project": "Project ::: Projects",
-    "reportContent": "Report",
     "scrollToLocationMap": "Scroll to map",
-    "shout": "Shout ::: Shouts",
-    "tag": "Tag ::: Tags",
-    "takeAction": "Take Action",
-    "user": "User ::: Users",
     "validations": {
       "categories": "Please select between one and three topics.",
       "contentNotEmpty": "Please enter some content.",
@@ -653,8 +599,7 @@
       "nameLength": "The name must be between {min} and {max} characters.",
       "titleLength": "The title must be between {min} and {max} characters.",
       "titleNotEmpty": "Please enter a title."
-    },
-    "versus": "Versus"
+    }
   },
   "component-slider": {
     "step": "Step {current} of {total}"
@@ -662,7 +607,6 @@
   "components": {
     "dateTimeRange": {
       "hourMinute": "HH:mm",
-      "monthDay": "MM/dd/",
       "yearMonthDay": "MM/dd/yyyy"
     },
     "password-reset": {
@@ -676,8 +620,7 @@
           "description": "A password reset e-mail will be sent to the given e-mail address.",
           "submit": "Request e-mail",
           "submitted": "An e-mail with further instructions has been sent to <b>{email}</b>"
-        },
-        "title": "Reset your password"
+        }
       }
     },
     "registration": {
@@ -715,8 +658,7 @@
           "nonce": "E-mail code: 32143",
           "validations": {
             "error": "Invalid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!",
-            "length": "must be {nonceLength} characters long",
-            "success": "Valid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!"
+            "length": "must be {nonceLength} characters long"
           }
         },
         "title": "E-Mail Confirmation"
@@ -726,11 +668,9 @@
         "form": {
           "description": "Enter the invitation code you received.",
           "invite-code": "Invite code: ACJERB",
-          "next": "Continue",
           "validations": {
             "error": "Invalid invite code <b>{inviteCode}</b>!",
-            "length": "must be {inviteCodeLength} characters long",
-            "success": "Valid invite code <b>{inviteCode}</b>!"
+            "length": "must be {inviteCodeLength} characters long"
           }
         },
         "invited-by": "Invited by {invitedBy}.",
@@ -742,14 +682,12 @@
       },
       "signup": {
         "form": {
-          "data-privacy": "I have read and understood the privacy statement.",
           "description": "To get started, you can register here for free:",
           "errors": {
             "email-exists": "There is already a user account with this e-mail address!"
           },
           "submit": "Create an account",
-          "success": "A mail with a link to complete your registration has been sent to <b>{email}</b>",
-          "terms-and-condition": "I confirm to the  <a href=\"/terms-and-conditions\" target=\"_blank\"><ds-text bold color=\"primary\">Terms and conditions</ds-text></a>."
+          "success": "A mail with a link to complete your registration has been sent to <b>{email}</b>"
         },
         "title": "Join {APPLICATION_NAME}!",
         "unavailable": "Unfortunately, public registration of user accounts is not available right now on this server."
@@ -761,9 +699,6 @@
     "amount-comments": "{amount} Comments",
     "amount-shouts": "{amount} Recommendations",
     "amount-views": "{amount} Views",
-    "categories": {
-      "infoSelectedNoOfMaxCategories": "{chosen} of {max} topics selected"
-    },
     "categoriesTitle": "Topics",
     "category": {
       "description": {
@@ -823,14 +758,6 @@
       }
     },
     "content": "Content",
-    "emotions-label": {
-      "angry": "Angry",
-      "cry": "Cry",
-      "funny": "Funny",
-      "happy": "Happy",
-      "surprised": "Surprised"
-    },
-    "filterFollow": "Users I follow",
     "filterMasonryGrid": {
       "myFriends": "Users I follow",
       "myGroups": "By my groups",
@@ -841,9 +768,6 @@
     },
     "filterMyGroups": "My groups",
     "inappropriatePicture": "This image may be inappropriate for some people.",
-    "languageSelectLabel": "Language of your contribution",
-    "languageSelectText": "Select Language",
-    "newEvent": "Create a new Event",
     "newPost": "Create a new Post",
     "postIn": "Post in",
     "postInGroupOption": "Group: {name}",
@@ -866,14 +790,12 @@
     "comment": {
       "message": "Do you really want to delete the comment “<b>{name}</b>”?",
       "success": "Comment successfully deleted!",
-      "title": "Delete Comment",
-      "type": "Comment"
+      "title": "Delete Comment"
     },
     "contribution": {
       "message": "Do you really want to delete the post “<b>{name}</b>”?",
       "success": "Post successfully deleted!",
-      "title": "Delete Post",
-      "type": "Contribution"
+      "title": "Delete Post"
     },
     "submit": "Delete"
   },
@@ -881,20 +803,17 @@
     "cancel": "Cancel",
     "comment": {
       "message": "Do you really want to disable the comment from “<b>{name}</b>”?",
-      "title": "Disable Comment",
-      "type": "Comment"
+      "title": "Disable Comment"
     },
     "contribution": {
       "message": "Do you really want to disable the contribution “<b>{name}</b>”?",
-      "title": "Disable Contribution",
-      "type": "Contribution"
+      "title": "Disable Contribution"
     },
     "submit": "Disable",
     "success": "Disabled successfully!",
     "user": {
       "message": "Do you really want to disable the user “<b>{name}</b>”?",
-      "title": "Disable User",
-      "type": "User"
+      "title": "Disable User"
     }
   },
   "donations": {
@@ -911,7 +830,6 @@
     "hashtag": {
       "addHashtag": "New hashtag",
       "addLetter": "Type a letter",
-      "noHashtagsFound": "No hashtags found",
       "relation": {
         "popular": "Popular",
         "usedByMe": "Used by me"
@@ -961,7 +879,6 @@
     "categories": "Topics",
     "creationDate": "Creation date",
     "deleteFilter": "Delete filter",
-    "emotions": "Emotions",
     "ended": {
       "all": {
         "hint": "Show all, also ended",
@@ -974,12 +891,9 @@
     },
     "event": "Event",
     "eventsBy": "Events – show ...",
-    "eventsEnded": "Ended",
     "filter-by": "Filter by ...",
     "following": "Users I follow",
     "following-title": "Sources",
-    "languages": "Languages",
-    "my-groups": "My groups",
     "order": {
       "last": {
         "hint": "Sort posts by the last first",
@@ -1022,7 +936,6 @@
     },
     "actionRadius": "Action radius of the group",
     "addMember": "Add Member",
-    "addMemberToGroup": "Add to group",
     "addMemberToGroupSuccess": "“{name}” was added to the group with the role “{role}”!",
     "addUser": "Add User",
     "addUserNoOptions": "No users found!",
@@ -1081,7 +994,6 @@
     "errors": {
       "userAlreadyMember": "User “{name}” is already a member!"
     },
-    "follow": "Follow",
     "foundation": "Foundation",
     "general": "General",
     "goal": "Goal of group",
@@ -1123,19 +1035,16 @@
     "modal": {
       "cancel": "Cancel",
       "confirm": "Confirm",
-      "confirmAddGroupMemberText": "Add user “{name}” to group?",
-      "confirmAddGroupMemberTitle": "Confirm"
+      "confirmAddGroupMemberText": "Add user “{name}” to group?"
     },
     "muted": "Group muted",
     "myGroups": "My Groups",
     "name": "Group name",
-    "radius": "Radius",
     "removeMember": "Remove member",
     "removeMemberButton": "Remove",
     "removeMemberConfirmText": "Remove user “{name}” from the group?",
     "removeMemberTitle": "Remove Member",
     "rights": {
-      "addRole": "Add a role",
       "advancedTitle": "Every right in detail",
       "applyTemplate": "Apply a template — replaces every role of this group with the template’s.",
       "blockedByFeature": "That feature is switched off for this network ({feature}).",
@@ -1143,7 +1052,6 @@
       "confirmApplyTemplate": "Apply the template “{template}” to this group? Every role is replaced by the template’s.",
       "confirmApplyTemplateDiscards": "Apply the template “{template}” to this group? Every role is replaced by the template’s — and the unsaved changes are lost.",
       "confirmDelete": "Delete the role “{role}”? Its members become “{target}”.",
-      "confirmReset": "Reset every role of this group to the defaults? Roles you added are removed and their members become ordinary members.",
       "deleteRole": "Delete role",
       "description": "Decide who may do what in this group — from outsiders to administrators.",
       "discardDraft": "The unsaved changes will be lost. Continue anyway?",
@@ -1167,9 +1075,9 @@
         "group_join": "Join the group directly, without approval.",
         "group_join_request": "Ask to join the group and wait for approval.",
         "group_leave": "Leave the group.",
-        "group_members_read": "See the member list and the member count.",
         "group_member_remove": "Remove members from the group.",
         "group_member_role_assign": "Change members' roles.",
+        "group_members_read": "See the member list and the member count.",
         "group_post_create": "Write posts in the group.",
         "group_post_moderate": "Remove someone else's post from the group. The post stays with its author.",
         "group_post_pin": "Pin and unpin posts in the group.",
@@ -1179,10 +1087,7 @@
         "group_videoCall_create": "Start a video call in the group.",
         "group_videoCall_join": "Join a video call running in the group."
       },
-      "reset": "Reset to defaults",
       "resultingType": "With these rights the group is:",
-      "roleKeyPlaceholder": "key, e.g. editors",
-      "roleLabelPlaceholder": "display name, e.g. Editors",
       "saved": "Rights saved",
       "saveFirst": "Save or discard first — there are unsaved changes.",
       "simple": {
@@ -1214,7 +1119,6 @@
       "usual": "Member"
     },
     "save": "Create new group",
-    "showMembers": "Member list visible to everyone",
     "teaser": {
       "notReadable": "You cannot open this group yet — your request is still pending",
       "openGroup": "Open group",
@@ -1261,8 +1165,7 @@
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",
-    "hashtag-search": "Searching for #{hashtag}",
-    "title": "Your filter bubble"
+    "hashtag-search": "Searching for #{hashtag}"
   },
   "header": {
     "avatarMenu": {
@@ -1316,7 +1219,6 @@
     "invite-link-message-hidden-group": "You have been invited to join a hidden group on {APPLICATION_NAME}.",
     "invite-link-message-personal": "You have been invited to join {APPLICATION_NAME}.",
     "invited-count": "You have already invited {count} people.",
-    "limit-reached": "You have reached the maximum number of invite links.",
     "members-only": "only for people who already have an account",
     "my-invite-links": "My invite links",
     "no-links": "No invite links created yet.",
@@ -1345,7 +1247,6 @@
     "login": "Login",
     "logout": "Logout",
     "moreInfo": "What is {APPLICATION_NAME}?",
-    "moreInfoHint": "to the presentation page",
     "no-account": "Don't have an account?",
     "no-cookie": "No cookie can be set. You must accept cookies.",
     "password": "Your Password",
@@ -1371,12 +1272,6 @@
       "theUser": "My position",
       "title": "Legend",
       "user": "User"
-    },
-    "markerTypes": {
-      "event": "event",
-      "group": "group",
-      "theUser": "my position",
-      "user": "user"
     },
     "pageTitle": "Map",
     "styles": {
@@ -1435,12 +1330,9 @@
       },
       "decision": "Decision",
       "DecisionSuccess": "Decided successfully!",
-      "disabled": "Disabled",
-      "disabledAt": "Disabled at",
       "disabledBy": "Disabled by",
       "empty": "Congratulations, nothing to moderate.",
       "enabled": "Enabled",
-      "enabledAt": "Enabled at",
       "enabledBy": "Enabled by",
       "filterLabel": {
         "all": "All",
@@ -1453,9 +1345,7 @@
       "hiddenGroupLink": "Go to {name} to use administrator access",
       "moreDetails": "View Details",
       "name": "Reports",
-      "noDecision": "No decision!",
       "numberOfUsers": "{count} users",
-      "previousDecision": "Previous decision:",
       "reasonCategory": "Topic",
       "reasonDescription": "Description",
       "reportedOn": "Date",
@@ -1468,14 +1358,12 @@
   },
   "notifications": {
     "comment": "Comment",
-    "content": "Content or Description",
     "empty": "Sorry, you don't have any notifications at the moment.",
     "filterLabel": {
       "all": "All",
       "read": "Read",
       "unread": "Unread"
     },
-    "group": "Description",
     "markAllAsRead": "Mark all as read",
     "markAsRead": "Mark as read",
     "markAsUnread": "Mark as unread",
@@ -1572,9 +1460,6 @@
       "hide": "Hide sensitive content",
       "show": "Show sensitive content"
     },
-    "takeAction": {
-      "name": "Take action"
-    },
     "viewEvent": {
       "eventEnd": "End",
       "eventEndBeforeStart": "The end date must be after the start date.",
@@ -1588,14 +1473,12 @@
       "eventVenue": "e.g. Café Chrysander, at Bergedorf Castle",
       "eventVenueLabel": "Venue description",
       "pickLocationOnMap": "Pick location on map",
-      "title": "Event",
       "viewOnMainMap": "View on main map"
     },
     "viewPost": {
       "forGroup": {
         "title": "In the group "
-      },
-      "title": "Post"
+      }
     }
   },
   "profile": {
@@ -1603,7 +1486,6 @@
       "submitted": "Upload successful!"
     },
     "commented": "Commented",
-    "follow": "Follow",
     "followers": "Followers",
     "following": "Following",
     "groups": {
@@ -1645,24 +1527,18 @@
   "release": {
     "cancel": "Cancel",
     "comment": {
-      "error": "You have already reported the comment!",
       "message": "Do you really want to release the comment from “<b>{name}</b>”?",
-      "title": "Release Comment",
-      "type": "Comment"
+      "title": "Release Comment"
     },
     "contribution": {
-      "error": "You have already reported the contribution!!",
       "message": "Do you really want to release the contribution “<b>{name}</b>”?",
-      "title": "Release Contribution",
-      "type": "Contribution"
+      "title": "Release Contribution"
     },
     "submit": "Release",
     "success": "Released successfully!",
     "user": {
-      "error": "You already reported the user!",
       "message": "Do you really want to release the user “<b>{name}</b>”?",
-      "title": "Release User",
-      "type": "User"
+      "title": "Release User"
     }
   },
   "report": {
@@ -1692,8 +1568,7 @@
           "intentional_intimidation_stalking_persecution": "Intentional intimidation, stalking or persecution.",
           "other": "Other …",
           "pornographic_content_links": "Posting or linking of clearly pornographic material."
-        },
-        "placeholder": "Topic …"
+        }
       },
       "description": {
         "label": "Please explain: Why you like to report this?",
@@ -1722,7 +1597,6 @@
     "no-results": "No results found for “{search}”. Try a different search term!",
     "page": "Page",
     "placeholder": "Search",
-    "results": "result found ::: results found",
     "title": "Search Results"
   },
   "settings": {
@@ -1797,7 +1671,6 @@
       },
       "empty": "So far, you have not blocked anybody.",
       "explanation": {
-        "closing": "This should be sufficient for now so that blocked users can no longer bother you.",
         "commenting-disabled": "You cannot comment on this post at this time.",
         "intro": "If another user has been blocked by you, this is what happens:",
         "notifications": "Blocked users will no longer receive notifications if they mention each other.",
@@ -1814,7 +1687,6 @@
       "givenNamePlaceholder": "Femanon",
       "labelBio": "About You",
       "labelCity": "Your City or Region",
-      "labelCityHint": "(shows approximate position on map)",
       "labelName": "Your name",
       "labelSlug": "Your unique user name",
       "name": "Your data",
@@ -1827,10 +1699,8 @@
     "deleteUserAccount": {
       "accountDescription": "Be aware that your Posts and Comments are important to our community. If you still choose to delete them, you have to mark them below.",
       "accountWarning": "You CAN'T MANAGE and CAN'T RECOVER your Account, Posts, or Comments after deleting your account!",
-      "accountWarningAdmin": "The account, contributions or comments can NOT BE ADMINISTERED OR RESTORED after deletion!",
       "accountWarningIsAdmin": "Attention! You are about to delete a user account!",
       "commentedCount": "Delete my {count} comment ::: Delete my {count} comments",
-      "confirmDeleting": "Delete user account now",
       "contributionsCount": "Delete my {count} post ::: Delete my {count} posts",
       "infoAdmin": "All contributions and comments of the user will be deleted additionally!",
       "name": "Delete user account",
@@ -1990,18 +1860,14 @@
   },
   "site": {
     "back-to-login": "Back to login page",
-    "bank": "bank account",
     "code-of-conduct": "Code of Conduct",
-    "contact": "Contact",
     "data-privacy": "Data Privacy",
     "donate": "Donate",
     "error-occurred": "An error occurred.",
     "faq": "FAQ",
-    "germany": "Germany",
     "imprint": "Imprint",
     "made": "Made with ❤️",
     "navigation": "Navigation",
-    "register": "Registry number",
     "support": "Support",
     "termsAndConditions": "Terms and Conditions",
     "thanks": "Thanks!"
@@ -2069,7 +1935,6 @@
     "minimize": "Minimize",
     "muteMic": "Mute microphone",
     "openChat": "Open chat",
-    "participants": "Participants",
     "prejoin": {
       "camera": "Camera",
       "cameraDisabled": "Camera is disabled.",

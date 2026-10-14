@@ -102,11 +102,6 @@ $ npm test
 ```
 
 ```bash
-# run locales in /webapp (use option --fix to sort the locales)
-$ npm run locales
-```
-
-```bash
 # start storybook in /webapp
 $ npm run storybook
 ```
@@ -114,6 +109,27 @@ $ npm run storybook
 You can then visit the Storybook playground on `http://localhost:3002`
 
 :::
+
+## Translations
+
+The texts live in `locales/<language>.json`, one file per language, all with the same keys.
+`en.json` is the reference. `npm run lint` checks them (eslint-config-it4c's `vueI18n` module):
+
+- every key the code asks for with `$t('…')` exists,
+- every language has exactly the keys of the others,
+- no key is left that nothing uses any more,
+- the keys are sorted. `npm run lint -- --fix` sorts them.
+
+A new text therefore goes into all languages at once, in English where no translation exists yet.
+A key the code builds at runtime (`` $t(`group.types.${type}`) ``) or hands over as
+data (a modal's `titleIdent`) is invisible to the unused-keys check: add its pattern to `ignores`
+in `eslint.config.mjs`, next to the others of its kind. Where the key is a choice between a few
+literals, prefer `cond ? $t('a') : $t('b')` over `` $t(cond ? 'a' : 'b') ``: then the lint sees both.
+
+The unit tests add a check of their own (`test/knownTranslationKeys.js`): a spec that renders a key
+`en.json` does not define fails, including the keys built at runtime. The translations of the
+backend's error codes, the permission catalogs and the admin config categories are checked against
+their source by `backend/src/graphql/webappTranslations.spec.ts`.
 
 ## Maintenance Mode
 
