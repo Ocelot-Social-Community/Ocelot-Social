@@ -5,9 +5,10 @@ Feature: Admin roles & permissions (RBAC)
 
   Background:
     Given the following "users" are in the database:
-      | slug      | email             | password | id    | name      | role  | termsAndConditionsAgreedVersion |
-      | admin     | admin@example.org | 1234     | admin | Admin     | admin | 0.0.4                           |
-      | peter-pan | peter@example.org | 1234     | peter | Peter Pan | user  | 0.0.4                           |
+      | slug      | email             | password | id    | name      | role      | termsAndConditionsAgreedVersion |
+      | admin     | admin@example.org | 1234     | admin | Admin     | admin     | 0.0.4                           |
+      | moderator | mod@example.org   | 1234     | mod   | Moderator | moderator | 0.0.4                           |
+      | peter-pan | peter@example.org | 1234     | peter | Peter Pan | user      | 0.0.4                           |
     And the following "posts" are in the database:
       | id     | title         | slug   | authorId |
       | post-1 | A shared post | a-post | admin    |
@@ -172,3 +173,21 @@ Feature: Admin roles & permissions (RBAC)
     And I confirm the action in the modal
     Then I see a toaster with status "success"
     And I do not see the element with test id "user-delete-peter"
+
+  # G — #10485: role.manage is no lever against those above. A moderator holding it demoted an
+  # admin on stage. Now they re-role only users they outrank, and the admin role is not theirs
+  # to change — the page offers neither, and the backend would refuse both.
+  Scenario: A moderator who may manage roles cannot touch the admins
+    Given the role "moderator" has the permission "role.manage"
+    And I am logged in as "moderator"
+    When I navigate to page "/admin/users"
+    Then I see the element with test id "user-role-select-peter"
+    And I do not see the element with test id "user-role-select-admin"
+    When I navigate to page "/admin/roles"
+    And I select the role "admin"
+    Then the save button for role "admin" is disabled
+    And the delete button for role "admin" is disabled
+    And the permission "comment.create" for role "admin" should "be.disabled"
+    When I select the role "user"
+    Then the permission "comment.create" for role "user" should "be.enabled"
+    And the permission "policy.manage" for role "user" should "be.disabled"

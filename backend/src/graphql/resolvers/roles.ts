@@ -6,14 +6,14 @@ import {
   isPermissionAvailable,
   permissionCatalog,
 } from '@src/permission'
-import {
-  OWNER_ROLE,
-  PERMISSIONS_CHANGED_CHANNEL,
-  RoleValidationError,
-  effectiveRoleName,
-} from '@src/role'
+import { OWNER_ROLE, PERMISSIONS_CHANGED_CHANNEL, RoleValidationError } from '@src/role'
 
 import { viewerOutranksUser } from './helpers/actOnHierarchy'
+import {
+  mayGrantPermission,
+  roleChangeRefusal,
+  roleOfferRefusal,
+} from './helpers/networkRoleAuthority'
 
 import type { Context } from '@src/context'
 import type { RoleDefinition } from '@src/role'
@@ -81,9 +81,6 @@ const countMembers = async (context: Context, name: string): Promise<number> => 
   return Number(result.records[0]?.get('count') ?? 0)
 }
 
-const actorIsOwner = (context: Context): boolean =>
-  effectiveRoleName(context.user ?? {}) === OWNER_ROLE
-
 export default {
   Query: {
     // Each catalog entry carries its runtime gate (gatedBy) and whether that gate is
@@ -97,6 +94,7 @@ export default {
         // actionable policy. Null when the permission is effective (available).
         gatedBy: blockingGateFor(entry.key, context),
         available: isPermissionAvailable(entry.key, context),
+        grantableByCurrentUser: mayGrantPermission(context, entry.key),
       })),
 
     roles: async (_parent: unknown, _args: unknown, context: Context) => {
@@ -264,16 +262,13 @@ export default {
                 RETURN count(DISTINCT targetOwner) AS isOwner, count(DISTINCT o) AS ownerCount`,
         variables: { userId },
       })
+      // Exactly one row, always: OPTIONAL MATCHes under an aggregation still return one.
       const row = guard.records[0]
-      const targetIsOwner = Number(row?.get('isOwner') ?? 0) > 0
-      const ownerCount = Number(row?.get('ownerCount') ?? 0)
+      const targetIsOwner = Number(row.get('isOwner')) > 0
+      const ownerCount = Number(row.get('ownerCount'))
 
-      // Only an owner may grant the owner role OR change an owner's role; a
-      // role.manage admin manages non-owner roles only (no escalating to owner, no
-      // demoting an owner).
-      if ((roleName === OWNER_ROLE || targetIsOwner) && !actorIsOwner(context)) {
-        throw new AppError(Errors.ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER)
-      }
+      // Who may give whom which role — the owner role included — the shield has decided by
+      // now (helpers/networkRoleAuthority.ts). What is left is the instance's own safety net.
       // Never demote the last owner — keep the instance failsafe.
       if (targetIsOwner && roleName !== OWNER_ROLE && ownerCount <= 1) {
         throw new AppError(Errors.ROLE_ASSIGNMENT_LAST_OWNER_NOT_REMOVABLE)
@@ -297,6 +292,18 @@ export default {
       publishPermissionsChanged(context, roleName)
       return user
     },
+  },
+
+  // What the admin pages offer, decided by the same functions the shield asks (#10485).
+  Role: {
+    // A protected role (`owner`) nobody changes; the shield leaves that refusal to RoleService.
+    editableByCurrentUser: (
+      role: { name: string; protected: boolean },
+      _args: unknown,
+      context: Context,
+    ) => !role.protected && roleChangeRefusal(context, role.name) === null,
+    assignableByCurrentUser: (role: { name: string }, _args: unknown, context: Context) =>
+      roleOfferRefusal(context, role.name) === null,
   },
 
   Subscription: {

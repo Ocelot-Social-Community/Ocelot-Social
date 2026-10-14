@@ -159,11 +159,8 @@
           :granted="grantedPermissions"
           :diff="matrixDiff"
           :group-label="groupLabel"
-          :disabled-for="(permission) => activeRole.protected || permission.available === false"
-          :hint-for="
-            (permission) =>
-              permission.available === false ? $t('admin.roles.permUnavailable') : null
-          "
+          :disabled-for="(permission) => !mayToggle(activeRole, permission)"
+          :hint-for="(permission) => permissionHint(activeRole, permission)"
           :note-for="
             (permission) =>
               permission.available === false ? $t('admin.roles.permUnavailable') : null
@@ -556,7 +553,29 @@ export default {
     // or deleted — the backend refuses both (MANDATORY_ROLE_NAMES). The lock on their tabs reads
     // this, so the two cannot disagree again; it used to follow `protected` and left `user` bare.
     canRename(role) {
-      return !role.protected && role.name !== 'user'
+      return !role.protected && role.name !== 'user' && this.mayChange(role)
+    },
+    // Whether the viewer may change this role at all (#10485): their own, or one their role
+    // outranks — the backend's answer, so the page offers exactly what it would accept. A
+    // field that is missing (an older backend) reads as "may".
+    mayChange(role) {
+      return !role.protected && role.editableByCurrentUser !== false
+    },
+    isOwnRole(role) {
+      return role.name === this.$store?.getters?.['auth/user']?.roleName
+    },
+    // A right can be switched in a role the viewer may change, when the feature exists, and —
+    // outside their own role, which `role.manage` lets them shape freely — when they hold it.
+    mayToggle(role, permission) {
+      if (!this.mayChange(role) || permission.available === false) return false
+      return this.isOwnRole(role) || permission.grantableByCurrentUser !== false
+    },
+    permissionHint(role, permission) {
+      if (permission.available === false) return this.$t('admin.roles.permUnavailable')
+      if (this.mayChange(role) && !this.mayToggle(role, permission)) {
+        return this.$t('admin.roles.permNotHeld')
+      }
+      return null
     },
     startRename() {
       this.creating = false
@@ -656,23 +675,24 @@ export default {
     canDelete(role) {
       // Protected (owner) and the implicit baseline (user) cannot be deleted, and a
       // role with members would orphan them — reassign first (enforced by the backend).
-      return !role.protected && role.name !== 'user' && (role.memberCount || 0) === 0
+      return this.mayChange(role) && role.name !== 'user' && (role.memberCount || 0) === 0
     },
     hasMembers(role) {
       return (role.memberCount || 0) > 0
     },
     saveDisabled(role) {
       // Protected roles are read-only; otherwise save only when there are changes.
-      return role.protected || !this.isDirty(role) || this.saving
+      return !this.mayChange(role) || !this.isDirty(role) || this.saving
     },
     saveHint(role) {
-      return role.protected ? this.$t('admin.roles.protectedHint') : ''
+      if (role.protected) return this.$t('admin.roles.protectedHint')
+      return this.mayChange(role) ? '' : this.$t('admin.roles.notEditableHint')
     },
     deleteHint(role) {
       if (this.canDelete(role)) return ''
       // A role that is only undeletable because it still has members gets the
       // specific "reassign first" hint.
-      if (!role.protected && role.name !== 'user' && this.hasMembers(role)) {
+      if (this.mayChange(role) && role.name !== 'user' && this.hasMembers(role)) {
         return this.$t('admin.roles.cannotDeleteHasMembers')
       }
       return this.$t('admin.roles.cannotDelete')

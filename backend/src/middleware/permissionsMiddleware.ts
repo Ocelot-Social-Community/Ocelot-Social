@@ -18,6 +18,13 @@ import {
   optionalMemberRoleMatch,
   visibilityOf,
 } from '@graphql/resolvers/helpers/groupAccessCypher'
+import {
+  assignmentError,
+  changeError,
+  roleAssignmentRefusal,
+  roleChangeRefusal,
+  roleCreateRefusal,
+} from '@graphql/resolvers/helpers/networkRoleAuthority'
 import { inviteCodeAllowsRegistration } from '@graphql/resolvers/inviteCodes'
 import {
   coversRole,
@@ -265,6 +272,42 @@ const canActOnTargetUser = (permission: PermissionKey) =>
       new AppError(Errors.USER_ACTION_TARGET_NOT_OUTRANKED)
     )
   })
+
+// The role mutations (#10485): `role.manage`, and then who acts on whom
+// (resolvers/helpers/networkRoleAuthority.ts). Explained with a reason, because the admin pages
+// only offer what passes and a refusal there means something changed underneath.
+const canSetUserRole = rule({ cache: 'no_cache' })(async (_parent, args, context: Context) => {
+  if (!hasPermissionEffective(context, 'role.manage')) {
+    return false
+  }
+  const refusal = await roleAssignmentRefusal(
+    context,
+    args.userId as string,
+    args.roleName as string,
+  )
+  return refusal ? assignmentError(refusal) : true
+})
+
+const canCreateRole = rule({ cache: 'no_cache' })((_parent, args, context: Context) => {
+  if (!hasPermissionEffective(context, 'role.manage')) {
+    return false
+  }
+  const refusal = roleCreateRefusal(context, args.permissions as string[])
+  return refusal ? changeError(refusal) : true
+})
+
+// updateRole carries the new rights; renameRole and deleteRole only name the role.
+const canChangeRole = rule({ cache: 'no_cache' })((_parent, args, context: Context) => {
+  if (!hasPermissionEffective(context, 'role.manage')) {
+    return false
+  }
+  const refusal = roleChangeRefusal(
+    context,
+    args.name as string,
+    args.permissions as string[] | undefined,
+  )
+  return refusal ? changeError(refusal) : true
+})
 
 // Same hierarchy guard for the report `review` mutation, which can disable the
 // reported resource. Only Users carry a role, so Posts/Comments pass through; a
@@ -903,11 +946,11 @@ export default shield(
       adminRevokeApiKey: hasPermission('apiKey.administer'),
       adminRevokeUserApiKeys: hasPermission('apiKey.administer'),
 
-      createRole: hasPermission('role.manage'),
-      updateRole: hasPermission('role.manage'),
-      renameRole: hasPermission('role.manage'),
-      deleteRole: hasPermission('role.manage'),
-      setUserRole: hasPermission('role.manage'),
+      createRole: canCreateRole,
+      updateRole: canChangeRole,
+      renameRole: canChangeRole,
+      deleteRole: canChangeRole,
+      setUserRole: canSetUserRole,
 
       // Group roles: editing a group's own role definitions is the group's meta right, and
       // every one of these additionally requires that the actor holds what they hand out

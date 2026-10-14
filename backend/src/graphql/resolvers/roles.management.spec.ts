@@ -20,7 +20,7 @@ import UPDATE_ROLE from '@graphql/queries/roles/updateRole.gql'
 import USER_ROLES from '@graphql/queries/roles/userRoles.gql'
 import USER_INFO from '@graphql/queries/roles/userWithRole.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { OWNER_ROLE, PERMISSIONS_CHANGED_CHANNEL, RoleService } from '@src/role'
+import { PERMISSIONS_CHANGED_CHANNEL, RoleService } from '@src/role'
 
 import rolesResolvers, { publishPermissionsChanged } from './roles'
 
@@ -1024,23 +1024,5 @@ describe('roles resolver guards (direct invocation)', () => {
     )
 
     expect(updated).toMatchObject({ name: 'editor', memberCount: 0 })
-  })
-
-  it('refuses to grant the owner role when the context carries no user', async () => {
-    // Owner is the failsafe role: only an owner may hand it out. The check reads the
-    // actor's effective role, so a context without a user must fall through to the
-    // baseline and be refused — never treated as an owner by default.
-    const context = contextWithout({
-      role: { getRole: () => ({ name: OWNER_ROLE, protected: true, permissions: [] }) },
-      database: { query: noRows() },
-    })
-
-    await expect(
-      rolesResolvers.Mutation.setUserRole(
-        null,
-        { userId: 'target', roleName: OWNER_ROLE },
-        context,
-      ),
-    ).rejects.toThrow(/Only an owner/)
   })
 })

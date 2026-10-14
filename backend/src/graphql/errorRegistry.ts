@@ -300,6 +300,26 @@ const definitions = {
     type: 'FORBIDDEN',
     text: 'Only an owner may assign or change the owner role.',
   },
+  ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED: {
+    type: 'FORBIDDEN',
+    text: 'You can only change the role of users whose role grants less authority than yours.',
+  },
+  ROLE_ASSIGNMENT_NOT_COVERED: {
+    type: 'FORBIDDEN',
+    text: 'You cannot hand out a role with rights you do not hold yourself.',
+  },
+  ROLE_CHANGE_NOT_OUTRANKED: {
+    type: 'FORBIDDEN',
+    text: 'You can only change your own role or roles that grant less authority than yours.',
+  },
+  ROLE_SAVE_WOULD_OUTRANK: {
+    type: 'FORBIDDEN',
+    text: 'Your own role cannot be raised above a role that yours does not outrank today.',
+  },
+  ROLE_SAVE_NOT_COVERED: {
+    type: 'FORBIDDEN',
+    text: 'A role can only contain rights you hold yourself.',
+  },
   ROLE_SAVE_NAME_ALREADY_TAKEN: { type: 'BAD_USER_INPUT', text: "Role '{name}' already exists." },
   ROLE_SAVE_NAME_INVALID: {
     type: 'BAD_USER_INPUT',
