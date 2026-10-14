@@ -2064,6 +2064,7 @@
     },
     "dialogLabel": "Videochamada de grupo",
     "enableAudio": "Ativar som",
+    "enterFullscreen": "Tela cheia",
     "errorBackToPrejoin": "Alterar configurações",
     "errorRetry": "Tentar novamente",
     "errors": {
@@ -2086,6 +2087,7 @@
         "noDevice": "Nenhuma tela disponível para compartilhar."
       }
     },
+    "exitFullscreen": "Sair da tela cheia",
     "gotoGroup": "Ir para o grupo “{name}”",
     "groupVideoCallButton": {
       "label": "Vídeo de grupo",

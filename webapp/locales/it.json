@@ -2064,6 +2064,7 @@
     },
     "dialogLabel": "Videochiamata di gruppo",
     "enableAudio": "Attiva audio",
+    "enterFullscreen": "Schermo intero",
     "errorBackToPrejoin": "Modifica impostazioni",
     "errorRetry": "Riprova",
     "errors": {
@@ -2086,6 +2087,7 @@
         "noDevice": "Nessuno schermo disponibile da condividere."
       }
     },
+    "exitFullscreen": "Esci da schermo intero",
     "gotoGroup": "Vai al gruppo «{name}»",
     "groupVideoCallButton": {
       "label": "Video del gruppo",

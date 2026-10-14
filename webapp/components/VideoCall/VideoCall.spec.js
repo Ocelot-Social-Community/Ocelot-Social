@@ -3316,6 +3316,97 @@ describe('VideoCall', () => {
     })
   })
 
+  describe('fullscreen', () => {
+    let fullscreenElement
+    const fullscreenChanged = () => document.dispatchEvent(new Event('fullscreenchange'))
+
+    beforeEach(() => {
+      fullscreenElement = null
+      Object.defineProperty(document, 'fullscreenEnabled', { value: true, configurable: true })
+      Object.defineProperty(document, 'fullscreenElement', {
+        get: () => fullscreenElement,
+        configurable: true,
+      })
+      document.documentElement.requestFullscreen = jest.fn(async () => {
+        fullscreenElement = document.documentElement
+        fullscreenChanged()
+      })
+      document.exitFullscreen = jest.fn(async () => {
+        fullscreenElement = null
+        fullscreenChanged()
+      })
+    })
+
+    afterEach(() => {
+      delete document.fullscreenEnabled
+      delete document.fullscreenElement
+      delete document.documentElement.requestFullscreen
+      delete document.exitFullscreen
+    })
+
+    const maximizedCall = async () => {
+      const built = factory({ show: true, minimized: false })
+      await built.wrapper.setData({ phase: 'in-call' })
+      return built
+    }
+    const button = (wrapper) => wrapper.find('[data-test="video-call-fullscreen"]')
+
+    it('is offered for the maximized call on a desktop', async () => {
+      const { wrapper } = await maximizedCall()
+      expect(button(wrapper).exists()).toBe(true)
+      expect(wrapper.vm.fullscreenLabel).toBe('videoCall.enterFullscreen')
+    })
+
+    it('is not offered where the browser cannot, nor before joining', async () => {
+      const { wrapper } = await maximizedCall()
+      await wrapper.setData({ canFullscreen: false })
+      expect(button(wrapper).exists()).toBe(false)
+      await wrapper.setData({ canFullscreen: true, phase: 'prejoin' })
+      expect(button(wrapper).exists()).toBe(false)
+    })
+
+    it('puts the whole page in fullscreen, and keeps its header and footer away', async () => {
+      const { wrapper, setPageBars } = await maximizedCall()
+      await button(wrapper).trigger('click')
+      await wrapper.vm.$nextTick()
+      expect(document.documentElement.requestFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(true)
+      expect(wrapper.vm.fullscreenLabel).toBe('videoCall.exitFullscreen')
+      expect(wrapper.find('.video-call').classes()).toContain('video-call--fullscreen')
+      expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'hidden')
+    })
+
+    it('ends at a second click', async () => {
+      const { wrapper } = await maximizedCall()
+      await wrapper.vm.toggleFullscreen()
+      await wrapper.vm.toggleFullscreen()
+      expect(document.exitFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+
+    it('follows the browser ending it (Esc)', async () => {
+      const { wrapper } = await maximizedCall()
+      await wrapper.vm.toggleFullscreen()
+      fullscreenElement = null
+      fullscreenChanged()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+
+    it('ends when the call is parked', async () => {
+      const { wrapper } = await maximizedCall()
+      await wrapper.vm.toggleFullscreen()
+      await wrapper.setData({ phase: 'connecting' })
+      expect(document.exitFullscreen).toHaveBeenCalled()
+    })
+
+    it('stays as it is when the browser refuses', async () => {
+      const { wrapper } = await maximizedCall()
+      document.documentElement.requestFullscreen = jest.fn(() => Promise.reject(new Error('no')))
+      await expect(wrapper.vm.toggleFullscreen()).resolves.toBeUndefined()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+  })
+
   describe('bars of the parked window', () => {
     const parkedCall = async () => {
       const built = factory({ show: true, minimized: true })

@@ -10,6 +10,7 @@
           'video-call--bars-hidden': barsOverlay && barsHidden,
           'video-call--parked-bars': parked,
           'video-call--chromium': isChromium,
+          'video-call--fullscreen': barsOverlay && inFullscreen,
           'video-call--bars-held': parked && (showDeviceSettings || pointerOnParked),
         },
       ]"
@@ -38,6 +39,21 @@
           {{ uniqueParticipantCount }}
         </span>
         <div class="video-call__header-actions">
+          <os-button
+            v-if="showFullscreenButton"
+            v-tooltip="fullscreenLabel"
+            data-test="video-call-fullscreen"
+            variant="primary"
+            appearance="outline"
+            size="sm"
+            circle
+            :aria-label="fullscreenLabel"
+            @click="toggleFullscreen"
+          >
+            <template #icon>
+              <os-icon :icon="inFullscreen ? icons.fullscreenExit : icons.fullscreen" />
+            </template>
+          </os-button>
           <os-button
             v-if="canMinimize && phase === 'in-call'"
             v-tooltip="minimizeLabel"
@@ -555,6 +571,9 @@ export default {
       // Only Chromium-based browsers (Chrome, Edge, Opera, …) know navigator.userAgentData.
       // Set once mounted: the server renders no browser.
       isChromium: false,
+      // Whether the browser can show the page in fullscreen, and whether it does now.
+      canFullscreen: false,
+      inFullscreen: false,
       // The control bar: how wide it is, and how wide it was the last time its buttons
       // had their labels (see controlsCrowded).
       controlsWidth: 0,
@@ -755,10 +774,21 @@ export default {
     autoHideBars() {
       return this.barsOverlay && this.phase === 'in-call' && !this.error
     },
-    // What the page's header and footer do meanwhile (layouts/default.vue).
+    // What the page's header and footer do meanwhile (layouts/default.vue). In fullscreen
+    // they stay away: the call is all there is.
     pageBars() {
       if (!this.barsOverlay) return 'normal'
-      return this.barsHidden ? 'hidden' : 'overlay'
+      return this.barsHidden || this.inFullscreen ? 'hidden' : 'overlay'
+    },
+    // Fullscreen is offered for the maximized call on a desktop. On a phone the call
+    // fills the screen already.
+    showFullscreenButton() {
+      return this.canFullscreen && !this.isMobile && this.isMaximized && this.phase === 'in-call'
+    },
+    fullscreenLabel() {
+      return this.inFullscreen
+        ? this.$t('videoCall.exitFullscreen')
+        : this.$t('videoCall.enterFullscreen')
     },
     modeClass() {
       if (this.isPreJoinModal) return 'video-call--modal'
@@ -925,6 +955,10 @@ export default {
         this.setPageBars(pageBars)
       },
     },
+    // Parked, left, or no longer on a desktop: the call leaves fullscreen with it.
+    showFullscreenButton(offered) {
+      if (!offered) this.exitFullscreen()
+    },
     autoHideBars: {
       immediate: true,
       handler(on) {
@@ -1014,6 +1048,8 @@ export default {
   },
   mounted() {
     this.isChromium = typeof navigator !== 'undefined' && !!navigator.userAgentData
+    this.canFullscreen = !!document.fullscreenEnabled
+    document.addEventListener('fullscreenchange', this.onFullscreenChange)
     this.observeStage()
   },
   updated() {
@@ -1025,6 +1061,8 @@ export default {
     this.measureControls()
   },
   beforeDestroy() {
+    document.removeEventListener('fullscreenchange', this.onFullscreenChange)
+    this.exitFullscreen()
     this.watchBarActivity(false)
     this.setPageBars('normal')
     this.disconnectStageObserver()
@@ -1045,6 +1083,25 @@ export default {
       setPageBars: 'videoCall/SET_PAGE_BARS',
       setShowChat: 'chat/SET_OPEN_CHAT',
     }),
+    // The whole page goes fullscreen, not the call alone: tooltips, menus and toasts are
+    // put at the end of the page, outside the call, and would not show otherwise. The
+    // page's header and footer are kept away meanwhile (pageBars).
+    async toggleFullscreen() {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen()
+        else await document.documentElement.requestFullscreen()
+      } catch {
+        // Refused by the browser (no user gesture, a policy): the call stays as it is.
+      }
+    },
+    exitFullscreen() {
+      if (typeof document === 'undefined' || !document.fullscreenElement) return
+      document.exitFullscreen().catch(() => {})
+    },
+    // Also when the browser ends it (Esc).
+    onFullscreenChange() {
+      this.inFullscreen = !!document.fullscreenElement
+    },
     watchBarActivity(on) {
       if (typeof document === 'undefined' || on === this.barsWatched) return
       this.barsWatched = on
@@ -2824,6 +2881,14 @@ export default {
   z-index: 4;
   backdrop-filter: blur(var(--video-call-bar-blur));
   transition: transform 0.3s ease;
+}
+
+/*  Fullscreen: the page's header and footer are away for good, so the call's own bars */
+/*  lie at the very top and bottom, and the chat beside the videos is as high as the */
+/*  screen. */
+.video-call--fullscreen {
+  --header-height: 0px;
+  --footer-height: 0px;
 }
 
 /*  Chromium draws the blur behind a bar sliding in this small window a step ahead of the */

@@ -2064,6 +2064,7 @@
     },
     "dialogLabel": "Telefonatë me video në grup",
     "enableAudio": "Aktivizo zërin",
+    "enterFullscreen": "Ekran i plotë",
     "errorBackToPrejoin": "Ndrysho cilësimet",
     "errorRetry": "Riprovo",
     "errors": {
@@ -2086,6 +2087,7 @@
         "noDevice": "Nuk ka ekran të disponueshëm për t'u ndarë."
       }
     },
+    "exitFullscreen": "Dil nga ekrani i plotë",
     "gotoGroup": "Shko te grupi „{name}“",
     "groupVideoCallButton": {
       "label": "Video grupi",
