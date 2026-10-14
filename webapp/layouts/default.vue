@@ -23,6 +23,7 @@
       <template v-if="showCallChatTabs">
         <room-header
           class="chat-modul__header"
+          compact
           :profile="callGroupProfile"
           :title="videoCallGroupName || ''"
           :to="callGroupRoute"
@@ -108,10 +109,10 @@ import { videoCallConfigQuery } from '~/graphql/VideoCalls'
 // Height of the tab row above the floating chat, in px. The chat is told, so it gives up
 // that much and the window does not grow under the page header. Kept in step with the
 // `.chat-modul__tabs` rule below.
-const CALL_CHAT_TABS_HEIGHT = 52
-// Height of the room header above those tabs, in px: RoomHeader's own, which is the base
-// avatar (44) with a small space (8) above and below.
-const CALL_CHAT_HEADER_HEIGHT = 60
+const CALL_CHAT_TABS_HEIGHT = 36
+// Height of the room header above those tabs, in px: RoomHeader's compact one, which is its
+// small avatar (28) with a small space (8) above and below.
+const CALL_CHAT_HEADER_HEIGHT = 44
 
 export default {
   components: {
@@ -334,12 +335,12 @@ export default {
 /*  latest messages visible — which is what the user interacts with. */
 /*  The tabs between the two chats of a running call, below the room's header. Their */
 /*  height is fixed, as the chat below is told how much room the two take */
-/*  (CALL_CHAT_TABS_HEIGHT; the header's is RoomHeader's own, CALL_CHAT_HEADER_HEIGHT). */
+/*  (CALL_CHAT_TABS_HEIGHT; the header's is RoomHeader's compact one, CALL_CHAT_HEADER_HEIGHT). */
 .chat-modul__tabs {
   display: flex;
   align-items: center;
   box-sizing: border-box;
-  height: 52px;
+  height: 36px;
   padding: 0 var(--space-small);
   background: var(--background-color-base);
   border-bottom: 1px solid var(--color-neutral-85);
