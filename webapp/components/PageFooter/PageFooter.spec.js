@@ -46,6 +46,16 @@ describe('PageFooter.vue', () => {
       })
     })
 
+    describe('height', () => {
+      it('tells the page its exact height, fractions included', async () => {
+        jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ height: 42.4 })
+        wrapper = Wrapper()
+        await wrapper.vm.$nextTick()
+        expect(document.documentElement.style.getPropertyValue('--footer-height')).toBe('42.4px')
+        HTMLElement.prototype.getBoundingClientRect.mockRestore()
+      })
+    })
+
     describe('inflexible links', () => {
       beforeEach(() => {
         wrapper = Wrapper()
