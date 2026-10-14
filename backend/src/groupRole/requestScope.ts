@@ -48,7 +48,10 @@ export interface GroupAuthorization {
   hasRoleDefinition: boolean
   /** Whether the viewer asked to act with their network rights here, and the ask still stands. */
   elevated: boolean
-  /** Whether such an ask would grant anything beyond reading (./elevation.ts). */
+  /**
+   * Whether such an ask would grant anything the viewer does not hold yet — a right, or the
+   * standing above every member (`outranksMembers`) — see ./elevation.ts.
+   */
   mayElevate: boolean
   /**
    * Whether the viewer's network rights ADMINISTER groups of this visibility — what an elevation
@@ -274,11 +277,13 @@ export function createGroupAuthorizationScope({
       /** Whether the viewer has asked to act with their network rights in this group. */
       elevated,
       /**
-       * Whether asking would give them anything they do not already hold HERE. An owner holds
-       * the whole catalog through their membership, so the network right adds nothing and the
-       * offer would be noise; a moderator who is not a member sees it.
+       * Whether asking would give them anything they do not already hold HERE: a right, or the
+       * standing above every member. An owner holds the whole catalog through their membership,
+       * but among owners they are a peer — an administering network right is what lets them act
+       * on a co-owner, and that only counts once asked for (#10481). An owner whose network
+       * rights do not administer gains nothing, so they are offered nothing.
        */
-      mayElevate: !elevated && elevationWouldAdd(effectiveWithEscape),
+      mayElevate: !elevated && (administers || elevationWouldAdd(effectiveWithEscape)),
       administersByNetwork: administers,
       outranksMembers: elevated && administers,
       callDoor,

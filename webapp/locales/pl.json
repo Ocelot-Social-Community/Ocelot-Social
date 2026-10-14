@@ -1067,6 +1067,7 @@
       "activeUntil": "Kończy się o {time} albo kiedy go zakończysz.",
       "end": "Zakończ dostęp administratora",
       "offerBody": "Dodatkowo masz uprawnienia sieciowe do tej grupy. Czytanie jej treści i wszelkie zmiany wymagają tego potwierdzenia, które zostaje odnotowane przy grupie.",
+      "offerBodyOwner": "Twoje uprawnienia sieciowe pozwalają też obniżyć rolę lub usunąć innych właścicieli tej grupy. Wymaga to tego potwierdzenia, które zostaje odnotowane przy grupie.",
       "reasonPlaceholder": "O co chodzi?",
       "start": "Użyj dostępu administratora"
     },

@@ -1067,6 +1067,7 @@
       "activeUntil": "Er endet um {time} oder wenn du ihn beendest.",
       "end": "Administratorzugriff beenden",
       "offerBody": "Zusätzlich hältst du Netzwerkrechte über sie. Ihre Inhalte zu lesen oder etwas zu ändern braucht diese Bestätigung, und sie wird bei der Gruppe vermerkt.",
+      "offerBodyOwner": "Über deine Netzwerkrechte kannst du auch die anderen Inhaber dieser Gruppe zurückstufen oder entfernen. Das braucht diese Bestätigung, und sie wird bei der Gruppe vermerkt.",
       "reasonPlaceholder": "Worum geht es?",
       "start": "Administratorzugriff nutzen"
     },

@@ -1067,6 +1067,7 @@
       "activeUntil": "Hij eindigt om {time}, of wanneer je hem beëindigt.",
       "end": "Beheerderstoegang beëindigen",
       "offerBody": "Daarnaast heb je netwerkrechten over de groep. De inhoud lezen of iets wijzigen vraagt om deze bevestiging, en die wordt bij de groep vastgelegd.",
+      "offerBodyOwner": "Met je netwerkrechten kun je ook de andere eigenaren van deze groep terugzetten of verwijderen. Dat vraagt om deze bevestiging, en die wordt bij de groep vastgelegd.",
       "reasonPlaceholder": "Waar gaat het om?",
       "start": "Beheerderstoegang gebruiken"
     },

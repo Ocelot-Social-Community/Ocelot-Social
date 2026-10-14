@@ -255,25 +255,49 @@ describe(createGroupAuthorizationScope, () => {
       expect(authorization?.outranksMembers).toBe(false)
     })
 
-    it('offers nothing to somebody whose membership already grants it all', async () => {
-      // An owner holds the whole catalog through their membership, so picking the network
-      // right up would add nothing — and an offer that changes nothing is noise.
+    const asOwner = { visibility: 'closed', roleName: 'owner', name: 'owner', protected: true }
+
+    it('offers an owner who administers by network the standing over their co-owners', async () => {
+      // An owner holds the whole catalog through their membership, yet among owners they are a
+      // peer: only an elevation that rests on administering puts them above a co-owner (#10481).
       const { scope } = scopeFor(
-        {
-          group: {
-            visibility: 'closed',
-            roleName: 'owner',
-            name: 'owner',
-            protected: true,
-            permissions: '[]',
-          },
-        },
+        { group: { ...asOwner, permissions: '[]' } },
         { network: ['group.administer.any_closed'] },
       )
       const authorization = await scope.forGroup('g1')
 
       expect(authorization?.has('group.settings.manage')).toBe(true)
+      expect(authorization?.mayElevate).toBe(true)
+      expect(authorization?.outranksMembers).toBe(false)
+    })
+
+    it('puts that owner above their co-owners once they asked', async () => {
+      const { scope } = scopeFor(
+        { group: { ...asOwner, permissions: '[]', elevated: true } },
+        { network: ['group.administer.any_closed'] },
+      )
+      const authorization = await scope.forGroup('g1')
+
       expect(authorization?.mayElevate).toBe(false)
+      expect(authorization?.outranksMembers).toBe(true)
+    })
+
+    it('offers nothing to an owner whose network rights do not administer', async () => {
+      // Moderating by network adds no right an owner lacks and no standing: an offer that
+      // changes nothing is noise.
+      const { scope } = scopeFor(
+        { group: { ...asOwner, permissions: '[]' } },
+        { network: ['group.moderate.any_closed'] },
+      )
+      const authorization = await scope.forGroup('g1')
+
+      expect(authorization?.mayElevate).toBe(false)
+    })
+
+    it('offers nothing to an owner without network rights', async () => {
+      const { scope } = scopeFor({ group: { ...asOwner, permissions: '[]' } })
+
+      expect((await scope.forGroup('g1'))?.mayElevate).toBe(false)
     })
 
     it('hands the folded rights over once the viewer has picked them up', async () => {

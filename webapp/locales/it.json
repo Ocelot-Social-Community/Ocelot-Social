@@ -1067,6 +1067,7 @@
       "activeUntil": "Termina alle {time}, o quando lo chiudi tu.",
       "end": "Termina l'accesso da amministratore",
       "offerBody": "In più hai diritti di rete su di esso. Per leggerne i contenuti o modificare qualcosa serve questa conferma, che resta registrata presso il gruppo.",
+      "offerBodyOwner": "I tuoi diritti di rete ti permettono anche di declassare o rimuovere gli altri proprietari di questo gruppo. Per farlo serve questa conferma, che resta registrata presso il gruppo.",
       "reasonPlaceholder": "Di cosa si tratta?",
       "start": "Usa l'accesso da amministratore"
     },

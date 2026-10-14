@@ -1067,6 +1067,7 @@
       "activeUntil": "Termina às {time}, ou quando o encerrares.",
       "end": "Encerrar o acesso de administrador",
       "offerBody": "Além disso tens direitos de rede sobre ele. Ler o seu conteúdo ou alterar algo pede esta confirmação, que fica registada junto do grupo.",
+      "offerBodyOwner": "Os teus direitos de rede também te permitem despromover ou remover os outros proprietários deste grupo. Isso pede esta confirmação, que fica registada junto do grupo.",
       "reasonPlaceholder": "Do que se trata?",
       "start": "Usar acesso de administrador"
     },
