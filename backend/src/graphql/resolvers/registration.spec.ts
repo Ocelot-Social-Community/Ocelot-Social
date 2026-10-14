@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect, vi } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import Signup from '@graphql/queries/auth/Signup.gql'
@@ -26,6 +26,9 @@ const SignupVerificationWithExtras = `
     $locale: String
     $inviteCode: String
     $locationName: String
+    $locationId: ID
+    $lat: Float
+    $lng: Float
   ) {
     SignupVerification(
       email: $email
@@ -36,6 +39,9 @@ const SignupVerificationWithExtras = `
       locale: $locale
       inviteCode: $inviteCode
       locationName: $locationName
+      locationId: $locationId
+      lat: $lat
+      lng: $lng
     ) {
       id
     }
@@ -277,7 +283,7 @@ describe('SignupVerification', () => {
           })
 
           // The signup form submits an empty string for a location the user did not fill in, and
-          // that is NOT a location named "". createOrUpdateLocations distinguishes the two by
+          // that is NOT a location named "". resolveLocationInput distinguishes the two by
           // reference: `undefined` means "leave it alone", `null` means "clear it", and only ''
           // arrives from the client — so without the normalisation every signup without a
           // location would forward '' to Mapbox and fail as an invalid locationName.
@@ -299,6 +305,92 @@ describe('SignupVerification', () => {
             })
 
             expect(records[0].get('locations').toNumber()).toBe(0)
+          })
+
+          // #7018, #7239: the place picked on the last slide, as the network stores it.
+          describe('with a location', () => {
+            const feature = (attributes: Record<string, unknown>) => ({
+              text_en: 'Switzerland',
+              text_de: 'Schweiz',
+              text_fr: 'Suisse',
+              text_nl: 'Zwitserland',
+              text_it: 'Svizzera',
+              text_es: 'Suiza',
+              text_pt: 'Suíça',
+              text_pl: 'Szwajcaria',
+              text_ru: 'Швейцария',
+              text_sq: 'Zvicra',
+              ...attributes,
+            })
+            // What Mapbox answers for the text "Schweiz" searched in several languages: Schweizer-
+            // Reneke first, Switzerland under its English name — the name the page showed is in
+            // none of them.
+            const schweizSearch = {
+              features: [
+                feature({
+                  id: 'place.98142462',
+                  place_name: 'Schweizer-Reneke, North West, South Africa',
+                  place_type: ['place'],
+                }),
+                feature({ id: 'country.8738', place_name: 'Switzerland', place_type: ['country'] }),
+              ],
+            }
+            const switzerland = {
+              features: [
+                feature({ id: 'country.8738', place_name: 'Switzerland', place_type: ['country'] }),
+              ],
+            }
+
+            let fetchSpy: ReturnType<typeof vi.spyOn>
+
+            afterEach(() => {
+              fetchSpy.mockRestore()
+            })
+
+            const located = async () => {
+              const { records } = await database.query({
+                query: `MATCH (user:User)-[:IS_IN]->(location:Location) RETURN location.id AS id`,
+              })
+              return records.map((record) => record.get('id') as string)
+            }
+
+            it('stores the place picked by its Mapbox id, whatever language it was shown in', async () => {
+              fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+                json: async () => Promise.resolve(switzerland),
+              } as unknown as Response)
+
+              const { errors } = await mutate({
+                mutation: SignupVerificationWithExtras,
+                variables: {
+                  ...variables,
+                  locationName: 'Schweiz',
+                  locationId: 'country.8738',
+                  lat: 46.8,
+                  lng: 8.2,
+                },
+              })
+
+              expect(errors).toBeUndefined()
+              expect(await located()).toEqual(['country.8738'])
+            })
+
+            // It used to store Schweizer-Reneke and create the account.
+            it('refuses a name it cannot match exactly, before creating the account', async () => {
+              fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+                json: async () => Promise.resolve(schweizSearch),
+              } as unknown as Response)
+
+              const { errors } = await mutate({
+                mutation: SignupVerificationWithExtras,
+                variables: { ...variables, locationName: 'Schweiz' },
+              })
+
+              expect(errors?.[0].extensions?.errorCode).toBe('LOCATION_NAME_NO_EXACT_MATCH')
+
+              const { records } = await database.query({ query: 'MATCH (user:User) RETURN user' })
+
+              expect(records).toHaveLength(0)
+            })
           })
 
           // A GROUP invite code on signup: the invited account has to end up IN the group, as a
