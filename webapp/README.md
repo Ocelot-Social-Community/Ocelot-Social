@@ -50,9 +50,10 @@ $ npm run dev
 ### Build for Production
 
 ```bash
-# build for production and launch server
-$ npm run build
-$ npm run start
+# build for production and launch server — NODE_ENV=production is what turns on the production
+# settings of nuxt.config.js (the CSS as cacheable files, the modern build); the Docker image sets it
+$ NODE_ENV=production npm run build
+$ NODE_ENV=production npm run start
 ```
 
 ### Run tests
