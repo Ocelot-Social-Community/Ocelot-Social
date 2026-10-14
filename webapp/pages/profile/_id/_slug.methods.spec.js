@@ -274,6 +274,15 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
     )
   })
 
+  describe('avatarUploaded', () => {
+    it('puts the new avatar into the logged-in user of the store, for the avatar menu', () => {
+      const avatar = { url: '/uploads/new.jpg' }
+      const ctx = { setCurrentUserPartial: jest.fn() }
+      methods.avatarUploaded.call(ctx, { UpdateUser: { id: 'u1', name: 'Peter', avatar } })
+      expect(ctx.setCurrentUserPartial).toHaveBeenCalledWith({ avatar })
+    })
+  })
+
   describe('onFollowHover', () => {
     it('sets followHovered=true when not loading', () => {
       const ctx = { followLoading: false, followHovered: false }

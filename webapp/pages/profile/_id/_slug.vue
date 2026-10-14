@@ -7,7 +7,12 @@
           :class="{ 'disabled-content': user.disabled }"
           style="position: relative; height: auto; overflow: visible"
         >
-          <avatar-uploader v-if="myProfile" :profile="user" :updateMutation="updateUserMutation">
+          <avatar-uploader
+            v-if="myProfile"
+            :profile="user"
+            :updateMutation="updateUserMutation"
+            @uploaded="avatarUploaded"
+          >
             <avatar-image :profile="user" class="profile-page-avatar" size="large" />
           </avatar-uploader>
           <avatar-image v-else :profile="user" class="profile-page-avatar" size="large" />
@@ -500,7 +505,13 @@ export default {
   methods: {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
+      setCurrentUserPartial: 'auth/SET_USER_PARTIAL',
     }),
+    // The header's avatar menu shows the logged-in user from the store, not from Apollo's cache,
+    // which the upload updates on its own (#5585).
+    avatarUploaded({ UpdateUser: { avatar } }) {
+      this.setCurrentUserPartial({ avatar })
+    },
     handleRoomUpdated(room) {
       if (!room || !room.id) return
       if (this.chatRoom && this.chatRoom.id === room.id) {
