@@ -587,19 +587,62 @@ describe('VideoCall', () => {
   })
 
   describe('button labels and tooltips', () => {
-    it('names each control after its current effect', () => {
+    it('names on each control what it is about, whatever its state', () => {
       const { wrapper } = factory({ show: true, groupId: 'g1' })
+      const labels = () => [
+        wrapper.vm.micLabel,
+        wrapper.vm.cameraLabel,
+        wrapper.vm.screenShareLabel,
+        wrapper.vm.chatLabel,
+        wrapper.vm.leaveLabel,
+      ]
+      const expected = [
+        'videoCall.controls.microphone',
+        'videoCall.controls.camera',
+        'videoCall.controls.screen',
+        'videoCall.controls.chat',
+        'videoCall.controls.leave',
+      ]
       wrapper.setData({ micEnabled: true, cameraEnabled: true, screenShareEnabled: false })
-      expect(wrapper.vm.micLabel).toBe('videoCall.muteMic')
-      expect(wrapper.vm.cameraLabel).toBe('videoCall.disableCamera')
-      expect(wrapper.vm.screenShareLabel).toBe('videoCall.startScreenShare')
-      expect(wrapper.vm.chatLabel).toBe('videoCall.openChat')
-      expect(wrapper.vm.leaveLabel).toBe('videoCall.leave')
-
+      expect(labels()).toEqual(expected)
       wrapper.setData({ micEnabled: false, cameraEnabled: false, screenShareEnabled: true })
-      expect(wrapper.vm.micLabel).toBe('videoCall.unmuteMic')
-      expect(wrapper.vm.cameraLabel).toBe('videoCall.enableCamera')
-      expect(wrapper.vm.screenShareLabel).toBe('videoCall.stopScreenShare')
+      expect(labels()).toEqual(expected)
+    })
+
+    it('says what a click does, for which device', async () => {
+      const { wrapper } = factory({ show: true, groupId: 'g1' })
+      await wrapper.setData({
+        knownDevices: [
+          { kind: 'audioinput', deviceId: 'mic-1', label: 'Headset' },
+          { kind: 'videoinput', deviceId: 'cam-1', label: 'Webcam' },
+        ],
+        micEnabled: true,
+        cameraEnabled: false,
+      })
+      expect(wrapper.vm.micAction).toBe('videoCall.controls.turnOff:{"device":"Headset"}')
+      expect(wrapper.vm.cameraAction).toBe('videoCall.controls.turnOn:{"device":"Webcam"}')
+    })
+
+    it('names the kind of device where the browser has not named it', () => {
+      const { wrapper } = factory({ show: true, groupId: 'g1' })
+      wrapper.setData({ micEnabled: false })
+      expect(wrapper.vm.micAction).toBe(
+        'videoCall.controls.turnOn:{"device":"videoCall.controls.microphone"}',
+      )
+    })
+
+    it('says what is shared when offering to stop', async () => {
+      const { wrapper } = factory({ show: true, groupId: 'g1' })
+      expect(wrapper.vm.screenShareAction).toBe('videoCall.controls.startSharing')
+      await wrapper.setData({ screenShareEnabled: true, screenShareSurface: 'window' })
+      expect(wrapper.vm.screenShareAction).toBe(
+        'videoCall.controls.stopSharing:{"surface":"videoCall.controls.surface.window"}',
+      )
+      // The browser did not tell: the screen.
+      await wrapper.setData({ screenShareSurface: null })
+      expect(wrapper.vm.screenShareAction).toBe(
+        'videoCall.controls.stopSharing:{"surface":"videoCall.controls.surface.monitor"}',
+      )
     })
 
     it('labels the header buttons by call state', () => {
@@ -614,25 +657,35 @@ describe('VideoCall', () => {
       expect(open.wrapper.vm.closeLabel).toBe('videoCall.prejoin.cancel')
     })
 
-    it('shows the chat button as closing while that chat is open', () => {
+    it('offers to close the chat while that chat is open', () => {
       const { wrapper } = factory({
         show: true,
         groupId: 'g1',
         chat: { showChat: true, chatUserId: null, groupId: 'g1' },
       })
-      expect(wrapper.vm.chatLabel).toBe('videoCall.closeChat')
+      expect(wrapper.vm.chatAction).toBe('videoCall.closeChat')
+      expect(wrapper.vm.leaveAction).toBe('videoCall.leave')
     })
 
-    it('tooltips only the buttons that lost their caption', () => {
+    it('tooltips every control with what a click does, as plain text', () => {
+      const { wrapper } = factory({ show: true, minimized: false })
+      wrapper.setData({ phase: 'in-call' })
+      expect(wrapper.vm.controlTooltip('<b>Headset</b>: turn off')).toEqual({
+        content: '<b>Headset</b>: turn off',
+        html: false,
+      })
+    })
+
+    it("tooltips only the device settings button's caption once it is gone", () => {
       const { wrapper } = factory({ show: true, minimized: true })
       wrapper.setData({ phase: 'in-call' })
       expect(wrapper.vm.iconOnly).toBe(true)
-      expect(wrapper.vm.iconOnlyTooltip('Mute')).toBe('Mute')
+      expect(wrapper.vm.iconOnlyTooltip('Devices')).toBe('Devices')
 
       const open = factory({ show: true, minimized: false })
       open.wrapper.setData({ phase: 'in-call' })
       // Caption is right there next to the icon — a tooltip would just repeat it.
-      expect(open.wrapper.vm.iconOnlyTooltip('Mute')).toBe('')
+      expect(open.wrapper.vm.iconOnlyTooltip('Devices')).toBe('')
     })
   })
 
@@ -2346,16 +2399,16 @@ describe('VideoCall', () => {
         const { wrapper } = await connected()
         const button = (label) =>
           wrapper.findAll('.stub-button').wrappers.find((b) => b.attributes('aria-label') === label)
-        expect(button('videoCall.muteMic').attributes('loading')).toBeUndefined()
-        expect(button('videoCall.disableCamera').attributes('loading')).toBeUndefined()
+        expect(button(wrapper.vm.micAction).attributes('loading')).toBeUndefined()
+        expect(button(wrapper.vm.cameraAction).attributes('loading')).toBeUndefined()
 
         await starting(wrapper, { videoinput: 1 })
-        expect(button('videoCall.disableCamera').attributes('loading')).toBe('true')
-        expect(button('videoCall.muteMic').attributes('loading')).toBeUndefined()
+        expect(button(wrapper.vm.cameraAction).attributes('loading')).toBe('true')
+        expect(button(wrapper.vm.micAction).attributes('loading')).toBeUndefined()
 
         await starting(wrapper, { audioinput: 1 })
-        expect(button('videoCall.muteMic').attributes('loading')).toBe('true')
-        expect(button('videoCall.disableCamera').attributes('loading')).toBeUndefined()
+        expect(button(wrapper.vm.micAction).attributes('loading')).toBe('true')
+        expect(button(wrapper.vm.cameraAction).attributes('loading')).toBeUndefined()
       })
 
       it('shows it in the device settings', async () => {
@@ -3283,6 +3336,7 @@ describe('VideoCall', () => {
       const phone = { parked: false, isMobile: true, phase: 'in-call' }
       expect(computed.iconOnly.call(phone)).toBe(true)
       expect(VideoCall.methods.iconOnlyTooltip.call(phone, 'Mute')).toBe('')
+      expect(VideoCall.methods.controlTooltip.call(phone, 'Headset: turn off')).toBe('')
     })
 
     it('drops the labels in the parked window, and offers them as tooltips', () => {

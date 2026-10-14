@@ -2041,15 +2041,29 @@
     "connecting": "Łączenie…",
     "connectionLost": "Utracono połączenie: {name}",
     "connectionPoor": "Słabe połączenie: {name}",
+    "controls": {
+      "camera": "Kamera",
+      "chat": "Czat",
+      "leave": "Rozłącz",
+      "microphone": "Mikrofon",
+      "screen": "Ekran",
+      "startSharing": "Udostępnij ekran, okno lub kartę",
+      "stopSharing": "{surface}: przestań udostępniać",
+      "surface": {
+        "browser": "Karta",
+        "monitor": "Ekran",
+        "window": "Okno"
+      },
+      "turnOff": "{device}: wyłącz",
+      "turnOn": "{device}: włącz"
+    },
     "deviceSettings": {
       "button": "Urządzenia",
       "speakerError": "Nie udało się przełączyć głośnika.",
       "title": "Ustawienia urządzeń"
     },
     "dialogLabel": "Rozmowa wideo grupowa",
-    "disableCamera": "Wyłącz kamerę",
     "enableAudio": "Włącz dźwięk",
-    "enableCamera": "Włącz kamerę",
     "errorBackToPrejoin": "Zmień ustawienia",
     "errorRetry": "Spróbuj ponownie",
     "errors": {
@@ -2083,7 +2097,6 @@
     "micNoSignal": "Twój mikrofon nie przesyła dźwięku — inni cię nie słyszą.",
     "micUnmuted": "Mikrofon włączony",
     "minimize": "Minimalizuj",
-    "muteMic": "Wycisz mikrofon",
     "openChat": "Otwórz czat",
     "participants": "Uczestnicy",
     "prejoin": {
@@ -2133,10 +2146,7 @@
     "screenShareEnded": "Zakończono udostępnianie ekranu",
     "showVideos": "Pokaż wideo",
     "spotlightExit": "Wyjdź z trybu spotlight",
-    "startScreenShare": "Udostępnij ekran",
-    "stopScreenShare": "Zakończ udostępnianie",
     "title": "Rozmowa wideo grupowa",
-    "unmuteMic": "Włącz mikrofon",
     "you": "ty",
     "youAreSharingScreen": "Udostępniasz swój ekran"
   }

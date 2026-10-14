@@ -2041,15 +2041,29 @@
     "connecting": "Conectando…",
     "connectionLost": "Conexão perdida: {name}",
     "connectionPoor": "Conexão fraca: {name}",
+    "controls": {
+      "camera": "Câmera",
+      "chat": "Chat",
+      "leave": "Desligar",
+      "microphone": "Microfone",
+      "screen": "Tela",
+      "startSharing": "Compartilhar a tela, uma janela ou uma aba",
+      "stopSharing": "{surface}: parar de compartilhar",
+      "surface": {
+        "browser": "Aba",
+        "monitor": "Tela",
+        "window": "Janela"
+      },
+      "turnOff": "{device}: desligar",
+      "turnOn": "{device}: ligar"
+    },
     "deviceSettings": {
       "button": "Dispositivos",
       "speakerError": "Não foi possível trocar o alto-falante.",
       "title": "Configurações dos dispositivos"
     },
     "dialogLabel": "Videochamada de grupo",
-    "disableCamera": "Desligar a câmera",
     "enableAudio": "Ativar som",
-    "enableCamera": "Ligar a câmera",
     "errorBackToPrejoin": "Alterar configurações",
     "errorRetry": "Tentar novamente",
     "errors": {
@@ -2083,7 +2097,6 @@
     "micNoSignal": "Seu microfone não está transmitindo som — os outros não ouvem você.",
     "micUnmuted": "Microfone ligado",
     "minimize": "Minimizar",
-    "muteMic": "Silenciar microfone",
     "openChat": "Abrir chat",
     "participants": "Participantes",
     "prejoin": {
@@ -2133,10 +2146,7 @@
     "screenShareEnded": "Compartilhamento de tela encerrado",
     "showVideos": "Mostrar vídeos",
     "spotlightExit": "Sair do destaque",
-    "startScreenShare": "Compartilhar tela",
-    "stopScreenShare": "Parar compartilhamento",
     "title": "Videochamada de grupo",
-    "unmuteMic": "Reativar microfone",
     "you": "você",
     "youAreSharingScreen": "Você está compartilhando sua tela"
   }

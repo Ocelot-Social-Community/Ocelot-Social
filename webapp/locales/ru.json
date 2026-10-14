@@ -2041,15 +2041,29 @@
     "connecting": "Подключение…",
     "connectionLost": "Соединение потеряно: {name}",
     "connectionPoor": "Слабое соединение: {name}",
+    "controls": {
+      "camera": "Камера",
+      "chat": "Чат",
+      "leave": "Завершить",
+      "microphone": "Микрофон",
+      "screen": "Экран",
+      "startSharing": "Показать экран, окно или вкладку",
+      "stopSharing": "{surface}: прекратить показ",
+      "surface": {
+        "browser": "Вкладка",
+        "monitor": "Экран",
+        "window": "Окно"
+      },
+      "turnOff": "{device}: выключить",
+      "turnOn": "{device}: включить"
+    },
     "deviceSettings": {
       "button": "Устройства",
       "speakerError": "Не удалось переключить динамик.",
       "title": "Настройки устройств"
     },
     "dialogLabel": "Групповой видеозвонок",
-    "disableCamera": "Выключить камеру",
     "enableAudio": "Включить звук",
-    "enableCamera": "Включить камеру",
     "errorBackToPrejoin": "Изменить настройки",
     "errorRetry": "Повторить",
     "errors": {
@@ -2083,7 +2097,6 @@
     "micNoSignal": "Ваш микрофон не передаёт звук — другие вас не слышат.",
     "micUnmuted": "Микрофон включён",
     "minimize": "Свернуть",
-    "muteMic": "Выключить микрофон",
     "openChat": "Открыть чат",
     "participants": "Участники",
     "prejoin": {
@@ -2133,10 +2146,7 @@
     "screenShareEnded": "Показ экрана завершён",
     "showVideos": "Показать видео",
     "spotlightExit": "Выйти из режима спотлайта",
-    "startScreenShare": "Показать экран",
-    "stopScreenShare": "Прекратить показ",
     "title": "Групповой видеозвонок",
-    "unmuteMic": "Включить микрофон",
     "you": "вы",
     "youAreSharingScreen": "Вы показываете свой экран"
   }

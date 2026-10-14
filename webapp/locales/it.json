@@ -2041,15 +2041,29 @@
     "connecting": "Connessione in corso…",
     "connectionLost": "Connessione persa: {name}",
     "connectionPoor": "Connessione debole: {name}",
+    "controls": {
+      "camera": "Fotocamera",
+      "chat": "Chat",
+      "leave": "Riaggancia",
+      "microphone": "Microfono",
+      "screen": "Schermo",
+      "startSharing": "Condividi lo schermo, una finestra o una scheda",
+      "stopSharing": "{surface}: smetti di condividere",
+      "surface": {
+        "browser": "Scheda",
+        "monitor": "Schermo",
+        "window": "Finestra"
+      },
+      "turnOff": "{device}: disattiva",
+      "turnOn": "{device}: attiva"
+    },
     "deviceSettings": {
       "button": "Dispositivi",
       "speakerError": "Impossibile cambiare l'altoparlante.",
       "title": "Impostazioni dei dispositivi"
     },
     "dialogLabel": "Videochiamata di gruppo",
-    "disableCamera": "Disattiva la fotocamera",
     "enableAudio": "Attiva audio",
-    "enableCamera": "Attiva la fotocamera",
     "errorBackToPrejoin": "Modifica impostazioni",
     "errorRetry": "Riprova",
     "errors": {
@@ -2083,7 +2097,6 @@
     "micNoSignal": "Il tuo microfono non trasmette alcun suono: gli altri non ti sentono.",
     "micUnmuted": "Microfono acceso",
     "minimize": "Riduci",
-    "muteMic": "Disattiva microfono",
     "openChat": "Apri chat",
     "participants": "Partecipanti",
     "prejoin": {
@@ -2133,10 +2146,7 @@
     "screenShareEnded": "Condivisione schermo terminata",
     "showVideos": "Mostra video",
     "spotlightExit": "Esci dallo spotlight",
-    "startScreenShare": "Condividi schermo",
-    "stopScreenShare": "Interrompi condivisione",
     "title": "Videochiamata di gruppo",
-    "unmuteMic": "Riattiva microfono",
     "you": "tu",
     "youAreSharingScreen": "Stai condividendo il tuo schermo"
   }

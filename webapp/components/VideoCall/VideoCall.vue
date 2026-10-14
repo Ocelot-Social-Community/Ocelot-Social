@@ -259,12 +259,12 @@
       -->
       <div v-if="phase === 'in-call' && !error" class="video-call__controls">
         <os-button
-          v-tooltip="deviceTooltip(micLabel, [deviceNames.mic])"
+          v-tooltip="controlTooltip(micAction)"
           :variant="micEnabled ? 'default' : 'danger'"
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="micLabel"
+          :aria-label="micAction"
           :loading="devicesStarting.audioinput > 0"
           @click="toggleMic"
         >
@@ -276,12 +276,12 @@
           </template>
         </os-button>
         <os-button
-          v-tooltip="deviceTooltip(cameraLabel, [deviceNames.camera])"
+          v-tooltip="controlTooltip(cameraAction)"
           :variant="cameraEnabled ? 'default' : 'danger'"
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="cameraLabel"
+          :aria-label="cameraAction"
           :loading="devicesStarting.videoinput > 0"
           @click="toggleCamera"
         >
@@ -294,12 +294,12 @@
         </os-button>
         <os-button
           v-if="screenShareSupported"
-          v-tooltip="iconOnlyTooltip(screenShareLabel)"
+          v-tooltip="controlTooltip(screenShareAction)"
           :variant="screenShareEnabled ? 'primary' : 'default'"
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="screenShareLabel"
+          :aria-label="screenShareAction"
           @click="toggleScreenShare"
         >
           <template #icon>
@@ -348,12 +348,12 @@
           />
         </div>
         <os-button
-          v-tooltip="iconOnlyTooltip(chatLabel)"
+          v-tooltip="controlTooltip(chatAction)"
           :variant="chatOpenForThisCall ? 'primary' : 'default'"
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="chatLabel"
+          :aria-label="chatAction"
           @click="toggleChat"
         >
           <template #icon>
@@ -364,13 +364,13 @@
           </template>
         </os-button>
         <os-button
-          v-tooltip="iconOnlyTooltip(leaveLabel)"
+          v-tooltip="controlTooltip(leaveAction)"
           variant="danger"
           appearance="filled"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           class="video-call__leave"
-          :aria-label="leaveLabel"
+          :aria-label="leaveAction"
           @click="leave"
         >
           <template #icon>
@@ -489,6 +489,8 @@ export default {
       micEnabled: true,
       cameraEnabled: true,
       screenShareEnabled: false,
+      // What is shared: 'monitor', 'window' or 'browser' (a tab), as the browser says.
+      screenShareSurface: null,
       error: null,
       cameraDeviceId: null,
       micDeviceId: null,
@@ -607,18 +609,38 @@ export default {
       const group = this.activeChatTab === 'group' ? 0 : this.groupChatUnread
       return call + group
     },
+    // The controls say on them what they are about; whether it is on, their icon and
+    // colour say. What a click does — for which device — the tooltip and a screen reader
+    // say (the …Action ones).
     micLabel() {
-      return this.micEnabled ? this.$t('videoCall.muteMic') : this.$t('videoCall.unmuteMic')
+      return this.$t('videoCall.controls.microphone')
+    },
+    micAction() {
+      return this.$t(`videoCall.controls.${this.micEnabled ? 'turnOff' : 'turnOn'}`, {
+        device: this.deviceNames.mic || this.micLabel,
+      })
     },
     cameraLabel() {
-      return this.cameraEnabled
-        ? this.$t('videoCall.disableCamera')
-        : this.$t('videoCall.enableCamera')
+      return this.$t('videoCall.controls.camera')
+    },
+    cameraAction() {
+      return this.$t(`videoCall.controls.${this.cameraEnabled ? 'turnOff' : 'turnOn'}`, {
+        device: this.deviceNames.camera || this.cameraLabel,
+      })
     },
     screenShareLabel() {
-      return this.screenShareEnabled
-        ? this.$t('videoCall.stopScreenShare')
-        : this.$t('videoCall.startScreenShare')
+      return this.$t('videoCall.controls.screen')
+    },
+    screenShareAction() {
+      if (!this.screenShareEnabled) return this.$t('videoCall.controls.startSharing')
+      // What is shared, as far as the browser tells: the screen, a window or a tab. Not
+      // their title — Chrome names them `window:12345:0`.
+      const surface = ['monitor', 'window', 'browser'].includes(this.screenShareSurface)
+        ? this.screenShareSurface
+        : 'monitor'
+      return this.$t('videoCall.controls.stopSharing', {
+        surface: this.$t(`videoCall.controls.surface.${surface}`),
+      })
     },
     deviceSettingsLabel() {
       return this.$t('videoCall.deviceSettings.button')
@@ -651,11 +673,17 @@ export default {
       return this.deviceTooltip(this.deviceSettingsLabel, details)
     },
     chatLabel() {
+      return this.$t('videoCall.controls.chat')
+    },
+    chatAction() {
       return this.chatOpenForThisCall
         ? this.$t('videoCall.closeChat')
         : this.$t('videoCall.openChat')
     },
     leaveLabel() {
+      return this.$t('videoCall.controls.leave')
+    },
+    leaveAction() {
       return this.$t('videoCall.leave')
     },
     minimizeLabel() {
@@ -1321,6 +1349,12 @@ export default {
       } catch (_e) {
         /* the buttons simply go without device names */
       }
+    },
+    // The tooltip of a control: what a click on it does. Plain text, as it may carry a
+    // device's name, which comes from outside. None on a phone (see iconOnlyTooltip).
+    controlTooltip(action) {
+      if (this.isMobile || !action) return ''
+      return { content: action, html: false }
     },
     iconOnlyTooltip(label) {
       // v-tooltip renders nothing for an empty string — exactly what we want
@@ -2120,8 +2154,13 @@ export default {
       if (!this.room || !this.screenShareSupported) return
       const next = !this.screenShareEnabled
       try {
-        await this.room.localParticipant.setScreenShareEnabled(next, { audio: true })
+        const publication = await this.room.localParticipant.setScreenShareEnabled(next, {
+          audio: true,
+        })
         this.screenShareEnabled = next
+        this.screenShareSurface = next
+          ? publication?.track?.mediaStreamTrack?.getSettings?.().displaySurface || null
+          : null
         this.refreshTiles()
       } catch (err) {
         this.screenShareEnabled = !!this.room.localParticipant.isScreenShareEnabled

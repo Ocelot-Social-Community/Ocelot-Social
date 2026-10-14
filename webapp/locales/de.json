@@ -2041,15 +2041,29 @@
     "connecting": "Verbinde…",
     "connectionLost": "Verbindung verloren: {name}",
     "connectionPoor": "Schwache Verbindung: {name}",
+    "controls": {
+      "camera": "Kamera",
+      "chat": "Chat",
+      "leave": "Auflegen",
+      "microphone": "Mikrofon",
+      "screen": "Bildschirm",
+      "startSharing": "Bildschirm, Fenster oder Tab teilen",
+      "stopSharing": "{surface}: nicht mehr teilen",
+      "surface": {
+        "browser": "Tab",
+        "monitor": "Bildschirm",
+        "window": "Fenster"
+      },
+      "turnOff": "{device}: ausschalten",
+      "turnOn": "{device}: einschalten"
+    },
     "deviceSettings": {
       "button": "Geräte",
       "speakerError": "Der Lautsprecher konnte nicht gewechselt werden.",
       "title": "Geräte-Einstellungen"
     },
     "dialogLabel": "Gruppen-Videoanruf",
-    "disableCamera": "Kamera ausschalten",
     "enableAudio": "Ton aktivieren",
-    "enableCamera": "Kamera einschalten",
     "errorBackToPrejoin": "Einstellungen ändern",
     "errorRetry": "Erneut versuchen",
     "errors": {
@@ -2083,7 +2097,6 @@
     "micNoSignal": "Dein Mikrofon liefert keinen Ton – die anderen hören dich nicht.",
     "micUnmuted": "Mikrofon an",
     "minimize": "Minimieren",
-    "muteMic": "Mikrofon stummschalten",
     "openChat": "Chat öffnen",
     "participants": "Teilnehmer",
     "prejoin": {
@@ -2133,10 +2146,7 @@
     "screenShareEnded": "Bildschirmfreigabe beendet",
     "showVideos": "Videos anzeigen",
     "spotlightExit": "Spotlight beenden",
-    "startScreenShare": "Bildschirm teilen",
-    "stopScreenShare": "Teilen beenden",
     "title": "Gruppen-Videoanruf",
-    "unmuteMic": "Stummschaltung aufheben",
     "you": "du",
     "youAreSharingScreen": "Du teilst gerade Deinen Bildschirm"
   }
