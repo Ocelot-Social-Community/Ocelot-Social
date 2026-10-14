@@ -606,7 +606,14 @@ describe('ContributionForm.vue', () => {
               .findComponent({ name: 'DatePicker' })
               .vm.$emit('change', new Date(now.getFullYear(), now.getMonth() + 1).toISOString())
             wrapper.find('input[name="eventVenue"]').setValue('Ellis Kinderzimmer')
-            wrapper.vm.updateFormField('eventLocationName', 'Deutschland')
+            // Picked from the search results: a name with the coordinates it was picked with.
+            wrapper.vm.updateFormField('eventLocationName', {
+              label: 'Deutschland',
+              value: 'Deutschland',
+              id: 'country.de',
+              lat: 51.165691,
+              lng: 10.451526,
+            })
           })
 
           it('has submit button not disabled', () => {
@@ -630,34 +637,29 @@ describe('ContributionForm.vue', () => {
                     eventLocationName: 'Deutschland',
                     eventIsOnline: false,
                     eventEnd: null,
-                    lat: null,
-                    lng: null,
+                    lat: 51.165691,
+                    lng: 10.451526,
                   },
                 }),
               })
             })
           })
 
-          describe('submit with LocationSelect object payload', () => {
+          // #7239: typed text was searched by the server, and Mapbox's top result stored — "7112
+          // Duvin" became a road in Ohio. The place has to be picked.
+          describe.each([
+            ['typed text', 'Deutschland'],
+            ['a result without coordinates', { value: 'Deutschland, Germany', id: 'place.abc123' }],
+          ])('a location that was not picked (%s)', (_what, value) => {
             beforeEach(async () => {
-              wrapper.vm.updateFormField('eventLocationName', {
-                label: 'Deutschland, Germany',
-                value: 'Deutschland, Germany',
-                id: 'place.abc123',
-              })
+              wrapper.vm.updateFormField('eventLocationName', value)
               await wrapper.find('form').trigger('submit')
               await wrapper.vm.$nextTick()
             })
 
-            it('extracts the value string from the location object', () => {
-              expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
-                mutation: PostMutations().CreatePost,
-                variables: expect.objectContaining({
-                  eventInput: expect.objectContaining({
-                    eventLocationName: 'Deutschland, Germany',
-                  }),
-                }),
-              })
+            it('is not submitted, and says why', () => {
+              expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+              expect(wrapper.vm.visibleErrors.eventLocationName).toBeTruthy()
             })
           })
 

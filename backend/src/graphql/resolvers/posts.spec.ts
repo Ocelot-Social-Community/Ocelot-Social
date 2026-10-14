@@ -1082,38 +1082,26 @@ describe('CreatePost', () => {
         })
       })
 
-      describe('valid event input with location name', () => {
-        it('has label "Event" set', async () => {
+      // #7239: a name without the coordinates it was picked with was typed, not picked. Searched
+      // as text, Mapbox's top result was stored — "7112 Duvin" became a road in Ohio.
+      describe('event input with a location name that was not picked', () => {
+        it('is refused', async () => {
           const now = new Date()
 
-          await expect(
-            mutate({
-              mutation: CreatePost,
-              variables: {
-                ...variables,
-                postType: 'Event',
-                eventInput: {
-                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
-                  eventLocationName: 'Leipzig',
-                  eventVenue: 'Connewitzer Kreuz',
-                },
-              },
-            }),
-          ).resolves.toMatchObject({
-            data: {
-              CreatePost: {
-                postType: ['Event'],
+          const { errors } = await mutate({
+            mutation: CreatePost,
+            variables: {
+              ...variables,
+              postType: 'Event',
+              eventInput: {
                 eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
                 eventLocationName: 'Leipzig',
                 eventVenue: 'Connewitzer Kreuz',
-                eventLocation: {
-                  lng: 12.375101,
-                  lat: 51.34083,
-                },
               },
             },
-            errors: undefined,
           })
+
+          expect(errors?.[0].extensions?.errorCode).toBe('POST_EVENT_LOCATION_NOT_PICKED')
         })
       })
 
@@ -1446,38 +1434,26 @@ describe('UpdatePost', () => {
         })
       })
 
-      describe('valid event input with location name', () => {
-        it('has label "Event" set', async () => {
+      // #7239: a name without the coordinates it was picked with was typed, not picked. Searched
+      // as text, Mapbox's top result was stored — "7112 Duvin" became a road in Ohio.
+      describe('event input with a location name that was not picked', () => {
+        it('is refused', async () => {
           const now = new Date()
 
-          await expect(
-            mutate({
-              mutation: UpdatePost,
-              variables: {
-                ...variables,
-                postType: 'Event',
-                eventInput: {
-                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
-                  eventLocationName: 'Leipzig',
-                  eventVenue: 'Connewitzer Kreuz',
-                },
-              },
-            }),
-          ).resolves.toMatchObject({
-            data: {
-              UpdatePost: {
-                postType: ['Event'],
+          const { errors } = await mutate({
+            mutation: UpdatePost,
+            variables: {
+              ...variables,
+              postType: 'Event',
+              eventInput: {
                 eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
                 eventLocationName: 'Leipzig',
                 eventVenue: 'Connewitzer Kreuz',
-                eventLocation: {
-                  lng: 12.375101,
-                  lat: 51.34083,
-                },
               },
             },
-            errors: undefined,
           })
+
+          expect(errors?.[0].extensions?.errorCode).toBe('POST_EVENT_LOCATION_NOT_PICKED')
         })
       })
 
