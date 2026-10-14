@@ -147,3 +147,18 @@ export const WithIcon: Story = {
     `,
   }),
 }
+
+export const Count: Story = {
+  render: () => ({
+    components: { OsBadge },
+    template: `
+      <div data-testid="count" class="flex items-center gap-3">
+        <OsBadge variant="danger" :count="3" />
+        <OsBadge variant="danger" :count="42" />
+        <OsBadge variant="danger" :count="120" />
+        <OsBadge variant="primary" :count="7" />
+        <OsBadge size="md" variant="default" :count="5" />
+      </div>
+    `,
+  }),
+}
