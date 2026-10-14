@@ -262,9 +262,10 @@ export default {
                 RETURN count(DISTINCT targetOwner) AS isOwner, count(DISTINCT o) AS ownerCount`,
         variables: { userId },
       })
+      // Exactly one row, always: OPTIONAL MATCHes under an aggregation still return one.
       const row = guard.records[0]
-      const targetIsOwner = Number(row?.get('isOwner') ?? 0) > 0
-      const ownerCount = Number(row?.get('ownerCount') ?? 0)
+      const targetIsOwner = Number(row.get('isOwner')) > 0
+      const ownerCount = Number(row.get('ownerCount'))
 
       // Who may give whom which role — the owner role included — the shield has decided by
       // now (helpers/networkRoleAuthority.ts). What is left is the instance's own safety net.

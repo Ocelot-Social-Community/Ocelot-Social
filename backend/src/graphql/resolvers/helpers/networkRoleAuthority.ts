@@ -76,10 +76,8 @@ export const roleCreateRefusal = (
  * `User.outrankedByCurrentUser`.
  */
 export const roleOfferRefusal = (context: Context, roleName: string): NetworkRoleRefusal | null => {
-  const assignedPermissions = permissionsOfRole(context, roleName)
-  if (!assignedPermissions) {
-    return null
-  }
+  // Asked for the roles that exist only (the Role field), so no unknown-role case here.
+  const assignedPermissions = context.role.permissionsForRole(roleName)
   const actor = actorOf(context)
   if (roleName === OWNER_ROLE && actor.roleName !== OWNER_ROLE) {
     return 'ownerOnly'

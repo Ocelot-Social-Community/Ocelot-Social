@@ -278,6 +278,29 @@ describe('a moderator who may manage roles', () => {
   })
 })
 
+// role.manage stays the first question: without it, none of the rules below is even asked.
+describe('somebody without role.manage', () => {
+  beforeEach(async () => {
+    authenticatedUser = await (await user('plain', USER_ROLE)).toJson()
+  })
+
+  it('may give nobody a role, create a role or change one', async () => {
+    const assigned = await setUserRole('member', MODERATOR_ROLE)
+    const created = await mutate({
+      mutation: CREATE_ROLE,
+      variables: { name: 'deputy', permissions: [] },
+    })
+    const updated = await updateRole(USER_ROLE, rights(USER_ROLE))
+
+    for (const { errors } of [assigned, created, updated]) {
+      expect(errors?.[0]?.message).toBe('Not Authorized!')
+    }
+
+    expect(await roleOf('member')).toBe(USER_ROLE)
+    expect(roleService.getRole('deputy')).toBeUndefined()
+  })
+})
+
 describe('an admin', () => {
   beforeEach(async () => {
     authenticatedUser = await (
