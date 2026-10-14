@@ -1608,6 +1608,9 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           eventStart: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7).toISOString(),
           eventVenue: 'Ellis Kinderzimmer',
           eventLocationName: 'Deutschland',
+          // As a picked place carries them: an event's place is taken only with its coordinates.
+          lat: 51.165691,
+          lng: 10.451526,
         },
       },
     })
@@ -1623,6 +1626,9 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           eventStart: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString(),
           eventVenue: 'Schlossgarten',
           eventLocationName: 'Stuttgart',
+          // As a picked place carries them: an event's place is taken only with its coordinates.
+          lat: 48.786,
+          lng: 9.188,
         },
       },
     })
@@ -1639,6 +1645,9 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           eventEnd: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 4).toISOString(),
           eventVenue: 'Ferienlager',
           eventLocationName: 'Bahra, Sachsen',
+          // As a picked place carries them: an event's place is taken only with its coordinates.
+          lat: 50.873,
+          lng: 13.931,
         },
       },
     })
