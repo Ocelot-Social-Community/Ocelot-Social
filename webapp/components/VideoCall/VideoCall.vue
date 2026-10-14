@@ -2,7 +2,14 @@
   <div v-if="show" class="video-call-root">
     <div v-if="isPreJoinModal" class="video-call__backdrop" @click="leave" />
     <div
-      :class="['video-call', modeClass]"
+      :class="[
+        'video-call',
+        modeClass,
+        {
+          'video-call--bars-overlay': barsOverlay,
+          'video-call--bars-hidden': barsOverlay && barsHidden,
+        },
+      ]"
       role="dialog"
       :aria-modal="isPreJoinModal ? 'true' : null"
       :aria-label="$t('videoCall.dialogLabel')"
@@ -424,6 +431,14 @@ const MIC_SILENCE_RECHECKS = 5
 const MIC_SILENCE_RECHECK_MS = 400
 const STRONG_QUALITIES = ['excellent', 'good']
 
+// The call's header and control bar on a desktop with the call maximized, and the page's
+// header and footer with them: how long the mouse has to rest before they move out of the
+// way, and how close to the window's upper or lower edge it brings them back from the chat.
+const BARS_HIDE_MS = 4000
+const BARS_EDGE_PX = 50
+// What brings the bars back. Focus too, for whoever moves through the controls by keyboard.
+const BARS_ACTIVITY_EVENTS = ['mousemove', 'pointerdown', 'keydown', 'wheel', 'focusin']
+
 // Cameras publish 16:9, so the grid aims for cells of that shape: the closer a
 // cell matches, the less `object-fit: cover` has to crop off the sides.
 const TILE_ASPECT_RATIO = 16 / 9
@@ -438,6 +453,15 @@ const DEVICE_FIELDS = {
   videoinput: 'cameraDeviceId',
   audioinput: 'micDeviceId',
   audiooutput: 'speakerDeviceId',
+}
+
+// Element.matches() throws on a selector the browser does not know.
+const matchesSafely = (element, selector) => {
+  try {
+    return element.matches(selector)
+  } catch {
+    return false
+  }
 }
 
 export default {
@@ -500,6 +524,8 @@ export default {
       // The remote participant heard last. Whoever spoke stays on screen next to
       // the chat on a phone until somebody else speaks (see speakerTile).
       lastRemoteSpeakerId: null,
+      // The bars lying on the videos have moved out of the way (see barsOverlay).
+      barsHidden: false,
     }
   },
   computed: {
@@ -658,6 +684,22 @@ export default {
       if (this.isPreJoinModal) return false
       return this.isMobile || !this.minimized || this.phase !== 'in-call'
     },
+    // On a desktop with the call maximized the call fills the window: its header and
+    // control bar lie on the videos, as the page's header and footer do, all four
+    // see-through, and they move out of the way while the mouse rests. On a phone, in the
+    // parked window and in the dialog before joining they stay where they are.
+    barsOverlay() {
+      return this.isFullscreen && !this.isMobile
+    },
+    // Only once there are videos to make room for.
+    autoHideBars() {
+      return this.barsOverlay && this.phase === 'in-call' && !this.error
+    },
+    // What the page's header and footer do meanwhile (layouts/default.vue).
+    pageBars() {
+      if (!this.barsOverlay) return 'normal'
+      return this.barsHidden ? 'hidden' : 'overlay'
+    },
     modeClass() {
       if (this.isPreJoinModal) return 'video-call--modal'
       return this.isFullscreen ? 'video-call--maximized' : 'video-call--minimized'
@@ -807,6 +849,18 @@ export default {
         this.setStorePhase(next || 'idle')
       },
     },
+    pageBars: {
+      immediate: true,
+      handler(pageBars) {
+        this.setPageBars(pageBars)
+      },
+    },
+    autoHideBars: {
+      immediate: true,
+      handler(on) {
+        this.watchBarActivity(on)
+      },
+    },
     activeSpeakerIds(ids) {
       const remote = ids.find((id) => this.tiles.some((t) => t.identity === id && !t.isLocal))
       if (remote) this.lastRemoteSpeakerId = remote
@@ -862,6 +916,9 @@ export default {
     // Set before the immediate `show` watcher runs — it does so ahead of
     // created() and may already store a prefetched join token here.
     this.prefetched = null
+    // Ahead of the immediate `autoHideBars` watcher as well.
+    this.barsTimer = null
+    this.barsWatched = false
   },
   created() {
     this.icons = iconRegistry
@@ -893,6 +950,8 @@ export default {
     this.observeStage()
   },
   beforeDestroy() {
+    this.watchBarActivity(false)
+    this.setPageBars('normal')
     this.disconnectStageObserver()
     this.closeDeviceSettings()
     this.cleanup()
@@ -908,8 +967,64 @@ export default {
       setConferenceUnread: 'videoCall/SET_CONFERENCE_UNREAD',
       setGroupChatUnread: 'videoCall/SET_GROUP_CHAT_UNREAD',
       setLastChatTab: 'videoCall/SET_LAST_CHAT_TAB',
+      setPageBars: 'videoCall/SET_PAGE_BARS',
       setShowChat: 'chat/SET_OPEN_CHAT',
     }),
+    watchBarActivity(on) {
+      if (typeof document === 'undefined' || on === this.barsWatched) return
+      this.barsWatched = on
+      const method = on ? 'addEventListener' : 'removeEventListener'
+      BARS_ACTIVITY_EVENTS.forEach((type) =>
+        document[method](type, this.onBarActivity, { capture: true, passive: true }),
+      )
+      if (on) {
+        this.scheduleBarsHide()
+      } else {
+        clearTimeout(this.barsTimer)
+        this.barsTimer = null
+        this.barsHidden = false
+      }
+    },
+    onBarActivity(event) {
+      // Reading and writing in the chat beside the videos is no reason to put the bars
+      // back on them; going for the page's header or footer at the window's edge is.
+      const inChat = event.target?.closest?.('.video-call__sidebar')
+      const atEdge =
+        typeof event.clientY === 'number' &&
+        (event.clientY < BARS_EDGE_PX || event.clientY > window.innerHeight - BARS_EDGE_PX)
+      if (inChat && !atEdge) return
+      this.barsHidden = false
+      this.scheduleBarsHide()
+    },
+    scheduleBarsHide() {
+      clearTimeout(this.barsTimer)
+      this.barsTimer = setTimeout(this.hideBarsUnlessInUse, BARS_HIDE_MS)
+    },
+    hideBarsUnlessInUse() {
+      if (this.barsInUse()) this.scheduleBarsHide()
+      else this.barsHidden = true
+    },
+    // Nothing moves away from under the mouse, from the keyboard's focus or from beneath
+    // a menu it opened.
+    barsInUse() {
+      if (this.showDeviceSettings) return true
+      const bars = [
+        this.$el?.querySelector?.('.video-call__header'),
+        this.$el?.querySelector?.('.video-call__controls'),
+        document.querySelector('.main-navigation'),
+        document.querySelector('.desktop-footer'),
+      ].filter(Boolean)
+      const focused = document.activeElement
+      const keyboardFocus = focused && matchesSafely(focused, ':focus-visible')
+      if (
+        bars.some((bar) => matchesSafely(bar, ':hover') || (keyboardFocus && bar.contains(focused)))
+      ) {
+        return true
+      }
+      // The menus of the page's header (avatar, notifications) are popovers, put at the
+      // end of the page.
+      return !!document.querySelector('.popover[aria-hidden="false"]')
+    },
     observeStage() {
       const el = this.$refs.stageEl || null
       if (el === this.observedStage) return
@@ -2438,6 +2553,112 @@ export default {
   /*  the window's top edge and the control bar: 280px minus the bar. */
   bottom: calc(100% + var(--space-xxx-small));
   max-height: 232px;
+}
+
+/*  Desktop, call maximized (barsOverlay): the call fills the window, the page's header and */
+/*  footer lie on it, and so do the call's own header and control bar — over the videos */
+/*  only, not over the chat beside them. All four are see-through and move out of the way */
+/*  while the mouse rests (.video-call--bars-hidden); the videos keep their size meanwhile. */
+/*  One grid cell for the videos and everything lying on them, one for the chat. The body */
+/*  gives up its box, so that the call's header and control bar share the videos' cell. */
+.video-call--bars-overlay {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr);
+  padding-top: 0;
+  padding-bottom: 0;
+  background: var(--color-neutral-10);
+  /*  How far the bars reach into the videos, for what is to stay clear of them: the page's */
+  /*  header and footer, and the call's header (44px) and control bar (45px). */
+  --video-call-bars-top: calc(var(--header-height) + 44px);
+  --video-call-bars-bottom: calc(var(--footer-height) + 45px);
+}
+
+.video-call--bars-hidden {
+  --video-call-bars-top: 0px;
+  --video-call-bars-bottom: 0px;
+}
+
+.video-call--bars-overlay .video-call__body {
+  display: contents;
+}
+
+.video-call--bars-overlay > *,
+.video-call--bars-overlay .video-call__body > * {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.video-call--bars-overlay .video-call__header,
+.video-call--bars-overlay .video-call__controls {
+  z-index: 4;
+  backdrop-filter: blur(var(--video-call-bar-blur));
+  transition: transform 0.3s ease;
+}
+
+.video-call--bars-overlay .video-call__header {
+  align-self: start;
+  margin-top: var(--header-height);
+  background: color-mix(
+    in srgb,
+    var(--color-header-background) var(--video-call-bar-opacity),
+    transparent
+  );
+}
+
+.video-call--bars-overlay .video-call__controls {
+  align-self: end;
+  margin-bottom: var(--footer-height);
+  background: color-mix(
+    in srgb,
+    var(--background-color-soft) var(--video-call-bar-opacity),
+    transparent
+  );
+}
+
+.video-call--bars-hidden .video-call__header {
+  transform: translateY(calc(-100% - var(--header-height)));
+}
+
+.video-call--bars-hidden .video-call__controls {
+  transform: translateY(calc(100% + var(--footer-height)));
+}
+
+.video-call--bars-overlay .video-call__speakers {
+  top: calc(var(--video-call-bars-top) + var(--space-x-small));
+  transition: top 0.3s ease;
+}
+
+.video-call--bars-overlay .video-call__notices {
+  bottom: calc(var(--video-call-bars-bottom) + var(--space-x-small));
+  transition: bottom 0.3s ease;
+}
+
+/*  The chat reaches from the page's header to its footer, and from edge to edge of the */
+/*  window once they are gone. */
+.video-call--bars-overlay .video-call__sidebar {
+  grid-column: 2;
+  width: 360px;
+  max-width: 40vw;
+  box-sizing: border-box;
+  padding-top: var(--header-height);
+  padding-bottom: var(--footer-height);
+  transition: padding 0.3s ease;
+}
+
+.video-call--bars-hidden .video-call__sidebar {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .video-call--bars-overlay .video-call__header,
+  .video-call--bars-overlay .video-call__controls,
+  .video-call--bars-overlay .video-call__speakers,
+  .video-call--bars-overlay .video-call__notices,
+  .video-call--bars-overlay .video-call__sidebar {
+    transition: none;
+  }
 }
 
 @media (--vp-mobile) {

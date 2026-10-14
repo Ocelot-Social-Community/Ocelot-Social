@@ -23,6 +23,7 @@ describe('videoCall store', () => {
         groupChatUnread: 0,
         lastChatTab: 'call',
         phase: 'idle',
+        pageBars: 'normal',
       })
     })
   })
@@ -123,8 +124,10 @@ describe('videoCall store', () => {
         state.groupAvatar = { url: 'a' }
         state.participantCount = 4
         state.phase = 'in-call'
+        state.pageBars = 'hidden'
         mutations.CLOSE(state)
         expect(state).toMatchObject({
+          pageBars: 'normal',
           showVideoCall: false,
           minimized: false,
           groupId: null,
@@ -235,6 +238,21 @@ describe('videoCall store', () => {
         mutations.CLOSE(state)
         mutations.OPEN(state, { groupId: 'g2' })
         expect(state.lastChatTab).toBe('group')
+      })
+    })
+
+    describe('SET_PAGE_BARS', () => {
+      it("stores how the page's header and footer stand to the call", () => {
+        mutations.SET_PAGE_BARS(state, 'overlay')
+        expect(getters.pageBars(state)).toBe('overlay')
+        mutations.SET_PAGE_BARS(state, 'hidden')
+        expect(getters.pageBars(state)).toBe('hidden')
+      })
+
+      it('falls back to normal for anything else', () => {
+        state.pageBars = 'hidden'
+        mutations.SET_PAGE_BARS(state, 'sideways')
+        expect(state.pageBars).toBe('normal')
       })
     })
 

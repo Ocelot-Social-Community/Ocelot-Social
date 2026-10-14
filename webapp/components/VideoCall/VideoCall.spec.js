@@ -103,6 +103,7 @@ const buildStore = (state = {}) => {
   const setChatRoomId = jest.fn()
   const setConferenceUnread = jest.fn()
   const setLastChatTab = jest.fn()
+  const setPageBars = jest.fn()
   return {
     store: new Vuex.Store({
       getters: {
@@ -128,6 +129,7 @@ const buildStore = (state = {}) => {
         'videoCall/SET_CONFERENCE_UNREAD': setConferenceUnread,
         'videoCall/SET_GROUP_CHAT_UNREAD': jest.fn(),
         'videoCall/SET_LAST_CHAT_TAB': setLastChatTab,
+        'videoCall/SET_PAGE_BARS': setPageBars,
         'chat/SET_OPEN_CHAT': showChat,
       },
     }),
@@ -137,6 +139,7 @@ const buildStore = (state = {}) => {
     showChat,
     setChatRoomId,
     setLastChatTab,
+    setPageBars,
   }
 }
 
@@ -3084,6 +3087,120 @@ describe('VideoCall', () => {
         conferenceUnread: 3,
       })
       expect(wrapper.vm.chatButtonUnread).toBe(3)
+    })
+  })
+
+  describe('bars on the videos', () => {
+    const { computed } = VideoCall
+
+    it('lie on the videos on a desktop with the call maximized', () => {
+      expect(computed.barsOverlay.call({ isFullscreen: true, isMobile: false })).toBe(true)
+    })
+
+    it('stay where they are on a phone, in the parked window and before joining', () => {
+      expect(computed.barsOverlay.call({ isFullscreen: true, isMobile: true })).toBe(false)
+      expect(computed.barsOverlay.call({ isFullscreen: false, isMobile: false })).toBe(false)
+    })
+
+    it('tell the page what its header and footer are to do', () => {
+      expect(computed.pageBars.call({ barsOverlay: false, barsHidden: true })).toBe('normal')
+      expect(computed.pageBars.call({ barsOverlay: true, barsHidden: false })).toBe('overlay')
+      expect(computed.pageBars.call({ barsOverlay: true, barsHidden: true })).toBe('hidden')
+    })
+
+    describe('during a call', () => {
+      let wrapper
+      let setPageBars
+      let chatEl
+
+      const move = (target = document, clientY = 300) =>
+        target.dispatchEvent(new MouseEvent('mousemove', { clientY, bubbles: true }))
+
+      beforeEach(async () => {
+        jest.useFakeTimers()
+        ;({ wrapper, setPageBars } = factory({ show: true, minimized: false }))
+        await wrapper.setData({ phase: 'in-call' })
+        chatEl = document.createElement('div')
+        chatEl.className = 'video-call__sidebar'
+        chatEl.appendChild(document.createElement('textarea'))
+        document.body.appendChild(chatEl)
+      })
+
+      afterEach(() => {
+        wrapper.destroy()
+        chatEl.remove()
+        jest.useRealTimers()
+      })
+
+      it('move out of the way once the mouse has rested for 4 seconds', async () => {
+        expect(wrapper.find('.video-call').classes()).toContain('video-call--bars-overlay')
+        jest.advanceTimersByTime(3999)
+        expect(wrapper.vm.barsHidden).toBe(false)
+        jest.advanceTimersByTime(1)
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.barsHidden).toBe(true)
+        expect(wrapper.find('.video-call').classes()).toContain('video-call--bars-hidden')
+        expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'hidden')
+      })
+
+      it('come back when the mouse moves, and wait for it to rest again', () => {
+        jest.advanceTimersByTime(4000)
+        move()
+        expect(wrapper.vm.barsHidden).toBe(false)
+        jest.advanceTimersByTime(3000)
+        move()
+        jest.advanceTimersByTime(3000)
+        expect(wrapper.vm.barsHidden).toBe(false)
+        jest.advanceTimersByTime(1000)
+        expect(wrapper.vm.barsHidden).toBe(true)
+      })
+
+      it('do not come back for reading and writing in the chat', () => {
+        jest.advanceTimersByTime(4000)
+        move(chatEl.firstChild)
+        chatEl.firstChild.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true }))
+        expect(wrapper.vm.barsHidden).toBe(true)
+      })
+
+      it("come back from the chat when the mouse goes to the window's edge", () => {
+        jest.advanceTimersByTime(4000)
+        move(chatEl.firstChild, 10)
+        expect(wrapper.vm.barsHidden).toBe(false)
+      })
+
+      it('stay while the device settings are open', async () => {
+        await wrapper.setData({ showDeviceSettings: true })
+        jest.advanceTimersByTime(8000)
+        expect(wrapper.vm.barsHidden).toBe(false)
+        await wrapper.setData({ showDeviceSettings: false })
+        jest.advanceTimersByTime(4000)
+        expect(wrapper.vm.barsHidden).toBe(true)
+      })
+
+      it('stay while a menu of the page header is open', () => {
+        const menu = document.createElement('div')
+        menu.className = 'tooltip popover'
+        menu.setAttribute('aria-hidden', 'false')
+        document.body.appendChild(menu)
+        jest.advanceTimersByTime(8000)
+        expect(wrapper.vm.barsHidden).toBe(false)
+        menu.remove()
+      })
+
+      it('are back, and no longer watched for, once the call is parked', async () => {
+        jest.advanceTimersByTime(4000)
+        await wrapper.setData({ phase: 'connecting' })
+        expect(wrapper.vm.barsHidden).toBe(false)
+        await wrapper.setData({ phase: 'in-call' })
+        await wrapper.setData({ error: 'broken' })
+        jest.advanceTimersByTime(4000)
+        expect(wrapper.vm.barsHidden).toBe(false)
+      })
+
+      it("leave the page's header and footer as they were when the call goes", () => {
+        wrapper.destroy()
+        expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'normal')
+      })
     })
   })
 

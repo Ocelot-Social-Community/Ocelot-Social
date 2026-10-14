@@ -34,6 +34,8 @@ describe('default.vue', () => {
       },
     }
     store = new Vuex.Store({
+      // What the call tells the page about its header and footer; set by the tests below.
+      state: { pageBars: 'normal' },
       getters: {
         'auth/isLoggedIn': () => true,
         'chat/showChat': () => {
@@ -47,6 +49,7 @@ describe('default.vue', () => {
         'videoCall/groupAvatar': () => null,
         'videoCall/phase': () => 'idle',
         'videoCall/chatRoomId': () => null,
+        'videoCall/pageBars': (state) => state.pageBars,
       },
       mutations: {
         'chat/SET_OPEN_CHAT': jest.fn(),
@@ -71,6 +74,27 @@ describe('default.vue', () => {
 
     it('renders', () => {
       expect(wrapper.classes('layout-default')).toBe(true)
+    })
+
+    describe('header and footer beside a maximized video call', () => {
+      it('stay as they are without one', () => {
+        expect(wrapper.classes()).not.toContain('layout-default--call-bars-overlay')
+        expect(wrapper.classes()).not.toContain('layout-default--call-bars-hidden')
+      })
+
+      it('lie on the call, see-through, while it fills the window', async () => {
+        store.state.pageBars = 'overlay'
+        await wrapper.vm.$nextTick()
+        expect(wrapper.classes()).toContain('layout-default--call-bars-overlay')
+        expect(wrapper.classes()).not.toContain('layout-default--call-bars-hidden')
+      })
+
+      it('move out of the way with the bars of the call', async () => {
+        store.state.pageBars = 'hidden'
+        await wrapper.vm.$nextTick()
+        expect(wrapper.classes()).toContain('layout-default--call-bars-overlay')
+        expect(wrapper.classes()).toContain('layout-default--call-bars-hidden')
+      })
     })
   })
 

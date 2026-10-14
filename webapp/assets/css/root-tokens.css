@@ -426,4 +426,14 @@
   --color-map-marker-user: rgb(51, 195, 119);
   --color-map-marker-group: rgb(248, 77, 77);
   --color-map-marker-event: rgb(119, 83, 235);
+  /**
+ * @tokens Video Call Bars
+ */
+
+  /* The bars lying on a maximized video call on a desktop — the page's header and footer, the
+     call's header and control bar (VideoCall.vue, layouts/default.vue). How much of their own
+     colour they keep — the rest lets the videos through — and how much the videos behind them
+     are blurred. 100% and 0px make them solid. */
+  --video-call-bar-opacity: 75%;
+  --video-call-bar-blur: 8px;
 }

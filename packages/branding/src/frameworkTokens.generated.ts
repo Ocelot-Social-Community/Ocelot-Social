@@ -210,6 +210,8 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'text-color-warning': 'var(--color-warning)',
   'text-weight-bold': '600',
   'text-weight-regular': 'normal',
+  'video-call-bar-blur': '8px',
+  'video-call-bar-opacity': '75%',
   'z-index-dropdown': '8888',
   'z-index-modal': '9999',
   'z-index-overlay': '9000',

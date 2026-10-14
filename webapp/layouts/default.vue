@@ -1,5 +1,13 @@
 <template>
-  <div class="layout-default">
+  <div
+    :class="[
+      'layout-default',
+      {
+        'layout-default--call-bars-overlay': videoCallPageBars !== 'normal',
+        'layout-default--call-bars-hidden': videoCallPageBars === 'hidden',
+      },
+    ]"
+  >
     <div class="main-navigation">
       <header-menu />
     </div>
@@ -150,6 +158,7 @@ export default {
       videoCallGroupAvatar: 'videoCall/groupAvatar',
       videoCallPhase: 'videoCall/phase',
       videoCallChatRoomId: 'videoCall/chatRoomId',
+      videoCallPageBars: 'videoCall/pageBars',
     }),
     chatLivesInVideoSidebar() {
       // Move the chat into the call's sidebar **only when the chat is for the
@@ -289,6 +298,48 @@ export default {
 <style>
 .main-navigation {
   background-color: var(--color-header-background);
+}
+
+/*  A maximized video call on a desktop fills the window: header and footer lie on it, */
+/*  see-through, and move out of the way with the call's own bars while the mouse rests */
+/*  (VideoCall.vue, barsOverlay). */
+.layout-default--call-bars-overlay .main-navigation,
+.layout-default--call-bars-overlay .desktop-footer.ds-footer {
+  backdrop-filter: blur(var(--video-call-bar-blur));
+  transition: transform 0.3s ease;
+}
+
+.layout-default--call-bars-overlay .main-navigation {
+  background-color: color-mix(
+    in srgb,
+    var(--color-header-background) var(--video-call-bar-opacity),
+    transparent
+  );
+}
+
+.layout-default--call-bars-overlay .desktop-footer.ds-footer {
+  background-color: color-mix(
+    in srgb,
+    var(--color-footer-background) var(--video-call-bar-opacity),
+    transparent
+  );
+}
+
+.layout-default--call-bars-hidden .main-navigation {
+  transform: translateY(-100%);
+  box-shadow: none;
+}
+
+.layout-default--call-bars-hidden .desktop-footer.ds-footer {
+  transform: translateY(100%);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout-default--call-bars-overlay .main-navigation,
+  .layout-default--call-bars-overlay .desktop-footer.ds-footer {
+    transition: none;
+  }
 }
 .main-container {
   padding-top: 6rem;
