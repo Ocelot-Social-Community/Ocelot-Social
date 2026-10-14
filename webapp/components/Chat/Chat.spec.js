@@ -1689,6 +1689,30 @@ describe('Chat.vue', () => {
         expect(styles).toContain('.vac-room-header { display: none !important; }')
         expect(styles).toContain('.vac-container-scroll { margin-top: 0 !important; }')
       })
+
+      it('follows a host that starts bringing its own while the chat stays', async () => {
+        wrapper = Wrapper()
+        const live = []
+        Object.defineProperty(wrapper.vm.$el, 'shadowRoot', {
+          configurable: true,
+          value: {
+            appendChild: (style) => {
+              style.remove = () => live.splice(live.indexOf(style), 1)
+              live.push(style)
+            },
+          },
+        })
+        wrapper.vm._shadowStylesInjected = false
+        wrapper.vm.injectShadowStyles()
+        expect(live).toHaveLength(1)
+        expect(live[0].textContent).not.toContain('display: none')
+
+        await wrapper.setProps({ hideHeader: true })
+
+        // The earlier styles are replaced, not added to.
+        expect(live).toHaveLength(1)
+        expect(live[0].textContent).toContain('.vac-room-header { display: none !important; }')
+      })
     })
 
     describe('cursor in the message field on opening a room', () => {

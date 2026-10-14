@@ -8,56 +8,52 @@
       :aria-label="$t('videoCall.dialogLabel')"
       @click.stop
     >
-      <div class="video-call__header">
-        <div class="video-call__header-info">
-          <avatar-image :profile="groupProfile" size="small" class="video-call__avatar" />
-          <room-title-link
-            :name="titleLabel"
-            :to="groupRoute"
-            :show-group-icon="!!groupId"
-            :aria-label="$t('videoCall.gotoGroup', { name: groupName || $t('videoCall.title') })"
-            @click="onGroupLinkClick"
-          />
-        </div>
-        <div class="video-call__header-right">
-          <span
-            v-if="phase === 'in-call'"
-            class="video-call__count"
-            data-test="video-call-participants"
+      <room-header
+        class="video-call__header"
+        :profile="groupProfile"
+        :title="titleLabel"
+        :to="groupRoute"
+        :show-group-icon="!!groupId"
+        :aria-label="$t('videoCall.gotoGroup', { name: groupName || $t('videoCall.title') })"
+        @title-click="onGroupLinkClick"
+      >
+        <span
+          v-if="phase === 'in-call'"
+          class="video-call__count"
+          data-test="video-call-participants"
+        >
+          {{ uniqueParticipantCount }}
+        </span>
+        <div class="video-call__header-actions">
+          <os-button
+            v-if="canMinimize && phase === 'in-call'"
+            v-tooltip="minimizeLabel"
+            variant="primary"
+            appearance="outline"
+            size="sm"
+            circle
+            :aria-label="minimizeLabel"
+            @click="toggleMinimize"
           >
-            {{ uniqueParticipantCount }}
-          </span>
-          <div class="video-call__header-actions">
-            <os-button
-              v-if="canMinimize && phase === 'in-call'"
-              v-tooltip="minimizeLabel"
-              variant="primary"
-              appearance="outline"
-              size="sm"
-              circle
-              :aria-label="minimizeLabel"
-              @click="toggleMinimize"
-            >
-              <template #icon>
-                <os-icon :icon="minimized ? icons.expand : icons.minus" />
-              </template>
-            </os-button>
-            <os-button
-              v-tooltip="closeLabel"
-              variant="danger"
-              appearance="outline"
-              size="sm"
-              circle
-              :aria-label="closeLabel"
-              @click="leave"
-            >
-              <template #icon>
-                <os-icon :icon="icons.close" />
-              </template>
-            </os-button>
-          </div>
+            <template #icon>
+              <os-icon :icon="minimized ? icons.expand : icons.minus" />
+            </template>
+          </os-button>
+          <os-button
+            v-tooltip="closeLabel"
+            variant="danger"
+            appearance="outline"
+            size="sm"
+            circle
+            :aria-label="closeLabel"
+            @click="leave"
+          >
+            <template #icon>
+              <os-icon :icon="icons.close" />
+            </template>
+          </os-button>
         </div>
-      </div>
+      </room-header>
 
       <pre-join v-if="phase === 'prejoin'" @join="onPreJoinReady" @cancel="leave" />
 
@@ -398,8 +394,7 @@ import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import Chat from '~/components/Chat/Chat.vue'
 import CallChatTabs from '~/components/VideoCall/CallChatTabs.vue'
 import { activeCallChatTab, callChatTarget } from '~/components/VideoCall/callChat'
-import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
-import RoomTitleLink from '~/components/_new/generic/RoomTitleLink/RoomTitleLink'
+import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 import DeviceSettings from './DeviceSettings.vue'
@@ -462,8 +457,7 @@ export default {
     OsIcon,
     CallChatTabs,
     Chat,
-    AvatarImage,
-    RoomTitleLink,
+    RoomHeader,
   },
   mixins: [mobile()],
   data() {
@@ -2161,48 +2155,8 @@ export default {
   }
 }
 
-.video-call__header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-x-small);
-  padding: var(--space-x-small) var(--space-small);
-  /*  Keep the header field at its pre-existing visual height even though the */
-  /*  avatar shrank from base (44px) to small (34px) — matches the chat header. */
-  min-height: calc(var(--size-avatar-base) + 2 * var(--space-x-small));
-  background: var(--color-header-background);
-  border-bottom: 1px solid var(--color-neutral-85);
-  font-weight: var(--text-weight-bold);
-  color: var(--text-color-base);
-
-  /*  The RoomTitleLink ships with font-weight: 500 (medium) for its in-chat */
-  /*  usage; inside the call modal we want the group name to read as a proper */
-  /*  dialog heading, so override with the heading bold weight. */
-  ::v-deep .room-title-link {
-    font-weight: var(--text-weight-bold);
-  }
-}
-
-.video-call__header-info {
-  display: flex;
-  align-items: center;
-  gap: var(--space-x-small);
-  flex: 1 1 0;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.video-call__avatar {
-  flex-shrink: 0;
-}
-
-.video-call__header-right {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xx-small);
-  margin-left: auto;
-  flex-shrink: 0;
-}
-
+/*  The header itself — avatar, title, where its buttons go — is RoomHeader's. What is */
+/*  the call's own are the things put into it. */
 .video-call__count {
   background: var(--color-primary);
   color: var(--color-primary-inverse);

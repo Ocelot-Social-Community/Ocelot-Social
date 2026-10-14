@@ -16,16 +16,75 @@
     >
       <!--
         Beside a parked call the window shows one of the call's two chats; the tabs
-        switch between them, as they do in the call's own sidebar.
+        switch between them, as they do in the call's own sidebar. The header sits above
+        them — first where one is, then the choice — which is why it is drawn here: the
+        chat's own header is part of the chat and cannot have anything put below it.
       -->
-      <div v-if="showCallChatTabs" class="chat-modul__tabs">
-        <call-chat-tabs />
-      </div>
+      <template v-if="showCallChatTabs">
+        <room-header
+          class="chat-modul__header"
+          :profile="callGroupProfile"
+          :title="videoCallGroupName || ''"
+          :to="callGroupRoute"
+          show-group-icon
+        >
+          <os-button
+            v-if="callChatTab === 'call'"
+            data-test="chat-modul-export"
+            variant="primary"
+            appearance="outline"
+            circle
+            size="sm"
+            :loading="chatExporting"
+            :aria-label="$t('chat.exportChat')"
+            :title="$t('chat.exportChat')"
+            @click="exportChat"
+          >
+            <template #icon>
+              <os-icon :icon="icons.download" />
+            </template>
+          </os-button>
+          <!-- No larger view for the call's conference chat: it is reached from the call only. -->
+          <os-button
+            v-else
+            data-test="chat-modul-expand"
+            as="nuxt-link"
+            :to="{ name: 'chat', query: { groupId: videoCallGroupId } }"
+            variant="primary"
+            appearance="outline"
+            circle
+            size="sm"
+            :aria-label="$t('chat.expandChat')"
+          >
+            <template #icon>
+              <os-icon :icon="icons.expand" />
+            </template>
+          </os-button>
+          <os-button
+            data-test="chat-modul-close"
+            variant="primary"
+            appearance="outline"
+            circle
+            size="sm"
+            :aria-label="$t('chat.closeChat')"
+            @click="closeSingleRoom"
+          >
+            <template #icon>
+              <os-icon :icon="icons.close" />
+            </template>
+          </os-button>
+        </room-header>
+        <div class="chat-modul__tabs">
+          <call-chat-tabs />
+        </div>
+      </template>
       <client-only>
         <chat
+          ref="chat"
           :key="getShowChat.roomId || getShowChat.groupId || getShowChat.chatUserId"
           singleRoom
-          :reservedHeight="showCallChatTabs ? CALL_CHAT_TABS_HEIGHT : 0"
+          :hideHeader="showCallChatTabs"
+          :reservedHeight="showCallChatTabs ? CALL_CHAT_TABS_HEIGHT + CALL_CHAT_HEADER_HEIGHT : 0"
           :userId="getShowChat.chatUserId"
           :groupId="getShowChat.groupId"
           :roomId="getShowChat.roomId"
@@ -45,7 +104,10 @@ import seo from '~/mixins/seo'
 import mobile from '~/mixins/mobile'
 import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
 import PageFooter from '~/components/PageFooter/PageFooter'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
 import Chat from '~/components/Chat/Chat.vue'
+import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import CallChatTabs from '~/components/VideoCall/CallChatTabs.vue'
 import { activeCallChatTab } from '~/components/VideoCall/callChat'
 import VideoCall from '~/components/VideoCall/VideoCall.vue'
@@ -55,6 +117,9 @@ import { videoCallConfigQuery } from '~/graphql/VideoCalls'
 // that much and the window does not grow under the page header. Kept in step with the
 // `.chat-modul__tabs` rule below.
 const CALL_CHAT_TABS_HEIGHT = 52
+// Height of the room header above those tabs, in px: RoomHeader's own, which is the base
+// avatar (44) with a small space (8) above and below.
+const CALL_CHAT_HEADER_HEIGHT = 60
 
 export default {
   components: {
@@ -62,10 +127,16 @@ export default {
     PageFooter,
     Chat,
     CallChatTabs,
+    RoomHeader,
+    OsButton,
+    OsIcon,
     VideoCall,
   },
   data() {
-    return { CALL_CHAT_TABS_HEIGHT }
+    return { CALL_CHAT_TABS_HEIGHT, CALL_CHAT_HEADER_HEIGHT, chatExporting: false }
+  },
+  created() {
+    this.icons = iconRegistry
   },
   mixins: [seo, mobile()],
   computed: {
@@ -74,6 +145,9 @@ export default {
       showVideoCall: 'videoCall/showVideoCall',
       videoCallMinimized: 'videoCall/minimized',
       videoCallGroupId: 'videoCall/groupId',
+      videoCallGroupName: 'videoCall/groupName',
+      videoCallGroupSlug: 'videoCall/groupSlug',
+      videoCallGroupAvatar: 'videoCall/groupAvatar',
       videoCallPhase: 'videoCall/phase',
       videoCallChatRoomId: 'videoCall/chatRoomId',
     }),
@@ -95,6 +169,14 @@ export default {
           (!!this.getShowChat.roomId && this.getShowChat.roomId === this.videoCallChatRoomId))
       )
     },
+    // Which of the running call's two chats the window shows: 'call', 'group', or null
+    // for any other chat.
+    callChatTab() {
+      return activeCallChatTab(this.getShowChat, {
+        groupId: this.videoCallGroupId,
+        chatRoomId: this.videoCallChatRoomId,
+      })
+    },
     showCallChatTabs() {
       // Only where there is a choice: in a call whose conference chat the server has
       // confirmed, and for a chat that is one of the call's two.
@@ -102,11 +184,24 @@ export default {
         this.showVideoCall &&
         this.videoCallPhase === 'in-call' &&
         !!this.videoCallChatRoomId &&
-        activeCallChatTab(this.getShowChat, {
-          groupId: this.videoCallGroupId,
-          chatRoomId: this.videoCallChatRoomId,
-        }) !== null
+        this.callChatTab !== null
       )
+    },
+    // Both of the call's chats are the group's, so the header above them names the group —
+    // as the call's own header does.
+    callGroupProfile() {
+      return {
+        id: this.videoCallGroupId,
+        name: this.videoCallGroupName || this.videoCallGroupSlug || '',
+        avatar: this.videoCallGroupAvatar,
+      }
+    },
+    callGroupRoute() {
+      if (!this.videoCallGroupId || !this.videoCallGroupSlug) return null
+      return {
+        name: 'groups-id-slug',
+        params: { id: this.videoCallGroupId, slug: this.videoCallGroupSlug },
+      }
     },
     chatRenderedElsewhere() {
       // Don't draw the floating chat-modul when the chat is already shown by
@@ -141,6 +236,17 @@ export default {
     }),
     closeSingleRoom() {
       this.showChat({ showChat: false, chatUserId: null, groupId: null })
+    },
+    // The export is the chat's own doing; only its button sits in the header drawn here.
+    async exportChat() {
+      const chat = this.$refs.chat
+      if (!chat || this.chatExporting) return
+      this.chatExporting = true
+      try {
+        await chat.exportRoom()
+      } finally {
+        this.chatExporting = false
+      }
     },
   },
   beforeCreate() {
@@ -213,8 +319,9 @@ export default {
 /*  The inner chat content keeps its own height; whatever extends above the */
 /*  viewport gets clipped by the browser, leaving the message input and the */
 /*  latest messages visible — which is what the user interacts with. */
-/*  The tabs between the two chats of a running call. Height fixed, as the chat below is */
-/*  told how much room they take (CALL_CHAT_TABS_HEIGHT). */
+/*  The tabs between the two chats of a running call, below the room's header. Their */
+/*  height is fixed, as the chat below is told how much room the two take */
+/*  (CALL_CHAT_TABS_HEIGHT; the header's is RoomHeader's own, CALL_CHAT_HEADER_HEIGHT). */
 .chat-modul__tabs {
   display: flex;
   align-items: center;

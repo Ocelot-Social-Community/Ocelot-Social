@@ -87,12 +87,11 @@ const stubs = {
   OsIcon: Stub('OsIcon'),
   OsCounterIcon: Stub('OsCounterIcon', { props: ['count'] }),
   CallChatTabs: Stub('CallChatTabs'),
-  AvatarImage: Stub('AvatarImage'),
+  RoomHeader: Stub('RoomHeader'),
   PreJoin: Stub('PreJoin'),
   DeviceSettings: Stub('DeviceSettings', { props: ['cameraStarting', 'micStarting'] }),
   VideoTile: Stub('VideoTile', { props: ['tile', 'cameraStarting', 'micStarting'] }),
   Chat: Stub('Chat'),
-  RoomTitleLink: Stub('RoomTitleLink'),
   ClientOnly: Stub('ClientOnly'),
 }
 

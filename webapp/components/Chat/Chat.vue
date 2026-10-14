@@ -256,6 +256,15 @@ export default {
         this.openRoom(newRoomId)
       }
     },
+    // The host can start or stop bringing its own header while this chat stays the same —
+    // beside a video call, once the call's conference chat is confirmed. The styles that
+    // take the built-in header out are written once, so they are written anew.
+    hideHeader() {
+      this._shadowStyle?.remove()
+      this._shadowStyle = null
+      this._shadowStylesInjected = false
+      this.injectShadowStyles()
+    },
     currentLocaleIso() {
       this.messages = this.messages.map((m) => {
         this.formatMessageDate(m)
@@ -498,6 +507,7 @@ export default {
         }
       `
       shadowRoot.appendChild(style)
+      this._shadowStyle = style
       this._shadowStylesInjected = true
     },
     setupMessageVisibilityTracking() {

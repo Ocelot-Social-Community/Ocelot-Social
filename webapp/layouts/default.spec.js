@@ -42,6 +42,9 @@ describe('default.vue', () => {
         'videoCall/showVideoCall': () => false,
         'videoCall/minimized': () => false,
         'videoCall/groupId': () => null,
+        'videoCall/groupName': () => null,
+        'videoCall/groupSlug': () => null,
+        'videoCall/groupAvatar': () => null,
         'videoCall/phase': () => 'idle',
         'videoCall/chatRoomId': () => null,
       },
@@ -119,15 +122,20 @@ describe('default.vue', () => {
     })
 
     describe('tabs in the floating chat window', () => {
-      const shows = (overrides = {}) =>
-        Default.computed.showCallChatTabs.call({
+      const shows = (overrides = {}) => {
+        const ctx = {
           showVideoCall: true,
           videoCallPhase: 'in-call',
           videoCallGroupId: 'g1',
           videoCallChatRoomId: 'room-1',
           getShowChat: { showChat: true, chatUserId: null, groupId: null, roomId: 'room-1' },
           ...overrides,
+        }
+        return Default.computed.showCallChatTabs.call({
+          ...ctx,
+          callChatTab: Default.computed.callChatTab.call(ctx),
         })
+      }
 
       it('are offered for the conference chat and for the chat of the group', () => {
         expect(shows()).toBe(true)
@@ -148,6 +156,60 @@ describe('default.vue', () => {
         ).toBe(false)
         expect(shows({ showVideoCall: false })).toBe(false)
         expect(shows({ videoCallPhase: 'prejoin' })).toBe(false)
+      })
+    })
+
+    describe('header above the tabs', () => {
+      const group = {
+        videoCallGroupId: 'g1',
+        videoCallGroupName: 'Yoga',
+        videoCallGroupSlug: 'yoga',
+        videoCallGroupAvatar: { url: 'yoga.png' },
+      }
+
+      it('names the group both chats belong to, and leads there', () => {
+        expect(Default.computed.callGroupProfile.call(group)).toEqual({
+          id: 'g1',
+          name: 'Yoga',
+          avatar: { url: 'yoga.png' },
+        })
+        expect(Default.computed.callGroupRoute.call(group)).toEqual({
+          name: 'groups-id-slug',
+          params: { id: 'g1', slug: 'yoga' },
+        })
+      })
+
+      it('makes do with the slug for a name, and without a link while the slug is missing', () => {
+        expect(
+          Default.computed.callGroupProfile.call({ ...group, videoCallGroupName: null }).name,
+        ).toBe('yoga')
+        expect(
+          Default.computed.callGroupRoute.call({ ...group, videoCallGroupSlug: null }),
+        ).toBeNull()
+      })
+
+      describe('export button', () => {
+        it('has the chat export its room, and shows it is busy meanwhile', async () => {
+          let finish
+          const exportRoom = jest.fn(() => new Promise((resolve) => (finish = resolve)))
+          const ctx = { chatExporting: false, $refs: { chat: { exportRoom } } }
+          const exporting = Default.methods.exportChat.call(ctx)
+          expect(exportRoom).toHaveBeenCalledTimes(1)
+          expect(ctx.chatExporting).toBe(true)
+          finish()
+          await exporting
+          expect(ctx.chatExporting).toBe(false)
+        })
+
+        it('does nothing without a chat, or on top of a running export', async () => {
+          const exportRoom = jest.fn()
+          await Default.methods.exportChat.call({ chatExporting: false, $refs: {} })
+          await Default.methods.exportChat.call({
+            chatExporting: true,
+            $refs: { chat: { exportRoom } },
+          })
+          expect(exportRoom).not.toHaveBeenCalled()
+        })
       })
     })
 
