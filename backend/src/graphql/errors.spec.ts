@@ -77,7 +77,7 @@ describe('Errors', () => {
   })
 
   // A code nothing throws any more is a translation in eleven languages for a message nobody can
-  // see — and scripts/translations/backend-error-codes.sh keeps it alive, since it only holds the
+  // see — and webappTranslations.spec.ts keeps it alive, since it only holds the
   // locales to the registry. Removing the last throw site has to remove the code with it.
   it('is thrown somewhere, every code of it', async () => {
     const source = await readBackendSource()
