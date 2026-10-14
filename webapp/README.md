@@ -65,8 +65,7 @@ We ensure the quality of our frontend code by using
 
 For more information see our [frontend testing guide](testing.md). Use these commands to run the tests:
 
-::: tabs
-@tab:active With Docker
+#### With Docker
 
 After starting the application following the above guidelines, open new terminal windows for each of these commands:
 
@@ -87,7 +86,7 @@ $ docker-compose exec webapp npm run storybook
 
 You can then visit the Storybook playground on `http://localhost:3002`
 
-@tab title Without Docker
+#### Without Docker
 
 After starting the application following the above guidelines, open new terminal windows and navigate to the `/webapp` directory for each of these commands:
 
@@ -107,8 +106,6 @@ $ npm run storybook
 ```
 
 You can then visit the Storybook playground on `http://localhost:3002`
-
-:::
 
 ## Translations
 
