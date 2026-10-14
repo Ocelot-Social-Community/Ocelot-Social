@@ -10,6 +10,7 @@
     >
       <room-header
         class="video-call__header"
+        compact
         :profile="groupProfile"
         :title="titleLabel"
         :to="groupRoute"
@@ -2324,7 +2325,7 @@ export default {
   gap: var(--space-x-small);
   /*  No padding above and below: the tabs reach the row's lower edge, where the */
   /*  underline of the active one belongs. The buttons bring the row's height. */
-  min-height: 44px;
+  min-height: 36px;
   padding: 0 var(--space-small);
   border-bottom: 1px solid var(--color-neutral-85);
 }
@@ -2402,7 +2403,8 @@ export default {
   position: relative;
   display: flex;
   gap: var(--space-x-small);
-  padding: var(--space-x-small) var(--space-small);
+  /*  Little space above and below the buttons: the height goes to the videos. */
+  padding: var(--space-xx-small) var(--space-small);
   background: var(--background-color-soft);
   border-top: 1px solid var(--color-neutral-85);
   flex-wrap: wrap;

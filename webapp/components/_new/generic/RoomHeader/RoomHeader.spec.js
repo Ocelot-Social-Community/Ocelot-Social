@@ -55,4 +55,9 @@ describe('RoomHeader', () => {
   it('has no place for buttons when there are none', () => {
     expect(Wrapper().find('.room-header__actions').exists()).toBe(false)
   })
+
+  it('is of the usual height unless asked to be compact', () => {
+    expect(Wrapper().classes()).not.toContain('room-header--compact')
+    expect(Wrapper({ compact: true }).classes()).toContain('room-header--compact')
+  })
 })
