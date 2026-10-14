@@ -247,6 +247,25 @@ describe('RegistrationSlideCreate', () => {
       expect(mocks.$router.push).toHaveBeenCalledWith('/')
     })
 
+    // #7018, #7239: the name alone was searched in another language than it was shown in, and the
+    // network got Mapbox's top result instead — "Schweiz" became Schweizer-Reneke.
+    it('sends a picked place by its Mapbox id and the coordinates it was picked with', async () => {
+      const wrapper = Wrapper()
+      await wrapper.setData({
+        locationName: { value: 'Schweiz', id: 'country.8738', lat: 46.8, lng: 8.2 },
+      })
+      await wrapper.vm.submit()
+      await flushPromises()
+      expect(mocks.$apollo.mutate.mock.calls[0][0].variables).toEqual(
+        expect.objectContaining({
+          locationName: 'Schweiz',
+          locationId: 'country.8738',
+          lat: 46.8,
+          lng: 8.2,
+        }),
+      )
+    })
+
     it('on success with a public-group invite: redirects to the group', async () => {
       propsData.sliderData.sliders[0].data.response = {
         validateInviteCode: { invitedTo: { visibility: 'public', slug: 'my-group' } },

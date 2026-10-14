@@ -22,13 +22,7 @@ import { pagingClause } from './helpers/paging'
 import Resolver from './helpers/Resolver'
 import { shoutsVisibleTo } from './helpers/shoutVisibility'
 import { images } from './images/images'
-import {
-  attachLocationFeature,
-  createOrUpdateLocations,
-  extractCoordinates,
-  extractLocationFeature,
-  NEIGHBORHOOD_REVERSE_GEOCODE_TYPES,
-} from './users/location'
+import { NEIGHBORHOOD_REVERSE_GEOCODE_TYPES, resolveLocationInput } from './users/location'
 
 import type { Context } from '@src/context'
 
@@ -369,17 +363,13 @@ export default {
     UpdateUser: async (_parent, params, context: Context, _resolveInfo) => {
       const { avatar: avatarInput } = params
       delete params.avatar
-      params.locationName = params.locationName === '' ? null : params.locationName
-      // Pulled off params (so it never reaches `SET user += $params` below —
-      // a user has no lat/lng fields of its own, unlike Post) and validated,
-      // same as Group's own coordinate handling.
-      const coordinates = extractCoordinates(params, 'User')
       // Resolved before anything is written: a refused place must not leave the user half-saved.
-      const locationFeature = await extractLocationFeature(
+      // Takes locationId/lat/lng off params, which a user has no fields for.
+      const location = await resolveLocationInput(
         params,
-        coordinates,
         context,
         NEIGHBORHOOD_REVERSE_GEOCODE_TYPES,
+        'User',
       )
       const { termsAndConditionsAgreedVersion } = params
       if (termsAndConditionsAgreedVersion) {
@@ -422,21 +412,7 @@ export default {
           }
           return user
         })
-        // TODO: put in a middleware, see "CreateGroup", "UpdateGroup"
-        if (locationFeature) {
-          await attachLocationFeature(session, 'User', params.id, locationFeature)
-        } else {
-          await createOrUpdateLocations(
-            'User',
-            params.id,
-            params.locationName,
-            session,
-            context,
-            coordinates,
-            NEIGHBORHOOD_REVERSE_GEOCODE_TYPES,
-            true,
-          )
-        }
+        await location.attach(session, 'User', params.id)
         if (
           'showPublicGroupsOnProfile' in params ||
           'showClosedGroupsOnProfile' in params ||
