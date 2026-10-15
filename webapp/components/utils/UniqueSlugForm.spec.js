@@ -1,4 +1,5 @@
 import UniqueSlugForm from './UniqueSlugForm'
+import { getBranding, setBranding } from '@ocelot-social/branding'
 import Schema from 'async-validator'
 
 let translate
@@ -34,6 +35,58 @@ describe('UniqueSlugForm', () => {
     describe('alphanumeric, hyphens or underscores', () => {
       it('validates', async () => {
         await expect(validate({ slug: '_all-right_' })).resolves.toEqual({ slug: '_all-right_' })
+      })
+    })
+  })
+
+  describe('length', () => {
+    it('rejects a slug shorter than the brand minimum', async () => {
+      await expect(validate({ slug: 'ab' })).rejects.toThrow('Validation error')
+      expect(translate).toHaveBeenCalledWith('settings.validation.slug.length', {
+        min: 3,
+        max: 50,
+      })
+    })
+
+    it('rejects a missing slug with the bounds, not a crash', async () => {
+      await expect(validate({})).rejects.toThrow('Validation error')
+      expect(translate).toHaveBeenCalledWith('settings.validation.slug.length', {
+        min: 3,
+        max: 50,
+      })
+    })
+
+    it('rejects a slug longer than the brand maximum', async () => {
+      await expect(validate({ slug: 'a'.repeat(51) })).rejects.toThrow('Validation error')
+    })
+
+    it('accepts a slug at either bound', async () => {
+      await expect(validate({ slug: 'abc' })).resolves.toEqual({ slug: 'abc' })
+      await expect(validate({ slug: 'a'.repeat(50) })).resolves.toEqual({ slug: 'a'.repeat(50) })
+    })
+
+    // The backend enforces the bounds only on a slug that changes, so the form must not hold an
+    // account to them for the slug it already has.
+    it('accepts the slug the user already has, even out of bounds', async () => {
+      currentUser = { slug: 'ab' }
+
+      await expect(validate({ slug: 'ab' })).resolves.toEqual({ slug: 'ab' })
+    })
+
+    describe('with the bounds of a brand', () => {
+      let original
+
+      beforeEach(() => {
+        original = getBranding()
+        setBranding({ ...original, user: { ...original.user, slugLengthMin: 2 } })
+      })
+
+      afterEach(() => {
+        setBranding(original)
+      })
+
+      it('accepts a slug the default minimum would refuse', async () => {
+        await expect(validate({ slug: 'ab' })).resolves.toEqual({ slug: 'ab' })
       })
     })
   })

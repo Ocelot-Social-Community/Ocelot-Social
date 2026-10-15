@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils'
+import { getBranding, setBranding } from '@ocelot-social/branding'
 import flushPromises from 'flush-promises'
 import RegistrationSlideCreate from './RegistrationSlideCreate.vue'
 
@@ -157,6 +158,90 @@ describe('RegistrationSlideCreate', () => {
         receiveCommunicationAsEmailsEtcConfirmed: true,
       })
       expect(wrapper.vm.validInput).toBeTruthy()
+    })
+
+    describe('name length (branding.user.nameLength*)', () => {
+      const completeForm = (wrapper, names) =>
+        wrapper.setData({
+          formData: {
+            ...wrapper.vm.formData,
+            ...names,
+            password: 'pw',
+            passwordConfirmation: 'pw',
+          },
+          termsAndConditionsConfirmed: true,
+          receiveCommunicationAsEmailsEtcConfirmed: true,
+        })
+
+      it('refuses a name shorter than the minimum, not counting surrounding spaces', async () => {
+        const wrapper = Wrapper()
+        await completeForm(wrapper, { name: '  Pe  ' })
+        expect(wrapper.vm.validInput).toBe(false)
+      })
+
+      it('refuses a name longer than the maximum', async () => {
+        const wrapper = Wrapper()
+        await completeForm(wrapper, { name: 'a'.repeat(51) })
+        expect(wrapper.vm.validInput).toBe(false)
+        await completeForm(wrapper, { name: 'a'.repeat(50) })
+        expect(wrapper.vm.validInput).toBe(true)
+      })
+
+      it('counts given and surname together, as they are submitted', async () => {
+        policyValues.askForRealName = true
+        const wrapper = Wrapper()
+        // 25 + 1 + 25 = 51
+        await completeForm(wrapper, { givenName: 'a'.repeat(25), surName: 'b'.repeat(25) })
+        expect(wrapper.vm.nameLength).toBe(51)
+        expect(wrapper.vm.validInput).toBe(false)
+      })
+
+      it('shows the counter with the bounds of the brand', () => {
+        const wrapper = Wrapper()
+        const hint = wrapper.findComponent({ name: 'OsValidationHint' })
+        expect(hint.props()).toMatchObject({ count: 0, min: 3, max: 50, text: null })
+      })
+
+      it('explains the bounds once the field was left out of them', async () => {
+        const wrapper = Wrapper()
+        await completeForm(wrapper, { name: 'Pe' })
+        expect(wrapper.vm.nameErrorText).toBeNull()
+
+        wrapper.vm.touchField('name')
+        expect(wrapper.vm.nameErrorText).toBe('common.validations.nameLength')
+        expect(mocks.$t).toHaveBeenCalledWith('common.validations.nameLength', { min: 3, max: 50 })
+
+        await completeForm(wrapper, { name: 'Peter' })
+        expect(wrapper.vm.nameErrorText).toBeNull()
+      })
+
+      it('explains them under the surname when real names are asked for', async () => {
+        policyValues.askForRealName = true
+        const wrapper = Wrapper()
+        await completeForm(wrapper, { givenName: 'a'.repeat(30), surName: 'b'.repeat(30) })
+
+        wrapper.vm.touchField('surName')
+        expect(wrapper.vm.nameErrorText).toBe('common.validations.nameLength')
+      })
+
+      describe('with the bounds of a brand', () => {
+        let original
+
+        beforeEach(() => {
+          original = getBranding()
+          setBranding({ ...original, user: { ...original.user, nameLengthMin: 2 } })
+        })
+
+        afterEach(() => {
+          setBranding(original)
+        })
+
+        it('accepts a name the default minimum would refuse', async () => {
+          const wrapper = Wrapper()
+          await completeForm(wrapper, { name: 'Jo' })
+          expect(wrapper.vm.validInput).toBe(true)
+        })
+      })
     })
 
     it('toggles the password reveal icons', async () => {

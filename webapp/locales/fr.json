@@ -529,7 +529,10 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Tu ne peux faire cela qu'avec des utilisateurs dont le rôle accorde moins de pouvoirs que le tien.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Tu n'as pas le droit de rechercher dans l'administration des utilisateurs.",
     "USER_DOES_NOT_EXIST": "L'utilisateur est introuvable.",
+    "USER_PROFILE_NAME_TOO_LONG": "Le nom ne doit pas dépasser {max} caractères.",
     "USER_PROFILE_NAME_TOO_SHORT": "Le nom doit comporter au moins {min} caractères.",
+    "USER_PROFILE_SLUG_TOO_LONG": "Le nom d'utilisateur ne doit pas dépasser {max} caractères.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "Le nom d'utilisateur doit comporter au moins {min} caractères.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Cet utilisateur n'est pas bloqué.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Aucune adhésion active à ce groupe n'a été trouvée pour l'appel vidéo.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Tu n'as pas le droit de démarrer un appel vidéo dans ce groupe."
@@ -1851,6 +1854,7 @@
       "nameNotEmpty": "Veuillez entrer ton nom.",
       "slug": {
         "alreadyTaken": "Ce nom d'utilisateur est déjà pris.",
+        "length": "Le nom d'utilisateur doit comporter entre {min} et {max} caractères.",
         "regex": "Les caractères autorisés ne sont que les lettres minuscules, les chiffres, les traits de soulignement et les traits d'union."
       }
     }

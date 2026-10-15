@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import slugify from 'slugify'
 
 // `slugify.extend`, not a named `extend` import — the reverse of what this file did under
@@ -32,17 +30,42 @@ export function toSlug(str: string): string {
 }
 
 type IsUnique = (slug: string) => Promise<boolean>
-export default async function uniqueSlug(str: string, isUnique: IsUnique) {
-  const slug = toSlug(str)
-  if (await isUnique(slug)) {
-    return slug
-  }
+interface LengthBounds {
+  minLength?: number
+  maxLength?: number
+}
 
-  let count = 0
-  let uniqueSlug: string
-  do {
-    count += 1
-    uniqueSlug = `${slug}-${count}`
-  } while (!(await isUnique(uniqueSlug)))
-  return uniqueSlug
+// Candidate number `count` for a slug derived from `slug`, kept within the bounds: 0 is the slug
+// itself, every other one carries a `-<count>` suffix. The text is cut to leave room for the
+// suffix — a name of 50 characters can slugify to far more, since `ä` becomes `ae` — and a
+// suffix too short to reach the minimum is zero-padded (`x-001`). A cut must not end on `-`
+// either, or the suffix would double it. Returns null when the bare slug is out of bounds, which
+// moves on to the suffixed candidates.
+const candidate = (
+  slug: string,
+  count: number,
+  { minLength = 0, maxLength = Infinity }: LengthBounds,
+): string | null => {
+  const cut = (n: number) => slug.slice(0, Math.max(n, 0)).replace(/-+$/, '')
+  if (count === 0) {
+    const bare = cut(maxLength)
+    return bare.length >= minLength ? bare : null
+  }
+  const digits = String(count)
+  const head = cut(maxLength - digits.length - 1)
+  return `${head}-${digits.padStart(minLength - head.length - 1, '0')}`
+}
+
+export default async function uniqueSlug(
+  str: string,
+  isUnique: IsUnique,
+  bounds: LengthBounds = {},
+) {
+  const slug = toSlug(str)
+  for (let count = 0; ; count += 1) {
+    const next = candidate(slug, count, bounds)
+    if (next !== null && (await isUnique(next))) {
+      return next
+    }
+  }
 }

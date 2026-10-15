@@ -529,7 +529,10 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Këtë mund ta bësh vetëm me përdorues, roli i të cilëve jep më pak autoritet se yti.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Nuk mund të kërkosh në administrimin e përdoruesve.",
     "USER_DOES_NOT_EXIST": "Përdoruesi nuk u gjet.",
+    "USER_PROFILE_NAME_TOO_LONG": "Emri duhet të ketë jo më shumë se {max} karaktere.",
     "USER_PROFILE_NAME_TOO_SHORT": "Emri duhet të ketë të paktën {min} karaktere.",
+    "USER_PROFILE_SLUG_TOO_LONG": "Emri i përdoruesit duhet të ketë jo më shumë se {max} karaktere.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "Emri i përdoruesit duhet të ketë të paktën {min} karaktere.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Ky përdorues nuk është i bllokuar.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Për telefonatën me video nuk u gjet asnjë anëtarësim aktiv në këtë grup.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Nuk mund të nisësh një telefonatë me video në këtë grup."
@@ -1851,6 +1854,7 @@
       "nameNotEmpty": "Ju lutem fut emrin tënd.",
       "slug": {
         "alreadyTaken": "Ky emër përdoruesi është tashmë i zënë.",
+        "length": "Emri i përdoruesit duhet të ketë midis {min} dhe {max} karaktere.",
         "regex": "Karakteret e lejuara janë vetëm shkronja të vogla, numra, nënviza dhe viza."
       }
     }

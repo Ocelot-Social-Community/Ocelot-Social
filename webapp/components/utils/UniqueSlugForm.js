@@ -1,3 +1,4 @@
+import { branding } from '@ocelot-social/branding'
 import { debounce } from 'lodash'
 import { checkSlugAvailableQuery } from '~/graphql/User.js'
 
@@ -33,6 +34,17 @@ export default function UniqueSlugForm({ translate, apollo, currentUser }) {
           required: true,
           pattern: /^[a-z0-9_-]+$/,
           message: translate('settings.validation.slug.regex'),
+        },
+        {
+          // The brand's bounds, which the backend enforces too — and like there, only on a slug
+          // that changes: an account whose slug predates them must still be able to save.
+          validator(rule, value) {
+            const { slugLengthMin: min, slugLengthMax: max } = branding.user
+            if (currentUser && value === currentUser.slug) return true
+            const { length } = value || ''
+            if (length >= min && length <= max) return true
+            return new Error(translate('settings.validation.slug.length', { min, max }))
+          },
         },
         {
           asyncValidator(rule, value, callback) {

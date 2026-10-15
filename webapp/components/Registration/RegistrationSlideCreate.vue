@@ -42,14 +42,25 @@
             model="surName"
             :label="$t('settings.data.surName')"
             :placeholder="$t('settings.data.surNamePlaceholder')"
+            @blur="touchField('surName')"
           />
         </div>
         <ocelot-input
           v-else
           id="name"
           model="name"
+          hide-error
           :label="$t('settings.data.labelName')"
           :placeholder="$t('settings.data.namePlaceholder')"
+          @blur="touchField('name')"
+        />
+        <!-- Counts the name as it is submitted: given and surname joined by one space. -->
+        <os-validation-hint
+          :count="nameLength"
+          :min="branding.user.nameLengthMin"
+          :max="branding.user.nameLengthMax"
+          :variant="nameErrorText ? 'error' : null"
+          :text="nameErrorText"
         />
         <div class="password-wrapper">
           <ocelot-input
@@ -144,6 +155,7 @@
 
 <script>
 import { branding } from '@ocelot-social/branding'
+import { OsValidationHint } from '@ocelot-social/ui'
 import links from '~/constants/links'
 import { SignupVerificationMutation } from '~/graphql/Registration.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
@@ -170,6 +182,7 @@ export default {
     SweetalertIcon,
     LocationSelect,
     OcelotInput,
+    OsValidationHint,
   },
   props: {
     sliderData: { type: Object, required: true },
@@ -177,6 +190,7 @@ export default {
   data() {
     const passwordForm = PasswordForm({ translate: this.$t })
     return {
+      branding,
       links,
       supportEmail: this.$env.SUPPORT_EMAIL,
       formData: {
@@ -199,7 +213,8 @@ export default {
         name: {
           type: 'string',
           required: this.$policy.get('askForRealName') !== true,
-          min: 3,
+          min: branding.user.nameLengthMin,
+          max: branding.user.nameLengthMax,
         },
         ...passwordForm.formSchema,
       },
@@ -255,11 +270,28 @@ export default {
     askForRealName() {
       return this.$policy.get('askForRealName') === true
     },
+    // The length the backend checks: the submitted name, trimmed.
+    nameLength() {
+      return this.buildName(this.formData).trim().length
+    },
+    nameInBounds() {
+      const { nameLengthMin, nameLengthMax } = branding.user
+      return this.nameLength >= nameLengthMin && this.nameLength <= nameLengthMax
+    },
+    nameErrorText() {
+      const field = this.askForRealName ? 'surName' : 'name'
+      if (!this.touchedFields[field] || this.nameInBounds) return null
+      return this.$t('common.validations.nameLength', {
+        min: branding.user.nameLengthMin,
+        max: branding.user.nameLengthMax,
+      })
+    },
     validInput() {
       return (
         (this.askForRealName
           ? this.formData.givenName.length >= 2 && this.formData.surName.length >= 2
-          : this.formData.name.length >= 3) &&
+          : true) &&
+        this.nameInBounds &&
         this.formData.password.length >= 1 &&
         this.formData.password === this.formData.passwordConfirmation &&
         this.termsAndConditionsConfirmed &&
