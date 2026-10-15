@@ -52,8 +52,43 @@ Copy Environment Variables:
 $ cp .env.template .env
 ```
 
-Configure the new file according to your needs and your local setup. Make sure
-a [local Neo4J](http://localhost:7474) instance is up and running.
+Configure the new file according to your needs and your local setup.
+
+The backend needs more than a database: uploads go to an S3 storage (MinIO) and
+images are delivered through imagor. The simplest way to get all of them is to
+start only the supporting services from the Docker Compose setup and run the
+backend itself on your host:
+
+```sh
+# in main folder
+$ docker compose up neo4j minio minio-mc imagor mailserver
+```
+
+This gives you:
+
+- Neo4j on `localhost:7687` (Bolt) and [localhost:7474](http://localhost:7474)
+  (browser)
+- MinIO on `localhost:9000` (S3 API) and [localhost:9001](http://localhost:9001)
+  (console); `minio-mc` creates the `ocelot` bucket and makes it publicly
+  readable, then exits
+- imagor on `localhost:8000`
+- the mail catcher on `localhost:1025` (SMTP) and
+  [localhost:1080](http://localhost:1080) (web interface)
+
+The defaults in `.env.template` — `AWS_ENDPOINT=http://localhost:9000`,
+`IMAGOR_PUBLIC_URL=http://localhost:8000` and the MinIO credentials — match
+these services as they are. Leave `PROXY_S3` unset: it is only needed inside the
+backend container, where it forwards the container's port 9000 to `minio:9000`.
+On the host, MinIO already owns port 9000 and the hostname `minio` does not
+resolve. To receive the e-mails in the mail catcher, set `SMTP_HOST=localhost`
+and `SMTP_PORT=1025` (see the commented example in `.env.template`).
+
+If MinIO refuses to start with `Unable to write to the backend`, your
+`minio_data` volume was written by the old MinIO image — see
+[One-time MinIO Volume Migration](../installation.md#one-time-minio-volume-migration).
+
+If you run Neo4j yourself instead, make sure a
+[local Neo4J](http://localhost:7474) instance is up and running.
 
 Start the backend for development with:
 
