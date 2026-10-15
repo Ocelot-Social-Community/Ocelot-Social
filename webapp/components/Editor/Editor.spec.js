@@ -404,6 +404,16 @@ describe('Editor.vue', () => {
         expect(paragraph().lastChild.text).toBe(' ')
       })
 
+      // Regression (#6462): the caret stayed in front of the space, so the reply was typed right
+      // behind the mention and the space trailed at the end.
+      it('puts the caret behind the space', () => {
+        const { selection } = wrapper.vm.editor.view.state
+        const endOfParagraph = 1 + paragraph().content.size
+        expect(selection.empty).toBe(true)
+        expect(selection.from).toBe(endOfParagraph)
+        expect(selection.$from.nodeBefore.text).toBe(' ')
+      })
+
       it('does not take the mention for one being typed', () => {
         expect(wrapper.vm.suggestionType).toBe('')
         expect(propsData.mentionSuggestions).not.toHaveBeenCalled()
