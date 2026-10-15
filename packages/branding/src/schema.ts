@@ -169,6 +169,17 @@ export interface BrandingConfig {
   user: {
     nameLengthMin: number
     nameLengthMax: number
+    /**
+     * Length bounds of the slug a user chooses (the unique name in their profile URL).
+     *
+     * Enforced where a slug is SET — signup and the profile settings — not on slugs already stored:
+     * an account keeps the slug it has until it changes it. A slug the backend derives from the
+     * name at signup is cut and padded into these bounds, so a generated slug cannot break them
+     * either. The maximum exists because the slug ends up in every profile URL and in the unique
+     * index; without one, a client could store a slug of any length.
+     */
+    slugLengthMin: number
+    slugLengthMax: number
   }
   registration: {
     nonceLength: number

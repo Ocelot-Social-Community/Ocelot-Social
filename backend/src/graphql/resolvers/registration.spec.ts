@@ -8,6 +8,7 @@ import Factory, { cleanDatabase } from '@db/factories'
 import Signup from '@graphql/queries/auth/Signup.gql'
 import SignupVerification from '@graphql/queries/auth/SignupVerification.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { getBranding, setBranding } from '@src/branding'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -635,6 +636,105 @@ describe('SignupVerification', () => {
               mutate({ mutation: SignupVerification, variables }),
             ).resolves.toMatchObject({
               errors: [{ message: 'Invalid version format!' }],
+            })
+          })
+
+          // The webapp holds the name to branding.user.nameLength*, but the API used to take any
+          // name at signup — only UpdateUser checked one, and that only for its minimum.
+          describe('holds the name to the brand bounds', () => {
+            it('rejects a name shorter than the minimum, not counting surrounding spaces', async () => {
+              variables = { ...variables, name: '  ab  ' }
+
+              await expect(
+                mutate({ mutation: SignupVerification, variables }),
+              ).resolves.toMatchObject({
+                data: { SignupVerification: null },
+                errors: [{ message: 'The name must be at least 3 characters long.' }],
+              })
+            })
+
+            it('rejects a name longer than the maximum', async () => {
+              variables = { ...variables, name: 'a'.repeat(51) }
+
+              await expect(
+                mutate({ mutation: SignupVerification, variables }),
+              ).resolves.toMatchObject({
+                data: { SignupVerification: null },
+                errors: [{ message: 'The name must be at most 50 characters long.' }],
+              })
+            })
+
+            it('creates no user for a refused name', async () => {
+              variables = { ...variables, name: 'ab' }
+              await mutate({ mutation: SignupVerification, variables })
+
+              const { records } = await database.neode.cypher(
+                'MATCH (u:User {name: $name}) RETURN u',
+                { name: 'ab' },
+              )
+
+              expect(records).toHaveLength(0)
+            })
+
+            it('reads the bounds from the branding', async () => {
+              const original = getBranding()
+              setBranding({ ...original, user: { ...original.user, nameLengthMin: 2 } })
+              try {
+                variables = { ...variables, name: 'Jo' }
+
+                await expect(
+                  mutate({ mutation: SignupVerification, variables }),
+                ).resolves.toMatchObject({
+                  data: { SignupVerification: { id: expect.any(String) } },
+                })
+              } finally {
+                setBranding(original)
+              }
+            })
+          })
+
+          describe('holds the slug to the brand bounds', () => {
+            it('rejects a chosen slug shorter than the minimum', async () => {
+              variables = { ...variables, slug: 'jd' }
+
+              await expect(
+                mutate({ mutation: SignupVerification, variables }),
+              ).resolves.toMatchObject({
+                data: { SignupVerification: null },
+                errors: [{ message: 'The slug must be at least 3 characters long.' }],
+              })
+            })
+
+            it('rejects a chosen slug longer than the maximum', async () => {
+              variables = { ...variables, slug: 'j'.repeat(51) }
+
+              await expect(
+                mutate({ mutation: SignupVerification, variables }),
+              ).resolves.toMatchObject({
+                data: { SignupVerification: null },
+                errors: [{ message: 'The slug must be at most 50 characters long.' }],
+              })
+            })
+
+            it('derives a slug within the bounds from a name that transliterates longer', async () => {
+              // 50 characters of name, 100 of slug before the cut
+              variables = { ...variables, name: 'ä'.repeat(50) }
+
+              await expect(
+                mutate({ mutation: SignupVerification, variables }),
+              ).resolves.toMatchObject({
+                data: { SignupVerification: { slug: 'ae'.repeat(25) } },
+              })
+            })
+
+            it('derives a slug at least as long as the minimum from a name that strips to less', async () => {
+              variables = { ...variables, name: 'Jo 😀' }
+
+              await expect(
+                mutate({ mutation: SignupVerification, variables }),
+              ).resolves.toMatchObject({
+                data: { SignupVerification: { slug: 'jo-1' } },
+              })
             })
           })
         })

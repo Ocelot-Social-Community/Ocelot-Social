@@ -70,7 +70,9 @@
     "termsAndConditions.version: string",
     "theme.tokens: object",
     "user.nameLengthMax: number",
-    "user.nameLengthMin: number"
+    "user.nameLengthMin: number",
+    "user.slugLengthMax: number",
+    "user.slugLengthMin: number"
   ],
   "buckets": {
     "theme": [

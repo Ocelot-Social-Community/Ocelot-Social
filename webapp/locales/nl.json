@@ -530,7 +530,10 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Dit kun je alleen doen bij gebruikers van wie de rol minder bevoegdheden geeft dan de jouwe.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Je mag niet zoeken in het gebruikersbeheer.",
     "USER_DOES_NOT_EXIST": "De gebruiker is niet gevonden.",
+    "USER_PROFILE_NAME_TOO_LONG": "De naam mag maximaal {max} tekens lang zijn.",
     "USER_PROFILE_NAME_TOO_SHORT": "De naam moet minimaal {min} tekens lang zijn.",
+    "USER_PROFILE_SLUG_TOO_LONG": "De gebruikersnaam mag maximaal {max} tekens lang zijn.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "De gebruikersnaam moet minimaal {min} tekens lang zijn.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Deze gebruiker is niet geblokkeerd.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Er is geen actief lidmaatschap van deze groep gevonden voor het videogesprek.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Je mag in deze groep geen videogesprek starten."
@@ -1852,6 +1855,7 @@
       "nameNotEmpty": "Voer alstublieft je naam in.",
       "slug": {
         "alreadyTaken": "Deze gebruikersnaam is al in gebruik.",
+        "length": "De gebruikersnaam moet tussen {min} en {max} tekens lang zijn.",
         "regex": "Toegestane tekens zijn alleen kleine letters, cijfers, underscores en koppeltekens."
       }
     }

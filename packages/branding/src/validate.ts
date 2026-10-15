@@ -41,6 +41,9 @@ export function validateBranding(config: BrandingConfig): string[] {
 
   atLeast('user.nameLengthMin', user.nameLengthMin, 0)
   atMost('user.nameLengthMin', user.nameLengthMin, 'user.nameLengthMax', user.nameLengthMax)
+  // At least one character: an empty slug would leave the profile URL without its last segment.
+  atLeast('user.slugLengthMin', user.slugLengthMin, 1)
+  atMost('user.slugLengthMin', user.slugLengthMin, 'user.slugLengthMax', user.slugLengthMax)
 
   atLeast('registration.nonceLength', registration.nonceLength, 1)
   atLeast('registration.inviteCodeLength', registration.inviteCodeLength, 1)

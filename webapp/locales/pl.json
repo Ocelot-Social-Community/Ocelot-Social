@@ -530,7 +530,10 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Możesz to zrobić tylko wobec użytkowników, których rola daje mniej uprawnień niż twoja.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Nie możesz przeszukiwać administracji użytkowników.",
     "USER_DOES_NOT_EXIST": "Nie znaleziono użytkownika.",
+    "USER_PROFILE_NAME_TOO_LONG": "Nazwa może mieć co najwyżej {max} znaków.",
     "USER_PROFILE_NAME_TOO_SHORT": "Nazwa musi mieć co najmniej {min} znaków.",
+    "USER_PROFILE_SLUG_TOO_LONG": "Nazwa użytkownika może mieć co najwyżej {max} znaków.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "Nazwa użytkownika musi mieć co najmniej {min} znaków.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Ten użytkownik nie jest zablokowany.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Nie znaleziono aktywnego członkostwa w tej grupie dla rozmowy wideo.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Nie możesz rozpocząć rozmowy wideo w tej grupie."
@@ -1852,6 +1855,7 @@
       "nameNotEmpty": "Proszę podaj swoje imię.",
       "slug": {
         "alreadyTaken": "Ta nazwa użytkownika jest już zajęta.",
+        "length": "Nazwa użytkownika musi mieć od {min} do {max} znaków.",
         "regex": "Dozwolone znaki to tylko małe litery, cyfry, podkreślenia i myślniki."
       }
     }
