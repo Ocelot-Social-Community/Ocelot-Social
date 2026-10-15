@@ -5,6 +5,7 @@ import metadata from './constants/metadata.js'
 import locales from './locales/index.js'
 import { brandingHeadHtml } from './utils/brandingHead.js'
 import brandIcons from './server-middleware/brand-icons.js'
+import workbox from './server-middleware/workbox.js'
 
 const CONFIG = require('./config').default // we need to use require since this is only evaluated at compile time.
 
@@ -176,6 +177,8 @@ export default {
     // Dynamic PWA manifest generated from the active brand's metadata (replaces the static
     // @nuxtjs/pwa manifest, disabled below) so app name / theme colour follow a live brand switch.
     { path: '/manifest.webmanifest', handler: '~/server-middleware/manifest.js' },
+    // Workbox for the service worker, from our own origin instead of jsdelivr (see pwa.workbox).
+    { path: '/workbox', handler: '~/server-middleware/workbox.js' },
   ],
 
   /*
@@ -374,6 +377,14 @@ export default {
     // whichever candidate the browser happened to prefer. The two links are declared in head.link
     // above instead, with hids, so branding-favicon.js can rewrite them.
     icon: false,
+    // The service worker would load Workbox from cdn.jsdelivr.net — every visitor's browser
+    // asking a third party, by default (#5761). It is served from our own origin instead, by
+    // server-middleware/workbox.js. workboxURL alone is not enough: workbox-sw loads its modules
+    // (core, precaching, routing, …) from the CDN, too, unless modulePathPrefix says otherwise.
+    workbox: {
+      workboxURL: `${workbox.urlPrefix}/workbox-sw.js`,
+      config: { modulePathPrefix: workbox.urlPrefix },
+    },
     meta: {
       // Prevent @nuxtjs/pwa from auto-generating description from package.json;
       // we set description and og:description manually in head.meta above.
