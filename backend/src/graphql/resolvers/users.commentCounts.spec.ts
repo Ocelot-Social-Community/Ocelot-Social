@@ -90,7 +90,7 @@ const undeletedCommentIdsOf = async (id: string) => {
   const result = await setup.database.query({
     query: `
       MATCH (:User { id: $id })-[:WROTE]->(comment:Comment)
-      WHERE NOT comment.deleted = true
+      WHERE coalesce(comment.deleted, false) = false
       RETURN comment.id AS id
     `,
     variables: { id },
@@ -145,7 +145,12 @@ beforeAll(async () => {
     comment('cc-only-deleted', { id: 'cc-comment-deleted', deleted: true }),
     comment('cc-disabled', { id: 'cc-comment-on-disabled' }),
     comment('cc-closed', { id: 'cc-comment-in-group' }),
+    comment('cc-public', { id: 'cc-comment-legacy' }),
   ])
+  // `deleted` is optional on Comment, so older data may lack it — such a comment is not deleted.
+  await setup.database.write({
+    query: `MATCH (comment:Comment { id: 'cc-comment-legacy' }) REMOVE comment.deleted`,
+  })
 })
 
 afterAll(async () => {
@@ -159,7 +164,7 @@ describe('User.commentedCount', () => {
   it('counts the posts the "commented" tab lists, not the comments', async () => {
     asUser('stranger')
 
-    // Three comments on cc-public are one post; a post whose only comment by the user was
+    // Four comments on cc-public are one post; a post whose only comment by the user was
     // deleted still appears in the tab, so it counts too.
     await expect(commentedTabOf('cc-commenter')).resolves.toEqual(['cc-only-deleted', 'cc-public'])
     await expect(commentedCountOf('cc-commenter')).resolves.toBe(2)
@@ -181,9 +186,9 @@ describe('User.commentsCount', () => {
   it('counts every comment the user has not deleted, wherever it is', async () => {
     asUser('commenter')
 
-    // The two on cc-public, the disabled one, the one on the disabled post and the one in
-    // the closed group — but not the deleted one.
-    await expect(countsOf('cc-commenter')).resolves.toMatchObject({ commentsCount: 5 })
+    // The two on cc-public, the one lacking `deleted`, the disabled one, the one on the
+    // disabled post and the one in the closed group — but not the deleted one.
+    await expect(countsOf('cc-commenter')).resolves.toMatchObject({ commentsCount: 6 })
   })
 
   it.each([['admin'], ['moderator']])(
@@ -191,7 +196,7 @@ describe('User.commentsCount', () => {
     async (viewer) => {
       asUser(viewer)
 
-      await expect(countsOf('cc-commenter')).resolves.toMatchObject({ commentsCount: 5 })
+      await expect(countsOf('cc-commenter')).resolves.toMatchObject({ commentsCount: 6 })
     },
   )
 

@@ -864,10 +864,12 @@ export default {
         // Real comments, and on purpose NOT filtered by the post's visibility: this is what
         // DeleteUser with `resource: ['Comment']` deletes — every comment the user wrote,
         // disabled ones and those on disabled/deleted posts or in closed groups included.
-        // Already deleted ones are left out, deleting them again changes nothing. Readable
-        // only by the user and user administrators (permissionsMiddleware.ts), since it
-        // counts comments the viewer may not see.
-        commentsCount: '-[:WROTE]->(related:Comment) WHERE NOT related.deleted = true',
+        // Already deleted ones are left out, deleting them again changes nothing; a comment
+        // without the (optional) `deleted` property is not deleted, and DeleteUser matches it.
+        // Readable only by the user and user administrators (permissionsMiddleware.ts), since
+        // it counts comments the viewer may not see.
+        commentsCount:
+          '-[:WROTE]->(related:Comment) WHERE coalesce(related.deleted, false) = false',
         // The parent here is the shouter: their setting decides whether others see these.
         shoutedCount: `-[:SHOUTED]->(related:Post) ${visiblePostFilter}
           AND ${shoutsVisibleTo('parent', '$cypherParams.currentUserId')}`,
