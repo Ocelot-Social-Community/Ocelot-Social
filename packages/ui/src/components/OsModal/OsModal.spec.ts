@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { nextTick } from 'vue'
 
 import OsModal from './OsModal.vue'
 
@@ -108,12 +109,27 @@ describe('osModal', () => {
   })
 
   describe('panel width', () => {
-    it('applies max-w-[500px]', () => {
+    it('applies max-w-[500px] by default (size md)', () => {
       const wrapper = mount(OsModal, {
         props: { open: true },
       })
 
       expect(wrapper.find('.os-modal').classes()).toContain('max-w-[500px]')
+    })
+
+    it.each([
+      ['sm', 'max-w-[400px]'],
+      ['md', 'max-w-[500px]'],
+      ['lg', 'max-w-[700px]'],
+    ] as const)('applies %s size as %s', (size, expected) => {
+      const wrapper = mount(OsModal, {
+        props: { open: true, size },
+      })
+
+      const classes = wrapper.find('.os-modal').classes()
+
+      expect(classes).toContain(expected)
+      expect(classes.filter((c) => c.startsWith('max-w-'))).toStrictEqual([expected])
     })
   })
 
@@ -378,48 +394,219 @@ describe('osModal', () => {
     })
   })
 
-  describe('keyboard accessibility', () => {
-    it('traps focus within the modal on Tab', async () => {
+  describe('close button label', () => {
+    it('defaults to an English fallback', () => {
       const wrapper = mount(OsModal, {
-        props: { open: true, title: 'Test' },
-        attachTo: document.body,
+        props: { open: true },
       })
 
-      const panel = wrapper.find('[data-testid="os-modal-panel"]')
-      const buttons = wrapper.findAll('button')
-      const lastButton = buttons[buttons.length - 1]
-
-      // Focus the last button
-      ;(lastButton.element as HTMLElement).focus()
-
-      // Press Tab → should wrap to first
-      await panel.trigger('keydown', { key: 'Tab' })
-
-      // The focus trap should have prevented default
-      // (we can't fully test focus movement in jsdom, but we test the handler exists)
-      expect(panel.exists()).toBe(true)
-
-      wrapper.unmount()
+      expect(wrapper.find('[data-testid="os-modal-close"]').attributes('aria-label')).toBe('Close')
     })
 
-    it('traps focus within the modal on Shift+Tab', async () => {
+    it('uses the closeLabel prop', () => {
       const wrapper = mount(OsModal, {
-        props: { open: true, title: 'Test' },
-        attachTo: document.body,
+        props: { open: true, closeLabel: 'Schließen' },
       })
 
-      const panel = wrapper.find('[data-testid="os-modal-panel"]')
-      const buttons = wrapper.findAll('button')
+      expect(wrapper.find('[data-testid="os-modal-close"]').attributes('aria-label')).toBe(
+        'Schließen',
+      )
+    })
+  })
 
-      // Focus the first button
-      ;(buttons[0].element as HTMLElement).focus()
+  describe('keyboard accessibility', () => {
+    let trigger: HTMLButtonElement
 
-      // Press Shift+Tab → should wrap to last
-      await panel.trigger('keydown', { key: 'Tab', shiftKey: true })
+    beforeEach(() => {
+      trigger = document.createElement('button')
+      trigger.textContent = 'open'
+      document.body.appendChild(trigger)
+      trigger.focus()
+    })
 
-      expect(panel.exists()).toBe(true)
+    afterEach(() => {
+      trigger.remove()
+    })
 
-      wrapper.unmount()
+    function mountOpen(slots: Record<string, string> = {}) {
+      return mount(OsModal, {
+        props: { open: true, title: 'Test' },
+        slots,
+        attachTo: document.body,
+      })
+    }
+
+    function pressTab(panel: HTMLElement, shiftKey = false) {
+      const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey, cancelable: true })
+      panel.dispatchEvent(event)
+      return event
+    }
+
+    describe('focus on open', () => {
+      it('moves focus to the panel when nothing asks for it', async () => {
+        const wrapper = mountOpen()
+        await nextTick()
+
+        expect(document.activeElement).toBe(wrapper.find('[data-testid="os-modal-panel"]').element)
+
+        wrapper.unmount()
+      })
+
+      it('moves focus to the element marked with data-autofocus', async () => {
+        const wrapper = mountOpen({
+          default: '<input class="first" /><input class="wanted" data-autofocus />',
+        })
+        await nextTick()
+
+        expect(document.activeElement).toBe(wrapper.find('.wanted').element)
+
+        wrapper.unmount()
+      })
+
+      it('moves focus when opened later', async () => {
+        const wrapper = mount(OsModal, {
+          props: { open: false },
+          attachTo: document.body,
+        })
+        await wrapper.setProps({ open: true })
+        await nextTick()
+
+        expect(document.activeElement).toBe(wrapper.find('[data-testid="os-modal-panel"]').element)
+
+        wrapper.unmount()
+      })
+
+      it('does not move focus when closed again before the next tick', async () => {
+        const wrapper = mountOpen()
+        await wrapper.setProps({ open: false })
+        await nextTick()
+
+        expect(document.activeElement).toBe(trigger)
+
+        wrapper.unmount()
+      })
+    })
+
+    describe('focus on close', () => {
+      it('returns focus to the previously focused element when closed', async () => {
+        const wrapper = mountOpen()
+        await nextTick()
+        await wrapper.setProps({ open: false })
+
+        expect(document.activeElement).toBe(trigger)
+
+        wrapper.unmount()
+      })
+
+      it('returns focus to the previously focused element when unmounted while open', async () => {
+        const wrapper = mountOpen()
+        await nextTick()
+        wrapper.unmount()
+
+        expect(document.activeElement).toBe(trigger)
+      })
+
+      it('does not try to focus an element that left the document', async () => {
+        const wrapper = mountOpen()
+        await nextTick()
+        trigger.remove()
+        const focus = vi.spyOn(trigger, 'focus')
+        await wrapper.setProps({ open: false })
+
+        expect(focus).not.toHaveBeenCalled()
+
+        wrapper.unmount()
+      })
+    })
+
+    describe('focus trap', () => {
+      it('wraps Tab on the last element to the first', async () => {
+        const wrapper = mountOpen()
+        await nextTick()
+        const panel = wrapper.find('[data-testid="os-modal-panel"]').element as HTMLElement
+        const close = wrapper.find('[data-testid="os-modal-close"]').element as HTMLElement
+        const confirm = wrapper.find('[data-testid="os-modal-confirm"]').element as HTMLElement
+        confirm.focus()
+
+        const event = pressTab(panel)
+
+        expect(event.defaultPrevented).toBe(true)
+        expect(document.activeElement).toBe(close)
+
+        wrapper.unmount()
+      })
+
+      it('wraps Shift+Tab on the first element to the last', async () => {
+        const wrapper = mountOpen()
+        await nextTick()
+        const panel = wrapper.find('[data-testid="os-modal-panel"]').element as HTMLElement
+        const close = wrapper.find('[data-testid="os-modal-close"]').element as HTMLElement
+        const confirm = wrapper.find('[data-testid="os-modal-confirm"]').element as HTMLElement
+        close.focus()
+
+        const event = pressTab(panel, true)
+
+        expect(event.defaultPrevented).toBe(true)
+        expect(document.activeElement).toBe(confirm)
+
+        wrapper.unmount()
+      })
+
+      it('keeps Shift+Tab from the focused panel inside the dialog', async () => {
+        const wrapper = mountOpen()
+        await nextTick()
+        const panel = wrapper.find('[data-testid="os-modal-panel"]').element as HTMLElement
+        const confirm = wrapper.find('[data-testid="os-modal-confirm"]').element as HTMLElement
+
+        const event = pressTab(panel, true)
+
+        expect(event.defaultPrevented).toBe(true)
+        expect(document.activeElement).toBe(confirm)
+
+        wrapper.unmount()
+      })
+
+      it('leaves Tab between inner elements to the browser', async () => {
+        const wrapper = mountOpen()
+        await nextTick()
+        const panel = wrapper.find('[data-testid="os-modal-panel"]').element as HTMLElement
+        const cancel = wrapper.find('[data-testid="os-modal-cancel"]').element as HTMLElement
+        cancel.focus()
+
+        expect(pressTab(panel).defaultPrevented).toBe(false)
+        expect(pressTab(panel, true).defaultPrevented).toBe(false)
+
+        wrapper.unmount()
+      })
+
+      it('skips disabled controls when finding the last element', async () => {
+        const wrapper = mountOpen({
+          footer: '<button class="enabled">ok</button><button class="off" disabled>off</button>',
+        })
+        await nextTick()
+        const panel = wrapper.find('[data-testid="os-modal-panel"]').element as HTMLElement
+        const close = wrapper.find('[data-testid="os-modal-close"]').element as HTMLElement
+        ;(wrapper.find('.enabled').element as HTMLElement).focus()
+
+        const event = pressTab(panel)
+
+        expect(event.defaultPrevented).toBe(true)
+        expect(document.activeElement).toBe(close)
+
+        wrapper.unmount()
+      })
+
+      it('ignores other keys', async () => {
+        const wrapper = mountOpen()
+        await nextTick()
+        const panel = wrapper.find('[data-testid="os-modal-panel"]').element as HTMLElement
+        const event = new KeyboardEvent('keydown', { key: 'a', cancelable: true })
+        panel.dispatchEvent(event)
+
+        expect(event.defaultPrevented).toBe(false)
+
+        wrapper.unmount()
+      })
     })
   })
 })
