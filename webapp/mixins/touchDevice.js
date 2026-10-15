@@ -1,22 +1,22 @@
 export default {
   data() {
-    const pointerQuery =
-      typeof window !== 'undefined' ? window.matchMedia('(pointer: coarse)') : null
+    // The server cannot know the pointer of the browser, so the first render assumes none is coarse
+    // on both sides — otherwise the client renders different markup than the server sent and fails
+    // to hydrate. The real value follows once mounted.
     return {
-      isTouchDevice: pointerQuery ? pointerQuery.matches : false,
-      pointerQuery,
+      isTouchDevice: false,
     }
   },
   mounted() {
-    if (this.pointerQuery) {
-      this.onPointerChange = (e) => {
-        this.isTouchDevice = e.matches
-      }
-      this.pointerQuery.addEventListener('change', this.onPointerChange)
+    this.pointerQuery = window.matchMedia('(pointer: coarse)')
+    this.isTouchDevice = this.pointerQuery.matches
+    this.onPointerChange = (e) => {
+      this.isTouchDevice = e.matches
     }
+    this.pointerQuery.addEventListener('change', this.onPointerChange)
   },
   beforeDestroy() {
-    if (this.pointerQuery && this.onPointerChange) {
+    if (this.pointerQuery) {
       this.pointerQuery.removeEventListener('change', this.onPointerChange)
     }
   },

@@ -107,7 +107,8 @@
             />
           </section>
           <div class="ds-mb-small"></div>
-          <p
+          <!-- A <div>, not a <p>: the dropdown renders a <div>, which a <p> must not contain. -->
+          <div
             v-if="post.group && post.group.id && post.group.slug"
             class="post-kicker ds-text ds-text-soft ds-text-size-base"
           >
@@ -132,7 +133,7 @@
                 />
               </template>
             </dropdown>
-          </p>
+          </div>
           <h1 class="ds-heading ds-heading-h1 title hyphenate-text">{{ post.title }}</h1>
           <!-- event data -->
           <div
