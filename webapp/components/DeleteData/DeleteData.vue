@@ -31,11 +31,11 @@
       <input type="checkbox" v-model="deleteComments" data-test="comments-deletion-checkbox" />
       {{
         $t(
-          'settings.deleteUserAccount.commentedCount',
+          'settings.deleteUserAccount.commentsCount',
           {
-            count: currentUserCounts.commentedCount,
+            count: currentUserCounts.commentsCount,
           },
-          currentUserCounts.commentedCount,
+          currentUserCounts.commentsCount,
         )
       }}
     </label>

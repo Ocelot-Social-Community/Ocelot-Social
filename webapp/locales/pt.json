@@ -1700,7 +1700,7 @@
       "accountDescription": "Esteja ciente de que o suas Publicações e Comentários são importantes para a nossa comunidade. Se você ainda optar por excluí-los, você tem que marcá-los abaixo.",
       "accountWarning": "Você NÃO PODE GERENCIAR e NÃO PODE RECUPERAR sua conta, Publicações, ou Comentários após excluir sua conta!",
       "accountWarningIsAdmin": "Atenção! Você está prestes a excluir uma conta de usuário!",
-      "commentedCount": "Deletar meus {count} comentários",
+      "commentsCount": "Deletar meus {count} comentários",
       "contributionsCount": "Deletar minhas {count} publicações",
       "infoAdmin": "Todas as contribuições e comentários do usuário serão excluídos adicionalmente!",
       "name": "Deletar dados",

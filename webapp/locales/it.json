@@ -1700,7 +1700,7 @@
       "accountDescription": "Essere consapevoli che i tuoi post e commenti sono importanti per la nostra comunità. Se cancelli il tuo account utente, tutto scomparirà per sempre - e sarebbe un vero peccato!",
       "accountWarning": "Attenzione! Tu NON PUOI GESTIRE e NON PUOI RECUPERARE il tuo account, i tuoi messaggi o commenti dopo aver cancellato il tuo account!",
       "accountWarningIsAdmin": "Attenzione! Stai per eliminare un account utente!",
-      "commentedCount": "Cancella i miei {count} commenti",
+      "commentsCount": "Cancella i miei {count} commenti",
       "contributionsCount": "Cancellare i miei {count} messaggi",
       "infoAdmin": "Tutti i contributi e i commenti dell'utente verranno eliminati in aggiunta!",
       "name": "Cancellare l'account utente",

@@ -287,9 +287,9 @@
         </div>
         <div style="flex: 0 0 15%; width: 15%">
           <p class="ds-text ds-text-size-small">
-            <strong>{{ $t('common.comment', null, deleteUserData.commentedCount) }}</strong>
+            <strong>{{ $t('common.comment', null, deleteUserData.commentsCount) }}</strong>
             <br />
-            {{ deleteUserData.commentedCount }}
+            {{ deleteUserData.commentsCount }}
           </p>
         </div>
       </div>
@@ -701,7 +701,9 @@ export default {
     },
     User: {
       query() {
-        return profileUserQuery(this.$i18n)
+        // The delete-user dialog states how many comments go with the account; only who may
+        // delete it reads that number (and asking for it without the right fails the query).
+        return profileUserQuery(this.$i18n, { withCommentsCount: this.$can('user.delete.any') })
       },
       variables() {
         return {

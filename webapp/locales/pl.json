@@ -1485,7 +1485,7 @@
     "avatar": {
       "submitted": "Przesłano pomyślnie"
     },
-    "commented": "Skomentuj",
+    "commented": "Skomentowane",
     "followers": "Obserwujący",
     "following": "Obserwowani",
     "groups": {
@@ -1700,7 +1700,7 @@
       "accountDescription": "Be aware that your Post and Comments are important to our community. If you still choose to delete them, you have to mark them below.",
       "accountWarning": "Po usunięcie Twojego konta, nie możesz ZARZĄDZAĆ ani ODZYSKAĆ danych, wpisów oraz komentarzy!",
       "accountWarningIsAdmin": "Uwaga! Zamierzasz usunąć konto użytkownika!",
-      "commentedCount": "Usuń {count} moich komentarzy",
+      "commentsCount": "Usuń {count} moich komentarzy",
       "contributionsCount": "Usuń {count} moich postów",
       "infoAdmin": "Wszystkie wpisy i komentarze użytkownika zostaną dodatkowo usunięte!",
       "name": "Usuń dane",

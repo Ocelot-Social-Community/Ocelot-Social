@@ -1041,6 +1041,15 @@ export default shield(
       // Users may read their own role name (for the role badge); role.manage admins
       // read anyone's.
       roleName: or(isMyOwn, hasPermission('role.manage')),
+      // Counts comments in groups and on posts the viewer may not see (it is what deleting the
+      // account deletes), so only for the user themselves and for those administering user
+      // accounts — the rights that open the user list, whose comments column shows it.
+      commentsCount: or(
+        isMyOwn,
+        hasPermission('user.delete.any'),
+        hasPermission('user.disable'),
+        hasPermission('badge.manage'),
+      ),
     },
     Group: {
       '*': isAuthenticated,

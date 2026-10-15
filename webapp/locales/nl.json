@@ -1700,7 +1700,7 @@
       "accountDescription": "Wees je ervan bewust dat je berichten en reacties belangrijk zijn voor onze community. Als je er toch voor kiest ze te verwijderen, moet je ze hieronder markeren.",
       "accountWarning": "Je kunt je account, berichten of reacties NIET BEHEREN en NIET HERSTELLEN na het verwijderen van je account!",
       "accountWarningIsAdmin": "Let op! Je staat op het punt een gebruikersaccount te verwijderen!",
-      "commentedCount": "Mijn {count} reactie verwijderen ::: Mijn {count} reacties verwijderen",
+      "commentsCount": "Mijn {count} reactie verwijderen ::: Mijn {count} reacties verwijderen",
       "contributionsCount": "Mijn {count} bericht verwijderen ::: Mijn {count} berichten verwijderen",
       "infoAdmin": "Alle bijdragen en reacties van de gebruiker worden ook verwijderd!",
       "name": "Gebruikersaccount verwijderen",

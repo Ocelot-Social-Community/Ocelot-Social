@@ -1700,7 +1700,7 @@
       "accountDescription": "Ki parasysh se postimet dhe komentet tuaja janë të rëndësishme për komunitetin tonë. Nëse vendos ende t'i fshish, duhet t'i shënosh më poshtë.",
       "accountWarning": "NUK MUND TA MENAXHOSH dhe NUK MUND TA RIKTHESH llogarinë, postimet ose komentet pasi të fshish llogarinë tënde!",
       "accountWarningIsAdmin": "Kujdes! Je duke fshirë një llogari përdoruesi!",
-      "commentedCount": "Fshi {count} komentin tim ::: Fshi {count} komentet e mia",
+      "commentsCount": "Fshi {count} komentin tim ::: Fshi {count} komentet e mia",
       "contributionsCount": "Fshi {count} postimin tim ::: Fshi {count} postimet e mia",
       "infoAdmin": "Të gjitha kontributet dhe komentet e përdoruesit do të fshihen gjithashtu!",
       "name": "Fshi llogarinë e përdoruesit",

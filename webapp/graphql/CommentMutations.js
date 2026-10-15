@@ -29,6 +29,7 @@ export default () => {
             shoutedCount
             contributionsCount
             commentedCount
+            commentsCount
             followedByCount
             followedByCurrentUser
             badgeTrophies {
@@ -87,6 +88,7 @@ export default () => {
             shoutedCount
             contributionsCount
             commentedCount
+            commentsCount
             followedByCount
             followedByCurrentUser
             badgeTrophies {
