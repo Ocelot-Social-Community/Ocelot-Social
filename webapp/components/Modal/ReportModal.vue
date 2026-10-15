@@ -1,11 +1,12 @@
 <template>
-  <os-modal class="report-modal" :title="title" :open="isOpen" @cancel="cancel">
-    <transition name="ds-transition-fade">
-      <div v-if="success" class="ds-flex ds-flex-centered hc-modal-success">
-        <sweetalert-icon icon="success" />
-      </div>
-    </transition>
-
+  <os-modal
+    class="report-modal"
+    size="lg"
+    :title="title"
+    :close-label="$t('actions.close')"
+    :open="isOpen"
+    @cancel="cancel"
+  >
     <!-- eslint-disable-next-line vue/no-v-html -->
     <p v-html="message" />
     <div class="ds-mb-small"></div>
@@ -69,7 +70,6 @@
 <script>
 import { OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { SweetalertIcon } from 'vue-sweetalert-icons'
 import { reportMutation } from '~/graphql/Moderation.js'
 import { valuesReasonCategoryOptions } from '~/constants/modals.js'
 import validReport from '~/components/utils/ReportModal'
@@ -81,7 +81,6 @@ export default {
     OsButton,
     OsIcon,
     OsModal,
-    SweetalertIcon,
     OcelotInput,
   },
   props: {
@@ -92,7 +91,6 @@ export default {
   data() {
     return {
       isOpen: true,
-      success: false,
       loading: false,
       form: {
         reasonCategory: null,
@@ -126,13 +124,12 @@ export default {
     })
   },
   methods: {
-    async cancel() {
-      // TODO: Use the "modalData" structure introduced in "ConfirmModal" and refactor this here. Be aware that all the Jest tests have to be refactored as well !!!
-      // await this.modalData.buttons.cancel.callback()
+    close() {
       this.isOpen = false
-      setTimeout(() => {
-        this.$emit('close')
-      }, 1000)
+      this.$emit('close')
+    },
+    cancel() {
+      this.close()
     },
     selectReasonCategory(option) {
       this.form.reasonCategory = option
@@ -149,8 +146,6 @@ export default {
     async confirm() {
       const { reasonCategory, reasonDescription } = this.form
       this.loading = true
-      // TODO: Use the "modalData" structure introduced in "ConfirmModal" and refactor this here. Be aware that all the Jest tests have to be refactored as well !!!
-      // await this.modalData.buttons.confirm.callback()
       this.$apollo
         .mutate({
           mutation: reportMutation(),
@@ -160,21 +155,12 @@ export default {
             reasonDescription,
           },
         })
-        .then(({ _data }) => {
-          this.success = true
+        .then(() => {
           this.$toast.success(this.$t('report.success'))
-          setTimeout(() => {
-            this.isOpen = false
-            setTimeout(() => {
-              this.success = false
-              this.$emit('close')
-            }, 500)
-          }, 1500)
           this.loading = false
+          this.close()
         })
         .catch((err) => {
-          this.$emit('close')
-          this.success = false
           switch (err.message) {
             case 'GraphQL error: User':
               this.$toast.error(this.$t('report.user.error'))
@@ -188,8 +174,8 @@ export default {
             default:
               this.$toastBackendError(err)
           }
-          this.isOpen = false
           this.loading = false
+          this.close()
         })
     },
   },
@@ -197,10 +183,6 @@ export default {
 </script>
 
 <style>
-.report-modal.os-modal {
-  width: 700px !important;
-  max-width: 700px !important;
-}
 .report-modal .report-radio-group {
   border: none;
   padding: 0;
@@ -258,17 +240,5 @@ export default {
   width: 100%;
   position: relative;
   left: 90%;
-}
-.report-modal .hc-modal-success {
-  pointer-events: none;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-color: var(--color-neutral-100);
-  opacity: 1;
-  z-index: var(--z-index-modal);
-  border-radius: var(--border-radius-x-large);
 }
 </style>
