@@ -98,3 +98,69 @@ describe('nuxt.config branding plugin order', () => {
     expect(entry.mode).not.toBe('client')
   })
 })
+
+// The e2e image's hydration check (cypress/support/step_definitions/common/hydration_warnings.js)
+// rests on these: without the alias the bundle reports no hydration mismatch at all, and without
+// `silent: false` it drops the one message every mismatch ends in. Production must get neither.
+describe('nuxt.config VUE_DEV_RUNTIME', () => {
+  const loadConfig = (flag) => {
+    const previous = process.env.VUE_DEV_RUNTIME
+    if (flag === undefined) delete process.env.VUE_DEV_RUNTIME
+    else process.env.VUE_DEV_RUNTIME = flag
+    try {
+      let loaded
+      jest.isolateModules(() => {
+        loaded = require('./nuxt.config.js').default
+      })
+      return loaded
+    } finally {
+      if (previous === undefined) delete process.env.VUE_DEV_RUNTIME
+      else process.env.VUE_DEV_RUNTIME = previous
+    }
+  }
+
+  const aliasesFor = (loaded, { isClient }) => {
+    const webpackConfig = {
+      resolve: { alias: {} },
+      module: { rules: [{ test: /\.(png|jpe?g|gif|svg|webp)$/ }] },
+    }
+    loaded.build.extend(webpackConfig, { isClient, isDev: false, loaders: { vue: {} } })
+    return webpackConfig.resolve.alias
+  }
+
+  describe('set', () => {
+    const loaded = loadConfig('1')
+
+    it('builds the client against the development runtime', () => {
+      expect(aliasesFor(loaded, { isClient: true }).vue$).toBe(
+        require.resolve('vue/dist/vue.runtime.common.dev.js'),
+      )
+    })
+
+    it('leaves the server bundle on the default runtime', () => {
+      expect(aliasesFor(loaded, { isClient: false })).not.toHaveProperty('vue$')
+    })
+
+    it('keeps the Vue imports of vue-demi and the composition API on that same Vue', () => {
+      const aliases = aliasesFor(loaded, { isClient: true })
+      expect(aliases['@vue/composition-api']).toBe('vue')
+      expect(aliases['vue-demi']).toMatch(/node_modules\/vue-demi$/)
+    })
+
+    it('lets Vue warn', () => {
+      expect(loaded.vue.config.silent).toBe(false)
+    })
+  })
+
+  describe('unset', () => {
+    const loaded = loadConfig(undefined)
+
+    it('leaves the client on the default runtime', () => {
+      expect(aliasesFor(loaded, { isClient: true })).not.toHaveProperty('vue$')
+    })
+
+    it("leaves Vue's silence to Nuxt", () => {
+      expect(loaded.vue.config.silent).toBeUndefined()
+    })
+  })
+})

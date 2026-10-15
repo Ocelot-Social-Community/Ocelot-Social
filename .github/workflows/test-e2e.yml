@@ -188,6 +188,11 @@ jobs:
           file: webapp/Dockerfile
           target: e2e
           load: true
+          # The client bundle on Vue's development runtime, which reports hydration mismatches in the
+          # browser console; cypress/support/step_definitions/common/hydration_warnings.js fails the
+          # scenario on them. The production build drops these warnings (see nuxt.config.js).
+          build-args: |
+            VUE_DEV_RUNTIME=1
           tags: ghcr.io/ocelot-social-community/ocelot-social/webapp:test
           # Reads the scopes of the other builds of this Dockerfile too (webapp, webapp-test): the stages
           # they share (base image, dependencies, branding) are then built once, not once per
