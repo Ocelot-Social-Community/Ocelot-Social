@@ -1389,6 +1389,11 @@ export default {
             followedByCount: 0,
             followingCount: 0,
           },
+          // Always the stored location, never a cached one: with the default cache-first a
+          // location changed in the settings only showed up after a reload (#6320). That it is
+          // fresh today only rests on the UpdateUser mutation writing it back into the cache.
+          // Not cache-and-network: $apollo.query resolves once, and Apollo rejects that policy here.
+          fetchPolicy: 'network-only',
         })
         return users && users[0] && users[0].location ? users[0].location : null
       } catch (err) {

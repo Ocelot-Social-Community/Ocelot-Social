@@ -1835,6 +1835,20 @@ describe('map', () => {
         expect(result).toEqual(userLocation)
       })
 
+      // Regression (#6320): cache-first showed the location from before a change in the settings.
+      it('asks the server instead of the cache', async () => {
+        mocks.$apollo.query.mockResolvedValueOnce({
+          data: { User: [{ location: userLocation }] },
+        })
+        await wrapper.vm.getUserLocation('u1')
+        expect(mocks.$apollo.query).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            variables: expect.objectContaining({ id: 'u1' }),
+            fetchPolicy: 'network-only',
+          }),
+        )
+      })
+
       it('returns null when user has no location', async () => {
         mocks.$apollo.query.mockResolvedValueOnce({
           data: { User: [{ location: null }] },
