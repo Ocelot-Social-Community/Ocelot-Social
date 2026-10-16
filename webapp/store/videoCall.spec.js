@@ -66,6 +66,41 @@ describe('videoCall store', () => {
         expect(state.groupSlug).toBeNull()
         expect(state.groupAvatar).toBeNull()
       })
+
+      describe('for the group whose call is running already', () => {
+        beforeEach(() => {
+          mutations.OPEN(state, { groupId: 'g1', groupName: 'Yoga', groupSlug: 'yoga' })
+          state.minimized = true
+          state.participantCount = 3
+          state.chatRoomId = 'room-1'
+          state.conferenceUnread = 2
+          state.groupChatUnread = 4
+        })
+
+        it('brings the parked call up and leaves what the running call knows', () => {
+          mutations.OPEN(state, { groupId: 'g1', groupName: 'Yoga', groupSlug: 'yoga' })
+          expect(state).toMatchObject({
+            showVideoCall: true,
+            minimized: false,
+            participantCount: 3,
+            chatRoomId: 'room-1',
+            conferenceUnread: 2,
+            groupChatUnread: 4,
+          })
+        })
+
+        it('updates the group info only where it is given', () => {
+          mutations.OPEN(state, { groupId: 'g1', groupName: null, groupAvatar: { url: 'b' } })
+          expect(state.groupName).toBe('Yoga')
+          expect(state.groupSlug).toBe('yoga')
+          expect(state.groupAvatar).toEqual({ url: 'b' })
+        })
+
+        it("starts afresh for another group's call", () => {
+          mutations.OPEN(state, { groupId: 'g2' })
+          expect(state).toMatchObject({ groupId: 'g2', chatRoomId: null, participantCount: 0 })
+        })
+      })
     })
 
     describe('SET_GROUP_INFO', () => {

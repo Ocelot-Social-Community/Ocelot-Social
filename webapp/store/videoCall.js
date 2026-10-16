@@ -34,6 +34,17 @@ export const mutations = {
     state.enabled = !!enabled
   },
   OPEN(state, { groupId, groupName, groupSlug, groupAvatar }) {
+    // The group's call is running already (its button pressed again while the call is
+    // parked): bring it up, and leave what the running call knows — its conference chat,
+    // the unread counts, the number of participants. Nothing would set them again, as the
+    // call stays connected. Group info only where it is given.
+    if (state.showVideoCall && state.groupId === groupId) {
+      state.minimized = false
+      if (groupName) state.groupName = groupName
+      if (groupSlug) state.groupSlug = groupSlug
+      if (groupAvatar) state.groupAvatar = groupAvatar
+      return
+    }
     state.showVideoCall = true
     state.minimized = false
     state.groupId = groupId
