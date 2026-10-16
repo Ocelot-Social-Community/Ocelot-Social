@@ -38,11 +38,15 @@ defineStep('I leave the video call', () => {
   cy.window().then((win) => win.$nuxt.$store.commit('videoCall/CLOSE'))
 })
 
+// Not window.__NUXT__.brandingComposition: the server stamps that only when it has branding
+// archives to compose from, and the e2e image has none — it stays undefined after any reload. The
+// policy the reloaded page loaded is what it applies the branding from.
 defineStep('the page is reloaded with the branding composition {string}', (composition) => {
   cy.window().should((win) => {
     expect(win.__inTheCallSince, 'marker of the page before the reload').to.equal(undefined)
-    expect(win.__NUXT__.brandingComposition, 'composition the page was rendered with').to.equal(
-      composition,
-    )
+    expect(
+      win.$nuxt && win.$nuxt.$store.getters['policy/snapshot'].brandingComposition,
+      'composition the reloaded page knows',
+    ).to.equal(composition)
   })
 })
