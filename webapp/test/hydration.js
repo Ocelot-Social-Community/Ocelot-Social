@@ -8,9 +8,11 @@ import { runInThisContext } from 'vm'
 
 // Jest hands every test file a copy of `process.env`, so assigning `TZ` there changes nothing.
 // Node switches the time zone of the whole worker when the variable of the real process changes,
-// which is reachable from the context the test sandbox runs in. `undefined` restores the default.
+// which is reachable from the context the test sandbox runs in. `undefined` restores the zone the
+// worker started with — which may itself be set (`TZ=… jest`), so it is put back, not deleted.
 const realProcess = runInThisContext('process')
-export const setTimeZone = (timeZone) => {
+const initialTimeZone = realProcess.env.TZ
+export const setTimeZone = (timeZone = initialTimeZone) => {
   if (timeZone === undefined) {
     delete realProcess.env.TZ
   } else {
