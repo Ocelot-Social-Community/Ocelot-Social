@@ -95,6 +95,9 @@ export default {
       profileListVisibleCount,
       filter: null,
       itemHeight: 56,
+      // The virtual scroller renders on the client only. Switching to it after mounting keeps the
+      // first client render equal to the server's, so hydration matches.
+      isMounted: false,
     }
   },
   computed: {
@@ -105,7 +108,7 @@ export default {
       return this.profiles.length > this.profileListVisibleCount
     },
     showVirtualScroll() {
-      return process.client && this.filteredConnections.length > VIRTUAL_SCROLL_THRESHOLD
+      return this.isMounted && this.filteredConnections.length > VIRTUAL_SCROLL_THRESHOLD
     },
     profilesClass() {
       return `profiles${this.isMoreAsVisible ? ' --overflow' : ''}`
@@ -165,6 +168,7 @@ export default {
     },
   },
   mounted() {
+    this.isMounted = true
     this.$nextTick(this.checkScrollable)
   },
   updated() {

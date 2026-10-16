@@ -50,23 +50,21 @@
         </template>
       </client-only>
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
-      <client-only>
-        <div v-if="post && post.postType[0] === 'Event'" class="ds-mb-small">
-          <location-teaser
-            class="event-info"
-            size="base"
-            :venue="post.eventVenue"
-            :locationName="post.eventLocationName"
-            :isOnline="post.eventIsOnline"
-          />
-          <date-time-range
-            class="event-info"
-            size="base"
-            :startDate="post.eventStart"
-            :endDate="post.eventEnd"
-          />
-        </div>
-      </client-only>
+      <div v-if="post && post.postType[0] === 'Event'" class="ds-mb-small">
+        <location-teaser
+          class="event-info"
+          size="base"
+          :venue="post.eventVenue"
+          :locationName="post.eventLocationName"
+          :isOnline="post.eventIsOnline"
+        />
+        <date-time-range
+          class="event-info"
+          size="base"
+          :startDate="post.eventStart"
+          :endDate="post.eventEnd"
+        />
+      </div>
       <div class="content hyphenate-text">{{ excerpt }}</div>
       <footer
         class="footer"
