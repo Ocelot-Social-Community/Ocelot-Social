@@ -530,7 +530,10 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Puoi farlo solo con utenti il cui ruolo concede meno poteri del tuo.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Non puoi cercare nell'amministrazione degli utenti.",
     "USER_DOES_NOT_EXIST": "L'utente non è stato trovato.",
+    "USER_PROFILE_NAME_TOO_LONG": "Il nome può contenere al massimo {max} caratteri.",
     "USER_PROFILE_NAME_TOO_SHORT": "Il nome deve contenere almeno {min} caratteri.",
+    "USER_PROFILE_SLUG_TOO_LONG": "Il nome utente può contenere al massimo {max} caratteri.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "Il nome utente deve contenere almeno {min} caratteri.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Questo utente non è bloccato.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Non è stata trovata alcuna iscrizione attiva a questo gruppo per la videochiamata.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Non puoi avviare una videochiamata in questo gruppo."
@@ -1852,6 +1855,7 @@
       "nameNotEmpty": "Per favore inserisci il tuo nome.",
       "slug": {
         "alreadyTaken": "Questo nome utente è già in uso.",
+        "length": "Il nome utente deve essere compreso tra {min} e {max} caratteri.",
         "regex": "I caratteri consentiti sono solo lettere minuscole, numeri, trattini bassi e trattini."
       }
     }

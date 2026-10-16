@@ -6,11 +6,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
+import { branding } from '@src/branding'
 
 import type { IMiddlewareResolver } from 'graphql-middleware/types'
 
 const COMMENT_MIN_LENGTH = 1
-const USERNAME_MIN_LENGTH = 3
 const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const content = args.content.replace(/<(?:.|\n)*?>/gm, '').trim()
   const { postId } = args
@@ -152,10 +152,67 @@ export const validateNotifyUsers = async (label: string, reason: string): Promis
   }
 }
 
+// The name and slug rules are the brand's (branding.user), the same values the webapp checks
+// against, so a client that skips the form cannot store what the form would refuse.
+const validateUserName = (name: unknown): void => {
+  if (typeof name !== 'string') {
+    return
+  }
+  const { nameLengthMin: min, nameLengthMax: max } = branding.user
+  const { length } = name.trim()
+  if (length < min) {
+    throw new AppError(Errors.USER_PROFILE_NAME_TOO_SHORT, { min })
+  }
+  if (length > max) {
+    throw new AppError(Errors.USER_PROFILE_NAME_TOO_LONG, { max })
+  }
+}
+
+const validateUserSlug = (slug: unknown): void => {
+  if (typeof slug !== 'string') {
+    return
+  }
+  const { slugLengthMin: min, slugLengthMax: max } = branding.user
+  if (slug.length < min) {
+    throw new AppError(Errors.USER_PROFILE_SLUG_TOO_SHORT, { min })
+  }
+  if (slug.length > max) {
+    throw new AppError(Errors.USER_PROFILE_SLUG_TOO_LONG, { max })
+  }
+}
+
+const validateSignupVerification: IMiddlewareResolver = async (
+  resolve,
+  root,
+  args,
+  context,
+  info,
+) => {
+  validateUserName(args.name)
+  // Only a slug the client chose. Without one, sluggifyMiddleware derives it from the name and
+  // keeps it inside the same bounds.
+  validateUserSlug(args.slug)
+  return resolve(root, args, context, info)
+}
+
 const validateUpdateUser: IMiddlewareResolver = async (resolve, root, params, context, info) => {
-  const { name } = params
-  if (typeof name === 'string' && name.trim().length < USERNAME_MIN_LENGTH) {
-    throw new AppError(Errors.USER_PROFILE_NAME_TOO_SHORT, { min: USERNAME_MIN_LENGTH })
+  const { id, name, slug } = params
+  validateUserName(name)
+  if (typeof slug === 'string') {
+    // Only a slug that changes. The settings form sends the slug on every save, and an account
+    // whose slug predates the bounds (or a brand that tightened them) must still be able to save
+    // the rest of its profile without being made to rename itself.
+    const session = context.driver.session()
+    try {
+      const result = await session.readTransaction((transaction) =>
+        transaction.run('MATCH (user:User {id: $id}) RETURN user.slug AS slug', { id }),
+      )
+      if (result.records[0]?.get('slug') !== slug) {
+        validateUserSlug(slug)
+      }
+    } finally {
+      await session.close()
+    }
   }
   return resolve(root, params, context, info)
 }
@@ -164,6 +221,7 @@ export default {
   Mutation: {
     CreateComment: validateCreateComment,
     UpdateComment: validateUpdateComment,
+    SignupVerification: validateSignupVerification,
     UpdateUser: validateUpdateUser,
     fileReport: validateReport,
     review: validateReview,
