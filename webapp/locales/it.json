@@ -77,6 +77,7 @@
       "verificationBadges": "Verifiche"
     },
     "branding": {
+      "appliedAfterCall": "Salvato: il nuovo design verrà applicato non appena lascerai la chiamata.",
       "available": {
         "active": "Base attiva",
         "default": "Riserva",
@@ -1977,6 +1978,7 @@
       "unsupportedBrowser": "Il tuo browser non supporta audio/video."
     },
     "reconnecting": "Connessione persa — riconnessione…",
+    "reloadPending": "La piattaforma ha un nuovo design. Verrà applicato non appena lascerai la chiamata.",
     "restartMic": "Riavvia microfono",
     "screenShare": "Schermo",
     "screenShareEnded": "Condivisione schermo terminata",

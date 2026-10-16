@@ -77,6 +77,7 @@
       "verificationBadges": "Verifikimet"
     },
     "branding": {
+      "appliedAfterCall": "U ruajt – dizajni i ri do të zbatohet sapo të largoheni nga thirrja.",
       "available": {
         "active": "Baza aktive",
         "default": "Rezervë",
@@ -1977,6 +1978,7 @@
       "unsupportedBrowser": "Shfletuesi yt nuk mbështet audio/video."
     },
     "reconnecting": "Lidhja u humb — po rilidhet…",
+    "reloadPending": "Platforma ka një dizajn të ri. Do të zbatohet sapo të largoheni nga thirrja.",
     "restartMic": "Rinis mikrofonin",
     "screenShare": "Ekrani",
     "screenShareEnded": "Ndarja e ekranit përfundoi",

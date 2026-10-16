@@ -77,6 +77,7 @@
       "verificationBadges": "Weryfikacje"
     },
     "branding": {
+      "appliedAfterCall": "Zapisano – nowy wygląd zostanie zastosowany, gdy tylko opuścisz rozmowę.",
       "available": {
         "active": "Aktywna baza",
         "default": "Zapasowe",
@@ -1977,6 +1978,7 @@
       "unsupportedBrowser": "Twoja przeglądarka nie obsługuje audio/wideo."
     },
     "reconnecting": "Utracono połączenie — ponowne łączenie…",
+    "reloadPending": "Platforma ma nowy wygląd. Zostanie zastosowany, gdy tylko opuścisz rozmowę.",
     "restartMic": "Uruchom ponownie mikrofon",
     "screenShare": "Ekran",
     "screenShareEnded": "Zakończono udostępnianie ekranu",

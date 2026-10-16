@@ -108,6 +108,7 @@ const buildStore = (state = {}) => {
         'videoCall/groupName': () => state.groupName ?? null,
         'videoCall/groupSlug': () => state.groupSlug ?? null,
         'videoCall/groupAvatar': () => state.groupAvatar ?? null,
+        'videoCall/reloadPending': () => state.reloadPending ?? false,
         'chat/showChat': () => state.chat ?? { showChat: false, chatUserId: null, groupId: null },
         'auth/user': () => state.user ?? { id: 'u1', name: 'Alice', avatar: { url: 'a.png' } },
       },
@@ -1371,6 +1372,37 @@ describe('VideoCall', () => {
       it('enableAudio is a no-op without a room', async () => {
         const { wrapper } = factory({ show: true })
         await expect(wrapper.vm.enableAudio()).resolves.toBeUndefined()
+      })
+    })
+
+    // #10353: a branding switch waits for the call; the call says so.
+    describe('a reload waiting for the call to end', () => {
+      it('is shown as a notice for as long as it waits', async () => {
+        const { wrapper } = await connected({ reloadPending: true })
+        await wrapper.vm.$nextTick()
+
+        expect(wrapper.find('[data-test="video-call-reload-pending"]').text()).toBe(
+          'videoCall.reloadPending',
+        )
+      })
+
+      it('is not shown when no reload waits', async () => {
+        const { wrapper } = await connected()
+        await wrapper.vm.$nextTick()
+
+        expect(wrapper.find('[data-test="video-call-reload-pending"]').exists()).toBe(false)
+      })
+
+      it('is announced once by a toast when it arrives', async () => {
+        const { wrapper } = await connected()
+        wrapper.vm.$toast = { info: jest.fn() }
+        const { reloadPending } = wrapper.vm.$options.watch
+
+        reloadPending.call(wrapper.vm, true)
+        reloadPending.call(wrapper.vm, false)
+
+        expect(wrapper.vm.$toast.info).toHaveBeenCalledTimes(1)
+        expect(wrapper.vm.$toast.info).toHaveBeenCalledWith('videoCall.reloadPending')
       })
     })
 

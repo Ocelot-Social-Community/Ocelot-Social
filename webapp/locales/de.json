@@ -77,6 +77,7 @@
       "verificationBadges": "Verifizierungen"
     },
     "branding": {
+      "appliedAfterCall": "Gespeichert – das neue Design wird übernommen, sobald du den Anruf verlässt.",
       "available": {
         "active": "Aktive Basis",
         "default": "Fallback",
@@ -1977,6 +1978,7 @@
       "unsupportedBrowser": "Dein Browser unterstützt Audio/Video nicht."
     },
     "reconnecting": "Verbindung unterbrochen – verbinde neu…",
+    "reloadPending": "Die Plattform hat ein neues Design. Es wird übernommen, sobald du den Anruf verlässt.",
     "restartMic": "Mikrofon neu starten",
     "screenShare": "Bildschirm",
     "screenShareEnded": "Bildschirmfreigabe beendet",

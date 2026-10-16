@@ -1,4 +1,8 @@
+import Vuex from 'vuex'
+import { createLocalVue } from '@vue/test-utils'
+
 import brandingSubscribe from './branding-subscribe.js'
+import * as videoCall from '~/store/videoCall'
 import { reloadPage } from '~/utils/reloadPage'
 
 // The reload is asserted through its module seam: jsdom 26 makes `window.location` non-configurable
@@ -17,6 +21,7 @@ function setup(brandingId, brandingComposition = '') {
   }
   let callback
   const store = {
+    getters: { 'videoCall/phase': 'idle' },
     watch: (_getter, cb) => {
       callback = cb
     },
@@ -126,6 +131,7 @@ function setupGetter(brandingId, brandingComposition = '') {
   let getter, callback
   brandingSubscribe({
     store: {
+      getters: { 'videoCall/phase': 'idle' },
       watch: (g, cb) => {
         getter = g
         callback = cb
@@ -177,5 +183,90 @@ describe('plugins/branding-subscribe (base normalisation)', () => {
     emit({ activeBranding: '', brandingComposition: '{"logos":"@default"}' })
 
     expect(reload).toHaveBeenCalledTimes(1)
+  })
+})
+
+// #10353: a switch must not drop a running video call. The store is a real one here, so the
+// deferral in utils/reloadWhenIdle.js watches the real call phase; the plugin's own watcher is
+// still driven by hand, as above.
+describe('plugins/branding-subscribe during a video call', () => {
+  const localVue = createLocalVue()
+  localVue.use(Vuex)
+  const reload = reloadPage
+  const TARGET_KEY = 'ocelot-branding-reload-target'
+
+  const setupInCall = (brandingId, phase = 'in-call') => {
+    window.__NUXT__ = { brandingId, brandingComposition: '' }
+    const store = new Vuex.Store({ modules: { videoCall: { namespaced: true, ...videoCall } } })
+    store.commit('videoCall/SET_PHASE', phase)
+    const storeWatch = store.watch.bind(store)
+    let callback
+    // The plugin registers first; everything after it (the deferral) gets the real watcher.
+    store.watch = (getter, cb) => {
+      if (callback) return storeWatch(getter, cb)
+      callback = cb
+      return () => {}
+    }
+    brandingSubscribe({ store })
+    const emit = (active) => callback(`${active || ''}\n`)
+    const endCall = () => {
+      store.commit('videoCall/CLOSE')
+      return localVue.nextTick()
+    }
+    return { store, emit, endCall }
+  }
+
+  beforeEach(() => {
+    window.sessionStorage.clear()
+    reload.mockClear()
+  })
+
+  it.each(['connecting', 'in-call'])('does not reload while the call is %s', (phase) => {
+    const { store, emit } = setupInCall('', phase)
+
+    emit('yunite')
+
+    expect(reload).not.toHaveBeenCalled()
+    expect(store.getters['videoCall/reloadPending']).toBe(true)
+  })
+
+  it('leaves the loop guard alone while it waits, so the deferred reload still has its attempt', () => {
+    const { emit } = setupInCall('')
+
+    emit('yunite')
+
+    expect(window.sessionStorage.getItem(TARGET_KEY)).toBeNull()
+  })
+
+  it('reloads once the call has ended, recording the target then', async () => {
+    const { emit, endCall } = setupInCall('')
+    emit('yunite')
+
+    await endCall()
+
+    expect(reload).toHaveBeenCalledTimes(1)
+    expect(window.sessionStorage.getItem(TARGET_KEY)).toBe('yunite\n')
+  })
+
+  it('applies only the latest of several switches during one call', async () => {
+    const { emit, endCall } = setupInCall('')
+    emit('yunite')
+    emit('acme')
+
+    await endCall()
+
+    expect(reload).toHaveBeenCalledTimes(1)
+    expect(window.sessionStorage.getItem(TARGET_KEY)).toBe('acme\n')
+  })
+
+  it('does not reload at all when the switch was undone during the call', async () => {
+    const { store, emit, endCall } = setupInCall('yunite')
+    emit('acme')
+    emit('yunite') // switched back to what the page was rendered with
+
+    await endCall()
+
+    expect(reload).not.toHaveBeenCalled()
+    expect(store.getters['videoCall/reloadPending']).toBe(false)
   })
 })

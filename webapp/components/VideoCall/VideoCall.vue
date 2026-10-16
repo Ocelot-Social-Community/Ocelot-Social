@@ -89,10 +89,22 @@
             just as much.
           -->
           <div
-            v-if="audioBlocked || micProblem || reconnecting || audioOnly"
+            v-if="audioBlocked || micProblem || reconnecting || audioOnly || reloadPending"
             class="video-call__notices"
             role="status"
           >
+            <!--
+              An admin switched the branding; applying it takes a reload, which waits for this
+              call to end (#10353). Said here for as long as it waits, so that the reload after
+              hanging up comes as no surprise.
+            -->
+            <div
+              v-if="reloadPending"
+              class="video-call__notice"
+              data-test="video-call-reload-pending"
+            >
+              {{ $t('videoCall.reloadPending') }}
+            </div>
             <div v-if="reconnecting" class="video-call__notice" data-test="video-call-reconnecting">
               {{ $t('videoCall.reconnecting') }}
             </div>
@@ -453,6 +465,7 @@ export default {
       groupName: 'videoCall/groupName',
       groupSlug: 'videoCall/groupSlug',
       groupAvatar: 'videoCall/groupAvatar',
+      reloadPending: 'videoCall/reloadPending',
       getShowChat: 'chat/showChat',
       currentUser: 'auth/user',
     }),
@@ -678,6 +691,10 @@ export default {
     },
   },
   watch: {
+    // Once, when it arrives; the notice above stays for as long as it waits.
+    reloadPending(pending) {
+      if (pending) this.$toast.info(this.$t('videoCall.reloadPending'))
+    },
     show: {
       immediate: true,
       handler(open, wasOpen) {
