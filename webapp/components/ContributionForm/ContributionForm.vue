@@ -282,6 +282,7 @@ import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
 import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
+import { locationCoordinates, locationName } from '~/utils/locationPayload'
 
 export default {
   mixins: [GetCategories, formValidation],
@@ -471,6 +472,11 @@ export default {
                 ),
               ]
             }
+            // Typed but never picked: the server takes an event's place only with the coordinates
+            // it was picked with (#7239) — a search result or a pin on the map.
+            if (!locationCoordinates(value)) {
+              return [new Error(this.$t('common.validations.eventLocationNotPicked'))]
+            }
             return []
           },
         },
@@ -486,25 +492,19 @@ export default {
     eventInput() {
       if (this.postType === 'Event') {
         const locationValue = this.formData.eventLocationName
-        // LocationSelect and LocationPickerMap both already resolve lat/lng
-        // (via reverse/forward geocoding) alongside the label when a search
-        // result or map pin is picked — a plain string here means the field
-        // still holds unresolved/typed text, no coordinates to send yet.
-        const hasCoordinates =
-          typeof locationValue === 'object' &&
-          locationValue !== null &&
-          typeof locationValue.lat === 'number' &&
-          typeof locationValue.lng === 'number'
+        // The coordinates a search result or map pin was picked with (utils/locationPayload.js);
+        // the validator above keeps typed text from getting this far.
+        const coordinates = locationCoordinates(locationValue)
         return {
           eventStart: new Date(this.formData.eventStart).toISOString(),
           eventVenue: this.formData.eventVenue,
           eventEnd: this.formData.eventEnd ? new Date(this.formData.eventEnd).toISOString() : null,
           eventIsOnline: this.formData.eventIsOnline,
           eventLocationName: !this.formData.eventIsOnline
-            ? (locationValue?.value ?? locationValue) || null
+            ? locationName(locationValue) || null
             : null,
-          lat: !this.formData.eventIsOnline && hasCoordinates ? locationValue.lat : null,
-          lng: !this.formData.eventIsOnline && hasCoordinates ? locationValue.lng : null,
+          lat: !this.formData.eventIsOnline ? (coordinates?.lat ?? null) : null,
+          lng: !this.formData.eventIsOnline ? (coordinates?.lng ?? null) : null,
         }
       }
       return undefined

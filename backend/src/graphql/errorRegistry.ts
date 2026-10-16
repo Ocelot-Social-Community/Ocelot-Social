@@ -186,6 +186,12 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'The comment must be at least {min} characters long.',
   },
+  // #7239: a place typed but not picked was searched, and Mapbox's top result stored — "7112 Duvin"
+  // in Switzerland became a road in Ohio. An event's place is taken only as picked.
+  POST_EVENT_LOCATION_NOT_PICKED: {
+    type: 'BAD_USER_INPUT',
+    text: 'Pick the event location from the search results or on the map.',
+  },
   POST_EVENT_LOCATION_COORDINATES_INCOMPLETE: {
     type: 'BAD_USER_INPUT',
     text: 'Event location requires both lat and lng, or neither.',

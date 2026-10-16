@@ -14,6 +14,7 @@ import {
   createOrUpdateLocations,
   extractLocationFeature,
   resolveLocationId,
+  resolveLocationInput,
 } from './location'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -515,6 +516,18 @@ describe(createOrUpdateLocations, () => {
     fetchSpy.mockResolvedValue(mockJsonResponse(body))
   }
 
+  // The name path moved to resolveLocationInput (events take their place only by coordinates):
+  // looked up by its exact name, then stored and attached the same way.
+  const attachByName = async (session: Session, nodeLabel: string, nodeId: string, name: string) =>
+    (
+      await resolveLocationInput(
+        { locationName: name },
+        locationContext(),
+        ['place', 'country'],
+        nodeLabel,
+      )
+    ).attach(session, nodeLabel, nodeId)
+
   // createLocation writes one property per supported locale and the driver REFUSES a query whose
   // parameters are undefined — so a fixture that omits a single `text_*` fails on the write rather
   // than on what the test is about. Filled uniformly here; none of these cases is about
@@ -562,42 +575,13 @@ describe(createOrUpdateLocations, () => {
     expect(requestedTypes).toEqual(['address', 'poi', 'place'])
   })
 
-  // groups.ts passes its own coarser list (place/region/country — a group's location is
-  // deliberately less precise than an event's exact pin) instead of relying on the
-  // address/poi/place default asserted above.
-  it('uses the caller-provided reverseGeocodeTypes instead of the default when given', async () => {
-    respondWith({ features: [] })
-
-    await expect(
-      withSession(async (session) =>
-        createOrUpdateLocations(
-          'Group',
-          'some-group',
-          'somewhere',
-          session,
-          locationContext(),
-          { lat: 0, lng: 0 },
-          ['place', 'region', 'country'],
-        ),
-      ),
-    ).rejects.toThrow('Location coordinates are invalid.')
-
-    const requestedTypes = fetchSpy.mock.calls.map(([input]) =>
-      new URL(input as string).searchParams.get('types'),
-    )
-
-    expect(requestedTypes).toEqual(['place', 'region', 'country'])
-  })
-
   // The forward-geocoding counterpart: free text Mapbox knows nothing about. Accepting it would
   // attach the node to a Location with an undefined id.
   it('refuses a location name Mapbox does not resolve', async () => {
     respondWith({ features: [] })
 
     await expect(
-      withSession(async (session) =>
-        createOrUpdateLocations('User', 'located-user', 'Absurdistan', session, locationContext()),
-      ),
+      withSession(async (session) => attachByName(session, 'User', 'located-user', 'Absurdistan')),
     ).rejects.toThrow('The locationName is invalid.')
   })
 
@@ -608,9 +592,7 @@ describe(createOrUpdateLocations, () => {
     respondWith({ features: [{ id: 'place.no-type', place_name: 'Typeless' }] })
 
     await expect(
-      withSession(async (session) =>
-        createOrUpdateLocations('User', 'located-user', 'Typeless', session, locationContext()),
-      ),
+      withSession(async (session) => attachByName(session, 'User', 'located-user', 'Typeless')),
     ).rejects.toThrow('The locationName is invalid.')
   })
 
@@ -637,13 +619,7 @@ describe(createOrUpdateLocations, () => {
       })
 
       await withSession(async (session) => {
-        await createOrUpdateLocations(
-          'User',
-          'located-user',
-          'Berlin, New Jersey, United States',
-          session,
-          locationContext(),
-        )
+        await attachByName(session, 'User', 'located-user', 'Berlin, New Jersey, United States')
       })
 
       const { records } = await database.query({
@@ -651,34 +627,6 @@ describe(createOrUpdateLocations, () => {
       })
 
       expect(records.map((record) => record.get('id') as string)).toEqual(['place.berlin-nj'])
-    })
-
-    // matchLocationNameExactly means locationName is the user's own picked choice (see its doc
-    // comment on createOrUpdateLocations) — without a matching_place_name among the results,
-    // silently saving Mapbox's top-ranked guess instead would be a different place than the one
-    // they picked. Standard mode (tested above via the "prefers..." case, and implicitly by every
-    // other test here that doesn't pass the flag) keeps falling back to the first result instead.
-    it('rejects locationName when matchLocationNameExactly is set and nothing matches it exactly', async () => {
-      respondWith({
-        features: [
-          feature({ id: 'place.berlin-de', place_name: 'Berlin, Germany', place_type: ['place'] }),
-        ],
-      })
-
-      await expect(
-        withSession(async (session) =>
-          createOrUpdateLocations(
-            'User',
-            'located-user',
-            'Berlin, New Jersey, United States',
-            session,
-            locationContext(),
-            undefined,
-            undefined,
-            true,
-          ),
-        ),
-      ).rejects.toThrow('The locationName is invalid.')
     })
 
     // Mapbox omits `context` for the broadest features (a country has nothing above it). The
@@ -689,7 +637,7 @@ describe(createOrUpdateLocations, () => {
       })
 
       await withSession(async (session) => {
-        await createOrUpdateLocations('User', 'located-user', 'Germany', session, locationContext())
+        await attachByName(session, 'User', 'located-user', 'Germany')
       })
 
       const { records } = await database.query({
@@ -718,13 +666,7 @@ describe(createOrUpdateLocations, () => {
       })
 
       await withSession(async (session) => {
-        await createOrUpdateLocations(
-          'User',
-          'located-user',
-          'Greenwich',
-          session,
-          locationContext(),
-        )
+        await attachByName(session, 'User', 'located-user', 'Greenwich')
       })
 
       const { records } = await database.query({
@@ -1054,5 +996,133 @@ describe('userMiddleware', () => {
         },
       ])
     })
+  })
+})
+
+// The one path for every location a user picked (profile, group, registration): resolved before
+// anything is written, attached after.
+describe(resolveLocationInput, () => {
+  const locationContext = () => ({ config: { MAPBOX_TOKEN: 'test-token' } }) as unknown as Context
+  const TYPES = ['place', 'region', 'country']
+
+  const withSession = async (work: (session: Session) => Promise<unknown>): Promise<void> => {
+    const session = database.driver.session()
+    try {
+      await work(session)
+    } finally {
+      await session.close()
+    }
+  }
+
+  const located = async () => {
+    const { records } = await database.query({
+      query: 'MATCH (:User { id: "located-user" })-[:IS_IN]->(l:Location) RETURN l.id AS id',
+    })
+    return records.map((record) => record.get('id') as string)
+  }
+
+  const feature = (attributes: Record<string, unknown>) => ({
+    text_en: 'Fixture',
+    text_de: 'Fixture',
+    text_fr: 'Fixture',
+    text_nl: 'Fixture',
+    text_it: 'Fixture',
+    text_es: 'Fixture',
+    text_pt: 'Fixture',
+    text_pl: 'Fixture',
+    text_ru: 'Fixture',
+    text_sq: 'Fixture',
+    ...attributes,
+  })
+
+  beforeEach(async () => {
+    await Factory.build('user', { id: 'located-user' })
+  })
+
+  // #7018, #7239: "Schweiz", as a German page shows it, is not the name a search in several
+  // languages gives back ("Switzerland"), and Mapbox's top result for the text was Schweizer-Reneke
+  // in South Africa. The picked name has to come back verbatim, or the place is refused.
+  it('refuses a name Mapbox does not give back verbatim, instead of taking its top result', async () => {
+    fetchSpy.mockResolvedValue(
+      mockJsonResponse({
+        features: [
+          feature({
+            id: 'place.98142462',
+            place_name: 'Schweizer-Reneke, North West, South Africa',
+            place_type: ['place'],
+          }),
+        ],
+      }),
+    )
+
+    await expect(
+      resolveLocationInput({ locationName: 'Schweiz' }, locationContext(), TYPES, 'User'),
+    ).rejects.toThrow('The locationName is invalid.')
+  })
+
+  it('attaches the feature named exactly so, searched with the allowed types', async () => {
+    fetchSpy.mockResolvedValue(
+      mockJsonResponse({
+        features: [feature({ id: 'country.8738', place_name: 'Schweiz', place_type: ['country'] })],
+      }),
+    )
+
+    const location = await resolveLocationInput(
+      { locationName: 'Schweiz' },
+      locationContext(),
+      TYPES,
+      'User',
+    )
+    await withSession(async (session) => location.attach(session, 'User', 'located-user'))
+
+    expect(await located()).toEqual(['country.8738'])
+    expect(new URL(fetchSpy.mock.calls[0][0] as string).searchParams.get('types')).toBe(
+      'place,region,country',
+    )
+  })
+
+  it('decides by the Mapbox id when one is given, confirmed at its coordinates', async () => {
+    fetchSpy.mockResolvedValue(
+      mockJsonResponse({
+        features: [
+          feature({ id: 'country.8738', place_name: 'Switzerland', place_type: ['country'] }),
+        ],
+      }),
+    )
+    const params = { locationName: 'Schweiz', locationId: 'country.8738', lat: 46.8, lng: 8.2 }
+
+    const location = await resolveLocationInput(params, locationContext(), TYPES, 'User')
+    await withSession(async (session) => location.attach(session, 'User', 'located-user'))
+
+    expect(await located()).toEqual(['country.8738'])
+    // Nothing of the place stays on the params a node is written from.
+    expect(params).toEqual({ locationName: 'Schweiz' })
+  })
+
+  it('clears the location for an empty name, and leaves it alone for none', async () => {
+    fetchSpy.mockResolvedValue(
+      mockJsonResponse({
+        features: [feature({ id: 'country.8738', place_name: 'Schweiz', place_type: ['country'] })],
+      }),
+    )
+    const set = await resolveLocationInput(
+      { locationName: 'Schweiz' },
+      locationContext(),
+      TYPES,
+      'User',
+    )
+    await withSession(async (session) => set.attach(session, 'User', 'located-user'))
+
+    const untouched = await resolveLocationInput({}, locationContext(), TYPES, 'User')
+    await withSession(async (session) => untouched.attach(session, 'User', 'located-user'))
+
+    expect(await located()).toEqual(['country.8738'])
+
+    const params = { locationName: '' }
+    const cleared = await resolveLocationInput(params, locationContext(), TYPES, 'User')
+    await withSession(async (session) => cleared.attach(session, 'User', 'located-user'))
+
+    expect(await located()).toEqual([])
+    expect(params.locationName).toBeNull()
   })
 })
