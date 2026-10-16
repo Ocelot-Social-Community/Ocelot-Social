@@ -44,6 +44,19 @@ describe('LocationSelect', () => {
       expect(wrapper.find('label.ds-input-label').text()).toBe('settings.data.labelCity')
     })
 
+    it('names what it asks for in the placeholder', () => {
+      expect(wrapper.find('input#city').attributes('placeholder')).toBe('settings.data.labelCity …')
+    })
+
+    it('takes a placeholder of its own instead', () => {
+      wrapper = mount(LocationSelect, {
+        mocks,
+        localVue,
+        propsData: { ...propsData, placeholder: 'Where is it?' },
+      })
+      expect(wrapper.find('input#city').attributes('placeholder')).toBe('Where is it?')
+    })
+
     it('renders the select', () => {
       expect(wrapper.find('.ds-select').exists()).toBe(true)
     })

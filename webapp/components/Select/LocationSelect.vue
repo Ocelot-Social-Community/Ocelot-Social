@@ -11,7 +11,7 @@
       icon="map-marker"
       :icon-right="null"
       :prefill-on-open="true"
-      :placeholder="placeholder"
+      :placeholder="placeholderText"
       :disabled="disabled"
       @input.native="handleCityInput"
     >
@@ -102,6 +102,11 @@ export default {
     }
   },
   computed: {
+    // Without one of its own the field names what it asks for, as before #10259 dropped it: the
+    // registration, the settings and the group form pass none.
+    placeholderText() {
+      return this.placeholder ?? `${this.$t('settings.data.labelCity')} …`
+    },
     locationName() {
       return typeof this.value === 'object' ? this.value.value : this.value
     },
