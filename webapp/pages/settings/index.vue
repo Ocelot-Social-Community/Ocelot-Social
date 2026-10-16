@@ -112,6 +112,7 @@ import { updateUserMutation } from '~/graphql/User'
 import scrollToContent from './scroll-to-content.js'
 import formValidation from '~/mixins/formValidation'
 import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
+import { locationName, locationPayload } from '~/utils/locationPayload'
 
 // Same coarse precision as GroupForm.vue's own location — deliberately as
 // imprecise as a group's, not an event's exact pin (see the backend's
@@ -235,43 +236,10 @@ export default {
         ...uniqueSlugForm.formSchema,
       }
     },
-    // LocationSelect and LocationPickerMap both already resolve lat/lng
-    // (via forward/reverse geocoding) alongside the label when a search
-    // result or map pin is picked — a plain string here means the field
-    // still holds unresolved/typed text, no coordinates to send yet.
+    // The name the location field shows; the rest of the place goes with the mutation
+    // (utils/locationPayload.js).
     formLocationName() {
-      const isNestedValue =
-        typeof this.formData.locationName === 'object' &&
-        typeof this.formData.locationName.value === 'string'
-      const isDirectString = typeof this.formData.locationName === 'string'
-      return isNestedValue
-        ? this.formData.locationName.value
-        : isDirectString
-          ? this.formData.locationName
-          : ''
-    },
-    // The Mapbox feature id of a place picked from the search or the map — what the backend
-    // decides the location by, since a place name differs with the language it was shown in.
-    // Null while the field holds typed text or a map point nothing was found at.
-    formLocationId() {
-      const locationValue = this.formData.locationName
-      // Only together with coordinates: the backend confirms the id at them, and a feature Mapbox
-      // returned without a centre leaves the id unconfirmable — the name path still takes it.
-      return typeof locationValue === 'object' &&
-        locationValue !== null &&
-        typeof locationValue.id === 'string' &&
-        this.formLocationCoordinates
-        ? locationValue.id
-        : null
-    },
-    formLocationCoordinates() {
-      const locationValue = this.formData.locationName
-      const hasCoordinates =
-        typeof locationValue === 'object' &&
-        locationValue !== null &&
-        typeof locationValue.lat === 'number' &&
-        typeof locationValue.lng === 'number'
-      return hasCoordinates ? { lat: locationValue.lat, lng: locationValue.lng } : null
+      return locationName(this.formData.locationName)
     },
     nameErrorText() {
       if (!this.visibleErrors?.name) return null
@@ -413,10 +381,7 @@ export default {
             id: this.currentUser.id,
             name,
             slug,
-            locationName: this.formLocationName,
-            locationId: this.formLocationId,
-            lat: this.formLocationCoordinates?.lat ?? null,
-            lng: this.formLocationCoordinates?.lng ?? null,
+            ...locationPayload(this.formData.locationName),
             about,
           },
           update: (store, { data: { UpdateUser } }) => {
