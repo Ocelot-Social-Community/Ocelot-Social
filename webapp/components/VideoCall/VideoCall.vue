@@ -2599,8 +2599,11 @@ export default {
   align-items: center;
   gap: var(--space-x-small);
   /*  No padding above and below: the tabs reach the row's lower edge, where the */
-  /*  underline of the active one belongs. The buttons bring the row's height. */
-  min-height: 36px;
+  /*  underline of the active one belongs. As high as the call's header beside it, line */
+  /*  included (RoomHeader compact: 28px avatar, 8px above and below), so both end on */
+  /*  one level. */
+  box-sizing: border-box;
+  min-height: calc(28px + 2 * var(--space-x-small));
   /*  The tabs start at the sidebar's edge, as in the floating chat window; the close */
   /*  button at the row's end keeps its space to the edge. */
   padding: 0 var(--space-small) 0 0;
