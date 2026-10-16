@@ -1,6 +1,7 @@
-import { computed, h } from 'vue'
+import { computed } from 'vue'
 
 import { IconCheck, OsIcon } from '#src/components/OsIcon'
+import { ocelotIcons } from '#src/ocelot'
 
 import OsBadge from './OsBadge.vue'
 
@@ -9,10 +10,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 // Icons, not text glyphs: no bundled font has a check mark or a warning sign, so they render from
 // each machine's fallback font and the screenshot differs between Docker and the CI runner.
-const IconWarning = (createElement = h) =>
-  createElement('svg', { viewBox: '0 0 24 24', fill: 'currentColor' }, [
-    createElement('path', { d: 'M12 2 1 21h22L12 2zm1 16h-2v-2h2v2zm0-4h-2V9h2v5z' }),
-  ])
+const IconWarning = ocelotIcons.warning
 
 const meta: Meta<typeof OsBadge> = {
   title: 'Components/OsBadge',
