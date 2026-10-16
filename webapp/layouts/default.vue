@@ -392,7 +392,8 @@ export default {
   align-items: center;
   box-sizing: border-box;
   height: 36px;
-  padding: 0 var(--space-small);
+  /*  The tabs reach from edge to edge of the window, their underline with them. */
+  padding: 0;
   background: var(--background-color-base);
   border-bottom: 1px solid var(--color-neutral-85);
 }

@@ -28,7 +28,7 @@
                 appearance="filled"
                 circle
                 :aria-label="
-                  $t(blurred ? 'post.sensitiveContent.show' : 'post.sensitiveContent.hide')
+                  blurred ? $t('post.sensitiveContent.show') : $t('post.sensitiveContent.hide')
                 "
                 @click="blurred = !blurred"
               >
@@ -107,7 +107,8 @@
             />
           </section>
           <div class="ds-mb-small"></div>
-          <p
+          <!-- A <div>, not a <p>: the dropdown renders a <div>, which a <p> must not contain. -->
+          <div
             v-if="post.group && post.group.id && post.group.slug"
             class="post-kicker ds-text ds-text-soft ds-text-size-base"
           >
@@ -132,7 +133,7 @@
                 />
               </template>
             </dropdown>
-          </p>
+          </div>
           <h1 class="ds-heading ds-heading-h1 title hyphenate-text">{{ post.title }}</h1>
           <!-- event data -->
           <div
@@ -566,9 +567,9 @@ export default {
           mutation: PostMutations().toggleObservePost,
           variables: { value, id: postId },
         })
-        const message = this.$t(
-          `post.menu.${value ? 'observedSuccessfully' : 'unobservedSuccessfully'}`,
-        )
+        const message = value
+          ? this.$t('post.menu.observedSuccessfully')
+          : this.$t('post.menu.unobservedSuccessfully')
         this.$toast.success(message)
         await this.$apollo.queries.Post.refetch()
       } catch (error) {

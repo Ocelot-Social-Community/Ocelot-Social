@@ -80,7 +80,6 @@ webapp: &webapp
   - 'styleguide/**/*'
   - 'package.json'
   - *ui
-  - 'scripts/translations/**/*'
   # webapp consumes @ocelot-social/branding (file: dep) → a branding change can break it
   - *branding
 

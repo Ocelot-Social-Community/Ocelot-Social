@@ -28,18 +28,6 @@ To design your documentation see the syntax description at GitBook:
 ### Small Headlines
 ```
 
-##### Tabs
-
-```markdown
-::: tabs
-@tab:active First tab's title <!-- this tab is setactive -->
-
-@tab Second tab's title
-
-:::
-```
-
-
 ##### Commands
 
 ~~~markdown
@@ -93,25 +81,21 @@ Copy the URL and paste it were you need it.
 
 #### Add an Arrow or some other Marking Stuff
 
-::: tabs
-@tab:active macOS
+##### macOS
 
-##### In the Preview App
+In the Preview app go to: **Menu** + **Tools** \(GER: Werkzeuge\) + **Annotate** \(GER: Anmerkungen\) + etc.
 
-Got to: **Menu** + **Tools** \(GER: Werkzeuge\) + **Annotate** \(GER: Anmerkungen\) + etc.
-
-@tab Windows
+##### Windows
 
 {% hint style="info" %}
 TODO: How to modify screenshots in Windows ...
 {% endhint %}
-{% endtab %}
 
-@tab Linux
+##### Linux
+
 {% hint style="info" %}
 TODO: How to modify screenshots in Linux ...
 {% endhint %}
-:::
 
 ## Deploy this Documentation
 

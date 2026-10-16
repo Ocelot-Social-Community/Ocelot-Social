@@ -37,10 +37,7 @@
           />
         </li>
         <li>
-          <os-number
-            :count="user.commentedCount"
-            :label="$t('common.comment', null, user.commentedCount)"
-          />
+          <os-number :count="user.commentedCount" :label="$t('profile.commented')" />
         </li>
       </ul>
       <os-button

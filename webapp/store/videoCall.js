@@ -27,6 +27,9 @@ export const state = () => {
     // them. 'overlay': the call fills the window and they lie on it, see-through. 'hidden':
     // they have moved out of the way along with the call's own bars (the mouse was still).
     pageBars: 'normal',
+    // A full reload is due (a new branding, #10353) but waits for this call to end:
+    // utils/reloadWhenIdle.js sets it, the call shows it as a notice.
+    reloadPending: false,
   }
 }
 
@@ -96,6 +99,9 @@ export const mutations = {
   SET_PAGE_BARS(state, pageBars) {
     state.pageBars = ['overlay', 'hidden'].includes(pageBars) ? pageBars : 'normal'
   },
+  SET_RELOAD_PENDING(state, pending) {
+    state.reloadPending = !!pending
+  },
 }
 
 export const getters = {
@@ -140,5 +146,8 @@ export const getters = {
   },
   pageBars(state) {
     return state.pageBars
+  },
+  reloadPending(state) {
+    return state.reloadPending
   },
 }

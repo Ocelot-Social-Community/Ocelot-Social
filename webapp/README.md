@@ -50,9 +50,10 @@ $ npm run dev
 ### Build for Production
 
 ```bash
-# build for production and launch server
-$ npm run build
-$ npm run start
+# build for production and launch server — NODE_ENV=production is what turns on the production
+# settings of nuxt.config.js (the CSS as cacheable files, the modern build); the Docker image sets it
+$ NODE_ENV=production npm run build
+$ NODE_ENV=production npm run start
 ```
 
 ### Run tests
@@ -64,8 +65,7 @@ We ensure the quality of our frontend code by using
 
 For more information see our [frontend testing guide](testing.md). Use these commands to run the tests:
 
-::: tabs
-@tab:active With Docker
+#### With Docker
 
 After starting the application following the above guidelines, open new terminal windows for each of these commands:
 
@@ -86,7 +86,7 @@ $ docker-compose exec webapp npm run storybook
 
 You can then visit the Storybook playground on `http://localhost:3002`
 
-@tab title Without Docker
+#### Without Docker
 
 After starting the application following the above guidelines, open new terminal windows and navigate to the `/webapp` directory for each of these commands:
 
@@ -101,18 +101,32 @@ $ npm test
 ```
 
 ```bash
-# run locales in /webapp (use option --fix to sort the locales)
-$ npm run locales
-```
-
-```bash
 # start storybook in /webapp
 $ npm run storybook
 ```
 
 You can then visit the Storybook playground on `http://localhost:3002`
 
-:::
+## Translations
+
+The texts live in `locales/<language>.json`, one file per language, all with the same keys.
+`en.json` is the reference. `npm run lint` checks them (eslint-config-it4c's `vueI18n` module):
+
+- every key the code asks for with `$t('…')` exists,
+- every language has exactly the keys of the others,
+- no key is left that nothing uses any more,
+- the keys are sorted. `npm run lint -- --fix` sorts them.
+
+A new text therefore goes into all languages at once, in English where no translation exists yet.
+A key the code builds at runtime (`` $t(`group.types.${type}`) ``) or hands over as
+data (a modal's `titleIdent`) is invisible to the unused-keys check: add its pattern to `ignores`
+in `eslint.config.mjs`, next to the others of its kind. Where the key is a choice between a few
+literals, prefer `cond ? $t('a') : $t('b')` over `` $t(cond ? 'a' : 'b') ``: then the lint sees both.
+
+The unit tests add a check of their own (`test/knownTranslationKeys.js`): a spec that renders a key
+`en.json` does not define fails, including the keys built at runtime. The translations of the
+backend's error codes, the permission catalogs and the admin config categories are checked against
+their source by `backend/src/graphql/webappTranslations.spec.ts`.
 
 ## Maintenance Mode
 

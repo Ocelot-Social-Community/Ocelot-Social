@@ -14,7 +14,7 @@ import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'
 import normalizeEmail from './helpers/normalizeEmail'
 import { redeemInviteCode } from './inviteCodes'
-import { createOrUpdateLocations } from './users/location'
+import { NEIGHBORHOOD_REVERSE_GEOCODE_TYPES, resolveLocationInput } from './users/location'
 
 import type { Context } from '@src/context'
 
@@ -63,6 +63,18 @@ export default {
       }
       args.termsAndConditionsAgreedAt = new Date().toISOString()
 
+      // The place picked on the last slide, resolved before the account is created — the same way
+      // as a profile's (UpdateUser): by its Mapbox id where the form sends one, otherwise by its
+      // exact name. Searched by name alone and falling back to Mapbox's top result, "Schweiz"
+      // used to become Schweizer-Reneke in South Africa (#7018, #7239). A place that cannot be
+      // resolved refuses the registration instead of creating the account without it.
+      const location = await resolveLocationInput(
+        args,
+        context,
+        NEIGHBORHOOD_REVERSE_GEOCODE_TYPES,
+        'User',
+      )
+
       let { nonce, email, inviteCode, locationName } = args
       email = normalizeEmail(email)
       delete args.nonce
@@ -71,10 +83,6 @@ export default {
       args.encryptedPassword = await hash(args.password, 10)
       delete args.password
       delete args.locationName
-
-      if (locationName === '') {
-        locationName = null
-      }
 
       const { driver } = context
       const session = driver.session()
@@ -143,7 +151,7 @@ export default {
           await redeemInviteCode(context, inviteCode, true)
         }
 
-        await createOrUpdateLocations('User', user.id, locationName, session, context)
+        await location.attach(session, 'User', user.id)
         return user
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {

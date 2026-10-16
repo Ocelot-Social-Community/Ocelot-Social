@@ -284,6 +284,7 @@ import formValidation from '~/mixins/formValidation'
 import GroupStateCard from '~/components/Group/GroupStateCard'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import groupRights from '~/mixins/groupRights'
+import { locationName, locationPayload } from '~/utils/locationPayload'
 
 // One glyph per template, falling back to the one for the visibility it derives to — so a
 // template nobody has drawn an icon for still shows what kind of group it makes.
@@ -510,43 +511,10 @@ export default {
     groupLocationTypes() {
       return GROUP_LOCATION_TYPES
     },
+    // The name the location field shows; the rest of the place goes with the mutation
+    // (utils/locationPayload.js).
     formLocationName() {
-      const isNestedValue =
-        typeof this.formData.locationName === 'object' &&
-        typeof this.formData.locationName.value === 'string'
-      const isDirectString = typeof this.formData.locationName === 'string'
-      return isNestedValue
-        ? this.formData.locationName.value
-        : isDirectString
-          ? this.formData.locationName
-          : ''
-    },
-    // LocationSelect and LocationPickerMap both already resolve lat/lng
-    // (via forward/reverse geocoding) alongside the label when a search
-    // result or map pin is picked — a plain string here means the field
-    // still holds unresolved/typed text, no coordinates to send yet.
-    // The Mapbox feature id of a place picked from the search or the map — what the backend
-    // decides the location by, since a place name differs with the language it was shown in.
-    // Null while the field holds typed text or a map point nothing was found at.
-    formLocationId() {
-      const locationValue = this.formData.locationName
-      // Only together with coordinates: the backend confirms the id at them, and a feature Mapbox
-      // returned without a centre leaves the id unconfirmable — the name path still takes it.
-      return typeof locationValue === 'object' &&
-        locationValue !== null &&
-        typeof locationValue.id === 'string' &&
-        this.formLocationCoordinates
-        ? locationValue.id
-        : null
-    },
-    formLocationCoordinates() {
-      const locationValue = this.formData.locationName
-      const hasCoordinates =
-        typeof locationValue === 'object' &&
-        locationValue !== null &&
-        typeof locationValue.lat === 'number' &&
-        typeof locationValue.lng === 'number'
-      return hasCoordinates ? { lat: locationValue.lat, lng: locationValue.lng } : null
+      return locationName(this.formData.locationName)
     },
     // The group's originally saved location — shown as a small note next to
     // the field while editing, but only once the user has actually changed
@@ -763,10 +731,7 @@ export default {
         about,
         description,
         actionRadius,
-        locationName: this.formLocationName,
-        locationId: this.formLocationId,
-        lat: this.formLocationCoordinates?.lat ?? null,
-        lng: this.formLocationCoordinates?.lng ?? null,
+        ...locationPayload(this.formData.locationName),
         categoryIds,
       }
       // Snapshot exactly what's being submitted — submit() to done() is a

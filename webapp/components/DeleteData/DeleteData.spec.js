@@ -3,6 +3,7 @@ import flushPromises from 'flush-promises'
 import DeleteData from './DeleteData.vue'
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { currentUserCountQuery } from '~/graphql/User'
 
 const localVue = global.localVue
 
@@ -53,7 +54,9 @@ describe('DeleteData.vue', () => {
       return {
         currentUserCounts: {
           contributionsCount: 4,
+          // Three comments on two posts: the checkbox deletes the comments.
           commentedCount: 2,
+          commentsCount: 3,
         },
       }
     }
@@ -71,6 +74,14 @@ describe('DeleteData.vue', () => {
 
     afterEach(() => {
       jest.clearAllMocks()
+    })
+
+    it('offers to delete the comments the account wrote, not the posts it commented on', () => {
+      expect(mocks.$t).toHaveBeenCalledWith(
+        'settings.deleteUserAccount.commentsCount',
+        { count: 3 },
+        3,
+      )
     })
 
     it('checkbox deleteContributions defaults be false', () => {
@@ -167,6 +178,16 @@ describe('DeleteData.vue', () => {
         await deleteAccountBtn.trigger('click')
         await flushPromises()
         expect(mocks.$router.push).toHaveBeenCalledWith('/')
+      })
+    })
+
+    describe('counts', () => {
+      it("reads the user's own counts for the labels", () => {
+        const { currentUser } = DeleteData.apollo
+        expect(currentUser.query()).toBe(currentUserCountQuery())
+        const ctx = {}
+        currentUser.update.call(ctx, { currentUser: { commentsCount: 7 } })
+        expect(ctx.currentUserCounts).toEqual({ commentsCount: 7 })
       })
     })
 

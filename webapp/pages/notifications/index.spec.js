@@ -112,6 +112,17 @@ describe('PostIndex', () => {
           expect(mocks.$apollo.queries.notifications.refresh).toHaveBeenCalledTimes(1)
         })
       })
+
+      describe('select Unread on a later page', () => {
+        beforeEach(async () => {
+          await wrapper.setData({ offset: 24 })
+          wrapper.findComponent(DropdownFilter).vm.$emit('filter', wrapper.vm.filterOptions[2])
+        })
+
+        it('goes back to the first page', () => {
+          expect(wrapper.vm.offset).toEqual(0)
+        })
+      })
     })
 
     describe('markNotificationAsRead', () => {

@@ -143,19 +143,15 @@ export default {
         })
 
         this.$toast.success(
-          this.$t(
-            badge.type === 'verification'
-              ? 'admin.badges.revokeVerification.success'
-              : 'admin.badges.revokeTrophy.success',
-          ),
+          badge.type === 'verification'
+            ? this.$t('admin.badges.revokeVerification.success')
+            : this.$t('admin.badges.revokeTrophy.success'),
         )
       } catch (error) {
         this.$toast.error(
-          this.$t(
-            badge.type === 'verification'
-              ? 'admin.badges.revokeVerification.error'
-              : 'admin.badges.revokeTrophy.error',
-          ),
+          badge.type === 'verification'
+            ? this.$t('admin.badges.revokeVerification.error')
+            : this.$t('admin.badges.revokeTrophy.error'),
         )
       }
     },

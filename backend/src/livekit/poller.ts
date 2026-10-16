@@ -94,12 +94,34 @@ const pollOnce = async () => {
         continue
       }
       // room.numParticipants is a number; gracefully coerce in case of bigint
-      const count = Number(room.numParticipants ?? 0) || 0
-      if (lastSeenCounts.get(room.name) !== count || told.has(room.name)) {
+      const listed = Number(room.numParticipants ?? 0) || 0
+      if (lastSeenCounts.get(room.name) !== listed || told.has(room.name)) {
+        let count = listed
+        if (told.has(room.name)) {
+          // The correction for a told room asks the participants themselves, as the count query
+          // does: the room list can lag behind them, and its count, published as "the truth",
+          // would put a call everybody just left back to 1 (#10508). If they cannot be asked,
+          // the room stays owed for the next poll rather than corrected with the list.
+          try {
+            const participants = await withTimeout(
+              client.listParticipants(room.name),
+              POLL_TIMEOUT_MS,
+              'listParticipants',
+            )
+            count = participants.length
+            // eslint-disable-next-line no-catch-all/no-catch-all
+          } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err)
+            logger.warn('LiveKit poll: listParticipants failed for', room.name, message)
+            continue
+          }
+        }
         await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count })
         // Only once it is out: a count noted before a publish that failed would look published
-        // to the next poll, which would then keep quiet about it.
-        lastSeenCounts.set(room.name, count)
+        // to the next poll, which would then keep quiet about it. What is noted is the LIST's
+        // count, which the next poll compares with — a list still lagging behind the
+        // participants then shows no change, instead of republishing its stale count.
+        lastSeenCounts.set(room.name, listed)
       }
       owed.delete(room.name)
     }

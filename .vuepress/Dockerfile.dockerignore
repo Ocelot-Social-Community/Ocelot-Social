@@ -26,7 +26,7 @@ release
 docu
 # …but docu/gitbook/ holds the SCREENSHOTS the published pages embed, and vite fails
 # hard on a missing asset rather than warning: "Could not load
-# /repo/docu/gitbook/graphql-playground.png (imported by …/backend/index.html.vue)".
-# Eight images across backend/, cypress/ and webapp/ READMEs resolve here; the folder
-# contains no markdown, so nothing WIP comes back in with them. 4.5 MB of the 21 MB.
+# /repo/docu/gitbook/<image> (imported by …/backend/index.html.vue)".
+# The images of the backend/, cypress/ and webapp/ READMEs resolve here; the folder
+# contains no markdown, so nothing WIP comes back in with them.
 !docu/gitbook

@@ -24,6 +24,7 @@ describe('videoCall store', () => {
         lastChatTab: 'call',
         phase: 'idle',
         pageBars: 'normal',
+        reloadPending: false,
       })
     })
   })
@@ -278,6 +279,15 @@ describe('videoCall store', () => {
       })
     })
 
+    describe('SET_RELOAD_PENDING', () => {
+      it('coerces to a boolean', () => {
+        mutations.SET_RELOAD_PENDING(state, 1)
+        expect(state.reloadPending).toBe(true)
+        mutations.SET_RELOAD_PENDING(state, undefined)
+        expect(state.reloadPending).toBe(false)
+      })
+    })
+
     describe('SET_PARTICIPANT_COUNT', () => {
       it('stores a numeric count', () => {
         mutations.SET_PARTICIPANT_COUNT(state, 3)
@@ -304,6 +314,7 @@ describe('videoCall store', () => {
         participantCount: 7,
         chatRoomId: 'room-1',
         phase: 'in-call',
+        reloadPending: true,
       }
       expect(getters.enabled(state)).toBe(true)
       expect(getters.showVideoCall(state)).toBe(true)
@@ -315,6 +326,7 @@ describe('videoCall store', () => {
       expect(getters.participantCount(state)).toBe(7)
       expect(getters.chatRoomId(state)).toBe('room-1')
       expect(getters.phase(state)).toBe('in-call')
+      expect(getters.reloadPending(state)).toBe(true)
     })
   })
 })

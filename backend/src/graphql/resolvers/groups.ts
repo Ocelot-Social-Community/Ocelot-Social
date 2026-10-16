@@ -43,31 +43,15 @@ import {
 import Resolver from './helpers/Resolver'
 import { groupReadScope } from './helpers/viewerGroups'
 import { images } from './images/images'
-import {
-  attachLocationFeature,
-  createOrUpdateLocations,
-  extractCoordinates,
-  extractLocationFeature,
-  NEIGHBORHOOD_REVERSE_GEOCODE_TYPES,
-} from './users/location'
+import { NEIGHBORHOOD_REVERSE_GEOCODE_TYPES, resolveLocationInput } from './users/location'
 
 import type { Context } from '@src/context'
 
-// Reverse-geocoded with these types (see createOrUpdateLocations) instead of
+// Resolved with these types (see resolveLocationInput) instead of
 // an event's precise address/poi/place — a group's location is deliberately
 // coarser than an event's exact pin (see NEIGHBORHOOD_REVERSE_GEOCODE_TYPES'
 // own doc comment for the full reasoning).
 const GROUP_REVERSE_GEOCODE_TYPES = NEIGHBORHOOD_REVERSE_GEOCODE_TYPES
-
-// Pulls lat/lng off params (so they never reach `SET group += $params` below
-// — a group has no lat/lng fields of its own, unlike Post) and validates
-// them, mirroring validateEventParams' own coordinate check. Returns null
-// when neither was given; throws when only one was, or either is out of
-// range. Thin wrapper around the shared extractCoordinates (see
-// users/location.ts) — User's own UpdateUser resolver uses the same
-// function directly with its own entity label.
-const extractGroupCoordinates = (params): { lat: number; lng: number } | null =>
-  extractCoordinates(params, 'Group')
 
 // Whether any Category nodes exist. Keeps CreateGroup graceful: the "categories
 // required" rule only applies when the policy is on AND there is at least one
@@ -373,14 +357,12 @@ export default {
       delete params.showMembers
       const { categoryIds } = params
       delete params.categoryIds
-      params.locationName = params.locationName === '' ? null : params.locationName
-      const coordinates = extractGroupCoordinates(params)
       // Resolved before anything is written: a refused place must not leave the group half-saved.
-      const locationFeature = await extractLocationFeature(
+      const location = await resolveLocationInput(
         params,
-        coordinates,
         context,
         GROUP_REVERSE_GEOCODE_TYPES,
+        'Group',
       )
       // Only require categories when the feature is on AND at least one category
       // exists — otherwise group creation would be impossible on an empty
@@ -474,21 +456,7 @@ export default {
           )
           return seeded.records[0].get('group')
         })
-        // TODO: put in a middleware, see "UpdateGroup", "UpdateUser"
-        if (locationFeature) {
-          await attachLocationFeature(session, 'Group', params.id, locationFeature)
-        } else {
-          await createOrUpdateLocations(
-            'Group',
-            params.id,
-            params.locationName,
-            session,
-            context,
-            coordinates,
-            GROUP_REVERSE_GEOCODE_TYPES,
-            true,
-          )
-        }
+        await location.attach(session, 'Group', params.id)
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
@@ -512,14 +480,12 @@ export default {
       delete params.categoryIds
       const { id: groupId, avatar: avatarInput } = params
       delete params.avatar
-      params.locationName = params.locationName === '' ? null : params.locationName
-      const coordinates = extractGroupCoordinates(params)
       // Resolved before anything is written: a refused place must not leave the group half-saved.
-      const locationFeature = await extractLocationFeature(
+      const location = await resolveLocationInput(
         params,
-        coordinates,
         context,
         GROUP_REVERSE_GEOCODE_TYPES,
+        'Group',
       )
 
       if (policy.get('categoriesActive') && categoryIds) {
@@ -664,21 +630,7 @@ export default {
             groupShowMembersChanged: { groupId },
           })
         }
-        // TODO: put in a middleware, see "CreateGroup", "UpdateUser"
-        if (locationFeature) {
-          await attachLocationFeature(session, 'Group', params.id, locationFeature)
-        } else {
-          await createOrUpdateLocations(
-            'Group',
-            params.id,
-            params.locationName,
-            session,
-            context,
-            coordinates,
-            GROUP_REVERSE_GEOCODE_TYPES,
-            true,
-          )
-        }
+        await location.attach(session, 'Group', params.id)
         // Read back last: both writes above land in the ROLES, and the visibility is computed
         // from the columns they keep in step — the row captured before them would report the
         // group as it was, which is the one thing a mutation's answer must not do.

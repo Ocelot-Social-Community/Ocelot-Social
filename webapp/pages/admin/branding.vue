@@ -255,6 +255,7 @@ import {
   setBrandingCompositionMutation,
 } from '~/graphql/BrandingMutations'
 import { discoverThemeTokens, summarizeStylesheet } from '~/utils/themeTokens.js'
+import { reloadWhenIdle } from '~/utils/reloadWhenIdle'
 
 /**
  * Fetches a brand's own stylesheets (config.assets.css, already namespaced to /branding/<id>/…) and
@@ -459,6 +460,14 @@ export default {
     },
   },
   methods: {
+    // Saved, but the reload that applies it waits for the admin's own video call to end (#10353):
+    // say so, and let the page be used meanwhile instead of spinning until a reload that is not
+    // coming yet.
+    appliedAfterCall() {
+      this.$toast.success(this.$t('admin.branding.appliedAfterCall'))
+      this.saving = null
+      this.savingComposition = false
+    },
     // Header logo of a brand (from its composed config), for the available-list preview.
     logo(b) {
       const config = this.details[b.id]
@@ -653,8 +662,9 @@ export default {
           mutation: setActiveBrandingMutation(),
           variables: { id },
         })
-        // Broadcast via policyChanged; reload to fully apply (config + assets + static HTML + theme).
-        window.location.reload()
+        // Broadcast via policyChanged; reload to fully apply (config + assets + static HTML + theme)
+        // — after the admin's own call, if they are in one (#10353).
+        if (reloadWhenIdle(this.$store)) this.appliedAfterCall()
       } catch (error) {
         this.$toast.error(this.$t('admin.branding.error'))
         this.saving = null
@@ -741,7 +751,7 @@ export default {
         // Server accepted it → commit locally, then reload to fully apply the recomposed branding.
         this.composition = next
         this.clearPending(bucket)
-        window.location.reload()
+        if (reloadWhenIdle(this.$store)) this.appliedAfterCall()
       } catch (error) {
         // Leave this.composition + pending untouched so the failed change stays pending (retry/cancel).
         this.$toast.error(this.$t('admin.branding.error'))

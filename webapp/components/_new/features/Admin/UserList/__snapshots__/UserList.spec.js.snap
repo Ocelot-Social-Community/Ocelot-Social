@@ -299,6 +299,8 @@ exports[`UserList given badges are disabled renders 1`] = `
               class="ds-table-col ds-table-col-right"
             >
               
+              17
+            
             </td>
              
             <td
@@ -472,6 +474,8 @@ exports[`UserList given badges are disabled renders 1`] = `
               class="ds-table-col ds-table-col-right"
             >
               
+              
+            
             </td>
              
             <td
@@ -971,6 +975,8 @@ exports[`UserList given badges are enabled renders 1`] = `
               class="ds-table-col ds-table-col-right"
             >
               
+              17
+            
             </td>
              
             <td
@@ -1177,6 +1183,8 @@ exports[`UserList given badges are enabled renders 1`] = `
               class="ds-table-col ds-table-col-right"
             >
               
+              
+            
             </td>
              
             <td

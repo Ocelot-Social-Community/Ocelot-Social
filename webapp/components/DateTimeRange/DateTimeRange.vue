@@ -15,19 +15,19 @@
         }}
       </div>
     </div>
-    <template v-if="!isSameDayLocal">
-      <os-icon :icon="icons.arrowDown" />
-      <div class="ds-flex date-time-row">
-        <div>
-          <os-icon :icon="icons.calendar" data-test="calendar" />
-          {{ getEndDateString }}
-        </div>
-        <div>
-          <os-icon :icon="icons.clock" data-test="clock" />
-          {{ getEndTimeString }}
-        </div>
+    <!-- Whether start and end fall on the same day depends on the time zone, which differs between
+         server and browser. v-show keeps the markup the same on both, so hydration matches. -->
+    <os-icon v-show="!isSameDayLocal" :icon="icons.arrowDown" />
+    <div v-show="!isSameDayLocal" class="ds-flex date-time-row">
+      <div>
+        <os-icon :icon="icons.calendar" data-test="calendar" />
+        {{ getEndDateString }}
       </div>
-    </template>
+      <div>
+        <os-icon :icon="icons.clock" data-test="clock" />
+        {{ getEndTimeString }}
+      </div>
+    </div>
   </div>
 </template>
 
