@@ -2342,7 +2342,9 @@ export default {
   /*  No padding above and below: the tabs reach the row's lower edge, where the */
   /*  underline of the active one belongs. The buttons bring the row's height. */
   min-height: 44px;
-  padding: 0 var(--space-small);
+  /*  The tabs start at the sidebar's edge, as in the floating chat window; the close */
+  /*  button at the row's end keeps its space to the edge. */
+  padding: 0 var(--space-small) 0 0;
   border-bottom: 1px solid var(--color-neutral-85);
 }
 
