@@ -908,6 +908,11 @@ export default {
       update({ profilePagePosts }) {
         this.posts = profilePagePosts
       },
+      // A failed load — the first one or a refetch, from wherever it was started — calls no
+      // update(): without this the list would wait for posts that never come, spinning forever.
+      error() {
+        if (this.posts === null) this.posts = []
+      },
       fetchPolicy: 'cache-and-network',
     },
     Group: {

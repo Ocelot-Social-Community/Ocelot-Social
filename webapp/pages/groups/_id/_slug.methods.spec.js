@@ -3,7 +3,7 @@
 // See pages/profile/_id/_slug.methods.spec.js for the same pattern.
 import GroupsSlug from './_slug.vue'
 
-const { methods } = GroupsSlug
+const { methods, apollo } = GroupsSlug
 
 describe('pages/groups/_id/_slug.vue — methods', () => {
   describe('showOrChangeGroupChat', () => {
@@ -41,6 +41,20 @@ describe('pages/groups/_id/_slug.vue — methods', () => {
       }
       await methods.onElevationChanged.call(ctx)
       expect(order).toEqual(['group', 'posts'])
+    })
+  })
+
+  describe('apollo.profilePagePosts.error', () => {
+    it('ends the spinner of a list that never loaded with "no posts"', () => {
+      const ctx = { posts: null }
+      apollo.profilePagePosts.error.call(ctx, new Error('network'))
+      expect(ctx.posts).toEqual([])
+    })
+
+    it('keeps posts that are already shown', () => {
+      const ctx = { posts: [{ id: 'p1' }] }
+      apollo.profilePagePosts.error.call(ctx, new Error('network'))
+      expect(ctx.posts).toEqual([{ id: 'p1' }])
     })
   })
 })

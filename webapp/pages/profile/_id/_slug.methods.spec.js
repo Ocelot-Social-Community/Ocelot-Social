@@ -600,5 +600,17 @@ describe('pages/profile/_id/_slug.vue — apollo', () => {
       apollo.profilePagePosts.update.call(ctx, { profilePagePosts: [{ id: 'p1' }] })
       expect(ctx.posts).toEqual([{ id: 'p1' }])
     })
+
+    it('error() ends the spinner of a list that never loaded with "no posts"', () => {
+      const ctx = { posts: null }
+      apollo.profilePagePosts.error.call(ctx, new Error('network'))
+      expect(ctx.posts).toEqual([])
+    })
+
+    it('error() keeps posts that are already shown', () => {
+      const ctx = { posts: [{ id: 'p1' }] }
+      apollo.profilePagePosts.error.call(ctx, new Error('network'))
+      expect(ctx.posts).toEqual([{ id: 'p1' }])
+    })
   })
 })
