@@ -170,7 +170,6 @@ Before you push, run the linters, and the tests of what you changed:
 ```bash
 # in folder webapp/
 $ npm run lint -- --fix
-$ npm run locales -- --fix
 $ npm test
 
 # in folder backend/ — the tests wipe the database they run against,

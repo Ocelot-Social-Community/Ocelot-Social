@@ -27,14 +27,13 @@
     "vue-router": "^5.3.1"
   },
   "devDependencies": {
-    "@intlify/eslint-plugin-vue-i18n": "^4.5.1",
     "@nuxt/eslint": "^1.17.0",
     "@nuxt/test-utils": "^4.3.3",
     "@tailwindcss/vite": "^4.2.2",
     "@vitest/coverage-v8": "^4.1.2",
     "@vue/test-utils": "^2.4.6",
     "eslint": "^10.8.1",
-    "eslint-config-it4c": "^0.13.2",
+    "eslint-config-it4c": "^0.14.0",
     "happy-dom": "^20.14.5",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",

@@ -129,9 +129,9 @@ export default {
           },
         })
         .then(() => {
-          const message = this.$t(
-            `post.menu.${value ? 'observedSuccessfully' : 'unobservedSuccessfully'}`,
-          )
+          const message = value
+            ? this.$t('post.menu.observedSuccessfully')
+            : this.$t('post.menu.unobservedSuccessfully')
           this.$toast.success(message)
           refetchPostList()
         })

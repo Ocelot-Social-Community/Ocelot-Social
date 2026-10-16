@@ -1,10 +1,18 @@
-# GraphQL Playground
+# Exploring the GraphQL API in the browser
 
-![GraphQL Playground](../../../docu/gitbook/graphql-playground%20%281%29.png)
+With `DEBUG=true` in your backend `.env` (see `.env.template`), opening the GraphQL endpoint in a
+browser shows **Apollo Sandbox**, an editor for queries and mutations with the schema's
+documentation.
 
-***Attention:** For using the GraphQL Playground set `DEBUG=true` in your backend `.env`, see `.env.template`!*
+The Sandbox is not part of the backend: Apollo's plugin only writes a page that loads it from
+Apollo's CDN, along with Google Fonts. That is why it exists in development only — `DEBUG` is never
+set in production (see `src/config/index.ts`), and there the endpoint serves no page at all and a
+browser fetches nothing from a third party (#6304). An explorer of our own, served without a CDN, is
+discussed in #10526.
 
-To use GraphQL Playground, we need to know some basics:
+Any GraphQL client works just as well against the endpoint, e.g. Altair, Bruno or Insomnia.
+
+To use the Sandbox, we need to know some basics:
 
 ## How To Login?
 
@@ -13,7 +21,7 @@ The user can be created by seeding the Neo4j database from the backend or by mul
 
 ### Seed The Neo4j Database
 
-In your browser you can reach the GraphQL Playground under `http://localhost:4000/`, if the database and the backend are running, see [backend](../../README.md).
+In your browser you can reach the Sandbox under `http://localhost:4000/`, if the database and the backend are running, see [backend](../../README.md).
 There you will also find instructions on how to seed the database.
 
 ### Use GraphQL Mutations To Create A User
@@ -42,7 +50,7 @@ If all goes well, you will receive a QGL response like:
 }
 ```
 
-You can use this response to set an HTTP header when you click `HTTP HEADERS` in the footer.
+You can use this response to set an HTTP header in the Sandbox's `Headers` tab below the operation.
 Just set it with the login token you received in response:
 
 ```json
@@ -55,7 +63,7 @@ This token is used for all other queries and mutations you send to the backend.
 
 ## Query And Mutate
 
-When you are logged in and open a new playground tab by clicking "+", you can create a new group by sending the following mutation:
+When you are logged in and open a new Sandbox tab by clicking "+", you can create a new group by sending the following mutation:
 
 ```gql
 mutation {

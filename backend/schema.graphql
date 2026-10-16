@@ -1045,7 +1045,35 @@ type Mutation {
   """
   Complete registration by confirming the nonce and creating the user account. Public.
   """
-  SignupVerification(about: String, email: String!, inviteCode: String = null, locale: String, locationName: String = null, name: String!, nonce: String!, password: String!, slug: String, termsAndConditionsAgreedVersion: String!): User
+  SignupVerification(
+    about: String
+    email: String!
+    inviteCode: String = null
+
+    """
+    The coordinates the place was picked with, given together or not at all. With locationId they confirm it; without, they only bias the lookup of locationName's text towards same-named places nearby.
+    """
+    lat: Float
+
+    """See lat."""
+    lng: Float
+    locale: String
+
+    """
+    The Mapbox feature id of the picked place (as `queryLocations` returns it). Decides the location when given — the same in every language, unlike a place name. Needs lat and lng: the server confirms the id lies there.
+    """
+    locationId: ID
+
+    """
+    The place picked on the last slide, as shown. Matched exactly when no locationId is given; '' or null for none.
+    """
+    locationName: String = null
+    name: String!
+    nonce: String!
+    password: String!
+    slug: String
+    termsAndConditionsAgreedVersion: String!
+  ): User
 
   """Edit one of your own comments. Restricted to the author."""
   UpdateComment(content: String!, id: ID!): Comment
@@ -2485,10 +2513,19 @@ type User {
   """
   blocked: Boolean!
   categories: [Category]
+
+  """
+  Number of distinct posts this user commented on, counted like the profile's commented tab lists them: only posts the viewer may see, including those where the user's comments were deleted. Not a number of comments, see commentsCount.
+  """
   commentedCount: Int!
 
   """Comments written by this user."""
   comments: [Comment]!
+
+  """
+  Number of comments this user wrote that are not deleted, including disabled ones and those on disabled posts or in groups the viewer cannot read: exactly what deleting the account with its comments deletes. Readable by the user themselves and by holders of user.delete.any, user.disable or badge.manage only.
+  """
+  commentsCount: Int!
 
   """Posts written by this user."""
   contributions: [Post]!

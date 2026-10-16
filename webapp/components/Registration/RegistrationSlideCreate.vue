@@ -146,6 +146,7 @@
 import { branding } from '@ocelot-social/branding'
 import links from '~/constants/links'
 import { SignupVerificationMutation } from '~/graphql/Registration.js'
+import { locationName, locationPayload } from '~/utils/locationPayload'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import PasswordStrength from '~/components/Password/Strength'
 import EmailDisplayAndVerify from './EmailDisplayAndVerify'
@@ -243,11 +244,7 @@ export default {
   },
   computed: {
     formLocationName() {
-      // toDo: Mixin or move it to location select component
-      const isNestedValue =
-        typeof this.locationName === 'object' && typeof this.locationName.value === 'string'
-      const isDirectString = typeof this.locationName === 'string'
-      return isNestedValue ? this.locationName.value : isDirectString ? this.locationName : ''
+      return locationName(this.locationName)
     },
     locationRequired() {
       return this.$policy.get('requireLocation') === true
@@ -297,7 +294,9 @@ export default {
       const { password, passwordConfirmation } = this.formData
       const name = this.buildName(this.formData)
       const { termsAndConditionsConfirmed, receiveCommunicationAsEmailsEtcConfirmed } = this
-      const locationName = this.formLocationName
+      // The field's value as it is, not just its name: coming back to this slide restores it, and a
+      // bare name would make LocationSelect search it again and take Mapbox's top result (#7018).
+      const { locationName } = this
 
       this.sliderData.setSliderValuesCallback(this.validInput, {
         collectedInputData: {
@@ -337,7 +336,9 @@ export default {
             nonce,
             termsAndConditionsAgreedVersion,
             locale,
-            locationName: this.formLocationName,
+            // By its Mapbox id where one was picked, like a profile's location — the name alone
+            // is what the network searched by, in another language than it was shown in (#7239).
+            ...locationPayload(this.locationName),
           },
         })
         this.response = 'success'

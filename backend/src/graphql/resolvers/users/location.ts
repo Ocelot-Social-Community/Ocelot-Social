@@ -206,6 +206,75 @@ const attachLocation = async (session, nodeLabel, nodeId, locationId: string) =>
   })
 }
 
+/**
+ * The feature Mapbox finds for a place's text — the name path, on its own, so that it can run
+ * before anything is written (resolveLocationInput) as well as after (createOrUpdateLocations).
+ *
+ * `exact`: the text IS the user's picked choice, so only a feature named exactly that will do,
+ * and none is an error. Without it the text is free input with no claim to an exact match, and
+ * Mapbox's top-ranked result is taken — which, for a name shown in one language and searched in
+ * several, can be a different place altogether (#7018, #7239).
+ */
+const geocodeLocationName = async (
+  locationName: string,
+  coordinates: { lat: number; lng: number } | null | undefined,
+  context: Context,
+  types: string[],
+  exact: boolean,
+) => {
+  // Coordinates are only a `proximity` bias here, disambiguating same-named places.
+  const proximity = coordinates ? `${coordinates.lng},${coordinates.lat}` : null
+  const response: any = await fetch(
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+      locationName,
+    )}.json?access_token=${
+      context.config.MAPBOX_TOKEN
+    }&types=${types.join(',')}&language=${locales.join(',')}` +
+      (proximity ? `&proximity=${encodeURIComponent(proximity)}` : ''),
+    {
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT),
+    },
+  )
+
+  const res = await response.json()
+
+  if (!res?.features?.[0]) {
+    throw new AppError(Errors.LOCATION_NAME_NOT_FOUND)
+  }
+
+  let data
+  res.features.forEach((item) => {
+    // place_name is what the frontend actually displays and sends back (see
+    // LocationSelect.vue, and queryLocations below, which never exposes
+    // matching_place_name to it in the first place). matching_place_name is
+    // additionally checked for completeness — Mapbox only sets it when it had to
+    // fuzzy-correct the query, so it is unset on the common, already-exact case.
+    if (item.place_name === locationName || item.matching_place_name === locationName) {
+      data = item
+    }
+  })
+  if (!data) {
+    if (exact) {
+      throw new AppError(Errors.LOCATION_NAME_NO_EXACT_MATCH)
+    }
+    data = res.features[0]
+  }
+
+  if (!data?.place_type?.length) {
+    throw new AppError(Errors.LOCATION_NAME_NOT_FOUND)
+  }
+  return data
+}
+
+/**
+ * A post's location — an event's place — attached after the post is written.
+ *
+ * Users, groups and new accounts go through resolveLocationInput instead, which resolves the place
+ * before writing and only ever by what the user picked. An event drops a pin that need not
+ * correspond 1:1 to any piece of text, so its coordinates are authoritative and reverse-geocoded
+ * with the precise, address-level types (EVENT_REVERSE_GEOCODE_TYPES). Without coordinates — a
+ * place typed but not picked — the text is searched and Mapbox's top-ranked result taken.
+ */
 export const createOrUpdateLocations = async (
   nodeLabel,
   nodeId,
@@ -213,97 +282,32 @@ export const createOrUpdateLocations = async (
   session,
   context: Context,
   coordinates?: { lat: number; lng: number } | null,
-  // Defaults to the precise, address-level types an event's exact pin uses.
-  // Groups pass their own coarser list (place/region/country) — see groups.ts.
-  reverseGeocodeTypes: string[] = EVENT_REVERSE_GEOCODE_TYPES,
-  // Events drop a pin that need not correspond 1:1 to any piece of text, so
-  // their coordinates are authoritative and reverse-geocoded (the default,
-  // false, below). User/Group locations are always picked either via exact
-  // text search or via a map click that the frontend itself already
-  // resolved to a named place (LocationPickerMap's precision="resolved") —
-  // there, `locationName` IS the user's actual choice, so it must be
-  // matched by forward-geocoding that exact text, never overridden by a
-  // second, independent reverse-geocode of the coordinates (which can land
-  // on a more specific place — e.g. a city district — than the one picked,
-  // since it tries the most specific type first). Coordinates are still
-  // useful there, just demoted to a `proximity` bias that disambiguates
-  // same-named places instead of a source of truth in their own right.
-  matchLocationNameExactly = false,
 ) => {
-  if (locationName === undefined) {
-    return
-  }
-
+  // Both callers (CreatePost, UpdatePost) call only when the input carries a location, or its
+  // removal (null).
   let locationId
 
   if (locationName !== null) {
     let data
 
-    if (coordinates && !matchLocationNameExactly) {
+    if (coordinates) {
       data = await reverseGeocodeCoordinates(
         coordinates.lat,
         coordinates.lng,
         context,
-        reverseGeocodeTypes,
+        EVENT_REVERSE_GEOCODE_TYPES,
       )
       if (!data?.place_type?.length) {
         throw new AppError(Errors.LOCATION_COORDINATES_NOT_RESOLVABLE)
       }
     } else {
-      // matchLocationNameExactly reuses reverseGeocodeTypes as the forward-
-      // search type filter (already the right granularity — e.g. groups'
-      // neighborhood/locality/place/region/country — and, unlike the
-      // reverse endpoint, forward search accepts several types in one
-      // combined request) instead of the narrower default below, which
-      // exists only for callers that never pass coordinates or the flag
-      // (e.g. registration.ts) and are unaffected by this branch either way.
-      const types = matchLocationNameExactly
-        ? reverseGeocodeTypes.join(',')
-        : 'region,place,country,address'
-      const proximity = coordinates ? `${coordinates.lng},${coordinates.lat}` : null
-      const response: any = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-          locationName,
-        )}.json?access_token=${
-          context.config.MAPBOX_TOKEN
-        }&types=${types}&language=${locales.join(',')}` +
-          (proximity ? `&proximity=${encodeURIComponent(proximity)}` : ''),
-        {
-          signal: AbortSignal.timeout(REQUEST_TIMEOUT),
-        },
+      data = await geocodeLocationName(
+        locationName,
+        null,
+        context,
+        ['region', 'place', 'country', 'address'],
+        false,
       )
-
-      const res = await response.json()
-
-      if (!res?.features?.[0]) {
-        throw new AppError(Errors.LOCATION_NAME_NOT_FOUND)
-      }
-
-      res.features.forEach((item) => {
-        // place_name is what the frontend actually displays and sends back (see
-        // LocationSelect.vue, and queryLocations below, which never exposes
-        // matching_place_name to it in the first place). matching_place_name is
-        // additionally checked for completeness — Mapbox only sets it when it had to
-        // fuzzy-correct the query, so it is unset on the common, already-exact case.
-        if (item.place_name === locationName || item.matching_place_name === locationName) {
-          data = item
-        }
-      })
-      if (!data) {
-        // matchLocationNameExactly means locationName IS the user's picked choice (see its own
-        // doc comment above) — silently falling back to Mapbox's top-ranked result here would
-        // save a different place than the one they picked. Standard mode (no coordinates, no
-        // flag) keeps the fallback: there, locationName is free text with no claim to an exact
-        // match in the first place.
-        if (matchLocationNameExactly) {
-          throw new AppError(Errors.LOCATION_NAME_NO_EXACT_MATCH)
-        }
-        data = res.features[0]
-      }
-
-      if (!data?.place_type?.length) {
-        throw new AppError(Errors.LOCATION_NAME_NOT_FOUND)
-      }
     }
 
     locationId = await storeLocation(session, data)
@@ -500,4 +504,48 @@ export const queryLocations = async ({ place, lang, types, proximity }, context:
   }
 
   return fetchMapboxFeatures(buildMapboxUrl(place, lang, locationTypes, 10, proximity, accessToken))
+}
+
+/**
+ * A node's location as a mutation asks for it — resolved BEFORE anything is written, attached
+ * after. The one path for every node whose location is a place the user picked (a user's
+ * profile, a group, an account being registered), so that they cannot drift apart again.
+ *
+ * Takes `locationName`, `locationId`, `lat` and `lng` off the params:
+ * - `locationId` (with the coordinates it was picked with) decides, confirmed at its coordinates
+ *   (resolveLocationId) — the same in every language, unlike the name;
+ * - otherwise `locationName` is matched exactly, the coordinates only biasing the search; a name
+ *   Mapbox does not give back verbatim is refused, never swapped for its top-ranked result;
+ * - `''` and `null` clear the location, `undefined` leaves it as it is.
+ *
+ * Refusing up front is the point: a place that cannot be resolved must not leave a user, a group
+ * or a new account half-saved.
+ */
+export const resolveLocationInput = async (
+  params,
+  context: Context,
+  allowedTypes: string[],
+  entityLabel: string,
+) => {
+  if (params.locationName === '') {
+    params.locationName = null
+  }
+  const coordinates = extractCoordinates(params, entityLabel)
+  const feature = await extractLocationFeature(params, coordinates, context, allowedTypes)
+  const { locationName } = params
+  const data =
+    feature ??
+    (locationName
+      ? await geocodeLocationName(locationName, coordinates, context, allowedTypes, true)
+      : null)
+
+  return {
+    attach: async (session, nodeLabel: string, nodeId: string) => {
+      if (data) {
+        await attachLocationFeature(session, nodeLabel, nodeId, data)
+      } else if (locationName === null) {
+        await attachLocation(session, nodeLabel, nodeId, 'non-existent-id')
+      }
+    },
+  }
 }

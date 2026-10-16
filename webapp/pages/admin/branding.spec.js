@@ -1,4 +1,9 @@
 import BrandingPage from './branding.vue'
+import { reloadWhenIdle } from '~/utils/reloadWhenIdle'
+
+// The reload decision (now, or after the admin's own call) is utils/reloadWhenIdle.js's; here only
+// what the page does with its answer.
+jest.mock('~/utils/reloadWhenIdle', () => ({ reloadWhenIdle: jest.fn(() => false) }))
 
 // Both fetch-driven suites below install their own URL fixture on the global. Restoring it after every
 // test keeps a later one from silently answering out of an earlier one's fixture — the failure mode is
@@ -11,7 +16,7 @@ afterEach(() => {
 
 // Method-level test (no full mount): confirm() → saveComposition() must NOT commit the optimistic
 // composition when the mutation fails, so the change stays pending for retry/cancel instead of being
-// shown as applied. The success path reloads the page, so only the failure path is unit-tested here.
+// shown as applied.
 describe('admin/branding saveComposition failure handling', () => {
   const makeCtx = (overrides = {}) => ({
     composition: { theme: 'acme' },
@@ -56,6 +61,62 @@ describe('admin/branding saveComposition failure handling', () => {
     const sent = JSON.parse(mutate.mock.calls[0][0].variables.composition)
     expect(sent).toEqual({ theme: 'acme' }) // identity removed, theme kept
   })
+})
+
+// #10353: applying a switch takes a reload, which must not drop the admin's own video call.
+describe('admin/branding applying a switch', () => {
+  const makeCtx = () => ({
+    composition: { theme: 'acme' },
+    pending: { theme: 'other-brand' },
+    bucketNames: ['theme', 'identity'],
+    saving: null,
+    savingComposition: false,
+    $store: {},
+    $apollo: { mutate: jest.fn().mockResolvedValue({}) },
+    $toast: { error: jest.fn(), success: jest.fn() },
+    $t: (key) => key,
+    clearPending: jest.fn(),
+    appliedAfterCall: BrandingPage.methods.appliedAfterCall,
+  })
+
+  beforeEach(() => {
+    reloadWhenIdle.mockClear()
+  })
+
+  it.each([
+    ['the base brand', (ctx) => BrandingPage.methods.switchTo.call(ctx, 'stage')],
+    [
+      'the composition',
+      (ctx) => BrandingPage.methods.saveComposition.call(ctx, { theme: 'other-brand' }, 'theme'),
+    ],
+  ])('reloads through the call-aware seam after saving %s', async (_what, save) => {
+    const ctx = makeCtx()
+
+    await save(ctx)
+
+    expect(reloadWhenIdle).toHaveBeenCalledWith(ctx.$store)
+    expect(ctx.$toast.success).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['the base brand', (ctx) => BrandingPage.methods.switchTo.call(ctx, 'stage')],
+    [
+      'the composition',
+      (ctx) => BrandingPage.methods.saveComposition.call(ctx, { theme: 'other-brand' }, 'theme'),
+    ],
+  ])(
+    'says that saving %s takes effect after the call, and unlocks the page',
+    async (_what, save) => {
+      reloadWhenIdle.mockReturnValueOnce(true)
+      const ctx = makeCtx()
+
+      await save(ctx)
+
+      expect(ctx.$toast.success).toHaveBeenCalledWith('admin.branding.appliedAfterCall')
+      expect(ctx.saving).toBeNull()
+      expect(ctx.savingComposition).toBe(false)
+    },
+  )
 })
 
 // The list is the admin's map of what is deployed: the baked default is the brand every unswitched

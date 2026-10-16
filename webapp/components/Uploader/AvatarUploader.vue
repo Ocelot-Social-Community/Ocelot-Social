@@ -83,8 +83,10 @@ export default {
             id: this.profile.id,
           },
         })
-        .then(() => {
+        .then(({ data }) => {
           this.$toast.success(this.$t('profile.avatar.submitted'))
+          // The mutation's result, for whoever keeps a copy of the profile outside Apollo's cache.
+          this.$emit('uploaded', data)
         })
         .catch((error) => this.$toastBackendError(error))
     },
