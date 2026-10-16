@@ -140,11 +140,11 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
   })
 
   describe('resetPostList', () => {
-    it('clears offset / posts / hasMore', () => {
+    it('clears offset / hasMore and marks the posts as not loaded (a spinner, not "no posts")', () => {
       const ctx = { offset: 42, posts: [{ id: 'p1' }], hasMore: false }
       methods.resetPostList.call(ctx)
       expect(ctx.offset).toBe(0)
-      expect(ctx.posts).toEqual([])
+      expect(ctx.posts).toBeNull()
       expect(ctx.hasMore).toBe(true)
     })
   })
@@ -161,7 +161,7 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
       }
       methods.refetchPostList.call(ctx)
       expect(ctx.offset).toBe(0)
-      expect(ctx.posts).toEqual([])
+      expect(ctx.posts).toBeNull()
       expect(refetch).toHaveBeenCalled()
     })
   })
