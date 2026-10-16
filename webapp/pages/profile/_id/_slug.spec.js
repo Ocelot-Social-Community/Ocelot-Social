@@ -357,6 +357,27 @@ describe('ProfileSlug', () => {
       // The profile groups list is gated on the groupsEnabled policy. Assert both branches
       // so removing the $policy.get('groupsEnabled') condition from the v-if fails loudly
       // instead of silently leaking the list while the groups feature is off.
+      // #6442: see the group page — the post list must not ask "is anything loading".
+      describe('the post list', () => {
+        // The post grid only: other parts of the page have spinners and empty states of their own.
+        const postGrid = () => wrapper.container.querySelector('.ds-grid')
+        const spinner = () => postGrid().querySelector('.os-spinner')
+        const empty = () => postGrid().querySelector('.hc-empty')
+
+        it('shows a spinner until the posts have loaded', () => {
+          wrapper = Wrapper(true, { ...user, posts: null })
+          expect(spinner()).not.toBeNull()
+          expect(empty()).toBeNull()
+        })
+
+        it('shows "no posts" for an empty result, while another query is still loading', () => {
+          mocks.$apollo.loading = true
+          wrapper = Wrapper(true, { ...user, posts: [] })
+          expect(empty()).not.toBeNull()
+          expect(spinner()).toBeNull()
+        })
+      })
+
       describe('group member list gating (groupsEnabled)', () => {
         const groupList = () => wrapper.container.querySelector('.group-member-list')
 

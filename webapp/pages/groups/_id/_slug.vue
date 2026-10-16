@@ -302,7 +302,11 @@
               />
             </masonry-grid-item>
           </template>
-          <template v-else-if="$apollo.loading">
+          <!-- Not loaded yet — not "any query of this page is loading": the server has every
+               result when it renders, while on the client other queries (the video call's
+               participant count) are still running when it hydrates, and a spinner where the
+               server rendered "no posts" made Vue throw the whole page away (#6442). -->
+          <template v-else-if="posts === null">
             <div style="grid-row-end: span 4; grid-column: 1 / -1">
               <div style="text-align: center; padding: 48px 0">
                 <os-spinner size="lg" />
@@ -421,7 +425,8 @@ export default {
     // const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     const filter = { group: { id: this.$route.params.id } }
     return {
-      posts: [],
+      // null until the first result: a spinner then, "no posts" only for an empty result.
+      posts: null,
       hasMore: true,
       offset: 0,
       pageSize: 6,
@@ -807,7 +812,7 @@ export default {
     },
     resetPostList() {
       this.offset = 0
-      this.posts = []
+      this.posts = null
       this.hasMore = true
     },
     refetchPostList() {
@@ -902,6 +907,11 @@ export default {
       },
       update({ profilePagePosts }) {
         this.posts = profilePagePosts
+      },
+      // A failed load — the first one or a refetch, from wherever it was started — calls no
+      // update(): without this the list would wait for posts that never come, spinning forever.
+      error() {
+        if (this.posts === null) this.posts = []
       },
       fetchPolicy: 'cache-and-network',
     },

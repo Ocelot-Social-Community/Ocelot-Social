@@ -677,6 +677,35 @@ describe('GroupProfileSlug', () => {
 
   // A description that changes while the page is open (an owner editing it in place) is
   // measured again, without waiting for the observer.
+  // #6442: on the server every query has finished when the page renders; on the client others
+  // (the video call's participant count) are still running when it hydrates. The post list must
+  // not ask "is anything loading", or a group without posts hydrates a spinner where the server
+  // rendered "no posts" and Vue throws the whole page away.
+  describe('the post list', () => {
+    const owner = () => ({ ...yogaPractice, ...groupRights('owner') })
+    // The post grid only: other parts of the page have spinners and empty states of their own.
+    const postGrid = () => wrapper.container.querySelector('.ds-grid')
+    const spinner = () => postGrid().querySelector('.os-spinner')
+    const empty = () => postGrid().querySelector('.hc-empty')
+
+    beforeEach(() => {
+      currentUserMock.mockReturnValue(peterLustig)
+    })
+
+    it('shows a spinner until the posts have loaded', () => {
+      wrapper = Wrapper(() => ({ group: owner(), posts: null }))
+      expect(spinner()).not.toBeNull()
+      expect(empty()).toBeNull()
+    })
+
+    it('shows "no posts" for an empty result, while another query is still loading', () => {
+      mocks.$apollo.loading = true
+      wrapper = Wrapper(() => ({ group: owner(), posts: [] }))
+      expect(empty()).not.toBeNull()
+      expect(spinner()).toBeNull()
+    })
+  })
+
   describe('description overflow re-measurement', () => {
     let savedErrorHandler
     let savedWarnHandler

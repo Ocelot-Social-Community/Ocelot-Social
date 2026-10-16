@@ -140,11 +140,11 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
   })
 
   describe('resetPostList', () => {
-    it('clears offset / posts / hasMore', () => {
+    it('clears offset / hasMore and marks the posts as not loaded (a spinner, not "no posts")', () => {
       const ctx = { offset: 42, posts: [{ id: 'p1' }], hasMore: false }
       methods.resetPostList.call(ctx)
       expect(ctx.offset).toBe(0)
-      expect(ctx.posts).toEqual([])
+      expect(ctx.posts).toBeNull()
       expect(ctx.hasMore).toBe(true)
     })
   })
@@ -161,7 +161,7 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
       }
       methods.refetchPostList.call(ctx)
       expect(ctx.offset).toBe(0)
-      expect(ctx.posts).toEqual([])
+      expect(ctx.posts).toBeNull()
       expect(refetch).toHaveBeenCalled()
     })
   })
@@ -598,6 +598,18 @@ describe('pages/profile/_id/_slug.vue — apollo', () => {
     it('update() writes the returned posts into component state', () => {
       const ctx = { posts: [] }
       apollo.profilePagePosts.update.call(ctx, { profilePagePosts: [{ id: 'p1' }] })
+      expect(ctx.posts).toEqual([{ id: 'p1' }])
+    })
+
+    it('error() ends the spinner of a list that never loaded with "no posts"', () => {
+      const ctx = { posts: null }
+      apollo.profilePagePosts.error.call(ctx, new Error('network'))
+      expect(ctx.posts).toEqual([])
+    })
+
+    it('error() keeps posts that are already shown', () => {
+      const ctx = { posts: [{ id: 'p1' }] }
+      apollo.profilePagePosts.error.call(ctx, new Error('network'))
       expect(ctx.posts).toEqual([{ id: 'p1' }])
     })
   })
