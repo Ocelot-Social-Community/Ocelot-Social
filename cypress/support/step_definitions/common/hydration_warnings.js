@@ -12,8 +12,8 @@ import { describeWarning, hydrationFailureMessage, isHydrationWarning } from '..
 // Only the hydration messages count (see ../../hydration.js). The development runtime warns about
 // plenty more — prop types and the like — and none of that fails a scenario here.
 
-// How long a step may leave a server-rendered page unmounted before its warnings are checked
-// anyway. Not a failure in itself: a page that never mounts fails the step that looks at it.
+// How long a server-rendered page may take to mount. Past it the step fails: its hydration could not
+// be checked, and a warning raised later would go unnoticed if this was the scenario's last step.
 const MOUNT_TIMEOUT = 10000
 
 const warnings = []
@@ -35,12 +35,19 @@ Cypress.on('window:before:load', (win) => {
 })
 
 const hydrated = (win) =>
-  new Cypress.Promise((resolve) => {
+  new Cypress.Promise((resolve, reject) => {
     const start = Date.now()
     const poll = () => {
       // A blank or non-Nuxt window has nothing to hydrate.
       const serverRendered = Boolean(win.__NUXT__ && win.__NUXT__.serverRendered)
-      if (!serverRendered || mounted.has(win) || Date.now() - start > MOUNT_TIMEOUT) resolve()
+      if (!serverRendered || mounted.has(win)) resolve()
+      else if (Date.now() - start > MOUNT_TIMEOUT)
+        reject(
+          new Error(
+            `${win.location.href} did not mount within ${MOUNT_TIMEOUT / 1000}s, so whether it ` +
+              'hydrated its server-rendered markup could not be checked',
+          ),
+        )
       else setTimeout(poll, 50)
     }
     poll()
