@@ -1,9 +1,16 @@
 import { computed } from 'vue'
 
+import { IconCheck, OsIcon } from '#src/components/OsIcon'
+import { ocelotIcons } from '#src/ocelot'
+
 import OsBadge from './OsBadge.vue'
 
 import type { BadgeShape, BadgeSize, BadgeVariant } from './badge.variants'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+
+// Icons, not text glyphs: no bundled font has a check mark or a warning sign, so they render from
+// each machine's fallback font and the screenshot differs between Docker and the CI runner.
+const IconWarning = ocelotIcons.warning
 
 const meta: Meta<typeof OsBadge> = {
   title: 'Components/OsBadge',
@@ -109,13 +116,14 @@ export const AllShapes: Story = {
 
 export const FormCounter: Story = {
   render: () => ({
-    components: { OsBadge },
+    components: { OsBadge, OsIcon },
+    setup: () => ({ IconWarning }),
     template: `
       <div data-testid="form-counter" class="flex flex-col gap-3">
         <p class="text-sm text-gray-500 m-0">Valid counter:</p>
         <OsBadge size="md">42/100</OsBadge>
         <p class="text-sm text-gray-500 m-0">Error counter (danger):</p>
-        <OsBadge size="md" variant="danger">105/100 ⚠</OsBadge>
+        <OsBadge size="md" variant="danger">105/100 <OsIcon :icon="IconWarning" size="sm" /></OsBadge>
         <p class="text-sm text-gray-500 m-0">Default with counter (form idle):</p>
         <OsBadge size="md" variant="default">0/100</OsBadge>
       </div>
@@ -125,14 +133,15 @@ export const FormCounter: Story = {
 
 export const WithIcon: Story = {
   render: () => ({
-    components: { OsBadge },
+    components: { OsBadge, OsIcon },
+    setup: () => ({ IconCheck, IconWarning }),
     template: `
       <div data-testid="with-icon" class="flex items-center gap-3">
         <OsBadge variant="primary">
-          <span class="mr-1">✓</span> Verified
+          <OsIcon :icon="IconCheck" size="sm" class="mr-1" /> Verified
         </OsBadge>
         <OsBadge variant="danger">
-          <span class="mr-1">⚠</span> Error
+          <OsIcon :icon="IconWarning" size="sm" class="mr-1" /> Error
         </OsBadge>
       </div>
     `,
