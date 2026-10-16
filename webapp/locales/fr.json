@@ -1485,7 +1485,7 @@
     "avatar": {
       "submitted": "Téléchargement réussi"
     },
-    "commented": "Commentais",
+    "commented": "Commenté",
     "followers": "Suiveurs",
     "following": "Suivant",
     "groups": {
@@ -1700,7 +1700,7 @@
       "accountDescription": "Sachez que vos postes et commentaires sont importants pour notre communauté. Si vous voulez quand même les supprimer, vous devez les marquer ci-dessous.",
       "accountWarning": "Vous NE POUVEZ PAS GÉRER et NE POUVEZ PAS RECOUVRIR votre compte, vos messages ou vos commentaires après avoir supprimé votre compte !",
       "accountWarningIsAdmin": "Attention ! Tu es sur le point de supprimer un compte utilisateur !",
-      "commentedCount": "Supprimer mes {count} commentaires",
+      "commentsCount": "Supprimer mes {count} commentaires",
       "contributionsCount": "Supprimer mes {count} postes",
       "infoAdmin": "Toutes les contributions et commentaires de l'utilisateur seront également supprimés !",
       "name": "Supprimer un compte utilisateur",

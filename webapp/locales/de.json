@@ -1700,7 +1700,7 @@
       "accountDescription": "Sei dir bewusst, dass deine Beiträge und Kommentare für unsere Community wichtig sind. Wenn du sie trotzdem löschen möchtest, musst du sie unten markieren.",
       "accountWarning": "Dein Konto, deine Beiträge oder Kommentare kannst du nach dem Löschen WEDER VERWALTEN NOCH WIEDERHERSTELLEN!",
       "accountWarningIsAdmin": "Achtung! Du löschst jetzt ein Nutzerkonto!",
-      "commentedCount": "Meinen {count} Kommentar löschen ::: Meine {count} Kommentare löschen",
+      "commentsCount": "Meinen {count} Kommentar löschen ::: Meine {count} Kommentare löschen",
       "contributionsCount": "Meinen {count} Beitrag löschen ::: Meine {count} Beiträge löschen",
       "infoAdmin": "Alle Beiträge und Kommentare des Users werden zusätzlich gelöscht!",
       "name": "Nutzerkonto löschen",

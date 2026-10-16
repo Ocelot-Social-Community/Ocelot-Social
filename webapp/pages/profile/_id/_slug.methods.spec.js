@@ -15,6 +15,7 @@
 // because the file's <script> exports a default options bag.
 import ProfileSlug from './_slug.vue'
 import { profilePagePosts } from '~/graphql/PostQuery.js'
+import { profileUserQuery } from '~/graphql/User.js'
 
 const { methods, computed } = ProfileSlug
 
@@ -558,6 +559,23 @@ describe('pages/profile/_id/_slug.vue — computed', () => {
 
 describe('pages/profile/_id/_slug.vue — apollo', () => {
   const { apollo } = ProfileSlug
+
+  describe('User query', () => {
+    const i18n = { locale: () => 'en' }
+
+    // User.commentsCount is refused to anybody but the user and user administrators, and a
+    // refused field fails the whole profile — so only who may delete the account asks for it.
+    it.each([
+      [true, true],
+      [false, false],
+    ])('asks for the comments count when user.delete.any is %s', (canDelete, withCommentsCount) => {
+      const ctx = {
+        $i18n: i18n,
+        $can: (permission) => permission === 'user.delete.any' && canDelete,
+      }
+      expect(apollo.User.query.call(ctx)).toBe(profileUserQuery(i18n, { withCommentsCount }))
+    })
+  })
 
   describe('profilePagePosts query', () => {
     it('wires the query to the profilePagePosts builder, threading the active locale', () => {

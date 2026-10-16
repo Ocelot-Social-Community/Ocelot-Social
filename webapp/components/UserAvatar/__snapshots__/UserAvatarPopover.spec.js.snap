@@ -97,7 +97,7 @@ exports[`UserAvatarPopover does not show badges when disabled 1`] = `
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            common.comment
+            profile.commented
           </span>
         </div>
       </li>
@@ -248,7 +248,7 @@ exports[`UserAvatarPopover renders correctly for a fresh user with zero counts 1
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            common.comment
+            profile.commented
           </span>
         </div>
       </li>
@@ -399,7 +399,7 @@ exports[`UserAvatarPopover shows badges when enabled 1`] = `
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            common.comment
+            profile.commented
           </span>
         </div>
       </li>

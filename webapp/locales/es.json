@@ -1700,7 +1700,7 @@
       "accountDescription": "Tenga en cuenta que su contribución y sus comentarios son importantes para nuestra comunidad. Si aún decide borrarlos, debe marcarlos a continuación.",
       "accountWarning": "¡NO PUEDE GESTIONAR y NO PUEDE RECUPERAR su cuenta, contribuciones o comentarios después de eliminar su cuenta!",
       "accountWarningIsAdmin": "¡Atención! ¡Estás a punto de eliminar una cuenta de usuario!",
-      "commentedCount": "Eliminar mis {count} comentarios",
+      "commentsCount": "Eliminar mis {count} comentarios",
       "contributionsCount": "Eliminar mis {count} contribuciones",
       "infoAdmin": "¡Todas las contribuciones y comentarios del usuario serán eliminados adicionalmente!",
       "name": "Eliminar cuenta de usuario",

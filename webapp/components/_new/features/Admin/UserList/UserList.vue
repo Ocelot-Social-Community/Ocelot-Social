@@ -56,6 +56,7 @@
                 🖉
               </th>
               <th
+                v-if="canSeeCommentsCount"
                 scope="col"
                 class="ds-table-head-col ds-table-head-col-right"
                 :aria-label="$t('admin.users.table.columns.comments')"
@@ -131,7 +132,9 @@
                 {{ user.createdAt | dateTime }}
               </td>
               <td class="ds-table-col ds-table-col-right">{{ user.contributionsCount }}</td>
-              <td class="ds-table-col ds-table-col-right">{{ user.commentedCount }}</td>
+              <td v-if="canSeeCommentsCount" class="ds-table-col ds-table-col-right">
+                {{ user.commentsCount }}
+              </td>
               <td class="ds-table-col ds-table-col-right">{{ user.shoutedCount }}</td>
               <td v-if="canManageRoles" class="ds-table-col ds-table-col-right">
                 <select
@@ -229,6 +232,7 @@ import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 // each area routes to its own badge-detail page. Columns gate per permission:
 // - email   → user.email.readAny  (field-gated server-side; query omits it without the right)
 // - role    → role.manage         (field-gated; query omits roleName, rolesQuery skipped)
+// - comments → user.delete.any | user.disable | badge.manage (field-gated; query omits it)
 // - badges  → badge.manage
 // - status  → user.disable        (reversible disable/enable toggle; moderation-grade)
 // - delete  → user.delete.any     (irreversible; administration-grade)
@@ -238,6 +242,11 @@ import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 // USER_ADMIN_SEARCH_NOT_PERMITTED otherwise). The list itself is open to more — a viewer
 // holding only user.disable reaches it through the moderation area.
 const SEARCH_PERMISSIONS = ['role.manage', 'badge.manage', 'user.delete.any', 'user.email.readAny']
+
+// The rights that may read User.commentsCount besides the user themselves (the backend's rule in
+// permissionsMiddleware.ts). It counts every comment the user wrote, closed groups included —
+// what deleting them with their comments deletes — so it is not for everybody.
+const COMMENTS_COUNT_PERMISSIONS = ['user.delete.any', 'user.disable', 'badge.manage']
 
 export default {
   mixins: [formValidation],
@@ -312,6 +321,10 @@ export default {
     canManageRoles() {
       return this.$can('role.manage')
     },
+    // The comments column; the admin area is reachable without any of these rights.
+    canSeeCommentsCount() {
+      return COMMENTS_COUNT_PERMISSIONS.some((permission) => this.$can(permission))
+    },
     // Badge column is shown only to badge.manage holders — the list is now also
     // reachable by delete-only moderators, who must not see the badge action.
     canManageBadges() {
@@ -366,7 +379,11 @@ export default {
       query() {
         // Omit email/roleName the viewer can't read — a denied field would abort the
         // whole response (apollo default errorPolicy), breaking the list.
-        return adminUserQuery({ withEmail: this.canSeeEmail, withRole: this.canManageRoles })
+        return adminUserQuery({
+          withEmail: this.canSeeEmail,
+          withRole: this.canManageRoles,
+          withCommentsCount: this.canSeeCommentsCount,
+        })
       },
       variables() {
         const { offset, first, roleFilter, searchText } = this
