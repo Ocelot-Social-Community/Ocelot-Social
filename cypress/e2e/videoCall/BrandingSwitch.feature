@@ -4,7 +4,9 @@ Feature: A branding switch does not drop a running video call
   So that the call is not cut off for everybody in it (#10353)
 
   # A real LiveKit connection is beyond the e2e stack (see README.md), so the call is represented
-  # by its phase in the store, which is what decides whether a reload has to wait.
+  # by its phase in the store, which is what decides whether a reload has to wait. The call window
+  # itself is not open, so its notice and toast about the waiting reload are covered by
+  # VideoCall.spec.js, not here.
 
   # The policy cache survives the database wipe between scenarios: the composition is set at the
   # start and reset at the end rather than assumed.
@@ -20,8 +22,7 @@ Feature: A branding switch does not drop a running video call
     And I navigate to page "/"
     And I am in a video call
     When an admin sets the branding composition to "{\"theme\":\"@default\"}"
-    Then I see a toaster with "The platform has a new design. It will be applied once you leave the call."
-    And the page has not been reloaded
+    Then the page has not been reloaded
     When I leave the video call
     Then the page is reloaded with the branding composition "{\"theme\":\"@default\"}"
     And the branding composition is ""
