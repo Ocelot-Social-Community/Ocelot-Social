@@ -266,6 +266,24 @@ describe('RegistrationSlideCreate', () => {
       )
     })
 
+    // Going back a slide and returning remounts this one from the collected input: a bare name
+    // there would be searched again, and the top result taken instead of the place picked.
+    it('keeps a picked place, id and coordinates, across going back and returning', async () => {
+      const picked = { value: 'Schweiz', id: 'country.8738', lat: 46.8, lng: 8.2 }
+      const wrapper = Wrapper()
+      await wrapper.setData({ locationName: picked })
+      const [, { collectedInputData }] =
+        propsData.sliderData.setSliderValuesCallback.mock.calls.at(-1)
+      expect(collectedInputData.locationName).toEqual(picked)
+
+      propsData.sliderData.collectedInputData = { ...baseCollected(), ...collectedInputData }
+      await Wrapper().vm.submit()
+      await flushPromises()
+      expect(mocks.$apollo.mutate.mock.calls[0][0].variables).toEqual(
+        expect.objectContaining({ locationName: 'Schweiz', locationId: 'country.8738' }),
+      )
+    })
+
     it('on success with a public-group invite: redirects to the group', async () => {
       propsData.sliderData.sliders[0].data.response = {
         validateInviteCode: { invitedTo: { visibility: 'public', slug: 'my-group' } },

@@ -294,7 +294,9 @@ export default {
       const { password, passwordConfirmation } = this.formData
       const name = this.buildName(this.formData)
       const { termsAndConditionsConfirmed, receiveCommunicationAsEmailsEtcConfirmed } = this
-      const locationName = this.formLocationName
+      // The field's value as it is, not just its name: coming back to this slide restores it, and a
+      // bare name would make LocationSelect search it again and take Mapbox's top result (#7018).
+      const { locationName } = this
 
       this.sliderData.setSliderValuesCallback(this.validInput, {
         collectedInputData: {
