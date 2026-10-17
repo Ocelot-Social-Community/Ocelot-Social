@@ -2772,9 +2772,43 @@ export default {
 /*  away together when asked to (.video-call--bars-collapsed) — up and down, the videos and */
 /*  the chat beside them growing into their place. Header and control bar go by their */
 /*  heights (44px, 45px); hidden once gone, so the keyboard does not land on them. */
+/*  The call's header and control bar stand above and below the videos only; the chat */
+/*  beside them reaches from the page's header to its footer, and from edge to edge of the */
+/*  window once those are gone. A grid of three rows for the videos' column, the chat */
+/*  spanning them; the body gives up its box, so the videos and the chat are its cells. */
 .video-call--bars-manual {
   overflow: hidden;
   transition: padding 0.3s ease;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  /*  The body's dark ground, which it no longer paints itself. */
+  background: var(--color-neutral-10);
+}
+
+.video-call--bars-manual .video-call__body {
+  display: contents;
+}
+
+.video-call--bars-manual > *,
+.video-call--bars-manual .video-call__body > * {
+  grid-row: 2;
+  grid-column: 1;
+}
+
+.video-call--bars-manual .video-call__header {
+  grid-row: 1;
+}
+
+.video-call--bars-manual .video-call__controls {
+  grid-row: 3;
+}
+
+.video-call--bars-manual .video-call__sidebar {
+  grid-row: 1 / -1;
+  grid-column: 2;
+  width: 360px;
+  max-width: 40vw;
 }
 
 .video-call--bars-manual .video-call__header,
@@ -2906,6 +2940,7 @@ export default {
 
 /*  The tabs stand beside the call's header here: as high as it, line included (RoomHeader */
 /*  compact: 28px avatar, 8px above and below), so both end on one level. */
+.video-call--bars-manual .video-call__sidebar > .video-call__chat-tabs,
 .video-call--bars-overlay .video-call__sidebar > .video-call__chat-tabs {
   box-sizing: border-box;
   min-height: calc(28px + 2 * var(--space-x-small));
