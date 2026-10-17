@@ -32,3 +32,14 @@ export { OsModal, modalPanelVariants } from './OsModal'
 export { OsMenu, OsMenuItem, menuItemVariants, type MenuItemVariants } from './OsMenu'
 export { OsValidationHint } from './OsValidationHint'
 export { OsToggleGroup, type ToggleGroupActivation, type ToggleGroupOption } from './OsToggleGroup'
+export {
+  OsTooltip,
+  vOsTooltip,
+  createTooltip,
+  normalizeTooltipValue,
+  TOOLTIP_DELAY,
+  type Tooltip,
+  type TooltipOptions,
+  type TooltipPlacement,
+  type TooltipValue,
+} from './OsTooltip'
