@@ -1933,6 +1933,7 @@
     },
     "dialogLabel": "Груповий відеовиклик",
     "enableAudio": "Увімкнути звук",
+    "enterFullscreen": "На весь екран",
     "errorBackToPrejoin": "Змінити налаштування",
     "errorRetry": "Повторити",
     "errors": {
@@ -1955,6 +1956,7 @@
         "noDevice": "Немає екрана для демонстрації."
       }
     },
+    "exitFullscreen": "Вийти з повноекранного режиму",
     "gotoGroup": "Перейти до групи «{name}»",
     "groupVideoCallButton": {
       "label": "Відео групи",

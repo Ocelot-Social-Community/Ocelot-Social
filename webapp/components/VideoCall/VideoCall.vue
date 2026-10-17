@@ -12,6 +12,7 @@
           'video-call--bars-collapsed': barsManual && barsCollapsed,
           'video-call--parked-bars': parked,
           'video-call--chromium': isChromium,
+          'video-call--fullscreen': inFullscreen,
           'video-call--bars-held': parked && (showDeviceSettings || pointerOnParked),
         },
       ]"
@@ -41,6 +42,21 @@
           {{ uniqueParticipantCount }}
         </span>
         <div class="video-call__header-actions">
+          <os-button
+            v-if="showFullscreenButton"
+            v-tooltip="fullscreenLabel"
+            data-test="video-call-fullscreen"
+            variant="primary"
+            appearance="outline"
+            size="sm"
+            circle
+            :aria-label="fullscreenLabel"
+            @click="toggleFullscreen"
+          >
+            <template #icon>
+              <os-icon :icon="inFullscreen ? icons.fullscreenExit : icons.fullscreen" />
+            </template>
+          </os-button>
           <os-button
             v-if="barsManual"
             v-tooltip="$t('videoCall.hideBars')"
@@ -192,7 +208,7 @@
             </div>
           </div>
           <div
-            v-if="isFullscreen && !mobileChatOpen && activeSpeakers.length"
+            v-if="isMaximized && !mobileChatOpen && activeSpeakers.length"
             class="video-call__speakers"
             :aria-label="$t('videoCall.activeSpeakers')"
           >
@@ -251,7 +267,7 @@
               :camera-starting="isOwnCameraTile(tile) && devicesStarting.videoinput > 0"
               :mic-starting="isOwnCameraTile(tile) && devicesStarting.audioinput > 0"
               :avatar-size="tileAvatarSize(tile)"
-              :clickable="isFullscreen && !mobileChatOpen"
+              :clickable="isMaximized && !mobileChatOpen"
               :class="{
                 'video-tile--hidden': singleTile && soloTile && tile.key !== soloTile.key,
                 'video-tile--spotlighted': !!(spotlightTile && tile.key === spotlightTile.key),
@@ -610,6 +626,9 @@ export default {
       // Only Chromium-based browsers (Chrome, Edge, Opera, …) know navigator.userAgentData.
       // Set once mounted: the server renders no browser.
       isChromium: false,
+      // Whether the browser can show the page in fullscreen, and whether it does now.
+      canFullscreen: false,
+      inFullscreen: false,
       // The control bar: how wide it is, and how wide it was the last time its buttons
       // had their labels (see controlsCrowded).
       controlsWidth: 0,
@@ -650,7 +669,7 @@ export default {
     showChatSidebar() {
       // Embedded in the maximized call view. In the minimized/parked state the
       // chat continues to live in the chat-modul (layouts/default.vue). On a
-      // phone the call is always full screen and the chat takes the place below
+      // phone the call is always maximized and the chat takes the place below
       // a single small tile (see mobileChatOpen).
       return this.phase === 'in-call' && this.chatOpenForThisCall && !this.parked
     },
@@ -662,7 +681,7 @@ export default {
     // Whether the stage shows one tile only: in the parked window, and next to the
     // chat on a phone. The others stay mounted, so their sound keeps playing.
     singleTile() {
-      return !this.isFullscreen || this.mobileChatOpen
+      return !this.isMaximized || this.mobileChatOpen
     },
     soloTile() {
       return this.mobileChatOpen ? this.speakerTile : this.primaryTile
@@ -799,38 +818,58 @@ export default {
     isPreJoinModal() {
       return this.phase === 'prejoin'
     },
-    isFullscreen() {
-      // During prejoin we render as a centered modal — not full screen.
+    isMaximized() {
+      // During prejoin we render as a centered modal — not maximized.
       if (this.isPreJoinModal) return false
       return this.isMobile || !this.minimized || this.phase !== 'in-call'
     },
-    // On a phone the maximized call fills the screen: its header and control bar lie on the
-    // videos, as the page's header does, see-through, and they move out of the way after a
-    // while without a touch, or at a tap. Not with the chat open, where one writes beneath
-    // a small tile.
+    // On a phone, and in fullscreen, the maximized call fills the screen: its header and
+    // control bar lie on the videos, see-through, and move out of the way by themselves —
+    // after a while without a touch or a tap on a phone, while the mouse rests in
+    // fullscreen. Not with the chat open on a phone, where one writes beneath a small tile.
     barsOverlay() {
-      return this.isFullscreen && this.isMobile && !this.mobileChatOpen
+      return this.isMaximized && !this.mobileChatOpen && (this.isMobile || this.inFullscreen)
     },
     // On a desktop the bars of the maximized call — the page's header and footer, the
     // call's header and control bar — stand around the videos, solid, and move only when
     // asked to, with a button: a mouse moved by chance would bring them in, and together
-    // they are high.
+    // they are high. In fullscreen they lie on the videos and move by themselves, as on a
+    // phone (barsOverlay).
     barsManual() {
-      return this.isFullscreen && !this.isMobile && this.phase === 'in-call' && !this.error
+      return (
+        this.isMaximized &&
+        !this.isMobile &&
+        !this.inFullscreen &&
+        this.phase === 'in-call' &&
+        !this.error
+      )
     },
     // Only once there are videos to make room for.
     autoHideBars() {
       return this.barsOverlay && this.phase === 'in-call' && !this.error
     },
-    // What the page's header and footer do meanwhile (layouts/default.vue).
+    // What the page's header and footer do meanwhile (layouts/default.vue). In fullscreen
+    // they stay away, also with the chat open on a phone: the call is all there is.
     pageBars() {
+      if (this.inFullscreen) return 'hidden'
       if (this.barsOverlay) return this.barsHidden ? 'hidden' : 'overlay'
       if (this.barsManual) return this.barsCollapsed ? 'collapsed' : 'manual'
       return 'normal'
     },
+    // Fullscreen is offered for the maximized call wherever the browser can show it —
+    // on a phone too (Android), where it also hides the browser's own bars. An iPhone
+    // cannot, and gets no button.
+    showFullscreenButton() {
+      return this.canFullscreen && this.isMaximized && this.phase === 'in-call'
+    },
+    fullscreenLabel() {
+      return this.inFullscreen
+        ? this.$t('videoCall.exitFullscreen')
+        : this.$t('videoCall.enterFullscreen')
+    },
     modeClass() {
       if (this.isPreJoinModal) return 'video-call--modal'
-      return this.isFullscreen ? 'video-call--maximized' : 'video-call--minimized'
+      return this.isMaximized ? 'video-call--maximized' : 'video-call--minimized'
     },
     onCallRoute() {
       return this.$route.name === 'call-id-slug'
@@ -838,7 +877,7 @@ export default {
     parked() {
       // The call sits in the corner as a small window: during an active call —
       // not during the prejoin modal — and never on a phone, where the call is
-      // always full screen.
+      // always maximized.
       return this.phase === 'in-call' && this.minimized && !this.isMobile
     },
     iconOnly() {
@@ -947,7 +986,7 @@ export default {
       // Outside the regular grid a tile owns the whole stage: the minimized
       // window shows exactly one, and the spotlight tile fills the wide cell
       // (its thumbnails are sized separately in tileAvatarSize).
-      if (!this.isFullscreen || this.spotlightTile) {
+      if (!this.isMaximized || this.spotlightTile) {
         return { width: this.stageWidth, height: this.stageHeight }
       }
       const { columns, rows } = this.gridDimensions
@@ -998,6 +1037,10 @@ export default {
         this.setPageBars(pageBars)
       },
     },
+    // Parked or left: the call leaves fullscreen with it.
+    showFullscreenButton(offered) {
+      if (!offered) this.exitFullscreen()
+    },
     autoHideBars: {
       immediate: true,
       handler(on) {
@@ -1043,7 +1086,7 @@ export default {
       // A failed connect holds no session worth preserving — minimizing only
       // exists so a *live* room survives navigation. Parking an error card in
       // the corner would be litter the user still has to dismiss, and leaving
-      // it full screen blocks the page they just navigated to. Close instead.
+      // it maximized blocks the page they just navigated to. Close instead.
       // Deliberately not leave(): its router.replace would hijack the
       // navigation that is running right now.
       if (this.phase === 'error') {
@@ -1087,6 +1130,8 @@ export default {
   },
   mounted() {
     this.isChromium = typeof navigator !== 'undefined' && !!navigator.userAgentData
+    this.canFullscreen = !!document.fullscreenEnabled
+    document.addEventListener('fullscreenchange', this.onFullscreenChange)
     this.observeStage()
   },
   updated() {
@@ -1098,6 +1143,8 @@ export default {
     this.measureControls()
   },
   beforeDestroy() {
+    document.removeEventListener('fullscreenchange', this.onFullscreenChange)
+    this.exitFullscreen()
     this.watchBarActivity(false)
     this.setPageBars('normal')
     this.disconnectStageObserver()
@@ -1118,6 +1165,38 @@ export default {
       setPageBars: 'videoCall/SET_PAGE_BARS',
       setShowChat: 'chat/SET_OPEN_CHAT',
     }),
+    // The whole page goes fullscreen, not the call alone: tooltips, menus and toasts are
+    // put at the end of the page, outside the call, and would not show otherwise. The
+    // page's header and footer are kept away meanwhile (pageBars).
+    async toggleFullscreen() {
+      try {
+        if (this.pageInFullscreen()) {
+          await document.exitFullscreen()
+          return
+        }
+        await document.documentElement.requestFullscreen()
+        // The browser takes a moment. Parked or left meanwhile, the call has no use for it
+        // any more — and the watcher that ends it found nothing to end yet.
+        if (!this.showFullscreenButton) this.exitFullscreen()
+      } catch {
+        // Refused by the browser (no user gesture, a policy): the call stays as it is.
+      }
+    },
+    // Only the page's own fullscreen is the call's: one of, say, a video embedded in a
+    // post is neither taken for it nor ended by it.
+    pageInFullscreen() {
+      return (
+        typeof document !== 'undefined' && document.fullscreenElement === document.documentElement
+      )
+    },
+    exitFullscreen() {
+      if (!this.pageInFullscreen()) return
+      document.exitFullscreen().catch(() => {})
+    },
+    // Also when the browser ends it (Esc).
+    onFullscreenChange() {
+      this.inFullscreen = this.pageInFullscreen()
+    },
     watchBarActivity(on) {
       if (typeof document === 'undefined' || on === this.barsWatched) return
       this.barsWatched = on
@@ -1467,8 +1546,8 @@ export default {
         return
       }
       if (!tile) return
-      // Only spotlight in fullscreen — minimized window already shows one tile.
-      if (!this.isFullscreen) return
+      // Only spotlight when maximized — minimized window already shows one tile.
+      if (!this.isMaximized) return
       this.spotlightKey = this.spotlightKey === tile.key ? null : tile.key
     },
     toggleMinimize() {
@@ -1683,8 +1762,8 @@ export default {
       } catch (err) {
         const message = this.$backendError(err)
         // The user navigated away while the handshake was still running, so
-        // the window is parked in the corner. Since isFullscreen treats every
-        // non-'in-call' phase as full screen, showing the error block here
+        // the window is parked in the corner. Since isMaximized treats every
+        // non-'in-call' phase as maximized, showing the error block here
         // would blow the parked window back up over the page they moved to.
         // There is no session to park either — toast the reason and close.
         if (this.minimized) {
@@ -3002,6 +3081,14 @@ export default {
   z-index: 4;
   backdrop-filter: blur(var(--video-call-bar-blur));
   transition: transform 0.3s ease;
+}
+
+/*  Fullscreen: the page's header and footer are away for good, so the call's own bars */
+/*  lie at the very top and bottom, and the chat beside the videos is as high as the */
+/*  screen. */
+.video-call--fullscreen {
+  --header-height: 0px;
+  --footer-height: 0px;
 }
 
 /*  Chromium draws the blur behind a bar sliding in this small window a step ahead of the */

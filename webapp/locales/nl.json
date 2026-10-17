@@ -1933,6 +1933,7 @@
     },
     "dialogLabel": "Groepsvideogesprek",
     "enableAudio": "Geluid inschakelen",
+    "enterFullscreen": "Volledig scherm",
     "errorBackToPrejoin": "Instellingen wijzigen",
     "errorRetry": "Opnieuw proberen",
     "errors": {
@@ -1955,6 +1956,7 @@
         "noDevice": "Geen scherm beschikbaar om te delen."
       }
     },
+    "exitFullscreen": "Volledig scherm verlaten",
     "gotoGroup": "Naar groep “{name}”",
     "groupVideoCallButton": {
       "label": "Groepsvideo",

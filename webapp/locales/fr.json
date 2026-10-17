@@ -1933,6 +1933,7 @@
     },
     "dialogLabel": "Appel vidéo de groupe",
     "enableAudio": "Activer le son",
+    "enterFullscreen": "Plein écran",
     "errorBackToPrejoin": "Modifier les paramètres",
     "errorRetry": "Réessayer",
     "errors": {
@@ -1955,6 +1956,7 @@
         "noDevice": "Aucun écran disponible à partager."
       }
     },
+    "exitFullscreen": "Quitter le plein écran",
     "gotoGroup": "Aller au groupe « {name} »",
     "groupVideoCallButton": {
       "label": "Vidéo de groupe",

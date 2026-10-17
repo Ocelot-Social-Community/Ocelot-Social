@@ -1933,6 +1933,7 @@
     },
     "dialogLabel": "Videollamada de grupo",
     "enableAudio": "Activar sonido",
+    "enterFullscreen": "Pantalla completa",
     "errorBackToPrejoin": "Cambiar ajustes",
     "errorRetry": "Reintentar",
     "errors": {
@@ -1955,6 +1956,7 @@
         "noDevice": "No hay pantalla disponible para compartir."
       }
     },
+    "exitFullscreen": "Salir de pantalla completa",
     "gotoGroup": "Ir al grupo «{name}»",
     "groupVideoCallButton": {
       "label": "Vídeo del grupo",

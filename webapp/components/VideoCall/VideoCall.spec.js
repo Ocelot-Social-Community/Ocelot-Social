@@ -220,13 +220,13 @@ describe('VideoCall', () => {
     })
   })
 
-  describe('modeClass / isFullscreen / isPreJoinModal', () => {
+  describe('modeClass / isMaximized / isPreJoinModal', () => {
     it('reports modal during prejoin', () => {
       const { wrapper } = factory({ show: true })
       wrapper.setData({ phase: 'prejoin' })
       expect(wrapper.vm.isPreJoinModal).toBe(true)
       expect(wrapper.vm.modeClass).toBe('video-call--modal')
-      expect(wrapper.vm.isFullscreen).toBe(false)
+      expect(wrapper.vm.isMaximized).toBe(false)
     })
 
     it('reports maximized when in-call and not minimized', () => {
@@ -471,7 +471,7 @@ describe('VideoCall', () => {
     })
 
     it('gives the whole stage to the single tile of the parked window', () => {
-      const ctx = { stageWidth: 355, stageHeight: 200, isFullscreen: false, spotlightTile: null }
+      const ctx = { stageWidth: 355, stageHeight: 200, isMaximized: false, spotlightTile: null }
       expect(VideoCall.computed.cellSize.call(ctx)).toEqual({ width: 355, height: 200 })
     })
 
@@ -479,7 +479,7 @@ describe('VideoCall', () => {
       const ctx = {
         stageWidth: 1600,
         stageHeight: 900,
-        isFullscreen: true,
+        isMaximized: true,
         spotlightTile: { key: 'a' },
       }
       expect(VideoCall.computed.cellSize.call(ctx)).toEqual({ width: 1600, height: 900 })
@@ -489,7 +489,7 @@ describe('VideoCall', () => {
       const ctx = {
         stageWidth: 1600,
         stageHeight: 900,
-        isFullscreen: true,
+        isMaximized: true,
         spotlightTile: null,
         gridDimensions: { columns: 2, rows: 2 },
       }
@@ -886,7 +886,7 @@ describe('VideoCall', () => {
       expect(wrapper.vm.spotlightKey).toBe('a')
     })
 
-    it('is a no-op when not fullscreen', () => {
+    it('is a no-op when not maximized', () => {
       const { wrapper } = factory({ show: true, minimized: true })
       wrapper.setData({ phase: 'in-call', spotlightKey: 'a' })
       wrapper.vm.onTileSelect({ key: 'b' })
@@ -1398,7 +1398,7 @@ describe('VideoCall', () => {
       expect(wrapper.vm.phase).toBe('error')
     })
 
-    it('toasts and closes instead of erroring full screen when parked mid-handshake', async () => {
+    it('toasts and closes instead of erroring maximized when parked mid-handshake', async () => {
       // The user navigated away while the handshake was still running, so the
       // window is minimized. The error phase would blow it back up to full
       // screen over the page they moved to.
@@ -3180,29 +3180,43 @@ describe('VideoCall', () => {
 
     it('lie on the videos with the call maximized on a phone', () => {
       expect(
-        computed.barsOverlay.call({ isFullscreen: true, isMobile: true, mobileChatOpen: false }),
+        computed.barsOverlay.call({ isMaximized: true, isMobile: true, mobileChatOpen: false }),
+      ).toBe(true)
+    })
+
+    it('lie on the videos in fullscreen on a desktop as well', () => {
+      expect(
+        computed.barsOverlay.call({
+          isMaximized: true,
+          isMobile: false,
+          inFullscreen: true,
+          mobileChatOpen: false,
+        }),
       ).toBe(true)
     })
 
     it('stay where they are with the chat open on a phone, on a desktop, in the parked window and before joining', () => {
-      const overlay = (ctx) => computed.barsOverlay.call({ isMobile: true, ...ctx })
-      expect(overlay({ isFullscreen: true, mobileChatOpen: true })).toBe(false)
-      expect(overlay({ isFullscreen: true, isMobile: false, mobileChatOpen: false })).toBe(false)
-      expect(overlay({ isFullscreen: false, mobileChatOpen: false })).toBe(false)
+      const overlay = (ctx) =>
+        computed.barsOverlay.call({ isMobile: true, inFullscreen: false, ...ctx })
+      expect(overlay({ isMaximized: true, mobileChatOpen: true })).toBe(false)
+      expect(overlay({ isMaximized: true, isMobile: false, mobileChatOpen: false })).toBe(false)
+      expect(overlay({ isMaximized: false, mobileChatOpen: false })).toBe(false)
     })
 
     it('move only when asked to around the maximized call on a desktop', () => {
       const manual = (ctx) =>
         computed.barsManual.call({
-          isFullscreen: true,
+          isMaximized: true,
           isMobile: false,
+          inFullscreen: false,
           phase: 'in-call',
           error: null,
           ...ctx,
         })
       expect(manual({})).toBe(true)
       expect(manual({ isMobile: true })).toBe(false)
-      expect(manual({ isFullscreen: false })).toBe(false)
+      expect(manual({ isMaximized: false })).toBe(false)
+      expect(manual({ inFullscreen: true })).toBe(false)
       expect(manual({ phase: 'connecting' })).toBe(false)
       expect(manual({ error: 'broken' })).toBe(false)
     })
@@ -3215,6 +3229,8 @@ describe('VideoCall', () => {
       expect(page({ barsOverlay: true, barsHidden: true })).toBe('hidden')
       expect(page({ barsManual: true, barsCollapsed: false })).toBe('manual')
       expect(page({ barsManual: true, barsCollapsed: true })).toBe('collapsed')
+      // In fullscreen they stay away, also where the bars lie in no overlay (chat open on a phone).
+      expect(page({ inFullscreen: true, barsHidden: false })).toBe('hidden')
     })
 
     describe('on a desktop', () => {
@@ -3420,6 +3436,142 @@ describe('VideoCall', () => {
     })
   })
 
+  describe('fullscreen', () => {
+    let fullscreenElement
+    const fullscreenChanged = () => document.dispatchEvent(new Event('fullscreenchange'))
+
+    beforeEach(() => {
+      fullscreenElement = null
+      Object.defineProperty(document, 'fullscreenEnabled', { value: true, configurable: true })
+      Object.defineProperty(document, 'fullscreenElement', {
+        get: () => fullscreenElement,
+        configurable: true,
+      })
+      document.documentElement.requestFullscreen = jest.fn(async () => {
+        fullscreenElement = document.documentElement
+        fullscreenChanged()
+      })
+      document.exitFullscreen = jest.fn(async () => {
+        fullscreenElement = null
+        fullscreenChanged()
+      })
+    })
+
+    afterEach(() => {
+      delete document.fullscreenEnabled
+      delete document.fullscreenElement
+      delete document.documentElement.requestFullscreen
+      delete document.exitFullscreen
+    })
+
+    const maximizedCall = async () => {
+      const built = factory({ show: true, minimized: false })
+      await built.wrapper.setData({ phase: 'in-call' })
+      return built
+    }
+    const button = (wrapper) => wrapper.find('[data-test="video-call-fullscreen"]')
+
+    it('is offered for the maximized call on a desktop', async () => {
+      const { wrapper } = await maximizedCall()
+      expect(button(wrapper).exists()).toBe(true)
+      expect(wrapper.vm.fullscreenLabel).toBe('videoCall.enterFullscreen')
+    })
+
+    it('is offered on a phone whose browser can, and keeps the page header away', async () => {
+      const { wrapper, setPageBars } = await maximizedCall()
+      await wrapper.setData({ windowWidth: 400 })
+      expect(wrapper.vm.isMobile).toBe(true)
+      expect(button(wrapper).exists()).toBe(true)
+      await wrapper.vm.toggleFullscreen()
+      await wrapper.setData({ barsHidden: false })
+      expect(wrapper.vm.pageBars).toBe('hidden')
+      expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'hidden')
+    })
+
+    it('is not offered where the browser cannot, nor before joining', async () => {
+      const { wrapper } = await maximizedCall()
+      await wrapper.setData({ canFullscreen: false })
+      expect(button(wrapper).exists()).toBe(false)
+      await wrapper.setData({ canFullscreen: true, phase: 'prejoin' })
+      expect(button(wrapper).exists()).toBe(false)
+    })
+
+    it('puts the whole page in fullscreen, and keeps its header and footer away', async () => {
+      const { wrapper, setPageBars } = await maximizedCall()
+      await button(wrapper).trigger('click')
+      await wrapper.vm.$nextTick()
+      expect(document.documentElement.requestFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(true)
+      expect(wrapper.vm.fullscreenLabel).toBe('videoCall.exitFullscreen')
+      expect(wrapper.find('.video-call').classes()).toContain('video-call--fullscreen')
+      expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'hidden')
+    })
+
+    it('ends at a second click', async () => {
+      const { wrapper } = await maximizedCall()
+      await wrapper.vm.toggleFullscreen()
+      await wrapper.vm.toggleFullscreen()
+      expect(document.exitFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+
+    it('follows the browser ending it (Esc)', async () => {
+      const { wrapper } = await maximizedCall()
+      await wrapper.vm.toggleFullscreen()
+      fullscreenElement = null
+      fullscreenChanged()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+
+    it('ends when the call is parked', async () => {
+      const { wrapper } = await maximizedCall()
+      await wrapper.vm.toggleFullscreen()
+      await wrapper.setData({ phase: 'connecting' })
+      expect(document.exitFullscreen).toHaveBeenCalled()
+    })
+
+    it('ends again when the call was parked while the browser was still entering it', async () => {
+      const { wrapper } = await maximizedCall()
+      let enter
+      document.documentElement.requestFullscreen = jest.fn(
+        () =>
+          new Promise((resolve) => {
+            enter = () => {
+              fullscreenElement = document.documentElement
+              fullscreenChanged()
+              resolve()
+            }
+          }),
+      )
+      const entering = wrapper.vm.toggleFullscreen()
+      await wrapper.setData({ phase: 'connecting' })
+      expect(document.exitFullscreen).not.toHaveBeenCalled()
+      enter()
+      await entering
+      expect(document.exitFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+
+    it('neither takes nor ends the fullscreen of something else on the page', async () => {
+      const { wrapper } = await maximizedCall()
+      fullscreenElement = document.createElement('video')
+      fullscreenChanged()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+      wrapper.vm.exitFullscreen()
+      expect(document.exitFullscreen).not.toHaveBeenCalled()
+      await wrapper.vm.toggleFullscreen()
+      expect(document.documentElement.requestFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(true)
+    })
+
+    it('stays as it is when the browser refuses', async () => {
+      const { wrapper } = await maximizedCall()
+      document.documentElement.requestFullscreen = jest.fn(() => Promise.reject(new Error('no')))
+      await expect(wrapper.vm.toggleFullscreen()).resolves.toBeUndefined()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+  })
+
   describe('bars of the parked window', () => {
     const parkedCall = async () => {
       const built = factory({ show: true, minimized: true })
@@ -3540,9 +3692,9 @@ describe('VideoCall', () => {
     })
 
     it('shrinks the stage to a single tile beside the chat', () => {
-      expect(computed.singleTile.call({ isFullscreen: true, mobileChatOpen: true })).toBe(true)
-      expect(computed.singleTile.call({ isFullscreen: true, mobileChatOpen: false })).toBe(false)
-      expect(computed.singleTile.call({ isFullscreen: false, mobileChatOpen: false })).toBe(true)
+      expect(computed.singleTile.call({ isMaximized: true, mobileChatOpen: true })).toBe(true)
+      expect(computed.singleTile.call({ isMaximized: true, mobileChatOpen: false })).toBe(false)
+      expect(computed.singleTile.call({ isMaximized: false, mobileChatOpen: false })).toBe(true)
       expect(computed.stageLayoutClass.call({ singleTile: true, spotlightTile: anna })).toBe(
         'video-call__single',
       )

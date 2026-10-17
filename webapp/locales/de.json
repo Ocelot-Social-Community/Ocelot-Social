@@ -1933,6 +1933,7 @@
     },
     "dialogLabel": "Gruppen-Videoanruf",
     "enableAudio": "Ton aktivieren",
+    "enterFullscreen": "Vollbild",
     "errorBackToPrejoin": "Einstellungen ändern",
     "errorRetry": "Erneut versuchen",
     "errors": {
@@ -1955,6 +1956,7 @@
         "noDevice": "Kein Bildschirm zum Teilen gefunden."
       }
     },
+    "exitFullscreen": "Vollbild beenden",
     "gotoGroup": "Zur Gruppe „{name}“",
     "groupVideoCallButton": {
       "label": "Gruppen-Video",
