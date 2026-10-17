@@ -31,6 +31,9 @@ interface LoadMocks {
   setBranding?: Mock
   checkSchemaCompat?: Mock
   describeSchemaCompat?: Mock
+  /** What backend/.env holds for this test. The real file is never read: on a developer machine it
+   *  would pin a brand and turn every "no brand active" case into a lookup. */
+  envFile?: Record<string, string>
 }
 
 const ORIGINAL_ENV = process.env
@@ -38,6 +41,11 @@ const ORIGINAL_ENV = process.env
 async function loadBootstrap(mocks: LoadMocks) {
   const setBranding = mocks.setBranding ?? vi.fn()
   const overlayBrandRuntimeFiles = vi.fn()
+  // Like dotenv: fills in what the file holds, never overrides what the environment already has.
+  const loadEnvFile = vi.fn(() => {
+    Object.assign(process.env, { ...mocks.envFile, ...process.env })
+  })
+  vi.doMock('dotenv', () => ({ config: loadEnvFile }))
   vi.doMock(BRANDING, () => ({
     setBranding,
     checkSchemaCompat: mocks.checkSchemaCompat ?? vi.fn(() => 'ok'),
@@ -57,7 +65,7 @@ async function loadBootstrap(mocks: LoadMocks) {
   await isolateModules(async () => {
     await import('./bootstrap')
   })
-  return { setBranding, overlayBrandRuntimeFiles }
+  return { setBranding, overlayBrandRuntimeFiles, loadEnvFile }
 }
 
 describe('branding bootstrap', () => {
@@ -112,6 +120,38 @@ describe('branding bootstrap', () => {
     expect(readDefaultMarker).toHaveBeenCalledWith(CONVENTIONAL)
     expect(discoverArchives).toHaveBeenCalledWith(CONVENTIONAL)
     expect(setBranding).toHaveBeenCalledWith(config)
+  })
+
+  // bootstrap runs before config/index.ts, which used to be the only place loading backend/.env — so
+  // a brand pinned there was read as unset and `npm run dev` ran unbranded.
+  it('activates a brand that is pinned only in the env file', async () => {
+    const archive = { file: '/assets/acme.tar.gz', schemaVersion: '0.0.1' }
+    const config = { metadata: { applicationName: 'Acme' } }
+    const discoverArchives = vi.fn(() => new Map([['acme', archive]]))
+    const { setBranding, loadEnvFile } = await loadBootstrap({
+      envFile: { OCELOT_BRANDING_ASSETS_DIR: '/assets', OCELOT_ACTIVE_BRANDING: 'acme' },
+      discoverArchives,
+      readArchiveConfig: vi.fn(() => config),
+    })
+
+    expect(loadEnvFile).toHaveBeenCalledWith({ quiet: true })
+    expect(discoverArchives).toHaveBeenCalledWith([resolve('/assets')])
+    expect(setBranding).toHaveBeenCalledWith(config)
+  })
+
+  it('keeps a brand set in the environment over the one in the env file', async () => {
+    process.env.OCELOT_ACTIVE_BRANDING = 'acme'
+    const archive = { file: 'acme.tar.gz', schemaVersion: '0.0.1' }
+    const discoverArchives = vi.fn(() => new Map([['acme', archive]]))
+    const config = { metadata: { applicationName: 'Acme' } }
+    const { setBranding } = await loadBootstrap({
+      envFile: { OCELOT_ACTIVE_BRANDING: 'other' },
+      discoverArchives,
+      readArchiveConfig: vi.fn(() => config),
+    })
+
+    expect(setBranding).toHaveBeenCalledWith(config)
+    expect(warnSpy).not.toHaveBeenCalled()
   })
 
   it('injects the composed config when the active archive resolves', async () => {
