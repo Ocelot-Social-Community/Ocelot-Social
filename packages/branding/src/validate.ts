@@ -4,8 +4,9 @@
 // config that type-checks but is nonsensical (e.g. nameLengthMin > nameLengthMax). Pure (no node deps).
 //
 // Only build-time (defineBranding): the runtime composes from already-validated fragments, and each
-// invariant lives inside ONE bucket domain (group/category/comment → behavior), so cross-brand
-// composition cannot violate them — no need (and it would be wrong) to re-validate + throw at runtime.
+// invariant lives inside ONE bucket domain (group/user/post/category/comment → behavior), so
+// cross-brand composition cannot violate them — no need (and it would be wrong) to re-validate +
+// throw at runtime.
 import type { BrandingConfig } from './schema.js'
 
 /**
@@ -30,7 +31,7 @@ export function validateBranding(config: BrandingConfig): string[] {
     }
   }
 
-  const { group, user, registration, comment, category, badges, metadata } = config
+  const { group, user, post, registration, comment, category, badges, metadata } = config
 
   atLeast('group.nameLengthMin', group.nameLengthMin, 0)
   atMost('group.nameLengthMin', group.nameLengthMin, 'group.nameLengthMax', group.nameLengthMax)
@@ -41,6 +42,10 @@ export function validateBranding(config: BrandingConfig): string[] {
 
   atLeast('user.nameLengthMin', user.nameLengthMin, 0)
   atMost('user.nameLengthMin', user.nameLengthMin, 'user.nameLengthMax', user.nameLengthMax)
+
+  // At least one character: an empty title leaves nothing to show for a post.
+  atLeast('post.titleLengthMin', post.titleLengthMin, 1)
+  atMost('post.titleLengthMin', post.titleLengthMin, 'post.titleLengthMax', post.titleLengthMax)
 
   atLeast('registration.nonceLength', registration.nonceLength, 1)
   atLeast('registration.inviteCodeLength', registration.inviteCodeLength, 1)

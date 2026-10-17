@@ -506,6 +506,7 @@
     "POST_PIN_FEATURE_DISABLED": "Pinning posts is not enabled.",
     "POST_PIN_LIMIT_REACHED": "The maximum number of pinned posts has been reached. Unpin another post first.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "A post with this slug already exists.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "The post title must be between {min} and {max} characters long.",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "The confirmation code is invalid.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "This username is already taken.",
     "REPORT_TARGET_IS_OWN": "You cannot report yourself or your own content.",

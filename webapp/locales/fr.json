@@ -506,6 +506,7 @@
     "POST_PIN_FEATURE_DISABLED": "L'épinglage de posts n'est pas activé.",
     "POST_PIN_LIMIT_REACHED": "Le nombre maximum de posts épinglés est atteint. Désépingle d'abord un autre post.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Un post avec ce slug existe déjà.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "Le titre du post doit comporter entre {min} et {max} caractères.",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Le code de confirmation n'est pas valide.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Ce nom d'utilisateur est déjà pris.",
     "REPORT_TARGET_IS_OWN": "Tu ne peux signaler ni toi-même ni ton propre contenu.",

@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom'
 import { mount } from '@vue/test-utils'
+import { defineBranding, setBranding } from '@ocelot-social/branding'
 import ContributionForm from './ContributionForm.vue'
 import PostMutations from '~/graphql/PostMutations.js'
 
@@ -135,6 +136,29 @@ describe('ContributionForm.vue', () => {
     describe('validation hint display', () => {
       it('shows the title length as "count / min–max"', () => {
         expect(wrapper.find('.os-validation-hint').text()).toContain('0 / 3–100')
+      })
+
+      describe('with a brand that overrides the title length', () => {
+        beforeEach(() => {
+          setBranding(defineBranding({ post: { titleLengthMin: 5, titleLengthMax: 20 } }))
+          wrapper = Wrapper()
+        })
+
+        afterEach(() => {
+          setBranding(undefined)
+        })
+
+        it('shows the branded limits in the hint', () => {
+          expect(wrapper.find('.os-validation-hint').text()).toContain('0 / 5–20')
+        })
+
+        it('validates the title against the branded limits', () => {
+          const { validator } = wrapper.vm.formSchema.title
+          expect(validator(null, 'four')).toHaveLength(1)
+          expect(validator(null, 'five!')).toEqual([])
+          expect(validator(null, 'x'.repeat(20))).toEqual([])
+          expect(validator(null, 'x'.repeat(21))).toHaveLength(1)
+        })
       })
     })
 

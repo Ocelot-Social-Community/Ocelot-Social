@@ -170,6 +170,14 @@ export interface BrandingConfig {
     nameLengthMin: number
     nameLengthMax: number
   }
+  post: {
+    /**
+     * Allowed length of a post's title, counted on the trimmed title. Checked by the webapp's
+     * contribution form and enforced again by the backend on CreatePost/UpdatePost.
+     */
+    titleLengthMin: number
+    titleLengthMax: number
+  }
   registration: {
     nonceLength: number
     inviteCodeLength: number
