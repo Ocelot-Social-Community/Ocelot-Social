@@ -105,7 +105,7 @@
     "eslint": "^10.9.1",
     "eslint-config-it4c": "^0.14.0",
     "eslint-config-prettier": "~10.1.8",
-    "eslint-plugin-jest": "^29.16.6",
+    "eslint-plugin-jest": "^29.17.0",
     "eslint-plugin-prettier": "^5.5.6",
     "eslint-plugin-vue": "^10.11.1",
     "flush-promises": "^1.0.2",
