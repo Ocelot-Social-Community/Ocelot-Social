@@ -12,6 +12,7 @@ describe('ocelotUI Plugin', () => {
   it('registers only Os-prefixed components', () => {
     const mockApp = {
       component: vi.fn<(name: string, component: unknown) => void>(),
+      directive: vi.fn<(name: string, directive: unknown) => void>(),
     }
 
     OcelotUI.install?.(mockApp as never)
@@ -26,9 +27,21 @@ describe('ocelotUI Plugin', () => {
     }
   })
 
+  it('registers the tooltip directive', () => {
+    const mockApp = {
+      component: vi.fn<(name: string, component: unknown) => void>(),
+      directive: vi.fn<(name: string, directive: unknown) => void>(),
+    }
+
+    OcelotUI.install?.(mockApp as never)
+
+    expect(mockApp.directive).toHaveBeenCalledWith('os-tooltip', components.vOsTooltip)
+  })
+
   it('does not register non-component exports', () => {
     const mockApp = {
       component: vi.fn<(name: string, component: unknown) => void>(),
+      directive: vi.fn<(name: string, directive: unknown) => void>(),
     }
 
     OcelotUI.install?.(mockApp as never)
@@ -42,6 +55,7 @@ describe('ocelotUI Plugin', () => {
   it('works without throwing', () => {
     const mockApp = {
       component: vi.fn<(name: string, component: unknown) => void>(),
+      directive: vi.fn<(name: string, directive: unknown) => void>(),
     }
 
     expect(() => {
