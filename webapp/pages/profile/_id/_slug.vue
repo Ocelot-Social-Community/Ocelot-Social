@@ -268,6 +268,7 @@
       v-if="deleteUserData"
       :open="showDeleteModal"
       :title="$t('settings.deleteUserAccount.accountWarningIsAdmin')"
+      :close-label="$t('actions.close')"
       @cancel="cancelDeleteUser"
     >
       <p>{{ $t('settings.deleteUserAccount.infoAdmin') }}</p>
