@@ -20,7 +20,7 @@
     "@ocelot-social/ui": "file:../packages/ui",
     "clsx": "^2.1.1",
     "floating-vue": "^5.4.0",
-    "nuxt": "^4.6.0",
+    "nuxt": "^4.6.1",
     "tailwind-merge": "^3.5.0",
     "vue": "^3.5.30",
     "vue-demi": "^0.14.10",
