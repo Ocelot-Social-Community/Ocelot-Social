@@ -6,6 +6,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
+import { branding } from '@src/branding'
 
 import type { IMiddlewareResolver } from 'graphql-middleware/types'
 
@@ -49,6 +50,17 @@ const validateUpdateComment: IMiddlewareResolver = async (resolve, root, args, c
     throw new AppError(Errors.COMMENT_SAVE_CONTENT_TOO_SHORT, { min: COMMENT_MIN_LENGTH })
   }
 
+  return resolve(root, args, context, info)
+}
+
+// Same limits as the contribution form in the webapp (ContributionForm.vue), both read from
+// branding.post. `title` is non-null on CreatePost and UpdatePost, so it is always a string here.
+const validatePostTitle: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+  const { titleLengthMin: min, titleLengthMax: max } = branding.post
+  const { length } = args.title.trim()
+  if (length < min || length > max) {
+    throw new AppError(Errors.POST_SAVE_TITLE_LENGTH_INVALID, { min, max })
+  }
   return resolve(root, args, context, info)
 }
 
@@ -164,6 +176,8 @@ export default {
   Mutation: {
     CreateComment: validateCreateComment,
     UpdateComment: validateUpdateComment,
+    CreatePost: validatePostTitle,
+    UpdatePost: validatePostTitle,
     UpdateUser: validateUpdateUser,
     fileReport: validateReport,
     review: validateReview,

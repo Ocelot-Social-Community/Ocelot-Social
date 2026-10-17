@@ -506,6 +506,7 @@
     "POST_PIN_FEATURE_DISABLED": "A fixação de publicações não está ativada.",
     "POST_PIN_LIMIT_REACHED": "O número máximo de publicações fixadas foi atingido. Desfixe outra publicação primeiro.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Já existe uma publicação com este slug.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "O título da publicação deve ter entre {min} e {max} caracteres.",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "O código de confirmação é inválido.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Este nome de usuário já está em uso.",
     "REPORT_TARGET_IS_OWN": "Você não pode denunciar a si mesmo nem seu próprio conteúdo.",

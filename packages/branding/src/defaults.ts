@@ -31,6 +31,10 @@ export const brandingDefaults: BrandingConfig = {
     nameLengthMin: 3,
     nameLengthMax: 50,
   },
+  post: {
+    titleLengthMin: 3,
+    titleLengthMax: 100,
+  },
   registration: {
     nonceLength: 5,
     inviteCodeLength: 6,

@@ -8,8 +8,11 @@ import CreateComment from '@graphql/queries/comments/CreateComment.gql'
 import UpdateComment from '@graphql/queries/comments/UpdateComment.gql'
 import fileReport from '@graphql/queries/moderation/fileReport.gql'
 import review from '@graphql/queries/moderation/review.gql'
+import CreatePost from '@graphql/queries/posts/CreatePost.gql'
+import UpdatePost from '@graphql/queries/posts/UpdatePost.gql'
 import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { brandingDefaults, setBranding } from '@src/branding'
 
 import { validateNotifyUsers } from './validationMiddleware'
 
@@ -188,6 +191,71 @@ describe('validateCreateComment', () => {
       ).resolves.toMatchObject({
         data: { UpdateComment: null },
         errors: [{ message: 'The comment must be at least 1 characters long.' }],
+      })
+    })
+  })
+})
+
+describe('validatePostTitle', () => {
+  beforeEach(async () => {
+    authenticatedUser = await commentingUser.toJson()
+  })
+
+  afterEach(() => {
+    setBranding(undefined)
+  })
+
+  const createPost = async (title: string) =>
+    mutate({ mutation: CreatePost, variables: { title, content: 'Some content' } })
+  const updatePost = async (title: string) =>
+    mutate({
+      mutation: UpdatePost,
+      variables: { id: 'post-4-commenting', title, content: 'Some content' },
+    })
+
+  describe.each([
+    ['CreatePost', createPost],
+    ['UpdatePost', updatePost],
+  ])('%s', (mutationName, save) => {
+    it('rejects a title shorter than the minimum, counted without surrounding spaces', async () => {
+      await expect(save('  xy  ')).resolves.toMatchObject({
+        data: { [mutationName]: null },
+        errors: [{ message: 'The post title must be between 3 and 100 characters long.' }],
+      })
+    })
+
+    it('rejects a title longer than the maximum', async () => {
+      await expect(save('x'.repeat(101))).resolves.toMatchObject({
+        data: { [mutationName]: null },
+        errors: [{ message: 'The post title must be between 3 and 100 characters long.' }],
+      })
+    })
+
+    it('accepts a title at both limits', async () => {
+      await expect(save('xyz')).resolves.toMatchObject({
+        data: { [mutationName]: { title: 'xyz' } },
+        errors: undefined,
+      })
+      await expect(save('x'.repeat(100))).resolves.toMatchObject({
+        data: { [mutationName]: { title: 'x'.repeat(100) } },
+        errors: undefined,
+      })
+    })
+
+    it('follows the limits of the active branding', async () => {
+      setBranding({ ...brandingDefaults, post: { titleLengthMin: 5, titleLengthMax: 20 } })
+
+      await expect(save('four')).resolves.toMatchObject({
+        data: { [mutationName]: null },
+        errors: [{ message: 'The post title must be between 5 and 20 characters long.' }],
+      })
+      await expect(save('x'.repeat(21))).resolves.toMatchObject({
+        data: { [mutationName]: null },
+        errors: [{ message: 'The post title must be between 5 and 20 characters long.' }],
+      })
+      await expect(save('five!')).resolves.toMatchObject({
+        data: { [mutationName]: { title: 'five!' } },
+        errors: undefined,
       })
     })
   })

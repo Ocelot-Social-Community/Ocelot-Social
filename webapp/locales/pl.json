@@ -506,6 +506,7 @@
     "POST_PIN_FEATURE_DISABLED": "Przypinanie wpisów nie jest włączone.",
     "POST_PIN_LIMIT_REACHED": "Osiągnięto maksymalną liczbę przypiętych wpisów. Najpierw odepnij inny wpis.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Wpis z tym slugiem już istnieje.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "Tytuł wpisu musi mieć od {min} do {max} znaków.",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Kod potwierdzający jest nieprawidłowy.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Ta nazwa użytkownika jest już zajęta.",
     "REPORT_TARGET_IS_OWN": "Nie możesz zgłosić siebie ani własnych treści.",

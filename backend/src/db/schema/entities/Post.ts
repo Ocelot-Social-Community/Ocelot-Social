@@ -21,7 +21,10 @@ export const Post = defineEntity({
     id: { type: 'string' },
     activityId: { type: ['string', 'null'] },
     objectId: { type: ['string', 'null'] },
-    title: { type: 'string', minLength: 3 },
+    // The real limits are brand-tunable (branding.post.titleLengthMin/Max, enforced by the
+    // validation middleware). 1 is the floor every valid branding keeps, so the audit never
+    // flags a title that the active brand allowed.
+    title: { type: 'string', minLength: 1 },
     slug: { type: ['string', 'null'] },
     content: { type: 'string', minLength: 3 },
     deleted: { type: 'boolean' },

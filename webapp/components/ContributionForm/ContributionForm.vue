@@ -263,6 +263,7 @@
   </div>
 </template>
 <script>
+import { branding } from '@ocelot-social/branding'
 import { OsButton, OsCard, OsIcon, OsValidationHint } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
@@ -383,14 +384,25 @@ export default {
     formSchema() {
       return {
         title: {
-          min: 3,
-          max: 100,
+          min: branding.post.titleLengthMin,
+          max: branding.post.titleLengthMax,
           validator: (_, value = '') => {
-            if (!value.trim()) {
+            const trimmed = value.trim()
+            if (!trimmed) {
               return [new Error(this.$t('common.validations.titleNotEmpty'))]
             }
-            if (value.trim().length < 3 || value.trim().length > 100) {
-              return [new Error(this.$t('common.validations.titleLength', { min: 3, max: 100 }))]
+            if (
+              trimmed.length < branding.post.titleLengthMin ||
+              trimmed.length > branding.post.titleLengthMax
+            ) {
+              return [
+                new Error(
+                  this.$t('common.validations.titleLength', {
+                    min: branding.post.titleLengthMin,
+                    max: branding.post.titleLengthMax,
+                  }),
+                ),
+              ]
             }
             return []
           },
@@ -516,7 +528,10 @@ export default {
       if (!this.visibleErrors?.title) return null
       return !this.formData.title.trim()
         ? this.$t('common.validations.titleNotEmpty')
-        : this.$t('common.validations.titleLength', { min: 3, max: this.formSchema.title.max })
+        : this.$t('common.validations.titleLength', {
+            min: this.formSchema.title.min,
+            max: this.formSchema.title.max,
+          })
     },
     venueErrorText() {
       if (!this.visibleErrors?.eventVenue) return null

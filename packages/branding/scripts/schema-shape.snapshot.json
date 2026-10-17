@@ -64,6 +64,8 @@
     "metadata.ogImageWidth: string",
     "metadata.organizationJurisdiction: string",
     "metadata.organizationName: string",
+    "post.titleLengthMax: number",
+    "post.titleLengthMin: number",
     "registration.inviteCodeLength: number",
     "registration.layout: string",
     "registration.nonceLength: number",
@@ -103,6 +105,7 @@
     "behavior": [
       "group",
       "user",
+      "post",
       "comment",
       "dateTime",
       "badges",

@@ -506,6 +506,7 @@
     "POST_PIN_FEATURE_DISABLED": "Закріплення дописів не увімкнено.",
     "POST_PIN_LIMIT_REACHED": "Досягнуто максимальної кількості закріплених дописів. Спочатку відкріпи інший допис.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Допис із таким slug уже існує.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "Заголовок допису повинен містити від {min} до {max} символів.",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Код підтвердження недійсний.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Це ім’я користувача вже зайняте.",
     "REPORT_TARGET_IS_OWN": "Ти не можеш поскаржитися ні на себе, ні на свій власний вміст.",

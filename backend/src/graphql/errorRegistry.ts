@@ -232,6 +232,11 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'Post with this slug already exists.',
   },
+  // Limits from branding.post (titleLengthMin/titleLengthMax), counted on the trimmed title.
+  POST_SAVE_TITLE_LENGTH_INVALID: {
+    type: 'BAD_USER_INPUT',
+    text: 'The post title must be between {min} and {max} characters long.',
+  },
   // locations
   // A query selected Location.distanceToMe without the location's id.
   LOCATION_FIELD_LOCATION_ID_MISSING: {
