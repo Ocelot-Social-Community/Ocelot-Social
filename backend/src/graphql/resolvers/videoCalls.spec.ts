@@ -4,6 +4,7 @@
 
 import { setTimeout as delay } from 'node:timers/promises'
 
+import { parse } from 'graphql'
 import { PubSub } from 'graphql-subscriptions'
 import { beforeAll, beforeEach, afterAll, describe, it, expect } from 'vitest'
 
@@ -14,6 +15,7 @@ import type { Context } from '@src/context'
 import type { RoleDefinition } from '@src/role'
 
 let listParticipantsMock = vi.fn<(...args: unknown[]) => Promise<unknown>>()
+let listRoomsMock = vi.fn<(...args: unknown[]) => Promise<unknown>>()
 
 vi.mock('livekit-server-sdk', () => {
   class MockTwirpError extends Error {
@@ -45,6 +47,7 @@ vi.mock('livekit-server-sdk', () => {
     RoomServiceClient: vi.fn().mockImplementation(function () {
       return {
         listParticipants: async (roomName: string) => listParticipantsMock(roomName),
+        listRooms: async (names?: string[]) => listRoomsMock(names),
       }
     }),
     TwirpError: MockTwirpError,
@@ -58,6 +61,9 @@ const { AccessToken, RoomServiceClient, TwirpError } = await import('livekit-ser
 const { default: Factory, cleanDatabase } = await import('@db/factories')
 const { default: JoinGroupVideoCall } =
   await import('@graphql/queries/videoCalls/JoinGroupVideoCall.gql')
+const { default: JoinGroup } = await import('@graphql/queries/groups/JoinGroup.gql')
+const { default: JoinGroupVideoCallChat } =
+  await import('@graphql/queries/videoCalls/JoinGroupVideoCallChat.gql')
 const { default: VideoCallConfig } = await import('@graphql/queries/videoCalls/VideoCallConfig.gql')
 const { default: VideoCallParticipantCount } =
   await import('@graphql/queries/videoCalls/VideoCallParticipantCount.gql')
@@ -65,9 +71,11 @@ const { createApolloTestSetup } = await import('@root/test/helpers')
 const {
   default: videoCallResolvers,
   assertGroupMembershipCached,
+  getLiveCall,
   getLiveParticipantCount,
   groupIdFromRoomName,
   roomNameForGroup,
+  userIdFromIdentity,
 } = await import('./videoCalls')
 
 const ENABLED_LIVEKIT = {
@@ -119,6 +127,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   await cleanDatabase()
   listParticipantsMock = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([])
+  listRoomsMock = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([])
   livekitConfig = {}
   authenticatedUser = null
   rolesOverride = undefined
@@ -687,6 +696,255 @@ describe('joinGroupVideoCall', () => {
 
       expect(vi.mocked(AccessToken).mock.calls.at(-1)?.[2]).toMatchObject({ ttl: '10m' })
     })
+  })
+})
+
+describe('joinGroupVideoCallChat', () => {
+  const chatParticipants = async (roomId: string): Promise<string[]> => {
+    const session = database.driver.session()
+    try {
+      const result = await session.run(
+        `
+          MATCH (user:User)-[:CHATS_IN]->(:Room { id: $roomId })-[:ROOM_FOR]->(:VideoCallSession)
+          RETURN user.id AS id ORDER BY id
+        `,
+        { roomId },
+      )
+      return result.records.map((record) => record.get('id') as string)
+    } finally {
+      await session.close()
+    }
+  }
+
+  beforeEach(async () => {
+    livekitConfig = ENABLED_LIVEKIT
+    authenticatedUser = memberJson
+    await Factory.build(
+      'group',
+      { id: 'chat-1', template: 'public', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
+  })
+
+  it('returns the conference chat room of the call the user is in', async () => {
+    listRoomsMock.mockResolvedValue([{ name: 'group-chat-1', sid: 'RM_1' }])
+    listParticipantsMock.mockResolvedValue([{ identity: 'member-1#abcd1234' }])
+
+    const { data, errors } = await mutate({
+      mutation: JoinGroupVideoCallChat,
+      variables: { groupId: 'chat-1' },
+    })
+
+    expect(errors).toBeUndefined()
+    await expect(chatParticipants(data.joinGroupVideoCallChat as string)).resolves.toEqual([
+      'member-1',
+    ])
+  })
+
+  it('returns the same room when asked again for the same call', async () => {
+    listRoomsMock.mockResolvedValue([{ name: 'group-chat-1', sid: 'RM_1' }])
+    listParticipantsMock.mockResolvedValue([{ identity: 'member-1#abcd1234' }])
+
+    const first = await mutate({
+      mutation: JoinGroupVideoCallChat,
+      variables: { groupId: 'chat-1' },
+    })
+    const second = await mutate({
+      mutation: JoinGroupVideoCallChat,
+      variables: { groupId: 'chat-1' },
+    })
+
+    expect(second.data.joinGroupVideoCallChat).toBe(first.data.joinGroupVideoCallChat)
+  })
+
+  it('returns another room for the next call of the group', async () => {
+    listParticipantsMock.mockResolvedValue([{ identity: 'member-1#abcd1234' }])
+    listRoomsMock.mockResolvedValueOnce([{ name: 'group-chat-1', sid: 'RM_1' }])
+    const first = await mutate({
+      mutation: JoinGroupVideoCallChat,
+      variables: { groupId: 'chat-1' },
+    })
+    listRoomsMock.mockResolvedValueOnce([{ name: 'group-chat-1', sid: 'RM_2' }])
+    const second = await mutate({
+      mutation: JoinGroupVideoCallChat,
+      variables: { groupId: 'chat-1' },
+    })
+
+    expect(second.data.joinGroupVideoCallChat).not.toBe(first.data.joinGroupVideoCallChat)
+  })
+
+  // The media server keeps a room for a while after the last participant has left. Whoever
+  // walks in then was not part of what was written there, and must not be shown it.
+  describe('in a room everybody else has left', () => {
+    const roomParticipants = parse(`query ($id: ID) { Room(id: $id) { id } }`)
+
+    beforeEach(async () => {
+      listRoomsMock.mockResolvedValue([{ name: 'group-chat-1', sid: 'RM_1' }])
+      // The second person is a member too: the chat is kept from them by the call they were
+      // not in, not by the group.
+      authenticatedUser = outsiderJson
+      await mutate({
+        mutation: JoinGroup,
+        variables: { groupId: 'chat-1', userId: 'outsider-1' },
+      })
+      authenticatedUser = memberJson
+    })
+
+    it('gives a member who was not in the call a chat of their own, without the old one', async () => {
+      listParticipantsMock.mockResolvedValue([{ identity: 'member-1#abcd1234' }])
+      const earlier = await mutate({
+        mutation: JoinGroupVideoCallChat,
+        variables: { groupId: 'chat-1' },
+      })
+
+      // The member has left; somebody else comes into the same, still open room.
+      authenticatedUser = outsiderJson
+      listParticipantsMock.mockResolvedValue([{ identity: 'outsider-1#abcd1234' }])
+      const next = await mutate({
+        mutation: JoinGroupVideoCallChat,
+        variables: { groupId: 'chat-1' },
+      })
+      const old = await query({
+        query: roomParticipants,
+        variables: { id: earlier.data.joinGroupVideoCallChat as string },
+      })
+
+      expect(next.errors).toBeUndefined()
+      expect(next.data.joinGroupVideoCallChat).not.toBe(earlier.data.joinGroupVideoCallChat)
+      expect(old.data.Room).toEqual([])
+    })
+
+    it('lets the member who was in the call carry on with the chat', async () => {
+      listParticipantsMock.mockResolvedValue([{ identity: 'member-1#abcd1234' }])
+      const earlier = await mutate({
+        mutation: JoinGroupVideoCallChat,
+        variables: { groupId: 'chat-1' },
+      })
+      // Left and back again, on a new connection.
+      listParticipantsMock.mockResolvedValue([{ identity: 'member-1#ffff0000' }])
+      const again = await mutate({
+        mutation: JoinGroupVideoCallChat,
+        variables: { groupId: 'chat-1' },
+      })
+
+      expect(again.data.joinGroupVideoCallChat).toBe(earlier.data.joinGroupVideoCallChat)
+    })
+
+    it('lets somebody new in on the chat while a participant of it is in the call', async () => {
+      listParticipantsMock.mockResolvedValue([{ identity: 'member-1#abcd1234' }])
+      const earlier = await mutate({
+        mutation: JoinGroupVideoCallChat,
+        variables: { groupId: 'chat-1' },
+      })
+
+      authenticatedUser = outsiderJson
+      listParticipantsMock.mockResolvedValue([
+        { identity: 'member-1#abcd1234' },
+        { identity: 'outsider-1#abcd1234' },
+      ])
+      const next = await mutate({
+        mutation: JoinGroupVideoCallChat,
+        variables: { groupId: 'chat-1' },
+      })
+
+      expect(next.data.joinGroupVideoCallChat).toBe(earlier.data.joinGroupVideoCallChat)
+    })
+  })
+
+  it('refuses a member who is not in the call', async () => {
+    listRoomsMock.mockResolvedValue([{ name: 'group-chat-1', sid: 'RM_1' }])
+    listParticipantsMock.mockResolvedValue([{ identity: 'somebody-else#abcd1234' }])
+
+    const { data, errors } = await mutate({
+      mutation: JoinGroupVideoCallChat,
+      variables: { groupId: 'chat-1' },
+    })
+
+    expect(errors?.[0].message).toMatch(/join the call first/i)
+    expect(data.joinGroupVideoCallChat).toBeNull()
+  })
+
+  it('refuses while no call is running', async () => {
+    const { errors } = await mutate({
+      mutation: JoinGroupVideoCallChat,
+      variables: { groupId: 'chat-1' },
+    })
+
+    expect(errors?.[0].message).toMatch(/join the call first/i)
+  })
+
+  it('refuses whoever may not join the calls of the group', async () => {
+    authenticatedUser = outsiderJson
+    await Factory.build(
+      'group',
+      { id: 'chat-hidden', template: 'hidden', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
+    listRoomsMock.mockResolvedValue([{ name: 'group-chat-hidden', sid: 'RM_1' }])
+    listParticipantsMock.mockResolvedValue([{ identity: 'outsider-1#abcd1234' }])
+
+    const { errors } = await mutate({
+      mutation: JoinGroupVideoCallChat,
+      variables: { groupId: 'chat-hidden' },
+    })
+
+    expect(errors?.[0].message).toBe('Not Authorized!')
+  })
+})
+
+describe('userIdFromIdentity', () => {
+  it('drops the per-connection suffix', () => {
+    expect(userIdFromIdentity('member-1#abcd1234')).toBe('member-1')
+  })
+
+  it('keeps a `#` that is part of the user id', () => {
+    expect(userIdFromIdentity('odd#id#abcd1234')).toBe('odd#id')
+  })
+
+  it('takes an identity without suffix as the user id', () => {
+    expect(userIdFromIdentity('member-1')).toBe('member-1')
+  })
+})
+
+describe('getLiveCall', () => {
+  it('returns the sid of the room and the users in it, each once', async () => {
+    listRoomsMock.mockResolvedValue([{ name: 'group-x', sid: 'RM_x' }])
+    listParticipantsMock.mockResolvedValue([
+      { identity: 'anna#1' },
+      { identity: 'anna#2' },
+      { identity: 'ben#3' },
+    ])
+
+    const call = await getLiveCall(ENABLED_LIVEKIT, 'group-x')
+
+    expect(call?.sid).toBe('RM_x')
+    expect([...(call?.userIds ?? [])]).toEqual(['anna', 'ben'])
+  })
+
+  it('returns null when the media server lists no such room', async () => {
+    await expect(getLiveCall(ENABLED_LIVEKIT, 'group-x')).resolves.toBeNull()
+  })
+
+  it('returns null when the room is gone by the time its participants are asked for', async () => {
+    listRoomsMock.mockResolvedValue([{ name: 'group-x', sid: 'RM_x' }])
+    listParticipantsMock.mockRejectedValue(new TwirpError('twirp', 'room not found', 404))
+
+    await expect(getLiveCall(ENABLED_LIVEKIT, 'group-x')).resolves.toBeNull()
+  })
+
+  it('takes the "not found" code for a missing room as well, whatever the status', async () => {
+    listRoomsMock.mockResolvedValue([{ name: 'group-x', sid: 'RM_x' }])
+    listParticipantsMock.mockRejectedValue(
+      new TwirpError('twirp', 'room not found', 400, 'not_found'),
+    )
+
+    await expect(getLiveCall(ENABLED_LIVEKIT, 'group-x')).resolves.toBeNull()
+  })
+
+  it('rethrows any other failure rather than passing it off as "no call"', async () => {
+    listRoomsMock.mockRejectedValue(new Error('upstream down'))
+
+    await expect(getLiveCall(ENABLED_LIVEKIT, 'group-x')).rejects.toThrow('upstream down')
   })
 })
 

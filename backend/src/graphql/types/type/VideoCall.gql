@@ -29,6 +29,8 @@ type Query {
 type Mutation {
   "Join a group's video call, returning the credentials to connect. Requires authentication."
   joinGroupVideoCall(groupId: ID!): VideoCallJoinPayload!
+  "Join the conference chat of the group's running video call — the chat room only the participants of this one call share — and return its room id. Requires taking part in the call."
+  joinGroupVideoCallChat(groupId: ID!): ID
 }
 
 type Subscription {

@@ -33,6 +33,7 @@ import {
   setNonMemberMemberListAccess,
   withinTransaction,
 } from '@src/groupRole/repository'
+import { removeUserFromGroupCallRooms } from '@src/livekit/callSession'
 
 import {
   nonMemberReadsGroup,
@@ -1199,6 +1200,8 @@ const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId)
     }
     // Remove user from group chat room
     await removeUserFromGroupChatRoom(transaction, groupId, userId)
+    // ... and from the conference chats of the group's video calls they took part in
+    await removeUserFromGroupCallRooms(transaction, groupId, userId)
     return result
   })
 }

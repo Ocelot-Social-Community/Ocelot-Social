@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 import Vuex from 'vuex'
 import Chat from './Chat.vue'
 
@@ -101,9 +102,15 @@ describe('Chat.vue', () => {
         },
         chat: {
           namespaced: true,
-          state: { unreadRoomCount: 0 },
+          state: { unreadRoomCount: 0, dismissedHints: [] },
+          getters: {
+            dismissedHints: (state) => state.dismissedHints,
+          },
           mutations: {
             UPDATE_ROOM_COUNT: jest.fn(),
+            DISMISS_HINT(state, key) {
+              state.dismissedHints = [...state.dismissedHints, key]
+            },
           },
         },
         videoCall: {
@@ -1584,6 +1591,465 @@ describe('Chat.vue', () => {
         fetchMoreSpy.mockClear()
         intersectionInstances[0].callback([{ isIntersecting: false }])
         expect(fetchMoreSpy).not.toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('conference chat of a video call', () => {
+    const callRoom = (overrides = {}) => ({
+      id: 'call-room',
+      roomId: 'call-room',
+      roomName: 'Yoga',
+      avatar: null,
+      isGroupRoom: false,
+      isCallRoom: true,
+      isWritable: true,
+      createdAt: '2026-01-01T00:00:00Z',
+      lastMessageAt: null,
+      unreadCount: 0,
+      group: { id: 'g1', slug: 'yoga', name: 'Yoga', avatar: null },
+      lastMessage: null,
+      users: [{ _id: 'current-user', id: 'current-user', slug: 'me', name: 'Me', avatar: null }],
+      ...overrides,
+    })
+
+    it('opens the room given by its id', async () => {
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [callRoom()], Message: [] } })
+      wrapper = Wrapper({ singleRoom: true, roomId: 'call-room' })
+      await flushPromises()
+      expect(mocks.$apollo.query.mock.calls[0][0].variables).toEqual({ id: 'call-room' })
+      expect(wrapper.vm.rooms.map((r) => r.id)).toEqual(['call-room'])
+      expect(wrapper.vm.rooms[0].isCallRoom).toBe(true)
+    })
+
+    it('does not take it for the chat of the group it carries', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      wrapper.vm.rooms = [wrapper.vm.fixRoomObject(callRoom())]
+      mocks.$apollo.query.mockClear()
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      await wrapper.vm.newGroupRoom('g1')
+      // Not found locally, so the server is asked for the group's own room.
+      expect(mocks.$apollo.query.mock.calls[0][0].variables).toEqual({ groupId: 'g1' })
+    })
+
+    it('ignores a message for a conference chat that is not open here', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      wrapper.vm.rooms = []
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [callRoom()] } })
+      await wrapper.vm.chatMessageAdded({
+        data: { chatMessageAdded: mockMessage({ room: { id: 'call-room' } }) },
+      })
+      expect(wrapper.vm.rooms).toEqual([])
+    })
+
+    describe('"no messages" text of a room opened on its own', () => {
+      // The library holds the text back while the rooms are loading.
+      it('is not held back for the chat of a group', async () => {
+        mocks.$apollo.query.mockResolvedValue({
+          data: { Room: [callRoom({ isCallRoom: false, isGroupRoom: true })], Message: [] },
+        })
+        wrapper = Wrapper({ singleRoom: true, groupId: 'g1' })
+        expect(wrapper.vm.loadingRooms).toBe(true)
+        await flushPromises()
+        expect(wrapper.vm.loadingRooms).toBe(false)
+      })
+
+      it('is not held back for a room opened by its id', async () => {
+        mocks.$apollo.query.mockResolvedValue({ data: { Room: [callRoom()], Message: [] } })
+        wrapper = Wrapper({ singleRoom: true, roomId: 'call-room' })
+        await flushPromises()
+        expect(wrapper.vm.loadingRooms).toBe(false)
+      })
+    })
+
+    describe('height in the floating chat window', () => {
+      it('gives up the room something above it takes', () => {
+        expect(Wrapper({ singleRoom: true }).vm.chatHeight).toBe('calc(100dvh - 190px)')
+        expect(Wrapper({ singleRoom: true, reservedHeight: 52 }).vm.chatHeight).toBe(
+          'calc(100dvh - 242px)',
+        )
+      })
+    })
+
+    describe('telling whether it holds no message', () => {
+      const emitted = () => (wrapper.emitted('empty-change') || []).map(([value]) => value)
+
+      it('says so once every message is loaded and there is none', async () => {
+        wrapper = Wrapper()
+        wrapper.vm.selectedRoom = mockRoom({ id: 'room-1' })
+        wrapper.vm.messages = []
+        wrapper.vm.messagesLoaded = true
+        await wrapper.vm.$nextTick()
+        expect(emitted()).toEqual([true])
+      })
+
+      it('does not take "nothing loaded yet" for empty', async () => {
+        wrapper = Wrapper()
+        wrapper.vm.selectedRoom = mockRoom({ id: 'room-1' })
+        wrapper.vm.messages = []
+        wrapper.vm.messagesLoaded = false
+        await wrapper.vm.$nextTick()
+        expect(emitted()).toEqual([])
+      })
+
+      it('takes it back when the first message arrives', async () => {
+        wrapper = Wrapper()
+        wrapper.vm.selectedRoom = mockRoom({ id: 'room-1' })
+        wrapper.vm.messagesLoaded = true
+        await wrapper.vm.$nextTick()
+        wrapper.vm.messages = [mockMessage()]
+        await wrapper.vm.$nextTick()
+        expect(emitted()).toEqual([true, false])
+      })
+    })
+
+    describe('room header', () => {
+      const injectedStyles = (propsData) => {
+        wrapper = Wrapper(propsData)
+        const appended = []
+        Object.defineProperty(wrapper.vm.$el, 'shadowRoot', {
+          configurable: true,
+          value: { appendChild: (style) => appended.push(style.textContent) },
+        })
+        wrapper.vm._shadowStylesInjected = false
+        wrapper.vm.injectShadowStyles()
+        return appended.join('')
+      }
+
+      it('is shown by default', () => {
+        expect(injectedStyles({})).not.toContain('display: none')
+      })
+
+      it('is left out, with the room it reserves, for a host that brings its own', () => {
+        const styles = injectedStyles({ hideHeader: true })
+        expect(styles).toContain('.vac-room-header { display: none !important; }')
+        expect(styles).toContain('.vac-container-scroll { margin-top: 0 !important; }')
+      })
+
+      it('follows a host that starts bringing its own while the chat stays', async () => {
+        wrapper = Wrapper()
+        const live = []
+        Object.defineProperty(wrapper.vm.$el, 'shadowRoot', {
+          configurable: true,
+          value: {
+            appendChild: (style) => {
+              style.remove = () => live.splice(live.indexOf(style), 1)
+              live.push(style)
+            },
+          },
+        })
+        wrapper.vm._shadowStylesInjected = false
+        wrapper.vm.injectShadowStyles()
+        expect(live).toHaveLength(1)
+        expect(live[0].textContent).not.toContain('display: none')
+
+        await wrapper.setProps({ hideHeader: true })
+
+        // The earlier styles are replaced, not added to.
+        expect(live).toHaveLength(1)
+        expect(live[0].textContent).toContain('.vac-room-header { display: none !important; }')
+      })
+    })
+
+    describe('hint above the messages', () => {
+      // A real shadow root with the library's message column in it, as the browser has it.
+      const withMessageColumn = (propsData) => {
+        wrapper = Wrapper(propsData)
+        const shadow = wrapper.vm.$el.attachShadow({ mode: 'open' })
+        const column = document.createElement('div')
+        column.className = 'vac-col-messages'
+        shadow.appendChild(column)
+        wrapper.vm.renderHint()
+        return { shadow, column }
+      }
+      const hint = 'Visible only to the participants\n(without notifications)'
+
+      it('floats above the messages, with its line breaks kept', () => {
+        const { column } = withMessageColumn({ hint, hintKey: 'call' })
+        const bubble = column.querySelector('[data-test="chat-hint"]')
+        expect(bubble).not.toBeNull()
+        expect(bubble.getAttribute('role')).toBe('note')
+        expect(bubble.querySelector('.chat-hint__text').textContent).toBe(hint)
+      })
+
+      it('takes its text as text, never as markup', () => {
+        const { column } = withMessageColumn({ hint: '<b>bold</b>', hintKey: 'x' })
+        expect(column.querySelector('b')).toBeNull()
+        expect(column.querySelector('.chat-hint__text').textContent).toBe('<b>bold</b>')
+      })
+
+      it('goes away with its X, and stays away for that key', async () => {
+        const { column } = withMessageColumn({ hint, hintKey: 'call' })
+        const close = column.querySelector('[data-test="chat-hint-close"]')
+        expect(close.getAttribute('aria-label')).toBe('actions.close')
+
+        close.click()
+        await wrapper.vm.$nextTick()
+
+        expect(column.querySelector('[data-test="chat-hint"]')).toBeNull()
+        expect(store.state.chat.dismissedHints).toEqual(['call'])
+
+        // Another chat with the same hint: still dismissed.
+        const second = withMessageColumn({ hint, hintKey: 'call' })
+        expect(second.column.querySelector('[data-test="chat-hint"]')).toBeNull()
+      })
+
+      it('is shown in a chat whose hint has another key', () => {
+        store.state.chat.dismissedHints = ['call']
+        const { column } = withMessageColumn({ hint, hintKey: 'group' })
+        expect(column.querySelector('[data-test="chat-hint"]')).not.toBeNull()
+      })
+
+      it('is not there in a chat without a hint', () => {
+        const { column } = withMessageColumn({})
+        expect(column.querySelector('[data-test="chat-hint"]')).toBeNull()
+      })
+
+      it('is put back into a message column drawn anew, once only', () => {
+        const { shadow, column } = withMessageColumn({ hint, hintKey: 'call' })
+        column.remove()
+        const redrawn = document.createElement('div')
+        redrawn.className = 'vac-col-messages'
+        shadow.appendChild(redrawn)
+
+        wrapper.vm.renderHint()
+        wrapper.vm.renderHint()
+
+        expect(redrawn.querySelectorAll('[data-test="chat-hint"]')).toHaveLength(1)
+      })
+
+      it('sits at the top where the host brings its own header, below the built-in one otherwise', () => {
+        const styles = (propsData) => {
+          wrapper = Wrapper(propsData)
+          const appended = []
+          Object.defineProperty(wrapper.vm.$el, 'shadowRoot', {
+            configurable: true,
+            value: { appendChild: (style) => appended.push(style.textContent) },
+          })
+          wrapper.vm._shadowStylesInjected = false
+          wrapper.vm.injectShadowStyles()
+          return appended.join('')
+        }
+        expect(styles({ hideHeader: true })).toMatch(/\.chat-hint \{[^}]*top: 8px/)
+        expect(styles({})).toMatch(/\.chat-hint \{[^}]*top: 68px/)
+      })
+    })
+
+    describe('cursor in the message field on opening a room', () => {
+      const openRoomWith = async (propsData) => {
+        wrapper = Wrapper(propsData)
+        await flushPromises()
+        const focus = jest.fn()
+        Object.defineProperty(wrapper.vm.$el, 'shadowRoot', {
+          configurable: true,
+          value: {
+            activeElement: null,
+            querySelector: (selector) => (selector === 'textarea#roomTextarea' ? { focus } : null),
+            appendChild: jest.fn(),
+          },
+        })
+        await wrapper.vm.fetchMessages({ room: mockRoom() })
+        await flushPromises()
+        return focus
+      }
+
+      it('is set by default', async () => {
+        const focus = await openRoomWith({})
+        expect(focus).toHaveBeenCalled()
+      })
+
+      it('is left alone where the keyboard would be in the way', async () => {
+        const focus = await openRoomWith({ autoFocus: false })
+        expect(focus).not.toHaveBeenCalled()
+      })
+    })
+
+    it('says in the title which of the two chats it is', () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = wrapper.vm.fixRoomObject(callRoom())
+      expect(wrapper.vm.selectedRoomTitle).toBe('chat.callRoomName')
+      expect(mocks.$t).toHaveBeenCalledWith('chat.callRoomName', { name: 'Yoga' })
+    })
+
+    it('keeps the plain name for every other room', () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = mockRoom()
+      expect(wrapper.vm.selectedRoomTitle).toBe('Test Room')
+    })
+
+    it('is read-only once the call is over', () => {
+      wrapper = Wrapper()
+      expect(wrapper.vm.selectedRoomWritable).toBe(true)
+      wrapper.vm.selectedRoom = wrapper.vm.fixRoomObject(callRoom())
+      expect(wrapper.vm.selectedRoomWritable).toBe(true)
+      wrapper.vm.selectedRoom = wrapper.vm.fixRoomObject(callRoom({ isWritable: false }))
+      expect(wrapper.vm.selectedRoomWritable).toBe(false)
+    })
+
+    describe('export', () => {
+      it('fetches every message, page by page, oldest first', async () => {
+        wrapper = Wrapper()
+        await flushPromises()
+        const page = (from, count) =>
+          Array.from({ length: count }, (_, i) =>
+            mockMessage({ id: `m${from + i}`, _id: `m${from + i}`, indexId: from + i }),
+          )
+        mocks.$apollo.query.mockReset()
+        mocks.$apollo.query
+          .mockResolvedValueOnce({ data: { Message: page(30, 100) } })
+          .mockResolvedValueOnce({ data: { Message: page(0, 30) } })
+        const all = await wrapper.vm.fetchAllMessages('call-room')
+        expect(mocks.$apollo.query.mock.calls.map(([arg]) => arg.variables)).toEqual([
+          { roomId: 'call-room', first: 100 },
+          { roomId: 'call-room', first: 100, beforeIndex: 30 },
+        ])
+        expect(all.map((m) => m.indexId)).toEqual(Array.from({ length: 130 }, (_, i) => i))
+      })
+
+      it('writes one line per message, and one per attachment', () => {
+        wrapper = Wrapper()
+        const text = wrapper.vm.buildExportText({ roomName: 'Yoga' }, [
+          mockMessage({ username: 'Anna', content: ' Hello ' }),
+          mockMessage({
+            username: 'Ben',
+            content: '',
+            files: [{ name: 'plan', extension: 'pdf' }, { name: 'notes' }],
+          }),
+        ])
+        const lines = text.split('\n')
+        expect(lines[0]).toBe('chat.export.title')
+        expect(lines[1]).toBe('chat.export.savedAt')
+        expect(lines[2]).toBe('')
+        expect(lines[3]).toMatch(/^\[.+\] Anna: Hello$/)
+        expect(lines[4]).toMatch(/^\[.+\] Ben:$/)
+        expect(lines[5]).toBe('    chat.export.attachment: plan.pdf')
+        expect(lines[6]).toBe('    chat.export.attachment: notes')
+        expect(mocks.$t).toHaveBeenCalledWith('chat.export.title', { name: 'Yoga' })
+      })
+
+      it('heads the file with the start of the call and the moment it is saved', () => {
+        wrapper = Wrapper()
+        const text = wrapper.vm.buildExportText(
+          { roomName: 'Yoga', createdAt: '2026-10-14T12:03:00Z' },
+          [mockMessage({ username: 'Anna', content: 'Hello' })],
+        )
+        const lines = text.split('\n')
+        expect(lines.slice(0, 4)).toEqual([
+          'chat.export.title',
+          'chat.export.callStarted',
+          'chat.export.savedAt',
+          '',
+        ])
+        expect(mocks.$t).toHaveBeenCalledWith('chat.export.callStarted', {
+          date: new Date('2026-10-14T12:03:00Z').toLocaleString('en-US'),
+        })
+      })
+
+      it('says so in the file when the chat has no message', () => {
+        wrapper = Wrapper()
+        const text = wrapper.vm.buildExportText(
+          { roomName: 'Yoga', createdAt: '2026-10-14T12:03:00Z' },
+          [],
+        )
+        expect(text.split('\n').slice(4)).toEqual(['chat.messagesEmpty', ''])
+      })
+
+      it('indents the further lines of a message written over several', () => {
+        wrapper = Wrapper()
+        const text = wrapper.vm.buildExportText({ roomName: 'Yoga' }, [
+          mockMessage({ username: 'Anna', content: 'First line\nsecond line\r\nthird line' }),
+          mockMessage({ username: 'Ben', content: 'Next message' }),
+        ])
+        const lines = text.split('\n')
+        expect(lines[3]).toMatch(/^\[.+\] Anna: First line$/)
+        expect(lines[4]).toBe('    second line')
+        expect(lines[5]).toBe('    third line')
+        // Only a new message starts at the beginning of a line.
+        expect(lines[6]).toMatch(/^\[.+\] Ben: Next message$/)
+      })
+
+      it('hands the text to the browser as a file', async () => {
+        wrapper = Wrapper()
+        await flushPromises()
+        wrapper.vm.selectedRoom = wrapper.vm.fixRoomObject(callRoom())
+        mocks.$apollo.query.mockResolvedValue({ data: { Message: [mockMessage()] } })
+        const createObjectURL = jest.fn(() => 'blob:export')
+        const revokeObjectURL = jest.fn()
+        const original = { create: URL.createObjectURL, revoke: URL.revokeObjectURL }
+        URL.createObjectURL = createObjectURL
+        URL.revokeObjectURL = revokeObjectURL
+        const click = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+        jest.useFakeTimers()
+        try {
+          await wrapper.vm.exportRoom()
+          expect(createObjectURL).toHaveBeenCalledWith(expect.any(Blob))
+          expect(click).toHaveBeenCalledTimes(1)
+          // The blob is kept until the browser has had time to start the download …
+          expect(revokeObjectURL).not.toHaveBeenCalled()
+          jest.runOnlyPendingTimers()
+          // … and released then.
+          expect(click.mock.instances[0].download).toMatch(/^chat_Yoga_\d{4}-\d\d-\d\d_.+\.txt$/)
+          expect(revokeObjectURL).toHaveBeenCalledWith('blob:export')
+          expect(wrapper.vm.exporting).toBe(false)
+        } finally {
+          jest.useRealTimers()
+          click.mockRestore()
+          URL.createObjectURL = original.create
+          URL.revokeObjectURL = original.revoke
+        }
+      })
+
+      describe('file name', () => {
+        // Local time, so the expectation holds in whatever zone the tests run.
+        const at = (day, hours, minutes) => new Date(2026, 9, day, hours, minutes)
+
+        it('names the group and the span from the start of the chat to the saving', () => {
+          wrapper = Wrapper()
+          const name = wrapper.vm.exportFileName(
+            { roomName: 'Yoga', createdAt: at(12, 14, 3).toISOString() },
+            at(12, 15, 10),
+          )
+          expect(name).toBe('chat_Yoga_2026-10-12_14-03--15-10.txt')
+        })
+
+        it('repeats the day when the chat ran past midnight', () => {
+          wrapper = Wrapper()
+          const name = wrapper.vm.exportFileName(
+            { roomName: 'Yoga', createdAt: at(12, 23, 50).toISOString() },
+            at(13, 0, 20),
+          )
+          expect(name).toBe('chat_Yoga_2026-10-12_23-50--2026-10-13_00-20.txt')
+        })
+
+        it('keeps the group name to characters a file name takes', () => {
+          wrapper = Wrapper()
+          const name = wrapper.vm.exportFileName(
+            { roomName: ' Yoga / Köln: "Anfänger"? ', createdAt: at(12, 14, 3).toISOString() },
+            at(12, 15, 10),
+          )
+          expect(name).toBe('chat_Yoga-Köln-Anfänger_2026-10-12_14-03--15-10.txt')
+        })
+
+        it('does without a name the room does not have', () => {
+          wrapper = Wrapper()
+          const name = wrapper.vm.exportFileName(
+            { roomName: '', createdAt: at(12, 14, 3).toISOString() },
+            at(12, 15, 10),
+          )
+          expect(name).toBe('chat_2026-10-12_14-03--15-10.txt')
+        })
+      })
+
+      it('reports a failure and is ready for another try', async () => {
+        wrapper = Wrapper()
+        await flushPromises()
+        wrapper.vm.selectedRoom = wrapper.vm.fixRoomObject(callRoom())
+        mocks.$apollo.query.mockRejectedValue(new Error('offline'))
+        await wrapper.vm.exportRoom()
+        expect(mocks.$toast.error).toHaveBeenCalled()
+        expect(wrapper.vm.exporting).toBe(false)
       })
     })
   })

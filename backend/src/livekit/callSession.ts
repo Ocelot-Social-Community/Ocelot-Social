@@ -1,0 +1,223 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
+// The database's side of a video call.
+//
+// The call itself runs on the media server and leaves no trace. What is kept here is one
+// VideoCallSession per call, and with it the conference chat: a Room that points at the session
+// (ROOM_FOR) and that only those who joined the call chat in (CHATS_IN). Everything the chat
+// does — history, attachments, unread marks, live delivery — is the ordinary Room/Message
+// machinery, which decides access on that one edge. So a message in it reaches the
+// participants of the call and nobody else, which is the whole point: the group's own chat
+// notifies every member, in the call or not.
+//
+// Which call is which is the media server's knowledge: every call of a group runs in a room
+// of the same name, but each room it opens gets an id of its own (the sid). A session belongs
+// to one sid, so a room opened anew always starts a new chat. Within one room a session lasts
+// as long as somebody of it is there (see joinCallSession) — the media server keeps an emptied
+// room for a while, and that must not hand the chat to whoever walks in next.
+//
+// When a call ends, the media server does not always tell: its webhook may be unreachable, and
+// the backend may have been down when the last participant left. So a session is ended when
+// the room is reported finished (webhook), when the room is gone from the server's list
+// (poller), and — the one that cannot be missed — when the group's next call begins and finds
+// an earlier session still marked as running.
+
+import type { Driver } from 'neo4j-driver'
+
+interface JoinCallSessionInput {
+  groupId: string
+  userId: string
+  /** The name of the media-server room the call runs in. */
+  livekitRoom: string
+  /** The id the media server gave this very room; it tells this call from the next. */
+  livekitSid: string
+  /** Everybody the media server lists in that room right now, the joining user included. */
+  presentUserIds: readonly string[]
+}
+
+/**
+ * Makes the user a participant of the conversation going on in that media-server room and
+ * returns the id of its conference chat room — or null if the group is gone.
+ *
+ * Which conversation that is, is decided by who is there. A session is carried on as long as
+ * somebody who took part in it is in the room — the joining user themselves, coming back, or
+ * anybody else. Where nobody of it is left, it is over, even though the media server keeps the
+ * empty room around for a while: whoever walks in then starts a new session and sees nothing of
+ * the old one. Otherwise that grace period would be a window for reading what the others wrote
+ * just after they have all gone.
+ *
+ * Every session of the group in ANOTHER media-server room is over by definition (a group has
+ * one call at a time) and is ended on the way.
+ */
+export const joinCallSession = async (
+  driver: Driver,
+  { groupId, userId, livekitRoom, livekitSid, presentUserIds }: JoinCallSessionInput,
+): Promise<string | null> => {
+  const session = driver.session()
+  try {
+    return await session.writeTransaction(async (transaction) => {
+      // The lock makes "is there a session to carry on, else open one" a single step. Two
+      // participants asking at the same moment would otherwise both find none and both create
+      // one. It is held until the transaction ends.
+      const open = await transaction.run(
+        `
+          MATCH (group:Group { id: $groupId })
+          CALL apoc.lock.nodes([group])
+          OPTIONAL MATCH (session:VideoCallSession)-[:CALL_IN]->(group)
+            WHERE session.endedAt IS NULL
+          OPTIONAL MATCH (room:Room)-[:ROOM_FOR]->(session)
+          // The group is returned so that a group that is gone yields no row at all.
+          RETURN group.id AS groupId,
+                 session.id AS id,
+                 session.livekitSid = $livekitSid AND size([
+                   (member:User)-[:CHATS_IN]->(room)
+                     WHERE member.id IN $presentUserIds | member
+                 ]) > 0 AS carriedOn
+          // Compared as datetimes, not as the stored strings: toString(datetime()) drops
+          // trailing zeros of the fraction, so the strings do not sort chronologically.
+          ORDER BY datetime(session.createdAt) DESC
+        `,
+        { groupId, livekitSid, presentUserIds },
+      )
+      if (open.records.length === 0) {
+        return null
+      }
+      const sessions = open.records
+        .map((record) => ({
+          id: record.get('id') as string | null,
+          carriedOn: record.get('carriedOn') === true,
+        }))
+        .filter(
+          (candidate): candidate is { id: string; carriedOn: boolean } => candidate.id !== null,
+        )
+      let sessionId = sessions.find((candidate) => candidate.carriedOn)?.id ?? null
+      const over = sessions.map((candidate) => candidate.id).filter((id) => id !== sessionId)
+      if (over.length > 0) {
+        await transaction.run(
+          `
+            MATCH (session:VideoCallSession)
+            WHERE session.id IN $ids
+            SET session.endedAt = toString(datetime())
+          `,
+          { ids: over },
+        )
+      }
+      if (!sessionId) {
+        const created = await transaction.run(
+          `
+            MATCH (group:Group { id: $groupId })
+            CREATE (room:Room { id: apoc.create.uuid(), createdAt: toString(datetime()) })
+            CREATE (session:VideoCallSession {
+              id: apoc.create.uuid(),
+              livekitRoom: $livekitRoom,
+              livekitSid: $livekitSid,
+              createdAt: toString(datetime())
+            })
+            CREATE (room)-[:ROOM_FOR]->(session)-[:CALL_IN]->(group)
+            RETURN session.id AS id
+          `,
+          { groupId, livekitRoom, livekitSid },
+        )
+        sessionId = created.records[0].get('id') as string
+      }
+      const joined = await transaction.run(
+        `
+          MATCH (room:Room)-[:ROOM_FOR]->(:VideoCallSession { id: $sessionId })
+          MATCH (user:User { id: $userId })
+          MERGE (user)-[:CHATS_IN]->(room)
+          RETURN room.id AS roomId
+        `,
+        { sessionId, userId },
+      )
+      return (joined.records[0]?.get('roomId') as string | undefined) ?? null
+    })
+  } finally {
+    await session.close()
+  }
+}
+
+/**
+ * Marks the sessions of that media-server room as over, which makes their chats read-only.
+ * By sid, so a report about one call can never end the next one in a room of the same name.
+ */
+export const endCallSession = async (driver: Driver, livekitSid: string): Promise<void> => {
+  const session = driver.session()
+  try {
+    await session.writeTransaction(async (transaction) =>
+      transaction.run(
+        `
+          MATCH (session:VideoCallSession { livekitSid: $livekitSid })
+          WHERE session.endedAt IS NULL
+          SET session.endedAt = toString(datetime())
+        `,
+        { livekitSid },
+      ),
+    )
+  } finally {
+    await session.close()
+  }
+}
+
+// A room missing from the media server's list says nothing about a session opened after the
+// list was taken — that one belongs to the room opened since. This is how long a session is
+// left alone for that reason: longer than a listing can take to arrive.
+export const MISSING_ROOM_GRACE_SECONDS = 30
+
+/**
+ * Marks the sessions running under that room NAME as over — for the case where all that is
+ * known is that no such room exists any more, and its sid with it. Sessions only just opened
+ * are spared (see MISSING_ROOM_GRACE_SECONDS).
+ *
+ * Returns whether that settles the room: true if no session is left running under the name,
+ * false if one was spared. The caller is to ask again then — by that time the session is
+ * either old enough to be ended, or its room has shown up in the list.
+ */
+export const endCallSessionsOfMissingRoom = async (
+  driver: Driver,
+  livekitRoom: string,
+): Promise<boolean> => {
+  const session = driver.session()
+  try {
+    const result = await session.writeTransaction(async (transaction) =>
+      transaction.run(
+        `
+          OPTIONAL MATCH (session:VideoCallSession { livekitRoom: $livekitRoom })
+            WHERE session.endedAt IS NULL
+          // Compared as datetimes, not as the stored strings: toString(datetime()) drops
+          // trailing zeros of the fraction, so the strings do not sort chronologically.
+          WITH session,
+               datetime(session.createdAt) <= datetime() - duration({ seconds: $graceSeconds }) AS due
+          FOREACH (ended IN CASE WHEN due THEN [session] ELSE [] END |
+            SET ended.endedAt = toString(datetime())
+          )
+          // Counts the sessions found running and not due; none found counts as none spared.
+          RETURN count(CASE WHEN session IS NOT NULL AND NOT due THEN 1 END) = 0 AS settled
+        `,
+        { livekitRoom, graceSeconds: MISSING_ROOM_GRACE_SECONDS },
+      ),
+    )
+    return result.records[0].get('settled') === true
+  } finally {
+    await session.close()
+  }
+}
+
+/**
+ * Takes the user out of every conference chat of that group's calls. Leaving a group ends the
+ * access to what was written in its calls, as it ends the access to the group's chat.
+ */
+export const removeUserFromGroupCallRooms = async (
+  transaction,
+  groupId: string,
+  userId: string,
+) => {
+  await transaction.run(
+    `
+      MATCH (:User { id: $userId })-[chatsIn:CHATS_IN]->(:Room)
+        -[:ROOM_FOR]->(:VideoCallSession)-[:CALL_IN]->(:Group { id: $groupId })
+      DELETE chatsIn
+    `,
+    { groupId, userId },
+  )
+}

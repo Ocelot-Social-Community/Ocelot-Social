@@ -85,12 +85,13 @@ const stubs = {
     template: '<button class="stub-button" @click="$emit(\'click\')"><slot /></button>',
   }),
   OsIcon: Stub('OsIcon'),
-  AvatarImage: Stub('AvatarImage'),
+  OsCounterIcon: Stub('OsCounterIcon', { props: ['count'] }),
+  CallChatTabs: Stub('CallChatTabs'),
+  RoomHeader: Stub('RoomHeader'),
   PreJoin: Stub('PreJoin'),
   DeviceSettings: Stub('DeviceSettings', { props: ['cameraStarting', 'micStarting'] }),
   VideoTile: Stub('VideoTile', { props: ['tile', 'cameraStarting', 'micStarting'] }),
   Chat: Stub('Chat'),
-  RoomTitleLink: Stub('RoomTitleLink'),
   ClientOnly: Stub('ClientOnly'),
 }
 
@@ -99,6 +100,9 @@ const buildStore = (state = {}) => {
   const close = jest.fn()
   const setStorePhase = jest.fn()
   const showChat = jest.fn()
+  const setChatRoomId = jest.fn()
+  const setConferenceUnread = jest.fn()
+  const setLastChatTab = jest.fn()
   return {
     store: new Vuex.Store({
       getters: {
@@ -108,6 +112,10 @@ const buildStore = (state = {}) => {
         'videoCall/groupName': () => state.groupName ?? null,
         'videoCall/groupSlug': () => state.groupSlug ?? null,
         'videoCall/groupAvatar': () => state.groupAvatar ?? null,
+        'videoCall/chatRoomId': () => state.chatRoomId ?? null,
+        'videoCall/conferenceUnread': () => state.conferenceUnread ?? 0,
+        'videoCall/groupChatUnread': () => state.groupChatUnread ?? 0,
+        'videoCall/lastChatTab': () => state.lastChatTab ?? 'call',
         'videoCall/reloadPending': () => state.reloadPending ?? false,
         'chat/showChat': () => state.chat ?? { showChat: false, chatUserId: null, groupId: null },
         'auth/user': () => state.user ?? { id: 'u1', name: 'Alice', avatar: { url: 'a.png' } },
@@ -117,12 +125,19 @@ const buildStore = (state = {}) => {
         'videoCall/CLOSE': close,
         'videoCall/SET_PHASE': setStorePhase,
         'videoCall/SET_PARTICIPANT_COUNT': jest.fn(),
+        'videoCall/SET_CHAT_ROOM_ID': setChatRoomId,
+        'videoCall/SET_CONFERENCE_UNREAD': setConferenceUnread,
+        'videoCall/SET_GROUP_CHAT_UNREAD': jest.fn(),
+        'videoCall/SET_LAST_CHAT_TAB': setLastChatTab,
         'chat/SET_OPEN_CHAT': showChat,
       },
     }),
     setMinimized,
     close,
     setStorePhase,
+    showChat,
+    setChatRoomId,
+    setLastChatTab,
   }
 }
 
@@ -295,9 +310,37 @@ describe('VideoCall', () => {
   })
 
   describe('toggleChat', () => {
-    it('opens chat for this group when not yet open', () => {
+    const { selectChatTab } = VideoCall.methods
+
+    it('opens the conference chat of the call when not yet open', () => {
       const setShowChat = jest.fn()
-      const ctx = { chatOpenForThisGroup: false, groupId: 'g1', setShowChat }
+      const ctx = {
+        chatOpenForThisCall: false,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        lastChatTab: 'call',
+        setShowChat,
+        selectChatTab,
+      }
+      VideoCall.methods.toggleChat.call(ctx)
+      expect(setShowChat).toHaveBeenCalledWith({
+        showChat: true,
+        chatUserId: null,
+        groupId: null,
+        roomId: 'room-1',
+      })
+    })
+
+    it('opens the chat that was looked at last', () => {
+      const setShowChat = jest.fn()
+      const ctx = {
+        chatOpenForThisCall: false,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        lastChatTab: 'group',
+        setShowChat,
+        selectChatTab,
+      }
       VideoCall.methods.toggleChat.call(ctx)
       expect(setShowChat).toHaveBeenCalledWith({
         showChat: true,
@@ -306,9 +349,27 @@ describe('VideoCall', () => {
       })
     })
 
-    it('closes chat when already open for this group', () => {
+    it('opens the chat of the group while the call has no conference chat', () => {
       const setShowChat = jest.fn()
-      const ctx = { chatOpenForThisGroup: true, groupId: 'g1', setShowChat }
+      const ctx = {
+        chatOpenForThisCall: false,
+        groupId: 'g1',
+        chatRoomId: null,
+        lastChatTab: 'call',
+        setShowChat,
+        selectChatTab,
+      }
+      VideoCall.methods.toggleChat.call(ctx)
+      expect(setShowChat).toHaveBeenCalledWith({
+        showChat: true,
+        chatUserId: null,
+        groupId: 'g1',
+      })
+    })
+
+    it('closes chat when already open for this call', () => {
+      const setShowChat = jest.fn()
+      const ctx = { chatOpenForThisCall: true, groupId: 'g1', setShowChat }
       VideoCall.methods.toggleChat.call(ctx)
       expect(setShowChat).toHaveBeenCalledWith({
         showChat: false,
@@ -2455,17 +2516,24 @@ describe('VideoCall', () => {
     const apolloResolving = () => ({
       mutate: jest.fn().mockResolvedValue({ data: { joinGroupVideoCall: payload } }),
     })
+    // Once connected, the call also asks for its conference chat — only the requests for a
+    // join token count here.
+    const tokenRequests = (apollo) =>
+      apollo.mutate.mock.calls.filter(
+        ([{ mutation }]) =>
+          mutation.definitions[0].selectionSet.selections[0].name.value === 'joinGroupVideoCall',
+      ).length
 
     it('asks for the token as soon as the dialog opens and joins with it', async () => {
       const apollo = apolloResolving()
       const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
       await flushPromises()
-      expect(apollo.mutate).toHaveBeenCalledTimes(1)
+      expect(tokenRequests(apollo)).toBe(1)
       expect(apollo.mutate.mock.calls[0][0].variables).toEqual({ groupId: 'g1' })
 
       await wrapper.vm.connect()
       // The click only opens the socket — no second round trip.
-      expect(apollo.mutate).toHaveBeenCalledTimes(1)
+      expect(tokenRequests(apollo)).toBe(1)
       expect(wrapper.vm.room.connect).toHaveBeenCalledWith('ws://lk', 'tok', expect.any(Object))
       expect(wrapper.vm.phase).toBe('in-call')
     })
@@ -2484,7 +2552,7 @@ describe('VideoCall', () => {
       await flushPromises()
       resolve({ data: { joinGroupVideoCall: payload } })
       await joining
-      expect(apollo.mutate).toHaveBeenCalledTimes(1)
+      expect(tokenRequests(apollo)).toBe(1)
       expect(wrapper.vm.phase).toBe('in-call')
     })
 
@@ -2496,7 +2564,7 @@ describe('VideoCall', () => {
         await flushPromises()
         now.mockReturnValue(1_000_000 + 60_000)
         await wrapper.vm.connect()
-        expect(apollo.mutate).toHaveBeenCalledTimes(2)
+        expect(tokenRequests(apollo)).toBe(2)
       } finally {
         now.mockRestore()
       }
@@ -2512,7 +2580,7 @@ describe('VideoCall', () => {
       const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
       await flushPromises()
       await wrapper.vm.connect()
-      expect(apollo.mutate).toHaveBeenCalledTimes(2)
+      expect(tokenRequests(apollo)).toBe(2)
       expect(wrapper.vm.error).toBe('join failed')
     })
 
@@ -2522,7 +2590,7 @@ describe('VideoCall', () => {
       await flushPromises()
       await wrapper.vm.connect()
       await wrapper.vm.retryConnect()
-      expect(apollo.mutate).toHaveBeenCalledTimes(2)
+      expect(tokenRequests(apollo)).toBe(2)
     })
 
     it('never hands out a token fetched for another group', async () => {
@@ -2530,7 +2598,7 @@ describe('VideoCall', () => {
       const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
       await flushPromises()
       await wrapper.vm.takeJoinPayload('g2')
-      expect(apollo.mutate).toHaveBeenCalledTimes(2)
+      expect(tokenRequests(apollo)).toBe(2)
       expect(apollo.mutate.mock.calls[1][0].variables).toEqual({ groupId: 'g2' })
     })
 
@@ -2965,13 +3033,509 @@ describe('VideoCall', () => {
   })
 
   describe('computed edge cases', () => {
-    it('chatOpenForThisGroup matches the active group chat', () => {
+    it('activeChatTab matches the active group chat', () => {
       const { wrapper } = factory({
         show: true,
         groupId: 'g1',
         chat: { showChat: true, chatUserId: null, groupId: 'g1' },
       })
-      expect(wrapper.vm.chatOpenForThisGroup).toBe(true)
+      expect(wrapper.vm.activeChatTab).toBe('group')
+      expect(wrapper.vm.chatOpenForThisCall).toBe(true)
+    })
+
+    it('activeChatTab matches the conference chat of the call', () => {
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        chat: { showChat: true, chatUserId: null, groupId: null, roomId: 'room-1' },
+      })
+      expect(wrapper.vm.activeChatTab).toBe('call')
+      expect(wrapper.vm.chatOpenForThisCall).toBe(true)
+    })
+
+    it('activeChatTab is null for a chat that is not of this call', () => {
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        chat: { showChat: true, chatUserId: null, groupId: 'g2', roomId: null },
+      })
+      expect(wrapper.vm.activeChatTab).toBeNull()
+      expect(wrapper.vm.chatOpenForThisCall).toBe(false)
+    })
+
+    it('chatButtonUnread is silent while the conference chat is on screen', () => {
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        conferenceUnread: 3,
+        chat: { showChat: true, chatUserId: null, groupId: null, roomId: 'room-1' },
+      })
+      expect(wrapper.vm.chatButtonUnread).toBe(0)
+    })
+
+    it('chatButtonUnread adds up both chats while neither is on screen', () => {
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        conferenceUnread: 3,
+        groupChatUnread: 4,
+      })
+      expect(wrapper.vm.chatButtonUnread).toBe(7)
+    })
+
+    it('chatButtonUnread leaves out the chat that is on screen', () => {
+      const unread = { conferenceUnread: 3, groupChatUnread: 4 }
+      const callOpen = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        ...unread,
+        chat: { showChat: true, chatUserId: null, groupId: null, roomId: 'room-1' },
+      })
+      expect(callOpen.wrapper.vm.chatButtonUnread).toBe(4)
+
+      const groupOpen = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        ...unread,
+        chat: { showChat: true, chatUserId: null, groupId: 'g1', roomId: null },
+      })
+      expect(groupOpen.wrapper.vm.chatButtonUnread).toBe(3)
+    })
+
+    it('chatButtonUnread shows the unread count while another chat or none is open', () => {
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        conferenceUnread: 3,
+      })
+      expect(wrapper.vm.chatButtonUnread).toBe(3)
+    })
+  })
+
+  describe('chat on a phone', () => {
+    const { computed } = VideoCall
+    const tile = (overrides) => ({ isLocal: false, isScreen: false, ...overrides })
+    const me = tile({ key: 'me', identity: 'me', isLocal: true })
+    const anna = tile({ key: 'anna', identity: 'anna' })
+    const ben = tile({ key: 'ben', identity: 'ben' })
+    const bensScreen = tile({ key: 'ben-screen', identity: 'ben', isScreen: true })
+
+    it('shows the chat inside the call on a phone as well', () => {
+      const ctx = { phase: 'in-call', chatOpenForThisCall: true, parked: false }
+      expect(computed.showChatSidebar.call(ctx)).toBe(true)
+      expect(computed.mobileChatOpen.call({ isMobile: true, showChatSidebar: true })).toBe(true)
+      expect(computed.mobileChatOpen.call({ isMobile: false, showChatSidebar: true })).toBe(false)
+      expect(computed.mobileChatOpen.call({ isMobile: true, showChatSidebar: false })).toBe(false)
+    })
+
+    it('drops the labels of the controls on a phone, but not their size', () => {
+      const phone = { parked: false, isMobile: true, phase: 'in-call' }
+      expect(computed.iconOnly.call(phone)).toBe(true)
+      expect(VideoCall.methods.iconOnlyTooltip.call(phone, 'Mute')).toBe('')
+    })
+
+    it('drops the labels in the parked window, and offers them as tooltips', () => {
+      const parkedWindow = { parked: true, isMobile: false, phase: 'in-call' }
+      expect(computed.iconOnly.call(parkedWindow)).toBe(true)
+      expect(VideoCall.methods.iconOnlyTooltip.call(parkedWindow, 'Mute')).toBe('Mute')
+    })
+
+    it('spells the controls out on a desktop with the call maximized', () => {
+      expect(computed.iconOnly.call({ parked: false, isMobile: false, phase: 'in-call' })).toBe(
+        false,
+      )
+    })
+
+    it('never parks the call on a phone', () => {
+      expect(computed.parked.call({ phase: 'in-call', minimized: true, isMobile: true })).toBe(
+        false,
+      )
+      expect(computed.parked.call({ phase: 'in-call', minimized: true, isMobile: false })).toBe(
+        true,
+      )
+    })
+
+    it('keeps the chat out of the parked window', () => {
+      const ctx = { phase: 'in-call', chatOpenForThisCall: true, parked: true }
+      expect(computed.showChatSidebar.call(ctx)).toBe(false)
+    })
+
+    it('shrinks the stage to a single tile beside the chat', () => {
+      expect(computed.singleTile.call({ isFullscreen: true, mobileChatOpen: true })).toBe(true)
+      expect(computed.singleTile.call({ isFullscreen: true, mobileChatOpen: false })).toBe(false)
+      expect(computed.singleTile.call({ isFullscreen: false, mobileChatOpen: false })).toBe(true)
+      expect(computed.stageLayoutClass.call({ singleTile: true, spotlightTile: anna })).toBe(
+        'video-call__single',
+      )
+      expect(computed.gridStyleConditional.call({ singleTile: true, gridStyle: {} })).toBeNull()
+    })
+
+    it('keeps the grid and the spotlight for the full stage', () => {
+      expect(computed.stageLayoutClass.call({ singleTile: false, spotlightTile: null })).toBe(
+        'video-call__grid',
+      )
+      expect(computed.stageLayoutClass.call({ singleTile: false, spotlightTile: anna })).toBe(
+        'video-call__stage--spotlight',
+      )
+    })
+
+    it('shows whoever spoke last, by their camera rather than their screen', () => {
+      const ctx = {
+        tiles: [me, anna, bensScreen, ben],
+        lastRemoteSpeakerId: 'ben',
+        primaryTile: anna,
+      }
+      expect(computed.speakerTile.call(ctx)).toBe(ben)
+    })
+
+    it('shows what the parked window would before anybody has spoken', () => {
+      const ctx = { tiles: [me, anna, ben], lastRemoteSpeakerId: null, primaryTile: anna }
+      expect(computed.speakerTile.call(ctx)).toBe(anna)
+    })
+
+    it('falls back when the last speaker has left', () => {
+      const ctx = { tiles: [me, anna], lastRemoteSpeakerId: 'ben', primaryTile: anna }
+      expect(computed.speakerTile.call(ctx)).toBe(anna)
+    })
+
+    it('picks the speaker beside the chat and the primary tile in the parked window', () => {
+      const ctx = { speakerTile: ben, primaryTile: anna }
+      expect(computed.soloTile.call({ ...ctx, mobileChatOpen: true })).toBe(ben)
+      expect(computed.soloTile.call({ ...ctx, mobileChatOpen: false })).toBe(anna)
+    })
+
+    it('remembers the remote participant heard last, not the user themselves', () => {
+      const ctx = { tiles: [me, anna, ben], lastRemoteSpeakerId: null }
+      VideoCall.watch.activeSpeakerIds.call(ctx, ['me'])
+      expect(ctx.lastRemoteSpeakerId).toBeNull()
+      VideoCall.watch.activeSpeakerIds.call(ctx, ['me', 'ben'])
+      expect(ctx.lastRemoteSpeakerId).toBe('ben')
+      // Silence does not take the face away.
+      VideoCall.watch.activeSpeakerIds.call(ctx, [])
+      expect(ctx.lastRemoteSpeakerId).toBe('ben')
+    })
+  })
+
+  describe('joinCallChat', () => {
+    const room = { name: 'the room' }
+    const context = (mutate, overrides = {}) => ({
+      groupId: 'g1',
+      room,
+      $apollo: { mutate },
+      setChatRoomId: jest.fn(),
+      joinCallChat: jest.fn(),
+      callChatRetryTimer: null,
+      cancelCallChatRetry: VideoCall.methods.cancelCallChatRetry,
+      ...overrides,
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it('stores the conference chat room the server returns', async () => {
+      const ctx = context(
+        jest.fn().mockResolvedValue({ data: { joinGroupVideoCallChat: 'room-1' } }),
+      )
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      expect(ctx.$apollo.mutate.mock.calls[0][0].variables).toEqual({ groupId: 'g1' })
+      expect(ctx.setChatRoomId).toHaveBeenCalledWith('room-1')
+    })
+
+    it('drops an answer for a call that has been left meanwhile', async () => {
+      const ctx = context(
+        jest.fn().mockResolvedValue({ data: { joinGroupVideoCallChat: 'room-1' } }),
+        { room: null },
+      )
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      expect(ctx.setChatRoomId).not.toHaveBeenCalled()
+    })
+
+    it('asks again after a failure, and gives up after the last attempt', async () => {
+      jest.useFakeTimers()
+      const ctx = context(jest.fn().mockRejectedValue(new Error('not in call yet')))
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      jest.runOnlyPendingTimers()
+      expect(ctx.joinCallChat).toHaveBeenCalledWith(room, 2)
+
+      ctx.joinCallChat.mockClear()
+      await VideoCall.methods.joinCallChat.call(ctx, room, 3)
+      jest.runOnlyPendingTimers()
+      expect(ctx.joinCallChat).not.toHaveBeenCalled()
+      expect(ctx.setChatRoomId).not.toHaveBeenCalled()
+    })
+
+    it('does not ask again once the retry has been called off', async () => {
+      jest.useFakeTimers()
+      const ctx = context(jest.fn().mockRejectedValue(new Error('not in call yet')))
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      expect(ctx.callChatRetryTimer).not.toBeNull()
+
+      VideoCall.methods.cancelCallChatRetry.call(ctx)
+      jest.runOnlyPendingTimers()
+
+      expect(ctx.callChatRetryTimer).toBeNull()
+      expect(ctx.joinCallChat).not.toHaveBeenCalled()
+    })
+
+    it('keeps one retry pending, not one per failure', async () => {
+      jest.useFakeTimers()
+      const ctx = context(jest.fn().mockRejectedValue(new Error('not in call yet')))
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      jest.runOnlyPendingTimers()
+
+      expect(ctx.joinCallChat).toHaveBeenCalledTimes(1)
+    })
+
+    it('calls a pending retry off when the call is left, before hanging up', async () => {
+      jest.useFakeTimers()
+      const { wrapper } = factory({ show: false })
+      const retry = jest.fn()
+      wrapper.vm.callChatRetryTimer = setTimeout(retry, 2000)
+      // Hanging up takes a moment; the retry must be gone before that moment begins.
+      let pendingWhileHangingUp
+      wrapper.vm.room = {
+        localParticipant: null,
+        disconnect: jest.fn(async () => {
+          pendingWhileHangingUp = wrapper.vm.callChatRetryTimer
+        }),
+      }
+
+      await wrapper.vm.cleanup()
+      jest.runOnlyPendingTimers()
+
+      expect(pendingWhileHangingUp).toBeNull()
+      expect(retry).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('conference chat', () => {
+    const subscription = () => {
+      const handlers = {}
+      const unsubscribe = jest.fn()
+      const $apollo = {
+        subscribe: jest.fn(() => ({
+          subscribe: (given) => {
+            Object.assign(handlers, given)
+            return { unsubscribe }
+          },
+        })),
+      }
+      return { handlers, unsubscribe, $apollo }
+    }
+
+    it('listens for the length of the call, and stops when told to', () => {
+      const { handlers, unsubscribe, $apollo } = subscription()
+      const ctx = { callChatsSub: null, onCallChatUpdated: jest.fn(), $apollo }
+      VideoCall.methods.watchCallChats.call(ctx, true)
+      handlers.next({ data: { roomUpdated: { id: 'room-1', unreadCount: 2 } } })
+      expect(ctx.onCallChatUpdated).toHaveBeenCalledWith({ id: 'room-1', unreadCount: 2 })
+
+      VideoCall.methods.watchCallChats.call(ctx, false)
+      expect(unsubscribe).toHaveBeenCalled()
+      expect(ctx.callChatsSub).toBeNull()
+    })
+
+    it('leaves the call alone when listening cannot be set up', () => {
+      const ctx = {
+        callChatsSub: null,
+        $apollo: {
+          subscribe: () => {
+            throw new Error('no socket')
+          },
+        },
+      }
+      expect(() => VideoCall.methods.watchCallChats.call(ctx, true)).not.toThrow()
+      expect(ctx.callChatsSub).toBeNull()
+    })
+
+    describe('unread counts of the two chats', () => {
+      const context = (overrides = {}) => ({
+        chatRoomId: 'room-1',
+        groupChatRoomId: 'group-room',
+        setConferenceUnread: jest.fn(),
+        setGroupChatUnread: jest.fn(),
+        loadGroupChatUnread: jest.fn(),
+        ...overrides,
+      })
+      const update = (ctx, room) => VideoCall.methods.onCallChatUpdated.call(ctx, room)
+
+      it('counts the conference chat by its room', () => {
+        const ctx = context()
+        update(ctx, { id: 'room-1', unreadCount: 2 })
+        expect(ctx.setConferenceUnread).toHaveBeenCalledWith(2)
+        expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+      })
+
+      it('counts the chat of the group by its room', () => {
+        const ctx = context()
+        update(ctx, { id: 'group-room', unreadCount: 5 })
+        expect(ctx.setGroupChatUnread).toHaveBeenCalledWith(5)
+        expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
+      })
+
+      it('leaves every other room alone', () => {
+        const ctx = context()
+        update(ctx, { id: 'another-room', unreadCount: 7 })
+        update(ctx, null)
+        expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
+        expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+        expect(ctx.loadGroupChatUnread).not.toHaveBeenCalled()
+      })
+
+      it('asks for the room of the group while it is not known yet', () => {
+        const ctx = context({ groupChatRoomId: null })
+        update(ctx, { id: 'maybe-the-new-group-room', unreadCount: 1 })
+        expect(ctx.loadGroupChatUnread).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('loading the chat of the group', () => {
+      const context = (query, overrides = {}) => ({
+        groupId: 'g1',
+        phase: 'in-call',
+        groupChatRoomId: null,
+        $apollo: { query },
+        setGroupChatUnread: jest.fn(),
+        ...overrides,
+      })
+      const load = (ctx) => VideoCall.methods.loadGroupChatUnread.call(ctx)
+
+      it('takes the room and what is unread in it', async () => {
+        const ctx = context(
+          jest.fn().mockResolvedValue({ data: { Room: [{ id: 'group-room', unreadCount: 4 }] } }),
+        )
+        await load(ctx)
+        expect(ctx.$apollo.query.mock.calls[0][0].variables).toEqual({ groupId: 'g1' })
+        expect(ctx.groupChatRoomId).toBe('group-room')
+        expect(ctx.setGroupChatUnread).toHaveBeenCalledWith(4)
+      })
+
+      it('counts nothing for a group that has no chat room yet', async () => {
+        const ctx = context(jest.fn().mockResolvedValue({ data: { Room: [] } }))
+        await load(ctx)
+        expect(ctx.groupChatRoomId).toBeNull()
+        expect(ctx.setGroupChatUnread).toHaveBeenCalledWith(0)
+      })
+
+      it('drops an answer that arrives after the call was left', async () => {
+        const ctx = context(
+          jest.fn().mockResolvedValue({ data: { Room: [{ id: 'group-room', unreadCount: 4 }] } }),
+          { phase: 'prejoin' },
+        )
+        await load(ctx)
+        expect(ctx.groupChatRoomId).toBeNull()
+        expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+      })
+
+      it('goes without a count when the request fails', async () => {
+        const ctx = context(jest.fn().mockRejectedValue(new Error('offline')))
+        await expect(load(ctx)).resolves.toBeUndefined()
+        expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('hint above the chat', () => {
+      const hintFor = (activeChatTab) =>
+        VideoCall.computed.chatHint.call({ activeChatTab, $t: (key) => key })
+
+      it('says what the chat on screen is, as its tab does', () => {
+        expect(hintFor('call')).toBe('videoCall.chatTabs.callHint')
+        expect(hintFor('group')).toBe('videoCall.chatTabs.groupHint')
+      })
+
+      it('has nothing to say while neither of the call chats is open', () => {
+        expect(hintFor(null)).toBeNull()
+      })
+    })
+
+    describe('whether the conference chat is empty', () => {
+      it('takes what the conference chat reports, and nothing the group chat does', () => {
+        const ctx = { activeChatTab: 'call', callChatEmpty: false }
+        VideoCall.methods.onChatEmptyChange.call(ctx, true)
+        expect(ctx.callChatEmpty).toBe(true)
+
+        const group = { activeChatTab: 'group', callChatEmpty: false }
+        VideoCall.methods.onChatEmptyChange.call(group, true)
+        expect(group.callChatEmpty).toBe(false)
+      })
+
+      it('forgets it when another chat comes on screen', () => {
+        const ctx = { callChatEmpty: true, chatRoomId: 'room-1', setLastChatTab: jest.fn() }
+        VideoCall.watch.activeChatTab.call(ctx, 'group', 'call')
+        expect(ctx.callChatEmpty).toBe(false)
+      })
+    })
+
+    describe('remembering the tab', () => {
+      const remember = (ctx, tab) => VideoCall.watch.activeChatTab.call(ctx, tab)
+
+      it('notes the tab that is looked at', () => {
+        const ctx = { chatRoomId: 'room-1', setLastChatTab: jest.fn() }
+        remember(ctx, 'group')
+        expect(ctx.setLastChatTab).toHaveBeenCalledWith('group')
+      })
+
+      it('keeps what it has when the chat is closed', () => {
+        const ctx = { chatRoomId: 'room-1', setLastChatTab: jest.fn() }
+        remember(ctx, null)
+        expect(ctx.setLastChatTab).not.toHaveBeenCalled()
+      })
+
+      it('does not take the chat of the group for a choice while it is the only one', () => {
+        const ctx = { chatRoomId: null, setLastChatTab: jest.fn() }
+        remember(ctx, 'group')
+        expect(ctx.setLastChatTab).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('export from the tab row', () => {
+      it('has the chat export its room, and shows it is busy meanwhile', async () => {
+        let finish
+        const exportRoom = jest.fn(() => new Promise((resolve) => (finish = resolve)))
+        const ctx = { chatExporting: false, $refs: { inCallChat: { exportRoom } } }
+        const exporting = VideoCall.methods.exportCallChat.call(ctx)
+        expect(exportRoom).toHaveBeenCalledTimes(1)
+        expect(ctx.chatExporting).toBe(true)
+        finish()
+        await exporting
+        expect(ctx.chatExporting).toBe(false)
+      })
+
+      it('does not start a second export on top of a running one', async () => {
+        const exportRoom = jest.fn()
+        const ctx = { chatExporting: true, $refs: { inCallChat: { exportRoom } } }
+        await VideoCall.methods.exportCallChat.call(ctx)
+        expect(exportRoom).not.toHaveBeenCalled()
+      })
+
+      it('is ready again after an export that failed', async () => {
+        const exportRoom = jest.fn().mockRejectedValue(new Error('offline'))
+        const ctx = { chatExporting: false, $refs: { inCallChat: { exportRoom } } }
+        await expect(VideoCall.methods.exportCallChat.call(ctx)).rejects.toThrow('offline')
+        expect(ctx.chatExporting).toBe(false)
+      })
+    })
+
+    it('selectChatTab opens the chat of the group for the group tab', () => {
+      const setShowChat = jest.fn()
+      VideoCall.methods.selectChatTab.call(
+        { groupId: 'g1', chatRoomId: 'room-1', setShowChat },
+        'group',
+      )
+      expect(setShowChat).toHaveBeenCalledWith({
+        showChat: true,
+        chatUserId: null,
+        groupId: 'g1',
+      })
     })
 
     it('onCallRoute reflects the call route name', () => {

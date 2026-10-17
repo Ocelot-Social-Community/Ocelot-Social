@@ -8,56 +8,52 @@
       :aria-label="$t('videoCall.dialogLabel')"
       @click.stop
     >
-      <div class="video-call__header">
-        <div class="video-call__header-info">
-          <avatar-image :profile="groupProfile" size="small" class="video-call__avatar" />
-          <room-title-link
-            :name="titleLabel"
-            :to="groupRoute"
-            :show-group-icon="!!groupId"
-            :aria-label="$t('videoCall.gotoGroup', { name: groupName || $t('videoCall.title') })"
-            @click="onGroupLinkClick"
-          />
-        </div>
-        <div class="video-call__header-right">
-          <span
-            v-if="phase === 'in-call'"
-            class="video-call__count"
-            data-test="video-call-participants"
+      <room-header
+        class="video-call__header"
+        :profile="groupProfile"
+        :title="titleLabel"
+        :to="groupRoute"
+        :show-group-icon="!!groupId"
+        :aria-label="$t('videoCall.gotoGroup', { name: groupName || $t('videoCall.title') })"
+        @title-click="onGroupLinkClick"
+      >
+        <span
+          v-if="phase === 'in-call'"
+          class="video-call__count"
+          data-test="video-call-participants"
+        >
+          {{ uniqueParticipantCount }}
+        </span>
+        <div class="video-call__header-actions">
+          <os-button
+            v-if="canMinimize && phase === 'in-call'"
+            v-tooltip="minimizeLabel"
+            variant="primary"
+            appearance="outline"
+            size="sm"
+            circle
+            :aria-label="minimizeLabel"
+            @click="toggleMinimize"
           >
-            {{ uniqueParticipantCount }}
-          </span>
-          <div class="video-call__header-actions">
-            <os-button
-              v-if="canMinimize && phase === 'in-call'"
-              v-tooltip="minimizeLabel"
-              variant="primary"
-              appearance="outline"
-              size="sm"
-              circle
-              :aria-label="minimizeLabel"
-              @click="toggleMinimize"
-            >
-              <template #icon>
-                <os-icon :icon="minimized ? icons.expand : icons.minus" />
-              </template>
-            </os-button>
-            <os-button
-              v-tooltip="closeLabel"
-              variant="danger"
-              appearance="outline"
-              size="sm"
-              circle
-              :aria-label="closeLabel"
-              @click="leave"
-            >
-              <template #icon>
-                <os-icon :icon="icons.close" />
-              </template>
-            </os-button>
-          </div>
+            <template #icon>
+              <os-icon :icon="minimized ? icons.expand : icons.minus" />
+            </template>
+          </os-button>
+          <os-button
+            v-tooltip="closeLabel"
+            variant="danger"
+            appearance="outline"
+            size="sm"
+            circle
+            :aria-label="closeLabel"
+            @click="leave"
+          >
+            <template #icon>
+              <os-icon :icon="icons.close" />
+            </template>
+          </os-button>
         </div>
-      </div>
+      </room-header>
 
       <pre-join v-if="phase === 'prejoin'" @join="onPreJoinReady" @cancel="leave" />
 
@@ -78,7 +74,7 @@
         </div>
       </div>
 
-      <div v-else class="video-call__body">
+      <div v-else :class="['video-call__body', { 'video-call__body--chat-below': mobileChatOpen }]">
         <div v-if="phase === 'connecting'" class="video-call__status">
           {{ $t('videoCall.connecting') }}
         </div>
@@ -152,7 +148,7 @@
             </div>
           </div>
           <div
-            v-if="isFullscreen && activeSpeakers.length"
+            v-if="isFullscreen && !mobileChatOpen && activeSpeakers.length"
             class="video-call__speakers"
             :aria-label="$t('videoCall.activeSpeakers')"
           >
@@ -189,9 +185,9 @@
               :camera-starting="isOwnCameraTile(tile) && devicesStarting.videoinput > 0"
               :mic-starting="isOwnCameraTile(tile) && devicesStarting.audioinput > 0"
               :avatar-size="tileAvatarSize(tile)"
-              :clickable="isFullscreen"
+              :clickable="isFullscreen && !mobileChatOpen"
               :class="{
-                'video-tile--hidden': !isFullscreen && primaryTile && tile.key !== primaryTile.key,
+                'video-tile--hidden': singleTile && soloTile && tile.key !== soloTile.key,
                 'video-tile--spotlighted': !!(spotlightTile && tile.key === spotlightTile.key),
               }"
               @select="onTileSelect"
@@ -202,8 +198,57 @@
             class="video-call__sidebar"
             :aria-label="$t('videoCall.openChat')"
           >
+            <!--
+              Two chats in a call: the conference chat only its participants share,
+              and the group's own, which reaches every member. The choice is offered
+              once the server has confirmed the participation — until then, and if
+              it never does, the sidebar is the group's chat as it always was.
+            -->
+            <!--
+              The chat brings no header of its own here (hideHeader): group and
+              avatar are in the call's header right above, and which chat it is the
+              tabs say. What its header offered besides sits at the end of this row.
+            -->
+            <div class="video-call__chat-tabs">
+              <call-chat-tabs
+                v-if="chatRoomId"
+                exportable
+                :exporting="chatExporting"
+                :exportEmpty="callChatEmpty"
+                @export="exportCallChat"
+              />
+              <div class="video-call__chat-actions">
+                <os-button
+                  data-test="video-call-close-chat"
+                  variant="primary"
+                  appearance="outline"
+                  circle
+                  size="sm"
+                  :aria-label="$t('chat.closeChat')"
+                  :title="$t('chat.closeChat')"
+                  @click="closeInCallChat"
+                >
+                  <template #icon>
+                    <os-icon :icon="icons.close" />
+                  </template>
+                </os-button>
+              </div>
+            </div>
             <client-only>
-              <chat singleRoom fitParent :groupId="groupId" @close-single-room="closeInCallChat" />
+              <chat
+                ref="inCallChat"
+                :key="activeChatTab"
+                singleRoom
+                fitParent
+                hideHeader
+                :groupId="activeChatTab === 'group' ? groupId : null"
+                :roomId="activeChatTab === 'call' ? chatRoomId : null"
+                :hint="chatHint"
+                @empty-change="onChatEmptyChange"
+                :hintKey="activeChatTab ? 'call-chat-' + activeChatTab : null"
+                :autoFocus="!isMobile"
+                @close-single-room="closeInCallChat"
+              />
             </client-only>
           </aside>
         </template>
@@ -221,7 +266,7 @@
           v-tooltip="deviceTooltip(micLabel, [deviceNames.mic])"
           :variant="micEnabled ? 'default' : 'danger'"
           appearance="outline"
-          :size="iconOnly ? 'sm' : 'md'"
+          :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           :aria-label="micLabel"
           :loading="devicesStarting.audioinput > 0"
@@ -238,14 +283,14 @@
           v-tooltip="deviceTooltip(cameraLabel, [deviceNames.camera])"
           :variant="cameraEnabled ? 'default' : 'danger'"
           appearance="outline"
-          :size="iconOnly ? 'sm' : 'md'"
+          :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           :aria-label="cameraLabel"
           :loading="devicesStarting.videoinput > 0"
           @click="toggleCamera"
         >
           <template #icon>
-            <os-icon :icon="icons.videoCamera" />
+            <os-icon :icon="cameraEnabled ? icons.videoCamera : icons.videoCameraSlash" />
           </template>
           <template v-if="!iconOnly">
             {{ cameraLabel }}
@@ -256,7 +301,7 @@
           v-tooltip="iconOnlyTooltip(screenShareLabel)"
           :variant="screenShareEnabled ? 'primary' : 'default'"
           appearance="outline"
-          :size="iconOnly ? 'sm' : 'md'"
+          :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           :aria-label="screenShareLabel"
           @click="toggleScreenShare"
@@ -280,7 +325,7 @@
             data-test="video-call-device-settings-toggle"
             :variant="showDeviceSettings ? 'primary' : 'default'"
             appearance="outline"
-            :size="iconOnly ? 'sm' : 'md'"
+            :size="parked ? 'sm' : 'md'"
             :circle="iconOnly"
             :aria-label="deviceSettingsLabel"
             :aria-expanded="showDeviceSettings.toString()"
@@ -307,17 +352,16 @@
           />
         </div>
         <os-button
-          v-if="!isMobile"
           v-tooltip="iconOnlyTooltip(chatLabel)"
-          :variant="chatOpenForThisGroup ? 'primary' : 'default'"
+          :variant="chatOpenForThisCall ? 'primary' : 'default'"
           appearance="outline"
-          :size="iconOnly ? 'sm' : 'md'"
+          :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           :aria-label="chatLabel"
           @click="toggleChat"
         >
           <template #icon>
-            <os-icon :icon="icons.chatBubble" />
+            <os-counter-icon :icon="icons.chatBubble" :count="chatButtonUnread" danger />
           </template>
           <template v-if="!iconOnly">
             {{ chatLabel }}
@@ -327,7 +371,7 @@
           v-tooltip="iconOnlyTooltip(leaveLabel)"
           variant="danger"
           appearance="filled"
-          :size="iconOnly ? 'sm' : 'md'"
+          :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           class="video-call__leave"
           :aria-label="leaveLabel"
@@ -347,13 +391,15 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCounterIcon, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import mobile from '~/mixins/mobile'
-import { joinGroupVideoCallMutation } from '~/graphql/VideoCalls'
+import { joinGroupVideoCallMutation, joinGroupVideoCallChatMutation } from '~/graphql/VideoCalls'
+import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import Chat from '~/components/Chat/Chat.vue'
-import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
-import RoomTitleLink from '~/components/_new/generic/RoomTitleLink/RoomTitleLink'
+import CallChatTabs from '~/components/VideoCall/CallChatTabs.vue'
+import { activeCallChatTab, callChatTarget } from '~/components/VideoCall/callChat'
+import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 import DeviceSettings from './DeviceSettings.vue'
@@ -371,6 +417,9 @@ const SPEAKER_HOLD_MS = 1500
 // would carry that decision past the moment it was true. Older ones are
 // fetched anew on join; the preloaded client library still saves its share.
 const PREFETCHED_TOKEN_MAX_AGE_MS = 60000
+// Asking for the call's conference chat: how often, and how long between two attempts.
+const CALL_CHAT_JOIN_ATTEMPTS = 3
+const CALL_CHAT_JOIN_RETRY_MS = 2000
 
 // LiveKit rates every participant's connection several times a minute. Videos
 // are paused once ours stays weak this long, and come back only after it has
@@ -409,10 +458,11 @@ export default {
     PreJoin,
     DeviceSettings,
     OsButton,
+    OsCounterIcon,
     OsIcon,
+    CallChatTabs,
     Chat,
-    AvatarImage,
-    RoomTitleLink,
+    RoomHeader,
   },
   mixins: [mobile()],
   data() {
@@ -455,6 +505,12 @@ export default {
       // What the level meter in the device settings listens to: the very
       // microphone track the others hear.
       micMeterStream: null,
+      chatExporting: false,
+      // Whether the conference chat on screen is known to hold no message (see Chat.vue).
+      callChatEmpty: false,
+      // The remote participant heard last. Whoever spoke stays on screen next to
+      // the chat on a phone until somebody else speaks (see speakerTile).
+      lastRemoteSpeakerId: null,
     }
   },
   computed: {
@@ -465,6 +521,10 @@ export default {
       groupName: 'videoCall/groupName',
       groupSlug: 'videoCall/groupSlug',
       groupAvatar: 'videoCall/groupAvatar',
+      chatRoomId: 'videoCall/chatRoomId',
+      conferenceUnread: 'videoCall/conferenceUnread',
+      groupChatUnread: 'videoCall/groupChatUnread',
+      lastChatTab: 'videoCall/lastChatTab',
       reloadPending: 'videoCall/reloadPending',
       getShowChat: 'chat/showChat',
       currentUser: 'auth/user',
@@ -476,19 +536,55 @@ export default {
         avatar: this.groupAvatar,
       }
     },
-    chatOpenForThisGroup() {
-      return !!(
-        this.getShowChat &&
-        this.getShowChat.showChat &&
-        this.getShowChat.groupId === this.groupId
-      )
+    // Which of the call's two chats is open, if any: 'call' is the conference chat
+    // only the participants share, 'group' the group's own.
+    activeChatTab() {
+      return activeCallChatTab(this.getShowChat, this)
+    },
+    chatOpenForThisCall() {
+      return this.activeChatTab !== null
     },
     showChatSidebar() {
       // Embedded in the maximized call view. In the minimized/parked state the
-      // chat continues to live in the chat-modul (layouts/default.vue).
-      return (
-        this.phase === 'in-call' && this.chatOpenForThisGroup && !this.iconOnly && !this.isMobile
+      // chat continues to live in the chat-modul (layouts/default.vue). On a
+      // phone the call is always full screen and the chat takes the place below
+      // a single small tile (see mobileChatOpen).
+      return this.phase === 'in-call' && this.chatOpenForThisCall && !this.parked
+    },
+    // On a phone there is no room for the chat beside the videos: it goes below,
+    // and the stage shrinks to one small tile, the person speaking.
+    mobileChatOpen() {
+      return this.isMobile && this.showChatSidebar
+    },
+    // Whether the stage shows one tile only: in the parked window, and next to the
+    // chat on a phone. The others stay mounted, so their sound keeps playing.
+    singleTile() {
+      return !this.isFullscreen || this.mobileChatOpen
+    },
+    soloTile() {
+      return this.mobileChatOpen ? this.speakerTile : this.primaryTile
+    },
+    speakerTile() {
+      // The camera of whoever spoke last — a face to go with the voice while one
+      // reads and writes. Before anybody has spoken, what the parked window shows.
+      const speaker = this.tiles.find(
+        (t) => t.identity === this.lastRemoteSpeakerId && !t.isScreen && !t.isLocal,
       )
+      return speaker || this.primaryTile
+    },
+    // What the chat on screen is, said once above its messages: who reads along, and
+    // whether it notifies — the same as the hint on its tab.
+    chatHint() {
+      if (this.activeChatTab === 'call') return this.$t('videoCall.chatTabs.callHint')
+      if (this.activeChatTab === 'group') return this.$t('videoCall.chatTabs.groupHint')
+      return null
+    },
+    chatButtonUnread() {
+      // Both of the call's chats, added up — less the one on screen, which has nothing
+      // left to point at.
+      const call = this.activeChatTab === 'call' ? 0 : this.conferenceUnread
+      const group = this.activeChatTab === 'group' ? 0 : this.groupChatUnread
+      return call + group
     },
     micLabel() {
       return this.micEnabled ? this.$t('videoCall.muteMic') : this.$t('videoCall.unmuteMic')
@@ -534,7 +630,7 @@ export default {
       return this.deviceTooltip(this.deviceSettingsLabel, details)
     },
     chatLabel() {
-      return this.chatOpenForThisGroup
+      return this.chatOpenForThisCall
         ? this.$t('videoCall.closeChat')
         : this.$t('videoCall.openChat')
     },
@@ -581,10 +677,18 @@ export default {
     onCallRoute() {
       return this.$route.name === 'call-id-slug'
     },
-    iconOnly() {
-      // Compact icon-only buttons only when the call is parked in the corner
-      // during an active call — not during the prejoin modal.
+    parked() {
+      // The call sits in the corner as a small window: during an active call —
+      // not during the prejoin modal — and never on a phone, where the call is
+      // always full screen.
       return this.phase === 'in-call' && this.minimized && !this.isMobile
+    },
+    iconOnly() {
+      // Buttons without their label where there is no room for it: in the parked
+      // window, and on a phone, where six spelled-out controls fill half the
+      // screen. In the parked window they are small as well (see `parked`); on a
+      // phone they keep the size a finger needs.
+      return this.parked || (this.isMobile && this.phase === 'in-call')
     },
     uniqueParticipantCount() {
       // A single participant publishing both camera and screen share still counts
@@ -612,13 +716,14 @@ export default {
       return this.tiles.find((t) => t.key === this.spotlightKey) || null
     },
     stageLayoutClass() {
-      if (this.spotlightTile && this.isFullscreen) return 'video-call__stage--spotlight'
-      return this.isFullscreen ? 'video-call__grid' : 'video-call__single'
+      if (this.singleTile) return 'video-call__single'
+      return this.spotlightTile ? 'video-call__stage--spotlight' : 'video-call__grid'
     },
     gridStyleConditional() {
       // The grid template only applies for the regular grid view. Spotlight
-      // and single (minimized) modes have their own static layouts.
-      if (this.spotlightTile || !this.isFullscreen) return null
+      // and single (minimized, or beside the chat on a phone) modes have their
+      // own static layouts.
+      if (this.spotlightTile || this.singleTile) return null
       return this.gridStyle
     },
     screenShareSupported() {
@@ -718,6 +823,27 @@ export default {
         this.setStorePhase(next || 'idle')
       },
     },
+    activeSpeakerIds(ids) {
+      const remote = ids.find((id) => this.tiles.some((t) => t.identity === id && !t.isLocal))
+      if (remote) this.lastRemoteSpeakerId = remote
+    },
+    // Where the chat button opens next time: the tab looked at last. Only while there is
+    // a choice — without a conference chat the group's is all there is, which says nothing
+    // about what the user would pick.
+    activeChatTab(tab, previous) {
+      // Another chat on screen: what was known of the conference chat's messages is the
+      // instance's that is gone; the new one reports again.
+      if (tab !== previous) this.callChatEmpty = false
+      if (tab && this.chatRoomId) this.setLastChatTab(tab)
+    },
+    chatRoomId(next, previous) {
+      // An open conference chat follows the call: to the room of the call the
+      // client is in now (it can change when a lost connection comes back into a
+      // call opened anew), and away with it when the call is left.
+      if (previous && this.getShowChat.showChat && this.getShowChat.roomId === previous) {
+        this.setShowChat({ showChat: !!next, chatUserId: null, groupId: null, roomId: next })
+      }
+    },
     tiles(newTiles) {
       // Clear the spotlight if the pinned tile no longer exists (participant
       // left, camera toggled and the key changed from cam→audio etc.).
@@ -768,6 +894,9 @@ export default {
     this.qualityClass = null
     this.leaving = false
     this.deviceSwitches = this.newDeviceSwitches()
+    this.callChatsSub = null
+    this.groupChatRoomId = null
+    this.callChatRetryTimer = null
   },
   mounted() {
     this.observeStage()
@@ -783,6 +912,7 @@ export default {
     this.disconnectStageObserver()
     this.closeDeviceSettings()
     this.cleanup()
+    this.watchCallChats(false)
   },
   methods: {
     ...mapMutations({
@@ -790,6 +920,10 @@ export default {
       close: 'videoCall/CLOSE',
       setParticipantCount: 'videoCall/SET_PARTICIPANT_COUNT',
       setStorePhase: 'videoCall/SET_PHASE',
+      setChatRoomId: 'videoCall/SET_CHAT_ROOM_ID',
+      setConferenceUnread: 'videoCall/SET_CONFERENCE_UNREAD',
+      setGroupChatUnread: 'videoCall/SET_GROUP_CHAT_UNREAD',
+      setLastChatTab: 'videoCall/SET_LAST_CHAT_TAB',
       setShowChat: 'chat/SET_OPEN_CHAT',
     }),
     observeStage() {
@@ -861,17 +995,125 @@ export default {
       }
     },
     toggleChat() {
-      if (this.chatOpenForThisGroup) {
+      if (this.chatOpenForThisCall) {
         this.setShowChat({ showChat: false, chatUserId: null, groupId: null })
         return
       }
-      this.setShowChat({ showChat: true, chatUserId: null, groupId: this.groupId })
+      // Where it was left: the tab looked at last, which starts out as the call's own
+      // chat — the one that disturbs nobody outside the call. Without a conference chat
+      // (see joinCallChat) either choice opens the group's chat.
+      this.selectChatTab(this.lastChatTab)
       // Chat renders inside the call sidebar when maximized, or in the
       // chat-modul (layouts/default.vue) when the call is parked. Either
       // way no navigation is needed.
     },
     closeInCallChat() {
       this.setShowChat({ showChat: false, chatUserId: null, groupId: null })
+    },
+    // The export is the chat's own doing (it knows the room and fetches every message);
+    // only its button sits here, in the tab row.
+    async exportCallChat() {
+      const chat = this.$refs.inCallChat
+      if (!chat || this.chatExporting) return
+      this.chatExporting = true
+      try {
+        await chat.exportRoom()
+      } finally {
+        this.chatExporting = false
+      }
+    },
+    onChatEmptyChange(empty) {
+      // Only the conference chat's emptiness bears on its download.
+      if (this.activeChatTab === 'call') this.callChatEmpty = empty
+    },
+    selectChatTab(tab) {
+      this.setShowChat(callChatTarget(tab, this))
+    },
+    // The conference chat is for those IN the call, so the server is asked for it
+    // only now that the client is connected — it checks that with the media
+    // server. A failure costs the conference chat, never the call: the chat
+    // button then opens the group's chat, as it did before there was another.
+    async joinCallChat(room, attempt = 1) {
+      const groupId = this.groupId
+      try {
+        const { data } = await this.$apollo.mutate({
+          mutation: joinGroupVideoCallChatMutation(),
+          variables: { groupId },
+        })
+        // The call may have been left, or swapped for another, in the meantime.
+        if (this.room !== room || this.groupId !== groupId) return
+        this.setChatRoomId((data && data.joinGroupVideoCallChat) || null)
+      } catch (_e) {
+        if (this.room !== room || this.groupId !== groupId) return
+        // The media server can take a moment to list a participant it just let in.
+        if (attempt < CALL_CHAT_JOIN_ATTEMPTS) {
+          // Kept, so leaving the call can call it off (see cleanup): hanging up takes a
+          // moment during which `this.room` is still the room, and a retry due just then
+          // would ask for the chat of a call that is being left.
+          this.cancelCallChatRetry()
+          this.callChatRetryTimer = setTimeout(() => {
+            this.callChatRetryTimer = null
+            if (this.room === room) this.joinCallChat(room, attempt + 1)
+          }, CALL_CHAT_JOIN_RETRY_MS)
+        }
+      }
+    },
+    cancelCallChatRetry() {
+      if (!this.callChatRetryTimer) return
+      clearTimeout(this.callChatRetryTimer)
+      this.callChatRetryTimer = null
+    },
+    // The unread counts of the call's two chats, for their tabs: one subscription for the
+    // length of the call, sorted by room below.
+    watchCallChats(active) {
+      if (this.callChatsSub) {
+        this.callChatsSub.unsubscribe()
+        this.callChatsSub = null
+      }
+      if (!active) return
+      // The counts are a convenience: whatever goes wrong here, at once or later, must not
+      // touch the call this runs in. The chat itself reports its own errors.
+      try {
+        this.callChatsSub = this.$apollo
+          .subscribe({ query: roomUpdated(), fetchPolicy: 'no-cache' })
+          .subscribe({
+            next: ({ data }) => this.onCallChatUpdated(data && data.roomUpdated),
+            error: () => {},
+          })
+      } catch (_e) {
+        this.callChatsSub = null
+      }
+    },
+    onCallChatUpdated(room) {
+      if (!room) return
+      if (this.chatRoomId && room.id === this.chatRoomId) {
+        this.setConferenceUnread(room.unreadCount)
+      } else if (this.groupChatRoomId && room.id === this.groupChatRoomId) {
+        this.setGroupChatUnread(room.unreadCount)
+      } else if (!this.groupChatRoomId) {
+        // The group's chat room is not known yet. It may not have existed when the call
+        // began, and this may be the message that brought it about — ask again.
+        this.loadGroupChatUnread()
+      }
+    },
+    // The room of the group's chat and what is unread in it. The room is asked for by the
+    // group, as it need not exist; updates then arrive by its id.
+    async loadGroupChatUnread() {
+      const groupId = this.groupId
+      try {
+        const { data } = await this.$apollo.query({
+          query: roomUnreadQuery(),
+          variables: { groupId },
+          fetchPolicy: 'network-only',
+        })
+        // The call may have been left, or swapped for another, in the meantime.
+        if (this.groupId !== groupId || this.phase !== 'in-call') return
+        const room = data && data.Room && data.Room[0]
+        this.groupChatRoomId = room ? room.id : null
+        this.setGroupChatUnread(room ? room.unreadCount : 0)
+      } catch (_e) {
+        /* the tab simply goes without a count */
+      }
     },
     tileAvatarSize(tile) {
       // Spotlight thumbnails are too short for the large avatar — it gets
@@ -913,8 +1155,10 @@ export default {
     },
     iconOnlyTooltip(label) {
       // v-tooltip renders nothing for an empty string — exactly what we want
-      // once the button spells its label out next to the icon.
-      return this.iconOnly ? label : ''
+      // once the button spells its label out next to the icon. Nor on a phone:
+      // there is no pointer to hover with, and a tap would open the tooltip on
+      // top of doing what the button does.
+      return this.parked ? label : ''
     },
     onTileSelect(tile) {
       if (!tile) return
@@ -1089,6 +1333,8 @@ export default {
           this.reconnecting = false
           this.refreshTiles()
           this.audioBlocked = !room.canPlaybackAudio
+          // Back in — possibly in a call opened anew meanwhile, with a chat of its own.
+          this.joinCallChat(room)
         })
         // A device came or went (headset plugged in, AirPods reconnected).
         // LiveKit already follows the system default; if our microphone was
@@ -1125,6 +1371,9 @@ export default {
         this.refreshTiles()
         this.audioBlocked = !room.canPlaybackAudio
         this.phase = 'in-call'
+        this.joinCallChat(room)
+        this.watchCallChats(true)
+        this.loadGroupChatUnread()
         this.refreshKnownDevices()
       } catch (err) {
         const message = this.$backendError(err)
@@ -1758,6 +2007,9 @@ export default {
       }
     },
     async cleanup() {
+      // First, before the disconnect below is awaited: nothing may ask for the call's chat
+      // any more once the call is being left.
+      this.cancelCallChatRetry()
       if (this.room) {
         // Belt-and-braces: stop every local track ourselves before asking
         // LiveKit to disconnect. LiveKit's room.disconnect(stopTracks=true)
@@ -1825,6 +2077,12 @@ export default {
       this.micSilenceProbe = null
       this.resetAudioOnly()
       this.prefetched = null
+      // The conference chat belongs to the call just left (see the chatRoomId watcher).
+      this.setChatRoomId(null)
+      this.watchCallChats(false)
+      this.groupChatRoomId = null
+      this.setGroupChatUnread(0)
+      this.lastRemoteSpeakerId = null
       // CRITICAL: do NOT set phase = 'prejoin' here. leave() runs cleanup()
       // BEFORE close(), so the Vuex `show` flag is still true when cleanup
       // finishes. A prejoin phase would make the template re-mount <pre-join>
@@ -1923,48 +2181,8 @@ export default {
   }
 }
 
-.video-call__header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-x-small);
-  padding: var(--space-x-small) var(--space-small);
-  /*  Keep the header field at its pre-existing visual height even though the */
-  /*  avatar shrank from base (44px) to small (34px) — matches the chat header. */
-  min-height: calc(var(--size-avatar-base) + 2 * var(--space-x-small));
-  background: var(--color-header-background);
-  border-bottom: 1px solid var(--color-neutral-85);
-  font-weight: var(--text-weight-bold);
-  color: var(--text-color-base);
-
-  /*  The RoomTitleLink ships with font-weight: 500 (medium) for its in-chat */
-  /*  usage; inside the call modal we want the group name to read as a proper */
-  /*  dialog heading, so override with the heading bold weight. */
-  ::v-deep .room-title-link {
-    font-weight: var(--text-weight-bold);
-  }
-}
-
-.video-call__header-info {
-  display: flex;
-  align-items: center;
-  gap: var(--space-x-small);
-  flex: 1 1 0;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.video-call__avatar {
-  flex-shrink: 0;
-}
-
-.video-call__header-right {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xx-small);
-  margin-left: auto;
-  flex-shrink: 0;
-}
-
+/*  The header itself — avatar, title, where its buttons go — is RoomHeader's. What is */
+/*  the call's own are the things put into it. */
 .video-call__count {
   background: var(--color-primary);
   color: var(--color-primary-inverse);
@@ -2084,6 +2302,57 @@ export default {
 .video-call__sidebar > * {
   flex: 1;
   min-height: 0;
+}
+
+/*  On a phone the chat goes below the videos instead of beside them, and the stage */
+/*  shrinks to one small tile — the person speaking — so the voice keeps a face */
+/*  while the rest of the screen is for reading and writing. */
+.video-call__body--chat-below {
+  flex-direction: column;
+}
+
+.video-call__body--chat-below .video-call__stage {
+  flex: 0 0 auto;
+  height: 22vh;
+  min-height: 110px;
+}
+
+.video-call__body--chat-below .video-call__sidebar {
+  flex: 1 1 0;
+  max-width: none;
+  min-height: 0;
+  border-left: 0;
+  border-top: 1px solid var(--color-neutral-85);
+}
+
+/*  The notices sit at the bottom of the body, which is the chat here: keep them */
+/*  on the videos. */
+.video-call__body--chat-below .video-call__notices {
+  top: var(--space-x-small);
+  bottom: auto;
+}
+
+/*  The choice between the call's two chats sits above the chat, at its own height, */
+/*  with the chat's buttons at its end. */
+.video-call__sidebar > .video-call__chat-tabs {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-x-small);
+  /*  No padding above and below: the tabs reach the row's lower edge, where the */
+  /*  underline of the active one belongs. The buttons bring the row's height. */
+  min-height: 44px;
+  /*  The tabs start at the sidebar's edge, as in the floating chat window; the close */
+  /*  button at the row's end keeps its space to the edge. */
+  padding: 0 var(--space-small) 0 0;
+  border-bottom: 1px solid var(--color-neutral-85);
+}
+
+.video-call__chat-actions {
+  display: flex;
+  gap: var(--space-xx-small);
+  /*  At the end of the row, also when there are no tabs before it. */
+  margin-left: auto;
 }
 
 .video-call__status,

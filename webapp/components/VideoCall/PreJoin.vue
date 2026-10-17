@@ -86,7 +86,9 @@
           :aria-pressed="cameraActive.toString()"
           @click="toggleCameraActive"
         >
-          <template #icon><os-icon :icon="icons.videoCamera" /></template>
+          <template #icon>
+            <os-icon :icon="cameraActive ? icons.videoCamera : icons.videoCameraSlash" />
+          </template>
           {{ cameraActive ? $t('videoCall.prejoin.cameraOn') : $t('videoCall.prejoin.cameraOff') }}
         </os-button>
       </div>

@@ -431,6 +431,7 @@
     "API_KEY_DOES_NOT_EXIST": "L'API Key est introuvable.",
     "API_KEYS_FEATURE_DISABLED": "Les API Keys ne sont pas activées sur ce réseau.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Tu ne peux sélectionner que des badges qui t'ont été attribués.",
+    "CHAT_CALL_ROOM_CLOSED": "Cet appel vidéo est terminé. Son chat peut encore être lu, mais plus aucun message ne peut y être écrit.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "Le chat de groupe n'a pas pu être créé.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Le message doit contenir un texte ou un fichier.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Tu ne peux pas démarrer un chat avec toi-même.",
@@ -532,15 +533,25 @@
     "USER_DOES_NOT_EXIST": "L'utilisateur est introuvable.",
     "USER_PROFILE_NAME_TOO_SHORT": "Le nom doit comporter au moins {min} caractères.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Cet utilisateur n'est pas bloqué.",
+    "VIDEO_CALL_CHAT_NOT_IN_CALL": "Le chat d'un appel vidéo est réservé à ses participants. Rejoins d'abord l'appel.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Aucune adhésion active à ce groupe n'a été trouvée pour l'appel vidéo.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Tu n'as pas le droit de démarrer un appel vidéo dans ce groupe."
   },
   "chat": {
     "addRoomHeadline": "Rechercher un utilisateur pour un nouveau chat",
+    "callRoomEmpty": "Pas encore de messages. Ce chat n'est visible que par les participants de cet appel vidéo.",
+    "callRoomName": "Appel · {name}",
     "cancelSelectMessage": "Annuler",
     "closeChat": "Fermer le chat",
     "conversationStarted": "Conversation commencée le :",
     "expandChat": "Agrandir le chat",
+    "export": {
+      "attachment": "Pièce jointe",
+      "callStarted": "Début de l'appel : {date}",
+      "savedAt": "Enregistré : {date}",
+      "title": "Chat de l'appel vidéo dans « {name} »"
+    },
+    "exportChat": "Télécharger le chat en fichier texte",
     "groupChatButton": {
       "label": "Chat de groupe",
       "tooltip": "Discuter avec le groupe « {name} »"
@@ -1888,6 +1899,13 @@
     "activeSpeakers": "Intervenants actifs",
     "audioBlocked": "Votre navigateur bloque le son de cet appel.",
     "audioOnly": "Connexion faible — les vidéos sont en pause pour que vous continuiez à entendre tout le monde.",
+    "chatTabs": {
+      "call": "Appel",
+      "callHint": "Visible uniquement par les participants de cet appel vidéo (sans notifications)",
+      "group": "Groupe",
+      "groupHint": "Visible par tous les membres du groupe (avec notifications)",
+      "label": "Choisir le chat"
+    },
     "closeChat": "Fermer le chat",
     "connecting": "Connexion…",
     "connectionLost": "Connexion perdue : {name}",

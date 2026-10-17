@@ -431,6 +431,7 @@
     "API_KEY_DOES_NOT_EXIST": "Der API Key wurde nicht gefunden.",
     "API_KEYS_FEATURE_DISABLED": "API Keys sind in diesem Netzwerk nicht aktiviert.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Du kannst nur Badges auswählen, die dir verliehen wurden.",
+    "CHAT_CALL_ROOM_CLOSED": "Dieser Videoanruf ist beendet. Sein Chat kann noch gelesen, aber nicht mehr beschrieben werden.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "Der Gruppenchat konnte nicht angelegt werden.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Die Nachricht braucht einen Text oder eine Datei.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Du kannst keinen Chat mit dir selbst beginnen.",
@@ -532,15 +533,25 @@
     "USER_DOES_NOT_EXIST": "Der Nutzer wurde nicht gefunden.",
     "USER_PROFILE_NAME_TOO_SHORT": "Der Name muss mindestens {min} Zeichen lang sein.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Dieser Nutzer ist nicht blockiert.",
+    "VIDEO_CALL_CHAT_NOT_IN_CALL": "Der Chat eines Videoanrufs steht nur dessen Teilnehmern offen. Tritt dem Anruf zuerst bei.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Für den Videoanruf wurde keine aktive Mitgliedschaft in dieser Gruppe gefunden.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Du darfst in dieser Gruppe keinen Videoanruf starten."
   },
   "chat": {
     "addRoomHeadline": "Suche Nutzer für neuen Chat",
+    "callRoomEmpty": "Noch keine Nachrichten. Dieser Chat ist nur für die Teilnehmer dieses Videoanrufs sichtbar.",
+    "callRoomName": "Anruf · {name}",
     "cancelSelectMessage": "Abbrechen",
     "closeChat": "Chat schließen",
     "conversationStarted": "Unterhaltung startete am:",
     "expandChat": "Chat erweitern",
+    "export": {
+      "attachment": "Anhang",
+      "callStarted": "Beginn des Anrufs: {date}",
+      "savedAt": "Gespeichert: {date}",
+      "title": "Chat des Videoanrufs in „{name}“"
+    },
+    "exportChat": "Chat als Textdatei herunterladen",
     "groupChatButton": {
       "label": "Gruppenchat",
       "tooltip": "Chatte mit der Gruppe „{name}“"
@@ -1888,6 +1899,13 @@
     "activeSpeakers": "Aktive Sprecher",
     "audioBlocked": "Dein Browser blockiert den Ton dieses Anrufs.",
     "audioOnly": "Schwache Verbindung – Videos sind pausiert, damit du alle weiter hörst.",
+    "chatTabs": {
+      "call": "Anruf",
+      "callHint": "Nur für die Teilnehmer dieses Videoanrufs sichtbar (ohne Benachrichtigung)",
+      "group": "Gruppe",
+      "groupHint": "Für alle Mitglieder der Gruppe sichtbar (mit Benachrichtigung)",
+      "label": "Chat auswählen"
+    },
     "closeChat": "Chat schließen",
     "connecting": "Verbinde…",
     "connectionLost": "Verbindung verloren: {name}",

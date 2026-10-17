@@ -1014,6 +1014,11 @@ export default shield(
         isAuthenticated,
         hasGroupPermission('group.videoCall.join'),
       ),
+      joinGroupVideoCallChat: and(
+        groupsEnabled,
+        isAuthenticated,
+        hasGroupPermission('group.videoCall.join'),
+      ),
       MarkMessagesAsSeen: and(
         isAuthenticated,
         hasGroupPermission('group.chat.participate', byRoom('roomId')),

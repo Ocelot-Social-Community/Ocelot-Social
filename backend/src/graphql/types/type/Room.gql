@@ -3,7 +3,7 @@ enum _RoomOrdering {
   createdAt_desc
 }
 
-"A chat room, either a one-to-one direct conversation between two users or the shared chat room of a group."
+"A chat room: a one-to-one direct conversation between two users, the shared chat room of a group, or the conference chat of a video call."
 type Room {
   "Alias of `id`, kept for the chat frontend (vue-advanced-chat keys objects by `_id`)."
   _id: String @deprecated(reason: "Use `id`.")
@@ -13,16 +13,20 @@ type Room {
 
   "Participants of the room."
   users: [User]!
-  "The group this room belongs to, or null for a direct room."
+  "The group this room belongs to — for the conference chat of a video call, the group the call takes place in — or null for a direct room."
   group: Group
 
   "Alias of id; prefer id in new code."
   roomId: String!
   "True if this is a group room, false for a direct room."
   isGroupRoom: Boolean!
-  "Display name: the group's name for a group room, otherwise the other participant's name."
+  "True if this is the conference chat of a video call, shared only by the participants of that call."
+  isCallRoom: Boolean!
+  "False once the room no longer takes messages: the conference chat of a video call that is over."
+  isWritable: Boolean!
+  "Display name: the group's name for a group room or a call's conference chat, otherwise the other participant's name."
   roomName: String!
-  "Display avatar URL: the group's avatar for a group room, otherwise the other participant's avatar."
+  "Display avatar URL: the group's avatar for a group room or a call's conference chat, otherwise the other participant's avatar."
   avatar: String
 
   "Timestamp of the most recent message, for sorting the room list."

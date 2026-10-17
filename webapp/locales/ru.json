@@ -431,6 +431,7 @@
     "API_KEY_DOES_NOT_EXIST": "API Key не найден.",
     "API_KEYS_FEATURE_DISABLED": "API Keys не включены в этой сети.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Ты можешь выбрать только те награды, которые были тебе присуждены.",
+    "CHAT_CALL_ROOM_CLOSED": "Этот видеозвонок завершён. Его чат можно читать, но писать в него больше нельзя.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "Не удалось создать групповой чат.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Сообщение должно содержать текст или файл.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Ты не можешь начать чат с самим собой.",
@@ -532,15 +533,25 @@
     "USER_DOES_NOT_EXIST": "Пользователь не найден.",
     "USER_PROFILE_NAME_TOO_SHORT": "Имя должно содержать не менее {min} символов.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Этот пользователь не заблокирован.",
+    "VIDEO_CALL_CHAT_NOT_IN_CALL": "Чат видеозвонка открыт только его участникам. Сначала присоединись к звонку.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Для видеозвонка не найдено активное участие в этой группе.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Ты не можешь начать видеозвонок в этой группе."
   },
   "chat": {
     "addRoomHeadline": "Поиск пользователя для нового чата",
+    "callRoomEmpty": "Сообщений пока нет. Этот чат виден только участникам этого видеозвонка.",
+    "callRoomName": "Звонок · {name}",
     "cancelSelectMessage": "Отмена",
     "closeChat": "Закрыть чат",
     "conversationStarted": "Беседа начата:",
     "expandChat": "Развернуть чат",
+    "export": {
+      "attachment": "Вложение",
+      "callStarted": "Начало звонка: {date}",
+      "savedAt": "Сохранено: {date}",
+      "title": "Чат видеозвонка в «{name}»"
+    },
+    "exportChat": "Скачать чат как текстовый файл",
     "groupChatButton": {
       "label": "Групповой чат",
       "tooltip": "Чат с группой «{name}»"
@@ -1888,6 +1899,13 @@
     "activeSpeakers": "Активные говорящие",
     "audioBlocked": "Ваш браузер блокирует звук этого звонка.",
     "audioOnly": "Слабое соединение — видео приостановлено, чтобы вы продолжали всех слышать.",
+    "chatTabs": {
+      "call": "Звонок",
+      "callHint": "Виден только участникам этого видеозвонка (без уведомлений)",
+      "group": "Группа",
+      "groupHint": "Виден всем участникам группы (с уведомлениями)",
+      "label": "Выбрать чат"
+    },
     "closeChat": "Закрыть чат",
     "connecting": "Подключение…",
     "connectionLost": "Соединение потеряно: {name}",
