@@ -65,6 +65,7 @@ describe('UserList', () => {
             roleName: 'moderator',
             slug: 'user',
             outrankedByCurrentUser: true,
+            commentsCount: 17,
           },
           {
             id: 'user2',
@@ -140,6 +141,14 @@ describe('UserList', () => {
         expect(fields).toContain('roleName')
       })
 
+      // #8557: the column states how many comments the user wrote, not on how many posts.
+      it('requests and shows the comments count, not the commented posts count', () => {
+        const fields = userFields(wrapper)
+        expect(fields).toContain('commentsCount')
+        expect(fields).not.toContain('commentedCount')
+        expect(wrapper.text()).toContain('17')
+      })
+
       it('requests outrankedByCurrentUser, which decides the per-row actions', () => {
         expect(userFields(wrapper)).toContain('outrankedByCurrentUser')
       })
@@ -194,7 +203,34 @@ describe('UserList', () => {
       it('hides the delete column (no user.delete.any)', () => {
         expect(wrapper.find('[data-test="user-delete-user"]').exists()).toBe(false)
       })
+
+      // User.commentsCount counts comments in closed groups too; the backend refuses it
+      // without a user administration right, and the admin area is reachable without one.
+      it('neither requests nor shows the comments count', () => {
+        expect(userFields(wrapper)).not.toContain('commentsCount')
+        expect(wrapper.find('[aria-label="admin.users.table.columns.comments"]').exists()).toBe(
+          false,
+        )
+        expect(wrapper.text()).not.toContain('17')
+      })
     })
+
+    describe.each(['user.delete.any', 'user.disable', 'badge.manage'])(
+      'a viewer holding only %s',
+      (right) => {
+        beforeEach(() => {
+          mocks.$can = jest.fn((permission) => permission === right)
+          wrapper = Wrapper()
+        })
+
+        it('reads and shows the comments count', () => {
+          expect(userFields(wrapper)).toContain('commentsCount')
+          expect(wrapper.find('[aria-label="admin.users.table.columns.comments"]').exists()).toBe(
+            true,
+          )
+        })
+      },
+    )
 
     describe('a viewer with only user.delete.any (delete-capable moderator)', () => {
       beforeEach(() => {

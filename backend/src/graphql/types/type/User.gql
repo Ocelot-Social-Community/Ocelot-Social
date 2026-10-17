@@ -121,7 +121,10 @@ type User {
 
   "Comments written by this user."
   comments: [Comment]!
+  "Number of distinct posts this user commented on, counted like the profile's commented tab lists them: only posts the viewer may see, including those where the user's comments were deleted. Not a number of comments, see commentsCount."
   commentedCount: Int!
+  "Number of comments this user wrote that are not deleted, including disabled ones and those on disabled posts or in groups the viewer cannot read: exactly what deleting the account with its comments deletes. Readable by the user themselves and by holders of user.delete.any, user.disable or badge.manage only."
+  commentsCount: Int!
 
   "Posts this user has shouted (endorsed)."
   shouted: [Post]!

@@ -6,7 +6,9 @@
 import http from 'node:http'
 
 import { ApolloServer } from '@apollo/server'
+import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/disabled'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
 import { expressMiddleware } from '@as-integrations/express5'
 import { searchPath } from '@ocelot-social/branding/dist/discover.js'
 import bodyParser from 'body-parser'
@@ -117,6 +119,15 @@ const createServer = async (options?: CreateServerOptions) => {
     // is gone (see src/db/schema), nothing throws that message any more and nothing attaches
     // `.details` to an error, so the hook had become an identity function on every code path.
     plugins: [
+      // The page a browser gets for the GraphQL URL (#6304). Apollo's own — the Sandbox, and the
+      // production landing page Apollo would serve otherwise — is not part of @apollo/server: the
+      // plugin only writes HTML that loads it from Apollo's CDN, along with Google Fonts. So it is
+      // there for developers only (DEBUG, which config/index.ts never sets in production), and
+      // every other instance answers the browser like any other GraphQL client, without fetching
+      // anything from a third party.
+      CONFIG.DEBUG
+        ? ApolloServerPluginLandingPageLocalDefault()
+        : ApolloServerPluginLandingPageDisabled(),
       ApolloServerPluginDrainHttpServer({ httpServer }),
       {
         // eslint-disable-next-line @typescript-eslint/require-await
@@ -135,8 +146,9 @@ const createServer = async (options?: CreateServerOptions) => {
 
   await server.start()
 
-  // TODO: this exception is required for the graphql playground, since the playground loads external resources
-  // See: https://github.com/graphql/graphql-playground/issues/1283
+  // DEBUG only: Apollo's Sandbox (the landing page above) comes from Apollo's CDN and embeds an
+  // iframe of theirs, which helmet's default content security policy would block. Everywhere else
+  // the defaults apply.
   app.use(
     helmet(
       (CONFIG.DEBUG && { contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }) || {},

@@ -2,9 +2,7 @@
 
 GraphQL is a data query language which provides an alternative to REST and ad-hoc web service architectures. It allows clients to define the structure of the data required, and exactly the same structure of the data is returned from the server.
 
-We have a closer description for the [GraphQL Playground](./src/graphql/GraphQL-Playground.md).
-
-![GraphQL Playground](../docu/gitbook/graphql-playground%20%281%29.png)
+We have a closer description of [exploring the API in the browser](./src/graphql/GraphQL-Playground.md).
 
 ## Middleware keeps resolvers clean
 
@@ -23,10 +21,11 @@ audiences and two ways to consume it:
 
 ### For developers: explore the live API
 
-Run the backend (`npm run dev`) and open the GraphQL endpoint
-(`GRAPHQL_URI`, default `http://localhost:4000/`) in a browser to get an
-interactive playground/sandbox where you can run queries against your data. See
-the [GraphQL Playground notes](./src/graphql/GraphQL-Playground.md).
+Run the backend (`npm run dev`) with `DEBUG=true` and open the GraphQL endpoint
+(`GRAPHQL_URI`, default `http://localhost:4000/`) in a browser to get Apollo
+Sandbox, where you can run queries against your data. It is loaded from Apollo's
+CDN and therefore not served in production. See the
+[notes on exploring the API](./src/graphql/GraphQL-Playground.md).
 
 ### For users: static HTML reference (SpectaQL)
 

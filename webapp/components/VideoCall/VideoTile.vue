@@ -169,9 +169,15 @@ export default {
       // tile would just be noise. LiveKit rates the participant, so the own
       // tile tells whether the trouble is on this side of the call.
       if (this.tile.isScreen) return null
-      const key = { poor: 'connectionPoor', lost: 'connectionLost' }[this.tile.connectionQuality]
-      if (!key) return null
-      return this.$t(`videoCall.${key}`, { name: this.tile.name })
+      const params = { name: this.tile.name }
+      switch (this.tile.connectionQuality) {
+        case 'poor':
+          return this.$t('videoCall.connectionPoor', params)
+        case 'lost':
+          return this.$t('videoCall.connectionLost', params)
+        default:
+          return null
+      }
     },
     showOwnScreenPlaceholder() {
       // Rendering the local screen share back to the user creates an infinite

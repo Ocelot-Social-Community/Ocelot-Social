@@ -7,7 +7,12 @@
           :class="{ 'disabled-content': user.disabled }"
           style="position: relative; height: auto; overflow: visible"
         >
-          <avatar-uploader v-if="myProfile" :profile="user" :updateMutation="updateUserMutation">
+          <avatar-uploader
+            v-if="myProfile"
+            :profile="user"
+            :updateMutation="updateUserMutation"
+            @uploaded="avatarUploaded"
+          >
             <avatar-image :profile="user" class="profile-page-avatar" size="large" />
           </avatar-uploader>
           <avatar-image v-else :profile="user" class="profile-page-avatar" size="large" />
@@ -282,9 +287,9 @@
         </div>
         <div style="flex: 0 0 15%; width: 15%">
           <p class="ds-text ds-text-size-small">
-            <strong>{{ $t('common.comment', null, deleteUserData.commentedCount) }}</strong>
+            <strong>{{ $t('common.comment', null, deleteUserData.commentsCount) }}</strong>
             <br />
-            {{ deleteUserData.commentedCount }}
+            {{ deleteUserData.commentsCount }}
           </p>
         </div>
       </div>
@@ -500,7 +505,13 @@ export default {
   methods: {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
+      setCurrentUserPartial: 'auth/SET_USER_PARTIAL',
     }),
+    // The header's avatar menu shows the logged-in user from the store, not from Apollo's cache,
+    // which the upload updates on its own (#5585).
+    avatarUploaded({ UpdateUser: { avatar } }) {
+      this.setCurrentUserPartial({ avatar })
+    },
     handleRoomUpdated(room) {
       if (!room || !room.id) return
       if (this.chatRoom && this.chatRoom.id === room.id) {
@@ -543,9 +554,13 @@ export default {
       this.resetPostList()
       this.$apollo.queries.profilePagePosts.refetch()
     },
+    // Each confirms itself (#10520), like unmuting/unblocking in the settings and muting a group:
+    // the profile changes as well, but a toast says what happened, and to whom — by the name
+    // the profile shows, so one without a name is not confirmed as "undefined".
     async muteUser(user) {
       try {
         await this.$apollo.mutate({ mutation: muteUser(), variables: { id: user.id } })
+        this.$toast.success(this.$t('settings.muted-users.muted', { name: this.userName }))
       } catch (error) {
         this.$toastBackendError(error)
       } finally {
@@ -557,6 +572,7 @@ export default {
     async unmuteUser(user) {
       try {
         await this.$apollo.mutate({ mutation: unmuteUser(), variables: { id: user.id } })
+        this.$toast.success(this.$t('settings.muted-users.unmuted', { name: this.userName }))
       } catch (error) {
         this.$toastBackendError(error)
       } finally {
@@ -568,6 +584,7 @@ export default {
     async blockUser(user) {
       try {
         await this.$apollo.mutate({ mutation: blockUser(), variables: { id: user.id } })
+        this.$toast.success(this.$t('settings.blocked-users.blocked', { name: this.userName }))
       } catch (error) {
         this.$toastBackendError(error)
       } finally {
@@ -577,6 +594,7 @@ export default {
     async unblockUser(user) {
       try {
         await this.$apollo.mutate({ mutation: unblockUser(), variables: { id: user.id } })
+        this.$toast.success(this.$t('settings.blocked-users.unblocked', { name: this.userName }))
       } catch (error) {
         this.$toastBackendError(error)
       } finally {
@@ -683,7 +701,9 @@ export default {
     },
     User: {
       query() {
-        return profileUserQuery(this.$i18n)
+        // The delete-user dialog states how many comments go with the account; only who may
+        // delete it reads that number (and asking for it without the right fails the query).
+        return profileUserQuery(this.$i18n, { withCommentsCount: this.$can('user.delete.any') })
       },
       variables() {
         return {

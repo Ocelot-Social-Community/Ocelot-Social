@@ -24,6 +24,7 @@ describe('videoCall store', () => {
         lastChatTab: 'call',
         phase: 'idle',
         pageBars: 'normal',
+        reloadPending: false,
       })
     })
   })
@@ -65,6 +66,41 @@ describe('videoCall store', () => {
         expect(state.groupName).toBeNull()
         expect(state.groupSlug).toBeNull()
         expect(state.groupAvatar).toBeNull()
+      })
+
+      describe('for the group whose call is running already', () => {
+        beforeEach(() => {
+          mutations.OPEN(state, { groupId: 'g1', groupName: 'Yoga', groupSlug: 'yoga' })
+          state.minimized = true
+          state.participantCount = 3
+          state.chatRoomId = 'room-1'
+          state.conferenceUnread = 2
+          state.groupChatUnread = 4
+        })
+
+        it('brings the parked call up and leaves what the running call knows', () => {
+          mutations.OPEN(state, { groupId: 'g1', groupName: 'Yoga', groupSlug: 'yoga' })
+          expect(state).toMatchObject({
+            showVideoCall: true,
+            minimized: false,
+            participantCount: 3,
+            chatRoomId: 'room-1',
+            conferenceUnread: 2,
+            groupChatUnread: 4,
+          })
+        })
+
+        it('updates the group info only where it is given', () => {
+          mutations.OPEN(state, { groupId: 'g1', groupName: null, groupAvatar: { url: 'b' } })
+          expect(state.groupName).toBe('Yoga')
+          expect(state.groupSlug).toBe('yoga')
+          expect(state.groupAvatar).toEqual({ url: 'b' })
+        })
+
+        it("starts afresh for another group's call", () => {
+          mutations.OPEN(state, { groupId: 'g2' })
+          expect(state).toMatchObject({ groupId: 'g2', chatRoomId: null, participantCount: 0 })
+        })
       })
     })
 
@@ -249,6 +285,13 @@ describe('videoCall store', () => {
         expect(getters.pageBars(state)).toBe('hidden')
       })
 
+      it('knows the solid bars of a desktop, and them moved away', () => {
+        mutations.SET_PAGE_BARS(state, 'manual')
+        expect(state.pageBars).toBe('manual')
+        mutations.SET_PAGE_BARS(state, 'collapsed')
+        expect(state.pageBars).toBe('collapsed')
+      })
+
       it('falls back to normal for anything else', () => {
         state.pageBars = 'hidden'
         mutations.SET_PAGE_BARS(state, 'sideways')
@@ -278,6 +321,15 @@ describe('videoCall store', () => {
       })
     })
 
+    describe('SET_RELOAD_PENDING', () => {
+      it('coerces to a boolean', () => {
+        mutations.SET_RELOAD_PENDING(state, 1)
+        expect(state.reloadPending).toBe(true)
+        mutations.SET_RELOAD_PENDING(state, undefined)
+        expect(state.reloadPending).toBe(false)
+      })
+    })
+
     describe('SET_PARTICIPANT_COUNT', () => {
       it('stores a numeric count', () => {
         mutations.SET_PARTICIPANT_COUNT(state, 3)
@@ -304,6 +356,7 @@ describe('videoCall store', () => {
         participantCount: 7,
         chatRoomId: 'room-1',
         phase: 'in-call',
+        reloadPending: true,
       }
       expect(getters.enabled(state)).toBe(true)
       expect(getters.showVideoCall(state)).toBe(true)
@@ -315,6 +368,7 @@ describe('videoCall store', () => {
       expect(getters.participantCount(state)).toBe(7)
       expect(getters.chatRoomId(state)).toBe('room-1')
       expect(getters.phase(state)).toBe('in-call')
+      expect(getters.reloadPending(state)).toBe(true)
     })
   })
 })

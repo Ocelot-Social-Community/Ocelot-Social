@@ -26,6 +26,19 @@ Feature: Register and recover an account
     And I create my account as "Nora Newcomer" with the password "Secret1234"
     Then I am logged in with username "Nora Newcomer"
 
+  # Where the network asks for a location, the account is created with the place picked from the
+  # suggestions — sent by its Mapbox id, not searched again by its name (#7018).
+  Scenario: Register where the network asks for a location
+    Given the network policy "publicRegistration" is "true"
+    And the network policy "requireLocation" is "true"
+    When I navigate to page "/registration"
+    And I enter the e-mail address "resident@example.org"
+    And I enter the code that was sent to "resident@example.org"
+    And I pick "Paris" as my location
+    And I create my account as "Rita Resident" with the password "Secret1234"
+    Then I am logged in with username "Rita Resident"
+    And my profile "rita-resident" shows "Paris" as my location
+
   Scenario: Register with an invite code where only invited people may join
     Given the network policy "publicRegistration" is "false"
     And the network policy "inviteRegistration" is "true"

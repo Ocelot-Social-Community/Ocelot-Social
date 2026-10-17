@@ -133,6 +133,15 @@ describe('UserAvatarPopover', () => {
     })
   })
 
+  // #8557: the number leads to the profile's "commented" tab, so it is labelled and counted like
+  // that tab — posts commented on, not comments.
+  it('labels the commented count like the profile tab it leads to', () => {
+    const wrapper = Wrapper()
+    const label = wrapper.getByText('profile.commented')
+    expect(label.parentElement.textContent).toContain('13')
+    expect(wrapper.queryByText('common.comment')).toBeNull()
+  })
+
   it('shows badges when enabled', () => {
     const wrapper = Wrapper({ badgesEnabled: true })
     expect(wrapper.container).toMatchSnapshot()

@@ -12,6 +12,7 @@ const mockConfig: {
 } = { LIVEKIT_ENABLED: false }
 
 const mockListRooms = vi.fn<(...args: unknown[]) => Promise<unknown>>()
+const mockListParticipants = vi.fn<(...args: unknown[]) => Promise<unknown>>()
 const mockRoomServiceCtor = vi.fn()
 
 // `function`, not an arrow: this stands in for a CLASS and the code under test calls it with
@@ -22,6 +23,7 @@ vi.mock('livekit-server-sdk', () => ({
     mockRoomServiceCtor(...args)
     return {
       listRooms: (...inner: unknown[]): unknown => mockListRooms(...inner),
+      listParticipants: (...inner: unknown[]): unknown => mockListParticipants(...inner),
     }
   }),
 }))
@@ -95,6 +97,7 @@ beforeEach(() => {
   mockConfig.LIVEKIT_API_KEY = undefined
   mockConfig.LIVEKIT_API_SECRET = undefined
   mockListRooms.mockReset().mockResolvedValue([])
+  mockListParticipants.mockReset().mockResolvedValue([])
   mockRoomServiceCtor.mockReset()
   mockPublish.mockReset().mockResolvedValue(undefined)
   // Settled at once, unless a test says otherwise.
@@ -471,12 +474,104 @@ describe('poll tick', () => {
       // The client was told 2; one of the two left before this poll.
       noteCountTold('group-a', 2)
       mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 1 }])
+      mockListParticipants.mockResolvedValueOnce([{ identity: 'u1' }])
       await vi.advanceTimersByTimeAsync(15_000)
 
       expect(mockPublish).toHaveBeenCalledTimes(1)
       expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
         groupId: 'a',
         count: 1,
+      })
+    })
+
+    // The room list can lag behind the participants: everybody has left, the list still has one.
+    // Its count published as the correction would put the call back to 1 for everybody (#10508).
+    it('publishes the participants of one that is still listed, not the list count', async () => {
+      startLiveKitPoller()
+      await vi.advanceTimersByTimeAsync(5_000)
+
+      // A was told 1 as the first of two left; then the second left as well.
+      noteCountTold('group-a', 1)
+      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 1 }])
+      mockListParticipants.mockResolvedValueOnce([])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockListParticipants).toHaveBeenCalledWith('group-a')
+      expect(mockPublish).toHaveBeenCalledTimes(1)
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'a',
+        count: 0,
+      })
+
+      // Still lagging on the next poll: no change of the list, so nothing stale goes out.
+      mockPublish.mockClear()
+      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 1 }])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockPublish).not.toHaveBeenCalled()
+    })
+
+    it('asks only for told rooms, and trusts the list for the others', async () => {
+      startLiveKitPoller()
+      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 2 }])
+      await vi.advanceTimersByTimeAsync(5_000)
+
+      expect(mockListParticipants).not.toHaveBeenCalled()
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'a',
+        count: 2,
+      })
+    })
+
+    it('keeps one for the next poll when its participants cannot be asked', async () => {
+      startLiveKitPoller()
+      await vi.advanceTimersByTimeAsync(5_000)
+
+      noteCountTold('group-a', 1)
+      noteCountTold('group-b', 1)
+      mockListRooms.mockResolvedValueOnce([
+        { name: 'group-a', numParticipants: 1 },
+        { name: 'group-b', numParticipants: 2 },
+      ])
+      mockListParticipants
+        .mockRejectedValueOnce(new Error('timeout'))
+        .mockResolvedValueOnce([{ identity: 'u1' }, { identity: 'u2' }])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      // Not corrected with the list's count; the other room is not held up by it.
+      expect(mockPublish).toHaveBeenCalledTimes(1)
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'b',
+        count: 2,
+      })
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        'LiveKit poll: listParticipants failed for',
+        'group-a',
+        'timeout',
+      )
+
+      mockPublish.mockClear()
+      mockListRooms.mockResolvedValueOnce([
+        { name: 'group-a', numParticipants: 1 },
+        { name: 'group-b', numParticipants: 2 },
+      ])
+      mockListParticipants.mockRejectedValueOnce('no error object').mockResolvedValueOnce([])
+      await vi.advanceTimersByTimeAsync(15_000)
+      mockListRooms.mockResolvedValueOnce([
+        { name: 'group-a', numParticipants: 1 },
+        { name: 'group-b', numParticipants: 2 },
+      ])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        'LiveKit poll: listParticipants failed for',
+        'group-a',
+        'no error object',
+      )
+      expect(mockPublish).toHaveBeenCalledTimes(1)
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'a',
+        count: 0,
       })
     })
 

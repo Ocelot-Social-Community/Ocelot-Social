@@ -2,6 +2,7 @@ import { render, fireEvent } from '@testing-library/vue'
 import { mount } from '@vue/test-utils'
 import ProfileSlug from './_slug.vue'
 import LocationPickerMap from '~/components/Map/LocationPickerMap'
+import AvatarUploader from '~/components/Uploader/AvatarUploader'
 
 const localVue = global.localVue
 
@@ -167,6 +168,19 @@ describe('ProfileSlug', () => {
         })
       })
 
+      it('states the comments deleting the account deletes, not the posts commented on', () => {
+        // #8557: commentedCount (8) is a number of posts; the dialog needs the comments.
+        const profileUser = { ...user.User[0], createdAt: '2020-01-01', commentsCount: 23 }
+        wrapper = render(ProfileSlug, {
+          localVue,
+          stubs: { ...stubs, DateTime: true },
+          data: () => ({ ...user, deleteUserData: profileUser, showDeleteModal: true }),
+          mocks: { ...mocks, $policy: { get: () => true } },
+        })
+        const cell = wrapper.getByText('common.comment').parentElement
+        expect(cell.textContent.replace(/\s+/g, ' ').trim()).toBe('common.comment 23')
+      })
+
       it("uses the green pin on someone else's profile", () => {
         // mount() (unlike testing-library's render() used elsewhere in this
         // file) actually descends into client-only's default slot content —
@@ -250,6 +264,23 @@ describe('ProfileSlug', () => {
       // above cover the granted member; assert both branches of the deny-by-default
       // gate explicitly so an RBAC regression (e.g. a denied action staying a live
       // link) fails loudly rather than silently changing a snapshot.
+      describe('uploading a new avatar', () => {
+        it('puts it into the logged-in user of the store, which the avatar menu shows', () => {
+          mocks.$store.commit = jest.fn()
+          const mountWrapper = mount(ProfileSlug, {
+            localVue,
+            stubs: { ...stubs, 'infinite-loading': true },
+            data: () => user,
+            mocks: { ...mocks, $policy: { get: () => true } },
+          })
+          const avatar = { url: '/uploads/new.jpg' }
+          mountWrapper.findComponent(AvatarUploader).vm.$emit('uploaded', {
+            UpdateUser: { id: 'u23', avatar },
+          })
+          expect(mocks.$store.commit).toHaveBeenCalledWith('auth/SET_USER_PARTIAL', { avatar })
+        })
+      })
+
       describe('add-post button gating (post.create)', () => {
         const addButton = () => wrapper.container.querySelector('.profile-post-add-button')
 

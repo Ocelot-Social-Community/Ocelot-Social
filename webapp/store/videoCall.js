@@ -24,9 +24,14 @@ export const state = () => {
     // phase so the layout can decide where the chat lives.
     phase: 'idle',
     // How the page's header and footer stand to the call. 'normal': the call sits between
-    // them. 'overlay': the call fills the window and they lie on it, see-through. 'hidden':
-    // they have moved out of the way along with the call's own bars (the mouse was still).
+    // them. 'overlay': the call fills the window and they lie on it, see-through; 'hidden':
+    // they have moved out of the way along with the call's own bars (nobody touched it).
+    // 'manual': solid around the maximized call on a desktop; 'collapsed': moved out of the
+    // way there, by the user's button.
     pageBars: 'normal',
+    // A full reload is due (a new branding, #10353) but waits for this call to end:
+    // utils/reloadWhenIdle.js sets it, the call shows it as a notice.
+    reloadPending: false,
   }
 }
 
@@ -35,6 +40,17 @@ export const mutations = {
     state.enabled = !!enabled
   },
   OPEN(state, { groupId, groupName, groupSlug, groupAvatar }) {
+    // The group's call is running already (its button pressed again while the call is
+    // parked): bring it up, and leave what the running call knows — its conference chat,
+    // the unread counts, the number of participants. Nothing would set them again, as the
+    // call stays connected. Group info only where it is given.
+    if (state.showVideoCall && state.groupId === groupId) {
+      state.minimized = false
+      if (groupName) state.groupName = groupName
+      if (groupSlug) state.groupSlug = groupSlug
+      if (groupAvatar) state.groupAvatar = groupAvatar
+      return
+    }
     state.showVideoCall = true
     state.minimized = false
     state.groupId = groupId
@@ -94,7 +110,12 @@ export const mutations = {
     state.lastChatTab = tab === 'group' ? 'group' : 'call'
   },
   SET_PAGE_BARS(state, pageBars) {
-    state.pageBars = ['overlay', 'hidden'].includes(pageBars) ? pageBars : 'normal'
+    state.pageBars = ['overlay', 'hidden', 'manual', 'collapsed'].includes(pageBars)
+      ? pageBars
+      : 'normal'
+  },
+  SET_RELOAD_PENDING(state, pending) {
+    state.reloadPending = !!pending
   },
 }
 
@@ -140,5 +161,8 @@ export const getters = {
   },
   pageBars(state) {
     return state.pageBars
+  },
+  reloadPending(state) {
+    return state.reloadPending
   },
 }

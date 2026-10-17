@@ -430,8 +430,9 @@
  * @tokens Video Call Bars
  */
 
-  /* The bars lying on a maximized video call on a desktop — the page's header and footer, the
-     call's header and control bar (VideoCall.vue, layouts/default.vue). How much of their own
+  /* The bars lying see-through on a video call — on a phone, in the parked window (and in
+     fullscreen): the page's header and footer, the call's header and control bar (VideoCall.vue,
+     layouts/default.vue). On a desktop the maximized call's bars are solid. How much of their own
      colour they keep — the rest lets the videos through — and how much the videos behind them
      are blurred. 100% and 0px make them solid. */
   --video-call-bar-opacity: 75%;

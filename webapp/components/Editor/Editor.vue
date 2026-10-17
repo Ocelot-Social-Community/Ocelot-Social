@@ -490,7 +490,10 @@ export default {
 </script>
 
 <style>
-.editor p.is-empty:first-child::before {
+/* The placeholder belongs to an empty editor, not to an empty first line above some text: tiptap
+   marks every empty line holding the cursor with is-empty, and only an empty editor with
+   is-editor-empty (#4254). */
+.editor p.is-editor-empty:first-child::before {
   content: attr(data-empty-text);
   float: left;
   color: var(--text-color-disabled);

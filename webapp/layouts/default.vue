@@ -3,8 +3,9 @@
     :class="[
       'layout-default',
       {
-        'layout-default--call-bars-overlay': videoCallPageBars !== 'normal',
-        'layout-default--call-bars-hidden': videoCallPageBars === 'hidden',
+        'layout-default--call-bars-movable': videoCallPageBars !== 'normal',
+        'layout-default--call-bars-glass': ['overlay', 'hidden'].includes(videoCallPageBars),
+        'layout-default--call-bars-away': ['hidden', 'collapsed'].includes(videoCallPageBars),
       },
     ]"
   >
@@ -300,16 +301,20 @@ export default {
   background-color: var(--color-header-background);
 }
 
-/*  A maximized video call on a desktop fills the window: header and footer lie on it, */
-/*  see-through, and move out of the way with the call's own bars while the mouse rests */
-/*  (VideoCall.vue, barsOverlay). */
-.layout-default--call-bars-overlay .main-navigation,
-.layout-default--call-bars-overlay .desktop-footer.ds-footer {
-  backdrop-filter: blur(var(--video-call-bar-blur));
+/*  Beside a maximized video call header and footer move out of the way with the call's own */
+/*  bars: on a phone after a while without a touch, lying on the call see-through (glass), */
+/*  on a desktop when the user asks to, solid (VideoCall.vue, barsOverlay / barsManual). */
+.layout-default--call-bars-movable .main-navigation,
+.layout-default--call-bars-movable .desktop-footer.ds-footer {
   transition: transform 0.3s ease;
 }
 
-.layout-default--call-bars-overlay .main-navigation {
+.layout-default--call-bars-glass .main-navigation,
+.layout-default--call-bars-glass .desktop-footer.ds-footer {
+  backdrop-filter: blur(var(--video-call-bar-blur));
+}
+
+.layout-default--call-bars-glass .main-navigation {
   background-color: color-mix(
     in srgb,
     var(--video-call-bar-page-header-color) var(--video-call-bar-opacity),
@@ -317,7 +322,7 @@ export default {
   );
 }
 
-.layout-default--call-bars-overlay .desktop-footer.ds-footer {
+.layout-default--call-bars-glass .desktop-footer.ds-footer {
   background-color: color-mix(
     in srgb,
     var(--video-call-bar-page-footer-color) var(--video-call-bar-opacity),
@@ -325,19 +330,19 @@ export default {
   );
 }
 
-.layout-default--call-bars-hidden .main-navigation {
+.layout-default--call-bars-away .main-navigation {
   transform: translateY(-100%);
   box-shadow: none;
 }
 
-.layout-default--call-bars-hidden .desktop-footer.ds-footer {
+.layout-default--call-bars-away .desktop-footer.ds-footer {
   transform: translateY(100%);
   box-shadow: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .layout-default--call-bars-overlay .main-navigation,
-  .layout-default--call-bars-overlay .desktop-footer.ds-footer {
+  .layout-default--call-bars-movable .main-navigation,
+  .layout-default--call-bars-movable .desktop-footer.ds-footer {
     transition: none;
   }
 }
@@ -392,7 +397,8 @@ export default {
   align-items: center;
   box-sizing: border-box;
   height: 36px;
-  padding: 0 var(--space-small);
+  /*  The tabs reach from edge to edge of the window, their underline with them. */
+  padding: 0;
   background: var(--background-color-base);
   border-bottom: 1px solid var(--color-neutral-85);
 }

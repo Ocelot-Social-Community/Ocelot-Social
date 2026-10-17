@@ -9,7 +9,9 @@ import { group } from './fragments/group'
 import { imageUrls } from './fragments/imageUrls'
 import { notificationMutationResponse } from './fragments/notification'
 
-export const profileUserQuery = (i18n) => {
+// withCommentsCount: the real number of comments, for the delete-user dialog. Readable only
+// for oneself and user administrators — requested without the right, it fails the query.
+export const profileUserQuery = (i18n, { withCommentsCount = false } = {}) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
     ${user}
@@ -21,6 +23,7 @@ export const profileUserQuery = (i18n) => {
       User(id: $id) {
         ...user
         ...userCounts
+        ${withCommentsCount ? 'commentsCount' : ''}
         ...locationOnUser
         ...badges
         about
@@ -88,11 +91,16 @@ export const mentionSuggestionsQuery = () => {
   `
 }
 
-// email and roleName are field-gated in the backend (user.email.readAny / role.manage),
-// so a viewer lacking the right must NOT request the field — a denied field aborts the
-// whole response under apollo's default errorPolicy. Callers pass withEmail/withRole
-// from their $can checks; the role-filtered area (moderation) omits them.
-export const adminUserQuery = ({ withEmail = true, withRole = true } = {}) => {
+// email, roleName and commentsCount are field-gated in the backend (user.email.readAny /
+// role.manage / a user administration right), so a viewer lacking the right must NOT request
+// the field — a denied field aborts the whole response under apollo's default errorPolicy.
+// Callers pass withEmail/withRole/withCommentsCount from their $can checks; the role-filtered
+// area (moderation) omits them.
+export const adminUserQuery = ({
+  withEmail = true,
+  withRole = true,
+  withCommentsCount = true,
+} = {}) => {
   return gql`
     query ($first: Int, $offset: Int, $roleName: String, $search: String) {
       User(
@@ -111,7 +119,7 @@ export const adminUserQuery = ({ withEmail = true, withRole = true } = {}) => {
         disabled
         outrankedByCurrentUser
         contributionsCount
-        commentedCount
+        ${withCommentsCount ? 'commentsCount' : ''}
         shoutedCount
       }
     }
@@ -510,11 +518,14 @@ export const currentUserQuery = gql`
   }
 `
 
+// commentsCount is not in the userCounts fragment: it is readable only for oneself and user
+// administrators, and the fragment is queried for everybody.
 export const currentUserCountQuery = () => gql`
   ${userCounts}
   query {
     currentUser {
       ...userCounts
+      commentsCount
     }
   }
 `

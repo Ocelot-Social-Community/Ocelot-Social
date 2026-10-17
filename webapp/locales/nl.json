@@ -3,11 +3,8 @@
     "cancel": "Annuleren",
     "clear": "Wissen",
     "close": "Sluiten",
-    "create": "Aanmaken",
     "delete": "Verwijderen",
     "edit": "Bewerken",
-    "loading": "laden",
-    "loadMore": "meer laden",
     "menu": "Menu openen",
     "reset": "Terugzetten",
     "save": "Opslaan",
@@ -29,12 +26,6 @@
       "empty": "Geen gebruikers met API Keys gevonden.",
       "name": "API Keys",
       "never": "nooit",
-      "order": {
-        "active-keys": "Actieve keys",
-        "comments": "Aantal reacties",
-        "last-used": "Laatste activiteit",
-        "posts": "Aantal berichten"
-      },
       "revoke": {
         "confirm": "Intrekken",
         "message": "Weet je zeker dat je de API Key “{name}” van {user} wilt intrekken?",
@@ -50,7 +41,6 @@
       "revoke-key": "Key intrekken",
       "revoked-at": "Ingetrokken op",
       "show-keys": "Keys tonen",
-      "sort-by": "Sorteren op",
       "table": {
         "actions": "Acties",
         "active": "Actief",
@@ -87,7 +77,7 @@
       "verificationBadges": "Verificaties"
     },
     "branding": {
-      "activate": "Activeren",
+      "appliedAfterCall": "Opgeslagen – het nieuwe ontwerp wordt toegepast zodra je het gesprek verlaat.",
       "available": {
         "active": "Actieve basis",
         "default": "Terugval",
@@ -116,32 +106,17 @@
         "unprovidedInherit": "Gebieden die niet meegeleverd worden, nemen de framework-standaard over.",
         "wholePackage": "Volledig pakket (alle gebieden)"
       },
-      "current": "Actief",
-      "description": "Kies welke ingebakken branding netwerkbreed actief is. Omschakelen herlaadt de app voor iedereen.",
       "detail": {
-        "appDescription": "Beschrijving",
-        "colors": "Kleuren",
-        "favicon": "Favicon",
-        "footer": "Footerpagina's",
-        "logos": "Logo's",
-        "noPages": "geen",
-        "organization": "Organisatie",
-        "pages": "Statische pagina's",
-        "pagesSummary": "{pages} pagina's ({locales})",
-        "reuse": "Hergebruik",
-        "themeColor": "Themakleur"
+        "organization": "Organisatie"
       },
       "error": "De branding kon niet worden omgeschakeld.",
       "loading": "Brandings laden…",
       "name": "Branding",
-      "none": "In deze instantie is geen branding ingebakken.",
       "noneExtra": "In deze instantie zijn geen extra brandings ingebakken — alleen de framework-standaard is beschikbaar.",
       "schema": "schema",
       "schemaTitle": "De versie van het @ocelot-social/branding-pakket waarmee dit archief is gebouwd.",
-      "stylesheets": "Eigen stylesheets",
       "stylesheetUnreadable": "niet leesbaar",
       "stylesheetVars": "{count} thema-eigenschap ::: {count} thema-eigenschappen",
-      "title": "Branding",
       "vanilla": "Framework-standaard (geen branding)"
     },
     "categories": {
@@ -251,10 +226,8 @@
       "disabledOnly": "alleen uitgeschakelde",
       "empty": "Geen groep past bij deze filters.",
       "name": "Groepen",
-      "next": "Volgende",
       "noOwner": "geen eigenaar",
       "ownerlessOnly": "alleen zonder eigenaar",
-      "previous": "Vorige",
       "searchPlaceholder": "naam of korte naam",
       "title": "Groepen beheren"
     },
@@ -350,7 +323,6 @@
         "message": "Deze rol is elders gewijzigd terwijl je aan het bewerken was. Je niet-opgeslagen wijzigingen blijven behouden — controleer de gemarkeerde rechten."
       },
       "create": "Rol aanmaken",
-      "createTitle": "Een nieuwe rol aanmaken",
       "delete": "Verwijderen",
       "deleteError": "Kon rol niet verwijderen: {message}",
       "deleteSuccess": "Rol verwijderd.",
@@ -415,8 +387,6 @@
       "name": "Instellingen"
     },
     "users": {
-      "addRole": "Rol toewijzen…",
-      "allRoles": "Alle rollen",
       "delete": {
         "error": "Kan gebruiker niet verwijderen: {message}",
         "message": "Weet je zeker dat je <strong>{name}</strong> permanent wilt verwijderen? Dit kan niet ongedaan worden gemaakt.",
@@ -436,7 +406,6 @@
         "placeholder": "e-mail, naam, beschrijving of role:moderator"
       },
       "name": "Gebruikers",
-      "removeRole": "Rol {role} verwijderen",
       "roleChanged": "Rol succesvol gewijzigd!",
       "table": {
         "columns": {
@@ -457,10 +426,10 @@
     }
   },
   "backendErrors": {
-    "API_KEYS_FEATURE_DISABLED": "API Keys zijn niet ingeschakeld op dit netwerk.",
     "API_KEY_CREATE_EXPIRY_INVALID": "De geldigheid moet minimaal één dag zijn.",
     "API_KEY_CREATE_LIMIT_REACHED": "Je hebt het maximum van {max} actieve API Keys bereikt. Trek een bestaande key in om een nieuwe aan te maken.",
     "API_KEY_DOES_NOT_EXIST": "De API Key is niet gevonden.",
+    "API_KEYS_FEATURE_DISABLED": "API Keys zijn niet ingeschakeld op dit netwerk.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Je kunt alleen badges kiezen die aan jou zijn toegekend.",
     "CHAT_CALL_ROOM_CLOSED": "Dit videogesprek is afgelopen. De chat kan nog worden gelezen, maar er kan niet meer in worden geschreven.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "De groepschat kon niet worden aangemaakt.",
@@ -477,7 +446,6 @@
       "NETWORK_ERROR": "De server is niet bereikbaar. Controleer je internetverbinding en probeer het opnieuw.",
       "UNAUTHENTICATED": "Log in om verder te gaan."
     },
-    "GROUPS_FEATURE_DISABLED": "Groepen zijn in dit netwerk niet ingeschakeld.",
     "GROUP_ELEVATION_REASON_INVALID": "De reden mag maximaal {max} tekens lang zijn en niet met een spatie beginnen of eindigen.",
     "GROUP_ELEVATION_REASON_MISSING": "Geef aan waar het om gaat.",
     "GROUP_ELEVATION_RIGHTS_MISSING": "Je netwerkrechten laten je hier alleen lezen.",
@@ -506,6 +474,7 @@
     "GROUP_TEMPLATE_PERMISSIONS_VISIBILITY_MISMATCH": "Met deze rechten past het sjabloon niet meer bij de zichtbaarheid waarnaar het is genoemd.",
     "GROUP_TEMPLATE_ROLE_UNKNOWN": "Deze rol bestaat niet in het sjabloon.",
     "GROUP_VISIBILITY_RAISE_NOT_PERMITTED": "Je mag deze groep niet verder afschermen dan je zelf groepen mag aanmaken.",
+    "GROUPS_FEATURE_DISABLED": "Groepen zijn in dit netwerk niet ingeschakeld.",
     "INVITE_CODE_CREATE_GROUP_MEMBERSHIP_REQUIRED": "Om een uitnodigingslink te maken moet je lid zijn van de groep.",
     "INVITE_CODE_CREATE_LIMIT_REACHED": "Je hebt het maximale aantal uitnodigingslinks bereikt.",
     "INVITE_CODE_INVALIDATE_CODE_NOT_FOUND": "De uitnodigingslink is niet gevonden.",
@@ -517,8 +486,8 @@
     "LOCATION_ID_NOT_CONFIRMED": "De gekozen plaats kon niet worden bevestigd. Kies hem opnieuw uit de suggesties.",
     "LOCATION_LATITUDE_OUT_OF_RANGE": "De breedtegraad van de locatie is ongeldig.",
     "LOCATION_LONGITUDE_OUT_OF_RANGE": "De lengtegraad van de locatie is ongeldig.",
-    "LOCATION_NAME_NOT_FOUND": "Deze plaats is niet gevonden.",
     "LOCATION_NAME_NO_EXACT_MATCH": "De gekozen plaats kon niet exact worden toegewezen. Kies hem opnieuw uit de suggesties.",
+    "LOCATION_NAME_NOT_FOUND": "Deze plaats is niet gevonden.",
     "LOGIN_ACCOUNT_DISABLED": "Je account is gedeactiveerd.",
     "LOGIN_CREDENTIALS_INCORRECT": "Onjuist e-mailadres of wachtwoord.",
     "PASSWORD_CHANGE_NEW_PASSWORD_EQUALS_OLD": "Het nieuwe wachtwoord moet verschillen van het oude.",
@@ -569,7 +538,6 @@
     "VIDEO_CALL_START_NOT_PERMITTED": "Je mag in deze groep geen videogesprek starten."
   },
   "chat": {
-    "addGroupRoomHeadline": "Zoek groep voor nieuwe chat",
     "addRoomHeadline": "Zoek gebruiker voor nieuwe chat",
     "callRoomEmpty": "Nog geen berichten. Deze chat is alleen zichtbaar voor de deelnemers aan dit videogesprek.",
     "callRoomName": "Gesprek · {name}",
@@ -594,18 +562,12 @@
     "messageDeleted": "Dit bericht is verwijderd",
     "messagesEmpty": "Geen berichten",
     "newMessages": "Nieuwe berichten",
-    "noGroupsFound": "Geen groepen gevonden",
-    "page": {
-      "headline": "Chat"
-    },
     "roomEmpty": "Geen ruimte geselecteerd",
     "roomsEmpty": "Geen ruimtes",
     "search": "Chatruimtes filteren",
     "searchBadgeGroup": "Groep",
     "searchBadgeUser": "Gebruiker",
-    "searchGroupPlaceholder": "Groep zoeken…",
     "searchPlaceholder": "Gebruiker of groep zoeken…",
-    "transmitting": "Bericht verzenden …",
     "typeMessage": "Typ een bericht",
     "userProfileButton": {
       "label": "Chat",
@@ -614,9 +576,6 @@
   },
   "client-only": {
     "loading": "Laden …"
-  },
-  "code-of-conduct": {
-    "subheader": "voor het sociale netwerk van {ORGANIZATION_NAME}"
   },
   "comment": {
     "content": {
@@ -633,24 +592,12 @@
     }
   },
   "common": {
-    "category": "Categorie ::: Categorieën",
     "comment": "Opmerking ::: Opmerkingen",
     "filter": "Filteren …",
-    "letsTalk": "Laten we praten",
-    "loading": "inlading",
-    "loadMore": "meer laden",
-    "name": "Naam",
     "noChangesHint": "Er is nog niets om op te slaan.",
-    "organization": "Organisatie ::: Organisaties",
     "post": "Bericht ::: Berichten",
     "previousLocation": "Vorige locatie: {location}",
-    "project": "Project ::: Projecten",
-    "reportContent": "Melden",
     "scrollToLocationMap": "Naar de kaart scrollen",
-    "shout": "Shout ::: Shouts",
-    "tag": "Tag ::: Tags",
-    "takeAction": "Onderneem actie",
-    "user": "Gebruiker ::: Gebruikers",
     "validations": {
       "categories": "Selecteer tussen één en drie onderwerpen.",
       "contentNotEmpty": "Voer inhoud in.",
@@ -664,8 +611,7 @@
       "nameLength": "De naam moet tussen {min} en {max} tekens lang zijn.",
       "titleLength": "De titel moet tussen {min} en {max} tekens lang zijn.",
       "titleNotEmpty": "Voer een titel in."
-    },
-    "versus": "Versus"
+    }
   },
   "component-slider": {
     "step": "Stap {current} van {total}"
@@ -673,7 +619,6 @@
   "components": {
     "dateTimeRange": {
       "hourMinute": "HH:mm",
-      "monthDay": "dd-MM-",
       "yearMonthDay": "dd-MM-yyyy"
     },
     "password-reset": {
@@ -687,8 +632,7 @@
           "description": "Er wordt een e-mail voor het opnieuw instellen van je wachtwoord gestuurd naar het opgegeven e-mailadres.",
           "submit": "E-mail aanvragen",
           "submitted": "Er is een e-mail met verdere instructies gestuurd naar <b>{email}</b>"
-        },
-        "title": "Wachtwoord opnieuw instellen"
+        }
       }
     },
     "registration": {
@@ -726,8 +670,7 @@
           "nonce": "E-mailcode: 32143",
           "validations": {
             "error": "Ongeldige verificatiecode <b>{nonce}</b> voor e-mail <b>{email}</b>!",
-            "length": "moet {nonceLength} tekens lang zijn",
-            "success": "Geldige verificatiecode <b>{nonce}</b> voor e-mail <b>{email}</b>!"
+            "length": "moet {nonceLength} tekens lang zijn"
           }
         },
         "title": "E-mailbevestiging"
@@ -737,11 +680,9 @@
         "form": {
           "description": "Voer de uitnodigingscode in die je hebt ontvangen.",
           "invite-code": "Uitnodigingscode: ACJERB",
-          "next": "Doorgaan",
           "validations": {
             "error": "Ongeldige uitnodigingscode <b>{inviteCode}</b>!",
-            "length": "moet {inviteCodeLength} tekens lang zijn",
-            "success": "Geldige uitnodigingscode <b>{inviteCode}</b>!"
+            "length": "moet {inviteCodeLength} tekens lang zijn"
           }
         },
         "invited-by": "Uitgenodigd door {invitedBy}.",
@@ -753,14 +694,12 @@
       },
       "signup": {
         "form": {
-          "data-privacy": "Ik heb de privacyverklaring gelezen en begrepen.",
           "description": "Om te beginnen kun je je hier gratis registreren:",
           "errors": {
             "email-exists": "Er bestaat al een gebruikersaccount met dit e-mailadres!"
           },
           "submit": "Account aanmaken",
-          "success": "Er is een e-mail met een link om je registratie te voltooien gestuurd naar <b>{email}</b>",
-          "terms-and-condition": "Ik ga akkoord met de <a href=\"/terms-and-conditions\" target=\"_blank\"><ds-text bold color=\"primary\">Algemene voorwaarden</ds-text></a>."
+          "success": "Er is een e-mail met een link om je registratie te voltooien gestuurd naar <b>{email}</b>"
         },
         "title": "Word lid van {APPLICATION_NAME}!",
         "unavailable": "Helaas is openbare registratie van gebruikersaccounts op dit moment niet beschikbaar op deze server."
@@ -772,9 +711,6 @@
     "amount-comments": "{amount} reacties",
     "amount-shouts": "{amount} aanbevelingen",
     "amount-views": "{amount} weergaven",
-    "categories": {
-      "infoSelectedNoOfMaxCategories": "{chosen} van {max} onderwerpen geselecteerd"
-    },
     "categoriesTitle": "Onderwerpen",
     "category": {
       "description": {
@@ -834,14 +770,6 @@
       }
     },
     "content": "Inhoud",
-    "emotions-label": {
-      "angry": "Boos",
-      "cry": "Huilen",
-      "funny": "Grappig",
-      "happy": "Blij",
-      "surprised": "Verrast"
-    },
-    "filterFollow": "Gebruikers die ik volg",
     "filterMasonryGrid": {
       "myFriends": "Gebruikers die ik volg",
       "myGroups": "Van mijn groepen",
@@ -852,9 +780,6 @@
     },
     "filterMyGroups": "Mijn groepen",
     "inappropriatePicture": "Deze afbeelding kan voor sommige mensen ongepast zijn.",
-    "languageSelectLabel": "Taal van je bijdrage",
-    "languageSelectText": "Selecteer taal",
-    "newEvent": "Maak een nieuw evenement aan",
     "newPost": "Maak een nieuw bericht aan",
     "postIn": "Publiceren in",
     "postInGroupOption": "Groep: {name}",
@@ -877,14 +802,12 @@
     "comment": {
       "message": "Wil je de reactie “<b>{name}</b>” echt verwijderen?",
       "success": "Reactie succesvol verwijderd!",
-      "title": "Reactie verwijderen",
-      "type": "Reactie"
+      "title": "Reactie verwijderen"
     },
     "contribution": {
       "message": "Wil je het bericht “<b>{name}</b>” echt verwijderen?",
       "success": "Bericht succesvol verwijderd!",
-      "title": "Bericht verwijderen",
-      "type": "Bijdrage"
+      "title": "Bericht verwijderen"
     },
     "submit": "Verwijderen"
   },
@@ -892,20 +815,17 @@
     "cancel": "Annuleren",
     "comment": {
       "message": "Wilt u de reactie van “<b>{name}</b>” echt uitschakelen ?",
-      "title": "Commentaar uitschakelen",
-      "type": "Melding"
+      "title": "Commentaar uitschakelen"
     },
     "contribution": {
       "message": "Wil je de bijdrage “<b>{name}</b>” echt deactiveren?",
-      "title": "Bijdrage deactiveren",
-      "type": "Bijdrage"
+      "title": "Bijdrage deactiveren"
     },
     "submit": "Deactiveren",
     "success": "Succesvol gedeactiveerd!",
     "user": {
       "message": "Wil je de gebruiker “<b>{name}</b>” echt deactiveren?",
-      "title": "Gebruiker deactiveren",
-      "type": "Gebruiker"
+      "title": "Gebruiker deactiveren"
     }
   },
   "donations": {
@@ -922,7 +842,6 @@
     "hashtag": {
       "addHashtag": "Nieuwe hashtag",
       "addLetter": "Typ een letter",
-      "noHashtagsFound": "Geen hashtags gevonden",
       "relation": {
         "popular": "Populair",
         "usedByMe": "Door mij gebruikt"
@@ -972,7 +891,6 @@
     "categories": "Onderwerpen",
     "creationDate": "Aanmaakdatum",
     "deleteFilter": "Filter verwijderen",
-    "emotions": "Emoties",
     "ended": {
       "all": {
         "hint": "Alles tonen, ook beëindigde",
@@ -985,12 +903,9 @@
     },
     "event": "Evenement",
     "eventsBy": "Evenementen – toon ...",
-    "eventsEnded": "Beëindigd",
     "filter-by": "Filteren op ...",
     "following": "Gebruikers die ik volg",
     "following-title": "Bronnen",
-    "languages": "Talen",
-    "my-groups": "Mijn groepen",
     "order": {
       "last": {
         "hint": "Berichten sorteren op laatst eerst",
@@ -1033,7 +948,6 @@
     },
     "actionRadius": "Actieradius van de groep",
     "addMember": "Lid toevoegen",
-    "addMemberToGroup": "Toevoegen aan groep",
     "addMemberToGroupSuccess": "“{name}” is toegevoegd aan de groep met de rol “{role}”!",
     "addUser": "Gebruiker toevoegen",
     "addUserNoOptions": "Geen gebruikers gevonden!",
@@ -1092,7 +1006,6 @@
     "errors": {
       "userAlreadyMember": "Gebruiker “{name}” is al lid!"
     },
-    "follow": "Volgen",
     "foundation": "Oprichting",
     "general": "Algemeen",
     "goal": "Doel van de groep",
@@ -1134,19 +1047,16 @@
     "modal": {
       "cancel": "Annuleren",
       "confirm": "Bevestigen",
-      "confirmAddGroupMemberText": "Gebruiker “{name}” toevoegen aan groep?",
-      "confirmAddGroupMemberTitle": "Bevestigen"
+      "confirmAddGroupMemberText": "Gebruiker “{name}” toevoegen aan groep?"
     },
     "muted": "Groep gedempt",
     "myGroups": "Mijn groepen",
     "name": "Groepsnaam",
-    "radius": "Radius",
     "removeMember": "Lid verwijderen",
     "removeMemberButton": "Verwijderen",
     "removeMemberConfirmText": "Gebruiker “{name}” uit de groep verwijderen?",
     "removeMemberTitle": "Lid verwijderen",
     "rights": {
-      "addRole": "Rol toevoegen",
       "advancedTitle": "Alle rechten in detail",
       "applyTemplate": "Sjabloon toepassen — vervangt alle rollen van deze groep door die van het sjabloon.",
       "blockedByFeature": "Deze functie is uitgeschakeld in dit netwerk ({feature}).",
@@ -1154,7 +1064,6 @@
       "confirmApplyTemplate": "Sjabloon “{template}” op deze groep toepassen? Alle rollen worden vervangen door die van het sjabloon.",
       "confirmApplyTemplateDiscards": "Sjabloon “{template}” op deze groep toepassen? Alle rollen worden vervangen door die van het sjabloon — en de niet-opgeslagen wijzigingen gaan verloren.",
       "confirmDelete": "De rol “{role}” verwijderen? De leden worden “{target}”.",
-      "confirmReset": "Alle rollen van deze groep terugzetten naar de standaard? Rollen die jullie hebben toegevoegd verdwijnen en hun leden worden gewone leden.",
       "deleteRole": "Rol verwijderen",
       "description": "Bepaal wie wat mag in deze groep — van buitenstaanders tot beheerders.",
       "discardDraft": "De niet-opgeslagen wijzigingen gaan verloren. Toch doorgaan?",
@@ -1178,9 +1087,9 @@
         "group_join": "Direct lid worden van de groep, zonder goedkeuring.",
         "group_join_request": "Een lidmaatschap aanvragen en op goedkeuring wachten.",
         "group_leave": "De groep verlaten.",
-        "group_members_read": "De ledenlijst en het aantal leden zien.",
         "group_member_remove": "Leden uit de groep verwijderen.",
         "group_member_role_assign": "De rollen van leden wijzigen.",
+        "group_members_read": "De ledenlijst en het aantal leden zien.",
         "group_post_create": "Berichten schrijven in de groep.",
         "group_post_moderate": "Het bericht van iemand anders uit de groep halen. Het bericht blijft van de auteur.",
         "group_post_pin": "Berichten in de groep vastzetten en losmaken.",
@@ -1190,10 +1099,7 @@
         "group_videoCall_create": "Een videogesprek starten in de groep.",
         "group_videoCall_join": "Deelnemen aan een lopend videogesprek van de groep."
       },
-      "reset": "Terug naar de standaard",
       "resultingType": "Met deze rechten is de groep:",
-      "roleKeyPlaceholder": "sleutel, bijv. redactie",
-      "roleLabelPlaceholder": "weergavenaam, bijv. Redactie",
       "saved": "Rechten opgeslagen",
       "saveFirst": "Eerst opslaan of verwerpen — er zijn niet-opgeslagen wijzigingen.",
       "simple": {
@@ -1225,7 +1131,6 @@
       "usual": "Lid"
     },
     "save": "Nieuwe groep aanmaken",
-    "showMembers": "Ledenlijst zichtbaar voor iedereen",
     "teaser": {
       "notReadable": "Je kunt deze groep nog niet openen — je aanvraag loopt nog",
       "openGroup": "Groep openen",
@@ -1272,8 +1177,7 @@
   },
   "hashtags-filter": {
     "clearSearch": "Zoekopdracht wissen",
-    "hashtag-search": "Zoeken naar #{hashtag}",
-    "title": "Jouw filterbubbel"
+    "hashtag-search": "Zoeken naar #{hashtag}"
   },
   "header": {
     "avatarMenu": {
@@ -1327,7 +1231,6 @@
     "invite-link-message-hidden-group": "Je bent uitgenodigd om lid te worden van een verborgen groep op {APPLICATION_NAME}.",
     "invite-link-message-personal": "Je bent uitgenodigd om lid te worden van {APPLICATION_NAME}.",
     "invited-count": "Je hebt al {count} mensen uitgenodigd.",
-    "limit-reached": "Je hebt het maximale aantal uitnodigingslinks bereikt.",
     "members-only": "alleen voor mensen die al een account hebben",
     "my-invite-links": "Mijn uitnodigingslinks",
     "no-links": "Nog geen uitnodigingslinks aangemaakt.",
@@ -1356,7 +1259,6 @@
     "login": "Inloggen",
     "logout": "Uitloggen",
     "moreInfo": "Wat is {APPLICATION_NAME}?",
-    "moreInfoHint": "naar de presentatiepagina",
     "no-account": "Heb je nog geen account?",
     "no-cookie": "Er kan geen cookie worden ingesteld. Je moet cookies accepteren.",
     "password": "Uw Wachtwoord",
@@ -1382,12 +1284,6 @@
       "theUser": "Mijn positie",
       "title": "Legenda",
       "user": "Gebruiker"
-    },
-    "markerTypes": {
-      "event": "evenement",
-      "group": "groep",
-      "theUser": "mijn positie",
-      "user": "gebruiker"
     },
     "pageTitle": "Kaart",
     "styles": {
@@ -1446,12 +1342,9 @@
       },
       "decision": "Beslissing",
       "DecisionSuccess": "Succesvol besloten!",
-      "disabled": "Gedeactiveerd",
-      "disabledAt": "Gedeactiveerd op",
       "disabledBy": "Gedeactiveerd door",
       "empty": "Gefeliciteerd, er is niets te modereren.",
       "enabled": "Geactiveerd",
-      "enabledAt": "Geactiveerd op",
       "enabledBy": "Geactiveerd door",
       "filterLabel": {
         "all": "Alles",
@@ -1464,9 +1357,7 @@
       "hiddenGroupLink": "Naar {name} om beheerderstoegang te gebruiken",
       "moreDetails": "Details bekijken",
       "name": "Meldingen",
-      "noDecision": "Geen beslissing!",
       "numberOfUsers": "{count} gebruikers",
-      "previousDecision": "Vorige beslissing:",
       "reasonCategory": "Onderwerp",
       "reasonDescription": "Beschrijving",
       "reportedOn": "Datum",
@@ -1479,14 +1370,12 @@
   },
   "notifications": {
     "comment": "Reactie",
-    "content": "Inhoud of beschrijving",
     "empty": "Sorry, je hebt op dit moment geen meldingen.",
     "filterLabel": {
       "all": "Alles",
       "read": "Gelezen",
       "unread": "Ongelezen"
     },
-    "group": "Beschrijving",
     "markAllAsRead": "Markeer alles als gelezen",
     "markAsRead": "Markeer als gelezen",
     "markAsUnread": "Markeer als ongelezen",
@@ -1583,9 +1472,6 @@
       "hide": "Gevoelige inhoud verbergen",
       "show": "Gevoelige inhoud tonen"
     },
-    "takeAction": {
-      "name": "Onderneem actie"
-    },
     "viewEvent": {
       "eventEnd": "Einde",
       "eventEndBeforeStart": "De einddatum moet na de startdatum liggen.",
@@ -1599,14 +1485,12 @@
       "eventVenue": "bijv. Café Chrysander, bij Slot Bergedorf",
       "eventVenueLabel": "Locatiebeschrijving",
       "pickLocationOnMap": "Locatie op de kaart kiezen",
-      "title": "Evenement",
       "viewOnMainMap": "Bekijken op hoofdkaart"
     },
     "viewPost": {
       "forGroup": {
         "title": "In de groep "
-      },
-      "title": "Bericht"
+      }
     }
   },
   "profile": {
@@ -1614,7 +1498,6 @@
       "submitted": "Upload geslaagd!"
     },
     "commented": "Gereageerd",
-    "follow": "Volgen",
     "followers": "Volgelingen",
     "following": "Volgt",
     "groups": {
@@ -1656,24 +1539,18 @@
   "release": {
     "cancel": "Annuleren",
     "comment": {
-      "error": "Je hebt de reactie al gemeld!",
       "message": "Wil je de reactie van “<b>{name}</b>” echt vrijgeven?",
-      "title": "Reactie vrijgeven",
-      "type": "Reactie"
+      "title": "Reactie vrijgeven"
     },
     "contribution": {
-      "error": "Je hebt de bijdrage al gemeld!",
       "message": "Wil je de bijdrage “<b>{name}</b>” echt vrijgeven?",
-      "title": "Bijdrage vrijgeven",
-      "type": "Bijdrage"
+      "title": "Bijdrage vrijgeven"
     },
     "submit": "Vrijgeven",
     "success": "Succesvol vrijgegeven!",
     "user": {
-      "error": "Je hebt de gebruiker al gemeld!",
       "message": "Wil je de gebruiker “<b>{name}</b>” echt vrijgeven?",
-      "title": "Gebruiker vrijgeven",
-      "type": "Gebruiker"
+      "title": "Gebruiker vrijgeven"
     }
   },
   "report": {
@@ -1703,8 +1580,7 @@
           "intentional_intimidation_stalking_persecution": "Opzettelijke intimidatie, stalking of vervolging.",
           "other": "Anders …",
           "pornographic_content_links": "Plaatsen van of verwijzen naar duidelijk pornografisch materiaal."
-        },
-        "placeholder": "Onderwerp …"
+        }
       },
       "description": {
         "label": "Leg uit: waarom wil je dit melden?",
@@ -1733,7 +1609,6 @@
     "no-results": "Geen resultaten gevonden voor “{search}”. Probeer een andere zoekterm!",
     "page": "Pagina",
     "placeholder": "Zoeken",
-    "results": "resultaat gevonden ::: resultaten gevonden",
     "title": "Zoekresultaten"
   },
   "settings": {
@@ -1800,6 +1675,7 @@
     },
     "blocked-users": {
       "block": "Gebruiker blokkeren",
+      "blocked": "{name} is geblokkeerd",
       "columns": {
         "name": "Naam",
         "slug": "Slug",
@@ -1807,7 +1683,6 @@
       },
       "empty": "Je hebt tot nu toe niemand geblokkeerd.",
       "explanation": {
-        "closing": "Dit zou voor nu voldoende moeten zijn zodat geblokkeerde gebruikers je niet meer kunnen lastigvallen.",
         "commenting-disabled": "Je kunt op dit moment niet reageren op dit bericht.",
         "intro": "Als een andere gebruiker door jou is geblokkeerd, gebeurt het volgende:",
         "notifications": "Geblokkeerde gebruikers ontvangen geen meldingen meer als ze elkaar noemen.",
@@ -1824,7 +1699,6 @@
       "givenNamePlaceholder": "Femanon",
       "labelBio": "Over jou",
       "labelCity": "Je stad of regio",
-      "labelCityHint": "(toont geschatte positie op de kaart)",
       "labelName": "Je naam",
       "labelSlug": "Je unieke gebruikersnaam",
       "name": "Uw gegevens",
@@ -1837,10 +1711,8 @@
     "deleteUserAccount": {
       "accountDescription": "Wees je ervan bewust dat je berichten en reacties belangrijk zijn voor onze community. Als je er toch voor kiest ze te verwijderen, moet je ze hieronder markeren.",
       "accountWarning": "Je kunt je account, berichten of reacties NIET BEHEREN en NIET HERSTELLEN na het verwijderen van je account!",
-      "accountWarningAdmin": "Het account, de bijdragen of reacties kunnen NA VERWIJDERING NIET WORDEN BEHEERD OF HERSTELD!",
       "accountWarningIsAdmin": "Let op! Je staat op het punt een gebruikersaccount te verwijderen!",
-      "commentedCount": "Mijn {count} reactie verwijderen ::: Mijn {count} reacties verwijderen",
-      "confirmDeleting": "Gebruikersaccount nu verwijderen",
+      "commentsCount": "Mijn {count} reactie verwijderen ::: Mijn {count} reacties verwijderen",
       "contributionsCount": "Mijn {count} bericht verwijderen ::: Mijn {count} berichten verwijderen",
       "infoAdmin": "Alle bijdragen en reacties van de gebruiker worden ook verwijderd!",
       "name": "Gebruikersaccount verwijderen",
@@ -1912,6 +1784,7 @@
       },
       "how-to": "Je kunt andere gebruikers dempen op hun profielpagina via het inhoudsmenu.",
       "mute": "Gebruiker dempen",
+      "muted": "{name} is gedempt",
       "name": "Gedempte gebruikers",
       "unmute": "Gebruiker niet meer dempen",
       "unmuted": "{name} is niet meer gedempt"
@@ -1999,18 +1872,14 @@
   },
   "site": {
     "back-to-login": "Terug naar de inlogpagina",
-    "bank": "bankrekening",
     "code-of-conduct": "Gedragscode",
-    "contact": "contact",
     "data-privacy": "gegevensbescherming",
     "donate": "Doneren",
     "error-occurred": "Er is een fout opgetreden.",
     "faq": "FAQ",
-    "germany": "Duitsland",
     "imprint": "Colofon",
     "made": "Met ❤️ gemaakt",
     "navigation": "Navigatie",
-    "register": "inschrijfnummer",
     "support": "Ondersteuning",
     "termsAndConditions": "Algemene voorwaarden",
     "thanks": "Bedankt!"
@@ -2093,6 +1962,7 @@
       "label": "Groepsvideo",
       "tooltip": "Videogesprek in groep “{name}”"
     },
+    "hideBars": "Balken verbergen",
     "leave": "Gesprek verlaten",
     "maximize": "Maximaliseren",
     "micMuted": "Microfoon uit",
@@ -2100,7 +1970,6 @@
     "micUnmuted": "Microfoon aan",
     "minimize": "Minimaliseren",
     "openChat": "Chat openen",
-    "participants": "Deelnemers",
     "prejoin": {
       "camera": "Camera",
       "cameraDisabled": "De camera is uitgeschakeld.",
@@ -2143,9 +2012,11 @@
       "unsupportedBrowser": "Je browser ondersteunt geen audio/video."
     },
     "reconnecting": "Verbinding verbroken — opnieuw verbinden…",
+    "reloadPending": "Het platform heeft een nieuw ontwerp. Het wordt toegepast zodra je het gesprek verlaat.",
     "restartMic": "Microfoon opnieuw starten",
     "screenShare": "Scherm",
     "screenShareEnded": "Schermdelen beëindigd",
+    "showBars": "Balken tonen",
     "showVideos": "Video's tonen",
     "spotlightExit": "Spotlight verlaten",
     "title": "Groepsvideogesprek",

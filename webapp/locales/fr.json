@@ -3,11 +3,8 @@
     "cancel": "Annuler",
     "clear": "Effacer",
     "close": "Fermer",
-    "create": "Créer",
     "delete": "Supprimer",
     "edit": "Modifier",
-    "loading": "chargement",
-    "loadMore": "charger plus",
     "menu": "Ouvrir le menu",
     "reset": "Réinitialiser",
     "save": "Sauvegarder",
@@ -29,12 +26,6 @@
       "empty": "Aucun utilisateur avec des API Keys trouvé.",
       "name": "API Keys",
       "never": "jamais",
-      "order": {
-        "active-keys": "Keys actives",
-        "comments": "Nombre de commentaires",
-        "last-used": "Dernière activité",
-        "posts": "Nombre de publications"
-      },
       "revoke": {
         "confirm": "Révoquer",
         "message": "Es-tu sûr de vouloir révoquer l'API Key « {name} » de {user} ?",
@@ -50,7 +41,6 @@
       "revoke-key": "Révoquer la key",
       "revoked-at": "Révoquée le",
       "show-keys": "Afficher les keys",
-      "sort-by": "Trier par",
       "table": {
         "actions": "Actions",
         "active": "Actives",
@@ -87,7 +77,7 @@
       "verificationBadges": "Vérifications"
     },
     "branding": {
-      "activate": "Activer",
+      "appliedAfterCall": "Enregistré – le nouveau design sera appliqué dès que vous quitterez l’appel.",
       "available": {
         "active": "Base active",
         "default": "Repli",
@@ -116,32 +106,17 @@
         "unprovidedInherit": "Les zones non fournies héritent de la valeur par défaut du framework.",
         "wholePackage": "Paquet complet (toutes les zones)"
       },
-      "current": "Actif",
-      "description": "Choisissez le branding intégré actif sur tout le réseau. Le changement recharge l'application pour tout le monde.",
       "detail": {
-        "appDescription": "Description",
-        "colors": "Couleurs",
-        "favicon": "Favicon",
-        "footer": "Pages du pied de page",
-        "logos": "Logos",
-        "noPages": "aucune",
-        "organization": "Organisation",
-        "pages": "Pages statiques",
-        "pagesSummary": "{pages} pages ({locales})",
-        "reuse": "Réutilisation",
-        "themeColor": "Couleur du thème"
+        "organization": "Organisation"
       },
       "error": "Impossible de changer le branding.",
       "loading": "Chargement des brandings…",
       "name": "Branding",
-      "none": "Aucun branding n'est intégré à cette instance.",
       "noneExtra": "Aucun autre branding n'est intégré à cette instance — seule la valeur par défaut du framework est disponible.",
       "schema": "schéma",
       "schemaTitle": "La version du paquet @ocelot-social/branding avec laquelle cette archive a été créée.",
-      "stylesheets": "Feuilles de style propres",
       "stylesheetUnreadable": "illisible",
       "stylesheetVars": "{count} propriété de thème ::: {count} propriétés de thème",
-      "title": "Branding",
       "vanilla": "Valeur par défaut du framework (sans branding)"
     },
     "categories": {
@@ -251,10 +226,8 @@
       "disabledOnly": "désactivés uniquement",
       "empty": "Aucun groupe ne correspond à ces filtres.",
       "name": "Groupes",
-      "next": "Suivant",
       "noOwner": "sans propriétaire",
       "ownerlessOnly": "sans propriétaire uniquement",
-      "previous": "Précédent",
       "searchPlaceholder": "nom ou nom court",
       "title": "Gérer les groupes"
     },
@@ -350,7 +323,6 @@
         "message": "Ce rôle a été modifié ailleurs pendant que vous l'éditiez. Vos modifications non enregistrées sont conservées — vérifiez les permissions mises en évidence."
       },
       "create": "Créer un rôle",
-      "createTitle": "Créer un nouveau rôle",
       "delete": "Supprimer",
       "deleteError": "Impossible de supprimer le rôle : {message}",
       "deleteSuccess": "Rôle supprimé.",
@@ -415,8 +387,6 @@
       "name": "Paramètres"
     },
     "users": {
-      "addRole": "Attribuer un rôle…",
-      "allRoles": "Tous les rôles",
       "delete": {
         "error": "Impossible de supprimer l'utilisateur : {message}",
         "message": "Voulez-vous vraiment supprimer définitivement <strong>{name}</strong> ? Cette action est irréversible.",
@@ -436,7 +406,6 @@
         "placeholder": "e-mail, nom, description ou role:moderator"
       },
       "name": "Utilisateurs",
-      "removeRole": "Retirer le rôle {role}",
       "roleChanged": "Rôle modifié avec succès !",
       "table": {
         "columns": {
@@ -457,10 +426,10 @@
     }
   },
   "backendErrors": {
-    "API_KEYS_FEATURE_DISABLED": "Les API Keys ne sont pas activées sur ce réseau.",
     "API_KEY_CREATE_EXPIRY_INVALID": "La validité doit être d'au moins un jour.",
     "API_KEY_CREATE_LIMIT_REACHED": "Tu as atteint le maximum de {max} API Keys actives. Révoque une key existante pour en créer une nouvelle.",
     "API_KEY_DOES_NOT_EXIST": "L'API Key est introuvable.",
+    "API_KEYS_FEATURE_DISABLED": "Les API Keys ne sont pas activées sur ce réseau.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Tu ne peux sélectionner que des badges qui t'ont été attribués.",
     "CHAT_CALL_ROOM_CLOSED": "Cet appel vidéo est terminé. Son chat peut encore être lu, mais plus aucun message ne peut y être écrit.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "Le chat de groupe n'a pas pu être créé.",
@@ -477,7 +446,6 @@
       "NETWORK_ERROR": "Le serveur est injoignable. Vérifie ta connexion Internet et réessaie.",
       "UNAUTHENTICATED": "Connecte-toi pour continuer."
     },
-    "GROUPS_FEATURE_DISABLED": "Les groupes ne sont pas activés sur ce réseau.",
     "GROUP_ELEVATION_REASON_INVALID": "La raison peut comporter au plus {max} caractères et ne doit ni commencer ni se terminer par une espace.",
     "GROUP_ELEVATION_REASON_MISSING": "Indique ce que tu fais ici.",
     "GROUP_ELEVATION_RIGHTS_MISSING": "Tes permissions sur le réseau te permettent seulement de lire ici.",
@@ -506,6 +474,7 @@
     "GROUP_TEMPLATE_PERMISSIONS_VISIBILITY_MISMATCH": "Avec ces permissions, le modèle ne correspondrait plus à la visibilité dont il porte le nom.",
     "GROUP_TEMPLATE_ROLE_UNKNOWN": "Ce rôle n'existe pas dans le modèle.",
     "GROUP_VISIBILITY_RAISE_NOT_PERMITTED": "Tu ne peux pas rendre ce groupe plus privé que tu n'as le droit d'en créer.",
+    "GROUPS_FEATURE_DISABLED": "Les groupes ne sont pas activés sur ce réseau.",
     "INVITE_CODE_CREATE_GROUP_MEMBERSHIP_REQUIRED": "Pour créer un lien d'invitation, tu dois être membre du groupe.",
     "INVITE_CODE_CREATE_LIMIT_REACHED": "Tu as atteint le nombre maximum de liens d'invitation.",
     "INVITE_CODE_INVALIDATE_CODE_NOT_FOUND": "Le lien d'invitation est introuvable.",
@@ -517,8 +486,8 @@
     "LOCATION_ID_NOT_CONFIRMED": "Le lieu sélectionné n'a pas pu être confirmé. Veuillez le choisir à nouveau parmi les suggestions.",
     "LOCATION_LATITUDE_OUT_OF_RANGE": "La latitude du lieu n'est pas valide.",
     "LOCATION_LONGITUDE_OUT_OF_RANGE": "La longitude du lieu n'est pas valide.",
-    "LOCATION_NAME_NOT_FOUND": "Ce lieu est introuvable.",
     "LOCATION_NAME_NO_EXACT_MATCH": "Le lieu sélectionné n'a pas pu être attribué avec précision. Choisis-le à nouveau parmi les suggestions.",
+    "LOCATION_NAME_NOT_FOUND": "Ce lieu est introuvable.",
     "LOGIN_ACCOUNT_DISABLED": "Ton compte a été désactivé.",
     "LOGIN_CREDENTIALS_INCORRECT": "Adresse mail ou mot de passe incorrect.",
     "PASSWORD_CHANGE_NEW_PASSWORD_EQUALS_OLD": "Le nouveau mot de passe doit être différent de l'ancien.",
@@ -569,7 +538,6 @@
     "VIDEO_CALL_START_NOT_PERMITTED": "Tu n'as pas le droit de démarrer un appel vidéo dans ce groupe."
   },
   "chat": {
-    "addGroupRoomHeadline": "Chercher un groupe pour un nouveau chat",
     "addRoomHeadline": "Rechercher un utilisateur pour un nouveau chat",
     "callRoomEmpty": "Pas encore de messages. Ce chat n'est visible que par les participants de cet appel vidéo.",
     "callRoomName": "Appel · {name}",
@@ -594,18 +562,12 @@
     "messageDeleted": "Ce message a été supprimé",
     "messagesEmpty": "Aucun message",
     "newMessages": "Nouveaux messages",
-    "noGroupsFound": "Aucun groupe trouvé",
-    "page": {
-      "headline": "Chat"
-    },
     "roomEmpty": "Aucun salon sélectionné",
     "roomsEmpty": "Aucun salon",
     "search": "Filtrer les salons de chat",
     "searchBadgeGroup": "Groupe",
     "searchBadgeUser": "Utilisateur",
-    "searchGroupPlaceholder": "Chercher un groupe…",
     "searchPlaceholder": "Chercher un utilisateur ou un groupe…",
-    "transmitting": "Envoi du message ...",
     "typeMessage": "Écris un message",
     "userProfileButton": {
       "label": "Chat",
@@ -614,9 +576,6 @@
   },
   "client-only": {
     "loading": "Chargement …"
-  },
-  "code-of-conduct": {
-    "subheader": "pour le réseau social de {ORGANIZATION_NAME}"
   },
   "comment": {
     "content": {
@@ -633,24 +592,12 @@
     }
   },
   "common": {
-    "category": "Catégorie ::: Catégories",
     "comment": "Commentaire ::: Commentaires",
     "filter": "Filtrer …",
-    "letsTalk": "Parlons-en",
-    "loading": "chargement",
-    "loadMore": "charger plus",
-    "name": "Nom",
     "noChangesHint": "Il n'y a encore rien à enregistrer.",
-    "organization": "Organisation ::: Organisations",
     "post": "Message ::: Messages",
     "previousLocation": "Emplacement précédent : {location}",
-    "project": "Projet ::: Projets",
-    "reportContent": "Signaler",
     "scrollToLocationMap": "Faire défiler jusqu’à la carte",
-    "shout": "Partage ::: Partages",
-    "tag": "Tag ::: Tags",
-    "takeAction": "Passer à l'action",
-    "user": "Utilisateur ::: Utilisateurs",
     "validations": {
       "categories": "Veuillez sélectionner entre un et trois sujets.",
       "contentNotEmpty": "Veuillez saisir du contenu.",
@@ -664,8 +611,7 @@
       "nameLength": "Le nom doit comporter entre {min} et {max} caractères.",
       "titleLength": "Le titre doit comporter entre {min} et {max} caractères.",
       "titleNotEmpty": "Veuillez saisir un titre."
-    },
-    "versus": "Versus"
+    }
   },
   "component-slider": {
     "step": "Étape {current} sur {total}"
@@ -673,7 +619,6 @@
   "components": {
     "dateTimeRange": {
       "hourMinute": "HH:mm",
-      "monthDay": "dd/MM/",
       "yearMonthDay": "dd/MM/yyyy"
     },
     "password-reset": {
@@ -687,8 +632,7 @@
           "description": "Un mail de réinitialisation de mot de passe sera envoyé à l'adresse mail indiquée.",
           "submit": "Demander mail",
           "submitted": "Un mail avec des instructions supplémentaires a été envoyé à <b>{email}</b>."
-        },
-        "title": "Réinitialiser votre mot de passe"
+        }
       }
     },
     "registration": {
@@ -726,8 +670,7 @@
           "nonce": "Entrez votre code",
           "validations": {
             "error": "Code de vérification invalide <b>{nonce}</b> pour l'e-mail <b>{email}</b> !",
-            "length": "doit comporter {nonceLength} caractères",
-            "success": "Code de vérification valide <b>{nonce}</b> pour l'e-mail <b>{email}</b> !"
+            "length": "doit comporter {nonceLength} caractères"
           }
         },
         "title": "Confirmation de l'e-mail"
@@ -737,11 +680,9 @@
         "form": {
           "description": "Saisis le code d'invitation que tu as reçu.",
           "invite-code": "Code d'invitation : ACJERB",
-          "next": "Continuer",
           "validations": {
             "error": "Code d'invitation invalide <b>{inviteCode}</b> !",
-            "length": "doit contenir {inviteCodeLength} caractères",
-            "success": "Code d'invitation valide <b>{inviteCode}</b> !"
+            "length": "doit contenir {inviteCodeLength} caractères"
           }
         },
         "invited-by": "Invité par {invitedBy}.",
@@ -753,14 +694,12 @@
       },
       "signup": {
         "form": {
-          "data-privacy": "J'ai lu et compris la Déclaration de confidentialité.",
           "description": "Pour commencer, entrez votre adresse mail :",
           "errors": {
             "email-exists": "Il existe déjà un compte utilisateur avec cette adresse mail !"
           },
           "submit": "Créer un compte",
-          "success": "Un mail avec un lien pour compléter votre inscription a été envoyé à <b>{email}</b>",
-          "terms-and-condition": "Je confirme les Conditions générales."
+          "success": "Un mail avec un lien pour compléter votre inscription a été envoyé à <b>{email}</b>"
         },
         "title": "Rejoignez {APPLICATION_NAME} !",
         "unavailable": "Malheureusement, l'enregistrement public des comptes utilisateurs n'est pas encore disponible sur ce serveur."
@@ -772,9 +711,6 @@
     "amount-comments": "{amount} Commentaires",
     "amount-shouts": "{amount} Recommandations",
     "amount-views": "{amount} Vues",
-    "categories": {
-      "infoSelectedNoOfMaxCategories": "{chosen} de {max} catégories sélectionnées"
-    },
     "categoriesTitle": "Sujets",
     "category": {
       "description": {
@@ -834,14 +770,6 @@
       }
     },
     "content": "Contenu",
-    "emotions-label": {
-      "angry": "En colère",
-      "cry": "Pleurer",
-      "funny": "Marrant",
-      "happy": "Heureux",
-      "surprised": "Surpris"
-    },
-    "filterFollow": "Filtrer les contributions des utilisateurs que je suis",
     "filterMasonryGrid": {
       "myFriends": "Utilisateurs que je suis",
       "myGroups": "Par mes groupes",
@@ -852,9 +780,6 @@
     },
     "filterMyGroups": "Mes groupes",
     "inappropriatePicture": "Cette image peut être inappropriée pour certaines personnes.",
-    "languageSelectLabel": "Langue",
-    "languageSelectText": "Sélectionner une langue",
-    "newEvent": "Créer un nouvel événement",
     "newPost": "Créer un nouveau Post",
     "postIn": "Publier dans",
     "postInGroupOption": "Groupe : {name}",
@@ -877,14 +802,12 @@
     "comment": {
       "message": "Voulez-vous vraiment supprimer le commentaire de « <b>{name}</b> » ?",
       "success": "Commentaire supprimé avec succès !",
-      "title": "Supprimer un commentaire",
-      "type": "Commentaire"
+      "title": "Supprimer un commentaire"
     },
     "contribution": {
       "message": "Voulez-vous vraiment supprimer la contribution « <b>{name}</b> » ?",
       "success": "Contribution supprimée avec succès !",
-      "title": "Supprimer la contribution",
-      "type": "Contribution"
+      "title": "Supprimer la contribution"
     },
     "submit": "Supprimer"
   },
@@ -892,20 +815,17 @@
     "cancel": "Annuler",
     "comment": {
       "message": "Souhaitez-vous vraiment désactiver le commentaire de « <b>{name}</b> » ?",
-      "title": "Désactiver le commentaire",
-      "type": "Commentaire"
+      "title": "Désactiver le commentaire"
     },
     "contribution": {
       "message": "Souhaitez-vous vraiment signaler l'entrée « <b>{name}</b> » ?",
-      "title": "Désactiver l'apport",
-      "type": "Contribution"
+      "title": "Désactiver l'apport"
     },
     "submit": "Désactiver",
     "success": "Désactivé avec succès",
     "user": {
       "message": "Souhaitez-vous vraiment désactiver l'utilisateur « <b>{name}</b> » ?",
-      "title": "Désactiver l'utilisateur",
-      "type": "Utilisateur"
+      "title": "Désactiver l'utilisateur"
     }
   },
   "donations": {
@@ -922,7 +842,6 @@
     "hashtag": {
       "addHashtag": "Nouveau hashtag",
       "addLetter": "Tapez une lettre",
-      "noHashtagsFound": "Aucun hashtag trouvé",
       "relation": {
         "popular": "Populaires",
         "usedByMe": "Utilisés par moi"
@@ -972,7 +891,6 @@
     "categories": "Catégories de contenu",
     "creationDate": "Date de création",
     "deleteFilter": "Supprimer le filtre",
-    "emotions": "Émotions",
     "ended": {
       "all": {
         "hint": "Afficher tout, y compris les terminés",
@@ -985,12 +903,9 @@
     },
     "event": "Événement",
     "eventsBy": "Événements – afficher ...",
-    "eventsEnded": "Terminés",
     "filter-by": "Filtrer par ...",
     "following": "Utilisateurs que je suis",
     "following-title": "Sources",
-    "languages": "Langues",
-    "my-groups": "Mes groupes",
     "order": {
       "last": {
         "hint": "Trier les publications par les dernières en premier",
@@ -1033,7 +948,6 @@
     },
     "actionRadius": "Rayon d'action du groupe",
     "addMember": "Ajouter un membre",
-    "addMemberToGroup": "Ajouter au groupe",
     "addMemberToGroupSuccess": "« {name} » a été ajouté au groupe avec le rôle « {role} » !",
     "addUser": "Ajouter un utilisateur",
     "addUserNoOptions": "Aucun utilisateur trouvé !",
@@ -1092,7 +1006,6 @@
     "errors": {
       "userAlreadyMember": "L'utilisateur « {name} » est déjà membre !"
     },
-    "follow": "Suivre",
     "foundation": "Fondation",
     "general": "Général",
     "goal": "Objectif du groupe",
@@ -1134,19 +1047,16 @@
     "modal": {
       "cancel": "Annuler",
       "confirm": "Confirmer",
-      "confirmAddGroupMemberText": "Ajouter l'utilisateur « {name} » au groupe ?",
-      "confirmAddGroupMemberTitle": "Confirmer"
+      "confirmAddGroupMemberText": "Ajouter l'utilisateur « {name} » au groupe ?"
     },
     "muted": "Groupe en sourdine",
     "myGroups": "Mes groupes",
     "name": "Nom du groupe",
-    "radius": "Rayon",
     "removeMember": "Retirer le membre",
     "removeMemberButton": "Retirer",
     "removeMemberConfirmText": "Retirer l'utilisateur « {name} » du groupe ?",
     "removeMemberTitle": "Retirer le membre",
     "rights": {
-      "addRole": "Ajouter un rôle",
       "advancedTitle": "Toutes les permissions en détail",
       "applyTemplate": "Appliquer un modèle — remplace tous les rôles de ce groupe par ceux du modèle.",
       "blockedByFeature": "Cette fonction est désactivée sur le réseau ({feature}).",
@@ -1154,7 +1064,6 @@
       "confirmApplyTemplate": "Appliquer le modèle « {template} » à ce groupe ? Tous les rôles sont remplacés par ceux du modèle.",
       "confirmApplyTemplateDiscards": "Appliquer le modèle « {template} » à ce groupe ? Tous les rôles sont remplacés par ceux du modèle, et les modifications non enregistrées sont perdues.",
       "confirmDelete": "Supprimer le rôle « {role} » ? Ses membres deviendront « {target} ».",
-      "confirmReset": "Réinitialiser tous les rôles de ce groupe aux valeurs par défaut ? Les rôles que vous avez ajoutés seront supprimés et leurs membres deviendront des membres ordinaires.",
       "deleteRole": "Supprimer le rôle",
       "description": "Décidez qui peut faire quoi dans ce groupe — des non-membres jusqu’aux administrateurs.",
       "discardDraft": "Les modifications non enregistrées seront perdues. Continuer quand même ?",
@@ -1178,9 +1087,9 @@
         "group_join": "Rejoindre le groupe directement, sans approbation.",
         "group_join_request": "Demander à rejoindre le groupe et attendre l'approbation.",
         "group_leave": "Quitter le groupe.",
-        "group_members_read": "Voir la liste des membres et leur nombre.",
         "group_member_remove": "Retirer des membres du groupe.",
         "group_member_role_assign": "Changer les rôles des membres.",
+        "group_members_read": "Voir la liste des membres et leur nombre.",
         "group_post_create": "Écrire des publications dans le groupe.",
         "group_post_moderate": "Retirer du groupe la publication de quelqu'un d'autre. La publication reste à son auteur.",
         "group_post_pin": "Épingler et désépingler des publications dans le groupe.",
@@ -1190,10 +1099,7 @@
         "group_videoCall_create": "Démarrer un appel vidéo dans le groupe.",
         "group_videoCall_join": "Rejoindre un appel vidéo en cours dans le groupe."
       },
-      "reset": "Rétablir les valeurs par défaut",
       "resultingType": "Avec ces permissions, le groupe est :",
-      "roleKeyPlaceholder": "clé, par ex. redaction",
-      "roleLabelPlaceholder": "nom affiché, par ex. Rédaction",
       "saved": "Permissions enregistrées",
       "saveFirst": "Enregistrez ou annulez d'abord : il y a des modifications non enregistrées.",
       "simple": {
@@ -1225,7 +1131,6 @@
       "usual": "Membre"
     },
     "save": "Créer un nouveau groupe",
-    "showMembers": "Liste des membres visible par tous",
     "teaser": {
       "notReadable": "Vous ne pouvez pas encore ouvrir ce groupe — votre demande est en attente",
       "openGroup": "Ouvrir le groupe",
@@ -1272,8 +1177,7 @@
   },
   "hashtags-filter": {
     "clearSearch": "Réinitialiser la recherche",
-    "hashtag-search": "Recherche de #{hashtag}",
-    "title": "Votre bulle de filtre"
+    "hashtag-search": "Recherche de #{hashtag}"
   },
   "header": {
     "avatarMenu": {
@@ -1327,7 +1231,6 @@
     "invite-link-message-hidden-group": "Tu as été invité à rejoindre un groupe caché sur {APPLICATION_NAME}.",
     "invite-link-message-personal": "Tu as été invité à rejoindre {APPLICATION_NAME}.",
     "invited-count": "Vous avez déjà invité {count} personnes.",
-    "limit-reached": "Tu as atteint le nombre maximum de liens d'invitation.",
     "members-only": "uniquement pour les personnes qui ont déjà un compte",
     "my-invite-links": "Mes liens d'invitation",
     "no-links": "Aucun lien d'invitation créé pour l'instant.",
@@ -1356,7 +1259,6 @@
     "login": "Connexion",
     "logout": "Déconnexion",
     "moreInfo": "Qu'est-ce que {APPLICATION_NAME} ?",
-    "moreInfoHint": "à la page de présentation",
     "no-account": "Vous n'avez pas de compte ?",
     "no-cookie": "Aucun cookie ne peut être défini. Tu dois accepter les cookies.",
     "password": "Votre mot de passe",
@@ -1382,12 +1284,6 @@
       "theUser": "Ma position",
       "title": "Légende",
       "user": "Utilisateur"
-    },
-    "markerTypes": {
-      "event": "événement",
-      "group": "groupe",
-      "theUser": "ma position",
-      "user": "utilisateur"
     },
     "pageTitle": "Carte",
     "styles": {
@@ -1446,12 +1342,9 @@
       },
       "decision": "Décision",
       "DecisionSuccess": "Décidé avec succès !",
-      "disabled": "Désactivé",
-      "disabledAt": "Désactivé le",
       "disabledBy": "désactivé par",
       "empty": "Félicitations, rien à modérer.",
       "enabled": "Activé",
-      "enabledAt": "Activé le",
       "enabledBy": "Activé par",
       "filterLabel": {
         "all": "Tous",
@@ -1464,9 +1357,7 @@
       "hiddenGroupLink": "Aller à {name} pour utiliser l’accès administrateur",
       "moreDetails": "Voir les détails",
       "name": "Signalisations",
-      "noDecision": "Pas de décision !",
       "numberOfUsers": "{count} utilisateurs",
-      "previousDecision": "Décision précédente :",
       "reasonCategory": "Catégorie",
       "reasonDescription": "Description",
       "reportedOn": "Date",
@@ -1479,14 +1370,12 @@
   },
   "notifications": {
     "comment": "Commentaire",
-    "content": "Contenu",
     "empty": "Désolé, vous n'avez pas de notifications pour le moment.",
     "filterLabel": {
       "all": "Tous",
       "read": "Lire",
       "unread": "Non lu"
     },
-    "group": "Description",
     "markAllAsRead": "Tout marquer comme lu",
     "markAsRead": "Marquer comme lu",
     "markAsUnread": "Marquer comme non lu",
@@ -1583,9 +1472,6 @@
       "hide": "Masquer le contenu sensible",
       "show": "Afficher le contenu sensible"
     },
-    "takeAction": {
-      "name": "Passez à l'action"
-    },
     "viewEvent": {
       "eventEnd": "Fin",
       "eventEndBeforeStart": "La date de fin doit être postérieure à la date de début.",
@@ -1599,22 +1485,19 @@
       "eventVenue": "p. ex. Café Chrysander, près du château de Bergedorf",
       "eventVenueLabel": "Description du lieu",
       "pickLocationOnMap": "Choisir un lieu sur la carte",
-      "title": "Événement",
       "viewOnMainMap": "Voir sur la carte principale"
     },
     "viewPost": {
       "forGroup": {
         "title": "Dans le groupe "
-      },
-      "title": "Publication"
+      }
     }
   },
   "profile": {
     "avatar": {
       "submitted": "Téléchargement réussi"
     },
-    "commented": "Commentais",
-    "follow": "Suivre",
+    "commented": "Commenté",
     "followers": "Suiveurs",
     "following": "Suivant",
     "groups": {
@@ -1656,24 +1539,18 @@
   "release": {
     "cancel": "Annuler",
     "comment": {
-      "error": "Vous avez déjà signalé le commentaire !",
       "message": "Voulez-vous vraiment publier le commentaire de « <b>{name}</b> » ?",
-      "title": "Publication des commentaires",
-      "type": "Commentaire"
+      "title": "Publication des commentaires"
     },
     "contribution": {
-      "error": "Vous avez déjà signalé la contribution !!",
       "message": "Voulez-vous vraiment débloquer la contribution « <b>{name}</b> » ?",
-      "title": "Versement de la contribution",
-      "type": "Contribution"
+      "title": "Versement de la contribution"
     },
     "submit": "Relâchez",
     "success": "Relâchez avec succès !",
     "user": {
-      "error": "Vous avez déjà signalé l'utilisateur !",
       "message": "Voulez-vous vraiment libérer l'utilisateur « <b>{name}</b> » ?",
-      "title": "Validation par l'utilisateur",
-      "type": "Utilisateur"
+      "title": "Validation par l'utilisateur"
     }
   },
   "report": {
@@ -1703,8 +1580,7 @@
           "intentional_intimidation_stalking_persecution": "L'intimidation, le harcèlement ou la persécution intentionnelle.",
           "other": "Autres...",
           "pornographic_content_links": "Publication ou partage de matériel clairement pornographique."
-        },
-        "placeholder": "Catégorie..."
+        }
       },
       "description": {
         "label": "S'il vous plaît expliquer : Pourquoi voulez-vous signaler cela ?",
@@ -1733,7 +1609,6 @@
     "no-results": "Aucun résultat trouvé pour « {search} ». Essaie un autre terme de recherche !",
     "page": "Page",
     "placeholder": "Rechercher",
-    "results": "résultat trouvé ::: résultats trouvés",
     "title": "Résultats de recherche"
   },
   "settings": {
@@ -1800,6 +1675,7 @@
     },
     "blocked-users": {
       "block": "Bloquer l'utilisateur",
+      "blocked": "{name} est bloqué",
       "columns": {
         "name": "Nom",
         "slug": "Slug",
@@ -1807,7 +1683,6 @@
       },
       "empty": "Jusqu'à présent, vous n'avez bloqué personne.",
       "explanation": {
-        "closing": "Ceci devrait être suffisant pour le moment afin que les utilisateurs bloqués ne puissent plus vous déranger.",
         "commenting-disabled": "Tu ne peux pas commenter cette publication pour le moment.",
         "intro": "Si vous avez bloqué un autre utilisateur, voici ce qui se passe :",
         "notifications": "Les utilisateurs bloqués ne recevront plus de notifications s'ils sont mentionnés dans vos postes.",
@@ -1824,7 +1699,6 @@
       "givenNamePlaceholder": "Femanon",
       "labelBio": "À propos de vous",
       "labelCity": "Votre ville ou région",
-      "labelCityHint": "(affiche la position approximative sur la carte)",
       "labelName": "Votre nom",
       "labelSlug": "Votre nom d'utilisateur unique",
       "name": "Vos données",
@@ -1837,10 +1711,8 @@
     "deleteUserAccount": {
       "accountDescription": "Sachez que vos postes et commentaires sont importants pour notre communauté. Si vous voulez quand même les supprimer, vous devez les marquer ci-dessous.",
       "accountWarning": "Vous NE POUVEZ PAS GÉRER et NE POUVEZ PAS RECOUVRIR votre compte, vos messages ou vos commentaires après avoir supprimé votre compte !",
-      "accountWarningAdmin": "Le compte, les contributions ou les commentaires NE PEUVENT PAS ÊTRE ADMINISTRÉS NI RESTAURÉS après la suppression !",
       "accountWarningIsAdmin": "Attention ! Tu es sur le point de supprimer un compte utilisateur !",
-      "commentedCount": "Supprimer mes {count} commentaires",
-      "confirmDeleting": "Supprimer le compte utilisateur maintenant",
+      "commentsCount": "Supprimer mes {count} commentaires",
       "contributionsCount": "Supprimer mes {count} postes",
       "infoAdmin": "Toutes les contributions et commentaires de l'utilisateur seront également supprimés !",
       "name": "Supprimer un compte utilisateur",
@@ -1912,6 +1784,7 @@
       },
       "how-to": "Tu peux mettre d'autres utilisateurs en sourdine sur leur page de profil via le menu de contenu.",
       "mute": "Mettre en sourdine",
+      "muted": "{name} est mis en sourdine",
       "name": "Utilisateurs en sourdine",
       "unmute": "Réactiver l'utilisateur",
       "unmuted": "{name} n'est plus en sourdine"
@@ -1999,18 +1872,14 @@
   },
   "site": {
     "back-to-login": "Retour à la page de connexion",
-    "bank": "compte bancaire",
     "code-of-conduct": "Code de conduite",
-    "contact": "Contacter",
     "data-privacy": "Protection des données",
     "donate": "Faire un don",
     "error-occurred": "Une erreur s'est produite.",
     "faq": "FAQ",
-    "germany": "Allemagne",
     "imprint": "Mentions légales",
     "made": "Fabriqué avec ❤️",
     "navigation": "Navigation",
-    "register": "Numéro de registre",
     "support": "Support",
     "termsAndConditions": "Conditions générales",
     "thanks": "Merci !"
@@ -2093,6 +1962,7 @@
       "label": "Vidéo de groupe",
       "tooltip": "Appel vidéo dans le groupe « {name} »"
     },
+    "hideBars": "Masquer les barres",
     "leave": "Quitter l'appel",
     "maximize": "Agrandir",
     "micMuted": "Microphone désactivé",
@@ -2100,7 +1970,6 @@
     "micUnmuted": "Microphone activé",
     "minimize": "Réduire",
     "openChat": "Ouvrir le chat",
-    "participants": "Participants",
     "prejoin": {
       "camera": "Caméra",
       "cameraDisabled": "La caméra est désactivée.",
@@ -2143,9 +2012,11 @@
       "unsupportedBrowser": "Votre navigateur ne prend pas en charge l'audio/vidéo."
     },
     "reconnecting": "Connexion perdue — reconnexion…",
+    "reloadPending": "La plateforme a un nouveau design. Il sera appliqué dès que vous quitterez l’appel.",
     "restartMic": "Redémarrer le microphone",
     "screenShare": "Écran",
     "screenShareEnded": "Partage d'écran terminé",
+    "showBars": "Afficher les barres",
     "showVideos": "Afficher les vidéos",
     "spotlightExit": "Quitter le focus",
     "title": "Appel vidéo de groupe",

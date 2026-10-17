@@ -52,7 +52,6 @@ export default hopeTheme({
       imgSize: true,
       sub: true,
       sup: true,
-      tabs: true,
       vPre: true,
     },
     searchPro: {

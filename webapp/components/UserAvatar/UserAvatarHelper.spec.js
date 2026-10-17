@@ -1,5 +1,7 @@
 import { render, waitFor, fireEvent } from '@testing-library/vue'
-import { RouterLinkStub } from '@vue/test-utils'
+import { createLocalVue, RouterLinkStub } from '@vue/test-utils'
+import Vue from 'vue'
+import { renderAndHydrate } from '~/test/hydration'
 import UserAvatarHelper from './UserAvatarHelper.vue'
 
 let mockMatchMediaMatches = false
@@ -125,6 +127,8 @@ describe('UserAvatarHelper', () => {
         withPopoverEnabled: true,
       })
 
+      // The pointer is only known once mounted.
+      await Vue.nextTick()
       const button = wrapper.container.querySelector('button')
       expect(button).toBeTruthy()
 
@@ -139,8 +143,9 @@ describe('UserAvatarHelper', () => {
 
   describe('with linkToProfile and popover enabled, on touch screen', () => {
     let wrapper
-    beforeEach(() => {
+    beforeEach(async () => {
       wrapper = Wrapper({ withLinkToProfile: true, onTouchScreen: true, withPopoverEnabled: true })
+      await Vue.nextTick()
     })
 
     it('renders button', () => {
@@ -217,6 +222,63 @@ describe('UserAvatarHelper', () => {
 
       expect(wrapper.emitted()['open-menu']).toBeUndefined()
       expect(wrapper.emitted()['close-menu']).toBeUndefined()
+    })
+  })
+
+  describe('when the pointer changes', () => {
+    beforeEach(() => {
+      mockMatchMediaListeners.length = 0
+    })
+
+    it('switches between link and button', async () => {
+      const wrapper = Wrapper({ withLinkToProfile: true, onTouchScreen: false })
+      expect(wrapper.container.querySelector('button')).toBeNull()
+
+      mockMatchMediaListeners.forEach((listener) => listener({ matches: true }))
+      await Vue.nextTick()
+      expect(wrapper.container.querySelector('button')).toBeTruthy()
+
+      mockMatchMediaListeners.forEach((listener) => listener({ matches: false }))
+      await Vue.nextTick()
+      expect(wrapper.container.querySelector('button')).toBeNull()
+    })
+  })
+
+  describe('hydrating server-rendered markup on a touch screen', () => {
+    const SsrVue = createLocalVue()
+    SsrVue.component('NuxtLink', RouterLinkStub)
+
+    const hydrate = () =>
+      renderAndHydrate(
+        {
+          render: (h) =>
+            h(UserAvatarHelper, { props: { userLink, showPopover: true } }, ['Test Content']),
+        },
+        {
+          LocalVue: SsrVue,
+          // The server has no pointer at all.
+          server: () => {
+            mockMatchMediaMatches = false
+          },
+          client: () => {
+            mockMatchMediaMatches = true
+          },
+        },
+      )
+
+    afterEach(() => {
+      document.body.innerHTML = ''
+    })
+
+    it('matches the markup of the server', async () => {
+      const { warnings } = await hydrate()
+      expect(warnings).toEqual([])
+    })
+
+    it('renders the button once mounted', async () => {
+      const { vm } = await hydrate()
+      await Vue.nextTick()
+      expect(vm.$el.tagName).toBe('BUTTON')
     })
   })
 })

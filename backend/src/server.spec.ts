@@ -316,7 +316,7 @@ describe(createServer, () => {
       vi.resetModules()
     })
 
-    // CONFIG.DEBUG is read at boot and decides whether helmet's CSP is installed — the playground
+    // CONFIG.DEBUG is read at boot and decides whether helmet's CSP is installed — Apollo's Sandbox
     // loads external resources and cannot run under it. Both sides are mocked rather than read
     // from the ambient environment on purpose: `.env` ships DEBUG=neo4j-graphql-js (truthy) while
     // the CI compose stack sets DEBUG= (falsy), so an unmocked assertion would pass in one place
@@ -355,6 +355,46 @@ describe(createServer, () => {
       },
       30000,
     )
+
+    // #6304: a browser opening the GraphQL URL. Apollo's pages load from Apollo's CDN and Google
+    // Fonts, so outside DEBUG there is no page at all, and nothing in the answer points elsewhere.
+    const openInBrowser = async (DEBUG: boolean) => {
+      vi.resetModules()
+      vi.doMock('./config', () => ({
+        default: { ...CONFIG, DEBUG },
+        nodemailerTransportOptions,
+      }))
+
+      const build = (await import('./server')).default
+      const { server, httpServer } = await build({ skipLiveKitBoot: true })
+      httpServer.listen(0, '127.0.0.1')
+      await once(httpServer, 'listening')
+      const { port } = httpServer.address() as AddressInfo
+      try {
+        const response = await fetch(`http://127.0.0.1:${String(port)}/`, {
+          headers: { accept: 'text/html' },
+        })
+        return {
+          contentType: response.headers.get('content-type') ?? '',
+          body: await response.text(),
+        }
+      } finally {
+        await server.stop()
+      }
+    }
+
+    it("serves Apollo's Sandbox to a browser with DEBUG", async () => {
+      const { body } = await openInBrowser(true)
+
+      expect(body).toContain('embeddable-sandbox.cdn.apollographql.com')
+    }, 30000)
+
+    it('serves no page and nothing from a third party without DEBUG', async () => {
+      const { contentType, body } = await openInBrowser(false)
+
+      expect(contentType).not.toMatch(/text\/html/)
+      expect(body).not.toMatch(/apollographql|googleapis|gstatic/)
+    }, 30000)
 
     // The production boot path. Both are skipped by the test helpers (they would leave polling
     // timers running across the suite), which is why nothing else reaches this branch — and the

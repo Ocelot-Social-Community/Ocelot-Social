@@ -53,16 +53,8 @@
                 type="button"
                 class="map-legend-visibility-toggle"
                 :aria-pressed="String(!isMarkerTypeHidden(type.id))"
-                :aria-label="
-                  $t(isMarkerTypeHidden(type.id) ? 'map.legend.showType' : 'map.legend.hideType', {
-                    type: $t('map.legend.' + type.id),
-                  })
-                "
-                :title="
-                  $t(isMarkerTypeHidden(type.id) ? 'map.legend.showType' : 'map.legend.hideType', {
-                    type: $t('map.legend.' + type.id),
-                  })
-                "
+                :aria-label="markerTypeToggleLabel(type.id)"
+                :title="markerTypeToggleLabel(type.id)"
                 @click="toggleMarkerTypeVisibility(type.id)"
               >
                 <os-icon
@@ -75,12 +67,8 @@
                 type="button"
                 class="map-legend-past-events-toggle"
                 :aria-pressed="String(showPastEvents)"
-                :aria-label="
-                  $t(showPastEvents ? 'map.legend.hidePastEvents' : 'map.legend.showPastEvents')
-                "
-                :title="
-                  $t(showPastEvents ? 'map.legend.hidePastEvents' : 'map.legend.showPastEvents')
-                "
+                :aria-label="pastEventsToggleLabel"
+                :title="pastEventsToggleLabel"
                 @click="toggleShowPastEvents"
               >
                 <os-icon :icon="showPastEvents ? icons.clockSlash : icons.clock" size="md" />
@@ -310,6 +298,11 @@ export default {
     this.destroyPopupComponents()
   },
   computed: {
+    pastEventsToggleLabel() {
+      return this.showPastEvents
+        ? this.$t('map.legend.hidePastEvents')
+        : this.$t('map.legend.showPastEvents')
+    },
     ...mapGetters({
       currentUser: 'auth/user',
     }),
@@ -444,6 +437,12 @@ export default {
     },
   },
   methods: {
+    markerTypeToggleLabel(typeId) {
+      const type = this.$t(`map.legend.${typeId}`)
+      return this.isMarkerTypeHidden(typeId)
+        ? this.$t('map.legend.showType', { type })
+        : this.$t('map.legend.hideType', { type })
+    },
     isMarkerTypeHidden(typeId) {
       return this.hiddenMarkerTypes.includes(typeId)
     },
