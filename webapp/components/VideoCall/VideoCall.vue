@@ -2458,8 +2458,9 @@ export default {
   right: 0;
   width: 355px;
   height: 280px;
-  border-top-left-radius: var(--border-radius-base);
-  border-top-right-radius: var(--border-radius-base);
+  /*  Rounded all round: it floats above the footer, not on the window's lower edge, and */
+  /*  the rounded tile inside showed the window's square corner behind it. */
+  border-radius: var(--border-radius-base);
   overflow: hidden;
 }
 
@@ -2981,6 +2982,9 @@ export default {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr);
+  /*  The body's dark ground, which it no longer paints itself: no light corner shows */
+  /*  around the rounded tiles. */
+  background: var(--color-neutral-10);
 }
 
 .video-call--parked-bars .video-call__body {
