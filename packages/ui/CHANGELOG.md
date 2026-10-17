@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.0.8](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.7...ui-v0.0.8) (2026-10-17)
+
+
+### Tests
+
+* **other:** visual regression tolerates no differing pixel ([#10558](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10558)) ([b844b4b](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/b844b4b3f8711ad6692684263249e5e2a064349f))
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump @playwright/test from 1.63.0 to 1.64.0 in /packages/ui ([#10581](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10581)) ([e231523](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/e2315239e55ef6d0592778dc1e482282fa0ff45d))
+* **deps-dev:** bump @types/node from 26.6.4 to 26.6.5 in /packages/ui ([#10587](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10587)) ([cdca991](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/cdca991125baa584e274be56ff8c6f50b817291f))
+* **deps-dev:** bump eslint-plugin-jsdoc from 65.1.0 to 65.3.2 in /packages/ui ([#10589](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10589)) ([d1899cf](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/d1899cf85d747db0787fe18dda11d3140633f320))
+* **deps-dev:** bump eslint-plugin-vuejs-accessibility from 2.6.0 to 2.6.2 in /packages/ui ([#10586](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10586)) ([c5d5c0b](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/c5d5c0b45e168d36c63e35f82937e80e9dbe0b58))
+* **deps-dev:** bump the size-limit group in /packages/ui with 2 updates ([#10569](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10569)) ([fd29c5c](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/fd29c5c195dc53d90a9464fa59d25ad07dfbd1d8))
+* **deps-dev:** bump the storybook group in /packages/ui with 3 updates ([#10574](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10574)) ([fdb5f22](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/fdb5f228a01d6a9e03c1b99d7900695b893c6c17))
+* **deps-dev:** bump the vitest group in /packages/ui with 2 updates ([#10579](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10579)) ([3688b16](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/3688b16e00e47dcf9226c5ea992924731b880399))
+* **deps-dev:** bump the vue group in /packages/ui with 2 updates ([#10577](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10577)) ([675a05e](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/675a05e0fcba7857d9aca4bb0f160b9b1875ae5d))
+* **deps:** bump node from 26.10.0-alpine to 26.11.1-alpine in /packages/ui ([#10582](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10582)) ([c16e851](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/c16e8518c95982286898428bf391ab113d4c3d26))
+
 ## [0.0.7](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.6...ui-v0.0.7) (2026-10-11)
 
 
