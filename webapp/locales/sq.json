@@ -1910,15 +1910,29 @@
     "connecting": "Po lidhet…",
     "connectionLost": "Lidhja u humb: {name}",
     "connectionPoor": "Lidhje e dobët: {name}",
+    "controls": {
+      "camera": "Kamera",
+      "chat": "Bisedë",
+      "leave": "Largohu",
+      "microphone": "Mikrofoni",
+      "screen": "Ekrani",
+      "startSharing": "Ndaj ekranin, një dritare ose një skedë",
+      "stopSharing": "{surface}: ndalo ndarjen",
+      "surface": {
+        "browser": "Skeda",
+        "monitor": "Ekrani",
+        "window": "Dritarja"
+      },
+      "turnOff": "{device}: fik",
+      "turnOn": "{device}: ndiz"
+    },
     "deviceSettings": {
       "button": "Pajisjet",
       "speakerError": "Altoparlanti nuk mund të ndërrohej.",
       "title": "Cilësimet e pajisjeve"
     },
     "dialogLabel": "Telefonatë me video në grup",
-    "disableCamera": "Fik kamerën",
     "enableAudio": "Aktivizo zërin",
-    "enableCamera": "Ndiz kamerën",
     "errorBackToPrejoin": "Ndrysho cilësimet",
     "errorRetry": "Riprovo",
     "errors": {
@@ -1946,13 +1960,13 @@
       "label": "Video grupi",
       "tooltip": "Telefonatë me video në grupin „{name}“"
     },
+    "hideBars": "Fshih shiritat",
     "leave": "Largohu nga telefonata",
     "maximize": "Maksimizo",
     "micMuted": "Mikrofoni fikur",
     "micNoSignal": "Mikrofoni juaj nuk po jep zë — të tjerët nuk ju dëgjojnë.",
     "micUnmuted": "Mikrofoni ndezur",
     "minimize": "Minimizo",
-    "muteMic": "Heshtëzo mikrofonin",
     "openChat": "Hap bisedën",
     "prejoin": {
       "camera": "Kamera",
@@ -2000,12 +2014,10 @@
     "restartMic": "Rinis mikrofonin",
     "screenShare": "Ekrani",
     "screenShareEnded": "Ndarja e ekranit përfundoi",
+    "showBars": "Shfaq shiritat",
     "showVideos": "Shfaq videot",
     "spotlightExit": "Dil nga spotlight",
-    "startScreenShare": "Ndaj ekranin",
-    "stopScreenShare": "Ndalo ndarjen",
     "title": "Telefonatë me video në grup",
-    "unmuteMic": "Aktivizo mikrofonin",
     "you": "ti",
     "youAreSharingScreen": "Po ndan ekranin tënd"
   }

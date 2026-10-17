@@ -426,4 +426,21 @@
   --color-map-marker-user: rgb(51, 195, 119);
   --color-map-marker-group: rgb(248, 77, 77);
   --color-map-marker-event: rgb(119, 83, 235);
+  /**
+ * @tokens Video Call Bars
+ */
+
+  /* The bars lying see-through on a video call — on a phone, in the parked window (and in
+     fullscreen): the page's header and footer, the call's header and control bar (VideoCall.vue,
+     layouts/default.vue). On a desktop the maximized call's bars are solid. How much of their own
+     colour they keep — the rest lets the videos through — and how much the videos behind them
+     are blurred. 100% and 0px make them solid. */
+  --video-call-bar-opacity: 75%;
+  --video-call-bar-blur: 8px;
+  /* The colour each of them is glass of; by default the one it has away from the call. A dark one
+     wants a light text, which these bars do not bring along. */
+  --video-call-bar-page-header-color: var(--color-header-background);
+  --video-call-bar-page-footer-color: var(--color-footer-background);
+  --video-call-bar-header-color: var(--color-header-background);
+  --video-call-bar-controls-color: var(--background-color-soft);
 }

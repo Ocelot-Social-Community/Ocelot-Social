@@ -1910,15 +1910,29 @@
     "connecting": "Connecting…",
     "connectionLost": "Connection lost: {name}",
     "connectionPoor": "Weak connection: {name}",
+    "controls": {
+      "camera": "Camera",
+      "chat": "Chat",
+      "leave": "Leave",
+      "microphone": "Microphone",
+      "screen": "Screen",
+      "startSharing": "Share your screen, a window or a tab",
+      "stopSharing": "{surface}: stop sharing",
+      "surface": {
+        "browser": "Tab",
+        "monitor": "Screen",
+        "window": "Window"
+      },
+      "turnOff": "{device}: turn off",
+      "turnOn": "{device}: turn on"
+    },
     "deviceSettings": {
       "button": "Devices",
       "speakerError": "Could not switch the speaker.",
       "title": "Device settings"
     },
     "dialogLabel": "Group video call",
-    "disableCamera": "Turn camera off",
     "enableAudio": "Enable sound",
-    "enableCamera": "Turn camera on",
     "errorBackToPrejoin": "Change settings",
     "errorRetry": "Retry",
     "errors": {
@@ -1946,13 +1960,13 @@
       "label": "Group Video",
       "tooltip": "Video call in group “{name}”"
     },
+    "hideBars": "Hide the bars",
     "leave": "Leave call",
     "maximize": "Maximize",
     "micMuted": "Microphone off",
     "micNoSignal": "Your microphone isn't delivering any sound — others can't hear you.",
     "micUnmuted": "Microphone on",
     "minimize": "Minimize",
-    "muteMic": "Mute microphone",
     "openChat": "Open chat",
     "prejoin": {
       "camera": "Camera",
@@ -2000,12 +2014,10 @@
     "restartMic": "Restart microphone",
     "screenShare": "Screen",
     "screenShareEnded": "Screen sharing ended",
+    "showBars": "Show the bars",
     "showVideos": "Show videos",
     "spotlightExit": "Exit spotlight",
-    "startScreenShare": "Share screen",
-    "stopScreenShare": "Stop sharing",
     "title": "Group video call",
-    "unmuteMic": "Unmute microphone",
     "you": "you",
     "youAreSharingScreen": "You are sharing your screen"
   }

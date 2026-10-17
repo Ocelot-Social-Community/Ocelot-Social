@@ -1910,15 +1910,29 @@
     "connecting": "Connexion…",
     "connectionLost": "Connexion perdue : {name}",
     "connectionPoor": "Connexion faible : {name}",
+    "controls": {
+      "camera": "Caméra",
+      "chat": "Chat",
+      "leave": "Raccrocher",
+      "microphone": "Microphone",
+      "screen": "Écran",
+      "startSharing": "Partager l'écran, une fenêtre ou un onglet",
+      "stopSharing": "{surface} : ne plus partager",
+      "surface": {
+        "browser": "Onglet",
+        "monitor": "Écran",
+        "window": "Fenêtre"
+      },
+      "turnOff": "{device} : désactiver",
+      "turnOn": "{device} : activer"
+    },
     "deviceSettings": {
       "button": "Appareils",
       "speakerError": "Impossible de changer de haut-parleur.",
       "title": "Réglages des appareils"
     },
     "dialogLabel": "Appel vidéo de groupe",
-    "disableCamera": "Désactiver la caméra",
     "enableAudio": "Activer le son",
-    "enableCamera": "Activer la caméra",
     "errorBackToPrejoin": "Modifier les paramètres",
     "errorRetry": "Réessayer",
     "errors": {
@@ -1946,13 +1960,13 @@
       "label": "Vidéo de groupe",
       "tooltip": "Appel vidéo dans le groupe « {name} »"
     },
+    "hideBars": "Masquer les barres",
     "leave": "Quitter l'appel",
     "maximize": "Agrandir",
     "micMuted": "Microphone désactivé",
     "micNoSignal": "Votre microphone ne transmet aucun son — les autres ne vous entendent pas.",
     "micUnmuted": "Microphone activé",
     "minimize": "Réduire",
-    "muteMic": "Couper le microphone",
     "openChat": "Ouvrir le chat",
     "prejoin": {
       "camera": "Caméra",
@@ -2000,12 +2014,10 @@
     "restartMic": "Redémarrer le microphone",
     "screenShare": "Écran",
     "screenShareEnded": "Partage d'écran terminé",
+    "showBars": "Afficher les barres",
     "showVideos": "Afficher les vidéos",
     "spotlightExit": "Quitter le focus",
-    "startScreenShare": "Partager l'écran",
-    "stopScreenShare": "Arrêter le partage",
     "title": "Appel vidéo de groupe",
-    "unmuteMic": "Réactiver le microphone",
     "you": "vous",
     "youAreSharingScreen": "Vous partagez votre écran"
   }

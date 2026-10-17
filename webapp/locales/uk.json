@@ -1910,15 +1910,29 @@
     "connecting": "З'єднання…",
     "connectionLost": "З'єднання втрачено: {name}",
     "connectionPoor": "Слабке з'єднання: {name}",
+    "controls": {
+      "camera": "Камера",
+      "chat": "Чат",
+      "leave": "Завершити",
+      "microphone": "Мікрофон",
+      "screen": "Екран",
+      "startSharing": "Показати екран, вікно або вкладку",
+      "stopSharing": "{surface}: припинити показ",
+      "surface": {
+        "browser": "Вкладка",
+        "monitor": "Екран",
+        "window": "Вікно"
+      },
+      "turnOff": "{device}: вимкнути",
+      "turnOn": "{device}: увімкнути"
+    },
     "deviceSettings": {
       "button": "Пристрої",
       "speakerError": "Не вдалося перемкнути динамік.",
       "title": "Налаштування пристроїв"
     },
     "dialogLabel": "Груповий відеовиклик",
-    "disableCamera": "Вимкнути камеру",
     "enableAudio": "Увімкнути звук",
-    "enableCamera": "Увімкнути камеру",
     "errorBackToPrejoin": "Змінити налаштування",
     "errorRetry": "Повторити",
     "errors": {
@@ -1946,13 +1960,13 @@
       "label": "Відео групи",
       "tooltip": "Відеовиклик у групі «{name}»"
     },
+    "hideBars": "Сховати панелі",
     "leave": "Покинути виклик",
     "maximize": "Розгорнути",
     "micMuted": "Мікрофон вимкнено",
     "micNoSignal": "Ваш мікрофон не передає звук — інші вас не чують.",
     "micUnmuted": "Мікрофон увімкнено",
     "minimize": "Згорнути",
-    "muteMic": "Вимкнути мікрофон",
     "openChat": "Відкрити чат",
     "prejoin": {
       "camera": "Камера",
@@ -2000,12 +2014,10 @@
     "restartMic": "Перезапустити мікрофон",
     "screenShare": "Екран",
     "screenShareEnded": "Демонстрацію екрана завершено",
+    "showBars": "Показати панелі",
     "showVideos": "Показати відео",
     "spotlightExit": "Вийти зі спотлайту",
-    "startScreenShare": "Поділитися екраном",
-    "stopScreenShare": "Припинити демонстрацію",
     "title": "Груповий відеовиклик",
-    "unmuteMic": "Увімкнути мікрофон",
     "you": "ви",
     "youAreSharingScreen": "Ви демонструєте свій екран"
   }

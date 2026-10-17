@@ -1910,15 +1910,29 @@
     "connecting": "Подключение…",
     "connectionLost": "Соединение потеряно: {name}",
     "connectionPoor": "Слабое соединение: {name}",
+    "controls": {
+      "camera": "Камера",
+      "chat": "Чат",
+      "leave": "Завершить",
+      "microphone": "Микрофон",
+      "screen": "Экран",
+      "startSharing": "Показать экран, окно или вкладку",
+      "stopSharing": "{surface}: прекратить показ",
+      "surface": {
+        "browser": "Вкладка",
+        "monitor": "Экран",
+        "window": "Окно"
+      },
+      "turnOff": "{device}: выключить",
+      "turnOn": "{device}: включить"
+    },
     "deviceSettings": {
       "button": "Устройства",
       "speakerError": "Не удалось переключить динамик.",
       "title": "Настройки устройств"
     },
     "dialogLabel": "Групповой видеозвонок",
-    "disableCamera": "Выключить камеру",
     "enableAudio": "Включить звук",
-    "enableCamera": "Включить камеру",
     "errorBackToPrejoin": "Изменить настройки",
     "errorRetry": "Повторить",
     "errors": {
@@ -1946,13 +1960,13 @@
       "label": "Видео группы",
       "tooltip": "Видеозвонок в группе «{name}»"
     },
+    "hideBars": "Скрыть панели",
     "leave": "Покинуть звонок",
     "maximize": "Развернуть",
     "micMuted": "Микрофон выключен",
     "micNoSignal": "Ваш микрофон не передаёт звук — другие вас не слышат.",
     "micUnmuted": "Микрофон включён",
     "minimize": "Свернуть",
-    "muteMic": "Выключить микрофон",
     "openChat": "Открыть чат",
     "prejoin": {
       "camera": "Камера",
@@ -2000,12 +2014,10 @@
     "restartMic": "Перезапустить микрофон",
     "screenShare": "Экран",
     "screenShareEnded": "Показ экрана завершён",
+    "showBars": "Показать панели",
     "showVideos": "Показать видео",
     "spotlightExit": "Выйти из режима спотлайта",
-    "startScreenShare": "Показать экран",
-    "stopScreenShare": "Прекратить показ",
     "title": "Групповой видеозвонок",
-    "unmuteMic": "Включить микрофон",
     "you": "вы",
     "youAreSharingScreen": "Вы показываете свой экран"
   }

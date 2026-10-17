@@ -4,7 +4,7 @@
     whatever buttons the place it is used in has for it. The look of the chat's own header
     and of the video call's, for places that show a room without either of them.
   -->
-  <div class="room-header">
+  <div :class="['room-header', { 'room-header--compact': compact }]">
     <div class="room-header__info">
       <avatar-image :profile="profile" size="small" class="room-header__avatar" />
       <room-title-link
@@ -37,6 +37,8 @@ export default {
     showGroupIcon: { type: Boolean, default: false },
     // What the title's link announces, where the title alone does not say where it leads.
     ariaLabel: { type: String, default: null },
+    // Lower, with a smaller avatar, where every pixel goes to something else: the video call.
+    compact: { type: Boolean, default: false },
   },
 }
 </script>
@@ -54,6 +56,17 @@ export default {
   background: var(--color-header-background);
   border-bottom: 1px solid var(--color-neutral-85);
   color: var(--text-color-base);
+}
+
+/*  The small buttons (26px) still have a small space above and below; the title keeps */
+/*  its size. */
+.room-header--compact {
+  height: calc(28px + 2 * var(--space-x-small));
+}
+
+.room-header--compact .room-header__avatar {
+  width: 28px;
+  height: 28px;
 }
 
 .room-header__info {

@@ -103,6 +103,7 @@ const buildStore = (state = {}) => {
   const setChatRoomId = jest.fn()
   const setConferenceUnread = jest.fn()
   const setLastChatTab = jest.fn()
+  const setPageBars = jest.fn()
   return {
     store: new Vuex.Store({
       getters: {
@@ -129,6 +130,7 @@ const buildStore = (state = {}) => {
         'videoCall/SET_CONFERENCE_UNREAD': setConferenceUnread,
         'videoCall/SET_GROUP_CHAT_UNREAD': jest.fn(),
         'videoCall/SET_LAST_CHAT_TAB': setLastChatTab,
+        'videoCall/SET_PAGE_BARS': setPageBars,
         'chat/SET_OPEN_CHAT': showChat,
       },
     }),
@@ -138,6 +140,7 @@ const buildStore = (state = {}) => {
     showChat,
     setChatRoomId,
     setLastChatTab,
+    setPageBars,
   }
 }
 
@@ -585,19 +588,62 @@ describe('VideoCall', () => {
   })
 
   describe('button labels and tooltips', () => {
-    it('names each control after its current effect', () => {
+    it('names on each control what it is about, whatever its state', () => {
       const { wrapper } = factory({ show: true, groupId: 'g1' })
+      const labels = () => [
+        wrapper.vm.micLabel,
+        wrapper.vm.cameraLabel,
+        wrapper.vm.screenShareLabel,
+        wrapper.vm.chatLabel,
+        wrapper.vm.leaveLabel,
+      ]
+      const expected = [
+        'videoCall.controls.microphone',
+        'videoCall.controls.camera',
+        'videoCall.controls.screen',
+        'videoCall.controls.chat',
+        'videoCall.controls.leave',
+      ]
       wrapper.setData({ micEnabled: true, cameraEnabled: true, screenShareEnabled: false })
-      expect(wrapper.vm.micLabel).toBe('videoCall.muteMic')
-      expect(wrapper.vm.cameraLabel).toBe('videoCall.disableCamera')
-      expect(wrapper.vm.screenShareLabel).toBe('videoCall.startScreenShare')
-      expect(wrapper.vm.chatLabel).toBe('videoCall.openChat')
-      expect(wrapper.vm.leaveLabel).toBe('videoCall.leave')
-
+      expect(labels()).toEqual(expected)
       wrapper.setData({ micEnabled: false, cameraEnabled: false, screenShareEnabled: true })
-      expect(wrapper.vm.micLabel).toBe('videoCall.unmuteMic')
-      expect(wrapper.vm.cameraLabel).toBe('videoCall.enableCamera')
-      expect(wrapper.vm.screenShareLabel).toBe('videoCall.stopScreenShare')
+      expect(labels()).toEqual(expected)
+    })
+
+    it('says what a click does, for which device', async () => {
+      const { wrapper } = factory({ show: true, groupId: 'g1' })
+      await wrapper.setData({
+        knownDevices: [
+          { kind: 'audioinput', deviceId: 'mic-1', label: 'Headset' },
+          { kind: 'videoinput', deviceId: 'cam-1', label: 'Webcam' },
+        ],
+        micEnabled: true,
+        cameraEnabled: false,
+      })
+      expect(wrapper.vm.micAction).toBe('videoCall.controls.turnOff:{"device":"Headset"}')
+      expect(wrapper.vm.cameraAction).toBe('videoCall.controls.turnOn:{"device":"Webcam"}')
+    })
+
+    it('names the kind of device where the browser has not named it', () => {
+      const { wrapper } = factory({ show: true, groupId: 'g1' })
+      wrapper.setData({ micEnabled: false })
+      expect(wrapper.vm.micAction).toBe(
+        'videoCall.controls.turnOn:{"device":"videoCall.controls.microphone"}',
+      )
+    })
+
+    it('says what is shared when offering to stop', async () => {
+      const { wrapper } = factory({ show: true, groupId: 'g1' })
+      expect(wrapper.vm.screenShareAction).toBe('videoCall.controls.startSharing')
+      await wrapper.setData({ screenShareEnabled: true, screenShareSurface: 'window' })
+      expect(wrapper.vm.screenShareAction).toBe(
+        'videoCall.controls.stopSharing:{"surface":"videoCall.controls.surface.window"}',
+      )
+      // The browser did not tell: the screen.
+      await wrapper.setData({ screenShareSurface: null })
+      expect(wrapper.vm.screenShareAction).toBe(
+        'videoCall.controls.stopSharing:{"surface":"videoCall.controls.surface.monitor"}',
+      )
     })
 
     it('labels the header buttons by call state', () => {
@@ -612,25 +658,35 @@ describe('VideoCall', () => {
       expect(open.wrapper.vm.closeLabel).toBe('videoCall.prejoin.cancel')
     })
 
-    it('shows the chat button as closing while that chat is open', () => {
+    it('offers to close the chat while that chat is open', () => {
       const { wrapper } = factory({
         show: true,
         groupId: 'g1',
         chat: { showChat: true, chatUserId: null, groupId: 'g1' },
       })
-      expect(wrapper.vm.chatLabel).toBe('videoCall.closeChat')
+      expect(wrapper.vm.chatAction).toBe('videoCall.closeChat')
+      expect(wrapper.vm.leaveAction).toBe('videoCall.leave')
     })
 
-    it('tooltips only the buttons that lost their caption', () => {
+    it('tooltips every control with what a click does, as plain text', () => {
+      const { wrapper } = factory({ show: true, minimized: false })
+      wrapper.setData({ phase: 'in-call' })
+      expect(wrapper.vm.controlTooltip('<b>Headset</b>: turn off')).toEqual({
+        content: '<b>Headset</b>: turn off',
+        html: false,
+      })
+    })
+
+    it("tooltips only the device settings button's caption once it is gone", () => {
       const { wrapper } = factory({ show: true, minimized: true })
       wrapper.setData({ phase: 'in-call' })
       expect(wrapper.vm.iconOnly).toBe(true)
-      expect(wrapper.vm.iconOnlyTooltip('Mute')).toBe('Mute')
+      expect(wrapper.vm.iconOnlyTooltip('Devices')).toBe('Devices')
 
       const open = factory({ show: true, minimized: false })
       open.wrapper.setData({ phase: 'in-call' })
       // Caption is right there next to the icon — a tooltip would just repeat it.
-      expect(open.wrapper.vm.iconOnlyTooltip('Mute')).toBe('')
+      expect(open.wrapper.vm.iconOnlyTooltip('Devices')).toBe('')
     })
   })
 
@@ -2375,16 +2431,16 @@ describe('VideoCall', () => {
         const { wrapper } = await connected()
         const button = (label) =>
           wrapper.findAll('.stub-button').wrappers.find((b) => b.attributes('aria-label') === label)
-        expect(button('videoCall.muteMic').attributes('loading')).toBeUndefined()
-        expect(button('videoCall.disableCamera').attributes('loading')).toBeUndefined()
+        expect(button(wrapper.vm.micAction).attributes('loading')).toBeUndefined()
+        expect(button(wrapper.vm.cameraAction).attributes('loading')).toBeUndefined()
 
         await starting(wrapper, { videoinput: 1 })
-        expect(button('videoCall.disableCamera').attributes('loading')).toBe('true')
-        expect(button('videoCall.muteMic').attributes('loading')).toBeUndefined()
+        expect(button(wrapper.vm.cameraAction).attributes('loading')).toBe('true')
+        expect(button(wrapper.vm.micAction).attributes('loading')).toBeUndefined()
 
         await starting(wrapper, { audioinput: 1 })
-        expect(button('videoCall.muteMic').attributes('loading')).toBe('true')
-        expect(button('videoCall.disableCamera').attributes('loading')).toBeUndefined()
+        expect(button(wrapper.vm.micAction).attributes('loading')).toBe('true')
+        expect(button(wrapper.vm.cameraAction).attributes('loading')).toBeUndefined()
       })
 
       it('shows it in the device settings', async () => {
@@ -3119,6 +3175,303 @@ describe('VideoCall', () => {
     })
   })
 
+  describe('bars on the videos', () => {
+    const { computed } = VideoCall
+
+    it('lie on the videos with the call maximized on a phone', () => {
+      expect(
+        computed.barsOverlay.call({ isFullscreen: true, isMobile: true, mobileChatOpen: false }),
+      ).toBe(true)
+    })
+
+    it('stay where they are with the chat open on a phone, on a desktop, in the parked window and before joining', () => {
+      const overlay = (ctx) => computed.barsOverlay.call({ isMobile: true, ...ctx })
+      expect(overlay({ isFullscreen: true, mobileChatOpen: true })).toBe(false)
+      expect(overlay({ isFullscreen: true, isMobile: false, mobileChatOpen: false })).toBe(false)
+      expect(overlay({ isFullscreen: false, mobileChatOpen: false })).toBe(false)
+    })
+
+    it('move only when asked to around the maximized call on a desktop', () => {
+      const manual = (ctx) =>
+        computed.barsManual.call({
+          isFullscreen: true,
+          isMobile: false,
+          phase: 'in-call',
+          error: null,
+          ...ctx,
+        })
+      expect(manual({})).toBe(true)
+      expect(manual({ isMobile: true })).toBe(false)
+      expect(manual({ isFullscreen: false })).toBe(false)
+      expect(manual({ phase: 'connecting' })).toBe(false)
+      expect(manual({ error: 'broken' })).toBe(false)
+    })
+
+    it('tell the page what its header and footer are to do', () => {
+      const page = (ctx) =>
+        computed.pageBars.call({ barsOverlay: false, barsManual: false, ...ctx })
+      expect(page({ barsHidden: true, barsCollapsed: true })).toBe('normal')
+      expect(page({ barsOverlay: true, barsHidden: false })).toBe('overlay')
+      expect(page({ barsOverlay: true, barsHidden: true })).toBe('hidden')
+      expect(page({ barsManual: true, barsCollapsed: false })).toBe('manual')
+      expect(page({ barsManual: true, barsCollapsed: true })).toBe('collapsed')
+    })
+
+    describe('on a desktop', () => {
+      const maximizedCall = async () => {
+        const built = factory({ show: true, minimized: false })
+        await built.wrapper.setData({ phase: 'in-call' })
+        return built
+      }
+
+      it('stand solid around the videos, with a button to move them away', async () => {
+        const { wrapper } = await maximizedCall()
+        const call = wrapper.find('.video-call')
+        expect(call.classes()).toContain('video-call--bars-manual')
+        expect(call.classes()).not.toContain('video-call--bars-overlay')
+        expect(wrapper.find('[data-test="video-call-hide-bars"]').exists()).toBe(true)
+        expect(wrapper.find('[data-test="video-call-show-bars"]').exists()).toBe(false)
+      })
+
+      it('do not move by themselves', async () => {
+        jest.useFakeTimers()
+        try {
+          const { wrapper } = await maximizedCall()
+          jest.advanceTimersByTime(10000)
+          expect(wrapper.find('.video-call').classes()).not.toContain('video-call--bars-collapsed')
+          expect(wrapper.vm.barsHidden).toBe(false)
+        } finally {
+          jest.useRealTimers()
+        }
+      })
+
+      it('move away at the button and come back at the one left on the videos', async () => {
+        const { wrapper, setPageBars } = await maximizedCall()
+        await wrapper.find('[data-test="video-call-hide-bars"]').trigger('click')
+        expect(wrapper.find('.video-call').classes()).toContain('video-call--bars-collapsed')
+        expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'collapsed')
+        await wrapper.find('[data-test="video-call-show-bars"]').trigger('click')
+        expect(wrapper.find('.video-call').classes()).not.toContain('video-call--bars-collapsed')
+        expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'manual')
+      })
+
+      it('are back for the next call', async () => {
+        const { wrapper } = await maximizedCall()
+        await wrapper.setData({ barsCollapsed: true })
+        // The `show` watcher sees a call opened anew.
+        wrapper.vm.$options.watch.show.handler.call(wrapper.vm, true, false)
+        expect(wrapper.vm.barsCollapsed).toBe(false)
+      })
+    })
+
+    describe('during a call', () => {
+      let wrapper
+      let setPageBars
+      let chatEl
+
+      const move = (target = document, clientY = 300) =>
+        target.dispatchEvent(new MouseEvent('mousemove', { clientY, bubbles: true }))
+
+      // On a phone, where they move by themselves.
+      beforeEach(async () => {
+        jest.useFakeTimers()
+        ;({ wrapper, setPageBars } = factory({ show: true, minimized: false }))
+        await wrapper.setData({ phase: 'in-call', windowWidth: 400 })
+        chatEl = document.createElement('div')
+        chatEl.className = 'video-call__sidebar'
+        chatEl.appendChild(document.createElement('textarea'))
+        document.body.appendChild(chatEl)
+      })
+
+      afterEach(() => {
+        wrapper.destroy()
+        chatEl.remove()
+        jest.useRealTimers()
+      })
+
+      it('move out of the way once the mouse has rested for 4 seconds', async () => {
+        expect(wrapper.find('.video-call').classes()).toContain('video-call--bars-overlay')
+        jest.advanceTimersByTime(3999)
+        expect(wrapper.vm.barsHidden).toBe(false)
+        jest.advanceTimersByTime(1)
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.barsHidden).toBe(true)
+        expect(wrapper.find('.video-call').classes()).toContain('video-call--bars-hidden')
+        expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'hidden')
+      })
+
+      it('come back when the mouse moves, and wait for it to rest again', () => {
+        jest.advanceTimersByTime(4000)
+        move()
+        expect(wrapper.vm.barsHidden).toBe(false)
+        jest.advanceTimersByTime(3000)
+        move()
+        jest.advanceTimersByTime(3000)
+        expect(wrapper.vm.barsHidden).toBe(false)
+        jest.advanceTimersByTime(1000)
+        expect(wrapper.vm.barsHidden).toBe(true)
+      })
+
+      it('do not come back for reading and writing in the chat', () => {
+        jest.advanceTimersByTime(4000)
+        move(chatEl.firstChild)
+        chatEl.firstChild.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true }))
+        expect(wrapper.vm.barsHidden).toBe(true)
+      })
+
+      it("come back from the chat when the mouse goes to the window's edge", () => {
+        jest.advanceTimersByTime(4000)
+        move(chatEl.firstChild, 10)
+        expect(wrapper.vm.barsHidden).toBe(false)
+      })
+
+      it('stay while the device settings are open', async () => {
+        await wrapper.setData({ showDeviceSettings: true })
+        jest.advanceTimersByTime(8000)
+        expect(wrapper.vm.barsHidden).toBe(false)
+        await wrapper.setData({ showDeviceSettings: false })
+        jest.advanceTimersByTime(4000)
+        expect(wrapper.vm.barsHidden).toBe(true)
+      })
+
+      it('stay while a menu of the page header is open', () => {
+        const menu = document.createElement('div')
+        menu.className = 'tooltip popover'
+        menu.setAttribute('aria-hidden', 'false')
+        document.body.appendChild(menu)
+        jest.advanceTimersByTime(8000)
+        expect(wrapper.vm.barsHidden).toBe(false)
+        menu.remove()
+      })
+
+      it('are back, and no longer watched for, once the call is parked', async () => {
+        jest.advanceTimersByTime(4000)
+        await wrapper.setData({ phase: 'connecting' })
+        expect(wrapper.vm.barsHidden).toBe(false)
+        await wrapper.setData({ phase: 'in-call' })
+        await wrapper.setData({ error: 'broken' })
+        jest.advanceTimersByTime(4000)
+        expect(wrapper.vm.barsHidden).toBe(false)
+      })
+
+      describe('on a touch screen', () => {
+        // The call is not attached to the document here, so what lands on its videos is
+        // handed to the listener directly, as the document would.
+        const tap = (target) =>
+          wrapper.vm.onBarActivity({ type: 'pointerdown', pointerType: 'touch', target })
+        let stage
+        let tile
+
+        beforeEach(() => {
+          stage = wrapper.find('.video-call__stage').element
+          tile = document.createElement('div')
+          tile.className = 'video-tile'
+          stage.appendChild(tile)
+        })
+
+        it('are switched away by a tap beside the tiles, and back by the next', () => {
+          tap(stage)
+          expect(wrapper.vm.barsHidden).toBe(true)
+          tap(stage)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          jest.advanceTimersByTime(4000)
+          expect(wrapper.vm.barsHidden).toBe(true)
+        })
+
+        it('come back at a tap on a tile, which then is not spotlighted', () => {
+          jest.advanceTimersByTime(4000)
+          tap(tile)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          wrapper.vm.onTileSelect({ key: 'anna' })
+          expect(wrapper.vm.spotlightKey).toBeNull()
+        })
+
+        it('stay at a tap on a tile, which is spotlighted as ever', () => {
+          tap(tile)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          wrapper.vm.onTileSelect({ key: 'anna' })
+          expect(wrapper.vm.spotlightKey).toBe('anna')
+        })
+
+        it('ignore the mouse events the browser makes up after a tap', () => {
+          tap(stage)
+          move()
+          wrapper.vm.onBarActivity({ type: 'focusin', target: tile })
+          expect(wrapper.vm.barsHidden).toBe(true)
+          jest.advanceTimersByTime(800)
+          move()
+          expect(wrapper.vm.barsHidden).toBe(false)
+        })
+
+        it("stay while the page's menu is open", () => {
+          const menu = document.createElement('div')
+          menu.className = 'mobil-header-box--open'
+          document.body.appendChild(menu)
+          jest.advanceTimersByTime(8000)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          menu.remove()
+        })
+      })
+
+      it("leave the page's header and footer as they were when the call goes", () => {
+        wrapper.destroy()
+        expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'normal')
+      })
+    })
+  })
+
+  describe('bars of the parked window', () => {
+    const parkedCall = async () => {
+      const built = factory({ show: true, minimized: true })
+      await built.wrapper.setData({ phase: 'in-call' })
+      return built
+    }
+
+    it('lie on the videos, and the number of participants stays in their place', async () => {
+      const { wrapper } = await parkedCall()
+      expect(wrapper.find('.video-call').classes()).toContain('video-call--parked-bars')
+      expect(wrapper.find('[data-test="video-call-parked-count"]').exists()).toBe(true)
+    })
+
+    it('are held while the device settings are open', async () => {
+      const { wrapper } = await parkedCall()
+      expect(wrapper.find('.video-call').classes()).not.toContain('video-call--bars-held')
+      await wrapper.setData({ showDeviceSettings: true })
+      expect(wrapper.find('.video-call').classes()).toContain('video-call--bars-held')
+    })
+
+    it('are held while the mouse is on the window', async () => {
+      const { wrapper } = await parkedCall()
+      const call = wrapper.find('.video-call')
+      await call.trigger('mouseenter')
+      expect(call.classes()).toContain('video-call--bars-held')
+      await call.trigger('mouseleave')
+      expect(call.classes()).not.toContain('video-call--bars-held')
+    })
+
+    it('know whether they are drawn by Chromium, which slides them without blur', async () => {
+      const { wrapper } = await parkedCall()
+      expect(wrapper.find('.video-call').classes()).not.toContain('video-call--chromium')
+      Object.defineProperty(global.navigator, 'userAgentData', {
+        value: { brands: [{ brand: 'Chromium', version: '140' }] },
+        configurable: true,
+      })
+      try {
+        const chromium = await parkedCall()
+        expect(chromium.wrapper.find('.video-call').classes()).toContain('video-call--chromium')
+      } finally {
+        delete global.navigator.userAgentData
+      }
+    })
+
+    it('are not those of a maximized call', async () => {
+      const { wrapper } = factory({ show: true, minimized: false })
+      await wrapper.setData({ phase: 'in-call' })
+      expect(wrapper.find('.video-call').classes()).not.toContain('video-call--parked-bars')
+      expect(wrapper.find('[data-test="video-call-parked-count"]').exists()).toBe(false)
+    })
+  })
+
   describe('chat on a phone', () => {
     const { computed } = VideoCall
     const tile = (overrides) => ({ isLocal: false, isScreen: false, ...overrides })
@@ -3139,6 +3492,7 @@ describe('VideoCall', () => {
       const phone = { parked: false, isMobile: true, phase: 'in-call' }
       expect(computed.iconOnly.call(phone)).toBe(true)
       expect(VideoCall.methods.iconOnlyTooltip.call(phone, 'Mute')).toBe('')
+      expect(VideoCall.methods.controlTooltip.call(phone, 'Headset: turn off')).toBe('')
     })
 
     it('drops the labels in the parked window, and offers them as tooltips', () => {
@@ -3148,9 +3502,27 @@ describe('VideoCall', () => {
     })
 
     it('spells the controls out on a desktop with the call maximized', () => {
-      expect(computed.iconOnly.call({ parked: false, isMobile: false, phase: 'in-call' })).toBe(
-        false,
-      )
+      expect(
+        computed.iconOnly.call({
+          parked: false,
+          isMobile: false,
+          phase: 'in-call',
+          controlsCrowded: false,
+        }),
+      ).toBe(false)
+    })
+
+    it('drops the labels on a desktop where they would take a second row', () => {
+      const desktop = { parked: false, isMobile: false, phase: 'in-call', controlsCrowded: true }
+      expect(computed.iconOnly.call(desktop)).toBe(true)
+      const crowded = (controlsWidth, labeledControlsWidth, isMobile = false) =>
+        computed.controlsCrowded.call({ controlsWidth, labeledControlsWidth, isMobile })
+      expect(crowded(500, 640)).toBe(true)
+      expect(crowded(700, 640)).toBe(false)
+      // Not measured yet, or a phone, which has its own rule.
+      expect(crowded(500, 0)).toBe(false)
+      expect(crowded(0, 640)).toBe(false)
+      expect(crowded(500, 640, true)).toBe(false)
     })
 
     it('never parks the call on a phone', () => {

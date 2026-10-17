@@ -1910,15 +1910,29 @@
     "connecting": "Łączenie…",
     "connectionLost": "Utracono połączenie: {name}",
     "connectionPoor": "Słabe połączenie: {name}",
+    "controls": {
+      "camera": "Kamera",
+      "chat": "Czat",
+      "leave": "Rozłącz",
+      "microphone": "Mikrofon",
+      "screen": "Ekran",
+      "startSharing": "Udostępnij ekran, okno lub kartę",
+      "stopSharing": "{surface}: przestań udostępniać",
+      "surface": {
+        "browser": "Karta",
+        "monitor": "Ekran",
+        "window": "Okno"
+      },
+      "turnOff": "{device}: wyłącz",
+      "turnOn": "{device}: włącz"
+    },
     "deviceSettings": {
       "button": "Urządzenia",
       "speakerError": "Nie udało się przełączyć głośnika.",
       "title": "Ustawienia urządzeń"
     },
     "dialogLabel": "Rozmowa wideo grupowa",
-    "disableCamera": "Wyłącz kamerę",
     "enableAudio": "Włącz dźwięk",
-    "enableCamera": "Włącz kamerę",
     "errorBackToPrejoin": "Zmień ustawienia",
     "errorRetry": "Spróbuj ponownie",
     "errors": {
@@ -1946,13 +1960,13 @@
       "label": "Wideo grupowe",
       "tooltip": "Rozmowa wideo w grupie „{name}”"
     },
+    "hideBars": "Ukryj paski",
     "leave": "Opuść rozmowę",
     "maximize": "Maksymalizuj",
     "micMuted": "Mikrofon wyłączony",
     "micNoSignal": "Twój mikrofon nie przesyła dźwięku — inni cię nie słyszą.",
     "micUnmuted": "Mikrofon włączony",
     "minimize": "Minimalizuj",
-    "muteMic": "Wycisz mikrofon",
     "openChat": "Otwórz czat",
     "prejoin": {
       "camera": "Kamera",
@@ -2000,12 +2014,10 @@
     "restartMic": "Uruchom ponownie mikrofon",
     "screenShare": "Ekran",
     "screenShareEnded": "Zakończono udostępnianie ekranu",
+    "showBars": "Pokaż paski",
     "showVideos": "Pokaż wideo",
     "spotlightExit": "Wyjdź z trybu spotlight",
-    "startScreenShare": "Udostępnij ekran",
-    "stopScreenShare": "Zakończ udostępnianie",
     "title": "Rozmowa wideo grupowa",
-    "unmuteMic": "Włącz mikrofon",
     "you": "ty",
     "youAreSharingScreen": "Udostępniasz swój ekran"
   }

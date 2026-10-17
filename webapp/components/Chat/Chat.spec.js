@@ -1705,19 +1705,38 @@ describe('Chat.vue', () => {
       })
     })
 
-    describe('room header', () => {
-      const injectedStyles = (propsData) => {
-        wrapper = Wrapper(propsData)
-        const appended = []
-        Object.defineProperty(wrapper.vm.$el, 'shadowRoot', {
-          configurable: true,
-          value: { appendChild: (style) => appended.push(style.textContent) },
-        })
-        wrapper.vm._shadowStylesInjected = false
-        wrapper.vm.injectShadowStyles()
-        return appended.join('')
-      }
+    const injectedStyles = (propsData) => {
+      wrapper = Wrapper(propsData)
+      const appended = []
+      Object.defineProperty(wrapper.vm.$el, 'shadowRoot', {
+        configurable: true,
+        value: { appendChild: (style) => appended.push(style.textContent) },
+      })
+      wrapper.vm._shadowStylesInjected = false
+      wrapper.vm.injectShadowStyles()
+      return appended.join('')
+    }
 
+    describe('input row', () => {
+      it("keeps the library's space around the input in the chat page", () => {
+        expect(injectedStyles({})).not.toContain('.vac-box-footer')
+      })
+
+      it('has less space above and below the input in a chat on its own', () => {
+        expect(injectedStyles({ singleRoom: true })).toContain(
+          '.vac-box-footer { padding-top: 4px !important; padding-bottom: 4px !important; }',
+        )
+      })
+
+      it("has an input as high as the call's buttons in a chat on its own", () => {
+        expect(injectedStyles({ singleRoom: true })).toContain(
+          '.vac-textarea { padding-top: 7px !important; padding-bottom: 7px !important; line-height: 20px !important; }',
+        )
+        expect(injectedStyles({})).not.toContain('.vac-textarea')
+      })
+    })
+
+    describe('room header', () => {
       it('is shown by default', () => {
         expect(injectedStyles({})).not.toContain('display: none')
       })

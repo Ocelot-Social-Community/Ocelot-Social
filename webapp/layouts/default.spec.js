@@ -34,6 +34,8 @@ describe('default.vue', () => {
       },
     }
     store = new Vuex.Store({
+      // What the call tells the page about its header and footer; set by the tests below.
+      state: { pageBars: 'normal' },
       getters: {
         'auth/isLoggedIn': () => true,
         'chat/showChat': () => {
@@ -47,6 +49,7 @@ describe('default.vue', () => {
         'videoCall/groupAvatar': () => null,
         'videoCall/phase': () => 'idle',
         'videoCall/chatRoomId': () => null,
+        'videoCall/pageBars': (state) => state.pageBars,
       },
       mutations: {
         'chat/SET_OPEN_CHAT': jest.fn(),
@@ -71,6 +74,35 @@ describe('default.vue', () => {
 
     it('renders', () => {
       expect(wrapper.classes('layout-default')).toBe(true)
+    })
+
+    describe('header and footer beside a maximized video call', () => {
+      const classes = () =>
+        ['movable', 'glass', 'away'].filter((name) =>
+          wrapper.classes().includes(`layout-default--call-bars-${name}`),
+        )
+      const showing = async (pageBars) => {
+        store.state.pageBars = pageBars
+        await wrapper.vm.$nextTick()
+        return classes()
+      }
+
+      it('stay as they are without one', () => {
+        expect(classes()).toEqual([])
+      })
+
+      it('lie on the call, see-through, while it fills a phone', async () => {
+        expect(await showing('overlay')).toEqual(['movable', 'glass'])
+      })
+
+      it('move out of the way with the bars of the call', async () => {
+        expect(await showing('hidden')).toEqual(['movable', 'glass', 'away'])
+      })
+
+      it('stand solid around the maximized call on a desktop, and move away when asked', async () => {
+        expect(await showing('manual')).toEqual(['movable'])
+        expect(await showing('collapsed')).toEqual(['movable', 'away'])
+      })
     })
   })
 

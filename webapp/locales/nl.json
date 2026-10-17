@@ -1910,15 +1910,29 @@
     "connecting": "Verbinden…",
     "connectionLost": "Verbinding verbroken: {name}",
     "connectionPoor": "Zwakke verbinding: {name}",
+    "controls": {
+      "camera": "Camera",
+      "chat": "Chat",
+      "leave": "Ophangen",
+      "microphone": "Microfoon",
+      "screen": "Scherm",
+      "startSharing": "Je scherm, een venster of een tabblad delen",
+      "stopSharing": "{surface}: niet meer delen",
+      "surface": {
+        "browser": "Tabblad",
+        "monitor": "Scherm",
+        "window": "Venster"
+      },
+      "turnOff": "{device}: uitschakelen",
+      "turnOn": "{device}: inschakelen"
+    },
     "deviceSettings": {
       "button": "Apparaten",
       "speakerError": "De luidspreker kon niet worden gewisseld.",
       "title": "Apparaatinstellingen"
     },
     "dialogLabel": "Groepsvideogesprek",
-    "disableCamera": "Camera uitschakelen",
     "enableAudio": "Geluid inschakelen",
-    "enableCamera": "Camera inschakelen",
     "errorBackToPrejoin": "Instellingen wijzigen",
     "errorRetry": "Opnieuw proberen",
     "errors": {
@@ -1946,13 +1960,13 @@
       "label": "Groepsvideo",
       "tooltip": "Videogesprek in groep “{name}”"
     },
+    "hideBars": "Balken verbergen",
     "leave": "Gesprek verlaten",
     "maximize": "Maximaliseren",
     "micMuted": "Microfoon uit",
     "micNoSignal": "Je microfoon levert geen geluid — anderen horen je niet.",
     "micUnmuted": "Microfoon aan",
     "minimize": "Minimaliseren",
-    "muteMic": "Microfoon dempen",
     "openChat": "Chat openen",
     "prejoin": {
       "camera": "Camera",
@@ -2000,12 +2014,10 @@
     "restartMic": "Microfoon opnieuw starten",
     "screenShare": "Scherm",
     "screenShareEnded": "Schermdelen beëindigd",
+    "showBars": "Balken tonen",
     "showVideos": "Video's tonen",
     "spotlightExit": "Spotlight verlaten",
-    "startScreenShare": "Scherm delen",
-    "stopScreenShare": "Stoppen met delen",
     "title": "Groepsvideogesprek",
-    "unmuteMic": "Microfoon inschakelen",
     "you": "jij",
     "youAreSharingScreen": "Je deelt je scherm"
   }

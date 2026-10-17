@@ -1,5 +1,14 @@
 <template>
-  <div class="layout-default">
+  <div
+    :class="[
+      'layout-default',
+      {
+        'layout-default--call-bars-movable': videoCallPageBars !== 'normal',
+        'layout-default--call-bars-glass': ['overlay', 'hidden'].includes(videoCallPageBars),
+        'layout-default--call-bars-away': ['hidden', 'collapsed'].includes(videoCallPageBars),
+      },
+    ]"
+  >
     <div class="main-navigation">
       <header-menu />
     </div>
@@ -23,6 +32,7 @@
       <template v-if="showCallChatTabs">
         <room-header
           class="chat-modul__header"
+          compact
           :profile="callGroupProfile"
           :title="videoCallGroupName || ''"
           :to="callGroupRoute"
@@ -108,10 +118,10 @@ import { videoCallConfigQuery } from '~/graphql/VideoCalls'
 // Height of the tab row above the floating chat, in px. The chat is told, so it gives up
 // that much and the window does not grow under the page header. Kept in step with the
 // `.chat-modul__tabs` rule below.
-const CALL_CHAT_TABS_HEIGHT = 52
-// Height of the room header above those tabs, in px: RoomHeader's own, which is the base
-// avatar (44) with a small space (8) above and below.
-const CALL_CHAT_HEADER_HEIGHT = 60
+const CALL_CHAT_TABS_HEIGHT = 36
+// Height of the room header above those tabs, in px: RoomHeader's compact one, which is its
+// small avatar (28) with a small space (8) above and below.
+const CALL_CHAT_HEADER_HEIGHT = 44
 
 export default {
   components: {
@@ -149,6 +159,7 @@ export default {
       videoCallGroupAvatar: 'videoCall/groupAvatar',
       videoCallPhase: 'videoCall/phase',
       videoCallChatRoomId: 'videoCall/chatRoomId',
+      videoCallPageBars: 'videoCall/pageBars',
     }),
     chatLivesInVideoSidebar() {
       // Move the chat into the call's sidebar **only when the chat is for the
@@ -289,6 +300,52 @@ export default {
 .main-navigation {
   background-color: var(--color-header-background);
 }
+
+/*  Beside a maximized video call header and footer move out of the way with the call's own */
+/*  bars: on a phone after a while without a touch, lying on the call see-through (glass), */
+/*  on a desktop when the user asks to, solid (VideoCall.vue, barsOverlay / barsManual). */
+.layout-default--call-bars-movable .main-navigation,
+.layout-default--call-bars-movable .desktop-footer.ds-footer {
+  transition: transform 0.3s ease;
+}
+
+.layout-default--call-bars-glass .main-navigation,
+.layout-default--call-bars-glass .desktop-footer.ds-footer {
+  backdrop-filter: blur(var(--video-call-bar-blur));
+}
+
+.layout-default--call-bars-glass .main-navigation {
+  background-color: color-mix(
+    in srgb,
+    var(--video-call-bar-page-header-color) var(--video-call-bar-opacity),
+    transparent
+  );
+}
+
+.layout-default--call-bars-glass .desktop-footer.ds-footer {
+  background-color: color-mix(
+    in srgb,
+    var(--video-call-bar-page-footer-color) var(--video-call-bar-opacity),
+    transparent
+  );
+}
+
+.layout-default--call-bars-away .main-navigation {
+  transform: translateY(-100%);
+  box-shadow: none;
+}
+
+.layout-default--call-bars-away .desktop-footer.ds-footer {
+  transform: translateY(100%);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout-default--call-bars-movable .main-navigation,
+  .layout-default--call-bars-movable .desktop-footer.ds-footer {
+    transition: none;
+  }
+}
 .main-container {
   padding-top: 6rem;
   padding-bottom: 8rem;
@@ -334,12 +391,12 @@ export default {
 /*  latest messages visible — which is what the user interacts with. */
 /*  The tabs between the two chats of a running call, below the room's header. Their */
 /*  height is fixed, as the chat below is told how much room the two take */
-/*  (CALL_CHAT_TABS_HEIGHT; the header's is RoomHeader's own, CALL_CHAT_HEADER_HEIGHT). */
+/*  (CALL_CHAT_TABS_HEIGHT; the header's is RoomHeader's compact one, CALL_CHAT_HEADER_HEIGHT). */
 .chat-modul__tabs {
   display: flex;
   align-items: center;
   box-sizing: border-box;
-  height: 52px;
+  height: 36px;
   /*  The tabs reach from edge to edge of the window, their underline with them. */
   padding: 0;
   background: var(--background-color-base);
