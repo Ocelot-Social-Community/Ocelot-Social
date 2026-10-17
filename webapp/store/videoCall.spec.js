@@ -285,6 +285,13 @@ describe('videoCall store', () => {
         expect(getters.pageBars(state)).toBe('hidden')
       })
 
+      it('knows the solid bars of a desktop, and them moved away', () => {
+        mutations.SET_PAGE_BARS(state, 'manual')
+        expect(state.pageBars).toBe('manual')
+        mutations.SET_PAGE_BARS(state, 'collapsed')
+        expect(state.pageBars).toBe('collapsed')
+      })
+
       it('falls back to normal for anything else', () => {
         state.pageBars = 'hidden'
         mutations.SET_PAGE_BARS(state, 'sideways')

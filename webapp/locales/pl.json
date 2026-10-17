@@ -1960,6 +1960,7 @@
       "label": "Wideo grupowe",
       "tooltip": "Rozmowa wideo w grupie „{name}”"
     },
+    "hideBars": "Ukryj paski",
     "leave": "Opuść rozmowę",
     "maximize": "Maksymalizuj",
     "micMuted": "Mikrofon wyłączony",
@@ -2013,6 +2014,7 @@
     "restartMic": "Uruchom ponownie mikrofon",
     "screenShare": "Ekran",
     "screenShareEnded": "Zakończono udostępnianie ekranu",
+    "showBars": "Pokaż paski",
     "showVideos": "Pokaż wideo",
     "spotlightExit": "Wyjdź z trybu spotlight",
     "title": "Rozmowa wideo grupowa",

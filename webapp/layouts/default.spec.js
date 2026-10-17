@@ -77,23 +77,31 @@ describe('default.vue', () => {
     })
 
     describe('header and footer beside a maximized video call', () => {
+      const classes = () =>
+        ['movable', 'glass', 'away'].filter((name) =>
+          wrapper.classes().includes(`layout-default--call-bars-${name}`),
+        )
+      const showing = async (pageBars) => {
+        store.state.pageBars = pageBars
+        await wrapper.vm.$nextTick()
+        return classes()
+      }
+
       it('stay as they are without one', () => {
-        expect(wrapper.classes()).not.toContain('layout-default--call-bars-overlay')
-        expect(wrapper.classes()).not.toContain('layout-default--call-bars-hidden')
+        expect(classes()).toEqual([])
       })
 
-      it('lie on the call, see-through, while it fills the window', async () => {
-        store.state.pageBars = 'overlay'
-        await wrapper.vm.$nextTick()
-        expect(wrapper.classes()).toContain('layout-default--call-bars-overlay')
-        expect(wrapper.classes()).not.toContain('layout-default--call-bars-hidden')
+      it('lie on the call, see-through, while it fills a phone', async () => {
+        expect(await showing('overlay')).toEqual(['movable', 'glass'])
       })
 
       it('move out of the way with the bars of the call', async () => {
-        store.state.pageBars = 'hidden'
-        await wrapper.vm.$nextTick()
-        expect(wrapper.classes()).toContain('layout-default--call-bars-overlay')
-        expect(wrapper.classes()).toContain('layout-default--call-bars-hidden')
+        expect(await showing('hidden')).toEqual(['movable', 'glass', 'away'])
+      })
+
+      it('stand solid around the maximized call on a desktop, and move away when asked', async () => {
+        expect(await showing('manual')).toEqual(['movable'])
+        expect(await showing('collapsed')).toEqual(['movable', 'away'])
       })
     })
   })

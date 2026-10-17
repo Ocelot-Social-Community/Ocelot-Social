@@ -3178,19 +3178,90 @@ describe('VideoCall', () => {
   describe('bars on the videos', () => {
     const { computed } = VideoCall
 
-    it('lie on the videos with the call maximized', () => {
-      expect(computed.barsOverlay.call({ isFullscreen: true, mobileChatOpen: false })).toBe(true)
+    it('lie on the videos with the call maximized on a phone', () => {
+      expect(
+        computed.barsOverlay.call({ isFullscreen: true, isMobile: true, mobileChatOpen: false }),
+      ).toBe(true)
     })
 
-    it('stay where they are with the chat open on a phone, in the parked window and before joining', () => {
-      expect(computed.barsOverlay.call({ isFullscreen: true, mobileChatOpen: true })).toBe(false)
-      expect(computed.barsOverlay.call({ isFullscreen: false, mobileChatOpen: false })).toBe(false)
+    it('stay where they are with the chat open on a phone, on a desktop, in the parked window and before joining', () => {
+      const overlay = (ctx) => computed.barsOverlay.call({ isMobile: true, ...ctx })
+      expect(overlay({ isFullscreen: true, mobileChatOpen: true })).toBe(false)
+      expect(overlay({ isFullscreen: true, isMobile: false, mobileChatOpen: false })).toBe(false)
+      expect(overlay({ isFullscreen: false, mobileChatOpen: false })).toBe(false)
+    })
+
+    it('move only when asked to around the maximized call on a desktop', () => {
+      const manual = (ctx) =>
+        computed.barsManual.call({
+          isFullscreen: true,
+          isMobile: false,
+          phase: 'in-call',
+          error: null,
+          ...ctx,
+        })
+      expect(manual({})).toBe(true)
+      expect(manual({ isMobile: true })).toBe(false)
+      expect(manual({ isFullscreen: false })).toBe(false)
+      expect(manual({ phase: 'connecting' })).toBe(false)
+      expect(manual({ error: 'broken' })).toBe(false)
     })
 
     it('tell the page what its header and footer are to do', () => {
-      expect(computed.pageBars.call({ barsOverlay: false, barsHidden: true })).toBe('normal')
-      expect(computed.pageBars.call({ barsOverlay: true, barsHidden: false })).toBe('overlay')
-      expect(computed.pageBars.call({ barsOverlay: true, barsHidden: true })).toBe('hidden')
+      const page = (ctx) =>
+        computed.pageBars.call({ barsOverlay: false, barsManual: false, ...ctx })
+      expect(page({ barsHidden: true, barsCollapsed: true })).toBe('normal')
+      expect(page({ barsOverlay: true, barsHidden: false })).toBe('overlay')
+      expect(page({ barsOverlay: true, barsHidden: true })).toBe('hidden')
+      expect(page({ barsManual: true, barsCollapsed: false })).toBe('manual')
+      expect(page({ barsManual: true, barsCollapsed: true })).toBe('collapsed')
+    })
+
+    describe('on a desktop', () => {
+      const maximizedCall = async () => {
+        const built = factory({ show: true, minimized: false })
+        await built.wrapper.setData({ phase: 'in-call' })
+        return built
+      }
+
+      it('stand solid around the videos, with a button to move them away', async () => {
+        const { wrapper } = await maximizedCall()
+        const call = wrapper.find('.video-call')
+        expect(call.classes()).toContain('video-call--bars-manual')
+        expect(call.classes()).not.toContain('video-call--bars-overlay')
+        expect(wrapper.find('[data-test="video-call-hide-bars"]').exists()).toBe(true)
+        expect(wrapper.find('[data-test="video-call-show-bars"]').exists()).toBe(false)
+      })
+
+      it('do not move by themselves', async () => {
+        jest.useFakeTimers()
+        try {
+          const { wrapper } = await maximizedCall()
+          jest.advanceTimersByTime(10000)
+          expect(wrapper.find('.video-call').classes()).not.toContain('video-call--bars-collapsed')
+          expect(wrapper.vm.barsHidden).toBe(false)
+        } finally {
+          jest.useRealTimers()
+        }
+      })
+
+      it('move away at the button and come back at the one left on the videos', async () => {
+        const { wrapper, setPageBars } = await maximizedCall()
+        await wrapper.find('[data-test="video-call-hide-bars"]').trigger('click')
+        expect(wrapper.find('.video-call').classes()).toContain('video-call--bars-collapsed')
+        expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'collapsed')
+        await wrapper.find('[data-test="video-call-show-bars"]').trigger('click')
+        expect(wrapper.find('.video-call').classes()).not.toContain('video-call--bars-collapsed')
+        expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'manual')
+      })
+
+      it('are back for the next call', async () => {
+        const { wrapper } = await maximizedCall()
+        await wrapper.setData({ barsCollapsed: true })
+        // The `show` watcher sees a call opened anew.
+        wrapper.vm.$options.watch.show.handler.call(wrapper.vm, true, false)
+        expect(wrapper.vm.barsCollapsed).toBe(false)
+      })
     })
 
     describe('during a call', () => {
@@ -3201,10 +3272,11 @@ describe('VideoCall', () => {
       const move = (target = document, clientY = 300) =>
         target.dispatchEvent(new MouseEvent('mousemove', { clientY, bubbles: true }))
 
+      // On a phone, where they move by themselves.
       beforeEach(async () => {
         jest.useFakeTimers()
         ;({ wrapper, setPageBars } = factory({ show: true, minimized: false }))
-        await wrapper.setData({ phase: 'in-call' })
+        await wrapper.setData({ phase: 'in-call', windowWidth: 400 })
         chatEl = document.createElement('div')
         chatEl.className = 'video-call__sidebar'
         chatEl.appendChild(document.createElement('textarea'))

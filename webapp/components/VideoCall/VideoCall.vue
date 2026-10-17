@@ -8,6 +8,8 @@
         {
           'video-call--bars-overlay': barsOverlay,
           'video-call--bars-hidden': barsOverlay && barsHidden,
+          'video-call--bars-manual': barsManual,
+          'video-call--bars-collapsed': barsManual && barsCollapsed,
           'video-call--parked-bars': parked,
           'video-call--chromium': isChromium,
           'video-call--bars-held': parked && (showDeviceSettings || pointerOnParked),
@@ -19,6 +21,7 @@
       @click.stop
       @mouseenter="pointerOnParked = true"
       @mouseleave="pointerOnParked = false"
+      @transitionend.self="measureStage"
     >
       <room-header
         class="video-call__header"
@@ -39,6 +42,21 @@
         </span>
         <div class="video-call__header-actions">
           <os-button
+            v-if="barsManual"
+            v-tooltip="$t('videoCall.hideBars')"
+            data-test="video-call-hide-bars"
+            variant="primary"
+            appearance="outline"
+            size="sm"
+            circle
+            :aria-label="$t('videoCall.hideBars')"
+            @click="barsCollapsed = true"
+          >
+            <template #icon>
+              <os-icon :icon="icons.expandVertical" />
+            </template>
+          </os-button>
+          <os-button
             v-if="canMinimize && phase === 'in-call'"
             v-tooltip="minimizeLabel"
             variant="primary"
@@ -49,7 +67,7 @@
             @click="toggleMinimize"
           >
             <template #icon>
-              <os-icon :icon="minimized ? icons.expand : icons.minus" />
+              <os-icon :icon="minimized ? icons.expand : icons.compress" />
             </template>
           </os-button>
           <os-button
@@ -194,6 +212,28 @@
             :class="['video-call__stage', stageLayoutClass]"
             :style="gridStyleConditional"
           >
+            <!--
+              The bars moved away on purpose: this alone stays, where the header's buttons
+              were, to bring them back. In a wrapper of its own: OsButton's root carries no
+              scoped-style attribute, so a position set on it would not apply, and the button
+              would take a row of the tiles' grid.
+            -->
+            <div v-if="barsManual && barsCollapsed" class="video-call__show-bars">
+              <os-button
+                v-tooltip="$t('videoCall.showBars')"
+                data-test="video-call-show-bars"
+                variant="primary"
+                appearance="filled"
+                size="sm"
+                circle
+                :aria-label="$t('videoCall.showBars')"
+                @click="barsCollapsed = false"
+              >
+                <template #icon>
+                  <os-icon :icon="icons.compressVertical" />
+                </template>
+              </os-button>
+            </div>
             <!--
             All tiles are always mounted so every participant's audio track stays
             attached to a DOM <audio> element. CSS Grid (in spotlight mode)
@@ -561,6 +601,9 @@ export default {
       lastRemoteSpeakerId: null,
       // The bars lying on the videos have moved out of the way (see barsOverlay).
       barsHidden: false,
+      // The user moved the bars of the maximized call out of the way (see barsManual). For
+      // this one call: the next one starts with them.
+      barsCollapsed: false,
       // The mouse is on the call's window: in the parked one that shows its bars. Not
       // :hover, which Safari does not set on it.
       pointerOnParked: false,
@@ -761,13 +804,19 @@ export default {
       if (this.isPreJoinModal) return false
       return this.isMobile || !this.minimized || this.phase !== 'in-call'
     },
-    // With the call maximized it fills the window: its header and control bar lie on the
-    // videos, as the page's header and footer do, all four see-through, and they move out
-    // of the way while the mouse rests — on a phone after a while without a touch, or at a
-    // tap. Not with the chat open on a phone, where one writes beneath a small tile, nor
-    // in the parked window or the dialog before joining.
+    // On a phone the maximized call fills the screen: its header and control bar lie on the
+    // videos, as the page's header does, see-through, and they move out of the way after a
+    // while without a touch, or at a tap. Not with the chat open, where one writes beneath
+    // a small tile.
     barsOverlay() {
-      return this.isFullscreen && !this.mobileChatOpen
+      return this.isFullscreen && this.isMobile && !this.mobileChatOpen
+    },
+    // On a desktop the bars of the maximized call — the page's header and footer, the
+    // call's header and control bar — stand around the videos, solid, and move only when
+    // asked to, with a button: a mouse moved by chance would bring them in, and together
+    // they are high.
+    barsManual() {
+      return this.isFullscreen && !this.isMobile && this.phase === 'in-call' && !this.error
     },
     // Only once there are videos to make room for.
     autoHideBars() {
@@ -775,8 +824,9 @@ export default {
     },
     // What the page's header and footer do meanwhile (layouts/default.vue).
     pageBars() {
-      if (!this.barsOverlay) return 'normal'
-      return this.barsHidden ? 'hidden' : 'overlay'
+      if (this.barsOverlay) return this.barsHidden ? 'hidden' : 'overlay'
+      if (this.barsManual) return this.barsCollapsed ? 'collapsed' : 'manual'
+      return 'normal'
     },
     modeClass() {
       if (this.isPreJoinModal) return 'video-call--modal'
@@ -924,6 +974,7 @@ export default {
         if (open) {
           this.phase = 'prejoin'
           this.error = null
+          this.barsCollapsed = false
           this.prefetchJoin()
         } else if (wasOpen) {
           // Only tear down if we were actually open before — on the initial
@@ -2599,11 +2650,8 @@ export default {
   align-items: center;
   gap: var(--space-x-small);
   /*  No padding above and below: the tabs reach the row's lower edge, where the */
-  /*  underline of the active one belongs. As high as the call's header beside it, line */
-  /*  included (RoomHeader compact: 28px avatar, 8px above and below), so both end on */
-  /*  one level. */
-  box-sizing: border-box;
-  min-height: calc(28px + 2 * var(--space-x-small));
+  /*  underline of the active one belongs. The buttons bring the row's height. */
+  min-height: 36px;
   /*  The tabs start at the sidebar's edge, as in the floating chat window; the close */
   /*  button at the row's end keeps its space to the edge. */
   padding: 0 var(--space-small) 0 0;
@@ -2720,7 +2768,64 @@ export default {
   max-height: 232px;
 }
 
-/*  Desktop, call maximized (barsOverlay): the call fills the window, the page's header and */
+/*  Desktop, call maximized (barsManual): the bars stand around the videos, solid, and move */
+/*  away together when asked to (.video-call--bars-collapsed) — up and down, the videos and */
+/*  the chat beside them growing into their place. Header and control bar go by their */
+/*  heights (44px, 45px); hidden once gone, so the keyboard does not land on them. */
+.video-call--bars-manual {
+  overflow: hidden;
+  transition: padding 0.3s ease;
+}
+
+.video-call--bars-manual .video-call__header,
+.video-call--bars-manual .video-call__controls {
+  transition:
+    margin 0.3s ease,
+    visibility 0s;
+}
+
+.video-call--bars-collapsed {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.video-call--bars-collapsed .video-call__header,
+.video-call--bars-collapsed .video-call__controls {
+  visibility: hidden;
+  transition:
+    margin 0.3s ease,
+    visibility 0s 0.3s;
+}
+
+.video-call--bars-collapsed .video-call__header {
+  margin-top: -44px;
+}
+
+.video-call--bars-collapsed .video-call__controls {
+  margin-bottom: -45px;
+}
+
+.video-call--bars-collapsed .video-call__stage {
+  position: relative;
+}
+
+.video-call__show-bars {
+  position: absolute;
+  top: var(--space-x-small);
+  right: var(--space-x-small);
+  z-index: 5;
+  display: flex;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .video-call--bars-manual,
+  .video-call--bars-manual .video-call__header,
+  .video-call--bars-manual .video-call__controls {
+    transition: none;
+  }
+}
+
+/*  Phone, call maximized (barsOverlay): the call fills the window, the page's header and */
 /*  footer lie on it, and so do the call's own header and control bar — over the videos */
 /*  only, not over the chat beside them. All four are see-through and move out of the way */
 /*  while the mouse rests (.video-call--bars-hidden); the videos keep their size meanwhile. */
@@ -2797,6 +2902,13 @@ export default {
 .video-call--bars-overlay .video-call__notices {
   bottom: calc(var(--video-call-bars-bottom) + var(--space-x-small));
   transition: bottom 0.3s ease;
+}
+
+/*  The tabs stand beside the call's header here: as high as it, line included (RoomHeader */
+/*  compact: 28px avatar, 8px above and below), so both end on one level. */
+.video-call--bars-overlay .video-call__sidebar > .video-call__chat-tabs {
+  box-sizing: border-box;
+  min-height: calc(28px + 2 * var(--space-x-small));
 }
 
 /*  The chat reaches from the page's header to its footer, and from edge to edge of the */

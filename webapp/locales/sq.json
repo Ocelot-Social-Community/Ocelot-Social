@@ -1960,6 +1960,7 @@
       "label": "Video grupi",
       "tooltip": "Telefonatë me video në grupin „{name}“"
     },
+    "hideBars": "Fshih shiritat",
     "leave": "Largohu nga telefonata",
     "maximize": "Maksimizo",
     "micMuted": "Mikrofoni fikur",
@@ -2013,6 +2014,7 @@
     "restartMic": "Rinis mikrofonin",
     "screenShare": "Ekrani",
     "screenShareEnded": "Ndarja e ekranit përfundoi",
+    "showBars": "Shfaq shiritat",
     "showVideos": "Shfaq videot",
     "spotlightExit": "Dil nga spotlight",
     "title": "Telefonatë me video në grup",

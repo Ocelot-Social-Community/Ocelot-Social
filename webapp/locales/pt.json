@@ -1960,6 +1960,7 @@
       "label": "Vídeo de grupo",
       "tooltip": "Videochamada no grupo “{name}”"
     },
+    "hideBars": "Ocultar as barras",
     "leave": "Sair da chamada",
     "maximize": "Maximizar",
     "micMuted": "Microfone desligado",
@@ -2013,6 +2014,7 @@
     "restartMic": "Reiniciar microfone",
     "screenShare": "Tela",
     "screenShareEnded": "Compartilhamento de tela encerrado",
+    "showBars": "Mostrar as barras",
     "showVideos": "Mostrar vídeos",
     "spotlightExit": "Sair do destaque",
     "title": "Videochamada de grupo",

@@ -24,8 +24,10 @@ export const state = () => {
     // phase so the layout can decide where the chat lives.
     phase: 'idle',
     // How the page's header and footer stand to the call. 'normal': the call sits between
-    // them. 'overlay': the call fills the window and they lie on it, see-through. 'hidden':
-    // they have moved out of the way along with the call's own bars (the mouse was still).
+    // them. 'overlay': the call fills the window and they lie on it, see-through; 'hidden':
+    // they have moved out of the way along with the call's own bars (nobody touched it).
+    // 'manual': solid around the maximized call on a desktop; 'collapsed': moved out of the
+    // way there, by the user's button.
     pageBars: 'normal',
     // A full reload is due (a new branding, #10353) but waits for this call to end:
     // utils/reloadWhenIdle.js sets it, the call shows it as a notice.
@@ -108,7 +110,9 @@ export const mutations = {
     state.lastChatTab = tab === 'group' ? 'group' : 'call'
   },
   SET_PAGE_BARS(state, pageBars) {
-    state.pageBars = ['overlay', 'hidden'].includes(pageBars) ? pageBars : 'normal'
+    state.pageBars = ['overlay', 'hidden', 'manual', 'collapsed'].includes(pageBars)
+      ? pageBars
+      : 'normal'
   },
   SET_RELOAD_PENDING(state, pending) {
     state.reloadPending = !!pending

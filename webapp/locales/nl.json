@@ -1960,6 +1960,7 @@
       "label": "Groepsvideo",
       "tooltip": "Videogesprek in groep “{name}”"
     },
+    "hideBars": "Balken verbergen",
     "leave": "Gesprek verlaten",
     "maximize": "Maximaliseren",
     "micMuted": "Microfoon uit",
@@ -2013,6 +2014,7 @@
     "restartMic": "Microfoon opnieuw starten",
     "screenShare": "Scherm",
     "screenShareEnded": "Schermdelen beëindigd",
+    "showBars": "Balken tonen",
     "showVideos": "Video's tonen",
     "spotlightExit": "Spotlight verlaten",
     "title": "Groepsvideogesprek",

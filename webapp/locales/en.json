@@ -1960,6 +1960,7 @@
       "label": "Group Video",
       "tooltip": "Video call in group “{name}”"
     },
+    "hideBars": "Hide the bars",
     "leave": "Leave call",
     "maximize": "Maximize",
     "micMuted": "Microphone off",
@@ -2013,6 +2014,7 @@
     "restartMic": "Restart microphone",
     "screenShare": "Screen",
     "screenShareEnded": "Screen sharing ended",
+    "showBars": "Show the bars",
     "showVideos": "Show videos",
     "spotlightExit": "Exit spotlight",
     "title": "Group video call",

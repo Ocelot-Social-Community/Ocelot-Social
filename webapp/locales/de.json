@@ -1960,6 +1960,7 @@
       "label": "Gruppen-Video",
       "tooltip": "Videoanruf in der Gruppe „{name}“"
     },
+    "hideBars": "Leisten ausblenden",
     "leave": "Anruf verlassen",
     "maximize": "Maximieren",
     "micMuted": "Mikrofon aus",
@@ -2013,6 +2014,7 @@
     "restartMic": "Mikrofon neu starten",
     "screenShare": "Bildschirm",
     "screenShareEnded": "Bildschirmfreigabe beendet",
+    "showBars": "Leisten einblenden",
     "showVideos": "Videos anzeigen",
     "spotlightExit": "Spotlight beenden",
     "title": "Gruppen-Videoanruf",

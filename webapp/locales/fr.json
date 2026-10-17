@@ -1960,6 +1960,7 @@
       "label": "Vidéo de groupe",
       "tooltip": "Appel vidéo dans le groupe « {name} »"
     },
+    "hideBars": "Masquer les barres",
     "leave": "Quitter l'appel",
     "maximize": "Agrandir",
     "micMuted": "Microphone désactivé",
@@ -2013,6 +2014,7 @@
     "restartMic": "Redémarrer le microphone",
     "screenShare": "Écran",
     "screenShareEnded": "Partage d'écran terminé",
+    "showBars": "Afficher les barres",
     "showVideos": "Afficher les vidéos",
     "spotlightExit": "Quitter le focus",
     "title": "Appel vidéo de groupe",
