@@ -1256,6 +1256,19 @@
   },
   "map": {
     "alertMessage": "The map cannot be accessed: The Mapbox token is not set on the server!",
+    "controls": {
+      "enterFullscreen": "Enter fullscreen",
+      "exitFullscreen": "Exit fullscreen",
+      "findMyLocation": "Find my location",
+      "locationNotAvailable": "Location not available",
+      "logo": "Mapbox logo",
+      "mapFeedback": "Map feedback",
+      "resetBearing": "Reset bearing to north",
+      "search": "Search for a place",
+      "toggleAttribution": "Toggle attribution",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out"
+    },
     "createEvent": {
       "pickLocation": "Place a new event here",
       "resolvingLocation": "Looking up the address…"

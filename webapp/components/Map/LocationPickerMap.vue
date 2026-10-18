@@ -17,6 +17,7 @@
         :view-on-map-label="$t('post.viewEvent.viewOnMainMap')"
         :styles="styles"
         :style-switcher-label="$t('map.styles.title')"
+        :locale="mapboxLocale"
         @pin-change="onPinChange"
         @view-on-map="onViewOnMap"
       />
@@ -28,6 +29,7 @@
 <script>
 import { isEmpty } from 'lodash'
 import mapboxgl from 'mapbox-gl'
+import { mapboxLocale } from '~/utils/mapboxLocale'
 import { OsLocationMap } from '@ocelot-social/ui/ocelot'
 import Empty from '~/components/Empty/Empty'
 import { queryLocations } from '~/graphql/location'
@@ -166,6 +168,9 @@ export default {
     }
   },
   computed: {
+    mapboxLocale() {
+      return mapboxLocale(this.$t)
+    },
     lat() {
       return this.hasCoordinates ? this.location.lat : null
     },

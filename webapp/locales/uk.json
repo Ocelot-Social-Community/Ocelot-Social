@@ -1256,6 +1256,19 @@
   },
   "map": {
     "alertMessage": "Карта недоступна: токен Mapbox не налаштовано на сервері!",
+    "controls": {
+      "enterFullscreen": "Повноекранний режим",
+      "exitFullscreen": "Вийти з повноекранного режиму",
+      "findMyLocation": "Показати моє місцезнаходження",
+      "locationNotAvailable": "Місцезнаходження недоступне",
+      "logo": "Логотип Mapbox",
+      "mapFeedback": "Відгук про карту",
+      "resetBearing": "Зорієнтувати на північ",
+      "search": "Знайти місце",
+      "toggleAttribution": "Показати або приховати джерела",
+      "zoomIn": "Наблизити",
+      "zoomOut": "Віддалити"
+    },
     "createEvent": {
       "pickLocation": "Розмістити тут нову подію",
       "resolvingLocation": "Пошук адреси…"

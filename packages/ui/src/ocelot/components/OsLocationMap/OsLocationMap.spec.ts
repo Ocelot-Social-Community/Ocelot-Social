@@ -165,6 +165,16 @@ describe('osLocationMap', () => {
     expect(ctx.mapboxGl.accessToken).toBe('test-token')
   })
 
+  it("passes the translations of mapbox-gl's own UI strings to the map", () => {
+    const locale = { 'NavigationControl.ZoomIn': 'Vergrößern' }
+
+    mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', locale },
+    })
+
+    expect(ctx.mapboxGl.Map).toHaveBeenCalledWith(expect.objectContaining({ locale }))
+  })
+
   it('adds the standard controls', () => {
     mount(OsLocationMap, {
       props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token' },
@@ -367,6 +377,181 @@ describe('osLocationMap', () => {
     })
 
     expect(untypedButton.getAttribute('type')).toBe('button')
+  })
+
+  describe('tooltips', () => {
+    const tooltipOf = (element: Element) => {
+      const id = element.getAttribute('aria-describedby')
+      return id ? document.getElementById(id) : null
+    }
+
+    it("turns the tools' titles, mapbox-gl's own included, into tooltips to the left", () => {
+      const controls = document.createElement('div')
+      controls.className = 'mapboxgl-control-container'
+      const zoomIn = document.createElement('button')
+      zoomIn.title = 'Zoom in'
+      controls.append(zoomIn)
+      ctx.mapInstance.getContainer().append(controls)
+
+      const wrapper = mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token' },
+      })
+
+      expect(zoomIn.hasAttribute('title')).toBe(false)
+      expect(tooltipOf(zoomIn)?.textContent).toBe('Zoom in')
+
+      const tooltip = tooltipOf(zoomIn)
+      wrapper.unmount()
+
+      expect(tooltip?.isConnected).toBe(false)
+    })
+
+    it('gives the view-on-map pin a tooltip above it, gone with the pin', async () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          lat: 52.5,
+          lng: 13.4,
+          viewOnMap: true,
+          viewOnMapLabel: 'View on map',
+        },
+      })
+
+      const tooltip = tooltipOf(ctx.markerElement)
+
+      expect(ctx.markerElement.hasAttribute('title')).toBe(false)
+      expect(tooltip?.textContent).toBe('View on map')
+
+      await wrapper.setProps({ lat: undefined, lng: undefined })
+
+      expect(tooltip?.isConnected).toBe(false)
+      expect(ctx.markerElement.hasAttribute('aria-describedby')).toBe(false)
+
+      wrapper.unmount()
+    })
+
+    it('relabels its tools and the pin in another language', async () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          lat: 52.5,
+          lng: 13.4,
+          viewOnMap: true,
+          viewOnMapLabel: 'View on map',
+          styleSwitcherLabel: 'Map style',
+          styles: [
+            { id: 'streets', url: 'mapbox://styles/a', label: 'Streets' },
+            { id: 'satellite', url: 'mapbox://styles/b', label: 'Satellite' },
+          ],
+        },
+      })
+      const find = (selector: string) =>
+        ctx.controlContainers
+          .map((container) => container.querySelector(selector))
+          .find((element): element is HTMLElement => element !== null)
+
+      await wrapper.setProps({
+        viewOnMapLabel: 'Auf der Karte ansehen',
+        styleSwitcherLabel: 'Kartenstil',
+        styles: [
+          { id: 'streets', url: 'mapbox://styles/a', label: 'Straßen' },
+          { id: 'satellite', url: 'mapbox://styles/b', label: 'Satellit' },
+        ],
+      })
+
+      expect(find('.os-location-map-view-on-map-toggle')?.title).toBe('Auf der Karte ansehen')
+      expect(find('.os-location-map-style-switcher-toggle')?.getAttribute('aria-label')).toBe(
+        'Kartenstil',
+      )
+      expect(ctx.markerElement.getAttribute('aria-label')).toBe('Auf der Karte ansehen')
+      expect(tooltipOf(ctx.markerElement)?.textContent).toBe('Auf der Karte ansehen')
+
+      wrapper.unmount()
+    })
+
+    it('relabels the style menu in another language', async () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          styleSwitcherLabel: 'Map style',
+          styles: [
+            { id: 'streets', url: 'mapbox://styles/a', label: 'Streets' },
+            { id: 'satellite', url: 'mapbox://styles/b', label: 'Satellite' },
+          ],
+        },
+      })
+
+      await wrapper.setProps({
+        styleSwitcherLabel: 'Kartenstil',
+        styles: [
+          { id: 'streets', url: 'mapbox://styles/a', label: 'Straßen' },
+          { id: 'satellite', url: 'mapbox://styles/b', label: 'Satellit' },
+        ],
+      })
+
+      const popover = document.querySelector('.os-location-map-style-popover')
+
+      expect(popover?.getAttribute('aria-label')).toBe('Kartenstil')
+      expect(
+        [...document.querySelectorAll('.os-location-map-style-popover-btn')].map(
+          (entry) => entry.textContent,
+        ),
+      ).toStrictEqual(['Straßen', 'Satellit'])
+
+      wrapper.unmount()
+    })
+
+    it("relabels the pick-location tool and mapbox-gl's own controls in another language", async () => {
+      const zoomIn = document.createElement('button')
+      zoomIn.className = 'mapboxgl-ctrl-zoom-in'
+      ctx.mapInstance.getContainer().append(zoomIn)
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          editable: true,
+          pickLocationLabel: 'Pick location',
+        },
+      })
+
+      await wrapper.setProps({
+        pickLocationLabel: 'Ort wählen',
+        locale: { 'NavigationControl.ZoomIn': 'Vergrößern' },
+      })
+
+      const picker = ctx.controlContainers
+        .map((container) => container.querySelector('.os-location-map-picker-toggle'))
+        .find((element): element is HTMLElement => element !== null)
+
+      expect(picker?.title).toBe('Ort wählen')
+      expect(zoomIn.getAttribute('aria-label')).toBe('Vergrößern')
+
+      wrapper.unmount()
+    })
+
+    it("gives the style menu's entries no tooltip: their label is on them", () => {
+      mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          styles: [
+            { id: 'streets', url: 'mapbox://styles/a', label: 'Streets' },
+            { id: 'satellite', url: 'mapbox://styles/b', label: 'Satellite' },
+          ],
+        },
+      })
+
+      const entries = document.querySelectorAll('.os-location-map-style-popover-btn')
+
+      expect(entries).toHaveLength(2)
+
+      entries.forEach((entry) => {
+        expect(entry.hasAttribute('title')).toBe(false)
+      })
+    })
   })
 
   it('does not add the pick-location tool when not editable', () => {

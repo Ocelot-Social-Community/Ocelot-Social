@@ -1256,6 +1256,19 @@
   },
   "map": {
     "alertMessage": "Карта недоступна: Токен Mapbox не настроен на сервере!",
+    "controls": {
+      "enterFullscreen": "Полноэкранный режим",
+      "exitFullscreen": "Выйти из полноэкранного режима",
+      "findMyLocation": "Показать моё местоположение",
+      "locationNotAvailable": "Местоположение недоступно",
+      "logo": "Логотип Mapbox",
+      "mapFeedback": "Отзыв о карте",
+      "resetBearing": "Сориентировать на север",
+      "search": "Найти место",
+      "toggleAttribution": "Показать или скрыть источники",
+      "zoomIn": "Приблизить",
+      "zoomOut": "Отдалить"
+    },
     "createEvent": {
       "pickLocation": "Разместить здесь новое мероприятие",
       "resolvingLocation": "Поиск адреса…"

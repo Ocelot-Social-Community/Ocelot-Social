@@ -1256,6 +1256,19 @@
   },
   "map": {
     "alertMessage": "Harta nuk mund të aksesohet: Tokeni i Mapbox nuk është vendosur në server!",
+    "controls": {
+      "enterFullscreen": "Ekran i plotë",
+      "exitFullscreen": "Dil nga ekrani i plotë",
+      "findMyLocation": "Shfaq vendndodhjen time",
+      "locationNotAvailable": "Vendndodhja nuk është e disponueshme",
+      "logo": "Logoja e Mapbox",
+      "mapFeedback": "Koment për hartën",
+      "resetBearing": "Orientoje nga veriu",
+      "search": "Kërko një vend",
+      "toggleAttribution": "Shfaq ose fshih burimet",
+      "zoomIn": "Zmadho",
+      "zoomOut": "Zvogëlo"
+    },
     "createEvent": {
       "pickLocation": "Vendos këtu një ngjarje të re",
       "resolvingLocation": "Duke kërkuar adresën…"

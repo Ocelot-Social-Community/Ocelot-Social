@@ -15,6 +15,7 @@
         :hash="false"
         :min-pitch="0"
         :max-pitch="60"
+        :locale="mapboxLocale"
         @load="onMapLoad"
       >
         <MglScaleControl />
@@ -54,7 +55,7 @@
                 class="map-legend-visibility-toggle"
                 :aria-pressed="String(!isMarkerTypeHidden(type.id))"
                 :aria-label="markerTypeToggleLabel(type.id)"
-                :title="markerTypeToggleLabel(type.id)"
+                v-os-tooltip="{ content: markerTypeToggleLabel(type.id), placement: 'top' }"
                 @click="toggleMarkerTypeVisibility(type.id)"
               >
                 <os-icon
@@ -68,7 +69,7 @@
                 class="map-legend-past-events-toggle"
                 :aria-pressed="String(showPastEvents)"
                 :aria-label="pastEventsToggleLabel"
-                :title="pastEventsToggleLabel"
+                v-os-tooltip="{ content: pastEventsToggleLabel, placement: 'top' }"
                 @click="toggleShowPastEvents"
               >
                 <os-icon :icon="showPastEvents ? icons.clockSlash : icons.clock" size="md" />
@@ -87,10 +88,12 @@
 import Vue from 'vue'
 import { isEmpty } from 'lodash'
 import mapboxgl from 'mapbox-gl'
+import { mapboxLocale } from '~/utils/mapboxLocale'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import { mapGetters } from 'vuex'
-import { OsIcon } from '@ocelot-social/ui'
+import { OsIcon, tooltipsFromTitles } from '@ocelot-social/ui'
+import { setMapboxLocale } from '@ocelot-social/ui/ocelot'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { isEventPast } from '~/utils/eventDate'
 import { profileUserQuery } from '~/graphql/User'
@@ -273,6 +276,11 @@ export default {
     // Pending "stop showing this popup's scrollbar again" timer (see
     // markPopupScrolling()) — cleared in beforeDestroy() below.
     this.popupScrollTimer = null
+    // The map tools' tooltips (see onMapLoad) — removed in beforeDestroy() below.
+    this.controlTooltips = null
+    // The style switcher's toggle and menu, relabelled in another language (relabelMapTools).
+    this.styleSwitcherToggle = null
+    this.styleSwitcherPopover = null
   },
   async mounted() {
     this.updateMapPosition()
@@ -291,6 +299,7 @@ export default {
     }
     clearTimeout(this.hoverPopupTimer)
     clearTimeout(this.popupScrollTimer)
+    if (this.controlTooltips) this.controlTooltips.destroy()
     // A still-open popup's mounted components (UserAvatarPopover etc.) each
     // run their own Apollo query — leaving on a route change without this
     // would leak that subscription instead of $destroy()ing it.
@@ -298,6 +307,9 @@ export default {
     this.destroyPopupComponents()
   },
   computed: {
+    mapboxLocale() {
+      return mapboxLocale(this.$t)
+    },
     pastEventsToggleLabel() {
       return this.showPastEvents
         ? this.$t('map.legend.hidePastEvents')
@@ -384,6 +396,10 @@ export default {
     },
   },
   watch: {
+    // Another language: the open map's tools follow (mapbox-gl reads its locale only once).
+    mapboxLocale(locale) {
+      this.relabelMapTools(locale)
+    },
     isPreparedForMarkers(newValue) {
       if (newValue) {
         this.addMarkersOnCheckPrepared()
@@ -483,12 +499,35 @@ export default {
       }
       this.$router.replace({ path: '/map', query })
     },
+    relabelMapTools(locale) {
+      if (!this.map) return
+      setMapboxLocale(this.map, locale)
+      const label = (element, text) => {
+        element.title = text
+        element.setAttribute('aria-label', text)
+      }
+      if (this.eventPinToolToggle) {
+        label(this.eventPinToolToggle, this.$t('map.createEvent.pickLocation'))
+      }
+      if (this.geocoder) {
+        this.geocoder.setPlaceholder(this.$t('map.controls.search'))
+      }
+      if (this.styleSwitcherToggle) {
+        const styleLabel = this.$t('map.styles.title')
+        label(this.styleSwitcherToggle, styleLabel)
+        this.styleSwitcherPopover.setAttribute('aria-label', styleLabel)
+        this.styleSwitcherPopover.querySelectorAll('.map-style-popover-btn').forEach((btn) => {
+          btn.textContent = this.availableStyles[btn.dataset.style].title
+        })
+      }
+    },
     addGeocoder() {
       this.geocoder = new MapboxGeocoder({
         accessToken: this.$env.MAPBOX_TOKEN,
         mapboxgl: this.mapboxgl,
         marker: false,
         collapsed: this.geocoderCollapsed,
+        placeholder: this.$t('map.controls.search'),
       })
       this.map.addControl(this.geocoder, 'top-right')
       // Ensure geocoder stays at the top of the control group
@@ -671,6 +710,7 @@ export default {
           toggle.className = 'map-style-switcher-toggle'
           toggle.title = styleLabel
           toggle.setAttribute('aria-label', styleLabel)
+          this.styleSwitcherToggle = toggle
           toggle.setAttribute('aria-expanded', 'false')
           toggle.innerHTML =
             '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">' +
@@ -688,12 +728,13 @@ export default {
           popover.className = 'map-style-popover'
           popover.setAttribute('role', 'listbox')
           popover.setAttribute('aria-label', styleLabel)
+          this.styleSwitcherPopover = popover
 
           Object.entries(this.availableStyles).forEach(([key, style]) => {
             const btn = document.createElement('button')
             btn.type = 'button'
-            btn.title = style.title
             btn.textContent = style.title
+            btn.dataset.style = key
             btn.className = 'map-style-popover-btn'
             btn.setAttribute('role', 'option')
             if (this.mapOptions.style === style.url) {
@@ -736,6 +777,13 @@ export default {
       // GeolocateControl comment above) so it lands at the bottom of the
       // top-right stack.
       this.map.addControl(styleSwitcher, 'top-right')
+
+      // The tools' `title`s, mapbox-gl's own and the search field included, as tooltips like
+      // everywhere else in the app — to the left, since the tools stand at the right edge.
+      this.controlTooltips = tooltipsFromTitles(
+        this.map.getContainer().querySelector('.mapboxgl-control-container'),
+        { placement: 'left' },
+      )
 
       // create a popup, but don't add it to the map yet
       this.markers.popup = new mapboxgl.Popup({
