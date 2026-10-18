@@ -6,6 +6,10 @@
         :appearance="filterActive ? 'filled' : 'ghost'"
         circle
         :aria-label="$t('common.filter')"
+        v-os-tooltip="{
+          content: $t('common.filter'),
+          placement: 'bottom-start',
+        }"
         @click.prevent="toggleMenu()"
       >
         <template #icon>
