@@ -452,8 +452,11 @@ export default {
     margin: 0;
   }
 
+  /* The hint sits in the gap to the next field instead of adding its own height to it: a field
+     without a hint is followed by --space-base, one with a hint by its 4px lead-in, the ~19px hint
+     and this — about the same. */
   > .os-validation-hint {
-    margin-bottom: var(--space-base);
+    margin-bottom: var(--space-xx-small);
     cursor: default;
   }
 
