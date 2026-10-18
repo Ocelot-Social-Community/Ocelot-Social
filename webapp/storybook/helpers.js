@@ -9,6 +9,7 @@ import IziToast from '~/plugins/izi-toast'
 import layout from './layout.vue'
 import locales from '~/locales/index.js'
 import '~/plugins/v-tooltip'
+import '~/plugins/os-tooltip'
 
 // Local stand-ins for the photos the stories used to pull off the public internet. Served by
 // Storybook from storybook/fixtures/ (see main.js staticDirs) — committed, byte-identical on every

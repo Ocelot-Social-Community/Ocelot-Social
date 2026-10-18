@@ -46,5 +46,12 @@ describe('FilterMenu.vue', () => {
       wrapper = Wrapper()
       expect(wrapper.find('.filter-menu button[data-appearance="filled"]').exists()).toBe(true)
     })
+
+    it('has a tooltip on the dropdown button that describes it', () => {
+      const button = wrapper.find('.filter-menu button')
+      const tooltip = document.getElementById(button.attributes('aria-describedby'))
+      expect(tooltip.getAttribute('role')).toBe('tooltip')
+      expect(tooltip.textContent).toBe('common.filter')
+    })
   })
 })

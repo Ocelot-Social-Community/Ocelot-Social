@@ -90,7 +90,7 @@
                         circle
                         :class="{ 'permission-denied': !$can('user.invite') }"
                         :aria-label="$t('invite-codes.button.tooltip')"
-                        v-tooltip="{
+                        v-os-tooltip="{
                           content: $can('user.invite')
                             ? $t('invite-codes.button.tooltip')
                             : $t('permissions.deniedHint'),
@@ -123,7 +123,7 @@
                   appearance="ghost"
                   circle
                   :aria-label="$t('header.groups.tooltip')"
-                  v-tooltip="{
+                  v-os-tooltip="{
                     content: $t('header.groups.tooltip'),
                     placement: 'bottom-start',
                   }"
@@ -143,7 +143,7 @@
                   appearance="ghost"
                   circle
                   :aria-label="$t('header.map.tooltip')"
-                  v-tooltip="{
+                  v-os-tooltip="{
                     content: $t('header.map.tooltip'),
                     placement: 'bottom-start',
                   }"

@@ -8,7 +8,7 @@
           appearance="ghost"
           circle
           :aria-label="$t('localeSwitch.tooltip')"
-          v-tooltip="{
+          v-os-tooltip="{
             content: $t('localeSwitch.tooltip'),
             placement: 'bottom-start',
           }"

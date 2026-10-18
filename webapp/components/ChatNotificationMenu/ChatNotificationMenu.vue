@@ -7,7 +7,7 @@
     appearance="ghost"
     circle
     :aria-label="$t('header.chats.tooltip')"
-    v-tooltip="{
+    v-os-tooltip="{
       content: $t('header.chats.tooltip'),
       placement: 'bottom-start',
     }"

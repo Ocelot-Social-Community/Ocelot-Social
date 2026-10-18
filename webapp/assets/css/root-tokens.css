@@ -375,6 +375,13 @@
   /*  Kept at its exact vanilla value — a color-mix() approximation would have shifted the colour. */
   --color-ribbon-event-shadow: #6001ff;
   /**
+ * @tokens Tooltip Color
+ */
+
+  /* Read by OsTooltip / v-os-tooltip from @ocelot-social/ui; a brand can recolour its tooltips here. */
+  --color-tooltip-background: var(--background-color-inverse-soft);
+  --color-tooltip-text: var(--text-color-inverse);
+  /**
  * @tokens Chat Color
  */
 
