@@ -172,6 +172,8 @@ describe('notify group members of new posts in group', () => {
       vi.clearAllMocks()
       authenticatedUser = await groupMember.toJson()
       await mutate({ mutation: markAllAsRead })
+      authenticatedUser = await emaillessMember.toJson()
+      await mutate({ mutation: markAllAsRead })
       authenticatedUser = await postAuthor.toJson()
       await mutate({ mutation: markAllAsRead })
       await mutate({
@@ -223,6 +225,34 @@ describe('notify group members of new posts in group', () => {
 
     it('sends notification to the group member', async () => {
       authenticatedUser = await groupMember.toJson()
+
+      await expect(
+        query({
+          query: notifications,
+          variables: {
+            orderBy: 'updatedAt_desc',
+            read: false,
+          },
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          notifications: [
+            {
+              from: {
+                __typename: 'Post',
+                id: 'post',
+              },
+              read: false,
+              reason: 'post_in_group',
+            },
+          ],
+        },
+        errors: undefined,
+      })
+    })
+
+    it('sends notification to the group member without an e-mail address', async () => {
+      authenticatedUser = await emaillessMember.toJson()
 
       await expect(
         query({
