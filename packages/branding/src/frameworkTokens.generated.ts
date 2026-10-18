@@ -120,6 +120,8 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'color-toast-orange': 'var(--color-warning)',
   'color-toast-red': 'var(--color-danger)',
   'color-toast-yellow': 'var(--color-yellow)',
+  'color-tooltip-background': 'var(--background-color-inverse-soft)',
+  'color-tooltip-text': 'var(--text-color-inverse)',
   'color-warning': 'rgb(230, 121, 25)',
   'color-warning-active': 'color-mix(in srgb, var(--color-warning), black 15%)',
   'color-warning-contrast': 'var(--text-color-primary-inverse)',

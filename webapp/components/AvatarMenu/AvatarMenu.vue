@@ -15,7 +15,7 @@
           :profile="user"
           size="small"
           :showProfileNameTitle="false"
-          v-tooltip="{
+          v-os-tooltip="{
             content: $t('header.avatarMenu.button.tooltip'),
             placement: 'bottom-start',
           }"

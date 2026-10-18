@@ -8,7 +8,7 @@
     appearance="ghost"
     circle
     :aria-label="$t('header.notifications.tooltip')"
-    v-tooltip="{
+    v-os-tooltip="{
       content: $t('header.notifications.tooltip'),
       placement: 'bottom-start',
     }"
@@ -31,7 +31,7 @@
         appearance="ghost"
         circle
         :aria-label="$t('header.notifications.tooltip')"
-        v-tooltip="{
+        v-os-tooltip="{
           content: $t('header.notifications.tooltip'),
           placement: 'bottom-start',
         }"

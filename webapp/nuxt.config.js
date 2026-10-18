@@ -247,6 +247,7 @@ export default {
     { src: '~/plugins/keep-alive.js', ssr: false },
     { src: '~/plugins/vue-directives.js', ssr: false },
     { src: '~/plugins/v-tooltip.js', ssr: false },
+    { src: '~/plugins/os-tooltip.js', ssr: false },
     { src: '~/plugins/izi-toast.js', ssr: false },
     { src: '~/plugins/backend-error.js' },
     { src: '~/plugins/vue-filters.js' },
