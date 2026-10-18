@@ -1256,6 +1256,19 @@
   },
   "map": {
     "alertMessage": "No se puede acceder al mapa: ¡El token de Mapbox no está configurado en el servidor!",
+    "controls": {
+      "enterFullscreen": "Pantalla completa",
+      "exitFullscreen": "Salir de pantalla completa",
+      "findMyLocation": "Mostrar mi ubicación",
+      "locationNotAvailable": "Ubicación no disponible",
+      "logo": "Logotipo de Mapbox",
+      "mapFeedback": "Comentarios sobre el mapa",
+      "resetBearing": "Orientar al norte",
+      "search": "Buscar un lugar",
+      "toggleAttribution": "Mostrar u ocultar las fuentes",
+      "zoomIn": "Acercar",
+      "zoomOut": "Alejar"
+    },
     "createEvent": {
       "pickLocation": "Crear un evento nuevo aquí",
       "resolvingLocation": "Buscando la dirección…"

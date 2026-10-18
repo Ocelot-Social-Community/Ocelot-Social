@@ -121,6 +121,16 @@ ul.os-menu-item-submenu {
   top: 0;
   left: 0;
   z-index: var(--os-tooltip-z-index, 9997);
+  /* Its own type, not that of where it sits: in fullscreen it sits inside the fullscreen element,
+     e.g. a map, whose mapbox-gl styles set a smaller font of their own. */
+  font-family: var(--os-tooltip-font-family, var(--font-family-text, inherit));
+  font-size: var(--os-tooltip-font-size, 1rem);
+  font-weight: normal;
+  font-style: normal;
+  line-height: var(--os-tooltip-line-height, var(--line-height-base, 1.3));
+  letter-spacing: normal;
+  text-align: start;
+  text-transform: none;
   visibility: hidden;
   opacity: 0;
   pointer-events: none;

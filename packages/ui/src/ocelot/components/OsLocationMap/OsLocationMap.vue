@@ -13,8 +13,13 @@
   } from 'vue-demi'
 
   import { IconClose } from '#src/components/OsIcon'
+  import { createTooltip, tooltipsFromTitles } from '#src/components/OsTooltip'
   import { cn } from '#src/utils'
 
+  import { setMapboxLocale } from './mapboxLocale'
+
+  import type { TitleTooltips, Tooltip } from '#src/components/OsTooltip'
+  import type { MapboxLocale } from './mapboxLocale'
   import type { PropType } from 'vue-demi'
 
   export interface OsLocationMapSearchResult {
@@ -129,6 +134,16 @@
       styleSwitcherLabel: {
         type: String,
         default: 'Map style',
+      },
+      /**
+       * mapbox-gl's own UI strings (the tooltips of zoom, compass, fullscreen, geolocate, …) in the
+       * user's language — mapbox-gl's `locale` map option, keyed as in its default locale, e.g.
+       * `NavigationControl.ZoomIn`. Left out, mapbox-gl's English strings show. A new value
+       * (another language) relabels the open map.
+       */
+      locale: {
+        type: Object as PropType<MapboxLocale>,
+        default: undefined,
       },
       /** Enables the pick-location tool and dragging the pin to move it. */
       editable: {
@@ -247,6 +262,15 @@
       let map: any = null
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let marker: any = null
+      // The "view on map" pin's tooltip, and those of the map's tools (mapbox-gl's own included).
+      let markerTooltip: Tooltip | null = null
+      let controlTooltips: TitleTooltips | null = null
+      // The labels this component sets on its own elements, as functions of the props they come
+      // from — so another language relabels the open map (see relabel() below). `title` turns into
+      // a tooltip; an element listed only in `ariaLabelled` has none.
+      const titled = new Map<HTMLElement, () => string>()
+      const ariaLabelled = new Map<HTMLElement, () => string>()
+      let styleEntries: HTMLElement[] = []
       let debounceTimer: ReturnType<typeof setTimeout> | null = null
       let resizeObserver: ResizeObserver | null = null
 
@@ -262,6 +286,8 @@
         /* v8 ignore stop */
         if (!hasPin.value) {
           if (marker) {
+            markerTooltip?.destroy()
+            markerTooltip = null
             marker.remove()
             marker = null
           }
@@ -302,8 +328,9 @@
           if (props.viewOnMap) {
             const el = marker.getElement()
             el.style.cursor = 'pointer'
-            el.title = props.viewOnMapLabel
+            markerTooltip = createTooltip(el, { content: props.viewOnMapLabel, placement: 'top' })
             el.setAttribute('aria-label', props.viewOnMapLabel)
+            ariaLabelled.set(el, () => props.viewOnMapLabel)
             el.setAttribute('role', 'button')
             el.setAttribute('tabindex', '0')
             const triggerViewOnMap = (e: Event) => {
@@ -419,6 +446,7 @@
             toggle.className = 'os-location-map-picker-toggle'
             toggle.title = props.pickLocationLabel
             toggle.setAttribute('aria-label', props.pickLocationLabel)
+            titled.set(toggle, () => props.pickLocationLabel)
             toggle.setAttribute('aria-pressed', 'false')
             // Same filled map-pin glyph as the cursor above — a solid shape
             // reads more clearly at this small toolbar size than the thin
@@ -504,6 +532,7 @@
             button.className = 'os-location-map-view-on-map-toggle'
             button.title = props.viewOnMapLabel
             button.setAttribute('aria-label', props.viewOnMapLabel)
+            titled.set(button, () => props.viewOnMapLabel)
             button.innerHTML =
               '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" ' +
               'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
@@ -564,6 +593,7 @@
             toggle.className = 'os-location-map-style-switcher-toggle'
             toggle.title = props.styleSwitcherLabel
             toggle.setAttribute('aria-label', props.styleSwitcherLabel)
+            titled.set(toggle, () => props.styleSwitcherLabel)
             toggle.setAttribute('aria-expanded', 'false')
             toggle.innerHTML =
               '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">' +
@@ -599,13 +629,15 @@
             popoverEl.className = 'os-location-map-style-popover'
             popoverEl.setAttribute('role', 'listbox')
             popoverEl.setAttribute('aria-label', props.styleSwitcherLabel)
+            ariaLabelled.set(popoverEl, () => props.styleSwitcherLabel)
+            styleEntries = []
 
             props.styles.forEach((style) => {
               const btn = document.createElement('button')
               btn.type = 'button'
-              btn.title = style.label
               btn.textContent = style.label
               btn.className = 'os-location-map-style-popover-btn'
+              styleEntries.push(btn)
               btn.setAttribute('role', 'option')
               if (props.mapStyle === style.url) {
                 btn.classList.add('os-location-map-style-popover-btn--active')
@@ -652,6 +684,37 @@
         }
       }
 
+      // Another language: the labels of the open map follow, mapbox-gl's own included.
+      function relabel() {
+        titled.forEach((text, element) => {
+          element.setAttribute('title', text())
+          element.setAttribute('aria-label', text())
+        })
+        ariaLabelled.forEach((text, element) => {
+          element.setAttribute('aria-label', text())
+        })
+        markerTooltip?.update({ content: props.viewOnMapLabel, placement: 'top' })
+        props.styles.slice(0, styleEntries.length).forEach((style, index) => {
+          // eslint-disable-next-line security/detect-object-injection -- index of the same-length list
+          styleEntries[index].textContent = style.label
+        })
+        // The map is there: props only change after mount.
+        if (props.locale) {
+          setMapboxLocale(map, props.locale)
+        }
+      }
+
+      watch(
+        () => [
+          props.pickLocationLabel,
+          props.viewOnMapLabel,
+          props.styleSwitcherLabel,
+          props.styles,
+          props.locale,
+        ],
+        relabel,
+      )
+
       onMounted(() => {
         /* v8 ignore start -- SSR / non-browser guard */
         if (typeof window === 'undefined' || !containerRef.value) {
@@ -673,6 +736,7 @@
           zoom: hasPin.value ? props.pinZoom : props.initialZoom,
           accessToken: props.accessToken,
           failIfMajorPerformanceCaveat: false,
+          locale: props.locale,
         })
 
         // mapbox-gl stacks same-corner controls in the order they're added
@@ -703,6 +767,15 @@
 
         if (props.styles.length > 1) {
           map.addControl(buildStyleSwitcher(), 'top-right')
+        }
+
+        // The tools' `title`s, mapbox-gl's own included, as tooltips like everywhere else in the
+        // app — to the left, since the tools stand at the right edge.
+        const controlContainer = map.getContainer().querySelector('.mapboxgl-control-container')
+        if (controlContainer) {
+          controlTooltips = tooltipsFromTitles(controlContainer as HTMLElement, {
+            placement: 'left',
+          })
         }
 
         // A <button> with no explicit `type` defaults to type="submit". Inside
@@ -761,6 +834,10 @@
           map = null
         }
         /* v8 ignore stop */
+        markerTooltip?.destroy()
+        markerTooltip = null
+        controlTooltips?.destroy()
+        controlTooltips = null
         marker = null
         locationPickerControl = null
       })

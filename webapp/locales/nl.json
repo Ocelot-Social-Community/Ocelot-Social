@@ -1256,6 +1256,19 @@
   },
   "map": {
     "alertMessage": "De kaart is niet toegankelijk: het Mapbox-token is niet ingesteld op de server!",
+    "controls": {
+      "enterFullscreen": "Volledig scherm",
+      "exitFullscreen": "Volledig scherm afsluiten",
+      "findMyLocation": "Mijn locatie tonen",
+      "locationNotAvailable": "Locatie niet beschikbaar",
+      "logo": "Mapbox-logo",
+      "mapFeedback": "Feedback over de kaart",
+      "resetBearing": "Naar het noorden draaien",
+      "search": "Plaats zoeken",
+      "toggleAttribution": "Bronvermelding tonen of verbergen",
+      "zoomIn": "Inzoomen",
+      "zoomOut": "Uitzoomen"
+    },
     "createEvent": {
       "pickLocation": "Hier een nieuw evenement plaatsen",
       "resolvingLocation": "Adres wordt opgezocht…"

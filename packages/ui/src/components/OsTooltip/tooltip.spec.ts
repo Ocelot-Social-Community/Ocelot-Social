@@ -450,6 +450,38 @@ describe(createTooltip, () => {
     })
   })
 
+  describe('fullscreen', () => {
+    afterEach(() => {
+      Reflect.deleteProperty(document, 'fullscreenElement')
+    })
+
+    it('shows inside the element in fullscreen, where the browser shows nothing else', () => {
+      const stage = document.createElement('div')
+      document.body.append(stage)
+      stage.append(reference)
+      Object.defineProperty(document, 'fullscreenElement', { configurable: true, value: stage })
+      attach('Exit fullscreen')
+
+      fire(reference, 'mouseenter')
+      vi.advanceTimersByTime(750)
+
+      expect(tooltipElement()?.parentElement).toBe(stage)
+      expect(tooltipElement()?.textContent).toBe('Exit fullscreen')
+
+      stage.remove()
+    })
+
+    it('stays under <body> outside fullscreen', () => {
+      Object.defineProperty(document, 'fullscreenElement', { configurable: true, value: null })
+      attach('Enter fullscreen')
+
+      fire(reference, 'mouseenter')
+      vi.advanceTimersByTime(750)
+
+      expect(tooltipElement()?.parentElement).toBe(document.body)
+    })
+  })
+
   describe('destroy', () => {
     it('removes the tooltip and stops listening', () => {
       const instance = attach('Delete')

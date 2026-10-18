@@ -12,7 +12,7 @@ jest.mock('@mapbox/mapbox-gl-geocoder', () => {
     const mockParent = global.document.createElement('div')
     const container = global.document.createElement('div')
     mockParent.appendChild(container)
-    return { container, clear: jest.fn() }
+    return { container, clear: jest.fn(), setPlaceholder: jest.fn() }
   })
 })
 
@@ -78,10 +78,17 @@ const mapSetStyleMock = jest.fn()
 const mapSetLayoutPropertyMock = jest.fn()
 const mapFlyToMock = jest.fn()
 const containerClickHandlers = []
+// The corner stacks of the map's tools, where mapbox-gl puts every control (see the tooltips test).
+// Fresh for each test: a page a test leaves undestroyed would otherwise keep watching it.
+let mapControlContainer
 const mapGetContainerMock = jest.fn(() => ({
   addEventListener: jest.fn((event, handler) => {
     if (event === 'click') containerClickHandlers.push(handler)
   }),
+  querySelector: jest.fn((selector) =>
+    selector === '.mapboxgl-control-container' ? mapControlContainer : null,
+  ),
+  querySelectorAll: jest.fn((selector) => mapControlContainer.querySelectorAll(selector)),
 }))
 const mapQueryRenderedFeaturesMock = jest.fn(() => [])
 
@@ -184,6 +191,10 @@ const posts = [
 ]
 
 describe('map', () => {
+  beforeEach(() => {
+    mapControlContainer = document.createElement('div')
+  })
+
   let wrapper
   let mocks
   let store
@@ -405,11 +416,100 @@ describe('map', () => {
         expect(mapOnMock).toHaveBeenCalledWith('click', 'markers', expect.any(Function))
       })
 
+      describe('tooltips of the tools', () => {
+        const tooltipOf = (element) =>
+          document.getElementById(element.getAttribute('aria-describedby'))
+
+        it("turns the tools' titles into tooltips to the left, and removes them with the page", async () => {
+          const zoomIn = document.createElement('button')
+          zoomIn.title = 'Zoom in'
+          mapControlContainer.append(zoomIn)
+          await Promise.resolve()
+
+          expect(zoomIn.hasAttribute('title')).toBe(false)
+          const tooltip = tooltipOf(zoomIn)
+          expect(tooltip.textContent).toBe('Zoom in')
+
+          wrapper.destroy()
+
+          expect(tooltip.isConnected).toBe(false)
+        })
+
+        describe('in another language', () => {
+          const switcherOf = () =>
+            mapAddControlMock.mock.calls
+              .map(([control]) => control && control.onAdd && control.onAdd())
+              .find((container) => container && container.className.includes('map-style-switcher'))
+
+          it("relabels mapbox-gl's own tools", async () => {
+            const zoomIn = document.createElement('button')
+            zoomIn.className = 'mapboxgl-ctrl-zoom-in'
+            mapControlContainer.append(zoomIn)
+
+            wrapper.vm.relabelMapTools({ 'NavigationControl.ZoomIn': 'Vergrößern' })
+            await Promise.resolve()
+
+            expect(zoomIn.getAttribute('aria-label')).toBe('Vergrößern')
+            expect(tooltipOf(zoomIn).textContent).toBe('Vergrößern')
+          })
+
+          it('relabels the pin tool and the style switcher with its menu', () => {
+            switcherOf()
+            const { eventPinToolToggle, styleSwitcherToggle, styleSwitcherPopover } = wrapper.vm
+            const entries = [...styleSwitcherPopover.querySelectorAll('.map-style-popover-btn')]
+            // Labelled in the language before.
+            ;[eventPinToolToggle, styleSwitcherToggle, styleSwitcherPopover].forEach((element) =>
+              element.setAttribute('aria-label', 'before'),
+            )
+            entries.forEach((entry) => {
+              entry.textContent = 'before'
+            })
+
+            wrapper.vm.relabelMapTools({})
+
+            expect(eventPinToolToggle.getAttribute('aria-label')).toBe(
+              'map.createEvent.pickLocation',
+            )
+            expect(styleSwitcherToggle.getAttribute('aria-label')).toBe('map.styles.title')
+            expect(styleSwitcherPopover.getAttribute('aria-label')).toBe('map.styles.title')
+            expect(wrapper.vm.geocoder.setPlaceholder).toHaveBeenCalledWith('map.controls.search')
+            expect(entries.map((entry) => entry.textContent)).toContain('map.styles.outdoors')
+          })
+
+          it('follows a language change', () => {
+            const relabel = jest.spyOn(wrapper.vm, 'relabelMapTools').mockImplementation(() => {})
+
+            wrapper.vm.$options.watch.mapboxLocale.call(wrapper.vm, {
+              'NavigationControl.ZoomIn': 'Vergrößern',
+            })
+
+            expect(relabel).toHaveBeenCalledWith({ 'NavigationControl.ZoomIn': 'Vergrößern' })
+          })
+
+          it('does nothing before the map is there', () => {
+            wrapper.vm.map = null
+
+            expect(() => wrapper.vm.relabelMapTools({})).not.toThrow()
+          })
+        })
+
+        it("gives the style menu's entries no tooltip: their label is on them", () => {
+          const switcher = mapAddControlMock.mock.calls
+            .map(([control]) => control && control.onAdd && control.onAdd())
+            .find((container) => container && container.className.includes('map-style-switcher'))
+          const entries = switcher.querySelectorAll('.map-style-popover-btn')
+
+          expect(entries.length).toBeGreaterThan(0)
+          entries.forEach((entry) => expect(entry.hasAttribute('title')).toBe(false))
+        })
+      })
+
       it('adds geocoder control', () => {
         expect(MapboxGeocoder).toHaveBeenCalledWith(
           expect.objectContaining({
             accessToken: 'MY_MAPBOX_TOKEN',
             marker: false,
+            placeholder: 'map.controls.search',
           }),
         )
         expect(mapAddControlMock).toHaveBeenCalled()

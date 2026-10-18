@@ -5,6 +5,16 @@ export { ocelotIcons } from './icons'
 export { OsActionButton } from './components/OsActionButton'
 export { OsCounterIcon } from './components/OsCounterIcon'
 export { OsLabeledButton } from './components/OsLabeledButton'
-export { OsLocationMap } from './components/OsLocationMap'
+export {
+  MAPBOX_LABELLED_CONTROLS,
+  MAPBOX_LOGO,
+  OsLocationMap,
+  setMapboxLocale,
+} from './components/OsLocationMap'
 export { OsRibbon } from './components/OsRibbon'
-export type { OsLocationMapSearchResult, OsLocationMapStyle } from './components/OsLocationMap'
+export type {
+  MapboxLabelledControl,
+  MapboxLocale,
+  OsLocationMapSearchResult,
+  OsLocationMapStyle,
+} from './components/OsLocationMap'

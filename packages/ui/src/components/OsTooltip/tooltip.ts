@@ -52,6 +52,14 @@ function classNames(options: TooltipOptions): string {
     .join(' ')
 }
 
+/**
+ * Where a shown tooltip lives: in fullscreen, the browser shows only the fullscreen element (a map,
+ * a video call), so the tooltip goes inside it; otherwise under `<body>`.
+ */
+function host(): HTMLElement {
+  return (document.fullscreenElement as HTMLElement | null) ?? document.body
+}
+
 /** Whether focus came from the keyboard, not from a click (which focuses a button, too). */
 function isFocusVisible(element: HTMLElement): boolean {
   return element.matches(':focus-visible')
@@ -70,8 +78,8 @@ function removeToken(list: string | null, token: string): string {
 
 /**
  * Attaches a tooltip to `reference`: shown on hover and on keyboard focus after a delay, hidden
- * on leave, blur, click and Esc. The tooltip lives under `<body>`, so no ancestor's `overflow`
- * clips it, and is positioned by Floating UI. It stays in the document while it has content,
+ * on leave, blur, click and Esc. The tooltip lives under `<body>` (or the fullscreen element), so
+ * no ancestor's `overflow` clips it, and is positioned by Floating UI. It stays in the document while it has content,
  * hidden, because `aria-describedby` on the element points at it.
  *
  * Framework-free: `v-os-tooltip` and `OsTooltip` are thin layers on top, for Vue 2 and Vue 3.
@@ -146,6 +154,10 @@ export function createTooltip(reference: HTMLElement, value: TooltipValue): Tool
     visible = true
     const placed = floating
     const placedArrow = arrowElement
+    const parent = host()
+    if (placed.parentElement !== parent) {
+      parent.append(placed)
+    }
     placed.classList.add('os-tooltip--visible')
     stopAutoUpdate = autoUpdate(reference, placed, () => {
       void position(placed, placedArrow)
