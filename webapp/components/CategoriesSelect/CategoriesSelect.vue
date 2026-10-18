@@ -9,7 +9,7 @@
       :appearance="isActive(category.id) ? 'filled' : 'outline'"
       :disabled="isDisabled(category.id)"
       size="sm"
-      v-tooltip="{
+      v-os-tooltip="{
         content: $t(`contribution.category.description.${category.slug}`),
         placement: 'bottom-start',
       }"
