@@ -1004,6 +1004,7 @@
     "foundation": "Заснування",
     "general": "Загальне",
     "goal": "Мета групи",
+    "goalPlaceholder": "напр. Створити сад, відкритий для всього району",
     "group": "Група",
     "groupCreated": "Групу створено!",
     "in": "в",
@@ -1047,6 +1048,7 @@
     "muted": "Сповіщення групи вимкнено",
     "myGroups": "Мої групи",
     "name": "Назва групи",
+    "namePlaceholder": "Громадський сад на Подолі",
     "removeMember": "Видалити учасника",
     "removeMemberButton": "Видалити",
     "removeMemberConfirmText": "Видалити користувача «{name}» з групи?",
@@ -1126,6 +1128,7 @@
       "usual": "Учасник"
     },
     "save": "Створити нову групу",
+    "slugPlaceholder": "hromadskyi-sad-podil",
     "teaser": {
       "notReadable": "Цю групу поки не можна відкрити — ваш запит ще розглядається",
       "openGroup": "Відкрити групу",
@@ -1690,6 +1693,7 @@
       "unblocked": "{name} знову розблоковано"
     },
     "data": {
+      "cityPlaceholder": "напр. Київ",
       "givenName": "Ваше ім'я",
       "givenNamePlaceholder": "Іван",
       "labelBio": "Про вас",

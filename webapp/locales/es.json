@@ -1004,6 +1004,7 @@
     "foundation": "Fundación",
     "general": "General",
     "goal": "Objetivo del grupo",
+    "goalPlaceholder": "p. ej. Crear un huerto abierto a todo el barrio",
     "group": "Grupo",
     "groupCreated": "¡El grupo fue creado!",
     "in": "en",
@@ -1047,6 +1048,7 @@
     "muted": "Grupo silenciado",
     "myGroups": "Mis grupos",
     "name": "Nombre del grupo",
+    "namePlaceholder": "Huerto Comunitario Lavapiés",
     "removeMember": "Eliminar miembro",
     "removeMemberButton": "Eliminar",
     "removeMemberConfirmText": "¿Eliminar al usuario «{name}» del grupo?",
@@ -1126,6 +1128,7 @@
       "usual": "Miembro"
     },
     "save": "Crear nuevo grupo",
+    "slugPlaceholder": "huerto-comunitario-lavapies",
     "teaser": {
       "notReadable": "Todavía no puedes abrir este grupo — tu solicitud sigue pendiente",
       "openGroup": "Abrir grupo",
@@ -1690,6 +1693,7 @@
       "unblocked": "{name} está desbloqueado nuevamente"
     },
     "data": {
+      "cityPlaceholder": "p. ej. Madrid",
       "givenName": "Tu nombre",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "Acerca de usted",

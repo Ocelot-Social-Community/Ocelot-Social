@@ -1004,6 +1004,7 @@
     "foundation": "Założenie",
     "general": "Ogólne",
     "goal": "Cel grupy",
+    "goalPlaceholder": "np. Założyć ogród otwarty dla całej dzielnicy",
     "group": "Grupa",
     "groupCreated": "Grupa została utworzona!",
     "in": "w",
@@ -1047,6 +1048,7 @@
     "muted": "Grupa wyciszona",
     "myGroups": "Moje grupy",
     "name": "Nazwa grupy",
+    "namePlaceholder": "Ogród społeczny Praga",
     "removeMember": "Usuń członka",
     "removeMemberButton": "Usuń",
     "removeMemberConfirmText": "Usunąć użytkownika „{name}” z grupy?",
@@ -1126,6 +1128,7 @@
       "usual": "Członek"
     },
     "save": "Utwórz nową grupę",
+    "slugPlaceholder": "ogrod-spoleczny-praga",
     "teaser": {
       "notReadable": "Nie możesz jeszcze otworzyć tej grupy — twoja prośba czeka na rozpatrzenie",
       "openGroup": "Otwórz grupę",
@@ -1690,6 +1693,7 @@
       "unblocked": "{name} został/a odblokowany/a"
     },
     "data": {
+      "cityPlaceholder": "np. Warszawa",
       "givenName": "Twoje imię",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "O Tobie",

@@ -1004,6 +1004,7 @@
     "foundation": "Oprichting",
     "general": "Algemeen",
     "goal": "Doel van de groep",
+    "goalPlaceholder": "bijv. Een tuin aanleggen voor de hele buurt",
     "group": "Groep",
     "groupCreated": "De groep is aangemaakt!",
     "in": "in",
@@ -1047,6 +1048,7 @@
     "muted": "Groep gedempt",
     "myGroups": "Mijn groepen",
     "name": "Groepsnaam",
+    "namePlaceholder": "Buurttuin De Pijp",
     "removeMember": "Lid verwijderen",
     "removeMemberButton": "Verwijderen",
     "removeMemberConfirmText": "Gebruiker “{name}” uit de groep verwijderen?",
@@ -1126,6 +1128,7 @@
       "usual": "Lid"
     },
     "save": "Nieuwe groep aanmaken",
+    "slugPlaceholder": "buurttuin-de-pijp",
     "teaser": {
       "notReadable": "Je kunt deze groep nog niet openen — je aanvraag loopt nog",
       "openGroup": "Groep openen",
@@ -1690,6 +1693,7 @@
       "unblocked": "{name} is weer gedeblokkeerd"
     },
     "data": {
+      "cityPlaceholder": "bijv. Amsterdam",
       "givenName": "Je voornaam",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "Over jou",

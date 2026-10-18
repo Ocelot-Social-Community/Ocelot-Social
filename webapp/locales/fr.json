@@ -1004,6 +1004,7 @@
     "foundation": "Fondation",
     "general": "Général",
     "goal": "Objectif du groupe",
+    "goalPlaceholder": "p. ex. Créer un jardin ouvert à tout le quartier",
     "group": "Groupe",
     "groupCreated": "Le groupe a été créé !",
     "in": "dans",
@@ -1047,6 +1048,7 @@
     "muted": "Groupe en sourdine",
     "myGroups": "Mes groupes",
     "name": "Nom du groupe",
+    "namePlaceholder": "Jardin partagé Belleville",
     "removeMember": "Retirer le membre",
     "removeMemberButton": "Retirer",
     "removeMemberConfirmText": "Retirer l'utilisateur « {name} » du groupe ?",
@@ -1126,6 +1128,7 @@
       "usual": "Membre"
     },
     "save": "Créer un nouveau groupe",
+    "slugPlaceholder": "jardin-partage-belleville",
     "teaser": {
       "notReadable": "Vous ne pouvez pas encore ouvrir ce groupe — votre demande est en attente",
       "openGroup": "Ouvrir le groupe",
@@ -1690,6 +1693,7 @@
       "unblocked": "{name} est à nouveau débloqué"
     },
     "data": {
+      "cityPlaceholder": "p. ex. Paris",
       "givenName": "Ton prénom",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "À propos de vous",
