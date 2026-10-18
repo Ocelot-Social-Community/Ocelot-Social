@@ -10,6 +10,7 @@ import fileReport from '@graphql/queries/moderation/fileReport.gql'
 import review from '@graphql/queries/moderation/review.gql'
 import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { getBranding, setBranding } from '@src/branding'
 
 import { validateNotifyUsers } from './validationMiddleware'
 
@@ -366,6 +367,142 @@ describe('validateReview', () => {
       await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
         data: { UpdateUser: null },
         errors: [{ message: 'The name must be at least 3 characters long.' }],
+      })
+    })
+
+    it('with name too long', async () => {
+      variables = { ...variables, name: 'a'.repeat(51) }
+
+      await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+        data: { UpdateUser: null },
+        errors: [{ message: 'The name must be at most 50 characters long.' }],
+      })
+    })
+
+    it('stores the name without surrounding spaces', async () => {
+      variables = { ...variables, name: '  John Doughnut  ' }
+
+      await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+        data: { UpdateUser: { name: 'John Doughnut' } },
+      })
+    })
+
+    it('does not let surrounding spaces carry a name past the maximum', async () => {
+      variables = { ...variables, name: ` ${'a'.repeat(50)} ` }
+
+      await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+        data: { UpdateUser: { name: 'a'.repeat(50) } },
+      })
+    })
+
+    it('with a name exactly as long as the maximum', async () => {
+      variables = { ...variables, name: 'a'.repeat(50) }
+
+      await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+        data: { UpdateUser: { name: 'a'.repeat(50) } },
+      })
+    })
+
+    describe('with the name bounds of a brand', () => {
+      let original: ReturnType<typeof getBranding>
+
+      beforeEach(() => {
+        original = getBranding()
+        setBranding({
+          ...original,
+          user: { ...original.user, nameLengthMin: 2, nameLengthMax: 10 },
+        })
+      })
+
+      afterEach(() => {
+        setBranding(original)
+      })
+
+      it('accepts a name the default minimum would refuse', async () => {
+        variables = { ...variables, name: 'Jo' }
+
+        await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+          data: { UpdateUser: { name: 'Jo' } },
+        })
+      })
+
+      it('refuses a name the default maximum would accept', async () => {
+        variables = { ...variables, name: 'John Doughnut' }
+
+        await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+          data: { UpdateUser: null },
+          errors: [{ message: 'The name must be at most 10 characters long.' }],
+        })
+      })
+    })
+
+    describe('slug', () => {
+      it('refuses a new slug shorter than the minimum', async () => {
+        variables = { ...variables, slug: 'jd' }
+
+        await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+          data: { UpdateUser: null },
+          errors: [{ message: 'The slug must be at least 3 characters long.' }],
+        })
+      })
+
+      it('refuses a new slug longer than the maximum', async () => {
+        variables = { ...variables, slug: 'j'.repeat(51) }
+
+        await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+          data: { UpdateUser: null },
+          errors: [{ message: 'The slug must be at most 50 characters long.' }],
+        })
+      })
+
+      it('accepts a new slug within the bounds', async () => {
+        variables = { ...variables, slug: 'john-doughnut' }
+
+        await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+          data: { UpdateUser: { slug: 'john-doughnut' } },
+        })
+      })
+
+      describe('stored before the bounds', () => {
+        const legacy = 'j'.repeat(60)
+
+        beforeEach(async () => {
+          await database.write({
+            query: 'MATCH (user:User {id: $id}) SET user.slug = $slug',
+            variables: { id: 'updating-user', slug: legacy },
+          })
+        })
+
+        // The settings form sends the slug with every profile change, so the next change brings
+        // it into bounds.
+        it('is refused when sent again unchanged', async () => {
+          variables = { ...variables, slug: legacy }
+
+          await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+            data: { UpdateUser: null },
+            errors: [{ message: 'The slug must be at most 50 characters long.' }],
+          })
+        })
+
+        it('does not hold up a save that carries no slug', async () => {
+          await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+            data: { UpdateUser: { name: 'John Doughnut', slug: legacy } },
+          })
+        })
+      })
+
+      it('reads the bounds from the branding', async () => {
+        const original = getBranding()
+        setBranding({ ...original, user: { ...original.user, slugLengthMin: 2 } })
+        try {
+          variables = { ...variables, slug: 'jd' }
+
+          await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+            data: { UpdateUser: { slug: 'jd' } },
+          })
+        } finally {
+          setBranding(original)
+        }
       })
     })
   })

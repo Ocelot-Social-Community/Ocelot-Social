@@ -6,11 +6,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
+import { branding } from '@src/branding'
 
 import type { IMiddlewareResolver } from 'graphql-middleware/types'
 
 const COMMENT_MIN_LENGTH = 1
-const USERNAME_MIN_LENGTH = 3
 const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const content = args.content.replace(/<(?:.|\n)*?>/gm, '').trim()
   const { postId } = args
@@ -152,18 +152,73 @@ export const validateNotifyUsers = async (label: string, reason: string): Promis
   }
 }
 
-const validateUpdateUser: IMiddlewareResolver = async (resolve, root, params, context, info) => {
-  const { name } = params
-  if (typeof name === 'string' && name.trim().length < USERNAME_MIN_LENGTH) {
-    throw new AppError(Errors.USER_PROFILE_NAME_TOO_SHORT, { min: USERNAME_MIN_LENGTH })
+// The name and slug rules are the brand's (branding.user), the same values the webapp checks
+// against, so a client that skips the form cannot store what the form would refuse.
+//
+// The name is measured trimmed and passed on trimmed: measuring one string and storing another
+// would let surrounding spaces carry a name past the maximum into the database.
+const withTrimmedName = <T extends { name?: unknown }>(args: T): T =>
+  typeof args.name === 'string' ? { ...args, name: args.name.trim() } : args
+
+const validateUserName = (name: unknown): void => {
+  if (typeof name !== 'string') {
+    return
   }
-  return resolve(root, params, context, info)
+  const { nameLengthMin: min, nameLengthMax: max } = branding.user
+  const { length } = name
+  if (length < min) {
+    throw new AppError(Errors.USER_PROFILE_NAME_TOO_SHORT, { min })
+  }
+  if (length > max) {
+    throw new AppError(Errors.USER_PROFILE_NAME_TOO_LONG, { max })
+  }
+}
+
+const validateUserSlug = (slug: unknown): void => {
+  if (typeof slug !== 'string') {
+    return
+  }
+  const { slugLengthMin: min, slugLengthMax: max } = branding.user
+  if (slug.length < min) {
+    throw new AppError(Errors.USER_PROFILE_SLUG_TOO_SHORT, { min })
+  }
+  if (slug.length > max) {
+    throw new AppError(Errors.USER_PROFILE_SLUG_TOO_LONG, { max })
+  }
+}
+
+const validateSignupVerification: IMiddlewareResolver = async (
+  resolve,
+  root,
+  args,
+  context,
+  info,
+) => {
+  const input = withTrimmedName(args)
+  validateUserName(input.name)
+  // Only a slug the client chose. Without one, sluggifyMiddleware derives it from the name and
+  // keeps it inside the same bounds.
+  validateUserSlug(input.slug)
+  return resolve(root, input, context, info)
+}
+
+const validateUpdateUser: IMiddlewareResolver = async (resolve, root, params, context, info) => {
+  const input = withTrimmedName(params)
+  validateUserName(input.name)
+  // Every save that carries a slug, the stored one included. The settings form sends the slug
+  // with each profile change, so an account whose slug predates the bounds (or a brand that
+  // tightened them) brings it into bounds with its next change — the same rule as for the name.
+  // Profile URLs resolve by id, so a new slug breaks no link. Saves without a slug (locale,
+  // notification settings, avatar …) are not held up by it.
+  validateUserSlug(input.slug)
+  return resolve(root, input, context, info)
 }
 
 export default {
   Mutation: {
     CreateComment: validateCreateComment,
     UpdateComment: validateUpdateComment,
+    SignupVerification: validateSignupVerification,
     UpdateUser: validateUpdateUser,
     fileReport: validateReport,
     review: validateReview,

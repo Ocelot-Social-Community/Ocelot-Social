@@ -1,4 +1,6 @@
 import { shallowMount } from '@vue/test-utils'
+import { getBranding, setBranding } from '@ocelot-social/branding'
+import Schema from 'async-validator'
 import flushPromises from 'flush-promises'
 import RegistrationSlideCreate from './RegistrationSlideCreate.vue'
 
@@ -157,6 +159,144 @@ describe('RegistrationSlideCreate', () => {
         receiveCommunicationAsEmailsEtcConfirmed: true,
       })
       expect(wrapper.vm.validInput).toBeTruthy()
+    })
+
+    describe('name length (branding.user.nameLength*)', () => {
+      const completeForm = (wrapper, names) =>
+        wrapper.setData({
+          formData: {
+            ...wrapper.vm.formData,
+            ...names,
+            password: 'pw',
+            passwordConfirmation: 'pw',
+          },
+          termsAndConditionsConfirmed: true,
+          receiveCommunicationAsEmailsEtcConfirmed: true,
+        })
+
+      it('refuses a name shorter than the minimum, not counting surrounding spaces', async () => {
+        const wrapper = Wrapper()
+        await completeForm(wrapper, { name: '  Pe  ' })
+        expect(wrapper.vm.validInput).toBe(false)
+      })
+
+      it('refuses a name longer than the maximum', async () => {
+        const wrapper = Wrapper()
+        await completeForm(wrapper, { name: 'a'.repeat(51) })
+        expect(wrapper.vm.validInput).toBe(false)
+        await completeForm(wrapper, { name: 'a'.repeat(50) })
+        expect(wrapper.vm.validInput).toBe(true)
+      })
+
+      describe('form schema', () => {
+        const validateName = (wrapper, name) =>
+          new Schema({ name: wrapper.vm.formSchema.name }).validate(
+            { name },
+            { suppressWarning: true },
+          )
+
+        it('measures the name without surrounding spaces, like the counter', async () => {
+          const wrapper = Wrapper()
+          await expect(validateName(wrapper, ` ${'a'.repeat(50)} `)).resolves.toBeDefined()
+          await expect(validateName(wrapper, '  ab  ')).rejects.toMatchObject({
+            errors: [expect.objectContaining({ field: 'name' })],
+          })
+        })
+
+        // With real names asked for, the single name field is not used and may be missing.
+        it('lets a missing name through when real names are asked for', async () => {
+          policyValues.askForRealName = true
+          const wrapper = Wrapper()
+          await expect(validateName(wrapper, undefined)).resolves.toBeDefined()
+        })
+
+        it('leaves the name in the form as it was typed', async () => {
+          const wrapper = Wrapper()
+          await completeForm(wrapper, { name: ` ${'a'.repeat(50)} ` })
+          await new Promise((resolve) => wrapper.vm.$validateForm(resolve))
+
+          expect(wrapper.vm.formErrors).toBeNull()
+          expect(wrapper.vm.formData.name).toBe(` ${'a'.repeat(50)} `)
+        })
+      })
+
+      it('counts given and surname together, as they are submitted', async () => {
+        policyValues.askForRealName = true
+        const wrapper = Wrapper()
+        // 25 + 1 + 25 = 51
+        await completeForm(wrapper, { givenName: 'a'.repeat(25), surName: 'b'.repeat(25) })
+        expect(wrapper.vm.nameLength).toBe(51)
+        expect(wrapper.vm.validInput).toBe(false)
+      })
+
+      // A valid form keeps its layout: the counter only appears with the error it explains.
+      it('shows no counter while the name is within bounds or not yet left', async () => {
+        const wrapper = Wrapper()
+        await completeForm(wrapper, { name: 'Pe' })
+        expect(wrapper.findComponent({ name: 'OsValidationHint' }).exists()).toBe(false)
+
+        await completeForm(wrapper, { name: 'Peter' })
+        wrapper.vm.touchField('name')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.findComponent({ name: 'OsValidationHint' }).exists()).toBe(false)
+      })
+
+      it('shows the counter with the bounds of the brand once the name is out of them', async () => {
+        const wrapper = Wrapper()
+        await completeForm(wrapper, { name: 'Pe' })
+        wrapper.vm.touchField('name')
+        await wrapper.vm.$nextTick()
+
+        const hint = wrapper.findComponent({ name: 'OsValidationHint' })
+        expect(hint.props()).toMatchObject({
+          count: 2,
+          min: 3,
+          max: 50,
+          variant: 'error',
+          text: 'common.validations.nameLength',
+        })
+      })
+
+      it('explains the bounds once the field was left out of them', async () => {
+        const wrapper = Wrapper()
+        await completeForm(wrapper, { name: 'Pe' })
+        expect(wrapper.vm.nameErrorText).toBeNull()
+
+        wrapper.vm.touchField('name')
+        expect(wrapper.vm.nameErrorText).toBe('common.validations.nameLength')
+        expect(mocks.$t).toHaveBeenCalledWith('common.validations.nameLength', { min: 3, max: 50 })
+
+        await completeForm(wrapper, { name: 'Peter' })
+        expect(wrapper.vm.nameErrorText).toBeNull()
+      })
+
+      it('explains them under the surname when real names are asked for', async () => {
+        policyValues.askForRealName = true
+        const wrapper = Wrapper()
+        await completeForm(wrapper, { givenName: 'a'.repeat(30), surName: 'b'.repeat(30) })
+
+        wrapper.vm.touchField('surName')
+        expect(wrapper.vm.nameErrorText).toBe('common.validations.nameLength')
+      })
+
+      describe('with the bounds of a brand', () => {
+        let original
+
+        beforeEach(() => {
+          original = getBranding()
+          setBranding({ ...original, user: { ...original.user, nameLengthMin: 2 } })
+        })
+
+        afterEach(() => {
+          setBranding(original)
+        })
+
+        it('accepts a name the default minimum would refuse', async () => {
+          const wrapper = Wrapper()
+          await completeForm(wrapper, { name: 'Jo' })
+          expect(wrapper.vm.validInput).toBe(true)
+        })
+      })
     })
 
     it('toggles the password reveal icons', async () => {

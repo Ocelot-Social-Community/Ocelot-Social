@@ -73,6 +73,18 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'The name must be at least {min} characters long.',
   },
+  USER_PROFILE_NAME_TOO_LONG: {
+    type: 'BAD_USER_INPUT',
+    text: 'The name must be at most {max} characters long.',
+  },
+  USER_PROFILE_SLUG_TOO_SHORT: {
+    type: 'BAD_USER_INPUT',
+    text: 'The slug must be at least {min} characters long.',
+  },
+  USER_PROFILE_SLUG_TOO_LONG: {
+    type: 'BAD_USER_INPUT',
+    text: 'The slug must be at most {max} characters long.',
+  },
   BADGE_SELECTION_BADGE_NOT_REWARDED: {
     type: 'BAD_USER_INPUT',
     text: 'You cannot set badges not rewarded to you.',

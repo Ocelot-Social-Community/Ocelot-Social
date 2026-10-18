@@ -30,6 +30,8 @@ export const brandingDefaults: BrandingConfig = {
   user: {
     nameLengthMin: 3,
     nameLengthMax: 50,
+    slugLengthMin: 3,
+    slugLengthMax: 50,
   },
   registration: {
     nonceLength: 5,
