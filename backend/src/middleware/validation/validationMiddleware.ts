@@ -154,12 +154,18 @@ export const validateNotifyUsers = async (label: string, reason: string): Promis
 
 // The name and slug rules are the brand's (branding.user), the same values the webapp checks
 // against, so a client that skips the form cannot store what the form would refuse.
+//
+// The name is measured trimmed and passed on trimmed: measuring one string and storing another
+// would let surrounding spaces carry a name past the maximum into the database.
+const withTrimmedName = <T extends { name?: unknown }>(args: T): T =>
+  typeof args.name === 'string' ? { ...args, name: args.name.trim() } : args
+
 const validateUserName = (name: unknown): void => {
   if (typeof name !== 'string') {
     return
   }
   const { nameLengthMin: min, nameLengthMax: max } = branding.user
-  const { length } = name.trim()
+  const { length } = name
   if (length < min) {
     throw new AppError(Errors.USER_PROFILE_NAME_TOO_SHORT, { min })
   }
@@ -188,15 +194,17 @@ const validateSignupVerification: IMiddlewareResolver = async (
   context,
   info,
 ) => {
-  validateUserName(args.name)
+  const input = withTrimmedName(args)
+  validateUserName(input.name)
   // Only a slug the client chose. Without one, sluggifyMiddleware derives it from the name and
   // keeps it inside the same bounds.
-  validateUserSlug(args.slug)
-  return resolve(root, args, context, info)
+  validateUserSlug(input.slug)
+  return resolve(root, input, context, info)
 }
 
 const validateUpdateUser: IMiddlewareResolver = async (resolve, root, params, context, info) => {
-  const { id, name, slug } = params
+  const input = withTrimmedName(params)
+  const { id, name, slug } = input
   validateUserName(name)
   if (typeof slug === 'string') {
     // Only a slug that changes. The settings form sends the slug on every save, and an account
@@ -214,7 +222,7 @@ const validateUpdateUser: IMiddlewareResolver = async (resolve, root, params, co
       await session.close()
     }
   }
-  return resolve(root, params, context, info)
+  return resolve(root, input, context, info)
 }
 
 export default {

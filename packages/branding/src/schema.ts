@@ -176,7 +176,8 @@ export interface BrandingConfig {
      * an account keeps the slug it has until it changes it. A slug the backend derives from the
      * name at signup is cut and padded into these bounds, so a generated slug cannot break them
      * either. The maximum exists because the slug ends up in every profile URL and in the unique
-     * index; without one, a client could store a slug of any length.
+     * index; without one, a client could store a slug of any length. It cannot go below 8
+     * (USER_SLUG_LENGTH_MAX_FLOOR): a derived slug needs room for its `-<n>` uniqueness suffix.
      */
     slugLengthMin: number
     slugLengthMax: number

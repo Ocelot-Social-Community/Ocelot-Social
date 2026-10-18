@@ -379,6 +379,22 @@ describe('validateReview', () => {
       })
     })
 
+    it('stores the name without surrounding spaces', async () => {
+      variables = { ...variables, name: '  John Doughnut  ' }
+
+      await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+        data: { UpdateUser: { name: 'John Doughnut' } },
+      })
+    })
+
+    it('does not let surrounding spaces carry a name past the maximum', async () => {
+      variables = { ...variables, name: ` ${'a'.repeat(50)} ` }
+
+      await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+        data: { UpdateUser: { name: 'a'.repeat(50) } },
+      })
+    })
+
     it('with a name exactly as long as the maximum', async () => {
       variables = { ...variables, name: 'a'.repeat(50) }
 

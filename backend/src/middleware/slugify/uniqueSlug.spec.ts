@@ -133,6 +133,16 @@ describe(uniqueSlug, () => {
       )
     })
 
+    it('fails instead of producing a slug without a name part, or one over the maximum', async () => {
+      const isUnique = vi.fn<IsUnique>().mockResolvedValue(false)
+
+      // 'ab' is taken, and a maximum of 2 leaves no room for 'a-1'
+      await expect(uniqueSlug('ab', isUnique, { minLength: 1, maxLength: 2 })).rejects.toThrow(
+        'No unique slug for "ab" fits 2 characters',
+      )
+      expect(isUnique.mock.calls).toEqual([['ab']])
+    })
+
     it('counts on until a candidate is free, every one of them within the bounds', async () => {
       const taken = new Set([
         'abcdefghij',

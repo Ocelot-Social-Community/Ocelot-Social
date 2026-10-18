@@ -664,6 +664,18 @@ describe('SignupVerification', () => {
               })
             })
 
+            it('stores the name without surrounding spaces', async () => {
+              variables = { ...variables, name: '  John Doe  ' }
+              await mutate({ mutation: SignupVerification, variables })
+
+              const { records } = await database.neode.cypher(
+                'MATCH (u:User)-[:PRIMARY_EMAIL]->(:EmailAddress {email: $email}) RETURN u.name AS name',
+                { email: variables.email },
+              )
+
+              expect(records.map((record) => record.get('name') as string)).toEqual(['John Doe'])
+            })
+
             it('creates no user for a refused name', async () => {
               variables = { ...variables, name: 'ab' }
               await mutate({ mutation: SignupVerification, variables })

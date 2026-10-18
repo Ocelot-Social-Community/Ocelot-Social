@@ -72,12 +72,26 @@ test('defineBranding THROWS on an invalid user slug length override', () => {
     () => defineBranding({ user: { slugLengthMin: 0 } }),
     /invalid branding config[\s\S]*user\.slugLengthMin must be ≥ 1 \(got 0\)/,
   )
+  // A derived slug needs room for one character of the name, the hyphen and its counter.
+  assert.throws(
+    () => defineBranding({ user: { slugLengthMin: 1, slugLengthMax: 7 } }),
+    /invalid branding config[\s\S]*user\.slugLengthMax must be ≥ 8 \(got 7\)/,
+  )
+})
+
+test('defineBranding THROWS on a user name minimum of 0', () => {
+  // The backend's DB schema holds User.name to at least USER_NAME_LENGTH_FLOOR characters, so a
+  // brand allowing an empty name would let users store what the audit then reports.
+  assert.throws(
+    () => defineBranding({ user: { nameLengthMin: 0 } }),
+    /invalid branding config[\s\S]*user\.nameLengthMin must be ≥ 1 \(got 0\)/,
+  )
 })
 
 test('defineBranding accepts valid overrides and the vanilla (empty) config', () => {
   assert.doesNotThrow(() => defineBranding({}))
   assert.doesNotThrow(() => defineBranding({ group: { nameLengthMax: 80 } }))
   assert.doesNotThrow(() => defineBranding({ user: { nameLengthMax: 80 } }))
-  assert.doesNotThrow(() => defineBranding({ user: { slugLengthMin: 1, slugLengthMax: 1 } }))
+  assert.doesNotThrow(() => defineBranding({ user: { slugLengthMin: 1, slugLengthMax: 8 } }))
   assert.doesNotThrow(() => defineBranding({ category: { min: 0, max: 0 } })) // min ≤ max, both ≥ 0
 })

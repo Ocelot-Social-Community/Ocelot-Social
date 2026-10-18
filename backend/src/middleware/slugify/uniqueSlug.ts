@@ -41,6 +41,11 @@ interface LengthBounds {
 // suffix too short to reach the minimum is zero-padded (`x-001`). A cut must not end on `-`
 // either, or the suffix would double it. Returns null when the bare slug is out of bounds, which
 // moves on to the suffixed candidates.
+//
+// Throws once the maximum leaves no room for a single character before the suffix: that candidate
+// would be `-<n>`, and every later one longer than the maximum. Branded bounds cannot get there
+// (validateBranding keeps the maximum at 8 or more, room for a six-digit counter), so this only
+// stops a caller passing tighter bounds — or the millionth collision — from looping forever.
 const candidate = (
   slug: string,
   count: number,
@@ -53,6 +58,11 @@ const candidate = (
   }
   const digits = String(count)
   const head = cut(maxLength - digits.length - 1)
+  if (!head) {
+    throw new Error(
+      `No unique slug for "${slug}" fits ${String(maxLength)} characters (tried ${digits} suffixes)`,
+    )
+  }
   return `${head}-${digits.padStart(minLength - head.length - 1, '0')}`
 }
 
