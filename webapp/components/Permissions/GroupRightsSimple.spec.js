@@ -8,7 +8,8 @@ const CATALOG = [
   { key: 'group.read' },
   { key: 'group.post.create' },
   { key: 'group.comment.create' },
-  { key: 'group.chat.participate' },
+  { key: 'group.chat.read' },
+  { key: 'group.chat.write' },
   { key: 'group.invite' },
   { key: 'group.content.read' },
   { key: 'group.members.read' },
@@ -100,6 +101,23 @@ describe('GroupRightsSimple', () => {
       expect(at(wrapper, 'switch-members-comment').element.checked).toBe(false)
     })
 
+    it('lets members read the chat without writing in it, but not write without reading', async () => {
+      // Two sentences for the chat: reading is the room, writing the input row in it.
+      const wrapper = mount(GroupRightsSimple, {
+        localVue,
+        mocks: { $t: (key) => key },
+        propsData: { roles: rolesWith([], []), catalog: CATALOG, caption: 'Resulting:' },
+      })
+
+      await at(wrapper, 'switch-members-chat-read').setChecked(true)
+      await at(wrapper, 'switch-members-chat').setChecked(true)
+
+      expect(wrapper.emitted('change')).toEqual([
+        ['usual', ['group.chat.read']],
+        ['usual', ['group.chat.write', 'group.chat.read']],
+      ])
+    })
+
     it('reports a tick as the role it would leave behind, and writes nothing itself', async () => {
       // The draft is the page's: the matrix under this edits the same roles, and one draft for
       // both is what lets a tick in either show up in the other. The component owns no mutation
@@ -147,9 +165,9 @@ describe('GroupRightsSimple', () => {
     it('locks a single row the viewer may not grant, with that row’s own reason', () => {
       // A closed feature gate or a missing network right blocks one right, not the screen.
       const wrapper = Wrapper({
-        grantable: (permission) => permission.key !== 'group.chat.participate',
+        grantable: (permission) => permission.key !== 'group.chat.write',
         hintFor: (permission) =>
-          permission.key === 'group.chat.participate' ? 'Chat is switched off' : null,
+          permission.key === 'group.chat.write' ? 'Chat is switched off' : null,
       })
 
       expect(at(wrapper, 'switch-members-chat').element.disabled).toBe(true)

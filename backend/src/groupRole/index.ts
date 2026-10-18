@@ -16,7 +16,7 @@ export {
 export { permissionsForGroupRole, effectiveGroupPermissions, authoritySourceFor } from './effective'
 export type { EffectiveGroupPermissionsInput } from './effective'
 export { seedGroupRoleTemplates } from './seedTemplates'
-export { seedRolesForGroupsWithoutRoles, writeGroupRole } from './repository'
+export { seedRolesForGroupsWithoutRoles, syncGroupChatRoom, writeGroupRole } from './repository'
 export { parseStoredPermissions } from './storedPermissions'
 export { nonMemberAccessFrom, defaultNonMemberAccessFor } from './nonMemberAccess'
 export {
@@ -47,6 +47,7 @@ export {
   isMandatoryFor,
   isMootFor,
   MANDATORY_MEMBERSHIP_RIGHTS,
+  MEMBER_ONLY_RIGHTS,
   NON_MEMBER_ONLY_RIGHTS,
   storableRightsFor,
   withImpliedRights,

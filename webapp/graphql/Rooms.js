@@ -18,6 +18,7 @@ export const createGroupRoom = () => gql`
         id
         name
         slug
+        myGroupPermissions
         avatar {
           ...imageUrls
         }
@@ -59,6 +60,7 @@ export const roomQuery = () => gql`
         id
         name
         slug
+        myGroupPermissions
         avatar {
           ...imageUrls
         }

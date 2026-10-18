@@ -19,7 +19,7 @@
     capture-files="true"
     :height="chatHeight"
     :styles="JSON.stringify(computedChatStyle)"
-    :show-footer="true"
+    :show-footer="showFooter"
     :responsive-breakpoint="600"
     :single-room="singleRoom"
     show-reaction-emojis="false"
@@ -291,6 +291,11 @@ export default {
       return this.rooms.map((r) =>
         typeof r.unreadCount === 'number' && r.unreadCount > 99 ? { ...r, unreadCount: '99+' } : r,
       )
+    },
+    // The input row, only where the viewer may write: a member who may only read the group's chat
+    // gets the conversation without it.
+    showFooter() {
+      return this.selectedRoom?.canWrite !== false
     },
     selectedRoomProfile() {
       if (!this.selectedRoom) return null
@@ -965,6 +970,12 @@ export default {
             }
           : null,
         userProfile: null,
+        // A group room may be readable without being writable (group.chat.read without
+        // group.chat.write). Unknown counts as writable: the backend refuses anyway, and a missing
+        // field must not silence a direct conversation.
+        canWrite: isGroupRoom
+          ? (room.group?.myGroupPermissions?.includes('group.chat.write') ?? true)
+          : true,
         index: room.lastMessage ? room.lastMessage.date : room.createdAt,
         avatar: room.avatar?.w320 || room.avatar,
         lastMessage: room.lastMessage ? this.buildLastMessage(room.lastMessage) : { content: '' },

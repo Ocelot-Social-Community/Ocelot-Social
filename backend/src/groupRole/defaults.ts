@@ -30,9 +30,10 @@ const MEMBER_BASELINE: GroupPermissionKey[] = [
   // Chat and calls ARE members-only today — but the check lives in three different places:
   // CreateGroupRoom filters on `membership.role IN [...]` in its own Cypher,
   // joinGroupVideoCall throws from getGroupMembershipType, and CreateMessage relies on the
-  // CHATS_IN edge that only active members get. Here they become one right, checked in the
-  // one place the shield looks.
-  'group.chat.participate',
+  // CHATS_IN edge that only active members get. Here they become rights, checked in the
+  // one place the shield looks — and the CHATS_IN edge follows `group.chat.read`.
+  'group.chat.read',
+  'group.chat.write',
   'group.videoCall.join',
   // Capped by the network's videoCall.create_<type>, whose default only covers public
   // groups — so this stays parity with today's public-only implementation.

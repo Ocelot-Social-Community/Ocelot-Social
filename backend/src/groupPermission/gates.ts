@@ -1,7 +1,7 @@
 // Runtime feature gates for GROUP permissions.
 //
 // Every key in this catalog is gated by the `groupsEnabled` policy — the group feature as
-// a whole. That is applied here, once, instead of being repeated in all nineteen catalog
+// a whole. That is applied here, once, instead of being repeated in all twenty catalog
 // entries: a truth that holds for the entire catalog cannot drift when it has a single
 // place. On top of it a key may declare `gatedBy` (e.g. `videoConference` for the call
 // keys), and then it is only effective while EVERY listed gate is open.

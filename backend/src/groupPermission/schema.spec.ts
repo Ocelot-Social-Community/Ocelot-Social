@@ -40,7 +40,8 @@ const EXPECTED_KEYS: GroupPermissionKey[] = [
   'group.invite.external',
   'group.settings.manage',
   'group.role.manage',
-  'group.chat.participate',
+  'group.chat.read',
+  'group.chat.write',
   'group.videoCall.create',
   'group.videoCall.join',
 ]

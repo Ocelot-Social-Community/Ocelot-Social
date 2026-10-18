@@ -546,6 +546,51 @@ describe('Chat.vue', () => {
     })
   })
 
+  describe('the input row', () => {
+    const groupRoom = (myGroupPermissions) =>
+      wrapper.vm.fixRoomObject({
+        id: 'r2',
+        roomId: 'r2',
+        roomName: 'Group',
+        isGroupRoom: true,
+        createdAt: '2026-01-01',
+        lastMessage: null,
+        group: { id: 'g1', slug: 'g', name: 'G', avatar: null, myGroupPermissions },
+        users: [{ id: 'current-user', name: 'Me', avatar: null }],
+      })
+
+    beforeEach(() => {
+      wrapper = Wrapper()
+    })
+
+    it('is offered in a group room the viewer may write in', () => {
+      wrapper.vm.selectedRoom = groupRoom(['group.chat.read', 'group.chat.write'])
+
+      expect(wrapper.vm.showFooter).toBe(true)
+    })
+
+    it('is withheld where the viewer may only read', () => {
+      // group.chat.read without group.chat.write: the conversation, without a way into it.
+      wrapper.vm.selectedRoom = groupRoom(['group.chat.read'])
+
+      expect(wrapper.vm.showFooter).toBe(false)
+    })
+
+    it('stays where the rights are not known, since the backend refuses anyway', () => {
+      wrapper.vm.selectedRoom = groupRoom(undefined)
+
+      expect(wrapper.vm.showFooter).toBe(true)
+    })
+
+    it('stays in a direct conversation and before any room is open', () => {
+      expect(wrapper.vm.showFooter).toBe(true)
+
+      wrapper.vm.selectedRoom = mockRoom()
+
+      expect(wrapper.vm.showFooter).toBe(true)
+    })
+  })
+
   describe('chatMessageAdded', () => {
     beforeEach(() => {
       wrapper = Wrapper()

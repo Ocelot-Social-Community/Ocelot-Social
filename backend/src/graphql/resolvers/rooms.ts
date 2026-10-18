@@ -10,9 +10,12 @@ import { withFilter } from 'graphql-subscriptions'
 import { ROOM_UPDATED } from '@constants/subscriptions'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
+import { syncGroupChatRoom } from '@src/groupRole'
 
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import Resolver from './helpers/Resolver'
+
+import type { RoleSeedTransaction } from '@src/groupRole/repository'
 
 // excludeGroupRooms: when the groups feature is off, group rooms must not count towards the
 // unread badge (they are hidden everywhere else too). The rest of the query is unchanged.
@@ -235,25 +238,30 @@ export default {
   },
   Mutation: {
     CreateGroupRoom: async (_parent, params, context, _resolveInfo) => {
-      const { groupId } = params
+      const { groupId } = params as { groupId: string }
       const {
         user: { id: currentUserId },
       } = context
       const session = context.driver.session()
       try {
-        const room = await session.writeTransaction(async (transaction) => {
-          // Step 1: Create/merge the room and add all active group members to it
+        const room = await session.writeTransaction(async (transaction: RoleSeedTransaction) => {
+          // Step 1: Create/merge the room. Who may is the shield's question (group.chat.read);
+          // the membership match only keeps a stranger from conjuring a room for a group.
+          await transaction.run(
+            `
+              MATCH (:User { id: $currentUserId })-[:MEMBER_OF]->(group:Group { id: $groupId })
+              MERGE (room:Room)-[:ROOM_FOR]->(group)
+              ON CREATE SET
+                room.createdAt = toString(datetime()),
+                room.id = apoc.create.uuid()
+            `,
+            { groupId, currentUserId },
+          )
+          // Step 2: the members whose role may read the chat are in it, the others are not.
+          await syncGroupChatRoom(transaction, groupId)
           const createGroupRoomCypher = `
-            MATCH (currentUser:User { id: $currentUserId })-[membership:MEMBER_OF]->(group:Group { id: $groupId })
-            WHERE membership.role <> 'pending'
-            MERGE (room:Room)-[:ROOM_FOR]->(group)
-            ON CREATE SET
-              room.createdAt = toString(datetime()),
-              room.id = apoc.create.uuid()
-            WITH room, group, currentUser
-            MATCH (member:User)-[m:MEMBER_OF]->(group)
-            WHERE m.role <> 'pending'
-            MERGE (member)-[:CHATS_IN]->(room)
+            MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)-[:ROOM_FOR]->(group:Group { id: $groupId })
+            MATCH (member:User)-[:CHATS_IN]->(room)
             WITH room, group, currentUser, collect(properties(member)) AS members
             OPTIONAL MATCH (currentUser)-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room)
             WITH room, group, members, COUNT(DISTINCT message) AS unread

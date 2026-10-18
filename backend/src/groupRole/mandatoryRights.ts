@@ -15,7 +15,8 @@
 //     precisely so a damaged row cannot produce a group its members cannot get out of.
 //
 // **Moot.** A right that cannot apply to the role it sits on. `group.leave` on `none`, which is
-// not a membership — there is nothing to leave. And the two JOIN rights on anything that IS a
+// not a membership — there is nothing to leave; the chat rights on `none` likewise, since the
+// room is entered through the membership. And the two JOIN rights on anything that IS a
 // membership: somebody who holds a membership role has already joined, and on `pending` a join
 // right would read as "an applicant may admit themselves", which is the one thing approval
 // exists to prevent. Admitting an applicant is `group.member.role.assign`, held by somebody
@@ -40,10 +41,23 @@ export const NON_MEMBER_ONLY_RIGHTS: readonly GroupPermissionKey[] = [
   'group.join.request',
 ]
 
+/**
+ * Rights that only mean something INSIDE the group: the chat. Its room is entered through the
+ * membership (the CHATS_IN edge follows it, see syncGroupChatRoom), so on the non-member role
+ * these would be a ticked box that opens nothing — and, through the floor that role sets for
+ * everybody, one that would quietly hand the chat to every member as well.
+ */
+export const MEMBER_ONLY_RIGHTS: readonly GroupPermissionKey[] = [
+  'group.chat.read',
+  'group.chat.write',
+]
+
 /** What each right drags in with it, because it cannot be exercised without it. */
 const IMPLIED_BY: ReadonlyMap<GroupPermissionKey, readonly GroupPermissionKey[]> = new Map([
   ['group.content.read', ['group.read'] as const],
   ['group.members.read', ['group.read'] as const],
+  // Writing into a conversation one cannot read is not a state the chat has.
+  ['group.chat.write', ['group.chat.read'] as const],
 ])
 
 /** Whether this right is one the role in question may not be written without. */
@@ -59,7 +73,9 @@ export function isMandatoryFor(roleName: string, permission: GroupPermissionKey)
  */
 export function isMootFor(roleName: string, permission: GroupPermissionKey): boolean {
   if (roleName === NONE_ROLE) {
-    return MANDATORY_MEMBERSHIP_RIGHTS.includes(permission)
+    return (
+      MANDATORY_MEMBERSHIP_RIGHTS.includes(permission) || MEMBER_ONLY_RIGHTS.includes(permission)
+    )
   }
   return NON_MEMBER_ONLY_RIGHTS.includes(permission)
 }

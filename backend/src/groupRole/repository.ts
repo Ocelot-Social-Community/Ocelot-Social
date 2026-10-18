@@ -9,6 +9,7 @@
 //
 // The editing paths at the bottom arrive with the mutations that call them — a repository
 // function nobody calls is as dead as a permission nobody enforces.
+import { roleHoldsPermission } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { sanitizeGroupPermissions } from '@src/groupPermission'
 
 import { defaultTemplateFor } from './defaults'
@@ -251,6 +252,57 @@ export async function syncNonMemberAccess(
   await run.run(WRITE_NON_MEMBER_ACCESS_CYPHER, { groupId, ...access })
 }
 
+// Who is in a group's chat room: every membership whose role holds `group.chat.read` — or
+// `group.chat.write`, which implies it, should a list ever have been stored without the
+// implication. The non-member role never takes part: it has no MEMBER_OF edge to match, and the
+// chat rights are moot on it (MEMBER_ONLY_RIGHTS).
+//
+// Restricted to one user when `$userId` is given (a membership changed), the whole group
+// otherwise (a role changed). Edges are removed first and added second, so one statement
+// leaves the room exactly as the rights say, whichever way they moved.
+const SYNC_GROUP_CHAT_ROOM_CYPHER = `
+  MATCH (room:Room)-[:ROOM_FOR]->(g:Group {id: $groupId})
+  OPTIONAL MATCH (participant:User)-[chatsIn:CHATS_IN]->(room)
+  WHERE ($userId IS NULL OR participant.id = $userId)
+    AND NOT EXISTS {
+      MATCH (participant)-[membership:MEMBER_OF]->(g),
+            (g)-[:HAS_GROUP_ROLE]->(role:GroupRole)
+      WHERE role.name = membership.role
+        AND (${roleHoldsPermission('role', 'group.chat.read')}
+          OR ${roleHoldsPermission('role', 'group.chat.write')})
+    }
+  DELETE chatsIn
+  WITH DISTINCT room, g
+  MATCH (reader:User)-[membership:MEMBER_OF]->(g),
+        (g)-[:HAS_GROUP_ROLE]->(role:GroupRole)
+  WHERE ($userId IS NULL OR reader.id = $userId)
+    AND role.name = membership.role
+    AND (${roleHoldsPermission('role', 'group.chat.read')}
+      OR ${roleHoldsPermission('role', 'group.chat.write')})
+  MERGE (reader)-[:CHATS_IN]->(room)
+`
+
+/**
+ * Make a group's chat room follow the right to read it.
+ *
+ * The CHATS_IN edge is what every chat path reads by — the room list, the messages, the unread
+ * count, the live updates and the notification e-mails — so it is the edge, not each of those
+ * paths, that has to agree with `group.chat.read`. It used to follow the role NAME (every role
+ * but `pending`), which made the right a write right only: a member without it still read
+ * everything.
+ *
+ * A group without a room yet has nothing to sync; CreateGroupRoom calls this once it exists.
+ * Takes the runner, like syncNonMemberAccess, so a membership change can do it in its own
+ * transaction.
+ */
+export async function syncGroupChatRoom(
+  run: RoleSeedTransaction,
+  groupId: string,
+  userId: string | null = null,
+): Promise<void> {
+  await run.run(SYNC_GROUP_CHAT_ROOM_CYPHER, { groupId, userId })
+}
+
 /**
  * Give a brand-new group its roles, inside the caller's transaction.
  *
@@ -341,6 +393,7 @@ export async function writeGroupRole(
   if (role.name === NONE_ROLE) {
     await syncNonMemberAccess(runnerFor(db), groupId)
   }
+  await syncGroupChatRoom(runnerFor(db), groupId)
 }
 
 /**
@@ -391,6 +444,8 @@ export async function deleteGroupRole(
             DETACH DELETE r`,
     variables: { groupId, name, reassignTo, now },
   })
+  // Its members now hold the role they were moved to, which may read the chat or not.
+  await syncGroupChatRoom(runnerFor(db), groupId)
 }
 
 /**
