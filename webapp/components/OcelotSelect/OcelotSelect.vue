@@ -61,6 +61,7 @@
           <slot v-if="innerValue" name="value" :value="innerValue">
             {{ innerValue[labelProp] || innerValue }}
           </slot>
+          <template v-else-if="keepSearchVisible && searchString">{{ searchString }}</template>
           <div v-else-if="placeholder" class="ds-select-placeholder">
             {{ placeholder }}
           </div>
@@ -200,6 +201,15 @@ export default {
     autoResetSearch: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * Show text typed into the search but never selected while the select is closed, instead of
+     * the placeholder. Without it the text is still there (it comes back on the next open) but
+     * looks gone — a field the user filled in that reads as empty.
+     */
+    keepSearchVisible: {
+      type: Boolean,
+      default: false,
     },
     prefillOnOpen: {
       type: Boolean,
