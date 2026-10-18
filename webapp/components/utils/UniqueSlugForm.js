@@ -36,11 +36,10 @@ export default function UniqueSlugForm({ translate, apollo, currentUser }) {
           message: translate('settings.validation.slug.regex'),
         },
         {
-          // The brand's bounds, which the backend enforces too — and like there, only on a slug
-          // that changes: an account whose slug predates them must still be able to save.
+          // The brand's bounds, which the backend enforces too — on the stored slug as well: an
+          // account whose slug predates them brings it into bounds with its next profile change.
           validator(rule, value) {
             const { slugLengthMin: min, slugLengthMax: max } = branding.user
-            if (currentUser && value === currentUser.slug) return true
             const { length } = value || ''
             if (length >= min && length <= max) return true
             return new Error(translate('settings.validation.slug.length', { min, max }))

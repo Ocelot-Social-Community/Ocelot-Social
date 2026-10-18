@@ -120,6 +120,61 @@ describe('index.vue', () => {
       expect(wrapper.vm.formSchema.name.validator(null, '  Peter Lustig  ')).toEqual([])
     })
 
+    describe('slug length', () => {
+      beforeEach(() => {
+        jest.useFakeTimers()
+      })
+
+      afterEach(() => {
+        jest.useRealTimers()
+      })
+
+      // The uniqueness check is debounced by 500ms, and async-validator reports no error before
+      // every rule of the field has answered.
+      const settle = async () => {
+        jest.advanceTimersByTime(500)
+        await flushPromises()
+      }
+
+      it('shows the slug length as "count / min–max"', async () => {
+        getters['auth/user'] = () => ({ slug: 'peter' })
+        const wrapper = Wrapper()
+        await wrapper.vm.$nextTick()
+
+        expect(wrapper.findAll('.os-validation-hint').at(1).text()).toContain('5 / 3–50')
+      })
+
+      // The backend refuses a save that carries a slug out of bounds, the stored one included.
+      it('shows a stored slug out of bounds as an error as soon as the page opens', async () => {
+        getters['auth/user'] = () => ({ slug: 'j'.repeat(60) })
+        const wrapper = Wrapper()
+        await settle()
+
+        expect(wrapper.vm.visibleErrors).toEqual({ slug: 'settings.validation.slug.length' })
+        expect(wrapper.findAll('.os-validation-hint').at(1).text()).toContain(
+          'settings.validation.slug.length',
+        )
+      })
+
+      it('shows it again after the form is reset', async () => {
+        getters['auth/user'] = () => ({ slug: 'j'.repeat(60) })
+        const wrapper = Wrapper()
+        await settle()
+        wrapper.vm.resetForm()
+        await settle()
+
+        expect(wrapper.vm.visibleErrors).toEqual({ slug: 'settings.validation.slug.length' })
+      })
+
+      it('shows no error for a stored slug within bounds before the field is touched', async () => {
+        getters['auth/user'] = () => ({ slug: 'peter' })
+        const wrapper = Wrapper()
+        await settle()
+
+        expect(wrapper.vm.visibleErrors).toBeNull()
+      })
+    })
+
     describe('given form validation errors', () => {
       beforeEach(() => {
         options = {

@@ -463,18 +463,31 @@ describe('validateReview', () => {
         })
       })
 
-      // The settings form sends the slug on every save. An account whose slug predates the
-      // bounds must still be able to save the rest of its profile.
-      it('lets an account keep a stored slug that is out of bounds', async () => {
+      describe('stored before the bounds', () => {
         const legacy = 'j'.repeat(60)
-        await database.write({
-          query: 'MATCH (user:User {id: $id}) SET user.slug = $slug',
-          variables: { id: 'updating-user', slug: legacy },
-        })
-        variables = { ...variables, slug: legacy }
 
-        await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
-          data: { UpdateUser: { name: 'John Doughnut', slug: legacy } },
+        beforeEach(async () => {
+          await database.write({
+            query: 'MATCH (user:User {id: $id}) SET user.slug = $slug',
+            variables: { id: 'updating-user', slug: legacy },
+          })
+        })
+
+        // The settings form sends the slug with every profile change, so the next change brings
+        // it into bounds.
+        it('is refused when sent again unchanged', async () => {
+          variables = { ...variables, slug: legacy }
+
+          await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+            data: { UpdateUser: null },
+            errors: [{ message: 'The slug must be at most 50 characters long.' }],
+          })
+        })
+
+        it('does not hold up a save that carries no slug', async () => {
+          await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+            data: { UpdateUser: { name: 'John Doughnut', slug: legacy } },
+          })
         })
       })
 

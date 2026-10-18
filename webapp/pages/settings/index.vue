@@ -32,6 +32,9 @@
           @blur="dirtyFields.slug && touchField('slug')"
         />
         <os-validation-hint
+          :count="formData.slug.length"
+          :min="branding.user.slugLengthMin"
+          :max="branding.user.slugLengthMax"
           :variant="visibleErrors && visibleErrors.slug ? 'error' : null"
           :text="visibleErrors && visibleErrors.slug"
         />
@@ -184,6 +187,7 @@ export default {
     // auto-resolve only ever fires once, and only when there was already a
     // saved locationName to resolve.
     this.ignoreNextLocationInput = !!this.currentUser.locationName
+    this.revealSlugOutOfBounds()
     window.addEventListener('beforeunload', this.onBeforeUnload)
   },
   beforeDestroy() {
@@ -348,6 +352,18 @@ export default {
       this.touchedFields = {}
       this.submitAttempted = false
       this.$validateForm()
+      this.revealSlugOutOfBounds()
+    },
+    // A slug stored before the brand's bounds (or before a brand tightened them) has to be brought
+    // into bounds with the next save — the backend refuses it otherwise. Shown as soon as the page
+    // opens, not once the field is touched: else saving an unrelated change is what reveals it.
+    revealSlugOutOfBounds() {
+      const { length } = this.formData.slug
+      const { slugLengthMin, slugLengthMax } = branding.user
+      if (length && (length < slugLengthMin || length > slugLengthMax)) {
+        this.touchField('slug')
+        this.$validateForm()
+      }
     },
     onSubmit() {
       this.formSubmit(this.submit, () => {
@@ -439,15 +455,6 @@ export default {
   > .os-validation-hint {
     margin-bottom: var(--space-base);
     cursor: default;
-  }
-
-  /* The slug field's own hint (unlike name's) renders NOTHING when there's
-     no error — OsValidationHint returns null with no text/count/variant to
-     show (see its own source) — so the rule above never applies there and
-     the field needs its own gap to the next one (the location label)
-     instead. */
-  > .ds-form-item:has(#slug) {
-    margin-bottom: var(--space-base);
   }
 
   > .location-selet {

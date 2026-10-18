@@ -204,24 +204,13 @@ const validateSignupVerification: IMiddlewareResolver = async (
 
 const validateUpdateUser: IMiddlewareResolver = async (resolve, root, params, context, info) => {
   const input = withTrimmedName(params)
-  const { id, name, slug } = input
-  validateUserName(name)
-  if (typeof slug === 'string') {
-    // Only a slug that changes. The settings form sends the slug on every save, and an account
-    // whose slug predates the bounds (or a brand that tightened them) must still be able to save
-    // the rest of its profile without being made to rename itself.
-    const session = context.driver.session()
-    try {
-      const result = await session.readTransaction((transaction) =>
-        transaction.run('MATCH (user:User {id: $id}) RETURN user.slug AS slug', { id }),
-      )
-      if (result.records[0]?.get('slug') !== slug) {
-        validateUserSlug(slug)
-      }
-    } finally {
-      await session.close()
-    }
-  }
+  validateUserName(input.name)
+  // Every save that carries a slug, the stored one included. The settings form sends the slug
+  // with each profile change, so an account whose slug predates the bounds (or a brand that
+  // tightened them) brings it into bounds with its next change — the same rule as for the name.
+  // Profile URLs resolve by id, so a new slug breaks no link. Saves without a slug (locale,
+  // notification settings, avatar …) are not held up by it.
+  validateUserSlug(input.slug)
   return resolve(root, input, context, info)
 }
 

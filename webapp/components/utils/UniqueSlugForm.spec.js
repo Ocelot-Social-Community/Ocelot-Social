@@ -65,12 +65,19 @@ describe('UniqueSlugForm', () => {
       await expect(validate({ slug: 'a'.repeat(50) })).resolves.toEqual({ slug: 'a'.repeat(50) })
     })
 
-    // The backend enforces the bounds only on a slug that changes, so the form must not hold an
-    // account to them for the slug it already has.
-    it('accepts the slug the user already has, even out of bounds', async () => {
+    // Like the backend: the slug an account already has is held to the bounds too, so a save
+    // brings one that predates them into bounds.
+    it('rejects the slug the user already has when it is out of bounds', async () => {
       currentUser = { slug: 'ab' }
 
-      await expect(validate({ slug: 'ab' })).resolves.toEqual({ slug: 'ab' })
+      await expect(validate({ slug: 'ab' })).rejects.toThrow('Validation error')
+    })
+
+    it('still counts the slug the user already has as available', async () => {
+      currentUser = { slug: 'peter' }
+      apollo.query.mockResolvedValue({ data: { User: [{ slug: 'peter' }] } })
+
+      await expect(validate({ slug: 'peter' })).resolves.toEqual({ slug: 'peter' })
     })
 
     describe('with the bounds of a brand', () => {
