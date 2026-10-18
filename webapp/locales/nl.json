@@ -599,6 +599,7 @@
       "eventVenueNotEmpty": "Voer een plaatsbeschrijving in.",
       "followableUrl": "moet een geldig webadres of e-mailadres zijn",
       "formHasErrors": "Vul alstublieft alle verplichte velden in.",
+      "locationNotPicked": "Kies de plaats uit de suggesties.",
       "nameLength": "De naam moet tussen {min} en {max} tekens lang zijn.",
       "titleLength": "De titel moet tussen {min} en {max} tekens lang zijn.",
       "titleNotEmpty": "Voer een titel in."

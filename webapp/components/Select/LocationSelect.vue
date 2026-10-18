@@ -11,6 +11,7 @@
       icon="map-marker"
       :icon-right="null"
       :prefill-on-open="true"
+      :keep-search-visible="true"
       :placeholder="placeholder"
       :disabled="disabled"
       @input.native="handleCityInput"
@@ -33,18 +34,25 @@
         </os-button>
       </template>
     </ocelot-select>
+    <!-- Only a picked suggestion becomes the field's value: typed text alone is never saved, so
+         say so once the user has left the field with some. -->
+    <os-validation-hint
+      v-if="unpickedText && !selectOpen"
+      variant="error"
+      :text="$t('common.validations.locationNotPicked')"
+    />
   </div>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsValidationHint } from '@ocelot-social/ui'
 import OcelotSelect from '~/components/OcelotSelect/OcelotSelect.vue'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { queryLocations } from '~/graphql/location'
 
 export default {
   name: 'LocationSelect',
-  components: { OsButton, OsIcon, OcelotSelect },
+  components: { OsButton, OsIcon, OsValidationHint, OcelotSelect },
   props: {
     value: {
       type: [String, Object],
@@ -86,6 +94,7 @@ export default {
     this.$watch(
       () => this.$refs.select && this.$refs.select.isOpen,
       (isOpen) => {
+        this.selectOpen = !!isOpen
         if (isOpen) this.onSelectOpen()
       },
     )
@@ -99,11 +108,18 @@ export default {
       loadingGeo: false,
       debounceTimeout: null,
       cities: [],
+      // What was last typed into the search, picked or not, and whether the dropdown is open.
+      typedText: '',
+      selectOpen: false,
     }
   },
   computed: {
     locationName() {
       return typeof this.value === 'object' ? this.value.value : this.value
+    },
+    // Text typed but no place picked: the field has no value, whatever it shows.
+    unpickedText() {
+      return this.locationName ? '' : this.typedText
     },
     currentLocale() {
       return this.$store && this.$store.state.i18n && this.$store.state.i18n.locale
@@ -121,6 +137,11 @@ export default {
     },
   },
   watch: {
+    // Tells the form, which only ever receives a picked place: a field that holds unpicked text
+    // is not empty to the user, and explains itself (see the hint in the template).
+    unpickedText(text, previous) {
+      if (!!text !== !!previous) this.$emit('unpicked', !!text)
+    },
     currentValue() {
       if (this.currentValue !== this.value) {
         this.$emit('input', this.currentValue)
@@ -156,6 +177,7 @@ export default {
   methods: {
     handleCityInput(event) {
       const value = event.target ? event.target.value.trim() : ''
+      this.typedText = value
       clearTimeout(this.debounceTimeout)
       if (value.length < 3) {
         this.cities = []
@@ -270,6 +292,8 @@ export default {
     },
     clearLocationName() {
       this.currentValue = ''
+      this.typedText = ''
+      this.$refs.select.resetSearch()
     },
   },
 }
@@ -278,5 +302,10 @@ export default {
 <style scoped>
 ::v-deep .ocelot-select-icon-right {
   right: 4px;
+}
+
+/* The hint belongs to the field above it, like every other field's: no form-item gap between. */
+.ds-form-item:has(+ .os-validation-hint) {
+  margin-bottom: 0;
 }
 </style>

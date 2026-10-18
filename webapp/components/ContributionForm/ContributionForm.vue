@@ -185,11 +185,13 @@
                 :placeholder="$t('post.viewEvent.eventLocationName')"
                 :disabled="locationSelectDisabled"
                 @input="onEventLocationSelectInput"
+                @unpicked="locationUnpicked = $event"
               />
               <os-validation-hint
-                v-if="!locationSelectDisabled && visibleErrors && visibleErrors.eventLocationName"
+                v-if="!locationSelectDisabled && locationErrorText"
+                data-test="event-location-hint"
                 variant="error"
-                :text="$t('post.viewEvent.eventLocationRequired')"
+                :text="locationErrorText"
               />
             </div>
             <location-picker-map
@@ -344,6 +346,8 @@ export default {
       // equivalent for them — same reasoning as GroupForm.vue's own
       // locationChangedByUser (see hasUnsavedChanges below).
       locationChangedByUser: false,
+      // LocationSelect holds typed text no place was picked for (its 'unpicked' event).
+      locationUnpicked: false,
       imageChangedByUser: false,
       // The type as of the last successful save — starts as the
       // contribution's own saved value, refreshed after each further save
@@ -517,6 +521,16 @@ export default {
       return !this.formData.title.trim()
         ? this.$t('common.validations.titleNotEmpty')
         : this.$t('common.validations.titleLength', { min: 3, max: this.formSchema.title.max })
+    },
+    // The validator's own message (length, a place held without coordinates), except for an empty
+    // field, which keeps explaining when an address is needed at all. Nothing while LocationSelect
+    // holds typed text it explains itself: to the form that field is empty, to the user it is not.
+    locationErrorText() {
+      const error = this.visibleErrors?.eventLocationName
+      if (!error || this.locationUnpicked) return null
+      return locationName(this.formData.eventLocationName).trim()
+        ? error
+        : this.$t('post.viewEvent.eventLocationRequired')
     },
     venueErrorText() {
       if (!this.visibleErrors?.eventVenue) return null

@@ -599,6 +599,7 @@
       "eventVenueNotEmpty": "Inserire una descrizione del luogo.",
       "followableUrl": "deve essere un indirizzo web o e-mail valido",
       "formHasErrors": "Si prega di compilare tutti i campi obbligatori.",
+      "locationNotPicked": "Scegli il luogo tra i suggerimenti.",
       "nameLength": "Il nome deve essere compreso tra {min} e {max} caratteri.",
       "titleLength": "Il titolo deve essere compreso tra {min} e {max} caratteri.",
       "titleNotEmpty": "Inserire un titolo."

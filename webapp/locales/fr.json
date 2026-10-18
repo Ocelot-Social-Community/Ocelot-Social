@@ -599,6 +599,7 @@
       "eventVenueNotEmpty": "Veuillez saisir une description du lieu.",
       "followableUrl": "doit être une adresse web ou e-mail valide",
       "formHasErrors": "Veuillez remplir tous les champs obligatoires.",
+      "locationNotPicked": "Veuillez choisir le lieu parmi les suggestions.",
       "nameLength": "Le nom doit comporter entre {min} et {max} caractères.",
       "titleLength": "Le titre doit comporter entre {min} et {max} caractères.",
       "titleNotEmpty": "Veuillez saisir un titre."

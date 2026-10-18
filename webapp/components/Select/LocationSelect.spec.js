@@ -305,4 +305,61 @@ describe('LocationSelect', () => {
       expect(wrapper.find('.ds-select-option').text()).toBe('Niendorf, Hamburg, Deutschland')
     })
   })
+
+  // Only a picked suggestion becomes the value. Typed text is kept on screen and explained, so a
+  // field the user filled in does not read as empty — nor as filled in, to the form.
+  describe('typed text no place was picked for', () => {
+    beforeEach(async () => {
+      queryMock.mockClear()
+      wrapper = mount(LocationSelect, { mocks, localVue, propsData: { value: '' } })
+      const input = wrapper.find('#city')
+      wrapper.vm.$refs.select.openAndFocus()
+      input.element.value = '7112 Duvin'
+      await input.trigger('input')
+      await wrapper.vm.$nextTick()
+    })
+
+    const hint = () => wrapper.find('.os-validation-hint')
+
+    it('is not explained while the user is still choosing', () => {
+      expect(hint().exists()).toBe(false)
+    })
+
+    describe('once the field is left', () => {
+      beforeEach(async () => {
+        wrapper.vm.$refs.select.closeAndBlur()
+        await wrapper.vm.$nextTick()
+      })
+
+      it('stays visible in the field', () => {
+        expect(wrapper.find('.ds-select-value').text()).toBe('7112 Duvin')
+      })
+
+      it('asks to choose the place from the suggestions', () => {
+        expect(hint().text()).toContain('common.validations.locationNotPicked')
+      })
+
+      it('tells the form, which received no value', () => {
+        expect(wrapper.emitted('unpicked')).toEqual([[true]])
+        expect(wrapper.emitted('input')).toBeUndefined()
+      })
+
+      it('is no longer explained once a place is picked', async () => {
+        await wrapper.setProps({ value: { value: '7112, Duvin', lat: 46.71, lng: 9.21 } })
+
+        expect(hint().exists()).toBe(false)
+        expect(wrapper.emitted('unpicked')).toEqual([[true], [false]])
+      })
+
+      it('goes with the clear button', async () => {
+        await wrapper.setProps({ value: { value: '7112, Duvin', lat: 46.71, lng: 9.21 } })
+        await wrapper.find('button[data-test="clear-location-button"]').trigger('click')
+        await wrapper.setProps({ value: '' })
+
+        expect(hint().exists()).toBe(false)
+        expect(wrapper.find('.ds-select-value').text()).toBe('')
+        expect(wrapper.vm.$refs.select.searchString).toBe('')
+      })
+    })
+  })
 })
