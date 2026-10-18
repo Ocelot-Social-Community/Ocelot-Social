@@ -344,6 +344,12 @@ describe('LocationSelect', () => {
         expect(wrapper.emitted('input')).toBeUndefined()
       })
 
+      it('is not explained on a disabled field, which takes no place at all', async () => {
+        await wrapper.setProps({ disabled: true })
+
+        expect(hint().exists()).toBe(false)
+      })
+
       it('is no longer explained once a place is picked', async () => {
         await wrapper.setProps({ value: { value: '7112, Duvin', lat: 46.71, lng: 9.21 } })
 

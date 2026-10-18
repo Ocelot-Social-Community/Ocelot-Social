@@ -35,9 +35,10 @@
       </template>
     </ocelot-select>
     <!-- Only a picked suggestion becomes the field's value: typed text alone is never saved, so
-         say so once the user has left the field with some. -->
+         say so once the user has left the field with some. Not on a disabled field: it takes no
+         place at all then (e.g. an online event). -->
     <os-validation-hint
-      v-if="unpickedText && !selectOpen"
+      v-if="!disabled && unpickedText && !selectOpen"
       variant="error"
       :text="$t('common.validations.locationNotPicked')"
     />
