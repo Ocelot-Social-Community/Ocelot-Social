@@ -10,9 +10,7 @@
       </div>
       <div>
         <os-icon :icon="icons.clock" data-test="clock" />
-        {{
-          getStartTimeString + (endDateAsDate && isSameDayLocal ? '&mdash;' + getEndTimeString : '')
-        }}
+        {{ endDateAsDate && isSameDayLocal ? getTimeRangeString : getStartTimeString }}
       </div>
     </div>
     <!-- Whether start and end fall on the same day depends on the time zone, which differs between
@@ -34,7 +32,8 @@
 <script>
 import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { format, isSameDay, isSameYear } from 'date-fns'
+import { getLocaleIso } from '~/locales'
+import { format, formatRange, isSameDay } from '~/utils/dateFormat'
 
 export default {
   name: 'DateTimeRange',
@@ -70,24 +69,24 @@ export default {
     isSameDayLocal() {
       return !this.endDateAsDate || isSameDay(this.endDateAsDate, this.startDateAsDate)
     },
-    isSameYearLocal() {
-      return !this.endDateAsDate || isSameYear(this.endDateAsDate, this.startDateAsDate)
+    locale() {
+      return getLocaleIso(this)
     },
     getStartDateString() {
-      return format(this.startDateAsDate, this.$t('components.dateTimeRange.yearMonthDay'))
+      return format(this.startDateAsDate, 'numericDate', this.locale)
     },
     getStartTimeString() {
-      return format(new Date(this.startDate), this.$t('components.dateTimeRange.hourMinute'))
+      return format(this.startDateAsDate, 'time', this.locale)
+    },
+    // "14:00–16:30 Uhr", "2:00 – 4:30 PM": the locale writes a span on one day as one.
+    getTimeRangeString() {
+      return formatRange(this.startDateAsDate, this.endDateAsDate, 'time', this.locale)
     },
     getEndDateString() {
-      return this.endDate
-        ? format(new Date(this.endDate), this.$t('components.dateTimeRange.yearMonthDay'))
-        : ''
+      return this.endDate ? format(this.endDateAsDate, 'numericDate', this.locale) : ''
     },
     getEndTimeString() {
-      return this.endDate
-        ? format(new Date(this.endDate), this.$t('components.dateTimeRange.hourMinute'))
-        : ''
+      return this.endDate ? format(this.endDateAsDate, 'time', this.locale) : ''
     },
   },
   created() {

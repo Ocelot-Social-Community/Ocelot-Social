@@ -8,7 +8,7 @@
         <os-counter-icon :icon="icons.handPointer" :count="option.clickedCount" soft />
         <os-counter-icon :icon="icons.eye" :count="option.viewedTeaserCount" soft />
       </span>
-      {{ option.author.name | truncate(32) }} - {{ option.createdAt | dateTime('dd.MM.yyyy') }}
+      {{ option.author.name | truncate(32) }} - {{ option.createdAt | date('numericDate') }}
     </div>
   </section>
 </template>

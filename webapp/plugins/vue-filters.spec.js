@@ -46,3 +46,32 @@ describe('removeLinks', () => {
     expect(removeLinks('<br><br>')).toBe('')
   })
 })
+
+describe('date and dateTime', () => {
+  const filtersIn = (code) => Filters({ app: { $i18n: { locale: () => code } } }).$filters
+  const createdAt = new Date(2026, 9, 19, 16, 0)
+
+  it('return an empty string for a missing value', () => {
+    const { date, dateTime } = filtersIn('de')
+    expect(date(null)).toBe('')
+    expect(dateTime(undefined)).toBe('')
+  })
+
+  it('write the date in the locale of the user', () => {
+    expect(filtersIn('de').date(createdAt)).toBe('19.10.2026')
+    expect(filtersIn('en').date(createdAt)).toBe('Oct 19, 2026')
+  })
+
+  it('add the time with dateTime', () => {
+    expect(filtersIn('de').dateTime(createdAt)).toBe('19.10.2026, 16:00')
+  })
+
+  it('take a preset name', () => {
+    expect(filtersIn('de').date(createdAt, 'monthYear')).toBe('Oktober 2026')
+    expect(filtersIn('en').date(createdAt, 'numericDate')).toBe('10/19/2026')
+  })
+
+  it('fall back to en-US without a known locale', () => {
+    expect(Filters({ app: {} }).$filters.date(createdAt)).toBe('Oct 19, 2026')
+  })
+})

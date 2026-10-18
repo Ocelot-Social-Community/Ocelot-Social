@@ -612,10 +612,6 @@
     "step": "Passo {current} de {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd/MM/yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "A alteração da sua senha falhou. Talvez o código de segurança não estivesse correto?",
