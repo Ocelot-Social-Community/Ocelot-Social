@@ -21,6 +21,18 @@ Why?
 - deep nesting makes it hard to understand, style and maintain components
 - it can lead to performance issues
 
+## A placeholder is an example – or there is none
+
+A form field's placeholder shows an example of a valid value: "e.g. London" for a place, "Femanon Funny" for a name. It never repeats the label shown above the field, and it never replaces a visible label.
+
+Free text gets an "e.g." in front (place, goal, venue), so the example is not mistaken for a value already entered. A value with a format of its own (a name, a slug) is shown as it is, to show that format. A field no example fits leaves the placeholder empty.
+
+Search fields and filters are the exception: there the placeholder is the conventional label of the box.
+
+Why?
+- a placeholder repeating the label tells the user nothing new
+- a placeholder vanishes as soon as the user types, and its contrast is low – it cannot stand in for a label
+
 ## Recommended reads
 
 For a deeper dive into the WHY and HOW have a look at the following resources:

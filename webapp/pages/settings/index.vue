@@ -64,7 +64,6 @@
           type="textarea"
           rows="3"
           :label="$t('settings.data.labelBio')"
-          :placeholder="$t('settings.data.labelBio')"
         />
         <div class="buttons">
           <os-button

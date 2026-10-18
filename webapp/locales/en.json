@@ -1004,6 +1004,7 @@
     "foundation": "Foundation",
     "general": "General",
     "goal": "Goal of group",
+    "goalPlaceholder": "e.g. Grow a garden open to the whole neighbourhood",
     "group": "Group",
     "groupCreated": "The group was created!",
     "in": "in",
@@ -1047,6 +1048,7 @@
     "muted": "Group muted",
     "myGroups": "My Groups",
     "name": "Group name",
+    "namePlaceholder": "Riverside Community Garden",
     "removeMember": "Remove member",
     "removeMemberButton": "Remove",
     "removeMemberConfirmText": "Remove user “{name}” from the group?",
@@ -1126,6 +1128,7 @@
       "usual": "Member"
     },
     "save": "Create new group",
+    "slugPlaceholder": "riverside-community-garden",
     "teaser": {
       "notReadable": "You cannot open this group yet — your request is still pending",
       "openGroup": "Open group",
@@ -1690,6 +1693,7 @@
       "unblocked": "{name} is unblocked again"
     },
     "data": {
+      "cityPlaceholder": "e.g. London",
       "givenName": "Your given name",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "About You",

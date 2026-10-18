@@ -1004,6 +1004,7 @@
     "foundation": "Fondazione",
     "general": "Generale",
     "goal": "Obiettivo del gruppo",
+    "goalPlaceholder": "ad es. Creare un orto aperto a tutto il quartiere",
     "group": "Gruppo",
     "groupCreated": "Il gruppo è stato creato!",
     "in": "in",
@@ -1047,6 +1048,7 @@
     "muted": "Gruppo silenziato",
     "myGroups": "I miei gruppi",
     "name": "Nome del gruppo",
+    "namePlaceholder": "Orto condiviso Trastevere",
     "removeMember": "Rimuovi membro",
     "removeMemberButton": "Rimuovi",
     "removeMemberConfirmText": "Rimuovere l'utente «{name}» dal gruppo?",
@@ -1126,6 +1128,7 @@
       "usual": "Membro"
     },
     "save": "Crea nuovo gruppo",
+    "slugPlaceholder": "orto-condiviso-trastevere",
     "teaser": {
       "notReadable": "Non puoi ancora aprire questo gruppo — la tua richiesta è in attesa",
       "openGroup": "Apri gruppo",
@@ -1690,6 +1693,7 @@
       "unblocked": "{name} è stato sbloccato"
     },
     "data": {
+      "cityPlaceholder": "ad es. Roma",
       "givenName": "Il tuo nome",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "Su di te",

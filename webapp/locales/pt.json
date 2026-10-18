@@ -1004,6 +1004,7 @@
     "foundation": "Fundação",
     "general": "Geral",
     "goal": "Objetivo do grupo",
+    "goalPlaceholder": "p. ex. Criar uma horta aberta a todo o bairro",
     "group": "Grupo",
     "groupCreated": "O grupo foi criado!",
     "in": "em",
@@ -1047,6 +1048,7 @@
     "muted": "Grupo silenciado",
     "myGroups": "Meus grupos",
     "name": "Nome do grupo",
+    "namePlaceholder": "Horta Comunitária Alfama",
     "removeMember": "Remover membro",
     "removeMemberButton": "Remover",
     "removeMemberConfirmText": "Remover o usuário “{name}” do grupo?",
@@ -1126,6 +1128,7 @@
       "usual": "Membro"
     },
     "save": "Criar novo grupo",
+    "slugPlaceholder": "horta-comunitaria-alfama",
     "teaser": {
       "notReadable": "Ainda não podes abrir este grupo — o teu pedido está pendente",
       "openGroup": "Abrir grupo",
@@ -1690,6 +1693,7 @@
       "unblocked": "{name} foi desbloqueado"
     },
     "data": {
+      "cityPlaceholder": "p. ex. Lisboa",
       "givenName": "Seu nome",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "Sobre você",

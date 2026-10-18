@@ -48,6 +48,23 @@ describe('LocationSelect', () => {
       expect(wrapper.find('.ds-select').exists()).toBe(true)
     })
 
+    it('shows an example place as placeholder, not the label again', () => {
+      expect(wrapper.findComponent({ name: 'OcelotSelect' }).props('placeholder')).toBe(
+        'settings.data.cityPlaceholder',
+      )
+    })
+
+    it("shows the form's own placeholder instead, where it passes one", () => {
+      wrapper = mount(LocationSelect, {
+        mocks,
+        localVue,
+        propsData: { ...propsData, placeholder: 'post.viewEvent.eventLocationName' },
+      })
+      expect(wrapper.findComponent({ name: 'OcelotSelect' }).props('placeholder')).toBe(
+        'post.viewEvent.eventLocationName',
+      )
+    })
+
     it('renders the clearLocationName button by default', () => {
       expect(wrapper.find('button[data-test="clear-location-button"]').exists()).toBe(true)
     })
@@ -363,7 +380,8 @@ describe('LocationSelect', () => {
         await wrapper.setProps({ value: '' })
 
         expect(hint().exists()).toBe(false)
-        expect(wrapper.find('.ds-select-value').text()).toBe('')
+        // No leftover text: the emptied field shows its example again.
+        expect(wrapper.find('.ds-select-value').text()).toBe('settings.data.cityPlaceholder')
         expect(wrapper.vm.$refs.select.searchString).toBe('')
       })
     })

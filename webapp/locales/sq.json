@@ -1004,6 +1004,7 @@
     "foundation": "Themelimi",
     "general": "Përgjithshme",
     "goal": "Qëllimi i grupit",
+    "goalPlaceholder": "p.sh. Të krijojmë një kopsht të hapur për gjithë lagjen",
     "group": "Grup",
     "groupCreated": "Grupi u krijua!",
     "in": "në",
@@ -1047,6 +1048,7 @@
     "muted": "Grupi u hesht",
     "myGroups": "Grupet e mia",
     "name": "Emri i grupit",
+    "namePlaceholder": "Kopshti i Lagjes Blloku",
     "removeMember": "Hiq anëtarin",
     "removeMemberButton": "Hiq",
     "removeMemberConfirmText": "Hiq përdoruesin „{name}“ nga grupi?",
@@ -1126,6 +1128,7 @@
       "usual": "Anëtar"
     },
     "save": "Krijo grup të ri",
+    "slugPlaceholder": "kopshti-i-lagjes-blloku",
     "teaser": {
       "notReadable": "Këtë grup nuk mund ta hapësh ende — kërkesa jote është në pritje",
       "openGroup": "Hap grupin",
@@ -1690,6 +1693,7 @@
       "unblocked": "{name} u zhbllokua përsëri"
     },
     "data": {
+      "cityPlaceholder": "p.sh. Tiranë",
       "givenName": "Emri yt",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "Rreth teje",

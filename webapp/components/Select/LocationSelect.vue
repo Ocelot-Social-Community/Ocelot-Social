@@ -12,7 +12,7 @@
       :icon-right="null"
       :prefill-on-open="true"
       :keep-search-visible="true"
-      :placeholder="placeholder"
+      :placeholder="placeholder !== null ? placeholder : $t('settings.data.cityPlaceholder')"
       :disabled="disabled"
       @input.native="handleCityInput"
     >

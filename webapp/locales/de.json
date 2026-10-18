@@ -1004,6 +1004,7 @@
     "foundation": "Gründung",
     "general": "Allgemein",
     "goal": "Ziel der Gruppe",
+    "goalPlaceholder": "z.B. Einen Garten für alle im Kiez anlegen",
     "group": "Gruppe",
     "groupCreated": "Die Gruppe wurde angelegt!",
     "in": "in",
@@ -1047,6 +1048,7 @@
     "muted": "Gruppe stummgeschaltet",
     "myGroups": "Meine Gruppen",
     "name": "Gruppenname",
+    "namePlaceholder": "Gemeinschaftsgarten Kreuzberg",
     "removeMember": "Mitglied aus der Gruppe entfernen?",
     "removeMemberButton": "Entfernen",
     "removeMemberConfirmText": "Nutzer „{name}“ aus der Gruppe entfernen?",
@@ -1126,6 +1128,7 @@
       "usual": "Mitglied"
     },
     "save": "Neue Gruppe anlegen",
+    "slugPlaceholder": "gemeinschaftsgarten-kreuzberg",
     "teaser": {
       "notReadable": "Diese Gruppe kannst du noch nicht öffnen — deine Anfrage läuft noch",
       "openGroup": "Gruppe öffnen",
@@ -1690,6 +1693,7 @@
       "unblocked": "{name} ist wieder entsperrt"
     },
     "data": {
+      "cityPlaceholder": "z.B. Berlin",
       "givenName": "Dein Vorname",
       "givenNamePlaceholder": "Petra",
       "labelBio": "Über dich",

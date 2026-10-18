@@ -6,6 +6,7 @@
         <ocelot-input
           name="name"
           :label="$t('group.name')"
+          :placeholder="$t('group.namePlaceholder')"
           model="name"
           autofocus
           hide-error
@@ -23,6 +24,7 @@
         <ocelot-input
           v-if="update"
           :label="$t('group.labelSlug')"
+          :placeholder="$t('group.slugPlaceholder')"
           model="slug"
           prefix="&amp;"
           hide-error
@@ -157,7 +159,13 @@
              EVERY save of this form, and so quietly undid what had been set there. -->
 
         <!-- goal -->
-        <ocelot-input name="about" :label="$t('group.goal')" v-model="formData.about" rows="3" />
+        <ocelot-input
+          name="about"
+          :label="$t('group.goal')"
+          :placeholder="$t('group.goalPlaceholder')"
+          v-model="formData.about"
+          rows="3"
+        />
 
         <div class="ds-mb-base"></div>
 

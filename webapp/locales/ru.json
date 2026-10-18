@@ -1004,6 +1004,7 @@
     "foundation": "Основание",
     "general": "Общее",
     "goal": "Цель группы",
+    "goalPlaceholder": "напр. Разбить сад, открытый для всего района",
     "group": "Группа",
     "groupCreated": "Группа создана!",
     "in": "в",
@@ -1047,6 +1048,7 @@
     "muted": "Группа отключена",
     "myGroups": "Мои группы",
     "name": "Название группы",
+    "namePlaceholder": "Общественный сад на Арбате",
     "removeMember": "Удалить участника",
     "removeMemberButton": "Удалить",
     "removeMemberConfirmText": "Удалить пользователя «{name}» из группы?",
@@ -1126,6 +1128,7 @@
       "usual": "Участник"
     },
     "save": "Создать новую группу",
+    "slugPlaceholder": "obshchestvennyj-sad-arbat",
     "teaser": {
       "notReadable": "Эту группу пока нельзя открыть — ваша заявка ещё рассматривается",
       "openGroup": "Открыть группу",
@@ -1690,6 +1693,7 @@
       "unblocked": "{name} - снова разблокирован"
     },
     "data": {
+      "cityPlaceholder": "напр. Москва",
       "givenName": "Твоё имя",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "О себе",
