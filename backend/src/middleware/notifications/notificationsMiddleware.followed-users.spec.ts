@@ -36,6 +36,7 @@ const capturedMails = (): unknown[] =>
 // registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { default: Factory, cleanDatabase } = await import('@db/factories')
 const { default: CreateGroup } = await import('@graphql/queries/groups/CreateGroup.gql')
+const { default: blockUser } = await import('@graphql/queries/interactions/blockUser.gql')
 const { default: followUser } = await import('@graphql/queries/interactions/followUser.gql')
 const { default: notifications } = await import('@graphql/queries/notifications/notifications.gql')
 const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
@@ -580,6 +581,61 @@ describe('following users notifications', () => {
         },
         errors: undefined,
       })
+    })
+  })
+
+  // Blocking deletes only the blocker's own FOLLOWS edge: the blocked user still follows the
+  // blocker. Every other notification reason excludes a block in either direction; this one
+  // has to as well, or the blocked user hears of each new post of the one who blocked them.
+  describe('the followed user blocks a follower and writes a post', () => {
+    let mails: unknown[]
+
+    beforeAll(async () => {
+      authenticatedUser = await thirdFollower.toJson()
+      await mutate({ mutation: markAllAsRead })
+      authenticatedUser = await postAuthor.toJson()
+      await mutate({ mutation: blockUser, variables: { id: 'third-follower' } })
+      vi.clearAllMocks()
+      await mutate({
+        mutation: CreatePost,
+        variables: {
+          id: 'post-after-block',
+          title: 'This is the post after the block',
+          content: 'This is the content of the post after the block',
+        },
+      })
+      mails = capturedMails()
+    })
+
+    it('sends NO notification to the blocked follower', async () => {
+      authenticatedUser = await thirdFollower.toJson()
+
+      await expect(
+        query({
+          query: notifications,
+          variables: { read: false, orderBy: 'updatedAt_desc' },
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          notifications: [],
+        },
+        errors: undefined,
+      })
+    })
+
+    it('sends NO email to the blocked follower', () => {
+      expect(mails).not.toContainEqual(
+        expect.objectContaining({ email: 'third-follower@example.org' }),
+      )
+    })
+
+    it('still notifies the other followers', () => {
+      expect(mails).toContainEqual(
+        expect.objectContaining({
+          email: 'first-follower@example.org',
+          reason: 'followed_user_posted',
+        }),
+      )
     })
   })
 })
