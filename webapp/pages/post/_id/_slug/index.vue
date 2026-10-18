@@ -58,7 +58,7 @@
                 <os-counter-icon
                   :icon="icons.comments"
                   :count="commentsCount"
-                  v-tooltip="{
+                  v-os-tooltip="{
                     content: $t('contribution.amount-comments', { amount: commentsCount }),
                     placement: 'bottom-start',
                   }"
@@ -67,7 +67,7 @@
               <os-counter-icon
                 :icon="icons.handPointer"
                 :count="post.clickedCount"
-                v-tooltip="{
+                v-os-tooltip="{
                   content: $t('contribution.amount-clicks', { amount: post.clickedCount }),
                   placement: 'bottom-start',
                 }"
@@ -75,7 +75,7 @@
               <os-counter-icon
                 :icon="icons.eye"
                 :count="post.viewedTeaserCount"
-                v-tooltip="{
+                v-os-tooltip="{
                   content: $t('contribution.amount-views', { amount: post.viewedTeaserCount }),
                   placement: 'bottom-start',
                 }"
@@ -175,7 +175,7 @@
               :key="category.id"
               :icon="category.icon"
               :name="$t(`contribution.category.name.${category.slug}`)"
-              v-tooltip="{
+              v-os-tooltip="{
                 content: $t(`contribution.category.description.${category.slug}`),
                 placement: 'bottom-start',
               }"

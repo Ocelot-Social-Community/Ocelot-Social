@@ -22,7 +22,7 @@
           :appearance="filteredCategoryIds.includes(category.id) ? 'filled' : 'outline'"
           size="sm"
           @click="saveCategories(category.id)"
-          v-tooltip="{
+          v-os-tooltip="{
             content: $t(`contribution.category.description.${category.slug}`),
             placement: 'bottom-start',
           }"

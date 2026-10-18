@@ -77,7 +77,7 @@
           <category
             v-for="category in post.categories"
             :key="category.id"
-            v-tooltip="{
+            v-os-tooltip="{
               content: `
                 ${$t(`contribution.category.name.${category.slug}`)}:
                 ${$t(`contribution.category.description.${category.slug}`)}
@@ -92,7 +92,7 @@
         <os-counter-icon
           :icon="icons.heartO"
           :count="post.shoutedCount"
-          v-tooltip="{
+          v-os-tooltip="{
             content: $t('contribution.amount-shouts', { amount: post.shoutedCount }),
             placement: 'bottom-start',
           }"
@@ -100,7 +100,7 @@
         <os-counter-icon
           :icon="icons.comments"
           :count="post.commentsCount"
-          v-tooltip="{
+          v-os-tooltip="{
             content: $t('contribution.amount-comments', { amount: post.commentsCount }),
             placement: 'bottom-start',
           }"
@@ -108,7 +108,7 @@
         <os-counter-icon
           :icon="icons.handPointer"
           :count="post.clickedCount"
-          v-tooltip="{
+          v-os-tooltip="{
             content: $t('contribution.amount-clicks', { amount: post.clickedCount }),
             placement: 'bottom-start',
           }"
@@ -116,7 +116,7 @@
         <os-counter-icon
           :icon="icons.eye"
           :count="post.viewedTeaserCount"
-          v-tooltip="{
+          v-os-tooltip="{
             content: $t('contribution.amount-views', { amount: post.viewedTeaserCount }),
             placement: 'bottom-start',
           }"
@@ -145,7 +145,7 @@
               v-if="post.sortDate && post.sortDate !== post.createdAt"
               :icon="icons.arrowUp"
               size="sm"
-              v-tooltip="{
+              v-os-tooltip="{
                 content: $t('post.menu.pushed'),
                 placement: 'bottom-end',
               }"

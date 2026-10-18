@@ -246,7 +246,7 @@
                 :loading="loading"
                 :class="{ 'permission-denied': submitVisuallyDenied }"
                 :aria-disabled="canSubmit ? undefined : true"
-                v-tooltip="{
+                v-os-tooltip="{
                   content: submitDeniedHint,
                 }"
               >
