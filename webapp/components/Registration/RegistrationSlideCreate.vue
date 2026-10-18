@@ -54,12 +54,14 @@
           :placeholder="$t('settings.data.namePlaceholder')"
           @blur="touchField('name')"
         />
-        <!-- Counts the name as it is submitted: given and surname joined by one space. -->
+        <!-- Counts the name as it is submitted: given and surname joined by one space. Only once
+             the name is out of bounds, so a valid form keeps its layout. -->
         <os-validation-hint
+          v-if="nameErrorText"
           :count="nameLength"
           :min="branding.user.nameLengthMin"
           :max="branding.user.nameLengthMax"
-          :variant="nameErrorText ? 'error' : null"
+          variant="error"
           :text="nameErrorText"
         />
         <div class="password-wrapper">

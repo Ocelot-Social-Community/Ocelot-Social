@@ -196,10 +196,32 @@ describe('RegistrationSlideCreate', () => {
         expect(wrapper.vm.validInput).toBe(false)
       })
 
-      it('shows the counter with the bounds of the brand', () => {
+      // A valid form keeps its layout: the counter only appears with the error it explains.
+      it('shows no counter while the name is within bounds or not yet left', async () => {
         const wrapper = Wrapper()
+        await completeForm(wrapper, { name: 'Pe' })
+        expect(wrapper.findComponent({ name: 'OsValidationHint' }).exists()).toBe(false)
+
+        await completeForm(wrapper, { name: 'Peter' })
+        wrapper.vm.touchField('name')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.findComponent({ name: 'OsValidationHint' }).exists()).toBe(false)
+      })
+
+      it('shows the counter with the bounds of the brand once the name is out of them', async () => {
+        const wrapper = Wrapper()
+        await completeForm(wrapper, { name: 'Pe' })
+        wrapper.vm.touchField('name')
+        await wrapper.vm.$nextTick()
+
         const hint = wrapper.findComponent({ name: 'OsValidationHint' })
-        expect(hint.props()).toMatchObject({ count: 0, min: 3, max: 50, text: null })
+        expect(hint.props()).toMatchObject({
+          count: 2,
+          min: 3,
+          max: 50,
+          variant: 'error',
+          text: 'common.validations.nameLength',
+        })
       })
 
       it('explains the bounds once the field was left out of them', async () => {
