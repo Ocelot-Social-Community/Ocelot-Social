@@ -185,6 +185,37 @@ describe('AvatarMenu.vue', () => {
           expect(allLinks).toHaveLength(8)
         })
       })
+
+      describe('active entry', () => {
+        const activeEntries = (path) => {
+          mocks.$route.path = path
+          wrapper = Wrapper()
+          wrapper.find('.avatar-menu-trigger').trigger('click')
+          return wrapper.findAll('.os-menu-item--active').wrappers.map((link) => link.text())
+        }
+
+        it('highlights "Groups" on a group page', () => {
+          expect(activeEntries('/groups/g1/school-for-citizens')).toEqual([
+            'header.avatarMenu.groups',
+          ])
+        })
+
+        it('highlights the section of a subpage, e.g. "Settings"', () => {
+          expect(activeEntries('/settings/my-email-address')).toEqual(['settings.name'])
+        })
+
+        it('highlights "My profile" on the own profile', () => {
+          expect(activeEntries('/profile/u343/matt')).toEqual(['header.avatarMenu.myProfile'])
+        })
+
+        it('highlights nothing on someone else’s profile', () => {
+          expect(activeEntries('/profile/u7/jenny')).toEqual([])
+        })
+
+        it('highlights nothing on a page outside the menu', () => {
+          expect(activeEntries('/post/p1/some-post')).toEqual([])
+        })
+      })
     })
   })
 })
