@@ -1,6 +1,5 @@
 <template>
   <div class="group-profile" v-if="isGroupVisible">
-    <div class="ds-mb-large"></div>
     <!-- Where a moderator or admin LANDS when a report points them at a group they are not in.
          Picking the network rights up is a decision, and this is where it is offered — the
          settings pages are behind the very rights it unlocks. -->
@@ -989,9 +988,20 @@ export default {
   margin: auto;
   margin-top: -60px;
 }
+/* Room for the avatar, which sticks out of its card upwards. It belongs to the layout, not to the
+   page: with the elevation banner shown first, the banner sits where any first card does and the
+   avatar keeps its distance from the banner instead. Padding, not an empty spacer, so it does not
+   collapse into the banner's margin. */
+.group-layout {
+  padding-top: var(--space-large);
+}
+/* The page layout leaves no gap below the header on mobile; the page brings its own. */
 @media (--vp-mobile) {
   .group-profile {
-    padding-top: var(--space-large);
+    padding-top: var(--space-small);
+  }
+  .group-layout {
+    padding-top: calc(var(--space-large) + var(--space-small));
   }
 }
 .group-layout__sidebar ::v-deep .group-profile-content-menu {
