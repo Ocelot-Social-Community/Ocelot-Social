@@ -12,6 +12,24 @@ PNGs pixel-identical, only their compression differs).
 **Action** only if your values pin `imagor.image.tag` themselves: raise it to `1.9.12`, or drop the
 override to follow the chart.
 
+## Branding: `dateTime.absoluteDateTimeFormat` is `dateTime.dateStyle` / `dateTime.timeStyle`
+
+The webapp no longer uses date-fns: dates and times are written by the browser's `Intl`, in the
+user's locale. The branding's absolute format therefore is no longer a date-fns token string but two
+lengths, `'short' | 'medium' | 'long' | 'full'` or `null` (see
+[deployment-values.md](deployment-values.md#date-time)). The default changes from `'P'` (`10/19/2026`)
+to `dateStyle: 'medium'` (`Oct 19, 2026` · `19.10.2026`).
+
+**Action** only if your branding sets `dateTime.absoluteDateTimeFormat` (it is a compile error now):
+
+```diff
+ dateTime: {
+-  absoluteDateTimeFormat: 'Pp',
++  dateStyle: 'short',
++  timeStyle: 'short',
+ },
+```
+
 ## ⚠️ Backend is a Deployment now — the uploads PVC is deleted on upgrade
 
 The backend used to be a `StatefulSet` with a `<release>-uploads` PersistentVolumeClaim. It is a

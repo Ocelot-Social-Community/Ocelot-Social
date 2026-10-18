@@ -48,7 +48,7 @@ export function validateBranding(config: BrandingConfig): string[] {
     }
   }
 
-  const { group, user, registration, comment, category, badges, metadata } = config
+  const { group, user, registration, comment, category, badges, metadata, dateTime } = config
 
   atLeast('group.nameLengthMin', group.nameLengthMin, 0)
   atMost('group.nameLengthMin', group.nameLengthMin, 'group.nameLengthMax', group.nameLengthMax)
@@ -84,6 +84,11 @@ export function validateBranding(config: BrandingConfig): string[] {
   nonEmpty('metadata.applicationName', metadata.applicationName)
   nonEmpty('metadata.applicationShortName', metadata.applicationShortName)
   nonEmpty('metadata.organizationName', metadata.organizationName)
+
+  // Intl.DateTimeFormat needs one of them; with neither the absolute timestamp has nothing to show.
+  if (dateTime.dateStyle === null && dateTime.timeStyle === null) {
+    violations.push('dateTime.dateStyle and dateTime.timeStyle must not both be null')
+  }
 
   return violations
 }

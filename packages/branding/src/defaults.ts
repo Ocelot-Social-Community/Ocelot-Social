@@ -48,7 +48,8 @@ export const brandingDefaults: BrandingConfig = {
   },
   dateTime: {
     relativeDateTime: true,
-    absoluteDateTimeFormat: 'P',
+    dateStyle: 'medium',
+    timeStyle: null,
   },
   metadata: {
     applicationName: 'ocelot.social',
