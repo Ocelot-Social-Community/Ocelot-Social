@@ -54,6 +54,7 @@ const { default: CreateMessage } = await import('@graphql/queries/messaging/Crea
 const { default: markAsRead } = await import('@graphql/queries/notifications/markAsRead.gql')
 const { default: notifications } = await import('@graphql/queries/notifications/notifications.gql')
 const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
+const { default: toggleObservePost } = await import('@graphql/queries/posts/toggleObservePost.gql')
 const { default: UpdatePost } = await import('@graphql/queries/posts/UpdatePost.gql')
 const { createApolloTestSetup } = await import('@root/test/helpers')
 
@@ -898,6 +899,41 @@ describe('notifications', () => {
                 },
               }),
             ).resolves.toMatchObject({ ...expected, errors: undefined })
+          })
+
+          // The author is left out of a comment's mentions only because, as an observer of
+          // their post, they hear of the comment anyway. Having stopped observing it, the
+          // mention is all that is left to reach them.
+          it('sends the author who no longer observes the post a notification with reason mentioned_in_comment', async () => {
+            await createPostAction()
+            authenticatedUser = await notifiedUser.toJson()
+            await mutate({ mutation: toggleObservePost, variables: { id: 'p47', value: false } })
+            authenticatedUser = await commentAuthor.toJson()
+            await mutate({
+              mutation: CreateComment,
+              variables: { id: 'c47', postId: 'p47', content: commentContent },
+            })
+            authenticatedUser = await notifiedUser.toJson()
+
+            await expect(
+              query({
+                query: notifications,
+                variables: {
+                  orderBy: 'updatedAt_desc',
+                  read: false,
+                },
+              }),
+            ).resolves.toMatchObject({
+              data: {
+                notifications: [
+                  {
+                    reason: 'mentioned_in_comment',
+                    from: { __typename: 'Comment', id: 'c47' },
+                  },
+                ],
+              },
+              errors: undefined,
+            })
           })
         })
 

@@ -196,7 +196,11 @@ const handleContentDataOfComment: IMiddlewareResolver = async (
   let idsOfMentionedUsers = extractMentionedUsers(content)
   const comment = await resolve(root, args, context, resolveInfo)
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
-  idsOfMentionedUsers = idsOfMentionedUsers.filter((id) => id !== postAuthor.id)
+  // An author observing their post hears of the comment as commented_on_post below; a mention
+  // on top would tell them twice. One who stopped observing it is reached by the mention only.
+  if (postAuthor.observes) {
+    idsOfMentionedUsers = idsOfMentionedUsers.filter((id) => id !== postAuthor.id)
+  }
   const sentEmails: string[] = await publishNotifications(
     context,
     notifyUsersOfMention(
@@ -224,8 +228,9 @@ const postAuthorOfComment = async (commentId, { context }) => {
     postAuthorId = await session.readTransaction((transaction) => {
       return transaction.run(
         `
-          MATCH (author:User)-[:WROTE]->(:Post)<-[:COMMENTS]-(:Comment { id: $commentId })
-          RETURN author { .id } as authorId
+          MATCH (author:User)-[:WROTE]->(post:Post)<-[:COMMENTS]-(:Comment { id: $commentId })
+          OPTIONAL MATCH (author)-[observation:OBSERVES { active: true }]->(post)
+          RETURN author { .id, observes: observation IS NOT NULL } as authorId
         `,
         { commentId },
       )
