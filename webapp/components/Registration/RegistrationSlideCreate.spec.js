@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils'
 import { getBranding, setBranding } from '@ocelot-social/branding'
+import Schema from 'async-validator'
 import flushPromises from 'flush-promises'
 import RegistrationSlideCreate from './RegistrationSlideCreate.vue'
 
@@ -185,6 +186,38 @@ describe('RegistrationSlideCreate', () => {
         expect(wrapper.vm.validInput).toBe(false)
         await completeForm(wrapper, { name: 'a'.repeat(50) })
         expect(wrapper.vm.validInput).toBe(true)
+      })
+
+      describe('form schema', () => {
+        const validateName = (wrapper, name) =>
+          new Schema({ name: wrapper.vm.formSchema.name }).validate(
+            { name },
+            { suppressWarning: true },
+          )
+
+        it('measures the name without surrounding spaces, like the counter', async () => {
+          const wrapper = Wrapper()
+          await expect(validateName(wrapper, ` ${'a'.repeat(50)} `)).resolves.toBeDefined()
+          await expect(validateName(wrapper, '  ab  ')).rejects.toMatchObject({
+            errors: [expect.objectContaining({ field: 'name' })],
+          })
+        })
+
+        // With real names asked for, the single name field is not used and may be missing.
+        it('lets a missing name through when real names are asked for', async () => {
+          policyValues.askForRealName = true
+          const wrapper = Wrapper()
+          await expect(validateName(wrapper, undefined)).resolves.toBeDefined()
+        })
+
+        it('leaves the name in the form as it was typed', async () => {
+          const wrapper = Wrapper()
+          await completeForm(wrapper, { name: ` ${'a'.repeat(50)} ` })
+          await new Promise((resolve) => wrapper.vm.$validateForm(resolve))
+
+          expect(wrapper.vm.formErrors).toBeNull()
+          expect(wrapper.vm.formData.name).toBe(` ${'a'.repeat(50)} `)
+        })
       })
 
       it('counts given and surname together, as they are submitted', async () => {

@@ -216,6 +216,10 @@ export default {
         name: {
           type: 'string',
           required: this.$policy.get('askForRealName') !== true,
+          // Measured trimmed, like the counter, validInput and the backend: otherwise surrounding
+          // spaces mark a valid name invalid (OcelotInput's red frame), or an invalid one valid.
+          // async-validator transforms a copy, so the input keeps what the user typed.
+          transform: (value) => (typeof value === 'string' ? value.trim() : value),
           min: branding.user.nameLengthMin,
           max: branding.user.nameLengthMax,
         },
