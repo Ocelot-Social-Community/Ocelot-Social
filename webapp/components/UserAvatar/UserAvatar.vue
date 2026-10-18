@@ -128,7 +128,6 @@ export default {
   .flex-direction-row {
     display: flex;
     flex-direction: row;
-    justify-content: center;
     padding-left: 2px;
   }
 
