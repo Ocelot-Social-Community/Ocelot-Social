@@ -115,6 +115,7 @@
       v-if="isOpen"
       :open.sync="isOpen"
       :title="$t('group.removeMemberTitle')"
+      :close-label="$t('actions.close')"
       @confirm="removeUser()"
     >
       <p class="ds-text ds-text-size-large">

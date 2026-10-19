@@ -7,6 +7,7 @@
       <os-modal
         v-if="isOpen"
         :title="$t('group.addMember')"
+        :close-label="$t('actions.close')"
         :open.sync="isOpen"
         @close="closeModal"
         @confirm="confirmModal"
