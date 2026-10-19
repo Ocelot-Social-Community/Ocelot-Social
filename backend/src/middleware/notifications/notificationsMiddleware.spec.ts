@@ -1155,6 +1155,36 @@ describe('notifications', () => {
       })
     })
 
+    describe('if the chatReceiver has no e-mail address', () => {
+      it('publishes subscriptions but sends no email', async () => {
+        await database.write({
+          query: `MATCH (:User { id: $id })-[:PRIMARY_EMAIL]->(email:EmailAddress)
+                  DETACH DELETE email`,
+          variables: { id: 'chatReceiver' },
+        })
+
+        await mutate({
+          mutation: CreateMessage,
+          variables: {
+            roomId,
+            content: 'Some nice message to chatReceiver',
+          },
+        })
+
+        expect(pubsubSpy).toHaveBeenCalledWith('ROOM_UPDATED', {
+          roomUpdated: expect.objectContaining({ id: expect.any(String) }),
+          userId: 'chatReceiver',
+        })
+        expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {
+          chatMessageAdded: expect.objectContaining({
+            content: 'Some nice message to chatReceiver',
+          }),
+          userId: 'chatReceiver',
+        })
+        expect(sendChatMessageMailMock).not.toHaveBeenCalled()
+      })
+    })
+
     describe('if the chatReceiver has blocked chatSender', () => {
       it('publishes no subscriptions and sends no email', async () => {
         isUserOnlineMock = vi.fn().mockReturnValue(false)

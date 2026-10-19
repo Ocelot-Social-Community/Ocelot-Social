@@ -297,13 +297,15 @@ const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
   const reason = 'post_in_group'
   const cypher = `
     MATCH (post:Post { id: $postId })<-[:WROTE]-(author:User { id: $userId })
-    OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
     MATCH (post)-[:IN]->(group:Group { id: $groupId })<-[membership:MEMBER_OF]-(user:User)
       WHERE NOT membership.role = 'pending'
       AND NOT (user)-[:MUTED]->(group)
       AND NOT (user)-[:MUTED]->(author)
       AND NOT (user)-[:BLOCKED]-(author)
       AND NOT user.id = $userId
+    // Only after user is bound to the members: before, it matched every user with an e-mail
+    // address in the network, and the members without one got no notification at all.
+    OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
     WITH post, author, user, emailAddress
     MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
       SET notification.read = FALSE
@@ -598,10 +600,12 @@ const handleCreateMessage: IMiddlewareResolver = async (
     const { senderUser, recipients } = await session.readTransaction(async (transaction) => {
       const messageRecipientsCypher = `
           MATCH (senderUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
-          MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
+          MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
             WHERE NOT recipientUser.id = $currentUserId
             AND NOT (recipientUser)-[:BLOCKED]-(senderUser)
             AND NOT (recipientUser)-[:MUTED]->(senderUser)
+          // Optional: a member without an e-mail address gets no mail, but still the live update.
+          OPTIONAL MATCH (recipientUser)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
           OPTIONAL MATCH (room)-[:ROOM_FOR]->(group:Group)<-[mutedGroup:MUTED]-(recipientUser)
           RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email},
             mutedGroup IS NOT NULL AS isGroupMuted
