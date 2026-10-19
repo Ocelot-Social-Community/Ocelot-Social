@@ -289,6 +289,67 @@ describe('notify group members of new posts in group', () => {
       )
     })
 
+    // Membership and reading are two questions: a member whose role may not read the group's
+    // posts hears of none of them, and an applicant the group lets read is still no member.
+    describe('and the group withholds its posts from a role', () => {
+      let readerLessMember
+
+      beforeEach(async () => {
+        vi.clearAllMocks()
+        readerLessMember = await Factory.build(
+          'user',
+          { id: 'reader-less-member', name: 'Reader-less Member', slug: 'reader-less-member' },
+          { email: 'reader-less@example.org', password: '1234' },
+        )
+        await database.write({
+          query: `MATCH (group:Group { id: 'g-1' }), (user:User { id: 'reader-less-member' })
+                  CREATE (group)-[:HAS_GROUP_ROLE]->(:GroupRole {
+                    name: 'listener', system: false, protected: false,
+                    permissions: '["group.read","group.leave"]'
+                  })
+                  CREATE (user)-[:MEMBER_OF { role: 'listener', createdAt: toString(datetime()) }]->(group)
+                  WITH group
+                  MATCH (group)-[:HAS_GROUP_ROLE]->(pending:GroupRole { name: 'pending' })
+                  SET pending.permissions = '["group.read","group.leave","group.content.read"]'`,
+        })
+        authenticatedUser = await postAuthor.toJson()
+        await mutate({
+          mutation: CreatePost,
+          variables: {
+            id: 'withheld-post',
+            title: 'A post the listeners may not read',
+            content: 'A post the listeners may not read, and the applicants may.',
+            groupId: 'g-1',
+          },
+        })
+      })
+
+      it('sends NO notification and NO email to the member whose role may not read', async () => {
+        authenticatedUser = await readerLessMember.toJson()
+
+        await expect(
+          query({ query: notifications, variables: { orderBy: 'updatedAt_desc', read: false } }),
+        ).resolves.toMatchObject({ data: { notifications: [] }, errors: undefined })
+        expect(sendNotificationMailMock).not.toHaveBeenCalledWith(
+          expect.objectContaining({ email: 'reader-less@example.org' }),
+        )
+      })
+
+      it('sends NO notification to the applicant, although the group lets applicants read', async () => {
+        authenticatedUser = await pendingMember.toJson()
+
+        await expect(
+          query({ query: notifications, variables: { orderBy: 'updatedAt_desc', read: false } }),
+        ).resolves.toMatchObject({ data: { notifications: [] }, errors: undefined })
+      })
+
+      it('still notifies the members who may read', () => {
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({ reason: 'post_in_group', email: 'group.member@example.org' }),
+        )
+      })
+    })
+
     describe('group member mutes group', () => {
       beforeEach(async () => {
         authenticatedUser = await groupMember.toJson()
