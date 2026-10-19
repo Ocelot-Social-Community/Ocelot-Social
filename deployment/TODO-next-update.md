@@ -2,6 +2,16 @@
 
 When you introduce a new version and branding and deploy it on your network, you need to consider the following changes and actions:
 
+## imagor 1.5.4 → 1.9.12
+
+The chart's image proxy moves from `shumc/imagor:1.5.4` to `1.9.12` — the version the development
+stack runs now too. No configuration changes: signed URLs, `fit-in` resizing, the HTTP loader and
+the cache headers behave as before (compared on JPEG and transparent PNG: JPEGs byte-identical,
+PNGs pixel-identical, only their compression differs).
+
+**Action** only if your values pin `imagor.image.tag` themselves: raise it to `1.9.12`, or drop the
+override to follow the chart.
+
 ## ⚠️ Backend is a Deployment now — the uploads PVC is deleted on upgrade
 
 The backend used to be a `StatefulSet` with a `<release>-uploads` PersistentVolumeClaim. It is a

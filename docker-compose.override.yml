@@ -132,7 +132,9 @@ services:
       "
 
   imagor:
-    image: shumc/imagor:latest
+    # The version production runs (deployment/helm/charts/ocelot-social/values.yaml) — keep the two
+    # in step, so development renders images the way production does.
+    image: shumc/imagor:1.9.12
     ports:
       - 8000:8000
     environment:
