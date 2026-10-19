@@ -234,7 +234,7 @@
               <hc-empty margin="xxx-small" icon="messages" :message="commentingDisabledMessage">
                 <cta-unblock-author v-if="blockingAuthor" :author="post.author" />
                 <cta-join-leave-group
-                  v-else-if="group && !commentingAllowedByGroupRole"
+                  v-else-if="!blockedEitherWay && group && !commentingAllowedByGroupRole"
                   :group="group"
                   @update="updateJoinLeave"
                 />
@@ -518,9 +518,10 @@ export default {
     canComment() {
       return this.$can('comment.create')
     },
-    // Reason-specific placeholder text. Block and group cases keep the generic message
-    // (each carries an actionable CTA); the permission case gets a dedicated message —
-    // there is no CTA, since only an admin can grant the role.
+    // Reason-specific placeholder text. Block and group cases keep the generic message (a block I
+    // set and a group I can join carry an actionable CTA, a block the author set has none); the
+    // permission case gets a dedicated message — there is no CTA, since only an admin can grant
+    // the role.
     commentingDisabledMessage() {
       if (
         !this.blockedEitherWay &&

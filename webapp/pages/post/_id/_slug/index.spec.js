@@ -767,7 +767,17 @@ describe('PostSlug', () => {
         backendData.post.author = { ...backendData.post.author, name: 'Author', ...block }
         // Someone else's post: the author is not the viewer (auth/user is 1stUser).
         backendData.post.author.id = 'author'
-        return Wrapper({ stubs: { CommentForm: true, CtaUnblockAuthor: true } })
+        return Wrapper({
+          stubs: { CommentForm: true, CtaUnblockAuthor: true, CtaJoinLeaveGroup: true },
+        })
+      }
+
+      // A group post whose comment right I do not hold: without a block, joining is the way in.
+      const inGroupWithoutCommentRight = async (wrapper) => {
+        await wrapper.setData({
+          post: { ...wrapper.vm.post, group: { id: 'g1' } },
+          group: { id: 'g1', myGroupPermissions: [] },
+        })
       }
 
       it('leaves the comment form where there is none', async () => {
@@ -786,6 +796,20 @@ describe('PostSlug', () => {
         wrapper = await withAuthor({ blocked: true, isBlocked: false })
         expect(wrapper.findComponent({ name: 'CommentForm' }).exists()).toBe(false)
         expect(wrapper.findComponent({ name: 'CtaUnblockAuthor' }).exists()).toBe(false)
+        expect(wrapper.text()).toContain('settings.blocked-users.explanation.commenting-disabled')
+      })
+
+      it('offers to join a group whose comment right I lack', async () => {
+        wrapper = await withAuthor({ blocked: false, isBlocked: false })
+        await inGroupWithoutCommentRight(wrapper)
+        expect(wrapper.findComponent({ name: 'CtaJoinLeaveGroup' }).exists()).toBe(true)
+      })
+
+      // Joining lifts no block: where the author blocked me, it would not let me comment either.
+      it('offers no group to join where the author blocked me', async () => {
+        wrapper = await withAuthor({ blocked: true, isBlocked: false })
+        await inGroupWithoutCommentRight(wrapper)
+        expect(wrapper.findComponent({ name: 'CtaJoinLeaveGroup' }).exists()).toBe(false)
         expect(wrapper.text()).toContain('settings.blocked-users.explanation.commenting-disabled')
       })
     })
