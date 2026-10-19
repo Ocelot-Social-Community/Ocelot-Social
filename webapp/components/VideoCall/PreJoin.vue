@@ -149,6 +149,9 @@ export default {
       // the empty preview reads as a failed attempt.
       cameraStarting: false,
       micStarting: false,
+      // Off because there was no camera to start, not because the user chose
+      // so — a retry may switch it back on.
+      cameraMissing: false,
       permissionError: null,
       stream: null,
     }
@@ -404,8 +407,23 @@ export default {
         !!(this.stream && this.stream.getTracks().some((t) => t.kind === kind))
       )
     },
+    isMissingDevice(err) {
+      const name = err && err.name
+      return name === 'NotFoundError' || name === 'OverconstrainedError'
+    },
+    markCameraMissing(err) {
+      this.cameraActive = false
+      this.cameraMissing = true
+      this.permissionError = this.isMissingDevice(err)
+        ? this.$t('videoCall.errors.camera.noDevice')
+        : this.permissionMessage(err)
+    },
     async retry() {
       this.permissionError = null
+      if (this.cameraMissing) {
+        this.cameraMissing = false
+        this.cameraActive = this.cameraStatus !== 'denied'
+      }
       try {
         await this.acquireStream()
         await this.refreshPermissionStatus()
@@ -491,6 +509,10 @@ export default {
           }
           cameraError = videoErr
         } else {
+          if (wantVideo && this.isMissingDevice(videoErr)) {
+            this.markCameraMissing(videoErr)
+            return true
+          }
           throw videoErr
         }
       } finally {
@@ -511,11 +533,12 @@ export default {
       })
       const complete = shown.length === 0 && !kinds.some(overtaken)
       this.stream = complete ? stream : new MediaStream([...shown, ...fresh])
-      // The microphone alone beats no preview at all, but a camera the user
-      // asked for by name and did not get must not fail in silence. Without a
-      // chosen camera there may simply be none, which is no error.
-      this.permissionError =
-        cameraError && requestedCamera ? this.permissionMessage(cameraError) : null
+      // The microphone alone beats no preview at all, but a camera that did
+      // not start — missing, busy, broken — must not fail in silence: the
+      // toggle goes to off, joining with it on would fail in the call, and the
+      // error says why and offers the retry.
+      if (cameraError) this.markCameraMissing(cameraError)
+      else this.permissionError = null
       this.$nextTick(() => {
         const v = this.$refs.previewEl
         // A new microphone is no reason to restart the picture.
@@ -597,6 +620,7 @@ export default {
       if (this.cameraStatus === 'denied' || this.cameraStatus === 'unsupported') return
       const next = !this.cameraActive
       this.cameraActive = next
+      this.cameraMissing = false
       this.permissionError = null
       try {
         await this.acquireStream('video')

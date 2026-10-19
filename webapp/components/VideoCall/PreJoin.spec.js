@@ -740,11 +740,14 @@ describe('PreJoin', () => {
       expect(wrapper.vm.permissionError).toBe('videoCall.prejoin.errorBusy')
     })
 
-    it('stays quiet when no camera was chosen — there may be none', async () => {
+    // A missing camera answers NotFoundError; one that answers NotReadableError is
+    // there but busy — whether it was chosen by name or not.
+    it('says so as well when no camera was chosen, and switches it off', async () => {
       const { wrapper } = mountFailingCamera('')
       await wrapper.vm.acquireStream()
       expect(wrapper.vm.stream).toBe(audioStream)
-      expect(wrapper.vm.permissionError).toBeNull()
+      expect(wrapper.vm.permissionError).toBe('videoCall.prejoin.errorBusy')
+      expect(wrapper.vm.cameraActive).toBe(false)
     })
   })
 
@@ -1395,5 +1398,95 @@ describe('PreJoin', () => {
       wrapper.setData({ cameraActive: true, micActive: false, cameraStatus: 'granted' })
       await expect(wrapper.vm.acquireStream()).rejects.toBe(err)
     })
+  })
+})
+
+describe('PreJoin — no camera attached', () => {
+  const track = (kind, deviceId) => ({ kind, stop: jest.fn(), getSettings: () => ({ deviceId }) })
+  const streamOf = (tracks) => ({
+    getTracks: () => tracks,
+    getAudioTracks: () => tracks.filter((t) => t.kind === 'audio'),
+    getVideoTracks: () => tracks.filter((t) => t.kind === 'video'),
+  })
+  const mic = { kind: 'audioinput', deviceId: 'm1', label: 'Mic' }
+  const cam = { kind: 'videoinput', deviceId: 'c1', label: 'Cam' }
+  const noCamera = () => ({
+    getUserMedia: jest.fn((c) =>
+      c.video
+        ? Promise.reject(
+            Object.assign(new Error('Requested device not found'), { name: 'NotFoundError' }),
+          )
+        : Promise.resolve(streamOf([track('audio', 'm1')])),
+    ),
+    enumerateDevices: jest.fn().mockResolvedValue([mic]),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+  })
+
+  it('shows the camera off and offers a retry', async () => {
+    const { wrapper } = mountWith(noCamera(), { runMounted: true })
+    await flushPromises()
+    expect(wrapper.vm.cameraActive).toBe(false)
+    expect(wrapper.vm.permissionError).toBe('videoCall.errors.camera.noDevice')
+    expect(wrapper.find('[data-test="prejoin-camera-toggle"]').text()).toContain(
+      'videoCall.prejoin.cameraOff',
+    )
+    expect(wrapper.find('.prejoin__error').exists()).toBe(true)
+  })
+
+  it('switches the camera back on when the retry finds one', async () => {
+    const media = noCamera()
+    const { wrapper } = mountWith(media, { runMounted: true })
+    await flushPromises()
+    media.enumerateDevices.mockResolvedValue([mic, cam])
+    media.getUserMedia.mockImplementation(() =>
+      Promise.resolve(streamOf([track('video', 'c1'), track('audio', 'm1')])),
+    )
+    await wrapper.vm.retry()
+    await flushPromises()
+    expect(wrapper.vm.cameraActive).toBe(true)
+    expect(wrapper.vm.permissionError).toBeNull()
+  })
+
+  it('leaves a camera the user switched off alone on retry', async () => {
+    const media = noCamera()
+    media.enumerateDevices.mockResolvedValue([mic, cam])
+    const { wrapper } = mountWith(media, { runMounted: true })
+    await flushPromises()
+    wrapper.setData({ cameraActive: false })
+    await wrapper.vm.retry()
+    await flushPromises()
+    expect(wrapper.vm.cameraActive).toBe(false)
+  })
+})
+
+describe('PreJoin — a camera that is listed but does not start', () => {
+  const track = (kind, deviceId) => ({ kind, stop: jest.fn(), getSettings: () => ({ deviceId }) })
+  const streamOf = (tracks) => ({
+    getTracks: () => tracks,
+    getAudioTracks: () => tracks.filter((t) => t.kind === 'audio'),
+    getVideoTracks: () => tracks.filter((t) => t.kind === 'video'),
+  })
+  const busyCamera = () => ({
+    getUserMedia: jest.fn((c) =>
+      c.video
+        ? Promise.reject(
+            Object.assign(new Error('Could not start video source'), { name: 'NotReadableError' }),
+          )
+        : Promise.resolve(streamOf([track('audio', 'm1')])),
+    ),
+    enumerateDevices: jest.fn().mockResolvedValue([
+      { kind: 'audioinput', deviceId: 'm1', label: 'Mic' },
+      { kind: 'videoinput', deviceId: 'c1', label: 'Cam' },
+    ]),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+  })
+
+  it('shows the camera off and says it is busy', async () => {
+    const { wrapper } = mountWith(busyCamera(), { runMounted: true })
+    await flushPromises()
+    expect(wrapper.vm.cameraActive).toBe(false)
+    expect(wrapper.vm.permissionError).toBe('videoCall.prejoin.errorBusy')
   })
 })
