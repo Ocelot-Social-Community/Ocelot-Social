@@ -1610,6 +1610,7 @@ export default {
       this.micRestart = null
       this.micSilenceProbe = null
       this.resetAudioOnly()
+      await this.leaveRoom()
       try {
         if (!this.groupId) throw new Error('Missing group id')
         const payload = await this.takeJoinPayload(this.groupId)
@@ -2379,9 +2380,23 @@ export default {
       this.error = null
       await this.connect()
     },
-    backToPrejoin() {
+    async backToPrejoin() {
       this.error = null
       this.phase = 'prejoin'
+      // A failed attempt may have joined the room before it failed.
+      await this.leaveRoom()
+    },
+    // Only one room per window: whoever joins anew leaves the old one first,
+    // or LiveKit keeps it as a second participant of our own.
+    async leaveRoom() {
+      const room = this.room
+      if (!room) return
+      this.room = null
+      try {
+        await room.disconnect()
+      } catch (_e) {
+        /* ignore */
+      }
     },
     async leave() {
       // Capture before close() clears the store.

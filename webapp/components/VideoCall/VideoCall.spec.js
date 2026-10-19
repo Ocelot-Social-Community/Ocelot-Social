@@ -4109,4 +4109,25 @@ describe('VideoCall — a join whose device fails', () => {
     expect(wrapper.vm[field]).toBe(false)
     expect(toast).toHaveBeenCalledWith(kind, expect.objectContaining({ name: 'NotFoundError' }))
   })
+
+  it('backToPrejoin leaves the room the failed attempt had joined', async () => {
+    const { wrapper } = factory({ show: true })
+    const disconnect = jest.fn().mockResolvedValue()
+    wrapper.setData({ room: { disconnect }, error: 'boom', phase: 'error' })
+    await wrapper.vm.backToPrejoin()
+    expect(disconnect).toHaveBeenCalled()
+    expect(wrapper.vm.room).toBeNull()
+    expect(wrapper.vm.phase).toBe('prejoin')
+  })
+
+  it('connect leaves an earlier room before it joins anew — no second self in the call', async () => {
+    const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+    withApollo(wrapper)
+    const disconnect = jest.fn().mockResolvedValue()
+    wrapper.setData({ room: { disconnect } })
+    await wrapper.vm.connect()
+    expect(disconnect).toHaveBeenCalled()
+    expect(wrapper.vm.room.disconnect).not.toBe(disconnect)
+    expect(wrapper.vm.phase).toBe('in-call')
+  })
 })
