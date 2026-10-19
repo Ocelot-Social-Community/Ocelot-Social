@@ -5,7 +5,7 @@ services:
     build:
       target: development
     environment:
-      - NODE_ENV="development"
+      - NODE_ENV=development
       # - DEBUG=true
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
     volumes:
@@ -34,7 +34,7 @@ services:
     build:
       target: development
     environment:
-      - NODE_ENV="development"
+      - NODE_ENV=development
       - SMTP_PORT=1025
       - SMTP_HOST=mailserver
       - AWS_ACCESS_KEY_ID=minio

@@ -29,7 +29,7 @@ services:
     build:
       target: test
     environment:
-      - NODE_ENV="test"
+      - NODE_ENV=test
       - AWS_ACCESS_KEY_ID=minio
       - AWS_SECRET_ACCESS_KEY=12341234
       - AWS_ENDPOINT=http:/minio:9000
