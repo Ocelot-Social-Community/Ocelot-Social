@@ -59,7 +59,7 @@ services:
       - 7474:7474
 
   mailserver:
-    image: maildev/maildev
+    image: maildev/maildev:3.0.0
     container_name: mailserver
     ports:
       - 1080:1080
