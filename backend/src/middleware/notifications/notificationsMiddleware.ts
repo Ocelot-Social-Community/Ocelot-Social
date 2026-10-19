@@ -260,6 +260,8 @@ const notifyFollowingUsers = async (postId, context) => {
   const reason = 'followed_user_posted'
   const cypher = `
     MATCH (post:Post { id: $postId })<-[:WROTE]-(author:User { id: $userId })<-[:FOLLOWS]-(user:User)
+      // Blocking deletes only the blocker's own FOLLOWS: the blocked user may still follow them.
+      WHERE NOT (user)-[:BLOCKED]-(author)
     OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
     WITH post, author, user, emailAddress
     WHERE NOT EXISTS {
