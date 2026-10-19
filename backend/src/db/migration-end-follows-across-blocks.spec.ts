@@ -73,4 +73,14 @@ describe('migration: end-follows-across-blocks', () => {
 
     expect(block.records[0].get('props')).toEqual({ createdAt: '2026-01-02T00:00:00.000Z' })
   })
+
+  // The memory of an ended follow lives on the BLOCKED edge: an unblock deletes it, and with it
+  // what down could restore — as an unblock after the fix brings no follow back either.
+  it('restores nothing on down after an unblock', async () => {
+    await up(noop)
+    await run(`MATCH ()-[block:BLOCKED]->() DELETE block`)
+    await down(noop)
+
+    expect(await follows()).toEqual([['bystander -> blocker', '2025-07-07T00:00:00.000Z']])
+  })
 })
