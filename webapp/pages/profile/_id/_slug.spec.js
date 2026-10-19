@@ -168,6 +168,27 @@ describe('ProfileSlug', () => {
         })
       })
 
+      // Blocking ends following both ways and the backend refuses it again while the block
+      // stands — so no follow button across a block, whoever blocked whom.
+      describe('the follow button', () => {
+        const followButton = (profileUser) =>
+          Wrapper(true, { User: [{ ...user.User[0], ...profileUser }] }).container.querySelector(
+            '[data-test="follow-btn"]',
+          )
+
+        it('is offered without a block', () => {
+          expect(followButton({ isBlocked: false, blocked: false })).not.toBeNull()
+        })
+
+        it('is not offered when I blocked them', () => {
+          expect(followButton({ isBlocked: true, blocked: true })).toBeNull()
+        })
+
+        it('is not offered when they blocked me', () => {
+          expect(followButton({ isBlocked: false, blocked: true })).toBeNull()
+        })
+      })
+
       it('states the comments deleting the account deletes, not the posts commented on', () => {
         // #8557: commentedCount (8) is a number of posts; the dialog needs the comments.
         const profileUser = { ...user.User[0], createdAt: '2020-01-01', commentsCount: 23 }

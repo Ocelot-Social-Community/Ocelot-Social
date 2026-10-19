@@ -316,8 +316,12 @@ export default {
             `
               MATCH (blockedUser:User {id: $args.id})
               MATCH (currentUser:User {id: $currentUser.id})
-              OPTIONAL MATCH (currentUser)-[r:FOLLOWS]->(blockedUser)
-              DELETE r
+              // Following ends both ways: the blocked user is not to hear of the blocker's
+              // posts any more either, and may not follow again while the block stands
+              // (followUser). Undirected, so up to two rows — DISTINCT folds them back to one.
+              OPTIONAL MATCH (currentUser)-[follows:FOLLOWS]-(blockedUser)
+              DELETE follows
+              WITH DISTINCT currentUser, blockedUser
               MERGE (currentUser)-[:BLOCKED]->(blockedUser)
               RETURN blockedUser {.*}
             `,
