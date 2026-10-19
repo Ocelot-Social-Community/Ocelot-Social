@@ -274,7 +274,7 @@ const notifyFollowingUsers = async (postId, context) => {
       SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
       SET notification.updatedAt = toString(datetime())
     WITH notification, author, user, emailAddress.email as email,
-      post {.*, author: properties(author) } AS finalResource
+      post { __typename: 'Post', .*, author: properties(author) } AS finalResource
     RETURN notification {
       .*,
       from: finalResource,
@@ -322,7 +322,7 @@ const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
       SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
       SET notification.updatedAt = toString(datetime())
     WITH notification, author, user, emailAddress.email as email,
-      post {.*, author: properties(author) } AS finalResource
+      post { __typename: 'Post', .*, author: properties(author) } AS finalResource
     RETURN notification {
       .*,
       from: finalResource,

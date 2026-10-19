@@ -43,6 +43,7 @@ const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.
 const { default: UpdatePost } = await import('@graphql/queries/posts/UpdatePost.gql')
 const { default: markAllAsRead } = await import('@graphql/queries/notifications/markAllAsRead.gql')
 const { createApolloTestSetup } = await import('@root/test/helpers')
+const { liveNotification } = await import('@root/test/liveNotification')
 
 let authenticatedUser: Context['user']
 const policy = { categoriesActive: false }
@@ -251,6 +252,18 @@ describe('following users notifications', () => {
           ],
         },
         errors: undefined,
+      })
+    })
+
+    // The same notification is published to the follower's socket: it has to resolve there too.
+    it('delivers the notification live as a post', async () => {
+      await expect(liveNotification(mails[0])).resolves.toEqual({
+        data: {
+          notificationAdded: {
+            reason: 'followed_user_posted',
+            from: { __typename: 'Post', id: 'post' },
+          },
+        },
       })
     })
 
