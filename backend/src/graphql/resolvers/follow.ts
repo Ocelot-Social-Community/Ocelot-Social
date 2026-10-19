@@ -21,9 +21,13 @@ export default {
       // `createdAt` on the edge came from the FOLLOWS property default in db/models/User.ts;
       // db/schema/relationships.ts requires it, so it is written here. ON CREATE, so that
       // following someone twice does not move the date.
+      //
+      // Not while a block stands, in either direction: blocking ends following both ways
+      // (blockUser), and following again would undo that.
       const result = await context.database.write({
         query: `
           MATCH (user:User {id: $currentUserId}), (followedUser:User {id: $followedUserId})
+          WHERE NOT (user)-[:BLOCKED]-(followedUser)
           MERGE (user)-[follows:FOLLOWS]->(followedUser)
           ON CREATE SET follows.createdAt = toString(datetime())
           RETURN followedUser {.*}

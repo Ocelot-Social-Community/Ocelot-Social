@@ -38,7 +38,14 @@ export const social: readonly RelationshipDefinition[] = [
     from: User,
     to: User,
     cardinality: 'many',
-    properties: { createdAt },
+    properties: {
+      createdAt,
+      // When a follow across this block had started, for each side that followed. Kept by the
+      // migration that ended such follows (20261019120000-end-follows-across-blocks), so its
+      // `down` can restore them. A block made since never had a follow to remember.
+      blockedFollowedSince: createdAt,
+      blockerFollowedSince: createdAt,
+    },
     required: ['createdAt'],
   }),
   defineRelationship({
