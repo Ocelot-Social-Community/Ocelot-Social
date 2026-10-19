@@ -10,6 +10,7 @@ import { withFilter } from 'graphql-subscriptions'
 import { ROOM_UPDATED } from '@constants/subscriptions'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
+import { isActiveMembership } from '@graphql/resolvers/helpers/groupAccessCypher'
 
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import Resolver from './helpers/Resolver'
@@ -245,14 +246,14 @@ export default {
           // Step 1: Create/merge the room and add all active group members to it
           const createGroupRoomCypher = `
             MATCH (currentUser:User { id: $currentUserId })-[membership:MEMBER_OF]->(group:Group { id: $groupId })
-            WHERE membership.role <> 'pending'
+            WHERE ${isActiveMembership('membership')}
             MERGE (room:Room)-[:ROOM_FOR]->(group)
             ON CREATE SET
               room.createdAt = toString(datetime()),
               room.id = apoc.create.uuid()
             WITH room, group, currentUser
             MATCH (member:User)-[m:MEMBER_OF]->(group)
-            WHERE m.role <> 'pending'
+            WHERE ${isActiveMembership('m')}
             MERGE (member)-[:CHATS_IN]->(room)
             WITH room, group, currentUser, collect(properties(member)) AS members
             OPTIONAL MATCH (currentUser)-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room)
