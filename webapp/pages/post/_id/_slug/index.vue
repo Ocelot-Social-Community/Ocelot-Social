@@ -221,7 +221,7 @@
             <comment-form
               v-if="
                 showNewCommentForm &&
-                !isBlocked &&
+                !blockedEitherWay &&
                 (!this.post.group || commentingAllowedByGroupRole) &&
                 canComment
               "
@@ -232,7 +232,7 @@
             <!-- commenting disabled -->
             <div class="ds-placeholder" v-else>
               <hc-empty margin="xxx-small" icon="messages" :message="commentingDisabledMessage">
-                <cta-unblock-author v-if="isBlocked" :author="post.author" />
+                <cta-unblock-author v-if="blockingAuthor" :author="post.author" />
                 <cta-join-leave-group
                   v-else-if="group && !commentingAllowedByGroupRole"
                   :group="group"
@@ -352,7 +352,6 @@ export default {
       title: 'loading',
       showNewCommentForm: true,
       blurred: false,
-      blocked: null,
       postAuthor: null,
       group: null,
       shoutedCount: 0,
@@ -428,10 +427,18 @@ export default {
         this.deletePostCallback,
       )
     },
-    isBlocked() {
+    // A block in either direction ends commenting — whoever set it.
+    blockedEitherWay() {
       const { author } = this.post
       if (!author) return false
       return author.blocked
+    },
+    // Only a block I set is one I can lift: the call to unblock the author is for this case. When
+    // the author blocked me, the generic "cannot comment" message is all there is to say.
+    blockingAuthor() {
+      const { author } = this.post
+      if (!author) return false
+      return author.isBlocked
     },
     isAuthor() {
       const { author } = this.post
@@ -516,7 +523,7 @@ export default {
     // there is no CTA, since only an admin can grant the role.
     commentingDisabledMessage() {
       if (
-        !this.isBlocked &&
+        !this.blockedEitherWay &&
         (!this.post.group || this.commentingAllowedByGroupRole) &&
         !this.canComment
       ) {

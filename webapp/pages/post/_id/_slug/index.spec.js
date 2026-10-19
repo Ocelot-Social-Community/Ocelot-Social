@@ -738,7 +738,7 @@ describe('PostSlug', () => {
       it('commentingDisabledMessage gives a dedicated reason when comment.create is missing', () => {
         // No group, not blocked, group-role OK → the only reason left is the permission.
         const base = {
-          isBlocked: false,
+          blockedEitherWay: false,
           post: {},
           commentingAllowedByGroupRole: true,
           $t: (key) => key,
@@ -753,10 +753,40 @@ describe('PostSlug', () => {
         expect(
           PostSlug.computed.commentingDisabledMessage.call({
             ...base,
-            isBlocked: true,
+            blockedEitherWay: true,
             canComment: false,
           }),
         ).toBe('settings.blocked-users.explanation.commenting-disabled')
+      })
+    })
+
+    // `blocked` is a block in either direction, `isBlocked` one I set: only the second is mine to
+    // lift, so only then may the page tell me to unblock the author.
+    describe('a block between me and the author', () => {
+      const withAuthor = async (block) => {
+        backendData.post.author = { ...backendData.post.author, name: 'Author', ...block }
+        // Someone else's post: the author is not the viewer (auth/user is 1stUser).
+        backendData.post.author.id = 'author'
+        return Wrapper({ stubs: { CommentForm: true, CtaUnblockAuthor: true } })
+      }
+
+      it('leaves the comment form where there is none', async () => {
+        wrapper = await withAuthor({ blocked: false, isBlocked: false })
+        expect(wrapper.findComponent({ name: 'CommentForm' }).exists()).toBe(true)
+        expect(wrapper.findComponent({ name: 'CtaUnblockAuthor' }).exists()).toBe(false)
+      })
+
+      it('takes the comment form away and offers to unblock where I blocked the author', async () => {
+        wrapper = await withAuthor({ blocked: true, isBlocked: true })
+        expect(wrapper.findComponent({ name: 'CommentForm' }).exists()).toBe(false)
+        expect(wrapper.findComponent({ name: 'CtaUnblockAuthor' }).exists()).toBe(true)
+      })
+
+      it('takes the comment form away but offers nothing to unblock where the author blocked me', async () => {
+        wrapper = await withAuthor({ blocked: true, isBlocked: false })
+        expect(wrapper.findComponent({ name: 'CommentForm' }).exists()).toBe(false)
+        expect(wrapper.findComponent({ name: 'CtaUnblockAuthor' }).exists()).toBe(false)
+        expect(wrapper.text()).toContain('settings.blocked-users.explanation.commenting-disabled')
       })
     })
 
