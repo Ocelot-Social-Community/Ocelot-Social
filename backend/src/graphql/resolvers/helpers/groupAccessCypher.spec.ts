@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  isActiveMembership,
   memberHoldsInGroup,
   memberRoleHolds,
   nonMemberReadsContent,
@@ -54,6 +55,12 @@ describe(roleHoldsPermission, () => {
     // coalesce, not a bare CONTAINS: `null CONTAINS '…'` is null, and a null in the middle of an
     // OR chain turns a decision into "unknown" rather than "no".
     expect(roleHoldsPermission('r', 'group.read')).toContain("coalesce(r.permissions, '')")
+  })
+})
+
+describe(isActiveMembership, () => {
+  it('leaves out the roles that are no membership, as isActiveMembershipRole does', () => {
+    expect(isActiveMembership('membership')).toBe("NOT membership.role IN ['none', 'pending']")
   })
 })
 

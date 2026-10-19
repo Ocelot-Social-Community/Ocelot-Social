@@ -9,6 +9,7 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 import { NOTIFICATION_ADDED, ROOM_UPDATED, CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
 import {
+  isActiveMembership,
   memberHoldsInGroup,
   nonMemberReadsContent,
   visibilityOf,
@@ -299,7 +300,9 @@ const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
     MATCH (post:Post { id: $postId })<-[:WROTE]-(author:User { id: $userId })
     OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
     MATCH (post)-[:IN]->(group:Group { id: $groupId })<-[membership:MEMBER_OF]-(user:User)
-      WHERE NOT membership.role = 'pending'
+      // News for the members — those who may read it: the role of each decides, not its name.
+      WHERE ${isActiveMembership('membership')}
+      AND ${readsGroupContent('group', 'user')}
       AND NOT (user)-[:MUTED]->(group)
       AND NOT (user)-[:MUTED]->(author)
       AND NOT (user)-[:BLOCKED]-(author)

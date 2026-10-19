@@ -47,10 +47,13 @@ export const SYSTEM_ROLE_NAMES: readonly string[] = [
   OWNER_ROLE,
 ]
 
-// The roles that count as an actual membership. `none` is no membership, `pending` is an
-// applicant — the same distinction the resolvers draw with `role <> 'pending'`.
+// The roles that do NOT count as an actual membership: `none` is no membership, `pending` is an
+// applicant — the same distinction the resolvers draw with `role <> 'pending'`. One list for the
+// TypeScript below and the Cypher of groupAccessCypher.ts (isActiveMembership).
+export const INACTIVE_MEMBERSHIP_ROLES: readonly string[] = [NONE_ROLE, PENDING_ROLE]
+
 export function isActiveMembershipRole(roleName: string): boolean {
-  return roleName !== NONE_ROLE && roleName !== PENDING_ROLE
+  return !INACTIVE_MEMBERSHIP_ROLES.includes(roleName)
 }
 
 // Where a permission in an effective set came from. Needed beyond display: a network
