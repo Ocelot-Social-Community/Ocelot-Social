@@ -4,6 +4,7 @@
 
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
+import { isActiveMembership } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { branding } from '@src/branding'
 import { PENDING_ROLE, USUAL_ROLE } from '@src/groupRole'
 
@@ -294,7 +295,7 @@ export default {
           query: `
           MATCH
             (user:User {id: $user.id})-[membership:MEMBER_OF]->(group:Group {id: $args.groupId})
-          WHERE NOT membership.role = 'pending'
+          WHERE ${isActiveMembership('membership')}
           OPTIONAL MATCH (oldInviteCode:InviteCode { code: toUpper($code) })
           DETACH DELETE oldInviteCode
           MERGE (user)-[:GENERATED]->(inviteCode:InviteCode { code: toUpper($code) })-[:INVITES_TO]->(group)

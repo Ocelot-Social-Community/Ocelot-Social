@@ -75,6 +75,14 @@ export const roleHoldsPermission = (role: string, permission: GroupPermissionKey
 
 /**
  * The membership is an actual one, not an applicant's (`isActiveMembershipRole` in Cypher).
+ *
+ * It used to be the list `['usual', 'admin', 'owner']`, and then `role <> 'pending'`, repeated in
+ * a dozen hand-written Cypher strings. With group-defined roles a list of member names is wrong
+ * by construction — a group that renames `usual` would turn its own members into non-members —
+ * and the question was never "which names": it is "is this edge a membership or an application".
+ * Hence the inverse, from the one list of roles that are none (INACTIVE_MEMBERSHIP_ROLES), which
+ * answers it for any role name a group invents.
+ *
  * A membership state, not a right: an operator may let applicants read a group, which does not
  * make them members.
  */

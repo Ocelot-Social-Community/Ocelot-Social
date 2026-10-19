@@ -7,6 +7,7 @@
 
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import {
+  isActiveMembership,
   memberHoldsInGroup,
   nonMemberReadsContent,
   nonMemberReadsGroup,
@@ -116,7 +117,7 @@ const searchMyGroupsSetup = {
           WITH user, resource, membership, score`,
   whereClause: `WHERE score >= 0.0
                 AND NOT (resource.deleted = true OR resource.disabled = true)
-                AND membership.role <> 'pending'`,
+                AND ${isActiveMembership('membership')}`,
   withClause: 'WITH resource, membership, score',
   returnClause: `resource { .*, myRole: membership.role, __typename: 'Group' }`,
   limit: 'LIMIT toInteger($limit)',
