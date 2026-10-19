@@ -1746,11 +1746,24 @@ export default {
           peerConnectionTimeout: 5000,
           maxRetries: 0,
         })
+        // We are in the room now. A device that does not start must not
+        // turn that into a failed join: the error block would sit on top of
+        // a live session, and joining again from there adds a second self.
         if (this.micEnabled) {
-          await room.localParticipant.setMicrophoneEnabled(true)
+          try {
+            await room.localParticipant.setMicrophoneEnabled(true)
+          } catch (err) {
+            this.micEnabled = false
+            this.showDeviceErrorToast('mic', err)
+          }
         }
         if (this.cameraEnabled) {
-          await room.localParticipant.setCameraEnabled(true)
+          try {
+            await room.localParticipant.setCameraEnabled(true)
+          } catch (err) {
+            this.cameraEnabled = false
+            this.showDeviceErrorToast('camera', err)
+          }
         }
         this.refreshTiles()
         this.audioBlocked = !room.canPlaybackAudio
