@@ -637,15 +637,45 @@ jobs:
     needs: [queue, fullstack_tests]
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
     steps:
       - name: Check E2E results
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESULT: ${{ needs.fullstack_tests.result }}
         run: |
-          if [ "${{ needs.queue.outputs.verified }}" = 'true' ] && [ "${{ needs.fullstack_tests.result }}" = 'skipped' ]; then
+          if [ "${{ needs.queue.outputs.verified }}" = 'true' ] && [ "${RESULT}" = 'skipped' ]; then
             echo "Passed in the merge queue on this very commit (run ${{ needs.queue.outputs.run-id }}) — not repeated"
             exit 0
           fi
-          if [ "${{ needs.fullstack_tests.result }}" != "success" ]; then
-            echo "E2E tests failed or were cancelled (result: ${{ needs.fullstack_tests.result }})"
+          # A branch run cancelled on a commit that master carries too. release-please resets its
+          # release branch to the master commit just merged and pushes the release commit on top a
+          # second later, so the branch's concurrency group cancels the run of the first push. Its
+          # checks land on the master commit, and as the newest ones they are what GitHub shows
+          # there: master looked red although its own run passed. master's push run of this commit
+          # is what counts, so this one mirrors it: green while that run is still going (it finishes
+          # later and its checks become the newest), its result once it is done. Only on branches:
+          # master runs one group per commit, so a cancelled master run is a real cancellation.
+          if [ "${RESULT}" = 'cancelled' ] && [ "${GITHUB_EVENT_NAME}" = 'push' ] \
+            && [[ "${GITHUB_REF}" == refs/heads/* ]] && [ "${GITHUB_REF}" != 'refs/heads/master' ]; then
+            workflow="${GITHUB_WORKFLOW_REF%@*}"
+            workflow="${workflow##*/}"
+            # Fails CLOSED: an API error leaves the cancellation red, as before.
+            if master_run="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/${workflow}/runs?event=push&branch=master&head_sha=${GITHUB_SHA}&per_page=1" \
+              --jq '.workflow_runs[0] // empty | "\(.id) \(.status) \(.conclusion // "")"')" && [ -n "${master_run}" ]; then
+              read -r run_id status conclusion <<< "${master_run}"
+              if [ "${status}" != 'completed' ] || [ "${conclusion}" = 'success' ]; then
+                echo "::notice::Cancelled on ${GITHUB_REF#refs/heads/}, but ${GITHUB_SHA} is a master commit — master's own run ${run_id} (${status}${conclusion:+, ${conclusion}}) covers it"
+                exit 0
+              fi
+              echo "Cancelled here, and master's own run ${run_id} of this commit ended ${conclusion}"
+              exit 1
+            fi
+          fi
+          if [ "${RESULT}" != "success" ]; then
+            echo "E2E tests failed or were cancelled (result: ${RESULT})"
             exit 1
           fi
 
