@@ -49,4 +49,9 @@ describe('isDarkTheme', () => {
     applyTheme('light')
     expect(callback).toHaveBeenCalledTimes(1)
   })
+
+  it('falls back to system for a cookie that cannot be decoded', () => {
+    expect(themeFromCookieHeader('ocelot-theme=%E0')).toBe('system')
+    expect(themeFromCookieHeader('ocelot-theme=%')).toBe('system')
+  })
 })

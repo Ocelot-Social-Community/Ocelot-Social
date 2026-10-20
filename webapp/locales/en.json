@@ -1888,7 +1888,7 @@
   "themeSwitch": {
     "dark": "Theme: dark",
     "light": "Theme: light",
-    "system": "Theme: as the system"
+    "system": "Theme: follow system"
   },
   "user-avatar": {
     "popover": {

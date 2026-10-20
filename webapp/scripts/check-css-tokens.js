@@ -125,6 +125,14 @@ function styleBodies(src) {
   )
 }
 
+/** A neutral step read directly — the scale names values, not roles. */
+function checkNeutral(text, rel) {
+  return [...text.matchAll(/var\(--color-neutral-(\d+)\)/g)].map(
+    ([, step]) =>
+      `${rel}: var(--color-neutral-${step}) — use a role token (background/text/border) instead`,
+  )
+}
+
 /** Both rules, over one file's source. `untokenised` counts literals that have no token to suggest. */
 function checkSource(src, byRgb, rel) {
   const errors = []
@@ -139,11 +147,7 @@ function checkSource(src, byRgb, rel) {
       if (prop.startsWith('--')) continue // declaring a token is allowed to use a literal
       // The neutral scale names values, not roles: neutral-100 was background here and text there,
       // which is why a dark theme cannot simply invert it. Components read a role token instead.
-      for (const [, step] of value.matchAll(/var\(--color-neutral-(\d+)\)/g)) {
-        errors.push(
-          `${rel}: var(--color-neutral-${step}) — use a role token (background/text/border) instead`,
-        )
-      }
+      errors.push(...checkNeutral(value, rel))
       for (const [raw] of value.matchAll(COLOUR)) {
         const rgb = toRgb(raw)
         if (!rgb) continue
@@ -165,6 +169,13 @@ function main() {
     errors.push(...result.errors)
     untokenised += result.untokenised
   }
+  // Colours handed to libraries as JS values (the chat palette) are read by components too.
+  const CONSTANTS = join(ROOT, 'constants')
+  for (const file of readdirSync(CONSTANTS).filter(
+    (f) => f.endsWith('.js') && !f.endsWith('.spec.js'),
+  )) {
+    errors.push(...checkNeutral(readFileSync(join(CONSTANTS, file), 'utf8'), `constants/${file}`))
+  }
 
   if (errors.length) {
     console.error(`✖ ${errors.length} problem(s):\n`)
@@ -184,4 +195,12 @@ function main() {
 
 if (require.main === module) main()
 
-module.exports = { toRgb, readTokens, indexByRgb, declarations, styleBodies, checkSource }
+module.exports = {
+  toRgb,
+  readTokens,
+  indexByRgb,
+  declarations,
+  styleBodies,
+  checkSource,
+  checkNeutral,
+}

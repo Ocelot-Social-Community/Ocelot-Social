@@ -5,6 +5,7 @@ const {
   declarations,
   styleBodies,
   checkSource,
+  checkNeutral,
 } = require('./check-css-tokens')
 
 const style = (css, attrs = ' scoped') => `<template><i /></template><style${attrs}>${css}</style>`
@@ -127,6 +128,12 @@ describe('checkSource', () => {
     const { errors } = checkSource(style('.a { color: var(--color-neutral-50); }'), byRgb, 'A.vue')
     expect(errors).toEqual([
       'A.vue: var(--color-neutral-50) — use a role token (background/text/border) instead',
+    ])
+  })
+
+  it('flags a neutral step in a JS value too (constants)', () => {
+    expect(checkNeutral("toggle: 'var(--color-neutral-30)',", 'constants/chat.js')).toEqual([
+      'constants/chat.js: var(--color-neutral-30) — use a role token (background/text/border) instead',
     ])
   })
 

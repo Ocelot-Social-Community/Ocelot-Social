@@ -414,6 +414,10 @@
             </div>
           </div>
 
+          <div class="mobile-theme-section">
+            <theme-switch class="mobile-theme-switch" />
+          </div>
+
           <!-- Locale switch collapsible (only when open) -->
           <div class="mobile-locale-section">
             <div
@@ -1206,6 +1210,10 @@ export default {
       background-color: var(--background-color-soft);
       box-shadow: inset 3px 0 0 var(--color-primary);
     }
+  }
+
+  .mobile-theme-section {
+    padding: 2px var(--space-small);
   }
 
   .mobile-locale-section {

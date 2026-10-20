@@ -7,7 +7,12 @@ export const normalizeTheme = (value) => (THEMES.includes(value) ? value : 'syst
 
 export const themeFromCookieHeader = (header) => {
   const match = String(header || '').match(new RegExp(`(?:^|;\\s*)${THEME_COOKIE}=([^;]*)`))
-  return normalizeTheme(match && decodeURIComponent(match[1]))
+  // The header comes from outside: a value that cannot be decoded is not a theme either.
+  try {
+    return normalizeTheme(match && decodeURIComponent(match[1]))
+  } catch (_e) {
+    return normalizeTheme(null)
+  }
 }
 
 export const THEME_CHANGE_EVENT = 'ocelot-theme-change'

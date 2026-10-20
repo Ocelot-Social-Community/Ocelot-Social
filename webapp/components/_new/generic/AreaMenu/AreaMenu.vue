@@ -89,9 +89,15 @@ export default {
   background-color: var(--background-color-base);
   color: var(--text-color-base);
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234b4554' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
+  /*  A chevron from two gradients, so it takes the text colour in either theme. */
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-color-base) 50%),
+    linear-gradient(135deg, var(--text-color-base) 50%, transparent 50%);
   background-repeat: no-repeat;
-  background-position: right var(--space-small) center;
+  background-size: 6px 6px;
+  background-position:
+    right calc(var(--space-small) + 6px) center,
+    right var(--space-small) center;
   cursor: pointer;
 
   &:focus {

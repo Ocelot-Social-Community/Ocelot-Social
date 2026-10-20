@@ -116,8 +116,8 @@ const STYLE = {
   icons: {
     search: 'var(--chat-text-muted)',
     add: 'var(--color-primary)',
-    toggle: 'var(--color-neutral-30)',
-    menu: 'var(--color-neutral-30)',
+    toggle: 'var(--chat-icon-soft)',
+    menu: 'var(--chat-icon-soft)',
     close: 'var(--chat-text-muted)',
     closeImage: 'var(--chat-on-media-color)',
     file: 'var(--color-primary)',
