@@ -1938,22 +1938,19 @@
     "errorRetry": "Erneut versuchen",
     "errors": {
       "camera": {
-        "busy": "Die Kamera wird von einer anderen Anwendung verwendet.",
-        "denied": "Kamera-Zugriff verweigert. Bitte aktiviere die Berechtigung in den Browser-Einstellungen (Schloss-Symbol in der Adressleiste).",
-        "generic": "Kamera konnte nicht aktiviert werden.",
-        "noDevice": "Keine Kamera gefunden."
+        "unavailable": "Kamera nicht verfügbar."
       },
       "mic": {
-        "busy": "Das Mikrofon wird von einer anderen Anwendung verwendet.",
-        "denied": "Mikrofon-Zugriff verweigert. Bitte aktiviere die Berechtigung in den Browser-Einstellungen (Schloss-Symbol in der Adressleiste).",
-        "generic": "Mikrofon konnte nicht aktiviert werden.",
-        "noDevice": "Kein Mikrofon gefunden."
+        "unavailable": "Mikrofon nicht verfügbar."
+      },
+      "reason": {
+        "busy": "Eine andere Anwendung benutzt es – schließe sie und versuche es erneut.",
+        "denied": "Erlaube den Zugriff im Browser (Schloss in der Adresszeile) und versuche es erneut.",
+        "generic": "Bitte versuche es erneut.",
+        "noDevice": "Kein Gerät gefunden – schließe eins an und versuche es erneut."
       },
       "screen": {
-        "busy": "Bildschirm-Teilen ist gerade nicht möglich.",
-        "denied": "Bildschirm-Teilen wurde verweigert.",
-        "generic": "Bildschirm konnte nicht geteilt werden.",
-        "noDevice": "Kein Bildschirm zum Teilen gefunden."
+        "unavailable": "Bildschirmfreigabe nicht verfügbar."
       }
     },
     "exitFullscreen": "Vollbild beenden",
@@ -1978,10 +1975,6 @@
       "cameraStarting": "Kamera wird gestartet…",
       "cancel": "Abbrechen",
       "description": "Du trittst gleich der Videokonferenz dieser Gruppe bei. Prüfe Kamera, Mikrofon und Lautsprecher, bevor du dem Anruf beitrittst.",
-      "errorBusy": "Das Gerät wird bereits von einer anderen Anwendung verwendet.",
-      "errorDenied": "Zugriff verweigert. Bitte erlaube Kamera- und Mikrofonzugriff in den Browser-Einstellungen.",
-      "errorNoDevice": "Kein passendes Gerät gefunden.",
-      "errorUnknown": "Auf die Geräte konnte nicht zugegriffen werden.",
       "headerTitle": "{name} – Video-Konferenz betreten",
       "hintBoth": "Du trittst ohne Kamera und Mikrofon bei — du wirst nur zuhören und zuschauen.",
       "hintCamera": "Du trittst ohne Kamera bei — andere können dich hören, aber nicht sehen.",

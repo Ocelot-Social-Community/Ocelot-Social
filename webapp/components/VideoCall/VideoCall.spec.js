@@ -294,7 +294,9 @@ describe('VideoCall', () => {
         $toast,
       }
       VideoCall.methods.showDeviceErrorToast.call(ctx, 'mic', { name: 'NotAllowedError' })
-      expect($toast.error).toHaveBeenCalledWith('videoCall.errors.mic.denied')
+      expect($toast.error).toHaveBeenCalledWith(
+        'videoCall.errors.mic.unavailable videoCall.errors.reason.denied',
+      )
     })
 
     it.each([
@@ -307,7 +309,9 @@ describe('VideoCall', () => {
       const $toast = { error: jest.fn() }
       const ctx = { $t: (k) => k, $toast }
       VideoCall.methods.showDeviceErrorToast.call(ctx, 'camera', { name })
-      expect($toast.error).toHaveBeenCalledWith(`videoCall.errors.camera.${key}`)
+      expect($toast.error).toHaveBeenCalledWith(
+        `videoCall.errors.camera.unavailable videoCall.errors.reason.${key}`,
+      )
     })
 
     it('is a no-op when $toast.error is not a function', () => {
@@ -1751,7 +1755,9 @@ describe('VideoCall', () => {
         room.localParticipant.getTrackPublication.mockReturnValue({ track })
         wrapper.setData({ micProblem: true })
         await wrapper.vm.restartMic()
-        expect($toast.error).toHaveBeenCalledWith('videoCall.errors.mic.busy')
+        expect($toast.error).toHaveBeenCalledWith(
+          'videoCall.errors.mic.unavailable videoCall.errors.reason.busy',
+        )
         expect(wrapper.vm.micProblem).toBe(true)
       })
 

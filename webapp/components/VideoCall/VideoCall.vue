@@ -472,6 +472,7 @@
 </template>
 
 <script>
+import { deviceErrorMessage } from './deviceError'
 import { mapGetters, mapMutations } from 'vuex'
 import { OsButton, OsCounterIcon, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
@@ -1912,20 +1913,8 @@ export default {
       this.setParticipantCount(new Set(tiles.map((t) => t.identity)).size)
     },
     showDeviceErrorToast(kind, err) {
-      const name = err && err.name
-      let key
-      if (name === 'NotAllowedError' || name === 'SecurityError') {
-        key = 'denied'
-      } else if (name === 'NotFoundError' || name === 'OverconstrainedError') {
-        key = 'noDevice'
-      } else if (name === 'NotReadableError') {
-        key = 'busy'
-      } else {
-        key = 'generic'
-      }
-      const message = this.$t(`videoCall.errors.${kind}.${key}`)
       if (this.$toast && typeof this.$toast.error === 'function') {
-        this.$toast.error(message)
+        this.$toast.error(deviceErrorMessage(this.$t, kind, err))
       }
     },
     toggleDeviceSettings() {
