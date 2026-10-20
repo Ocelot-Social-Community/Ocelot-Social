@@ -95,8 +95,9 @@
             >
               {{ $t('settings.muted-users.unmute') }}
             </os-button>
+            <!-- Not across a block, in either direction: the backend refuses to follow then. -->
             <os-button
-              v-if="!user.isMuted && !user.isBlocked"
+              v-if="!user.isMuted && !user.blocked"
               data-test="follow-btn"
               :variant="user.followedByCurrentUser && followHovered ? 'danger' : 'primary'"
               :appearance="user.followedByCurrentUser && !followHovered ? 'filled' : 'outline'"

@@ -20,6 +20,7 @@ import { AppError, UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 import { branding } from '@src/branding'
 import {
+  isActiveMembershipRole,
   NONE_ROLE,
   PENDING_ROLE,
   privacyLevelFrom,
@@ -35,6 +36,7 @@ import {
 } from '@src/groupRole/repository'
 
 import {
+  isActiveMembership,
   nonMemberReadsGroup,
   nonMemberReadsMembers,
   visibilityOf,
@@ -236,7 +238,7 @@ export default {
         return await session.readTransaction(async (txc) => {
           const memberCheckResult = await txc.run(
             `MATCH (:User {id: $viewerId})-[m:MEMBER_OF]->(:Group {id: $groupId})
-             WHERE m.role <> 'pending'
+             WHERE ${isActiveMembership('m')}
              RETURN m.role AS role`,
             { viewerId, groupId },
           )
@@ -262,7 +264,7 @@ export default {
               ELSE 3
             END, user.name`
           if (isMember || managesMembers) {
-            const pendingFilter = includePending ? '' : "AND membership.role <> 'pending'"
+            const pendingFilter = includePending ? '' : `AND ${isActiveMembership('membership')}`
             cypher = `
               MATCH (user:User)-[membership:MEMBER_OF]->(:Group {id: $groupId})
               WHERE true ${pendingFilter} ${nameFilterClause}
@@ -286,7 +288,7 @@ export default {
               MATCH (group:Group {id: $groupId})
               ${readsMembersClause}
               MATCH (user:User)-[membership:MEMBER_OF]->(group)
-              WHERE membership.role <> 'pending'
+              WHERE ${isActiveMembership('membership')}
                 AND coalesce(membership.showOnProfile, true) = true
                 ${nameFilterClause}
               RETURN user {.*}, membership {.*}
@@ -695,7 +697,7 @@ export default {
             return { user: record.get('user'), membership: record.get('membership') }
           })
           // Add user to group chat room if they are an active member (not pending)
-          if (records[0]?.membership?.role && records[0].membership.role !== 'pending') {
+          if (records[0]?.membership?.role && isActiveMembershipRole(records[0].membership.role)) {
             await addUserToGroupChatRoom(transaction, groupId, userId)
           }
           return records
@@ -750,7 +752,7 @@ export default {
             return { user: record.get('user'), membership: record.get('membership') }
           })
           // Manage group chat room membership based on role
-          if (roleInGroup !== 'pending') {
+          if (isActiveMembershipRole(roleInGroup)) {
             await addUserToGroupChatRoom(transaction, groupId, userId)
           } else {
             await removeUserFromGroupChatRoom(transaction, groupId, userId)
@@ -811,7 +813,7 @@ export default {
           const result = await transaction.run(
             `
               MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
-              WHERE membership.role <> 'pending'
+              WHERE ${isActiveMembership('membership')}
               SET membership.showOnProfile = $showOnProfile
               SET membership.updatedAt = toString(datetime())
               RETURN membership {.*}
@@ -882,7 +884,7 @@ export default {
           if (isOwnProfile) {
             cypher = `
               MATCH (profileUser:User {id: $profileUserId})-[membership:MEMBER_OF]->(group:Group)
-              WHERE membership.role <> 'pending'
+              WHERE ${isActiveMembership('membership')}
                 AND ($nameFilter = '' OR toLower(group.name) CONTAINS toLower($nameFilter))
               RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
               ORDER BY ${visibilityOf('group')} ASC, group.createdAt DESC
@@ -891,7 +893,7 @@ export default {
           } else {
             cypher = `
               MATCH (profileUser:User {id: $profileUserId})-[membership:MEMBER_OF]->(group:Group)
-              WHERE membership.role <> 'pending'
+              WHERE ${isActiveMembership('membership')}
                 AND coalesce(membership.showOnProfile, true) = true
                 AND ($nameFilter = '' OR toLower(group.name) CONTAINS toLower($nameFilter))
               OPTIONAL MATCH (viewer:User {id: $viewerId})-[viewerMembership:MEMBER_OF]->(group)
@@ -903,12 +905,12 @@ export default {
                   ${visibilityOf('group')} = 'hidden'
                   AND coalesce(profileUser.showHiddenGroupsOnProfile, true) = true
                   AND viewerMembership IS NOT NULL
-                  AND viewerMembership.role <> 'pending'
+                  AND ${isActiveMembership('viewerMembership')}
                 )
               )
               RETURN group {.*, myRole: viewerMembership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
               ORDER BY
-                CASE WHEN viewerMembership IS NOT NULL AND viewerMembership.role <> 'pending' THEN 0 ELSE 1 END ASC,
+                CASE WHEN viewerMembership IS NOT NULL AND ${isActiveMembership('viewerMembership')} THEN 0 ELSE 1 END ASC,
                 group.createdAt DESC
               SKIP toInteger($offset) LIMIT toInteger($first)
             `
@@ -1050,7 +1052,7 @@ export default {
         return await session.readTransaction(async (txc) => {
           const cypher = `
             MATCH (:Group {id: $id})<-[membership:MEMBER_OF]-(:User)
-            WHERE membership.role <> 'pending'
+            WHERE ${isActiveMembership('membership')}
             RETURN COUNT(membership) as count
           `
           const result = await txc.run(cypher, { id: parent.id })

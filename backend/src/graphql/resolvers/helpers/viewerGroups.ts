@@ -1,7 +1,6 @@
 import {
   visibilitiesWithNetworkAuthority,
   parseStoredPermissions,
-  PENDING_ROLE,
   permissionsForGroupRole,
 } from '@src/groupRole'
 
@@ -9,20 +8,6 @@ import { visibilityOf } from './groupAccessCypher'
 
 import type { Context } from '@src/context'
 import type { GroupPermissionKey } from '@src/groupPermission'
-
-/**
- * What counts as an actual membership, as a Cypher condition rather than a list of names.
- *
- * It used to be the list `['usual', 'admin', 'owner']`, repeated in a dozen hand-written Cypher
- * strings. With group-defined roles that list is wrong by construction: a group that renames
- * `usual` would turn its own members into non-members everywhere the literal appears. The
- * question was never "which of these three names" — it is "is this edge a membership or an
- * application", so `role <> 'pending'` answers it for any role name a group invents.
- *
- * `none` needs no mention: it is the absence of the edge, so a viewer without a membership
- * never reaches this condition.
- */
-export const PENDING_GROUP_ROLE = PENDING_ROLE
 
 const MEMBER_READ_SCOPE_QUERY = `
   MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group:Group)

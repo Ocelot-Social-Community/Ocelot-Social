@@ -42,7 +42,10 @@ const environment = {
         .map((name) => name.trim())
         .filter(Boolean) ?? [])
     : [],
-  SEND_MAIL: env.NODE_ENV !== 'test',
+  // Always on outside of `test`, so no env value can silence production. A `test` backend sends
+  // only when SEND_MAIL_IN_TEST says so — the e2e stack does: the notification features read
+  // the mails from maildev.
+  SEND_MAIL: env.NODE_ENV !== 'test' || env.SEND_MAIL_IN_TEST === 'true',
   LOG_LEVEL: 'DEBUG',
   PROXY_S3: env.PROXY_S3,
 }
