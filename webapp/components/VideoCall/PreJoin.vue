@@ -724,7 +724,7 @@ export default {
   flex-direction: column;
   gap: var(--space-small);
   background: var(--background-color-soft);
-  border-left: 1px solid var(--color-neutral-85);
+  border-left: 1px solid var(--border-color-softest);
 }
 
 .prejoin__title {
@@ -748,8 +748,8 @@ export default {
   flex-wrap: wrap;
   justify-content: center;
   padding: var(--space-x-small) 0;
-  border-top: 1px solid var(--color-neutral-85);
-  border-bottom: 1px solid var(--color-neutral-85);
+  border-top: 1px solid var(--border-color-softest);
+  border-bottom: 1px solid var(--border-color-softest);
 }
 
 .prejoin__hint {
@@ -797,7 +797,7 @@ export default {
     max-width: none;
     flex: 1 1 auto;
     border-left: none;
-    border-top: 1px solid var(--color-neutral-85);
+    border-top: 1px solid var(--border-color-softest);
   }
 }
 </style>

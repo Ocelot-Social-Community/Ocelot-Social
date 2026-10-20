@@ -848,7 +848,7 @@ export default {
 .select-label {
   margin-bottom: 0;
   padding-bottom: 4px;
-  color: var(--color-neutral-40);
+  color: var(--text-color-soft);
   font-size: 1rem;
 }
 

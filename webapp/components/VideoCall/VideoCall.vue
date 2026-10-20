@@ -1932,7 +1932,7 @@ export default {
   /*  avatar shrank from base (44px) to small (34px) — matches the chat header. */
   min-height: calc(var(--size-avatar-base) + 2 * var(--space-x-small));
   background: var(--color-header-background);
-  border-bottom: 1px solid var(--color-neutral-85);
+  border-bottom: 1px solid var(--border-color-softest);
   font-weight: var(--text-weight-bold);
   color: var(--text-color-base);
 
@@ -2077,7 +2077,7 @@ export default {
   display: flex;
   flex-direction: column;
   background: var(--background-color-base);
-  border-left: 1px solid var(--color-neutral-85);
+  border-left: 1px solid var(--border-color-softest);
   overflow: hidden;
 }
 
@@ -2154,7 +2154,7 @@ export default {
   gap: var(--space-x-small);
   padding: var(--space-x-small) var(--space-small);
   background: var(--background-color-soft);
-  border-top: 1px solid var(--color-neutral-85);
+  border-top: 1px solid var(--border-color-softest);
   flex-wrap: wrap;
   justify-content: center;
 }
