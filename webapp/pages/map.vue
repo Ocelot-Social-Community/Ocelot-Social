@@ -94,6 +94,7 @@ import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { isEventPast } from '~/utils/eventDate'
 import { isDarkTheme, onThemeChange } from '~/utils/theme'
+import { MAP_STYLES, defaultMapStyleUrl } from '~/constants/mapStyles'
 import { profileUserQuery } from '~/graphql/User'
 import { mapQuery } from '~/graphql/MapQuery'
 import { queryLocations } from '~/graphql/location'
@@ -342,31 +343,13 @@ export default {
       return Number.isFinite(parsed) ? parsed : PAST_EVENT_OPACITY_FALLBACK
     },
     availableStyles() {
-      // https://docs.mapbox.com/api/maps/styles/
-      const availableStyles = {
-        outdoors: {
-          url: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
-        },
-        streets: {
-          url: 'mapbox://styles/mapbox/streets-v11?optimize=true',
-          // use the newest version?
-          // url: 'mapbox://styles/mapbox/streets-v12',
-        },
-        satellite: {
-          url: 'mapbox://styles/mapbox/satellite-streets-v11?optimize=true',
-        },
-        dark: {
-          url: 'mapbox://styles/mapbox/dark-v10?optimize=true',
-        },
-      }
-      Object.keys(availableStyles).forEach((key) => {
-        availableStyles[key].title = this.$t('map.styles.' + key)
-      })
-      return availableStyles
+      return Object.fromEntries(
+        MAP_STYLES.map(({ id, url }) => [id, { url, title: this.$t('map.styles.' + id) }]),
+      )
     },
     // A dark page opens on the dark tiles; a style the user picked always wins.
     defaultStyleUrl() {
-      return this.dark ? this.availableStyles.dark.url : this.availableStyles.outdoors.url
+      return defaultMapStyleUrl(this.dark)
     },
     mapOptions() {
       return {
@@ -1727,7 +1710,6 @@ export default {
     width: 29px;
     height: 29px;
     min-width: 29px;
-    background-color: var(--map-control-background);
     border-radius: var(--border-radius-x-large);
     box-shadow: 0 0 0 2px var(--shadow-color);
     overflow: hidden;
@@ -1860,13 +1842,16 @@ export default {
   }
 }
 
-.map-event-pin-tool {
+/* The page's own map controls (event pin tool, style switcher) share one chrome. */
+.map-event-pin-tool,
+.map-style-switcher {
   background: var(--map-control-background);
   border-radius: var(--border-radius-x-large);
   box-shadow: 0 0 0 2px var(--shadow-color);
 }
 
-.map-event-pin-tool-toggle {
+.map-event-pin-tool-toggle,
+.map-style-switcher-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1893,9 +1878,6 @@ export default {
 
 .map-style-switcher {
   position: relative;
-  background: var(--map-control-background);
-  border-radius: var(--border-radius-x-large);
-  box-shadow: 0 0 0 2px var(--shadow-color);
   /* Mapbox gives every top-level control (.mapboxgl-ctrl, including this one
      and the scale control) `transform: translate(0)`, which makes each its
      own stacking context. That containment means a z-index set on a

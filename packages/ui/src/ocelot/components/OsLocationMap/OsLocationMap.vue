@@ -1056,72 +1056,18 @@
     outline-offset: -2px;
   }
 
-  .os-location-map-picker {
-    background: var(--map-control-background, white);
-    border-radius: 4px;
-    box-shadow: 0 0 0 2px var(--shadow-color, rgba(0, 0, 0, 0.1));
-  }
-
-  .os-location-map-picker-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 29px;
-    height: 29px;
-    padding: 0;
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: var(--text-color-strong, #333);
-  }
-
-  .os-location-map-picker-toggle:hover {
-    background: var(--background-color-hover, rgba(0, 0, 0, 0.05));
-  }
-
-  .os-location-map-picker-toggle--active {
-    background: var(--background-color-pressed, rgba(0, 0, 0, 0.1));
-    /* Deliberately not --color-primary — that's the app's brand accent
-       (green in this app), which reads as a totally different, unrelated
-       signal here. This is the shared "map tool" accent blue, its own
-       overridable custom property (also used by the view-on-map button
-       below). */
-    color: var(--os-location-map-accent-color, rgb(0, 142, 230));
-  }
-
-  .os-location-map-view-on-map {
-    background: var(--map-control-background, white);
-    border-radius: 4px;
-    box-shadow: 0 0 0 2px var(--shadow-color, rgba(0, 0, 0, 0.1));
-  }
-
-  .os-location-map-view-on-map-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 29px;
-    height: 29px;
-    padding: 0;
-    border: none;
-    background: none;
-    cursor: pointer;
-    /* Neutral, same as the picker toggle's own resting state — this button
-       has no armed/active state of its own (it's a one-shot action, not a
-       toggle), so it shouldn't wear the "tool is active" accent color. */
-    color: var(--text-color-strong, #333);
-  }
-
-  .os-location-map-view-on-map-toggle:hover {
-    background: var(--background-color-hover, rgba(0, 0, 0, 0.05));
-  }
-
+  /* The three tool controls (pick location, view on map, style switcher) share one chrome. */
+  .os-location-map-picker,
+  .os-location-map-view-on-map,
   .os-location-map-style-switcher {
-    position: relative;
     background: var(--map-control-background, white);
     border-radius: 4px;
     box-shadow: 0 0 0 2px var(--shadow-color, rgba(0, 0, 0, 0.1));
   }
 
+  /* view-on-map stays neutral too: a one-shot action has no armed state, so no accent. */
+  .os-location-map-picker-toggle,
+  .os-location-map-view-on-map-toggle,
   .os-location-map-style-switcher-toggle {
     display: flex;
     align-items: center;
@@ -1135,8 +1081,24 @@
     color: var(--text-color-strong, #333);
   }
 
+  .os-location-map-picker-toggle:hover,
+  .os-location-map-view-on-map-toggle:hover,
   .os-location-map-style-switcher-toggle:hover {
     background: var(--background-color-hover, rgba(0, 0, 0, 0.05));
+  }
+
+  .os-location-map-picker-toggle--active {
+    background: var(--background-color-pressed, rgba(0, 0, 0, 0.1));
+    /* Deliberately not --color-primary — that's the app's brand accent
+       (green in this app), which reads as a totally different, unrelated
+       signal here. This is the shared "map tool" accent blue, its own
+       overridable custom property (also used by the view-on-map button
+       below). */
+    color: var(--os-location-map-accent-color, rgb(0, 142, 230));
+  }
+
+  .os-location-map-style-switcher {
+    position: relative;
   }
 
   .os-location-map-style-popover {
