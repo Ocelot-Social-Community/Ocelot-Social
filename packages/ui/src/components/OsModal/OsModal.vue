@@ -239,7 +239,7 @@
           headerChildren.push(
             h('div', {
               class:
-                'absolute bottom-0 left-0 w-[calc(100%-10px)] h-[30px] translate-y-full bg-gradient-to-b from-white to-transparent pointer-events-none z-10',
+                'absolute bottom-0 left-0 w-[calc(100%-10px)] h-[30px] translate-y-full bg-gradient-to-b from-[var(--background-color-base,white)] to-transparent pointer-events-none z-10',
             }),
           )
         }
@@ -330,7 +330,7 @@
           'footer',
           {
             class:
-              'os-modal__footer bg-[#f5f5f5] px-3 py-3 flex justify-end gap-2 rounded-b-lg shadow-[0_-20px_15px_-10px_rgba(255,255,255,0.9)]',
+              'os-modal__footer bg-[var(--background-color-softer,#f5f5f5)] px-3 py-3 flex justify-end gap-2 rounded-b-lg shadow-[0_-20px_15px_-10px_var(--background-color-base,rgba(255,255,255,0.9))]',
           },
           footerContent,
         )
