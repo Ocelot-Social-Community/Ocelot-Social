@@ -38,6 +38,7 @@ const { default: markAllAsRead } = await import('@graphql/queries/notifications/
 const { default: notifications } = await import('@graphql/queries/notifications/notifications.gql')
 const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
 const { createApolloTestSetup } = await import('@root/test/helpers')
+const { liveNotification } = await import('@root/test/liveNotification')
 
 let authenticatedUser: Context['user']
 const policy = { categoriesActive: false }
@@ -276,6 +277,20 @@ describe('notify group members of new posts in group', () => {
           ],
         },
         errors: undefined,
+      })
+    })
+
+    // The same notification is published to the member's socket: it has to resolve there too.
+    it('delivers the notification live as a post', async () => {
+      const [[notification]] = vi.mocked(sendNotificationMailMock).mock.calls
+
+      await expect(liveNotification(notification)).resolves.toEqual({
+        data: {
+          notificationAdded: {
+            reason: 'post_in_group',
+            from: { __typename: 'Post', id: 'post' },
+          },
+        },
       })
     })
 
