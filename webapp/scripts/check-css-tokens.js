@@ -25,13 +25,13 @@ const { readFileSync, readdirSync, statSync } = require('fs')
 const { join, relative } = require('path')
 
 const ROOT = join(__dirname, '..')
-const TOKEN_DIR = join(ROOT, 'assets/css')
 
 /** Every `--token: value` pair declared in assets/css, comments stripped. */
-function readTokens() {
+function readTokens(root = ROOT) {
+  const tokenDir = join(root, 'assets/css')
   const tokens = {}
-  for (const file of readdirSync(TOKEN_DIR).filter((f) => f.endsWith('.css'))) {
-    const src = readFileSync(join(TOKEN_DIR, file), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+  for (const file of readdirSync(tokenDir).filter((f) => f.endsWith('.css'))) {
+    const src = readFileSync(join(tokenDir, file), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
     for (const [, name, value] of src.matchAll(/^\s*--([a-z0-9-]+)\s*:\s*([^;]+);/gm)) {
       tokens[name] = value.trim().replace(/\s+/g, ' ')
     }
@@ -63,6 +63,20 @@ function toRgb(raw) {
   return rgb ? `${rgb[1]},${rgb[2]},${rgb[3]}` : null
 }
 
+/** What a colour can hide in: components, global stylesheets, and JS handing values to libraries. */
+const SOURCE = /\.(vue|js|ts|css)$/
+
+/**
+ * Where the neutral scale is allowed to be read: the files that BUILD the roles on it. Everywhere
+ * else a step is a value standing in for a role — in a <style>, a template's inline style, or a JS
+ * string handed to a library (the chat palette was the last one, in constants/ only by accident).
+ */
+const TOKEN_FILES = [
+  'assets/css/root-tokens.css',
+  'assets/css/theme-dark.css',
+  'assets/css/ocelot-ui-variables.css',
+]
+
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir)) {
     if (entry === 'node_modules' || entry === '.nuxt' || entry === 'coverage' || entry === 'dist') {
@@ -70,7 +84,7 @@ function walk(dir, out = []) {
     }
     const full = join(dir, entry)
     if (statSync(full).isDirectory()) walk(full, out)
-    else if (entry.endsWith('.vue')) out.push(full)
+    else if (SOURCE.test(entry) && !/\.(spec|test)\.[jt]s$/.test(entry)) out.push(full)
   }
   return out
 }
@@ -133,11 +147,40 @@ function checkNeutral(text, rel) {
   )
 }
 
-/** Both rules, over one file's source. `untokenised` counts literals that have no token to suggest. */
+/**
+ * The colours an SVG `data:` URI spells out — `%23`-encoded or raw hex, `rgb()`. A data URI is its own
+ * document: no custom property, no theme reaches into it, so a fill there stays the same in light and
+ * dark (the AreaMenu chevron was `%234b4554`, dark grey on a dark select). Colours spliced in at runtime
+ * (`${fill}`) are the cure, not the problem, and are not matched.
+ */
+function checkDataUris(src, rel) {
+  const errors = []
+  for (const match of src.matchAll(/data:image\/svg\+xml[,;]/g)) {
+    // The URI runs to the delimiter that opened it — the quote before `data:`, or `)` for a bare url().
+    const opener = src[match.index - 1]
+    const closer = { '"': '"', "'": "'", '`': '`', '(': ')' }[opener]
+    const end = closer ? src.indexOf(closer, match.index) : -1
+    const uri = src.slice(match.index, end === -1 ? undefined : end)
+    for (const [raw] of uri.matchAll(/(?:%23|#)[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)/g)) {
+      errors.push(
+        `${rel}: ${raw.replace(/^%23/, '#')} in a data: URI — a data: URI is its own document, no theme reaches it`,
+      )
+    }
+  }
+  return errors
+}
+
+/**
+ * All rules, over one file's source. `rel` decides how it is read: a .css file is one style body, a
+ * .vue file contributes its plain-CSS <style> blocks, JS has none. The neutral and data-URI rules read
+ * the WHOLE file — a colour in a script or an inline style is read by the browser all the same.
+ * `untokenised` counts literals that have no token to suggest.
+ */
 function checkSource(src, byRgb, rel) {
   const errors = []
   let untokenised = 0
-  for (const body of styleBodies(src)) {
+  const bodies = rel.endsWith('.css') ? [src] : rel.endsWith('.vue') ? styleBodies(src) : []
+  for (const body of bodies) {
     for (const { prop, value } of declarations(body)) {
       if (prop.startsWith('white-space')) continue
 
@@ -145,9 +188,6 @@ function checkSource(src, byRgb, rel) {
         errors.push(`${rel}: $${name} — SCSS variable in a plain CSS block, resolves to nothing`)
       }
       if (prop.startsWith('--')) continue // declaring a token is allowed to use a literal
-      // The neutral scale names values, not roles: neutral-100 was background here and text there,
-      // which is why a dark theme cannot simply invert it. Components read a role token instead.
-      errors.push(...checkNeutral(value, rel))
       for (const [raw] of value.matchAll(COLOUR)) {
         const rgb = toRgb(raw)
         if (!rgb) continue
@@ -156,26 +196,27 @@ function checkSource(src, byRgb, rel) {
       }
     }
   }
+  if (!TOKEN_FILES.includes(rel)) errors.push(...checkNeutral(src, rel))
+  errors.push(...checkDataUris(src, rel))
+  return { errors, untokenised }
+}
+
+/** Every problem under `root` — the whole check, without the reporting. */
+function findProblems(root) {
+  const byRgb = indexByRgb(readTokens(root))
+  const errors = []
+  let untokenised = 0
+
+  for (const file of walk(root)) {
+    const result = checkSource(readFileSync(file, 'utf8'), byRgb, relative(root, file))
+    errors.push(...result.errors)
+    untokenised += result.untokenised
+  }
   return { errors, untokenised }
 }
 
 function main() {
-  const byRgb = indexByRgb(readTokens())
-  const errors = []
-  let untokenised = 0
-
-  for (const file of walk(ROOT)) {
-    const result = checkSource(readFileSync(file, 'utf8'), byRgb, relative(ROOT, file))
-    errors.push(...result.errors)
-    untokenised += result.untokenised
-  }
-  // Colours handed to libraries as JS values (the chat palette) are read by components too.
-  const CONSTANTS = join(ROOT, 'constants')
-  for (const file of readdirSync(CONSTANTS).filter(
-    (f) => f.endsWith('.js') && !f.endsWith('.spec.js'),
-  )) {
-    errors.push(...checkNeutral(readFileSync(join(CONSTANTS, file), 'utf8'), `constants/${file}`))
-  }
+  const { errors, untokenised } = findProblems(ROOT)
 
   if (errors.length) {
     console.error(`✖ ${errors.length} problem(s):\n`)
@@ -203,4 +244,6 @@ module.exports = {
   styleBodies,
   checkSource,
   checkNeutral,
+  checkDataUris,
+  findProblems,
 }

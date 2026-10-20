@@ -63,11 +63,11 @@ blockquote {
   /*Font*/
   font-size: var(--font-size-base);
   line-height: 1.2;
-  color: var(--color-neutral-40);
+  color: var(--text-color-soft);
   font-family: var(--font-family-serif);
   font-style: italic;
 
-  border-left: 3px dotted var(--color-neutral-70);
+  border-left: 3px dotted var(--border-color-soft);
 
   &::before {
     content: '\201C';
@@ -76,7 +76,7 @@ blockquote {
     /*Font*/
     font-size: var(--font-size-xxxx-large);
     font-weight: bold;
-    color: var(--color-neutral-50);
+    color: var(--text-color-muted);
 
     /*Positioning*/
     position: absolute;
@@ -102,8 +102,8 @@ blockquote {
 hr {
   border: 0;
   width: 100%;
-  color: var(--color-neutral-80);
-  background-color: var(--color-neutral-80);
+  color: var(--border-color-softer);
+  background-color: var(--border-color-softer);
   height: 1px !important;
 }
 
