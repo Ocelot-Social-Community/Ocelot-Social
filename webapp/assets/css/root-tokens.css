@@ -78,6 +78,8 @@
   --text-color-warning: var(--color-warning);
   --text-color-danger: var(--color-danger);
   --text-color-danger-inverse: var(--color-danger-inverse);
+  /* Icon and control text on light surfaces (map controls) — darker than --text-color-base. */
+  --text-color-strong: rgb(51, 51, 51);
   /**
  * @tokens Color Background
  * @presenter Color
@@ -94,6 +96,18 @@
   --background-color-primary: var(--color-primary);
   --background-color-primary-inverse: var(--color-primary-inverse);
   --background-color-warning: var(--color-warning);
+  /* State layers laid over whatever surface is below — hover, pressed, selected. */
+  --background-color-hover: rgba(0, 0, 0, 0.05);
+  --background-color-pressed: rgba(0, 0, 0, 0.1);
+  --background-color-selected: rgba(0, 0, 0, 0.08);
+  /* A filled surface one step below --background-color-softest, and the hover of a softer surface. */
+  --background-color-muted: var(--color-neutral-80);
+  --background-color-softer-hover: rgb(224, 224, 224);
+  /* Dims the page under an open menu. */
+  --background-color-overlay: rgba(0, 0, 0, 0.15);
+  /* See-through panels over a map. */
+  --background-color-translucent: rgba(255, 255, 255, 0.75);
+  --background-color-translucent-soft: rgba(255, 255, 255, 0.5);
   /**
  * @tokens Color Border
  * @presenter Color
@@ -102,6 +116,8 @@
   --border-color-base: var(--color-neutral-60);
   --border-color-soft: var(--color-neutral-70);
   --border-color-softer: var(--color-neutral-80);
+  --border-color-softest: var(--color-neutral-85);
+  --border-color-strong: var(--color-neutral-20);
   --border-color-active: var(--color-primary);
   --border-color-danger: var(--color-danger);
   /**
@@ -277,6 +293,13 @@
   --box-shadow-x-large: 0 15px 30px 0 rgba(0, 0, 0, 0.11), 0 5px 15px 0 rgba(0, 0, 0, 0.08);
   --box-shadow-large: 0 10px 20px 0 rgba(0, 0, 0, 0.11), 0 3px 10px 0 rgba(0, 0, 0, 0.08);
   --box-shadow-base: 0px 12px 26px -4px rgba(0, 0, 0, 0.1);
+  /* The colour alone, for shadows that carry their own geometry. */
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-color-strong: rgba(0, 0, 0, 0.3);
+  --shadow-color-raised: rgb(189, 189, 189);
+  --scrollbar-thumb-color: rgba(0, 0, 0, 0.25);
+  /* Fill of the monochrome logo SVG. */
+  --color-logo: rgb(0, 0, 0);
   /**
  * @tokens Effects
  */
@@ -343,9 +366,6 @@
   --color-donation-bar: var(--color-primary);
 
   --color-donation-bar-light: var(--color-primary-light);
-  /* The empty rest of the donation bar (ProgressBar.vue): two stripes, the label sits on top of them. */
-  --color-donation-bar-goal: var(--color-neutral-80);
-  --color-donation-bar-goal-stripe: var(--color-neutral-70);
   /**
  * @tokens Toast Color
  */
@@ -398,6 +418,9 @@
   --chat-room-color-username: var(--text-color-base);
 
   --chat-message-color: var(--text-color-base);
+  /* The docked chat window (layouts/default.vue .chat-modul) and its close link. */
+  --chat-module-background: rgb(233, 228, 228);
+  --chat-module-close-color: blue;
   --chat-message-bg-others: var(--color-neutral-80);
   --chat-sidemenu-bg: var(--color-neutral-100);
   /* The hover partner of --chat-sidemenu-bg. Carried over as a literal because the SCSS side had it
@@ -413,12 +436,15 @@
  * @presenter Color
  */
 
-  /* Same colors as pages/map.vue's marker legend (markers.types). Not yet consumed there itself —
-     that page still keys its GeoJSON icons by hardcoded hex — but defined here as the single source
-     so other map/location UI (e.g. LocationPickerMap's pin) can share it, and so it stays overridable
-     by a brand like every other token here. */
+  /* The single source of the marker colours: pages/map.vue's legend reads them, LocationPickerMap's
+     pin resolves them. The GeoJSON icons on pages/map.vue are still PNGs in these colours. */
   --color-map-marker-current-user: rgb(247, 150, 64);
   --color-map-marker-user: rgb(51, 195, 119);
   --color-map-marker-group: rgb(248, 77, 77);
   --color-map-marker-event: rgb(119, 83, 235);
+  /* Under the tiles while they load, and the controls drawn over the map (mapbox-gl's own and ours). */
+  --map-background: rgb(229, 229, 229);
+  --map-control-background: var(--background-color-base);
+  /* mapbox-gl ships its control icons as dark SVG data URIs — only a filter can lighten them. */
+  --map-control-icon-filter: none;
 }

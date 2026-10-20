@@ -68,8 +68,8 @@ export default {
   border: 1px solid var(--color-primary);
   background: repeating-linear-gradient(
     120deg,
-    var(--color-donation-bar-goal),
-    var(--color-donation-bar-goal-stripe)
+    var(--background-color-muted),
+    var(--border-color-soft)
   );
   border-radius: var(--border-radius-base);
 }

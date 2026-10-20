@@ -110,7 +110,7 @@ export default {
   height: 100%;
   top: 0;
   left: 0;
-  background-color: var(--color-neutral-100);
+  background-color: var(--background-color-base);
   opacity: 1;
   z-index: var(--z-index-modal);
   border-radius: var(--border-radius-x-large);

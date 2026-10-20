@@ -431,7 +431,7 @@
             toggle.innerHTML =
               '<svg viewBox="0 0 20 30.5" width="16" height="24" aria-hidden="true">' +
               '<path d="M19.25,10.4a13.0663,13.0663,0,0,1-1.4607,5.2235,41.5281,41.5281,0,0,1-3.2459,5.5483c-1.1829,1.7369-2.3662,3.2784-3.2541,4.3859-.4438.5536-.8135.9984-1.0721,1.3046-.0844.1-.157.1852-.2164.2545-.06-.07-.1325-.1564-.2173-.2578-.2587-.3088-.6284-.7571-1.0723-1.3147-.8879-1.1154-2.0714-2.6664-3.2543-4.41a42.2677,42.2677,0,0,1-3.2463-5.5535A12.978,12.978,0,0,1,.75,10.4,9.4659,9.4659,0,0,1,10,.75,9.4659,9.4659,0,0,1,19.25,10.4Z" fill="currentColor"/>' +
-              '<path d="M13.55,10A3.55,3.55,0,1,1,10,6.45,3.5484,3.5484,0,0,1,13.55,10Z" fill="#fff"/>' +
+              '<path d="M13.55,10A3.55,3.55,0,1,1,10,6.45,3.5484,3.5484,0,0,1,13.55,10Z" style="fill: var(--map-control-background, #fff)"/>' +
               '</svg>'
             toggle.addEventListener('click', (e) => {
               e.stopPropagation()
@@ -932,7 +932,7 @@
     width: 100%;
     height: 100%;
     min-height: 200px;
-    background: #e5e5e5;
+    background: var(--map-background, #e5e5e5);
     border-radius: 4px;
     /* No overflow:hidden here — it would clip overlaid UI that intentionally
        extends past the map bounds, e.g. the style-switcher popover below. */
@@ -956,9 +956,9 @@
     right: 46px;
     z-index: 1;
     max-width: 320px;
-    background: white;
+    background: var(--map-control-background, white);
     border-radius: 4px;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 0 2px var(--shadow-color, rgba(0, 0, 0, 0.1));
   }
 
   .os-location-map__search-toggle {
@@ -974,14 +974,14 @@
     padding: 0;
     border: none;
     border-radius: 4px;
-    background: white;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    background: var(--map-control-background, white);
+    box-shadow: 0 0 0 2px var(--shadow-color, rgba(0, 0, 0, 0.1));
     cursor: pointer;
-    color: #333;
+    color: var(--text-color-strong, #333);
   }
 
   .os-location-map__search-toggle:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--background-color-hover, rgba(0, 0, 0, 0.05));
   }
 
   .os-location-map__search-input {
@@ -1019,7 +1019,7 @@
     padding: 4px 0;
     max-height: 220px;
     overflow-y: auto;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border-color-softest, #eee);
   }
 
   .os-location-map__search-result {
@@ -1034,7 +1034,7 @@
   }
 
   .os-location-map__search-result:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--background-color-hover, rgba(0, 0, 0, 0.05));
   }
 
   .os-location-map__search-result:focus-visible {
@@ -1043,9 +1043,9 @@
   }
 
   .os-location-map-picker {
-    background: white;
+    background: var(--map-control-background, white);
     border-radius: 4px;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 0 2px var(--shadow-color, rgba(0, 0, 0, 0.1));
   }
 
   .os-location-map-picker-toggle {
@@ -1058,15 +1058,15 @@
     border: none;
     background: none;
     cursor: pointer;
-    color: #333;
+    color: var(--text-color-strong, #333);
   }
 
   .os-location-map-picker-toggle:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--background-color-hover, rgba(0, 0, 0, 0.05));
   }
 
   .os-location-map-picker-toggle--active {
-    background: rgba(0, 0, 0, 0.1);
+    background: var(--background-color-pressed, rgba(0, 0, 0, 0.1));
     /* Deliberately not --color-primary — that's the app's brand accent
        (green in this app), which reads as a totally different, unrelated
        signal here. This is the shared "map tool" accent blue, its own
@@ -1076,9 +1076,9 @@
   }
 
   .os-location-map-view-on-map {
-    background: white;
+    background: var(--map-control-background, white);
     border-radius: 4px;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 0 2px var(--shadow-color, rgba(0, 0, 0, 0.1));
   }
 
   .os-location-map-view-on-map-toggle {
@@ -1094,18 +1094,18 @@
     /* Neutral, same as the picker toggle's own resting state — this button
        has no armed/active state of its own (it's a one-shot action, not a
        toggle), so it shouldn't wear the "tool is active" accent color. */
-    color: #333;
+    color: var(--text-color-strong, #333);
   }
 
   .os-location-map-view-on-map-toggle:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--background-color-hover, rgba(0, 0, 0, 0.05));
   }
 
   .os-location-map-style-switcher {
     position: relative;
-    background: white;
+    background: var(--map-control-background, white);
     border-radius: 4px;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 0 2px var(--shadow-color, rgba(0, 0, 0, 0.1));
   }
 
   .os-location-map-style-switcher-toggle {
@@ -1118,20 +1118,20 @@
     border: none;
     background: none;
     cursor: pointer;
-    color: #333;
+    color: var(--text-color-strong, #333);
   }
 
   .os-location-map-style-switcher-toggle:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--background-color-hover, rgba(0, 0, 0, 0.05));
   }
 
   .os-location-map-style-popover {
     display: none;
     /* top/left/transform are set inline in JS from the toggle's own rect. */
     position: fixed;
-    background: white;
+    background: var(--map-control-background, white);
     border-radius: 4px;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 4px var(--shadow-color-strong, rgba(0, 0, 0, 0.3));
     white-space: nowrap;
     overflow: hidden;
     z-index: 10000;
@@ -1153,15 +1153,15 @@
   }
 
   .os-location-map-style-popover-btn:not(:last-child) {
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color-softest, #eee);
   }
 
   .os-location-map-style-popover-btn:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--background-color-hover, rgba(0, 0, 0, 0.05));
   }
 
   .os-location-map-style-popover-btn--active {
     font-weight: bold;
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--background-color-selected, rgba(0, 0, 0, 0.08));
   }
 </style>

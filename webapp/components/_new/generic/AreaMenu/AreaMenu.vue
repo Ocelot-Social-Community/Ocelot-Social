@@ -84,9 +84,9 @@ export default {
   margin-bottom: var(--space-small);
   padding: var(--space-x-small) var(--space-large) var(--space-x-small) var(--space-small);
   font-size: var(--font-size-base);
-  border: 1px solid var(--color-neutral-80);
+  border: 1px solid var(--border-color-softer);
   border-radius: var(--border-radius-base);
-  background-color: var(--color-neutral-100);
+  background-color: var(--background-color-base);
   color: var(--text-color-base);
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234b4554' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");

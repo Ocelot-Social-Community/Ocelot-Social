@@ -1,0 +1,74 @@
+/**
+ * mapbox-gl's and the geocoder's own control chrome, read from the semantic tokens.
+ *
+ * Both libraries ship literal whites and #333 in their stylesheets (mapbox-gl.css, mapbox-gl-geocoder.css),
+ * so every map in the app — pages/map.vue and every LocationPickerMap — stayed light in the dark theme.
+ * Each light token value is exactly the literal it replaces here, so the light theme does not move.
+ * Global on purpose: the controls are created by the library, outside any component's scope.
+ * `:root` lifts each rule one step above the library's own, which components @import after this file.
+ */
+
+:root .mapboxgl-ctrl-group,
+:root .mapboxgl-popup-content,
+:root .mapboxgl-ctrl-geocoder,
+:root .mapboxgl-ctrl-geocoder .suggestions,
+:root .mapboxgl-ctrl-geocoder--button,
+:root .mapboxgl-ctrl-attrib.mapboxgl-compact {
+  background-color: var(--map-control-background);
+}
+
+:root .mapboxgl-popup-content {
+  color: var(--text-color-base);
+}
+
+:root .mapboxgl-ctrl-group button + button {
+  border-top-color: var(--border-color-softer);
+}
+
+/* The control icons are dark SVG data URIs — a filter is the only lever. */
+:root .mapboxgl-ctrl button .mapboxgl-ctrl-icon,
+:root .mapboxgl-ctrl-attrib-button {
+  filter: var(--map-control-icon-filter);
+}
+
+:root .mapboxgl-ctrl.mapboxgl-ctrl-scale {
+  background-color: var(--background-color-translucent);
+  border-color: var(--text-color-strong);
+  color: var(--text-color-strong);
+}
+
+:root .mapboxgl-ctrl.mapboxgl-ctrl-attrib {
+  background-color: var(--background-color-translucent-soft);
+}
+
+:root .mapboxgl-ctrl-attrib a,
+:root .mapboxgl-ctrl-geocoder--input,
+:root .mapboxgl-ctrl-geocoder .suggestions > li > a {
+  color: var(--text-color-base);
+}
+
+:root .mapboxgl-ctrl-geocoder .suggestions > .active > a,
+:root .mapboxgl-ctrl-geocoder .suggestions > li > a:hover {
+  color: var(--text-color-base);
+  background-color: var(--background-color-hover);
+}
+
+:root .mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
+:root .mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip,
+:root .mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
+  border-bottom-color: var(--map-control-background);
+}
+
+:root .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
+:root .mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip,
+:root .mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
+  border-top-color: var(--map-control-background);
+}
+
+:root .mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+  border-right-color: var(--map-control-background);
+}
+
+:root .mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+  border-left-color: var(--map-control-background);
+}

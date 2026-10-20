@@ -185,8 +185,8 @@ export default {
   margin: var(--space-small) auto;
   overflow: hidden;
   border-radius: var(--border-radius-base);
-  border: 1px solid var(--color-neutral-70);
-  background-color: var(--color-neutral-90);
+  border: 1px solid var(--border-color-soft);
+  background-color: var(--background-color-softer);
 
   > .content {
     width: 100%;
@@ -243,7 +243,7 @@ export default {
     right: 0;
 
     padding: var(--space-large);
-    background-color: var(--color-neutral-100);
+    background-color: var(--background-color-base);
 
     > .buttons {
       button {

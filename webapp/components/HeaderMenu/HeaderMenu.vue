@@ -914,7 +914,7 @@ export default {
     flex-direction: column;
     height: calc(100dvh - 20px);
     margin: 0 -10px; /*  extend to screen edge */
-    background-color: var(--color-neutral-100);
+    background-color: var(--background-color-base);
 
     > .mobile-header-row {
       flex: 0 0 auto;
@@ -1015,7 +1015,7 @@ export default {
 
     &.mobile-logout-item {
       color: var(--text-color-danger);
-      border-top: 1px solid var(--color-neutral-90);
+      border-top: 1px solid var(--background-color-softer);
       padding-top: 4px;
       margin-top: 2px;
 
@@ -1076,7 +1076,7 @@ export default {
 
   .mobile-user-info {
     padding: 6px 0;
-    border-bottom: 1px solid var(--color-neutral-90);
+    border-bottom: 1px solid var(--background-color-softer);
   }
 
   .mobile-avatar.avatar-image {
@@ -1119,8 +1119,8 @@ export default {
     padding: 4px 0 0 0;
 
     hr {
-      color: var(--color-neutral-90);
-      background-color: var(--color-neutral-90);
+      color: var(--background-color-softer);
+      background-color: var(--background-color-softer);
       margin: 2px 0;
     }
   }
@@ -1160,7 +1160,7 @@ export default {
 
   .mobile-more-section {
     padding: 2px 0;
-    border-top: 1px solid var(--color-neutral-90);
+    border-top: 1px solid var(--background-color-softer);
   }
 
   .mobile-more-header {
@@ -1181,8 +1181,8 @@ export default {
     padding: 0;
 
     hr {
-      color: var(--color-neutral-90);
-      background-color: var(--color-neutral-90);
+      color: var(--background-color-softer);
+      background-color: var(--background-color-softer);
       margin: 2px 0;
     }
   }

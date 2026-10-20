@@ -13,3 +13,11 @@ export const themeFromCookieHeader = (header) => {
 export const applyTheme = (theme, doc = document) => {
   doc.documentElement.setAttribute('data-theme', normalizeTheme(theme))
 }
+
+// Whether the page is dark right now — the explicit choice on <html data-theme>, else the system's.
+// For code that needs the answer itself (a map style URL), where CSS alone cannot follow the theme.
+export const isDarkTheme = (doc = document, win = window) => {
+  const theme = normalizeTheme(doc.documentElement.getAttribute('data-theme'))
+  if (theme !== 'system') return theme === 'dark'
+  return Boolean(win.matchMedia && win.matchMedia('(prefers-color-scheme: dark)').matches)
+}

@@ -380,7 +380,7 @@ export default {
 }
 
 .detail-cell {
-  background-color: var(--color-neutral-90);
+  background-color: var(--background-color-softer);
   padding: var(--space-small);
 }
 

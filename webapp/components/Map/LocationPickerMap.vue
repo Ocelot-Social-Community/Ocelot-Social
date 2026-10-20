@@ -31,6 +31,7 @@ import mapboxgl from 'mapbox-gl'
 import { OsLocationMap } from '@ocelot-social/ui/ocelot'
 import Empty from '~/components/Empty/Empty'
 import { queryLocations } from '~/graphql/location'
+import { isDarkTheme } from '~/utils/theme'
 
 // Default for the "types" prop — precise enough for an event's exact pin.
 // Callers wanting coarser results (e.g. groups) pass their own "types" prop.
@@ -41,6 +42,7 @@ const REVERSE_GEOCODE_TYPES = 'address,poi,place'
 // this value against each entry's url, so a mismatch (e.g. a missing/extra
 // query param) leaves none of them highlighted until the user clicks one.
 const OUTDOORS_STYLE_URL = 'mapbox://styles/mapbox/outdoors-v12?optimize=true'
+const DARK_STYLE_URL = 'mapbox://styles/mapbox/dark-v10?optimize=true'
 
 // Mirrors the matching --color-map-marker-* custom properties in
 // root-tokens.css, used only if they can't be read yet (e.g. before the
@@ -180,8 +182,9 @@ export default {
         typeof this.location.lng === 'number'
       )
     },
+    // A dark page opens on the dark tiles.
     defaultStyleUrl() {
-      return OUTDOORS_STYLE_URL
+      return typeof window !== 'undefined' && isDarkTheme() ? DARK_STYLE_URL : OUTDOORS_STYLE_URL
     },
     // Same color as the matching markers on pages/map.vue — read from the
     // shared CSS token (markerColorToken, root-tokens.css) at runtime rather
@@ -216,7 +219,7 @@ export default {
         },
         {
           id: 'dark',
-          url: 'mapbox://styles/mapbox/dark-v10?optimize=true',
+          url: DARK_STYLE_URL,
           label: this.$t('map.styles.dark'),
         },
       ]

@@ -197,7 +197,7 @@ export default {
   &.is-selected,
   &:hover {
     /*  color-mix, not rgba(): var(--color-neutral-100) is a var() and Sass cannot decompose one. */
-    background-color: color-mix(in srgb, var(--color-neutral-100) 30%, transparent);
+    background-color: color-mix(in srgb, var(--background-color-base) 30%, transparent);
   }
 
   &.hint {
