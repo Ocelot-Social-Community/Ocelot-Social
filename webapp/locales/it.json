@@ -1938,22 +1938,19 @@
     "errorRetry": "Riprova",
     "errors": {
       "camera": {
-        "busy": "La fotocamera è in uso da un'altra applicazione.",
-        "denied": "Accesso alla fotocamera negato. Abilita l'autorizzazione nelle impostazioni del browser (icona del lucchetto nella barra degli indirizzi).",
-        "generic": "Impossibile attivare la fotocamera.",
-        "noDevice": "Nessuna fotocamera trovata."
+        "unavailable": "Fotocamera non disponibile."
       },
       "mic": {
-        "busy": "Il microfono è in uso da un'altra applicazione.",
-        "denied": "Accesso al microfono negato. Abilita l'autorizzazione nelle impostazioni del browser (icona del lucchetto nella barra degli indirizzi).",
-        "generic": "Impossibile attivare il microfono.",
-        "noDevice": "Nessun microfono trovato."
+        "unavailable": "Microfono non disponibile."
+      },
+      "reason": {
+        "busy": "Un'altra applicazione lo sta usando: chiudila e riprova.",
+        "denied": "Consenti l'accesso nel browser (icona del lucchetto nella barra degli indirizzi), poi riprova.",
+        "generic": "Riprova.",
+        "noDevice": "Nessun dispositivo trovato: collegane uno e riprova."
       },
       "screen": {
-        "busy": "La condivisione dello schermo non è disponibile al momento.",
-        "denied": "Condivisione schermo negata.",
-        "generic": "Impossibile condividere lo schermo.",
-        "noDevice": "Nessuno schermo disponibile da condividere."
+        "unavailable": "Condivisione schermo non disponibile."
       }
     },
     "exitFullscreen": "Esci da schermo intero",
@@ -1978,10 +1975,6 @@
       "cameraStarting": "Avvio della fotocamera…",
       "cancel": "Annulla",
       "description": "Stai per partecipare alla videochiamata di questo gruppo. Controlla fotocamera, microfono e altoparlante, poi entra nella chiamata.",
-      "errorBusy": "Il dispositivo è in uso da un'altra applicazione.",
-      "errorDenied": "Accesso negato. Consenti l'accesso a fotocamera e microfono nelle impostazioni del browser.",
-      "errorNoDevice": "Nessun dispositivo corrispondente trovato.",
-      "errorUnknown": "Impossibile accedere ai tuoi dispositivi.",
       "headerTitle": "{name} – Partecipa alla videochiamata",
       "hintBoth": "Stai entrando senza fotocamera e microfono — vedrai e ascolterai solo gli altri.",
       "hintCamera": "Stai entrando senza fotocamera — gli altri ti sentiranno ma non ti vedranno.",

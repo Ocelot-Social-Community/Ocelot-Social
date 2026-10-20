@@ -1938,22 +1938,19 @@
     "errorRetry": "Spróbuj ponownie",
     "errors": {
       "camera": {
-        "busy": "Kamera jest używana przez inną aplikację.",
-        "denied": "Odmowa dostępu do kamery. Włącz uprawnienia w ustawieniach przeglądarki (ikona kłódki na pasku adresu).",
-        "generic": "Nie można włączyć kamery.",
-        "noDevice": "Nie znaleziono kamery."
+        "unavailable": "Kamera niedostępna."
       },
       "mic": {
-        "busy": "Mikrofon jest używany przez inną aplikację.",
-        "denied": "Odmowa dostępu do mikrofonu. Włącz uprawnienia w ustawieniach przeglądarki (ikona kłódki na pasku adresu).",
-        "generic": "Nie można włączyć mikrofonu.",
-        "noDevice": "Nie znaleziono mikrofonu."
+        "unavailable": "Mikrofon niedostępny."
+      },
+      "reason": {
+        "busy": "Inna aplikacja go używa — zamknij ją i spróbuj ponownie.",
+        "denied": "Zezwól na dostęp w przeglądarce (ikona kłódki w pasku adresu) i spróbuj ponownie.",
+        "generic": "Spróbuj ponownie.",
+        "noDevice": "Nie znaleziono urządzenia — podłącz je i spróbuj ponownie."
       },
       "screen": {
-        "busy": "Udostępnianie ekranu jest obecnie niedostępne.",
-        "denied": "Odmowa udostępnienia ekranu.",
-        "generic": "Nie można udostępnić ekranu.",
-        "noDevice": "Brak ekranu do udostępnienia."
+        "unavailable": "Udostępnianie ekranu niedostępne."
       }
     },
     "exitFullscreen": "Zamknij pełny ekran",
@@ -1978,10 +1975,6 @@
       "cameraStarting": "Uruchamianie kamery…",
       "cancel": "Anuluj",
       "description": "Za chwilę dołączysz do rozmowy wideo tej grupy. Sprawdź kamerę, mikrofon i głośnik, a następnie dołącz do połączenia.",
-      "errorBusy": "Urządzenie jest używane przez inną aplikację.",
-      "errorDenied": "Odmowa dostępu. Zezwól na dostęp do kamery i mikrofonu w ustawieniach przeglądarki.",
-      "errorNoDevice": "Nie znaleziono pasującego urządzenia.",
-      "errorUnknown": "Nie można uzyskać dostępu do urządzeń.",
       "headerTitle": "{name} – Dołącz do rozmowy wideo",
       "hintBoth": "Dołączasz bez kamery i mikrofonu — będziesz tylko widzieć i słyszeć innych.",
       "hintCamera": "Dołączasz bez kamery — inni cię usłyszą, ale nie zobaczą.",

@@ -1938,22 +1938,19 @@
     "errorRetry": "Opnieuw proberen",
     "errors": {
       "camera": {
-        "busy": "De camera wordt gebruikt door een andere toepassing.",
-        "denied": "Toegang tot de camera geweigerd. Schakel de toestemming in via de browserinstellingen (slotpictogram in de adresbalk).",
-        "generic": "Kon de camera niet inschakelen.",
-        "noDevice": "Geen camera gevonden."
+        "unavailable": "Camera niet beschikbaar."
       },
       "mic": {
-        "busy": "De microfoon wordt gebruikt door een andere toepassing.",
-        "denied": "Toegang tot de microfoon geweigerd. Schakel de toestemming in via de browserinstellingen (slotpictogram in de adresbalk).",
-        "generic": "Kon de microfoon niet inschakelen.",
-        "noDevice": "Geen microfoon gevonden."
+        "unavailable": "Microfoon niet beschikbaar."
+      },
+      "reason": {
+        "busy": "Een andere toepassing gebruikt het — sluit die en probeer het opnieuw.",
+        "denied": "Sta toegang toe in je browser (slotje in de adresbalk) en probeer het opnieuw.",
+        "generic": "Probeer het opnieuw.",
+        "noDevice": "Geen apparaat gevonden — sluit er een aan en probeer het opnieuw."
       },
       "screen": {
-        "busy": "Scherm delen is nu niet beschikbaar.",
-        "denied": "Scherm delen werd geweigerd.",
-        "generic": "Kon het scherm niet delen.",
-        "noDevice": "Geen scherm beschikbaar om te delen."
+        "unavailable": "Scherm delen niet beschikbaar."
       }
     },
     "exitFullscreen": "Volledig scherm verlaten",
@@ -1978,10 +1975,6 @@
       "cameraStarting": "Camera wordt gestart…",
       "cancel": "Annuleren",
       "description": "Je staat op het punt deel te nemen aan de videogesprek van deze groep. Controleer je camera, microfoon en luidspreker en neem dan deel aan het gesprek.",
-      "errorBusy": "Het apparaat wordt gebruikt door een andere toepassing.",
-      "errorDenied": "Toegang geweigerd. Sta camera- en microfoontoegang toe in de browserinstellingen.",
-      "errorNoDevice": "Geen overeenkomend apparaat gevonden.",
-      "errorUnknown": "Kon geen toegang krijgen tot je apparaten.",
       "headerTitle": "{name} – Deelnemen aan videogesprek",
       "hintBoth": "Je neemt deel zonder camera en microfoon — je ziet en hoort anderen alleen.",
       "hintCamera": "Je neemt deel zonder camera — anderen horen je maar zien je niet.",

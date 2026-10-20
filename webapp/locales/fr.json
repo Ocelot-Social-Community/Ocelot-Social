@@ -1938,22 +1938,19 @@
     "errorRetry": "Réessayer",
     "errors": {
       "camera": {
-        "busy": "La caméra est utilisée par une autre application.",
-        "denied": "Accès à la caméra refusé. Activez l'autorisation dans les paramètres du navigateur (icône cadenas dans la barre d'adresse).",
-        "generic": "Impossible d'activer la caméra.",
-        "noDevice": "Aucune caméra trouvée."
+        "unavailable": "Caméra non disponible."
       },
       "mic": {
-        "busy": "Le microphone est utilisé par une autre application.",
-        "denied": "Accès au microphone refusé. Activez l'autorisation dans les paramètres du navigateur (icône cadenas dans la barre d'adresse).",
-        "generic": "Impossible d'activer le microphone.",
-        "noDevice": "Aucun microphone trouvé."
+        "unavailable": "Microphone non disponible."
+      },
+      "reason": {
+        "busy": "Une autre application l'utilise — fermez-la et réessayez.",
+        "denied": "Autorisez l'accès dans votre navigateur (icône du cadenas dans la barre d'adresse), puis réessayez.",
+        "generic": "Veuillez réessayer.",
+        "noDevice": "Aucun appareil trouvé — branchez-en un et réessayez."
       },
       "screen": {
-        "busy": "Le partage d'écran n'est pas disponible actuellement.",
-        "denied": "Le partage d'écran a été refusé.",
-        "generic": "Impossible de partager l'écran.",
-        "noDevice": "Aucun écran disponible à partager."
+        "unavailable": "Partage d'écran non disponible."
       }
     },
     "exitFullscreen": "Quitter le plein écran",
@@ -1978,10 +1975,6 @@
       "cameraStarting": "Démarrage de la caméra…",
       "cancel": "Annuler",
       "description": "Vous êtes sur le point de rejoindre l'appel vidéo de ce groupe. Vérifiez votre caméra, votre microphone et votre haut-parleur, puis rejoignez l'appel.",
-      "errorBusy": "Le périphérique est utilisé par une autre application.",
-      "errorDenied": "Accès refusé. Veuillez autoriser l'accès à la caméra et au microphone dans les paramètres du navigateur.",
-      "errorNoDevice": "Aucun périphérique correspondant trouvé.",
-      "errorUnknown": "Impossible d'accéder à vos périphériques.",
       "headerTitle": "{name} – Rejoindre l'appel vidéo",
       "hintBoth": "Vous rejoignez sans caméra ni microphone — vous ne ferez que voir et entendre les autres.",
       "hintCamera": "Vous rejoignez sans caméra — les autres vous entendront mais ne vous verront pas.",

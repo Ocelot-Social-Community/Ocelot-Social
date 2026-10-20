@@ -1938,22 +1938,19 @@
     "errorRetry": "Reintentar",
     "errors": {
       "camera": {
-        "busy": "La cámara está siendo utilizada por otra aplicación.",
-        "denied": "Acceso a la cámara denegado. Habilita el permiso en la configuración del navegador (ícono de candado en la barra de direcciones).",
-        "generic": "No se pudo encender la cámara.",
-        "noDevice": "No se encontró cámara."
+        "unavailable": "Cámara no disponible."
       },
       "mic": {
-        "busy": "El micrófono está siendo utilizado por otra aplicación.",
-        "denied": "Acceso al micrófono denegado. Habilita el permiso en la configuración del navegador (ícono de candado en la barra de direcciones).",
-        "generic": "No se pudo encender el micrófono.",
-        "noDevice": "No se encontró micrófono."
+        "unavailable": "Micrófono no disponible."
+      },
+      "reason": {
+        "busy": "Otra aplicación lo está usando: ciérrala e inténtalo de nuevo.",
+        "denied": "Permite el acceso en tu navegador (icono del candado en la barra de direcciones) e inténtalo de nuevo.",
+        "generic": "Inténtalo de nuevo.",
+        "noDevice": "No se encontró ningún dispositivo: conecta uno e inténtalo de nuevo."
       },
       "screen": {
-        "busy": "Compartir pantalla no está disponible en este momento.",
-        "denied": "Se denegó compartir pantalla.",
-        "generic": "No se pudo compartir la pantalla.",
-        "noDevice": "No hay pantalla disponible para compartir."
+        "unavailable": "Compartir pantalla no disponible."
       }
     },
     "exitFullscreen": "Salir de pantalla completa",
@@ -1978,10 +1975,6 @@
       "cameraStarting": "Iniciando la cámara…",
       "cancel": "Cancelar",
       "description": "Estás a punto de unirte a la videollamada de este grupo. Comprueba tu cámara, micrófono y altavoz, y luego únete a la llamada.",
-      "errorBusy": "El dispositivo está siendo utilizado por otra aplicación.",
-      "errorDenied": "Acceso denegado. Permite el acceso a la cámara y al micrófono en la configuración del navegador.",
-      "errorNoDevice": "No se encontró ningún dispositivo coincidente.",
-      "errorUnknown": "No se pudo acceder a tus dispositivos.",
       "headerTitle": "{name} – Unirse a la videollamada",
       "hintBoth": "Te unirás sin cámara ni micrófono — solo verás y escucharás a los demás.",
       "hintCamera": "Te unirás sin cámara — los demás te escucharán pero no te verán.",

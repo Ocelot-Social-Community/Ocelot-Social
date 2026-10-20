@@ -1938,22 +1938,19 @@
     "errorRetry": "Riprovo",
     "errors": {
       "camera": {
-        "busy": "Kamera është në përdorim nga një aplikacion tjetër.",
-        "denied": "Qasja te kamera u refuzua. Aktivizo lejen në cilësimet e shfletuesit (ikona e dryrit në shiritin e adresës).",
-        "generic": "Nuk u arrit të ndizet kamera.",
-        "noDevice": "Nuk u gjet kamerë."
+        "unavailable": "Kamera nuk është e disponueshme."
       },
       "mic": {
-        "busy": "Mikrofoni është në përdorim nga një aplikacion tjetër.",
-        "denied": "Qasja te mikrofoni u refuzua. Aktivizo lejen në cilësimet e shfletuesit (ikona e dryrit në shiritin e adresës).",
-        "generic": "Nuk u arrit të ndizet mikrofoni.",
-        "noDevice": "Nuk u gjet mikrofon."
+        "unavailable": "Mikrofoni nuk është i disponueshëm."
+      },
+      "reason": {
+        "busy": "Një aplikacion tjetër po e përdor — mbylle dhe provo përsëri.",
+        "denied": "Lejo qasjen në shfletues (ikona e drynit në shiritin e adresës) dhe provo përsëri.",
+        "generic": "Provo përsëri.",
+        "noDevice": "Nuk u gjet asnjë pajisje — lidh një dhe provo përsëri."
       },
       "screen": {
-        "busy": "Ndarja e ekranit nuk është e disponueshme tani.",
-        "denied": "Ndarja e ekranit u refuzua.",
-        "generic": "Nuk u arrit të ndahet ekrani.",
-        "noDevice": "Nuk ka ekran të disponueshëm për t'u ndarë."
+        "unavailable": "Ndarja e ekranit nuk është e disponueshme."
       }
     },
     "exitFullscreen": "Dil nga ekrani i plotë",
@@ -1978,10 +1975,6 @@
       "cameraStarting": "Kamera po niset…",
       "cancel": "Anulo",
       "description": "Po bashkohesh me thirrjen video të këtij grupi. Kontrollo kamerën, mikrofonin dhe altoparlantin, pastaj bashkohu me thirrjen.",
-      "errorBusy": "Pajisja është në përdorim nga një aplikacion tjetër.",
-      "errorDenied": "Qasja u refuzua. Lejo qasjen te kamera dhe mikrofoni në cilësimet e shfletuesit.",
-      "errorNoDevice": "Nuk u gjet pajisje që përputhet.",
-      "errorUnknown": "Nuk u arrit të kontaktohen pajisjet e tua.",
       "headerTitle": "{name} – Bashkohu me thirrjen video",
       "hintBoth": "Po bashkohesh pa kamerë dhe mikrofon — do t'i shohësh dhe dëgjosh vetëm të tjerët.",
       "hintCamera": "Po bashkohesh pa kamerë — të tjerët do të dëgjojnë por nuk do të shohin.",

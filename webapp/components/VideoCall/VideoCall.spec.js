@@ -47,8 +47,13 @@ jest.mock('livekit-client', () => {
         isCameraEnabled: false,
         audioTrackPublications: new Map(),
         videoTrackPublications: new Map(),
-        setMicrophoneEnabled: jest.fn().mockResolvedValue(),
-        setCameraEnabled: jest.fn().mockResolvedValue(),
+        // Tests set Room.deviceErrors to start a room whose device fails.
+        setMicrophoneEnabled: jest.fn(() =>
+          Room.deviceErrors.mic ? Promise.reject(Room.deviceErrors.mic) : Promise.resolve(),
+        ),
+        setCameraEnabled: jest.fn(() =>
+          Room.deviceErrors.camera ? Promise.reject(Room.deviceErrors.camera) : Promise.resolve(),
+        ),
         setScreenShareEnabled: jest.fn().mockResolvedValue(),
         getTrackPublication: jest.fn(),
       }
@@ -67,6 +72,7 @@ jest.mock('livekit-client', () => {
     }
   }
   Room.initialCanPlaybackAudio = true
+  Room.deviceErrors = {}
   return { __esModule: true, Room, RoomEvent, Track, TrackEvent, DisconnectReason }
 })
 
@@ -288,7 +294,9 @@ describe('VideoCall', () => {
         $toast,
       }
       VideoCall.methods.showDeviceErrorToast.call(ctx, 'mic', { name: 'NotAllowedError' })
-      expect($toast.error).toHaveBeenCalledWith('videoCall.errors.mic.denied')
+      expect($toast.error).toHaveBeenCalledWith(
+        'videoCall.errors.mic.unavailable videoCall.errors.reason.denied',
+      )
     })
 
     it.each([
@@ -301,7 +309,9 @@ describe('VideoCall', () => {
       const $toast = { error: jest.fn() }
       const ctx = { $t: (k) => k, $toast }
       VideoCall.methods.showDeviceErrorToast.call(ctx, 'camera', { name })
-      expect($toast.error).toHaveBeenCalledWith(`videoCall.errors.camera.${key}`)
+      expect($toast.error).toHaveBeenCalledWith(
+        `videoCall.errors.camera.unavailable videoCall.errors.reason.${key}`,
+      )
     })
 
     it('is a no-op when $toast.error is not a function', () => {
@@ -1745,7 +1755,9 @@ describe('VideoCall', () => {
         room.localParticipant.getTrackPublication.mockReturnValue({ track })
         wrapper.setData({ micProblem: true })
         await wrapper.vm.restartMic()
-        expect($toast.error).toHaveBeenCalledWith('videoCall.errors.mic.busy')
+        expect($toast.error).toHaveBeenCalledWith(
+          'videoCall.errors.mic.unavailable videoCall.errors.reason.busy',
+        )
         expect(wrapper.vm.micProblem).toBe(true)
       })
 
@@ -4068,5 +4080,60 @@ describe('VideoCall', () => {
         false,
       )
     })
+  })
+})
+
+describe('VideoCall — a join whose device fails', () => {
+  const notFound = () =>
+    Object.assign(new Error('Requested device not found'), { name: 'NotFoundError' })
+  const withApollo = (wrapper) => {
+    wrapper.vm.$apollo = {
+      mutate: jest
+        .fn()
+        .mockResolvedValue({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } }),
+    }
+  }
+
+  afterEach(async () => {
+    const { Room } = await import('livekit-client')
+    Room.deviceErrors = {}
+  })
+
+  it.each([
+    ['camera', 'cameraEnabled'],
+    ['mic', 'micEnabled'],
+  ])('stays in the call without the %s that does not start', async (kind, field) => {
+    const { Room } = await import('livekit-client')
+    Room.deviceErrors = { [kind]: notFound() }
+    const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+    withApollo(wrapper)
+    const toast = jest.spyOn(wrapper.vm, 'showDeviceErrorToast').mockImplementation(() => {})
+    wrapper.setData({ cameraEnabled: true, micEnabled: true })
+    await wrapper.vm.connect()
+    expect(wrapper.vm.phase).toBe('in-call')
+    expect(wrapper.vm.error).toBeNull()
+    expect(wrapper.vm[field]).toBe(false)
+    expect(toast).toHaveBeenCalledWith(kind, expect.objectContaining({ name: 'NotFoundError' }))
+  })
+
+  it('backToPrejoin leaves the room the failed attempt had joined', async () => {
+    const { wrapper } = factory({ show: true })
+    const disconnect = jest.fn().mockResolvedValue()
+    wrapper.setData({ room: { disconnect }, error: 'boom', phase: 'error' })
+    await wrapper.vm.backToPrejoin()
+    expect(disconnect).toHaveBeenCalled()
+    expect(wrapper.vm.room).toBeNull()
+    expect(wrapper.vm.phase).toBe('prejoin')
+  })
+
+  it('connect leaves an earlier room before it joins anew — no second self in the call', async () => {
+    const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+    withApollo(wrapper)
+    const disconnect = jest.fn().mockResolvedValue()
+    wrapper.setData({ room: { disconnect } })
+    await wrapper.vm.connect()
+    expect(disconnect).toHaveBeenCalled()
+    expect(wrapper.vm.room.disconnect).not.toBe(disconnect)
+    expect(wrapper.vm.phase).toBe('in-call')
   })
 })

@@ -1938,22 +1938,19 @@
     "errorRetry": "Retry",
     "errors": {
       "camera": {
-        "busy": "The camera is in use by another application.",
-        "denied": "Camera access denied. Please enable the permission in your browser settings (lock icon in the address bar).",
-        "generic": "Could not turn the camera on.",
-        "noDevice": "No camera found."
+        "unavailable": "Camera not available."
       },
       "mic": {
-        "busy": "The microphone is in use by another application.",
-        "denied": "Microphone access denied. Please enable the permission in your browser settings (lock icon in the address bar).",
-        "generic": "Could not turn the microphone on.",
-        "noDevice": "No microphone found."
+        "unavailable": "Microphone not available."
+      },
+      "reason": {
+        "busy": "Another application is using it — close that one and try again.",
+        "denied": "Allow access in your browser (lock icon in the address bar), then try again.",
+        "generic": "Please try again.",
+        "noDevice": "No device found — connect one and try again."
       },
       "screen": {
-        "busy": "Screen sharing is not available right now.",
-        "denied": "Screen sharing was denied.",
-        "generic": "Could not share the screen.",
-        "noDevice": "No screen available to share."
+        "unavailable": "Screen sharing not available."
       }
     },
     "exitFullscreen": "Exit fullscreen",
@@ -1978,10 +1975,6 @@
       "cameraStarting": "Starting camera…",
       "cancel": "Cancel",
       "description": "You're about to join this group's video call. Check your camera, microphone and speaker, then join the call.",
-      "errorBusy": "The device is in use by another application.",
-      "errorDenied": "Access denied. Please allow camera and microphone access in your browser settings.",
-      "errorNoDevice": "No matching device found.",
-      "errorUnknown": "Could not access your devices.",
       "headerTitle": "{name} – Join video call",
       "hintBoth": "Joining without camera and microphone — you'll only see and hear others.",
       "hintCamera": "Joining without camera — others will hear you but not see you.",
