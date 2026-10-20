@@ -51,7 +51,7 @@
               <location-info :location-data="user.location" :is-owner="myProfile" size="small" />
             </button>
             <p class="ds-text ds-text-center ds-text-soft ds-text-size-small">
-              {{ $t('profile.memberSince') }} {{ user.createdAt | date('MMMM yyyy') }}
+              {{ $t('profile.memberSince') }} {{ user.createdAt | date('monthYear') }}
             </p>
           </div>
           <div v-if="userBadges && userBadges.length" class="ds-my-x-small">

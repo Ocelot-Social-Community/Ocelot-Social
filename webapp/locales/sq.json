@@ -612,10 +612,6 @@
     "step": "Hapi {current} nga {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd.MM.yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Ndryshimi i fjalëkalimit dështoi. Ndoshta kodi i sigurisë nuk ishte i saktë?",

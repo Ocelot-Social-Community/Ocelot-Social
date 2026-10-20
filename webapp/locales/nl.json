@@ -612,10 +612,6 @@
     "step": "Stap {current} van {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd-MM-yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Het wijzigen van je wachtwoord is mislukt. Misschien was de beveiligingscode niet correct?",
