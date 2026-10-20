@@ -14,7 +14,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         class="profile-layout__sidebar"
       >
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+          class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -401,7 +401,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         />
          
         <div
-          class="profile-location-map os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-location-map"
+          class="profile-location-map os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-location-map"
         >
           <div
             class="location-picker-map"
@@ -486,7 +486,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           class="tab-navigation ds-mb-large"
         >
           <div
-            class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
+            class="ds-tab-nav os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
           >
             <ul
               class="Tabs"
@@ -738,7 +738,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         class="profile-layout__sidebar"
       >
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+          class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -1164,7 +1164,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         />
          
         <div
-          class="profile-location-map os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-location-map"
+          class="profile-location-map os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-location-map"
         >
           <div
             class="location-picker-map"
@@ -1249,7 +1249,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           class="tab-navigation ds-mb-large"
         >
           <div
-            class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
+            class="ds-tab-nav os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
           >
             <ul
               class="Tabs"
@@ -1501,7 +1501,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         class="profile-layout__sidebar"
       >
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+          class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -1776,7 +1776,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         />
          
         <div
-          class="profile-location-map os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-location-map"
+          class="profile-location-map os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-location-map"
         >
           <div
             class="location-picker-map"
@@ -1862,7 +1862,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           class="tab-navigation ds-mb-large"
         >
           <div
-            class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
+            class="ds-tab-nav os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
           >
             <ul
               class="Tabs"
@@ -2148,7 +2148,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         class="profile-layout__sidebar"
       >
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+          class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -2467,7 +2467,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         />
          
         <div
-          class="profile-location-map os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-location-map"
+          class="profile-location-map os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-location-map"
         >
           <div
             class="location-picker-map"
@@ -2553,7 +2553,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           class="tab-navigation ds-mb-large"
         >
           <div
-            class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
+            class="ds-tab-nav os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
           >
             <ul
               class="Tabs"

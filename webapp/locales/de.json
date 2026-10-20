@@ -1886,9 +1886,9 @@
     "termsAndConditionsNewConfirmText": "Bitte lies Dir die neuen Nutzungsbedingungen jetzt durch!"
   },
   "themeSwitch": {
-    "system": "Design: wie das System",
+    "dark": "Design: dunkel",
     "light": "Design: hell",
-    "dark": "Design: dunkel"
+    "system": "Design: wie das System"
   },
   "user-avatar": {
     "popover": {

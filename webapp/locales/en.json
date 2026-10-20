@@ -1886,9 +1886,9 @@
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!"
   },
   "themeSwitch": {
-    "system": "Theme: as the system",
+    "dark": "Theme: dark",
     "light": "Theme: light",
-    "dark": "Theme: dark"
+    "system": "Theme: as the system"
   },
   "user-avatar": {
     "popover": {

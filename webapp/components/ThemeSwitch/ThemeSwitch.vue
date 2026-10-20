@@ -32,7 +32,13 @@ export default {
       return GLYPHS[this.theme]
     },
     label() {
-      return this.$t(`themeSwitch.${this.theme}`)
+      // Spelled out so the i18n lint sees every key in use.
+      const labels = {
+        system: this.$t('themeSwitch.system'),
+        light: this.$t('themeSwitch.light'),
+        dark: this.$t('themeSwitch.dark'),
+      }
+      return labels[this.theme]
     },
   },
   methods: {

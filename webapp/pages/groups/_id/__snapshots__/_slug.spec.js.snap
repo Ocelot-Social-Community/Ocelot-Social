@@ -14,7 +14,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
         class="group-layout__sidebar"
       >
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+          class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -642,7 +642,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
         />
          
         <div
-          class="group-location-map os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-location-map"
+          class="group-location-map os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-location-map"
         >
           <div
             class="location-picker-map"
@@ -706,7 +706,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           class="ds-mb-large"
         >
           <div
-            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
+            class="group-description os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text description-clamp"
@@ -948,7 +948,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
         class="group-layout__sidebar"
       >
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+          class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -1263,7 +1263,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
         />
          
         <div
-          class="group-location-map os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-location-map"
+          class="group-location-map os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-location-map"
         >
           <div
             class="location-picker-map"
@@ -1325,7 +1325,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           class="ds-mb-large"
         >
           <div
-            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
+            class="group-description os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text description-clamp"
@@ -1533,7 +1533,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
         class="group-layout__sidebar"
       >
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+          class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -1867,7 +1867,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
         />
          
         <div
-          class="group-location-map os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-location-map"
+          class="group-location-map os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-location-map"
         >
           <div
             class="location-picker-map"
@@ -1929,7 +1929,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           class="ds-mb-large"
         >
           <div
-            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
+            class="group-description os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text description-clamp"
@@ -2137,7 +2137,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
         class="group-layout__sidebar"
       >
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+          class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -2659,7 +2659,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
         />
          
         <div
-          class="group-location-map os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-location-map"
+          class="group-location-map os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-location-map"
         >
           <div
             class="location-picker-map"
@@ -2723,7 +2723,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           class="ds-mb-large"
         >
           <div
-            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
+            class="group-description os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text description-clamp"
@@ -2965,7 +2965,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
         class="group-layout__sidebar"
       >
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+          class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -3539,7 +3539,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           class="ds-mb-large"
         >
           <div
-            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
+            class="group-description os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text description-clamp"
@@ -3763,7 +3763,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
         class="group-layout__sidebar"
       >
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+          class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -4050,7 +4050,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           class="ds-mb-large"
         >
           <div
-            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
+            class="group-description os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text description-clamp"
@@ -4240,7 +4240,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
         class="group-layout__sidebar"
       >
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+          class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -4546,7 +4546,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           class="ds-mb-large"
         >
           <div
-            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
+            class="group-description os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text description-clamp"
@@ -4736,7 +4736,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
         class="group-layout__sidebar"
       >
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+          class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -5204,7 +5204,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           class="ds-mb-large"
         >
           <div
-            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
+            class="group-description os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text description-clamp"
@@ -5428,7 +5428,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
         class="group-layout__sidebar"
       >
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+          class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -6055,7 +6055,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
         />
          
         <div
-          class="group-location-map os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-location-map"
+          class="group-location-map os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-location-map"
         >
           <div
             class="location-picker-map"
@@ -6119,7 +6119,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           class="ds-mb-large"
         >
           <div
-            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
+            class="group-description os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text description-clamp"
@@ -6379,7 +6379,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
         class="group-layout__sidebar"
       >
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+          class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -6900,7 +6900,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
         />
          
         <div
-          class="group-location-map os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-location-map"
+          class="group-location-map os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-location-map"
         >
           <div
             class="location-picker-map"
@@ -6964,7 +6964,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           class="ds-mb-large"
         >
           <div
-            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
+            class="group-description os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text description-clamp"

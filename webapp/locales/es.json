@@ -1885,6 +1885,11 @@
     "termsAndConditionsNewConfirm": "He leído y acepto los nuevos términos de uso.",
     "termsAndConditionsNewConfirmText": "¡Por favor, lea los nuevos términos de uso ahora!"
   },
+  "themeSwitch": {
+    "dark": "Tema: oscuro",
+    "light": "Tema: claro",
+    "system": "Tema: como el sistema"
+  },
   "user-avatar": {
     "popover": {
       "open-profile": "Abrir perfil",
