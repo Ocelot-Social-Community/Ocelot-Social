@@ -768,7 +768,7 @@ export default {
 .post-side-navigation {
   position: sticky;
   top: 65px;
-  z-index: 2;
+  z-index: var(--z-index-sticky);
 }
 
 .post-page {
