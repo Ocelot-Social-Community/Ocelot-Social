@@ -362,7 +362,10 @@ if (!linter) {
 //    be a subset of another's — that is precisely the condition under which it would see them.
 //
 //    A config matches with its `label`s only, but its pull requests carry its `extra-label`s as
-//    well (top level and per package; `strategies/base.js` appends them). Tagging removes the
+//    well (`strategies/base.js` appends them). Each package takes its own `extra-label`, the top
+//    level is only the fallback for a package without one (`pathConfig.extraLabels ??
+//    defaultConfig.extraLabels`), so a top-level value a package overrides lands on no pull
+//    request. A combined pull request carries the union of its packages' labels. Tagging removes the
 //    `label`s and leaves the `extra-label`s, so a foreign pending label there would match for good,
 //    not only until the tag. Hence a's `label`s are checked against everything b's pull requests carry.
 const DEFAULT_LABEL = 'autorelease: pending'
@@ -370,9 +373,10 @@ const splitLabels = (value) => (value ? value.split(',').map((l) => l.trim()) : 
 const labelSets = configs.map((file) => {
   const config = readJson(file)
   const labels = config.label ? splitLabels(config.label) : [DEFAULT_LABEL]
-  const extraLabels = [config, ...Object.values(config.packages ?? {})].flatMap((c) =>
-    splitLabels(c['extra-label']),
-  )
+  const packages = Object.values(config.packages ?? {})
+  const extraLabels = packages.length
+    ? packages.flatMap((p) => splitLabels(p['extra-label'] ?? config['extra-label']))
+    : splitLabels(config['extra-label'])
   return { file, labels, prLabels: [...new Set([...labels, ...extraLabels])] }
 })
 for (const a of labelSets) {
