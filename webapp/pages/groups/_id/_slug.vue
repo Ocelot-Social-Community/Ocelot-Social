@@ -56,7 +56,7 @@
             </button>
             <!-- group created at -->
             <p class="ds-text ds-text-center ds-text-soft ds-text-size-small">
-              {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
+              {{ $t('group.foundation') }} {{ group.createdAt | date('monthYear') }}
             </p>
           </div>
           <div class="ds-flex" v-if="isAllowedSeeingGroupMembers">

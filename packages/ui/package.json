@@ -1,6 +1,6 @@
 {
   "name": "@ocelot-social/ui",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Vue component library for ocelot.social - works with Vue 2.7+ and Vue 3",
   "license": "Apache-2.0",
   "type": "module",
@@ -96,7 +96,7 @@
     "@vitest/coverage-v8": "^5.0.0",
     "@vue/test-utils": "^2.4.8",
     "eslint": "^10.8.1",
-    "eslint-config-it4c": "^0.13.2",
+    "eslint-config-it4c": "^0.14.1",
     "eslint-plugin-jsdoc": "^65.1.0",
     "eslint-plugin-playwright": "^2.11.0",
     "eslint-plugin-storybook": "^10.5.7",

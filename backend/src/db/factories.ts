@@ -56,9 +56,7 @@ import type { Context } from '@src/context'
 const createUserNode = async (buildObject) => {
   // `password` is a build input — the hash derived from it is what the node carries. `role`
   // selects the Role node to link and was never a property.
-  const { password, role, ...properties } = buildObject
-  void password
-  void role
+  const { password: _password, role: _role, ...properties } = buildObject
   return createNode(User, {
     deleted: false,
     disabled: false,
@@ -90,10 +88,12 @@ const createUserNode = async (buildObject) => {
 const createPostNode = async (buildObject) => {
   // Build inputs that were never Post properties: neode dropped them, so they have never
   // existed on a single node in any database.
-  const { visibility, imageBlurred, imageAspectRatio, ...properties } = buildObject
-  void visibility
-  void imageBlurred
-  void imageAspectRatio
+  const {
+    visibility: _visibility,
+    imageBlurred: _imageBlurred,
+    imageAspectRatio: _imageAspectRatio,
+    ...properties
+  } = buildObject
   const postType = (properties.postType as string) || 'Article'
   const now = new Date().toISOString()
   return createNode(
@@ -204,8 +204,7 @@ Factory.define('image')
         blur: buildObject.blur,
       })
     }
-    const { width, height, blur, ...properties } = buildObject
-    void blur
+    const { width, height, blur: _blur, ...properties } = buildObject
     // width/height/blur shape the generated URL; only their ratio is stored. They used to be
     // handed to neode and dropped there.
     return createNode(Image, {

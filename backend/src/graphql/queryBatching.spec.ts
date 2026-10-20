@@ -149,8 +149,7 @@ beforeAll(async () => {
   // matches what CreateRoom/CreateMessage produce: CHATS_IN from both participants, INSIDE
   // from the message, CREATED from its sender.
   for (let index = 0; index < 12; index++) {
-    const partner = await Factory.build('user', { id: `batching-partner-${String(index)}` })
-    void partner
+    await Factory.build('user', { id: `batching-partner-${String(index)}` })
     await setup.database.write({
       query: `
         MATCH (me:User { id: 'batching-author' })

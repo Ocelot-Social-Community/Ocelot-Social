@@ -31,6 +31,7 @@ test('validateBranding collects ALL invariant violations, not just the first', (
     comment: { ...brandingDefaults.comment, truncateToLength: 5000, maxUntruncatedLength: 1200 },
     category: { min: 5, max: 3 },
     metadata: { ...brandingDefaults.metadata, applicationName: '   ' },
+    dateTime: { ...brandingDefaults.dateTime, dateStyle: null, timeStyle: null },
   }
   const v = validateBranding(bad)
   assert.ok(
@@ -45,6 +46,9 @@ test('validateBranding collects ALL invariant violations, not just the first', (
   )
   assert.ok(v.some((x) => x.includes('category.min (5) must be ≤ category.max (3)')))
   assert.ok(v.some((x) => x.includes('metadata.applicationName must not be empty')))
+  assert.ok(
+    v.some((x) => x.includes('dateTime.dateStyle and dateTime.timeStyle must not both be null')),
+  )
   assert.ok(v.length >= 6)
 })
 

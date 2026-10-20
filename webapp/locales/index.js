@@ -1,4 +1,3 @@
-import { enUS, de, nl, fr, es, it, pt, pl, ru, sq, uk } from 'date-fns/locale'
 import find from 'lodash/find'
 
 const locales = [
@@ -8,7 +7,6 @@ const locales = [
     iso: 'en-US',
     flag: '🇬🇧',
     enabled: true,
-    dateFnsLocale: enUS,
   },
   {
     name: 'Deutsch',
@@ -16,7 +14,6 @@ const locales = [
     iso: 'de-DE',
     flag: '🇩🇪',
     enabled: true,
-    dateFnsLocale: de,
   },
   {
     name: 'Nederlands',
@@ -24,7 +21,6 @@ const locales = [
     iso: 'nl-NL',
     flag: '🇳🇱',
     enabled: true,
-    dateFnsLocale: nl,
   },
   {
     name: 'Français',
@@ -32,7 +28,6 @@ const locales = [
     iso: 'fr-FR',
     flag: '🇫🇷',
     enabled: true,
-    dateFnsLocale: fr,
   },
   {
     name: 'Italiano',
@@ -40,7 +35,6 @@ const locales = [
     iso: 'it-IT',
     flag: '🇮🇹',
     enabled: true,
-    dateFnsLocale: it,
   },
   {
     name: 'Español',
@@ -48,7 +42,6 @@ const locales = [
     iso: 'es-ES',
     flag: '🇪🇸',
     enabled: true,
-    dateFnsLocale: es,
   },
   {
     name: 'Português',
@@ -56,7 +49,6 @@ const locales = [
     iso: 'pt-PT',
     flag: '🇵🇹',
     enabled: true,
-    dateFnsLocale: pt,
   },
   {
     name: 'Polski',
@@ -64,7 +56,6 @@ const locales = [
     iso: 'pl-PL',
     flag: '🇵🇱',
     enabled: true,
-    dateFnsLocale: pl,
   },
   {
     name: 'Русский',
@@ -72,7 +63,6 @@ const locales = [
     iso: 'ru-RU',
     flag: '🇷🇺',
     enabled: true,
-    dateFnsLocale: ru,
   },
   {
     name: 'Shqip',
@@ -80,7 +70,6 @@ const locales = [
     iso: 'sq-AL',
     flag: '🇦🇱',
     enabled: true,
-    dateFnsLocale: sq,
   },
   {
     name: 'Українська',
@@ -88,12 +77,12 @@ const locales = [
     iso: 'uk-UA',
     flag: '🇺🇦',
     enabled: true,
-    dateFnsLocale: uk,
   },
 ]
 
 export default locales
-export function getDateFnsLocale({ $i18n }) {
-  const { dateFnsLocale } = find(locales, { code: $i18n.locale() }) || {}
-  return dateFnsLocale || enUS
+// The BCP 47 tag Intl formats dates with, for the current UI locale.
+export function getLocaleIso({ $i18n }) {
+  const { iso } = find(locales, { code: $i18n && $i18n.locale() }) || {}
+  return iso || 'en-US'
 }

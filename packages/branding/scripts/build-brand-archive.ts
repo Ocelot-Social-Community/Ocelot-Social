@@ -20,7 +20,8 @@
 // --default (only with a directory out): additionally writes a `DEFAULT` marker file holding the
 // brand id, so an image that bakes this brand as its default theme renders branded out of the box
 // (webapp plugin / backend bootstrap read the marker when no brand is pinned by policy/env).
-import { watch, writeFileSync } from 'node:fs'
+import { writeFileSync } from 'node:fs'
+import { watch } from 'node:fs/promises'
 import { basename, resolve } from 'node:path'
 
 import { buildBrandArchive, publishBrandArchive } from './lib/build-brandings.ts'
@@ -79,16 +80,15 @@ await build()
 if (isWatch) {
   console.log('[brand] watching for changes…')
   let timer: ReturnType<typeof setTimeout> | undefined
-  watch(brandDir, { recursive: true }, (_event, filename) => {
+  for await (const { filename } of watch(brandDir, { recursive: true })) {
     // Ignore our own output (the .tar.gz files, incl. those under dist/).
-    if (filename?.endsWith('.tar.gz')) {
-      return
+    if (!filename?.endsWith('.tar.gz')) {
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        build().catch((error: unknown) => {
+          console.error('[brand] build failed:', error instanceof Error ? error.message : error)
+        })
+      }, 150)
     }
-    clearTimeout(timer)
-    timer = setTimeout(() => {
-      build().catch((error: unknown) => {
-        console.error('[brand] build failed:', error instanceof Error ? error.message : error)
-      })
-    }, 150)
-  })
+  }
 }

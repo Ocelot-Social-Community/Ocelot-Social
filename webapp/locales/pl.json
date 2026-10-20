@@ -612,10 +612,6 @@
     "step": "Krok {current} z {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd.MM.yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Zmiana hasła nie powiodła się. Może kod bezpieczeństwa nie był poprawny?",

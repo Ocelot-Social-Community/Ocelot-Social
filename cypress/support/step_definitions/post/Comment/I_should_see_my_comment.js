@@ -9,5 +9,5 @@ defineStep('I should see my comment', () => {
     .should('have.attr', 'src')
     .and('contain', 'https://') // some url
     .get('.user-avatar .info > .text')
-    .should('contain', 'today at')
+    .should('contain', 'today, ') // utils/dateFormat.js formatRelative: "today, 3:55 PM"
 })

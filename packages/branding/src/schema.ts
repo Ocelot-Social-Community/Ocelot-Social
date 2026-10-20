@@ -46,6 +46,9 @@ export interface LogoClick {
  */
 export type PageLayout = 'basic' | 'blank' | 'default' | 'no-header'
 
+/** A length of `Intl.DateTimeFormat`'s `dateStyle` / `timeStyle`. */
+export type DateTimeStyle = 'short' | 'medium' | 'long' | 'full'
+
 /** The footer / static pages a brand can point at an external URL or re-order. */
 export type LinkPageKey =
   | 'organization'
@@ -200,11 +203,14 @@ export interface BrandingConfig {
   dateTime: {
     relativeDateTime: boolean
     /**
-     * Absolute timestamp format — a date-fns format-token string (e.g. `P` = localized short date,
-     * `PPpp` = long date + time), consumed by the webapp `DateTime` component via date-fns `format`.
-     * An OPEN vocabulary (any token string), so deliberately `string` and not a union.
+     * Absolute timestamp, as `Intl.DateTimeFormat`'s `dateStyle` and `timeStyle`: the browser
+     * localizes it, so a brand picks a length, not a pattern. `null` leaves that part out; at least
+     * one of the two must be set. Two scalars rather than one options object: a brand's override
+     * replaces a scalar, where a nested object would merge and keep the default's other key.
+     * The relative format falls back to `dateStyle` for anything older than a week.
      */
-    absoluteDateTimeFormat: string
+    dateStyle: DateTimeStyle | null
+    timeStyle: DateTimeStyle | null
   }
   metadata: {
     // NOTE: no brand `version` here — the brand's version lives ONLY in the archive manifest

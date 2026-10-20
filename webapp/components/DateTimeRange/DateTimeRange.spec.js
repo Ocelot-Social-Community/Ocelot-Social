@@ -2,16 +2,13 @@ import { createLocalVue } from '@vue/test-utils'
 import { renderAndHydrate, setTimeZone } from '~/test/hydration'
 import DateTimeRange from './DateTimeRange.vue'
 
-const formats = {
-  'components.dateTimeRange.hourMinute': 'HH:mm',
-  'components.dateTimeRange.yearMonthDay': 'MM/dd/yyyy',
-}
-
+let locale = 'de'
 const LocalVue = createLocalVue()
-LocalVue.prototype.$t = (key) => formats[key]
+LocalVue.prototype.$i18n = { locale: () => locale }
 
 describe('DateTimeRange', () => {
   afterEach(() => {
+    locale = 'de'
     setTimeZone(undefined)
     document.body.innerHTML = ''
   })
@@ -38,7 +35,11 @@ describe('DateTimeRange', () => {
     const walker = document.createTreeWalker(vm.$el, NodeFilter.SHOW_TEXT)
     while (walker.nextNode()) {
       const text = walker.currentNode.textContent.trim()
-      if (text && !walker.currentNode.parentElement.closest('[style*="display: none"]')) {
+      // The server writes `display:none`, the client patches in `display: none`.
+      const hidden = walker.currentNode.parentElement.closest(
+        '[style*="display:none"], [style*="display: none"]',
+      )
+      if (text && !hidden) {
         texts.push(text)
       }
     }
@@ -59,7 +60,7 @@ describe('DateTimeRange', () => {
         serverTimeZone: 'UTC',
         clientTimeZone: 'Europe/Berlin',
       })
-      expect(visibleText(vm)).toEqual(['01/01/2026', '23:30', '01/02/2026', '00:30'])
+      expect(visibleText(vm)).toEqual(['01.01.2026', '23:30', '02.01.2026', '00:30'])
     })
   })
 
@@ -77,7 +78,7 @@ describe('DateTimeRange', () => {
         serverTimeZone: 'Europe/Berlin',
         clientTimeZone: 'UTC',
       })
-      expect(visibleText(vm)).toEqual(['01/01/2026', '22:30—23:30'])
+      expect(visibleText(vm)).toEqual(['01.01.2026', '22:30–23:30 Uhr'])
     })
   })
 
@@ -88,7 +89,21 @@ describe('DateTimeRange', () => {
         { serverTimeZone: 'UTC', clientTimeZone: 'UTC' },
       )
       expect(warnings).toEqual([])
-      expect(visibleText(vm)).toEqual(['01/01/2026', '22:30'])
+      expect(visibleText(vm)).toEqual(['01.01.2026', '22:30'])
+    })
+  })
+
+  describe('in the locale of the user', () => {
+    it('writes date, time and span the way the locale does', async () => {
+      locale = 'en'
+      const { vm } = await hydrate(eventAcrossMidnightInBerlin, {
+        serverTimeZone: 'UTC',
+        clientTimeZone: 'UTC',
+      })
+      expect(visibleText(vm).map((text) => text.replace(/[\u2009\u202f]/g, ' '))).toEqual([
+        '01/01/2026',
+        '10:30 – 11:30 PM',
+      ])
     })
   })
 })

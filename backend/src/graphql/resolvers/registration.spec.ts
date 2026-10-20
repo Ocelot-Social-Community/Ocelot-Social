@@ -467,12 +467,11 @@ describe('SignupVerification', () => {
           // INVITED edge that the invite statistics count. Redeeming the same link from an
           // ALREADY registered account deliberately does none of that.
           it('redeems the invite code the account signed up with', async () => {
-            const host = await Factory.build('user', { id: 'invite-host', name: 'Invite Host' })
+            await Factory.build('user', { id: 'invite-host', name: 'Invite Host' })
             await database.write({
               query: `MATCH (host:User { id: 'invite-host' })
                       MERGE (host)-[:GENERATED]->(:InviteCode { code: 'SIGNUP' })`,
             })
-            void host
 
             const { data, errors } = await mutate({
               mutation: SignupVerificationWithExtras,

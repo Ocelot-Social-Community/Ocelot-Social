@@ -67,7 +67,7 @@ describe('FiledReportsTable.vue', () => {
 
         it('renders the reported date', () => {
           const date = wrapper.find('[data-test="filed-date"]')
-          expect(date.text()).toEqual('10/02/2019')
+          expect(date.text()).toEqual('Oct 2, 2019')
         })
 
         it('renders the category text', () => {

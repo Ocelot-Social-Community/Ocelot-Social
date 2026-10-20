@@ -612,10 +612,6 @@
     "step": "Крок {current} з {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd.MM.yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Зміна пароля не вдалася. Можливо, код безпеки був неправильним?",

@@ -612,10 +612,6 @@
     "step": "Шаг {current} из {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd.MM.yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Смена пароля не удалась. Может быть, код безопасности был неправильным?",

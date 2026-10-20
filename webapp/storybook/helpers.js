@@ -34,8 +34,8 @@ const helpers = {
     faker.setDefaultRefDate('2026-01-01T00:00:00.000Z')
     Vue.use(Vuex)
     // `~/plugins/vue-filters` is a Nuxt plugin — it expects `({ app })`, not the `Vue` constructor
-    // `Vue.use` would hand it. Called wrong, `getDateFnsLocale` closes over an app without `$i18n`
-    // and throws the moment `date`/`dateTime` filters actually run.
+    // `Vue.use` would hand it. Called wrong, `getLocaleIso` closes over an app without `$i18n`
+    // and the `date`/`dateTime` filters fall back to en-US instead of the story's locale.
     Filters({ app: { $i18n: { locale: () => 'en' } } })
     Vue.use(IziToast)
     Vue.use(Directives)

@@ -161,6 +161,19 @@ const { parsed } = dotenv.config({ path: '../backend/.env' })
 // Drift is self-announcing: a new required variable in the backend config produces exactly that
 // loud, immediate error on the first spec rather than a subtle mis-run.
 const PLACEHOLDER = 'unused-in-e2e'
+
+// A duration in ms from the environment, or its default when unset. Anything but a whole number
+// stops the run: a mistyped value would otherwise become NaN, which no elapsed time ever
+// exceeds — the mail polling would then never time out.
+const milliseconds = (name, fallback) => {
+  const raw = process.env[name]
+  if (raw === undefined || raw === '') return fallback
+  if (!/^\d+$/.test(raw)) {
+    throw new Error(`${name} must be a whole number of milliseconds, got "${raw}"`)
+  }
+  return Number(raw)
+}
+
 const exposedToSpecs = {
   // --- real ---
   NODE_ENV: parsed.NODE_ENV,
@@ -185,6 +198,10 @@ const exposedToSpecs = {
   IMAGOR_PUBLIC_URL: PLACEHOLDER,
   IMAGOR_SECRET: PLACEHOLDER,
   MAPBOX_TOKEN: PLACEHOLDER,
+  // maildev of docker-compose.test.yml and how long to wait on it (see cypress/support/mailbox.js)
+  MAILDEV_URL: process.env.MAILDEV_URL || 'http://localhost:1080',
+  MAIL_TIMEOUT: milliseconds('MAIL_TIMEOUT', 30000),
+  MAIL_SETTLE: milliseconds('MAIL_SETTLE', 1500),
 }
 
 module.exports = defineConfig({

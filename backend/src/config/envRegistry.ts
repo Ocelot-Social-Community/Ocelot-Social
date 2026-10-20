@@ -104,6 +104,8 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
     category: 'mail',
     softwareDefault: SOFTWARE_DEFAULTS.SUPPORT_EMAIL,
   },
+  // Read under NODE_ENV=test only; outside of it mail is always sent (see config/index.ts).
+  { name: 'SEND_MAIL_IN_TEST', secret: false, category: 'mail', softwareDefault: null },
   { name: 'SMTP_HOST', secret: false, category: 'mail', softwareDefault: null },
   { name: 'SMTP_PORT', secret: false, category: 'mail', softwareDefault: null },
   {
