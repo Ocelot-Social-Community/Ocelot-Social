@@ -51,7 +51,7 @@ html {
 }
 
 .main-navigation {
-  background: #fff;
+  background: var(--color-header-background);
 }
 
 blockquote {

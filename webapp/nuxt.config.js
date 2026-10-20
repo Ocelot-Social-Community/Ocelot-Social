@@ -4,6 +4,7 @@ import manifest from './constants/manifest.js'
 import metadata from './constants/metadata.js'
 import locales from './locales/index.js'
 import { brandingHeadHtml } from './utils/brandingHead.js'
+import { themeFromCookieHeader } from './utils/theme.js'
 import brandIcons from './server-middleware/brand-icons.js'
 import workbox from './server-middleware/workbox.js'
 
@@ -161,6 +162,8 @@ export default {
     '~assets/css/main.css',
     // @ocelot-social/ui CSS variables
     '~assets/css/ocelot-ui-variables.css',
+    // Dark theme: the semantic tokens of the two files above, mapped anew (data-theme / system)
+    '~assets/css/theme-dark.css',
     // Utility classes replacing ds-* Vue components
     '~assets/css/ds-compat.css',
     // UI library component styles (Tailwind utilities + OsMenu CSS)
@@ -208,6 +211,9 @@ export default {
     'vue-renderer:ssr:templateParams'(templateParams, renderContext) {
       const branding = renderContext && renderContext.nuxt && renderContext.nuxt.branding
       if (branding) templateParams.HEAD += brandingHeadHtml(branding)
+      // The theme rides on <html> from the first byte — set on the client, it would flash light.
+      const theme = themeFromCookieHeader(renderContext.req && renderContext.req.headers.cookie)
+      templateParams.HTML_ATTRS += ` data-theme="${theme}"`
     },
 
     // Brand the WELL-KNOWN icon paths (/favicon.ico, /icon.png, /apple-touch-icon*.png) — the ones a

@@ -70,6 +70,7 @@
             </client-only>
             <!-- locale switch -->
             <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
+            <theme-switch class="topbar-theme-switch" />
             <template v-if="isLoggedIn">
               <!-- chat menu -->
               <client-only>
@@ -585,6 +586,7 @@ import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import Dropdown from '~/components/Dropdown'
 import InviteCodeList from '~/components/_new/features/Invitations/InviteCodeList.vue'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import ThemeSwitch from '~/components/ThemeSwitch/ThemeSwitch'
 import Logo from '~/components/Logo/Logo'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
@@ -608,6 +610,7 @@ export default {
     Dropdown,
     InviteCodeList,
     LocaleSwitch,
+    ThemeSwitch,
     Logo,
     NotificationMenu,
     PageParamsLink,
