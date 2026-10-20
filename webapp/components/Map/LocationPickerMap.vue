@@ -32,7 +32,7 @@ import { OsLocationMap } from '@ocelot-social/ui/ocelot'
 import Empty from '~/components/Empty/Empty'
 import { queryLocations } from '~/graphql/location'
 import { isDarkTheme, onThemeChange } from '~/utils/theme'
-import { MAP_STYLES, defaultMapStyleUrl } from '~/constants/mapStyles'
+import { MAP_STYLES, defaultMapStyleUrl, mapStyleLabel } from '~/constants/mapStyles'
 
 // Default for the "types" prop — precise enough for an event's exact pin.
 // Callers wanting coarser results (e.g. groups) pass their own "types" prop.
@@ -205,7 +205,7 @@ export default {
       return value || fallback
     },
     styles() {
-      return MAP_STYLES.map((style) => ({ ...style, label: this.$t('map.styles.' + style.id) }))
+      return MAP_STYLES.map((style) => ({ ...style, label: mapStyleLabel(this.$t, style.id) }))
     },
   },
   methods: {

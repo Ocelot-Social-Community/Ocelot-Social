@@ -11,3 +11,12 @@ const urlOf = (id) => MAP_STYLES.find((style) => style.id === id).url
 
 // A dark page opens on the dark tiles, a light one on outdoors.
 export const defaultMapStyleUrl = (dark) => urlOf(dark ? 'dark' : 'outdoors')
+
+// Spelled out so the i18n lint sees every label key in use.
+export const mapStyleLabel = ($t, id) =>
+  ({
+    outdoors: $t('map.styles.outdoors'),
+    streets: $t('map.styles.streets'),
+    satellite: $t('map.styles.satellite'),
+    dark: $t('map.styles.dark'),
+  })[id]

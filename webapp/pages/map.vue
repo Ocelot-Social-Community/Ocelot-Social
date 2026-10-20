@@ -94,7 +94,7 @@ import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { isEventPast } from '~/utils/eventDate'
 import { isDarkTheme, onThemeChange } from '~/utils/theme'
-import { MAP_STYLES, defaultMapStyleUrl } from '~/constants/mapStyles'
+import { MAP_STYLES, defaultMapStyleUrl, mapStyleLabel } from '~/constants/mapStyles'
 import { profileUserQuery } from '~/graphql/User'
 import { mapQuery } from '~/graphql/MapQuery'
 import { queryLocations } from '~/graphql/location'
@@ -344,7 +344,7 @@ export default {
     },
     availableStyles() {
       return Object.fromEntries(
-        MAP_STYLES.map(({ id, url }) => [id, { url, title: this.$t('map.styles.' + id) }]),
+        MAP_STYLES.map(({ id, url }) => [id, { url, title: mapStyleLabel(this.$t, id) }]),
       )
     },
     // A dark page opens on the dark tiles; a style the user picked always wins.
