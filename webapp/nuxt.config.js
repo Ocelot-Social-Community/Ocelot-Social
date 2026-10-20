@@ -164,6 +164,8 @@ export default {
     '~assets/css/ocelot-ui-variables.css',
     // Dark theme: the semantic tokens of the two files above, mapped anew (data-theme / system)
     '~assets/css/theme-dark.css',
+    // mapbox-gl's and the geocoder's control chrome on the same tokens
+    '~assets/css/mapbox-theme.css',
     // Utility classes replacing ds-* Vue components
     '~assets/css/ds-compat.css',
     // UI library component styles (Tailwind utilities + OsMenu CSS)
