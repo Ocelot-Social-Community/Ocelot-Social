@@ -72,3 +72,8 @@
 :root .mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
   border-left-color: var(--map-control-background);
 }
+
+/* The attribution "i" toggle carries its own half-white disc (mapbox-gl.css). */
+:root .mapboxgl-ctrl-attrib-button {
+  background-color: var(--background-color-translucent-soft);
+}
