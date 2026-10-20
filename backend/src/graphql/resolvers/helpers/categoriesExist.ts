@@ -16,3 +16,27 @@ export const categoriesExist = async (context: Context): Promise<boolean> => {
     await session.close()
   }
 }
+
+// The ids among `categoryIds` that name no category. Checked before anything is written: an
+// unknown id matches nothing, which ends the write query's rows there — a post's group was
+// then never attached, and a group or post was saved without the categories it was sent.
+export const unknownCategoryIds = async (
+  context: Context,
+  categoryIds: string[],
+): Promise<string[]> => {
+  const session = context.driver.session()
+  try {
+    return await session.readTransaction(async (txc) => {
+      const result = await txc.run(
+        `UNWIND $categoryIds AS categoryId
+         OPTIONAL MATCH (category:Category {id: categoryId})
+         WITH categoryId, category WHERE category IS NULL
+         RETURN collect(DISTINCT categoryId) AS unknown`,
+        { categoryIds },
+      )
+      return (result.records[0]?.get('unknown') as string[] | undefined) ?? []
+    })
+  } finally {
+    await session.close()
+  }
+}

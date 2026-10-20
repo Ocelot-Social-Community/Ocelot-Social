@@ -12,7 +12,7 @@ import { AppError, UserInputError } from '@graphql/errors'
 import { branding } from '@src/branding'
 
 import { runBatch } from './helpers/batch'
-import { categoriesExist } from './helpers/categoriesExist'
+import { categoriesExist, unknownCategoryIds } from './helpers/categoriesExist'
 import cypherFields, { unwrap } from './helpers/cypherField'
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
@@ -334,6 +334,13 @@ export default {
       ) {
         throw new AppError(Errors.POST_SAVE_TOO_MANY_CATEGORIES, { max: branding.category.max })
       }
+      if (
+        policy.get('categoriesActive') &&
+        categoryIds?.length &&
+        (await unknownCategoryIds(context, categoryIds)).length
+      ) {
+        throw new AppError(Errors.POST_SAVE_CATEGORY_UNKNOWN)
+      }
 
       delete params.categoryIds
       delete params.image
@@ -376,8 +383,8 @@ export default {
             SET obs.active = true
             SET obs.createdAt = toString(datetime())
             SET obs.updatedAt = toString(datetime())
-            ${categoriesCypher}
             ${groupCypher}
+            ${categoriesCypher}
             RETURN post {.*, postType: [l IN labels(post) WHERE NOT l = 'Post'] }
           `,
           { userId: user.id, categoryIds, groupId, params, apiKeyId: user.apiKeyId || null },
@@ -423,6 +430,10 @@ export default {
         }
         if (categoryIds.length > branding.category.max) {
           throw new AppError(Errors.POST_SAVE_TOO_MANY_CATEGORIES, { max: branding.category.max })
+        }
+        // Checked before the old categories are removed: they would go, and nothing come.
+        if (categoryIds.length && (await unknownCategoryIds(context, categoryIds)).length) {
+          throw new AppError(Errors.POST_SAVE_CATEGORY_UNKNOWN)
         }
       }
 
