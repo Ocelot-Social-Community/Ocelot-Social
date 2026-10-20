@@ -407,21 +407,21 @@
   --chat-message-bg-me: var(--color-primary-light);
   --chat-sidemenu-background-active: var(--color-primary-light);
   --chat-new-message-color: rgb(10, 161, 255);
-  --chat-message-checkmark-seen: var(--text-color-secondary);
-  --chat-message-checkmark: var(--text-color-soft);
-  --chat-room-color-counter-badge: var(--text-color-inverse);
-  --chat-room-background-counter-badge: var(--color-danger);
   /* The room name next to its icon (Chat.vue .room-name-with-icon). Was referenced without ever being
      declared and without a fallback, so `color` resolved to nothing and the browser dropped the whole
      declaration — the name rendered in the inherited colour. Same family and same value as
-     --chat-message-color, which is what it visually pairs with. */
-  --chat-room-color-username: var(--text-color-base);
-
-  --chat-message-color: var(--text-color-base);
+     --text-color-base (the message colour), which is what it visually pairs with. */
   /* The docked chat window (layouts/default.vue .chat-modul) and its close link. */
   --chat-module-background: rgb(233, 228, 228);
   --chat-module-close-color: blue;
   --chat-message-bg-others: var(--color-neutral-80);
+  /* Roles that read a neutral step on purpose and look the same in both themes. */
+  --video-surface: var(--color-neutral-10);
+  --video-surface-deep: var(--color-neutral-0);
+  --video-text-soft: var(--color-neutral-70);
+  --text-color-muted: var(--color-neutral-50);
+  --text-color-on-primary: var(--color-neutral-100);
+  --shadow-ink: var(--color-neutral-0);
   /* Tooltips (tooltip.css): inverse in light, so they stand off the page; dark in dark too. */
   --tooltip-background: var(--background-color-inverse-soft);
   --tooltip-color: var(--text-color-inverse);
@@ -430,10 +430,6 @@
      as one too ($chat-sidemenu-background-over); it is a token rather than a value inlined in
      constants/chatTokens.js so a brand can actually reach it, like every other chat token. */
   --chat-sidemenu-background-over: #f6f6f6;
-  --chat-message-timestamp: var(--text-color-soft);
-  --chat-icon-add: var(--color-primary);
-  --chat-icon-send: var(--color-primary);
-  --chat-icon-emoji: var(--color-primary);
   /* vue-advanced-chat's own palette, one token per literal it shipped with (constants/chat.js).
      Names must never equal one of the library's own --chat-* variables: it sets those on its root
      from these values, and a var() naming itself is a cycle the browser throws away. */

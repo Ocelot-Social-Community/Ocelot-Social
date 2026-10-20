@@ -345,7 +345,7 @@ export default {
   /*  active-speaker chips), where a tie is decided by DOM order — and the tiles */
   /*  come last, so the frame would paint over the chips. */
   isolation: isolate;
-  background: var(--color-neutral-0);
+  background: var(--video-surface-deep);
   overflow: hidden;
   display: flex;
   /*  Fill the flex/grid parent so a single tile occupies the full body in the */
@@ -366,7 +366,7 @@ export default {
 }
 
 .video-tile--screen {
-  background: var(--color-neutral-10);
+  background: var(--video-surface);
 
   video {
     object-fit: contain;
@@ -447,8 +447,8 @@ export default {
 }
 
 .video-tile__fallback--own-screen {
-  background: var(--color-neutral-10);
-  color: var(--color-neutral-70);
+  background: var(--video-surface);
+  color: var(--video-text-soft);
 }
 
 .video-tile__fallback-icon {

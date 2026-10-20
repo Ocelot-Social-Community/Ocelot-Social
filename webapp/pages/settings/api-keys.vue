@@ -423,7 +423,7 @@ export default {
 .key-counter {
   font-weight: normal;
   font-size: var(--font-size-base);
-  color: var(--color-neutral-50);
+  color: var(--text-color-muted);
 }
 
 .limit-warning {

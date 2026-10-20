@@ -1991,7 +1991,7 @@ export default {
   flex: 1;
   display: flex;
   overflow: hidden;
-  background: var(--color-neutral-10);
+  background: var(--video-surface);
   position: relative;
   min-height: 0;
 }
@@ -2121,7 +2121,7 @@ export default {
   border-radius: var(--border-radius-base);
   text-align: center;
   color: var(--text-color-inverse);
-  background: var(--color-neutral-10);
+  background: var(--video-surface);
 }
 
 .video-call__notice--warning {

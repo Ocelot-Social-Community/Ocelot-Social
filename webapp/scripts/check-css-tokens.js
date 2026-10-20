@@ -11,6 +11,9 @@
  *    nothing; PostCSS passes the literal through and the browser drops the whole declaration. Twice
  *    found in review, both times invisible until someone looked at that exact element.
  *
+ * 3. A step of the neutral scale read directly by a component. The scale names values, not roles —
+ *    the same step was background in one place and text in another, so no theme could remap it.
+ *
  * A deliberate non-goal: colours that have NO token yet (transparencies, one-off greys). Those need a
  * new token first, which is a design decision — the check reports them as a count and moves on.
  *
@@ -134,6 +137,13 @@ function checkSource(src, byRgb, rel) {
         errors.push(`${rel}: $${name} — SCSS variable in a plain CSS block, resolves to nothing`)
       }
       if (prop.startsWith('--')) continue // declaring a token is allowed to use a literal
+      // The neutral scale names values, not roles: neutral-100 was background here and text there,
+      // which is why a dark theme cannot simply invert it. Components read a role token instead.
+      for (const [, step] of value.matchAll(/var\(--color-neutral-(\d+)\)/g)) {
+        errors.push(
+          `${rel}: var(--color-neutral-${step}) — use a role token (background/text/border) instead`,
+        )
+      }
       for (const [raw] of value.matchAll(COLOUR)) {
         const rgb = toRgb(raw)
         if (!rgb) continue

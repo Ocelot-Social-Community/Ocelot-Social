@@ -123,6 +123,22 @@ describe('checkSource', () => {
     ])
   })
 
+  it('flags a neutral step read directly by a component', () => {
+    const { errors } = checkSource(style('.a { color: var(--color-neutral-50); }'), byRgb, 'A.vue')
+    expect(errors).toEqual([
+      'A.vue: var(--color-neutral-50) — use a role token (background/text/border) instead',
+    ])
+  })
+
+  it('allows a role token built on a neutral step', () => {
+    const { errors } = checkSource(
+      style(':root { --text-color-muted: var(--color-neutral-50); }'),
+      byRgb,
+      'A.vue',
+    )
+    expect(errors).toEqual([])
+  })
+
   it('allows a literal where the token itself is declared', () => {
     const { errors } = checkSource(style(':root { --color-primary: #17b53f; }'), byRgb, 'A.vue')
     expect(errors).toEqual([])

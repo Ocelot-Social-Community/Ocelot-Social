@@ -652,7 +652,7 @@ export default {
 .prejoin__preview {
   position: relative;
   flex: 1 1 60%;
-  background: var(--color-neutral-10);
+  background: var(--video-surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -674,7 +674,7 @@ export default {
   align-items: center;
   justify-content: center;
   gap: var(--space-small);
-  color: var(--color-neutral-70);
+  color: var(--video-text-soft);
   padding: var(--space-small);
   text-align: center;
   pointer-events: none;

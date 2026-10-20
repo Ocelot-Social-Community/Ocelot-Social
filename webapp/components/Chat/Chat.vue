@@ -1193,7 +1193,7 @@ export default {
 }
 
 .room-name-with-icon {
-  color: var(--chat-room-color-username);
+  color: var(--text-color-base);
   font-weight: 500;
 }
 
