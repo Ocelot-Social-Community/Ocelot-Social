@@ -154,7 +154,7 @@ export default {
 }
 
 .chat-modul {
-  background-color: rgb(233, 228, 228);
+  background-color: var(--chat-module-background);
   width: 355px;
   position: fixed;
   bottom: 45px;
@@ -164,7 +164,7 @@ export default {
   z-index: var(--z-index-overlay);
   .close {
     padding: 10px;
-    color: blue;
+    color: var(--chat-module-close-color);
     cursor: pointer;
   }
 }

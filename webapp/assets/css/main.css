@@ -127,7 +127,7 @@ hr {
   top: 0;
   left: 0;
   position: fixed;
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--background-color-overlay);
   z-index: var(--z-index-overlay);
   pointer-events: none;
   transition: opacity 150ms ease-out;
