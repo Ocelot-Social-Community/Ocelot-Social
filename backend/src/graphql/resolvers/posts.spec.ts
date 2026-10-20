@@ -65,8 +65,13 @@ let variables
 // through the real schema (input coercion, transaction, rollback) rather than by calling
 // the resolver by hand.
 const CreatePostWithImage = parse(`
-  mutation CreatePostWithImage($title: String!, $content: String!, $image: ImageInput) {
-    CreatePost(title: $title, content: $content, image: $image) {
+  mutation CreatePostWithImage(
+    $title: String!
+    $content: String!
+    $image: ImageInput
+    $categoryIds: [ID]
+  ) {
+    CreatePost(title: $title, content: $content, image: $image, categoryIds: $categoryIds) {
       id
     }
   }

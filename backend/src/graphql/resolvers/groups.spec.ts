@@ -3931,7 +3931,6 @@ describe('in mode', () => {
               await mutate({
                 mutation: CreatePost,
                 variables: {
-                  categoryIds: ['cat9'],
                   id: 'visibility-test-post',
                   title: 'Visibility Test Post',
                   content: 'Content for visibility change test',
