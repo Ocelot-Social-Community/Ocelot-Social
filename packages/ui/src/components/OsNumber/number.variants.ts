@@ -1,7 +1,5 @@
 import { cva } from 'class-variance-authority'
 
-import type { VariantProps } from 'class-variance-authority'
-
 /**
  * Number display variants using CVA (Class Variance Authority)
  *
@@ -12,4 +10,6 @@ export const numberVariants = cva(['flex flex-col items-center text-center'], {
   defaultVariants: {},
 })
 
-export type NumberVariants = VariantProps<typeof numberVariants>
+// No variants yet, so there are no variant props. `VariantProps<typeof numberVariants>` would
+// resolve to `{}`, which accepts any non-nullish value instead of none.
+export type NumberVariants = Record<string, never>
