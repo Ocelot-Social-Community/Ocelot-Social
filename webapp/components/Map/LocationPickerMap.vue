@@ -32,17 +32,11 @@ import { OsLocationMap } from '@ocelot-social/ui/ocelot'
 import Empty from '~/components/Empty/Empty'
 import { queryLocations } from '~/graphql/location'
 import { isDarkTheme, onThemeChange } from '~/utils/theme'
+import { MAP_STYLES, defaultMapStyleUrl } from '~/constants/mapStyles'
 
 // Default for the "types" prop — precise enough for an event's exact pin.
 // Callers wanting coarser results (e.g. groups) pass their own "types" prop.
 const REVERSE_GEOCODE_TYPES = 'address,poi,place'
-
-// Must exactly match the "outdoors" entry's URL in the `styles` computed
-// below — the style-switcher marks a style "active" by string-comparing
-// this value against each entry's url, so a mismatch (e.g. a missing/extra
-// query param) leaves none of them highlighted until the user clicks one.
-const OUTDOORS_STYLE_URL = 'mapbox://styles/mapbox/outdoors-v12?optimize=true'
-const DARK_STYLE_URL = 'mapbox://styles/mapbox/dark-v10?optimize=true'
 
 // Mirrors the matching --color-map-marker-* custom properties in
 // root-tokens.css, used only if they can't be read yet (e.g. before the
@@ -194,7 +188,7 @@ export default {
     },
     // A dark page opens on the dark tiles.
     defaultStyleUrl() {
-      return this.dark ? DARK_STYLE_URL : OUTDOORS_STYLE_URL
+      return defaultMapStyleUrl(this.dark)
     },
     // Same color as the matching markers on pages/map.vue — read from the
     // shared CSS token (markerColorToken, root-tokens.css) at runtime rather
@@ -211,28 +205,7 @@ export default {
       return value || fallback
     },
     styles() {
-      return [
-        {
-          id: 'outdoors',
-          url: OUTDOORS_STYLE_URL,
-          label: this.$t('map.styles.outdoors'),
-        },
-        {
-          id: 'streets',
-          url: 'mapbox://styles/mapbox/streets-v11?optimize=true',
-          label: this.$t('map.styles.streets'),
-        },
-        {
-          id: 'satellite',
-          url: 'mapbox://styles/mapbox/satellite-streets-v11?optimize=true',
-          label: this.$t('map.styles.satellite'),
-        },
-        {
-          id: 'dark',
-          url: DARK_STYLE_URL,
-          label: this.$t('map.styles.dark'),
-        },
-      ]
+      return MAP_STYLES.map((style) => ({ ...style, label: this.$t('map.styles.' + style.id) }))
     },
   },
   methods: {

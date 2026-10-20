@@ -724,6 +724,17 @@ describe('map', () => {
           expect(popover.classList.contains('map-style-popover--open')).toBe(false)
         })
 
+        it('moves the active mark along when the theme switches the tiles', async () => {
+          const buttons = container.querySelectorAll('.map-style-popover-btn')
+          wrapper.vm.dark = true
+          await wrapper.vm.$nextTick()
+          expect(mapSetStyleMock).toHaveBeenCalledWith(wrapper.vm.availableStyles.dark.url)
+          expect(buttons[3].classList.contains('map-style-popover-btn--active')).toBe(true)
+          expect(buttons[3].getAttribute('aria-selected')).toBe('true')
+          expect(buttons[0].classList.contains('map-style-popover-btn--active')).toBe(false)
+          expect(buttons[0].getAttribute('aria-selected')).toBe('false')
+        })
+
         it('clicking style button sets correct style and closes popover', () => {
           const buttons = container.querySelectorAll('.map-style-popover-btn')
           const popover = container.querySelector('.map-style-popover')

@@ -11,6 +11,7 @@
 :root .mapboxgl-ctrl-group,
 :root .mapboxgl-popup-content,
 :root .mapboxgl-ctrl-geocoder,
+:root .mapboxgl-ctrl-geocoder.mapboxgl-ctrl-geocoder--collapsed,
 :root .mapboxgl-ctrl-geocoder .suggestions,
 :root .mapboxgl-ctrl-geocoder--button,
 :root .mapboxgl-ctrl-attrib.mapboxgl-compact {
@@ -37,7 +38,9 @@
   color: var(--text-color-strong);
 }
 
-:root .mapboxgl-ctrl.mapboxgl-ctrl-attrib {
+/* The attribution "i" toggle carries its own half-white disc (mapbox-gl.css). */
+:root .mapboxgl-ctrl.mapboxgl-ctrl-attrib,
+:root .mapboxgl-ctrl-attrib-button {
   background-color: var(--background-color-translucent-soft);
 }
 
@@ -71,9 +74,4 @@
 
 :root .mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
   border-left-color: var(--map-control-background);
-}
-
-/* The attribution "i" toggle carries its own half-white disc (mapbox-gl.css). */
-:root .mapboxgl-ctrl-attrib-button {
-  background-color: var(--background-color-translucent-soft);
 }
