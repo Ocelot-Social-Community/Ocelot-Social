@@ -32,11 +32,10 @@ beforeAll(async () => {
   await cleanDatabase()
   setup = await createApolloTestSetup({ context: () => ({ authenticatedUser }) })
 
-  const [me, partner] = await Promise.all([
+  const [me] = await Promise.all([
     Factory.build('user', { id: 'rn-me', name: 'Current User' }),
     Factory.build('user', { id: 'rn-partner', name: 'Chat Partner' }),
   ])
-  void partner
   authenticatedUser = await me.toJson()
 
   // The real path into a direct room: sending a message creates it.

@@ -74,12 +74,11 @@ beforeAll(async () => {
   ]
 
   const category = await Factory.build('category', { id: 'cat-two', name: 'Two', slug: 'two' })
-  const emptyCategory = await Factory.build('category', {
+  await Factory.build('category', {
     id: 'cat-none',
     name: 'None',
     slug: 'none',
   })
-  void emptyCategory
 
   let postIndex = 0
   for (const [tagId, authors] of plan) {

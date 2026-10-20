@@ -29,8 +29,8 @@ export default [
       // slot falls back to the framework default), never throw and 500 the site mid-deploy. The catches
       // deliberately treat ANY failure as "archive absent".
       'no-catch-all/no-catch-all': 'off',
-      // The only callbacks here are a synchronous leaf-visitor and fs.watch — no promises involved, so
-      // "prefer async/await" does not apply.
+      // The only callbacks here are a synchronous leaf-visitor and the watch-mode debounce timer — no
+      // promises involved, so "prefer async/await" does not apply.
       'promise/prefer-await-to-callbacks': 'off',
       // The package is ESM ("type": "module"), so relative imports MUST carry the explicit `.js`
       // extension — this rule (which forbids extensions) is the wrong default for an ESM package.
