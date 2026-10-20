@@ -360,15 +360,25 @@ if (!linter) {
 //    application's release pull request stale, which is how v3.21.2 missed branding 0.2.4. Nothing
 //    turns red; the changelog just stops updating until the next push. So no config's label set may
 //    be a subset of another's — that is precisely the condition under which it would see them.
+//
+//    A config matches with its `label`s only, but its pull requests carry its `extra-label`s as
+//    well (top level and per package; `strategies/base.js` appends them). Tagging removes the
+//    `label`s and leaves the `extra-label`s, so a foreign pending label there would match for good,
+//    not only until the tag. Hence a's `label`s are checked against everything b's pull requests carry.
 const DEFAULT_LABEL = 'autorelease: pending'
+const splitLabels = (value) => (value ? value.split(',').map((l) => l.trim()) : [])
 const labelSets = configs.map((file) => {
-  const label = readJson(file).label
-  return { file, labels: label ? label.split(',').map((l) => l.trim()) : [DEFAULT_LABEL] }
+  const config = readJson(file)
+  const labels = config.label ? splitLabels(config.label) : [DEFAULT_LABEL]
+  const extraLabels = [config, ...Object.values(config.packages ?? {})].flatMap((c) =>
+    splitLabels(c['extra-label']),
+  )
+  return { file, labels, prLabels: [...new Set([...labels, ...extraLabels])] }
 })
 for (const a of labelSets) {
   for (const b of labelSets) {
-    if (a !== b && a.labels.every((l) => b.labels.includes(l))) {
-      fail(a.file, `its release pull request label(s) ${JSON.stringify(a.labels)} are all carried by ${b.file}'s release pull requests too (${JSON.stringify(b.labels)}) — its run would treat those as its own and abort while one is merged but untagged. Give it a \`label\` of its own.`)
+    if (a !== b && a.labels.every((l) => b.prLabels.includes(l))) {
+      fail(a.file, `its release pull request label(s) ${JSON.stringify(a.labels)} are all carried by ${b.file}'s release pull requests too (${JSON.stringify(b.prLabels)}, its \`label\` and \`extra-label\`s) — its run would treat those as its own and abort while one is merged but untagged, and for good if the match is an \`extra-label\`, which tagging does not remove. Give it a \`label\` of its own, and keep it out of other configs' \`extra-label\`.`)
     }
   }
 }
