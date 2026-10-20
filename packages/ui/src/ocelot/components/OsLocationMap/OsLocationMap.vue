@@ -251,6 +251,19 @@
       let resizeObserver: ResizeObserver | null = null
       // Once the user picks a style in the switcher, a changed mapStyle prop no longer overrides it.
       let stylePicked = false
+      // This instance's own switcher popover (lives in <body>, several maps can be open at once).
+      let stylePopover: HTMLElement | null = null
+
+      // The switcher marks the style the map shows — on a pick and on a theme switch alike.
+      function markActiveStyle(url: string | undefined) {
+        stylePopover
+          ?.querySelectorAll<HTMLElement>('.os-location-map-style-popover-btn')
+          .forEach((btn) => {
+            const active = btn.dataset.url === url
+            btn.classList.toggle('os-location-map-style-popover-btn--active', active)
+            btn.setAttribute('aria-selected', String(active))
+          })
+      }
 
       const hasPin = computed(() => typeof props.lat === 'number' && typeof props.lng === 'number')
 
@@ -609,25 +622,19 @@
               btn.textContent = style.label
               btn.className = 'os-location-map-style-popover-btn'
               btn.setAttribute('role', 'option')
-              if (props.mapStyle === style.url) {
-                btn.classList.add('os-location-map-style-popover-btn--active')
-                btn.setAttribute('aria-selected', 'true')
-              }
+              btn.dataset.url = style.url
               btn.addEventListener('click', (e) => {
                 e.stopPropagation()
                 stylePicked = true
                 map.setStyle(style.url)
-                popoverEl.querySelectorAll('.os-location-map-style-popover-btn').forEach((b) => {
-                  b.classList.remove('os-location-map-style-popover-btn--active')
-                  b.setAttribute('aria-selected', 'false')
-                })
-                btn.classList.add('os-location-map-style-popover-btn--active')
-                btn.setAttribute('aria-selected', 'true')
+                markActiveStyle(style.url)
                 closePopover()
               })
               popoverEl.appendChild(btn)
             })
             document.body.appendChild(popoverEl)
+            stylePopover = popoverEl
+            markActiveStyle(props.mapStyle)
 
             // Listens on the whole document (not just the map) since the
             // popover itself now lives outside the map's DOM subtree — a
@@ -749,6 +756,7 @@
           // map is set synchronously in onMounted, the watcher only fires after that.
           if (!stylePicked) {
             map.setStyle(url)
+            markActiveStyle(url)
           }
         },
       )

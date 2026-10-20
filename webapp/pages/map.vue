@@ -692,25 +692,18 @@ export default {
             btn.textContent = style.title
             btn.className = 'map-style-popover-btn'
             btn.setAttribute('role', 'option')
-            if (this.mapOptions.style === style.url) {
-              btn.classList.add('map-style-popover-btn--active')
-              btn.setAttribute('aria-selected', 'true')
-            }
+            btn.dataset.url = style.url
             btn.addEventListener('click', (e) => {
               e.stopPropagation()
               this.setStyle(style.url)
-              popover.querySelectorAll('.map-style-popover-btn').forEach((b) => {
-                b.classList.remove('map-style-popover-btn--active')
-                b.setAttribute('aria-selected', 'false')
-              })
-              btn.classList.add('map-style-popover-btn--active')
-              btn.setAttribute('aria-selected', 'true')
               popover.classList.remove('map-style-popover--open')
               toggle.setAttribute('aria-expanded', 'false')
             })
             popover.appendChild(btn)
           })
           container.appendChild(popover)
+          this.stylePopover = popover
+          this.markActiveStyle(this.mapOptions.style)
 
           // Close popover when clicking elsewhere on the map
           closePopoverHandler = () => {
@@ -1027,11 +1020,24 @@ export default {
     // The theme changed: new default tiles, unless the user picked a style himself.
     // style.load (onMapLoad) re-adds the markers.
     followThemeStyle() {
-      if (this.map && !this.activeStyle) this.map.setStyle(this.defaultStyleUrl)
+      if (this.map && !this.activeStyle) {
+        this.map.setStyle(this.defaultStyleUrl)
+        this.markActiveStyle(this.defaultStyleUrl)
+      }
+    },
+    // The switcher marks the style the map shows — on a pick and on a theme switch alike.
+    markActiveStyle(url) {
+      if (!this.stylePopover) return
+      this.stylePopover.querySelectorAll('.map-style-popover-btn').forEach((btn) => {
+        const active = btn.dataset.url === url
+        btn.classList.toggle('map-style-popover-btn--active', active)
+        btn.setAttribute('aria-selected', String(active))
+      })
     },
     setStyle(url) {
       this.map.setStyle(url)
       this.activeStyle = url
+      this.markActiveStyle(url)
     },
     loadMarkersIconsAndAddMarkers() {
       Promise.all(
