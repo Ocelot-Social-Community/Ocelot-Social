@@ -458,13 +458,16 @@ describe('in mode', () => {
           })
 
           describe('an unknown one', () => {
-            it('throws error: "Unknown category."', async () => {
+            it('throws error: "At least one of the categories does not exist."', async () => {
               const { errors } = await mutate({
                 mutation: CreateGroup,
                 variables: { ...variables, categoryIds: ['cat9', 'no-such-category'] },
               })
 
-              expect(errors?.[0]).toHaveProperty('message', 'Unknown category.')
+              expect(errors?.[0]).toHaveProperty(
+                'message',
+                'At least one of the categories does not exist.',
+              )
             })
           })
 
@@ -3868,13 +3871,16 @@ describe('in mode', () => {
               })
 
               describe('an unknown one', () => {
-                it('throws error: "Unknown category."', async () => {
+                it('throws error: "At least one of the categories does not exist."', async () => {
                   const { errors } = await mutate({
                     mutation: UpdateGroup,
                     variables: { id: 'my-group', categoryIds: ['no-such-category'] },
                   })
 
-                  expect(errors?.[0]).toHaveProperty('message', 'Unknown category.')
+                  expect(errors?.[0]).toHaveProperty(
+                    'message',
+                    'At least one of the categories does not exist.',
+                  )
                 })
               })
 
