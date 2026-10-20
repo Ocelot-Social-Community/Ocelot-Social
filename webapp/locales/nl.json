@@ -507,6 +507,8 @@
     "POST_PIN_FEATURE_DISABLED": "Het vastpinnen van berichten is niet ingeschakeld.",
     "POST_PIN_LIMIT_REACHED": "Het maximale aantal vastgepinde berichten is bereikt. Maak eerst een ander bericht los.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Er bestaat al een bericht met deze slug.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Te weinig onderwerpen geselecteerd (minimaal {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Te veel onderwerpen geselecteerd (maximaal {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "De bevestigingscode is ongeldig.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Deze gebruikersnaam is al in gebruik.",
     "REPORT_TARGET_IS_OWN": "Je kunt jezelf en je eigen inhoud niet melden.",

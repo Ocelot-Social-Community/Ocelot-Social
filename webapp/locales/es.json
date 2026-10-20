@@ -507,6 +507,8 @@
     "POST_PIN_FEATURE_DISABLED": "Anclar contribuciones no está activado.",
     "POST_PIN_LIMIT_REACHED": "Se ha alcanzado el número máximo de contribuciones ancladas. Desancla primero otra contribución.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Ya existe una contribución con este slug.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Hay muy pocos temas seleccionados (al menos {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Hay demasiados temas seleccionados (como máximo {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "El código de confirmación no es válido.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Este nombre de usuario ya está en uso.",
     "REPORT_TARGET_IS_OWN": "No puedes denunciarte a ti mismo ni denunciar tu propio contenido.",

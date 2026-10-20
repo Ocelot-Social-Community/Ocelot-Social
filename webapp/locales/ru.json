@@ -507,6 +507,8 @@
     "POST_PIN_FEATURE_DISABLED": "Закрепление постов не включено.",
     "POST_PIN_LIMIT_REACHED": "Достигнуто максимальное количество закреплённых постов. Сначала открепи другой пост.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Пост с таким slug уже существует.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Выбрано слишком мало тем (минимум {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Выбрано слишком много тем (максимум {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Код подтверждения недействителен.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Это имя пользователя уже занято.",
     "REPORT_TARGET_IS_OWN": "Ты не можешь пожаловаться ни на себя, ни на свой собственный контент.",
