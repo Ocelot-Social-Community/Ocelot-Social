@@ -352,6 +352,27 @@ if (!linter) {
   }
 }
 
+// 7. Release pull request labels. release-please finds "its" release pull requests by label alone:
+//    a pull request belongs to a config when it carries ALL of that config's `label`s
+//    (`hasAllLabels` in manifest.js). With the default `autorelease: pending` everywhere, every
+//    workflow sees every other one's merged-but-not-yet-tagged release pull request — publish.yml
+//    then logs `There are untagged, merged release PRs outstanding - aborting` and leaves the
+//    application's release pull request stale, which is how v3.21.2 missed branding 0.2.4. Nothing
+//    turns red; the changelog just stops updating until the next push. So no config's label set may
+//    be a subset of another's — that is precisely the condition under which it would see them.
+const DEFAULT_LABEL = 'autorelease: pending'
+const labelSets = configs.map((file) => {
+  const label = readJson(file).label
+  return { file, labels: label ? label.split(',').map((l) => l.trim()) : [DEFAULT_LABEL] }
+})
+for (const a of labelSets) {
+  for (const b of labelSets) {
+    if (a !== b && a.labels.every((l) => b.labels.includes(l))) {
+      fail(a.file, `its release pull request label(s) ${JSON.stringify(a.labels)} are all carried by ${b.file}'s release pull requests too (${JSON.stringify(b.labels)}) — its run would treat those as its own and abort while one is merged but untagged. Give it a \`label\` of its own.`)
+    }
+  }
+}
+
 const distinct = new Set(sectionLists.values())
 if (distinct.size > 1) {
   const grouped = [...sectionLists.entries()].map(([f, s]) => `${f}: ${JSON.parse(s).map((x) => x.type).join(',')}`)

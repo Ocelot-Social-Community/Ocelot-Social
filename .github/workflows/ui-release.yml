@@ -74,7 +74,7 @@ jobs:
           # app happens to be installed with would reach every later step in this job.
           #   contents      — commits, branches, tags and the GitHub release
           #   pull-requests — the release pull request itself
-          #   issues        — its `autorelease: pending`/`tagged` labels; labelling a pull request
+          #   issues        — its `autorelease: pending (ui)`/`tagged (ui)` labels; labelling a pull request
           #                   goes through the issues API, so it is a separate scope
           permission-contents: write
           permission-pull-requests: write
