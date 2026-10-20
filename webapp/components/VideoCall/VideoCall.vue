@@ -1861,10 +1861,10 @@ export default {
 
 .video-call--maximized {
   /*  Match the map page's layering pattern (see pages/map.vue): cover the full */
-  /*  viewport (top: 0, bottom: 0) and sit one below var(--z-index-page-submenu), so the */
-  /*  page's own floating elements (the feed's "+" button, z-index 150) stay beneath the */
-  /*  call, while the page header (.main-navigation) and the sticky footer (.ds-footer), */
-  /*  both at var(--z-index-page-submenu) = 2500, stack on top — their own */
+  /*  viewport (top: 0, bottom: 0) and sit at var(--z-index-call-maximized), one below */
+  /*  var(--z-index-page-submenu). The page's own floating elements (the feed's "+" button, */
+  /*  z-index 150) stay beneath the call, while the page header (.main-navigation) and the */
+  /*  sticky footer (.ds-footer), both at var(--z-index-page-submenu) = 2500, stack on top — their own */
   /*  box-shadows then naturally fall onto the call surface from above and */
   /*  below. Padding (not offset) keeps the call's internal header and */
   /*  controls below the page header / above the page footer. */
@@ -1876,7 +1876,7 @@ export default {
   left: 0;
   padding-top: var(--header-height);
   padding-bottom: var(--footer-height);
-  z-index: calc(var(--z-index-page-submenu) - 1);
+  z-index: var(--z-index-call-maximized);
   /*  The base .video-call rule paints a var(--box-shadow-large) around the panel. */
   /*  When the panel covers the full viewport that shadow has nowhere to land */
   /*  — and worse, the panel's own shadow competes with the header/footer */

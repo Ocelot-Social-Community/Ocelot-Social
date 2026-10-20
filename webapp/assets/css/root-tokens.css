@@ -307,7 +307,8 @@
   --z-index-dropdown: 8888;
   /* page-submenu: page chrome — header, footer and their submenus. Above a maximized call. */
   --z-index-page-submenu: 2500;
-  /* (page-submenu - 1: a maximized video call, between the page content and the page chrome) */
+  /* call-maximized: a maximized video call, one below the page chrome and above the page content */
+  --z-index-call-maximized: calc(var(--z-index-page-submenu) - 1);
   /* sticky-float: floating page elements, e.g. the feed's new-post button */
   --z-index-sticky-float: 150;
   /* sticky: sticky page elements */
