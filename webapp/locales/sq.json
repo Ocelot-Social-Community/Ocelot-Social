@@ -594,7 +594,7 @@
     "previousLocation": "Vendndodhja e mëparshme: {location}",
     "scrollToLocationMap": "Rrëshqit te harta",
     "validations": {
-      "categories": "Ju lutem zgjidhni midis një dhe tre temave.",
+      "categories": "Ju lutem zgjidhni midis {min} dhe {max} temave.",
       "contentNotEmpty": "Ju lutem shkruani përmbajtje.",
       "email": "Ju lutem shkruani një adresë e-mail të vlefshme.",
       "eventLocationNameLength": "Adresa duhet të ketë midis {min} dhe {max} karaktere.",

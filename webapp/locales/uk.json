@@ -594,7 +594,7 @@
     "previousLocation": "Попереднє місцезнаходження: {location}",
     "scrollToLocationMap": "Прокрутити до карти",
     "validations": {
-      "categories": "Будь ласка, оберіть від однієї до трьох тем.",
+      "categories": "Будь ласка, оберіть від {min} до {max} тем.",
       "contentNotEmpty": "Будь ласка, введіть вміст.",
       "email": "Будь ласка, введіть дійсну електронну адресу.",
       "eventLocationNameLength": "Адреса повинна містити від {min} до {max} символів.",

@@ -218,7 +218,10 @@
             :variant="visibleErrors && visibleErrors.categoryIds ? 'error' : null"
             :text="
               visibleErrors && visibleErrors.categoryIds
-                ? $t('common.validations.categories')
+                ? $t('common.validations.categories', {
+                    min: branding.category.min,
+                    max: branding.category.max,
+                  })
                 : null
             "
           />
@@ -421,7 +424,14 @@ export default {
               this.categoriesActive &&
               (value.length < branding.category.min || value.length > branding.category.max)
             ) {
-              return [new Error(this.$t('common.validations.categories'))]
+              return [
+                new Error(
+                  this.$t('common.validations.categories', {
+                    min: branding.category.min,
+                    max: branding.category.max,
+                  }),
+                ),
+              ]
             }
             return []
           },

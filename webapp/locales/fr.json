@@ -594,7 +594,7 @@
     "previousLocation": "Emplacement précédent : {location}",
     "scrollToLocationMap": "Faire défiler jusqu’à la carte",
     "validations": {
-      "categories": "Veuillez sélectionner entre un et trois sujets.",
+      "categories": "Veuillez sélectionner entre {min} et {max} sujets.",
       "contentNotEmpty": "Veuillez saisir du contenu.",
       "email": "Veuillez saisir une adresse e-mail valide.",
       "eventLocationNameLength": "L'adresse doit comporter entre {min} et {max} caractères.",

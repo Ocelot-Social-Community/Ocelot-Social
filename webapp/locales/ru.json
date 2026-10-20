@@ -594,7 +594,7 @@
     "previousLocation": "Предыдущее местоположение: {location}",
     "scrollToLocationMap": "Прокрутить к карте",
     "validations": {
-      "categories": "Пожалуйста, выберите от одной до трёх тем.",
+      "categories": "Пожалуйста, выберите от {min} до {max} тем.",
       "contentNotEmpty": "Пожалуйста, введите содержимое.",
       "email": "Пожалуйста, введите корректный адрес электронной почты.",
       "eventLocationNameLength": "Адрес должен содержать от {min} до {max} символов.",

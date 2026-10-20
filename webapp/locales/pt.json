@@ -594,7 +594,7 @@
     "previousLocation": "Localização anterior: {location}",
     "scrollToLocationMap": "Rolar até o mapa",
     "validations": {
-      "categories": "Por favor, selecione entre um e três tópicos.",
+      "categories": "Por favor, selecione entre {min} e {max} tópicos.",
       "contentNotEmpty": "Por favor, insira algum conteúdo.",
       "email": "Por favor, insira um endereço de e-mail válido.",
       "eventLocationNameLength": "O endereço deve ter entre {min} e {max} caracteres.",

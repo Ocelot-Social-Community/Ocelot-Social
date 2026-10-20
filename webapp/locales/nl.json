@@ -594,7 +594,7 @@
     "previousLocation": "Vorige locatie: {location}",
     "scrollToLocationMap": "Naar de kaart scrollen",
     "validations": {
-      "categories": "Selecteer tussen één en drie onderwerpen.",
+      "categories": "Selecteer tussen {min} en {max} onderwerpen.",
       "contentNotEmpty": "Voer inhoud in.",
       "email": "Voer een geldig e-mailadres in.",
       "eventLocationNameLength": "Het adres moet tussen {min} en {max} tekens lang zijn.",

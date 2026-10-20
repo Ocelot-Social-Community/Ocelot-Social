@@ -594,7 +594,7 @@
     "previousLocation": "Posizione precedente: {location}",
     "scrollToLocationMap": "Scorri fino alla mappa",
     "validations": {
-      "categories": "Selezionare tra uno e tre argomenti.",
+      "categories": "Selezionare tra {min} e {max} argomenti.",
       "contentNotEmpty": "Inserire del contenuto.",
       "email": "Inserire un indirizzo e-mail valido.",
       "eventLocationNameLength": "L'indirizzo deve essere compreso tra {min} e {max} caratteri.",
