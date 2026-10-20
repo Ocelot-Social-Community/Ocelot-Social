@@ -422,6 +422,9 @@
   --chat-module-background: rgb(233, 228, 228);
   --chat-module-close-color: blue;
   --chat-message-bg-others: var(--color-neutral-80);
+  /* Tooltips (tooltip.css): inverse in light, so they stand off the page; dark in dark too. */
+  --tooltip-background: var(--background-color-inverse-soft);
+  --tooltip-color: var(--text-color-inverse);
   --chat-sidemenu-bg: var(--color-neutral-100);
   /* The hover partner of --chat-sidemenu-bg. Carried over as a literal because the SCSS side had it
      as one too ($chat-sidemenu-background-over); it is a token rather than a value inlined in
