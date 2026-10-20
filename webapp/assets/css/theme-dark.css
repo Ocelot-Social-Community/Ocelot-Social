@@ -45,6 +45,7 @@
   --chat-message-bg-others: rgb(48, 46, 54);
   --chat-sidemenu-bg: rgb(30, 29, 34);
   --chat-sidemenu-background-over: rgb(38, 36, 43);
+  --chat-sidemenu-background-active: rgb(28, 74, 40);
 
 
   --color-default: var(--background-color-softer);
@@ -133,6 +134,7 @@
     --chat-message-bg-others: rgb(48, 46, 54);
     --chat-sidemenu-bg: rgb(30, 29, 34);
     --chat-sidemenu-background-over: rgb(38, 36, 43);
+    --chat-sidemenu-background-active: rgb(28, 74, 40);
 
 
     --color-default: var(--background-color-softer);
