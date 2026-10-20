@@ -70,6 +70,38 @@
   --chat-module-close-color: rgb(120, 170, 255);
   --map-background: rgb(38, 36, 43);
   --map-control-icon-filter: invert(0.88);
+  --chat-accent: rgb(100, 170, 240);
+  --chat-accent-contrast: rgb(24, 23, 27);
+  --chat-border-color: rgb(58, 55, 64);
+  --chat-search-border-color: rgb(58, 55, 64);
+  --chat-hover-background: rgb(38, 36, 43);
+  --chat-text-strong: rgb(232, 230, 236);
+  --chat-text-muted: rgb(140, 133, 152);
+  --chat-text-subtle: rgb(160, 153, 172);
+  --chat-deleted-background: rgb(48, 46, 54);
+  --chat-selected-background: rgb(40, 60, 90);
+  --chat-notice-background: rgb(38, 44, 58);
+  --chat-notice-color: rgb(178, 172, 188);
+  --chat-shade-strong: rgba(255, 255, 255, 0.15);
+  --chat-shade: rgba(255, 255, 255, 0.08);
+  --chat-reply-color: rgb(178, 172, 188);
+  --chat-tag-color: rgb(110, 170, 235);
+  --chat-image-background: rgb(48, 46, 54);
+  --chat-reaction-background: rgb(48, 46, 54);
+  --chat-reaction-border-hover: rgb(75, 71, 83);
+  --chat-reaction-me-background: rgb(30, 60, 75);
+  --chat-reaction-me-border: rgb(59, 152, 184);
+  --chat-reaction-me-color: rgb(140, 190, 240);
+  --chat-audio-color: rgb(178, 172, 188);
+  --chat-code-background: rgba(255, 255, 255, 0.08);
+  --chat-code-border: rgba(255, 255, 255, 0.15);
+  --chat-code-color: rgb(240, 110, 150);
+  --chat-room-message-color: rgb(178, 172, 188);
+  --chat-room-timestamp-color: rgb(140, 133, 152);
+  --chat-icon-strong: rgb(232, 230, 236);
+  --chat-icon-soft: rgb(140, 133, 152);
+  --chat-icon-faint: rgba(255, 255, 255, 0.35);
+  --chat-icon-backdrop: rgba(0, 0, 0, 0.45);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -126,5 +158,37 @@
     --chat-module-close-color: rgb(120, 170, 255);
     --map-background: rgb(38, 36, 43);
     --map-control-icon-filter: invert(0.88);
+    --chat-accent: rgb(100, 170, 240);
+    --chat-accent-contrast: rgb(24, 23, 27);
+    --chat-border-color: rgb(58, 55, 64);
+    --chat-search-border-color: rgb(58, 55, 64);
+    --chat-hover-background: rgb(38, 36, 43);
+    --chat-text-strong: rgb(232, 230, 236);
+    --chat-text-muted: rgb(140, 133, 152);
+    --chat-text-subtle: rgb(160, 153, 172);
+    --chat-deleted-background: rgb(48, 46, 54);
+    --chat-selected-background: rgb(40, 60, 90);
+    --chat-notice-background: rgb(38, 44, 58);
+    --chat-notice-color: rgb(178, 172, 188);
+    --chat-shade-strong: rgba(255, 255, 255, 0.15);
+    --chat-shade: rgba(255, 255, 255, 0.08);
+    --chat-reply-color: rgb(178, 172, 188);
+    --chat-tag-color: rgb(110, 170, 235);
+    --chat-image-background: rgb(48, 46, 54);
+    --chat-reaction-background: rgb(48, 46, 54);
+    --chat-reaction-border-hover: rgb(75, 71, 83);
+    --chat-reaction-me-background: rgb(30, 60, 75);
+    --chat-reaction-me-border: rgb(59, 152, 184);
+    --chat-reaction-me-color: rgb(140, 190, 240);
+    --chat-audio-color: rgb(178, 172, 188);
+    --chat-code-background: rgba(255, 255, 255, 0.08);
+    --chat-code-border: rgba(255, 255, 255, 0.15);
+    --chat-code-color: rgb(240, 110, 150);
+    --chat-room-message-color: rgb(178, 172, 188);
+    --chat-room-timestamp-color: rgb(140, 133, 152);
+    --chat-icon-strong: rgb(232, 230, 236);
+    --chat-icon-soft: rgb(140, 133, 152);
+    --chat-icon-faint: rgba(255, 255, 255, 0.35);
+    --chat-icon-backdrop: rgba(0, 0, 0, 0.45);
   }
 }
