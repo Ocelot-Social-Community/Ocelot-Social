@@ -46,6 +46,9 @@
   --chat-sidemenu-bg: rgb(30, 29, 34);
   --chat-sidemenu-background-over: rgb(38, 36, 43);
 
+  --color-donation-bar-goal: rgb(48, 46, 54);
+  --color-donation-bar-goal-stripe: rgb(58, 55, 64);
+
   --color-default: var(--background-color-softer);
   --color-default-hover: rgb(60, 57, 66);
   --color-default-active: rgb(75, 71, 83);
@@ -80,6 +83,9 @@
     --chat-message-bg-others: rgb(48, 46, 54);
     --chat-sidemenu-bg: rgb(30, 29, 34);
     --chat-sidemenu-background-over: rgb(38, 36, 43);
+
+    --color-donation-bar-goal: rgb(48, 46, 54);
+    --color-donation-bar-goal-stripe: rgb(58, 55, 64);
 
     --color-default: var(--background-color-softer);
     --color-default-hover: rgb(60, 57, 66);

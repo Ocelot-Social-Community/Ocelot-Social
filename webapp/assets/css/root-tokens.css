@@ -343,6 +343,9 @@
   --color-donation-bar: var(--color-primary);
 
   --color-donation-bar-light: var(--color-primary-light);
+  /* The empty rest of the donation bar (ProgressBar.vue): two stripes, the label sits on top of them. */
+  --color-donation-bar-goal: var(--color-neutral-80);
+  --color-donation-bar-goal-stripe: var(--color-neutral-70);
   /**
  * @tokens Toast Color
  */
