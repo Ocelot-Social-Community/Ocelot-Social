@@ -1750,20 +1750,16 @@ export default {
         // We are in the room now. A device that does not start must not
         // turn that into a failed join: the error block would sit on top of
         // a live session, and joining again from there adds a second self.
-        if (this.micEnabled) {
+        for (const [kind, flag, enable] of [
+          ['mic', 'micEnabled', 'setMicrophoneEnabled'],
+          ['camera', 'cameraEnabled', 'setCameraEnabled'],
+        ]) {
+          if (!this[flag]) continue
           try {
-            await room.localParticipant.setMicrophoneEnabled(true)
+            await room.localParticipant[enable](true)
           } catch (err) {
-            this.micEnabled = false
-            this.showDeviceErrorToast('mic', err)
-          }
-        }
-        if (this.cameraEnabled) {
-          try {
-            await room.localParticipant.setCameraEnabled(true)
-          } catch (err) {
-            this.cameraEnabled = false
-            this.showDeviceErrorToast('camera', err)
+            this[flag] = false
+            this.showDeviceErrorToast(kind, err)
           }
         }
         this.refreshTiles()
@@ -2366,14 +2362,7 @@ export default {
     async retryConnect() {
       // Tear down whatever half-initialized room may exist from the failed
       // attempt so listeners and tracks from the previous try don't leak.
-      if (this.room) {
-        try {
-          await this.room.disconnect()
-        } catch (_e) {
-          /* ignore */
-        }
-        this.room = null
-      }
+      await this.leaveRoom()
       this.tiles = []
       this.activeSpeakerIds = []
       this.spotlightKey = null
@@ -2394,8 +2383,10 @@ export default {
       this.room = null
       try {
         await room.disconnect()
-      } catch (_e) {
-        /* ignore */
+      } catch (err) {
+        // The room is dropped either way; say so instead of failing in silence.
+        // eslint-disable-next-line no-console
+        console.warn('VideoCall: leaving the room failed', err)
       }
     },
     async leave() {
