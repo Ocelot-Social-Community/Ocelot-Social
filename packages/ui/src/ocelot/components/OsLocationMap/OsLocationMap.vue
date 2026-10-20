@@ -249,6 +249,8 @@
       let marker: any = null
       let debounceTimer: ReturnType<typeof setTimeout> | null = null
       let resizeObserver: ResizeObserver | null = null
+      // Once the user picks a style in the switcher, a changed mapStyle prop no longer overrides it.
+      let stylePicked = false
 
       const hasPin = computed(() => typeof props.lat === 'number' && typeof props.lng === 'number')
 
@@ -613,6 +615,7 @@
               }
               btn.addEventListener('click', (e) => {
                 e.stopPropagation()
+                stylePicked = true
                 map.setStyle(style.url)
                 popoverEl.querySelectorAll('.os-location-map-style-popover-btn').forEach((b) => {
                   b.classList.remove('os-location-map-style-popover-btn--active')
@@ -738,6 +741,17 @@
         }
         /* v8 ignore stop */
       })
+
+      // The page's theme can change while the map is open (light/dark tiles).
+      watch(
+        () => props.mapStyle,
+        (url) => {
+          // map is set synchronously in onMounted, the watcher only fires after that.
+          if (!stylePicked) {
+            map.setStyle(url)
+          }
+        },
+      )
 
       onBeforeUnmount(() => {
         if (debounceTimer) {

@@ -10,8 +10,24 @@ export const themeFromCookieHeader = (header) => {
   return normalizeTheme(match && decodeURIComponent(match[1]))
 }
 
+export const THEME_CHANGE_EVENT = 'ocelot-theme-change'
+
 export const applyTheme = (theme, doc = document) => {
   doc.documentElement.setAttribute('data-theme', normalizeTheme(theme))
+  const win = doc.defaultView
+  if (win) win.dispatchEvent(new win.CustomEvent(THEME_CHANGE_EVENT))
+}
+
+// Calls back whenever the effective theme may have changed: the switch, or the system
+// scheme while the switch stands on 'system'. Returns the unsubscribe.
+export const onThemeChange = (callback, win = window) => {
+  const media = win.matchMedia ? win.matchMedia('(prefers-color-scheme: dark)') : null
+  win.addEventListener(THEME_CHANGE_EVENT, callback)
+  if (media) media.addEventListener('change', callback)
+  return () => {
+    win.removeEventListener(THEME_CHANGE_EVENT, callback)
+    if (media) media.removeEventListener('change', callback)
+  }
 }
 
 // Whether the page is dark right now — the explicit choice on <html data-theme>, else the system's.

@@ -31,7 +31,7 @@ import mapboxgl from 'mapbox-gl'
 import { OsLocationMap } from '@ocelot-social/ui/ocelot'
 import Empty from '~/components/Empty/Empty'
 import { queryLocations } from '~/graphql/location'
-import { isDarkTheme } from '~/utils/theme'
+import { isDarkTheme, onThemeChange } from '~/utils/theme'
 
 // Default for the "types" prop — precise enough for an event's exact pin.
 // Callers wanting coarser results (e.g. groups) pass their own "types" prop.
@@ -150,6 +150,7 @@ export default {
     return {
       isEmpty,
       mapboxgl,
+      dark: false,
       defaultCenter: [10.452764, 51.165707], // center of Germany
       // Bumped on every onPinChange call so a slow, stale reverse-geocoding
       // response (from an earlier drag) can't overwrite what a later one
@@ -166,6 +167,15 @@ export default {
       // the drag itself) on-screen position.
       pinRevision: 0,
     }
+  },
+  mounted() {
+    this.dark = isDarkTheme()
+    this.offThemeChange = onThemeChange(() => {
+      this.dark = isDarkTheme()
+    })
+  },
+  beforeDestroy() {
+    if (this.offThemeChange) this.offThemeChange()
   },
   computed: {
     lat() {
@@ -184,7 +194,7 @@ export default {
     },
     // A dark page opens on the dark tiles.
     defaultStyleUrl() {
-      return typeof window !== 'undefined' && isDarkTheme() ? DARK_STYLE_URL : OUTDOORS_STYLE_URL
+      return this.dark ? DARK_STYLE_URL : OUTDOORS_STYLE_URL
     },
     // Same color as the matching markers on pages/map.vue — read from the
     // shared CSS token (markerColorToken, root-tokens.css) at runtime rather

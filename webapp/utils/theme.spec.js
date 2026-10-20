@@ -1,4 +1,10 @@
-import { applyTheme, isDarkTheme, normalizeTheme, themeFromCookieHeader } from './theme'
+import {
+  applyTheme,
+  isDarkTheme,
+  normalizeTheme,
+  onThemeChange,
+  themeFromCookieHeader,
+} from './theme'
 
 describe('theme', () => {
   it('reads the theme from a cookie header', () => {
@@ -32,5 +38,15 @@ describe('isDarkTheme', () => {
   it('follows the system for system or no attribute', () => {
     expect(isDarkTheme(doc('system'), win(true))).toBe(true)
     expect(isDarkTheme(doc(null), win(false))).toBe(false)
+  })
+
+  it('tells subscribers when the theme is applied, until they unsubscribe', () => {
+    const callback = jest.fn()
+    const off = onThemeChange(callback)
+    applyTheme('dark')
+    expect(callback).toHaveBeenCalledTimes(1)
+    off()
+    applyTheme('light')
+    expect(callback).toHaveBeenCalledTimes(1)
   })
 })

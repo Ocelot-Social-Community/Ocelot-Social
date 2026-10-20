@@ -932,6 +932,39 @@ describe('osLocationMap', () => {
       expect(toggle.getAttribute('aria-expanded')).toBe('false')
     })
 
+    it('follows a changed mapStyle prop (theme switch) while the user picked none', async () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          styles,
+          mapStyle: styles[0].url,
+        },
+      })
+
+      await wrapper.setProps({ mapStyle: styles[1].url })
+
+      expect(ctx.mapInstance.setStyle).toHaveBeenCalledWith(styles[1].url)
+    })
+
+    it('keeps the style the user picked when the mapStyle prop changes', async () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          styles,
+          mapStyle: styles[0].url,
+        },
+      })
+      getStyleSwitcherToggle().dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      getStyleOption(1).dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      ctx.mapInstance.setStyle.mockClear()
+
+      await wrapper.setProps({ mapStyle: styles[0].url + '?dark' })
+
+      expect(ctx.mapInstance.setStyle).not.toHaveBeenCalled()
+    })
+
     it('closes the popover on window scroll (its fixed position would otherwise go stale)', () => {
       mount(OsLocationMap, {
         props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', styles },

@@ -93,7 +93,7 @@ import { mapGetters } from 'vuex'
 import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { isEventPast } from '~/utils/eventDate'
-import { isDarkTheme } from '~/utils/theme'
+import { isDarkTheme, onThemeChange } from '~/utils/theme'
 import { profileUserQuery } from '~/graphql/User'
 import { mapQuery } from '~/graphql/MapQuery'
 import { queryLocations } from '~/graphql/location'
@@ -182,6 +182,7 @@ export default {
       mapboxgl,
       legendOpen: false,
       activeStyle: null,
+      dark: typeof window !== 'undefined' && isDarkTheme(),
       initialCoordinates,
       initialEventId,
       initialGroupId,
@@ -276,6 +277,9 @@ export default {
     this.popupScrollTimer = null
   },
   async mounted() {
+    this.offThemeChange = onThemeChange(() => {
+      this.dark = isDarkTheme()
+    })
     this.updateMapPosition()
     window.addEventListener('resize', this.updateMapPosition)
 
@@ -286,6 +290,7 @@ export default {
     this.addMarkersOnCheckPrepared()
   },
   beforeDestroy() {
+    if (this.offThemeChange) this.offThemeChange()
     window.removeEventListener('resize', this.updateMapPosition)
     if (this.geocoderCollapseHandler) {
       window.removeEventListener('resize', this.geocoderCollapseHandler)
@@ -361,8 +366,7 @@ export default {
     },
     // A dark page opens on the dark tiles; a style the user picked always wins.
     defaultStyleUrl() {
-      const dark = typeof window !== 'undefined' && isDarkTheme()
-      return dark ? this.availableStyles.dark.url : this.availableStyles.outdoors.url
+      return this.dark ? this.availableStyles.dark.url : this.availableStyles.outdoors.url
     },
     mapOptions() {
       return {
@@ -390,6 +394,9 @@ export default {
     },
   },
   watch: {
+    dark() {
+      this.followThemeStyle()
+    },
     isPreparedForMarkers(newValue) {
       if (newValue) {
         this.addMarkersOnCheckPrepared()
@@ -1033,6 +1040,11 @@ export default {
           map.setLayoutProperty(thisLayer.id, 'text-field', ['get', 'name'])
         }
       })
+    },
+    // The theme changed: new default tiles, unless the user picked a style himself.
+    // style.load (onMapLoad) re-adds the markers.
+    followThemeStyle() {
+      if (this.map && !this.activeStyle) this.map.setStyle(this.defaultStyleUrl)
     },
     setStyle(url) {
       this.map.setStyle(url)
