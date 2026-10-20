@@ -905,10 +905,12 @@ describe('PreJoin', () => {
       expect(wrapper.find(STARTING).exists()).toBe(true)
 
       refuse(new Error('boom'))
-      await expect(starting).rejects.toThrow('boom')
+      // A camera that does not start goes to off and says why; it no longer throws.
+      await expect(starting).resolves.toBe(true)
       await wrapper.vm.$nextTick()
       expect(wrapper.find(STARTING).exists()).toBe(false)
-      expect(placeholder(wrapper)).toBe('videoCall.prejoin.noCamera')
+      // …and the camera is switched off, so the placeholder says so.
+      expect(placeholder(wrapper)).toBe('videoCall.prejoin.cameraDisabled')
     })
 
     it('names the camera that is starting, once the browser has named it', async () => {
@@ -1386,8 +1388,23 @@ describe('PreJoin', () => {
       })
     })
 
-    it('rethrows when video-only acquisition fails (no audio fallback)', async () => {
+    it('switches a busy camera off when it is asked for alone (no audio fallback)', async () => {
       const err = Object.assign(new Error('fail'), { name: 'NotReadableError' })
+      const mediaDevices = {
+        getUserMedia: jest.fn().mockRejectedValue(err),
+        enumerateDevices: jest.fn().mockResolvedValue([]),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      }
+      const { wrapper } = mountWith(mediaDevices)
+      wrapper.setData({ cameraActive: true, micActive: false, cameraStatus: 'granted' })
+      await expect(wrapper.vm.acquireStream()).resolves.toBe(true)
+      expect(wrapper.vm.cameraActive).toBe(false)
+      expect(wrapper.vm.permissionError).toBe('videoCall.prejoin.errorBusy')
+    })
+
+    it('rethrows a refused permission when video-only acquisition fails', async () => {
+      const err = Object.assign(new Error('fail'), { name: 'NotAllowedError' })
       const mediaDevices = {
         getUserMedia: jest.fn().mockRejectedValue(err),
         enumerateDevices: jest.fn().mockResolvedValue([]),

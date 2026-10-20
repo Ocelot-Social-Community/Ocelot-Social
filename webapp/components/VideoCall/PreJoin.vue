@@ -509,7 +509,11 @@ export default {
           }
           cameraError = videoErr
         } else {
-          if (wantVideo && this.isMissingDevice(videoErr)) {
+          // Any camera that does not start goes to off — missing, busy, broken —
+          // as it does with the microphone on (below). A refused permission is
+          // the one case left to the callers, which know the permission state.
+          const denied = ['NotAllowedError', 'SecurityError'].includes(videoErr && videoErr.name)
+          if (wantVideo && !denied) {
             this.markCameraMissing(videoErr)
             return true
           }
