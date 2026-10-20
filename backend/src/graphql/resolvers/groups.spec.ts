@@ -3855,6 +3855,38 @@ describe('in mode', () => {
                   expect(errors?.[0]).toHaveProperty('message', 'Too many categories (at most 3).')
                 })
               })
+
+              // As for CreateGroup: on an empty category DB there is nothing to choose, and a
+              // group must still be savable — the frontend sends an empty multi-select as [].
+              describe('but no categories exist in the database (empty category DB)', () => {
+                beforeEach(async () => {
+                  const session = database.driver.session()
+                  try {
+                    await session.run('MATCH (category:Category) DETACH DELETE category')
+                  } finally {
+                    await session.close()
+                  }
+                })
+
+                it('updates the group with "categoryIds: []" instead of throwing "Too few categories."', async () => {
+                  await expect(
+                    mutate({
+                      mutation: UpdateGroup,
+                      variables: { id: 'my-group', name: 'The New Group Name', categoryIds: [] },
+                    }),
+                  ).resolves.toMatchObject({
+                    data: {
+                      UpdateGroup: {
+                        id: 'my-group',
+                        name: 'The New Group Name',
+                        categories: [],
+                        myRole: 'owner',
+                      },
+                    },
+                    errors: undefined,
+                  })
+                })
+              })
             })
 
             describe('showMembers', () => {
