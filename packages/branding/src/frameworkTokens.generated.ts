@@ -205,6 +205,7 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'text-color-warning': 'var(--color-warning)',
   'text-weight-bold': '600',
   'text-weight-regular': 'normal',
+  'z-index-call-maximized': 'calc(var(--z-index-page-submenu) - 1)',
   'z-index-dropdown': '8888',
   'z-index-modal': '9999',
   'z-index-overlay': '9000',

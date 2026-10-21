@@ -46,8 +46,9 @@ defaults:
     shell: bash
 
 jobs:
-  # On master, a commit the merge queue already tested here is not tested a second time: the queue
-  # fast-forwards master to the very commit it ran this workflow on. The prepare jobs below are
+  # On a branch, a commit the merge queue already tested here is not tested a second time: the queue
+  # fast-forwards master to the very commit it ran this workflow on (and release-please resets its
+  # release branch to that commit, too — see the action). The prepare jobs below are
   # then skipped (which counts as passed), the matrix with them, and the status job accepts it.
   queue:
     name: Already verified by the merge queue?

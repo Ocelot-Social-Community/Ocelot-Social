@@ -69,7 +69,8 @@ export default {
 <style scoped>
 .ds-footer {
   text-align: center;
-  z-index: 10;
+  /*  Page chrome like the header: stays above a maximized video call. */
+  z-index: var(--z-index-page-submenu);
   background-color: var(--color-footer-background);
   width: 100%;
   padding: 10px 10px;
