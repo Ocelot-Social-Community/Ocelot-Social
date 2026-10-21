@@ -34,7 +34,8 @@ export const unknownCategoryIds = async (
          RETURN collect(DISTINCT categoryId) AS unknown`,
         { categoryIds },
       )
-      return (result.records[0]?.get('unknown') as string[] | undefined) ?? []
+      // collect() always yields one row, an empty list when nothing is unknown.
+      return result.records[0].get('unknown') as string[]
     })
   } finally {
     await session.close()
