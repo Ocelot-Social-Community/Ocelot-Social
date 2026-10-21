@@ -5,6 +5,8 @@ const {
   declarations,
   styleBodies,
   checkSource,
+  localZLimit,
+  formatZIndexReport,
 } = require('./check-css-tokens')
 
 const style = (css, attrs = ' scoped') => `<template><i /></template><style${attrs}>${css}</style>`
@@ -148,5 +150,102 @@ describe('checkSource', () => {
   it('leaves scss blocks alone', () => {
     const { errors } = checkSource(style('.a { color: $primary; }', ' lang="scss"'), byRgb, 'A.vue')
     expect(errors).toEqual([])
+  })
+})
+
+describe('checkSource — z-index', () => {
+  const check = (css, limit) => checkSource(style(css), {}, 'A.vue', limit)
+
+  it('allows a token, also inside a calc()', () => {
+    expect(check('.a { z-index: var(--z-index-modal); }').errors).toEqual([])
+    expect(check('.a { z-index: calc(var(--z-index-modal) - 2); }').errors).toEqual([])
+  })
+
+  it('allows a local number below the limit, negative ones too', () => {
+    expect(check('.a { z-index: 3; }').errors).toEqual([])
+    expect(check('.a { z-index: -1; }').errors).toEqual([])
+    expect(check('.a { z-index: 99; }', 100).errors).toEqual([])
+  })
+
+  it('flags a raw number from the limit up', () => {
+    expect(check('.a { z-index: 100; }', 100).errors).toEqual([
+      'A.vue: z-index: 100 — use a var(--z-index-*) token; only plain numbers below 100 are local',
+    ])
+    expect(check('.a { z-index: 9999 !important; }').errors).toHaveLength(1)
+  })
+
+  it('flags a raw number that hides in a calc() or another unit', () => {
+    expect(check('.a { z-index: calc(150 + 1); }').errors).toHaveLength(1)
+  })
+
+  it('allows the keywords', () => {
+    expect(check('.a { z-index: auto; }').errors).toEqual([])
+  })
+
+  it('leaves scss blocks alone', () => {
+    const src = style('.a { z-index: 5000; }', ' lang="scss"')
+    expect(checkSource(src, {}, 'A.vue').errors).toEqual([])
+  })
+
+  it('records the tokens and the local numbers a file uses', () => {
+    const { zUsages } = check('.a { z-index: var(--z-index-modal); } .b { z-index: 2; }')
+    expect(zUsages).toEqual([
+      { rel: 'A.vue', token: 'z-index-modal' },
+      { rel: 'A.vue', local: 2 },
+    ])
+  })
+})
+
+describe('localZLimit', () => {
+  it('is the lowest page-level token, --z-index-sticky', () => {
+    expect(localZLimit({ 'z-index-sticky': '100' })).toBe(100)
+  })
+
+  it('falls back when the token is missing or not a number', () => {
+    expect(localZLimit({})).toBe(100)
+    expect(localZLimit({ 'z-index-sticky': 'calc(1 + 1)' })).toBe(100)
+  })
+
+  it('matches the real scale', () => {
+    expect(localZLimit(readTokens())).toBe(100)
+  })
+})
+
+describe('formatZIndexReport', () => {
+  const tokens = {
+    'z-index-modal': '9999',
+    'z-index-page-submenu': '2500',
+    'z-index-call-maximized': 'calc(var(--z-index-page-submenu) - 1)',
+    'z-index-surface': '1',
+    'color-primary': '#17b53f',
+  }
+  const usages = [
+    { rel: 'b/Modal.vue', token: 'z-index-modal' },
+    { rel: 'a/Call.vue', token: 'z-index-call-maximized' },
+    { rel: 'a/Tile.vue', local: 3 },
+    { rel: 'a/Call.vue', local: 3 },
+  ]
+  const report = formatZIndexReport(tokens, usages)
+
+  it('lists the tokens highest first, resolving a calc() level by its number', () => {
+    const order = ['--z-index-modal', '--z-index-page-submenu', '--z-index-call-maximized']
+    const at = order.map((name) => report.indexOf(name))
+    expect(at).toEqual([...at].sort((x, y) => x - y))
+    expect(report.indexOf('--z-index-call-maximized')).toBeLessThan(
+      report.indexOf('--z-index-surface'),
+    )
+  })
+
+  it('names the files of a token and marks an unused one', () => {
+    expect(report).toContain('b/Modal.vue')
+    expect(report).toMatch(/--z-index-page-submenu\n\s+\(unused\)/)
+  })
+
+  it('groups the local numbers with their files, sorted', () => {
+    expect(report).toMatch(/\n {2}3\n {6}a\/Call\.vue\n {6}a\/Tile\.vue/)
+  })
+
+  it('leaves out tokens that are not z-index levels', () => {
+    expect(report).not.toContain('color-primary')
   })
 })
