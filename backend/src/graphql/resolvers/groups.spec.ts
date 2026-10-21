@@ -4539,6 +4539,7 @@ describe('in mode', () => {
         await mutate({
           mutation: CreatePost,
           variables: {
+            categoryIds: ['cat9'],
             id: 'post-in-group-1',
             title: 'First Post',
             content: 'Content of first post',
@@ -4549,6 +4550,7 @@ describe('in mode', () => {
         await mutate({
           mutation: CreatePost,
           variables: {
+            categoryIds: ['cat9'],
             id: 'post-in-group-2',
             title: 'Second Post',
             content: 'Content of second post',

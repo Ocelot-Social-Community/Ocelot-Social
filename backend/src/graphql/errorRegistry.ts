@@ -250,6 +250,14 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'Post with this slug already exists.',
   },
+  POST_SAVE_TOO_FEW_CATEGORIES: {
+    type: 'BAD_USER_INPUT',
+    text: 'Too few categories (at least {min}).',
+  },
+  POST_SAVE_TOO_MANY_CATEGORIES: {
+    type: 'BAD_USER_INPUT',
+    text: 'Too many categories (at most {max}).',
+  },
   // locations
   // A query selected Location.distanceToMe without the location's id.
   LOCATION_FIELD_LOCATION_ID_MISSING: {
