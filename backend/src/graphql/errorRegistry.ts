@@ -113,6 +113,10 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'Too many categories (at most {max}).',
   },
+  GROUP_SAVE_CATEGORY_UNKNOWN: {
+    type: 'BAD_USER_INPUT',
+    text: 'At least one of the categories does not exist.',
+  },
   GROUP_MEMBERSHIP_USER_NOT_A_MEMBER: {
     type: 'BAD_USER_INPUT',
     text: 'User is not a member of this group.',
@@ -257,6 +261,10 @@ const definitions = {
   POST_SAVE_TOO_MANY_CATEGORIES: {
     type: 'BAD_USER_INPUT',
     text: 'Too many categories (at most {max}).',
+  },
+  POST_SAVE_CATEGORY_UNKNOWN: {
+    type: 'BAD_USER_INPUT',
+    text: 'At least one of the categories does not exist.',
   },
   // locations
   // A query selected Location.distanceToMe without the location's id.

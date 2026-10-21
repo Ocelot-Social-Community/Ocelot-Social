@@ -35,7 +35,7 @@ import {
   withinTransaction,
 } from '@src/groupRole/repository'
 
-import { categoriesExist } from './helpers/categoriesExist'
+import { categoriesExist, unknownCategoryIds } from './helpers/categoriesExist'
 import {
   isActiveMembership,
   nonMemberReadsGroup,
@@ -364,6 +364,13 @@ export default {
         throw new AppError(Errors.GROUP_SAVE_TOO_MANY_CATEGORIES, { max: branding.category.max })
       }
       if (
+        policy.get('categoriesActive') &&
+        categoryIds?.length &&
+        (await unknownCategoryIds(context, categoryIds)).length
+      ) {
+        throw new AppError(Errors.GROUP_SAVE_CATEGORY_UNKNOWN)
+      }
+      if (
         params.description === undefined ||
         params.description === null ||
         removeHtmlTags(params.description).length < branding.group.descriptionMinLength
@@ -481,6 +488,9 @@ export default {
         }
         if (categoryIds.length > branding.category.max) {
           throw new AppError(Errors.GROUP_SAVE_TOO_MANY_CATEGORIES, { max: branding.category.max })
+        }
+        if (categoryIds.length && (await unknownCategoryIds(context, categoryIds)).length) {
+          throw new AppError(Errors.GROUP_SAVE_CATEGORY_UNKNOWN)
         }
       }
       if (
