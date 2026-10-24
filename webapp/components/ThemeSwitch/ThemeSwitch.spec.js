@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import ThemeSwitch from './ThemeSwitch.vue'
+import { iconRegistry } from '~/utils/iconRegistry'
 
 const factory = (cookie) => {
   const $cookies = { get: jest.fn(() => cookie), set: jest.fn() }
@@ -17,6 +18,14 @@ const factory = (cookie) => {
 }
 
 describe('ThemeSwitch', () => {
+  it('shows an icon per theme', () => {
+    for (const theme of ['system', 'light', 'dark']) {
+      expect(factory(theme).wrapper.vm.icon).toBe(
+        iconRegistry[{ system: 'themeSystem', light: 'themeLight', dark: 'themeDark' }[theme]],
+      )
+    }
+  })
+
   it('starts from the cookie', () => {
     expect(factory('dark').wrapper.vm.theme).toBe('dark')
     expect(factory(undefined).wrapper.vm.theme).toBe('system')
@@ -36,18 +45,5 @@ describe('ThemeSwitch', () => {
       'system',
       expect.objectContaining({ path: '/' }),
     )
-  })
-})
-
-describe('ThemeSwitch icon trial', () => {
-  it('swaps glyphs for SVG icons and remembers it', async () => {
-    window.localStorage.removeItem('ocelot-theme-icons')
-    const { wrapper } = factory('dark')
-    expect(wrapper.find('.theme-switch__glyph').exists()).toBe(true)
-    await wrapper.find('[data-test="theme-icon-trial"]').trigger('click')
-    expect(wrapper.find('.theme-switch__glyph').exists()).toBe(false)
-    expect(window.localStorage.getItem('ocelot-theme-icons')).toBe('svg')
-    await wrapper.find('[data-test="theme-icon-trial"]').trigger('click')
-    expect(window.localStorage.getItem('ocelot-theme-icons')).toBe('glyph')
   })
 })
