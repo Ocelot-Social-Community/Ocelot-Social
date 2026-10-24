@@ -1,0 +1,58 @@
+/**
+ * vue2-datepicker's popup chrome, read from the semantic tokens (--datepicker-* in root-tokens.css).
+ *
+ * The library ships literal whites and greys (vue2-datepicker/index.css), so the event form's
+ * calendar stayed white in the dark theme. Light values are exactly those literals.
+ * Global on purpose: the popup is appended to <body>, outside the component's scope.
+ * `:root` lifts each rule above the library's own, which ContributionForm imports after this file.
+ */
+
+:root .mx-datepicker-main,
+:root .mx-time {
+  color: var(--datepicker-color);
+  background-color: var(--datepicker-background);
+  border-color: var(--datepicker-border);
+}
+
+:root .mx-datepicker-header,
+:root .mx-datepicker-footer,
+:root .mx-time-header,
+:root .mx-time-column,
+:root .mx-time + .mx-time,
+:root .mx-calendar + .mx-calendar,
+:root .mx-datepicker-sidebar + .mx-datepicker-content {
+  border-color: var(--datepicker-border);
+}
+
+:root .mx-btn {
+  color: var(--datepicker-color);
+  border-color: var(--datepicker-button-border);
+}
+
+:root .mx-calendar-content .cell:hover,
+:root .mx-calendar-week-mode .mx-date-row:hover,
+:root .mx-time-column .mx-time-item:hover,
+:root .mx-time-option:hover {
+  color: var(--datepicker-color);
+  background-color: var(--datepicker-hover);
+}
+
+:root .mx-calendar-content .cell.in-range,
+:root .mx-calendar-content .cell.hover-in-range,
+:root .mx-calendar-week-mode .mx-date-row.mx-active-week {
+  color: var(--datepicker-color);
+  background-color: var(--datepicker-range);
+}
+
+:root .mx-table-date .cell.not-current-month,
+:root .mx-btn:disabled,
+:root .mx-btn.disabled {
+  color: var(--datepicker-faint);
+}
+
+:root .mx-calendar-content .cell.disabled,
+:root .mx-time-column .mx-time-item.disabled,
+:root .mx-time-option.disabled {
+  color: var(--datepicker-faint);
+  background-color: var(--datepicker-disabled-background);
+}

@@ -74,6 +74,7 @@
   --color-disabled-contrast: var(--color-neutral-100); /*  weiß */
 
   /*  Text */
+  --color-text-base: var(--text-color-base); /*  rgb(75, 69, 84) — OsMenuItem links; undeclared, they fell back to a literal and stayed dark in dark */
   --color-text-soft: var(--text-color-soft); /*  rgb(112, 103, 126) */
 
   /*  Ocelot ActionButton badge */

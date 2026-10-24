@@ -135,6 +135,18 @@ describe('checkSource', () => {
     ])
   })
 
+  it('flags every direct neutral step in one declaration', () => {
+    const { errors } = checkSource(
+      style('.a { box-shadow: 0 0 var(--color-neutral-50), 0 0 var(--color-neutral-90); }'),
+      byRgb,
+      'A.vue',
+    )
+    expect(errors).toEqual([
+      'A.vue: var(--color-neutral-50) — use a role token (background/text/border) instead',
+      'A.vue: var(--color-neutral-90) — use a role token (background/text/border) instead',
+    ])
+  })
+
   it('flags a neutral step in a JS value too (constants)', () => {
     expect(checkNeutral("toggle: 'var(--color-neutral-30)',", 'constants/chat.js')).toEqual([
       'constants/chat.js: var(--color-neutral-30) — use a role token (background/text/border) instead',

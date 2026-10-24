@@ -1019,7 +1019,7 @@ export default {
 
     &.mobile-logout-item {
       color: var(--text-color-danger);
-      border-top: 1px solid var(--background-color-softer);
+      border-top: 1px solid var(--border-color-softest);
       padding-top: 4px;
       margin-top: 2px;
 
@@ -1080,7 +1080,7 @@ export default {
 
   .mobile-user-info {
     padding: 6px 0;
-    border-bottom: 1px solid var(--background-color-softer);
+    border-bottom: 1px solid var(--border-color-softest);
   }
 
   .mobile-avatar.avatar-image {
@@ -1123,8 +1123,8 @@ export default {
     padding: 4px 0 0 0;
 
     hr {
-      color: var(--background-color-softer);
-      background-color: var(--background-color-softer);
+      color: var(--border-color-softest);
+      background-color: var(--border-color-softest);
       margin: 2px 0;
     }
   }
@@ -1164,7 +1164,7 @@ export default {
 
   .mobile-more-section {
     padding: 2px 0;
-    border-top: 1px solid var(--background-color-softer);
+    border-top: 1px solid var(--border-color-softest);
   }
 
   .mobile-more-header {
@@ -1185,8 +1185,8 @@ export default {
     padding: 0;
 
     hr {
-      color: var(--background-color-softer);
-      background-color: var(--background-color-softer);
+      color: var(--border-color-softest);
+      background-color: var(--border-color-softest);
       margin: 2px 0;
     }
   }

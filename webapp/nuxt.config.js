@@ -166,6 +166,8 @@ export default {
     '~assets/css/theme-dark.css',
     // mapbox-gl's and the geocoder's control chrome on the same tokens
     '~assets/css/mapbox-theme.css',
+    // vue2-datepicker's popup on the same tokens
+    '~assets/css/datepicker-theme.css',
     // Utility classes replacing ds-* Vue components
     '~assets/css/ds-compat.css',
     // UI library component styles (Tailwind utilities + OsMenu CSS)

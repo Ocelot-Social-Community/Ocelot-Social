@@ -420,6 +420,15 @@
   --video-surface-deep: var(--color-neutral-0);
   --video-text-soft: var(--color-neutral-70);
   --text-color-muted: var(--color-neutral-50);
+  /* vue2-datepicker's own chrome (datepicker-theme.css) — light values are the library's literals, so light does not move. */
+  --datepicker-background: rgb(255, 255, 255);
+  --datepicker-color: rgb(115, 135, 156);
+  --datepicker-border: rgb(232, 232, 232);
+  --datepicker-hover: rgb(243, 249, 254);
+  --datepicker-range: rgb(219, 237, 251);
+  --datepicker-faint: rgb(204, 204, 204);
+  --datepicker-disabled-background: rgb(243, 243, 243);
+  --datepicker-button-border: rgba(0, 0, 0, 0.1);
   --text-color-on-primary: var(--color-neutral-100);
   --shadow-ink: var(--color-neutral-0);
   /* Tooltips (tooltip.css): inverse in light, so they stand off the page; dark in dark too. */
