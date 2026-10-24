@@ -227,6 +227,40 @@ function cyclicTokens(raw: Record<string, string>): Set<string> {
  * blue when `--a` is unresolvable, which is what a browser does too — the fallback is only forfeited by
  * the tokens inside the cycle.
  */
+/**
+ * `light-dark(a, b)` reduced to `a`. A mail, a manifest or a meta tag has no `color-scheme` to choose
+ * by, and most mail clients drop the whole declaration as unknown syntax — the light value stands, as
+ * it always did there. Arguments are split at the top-level comma, so `light-dark(rgb(1, 2, 3), …)`
+ * keeps its own commas.
+ */
+export function lightOf(value: string): string {
+  for (let at = value.indexOf('light-dark('); at !== -1; at = value.indexOf('light-dark(')) {
+    const start = at + 'light-dark('.length
+    let depth = 0
+    let comma = -1
+    let end = -1
+    for (let i = start; i < value.length && end === -1; i++) {
+      const c = value[i]
+      if (c === '(') {
+        depth++
+      } else if (c === ')') {
+        if (depth === 0) {
+          end = i
+        } else {
+          depth--
+        }
+      } else if (c === ',' && depth === 0 && comma === -1) {
+        comma = i
+      }
+    }
+    if (end === -1 || comma === -1) {
+      return value
+    }
+    value = value.slice(0, at) + value.slice(start, comma).trim() + value.slice(end + 1)
+  }
+  return value
+}
+
 export function resolveTokens(raw: Record<string, string>): Record<string, string> {
   // Phase 1 — the graph. Every token on a cycle is invalid before a single value is looked at, which
   // is also what makes phase 2 terminate: with the cycles already short-circuited, what is left to
@@ -279,6 +313,7 @@ export function resolveTokens(raw: Record<string, string>): Record<string, strin
       out = null
     }
     if (out !== null) {
+      out = lightOf(out)
       resolved[name] = out.trim().replace(/\s+/g, ' ')
     }
     return out

@@ -3,8 +3,22 @@ import {
   isDarkTheme,
   normalizeTheme,
   onThemeChange,
+  pinnedTheme,
   themeFromCookieHeader,
 } from './theme'
+
+describe('pinnedTheme', () => {
+  it('pins a brand with one scheme to it, whatever the visitor chose', () => {
+    expect(pinnedTheme('light', 'dark')).toBe('light')
+    expect(pinnedTheme('dark', 'light')).toBe('dark')
+    expect(pinnedTheme('dark', undefined)).toBe('dark')
+  })
+
+  it('leaves the choice to the visitor where the brand has both', () => {
+    expect(pinnedTheme('light dark', 'dark')).toBe('dark')
+    expect(pinnedTheme('light dark', 'bogus')).toBe('system')
+  })
+})
 
 describe('theme', () => {
   it('reads the theme from a cookie header', () => {

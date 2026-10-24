@@ -4,7 +4,8 @@ import manifest from './constants/manifest.js'
 import metadata from './constants/metadata.js'
 import locales from './locales/index.js'
 import { brandingHeadHtml } from './utils/brandingHead.js'
-import { themeFromCookieHeader } from './utils/theme.js'
+import { colorSchemeOf } from '@ocelot-social/branding'
+import { pinnedTheme, themeFromCookieHeader } from './utils/theme.js'
 import brandIcons from './server-middleware/brand-icons.js'
 import workbox from './server-middleware/workbox.js'
 
@@ -216,7 +217,10 @@ export default {
       const branding = renderContext && renderContext.nuxt && renderContext.nuxt.branding
       if (branding) templateParams.HEAD += brandingHeadHtml(branding)
       // The theme rides on <html> from the first byte — set on the client, it would flash light.
-      const theme = themeFromCookieHeader(renderContext.req && renderContext.req.headers.cookie)
+      const theme = pinnedTheme(
+        colorSchemeOf(branding),
+        themeFromCookieHeader(renderContext.req && renderContext.req.headers.cookie),
+      )
       templateParams.HTML_ATTRS += ` data-theme="${theme}"`
     },
 

@@ -85,6 +85,9 @@ export interface LinkPageOverride {
   }
 }
 
+/** A CSS `color-scheme` value the webapp supports — see `theme.colorScheme`. */
+export type ColorScheme = 'light' | 'dark' | 'light dark'
+
 export interface BrandingConfig {
   /**
    * Metadata ABOUT this branding itself (not the app identity) — shown in the admin Branding
@@ -144,6 +147,16 @@ export interface BrandingConfig {
      * provides identity but no theme would otherwise carry colours it does not define.
      */
     tokens: Record<string, string>
+    /**
+     * Which colour schemes the brand's look has, in CSS `color-scheme` words: `'light'`, `'dark'`, or
+     * `'light dark'` (both — the page follows the visitor's choice, the header shows the switch).
+     *
+     * With one scheme the server pins `<html data-theme>` to it and ignores the visitor's cookie and
+     * system preference. The framework default is `'light'`, so a brand built before this field
+     * existed keeps looking exactly as it did; only vanilla (no brand at all) offers both. A brand
+     * opts in once its stylesheets carry dark values — as `light-dark(light, dark)` pairs.
+     */
+    colorScheme: ColorScheme
   }
   group: {
     nameLengthMin: number

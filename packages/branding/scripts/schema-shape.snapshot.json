@@ -69,6 +69,7 @@
     "registration.layout: string",
     "registration.nonceLength: number",
     "termsAndConditions.version: string",
+    "theme.colorScheme: string",
     "theme.tokens: object",
     "user.nameLengthMax: number",
     "user.nameLengthMin: number",

@@ -70,7 +70,7 @@
             </client-only>
             <!-- locale switch -->
             <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
-            <theme-switch class="topbar-theme-switch" />
+            <theme-switch v-if="hasThemeChoice" class="topbar-theme-switch" />
             <template v-if="isLoggedIn">
               <!-- chat menu -->
               <client-only>
@@ -414,7 +414,7 @@
             </div>
           </div>
 
-          <div class="mobile-theme-section">
+          <div v-if="hasThemeChoice" class="mobile-theme-section">
             <theme-switch class="mobile-theme-switch" />
           </div>
 
@@ -581,7 +581,7 @@ import isEmpty from 'lodash/isEmpty'
 import orderBy from 'lodash/orderBy'
 import throttle from 'lodash/throttle'
 import locales from '~/locales'
-import { branding } from '@ocelot-social/branding'
+import { branding, colorSchemeOf, getBranding } from '@ocelot-social/branding'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import ChatNotificationMenu from '~/components/ChatNotificationMenu/ChatNotificationMenu'
 import CustomButton from '~/components/CustomButton/CustomButton'
@@ -644,6 +644,10 @@ export default {
     }
   },
   computed: {
+    // The switch only where the brand has both colour schemes (branding theme.colorScheme).
+    hasThemeChoice() {
+      return colorSchemeOf(getBranding()) === 'light dark'
+    },
     ...mapGetters({
       isLoggedIn: 'auth/isLoggedIn',
       user: 'auth/user',

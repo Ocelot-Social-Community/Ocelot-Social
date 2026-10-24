@@ -15,6 +15,11 @@ export const themeFromCookieHeader = (header) => {
   }
 }
 
+// A brand with one colour scheme (branding theme.colorScheme 'light' or 'dark') is pinned to it:
+// the visitor's cookie and system preference only count where the brand has both ('light dark').
+export const pinnedTheme = (colorScheme, theme) =>
+  colorScheme === 'light' || colorScheme === 'dark' ? colorScheme : normalizeTheme(theme)
+
 export const THEME_CHANGE_EVENT = 'ocelot-theme-change'
 
 export const applyTheme = (theme, doc = document) => {

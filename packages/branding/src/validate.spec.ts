@@ -99,3 +99,13 @@ test('defineBranding accepts valid overrides and the vanilla (empty) config', ()
   assert.doesNotThrow(() => defineBranding({ user: { slugLengthMin: 1, slugLengthMax: 8 } }))
   assert.doesNotThrow(() => defineBranding({ category: { min: 0, max: 0 } })) // min ≤ max, both ≥ 0
 })
+
+test('theme.colorScheme must be a supported color-scheme value', () => {
+  for (const colorScheme of ['light', 'dark', 'light dark']) {
+    assert.doesNotThrow(() => defineBranding({ theme: { colorScheme } }))
+  }
+  assert.throws(
+    () => defineBranding({ theme: { colorScheme: 'both' } }),
+    /theme\.colorScheme must be one of 'light', 'dark', 'light dark' \(got 'both'\)/,
+  )
+})
