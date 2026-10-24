@@ -218,6 +218,27 @@ const LEGACY_LOCALE_DIRS = new Set(['tmp', 'html'])
  *     of each stylesheet has its `:root` selectors rewritten to `:root:root`, which wins on
  *     specificity no matter the order. The brand's source file is untouched — only what ships changes.
  */
+/**
+ * A brand with both schemes ('light dark') whose stylesheet sets a colour as ONE literal: that colour
+ * then holds in light and dark alike — a white header in the middle of a dark page. A `light-dark()`
+ * pair, or a var() onto a framework token (which carries its own pair), is what such a brand means.
+ */
+export function singleSchemeColours(
+  id: string,
+  colorScheme: string,
+  declared: Record<string, string>,
+): string[] {
+  if (colorScheme !== 'light dark') {
+    return []
+  }
+  return Object.entries(declared)
+    .filter(([, value]) => /^(#|rgba?\(|hsla?\(|oklch\(|color-mix\()/i.test(value.trim()))
+    .map(
+      ([name]) =>
+        `  ! ${id}: --${name} is one colour for both schemes — declare it as light-dark(light, dark)`,
+    )
+}
+
 function loadThemeFromStylesheets(
   dir: string,
   id: string,
@@ -253,6 +274,7 @@ function loadThemeFromStylesheets(
       .filter((name) => Object.hasOwn(resolved, name))
       .map((name) => [name, resolved[name]]),
   )
+  warnings.push(...singleSchemeColours(id, config.theme.colorScheme, declared))
   if (!unconditional['color-primary'] && declared['color-primary']) {
     warnings.push(
       `  ! ${id}: --color-primary is only declared inside an at-rule, so it cannot become the PWA` +

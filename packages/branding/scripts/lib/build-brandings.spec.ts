@@ -18,6 +18,7 @@ import {
   findConfig,
   outSpecifyRoot,
   publishBrandArchive,
+  singleSchemeColours,
 } from './build-brandings.ts'
 
 const roots = []
@@ -880,4 +881,17 @@ describe('metadata.ogImage', () => {
       assert.equal(await ogWarnings(missing), '') // reported once, as "referenced asset not found"
     })
   })
+})
+
+test('singleSchemeColours: a brand with both schemes is warned about one-colour literals only', () => {
+  const declared = {
+    'color-header-background': '#fff',
+    'color-primary': 'light-dark(rgb(1, 2, 3), rgb(4, 5, 6))',
+    'text-color-link': 'var(--color-primary)',
+    'font-family-text': 'Overpass, sans-serif',
+  }
+  assert.deepEqual(singleSchemeColours('b', 'light dark', declared), [
+    '  ! b: --color-header-background is one colour for both schemes — declare it as light-dark(light, dark)',
+  ])
+  assert.deepEqual(singleSchemeColours('b', 'light', declared), [])
 })

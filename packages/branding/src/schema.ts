@@ -148,8 +148,10 @@ export interface BrandingConfig {
      */
     tokens: Record<string, string>
     /**
-     * Which colour schemes the brand's look has, in CSS `color-scheme` words: `'light'`, `'dark'`, or
-     * `'light dark'` (both — the page follows the visitor's choice, the header shows the switch).
+     * Which colour schemes the brand's look is BUILT ON, in CSS `color-scheme` words: `'light'`, `'dark'`,
+     * or `'light dark'` (both — the page follows the visitor's choice, the header shows the switch).
+     * Not a claim that the look IS light or dark: a look in between still sits on one ground, and that
+     * ground decides the browser's own widgets and which half of every framework token it did not set.
      *
      * With one scheme the server pins `<html data-theme>` to it and ignores the visitor's cookie and
      * system preference. The framework default is `'light'`, so a brand built before this field
