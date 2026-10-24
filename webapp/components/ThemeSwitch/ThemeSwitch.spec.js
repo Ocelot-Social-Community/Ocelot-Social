@@ -8,7 +8,8 @@ const factory = (cookie) => {
     directives: { tooltip: {} },
     stubs: {
       OsButton: {
-        template: '<button @click="$emit(\'click\', $event)"><slot name="icon" /></button>',
+        template:
+          '<button class="os" @click="$emit(\'click\', $event)"><slot name="icon" /></button>',
       },
     },
   })
@@ -25,7 +26,7 @@ describe('ThemeSwitch', () => {
     const { wrapper, $cookies } = factory(undefined)
     const seen = []
     for (let i = 0; i < 3; i++) {
-      await wrapper.find('button').trigger('click')
+      await wrapper.find('button.os').trigger('click')
       seen.push(wrapper.vm.theme)
       expect(document.documentElement.getAttribute('data-theme')).toBe(wrapper.vm.theme)
     }
@@ -35,5 +36,18 @@ describe('ThemeSwitch', () => {
       'system',
       expect.objectContaining({ path: '/' }),
     )
+  })
+})
+
+describe('ThemeSwitch icon trial', () => {
+  it('swaps glyphs for SVG icons and remembers it', async () => {
+    window.localStorage.removeItem('ocelot-theme-icons')
+    const { wrapper } = factory('dark')
+    expect(wrapper.find('.theme-switch__glyph').exists()).toBe(true)
+    await wrapper.find('[data-test="theme-icon-trial"]').trigger('click')
+    expect(wrapper.find('.theme-switch__glyph').exists()).toBe(false)
+    expect(window.localStorage.getItem('ocelot-theme-icons')).toBe('svg')
+    await wrapper.find('[data-test="theme-icon-trial"]').trigger('click')
+    expect(window.localStorage.getItem('ocelot-theme-icons')).toBe('glyph')
   })
 })
