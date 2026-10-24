@@ -93,6 +93,8 @@ import { mapGetters } from 'vuex'
 import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { isEventPast } from '~/utils/eventDate'
+import { isDarkTheme, onThemeChange } from '~/utils/theme'
+import { MAP_STYLES, defaultMapStyleUrl, mapStyleLabel } from '~/constants/mapStyles'
 import { profileUserQuery } from '~/graphql/User'
 import { mapQuery } from '~/graphql/MapQuery'
 import { queryLocations } from '~/graphql/location'
@@ -181,6 +183,7 @@ export default {
       mapboxgl,
       legendOpen: false,
       activeStyle: null,
+      dark: typeof window !== 'undefined' && isDarkTheme(),
       initialCoordinates,
       initialEventId,
       initialGroupId,
@@ -198,7 +201,7 @@ export default {
         types: [
           {
             id: 'theUser',
-            color: '#f79640',
+            color: 'var(--color-map-marker-current-user)',
             icon: {
               id: 'marker-orange',
               mapName: 'mapbox-marker-icon-20px-orange.png',
@@ -206,7 +209,7 @@ export default {
           },
           {
             id: 'user',
-            color: '#33c377',
+            color: 'var(--color-map-marker-user)',
             icon: {
               id: 'marker-green',
               mapName: 'mapbox-marker-icon-20px-green.png',
@@ -214,7 +217,7 @@ export default {
           },
           {
             id: 'group',
-            color: '#f84d4d',
+            color: 'var(--color-map-marker-group)',
             icon: {
               id: 'marker-red',
               mapName: 'mapbox-marker-icon-20px-red.png',
@@ -222,7 +225,7 @@ export default {
           },
           {
             id: 'event',
-            color: '#7753eb',
+            color: 'var(--color-map-marker-event)',
             icon: {
               id: 'marker-purple',
               mapName: 'mapbox-marker-icon-20px-purple.png',
@@ -275,6 +278,9 @@ export default {
     this.popupScrollTimer = null
   },
   async mounted() {
+    this.offThemeChange = onThemeChange(() => {
+      this.dark = isDarkTheme()
+    })
     this.updateMapPosition()
     window.addEventListener('resize', this.updateMapPosition)
 
@@ -285,6 +291,7 @@ export default {
     this.addMarkersOnCheckPrepared()
   },
   beforeDestroy() {
+    if (this.offThemeChange) this.offThemeChange()
     window.removeEventListener('resize', this.updateMapPosition)
     if (this.geocoderCollapseHandler) {
       window.removeEventListener('resize', this.geocoderCollapseHandler)
@@ -336,32 +343,18 @@ export default {
       return Number.isFinite(parsed) ? parsed : PAST_EVENT_OPACITY_FALLBACK
     },
     availableStyles() {
-      // https://docs.mapbox.com/api/maps/styles/
-      const availableStyles = {
-        outdoors: {
-          url: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
-        },
-        streets: {
-          url: 'mapbox://styles/mapbox/streets-v11?optimize=true',
-          // use the newest version?
-          // url: 'mapbox://styles/mapbox/streets-v12',
-        },
-        satellite: {
-          url: 'mapbox://styles/mapbox/satellite-streets-v11?optimize=true',
-        },
-        dark: {
-          url: 'mapbox://styles/mapbox/dark-v10?optimize=true',
-        },
-      }
-      Object.keys(availableStyles).forEach((key) => {
-        availableStyles[key].title = this.$t('map.styles.' + key)
-      })
-      return availableStyles
+      return Object.fromEntries(
+        MAP_STYLES.map(({ id, url }) => [id, { url, title: mapStyleLabel(this.$t, id) }]),
+      )
+    },
+    // A dark page opens on the dark tiles; a style the user picked always wins.
+    defaultStyleUrl() {
+      return defaultMapStyleUrl(this.dark)
     },
     mapOptions() {
       return {
         // accessToken: this.$env.MAPBOX_TOKEN, // is set already above
-        style: !this.activeStyle ? this.availableStyles.outdoors.url : this.activeStyle,
+        style: this.activeStyle || this.defaultStyleUrl,
         center: this.mapCenter,
         zoom: this.mapZoom,
         maxZoom: 22,
@@ -384,6 +377,9 @@ export default {
     },
   },
   watch: {
+    dark() {
+      this.followThemeStyle()
+    },
     isPreparedForMarkers(newValue) {
       if (newValue) {
         this.addMarkersOnCheckPrepared()
@@ -609,7 +605,7 @@ export default {
           toggle.innerHTML =
             '<svg viewBox="0 0 20 30.5" width="16" height="24" aria-hidden="true">' +
             '<path d="M19.25,10.4a13.0663,13.0663,0,0,1-1.4607,5.2235,41.5281,41.5281,0,0,1-3.2459,5.5483c-1.1829,1.7369-2.3662,3.2784-3.2541,4.3859-.4438.5536-.8135.9984-1.0721,1.3046-.0844.1-.157.1852-.2164.2545-.06-.07-.1325-.1564-.2173-.2578-.2587-.3088-.6284-.7571-1.0723-1.3147-.8879-1.1154-2.0714-2.6664-3.2543-4.41a42.2677,42.2677,0,0,1-3.2463-5.5535A12.978,12.978,0,0,1,.75,10.4,9.4659,9.4659,0,0,1,10,.75,9.4659,9.4659,0,0,1,19.25,10.4Z" fill="currentColor"/>' +
-            '<path d="M13.55,10A3.55,3.55,0,1,1,10,6.45,3.5484,3.5484,0,0,1,13.55,10Z" fill="#fff"/>' +
+            '<path d="M13.55,10A3.55,3.55,0,1,1,10,6.45,3.5484,3.5484,0,0,1,13.55,10Z" style="fill: var(--map-control-background)"/>' +
             '</svg>'
           toggle.addEventListener('click', (e) => {
             e.stopPropagation()
@@ -696,25 +692,18 @@ export default {
             btn.textContent = style.title
             btn.className = 'map-style-popover-btn'
             btn.setAttribute('role', 'option')
-            if (this.mapOptions.style === style.url) {
-              btn.classList.add('map-style-popover-btn--active')
-              btn.setAttribute('aria-selected', 'true')
-            }
+            btn.dataset.url = style.url
             btn.addEventListener('click', (e) => {
               e.stopPropagation()
               this.setStyle(style.url)
-              popover.querySelectorAll('.map-style-popover-btn').forEach((b) => {
-                b.classList.remove('map-style-popover-btn--active')
-                b.setAttribute('aria-selected', 'false')
-              })
-              btn.classList.add('map-style-popover-btn--active')
-              btn.setAttribute('aria-selected', 'true')
               popover.classList.remove('map-style-popover--open')
               toggle.setAttribute('aria-expanded', 'false')
             })
             popover.appendChild(btn)
           })
           container.appendChild(popover)
+          this.stylePopover = popover
+          this.markActiveStyle(this.mapOptions.style)
 
           // Close popover when clicking elsewhere on the map
           closePopoverHandler = () => {
@@ -1028,9 +1017,27 @@ export default {
         }
       })
     },
+    // The theme changed: new default tiles, unless the user picked a style himself.
+    // style.load (onMapLoad) re-adds the markers.
+    followThemeStyle() {
+      if (this.map && !this.activeStyle) {
+        this.map.setStyle(this.defaultStyleUrl)
+        this.markActiveStyle(this.defaultStyleUrl)
+      }
+    },
+    // The switcher marks the style the map shows — on a pick and on a theme switch alike.
+    markActiveStyle(url) {
+      if (!this.stylePopover) return
+      this.stylePopover.querySelectorAll('.map-style-popover-btn').forEach((btn) => {
+        const active = btn.dataset.url === url
+        btn.classList.toggle('map-style-popover-btn--active', active)
+        btn.setAttribute('aria-selected', String(active))
+      })
+    },
     setStyle(url) {
       this.map.setStyle(url)
       this.activeStyle = url
+      this.markActiveStyle(url)
     },
     loadMarkersIconsAndAddMarkers() {
       Promise.all(
@@ -1530,7 +1537,7 @@ export default {
 
 .map-popup-container.is-scrolling {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+  scrollbar-color: var(--scrollbar-thumb-color) transparent;
 }
 
 .map-popup-container::-webkit-scrollbar {
@@ -1551,7 +1558,7 @@ export default {
 }
 
 .map-popup-container.is-scrolling::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--scrollbar-thumb-color);
 }
 
 /* 16px horizontal inset matches the cards' own padding (UserAvatarPopover/
@@ -1709,9 +1716,8 @@ export default {
     width: 29px;
     height: 29px;
     min-width: 29px;
-    background-color: var(--color-neutral-100);
     border-radius: var(--border-radius-x-large);
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 0 2px var(--shadow-color);
     overflow: hidden;
 
     .mapboxgl-ctrl-geocoder--icon-search {
@@ -1749,12 +1755,12 @@ export default {
   position: absolute;
   bottom: 30px;
   left: 10px;
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--background-color-translucent);
   backdrop-filter: blur(4px);
   border-radius: var(--border-radius-x-large);
   z-index: 1;
   font-size: var(--font-size-base);
-  color: var(--color-neutral-10);
+  color: var(--text-color-strong);
 }
 
 .map-legend-toggle {
@@ -1762,8 +1768,8 @@ export default {
   width: 100%;
   padding: 4px 8px;
   border: none;
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--color-neutral-10);
+  background: var(--background-color-hover);
+  color: var(--text-color-strong);
   border-radius: var(--border-radius-x-large);
   cursor: pointer;
   font-size: var(--font-size-base);
@@ -1774,7 +1780,7 @@ export default {
 
   &:hover,
   &:active {
-    background: rgba(0, 0, 0, 0.1);
+    background: var(--background-color-pressed);
   }
 }
 
@@ -1807,7 +1813,7 @@ export default {
   cursor: pointer;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--background-color-hover);
   }
 }
 
@@ -1833,7 +1839,7 @@ export default {
   }
 
   .map-legend--open .map-legend-content {
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color-softest);
   }
 
   .map-legend--open .map-legend-toggle {
@@ -1842,13 +1848,16 @@ export default {
   }
 }
 
-.map-event-pin-tool {
-  background: var(--color-neutral-100);
+/* The page's own map controls (event pin tool, style switcher) share one chrome. */
+.map-event-pin-tool,
+.map-style-switcher {
+  background: var(--map-control-background);
   border-radius: var(--border-radius-x-large);
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 0 2px var(--shadow-color);
 }
 
-.map-event-pin-tool-toggle {
+.map-event-pin-tool-toggle,
+.map-style-switcher-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1858,15 +1867,15 @@ export default {
   border: none;
   background: none;
   cursor: pointer;
-  color: #333;
+  color: var(--text-color-strong);
 
   &:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--background-color-hover);
   }
 }
 
 .map-event-pin-tool-toggle--active {
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--background-color-pressed);
   /* Same "map tool" accent as OsLocationMap's own pick-location toggle —
      shares its --os-location-map-accent-color override hook, not
      --color-primary, which is this app's unrelated brand accent. */
@@ -1875,9 +1884,6 @@ export default {
 
 .map-style-switcher {
   position: relative;
-  background: var(--color-neutral-100);
-  border-radius: var(--border-radius-x-large);
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
   /* Mapbox gives every top-level control (.mapboxgl-ctrl, including this one
      and the scale control) `transform: translate(0)`, which makes each its
      own stacking context. That containment means a z-index set on a
@@ -1898,10 +1904,10 @@ export default {
   border: none;
   background: none;
   cursor: pointer;
-  color: #333;
+  color: var(--text-color-strong);
 
   &:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--background-color-hover);
   }
 }
 
@@ -1911,9 +1917,9 @@ export default {
   top: 0;
   right: 100%;
   margin-right: 6px;
-  background: var(--color-neutral-100);
+  background: var(--map-control-background);
   border-radius: var(--border-radius-x-large);
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 4px var(--shadow-color-strong);
   white-space: nowrap;
   overflow: hidden;
 }
@@ -1933,16 +1939,16 @@ export default {
   text-align: left;
 
   &:not(:last-child) {
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color-softest);
   }
 
   &:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--background-color-hover);
   }
 }
 
 .map-style-popover-btn--active {
   font-weight: bold;
-  background: rgba(0, 0, 0, 0.08);
+  background: var(--background-color-selected);
 }
 </style>

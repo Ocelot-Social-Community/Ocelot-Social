@@ -476,8 +476,8 @@ export default {
 
 #my-filter {
   max-width: 1028px;
-  background-color: var(--color-neutral-100);
-  box-shadow: rgb(189 189 189) 1px 9px 15px 1px;
+  background-color: var(--background-color-base);
+  box-shadow: var(--shadow-color-raised) 1px 9px 15px 1px;
   max-height: 950px;
   overflow: auto;
   padding-bottom: 0px;

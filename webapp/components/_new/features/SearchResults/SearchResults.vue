@@ -461,7 +461,7 @@ export default {
 .search-results {
   > .results {
     padding: var(--space-small);
-    background-color: var(--color-neutral-80);
+    background-color: var(--background-color-muted);
     border-radius: 0 var(--border-radius-base) var(--border-radius-base) var(--border-radius-base);
 
     &.--user {
@@ -473,7 +473,7 @@ export default {
       width: 100%;
       max-width: 600px;
       background-color: transparent;
-      border: var(--border-size-base) solid var(--color-neutral-80);
+      border: var(--border-size-base) solid var(--border-color-softer);
     }
   }
 

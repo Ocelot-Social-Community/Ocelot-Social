@@ -78,6 +78,8 @@
   --text-color-warning: var(--color-warning);
   --text-color-danger: var(--color-danger);
   --text-color-danger-inverse: var(--color-danger-inverse);
+  /* Icon and control text on light surfaces (map controls) — darker than --text-color-base. */
+  --text-color-strong: rgb(51, 51, 51);
   /**
  * @tokens Color Background
  * @presenter Color
@@ -94,6 +96,18 @@
   --background-color-primary: var(--color-primary);
   --background-color-primary-inverse: var(--color-primary-inverse);
   --background-color-warning: var(--color-warning);
+  /* State layers laid over whatever surface is below — hover, pressed, selected. */
+  --background-color-hover: rgba(0, 0, 0, 0.05);
+  --background-color-pressed: rgba(0, 0, 0, 0.1);
+  --background-color-selected: rgba(0, 0, 0, 0.08);
+  /* A filled surface one step below --background-color-softest, and the hover of a softer surface. */
+  --background-color-muted: var(--color-neutral-80);
+  --background-color-softer-hover: rgb(224, 224, 224);
+  /* Dims the page under an open menu. */
+  --background-color-overlay: rgba(0, 0, 0, 0.15);
+  /* See-through panels over a map. */
+  --background-color-translucent: rgba(255, 255, 255, 0.75);
+  --background-color-translucent-soft: rgba(255, 255, 255, 0.5);
   /**
  * @tokens Color Border
  * @presenter Color
@@ -102,6 +116,8 @@
   --border-color-base: var(--color-neutral-60);
   --border-color-soft: var(--color-neutral-70);
   --border-color-softer: var(--color-neutral-80);
+  --border-color-softest: var(--color-neutral-85);
+  --border-color-strong: var(--color-neutral-20);
   --border-color-active: var(--color-primary);
   --border-color-danger: var(--color-danger);
   /**
@@ -277,6 +293,13 @@
   --box-shadow-x-large: 0 15px 30px 0 rgba(0, 0, 0, 0.11), 0 5px 15px 0 rgba(0, 0, 0, 0.08);
   --box-shadow-large: 0 10px 20px 0 rgba(0, 0, 0, 0.11), 0 3px 10px 0 rgba(0, 0, 0, 0.08);
   --box-shadow-base: 0px 12px 26px -4px rgba(0, 0, 0, 0.1);
+  /* The colour alone, for shadows that carry their own geometry. */
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-color-strong: rgba(0, 0, 0, 0.3);
+  --shadow-color-raised: rgb(189, 189, 189);
+  --scrollbar-thumb-color: rgba(0, 0, 0, 0.25);
+  /* Fill of the monochrome logo SVG. */
+  --color-logo: rgb(0, 0, 0);
   /**
  * @tokens Effects
  */
@@ -394,38 +417,91 @@
   --chat-message-bg-me: var(--color-primary-light);
   --chat-sidemenu-background-active: var(--color-primary-light);
   --chat-new-message-color: rgb(10, 161, 255);
-  --chat-message-checkmark-seen: var(--text-color-secondary);
-  --chat-message-checkmark: var(--text-color-soft);
-  --chat-room-color-counter-badge: var(--text-color-inverse);
-  --chat-room-background-counter-badge: var(--color-danger);
   /* The room name next to its icon (Chat.vue .room-name-with-icon). Was referenced without ever being
      declared and without a fallback, so `color` resolved to nothing and the browser dropped the whole
      declaration — the name rendered in the inherited colour. Same family and same value as
-     --chat-message-color, which is what it visually pairs with. */
-  --chat-room-color-username: var(--text-color-base);
-
-  --chat-message-color: var(--text-color-base);
+     --text-color-base (the message colour), which is what it visually pairs with. */
+  /* The docked chat window (layouts/default.vue .chat-modul) and its close link. */
+  --chat-module-background: rgb(233, 228, 228);
+  --chat-module-close-color: blue;
   --chat-message-bg-others: var(--color-neutral-80);
+  /* Roles that read a neutral step on purpose and look the same in both themes. */
+  --video-surface: var(--color-neutral-10);
+  --video-surface-deep: var(--color-neutral-0);
+  --video-text-soft: var(--color-neutral-70);
+  --text-color-muted: var(--color-neutral-50);
+  /* vue2-datepicker's own chrome (datepicker-theme.css) — light values are the library's literals, so light does not move. */
+  --datepicker-background: rgb(255, 255, 255);
+  --datepicker-color: rgb(115, 135, 156);
+  --datepicker-border: rgb(232, 232, 232);
+  --datepicker-hover: rgb(243, 249, 254);
+  --datepicker-range: rgb(219, 237, 251);
+  --datepicker-faint: rgb(204, 204, 204);
+  --datepicker-disabled-background: rgb(243, 243, 243);
+  --datepicker-button-border: rgba(0, 0, 0, 0.1);
+  --text-color-on-primary: var(--color-neutral-100);
+  --shadow-ink: var(--color-neutral-0);
+  /* Tooltips (tooltip.css): inverse in light, so they stand off the page; dark in dark too. */
+  --tooltip-background: var(--background-color-inverse-soft);
+  --tooltip-color: var(--text-color-inverse);
   --chat-sidemenu-bg: var(--color-neutral-100);
   /* The hover partner of --chat-sidemenu-bg. Carried over as a literal because the SCSS side had it
      as one too ($chat-sidemenu-background-over); it is a token rather than a value inlined in
      constants/chatTokens.js so a brand can actually reach it, like every other chat token. */
   --chat-sidemenu-background-over: #f6f6f6;
-  --chat-message-timestamp: var(--text-color-soft);
-  --chat-icon-add: var(--color-primary);
-  --chat-icon-send: var(--color-primary);
-  --chat-icon-emoji: var(--color-primary);
+  /* vue-advanced-chat's own palette, one token per literal it shipped with (constants/chat.js).
+     Names must never equal one of the library's own --chat-* variables: it sets those on its root
+     from these values, and a var() naming itself is a cycle the browser throws away. */
+  --chat-accent: #1976d2;
+  --chat-accent-contrast: #fff;
+  --chat-border-color: #e1e4e8;
+  --chat-search-border-color: #e1e5e8;
+  --chat-hover-background: #f6f6f6;
+  --chat-text-strong: #0a0a0a;
+  --chat-text-muted: #9ca6af;
+  --chat-text-subtle: #757e85;
+  --chat-deleted-background: #dadfe2;
+  --chat-selected-background: #c2dcf2;
+  --chat-notice-background: #e5effa;
+  --chat-notice-color: #505a62;
+  --chat-shade-strong: rgba(0, 0, 0, 0.15);
+  --chat-shade: rgba(0, 0, 0, 0.08);
+  --chat-reply-color: #6e6e6e;
+  --chat-tag-color: #0d579c;
+  --chat-image-background: #ddd;
+  --chat-reaction-background: #eee;
+  --chat-reaction-border-hover: #ddd;
+  --chat-reaction-me-background: #cfecf5;
+  --chat-reaction-me-border: #3b98b8;
+  --chat-reaction-me-color: #0b59b3;
+  --chat-record-color: #eb4034;
+  --chat-audio-color: #455247;
+  --chat-code-background: rgba(239, 239, 239, 0.7);
+  --chat-code-border: rgba(212, 212, 212, 0.9);
+  --chat-code-color: #e01e5a;
+  --chat-room-message-color: #67717a;
+  --chat-room-timestamp-color: #a2aeb8;
+  --chat-online-color: #4caf50;
+  --chat-on-media-color: #fff;
+  --chat-icon-strong: #000;
+  --chat-icon-soft: #9e9e9e;
+  --chat-icon-faint: rgba(0, 0, 0, 0.3);
+  --chat-icon-backdrop: rgba(0, 0, 0, 0.25);
+  --chat-confirm-color: #1ba65b;
   /**
  * @tokens Map Marker Color
  * @presenter Color
  */
 
-  /* Same colors as pages/map.vue's marker legend (markers.types). Not yet consumed there itself —
-     that page still keys its GeoJSON icons by hardcoded hex — but defined here as the single source
-     so other map/location UI (e.g. LocationPickerMap's pin) can share it, and so it stays overridable
-     by a brand like every other token here. */
+  /* The single source of the marker colours: pages/map.vue's legend reads them, LocationPickerMap's
+     pin resolves them. The GeoJSON icons on pages/map.vue are still PNGs in these colours. */
   --color-map-marker-current-user: rgb(247, 150, 64);
   --color-map-marker-user: rgb(51, 195, 119);
   --color-map-marker-group: rgb(248, 77, 77);
   --color-map-marker-event: rgb(119, 83, 235);
+  /* Under the tiles while they load, and the controls drawn over the map (mapbox-gl's own and ours). */
+  --map-background: rgb(229, 229, 229);
+  --map-control-background: var(--background-color-base);
+  /* mapbox-gl ships its control icons as dark SVG data URIs — only a filter can lighten them. */
+  --map-control-icon-filter: none;
 }

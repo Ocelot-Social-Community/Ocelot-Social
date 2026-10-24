@@ -3,7 +3,7 @@
 exports[`badge settings with badges more badges available selecting an empty slot shows list with available badges 1`] = `
 <div>
   <div
-    class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+    class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
   >
     <h2
       class="title"
@@ -159,7 +159,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
 exports[`badge settings with badges no more badges available selecting an empty slot shows no more badges available message 1`] = `
 <div>
   <div
-    class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+    class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
   >
     <h2
       class="title"
@@ -252,7 +252,7 @@ exports[`badge settings with badges no more badges available selecting an empty 
 exports[`badge settings with badges renders 1`] = `
 <div>
   <div
-    class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+    class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
   >
     <h2
       class="title"
@@ -408,7 +408,7 @@ exports[`badge settings with badges renders 1`] = `
 exports[`badge settings without badges renders 1`] = `
 <div>
   <div
-    class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+    class="os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
   >
     <h2
       class="title"

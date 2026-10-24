@@ -15,6 +15,9 @@
   --color-default-hover: var(--color-neutral-70); /*  rgb(203, 199, 209) - deutlich dunkler */
   --color-default-active: var(--color-neutral-60); /*  rgb(177, 171, 186) - noch dunkler */
   --color-default-contrast: var(--text-color-base);
+  /*  The ui library's own name for the soft background (styles/index.css: the active menu item). */
+  /*  Never declared, so its literal fallback #faf9fa stayed light in the dark theme. */
+  --color-background-soft: var(--background-color-soft);
   --color-default-contrast-inverse: var(--color-neutral-100); /*  weiß für dunkle Hintergründe */
 
   /*  Primary (grün) - verwendet var(--text-color-primary-inverse) wie ds-button. */
@@ -71,6 +74,7 @@
   --color-disabled-contrast: var(--color-neutral-100); /*  weiß */
 
   /*  Text */
+  --color-text-base: var(--text-color-base); /*  rgb(75, 69, 84) — OsMenuItem links; undeclared, they fell back to a literal and stayed dark in dark */
   --color-text-soft: var(--text-color-soft); /*  rgb(112, 103, 126) */
 
   /*  Ocelot ActionButton badge */

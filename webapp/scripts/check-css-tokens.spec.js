@@ -5,7 +5,12 @@ const {
   declarations,
   styleBodies,
   checkSource,
+  checkNeutral,
+  findProblems,
 } = require('./check-css-tokens')
+const { mkdtempSync, mkdirSync, writeFileSync } = require('fs')
+const { tmpdir } = require('os')
+const { join, dirname } = require('path')
 
 const style = (css, attrs = ' scoped') => `<template><i /></template><style${attrs}>${css}</style>`
 
@@ -123,6 +128,84 @@ describe('checkSource', () => {
     ])
   })
 
+  it('flags a neutral step read directly by a component', () => {
+    const { errors } = checkSource(style('.a { color: var(--color-neutral-50); }'), byRgb, 'A.vue')
+    expect(errors).toEqual([
+      'A.vue: var(--color-neutral-50) — use a role token (background/text/border) instead',
+    ])
+  })
+
+  it('flags every direct neutral step in one declaration', () => {
+    const { errors } = checkSource(
+      style('.a { box-shadow: 0 0 var(--color-neutral-50), 0 0 var(--color-neutral-90); }'),
+      byRgb,
+      'A.vue',
+    )
+    expect(errors).toEqual([
+      'A.vue: var(--color-neutral-50) — use a role token (background/text/border) instead',
+      'A.vue: var(--color-neutral-90) — use a role token (background/text/border) instead',
+    ])
+  })
+
+  it('flags a neutral step in a JS value too (constants)', () => {
+    expect(checkNeutral("toggle: 'var(--color-neutral-30)',", 'constants/chat.js')).toEqual([
+      'constants/chat.js: var(--color-neutral-30) — use a role token (background/text/border) instead',
+    ])
+  })
+
+  it('flags a component-local alias of a neutral step — the same direct read, one hop later', () => {
+    const { errors } = checkSource(
+      style(':root { --text-color-muted: var(--color-neutral-50); }'),
+      byRgb,
+      'A.vue',
+    )
+    expect(errors).toEqual([
+      'A.vue: var(--color-neutral-50) — use a role token (background/text/border) instead',
+    ])
+  })
+
+  it('flags a neutral step in the script of a component, not only in its style', () => {
+    const src =
+      "<template><i /></template><script>const toggle = 'var(--color-neutral-30)'</script>"
+    expect(checkSource(src, byRgb, 'A.vue').errors).toEqual([
+      'A.vue: var(--color-neutral-30) — use a role token (background/text/border) instead',
+    ])
+  })
+
+  describe('data: URIs', () => {
+    const uri = (fill) =>
+      `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='${fill}' d='M0 0'/%3E%3C/svg%3E")`
+    const reason = 'a data: URI is its own document, no theme reaches it'
+
+    it('flags a %23-encoded fill — the AreaMenu chevron', () => {
+      const { errors } = checkSource(
+        style(`.a { background-image: ${uri('%234b4554')}; }`),
+        byRgb,
+        'A.vue',
+      )
+      expect(errors).toEqual([`A.vue: #4b4554 in a data: URI — ${reason}`])
+    })
+
+    it.each(['#fff', 'rgb(1, 2, 3)'])('flags a raw %s too', (fill) => {
+      const { errors } = checkSource(style(`.a { background: ${uri(fill)}; }`), byRgb, 'A.vue')
+      expect(errors).toEqual([`A.vue: ${fill} in a data: URI — ${reason}`])
+    })
+
+    it('flags one in a JS string outside url()', () => {
+      const src = `const icon = 'data:image/svg+xml,<svg><circle fill="#000"/></svg>'`
+      expect(checkSource(src, byRgb, 'utils/icon.js').errors).toEqual([
+        `utils/icon.js: #000 in a data: URI — ${reason}`,
+      ])
+    })
+
+    it('leaves a URI alone whose colours are resolved at runtime or that carries none', () => {
+      const src =
+        'const a = `data:image/svg+xml,<svg><circle fill="${fill}"/></svg>`\n' +
+        `const b = '${uri('').slice(5, -2)}'`
+      expect(checkSource(src, byRgb, 'A.js').errors).toEqual([])
+    })
+  })
+
   it('allows a literal where the token itself is declared', () => {
     const { errors } = checkSource(style(':root { --color-primary: #17b53f; }'), byRgb, 'A.vue')
     expect(errors).toEqual([])
@@ -148,5 +231,40 @@ describe('checkSource', () => {
   it('leaves scss blocks alone', () => {
     const { errors } = checkSource(style('.a { color: $primary; }', ' lang="scss"'), byRgb, 'A.vue')
     expect(errors).toEqual([])
+  })
+})
+
+describe('findProblems', () => {
+  const tree = (files) => {
+    const root = mkdtempSync(join(tmpdir(), 'css-tokens-'))
+    for (const [path, content] of Object.entries({ 'assets/css/root-tokens.css': '', ...files })) {
+      mkdirSync(dirname(join(root, path)), { recursive: true })
+      writeFileSync(join(root, path), content)
+    }
+    return root
+  }
+
+  it('reads every .js, not only constants — the chat palette moved, the rule must not care', () => {
+    const root = tree({
+      'components/Chat/palette.js': "export default { toggle: 'var(--color-neutral-30)' }",
+    })
+    expect(findProblems(root).errors).toEqual([
+      'components/Chat/palette.js: var(--color-neutral-30) — use a role token (background/text/border) instead',
+    ])
+  })
+
+  it('reads global .css files', () => {
+    const root = tree({ 'assets/css/main.css': 'hr { color: var(--color-neutral-80); }' })
+    expect(findProblems(root).errors).toHaveLength(1)
+  })
+
+  it('lets the token files build roles on the scale, and skips specs', () => {
+    const root = tree({
+      'assets/css/root-tokens.css': ':root { --text-color-soft: var(--color-neutral-40); }',
+      'assets/css/theme-dark.css': ':root { --x: var(--color-neutral-10); }',
+      'assets/css/ocelot-ui-variables.css': ':root { --y: var(--color-neutral-70); }',
+      'components/A.spec.js': "expect('var(--color-neutral-30)')",
+    })
+    expect(findProblems(root).errors).toEqual([])
   })
 })

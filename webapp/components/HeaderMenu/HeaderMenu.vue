@@ -70,6 +70,7 @@
             </client-only>
             <!-- locale switch -->
             <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
+            <theme-switch class="topbar-theme-switch" />
             <template v-if="isLoggedIn">
               <!-- chat menu -->
               <client-only>
@@ -413,6 +414,10 @@
             </div>
           </div>
 
+          <div class="mobile-theme-section">
+            <theme-switch class="mobile-theme-switch" />
+          </div>
+
           <!-- Locale switch collapsible (only when open) -->
           <div class="mobile-locale-section">
             <div
@@ -585,6 +590,7 @@ import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import Dropdown from '~/components/Dropdown'
 import InviteCodeList from '~/components/_new/features/Invitations/InviteCodeList.vue'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import ThemeSwitch from '~/components/ThemeSwitch/ThemeSwitch'
 import Logo from '~/components/Logo/Logo'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
@@ -608,6 +614,7 @@ export default {
     Dropdown,
     InviteCodeList,
     LocaleSwitch,
+    ThemeSwitch,
     Logo,
     NotificationMenu,
     PageParamsLink,
@@ -911,7 +918,7 @@ export default {
     flex-direction: column;
     height: calc(100dvh - 20px);
     margin: 0 -10px; /*  extend to screen edge */
-    background-color: var(--color-neutral-100);
+    background-color: var(--background-color-base);
 
     > .mobile-header-row {
       flex: 0 0 auto;
@@ -1012,7 +1019,7 @@ export default {
 
     &.mobile-logout-item {
       color: var(--text-color-danger);
-      border-top: 1px solid var(--color-neutral-90);
+      border-top: 1px solid var(--border-color-softest);
       padding-top: 4px;
       margin-top: 2px;
 
@@ -1073,7 +1080,7 @@ export default {
 
   .mobile-user-info {
     padding: 6px 0;
-    border-bottom: 1px solid var(--color-neutral-90);
+    border-bottom: 1px solid var(--border-color-softest);
   }
 
   .mobile-avatar.avatar-image {
@@ -1116,8 +1123,8 @@ export default {
     padding: 4px 0 0 0;
 
     hr {
-      color: var(--color-neutral-90);
-      background-color: var(--color-neutral-90);
+      color: var(--border-color-softest);
+      background-color: var(--border-color-softest);
       margin: 2px 0;
     }
   }
@@ -1157,7 +1164,7 @@ export default {
 
   .mobile-more-section {
     padding: 2px 0;
-    border-top: 1px solid var(--color-neutral-90);
+    border-top: 1px solid var(--border-color-softest);
   }
 
   .mobile-more-header {
@@ -1178,8 +1185,8 @@ export default {
     padding: 0;
 
     hr {
-      color: var(--color-neutral-90);
-      background-color: var(--color-neutral-90);
+      color: var(--border-color-softest);
+      background-color: var(--border-color-softest);
       margin: 2px 0;
     }
   }
@@ -1203,6 +1210,10 @@ export default {
       background-color: var(--background-color-soft);
       box-shadow: inset 3px 0 0 var(--color-primary);
     }
+  }
+
+  .mobile-theme-section {
+    padding: 2px var(--space-small);
   }
 
   .mobile-locale-section {

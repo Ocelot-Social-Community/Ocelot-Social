@@ -466,12 +466,12 @@ export default {
   align-items: flex-start;
   margin-bottom: 16px;
   padding: 16px;
-  background-color: #f8f9fa; /*  Light gray background */
+  background-color: var(--background-color-soft);
   border-radius: 8px;
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: #f0f2f5; /*  Slightly darker on hover */
+    background-color: var(--background-color-softer);
   }
 
   &:last-child {
@@ -492,7 +492,7 @@ export default {
   flex: 1;
   cursor: pointer;
   line-height: 1.5;
-  color: #374151; /*  Dark gray text */
+  color: var(--text-color-base);
 }
 
 .checkbox-text {
@@ -509,7 +509,7 @@ export default {
   font-size: 0.875rem; /*  Slightly smaller text for links */
 
   .separator {
-    color: #9ca3af; /*  Light gray separator */
+    color: var(--text-color-softer);
     font-size: 0.75rem;
   }
 }

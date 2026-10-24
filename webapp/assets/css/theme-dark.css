@@ -1,0 +1,220 @@
+/**
+ * Dark theme — the semantic tokens of root-tokens.css and ocelot-ui-variables.css mapped anew.
+ *
+ * The neutral scale itself is NOT inverted: it is used as background, text and border alike, so
+ * turning it round would darken white text on dark ground. What follows the theme is the meaning
+ * (--background-color-*, --text-color-*, --border-color-*); a component that still names a neutral
+ * step directly stays light until it says what it means.
+ *
+ * Who decides: <html data-theme> — set on the server from the `ocelot-theme` cookie
+ * (nuxt.config.js → vue-renderer:ssr:templateParams), so the first paint is already dark.
+ *   dark   — always dark
+ *   light  — always light
+ *   system — or no attribute at all: follows prefers-color-scheme
+ *
+ * The selectors outrank :root (0,1,0) but not a brand's :root:root (0,2,0) declared later — a brand
+ * that sets a colour keeps it in both themes until it ships dark values of its own.
+ * Plain CSS has no way to share one block between a selector and a media query, hence twice.
+ */
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --text-color-base: rgb(212, 208, 218);
+  --text-color-soft: rgb(178, 172, 188);
+  --text-color-softer: rgb(140, 133, 152);
+  --text-color-muted: rgb(160, 153, 172);
+  --text-color-disabled: rgb(110, 104, 120);
+  --text-color-inverse: rgb(24, 23, 27);
+
+  --background-color-base: rgb(24, 23, 27);
+  --background-color-soft: rgb(30, 29, 34);
+  --background-color-softer: rgb(38, 36, 43);
+  --background-color-softer-active: rgb(30, 29, 34);
+  --background-color-softest: rgb(48, 46, 54);
+  --background-color-inverse: rgb(240, 239, 242);
+  --background-color-inverse-soft: rgb(220, 218, 225);
+  --background-color-disabled: rgb(38, 36, 43);
+
+  --border-color-base: rgb(95, 90, 104);
+  --border-color-soft: rgb(75, 71, 83);
+  --border-color-softer: rgb(58, 55, 64);
+
+  --color-header-background: rgb(30, 29, 34);
+  --color-footer-background: rgb(30, 29, 34);
+
+  --chat-message-bg-others: rgb(48, 46, 54);
+  --chat-sidemenu-bg: rgb(30, 29, 34);
+  --chat-sidemenu-background-over: rgb(38, 36, 43);
+  --tooltip-background: rgb(58, 55, 64);
+  --tooltip-color: rgb(232, 230, 236);
+  --chat-sidemenu-background-active: rgb(30, 70, 40);
+  --chat-message-bg-me: rgb(30, 70, 40);
+
+
+  --color-default: var(--background-color-softer);
+  --color-default-hover: rgb(60, 57, 66);
+  --color-default-active: rgb(75, 71, 83);
+  --text-color-strong: rgb(240, 238, 243);
+  --background-color-hover: rgba(255, 255, 255, 0.06);
+  --background-color-pressed: rgba(255, 255, 255, 0.12);
+  --background-color-selected: rgba(255, 255, 255, 0.1);
+  --background-color-muted: rgb(58, 55, 64);
+  --background-color-softer-hover: rgb(60, 57, 66);
+  --background-color-overlay: rgba(0, 0, 0, 0.5);
+  --background-color-translucent: rgba(24, 23, 27, 0.75);
+  --background-color-translucent-soft: rgba(24, 23, 27, 0.5);
+  --border-color-softest: rgb(48, 46, 54);
+  --border-color-strong: rgb(178, 172, 188);
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --shadow-color-strong: rgba(0, 0, 0, 0.7);
+  --shadow-color-raised: rgba(0, 0, 0, 0.6);
+  --scrollbar-thumb-color: rgba(255, 255, 255, 0.25);
+  --color-logo: rgb(232, 230, 236);
+  --chat-module-background: rgb(38, 36, 43);
+  --chat-module-close-color: rgb(120, 170, 255);
+  --map-background: rgb(38, 36, 43);
+  --map-control-icon-filter: invert(0.88);
+  --chat-accent: rgb(100, 170, 240);
+  --chat-accent-contrast: rgb(24, 23, 27);
+  --chat-border-color: rgb(58, 55, 64);
+  --chat-search-border-color: rgb(58, 55, 64);
+  --chat-hover-background: rgb(38, 36, 43);
+  --chat-text-strong: rgb(232, 230, 236);
+  --chat-text-muted: rgb(140, 133, 152);
+  --chat-text-subtle: rgb(160, 153, 172);
+  --chat-deleted-background: rgb(48, 46, 54);
+  --chat-selected-background: rgb(40, 60, 90);
+  --chat-notice-background: rgb(38, 44, 58);
+  --chat-notice-color: rgb(178, 172, 188);
+  --chat-shade-strong: rgba(255, 255, 255, 0.15);
+  --chat-shade: rgba(255, 255, 255, 0.08);
+  --chat-reply-color: rgb(178, 172, 188);
+  --chat-tag-color: rgb(110, 170, 235);
+  --chat-image-background: rgb(48, 46, 54);
+  --chat-reaction-background: rgb(48, 46, 54);
+  --chat-reaction-border-hover: rgb(75, 71, 83);
+  --chat-reaction-me-background: rgb(30, 60, 75);
+  --chat-reaction-me-border: rgb(59, 152, 184);
+  --chat-reaction-me-color: rgb(140, 190, 240);
+  --chat-audio-color: rgb(178, 172, 188);
+  --chat-code-background: rgba(255, 255, 255, 0.08);
+  --chat-code-border: rgba(255, 255, 255, 0.15);
+  --chat-code-color: rgb(240, 110, 150);
+  --chat-room-message-color: rgb(178, 172, 188);
+  --chat-room-timestamp-color: rgb(140, 133, 152);
+  --chat-icon-strong: rgb(232, 230, 236);
+  --chat-icon-soft: rgb(140, 133, 152);
+  --chat-icon-faint: rgba(255, 255, 255, 0.35);
+  --chat-icon-backdrop: rgba(0, 0, 0, 0.45);
+  --datepicker-background: var(--background-color-softer);
+  --datepicker-color: var(--text-color-soft);
+  --datepicker-border: var(--border-color-softer);
+  --datepicker-hover: var(--background-color-hover);
+  --datepicker-range: rgb(40, 60, 90);
+  --datepicker-faint: var(--text-color-disabled);
+  --datepicker-disabled-background: var(--background-color-disabled);
+  --datepicker-button-border: rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']):not([data-theme='dark']) {
+    color-scheme: dark;
+
+    --text-color-base: rgb(212, 208, 218);
+    --text-color-soft: rgb(178, 172, 188);
+    --text-color-softer: rgb(140, 133, 152);
+    --text-color-muted: rgb(160, 153, 172);
+    --text-color-disabled: rgb(110, 104, 120);
+    --text-color-inverse: rgb(24, 23, 27);
+
+    --background-color-base: rgb(24, 23, 27);
+    --background-color-soft: rgb(30, 29, 34);
+    --background-color-softer: rgb(38, 36, 43);
+    --background-color-softer-active: rgb(30, 29, 34);
+    --background-color-softest: rgb(48, 46, 54);
+    --background-color-inverse: rgb(240, 239, 242);
+    --background-color-inverse-soft: rgb(220, 218, 225);
+    --background-color-disabled: rgb(38, 36, 43);
+
+    --border-color-base: rgb(95, 90, 104);
+    --border-color-soft: rgb(75, 71, 83);
+    --border-color-softer: rgb(58, 55, 64);
+
+    --color-header-background: rgb(30, 29, 34);
+    --color-footer-background: rgb(30, 29, 34);
+
+    --chat-message-bg-others: rgb(48, 46, 54);
+    --chat-sidemenu-bg: rgb(30, 29, 34);
+    --chat-sidemenu-background-over: rgb(38, 36, 43);
+    --tooltip-background: rgb(58, 55, 64);
+    --tooltip-color: rgb(232, 230, 236);
+    --chat-sidemenu-background-active: rgb(30, 70, 40);
+    --chat-message-bg-me: rgb(30, 70, 40);
+
+
+    --color-default: var(--background-color-softer);
+    --color-default-hover: rgb(60, 57, 66);
+    --color-default-active: rgb(75, 71, 83);
+    --text-color-strong: rgb(240, 238, 243);
+    --background-color-hover: rgba(255, 255, 255, 0.06);
+    --background-color-pressed: rgba(255, 255, 255, 0.12);
+    --background-color-selected: rgba(255, 255, 255, 0.1);
+    --background-color-muted: rgb(58, 55, 64);
+    --background-color-softer-hover: rgb(60, 57, 66);
+    --background-color-overlay: rgba(0, 0, 0, 0.5);
+    --background-color-translucent: rgba(24, 23, 27, 0.75);
+    --background-color-translucent-soft: rgba(24, 23, 27, 0.5);
+    --border-color-softest: rgb(48, 46, 54);
+    --border-color-strong: rgb(178, 172, 188);
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --shadow-color-strong: rgba(0, 0, 0, 0.7);
+    --shadow-color-raised: rgba(0, 0, 0, 0.6);
+    --scrollbar-thumb-color: rgba(255, 255, 255, 0.25);
+    --color-logo: rgb(232, 230, 236);
+    --chat-module-background: rgb(38, 36, 43);
+    --chat-module-close-color: rgb(120, 170, 255);
+    --map-background: rgb(38, 36, 43);
+    --map-control-icon-filter: invert(0.88);
+    --chat-accent: rgb(100, 170, 240);
+    --chat-accent-contrast: rgb(24, 23, 27);
+    --chat-border-color: rgb(58, 55, 64);
+    --chat-search-border-color: rgb(58, 55, 64);
+    --chat-hover-background: rgb(38, 36, 43);
+    --chat-text-strong: rgb(232, 230, 236);
+    --chat-text-muted: rgb(140, 133, 152);
+    --chat-text-subtle: rgb(160, 153, 172);
+    --chat-deleted-background: rgb(48, 46, 54);
+    --chat-selected-background: rgb(40, 60, 90);
+    --chat-notice-background: rgb(38, 44, 58);
+    --chat-notice-color: rgb(178, 172, 188);
+    --chat-shade-strong: rgba(255, 255, 255, 0.15);
+    --chat-shade: rgba(255, 255, 255, 0.08);
+    --chat-reply-color: rgb(178, 172, 188);
+    --chat-tag-color: rgb(110, 170, 235);
+    --chat-image-background: rgb(48, 46, 54);
+    --chat-reaction-background: rgb(48, 46, 54);
+    --chat-reaction-border-hover: rgb(75, 71, 83);
+    --chat-reaction-me-background: rgb(30, 60, 75);
+    --chat-reaction-me-border: rgb(59, 152, 184);
+    --chat-reaction-me-color: rgb(140, 190, 240);
+    --chat-audio-color: rgb(178, 172, 188);
+    --chat-code-background: rgba(255, 255, 255, 0.08);
+    --chat-code-border: rgba(255, 255, 255, 0.15);
+    --chat-code-color: rgb(240, 110, 150);
+    --chat-room-message-color: rgb(178, 172, 188);
+    --chat-room-timestamp-color: rgb(140, 133, 152);
+    --chat-icon-strong: rgb(232, 230, 236);
+    --chat-icon-soft: rgb(140, 133, 152);
+    --chat-icon-faint: rgba(255, 255, 255, 0.35);
+    --chat-icon-backdrop: rgba(0, 0, 0, 0.45);
+    --datepicker-background: var(--background-color-softer);
+    --datepicker-color: var(--text-color-soft);
+    --datepicker-border: var(--border-color-softer);
+    --datepicker-hover: var(--background-color-hover);
+    --datepicker-range: rgb(40, 60, 90);
+    --datepicker-faint: var(--text-color-disabled);
+    --datepicker-disabled-background: var(--background-color-disabled);
+    --datepicker-button-border: rgba(255, 255, 255, 0.1);
+  }
+}
