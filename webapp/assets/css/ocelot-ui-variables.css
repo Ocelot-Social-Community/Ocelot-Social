@@ -11,9 +11,9 @@
 
 :root {
   /*  Default (grau) - entspricht ds-button ohne Modifier */
-  --color-default: var(--background-color-softer); /*  neutral-90: rgb(245, 244, 246) */
-  --color-default-hover: var(--color-neutral-70); /*  rgb(203, 199, 209) - deutlich dunkler */
-  --color-default-active: var(--color-neutral-60); /*  rgb(177, 171, 186) - noch dunkler */
+  --color-default: light-dark(var(--background-color-softer), var(--background-color-softer));
+  --color-default-hover: light-dark(var(--color-neutral-70), rgb(60, 57, 66));
+  --color-default-active: light-dark(var(--color-neutral-60), rgb(75, 71, 83));
   --color-default-contrast: var(--text-color-base);
   /*  The ui library's own name for the soft background (styles/index.css: the active menu item). */
   /*  Never declared, so its literal fallback #faf9fa stayed light in the dark theme. */

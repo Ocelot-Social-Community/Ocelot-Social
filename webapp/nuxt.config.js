@@ -469,6 +469,9 @@ export default {
      ** `@media (--vp-mobile)` would pass through to the browser unresolved and the rule would be dead.
      */
     postcss: {
+      // light-dark() goes to the browser as written (Chrome 123, Firefox 120, Safari 17.5): preset-env's
+      // polyfill switches on prefers-color-scheme only and would ignore <html data-theme>.
+      preset: { features: { 'light-dark-function': false } },
       postcssOptions: {
         plugins: {
           '@csstools/postcss-global-data': {

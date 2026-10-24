@@ -15,7 +15,7 @@
 :root .mapboxgl-ctrl-geocoder .suggestions,
 :root .mapboxgl-ctrl-geocoder--button,
 :root .mapboxgl-ctrl-attrib.mapboxgl-compact {
-  background-color: var(--map-control-background);
+  background-color: var(--background-color-base);
 }
 
 :root .mapboxgl-popup-content {
@@ -59,19 +59,19 @@
 :root .mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
 :root .mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip,
 :root .mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
-  border-bottom-color: var(--map-control-background);
+  border-bottom-color: var(--background-color-base);
 }
 
 :root .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
 :root .mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip,
 :root .mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
-  border-top-color: var(--map-control-background);
+  border-top-color: var(--background-color-base);
 }
 
 :root .mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
-  border-right-color: var(--map-control-background);
+  border-right-color: var(--background-color-base);
 }
 
 :root .mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
-  border-left-color: var(--map-control-background);
+  border-left-color: var(--background-color-base);
 }
