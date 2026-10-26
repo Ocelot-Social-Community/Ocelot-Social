@@ -32,6 +32,12 @@ esac
 LOCK_FILE=$DEPLOY_DIR.lock
 PENDING_FILE=$DEPLOY_DIR.pending
 KEEP_RELEASES=${KEEP_RELEASES:-3}
+case $KEEP_RELEASES in
+  '' | *[!0-9]*)
+    echo "KEEP_RELEASES must be a non-negative integer, got '$KEEP_RELEASES'" >&2
+    exit 1
+    ;;
+esac
 FORCE=${FORCE:-0}
 STAGING_DIR=
 
@@ -46,6 +52,12 @@ on_exit() {
   fi
   if [ "$status" -ne 0 ]; then
     log "failed (exit $status), live release left untouched"
+    # a trigger during this run may carry the fix, so it must not be dropped
+    if [ -e "$PENDING_FILE" ]; then
+      log "triggered again meanwhile, deploying once more"
+      flock -u 9
+      exec "$0" "$DEPLOY_DIR"
+    fi
   fi
 }
 
@@ -166,7 +178,7 @@ main() {
   # A trigger arriving between the last check and here would be lost; pick it up.
   flock -u 9
   if [ -e "$PENDING_FILE" ]; then
-    exec "$0" "$@"
+    exec "$0" "$DEPLOY_DIR"
   fi
 }
 

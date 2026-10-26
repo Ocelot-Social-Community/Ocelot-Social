@@ -7,9 +7,9 @@ Each run builds the styleguide into `<DEPLOY_DIR>-<git sha>` and swaps the `<DEP
 - aborts on the first failing step (`git pull`, `npm ci`, `npm run build`) and leaves the live release untouched,
 - publishes a release only once it is complete (`index.html` present), so a broken build can no longer leave an empty, `403`-answering directory live,
 - removes leftovers of an aborted run by itself, so a redeploy needs no manual cleanup,
-- never runs twice at once (`flock` on `<DEPLOY_DIR>.lock`): a webhook arriving during a run makes that run deploy once more afterwards,
+- never runs twice at once (`flock` on `<DEPLOY_DIR>.lock`): a webhook arriving during a run makes that run deploy once more afterwards, even when the run itself fails,
 - skips the build when nothing below `styleguide/` changed since the live release (`FORCE=1` builds anyway),
-- keeps the newest `KEEP_RELEASES` releases (default `3`, the live one included) and deletes older ones.
+- keeps the newest `KEEP_RELEASES` releases (default `3`, the live one included; must be a non-negative integer) and deletes older ones.
 
 For this to work follow these steps (using alpine):
 
