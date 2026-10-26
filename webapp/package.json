@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social-webapp",
-  "version": "3.21.1",
+  "version": "3.21.2",
   "description": "ocelot.social Frontend",
   "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
   "author": "ocelot.social Community",
@@ -45,7 +45,7 @@
     "graphql-tag": "2.12.7",
     "intersection-observer": "^0.12.2",
     "linkify-it": "~5.0.2",
-    "livekit-client": "^2.22.4",
+    "livekit-client": "^2.23.0",
     "lodash": "4.18.1",
     "mapbox-gl": "1.13.3",
     "nuxt-dropzone": "^1.0.4",

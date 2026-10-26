@@ -263,6 +263,7 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'video-surface': 'var(--color-neutral-10)',
   'video-surface-deep': 'var(--color-neutral-0)',
   'video-text-soft': 'var(--color-neutral-70)',
+  'z-index-call-maximized': 'calc(var(--z-index-page-submenu) - 1)',
   'z-index-dropdown': '8888',
   'z-index-modal': '9999',
   'z-index-overlay': '9000',

@@ -321,12 +321,22 @@
  * @tokens Z-Index
  */
 
+  /* Layering, top to bottom. Use a token for anything that must stack over page content. */
+  /* modal: dialogs and the global tooltip/popover stack */
   --z-index-modal: 9999;
+  /* overlay: the chat module, a minimized call, the pre-join dialog, backdrops */
   --z-index-overlay: 9000;
+  /* dropdown: menus opened from the page */
   --z-index-dropdown: 8888;
+  /* page-submenu: page chrome — header, footer and their submenus. Above a maximized call. */
   --z-index-page-submenu: 2500;
+  /* call-maximized: a maximized video call, one below the page chrome and above the page content */
+  --z-index-call-maximized: calc(var(--z-index-page-submenu) - 1);
+  /* sticky-float: floating page elements, e.g. the feed's new-post button */
   --z-index-sticky-float: 150;
+  /* sticky: sticky page elements */
   --z-index-sticky: 100;
+  /* surface: lowest layer above the page flow */
   --z-index-surface: 1;
   /**
  * @tokens Media Query

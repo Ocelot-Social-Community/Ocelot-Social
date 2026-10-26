@@ -54,8 +54,8 @@ import type { Context } from '@src/context'
 // own doc comment for the full reasoning).
 const GROUP_REVERSE_GEOCODE_TYPES = NEIGHBORHOOD_REVERSE_GEOCODE_TYPES
 
-// Whether any Category nodes exist. Keeps CreateGroup graceful: the "categories
-// required" rule only applies when the policy is on AND there is at least one
+// Whether any Category nodes exist. Keeps CreateGroup and UpdateGroup graceful: the
+// "categories required" rule only applies when the policy is on AND there is at least one
 // category to choose from (mirrors the frontend gating in getCategoriesMixin).
 const categoriesExist = async (context: Context): Promise<boolean> => {
   const session = context.driver.session()
@@ -490,7 +490,9 @@ export default {
       )
 
       if (policy.get('categoriesActive') && categoryIds) {
-        if (categoryIds.length < branding.category.min) {
+        // As in CreateGroup: the minimum only holds while there is a category to choose from —
+        // on an empty category DB a group could otherwise never be saved again.
+        if (categoryIds.length < branding.category.min && (await categoriesExist(context))) {
           throw new AppError(Errors.GROUP_SAVE_TOO_FEW_CATEGORIES, { min: branding.category.min })
         }
         if (categoryIds.length > branding.category.max) {
