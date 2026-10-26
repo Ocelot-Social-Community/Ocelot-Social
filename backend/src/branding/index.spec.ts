@@ -10,7 +10,11 @@ describe('branding (shared package)', () => {
   })
 
   it('re-exports the resolved config, which equals the defaults for an empty override slot', () => {
-    expect(branding).toEqual(brandingDefaults)
+    // Vanilla offers both colour schemes; a brand has only the one it declares (default light).
+    expect(branding).toEqual({
+      ...brandingDefaults,
+      theme: { ...brandingDefaults.theme, colorScheme: 'light dark' },
+    })
   })
 
   it('exposes the migrated backend domains with their default values', () => {
