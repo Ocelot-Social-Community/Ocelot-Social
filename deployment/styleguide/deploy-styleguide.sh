@@ -52,10 +52,11 @@ on_exit() {
   fi
   if [ "$status" -ne 0 ]; then
     log "failed (exit $status), live release left untouched"
-    # a trigger during this run may carry the fix, so it must not be dropped
+    # A trigger during this run may carry the fix, so it must not be dropped.
+    # Unlock first: a trigger arriving after the check then takes the lock itself.
+    flock -u 9
     if [ -e "$PENDING_FILE" ]; then
       log "triggered again meanwhile, deploying once more"
-      flock -u 9
       exec "$0" "$DEPLOY_DIR"
     fi
   fi
