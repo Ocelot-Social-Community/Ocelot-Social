@@ -869,7 +869,8 @@ describe('notifications', () => {
             postAuthor = notifiedUser
           })
 
-          it('sends only one notification with reason commented_on_post, no notification with reason mentioned_in_comment', async () => {
+          // Mentioned AND observing their post: told once, and the mention outranks the comment.
+          it('sends only one notification with reason mentioned_in_comment, no notification with reason commented_on_post', async () => {
             await createCommentOnPostAction()
             const expected = {
               data: {
@@ -878,7 +879,7 @@ describe('notifications', () => {
                     id: expect.any(String),
                     read: false,
                     createdAt: expect.any(String),
-                    reason: 'commented_on_post',
+                    reason: 'mentioned_in_comment',
                     from: {
                       __typename: 'Comment',
                       id: 'c47',
@@ -901,9 +902,7 @@ describe('notifications', () => {
             ).resolves.toMatchObject({ ...expected, errors: undefined })
           })
 
-          // The author is left out of a comment's mentions only because, as an observer of
-          // their post, they hear of the comment anyway. Having stopped observing it, the
-          // mention is all that is left to reach them.
+          // Having stopped observing their post, the mention is all that reaches the author.
           it('sends the author who no longer observes the post a notification with reason mentioned_in_comment', async () => {
             await createPostAction()
             authenticatedUser = await notifiedUser.toJson()
