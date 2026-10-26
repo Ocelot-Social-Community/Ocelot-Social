@@ -22,8 +22,8 @@ concurrency:
 # granted per job, to the ones that need it: `contents: write` for github_tag and release_notes,
 # which create the build tag and edit the GitHub release with GITHUB_TOKEN, and `packages: write`
 # for docker_retag, which pushes the version tags to the registry. `release_please` needs none of
-# it — it works through the it4c-release-bot app token it mints itself. The repository dispatches in
-# build_trigger authenticate with OCELOT_PUBLISH_EVENT_PAT rather than GITHUB_TOKEN, so that job
+# it — it works through the it4c-release-bot app token it mints itself. The repository dispatch in
+# build_trigger authenticates with OCELOT_PUBLISH_EVENT_PAT rather than GITHUB_TOKEN, so that job
 # needs no scope at all and says so with `permissions: {}`.
 permissions:
   contents: read
@@ -489,7 +489,7 @@ jobs:
     # this registry, so the tags have to exist before they are told to go. github_tag is listed as
     # well because a job's outputs are only readable through `needs`.
     needs: [github_tag, docker_retag]
-    # GITHUB_TOKEN is unused here: both dispatches authenticate with OCELOT_PUBLISH_EVENT_PAT, and
+    # GITHUB_TOKEN is unused here: the dispatch authenticates with OCELOT_PUBLISH_EVENT_PAT, and
     # since the payload no longer comes from package.json there is not even a checkout left to grant
     # `contents: read` for. Stated explicitly so that adding a step which does need a scope has to
     # say so — see the commented-out dispatch below, which would need `contents: write`.
@@ -499,8 +499,8 @@ jobs:
       # is shell syntax in a `with:` string, which Actions does not expand — the stage repositories
       # received the four-character literal `${VERSION}` and an empty GITHUB_RUN_NUMBER, since
       # runner defaults like GITHUB_RUN_NUMBER are not part of the `env` context either. Building it
-      # once with jq fixes both, keeps the two dispatches from drifting apart, and quotes the values
-      # properly instead of relying on them never containing a `"`.
+      # once with jq fixes both and quotes the values properly instead of relying on them never
+      # containing a `"`.
       #
       # No checkout and no Node any more: the only reason for either was reading the version out of
       # package.json, which github_tag already publishes as an output.
@@ -535,7 +535,7 @@ jobs:
       # BUILD_TAG is the one key that is new: it names the immutable container image tag for this
       # commit, so a downstream deployment can pin it instead of resolving a moving `master`.
       #
-      # Unlike the two dispatches below, this one uses GITHUB_TOKEN instead of the PAT. Reactivating
+      # Unlike the dispatch below, this one uses GITHUB_TOKEN instead of the PAT. Reactivating
       # it therefore needs `permissions: contents: write` on this job — a repository dispatch is a
       # write operation, and the job runs read-only.
       #- name: Repository Dispatch
@@ -552,12 +552,4 @@ jobs:
           token: ${{ secrets.OCELOT_PUBLISH_EVENT_PAT }} # this token is required to access the other repository
           event-type: trigger-ocelot-build-success
           repository: 'Ocelot-Social-Community/stage.ocelot.social'
-          client-payload: ${{ steps.payload.outputs.payload }}
-
-      - name: Repository Dispatch stage.yunite.me
-        uses: peter-evans/repository-dispatch@4e4111d77d8ccae527ceb1dfa1811a0bc3b03d78 # v3.0.0
-        with:
-          token: ${{ secrets.OCELOT_PUBLISH_EVENT_PAT }} # this token is required to access the other repository
-          event-type: trigger-ocelot-build-success
-          repository: 'Yunite-Net/stage.yunite.me'
           client-payload: ${{ steps.payload.outputs.payload }}
