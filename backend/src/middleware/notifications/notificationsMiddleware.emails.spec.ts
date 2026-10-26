@@ -167,7 +167,7 @@ describe('emails sent for notifications', () => {
           )
         })
 
-        it('sends 3 notifications', async () => {
+        it('sends one notification, for the mention', async () => {
           authenticatedUser = await groupMember.toJson()
 
           await expect(
@@ -177,33 +177,7 @@ describe('emails sent for notifications', () => {
             }),
           ).resolves.toMatchObject({
             data: {
-              notifications: expect.arrayContaining([
-                {
-                  id: expect.any(String),
-                  createdAt: expect.any(String),
-                  from: {
-                    __typename: 'Post',
-                    id: 'post',
-                    content:
-                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
-                  },
-                  read: false,
-                  reason: 'post_in_group',
-                  relatedUser: null,
-                },
-                {
-                  id: expect.any(String),
-                  createdAt: expect.any(String),
-                  from: {
-                    __typename: 'Post',
-                    id: 'post',
-                    content:
-                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
-                  },
-                  read: false,
-                  reason: 'followed_user_posted',
-                  relatedUser: null,
-                },
+              notifications: [
                 {
                   id: expect.any(String),
                   createdAt: expect.any(String),
@@ -217,7 +191,7 @@ describe('emails sent for notifications', () => {
                   reason: 'mentioned_in_post',
                   relatedUser: null,
                 },
-              ]),
+              ],
             },
             errors: undefined,
           })
@@ -240,17 +214,19 @@ describe('emails sent for notifications', () => {
           })
         })
 
-        it('sends only one email', () => {
+        // The bell holds the mention only, but the member still wants mails about posts in
+        // their groups — and that is the next reason in line.
+        it('sends only one email, for the post in the group', () => {
           expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
           expect(sendNotificationMailMock).toHaveBeenCalledWith(
             expect.objectContaining({
-              reason: 'followed_user_posted',
+              reason: 'post_in_group',
               email: 'group.member@example.org',
             }),
           )
         })
 
-        it('sends 3 notifications', async () => {
+        it('sends one notification, for the mention', async () => {
           authenticatedUser = await groupMember.toJson()
 
           await expect(
@@ -260,33 +236,7 @@ describe('emails sent for notifications', () => {
             }),
           ).resolves.toMatchObject({
             data: {
-              notifications: expect.arrayContaining([
-                {
-                  id: expect.any(String),
-                  createdAt: expect.any(String),
-                  from: {
-                    __typename: 'Post',
-                    id: 'post',
-                    content:
-                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
-                  },
-                  read: false,
-                  reason: 'post_in_group',
-                  relatedUser: null,
-                },
-                {
-                  id: expect.any(String),
-                  createdAt: expect.any(String),
-                  from: {
-                    __typename: 'Post',
-                    id: 'post',
-                    content:
-                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
-                  },
-                  read: false,
-                  reason: 'followed_user_posted',
-                  relatedUser: null,
-                },
+              notifications: [
                 {
                   id: expect.any(String),
                   createdAt: expect.any(String),
@@ -300,7 +250,7 @@ describe('emails sent for notifications', () => {
                   reason: 'mentioned_in_post',
                   relatedUser: null,
                 },
-              ]),
+              ],
             },
             errors: undefined,
           })
@@ -334,7 +284,7 @@ describe('emails sent for notifications', () => {
           )
         })
 
-        it('sends 3 notifications', async () => {
+        it('sends one notification, for the mention', async () => {
           authenticatedUser = await groupMember.toJson()
 
           await expect(
@@ -344,33 +294,7 @@ describe('emails sent for notifications', () => {
             }),
           ).resolves.toMatchObject({
             data: {
-              notifications: expect.arrayContaining([
-                {
-                  id: expect.any(String),
-                  createdAt: expect.any(String),
-                  from: {
-                    __typename: 'Post',
-                    id: 'post',
-                    content:
-                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
-                  },
-                  read: false,
-                  reason: 'post_in_group',
-                  relatedUser: null,
-                },
-                {
-                  id: expect.any(String),
-                  createdAt: expect.any(String),
-                  from: {
-                    __typename: 'Post',
-                    id: 'post',
-                    content:
-                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
-                  },
-                  read: false,
-                  reason: 'followed_user_posted',
-                  relatedUser: null,
-                },
+              notifications: [
                 {
                   id: expect.any(String),
                   createdAt: expect.any(String),
@@ -384,7 +308,56 @@ describe('emails sent for notifications', () => {
                   reason: 'mentioned_in_post',
                   relatedUser: null,
                 },
-              ]),
+              ],
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('email notification for mention in post and post in group is false', () => {
+        beforeEach(async () => {
+          vi.clearAllMocks()
+          await groupMember.update({ emailNotificationsMention: false })
+          await groupMember.update({ emailNotificationsPostInGroup: false })
+          authenticatedUser = await postAuthor.toJson()
+          await mutate({
+            mutation: CreatePost,
+            variables: {
+              id: 'post',
+              title: 'This is the post',
+              content: `Hello, ${mentionString}, my trusty followers.`,
+              groupId: 'public-group',
+            },
+          })
+        })
+
+        it('still sends the email for following the author', () => {
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              reason: 'followed_user_posted',
+              email: 'group.member@example.org',
+            }),
+          )
+        })
+
+        it('sends one notification, for the mention', async () => {
+          authenticatedUser = await groupMember.toJson()
+
+          await expect(
+            query({
+              query: notifications,
+              variables: { orderBy: 'updatedAt_desc' },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              notifications: [
+                {
+                  from: { __typename: 'Post', id: 'post' },
+                  reason: 'mentioned_in_post',
+                },
+              ],
             },
             errors: undefined,
           })
@@ -413,7 +386,7 @@ describe('emails sent for notifications', () => {
           expect(sendNotificationMailMock).not.toHaveBeenCalled()
         })
 
-        it('sends 3 notifications', async () => {
+        it('sends one notification, for the mention', async () => {
           authenticatedUser = await groupMember.toJson()
 
           await expect(
@@ -423,33 +396,7 @@ describe('emails sent for notifications', () => {
             }),
           ).resolves.toMatchObject({
             data: {
-              notifications: expect.arrayContaining([
-                {
-                  id: expect.any(String),
-                  createdAt: expect.any(String),
-                  from: {
-                    __typename: 'Post',
-                    id: 'post',
-                    content:
-                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
-                  },
-                  read: false,
-                  reason: 'post_in_group',
-                  relatedUser: null,
-                },
-                {
-                  id: expect.any(String),
-                  createdAt: expect.any(String),
-                  from: {
-                    __typename: 'Post',
-                    id: 'post',
-                    content:
-                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
-                  },
-                  read: false,
-                  reason: 'followed_user_posted',
-                  relatedUser: null,
-                },
+              notifications: [
                 {
                   id: expect.any(String),
                   createdAt: expect.any(String),
@@ -463,7 +410,7 @@ describe('emails sent for notifications', () => {
                   reason: 'mentioned_in_post',
                   relatedUser: null,
                 },
-              ]),
+              ],
             },
             errors: undefined,
           })
