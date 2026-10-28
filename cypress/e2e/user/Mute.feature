@@ -27,7 +27,8 @@ Feature: Mute a user
     Given "peter-pan" follows "annoying-user"
     And "annoying-user" writes the post "Spam Spam Spam"
     When I navigate to page "/profile/annoying-user"
-    And I click on "Mute user" from the content menu in the user info box
+    Then I see the post "Spam Spam Spam" in the feed
+    When I click on "Mute user" from the content menu in the user info box
     Then the list of posts of this user is empty
     And I get removed from his follower collection
 
@@ -42,6 +43,7 @@ Feature: Mute a user
 
   Scenario: Posts of muted users are filtered from search results, users are not
     Given "annoying-user" writes the post "Spam Spam Spam"
+    And "peter-pan" writes the post "Spam from Peter"
     And I navigate to page "/"
     When I search for "Spam"
     Then I should see the following posts in the select dropdown:
@@ -56,4 +58,7 @@ Feature: Mute a user
     And I should not see "Spam Spam Spam" in the select dropdown
     When I clear the search field
     And I search for "Spam"
-    Then I should not see "Spam Spam Spam" in the select dropdown
+    Then I should see the following posts in the select dropdown:
+      | title           |
+      | Spam from Peter |
+    And I should not see "Spam Spam Spam" in the select dropdown

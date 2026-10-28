@@ -59,6 +59,15 @@ describe('SearchableInput.vue', () => {
       expect(wrapper.find('.ds-select-is-open').exists()).toBe(false)
     })
 
+    it('empties the field when cleared with esc key, so typing on starts a new search', async () => {
+      const input = wrapper.find('input.ds-select-search')
+      input.setValue('abcd')
+      select.trigger('input')
+      select.trigger('keyup.esc')
+      await Vue.nextTick()
+      expect(input.element.value).toBe('')
+    })
+
     it('changes the unprocessedSearchInput as the value changes', () => {
       select.trigger('input')
       expect(select.element.value).toBe('abcd')
