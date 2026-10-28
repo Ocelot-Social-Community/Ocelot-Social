@@ -1,19 +1,10 @@
 <script lang="ts">
-  import {
-    computed,
-    defineComponent,
-    getCurrentInstance,
-    h,
-    isVue2,
-    onBeforeUnmount,
-    onMounted,
-    ref,
-    watch,
-  } from 'vue-demi'
+  import { computed, defineComponent, getCurrentInstance, h, isVue2, ref, watch } from 'vue-demi'
 
   import OsButton from '#src/components/OsButton/OsButton.vue'
   import { IconCheck, IconClose } from '#src/components/OsIcon'
   import { cn } from '#src/utils'
+  import { trapFocus, useBodyScrollLock, useEscapeKey } from '#src/utils/dialog'
 
   import { modalPanelVariants } from './modal.variants'
 
@@ -66,7 +57,6 @@
 
       const modalRef = ref<HTMLElement | null>(null)
       const isScrolled = ref(false)
-      let previousOverflow = ''
       const titleId = `os-modal-title-${Math.random().toString(36).slice(2, 7)}`
 
       /* v8 ignore start -- Vue 2 only */
@@ -114,76 +104,26 @@
         close(type)
       }
 
-      // --- Body scroll lock ---
+      // --- Body scroll lock, ESC key ---
+      useBodyScrollLock(() => props.open)
+      useEscapeKey(
+        () => props.open,
+        () => cancel('backdrop'),
+      )
       watch(
         () => props.open,
         (show) => {
-          /* v8 ignore start -- SSR guard */
-          if (typeof document === 'undefined') {
-            return
-          }
-          /* v8 ignore stop */
           if (show) {
-            previousOverflow = document.body.style.overflow
-            document.body.style.overflow = 'hidden'
             emit('opened')
-          } else {
-            document.body.style.overflow = previousOverflow
           }
         },
         { immediate: true },
       )
 
-      // --- ESC key handler ---
-      function onKeydown(e: KeyboardEvent) {
-        if (props.open && e.key === 'Escape') {
-          cancel('backdrop')
-        }
-      }
-
-      onMounted(() => {
-        document.addEventListener('keydown', onKeydown)
-      })
-
-      onBeforeUnmount(() => {
-        document.removeEventListener('keydown', onKeydown)
-        /* v8 ignore start -- cleanup guard */
-        if (typeof document !== 'undefined') {
-          document.body.style.overflow = previousOverflow
-        }
-        /* v8 ignore stop */
-      })
-
       // --- Focus trap ---
-      /* v8 ignore start -- focus wrapping requires real browser (tested in visual tests) */
       function onFocusTrap(e: KeyboardEvent) {
-        if (e.key !== 'Tab' || !modalRef.value) {
-          return
-        }
-
-        const focusable = modalRef.value.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        )
-        if (focusable.length === 0) {
-          return
-        }
-
-        const first = focusable[0]
-        const last = focusable[focusable.length - 1]
-
-        if (e.shiftKey) {
-          if (document.activeElement === first) {
-            e.preventDefault()
-            last.focus()
-          }
-        } else {
-          if (document.activeElement === last) {
-            e.preventDefault()
-            first.focus()
-          }
-        }
+        trapFocus(modalRef.value, e)
       }
-      /* v8 ignore stop */
 
       return () => {
         if (!props.open) {
