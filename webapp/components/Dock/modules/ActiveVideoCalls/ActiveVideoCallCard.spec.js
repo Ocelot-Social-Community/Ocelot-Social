@@ -58,6 +58,11 @@ describe('ActiveVideoCallCard.vue', () => {
     expect(wrapper.findAll('.active-video-call__avatar')).toHaveLength(1)
   })
 
+  it('shows a user once per connection: it may be two people sharing an account', () => {
+    const wrapper = Wrapper({ call: callWith([user('u1'), user('u1')]) })
+    expect(wrapper.findAll('.active-video-call__avatar')).toHaveLength(2)
+  })
+
   it('shows up to five people, and "+n" in the last place for more', () => {
     const five = Wrapper({ call: callWith(['a', 'b', 'c', 'd', 'e'].map((id) => user(id))) })
     expect(five.findAll('.active-video-call__avatar')).toHaveLength(5)

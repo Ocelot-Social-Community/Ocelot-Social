@@ -39,7 +39,7 @@ type ActiveVideoCall {
   group: Group!
   "Connections to the call — tabs and devices, so two people sharing an account count twice."
   participantCount: Int!
-  "The distinct users in the call, in the order they joined."
+  "The user behind each connection, in the order they joined."
   participants: [User!]!
 }
 
@@ -53,7 +53,7 @@ type Query        { activeVideoCalls: [ActiveVideoCall!]! }
 type Subscription { activeVideoCallChanged: ActiveVideoCallChange! }
 ```
 
-- **`participantCount`** zählt LiveKit-Verbindungen, also Tabs (E2): Zwei Menschen können sich einen Account teilen, die Zahl soll sie nicht verschlucken. **`participants`** ist nach `userId` dedupliziert und nach Beitrittszeit sortiert. Die Karte zeigt deshalb die Zahl, und die Avatare darunter können weniger sein.
+- **`participantCount`** zählt LiveKit-Verbindungen, also Tabs (E2): Zwei Menschen können sich einen Account teilen, die Zahl soll sie nicht verschlucken. Aus demselben Grund enthält **`participants`** den Nutzer hinter *jeder* Verbindung, nach Beitrittszeit sortiert; ein Nutzer mit zwei Verbindungen steht also zweimal darin. Zahl und Avatare passen damit zusammen.
 - Der Nutzer hinter einer Verbindung wird aus `metadata.userId` gelesen. Ist die Metadata unlesbar, dient die Identität `userId#suffix` als Rückfall.
 - `Group.activeVideoCall` für die Gruppenseite folgt erst in Schritt 5, zusammen mit deren Umstellung, damit kein ungenutztes Feld entsteht.
 
@@ -156,7 +156,7 @@ Getroffen am 2026-10-28:
 | # | Frage | Entscheidung | Warum |
 |---|---|---|---|
 | E1 | Steuerung der Modul-Sichtbarkeit | Registry im Code (`routes`), fest verdrahtet | Ein einziges Modul rechtfertigt keine Konfigurationsschicht. Das Format lässt einen späteren Override zu. |
-| E2 | Was zählt die Zahl? | Verbindungen (Tabs), wie heute | Mehrere Menschen können sich einen Account teilen. |
+| E2 | Was zählt die Zahl? | Verbindungen (Tabs), wie heute; die Avatare ebenso (ein Nutzer mit zwei Verbindungen erscheint zweimal) | Mehrere Menschen können sich einen Account teilen. |
 | E3 | Geblockt-Symbol | nur „von mir geblockt“ (`isBlocked`) | `blocked` würde verraten, wer mich geblockt hat. |
 | E4 | Avatare am Gruppen-Button | vorerst nicht | nicht Teil des ersten Schritts |
 | – | Wo erscheint das Dock? | auf allen Seiten, das Video-Modul nur auf `/` | Das Dock soll überall nutzbar sein, die Module werden pro Seite gesteuert. |

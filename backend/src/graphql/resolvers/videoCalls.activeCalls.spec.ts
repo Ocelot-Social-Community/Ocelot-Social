@@ -206,8 +206,9 @@ describe('activeVideoCalls', () => {
     expect(data.activeVideoCalls).toEqual([])
   })
 
-  it('counts connections but lists each user once, in the order they joined', async () => {
-    // Two people sharing one account are two connections; the count must not swallow them.
+  it('lists the user behind each connection, in the order they joined', async () => {
+    // Two people sharing one account are two connections; neither count nor faces may
+    // swallow one of them.
     await buildGroup('closed-1', 'closed')
     await addMember('closed-1', 'member-1')
     authenticatedUser = ownerJson
@@ -224,6 +225,7 @@ describe('activeVideoCalls', () => {
     expect(idsOf(data.activeVideoCalls[0].participants as { id: string }[])).toEqual([
       'owner-1',
       'member-1',
+      'owner-1',
     ])
   })
 

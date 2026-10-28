@@ -24,7 +24,7 @@ type ActiveVideoCall {
   group: Group!
   "Connections to the call — tabs and devices, so two people sharing an account count twice."
   participantCount: Int!
-  "The distinct users in the call, in the order they joined."
+  "The user behind each connection, in the order they joined — a user twice for two connections, as two people may share an account."
   participants: [User!]!
 }
 

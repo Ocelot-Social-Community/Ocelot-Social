@@ -152,7 +152,10 @@ const roomServiceFor = (config: LiveKitConfig) =>
 export interface RoomParticipants {
   /** LiveKit connections, i.e. tabs and devices — two people sharing an account count twice. */
   count: number
-  /** The distinct users behind them, in the order they joined. */
+  /**
+   * The user behind each connection, in the order they joined — a user twice for two
+   * connections, like the count: it may be two people sharing an account.
+   */
   userIds: string[]
 }
 
@@ -186,7 +189,7 @@ export const getRoomParticipants = async (
     const ordered = [...participants].sort(
       (a, b) => Number(a.joinedAt ?? 0) - Number(b.joinedAt ?? 0),
     )
-    const userIds = [...new Set(ordered.map(userIdOf).filter((id): id is string => !!id))]
+    const userIds = ordered.map(userIdOf).filter((id): id is string => !!id)
     return { count: participants.length, userIds }
   } catch (err) {
     // Only "room not found" is a legitimate zero — the room hasn't been

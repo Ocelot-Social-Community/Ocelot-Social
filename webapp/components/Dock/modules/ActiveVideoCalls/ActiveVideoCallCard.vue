@@ -15,8 +15,8 @@
     <div class="active-video-call__people">
       <ul class="active-video-call__avatars" :aria-label="$t('dock.activeVideoCalls.participants')">
         <li
-          v-for="user in shownParticipants"
-          :key="user.id"
+          v-for="(user, index) in shownParticipants"
+          :key="`${user.id}-${index}`"
           class="active-video-call__avatar"
           :title="participantTitle(user)"
         >
