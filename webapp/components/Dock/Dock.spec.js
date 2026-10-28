@@ -114,36 +114,59 @@ describe('Dock.vue', () => {
       ).toHaveLength(1)
     })
 
-    it('opens the drawer as a modal dialog and focuses it', async () => {
+    const drawerPanel = (wrapper) => wrapper.find('[data-testid="os-drawer-panel"]')
+
+    it('opens the drawer as a modal dialog that takes the focus', async () => {
       const wrapper = Wrapper()
       await report(wrapper, 'calls', 1)
 
       await wrapper.find('[data-test="dock-flag"]').trigger('click')
       await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
 
-      const panel = wrapper.find('aside')
-      expect(wrapper.classes()).toContain('dock--open')
+      const panel = drawerPanel(wrapper)
       expect(wrapper.find('[data-test="dock-flag"]').attributes('aria-expanded')).toBe('true')
       expect(panel.attributes('role')).toBe('dialog')
       expect(panel.attributes('aria-modal')).toBe('true')
+      expect(panel.attributes('aria-label')).toBe('dock.label')
+      expect(panel.classes()).toContain('visible')
       expect(document.activeElement).toBe(panel.element)
+    })
+
+    it('has the modules inside the drawer, named in the page language', () => {
+      const wrapper = Wrapper()
+      expect(drawerPanel(wrapper).find('.reporter').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="os-drawer-close"]').attributes('aria-label')).toBe(
+        'dock.close',
+      )
     })
 
     it.each([
       ['the flag', (wrapper) => wrapper.find('[data-test="dock-flag"]').trigger('click')],
-      ['the backdrop', (wrapper) => wrapper.find('[data-test="dock-backdrop"]').trigger('click')],
-      ['the close button', (wrapper) => wrapper.find('[data-test="dock-close"]').trigger('click')],
-      ['Escape', (wrapper) => wrapper.find('aside').trigger('keydown', { key: 'Escape' })],
+      [
+        'the backdrop',
+        (wrapper) => wrapper.find('[data-testid="os-drawer-backdrop"]').trigger('click'),
+      ],
+      [
+        'the close button',
+        (wrapper) => wrapper.find('[data-testid="os-drawer-close"]').trigger('click'),
+      ],
+      ['Escape', () => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))],
     ])('closes on %s and gives the focus back to the flag', async (_name, act) => {
       const wrapper = Wrapper()
       await report(wrapper, 'calls', 1)
-      await wrapper.find('[data-test="dock-flag"]').trigger('click')
+      const flag = wrapper.find('[data-test="dock-flag"]')
+      flag.element.focus()
+      await flag.trigger('click')
+      await wrapper.vm.$nextTick()
 
       await act(wrapper)
       await wrapper.vm.$nextTick()
 
-      expect(wrapper.classes()).not.toContain('dock--open')
-      expect(document.activeElement).toBe(wrapper.find('[data-test="dock-flag"]').element)
+      expect(wrapper.vm.open).toBe(false)
+      expect(drawerPanel(wrapper).classes()).toContain('invisible')
+      expect(document.activeElement).toBe(flag.element)
+      wrapper.destroy()
     })
 
     it('closes when its modules have nothing left to show', async () => {
@@ -165,38 +188,6 @@ describe('Dock.vue', () => {
 
       expect(wrapper.vm.open).toBe(false)
     })
-
-    it('keeps the focus inside the open drawer', async () => {
-      const wrapper = Wrapper()
-      await report(wrapper, 'calls', 1)
-      await wrapper.find('[data-test="dock-flag"]').trigger('click')
-      const panel = wrapper.find('aside')
-      const focusable = panel.findAll('button, a')
-      const first = focusable.at(0).element
-      const last = focusable.at(focusable.length - 1).element
-
-      last.focus()
-      await panel.trigger('keydown', { key: 'Tab' })
-      expect(document.activeElement).toBe(first)
-
-      first.focus()
-      await panel.trigger('keydown', { key: 'Tab', shiftKey: true })
-      expect(document.activeElement).toBe(last)
-
-      // In between, Tab moves on as usual.
-      focusable.at(1).element.focus()
-      await panel.trigger('keydown', { key: 'Tab' })
-      expect(document.activeElement).toBe(focusable.at(1).element)
-      await panel.trigger('keydown', { key: 'Enter' })
-      expect(wrapper.vm.open).toBe(true)
-    })
-
-    it('ignores keys while closed', async () => {
-      const wrapper = Wrapper()
-      await report(wrapper, 'calls', 1)
-      await wrapper.find('aside').trigger('keydown', { key: 'Escape' })
-      expect(wrapper.vm.open).toBe(false)
-    })
   })
 
   describe('on a wide screen', () => {
@@ -208,8 +199,9 @@ describe('Dock.vue', () => {
 
       expect(wrapper.classes()).toContain('dock--rail')
       expect(wrapper.find('[data-test="dock-flag"]').exists()).toBe(false)
-      expect(wrapper.find('[data-test="dock-close"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="dock-drawer"]').exists()).toBe(false)
       expect(wrapper.find('aside').attributes('role')).toBeUndefined()
+      expect(wrapper.find('aside').attributes('aria-label')).toBe('dock.label')
     })
 
     it('folds into the flag when the screen gets narrow, and back', async () => {
@@ -255,6 +247,8 @@ describe('Dock.vue', () => {
     const WideWrapper = async () => {
       mockMatchMedia(true)
       const wrapper = Wrapper()
+      // The rail replaces the drawer once the media query has been asked, after mounting.
+      await wrapper.vm.$nextTick()
       // jsdom does no layout: no offsetParent, every rect at 0.
       const layout = document.createElement('div')
       rectTop(layout, 10)

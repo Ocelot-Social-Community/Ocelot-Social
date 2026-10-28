@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="modules.length"
-    :class="['dock', `dock--${side}`, wide ? 'dock--rail' : 'dock--drawer', { 'dock--open': open }]"
+    :class="['dock', `dock--${side}`, wide ? 'dock--rail' : 'dock--drawer']"
     :hidden="!count"
     :style="top !== null ? { top: `${top}px`, '--dock-start': `${top}px` } : null"
     data-test="dock"
@@ -25,27 +25,7 @@
       />
       <span class="dock__flag-count" aria-hidden="true">{{ count }}</span>
     </button>
-    <div v-if="!wide && open" class="dock__backdrop" data-test="dock-backdrop" @click="close" />
-    <aside
-      :id="panelId"
-      ref="panel"
-      class="dock__panel"
-      :aria-label="$t('dock.label')"
-      :role="wide ? null : 'dialog'"
-      :aria-modal="wide ? null : 'true'"
-      :tabindex="wide ? null : '-1'"
-      @keydown="onKeydown"
-    >
-      <button
-        v-if="!wide"
-        type="button"
-        class="dock__close"
-        data-test="dock-close"
-        :aria-label="$t('dock.close')"
-        @click="close"
-      >
-        <os-icon :icon="icons.close" />
-      </button>
+    <aside v-if="wide" :id="panelId" ref="panel" class="dock__panel" :aria-label="$t('dock.label')">
       <component
         :is="module.component"
         v-for="module in modules"
@@ -53,11 +33,27 @@
         @count="setCount(module.id, $event)"
       />
     </aside>
+    <os-drawer
+      v-else
+      :id="panelId"
+      :open.sync="open"
+      :side="side"
+      :aria-label="$t('dock.label')"
+      :close-label="$t('dock.close')"
+      data-test="dock-drawer"
+    >
+      <component
+        :is="module.component"
+        v-for="module in modules"
+        :key="module.id"
+        @count="setCount(module.id, $event)"
+      />
+    </os-drawer>
   </div>
 </template>
 
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import { OsDrawer, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import registry, { modulesFor } from './modules'
 
@@ -67,11 +63,9 @@ import registry, { modulesFor } from './modules'
 // the dock folds into a flag at the screen edge.
 export const RAIL_MEDIA_QUERY = '(min-width: 1760px)'
 
-const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, [tabindex="0"]'
-
 export default {
   name: 'Dock',
-  components: { OsIcon },
+  components: { OsDrawer, OsIcon },
   props: {
     side: { type: String, required: true, validator: (value) => /^(left|right)$/.test(value) },
     // The registry is a prop so a test can hand in its own modules.
@@ -132,7 +126,7 @@ export default {
     this.wide = this.mediaQuery.matches
     this.onMediaChange = ({ matches }) => {
       this.wide = matches
-      if (matches) this.open = false
+      if (matches) this.close()
     }
     this.mediaQuery.addEventListener('change', this.onMediaChange)
     // Whatever stands above the page content (a donation bar, a filter row) moves it, and
@@ -176,36 +170,11 @@ export default {
       this.counts = { ...this.counts, [id]: count }
     },
     toggle() {
-      if (this.open) {
-        this.close()
-      } else {
-        this.open = true
-        this.$nextTick(() => this.$refs.panel.focus())
-      }
+      // OsDrawer takes the focus on open and gives it back to the flag on close.
+      this.open = !this.open
     },
     close() {
-      if (!this.open) return
       this.open = false
-      this.$nextTick(() => this.$refs.flag.focus())
-    },
-    onKeydown(event) {
-      if (!this.open) return
-      if (event.key === 'Escape') {
-        this.close()
-        return
-      }
-      if (event.key !== 'Tab') return
-      // Keep the focus inside the open drawer (it is a modal dialog).
-      const focusable = [...this.$refs.panel.querySelectorAll(FOCUSABLE)]
-      const first = focusable[0]
-      const last = focusable[focusable.length - 1]
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault()
-        last.focus()
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault()
-        first.focus()
-      }
     },
   },
 }
@@ -298,54 +267,10 @@ export default {
   font-weight: bold;
 }
 
-/*  Drawer: slides in from the dock's side, above everything but modals. */
-.dock__backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: calc(var(--z-index-overlay) + 1);
-  background-color: rgba(0, 0, 0, 0.3);
-}
-.dock--drawer .dock__panel {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  z-index: calc(var(--z-index-overlay) + 2);
-  width: min(320px, 85vw);
-  padding: var(--space-base);
-  overflow-y: auto;
-  background-color: var(--background-color-base);
-  box-shadow: var(--box-shadow-x-large);
-  visibility: hidden;
-  transition:
-    transform 0.2s ease,
-    visibility 0.2s;
-}
-.dock--drawer.dock--right .dock__panel {
-  right: 0;
-  transform: translateX(100%);
-}
-.dock--drawer.dock--left .dock__panel {
-  left: 0;
-  transform: translateX(-100%);
-}
-.dock--drawer.dock--open .dock__panel {
-  visibility: visible;
-  transform: none;
-}
-.dock__close {
-  display: block;
-  margin-left: auto;
-  padding: var(--space-xx-small);
-  border: none;
-  background: none;
-  color: var(--text-color-soft);
-  cursor: pointer;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .dock__flag,
   .dock__panel {
-    transition: none !important;
+    transition: none;
   }
 }
 </style>
