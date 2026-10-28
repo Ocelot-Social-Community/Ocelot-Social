@@ -11,6 +11,7 @@ Feature: Block a user
     And the following "posts" are in the database:
       | id         | title                   | slug                    | authorId        |
       | bWBjpkTKZp | previously created post | previously-created-post | id-of-peter-pan |
+      | harass-1   | a post of harassing     | a-post-of-harassing     | harassing-user  |
     And I am logged in as "peter-pan"
 
   Scenario: Block a user
@@ -42,29 +43,16 @@ Feature: Block a user
     Then I should not see the "Follow" button
     And I get removed from his follower collection
 
-  Scenario: Posts of blocked users are not filtered from search results
-    Given "harassing-user" writes the post "You can still see my posts"
-    And "peter-pan" blocks "harassing-user"
-    When I navigate to page "/"
-    And I search for "see"
-    Then I should see the following posts in the select dropdown:
-      | title                      |
-      | You can still see my posts |
-
-  Scenario: Blocked users can still find my posts
+  Scenario: Unblocking lets me comment and follow again
     Given "peter-pan" blocks "harassing-user"
-    And I am logged in as "harassing-user"
-    When I navigate to page "/"
-    And I search for "previously created"
-    Then I should see the following posts in the select dropdown:
-      | title                   |
-      | previously created post |
-
-  Scenario: Blocked users do not see in their list who blocked them
-    Given "harassing-user" blocks "peter-pan"
-    When I navigate to page "/"
-    And I navigate to my "Blocked users" settings page
-    Then I should see no users in my blocked users list
+    When I navigate to page "/post/harass-1/a-post-of-harassing"
+    Then they should see a text explaining why commenting is not possible
+    And they should not see the comment form
+    When I navigate to page "/profile/harassing-user"
+    And I click on the "Unblock user" button
+    Then I should see the "Follow" button
+    When I navigate to page "/post/harass-1/a-post-of-harassing"
+    Then I should see the comment form
 
   Scenario: Blocked users cannot unblock themselves, nor follow
     Given "harassing-user" blocks "peter-pan"

@@ -588,6 +588,49 @@ und hinter tausend Stäben keine Welt.`,
         })
       })
 
+      // Unlike a mute, a block ends interaction, not visibility: both sides still find each
+      // other's posts.
+      describe('adding posts of a user the authenticated user blocked, and of one who blocked them', () => {
+        beforeAll(async () => {
+          const blockedUser = await Factory.build('user', {
+            id: 'blocked-user',
+            name: 'Blocked',
+            slug: 'blocked',
+          })
+          const blockingUser = await Factory.build('user', {
+            id: 'blocking-user',
+            name: 'Blocking',
+            slug: 'blocking',
+          })
+          await user.relateTo(blockedUser, 'blocked')
+          await blockingUser.relateTo(user, 'blocked')
+          await Factory.build(
+            'post',
+            { id: 'blocked-post', title: 'Zaunkoenig im Garten', content: 'Ein kleiner Vogel.' },
+            { authorId: 'blocked-user' },
+          )
+          await Factory.build(
+            'post',
+            { id: 'blocking-post', title: 'Zaunkoenig am Teich', content: 'Ein kleiner Vogel.' },
+            { authorId: 'blocking-user' },
+          )
+        })
+
+        it('finds the posts of both', async () => {
+          variables = { query: 'zaunkoenig' }
+
+          await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
+            data: {
+              searchResults: expect.arrayContaining([
+                expect.objectContaining({ __typename: 'Post', id: 'blocked-post' }),
+                expect.objectContaining({ __typename: 'Post', id: 'blocking-post' }),
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+
       describe('adding a tag', () => {
         beforeAll(async () => {
           await Factory.build('tag', { id: 'myHashtag' })

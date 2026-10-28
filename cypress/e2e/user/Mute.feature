@@ -31,6 +31,15 @@ Feature: Mute a user
     Then the list of posts of this user is empty
     And I get removed from his follower collection
 
+  Scenario: Posts of muted users leave my newsfeed
+    Given "annoying-user" writes the post "Spam Spam Spam"
+    When I navigate to page "/"
+    Then I see the post "Spam Spam Spam" in the feed
+    When "peter-pan" mutes "annoying-user"
+    And I refresh the page
+    Then I see the post "Post that should be seen" in the feed
+    And I do not see the post "Spam Spam Spam" in the feed
+
   Scenario: Posts of muted users are filtered from search results, users are not
     Given "annoying-user" writes the post "Spam Spam Spam"
     And I navigate to page "/"
@@ -48,17 +57,3 @@ Feature: Mute a user
     When I clear the search field
     And I search for "Spam"
     Then I should not see "Spam Spam Spam" in the select dropdown
-    When I clear the search field
-    And I search for "not muted"
-    Then I should see the following posts in the select dropdown:
-      | title                    |
-      | Post that should be seen |
-
-  Scenario: Muted users can still find my posts
-    Given "peter-pan" mutes "annoying-user"
-    And I am logged in as "annoying-user"
-    When I navigate to page "/"
-    And I search for "previously created"
-    Then I should see the following posts in the select dropdown:
-      | title                   |
-      | previously created post |

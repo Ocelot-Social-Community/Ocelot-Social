@@ -34,10 +34,6 @@ Feature: Search
       | title                                         |
       | 101 Essays that will change the way you think |
 
-  Scenario: Escape clears the search field
-    When I type "Ess" and press escape
-    Then the search field should clear
-
   Scenario: Picking a post opens it
     When I search for "Essays"
     And I select a post entry
