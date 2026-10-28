@@ -48,6 +48,7 @@
         v-for="module in modules"
         :key="module.id"
         @count="setCount(module.id, $event)"
+        @close="close"
       />
     </os-drawer>
   </div>

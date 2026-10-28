@@ -97,6 +97,7 @@ describe('ActiveVideoCallCard.vue', () => {
       groupSlug: 'circle',
       groupAvatar: null,
     })
+    expect(wrapper.emitted('joined')).toHaveLength(1)
   })
 
   it('says the viewer is in the call instead of offering to join', () => {

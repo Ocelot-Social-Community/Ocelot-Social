@@ -198,6 +198,16 @@ describe('Dock.vue', () => {
       wrapper.destroy()
     })
 
+    it('closes when a module asks, e.g. for the call it just joined', async () => {
+      const wrapper = Wrapper()
+      await report(wrapper, 'calls', 1)
+      await wrapper.find('[data-test="dock-flag"]').trigger('click')
+
+      wrapper.findComponent(Reporter).vm.$emit('close')
+
+      expect(wrapper.vm.open).toBe(false)
+    })
+
     it('closes when its modules have nothing left to show', async () => {
       const wrapper = Wrapper()
       await report(wrapper, 'calls', 1)

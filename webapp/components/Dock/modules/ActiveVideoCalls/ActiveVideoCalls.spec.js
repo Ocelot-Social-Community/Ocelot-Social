@@ -65,6 +65,12 @@ describe('ActiveVideoCalls.vue', () => {
     expect(wrapper.findComponent({ name: 'ActiveVideoCallCard' }).props('joined')).toBe(false)
   })
 
+  it('asks the dock to get out of the way once a call is joined', () => {
+    const wrapper = Wrapper({ calls: [call('a')] })
+    wrapper.findComponent({ name: 'ActiveVideoCallCard' }).vm.$emit('joined')
+    expect(wrapper.emitted('close')).toHaveLength(1)
+  })
+
   describe('apollo', () => {
     const apollo = ActiveVideoCalls.apollo.activeVideoCalls
     const { updateQuery } = apollo.subscribeToMore

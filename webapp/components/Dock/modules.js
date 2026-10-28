@@ -10,7 +10,8 @@
 // before opening it.
 //
 // A module emits `count` with the number of entries it shows; a dock whose modules show
-// nothing takes no room, and on narrow screens shows no flag.
+// nothing takes no room, and on narrow screens shows no flag. It emits `close` when what it
+// started belongs in front (a call being joined): the drawer then gets out of the way.
 export default [
   {
     id: 'activeVideoCalls',

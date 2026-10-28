@@ -106,6 +106,7 @@ export default {
         groupSlug: this.group.slug,
         groupAvatar: this.group.avatar,
       })
+      this.$emit('joined')
     },
   },
 }
