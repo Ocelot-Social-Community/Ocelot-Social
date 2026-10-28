@@ -85,7 +85,7 @@
         class="video-tile__connection"
         :class="{ 'video-tile__connection--lost': tile.connectionQuality === 'lost' }"
         role="img"
-        v-tooltip="{ content: weakConnectionLabel, placement: 'top' }"
+        v-tooltip="{ content: weakConnectionLabel, placement: 'top', html: false }"
         :aria-label="weakConnectionLabel"
         data-test="video-tile-weak-connection"
       >
