@@ -819,6 +819,19 @@
       "title": "Disable User"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (blocked by you)",
+      "count": "{count} connected",
+      "join": "Join",
+      "joined": "You are in this call",
+      "participants": "Participants",
+      "title": "Running video calls"
+    },
+    "close": "Close sidebar",
+    "label": "Sidebar",
+    "open": "Open sidebar ({count})"
+  },
   "donations": {
     "amount-of-total": "{amount} of {total} € collected",
     "donate-now": "Donate now"

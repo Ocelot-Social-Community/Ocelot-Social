@@ -25,6 +25,8 @@
       </client-only>
     </div>
     <client-only>
+      <dock side="left" />
+      <dock side="right" />
       <video-call v-if="showVideoCall" />
     </client-only>
   </div>
@@ -37,6 +39,7 @@ import mobile from '~/mixins/mobile'
 import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
 import PageFooter from '~/components/PageFooter/PageFooter'
 import Chat from '~/components/Chat/Chat.vue'
+import Dock from '~/components/Dock/Dock.vue'
 import VideoCall from '~/components/VideoCall/VideoCall.vue'
 import { videoCallConfigQuery } from '~/graphql/VideoCalls'
 
@@ -45,6 +48,7 @@ export default {
     HeaderMenu,
     PageFooter,
     Chat,
+    Dock,
     VideoCall,
   },
   mixins: [seo, mobile()],

@@ -819,6 +819,19 @@
       "title": "Disabilita utente"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (bloccato da te)",
+      "count": "{count} connessi",
+      "join": "Partecipa",
+      "joined": "Sei in questa chiamata",
+      "participants": "Partecipanti",
+      "title": "Videochiamate in corso"
+    },
+    "close": "Chiudi barra laterale",
+    "label": "Barra laterale",
+    "open": "Apri barra laterale ({count})"
+  },
   "donations": {
     "amount-of-total": "{amount} of {total} € collezionato",
     "donate-now": "Dona ora"

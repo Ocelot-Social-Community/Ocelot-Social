@@ -826,6 +826,8 @@ export default shield(
       UnreadRooms: isAuthenticated,
       videoCallConfig: allow,
       videoCallParticipantCount: and(isAuthenticated, hasGroupPermission('group.videoCall.join')),
+      // Which calls are listed is decided per group in the resolver, on the same right.
+      activeVideoCalls: isAuthenticated,
       PostsPinnedCounts: hasPermission('post.pin'),
 
       // Invite Code

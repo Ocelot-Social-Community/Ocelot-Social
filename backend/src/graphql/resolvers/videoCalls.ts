@@ -13,10 +13,12 @@ import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@constants/subscriptions'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
 import { isActiveMembership, visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
+import { createGroupAuthorizationScope } from '@src/groupRole/requestScope'
 import { noteCountTold } from '@src/livekit/toldRooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
+import type { Context } from '@src/context'
 import type { Driver } from 'neo4j-driver'
 
 const ROOM_PREFIX = 'group-'
@@ -123,42 +125,225 @@ const LIVEKIT_API_TIMEOUT_MS = 4000
 // refresh arrives; two hours used to let a copied token outlive both decisions.
 const JOIN_TOKEN_TTL = '10m'
 
-export const getLiveParticipantCount = async (
-  config: { LIVEKIT_URL: string; LIVEKIT_API_KEY: string; LIVEKIT_API_SECRET: string },
-  roomName: string,
-): Promise<number> => {
-  const client = new RoomServiceClient(
+interface LiveKitConfig {
+  LIVEKIT_URL: string
+  LIVEKIT_API_KEY: string
+  LIVEKIT_API_SECRET: string
+}
+
+// The LiveKit part of the server config, when it is complete. The videoConference policy
+// requires it (requiresEnv), so with the feature on this is never null.
+const liveKitConfigOf = ({
+  LIVEKIT_URL,
+  LIVEKIT_API_KEY,
+  LIVEKIT_API_SECRET,
+}: Partial<Record<keyof LiveKitConfig, string>>): LiveKitConfig | null =>
+  LIVEKIT_URL && LIVEKIT_API_KEY && LIVEKIT_API_SECRET
+    ? { LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET }
+    : null
+
+const roomServiceFor = (config: LiveKitConfig) =>
+  new RoomServiceClient(
     httpUrlFor(config.LIVEKIT_URL),
     config.LIVEKIT_API_KEY,
     config.LIVEKIT_API_SECRET,
   )
+
+export interface RoomParticipants {
+  /** LiveKit connections, i.e. tabs and devices — two people sharing an account count twice. */
+  count: number
+  /** The distinct users behind them, in the order they joined. */
+  userIds: string[]
+}
+
+// The user behind a connection: the join token puts it into the metadata, and the identity is
+// `<userId>#<suffix>` (see joinGroupVideoCall) for a participant whose metadata is unreadable.
+const userIdOf = (participant: { identity?: string; metadata?: string }): string | null => {
+  try {
+    const { userId } = JSON.parse(participant.metadata ?? '') as { userId?: unknown }
+    if (typeof userId === 'string' && userId) {
+      return userId
+    }
+    // eslint-disable-next-line no-catch-all/no-catch-all
+  } catch {
+    // fall through to the identity
+  }
+  const [userId] = (participant.identity ?? '').split('#')
+  return userId || null
+}
+
+export const getRoomParticipants = async (
+  config: LiveKitConfig,
+  roomName: string,
+): Promise<RoomParticipants> => {
+  const client = roomServiceFor(config)
   try {
     const participants = await withTimeout(
       client.listParticipants(roomName),
       LIVEKIT_API_TIMEOUT_MS,
       'listParticipants',
     )
-    return participants.length
+    const ordered = [...participants].sort(
+      (a, b) => Number(a.joinedAt ?? 0) - Number(b.joinedAt ?? 0),
+    )
+    const userIds = [...new Set(ordered.map(userIdOf).filter((id): id is string => !!id))]
+    return { count: participants.length, userIds }
   } catch (err) {
     // Only "room not found" is a legitimate zero — the room hasn't been
     // created yet because no participant has joined. Every other error
     // (network, credentials, throttling, timeout) is a real failure that
     // would silently masquerade as "empty room" if swallowed.
     if (err instanceof TwirpError && (err.status === 404 || err.code === 'not_found')) {
-      return 0
+      return { count: 0, userIds: [] }
     }
     logger.warn(`listParticipants failed for ${roomName}:`, err)
     throw err
   }
 }
 
-// The videoConference policy is the single runtime switch, and it is enforced where every
-// other right is: the two group rights these resolvers sit behind carry it as their catalog
-// gate (`gatedBy: videoConference`), so the shield denies a disabled call before it arrives.
-// This file used to re-check it on the way in, which became unreachable — and an unreachable
-// guard is a claim nobody can verify.
+export const getLiveParticipantCount = async (
+  config: LiveKitConfig,
+  roomName: string,
+): Promise<number> => (await getRoomParticipants(config, roomName)).count
+
+// A call change is published to every subscriber at once, and every dock asks LiveKit the same
+// question in that moment. Requests still in flight are shared, so N viewers cost one call.
+// Nothing is kept once it is answered: a cached answer would be stale exactly when it matters,
+// right after the change that made everybody ask.
+const inFlight = new Map<string, Promise<unknown>>()
+const shared = async <T>(key: string, fetch: () => Promise<T>): Promise<T> => {
+  const pending = inFlight.get(key) as Promise<T> | undefined
+  if (pending) {
+    return pending
+  }
+  const request = fetch().finally(() => inFlight.delete(key))
+  inFlight.set(key, request)
+  return request
+}
+
+// Read paths only. Whoever DECIDES on the count — joinGroupVideoCall, opening vs. joining —
+// asks LiveKit itself and never takes an answer that was fetched for somebody else.
+const sharedRoomParticipants = async (config: LiveKitConfig, roomName: string) =>
+  shared(`participants:${roomName}`, async () => getRoomParticipants(config, roomName))
+
+// The groups that have a LiveKit room right now. A room lives exactly as long as somebody is in
+// it (plus LiveKit's empty timeout), so this is the candidate list; the participants decide.
+const listCallGroupIds = async (config: LiveKitConfig): Promise<string[]> =>
+  shared('rooms', async () => {
+    const rooms = await withTimeout(
+      roomServiceFor(config).listRooms(),
+      LIVEKIT_API_TIMEOUT_MS,
+      'listRooms',
+    )
+    return rooms.map((room) => groupIdFromRoomName(room.name)).filter((id): id is string => !!id)
+  })
+
+/** A running call as the resolvers pass it on; `userIds` is fetched lazily when absent. */
+interface ActiveVideoCallSource {
+  groupId: string
+  participantCount: number
+  userIds?: string[]
+}
+
+// Whether the viewer may join the call in that group — the very right joining asks for, so a
+// call shows up wherever the viewer could walk in, hidden groups included. Subscriptions keep
+// their context for the whole connection, so the request-scoped memo of context.groupAuthorization
+// would answer with the rights of the moment the client subscribed. A fresh scope per check, and
+// the answer kept for a short while — both ways, since most events concern groups the viewer is
+// not in, and those are the ones that would cost a read per event × subscriber. The whole cache is
+// dropped at once when it gets too old, which also bounds it to the pairs asked within a window.
+const MAY_JOIN_CACHE_TTL_MS = 30_000
+let mayJoinCache = new Map<string, boolean>()
+let mayJoinCacheSince = 0
+
+export const mayJoinCallCached = async (context: Context, groupId: string): Promise<boolean> => {
+  if (!context.user) {
+    return false
+  }
+  const now = Date.now()
+  if (now - mayJoinCacheSince > MAY_JOIN_CACHE_TTL_MS) {
+    mayJoinCache = new Map()
+    mayJoinCacheSince = now
+  }
+  const key = `${context.user.id}|${groupId}`
+  const cached = mayJoinCache.get(key)
+  if (cached !== undefined) {
+    return cached
+  }
+  const authorization = await createGroupAuthorizationScope({
+    database: context.database,
+    userId: context.user.id,
+    effectivePermissions: context.effectivePermissions,
+    policy: context.policy,
+  }).forGroup(groupId)
+  const mayJoin = !!authorization?.has('group.videoCall.join')
+  mayJoinCache.set(key, mayJoin)
+  return mayJoin
+}
+
 export default {
+  ActiveVideoCall: {
+    group: async (call: ActiveVideoCallSource, _args, context: Context) => {
+      const session = context.driver.session()
+      try {
+        const result = await session.readTransaction(async (tx) =>
+          tx.run('MATCH (group:Group {id: $groupId}) RETURN group {.*}', {
+            groupId: call.groupId,
+          }),
+        )
+        // The group exists: both ways a call gets here asked its rights in it first.
+        return result.records[0].get('group')
+      } finally {
+        await session.close()
+      }
+    },
+    participants: async (call: ActiveVideoCallSource, _args, context: Context) => {
+      let userIds = call.userIds
+      if (!userIds) {
+        // A call pushed by the subscription knows its count, not who is in it.
+        const config = liveKitConfigOf(context.config)
+        if (!config) {
+          return []
+        }
+        try {
+          ;({ userIds } = await sharedRoomParticipants(config, roomNameForGroup(call.groupId)))
+          // eslint-disable-next-line no-catch-all/no-catch-all
+        } catch {
+          // Already logged. The count still stands; the faces follow with the next change.
+          return []
+        }
+      }
+      if (userIds.length === 0) {
+        return []
+      }
+      const session = context.driver.session()
+      try {
+        const result = await session.readTransaction(async (tx) =>
+          tx.run('MATCH (user:User) WHERE user.id IN $userIds RETURN user {.*}', { userIds }),
+        )
+        const byId = new Map(
+          result.records.map((record) => [record.get('user').id as string, record.get('user')]),
+        )
+        return userIds.map((id) => byId.get(id)).filter(Boolean)
+      } finally {
+        await session.close()
+      }
+    },
+  },
   Subscription: {
+    activeVideoCallChanged: {
+      resolve: (payload: { groupId: string; count: number }) => ({
+        groupId: payload.groupId,
+        call:
+          payload.count > 0 ? { groupId: payload.groupId, participantCount: payload.count } : null,
+      }),
+      subscribe: withFilter(
+        (_root, _args, context: Context) =>
+          context.pubsub.asyncIterator(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED),
+        async (payload: { groupId: string; count: number }, _variables, context: Context) =>
+          mayJoinCallCached(context, payload.groupId),
+      ),
+    },
     videoCallParticipantCountChanged: {
       resolve: (payload: { groupId: string; count: number }) => payload,
       subscribe: withFilter(
@@ -194,6 +379,37 @@ export default {
       // truth for the room, so the client is not left with it for good (see toldRooms.ts).
       noteCountTold(roomName, count)
       return count
+    },
+    activeVideoCalls: async (_root, _args, context: Context) => {
+      const config = liveKitConfigOf(context.config)
+      if (!context.policy.getEffective('videoConference') || !config) {
+        return []
+      }
+      const groupIds = await listCallGroupIds(config)
+      const calls = await Promise.all(
+        groupIds.map(async (groupId): Promise<ActiveVideoCallSource | null> => {
+          const authorization = await context.groupAuthorization.forGroup(groupId)
+          if (!authorization?.has('group.videoCall.join')) {
+            return null
+          }
+          const roomName = roomNameForGroup(groupId)
+          let participants: RoomParticipants
+          try {
+            participants = await sharedRoomParticipants(config, roomName)
+            // eslint-disable-next-line no-catch-all/no-catch-all
+          } catch {
+            // Already logged. One room LiveKit cannot answer for must not hide all the others.
+            return null
+          }
+          if (participants.count === 0) {
+            return null
+          }
+          // Same as the count query: what is told here must be corrected if it ends unseen.
+          noteCountTold(roomName, participants.count)
+          return { groupId, participantCount: participants.count, userIds: participants.userIds }
+        }),
+      )
+      return calls.filter((call): call is ActiveVideoCallSource => !!call)
     },
   },
   Mutation: {

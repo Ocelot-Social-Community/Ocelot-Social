@@ -819,6 +819,19 @@
       "title": "Çaktivizo përdoruesin"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (i bllokuar nga ti)",
+      "count": "{count} të lidhur",
+      "join": "Bashkohu",
+      "joined": "Je në këtë thirrje",
+      "participants": "Pjesëmarrësit",
+      "title": "Thirrje video në vazhdim"
+    },
+    "close": "Mbyll shiritin anësor",
+    "label": "Shiriti anësor",
+    "open": "Hap shiritin anësor ({count})"
+  },
   "donations": {
     "amount-of-total": "{amount} nga {total} € të mbledhura",
     "donate-now": "Dhuro tani"

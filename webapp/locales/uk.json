@@ -819,6 +819,19 @@
       "title": "Деактивувати користувача"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (заблоковано вами)",
+      "count": "Підключено: {count}",
+      "join": "Приєднатися",
+      "joined": "Ви в цьому дзвінку",
+      "participants": "Учасники",
+      "title": "Поточні відеодзвінки"
+    },
+    "close": "Закрити бічну панель",
+    "label": "Бічна панель",
+    "open": "Відкрити бічну панель ({count})"
+  },
   "donations": {
     "amount-of-total": "{amount} з {total} € зібрано",
     "donate-now": "Пожертвувати зараз"

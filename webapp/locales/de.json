@@ -819,6 +819,19 @@
       "title": "Nutzer sperren"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (von dir blockiert)",
+      "count": "{count} verbunden",
+      "join": "Beitreten",
+      "joined": "Du bist dabei",
+      "participants": "Teilnehmer",
+      "title": "Laufende Video-Calls"
+    },
+    "close": "Seitenleiste schließen",
+    "label": "Seitenleiste",
+    "open": "Seitenleiste öffnen ({count})"
+  },
   "donations": {
     "amount-of-total": "{amount} von {total} € erreicht",
     "donate-now": "Jetzt spenden"
