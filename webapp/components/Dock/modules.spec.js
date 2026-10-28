@@ -23,8 +23,9 @@ describe('dock modules', () => {
   describe('running video calls', () => {
     const module = registry.find(({ id }) => id === 'activeVideoCalls')
 
-    it('sits on the right, on the main feed only', () => {
+    it('sits on the right, on the main feed only, under a camera', () => {
       expect(module.side).toBe('right')
+      expect(module.icon).toBe('videoCamera')
       expect(module.routes).toEqual(['index'])
     })
 

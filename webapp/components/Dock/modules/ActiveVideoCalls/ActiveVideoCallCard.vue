@@ -1,7 +1,7 @@
 <template>
   <article :class="['active-video-call', { 'active-video-call--joined': joined }]">
     <nuxt-link :to="groupLink" class="active-video-call__group" data-test="call-group">
-      <avatar-image :profile="group" size="small" />
+      <avatar-image :profile="group" size="small" class="active-video-call__group-avatar" />
       <span class="active-video-call__group-name">{{ group.name }}</span>
       <os-icon
         v-if="group.visibility !== 'public'"
@@ -122,7 +122,10 @@ export default {
   box-shadow: var(--box-shadow-base);
 }
 .active-video-call--joined {
-  outline: 2px solid var(--color-primary);
+  /*  Inside the card, not an outline: the dock panel scrolls, and clips what sticks out. */
+  box-shadow:
+    inset 0 0 0 2px var(--color-primary),
+    var(--box-shadow-base);
 }
 .active-video-call__group {
   display: flex;
@@ -131,6 +134,10 @@ export default {
   min-width: 0;
   color: var(--text-color-base);
   font-weight: bold;
+}
+.active-video-call__group-avatar {
+  /*  The long group name next to it must shrink, not the avatar. */
+  flex-shrink: 0;
 }
 .active-video-call__group-name {
   overflow: hidden;
@@ -156,6 +163,7 @@ export default {
 .active-video-call__avatar,
 .active-video-call__more {
   position: relative;
+  flex-shrink: 0;
   margin-right: calc(-1 * var(--space-xx-small));
 }
 .active-video-call__more {

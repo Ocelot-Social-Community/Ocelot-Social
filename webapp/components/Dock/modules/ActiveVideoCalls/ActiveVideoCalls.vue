@@ -1,7 +1,7 @@
 <template>
   <section v-if="sortedCalls.length" class="active-video-calls" data-test="active-video-calls">
     <h2 class="active-video-calls__title">{{ $t('dock.activeVideoCalls.title') }}</h2>
-    <ul class="active-video-calls__list">
+    <ul class="active-video-calls__list" data-dock-align>
       <li v-for="call in sortedCalls" :key="call.group.id">
         <active-video-call-card :call="call" :joined="call.group.id === ownCallGroupId" />
       </li>

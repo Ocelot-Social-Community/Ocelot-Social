@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import Dock, { RAIL_MEDIA_QUERY } from './Dock.vue'
+import registry from './modules'
 
 const localVue = global.localVue
 
@@ -7,7 +8,7 @@ const localVue = global.localVue
 const Reporter = {
   name: 'Reporter',
   render(h) {
-    return h('div', { class: 'reporter' }, [
+    return h('div', { class: 'reporter', attrs: { 'data-dock-align': '' } }, [
       h('a', { attrs: { href: '#a' } }, 'a'),
       h('a', { attrs: { href: '#b' } }, 'b'),
     ])
@@ -17,6 +18,7 @@ const Reporter = {
 const moduleOn = (id, side = 'right', routes = ['*']) => ({
   id,
   side,
+  icon: 'videoCamera',
   routes,
   component: Reporter,
   enabled: () => true,
@@ -59,6 +61,15 @@ describe('Dock.vue', () => {
     mockMatchMedia(false)
   })
 
+  it('takes its modules from the registry', () => {
+    const wrapper = mount(Dock, {
+      localVue,
+      propsData: { side: 'left' },
+      mocks: { $t: (key) => key, $route: route, $store: {} },
+    })
+    expect(wrapper.vm.registry).toBe(registry)
+  })
+
   it('sits on the left or the right', () => {
     const { validator } = Dock.props.side
     expect(['left', 'right'].map(validator)).toEqual([true, true])
@@ -92,8 +103,15 @@ describe('Dock.vue', () => {
       const flag = wrapper.find('[data-test="dock-flag"]')
       expect(wrapper.find('[data-test="dock"]').attributes('hidden')).toBeUndefined()
       expect(flag.text()).toBe('3')
+      // One icon per module that shows something: you see what is in there.
+      expect(flag.findAllComponents({ name: 'OsIcon' })).toHaveLength(2)
       expect(flag.attributes('aria-label')).toBe('dock.open {"count":3}')
       expect(flag.attributes('aria-expanded')).toBe('false')
+
+      await report(wrapper, 'b', 0)
+      expect(
+        wrapper.find('[data-test="dock-flag"]').findAllComponents({ name: 'OsIcon' }),
+      ).toHaveLength(1)
     })
 
     it('opens the drawer as a modal dialog and focuses it', async () => {
@@ -226,5 +244,101 @@ describe('Dock.vue', () => {
     await wrapper.setProps({ registry: [moduleOn('calls', 'right', ['groups'])] })
 
     expect(wrapper.vm.counts).toEqual({})
+  })
+
+  describe('lining up with the page content', () => {
+    let anchor, observer
+
+    const rectTop = (element, top) => {
+      element.getBoundingClientRect = () => ({ top })
+    }
+    const WideWrapper = async () => {
+      mockMatchMedia(true)
+      const wrapper = Wrapper()
+      // jsdom does no layout: no offsetParent, every rect at 0.
+      const layout = document.createElement('div')
+      rectTop(layout, 10)
+      Object.defineProperty(wrapper.element, 'offsetParent', { value: layout, configurable: true })
+      rectTop(wrapper.find('aside').element, 100)
+      rectTop(wrapper.find('[data-dock-align]').element, 140)
+      await report(wrapper, 'calls', 1)
+      await wrapper.vm.$nextTick()
+      return wrapper
+    }
+
+    beforeEach(() => {
+      anchor = document.createElement('div')
+      anchor.setAttribute('data-dock-anchor', '')
+      rectTop(anchor, 310)
+      document.body.appendChild(anchor)
+      window.ResizeObserver = jest.fn(function (callback) {
+        observer = { callback, observe: jest.fn(), disconnect: jest.fn() }
+        return observer
+      })
+    })
+
+    afterEach(() => {
+      anchor.remove()
+      delete window.ResizeObserver
+    })
+
+    it('starts its first list where the page content starts, the heading above it', async () => {
+      const wrapper = await WideWrapper()
+      // anchor 300 below the layout's top, minus the 40 the heading takes
+      expect(wrapper.vm.top).toBe(260)
+      expect(wrapper.attributes('style')).toContain('top: 260px')
+    })
+
+    it('looks again whenever the page changes its size', async () => {
+      const wrapper = await WideWrapper()
+      expect(observer.observe).toHaveBeenCalledWith(document.body)
+
+      rectTop(anchor, 410)
+      observer.callback()
+
+      expect(wrapper.vm.top).toBe(360)
+      wrapper.destroy()
+      expect(observer.disconnect).toHaveBeenCalled()
+    })
+
+    it('keeps its default place on a page without an anchor', async () => {
+      anchor.remove()
+      const wrapper = await WideWrapper()
+      expect(wrapper.vm.top).toBeNull()
+      expect(wrapper.attributes('style')).toBeUndefined()
+    })
+
+    it('starts the flag where the page content starts', async () => {
+      const wrapper = Wrapper()
+      const layout = document.createElement('div')
+      rectTop(layout, 10)
+      Object.defineProperty(wrapper.element, 'offsetParent', { value: layout, configurable: true })
+      await report(wrapper, 'calls', 1)
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.top).toBe(300)
+      expect(wrapper.attributes('style')).toContain('top: 300px')
+    })
+
+    it('keeps the default place while the dock is not laid out', async () => {
+      // A hidden dock has no offsetParent.
+      const wrapper = Wrapper()
+      await report(wrapper, 'calls', 1)
+      expect(wrapper.vm.top).toBeNull()
+    })
+
+    it('keeps the default place while no module marks where its content starts', async () => {
+      const wrapper = await WideWrapper()
+      wrapper.find('[data-dock-align]').element.removeAttribute('data-dock-align')
+      wrapper.vm.align()
+      expect(wrapper.vm.top).toBeNull()
+    })
+
+    it('does without a ResizeObserver', async () => {
+      delete window.ResizeObserver
+      const wrapper = await WideWrapper()
+      expect(wrapper.vm.top).toBe(260)
+      expect(() => wrapper.destroy()).not.toThrow()
+    })
   })
 })

@@ -133,6 +133,10 @@ export default {
 </script>
 
 <style>
+.layout-default {
+  /*  The dock rail is positioned against the layout, to line up with the page content. */
+  position: relative;
+}
 .main-navigation {
   background-color: var(--color-header-background);
 }
