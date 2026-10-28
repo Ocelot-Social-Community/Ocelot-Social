@@ -567,6 +567,8 @@ export default {
       try {
         await this.$apollo.mutate({ mutation: muteUser(), variables: { id: user.id } })
         this.$toast.success(this.$t('settings.muted-users.muted', { name: this.userName }))
+        // Muting ends my following them (users.ts muteUser).
+        this.reloadConnections()
       } catch (error) {
         this.$toastBackendError(error)
       } finally {
@@ -591,6 +593,8 @@ export default {
       try {
         await this.$apollo.mutate({ mutation: blockUser(), variables: { id: user.id } })
         this.$toast.success(this.$t('settings.blocked-users.blocked', { name: this.userName }))
+        // Blocking ends following in both directions (users.ts blockUser).
+        this.reloadConnections()
       } catch (error) {
         this.$toastBackendError(error)
       } finally {
@@ -641,6 +645,11 @@ export default {
     onFollowHover() {
       if (!this.followLoading) this.followHovered = true
     },
+    // The follow lists load themselves once; whatever changes who follows whom reloads them.
+    reloadConnections() {
+      this.$refs.followListFollowedBy?.loadConnections(0)
+      this.$refs.followListFollowing?.loadConnections(0)
+    },
     async toggleFollow() {
       if (this.followLoading) return
       const follow = !this.user.followedByCurrentUser
@@ -662,8 +671,7 @@ export default {
       if (success) {
         this.user.followedByCount = data.followedByCount
         this.user.followedByCurrentUser = data.followedByCurrentUser
-        this.$refs.followListFollowedBy?.loadConnections(0)
-        this.$refs.followListFollowing?.loadConnections(0)
+        this.reloadConnections()
       } else {
         // rollback optimistic update
         this.$toast.error(this.$t('followButton.error'))
