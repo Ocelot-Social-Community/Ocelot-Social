@@ -111,8 +111,10 @@ union ChatTarget = Group | User
 
 """A comment written by a user in reply to a post."""
 type Comment {
-  """ActivityPub activity id, for federated comments."""
-  activityId: String
+  """
+  Former ActivityPub activity id. Nothing has written it since ActivityPub was removed; older nodes may still carry a value.
+  """
+  activityId: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
   author: User
 
   """Comment body as rich text (HTML)."""
@@ -1681,8 +1683,10 @@ type PolicyValueChanged {
 A contribution — an article or event — written by a user, optionally within a group.
 """
 type Post {
-  """ActivityPub activity id, for federated posts."""
-  activityId: String
+  """
+  Former ActivityPub activity id. Nothing has written it since ActivityPub was removed; older nodes may still carry a value.
+  """
+  activityId: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
   author: User
   categories: [Category]
 
@@ -1755,8 +1759,10 @@ type Post {
   """Precise longitude of the event's map pin (Event posts), see lat."""
   lng: Float
 
-  """ActivityPub object id, for federated posts."""
-  objectId: String
+  """
+  Former ActivityPub object id. Nothing has written it since ActivityPub was removed; older nodes may still carry a value.
+  """
+  objectId: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
 
   """Number of users observing this post."""
   observingUsersCount: Int!
@@ -2470,8 +2476,10 @@ type User {
   """Category slugs the user has activated as their content filter."""
   activeCategories: [String]
 
-  """ActivityPub actor id, for federated users."""
-  actorId: String
+  """
+  Former ActivityPub actor id. Nothing has written it since ActivityPub was removed; older nodes may still carry a value.
+  """
+  actorId: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
 
   """Whether the user permits embedded iframes in content they view."""
   allowEmbedIframes: Boolean
@@ -2577,8 +2585,10 @@ type User {
   """
   outrankedByCurrentUser: Boolean!
 
-  """The user's public key, for federation/verification."""
-  publicKey: String
+  """
+  Former ActivityPub public key. Nothing has written it since ActivityPub was removed; older nodes may still carry a value.
+  """
+  publicKey: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
 
   """The invite code this user redeemed on registration, if any."""
   redeemedInviteCode: InviteCode

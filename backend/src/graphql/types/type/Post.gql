@@ -139,10 +139,10 @@ enum _PostOrdering {
 "A contribution — an article or event — written by a user, optionally within a group."
 type Post {
   id: ID!
-  "ActivityPub activity id, for federated posts."
-  activityId: String
-  "ActivityPub object id, for federated posts."
-  objectId: String
+  "Former ActivityPub activity id. Nothing has written it since ActivityPub was removed; older nodes may still carry a value."
+  activityId: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
+  "Former ActivityPub object id. Nothing has written it since ActivityPub was removed; older nodes may still carry a value."
+  objectId: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
   author: User
   title: String!
   "URL-safe unique handle for the post."
