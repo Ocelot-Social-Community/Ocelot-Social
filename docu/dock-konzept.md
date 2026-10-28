@@ -89,13 +89,14 @@ type Subscription { activeVideoCallChanged: ActiveVideoCallChange! }
 
 ```text
 components/Dock/
-  Dock.vue                 # side: 'left' | 'right'; renders the modules that match the route
-  DockFlag.vue             # mobile / narrow: edge tab + drawer
+  Dock.vue                 # side: 'left' | 'right'; the flag (a button), the rail or an OsDrawer
   modules.js               # registry
 components/Dock/modules/ActiveVideoCalls/
   ActiveVideoCalls.vue
   ActiveVideoCallCard.vue
 ```
+
+Die Schublade ist `OsDrawer` aus `packages/ui` (#10730). Fokusfalle, Escape, Backdrop, Fokus-Rückgabe und Scroll-Sperre kommen von dort.
 
 ### 4.2 Modul-Registry und Sichtbarkeit
 
@@ -105,41 +106,49 @@ export default [
   {
     id: 'activeVideoCalls',
     side: 'right',
+    icon: 'videoCamera',                       // stands for the module on the flag
+    label: 'dock.activeVideoCalls.flag',       // i18n key with {count}: the flag's tooltip
     component: () => import('./modules/ActiveVideoCalls/ActiveVideoCalls.vue'),
-    routes: ['index'],                 // route names; '*' = everywhere
+    routes: ['index'],                         // route names; '*' = everywhere
     enabled: ({ store }) => store.getters['videoCall/enabled'],  // videoCallConfig
   },
 ]
 ```
 
 - Ein Modul wird **nur gemountet**, wenn Route und Gate passen. Auf allen anderen Seiten laufen weder Query noch Subscription.
-- Ein Modul meldet per Event `has-content` (`true/false`). Ein Dock ohne Inhalt nimmt keinen Platz ein. Mobil gibt es dann auch kein Fähnchen.
+- Ein Modul meldet per Event `count` die Zahl seiner Einträge. Ein Dock, dessen Module zusammen 0 melden, nimmt keinen Platz ein, und mobil gibt es dann auch kein Fähnchen.
+- Ein Modul kann `close` melden, wenn das, was es gestartet hat, nach vorne gehört (ein Call, dem man beitritt). Die Schublade schließt sich dann.
 - Ausbaustufen der Steuerung sind in E1 beschrieben. Das Registry-Format ist so gewählt, dass `routes` später überschrieben werden kann, ohne Module umzubauen.
 
-### 4.3 Breakpoints
+### 4.3 Position und Breakpoints
+
+Die Seite markiert den Beginn ihres Inhalts mit `data-dock-anchor`. Der Wert darf benennen, welches Element darin der sichtbare Anfang ist; der Feed setzt `data-dock-anchor=".os-card"`, also die erste Karte. Ein Modul markiert seine Liste mit `data-dock-align`. `align()` in `Dock.vue` misst beides und setzt das Dock so, dass die erste Liste auf Höhe der ersten Karte beginnt; eine Überschrift steht darüber. Gemessen wird neu, sobald sich die Seitengröße ändert (`ResizeObserver`).
+
+Spalte und Fähnchen scrollen mit der Seite, bis sie unter dem Header ankommen, und bleiben dort stehen (`position: sticky`). Die Sticky-Höhe folgt `--header-height`, die der Header selbst setzt (0, wenn er sich beim Scrollen ausblendet). Sie ist nie größer als die Ausgangsposition, damit sticky das Dock nicht schon ohne Scrollen nach unten schiebt.
 
 | Viewport | Darstellung |
 |---|---|
-| breit (≥ 1760 px) | Seitenspalte von 256 px im freien Rand neben der 1200-px-Inhaltsspalte, fix unter dem Header. Die Inhaltsspalte bleibt unverändert, damit der Feed nicht schmaler wird. 1760 = 1200 + 2 × (256 + 24 Abstand); das linke Dock spiegelt das rechte. |
-| darunter, inkl. mobil | **Fähnchen** am jeweiligen Rand: vertikaler Tab, vertikal mittig (nicht unten, dort sitzen Chat und Video), mit Zähler-Badge. Tippen öffnet eine Schublade von dieser Seite; schließen per Tap daneben, ESC oder Wischen. |
+| breit (≥ 1760 px) | Seitenspalte von 256 px im freien Rand neben der 1200-px-Inhaltsspalte. Die Inhaltsspalte bleibt unverändert, damit der Feed nicht schmaler wird. 1760 = 1200 + 2 × (256 + 24 Abstand); das linke Dock spiegelt das rechte. |
+| darunter, inkl. mobil | **Fähnchen** am jeweiligen Rand, auf Höhe des Inhaltsbeginns (unten sitzen Chat und Video): die Icons der Module, die etwas anzeigen, und die Gesamtzahl; der Tooltip sagt pro Modul, was gezählt wird. Tippen öffnet die Schublade von dieser Seite; schließen per Backdrop, Schließen-Button oder Escape. |
 
-Barrierefreiheit: Das Fähnchen ist ein `button` mit `aria-expanded` und `aria-controls`. Die Schublade ist ein Dialog mit Fokusfalle, und der Fokus kehrt danach zum Fähnchen zurück.
+Barrierefreiheit: Das Fähnchen ist ein `button` mit `aria-expanded`, `aria-controls` und einem Namen, der den Tooltip enthält. Die Schublade ist ein modaler Dialog (`OsDrawer`): Der Fokus geht beim Öffnen hinein, Tab und Shift+Tab bleiben darin, und beim Schließen kehrt er zum Fähnchen zurück.
 
-## 5. Modul „Laufende Calls“
+## 5. Modul „Laufende Videoanrufe“
 
 Karte pro Call:
 
 - Gruppenavatar und Name (Link zur Gruppe), ein Schloss-Symbol bei geschlossenen oder versteckten Gruppen.
-- Teilnehmerzahl (Verbindungen) und Avatare der verschiedenen Nutzer (bis 5, dann „+n“), Namen im Tooltip. Geblockte Nutzer bekommen ein Symbol am Avatar.
-- Button „Beitreten“ öffnet das bestehende Pre-Join (`store/videoCall`), so wie der Gruppen-Button.
+- Zahl der Verbindungen und ein Avatar je Verbindung (bis 5, dann „+n“); ein Nutzer mit zwei Verbindungen erscheint zweimal. Namen im Tooltip. Von mir geblockte Nutzer bekommen ein Symbol am Avatar.
+- Button „Beitreten“ öffnet das bestehende Pre-Join (`store/videoCall`), so wie der Gruppen-Button, und schließt die Schublade.
 - Bin ich selbst in diesem Call, wird die Karte hervorgehoben („Du bist dabei“) und es gibt keinen Beitreten-Button.
 - Sortierung: der eigene Call zuerst, danach nach Teilnehmerzahl absteigend.
 
 ## 6. Tests
 
-- **Backend:** `rooms.ts` (Cache, Dedupe, 404 → leer), `activeVideoCalls` (Mitglied, Nicht-Mitglied, versteckte Gruppe, fehlendes Join-Recht, Policy aus), Subscription-Filter, `noteCountTold` auf dem neuen Pfad, `Group.activeVideoCall`. LiveKit wird gemockt wie in `videoCalls.spec.ts`.
-- **Webapp (Jest):** Registry-Matching (Route, Gate), `has-content` → Dock/Fähnchen ein/aus, Karte (Hervorhebung, Geblockt-Symbol, „+n“), Fähnchen-a11y.
-- **e2e:** nach der Umsetzung zu entscheiden. Kandidat: zwei Nutzer, einer im Call einer versteckten Gruppe, der andere sieht ihn im Dock.
+- **Backend** (`resolvers/videoCalls.activeCalls.spec.ts`, gegen Neo4j): `activeVideoCalls` (Mitglied, Nicht-Mitglied, versteckte Gruppe, Antragsteller, Policy aus), Verbindungen und Nutzer, unlesbare Metadaten, LiveKit-Fehler je Raum und bei `listRooms`, das Teilen gleichzeitiger Anfragen, `noteCountTold` auf dem neuen Pfad, Subscription-Filter und -Payload. LiveKit wird gemockt wie in `videoCalls.spec.ts`.
+- **UI-Bibliothek** (#10730): `OsDrawer` und `utils/dialog.ts` mit Unit-, Tastatur- und Visual-Tests inklusive a11y-Prüfung.
+- **Webapp (Jest):** Registry-Matching (Route, Gate, Icon, Label), `count` → Dock und Fähnchen ein/aus, Ausrichtung, Schublade gegen das echte `OsDrawer` (bleibt offen für ein Modul, das beim Mounten meldet; schließt auf `close`), Karte (Hervorhebung, Geblockt-Symbol, „+n“, doppelte Nutzer).
+- **e2e** (`cypress/e2e/videoCall/Dock.feature`, Liste der Calls gestubbt, weil die e2e-Umgebung kein LiveKit hat): Spalte bündig zur ersten Kachel und Beitreten; Fähnchen, Schublade bleibt offen, Escape mit Fokus-Rückgabe, Beitreten schließt sie; kein Dock außerhalb des Feeds und ohne laufenden Call. Die Rechte prüft der Backend-Test.
 
 ## 7. Umsetzungsreihenfolge
 
