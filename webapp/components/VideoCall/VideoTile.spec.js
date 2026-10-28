@@ -1,7 +1,9 @@
 import { mount, createLocalVue } from '@vue/test-utils'
+import VTooltip from 'v-tooltip'
 import VideoTile from './VideoTile.vue'
 
 const localVue = createLocalVue()
+localVue.use(VTooltip)
 
 const Stub = (name) => ({ name, template: `<div class="${name.toLowerCase()}" />` })
 const stubs = {
@@ -167,8 +169,20 @@ describe('VideoTile', () => {
     it('warns about a weak connection, naming whose it is', () => {
       const el = badge(tFactory({ connectionQuality: 'poor', name: 'Bob' }))
       expect(el.attributes('aria-label')).toBe('videoCall.connectionPoor:Bob')
-      expect(el.attributes('title')).toBe('videoCall.connectionPoor:Bob')
       expect(el.classes()).not.toContain('video-tile__connection--lost')
+    })
+
+    it('explains the warning in a tooltip, not a native title', () => {
+      // A native title never shows here: the label lets the pointer through to the tile.
+      const el = badge(tFactory({ connectionQuality: 'poor', name: 'Bob' }))
+      expect(el.element._tooltip.options.title).toBe('videoCall.connectionPoor:Bob')
+      expect(el.attributes('title')).toBeUndefined()
+    })
+
+    it('updates the tooltip when the connection gets worse', async () => {
+      const wrapper = tFactory({ connectionQuality: 'poor', name: 'Bob' })
+      await wrapper.setProps({ tile: buildTile({ connectionQuality: 'lost', name: 'Bob' }) })
+      expect(badge(wrapper).element._tooltip.options.title).toBe('videoCall.connectionLost:Bob')
     })
 
     it('marks a lost connection more urgently', () => {
