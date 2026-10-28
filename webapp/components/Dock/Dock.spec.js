@@ -287,6 +287,8 @@ describe('Dock.vue', () => {
       // anchor 300 below the layout's top, minus the 40 the heading takes
       expect(wrapper.vm.top).toBe(260)
       expect(wrapper.attributes('style')).toContain('top: 260px')
+      // …and never sticks below that.
+      expect(wrapper.attributes('style')).toContain('--dock-start: 260px')
     })
 
     it('looks again whenever the page changes its size', async () => {

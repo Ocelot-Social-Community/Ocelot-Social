@@ -3,7 +3,7 @@
     v-if="modules.length"
     :class="['dock', `dock--${side}`, wide ? 'dock--rail' : 'dock--drawer', { 'dock--open': open }]"
     :hidden="!count"
-    :style="top !== null ? { top: `${top}px` } : null"
+    :style="top !== null ? { top: `${top}px`, '--dock-start': `${top}px` } : null"
     data-test="dock"
   >
     <button
@@ -220,16 +220,17 @@ export default {
 /*  it shows — the rail's panel, the flag — scrolls along with the page until it reaches the */
 /*  header, and stays there. */
 .dock {
-  --dock-sticky-top: 6rem;
+  /*  Below the header, which hides on scrolling down and sets --header-height to 0 then. */
+  /*  Never below where the dock starts (--dock-start, set by align()): sticky would push it */
+  /*  down from there before anything is scrolled, off the line of the first post. */
+  --dock-sticky-top: min(
+    calc(var(--header-height, 5rem) + var(--space-small)),
+    var(--dock-start, 100vh)
+  );
 
   position: absolute;
-  top: var(--dock-sticky-top);
+  top: 6rem;
   bottom: 0;
-}
-@media (--vp-mobile) {
-  .dock {
-    --dock-sticky-top: 4.5rem;
-  }
 }
 .dock--drawer.dock--right {
   right: 0;
@@ -251,6 +252,7 @@ export default {
 .dock--rail .dock__panel {
   position: sticky;
   top: var(--dock-sticky-top);
+  transition: top 0.3s ease;
   max-height: calc(100vh - var(--dock-sticky-top) - var(--space-x-large));
   /*  Room for the cards' shadows, which the scrolling panel would clip. */
   padding: var(--space-xx-small) var(--space-small) var(--space-large);
@@ -263,6 +265,7 @@ export default {
 .dock__flag {
   position: sticky;
   top: var(--dock-sticky-top);
+  transition: top 0.3s ease;
   z-index: var(--z-index-sticky-float);
   display: flex;
   flex-direction: column;
@@ -340,8 +343,9 @@ export default {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dock--drawer .dock__panel {
-    transition: none;
+  .dock__flag,
+  .dock__panel {
+    transition: none !important;
   }
 }
 </style>
