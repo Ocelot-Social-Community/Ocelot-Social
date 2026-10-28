@@ -361,8 +361,8 @@
         "user_disable": "Nutzerkonten sperren und wieder freigeben — nur von Nutzern mit weniger Befugnissen als den eigenen.",
         "user_email_readAny": "E-Mail-Adresse beliebiger Nutzer lesen.",
         "user_invite": "Persönliche Einladungscodes erzeugen.",
-        "videoCall_create_open": "Einen Video-Call in einer Gruppe starten, die jeder betreten kann — die also auffindbar ist und ohne Freigabe beigetreten werden kann.",
-        "videoCall_create_restricted": "Einen Video-Call in einer Gruppe starten, die man nicht einfach betreten kann: Der Beitritt braucht eine Freigabe oder Einladung, oder die Gruppe ist unsichtbar."
+        "videoCall_create_open": "Einen Videoanruf in einer Gruppe starten, die jeder betreten kann — die also auffindbar ist und ohne Freigabe beigetreten werden kann.",
+        "videoCall_create_restricted": "Einen Videoanruf in einer Gruppe starten, die man nicht einfach betreten kann: Der Beitritt braucht eine Freigabe oder Einladung, oder die Gruppe ist unsichtbar."
       },
       "permNotHeld": "Dieses Recht hast du selbst nicht, darum kannst du es nicht vergeben.",
       "permUnavailable": "Funktion nicht konfiguriert – das Recht hat keine Wirkung.",
@@ -1089,8 +1089,8 @@
         "group_read": "Das Profil der Gruppe über das immer Öffentliche hinaus sehen.",
         "group_role_manage": "Die Rollen der Gruppe und ihre Rechte bearbeiten.",
         "group_settings_manage": "Die Einstellungen der Gruppe ändern: Name, Beschreibung, Bild, Ort und Kategorien.",
-        "group_videoCall_create": "Einen Video-Call in der Gruppe starten.",
-        "group_videoCall_join": "An einem laufenden Video-Call der Gruppe teilnehmen."
+        "group_videoCall_create": "Einen Videoanruf in der Gruppe starten.",
+        "group_videoCall_join": "An einem laufenden Videoanruf der Gruppe teilnehmen."
       },
       "resultingType": "Mit diesen Rechten ist die Gruppe:",
       "saved": "Rechte gespeichert",
@@ -1950,7 +1950,7 @@
       "cameraOn": "Kamera: An",
       "cameraStarting": "Kamera wird gestartet…",
       "cancel": "Abbrechen",
-      "description": "Du trittst gleich der Videokonferenz dieser Gruppe bei. Prüfe Kamera, Mikrofon und Lautsprecher, bevor du dem Anruf beitrittst.",
+      "description": "Du trittst gleich dem Videoanruf dieser Gruppe bei. Prüfe Kamera, Mikrofon und Lautsprecher, bevor du beitrittst.",
       "errorBusy": "Das Gerät wird bereits von einer anderen Anwendung verwendet.",
       "errorDenied": "Zugriff verweigert. Bitte erlaube Kamera- und Mikrofonzugriff in den Browser-Einstellungen.",
       "errorNoDevice": "Kein passendes Gerät gefunden.",
