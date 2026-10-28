@@ -81,10 +81,10 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
-Phase 4: █████████░  85% (23/27 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅, OsNumber ✅, OsModal ✅, ds-radio→HTML ✅ | Tier B ✅, OcelotInput ✅, OcelotSelect ✅, OsMenu ✅ | 0 ds-* Tags verbleibend
+Phase 4: █████████░  86% (24/28 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅, OsNumber ✅, OsModal ✅, OsConfirmDialog ✅, ds-radio→HTML ✅ | Tier B ✅, OcelotInput ✅, OcelotSelect ✅, OsMenu ✅ | 0 ds-* Tags verbleibend
 Phase 5: ███░░░░░░░  29% (2/7 Aufgaben) - Maintenance-App entkoppelt ✅
 ───────────────────────────────────────
-Gesamt:  █████████░  91% (87/96 Aufgaben)
+Gesamt:  █████████░  91% (88/97 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -216,9 +216,15 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-03-28 (Session 35)
+**Letzte Aktualisierung:** 2026-10-15 (#10283)
 
 **Aktuelle Phase:** Phase 5 gestartet — Maintenance-App entkoppelt ✅ | Weitere Phase 5 Aufgaben ausstehend
+
+**Zuletzt abgeschlossen (#10283 - OsConfirmDialog):**
+- [x] OsConfirmDialog in packages/ui (i18n-frei, Props-Only), Webapp-`ConfirmModal` als dünner Adapter — 18 Aufrufer unverändert
+- [x] OsModal: `size`, `closeLabel`, Fokus hinein/zurück, Vue-2-Attribute; ReportModal nutzt `size="lg"` (totes 700px-CSS entfernt)
+- [x] Erfolgs-Overlay (vue-sweetalert-icons) + künstliche Schließ-Verzögerungen aus ConfirmModal/ReportModal entfernt — Erfolg meldet der Toast des Aufrufers
+- [x] Interpolierte Werte (Namen, Titel) in ConfirmModal-Nachrichten werden HTML-escaped (vorher ungefiltert in `v-html`)
 
 **Zuletzt abgeschlossen (Session 35 - Maintenance-App Entkopplung):**
 - [x] Maintenance-App als eigenständiges Nuxt 4-Projekt unter `maintenance/` aufgesetzt
@@ -710,6 +716,8 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 
 **Tier 2: Layout & Feedback (UI-Library)**
 - [x] OsModal (Basis: DsModal → h() Render-Function, Vue 2/3 Compat, Focus-Trap, Scroll-Lock, A11y) ✅
+  - Erweitert (#10283): `size` (sm/md/lg), `closeLabel`, Fokus beim Öffnen hinein (`data-autofocus` oder Panel) und beim Schließen zurück, HTML-Attribute unter Vue 2 (role/aria/data-testid fehlten zuvor im Webapp-DOM)
+- [x] OsConfirmDialog (auf OsModal, i18n-frei: alle Texte als Props; `variant` default/danger, `loading`, Icons; meldet nur confirm/cancel) ✅ — Webapp-`ConfirmModal` ist übersetzender Adapter (modalData-API, $t, Callbacks)
 - [ ] OsDropdown (Basis: Webapp Dropdown)
 - [ ] OsAvatar (vereint DsAvatar + ProfileAvatar)
 - [x] ds-input → OcelotInput (23 Dateien, Webapp-Komponente mit lokalen Imports, formValidation-kompatibel) ✅
@@ -1878,6 +1886,7 @@ Bei der Migration werden:
 | 2026-03-23 | **ds-select → OcelotSelect** | Neue Webapp-Komponente `OcelotSelect.vue`: vereint DsSelect + inputMixin + multiinputMixin (~420 Zeilen). Form-Validation entfernt (von keinem Consumer genutzt). DsChip→OsBadge, DsSpinner→OsSpinner, DsIcon→OsIcon. vue-click-outside durch inline document.addEventListener ersetzt. 3 Dateien migriert, 16 Tests ✅. |
 | 2026-03-23 | **ds-menu → OsMenu/OsMenuItem** | Neue packages/ui Komponenten: h() Render, vue-demi, provide/inject, dropdown Prop für Popup-Variante. CSS in src/styles/index.css (integriert in style.css Build). 17 Nutzungen in 11 Dateien migriert. Action-Menüs nutzen link-tag default 'a' statt router-link. router-link Stub global in testSetup.js. Vite closeBundle Hook: ui.css in style.css gemergt. 273 UI-Tests, 108 Webapp-Tests ✅. **0 ds-* Komponenten-Tags verbleibend in Webapp.** |
 | 2026-03-28 | **Maintenance-App entkoppelt (Session 35)** | Eigenständiges Nuxt 4-Projekt unter `maintenance/`. Vue 3, SSR off, `nuxt generate` → statisches HTML. Abhängigkeiten: @ocelot-social/ui (OsButton, OsIcon, OsCard), @nuxtjs/i18n v10 (11 Sprachen), floating-vue (VDropdown für LocaleSwitch), Tailwind CSS v4. Eigene LocaleSwitch-Komponente (OsButton ghost/circle + OsIcon language + VDropdown). Eigene Locale-Dateien, Branding-CSS, Docker + nginx. Tests: vitest + @nuxt/test-utils. Kein Vuex/Apollo/v-tooltip — **vollständig von Webapp entkoppelt. Validiert packages/ui als echten Shared Layer.** |
+| 2026-10-15 | **OsConfirmDialog + OsModal-Ausbau (#10283)** | Neue Komponente OsConfirmDialog auf OsModal: Texte nur als Props (i18n bleibt in der App), `variant` default/danger (Fokus auf die sichere Wahl, Ocelot-Farbregel für Abbrechen), `loading` sperrt beide Wege, meldet nur `confirm`/`cancel`/`update:open`. OsModal: `size` (sm/md/lg, CVA), `closeLabel`, Fokus beim Öffnen hinein (`data-autofocus` oder Panel) und beim Schließen zurück, Focus-Trap überspringt deaktivierte Controls und fängt Shift+Tab vom Panel; HTML-Attribute unter Vue 2 jetzt unter `attrs` (role/aria/id/data-testid fehlten bisher im Webapp-DOM). Webapp: `ConfirmModal` als Adapter (modalData-API unverändert, Params HTML-escaped), Success-Overlay + Verzögerungen raus, ReportModal `size="lg"`. Unit-Tests 100%, neue Visual-/Keyboard-Tests. |
 
 ---
 
@@ -1895,7 +1904,7 @@ Bei der Migration werden:
 **Styleguide-Migration:**
 | Status | Komponenten |
 |--------|------------|
-| ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard, OsBadge, OsNumber, OsModal (7) |
+| ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard, OsBadge, OsNumber, OsModal (7) + OsConfirmDialog (auf OsModal) |
 | ✅ → Plain HTML | Section, Placeholder, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem, Grid, GridItem, Table, Radio (14) — Tier A/B |
 | ✅ → UI-Library | Chip, Tag → OsBadge (2), Number → OsNumber (1) — Tier B |
 | ✅ ds-form entkoppelt | Form-Validierung → formValidation Mixin (async-validator), vuelidate entfernt |
