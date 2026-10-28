@@ -50,6 +50,11 @@ export const Playground: StoryObj<PlaygroundArgs> = {
   }),
 }
 
+// An open drawer covers the page it is rendered on. On the autodocs page the stories render
+// inline by default, and an open drawer would lay its backdrop, focus trap and scroll lock over
+// the docs themselves — so the open stories get an iframe of their own there.
+const ownFrame = { docs: { story: { inline: false, iframeHeight: 420 } } }
+
 const content = `
   <h2 style="margin-top: 0">Running video calls</h2>
   <p>Content that belongs next to the page rather than in front of it.</p>
@@ -57,6 +62,7 @@ const content = `
 `
 
 export const Right: Story = {
+  parameters: ownFrame,
   render: () => ({
     components: { OsDrawer },
     template: `
@@ -68,6 +74,7 @@ export const Right: Story = {
 }
 
 export const Left: Story = {
+  parameters: ownFrame,
   render: () => ({
     components: { OsDrawer },
     template: `

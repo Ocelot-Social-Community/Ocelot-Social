@@ -43,8 +43,8 @@ describe('osDrawer', () => {
       const open = panelOf(mount(OsDrawer, { props: { open: true } })).classes()
       const closed = panelOf(mount(OsDrawer)).classes()
 
-      expect(open).toContain('[transition:transform_200ms_ease-out]')
-      expect(closed).toContain('[transition:transform_200ms_ease-out,visibility_0s_linear_200ms]')
+      expect(open).toContain('[transition:translate_200ms_ease-out]')
+      expect(closed).toContain('[transition:translate_200ms_ease-out,visibility_0s_linear_200ms]')
     })
 
     it.each([

@@ -112,6 +112,11 @@
       watch(
         () => props.open,
         async (open, wasOpen) => {
+          /* v8 ignore start -- SSR guard: immediate, so this runs in setup() on the server too */
+          if (typeof document === 'undefined') {
+            return
+          }
+          /* v8 ignore stop */
           if (open) {
             returnFocusTo = document.activeElement as HTMLElement | null
             emit('opened')
@@ -128,15 +133,16 @@
         { immediate: true },
       )
 
-      // Opening, the panel is visible at once and only slides: an element is still hidden at the
+      // Tailwind v4's translate-x-* set the `translate` property, not `transform`: that is what
+      // slides. Opening, the panel is visible at once and only slides: an element is still hidden at the
       // start of a visibility transition, and focusing it then would go nowhere. Closing, it
       // hides once it has slid out.
       const panelClasses = computed(() =>
         cn(
           drawerPanelVariants({ side: props.side }),
           props.open
-            ? 'translate-x-0 visible [transition:transform_200ms_ease-out]'
-            : 'invisible [transition:transform_200ms_ease-out,visibility_0s_linear_200ms]',
+            ? 'translate-x-0 visible [transition:translate_200ms_ease-out]'
+            : 'invisible [transition:translate_200ms_ease-out,visibility_0s_linear_200ms]',
         ),
       )
 
