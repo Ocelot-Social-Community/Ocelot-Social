@@ -169,8 +169,10 @@ export default {
       const anchor = marked.querySelector(start) || marked
       const layoutTop = this.$el.offsetParent.getBoundingClientRect().top
       const anchorTop = anchor.getBoundingClientRect().top - layoutTop
+      // Measured from the dock itself, which is what `top` places — not from the panel, whose
+      // margin and padding (room for the cards' shadows) would count twice.
       const alignOffset = align
-        ? align.getBoundingClientRect().top - this.$refs.panel.getBoundingClientRect().top
+        ? align.getBoundingClientRect().top - this.$el.getBoundingClientRect().top
         : 0
       this.top = Math.round(anchorTop - alignOffset)
     },

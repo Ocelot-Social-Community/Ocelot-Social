@@ -292,7 +292,7 @@ describe('Dock.vue', () => {
       const layout = document.createElement('div')
       rectTop(layout, 10)
       Object.defineProperty(wrapper.element, 'offsetParent', { value: layout, configurable: true })
-      rectTop(wrapper.find('aside').element, 100)
+      rectTop(wrapper.element, 100)
       rectTop(wrapper.find('[data-dock-align]').element, 140)
       await report(wrapper, 'calls', 1)
       await wrapper.vm.$nextTick()
