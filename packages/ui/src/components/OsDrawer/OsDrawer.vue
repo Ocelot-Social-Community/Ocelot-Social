@@ -10,8 +10,8 @@
     watch,
   } from 'vue-demi'
 
-  import { IconClose } from '#src/components/OsIcon'
   import { cn } from '#src/utils'
+  import { renderCloseButton } from '#src/utils/closeButton'
   import { trapFocus, useBodyScrollLock, useEscapeKey } from '#src/utils/dialog'
 
   import { drawerPanelVariants } from './drawer.variants'
@@ -128,32 +128,26 @@
         { immediate: true },
       )
 
+      // Opening, the panel is visible at once and only slides: an element is still hidden at the
+      // start of a visibility transition, and focusing it then would go nowhere. Closing, it
+      // hides once it has slid out.
       const panelClasses = computed(() =>
         cn(
           drawerPanelVariants({ side: props.side }),
-          props.open ? 'translate-x-0 visible' : 'invisible',
+          props.open
+            ? 'translate-x-0 visible [transition:transform_200ms_ease-out]'
+            : 'invisible [transition:transform_200ms_ease-out,visibility_0s_linear_200ms]',
         ),
       )
 
       return () => {
-        const closeButton = h(
-          'button',
-          elementData({
-            class:
-              'os-drawer__close self-end flex items-center justify-center w-[26px] h-[26px] m-2 mb-0 shrink-0 rounded-full bg-transparent border-0 cursor-pointer p-0 hover:bg-[var(--color-default-hover)] text-[var(--color-default-contrast)]',
-            type: 'button',
-            'aria-label': props.closeLabel,
-            'data-testid': 'os-drawer-close',
-            ...eventProps({ click: () => close('close') }),
-          }),
-          [
-            h(
-              'span',
-              elementData({ class: 'w-4 h-4 fill-current inline-flex', 'aria-hidden': 'true' }),
-              [IconClose(createElement, isVue2)],
-            ),
-          ],
-        )
+        const closeButton = renderCloseButton({
+          class: 'os-drawer__close self-end m-2 mb-0 shrink-0',
+          label: props.closeLabel,
+          testId: 'os-drawer-close',
+          onClick: () => close('close'),
+          createElement,
+        })
 
         const content = h('div', { class: 'os-drawer__content px-4 pb-4' }, slots.default?.())
 

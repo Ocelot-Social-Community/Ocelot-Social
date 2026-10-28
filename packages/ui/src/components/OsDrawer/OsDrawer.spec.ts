@@ -37,6 +37,16 @@ describe('osDrawer', () => {
       expect(wrapper.find('[data-testid="os-drawer-backdrop"]').exists()).toBe(true)
     })
 
+    it('is visible at once when it opens and only slides, so the focus can land in it', () => {
+      // At the start of a visibility transition an element is still hidden, and focus() on it
+      // goes nowhere; only on closing does it hide, once it has slid out.
+      const open = panelOf(mount(OsDrawer, { props: { open: true } })).classes()
+      const closed = panelOf(mount(OsDrawer)).classes()
+
+      expect(open).toContain('[transition:transform_200ms_ease-out]')
+      expect(closed).toContain('[transition:transform_200ms_ease-out,visibility_0s_linear_200ms]')
+    })
+
     it.each([
       ['right', 'right-0', 'translate-x-full'],
       ['left', 'left-0', '-translate-x-full'],

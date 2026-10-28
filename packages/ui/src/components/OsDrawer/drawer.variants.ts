@@ -14,7 +14,7 @@ export const drawerPanelVariants = cva(
     'fixed top-0 bottom-0 z-[9999]',
     'flex flex-col w-[min(320px,85vw)]',
     'bg-white shadow-xl overflow-y-auto outline-none',
-    'transition-[transform,visibility] duration-200 ease-out motion-reduce:transition-none',
+    'motion-reduce:transition-none',
   ],
   {
     variants: {

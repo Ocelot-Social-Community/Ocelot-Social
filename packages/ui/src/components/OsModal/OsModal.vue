@@ -4,6 +4,7 @@
   import OsButton from '#src/components/OsButton/OsButton.vue'
   import { IconCheck, IconClose } from '#src/components/OsIcon'
   import { cn } from '#src/utils'
+  import { renderCloseButton } from '#src/utils/closeButton'
   import { trapFocus, useBodyScrollLock, useEscapeKey } from '#src/utils/dialog'
 
   import { modalPanelVariants } from './modal.variants'
@@ -143,23 +144,14 @@
           return h('div', { class: cn('os-modal-wrapper', (closedAttrClass as string) || '') })
         }
 
-        // --- Close button (native <button> for Vue 2/3 compatibility) ---
-        const closeBtn = h(
-          'button',
-          {
-            class:
-              'os-modal__close absolute top-3 right-3 flex items-center justify-center w-[26px] h-[26px] rounded-full bg-transparent border-0 cursor-pointer p-0 hover:bg-[var(--color-default-hover)] text-[var(--color-default-contrast)]',
-            type: 'button',
-            'aria-label': 'Close',
-            'data-testid': 'os-modal-close',
-            ...eventProps({ click: () => cancel('close') }),
-          },
-          [
-            h('span', { class: 'w-4 h-4 fill-current inline-flex', 'aria-hidden': 'true' }, [
-              IconClose(createElement, isVue2),
-            ]),
-          ],
-        )
+        // --- Close button ---
+        const closeBtn = renderCloseButton({
+          class: 'os-modal__close absolute top-3 right-3',
+          label: 'Close',
+          testId: 'os-modal-close',
+          onClick: () => cancel('close'),
+          createElement,
+        })
 
         // --- Header ---
         const headerChildren: ReturnType<typeof h>[] = []
