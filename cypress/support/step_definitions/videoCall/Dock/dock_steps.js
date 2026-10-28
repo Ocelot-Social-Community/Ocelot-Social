@@ -112,3 +112,7 @@ defineStep('I see no dock', () => {
     expect($body.find('.dock__panel:visible, [data-test="dock-flag"]:visible')).to.have.length(0)
   })
 })
+
+defineStep('the pre-join dialog of the call opens', () => {
+  cy.get('.prejoin').should('be.visible')
+})

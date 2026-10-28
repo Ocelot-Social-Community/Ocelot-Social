@@ -26,7 +26,7 @@ Feature: Running video calls in the dock
     Then the dock shows the running call beside the feed
     And the first call in the dock is level with the first post
     When I join the call from the dock
-    Then I see the video-call pre-join dialog
+    Then the pre-join dialog of the call opens
 
   Scenario: On a small screen the call waits behind a flag
     Given the screen is 375 pixels wide
@@ -38,7 +38,7 @@ Feature: Running video calls in the dock
     Then the dock drawer is closed and the flag has the focus
     When I open the dock
     And I join the call from the dock
-    Then I see the video-call pre-join dialog
+    Then the pre-join dialog of the call opens
     And the dock drawer is closed
 
   Scenario: The calls show on the feed only, and only while one runs
