@@ -78,10 +78,9 @@
             v-for="category in post.categories"
             :key="category.id"
             v-tooltip="{
-              content: `
-                ${$t(`contribution.category.name.${category.slug}`)}:
-                ${$t(`contribution.category.description.${category.slug}`)}
-              `,
+              content: `${$t(`contribution.category.name.${category.slug}`)}: ${$t(
+                `contribution.category.description.${category.slug}`,
+              )}`,
               placement: 'bottom-start',
             }"
             :icon="category.icon"
