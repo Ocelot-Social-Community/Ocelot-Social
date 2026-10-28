@@ -101,6 +101,44 @@ describe('AvatarImage', () => {
         expect(wrapper.find('.image').attributes('loading')).toBe('eager')
       })
 
+      describe('while the image loads', () => {
+        it('keeps the initials legible, since an image that hangs reports no error for minutes', () => {
+          expect(wrapper.classes()).toContain('--no-image')
+        })
+
+        it('shows the image on its own once it has loaded', async () => {
+          await wrapper.find('.image').trigger('load')
+          expect(wrapper.classes()).not.toContain('--no-image')
+        })
+
+        it('waits again for the image of a different profile', async () => {
+          await wrapper.find('.image').trigger('load')
+          await wrapper.setProps({
+            profile: {
+              ...propsData.profile,
+              avatar: { ...propsData.profile.avatar, url: 'x.jpg' },
+            },
+          })
+          expect(wrapper.classes()).toContain('--no-image')
+        })
+
+        it('does not show the image of the previous profile while the new one loads', async () => {
+          // A browser keeps showing an <img>'s old picture until the new src has loaded — for a
+          // host that never answers, the previous person's face over the new profile.
+          await wrapper.find('.image').trigger('load')
+          expect(wrapper.find('.image').classes()).toContain('responsive-image--loaded')
+
+          await wrapper.setProps({
+            profile: {
+              ...propsData.profile,
+              avatar: { ...propsData.profile.avatar, url: 'x.jpg' },
+            },
+          })
+
+          expect(wrapper.find('.image').classes()).not.toContain('responsive-image--loaded')
+        })
+      })
+
       describe('when the image cannot be loaded', () => {
         beforeEach(async () => {
           await wrapper.find('.image').trigger('error')
