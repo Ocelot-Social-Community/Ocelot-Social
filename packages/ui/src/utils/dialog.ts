@@ -11,7 +11,9 @@ export const FOCUSABLE_SELECTOR =
 
 /**
  * Keeps Tab and Shift+Tab inside `container`: from its last focusable element to its first,
- * and back. Call it from the container's keydown handler.
+ * and back. The container itself counts as the start — a dialog that focuses its panel on
+ * open would otherwise let the first Shift+Tab out to the page behind it. Call it from the
+ * container's keydown handler.
  */
 export function trapFocus(container: HTMLElement | null, event: KeyboardEvent): void {
   if (event.key !== 'Tab' || !container) {
@@ -23,7 +25,8 @@ export function trapFocus(container: HTMLElement | null, event: KeyboardEvent): 
   }
   const first = focusable[0]
   const last = focusable[focusable.length - 1]
-  if (event.shiftKey && document.activeElement === first) {
+  const atStart = document.activeElement === first || document.activeElement === container
+  if (event.shiftKey && atStart) {
     event.preventDefault()
     last.focus()
   } else if (!event.shiftKey && document.activeElement === last) {

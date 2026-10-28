@@ -46,6 +46,11 @@
         type: String,
         default: 'Cancel',
       },
+      /** Accessible label of the close button */
+      closeLabel: {
+        type: String,
+        default: 'Close',
+      },
       /** Label for the built-in confirm button */
       confirmLabel: {
         type: String,
@@ -147,7 +152,7 @@
         // --- Close button ---
         const closeBtn = renderCloseButton({
           class: 'os-modal__close absolute top-3 right-3',
-          label: 'Close',
+          label: props.closeLabel,
           testId: 'os-modal-close',
           onClick: () => cancel('close'),
           createElement,

@@ -234,6 +234,23 @@ describe('osDrawer', () => {
       wrapper.unmount()
     })
 
+    it('keeps Shift+Tab inside right after opening, when the panel itself has the focus', async () => {
+      const wrapper = mount(OsDrawer, {
+        props: { open: true },
+        slots: { default: '<a href="#">Link</a>' },
+        attachTo: document.body,
+      })
+      await nextTick()
+
+      expect(document.activeElement).toBe(panelOf(wrapper).element)
+
+      await panelOf(wrapper).trigger('keydown', { key: 'Tab', shiftKey: true })
+
+      expect(document.activeElement).toBe(wrapper.find('a').element)
+
+      wrapper.unmount()
+    })
+
     it('keeps the closed drawer out of reach', () => {
       // `invisible` (visibility: hidden) takes the panel and its buttons out of the tab order
       // and the accessibility tree; jsdom does not compute it, so the class is what is checked.

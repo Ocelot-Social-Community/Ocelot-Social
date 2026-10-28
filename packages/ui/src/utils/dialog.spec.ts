@@ -53,6 +53,17 @@ describe(trapFocus, () => {
     expect(event.defaultPrevented).toBe(true)
   })
 
+  it('wraps Shift+Tab to the last element from the container itself', () => {
+    // A dialog focuses its panel on open; the first Shift+Tab must not leave it.
+    container.tabIndex = -1
+    container.focus()
+    const event = tab(true)
+    trapFocus(container, event)
+
+    expect(document.activeElement).toBe(byId('last'))
+    expect(event.defaultPrevented).toBe(true)
+  })
+
   it('lets Tab move on as usual in between', () => {
     byId('middle').focus()
     const forward = tab()

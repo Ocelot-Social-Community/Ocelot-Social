@@ -378,6 +378,18 @@ describe('osModal', () => {
     })
   })
 
+  describe('close button', () => {
+    it('names the close button in English unless told otherwise', () => {
+      const english = mount(OsModal, { props: { open: true } })
+      const german = mount(OsModal, { props: { open: true, closeLabel: 'Schließen' } })
+
+      expect(english.find('[data-testid="os-modal-close"]').attributes('aria-label')).toBe('Close')
+      expect(german.find('[data-testid="os-modal-close"]').attributes('aria-label')).toBe(
+        'Schließen',
+      )
+    })
+  })
+
   describe('keyboard accessibility', () => {
     it('traps focus within the modal on Tab', async () => {
       const wrapper = mount(OsModal, {
