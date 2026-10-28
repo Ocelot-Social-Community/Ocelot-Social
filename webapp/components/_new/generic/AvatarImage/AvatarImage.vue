@@ -3,8 +3,11 @@
     <!-- '--no-image' (the dark background the initials are legible against) stays until the image has actually loaded: one that hangs never errors for minutes. Once loaded, it goes, or images with white backgrounds get a dark rim. -->
     <span class="initials">{{ profileInitials }}</span>
     <os-icon v-if="isAnonymous" :icon="icons.eyeSlash" />
+    <!-- Keyed by the URL: a reused <img> keeps showing the previous picture until the new one has
+         loaded, and for a host that never answers that is the previous person's face. -->
     <responsive-image
       v-if="showImage"
+      :key="profile.avatar.url"
       :image="profile.avatar"
       class="image"
       :alt="profile.name"

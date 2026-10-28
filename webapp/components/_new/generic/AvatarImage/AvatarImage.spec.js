@@ -121,6 +121,22 @@ describe('AvatarImage', () => {
           })
           expect(wrapper.classes()).toContain('--no-image')
         })
+
+        it('does not show the image of the previous profile while the new one loads', async () => {
+          // A browser keeps showing an <img>'s old picture until the new src has loaded — for a
+          // host that never answers, the previous person's face over the new profile.
+          await wrapper.find('.image').trigger('load')
+          expect(wrapper.find('.image').classes()).toContain('responsive-image--loaded')
+
+          await wrapper.setProps({
+            profile: {
+              ...propsData.profile,
+              avatar: { ...propsData.profile.avatar, url: 'x.jpg' },
+            },
+          })
+
+          expect(wrapper.find('.image').classes()).not.toContain('responsive-image--loaded')
+        })
       })
 
       describe('when the image cannot be loaded', () => {
