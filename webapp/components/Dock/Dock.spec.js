@@ -133,6 +133,30 @@ describe('Dock.vue', () => {
       expect(document.activeElement).toBe(panel.element)
     })
 
+    it('stays open for a module that reports what it shows when it mounts', async () => {
+      // As the real modules do. Remounted on opening, such a module would report "nothing yet"
+      // and close the drawer it was just opened in.
+      let mounts = 0
+      const Eager = {
+        name: 'Eager',
+        mounted() {
+          mounts += 1
+          this.$emit('count', mounts === 1 ? 1 : 0)
+        },
+        render: (h) => h('p', 'calls'),
+      }
+      const wrapper = Wrapper({ registry: [{ ...moduleOn('calls'), component: Eager }] })
+      await wrapper.vm.$nextTick()
+
+      await wrapper.find('[data-test="dock-flag"]').trigger('click')
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+
+      expect(mounts).toBe(1)
+      expect(wrapper.vm.open).toBe(true)
+      wrapper.destroy()
+    })
+
     it('has the modules inside the drawer, named in the page language', () => {
       const wrapper = Wrapper()
       expect(drawerPanel(wrapper).find('.reporter').exists()).toBe(true)
