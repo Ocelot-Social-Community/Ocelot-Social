@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it } from 'vitest'
-import { nextTick } from 'vue'
+import { defineComponent, h, nextTick, onMounted } from 'vue'
 
 import OsDrawer from './OsDrawer.vue'
 
@@ -58,6 +58,28 @@ describe('osDrawer', () => {
 
     it('has a root without extra classes, too', () => {
       expect(mount(OsDrawer).classes()).toStrictEqual(['os-drawer-wrapper'])
+    })
+  })
+
+  describe('content', () => {
+    it('keeps its content alive when it opens and closes', async () => {
+      // The backdrop comes and goes in front of the panel; without keys, the renderer would
+      // turn the panel into the backdrop and build a new panel — remounting the content.
+      let mounted = 0
+      const Content = defineComponent({
+        setup() {
+          onMounted(() => {
+            mounted += 1
+          })
+          return () => h('p', 'Inside')
+        },
+      })
+      const wrapper = mount(OsDrawer, { slots: { default: () => h(Content) } })
+
+      await wrapper.setProps({ open: true })
+      await wrapper.setProps({ open: false })
+
+      expect(mounted).toBe(1)
     })
   })
 

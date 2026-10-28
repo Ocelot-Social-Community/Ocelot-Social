@@ -91,8 +91,8 @@
       function elementData(data: Record<string, unknown>): Record<string, unknown> {
         /* v8 ignore start -- Vue 2 branch */
         if (isVue2) {
-          const { class: className, ref: elementRef, on, ...attributes } = data
-          return { class: className, ref: elementRef, on, attrs: attributes }
+          const { class: className, ref: elementRef, key, on, ...attributes } = data
+          return { class: className, ref: elementRef, key, on, attrs: attributes }
         }
         /* v8 ignore stop */
         return data
@@ -158,6 +158,9 @@
         const content = h('div', { class: 'os-drawer__content px-4 pb-4' }, slots.default?.())
 
         const panelProps: Record<string, unknown> = {
+          // Keyed, like the backdrop: it comes and goes in front of the panel, and unkeyed the
+          // renderer would turn the panel into the backdrop and remount everything inside.
+          key: 'panel',
           class: panelClasses.value,
           role: 'dialog',
           'aria-modal': 'true',
@@ -181,6 +184,7 @@
             h(
               'div',
               elementData({
+                key: 'backdrop',
                 class: 'os-drawer__backdrop fixed inset-0 bg-black/50 z-[9998]',
                 'data-testid': 'os-drawer-backdrop',
                 ...eventProps({ click: () => close('backdrop') }),
