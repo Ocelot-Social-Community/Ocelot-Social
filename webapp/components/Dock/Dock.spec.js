@@ -19,6 +19,7 @@ const moduleOn = (id, side = 'right', routes = ['*']) => ({
   id,
   side,
   icon: 'videoCamera',
+  label: 'dock.activeVideoCalls.flag',
   routes,
   component: Reporter,
   enabled: () => true,
@@ -105,7 +106,11 @@ describe('Dock.vue', () => {
       expect(flag.text()).toBe('3')
       // One icon per module that shows something: you see what is in there.
       expect(flag.findAllComponents({ name: 'OsIcon' })).toHaveLength(2)
-      expect(flag.attributes('aria-label')).toBe('dock.open {"count":3}')
+      // Tooltip and name say what is counted, module by module.
+      const label =
+        'dock.activeVideoCalls.flag {"count":2} · dock.activeVideoCalls.flag {"count":1}'
+      expect(wrapper.vm.flagLabel).toBe(label)
+      expect(flag.attributes('aria-label')).toBe(`dock.open ${JSON.stringify({ content: label })}`)
       expect(flag.attributes('aria-expanded')).toBe('false')
 
       await report(wrapper, 'b', 0)

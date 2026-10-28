@@ -823,6 +823,7 @@
     "activeVideoCalls": {
       "blocked": "{name} (bloqué par toi)",
       "count": "{count} connectés",
+      "flag": "Appels vidéo en cours : {count}",
       "join": "Rejoindre",
       "joined": "Tu participes à cet appel",
       "participants": "Participants",
@@ -830,7 +831,7 @@
     },
     "close": "Fermer la barre latérale",
     "label": "Barre latérale",
-    "open": "Ouvrir la barre latérale ({count})"
+    "open": "Ouvrir la barre latérale – {content}"
   },
   "donations": {
     "amount-of-total": "{amount} de {total} € collectés",

@@ -823,6 +823,7 @@
     "activeVideoCalls": {
       "blocked": "{name} (i bllokuar nga ti)",
       "count": "{count} të lidhur",
+      "flag": "Thirrje video në vazhdim: {count}",
       "join": "Bashkohu",
       "joined": "Je në këtë thirrje",
       "participants": "Pjesëmarrësit",
@@ -830,7 +831,7 @@
     },
     "close": "Mbyll shiritin anësor",
     "label": "Shiriti anësor",
-    "open": "Hap shiritin anësor ({count})"
+    "open": "Hap shiritin anësor – {content}"
   },
   "donations": {
     "amount-of-total": "{amount} nga {total} € të mbledhura",

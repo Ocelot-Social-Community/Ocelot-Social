@@ -823,6 +823,7 @@
     "activeVideoCalls": {
       "blocked": "{name} (blocked by you)",
       "count": "{count} connected",
+      "flag": "Running video calls: {count}",
       "join": "Join",
       "joined": "You are in this call",
       "participants": "Participants",
@@ -830,7 +831,7 @@
     },
     "close": "Close sidebar",
     "label": "Sidebar",
-    "open": "Open sidebar ({count})"
+    "open": "Open sidebar – {content}"
   },
   "donations": {
     "amount-of-total": "{amount} of {total} € collected",

@@ -823,6 +823,7 @@
     "activeVideoCalls": {
       "blocked": "{name} (заблокирован вами)",
       "count": "Подключено: {count}",
+      "flag": "Идущие видеозвонки: {count}",
       "join": "Присоединиться",
       "joined": "Вы в этом звонке",
       "participants": "Участники",
@@ -830,7 +831,7 @@
     },
     "close": "Закрыть боковую панель",
     "label": "Боковая панель",
-    "open": "Открыть боковую панель ({count})"
+    "open": "Открыть боковую панель – {content}"
   },
   "donations": {
     "amount-of-total": "{amount} из {total} € собрано",

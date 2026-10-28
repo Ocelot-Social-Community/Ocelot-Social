@@ -823,6 +823,7 @@
     "activeVideoCalls": {
       "blocked": "{name} (von dir blockiert)",
       "count": "{count} verbunden",
+      "flag": "Laufende Video-Calls: {count}",
       "join": "Beitreten",
       "joined": "Du bist dabei",
       "participants": "Teilnehmer",
@@ -830,7 +831,7 @@
     },
     "close": "Seitenleiste schließen",
     "label": "Seitenleiste",
-    "open": "Seitenleiste öffnen ({count})"
+    "open": "Seitenleiste öffnen – {content}"
   },
   "donations": {
     "amount-of-total": "{amount} von {total} € erreicht",

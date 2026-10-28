@@ -26,6 +26,7 @@ describe('dock modules', () => {
     it('sits on the right, on the main feed only, under a camera', () => {
       expect(module.side).toBe('right')
       expect(module.icon).toBe('videoCamera')
+      expect(module.label).toBe('dock.activeVideoCalls.flag')
       expect(module.routes).toEqual(['index'])
     })
 

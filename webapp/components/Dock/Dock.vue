@@ -14,7 +14,8 @@
       data-test="dock-flag"
       :aria-expanded="String(open)"
       :aria-controls="panelId"
-      :aria-label="$t('dock.open', { count })"
+      :aria-label="$t('dock.open', { content: flagLabel })"
+      v-tooltip="{ content: flagLabel, placement: side === 'right' ? 'left' : 'right' }"
       @click="toggle"
     >
       <os-icon
@@ -90,6 +91,12 @@ export default {
     },
     modulesWithContent() {
       return this.modules.filter(({ id }) => this.counts[id] > 0)
+    },
+    // What the flag stands for, module by module: "Running video calls: 2".
+    flagLabel() {
+      return this.modulesWithContent
+        .map(({ id, label }) => this.$t(label, { count: this.counts[id] }))
+        .join(' · ')
     },
     count() {
       return this.modules.reduce((sum, { id }) => sum + (this.counts[id] || 0), 0)

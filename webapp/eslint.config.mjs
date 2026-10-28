@@ -132,6 +132,8 @@ export default [
             '/^admin\\.config\\.state\\./',
             '/^admin\\.dashboard\\./',
             '/^admin\\.branding\\.composition\\.bucket\\./',
+            // the dock registry (components/Dock/modules.js) names each module's flag label
+            '/^dock\\.[^.]+\\.flag$/',
             // enums: one key per value
             '/^notifications\\.reason\\./',
             '/^report\\.reason\\.category\\.options\\./',
