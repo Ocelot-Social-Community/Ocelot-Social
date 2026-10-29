@@ -92,6 +92,15 @@ const buildGroup = async (id: string, template: 'public' | 'closed' | 'hidden', 
   )
 }
 
+const deleteGroup = async (groupId: string) => {
+  const session = database.driver.session()
+  try {
+    await session.run('MATCH (g:Group {id: $groupId}) DETACH DELETE g', { groupId })
+  } finally {
+    await session.close()
+  }
+}
+
 const idsOf = (items: { id: string }[]) => items.map(({ id }) => id)
 
 const addMember = async (groupId: string, userId: string, role = 'usual') => {
@@ -278,6 +287,26 @@ describe('activeVideoCalls', () => {
     ).toEqual(['closed-2'])
   })
 
+  it('skips a call whose group was deleted while its room still runs', async () => {
+    // A LiveKit room outlives its group until the last participant leaves.
+    await Promise.all([buildGroup('closed-1', 'closed'), buildGroup('closed-2', 'closed')])
+    authenticatedUser = ownerJson
+    listRoomsMock.mockResolvedValue([room('closed-1'), room('closed-2')])
+    listParticipantsMock.mockImplementation(async (roomName) => {
+      if (roomName === 'group-closed-1') {
+        await deleteGroup('closed-1')
+      }
+      return [participant('owner-1', 1)]
+    })
+
+    const { data, errors } = await query({ query: ActiveVideoCalls })
+
+    expect(errors).toBeUndefined()
+    expect(
+      idsOf((data.activeVideoCalls as { group: { id: string } }[]).map(({ group }) => group)),
+    ).toEqual(['closed-2'])
+  })
+
   it('fails when LiveKit cannot list its rooms, rather than pretending nothing runs', async () => {
     authenticatedUser = ownerJson
     listRoomsMock.mockRejectedValue(new Error('connection refused'))
@@ -384,23 +413,74 @@ describe('Subscription.activeVideoCallChanged', () => {
 
   it('pushes a change to somebody who may join that call', async () => {
     await buildGroup('sub-1', 'hidden')
-    const { pubsub, next } = await subscribe(ownerJson)
+    const { pubsub, subscriber, next } = await subscribe(ownerJson)
 
     await publish(pubsub, 'sub-1', 2)
     const delivered = await awaitDelivery(next)
 
     expect(delivered).not.toBe(DROPPED)
-    expect(subscription.resolve((delivered as IteratorYieldResult<CountPayload>).value)).toEqual({
+    await expect(
+      subscription.resolve((delivered as IteratorYieldResult<CountPayload>).value, {}, subscriber),
+    ).resolves.toEqual({
       groupId: 'sub-1',
-      call: { groupId: 'sub-1', participantCount: 2 },
+      call: {
+        groupId: 'sub-1',
+        participantCount: 2,
+        group: expect.objectContaining({ id: 'sub-1' }),
+      },
     })
   })
 
-  it('tells that a call has ended', () => {
-    expect(subscription.resolve({ groupId: 'sub-1', count: 0 })).toEqual({
+  it('tells that a call has ended', async () => {
+    const { subscriber } = await subscribe(ownerJson)
+
+    await expect(
+      subscription.resolve({ groupId: 'sub-1', count: 0 }, {}, subscriber),
+    ).resolves.toEqual({
       groupId: 'sub-1',
       call: null,
     })
+  })
+
+  it('tells that a call has ended when its group is gone, though its room still runs', async () => {
+    // The subscriber's right was checked (and kept) while the group still existed.
+    const { subscriber } = await subscribe(ownerJson)
+
+    await expect(
+      subscription.resolve({ groupId: 'deleted-1', count: 2 }, {}, subscriber),
+    ).resolves.toEqual({
+      groupId: 'deleted-1',
+      call: null,
+    })
+  })
+
+  it('reads group and participants once for subscribers who get the change at the same moment', async () => {
+    await buildGroup('sub-4', 'hidden')
+    listParticipantsMock.mockResolvedValue([participant('owner-1', 1)])
+    const subscribers = await Promise.all([subscribe(ownerJson), subscribe(ownerJson)])
+    const sessions = vi.spyOn(database.driver, 'session')
+    try {
+      const pushed = await Promise.all(
+        subscribers.map(async ({ subscriber }) => {
+          const { call } = await subscription.resolve(
+            { groupId: 'sub-4', count: 1 },
+            {},
+            subscriber,
+          )
+          if (!call) {
+            throw new Error('the call should have been pushed')
+          }
+          return videoCallResolvers.ActiveVideoCall.participants(call, {}, subscriber)
+        }),
+      )
+
+      expect(pushed.map((users) => idsOf(users))).toEqual([['owner-1'], ['owner-1']])
+      // One for the group, one for the users.
+      expect(sessions).toHaveBeenCalledTimes(2)
+      expect(listParticipantsMock).toHaveBeenCalledTimes(1)
+    } finally {
+      sessions.mockRestore()
+    }
   })
 
   it('drops changes in groups whose call the subscriber may not join', async () => {
@@ -429,7 +509,11 @@ describe('Subscription.activeVideoCallChanged', () => {
       const subscriber = await contextFor({ headers: {} })
       listParticipantsMock.mockResolvedValue([participant('member-1', 1)])
 
-      const users = await participantsOf({ groupId: 'g1', participantCount: 1 }, {}, subscriber)
+      const users = await participantsOf(
+        { groupId: 'g1', participantCount: 1, group: { id: 'g1' } },
+        {},
+        subscriber,
+      )
 
       expect(listParticipantsMock).toHaveBeenCalledWith('group-g1')
       expect(idsOf(users as { id: string }[])).toEqual(['member-1'])
@@ -441,7 +525,7 @@ describe('Subscription.activeVideoCallChanged', () => {
       listParticipantsMock.mockResolvedValue([])
 
       await expect(
-        participantsOf({ groupId: 'g1', participantCount: 1 }, {}, subscriber),
+        participantsOf({ groupId: 'g1', participantCount: 1, group: { id: 'g1' } }, {}, subscriber),
       ).resolves.toEqual([])
     })
 
@@ -451,7 +535,7 @@ describe('Subscription.activeVideoCallChanged', () => {
       listParticipantsMock.mockRejectedValue(new Error('timeout'))
 
       await expect(
-        participantsOf({ groupId: 'g1', participantCount: 1 }, {}, subscriber),
+        participantsOf({ groupId: 'g1', participantCount: 1, group: { id: 'g1' } }, {}, subscriber),
       ).resolves.toEqual([])
     })
 
@@ -461,7 +545,7 @@ describe('Subscription.activeVideoCallChanged', () => {
       const subscriber = await contextFor({ headers: {} })
 
       await expect(
-        participantsOf({ groupId: 'g1', participantCount: 1 }, {}, subscriber),
+        participantsOf({ groupId: 'g1', participantCount: 1, group: { id: 'g1' } }, {}, subscriber),
       ).resolves.toEqual([])
       expect(listParticipantsMock).not.toHaveBeenCalled()
     })

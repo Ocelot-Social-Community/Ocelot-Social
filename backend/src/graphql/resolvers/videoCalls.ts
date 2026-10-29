@@ -241,11 +241,56 @@ const listCallGroupIds = async (config: LiveKitConfig): Promise<string[]> =>
     return rooms.map((room) => groupIdFromRoomName(room.name)).filter((id): id is string => !!id)
   })
 
-/** A running call as the resolvers pass it on; `userIds` is fetched lazily when absent. */
+type Node = Record<string, unknown> & { id: string }
+
+const GROUPS_BY_ID = 'MATCH (node:Group) WHERE node.id IN $ids RETURN node {.*} AS node'
+const USERS_BY_ID = 'MATCH (node:User) WHERE node.id IN $ids RETURN node {.*} AS node'
+
+// Raw nodes by id, in one read. What a viewer sees of them is up to the type resolvers, so the
+// same answer serves every viewer — which is what lets the subscription share it.
+const readNodes = async (
+  context: Context,
+  label: 'Group' | 'User',
+  ids: string[],
+): Promise<Map<string, Node>> => {
+  if (ids.length === 0) {
+    return new Map()
+  }
+  const session = context.driver.session()
+  try {
+    const result = await session.readTransaction(async (tx) =>
+      tx.run(label === 'Group' ? GROUPS_BY_ID : USERS_BY_ID, { ids: [...new Set(ids)] }),
+    )
+    return new Map(
+      result.records.map((record) => {
+        const node = record.get('node') as Node
+        return [node.id, node]
+      }),
+    )
+  } finally {
+    await session.close()
+  }
+}
+
+// A change reaches every subscriber at once, and each would read the same group and the same
+// users right then; like the LiveKit requests, reads in flight are shared.
+const sharedGroup = async (context: Context, groupId: string) =>
+  (await shared(`group:${groupId}`, async () => readNodes(context, 'Group', [groupId]))).get(
+    groupId,
+  )
+const sharedUsers = async (context: Context, userIds: string[]) =>
+  shared(`users:${userIds.join(',')}`, async () => readNodes(context, 'User', userIds))
+
+// The users behind the connections, a user twice for two connections.
+const usersFor = (userIds: string[], users: Map<string, Node>) =>
+  userIds.map((id) => users.get(id)).filter((user): user is Node => !!user)
+
+/** A running call as the resolvers pass it on; `users` is fetched lazily when absent. */
 interface ActiveVideoCallSource {
   groupId: string
   participantCount: number
-  userIds?: string[]
+  group: Node
+  users?: Node[]
 }
 
 // Whether the viewer may join the call in that group — the very right joining asks for, so a
@@ -284,62 +329,43 @@ export const mayJoinCallCached = async (context: Context, groupId: string): Prom
   return mayJoin
 }
 
+// The videoConference policy is the single runtime switch, and it is enforced where every
+// other right is: the two group rights these resolvers sit behind carry it as their catalog
+// gate (`gatedBy: videoConference`), so the shield denies a disabled call before it arrives.
+// This file used to re-check it on the way in, which became unreachable — and an unreachable
+// guard is a claim nobody can verify. The one exception is activeVideoCalls, see there.
 export default {
   ActiveVideoCall: {
-    group: async (call: ActiveVideoCallSource, _args, context: Context) => {
-      const session = context.driver.session()
-      try {
-        const result = await session.readTransaction(async (tx) =>
-          tx.run('MATCH (group:Group {id: $groupId}) RETURN group {.*}', {
-            groupId: call.groupId,
-          }),
-        )
-        // The group exists: both ways a call gets here asked its rights in it first.
-        return result.records[0].get('group')
-      } finally {
-        await session.close()
-      }
-    },
     participants: async (call: ActiveVideoCallSource, _args, context: Context) => {
-      let userIds = call.userIds
-      if (!userIds) {
-        // A call pushed by the subscription knows its count, not who is in it.
-        const config = liveKitConfigOf(context.config)
-        if (!config) {
-          return []
-        }
-        try {
-          ;({ userIds } = await sharedRoomParticipants(config, roomNameForGroup(call.groupId)))
-          // eslint-disable-next-line no-catch-all/no-catch-all
-        } catch {
-          // Already logged. The count still stands; the faces follow with the next change.
-          return []
-        }
+      if (call.users) {
+        return call.users
       }
-      if (userIds.length === 0) {
+      // A call pushed by the subscription knows its count, not who is in it.
+      const config = liveKitConfigOf(context.config)
+      if (!config) {
         return []
       }
-      const session = context.driver.session()
+      let userIds: string[]
       try {
-        const result = await session.readTransaction(async (tx) =>
-          tx.run('MATCH (user:User) WHERE user.id IN $userIds RETURN user {.*}', { userIds }),
-        )
-        const byId = new Map(
-          result.records.map((record) => [record.get('user').id as string, record.get('user')]),
-        )
-        return userIds.map((id) => byId.get(id)).filter(Boolean)
-      } finally {
-        await session.close()
+        ;({ userIds } = await sharedRoomParticipants(config, roomNameForGroup(call.groupId)))
+        // eslint-disable-next-line no-catch-all/no-catch-all
+      } catch {
+        // Already logged. The count still stands; the faces follow with the next change.
+        return []
       }
+      return usersFor(userIds, await sharedUsers(context, userIds))
     },
   },
   Subscription: {
     activeVideoCallChanged: {
-      resolve: (payload: { groupId: string; count: number }) => ({
-        groupId: payload.groupId,
-        call:
-          payload.count > 0 ? { groupId: payload.groupId, participantCount: payload.count } : null,
-      }),
+      // A room can outlive its group: a call in a deleted group has ended for the dock.
+      resolve: async (payload: { groupId: string; count: number }, _args, context: Context) => {
+        const group = payload.count > 0 ? await sharedGroup(context, payload.groupId) : undefined
+        return {
+          groupId: payload.groupId,
+          call: group ? { groupId: payload.groupId, participantCount: payload.count, group } : null,
+        }
+      },
       subscribe: withFilter(
         (_root, _args, context: Context) =>
           context.pubsub.asyncIterator(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED),
@@ -384,13 +410,16 @@ export default {
       return count
     },
     activeVideoCalls: async (_root, _args, context: Context) => {
+      // The exception to the rule above: a list, not an act, so it sits behind no right the
+      // shield could gate — a dock with the feature off is empty, not an error. The rights
+      // checks below would also come back empty; the guard saves asking LiveKit for nothing.
       const config = liveKitConfigOf(context.config)
       if (!context.policy.getEffective('videoConference') || !config) {
         return []
       }
       const groupIds = await listCallGroupIds(config)
-      const calls = await Promise.all(
-        groupIds.map(async (groupId): Promise<ActiveVideoCallSource | null> => {
+      const running = await Promise.all(
+        groupIds.map(async (groupId) => {
           const authorization = await context.groupAuthorization.forGroup(groupId)
           if (!authorization?.has('group.videoCall.join')) {
             return null
@@ -412,7 +441,25 @@ export default {
           return { groupId, participantCount: participants.count, userIds: participants.userIds }
         }),
       )
-      return calls.filter((call): call is ActiveVideoCallSource => !!call)
+      const calls = running.filter((call) => !!call)
+      // Groups and users of all calls in one read each, not one per call.
+      const [groups, users] = await Promise.all([
+        readNodes(
+          context,
+          'Group',
+          calls.map(({ groupId }) => groupId),
+        ),
+        readNodes(
+          context,
+          'User',
+          calls.flatMap(({ userIds }) => userIds),
+        ),
+      ])
+      return calls.flatMap(({ groupId, participantCount, userIds }): ActiveVideoCallSource[] => {
+        const group = groups.get(groupId)
+        // A room can outlive its group; a deleted group has no call to show.
+        return group ? [{ groupId, participantCount, group, users: usersFor(userIds, users) }] : []
+      })
     },
   },
   Mutation: {
