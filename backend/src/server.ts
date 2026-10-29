@@ -83,14 +83,26 @@ const createServer = async (options?: CreateServerOptions) => {
   )
 
   // Legacy protocol: subscriptions-transport-ws (subprotocol: graphql-ws)
+  // The library hands every operation a shallow COPY of what onConnect returned
+  // (`Object.assign(Object.create(…), initResult)`), while the subscription context refreshes its
+  // viewer by writing into the object it built. Each operation is handed that object back, or a
+  // refresh would never reach the filters and resolvers.
+  const legacyContexts = new WeakMap<object, Awaited<ReturnType<typeof getSubscriptionContext>>>()
   const legacyServerCleanup = SubscriptionServer.create(
     {
       schema: appliedSchema,
       execute,
       subscribe,
-      onConnect: async (connectionParams: Record<string, unknown>) => {
-        return getSubscriptionContext(normaliseWsHeaders(connectionParams))
+      onConnect: async (connectionParams: Record<string, unknown>, socket: object) => {
+        const context = await getSubscriptionContext(normaliseWsHeaders(connectionParams))
+        legacyContexts.set(socket, context)
+        return context
       },
+      // onConnect always settles before the library runs an operation on the same socket.
+      onOperation: (_message: unknown, params: Record<string, unknown>, socket: object) => ({
+        ...params,
+        context: legacyContexts.get(socket),
+      }),
       onDisconnect: () => {
         logger.debug('Legacy WebSocket client disconnected')
       },

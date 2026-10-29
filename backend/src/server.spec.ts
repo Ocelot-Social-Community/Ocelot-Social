@@ -4,11 +4,13 @@ import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest
 import { WebSocket } from 'ws'
 
 import CONFIG, { nodemailerTransportOptions } from './config'
-import { getContext } from './context'
+import { getContext, serverPubsub } from './context'
 import { getSubscriptionContext } from './context/subscription'
 import logger from './logger'
+import { allKeys, audiencesFor, POLICY_CHANGED_CHANNEL } from './policy'
 import createServer from './server'
 
+import type { Context } from './context'
 import type { AddressInfo } from 'node:net'
 
 // Passed through to the real one; spied on so the WebSocket tests can tell that both protocols
@@ -291,6 +293,75 @@ describe(createServer, () => {
 
       expect(code).toBe(1002)
     })
+
+    // The subscription context reads its viewer again by writing into the object it built, so
+    // that object must be the one filters and resolvers are handed. subscriptions-transport-ws
+    // copies what onConnect returned for every operation; this is where that would show. The
+    // refresh is played by writing an admin's permissions into the context, the way it does.
+    it.each([
+      ['graphql-transport-ws', 'subscribe', 'next'],
+      ['graphql-ws', 'start', 'data'],
+    ])(
+      'hands a %s subscription the context its viewer is refreshed in',
+      async (protocol, startType, dataType) => {
+        const adminOnlyKey = allKeys().find((key) =>
+          audiencesFor(key).every((audience) => audience === 'perm:policy.manage'),
+        )
+        const publicKey = allKeys().find((key) => audiencesFor(key).includes('public'))
+        const subscribed = vi.spyOn(serverPubsub, 'subscribe')
+        const publish = async (key: string | undefined) =>
+          serverPubsub.publish(POLICY_CHANGED_CHANNEL, { policyChanged: { key, value: true } })
+        vi.mocked(getSubscriptionContext).mockClear()
+        const socket = await open(running.wsUrl, protocol)
+        const read = reader(socket)
+        try {
+          socket.send(JSON.stringify({ type: 'connection_init', payload: {} }))
+          await read.next()
+          socket.send(
+            JSON.stringify({
+              id: '1',
+              type: startType,
+              payload: { query: 'subscription { policyChanged { key } }' },
+            }),
+          )
+          await vi.waitFor(() => {
+            expect(subscribed.mock.calls[0]?.[0]).toBe(POLICY_CHANGED_CHANNEL)
+          })
+          const received = async () => {
+            const message = (await read.next()) as {
+              type: string
+              payload: { data: { policyChanged: { key: string } } }
+            }
+
+            expect(message.type).toBe(dataType)
+
+            return message.payload.data.policyChanged.key
+          }
+
+          // Anonymous: the admin-only change is skipped, the public one arrives first.
+          await publish(adminOnlyKey)
+          await publish(publicKey)
+
+          expect(await received()).toBe(publicKey)
+
+          const context = (await vi.mocked(getSubscriptionContext).mock.results[0]
+            ?.value) as Context
+          Object.assign(context, {
+            user: { id: 'admin' },
+            effectivePermissions: new Set(['policy.manage']),
+          })
+          await publish(adminOnlyKey)
+          await publish(publicKey)
+
+          expect(await received()).toBe(adminOnlyKey)
+        } finally {
+          subscribed.mockRestore()
+          await read.close()
+          socket.close()
+          await once(socket, 'close')
+        }
+      },
+    )
 
     // Both servers log their own disconnect line. Kept apart because the two callbacks are
     // registered on different servers: a routing regression that sent every client to one of them
