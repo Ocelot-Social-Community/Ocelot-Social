@@ -24,6 +24,8 @@ let pubsub: PubSub
 let principalListener: number
 // Stands in for the RoleService singleton: only its change counter is read here.
 const role = { version: 0 }
+// The same for the PolicyService singleton.
+const policy = { version: 0 }
 // Lets a test act while a read is under way.
 let duringRead: () => void
 
@@ -36,6 +38,7 @@ const buildContext = vi.fn(async (): Promise<Context> => {
   return Promise.resolve({
     pubsub,
     role,
+    policy,
     user,
     effectivePermissions: new Set(viewer?.permissions ?? []),
     cypherParams: { currentUserId: user?.id ?? null },
@@ -198,6 +201,18 @@ describe(getSubscriptionContext, () => {
       const events = context.pubsub.asyncIterator('channel') as AsyncIterableIterator<unknown>
       viewer = { id: 'u1', permissions: [] }
       role.version += 1
+      await deliver(events)
+
+      expect(context.effectivePermissions).toEqual(new Set())
+    })
+
+    // A policy key can be the gate a permission is folded through, e.g. videoConference for
+    // group.videoCall.join: switched off, the viewer's group memo must not keep it open.
+    it('reads the viewer again once the network policy changed', async () => {
+      const context = await subscriptionContext()
+      const events = context.pubsub.asyncIterator('channel') as AsyncIterableIterator<unknown>
+      viewer = { id: 'u1', permissions: [] }
+      policy.version += 1
       await deliver(events)
 
       expect(context.effectivePermissions).toEqual(new Set())

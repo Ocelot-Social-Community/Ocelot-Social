@@ -9,10 +9,11 @@ import type { Context } from '@context/index'
 // user who is demoted, loses a network permission, is disabled or deleted, or whose token expires
 // would keep receiving whatever their old rights let through until they reconnect. With it, that
 // lasts at most this long. One decode per subscription and window, and only when events arrive.
-// The changes the backend makes itself to a user or a network role are faster than that: they
-// move an epoch (./principalEpoch.ts, RoleService.version), and the next event reads the viewer
-// at once. The window stays the net for everything else: a token that expires, a group right
-// (those are not counted), an event that got lost.
+// The changes the backend makes itself to a user, a network role or the network policy (whose
+// keys gate permissions) are faster than that: they move an epoch (./principalEpoch.ts,
+// RoleService.version, PolicyService.version), and the next event reads the viewer at once. The
+// window stays the net for everything else: a token that expires, a group right (those are not
+// counted), an event that got lost.
 export const SUBSCRIPTION_PRINCIPAL_TTL_MS = 30_000
 
 type Request = Parameters<ReturnType<typeof getContext>>[0]
@@ -49,12 +50,13 @@ export const getSubscriptionContext = async (
   const epoch = () => ({
     user: userId ? principalEpoch(userId) : 0,
     roles: context.role.version,
+    policy: context.policy.version,
   })
   let loadedAt = Date.now()
   let loadedEpoch = epoch()
   const moved = () => {
-    const { user, roles } = epoch()
-    return user !== loadedEpoch.user || roles !== loadedEpoch.roles
+    const { user, roles, policy } = epoch()
+    return user !== loadedEpoch.user || roles !== loadedEpoch.roles || policy !== loadedEpoch.policy
   }
   // Events often arrive in bursts; all of them wait for the one read already under way.
   let refreshing: Promise<void> | null = null

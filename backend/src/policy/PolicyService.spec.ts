@@ -455,6 +455,47 @@ describe('PolicyService', () => {
     })
   })
 
+  describe('version', () => {
+    it('counts every change to the cache, local or applied from another instance', async () => {
+      readAllSettings.mockResolvedValue({})
+      const svc = new PolicyService(dbStub)
+      await svc.init({})
+      const versions = [svc.version]
+      await svc.set('publicRegistration', true, 'a-1')
+      versions.push(svc.version)
+      await svc.reset('publicRegistration', 'a-1')
+      versions.push(svc.version)
+      svc.applyExternalChange({
+        key: 'publicRegistration',
+        value: true,
+        actor: 'remote-admin',
+        timestamp: 't',
+      })
+      versions.push(svc.version)
+      await svc.reload()
+      versions.push(svc.version)
+
+      expect(versions).toEqual([0, 1, 2, 3, 4])
+    })
+
+    it('does not count a remote change it discards', async () => {
+      readAllSettings.mockResolvedValue({})
+      const svc = new PolicyService(dbStub)
+      await svc.init({})
+      vi.spyOn(console, 'warn').mockImplementation(() => {})
+      svc.applyExternalChange({ key: 'nonsense', value: true, actor: 'x', timestamp: 't' })
+      svc.applyExternalChange({ key: 'publicRegistration', value: 7, actor: 'x', timestamp: 't' })
+
+      expect(svc.version).toBe(0)
+    })
+
+    // A count that starts as undefined would compare unequal to itself after one change (NaN),
+    // and a subscription built on the test double would read its viewer with every event.
+    it('starts at zero in the in-memory double', () => {
+      expect(createInMemoryPolicyService().version).toBe(0)
+    })
+  })
+
   // videoConference is the only shipped key with hard env requirements (the three
   // LiveKit vars) and its effective value is what the videoCall.* permission gates read.
   // A var that is defined-but-blank — how Helm/compose render an unset value — must count
