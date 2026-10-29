@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
@@ -69,6 +69,7 @@ export default {
     joined: { type: Boolean, default: false },
   },
   computed: {
+    ...mapGetters({ showVideoCall: 'videoCall/showVideoCall' }),
     group() {
       return this.call.group
     },
@@ -91,15 +92,22 @@ export default {
     this.icons = iconRegistry
   },
   methods: {
-    ...mapMutations({ openVideoCall: 'videoCall/OPEN' }),
+    ...mapMutations({ openVideoCall: 'videoCall/OPEN', closeVideoCall: 'videoCall/CLOSE' }),
     participantTitle(user) {
       return user.isBlocked
         ? this.$t('dock.activeVideoCalls.blocked', { name: user.name })
         : user.name
     },
-    join() {
+    async join() {
       // The call is running and listed because the viewer may join it — no "may I open it"
       // check like on the group page.
+      if (this.showVideoCall) {
+        // In another group's call (this one's card says "joined" instead): the call window
+        // reconnects only when it opens, so it is closed first and opened on the next tick —
+        // as the call page does it.
+        this.closeVideoCall()
+        await this.$nextTick()
+      }
       this.openVideoCall({
         groupId: this.group.id,
         groupName: this.group.name,

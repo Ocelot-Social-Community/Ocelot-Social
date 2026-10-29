@@ -1,4 +1,5 @@
 import { mount, RouterLinkStub } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 import Vuex from 'vuex'
 import ActiveVideoCallCard from './ActiveVideoCallCard.vue'
 
@@ -14,10 +15,19 @@ const callWith = (participants, extra = {}) => ({
 
 describe('ActiveVideoCallCard.vue', () => {
   let open
+  let close
+  let inCall
 
-  const Wrapper = (propsData) => {
-    open = jest.fn()
-    const store = new Vuex.Store({ mutations: { 'videoCall/OPEN': open } })
+  const Wrapper = (propsData, { showVideoCall = false } = {}) => {
+    // The call window, as far as the card sees it: whether it is open, and the order of
+    // what is done to it.
+    inCall = []
+    open = jest.fn(() => inCall.push('open'))
+    close = jest.fn(() => inCall.push('close'))
+    const store = new Vuex.Store({
+      getters: { 'videoCall/showVideoCall': () => showVideoCall },
+      mutations: { 'videoCall/OPEN': open, 'videoCall/CLOSE': close },
+    })
     return mount(ActiveVideoCallCard, {
       localVue,
       store,
@@ -91,6 +101,7 @@ describe('ActiveVideoCallCard.vue', () => {
 
     await wrapper.find('[data-test="call-join"]').trigger('click')
 
+    expect(close).not.toHaveBeenCalled()
     expect(open).toHaveBeenCalledWith(expect.anything(), {
       groupId: 'g1',
       groupName: 'Circle',
@@ -98,6 +109,18 @@ describe('ActiveVideoCallCard.vue', () => {
       groupAvatar: null,
     })
     expect(wrapper.emitted('joined')).toHaveLength(1)
+  })
+
+  it('leaves the call the viewer is in before joining this one', async () => {
+    // The call window connects when it opens; told to show another group while open, it
+    // would stay in the old room.
+    const wrapper = Wrapper({ call: callWith([user('u1')]) }, { showVideoCall: true })
+
+    await wrapper.find('[data-test="call-join"]').trigger('click')
+    await flushPromises()
+
+    expect(inCall).toEqual(['close', 'open'])
+    expect(open).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ groupId: 'g1' }))
   })
 
   it('says the viewer is in the call instead of offering to join', () => {
