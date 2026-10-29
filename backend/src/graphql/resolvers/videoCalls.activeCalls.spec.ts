@@ -46,7 +46,7 @@ const { default: ActiveVideoCalls } =
   await import('@graphql/queries/videoCalls/ActiveVideoCalls.gql')
 const { createApolloTestSetup } = await import('@root/test/helpers')
 const { takeToldRooms } = await import('@src/livekit/toldRooms')
-const { default: videoCallResolvers, mayJoinCallCached } = await import('./videoCalls')
+const { default: videoCallResolvers, mayJoinCall } = await import('./videoCalls')
 
 const ENABLED_LIVEKIT = {
   LIVEKIT_URL: 'wss://livekit.example.test',
@@ -359,33 +359,28 @@ describe('activeVideoCalls', () => {
   })
 })
 
-describe('mayJoinCallCached', () => {
+describe('mayJoinCall', () => {
   it('answers no without a user', async () => {
     authenticatedUser = null
     const subscriber = await contextFor({ headers: {} })
 
-    await expect(mayJoinCallCached(subscriber, 'any')).resolves.toBe(false)
+    await expect(mayJoinCall(subscriber, 'any')).resolves.toBe(false)
   })
 
-  it('keeps the answer for a while, a no just as well as a yes', async () => {
+  it("keeps a context's answer per group, a no just as well as a yes", async () => {
     // Most events concern groups the subscriber is not in; asking the database for each of
-    // them would cost a read per event × subscriber.
+    // them would cost a read per event × subscriber. A fresh answer comes with a fresh context,
+    // which is what a subscription builds when it reads its viewer again.
     await buildGroup('cache-1', 'hidden')
     authenticatedUser = outsiderJson
     const subscriber = await contextFor({ headers: {} })
 
-    await expect(mayJoinCallCached(subscriber, 'cache-1')).resolves.toBe(false)
+    await expect(mayJoinCall(subscriber, 'cache-1')).resolves.toBe(false)
 
     await addMember('cache-1', 'outsider-1')
 
-    await expect(mayJoinCallCached(subscriber, 'cache-1')).resolves.toBe(false)
-
-    vi.useFakeTimers({ now: Date.now() + 31_000, toFake: ['Date'] })
-    try {
-      await expect(mayJoinCallCached(subscriber, 'cache-1')).resolves.toBe(true)
-    } finally {
-      vi.useRealTimers()
-    }
+    await expect(mayJoinCall(subscriber, 'cache-1')).resolves.toBe(false)
+    await expect(mayJoinCall(await contextFor({ headers: {} }), 'cache-1')).resolves.toBe(true)
   })
 })
 

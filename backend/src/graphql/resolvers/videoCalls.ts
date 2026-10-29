@@ -13,7 +13,6 @@ import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@constants/subscriptions'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
 import { isActiveMembership, visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
-import { createGroupAuthorizationScope } from '@src/groupRole/requestScope'
 import { noteCountTold } from '@src/livekit/toldRooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
@@ -294,39 +293,16 @@ interface ActiveVideoCallSource {
 }
 
 // Whether the viewer may join the call in that group — the very right joining asks for, so a
-// call shows up wherever the viewer could walk in, hidden groups included. Subscriptions keep
-// their context for the whole connection, so the request-scoped memo of context.groupAuthorization
-// would answer with the rights of the moment the client subscribed. A fresh scope per check, and
-// the answer kept for a short while — both ways, since most events concern groups the viewer is
-// not in, and those are the ones that would cost a read per event × subscriber. The whole cache is
-// dropped at once when it gets too old, which also bounds it to the pairs asked within a window.
-const MAY_JOIN_CACHE_TTL_MS = 30_000
-let mayJoinCache = new Map<string, boolean>()
-let mayJoinCacheSince = 0
-
-export const mayJoinCallCached = async (context: Context, groupId: string): Promise<boolean> => {
+// call shows up wherever the viewer could walk in, hidden groups included. Asked through the
+// context's per-group memo, so a subscriber pays one read per group, not one per event. A
+// subscription context reads its viewer again after a while (context/subscription.ts) and
+// rebuilds that memo with it, which is what keeps a right lost after subscribing from lasting.
+export const mayJoinCall = async (context: Context, groupId: string): Promise<boolean> => {
   if (!context.user) {
     return false
   }
-  const now = Date.now()
-  if (now - mayJoinCacheSince > MAY_JOIN_CACHE_TTL_MS) {
-    mayJoinCache = new Map()
-    mayJoinCacheSince = now
-  }
-  const key = `${context.user.id}|${groupId}`
-  const cached = mayJoinCache.get(key)
-  if (cached !== undefined) {
-    return cached
-  }
-  const authorization = await createGroupAuthorizationScope({
-    database: context.database,
-    userId: context.user.id,
-    effectivePermissions: context.effectivePermissions,
-    policy: context.policy,
-  }).forGroup(groupId)
-  const mayJoin = !!authorization?.has('group.videoCall.join')
-  mayJoinCache.set(key, mayJoin)
-  return mayJoin
+  const authorization = await context.groupAuthorization.forGroup(groupId)
+  return !!authorization?.has('group.videoCall.join')
 }
 
 // The videoConference policy is the single runtime switch, and it is enforced where every
@@ -370,7 +346,7 @@ export default {
         (_root, _args, context: Context) =>
           context.pubsub.asyncIterator(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED),
         async (payload: { groupId: string; count: number }, _variables, context: Context) =>
-          mayJoinCallCached(context, payload.groupId),
+          mayJoinCall(context, payload.groupId),
       ),
     },
     videoCallParticipantCountChanged: {
