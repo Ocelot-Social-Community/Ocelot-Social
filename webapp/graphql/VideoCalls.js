@@ -1,4 +1,5 @@
 import gql from 'graphql-tag'
+import { imageUrls } from './fragments/imageUrls'
 
 export const videoCallConfigQuery = () => gql`
   query {
@@ -29,6 +30,55 @@ export const videoCallParticipantCountChangedSubscription = () => gql`
     videoCallParticipantCountChanged(groupId: $groupId) {
       groupId
       count
+    }
+  }
+`
+
+const activeVideoCallFields = gql`
+  ${imageUrls}
+
+  fragment activeVideoCall on ActiveVideoCall {
+    group {
+      id
+      slug
+      name
+      visibility
+      avatar {
+        ...imageUrls
+      }
+    }
+    participantCount
+    participants {
+      id
+      slug
+      name
+      isBlocked
+      avatar {
+        ...imageUrls
+      }
+    }
+  }
+`
+
+export const activeVideoCallsQuery = () => gql`
+  ${activeVideoCallFields}
+
+  query {
+    activeVideoCalls {
+      ...activeVideoCall
+    }
+  }
+`
+
+export const activeVideoCallChangedSubscription = () => gql`
+  ${activeVideoCallFields}
+
+  subscription {
+    activeVideoCallChanged {
+      groupId
+      call {
+        ...activeVideoCall
+      }
     }
   }
 `

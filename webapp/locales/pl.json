@@ -819,6 +819,20 @@
       "title": "Wyłączenie użytkownika"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (zablokowany przez ciebie)",
+      "count": "Połączonych: {count}",
+      "flag": "Trwające rozmowy wideo: {count}",
+      "join": "Dołącz",
+      "joined": "Jesteś w tej rozmowie",
+      "participants": "Uczestnicy",
+      "title": "Trwające rozmowy wideo"
+    },
+    "close": "Zamknij panel boczny",
+    "label": "Panel boczny",
+    "open": "Otwórz panel boczny – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} z {total} € zebrano",
     "donate-now": "Przekaż darowiznę"

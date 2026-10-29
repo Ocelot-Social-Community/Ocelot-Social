@@ -819,6 +819,20 @@
       "title": "Désactiver l'utilisateur"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (bloqué par toi)",
+      "count": "{count} connectés",
+      "flag": "Appels vidéo en cours : {count}",
+      "join": "Rejoindre",
+      "joined": "Tu participes à cet appel",
+      "participants": "Participants",
+      "title": "Appels vidéo en cours"
+    },
+    "close": "Fermer la barre latérale",
+    "label": "Barre latérale",
+    "open": "Ouvrir la barre latérale – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} de {total} € collectés",
     "donate-now": "Faites un don"

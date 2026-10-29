@@ -819,6 +819,20 @@
       "title": "Desativar usuário"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (bloqueado por você)",
+      "count": "{count} conectados",
+      "flag": "Videochamadas em curso: {count}",
+      "join": "Entrar",
+      "joined": "Você está nesta chamada",
+      "participants": "Participantes",
+      "title": "Videochamadas em curso"
+    },
+    "close": "Fechar barra lateral",
+    "label": "Barra lateral",
+    "open": "Abrir barra lateral – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} de {total} € coletados",
     "donate-now": "Doe agora"

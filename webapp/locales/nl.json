@@ -819,6 +819,20 @@
       "title": "Gebruiker deactiveren"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (door jou geblokkeerd)",
+      "count": "{count} verbonden",
+      "flag": "Lopende videogesprekken: {count}",
+      "join": "Deelnemen",
+      "joined": "Je neemt deel aan dit gesprek",
+      "participants": "Deelnemers",
+      "title": "Lopende videogesprekken"
+    },
+    "close": "Zijbalk sluiten",
+    "label": "Zijbalk",
+    "open": "Zijbalk openen – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} van {total} € verzameld",
     "donate-now": "Doneer nu"

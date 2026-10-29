@@ -1,0 +1,13 @@
+query ActiveVideoCalls {
+  activeVideoCalls {
+    group {
+      id
+      name
+    }
+    participantCount
+    participants {
+      id
+      name
+    }
+  }
+}

@@ -1,3 +1,25 @@
+"""A video call running in a group right now."""
+type ActiveVideoCall {
+  group: Group!
+
+  """
+  Connections to the call — tabs and devices, so two people sharing an account count twice.
+  """
+  participantCount: Int!
+
+  """
+  The user behind each connection, in the order they joined — a user twice for two connections, as two people may share an account.
+  """
+  participants: [User!]!
+}
+
+"""A group's call started, changed or ended."""
+type ActiveVideoCallChange {
+  """The running call, or null once it has ended."""
+  call: ActiveVideoCall
+  groupId: ID!
+}
+
 """
 A personal API key that authenticates programmatic access on behalf of its owner. Only a non-secret prefix and metadata are stored; the secret itself is shown exactly once, at creation.
 """
@@ -1939,6 +1961,11 @@ type Query {
   """
   VerifyNonce(email: String!, nonce: String!): Boolean!
 
+  """
+  The calls running right now in groups whose call the current user may join. Requires authentication.
+  """
+  activeVideoCalls: [ActiveVideoCall!]!
+
   """How many groups the same filters match, for paging the admin list."""
   adminGroupCount(disabled: Boolean, ownerless: Boolean, search: String, visibility: GroupVisibility): Int!
 
@@ -2356,6 +2383,11 @@ type Statistics {
 }
 
 type Subscription {
+  """
+  Pushes every start, change and end of a call the current user may join.
+  """
+  activeVideoCallChanged: ActiveVideoCallChange!
+
   """Pushes newly added messages in the current user's rooms."""
   chatMessageAdded: Message
 
