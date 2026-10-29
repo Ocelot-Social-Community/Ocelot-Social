@@ -151,6 +151,9 @@ export default {
     },
     clear() {
       this.value = ''
+      // Escape only closes the select and leaves its text in the still focused field, so typing on
+      // would append to the old search behind a placeholder that says the field is empty.
+      this.$refs.select.resetSearch()
       this.$emit('clearSearch')
       clearTimeout(this.searchProcess)
     },

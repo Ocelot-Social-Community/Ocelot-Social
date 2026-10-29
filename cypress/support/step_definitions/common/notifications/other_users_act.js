@@ -23,6 +23,18 @@ const muteUser = `
   }
 `
 
+const followUser = `
+  mutation ($id: ID!) {
+    followUser(id: $id) { id }
+  }
+`
+
+const blockUser = `
+  mutation ($id: ID!) {
+    blockUser(id: $id) { id }
+  }
+`
+
 defineStep('{string} posts {string} in the group {string}', (slug, title, groupId) => {
   actAs(slug, createPost, {
     title,
@@ -43,6 +55,18 @@ defineStep('{string} mutes {string}', (slug, mutedSlug) => {
   cy.fixtures()
     .firstOf('User', { slug: mutedSlug })
     .then((muted) => actAs(slug, muteUser, { id: muted.get('id') }))
+})
+
+defineStep('{string} follows {string}', (slug, followedSlug) => {
+  cy.fixtures()
+    .firstOf('User', { slug: followedSlug })
+    .then((followed) => actAs(slug, followUser, { id: followed.get('id') }))
+})
+
+defineStep('{string} blocks {string}', (slug, blockedSlug) => {
+  cy.fixtures()
+    .firstOf('User', { slug: blockedSlug })
+    .then((blocked) => actAs(slug, blockUser, { id: blocked.get('id') }))
 })
 
 // A user counts as online for 90 s after the webapp last reported them (isUserOnline.ts), logout

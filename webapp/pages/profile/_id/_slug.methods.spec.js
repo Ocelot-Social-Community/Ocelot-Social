@@ -184,6 +184,7 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
       posts: [{ id: 'p1' }],
       hasMore: false,
       resetPostList: methods.resetPostList,
+      reloadConnections: jest.fn(),
     })
 
     it.each([
@@ -206,6 +207,23 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
       expect(ctx.$toast.error).toHaveBeenCalledWith('mute-fail')
       expect(ctx.$toast.success).not.toHaveBeenCalled()
       expect(ctx.$apollo.queries.User.refetch).toHaveBeenCalled()
+      expect(ctx.reloadConnections).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('reloadConnections', () => {
+    it('reloads both follow lists from the start', () => {
+      const followedBy = { loadConnections: jest.fn() }
+      const following = { loadConnections: jest.fn() }
+      methods.reloadConnections.call({
+        $refs: { followListFollowedBy: followedBy, followListFollowing: following },
+      })
+      expect(followedBy.loadConnections).toHaveBeenCalledWith(0)
+      expect(following.loadConnections).toHaveBeenCalledWith(0)
+    })
+
+    it('skips lists that are not rendered', () => {
+      expect(() => methods.reloadConnections.call({ $refs: {} })).not.toThrow()
     })
   })
 
@@ -232,6 +250,21 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
         this.$toast.error(error.message)
       },
       resetPostList: jest.fn(),
+      reloadConnections: jest.fn(),
+    })
+
+    // Blocking ends following both ways, muting ends mine: the follow lists beside it are stale.
+    it.each([
+      ['muteUser', true],
+      ['blockUser', true],
+      ['unmuteUser', false],
+      ['unblockUser', false],
+    ])('%s reloads the follow lists: %s', async (method, reloads) => {
+      const ctx = buildCtx(jest.fn().mockResolvedValue())
+
+      await methods[method].call(ctx, { id: 'u9', name: 'Bob' })
+
+      expect(ctx.reloadConnections).toHaveBeenCalledTimes(reloads ? 1 : 0)
     })
 
     it.each([
@@ -271,6 +304,7 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
         expect(ctx.$toast.success).not.toHaveBeenCalled()
         expect(ctx.$toast.error).toHaveBeenCalledWith('block-fail')
         expect(ctx.$apollo.queries.User.refetch).toHaveBeenCalled()
+        expect(ctx.reloadConnections).not.toHaveBeenCalled()
       },
     )
   })
@@ -340,6 +374,7 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
         followHovered: true,
         user: { ...baseUser, followedBy: [...baseUser.followedBy] },
         $refs: {},
+        reloadConnections: jest.fn(),
         $store: { getters: { 'auth/user': { id: 'me' } } },
         $toast: { error: jest.fn() },
         $t: (k) => k,
