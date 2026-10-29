@@ -30,8 +30,9 @@ describe('plugins/v-tooltip', () => {
 
   it('shows content with markup as text', async () => {
     // A user or group name in a tooltip must not be read as HTML.
-    wrapper = await showTooltip('Chat with “<img src="x" data-test="injected">”')
-    expect(document.querySelector('.tooltip')).not.toBeNull()
+    const content = 'Chat with “<img src="x" data-test="injected">”'
+    wrapper = await showTooltip(content)
+    expect(document.querySelector('.tooltip-inner').innerText).toBe(content)
     expect(document.querySelector('[data-test="injected"]')).toBeNull()
   })
 
