@@ -128,7 +128,7 @@ Spalte und Fähnchen scrollen mit der Seite, bis sie unter dem Header ankommen, 
 
 | Viewport | Darstellung |
 |---|---|
-| breit (≥ 1760 px) | Seitenspalte von 256 px im freien Rand neben der 1200-px-Inhaltsspalte. Die Inhaltsspalte bleibt unverändert, damit der Feed nicht schmaler wird. 1760 = 1200 + 2 × (256 + 24 Abstand); das linke Dock spiegelt das rechte. |
+| breit (≥ 1792 px) | Seitenspalte von 256 px im freien Rand neben der 1200-px-Inhaltsspalte. Die Inhaltsspalte bleibt unverändert, damit der Feed nicht schmaler wird. 1760 = 1200 + 2 × (256 + 24 Abstand); das linke Dock spiegelt das rechte. Die Media Query zählt eine klassische Scrollbar mit, die der Rand nicht hat, daher 32 px Reserve. |
 | darunter, inkl. mobil | **Fähnchen** am jeweiligen Rand, auf Höhe des Inhaltsbeginns (unten sitzen Chat und Video): die Icons der Module, die etwas anzeigen, und die Gesamtzahl; der Tooltip sagt pro Modul, was gezählt wird. Tippen öffnet die Schublade von dieser Seite; schließen per Backdrop, Schließen-Button oder Escape. |
 
 Barrierefreiheit: Das Fähnchen ist ein `button` mit `aria-expanded`, `aria-controls` und einem Namen, der den Tooltip enthält. Die Schublade ist ein modaler Dialog (`OsDrawer`): Der Fokus geht beim Öffnen hinein, Tab und Shift+Tab bleiben darin, und beim Schließen kehrt er zum Fähnchen zurück.

@@ -61,9 +61,10 @@ import registry, { modulesFor } from './modules'
 
 // Where the dock becomes a rail beside the content: the content column is 1200px
 // (.ds-container-x-large), and a 256px rail plus a 24px gap must fit on both sides — the
-// left dock mirrors the right one, so the content stays centred either way. Below that,
-// the dock folds into a flag at the screen edge.
-export const RAIL_MEDIA_QUERY = '(min-width: 1760px)'
+// left dock mirrors the right one, so the content stays centred either way: 1760px. The
+// media query counts a classic scrollbar, which the rail's room does not have, so it asks for
+// 32px more. Below that, the dock folds into a flag at the screen edge.
+export const RAIL_MEDIA_QUERY = '(min-width: 1792px)'
 
 export default {
   name: 'Dock',
