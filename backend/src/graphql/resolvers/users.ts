@@ -12,6 +12,7 @@ import { GROUP_MEMBERSHIP_VISIBILITY_CHANGED } from '@constants/subscriptions'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError, ForbiddenError, UserInputError } from '@graphql/errors'
 import { branding } from '@src/branding'
+import { publishPrincipalChanged } from '@src/context/principalEpoch'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
@@ -436,7 +437,7 @@ export default {
       const allowedLabels = ['Post', 'Comment']
       const session = context.driver.session()
       try {
-        return await session.writeTransaction(async (transaction) => {
+        const deleted = await session.writeTransaction(async (transaction) => {
           if (resource?.length) {
             await Promise.all(
               resource.map(async (node) => {
@@ -498,6 +499,9 @@ export default {
           await images(context.config).deleteImage(user, 'AVATAR_IMAGE', { transaction })
           return user
         })
+        // After the commit, so the deleted user's open subscriptions read them as gone.
+        publishPrincipalChanged(context.pubsub, userId)
+        return deleted
       } finally {
         await session.close()
       }

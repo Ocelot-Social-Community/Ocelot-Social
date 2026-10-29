@@ -1,5 +1,8 @@
 import { getContext } from '@context/index'
+import { principalChanges, principalEpoch } from '@context/principalEpoch'
 import ocelotLogger from '@src/logger'
+import { getPolicyService } from '@src/policy'
+import { getRoleService } from '@src/role'
 
 import type { Context } from '@context/index'
 
@@ -8,10 +11,19 @@ import type { Context } from '@context/index'
 // user who is demoted, loses a network permission, is disabled or deleted, or whose token expires
 // would keep receiving whatever their old rights let through until they reconnect. With it, that
 // lasts at most this long. One decode per subscription and window, and only when events arrive.
+// The changes the backend makes itself to a user, a network role or the network policy (whose
+// keys gate permissions) are faster than that: they move an epoch (./principalEpoch.ts,
+// RoleService.version, PolicyService.version), and the next event reads the viewer at once. The
+// window stays the net for everything else: a token that expires, a group right (those are not
+// counted), an event that got lost.
 export const SUBSCRIPTION_PRINCIPAL_TTL_MS = 30_000
 
 type Request = Parameters<ReturnType<typeof getContext>>[0]
 type BuildContext = (req: Request) => Promise<Context>
+// The caches whose changes can change what a viewer may do; only their change counts are read.
+interface Versioned {
+  readonly version: number
+}
 
 /**
  * The context of one subscription. It starts out as an ordinary request context, and before
@@ -30,27 +42,61 @@ export const getSubscriptionContext = async (
     buildContext = getContext(),
     ttlMs = SUBSCRIPTION_PRINCIPAL_TTL_MS,
     logger = ocelotLogger,
+    roles = getRoleService(),
+    policy = getPolicyService(),
   }: {
     buildContext?: BuildContext
     ttlMs?: number
     logger?: Pick<typeof ocelotLogger, 'warn'>
+    roles?: Versioned
+    policy?: Versioned
   } = {},
 ): Promise<Context> => {
+  // Taken before the first read, for the same reason as before every later one (see refresh).
+  // Whose principal to count is only known once the token is decoded, so for the viewer all
+  // changes are counted: if any landed during the read, it may have been this viewer's.
+  const before = { roles: roles.version, policy: policy.version, principals: principalChanges() }
   const context = await buildContext(req)
   const { pubsub } = context
+  // Who the token names stays who it names: a viewer that comes back anonymous (disabled,
+  // deleted) is still counted under the id the subscription was opened with.
+  const userId = context.user?.id
+  const epoch = () => ({
+    user: userId ? principalEpoch(userId) : 0,
+    roles: roles.version,
+    policy: policy.version,
+  })
   let loadedAt = Date.now()
+  let loadedEpoch = {
+    // -1 is a count no viewer has, so the next event reads the viewer again.
+    user: userId && principalChanges() !== before.principals ? -1 : epoch().user,
+    roles: before.roles,
+    policy: before.policy,
+  }
+  const moved = () => {
+    const now = epoch()
+    return (
+      now.user !== loadedEpoch.user ||
+      now.roles !== loadedEpoch.roles ||
+      now.policy !== loadedEpoch.policy
+    )
+  }
   // Events often arrive in bursts; all of them wait for the one read already under way.
   let refreshing: Promise<void> | null = null
 
   const refresh = async () => {
-    if (Date.now() - loadedAt < ttlMs) {
+    if (Date.now() - loadedAt < ttlMs && !moved()) {
       return
     }
     refreshing ??= (async () => {
       try {
+        // Taken before the read: a change that lands while it runs moves the epoch past this
+        // and is read with the next event, rather than being taken as already seen.
+        const readEpoch = epoch()
         const { pubsub: _freshPubsub, ...fresh } = await buildContext(req)
         Object.assign(context, fresh)
         loadedAt = Date.now()
+        loadedEpoch = readEpoch
         // eslint-disable-next-line no-catch-all/no-catch-all
       } catch (error: unknown) {
         // The viewer is kept and the read retried with the next event. A failed read means the

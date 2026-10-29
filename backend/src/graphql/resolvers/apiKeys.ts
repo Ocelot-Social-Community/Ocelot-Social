@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid'
 
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
+import { publishPrincipalChanged } from '@src/context/principalEpoch'
 
 import Resolver from './helpers/Resolver'
 
@@ -190,7 +191,12 @@ export default {
       return normalizeApiKey(getRecord(result.records[0], 'k'))
     },
 
-    revokeApiKey: async (_parent: unknown, args: ApiKeyArgs, context: Context) => {
+    revokeApiKey: async (
+      _parent: unknown,
+      args: ApiKeyArgs,
+      // The shield lets only an authenticated user revoke their own key.
+      context: Context & { user: NonNullable<Context['user']> },
+    ) => {
       const result = await context.database.write({
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey { id: $keyId })
@@ -199,11 +205,15 @@ export default {
           RETURN k
         `,
         variables: {
-          userId: context.user?.id,
+          userId: context.user.id,
           keyId: args.id,
           disabledAt: new Date().toISOString(),
         },
       })
+      // A subscription opened with the key reads its viewer again, and finds none.
+      if (result.records.length > 0) {
+        publishPrincipalChanged(context.pubsub, context.user.id)
+      }
       return result.records.length > 0
     },
 
@@ -213,14 +223,24 @@ export default {
           MATCH (k:ApiKey { id: $keyId })
           WHERE NOT k.disabled
           SET k.disabled = true, k.disabledAt = $disabledAt
-          RETURN k
+          WITH k
+          OPTIONAL MATCH (owner:User)-[:HAS_API_KEY]->(k)
+          RETURN k, owner.id AS ownerId
         `,
         variables: { keyId: args.id, disabledAt: new Date().toISOString() },
       })
+      const ownerId = result.records[0]?.get('ownerId') as string | null | undefined
+      if (ownerId) {
+        publishPrincipalChanged(context.pubsub, ownerId)
+      }
       return result.records.length > 0
     },
 
-    adminRevokeUserApiKeys: async (_parent: unknown, args: ApiKeyArgs, context: Context) => {
+    adminRevokeUserApiKeys: async (
+      _parent: unknown,
+      args: ApiKeyArgs & { userId: string },
+      context: Context,
+    ) => {
       const result = await context.database.write({
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey)
@@ -230,7 +250,11 @@ export default {
         `,
         variables: { userId: args.userId, disabledAt: new Date().toISOString() },
       })
-      return toNumber(result.records[0].get('count') as Integer)
+      const count = toNumber(result.records[0].get('count') as Integer)
+      if (count > 0) {
+        publishPrincipalChanged(context.pubsub, args.userId)
+      }
+      return count
     },
   },
   ApiKey: {

@@ -106,6 +106,15 @@ export class PolicyService {
   private env: Env = {}
   private subscriptionId: number | undefined
   private lastChange: { actor: string; timestamp: string } | undefined
+  // Raised with every change to the cache, whether made here or applied from another instance.
+  // A subscription context compares it to the value it read its viewer at: a policy that changed
+  // may have opened or closed a gate the viewer's permissions are folded through (see
+  // context/subscription.ts).
+  private changes = 0
+
+  get version(): number {
+    return this.changes
+  }
 
   constructor(private readonly db: DbContext = databaseContext()) {}
 
@@ -185,6 +194,7 @@ export class PolicyService {
   async reload(): Promise<void> {
     this.cache = {}
     await this.loadFromDb()
+    this.changes += 1
   }
 
   shutdown(): void {
@@ -302,6 +312,7 @@ export class PolicyService {
 
     await writeSetting(this.db, POLICY_NAMESPACE, key, value, actor)
     this.cache[key] = value
+    this.changes += 1
 
     const event: PolicyChangeEvent = {
       key,
@@ -321,6 +332,7 @@ export class PolicyService {
 
     const newValue = this.getDefault(key)
     this.cache[key] = newValue as never
+    this.changes += 1
 
     const event: PolicyChangeEvent = {
       key,
@@ -399,6 +411,7 @@ export class PolicyService {
       return
     }
     this.cache[event.key] = event.value as never
+    this.changes += 1
     this.lastChange = { actor: event.actor, timestamp: event.timestamp }
   }
 
@@ -443,6 +456,7 @@ export function setPolicyServiceForTesting(svc: PolicyService | undefined): void
 // Avoids any DB access. Missing keys fall back to schema defaults.
 interface PolicyServiceInternal {
   cache: Partial<NetworkPolicy>
+  changes: number
   initialised: boolean
   env: Env
   init: PolicyService['init']
@@ -454,6 +468,8 @@ export function createInMemoryPolicyService(
 ): PolicyService {
   const svc = Object.create(PolicyService.prototype) as unknown as PolicyServiceInternal
   svc.cache = { ...values }
+  // No constructor runs, so neither do the field initialisers.
+  svc.changes = 0
   svc.initialised = true
   svc.env = env // so getDefault() can read envSeed values
   // The double has no DB (built via Object.create, no constructor). Make init()

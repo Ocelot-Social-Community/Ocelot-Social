@@ -45,7 +45,15 @@ export class RoleValidationError<Entry extends ErrorEntry = ErrorEntry> extends 
 
 export class RoleService {
   private readonly cache = new Map<string, RoleDefinition>()
+  // Raised with every change to the cache, whether made here or applied from another instance.
+  // A subscription context compares it to the value it read its viewer at: a role definition
+  // that changed may have changed the viewer's permissions (see context/subscription.ts).
+  private changes = 0
   private initialised = false
+
+  get version(): number {
+    return this.changes
+  }
   private pubsub: RolePubSub | undefined
   private subscriptionId: number | undefined
 
@@ -124,6 +132,7 @@ export class RoleService {
     for (const role of roles) {
       this.cache.set(role.name, role)
     }
+    this.changes += 1
     // Same invariant as init(): a resync that lost owner/user left a broken cache, so
     // fail loudly rather than report success with a half-empty role set.
     this.assertMandatoryRoles('reload')
@@ -188,6 +197,7 @@ export class RoleService {
     const now = new Date().toISOString()
     await writeRole(this.db, definition, actor, now)
     this.cache.set(definition.name, definition)
+    this.changes += 1
     this.publishChange({ name: definition.name, definition, actor, timestamp: now })
     return definition
   }
@@ -222,6 +232,7 @@ export class RoleService {
     await dbRenameRole(this.db, oldName, newName, actor, now)
     this.cache.delete(oldName)
     this.cache.set(newName, definition)
+    this.changes += 1
     this.publishChange({ name: newName, previousName: oldName, definition, actor, timestamp: now })
     return definition
   }
@@ -250,6 +261,7 @@ export class RoleService {
 
     await dbDeleteRole(this.db, name)
     this.cache.delete(name)
+    this.changes += 1
     this.publishChange({
       name,
       definition: null,
@@ -276,6 +288,7 @@ export class RoleService {
 
   // Apply a change broadcast by any instance (including our own echo). Idempotent.
   applyExternalChange(event: RoleChangeEvent): void {
+    this.changes += 1
     // A rename arrives as a single event carrying the former name: drop the stale
     // cache key first, so the role is not left duplicated under both names.
     if (event.previousName && event.previousName !== event.name) {

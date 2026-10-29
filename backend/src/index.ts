@@ -3,6 +3,7 @@ import './branding/bootstrap'
 
 import CONFIG from './config'
 import { serverDatabase } from './context'
+import { listenForPrincipalChanges } from './context/principalEpoch'
 import pubsubContext from './context/pubsub'
 import { closeDriver } from './db/neo4j'
 import { seedGroupRoleTemplates, seedRolesForGroupsWithoutRoles } from './groupRole'
@@ -29,6 +30,9 @@ async function main() {
   // roles.changed for cross-instance cache sync. Also must complete before the
   // server accepts requests, since authorization resolves against the cache.
   await getRoleService().init(pubsub as unknown as RolePubSub)
+
+  // Count the changes to a user that open subscriptions must read their viewer again for.
+  await listenForPrincipalChanges(pubsubContext())
 
   // Ensure the group role templates exist. Not only in the migration: a fresh install has no
   // history to replay, and db:reset wipes them. ON CREATE, so an edited template survives.

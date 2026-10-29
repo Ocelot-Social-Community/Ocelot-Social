@@ -18,6 +18,8 @@ import DELETE_USER from '@graphql/queries/users/DeleteUser.gql'
 import DISABLE_USER from '@graphql/queries/users/disableUser.gql'
 import OUTRANKED from '@graphql/queries/users/UserOutrankedByCurrentUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { serverPubsub } from '@src/context'
+import { listenForPrincipalChanges, principalEpoch } from '@src/context/principalEpoch'
 import { DEFAULT_ROLES } from '@src/role'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -65,8 +67,13 @@ const buildOfficeUser = async (id: string) => {
 }
 
 describe('act-on hierarchy', () => {
+  // Counts what disableUser publishes, as index.ts does in production: a disabled user's open
+  // subscriptions must read them again.
+  let principalListener: number
+
   beforeAll(async () => {
     await cleanDatabase()
+    principalListener = await listenForPrincipalChanges(serverPubsub)
     authenticatedUser = null
     const apolloSetup = await createApolloTestSetup({ context: contextFn })
     query = apolloSetup.query
@@ -76,6 +83,7 @@ describe('act-on hierarchy', () => {
   })
 
   afterAll(async () => {
+    serverPubsub.unsubscribe(principalListener)
     await cleanDatabase()
     void server.stop()
     void database.driver.close()
@@ -115,6 +123,14 @@ describe('act-on hierarchy', () => {
         data: { disableUser: { id: 'plain-user', disabled: true } },
         errors: undefined,
       })
+    })
+
+    it("moves the disabled user's principal epoch", async () => {
+      await as('the-moderator')
+      const before = principalEpoch('plain-user')
+      await mutate({ mutation: DISABLE_USER, variables: { id: 'plain-user', disable: true } })
+
+      expect(principalEpoch('plain-user')).toBe(before + 1)
     })
 
     it('lets a moderator re-enable a plain user', async () => {
