@@ -4,6 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import policyResolvers from '@graphql/resolvers/policy'
 import { allKeys, audiencesFor, POLICY_CHANGED_CHANNEL } from '@src/policy'
 
+import {
+  listenForPrincipalChanges,
+  principalEpoch,
+  publishPrincipalChanged,
+} from './principalEpoch'
 import { getSubscriptionContext, SUBSCRIPTION_PRINCIPAL_TTL_MS } from './subscription'
 
 import type { Context } from '@context/index'
@@ -16,14 +21,21 @@ const req = { headers: { authorization: 'Bearer token' } }
 let viewer: { id: string; permissions: PermissionKey[] } | null
 let unreachable: boolean
 let pubsub: PubSub
+let principalListener: number
+// Stands in for the RoleService singleton: only its change counter is read here.
+const role = { version: 0 }
+// Lets a test act while a read is under way.
+let duringRead: () => void
 
 const buildContext = vi.fn(async (): Promise<Context> => {
   if (unreachable) {
     return Promise.reject(new Error('database unreachable'))
   }
   const user = viewer && { id: viewer.id }
+  duringRead()
   return Promise.resolve({
     pubsub,
+    role,
     user,
     effectivePermissions: new Set(viewer?.permissions ?? []),
     cypherParams: { currentUserId: user?.id ?? null },
@@ -36,17 +48,20 @@ const subscriptionContext = async () => getSubscriptionContext(req, { buildConte
 
 const nextEvent = async (events: AsyncIterator<unknown>) => events.next()
 
-beforeEach(() => {
+beforeEach(async () => {
   // Only the clock: the window is measured with Date.now, and events need real ticks.
   vi.useFakeTimers({ toFake: ['Date'] })
   viewer = { id: 'u1', permissions: ['policy.manage'] }
   unreachable = false
   pubsub = new PubSub()
+  principalListener = await listenForPrincipalChanges(pubsub)
+  duringRead = () => undefined
   buildContext.mockClear()
   logger.warn.mockClear()
 })
 
 afterEach(() => {
+  pubsub.unsubscribe(principalListener)
   vi.useRealTimers()
 })
 
@@ -141,6 +156,92 @@ describe(getSubscriptionContext, () => {
       await second
 
       expect(context.user).toBeNull()
+    })
+  })
+
+  describe('within the window', () => {
+    const deliver = async (events: AsyncIterator<unknown>) => {
+      const event = nextEvent(events)
+      await pubsub.publish('channel', { n: 1 })
+      return event
+    }
+
+    const changePrincipal = async (userId: string) => {
+      const before = principalEpoch(userId)
+      publishPrincipalChanged(pubsub, userId)
+      await vi.waitFor(() => {
+        expect(principalEpoch(userId)).toBe(before + 1)
+      })
+    }
+
+    it("reads the viewer again once the backend changed that user's principal", async () => {
+      const context = await subscriptionContext()
+      const events = context.pubsub.asyncIterator('channel') as AsyncIterableIterator<unknown>
+      viewer = null
+      await changePrincipal('u1')
+      await deliver(events)
+
+      expect(context.user).toBeNull()
+    })
+
+    it("does not read the viewer again for another user's change", async () => {
+      const context = await subscriptionContext()
+      const events = context.pubsub.asyncIterator('channel') as AsyncIterableIterator<unknown>
+      await changePrincipal('u2')
+      await deliver(events)
+
+      expect(buildContext).toHaveBeenCalledTimes(1)
+    })
+
+    it('reads the viewer again once a role definition changed', async () => {
+      const context = await subscriptionContext()
+      const events = context.pubsub.asyncIterator('channel') as AsyncIterableIterator<unknown>
+      viewer = { id: 'u1', permissions: [] }
+      role.version += 1
+      await deliver(events)
+
+      expect(context.effectivePermissions).toEqual(new Set())
+    })
+
+    it('reads an anonymous viewer again for a role definition only', async () => {
+      viewer = null
+      const context = await subscriptionContext()
+      const events = context.pubsub.asyncIterator('channel') as AsyncIterableIterator<unknown>
+      await changePrincipal('u1')
+      await deliver(events)
+
+      expect(buildContext).toHaveBeenCalledTimes(1)
+
+      role.version += 1
+      await deliver(events)
+
+      expect(buildContext).toHaveBeenCalledTimes(2)
+    })
+
+    // The epoch is counted under the id the token names, not under the viewer it last read.
+    it('does not read a viewer that came back anonymous again with every event', async () => {
+      const context = await subscriptionContext()
+      const events = context.pubsub.asyncIterator('channel') as AsyncIterableIterator<unknown>
+      viewer = null
+      await changePrincipal('u1')
+      await deliver(events)
+      await deliver(events)
+
+      expect(buildContext).toHaveBeenCalledTimes(2)
+    })
+
+    it('reads a change that lands during a read with the next event', async () => {
+      const context = await subscriptionContext()
+      const events = context.pubsub.asyncIterator('channel') as AsyncIterableIterator<unknown>
+      role.version += 1
+      duringRead = () => {
+        duringRead = () => undefined
+        role.version += 1
+      }
+      await deliver(events)
+      await deliver(events)
+
+      expect(buildContext).toHaveBeenCalledTimes(3)
     })
   })
 

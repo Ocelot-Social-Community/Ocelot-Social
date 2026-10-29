@@ -433,6 +433,25 @@ describe(RoleService, () => {
       expect(writes).toHaveLength(0)
     })
 
+    // Subscription contexts compare it to notice that a viewer's permissions may have changed.
+    it('counts every change to the cache, local or applied from another instance', async () => {
+      const { svc, fakePubsub } = makeService()
+      await svc.init(fakePubsub)
+      const versions = [svc.version]
+      await svc.upsertRole({ name: 'temp', protected: false, permissions: [] }, 'a-1')
+      versions.push(svc.version)
+      await svc.renameRole('temp', 'temp-2', 'a-1')
+      versions.push(svc.version)
+      await svc.deleteRole('temp-2', 'a-1')
+      versions.push(svc.version)
+      svc.applyExternalChange({ name: 'temp-2', definition: null, actor: 'x', timestamp: 't' })
+      versions.push(svc.version)
+      await svc.reload()
+      versions.push(svc.version)
+
+      expect(versions).toEqual([0, 1, 2, 3, 4, 5])
+    })
+
     it('reload() resyncs the cache from the DB, dropping roles no longer present', async () => {
       const { svc, fakePubsub } = makeService()
       await svc.init(fakePubsub)

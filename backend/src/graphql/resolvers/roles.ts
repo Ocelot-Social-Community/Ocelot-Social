@@ -1,5 +1,6 @@
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
+import { publishPrincipalChanged } from '@src/context/principalEpoch'
 import {
   blockingGateFor,
   groupFor,
@@ -288,8 +289,10 @@ export default {
       if (!user) {
         throw new AppError(Errors.USER_DOES_NOT_EXIST)
       }
-      // The target user's effective permissions changed → they must refetch.
+      // The target user's effective permissions changed → they must refetch, and their open
+      // subscriptions read them again.
       publishPermissionsChanged(context, roleName)
+      publishPrincipalChanged(context.pubsub, userId)
       return user
     },
   },

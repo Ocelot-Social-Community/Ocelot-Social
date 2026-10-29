@@ -8,6 +8,7 @@
 import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
 
 import { categories } from '@constants/categories'
+import { listenForPrincipalChanges, principalEpoch } from '@context/principalEpoch'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import resetTrophyBadgesSelected from '@graphql/queries/badges/resetTrophyBadgesSelected.gql'
@@ -41,8 +42,13 @@ let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
+// Counts what DeleteUser publishes, as index.ts does in production: a deleted user's open
+// subscriptions must read them again (and find nobody).
+let principalListener: number
+
 beforeAll(async () => {
   await cleanDatabase()
+  principalListener = await listenForPrincipalChanges(pubsub)
   const apolloSetup = await createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
@@ -51,6 +57,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
+  pubsub.unsubscribe(principalListener)
   await cleanDatabase()
   void server.stop()
   void database.driver.close()
@@ -625,6 +632,13 @@ describe('Delete a User as admin', () => {
               postId: 'p139',
             },
           )
+        })
+
+        it("moves the deleted user's principal epoch", async () => {
+          const before = principalEpoch('u343')
+          await mutate({ mutation: DeleteUser, variables })
+
+          expect(principalEpoch('u343')).toBe(before + 1)
         })
 
         it("deletes account, but doesn't delete posts or comments by default", async () => {

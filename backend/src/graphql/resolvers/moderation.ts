@@ -1,13 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
+import { publishPrincipalChanged } from '@src/context/principalEpoch'
+
+import type { Context } from '@src/context'
 
 export default {
   Mutation: {
-    review: async (_object, params, context, _resolveInfo) => {
+    review: async (
+      _object,
+      params: { resourceId: string; disable: boolean; closed: boolean },
+      // The shield lets only an authenticated moderator through.
+      context: Context & { user: NonNullable<Context['user']> },
+      _resolveInfo,
+    ) => {
       const { user: moderator, driver } = context
 
       const session = driver.session()
@@ -35,6 +43,10 @@ export default {
           return reviewTransactionResponse.records.map((record) => record.get('review'))
         })
         const [reviewed] = await reviewWriteTxResultPromise
+        // A reviewed user is disabled or enabled with it; their open subscriptions follow.
+        if (reviewed?.resource.__typename === 'User') {
+          publishPrincipalChanged(context.pubsub, params.resourceId)
+        }
         // Preconditions (resource exists, has an open report, not self/own-content) are
         // enforced by the validateReview middleware before this resolver runs, so a
         // missing report surfaces there with a specific message rather than as a null
@@ -52,7 +64,7 @@ export default {
     // no report; it just toggles user.disabled. The shield gates it on the user.disable
     // permission AND the act-on hierarchy (canActOnTargetUser), so a moderator cannot
     // disable a peer or a higher-privileged user.
-    disableUser: async (_object, params, context) => {
+    disableUser: async (_object, params: { id: string; disable: boolean }, context: Context) => {
       const { id, disable } = params
       const session = context.driver.session()
       try {
@@ -74,6 +86,7 @@ export default {
           // reachable; fail loudly rather than returning a success-looking null.
           throw new AppError(Errors.USER_DOES_NOT_EXIST)
         }
+        publishPrincipalChanged(context.pubsub, id)
         return user
       } finally {
         await session.close()
