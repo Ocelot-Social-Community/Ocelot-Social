@@ -20,7 +20,7 @@ import ActiveVideoCallCard from './ActiveVideoCallCard'
 
 // The running calls the viewer may join (docu/dock-konzept.md, §5). Loaded once, then kept
 // up to date by the subscription, which pushes each start, change and end with the call's
-// current state — no refetch needed.
+// current state — no refetch needed, except for a change that arrives while the list loads.
 export default {
   name: 'ActiveVideoCalls',
   components: { ActiveVideoCallCard },
@@ -60,6 +60,12 @@ export default {
         return activeVideoCallsQuery()
       },
       fetchPolicy: 'network-only',
+      result() {
+        if (this.reloadAfterLoad) {
+          this.reloadAfterLoad = false
+          this.$apollo.queries.activeVideoCalls.refetch()
+        }
+      },
       error(err) {
         // The dock is an extra; a failed load leaves it empty instead of in the way.
         // eslint-disable-next-line no-console
@@ -67,11 +73,17 @@ export default {
       },
       subscribeToMore: {
         document: activeVideoCallChangedSubscription(),
-        updateQuery: (previous, { subscriptionData }) => {
+        // Bound to the component by vue-apollo.
+        updateQuery(previous, { subscriptionData }) {
+          if (!previous?.activeVideoCalls) {
+            // The list is still loading, and its answer may predate this change — applied now,
+            // the change would be overwritten by it; applied after, it might undo a newer one.
+            // Asking again once the list is there gets an answer that includes it.
+            this.reloadAfterLoad = true
+            return undefined
+          }
           const { groupId, call } = subscriptionData.data.activeVideoCallChanged
-          const others = (previous?.activeVideoCalls ?? []).filter(
-            ({ group }) => group.id !== groupId,
-          )
+          const others = previous.activeVideoCalls.filter(({ group }) => group.id !== groupId)
           return { activeVideoCalls: call ? [...others, call] : others }
         },
       },

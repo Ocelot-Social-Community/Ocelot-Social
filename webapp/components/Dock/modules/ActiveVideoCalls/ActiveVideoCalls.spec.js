@@ -106,8 +106,22 @@ describe('ActiveVideoCalls.vue', () => {
       expect(result.activeVideoCalls.map(({ group }) => group.id)).toEqual(['b'])
     })
 
-    it('copes with nothing loaded yet', () => {
-      expect(updateQuery(undefined, pushed('a', call('a'))).activeVideoCalls).toEqual([call('a')])
+    it('waits for the list when a change comes in while it loads', () => {
+      const vm = {}
+      expect(updateQuery.call(vm, undefined, pushed('a', call('a')))).toBeUndefined()
+      expect(vm.reloadAfterLoad).toBe(true)
+    })
+
+    it('asks again once loaded when a change came in while loading', () => {
+      // The answer may predate the change; asking again gets one that includes it.
+      const refetch = jest.fn()
+      const vm = { reloadAfterLoad: true, $apollo: { queries: { activeVideoCalls: { refetch } } } }
+
+      apollo.result.call(vm)
+      apollo.result.call(vm)
+
+      expect(refetch).toHaveBeenCalledTimes(1)
+      expect(vm.reloadAfterLoad).toBe(false)
     })
   })
 })
