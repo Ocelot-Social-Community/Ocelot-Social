@@ -1899,6 +1899,11 @@
     "termsAndConditionsNewConfirm": "Ho letto e accetto le nuove condizioni generali di contratto.",
     "termsAndConditionsNewConfirmText": "Si prega di leggere le nuove condizioni d'uso ora!"
   },
+  "themeSwitch": {
+    "dark": "Tema: scuro",
+    "light": "Tema: chiaro",
+    "system": "Tema: come il sistema"
+  },
   "user-avatar": {
     "popover": {
       "open-profile": "Apri profilo",

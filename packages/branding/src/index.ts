@@ -16,6 +16,7 @@
 // docu/branding-architecture-konzept.md for the build-vs-runtime split.)
 
 import { defineBranding } from './merge.js'
+import { VANILLA_COLOR_SCHEME } from './theme.js'
 
 import type { BrandingConfig } from './schema.js'
 
@@ -34,7 +35,7 @@ type BrandingGlobal = typeof globalThis & { [GLOBAL_KEY]?: BrandingConfig }
 
 // Framework-resolved config (the defaults, with no brand override applied) — the fallback when no
 // brand config has been injected at runtime.
-const vanilla: BrandingConfig = defineBranding({})
+const vanilla: BrandingConfig = defineBranding({ theme: { colorScheme: VANILLA_COLOR_SCHEME } })
 
 /** The currently effective config: the runtime-injected brand config, else framework defaults. */
 export function getBranding(): BrandingConfig {

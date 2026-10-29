@@ -1899,6 +1899,11 @@
     "termsAndConditionsNewConfirm": "Przeczytałem/am i zgadzam się z nowym regulaminem.",
     "termsAndConditionsNewConfirmText": "Proszę przeczytaj teraz nowy regulamin!"
   },
+  "themeSwitch": {
+    "dark": "Motyw: ciemny",
+    "light": "Motyw: jasny",
+    "system": "Motyw: jak w systemie"
+  },
   "user-avatar": {
     "popover": {
       "open-profile": "Otwórz profil",

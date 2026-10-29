@@ -6,7 +6,7 @@ import { cva } from 'class-variance-authority'
 export const modalPanelVariants = cva([
   'os-modal',
   'relative',
-  'bg-white rounded-lg shadow-xl',
+  'bg-[var(--background-color-base,white)] rounded-lg shadow-xl',
   'flex flex-col',
   'w-[90vw] max-w-[500px]',
 ])

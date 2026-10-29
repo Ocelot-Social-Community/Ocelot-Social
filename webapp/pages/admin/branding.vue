@@ -630,9 +630,9 @@ export default {
       return out
     },
     isColor(v) {
-      // Literal colours plus var()/color-mix() references — the browser resolves the latter for the
+      // Literal colours plus var()/color-mix()/light-dark() references — the browser resolves the latter for the
       // swatch's background-color, so a token that defaults to `var(--color-primary)` still shows one.
-      return typeof v === 'string' && /^(#|rgb|hsl|var\(|color-mix\()/i.test(v.trim())
+      return typeof v === 'string' && /^(#|rgb|hsl|var\(|color-mix\(|light-dark\()/i.test(v.trim())
     },
     isImage(v) {
       return typeof v === 'string' && /\.(svg|png|jpe?g|webp|gif|ico)(\?|$)/i.test(v)

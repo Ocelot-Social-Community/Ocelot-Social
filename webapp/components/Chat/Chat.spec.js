@@ -232,6 +232,31 @@ describe('Chat.vue', () => {
     })
   })
 
+  describe('initialsAvatarUrl', () => {
+    beforeEach(() => {
+      wrapper = Wrapper()
+    })
+    afterEach(() => {
+      document.documentElement.style.removeProperty('--color-primary-dark')
+      document.documentElement.style.removeProperty('--text-color-primary-inverse')
+    })
+
+    it('draws the initials in the theme colours read from the document', () => {
+      document.documentElement.style.setProperty('--color-primary-dark', 'rgb(1, 2, 3)')
+      document.documentElement.style.setProperty('--text-color-primary-inverse', 'rgb(4, 5, 6)')
+      const url = wrapper.vm.initialsAvatarUrl('Peter Lustig')
+      expect(url).toContain('>PL</text>')
+      expect(url).toContain(`fill="${encodeURIComponent('rgb(1, 2, 3)')}"`)
+      expect(url).toContain(`fill="${encodeURIComponent('rgb(4, 5, 6)')}"`)
+    })
+
+    it('keeps the light colours when the tokens cannot be read', () => {
+      const url = wrapper.vm.initialsAvatarUrl('Peter Lustig')
+      expect(url).toContain(`fill="${encodeURIComponent('rgb(25,122,49)')}"`)
+      expect(url).toContain('fill="white"')
+    })
+  })
+
   describe('applyAvatarsOnList', () => {
     beforeEach(() => {
       wrapper = Wrapper()

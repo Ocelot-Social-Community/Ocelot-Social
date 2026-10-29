@@ -7,7 +7,7 @@
   import type { PropType } from 'vue-demi'
 
   const CARD_BASE =
-    'os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)]'
+    'os-card relative rounded-[5px] break-words bg-[var(--background-color-base,white)] shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)]'
 
   const HIGHLIGHT_CLASS = 'outline outline-1 outline-[var(--color-warning)]'
 

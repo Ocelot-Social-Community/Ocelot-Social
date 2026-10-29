@@ -409,7 +409,7 @@ export default {
   flex: 1;
   padding: var(--space-x-small);
   background: var(--background-color-base);
-  border: 1px solid var(--color-neutral-80);
+  border: 1px solid var(--border-color-softer);
   border-radius: var(--border-radius-base);
   word-break: break-all;
   font-size: var(--font-size-small);
@@ -423,7 +423,7 @@ export default {
 .key-counter {
   font-weight: normal;
   font-size: var(--font-size-base);
-  color: var(--color-neutral-50);
+  color: var(--text-color-muted);
 }
 
 .limit-warning {
@@ -486,7 +486,7 @@ tr > td:last-child {
   width: 100%;
   padding: var(--space-x-small);
   font-size: var(--font-size-base);
-  border: 1px solid var(--color-neutral-80);
+  border: 1px solid var(--border-color-softer);
   border-radius: var(--border-radius-base);
   background-color: var(--background-color-base);
 }

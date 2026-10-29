@@ -6,6 +6,8 @@
 // Only build-time (defineBranding): the runtime composes from already-validated fragments, and each
 // invariant lives inside ONE bucket domain (group/category/comment → behavior), so cross-brand
 // composition cannot violate them — no need (and it would be wrong) to re-validate + throw at runtime.
+import { COLOR_SCHEMES } from './theme.js'
+
 import type { BrandingConfig } from './schema.js'
 
 /**
@@ -88,6 +90,12 @@ export function validateBranding(config: BrandingConfig): string[] {
   // Intl.DateTimeFormat needs one of them; with neither the absolute timestamp has nothing to show.
   if (dateTime.dateStyle === null && dateTime.timeStyle === null) {
     violations.push('dateTime.dateStyle and dateTime.timeStyle must not both be null')
+  }
+
+  if (!COLOR_SCHEMES.includes(config.theme.colorScheme)) {
+    violations.push(
+      `theme.colorScheme must be one of ${COLOR_SCHEMES.map((s) => `'${s}'`).join(', ')} (got '${config.theme.colorScheme}')`,
+    )
   }
 
   return violations

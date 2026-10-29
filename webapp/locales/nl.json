@@ -1899,6 +1899,11 @@
     "termsAndConditionsNewConfirm": "Ik heb de nieuwe algemene voorwaarden gelezen en ga ermee akkoord.",
     "termsAndConditionsNewConfirmText": "Lees nu de nieuwe gebruiksvoorwaarden!"
   },
+  "themeSwitch": {
+    "dark": "Thema: donker",
+    "light": "Thema: licht",
+    "system": "Thema: zoals het systeem"
+  },
   "user-avatar": {
     "popover": {
       "open-profile": "Profiel openen",

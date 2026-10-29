@@ -4,6 +4,8 @@ import manifest from './constants/manifest.js'
 import metadata from './constants/metadata.js'
 import locales from './locales/index.js'
 import { brandingHeadHtml } from './utils/brandingHead.js'
+import { colorSchemeOf } from '@ocelot-social/branding'
+import { pinnedTheme, themeFromCookieHeader } from './utils/theme.js'
 import brandIcons from './server-middleware/brand-icons.js'
 import workbox from './server-middleware/workbox.js'
 
@@ -161,6 +163,12 @@ export default {
     '~assets/css/main.css',
     // @ocelot-social/ui CSS variables
     '~assets/css/ocelot-ui-variables.css',
+    // Dark theme: the semantic tokens of the two files above, mapped anew (data-theme / system)
+    '~assets/css/theme-dark.css',
+    // mapbox-gl's and the geocoder's control chrome on the same tokens
+    '~assets/css/mapbox-theme.css',
+    // vue2-datepicker's popup on the same tokens
+    '~assets/css/datepicker-theme.css',
     // Utility classes replacing ds-* Vue components
     '~assets/css/ds-compat.css',
     // UI library component styles (Tailwind utilities + OsMenu CSS)
@@ -208,6 +216,12 @@ export default {
     'vue-renderer:ssr:templateParams'(templateParams, renderContext) {
       const branding = renderContext && renderContext.nuxt && renderContext.nuxt.branding
       if (branding) templateParams.HEAD += brandingHeadHtml(branding)
+      // The theme rides on <html> from the first byte — set on the client, it would flash light.
+      const theme = pinnedTheme(
+        colorSchemeOf(branding),
+        themeFromCookieHeader(renderContext.req && renderContext.req.headers.cookie),
+      )
+      templateParams.HTML_ATTRS += ` data-theme="${theme}"`
     },
 
     // Brand the WELL-KNOWN icon paths (/favicon.ico, /icon.png, /apple-touch-icon*.png) — the ones a
@@ -444,6 +458,9 @@ export default {
      ** `@media (--vp-mobile)` would pass through to the browser unresolved and the rule would be dead.
      */
     postcss: {
+      // light-dark() goes to the browser as written (Chrome 123, Firefox 120, Safari 17.5): preset-env's
+      // polyfill switches on prefers-color-scheme only and would ignore <html data-theme>.
+      preset: { features: { 'light-dark-function': false } },
       postcssOptions: {
         plugins: {
           '@csstools/postcss-global-data': {

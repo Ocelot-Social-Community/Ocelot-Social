@@ -1,0 +1,40 @@
+/**
+ * Dark theme. Every semantic token carries both values in one place — `light-dark(light, dark)` in
+ * root-tokens.css and ocelot-ui-variables.css — and this file only decides which one the page uses.
+ *
+ * The neutral scale itself is NOT inverted: it is used as background, text and border alike, so
+ * turning it round would darken white text on dark ground. What follows the theme is the meaning
+ * (--background-color-*, --text-color-*, --border-color-*).
+ *
+ * Who decides: <html data-theme> — set on the server from the `ocelot-theme` cookie
+ * (nuxt.config.js → vue-renderer:ssr:templateParams), so the first paint is already dark.
+ *   dark   — always dark
+ *   light  — always light
+ *   system — or no attribute at all: follows prefers-color-scheme
+ *
+ * A brand's :root:root colour replaces the whole light-dark() pair, so it keeps that colour in both
+ * themes until it ships a pair of its own. light-dark() needs Chrome 123, Firefox 120, Safari 17.5.
+ */
+
+:root {
+  color-scheme: light dark;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* Not a colour, so light-dark() cannot carry it: the map controls' icons are images. */
+:root[data-theme='dark'] {
+  --map-control-icon-filter: invert(0.88);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']):not([data-theme='dark']) {
+    --map-control-icon-filter: invert(0.88);
+  }
+}

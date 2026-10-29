@@ -932,6 +932,76 @@ describe('osLocationMap', () => {
       expect(toggle.getAttribute('aria-expanded')).toBe('false')
     })
 
+    it('follows a changed mapStyle prop (theme switch) while the user picked none', async () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          styles,
+          mapStyle: styles[0].url,
+        },
+      })
+
+      await wrapper.setProps({ mapStyle: styles[1].url })
+
+      expect(ctx.mapInstance.setStyle).toHaveBeenCalledWith(styles[1].url)
+    })
+
+    it('moves the active mark along when the mapStyle prop changes (theme switch)', async () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          styles,
+          mapStyle: styles[0].url,
+        },
+      })
+
+      await wrapper.setProps({ mapStyle: styles[1].url })
+
+      expect(
+        getStyleOption(1).classList.contains('os-location-map-style-popover-btn--active'),
+      ).toBe(true)
+      expect(getStyleOption(1).getAttribute('aria-selected')).toBe('true')
+      expect(
+        getStyleOption(0).classList.contains('os-location-map-style-popover-btn--active'),
+      ).toBe(false)
+      expect(getStyleOption(0).getAttribute('aria-selected')).toBe('false')
+    })
+
+    it('follows a changed mapStyle prop without a switcher (a single style)', async () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          styles: [styles[0]],
+          mapStyle: styles[0].url,
+        },
+      })
+
+      await wrapper.setProps({ mapStyle: styles[1].url })
+
+      expect(ctx.mapInstance.setStyle).toHaveBeenCalledWith(styles[1].url)
+    })
+
+    it('keeps the style the user picked when the mapStyle prop changes', async () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          styles,
+          mapStyle: styles[0].url,
+        },
+      })
+      getStyleSwitcherToggle().dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      getStyleOption(1).dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      ctx.mapInstance.setStyle.mockClear()
+
+      await wrapper.setProps({ mapStyle: styles[0].url + '?dark' })
+
+      expect(ctx.mapInstance.setStyle).not.toHaveBeenCalled()
+    })
+
     it('closes the popover on window scroll (its fixed position would otherwise go stale)', () => {
       mount(OsLocationMap, {
         props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', styles },
