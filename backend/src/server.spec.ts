@@ -4,11 +4,21 @@ import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest
 import { WebSocket } from 'ws'
 
 import CONFIG, { nodemailerTransportOptions } from './config'
-import { getContext } from './context'
+import { getContext, serverPubsub } from './context'
+import { getSubscriptionContext } from './context/subscription'
 import logger from './logger'
+import { allKeys, audiencesFor, POLICY_CHANGED_CHANNEL } from './policy'
 import createServer from './server'
 
+import type { Context } from './context'
 import type { AddressInfo } from 'node:net'
+
+// Passed through to the real one; spied on so the WebSocket tests can tell that both protocols
+// build the refreshing subscription context rather than a one-off request context.
+vi.mock('./context/subscription', async (importOriginal) => {
+  const actual = await importOriginal<{ getSubscriptionContext: typeof getSubscriptionContext }>()
+  return { ...actual, getSubscriptionContext: vi.fn(actual.getSubscriptionContext) }
+})
 
 // This file drives createServer over a REAL listening socket. test/helpers.ts reaches the schema
 // through `server.executeOperation`, which enters Apollo BELOW the transport — so everything
@@ -191,6 +201,7 @@ describe(createServer, () => {
     // Carried through to a real operation because `useServer`'s context callback — the one that
     // turns connectionParams into a request context — only runs once an operation is subscribed.
     it('routes the graphql-transport-ws subprotocol to the modern server', async () => {
+      vi.mocked(getSubscriptionContext).mockClear()
       const socket = await open(running.wsUrl, 'graphql-transport-ws')
       const read = reader(socket)
       try {
@@ -211,6 +222,7 @@ describe(createServer, () => {
         expect(next.type).toBe('next')
         expect(next.payload.errors).toBeUndefined()
         expect(next.payload.data?.embedProviders?.length).toBeGreaterThan(0)
+        expect(getSubscriptionContext).toHaveBeenCalledWith({ headers: { authorization: '' } })
       } finally {
         await read.close()
         socket.close()
@@ -250,6 +262,7 @@ describe(createServer, () => {
     // the collision with the modern library's package name is exactly why this routing is easy to
     // invert. The legacy server is what the deployed Nuxt 2 webapp still connects with.
     it('routes the legacy graphql-ws subprotocol to the legacy server', async () => {
+      vi.mocked(getSubscriptionContext).mockClear()
       const socket = await open(running.wsUrl, 'graphql-ws')
       const read = reader(socket)
       try {
@@ -258,6 +271,7 @@ describe(createServer, () => {
         )
 
         expect(await read.next()).toMatchObject({ type: 'connection_ack' })
+        expect(getSubscriptionContext).toHaveBeenCalledWith({ headers: { authorization: '' } })
       } finally {
         await read.close()
         socket.close()
@@ -279,6 +293,78 @@ describe(createServer, () => {
 
       expect(code).toBe(1002)
     })
+
+    // The subscription context reads its viewer again by writing into the object it built, so
+    // that object must be the one filters and resolvers are handed. subscriptions-transport-ws
+    // copies what onConnect returned for every operation; this is where that would show. The
+    // refresh is played by writing an admin's permissions into the context, the way it does.
+    it.each([
+      ['graphql-transport-ws', 'subscribe', 'next'],
+      ['graphql-ws', 'start', 'data'],
+    ])(
+      'hands a %s subscription the context its viewer is refreshed in',
+      async (protocol, startType, dataType) => {
+        const adminOnlyKey = allKeys().find((key) =>
+          audiencesFor(key).every((audience) => audience === 'perm:policy.manage'),
+        )
+        const publicKey = allKeys().find((key) => audiencesFor(key).includes('public'))
+        const subscribed = vi.spyOn(serverPubsub, 'subscribe')
+        const publish = async (key: string | undefined) =>
+          serverPubsub.publish(POLICY_CHANGED_CHANNEL, { policyChanged: { key, value: true } })
+        vi.mocked(getSubscriptionContext).mockClear()
+        const socket = await open(running.wsUrl, protocol)
+        const read = reader(socket)
+        try {
+          socket.send(JSON.stringify({ type: 'connection_init', payload: {} }))
+          await read.next()
+          socket.send(
+            JSON.stringify({
+              id: '1',
+              type: startType,
+              payload: { query: 'subscription { policyChanged { key } }' },
+            }),
+          )
+          await vi.waitFor(() => {
+            expect(subscribed.mock.calls[0]?.[0]).toBe(POLICY_CHANGED_CHANNEL)
+          })
+          // Settled once the subscription is registered; with Redis that is a round trip later,
+          // and an event published before it would be lost.
+          await subscribed.mock.results[0]?.value
+          const received = async () => {
+            const message = (await read.next()) as {
+              type: string
+              payload: { data: { policyChanged: { key: string } } }
+            }
+
+            expect(message.type).toBe(dataType)
+
+            return message.payload.data.policyChanged.key
+          }
+
+          // Anonymous: the admin-only change is skipped, the public one arrives first.
+          await publish(adminOnlyKey)
+          await publish(publicKey)
+
+          expect(await received()).toBe(publicKey)
+
+          const context = (await vi.mocked(getSubscriptionContext).mock.results[0]
+            ?.value) as Context
+          Object.assign(context, {
+            user: { id: 'admin' },
+            effectivePermissions: new Set(['policy.manage']),
+          })
+          await publish(adminOnlyKey)
+          await publish(publicKey)
+
+          expect(await received()).toBe(adminOnlyKey)
+        } finally {
+          subscribed.mockRestore()
+          await read.close()
+          socket.close()
+          await once(socket, 'close')
+        }
+      },
+    )
 
     // Both servers log their own disconnect line. Kept apart because the two callbacks are
     // registered on different servers: a routing regression that sent every client to one of them
