@@ -1,4 +1,4 @@
-import { computed } from 'vue'
+import { ref } from 'vue'
 
 import OsButton from '#src/components/OsButton/OsButton.vue'
 
@@ -16,7 +16,6 @@ export default meta
 type Story = StoryObj<typeof OsModal>
 
 interface PlaygroundArgs {
-  open: boolean
   title: string
   cancelLabel: string
   confirmLabel: string
@@ -24,37 +23,50 @@ interface PlaygroundArgs {
 }
 
 export const Playground: StoryObj<PlaygroundArgs> = {
+  // `open` belongs to the button below, not to a control that could not follow it.
+  parameters: { controls: { exclude: ['open'] } },
   argTypes: {
-    open: { control: 'boolean' },
     title: { control: 'text' },
     cancelLabel: { control: 'text' },
     confirmLabel: { control: 'text' },
     content: { control: 'text' },
   },
   args: {
-    open: true,
     title: 'Modal Title',
     cancelLabel: 'Cancel',
     confirmLabel: 'Confirm',
     content: 'This is the modal body content.',
   },
+  // Opened from a button and bound with v-model, like it is used: Escape, the backdrop and both
+  // buttons close it, and it starts closed so the docs page it is rendered on stays usable.
   render: (args) => ({
-    components: { OsModal },
+    components: { OsModal, OsButton },
     setup() {
-      const modalProps = computed(() => ({
-        open: args.open,
-        title: args.title,
-        cancelLabel: args.cancelLabel,
-        confirmLabel: args.confirmLabel,
-      }))
-      const content = computed(() => args.content)
-      return { modalProps, content }
+      const open = ref(false)
+      return { args, open }
     },
-    template: `<OsModal v-bind="modalProps">{{ content }}</OsModal>`,
+    template: `
+      <div>
+        <OsButton variant="primary" @click="open = true">Open modal</OsButton>
+        <OsModal
+          v-model:open="open"
+          :title="args.title"
+          :cancel-label="args.cancelLabel"
+          :confirm-label="args.confirmLabel"
+        >{{ args.content }}</OsModal>
+      </div>
+    `,
   }),
 }
 
+// An open modal covers the page it is rendered on. On the autodocs page the stories render
+// inline by default, and an open modal would lay its backdrop, focus trap and scroll lock over
+// the docs themselves — and, with nobody listening to update:open, stay there. So the open
+// stories get an iframe of their own there, high enough for the modal they show.
+const ownFrame = (iframeHeight: number) => ({ docs: { story: { inline: false, iframeHeight } } })
+
 export const DefaultSize: Story = {
+  parameters: ownFrame(360),
   render: () => ({
     components: { OsModal },
     template: `
@@ -69,6 +81,7 @@ export const DefaultSize: Story = {
 }
 
 export const CustomFooter: Story = {
+  parameters: ownFrame(320),
   render: () => ({
     components: { OsModal, OsButton },
     template: `
@@ -86,6 +99,8 @@ export const CustomFooter: Story = {
 }
 
 export const ScrollableContent: Story = {
+  // The content area is capped at half the viewport, so this frame shows it scrolling.
+  parameters: ownFrame(520),
   render: () => ({
     components: { OsModal },
     template: `
