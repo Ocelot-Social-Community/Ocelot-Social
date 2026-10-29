@@ -1,7 +1,7 @@
 # Dock: Seitenleisten neben dem Inhalt — Konzept
 
 Stand: 2026-10-28
-Status: Entscheidungen getroffen (Abschnitt 8), Umsetzung läuft
+Status: Entscheidungen getroffen (Abschnitt 8), umgesetzt
 
 Links und rechts vom Inhalt entsteht Raum, der mit Modulen befüllt werden kann: das **Dock**. Das Dock gibt es auf allen Seiten des Default-Layouts. Welche Module wo erscheinen, wird pro Modul gesteuert. Erstes Modul: **laufende Video-Calls** (rechts), nur auf dem Hauptfeed.
 
@@ -75,7 +75,7 @@ type Subscription { activeVideoCallChanged: ActiveVideoCallChange! }
 ### 3.4 Subscription
 
 - `activeVideoCallChanged` hängt am **bestehenden** Event `VIDEO_CALL_PARTICIPANT_COUNT_CHANGED`. Webhook und Poller bleiben unverändert.
-- **Filter** `mayJoinCallCached`: dasselbe Join-Recht, aber mit jeweils frischem Autorisierungs-Scope. Der Kontext einer Subscription lebt so lange wie die Verbindung, und dessen Request-Memo würde die Rechte vom Zeitpunkt des Abonnierens festschreiben. Antworten werden höchstens 30 s gehalten, „nein“ ebenso wie „ja“, denn die meisten Events betreffen fremde Gruppen. Danach wird der ganze Cache auf einmal verworfen, damit er nicht unbegrenzt wächst.
+- **Filter** `mayJoinCall`: dasselbe Join-Recht, gefragt über das Gruppen-Memo des Kontexts (`groupAuthorization.forGroup()`). Pro Gruppe fällt so höchstens eine Abfrage an, „nein“ ebenso wie „ja“, denn die meisten Events betreffen fremde Gruppen. Der Kontext einer Subscription lebt so lange wie die Verbindung; dass das Memo die Rechte nicht vom Zeitpunkt des Abonnierens festschreibt, leistet das Neu-Einlesen des Kontexts (`context/subscription.ts`), kein eigener Cache.
 - **Payload:** `{ groupId, call }`, wobei `call` bei 0 gleich `null` ist. `participants` wird lazy bei LiveKit nachgefragt, weil der Event nur die Zahl kennt. Scheitert diese Nachfrage, kommt `[]` zurück; die Zahl bleibt trotzdem stehen.
 - Ein Wechsel bei gleicher Zahl (A geht, B kommt) erzeugt über den Webhook trotzdem zwei Events. Nur im reinen Poller-Betrieb kann so ein Wechsel bis zum nächsten Zahlwechsel unbemerkt bleiben. Das wird akzeptiert.
 
