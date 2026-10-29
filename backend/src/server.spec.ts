@@ -5,10 +5,18 @@ import { WebSocket } from 'ws'
 
 import CONFIG, { nodemailerTransportOptions } from './config'
 import { getContext } from './context'
+import { getSubscriptionContext } from './context/subscription'
 import logger from './logger'
 import createServer from './server'
 
 import type { AddressInfo } from 'node:net'
+
+// Passed through to the real one; spied on so the WebSocket tests can tell that both protocols
+// build the refreshing subscription context rather than a one-off request context.
+vi.mock('./context/subscription', async (importOriginal) => {
+  const actual = await importOriginal<{ getSubscriptionContext: typeof getSubscriptionContext }>()
+  return { ...actual, getSubscriptionContext: vi.fn(actual.getSubscriptionContext) }
+})
 
 // This file drives createServer over a REAL listening socket. test/helpers.ts reaches the schema
 // through `server.executeOperation`, which enters Apollo BELOW the transport — so everything
@@ -191,6 +199,7 @@ describe(createServer, () => {
     // Carried through to a real operation because `useServer`'s context callback — the one that
     // turns connectionParams into a request context — only runs once an operation is subscribed.
     it('routes the graphql-transport-ws subprotocol to the modern server', async () => {
+      vi.mocked(getSubscriptionContext).mockClear()
       const socket = await open(running.wsUrl, 'graphql-transport-ws')
       const read = reader(socket)
       try {
@@ -211,6 +220,7 @@ describe(createServer, () => {
         expect(next.type).toBe('next')
         expect(next.payload.errors).toBeUndefined()
         expect(next.payload.data?.embedProviders?.length).toBeGreaterThan(0)
+        expect(getSubscriptionContext).toHaveBeenCalledWith({ headers: { authorization: '' } })
       } finally {
         await read.close()
         socket.close()
@@ -250,6 +260,7 @@ describe(createServer, () => {
     // the collision with the modern library's package name is exactly why this routing is easy to
     // invert. The legacy server is what the deployed Nuxt 2 webapp still connects with.
     it('routes the legacy graphql-ws subprotocol to the legacy server', async () => {
+      vi.mocked(getSubscriptionContext).mockClear()
       const socket = await open(running.wsUrl, 'graphql-ws')
       const read = reader(socket)
       try {
@@ -258,6 +269,7 @@ describe(createServer, () => {
         )
 
         expect(await read.next()).toMatchObject({ type: 'connection_ack' })
+        expect(getSubscriptionContext).toHaveBeenCalledWith({ headers: { authorization: '' } })
       } finally {
         await read.close()
         socket.close()

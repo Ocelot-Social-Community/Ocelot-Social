@@ -23,6 +23,7 @@ import { WebSocketServer } from 'ws'
 import { brandingRouter } from './branding/routes'
 import CONFIG from './config'
 import { getContext } from './context'
+import { getSubscriptionContext } from './context/subscription'
 import schema from './graphql/schema'
 import { startLiveKitPoller } from './livekit/poller'
 import { registerLiveKitWebhook } from './livekit/webhook'
@@ -67,7 +68,7 @@ const createServer = async (options?: CreateServerOptions) => {
     {
       schema: appliedSchema,
       context: async (ctx) =>
-        getContext()(normaliseWsHeaders(ctx.connectionParams as Record<string, unknown>)),
+        getSubscriptionContext(normaliseWsHeaders(ctx.connectionParams as Record<string, unknown>)),
       onDisconnect: () => {
         logger.debug('WebSocket client disconnected')
       },
@@ -88,7 +89,7 @@ const createServer = async (options?: CreateServerOptions) => {
       execute,
       subscribe,
       onConnect: async (connectionParams: Record<string, unknown>) => {
-        return getContext()(normaliseWsHeaders(connectionParams))
+        return getSubscriptionContext(normaliseWsHeaders(connectionParams))
       },
       onDisconnect: () => {
         logger.debug('Legacy WebSocket client disconnected')
