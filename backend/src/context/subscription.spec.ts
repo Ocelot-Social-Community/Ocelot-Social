@@ -27,14 +27,14 @@ const role = { version: 0 }
 // The same for the PolicyService singleton.
 const policy = { version: 0 }
 // Lets a test act while a read is under way.
-let duringRead: () => void
+let duringRead: () => void | Promise<void>
 
 const buildContext = vi.fn(async (): Promise<Context> => {
   if (unreachable) {
     return Promise.reject(new Error('database unreachable'))
   }
   const user = viewer && { id: viewer.id }
-  duringRead()
+  await duringRead()
   return Promise.resolve({
     pubsub,
     role,
@@ -47,7 +47,8 @@ const buildContext = vi.fn(async (): Promise<Context> => {
 
 const logger = { warn: vi.fn() }
 
-const subscriptionContext = async () => getSubscriptionContext(req, { buildContext, logger })
+const subscriptionContext = async () =>
+  getSubscriptionContext(req, { buildContext, logger, roles: role, policy })
 
 const nextEvent = async (events: AsyncIterator<unknown>) => events.next()
 
@@ -257,6 +258,53 @@ describe(getSubscriptionContext, () => {
       await deliver(events)
 
       expect(buildContext).toHaveBeenCalledTimes(3)
+    })
+
+    // The first read is no different: what it read may be from before the change.
+    describe('that lands during the first read', () => {
+      it.each([
+        ['role definition', () => (role.version += 1)],
+        ['network policy', () => (policy.version += 1)],
+        ["viewer's principal", async () => changePrincipal('u1')],
+      ])('reads a change to the %s with the first event', async (_change, change) => {
+        duringRead = async () => {
+          duringRead = () => undefined
+          await change()
+        }
+        const context = await subscriptionContext()
+        const events = context.pubsub.asyncIterator('channel') as AsyncIterableIterator<unknown>
+        await deliver(events)
+        await deliver(events)
+
+        expect(buildContext).toHaveBeenCalledTimes(2)
+      })
+
+      // Before the token is decoded there is no telling whose change it was, so any counts once.
+      it("reads the viewer again for another user's change, once", async () => {
+        duringRead = async () => {
+          duringRead = () => undefined
+          await changePrincipal('u2')
+        }
+        const context = await subscriptionContext()
+        const events = context.pubsub.asyncIterator('channel') as AsyncIterableIterator<unknown>
+        await deliver(events)
+        await deliver(events)
+
+        expect(buildContext).toHaveBeenCalledTimes(2)
+      })
+
+      it('does not read an anonymous viewer again for a principal change', async () => {
+        viewer = null
+        duringRead = async () => {
+          duringRead = () => undefined
+          await changePrincipal('u1')
+        }
+        const context = await subscriptionContext()
+        const events = context.pubsub.asyncIterator('channel') as AsyncIterableIterator<unknown>
+        await deliver(events)
+
+        expect(buildContext).toHaveBeenCalledTimes(1)
+      })
     })
   })
 

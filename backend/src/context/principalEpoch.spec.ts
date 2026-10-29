@@ -6,6 +6,7 @@ import ocelotLogger from '@src/logger'
 
 import {
   listenForPrincipalChanges,
+  principalChanges,
   principalEpoch,
   publishPrincipalChanged,
 } from './principalEpoch'
@@ -38,6 +39,17 @@ describe(principalEpoch, () => {
     })
 
     expect(principalEpoch('theirs')).toBe(theirs)
+  })
+})
+
+describe(principalChanges, () => {
+  it('moves by one per published change, whoever it was for', async () => {
+    const before = principalChanges()
+    publishPrincipalChanged(pubsub, 'mine')
+    publishPrincipalChanged(pubsub, 'theirs')
+    await vi.waitFor(() => {
+      expect(principalChanges()).toBe(before + 2)
+    })
   })
 })
 

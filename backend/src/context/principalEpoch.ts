@@ -15,12 +15,17 @@ import type { Context } from '@context/index'
 //
 // One number per user whose principal ever changed in this process; not worth evicting.
 const epochs = new Map<string, number>()
+// All of them together: what a context that does not know its viewer yet can compare.
+let changes = 0
 
 export const principalEpoch = (userId: string): number => epochs.get(userId) ?? 0
+
+export const principalChanges = (): number => changes
 
 export const listenForPrincipalChanges = async (pubsub: Pick<Context['pubsub'], 'subscribe'>) =>
   pubsub.subscribe(PRINCIPAL_CHANGED, ({ userId }: { userId: string }) => {
     epochs.set(userId, principalEpoch(userId) + 1)
+    changes += 1
   })
 
 const warnPublishFailed = (error: unknown) => {
