@@ -1,6 +1,7 @@
 import { beforeEach, describe, it, expect } from 'vitest'
 
 import type { RedisOptions } from 'ioredis'
+import type { Mock } from 'vitest'
 
 interface MockRedisConfig {
   REDIS_DOMAIN?: string
@@ -10,18 +11,31 @@ interface MockRedisConfig {
 
 // `vi.hoisted` lifts the object to where the (hoisted) mock factory can see it. The Jest version
 // reached the same end through a getter, which only existed to dodge the TDZ its hoisting caused.
-const { mockConfig } = vi.hoisted((): { mockConfig: MockRedisConfig } => ({ mockConfig: {} }))
+const { mockConfig, mockPublish, mockWarn } = vi.hoisted(
+  (): {
+    mockConfig: MockRedisConfig
+    mockPublish: Mock<(trigger: string, payload: unknown) => Promise<void>>
+    mockWarn: Mock
+  } => ({ mockConfig: {}, mockPublish: vi.fn(), mockWarn: vi.fn() }),
+)
 
 vi.mock('@config/index', () => ({ __esModule: true, default: mockConfig }))
 
+vi.mock('@src/logger', () => ({ default: { warn: mockWarn } }))
+
+// `function`, not arrows: both stand in for classes the code under test calls with `new`.
 vi.mock('ioredis', () => ({
   __esModule: true,
-  default: vi.fn(),
+  default: vi.fn().mockImplementation(function (this: { on: unknown }) {
+    this.on = vi.fn().mockReturnValue(this)
+  }),
 }))
 
 vi.mock('graphql-redis-subscriptions', () => ({
   __esModule: true,
-  RedisPubSub: vi.fn(),
+  RedisPubSub: vi.fn().mockImplementation(function (this: { publish: unknown }) {
+    this.publish = mockPublish
+  }),
 }))
 
 // The module memoises its client in module scope, so every case needs a fresh registry. The
@@ -120,6 +134,54 @@ describe('with Redis configured', () => {
       port: 6379,
       password: 'sesame',
     })
+  })
+
+  it('never queues or repeats a publish, and never gives up on a subscription', async () => {
+    const { pubsub, Redis } = await load()
+    pubsub()
+    const [publisherOptions, subscriberOptions] = (Redis.mock.calls as unknown[][]).map(
+      ([options]) => options as RedisOptions,
+    )
+
+    expect(publisherOptions).toMatchObject({
+      enableOfflineQueue: false,
+      autoResendUnfulfilledCommands: false,
+      commandTimeout: 2_000,
+    })
+    expect(subscriberOptions).toMatchObject({ maxRetriesPerRequest: null })
+  })
+
+  it('logs a connection error instead of leaving it unhandled', async () => {
+    const { pubsub, Redis } = await load()
+    pubsub()
+    const [client] = Redis.mock.instances as unknown as { on: ReturnType<typeof vi.fn> }[]
+    const [event, onError] = client.on.mock.calls[0] as [string, (error: Error) => void]
+
+    onError(new Error('connection refused'))
+
+    expect(event).toBe('error')
+    expect(mockWarn).toHaveBeenCalledWith(expect.any(String), 'connection refused')
+  })
+
+  it('hands a publish on to Redis', async () => {
+    const { pubsub } = await load()
+    mockPublish.mockResolvedValueOnce()
+
+    await pubsub().publish('CHANNEL', { id: 1 })
+
+    expect(mockPublish).toHaveBeenCalledWith('CHANNEL', { id: 1 })
+    expect(mockWarn).not.toHaveBeenCalled()
+  })
+
+  // Most callers `void` their publish: a rejection here would end the process.
+  it('swallows a failed publish, and says so', async () => {
+    const { pubsub } = await load()
+    const error = new Error('Stream is not writeable')
+    mockPublish.mockRejectedValueOnce(error)
+
+    await expect(pubsub().publish('CHANNEL', {})).resolves.toBeUndefined()
+
+    expect(mockWarn).toHaveBeenCalledWith(expect.stringContaining('CHANNEL'), error)
   })
 
   it('backs off linearly and caps the retry delay at two seconds', async () => {

@@ -75,8 +75,11 @@ export async function writeSetting(
   actor: string,
 ): Promise<void> {
   await db.write({
-    query: `MERGE (s:Setting {namespace: $namespace, key: $key})
-            SET s.id = $id,
+    // MERGE on `id`, the property the constraint is on: only that makes two instances seeding the
+    // same key at the same moment wait for each other instead of colliding.
+    query: `MERGE (s:Setting {id: $id})
+            SET s.namespace = $namespace,
+                s.key = $key,
                 s.value = $value,
                 s.updatedAt = toString(datetime()),
                 s.updatedBy = $actor`,

@@ -26,10 +26,15 @@ services:
       - minio
       - minio-mc
       - mailserver
+      - redis
     build:
       target: test
     environment:
       - NODE_ENV=test
+      # Tested on what production runs on, not on the process-local fallback development uses.
+      - REDIS_DOMAIN=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=redis-test-password
       - AWS_ACCESS_KEY_ID=minio
       - AWS_SECRET_ACCESS_KEY=12341234
       - AWS_ENDPOINT=http:/minio:9000
@@ -58,6 +63,27 @@ services:
       # `<backend>/src/graphql/../../../webapp`, and the backend lives at /app.
       - ./webapp:/webapp:ro
 
+  # The second backend of test/multi-instance. The only thing the two share is Neo4j and Redis, and
+  # that is the point: an event only gets from one to the other the way it does in production.
+  backend-2:
+    image: ghcr.io/ocelot-social-community/ocelot-social/backend:test
+    profiles:
+      - multi-instance
+    depends_on:
+      - neo4j
+      - redis
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=test
+      - NEO4J_URI=bolt://neo4j:7687
+      # The same as the first one's: the token of a user is issued for one network, not one pod.
+      - GRAPHQL_URI=http://backend:4000
+      - CLIENT_URI=http://webapp:3000
+      - REDIS_DOMAIN=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=redis-test-password
+
   maintenance:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ghcr.io/ocelot-social-community/ocelot-social/maintenance:test
@@ -76,6 +102,11 @@ services:
     #  - NEO4J_dbms_connectors_default__listen__address=0.0.0.0
     #  - NEO4J_dbms_connector_http_listen__address=0.0.0.0:7474
     #  - NEO4J_dbms_connector_https_listen__address=0.0.0.0:7473
+
+  # Only ever a message bus here, so nothing is written to disk.
+  redis:
+    image: redis:8.2-alpine
+    command: redis-server --requirepass redis-test-password --save "" --appendonly no
 
   mailserver:
     image: maildev/maildev:3.0.0
