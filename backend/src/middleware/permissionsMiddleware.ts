@@ -177,7 +177,7 @@ const groupsEnabled = rule({ cache: 'contextual' })(
 // Gates the dev/test-only cache-resync trigger: db:reset/db:seed and the e2e harness
 // must be able to call it when no users exist yet (right after a wipe), so it is open
 // outside production and fully disabled in production. Prod cache resyncs are handled
-// by a rolling restart (each instance re-reads the DB on boot), not this mutation.
+// by the periodic resync (context/cacheResync.ts) or a restart, not this mutation.
 const isNotProduction = rule({ cache: 'contextual' })(async () => !CONFIG.PRODUCTION)
 
 const onlyYourself = rule({
@@ -997,7 +997,7 @@ export default shield(
       setBrandingComposition: hasPermission('branding.manage'),
 
       // Cache resync: dev/test recovery hook only (db:reset/seed + e2e). Disabled in
-      // production — fleet resyncs there are done via a rolling restart.
+      // production — instances resync there by themselves (context/cacheResync.ts).
       resyncCaches: isNotProduction,
 
       saveCategorySettings: isAuthenticated,

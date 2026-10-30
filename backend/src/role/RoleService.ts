@@ -11,13 +11,20 @@
 // Multi-instance: eventual consistency via Redis pub/sub; same-name concurrent
 // writes resolve last-writer-wins (same trade-off as policy).
 
+import { isDeepStrictEqual } from 'node:util'
+
 import databaseContext from '@context/database'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
 import { allPermissionKeys, sanitizePermissions } from '@src/permission'
 
 import { DEFAULT_ROLES, MANDATORY_ROLE_NAMES } from './defaults'
-import { deleteRole as dbDeleteRole, renameRole as dbRenameRole, writeRole } from './repository'
+import {
+  deleteRole as dbDeleteRole,
+  readAllRoles,
+  renameRole as dbRenameRole,
+  writeRole,
+} from './repository'
 import { OWNER_ROLE, USER_ROLE } from './types'
 import { seedDefaultRoleNodes } from './userRoleEdges'
 
@@ -136,6 +143,35 @@ export class RoleService {
     // Same invariant as init(): a resync that lost owner/user left a broken cache, so
     // fail loudly rather than report success with a half-empty role set.
     this.assertMandatoryRoles('reload')
+  }
+
+  // Bring the cache back in line with the DB on a live instance, for a change event it never
+  // got. Same rules as PolicyService.resync: it only reads, a change during the read drops that
+  // read, and the version only moves if a role differs.
+  //
+  // A read without owner or user keeps the cache: authorization runs on it, so the last good
+  // role set beats a broken one, and unlike at boot the instance is already serving.
+  async resync(): Promise<void> {
+    const changesBefore = this.changes
+    const roles = await readAllRoles(this.db)
+    if (this.changes !== changesBefore) {
+      return
+    }
+
+    const cache = new Map(roles.map((role) => [role.name, role]))
+    if (MANDATORY_ROLE_NAMES.some((name) => !cache.has(name))) {
+      // eslint-disable-next-line no-console
+      console.warn('[roles] resync skipped: a mandatory role is missing in the database.')
+      return
+    }
+    if (isDeepStrictEqual(cache, this.cache)) {
+      return
+    }
+    this.cache.clear()
+    for (const [name, role] of cache) {
+      this.cache.set(name, role)
+    }
+    this.changes += 1
   }
 
   shutdown(): void {

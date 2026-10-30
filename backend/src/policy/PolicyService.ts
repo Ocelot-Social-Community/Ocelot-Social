@@ -19,6 +19,8 @@
 // MERGE is atomic per query, but ordering across instances is not enforced).
 
 /* eslint-disable security/detect-object-injection */ // keys are PolicyKeys from the schema, never user input
+import { isDeepStrictEqual } from 'node:util'
+
 import databaseContext from '@context/database'
 
 import {
@@ -194,6 +196,43 @@ export class PolicyService {
   async reload(): Promise<void> {
     this.cache = {}
     await this.loadFromDb()
+    this.changes += 1
+  }
+
+  // Bring the cache back in line with the DB on a live instance, for a change event it never
+  // got. Unlike reload() this only reads, because it runs on every instance on a timer: an
+  // instance on an older schema must not reseed a value it cannot validate (hence the invalid
+  // value keeps what the cache holds), and the cache is swapped at once, so `get()` never falls
+  // back to a default in between.
+  //
+  // A change during the read may be newer than what was read, so that read is dropped: the next
+  // run sees the change in the DB. The version only moves if a value differs, otherwise every
+  // open subscription would read its viewer again after each run (see context/subscription.ts).
+  // So does lastChange: reset() deletes the row it would be read from, and the next run with
+  // nothing to do must not take that reset away from the admin UI.
+  async resync(): Promise<void> {
+    const changesBefore = this.changes
+    const dbValues = await readAllSettings(this.db, POLICY_NAMESPACE)
+    const lastChange = await readLastChange(this.db, POLICY_NAMESPACE)
+    if (this.changes !== changesBefore) {
+      return
+    }
+
+    const cache: Partial<NetworkPolicy> = {}
+    for (const key of allKeys()) {
+      const stored = dbValues[key]
+      if (stored === undefined) {
+        // No row is what reset() leaves behind: the key is at its configured default.
+        cache[key] = this.getDefault(key) as never
+      } else {
+        cache[key] = (this.isValidValue(key, stored) ? stored : this.cache[key]) as never
+      }
+    }
+    if (isDeepStrictEqual(cache, this.cache)) {
+      return
+    }
+    this.cache = cache
+    this.lastChange = lastChange ?? undefined
     this.changes += 1
   }
 

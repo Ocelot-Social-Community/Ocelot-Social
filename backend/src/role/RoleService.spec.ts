@@ -691,6 +691,108 @@ describe(RoleService, () => {
   // The DB write is the commit point and the local cache is already updated by the time the
   // broadcast goes out. A pubsub failure therefore costs peers a stale cache until the next
   // change — bad, but far better than failing a role update the database has already accepted.
+  describe('resync', () => {
+    type DbArg = ConstructorParameters<typeof RoleService>[0]
+    type Role = (typeof DEFAULT_ROLES)[number]
+
+    const record = (role: Role) => ({
+      get: (key: string) => {
+        if (key === 'permissions') {
+          return JSON.stringify(role.permissions)
+        }
+        return key === 'protected' ? role.protected : role.name
+      },
+    })
+
+    // The roles the database holds, swappable by the test; a write would be a failure.
+    const makeService = async () => {
+      const database = { roles: [...DEFAULT_ROLES], onRead: () => {} }
+      const write = vi.fn()
+      const fakeDb = {
+        query: async () => {
+          database.onRead()
+          return Promise.resolve({ records: database.roles.map(record) })
+        },
+        write,
+      } as unknown as DbArg
+      const service = new RoleService(fakeDb)
+      await service.init()
+      return { service, database, write }
+    }
+
+    const withoutModeratorPermissions = (roles: readonly Role[]) =>
+      roles.map((role) =>
+        role.name === MODERATOR_ROLE ? { ...role, permissions: [] as Role['permissions'] } : role,
+      )
+
+    it('picks up a changed role whose event this instance missed', async () => {
+      const { service, database } = await makeService()
+      database.roles = withoutModeratorPermissions(DEFAULT_ROLES)
+
+      await service.resync()
+
+      expect(service.permissionsForRole(MODERATOR_ROLE).size).toBe(0)
+      expect(service.version).toBe(1)
+    })
+
+    it('drops a role deleted elsewhere', async () => {
+      const { service, database } = await makeService()
+      database.roles = DEFAULT_ROLES.filter((role) => role.name !== ADMIN_ROLE)
+
+      await service.resync()
+
+      expect(service.getRole(ADMIN_ROLE)).toBeUndefined()
+    })
+
+    it('leaves the version alone when nothing changed, however the cache is ordered', async () => {
+      const { service, database } = await makeService()
+      database.roles = [...DEFAULT_ROLES].reverse()
+
+      await service.resync()
+
+      expect(service.version).toBe(0)
+    })
+
+    it('writes nothing, not even a missing default role', async () => {
+      const { service, database, write } = await makeService()
+      write.mockClear()
+      database.roles = DEFAULT_ROLES.filter((role) => role.name !== ADMIN_ROLE)
+
+      await service.resync()
+
+      expect(write).not.toHaveBeenCalled()
+    })
+
+    it('keeps the cache when a mandatory role is missing from the read', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const { service, database } = await makeService()
+      database.roles = DEFAULT_ROLES.filter((role) => role.name !== OWNER_ROLE)
+
+      await service.resync()
+
+      expect(service.getRole(OWNER_ROLE)).toBeDefined()
+      expect(service.version).toBe(0)
+      expect(warn).toHaveBeenCalledTimes(1)
+    })
+
+    it('drops a read that a change event overtook', async () => {
+      const { service, database } = await makeService()
+      database.onRead = () => {
+        service.applyExternalChange({
+          name: ADMIN_ROLE,
+          definition: { name: ADMIN_ROLE, protected: false, permissions: [] },
+          actor: 'remote-admin',
+          timestamp: 't',
+        })
+      }
+
+      await service.resync()
+
+      expect(service.permissionsForRole(ADMIN_ROLE).size).toBe(0)
+      expect(service.version).toBe(1)
+    })
+  })
+
   describe('broadcast failures do not fail the caller', () => {
     type DbArg = ConstructorParameters<typeof RoleService>[0]
 
