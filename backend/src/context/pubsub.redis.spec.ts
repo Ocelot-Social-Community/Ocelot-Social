@@ -27,7 +27,11 @@ describe.runIf(redisConfigured)('pubsub across two instances', () => {
     writer = await instance()
     reader = await instance()
     // A publisher has no offline queue: what it is handed before it is connected is dropped.
-    await once(writer.getPublisher(), 'ready')
+    // It may well be connected by now, and then 'ready' has come and gone.
+    const publisher = writer.getPublisher()
+    if (publisher.status !== 'ready') {
+      await once(publisher, 'ready')
+    }
   })
 
   afterAll(async () => {
