@@ -136,14 +136,18 @@ describe('with Redis configured', () => {
     })
   })
 
-  it('never queues a publish, and never gives up on a subscription', async () => {
+  it('never queues or repeats a publish, and never gives up on a subscription', async () => {
     const { pubsub, Redis } = await load()
     pubsub()
     const [publisherOptions, subscriberOptions] = (Redis.mock.calls as unknown[][]).map(
       ([options]) => options as RedisOptions,
     )
 
-    expect(publisherOptions).toMatchObject({ enableOfflineQueue: false })
+    expect(publisherOptions).toMatchObject({
+      enableOfflineQueue: false,
+      autoResendUnfulfilledCommands: false,
+      commandTimeout: 2_000,
+    })
     expect(subscriberOptions).toMatchObject({ maxRetriesPerRequest: null })
   })
 

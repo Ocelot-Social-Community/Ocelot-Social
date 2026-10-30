@@ -74,8 +74,12 @@ export const buildUser = async (id: string, role = 'user') => {
 export const resetDatabase = async () => {
   await cleanDatabase()
   // The wipe happens here, the caches live over there.
-  await query(FIRST, 'mutation { resyncCaches }')
-  await query(SECOND, 'mutation { resyncCaches }')
+  for (const backend of [FIRST, SECOND]) {
+    const { errors } = await query(backend, 'mutation { resyncCaches }')
+    if (errors) {
+      throw new Error(`resyncCaches failed on ${backend}: ${JSON.stringify(errors)}`)
+    }
+  }
 }
 
 const subscribers = async (channel: string) => {

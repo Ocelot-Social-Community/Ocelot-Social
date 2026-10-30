@@ -15,6 +15,10 @@ import type { RedisOptions } from 'ioredis'
 // same broker, but consistency across environments is worth the singleton.
 let instance: PubSub | RedisPubSub | undefined
 
+// Far above what a publish takes, even from a pod under CPU pressure: running into it loses a live
+// event, while it only ever costs time when Redis is gone anyway.
+const PUBLISH_TIMEOUT_MS = 2_000
+
 // An event crosses Redis as JSON, while the in-process PubSub hands on the object itself. A Neo4j
 // integer does not survive that: it arrives as `{ low, high }`, which no Int field can serialize.
 const serializer = (event: unknown) =>
@@ -47,9 +51,15 @@ export default () => {
   const onError = (error: Error) => {
     ocelotLogger.warn('Redis connection failed', error.message)
   }
-  // No queue for a publisher: what happens while Redis is away is lost either way, and a mutation
-  // awaiting publish() would sit through every retry first, for an answer nobody needs.
-  const publisher = new Redis({ ...options, enableOfflineQueue: false }).on('error', onError)
+  // No queue for a publisher, and no second try: what happens while Redis is away is lost either
+  // way, and a mutation awaiting publish() would sit through every retry first, for an answer
+  // nobody needs. The timeout is for a Redis that stopped answering without closing the socket.
+  const publisher = new Redis({
+    ...options,
+    enableOfflineQueue: false,
+    autoResendUnfulfilledCommands: false,
+    commandTimeout: PUBLISH_TIMEOUT_MS,
+  }).on('error', onError)
   // No limit for a subscriber: it waits for Redis, however long that takes. Giving up would throw
   // out of init() at boot, and out of an open subscription later on.
   const subscriber = new Redis({ ...options, maxRetriesPerRequest: null }).on('error', onError)
