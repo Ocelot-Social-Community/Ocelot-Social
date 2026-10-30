@@ -39,7 +39,10 @@ export const closeClients = async () => {
 export const eventually = async <T>(read: () => Promise<T>, accept: (value: T) => boolean) => {
   const deadline = Date.now() + 15_000
   let value = await read()
-  while (!accept(value) && Date.now() < deadline) {
+  while (!accept(value)) {
+    if (Date.now() >= deadline) {
+      throw new Error(`Still not there after 15s, last read: ${JSON.stringify(value)}`)
+    }
     await sleep(200)
     value = await read()
   }
