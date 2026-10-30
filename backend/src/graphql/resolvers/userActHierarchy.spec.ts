@@ -130,7 +130,10 @@ describe('act-on hierarchy', () => {
       const before = principalEpoch('plain-user')
       await mutate({ mutation: DISABLE_USER, variables: { id: 'plain-user', disable: true } })
 
-      expect(principalEpoch('plain-user')).toBe(before + 1)
+      // The count moves when the event comes back, and over Redis that is not at once.
+      await vi.waitFor(() => {
+        expect(principalEpoch('plain-user')).toBe(before + 1)
+      })
     })
 
     it('lets a moderator re-enable a plain user', async () => {
