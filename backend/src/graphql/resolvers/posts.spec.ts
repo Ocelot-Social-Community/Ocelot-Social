@@ -65,8 +65,13 @@ let variables
 // through the real schema (input coercion, transaction, rollback) rather than by calling
 // the resolver by hand.
 const CreatePostWithImage = parse(`
-  mutation CreatePostWithImage($title: String!, $content: String!, $image: ImageInput) {
-    CreatePost(title: $title, content: $content, image: $image) {
+  mutation CreatePostWithImage(
+    $title: String!
+    $content: String!
+    $image: ImageInput
+    $categoryIds: [ID]
+  ) {
+    CreatePost(title: $title, content: $content, image: $image, categoryIds: $categoryIds) {
       id
     }
   }
@@ -448,6 +453,7 @@ describe('CreatePost', () => {
         const { errors } = await mutate({
           mutation: CreatePostWithImage,
           variables: {
+            categoryIds: ['cat9'],
             title: 'I am a title',
             content: 'Some content',
             image: { alt: 'metadata without a file' },
@@ -469,6 +475,7 @@ describe('CreatePost', () => {
         const { errors } = await mutate({
           mutation: CreatePostWithImage,
           variables: {
+            categoryIds: ['cat9'],
             title: 'I am a title',
             content: 'Some content',
             image: { alt: 'metadata without a file' },
@@ -1154,6 +1161,72 @@ describe('CreatePost', () => {
         })
       })
     })
+
+    // As for groups: a minimum and a maximum while categories are active, and no minimum on a
+    // network whose category DB is empty — there is nothing to choose there.
+    describe('number of categories', () => {
+      it('throws "Too few categories." without any', async () => {
+        const { errors } = await mutate({
+          mutation: CreatePost,
+          variables: { ...variables, categoryIds: null },
+        })
+
+        expect(errors?.[0]).toHaveProperty('message', 'Too few categories (at least 1).')
+      })
+
+      it('throws "Too few categories." for an empty list', async () => {
+        const { errors } = await mutate({
+          mutation: CreatePost,
+          variables: { ...variables, categoryIds: [] },
+        })
+
+        expect(errors?.[0]).toHaveProperty('message', 'Too few categories (at least 1).')
+      })
+
+      it('throws "Too many categories." for four', async () => {
+        const { errors } = await mutate({
+          mutation: CreatePost,
+          variables: { ...variables, categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'] },
+        })
+
+        expect(errors?.[0]).toHaveProperty('message', 'Too many categories (at most 3).')
+      })
+
+      describe('but no categories exist in the database (empty category DB)', () => {
+        beforeEach(async () => {
+          const session = database.driver.session()
+          try {
+            await session.run('MATCH (category:Category) DETACH DELETE category')
+          } finally {
+            await session.close()
+          }
+        })
+
+        it('creates the post without categories', async () => {
+          await expect(
+            mutate({ mutation: CreatePost, variables: { ...variables, categoryIds: [] } }),
+          ).resolves.toMatchObject({
+            data: { CreatePost: { title: 'I am a title', categories: [] } },
+            errors: undefined,
+          })
+        })
+      })
+    })
+
+    describe('categories switched off', () => {
+      beforeEach(() => {
+        policy = { ...policy, categoriesActive: false }
+      })
+
+      it('creates the post without categories', async () => {
+        await expect(
+          mutate({ mutation: CreatePost, variables: { ...variables, categoryIds: [] } }),
+        ).resolves.toMatchObject({
+          data: { CreatePost: { title: 'I am a title' } },
+          errors: undefined,
+        })
+      })
+    })
   })
 })
 
@@ -1501,6 +1574,48 @@ describe('UpdatePost', () => {
                 },
               },
             },
+            errors: undefined,
+          })
+        })
+      })
+    })
+
+    // As for groups: a minimum and a maximum while categories are active, and no minimum on a
+    // network whose category DB is empty — there is nothing to choose there.
+    describe('number of categories', () => {
+      it('throws "Too few categories." for an empty list', async () => {
+        const { errors } = await mutate({
+          mutation: UpdatePost,
+          variables: { ...variables, categoryIds: [] },
+        })
+
+        expect(errors?.[0]).toHaveProperty('message', 'Too few categories (at least 1).')
+      })
+
+      it('throws "Too many categories." for four', async () => {
+        const { errors } = await mutate({
+          mutation: UpdatePost,
+          variables: { ...variables, categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'] },
+        })
+
+        expect(errors?.[0]).toHaveProperty('message', 'Too many categories (at most 3).')
+      })
+
+      describe('but no categories exist in the database (empty category DB)', () => {
+        beforeEach(async () => {
+          const session = database.driver.session()
+          try {
+            await session.run('MATCH (category:Category) DETACH DELETE category')
+          } finally {
+            await session.close()
+          }
+        })
+
+        it('updates the post with an empty list', async () => {
+          await expect(
+            mutate({ mutation: UpdatePost, variables: { ...variables, categoryIds: [] } }),
+          ).resolves.toMatchObject({
+            data: { UpdatePost: { id: newlyCreatedPost.id, title: 'New title' } },
             errors: undefined,
           })
         })

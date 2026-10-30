@@ -507,6 +507,8 @@
     "POST_PIN_FEATURE_DISABLED": "Pinning posts is not enabled.",
     "POST_PIN_LIMIT_REACHED": "The maximum number of pinned posts has been reached. Unpin another post first.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "A post with this slug already exists.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Too few topics selected (at least {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Too many topics selected (at most {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "The confirmation code is invalid.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "This username is already taken.",
     "REPORT_TARGET_IS_OWN": "You cannot report yourself or your own content.",
@@ -592,7 +594,7 @@
     "previousLocation": "Previous location: {location}",
     "scrollToLocationMap": "Scroll to map",
     "validations": {
-      "categories": "Please select between one and three topics.",
+      "categories": "Please select between {min} and {max} topics.",
       "contentNotEmpty": "Please enter some content.",
       "email": "Please enter a valid e-mail address.",
       "eventLocationNameLength": "The address must be between {min} and {max} characters long.",

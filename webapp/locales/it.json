@@ -507,6 +507,8 @@
     "POST_PIN_FEATURE_DISABLED": "Fissare le pubblicazioni non è attivato.",
     "POST_PIN_LIMIT_REACHED": "È stato raggiunto il numero massimo di pubblicazioni fissate. Rimuovi prima un'altra pubblicazione fissata.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Esiste già una pubblicazione con questo slug.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Sono stati selezionati troppo pochi argomenti (almeno {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Sono stati selezionati troppi argomenti (al massimo {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Il codice di conferma non è valido.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Questo nome utente è già in uso.",
     "REPORT_TARGET_IS_OWN": "Non puoi segnalare né te stesso né i tuoi contenuti.",
@@ -592,7 +594,7 @@
     "previousLocation": "Posizione precedente: {location}",
     "scrollToLocationMap": "Scorri fino alla mappa",
     "validations": {
-      "categories": "Selezionare tra uno e tre argomenti.",
+      "categories": "Selezionare tra {min} e {max} argomenti.",
       "contentNotEmpty": "Inserire del contenuto.",
       "email": "Inserire un indirizzo e-mail valido.",
       "eventLocationNameLength": "L'indirizzo deve essere compreso tra {min} e {max} caratteri.",

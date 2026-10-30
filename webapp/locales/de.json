@@ -507,6 +507,8 @@
     "POST_PIN_FEATURE_DISABLED": "Das Anheften von Beiträgen ist nicht aktiviert.",
     "POST_PIN_LIMIT_REACHED": "Die maximale Anzahl angehefteter Beiträge ist erreicht. Löse zuerst einen anderen Beitrag.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Es gibt bereits einen Beitrag mit diesem Slug.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Es sind zu wenige Themen ausgewählt (mindestens {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Es sind zu viele Themen ausgewählt (höchstens {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Der Bestätigungscode ist ungültig.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Dieser Nutzername ist bereits vergeben.",
     "REPORT_TARGET_IS_OWN": "Du kannst weder dich selbst noch deine eigenen Inhalte melden.",
@@ -592,7 +594,7 @@
     "previousLocation": "Vorheriger Ort: {location}",
     "scrollToLocationMap": "Zur Karte scrollen",
     "validations": {
-      "categories": "Bitte ein bis drei Themen auswählen.",
+      "categories": "Bitte {min} bis {max} Themen auswählen.",
       "contentNotEmpty": "Bitte einen Inhalt eingeben.",
       "email": "Bitte eine gültige E-Mail-Adresse eingeben.",
       "eventLocationNameLength": "Die Adresse muss zwischen {min} und {max} Zeichen lang sein.",
