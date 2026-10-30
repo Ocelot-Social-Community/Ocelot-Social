@@ -1,3 +1,5 @@
+import { EventEmitter, once } from 'node:events'
+
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { CACHE_RESYNC_INTERVAL_MS, startCacheResync, stopCacheResync } from './cacheResync'
@@ -61,6 +63,23 @@ describe('cacheResync', () => {
 
     expect(policyResync).toHaveBeenCalledTimes(2)
     expect(warn).toHaveBeenCalledTimes(1)
+  })
+
+  it('skips a run while the last one is still reading, and carries on after it', async () => {
+    const database = new EventEmitter()
+    policyResync.mockImplementationOnce(async () => {
+      await once(database, 'answered')
+    })
+    startCacheResync()
+
+    await vi.advanceTimersByTimeAsync(CACHE_RESYNC_INTERVAL_MS * 2)
+
+    expect(policyResync).toHaveBeenCalledTimes(1)
+
+    database.emit('answered')
+    await vi.advanceTimersByTimeAsync(CACHE_RESYNC_INTERVAL_MS)
+
+    expect(policyResync).toHaveBeenCalledTimes(2)
   })
 
   it('stops', async () => {

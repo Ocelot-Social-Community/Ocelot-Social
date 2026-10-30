@@ -6,15 +6,24 @@ import { getRoleService } from '@src/role'
 export const CACHE_RESYNC_INTERVAL_MS = 60_000
 
 let timer: ReturnType<typeof setInterval> | null = null
+let running = false
 
 // The services keep what they have when a read fails, so a run that fails costs one interval.
+//
+// One run at a time: on a slow database an older read could finish after a newer one and win,
+// and a run that is still reading has nothing to gain from a second one.
 const resyncCaches = async () => {
+  if (running) {
+    return
+  }
+  running = true
   const results = await Promise.allSettled([getPolicyService().resync(), getRoleService().resync()])
   for (const result of results) {
     if (result.status === 'rejected') {
       ocelotLogger.warn('Could not resync the policy and role caches', result.reason)
     }
   }
+  running = false
 }
 
 // Pubsub keeps nothing, so an event an instance misses is gone, and only the database can tell.

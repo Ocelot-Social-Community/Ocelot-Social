@@ -206,14 +206,22 @@ export class PolicyService {
   // A change during the read may be newer than what was read, so that read is dropped: the next
   // run sees the change in the DB. The version only moves if a value differs, otherwise every
   // open subscription would read its viewer again after each run (see context/subscription.ts).
-  // So does lastChange: reset() deletes the row it would be read from, and the next run with
-  // nothing to do must not take that reset away from the admin UI.
+  // lastChange is taken over on its own, as saving the same value again changes only that, and
+  // only if it is newer: reset() deletes the row it is read from, so the DB may know less than
+  // this instance does.
   async resync(): Promise<void> {
     const changesBefore = this.changes
     const dbValues = await readAllSettings(this.db, POLICY_NAMESPACE)
     const lastChange = await readLastChange(this.db, POLICY_NAMESPACE)
     if (this.changes !== changesBefore) {
       return
+    }
+
+    if (
+      lastChange &&
+      (!this.lastChange || Date.parse(lastChange.timestamp) > Date.parse(this.lastChange.timestamp))
+    ) {
+      this.lastChange = lastChange
     }
 
     const cache: Partial<NetworkPolicy> = {}
@@ -232,7 +240,6 @@ export class PolicyService {
       return
     }
     this.cache = cache
-    this.lastChange = lastChange ?? undefined
     this.changes += 1
   }
 

@@ -538,11 +538,28 @@ describe('PolicyService', () => {
       expect(svc.version).toBe(1)
     })
 
-    it('keeps a reset in the last change when nothing else moved', async () => {
+    it('takes over a newer last change of a value saved again, without a new version', async () => {
+      const svc = await initialised({ publicRegistration: true })
+      await svc.set('publicRegistration', true, 'admin')
+      const version = svc.version
+      const lastChange = { actor: 'remote-admin', timestamp: '2999-01-01T00:00:00.000Z' }
+      readAllSettings.mockResolvedValue({ publicRegistration: true })
+      readLastChange.mockResolvedValueOnce(lastChange)
+
+      await svc.resync()
+
+      expect(svc.getLastChange()).toEqual(lastChange)
+      expect(svc.version).toBe(version)
+    })
+
+    it('keeps a reset in the last change, which the DB no longer knows', async () => {
       const svc = await initialised()
       await svc.reset('publicRegistration', 'admin')
       const lastChange = svc.getLastChange()
-      readLastChange.mockResolvedValueOnce({ actor: 'older', timestamp: 't' })
+      readLastChange.mockResolvedValueOnce({
+        actor: 'older',
+        timestamp: '2000-01-01T00:00:00.000Z',
+      })
 
       await svc.resync()
 
