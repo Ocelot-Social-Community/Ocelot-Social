@@ -578,6 +578,17 @@ describe('PolicyService', () => {
       expect(writeSetting).not.toHaveBeenCalled()
     })
 
+    // groupsEnabled: false must not turn into its default of true because of a broken row.
+    it('keeps the cached value of a row that cannot be read', async () => {
+      const svc = await initialised({ publicRegistration: true })
+      readAllSettings.mockResolvedValue({ publicRegistration: undefined })
+
+      await svc.resync()
+
+      expect(svc.get('publicRegistration')).toBe(true)
+      expect(svc.version).toBe(0)
+    })
+
     it('writes nothing for a missing row either', async () => {
       const svc = await initialised({ publicRegistration: true })
       readAllSettings.mockResolvedValue({})

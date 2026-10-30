@@ -81,6 +81,18 @@ describe('writeSetting / readAllSettings', () => {
     expect(result.records[0].get('id')).toBe('policy.publicRegistration')
   })
 
+  it('keeps the key of malformed JSON apart from a row that is gone', async () => {
+    await db.write({
+      query: `CREATE (:Setting {id: 'policy.broken', namespace: $namespace, key: 'broken', value: 'not-json'})`,
+      variables: { namespace: POLICY_NAMESPACE },
+    })
+
+    const settings = await readAllSettings(db, POLICY_NAMESPACE)
+
+    expect(Object.keys(settings)).toContain('broken')
+    expect(settings.broken).toBeUndefined()
+  })
+
   it('skips entries with malformed JSON instead of throwing', async () => {
     await writeSetting(db, POLICY_NAMESPACE, 'publicRegistration', true, 'admin-1')
     // Inject a node whose value is not valid JSON.

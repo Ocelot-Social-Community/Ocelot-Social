@@ -226,11 +226,11 @@ export class PolicyService {
 
     const cache: Partial<NetworkPolicy> = {}
     for (const key of allKeys()) {
-      const stored = dbValues[key]
-      if (stored === undefined) {
+      if (!(key in dbValues)) {
         // No row is what reset() leaves behind: the key is at its configured default.
         cache[key] = this.getDefault(key) as never
       } else {
+        const stored = dbValues[key]
         cache[key] = (this.isValidValue(key, stored) ? stored : this.cache[key]) as never
       }
     }
