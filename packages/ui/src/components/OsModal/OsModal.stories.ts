@@ -23,8 +23,6 @@ interface PlaygroundArgs {
 }
 
 export const Playground: StoryObj<PlaygroundArgs> = {
-  // `open` belongs to the button below, not to a control that could not follow it.
-  parameters: { controls: { exclude: ['open'] } },
   argTypes: {
     title: { control: 'text' },
     cancelLabel: { control: 'text' },
