@@ -496,6 +496,150 @@ describe('PolicyService', () => {
     })
   })
 
+  describe('resync()', () => {
+    const initialised = async (stored: Record<string, unknown> = {}) => {
+      readAllSettings.mockResolvedValue(stored)
+      const svc = new PolicyService(dbStub)
+      await svc.init({})
+      writeSetting.mockClear()
+      return svc
+    }
+
+    it('picks up a change whose event this instance missed', async () => {
+      const svc = await initialised({ publicRegistration: false })
+      const lastChange = { actor: 'remote-admin', timestamp: 't' }
+      readAllSettings.mockResolvedValue({ publicRegistration: true })
+      readLastChange.mockResolvedValueOnce(lastChange)
+
+      await svc.resync()
+
+      expect(svc.get('publicRegistration')).toBe(true)
+      expect(svc.getLastChange()).toEqual(lastChange)
+      expect(svc.version).toBe(1)
+    })
+
+    it('leaves the version alone when nothing changed', async () => {
+      const svc = await initialised({ publicRegistration: true })
+
+      await svc.resync()
+      await svc.resync()
+
+      expect(svc.get('publicRegistration')).toBe(true)
+      expect(svc.version).toBe(0)
+    })
+
+    it('falls back to the default for a row another instance reset', async () => {
+      const svc = await initialised({ publicRegistration: true })
+      readAllSettings.mockResolvedValue({})
+
+      await svc.resync()
+
+      expect(svc.get('publicRegistration')).toBe(svc.getDefault('publicRegistration'))
+      expect(svc.version).toBe(1)
+    })
+
+    it('takes over a newer last change of a value saved again, without a new version', async () => {
+      const svc = await initialised({ publicRegistration: true })
+      await svc.set('publicRegistration', true, 'admin')
+      const version = svc.version
+      const lastChange = { actor: 'remote-admin', timestamp: '2999-01-01T00:00:00.000Z' }
+      readAllSettings.mockResolvedValue({ publicRegistration: true })
+      readLastChange.mockResolvedValueOnce(lastChange)
+
+      await svc.resync()
+
+      expect(svc.getLastChange()).toEqual(lastChange)
+      expect(svc.version).toBe(version)
+    })
+
+    it('keeps a reset in the last change, which the DB no longer knows', async () => {
+      const svc = await initialised()
+      await svc.reset('publicRegistration', 'admin')
+      const lastChange = svc.getLastChange()
+      readLastChange.mockResolvedValueOnce({
+        actor: 'older',
+        timestamp: '2000-01-01T00:00:00.000Z',
+      })
+
+      await svc.resync()
+
+      expect(svc.getLastChange()).toEqual(lastChange)
+    })
+
+    // An instance on an older schema could otherwise overwrite a value only newer ones understand.
+    it('keeps the cached value of an invalid row, and writes nothing', async () => {
+      const svc = await initialised({ publicRegistration: true })
+      readAllSettings.mockResolvedValue({ publicRegistration: 'not-a-boolean' })
+
+      await svc.resync()
+
+      expect(svc.get('publicRegistration')).toBe(true)
+      expect(svc.version).toBe(0)
+      expect(writeSetting).not.toHaveBeenCalled()
+    })
+
+    // groupsEnabled: false must not turn into its default of true because of a broken row.
+    it('keeps the cached value of a row that cannot be read', async () => {
+      const svc = await initialised({ publicRegistration: true })
+      readAllSettings.mockResolvedValue({ publicRegistration: undefined })
+
+      await svc.resync()
+
+      expect(svc.get('publicRegistration')).toBe(true)
+      expect(svc.version).toBe(0)
+    })
+
+    it('writes nothing for a missing row either', async () => {
+      const svc = await initialised({ publicRegistration: true })
+      readAllSettings.mockResolvedValue({})
+
+      await svc.resync()
+
+      expect(writeSetting).not.toHaveBeenCalled()
+    })
+
+    it('drops a read that a change event overtook', async () => {
+      const svc = await initialised({ publicRegistration: false })
+      readAllSettings.mockImplementationOnce(async () => {
+        svc.applyExternalChange({
+          key: 'publicRegistration',
+          value: true,
+          actor: 'remote-admin',
+          timestamp: 't',
+        })
+        return Promise.resolve({ publicRegistration: false })
+      })
+
+      await svc.resync()
+
+      expect(svc.get('publicRegistration')).toBe(true)
+      expect(svc.version).toBe(1)
+    })
+
+    it('never shows a default while it reads', async () => {
+      const svc = await initialised({ publicRegistration: true })
+      let duringRead: boolean | undefined
+      readAllSettings.mockImplementationOnce(async () => {
+        duringRead = svc.get('publicRegistration')
+        return Promise.resolve({ publicRegistration: true })
+      })
+
+      await svc.resync()
+
+      expect(duringRead).toBe(true)
+    })
+
+    it('keeps the cache when the read fails', async () => {
+      const svc = await initialised({ publicRegistration: true })
+      readAllSettings.mockRejectedValueOnce(new Error('neo4j is away'))
+
+      await expect(svc.resync()).rejects.toThrow('neo4j is away')
+
+      expect(svc.get('publicRegistration')).toBe(true)
+      expect(svc.version).toBe(0)
+    })
+  })
+
   // videoConference is the only shipped key with hard env requirements (the three
   // LiveKit vars) and its effective value is what the videoCall.* permission gates read.
   // A var that is defined-but-blank — how Helm/compose render an unset value — must count

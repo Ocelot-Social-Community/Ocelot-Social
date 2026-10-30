@@ -32,9 +32,11 @@ export async function readAllSettings(
       out[key] = JSON.parse(rawValue)
       // eslint-disable-next-line no-catch-all/no-catch-all -- JSON.parse throws SyntaxError only
     } catch {
-      // Skip malformed JSON; bootstrap reseeds the key. There used to be an `instanceof
-      // SyntaxError` rethrow here for "anything unexpected" — JSON.parse has no other failure
-      // mode, so that arm could not run.
+      // Malformed JSON has no value, but the key stays: a row that cannot be read is not a row
+      // that is gone. Bootstrap reseeds it, resync keeps what it has. There used to be an
+      // `instanceof SyntaxError` rethrow here for "anything unexpected" — JSON.parse has no other
+      // failure mode, so that arm could not run.
+      out[key] = undefined
     }
   }
   return out

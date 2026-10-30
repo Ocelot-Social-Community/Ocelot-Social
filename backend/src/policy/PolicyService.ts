@@ -197,6 +197,52 @@ export class PolicyService {
     this.changes += 1
   }
 
+  // Bring the cache back in line with the DB on a live instance, for a change event it never
+  // got. Unlike reload() this only reads, because it runs on every instance on a timer: an
+  // instance on an older schema must not reseed a value it cannot validate (hence the invalid
+  // value keeps what the cache holds), and the cache is swapped at once, so `get()` never falls
+  // back to a default in between.
+  //
+  // A change during the read may be newer than what was read, so that read is dropped: the next
+  // run sees the change in the DB. The version only moves if a value differs, otherwise every
+  // open subscription would read its viewer again after each run (see context/subscription.ts).
+  // lastChange is taken over on its own, as saving the same value again changes only that, and
+  // only if it is newer: reset() deletes the row it is read from, so the DB may know less than
+  // this instance does.
+  async resync(): Promise<void> {
+    const changesBefore = this.changes
+    const dbValues = await readAllSettings(this.db, POLICY_NAMESPACE)
+    const lastChange = await readLastChange(this.db, POLICY_NAMESPACE)
+    if (this.changes !== changesBefore) {
+      return
+    }
+
+    if (
+      lastChange &&
+      (!this.lastChange || Date.parse(lastChange.timestamp) > Date.parse(this.lastChange.timestamp))
+    ) {
+      this.lastChange = lastChange
+    }
+
+    const cache: Partial<NetworkPolicy> = {}
+    for (const key of allKeys()) {
+      if (!(key in dbValues)) {
+        // No row is what reset() leaves behind: the key is at its configured default.
+        cache[key] = this.getDefault(key) as never
+      } else {
+        const stored = dbValues[key]
+        cache[key] = (this.isValidValue(key, stored) ? stored : this.cache[key]) as never
+      }
+    }
+    // By hand, not with node:util: the e2e tests bundle this file through db/factories, and their
+    // webpack cannot read `node:` imports.
+    if (allKeys().every((key) => JSON.stringify(cache[key]) === JSON.stringify(this.cache[key]))) {
+      return
+    }
+    this.cache = cache
+    this.changes += 1
+  }
+
   shutdown(): void {
     if (this.subscriptionId !== undefined && this.pubsub) {
       this.pubsub.unsubscribe(this.subscriptionId)

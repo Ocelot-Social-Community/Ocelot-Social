@@ -268,7 +268,7 @@ Gewinn: kein RWO-Lock mehr; eine verspätet startende Datenbank wird bis zu 25 M
 
 ### Phase 2 — Redis, dann echtes Zero-Downtime
 
-1. Redis ins Chart aufnehmen (oder extern bereitstellen) und `REDIS_DOMAIN`/`REDIS_PORT`/`REDIS_PASSWORD` verdrahten. `pubsub.ts` schaltet dann von allein auf `RedisPubSub` um — kein Codechange nötig.
+1. Redis ins Chart aufnehmen (oder extern bereitstellen) und `REDIS_DOMAIN`/`REDIS_PORT`/`REDIS_PASSWORD` verdrahten. `pubsub.ts` schaltet dann von allein auf `RedisPubSub` um — kein Codechange nötig. Verpasste `policy.changed`-/`roles.changed`-Events fängt der Abgleich gegen die Datenbank ab (`context/cacheResync.ts`, alle 60 s, siehe #10743): Eine Instanz kann so höchstens ein Intervall lang veraltete Policy oder Rollen ausliefern.
 2. Migrations-Konvention (Expand/Contract, Abschnitt 4) ins `CONTRIBUTING.md` aufnehmen und im Review einfordern.
 3. Erst danach `maxSurge: 1, maxUnavailable: 0` — und erst, wenn mindestens ein destruktiver Migrationszyklus sauber nach Expand-and-Contract durchgelaufen ist.
 

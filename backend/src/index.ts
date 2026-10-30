@@ -3,6 +3,7 @@ import './branding/bootstrap'
 
 import CONFIG from './config'
 import { serverDatabase } from './context'
+import { startCacheResync, stopCacheResync } from './context/cacheResync'
 import { listenForPrincipalChanges } from './context/principalEpoch'
 import pubsubContext from './context/pubsub'
 import { closeDriver } from './db/neo4j'
@@ -30,6 +31,9 @@ async function main() {
   // roles.changed for cross-instance cache sync. Also must complete before the
   // server accepts requests, since authorization resolves against the cache.
   await getRoleService().init(pubsub as unknown as RolePubSub)
+
+  // Change events can get lost: every instance also compares both caches to the database.
+  startCacheResync()
 
   // Count the changes to a user that open subscriptions must read their viewer again for.
   await listenForPrincipalChanges(pubsubContext())
@@ -86,6 +90,7 @@ async function main() {
   const shutdown = async () => {
     /* eslint-disable-next-line no-console */
     console.log('Shutting down...')
+    stopCacheResync()
     await server.stop()
     httpServer.close()
     await closeDriver()
