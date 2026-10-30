@@ -11,8 +11,6 @@
 // Multi-instance: eventual consistency via Redis pub/sub; same-name concurrent
 // writes resolve last-writer-wins (same trade-off as policy).
 
-import { isDeepStrictEqual } from 'node:util'
-
 import databaseContext from '@context/database'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
@@ -164,7 +162,11 @@ export class RoleService {
       console.warn('[roles] resync skipped: a mandatory role is missing in the database.')
       return
     }
-    if (isDeepStrictEqual(cache, this.cache)) {
+    // By hand, not with node:util: see PolicyService.resync.
+    const unchanged =
+      cache.size === this.cache.size &&
+      roles.every((role) => JSON.stringify(role) === JSON.stringify(this.cache.get(role.name)))
+    if (unchanged) {
       return
     }
     this.cache.clear()

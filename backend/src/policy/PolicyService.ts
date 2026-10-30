@@ -19,8 +19,6 @@
 // MERGE is atomic per query, but ordering across instances is not enforced).
 
 /* eslint-disable security/detect-object-injection */ // keys are PolicyKeys from the schema, never user input
-import { isDeepStrictEqual } from 'node:util'
-
 import databaseContext from '@context/database'
 
 import {
@@ -228,7 +226,9 @@ export class PolicyService {
         cache[key] = (this.isValidValue(key, stored) ? stored : this.cache[key]) as never
       }
     }
-    if (isDeepStrictEqual(cache, this.cache)) {
+    // By hand, not with node:util: the e2e tests bundle this file through db/factories, and their
+    // webpack cannot read `node:` imports.
+    if (allKeys().every((key) => JSON.stringify(cache[key]) === JSON.stringify(this.cache[key]))) {
       return
     }
     this.cache = cache
