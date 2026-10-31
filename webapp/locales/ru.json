@@ -533,6 +533,7 @@
     "USER_DOES_NOT_EXIST": "Пользователь не найден.",
     "USER_PROFILE_NAME_TOO_LONG": "Имя должно содержать не более {max} символов.",
     "USER_PROFILE_NAME_TOO_SHORT": "Имя должно содержать не менее {min} символов.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Допускаются только строчные буквы, цифры, подчеркивания или дефисы.",
     "USER_PROFILE_SLUG_TOO_LONG": "Имя пользователя должно содержать не более {max} символов.",
     "USER_PROFILE_SLUG_TOO_SHORT": "Имя пользователя должно содержать не менее {min} символов.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Этот пользователь не заблокирован.",

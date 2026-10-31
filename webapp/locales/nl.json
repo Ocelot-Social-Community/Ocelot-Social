@@ -533,6 +533,7 @@
     "USER_DOES_NOT_EXIST": "De gebruiker is niet gevonden.",
     "USER_PROFILE_NAME_TOO_LONG": "De naam mag maximaal {max} tekens lang zijn.",
     "USER_PROFILE_NAME_TOO_SHORT": "De naam moet minimaal {min} tekens lang zijn.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Toegestane tekens zijn alleen kleine letters, cijfers, underscores en koppeltekens.",
     "USER_PROFILE_SLUG_TOO_LONG": "De gebruikersnaam mag maximaal {max} tekens lang zijn.",
     "USER_PROFILE_SLUG_TOO_SHORT": "De gebruikersnaam moet minimaal {min} tekens lang zijn.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Deze gebruiker is niet geblokkeerd.",

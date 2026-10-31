@@ -533,6 +533,7 @@
     "USER_DOES_NOT_EXIST": "Nie znaleziono użytkownika.",
     "USER_PROFILE_NAME_TOO_LONG": "Nazwa może mieć co najwyżej {max} znaków.",
     "USER_PROFILE_NAME_TOO_SHORT": "Nazwa musi mieć co najmniej {min} znaków.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Dozwolone znaki to tylko małe litery, cyfry, podkreślenia i myślniki.",
     "USER_PROFILE_SLUG_TOO_LONG": "Nazwa użytkownika może mieć co najwyżej {max} znaków.",
     "USER_PROFILE_SLUG_TOO_SHORT": "Nazwa użytkownika musi mieć co najmniej {min} znaków.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Ten użytkownik nie jest zablokowany.",

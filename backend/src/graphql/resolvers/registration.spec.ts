@@ -727,6 +727,32 @@ describe('SignupVerification', () => {
               })
             })
 
+            it('rejects a chosen slug with characters outside the alphabet', async () => {
+              variables = { ...variables, slug: 'Foo Bar!' }
+
+              await expect(
+                mutate({ mutation: SignupVerification, variables }),
+              ).resolves.toMatchObject({
+                data: { SignupVerification: null },
+                errors: [
+                  {
+                    message:
+                      'The slug may only contain lowercase letters, numbers, underscores and hyphens.',
+                  },
+                ],
+              })
+            })
+
+            it('derives a slug inside the alphabet from a name outside it', async () => {
+              variables = { ...variables, name: 'Foo Bar!' }
+
+              await expect(
+                mutate({ mutation: SignupVerification, variables }),
+              ).resolves.toMatchObject({
+                data: { SignupVerification: { slug: 'foo-bar' } },
+              })
+            })
+
             it('derives a slug within the bounds from a name that transliterates longer', async () => {
               // 50 characters of name, 100 of slug before the cut
               variables = { ...variables, name: 'ä'.repeat(50) }

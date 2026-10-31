@@ -463,6 +463,65 @@ describe('validateReview', () => {
         })
       })
 
+      it.each([
+        ['spaces and punctuation', 'Foo Bar!'],
+        ['an uppercase letter', 'John-doughnut'],
+        ['a path separator', 'john/doughnut'],
+        ['a non-ascii letter', 'jöhn'],
+        ['a trailing newline', 'john-doughnut\n'],
+      ])('refuses a new slug with %s', async (_, slug) => {
+        variables = { ...variables, slug }
+
+        await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+          data: { UpdateUser: null },
+          errors: [
+            {
+              message:
+                'The slug may only contain lowercase letters, numbers, underscores and hyphens.',
+            },
+          ],
+        })
+      })
+
+      it('accepts every character of the slug alphabet', async () => {
+        variables = { ...variables, slug: 'john_doughnut-42' }
+
+        await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+          data: { UpdateUser: { slug: 'john_doughnut-42' } },
+        })
+      })
+
+      describe('stored with characters outside the alphabet', () => {
+        const legacy = 'John Doughnut'
+
+        beforeEach(async () => {
+          await database.write({
+            query: 'MATCH (user:User {id: $id}) SET user.slug = $slug',
+            variables: { id: 'updating-user', slug: legacy },
+          })
+        })
+
+        it('is refused when sent again unchanged', async () => {
+          variables = { ...variables, slug: legacy }
+
+          await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+            data: { UpdateUser: null },
+            errors: [
+              {
+                message:
+                  'The slug may only contain lowercase letters, numbers, underscores and hyphens.',
+              },
+            ],
+          })
+        })
+
+        it('does not hold up a save that carries no slug', async () => {
+          await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+            data: { UpdateUser: { name: 'John Doughnut', slug: legacy } },
+          })
+        })
+      })
+
       describe('stored before the bounds', () => {
         const legacy = 'j'.repeat(60)
 

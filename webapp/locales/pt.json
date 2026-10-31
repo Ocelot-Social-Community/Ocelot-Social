@@ -533,6 +533,7 @@
     "USER_DOES_NOT_EXIST": "O usuário não foi encontrado.",
     "USER_PROFILE_NAME_TOO_LONG": "O nome deve ter no máximo {max} caracteres.",
     "USER_PROFILE_NAME_TOO_SHORT": "O nome deve ter pelo menos {min} caracteres.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Caracteres permitidos são apenas letras minúsculas, números, sublinhados e hífens.",
     "USER_PROFILE_SLUG_TOO_LONG": "O nome de usuário deve ter no máximo {max} caracteres.",
     "USER_PROFILE_SLUG_TOO_SHORT": "O nome de usuário deve ter pelo menos {min} caracteres.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Este usuário não está bloqueado.",
