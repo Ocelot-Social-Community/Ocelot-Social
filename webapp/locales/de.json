@@ -533,6 +533,7 @@
     "USER_DOES_NOT_EXIST": "Der Nutzer wurde nicht gefunden.",
     "USER_PROFILE_NAME_TOO_LONG": "Der Name darf höchstens {max} Zeichen lang sein.",
     "USER_PROFILE_NAME_TOO_SHORT": "Der Name muss mindestens {min} Zeichen lang sein.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Es sind nur Kleinbuchstaben (a–z), Zahlen (0–9), Unterstriche oder Bindestriche erlaubt.",
     "USER_PROFILE_SLUG_TOO_LONG": "Der Nutzername darf höchstens {max} Zeichen lang sein.",
     "USER_PROFILE_SLUG_TOO_SHORT": "Der Nutzername muss mindestens {min} Zeichen lang sein.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Dieser Nutzer ist nicht blockiert.",
@@ -1873,7 +1874,7 @@
       "slug": {
         "alreadyTaken": "Dieser Nutzername ist schon vergeben.",
         "length": "Der Nutzername muss zwischen {min} und {max} Zeichen lang sein.",
-        "regex": "Es sind nur Kleinbuchstaben, Zahlen, Unterstriche oder Bindestriche erlaubt."
+        "regex": "Es sind nur Kleinbuchstaben (a–z), Zahlen (0–9), Unterstriche oder Bindestriche erlaubt."
       }
     }
   },

@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { SLUG_REGEXP } from '@db/schema/entities/patterns'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
 import { branding } from '@src/branding'
@@ -152,8 +153,9 @@ export const validateNotifyUsers = async (label: string, reason: string): Promis
   }
 }
 
-// The name and slug rules are the brand's (branding.user), the same values the webapp checks
-// against, so a client that skips the form cannot store what the form would refuse.
+// The name and slug bounds are the brand's (branding.user), the same values the webapp checks
+// against, and the slug's alphabet is the one the DB schema audits, so a client that skips the
+// form cannot store what the form would refuse.
 //
 // The name is measured trimmed and passed on trimmed: measuring one string and storing another
 // would let surrounding spaces carry a name past the maximum into the database.
@@ -185,6 +187,9 @@ const validateUserSlug = (slug: unknown): void => {
   if (slug.length > max) {
     throw new AppError(Errors.USER_PROFILE_SLUG_TOO_LONG, { max })
   }
+  if (!SLUG_REGEXP.test(slug)) {
+    throw new AppError(Errors.USER_PROFILE_SLUG_INVALID_CHARACTERS)
+  }
 }
 
 const validateSignupVerification: IMiddlewareResolver = async (
@@ -206,8 +211,8 @@ const validateUpdateUser: IMiddlewareResolver = async (resolve, root, params, co
   const input = withTrimmedName(params)
   validateUserName(input.name)
   // Every save that carries a slug, the stored one included. The settings form sends the slug
-  // with each profile change, so an account whose slug predates the bounds (or a brand that
-  // tightened them) brings it into bounds with its next change — the same rule as for the name.
+  // with each profile change, so an account whose slug predates the rules (or a brand that
+  // tightened the bounds) fixes it with its next change — the same rule as for the name.
   // Profile URLs resolve by id, so a new slug breaks no link. Saves without a slug (locale,
   // notification settings, avatar …) are not held up by it.
   validateUserSlug(input.slug)
