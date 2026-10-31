@@ -11,6 +11,7 @@ import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
 import { v4 as uuid } from 'uuid'
 
+import CONFIG from '@config/index'
 import { Badge } from '@db/schema/entities/Badge'
 import { Category } from '@db/schema/entities/Category'
 import { Comment } from '@db/schema/entities/Comment'
@@ -240,8 +241,10 @@ Factory.define('basicUser')
   })
   .attr('slug', null)
   .attr('encryptedPassword', ['password'], (password) => {
+    // bcrypt's minimum under test, where it was 40 % of a database spec's time. These factories
+    // also seed development and staging, and a login reads the cost from the hash.
     // eslint-disable-next-line n/no-sync
-    return hashSync(password, 10)
+    return hashSync(password, CONFIG.TEST ? 4 : 10)
   })
 
 // Single-role: link a freshly built user to their role's :Role node (HAS_ROLE), so
