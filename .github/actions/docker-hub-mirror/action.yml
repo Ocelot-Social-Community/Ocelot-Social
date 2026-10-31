@@ -1,0 +1,19 @@
+name: Docker Hub through a mirror
+description: >
+  Makes the Docker daemon pull images from Docker Hub through Google's mirror of it first. A 502 from
+  Docker Hub failed whole jobs. The `mirrors` setting of the Buildx steps only reaches BuildKit, not
+  what `docker pull` and `docker compose up` fetch. The daemon falls back to docker.io whenever the
+  mirror has nothing. Registries other than docker.io are not affected.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        # Merged, not written: the runner image ships a daemon.json of its own.
+        config=/etc/docker/daemon.json
+        sudo mkdir -p "$(dirname "$config")"
+        [ -s "$config" ] || echo '{}' | sudo tee "$config" > /dev/null
+        sudo jq '. + { "registry-mirrors": ["https://mirror.gcr.io"] }' "$config" | sudo tee "$config.new" > /dev/null
+        sudo mv "$config.new" "$config"
+        sudo systemctl restart docker
+        docker info --format 'Registry mirrors: {{.RegistryConfig.Mirrors}}'

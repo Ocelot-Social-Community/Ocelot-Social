@@ -250,6 +250,9 @@ jobs:
           name: backend-test-image
           path: /tmp
 
+      - name: Docker Hub through a mirror
+        uses: ./.github/actions/docker-hub-mirror
+
       - name: Load Docker Images
         run: |
           zstd -dc /tmp/neo4j.tar.zst | docker load
@@ -416,6 +419,9 @@ jobs:
         with:
           name: backend-test-image
           path: /tmp
+
+      - name: Docker Hub through a mirror
+        uses: ./.github/actions/docker-hub-mirror
 
       - name: Load Docker Images
         run: |
