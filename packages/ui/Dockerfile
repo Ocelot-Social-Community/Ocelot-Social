@@ -1,4 +1,4 @@
-FROM node:26.12.0-alpine AS base
+FROM node:26.12.1-alpine AS base
 LABEL org.label-schema.name="ocelot.social:ui"
 LABEL org.label-schema.description="UI Component Library for ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/packages/ui/README.md"
