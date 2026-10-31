@@ -533,7 +533,7 @@
     "USER_DOES_NOT_EXIST": "L'utilisateur est introuvable.",
     "USER_PROFILE_NAME_TOO_LONG": "Le nom ne doit pas dépasser {max} caractères.",
     "USER_PROFILE_NAME_TOO_SHORT": "Le nom doit comporter au moins {min} caractères.",
-    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Les caractères autorisés ne sont que les lettres minuscules, les chiffres, les traits de soulignement et les traits d'union.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Les caractères autorisés ne sont que les lettres minuscules (a–z), les chiffres (0–9), les traits de soulignement et les traits d'union.",
     "USER_PROFILE_SLUG_TOO_LONG": "Le nom d'utilisateur ne doit pas dépasser {max} caractères.",
     "USER_PROFILE_SLUG_TOO_SHORT": "Le nom d'utilisateur doit comporter au moins {min} caractères.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Cet utilisateur n'est pas bloqué.",
@@ -1874,7 +1874,7 @@
       "slug": {
         "alreadyTaken": "Ce nom d'utilisateur est déjà pris.",
         "length": "Le nom d'utilisateur doit comporter entre {min} et {max} caractères.",
-        "regex": "Les caractères autorisés ne sont que les lettres minuscules, les chiffres, les traits de soulignement et les traits d'union."
+        "regex": "Les caractères autorisés ne sont que les lettres minuscules (a–z), les chiffres (0–9), les traits de soulignement et les traits d'union."
       }
     }
   },

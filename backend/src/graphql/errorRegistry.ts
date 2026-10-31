@@ -87,7 +87,7 @@ const definitions = {
   },
   USER_PROFILE_SLUG_INVALID_CHARACTERS: {
     type: 'BAD_USER_INPUT',
-    text: 'The slug may only contain lowercase letters, numbers, underscores and hyphens.',
+    text: 'The slug may only contain lowercase letters (a–z), numbers (0–9), underscores and hyphens.',
   },
   BADGE_SELECTION_BADGE_NOT_REWARDED: {
     type: 'BAD_USER_INPUT',

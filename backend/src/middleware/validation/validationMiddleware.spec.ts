@@ -477,7 +477,7 @@ describe('validateReview', () => {
           errors: [
             {
               message:
-                'The slug may only contain lowercase letters, numbers, underscores and hyphens.',
+                'The slug may only contain lowercase letters (a–z), numbers (0–9), underscores and hyphens.',
             },
           ],
         })
@@ -509,7 +509,7 @@ describe('validateReview', () => {
             errors: [
               {
                 message:
-                  'The slug may only contain lowercase letters, numbers, underscores and hyphens.',
+                  'The slug may only contain lowercase letters (a–z), numbers (0–9), underscores and hyphens.',
               },
             ],
           })

@@ -533,7 +533,7 @@
     "USER_DOES_NOT_EXIST": "L'utente non è stato trovato.",
     "USER_PROFILE_NAME_TOO_LONG": "Il nome può contenere al massimo {max} caratteri.",
     "USER_PROFILE_NAME_TOO_SHORT": "Il nome deve contenere almeno {min} caratteri.",
-    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "I caratteri consentiti sono solo lettere minuscole, numeri, trattini bassi e trattini.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "I caratteri consentiti sono solo lettere minuscole (a–z), numeri (0–9), trattini bassi e trattini.",
     "USER_PROFILE_SLUG_TOO_LONG": "Il nome utente può contenere al massimo {max} caratteri.",
     "USER_PROFILE_SLUG_TOO_SHORT": "Il nome utente deve contenere almeno {min} caratteri.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Questo utente non è bloccato.",
@@ -1874,7 +1874,7 @@
       "slug": {
         "alreadyTaken": "Questo nome utente è già in uso.",
         "length": "Il nome utente deve essere compreso tra {min} e {max} caratteri.",
-        "regex": "I caratteri consentiti sono solo lettere minuscole, numeri, trattini bassi e trattini."
+        "regex": "I caratteri consentiti sono solo lettere minuscole (a–z), numeri (0–9), trattini bassi e trattini."
       }
     }
   },
