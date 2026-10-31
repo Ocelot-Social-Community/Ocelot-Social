@@ -558,7 +558,9 @@ describe('Room', () => {
       )
 
       expect(dates.length).toBeGreaterThan(0)
-      expect(dates.every((date: string) => date < cursor)).toBe(true)
+      // As instants, not as strings: Neo4j drops trailing zeros of the fraction ("…04.12Z" for
+      // 120 ms), and since "Z" sorts after any digit that one reads as later than "…04.123Z".
+      expect(dates.every((date: string) => Date.parse(date) < Date.parse(cursor))).toBe(true)
     })
 
     // Neo4j's toString(datetime()) drops trailing zeros of the fraction, so 890 ms is stored as
