@@ -122,11 +122,14 @@ jobs:
             type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend-test
 
+      - name: Docker Hub through a mirror
+        uses: ./.github/actions/docker-hub-mirror
+
       - name: Pull third-party images
         run: |
           docker pull cgr.dev/chainguard/minio:latest
           docker pull cgr.dev/chainguard/minio-client:latest-dev
-          docker pull maildev/maildev:latest
+          docker pull maildev/maildev:3.0.0
           docker pull redis:8.2-alpine
 
       # Compressed on the way out: `docker save` writes UNCOMPRESSED layer tars, and every byte here is
@@ -140,7 +143,7 @@ jobs:
           docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" | zstd -T0 -3 > /tmp/neo4j.tar.zst
           docker save "cgr.dev/chainguard/minio:latest" | zstd -T0 -3 > /tmp/minio.tar.zst
           docker save "cgr.dev/chainguard/minio-client:latest-dev" | zstd -T0 -3 > /tmp/minio-mc.tar.zst
-          docker save "maildev/maildev:latest" | zstd -T0 -3 > /tmp/mailserver.tar.zst
+          docker save "maildev/maildev:3.0.0" | zstd -T0 -3 > /tmp/mailserver.tar.zst
           docker save "redis:8.2-alpine" | zstd -T0 -3 > /tmp/redis.tar.zst
 
       # ARTIFACT, not cache. These are run-scoped hand-offs between jobs, which is what artifacts are
