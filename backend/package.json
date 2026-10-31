@@ -94,7 +94,7 @@
     "metascraper-youtube": "^5.58.4",
     "migrate": "^2.1.0",
     "mime-types": "^3.0.2",
-    "minimatch": "^10.2.6",
+    "minimatch": "^11.0.2",
     "mustache": "^4.2.0",
     "neo4j-driver": "^4.4.11",
     "node-fetch": "^2.7.0",
