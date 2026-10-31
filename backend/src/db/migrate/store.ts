@@ -93,6 +93,9 @@ class Store {
       // eslint-disable-next-line no-catch-all/no-catch-all
     } catch (error) {
       console.log(error) // eslint-disable-line no-console
+      // `errFn` only prints: `migrate init` ends with 0 whatever it is told, and the `&&` in front
+      // of `migrate up` and every wait on this command would take that for a success.
+      process.exitCode = 1
       errFn(error)
     } finally {
       await session.close()
