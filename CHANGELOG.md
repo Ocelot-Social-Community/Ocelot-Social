@@ -9,6 +9,84 @@ verbatim; only its version headings were lifted to `##`, because release-please 
 in front of the first `##`/`###` version heading it finds and would otherwise have written it into
 the middle of the file.
 
+## [3.22.0](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/3.21.2...3.22.0) (2026-10-31)
+
+
+### Features
+
+* **backend:** the tests run on Redis, across two backends ([#10746](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10746)) ([f4ce4d9](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/f4ce4d91784b0eb5b0fa0eec1d5ec405a79eb705))
+* **other:** dock beside the feed shows running video calls ([#10728](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10728)) ([1b3b680](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/1b3b680ac3aa75602720f88c0ad95f2c36eb8399))
+* **package/ui:** a drawer component, OsDrawer, slides in from a screen edge ([#10730](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10730)) ([363e6c6](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/363e6c64d8d4d72d08d38562a88535ed328f7a70))
+* **package/ui:** the storybook renders the autodocs pages its stories ask for ([#10741](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10741)) ([22efc95](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/22efc95c43e48077383ed25f661d5eefb01e4036))
+
+
+### Bug Fixes
+
+* **backend:** a comment that mentions an observer shows up once in the notifications ([#10723](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10723)) ([2eedfdc](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/2eedfdcc26d25c368748a1a9729d92bd0995dba7))
+* **backend:** a group can be saved again on a network without categories ([#10687](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10687)) ([d758012](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/d7580124061b3c08e6088895632b8b4850d1694a))
+* **backend:** a new post shows up once in the notifications, not once per reason ([#10722](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10722)) ([bc3fa5c](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/bc3fa5cc21f7a10d76ab249125f2f8d2931773d3))
+* **backend:** a subscription reads its viewer again after 30 seconds ([#10739](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10739)) ([740d1a6](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/740d1a61f00a5541022265d1cff34ecbbaca689d))
+* **backend:** a subscription reads its viewer again as soon as the backend changes them ([#10740](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10740)) ([86ad2c3](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/86ad2c33398d48ace68a10bf3e27af3aa0b59043))
+* **backend:** an instance that missed a policy or role change catches up ([#10745](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10745)) ([6f0f3cb](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/6f0f3cbf93a0a9b21f8f133a6e9d77d7f88c2f64))
+* **other:** a failed styleguide build no longer takes styleguide.ocelot.social down ([#10726](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10726)) ([a9a1d59](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/a9a1d590497c3a4e3eae15ab319700c3040e6b98))
+* **other:** reference the vuep fork branch again ([#10721](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10721)) ([f905094](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/f9050947d37579827499058af2ab2c13175db749))
+* **other:** styleguide installs vuep again under allow-git=root ([#10720](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10720)) ([9706014](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/970601401aa1b213d67e291fc8f2c21e76551353))
+* **package/ui:** the open stories of OsModal no longer cover its docs page ([#10742](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10742)) ([68cb0fb](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/68cb0fb0e49da8e43c32c949b3c0022f70dfe78a))
+* **webapp:** a maximized video call stacks above the page's floating elements ([#10691](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10691)) ([2bd6811](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/2bd6811d37e127b2f5c6162bda0e2184bcf9c5ef))
+* **webapp:** an avatar keeps its initials legible while its image loads ([#10731](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10731)) ([9b0e90f](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/9b0e90f244589700e4e1916eb423372016055ec5))
+* **webapp:** the German texts call a video call a Videoanruf throughout ([#10729](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10729)) ([39fb1ed](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/39fb1eddc6a55eedea0a4c65d2e87679f034908a))
+* **webapp:** the weak-connection warning in a video tile sits centered and explains itself on hover ([#10733](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10733)) ([90ee604](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/90ee604f04433098a6e09b2c939496ad7c39b7a1))
+* **webapp:** tooltips show their content as text ([#10737](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10737)) ([0e33267](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/0e332670e7782bda299f4ff1f0d6cf28d6472724))
+
+
+### Code Refactoring
+
+* **backend:** deprecate the ActivityPub fields and drop the webapp proxies ([#10734](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10734)) ([42b7675](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/42b7675fd852156ebc304de2e5daf3da0dc17f14))
+
+
+### Tests
+
+* **e2e:** revive the header search, block and mute features ([#10736](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10736)) ([97d4d2e](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/97d4d2ef66986a273b2f30d36b22ff27091126dc))
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump eslint from 10.12.0 to 10.13.0 in /packages/branding ([#10703](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10703)) ([f972a88](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/f972a88a2b37813e7dee16325881ed375f335122))
+* **deps-dev:** bump eslint from 10.12.0 to 10.13.0 in /packages/ui ([#10706](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10706)) ([10f9803](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/10f98030e74b06d4fc4dc9a264540a9f0ba1552d))
+* **deps-dev:** bump eslint-plugin-jsdoc from 65.3.6 to 65.4.0 in /packages/ui ([#10711](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10711)) ([a50b91c](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/a50b91c80a8716718231c727dd3c510c0bf8de95))
+* **deps-dev:** bump eslint-plugin-vue from 10.11.1 to 10.12.0 in /webapp ([#10755](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10755)) ([97975f8](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/97975f86abcaf646dec39fc12d895b8b5565d796))
+* **deps-dev:** bump happy-dom from 21.0.3 to 21.0.4 in /maintenance ([#10709](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10709)) ([b371239](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/b371239dc383c56f67de362fa23ca077e93885a5))
+* **deps-dev:** bump multiple-cucumber-html-reporter from 4.4.2 to 4.5.0 in the cypress group ([#10698](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10698)) ([5f6e36c](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/5f6e36c8ccc7d3545486e7b4591cf08d989d1c4c))
+* **deps-dev:** bump sass-embedded from 1.105.2 to 1.106.1 ([#10753](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10753)) ([87978b9](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/87978b9fb921ab7f5455cb40d63e7a6b0682cf3c))
+* **deps-dev:** bump the size-limit group in /packages/ui with 2 updates ([#10754](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10754)) ([bbe39fb](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/bbe39fb859cadce150dd9874a24ae73a61eaa170))
+* **deps-dev:** bump the storybook group in /packages/ui with 3 updates ([#10702](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10702)) ([82f5fdd](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/82f5fdde2b622ff598a458b13be91a40fdf2ee30))
+* **deps-dev:** bump tsc-alias from 1.9.7 to 1.9.8 in /backend ([#10701](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10701)) ([db59c46](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/db59c4628b0e4084b3efba6a2cf234eab400f007))
+* **deps-dev:** bump typescript-eslint from 8.71.2 to 8.72.0 in /packages/branding ([#10710](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10710)) ([6c31927](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/6c319275024e27f47469e02d8b2172d2f00b8102))
+* **deps-dev:** bump webpack from 5.112.0 to 5.112.2 ([#10752](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10752)) ([437da48](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/437da481d2b096dc973fbd1c73037a484f01e721))
+* **deps:** bump @aws-sdk/client-s3 from 3.1152.0 to 3.1154.0 in /backend ([#10708](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10708)) ([e9925e7](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/e9925e7eb4b3e1783bb972d3b3f4a3915f3df3e5))
+* **deps:** bump @aws-sdk/client-s3 from 3.1156.0 to 3.1158.0 in /backend ([#10757](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10757)) ([7ade921](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/7ade92170bf7d8267efa2df6f9729bb63bcc726f))
+* **deps:** bump @aws-sdk/lib-storage from 3.1152.0 to 3.1156.0 in /backend ([#10716](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10716)) ([da77a2d](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/da77a2ded519c675e1650649818c49a10136e166))
+* **deps:** bump @graphql-tools/load-files from 7.0.1 to 8.0.4 in /backend ([#10699](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10699)) ([5f57d36](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/5f57d368642a51ee3654d93190862a94333c9560))
+* **deps:** bump @graphql-tools/merge from 9.2.8 to 10.0.6 in /backend ([#10718](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10718)) ([374c30c](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/374c30cbc4abde6f89bea535ba92b8bfe58e2b58))
+* **deps:** bump @graphql-tools/schema from 10.1.5 to 11.0.4 in /backend ([#10713](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10713)) ([e59600e](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/e59600e0c04ba0c2186bffd029fa7aedbea5b574))
+* **deps:** bump docker/login-action from 4.6.0 to 4.7.0 ([#10750](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10750)) ([f9426ec](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/f9426eca3cbe886dd3a3603a3601a5940515abe2))
+* **deps:** bump livekit-client from 2.22.4 to 2.23.0 in /webapp ([#10700](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10700)) ([f81a7e1](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/f81a7e1c68501b4f8f5e756572d6de2e02ed92a1))
+* **deps:** bump livekit-server-sdk from 2.19.1 to 2.19.2 in /backend ([#10762](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10762)) ([d85b0e4](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/d85b0e41a5595d714f4830e627d39efce7efcf60))
+* **deps:** bump node from 26.12.0-alpine to 26.12.1-alpine in /maintenance ([#10751](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10751)) ([fcfe60a](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/fcfe60a501df15cb585d24674a3bd29734ce9657))
+* **deps:** bump node from 26.12.0-alpine to 26.12.1-alpine in /webapp ([#10748](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10748)) ([18e8725](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/18e872506fb71e8bd3f7af6ee4b9f46a6492f063))
+* **deps:** bump nodemailer from 10.1.1 to 10.1.7 in /backend ([#10717](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10717)) ([13df321](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/13df3211d59790834cf4cefa6074a3183b8e6230))
+* **deps:** bump nodemailer from 10.1.7 to 10.2.1 in /backend ([#10758](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10758)) ([4f5850c](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/4f5850c84357a8bd97e7eebde57998207f0f47dd))
+* **deps:** bump postcss from 8.5.30 to 8.5.31 in /packages/branding ([#10704](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10704)) ([ac0735f](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/ac0735f462fddf4b8e05fe3e480880685097b517))
+* **deps:** bump the nuxt group in /maintenance with 2 updates ([#10705](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10705)) ([f7ce0ee](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/f7ce0ee1db78d5f9c24bd09cde59499c2eafe2a0))
+* **deps:** bump tslog from 5.2.0 to 5.4.0 in /backend ([#10712](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10712)) ([0c032b3](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/0c032b371c67cb639b579f10546f4b26d52f770e))
+
+
+### Continuous Integration
+
+* **workflow:** a branch run cancelled on a master commit no longer turns that commit red ([#10694](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10694)) ([6c1c8c6](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/6c1c8c6de3912a39a9acfcecf7c76dc2df6a686a))
+* **workflow:** a package's release no longer stalls the application's release pull request ([#10677](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10677)) ([ca42c56](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/ca42c568c3b9d404fba953490eb345c669030959))
+* **workflow:** stop dispatching master builds to stage.yunite.me ([#10725](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10725)) ([46b53ec](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/46b53ecb2a88c27d82ebafe37ceed34d1f125877))
+
 ## [3.21.2](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/3.21.1...3.21.2) (2026-10-20)
 
 
