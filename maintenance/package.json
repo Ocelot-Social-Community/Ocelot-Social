@@ -1,6 +1,6 @@
 {
   "name": "maintenance",
-  "version": "3.21.2",
+  "version": "3.22.0",
   "type": "module",
   "private": true,
   "scripts": {
