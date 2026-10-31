@@ -75,7 +75,7 @@
     "jsonwebtoken": "~9.0.3",
     "languagedetect": "^2.0.0",
     "linkify-html": "^4.3.3",
-    "linkifyjs": "^4.3.3",
+    "linkifyjs": "^4.4.0",
     "livekit-server-sdk": "^2.19.2",
     "lodash": "~4.18.1",
     "metascraper": "^5.58.5",
