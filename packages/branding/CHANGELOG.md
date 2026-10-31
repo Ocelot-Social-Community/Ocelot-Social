@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.2.5](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.2.4...branding-v0.2.5) (2026-10-31)
+
+
+### Bug Fixes
+
+* **webapp:** a maximized video call stacks above the page's floating elements ([#10691](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10691)) ([2bd6811](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/2bd6811d37e127b2f5c6162bda0e2184bcf9c5ef))
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump eslint from 10.12.0 to 10.13.0 in /packages/branding ([#10703](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10703)) ([f972a88](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/f972a88a2b37813e7dee16325881ed375f335122))
+* **deps-dev:** bump typescript-eslint from 8.71.2 to 8.72.0 in /packages/branding ([#10710](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10710)) ([6c31927](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/6c319275024e27f47469e02d8b2172d2f00b8102))
+* **deps-dev:** bump typescript-eslint from 8.72.0 to 8.72.1 in /packages/branding ([#10768](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10768)) ([b318f31](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/b318f314adc1dd22ec66a4b6989fe174123c74a8))
+* **deps:** bump postcss from 8.5.30 to 8.5.31 in /packages/branding ([#10704](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10704)) ([ac0735f](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/ac0735f462fddf4b8e05fe3e480880685097b517))
+* **deps:** bump postcss from 8.5.31 to 8.5.32 in /packages/branding ([#10765](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10765)) ([4055eae](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/4055eaeae416309500998f49ff060c0c4d624b5a))
+
 ## [0.2.4](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.2.3...branding-v0.2.4) (2026-10-20)
 
 
