@@ -533,6 +533,7 @@
     "USER_DOES_NOT_EXIST": "Përdoruesi nuk u gjet.",
     "USER_PROFILE_NAME_TOO_LONG": "Emri duhet të ketë jo më shumë se {max} karaktere.",
     "USER_PROFILE_NAME_TOO_SHORT": "Emri duhet të ketë të paktën {min} karaktere.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Karakteret e lejuara janë vetëm shkronja të vogla (a–z), numra (0–9), nënviza dhe viza.",
     "USER_PROFILE_SLUG_TOO_LONG": "Emri i përdoruesit duhet të ketë jo më shumë se {max} karaktere.",
     "USER_PROFILE_SLUG_TOO_SHORT": "Emri i përdoruesit duhet të ketë të paktën {min} karaktere.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Ky përdorues nuk është i bllokuar.",
@@ -1873,7 +1874,7 @@
       "slug": {
         "alreadyTaken": "Ky emër përdoruesi është tashmë i zënë.",
         "length": "Emri i përdoruesit duhet të ketë midis {min} dhe {max} karaktere.",
-        "regex": "Karakteret e lejuara janë vetëm shkronja të vogla, numra, nënviza dhe viza."
+        "regex": "Karakteret e lejuara janë vetëm shkronja të vogla (a–z), numra (0–9), nënviza dhe viza."
       }
     }
   },
