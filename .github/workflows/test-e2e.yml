@@ -81,6 +81,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: Docker Hub through a mirror
+        uses: ./.github/actions/docker-hub-mirror
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
         # Base images from Docker Hub through Google's mirror of it first: a 503 from Docker Hub
@@ -122,12 +125,17 @@ jobs:
             type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend-test
 
+      # maildev comes from the compose file: Dependabot bumps it there, not here, and a tag written
+      # down here would leave the bumped image out of the artifact the test jobs load.
       - name: Pull third-party images
+        id: third_party
         run: |
+          maildev=$(yq --exit-status '.services.mailserver.image' docker-compose.test.yml)
           docker pull cgr.dev/chainguard/minio:latest
           docker pull cgr.dev/chainguard/minio-client:latest-dev
-          docker pull maildev/maildev:latest
+          docker pull "$maildev"
           docker pull redis:8.2-alpine
+          echo "maildev=$maildev" >> "$GITHUB_OUTPUT"
 
       # Compressed on the way out: `docker save` writes UNCOMPRESSED layer tars, and every byte here is
       # paid 40 times over on the matrix side. zstd rather than gzip -1 — smaller AND faster on both
@@ -135,12 +143,14 @@ jobs:
       # ubuntu-latest. The matrix side pipes it through `zstd -dc` explicitly instead of relying on
       # `docker load` sniffing the format.
       - name: Save all images
+        env:
+          MAILDEV_IMAGE: ${{ steps.third_party.outputs.maildev }}
         run: |
           docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" | zstd -T0 -3 > /tmp/backend.tar.zst
           docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" | zstd -T0 -3 > /tmp/neo4j.tar.zst
           docker save "cgr.dev/chainguard/minio:latest" | zstd -T0 -3 > /tmp/minio.tar.zst
           docker save "cgr.dev/chainguard/minio-client:latest-dev" | zstd -T0 -3 > /tmp/minio-mc.tar.zst
-          docker save "maildev/maildev:latest" | zstd -T0 -3 > /tmp/mailserver.tar.zst
+          docker save "$MAILDEV_IMAGE" | zstd -T0 -3 > /tmp/mailserver.tar.zst
           docker save "redis:8.2-alpine" | zstd -T0 -3 > /tmp/redis.tar.zst
 
       # ARTIFACT, not cache. These are run-scoped hand-offs between jobs, which is what artifacts are
@@ -168,6 +178,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Docker Hub through a mirror
+        uses: ./.github/actions/docker-hub-mirror
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
