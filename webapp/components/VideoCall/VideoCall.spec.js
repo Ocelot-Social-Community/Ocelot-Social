@@ -70,6 +70,15 @@ jest.mock('livekit-client', () => {
   return { __esModule: true, Room, RoomEvent, Track, TrackEvent, DisconnectReason }
 })
 
+// The watchdog has its own spec; here it only matters when it runs.
+jest.mock('./audioWatchdog', () => ({
+  createAudioWatchdog: jest.fn((opts) => ({
+    opts,
+    start: jest.fn(),
+    stop: jest.fn(),
+  })),
+}))
+
 const localVue = createLocalVue()
 localVue.use(Vuex)
 localVue.use(VTooltip)
@@ -1372,6 +1381,40 @@ describe('VideoCall', () => {
       it('enableAudio is a no-op without a room', async () => {
         const { wrapper } = factory({ show: true })
         await expect(wrapper.vm.enableAudio()).resolves.toBeUndefined()
+      })
+    })
+
+    describe('one speaker missing for one listener', () => {
+      it('is watched for as soon as the call runs', async () => {
+        const { wrapper, room } = await connected()
+        const watchdog = wrapper.vm.audioWatchdog
+        expect(watchdog.opts.room).toBe(room)
+        expect(watchdog.start).toHaveBeenCalled()
+      })
+
+      it('is not watched for while reconnecting', async () => {
+        const { wrapper, room } = await connected()
+        const { isPaused } = wrapper.vm.audioWatchdog.opts
+        expect(isPaused()).toBe(false)
+        room.handlers.Reconnecting()
+        expect(isPaused()).toBe(true)
+      })
+
+      it('is no longer watched for once the call is over', async () => {
+        const { wrapper } = await connected()
+        const watchdog = wrapper.vm.audioWatchdog
+        await wrapper.vm.cleanup()
+        expect(watchdog.stop).toHaveBeenCalled()
+        expect(wrapper.vm.audioWatchdog).toBeNull()
+      })
+
+      it('is watched for by the new room only after a retry', async () => {
+        const { wrapper } = await connected()
+        const first = wrapper.vm.audioWatchdog
+        await wrapper.vm.retryConnect()
+        expect(first.stop).toHaveBeenCalled()
+        expect(wrapper.vm.audioWatchdog).not.toBe(first)
+        expect(wrapper.vm.audioWatchdog.opts.room).toBe(wrapper.vm.room)
       })
     })
 
