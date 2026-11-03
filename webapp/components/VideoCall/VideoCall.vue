@@ -486,6 +486,7 @@ import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 import DeviceSettings from './DeviceSettings.vue'
 import { saveDevicePreference } from './devicePreferences'
+import { createAudioWatchdog } from './audioWatchdog'
 
 // How long a participant keeps the speaking treatment after LiveKit drops them
 // from the active-speaker list. LiveKit reports raw audio activity, so it lets
@@ -1122,6 +1123,7 @@ export default {
     this.observedStage = null
     this.qualityTimer = null
     this.qualityClass = null
+    this.audioWatchdog = null
     this.leaving = false
     this.deviceSwitches = this.newDeviceSwitches()
     this.callChatsSub = null
@@ -1620,6 +1622,7 @@ export default {
       // tears that down without cleanup(), so let go of it here for every way in.
       this.micRestart = null
       this.micSilenceProbe = null
+      this.stopAudioWatchdog()
       this.resetAudioOnly()
       try {
         if (!this.groupId) throw new Error('Missing group id')
@@ -1766,6 +1769,15 @@ export default {
         this.refreshTiles()
         this.audioBlocked = !room.canPlaybackAudio
         this.phase = 'in-call'
+        // One listener can lose one speaker's audio while everyone else still
+        // hears them — repair that subscription instead of waiting it out.
+        this.audioWatchdog = createAudioWatchdog({
+          room,
+          Track,
+          // A reconnect re-subscribes everything anyway.
+          isPaused: () => this.reconnecting,
+        })
+        this.audioWatchdog.start()
         this.joinCallChat(room)
         this.watchCallChats(true)
         this.loadGroupChatUnread()
@@ -2216,6 +2228,10 @@ export default {
       this.audioOnlyDismissed = true
       this.setAudioOnly(false)
     },
+    stopAudioWatchdog() {
+      if (this.audioWatchdog) this.audioWatchdog.stop()
+      this.audioWatchdog = null
+    },
     resetAudioOnly() {
       this.clearQualityTimer()
       this.qualityClass = null
@@ -2407,6 +2423,8 @@ export default {
       }
     },
     async cleanup() {
+      // Before the disconnect: a check must not resubscribe on a room going away.
+      this.stopAudioWatchdog()
       // First, before the disconnect below is awaited: nothing may ask for the call's chat
       // any more once the call is being left.
       this.cancelCallChatRetry()
