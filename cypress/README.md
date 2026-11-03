@@ -77,3 +77,16 @@ This is used to run cypress in CI or in console
 
 Check out the Cypress documentation for further information on how to write tests:
 [Write-a-simple-test](https://docs.cypress.io/guides/getting-started/writing-your-first-test.html#Write-a-simple-test)
+
+## Hydration mismatches fail every scenario
+
+Every scenario also checks, after each step, that Vue could hydrate the server-rendered markup of
+the pages it loaded. When the client renders something other than what the server sent, the step
+fails with the page's URL and Vue's warning (see
+`support/step_definitions/common/hydration_warnings.js`). A server-rendered page that has not mounted
+within 10 seconds fails the step too: its hydration could not be checked.
+
+Vue reports a mismatch only in its development runtime. `npm run dev` has it; the `e2e` webapp image
+built by CI gets it through the build argument `VUE_DEV_RUNTIME=1`, which switches the client bundle
+to that runtime (see `webapp/nuxt.config.js`). Against a plain production build the check finds
+nothing and passes.

@@ -337,10 +337,6 @@ describe('Group.showMembers', () => {
 describe('Subscription.groupMembershipVisibilityChanged', () => {
   // Subscriptions bypass the shield (it gates Query and Mutation), so this filter is the only
   // thing standing in front of the event stream.
-  const filter = resolvers.Subscription.groupMembershipVisibilityChanged as unknown as {
-    subscribe: { filterFn?: unknown }
-  } as never
-
   const subscriptionContext = (options: {
     user?: { id: string } | null
     groupsEnabled?: boolean
@@ -384,8 +380,6 @@ describe('Subscription.groupMembershipVisibilityChanged', () => {
       await runFilter(subscriptionContext({ groupsEnabled: false }), { userId: 'viewer' }),
     ).toBe(false)
   })
-
-  void filter
 })
 
 describe('GroupMembers past the shield', () => {

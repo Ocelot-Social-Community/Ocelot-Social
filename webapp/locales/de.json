@@ -361,8 +361,8 @@
         "user_disable": "Nutzerkonten sperren und wieder freigeben — nur von Nutzern mit weniger Befugnissen als den eigenen.",
         "user_email_readAny": "E-Mail-Adresse beliebiger Nutzer lesen.",
         "user_invite": "Persönliche Einladungscodes erzeugen.",
-        "videoCall_create_open": "Einen Video-Call in einer Gruppe starten, die jeder betreten kann — die also auffindbar ist und ohne Freigabe beigetreten werden kann.",
-        "videoCall_create_restricted": "Einen Video-Call in einer Gruppe starten, die man nicht einfach betreten kann: Der Beitritt braucht eine Freigabe oder Einladung, oder die Gruppe ist unsichtbar."
+        "videoCall_create_open": "Einen Videoanruf in einer Gruppe starten, die jeder betreten kann — die also auffindbar ist und ohne Freigabe beigetreten werden kann.",
+        "videoCall_create_restricted": "Einen Videoanruf in einer Gruppe starten, die man nicht einfach betreten kann: Der Beitritt braucht eine Freigabe oder Einladung, oder die Gruppe ist unsichtbar."
       },
       "permNotHeld": "Dieses Recht hast du selbst nicht, darum kannst du es nicht vergeben.",
       "permUnavailable": "Funktion nicht konfiguriert – das Recht hat keine Wirkung.",
@@ -500,6 +500,7 @@
     "POST_EVENT_LOCATION_COORDINATES_INCOMPLETE": "Für den Ort der Veranstaltung fehlt eine Koordinate.",
     "POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE": "Der Breitengrad des Veranstaltungsorts ist ungültig.",
     "POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE": "Der Längengrad des Veranstaltungsorts ist ungültig.",
+    "POST_EVENT_LOCATION_NOT_PICKED": "Bitte wähle den Ort aus den Suchergebnissen oder setze ihn auf der Karte.",
     "POST_EVENT_START_DATE_INVALID": "Das Startdatum ist kein gültiges Datum.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "Das Startdatum muss im ISO-Format angegeben werden.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "Die Ortsbeschreibung muss zwischen {min} und {max} Zeichen lang sein.",
@@ -531,7 +532,11 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Das kannst du nur bei Nutzern tun, deren Rolle weniger Befugnisse gewährt als deine.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Du darfst die Nutzerverwaltung nicht durchsuchen.",
     "USER_DOES_NOT_EXIST": "Der Nutzer wurde nicht gefunden.",
+    "USER_PROFILE_NAME_TOO_LONG": "Der Name darf höchstens {max} Zeichen lang sein.",
     "USER_PROFILE_NAME_TOO_SHORT": "Der Name muss mindestens {min} Zeichen lang sein.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Es sind nur Kleinbuchstaben (a–z), Zahlen (0–9), Unterstriche oder Bindestriche erlaubt.",
+    "USER_PROFILE_SLUG_TOO_LONG": "Der Nutzername darf höchstens {max} Zeichen lang sein.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "Der Nutzername muss mindestens {min} Zeichen lang sein.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Dieser Nutzer ist nicht blockiert.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "Der Chat eines Videoanrufs steht nur dessen Teilnehmern offen. Tritt dem Anruf zuerst bei.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Für den Videoanruf wurde keine aktive Mitgliedschaft in dieser Gruppe gefunden.",
@@ -604,10 +609,12 @@
       "email": "Bitte eine gültige E-Mail-Adresse eingeben.",
       "eventLocationNameLength": "Die Adresse muss zwischen {min} und {max} Zeichen lang sein.",
       "eventLocationNameNotEmpty": "Bitte eine Adresse eingeben.",
+      "eventLocationNotPicked": "Bitte wähle den Ort aus den Suchergebnissen oder setze ihn auf der Karte.",
       "eventVenueLength": "Die Ortsbeschreibung muss zwischen {min} und {max} Zeichen lang sein.",
       "eventVenueNotEmpty": "Bitte eine Ortsbeschreibung eingeben.",
       "followableUrl": "muss eine gültige Web- oder E-Mail-Adresse sein",
       "formHasErrors": "Bitte alle Pflichtfelder ausfüllen.",
+      "locationNotPicked": "Bitte wähle den Ort aus den Vorschlägen aus.",
       "nameLength": "Der Name muss zwischen {min} und {max} Zeichen lang sein.",
       "titleLength": "Der Titel muss zwischen {min} und {max} Zeichen lang sein.",
       "titleNotEmpty": "Bitte einen Titel eingeben."
@@ -617,10 +624,6 @@
     "step": "Schritt {current} von {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd.MM.yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Passwort Änderung fehlgeschlagen. Möglicherweise falscher Sicherheitscode?",
@@ -828,6 +831,20 @@
       "title": "Nutzer sperren"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (von dir blockiert)",
+      "count": "{count} verbunden",
+      "flag": "Laufende Videoanrufe: {count}",
+      "join": "Beitreten",
+      "joined": "Du bist dabei",
+      "participants": "Teilnehmer",
+      "title": "Laufende Videoanrufe"
+    },
+    "close": "Seitenleiste schließen",
+    "label": "Seitenleiste",
+    "open": "Seitenleiste öffnen – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} von {total} € erreicht",
     "donate-now": "Jetzt spenden"
@@ -1009,6 +1026,7 @@
     "foundation": "Gründung",
     "general": "Allgemein",
     "goal": "Ziel der Gruppe",
+    "goalPlaceholder": "z.B. Einen Garten für alle im Kiez anlegen",
     "group": "Gruppe",
     "groupCreated": "Die Gruppe wurde angelegt!",
     "in": "in",
@@ -1052,6 +1070,7 @@
     "muted": "Gruppe stummgeschaltet",
     "myGroups": "Meine Gruppen",
     "name": "Gruppenname",
+    "namePlaceholder": "Gemeinschaftsgarten Kreuzberg",
     "removeMember": "Mitglied aus der Gruppe entfernen?",
     "removeMemberButton": "Entfernen",
     "removeMemberConfirmText": "Nutzer „{name}“ aus der Gruppe entfernen?",
@@ -1096,8 +1115,8 @@
         "group_read": "Das Profil der Gruppe über das immer Öffentliche hinaus sehen.",
         "group_role_manage": "Die Rollen der Gruppe und ihre Rechte bearbeiten.",
         "group_settings_manage": "Die Einstellungen der Gruppe ändern: Name, Beschreibung, Bild, Ort und Kategorien.",
-        "group_videoCall_create": "Einen Video-Call in der Gruppe starten.",
-        "group_videoCall_join": "An einem laufenden Video-Call der Gruppe teilnehmen."
+        "group_videoCall_create": "Einen Videoanruf in der Gruppe starten.",
+        "group_videoCall_join": "An einem laufenden Videoanruf der Gruppe teilnehmen."
       },
       "resultingType": "Mit diesen Rechten ist die Gruppe:",
       "saved": "Rechte gespeichert",
@@ -1131,6 +1150,7 @@
       "usual": "Mitglied"
     },
     "save": "Neue Gruppe anlegen",
+    "slugPlaceholder": "gemeinschaftsgarten-kreuzberg",
     "teaser": {
       "notReadable": "Diese Gruppe kannst du noch nicht öffnen — deine Anfrage läuft noch",
       "openGroup": "Gruppe öffnen",
@@ -1695,6 +1715,7 @@
       "unblocked": "{name} ist wieder entsperrt"
     },
     "data": {
+      "cityPlaceholder": "z.B. Berlin",
       "givenName": "Dein Vorname",
       "givenNamePlaceholder": "Petra",
       "labelBio": "Über dich",
@@ -1863,7 +1884,8 @@
       "nameNotEmpty": "Bitte gib deinen Namen an.",
       "slug": {
         "alreadyTaken": "Dieser Nutzername ist schon vergeben.",
-        "regex": "Es sind nur Kleinbuchstaben, Zahlen, Unterstriche oder Bindestriche erlaubt."
+        "length": "Der Nutzername muss zwischen {min} und {max} Zeichen lang sein.",
+        "regex": "Es sind nur Kleinbuchstaben (a–z), Zahlen (0–9), Unterstriche oder Bindestriche erlaubt."
       }
     }
   },
@@ -1977,12 +1999,12 @@
       "cameraOn": "Kamera: An",
       "cameraStarting": "Kamera wird gestartet…",
       "cancel": "Abbrechen",
-      "description": "Du trittst gleich der Videokonferenz dieser Gruppe bei. Prüfe Kamera, Mikrofon und Lautsprecher, bevor du dem Anruf beitrittst.",
+      "description": "Du trittst gleich dem Videoanruf dieser Gruppe bei. Prüfe Kamera, Mikrofon und Lautsprecher, bevor du beitrittst.",
       "errorBusy": "Das Gerät wird bereits von einer anderen Anwendung verwendet.",
       "errorDenied": "Zugriff verweigert. Bitte erlaube Kamera- und Mikrofonzugriff in den Browser-Einstellungen.",
       "errorNoDevice": "Kein passendes Gerät gefunden.",
       "errorUnknown": "Auf die Geräte konnte nicht zugegriffen werden.",
-      "headerTitle": "{name} – Video-Konferenz betreten",
+      "headerTitle": "{name} – Videoanruf beitreten",
       "hintBoth": "Du trittst ohne Kamera und Mikrofon bei — du wirst nur zuhören und zuschauen.",
       "hintCamera": "Du trittst ohne Kamera bei — andere können dich hören, aber nicht sehen.",
       "hintMic": "Du trittst ohne Mikrofon bei — andere können dich sehen, aber nicht hören.",

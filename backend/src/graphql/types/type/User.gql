@@ -40,8 +40,8 @@ type User {
   "Alias of `id`, kept for the chat frontend (vue-advanced-chat keys objects by `_id`)."
   _id: String @deprecated(reason: "Use `id`.")
   id: ID!
-  "ActivityPub actor id, for federated users."
-  actorId: String
+  "Former ActivityPub actor id. Nothing has written it since ActivityPub was removed; older nodes may still carry a value."
+  actorId: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
   name: String
   "The user's primary email address. Visible only to the owner or with user.email.readAny."
   email: String!
@@ -56,8 +56,8 @@ type User {
   roleName: String
   "Whether the current user's role grants strictly more authority than this user's — the act-on hierarchy that disableUser and DeleteUser enforce on top of user.disable / user.delete.any. Always false for oneself."
   outrankedByCurrentUser: Boolean!
-  "The user's public key, for federation/verification."
-  publicKey: String
+  "Former ActivityPub public key. Nothing has written it since ActivityPub was removed; older nodes may still carry a value."
+  publicKey: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
   "The user who invited this user, if any."
   invitedBy: User
   "Users this user has invited."

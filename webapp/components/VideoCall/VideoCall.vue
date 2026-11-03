@@ -350,7 +350,7 @@
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="micAction"
+          :aria-label="controlName(micLabel, micAction)"
           :loading="devicesStarting.audioinput > 0"
           @click="toggleMic"
         >
@@ -367,7 +367,7 @@
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="cameraAction"
+          :aria-label="controlName(cameraLabel, cameraAction)"
           :loading="devicesStarting.videoinput > 0"
           @click="toggleCamera"
         >
@@ -385,7 +385,7 @@
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="screenShareAction"
+          :aria-label="controlName(screenShareLabel, screenShareAction)"
           @click="toggleScreenShare"
         >
           <template #icon>
@@ -439,7 +439,7 @@
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="chatAction"
+          :aria-label="controlName(chatLabel, chatAction)"
           @click="toggleChat"
         >
           <template #icon>
@@ -456,7 +456,7 @@
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           class="video-call__leave"
-          :aria-label="leaveAction"
+          :aria-label="controlName(leaveLabel, leaveAction)"
           @click="leave"
         >
           <template #icon>
@@ -525,7 +525,7 @@ const BARS_EDGE_PX = 50
 // What brings the bars back. Focus too, for whoever moves through the controls by keyboard.
 const BARS_ACTIVITY_EVENTS = ['mousemove', 'pointerdown', 'keydown', 'wheel', 'focusin']
 // A tap is followed by the mouse events and the focus the browser makes up for it; they
-// come within this time and are no activity of their own.
+// come within this time and are no activity of their own. A key pressed is none of them.
 const TOUCH_ECHO_MS = 800
 
 // Cameras publish 16:9, so the grid aims for cells of that shape: the closer a
@@ -1210,6 +1210,7 @@ export default {
         clearTimeout(this.barsTimer)
         this.barsTimer = null
         this.barsHidden = false
+        this.swallowTileSelect = false
       }
     },
     onBarActivity(event) {
@@ -1217,7 +1218,9 @@ export default {
         this.onBarTouch(event)
         return
       }
-      if (Date.now() - this.lastTouchAt < TOUCH_ECHO_MS) return
+      // A click with the mouse or a pen is the user's own: a tile it lands on is selected.
+      if (event.type === 'pointerdown') this.swallowTileSelect = false
+      if (event.type !== 'keydown' && Date.now() - this.lastTouchAt < TOUCH_ECHO_MS) return
       // Reading and writing in the chat beside the videos is no reason to put the bars
       // back on them; going for the page's header or footer at the window's edge is.
       const inChat = event.target?.closest?.('.video-call__sidebar')
@@ -1532,6 +1535,14 @@ export default {
     controlTooltip(action) {
       if (this.isMobile || !action) return ''
       return { content: action, html: false }
+    },
+    // The name a screen reader gives a control: what a click on it does. While the button
+    // spells out its label, the name has to hold that word too, so the control can be called
+    // by it by voice (WCAG 2.5.3, label in name): put in front where the action lacks it, as
+    // "Headset: turn off" does next to "Microphone".
+    controlName(label, action) {
+      if (this.iconOnly || action.toLowerCase().includes(label.toLowerCase())) return action
+      return `${label}, ${action}`
     },
     iconOnlyTooltip(label) {
       // v-tooltip renders nothing for an empty string — exactly what we want
@@ -2508,9 +2519,10 @@ export default {
 
 .video-call--maximized {
   /*  Match the map page's layering pattern (see pages/map.vue): cover the full */
-  /*  viewport (top: 0, bottom: 0) and sit at var(--z-index-surface) so the page */
-  /*  header (.main-navigation, z-index: var(--z-index-page-submenu) = 2500) and the */
-  /*  sticky footer (.ds-footer, z-index: 10) both stack on top — their own */
+  /*  viewport (top: 0, bottom: 0) and sit at var(--z-index-call-maximized), one below */
+  /*  var(--z-index-page-submenu). The page's own floating elements (the feed's "+" button, */
+  /*  z-index 150) stay beneath the call, while the page header (.main-navigation) and the */
+  /*  sticky footer (.ds-footer), both at var(--z-index-page-submenu) = 2500, stack on top — their own */
   /*  box-shadows then naturally fall onto the call surface from above and */
   /*  below. Padding (not offset) keeps the call's internal header and */
   /*  controls below the page header / above the page footer. */
@@ -2522,7 +2534,7 @@ export default {
   left: 0;
   padding-top: var(--header-height);
   padding-bottom: var(--footer-height);
-  z-index: var(--z-index-surface);
+  z-index: var(--z-index-call-maximized);
   /*  The base .video-call rule paints a var(--box-shadow-large) around the panel. */
   /*  When the panel covers the full viewport that shadow has nowhere to land */
   /*  — and worse, the panel's own shadow competes with the header/footer */

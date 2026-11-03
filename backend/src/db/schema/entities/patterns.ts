@@ -8,7 +8,8 @@
 // through a real Neo4j and a JS RegExp side by side and requires the same answer.
 
 /** Lowercase slug as produced by the slugify middleware. Mirrors db/models/User.ts. */
-export const SLUG = '^[a-z0-9_-]+$'
+export const SLUG_REGEXP = /^[a-z0-9_-]+$/
+export const SLUG = SLUG_REGEXP.source
 
 /**
  * ISO 8601 date-time, as written by BOTH writers in this codebase:

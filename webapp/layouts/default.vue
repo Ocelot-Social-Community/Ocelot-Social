@@ -95,6 +95,8 @@
       </client-only>
     </div>
     <client-only>
+      <dock side="left" />
+      <dock side="right" />
       <video-call v-if="showVideoCall" />
     </client-only>
   </div>
@@ -112,6 +114,7 @@ import Chat from '~/components/Chat/Chat.vue'
 import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import CallChatTabs from '~/components/VideoCall/CallChatTabs.vue'
 import { activeCallChatTab } from '~/components/VideoCall/callChat'
+import Dock from '~/components/Dock/Dock.vue'
 import VideoCall from '~/components/VideoCall/VideoCall.vue'
 import { videoCallConfigQuery } from '~/graphql/VideoCalls'
 
@@ -132,6 +135,7 @@ export default {
     RoomHeader,
     OsButton,
     OsIcon,
+    Dock,
     VideoCall,
   },
   data() {
@@ -297,6 +301,10 @@ export default {
 </script>
 
 <style>
+.layout-default {
+  /*  The dock rail is positioned against the layout, to line up with the page content. */
+  position: relative;
+}
 .main-navigation {
   background-color: var(--color-header-background);
 }
@@ -330,14 +338,23 @@ export default {
   );
 }
 
+/*  Out of the keyboard's way too once they are gone: hidden when the slide has ended, and */
+/*  back at once when they return (the transition above has no delay). */
+.layout-default--call-bars-away .main-navigation,
+.layout-default--call-bars-away .desktop-footer.ds-footer {
+  box-shadow: none;
+  visibility: hidden;
+  transition:
+    transform 0.3s ease,
+    visibility 0s linear 0.3s;
+}
+
 .layout-default--call-bars-away .main-navigation {
   transform: translateY(-100%);
-  box-shadow: none;
 }
 
 .layout-default--call-bars-away .desktop-footer.ds-footer {
   transform: translateY(100%);
-  box-shadow: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

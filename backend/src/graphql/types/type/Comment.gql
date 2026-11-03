@@ -19,8 +19,8 @@ input _CommentFilter {
 "A comment written by a user in reply to a post."
 type Comment {
   id: ID!
-  "ActivityPub activity id, for federated comments."
-  activityId: String
+  "Former ActivityPub activity id. Nothing has written it since ActivityPub was removed; older nodes may still carry a value."
+  activityId: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
   author: User
   "Comment body as rich text (HTML)."
   content: String!

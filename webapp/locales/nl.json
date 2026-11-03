@@ -500,6 +500,7 @@
     "POST_EVENT_LOCATION_COORDINATES_INCOMPLETE": "Er ontbreekt een coördinaat voor de locatie van het evenement.",
     "POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE": "De breedtegraad van de locatie van het evenement is ongeldig.",
     "POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE": "De lengtegraad van de locatie van het evenement is ongeldig.",
+    "POST_EVENT_LOCATION_NOT_PICKED": "Kies de locatie uit de zoekresultaten of zet hem op de kaart.",
     "POST_EVENT_START_DATE_INVALID": "De startdatum is geen geldige datum.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "De startdatum moet in ISO-formaat zijn.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "De plaatsbeschrijving moet tussen {min} en {max} tekens lang zijn.",
@@ -531,7 +532,11 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Dit kun je alleen doen bij gebruikers van wie de rol minder bevoegdheden geeft dan de jouwe.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Je mag niet zoeken in het gebruikersbeheer.",
     "USER_DOES_NOT_EXIST": "De gebruiker is niet gevonden.",
+    "USER_PROFILE_NAME_TOO_LONG": "De naam mag maximaal {max} tekens lang zijn.",
     "USER_PROFILE_NAME_TOO_SHORT": "De naam moet minimaal {min} tekens lang zijn.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Toegestane tekens zijn alleen kleine letters (a–z), cijfers (0–9), underscores en koppeltekens.",
+    "USER_PROFILE_SLUG_TOO_LONG": "De gebruikersnaam mag maximaal {max} tekens lang zijn.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "De gebruikersnaam moet minimaal {min} tekens lang zijn.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Deze gebruiker is niet geblokkeerd.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "De chat van een videogesprek is alleen open voor de deelnemers. Neem eerst deel aan het gesprek.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Er is geen actief lidmaatschap van deze groep gevonden voor het videogesprek.",
@@ -604,10 +609,12 @@
       "email": "Voer een geldig e-mailadres in.",
       "eventLocationNameLength": "Het adres moet tussen {min} en {max} tekens lang zijn.",
       "eventLocationNameNotEmpty": "Voer een adres in.",
+      "eventLocationNotPicked": "Kies de locatie uit de zoekresultaten of zet hem op de kaart.",
       "eventVenueLength": "De plaatsbeschrijving moet tussen {min} en {max} tekens lang zijn.",
       "eventVenueNotEmpty": "Voer een plaatsbeschrijving in.",
       "followableUrl": "moet een geldig webadres of e-mailadres zijn",
       "formHasErrors": "Vul alstublieft alle verplichte velden in.",
+      "locationNotPicked": "Kies de plaats uit de suggesties.",
       "nameLength": "De naam moet tussen {min} en {max} tekens lang zijn.",
       "titleLength": "De titel moet tussen {min} en {max} tekens lang zijn.",
       "titleNotEmpty": "Voer een titel in."
@@ -617,10 +624,6 @@
     "step": "Stap {current} van {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd-MM-yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Het wijzigen van je wachtwoord is mislukt. Misschien was de beveiligingscode niet correct?",
@@ -828,6 +831,20 @@
       "title": "Gebruiker deactiveren"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (door jou geblokkeerd)",
+      "count": "{count} verbonden",
+      "flag": "Lopende videogesprekken: {count}",
+      "join": "Deelnemen",
+      "joined": "Je neemt deel aan dit gesprek",
+      "participants": "Deelnemers",
+      "title": "Lopende videogesprekken"
+    },
+    "close": "Zijbalk sluiten",
+    "label": "Zijbalk",
+    "open": "Zijbalk openen – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} van {total} € verzameld",
     "donate-now": "Doneer nu"
@@ -1009,6 +1026,7 @@
     "foundation": "Oprichting",
     "general": "Algemeen",
     "goal": "Doel van de groep",
+    "goalPlaceholder": "bijv. Een tuin aanleggen voor de hele buurt",
     "group": "Groep",
     "groupCreated": "De groep is aangemaakt!",
     "in": "in",
@@ -1052,6 +1070,7 @@
     "muted": "Groep gedempt",
     "myGroups": "Mijn groepen",
     "name": "Groepsnaam",
+    "namePlaceholder": "Buurttuin De Pijp",
     "removeMember": "Lid verwijderen",
     "removeMemberButton": "Verwijderen",
     "removeMemberConfirmText": "Gebruiker “{name}” uit de groep verwijderen?",
@@ -1131,6 +1150,7 @@
       "usual": "Lid"
     },
     "save": "Nieuwe groep aanmaken",
+    "slugPlaceholder": "buurttuin-de-pijp",
     "teaser": {
       "notReadable": "Je kunt deze groep nog niet openen — je aanvraag loopt nog",
       "openGroup": "Groep openen",
@@ -1695,6 +1715,7 @@
       "unblocked": "{name} is weer gedeblokkeerd"
     },
     "data": {
+      "cityPlaceholder": "bijv. Amsterdam",
       "givenName": "Je voornaam",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "Over jou",
@@ -1863,7 +1884,8 @@
       "nameNotEmpty": "Voer alstublieft je naam in.",
       "slug": {
         "alreadyTaken": "Deze gebruikersnaam is al in gebruik.",
-        "regex": "Toegestane tekens zijn alleen kleine letters, cijfers, underscores en koppeltekens."
+        "length": "De gebruikersnaam moet tussen {min} en {max} tekens lang zijn.",
+        "regex": "Toegestane tekens zijn alleen kleine letters (a–z), cijfers (0–9), underscores en koppeltekens."
       }
     }
   },

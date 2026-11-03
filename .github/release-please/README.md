@@ -43,6 +43,7 @@ its own:
 | The filter rule gating the lint job matches every file the lint reads | The checks above only help if they run when one of those files changes, and the rule is a hand-written copy of what the configs bump — this is the only thing keeping it honest. The chain from the job's `if:` to the rule is resolved, not assumed ([`workflow-gate.mjs`](./workflow-gate.mjs)), so rewiring the gate fails loudly instead of leaving the check pointing at a list nobody uses. Matched with the same `picomatch` version `dorny/paths-filter` bundles — any other matcher would answer a slightly different question than the action does. |
 | Every file a config bumps carries the version its manifest records | The lockstep bump silently stopping — see below. Covers the `extra-files` *and* what the `node` release-type bumps on its own: `package.json` plus both version fields of `package-lock.json`. The latter are easy to miss precisely because no config mentions them. This check also fires on the release pull request itself, since that pull request edits `<name>-manifest.json`: a file the bump missed still shows the old version while the manifest already shows the new one. |
 | No `extra-files` entry is a bare string ending in `.json`/`.yaml`/`.toml`/`.xml` | The trap below. |
+| No config's release pull request `label`s are a subset of another config's | The shared-label abort described under "Why they are split". Mirrors release-please's own matching rule: a pull request belongs to a config when it carries **all** of that config's labels. |
 
 ### The `extra-files` trap
 
@@ -148,8 +149,22 @@ run that actually creates the release — that was the *branding* workflow, whic
 `packages/branding--release_created` and therefore saw `false` — so nothing published, and re-running
 could not help: release-please does not create an existing release a second time.
 
-Split per package, each workflow's release-please knows exactly one package, so neither the trigger
-overlap nor the shared tag/label state exists any more.
+Split per package, each workflow's release-please knows exactly one package, so the trigger overlap
+and the shared tag state are gone.
+
+The **labels** were still shared until v3.21.2. release-please recognises its release pull requests
+by label alone: a pull request belongs to a config when it carries all of that config's `label`s,
+and every config used the default `autorelease: pending`. So `publish.yml` saw the merged branding
+0.2.4 release pull request (#10609) in the minute before `branding-release.yml` relabelled it
+`autorelease: tagged`. It logged `Bad pull request title` and then
+`There are untagged, merged release PRs outstanding - aborting`, and left the application's release
+pull request without the branding entry. It is a race on every package release, in both
+directions, and nothing turns red. ui 0.0.8 made it into the same changelog only because its label
+flipped a few seconds earlier.
+
+The packages therefore carry their own `label` and `release-label` (`autorelease: pending (ui)`,
+`autorelease: tagged (ui)`, and the same for branding). The application keeps release-please's
+defaults, so the label on its open release pull request still matches.
 
 ## Adding a package
 
@@ -169,9 +184,13 @@ overlap nor the shared tag/label state exists any more.
 3. Copy the `changelog-sections` array verbatim from an existing config — see the section above for
    why it is duplicated rather than shared, and why leaving it out is not the neutral choice it
    looks like.
-4. Give the package its own release workflow whose `on: push: paths` lists `packages/<name>/**` plus
+4. Give the config a top-level `label` and `release-label` of its own —
+   `autorelease: pending (<name>)` / `autorelease: tagged (<name>)`. Leave them out and the package
+   shares `autorelease: pending` with the application, which reintroduces the abort described above;
+   the lint rejects it.
+5. Give the package its own release workflow whose `on: push: paths` lists `packages/<name>/**` plus
    only that package's two files here. Never list another package's files, and never share a config.
-5. End that workflow with a `release_notes` job, modelled on the one in `ui-release.yml`: it appends
+6. End that workflow with a `release_notes` job, modelled on the one in `ui-release.yml`: it appends
    the install instructions to the release release-please created, because release-please knows the
    changelog but not where the artefact was published. Keep its `always() && needs.publish.result ==
    'success'` gate — a failed GitHub Packages mirror must not withhold the notes for a successful

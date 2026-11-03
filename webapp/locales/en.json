@@ -500,6 +500,7 @@
     "POST_EVENT_LOCATION_COORDINATES_INCOMPLETE": "A coordinate is missing for the event location.",
     "POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE": "The latitude of the event location is invalid.",
     "POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE": "The longitude of the event location is invalid.",
+    "POST_EVENT_LOCATION_NOT_PICKED": "Please pick the location from the search results or set it on the map.",
     "POST_EVENT_START_DATE_INVALID": "The start date is not a valid date.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "The start date must be in ISO format.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "The venue description must be between {min} and {max} characters long.",
@@ -531,7 +532,11 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "You can only do this to users whose role grants less authority than yours.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "You are not allowed to search the user administration.",
     "USER_DOES_NOT_EXIST": "The user could not be found.",
+    "USER_PROFILE_NAME_TOO_LONG": "The name must be at most {max} characters long.",
     "USER_PROFILE_NAME_TOO_SHORT": "The name must be at least {min} characters long.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Allowed characters are only lowercase letters (a–z), numbers (0–9), underscores and hyphens.",
+    "USER_PROFILE_SLUG_TOO_LONG": "The user name must be at most {max} characters long.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "The user name must be at least {min} characters long.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "This user is not blocked.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "The chat of a video call is open to those taking part in it. Join the call first.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "No active membership in this group was found for the video call.",
@@ -604,10 +609,12 @@
       "email": "Please enter a valid e-mail address.",
       "eventLocationNameLength": "The address must be between {min} and {max} characters long.",
       "eventLocationNameNotEmpty": "Please enter an address.",
+      "eventLocationNotPicked": "Please pick the location from the search results or set it on the map.",
       "eventVenueLength": "The venue description must be between {min} and {max} characters long.",
       "eventVenueNotEmpty": "Please enter a venue description.",
       "followableUrl": "must be a valid web address or mail address",
       "formHasErrors": "Please fill in all required fields.",
+      "locationNotPicked": "Please choose the place from the suggestions.",
       "nameLength": "The name must be between {min} and {max} characters.",
       "titleLength": "The title must be between {min} and {max} characters.",
       "titleNotEmpty": "Please enter a title."
@@ -617,10 +624,6 @@
     "step": "Step {current} of {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "MM/dd/yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Changing your password failed. Maybe the security code was not correct?",
@@ -828,6 +831,20 @@
       "title": "Disable User"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (blocked by you)",
+      "count": "{count} connected",
+      "flag": "Running video calls: {count}",
+      "join": "Join",
+      "joined": "You are in this call",
+      "participants": "Participants",
+      "title": "Running video calls"
+    },
+    "close": "Close sidebar",
+    "label": "Sidebar",
+    "open": "Open sidebar – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} of {total} € collected",
     "donate-now": "Donate now"
@@ -1009,6 +1026,7 @@
     "foundation": "Foundation",
     "general": "General",
     "goal": "Goal of group",
+    "goalPlaceholder": "e.g. Grow a garden open to the whole neighbourhood",
     "group": "Group",
     "groupCreated": "The group was created!",
     "in": "in",
@@ -1052,6 +1070,7 @@
     "muted": "Group muted",
     "myGroups": "My Groups",
     "name": "Group name",
+    "namePlaceholder": "Riverside Community Garden",
     "removeMember": "Remove member",
     "removeMemberButton": "Remove",
     "removeMemberConfirmText": "Remove user “{name}” from the group?",
@@ -1131,6 +1150,7 @@
       "usual": "Member"
     },
     "save": "Create new group",
+    "slugPlaceholder": "riverside-community-garden",
     "teaser": {
       "notReadable": "You cannot open this group yet — your request is still pending",
       "openGroup": "Open group",
@@ -1695,6 +1715,7 @@
       "unblocked": "{name} is unblocked again"
     },
     "data": {
+      "cityPlaceholder": "e.g. London",
       "givenName": "Your given name",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "About You",
@@ -1863,7 +1884,8 @@
       "nameNotEmpty": "Please enter your name.",
       "slug": {
         "alreadyTaken": "This user name is already taken.",
-        "regex": "Allowed characters are only lowercase letters, numbers, underscores and hyphens."
+        "length": "The user name must be between {min} and {max} characters.",
+        "regex": "Allowed characters are only lowercase letters (a–z), numbers (0–9), underscores and hyphens."
       }
     }
   },

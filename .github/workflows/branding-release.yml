@@ -45,7 +45,7 @@ jobs:
       # never run on the release PR. The app token lets them run.
       - name: Generate it4c-release-bot token
         id: app-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
           app-id: ${{ vars.RELEASE_APP_ID }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
@@ -55,7 +55,7 @@ jobs:
           # app happens to be installed with would reach every later step in this job.
           #   contents      — commits, branches, tags and the GitHub release
           #   pull-requests — the release pull request itself
-          #   issues        — its `autorelease: pending`/`tagged` labels; labelling a pull request
+          #   issues        — its `autorelease: pending (branding)`/`tagged (branding)` labels; labelling a pull request
           #                   goes through the issues API, so it is a separate scope
           permission-contents: write
           permission-pull-requests: write

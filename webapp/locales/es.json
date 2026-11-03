@@ -500,6 +500,7 @@
     "POST_EVENT_LOCATION_COORDINATES_INCOMPLETE": "Falta una coordenada para la ubicación del evento.",
     "POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE": "La latitud de la ubicación del evento no es válida.",
     "POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE": "La longitud de la ubicación del evento no es válida.",
+    "POST_EVENT_LOCATION_NOT_PICKED": "Elige el lugar de los resultados de búsqueda o márcalo en el mapa.",
     "POST_EVENT_START_DATE_INVALID": "La fecha de inicio no es una fecha válida.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "La fecha de inicio debe estar en formato ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "La descripción del lugar debe tener entre {min} y {max} caracteres.",
@@ -531,7 +532,11 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Solo puedes hacer esto con usuarios cuyo rol otorgue menos atribuciones que el tuyo.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "No puedes buscar en la administración de usuarios.",
     "USER_DOES_NOT_EXIST": "No se ha encontrado el usuario.",
+    "USER_PROFILE_NAME_TOO_LONG": "El nombre puede tener como máximo {max} caracteres.",
     "USER_PROFILE_NAME_TOO_SHORT": "El nombre debe tener al menos {min} caracteres.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Los caracteres permitidos son solo letras minúsculas (a–z), números (0–9), guiones bajos y guiones.",
+    "USER_PROFILE_SLUG_TOO_LONG": "El nombre de usuario puede tener como máximo {max} caracteres.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "El nombre de usuario debe tener al menos {min} caracteres.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Este usuario no está bloqueado.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "El chat de una videollamada solo está abierto a quienes participan en ella. Únete primero a la llamada.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "No se ha encontrado ninguna membresía activa en este grupo para la videollamada.",
@@ -604,10 +609,12 @@
       "email": "Por favor, ingrese una dirección de correo electrónico válida.",
       "eventLocationNameLength": "La dirección debe tener entre {min} y {max} caracteres.",
       "eventLocationNameNotEmpty": "Por favor, ingrese una dirección.",
+      "eventLocationNotPicked": "Elige el lugar de los resultados de búsqueda o márcalo en el mapa.",
       "eventVenueLength": "La descripción del lugar debe tener entre {min} y {max} caracteres.",
       "eventVenueNotEmpty": "Por favor, ingrese una descripción del lugar.",
       "followableUrl": "debe ser una dirección web o de correo electrónico válida",
       "formHasErrors": "Por favor, rellene todos los campos obligatorios.",
+      "locationNotPicked": "Elige el lugar de las sugerencias.",
       "nameLength": "El nombre debe tener entre {min} y {max} caracteres.",
       "titleLength": "El título debe tener entre {min} y {max} caracteres.",
       "titleNotEmpty": "Por favor, ingrese un título."
@@ -617,10 +624,6 @@
     "step": "Paso {current} de {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd/MM/yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Error al cambiar la contraseña. ¿Posiblemente un código de seguridad incorrecto?",
@@ -828,6 +831,20 @@
       "title": "Desactivar usuario"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (bloqueado por ti)",
+      "count": "{count} conectados",
+      "flag": "Videollamadas en curso: {count}",
+      "join": "Unirse",
+      "joined": "Estás en esta llamada",
+      "participants": "Participantes",
+      "title": "Videollamadas en curso"
+    },
+    "close": "Cerrar barra lateral",
+    "label": "Barra lateral",
+    "open": "Abrir barra lateral – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} de {total} € recaudados",
     "donate-now": "Donar ahora"
@@ -1009,6 +1026,7 @@
     "foundation": "Fundación",
     "general": "General",
     "goal": "Objetivo del grupo",
+    "goalPlaceholder": "p. ej. Crear un huerto abierto a todo el barrio",
     "group": "Grupo",
     "groupCreated": "¡El grupo fue creado!",
     "in": "en",
@@ -1052,6 +1070,7 @@
     "muted": "Grupo silenciado",
     "myGroups": "Mis grupos",
     "name": "Nombre del grupo",
+    "namePlaceholder": "Huerto Comunitario Lavapiés",
     "removeMember": "Eliminar miembro",
     "removeMemberButton": "Eliminar",
     "removeMemberConfirmText": "¿Eliminar al usuario «{name}» del grupo?",
@@ -1131,6 +1150,7 @@
       "usual": "Miembro"
     },
     "save": "Crear nuevo grupo",
+    "slugPlaceholder": "huerto-comunitario-lavapies",
     "teaser": {
       "notReadable": "Todavía no puedes abrir este grupo — tu solicitud sigue pendiente",
       "openGroup": "Abrir grupo",
@@ -1695,6 +1715,7 @@
       "unblocked": "{name} está desbloqueado nuevamente"
     },
     "data": {
+      "cityPlaceholder": "p. ej. Madrid",
       "givenName": "Tu nombre",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "Acerca de usted",
@@ -1863,7 +1884,8 @@
       "nameNotEmpty": "Por favor introduce tu nombre.",
       "slug": {
         "alreadyTaken": "Este nombre de usuario ya está en uso.",
-        "regex": "Los caracteres permitidos son solo letras minúsculas, números, guiones bajos y guiones."
+        "length": "El nombre de usuario debe tener entre {min} y {max} caracteres.",
+        "regex": "Los caracteres permitidos son solo letras minúsculas (a–z), números (0–9), guiones bajos y guiones."
       }
     }
   },

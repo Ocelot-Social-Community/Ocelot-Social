@@ -1,8 +1,10 @@
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { PubSub } from 'graphql-subscriptions'
 import Redis from 'ioredis'
+import { isInt } from 'neo4j-driver'
 
 import CONFIG from '@config/index'
+import ocelotLogger from '@src/logger'
 
 import type { RedisOptions } from 'ioredis'
 
@@ -12,6 +14,15 @@ import type { RedisOptions } from 'ioredis'
 // (without Redis); with Redis it would work because both clients hit the
 // same broker, but consistency across environments is worth the singleton.
 let instance: PubSub | RedisPubSub | undefined
+
+// Far above what a publish takes, even from a pod under CPU pressure: running into it loses a live
+// event, while it only ever costs time when Redis is gone anyway.
+const PUBLISH_TIMEOUT_MS = 2_000
+
+// An event crosses Redis as JSON, while the in-process PubSub hands on the object itself. A Neo4j
+// integer does not survive that: it arrives as `{ low, high }`, which no Int field can serialize.
+const serializer = (event: unknown) =>
+  JSON.stringify(event, (_key, value: unknown) => (isInt(value) ? value.toNumber() : value))
 
 export default () => {
   if (instance) {
@@ -37,9 +48,34 @@ export default () => {
       return Math.min(times * 50, 2000)
     },
   }
-  instance = new RedisPubSub({
-    publisher: new Redis(options),
-    subscriber: new Redis(options),
-  })
+  const onError = (error: Error) => {
+    ocelotLogger.warn('Redis connection failed', error.message)
+  }
+  // No queue for a publisher, and no second try: what happens while Redis is away is lost either
+  // way, and a mutation awaiting publish() would sit through every retry first, for an answer
+  // nobody needs. The timeout is for a Redis that stopped answering without closing the socket.
+  const publisher = new Redis({
+    ...options,
+    enableOfflineQueue: false,
+    autoResendUnfulfilledCommands: false,
+    commandTimeout: PUBLISH_TIMEOUT_MS,
+  }).on('error', onError)
+  // No limit for a subscriber: it waits for Redis, however long that takes. Giving up would throw
+  // out of init() at boot, and out of an open subscription later on.
+  const subscriber = new Redis({ ...options, maxRetriesPerRequest: null }).on('error', onError)
+  const pubsub = new RedisPubSub({ publisher, subscriber, serializer })
+
+  // Most callers `void` their publish() because the write has committed and the event is a
+  // courtesy, so a rejection from here would go unhandled and take the whole process down with it.
+  const publish = pubsub.publish.bind(pubsub)
+  pubsub.publish = async (trigger, payload) => {
+    try {
+      await publish(trigger, payload)
+      // eslint-disable-next-line no-catch-all/no-catch-all -- see above: nothing may escape
+    } catch (error) {
+      ocelotLogger.warn(`Could not publish ${trigger}`, error)
+    }
+  }
+  instance = pubsub
   return instance
 }

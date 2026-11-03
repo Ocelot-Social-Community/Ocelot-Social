@@ -42,6 +42,23 @@ updates:
       patterns:
         - "*vuepress*"
 
+# The compose files at the root (docker-compose*.yml — Dependabot's docker-compose ecosystem matches
+# docker-compose.test.yml and docker-compose.override.yml as well). Only the images listed are
+# updated: ubuntu:24.04 in docker-compose.visual.yml stays where the CI runner is, or the visual
+# baselines would stop matching; the chainguard/imagor images run on floating tags.
+# maildev is pinned because the notification e2e tests read its REST API, which has moved before
+# (3.0 serves it under /api) — a bump arrives as a pull request whose e2e run shows if it still fits.
+- package-ecosystem: docker-compose
+  open-pull-requests-limit: 99
+  directory: "/"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+  allow:
+    - dependency-name: "maildev/maildev"
+
 # backend
 - package-ecosystem: docker
   open-pull-requests-limit: 99

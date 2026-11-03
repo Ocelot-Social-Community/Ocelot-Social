@@ -3409,6 +3409,39 @@ describe('VideoCall', () => {
           expect(wrapper.vm.spotlightKey).toBe('anna')
         })
 
+        it('hear a tap through the document', () => {
+          // The call is not attached to the document, so a stage of its own is.
+          const attachedStage = document.createElement('div')
+          attachedStage.className = 'video-call__stage'
+          document.body.appendChild(attachedStage)
+          const touch = () => {
+            const event = new Event('pointerdown', { bubbles: true })
+            Object.defineProperty(event, 'pointerType', { value: 'touch' })
+            attachedStage.dispatchEvent(event)
+          }
+          touch()
+          expect(wrapper.vm.barsHidden).toBe(true)
+          touch()
+          expect(wrapper.vm.barsHidden).toBe(false)
+          attachedStage.remove()
+        })
+
+        it('come back at a key pressed right after a tap', () => {
+          tap(stage)
+          expect(wrapper.vm.barsHidden).toBe(true)
+          document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true }))
+          expect(wrapper.vm.barsHidden).toBe(false)
+        })
+
+        it('spotlight a tile clicked with the mouse after a tap beside the tiles', () => {
+          jest.advanceTimersByTime(4000)
+          tap(stage)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          wrapper.vm.onBarActivity({ type: 'pointerdown', pointerType: 'mouse', target: tile })
+          wrapper.vm.onTileSelect({ key: 'anna' })
+          expect(wrapper.vm.spotlightKey).toBe('anna')
+        })
+
         it('ignore the mouse events the browser makes up after a tap', () => {
           tap(stage)
           move()
@@ -3647,6 +3680,19 @@ describe('VideoCall', () => {
       expect(VideoCall.methods.controlTooltip.call(phone, 'Headset: turn off')).toBe('')
     })
 
+    it('names a control by its visible label too, while it shows one', () => {
+      const name = (iconOnly, label, action) =>
+        VideoCall.methods.controlName.call({ iconOnly }, label, action)
+      expect(name(false, 'Microphone', 'Headset: turn off')).toBe('Microphone, Headset: turn off')
+      // Not twice where the action has it already.
+      expect(name(false, 'Microphone', 'Microphone: turn off')).toBe('Microphone: turn off')
+      expect(name(false, 'Screen', 'Share your screen, a window or a tab')).toBe(
+        'Share your screen, a window or a tab',
+      )
+      // Without a label to see, the action alone.
+      expect(name(true, 'Microphone', 'Headset: turn off')).toBe('Headset: turn off')
+    })
+
     it('drops the labels in the parked window, and offers them as tooltips', () => {
       const parkedWindow = { parked: true, isMobile: false, phase: 'in-call' }
       expect(computed.iconOnly.call(parkedWindow)).toBe(true)
@@ -3675,6 +3721,40 @@ describe('VideoCall', () => {
       expect(crowded(500, 0)).toBe(false)
       expect(crowded(0, 640)).toBe(false)
       expect(crowded(500, 640, true)).toBe(false)
+    })
+
+    describe('measureControls', () => {
+      let getComputedStyleSpy
+
+      afterEach(() => {
+        getComputedStyleSpy?.mockRestore()
+      })
+
+      it('measures the control bar and what its labeled buttons need in one row', async () => {
+        const { wrapper } = factory({ show: true, minimized: false })
+        await wrapper.setData({ phase: 'in-call', windowWidth: 1200 })
+        const bar = wrapper.find('.video-call__controls').element
+        const items = Array.from(bar.children)
+        items.forEach((item) => Object.defineProperty(item, 'offsetWidth', { value: 100 }))
+        const width = (value) =>
+          Object.defineProperty(bar, 'clientWidth', { value, configurable: true })
+        getComputedStyleSpy = jest
+          .spyOn(window, 'getComputedStyle')
+          .mockReturnValue({ columnGap: '8px', paddingLeft: '10px', paddingRight: '10px' })
+        const needed = items.length * 100 + 8 * (items.length - 1) + 20
+
+        width(needed - 1)
+        wrapper.vm.measureControls()
+        expect(wrapper.vm.controlsWidth).toBe(needed - 1)
+        expect(wrapper.vm.labeledControlsWidth).toBe(needed)
+        expect(wrapper.vm.iconOnly).toBe(true)
+
+        width(needed + 100)
+        wrapper.vm.measureControls()
+        expect(wrapper.vm.controlsWidth).toBe(needed + 100)
+        expect(wrapper.vm.iconOnly).toBe(false)
+        wrapper.destroy()
+      })
     })
 
     it('never parks the call on a phone', () => {

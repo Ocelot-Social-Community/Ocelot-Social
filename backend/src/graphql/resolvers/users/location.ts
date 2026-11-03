@@ -207,20 +207,18 @@ const attachLocation = async (session, nodeLabel, nodeId, locationId: string) =>
 }
 
 /**
- * The feature Mapbox finds for a place's text — the name path, on its own, so that it can run
- * before anything is written (resolveLocationInput) as well as after (createOrUpdateLocations).
+ * The feature Mapbox names exactly as the place was picked — the name path of
+ * resolveLocationInput, where no Mapbox id came with the name.
  *
- * `exact`: the text IS the user's picked choice, so only a feature named exactly that will do,
- * and none is an error. Without it the text is free input with no claim to an exact match, and
- * Mapbox's top-ranked result is taken — which, for a name shown in one language and searched in
- * several, can be a different place altogether (#7018, #7239).
+ * Only a feature named exactly so will do, and none is an error. Mapbox's top-ranked result used
+ * to be taken instead, which, for a name shown in one language and searched in several, was a
+ * different place altogether (#7018, #7239).
  */
 const geocodeLocationName = async (
   locationName: string,
   coordinates: { lat: number; lng: number } | null | undefined,
   context: Context,
   types: string[],
-  exact: boolean,
 ) => {
   // Coordinates are only a `proximity` bias here, disambiguating same-named places.
   const proximity = coordinates ? `${coordinates.lng},${coordinates.lat}` : null
@@ -254,10 +252,7 @@ const geocodeLocationName = async (
     }
   })
   if (!data) {
-    if (exact) {
-      throw new AppError(Errors.LOCATION_NAME_NO_EXACT_MATCH)
-    }
-    data = res.features[0]
+    throw new AppError(Errors.LOCATION_NAME_NO_EXACT_MATCH)
   }
 
   if (!data?.place_type?.length) {
@@ -267,54 +262,35 @@ const geocodeLocationName = async (
 }
 
 /**
- * A post's location — an event's place — attached after the post is written.
+ * An event's place, attached after the post is written.
  *
- * Users, groups and new accounts go through resolveLocationInput instead, which resolves the place
- * before writing and only ever by what the user picked. An event drops a pin that need not
- * correspond 1:1 to any piece of text, so its coordinates are authoritative and reverse-geocoded
- * with the precise, address-level types (EVENT_REVERSE_GEOCODE_TYPES). Without coordinates — a
- * place typed but not picked — the text is searched and Mapbox's top-ranked result taken.
+ * Users, groups and new accounts go through resolveLocationInput instead. An event's place is
+ * always picked — a search result or a dropped pin, never typed text (validateEventParams refuses
+ * that) — and the pin need not correspond 1:1 to any piece of text, so its coordinates are
+ * authoritative, reverse-geocoded with the precise, address-level types
+ * (EVENT_REVERSE_GEOCODE_TYPES). `null` removes the place.
  */
 export const createOrUpdateLocations = async (
   nodeLabel,
   nodeId,
-  locationName,
+  locationName: string | null,
   session,
   context: Context,
   coordinates?: { lat: number; lng: number } | null,
 ) => {
-  // Both callers (CreatePost, UpdatePost) call only when the input carries a location, or its
-  // removal (null).
-  let locationId
-
-  if (locationName !== null) {
-    let data
-
-    if (coordinates) {
-      data = await reverseGeocodeCoordinates(
-        coordinates.lat,
-        coordinates.lng,
-        context,
-        EVENT_REVERSE_GEOCODE_TYPES,
-      )
-      if (!data?.place_type?.length) {
-        throw new AppError(Errors.LOCATION_COORDINATES_NOT_RESOLVABLE)
-      }
-    } else {
-      data = await geocodeLocationName(
-        locationName,
-        null,
-        context,
-        ['region', 'place', 'country', 'address'],
-        false,
-      )
+  let locationId = 'non-existent-id'
+  if (locationName !== null && coordinates) {
+    const data = await reverseGeocodeCoordinates(
+      coordinates.lat,
+      coordinates.lng,
+      context,
+      EVENT_REVERSE_GEOCODE_TYPES,
+    )
+    if (!data?.place_type?.length) {
+      throw new AppError(Errors.LOCATION_COORDINATES_NOT_RESOLVABLE)
     }
-
     locationId = await storeLocation(session, data)
-  } else {
-    locationId = 'non-existent-id'
   }
-
   await attachLocation(session, nodeLabel, nodeId, locationId)
 }
 
@@ -536,7 +512,7 @@ export const resolveLocationInput = async (
   const data =
     feature ??
     (locationName
-      ? await geocodeLocationName(locationName, coordinates, context, allowedTypes, true)
+      ? await geocodeLocationName(locationName, coordinates, context, allowedTypes)
       : null)
 
   return {
