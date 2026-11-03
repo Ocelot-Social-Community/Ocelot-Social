@@ -599,6 +599,9 @@ export default {
       // videos back, so we stop deciding for them until the next call.
       audioOnly: false,
       audioOnlyDismissed: false,
+      // Our machine cannot keep up with encoding and decoding video. Holds for
+      // the rest of the call, like in LiveKit's own app.
+      cpuConstrained: false,
       showDeviceSettings: false,
       // What the browser lists, to put a name to the devices in use.
       knownDevices: [],
@@ -1627,12 +1630,21 @@ export default {
       this.micSilenceProbe = null
       this.stopAudioWatchdog()
       this.resetAudioOnly()
+      this.cpuConstrained = false
       try {
         if (!this.groupId) throw new Error('Missing group id')
         const payload = await this.takeJoinPayload(this.groupId)
 
         const livekit = await import('livekit-client')
-        const { Room, RoomEvent, Track, TrackEvent, DisconnectReason } = livekit
+        const {
+          Room,
+          RoomEvent,
+          ParticipantEvent,
+          Track,
+          TrackEvent,
+          VideoQuality,
+          DisconnectReason,
+        } = livekit
         this.Track = Track
 
         const room = new Room({
@@ -1650,10 +1662,30 @@ export default {
         const onAny = () => this.refreshTiles()
         room.on(RoomEvent.ParticipantConnected, onAny)
         room.on(RoomEvent.ParticipantDisconnected, onAny)
-        room.on(RoomEvent.TrackSubscribed, () => {
+        room.on(RoomEvent.TrackSubscribed, (_track, pub) => {
           // Subscribed before the unsubscribe of audio-only mode took hold.
           if (this.audioOnly) this.applyAudioOnly()
+          if (this.cpuConstrained) this.lowerCameraQuality(pub, VideoQuality)
           onAny()
+        })
+        // Encoding and decoding video can eat the CPU to the point where the
+        // audio stutters as well. Once the browser reports that our own video is
+        // held back by the CPU, the cameras give way: ours is sent small and at
+        // 15 fps, everyone else's arrives in the lowest layer. Screen shares
+        // keep their quality — they are what the call is about, and unreadable
+        // when small.
+        room.localParticipant.on(ParticipantEvent.LocalTrackCpuConstrained, () => {
+          if (this.cpuConstrained) return
+          // A deliberate diagnosis: the only trace of why the videos got coarse.
+          // eslint-disable-next-line no-console
+          console.warn('[video-call] CPU constrained, lowering the video quality of the cameras')
+          this.cpuConstrained = true
+          this.relieveOwnCamera()
+          for (const participant of room.remoteParticipants.values()) {
+            for (const pub of participant.videoTrackPublications.values()) {
+              this.lowerCameraQuality(pub, VideoQuality)
+            }
+          }
         })
         // A camera published while we are in audio-only mode would otherwise
         // be auto-subscribed and eat the bandwidth we just freed.
@@ -1691,6 +1723,10 @@ export default {
         })
         room.on(RoomEvent.LocalTrackPublished, (pub) => {
           this.screenShareEnabled = !!room.localParticipant.isScreenShareEnabled
+          // A camera switched on only now gets the same relief.
+          if (this.cpuConstrained && pub && pub.source === Track.Source.Camera) {
+            this.relieveOwnCamera()
+          }
           if (pub && pub.source === Track.Source.Microphone && pub.track) {
             this.watchMicTrack(pub.track, TrackEvent)
           }
@@ -2238,6 +2274,18 @@ export default {
     stopAudioWatchdog() {
       if (this.audioWatchdog) this.audioWatchdog.stop()
       this.audioWatchdog = null
+    },
+    relieveOwnCamera() {
+      const pub = this.room.localParticipant.getTrackPublication(this.Track.Source.Camera)
+      const track = pub && pub.track
+      if (!track || typeof track.prioritizePerformance !== 'function') return
+      // Rejects when the track is not being sent (yet) — nothing to relieve then.
+      track.prioritizePerformance().catch(() => {})
+    },
+    lowerCameraQuality(pub, VideoQuality) {
+      if (pub && pub.source === this.Track.Source.Camera && pub.setVideoQuality) {
+        pub.setVideoQuality(VideoQuality.LOW)
+      }
     },
     resetAudioOnly() {
       this.clearQualityTimer()
