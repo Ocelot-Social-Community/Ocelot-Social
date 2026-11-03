@@ -48,6 +48,8 @@ updates:
 # baselines would stop matching; the chainguard/imagor images run on floating tags.
 # maildev is pinned because the notification e2e tests read its REST API, which has moved before
 # (3.0 serves it under /api) — a bump arrives as a pull request whose e2e run shows if it still fits.
+# The CI workflows name neither image: the test jobs pull them by the tag in docker-compose.test.yml,
+# so a bump there is all a bump takes.
 - package-ecosystem: docker-compose
   open-pull-requests-limit: 99
   directory: "/"
@@ -58,6 +60,7 @@ updates:
     time: "03:00"
   allow:
     - dependency-name: "maildev/maildev"
+    - dependency-name: "redis"
 
 # backend
 - package-ecosystem: docker
