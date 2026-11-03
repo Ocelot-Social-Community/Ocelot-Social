@@ -338,14 +338,23 @@ export default {
   );
 }
 
+/*  Out of the keyboard's way too once they are gone: hidden when the slide has ended, and */
+/*  back at once when they return (the transition above has no delay). */
+.layout-default--call-bars-away .main-navigation,
+.layout-default--call-bars-away .desktop-footer.ds-footer {
+  box-shadow: none;
+  visibility: hidden;
+  transition:
+    transform 0.3s ease,
+    visibility 0s linear 0.3s;
+}
+
 .layout-default--call-bars-away .main-navigation {
   transform: translateY(-100%);
-  box-shadow: none;
 }
 
 .layout-default--call-bars-away .desktop-footer.ds-footer {
   transform: translateY(100%);
-  box-shadow: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

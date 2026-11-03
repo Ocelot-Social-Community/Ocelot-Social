@@ -509,7 +509,7 @@ const BARS_EDGE_PX = 50
 // What brings the bars back. Focus too, for whoever moves through the controls by keyboard.
 const BARS_ACTIVITY_EVENTS = ['mousemove', 'pointerdown', 'keydown', 'wheel', 'focusin']
 // A tap is followed by the mouse events and the focus the browser makes up for it; they
-// come within this time and are no activity of their own.
+// come within this time and are no activity of their own. A key pressed is none of them.
 const TOUCH_ECHO_MS = 800
 
 // Cameras publish 16:9, so the grid aims for cells of that shape: the closer a
@@ -1131,6 +1131,7 @@ export default {
         clearTimeout(this.barsTimer)
         this.barsTimer = null
         this.barsHidden = false
+        this.swallowTileSelect = false
       }
     },
     onBarActivity(event) {
@@ -1138,7 +1139,9 @@ export default {
         this.onBarTouch(event)
         return
       }
-      if (Date.now() - this.lastTouchAt < TOUCH_ECHO_MS) return
+      // A click with the mouse or a pen is the user's own: a tile it lands on is selected.
+      if (event.type === 'pointerdown') this.swallowTileSelect = false
+      if (event.type !== 'keydown' && Date.now() - this.lastTouchAt < TOUCH_ECHO_MS) return
       // Reading and writing in the chat beside the videos is no reason to put the bars
       // back on them; going for the page's header or footer at the window's edge is.
       const inChat = event.target?.closest?.('.video-call__sidebar')
