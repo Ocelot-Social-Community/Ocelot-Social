@@ -999,15 +999,15 @@
       "title": "Editar meu grupo"
     },
     "elevation": {
-      "actingAsMember": "Aqui ages como {role}.",
-      "actingAsNonMember": "Não és membro deste grupo.",
       "activeTitle": "O acesso de administrador está ativo.",
       "activeUntil": "Termina às {time}, ou quando o encerrares.",
       "end": "Encerrar o acesso de administrador",
-      "offerBody": "Além disso tens direitos de rede sobre ele. Ler o seu conteúdo ou alterar algo pede esta confirmação, que fica registada junto do grupo.",
-      "offerBodyOwner": "Os teus direitos de rede também te permitem despromover ou remover os outros proprietários deste grupo. Isso pede esta confirmação, que fica registada junto do grupo.",
-      "reasonPlaceholder": "Do que se trata?",
-      "start": "Usar acesso de administrador"
+      "offerBody": "O teu papel atual neste grupo: «{role}». Indica o motivo pelo qual queres gerir este grupo (fica registado).",
+      "offerBodyNoneMember": "Não és membro do grupo. Indica o motivo pelo qual queres gerir este grupo (fica registado).",
+      "offerBodyOwner": "O teu papel atual neste grupo: «{role}». Os teus direitos de rede também te permitem despromover ou remover os outros proprietários deste grupo. Indica o motivo pelo qual queres gerir este grupo (fica registado).",
+      "reasonPlaceholder": "Motivo da tua ação",
+      "start": "Gerir grupo",
+      "title": "Tens o direito de gerir este grupo como um superproprietário."
     },
     "errors": {
       "userAlreadyMember": "O usuário “{name}” já é membro!"

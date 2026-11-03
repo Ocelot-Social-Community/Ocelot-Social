@@ -999,15 +999,15 @@
       "title": "Mijn groep bewerken"
     },
     "elevation": {
-      "actingAsMember": "Je handelt hier als {role}.",
-      "actingAsNonMember": "Je bent geen lid van deze groep.",
       "activeTitle": "Beheerderstoegang is actief.",
       "activeUntil": "Hij eindigt om {time}, of wanneer je hem beëindigt.",
       "end": "Beheerderstoegang beëindigen",
-      "offerBody": "Daarnaast heb je netwerkrechten over de groep. De inhoud lezen of iets wijzigen vraagt om deze bevestiging, en die wordt bij de groep vastgelegd.",
-      "offerBodyOwner": "Met je netwerkrechten kun je ook de andere eigenaren van deze groep terugzetten of verwijderen. Dat vraagt om deze bevestiging, en die wordt bij de groep vastgelegd.",
-      "reasonPlaceholder": "Waar gaat het om?",
-      "start": "Beheerderstoegang gebruiken"
+      "offerBody": "Je huidige rol in deze groep: “{role}”. Geef een reden op waarom je deze groep wilt beheren (wordt vastgelegd).",
+      "offerBodyNoneMember": "Je bent geen lid van de groep. Geef een reden op waarom je deze groep wilt beheren (wordt vastgelegd).",
+      "offerBodyOwner": "Je huidige rol in deze groep: “{role}”. Met je netwerkrechten kun je ook de andere eigenaren van deze groep terugzetten of verwijderen. Geef een reden op waarom je deze groep wilt beheren (wordt vastgelegd).",
+      "reasonPlaceholder": "Reden voor je actie",
+      "start": "Groep beheren",
+      "title": "Je hebt het recht om deze groep te beheren als een supereigenaar."
     },
     "errors": {
       "userAlreadyMember": "Gebruiker “{name}” is al lid!"

@@ -38,10 +38,8 @@ describe('GroupElevation', () => {
     expect(at(wrapper, 'group-elevation').exists()).toBe(false)
   })
 
-  it('says what the viewer is RIGHT NOW, which is not elevated', async () => {
-    // Until they ask, they act on their membership — telling a member they are "not acting as
-    // a member" was simply wrong, and telling anyone they are elevated before they asked is
-    // worse.
+  it("names the viewer's current role, or says they are no member", () => {
+    // Until they ask, they act on their membership — the offer must not claim they are elevated.
     const asMember = Wrapper({
       id: 'g1',
       mayElevateInGroup: true,
@@ -49,11 +47,16 @@ describe('GroupElevation', () => {
       myGroupRole: { name: 'usual', label: null },
     })
 
-    expect(at(asMember, 'elevation-offer').text()).toContain('group.elevation.actingAsMember')
+    expect(at(asMember, 'elevation-offer').text()).toContain('group.elevation.title')
+    expect(at(asMember, 'elevation-offer').text()).toContain('group.elevation.offerBody')
+    expect(at(asMember, 'elevation-offer').text()).not.toContain('offerBodyNoneMember')
+    expect(at(asMember, 'elevation-offer').text()).not.toContain('offerBodyOwner')
 
     const asStranger = Wrapper({ id: 'g1', mayElevateInGroup: true, myGroupElevation: null })
 
-    expect(at(asStranger, 'elevation-offer').text()).toContain('group.elevation.actingAsNonMember')
+    expect(at(asStranger, 'elevation-offer').text()).toContain(
+      'group.elevation.offerBodyNoneMember',
+    )
   })
 
   it('tells an owner what asking adds for them: the standing over their co-owners', () => {
@@ -66,11 +69,6 @@ describe('GroupElevation', () => {
     })
 
     expect(at(asOwner, 'elevation-offer').text()).toContain('group.elevation.offerBodyOwner')
-
-    const asStranger = Wrapper({ id: 'g1', mayElevateInGroup: true, myGroupElevation: null })
-
-    expect(at(asStranger, 'elevation-offer').text()).toContain('group.elevation.offerBody')
-    expect(at(asStranger, 'elevation-offer').text()).not.toContain('offerBodyOwner')
   })
 
   it('offers the access to somebody who holds network rights here', () => {

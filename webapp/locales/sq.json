@@ -999,15 +999,15 @@
       "title": "Ndrysho grupin tim"
     },
     "elevation": {
-      "actingAsMember": "Këtu vepron si {role}.",
-      "actingAsNonMember": "Nuk je anëtar i këtij grupi.",
       "activeTitle": "Qasja si administrator është aktive.",
       "activeUntil": "Përfundon në {time}, ose kur ta mbyllësh ti.",
       "end": "Mbyll qasjen si administrator",
-      "offerBody": "Përveç kësaj ke të drejta rrjeti mbi të. Leximi i përmbajtjes ose çdo ndryshim kërkon këtë konfirmim, i cili regjistrohet te grupi.",
-      "offerBodyOwner": "Të drejtat e rrjetit të lejojnë gjithashtu të ulësh ose të heqësh pronarët e tjerë të këtij grupi. Kjo kërkon këtë konfirmim, i cili regjistrohet te grupi.",
-      "reasonPlaceholder": "Për çfarë bëhet fjalë?",
-      "start": "Përdor qasjen si administrator"
+      "offerBody": "Roli yt aktual në këtë grup: «{role}». Jep një arsye pse dëshiron ta administrosh këtë grup (do të regjistrohet).",
+      "offerBodyNoneMember": "Nuk je anëtar i grupit. Jep një arsye pse dëshiron ta administrosh këtë grup (do të regjistrohet).",
+      "offerBodyOwner": "Roli yt aktual në këtë grup: «{role}». Të drejtat e rrjetit të lejojnë gjithashtu të ulësh ose të heqësh pronarët e tjerë të këtij grupi. Jep një arsye pse dëshiron ta administrosh këtë grup (do të regjistrohet).",
+      "reasonPlaceholder": "Arsyeja e veprimit tënd",
+      "start": "Administro grupin",
+      "title": "Ke të drejtë ta administrosh këtë grup si super pronar."
     },
     "errors": {
       "userAlreadyMember": "Përdoruesi „{name}“ është tashmë anëtar!"

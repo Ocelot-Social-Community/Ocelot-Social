@@ -999,15 +999,15 @@
       "title": "Modifica il mio gruppo"
     },
     "elevation": {
-      "actingAsMember": "Qui agisci come {role}.",
-      "actingAsNonMember": "Non sei iscritto a questo gruppo.",
       "activeTitle": "L'accesso da amministratore è attivo.",
       "activeUntil": "Termina alle {time}, o quando lo chiudi tu.",
       "end": "Termina l'accesso da amministratore",
-      "offerBody": "In più hai diritti di rete su di esso. Per leggerne i contenuti o modificare qualcosa serve questa conferma, che resta registrata presso il gruppo.",
-      "offerBodyOwner": "I tuoi diritti di rete ti permettono anche di declassare o rimuovere gli altri proprietari di questo gruppo. Per farlo serve questa conferma, che resta registrata presso il gruppo.",
-      "reasonPlaceholder": "Di cosa si tratta?",
-      "start": "Usa l'accesso da amministratore"
+      "offerBody": "Il tuo ruolo attuale in questo gruppo: «{role}». Indica il motivo per cui vuoi gestire questo gruppo (verrà registrato).",
+      "offerBodyNoneMember": "Non sei iscritto al gruppo. Indica il motivo per cui vuoi gestire questo gruppo (verrà registrato).",
+      "offerBodyOwner": "Il tuo ruolo attuale in questo gruppo: «{role}». I tuoi diritti di rete ti permettono anche di declassare o rimuovere gli altri proprietari di questo gruppo. Indica il motivo per cui vuoi gestire questo gruppo (verrà registrato).",
+      "reasonPlaceholder": "Motivo della tua azione",
+      "start": "Gestisci gruppo",
+      "title": "Hai il diritto di gestire questo gruppo come un super proprietario."
     },
     "errors": {
       "userAlreadyMember": "L'utente «{name}» è già membro!"

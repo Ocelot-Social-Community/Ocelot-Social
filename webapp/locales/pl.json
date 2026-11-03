@@ -999,15 +999,15 @@
       "title": "Edytuj moją grupę"
     },
     "elevation": {
-      "actingAsMember": "Działasz tu jako {role}.",
-      "actingAsNonMember": "Nie jesteś członkiem tej grupy.",
       "activeTitle": "Dostęp administratora jest aktywny.",
       "activeUntil": "Kończy się o {time} albo kiedy go zakończysz.",
       "end": "Zakończ dostęp administratora",
-      "offerBody": "Dodatkowo masz uprawnienia sieciowe do tej grupy. Czytanie jej treści i wszelkie zmiany wymagają tego potwierdzenia, które zostaje odnotowane przy grupie.",
-      "offerBodyOwner": "Twoje uprawnienia sieciowe pozwalają też obniżyć rolę lub usunąć innych właścicieli tej grupy. Wymaga to tego potwierdzenia, które zostaje odnotowane przy grupie.",
-      "reasonPlaceholder": "O co chodzi?",
-      "start": "Użyj dostępu administratora"
+      "offerBody": "Twoja obecna rola w tej grupie: „{role}”. Podaj powód, dla którego chcesz zarządzać tą grupą (zostanie odnotowany).",
+      "offerBodyNoneMember": "Nie jesteś członkiem grupy. Podaj powód, dla którego chcesz zarządzać tą grupą (zostanie odnotowany).",
+      "offerBodyOwner": "Twoja obecna rola w tej grupie: „{role}”. Twoje uprawnienia sieciowe pozwalają też obniżyć rolę lub usunąć innych właścicieli tej grupy. Podaj powód, dla którego chcesz zarządzać tą grupą (zostanie odnotowany).",
+      "reasonPlaceholder": "Powód twojego działania",
+      "start": "Zarządzaj grupą",
+      "title": "Masz prawo zarządzać tą grupą jak superwłaściciel."
     },
     "errors": {
       "userAlreadyMember": "Użytkownik „{name}” jest już członkiem!"

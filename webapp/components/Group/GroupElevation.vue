@@ -17,7 +17,7 @@
 
     <template v-else>
       <p class="elevation__offer" data-test="elevation-offer">
-        <strong>{{ actingAs }}</strong>
+        <strong>{{ $t('group.elevation.title') }}</strong>
         {{ offerBody }}
       </p>
       <ocelot-input
@@ -86,24 +86,16 @@ export default {
       return this.group?.mayElevateInGroup === true
     },
     /**
-     * What the viewer is right now — which is NOT "elevated": until they ask, they act on their
-     * membership, and for a member saying otherwise is simply wrong.
-     */
-    actingAs() {
-      const role = this.group?.myGroupRole
-      if (!role) {
-        return this.$t('group.elevation.actingAsNonMember')
-      }
-      return this.$t('group.elevation.actingAsMember', { role: this.roleLabel(role) })
-    },
-    /**
      * What asking would add. An owner already holds every right; for them it is the standing
      * over their co-owners, which nothing else in the group gives (#10481).
      */
     offerBody() {
-      return this.group?.myGroupRole?.name === 'owner'
-        ? this.$t('group.elevation.offerBodyOwner')
-        : this.$t('group.elevation.offerBody')
+      const role = this.group?.myGroupRole
+      return !role
+        ? this.$t('group.elevation.offerBodyNoneMember')
+        : this.group?.myGroupRole?.name === 'owner'
+          ? this.$t('group.elevation.offerBodyOwner', { role: this.roleLabel(role) })
+          : this.$t('group.elevation.offerBody', { role: this.roleLabel(role) })
     },
     /** Sent trimmed: the server refuses a padded reason like a padded role label. */
     trimmedReason() {
