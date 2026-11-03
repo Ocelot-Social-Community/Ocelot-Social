@@ -19,7 +19,11 @@ export const User = defineEntity({
   properties: {
     id: { type: 'string' },
     actorId: { type: ['string', 'null'] },
-    name: { type: 'string', minLength: 3 },
+    // Only a floor. The brandable bounds live in branding.user.nameLengthMin/-Max and are enforced
+    // by the validation middleware where a name is written; a fixed 3 here would make the audit
+    // flag every name a brand with a lower minimum allowed. Must not exceed the branding's
+    // USER_NAME_LENGTH_FLOOR, which schema.spec.ts asserts.
+    name: { type: 'string', minLength: 1 },
     slug: { type: 'string', pattern: SLUG },
     encryptedPassword: { type: 'string' },
     deleted: { type: 'boolean' },

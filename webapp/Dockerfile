@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM node:26.10.0-alpine AS ui-library
+FROM node:26.12.1-alpine AS ui-library
 RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
@@ -29,7 +29,7 @@ RUN npm prune --omit=dev --omit=optional && rm -rf src examples
 
 # Build the shared branding package (tsc -> dist). Placed at /packages/branding in `base` so the
 # webapp's `file:../packages/branding` dependency resolves (context is already the repo root).
-FROM node:26.10.0-alpine AS branding-library
+FROM node:26.12.1-alpine AS branding-library
 RUN mkdir -p /app
 WORKDIR /app
 COPY packages/branding/package.json packages/branding/package-lock.json ./
@@ -51,7 +51,7 @@ FROM branding-library AS branding-tools
 FROM branding-library AS branding-runtime
 RUN npm prune --omit=dev
 
-FROM node:26.10.0-alpine AS base
+FROM node:26.12.1-alpine AS base
 LABEL org.label-schema.name="ocelot.social:webapp"
 LABEL org.label-schema.description="Web Frontend of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
@@ -181,6 +181,12 @@ COPY webapp/scripts ./scripts/
 RUN --mount=type=cache,target=/root/.npm,sharing=locked \
     npm ci --include=dev --no-audit --no-fund
 COPY webapp/. .
+# Set to 1 by the e2e workflow only: the client bundle is then built against Vue's development runtime
+# so the browser reports hydration mismatches, which every Cypress scenario fails on (see
+# VUE_DEV_RUNTIME in nuxt.config.js). An ARG reaches the RUN instructions of its own stage only, and
+# `production` does not derive from this one. Empty for the unit-test image `test`. Build time only:
+# nuxt.config.js bakes it into the bundle, `nuxt start` does not read it.
+ARG VUE_DEV_RUNTIME=""
 RUN npm run build
 RUN mkdir /build && \
     cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./utils ./package.json ./package-lock.json ./.npmrc ./scripts /build

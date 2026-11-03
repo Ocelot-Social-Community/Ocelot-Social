@@ -96,12 +96,6 @@ info:
         (`upload` field), chat attachments take a `FileInput`. Non-multipart
         clients may instead reference already-hosted assets by URL.
 
-    - title: Federation
-      description: |
-        The schema carries ActivityPub identifiers (`actorId`, `activityId`,
-        `objectId`, `publicKey`) on users, posts and comments for federation with
-        other instances. Most clients can ignore these fields.
-
     - title: Examples
       description: |
         A few representative operations. Send variables alongside each query and

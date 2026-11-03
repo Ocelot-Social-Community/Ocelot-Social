@@ -85,6 +85,8 @@
       </client-only>
     </div>
     <client-only>
+      <dock side="left" />
+      <dock side="right" />
       <video-call v-if="showVideoCall" />
     </client-only>
   </div>
@@ -102,6 +104,7 @@ import Chat from '~/components/Chat/Chat.vue'
 import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import CallChatTabs from '~/components/VideoCall/CallChatTabs.vue'
 import { activeCallChatTab } from '~/components/VideoCall/callChat'
+import Dock from '~/components/Dock/Dock.vue'
 import VideoCall from '~/components/VideoCall/VideoCall.vue'
 import { videoCallConfigQuery } from '~/graphql/VideoCalls'
 
@@ -122,6 +125,7 @@ export default {
     RoomHeader,
     OsButton,
     OsIcon,
+    Dock,
     VideoCall,
   },
   data() {
@@ -286,6 +290,10 @@ export default {
 </script>
 
 <style>
+.layout-default {
+  /*  The dock rail is positioned against the layout, to line up with the page content. */
+  position: relative;
+}
 .main-navigation {
   background-color: var(--color-header-background);
 }

@@ -8,6 +8,8 @@ import { describe, beforeAll, afterAll, beforeEach, afterEach, it, expect } from
 import Factory, { cleanDatabase } from '@db/factories'
 import review from '@graphql/queries/moderation/review.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { serverPubsub } from '@src/context'
+import { listenForPrincipalChanges, principalEpoch } from '@src/context/principalEpoch'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -23,8 +25,13 @@ const contextFn = () => ({
 })
 
 describe('moderate resources', () => {
+  // Counts what review publishes, as index.ts does in production: a user disabled by a review
+  // must have their open subscriptions read them again.
+  let principalListener: number
+
   beforeAll(async () => {
     await cleanDatabase()
+    principalListener = await listenForPrincipalChanges(serverPubsub)
 
     authenticatedUser = null
     const apolloSetup = await createApolloTestSetup({ context: contextFn })
@@ -34,6 +41,7 @@ describe('moderate resources', () => {
   })
 
   afterAll(async () => {
+    serverPubsub.unsubscribe(principalListener)
     await cleanDatabase()
     void server.stop()
     void database.driver.close()
@@ -407,6 +415,13 @@ describe('moderate resources', () => {
             data: { review: { resource: { __typename: 'User', id: 'user-id' } } },
             errors: undefined,
           })
+        })
+
+        it("moves the reviewed user's principal epoch", async () => {
+          const before = principalEpoch('user-id')
+          await mutate({ mutation: review, variables: disableVariables })
+
+          expect(principalEpoch('user-id')).toBe(before + 1)
         })
 
         it('returns .reviewed', async () => {

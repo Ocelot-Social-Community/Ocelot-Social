@@ -352,6 +352,41 @@ if (!linter) {
   }
 }
 
+// 7. Release pull request labels. release-please finds "its" release pull requests by label alone:
+//    a pull request belongs to a config when it carries ALL of that config's `label`s
+//    (`hasAllLabels` in manifest.js). With the default `autorelease: pending` everywhere, every
+//    workflow sees every other one's merged-but-not-yet-tagged release pull request — publish.yml
+//    then logs `There are untagged, merged release PRs outstanding - aborting` and leaves the
+//    application's release pull request stale, which is how v3.21.2 missed branding 0.2.4. Nothing
+//    turns red; the changelog just stops updating until the next push. So no config's label set may
+//    be a subset of another's — that is precisely the condition under which it would see them.
+//
+//    A config matches with its `label`s only, but its pull requests carry its `extra-label`s as
+//    well (`strategies/base.js` appends them). Each package takes its own `extra-label`, the top
+//    level is only the fallback for a package without one (`pathConfig.extraLabels ??
+//    defaultConfig.extraLabels`), so a top-level value a package overrides lands on no pull
+//    request. A combined pull request carries the union of its packages' labels. Tagging removes the
+//    `label`s and leaves the `extra-label`s, so a foreign pending label there would match for good,
+//    not only until the tag. Hence a's `label`s are checked against everything b's pull requests carry.
+const DEFAULT_LABEL = 'autorelease: pending'
+const splitLabels = (value) => (value ? value.split(',').map((l) => l.trim()) : [])
+const labelSets = configs.map((file) => {
+  const config = readJson(file)
+  const labels = config.label ? splitLabels(config.label) : [DEFAULT_LABEL]
+  const packages = Object.values(config.packages ?? {})
+  const extraLabels = packages.length
+    ? packages.flatMap((p) => splitLabels(p['extra-label'] ?? config['extra-label']))
+    : splitLabels(config['extra-label'])
+  return { file, labels, prLabels: [...new Set([...labels, ...extraLabels])] }
+})
+for (const a of labelSets) {
+  for (const b of labelSets) {
+    if (a !== b && a.labels.every((l) => b.prLabels.includes(l))) {
+      fail(a.file, `its release pull request label(s) ${JSON.stringify(a.labels)} are all carried by ${b.file}'s release pull requests too (${JSON.stringify(b.prLabels)}, its \`label\` and \`extra-label\`s) — its run would treat those as its own and abort while one is merged but untagged, and for good if the match is an \`extra-label\`, which tagging does not remove. Give it a \`label\` of its own, and keep it out of other configs' \`extra-label\`.`)
+    }
+  }
+}
+
 const distinct = new Set(sectionLists.values())
 if (distinct.size > 1) {
   const grouped = [...sectionLists.entries()].map(([f, s]) => `${f}: ${JSON.parse(s).map((x) => x.type).join(',')}`)

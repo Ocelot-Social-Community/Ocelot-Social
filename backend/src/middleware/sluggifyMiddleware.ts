@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+import { branding } from '@src/branding'
+
 import uniqueSlug from './slugify/uniqueSlug'
 
 import type { Context } from '@src/context'
@@ -46,7 +48,14 @@ export default {
       context: Context,
       info,
     ) => {
-      args.slug = args.slug || (await uniqueSlug(args.name, isUniqueFor(context, 'User')))
+      // Within the brand's slug bounds: a slug chosen in the settings is held to them, so one the
+      // backend picks for the user must be too (validationMiddleware checks a client-sent one).
+      args.slug =
+        args.slug ||
+        (await uniqueSlug(args.name, isUniqueFor(context, 'User'), {
+          minLength: branding.user.slugLengthMin,
+          maxLength: branding.user.slugLengthMax,
+        }))
       return resolve(root, args, context, info)
     },
     CreateGroup: async (

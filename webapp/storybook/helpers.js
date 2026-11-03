@@ -29,10 +29,13 @@ const helpers = {
     // story files did first. Visual-regression screenshots need that: a random name or date baked
     // into a component render would fail the pixel diff on every single run, not just real changes.
     faker.seed(20260101)
+    // The seed alone does not fix dates: faker.date.past() / recent() count back from now, so the
+    // same seed gave a different date every day.
+    faker.setDefaultRefDate('2026-01-01T00:00:00.000Z')
     Vue.use(Vuex)
     // `~/plugins/vue-filters` is a Nuxt plugin — it expects `({ app })`, not the `Vue` constructor
-    // `Vue.use` would hand it. Called wrong, `getDateFnsLocale` closes over an app without `$i18n`
-    // and throws the moment `date`/`dateTime` filters actually run.
+    // `Vue.use` would hand it. Called wrong, `getLocaleIso` closes over an app without `$i18n`
+    // and the `date`/`dateTime` filters fall back to en-US instead of the story's locale.
     Filters({ app: { $i18n: { locale: () => 'en' } } })
     Vue.use(IziToast)
     Vue.use(Directives)

@@ -500,6 +500,7 @@
     "POST_EVENT_LOCATION_COORDINATES_INCOMPLETE": "Falta uma coordenada para o local do evento.",
     "POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE": "A latitude do local do evento é inválida.",
     "POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE": "A longitude do local do evento é inválida.",
+    "POST_EVENT_LOCATION_NOT_PICKED": "Escolha o local nos resultados da pesquisa ou marque-o no mapa.",
     "POST_EVENT_START_DATE_INVALID": "A data de início não é uma data válida.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "A data de início deve estar no formato ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "A descrição do local deve ter entre {min} e {max} caracteres.",
@@ -531,7 +532,11 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Você só pode fazer isso com usuários cuja função concede menos poderes do que a sua.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Você não pode pesquisar na administração de usuários.",
     "USER_DOES_NOT_EXIST": "O usuário não foi encontrado.",
+    "USER_PROFILE_NAME_TOO_LONG": "O nome deve ter no máximo {max} caracteres.",
     "USER_PROFILE_NAME_TOO_SHORT": "O nome deve ter pelo menos {min} caracteres.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Caracteres permitidos são apenas letras minúsculas (a–z), números (0–9), sublinhados e hífens.",
+    "USER_PROFILE_SLUG_TOO_LONG": "O nome de usuário deve ter no máximo {max} caracteres.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "O nome de usuário deve ter pelo menos {min} caracteres.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Este usuário não está bloqueado.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "O chat de uma videochamada está aberto apenas a quem participa dela. Entre primeiro na chamada.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Nenhuma participação ativa neste grupo foi encontrada para a videochamada.",
@@ -604,10 +609,12 @@
       "email": "Por favor, insira um endereço de e-mail válido.",
       "eventLocationNameLength": "O endereço deve ter entre {min} e {max} caracteres.",
       "eventLocationNameNotEmpty": "Por favor, insira um endereço.",
+      "eventLocationNotPicked": "Escolha o local nos resultados da pesquisa ou marque-o no mapa.",
       "eventVenueLength": "A descrição do local deve ter entre {min} e {max} caracteres.",
       "eventVenueNotEmpty": "Por favor, insira uma descrição do local.",
       "followableUrl": "deve ser um endereço web ou de e-mail válido",
       "formHasErrors": "Por favor, preencha todos os campos obrigatórios.",
+      "locationNotPicked": "Escolha o local nas sugestões.",
       "nameLength": "O nome deve ter entre {min} e {max} caracteres.",
       "titleLength": "O título deve ter entre {min} e {max} caracteres.",
       "titleNotEmpty": "Por favor, insira um título."
@@ -617,10 +624,6 @@
     "step": "Passo {current} de {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd/MM/yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "A alteração da sua senha falhou. Talvez o código de segurança não estivesse correto?",
@@ -828,6 +831,20 @@
       "title": "Desativar usuário"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (bloqueado por você)",
+      "count": "{count} conectados",
+      "flag": "Videochamadas em curso: {count}",
+      "join": "Entrar",
+      "joined": "Você está nesta chamada",
+      "participants": "Participantes",
+      "title": "Videochamadas em curso"
+    },
+    "close": "Fechar barra lateral",
+    "label": "Barra lateral",
+    "open": "Abrir barra lateral – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} de {total} € coletados",
     "donate-now": "Doe agora"
@@ -1009,6 +1026,7 @@
     "foundation": "Fundação",
     "general": "Geral",
     "goal": "Objetivo do grupo",
+    "goalPlaceholder": "p. ex. Criar uma horta aberta a todo o bairro",
     "group": "Grupo",
     "groupCreated": "O grupo foi criado!",
     "in": "em",
@@ -1052,6 +1070,7 @@
     "muted": "Grupo silenciado",
     "myGroups": "Meus grupos",
     "name": "Nome do grupo",
+    "namePlaceholder": "Horta Comunitária Alfama",
     "removeMember": "Remover membro",
     "removeMemberButton": "Remover",
     "removeMemberConfirmText": "Remover o usuário “{name}” do grupo?",
@@ -1131,6 +1150,7 @@
       "usual": "Membro"
     },
     "save": "Criar novo grupo",
+    "slugPlaceholder": "horta-comunitaria-alfama",
     "teaser": {
       "notReadable": "Ainda não podes abrir este grupo — o teu pedido está pendente",
       "openGroup": "Abrir grupo",
@@ -1695,6 +1715,7 @@
       "unblocked": "{name} foi desbloqueado"
     },
     "data": {
+      "cityPlaceholder": "p. ex. Lisboa",
       "givenName": "Seu nome",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "Sobre você",
@@ -1863,7 +1884,8 @@
       "nameNotEmpty": "Por favor, insira seu nome.",
       "slug": {
         "alreadyTaken": "Este nome de usuário já está em uso.",
-        "regex": "Caracteres permitidos são apenas letras minúsculas, números, sublinhados e hífens."
+        "length": "O nome de usuário deve ter entre {min} e {max} caracteres.",
+        "regex": "Caracteres permitidos são apenas letras minúsculas (a–z), números (0–9), sublinhados e hífens."
       }
     }
   },

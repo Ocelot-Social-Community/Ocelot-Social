@@ -106,6 +106,15 @@ export class PolicyService {
   private env: Env = {}
   private subscriptionId: number | undefined
   private lastChange: { actor: string; timestamp: string } | undefined
+  // Raised with every change to the cache, whether made here or applied from another instance.
+  // A subscription context compares it to the value it read its viewer at: a policy that changed
+  // may have opened or closed a gate the viewer's permissions are folded through (see
+  // context/subscription.ts).
+  private changes = 0
+
+  get version(): number {
+    return this.changes
+  }
 
   constructor(private readonly db: DbContext = databaseContext()) {}
 
@@ -185,6 +194,53 @@ export class PolicyService {
   async reload(): Promise<void> {
     this.cache = {}
     await this.loadFromDb()
+    this.changes += 1
+  }
+
+  // Bring the cache back in line with the DB on a live instance, for a change event it never
+  // got. Unlike reload() this only reads, because it runs on every instance on a timer: an
+  // instance on an older schema must not reseed a value it cannot validate (hence the invalid
+  // value keeps what the cache holds), and the cache is swapped at once, so `get()` never falls
+  // back to a default in between.
+  //
+  // A change during the read may be newer than what was read, so that read is dropped: the next
+  // run sees the change in the DB. The version only moves if a value differs, otherwise every
+  // open subscription would read its viewer again after each run (see context/subscription.ts).
+  // lastChange is taken over on its own, as saving the same value again changes only that, and
+  // only if it is newer: reset() deletes the row it is read from, so the DB may know less than
+  // this instance does.
+  async resync(): Promise<void> {
+    const changesBefore = this.changes
+    const dbValues = await readAllSettings(this.db, POLICY_NAMESPACE)
+    const lastChange = await readLastChange(this.db, POLICY_NAMESPACE)
+    if (this.changes !== changesBefore) {
+      return
+    }
+
+    if (
+      lastChange &&
+      (!this.lastChange || Date.parse(lastChange.timestamp) > Date.parse(this.lastChange.timestamp))
+    ) {
+      this.lastChange = lastChange
+    }
+
+    const cache: Partial<NetworkPolicy> = {}
+    for (const key of allKeys()) {
+      if (!(key in dbValues)) {
+        // No row is what reset() leaves behind: the key is at its configured default.
+        cache[key] = this.getDefault(key) as never
+      } else {
+        const stored = dbValues[key]
+        cache[key] = (this.isValidValue(key, stored) ? stored : this.cache[key]) as never
+      }
+    }
+    // By hand, not with node:util: the e2e tests bundle this file through db/factories, and their
+    // webpack cannot read `node:` imports.
+    if (allKeys().every((key) => JSON.stringify(cache[key]) === JSON.stringify(this.cache[key]))) {
+      return
+    }
+    this.cache = cache
+    this.changes += 1
   }
 
   shutdown(): void {
@@ -302,6 +358,7 @@ export class PolicyService {
 
     await writeSetting(this.db, POLICY_NAMESPACE, key, value, actor)
     this.cache[key] = value
+    this.changes += 1
 
     const event: PolicyChangeEvent = {
       key,
@@ -321,6 +378,7 @@ export class PolicyService {
 
     const newValue = this.getDefault(key)
     this.cache[key] = newValue as never
+    this.changes += 1
 
     const event: PolicyChangeEvent = {
       key,
@@ -399,6 +457,7 @@ export class PolicyService {
       return
     }
     this.cache[event.key] = event.value as never
+    this.changes += 1
     this.lastChange = { actor: event.actor, timestamp: event.timestamp }
   }
 
@@ -443,6 +502,7 @@ export function setPolicyServiceForTesting(svc: PolicyService | undefined): void
 // Avoids any DB access. Missing keys fall back to schema defaults.
 interface PolicyServiceInternal {
   cache: Partial<NetworkPolicy>
+  changes: number
   initialised: boolean
   env: Env
   init: PolicyService['init']
@@ -454,6 +514,8 @@ export function createInMemoryPolicyService(
 ): PolicyService {
   const svc = Object.create(PolicyService.prototype) as unknown as PolicyServiceInternal
   svc.cache = { ...values }
+  // No constructor runs, so neither do the field initialisers.
+  svc.changes = 0
   svc.initialised = true
   svc.env = env // so getDefault() can read envSeed values
   // The double has no DB (built via Object.create, no constructor). Make init()

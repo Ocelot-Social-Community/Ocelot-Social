@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.2.4](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.2.3...branding-v0.2.4) (2026-10-20)
+
+
+### Bug Fixes
+
+* **package/branding:** user names and slugs keep the brand's length limits everywhere ([#10549](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10549)) ([aea6095](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/aea609576c3fd0ee3e41ce8722b2ce7e9861978e))
+
+
+### Code Refactoring
+
+* **webapp:** replace date-fns with Intl ([#10626](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10626)) ([f767817](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/f7678177d79018e2186a2fc17d506539a1a0d9e2))
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump @types/node from 26.6.4 to 26.6.5 in /packages/branding ([#10578](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10578)) ([5516b6c](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/5516b6c9b8bb7a7c59f202dc62e2a9ec0edac3f3))
+* **deps-dev:** bump typescript-eslint from 8.71.1 to 8.71.2 in /packages/branding ([#10585](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10585)) ([7d1ed91](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/7d1ed9118f6866df5508ac2209c6aee22400087c))
+* **deps:** bump postcss from 8.5.29 to 8.5.30 in /packages/branding ([#10580](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10580)) ([825e126](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/825e126df6f843e9e64a3837c072fd6e6f76db32))
+* **other:** eslint-config-it4c 0.14.1 in every package ([#10676](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10676)) ([388c15c](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/388c15ca8123ec44d807c6572f66fc6bb4818726))
+
 ## [0.2.3](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.2.2...branding-v0.2.3) (2026-10-12)
 
 

@@ -6,6 +6,7 @@
 import { PubSub } from 'graphql-subscriptions'
 import { describe, beforeAll, afterAll, beforeEach, it, expect } from 'vitest'
 
+import { PRINCIPAL_CHANGED } from '@constants/subscriptions'
 import Factory, { cleanDatabase } from '@db/factories'
 import CREATE_ROLE from '@graphql/queries/roles/createRole.gql'
 import DELETE_ROLE from '@graphql/queries/roles/deleteRole.gql'
@@ -165,6 +166,8 @@ describe('role management', () => {
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
         permissionsChanged: { roleName: 'broadcast-role', previousRoleName: null },
       })
+      // …and the target's open subscriptions read them again.
+      expect(pubsubMock?.publish).toHaveBeenCalledWith(PRINCIPAL_CHANGED, { userId: 'member-x' })
     })
 
     it('does not fail the already-committed mutation when publish throws synchronously', async () => {

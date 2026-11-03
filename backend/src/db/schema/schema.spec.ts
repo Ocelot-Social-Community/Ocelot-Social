@@ -1,3 +1,4 @@
+import { USER_NAME_LENGTH_FLOOR } from '@ocelot-social/branding'
 import { Ajv } from 'ajv'
 import { describe, expect, it } from 'vitest'
 
@@ -34,6 +35,12 @@ describe('the declaration', () => {
 
       expect(declared).toEqual(expect.arrayContaining(referenced))
     }
+  })
+
+  // The schema states what every stored name satisfies, whichever brand wrote it. Stricter than the
+  // lowest minimum a brand may configure, the audit would report names that brand allowed.
+  it('holds User.name to no more than the shortest name a brand may allow', () => {
+    expect(User.properties.name.minLength).toBeLessThanOrEqual(USER_NAME_LENGTH_FLOOR)
   })
 
   it('connects only declared entities', () => {

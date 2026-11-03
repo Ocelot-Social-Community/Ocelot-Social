@@ -51,7 +51,7 @@
               <location-info :location-data="user.location" :is-owner="myProfile" size="small" />
             </button>
             <p class="ds-text ds-text-center ds-text-soft ds-text-size-small">
-              {{ $t('profile.memberSince') }} {{ user.createdAt | date('MMMM yyyy') }}
+              {{ $t('profile.memberSince') }} {{ user.createdAt | date('monthYear') }}
             </p>
           </div>
           <div v-if="userBadges && userBadges.length" class="ds-my-x-small">
@@ -95,8 +95,9 @@
             >
               {{ $t('settings.muted-users.unmute') }}
             </os-button>
+            <!-- Not across a block, in either direction: the backend refuses to follow then. -->
             <os-button
-              v-if="!user.isMuted && !user.isBlocked"
+              v-if="!user.isMuted && !user.blocked"
               data-test="follow-btn"
               :variant="user.followedByCurrentUser && followHovered ? 'danger' : 'primary'"
               :appearance="user.followedByCurrentUser && !followHovered ? 'filled' : 'outline'"
@@ -217,7 +218,7 @@
         </div>
 
         <masonry-grid>
-          <template v-if="posts.length">
+          <template v-if="posts && posts.length">
             <masonry-grid-item
               v-for="post in posts"
               :key="post.id"
@@ -239,7 +240,11 @@
               />
             </masonry-grid-item>
           </template>
-          <template v-else-if="$apollo.loading">
+          <!-- Not loaded yet — not "any query of this page is loading": the server has every
+               result when it renders, while on the client other queries can still be running
+               when it hydrates, and a spinner where the server rendered "no posts" made Vue
+               throw the whole page away (#6442). -->
+          <template v-else-if="posts === null">
             <div style="grid-row-end: span 4; grid-column: 1 / -1">
               <div style="text-align: center; padding: 48px 0">
                 <os-spinner size="lg" />
@@ -418,7 +423,8 @@ export default {
     const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     return {
       User: [],
-      posts: [],
+      // null until the first result: a spinner then, "no posts" only for an empty result.
+      posts: null,
       hasMore: true,
       offset: 0,
       pageSize: 6,
@@ -547,7 +553,7 @@ export default {
     },
     resetPostList() {
       this.offset = 0
-      this.posts = []
+      this.posts = null
       this.hasMore = true
     },
     refetchPostList() {
@@ -561,6 +567,8 @@ export default {
       try {
         await this.$apollo.mutate({ mutation: muteUser(), variables: { id: user.id } })
         this.$toast.success(this.$t('settings.muted-users.muted', { name: this.userName }))
+        // Muting ends my following them (users.ts muteUser).
+        this.reloadConnections()
       } catch (error) {
         this.$toastBackendError(error)
       } finally {
@@ -585,6 +593,8 @@ export default {
       try {
         await this.$apollo.mutate({ mutation: blockUser(), variables: { id: user.id } })
         this.$toast.success(this.$t('settings.blocked-users.blocked', { name: this.userName }))
+        // Blocking ends following in both directions (users.ts blockUser).
+        this.reloadConnections()
       } catch (error) {
         this.$toastBackendError(error)
       } finally {
@@ -635,6 +645,11 @@ export default {
     onFollowHover() {
       if (!this.followLoading) this.followHovered = true
     },
+    // The follow lists load themselves once; whatever changes who follows whom reloads them.
+    reloadConnections() {
+      this.$refs.followListFollowedBy?.loadConnections(0)
+      this.$refs.followListFollowing?.loadConnections(0)
+    },
     async toggleFollow() {
       if (this.followLoading) return
       const follow = !this.user.followedByCurrentUser
@@ -656,8 +671,7 @@ export default {
       if (success) {
         this.user.followedByCount = data.followedByCount
         this.user.followedByCurrentUser = data.followedByCurrentUser
-        this.$refs.followListFollowedBy?.loadConnections(0)
-        this.$refs.followListFollowing?.loadConnections(0)
+        this.reloadConnections()
       } else {
         // rollback optimistic update
         this.$toast.error(this.$t('followButton.error'))
@@ -696,6 +710,11 @@ export default {
       },
       update({ profilePagePosts }) {
         this.posts = profilePagePosts
+      },
+      // A failed load — the first one or a refetch, from wherever it was started — calls no
+      // update(): without this the list would wait for posts that never come, spinning forever.
+      error() {
+        if (this.posts === null) this.posts = []
       },
       fetchPolicy: 'cache-and-network',
     },

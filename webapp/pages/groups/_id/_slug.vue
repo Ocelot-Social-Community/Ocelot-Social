@@ -1,6 +1,5 @@
 <template>
   <div class="group-profile" v-if="isGroupVisible">
-    <div class="ds-mb-large"></div>
     <!-- Where a moderator or admin LANDS when a report points them at a group they are not in.
          Picking the network rights up is a decision, and this is where it is offered — the
          settings pages are behind the very rights it unlocks. -->
@@ -57,7 +56,7 @@
             </button>
             <!-- group created at -->
             <p class="ds-text ds-text-center ds-text-soft ds-text-size-small">
-              {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
+              {{ $t('group.foundation') }} {{ group.createdAt | date('monthYear') }}
             </p>
           </div>
           <div class="ds-flex" v-if="isAllowedSeeingGroupMembers">
@@ -302,7 +301,11 @@
               />
             </masonry-grid-item>
           </template>
-          <template v-else-if="$apollo.loading">
+          <!-- Not loaded yet — not "any query of this page is loading": the server has every
+               result when it renders, while on the client other queries (the video call's
+               participant count) are still running when it hydrates, and a spinner where the
+               server rendered "no posts" made Vue throw the whole page away (#6442). -->
+          <template v-else-if="posts === null">
             <div style="grid-row-end: span 4; grid-column: 1 / -1">
               <div style="text-align: center; padding: 48px 0">
                 <os-spinner size="lg" />
@@ -421,7 +424,8 @@ export default {
     // const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     const filter = { group: { id: this.$route.params.id } }
     return {
-      posts: [],
+      // null until the first result: a spinner then, "no posts" only for an empty result.
+      posts: null,
       hasMore: true,
       offset: 0,
       pageSize: 6,
@@ -807,7 +811,7 @@ export default {
     },
     resetPostList() {
       this.offset = 0
-      this.posts = []
+      this.posts = null
       this.hasMore = true
     },
     refetchPostList() {
@@ -903,6 +907,11 @@ export default {
       update({ profilePagePosts }) {
         this.posts = profilePagePosts
       },
+      // A failed load — the first one or a refetch, from wherever it was started — calls no
+      // update(): without this the list would wait for posts that never come, spinning forever.
+      error() {
+        if (this.posts === null) this.posts = []
+      },
       fetchPolicy: 'cache-and-network',
     },
     Group: {
@@ -979,9 +988,20 @@ export default {
   margin: auto;
   margin-top: -60px;
 }
+/* Room for the avatar, which sticks out of its card upwards. It belongs to the layout, not to the
+   page: with the elevation banner shown first, the banner sits where any first card does and the
+   avatar keeps its distance from the banner instead. Padding, not an empty spacer, so it does not
+   collapse into the banner's margin. */
+.group-layout {
+  padding-top: var(--space-large);
+}
+/* The page layout leaves no gap below the header on mobile; the page brings its own. */
 @media (--vp-mobile) {
   .group-profile {
-    padding-top: var(--space-large);
+    padding-top: var(--space-small);
+  }
+  .group-layout {
+    padding-top: calc(var(--space-large) + var(--space-small));
   }
 }
 .group-layout__sidebar ::v-deep .group-profile-content-menu {
