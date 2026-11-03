@@ -41,6 +41,7 @@
       </os-button>
 
       <os-button
+        ref="linkButton"
         size="sm"
         circle
         variant="primary"

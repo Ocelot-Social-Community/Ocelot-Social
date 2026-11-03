@@ -61,7 +61,7 @@ export default {
         { iconName: this.icons.bold, name: `editor.legend.bold`, shortcut: 'ctrl + b' },
         { iconName: this.icons.italic, name: `editor.legend.italic`, shortcut: 'ctrl + i' },
         { iconName: this.icons.underline, name: `editor.legend.underline`, shortcut: 'ctrl + u' },
-        { iconName: this.icons.link, name: `editor.legend.link`, shortcut: '' },
+        { iconName: this.icons.link, name: `editor.legend.link`, shortcut: 'ctrl + k' },
         { iconName: this.icons.paragraph, name: `editor.legend.paragraph`, shortcut: '' },
         { label: 'H3', name: `editor.legend.heading3`, shortcut: '### + space' },
         { label: 'H4', name: `editor.legend.heading4`, shortcut: '#### + space' },

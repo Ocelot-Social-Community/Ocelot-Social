@@ -1,6 +1,6 @@
 <template>
   <div class="editor">
-    <menu-bar :editor="editor" :toggleLinkInput="toggleLinkInput" />
+    <menu-bar ref="menuBar" :editor="editor" :toggleLinkInput="toggleLinkInput" />
     <editor-content ref="editor" :editor="editor" class="ds-input editor-content" />
     <context-menu ref="contextMenu" />
     <suggestion-list
@@ -21,6 +21,8 @@
         @blur.native.capture="toggleLinkInput()"
         @keydown.native.esc.prevent="toggleLinkInput()"
         @keydown.native.enter.prevent="enterLink()"
+        @keydown.native.ctrl.k.prevent="toggleLinkInput()"
+        @keydown.native.meta.k.prevent="toggleLinkInput()"
       />
     </div>
   </div>
@@ -36,6 +38,7 @@ import * as key from '../../constants/keycodes'
 import { HASHTAG, MENTION } from '../../constants/editor'
 import defaultExtensions from './defaultExtensions'
 import EventHandler from './plugins/eventHandler'
+import LinkShortcut from './plugins/linkShortcut'
 import Hashtag from './nodes/Hashtag'
 import Mention from './nodes/Mention'
 import MenuBar from './MenuBar'
@@ -161,6 +164,8 @@ export default {
         ...this.optionalExtensions,
         ...defaultExtensions(this),
         new EventHandler(),
+        // Only here, not in defaultExtensions: the read-only ContentViewer shares those.
+        new LinkShortcut({ onShortcut: () => this.toggleLinkInputByShortcut() }),
         new History(),
       ],
       onUpdate: (e) => {
@@ -466,6 +471,13 @@ export default {
         this.isLinkInputActive = false
         this.editor.focus()
       }
+    },
+    // Ctrl+K / Cmd+K: the same link input as the toolbar's link button, anchored to that button.
+    toggleLinkInputByShortcut() {
+      this.toggleLinkInput(
+        this.editor.getMarkAttrs('link'),
+        this.$refs.menuBar.$refs.linkButton.$el,
+      )
     },
     setLinkUrl(url) {
       const normalizedLinks = url ? linkify().match(url) : null
