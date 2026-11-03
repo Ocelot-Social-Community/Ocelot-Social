@@ -18,6 +18,10 @@ describe('videoCall store', () => {
         groupSlug: null,
         groupAvatar: null,
         participantCount: 0,
+        chatRoomId: null,
+        conferenceUnread: 0,
+        groupChatUnread: 0,
+        lastChatTab: 'call',
         phase: 'idle',
         reloadPending: false,
       })
@@ -61,6 +65,41 @@ describe('videoCall store', () => {
         expect(state.groupName).toBeNull()
         expect(state.groupSlug).toBeNull()
         expect(state.groupAvatar).toBeNull()
+      })
+
+      describe('for the group whose call is running already', () => {
+        beforeEach(() => {
+          mutations.OPEN(state, { groupId: 'g1', groupName: 'Yoga', groupSlug: 'yoga' })
+          state.minimized = true
+          state.participantCount = 3
+          state.chatRoomId = 'room-1'
+          state.conferenceUnread = 2
+          state.groupChatUnread = 4
+        })
+
+        it('brings the parked call up and leaves what the running call knows', () => {
+          mutations.OPEN(state, { groupId: 'g1', groupName: 'Yoga', groupSlug: 'yoga' })
+          expect(state).toMatchObject({
+            showVideoCall: true,
+            minimized: false,
+            participantCount: 3,
+            chatRoomId: 'room-1',
+            conferenceUnread: 2,
+            groupChatUnread: 4,
+          })
+        })
+
+        it('updates the group info only where it is given', () => {
+          mutations.OPEN(state, { groupId: 'g1', groupName: null, groupAvatar: { url: 'b' } })
+          expect(state.groupName).toBe('Yoga')
+          expect(state.groupSlug).toBe('yoga')
+          expect(state.groupAvatar).toEqual({ url: 'b' })
+        })
+
+        it("starts afresh for another group's call", () => {
+          mutations.OPEN(state, { groupId: 'g2' })
+          expect(state).toMatchObject({ groupId: 'g2', chatRoomId: null, participantCount: 0 })
+        })
       })
     })
 
@@ -134,6 +173,107 @@ describe('videoCall store', () => {
       })
     })
 
+    describe('SET_CHAT_ROOM_ID', () => {
+      it('stores the conference chat room of the call', () => {
+        mutations.SET_CHAT_ROOM_ID(state, 'room-1')
+        expect(state.chatRoomId).toBe('room-1')
+      })
+
+      it('falls back to null when called without a value', () => {
+        state.chatRoomId = 'room-1'
+        mutations.SET_CHAT_ROOM_ID(state)
+        expect(state.chatRoomId).toBeNull()
+      })
+
+      it('is forgotten when a call is opened or closed', () => {
+        state.chatRoomId = 'room-1'
+        mutations.OPEN(state, { groupId: 'g2' })
+        expect(state.chatRoomId).toBeNull()
+
+        state.chatRoomId = 'room-2'
+        mutations.CLOSE(state)
+        expect(state.chatRoomId).toBeNull()
+      })
+    })
+
+    describe('SET_CONFERENCE_UNREAD', () => {
+      it('stores the number of unread messages in the conference chat', () => {
+        mutations.SET_CONFERENCE_UNREAD(state, 3)
+        expect(state.conferenceUnread).toBe(3)
+        expect(getters.conferenceUnread(state)).toBe(3)
+      })
+
+      it('coerces what is not a number to 0', () => {
+        mutations.SET_CONFERENCE_UNREAD(state, undefined)
+        expect(state.conferenceUnread).toBe(0)
+      })
+
+      it('is forgotten with the room it belongs to', () => {
+        mutations.SET_CHAT_ROOM_ID(state, 'room-1')
+        mutations.SET_CONFERENCE_UNREAD(state, 3)
+        // The same room confirmed again: nothing has been read.
+        mutations.SET_CHAT_ROOM_ID(state, 'room-1')
+        expect(state.conferenceUnread).toBe(3)
+        mutations.SET_CHAT_ROOM_ID(state, 'room-2')
+        expect(state.conferenceUnread).toBe(0)
+      })
+
+      it('is forgotten when a call is opened or closed', () => {
+        state.conferenceUnread = 3
+        mutations.OPEN(state, { groupId: 'g2' })
+        expect(state.conferenceUnread).toBe(0)
+
+        state.conferenceUnread = 3
+        mutations.CLOSE(state)
+        expect(state.conferenceUnread).toBe(0)
+      })
+    })
+
+    describe('SET_GROUP_CHAT_UNREAD', () => {
+      it('stores the number of unread messages in the chat of the group', () => {
+        mutations.SET_GROUP_CHAT_UNREAD(state, 4)
+        expect(state.groupChatUnread).toBe(4)
+        expect(getters.groupChatUnread(state)).toBe(4)
+      })
+
+      it('coerces what is not a number to 0', () => {
+        mutations.SET_GROUP_CHAT_UNREAD(state, null)
+        expect(state.groupChatUnread).toBe(0)
+      })
+
+      it('is forgotten when a call is opened or closed', () => {
+        state.groupChatUnread = 4
+        mutations.OPEN(state, { groupId: 'g2' })
+        expect(state.groupChatUnread).toBe(0)
+
+        state.groupChatUnread = 4
+        mutations.CLOSE(state)
+        expect(state.groupChatUnread).toBe(0)
+      })
+    })
+
+    describe('SET_LAST_CHAT_TAB', () => {
+      it('remembers which of the two chats was looked at last', () => {
+        mutations.SET_LAST_CHAT_TAB(state, 'group')
+        expect(getters.lastChatTab(state)).toBe('group')
+        mutations.SET_LAST_CHAT_TAB(state, 'call')
+        expect(getters.lastChatTab(state)).toBe('call')
+      })
+
+      it('falls back to the chat of the call for anything else', () => {
+        state.lastChatTab = 'group'
+        mutations.SET_LAST_CHAT_TAB(state, undefined)
+        expect(state.lastChatTab).toBe('call')
+      })
+
+      it('is kept across calls', () => {
+        mutations.SET_LAST_CHAT_TAB(state, 'group')
+        mutations.CLOSE(state)
+        mutations.OPEN(state, { groupId: 'g2' })
+        expect(state.lastChatTab).toBe('group')
+      })
+    })
+
     describe('SET_MINIMIZED', () => {
       it('coerces to a boolean', () => {
         mutations.SET_MINIMIZED(state, 'yes')
@@ -189,6 +329,7 @@ describe('videoCall store', () => {
         groupSlug: 'yoga',
         groupAvatar: { url: 'a' },
         participantCount: 7,
+        chatRoomId: 'room-1',
         phase: 'in-call',
         reloadPending: true,
       }
@@ -200,6 +341,7 @@ describe('videoCall store', () => {
       expect(getters.groupSlug(state)).toBe('yoga')
       expect(getters.groupAvatar(state)).toEqual({ url: 'a' })
       expect(getters.participantCount(state)).toBe(7)
+      expect(getters.chatRoomId(state)).toBe('room-1')
       expect(getters.phase(state)).toBe('in-call')
       expect(getters.reloadPending(state)).toBe(true)
     })

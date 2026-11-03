@@ -7,7 +7,10 @@ import { WebhookReceiver } from 'livekit-server-sdk'
 import CONFIG from '@src/config'
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@src/constants/subscriptions'
 import { serverPubsub } from '@src/context'
+import { getDriver } from '@src/db/neo4j'
 import { getLiveParticipantCount, groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
+import { endCallSession, endCallSessionsOfMissingRoom } from '@src/livekit/callSession'
+import { markRoomTold } from '@src/livekit/toldRooms'
 import logger from '@src/logger'
 
 import type { Express, Request, Response } from 'express'
@@ -93,6 +96,28 @@ export const registerLiveKitWebhook = (app: Express) => {
         // eslint-disable-next-line no-catch-all/no-catch-all
       } catch (err: unknown) {
         logger.error('Failed to publish LiveKit participant count update', err)
+      }
+    }
+    if (event.event === 'room_finished') {
+      // The call is over: its session ends, and with it writing to its conference chat.
+      // By the room's sid where the event carries it: a late report about one call must not
+      // end the next one, which runs in a room of the same name.
+      const roomSid: string | undefined = event.room?.sid
+      try {
+        if (roomSid) {
+          await endCallSession(getDriver(), roomSid)
+        } else if (!(await endCallSessionsOfMissingRoom(getDriver(), roomName))) {
+          // By name, a session only just opened is spared, and nothing here comes back to
+          // it. The poller does: a room noted as told is looked at on its next run, where
+          // the session is ended once it is old enough (see poller.ts).
+          markRoomTold(roomName)
+        }
+        // eslint-disable-next-line no-catch-all/no-catch-all
+      } catch (err: unknown) {
+        logger.error('Failed to end the call session of a finished LiveKit room', err)
+        // Left to the poller as well: it asks again on its next run, by which time whatever
+        // failed here may be over.
+        markRoomTold(roomName)
       }
     }
     res.status(204).end()

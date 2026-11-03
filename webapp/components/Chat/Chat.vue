@@ -19,7 +19,7 @@
     capture-files="true"
     :height="chatHeight"
     :styles="JSON.stringify(computedChatStyle)"
-    :show-footer="true"
+    :show-footer="selectedRoomWritable ? 'true' : 'false'"
     :responsive-breakpoint="600"
     :single-room="singleRoom"
     show-reaction-emojis="false"
@@ -34,8 +34,25 @@
     @open-file="openFile($event.detail[0].file.file)"
   >
     <div v-if="selectedRoom && selectedRoom.roomId" slot="room-options" class="chat-room-options">
-      <div v-if="singleRoom" class="chat-room-options__buttons">
+      <div v-if="singleRoom || selectedRoom.isCallRoom" class="chat-room-options__buttons">
         <os-button
+          v-if="selectedRoom.isCallRoom"
+          variant="primary"
+          appearance="outline"
+          circle
+          size="sm"
+          :loading="exporting"
+          :aria-label="$t('chat.exportChat')"
+          :title="$t('chat.exportChat')"
+          @click="exportRoom"
+        >
+          <template #icon>
+            <os-icon :icon="icons.download" />
+          </template>
+        </os-button>
+        <!-- No larger view for a call's conference chat: it is reached from the call only. -->
+        <os-button
+          v-if="singleRoom && !selectedRoom.isCallRoom"
           as="nuxt-link"
           :to="expandChatLink"
           variant="primary"
@@ -49,6 +66,7 @@
           </template>
         </os-button>
         <os-button
+          v-if="singleRoom"
           variant="primary"
           appearance="outline"
           circle
@@ -81,7 +99,7 @@
     <div slot="room-header-info" class="chat-room-header-info">
       <div class="vac-room-name vac-text-ellipsis">
         <room-title-link
-          :name="selectedRoom ? selectedRoom.roomName : ''"
+          :name="selectedRoomTitle"
           :to="roomHeaderLink"
           :show-group-icon="!!(selectedRoom && selectedRoom.isGroupRoom)"
         />
@@ -138,8 +156,20 @@ import chatStyle from '~/constants/chat.js'
 import { mapGetters, mapMutations } from 'vuex'
 
 const EMPTY_ACTIONS = JSON.stringify([])
+// The app's info-circle and close icons, as paths: the hint lives inside the chat library's
+// markup, where no component of the app can be put.
+const INFO_ICON_PATH =
+  'M16 3c7.168 0 13 5.832 13 13s-5.832 13-13 13-13-5.832-13-13 5.832-13 13-13zM16 5c-6.087 0-11 4.913-11 11s4.913 11 11 11 11-4.913 11-11-4.913-11-11-11zM15 10h2v2h-2v-2zM15 14h2v8h-2v-8z'
+const CLOSE_ICON_PATH =
+  'M7.219 5.781l8.781 8.781 8.781-8.781 1.438 1.438-8.781 8.781 8.781 8.781-1.438 1.438-8.781-8.781-8.781 8.781-1.438-1.438 8.781-8.781-8.781-8.781z'
 const ROOM_PAGE_SIZE = 10
 const MESSAGE_PAGE_SIZE = 20
+const EXPORT_PAGE_SIZE = 100
+// How long the exported file's blob URL is kept after the download was asked for.
+const EXPORT_URL_RELEASE_MS = 1000
+// What belongs to the message above it in an exported chat is set in by this much: the
+// further lines of a message written over several, and its attachments.
+const EXPORT_INDENT = '    '
 
 export default {
   name: 'Chat',
@@ -158,6 +188,43 @@ export default {
       default: null,
     },
     groupId: {
+      type: String,
+      default: null,
+    },
+    // A room opened by its id — the conference chat of a video call, which belongs to
+    // neither one user nor the group as a whole.
+    roomId: {
+      type: String,
+      default: null,
+    },
+    // Whether opening a room puts the cursor into the message field. Off where that would
+    // be unwelcome: on a phone it brings up the keyboard over what one came to read.
+    autoFocus: {
+      type: Boolean,
+      default: true,
+    },
+    // Height in px that something above the chat takes inside the floating chat window —
+    // the tab row beside a parked video call. The chat gives up that much, so the window
+    // keeps its place below the page header.
+    reservedHeight: {
+      type: Number,
+      default: 0,
+    },
+    // Leaves out the room's header — avatar, name and the room's buttons. For a host that
+    // already says which room this is and offers the buttons itself: the video call does
+    // both in its own header and tab row, right above the chat.
+    hideHeader: {
+      type: Boolean,
+      default: false,
+    },
+    // A hint shown above the messages when the chat opens, until it is dismissed with its X
+    // (for as long as the page is not reloaded). Line breaks in the text are kept. `hintKey`
+    // names the hint for that dismissal: a hint with the same key stays away in every chat.
+    hint: {
+      type: String,
+      default: null,
+    },
+    hintKey: {
       type: String,
       default: null,
     },
@@ -184,6 +251,7 @@ export default {
       messages: [],
       unseenMessageIds: new Set(),
       pendingStatusUpdates: {},
+      exporting: false,
     }
   },
   created() {
@@ -200,6 +268,31 @@ export default {
         this.newRoom(newUserId)
       }
     },
+    roomId(newRoomId) {
+      if (this.singleRoom && newRoomId) {
+        this.openRoom(newRoomId)
+      }
+    },
+    showHint() {
+      this.renderHint()
+    },
+    // For a host that offers something depending on it — the download in a call's menu says
+    // when there is nothing to download.
+    knownEmpty(empty) {
+      this.$emit('empty-change', empty)
+    },
+    hint() {
+      this.renderHint()
+    },
+    // The host can start or stop bringing its own header while this chat stays the same —
+    // beside a video call, once the call's conference chat is confirmed. The styles that
+    // take the built-in header out are written once, so they are written anew.
+    hideHeader() {
+      this._shadowStyle?.remove()
+      this._shadowStyle = null
+      this._shadowStylesInjected = false
+      this.injectShadowStyles()
+    },
     currentLocaleIso() {
       this.messages = this.messages.map((m) => {
         this.formatMessageDate(m)
@@ -208,13 +301,22 @@ export default {
     },
   },
   mounted() {
-    if (this.singleRoom && this.groupId) {
+    if (this.singleRoom && this.roomId) {
+      this.openRoom(this.roomId)
+    } else if (this.singleRoom && this.groupId) {
       this.newGroupRoom(this.groupId)
     } else if (this.singleRoom && this.userId) {
       this.newRoom(this.userId)
     } else {
       this.fetchRooms()
     }
+
+    // Not left to the first batch of messages (see setupMessageVisibilityTracking): a
+    // header that is to be left out must not show until then.
+    this.$nextTick(() => {
+      this.injectShadowStyles()
+      this.renderHint()
+    })
 
     // Subscriptions
     this._subscriptions = []
@@ -244,7 +346,11 @@ export default {
       currentUser: 'auth/user',
       videoCallShown: 'videoCall/showVideoCall',
       videoCallMinimized: 'videoCall/minimized',
+      dismissedHints: 'chat/dismissedHints',
     }),
+    showHint() {
+      return !!this.hint && !(this.dismissedHints || []).includes(this.hintKey || this.hint)
+    },
     chatHeight() {
       // When embedded in another container (e.g. video-call sidebar), let the
       // parent dictate the size.
@@ -255,9 +361,9 @@ export default {
         // bottom: 333px (45 + 280 + 8) — clamp the chat height so it stays
         // below the page header instead of running off the top of the viewport.
         if (this.videoCallShown && this.videoCallMinimized) {
-          return 'calc(100dvh - 420px)'
+          return `calc(100dvh - ${420 + this.reservedHeight}px)`
         }
-        return 'calc(100dvh - 190px)'
+        return `calc(100dvh - ${190 + this.reservedHeight}px)`
       }
       return '100%'
     },
@@ -311,13 +417,37 @@ export default {
       }
       return null
     },
+    selectedRoomTitle() {
+      if (!this.selectedRoom) return ''
+      // A call's conference chat carries the group's name; say which of the two chats it is.
+      return this.selectedRoom.isCallRoom
+        ? this.$t('chat.callRoomName', { name: this.selectedRoom.roomName })
+        : this.selectedRoom.roomName
+    },
+    // Known to hold no message at all: every message is loaded, and there is none. Not just
+    // "none loaded yet", which a chat whose older messages are still to come would also be.
+    knownEmpty() {
+      return (
+        !!this.selectedRoom?.id &&
+        !this.selectedRoom.id.startsWith('temp-') &&
+        this.messagesLoaded &&
+        this.messages.length === 0
+      )
+    },
+    selectedRoomWritable() {
+      // Only the conference chat of a video call that is over is read-only.
+      return !this.selectedRoom || this.selectedRoom.isWritable !== false
+    },
     textMessages() {
       return {
         ROOMS_EMPTY: this.$t('chat.roomsEmpty'),
         ROOM_EMPTY: this.$t('chat.roomEmpty'),
         NEW_MESSAGES: this.$t('chat.newMessages'),
         MESSAGE_DELETED: this.$t('chat.messageDeleted'),
-        MESSAGES_EMPTY: this.$t('chat.messagesEmpty'),
+        MESSAGES_EMPTY:
+          this.selectedRoom && this.selectedRoom.isCallRoom
+            ? this.$t('chat.callRoomEmpty')
+            : this.$t('chat.messagesEmpty'),
         CONVERSATION_STARTED: this.$t('chat.conversationStarted'),
         TYPE_MESSAGE: this.$t('chat.typeMessage'),
         SEARCH: this.$t('chat.search'),
@@ -331,7 +461,46 @@ export default {
   methods: {
     ...mapMutations({
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
+      dismissHint: 'chat/DISMISS_HINT',
     }),
+
+    // The hint floats above the messages, inside the chat library's own markup: the library
+    // offers no place there to put anything into, so it is added to its message column from
+    // outside, as the styles in injectShadowStyles are. Called again whenever the column may
+    // have been drawn anew (a room opened) and whenever the hint changes or is dismissed.
+    renderHint() {
+      const shadowRoot = this.$el?.shadowRoot
+      // Only real elements count: whatever else answers to a selector is not markup to add to.
+      const find = (selector) => {
+        const node = shadowRoot?.querySelector?.(selector)
+        return node instanceof Element ? node : null
+      }
+      const column = find('.vac-col-messages')
+      const existing = find('.chat-hint')
+      if (!this.showHint) {
+        existing?.remove()
+        return
+      }
+      if (!column) return
+      if (existing && existing.parentNode === column) {
+        existing.querySelector('.chat-hint__text').textContent = this.hint
+        return
+      }
+      existing?.remove()
+      const bubble = document.createElement('div')
+      bubble.className = 'chat-hint'
+      bubble.setAttribute('role', 'note')
+      bubble.dataset.test = 'chat-hint'
+      const svg = (path) =>
+        `<svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="${path}"/></svg>`
+      bubble.innerHTML = `${svg(INFO_ICON_PATH)}<span class="chat-hint__text"></span><button type="button" class="chat-hint__close" data-test="chat-hint-close">${svg(CLOSE_ICON_PATH)}</button>`
+      // The text as text: it comes from the locales, but has no business being markup.
+      bubble.querySelector('.chat-hint__text').textContent = this.hint
+      const close = bubble.querySelector('.chat-hint__close')
+      close.setAttribute('aria-label', this.$t('actions.close'))
+      close.addEventListener('click', () => this.dismissHint(this.hintKey || this.hint))
+      column.appendChild(bubble)
+    },
 
     buildLastMessage(msg) {
       const content = (msg.content || '').trim()
@@ -403,6 +572,50 @@ export default {
         .vac-room-header { height: 60px !important; }
         .vac-room-header .vac-avatar-profile--header { margin-right: 8px; }
         ${
+          // The library has no switch for its header, and reserves the header's height
+          // above the messages with a margin of their own — both have to go.
+          this.hideHeader
+            ? `
+        .vac-room-header { display: none !important; }
+        .vac-container-scroll { margin-top: 0 !important; }
+        `
+            : ''
+        }
+        /* The hint above the messages (see renderHint). Below the room's header where there
+           is one, at the top where the host brings its own. */
+        .chat-hint {
+          position: absolute;
+          top: ${this.hideHeader ? 8 : 68}px;
+          left: 12px;
+          right: 12px;
+          z-index: 20;
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          padding: 8px 8px 8px 12px;
+          /* Its colours are tokens (root-tokens.css, --chat-hint-*), for a brand to change. */
+          background: var(--chat-hint-background);
+          color: var(--chat-hint-color);
+          border-radius: var(--border-radius-base);
+          box-shadow: var(--chat-hint-shadow);
+          font-size: 14px;
+          line-height: 1.4;
+        }
+        .chat-hint > svg { flex-shrink: 0; margin-top: 2px; color: var(--chat-hint-icon-color); }
+        .chat-hint__text { flex: 1 1 auto; min-width: 0; white-space: pre-line; }
+        .chat-hint__close {
+          flex-shrink: 0;
+          display: flex;
+          padding: 2px;
+          border: 0;
+          background: none;
+          color: inherit;
+          cursor: pointer;
+          border-radius: var(--border-radius-base);
+        }
+        .chat-hint__close:hover { background: var(--chat-hint-close-hover-background); }
+        .chat-hint__close:focus-visible { outline: 2px solid var(--chat-hint-color); }
+        ${
           this.singleRoom
             ? `
         .vac-message-wrapper .vac-message-box { flex: 0 0 80%; max-width: 80%; }
@@ -412,6 +625,7 @@ export default {
         }
       `
       shadowRoot.appendChild(style)
+      this._shadowStyle = style
       this._shadowStylesInjected = true
     },
     setupMessageVisibilityTracking() {
@@ -704,7 +918,7 @@ export default {
       // the user is actively typing in the filter.
       const shadowRoot = this.$el?.shadowRoot
       const userIsFiltering = shadowRoot?.activeElement?.matches?.('input[type="search"].vac-input')
-      if (!userIsFiltering) {
+      if (!userIsFiltering && this.autoFocus) {
         this.$nextTick(() => {
           this.$el?.shadowRoot?.querySelector('textarea#roomTextarea')?.focus()
         })
@@ -751,7 +965,11 @@ export default {
           this.messagesLoaded = true
         }
         // Ensure visibility tracking is running
-        this.$nextTick(() => this.setupMessageVisibilityTracking())
+        this.$nextTick(() => {
+          this.setupMessageVisibilityTracking()
+          // A room opened may have had its message column drawn anew.
+          this.renderHint()
+        })
       } catch (error) {
         this.messages = []
         this.$toastBackendError(error)
@@ -772,6 +990,10 @@ export default {
             variables: { id: msg.room.id },
             fetchPolicy: 'no-cache',
           })
+          // The conference chat of a video call is no conversation of its own: it is
+          // shown where the call opens it (and is then in the list already), never
+          // because a message happens to arrive for it.
+          if (Room?.length && Room[0].isCallRoom) return
           if (Room?.length) {
             const newRoom = this.fixRoomObject(Room[0])
             if (!this._externalRoomIds) this._externalRoomIds = new Set()
@@ -1000,6 +1222,10 @@ export default {
     },
 
     bringRoomToTopAndSelect(room) {
+      // A room is there, so the rooms are no longer loading. The library holds back its
+      // "no messages" text while they are, and the paths that open ONE room (a group's
+      // chat, a room by its id) never went through fetchRooms, which is what used to say so.
+      this.loadingRooms = false
       room.index = new Date().toISOString()
       this.moveRoomToTop(room)
       this.$nextTick(() => {
@@ -1115,7 +1341,11 @@ export default {
     },
 
     async newGroupRoom(groupId) {
-      if (this.findLocalRoom((r) => r.isGroupRoom && r.groupProfile?.id === groupId)) return
+      // Not a call's conference chat: it carries the group too, but is not the group's chat.
+      if (
+        this.findLocalRoom((r) => r.isGroupRoom && !r.isCallRoom && r.groupProfile?.id === groupId)
+      )
+        return
       if (await this.fetchServerRoom({ groupId })) return
 
       try {
@@ -1129,6 +1359,110 @@ export default {
         this.bringRoomToTopAndSelect(room)
       } catch (error) {
         this.$toastBackendError(error)
+      }
+    },
+
+    async openRoom(roomId) {
+      if (this.findLocalRoom((r) => r.id === roomId)) return
+      const room = await this.fetchServerRoom({ id: roomId })
+      this.loadingRooms = false
+      return room
+    },
+
+    // Everything written in the room, oldest first — not only what has been scrolled into
+    // view so far.
+    async fetchAllMessages(roomId) {
+      const all = []
+      let beforeIndex = null
+      for (;;) {
+        const variables = { roomId, first: EXPORT_PAGE_SIZE }
+        if (beforeIndex !== null) variables.beforeIndex = beforeIndex
+        const {
+          data: { Message },
+        } = await this.$apollo.query({
+          query: messageQuery(),
+          variables,
+          fetchPolicy: 'no-cache',
+        })
+        all.unshift(...Message)
+        if (Message.length < EXPORT_PAGE_SIZE) return all
+        beforeIndex = Math.min(...Message.map((m) => m.indexId))
+      }
+    },
+
+    buildExportText(room, messages) {
+      const locale = this.currentLocaleIso
+      // The span the file covers: from the start of the call — when its chat came about, with
+      // the first to join — to the moment it is saved.
+      const lines = [this.$t('chat.export.title', { name: room.roomName })]
+      if (room.createdAt) {
+        lines.push(
+          this.$t('chat.export.callStarted', {
+            date: new Date(room.createdAt).toLocaleString(locale),
+          }),
+        )
+      }
+      lines.push(this.$t('chat.export.savedAt', { date: new Date().toLocaleString(locale) }), '')
+      // Said in so many words, so the file is understood on its own.
+      if (messages.length === 0) lines.push(this.$t('chat.messagesEmpty'))
+      for (const message of messages) {
+        const sentAt = new Date(message.date).toLocaleString(locale)
+        // A line break inside a message stays one, but what follows it is indented:
+        // at the start of a line it would read as a message of its own, without sender.
+        const content = (message.content || '').trim().replace(/\r?\n/g, `\n${EXPORT_INDENT}`)
+        lines.push(`[${sentAt}] ${message.username}:${content ? ` ${content}` : ''}`)
+        for (const file of message.files || []) {
+          const name = file.extension ? `${file.name}.${file.extension}` : file.name
+          lines.push(`${EXPORT_INDENT}${this.$t('chat.export.attachment')}: ${name}`)
+        }
+      }
+      return lines.join('\n') + '\n'
+    },
+
+    // "chat_<group>_<day>_<from>--<until>.txt": the group the call took place in, and the
+    // span the file covers — from the start of the chat to the moment it is saved, in the
+    // viewer's own time. Kept to characters every file system takes.
+    exportFileName(room, savedAt = new Date()) {
+      const pad = (n) => String(n).padStart(2, '0')
+      const day = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+      const time = (d) => `${pad(d.getHours())}-${pad(d.getMinutes())}`
+      const startedAt = room.createdAt ? new Date(room.createdAt) : savedAt
+      const name = (room.roomName || '')
+        .replace(/[\\/:*?"<>|\p{Cc}]/gu, ' ')
+        .trim()
+        .replace(/\s+/g, '-')
+      // The day is only repeated when the chat ran past midnight.
+      const until =
+        day(savedAt) === day(startedAt) ? time(savedAt) : `${day(savedAt)}_${time(savedAt)}`
+      return ['chat', name, `${day(startedAt)}_${time(startedAt)}--${until}`]
+        .filter(Boolean)
+        .join('_')
+        .concat('.txt')
+    },
+
+    async exportRoom() {
+      const room = this.selectedRoom
+      if (!room?.id || this.exporting) return
+      this.exporting = true
+      try {
+        const messages = await this.fetchAllMessages(room.id)
+        const blob = new Blob([this.buildExportText(room, messages)], {
+          type: 'text/plain;charset=utf-8',
+        })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = this.exportFileName(room)
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        // Not at once: the click only asks the browser to start the download, and some
+        // browsers have not picked the blob up yet when it returns.
+        setTimeout(() => URL.revokeObjectURL(url), EXPORT_URL_RELEASE_MS)
+      } catch (error) {
+        this.$toastBackendError(error)
+      } finally {
+        this.exporting = false
       }
     },
 

@@ -13,6 +13,7 @@ import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@constants/subscriptions'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
 import { isActiveMembership, visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
+import { joinCallSession } from '@src/livekit/callSession'
 import { noteCountTold } from '@src/livekit/toldRooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
@@ -199,6 +200,44 @@ export const getRoomParticipants = async (
       return { count: 0, userIds: [] }
     }
     logger.warn(`listParticipants failed for ${roomName}:`, err)
+    throw err
+  }
+}
+
+/**
+ * The call currently running in that room, as the media server knows it: the id it gave the
+ * room (which tells this call from the next one in a room of the same name) and who is in it.
+ * Null if there is no such room, which is to say no call.
+ *
+ * Who is in it comes from getRoomParticipants, so a connection is a user by the same rule
+ * everywhere (userIdOf). Asked afresh, never through the shared requests the dock uses: this
+ * answer decides who may enter the call's conference chat.
+ */
+export const getLiveCall = async (
+  config: LiveKitConfig,
+  roomName: string,
+): Promise<{ sid: string; userIds: Set<string> } | null> => {
+  try {
+    const [rooms, { userIds }] = await Promise.all([
+      withTimeout(
+        roomServiceFor(config).listRooms([roomName]),
+        LIVEKIT_API_TIMEOUT_MS,
+        'listRooms',
+      ),
+      getRoomParticipants(config, roomName),
+    ])
+    const room = rooms.find((candidate) => candidate.name === roomName)
+    if (!room?.sid) {
+      return null
+    }
+    return { sid: room.sid, userIds: new Set(userIds) }
+  } catch (err) {
+    // As in getRoomParticipants: only "room not found" means there is no call. Anything else
+    // is a failure and must not pass for "nobody there".
+    if (err instanceof TwirpError && (err.status === 404 || err.code === 'not_found')) {
+      return null
+    }
+    logger.warn(`Looking up the call in ${roomName} failed:`, err)
     throw err
   }
 }
@@ -439,6 +478,25 @@ export default {
     },
   },
   Mutation: {
+    // The conference chat is for those IN the call, and that is asked of the media server
+    // rather than taken from the join token: a token is handed out as soon as the device
+    // setup opens, to people who may never go in, and it says nothing about which of a
+    // group's calls it was used for. So the client asks again once it is connected, and gets
+    // the chat of the very room it is in.
+    joinGroupVideoCallChat: async (_root, params: { groupId: string }, context) => {
+      const roomName = roomNameForGroup(params.groupId)
+      const call = await getLiveCall(context.config, roomName)
+      if (!call?.userIds.has(context.user.id)) {
+        throw new AppError(Errors.VIDEO_CALL_CHAT_NOT_IN_CALL)
+      }
+      return joinCallSession(context.driver, {
+        groupId: params.groupId,
+        userId: context.user.id,
+        livekitRoom: roomName,
+        livekitSid: call.sid,
+        presentUserIds: [...call.userIds],
+      })
+    },
     joinGroupVideoCall: async (_root, params: { groupId: string }, context) => {
       const roomName = roomNameForGroup(params.groupId)
       // Two different acts through one mutation. JOINING an existing call (count > 0) needs

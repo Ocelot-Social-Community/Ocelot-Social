@@ -665,7 +665,8 @@ const handleCreateMessage: IMiddlewareResolver = async (
           OPTIONAL MATCH (recipientUser)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
           OPTIONAL MATCH (room)-[:ROOM_FOR]->(group:Group)<-[mutedGroup:MUTED]-(recipientUser)
           RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email},
-            mutedGroup IS NOT NULL AS isGroupMuted
+            mutedGroup IS NOT NULL AS isGroupMuted,
+            EXISTS((room)-[:ROOM_FOR]->(:VideoCallSession)) AS isCallRoom
         `
       const txResponse = await transaction.run(messageRecipientsCypher, {
         currentUserId,
@@ -678,6 +679,7 @@ const handleCreateMessage: IMiddlewareResolver = async (
           user: record.get('recipientUser'),
           email: record.get('emailAddress')?.email,
           isGroupMuted: record.get('isGroupMuted'),
+          isCallRoom: record.get('isCallRoom'),
         })),
       }
     })
@@ -705,9 +707,12 @@ const handleCreateMessage: IMiddlewareResolver = async (
         userId: recipientUser.id,
       })
 
-      // Send EMail if we found a user(not blocked) and he is not considered online
+      // Send EMail if we found a user(not blocked) and he is not considered online.
+      // Never for the conference chat of a video call: it is talk among those in the call, and
+      // a mail would chase everybody who has left it.
       if (
         email &&
+        !recipient.isCallRoom &&
         recipientUser.emailNotificationsChatMessage !== false &&
         !isUserOnline(recipientUser) &&
         !recipient.isGroupMuted
