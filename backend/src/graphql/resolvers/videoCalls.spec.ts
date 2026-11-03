@@ -932,6 +932,15 @@ describe('getLiveCall', () => {
     expect(call?.userIds.size).toBe(0)
   })
 
+  it.each([
+    ['a 404', new TwirpError('twirp', 'room not found', 404)],
+    ['the "not found" code', new TwirpError('twirp', 'room not found', 400, 'not_found')],
+  ])('returns null when listing the room answers %s', async (_, error) => {
+    listRoomsMock.mockRejectedValue(error)
+
+    await expect(getLiveCall(ENABLED_LIVEKIT, 'group-x')).resolves.toBeNull()
+  })
+
   it("takes a user from the join token's metadata, as everywhere else", async () => {
     listRoomsMock.mockResolvedValue([{ name: 'group-x', sid: 'RM_x' }])
     listParticipantsMock.mockResolvedValue([
