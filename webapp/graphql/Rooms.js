@@ -121,8 +121,8 @@ export const unreadRoomsQuery = () => {
 }
 
 export const roomUnreadQuery = () => gql`
-  query Room($userId: ID, $groupId: ID) {
-    Room(userId: $userId, groupId: $groupId) {
+  query Room($id: ID, $userId: ID, $groupId: ID) {
+    Room(id: $id, userId: $userId, groupId: $groupId) {
       id
       unreadCount
     }

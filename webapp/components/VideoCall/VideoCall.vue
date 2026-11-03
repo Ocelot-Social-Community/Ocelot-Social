@@ -897,6 +897,8 @@ export default {
     this.callChatsSub = null
     this.groupChatRoomId = null
     this.callChatRetryTimer = null
+    // How often the conference chat has been asked for; see joinCallChat.
+    this.callChatAsks = 0
   },
   mounted() {
     this.observeStage()
@@ -1035,16 +1037,24 @@ export default {
     // button then opens the group's chat, as it did before there was another.
     async joinCallChat(room, attempt = 1) {
       const groupId = this.groupId
+      // Only the latest question counts. A reconnect asks again while the first answer may
+      // still be on its way, and the server may have opened a new session in between: the
+      // older answer would put the chat of a session that is over back in place.
+      const ask = ++this.callChatAsks
       try {
         const { data } = await this.$apollo.mutate({
           mutation: joinGroupVideoCallChatMutation(),
           variables: { groupId },
         })
         // The call may have been left, or swapped for another, in the meantime.
-        if (this.room !== room || this.groupId !== groupId) return
-        this.setChatRoomId((data && data.joinGroupVideoCallChat) || null)
+        if (this.room !== room || this.groupId !== groupId || ask !== this.callChatAsks) return
+        const chatRoomId = (data && data.joinGroupVideoCallChat) || null
+        this.setChatRoomId(chatRoomId)
+        // Updates only tell of what is written from now on; what came before — while the
+        // page was reloaded, say — is asked for once.
+        if (chatRoomId) this.loadConferenceUnread(chatRoomId)
       } catch (_e) {
-        if (this.room !== room || this.groupId !== groupId) return
+        if (this.room !== room || this.groupId !== groupId || ask !== this.callChatAsks) return
         // The media server can take a moment to list a participant it just let in.
         if (attempt < CALL_CHAT_JOIN_ATTEMPTS) {
           // Kept, so leaving the call can call it off (see cleanup): hanging up takes a
@@ -1113,6 +1123,23 @@ export default {
         this.setGroupChatUnread(room ? room.unreadCount : 0)
       } catch (_e) {
         /* the tab simply goes without a count */
+      }
+    },
+    // What is unread in the call's conference chat when it is joined; updates follow by
+    // its id (onCallChatUpdated).
+    async loadConferenceUnread(roomId) {
+      try {
+        const { data } = await this.$apollo.query({
+          query: roomUnreadQuery(),
+          variables: { id: roomId },
+          fetchPolicy: 'network-only',
+        })
+        // The call may have been left, or its chat swapped for another, in the meantime.
+        if (this.chatRoomId !== roomId) return
+        const room = data && data.Room && data.Room[0]
+        if (room) this.setConferenceUnread(room.unreadCount)
+      } catch (_e) {
+        /* the tab simply goes without a count until the next message */
       }
     },
     tileAvatarSize(tile) {

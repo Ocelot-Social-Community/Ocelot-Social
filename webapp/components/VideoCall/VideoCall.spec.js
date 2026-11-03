@@ -3232,6 +3232,8 @@ describe('VideoCall', () => {
       setChatRoomId: jest.fn(),
       joinCallChat: jest.fn(),
       callChatRetryTimer: null,
+      callChatAsks: 0,
+      loadConferenceUnread: jest.fn(),
       cancelCallChatRetry: VideoCall.methods.cancelCallChatRetry,
       ...overrides,
     })
@@ -3247,6 +3249,14 @@ describe('VideoCall', () => {
       await VideoCall.methods.joinCallChat.call(ctx, room)
       expect(ctx.$apollo.mutate.mock.calls[0][0].variables).toEqual({ groupId: 'g1' })
       expect(ctx.setChatRoomId).toHaveBeenCalledWith('room-1')
+      expect(ctx.loadConferenceUnread).toHaveBeenCalledWith('room-1')
+    })
+
+    it('asks for nothing unread where the server gives no chat', async () => {
+      const ctx = context(jest.fn().mockResolvedValue({ data: { joinGroupVideoCallChat: null } }))
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      expect(ctx.setChatRoomId).toHaveBeenCalledWith(null)
+      expect(ctx.loadConferenceUnread).not.toHaveBeenCalled()
     })
 
     it('drops an answer for a call that has been left meanwhile', async () => {
@@ -3256,6 +3266,24 @@ describe('VideoCall', () => {
       )
       await VideoCall.methods.joinCallChat.call(ctx, room)
       expect(ctx.setChatRoomId).not.toHaveBeenCalled()
+    })
+
+    it('drops an older answer that arrives after a newer one', async () => {
+      let answerFirst
+      const mutate = jest
+        .fn()
+        .mockReturnValueOnce(
+          new Promise((resolve) => {
+            answerFirst = () => resolve({ data: { joinGroupVideoCallChat: 'room-old' } })
+          }),
+        )
+        .mockResolvedValueOnce({ data: { joinGroupVideoCallChat: 'room-new' } })
+      const ctx = context(mutate)
+      const first = VideoCall.methods.joinCallChat.call(ctx, room)
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      answerFirst()
+      await first
+      expect(ctx.setChatRoomId.mock.calls).toEqual([['room-new']])
     })
 
     it('asks again after a failure, and gives up after the last attempt', async () => {
@@ -3440,6 +3468,40 @@ describe('VideoCall', () => {
         const ctx = context(jest.fn().mockRejectedValue(new Error('offline')))
         await expect(load(ctx)).resolves.toBeUndefined()
         expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('loading what is unread in the conference chat', () => {
+      const context = (query, overrides = {}) => ({
+        chatRoomId: 'call-room',
+        $apollo: { query },
+        setConferenceUnread: jest.fn(),
+        ...overrides,
+      })
+      const load = (ctx) => VideoCall.methods.loadConferenceUnread.call(ctx, 'call-room')
+
+      it('takes what is unread in the room', async () => {
+        const ctx = context(
+          jest.fn().mockResolvedValue({ data: { Room: [{ id: 'call-room', unreadCount: 3 }] } }),
+        )
+        await load(ctx)
+        expect(ctx.$apollo.query.mock.calls[0][0].variables).toEqual({ id: 'call-room' })
+        expect(ctx.setConferenceUnread).toHaveBeenCalledWith(3)
+      })
+
+      it("drops an answer for a chat that is no longer the call's", async () => {
+        const ctx = context(
+          jest.fn().mockResolvedValue({ data: { Room: [{ id: 'call-room', unreadCount: 3 }] } }),
+          { chatRoomId: 'another-room' },
+        )
+        await load(ctx)
+        expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
+      })
+
+      it('goes without a count when the request fails', async () => {
+        const ctx = context(jest.fn().mockRejectedValue(new Error('offline')))
+        await expect(load(ctx)).resolves.toBeUndefined()
+        expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
       })
     })
 

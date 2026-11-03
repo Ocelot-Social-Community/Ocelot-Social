@@ -24,7 +24,7 @@
         <room-header
           class="chat-modul__header"
           :profile="callGroupProfile"
-          :title="videoCallGroupName || ''"
+          :title="callGroupProfile.name"
           :to="callGroupRoute"
           show-group-icon
         >
