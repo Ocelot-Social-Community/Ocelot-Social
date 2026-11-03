@@ -3528,6 +3528,19 @@ describe('VideoCall', () => {
       expect(VideoCall.methods.controlTooltip.call(phone, 'Headset: turn off')).toBe('')
     })
 
+    it('names a control by its visible label too, while it shows one', () => {
+      const name = (iconOnly, label, action) =>
+        VideoCall.methods.controlName.call({ iconOnly }, label, action)
+      expect(name(false, 'Microphone', 'Headset: turn off')).toBe('Microphone, Headset: turn off')
+      // Not twice where the action has it already.
+      expect(name(false, 'Microphone', 'Microphone: turn off')).toBe('Microphone: turn off')
+      expect(name(false, 'Screen', 'Share your screen, a window or a tab')).toBe(
+        'Share your screen, a window or a tab',
+      )
+      // Without a label to see, the action alone.
+      expect(name(true, 'Microphone', 'Headset: turn off')).toBe('Headset: turn off')
+    })
+
     it('drops the labels in the parked window, and offers them as tooltips', () => {
       const parkedWindow = { parked: true, isMobile: false, phase: 'in-call' }
       expect(computed.iconOnly.call(parkedWindow)).toBe(true)

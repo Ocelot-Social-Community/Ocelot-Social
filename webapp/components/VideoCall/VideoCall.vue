@@ -334,7 +334,7 @@
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="micAction"
+          :aria-label="controlName(micLabel, micAction)"
           :loading="devicesStarting.audioinput > 0"
           @click="toggleMic"
         >
@@ -351,7 +351,7 @@
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="cameraAction"
+          :aria-label="controlName(cameraLabel, cameraAction)"
           :loading="devicesStarting.videoinput > 0"
           @click="toggleCamera"
         >
@@ -369,7 +369,7 @@
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="screenShareAction"
+          :aria-label="controlName(screenShareLabel, screenShareAction)"
           @click="toggleScreenShare"
         >
           <template #icon>
@@ -423,7 +423,7 @@
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="chatAction"
+          :aria-label="controlName(chatLabel, chatAction)"
           @click="toggleChat"
         >
           <template #icon>
@@ -440,7 +440,7 @@
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           class="video-call__leave"
-          :aria-label="leaveAction"
+          :aria-label="controlName(leaveLabel, leaveAction)"
           @click="leave"
         >
           <template #icon>
@@ -1456,6 +1456,14 @@ export default {
     controlTooltip(action) {
       if (this.isMobile || !action) return ''
       return { content: action, html: false }
+    },
+    // The name a screen reader gives a control: what a click on it does. While the button
+    // spells out its label, the name has to hold that word too, so the control can be called
+    // by it by voice (WCAG 2.5.3, label in name): put in front where the action lacks it, as
+    // "Headset: turn off" does next to "Microphone".
+    controlName(label, action) {
+      if (this.iconOnly || action.toLowerCase().includes(label.toLowerCase())) return action
+      return `${label}, ${action}`
     },
     iconOnlyTooltip(label) {
       // v-tooltip renders nothing for an empty string — exactly what we want
