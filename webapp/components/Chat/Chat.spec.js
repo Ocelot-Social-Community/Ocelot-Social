@@ -669,6 +669,46 @@ describe('Chat.vue', () => {
       await wrapper.vm.fetchMessages({ room })
       expect(wrapper.vm.unseenMessageIds.has('unseen-1')).toBe(true)
     })
+
+    it('drops the messages of a room that was left while they were asked for', async () => {
+      const first = mockRoom({ id: 'r-first', roomId: 'r-first' })
+      const second = mockRoom({ id: 'r-second', roomId: 'r-second' })
+      let answerFirst
+      mocks.$apollo.query
+        .mockReturnValueOnce(
+          new Promise((resolve) => {
+            answerFirst = () =>
+              resolve({ data: { Message: [mockMessage({ id: 'from-first', indexId: 0 })] } })
+          }),
+        )
+        .mockResolvedValueOnce({ data: { Message: [] } })
+      const loadingFirst = wrapper.vm.fetchMessages({ room: first })
+      await wrapper.vm.fetchMessages({ room: second })
+      answerFirst()
+      await loadingFirst
+      expect(wrapper.vm.selectedRoom.id).toBe('r-second')
+      expect(wrapper.vm.messages).toHaveLength(0)
+    })
+
+    it('leaves the room opened since alone when the request for a left one fails', async () => {
+      const first = mockRoom({ id: 'r-first', roomId: 'r-first' })
+      const second = mockRoom({ id: 'r-second', roomId: 'r-second' })
+      let failFirst
+      mocks.$apollo.query
+        .mockReturnValueOnce(
+          new Promise((_resolve, reject) => {
+            failFirst = () => reject(new Error('offline'))
+          }),
+        )
+        .mockResolvedValueOnce({
+          data: { Message: [mockMessage({ id: 'from-second', indexId: 0 })] },
+        })
+      const loadingFirst = wrapper.vm.fetchMessages({ room: first })
+      await wrapper.vm.fetchMessages({ room: second })
+      failFirst()
+      await loadingFirst
+      expect(wrapper.vm.messages).toHaveLength(1)
+    })
   })
 
   describe('sendMessage', () => {
