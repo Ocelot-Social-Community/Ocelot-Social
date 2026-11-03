@@ -61,15 +61,21 @@ export const joinCallSession = async (
       // participants asking at the same moment would otherwise both find none and both create
       // one. Writing to the group takes its write lock, which is held until the transaction
       // ends; the property is removed again at once, so nothing of it is stored. A statement of
-      // its own, so the lock is surely held before anything below is read.
-      await transaction.run(
+      // its own, so the lock is surely held before anything below is read. A user or group
+      // that is not there gets nothing, not even a session opened for nobody.
+      const locked = await transaction.run(
         `
           MATCH (group:Group { id: $groupId })
+          MATCH (:User { id: $userId })
           SET group.callSessionLock = true
           REMOVE group.callSessionLock
+          RETURN group.id AS groupId
         `,
-        { groupId },
+        { groupId, userId },
       )
+      if (locked.records.length === 0) {
+        return null
+      }
       const open = await transaction.run(
         `
           MATCH (group:Group { id: $groupId })
