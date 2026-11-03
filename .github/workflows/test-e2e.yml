@@ -125,13 +125,16 @@ jobs:
             type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend-test
 
-      # Only what the Docker Hub mirror cannot serve. maildev and redis are not handed over here: the
-      # test jobs pull them through the mirror at `compose up`, by the tag docker-compose.test.yml
-      # names — the one place Dependabot bumps them.
+      # maildev and redis by service name, not by tag: compose resolves the tag from
+      # docker-compose.test.yml, the one place Dependabot bumps them. Compose reads the services'
+      # env files even to pull, hence the copies — the same the test jobs make.
       - name: Pull third-party images
         run: |
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.test_e2e backend/.env
           docker pull cgr.dev/chainguard/minio:latest
           docker pull cgr.dev/chainguard/minio-client:latest-dev
+          docker compose -f docker-compose.yml -f docker-compose.test.yml pull mailserver redis
 
       # Compressed on the way out: `docker save` writes UNCOMPRESSED layer tars, and every byte here is
       # paid 40 times over on the matrix side. zstd rather than gzip -1 — smaller AND faster on both
@@ -140,10 +143,13 @@ jobs:
       # `docker load` sniffing the format.
       - name: Save all images
         run: |
+          compose() { docker compose -f docker-compose.yml -f docker-compose.test.yml "$@"; }
           docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" | zstd -T0 -3 > /tmp/backend.tar.zst
           docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" | zstd -T0 -3 > /tmp/neo4j.tar.zst
           docker save "cgr.dev/chainguard/minio:latest" | zstd -T0 -3 > /tmp/minio.tar.zst
           docker save "cgr.dev/chainguard/minio-client:latest-dev" | zstd -T0 -3 > /tmp/minio-mc.tar.zst
+          docker save "$(compose config --images mailserver)" | zstd -T0 -3 > /tmp/mailserver.tar.zst
+          docker save "$(compose config --images redis)" | zstd -T0 -3 > /tmp/redis.tar.zst
 
       # ARTIFACT, not cache. These are run-scoped hand-offs between jobs, which is what artifacts are
       # for; `actions/cache` with a `run_id` key can never hit on a later run, yet it occupies the
@@ -402,14 +408,9 @@ jobs:
           sudo chmod +x /opt/cucumber-json-formatter
           sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
 
-      # Before anything is loaded: it restarts the daemon. `compose up` then pulls maildev and redis
-      # through it.
-      - name: Docker Hub through a mirror
-        uses: ./.github/actions/docker-hub-mirror
-
       - name: Boot up test system | docker compose
         run: |
-          for image in neo4j backend minio minio-mc webapp; do
+          for image in neo4j backend minio minio-mc mailserver redis webapp; do
             zstd -dc "/tmp/${image}.tar.zst" | docker load
           done
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
