@@ -223,6 +223,30 @@ describe('audioWatchdog', () => {
       expect(pub.setSubscribed).toHaveBeenCalledTimes(3)
     })
 
+    it('keeps the cooldown across the moment the repair is unsubscribed', async () => {
+      const { watchdog, pub } = setup()
+      await stalledChecks(watchdog)
+      pub.isSubscribed = false
+      await watchdog.tick()
+      await flushResubscribe()
+      pub.isSubscribed = true
+      await watchdog.tick()
+      pub.track = audioTrack()
+      await stalledChecks(watchdog, AUDIO_STALL_CHECKS * 2)
+      expect(pub.setSubscribed).toHaveBeenCalledTimes(2)
+    })
+
+    it('forgets the cooldown once the participant left', async () => {
+      const { watchdog, room, bob, pub } = setup()
+      await stalledChecks(watchdog)
+      await flushResubscribe()
+      room.remoteParticipants.delete('bob')
+      await watchdog.tick()
+      room.remoteParticipants.set('bob', bob)
+      await stalledChecks(watchdog)
+      expect(pub.setSubscribed).toHaveBeenCalledTimes(3)
+    })
+
     it('does not subscribe again when the participant left meanwhile', async () => {
       const { watchdog, room, pub } = setup()
       await stalledChecks(watchdog)

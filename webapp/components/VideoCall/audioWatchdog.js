@@ -31,8 +31,12 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 const counter = (value) => (typeof value === 'number' ? value : null)
 
 export function createAudioWatchdog({ room, Track, isPaused = () => false, logger = console }) {
-  // identity -> { track, bytes, energy, stalls, healedAt }
+  // identity -> { track, bytes, energy, stalls }
   const watched = new Map()
+  // identity -> time of the last repair. Kept apart from the counters, which a
+  // repair itself resets (unsubscribed for a moment, then a new track) — the
+  // cooldown has to outlast exactly that.
+  const healedAt = new Map()
   let timer = null
   let running = false
   let stopped = false
@@ -92,7 +96,6 @@ export function createAudioWatchdog({ room, Track, isPaused = () => false, logge
       bytes: counter(stats.bytesReceived),
       energy: counter(stats.totalAudioEnergy),
       stalls: 0,
-      healedAt: prev ? prev.healedAt : 0,
     }
     watched.set(participant.identity, entry)
     // A new track (resubscribed, republished) starts its counters at zero.
@@ -106,9 +109,10 @@ export function createAudioWatchdog({ room, Track, isPaused = () => false, logge
     if (!noBytes && !silent) return
     entry.stalls = prev.stalls + 1
     if (entry.stalls < AUDIO_STALL_CHECKS) return
-    if (entry.healedAt && now - entry.healedAt < AUDIO_HEAL_COOLDOWN_MS) return
+    const lastHeal = healedAt.get(participant.identity)
+    if (lastHeal !== undefined && now - lastHeal < AUDIO_HEAL_COOLDOWN_MS) return
     entry.stalls = 0
-    entry.healedAt = now
+    healedAt.set(participant.identity, now)
     // The cause goes along with the log line: no bytes means the server stopped
     // forwarding, bytes without sound means the browser drops what it gets.
     // Not awaited: the other speakers' checks need not wait for this repair.
@@ -127,8 +131,10 @@ export function createAudioWatchdog({ room, Track, isPaused = () => false, logge
         await check(participant, now)
         if (stopped) return
       }
-      for (const identity of watched.keys()) {
-        if (!present.has(identity)) watched.delete(identity)
+      for (const map of [watched, healedAt]) {
+        for (const identity of map.keys()) {
+          if (!present.has(identity)) map.delete(identity)
+        }
       }
     } finally {
       running = false
@@ -146,6 +152,7 @@ export function createAudioWatchdog({ room, Track, isPaused = () => false, logge
       if (timer) clearInterval(timer)
       timer = null
       watched.clear()
+      healedAt.clear()
     },
   }
 }
