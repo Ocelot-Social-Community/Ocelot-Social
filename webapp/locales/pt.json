@@ -278,6 +278,7 @@
         "showContentFilterMasonryGrid": "Mostra o filtro de conteúdo na grade masonry (notícias).",
         "showGroupButtonInHeader": "Mostra o botão de grupos no cabeçalho.",
         "socialMediaEnabled": "Ativa a funcionalidade de links de redes sociais: os links são exibidos nos perfis e gerenciados nas configurações do usuário.",
+        "videoCallDtx": "Padrão para chamadas de vídeo: enquanto alguém está em silêncio, o seu microfone quase não envia dados. Poupa largura de banda, mas pode tornar participantes individuais inaudíveis para ouvintes individuais. Cada utilizador pode alterá-lo para o seu próprio microfone nas configurações dos dispositivos de uma chamada.",
         "videoConference": "Ativa a videoconferência (LiveKit). O interruptor de tempo de execução para as permissões de chamada de vídeo. Requer as variáveis de ambiente do LiveKit; sem elas permanece desativada e esmaecida."
       },
       "envLink": "Ver ambiente",
@@ -301,6 +302,7 @@
         "showContentFilterMasonryGrid": "Filtro de conteúdo na grade",
         "showGroupButtonInHeader": "Botão de grupos no cabeçalho",
         "socialMediaEnabled": "Redes sociais",
+        "videoCallDtx": "Supressão de silêncio nas chamadas",
         "videoConference": "Videoconferência"
       },
       "lastUpdated": "Última alteração: {timestamp} por {actor}",
@@ -1934,6 +1936,8 @@
     "connectionPoor": "Conexão fraca: {name}",
     "deviceSettings": {
       "button": "Dispositivos",
+      "dtx": "Não transmitir as pausas na fala",
+      "dtxHint": "Poupa dados enquanto estás em silêncio. Se às vezes os outros não te ouvem, desativa-o.",
       "speakerError": "Não foi possível trocar o alto-falante.",
       "title": "Configurações dos dispositivos"
     },

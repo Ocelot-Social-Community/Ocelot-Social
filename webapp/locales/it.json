@@ -278,6 +278,7 @@
         "showContentFilterMasonryGrid": "Mostra il filtro dei contenuti nella griglia masonry (feed).",
         "showGroupButtonInHeader": "Mostra il pulsante dei gruppi nell'intestazione.",
         "socialMediaEnabled": "Abilita la funzione dei link ai social media: i link sono mostrati sui profili e gestiti nelle impostazioni utente.",
+        "videoCallDtx": "Impostazione predefinita per le videochiamate: finché qualcuno tace, il suo microfono non invia quasi alcun dato. Risparmia banda, ma può rendere singoli partecipanti non udibili per singoli ascoltatori. Ogni utente può modificarla per il proprio microfono nelle impostazioni dei dispositivi di una chiamata.",
         "videoConference": "Abilita la videoconferenza (LiveKit). L’interruttore runtime per i permessi delle videochiamate. Richiede le variabili d’ambiente di LiveKit; senza di esse resta disattivata e in grigio."
       },
       "envLink": "Visualizza ambiente",
@@ -301,6 +302,7 @@
         "showContentFilterMasonryGrid": "Filtro contenuti nella griglia",
         "showGroupButtonInHeader": "Pulsante gruppi nell'intestazione",
         "socialMediaEnabled": "Social media",
+        "videoCallDtx": "Soppressione dei silenzi nelle chiamate",
         "videoConference": "Videoconferenza"
       },
       "lastUpdated": "Ultima modifica: {timestamp} da {actor}",
@@ -1934,6 +1936,8 @@
     "connectionPoor": "Connessione debole: {name}",
     "deviceSettings": {
       "button": "Dispositivi",
+      "dtx": "Non trasmettere le pause nel parlato",
+      "dtxHint": "Risparmia dati mentre taci. Se a volte gli altri non ti sentono, disattivalo.",
       "speakerError": "Impossibile cambiare l'altoparlante.",
       "title": "Impostazioni dei dispositivi"
     },

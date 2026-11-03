@@ -40,6 +40,22 @@
       @mic-change="emitSwitch('audioinput', mics, $event)"
       @speaker-change="emitSwitch('audiooutput', speakers, $event)"
     />
+    <label class="device-settings__option">
+      <input
+        type="checkbox"
+        data-test="video-call-dtx"
+        aria-describedby="video-call-dtx-hint"
+        :checked="dtx"
+        :disabled="dtxApplying"
+        @change="$emit('dtx-change', $event.target.checked)"
+      />
+      <span class="device-settings__option-text">
+        {{ $t('videoCall.deviceSettings.dtx') }}
+        <small id="video-call-dtx-hint" class="device-settings__option-hint">
+          {{ $t('videoCall.deviceSettings.dtxHint') }}
+        </small>
+      </span>
+    </label>
   </div>
 </template>
 
@@ -76,6 +92,16 @@ export default {
       default: false,
     },
     micStarting: {
+      type: Boolean,
+      default: false,
+    },
+    // Whether our microphone leaves out pauses in speech (Opus DTX).
+    dtx: {
+      type: Boolean,
+      default: false,
+    },
+    // The microphone is being published anew to apply a change of `dtx`.
+    dtxApplying: {
       type: Boolean,
       default: false,
     },
@@ -164,6 +190,26 @@ export default {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-x-small);
+}
+
+.device-settings__option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-x-small);
+  cursor: pointer;
+}
+
+.device-settings__option input {
+  margin-top: 0.2em;
+}
+
+.device-settings__option-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.device-settings__option-hint {
+  color: var(--text-color-soft);
 }
 
 .device-settings__title {

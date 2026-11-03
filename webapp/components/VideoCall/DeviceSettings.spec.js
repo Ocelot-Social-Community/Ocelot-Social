@@ -107,6 +107,40 @@ describe('DeviceSettings', () => {
     wrapper.destroy()
   })
 
+  describe('pauses in speech (dtx)', () => {
+    const checkbox = (wrapper) => wrapper.find('[data-test="video-call-dtx"]')
+
+    it('shows whether they are left out', async () => {
+      const { wrapper: off } = await mountWith()
+      expect(checkbox(off).element.checked).toBe(false)
+      off.destroy()
+      const { wrapper: on } = await mountWith({ propsData: { dtx: true } })
+      expect(checkbox(on).element.checked).toBe(true)
+      on.destroy()
+    })
+
+    it('asks the call to change it', async () => {
+      const { wrapper } = await mountWith()
+      checkbox(wrapper).element.checked = true
+      await checkbox(wrapper).trigger('change')
+      expect(wrapper.emitted('dtx-change')).toEqual([[true]])
+      wrapper.destroy()
+    })
+
+    it('cannot be changed while the last change is applied', async () => {
+      const { wrapper } = await mountWith({ propsData: { dtxApplying: true } })
+      expect(checkbox(wrapper).attributes('disabled')).toBeDefined()
+      wrapper.destroy()
+    })
+
+    it('explains itself to screen readers', async () => {
+      const { wrapper } = await mountWith()
+      const hint = wrapper.find(`#${checkbox(wrapper).attributes('aria-describedby')}`)
+      expect(hint.text()).toBe('videoCall.deviceSettings.dtxHint')
+      wrapper.destroy()
+    })
+  })
+
   it('asks to be closed via its close button', async () => {
     const { wrapper } = await mountWith()
     await wrapper.find('[data-test="video-call-device-settings-close"]').trigger('click')

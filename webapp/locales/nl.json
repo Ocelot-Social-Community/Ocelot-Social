@@ -278,6 +278,7 @@
         "showContentFilterMasonryGrid": "Toont het inhoudsfilter in het masonry-raster (nieuwsoverzicht).",
         "showGroupButtonInHeader": "Toont de groepenknop in de koptekst.",
         "socialMediaEnabled": "Schakelt de functie voor social-mediakoppelingen in: koppelingen worden op profielen getoond en beheerd in de gebruikersinstellingen.",
+        "videoCallDtx": "Standaard voor video-oproepen: zolang iemand zwijgt, verstuurt zijn microfoon nauwelijks gegevens. Bespaart bandbreedte, maar kan afzonderlijke deelnemers onhoorbaar maken voor afzonderlijke luisteraars. Elke gebruiker kan dit voor de eigen microfoon wijzigen in de apparaatinstellingen van een gesprek.",
         "videoConference": "Schakelt videovergaderen in (LiveKit). De runtime-schakelaar voor de video-oproeprechten. Vereist de LiveKit-omgevingsvariabelen; zonder deze blijft het uitgeschakeld en grijs."
       },
       "envLink": "Omgeving bekijken",
@@ -301,6 +302,7 @@
         "showContentFilterMasonryGrid": "Inhoudsfilter in raster",
         "showGroupButtonInHeader": "Groepenknop in koptekst",
         "socialMediaEnabled": "Sociale media",
+        "videoCallDtx": "Stilteonderdrukking in gesprekken",
         "videoConference": "Videovergaderen"
       },
       "lastUpdated": "Laatst gewijzigd: {timestamp} door {actor}",
@@ -1934,6 +1936,8 @@
     "connectionPoor": "Zwakke verbinding: {name}",
     "deviceSettings": {
       "button": "Apparaten",
+      "dtx": "Spreekpauzes niet verzenden",
+      "dtxHint": "Bespaart gegevens zolang je zwijgt. Horen anderen je soms niet, zet het dan uit.",
       "speakerError": "De luidspreker kon niet worden gewisseld.",
       "title": "Apparaatinstellingen"
     },

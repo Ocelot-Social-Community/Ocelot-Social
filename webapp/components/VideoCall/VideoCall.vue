@@ -347,7 +347,10 @@
             :meter-stream="micMeterStream"
             :camera-starting="devicesStarting.videoinput > 0"
             :mic-starting="devicesStarting.audioinput > 0"
+            :dtx="dtx"
+            :dtx-applying="dtxApplying"
             @switch="switchDevice"
+            @dtx-change="setDtx"
             @close="closeDeviceSettings({ restoreFocus: true })"
           />
         </div>
@@ -403,7 +406,7 @@ import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 import DeviceSettings from './DeviceSettings.vue'
-import { saveDevicePreference } from './devicePreferences'
+import { saveDevicePreference, loadDtxPreference, saveDtxPreference } from './devicePreferences'
 
 // How long a participant keeps the speaking treatment after LiveKit drops them
 // from the active-speaker list. LiveKit reports raw audio activity, so it lets
@@ -488,6 +491,10 @@ export default {
       // Our microphone is published but delivers nothing: the OS took the device
       // away (LiveKit then pauses the upstream) or it only yields digital silence.
       micProblem: false,
+      // The user's own choice on leaving out pauses in speech (Opus DTX), or
+      // null to follow the network's default.
+      dtxPreference: null,
+      dtxApplying: false,
       reconnecting: false,
       // Remote cameras are unsubscribed because our connection is weak — the
       // sound gets the bandwidth. audioOnlyDismissed: the user asked for the
@@ -514,6 +521,14 @@ export default {
     }
   },
   computed: {
+    // Opus DTX: while we are silent, our microphone sends hardly any packets.
+    // Off unless the network or the user turns it on — a nearly idle audio
+    // path leaves more room for one listener losing us (#10787), and LiveKit's
+    // own meet app keeps it off as well.
+    dtx() {
+      if (this.dtxPreference !== null) return this.dtxPreference
+      return !!(this.$policy && this.$policy.get('videoCallDtx'))
+    },
     ...mapGetters({
       show: 'videoCall/showVideoCall',
       minimized: 'videoCall/minimized',
@@ -888,6 +903,9 @@ export default {
     this.speakerHoldTimer = null
     this.micRestart = null
     this.micSilenceProbe = null
+    // Tracks whose events we listen to — publishing a track anew must not
+    // double the listeners.
+    this.watchedMicTracks = new WeakSet()
     this.stageObserver = null
     this.observedStage = null
     this.qualityTimer = null
@@ -1225,6 +1243,8 @@ export default {
       // tears that down without cleanup(), so let go of it here for every way in.
       this.micRestart = null
       this.micSilenceProbe = null
+      this.dtxApplying = false
+      this.dtxPreference = loadDtxPreference()
       this.resetAudioOnly()
       try {
         if (!this.groupId) throw new Error('Missing group id')
@@ -1239,6 +1259,7 @@ export default {
           dynacast: true,
           videoCaptureDefaults: this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : {},
           audioCaptureDefaults: this.micDeviceId ? { deviceId: this.micDeviceId } : {},
+          publishDefaults: { dtx: this.dtx },
           // LiveKit picks the speaker anew whenever a device comes or goes.
           // Unless it knows ours, that puts everyone back on the system
           // default without a word.
@@ -1828,6 +1849,8 @@ export default {
       this.audioOnlyDismissed = false
     },
     watchMicTrack(track, TrackEvent) {
+      if (this.watchedMicTracks.has(track)) return
+      this.watchedMicTracks.add(track)
       // When the OS takes the microphone away (another app, a Bluetooth profile
       // switch, macOS muting the capture) the MediaStreamTrack fires `mute`
       // and LiveKit stops sending after a few seconds — while the participant
@@ -1901,6 +1924,38 @@ export default {
         this.refreshMicMeter()
       } catch (err) {
         if (this.room === room) this.showDeviceErrorToast('mic', err)
+      }
+    },
+    async setDtx(on) {
+      this.dtxPreference = on
+      saveDtxPreference(on)
+      const room = this.room
+      const Track = this.Track
+      if (!room || !Track) return
+      // Every later publish of the microphone follows the room's defaults.
+      room.options.publishDefaults.dtx = on
+      const pub = room.localParticipant.getTrackPublication(Track.Source.Microphone)
+      const track = pub && pub.track
+      if (!track) return
+      // DTX is agreed on when a track is published, so the microphone has to be
+      // published anew. The same track, unstopped: capture, mute state and our
+      // listeners stay as they are.
+      this.dtxApplying = true
+      try {
+        await room.localParticipant.unpublishTrack(track, false)
+        if (this.room !== room) return
+        await room.localParticipant.publishTrack(track, {
+          source: Track.Source.Microphone,
+          dtx: on,
+        })
+      } catch (err) {
+        if (this.room === room) this.showDeviceErrorToast('mic', err)
+      } finally {
+        if (this.room === room) {
+          this.dtxApplying = false
+          // A failed publish leaves the microphone off — say so on the button.
+          this.micEnabled = !!room.localParticipant.isMicrophoneEnabled
+        }
       }
     },
     async toggleMic() {

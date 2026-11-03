@@ -185,6 +185,7 @@ describe('Query.policyDefaults', () => {
       'groupsEnabled',
       'apiKeysEnabled',
       'videoConference',
+      'videoCallDtx',
       'showContentFilterHeaderMenu',
       'showContentFilterMasonryGrid',
       'showGroupButtonInHeader',

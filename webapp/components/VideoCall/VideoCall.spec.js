@@ -40,6 +40,7 @@ jest.mock('livekit-client', () => {
   class Room {
     constructor(opts) {
       this.opts = opts
+      this.options = opts
       this.handlers = {}
       this.localParticipant = {
         isScreenShareEnabled: false,
@@ -51,6 +52,8 @@ jest.mock('livekit-client', () => {
         setCameraEnabled: jest.fn().mockResolvedValue(),
         setScreenShareEnabled: jest.fn().mockResolvedValue(),
         getTrackPublication: jest.fn(),
+        unpublishTrack: jest.fn().mockResolvedValue(),
+        publishTrack: jest.fn().mockResolvedValue(),
       }
       // Tests flip the static to start a room whose audio is already blocked.
       this.canPlaybackAudio = Room.initialCanPlaybackAudio
@@ -89,7 +92,9 @@ const stubs = {
   CallChatTabs: Stub('CallChatTabs'),
   RoomHeader: Stub('RoomHeader'),
   PreJoin: Stub('PreJoin'),
-  DeviceSettings: Stub('DeviceSettings', { props: ['cameraStarting', 'micStarting'] }),
+  DeviceSettings: Stub('DeviceSettings', {
+    props: ['cameraStarting', 'micStarting', 'dtx', 'dtxApplying'],
+  }),
   VideoTile: Stub('VideoTile', { props: ['tile', 'cameraStarting', 'micStarting'] }),
   Chat: Stub('Chat'),
   ClientOnly: Stub('ClientOnly'),
@@ -153,6 +158,7 @@ const factory = (state = {}) => {
       $router,
       $t: (k, vars) => (vars ? `${k}:${JSON.stringify(vars)}` : k),
       ...(state.apollo ? { $apollo: state.apollo } : {}),
+      ...(state.policy ? { $policy: { get: (key) => state.policy[key] } } : {}),
     },
     stubs,
   })
@@ -2802,6 +2808,149 @@ describe('VideoCall', () => {
       expect(wrapper.vm.audioOnlyDismissed).toBe(false)
       jest.advanceTimersByTime(60_000)
       expect(wrapper.vm.audioOnly).toBe(false)
+    })
+  })
+
+  describe('dtx (pauses in speech)', () => {
+    const STORAGE_KEY = 'ocelot-video-call-devices'
+
+    const connected = async (state = {}) => {
+      const built = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', ...state })
+      built.wrapper.vm.$apollo = {
+        mutate: jest
+          .fn()
+          .mockResolvedValue({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } }),
+      }
+      await built.wrapper.vm.connect()
+      return { ...built, room: built.wrapper.vm.room }
+    }
+
+    const withMic = (room, track = { on: jest.fn() }) => {
+      room.localParticipant.getTrackPublication.mockImplementation((source) =>
+        source === 'microphone' ? { track } : undefined,
+      )
+      return track
+    }
+
+    beforeEach(() => {
+      localStorage.clear()
+    })
+
+    it('leaves the pauses in by default', async () => {
+      const { wrapper, room } = await connected()
+      expect(room.opts.publishDefaults).toEqual({ dtx: false })
+      expect(wrapper.vm.dtx).toBe(false)
+    })
+
+    it("follows the network's default", async () => {
+      const { room } = await connected({ policy: { videoCallDtx: true } })
+      expect(room.opts.publishDefaults).toEqual({ dtx: true })
+    })
+
+    it("lets the user's own choice win over the network's default", async () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ dtx: false }))
+      const { room } = await connected({ policy: { videoCallDtx: true } })
+      expect(room.opts.publishDefaults).toEqual({ dtx: false })
+    })
+
+    it('publishes the microphone anew when the user changes it during the call', async () => {
+      const { wrapper, room } = await connected()
+      const track = withMic(room)
+      room.localParticipant.isMicrophoneEnabled = true
+      const applying = wrapper.vm.setDtx(true)
+      expect(wrapper.vm.dtxApplying).toBe(true)
+      await applying
+      expect(room.localParticipant.unpublishTrack).toHaveBeenCalledWith(track, false)
+      expect(room.localParticipant.publishTrack).toHaveBeenCalledWith(track, {
+        source: 'microphone',
+        dtx: true,
+      })
+      expect(room.options.publishDefaults.dtx).toBe(true)
+      expect(wrapper.vm.dtx).toBe(true)
+      expect(wrapper.vm.dtxApplying).toBe(false)
+      expect(wrapper.vm.micEnabled).toBe(true)
+      expect(JSON.parse(localStorage.getItem(STORAGE_KEY))).toEqual({ dtx: true })
+    })
+
+    it('keeps a muted microphone muted', async () => {
+      const { wrapper, room } = await connected()
+      withMic(room)
+      room.localParticipant.isMicrophoneEnabled = false
+      await wrapper.vm.setDtx(true)
+      expect(wrapper.vm.micEnabled).toBe(false)
+    })
+
+    it('only takes note while the microphone is not published', async () => {
+      const { wrapper, room } = await connected()
+      await wrapper.vm.setDtx(true)
+      expect(room.options.publishDefaults.dtx).toBe(true)
+      expect(room.localParticipant.unpublishTrack).not.toHaveBeenCalled()
+    })
+
+    it('only takes note outside a call', async () => {
+      const { wrapper } = factory({ show: false })
+      await wrapper.vm.setDtx(true)
+      expect(wrapper.vm.dtx).toBe(true)
+      expect(JSON.parse(localStorage.getItem(STORAGE_KEY))).toEqual({ dtx: true })
+    })
+
+    it('reports a microphone that could not be published again', async () => {
+      const { wrapper, room } = await connected()
+      withMic(room)
+      room.localParticipant.isMicrophoneEnabled = false
+      room.localParticipant.publishTrack.mockRejectedValue(
+        Object.assign(new Error('denied'), { name: 'NotAllowedError' }),
+      )
+      const toast = jest.spyOn(wrapper.vm, 'showDeviceErrorToast').mockImplementation(() => {})
+      await wrapper.vm.setDtx(true)
+      expect(toast).toHaveBeenCalledWith('mic', expect.any(Error))
+      expect(wrapper.vm.micEnabled).toBe(false)
+      expect(wrapper.vm.dtxApplying).toBe(false)
+    })
+
+    it('leaves a call that was left meanwhile alone', async () => {
+      const { wrapper, room } = await connected()
+      withMic(room)
+      room.localParticipant.unpublishTrack.mockImplementation(async () => {
+        wrapper.vm.room = null
+      })
+      const toast = jest.spyOn(wrapper.vm, 'showDeviceErrorToast').mockImplementation(() => {})
+      await wrapper.vm.setDtx(true)
+      expect(room.localParticipant.publishTrack).not.toHaveBeenCalled()
+      expect(toast).not.toHaveBeenCalled()
+    })
+
+    it('swallows the failure of a call that was left meanwhile', async () => {
+      const { wrapper, room } = await connected()
+      withMic(room)
+      room.localParticipant.unpublishTrack.mockImplementation(async () => {
+        wrapper.vm.room = null
+        throw new Error('gone')
+      })
+      const toast = jest.spyOn(wrapper.vm, 'showDeviceErrorToast').mockImplementation(() => {})
+      await wrapper.vm.setDtx(true)
+      expect(toast).not.toHaveBeenCalled()
+    })
+
+    it('does not listen twice to a microphone published anew', async () => {
+      const { room } = await connected()
+      const track = { on: jest.fn() }
+      room.handlers.LocalTrackPublished({ source: 'microphone', track })
+      const listeners = track.on.mock.calls.length
+      room.handlers.LocalTrackPublished({ source: 'microphone', track })
+      expect(track.on).toHaveBeenCalledTimes(listeners)
+    })
+
+    it('hands the setting to the device panel and takes changes from it', async () => {
+      const { wrapper } = await connected()
+      wrapper.vm.showDeviceSettings = true
+      await wrapper.vm.$nextTick()
+      const panel = wrapper.findComponent({ name: 'DeviceSettings' })
+      expect(panel.props('dtx')).toBe(false)
+      expect(panel.props('dtxApplying')).toBe(false)
+      panel.vm.$emit('dtx-change', true)
+      await flushPromises()
+      expect(panel.props('dtx')).toBe(true)
     })
   })
 
