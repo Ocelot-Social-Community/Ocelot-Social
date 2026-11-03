@@ -236,15 +236,15 @@ describe('audioWatchdog', () => {
       expect(pub.setSubscribed).toHaveBeenCalledTimes(2)
     })
 
-    it('forgets the cooldown once the participant left', async () => {
-      const { watchdog, room, bob, pub } = setup()
+    it('does not hold against a participant who rejoined between two checks', async () => {
+      const { watchdog, room, pub } = setup()
       await stalledChecks(watchdog)
       await flushResubscribe()
-      room.remoteParticipants.delete('bob')
-      await watchdog.tick()
-      room.remoteParticipants.set('bob', bob)
+      const rejoinedPub = micPublication()
+      room.remoteParticipants.set('bob', participant('bob', [rejoinedPub]))
       await stalledChecks(watchdog)
-      expect(pub.setSubscribed).toHaveBeenCalledTimes(3)
+      expect(pub.setSubscribed).toHaveBeenCalledTimes(2)
+      expect(rejoinedPub.setSubscribed).toHaveBeenCalledWith(false)
     })
 
     it('does not subscribe again when the participant left meanwhile', async () => {
