@@ -219,7 +219,8 @@ export default {
   justify-content: center;
   gap: var(--space-xx-small);
   align-self: stretch;
-  padding: var(--space-x-small) var(--space-xx-small);
+  /*  Hardly any space above and below: the row the tabs are put in sets their height. */
+  padding: var(--space-xxx-small) var(--space-xx-small);
   border: 0;
   background: none;
   color: var(--text-color-base);
