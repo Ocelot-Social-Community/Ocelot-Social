@@ -171,6 +171,8 @@ export default {
 
 .elevation__reason {
   flex: 1 1 14rem;
+  /* the form item's bottom margin would push the field up against the centred button (#10686) */
+  margin-bottom: 0;
 }
 
 .elevation__active,
