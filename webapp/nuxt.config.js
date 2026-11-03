@@ -14,6 +14,15 @@ const toOgLocale = (code) => {
   const locale = locales.find((l) => l.code === code)
   return locale ? locale.iso.replace('-', '_') : null
 }
+// e2e only (webapp/Dockerfile `test_build`, set by .github/workflows/test-e2e.yml): build the CLIENT
+// against Vue's development runtime, so a hydration mismatch is reported in the browser console
+// where Cypress records it (cypress/support/step_definitions/common/hydration_warnings.js). A
+// production build cannot report one: vue.runtime.esm.js guards every hydration warning with
+// `process.env.NODE_ENV !== 'production'`, and `nuxt build` defines that as 'production'. The
+// common.dev build carries no such guard. The SERVER bundle stays as it is — it renders the markup
+// under test, and Vue warns about hydration on the client only.
+const VUE_DEV_RUNTIME = Boolean(process.env.VUE_DEV_RUNTIME)
+
 const ogLocale = toOgLocale(CONFIG.LANGUAGE_DEFAULT)
 const ogLocaleAlternates = locales
   .filter((l) => l.enabled && l.code !== CONFIG.LANGUAGE_DEFAULT)
@@ -291,21 +300,6 @@ export default {
     proxy: true,
   },
   proxy: {
-    '/.well-known/webfinger': {
-      target: CONFIG.GRAPHQL_URI,
-      toProxy: true, // cloudflare needs that
-      headers: {
-        Accept: 'application/json',
-      },
-    },
-    '/activitypub': {
-      // make this configurable (nuxt-dotenv)
-      target: CONFIG.GRAPHQL_URI,
-      toProxy: true, // cloudflare needs that
-      headers: {
-        Accept: 'application/json',
-      },
-    },
     '/api': {
       // make this configurable (nuxt-dotenv)
       target: CONFIG.GRAPHQL_URI,
@@ -390,6 +384,15 @@ export default {
       // we set description and og:description manually in head.meta above.
       description: CONFIG.DESCRIPTION,
       ogHost: false,
+    },
+  },
+
+  vue: {
+    config: {
+      // Nuxt silences Vue in every build that is not `nuxt dev` (silent = !dev), and the dev runtime
+      // above sends the root message of a mismatch — "The client-side rendered virtual DOM tree is
+      // not matching server-rendered content" — through that switch. Left alone (undefined) otherwise.
+      silent: VUE_DEV_RUNTIME ? false : undefined,
     },
   },
 
@@ -478,6 +481,14 @@ export default {
         const brandingServerStub = path.resolve(__dirname, 'webpack/branding-server-stub.js')
         config.resolve.alias['@ocelot-social/branding/dist/discover.js$'] = brandingServerStub
         config.resolve.alias['@ocelot-social/branding/dist/tar.js$'] = brandingServerStub
+        // See VUE_DEV_RUNTIME above. `vue$` (exact) is what every `import … from 'vue'` resolves
+        // through — the vue-demi and @vue/composition-api aliases below end in a bare 'vue' and are
+        // resolved through it as well, so the bundle still holds a single Vue. The CommonJS build
+        // exports the Composition API as properties of Vue, which webpack's interop maps the named
+        // imports onto.
+        if (VUE_DEV_RUNTIME) {
+          config.resolve.alias.vue$ = require.resolve('vue/dist/vue.runtime.common.dev.js')
+        }
       }
 
       // Vue 2.7 has built-in Composition API - redirect old imports

@@ -3,8 +3,9 @@ Feature: Register and recover an account
   I want to sign up, confirm my e-mail address, and get back in
   So that I can take part
 
-  # The codes the server mails are read from the database instead of the mailbox: the e2e stack
-  # sends no mail, and a test that waits for one would only be slower and flakier. What is tested
+  # The codes the server mails are read from the database instead of the mailbox: a test that
+  # waits for a mail would only be slower and flakier (the notification features are the ones
+  # that read maildev, since the mail is what they are about). What is tested
   # is everything around it — the slides the network's policies choose, the code check, the
   # account creation and the login that follows.
 

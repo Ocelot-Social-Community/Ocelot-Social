@@ -17,7 +17,12 @@ import { AppError } from '@graphql/errors'
 import { allPermissionKeys, sanitizePermissions } from '@src/permission'
 
 import { DEFAULT_ROLES, MANDATORY_ROLE_NAMES } from './defaults'
-import { deleteRole as dbDeleteRole, renameRole as dbRenameRole, writeRole } from './repository'
+import {
+  deleteRole as dbDeleteRole,
+  readAllRoles,
+  renameRole as dbRenameRole,
+  writeRole,
+} from './repository'
 import { OWNER_ROLE, USER_ROLE } from './types'
 import { seedDefaultRoleNodes } from './userRoleEdges'
 
@@ -45,7 +50,15 @@ export class RoleValidationError<Entry extends ErrorEntry = ErrorEntry> extends 
 
 export class RoleService {
   private readonly cache = new Map<string, RoleDefinition>()
+  // Raised with every change to the cache, whether made here or applied from another instance.
+  // A subscription context compares it to the value it read its viewer at: a role definition
+  // that changed may have changed the viewer's permissions (see context/subscription.ts).
+  private changes = 0
   private initialised = false
+
+  get version(): number {
+    return this.changes
+  }
   private pubsub: RolePubSub | undefined
   private subscriptionId: number | undefined
 
@@ -124,9 +137,43 @@ export class RoleService {
     for (const role of roles) {
       this.cache.set(role.name, role)
     }
+    this.changes += 1
     // Same invariant as init(): a resync that lost owner/user left a broken cache, so
     // fail loudly rather than report success with a half-empty role set.
     this.assertMandatoryRoles('reload')
+  }
+
+  // Bring the cache back in line with the DB on a live instance, for a change event it never
+  // got. Same rules as PolicyService.resync: it only reads, a change during the read drops that
+  // read, and the version only moves if a role differs.
+  //
+  // A read without owner or user keeps the cache: authorization runs on it, so the last good
+  // role set beats a broken one, and unlike at boot the instance is already serving.
+  async resync(): Promise<void> {
+    const changesBefore = this.changes
+    const roles = await readAllRoles(this.db)
+    if (this.changes !== changesBefore) {
+      return
+    }
+
+    const cache = new Map(roles.map((role) => [role.name, role]))
+    if (MANDATORY_ROLE_NAMES.some((name) => !cache.has(name))) {
+      // eslint-disable-next-line no-console
+      console.warn('[roles] resync skipped: a mandatory role is missing in the database.')
+      return
+    }
+    // By hand, not with node:util: see PolicyService.resync.
+    const unchanged =
+      cache.size === this.cache.size &&
+      roles.every((role) => JSON.stringify(role) === JSON.stringify(this.cache.get(role.name)))
+    if (unchanged) {
+      return
+    }
+    this.cache.clear()
+    for (const [name, role] of cache) {
+      this.cache.set(name, role)
+    }
+    this.changes += 1
   }
 
   shutdown(): void {
@@ -188,6 +235,7 @@ export class RoleService {
     const now = new Date().toISOString()
     await writeRole(this.db, definition, actor, now)
     this.cache.set(definition.name, definition)
+    this.changes += 1
     this.publishChange({ name: definition.name, definition, actor, timestamp: now })
     return definition
   }
@@ -222,6 +270,7 @@ export class RoleService {
     await dbRenameRole(this.db, oldName, newName, actor, now)
     this.cache.delete(oldName)
     this.cache.set(newName, definition)
+    this.changes += 1
     this.publishChange({ name: newName, previousName: oldName, definition, actor, timestamp: now })
     return definition
   }
@@ -250,6 +299,7 @@ export class RoleService {
 
     await dbDeleteRole(this.db, name)
     this.cache.delete(name)
+    this.changes += 1
     this.publishChange({
       name,
       definition: null,
@@ -276,6 +326,7 @@ export class RoleService {
 
   // Apply a change broadcast by any instance (including our own echo). Idempotent.
   applyExternalChange(event: RoleChangeEvent): void {
+    this.changes += 1
     // A rename arrives as a single event carrying the former name: drop the stale
     // cache key first, so the role is not left duplicated under both names.
     if (event.previousName && event.previousName !== event.name) {

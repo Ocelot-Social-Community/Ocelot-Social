@@ -9,14 +9,14 @@ We have several configuration possibilities just in the frontend.
 
 ### Date Time
 
-In file `branding/constants/dateTime.js`.
+In the branding (`defineBranding({ dateTime: { … } })`), written by the browser's `Intl` in the user's locale.
 
-- `RELATIVE_DATETIME`
-  - `true` (default) or `false`
-- `ABSOLUT_DATETIME_FORMAT`
-  - definition see [date-fns, format](https://date-fns.org/v3.3.1/docs/format):
-    - `P`: just localized date
-    - `Pp`: just localized date and time
+- `relativeDateTime`
+  - `true` (default): "today, 3:55 PM", "Thursday 11:00 AM" within a week, the date (in `dateStyle`) beyond
+  - `false`: always the absolute date/time below
+- `dateStyle`, `timeStyle`
+  - each `'short'`, `'medium'`, `'long'`, `'full'` or `null` (left out) — see [`Intl.DateTimeFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#datestyle); not both `null`
+  - default: `dateStyle: 'medium'` (`Oct 19, 2026` · `19.10.2026`), `timeStyle: null`
 
 ## E-Mails
 

@@ -500,6 +500,7 @@
     "POST_EVENT_LOCATION_COORDINATES_INCOMPLETE": "Для місця події бракує координати.",
     "POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE": "Широта місця події недійсна.",
     "POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE": "Довгота місця події недійсна.",
+    "POST_EVENT_LOCATION_NOT_PICKED": "Виберіть місце з результатів пошуку або позначте його на мапі.",
     "POST_EVENT_START_DATE_INVALID": "Дата початку не є дійсною датою.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "Дата початку має бути у форматі ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "Опис місця повинен містити від {min} до {max} символів.",
@@ -531,7 +532,11 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Ти можеш зробити це лише з користувачами, чия роль надає менше повноважень, ніж твоя.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Ти не можеш шукати в адмініструванні користувачів.",
     "USER_DOES_NOT_EXIST": "Користувача не знайдено.",
+    "USER_PROFILE_NAME_TOO_LONG": "Ім’я має містити не більше {max} символів.",
     "USER_PROFILE_NAME_TOO_SHORT": "Ім’я має містити щонайменше {min} символів.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Дозволені лише малі літери (a–z), цифри (0–9), підкреслення та дефіси.",
+    "USER_PROFILE_SLUG_TOO_LONG": "Ім’я користувача має містити не більше {max} символів.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "Ім’я користувача має містити щонайменше {min} символів.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Цей користувач не заблокований.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "Чат відеовиклику відкритий лише для його учасників. Спершу приєднайся до виклику.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Для відеовиклику не знайдено активного членства в цій групі.",
@@ -604,10 +609,12 @@
       "email": "Будь ласка, введіть дійсну електронну адресу.",
       "eventLocationNameLength": "Адреса повинна містити від {min} до {max} символів.",
       "eventLocationNameNotEmpty": "Будь ласка, введіть адресу.",
+      "eventLocationNotPicked": "Виберіть місце з результатів пошуку або позначте його на мапі.",
       "eventVenueLength": "Опис місця повинен містити від {min} до {max} символів.",
       "eventVenueNotEmpty": "Будь ласка, введіть опис місця.",
       "followableUrl": "має бути дійсною веб-адресою або адресою електронної пошти",
       "formHasErrors": "Будь ласка, заповніть усі обов'язкові поля.",
+      "locationNotPicked": "Виберіть місце з підказок.",
       "nameLength": "Повинно містити від {min} до {max} символів.",
       "titleLength": "Заголовок повинен містити від {min} до {max} символів.",
       "titleNotEmpty": "Будь ласка, введіть заголовок."
@@ -617,10 +624,6 @@
     "step": "Крок {current} з {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd.MM.yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Зміна пароля не вдалася. Можливо, код безпеки був неправильним?",
@@ -828,6 +831,20 @@
       "title": "Деактивувати користувача"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (заблоковано вами)",
+      "count": "Підключено: {count}",
+      "flag": "Поточні відеодзвінки: {count}",
+      "join": "Приєднатися",
+      "joined": "Ви в цьому дзвінку",
+      "participants": "Учасники",
+      "title": "Поточні відеодзвінки"
+    },
+    "close": "Закрити бічну панель",
+    "label": "Бічна панель",
+    "open": "Відкрити бічну панель – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} з {total} € зібрано",
     "donate-now": "Пожертвувати зараз"
@@ -1009,6 +1026,7 @@
     "foundation": "Заснування",
     "general": "Загальне",
     "goal": "Мета групи",
+    "goalPlaceholder": "напр. Створити сад, відкритий для всього району",
     "group": "Група",
     "groupCreated": "Групу створено!",
     "in": "в",
@@ -1052,6 +1070,7 @@
     "muted": "Сповіщення групи вимкнено",
     "myGroups": "Мої групи",
     "name": "Назва групи",
+    "namePlaceholder": "Громадський сад на Подолі",
     "removeMember": "Видалити учасника",
     "removeMemberButton": "Видалити",
     "removeMemberConfirmText": "Видалити користувача «{name}» з групи?",
@@ -1131,6 +1150,7 @@
       "usual": "Учасник"
     },
     "save": "Створити нову групу",
+    "slugPlaceholder": "hromadskyi-sad-podil",
     "teaser": {
       "notReadable": "Цю групу поки не можна відкрити — ваш запит ще розглядається",
       "openGroup": "Відкрити групу",
@@ -1695,6 +1715,7 @@
       "unblocked": "{name} знову розблоковано"
     },
     "data": {
+      "cityPlaceholder": "напр. Київ",
       "givenName": "Ваше ім'я",
       "givenNamePlaceholder": "Іван",
       "labelBio": "Про вас",
@@ -1863,7 +1884,8 @@
       "nameNotEmpty": "Будь ласка, введіть ваше ім'я.",
       "slug": {
         "alreadyTaken": "Це ім'я користувача вже зайнято.",
-        "regex": "Дозволені лише малі літери, цифри, підкреслення та дефіси."
+        "length": "Ім’я користувача має містити від {min} до {max} символів.",
+        "regex": "Дозволені лише малі літери (a–z), цифри (0–9), підкреслення та дефіси."
       }
     }
   },

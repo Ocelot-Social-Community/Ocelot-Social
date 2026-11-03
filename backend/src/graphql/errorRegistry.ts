@@ -73,6 +73,22 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'The name must be at least {min} characters long.',
   },
+  USER_PROFILE_NAME_TOO_LONG: {
+    type: 'BAD_USER_INPUT',
+    text: 'The name must be at most {max} characters long.',
+  },
+  USER_PROFILE_SLUG_TOO_SHORT: {
+    type: 'BAD_USER_INPUT',
+    text: 'The slug must be at least {min} characters long.',
+  },
+  USER_PROFILE_SLUG_TOO_LONG: {
+    type: 'BAD_USER_INPUT',
+    text: 'The slug must be at most {max} characters long.',
+  },
+  USER_PROFILE_SLUG_INVALID_CHARACTERS: {
+    type: 'BAD_USER_INPUT',
+    text: 'The slug may only contain lowercase letters (a–z), numbers (0–9), underscores and hyphens.',
+  },
   BADGE_SELECTION_BADGE_NOT_REWARDED: {
     type: 'BAD_USER_INPUT',
     text: 'You cannot set badges not rewarded to you.',
@@ -185,6 +201,12 @@ const definitions = {
   COMMENT_SAVE_CONTENT_TOO_SHORT: {
     type: 'BAD_USER_INPUT',
     text: 'The comment must be at least {min} characters long.',
+  },
+  // #7239: a place typed but not picked was searched, and Mapbox's top result stored — "7112 Duvin"
+  // in Switzerland became a road in Ohio. An event's place is taken only as picked.
+  POST_EVENT_LOCATION_NOT_PICKED: {
+    type: 'BAD_USER_INPUT',
+    text: 'Pick the event location from the search results or on the map.',
   },
   POST_EVENT_LOCATION_COORDINATES_INCOMPLETE: {
     type: 'BAD_USER_INPUT',

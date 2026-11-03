@@ -168,6 +168,27 @@ describe('ProfileSlug', () => {
         })
       })
 
+      // Blocking ends following both ways and the backend refuses it again while the block
+      // stands — so no follow button across a block, whoever blocked whom.
+      describe('the follow button', () => {
+        const followButton = (profileUser) =>
+          Wrapper(true, { User: [{ ...user.User[0], ...profileUser }] }).container.querySelector(
+            '[data-test="follow-btn"]',
+          )
+
+        it('is offered without a block', () => {
+          expect(followButton({ isBlocked: false, blocked: false })).not.toBeNull()
+        })
+
+        it('is not offered when I blocked them', () => {
+          expect(followButton({ isBlocked: true, blocked: true })).toBeNull()
+        })
+
+        it('is not offered when they blocked me', () => {
+          expect(followButton({ isBlocked: false, blocked: true })).toBeNull()
+        })
+      })
+
       it('states the comments deleting the account deletes, not the posts commented on', () => {
         // #8557: commentedCount (8) is a number of posts; the dialog needs the comments.
         const profileUser = { ...user.User[0], createdAt: '2020-01-01', commentsCount: 23 }
@@ -357,6 +378,27 @@ describe('ProfileSlug', () => {
       // The profile groups list is gated on the groupsEnabled policy. Assert both branches
       // so removing the $policy.get('groupsEnabled') condition from the v-if fails loudly
       // instead of silently leaking the list while the groups feature is off.
+      // #6442: see the group page — the post list must not ask "is anything loading".
+      describe('the post list', () => {
+        // The post grid only: other parts of the page have spinners and empty states of their own.
+        const postGrid = () => wrapper.container.querySelector('.ds-grid')
+        const spinner = () => postGrid().querySelector('.os-spinner')
+        const empty = () => postGrid().querySelector('.hc-empty')
+
+        it('shows a spinner until the posts have loaded', () => {
+          wrapper = Wrapper(true, { ...user, posts: null })
+          expect(spinner()).not.toBeNull()
+          expect(empty()).toBeNull()
+        })
+
+        it('shows "no posts" for an empty result, while another query is still loading', () => {
+          mocks.$apollo.loading = true
+          wrapper = Wrapper(true, { ...user, posts: [] })
+          expect(empty()).not.toBeNull()
+          expect(spinner()).toBeNull()
+        })
+      })
+
       describe('group member list gating (groupsEnabled)', () => {
         const groupList = () => wrapper.container.querySelector('.group-member-list')
 

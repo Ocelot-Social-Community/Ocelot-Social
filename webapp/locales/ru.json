@@ -500,6 +500,7 @@
     "POST_EVENT_LOCATION_COORDINATES_INCOMPLETE": "Для места мероприятия не хватает координаты.",
     "POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE": "Широта места мероприятия недействительна.",
     "POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE": "Долгота места мероприятия недействительна.",
+    "POST_EVENT_LOCATION_NOT_PICKED": "Выберите место из результатов поиска или отметьте его на карте.",
     "POST_EVENT_START_DATE_INVALID": "Дата начала не является допустимой датой.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "Дата начала должна быть в формате ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "Описание места должно содержать от {min} до {max} символов.",
@@ -531,7 +532,11 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Ты можешь сделать это только с пользователями, чья роль даёт меньше полномочий, чем твоя.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Ты не можешь искать в управлении пользователями.",
     "USER_DOES_NOT_EXIST": "Пользователь не найден.",
+    "USER_PROFILE_NAME_TOO_LONG": "Имя должно содержать не более {max} символов.",
     "USER_PROFILE_NAME_TOO_SHORT": "Имя должно содержать не менее {min} символов.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Допускаются только строчные буквы (a–z), цифры (0–9), подчеркивания или дефисы.",
+    "USER_PROFILE_SLUG_TOO_LONG": "Имя пользователя должно содержать не более {max} символов.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "Имя пользователя должно содержать не менее {min} символов.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Этот пользователь не заблокирован.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "Чат видеозвонка открыт только его участникам. Сначала присоединись к звонку.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Для видеозвонка не найдено активное участие в этой группе.",
@@ -604,10 +609,12 @@
       "email": "Пожалуйста, введите корректный адрес электронной почты.",
       "eventLocationNameLength": "Адрес должен содержать от {min} до {max} символов.",
       "eventLocationNameNotEmpty": "Пожалуйста, введите адрес.",
+      "eventLocationNotPicked": "Выберите место из результатов поиска или отметьте его на карте.",
       "eventVenueLength": "Описание места должно содержать от {min} до {max} символов.",
       "eventVenueNotEmpty": "Пожалуйста, введите описание места.",
       "followableUrl": "должен быть корректный веб-адрес или адрес электронной почты",
       "formHasErrors": "Пожалуйста, заполните все обязательные поля.",
+      "locationNotPicked": "Выберите место из подсказок.",
       "nameLength": "Должно содержать от {min} до {max} символов.",
       "titleLength": "Заголовок должен содержать от {min} до {max} символов.",
       "titleNotEmpty": "Пожалуйста, введите заголовок."
@@ -617,10 +624,6 @@
     "step": "Шаг {current} из {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd.MM.yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Смена пароля не удалась. Может быть, код безопасности был неправильным?",
@@ -828,6 +831,20 @@
       "title": "Отключить пользователя"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (заблокирован вами)",
+      "count": "Подключено: {count}",
+      "flag": "Идущие видеозвонки: {count}",
+      "join": "Присоединиться",
+      "joined": "Вы в этом звонке",
+      "participants": "Участники",
+      "title": "Идущие видеозвонки"
+    },
+    "close": "Закрыть боковую панель",
+    "label": "Боковая панель",
+    "open": "Открыть боковую панель – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} из {total} € собрано",
     "donate-now": "Пожертвуйте сейчас"
@@ -1009,6 +1026,7 @@
     "foundation": "Основание",
     "general": "Общее",
     "goal": "Цель группы",
+    "goalPlaceholder": "напр. Разбить сад, открытый для всего района",
     "group": "Группа",
     "groupCreated": "Группа создана!",
     "in": "в",
@@ -1052,6 +1070,7 @@
     "muted": "Группа отключена",
     "myGroups": "Мои группы",
     "name": "Название группы",
+    "namePlaceholder": "Общественный сад на Арбате",
     "removeMember": "Удалить участника",
     "removeMemberButton": "Удалить",
     "removeMemberConfirmText": "Удалить пользователя «{name}» из группы?",
@@ -1131,6 +1150,7 @@
       "usual": "Участник"
     },
     "save": "Создать новую группу",
+    "slugPlaceholder": "obshchestvennyj-sad-arbat",
     "teaser": {
       "notReadable": "Эту группу пока нельзя открыть — ваша заявка ещё рассматривается",
       "openGroup": "Открыть группу",
@@ -1695,6 +1715,7 @@
       "unblocked": "{name} - снова разблокирован"
     },
     "data": {
+      "cityPlaceholder": "напр. Москва",
       "givenName": "Твоё имя",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "О себе",
@@ -1863,7 +1884,8 @@
       "nameNotEmpty": "Пожалуйста, введи своё имя.",
       "slug": {
         "alreadyTaken": "Это имя пользователя уже занято.",
-        "regex": "Допускаются только строчные буквы, цифры, подчеркивания или дефисы."
+        "length": "Имя пользователя должно содержать от {min} до {max} символов.",
+        "regex": "Допускаются только строчные буквы (a–z), цифры (0–9), подчеркивания или дефисы."
       }
     }
   },

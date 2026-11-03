@@ -114,6 +114,29 @@ describe('environment flags', () => {
     expect(CONFIG.SEND_MAIL).toBe(false)
   })
 
+  it('sends mail while testing when SEND_MAIL_IN_TEST says so, as the e2e stack does', async () => {
+    const { default: CONFIG } = await loadConfig({ NODE_ENV: 'test', SEND_MAIL_IN_TEST: 'true' })
+
+    expect(CONFIG.TEST).toBe(true)
+    expect(CONFIG.SEND_MAIL).toBe(true)
+  })
+
+  it('sends no mail while testing when SEND_MAIL_IN_TEST is anything but true', async () => {
+    const { default: CONFIG } = await loadConfig({ NODE_ENV: 'test', SEND_MAIL_IN_TEST: '1' })
+
+    expect(CONFIG.SEND_MAIL).toBe(false)
+  })
+
+  // The switch exists for the e2e stack only: whatever it is set to, production keeps sending.
+  it('sends mail in production whatever SEND_MAIL_IN_TEST says', async () => {
+    const { default: CONFIG } = await loadConfig({
+      NODE_ENV: 'production',
+      SEND_MAIL_IN_TEST: 'false',
+    })
+
+    expect(CONFIG.SEND_MAIL).toBe(true)
+  })
+
   // DEBUG turns on verbose query/resolver logging. In production that is both a performance
   // and a data-exposure problem, so it is gated on NODE_ENV rather than trusted from the
   // environment — setting DEBUG=true on a production deployment must have no effect.

@@ -48,6 +48,23 @@ describe('LocationSelect', () => {
       expect(wrapper.find('.ds-select').exists()).toBe(true)
     })
 
+    it('shows an example place as placeholder, not the label again', () => {
+      expect(wrapper.findComponent({ name: 'OcelotSelect' }).props('placeholder')).toBe(
+        'settings.data.cityPlaceholder',
+      )
+    })
+
+    it("shows the form's own placeholder instead, where it passes one", () => {
+      wrapper = mount(LocationSelect, {
+        mocks,
+        localVue,
+        propsData: { ...propsData, placeholder: 'post.viewEvent.eventLocationName' },
+      })
+      expect(wrapper.findComponent({ name: 'OcelotSelect' }).props('placeholder')).toBe(
+        'post.viewEvent.eventLocationName',
+      )
+    })
+
     it('renders the clearLocationName button by default', () => {
       expect(wrapper.find('button[data-test="clear-location-button"]').exists()).toBe(true)
     })
@@ -303,6 +320,70 @@ describe('LocationSelect', () => {
       expect(wrapper.vm.$refs.select.searchString).toBe('Niendorf, Hamburg, Deutschland')
       expect(wrapper.findAll('.ds-select-option').length).toBe(1)
       expect(wrapper.find('.ds-select-option').text()).toBe('Niendorf, Hamburg, Deutschland')
+    })
+  })
+
+  // Only a picked suggestion becomes the value. Typed text is kept on screen and explained, so a
+  // field the user filled in does not read as empty — nor as filled in, to the form.
+  describe('typed text no place was picked for', () => {
+    beforeEach(async () => {
+      queryMock.mockClear()
+      wrapper = mount(LocationSelect, { mocks, localVue, propsData: { value: '' } })
+      const input = wrapper.find('#city')
+      wrapper.vm.$refs.select.openAndFocus()
+      input.element.value = '7112 Duvin'
+      await input.trigger('input')
+      await wrapper.vm.$nextTick()
+    })
+
+    const hint = () => wrapper.find('.os-validation-hint')
+
+    it('is not explained while the user is still choosing', () => {
+      expect(hint().exists()).toBe(false)
+    })
+
+    describe('once the field is left', () => {
+      beforeEach(async () => {
+        wrapper.vm.$refs.select.closeAndBlur()
+        await wrapper.vm.$nextTick()
+      })
+
+      it('stays visible in the field', () => {
+        expect(wrapper.find('.ds-select-value').text()).toBe('7112 Duvin')
+      })
+
+      it('asks to choose the place from the suggestions', () => {
+        expect(hint().text()).toContain('common.validations.locationNotPicked')
+      })
+
+      it('tells the form, which received no value', () => {
+        expect(wrapper.emitted('unpicked')).toEqual([[true]])
+        expect(wrapper.emitted('input')).toBeUndefined()
+      })
+
+      it('is not explained on a disabled field, which takes no place at all', async () => {
+        await wrapper.setProps({ disabled: true })
+
+        expect(hint().exists()).toBe(false)
+      })
+
+      it('is no longer explained once a place is picked', async () => {
+        await wrapper.setProps({ value: { value: '7112, Duvin', lat: 46.71, lng: 9.21 } })
+
+        expect(hint().exists()).toBe(false)
+        expect(wrapper.emitted('unpicked')).toEqual([[true], [false]])
+      })
+
+      it('goes with the clear button', async () => {
+        await wrapper.setProps({ value: { value: '7112, Duvin', lat: 46.71, lng: 9.21 } })
+        await wrapper.find('button[data-test="clear-location-button"]').trigger('click')
+        await wrapper.setProps({ value: '' })
+
+        expect(hint().exists()).toBe(false)
+        // No leftover text: the emptied field shows its example again.
+        expect(wrapper.find('.ds-select-value').text()).toBe('settings.data.cityPlaceholder')
+        expect(wrapper.vm.$refs.select.searchString).toBe('')
+      })
     })
   })
 })

@@ -18,7 +18,7 @@ services:
       # Envs used in Dockerfile
       # - DOCKER_WORKDIR="/app"
       # - PORT="3000"
-      - NODE_ENV="production"
+      - NODE_ENV=production
       # Application only envs
       - HOST=0.0.0.0 # This is nuxt specific, alternative value is HOST=webapp
       - GRAPHQL_URI=http://backend:4000
@@ -39,7 +39,7 @@ services:
       # Envs used in Dockerfile
       # - DOCKER_WORKDIR="/app"
       # - PORT="4000"
-      - NODE_ENV="production"
+      - NODE_ENV=production
       # Application only envs
       - NEO4J_URI=bolt://neo4j:7687
       - GRAPHQL_URI=http://backend:4000

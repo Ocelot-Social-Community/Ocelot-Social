@@ -1,15 +1,19 @@
 <template>
-  <div :class="['avatar-image', size && `--${size}`, !showImage && '--no-image']">
-    <!-- '--no-image' is neccessary, because otherwise we still have a little unwanted boarder araund the image for images with white backgrounds -->
+  <div :class="['avatar-image', size && `--${size}`, !imageLoaded && '--no-image']">
+    <!-- '--no-image' (the dark background the initials are legible against) stays until the image has actually loaded: one that hangs never errors for minutes. Once loaded, it goes, or images with white backgrounds get a dark rim. -->
     <span class="initials">{{ profileInitials }}</span>
     <os-icon v-if="isAnonymous" :icon="icons.eyeSlash" />
+    <!-- Keyed by the URL: a reused <img> keeps showing the previous picture until the new one has
+         loaded, and for a host that never answers that is the previous person's face. -->
     <responsive-image
       v-if="showImage"
+      :key="profile.avatar.url"
       :image="profile.avatar"
       class="image"
       :alt="profile.name"
       :title="showProfileNameTitle ? profile.name : ''"
       :loading="loading"
+      @loaded="imageLoaded = true"
       @error="imageFailed = true"
       sizes="320px"
     />
@@ -54,6 +58,7 @@ export default {
   data() {
     return {
       imageFailed: false,
+      imageLoaded: false,
     }
   },
   watch: {
@@ -62,6 +67,7 @@ export default {
       // permanently pin this instance to the initials fallback even after the
       // component is reused for a different profile.
       this.imageFailed = false
+      this.imageLoaded = false
     },
   },
   computed: {

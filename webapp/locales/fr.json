@@ -500,6 +500,7 @@
     "POST_EVENT_LOCATION_COORDINATES_INCOMPLETE": "Il manque une coordonnée pour le lieu de l'événement.",
     "POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE": "La latitude du lieu de l'événement n'est pas valide.",
     "POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE": "La longitude du lieu de l'événement n'est pas valide.",
+    "POST_EVENT_LOCATION_NOT_PICKED": "Veuillez choisir le lieu dans les résultats de recherche ou le placer sur la carte.",
     "POST_EVENT_START_DATE_INVALID": "La date de début n'est pas une date valide.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "La date de début doit être au format ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "La description du lieu doit comporter entre {min} et {max} caractères.",
@@ -531,7 +532,11 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Tu ne peux faire cela qu'avec des utilisateurs dont le rôle accorde moins de pouvoirs que le tien.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Tu n'as pas le droit de rechercher dans l'administration des utilisateurs.",
     "USER_DOES_NOT_EXIST": "L'utilisateur est introuvable.",
+    "USER_PROFILE_NAME_TOO_LONG": "Le nom ne doit pas dépasser {max} caractères.",
     "USER_PROFILE_NAME_TOO_SHORT": "Le nom doit comporter au moins {min} caractères.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Les caractères autorisés ne sont que les lettres minuscules (a–z), les chiffres (0–9), les traits de soulignement et les traits d'union.",
+    "USER_PROFILE_SLUG_TOO_LONG": "Le nom d'utilisateur ne doit pas dépasser {max} caractères.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "Le nom d'utilisateur doit comporter au moins {min} caractères.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Cet utilisateur n'est pas bloqué.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "Le chat d'un appel vidéo est réservé à ses participants. Rejoins d'abord l'appel.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Aucune adhésion active à ce groupe n'a été trouvée pour l'appel vidéo.",
@@ -604,10 +609,12 @@
       "email": "Veuillez saisir une adresse e-mail valide.",
       "eventLocationNameLength": "L'adresse doit comporter entre {min} et {max} caractères.",
       "eventLocationNameNotEmpty": "Veuillez saisir une adresse.",
+      "eventLocationNotPicked": "Veuillez choisir le lieu dans les résultats de recherche ou le placer sur la carte.",
       "eventVenueLength": "La description du lieu doit comporter entre {min} et {max} caractères.",
       "eventVenueNotEmpty": "Veuillez saisir une description du lieu.",
       "followableUrl": "doit être une adresse web ou e-mail valide",
       "formHasErrors": "Veuillez remplir tous les champs obligatoires.",
+      "locationNotPicked": "Veuillez choisir le lieu parmi les suggestions.",
       "nameLength": "Le nom doit comporter entre {min} et {max} caractères.",
       "titleLength": "Le titre doit comporter entre {min} et {max} caractères.",
       "titleNotEmpty": "Veuillez saisir un titre."
@@ -617,10 +624,6 @@
     "step": "Étape {current} sur {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd/MM/yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "La modification de votre mot de passe a échoué. Peut-être que le code de sécurité n'était pas correct ?",
@@ -828,6 +831,20 @@
       "title": "Désactiver l'utilisateur"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (bloqué par toi)",
+      "count": "{count} connectés",
+      "flag": "Appels vidéo en cours : {count}",
+      "join": "Rejoindre",
+      "joined": "Tu participes à cet appel",
+      "participants": "Participants",
+      "title": "Appels vidéo en cours"
+    },
+    "close": "Fermer la barre latérale",
+    "label": "Barre latérale",
+    "open": "Ouvrir la barre latérale – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} de {total} € collectés",
     "donate-now": "Faites un don"
@@ -1009,6 +1026,7 @@
     "foundation": "Fondation",
     "general": "Général",
     "goal": "Objectif du groupe",
+    "goalPlaceholder": "p. ex. Créer un jardin ouvert à tout le quartier",
     "group": "Groupe",
     "groupCreated": "Le groupe a été créé !",
     "in": "dans",
@@ -1052,6 +1070,7 @@
     "muted": "Groupe en sourdine",
     "myGroups": "Mes groupes",
     "name": "Nom du groupe",
+    "namePlaceholder": "Jardin partagé Belleville",
     "removeMember": "Retirer le membre",
     "removeMemberButton": "Retirer",
     "removeMemberConfirmText": "Retirer l'utilisateur « {name} » du groupe ?",
@@ -1131,6 +1150,7 @@
       "usual": "Membre"
     },
     "save": "Créer un nouveau groupe",
+    "slugPlaceholder": "jardin-partage-belleville",
     "teaser": {
       "notReadable": "Vous ne pouvez pas encore ouvrir ce groupe — votre demande est en attente",
       "openGroup": "Ouvrir le groupe",
@@ -1695,6 +1715,7 @@
       "unblocked": "{name} est à nouveau débloqué"
     },
     "data": {
+      "cityPlaceholder": "p. ex. Paris",
       "givenName": "Ton prénom",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "À propos de vous",
@@ -1863,7 +1884,8 @@
       "nameNotEmpty": "Veuillez entrer ton nom.",
       "slug": {
         "alreadyTaken": "Ce nom d'utilisateur est déjà pris.",
-        "regex": "Les caractères autorisés ne sont que les lettres minuscules, les chiffres, les traits de soulignement et les traits d'union."
+        "length": "Le nom d'utilisateur doit comporter entre {min} et {max} caractères.",
+        "regex": "Les caractères autorisés ne sont que les lettres minuscules (a–z), les chiffres (0–9), les traits de soulignement et les traits d'union."
       }
     }
   },

@@ -59,11 +59,20 @@ export const joinCallSession = async (
     return await session.writeTransaction(async (transaction) => {
       // The lock makes "is there a session to carry on, else open one" a single step. Two
       // participants asking at the same moment would otherwise both find none and both create
-      // one. It is held until the transaction ends.
+      // one. Writing to the group takes its write lock, which is held until the transaction
+      // ends; the property is removed again at once, so nothing of it is stored. A statement of
+      // its own, so the lock is surely held before anything below is read.
+      await transaction.run(
+        `
+          MATCH (group:Group { id: $groupId })
+          SET group.callSessionLock = true
+          REMOVE group.callSessionLock
+        `,
+        { groupId },
+      )
       const open = await transaction.run(
         `
           MATCH (group:Group { id: $groupId })
-          CALL apoc.lock.nodes([group])
           OPTIONAL MATCH (session:VideoCallSession)-[:CALL_IN]->(group)
             WHERE session.endedAt IS NULL
           OPTIONAL MATCH (room:Room)-[:ROOM_FOR]->(session)

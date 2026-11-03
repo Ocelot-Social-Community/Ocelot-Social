@@ -8,6 +8,7 @@ import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect } from
 import { cleanDatabase } from '@db/factories'
 import blockedUsers from '@graphql/queries/interactions/blockedUsers.gql'
 import blockUser from '@graphql/queries/interactions/blockUser.gql'
+import followUser from '@graphql/queries/interactions/followUser.gql'
 import unblockUser from '@graphql/queries/interactions/unblockUser.gql'
 import Post from '@graphql/queries/posts/Post.gql'
 import User from '@graphql/queries/users/User.gql'
@@ -168,6 +169,49 @@ describe('blockUser', () => {
 
         await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
           data: { User: [{ id: 'u2', isBlocked: true, followedByCurrentUser: false }] },
+        })
+      })
+
+      const followsBetween = async (): Promise<number> => {
+        const result = await database.query({
+          query: `MATCH (:User {id: 'u1'})-[follows:FOLLOWS]-(:User {id: 'u2'})
+                  RETURN count(follows) AS count`,
+        })
+        return (result.records[0].get('count') as { toNumber: () => number }).toNumber()
+      }
+
+      // Following ends both ways: the blocked user is not to hear of the blocker's posts either.
+      it('ends the blocked user following the current user, too', async () => {
+        await currentUser.relateTo(blockedUser, 'following')
+        await blockedUser.relateTo(currentUser, 'following')
+
+        expect(await followsBetween()).toBe(2)
+
+        await mutate({ mutation: blockUser, variables: { id: 'u2' } })
+
+        expect(await followsBetween()).toBe(0)
+      })
+
+      // Following again would undo what blocking ended — in either direction.
+      describe('while the block stands', () => {
+        beforeEach(async () => {
+          await mutate({ mutation: blockUser, variables: { id: 'u2' } })
+        })
+
+        it('the blocked user cannot follow the current user', async () => {
+          authenticatedUser = await blockedUser.toJson()
+
+          await expect(
+            mutate({ mutation: followUser, variables: { id: 'u1' } }),
+          ).resolves.toMatchObject({ data: { followUser: null }, errors: undefined })
+          expect(await followsBetween()).toBe(0)
+        })
+
+        it('the current user cannot follow the blocked user', async () => {
+          await expect(
+            mutate({ mutation: followUser, variables: { id: 'u2' } }),
+          ).resolves.toMatchObject({ data: { followUser: null }, errors: undefined })
+          expect(await followsBetween()).toBe(0)
         })
       })
 

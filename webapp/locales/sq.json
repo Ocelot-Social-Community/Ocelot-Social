@@ -500,6 +500,7 @@
     "POST_EVENT_LOCATION_COORDINATES_INCOMPLETE": "Mungon një koordinatë për vendndodhjen e eventit.",
     "POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE": "Gjerësia gjeografike e vendndodhjes së eventit është e pavlefshme.",
     "POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE": "Gjatësia gjeografike e vendndodhjes së eventit është e pavlefshme.",
+    "POST_EVENT_LOCATION_NOT_PICKED": "Zgjidhni vendin nga rezultatet e kërkimit ose vendoseni në hartë.",
     "POST_EVENT_START_DATE_INVALID": "Data e fillimit nuk është një datë e vlefshme.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "Data e fillimit duhet të jetë në formatin ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "Përshkrimi i vendit duhet të ketë midis {min} dhe {max} karaktere.",
@@ -531,7 +532,11 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Këtë mund ta bësh vetëm me përdorues, roli i të cilëve jep më pak autoritet se yti.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Nuk mund të kërkosh në administrimin e përdoruesve.",
     "USER_DOES_NOT_EXIST": "Përdoruesi nuk u gjet.",
+    "USER_PROFILE_NAME_TOO_LONG": "Emri duhet të ketë jo më shumë se {max} karaktere.",
     "USER_PROFILE_NAME_TOO_SHORT": "Emri duhet të ketë të paktën {min} karaktere.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Karakteret e lejuara janë vetëm shkronja të vogla (a–z), numra (0–9), nënviza dhe viza.",
+    "USER_PROFILE_SLUG_TOO_LONG": "Emri i përdoruesit duhet të ketë jo më shumë se {max} karaktere.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "Emri i përdoruesit duhet të ketë të paktën {min} karaktere.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Ky përdorues nuk është i bllokuar.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "Biseda e një telefonate me video është e hapur vetëm për pjesëmarrësit e saj. Bashkohu fillimisht në telefonatë.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Për telefonatën me video nuk u gjet asnjë anëtarësim aktiv në këtë grup.",
@@ -604,10 +609,12 @@
       "email": "Ju lutem shkruani një adresë e-mail të vlefshme.",
       "eventLocationNameLength": "Adresa duhet të ketë midis {min} dhe {max} karaktere.",
       "eventLocationNameNotEmpty": "Ju lutem shkruani një adresë.",
+      "eventLocationNotPicked": "Zgjidhni vendin nga rezultatet e kërkimit ose vendoseni në hartë.",
       "eventVenueLength": "Përshkrimi i vendit duhet të ketë midis {min} dhe {max} karaktere.",
       "eventVenueNotEmpty": "Ju lutem shkruani një përshkrim të vendit.",
       "followableUrl": "duhet të jetë një adresë uebi ose e-mail e vlefshme",
       "formHasErrors": "Ju lutem plotësoni të gjitha fushat e detyrueshme.",
+      "locationNotPicked": "Zgjidhe vendin nga sugjerimet.",
       "nameLength": "Emri duhet të ketë midis {min} dhe {max} karaktere.",
       "titleLength": "Titulli duhet të ketë midis {min} dhe {max} karaktere.",
       "titleNotEmpty": "Ju lutem shkruani një titull."
@@ -617,10 +624,6 @@
     "step": "Hapi {current} nga {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd.MM.yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Ndryshimi i fjalëkalimit dështoi. Ndoshta kodi i sigurisë nuk ishte i saktë?",
@@ -828,6 +831,20 @@
       "title": "Çaktivizo përdoruesin"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (i bllokuar nga ti)",
+      "count": "{count} të lidhur",
+      "flag": "Thirrje video në vazhdim: {count}",
+      "join": "Bashkohu",
+      "joined": "Je në këtë thirrje",
+      "participants": "Pjesëmarrësit",
+      "title": "Thirrje video në vazhdim"
+    },
+    "close": "Mbyll shiritin anësor",
+    "label": "Shiriti anësor",
+    "open": "Hap shiritin anësor – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} nga {total} € të mbledhura",
     "donate-now": "Dhuro tani"
@@ -1009,6 +1026,7 @@
     "foundation": "Themelimi",
     "general": "Përgjithshme",
     "goal": "Qëllimi i grupit",
+    "goalPlaceholder": "p.sh. Të krijojmë një kopsht të hapur për gjithë lagjen",
     "group": "Grup",
     "groupCreated": "Grupi u krijua!",
     "in": "në",
@@ -1052,6 +1070,7 @@
     "muted": "Grupi u hesht",
     "myGroups": "Grupet e mia",
     "name": "Emri i grupit",
+    "namePlaceholder": "Kopshti i Lagjes Blloku",
     "removeMember": "Hiq anëtarin",
     "removeMemberButton": "Hiq",
     "removeMemberConfirmText": "Hiq përdoruesin „{name}“ nga grupi?",
@@ -1131,6 +1150,7 @@
       "usual": "Anëtar"
     },
     "save": "Krijo grup të ri",
+    "slugPlaceholder": "kopshti-i-lagjes-blloku",
     "teaser": {
       "notReadable": "Këtë grup nuk mund ta hapësh ende — kërkesa jote është në pritje",
       "openGroup": "Hap grupin",
@@ -1695,6 +1715,7 @@
       "unblocked": "{name} u zhbllokua përsëri"
     },
     "data": {
+      "cityPlaceholder": "p.sh. Tiranë",
       "givenName": "Emri yt",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "Rreth teje",
@@ -1863,7 +1884,8 @@
       "nameNotEmpty": "Ju lutem fut emrin tënd.",
       "slug": {
         "alreadyTaken": "Ky emër përdoruesi është tashmë i zënë.",
-        "regex": "Karakteret e lejuara janë vetëm shkronja të vogla, numra, nënviza dhe viza."
+        "length": "Emri i përdoruesit duhet të ketë midis {min} dhe {max} karaktere.",
+        "regex": "Karakteret e lejuara janë vetëm shkronja të vogla (a–z), numra (0–9), nënviza dhe viza."
       }
     }
   },

@@ -144,7 +144,9 @@ export default {
     policyChanged: {
       // Same visibility mechanism as the query: a change event is only
       // delivered to a subscriber if canView() grants them the changed key.
-      // The viewer's context (user) is fixed at WebSocket connect time.
+      // The viewer's permissions are read again once they are older than
+      // SUBSCRIPTION_PRINCIPAL_TTL_MS (context/subscription.ts), so a demoted
+      // admin stops seeing admin-only keys without reconnecting.
       subscribe: withFilter(
         (_parent: unknown, _args: unknown, { pubsub }: Context) =>
           pubsub.asyncIterator(POLICY_CHANGED_CHANNEL),

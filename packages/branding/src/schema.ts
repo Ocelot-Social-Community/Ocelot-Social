@@ -46,6 +46,9 @@ export interface LogoClick {
  */
 export type PageLayout = 'basic' | 'blank' | 'default' | 'no-header'
 
+/** A length of `Intl.DateTimeFormat`'s `dateStyle` / `timeStyle`. */
+export type DateTimeStyle = 'short' | 'medium' | 'long' | 'full'
+
 /** The footer / static pages a brand can point at an external URL or re-order. */
 export type LinkPageKey =
   | 'organization'
@@ -169,6 +172,20 @@ export interface BrandingConfig {
   user: {
     nameLengthMin: number
     nameLengthMax: number
+    /**
+     * Length bounds of the slug a user chooses (the unique name in their profile URL).
+     *
+     * Enforced where a slug is SENT — signup and every save of the profile settings, which always
+     * send the slug. A slug stored before these bounds (or before a brand tightened them) is not
+     * migrated, but has to be brought into bounds with the account's next profile change; profile
+     * URLs resolve by id, so a new slug breaks no link. A slug the backend derives from the
+     * name at signup is cut and padded into these bounds, so a generated slug cannot break them
+     * either. The maximum exists because the slug ends up in every profile URL and in the unique
+     * index; without one, a client could store a slug of any length. It cannot go below 8
+     * (USER_SLUG_LENGTH_MAX_FLOOR): a derived slug needs room for its `-<n>` uniqueness suffix.
+     */
+    slugLengthMin: number
+    slugLengthMax: number
   }
   registration: {
     nonceLength: number
@@ -186,11 +203,14 @@ export interface BrandingConfig {
   dateTime: {
     relativeDateTime: boolean
     /**
-     * Absolute timestamp format — a date-fns format-token string (e.g. `P` = localized short date,
-     * `PPpp` = long date + time), consumed by the webapp `DateTime` component via date-fns `format`.
-     * An OPEN vocabulary (any token string), so deliberately `string` and not a union.
+     * Absolute timestamp, as `Intl.DateTimeFormat`'s `dateStyle` and `timeStyle`: the browser
+     * localizes it, so a brand picks a length, not a pattern. `null` leaves that part out; at least
+     * one of the two must be set. Two scalars rather than one options object: a brand's override
+     * replaces a scalar, where a nested object would merge and keep the default's other key.
+     * The relative format falls back to `dateStyle` for anything older than a week.
      */
-    absoluteDateTimeFormat: string
+    dateStyle: DateTimeStyle | null
+    timeStyle: DateTimeStyle | null
   }
   metadata: {
     // NOTE: no brand `version` here — the brand's version lives ONLY in the archive manifest

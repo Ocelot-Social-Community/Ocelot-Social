@@ -23,7 +23,7 @@
 // an `EXISTS { … }` subquery may hold ONE match clause (comma-separated patterns are fine) and
 // may only appear in a WHERE. That is why the role lookup is a correlated pattern inside the
 // same MATCH, and why the projection form below is built from plain expressions instead.
-import { OWNER_ROLE } from '@src/groupRole/types'
+import { INACTIVE_MEMBERSHIP_ROLES, OWNER_ROLE } from '@src/groupRole/types'
 
 import type { GroupPermissionKey } from '@src/groupPermission'
 
@@ -72,6 +72,22 @@ export const visibilityOf = (group: string): string =>
  */
 export const roleHoldsPermission = (role: string, permission: GroupPermissionKey): string =>
   `(${role}.name = '${OWNER_ROLE}' OR coalesce(${role}.permissions, '') CONTAINS '"${permission}"')`
+
+/**
+ * The membership is an actual one, not an applicant's (`isActiveMembershipRole` in Cypher).
+ *
+ * It used to be the list `['usual', 'admin', 'owner']`, and then `role <> 'pending'`, repeated in
+ * a dozen hand-written Cypher strings. With group-defined roles a list of member names is wrong
+ * by construction — a group that renames `usual` would turn its own members into non-members —
+ * and the question was never "which names": it is "is this edge a membership or an application".
+ * Hence the inverse, from the one list of roles that are none (INACTIVE_MEMBERSHIP_ROLES), which
+ * answers it for any role name a group invents.
+ *
+ * A membership state, not a right: an operator may let applicants read a group, which does not
+ * make them members.
+ */
+export const isActiveMembership = (membership: string): string =>
+  `NOT ${membership}.role IN [${INACTIVE_MEMBERSHIP_ROLES.map((role) => `'${role}'`).join(', ')}]`
 
 /**
  * The viewer holds a right in that group through their own membership — for a WHERE clause.
