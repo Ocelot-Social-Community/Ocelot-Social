@@ -217,7 +217,8 @@ export default {
           // Resolve the room — either by roomId or by finding the DM room with userId
           const matchRoom = roomId
             ? // The conference chat of a video call that is over is kept, but no longer
-              // written to. Refused in the match, so no check can come apart from the write.
+              // written to. Refused in the match, which reads the call as it is when the
+              // message is written: a call ending at that very moment may still get it.
               `MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
                WHERE NOT EXISTS {
                  MATCH (room)-[:ROOM_FOR]->(call:VideoCallSession)
