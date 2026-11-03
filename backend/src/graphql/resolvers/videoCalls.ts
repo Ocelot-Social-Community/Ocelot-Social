@@ -204,39 +204,36 @@ export const getRoomParticipants = async (
   }
 }
 
-// Who a media-server identity belongs to. joinGroupVideoCall issues `<userId>#<random>`, so the
-// same user can be in a call from several tabs; everything before the last `#` is the user.
-export const userIdFromIdentity = (identity: string): string => {
-  const separator = identity.lastIndexOf('#')
-  return separator === -1 ? identity : identity.slice(0, separator)
-}
-
 /**
  * The call currently running in that room, as the media server knows it: the id it gave the
  * room (which tells this call from the next one in a room of the same name) and who is in it.
  * Null if there is no such room, which is to say no call.
+ *
+ * Who is in it comes from getRoomParticipants, so a connection is a user by the same rule
+ * everywhere (userIdOf). Asked afresh, never through the shared requests the dock uses: this
+ * answer decides who may enter the call's conference chat.
  */
 export const getLiveCall = async (
   config: LiveKitConfig,
   roomName: string,
 ): Promise<{ sid: string; userIds: Set<string> } | null> => {
-  const client = roomServiceFor(config)
   try {
-    const [rooms, participants] = await Promise.all([
-      withTimeout(client.listRooms([roomName]), LIVEKIT_API_TIMEOUT_MS, 'listRooms'),
-      withTimeout(client.listParticipants(roomName), LIVEKIT_API_TIMEOUT_MS, 'listParticipants'),
+    const [rooms, { userIds }] = await Promise.all([
+      withTimeout(
+        roomServiceFor(config).listRooms([roomName]),
+        LIVEKIT_API_TIMEOUT_MS,
+        'listRooms',
+      ),
+      getRoomParticipants(config, roomName),
     ])
     const room = rooms.find((candidate) => candidate.name === roomName)
     if (!room?.sid) {
       return null
     }
-    return {
-      sid: room.sid,
-      userIds: new Set(participants.map((participant) => userIdFromIdentity(participant.identity))),
-    }
+    return { sid: room.sid, userIds: new Set(userIds) }
   } catch (err) {
-    // As in getLiveParticipantCount: only "room not found" means there is no call. Anything
-    // else is a failure and must not pass for "nobody there".
+    // As in getRoomParticipants: only "room not found" means there is no call. Anything else
+    // is a failure and must not pass for "nobody there".
     if (err instanceof TwirpError && (err.status === 404 || err.code === 'not_found')) {
       return null
     }

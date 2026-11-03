@@ -75,7 +75,6 @@ const {
   getLiveParticipantCount,
   groupIdFromRoomName,
   roomNameForGroup,
-  userIdFromIdentity,
 } = await import('./videoCalls')
 
 const ENABLED_LIVEKIT = {
@@ -892,20 +891,6 @@ describe('joinGroupVideoCallChat', () => {
   })
 })
 
-describe('userIdFromIdentity', () => {
-  it('drops the per-connection suffix', () => {
-    expect(userIdFromIdentity('member-1#abcd1234')).toBe('member-1')
-  })
-
-  it('keeps a `#` that is part of the user id', () => {
-    expect(userIdFromIdentity('odd#id#abcd1234')).toBe('odd#id')
-  })
-
-  it('takes an identity without suffix as the user id', () => {
-    expect(userIdFromIdentity('member-1')).toBe('member-1')
-  })
-})
-
 describe('getLiveCall', () => {
   it('returns the sid of the room and the users in it, each once', async () => {
     listRoomsMock.mockResolvedValue([{ name: 'group-x', sid: 'RM_x' }])
@@ -925,11 +910,15 @@ describe('getLiveCall', () => {
     await expect(getLiveCall(ENABLED_LIVEKIT, 'group-x')).resolves.toBeNull()
   })
 
-  it('returns null when the room is gone by the time its participants are asked for', async () => {
+  // getRoomParticipants takes a vanished room for an empty one: the call is listed, but
+  // nobody is in it — which lets nobody into its chat, as no call would.
+  it('has nobody in a room that is gone by the time its participants are asked for', async () => {
     listRoomsMock.mockResolvedValue([{ name: 'group-x', sid: 'RM_x' }])
     listParticipantsMock.mockRejectedValue(new TwirpError('twirp', 'room not found', 404))
 
-    await expect(getLiveCall(ENABLED_LIVEKIT, 'group-x')).resolves.toBeNull()
+    const call = await getLiveCall(ENABLED_LIVEKIT, 'group-x')
+
+    expect(call?.userIds.size).toBe(0)
   })
 
   it('takes the "not found" code for a missing room as well, whatever the status', async () => {
@@ -938,7 +927,20 @@ describe('getLiveCall', () => {
       new TwirpError('twirp', 'room not found', 400, 'not_found'),
     )
 
-    await expect(getLiveCall(ENABLED_LIVEKIT, 'group-x')).resolves.toBeNull()
+    const call = await getLiveCall(ENABLED_LIVEKIT, 'group-x')
+
+    expect(call?.userIds.size).toBe(0)
+  })
+
+  it("takes a user from the join token's metadata, as everywhere else", async () => {
+    listRoomsMock.mockResolvedValue([{ name: 'group-x', sid: 'RM_x' }])
+    listParticipantsMock.mockResolvedValue([
+      { identity: 'whatever#1', metadata: JSON.stringify({ userId: 'anna' }) },
+    ])
+
+    const call = await getLiveCall(ENABLED_LIVEKIT, 'group-x')
+
+    expect([...(call?.userIds ?? [])]).toEqual(['anna'])
   })
 
   it('rethrows any other failure rather than passing it off as "no call"', async () => {
