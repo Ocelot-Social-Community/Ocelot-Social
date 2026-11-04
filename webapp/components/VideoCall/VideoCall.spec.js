@@ -3046,7 +3046,7 @@ describe('VideoCall', () => {
       expect(camera.setVideoQuality).not.toHaveBeenCalled()
     })
 
-    it('ignores an event of the previous room while the next one is still being set up', async () => {
+    it('resets the CPU state only once the next room takes over', async () => {
       const { wrapper, constrained } = await connected()
       let join
       wrapper.vm.$apollo.mutate.mockReturnValue(
