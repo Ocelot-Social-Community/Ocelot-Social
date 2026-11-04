@@ -242,6 +242,15 @@ describe('validatePostTitle', () => {
       })
     })
 
+    // Checked trimmed and stored untrimmed, this title would pass with 100 characters and be saved
+    // with 104, over the brand's maximum.
+    it('stores the title without the surrounding spaces it was checked without', async () => {
+      await expect(save(`    ${'x'.repeat(100)}  `)).resolves.toMatchObject({
+        data: { [mutationName]: { title: 'x'.repeat(100) } },
+        errors: undefined,
+      })
+    })
+
     it('follows the limits of the active branding', async () => {
       setBranding({ ...brandingDefaults, post: { titleLengthMin: 5, titleLengthMax: 20 } })
 

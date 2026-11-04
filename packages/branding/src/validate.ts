@@ -17,6 +17,14 @@ import type { BrandingConfig } from './schema.js'
  */
 export const USER_NAME_LENGTH_FLOOR = 1
 
+/**
+ * The shortest post title any brand may require. Exported because the backend relies on it: its DB
+ * schema declares `Post.title` no stricter than this (asserted in `db/schema/schema.spec.ts`), so
+ * the audit never flags a title that a valid brand allowed. 1, not 0: an empty title leaves nothing
+ * to show for a post.
+ */
+export const POST_TITLE_LENGTH_FLOOR = 1
+
 /** The shortest slug any brand may require: an empty one would leave the profile URL without its last segment. */
 export const USER_SLUG_LENGTH_FLOOR = 1
 
@@ -64,8 +72,7 @@ export function validateBranding(config: BrandingConfig): string[] {
   atLeast('user.slugLengthMax', user.slugLengthMax, USER_SLUG_LENGTH_MAX_FLOOR)
   atMost('user.slugLengthMin', user.slugLengthMin, 'user.slugLengthMax', user.slugLengthMax)
 
-  // At least one character: an empty title leaves nothing to show for a post.
-  atLeast('post.titleLengthMin', post.titleLengthMin, 1)
+  atLeast('post.titleLengthMin', post.titleLengthMin, POST_TITLE_LENGTH_FLOOR)
   atMost('post.titleLengthMin', post.titleLengthMin, 'post.titleLengthMax', post.titleLengthMax)
 
   atLeast('registration.nonceLength', registration.nonceLength, 1)
