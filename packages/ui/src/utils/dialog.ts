@@ -91,8 +91,8 @@ export function useEscapeKey(isOpen: () => boolean, onEscape: () => void): void 
 }
 
 /**
- * Moves the focus into the dialog when it opens — to the enabled element inside marked
- * `data-autofocus`, else to `panel` itself, which needs `tabindex="-1"` for that — and gives it
+ * Moves the focus into the dialog when it opens — to the element inside marked `data-autofocus`
+ * if it takes the focus, else to `panel` itself, which needs `tabindex="-1"` for that — and gives it
  * back to where it was when the dialog closes, or unmounts while open. Only where it can still
  * go: that element may have left the page meanwhile.
  */
@@ -124,10 +124,13 @@ export function useDialogFocus(isOpen: () => boolean, panel: Ref<HTMLElement | n
         if (!isOpen()) {
           return
         }
-        // A disabled element cannot take the focus (a confirm button opened while loading).
-        const target =
-          panel.value?.querySelector<HTMLElement>('[data-autofocus]:not([disabled])') ?? panel.value
+        const target = panel.value?.querySelector<HTMLElement>('[data-autofocus]')
         target?.focus()
+        // Checked, not predicted: an element may refuse the focus for many reasons (disabled itself
+        // — a confirm button opened while loading — or inside a disabled fieldset, inert, hidden).
+        if (document.activeElement !== target) {
+          panel.value?.focus()
+        }
       } else if (wasOpen) {
         giveBack()
       }

@@ -455,6 +455,17 @@ describe('osModal', () => {
         wrapper.unmount()
       })
 
+      it('moves focus to the panel when the marked element refuses it, as in a disabled fieldset', async () => {
+        const wrapper = mountOpen({
+          default: '<fieldset disabled><input class="wanted" data-autofocus /></fieldset>',
+        })
+        await nextTick()
+
+        expect(document.activeElement).toBe(wrapper.find('[data-testid="os-modal-panel"]').element)
+
+        wrapper.unmount()
+      })
+
       it('moves focus when opened later', async () => {
         const wrapper = mount(OsModal, {
           props: { open: false },
