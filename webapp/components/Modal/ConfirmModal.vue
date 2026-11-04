@@ -1,56 +1,37 @@
 <template>
-  <os-modal :title="title" :open="isOpen" @cancel="cancel" data-test="confirm-modal">
-    <transition name="ds-transition-fade">
-      <div v-if="success" class="ds-flex ds-flex-centered hc-modal-success">
-        <sweetalert-icon icon="success" />
-      </div>
-    </transition>
-
+  <os-confirm-dialog
+    :open="isOpen"
+    :title="title"
+    :confirm-label="$t(modalData.buttons.confirm.textIdent)"
+    :cancel-label="$t(modalData.buttons.cancel.textIdent)"
+    :close-label="$t('actions.close')"
+    :variant="modalData.buttons.confirm.danger ? 'danger' : 'default'"
+    :confirm-icon="modalData.buttons.confirm.icon"
+    :cancel-icon="modalData.buttons.cancel.icon"
+    :loading="loading"
+    data-test="confirm-modal"
+    @confirm="confirm"
+    @cancel="cancel"
+  >
+    <!-- The translations carry markup (<b>, <br>); every interpolated value is escaped. -->
     <!-- eslint-disable-next-line vue/no-v-html -->
     <p v-html="message" />
-
-    <template #footer>
-      <os-button
-        class="cancel"
-        :variant="!modalData.buttons.confirm.danger ? 'danger' : 'primary'"
-        appearance="outline"
-        @click="cancel"
-        data-test="cancel-button"
-      >
-        <template v-if="modalData.buttons.cancel.icon" #icon>
-          <os-icon :icon="modalData.buttons.cancel.icon" />
-        </template>
-        {{ $t(modalData.buttons.cancel.textIdent) }}
-      </os-button>
-
-      <os-button
-        class="confirm"
-        :variant="modalData.buttons.confirm.danger ? 'danger' : 'primary'"
-        appearance="filled"
-        :loading="loading"
-        @click="confirm"
-        data-test="confirm-button"
-      >
-        <template v-if="modalData.buttons.confirm.icon" #icon>
-          <os-icon :icon="modalData.buttons.confirm.icon" />
-        </template>
-        {{ $t(modalData.buttons.confirm.textIdent) }}
-      </os-button>
-    </template>
-  </os-modal>
+  </os-confirm-dialog>
 </template>
 
 <script>
-import { OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
-import { SweetalertIcon } from 'vue-sweetalert-icons'
+import { escape, mapValues } from 'lodash'
+import { OsConfirmDialog } from '@ocelot-social/ui'
 
+/**
+ * Translating adapter around the i18n-agnostic OsConfirmDialog: resolves the `modalData`
+ * idents with $t and runs the (possibly async) button callbacks, showing the confirm button
+ * as loading meanwhile. The callbacks report success or failure themselves (toasts).
+ */
 export default {
   name: 'ConfirmModal',
   components: {
-    OsButton,
-    OsIcon,
-    OsModal,
-    SweetalertIcon,
+    OsConfirmDialog,
   },
   emits: ['close'],
   props: {
@@ -59,7 +40,6 @@ export default {
   data() {
     return {
       isOpen: true,
-      success: false,
       loading: false,
     }
   },
@@ -68,51 +48,35 @@ export default {
       return this.$t(this.modalData.titleIdent)
     },
     message() {
-      return this.$t(this.modalData.messageIdent, this.modalData.messageParams)
+      // Params are user content (names, titles) and land in v-html: escape them, so only the
+      // translation's own markup is interpreted.
+      const { messageIdent, messageParams } = this.modalData
+      const params =
+        messageParams &&
+        mapValues(messageParams, (value) => (typeof value === 'string' ? escape(value) : value))
+      return this.$t(messageIdent, params)
     },
   },
   methods: {
+    close() {
+      this.isOpen = false
+      this.$emit('close')
+    },
     async cancel() {
       await this.modalData.buttons.cancel.callback()
-      this.isOpen = false
-      setTimeout(() => {
-        this.$emit('close')
-      }, 1000)
+      this.close()
     },
     async confirm() {
       this.loading = true
       try {
         await this.modalData.buttons.confirm.callback()
-        this.success = true
-        setTimeout(() => {
-          this.isOpen = false
-          setTimeout(() => {
-            this.success = false
-            this.$emit('close')
-          }, 500)
-        }, 1500)
-      } catch (err) {
-        this.isOpen = false
-        this.$emit('close')
+      } catch {
+        // The callbacks show their own error toasts; the dialog just closes.
       } finally {
         this.loading = false
+        this.close()
       }
     },
   },
 }
 </script>
-
-<style>
-.hc-modal-success {
-  pointer-events: none;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-color: var(--color-neutral-100);
-  opacity: 1;
-  z-index: var(--z-index-modal);
-  border-radius: var(--border-radius-x-large);
-}
-</style>

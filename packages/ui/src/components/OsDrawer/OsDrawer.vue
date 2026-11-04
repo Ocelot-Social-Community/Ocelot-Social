@@ -1,18 +1,10 @@
 <script lang="ts">
-  import {
-    computed,
-    defineComponent,
-    getCurrentInstance,
-    h,
-    isVue2,
-    nextTick,
-    ref,
-    watch,
-  } from 'vue-demi'
+  import { computed, defineComponent, getCurrentInstance, h, isVue2, ref, watch } from 'vue-demi'
 
   import { cn } from '#src/utils'
   import { renderCloseButton } from '#src/utils/closeButton'
-  import { trapFocus, useBodyScrollLock, useEscapeKey } from '#src/utils/dialog'
+  import { trapFocus, useBodyScrollLock, useDialogFocus, useEscapeKey } from '#src/utils/dialog'
+  import { elementData } from '#src/utils/elementData'
 
   import { drawerPanelVariants } from './drawer.variants'
 
@@ -24,8 +16,9 @@
    * to the page rather than in front of it (a sidebar on a small screen, say).
    *
    * Behaves as a modal dialog: a backdrop, the focus kept inside, the page behind it held
-   * still. Escape, the backdrop and the close button close it, and the focus returns to where
-   * it was before it opened.
+   * still. Escape, the backdrop and the close button close it. Opening, the focus moves to the
+   * element inside marked `data-autofocus`, else to the panel; closing, it returns to where it
+   * was before.
    *
    * Vue 2: `<os-drawer :open.sync="show" />`
    * Vue 3: `<os-drawer v-model:open="show" />`
@@ -60,8 +53,6 @@
     emits: ['update:open', 'close', 'opened'],
     setup(props, { slots, attrs, emit }) {
       const panelRef = ref<HTMLElement | null>(null)
-      // Where the focus was before the drawer opened, to give it back on close.
-      let returnFocusTo: HTMLElement | null = null
 
       /* v8 ignore start -- Vue 2 only */
       const instance = isVue2 ? getCurrentInstance() : null
@@ -86,18 +77,6 @@
         return result
       }
 
-      // Vue 2 takes HTML attributes under `attrs` and drops them at the top level; Vue 3 takes
-      // them flat. Element data is written the Vue 3 way and moved here for Vue 2.
-      function elementData(data: Record<string, unknown>): Record<string, unknown> {
-        /* v8 ignore start -- Vue 2 branch */
-        if (isVue2) {
-          const { class: className, ref: elementRef, key, on, ...attributes } = data
-          return { class: className, ref: elementRef, key, on, attrs: attributes }
-        }
-        /* v8 ignore stop */
-        return data
-      }
-
       function close(type: 'close' | 'backdrop' | 'escape') {
         emit('update:open', false)
         emit('close', type)
@@ -109,25 +88,12 @@
         () => close('escape'),
       )
 
+      useDialogFocus(() => props.open, panelRef)
       watch(
         () => props.open,
-        async (open, wasOpen) => {
-          /* v8 ignore start -- SSR guard: immediate, so this runs in setup() on the server too */
-          if (typeof document === 'undefined') {
-            return
-          }
-          /* v8 ignore stop */
+        (open) => {
           if (open) {
-            returnFocusTo = document.activeElement as HTMLElement | null
             emit('opened')
-            await nextTick()
-            panelRef.value?.focus()
-          } else if (wasOpen) {
-            // Only where it can still go: the element may have left the page meanwhile.
-            if (returnFocusTo?.isConnected) {
-              returnFocusTo.focus()
-            }
-            returnFocusTo = null
           }
         },
         { immediate: true },
