@@ -2886,8 +2886,15 @@ describe('VideoCall', () => {
     const local = sharing('me', [])
 
     it("plays a remote share's sound from its screen tile, the voice from the main tile", () => {
-      // Published in either order — the screen audio before the microphone here.
+      // The screen audio published before the microphone.
       const tiles = tilesFor(local, sharing('bob', [shareAudio, mic]))
+      const bob = tiles.filter((t) => t.identity === 'bob')
+      expect(bob.find((t) => t.isScreen).audioTrack).toBe(shareAudio.track)
+      expect(bob.find((t) => !t.isScreen).audioTrack).toBe(mic.track)
+    })
+
+    it('tells the two apart when the microphone was published first', () => {
+      const tiles = tilesFor(local, sharing('bob', [mic, shareAudio]))
       const bob = tiles.filter((t) => t.identity === 'bob')
       expect(bob.find((t) => t.isScreen).audioTrack).toBe(shareAudio.track)
       expect(bob.find((t) => !t.isScreen).audioTrack).toBe(mic.track)

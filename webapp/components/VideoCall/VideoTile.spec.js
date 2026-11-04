@@ -272,6 +272,14 @@ describe('VideoTile', () => {
       })
     })
 
+    it("attaches the audio track of a screen tile, which plays the share's sound", () => {
+      const audioTrack = buildTrack()
+      factory({ tile: buildTile({ audioTrack, isScreen: true }) })
+      return Promise.resolve().then(() => {
+        expect(audioTrack.attach).toHaveBeenCalled()
+      })
+    })
+
     it('detaches video and audio on unmount', async () => {
       const videoTrack = buildTrack()
       const audioTrack = buildTrack()
