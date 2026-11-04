@@ -176,6 +176,11 @@ describe('checkSource — z-index', () => {
 
   it('flags a raw number that hides in a calc() or another unit', () => {
     expect(check('.a { z-index: calc(150 + 1); }').errors).toHaveLength(1)
+    expect(check('.a { z-index: 150px; }').errors).toHaveLength(1)
+  })
+
+  it('allows a local number with !important', () => {
+    expect(check('.a { z-index: 3 !important; }').errors).toEqual([])
   })
 
   it('allows the keywords', () => {
