@@ -66,6 +66,13 @@ const sessions = async () => {
   }))
 }
 
+// Every chat room, whether a session points at it or not: a room left over on its own would
+// escape `sessions()`.
+const rooms = async () => {
+  const result = await run(`MATCH (room:Room) RETURN room.id AS roomId`)
+  return result.records.map((record) => record.get('roomId') as string)
+}
+
 beforeEach(async () => {
   await cleanDatabase()
   await run(`
@@ -211,11 +218,13 @@ describe(joinCallSession, () => {
   it('returns null for a user that does not exist', async () => {
     await expect(join('nobody', 'RM_1')).resolves.toBeNull()
     expect(await sessions()).toEqual([])
+    expect(await rooms()).toEqual([])
   })
 
   it('returns null for a group that does not exist', async () => {
     await expect(join('anna', 'RM_1', ['anna'], 'no-such-group')).resolves.toBeNull()
     expect(await sessions()).toEqual([])
+    expect(await rooms()).toEqual([])
   })
 })
 
