@@ -3046,6 +3046,21 @@ describe('VideoCall', () => {
       expect(camera.setVideoQuality).not.toHaveBeenCalled()
     })
 
+    it('ignores an event of the previous room while the next one is still being set up', async () => {
+      const { wrapper, constrained } = await connected()
+      let join
+      wrapper.vm.$apollo.mutate.mockReturnValue(
+        new Promise((resolve) => {
+          join = resolve
+        }),
+      )
+      const connecting = wrapper.vm.connect()
+      constrained()
+      join({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } })
+      await connecting
+      expect(wrapper.vm.cpuConstrained).toBe(false)
+    })
+
     it('starts the next call unconstrained', async () => {
       const { wrapper, constrained } = await connected()
       constrained()

@@ -1630,7 +1630,6 @@ export default {
       this.micSilenceProbe = null
       this.stopAudioWatchdog()
       this.resetAudioOnly()
-      this.cpuConstrained = false
       try {
         if (!this.groupId) throw new Error('Missing group id')
         const payload = await this.takeJoinPayload(this.groupId)
@@ -1657,6 +1656,9 @@ export default {
           // default without a word.
           ...(this.speakerDeviceId ? { audioOutput: { deviceId: this.speakerDeviceId } } : {}),
         })
+        // Reset only now: until the line below, this.room is still the previous
+        // room, and its late CPU event would pass the room check in the listener.
+        this.cpuConstrained = false
         this.room = room
 
         const onAny = () => this.refreshTiles()
