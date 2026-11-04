@@ -37,6 +37,8 @@ jest.mock('livekit-client', () => {
   const Track = {
     Source: { Microphone: 'microphone', Camera: 'camera', ScreenShare: 'screen_share' },
   }
+  const ParticipantEvent = { LocalTrackCpuConstrained: 'localTrackCpuConstrained' }
+  const VideoQuality = { LOW: 0, MEDIUM: 1, HIGH: 2 }
   const DisconnectReason = { CLIENT_INITIATED: 'CLIENT_INITIATED' }
   class Room {
     constructor(opts) {
@@ -52,6 +54,11 @@ jest.mock('livekit-client', () => {
         setCameraEnabled: jest.fn().mockResolvedValue(),
         setScreenShareEnabled: jest.fn().mockResolvedValue(),
         getTrackPublication: jest.fn(),
+        handlers: {},
+        on(evt, cb) {
+          this.handlers[evt] = cb
+          return this
+        },
       }
       // Tests flip the static to start a room whose audio is already blocked.
       this.canPlaybackAudio = Room.initialCanPlaybackAudio
@@ -68,7 +75,16 @@ jest.mock('livekit-client', () => {
     }
   }
   Room.initialCanPlaybackAudio = true
-  return { __esModule: true, Room, RoomEvent, Track, TrackEvent, DisconnectReason }
+  return {
+    __esModule: true,
+    Room,
+    RoomEvent,
+    ParticipantEvent,
+    Track,
+    TrackEvent,
+    VideoQuality,
+    DisconnectReason,
+  }
 })
 
 // The watchdog has its own spec; here it only matters when it runs.
@@ -2902,6 +2918,154 @@ describe('VideoCall', () => {
       expect(wrapper.vm.audioOnlyDismissed).toBe(false)
       jest.advanceTimersByTime(60_000)
       expect(wrapper.vm.audioOnly).toBe(false)
+    })
+  })
+
+  describe('cpu relief', () => {
+    const remoteVideo = (source) => ({ source, setVideoQuality: jest.fn() })
+
+    const connected = async () => {
+      const built = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
+      built.wrapper.vm.$apollo = {
+        mutate: jest
+          .fn()
+          .mockResolvedValue({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } }),
+      }
+      await built.wrapper.vm.connect()
+      const room = built.wrapper.vm.room
+      const camera = remoteVideo('camera')
+      const screen = remoteVideo('screen_share')
+      room.remoteParticipants.set('bob', {
+        identity: 'bob',
+        audioTrackPublications: new Map(),
+        videoTrackPublications: new Map([
+          ['c', camera],
+          ['s', screen],
+        ]),
+      })
+      const ownCamera = { prioritizePerformance: jest.fn().mockResolvedValue() }
+      room.localParticipant.getTrackPublication.mockImplementation((source) =>
+        source === 'camera' ? { track: ownCamera } : undefined,
+      )
+      const constrained = () => room.localParticipant.handlers.localTrackCpuConstrained()
+      return { ...built, room, camera, screen, ownCamera, constrained }
+    }
+
+    let warn
+    beforeEach(() => {
+      warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    })
+
+    afterEach(() => {
+      warn.mockRestore()
+    })
+
+    it('leaves the video alone as long as the CPU keeps up', async () => {
+      const { wrapper, camera, ownCamera } = await connected()
+      expect(wrapper.vm.cpuConstrained).toBe(false)
+      expect(camera.setVideoQuality).not.toHaveBeenCalled()
+      expect(ownCamera.prioritizePerformance).not.toHaveBeenCalled()
+    })
+
+    it('lets the cameras give way once the CPU holds our video back', async () => {
+      const { wrapper, camera, screen, ownCamera, constrained } = await connected()
+      constrained()
+      expect(wrapper.vm.cpuConstrained).toBe(true)
+      expect(ownCamera.prioritizePerformance).toHaveBeenCalledTimes(1)
+      expect(camera.setVideoQuality).toHaveBeenCalledWith(0)
+      // Screen shares stay readable.
+      expect(screen.setVideoQuality).not.toHaveBeenCalled()
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('CPU constrained'))
+    })
+
+    it('acts only once per call', async () => {
+      const { camera, ownCamera, constrained } = await connected()
+      constrained()
+      constrained()
+      expect(ownCamera.prioritizePerformance).toHaveBeenCalledTimes(1)
+      expect(camera.setVideoQuality).toHaveBeenCalledTimes(1)
+    })
+
+    it('lowers cameras subscribed afterwards as well, but no screen shares', async () => {
+      const { room, constrained } = await connected()
+      constrained()
+      const later = remoteVideo('camera')
+      const laterScreen = remoteVideo('screen_share')
+      room.handlers.TrackSubscribed({}, later)
+      room.handlers.TrackSubscribed({}, laterScreen)
+      expect(later.setVideoQuality).toHaveBeenCalledWith(0)
+      expect(laterScreen.setVideoQuality).not.toHaveBeenCalled()
+    })
+
+    it('does not lower what is subscribed while the CPU keeps up', async () => {
+      const { room } = await connected()
+      const later = remoteVideo('camera')
+      room.handlers.TrackSubscribed({}, later)
+      expect(later.setVideoQuality).not.toHaveBeenCalled()
+    })
+
+    it('relieves our own camera when it is switched on only later', async () => {
+      const { room, ownCamera, constrained } = await connected()
+      room.localParticipant.getTrackPublication.mockReturnValue(undefined)
+      constrained()
+      room.localParticipant.getTrackPublication.mockReturnValue({ track: ownCamera })
+      room.handlers.LocalTrackPublished({ source: 'screen_share' })
+      expect(ownCamera.prioritizePerformance).not.toHaveBeenCalled()
+      room.handlers.LocalTrackPublished({ source: 'camera' })
+      expect(ownCamera.prioritizePerformance).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not relieve a camera switched on while the CPU keeps up', async () => {
+      const { room, ownCamera } = await connected()
+      room.handlers.LocalTrackPublished({ source: 'camera' })
+      expect(ownCamera.prioritizePerformance).not.toHaveBeenCalled()
+    })
+
+    it('copes with a camera that is not being sent', async () => {
+      const { ownCamera, camera, constrained } = await connected()
+      ownCamera.prioritizePerformance.mockRejectedValue(new Error('sender not found'))
+      constrained()
+      await flushPromises()
+      expect(camera.setVideoQuality).toHaveBeenCalled()
+    })
+
+    it('copes with a camera track that cannot be relieved', async () => {
+      const { room, camera, constrained } = await connected()
+      room.localParticipant.getTrackPublication.mockReturnValue({ track: {} })
+      constrained()
+      expect(camera.setVideoQuality).toHaveBeenCalled()
+    })
+
+    it('ignores a late event of a room already replaced', async () => {
+      const { wrapper, room, camera, ownCamera, constrained } = await connected()
+      await wrapper.vm.connect()
+      expect(wrapper.vm.room).not.toBe(room)
+      constrained()
+      expect(wrapper.vm.cpuConstrained).toBe(false)
+      expect(ownCamera.prioritizePerformance).not.toHaveBeenCalled()
+      expect(camera.setVideoQuality).not.toHaveBeenCalled()
+    })
+
+    it('resets the CPU state only once the next room takes over', async () => {
+      const { wrapper, constrained } = await connected()
+      let join
+      wrapper.vm.$apollo.mutate.mockReturnValue(
+        new Promise((resolve) => {
+          join = resolve
+        }),
+      )
+      const connecting = wrapper.vm.connect()
+      constrained()
+      join({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } })
+      await connecting
+      expect(wrapper.vm.cpuConstrained).toBe(false)
+    })
+
+    it('starts the next call unconstrained', async () => {
+      const { wrapper, constrained } = await connected()
+      constrained()
+      await wrapper.vm.connect()
+      expect(wrapper.vm.cpuConstrained).toBe(false)
     })
   })
 
