@@ -140,7 +140,7 @@ function localZLimit(tokens) {
 
 const Z_TOKEN = /var\(\s*--(z-index-[a-z0-9-]+)/g
 const Z_SHAPE =
-  /^(?:var\(\s*--z-index-[a-z0-9-]+\s*\)|calc\(\s*var\(\s*--z-index-[a-z0-9-]+\s*\)\s*[+-]\s*(\d+)\s*\))$/
+  /^(?:var\(\s*--z-index-[a-z0-9-]+\s*\)|calc\(\s*var\(\s*--z-index-[a-z0-9-]+\s*\)\s+[+-]\s+(\d+)\s*\))$/
 const Z_KEYWORD = /^(auto|inherit|initial|unset|revert)$/
 
 /**
@@ -238,7 +238,7 @@ function formatZIndexReport(tokens, zUsages) {
       name,
       value,
       // calc() levels resolve against another token, so sort on the number they come to.
-      rank: Number(value) || Number(tokens['z-index-page-submenu']) - 1,
+      rank: /^-?\d+$/.test(value) ? Number(value) : Number(tokens['z-index-page-submenu']) - 1,
     }))
     .sort((a, b) => b.rank - a.rank)
   const lines = ['z-index levels (tokens, highest first)', '']

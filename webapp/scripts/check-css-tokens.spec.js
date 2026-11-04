@@ -219,6 +219,12 @@ describe('checkSource — z-index', () => {
     expect(check('.a { z-index: calc(var(--z-index-sticky) - 2); }', 100).errors).toEqual([])
   })
 
+  it('needs spaces around the operator in calc()', () => {
+    expect(check('.a { z-index: calc(var(--z-index-sticky)+2); }', 100).errors).toHaveLength(1)
+    expect(check('.a { z-index: calc(var(--z-index-sticky) +2); }', 100).errors).toHaveLength(1)
+    expect(check('.a { z-index: calc(var(--z-index-sticky) + 2); }', 100).errors).toEqual([])
+  })
+
   it('checks the property name case-insensitively', () => {
     expect(check('.a { Z-INDEX: 9999; }', 100).errors).toHaveLength(1)
     expect(check('.a { Z-Index: 3; }', 100).errors).toEqual([])
@@ -279,6 +285,11 @@ describe('formatZIndexReport', () => {
     { rel: 'a/Call.vue', local: 3 },
   ]
   const report = formatZIndexReport(tokens, usages)
+
+  it('sorts a token with the value 0 below the others', () => {
+    const zero = formatZIndexReport({ ...tokens, 'z-index-zero': '0' }, usages)
+    expect(zero.indexOf('--z-index-zero')).toBeGreaterThan(zero.indexOf('--z-index-surface'))
+  })
 
   it('lists the tokens highest first, resolving a calc() level by its number', () => {
     const order = ['--z-index-modal', '--z-index-page-submenu', '--z-index-call-maximized']
