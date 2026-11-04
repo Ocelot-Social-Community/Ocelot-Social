@@ -154,9 +154,18 @@ function checkZIndex(value, rel, localLimit, zUsages, knownTokens = null) {
     const unknown = knownTokens && tokens.find((name) => !knownTokens.has(name))
     if (unknown) return `${rel}: z-index: ${bare} — --${unknown} is not a declared token`
     for (const token of tokens) zUsages.push({ rel, token })
+    // Beside the plain token references only numbers may remain. Any other `var()` is either a
+    // foreign variable or a fallback (`var(--z-index-sticky, 9999)`) that would hide a level.
+    const rest = bare.replace(/var\(\s*--z-index-[a-z0-9-]+\s*\)/g, '')
+    if (rest.includes('var(')) {
+      return (
+        `${rel}: z-index: ${bare} — only plain var(--z-index-*) references are allowed here, ` +
+        `no fallback and no other variable`
+      )
+    }
     // A number beside a token (`calc(var(--z-index-sticky) + 5000)`) is a page-level level in
     // disguise. Small offsets (`- 1`, `+ 1`) stay fine.
-    const numbers = bare.replace(/var\([^)]*\)/g, '').match(/\d+/g) || []
+    const numbers = rest.match(/\d+/g) || []
     if (numbers.some((n) => Number(n) >= localLimit)) {
       return (
         `${rel}: z-index: ${bare} — a number from ${localLimit} up next to a token is a level ` +
@@ -188,15 +197,15 @@ function checkSource(src, byRgb, rel, localLimit = DEFAULT_LOCAL_Z_LIMIT, zToken
   for (const body of styleBodies(src)) {
     for (const { prop, value } of declarations(body)) {
       if (prop.startsWith('white-space')) continue
+      for (const [, name] of value.matchAll(/\$([a-z][a-z0-9-]*)/gi)) {
+        errors.push(`${rel}: $${name} — SCSS variable in a plain CSS block, resolves to nothing`)
+      }
       if (prop === 'z-index') {
         const finding = checkZIndex(value, rel, localLimit, zUsages, zTokens)
         if (finding) errors.push(finding)
         continue
       }
 
-      for (const [, name] of value.matchAll(/\$([a-z][a-z0-9-]*)/gi)) {
-        errors.push(`${rel}: $${name} — SCSS variable in a plain CSS block, resolves to nothing`)
-      }
       if (prop.startsWith('--')) continue // declaring a token is allowed to use a literal
       for (const [raw] of value.matchAll(COLOUR)) {
         const rgb = toRgb(raw)

@@ -203,6 +203,20 @@ describe('checkSource — z-index', () => {
     expect(check('.a { z-index: calc(var(--z-index-overlay) + 1); }', 100).errors).toEqual([])
   })
 
+  it('rejects a fallback or another variable beside a token', () => {
+    expect(check('.a { z-index: var(--z-index-sticky, 9999); }', 100).errors).toHaveLength(1)
+    expect(check('.a { z-index: var(--z-index-sticky, -5000); }', 100).errors).toHaveLength(1)
+    expect(
+      check('.a { z-index: calc(var(--z-index-sticky) + var(--foo)); }', 100).errors,
+    ).toHaveLength(1)
+  })
+
+  it('reports an SCSS variable beside a token', () => {
+    expect(check('.a { z-index: calc(var(--z-index-sticky) + $offset); }', 100).errors).toEqual([
+      'A.vue: $offset — SCSS variable in a plain CSS block, resolves to nothing',
+    ])
+  })
+
   it('allows the keywords', () => {
     expect(check('.a { z-index: auto; }').errors).toEqual([])
   })
