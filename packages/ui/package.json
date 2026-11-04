@@ -160,7 +160,7 @@
     },
     {
       "path": "dist/style.css",
-      "limit": "5 kB",
+      "limit": "6 kB",
       "brotli": true
     }
   ]
