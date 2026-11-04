@@ -4133,6 +4133,8 @@ describe('VideoCall', () => {
       const context = (overrides = {}) => ({
         chatRoomId: 'room-1',
         groupChatRoomId: 'group-room',
+        conferenceUnreadPushes: 0,
+        groupChatUnreadPushes: 0,
         setConferenceUnread: jest.fn(),
         setGroupChatUnread: jest.fn(),
         loadGroupChatUnread: jest.fn(),
@@ -4145,6 +4147,8 @@ describe('VideoCall', () => {
         update(ctx, { id: 'room-1', unreadCount: 2 })
         expect(ctx.setConferenceUnread).toHaveBeenCalledWith(2)
         expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+        expect(ctx.conferenceUnreadPushes).toBe(1)
+        expect(ctx.groupChatUnreadPushes).toBe(0)
       })
 
       it('counts the chat of the group by its room', () => {
@@ -4152,6 +4156,8 @@ describe('VideoCall', () => {
         update(ctx, { id: 'group-room', unreadCount: 5 })
         expect(ctx.setGroupChatUnread).toHaveBeenCalledWith(5)
         expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
+        expect(ctx.groupChatUnreadPushes).toBe(1)
+        expect(ctx.conferenceUnreadPushes).toBe(0)
       })
 
       it('leaves every other room alone', () => {
@@ -4175,6 +4181,7 @@ describe('VideoCall', () => {
         groupId: 'g1',
         phase: 'in-call',
         groupChatRoomId: null,
+        groupChatUnreadPushes: 0,
         $apollo: { query },
         setGroupChatUnread: jest.fn(),
         ...overrides,
@@ -4208,6 +4215,18 @@ describe('VideoCall', () => {
         expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
       })
 
+      it('gives way to a count pushed while it was asking', async () => {
+        const ctx = context(
+          jest.fn(async () => {
+            ctx.groupChatUnreadPushes++
+            return { data: { Room: [{ id: 'group-room', unreadCount: 4 }] } }
+          }),
+          { groupChatRoomId: 'group-room' },
+        )
+        await load(ctx)
+        expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+      })
+
       it('goes without a count when the request fails', async () => {
         const ctx = context(jest.fn().mockRejectedValue(new Error('offline')))
         await expect(load(ctx)).resolves.toBeUndefined()
@@ -4218,6 +4237,7 @@ describe('VideoCall', () => {
     describe('loading what is unread in the conference chat', () => {
       const context = (query, overrides = {}) => ({
         chatRoomId: 'call-room',
+        conferenceUnreadPushes: 0,
         $apollo: { query },
         setConferenceUnread: jest.fn(),
         ...overrides,
@@ -4237,6 +4257,17 @@ describe('VideoCall', () => {
         const ctx = context(
           jest.fn().mockResolvedValue({ data: { Room: [{ id: 'call-room', unreadCount: 3 }] } }),
           { chatRoomId: 'another-room' },
+        )
+        await load(ctx)
+        expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
+      })
+
+      it('gives way to a count pushed while it was asking', async () => {
+        const ctx = context(
+          jest.fn(async () => {
+            ctx.conferenceUnreadPushes++
+            return { data: { Room: [{ id: 'call-room', unreadCount: 3 }] } }
+          }),
         )
         await load(ctx)
         expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
