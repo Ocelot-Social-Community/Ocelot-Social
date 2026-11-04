@@ -3036,6 +3036,16 @@ describe('VideoCall', () => {
       expect(camera.setVideoQuality).toHaveBeenCalled()
     })
 
+    it('ignores a late event of a room already replaced', async () => {
+      const { wrapper, room, camera, ownCamera, constrained } = await connected()
+      await wrapper.vm.connect()
+      expect(wrapper.vm.room).not.toBe(room)
+      constrained()
+      expect(wrapper.vm.cpuConstrained).toBe(false)
+      expect(ownCamera.prioritizePerformance).not.toHaveBeenCalled()
+      expect(camera.setVideoQuality).not.toHaveBeenCalled()
+    })
+
     it('starts the next call unconstrained', async () => {
       const { wrapper, constrained } = await connected()
       constrained()

@@ -1675,7 +1675,8 @@ export default {
         // keep their quality — they are what the call is about, and unreadable
         // when small.
         room.localParticipant.on(ParticipantEvent.LocalTrackCpuConstrained, () => {
-          if (this.cpuConstrained) return
+          // A late event of a room already replaced must not throttle the new call.
+          if (this.room !== room || this.cpuConstrained) return
           // A deliberate diagnosis: the only trace of why the videos got coarse.
           // eslint-disable-next-line no-console
           console.warn('[video-call] CPU constrained, lowering the video quality of the cameras')
