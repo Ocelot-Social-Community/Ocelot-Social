@@ -431,6 +431,7 @@
     "API_KEY_DOES_NOT_EXIST": "De API Key is niet gevonden.",
     "API_KEYS_FEATURE_DISABLED": "API Keys zijn niet ingeschakeld op dit netwerk.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Je kunt alleen badges kiezen die aan jou zijn toegekend.",
+    "CHAT_CALL_ROOM_CLOSED": "Dit videogesprek is afgelopen. De chat kan nog worden gelezen, maar er kan niet meer in worden geschreven.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "De groepschat kon niet worden aangemaakt.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Het bericht heeft een tekst of een bestand nodig.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Je kunt geen chat met jezelf starten.",
@@ -533,18 +534,29 @@
     "USER_DOES_NOT_EXIST": "De gebruiker is niet gevonden.",
     "USER_PROFILE_NAME_TOO_LONG": "De naam mag maximaal {max} tekens lang zijn.",
     "USER_PROFILE_NAME_TOO_SHORT": "De naam moet minimaal {min} tekens lang zijn.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Toegestane tekens zijn alleen kleine letters (a–z), cijfers (0–9), underscores en koppeltekens.",
     "USER_PROFILE_SLUG_TOO_LONG": "De gebruikersnaam mag maximaal {max} tekens lang zijn.",
     "USER_PROFILE_SLUG_TOO_SHORT": "De gebruikersnaam moet minimaal {min} tekens lang zijn.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Deze gebruiker is niet geblokkeerd.",
+    "VIDEO_CALL_CHAT_NOT_IN_CALL": "De chat van een videogesprek is alleen open voor de deelnemers. Neem eerst deel aan het gesprek.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Er is geen actief lidmaatschap van deze groep gevonden voor het videogesprek.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Je mag in deze groep geen videogesprek starten."
   },
   "chat": {
     "addRoomHeadline": "Zoek gebruiker voor nieuwe chat",
+    "callRoomEmpty": "Nog geen berichten. Deze chat is alleen zichtbaar voor de deelnemers aan dit videogesprek.",
+    "callRoomName": "Gesprek · {name}",
     "cancelSelectMessage": "Annuleren",
     "closeChat": "Chat sluiten",
     "conversationStarted": "Gesprek gestart op:",
     "expandChat": "Chat uitvouwen",
+    "export": {
+      "attachment": "Bijlage",
+      "callStarted": "Begin van het gesprek: {date}",
+      "savedAt": "Opgeslagen: {date}",
+      "title": "Chat van het videogesprek in “{name}”"
+    },
+    "exportChat": "Chat downloaden als tekstbestand",
     "groupChatButton": {
       "label": "Groepschat",
       "tooltip": "Chat met groep “{name}”"
@@ -819,6 +831,20 @@
       "title": "Gebruiker deactiveren"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (door jou geblokkeerd)",
+      "count": "{count} verbonden",
+      "flag": "Lopende videogesprekken: {count}",
+      "join": "Deelnemen",
+      "joined": "Je neemt deel aan dit gesprek",
+      "participants": "Deelnemers",
+      "title": "Lopende videogesprekken"
+    },
+    "close": "Zijbalk sluiten",
+    "label": "Zijbalk",
+    "open": "Zijbalk openen – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} van {total} € verzameld",
     "donate-now": "Doneer nu"
@@ -984,15 +1010,15 @@
       "title": "Mijn groep bewerken"
     },
     "elevation": {
-      "actingAsMember": "Je handelt hier als {role}.",
-      "actingAsNonMember": "Je bent geen lid van deze groep.",
       "activeTitle": "Beheerderstoegang is actief.",
       "activeUntil": "Hij eindigt om {time}, of wanneer je hem beëindigt.",
       "end": "Beheerderstoegang beëindigen",
-      "offerBody": "Daarnaast heb je netwerkrechten over de groep. De inhoud lezen of iets wijzigen vraagt om deze bevestiging, en die wordt bij de groep vastgelegd.",
-      "offerBodyOwner": "Met je netwerkrechten kun je ook de andere eigenaren van deze groep terugzetten of verwijderen. Dat vraagt om deze bevestiging, en die wordt bij de groep vastgelegd.",
-      "reasonPlaceholder": "Waar gaat het om?",
-      "start": "Beheerderstoegang gebruiken"
+      "offerBody": "Je huidige rol in deze groep: “{role}”. Geef een reden op waarom je deze groep wilt beheren (wordt vastgelegd).",
+      "offerBodyNoneMember": "Je bent geen lid van de groep. Geef een reden op waarom je deze groep wilt beheren (wordt vastgelegd).",
+      "offerBodyOwner": "Je huidige rol in deze groep: “{role}”. Met je netwerkrechten kun je ook de andere eigenaren van deze groep terugzetten of verwijderen. Geef een reden op waarom je deze groep wilt beheren (wordt vastgelegd).",
+      "reasonPlaceholder": "Reden voor je actie",
+      "start": "Groep beheren",
+      "title": "Je hebt het recht om deze groep te beheren als een supereigenaar."
     },
     "errors": {
       "userAlreadyMember": "Gebruiker “{name}” is al lid!"
@@ -1859,7 +1885,7 @@
       "slug": {
         "alreadyTaken": "Deze gebruikersnaam is al in gebruik.",
         "length": "De gebruikersnaam moet tussen {min} en {max} tekens lang zijn.",
-        "regex": "Toegestane tekens zijn alleen kleine letters, cijfers, underscores en koppeltekens."
+        "regex": "Toegestane tekens zijn alleen kleine letters (a–z), cijfers (0–9), underscores en koppeltekens."
       }
     }
   },
@@ -1895,19 +1921,41 @@
     "activeSpeakers": "Actieve sprekers",
     "audioBlocked": "Je browser blokkeert het geluid van dit gesprek.",
     "audioOnly": "Zwakke verbinding — video's zijn gepauzeerd zodat je iedereen blijft horen.",
+    "chatTabs": {
+      "call": "Gesprek",
+      "callHint": "Alleen zichtbaar voor de deelnemers aan dit videogesprek (zonder meldingen)",
+      "group": "Groep",
+      "groupHint": "Zichtbaar voor alle leden van de groep (met meldingen)",
+      "label": "Chat kiezen"
+    },
     "closeChat": "Chat sluiten",
     "connecting": "Verbinden…",
     "connectionLost": "Verbinding verbroken: {name}",
     "connectionPoor": "Zwakke verbinding: {name}",
+    "controls": {
+      "camera": "Camera",
+      "chat": "Chat",
+      "leave": "Ophangen",
+      "microphone": "Microfoon",
+      "screen": "Scherm",
+      "startSharing": "Je scherm, een venster of een tabblad delen",
+      "stopSharing": "{surface}: niet meer delen",
+      "surface": {
+        "browser": "Tabblad",
+        "monitor": "Scherm",
+        "window": "Venster"
+      },
+      "turnOff": "{device}: uitschakelen",
+      "turnOn": "{device}: inschakelen"
+    },
     "deviceSettings": {
       "button": "Apparaten",
       "speakerError": "De luidspreker kon niet worden gewisseld.",
       "title": "Apparaatinstellingen"
     },
     "dialogLabel": "Groepsvideogesprek",
-    "disableCamera": "Camera uitschakelen",
     "enableAudio": "Geluid inschakelen",
-    "enableCamera": "Camera inschakelen",
+    "enterFullscreen": "Volledig scherm",
     "errorBackToPrejoin": "Instellingen wijzigen",
     "errorRetry": "Opnieuw proberen",
     "errors": {
@@ -1930,18 +1978,19 @@
         "noDevice": "Geen scherm beschikbaar om te delen."
       }
     },
+    "exitFullscreen": "Volledig scherm verlaten",
     "gotoGroup": "Naar groep “{name}”",
     "groupVideoCallButton": {
       "label": "Groepsvideo",
       "tooltip": "Videogesprek in groep “{name}”"
     },
+    "hideBars": "Balken verbergen",
     "leave": "Gesprek verlaten",
     "maximize": "Maximaliseren",
     "micMuted": "Microfoon uit",
     "micNoSignal": "Je microfoon levert geen geluid — anderen horen je niet.",
     "micUnmuted": "Microfoon aan",
     "minimize": "Minimaliseren",
-    "muteMic": "Microfoon dempen",
     "openChat": "Chat openen",
     "prejoin": {
       "camera": "Camera",
@@ -1989,12 +2038,10 @@
     "restartMic": "Microfoon opnieuw starten",
     "screenShare": "Scherm",
     "screenShareEnded": "Schermdelen beëindigd",
+    "showBars": "Balken tonen",
     "showVideos": "Video's tonen",
     "spotlightExit": "Spotlight verlaten",
-    "startScreenShare": "Scherm delen",
-    "stopScreenShare": "Stoppen met delen",
     "title": "Groepsvideogesprek",
-    "unmuteMic": "Microfoon inschakelen",
     "you": "jij",
     "youAreSharingScreen": "Je deelt je scherm"
   }

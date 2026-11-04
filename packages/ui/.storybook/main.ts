@@ -2,6 +2,9 @@ import type { StorybookConfig } from '@storybook/vue3-vite'
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
+  // The autodocs page every story file asks for with `tags: ['autodocs']`: since Storybook 9
+  // docs are an addon, and without it the tag does nothing.
+  addons: ['@storybook/addon-docs'],
   core: {
     disableTelemetry: true,
   },

@@ -180,7 +180,7 @@ exports[`UserAvatar given an user user is disabled current user is a moderator r
           data-test="avatarUserLink"
         >
           <div
-            class="avatar-image --small"
+            class="avatar-image --small --no-image"
           >
             <span
               class="initials"
@@ -314,7 +314,7 @@ exports[`UserAvatar given an user with linkToProfile, on desktop renders 1`] = `
           data-test="avatarUserLink"
         >
           <div
-            class="avatar-image --small"
+            class="avatar-image --small --no-image"
           >
             <span
               class="initials"
@@ -407,7 +407,7 @@ exports[`UserAvatar given an user with linkToProfile, on desktop when hovering t
           data-test="avatarUserLink"
         >
           <div
-            class="avatar-image --small"
+            class="avatar-image --small --no-image"
           >
             <span
               class="initials"
@@ -500,7 +500,7 @@ exports[`UserAvatar given an user with linkToProfile, on touch screen renders 1`
           data-test="avatarUserLink"
         >
           <div
-            class="avatar-image --small"
+            class="avatar-image --small --no-image"
           >
             <span
               class="initials"
@@ -594,7 +594,7 @@ exports[`UserAvatar given an user with linkToProfile, on touch screen when click
           data-test="avatarUserLink"
         >
           <div
-            class="avatar-image --small"
+            class="avatar-image --small --no-image"
           >
             <span
               class="initials"
@@ -692,7 +692,7 @@ exports[`UserAvatar given an user without linkToProfile, on desktop renders 1`] 
           data-test="avatarUserLink"
         >
           <div
-            class="avatar-image --small"
+            class="avatar-image --small --no-image"
           >
             <span
               class="initials"
@@ -785,7 +785,7 @@ exports[`UserAvatar given an user without linkToProfile, on desktop when hoverin
           data-test="avatarUserLink"
         >
           <div
-            class="avatar-image --small"
+            class="avatar-image --small --no-image"
           >
             <span
               class="initials"
@@ -878,7 +878,7 @@ exports[`UserAvatar given an user without linkToProfile, on desktop when hoverin
           data-test="avatarUserLink"
         >
           <div
-            class="avatar-image --small"
+            class="avatar-image --small --no-image"
           >
             <span
               class="initials"
@@ -971,7 +971,7 @@ exports[`UserAvatar given an user without linkToProfile, on touch screen renders
           data-test="avatarUserLink"
         >
           <div
-            class="avatar-image --small"
+            class="avatar-image --small --no-image"
           >
             <span
               class="initials"
@@ -1065,7 +1065,7 @@ exports[`UserAvatar given an user without linkToProfile, on touch screen when cl
           data-test="avatarUserLink"
         >
           <div
-            class="avatar-image --small"
+            class="avatar-image --small --no-image"
           >
             <span
               class="initials"
@@ -1163,7 +1163,7 @@ exports[`UserAvatar given an user without linkToProfile, on touch screen when cl
           data-test="avatarUserLink"
         >
           <div
-            class="avatar-image --small"
+            class="avatar-image --small --no-image"
           >
             <span
               class="initials"

@@ -56,9 +56,11 @@ export default {
       this.$nextTick(() => {
         const el = this.$el
         if (!el || typeof document === 'undefined' || !document.documentElement) return
-        // offsetHeight is 0 when the footer is display:none (mobile breakpoint),
-        // which is exactly what callers want as the CSS value.
-        const height = el.offsetHeight || 0
+        // The height is 0 when the footer is display:none (mobile breakpoint),
+        // which is exactly what callers want as the CSS value. Exact, not
+        // offsetHeight's whole pixels: what sits on the footer would otherwise
+        // stop a fraction short of it, which Chrome and Firefox draw as a line.
+        const height = el.getBoundingClientRect().height || 0
         document.documentElement.style.setProperty('--footer-height', `${height}px`)
       })
     },

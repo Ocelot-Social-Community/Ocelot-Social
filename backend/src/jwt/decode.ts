@@ -30,8 +30,8 @@ export interface DecodedUser {
 }
 
 // The raw user shape as returned by the decode Cypher (carries the HAS_ROLE edge
-// names as an array + actorId); collapsed to DecodedUser via resolveRoleName.
-type RawDbUser = Omit<DecodedUser, 'roleName'> & { roles?: string[]; actorId?: string }
+// names as an array); collapsed to DecodedUser via resolveRoleName.
+type RawDbUser = Omit<DecodedUser, 'roleName'> & { roles?: string[] }
 
 const decodeJwt = async (
   context: { config: Pick<typeof CONFIG, 'JWT_SECRET'>; driver: Driver },
@@ -57,7 +57,7 @@ const decodeJwt = async (
       `
       MATCH (user:User {id: $id, deleted: false, disabled: false })
       RETURN user {
-        .id, .slug, .name, .disabled, .actorId,
+        .id, .slug, .name, .disabled,
         roles: [(user)-[:HAS_ROLE]->(r:Role) | r.name]
       }
       LIMIT 1
@@ -95,7 +95,7 @@ const decodeApiKey = async (driver: Driver, key: string): Promise<DecodedUser | 
           AND user.deleted = false
           AND user.disabled = false
         RETURN user {
-          .id, .slug, .name, .disabled, .actorId,
+          .id, .slug, .name, .disabled,
           roles: [(user)-[:HAS_ROLE]->(r:Role) | r.name]
         } AS user, k.id AS keyId
         LIMIT 1

@@ -15,7 +15,9 @@ import { RoomServiceClient } from 'livekit-server-sdk'
 import CONFIG from '@src/config'
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@src/constants/subscriptions'
 import { serverPubsub } from '@src/context'
+import { getDriver } from '@src/db/neo4j'
 import { groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
+import { endCallSessionsOfMissingRoom } from '@src/livekit/callSession'
 import { markRoomTold, takeToldRooms } from '@src/livekit/toldRooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
@@ -128,9 +130,26 @@ const pollOnce = async () => {
     // event never made it to us, then drop the entry so the map doesn't grow
     // unbounded across long-lived servers with many short-lived rooms. The same goes for a
     // room a client was told a running call for, even if this poller never saw it.
+    //
+    // The entry is kept a while longer in one case only: while the room's call session could
+    // not be ended yet (see below).
     for (const roomName of new Set([...lastSeenCounts.keys(), ...told])) {
       if (seen.has(roomName)) {
         continue
+      }
+      // The room is gone, so the call is over: its session ends here too, for the setups
+      // this poller exists for — the ones the webhook's "room finished" never reaches. It
+      // may not be settled at once: a session only just opened is spared, as it may belong to
+      // a room opened after this list was taken, and the database may fail. Neither is a
+      // reason to hold back the count below — but the room is remembered then, so the next
+      // poll asks again instead of leaving the session running until the group's next call.
+      let sessionsSettled = false
+      try {
+        sessionsSettled = await endCallSessionsOfMissingRoom(getDriver(), roomName)
+        // eslint-disable-next-line no-catch-all/no-catch-all
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err)
+        logger.warn(`Ending the call session of ${roomName} failed:`, message)
       }
       if ((lastSeenCounts.get(roomName) ?? 0) > 0 || told.has(roomName)) {
         const groupId = groupIdFromRoomName(roomName)
@@ -143,7 +162,13 @@ const pollOnce = async () => {
           await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count: 0 })
         }
       }
-      lastSeenCounts.delete(roomName)
+      if (sessionsSettled) {
+        lastSeenCounts.delete(roomName)
+      } else {
+        // Remembered at 0, not as "told": the count: 0 above is out, and a told room would
+        // have it published again on every poll until the session is settled.
+        lastSeenCounts.set(roomName, 0)
+      }
       owed.delete(roomName)
     }
   } finally {

@@ -431,6 +431,7 @@
     "API_KEY_DOES_NOT_EXIST": "No se ha encontrado la API Key.",
     "API_KEYS_FEATURE_DISABLED": "Las API Keys no están activadas en esta red.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Solo puedes seleccionar insignias que te hayan sido otorgadas.",
+    "CHAT_CALL_ROOM_CLOSED": "Esta videollamada ha terminado. Su chat aún se puede leer, pero ya no se puede escribir en él.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "No se ha podido crear el chat del grupo.",
     "CHAT_MESSAGE_CONTENT_MISSING": "El mensaje necesita un texto o un archivo.",
     "CHAT_ROOM_PARTNER_IS_SELF": "No puedes iniciar un chat contigo mismo.",
@@ -533,18 +534,29 @@
     "USER_DOES_NOT_EXIST": "No se ha encontrado el usuario.",
     "USER_PROFILE_NAME_TOO_LONG": "El nombre puede tener como máximo {max} caracteres.",
     "USER_PROFILE_NAME_TOO_SHORT": "El nombre debe tener al menos {min} caracteres.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Los caracteres permitidos son solo letras minúsculas (a–z), números (0–9), guiones bajos y guiones.",
     "USER_PROFILE_SLUG_TOO_LONG": "El nombre de usuario puede tener como máximo {max} caracteres.",
     "USER_PROFILE_SLUG_TOO_SHORT": "El nombre de usuario debe tener al menos {min} caracteres.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Este usuario no está bloqueado.",
+    "VIDEO_CALL_CHAT_NOT_IN_CALL": "El chat de una videollamada solo está abierto a quienes participan en ella. Únete primero a la llamada.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "No se ha encontrado ninguna membresía activa en este grupo para la videollamada.",
     "VIDEO_CALL_START_NOT_PERMITTED": "No puedes iniciar una videollamada en este grupo."
   },
   "chat": {
     "addRoomHeadline": "Buscar usuario para nuevo chat",
+    "callRoomEmpty": "Aún no hay mensajes. Este chat solo es visible para los participantes de esta videollamada.",
+    "callRoomName": "Llamada · {name}",
     "cancelSelectMessage": "Cancelar",
     "closeChat": "Cerrar chat",
     "conversationStarted": "Conversación iniciada el:",
     "expandChat": "Expandir chat",
+    "export": {
+      "attachment": "Adjunto",
+      "callStarted": "Inicio de la llamada: {date}",
+      "savedAt": "Guardado: {date}",
+      "title": "Chat de la videollamada en «{name}»"
+    },
+    "exportChat": "Descargar el chat como archivo de texto",
     "groupChatButton": {
       "label": "Chat grupal",
       "tooltip": "Chat con el grupo «{name}»"
@@ -819,6 +831,20 @@
       "title": "Desactivar usuario"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (bloqueado por ti)",
+      "count": "{count} conectados",
+      "flag": "Videollamadas en curso: {count}",
+      "join": "Unirse",
+      "joined": "Estás en esta llamada",
+      "participants": "Participantes",
+      "title": "Videollamadas en curso"
+    },
+    "close": "Cerrar barra lateral",
+    "label": "Barra lateral",
+    "open": "Abrir barra lateral – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} de {total} € recaudados",
     "donate-now": "Donar ahora"
@@ -984,15 +1010,15 @@
       "title": "Editar mi grupo"
     },
     "elevation": {
-      "actingAsMember": "Aquí actúas como {role}.",
-      "actingAsNonMember": "No eres miembro de este grupo.",
       "activeTitle": "El acceso de administrador está activo.",
       "activeUntil": "Termina a las {time}, o cuando lo finalices.",
       "end": "Finalizar el acceso de administrador",
-      "offerBody": "Además tienes permisos de red sobre él. Leer su contenido o cambiar algo requiere esta confirmación, que queda registrada en el grupo.",
-      "offerBodyOwner": "Tus permisos de red también te permiten degradar o quitar a los demás propietarios de este grupo. Eso requiere esta confirmación, que queda registrada en el grupo.",
-      "reasonPlaceholder": "¿De qué se trata?",
-      "start": "Usar acceso de administrador"
+      "offerBody": "Tu rol actual en este grupo: «{role}». Indica un motivo por el que quieres gestionar este grupo (queda registrado).",
+      "offerBodyNoneMember": "No eres miembro del grupo. Indica un motivo por el que quieres gestionar este grupo (queda registrado).",
+      "offerBodyOwner": "Tu rol actual en este grupo: «{role}». Tus permisos de red también te permiten degradar o quitar a los demás propietarios de este grupo. Indica un motivo por el que quieres gestionar este grupo (queda registrado).",
+      "reasonPlaceholder": "Motivo de tu acción",
+      "start": "Gestionar grupo",
+      "title": "Tienes derecho a gestionar este grupo como un superpropietario."
     },
     "errors": {
       "userAlreadyMember": "¡El usuario «{name}» ya es miembro!"
@@ -1859,7 +1885,7 @@
       "slug": {
         "alreadyTaken": "Este nombre de usuario ya está en uso.",
         "length": "El nombre de usuario debe tener entre {min} y {max} caracteres.",
-        "regex": "Los caracteres permitidos son solo letras minúsculas, números, guiones bajos y guiones."
+        "regex": "Los caracteres permitidos son solo letras minúsculas (a–z), números (0–9), guiones bajos y guiones."
       }
     }
   },
@@ -1895,19 +1921,41 @@
     "activeSpeakers": "Hablantes activos",
     "audioBlocked": "Tu navegador está bloqueando el sonido de esta llamada.",
     "audioOnly": "Conexión débil: los vídeos están en pausa para que sigas oyendo a todos.",
+    "chatTabs": {
+      "call": "Llamada",
+      "callHint": "Visible solo para los participantes de esta videollamada (sin notificaciones)",
+      "group": "Grupo",
+      "groupHint": "Visible para todos los miembros del grupo (con notificaciones)",
+      "label": "Elegir chat"
+    },
     "closeChat": "Cerrar chat",
     "connecting": "Conectando…",
     "connectionLost": "Conexión perdida: {name}",
     "connectionPoor": "Conexión débil: {name}",
+    "controls": {
+      "camera": "Cámara",
+      "chat": "Chat",
+      "leave": "Colgar",
+      "microphone": "Micrófono",
+      "screen": "Pantalla",
+      "startSharing": "Compartir la pantalla, una ventana o una pestaña",
+      "stopSharing": "{surface}: dejar de compartir",
+      "surface": {
+        "browser": "Pestaña",
+        "monitor": "Pantalla",
+        "window": "Ventana"
+      },
+      "turnOff": "{device}: apagar",
+      "turnOn": "{device}: encender"
+    },
     "deviceSettings": {
       "button": "Dispositivos",
       "speakerError": "No se pudo cambiar el altavoz.",
       "title": "Ajustes de dispositivos"
     },
     "dialogLabel": "Videollamada de grupo",
-    "disableCamera": "Apagar la cámara",
     "enableAudio": "Activar sonido",
-    "enableCamera": "Encender la cámara",
+    "enterFullscreen": "Pantalla completa",
     "errorBackToPrejoin": "Cambiar ajustes",
     "errorRetry": "Reintentar",
     "errors": {
@@ -1930,18 +1978,19 @@
         "noDevice": "No hay pantalla disponible para compartir."
       }
     },
+    "exitFullscreen": "Salir de pantalla completa",
     "gotoGroup": "Ir al grupo «{name}»",
     "groupVideoCallButton": {
       "label": "Vídeo del grupo",
       "tooltip": "Videollamada en el grupo «{name}»"
     },
+    "hideBars": "Ocultar las barras",
     "leave": "Salir de la llamada",
     "maximize": "Maximizar",
     "micMuted": "Micrófono apagado",
     "micNoSignal": "Tu micrófono no transmite sonido: los demás no te oyen.",
     "micUnmuted": "Micrófono encendido",
     "minimize": "Minimizar",
-    "muteMic": "Silenciar micrófono",
     "openChat": "Abrir chat",
     "prejoin": {
       "camera": "Cámara",
@@ -1989,12 +2038,10 @@
     "restartMic": "Reiniciar micrófono",
     "screenShare": "Pantalla",
     "screenShareEnded": "Uso compartido de pantalla finalizado",
+    "showBars": "Mostrar las barras",
     "showVideos": "Mostrar vídeos",
     "spotlightExit": "Salir del foco",
-    "startScreenShare": "Compartir pantalla",
-    "stopScreenShare": "Detener uso compartido",
     "title": "Videollamada de grupo",
-    "unmuteMic": "Activar micrófono",
     "you": "tú",
     "youAreSharingScreen": "Estás compartiendo tu pantalla"
   }

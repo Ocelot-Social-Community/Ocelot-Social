@@ -35,7 +35,10 @@ const publishNotifications = async (
 ): Promise<string[]> => {
   const notifications = await notificationsPromise
   notifications.forEach((notificationAdded) => {
-    context.pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
+    // A silent notification has no edge behind it (see `announceNewPost`): nothing for the bell.
+    if (!notificationAdded.silent) {
+      context.pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
+    }
     if (
       notificationAdded.email && // no primary email was found
       (notificationAdded.to[emailNotificationSetting] ?? true) &&
@@ -135,6 +138,21 @@ const notifyMentionedInPost = async (postId, content, context): Promise<string[]
     'emailNotificationsMention',
   )
 
+/**
+ * One notification per post and recipient, under the most specific reason that applies:
+ * `mentioned_in_post` before `post_in_group` before `followed_user_posted`.
+ *
+ * Each reason used to MERGE its own edge, so a follower of the author who was also a member of
+ * the group (or was mentioned) found the same post two or three times in their bell. The order
+ * of the calls below IS the ranking now: a notifier skips everyone an earlier one already told,
+ * so they have to run from the most specific reason down.
+ *
+ * The e-mail is a different question and keeps its old answer. Being told once in the bell does
+ * not mean having switched off the mail for every reason: whoever turned off mails for mentions
+ * but kept them for posts in their groups still gets one. So the later notifiers still return the
+ * already-told recipients, marked `silent` — no edge, no bell, but a candidate for the mail —
+ * and `sentEmails` keeps it to one mail per post.
+ */
 const handleCreatePost: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
   const { groupId, content } = args
   const post = await resolve(root, args, context, resolveInfo)
@@ -146,14 +164,14 @@ const handleCreatePost: IMiddlewareResolver = async (resolve, root, args, contex
     const sentEmails: string[] = await notifyMentionedInPost(post.id, content, context)
     await publishNotifications(
       context,
-      notifyFollowingUsers(post.id, context),
-      'emailNotificationsFollowingUsers',
+      notifyGroupMembersOfNewPost(post.id, groupId, context),
+      'emailNotificationsPostInGroup',
       sentEmails,
     )
     await publishNotifications(
       context,
-      notifyGroupMembersOfNewPost(post.id, groupId, context),
-      'emailNotificationsPostInGroup',
+      notifyFollowingUsers(post.id, context),
+      'emailNotificationsFollowingUsers',
       sentEmails,
     )
   }
@@ -186,6 +204,18 @@ const handleUpdatePost: IMiddlewareResolver = async (resolve, root, args, contex
   return post
 }
 
+/**
+ * One notification per comment and recipient, as for a post (see `handleCreatePost`):
+ * `mentioned_in_comment` before `commented_on_post`.
+ *
+ * An observer of the post who was also mentioned in the comment found it twice in their bell.
+ * The mention runs first; the observers it already told get no second edge, but still come back
+ * `silent` as candidates for the mail, so whoever switched off mails for mentions but not for
+ * comments on observed posts still gets one.
+ *
+ * This replaces a rule for the post's author alone, who was taken off the mention list while
+ * observing their post: the author now hears of the comment as a mention like everyone else.
+ */
 const handleContentDataOfComment: IMiddlewareResolver = async (
   resolve,
   root,
@@ -194,53 +224,71 @@ const handleContentDataOfComment: IMiddlewareResolver = async (
   resolveInfo,
 ) => {
   const { content } = args
-  let idsOfMentionedUsers = extractMentionedUsers(content)
+  const idsOfMentionedUsers = extractMentionedUsers(content)
   const comment = await resolve(root, args, context, resolveInfo)
-  const [postAuthor] = await postAuthorOfComment(comment.id, { context })
-  // An author observing their post hears of the comment as commented_on_post below; a mention
-  // on top would tell them twice. One who stopped observing it is reached by the mention only.
-  if (postAuthor.observes) {
-    idsOfMentionedUsers = idsOfMentionedUsers.filter((id) => id !== postAuthor.id)
-  }
+  const mentions = await notifyUsersOfMention(
+    'Comment',
+    comment.id,
+    idsOfMentionedUsers,
+    'mentioned_in_comment',
+    context,
+  )
   const sentEmails: string[] = await publishNotifications(
     context,
-    notifyUsersOfMention(
-      'Comment',
-      comment.id,
-      idsOfMentionedUsers,
-      'mentioned_in_comment',
-      context,
-    ),
+    mentions,
     'emailNotificationsMention',
   )
   await publishNotifications(
     context,
-    notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context),
+    notifyUsersOfComment(
+      'Comment',
+      comment.id,
+      'commented_on_post',
+      // Only a new comment is news. On an edit, a mention that just replaced the observer's
+      // `commented_on_post` edge must not bring back that comment's mail.
+      resolveInfo.fieldName === 'CreateComment' ? mentions.map(({ to }) => to.id) : [],
+      context,
+    ),
     'emailNotificationsCommentOnObservedPost',
     sentEmails,
   )
   return comment
 }
 
-const postAuthorOfComment = async (commentId, { context }) => {
-  const session = context.driver.session()
-  let postAuthorId
-  try {
-    postAuthorId = await session.readTransaction((transaction) => {
-      return transaction.run(
-        `
-          MATCH (author:User)-[:WROTE]->(post:Post)<-[:COMMENTS]-(:Comment { id: $commentId })
-          OPTIONAL MATCH (author)-[observation:OBSERVES { active: true }]->(post)
-          RETURN author { .id, observes: observation IS NOT NULL } as authorId
-        `,
-        { commentId },
-      )
-    })
-    return postAuthorId.records.map((record) => record.get('authorId'))
-  } finally {
-    await session.close()
-  }
-}
+/**
+ * The end of both announcers of a new post: notify `user` about `post` for `$reason` — unless
+ * an earlier notifier already did, see `handleCreatePost` for why and in which order.
+ *
+ * Expects `post`, `author`, `user` and `emailAddress` bound. The already-told recipient is still
+ * returned, as `silent` and without an edge, because the e-mail may yet be theirs to get. The
+ * edge's own properties come back separately: a map projection of a null edge is null, which
+ * would take the recipient with it. `readAnnouncement` puts the two together.
+ */
+const announceNewPost = `
+    // A pattern comprehension, not \`EXISTS { … }\`: Neo4j 4.4 accepts the subquery only in WHERE.
+    WITH post, author, user, emailAddress,
+      size([(post)-[told:NOTIFIED]->(user) | told]) > 0 AS silent
+    FOREACH (_ IN CASE WHEN silent THEN [] ELSE [1] END |
+      MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
+        SET notification.read = FALSE
+        SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
+        SET notification.updatedAt = toString(datetime())
+    )
+    WITH post, author, user, emailAddress, silent
+    OPTIONAL MATCH (post)-[notification:NOTIFIED {reason: $reason}]->(user)
+      WHERE NOT silent
+    RETURN properties(notification) AS edge, {
+      reason: $reason,
+      silent: silent,
+      from: post { __typename: 'Post', .*, author: properties(author) },
+      to: properties(user),
+      email: emailAddress.email,
+      relatedUser: properties(author)
+    } AS notification
+`
+
+// Also the end of `notifyUsersOfComment`, which returns the same two columns.
+const readAnnouncement = (record) => ({ ...record.get('notification'), ...record.get('edge') })
 
 /**
  * Announce a new post to the author's followers — unless it lives in a non-public group.
@@ -269,19 +317,7 @@ const notifyFollowingUsers = async (postId, context) => {
       MATCH (post)-[:IN]->(group:Group)
       WHERE NOT ${visibilityOf('group')} = 'public'
     }
-    MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
-      SET notification.read = FALSE
-      SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
-      SET notification.updatedAt = toString(datetime())
-    WITH notification, author, user, emailAddress.email as email,
-      post { __typename: 'Post', .*, author: properties(author) } AS finalResource
-    RETURN notification {
-      .*,
-      from: finalResource,
-      to: properties(user),
-      email: email,
-      relatedUser: properties(author)
-    }
+    ${announceNewPost}
   `
   const session = context.driver.session()
   try {
@@ -291,7 +327,7 @@ const notifyFollowingUsers = async (postId, context) => {
         reason,
         userId: context.user.id,
       })
-      return notificationTransactionResponse.records.map((record) => record.get('notification'))
+      return notificationTransactionResponse.records.map(readAnnouncement)
     })
   } finally {
     await session.close()
@@ -317,19 +353,7 @@ const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
     // address in the network, and the members without one got no notification at all.
     OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
     WITH post, author, user, emailAddress
-    MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
-      SET notification.read = FALSE
-      SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
-      SET notification.updatedAt = toString(datetime())
-    WITH notification, author, user, emailAddress.email as email,
-      post { __typename: 'Post', .*, author: properties(author) } AS finalResource
-    RETURN notification {
-      .*,
-      from: finalResource,
-      to: properties(user),
-      email: email,
-      relatedUser: properties(author)
-    }
+    ${announceNewPost}
   `
   const session = context.driver.session()
   try {
@@ -340,7 +364,7 @@ const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
         groupId,
         userId: context.user.id,
       })
-      return notificationTransactionResponse.records.map((record) => record.get('notification'))
+      return notificationTransactionResponse.records.map(readAnnouncement)
     })
   } finally {
     await session.close()
@@ -464,6 +488,13 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
         // Already told about this post — see the note on this function.
         AND NOT EXISTS { MATCH (post)-[:NOTIFIED { reason: $reason }]->(user) }
         MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
+        // One notification per post (see handleCreatePost): a mention added by an edit
+        // outranks the announcement the post got when it was created, and replaces it.
+        WITH post, notification, user, emailAddress
+        OPTIONAL MATCH (post)-[announced:NOTIFIED]->(user)
+          WHERE announced.reason IN ['post_in_group', 'followed_user_posted']
+        WITH post, notification, user, emailAddress, collect(announced) AS announced
+        FOREACH (outranked IN announced | DELETE outranked)
         WITH post AS resource, notification, user, emailAddress
       `
       break
@@ -485,6 +516,10 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
       // Already told about this comment — see the note on this function.
       AND NOT EXISTS { MATCH (comment)-[:NOTIFIED { reason: $reason }]->(user) }
       MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(user)
+      // One notification per comment, as in the post branch above.
+      WITH comment, notification, user, emailAddress
+      OPTIONAL MATCH (comment)-[announced:NOTIFIED { reason: 'commented_on_post' }]->(user)
+      FOREACH (outranked IN CASE WHEN announced IS NULL THEN [] ELSE [announced] END | DELETE outranked)
       WITH comment AS resource, notification, user, emailAddress
       `
       break
@@ -525,11 +560,15 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
  * defect as the mention path (see `notifyUsersOfMention`), with a larger audience — observers of
  * the post rather than the people named in it.
  *
- * Hence the `NOT EXISTS` guard: an observer already told about this comment produces no row, so
- * nothing is written, reset, published or mailed. A no-op on CreateComment, where no edge exists
- * yet. An edit of a comment is not news; its appearance was.
+ * Hence the guard: an observer the comment already notified produces no row, so nothing is
+ * written, reset, published or mailed. An edit of a comment is not news; its appearance was.
+ *
+ * The one exception is `idsJustMentioned`, the observers the mention notified in this very
+ * request: told once already, so `silent` — no edge, no bell — but still a candidate for the mail
+ * (see `handleContentDataOfComment`). Their mention edge is new, which is why the guard cannot
+ * tell them apart from an old one by itself.
  */
-const notifyUsersOfComment = async (label, commentId, reason, context) => {
+const notifyUsersOfComment = async (label, commentId, reason, idsJustMentioned, context) => {
   await validateNotifyUsers(label, reason)
   const session = context.driver.session()
   try {
@@ -540,34 +579,42 @@ const notifyUsersOfComment = async (label, commentId, reason, context) => {
           WHERE NOT (observingUser)-[:BLOCKED]-(commenter)
           AND NOT (observingUser)-[:MUTED]->(commenter)
           AND NOT observingUser.id = $userId
-          // Already told about this comment — see the note on this function. Safe to append as
-          // a bare AND here: this WHERE is a chain of ANDs, unlike the group rule in
-          // notifyUsersOfMention, which needed parentheses.
+          // Already told about this comment — see the note on this function.
           AND NOT EXISTS { MATCH (comment)-[:NOTIFIED { reason: $reason }]->(observingUser) }
+          AND (
+            observingUser.id IN $idsJustMentioned
+            OR NOT EXISTS { MATCH (comment)-[:NOTIFIED]->(observingUser) }
+          )
         OPTIONAL MATCH (observingUser)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
-        WITH observingUser, emailAddress, post, comment, commenter
+        WITH observingUser, emailAddress, post, comment, commenter,
+          observingUser.id IN $idsJustMentioned AS silent
         MATCH (postAuthor:User)-[:WROTE]->(post)
-        MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(observingUser)
-        SET notification.read = FALSE
-        SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
-        SET notification.updatedAt = toString(datetime())
-        WITH notification, observingUser, emailAddress.email as email, post, commenter, postAuthor,
-        comment {.*, __typename: labels(comment)[0], author: properties(commenter), post:  post {.*, author: properties(postAuthor) } } AS finalResource
-        RETURN notification {
-          .*,
-          from: finalResource,
+        FOREACH (_ IN CASE WHEN silent THEN [] ELSE [1] END |
+          MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(observingUser)
+          SET notification.read = FALSE
+          SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
+          SET notification.updatedAt = toString(datetime())
+        )
+        WITH observingUser, emailAddress, post, comment, commenter, postAuthor, silent
+        OPTIONAL MATCH (comment)-[notification:NOTIFIED {reason: $reason}]->(observingUser)
+          WHERE NOT silent
+        RETURN properties(notification) AS edge, {
+          reason: $reason,
+          silent: silent,
+          from: comment {.*, __typename: labels(comment)[0], author: properties(commenter), post: post {.*, author: properties(postAuthor) } },
           to: properties(observingUser),
-          email: email,
+          email: emailAddress.email,
           relatedUser: properties(commenter)
-        }
+        } AS notification
       `,
         {
           commentId,
           reason,
+          idsJustMentioned,
           userId: context.user.id,
         },
       )
-      return notificationTransactionResponse.records.map((record) => record.get('notification'))
+      return notificationTransactionResponse.records.map(readAnnouncement)
     })
   } finally {
     await session.close()
@@ -618,7 +665,8 @@ const handleCreateMessage: IMiddlewareResolver = async (
           OPTIONAL MATCH (recipientUser)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
           OPTIONAL MATCH (room)-[:ROOM_FOR]->(group:Group)<-[mutedGroup:MUTED]-(recipientUser)
           RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email},
-            mutedGroup IS NOT NULL AS isGroupMuted
+            mutedGroup IS NOT NULL AS isGroupMuted,
+            EXISTS((room)-[:ROOM_FOR]->(:VideoCallSession)) AS isCallRoom
         `
       const txResponse = await transaction.run(messageRecipientsCypher, {
         currentUserId,
@@ -631,6 +679,7 @@ const handleCreateMessage: IMiddlewareResolver = async (
           user: record.get('recipientUser'),
           email: record.get('emailAddress')?.email,
           isGroupMuted: record.get('isGroupMuted'),
+          isCallRoom: record.get('isCallRoom'),
         })),
       }
     })
@@ -658,9 +707,12 @@ const handleCreateMessage: IMiddlewareResolver = async (
         userId: recipientUser.id,
       })
 
-      // Send EMail if we found a user(not blocked) and he is not considered online
+      // Send EMail if we found a user(not blocked) and he is not considered online.
+      // Never for the conference chat of a video call: it is talk among those in the call, and
+      // a mail would chase everybody who has left it.
       if (
         email &&
+        !recipient.isCallRoom &&
         recipientUser.emailNotificationsChatMessage !== false &&
         !isUserOnline(recipientUser) &&
         !recipient.isGroupMuted

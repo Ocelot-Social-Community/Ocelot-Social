@@ -323,20 +323,7 @@ describe('mentions in groups', () => {
         }),
       ).resolves.toMatchObject({
         data: {
-          notifications: expect.arrayContaining([
-            {
-              id: expect.any(String),
-              createdAt: expect.any(String),
-              from: {
-                __typename: 'Post',
-                id: 'public-post',
-                content:
-                  'Hey <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-member</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>.<br>! Please read this',
-              },
-              read: false,
-              reason: 'post_in_group',
-              relatedUser: null,
-            },
+          notifications: [
             {
               id: expect.any(String),
               createdAt: expect.any(String),
@@ -350,7 +337,7 @@ describe('mentions in groups', () => {
               reason: 'mentioned_in_post',
               relatedUser: null,
             },
-          ]),
+          ],
         },
         errors: undefined,
       })
@@ -445,20 +432,7 @@ describe('mentions in groups', () => {
         }),
       ).resolves.toMatchObject({
         data: {
-          notifications: expect.arrayContaining([
-            {
-              id: expect.any(String),
-              createdAt: expect.any(String),
-              from: {
-                __typename: 'Post',
-                id: 'closed-post',
-                content:
-                  'Hey members <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-member</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>.<br>! Please read this',
-              },
-              read: false,
-              reason: 'post_in_group',
-              relatedUser: null,
-            },
+          notifications: [
             {
               id: expect.any(String),
               createdAt: expect.any(String),
@@ -472,7 +446,7 @@ describe('mentions in groups', () => {
               reason: 'mentioned_in_post',
               relatedUser: null,
             },
-          ]),
+          ],
         },
         errors: undefined,
       })
@@ -623,20 +597,7 @@ describe('mentions in groups', () => {
         }),
       ).resolves.toMatchObject({
         data: {
-          notifications: expect.arrayContaining([
-            {
-              id: expect.any(String),
-              createdAt: expect.any(String),
-              from: {
-                __typename: 'Post',
-                id: 'hidden-post',
-                content:
-                  'Hey hiders <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-member</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>.<br>! Please read this',
-              },
-              read: false,
-              reason: 'post_in_group',
-              relatedUser: null,
-            },
+          notifications: [
             {
               id: expect.any(String),
               createdAt: expect.any(String),
@@ -650,7 +611,7 @@ describe('mentions in groups', () => {
               reason: 'mentioned_in_post',
               relatedUser: null,
             },
-          ]),
+          ],
         },
         errors: undefined,
       })

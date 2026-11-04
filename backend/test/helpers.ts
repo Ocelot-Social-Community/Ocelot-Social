@@ -189,6 +189,9 @@ export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
     query,
     mutate,
     database,
+    // The context a request would get — for resolvers the API does not reach, like a
+    // subscription's filter.
+    context: contextFn,
   }
 }
 

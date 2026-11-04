@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import Vuex from 'vuex'
 import VTooltip from 'v-tooltip'
 import { mount, createLocalVue } from '@vue/test-utils'
@@ -70,6 +71,15 @@ jest.mock('livekit-client', () => {
   return { __esModule: true, Room, RoomEvent, Track, TrackEvent, DisconnectReason }
 })
 
+// The watchdog has its own spec; here it only matters when it runs.
+jest.mock('./audioWatchdog', () => ({
+  createAudioWatchdog: jest.fn((opts) => ({
+    opts,
+    start: jest.fn(),
+    stop: jest.fn(),
+  })),
+}))
+
 const localVue = createLocalVue()
 localVue.use(Vuex)
 localVue.use(VTooltip)
@@ -85,12 +95,13 @@ const stubs = {
     template: '<button class="stub-button" @click="$emit(\'click\')"><slot /></button>',
   }),
   OsIcon: Stub('OsIcon'),
-  AvatarImage: Stub('AvatarImage'),
+  OsCounterIcon: Stub('OsCounterIcon', { props: ['count'] }),
+  CallChatTabs: Stub('CallChatTabs'),
+  RoomHeader: Stub('RoomHeader'),
   PreJoin: Stub('PreJoin'),
   DeviceSettings: Stub('DeviceSettings', { props: ['cameraStarting', 'micStarting'] }),
   VideoTile: Stub('VideoTile', { props: ['tile', 'cameraStarting', 'micStarting'] }),
   Chat: Stub('Chat'),
-  RoomTitleLink: Stub('RoomTitleLink'),
   ClientOnly: Stub('ClientOnly'),
 }
 
@@ -99,6 +110,10 @@ const buildStore = (state = {}) => {
   const close = jest.fn()
   const setStorePhase = jest.fn()
   const showChat = jest.fn()
+  const setChatRoomId = jest.fn()
+  const setConferenceUnread = jest.fn()
+  const setLastChatTab = jest.fn()
+  const setPageBars = jest.fn()
   return {
     store: new Vuex.Store({
       getters: {
@@ -108,6 +123,10 @@ const buildStore = (state = {}) => {
         'videoCall/groupName': () => state.groupName ?? null,
         'videoCall/groupSlug': () => state.groupSlug ?? null,
         'videoCall/groupAvatar': () => state.groupAvatar ?? null,
+        'videoCall/chatRoomId': () => state.chatRoomId ?? null,
+        'videoCall/conferenceUnread': () => state.conferenceUnread ?? 0,
+        'videoCall/groupChatUnread': () => state.groupChatUnread ?? 0,
+        'videoCall/lastChatTab': () => state.lastChatTab ?? 'call',
         'videoCall/reloadPending': () => state.reloadPending ?? false,
         'chat/showChat': () => state.chat ?? { showChat: false, chatUserId: null, groupId: null },
         'auth/user': () => state.user ?? { id: 'u1', name: 'Alice', avatar: { url: 'a.png' } },
@@ -117,12 +136,21 @@ const buildStore = (state = {}) => {
         'videoCall/CLOSE': close,
         'videoCall/SET_PHASE': setStorePhase,
         'videoCall/SET_PARTICIPANT_COUNT': jest.fn(),
+        'videoCall/SET_CHAT_ROOM_ID': setChatRoomId,
+        'videoCall/SET_CONFERENCE_UNREAD': setConferenceUnread,
+        'videoCall/SET_GROUP_CHAT_UNREAD': jest.fn(),
+        'videoCall/SET_LAST_CHAT_TAB': setLastChatTab,
+        'videoCall/SET_PAGE_BARS': setPageBars,
         'chat/SET_OPEN_CHAT': showChat,
       },
     }),
     setMinimized,
     close,
     setStorePhase,
+    showChat,
+    setChatRoomId,
+    setLastChatTab,
+    setPageBars,
   }
 }
 
@@ -202,13 +230,13 @@ describe('VideoCall', () => {
     })
   })
 
-  describe('modeClass / isFullscreen / isPreJoinModal', () => {
+  describe('modeClass / isMaximized / isPreJoinModal', () => {
     it('reports modal during prejoin', () => {
       const { wrapper } = factory({ show: true })
       wrapper.setData({ phase: 'prejoin' })
       expect(wrapper.vm.isPreJoinModal).toBe(true)
       expect(wrapper.vm.modeClass).toBe('video-call--modal')
-      expect(wrapper.vm.isFullscreen).toBe(false)
+      expect(wrapper.vm.isMaximized).toBe(false)
     })
 
     it('reports maximized when in-call and not minimized', () => {
@@ -295,9 +323,37 @@ describe('VideoCall', () => {
   })
 
   describe('toggleChat', () => {
-    it('opens chat for this group when not yet open', () => {
+    const { selectChatTab } = VideoCall.methods
+
+    it('opens the conference chat of the call when not yet open', () => {
       const setShowChat = jest.fn()
-      const ctx = { chatOpenForThisGroup: false, groupId: 'g1', setShowChat }
+      const ctx = {
+        chatOpenForThisCall: false,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        lastChatTab: 'call',
+        setShowChat,
+        selectChatTab,
+      }
+      VideoCall.methods.toggleChat.call(ctx)
+      expect(setShowChat).toHaveBeenCalledWith({
+        showChat: true,
+        chatUserId: null,
+        groupId: null,
+        roomId: 'room-1',
+      })
+    })
+
+    it('opens the chat that was looked at last', () => {
+      const setShowChat = jest.fn()
+      const ctx = {
+        chatOpenForThisCall: false,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        lastChatTab: 'group',
+        setShowChat,
+        selectChatTab,
+      }
       VideoCall.methods.toggleChat.call(ctx)
       expect(setShowChat).toHaveBeenCalledWith({
         showChat: true,
@@ -306,9 +362,27 @@ describe('VideoCall', () => {
       })
     })
 
-    it('closes chat when already open for this group', () => {
+    it('opens the chat of the group while the call has no conference chat', () => {
       const setShowChat = jest.fn()
-      const ctx = { chatOpenForThisGroup: true, groupId: 'g1', setShowChat }
+      const ctx = {
+        chatOpenForThisCall: false,
+        groupId: 'g1',
+        chatRoomId: null,
+        lastChatTab: 'call',
+        setShowChat,
+        selectChatTab,
+      }
+      VideoCall.methods.toggleChat.call(ctx)
+      expect(setShowChat).toHaveBeenCalledWith({
+        showChat: true,
+        chatUserId: null,
+        groupId: 'g1',
+      })
+    })
+
+    it('closes chat when already open for this call', () => {
+      const setShowChat = jest.fn()
+      const ctx = { chatOpenForThisCall: true, groupId: 'g1', setShowChat }
       VideoCall.methods.toggleChat.call(ctx)
       expect(setShowChat).toHaveBeenCalledWith({
         showChat: false,
@@ -407,7 +481,7 @@ describe('VideoCall', () => {
     })
 
     it('gives the whole stage to the single tile of the parked window', () => {
-      const ctx = { stageWidth: 355, stageHeight: 200, isFullscreen: false, spotlightTile: null }
+      const ctx = { stageWidth: 355, stageHeight: 200, isMaximized: false, spotlightTile: null }
       expect(VideoCall.computed.cellSize.call(ctx)).toEqual({ width: 355, height: 200 })
     })
 
@@ -415,7 +489,7 @@ describe('VideoCall', () => {
       const ctx = {
         stageWidth: 1600,
         stageHeight: 900,
-        isFullscreen: true,
+        isMaximized: true,
         spotlightTile: { key: 'a' },
       }
       expect(VideoCall.computed.cellSize.call(ctx)).toEqual({ width: 1600, height: 900 })
@@ -425,7 +499,7 @@ describe('VideoCall', () => {
       const ctx = {
         stageWidth: 1600,
         stageHeight: 900,
-        isFullscreen: true,
+        isMaximized: true,
         spotlightTile: null,
         gridDimensions: { columns: 2, rows: 2 },
       }
@@ -524,19 +598,62 @@ describe('VideoCall', () => {
   })
 
   describe('button labels and tooltips', () => {
-    it('names each control after its current effect', () => {
+    it('names on each control what it is about, whatever its state', () => {
       const { wrapper } = factory({ show: true, groupId: 'g1' })
+      const labels = () => [
+        wrapper.vm.micLabel,
+        wrapper.vm.cameraLabel,
+        wrapper.vm.screenShareLabel,
+        wrapper.vm.chatLabel,
+        wrapper.vm.leaveLabel,
+      ]
+      const expected = [
+        'videoCall.controls.microphone',
+        'videoCall.controls.camera',
+        'videoCall.controls.screen',
+        'videoCall.controls.chat',
+        'videoCall.controls.leave',
+      ]
       wrapper.setData({ micEnabled: true, cameraEnabled: true, screenShareEnabled: false })
-      expect(wrapper.vm.micLabel).toBe('videoCall.muteMic')
-      expect(wrapper.vm.cameraLabel).toBe('videoCall.disableCamera')
-      expect(wrapper.vm.screenShareLabel).toBe('videoCall.startScreenShare')
-      expect(wrapper.vm.chatLabel).toBe('videoCall.openChat')
-      expect(wrapper.vm.leaveLabel).toBe('videoCall.leave')
-
+      expect(labels()).toEqual(expected)
       wrapper.setData({ micEnabled: false, cameraEnabled: false, screenShareEnabled: true })
-      expect(wrapper.vm.micLabel).toBe('videoCall.unmuteMic')
-      expect(wrapper.vm.cameraLabel).toBe('videoCall.enableCamera')
-      expect(wrapper.vm.screenShareLabel).toBe('videoCall.stopScreenShare')
+      expect(labels()).toEqual(expected)
+    })
+
+    it('says what a click does, for which device', async () => {
+      const { wrapper } = factory({ show: true, groupId: 'g1' })
+      await wrapper.setData({
+        knownDevices: [
+          { kind: 'audioinput', deviceId: 'mic-1', label: 'Headset' },
+          { kind: 'videoinput', deviceId: 'cam-1', label: 'Webcam' },
+        ],
+        micEnabled: true,
+        cameraEnabled: false,
+      })
+      expect(wrapper.vm.micAction).toBe('videoCall.controls.turnOff:{"device":"Headset"}')
+      expect(wrapper.vm.cameraAction).toBe('videoCall.controls.turnOn:{"device":"Webcam"}')
+    })
+
+    it('names the kind of device where the browser has not named it', () => {
+      const { wrapper } = factory({ show: true, groupId: 'g1' })
+      wrapper.setData({ micEnabled: false })
+      expect(wrapper.vm.micAction).toBe(
+        'videoCall.controls.turnOn:{"device":"videoCall.controls.microphone"}',
+      )
+    })
+
+    it('says what is shared when offering to stop', async () => {
+      const { wrapper } = factory({ show: true, groupId: 'g1' })
+      expect(wrapper.vm.screenShareAction).toBe('videoCall.controls.startSharing')
+      await wrapper.setData({ screenShareEnabled: true, screenShareSurface: 'window' })
+      expect(wrapper.vm.screenShareAction).toBe(
+        'videoCall.controls.stopSharing:{"surface":"videoCall.controls.surface.window"}',
+      )
+      // The browser did not tell: the screen.
+      await wrapper.setData({ screenShareSurface: null })
+      expect(wrapper.vm.screenShareAction).toBe(
+        'videoCall.controls.stopSharing:{"surface":"videoCall.controls.surface.monitor"}',
+      )
     })
 
     it('labels the header buttons by call state', () => {
@@ -551,25 +668,35 @@ describe('VideoCall', () => {
       expect(open.wrapper.vm.closeLabel).toBe('videoCall.prejoin.cancel')
     })
 
-    it('shows the chat button as closing while that chat is open', () => {
+    it('offers to close the chat while that chat is open', () => {
       const { wrapper } = factory({
         show: true,
         groupId: 'g1',
         chat: { showChat: true, chatUserId: null, groupId: 'g1' },
       })
-      expect(wrapper.vm.chatLabel).toBe('videoCall.closeChat')
+      expect(wrapper.vm.chatAction).toBe('videoCall.closeChat')
+      expect(wrapper.vm.leaveAction).toBe('videoCall.leave')
     })
 
-    it('tooltips only the buttons that lost their caption', () => {
+    it('tooltips every control with what a click does, as plain text', () => {
+      const { wrapper } = factory({ show: true, minimized: false })
+      wrapper.setData({ phase: 'in-call' })
+      expect(wrapper.vm.controlTooltip('<b>Headset</b>: turn off')).toEqual({
+        content: '<b>Headset</b>: turn off',
+        html: false,
+      })
+    })
+
+    it("tooltips only the device settings button's caption once it is gone", () => {
       const { wrapper } = factory({ show: true, minimized: true })
       wrapper.setData({ phase: 'in-call' })
       expect(wrapper.vm.iconOnly).toBe(true)
-      expect(wrapper.vm.iconOnlyTooltip('Mute')).toBe('Mute')
+      expect(wrapper.vm.iconOnlyTooltip('Devices')).toBe('Devices')
 
       const open = factory({ show: true, minimized: false })
       open.wrapper.setData({ phase: 'in-call' })
       // Caption is right there next to the icon — a tooltip would just repeat it.
-      expect(open.wrapper.vm.iconOnlyTooltip('Mute')).toBe('')
+      expect(open.wrapper.vm.iconOnlyTooltip('Devices')).toBe('')
     })
   })
 
@@ -769,7 +896,7 @@ describe('VideoCall', () => {
       expect(wrapper.vm.spotlightKey).toBe('a')
     })
 
-    it('is a no-op when not fullscreen', () => {
+    it('is a no-op when not maximized', () => {
       const { wrapper } = factory({ show: true, minimized: true })
       wrapper.setData({ phase: 'in-call', spotlightKey: 'a' })
       wrapper.vm.onTileSelect({ key: 'b' })
@@ -1281,7 +1408,7 @@ describe('VideoCall', () => {
       expect(wrapper.vm.phase).toBe('error')
     })
 
-    it('toasts and closes instead of erroring full screen when parked mid-handshake', async () => {
+    it('toasts and closes instead of erroring maximized when parked mid-handshake', async () => {
       // The user navigated away while the handshake was still running, so the
       // window is minimized. The error phase would blow it back up to full
       // screen over the page they moved to.
@@ -1372,6 +1499,40 @@ describe('VideoCall', () => {
       it('enableAudio is a no-op without a room', async () => {
         const { wrapper } = factory({ show: true })
         await expect(wrapper.vm.enableAudio()).resolves.toBeUndefined()
+      })
+    })
+
+    describe('one speaker missing for one listener', () => {
+      it('is watched for as soon as the call runs', async () => {
+        const { wrapper, room } = await connected()
+        const watchdog = wrapper.vm.audioWatchdog
+        expect(watchdog.opts.room).toBe(room)
+        expect(watchdog.start).toHaveBeenCalled()
+      })
+
+      it('is not watched for while reconnecting', async () => {
+        const { wrapper, room } = await connected()
+        const { isPaused } = wrapper.vm.audioWatchdog.opts
+        expect(isPaused()).toBe(false)
+        room.handlers.Reconnecting()
+        expect(isPaused()).toBe(true)
+      })
+
+      it('is no longer watched for once the call is over', async () => {
+        const { wrapper } = await connected()
+        const watchdog = wrapper.vm.audioWatchdog
+        await wrapper.vm.cleanup()
+        expect(watchdog.stop).toHaveBeenCalled()
+        expect(wrapper.vm.audioWatchdog).toBeNull()
+      })
+
+      it('is watched for by the new room only after a retry', async () => {
+        const { wrapper } = await connected()
+        const first = wrapper.vm.audioWatchdog
+        await wrapper.vm.retryConnect()
+        expect(first.stop).toHaveBeenCalled()
+        expect(wrapper.vm.audioWatchdog).not.toBe(first)
+        expect(wrapper.vm.audioWatchdog.opts.room).toBe(wrapper.vm.room)
       })
     })
 
@@ -2314,16 +2475,16 @@ describe('VideoCall', () => {
         const { wrapper } = await connected()
         const button = (label) =>
           wrapper.findAll('.stub-button').wrappers.find((b) => b.attributes('aria-label') === label)
-        expect(button('videoCall.muteMic').attributes('loading')).toBeUndefined()
-        expect(button('videoCall.disableCamera').attributes('loading')).toBeUndefined()
+        expect(button(wrapper.vm.micAction).attributes('loading')).toBeUndefined()
+        expect(button(wrapper.vm.cameraAction).attributes('loading')).toBeUndefined()
 
         await starting(wrapper, { videoinput: 1 })
-        expect(button('videoCall.disableCamera').attributes('loading')).toBe('true')
-        expect(button('videoCall.muteMic').attributes('loading')).toBeUndefined()
+        expect(button(wrapper.vm.cameraAction).attributes('loading')).toBe('true')
+        expect(button(wrapper.vm.micAction).attributes('loading')).toBeUndefined()
 
         await starting(wrapper, { audioinput: 1 })
-        expect(button('videoCall.muteMic').attributes('loading')).toBe('true')
-        expect(button('videoCall.disableCamera').attributes('loading')).toBeUndefined()
+        expect(button(wrapper.vm.micAction).attributes('loading')).toBe('true')
+        expect(button(wrapper.vm.cameraAction).attributes('loading')).toBeUndefined()
       })
 
       it('shows it in the device settings', async () => {
@@ -2455,17 +2616,24 @@ describe('VideoCall', () => {
     const apolloResolving = () => ({
       mutate: jest.fn().mockResolvedValue({ data: { joinGroupVideoCall: payload } }),
     })
+    // Once connected, the call also asks for its conference chat — only the requests for a
+    // join token count here.
+    const tokenRequests = (apollo) =>
+      apollo.mutate.mock.calls.filter(
+        ([{ mutation }]) =>
+          mutation.definitions[0].selectionSet.selections[0].name.value === 'joinGroupVideoCall',
+      ).length
 
     it('asks for the token as soon as the dialog opens and joins with it', async () => {
       const apollo = apolloResolving()
       const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
       await flushPromises()
-      expect(apollo.mutate).toHaveBeenCalledTimes(1)
+      expect(tokenRequests(apollo)).toBe(1)
       expect(apollo.mutate.mock.calls[0][0].variables).toEqual({ groupId: 'g1' })
 
       await wrapper.vm.connect()
       // The click only opens the socket — no second round trip.
-      expect(apollo.mutate).toHaveBeenCalledTimes(1)
+      expect(tokenRequests(apollo)).toBe(1)
       expect(wrapper.vm.room.connect).toHaveBeenCalledWith('ws://lk', 'tok', expect.any(Object))
       expect(wrapper.vm.phase).toBe('in-call')
     })
@@ -2484,7 +2652,7 @@ describe('VideoCall', () => {
       await flushPromises()
       resolve({ data: { joinGroupVideoCall: payload } })
       await joining
-      expect(apollo.mutate).toHaveBeenCalledTimes(1)
+      expect(tokenRequests(apollo)).toBe(1)
       expect(wrapper.vm.phase).toBe('in-call')
     })
 
@@ -2496,7 +2664,7 @@ describe('VideoCall', () => {
         await flushPromises()
         now.mockReturnValue(1_000_000 + 60_000)
         await wrapper.vm.connect()
-        expect(apollo.mutate).toHaveBeenCalledTimes(2)
+        expect(tokenRequests(apollo)).toBe(2)
       } finally {
         now.mockRestore()
       }
@@ -2512,7 +2680,7 @@ describe('VideoCall', () => {
       const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
       await flushPromises()
       await wrapper.vm.connect()
-      expect(apollo.mutate).toHaveBeenCalledTimes(2)
+      expect(tokenRequests(apollo)).toBe(2)
       expect(wrapper.vm.error).toBe('join failed')
     })
 
@@ -2522,7 +2690,7 @@ describe('VideoCall', () => {
       await flushPromises()
       await wrapper.vm.connect()
       await wrapper.vm.retryConnect()
-      expect(apollo.mutate).toHaveBeenCalledTimes(2)
+      expect(tokenRequests(apollo)).toBe(2)
     })
 
     it('never hands out a token fetched for another group', async () => {
@@ -2530,7 +2698,7 @@ describe('VideoCall', () => {
       const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
       await flushPromises()
       await wrapper.vm.takeJoinPayload('g2')
-      expect(apollo.mutate).toHaveBeenCalledTimes(2)
+      expect(tokenRequests(apollo)).toBe(2)
       expect(apollo.mutate.mock.calls[1][0].variables).toEqual({ groupId: 'g2' })
     })
 
@@ -2965,13 +3133,1095 @@ describe('VideoCall', () => {
   })
 
   describe('computed edge cases', () => {
-    it('chatOpenForThisGroup matches the active group chat', () => {
+    it('activeChatTab matches the active group chat', () => {
       const { wrapper } = factory({
         show: true,
         groupId: 'g1',
         chat: { showChat: true, chatUserId: null, groupId: 'g1' },
       })
-      expect(wrapper.vm.chatOpenForThisGroup).toBe(true)
+      expect(wrapper.vm.activeChatTab).toBe('group')
+      expect(wrapper.vm.chatOpenForThisCall).toBe(true)
+    })
+
+    it('activeChatTab matches the conference chat of the call', () => {
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        chat: { showChat: true, chatUserId: null, groupId: null, roomId: 'room-1' },
+      })
+      expect(wrapper.vm.activeChatTab).toBe('call')
+      expect(wrapper.vm.chatOpenForThisCall).toBe(true)
+    })
+
+    it('activeChatTab is null for a chat that is not of this call', () => {
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        chat: { showChat: true, chatUserId: null, groupId: 'g2', roomId: null },
+      })
+      expect(wrapper.vm.activeChatTab).toBeNull()
+      expect(wrapper.vm.chatOpenForThisCall).toBe(false)
+    })
+
+    it('chatButtonUnread is silent while the conference chat is on screen', () => {
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        conferenceUnread: 3,
+        chat: { showChat: true, chatUserId: null, groupId: null, roomId: 'room-1' },
+      })
+      expect(wrapper.vm.chatButtonUnread).toBe(0)
+    })
+
+    it('chatButtonUnread adds up both chats while neither is on screen', () => {
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        conferenceUnread: 3,
+        groupChatUnread: 4,
+      })
+      expect(wrapper.vm.chatButtonUnread).toBe(7)
+    })
+
+    it('chatButtonUnread leaves out the chat that is on screen', () => {
+      const unread = { conferenceUnread: 3, groupChatUnread: 4 }
+      const callOpen = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        ...unread,
+        chat: { showChat: true, chatUserId: null, groupId: null, roomId: 'room-1' },
+      })
+      expect(callOpen.wrapper.vm.chatButtonUnread).toBe(4)
+
+      const groupOpen = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        ...unread,
+        chat: { showChat: true, chatUserId: null, groupId: 'g1', roomId: null },
+      })
+      expect(groupOpen.wrapper.vm.chatButtonUnread).toBe(3)
+    })
+
+    it('chatButtonUnread shows the unread count while another chat or none is open', () => {
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        chatRoomId: 'room-1',
+        conferenceUnread: 3,
+      })
+      expect(wrapper.vm.chatButtonUnread).toBe(3)
+    })
+  })
+
+  describe('bars on the videos', () => {
+    const { computed } = VideoCall
+
+    it('lie on the videos with the call maximized on a phone', () => {
+      expect(
+        computed.barsOverlay.call({ isMaximized: true, isMobile: true, mobileChatOpen: false }),
+      ).toBe(true)
+    })
+
+    it('lie on the videos in fullscreen on a desktop as well', () => {
+      expect(
+        computed.barsOverlay.call({
+          isMaximized: true,
+          isMobile: false,
+          inFullscreen: true,
+          mobileChatOpen: false,
+        }),
+      ).toBe(true)
+    })
+
+    it('stay where they are with the chat open on a phone, on a desktop, in the parked window and before joining', () => {
+      const overlay = (ctx) =>
+        computed.barsOverlay.call({ isMobile: true, inFullscreen: false, ...ctx })
+      expect(overlay({ isMaximized: true, mobileChatOpen: true })).toBe(false)
+      expect(overlay({ isMaximized: true, isMobile: false, mobileChatOpen: false })).toBe(false)
+      expect(overlay({ isMaximized: false, mobileChatOpen: false })).toBe(false)
+    })
+
+    it('move only when asked to around the maximized call on a desktop', () => {
+      const manual = (ctx) =>
+        computed.barsManual.call({
+          isMaximized: true,
+          isMobile: false,
+          inFullscreen: false,
+          phase: 'in-call',
+          error: null,
+          ...ctx,
+        })
+      expect(manual({})).toBe(true)
+      expect(manual({ isMobile: true })).toBe(false)
+      expect(manual({ isMaximized: false })).toBe(false)
+      expect(manual({ inFullscreen: true })).toBe(false)
+      expect(manual({ phase: 'connecting' })).toBe(false)
+      expect(manual({ error: 'broken' })).toBe(false)
+    })
+
+    it('tell the page what its header and footer are to do', () => {
+      const page = (ctx) =>
+        computed.pageBars.call({ barsOverlay: false, barsManual: false, ...ctx })
+      expect(page({ barsHidden: true, barsCollapsed: true })).toBe('normal')
+      expect(page({ barsOverlay: true, barsHidden: false })).toBe('overlay')
+      expect(page({ barsOverlay: true, barsHidden: true })).toBe('hidden')
+      expect(page({ barsManual: true, barsCollapsed: false })).toBe('manual')
+      expect(page({ barsManual: true, barsCollapsed: true })).toBe('collapsed')
+      // In fullscreen they stay away, also where the bars lie in no overlay (chat open on a phone).
+      expect(page({ inFullscreen: true, barsHidden: false })).toBe('hidden')
+    })
+
+    describe('on a desktop', () => {
+      const maximizedCall = async () => {
+        const built = factory({ show: true, minimized: false })
+        await built.wrapper.setData({ phase: 'in-call' })
+        return built
+      }
+
+      it('stand solid around the videos, with a button to move them away', async () => {
+        const { wrapper } = await maximizedCall()
+        const call = wrapper.find('.video-call')
+        expect(call.classes()).toContain('video-call--bars-manual')
+        expect(call.classes()).not.toContain('video-call--bars-overlay')
+        expect(wrapper.find('[data-test="video-call-hide-bars"]').exists()).toBe(true)
+        expect(wrapper.find('[data-test="video-call-show-bars"]').exists()).toBe(false)
+      })
+
+      it('do not move by themselves', async () => {
+        jest.useFakeTimers()
+        try {
+          const { wrapper } = await maximizedCall()
+          jest.advanceTimersByTime(10000)
+          expect(wrapper.find('.video-call').classes()).not.toContain('video-call--bars-collapsed')
+          expect(wrapper.vm.barsHidden).toBe(false)
+        } finally {
+          jest.useRealTimers()
+        }
+      })
+
+      it('move away at the button and come back at the one left on the videos', async () => {
+        const { wrapper, setPageBars } = await maximizedCall()
+        await wrapper.find('[data-test="video-call-hide-bars"]').trigger('click')
+        expect(wrapper.find('.video-call').classes()).toContain('video-call--bars-collapsed')
+        expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'collapsed')
+        await wrapper.find('[data-test="video-call-show-bars"]').trigger('click')
+        expect(wrapper.find('.video-call').classes()).not.toContain('video-call--bars-collapsed')
+        expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'manual')
+      })
+
+      it('are back for the next call', async () => {
+        const { wrapper } = await maximizedCall()
+        await wrapper.setData({ barsCollapsed: true })
+        // The `show` watcher sees a call opened anew.
+        wrapper.vm.$options.watch.show.handler.call(wrapper.vm, true, false)
+        expect(wrapper.vm.barsCollapsed).toBe(false)
+      })
+    })
+
+    describe('during a call', () => {
+      let wrapper
+      let setPageBars
+      let chatEl
+
+      const move = (target = document, clientY = 300) =>
+        target.dispatchEvent(new MouseEvent('mousemove', { clientY, bubbles: true }))
+
+      // On a phone, where they move by themselves.
+      beforeEach(async () => {
+        jest.useFakeTimers()
+        ;({ wrapper, setPageBars } = factory({ show: true, minimized: false }))
+        await wrapper.setData({ phase: 'in-call', windowWidth: 400 })
+        chatEl = document.createElement('div')
+        chatEl.className = 'video-call__sidebar'
+        chatEl.appendChild(document.createElement('textarea'))
+        document.body.appendChild(chatEl)
+      })
+
+      afterEach(() => {
+        wrapper.destroy()
+        chatEl.remove()
+        jest.useRealTimers()
+      })
+
+      it('move out of the way once the mouse has rested for 4 seconds', async () => {
+        expect(wrapper.find('.video-call').classes()).toContain('video-call--bars-overlay')
+        jest.advanceTimersByTime(3999)
+        expect(wrapper.vm.barsHidden).toBe(false)
+        jest.advanceTimersByTime(1)
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.barsHidden).toBe(true)
+        expect(wrapper.find('.video-call').classes()).toContain('video-call--bars-hidden')
+        expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'hidden')
+      })
+
+      it('come back when the mouse moves, and wait for it to rest again', () => {
+        jest.advanceTimersByTime(4000)
+        move()
+        expect(wrapper.vm.barsHidden).toBe(false)
+        jest.advanceTimersByTime(3000)
+        move()
+        jest.advanceTimersByTime(3000)
+        expect(wrapper.vm.barsHidden).toBe(false)
+        jest.advanceTimersByTime(1000)
+        expect(wrapper.vm.barsHidden).toBe(true)
+      })
+
+      it('do not come back for reading and writing in the chat', () => {
+        jest.advanceTimersByTime(4000)
+        move(chatEl.firstChild)
+        chatEl.firstChild.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true }))
+        expect(wrapper.vm.barsHidden).toBe(true)
+      })
+
+      it("come back from the chat when the mouse goes to the window's edge", () => {
+        jest.advanceTimersByTime(4000)
+        move(chatEl.firstChild, 10)
+        expect(wrapper.vm.barsHidden).toBe(false)
+      })
+
+      it('stay while the device settings are open', async () => {
+        await wrapper.setData({ showDeviceSettings: true })
+        jest.advanceTimersByTime(8000)
+        expect(wrapper.vm.barsHidden).toBe(false)
+        await wrapper.setData({ showDeviceSettings: false })
+        jest.advanceTimersByTime(4000)
+        expect(wrapper.vm.barsHidden).toBe(true)
+      })
+
+      it('stay while a menu of the page header is open', () => {
+        const menu = document.createElement('div')
+        menu.className = 'tooltip popover'
+        menu.setAttribute('aria-hidden', 'false')
+        document.body.appendChild(menu)
+        jest.advanceTimersByTime(8000)
+        expect(wrapper.vm.barsHidden).toBe(false)
+        menu.remove()
+      })
+
+      it('are back, and no longer watched for, once the call is parked', async () => {
+        jest.advanceTimersByTime(4000)
+        await wrapper.setData({ phase: 'connecting' })
+        expect(wrapper.vm.barsHidden).toBe(false)
+        await wrapper.setData({ phase: 'in-call' })
+        await wrapper.setData({ error: 'broken' })
+        jest.advanceTimersByTime(4000)
+        expect(wrapper.vm.barsHidden).toBe(false)
+      })
+
+      describe('on a touch screen', () => {
+        // The call is not attached to the document here, so what lands on its videos is
+        // handed to the listener directly, as the document would.
+        const tap = (target) =>
+          wrapper.vm.onBarActivity({ type: 'pointerdown', pointerType: 'touch', target })
+        let stage
+        let tile
+
+        beforeEach(() => {
+          stage = wrapper.find('.video-call__stage').element
+          tile = document.createElement('div')
+          tile.className = 'video-tile'
+          stage.appendChild(tile)
+        })
+
+        it('are switched away by a tap beside the tiles, and back by the next', () => {
+          tap(stage)
+          expect(wrapper.vm.barsHidden).toBe(true)
+          tap(stage)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          jest.advanceTimersByTime(4000)
+          expect(wrapper.vm.barsHidden).toBe(true)
+        })
+
+        it('come back at a tap on a tile, which then is not spotlighted', () => {
+          jest.advanceTimersByTime(4000)
+          tap(tile)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          wrapper.vm.onTileSelect({ key: 'anna' })
+          expect(wrapper.vm.spotlightKey).toBeNull()
+        })
+
+        it('stay at a tap on a tile, which is spotlighted as ever', () => {
+          tap(tile)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          wrapper.vm.onTileSelect({ key: 'anna' })
+          expect(wrapper.vm.spotlightKey).toBe('anna')
+        })
+
+        it('hear a tap through the document', () => {
+          // The call is not attached to the document, so a stage of its own is.
+          const attachedStage = document.createElement('div')
+          attachedStage.className = 'video-call__stage'
+          document.body.appendChild(attachedStage)
+          const touch = () => {
+            const event = new Event('pointerdown', { bubbles: true })
+            Object.defineProperty(event, 'pointerType', { value: 'touch' })
+            attachedStage.dispatchEvent(event)
+          }
+          touch()
+          expect(wrapper.vm.barsHidden).toBe(true)
+          touch()
+          expect(wrapper.vm.barsHidden).toBe(false)
+          attachedStage.remove()
+        })
+
+        it('come back at a key pressed right after a tap', () => {
+          tap(stage)
+          expect(wrapper.vm.barsHidden).toBe(true)
+          document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true }))
+          expect(wrapper.vm.barsHidden).toBe(false)
+        })
+
+        it('spotlight a tile clicked with the mouse after a tap beside the tiles', () => {
+          jest.advanceTimersByTime(4000)
+          tap(stage)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          wrapper.vm.onBarActivity({ type: 'pointerdown', pointerType: 'mouse', target: tile })
+          wrapper.vm.onTileSelect({ key: 'anna' })
+          expect(wrapper.vm.spotlightKey).toBe('anna')
+        })
+
+        it('ignore the mouse events the browser makes up after a tap', () => {
+          tap(stage)
+          move()
+          wrapper.vm.onBarActivity({ type: 'focusin', target: tile })
+          expect(wrapper.vm.barsHidden).toBe(true)
+          jest.advanceTimersByTime(800)
+          move()
+          expect(wrapper.vm.barsHidden).toBe(false)
+        })
+
+        it("stay while the page's menu is open", () => {
+          const menu = document.createElement('div')
+          menu.className = 'mobil-header-box--open'
+          document.body.appendChild(menu)
+          jest.advanceTimersByTime(8000)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          menu.remove()
+        })
+      })
+
+      it("leave the page's header and footer as they were when the call goes", () => {
+        wrapper.destroy()
+        expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'normal')
+      })
+    })
+  })
+
+  describe('fullscreen', () => {
+    let fullscreenElement
+    const fullscreenChanged = () => document.dispatchEvent(new Event('fullscreenchange'))
+
+    beforeEach(() => {
+      fullscreenElement = null
+      Object.defineProperty(document, 'fullscreenEnabled', { value: true, configurable: true })
+      Object.defineProperty(document, 'fullscreenElement', {
+        get: () => fullscreenElement,
+        configurable: true,
+      })
+      document.documentElement.requestFullscreen = jest.fn(async () => {
+        fullscreenElement = document.documentElement
+        fullscreenChanged()
+      })
+      document.exitFullscreen = jest.fn(async () => {
+        fullscreenElement = null
+        fullscreenChanged()
+      })
+    })
+
+    afterEach(() => {
+      delete document.fullscreenEnabled
+      delete document.fullscreenElement
+      delete document.documentElement.requestFullscreen
+      delete document.exitFullscreen
+    })
+
+    const maximizedCall = async () => {
+      const built = factory({ show: true, minimized: false })
+      await built.wrapper.setData({ phase: 'in-call' })
+      return built
+    }
+    const button = (wrapper) => wrapper.find('[data-test="video-call-fullscreen"]')
+
+    it('is offered for the maximized call on a desktop', async () => {
+      const { wrapper } = await maximizedCall()
+      expect(button(wrapper).exists()).toBe(true)
+      expect(wrapper.vm.fullscreenLabel).toBe('videoCall.enterFullscreen')
+    })
+
+    it('is offered on a phone whose browser can, and keeps the page header away', async () => {
+      const { wrapper, setPageBars } = await maximizedCall()
+      await wrapper.setData({ windowWidth: 400 })
+      expect(wrapper.vm.isMobile).toBe(true)
+      expect(button(wrapper).exists()).toBe(true)
+      await wrapper.vm.toggleFullscreen()
+      await wrapper.setData({ barsHidden: false })
+      expect(wrapper.vm.pageBars).toBe('hidden')
+      expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'hidden')
+    })
+
+    it('is not offered where the browser cannot, nor before joining', async () => {
+      const { wrapper } = await maximizedCall()
+      await wrapper.setData({ canFullscreen: false })
+      expect(button(wrapper).exists()).toBe(false)
+      await wrapper.setData({ canFullscreen: true, phase: 'prejoin' })
+      expect(button(wrapper).exists()).toBe(false)
+    })
+
+    it('puts the whole page in fullscreen, and keeps its header and footer away', async () => {
+      const { wrapper, setPageBars } = await maximizedCall()
+      await button(wrapper).trigger('click')
+      await wrapper.vm.$nextTick()
+      expect(document.documentElement.requestFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(true)
+      expect(wrapper.vm.fullscreenLabel).toBe('videoCall.exitFullscreen')
+      expect(wrapper.find('.video-call').classes()).toContain('video-call--fullscreen')
+      expect(setPageBars).toHaveBeenLastCalledWith(expect.anything(), 'hidden')
+    })
+
+    it('ends at a second click', async () => {
+      const { wrapper } = await maximizedCall()
+      await wrapper.vm.toggleFullscreen()
+      await wrapper.vm.toggleFullscreen()
+      expect(document.exitFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+
+    it('follows the browser ending it (Esc)', async () => {
+      const { wrapper } = await maximizedCall()
+      await wrapper.vm.toggleFullscreen()
+      fullscreenElement = null
+      fullscreenChanged()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+
+    it('ends when the call is parked', async () => {
+      // Reactive, so that parking the call reaches the store's getter.
+      const state = Vue.observable({ show: true, minimized: false })
+      const { wrapper } = factory(state)
+      await wrapper.setData({ phase: 'in-call' })
+      await wrapper.vm.toggleFullscreen()
+      state.minimized = true
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.isMaximized).toBe(false)
+      expect(document.exitFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+
+    it('ends when the call is connecting anew', async () => {
+      const { wrapper } = await maximizedCall()
+      await wrapper.vm.toggleFullscreen()
+      await wrapper.setData({ phase: 'connecting' })
+      expect(document.exitFullscreen).toHaveBeenCalled()
+    })
+
+    it('ends again when the call was parked while the browser was still entering it', async () => {
+      const { wrapper } = await maximizedCall()
+      let enter
+      document.documentElement.requestFullscreen = jest.fn(
+        () =>
+          new Promise((resolve) => {
+            enter = () => {
+              fullscreenElement = document.documentElement
+              fullscreenChanged()
+              resolve()
+            }
+          }),
+      )
+      const entering = wrapper.vm.toggleFullscreen()
+      await wrapper.setData({ phase: 'connecting' })
+      expect(document.exitFullscreen).not.toHaveBeenCalled()
+      enter()
+      await entering
+      expect(document.exitFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+
+    it('ends again when the call was gone from the page while the browser was still entering it', async () => {
+      const { wrapper } = await maximizedCall()
+      let enter
+      document.documentElement.requestFullscreen = jest.fn(
+        () =>
+          new Promise((resolve) => {
+            enter = () => {
+              fullscreenElement = document.documentElement
+              fullscreenChanged()
+              resolve()
+            }
+          }),
+      )
+      // A call being left: the media server has yet to confirm the disconnect, so leaving
+      // has not reset the call's phase when the browser reports fullscreen.
+      wrapper.vm.room = { localParticipant: null, disconnect: () => new Promise(() => {}) }
+      const entering = wrapper.vm.toggleFullscreen()
+      wrapper.destroy()
+      expect(document.exitFullscreen).not.toHaveBeenCalled()
+      enter()
+      await entering
+      expect(document.exitFullscreen).toHaveBeenCalled()
+      expect(fullscreenElement).toBe(null)
+    })
+
+    it('neither takes nor ends the fullscreen of something else on the page', async () => {
+      const { wrapper } = await maximizedCall()
+      fullscreenElement = document.createElement('video')
+      fullscreenChanged()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+      wrapper.vm.exitFullscreen()
+      expect(document.exitFullscreen).not.toHaveBeenCalled()
+      await wrapper.vm.toggleFullscreen()
+      expect(document.documentElement.requestFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(true)
+    })
+
+    it('stays as it is when the browser refuses', async () => {
+      const { wrapper } = await maximizedCall()
+      document.documentElement.requestFullscreen = jest.fn(() => Promise.reject(new Error('no')))
+      await expect(wrapper.vm.toggleFullscreen()).resolves.toBeUndefined()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+  })
+
+  describe('bars of the parked window', () => {
+    const parkedCall = async () => {
+      const built = factory({ show: true, minimized: true })
+      await built.wrapper.setData({ phase: 'in-call' })
+      return built
+    }
+
+    it('lie on the videos, and the number of participants stays in their place', async () => {
+      const { wrapper } = await parkedCall()
+      expect(wrapper.find('.video-call').classes()).toContain('video-call--parked-bars')
+      expect(wrapper.find('[data-test="video-call-parked-count"]').exists()).toBe(true)
+    })
+
+    it('are held while the device settings are open', async () => {
+      const { wrapper } = await parkedCall()
+      expect(wrapper.find('.video-call').classes()).not.toContain('video-call--bars-held')
+      await wrapper.setData({ showDeviceSettings: true })
+      expect(wrapper.find('.video-call').classes()).toContain('video-call--bars-held')
+    })
+
+    it('are held while the mouse is on the window', async () => {
+      const { wrapper } = await parkedCall()
+      const call = wrapper.find('.video-call')
+      await call.trigger('mouseenter')
+      expect(call.classes()).toContain('video-call--bars-held')
+      await call.trigger('mouseleave')
+      expect(call.classes()).not.toContain('video-call--bars-held')
+    })
+
+    it('know whether they are drawn by Chromium, which slides them without blur', async () => {
+      const { wrapper } = await parkedCall()
+      expect(wrapper.find('.video-call').classes()).not.toContain('video-call--chromium')
+      Object.defineProperty(global.navigator, 'userAgentData', {
+        value: { brands: [{ brand: 'Chromium', version: '140' }] },
+        configurable: true,
+      })
+      try {
+        const chromium = await parkedCall()
+        expect(chromium.wrapper.find('.video-call').classes()).toContain('video-call--chromium')
+      } finally {
+        delete global.navigator.userAgentData
+      }
+    })
+
+    it('are not those of a maximized call', async () => {
+      const { wrapper } = factory({ show: true, minimized: false })
+      await wrapper.setData({ phase: 'in-call' })
+      expect(wrapper.find('.video-call').classes()).not.toContain('video-call--parked-bars')
+      expect(wrapper.find('[data-test="video-call-parked-count"]').exists()).toBe(false)
+    })
+  })
+
+  describe('chat on a phone', () => {
+    const { computed } = VideoCall
+    const tile = (overrides) => ({ isLocal: false, isScreen: false, ...overrides })
+    const me = tile({ key: 'me', identity: 'me', isLocal: true })
+    const anna = tile({ key: 'anna', identity: 'anna' })
+    const ben = tile({ key: 'ben', identity: 'ben' })
+    const bensScreen = tile({ key: 'ben-screen', identity: 'ben', isScreen: true })
+
+    it('shows the chat inside the call on a phone as well', () => {
+      const ctx = { phase: 'in-call', chatOpenForThisCall: true, parked: false }
+      expect(computed.showChatSidebar.call(ctx)).toBe(true)
+      expect(computed.mobileChatOpen.call({ isMobile: true, showChatSidebar: true })).toBe(true)
+      expect(computed.mobileChatOpen.call({ isMobile: false, showChatSidebar: true })).toBe(false)
+      expect(computed.mobileChatOpen.call({ isMobile: true, showChatSidebar: false })).toBe(false)
+    })
+
+    it('drops the labels of the controls on a phone, but not their size', () => {
+      const phone = { parked: false, isMobile: true, phase: 'in-call' }
+      expect(computed.iconOnly.call(phone)).toBe(true)
+      expect(VideoCall.methods.iconOnlyTooltip.call(phone, 'Mute')).toBe('')
+      expect(VideoCall.methods.controlTooltip.call(phone, 'Headset: turn off')).toBe('')
+    })
+
+    it('names a control by its visible label too, while it shows one', () => {
+      const name = (iconOnly, label, action) =>
+        VideoCall.methods.controlName.call({ iconOnly }, label, action)
+      expect(name(false, 'Microphone', 'Headset: turn off')).toBe('Microphone, Headset: turn off')
+      // Not twice where the action has it already.
+      expect(name(false, 'Microphone', 'Microphone: turn off')).toBe('Microphone: turn off')
+      expect(name(false, 'Screen', 'Share your screen, a window or a tab')).toBe(
+        'Share your screen, a window or a tab',
+      )
+      // Without a label to see, the action alone.
+      expect(name(true, 'Microphone', 'Headset: turn off')).toBe('Headset: turn off')
+    })
+
+    it('drops the labels in the parked window, and offers them as tooltips', () => {
+      const parkedWindow = { parked: true, isMobile: false, phase: 'in-call' }
+      expect(computed.iconOnly.call(parkedWindow)).toBe(true)
+      expect(VideoCall.methods.iconOnlyTooltip.call(parkedWindow, 'Mute')).toBe('Mute')
+    })
+
+    it('spells the controls out on a desktop with the call maximized', () => {
+      expect(
+        computed.iconOnly.call({
+          parked: false,
+          isMobile: false,
+          phase: 'in-call',
+          controlsCrowded: false,
+        }),
+      ).toBe(false)
+    })
+
+    it('drops the labels on a desktop where they would take a second row', () => {
+      const desktop = { parked: false, isMobile: false, phase: 'in-call', controlsCrowded: true }
+      expect(computed.iconOnly.call(desktop)).toBe(true)
+      const crowded = (controlsWidth, labeledControlsWidth, isMobile = false) =>
+        computed.controlsCrowded.call({ controlsWidth, labeledControlsWidth, isMobile })
+      expect(crowded(500, 640)).toBe(true)
+      expect(crowded(700, 640)).toBe(false)
+      // Not measured yet, or a phone, which has its own rule.
+      expect(crowded(500, 0)).toBe(false)
+      expect(crowded(0, 640)).toBe(false)
+      expect(crowded(500, 640, true)).toBe(false)
+    })
+
+    describe('measureControls', () => {
+      let getComputedStyleSpy
+
+      afterEach(() => {
+        getComputedStyleSpy?.mockRestore()
+      })
+
+      it('measures the control bar and what its labeled buttons need in one row', async () => {
+        const { wrapper } = factory({ show: true, minimized: false })
+        await wrapper.setData({ phase: 'in-call', windowWidth: 1200 })
+        const bar = wrapper.find('.video-call__controls').element
+        const items = Array.from(bar.children)
+        items.forEach((item) => Object.defineProperty(item, 'offsetWidth', { value: 100 }))
+        const width = (value) =>
+          Object.defineProperty(bar, 'clientWidth', { value, configurable: true })
+        getComputedStyleSpy = jest
+          .spyOn(window, 'getComputedStyle')
+          .mockReturnValue({ columnGap: '8px', paddingLeft: '10px', paddingRight: '10px' })
+        const needed = items.length * 100 + 8 * (items.length - 1) + 20
+
+        width(needed - 1)
+        wrapper.vm.measureControls()
+        expect(wrapper.vm.controlsWidth).toBe(needed - 1)
+        expect(wrapper.vm.labeledControlsWidth).toBe(needed)
+        expect(wrapper.vm.iconOnly).toBe(true)
+
+        width(needed + 100)
+        wrapper.vm.measureControls()
+        expect(wrapper.vm.controlsWidth).toBe(needed + 100)
+        expect(wrapper.vm.iconOnly).toBe(false)
+        wrapper.destroy()
+      })
+    })
+
+    it('never parks the call on a phone', () => {
+      expect(computed.parked.call({ phase: 'in-call', minimized: true, isMobile: true })).toBe(
+        false,
+      )
+      expect(computed.parked.call({ phase: 'in-call', minimized: true, isMobile: false })).toBe(
+        true,
+      )
+    })
+
+    it('keeps the chat out of the parked window', () => {
+      const ctx = { phase: 'in-call', chatOpenForThisCall: true, parked: true }
+      expect(computed.showChatSidebar.call(ctx)).toBe(false)
+    })
+
+    it('shrinks the stage to a single tile beside the chat', () => {
+      expect(computed.singleTile.call({ isMaximized: true, mobileChatOpen: true })).toBe(true)
+      expect(computed.singleTile.call({ isMaximized: true, mobileChatOpen: false })).toBe(false)
+      expect(computed.singleTile.call({ isMaximized: false, mobileChatOpen: false })).toBe(true)
+      expect(computed.stageLayoutClass.call({ singleTile: true, spotlightTile: anna })).toBe(
+        'video-call__single',
+      )
+      expect(computed.gridStyleConditional.call({ singleTile: true, gridStyle: {} })).toBeNull()
+    })
+
+    it('keeps the grid and the spotlight for the full stage', () => {
+      expect(computed.stageLayoutClass.call({ singleTile: false, spotlightTile: null })).toBe(
+        'video-call__grid',
+      )
+      expect(computed.stageLayoutClass.call({ singleTile: false, spotlightTile: anna })).toBe(
+        'video-call__stage--spotlight',
+      )
+    })
+
+    it('shows whoever spoke last, by their camera rather than their screen', () => {
+      const ctx = {
+        tiles: [me, anna, bensScreen, ben],
+        lastRemoteSpeakerId: 'ben',
+        primaryTile: anna,
+      }
+      expect(computed.speakerTile.call(ctx)).toBe(ben)
+    })
+
+    it('shows what the parked window would before anybody has spoken', () => {
+      const ctx = { tiles: [me, anna, ben], lastRemoteSpeakerId: null, primaryTile: anna }
+      expect(computed.speakerTile.call(ctx)).toBe(anna)
+    })
+
+    it('falls back when the last speaker has left', () => {
+      const ctx = { tiles: [me, anna], lastRemoteSpeakerId: 'ben', primaryTile: anna }
+      expect(computed.speakerTile.call(ctx)).toBe(anna)
+    })
+
+    it('picks the speaker beside the chat and the primary tile in the parked window', () => {
+      const ctx = { speakerTile: ben, primaryTile: anna }
+      expect(computed.soloTile.call({ ...ctx, mobileChatOpen: true })).toBe(ben)
+      expect(computed.soloTile.call({ ...ctx, mobileChatOpen: false })).toBe(anna)
+    })
+
+    it('remembers the remote participant heard last, not the user themselves', () => {
+      const ctx = { tiles: [me, anna, ben], lastRemoteSpeakerId: null }
+      VideoCall.watch.activeSpeakerIds.call(ctx, ['me'])
+      expect(ctx.lastRemoteSpeakerId).toBeNull()
+      VideoCall.watch.activeSpeakerIds.call(ctx, ['me', 'ben'])
+      expect(ctx.lastRemoteSpeakerId).toBe('ben')
+      // Silence does not take the face away.
+      VideoCall.watch.activeSpeakerIds.call(ctx, [])
+      expect(ctx.lastRemoteSpeakerId).toBe('ben')
+    })
+  })
+
+  describe('joinCallChat', () => {
+    const room = { name: 'the room' }
+    const context = (mutate, overrides = {}) => ({
+      groupId: 'g1',
+      room,
+      $apollo: { mutate },
+      setChatRoomId: jest.fn(),
+      joinCallChat: jest.fn(),
+      callChatRetryTimer: null,
+      cancelCallChatRetry: VideoCall.methods.cancelCallChatRetry,
+      ...overrides,
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it('stores the conference chat room the server returns', async () => {
+      const ctx = context(
+        jest.fn().mockResolvedValue({ data: { joinGroupVideoCallChat: 'room-1' } }),
+      )
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      expect(ctx.$apollo.mutate.mock.calls[0][0].variables).toEqual({ groupId: 'g1' })
+      expect(ctx.setChatRoomId).toHaveBeenCalledWith('room-1')
+    })
+
+    it('drops an answer for a call that has been left meanwhile', async () => {
+      const ctx = context(
+        jest.fn().mockResolvedValue({ data: { joinGroupVideoCallChat: 'room-1' } }),
+        { room: null },
+      )
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      expect(ctx.setChatRoomId).not.toHaveBeenCalled()
+    })
+
+    it('asks again after a failure, and gives up after the last attempt', async () => {
+      jest.useFakeTimers()
+      const ctx = context(jest.fn().mockRejectedValue(new Error('not in call yet')))
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      jest.runOnlyPendingTimers()
+      expect(ctx.joinCallChat).toHaveBeenCalledWith(room, 2)
+
+      ctx.joinCallChat.mockClear()
+      await VideoCall.methods.joinCallChat.call(ctx, room, 3)
+      jest.runOnlyPendingTimers()
+      expect(ctx.joinCallChat).not.toHaveBeenCalled()
+      expect(ctx.setChatRoomId).not.toHaveBeenCalled()
+    })
+
+    it('does not ask again once the retry has been called off', async () => {
+      jest.useFakeTimers()
+      const ctx = context(jest.fn().mockRejectedValue(new Error('not in call yet')))
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      expect(ctx.callChatRetryTimer).not.toBeNull()
+
+      VideoCall.methods.cancelCallChatRetry.call(ctx)
+      jest.runOnlyPendingTimers()
+
+      expect(ctx.callChatRetryTimer).toBeNull()
+      expect(ctx.joinCallChat).not.toHaveBeenCalled()
+    })
+
+    it('keeps one retry pending, not one per failure', async () => {
+      jest.useFakeTimers()
+      const ctx = context(jest.fn().mockRejectedValue(new Error('not in call yet')))
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      jest.runOnlyPendingTimers()
+
+      expect(ctx.joinCallChat).toHaveBeenCalledTimes(1)
+    })
+
+    it('calls a pending retry off when the call is left, before hanging up', async () => {
+      jest.useFakeTimers()
+      const { wrapper } = factory({ show: false })
+      const retry = jest.fn()
+      wrapper.vm.callChatRetryTimer = setTimeout(retry, 2000)
+      // Hanging up takes a moment; the retry must be gone before that moment begins.
+      let pendingWhileHangingUp
+      wrapper.vm.room = {
+        localParticipant: null,
+        disconnect: jest.fn(async () => {
+          pendingWhileHangingUp = wrapper.vm.callChatRetryTimer
+        }),
+      }
+
+      await wrapper.vm.cleanup()
+      jest.runOnlyPendingTimers()
+
+      expect(pendingWhileHangingUp).toBeNull()
+      expect(retry).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('conference chat', () => {
+    const subscription = () => {
+      const handlers = {}
+      const unsubscribe = jest.fn()
+      const $apollo = {
+        subscribe: jest.fn(() => ({
+          subscribe: (given) => {
+            Object.assign(handlers, given)
+            return { unsubscribe }
+          },
+        })),
+      }
+      return { handlers, unsubscribe, $apollo }
+    }
+
+    it('listens for the length of the call, and stops when told to', () => {
+      const { handlers, unsubscribe, $apollo } = subscription()
+      const ctx = { callChatsSub: null, onCallChatUpdated: jest.fn(), $apollo }
+      VideoCall.methods.watchCallChats.call(ctx, true)
+      handlers.next({ data: { roomUpdated: { id: 'room-1', unreadCount: 2 } } })
+      expect(ctx.onCallChatUpdated).toHaveBeenCalledWith({ id: 'room-1', unreadCount: 2 })
+
+      VideoCall.methods.watchCallChats.call(ctx, false)
+      expect(unsubscribe).toHaveBeenCalled()
+      expect(ctx.callChatsSub).toBeNull()
+    })
+
+    it('leaves the call alone when listening cannot be set up', () => {
+      const ctx = {
+        callChatsSub: null,
+        $apollo: {
+          subscribe: () => {
+            throw new Error('no socket')
+          },
+        },
+      }
+      expect(() => VideoCall.methods.watchCallChats.call(ctx, true)).not.toThrow()
+      expect(ctx.callChatsSub).toBeNull()
+    })
+
+    describe('unread counts of the two chats', () => {
+      const context = (overrides = {}) => ({
+        chatRoomId: 'room-1',
+        groupChatRoomId: 'group-room',
+        setConferenceUnread: jest.fn(),
+        setGroupChatUnread: jest.fn(),
+        loadGroupChatUnread: jest.fn(),
+        ...overrides,
+      })
+      const update = (ctx, room) => VideoCall.methods.onCallChatUpdated.call(ctx, room)
+
+      it('counts the conference chat by its room', () => {
+        const ctx = context()
+        update(ctx, { id: 'room-1', unreadCount: 2 })
+        expect(ctx.setConferenceUnread).toHaveBeenCalledWith(2)
+        expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+      })
+
+      it('counts the chat of the group by its room', () => {
+        const ctx = context()
+        update(ctx, { id: 'group-room', unreadCount: 5 })
+        expect(ctx.setGroupChatUnread).toHaveBeenCalledWith(5)
+        expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
+      })
+
+      it('leaves every other room alone', () => {
+        const ctx = context()
+        update(ctx, { id: 'another-room', unreadCount: 7 })
+        update(ctx, null)
+        expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
+        expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+        expect(ctx.loadGroupChatUnread).not.toHaveBeenCalled()
+      })
+
+      it('asks for the room of the group while it is not known yet', () => {
+        const ctx = context({ groupChatRoomId: null })
+        update(ctx, { id: 'maybe-the-new-group-room', unreadCount: 1 })
+        expect(ctx.loadGroupChatUnread).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('loading the chat of the group', () => {
+      const context = (query, overrides = {}) => ({
+        groupId: 'g1',
+        phase: 'in-call',
+        groupChatRoomId: null,
+        $apollo: { query },
+        setGroupChatUnread: jest.fn(),
+        ...overrides,
+      })
+      const load = (ctx) => VideoCall.methods.loadGroupChatUnread.call(ctx)
+
+      it('takes the room and what is unread in it', async () => {
+        const ctx = context(
+          jest.fn().mockResolvedValue({ data: { Room: [{ id: 'group-room', unreadCount: 4 }] } }),
+        )
+        await load(ctx)
+        expect(ctx.$apollo.query.mock.calls[0][0].variables).toEqual({ groupId: 'g1' })
+        expect(ctx.groupChatRoomId).toBe('group-room')
+        expect(ctx.setGroupChatUnread).toHaveBeenCalledWith(4)
+      })
+
+      it('counts nothing for a group that has no chat room yet', async () => {
+        const ctx = context(jest.fn().mockResolvedValue({ data: { Room: [] } }))
+        await load(ctx)
+        expect(ctx.groupChatRoomId).toBeNull()
+        expect(ctx.setGroupChatUnread).toHaveBeenCalledWith(0)
+      })
+
+      it('drops an answer that arrives after the call was left', async () => {
+        const ctx = context(
+          jest.fn().mockResolvedValue({ data: { Room: [{ id: 'group-room', unreadCount: 4 }] } }),
+          { phase: 'prejoin' },
+        )
+        await load(ctx)
+        expect(ctx.groupChatRoomId).toBeNull()
+        expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+      })
+
+      it('goes without a count when the request fails', async () => {
+        const ctx = context(jest.fn().mockRejectedValue(new Error('offline')))
+        await expect(load(ctx)).resolves.toBeUndefined()
+        expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('hint above the chat', () => {
+      const hintFor = (activeChatTab) =>
+        VideoCall.computed.chatHint.call({ activeChatTab, $t: (key) => key })
+
+      it('says what the chat on screen is, as its tab does', () => {
+        expect(hintFor('call')).toBe('videoCall.chatTabs.callHint')
+        expect(hintFor('group')).toBe('videoCall.chatTabs.groupHint')
+      })
+
+      it('has nothing to say while neither of the call chats is open', () => {
+        expect(hintFor(null)).toBeNull()
+      })
+    })
+
+    describe('whether the conference chat is empty', () => {
+      it('takes what the conference chat reports, and nothing the group chat does', () => {
+        const ctx = { activeChatTab: 'call', callChatEmpty: false }
+        VideoCall.methods.onChatEmptyChange.call(ctx, true)
+        expect(ctx.callChatEmpty).toBe(true)
+
+        const group = { activeChatTab: 'group', callChatEmpty: false }
+        VideoCall.methods.onChatEmptyChange.call(group, true)
+        expect(group.callChatEmpty).toBe(false)
+      })
+
+      it('forgets it when another chat comes on screen', () => {
+        const ctx = { callChatEmpty: true, chatRoomId: 'room-1', setLastChatTab: jest.fn() }
+        VideoCall.watch.activeChatTab.call(ctx, 'group', 'call')
+        expect(ctx.callChatEmpty).toBe(false)
+      })
+    })
+
+    describe('remembering the tab', () => {
+      const remember = (ctx, tab) => VideoCall.watch.activeChatTab.call(ctx, tab)
+
+      it('notes the tab that is looked at', () => {
+        const ctx = { chatRoomId: 'room-1', setLastChatTab: jest.fn() }
+        remember(ctx, 'group')
+        expect(ctx.setLastChatTab).toHaveBeenCalledWith('group')
+      })
+
+      it('keeps what it has when the chat is closed', () => {
+        const ctx = { chatRoomId: 'room-1', setLastChatTab: jest.fn() }
+        remember(ctx, null)
+        expect(ctx.setLastChatTab).not.toHaveBeenCalled()
+      })
+
+      it('does not take the chat of the group for a choice while it is the only one', () => {
+        const ctx = { chatRoomId: null, setLastChatTab: jest.fn() }
+        remember(ctx, 'group')
+        expect(ctx.setLastChatTab).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('export from the tab row', () => {
+      it('has the chat export its room, and shows it is busy meanwhile', async () => {
+        let finish
+        const exportRoom = jest.fn(() => new Promise((resolve) => (finish = resolve)))
+        const ctx = { chatExporting: false, $refs: { inCallChat: { exportRoom } } }
+        const exporting = VideoCall.methods.exportCallChat.call(ctx)
+        expect(exportRoom).toHaveBeenCalledTimes(1)
+        expect(ctx.chatExporting).toBe(true)
+        finish()
+        await exporting
+        expect(ctx.chatExporting).toBe(false)
+      })
+
+      it('does not start a second export on top of a running one', async () => {
+        const exportRoom = jest.fn()
+        const ctx = { chatExporting: true, $refs: { inCallChat: { exportRoom } } }
+        await VideoCall.methods.exportCallChat.call(ctx)
+        expect(exportRoom).not.toHaveBeenCalled()
+      })
+
+      it('is ready again after an export that failed', async () => {
+        const exportRoom = jest.fn().mockRejectedValue(new Error('offline'))
+        const ctx = { chatExporting: false, $refs: { inCallChat: { exportRoom } } }
+        await expect(VideoCall.methods.exportCallChat.call(ctx)).rejects.toThrow('offline')
+        expect(ctx.chatExporting).toBe(false)
+      })
+    })
+
+    it('selectChatTab opens the chat of the group for the group tab', () => {
+      const setShowChat = jest.fn()
+      VideoCall.methods.selectChatTab.call(
+        { groupId: 'g1', chatRoomId: 'room-1', setShowChat },
+        'group',
+      )
+      expect(setShowChat).toHaveBeenCalledWith({
+        showChat: true,
+        chatUserId: null,
+        groupId: 'g1',
+      })
     })
 
     it('onCallRoute reflects the call route name', () => {

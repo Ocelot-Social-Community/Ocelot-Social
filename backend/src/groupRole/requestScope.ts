@@ -7,7 +7,10 @@
 //
 // Deliberately NOT a process-wide cache the way the network roles have one: those are a
 // handful of global objects, whereas group roles scale with the number of groups. A read per
-// request against an indexed lookup is the cheaper trade — and it cannot go stale.
+// request against an indexed lookup is the cheaper trade — and it cannot go stale. A
+// subscription is the one long-lived "request": its context rebuilds this scope whenever it
+// reads the viewer again (see context/subscription.ts), so there the memo lasts one refresh
+// window, not the life of the socket.
 import { visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { GROUPS_ENABLED_GATE } from '@src/groupPermission'
 
