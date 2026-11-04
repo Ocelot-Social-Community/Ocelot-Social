@@ -139,6 +139,8 @@ function localZLimit(tokens) {
 }
 
 const Z_TOKEN = /var\(\s*--(z-index-[a-z0-9-]+)/g
+const Z_SHAPE =
+  /^(?:var\(\s*--z-index-[a-z0-9-]+\s*\)|calc\(\s*var\(\s*--z-index-[a-z0-9-]+\s*\)\s*[+-]\s*(\d+)\s*\))$/
 const Z_KEYWORD = /^(auto|inherit|initial|unset|revert)$/
 
 /**
@@ -163,10 +165,18 @@ function checkZIndex(value, rel, localLimit, zUsages, knownTokens = null) {
         `no fallback and no other variable`
       )
     }
-    // A number beside a token (`calc(var(--z-index-sticky) + 5000)`) is a page-level level in
-    // disguise. Small offsets (`- 1`, `+ 1`) stay fine.
-    const numbers = rest.match(/\d+/g) || []
-    if (numbers.some((n) => Number(n) >= localLimit)) {
+    // Only a single token, or a single token with one small offset, is a token-based level.
+    // Anything else (two tokens, `*`, units) computes a level of its own.
+    const shape = Z_SHAPE.exec(bare)
+    if (!shape) {
+      return (
+        `${rel}: z-index: ${bare} — only one token, optionally with one + or - offset, is ` +
+        `allowed; give a computed level its own token`
+      )
+    }
+    // A big offset (`calc(var(--z-index-sticky) + 5000)`) is a page-level level in disguise.
+    // Small offsets (`- 1`, `+ 1`) stay fine.
+    if (Number(shape[1]) >= localLimit) {
       return (
         `${rel}: z-index: ${bare} — a number from ${localLimit} up next to a token is a level ` +
         `of its own; give it a token`
@@ -200,7 +210,8 @@ function checkSource(src, byRgb, rel, localLimit = DEFAULT_LOCAL_Z_LIMIT, zToken
       for (const [, name] of value.matchAll(/\$([a-z][a-z0-9-]*)/gi)) {
         errors.push(`${rel}: $${name} — SCSS variable in a plain CSS block, resolves to nothing`)
       }
-      if (prop === 'z-index') {
+      // Property names are case-insensitive; custom properties (`--Foo`) are not, so only compare.
+      if (prop.toLowerCase() === 'z-index') {
         const finding = checkZIndex(value, rel, localLimit, zUsages, zTokens)
         if (finding) errors.push(finding)
         continue

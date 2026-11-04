@@ -211,10 +211,24 @@ describe('checkSource — z-index', () => {
     ).toHaveLength(1)
   })
 
+  it('allows only one token with at most one small offset', () => {
+    const sum = 'calc(var(--z-index-sticky) + var(--z-index-sticky))'
+    expect(check(`.a { z-index: ${sum}; }`, 100).errors).toHaveLength(1)
+    expect(check('.a { z-index: calc(var(--z-index-sticky) * 50); }', 100).errors).toHaveLength(1)
+    expect(check('.a { z-index: calc(var(--z-index-sticky) + 2px); }', 100).errors).toHaveLength(1)
+    expect(check('.a { z-index: calc(var(--z-index-sticky) - 2); }', 100).errors).toEqual([])
+  })
+
+  it('checks the property name case-insensitively', () => {
+    expect(check('.a { Z-INDEX: 9999; }', 100).errors).toHaveLength(1)
+    expect(check('.a { Z-Index: 3; }', 100).errors).toEqual([])
+  })
+
   it('reports an SCSS variable beside a token', () => {
-    expect(check('.a { z-index: calc(var(--z-index-sticky) + $offset); }', 100).errors).toEqual([
+    const { errors } = check('.a { z-index: calc(var(--z-index-sticky) + $offset); }', 100)
+    expect(errors).toContain(
       'A.vue: $offset — SCSS variable in a plain CSS block, resolves to nothing',
-    ])
+    )
   })
 
   it('allows the keywords', () => {
