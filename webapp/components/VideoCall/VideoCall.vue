@@ -1817,9 +1817,9 @@ export default {
       const Track = this.Track
       if (!room) return
       const tiles = []
-      const collectAudio = (participant) => {
+      const collectAudio = (participant, source) => {
         for (const pub of participant.audioTrackPublications.values()) {
-          if (!Track || pub.source === Track.Source.Microphone) return pub.track || null
+          if (!Track || pub.source === source) return pub.track || null
         }
         return null
       }
@@ -1876,7 +1876,7 @@ export default {
         return null
       }
       const collect = (participant, isLocal) => {
-        const audioTrack = collectAudio(participant)
+        const audioTrack = collectAudio(participant, Track && Track.Source.Microphone)
         const profile = profileFor(participant, isLocal)
         const micEnabled = !!participant.isMicrophoneEnabled
         // Use the participant-level getters (isCameraEnabled / isScreenShareEnabled)
@@ -1916,7 +1916,11 @@ export default {
             name: participant.name || participant.identity,
             profile,
             videoTrack: screenPub.track,
-            audioTrack: null,
+            // The sound of the shared tab or screen plays from this tile, as long
+            // as the share runs. Whether there is any is the sharer's choice in
+            // the browser's share dialog; browsers that cannot capture it publish
+            // none. Our own we would only hear twice.
+            audioTrack: isLocal ? null : collectAudio(participant, Track.Source.ScreenShareAudio),
             isLocal,
             isScreen: true,
           })

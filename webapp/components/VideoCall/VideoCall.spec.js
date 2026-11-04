@@ -2953,6 +2953,64 @@ describe('VideoCall', () => {
     })
   })
 
+  describe('refreshTiles (screen share audio)', () => {
+    const Track = {
+      Source: {
+        Microphone: 'microphone',
+        Camera: 'camera',
+        ScreenShare: 'screen_share',
+        ScreenShareAudio: 'screen_share_audio',
+      },
+    }
+    const sharing = (identity, audioPubs) => ({
+      identity,
+      name: identity,
+      isCameraEnabled: false,
+      isScreenShareEnabled: true,
+      metadata: null,
+      audioTrackPublications: new Map(audioPubs.map((pub, i) => [`${identity}-a${i}`, pub])),
+      videoTrackPublications: new Map([['s', { source: 'screen_share', track: { id: 'st' } }]]),
+    })
+    const tilesFor = (local, ...remotes) => {
+      const { wrapper } = factory({ show: false })
+      wrapper.vm.Track = Track
+      wrapper.vm.room = {
+        localParticipant: local,
+        remoteParticipants: new Map(remotes.map((p) => [p.identity, p])),
+      }
+      wrapper.vm.refreshTiles()
+      return wrapper.vm.tiles
+    }
+    const mic = { source: 'microphone', track: { id: 'mic' } }
+    const shareAudio = { source: 'screen_share_audio', track: { id: 'share-audio' } }
+    const local = sharing('me', [])
+
+    it("plays a remote share's sound from its screen tile, the voice from the main tile", () => {
+      // The screen audio published before the microphone.
+      const tiles = tilesFor(local, sharing('bob', [shareAudio, mic]))
+      const bob = tiles.filter((t) => t.identity === 'bob')
+      expect(bob.find((t) => t.isScreen).audioTrack).toBe(shareAudio.track)
+      expect(bob.find((t) => !t.isScreen).audioTrack).toBe(mic.track)
+    })
+
+    it('tells the two apart when the microphone was published first', () => {
+      const tiles = tilesFor(local, sharing('bob', [mic, shareAudio]))
+      const bob = tiles.filter((t) => t.identity === 'bob')
+      expect(bob.find((t) => t.isScreen).audioTrack).toBe(shareAudio.track)
+      expect(bob.find((t) => !t.isScreen).audioTrack).toBe(mic.track)
+    })
+
+    it('leaves the screen tile silent when the share carries no sound', () => {
+      const tiles = tilesFor(local, sharing('bob', [mic]))
+      expect(tiles.find((t) => t.identity === 'bob' && t.isScreen).audioTrack).toBeNull()
+    })
+
+    it('does not play our own share back to us', () => {
+      const tiles = tilesFor(sharing('me', [shareAudio]))
+      expect(tiles.find((t) => t.isLocal && t.isScreen).audioTrack).toBeNull()
+    })
+  })
+
   describe('cleanup (track teardown)', () => {
     it('stops local tracks (tolerating stop errors) and clears the speaker timer', async () => {
       const { wrapper } = factory({ show: false })
