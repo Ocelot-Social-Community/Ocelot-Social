@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import Vuex from 'vuex'
 import VTooltip from 'v-tooltip'
 import { mount, createLocalVue } from '@vue/test-utils'
@@ -3600,6 +3601,19 @@ describe('VideoCall', () => {
     })
 
     it('ends when the call is parked', async () => {
+      // Reactive, so that parking the call reaches the store's getter.
+      const state = Vue.observable({ show: true, minimized: false })
+      const { wrapper } = factory(state)
+      await wrapper.setData({ phase: 'in-call' })
+      await wrapper.vm.toggleFullscreen()
+      state.minimized = true
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.isMaximized).toBe(false)
+      expect(document.exitFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+
+    it('ends when the call is connecting anew', async () => {
       const { wrapper } = await maximizedCall()
       await wrapper.vm.toggleFullscreen()
       await wrapper.setData({ phase: 'connecting' })
@@ -3626,6 +3640,31 @@ describe('VideoCall', () => {
       await entering
       expect(document.exitFullscreen).toHaveBeenCalled()
       expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+
+    it('ends again when the call was gone from the page while the browser was still entering it', async () => {
+      const { wrapper } = await maximizedCall()
+      let enter
+      document.documentElement.requestFullscreen = jest.fn(
+        () =>
+          new Promise((resolve) => {
+            enter = () => {
+              fullscreenElement = document.documentElement
+              fullscreenChanged()
+              resolve()
+            }
+          }),
+      )
+      // A call being left: the media server has yet to confirm the disconnect, so leaving
+      // has not reset the call's phase when the browser reports fullscreen.
+      wrapper.vm.room = { localParticipant: null, disconnect: () => new Promise(() => {}) }
+      const entering = wrapper.vm.toggleFullscreen()
+      wrapper.destroy()
+      expect(document.exitFullscreen).not.toHaveBeenCalled()
+      enter()
+      await entering
+      expect(document.exitFullscreen).toHaveBeenCalled()
+      expect(fullscreenElement).toBe(null)
     })
 
     it('neither takes nor ends the fullscreen of something else on the page', async () => {

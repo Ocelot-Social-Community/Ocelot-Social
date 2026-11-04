@@ -1125,6 +1125,7 @@ export default {
     this.qualityClass = null
     this.audioWatchdog = null
     this.leaving = false
+    this.unmounting = false
     this.deviceSwitches = this.newDeviceSwitches()
     this.callChatsSub = null
     this.groupChatRoomId = null
@@ -1146,6 +1147,7 @@ export default {
   },
   beforeDestroy() {
     document.removeEventListener('fullscreenchange', this.onFullscreenChange)
+    this.unmounting = true
     this.exitFullscreen()
     this.watchBarActivity(false)
     this.setPageBars('normal')
@@ -1177,9 +1179,10 @@ export default {
           return
         }
         await document.documentElement.requestFullscreen()
-        // The browser takes a moment. Parked or left meanwhile, the call has no use for it
-        // any more — and the watcher that ends it found nothing to end yet.
-        if (!this.showFullscreenButton) this.exitFullscreen()
+        // The browser takes a moment. Parked, left or gone from the page meanwhile, the call
+        // has no use for it any more — and the watcher or beforeDestroy that ends it found
+        // nothing to end yet. Once gone, showFullscreenButton keeps its last value.
+        if (this.unmounting || !this.showFullscreenButton) this.exitFullscreen()
       } catch {
         // Refused by the browser (no user gesture, a policy): the call stays as it is.
       }
