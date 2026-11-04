@@ -2,7 +2,7 @@
 /* eslint-disable no-console -- a CLI reporter: stdout/stderr IS its output channel. The sibling
    scripts in this folder silence the same rule per call; once per file says the same thing. */
 /**
- * Guards the design-token system against the two ways it silently erodes.
+ * Guards the design-token system against the three ways it silently erodes.
  *
  * 1. A colour literal written where a token holds the SAME colour. It looks right in vanilla and is
  *    wrong for every brand — `#17b53f` in TabNavigation.vue was exactly this: the vanilla value of
@@ -11,10 +11,18 @@
  *    nothing; PostCSS passes the literal through and the browser drops the whole declaration. Twice
  *    found in review, both times invisible until someone looked at that exact element.
  *
+ * 3. A `z-index` that is neither a `--z-index-*` token nor a LOCAL number. A raw 150 next to the scale
+ *    is how the feed's "+" button ended up over a maximized video call: the call sat at 1. A plain
+ *    integer below the lowest page-level token (--z-index-sticky) is an ordering inside one component's
+ *    own stacking context and stays a number; anything from there up is page-level and takes a token.
+ *
  * A deliberate non-goal: colours that have NO token yet (transparencies, one-off greys). Those need a
  * new token first, which is a design decision — the check reports them as a count and moves on.
  *
- * Not stylelint: this is two rules over .vue <style> blocks, and stylelint would mean a second lint
+ * `--z-index-report` prints the z-index levels instead: each token with the files that use it, and the
+ * local numbers with theirs. It is read off the code, so unlike a list kept by hand it cannot go stale.
+ *
+ * Not stylelint: this is three rules over .vue <style> blocks, and stylelint would mean a second lint
  * toolchain plus a config to keep in sync with the token file. Same reasoning as
  * packages/ui/scripts/check-completeness.ts.
  */
@@ -122,17 +130,93 @@ function styleBodies(src) {
   )
 }
 
-/** Both rules, over one file's source. `untokenised` counts literals that have no token to suggest. */
-function checkSource(src, byRgb, rel) {
+/** The lowest page-level z-index: raw numbers below it are local, from it up a token is required. */
+const DEFAULT_LOCAL_Z_LIMIT = 100
+
+function localZLimit(tokens) {
+  const limit = parseInt(tokens['z-index-sticky'], 10)
+  return Number.isFinite(limit) ? limit : DEFAULT_LOCAL_Z_LIMIT
+}
+
+const Z_TOKEN = /var\(\s*--(z-index-[a-z0-9-]+)/g
+const Z_SHAPE =
+  /^(?:var\(\s*--z-index-[a-z0-9-]+\s*\)|calc\(\s*var\(\s*--z-index-[a-z0-9-]+\s*\)\s+[+-]\s+(\d+)\s*\))$/
+const Z_KEYWORD = /^(auto|inherit|initial|unset|revert)$/
+
+/**
+ * Rule 3 for one `z-index` value. Records what it saw in `zUsages` (for the report) and returns the
+ * finding, or null when the value is fine. `knownTokens` is the set of declared `z-index-*` names; a
+ * token outside it is a typo, which the browser would drop silently. Without the set the names are
+ * taken as they come.
+ */
+function checkZIndex(value, rel, localLimit, zUsages, knownTokens = null) {
+  const bare = value.replace(/\s*!important\s*$/, '').trim()
+  const tokens = [...bare.matchAll(Z_TOKEN)].map(([, name]) => name)
+  if (tokens.length) {
+    const unknown = knownTokens && tokens.find((name) => !knownTokens.has(name))
+    if (unknown) return `${rel}: z-index: ${bare} — --${unknown} is not a declared token`
+    for (const token of tokens) zUsages.push({ rel, token })
+    // Beside the plain token references only numbers may remain. Any other `var()` is either a
+    // foreign variable or a fallback (`var(--z-index-sticky, 9999)`) that would hide a level.
+    const rest = bare.replace(/var\(\s*--z-index-[a-z0-9-]+\s*\)/g, '')
+    if (rest.includes('var(')) {
+      return (
+        `${rel}: z-index: ${bare} — only plain var(--z-index-*) references are allowed here, ` +
+        `no fallback and no other variable`
+      )
+    }
+    // Only a single token, or a single token with one small offset, is a token-based level.
+    // Anything else (two tokens, `*`, units) computes a level of its own.
+    const shape = Z_SHAPE.exec(bare)
+    if (!shape) {
+      return (
+        `${rel}: z-index: ${bare} — only one token, optionally with one + or - offset, is ` +
+        `allowed; give a computed level its own token`
+      )
+    }
+    // A big offset (`calc(var(--z-index-sticky) + 5000)`) is a page-level level in disguise.
+    // Small offsets (`- 1`, `+ 1`) stay fine.
+    if (Number(shape[1]) >= localLimit) {
+      return (
+        `${rel}: z-index: ${bare} — a number from ${localLimit} up next to a token is a level ` +
+        `of its own; give it a token`
+      )
+    }
+    return null
+  }
+  if (Z_KEYWORD.test(bare)) return null
+  // Negative values sit below everything, so they are always local — no absolute value here.
+  if (/^-?\d+$/.test(bare) && Number(bare) < localLimit) {
+    zUsages.push({ rel, local: Number(bare) })
+    return null
+  }
+  return (
+    `${rel}: z-index: ${bare} — use a var(--z-index-*) token; ` +
+    `only plain numbers below ${localLimit} are local`
+  )
+}
+
+/**
+ * All rules, over one file's source. `untokenised` counts literals that have no token to suggest;
+ * `zUsages` lists every z-index level the file uses, for the report.
+ */
+function checkSource(src, byRgb, rel, localLimit = DEFAULT_LOCAL_Z_LIMIT, zTokens = null) {
   const errors = []
+  const zUsages = []
   let untokenised = 0
   for (const body of styleBodies(src)) {
     for (const { prop, value } of declarations(body)) {
       if (prop.startsWith('white-space')) continue
-
       for (const [, name] of value.matchAll(/\$([a-z][a-z0-9-]*)/gi)) {
         errors.push(`${rel}: $${name} — SCSS variable in a plain CSS block, resolves to nothing`)
       }
+      // Property names are case-insensitive; custom properties (`--Foo`) are not, so only compare.
+      if (prop.toLowerCase() === 'z-index') {
+        const finding = checkZIndex(value, rel, localLimit, zUsages, zTokens)
+        if (finding) errors.push(finding)
+        continue
+      }
+
       if (prop.startsWith('--')) continue // declaring a token is allowed to use a literal
       for (const [raw] of value.matchAll(COLOUR)) {
         const rgb = toRgb(raw)
@@ -142,18 +226,75 @@ function checkSource(src, byRgb, rel) {
       }
     }
   }
-  return { errors, untokenised }
+  return { errors, untokenised, zUsages }
+}
+
+/** The z-index tokens, highest first, each with the files that use it, then the local numbers. */
+function formatZIndexReport(tokens, zUsages) {
+  const files = (list) => [...new Set(list.map((u) => u.rel))].sort()
+  const levels = Object.entries(tokens)
+    .filter(([name]) => name.startsWith('z-index-'))
+    .map(([name, value]) => ({
+      name,
+      value,
+      // calc() levels resolve against another token, so sort on the number they come to.
+      rank: /^-?\d+$/.test(value) ? Number(value) : Number(tokens['z-index-page-submenu']) - 1,
+    }))
+    .sort((a, b) => b.rank - a.rank)
+  const lines = ['z-index levels (tokens, highest first)', '']
+  for (const { name, value } of levels) {
+    const users = files(zUsages.filter((u) => u.token === name))
+    lines.push(`  ${String(value).padEnd(48)} --${name}`)
+    lines.push(users.length ? users.map((f) => `      ${f}`).join('\n') : '      (unused)')
+  }
+  const locals = zUsages.filter((u) => u.local !== undefined)
+  lines.push('', 'local numbers (inside one component, below the lowest page-level token)', '')
+  for (const n of [...new Set(locals.map((u) => u.local))].sort((a, b) => b - a)) {
+    lines.push(`  ${n}`)
+    lines.push(
+      files(locals.filter((u) => u.local === n))
+        .map((f) => `      ${f}`)
+        .join('\n'),
+    )
+  }
+  return lines.join('\n')
 }
 
 function main() {
-  const byRgb = indexByRgb(readTokens())
+  const tokens = readTokens()
+  const byRgb = indexByRgb(tokens)
+  const localLimit = localZLimit(tokens)
+  const zTokens = new Set(Object.keys(tokens).filter((name) => name.startsWith('z-index-')))
   const errors = []
+  const zUsages = []
   let untokenised = 0
 
   for (const file of walk(ROOT)) {
-    const result = checkSource(readFileSync(file, 'utf8'), byRgb, relative(ROOT, file))
+    const result = checkSource(
+      readFileSync(file, 'utf8'),
+      byRgb,
+      relative(ROOT, file),
+      localLimit,
+      zTokens,
+    )
     errors.push(...result.errors)
+    zUsages.push(...result.zUsages)
     untokenised += result.untokenised
+  }
+
+  // The global stylesheets hold z-indexes too (the dropdown level is only used there). Rule 3 only:
+  // their colours are not this script's business, so the other findings are dropped.
+  for (const file of readdirSync(TOKEN_DIR).filter((f) => f.endsWith('.css'))) {
+    if (file === 'root-tokens.css') continue
+    const src = `<style>${readFileSync(join(TOKEN_DIR, file), 'utf8')}</style>`
+    const result = checkSource(src, byRgb, `assets/css/${file}`, localLimit, zTokens)
+    errors.push(...result.errors.filter((e) => e.includes(' z-index: ')))
+    zUsages.push(...result.zUsages)
+  }
+
+  if (process.argv.includes('--z-index-report')) {
+    console.log(formatZIndexReport(tokens, zUsages))
+    return
   }
 
   if (errors.length) {
@@ -167,11 +308,20 @@ function main() {
   }
 
   console.log(
-    `✓ no hard-coded colours with a token equivalent, no SCSS leftovers ` +
+    `✓ no hard-coded colours with a token equivalent, no SCSS leftovers, no page-level raw z-index ` +
       `(${untokenised} literal(s) without a token — see assets/css/root-tokens.css)`,
   )
 }
 
 if (require.main === module) main()
 
-module.exports = { toRgb, readTokens, indexByRgb, declarations, styleBodies, checkSource }
+module.exports = {
+  toRgb,
+  readTokens,
+  indexByRgb,
+  declarations,
+  styleBodies,
+  checkSource,
+  localZLimit,
+  formatZIndexReport,
+}

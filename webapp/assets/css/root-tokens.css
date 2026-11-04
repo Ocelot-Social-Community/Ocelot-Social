@@ -299,6 +299,9 @@
  */
 
   /* Layering, top to bottom. Use a token for anything that must stack over page content. */
+  /* A plain number below --z-index-sticky is a local order inside one component and stays a number; */
+  /* from there up it takes a token. `npm run lint:css-tokens` enforces this, and */
+  /* `npm run lint:css-tokens -- --z-index-report` lists who uses which level. */
   /* modal: dialogs and the global tooltip/popover stack */
   --z-index-modal: 9999;
   /* overlay: the chat module, a minimized call, the pre-join dialog, backdrops */

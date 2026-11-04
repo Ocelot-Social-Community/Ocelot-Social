@@ -1192,6 +1192,24 @@ describe('CreatePost', () => {
         expect(errors?.[0]).toHaveProperty('message', 'Too many categories (at most 3).')
       })
 
+      // An unknown id matched nothing and ended the write query's rows: the post was saved,
+      // but without its group — in a hidden group, visible to everyone.
+      it('throws "At least one of the categories does not exist." and saves nothing', async () => {
+        const { errors } = await mutate({
+          mutation: CreatePost,
+          variables: { ...variables, categoryIds: ['cat9', 'no-such-category'] },
+        })
+
+        expect(errors?.[0]).toHaveProperty(
+          'message',
+          'At least one of the categories does not exist.',
+        )
+
+        const { data } = await query({ query: Post, variables: {} })
+
+        expect(data?.Post.map((post: { id: string }) => post.id)).not.toContain('p3589')
+      })
+
       describe('but no categories exist in the database (empty category DB)', () => {
         beforeEach(async () => {
           const session = database.driver.session()
@@ -1599,6 +1617,26 @@ describe('UpdatePost', () => {
         })
 
         expect(errors?.[0]).toHaveProperty('message', 'Too many categories (at most 3).')
+      })
+
+      // The old categories were removed first, then nothing matched to replace them.
+      it('throws "At least one of the categories does not exist." and keeps the categories it has', async () => {
+        const { errors } = await mutate({
+          mutation: UpdatePost,
+          variables: { ...variables, categoryIds: ['no-such-category'] },
+        })
+
+        expect(errors?.[0]).toHaveProperty(
+          'message',
+          'At least one of the categories does not exist.',
+        )
+        await expect(mutate({ mutation: UpdatePost, variables })).resolves.toMatchObject({
+          data: {
+            UpdatePost: {
+              categories: expect.arrayContaining([{ id: 'cat9' }, { id: 'cat4' }, { id: 'cat15' }]),
+            },
+          },
+        })
       })
 
       describe('but no categories exist in the database (empty category DB)', () => {

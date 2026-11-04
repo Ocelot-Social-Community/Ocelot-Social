@@ -457,6 +457,20 @@ describe('in mode', () => {
             })
           })
 
+          describe('an unknown one', () => {
+            it('throws error: "At least one of the categories does not exist."', async () => {
+              const { errors } = await mutate({
+                mutation: CreateGroup,
+                variables: { ...variables, categoryIds: ['cat9', 'no-such-category'] },
+              })
+
+              expect(errors?.[0]).toHaveProperty(
+                'message',
+                'At least one of the categories does not exist.',
+              )
+            })
+          })
+
           describe('but no categories exist in the database (empty category DB)', () => {
             beforeEach(async () => {
               const session = database.driver.session()
@@ -3853,6 +3867,20 @@ describe('in mode', () => {
                   })
 
                   expect(errors?.[0]).toHaveProperty('message', 'Too many categories (at most 3).')
+                })
+              })
+
+              describe('an unknown one', () => {
+                it('throws error: "At least one of the categories does not exist."', async () => {
+                  const { errors } = await mutate({
+                    mutation: UpdateGroup,
+                    variables: { id: 'my-group', categoryIds: ['no-such-category'] },
+                  })
+
+                  expect(errors?.[0]).toHaveProperty(
+                    'message',
+                    'At least one of the categories does not exist.',
+                  )
                 })
               })
 
