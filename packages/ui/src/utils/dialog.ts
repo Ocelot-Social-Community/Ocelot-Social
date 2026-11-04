@@ -1,4 +1,6 @@
-import { onBeforeUnmount, onMounted, watch } from 'vue-demi'
+import { nextTick, onBeforeUnmount, onMounted, watch } from 'vue-demi'
+
+import type { Ref } from 'vue-demi'
 
 /**
  * Behaviour shared by the modal surfaces (OsModal, OsDrawer): what keeps the user inside an
@@ -86,4 +88,45 @@ export function useEscapeKey(isOpen: () => boolean, onEscape: () => void): void 
   onBeforeUnmount(() => {
     document.removeEventListener('keydown', onKeydown)
   })
+}
+
+/**
+ * Moves the focus into the dialog when it opens — to the element inside marked
+ * `data-autofocus`, else to `panel` itself, which needs `tabindex="-1"` for that — and gives it
+ * back to where it was when the dialog closes, or unmounts while open. Only where it can still
+ * go: that element may have left the page meanwhile.
+ */
+export function useDialogFocus(isOpen: () => boolean, panel: Ref<HTMLElement | null>): void {
+  let returnFocusTo: HTMLElement | null = null
+
+  const giveBack = () => {
+    const target = returnFocusTo
+    returnFocusTo = null
+    if (target?.isConnected) {
+      target.focus()
+    }
+  }
+
+  watch(
+    isOpen,
+    async (open, wasOpen) => {
+      /* v8 ignore start -- SSR guard: immediate, so this runs in setup() on the server too */
+      if (typeof document === 'undefined') {
+        return
+      }
+      /* v8 ignore stop */
+      if (open) {
+        returnFocusTo = document.activeElement as HTMLElement | null
+        // The panel is rendered by then.
+        await nextTick()
+        const target = panel.value?.querySelector<HTMLElement>('[data-autofocus]') ?? panel.value
+        target?.focus()
+      } else if (wasOpen) {
+        giveBack()
+      }
+    },
+    { immediate: true },
+  )
+
+  onBeforeUnmount(giveBack)
 }
