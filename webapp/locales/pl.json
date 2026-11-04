@@ -1955,6 +1955,7 @@
     },
     "dialogLabel": "Rozmowa wideo grupowa",
     "enableAudio": "Włącz dźwięk",
+    "enterFullscreen": "Pełny ekran",
     "errorBackToPrejoin": "Zmień ustawienia",
     "errorRetry": "Spróbuj ponownie",
     "errors": {
@@ -1977,6 +1978,7 @@
         "noDevice": "Brak ekranu do udostępnienia."
       }
     },
+    "exitFullscreen": "Zamknij pełny ekran",
     "gotoGroup": "Przejdź do grupy „{name}”",
     "groupVideoCallButton": {
       "label": "Wideo grupowe",

@@ -1955,6 +1955,7 @@
     },
     "dialogLabel": "Групповой видеозвонок",
     "enableAudio": "Включить звук",
+    "enterFullscreen": "Во весь экран",
     "errorBackToPrejoin": "Изменить настройки",
     "errorRetry": "Повторить",
     "errors": {
@@ -1977,6 +1978,7 @@
         "noDevice": "Нет доступного экрана для показа."
       }
     },
+    "exitFullscreen": "Выйти из полноэкранного режима",
     "gotoGroup": "Перейти к группе «{name}»",
     "groupVideoCallButton": {
       "label": "Видео группы",
