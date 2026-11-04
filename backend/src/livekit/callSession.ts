@@ -141,6 +141,7 @@ export const joinCallSession = async (
         `,
         { sessionId, userId },
       )
+      /* v8 ignore next -- unreachable: the lock above has found the user, and a session always has its room */
       return (joined.records[0]?.get('roomId') as string | undefined) ?? null
     })
   } finally {
