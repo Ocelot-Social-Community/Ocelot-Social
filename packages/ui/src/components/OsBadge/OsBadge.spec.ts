@@ -149,6 +149,7 @@ describe('osBadge', () => {
       expect(wrapper.classes()).toStrictEqual(
         expect.arrayContaining(['min-w-[1.7em]', 'h-[1.7em]', 'px-[0.45em]', 'py-0']),
       )
+      expect(wrapper.classes()).toContain('shrink-0')
       expect(wrapper.classes()).not.toContain('px-[1em]')
       expect(wrapper.classes()).not.toContain('py-[0.15em]')
     })
@@ -157,6 +158,7 @@ describe('osBadge', () => {
       const wrapper = mount(OsBadge, { slots: { default: 'Badge text' } })
 
       expect(wrapper.classes()).not.toContain('min-w-[1.7em]')
+      expect(wrapper.classes()).not.toContain('shrink-0')
       expect(wrapper.classes()).toContain('px-[0.8em]')
     })
   })

@@ -26,11 +26,12 @@ export const badgeVariants = cva(
         square: 'rounded-[0.25em]',
       },
       /**
-       * A count instead of words: as wide as it is high around one digit, wider with more.
-       * After size, so its padding and height win over the size's.
+       * A count instead of words: as wide as it is high around one digit, wider with more,
+       * and never squeezed in a narrow row. After size, so its padding and height win over
+       * the size's.
        */
       count: {
-        true: 'justify-center box-border min-w-[1.7em] h-[1.7em] px-[0.45em] py-0 leading-none',
+        true: 'shrink-0 justify-center box-border min-w-[1.7em] h-[1.7em] px-[0.45em] py-0 leading-none',
       },
     },
     defaultVariants: {

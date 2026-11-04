@@ -33,7 +33,6 @@
         <os-badge
           v-if="tab.count > 0"
           variant="danger"
-          class="call-chat-tabs__count"
           :count="tab.count"
           :data-test="'call-chat-tab-count-' + tab.value"
         />
@@ -235,19 +234,13 @@ export default {
   flex-shrink: 0;
 }
 
-/*  The label gives way when the row gets narrow; the count beside it does not. */
+/*  The label gives way when the row gets narrow; the count beside it does not (OsBadge's */
+/*  `count` never shrinks). */
 .call-chat-tabs__label {
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/*  The count's round shape is the badge's own (`count`). `::v-deep`, because the badge's */
-/*  root carries no scoped-style attribute of this component. */
-.call-chat-tabs__tab ::v-deep .call-chat-tabs__count {
-  flex: 0 0 auto;
-  font-weight: var(--text-weight-bold);
 }
 
 .call-chat-tabs__tab:focus-visible {
