@@ -91,7 +91,7 @@ export function useEscapeKey(isOpen: () => boolean, onEscape: () => void): void 
 }
 
 /**
- * Moves the focus into the dialog when it opens — to the element inside marked
+ * Moves the focus into the dialog when it opens — to the enabled element inside marked
  * `data-autofocus`, else to `panel` itself, which needs `tabindex="-1"` for that — and gives it
  * back to where it was when the dialog closes, or unmounts while open. Only where it can still
  * go: that element may have left the page meanwhile.
@@ -117,9 +117,16 @@ export function useDialogFocus(isOpen: () => boolean, panel: Ref<HTMLElement | n
       /* v8 ignore stop */
       if (open) {
         returnFocusTo = document.activeElement as HTMLElement | null
-        // The panel is rendered by then.
+        // The panel is rendered by then. Closed again meanwhile (by an `opened` handler, say), the
+        // focus has been given back already — a drawer's panel is still visible while it slides
+        // out and would take it.
         await nextTick()
-        const target = panel.value?.querySelector<HTMLElement>('[data-autofocus]') ?? panel.value
+        if (!isOpen()) {
+          return
+        }
+        // A disabled element cannot take the focus (a confirm button opened while loading).
+        const target =
+          panel.value?.querySelector<HTMLElement>('[data-autofocus]:not([disabled])') ?? panel.value
         target?.focus()
       } else if (wasOpen) {
         giveBack()

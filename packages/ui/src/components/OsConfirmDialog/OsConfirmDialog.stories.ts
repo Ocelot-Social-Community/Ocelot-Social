@@ -18,7 +18,6 @@ export default meta
 type Story = StoryObj<typeof OsConfirmDialog>
 
 interface PlaygroundArgs {
-  open: boolean
   title: string
   message: string
   confirmLabel: string
@@ -30,7 +29,6 @@ interface PlaygroundArgs {
 
 export const Playground: StoryObj<PlaygroundArgs> = {
   argTypes: {
-    open: { control: 'boolean' },
     title: { control: 'text' },
     message: { control: 'text' },
     confirmLabel: { control: 'text' },
@@ -40,7 +38,6 @@ export const Playground: StoryObj<PlaygroundArgs> = {
     loading: { control: 'boolean' },
   },
   args: {
-    open: true,
     title: 'Delete post',
     message: 'Do you really want to delete this post?',
     confirmLabel: 'Delete',
@@ -49,17 +46,33 @@ export const Playground: StoryObj<PlaygroundArgs> = {
     variant: 'danger',
     loading: false,
   },
+  // Opened from a button and bound with v-model, like it is used: cancel, the close button,
+  // Escape and the backdrop close it, and it starts closed so the docs page stays usable. Confirm
+  // only reports the decision — closing is the parent's job, so here it closes right away.
   render: (args) => ({
-    components: { OsConfirmDialog },
+    components: { OsConfirmDialog, OsButton },
     setup() {
+      const open = ref(false)
       const dialogProps = computed(() => ({ ...args }))
-      return { dialogProps }
+      return { open, dialogProps }
     },
-    template: `<OsConfirmDialog v-bind="dialogProps" />`,
+    template: `
+      <div>
+        <OsButton variant="primary" @click="open = true">Open dialog</OsButton>
+        <OsConfirmDialog v-bind="dialogProps" v-model:open="open" @confirm="open = false" />
+      </div>
+    `,
   }),
 }
 
+// An open dialog covers the page it is rendered on. On the autodocs page the stories render
+// inline by default, and an open dialog would lay its backdrop, focus trap and scroll lock over
+// the docs themselves — and, with nobody listening to update:open, stay there. So the open
+// stories get an iframe of their own there, high enough for the dialog they show (as OsModal's).
+const ownFrame = (iframeHeight: number) => ({ docs: { story: { inline: false, iframeHeight } } })
+
 export const Default: Story = {
+  parameters: ownFrame(320),
   render: () => ({
     components: { OsConfirmDialog },
     template: `
@@ -78,6 +91,7 @@ export const Default: Story = {
 }
 
 export const Danger: Story = {
+  parameters: ownFrame(320),
   render: () => ({
     components: { OsConfirmDialog },
     template: `
@@ -96,6 +110,7 @@ export const Danger: Story = {
 }
 
 export const WithIcons: Story = {
+  parameters: ownFrame(320),
   render: () => ({
     components: { OsConfirmDialog },
     setup() {
@@ -119,6 +134,7 @@ export const WithIcons: Story = {
 }
 
 export const Loading: Story = {
+  parameters: ownFrame(320),
   render: () => ({
     components: { OsConfirmDialog },
     template: `
@@ -138,6 +154,7 @@ export const Loading: Story = {
 }
 
 export const RichMessage: Story = {
+  parameters: ownFrame(360),
   render: () => ({
     components: { OsConfirmDialog },
     template: `

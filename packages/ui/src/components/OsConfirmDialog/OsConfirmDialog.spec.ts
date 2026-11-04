@@ -202,6 +202,18 @@ describe('osConfirmDialog', () => {
       wrapper.unmount()
     })
 
+    it('focuses the dialog itself when it opens while loading, as the buttons cannot take it', async () => {
+      const wrapper = mount(OsConfirmDialog, {
+        props: { open: true, variant: 'danger', loading: true },
+        attachTo: document.body,
+      })
+      await nextTick()
+
+      expect(document.activeElement).toBe(wrapper.find('[data-testid="os-modal-panel"]').element)
+
+      wrapper.unmount()
+    })
+
     it('focuses the confirm button otherwise', async () => {
       const wrapper = mount(OsConfirmDialog, {
         props: { open: true },

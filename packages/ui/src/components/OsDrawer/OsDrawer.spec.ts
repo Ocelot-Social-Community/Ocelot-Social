@@ -199,6 +199,19 @@ describe('osDrawer', () => {
       expect(document.activeElement).toBe(button)
     })
 
+    it('leaves the focus where it was when its opened handler closes it right away', async () => {
+      const button = opener()
+      const wrapper = mount(OsDrawer, {
+        attachTo: document.body,
+        props: { onOpened: async () => wrapper.setProps({ open: false }) },
+      })
+
+      await wrapper.setProps({ open: true })
+      await nextTick()
+
+      expect(document.activeElement).toBe(button)
+    })
+
     it('does not reach for an element that has left the page', async () => {
       const button = opener()
       const wrapper = mount(OsDrawer, { attachTo: document.body })
