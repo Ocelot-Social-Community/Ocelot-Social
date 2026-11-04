@@ -23,6 +23,12 @@ export const state = () => {
     // 'idle' | 'prejoin' | 'connecting' | 'in-call' — mirrors VideoCall's local
     // phase so the layout can decide where the chat lives.
     phase: 'idle',
+    // How the page's header and footer stand to the call. 'normal': the call sits between
+    // them. 'overlay': the call fills the window and they lie on it, see-through; 'hidden':
+    // they have moved out of the way along with the call's own bars (nobody touched it).
+    // 'manual': solid around the maximized call on a desktop; 'collapsed': moved out of the
+    // way there, by the user's button.
+    pageBars: 'normal',
     // A full reload is due (a new branding, #10353) but waits for this call to end:
     // utils/reloadWhenIdle.js sets it, the call shows it as a notice.
     reloadPending: false,
@@ -73,6 +79,7 @@ export const mutations = {
     state.groupSlug = null
     state.groupAvatar = null
     state.phase = 'idle'
+    state.pageBars = 'normal'
     state.participantCount = 0
     state.chatRoomId = null
     state.conferenceUnread = 0
@@ -101,6 +108,11 @@ export const mutations = {
   },
   SET_LAST_CHAT_TAB(state, tab) {
     state.lastChatTab = tab === 'group' ? 'group' : 'call'
+  },
+  SET_PAGE_BARS(state, pageBars) {
+    state.pageBars = ['overlay', 'hidden', 'manual', 'collapsed'].includes(pageBars)
+      ? pageBars
+      : 'normal'
   },
   SET_RELOAD_PENDING(state, pending) {
     state.reloadPending = !!pending
@@ -146,6 +158,9 @@ export const getters = {
   },
   phase(state) {
     return state.phase
+  },
+  pageBars(state) {
+    return state.pageBars
   },
   reloadPending(state) {
     return state.reloadPending

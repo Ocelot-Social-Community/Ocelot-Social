@@ -33,11 +33,9 @@
         <os-badge
           v-if="tab.count > 0"
           variant="danger"
-          class="call-chat-tabs__count"
+          :count="tab.count"
           :data-test="'call-chat-tab-count-' + tab.value"
-        >
-          {{ tab.count > 99 ? '99+' : tab.count }}
-        </os-badge>
+        />
       </button>
       <!--
         What can be done with the conference chat, behind the app's three dots: calmer
@@ -219,7 +217,8 @@ export default {
   justify-content: center;
   gap: var(--space-xx-small);
   align-self: stretch;
-  padding: var(--space-x-small) var(--space-xx-small);
+  /*  Hardly any space above and below: the row the tabs are put in sets their height. */
+  padding: var(--space-xxx-small) var(--space-xx-small);
   border: 0;
   background: none;
   color: var(--text-color-base);
@@ -235,31 +234,13 @@ export default {
   flex-shrink: 0;
 }
 
-/*  The label gives way when the row gets narrow; the count beside it does not. */
+/*  The label gives way when the row gets narrow; the count beside it does not (OsBadge's */
+/*  `count` never shrinks). */
 .call-chat-tabs__label {
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/*  OsBadge is a pill made for words. For a count it is drawn in to a circle around one */
-/*  digit — as wide as it is high, both set, as the badge's own box does not include its */
-/*  padding in a width — and grows sideways with more. `::v-deep`, because the badge's */
-/*  root carries no scoped-style attribute of this component. */
-.call-chat-tabs__tab ::v-deep .call-chat-tabs__count {
-  flex: 0 0 auto;
-  box-sizing: border-box;
-  justify-content: center;
-  min-width: 1.7em;
-  height: 1.7em;
-  /*  `!important`, because no selector written here outranks the badge's own padding: */
-  /*  the app's build lifts every utility class of the UI library to the weight of an id */
-  /*  (`.px-\[0\.8em\]:not(#\#)`, the cascade-layers polyfill), so the pill's padding */
-  /*  won against this rule and the count stayed wider than high. */
-  padding: 0 0.45em !important;
-  line-height: 1;
-  font-weight: var(--text-weight-bold);
 }
 
 .call-chat-tabs__tab:focus-visible {

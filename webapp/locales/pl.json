@@ -508,6 +508,8 @@
     "POST_PIN_FEATURE_DISABLED": "Przypinanie wpisów nie jest włączone.",
     "POST_PIN_LIMIT_REACHED": "Osiągnięto maksymalną liczbę przypiętych wpisów. Najpierw odepnij inny wpis.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Wpis z tym slugiem już istnieje.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Wybrano za mało tematów (co najmniej {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Wybrano za dużo tematów (najwyżej {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Kod potwierdzający jest nieprawidłowy.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Ta nazwa użytkownika jest już zajęta.",
     "REPORT_TARGET_IS_OWN": "Nie możesz zgłosić siebie ani własnych treści.",
@@ -604,7 +606,7 @@
     "previousLocation": "Poprzednia lokalizacja: {location}",
     "scrollToLocationMap": "Przewiń do mapy",
     "validations": {
-      "categories": "Proszę wybrać od jednego do trzech tematów.",
+      "categories": "Proszę wybrać od {min} do {max} tematów.",
       "contentNotEmpty": "Proszę podać treść.",
       "email": "Proszę podać prawidłowy adres e-mail.",
       "eventLocationNameLength": "Adres musi mieć od {min} do {max} znaków.",
@@ -1010,15 +1012,15 @@
       "title": "Edytuj moją grupę"
     },
     "elevation": {
-      "actingAsMember": "Działasz tu jako {role}.",
-      "actingAsNonMember": "Nie jesteś członkiem tej grupy.",
       "activeTitle": "Dostęp administratora jest aktywny.",
       "activeUntil": "Kończy się o {time} albo kiedy go zakończysz.",
       "end": "Zakończ dostęp administratora",
-      "offerBody": "Dodatkowo masz uprawnienia sieciowe do tej grupy. Czytanie jej treści i wszelkie zmiany wymagają tego potwierdzenia, które zostaje odnotowane przy grupie.",
-      "offerBodyOwner": "Twoje uprawnienia sieciowe pozwalają też obniżyć rolę lub usunąć innych właścicieli tej grupy. Wymaga to tego potwierdzenia, które zostaje odnotowane przy grupie.",
-      "reasonPlaceholder": "O co chodzi?",
-      "start": "Użyj dostępu administratora"
+      "offerBody": "Twoja obecna rola w tej grupie: „{role}”. Podaj powód, dla którego chcesz zarządzać tą grupą (zostanie odnotowany).",
+      "offerBodyNoneMember": "Nie jesteś członkiem grupy. Podaj powód, dla którego chcesz zarządzać tą grupą (zostanie odnotowany).",
+      "offerBodyOwner": "Twoja obecna rola w tej grupie: „{role}”. Twoje uprawnienia sieciowe pozwalają też obniżyć rolę lub usunąć innych właścicieli tej grupy. Podaj powód, dla którego chcesz zarządzać tą grupą (zostanie odnotowany).",
+      "reasonPlaceholder": "Powód twojego działania",
+      "start": "Zarządzaj grupą",
+      "title": "Masz prawo zarządzać tą grupą jak superwłaściciel."
     },
     "errors": {
       "userAlreadyMember": "Użytkownik „{name}” jest już członkiem!"
@@ -1932,15 +1934,30 @@
     "connecting": "Łączenie…",
     "connectionLost": "Utracono połączenie: {name}",
     "connectionPoor": "Słabe połączenie: {name}",
+    "controls": {
+      "camera": "Kamera",
+      "chat": "Czat",
+      "leave": "Rozłącz",
+      "microphone": "Mikrofon",
+      "screen": "Ekran",
+      "startSharing": "Udostępnij ekran, okno lub kartę",
+      "stopSharing": "{surface}: przestań udostępniać",
+      "surface": {
+        "browser": "Karta",
+        "monitor": "Ekran",
+        "window": "Okno"
+      },
+      "turnOff": "{device}: wyłącz",
+      "turnOn": "{device}: włącz"
+    },
     "deviceSettings": {
       "button": "Urządzenia",
       "speakerError": "Nie udało się przełączyć głośnika.",
       "title": "Ustawienia urządzeń"
     },
     "dialogLabel": "Rozmowa wideo grupowa",
-    "disableCamera": "Wyłącz kamerę",
     "enableAudio": "Włącz dźwięk",
-    "enableCamera": "Włącz kamerę",
+    "enterFullscreen": "Pełny ekran",
     "errorBackToPrejoin": "Zmień ustawienia",
     "errorRetry": "Spróbuj ponownie",
     "errors": {
@@ -1963,18 +1980,19 @@
         "noDevice": "Brak ekranu do udostępnienia."
       }
     },
+    "exitFullscreen": "Zamknij pełny ekran",
     "gotoGroup": "Przejdź do grupy „{name}”",
     "groupVideoCallButton": {
       "label": "Wideo grupowe",
       "tooltip": "Rozmowa wideo w grupie „{name}”"
     },
+    "hideBars": "Ukryj paski",
     "leave": "Opuść rozmowę",
     "maximize": "Maksymalizuj",
     "micMuted": "Mikrofon wyłączony",
     "micNoSignal": "Twój mikrofon nie przesyła dźwięku — inni cię nie słyszą.",
     "micUnmuted": "Mikrofon włączony",
     "minimize": "Minimalizuj",
-    "muteMic": "Wycisz mikrofon",
     "openChat": "Otwórz czat",
     "prejoin": {
       "camera": "Kamera",
@@ -2022,12 +2040,10 @@
     "restartMic": "Uruchom ponownie mikrofon",
     "screenShare": "Ekran",
     "screenShareEnded": "Zakończono udostępnianie ekranu",
+    "showBars": "Pokaż paski",
     "showVideos": "Pokaż wideo",
     "spotlightExit": "Wyjdź z trybu spotlight",
-    "startScreenShare": "Udostępnij ekran",
-    "stopScreenShare": "Zakończ udostępnianie",
     "title": "Rozmowa wideo grupowa",
-    "unmuteMic": "Włącz mikrofon",
     "you": "ty",
     "youAreSharingScreen": "Udostępniasz swój ekran"
   }

@@ -9,8 +9,10 @@ import { v4 as uuid } from 'uuid'
 
 import { Errors } from '@graphql/errorRegistry'
 import { AppError, UserInputError } from '@graphql/errors'
+import { branding } from '@src/branding'
 
 import { runBatch } from './helpers/batch'
+import { categoriesExist } from './helpers/categoriesExist'
 import cypherFields, { unwrap } from './helpers/cypherField'
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
@@ -317,6 +319,21 @@ export default {
       const { image: imageInput } = params
 
       const { locationName, coordinates } = validateEventParams(params)
+      // As for groups: the minimum only while there is a category to choose from.
+      if (
+        policy.get('categoriesActive') &&
+        (!categoryIds || categoryIds.length < branding.category.min) &&
+        (await categoriesExist(context))
+      ) {
+        throw new AppError(Errors.POST_SAVE_TOO_FEW_CATEGORIES, { min: branding.category.min })
+      }
+      if (
+        policy.get('categoriesActive') &&
+        categoryIds &&
+        categoryIds.length > branding.category.max
+      ) {
+        throw new AppError(Errors.POST_SAVE_TOO_MANY_CATEGORIES, { max: branding.category.max })
+      }
 
       delete params.categoryIds
       delete params.image
@@ -399,6 +416,15 @@ export default {
       const { image: imageInput } = params
 
       const { locationName, coordinates } = validateEventParams(params)
+      // Only when categories are sent: an update without them leaves them as they are.
+      if (policy.get('categoriesActive') && categoryIds) {
+        if (categoryIds.length < branding.category.min && (await categoriesExist(context))) {
+          throw new AppError(Errors.POST_SAVE_TOO_FEW_CATEGORIES, { min: branding.category.min })
+        }
+        if (categoryIds.length > branding.category.max) {
+          throw new AppError(Errors.POST_SAVE_TOO_MANY_CATEGORIES, { max: branding.category.max })
+        }
+      }
 
       delete params.categoryIds
       delete params.image

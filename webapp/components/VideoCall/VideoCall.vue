@@ -2,14 +2,31 @@
   <div v-if="show" class="video-call-root">
     <div v-if="isPreJoinModal" class="video-call__backdrop" @click="leave" />
     <div
-      :class="['video-call', modeClass]"
+      :class="[
+        'video-call',
+        modeClass,
+        {
+          'video-call--bars-overlay': barsOverlay,
+          'video-call--bars-hidden': barsOverlay && barsHidden,
+          'video-call--bars-manual': barsManual,
+          'video-call--bars-collapsed': barsManual && barsCollapsed,
+          'video-call--parked-bars': parked,
+          'video-call--chromium': isChromium,
+          'video-call--fullscreen': inFullscreen,
+          'video-call--bars-held': parked && (showDeviceSettings || pointerOnParked),
+        },
+      ]"
       role="dialog"
       :aria-modal="isPreJoinModal ? 'true' : null"
       :aria-label="$t('videoCall.dialogLabel')"
       @click.stop
+      @mouseenter="pointerOnParked = true"
+      @mouseleave="pointerOnParked = false"
+      @transitionend.self="measureStage"
     >
       <room-header
         class="video-call__header"
+        compact
         :profile="groupProfile"
         :title="titleLabel"
         :to="groupRoute"
@@ -26,6 +43,36 @@
         </span>
         <div class="video-call__header-actions">
           <os-button
+            v-if="showFullscreenButton"
+            v-tooltip="fullscreenLabel"
+            data-test="video-call-fullscreen"
+            variant="primary"
+            appearance="outline"
+            size="sm"
+            circle
+            :aria-label="fullscreenLabel"
+            @click="toggleFullscreen"
+          >
+            <template #icon>
+              <os-icon :icon="inFullscreen ? icons.fullscreenExit : icons.fullscreen" />
+            </template>
+          </os-button>
+          <os-button
+            v-if="barsManual"
+            v-tooltip="$t('videoCall.hideBars')"
+            data-test="video-call-hide-bars"
+            variant="primary"
+            appearance="outline"
+            size="sm"
+            circle
+            :aria-label="$t('videoCall.hideBars')"
+            @click="barsCollapsed = true"
+          >
+            <template #icon>
+              <os-icon :icon="icons.expandVertical" />
+            </template>
+          </os-button>
+          <os-button
             v-if="canMinimize && phase === 'in-call'"
             v-tooltip="minimizeLabel"
             variant="primary"
@@ -36,7 +83,7 @@
             @click="toggleMinimize"
           >
             <template #icon>
-              <os-icon :icon="minimized ? icons.expand : icons.minus" />
+              <os-icon :icon="minimized ? icons.expand : icons.compress" />
             </template>
           </os-button>
           <os-button
@@ -54,6 +101,19 @@
           </os-button>
         </div>
       </room-header>
+
+      <!--
+        In the parked window header and control bar show only while the mouse is on it,
+        and the number of participants stays in their place meanwhile.
+      -->
+      <span
+        v-if="parked"
+        class="video-call__parked-count"
+        data-test="video-call-parked-count"
+        aria-hidden="true"
+      >
+        {{ uniqueParticipantCount }}
+      </span>
 
       <pre-join v-if="phase === 'prejoin'" @join="onPreJoinReady" @cancel="leave" />
 
@@ -148,7 +208,7 @@
             </div>
           </div>
           <div
-            v-if="isFullscreen && !mobileChatOpen && activeSpeakers.length"
+            v-if="isMaximized && !mobileChatOpen && activeSpeakers.length"
             class="video-call__speakers"
             :aria-label="$t('videoCall.activeSpeakers')"
           >
@@ -169,6 +229,28 @@
             :style="gridStyleConditional"
           >
             <!--
+              The bars moved away on purpose: this alone stays, where the header's buttons
+              were, to bring them back. In a wrapper of its own: OsButton's root carries no
+              scoped-style attribute, so a position set on it would not apply, and the button
+              would take a row of the tiles' grid.
+            -->
+            <div v-if="barsManual && barsCollapsed" class="video-call__show-bars">
+              <os-button
+                v-tooltip="$t('videoCall.showBars')"
+                data-test="video-call-show-bars"
+                variant="primary"
+                appearance="filled"
+                size="sm"
+                circle
+                :aria-label="$t('videoCall.showBars')"
+                @click="barsCollapsed = false"
+              >
+                <template #icon>
+                  <os-icon :icon="icons.compressVertical" />
+                </template>
+              </os-button>
+            </div>
+            <!--
             All tiles are always mounted so every participant's audio track stays
             attached to a DOM <audio> element. CSS Grid (in spotlight mode)
             places the spotlight tile into the wide left cell and lets the
@@ -185,7 +267,7 @@
               :camera-starting="isOwnCameraTile(tile) && devicesStarting.videoinput > 0"
               :mic-starting="isOwnCameraTile(tile) && devicesStarting.audioinput > 0"
               :avatar-size="tileAvatarSize(tile)"
-              :clickable="isFullscreen && !mobileChatOpen"
+              :clickable="isMaximized && !mobileChatOpen"
               :class="{
                 'video-tile--hidden': singleTile && soloTile && tile.key !== soloTile.key,
                 'video-tile--spotlighted': !!(spotlightTile && tile.key === spotlightTile.key),
@@ -263,12 +345,12 @@
       -->
       <div v-if="phase === 'in-call' && !error" class="video-call__controls">
         <os-button
-          v-tooltip="deviceTooltip(micLabel, [deviceNames.mic])"
+          v-tooltip="controlTooltip(micAction)"
           :variant="micEnabled ? 'default' : 'danger'"
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="micLabel"
+          :aria-label="controlName(micLabel, micAction)"
           :loading="devicesStarting.audioinput > 0"
           @click="toggleMic"
         >
@@ -280,12 +362,12 @@
           </template>
         </os-button>
         <os-button
-          v-tooltip="deviceTooltip(cameraLabel, [deviceNames.camera])"
+          v-tooltip="controlTooltip(cameraAction)"
           :variant="cameraEnabled ? 'default' : 'danger'"
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="cameraLabel"
+          :aria-label="controlName(cameraLabel, cameraAction)"
           :loading="devicesStarting.videoinput > 0"
           @click="toggleCamera"
         >
@@ -298,12 +380,12 @@
         </os-button>
         <os-button
           v-if="screenShareSupported"
-          v-tooltip="iconOnlyTooltip(screenShareLabel)"
+          v-tooltip="controlTooltip(screenShareAction)"
           :variant="screenShareEnabled ? 'primary' : 'default'"
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="screenShareLabel"
+          :aria-label="controlName(screenShareLabel, screenShareAction)"
           @click="toggleScreenShare"
         >
           <template #icon>
@@ -352,12 +434,12 @@
           />
         </div>
         <os-button
-          v-tooltip="iconOnlyTooltip(chatLabel)"
+          v-tooltip="controlTooltip(chatAction)"
           :variant="chatOpenForThisCall ? 'primary' : 'default'"
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="chatLabel"
+          :aria-label="controlName(chatLabel, chatAction)"
           @click="toggleChat"
         >
           <template #icon>
@@ -368,13 +450,13 @@
           </template>
         </os-button>
         <os-button
-          v-tooltip="iconOnlyTooltip(leaveLabel)"
+          v-tooltip="controlTooltip(leaveAction)"
           variant="danger"
           appearance="filled"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           class="video-call__leave"
-          :aria-label="leaveLabel"
+          :aria-label="controlName(leaveLabel, leaveAction)"
           @click="leave"
         >
           <template #icon>
@@ -404,6 +486,7 @@ import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 import DeviceSettings from './DeviceSettings.vue'
 import { saveDevicePreference } from './devicePreferences'
+import { createAudioWatchdog } from './audioWatchdog'
 
 // How long a participant keeps the speaking treatment after LiveKit drops them
 // from the active-speaker list. LiveKit reports raw audio activity, so it lets
@@ -435,6 +518,17 @@ const MIC_SILENCE_RECHECKS = 5
 const MIC_SILENCE_RECHECK_MS = 400
 const STRONG_QUALITIES = ['excellent', 'good']
 
+// The call's header and control bar on a desktop with the call maximized, and the page's
+// header and footer with them: how long the mouse has to rest before they move out of the
+// way, and how close to the window's upper or lower edge it brings them back from the chat.
+const BARS_HIDE_MS = 4000
+const BARS_EDGE_PX = 50
+// What brings the bars back. Focus too, for whoever moves through the controls by keyboard.
+const BARS_ACTIVITY_EVENTS = ['mousemove', 'pointerdown', 'keydown', 'wheel', 'focusin']
+// A tap is followed by the mouse events and the focus the browser makes up for it; they
+// come within this time and are no activity of their own. A key pressed is none of them.
+const TOUCH_ECHO_MS = 800
+
 // Cameras publish 16:9, so the grid aims for cells of that shape: the closer a
 // cell matches, the less `object-fit: cover` has to crop off the sides.
 const TILE_ASPECT_RATIO = 16 / 9
@@ -449,6 +543,15 @@ const DEVICE_FIELDS = {
   videoinput: 'cameraDeviceId',
   audioinput: 'micDeviceId',
   audiooutput: 'speakerDeviceId',
+}
+
+// Element.matches() throws on a selector the browser does not know.
+const matchesSafely = (element, selector) => {
+  try {
+    return element.matches(selector)
+  } catch {
+    return false
+  }
 }
 
 export default {
@@ -473,6 +576,8 @@ export default {
       micEnabled: true,
       cameraEnabled: true,
       screenShareEnabled: false,
+      // What is shared: 'monitor', 'window' or 'browser' (a tab), as the browser says.
+      screenShareSurface: null,
       error: null,
       cameraDeviceId: null,
       micDeviceId: null,
@@ -511,6 +616,24 @@ export default {
       // The remote participant heard last. Whoever spoke stays on screen next to
       // the chat on a phone until somebody else speaks (see speakerTile).
       lastRemoteSpeakerId: null,
+      // The bars lying on the videos have moved out of the way (see barsOverlay).
+      barsHidden: false,
+      // The user moved the bars of the maximized call out of the way (see barsManual). For
+      // this one call: the next one starts with them.
+      barsCollapsed: false,
+      // The mouse is on the call's window: in the parked one that shows its bars. Not
+      // :hover, which Safari does not set on it.
+      pointerOnParked: false,
+      // Only Chromium-based browsers (Chrome, Edge, Opera, …) know navigator.userAgentData.
+      // Set once mounted: the server renders no browser.
+      isChromium: false,
+      // Whether the browser can show the page in fullscreen, and whether it does now.
+      canFullscreen: false,
+      inFullscreen: false,
+      // The control bar: how wide it is, and how wide it was the last time its buttons
+      // had their labels (see controlsCrowded).
+      controlsWidth: 0,
+      labeledControlsWidth: 0,
     }
   },
   computed: {
@@ -547,7 +670,7 @@ export default {
     showChatSidebar() {
       // Embedded in the maximized call view. In the minimized/parked state the
       // chat continues to live in the chat-modul (layouts/default.vue). On a
-      // phone the call is always full screen and the chat takes the place below
+      // phone the call is always maximized and the chat takes the place below
       // a single small tile (see mobileChatOpen).
       return this.phase === 'in-call' && this.chatOpenForThisCall && !this.parked
     },
@@ -559,7 +682,7 @@ export default {
     // Whether the stage shows one tile only: in the parked window, and next to the
     // chat on a phone. The others stay mounted, so their sound keeps playing.
     singleTile() {
-      return !this.isFullscreen || this.mobileChatOpen
+      return !this.isMaximized || this.mobileChatOpen
     },
     soloTile() {
       return this.mobileChatOpen ? this.speakerTile : this.primaryTile
@@ -586,18 +709,43 @@ export default {
       const group = this.activeChatTab === 'group' ? 0 : this.groupChatUnread
       return call + group
     },
+    // The controls say on them what they are about; whether it is on, their icon and
+    // colour say. What a click does — for which device — the tooltip and a screen reader
+    // say (the …Action ones).
     micLabel() {
-      return this.micEnabled ? this.$t('videoCall.muteMic') : this.$t('videoCall.unmuteMic')
+      return this.$t('videoCall.controls.microphone')
+    },
+    micAction() {
+      const device = this.deviceNames.mic || this.micLabel
+      return this.micEnabled
+        ? this.$t('videoCall.controls.turnOff', { device })
+        : this.$t('videoCall.controls.turnOn', { device })
     },
     cameraLabel() {
+      return this.$t('videoCall.controls.camera')
+    },
+    cameraAction() {
+      const device = this.deviceNames.camera || this.cameraLabel
       return this.cameraEnabled
-        ? this.$t('videoCall.disableCamera')
-        : this.$t('videoCall.enableCamera')
+        ? this.$t('videoCall.controls.turnOff', { device })
+        : this.$t('videoCall.controls.turnOn', { device })
     },
     screenShareLabel() {
-      return this.screenShareEnabled
-        ? this.$t('videoCall.stopScreenShare')
-        : this.$t('videoCall.startScreenShare')
+      return this.$t('videoCall.controls.screen')
+    },
+    screenShareAction() {
+      if (!this.screenShareEnabled) return this.$t('videoCall.controls.startSharing')
+      // What is shared, as far as the browser tells: the screen, a window or a tab. Not
+      // their title — Chrome names them `window:12345:0`.
+      // Each key spelled out, so the check for unused translations sees it used.
+      const surfaces = {
+        window: () => this.$t('videoCall.controls.surface.window'),
+        browser: () => this.$t('videoCall.controls.surface.browser'),
+      }
+      const surface = (
+        surfaces[this.screenShareSurface] || (() => this.$t('videoCall.controls.surface.monitor'))
+      )()
+      return this.$t('videoCall.controls.stopSharing', { surface })
     },
     deviceSettingsLabel() {
       return this.$t('videoCall.deviceSettings.button')
@@ -630,11 +778,17 @@ export default {
       return this.deviceTooltip(this.deviceSettingsLabel, details)
     },
     chatLabel() {
+      return this.$t('videoCall.controls.chat')
+    },
+    chatAction() {
       return this.chatOpenForThisCall
         ? this.$t('videoCall.closeChat')
         : this.$t('videoCall.openChat')
     },
     leaveLabel() {
+      return this.$t('videoCall.controls.leave')
+    },
+    leaveAction() {
       return this.$t('videoCall.leave')
     },
     minimizeLabel() {
@@ -665,14 +819,58 @@ export default {
     isPreJoinModal() {
       return this.phase === 'prejoin'
     },
-    isFullscreen() {
-      // During prejoin we render as a centered modal — not full screen.
+    isMaximized() {
+      // During prejoin we render as a centered modal — not maximized.
       if (this.isPreJoinModal) return false
       return this.isMobile || !this.minimized || this.phase !== 'in-call'
     },
+    // On a phone, and in fullscreen, the maximized call fills the screen: its header and
+    // control bar lie on the videos, see-through, and move out of the way by themselves —
+    // after a while without a touch or a tap on a phone, while the mouse rests in
+    // fullscreen. Not with the chat open on a phone, where one writes beneath a small tile.
+    barsOverlay() {
+      return this.isMaximized && !this.mobileChatOpen && (this.isMobile || this.inFullscreen)
+    },
+    // On a desktop the bars of the maximized call — the page's header and footer, the
+    // call's header and control bar — stand around the videos, solid, and move only when
+    // asked to, with a button: a mouse moved by chance would bring them in, and together
+    // they are high. In fullscreen they lie on the videos and move by themselves, as on a
+    // phone (barsOverlay).
+    barsManual() {
+      return (
+        this.isMaximized &&
+        !this.isMobile &&
+        !this.inFullscreen &&
+        this.phase === 'in-call' &&
+        !this.error
+      )
+    },
+    // Only once there are videos to make room for.
+    autoHideBars() {
+      return this.barsOverlay && this.phase === 'in-call' && !this.error
+    },
+    // What the page's header and footer do meanwhile (layouts/default.vue). In fullscreen
+    // they stay away, also with the chat open on a phone: the call is all there is.
+    pageBars() {
+      if (this.inFullscreen) return 'hidden'
+      if (this.barsOverlay) return this.barsHidden ? 'hidden' : 'overlay'
+      if (this.barsManual) return this.barsCollapsed ? 'collapsed' : 'manual'
+      return 'normal'
+    },
+    // Fullscreen is offered for the maximized call wherever the browser can show it —
+    // on a phone too (Android), where it also hides the browser's own bars. An iPhone
+    // cannot, and gets no button.
+    showFullscreenButton() {
+      return this.canFullscreen && this.isMaximized && this.phase === 'in-call'
+    },
+    fullscreenLabel() {
+      return this.inFullscreen
+        ? this.$t('videoCall.exitFullscreen')
+        : this.$t('videoCall.enterFullscreen')
+    },
     modeClass() {
       if (this.isPreJoinModal) return 'video-call--modal'
-      return this.isFullscreen ? 'video-call--maximized' : 'video-call--minimized'
+      return this.isMaximized ? 'video-call--maximized' : 'video-call--minimized'
     },
     onCallRoute() {
       return this.$route.name === 'call-id-slug'
@@ -680,15 +878,25 @@ export default {
     parked() {
       // The call sits in the corner as a small window: during an active call —
       // not during the prejoin modal — and never on a phone, where the call is
-      // always full screen.
+      // always maximized.
       return this.phase === 'in-call' && this.minimized && !this.isMobile
     },
     iconOnly() {
       // Buttons without their label where there is no room for it: in the parked
-      // window, and on a phone, where six spelled-out controls fill half the
-      // screen. In the parked window they are small as well (see `parked`); on a
-      // phone they keep the size a finger needs.
-      return this.parked || (this.isMobile && this.phase === 'in-call')
+      // window, on a phone, where six spelled-out controls fill half the
+      // screen, and where the labels would take a second row. In the parked window
+      // they are small as well (see `parked`); on a phone they keep the size a
+      // finger needs.
+      return this.parked || (this.isMobile && this.phase === 'in-call') || this.controlsCrowded
+    },
+    // The control bar lies on the videos only, so the chat beside them narrows it.
+    controlsCrowded() {
+      return (
+        !this.isMobile &&
+        this.controlsWidth > 0 &&
+        this.labeledControlsWidth > 0 &&
+        this.controlsWidth < this.labeledControlsWidth
+      )
     },
     uniqueParticipantCount() {
       // A single participant publishing both camera and screen share still counts
@@ -779,7 +987,7 @@ export default {
       // Outside the regular grid a tile owns the whole stage: the minimized
       // window shows exactly one, and the spotlight tile fills the wide cell
       // (its thumbnails are sized separately in tileAvatarSize).
-      if (!this.isFullscreen || this.spotlightTile) {
+      if (!this.isMaximized || this.spotlightTile) {
         return { width: this.stageWidth, height: this.stageHeight }
       }
       const { columns, rows } = this.gridDimensions
@@ -806,6 +1014,7 @@ export default {
         if (open) {
           this.phase = 'prejoin'
           this.error = null
+          this.barsCollapsed = false
           this.prefetchJoin()
         } else if (wasOpen) {
           // Only tear down if we were actually open before — on the initial
@@ -821,6 +1030,22 @@ export default {
         // Sync to the store so layouts (chat-modul vs sidebar) can switch in
         // the same reactive tick as the local phase change.
         this.setStorePhase(next || 'idle')
+      },
+    },
+    pageBars: {
+      immediate: true,
+      handler(pageBars) {
+        this.setPageBars(pageBars)
+      },
+    },
+    // Parked or left: the call leaves fullscreen with it.
+    showFullscreenButton(offered) {
+      if (!offered) this.exitFullscreen()
+    },
+    autoHideBars: {
+      immediate: true,
+      handler(on) {
+        this.watchBarActivity(on)
       },
     },
     activeSpeakerIds(ids) {
@@ -862,7 +1087,7 @@ export default {
       // A failed connect holds no session worth preserving — minimizing only
       // exists so a *live* room survives navigation. Parking an error card in
       // the corner would be litter the user still has to dismiss, and leaving
-      // it full screen blocks the page they just navigated to. Close instead.
+      // it maximized blocks the page they just navigated to. Close instead.
       // Deliberately not leave(): its router.replace would hijack the
       // navigation that is running right now.
       if (this.phase === 'error') {
@@ -878,6 +1103,12 @@ export default {
     // Set before the immediate `show` watcher runs — it does so ahead of
     // created() and may already store a prefetched join token here.
     this.prefetched = null
+    // Ahead of the immediate `autoHideBars` watcher as well.
+    this.barsTimer = null
+    this.barsWatched = false
+    this.lastTouchAt = 0
+    // The tap that brought the bars back is not meant for the tile it landed on.
+    this.swallowTileSelect = false
   },
   created() {
     this.icons = iconRegistry
@@ -892,7 +1123,9 @@ export default {
     this.observedStage = null
     this.qualityTimer = null
     this.qualityClass = null
+    this.audioWatchdog = null
     this.leaving = false
+    this.unmounting = false
     this.deviceSwitches = this.newDeviceSwitches()
     this.callChatsSub = null
     this.groupChatRoomId = null
@@ -901,6 +1134,9 @@ export default {
     this.callChatAsks = 0
   },
   mounted() {
+    this.isChromium = typeof navigator !== 'undefined' && !!navigator.userAgentData
+    this.canFullscreen = !!document.fullscreenEnabled
+    document.addEventListener('fullscreenchange', this.onFullscreenChange)
     this.observeStage()
   },
   updated() {
@@ -909,8 +1145,14 @@ export default {
     // element is unchanged, which also keeps the observer's own updates from
     // looping.
     this.observeStage()
+    this.measureControls()
   },
   beforeDestroy() {
+    document.removeEventListener('fullscreenchange', this.onFullscreenChange)
+    this.unmounting = true
+    this.exitFullscreen()
+    this.watchBarActivity(false)
+    this.setPageBars('normal')
     this.disconnectStageObserver()
     this.closeDeviceSettings()
     this.cleanup()
@@ -926,8 +1168,130 @@ export default {
       setConferenceUnread: 'videoCall/SET_CONFERENCE_UNREAD',
       setGroupChatUnread: 'videoCall/SET_GROUP_CHAT_UNREAD',
       setLastChatTab: 'videoCall/SET_LAST_CHAT_TAB',
+      setPageBars: 'videoCall/SET_PAGE_BARS',
       setShowChat: 'chat/SET_OPEN_CHAT',
     }),
+    // The whole page goes fullscreen, not the call alone: tooltips, menus and toasts are
+    // put at the end of the page, outside the call, and would not show otherwise. The
+    // page's header and footer are kept away meanwhile (pageBars).
+    async toggleFullscreen() {
+      try {
+        if (this.pageInFullscreen()) {
+          await document.exitFullscreen()
+          return
+        }
+        await document.documentElement.requestFullscreen()
+        // The browser takes a moment. Parked, left or gone from the page meanwhile, the call
+        // has no use for it any more — and the watcher or beforeDestroy that ends it found
+        // nothing to end yet. Once gone, showFullscreenButton keeps its last value.
+        if (this.unmounting || !this.showFullscreenButton) this.exitFullscreen()
+      } catch {
+        // Refused by the browser (no user gesture, a policy): the call stays as it is.
+      }
+    },
+    // Only the page's own fullscreen is the call's: one of, say, a video embedded in a
+    // post is neither taken for it nor ended by it.
+    pageInFullscreen() {
+      return (
+        typeof document !== 'undefined' && document.fullscreenElement === document.documentElement
+      )
+    },
+    exitFullscreen() {
+      if (!this.pageInFullscreen()) return
+      document.exitFullscreen().catch(() => {})
+    },
+    // Also when the browser ends it (Esc).
+    onFullscreenChange() {
+      this.inFullscreen = this.pageInFullscreen()
+    },
+    watchBarActivity(on) {
+      if (typeof document === 'undefined' || on === this.barsWatched) return
+      this.barsWatched = on
+      const method = on ? 'addEventListener' : 'removeEventListener'
+      BARS_ACTIVITY_EVENTS.forEach((type) =>
+        document[method](type, this.onBarActivity, { capture: true, passive: true }),
+      )
+      if (on) {
+        this.scheduleBarsHide()
+      } else {
+        clearTimeout(this.barsTimer)
+        this.barsTimer = null
+        this.barsHidden = false
+        this.swallowTileSelect = false
+      }
+    },
+    onBarActivity(event) {
+      if (event.type === 'pointerdown' && event.pointerType === 'touch') {
+        this.onBarTouch(event)
+        return
+      }
+      // A click with the mouse or a pen is the user's own: a tile it lands on is selected.
+      if (event.type === 'pointerdown') this.swallowTileSelect = false
+      if (event.type !== 'keydown' && Date.now() - this.lastTouchAt < TOUCH_ECHO_MS) return
+      // Reading and writing in the chat beside the videos is no reason to put the bars
+      // back on them; going for the page's header or footer at the window's edge is.
+      const inChat = event.target?.closest?.('.video-call__sidebar')
+      const atEdge =
+        typeof event.clientY === 'number' &&
+        (event.clientY < BARS_EDGE_PX || event.clientY > window.innerHeight - BARS_EDGE_PX)
+      if (inChat && !atEdge) return
+      this.barsHidden = false
+      this.scheduleBarsHide()
+    },
+    // On a touch screen a tap on the videos switches the bars: back when they are gone —
+    // without spotlighting the tile it landed on — and away when they are there, unless
+    // the tap is on a tile, which spotlights it as ever. Other taps keep them a while.
+    onBarTouch(event) {
+      this.lastTouchAt = Date.now()
+      this.swallowTileSelect = false
+      const onStage = event.target?.closest?.('.video-call__stage')
+      if (this.barsHidden) {
+        this.barsHidden = false
+        this.swallowTileSelect = !!onStage
+        this.scheduleBarsHide()
+      } else if (onStage && !event.target.closest('.video-tile')) {
+        clearTimeout(this.barsTimer)
+        this.barsHidden = true
+      } else {
+        this.scheduleBarsHide()
+      }
+    },
+    scheduleBarsHide() {
+      clearTimeout(this.barsTimer)
+      this.barsTimer = setTimeout(this.hideBarsUnlessInUse, BARS_HIDE_MS)
+    },
+    hideBarsUnlessInUse() {
+      if (this.barsInUse()) this.scheduleBarsHide()
+      else this.barsHidden = true
+    },
+    // Nothing moves away from under the mouse, from the keyboard's focus or from beneath
+    // a menu it opened.
+    barsInUse() {
+      if (this.showDeviceSettings) return true
+      const bars = [
+        this.$el?.querySelector?.('.video-call__header'),
+        this.$el?.querySelector?.('.video-call__controls'),
+        document.querySelector('.main-navigation'),
+        document.querySelector('.desktop-footer'),
+      ].filter(Boolean)
+      const focused = document.activeElement
+      const keyboardFocus = focused && matchesSafely(focused, ':focus-visible')
+      // A touch screen keeps the last tapped element as hovered; that says nothing there.
+      const hovers = window.matchMedia?.('(hover: hover)')?.matches ?? true
+      if (
+        bars.some(
+          (bar) =>
+            (hovers && matchesSafely(bar, ':hover')) || (keyboardFocus && bar.contains(focused)),
+        )
+      ) {
+        return true
+      }
+      // The page's menu on a phone covers the screen from its header.
+      if (document.querySelector('.mobil-header-box--open')) return true
+      // The menus of the page's header (avatar, notifications) are popovers, put at the
+      // end of the page.
+      return !!document.querySelector('.popover[aria-hidden="false"]')
+    },
     observeStage() {
       const el = this.$refs.stageEl || null
       if (el === this.observedStage) return
@@ -953,6 +1317,24 @@ export default {
       if (width === this.stageWidth && height === this.stageHeight) return
       this.stageWidth = width
       this.stageHeight = height
+    },
+    // How wide the control bar is, and — while its buttons have their labels — how wide
+    // they need it in one row. Run after every render: the bar changes with the stage
+    // (whose observer re-renders) and with the labels (muted or not).
+    measureControls() {
+      const bar = this.$el?.querySelector?.('.video-call__controls')
+      if (!bar) return
+      if (bar.clientWidth !== this.controlsWidth) this.controlsWidth = bar.clientWidth
+      if (this.iconOnly) return
+      const style = window.getComputedStyle(bar)
+      const items = Array.from(bar.children)
+      const needed = Math.ceil(
+        items.reduce((sum, item) => sum + item.offsetWidth, 0) +
+          (parseFloat(style.columnGap) || 0) * Math.max(items.length - 1, 0) +
+          (parseFloat(style.paddingLeft) || 0) +
+          (parseFloat(style.paddingRight) || 0),
+      )
+      if (needed !== this.labeledControlsWidth) this.labeledControlsWidth = needed
     },
     disconnectStageObserver() {
       if (this.stageObserver) {
@@ -1180,17 +1562,35 @@ export default {
         /* the buttons simply go without device names */
       }
     },
+    // The tooltip of a control: what a click on it does. Plain text, as it may carry a
+    // device's name, which comes from outside. None on a phone (see iconOnlyTooltip).
+    controlTooltip(action) {
+      if (this.isMobile || !action) return ''
+      return { content: action, html: false }
+    },
+    // The name a screen reader gives a control: what a click on it does. While the button
+    // spells out its label, the name has to hold that word too, so the control can be called
+    // by it by voice (WCAG 2.5.3, label in name): put in front where the action lacks it, as
+    // "Headset: turn off" does next to "Microphone".
+    controlName(label, action) {
+      if (this.iconOnly || action.toLowerCase().includes(label.toLowerCase())) return action
+      return `${label}, ${action}`
+    },
     iconOnlyTooltip(label) {
       // v-tooltip renders nothing for an empty string — exactly what we want
       // once the button spells its label out next to the icon. Nor on a phone:
       // there is no pointer to hover with, and a tap would open the tooltip on
       // top of doing what the button does.
-      return this.parked ? label : ''
+      return this.parked || this.controlsCrowded ? label : ''
     },
     onTileSelect(tile) {
+      if (this.swallowTileSelect) {
+        this.swallowTileSelect = false
+        return
+      }
       if (!tile) return
-      // Only spotlight in fullscreen — minimized window already shows one tile.
-      if (!this.isFullscreen) return
+      // Only spotlight when maximized — minimized window already shows one tile.
+      if (!this.isMaximized) return
       this.spotlightKey = this.spotlightKey === tile.key ? null : tile.key
     },
     toggleMinimize() {
@@ -1252,6 +1652,7 @@ export default {
       // tears that down without cleanup(), so let go of it here for every way in.
       this.micRestart = null
       this.micSilenceProbe = null
+      this.stopAudioWatchdog()
       this.resetAudioOnly()
       try {
         if (!this.groupId) throw new Error('Missing group id')
@@ -1398,6 +1799,15 @@ export default {
         this.refreshTiles()
         this.audioBlocked = !room.canPlaybackAudio
         this.phase = 'in-call'
+        // One listener can lose one speaker's audio while everyone else still
+        // hears them — repair that subscription instead of waiting it out.
+        this.audioWatchdog = createAudioWatchdog({
+          room,
+          Track,
+          // A reconnect re-subscribes everything anyway.
+          isPaused: () => this.reconnecting,
+        })
+        this.audioWatchdog.start()
         this.joinCallChat(room)
         this.watchCallChats(true)
         this.loadGroupChatUnread()
@@ -1405,8 +1815,8 @@ export default {
       } catch (err) {
         const message = this.$backendError(err)
         // The user navigated away while the handshake was still running, so
-        // the window is parked in the corner. Since isFullscreen treats every
-        // non-'in-call' phase as full screen, showing the error block here
+        // the window is parked in the corner. Since isMaximized treats every
+        // non-'in-call' phase as maximized, showing the error block here
         // would blow the parked window back up over the page they moved to.
         // There is no session to park either — toast the reason and close.
         if (this.minimized) {
@@ -1434,9 +1844,9 @@ export default {
       const Track = this.Track
       if (!room) return
       const tiles = []
-      const collectAudio = (participant) => {
+      const collectAudio = (participant, source) => {
         for (const pub of participant.audioTrackPublications.values()) {
-          if (!Track || pub.source === Track.Source.Microphone) return pub.track || null
+          if (!Track || pub.source === source) return pub.track || null
         }
         return null
       }
@@ -1493,7 +1903,7 @@ export default {
         return null
       }
       const collect = (participant, isLocal) => {
-        const audioTrack = collectAudio(participant)
+        const audioTrack = collectAudio(participant, Track && Track.Source.Microphone)
         const profile = profileFor(participant, isLocal)
         const micEnabled = !!participant.isMicrophoneEnabled
         // Use the participant-level getters (isCameraEnabled / isScreenShareEnabled)
@@ -1533,7 +1943,11 @@ export default {
             name: participant.name || participant.identity,
             profile,
             videoTrack: screenPub.track,
-            audioTrack: null,
+            // The sound of the shared tab or screen plays from this tile, as long
+            // as the share runs. Whether there is any is the sharer's choice in
+            // the browser's share dialog; browsers that cannot capture it publish
+            // none. Our own we would only hear twice.
+            audioTrack: isLocal ? null : collectAudio(participant, Track.Source.ScreenShareAudio),
             isLocal,
             isScreen: true,
           })
@@ -1848,6 +2262,10 @@ export default {
       this.audioOnlyDismissed = true
       this.setAudioOnly(false)
     },
+    stopAudioWatchdog() {
+      if (this.audioWatchdog) this.audioWatchdog.stop()
+      this.audioWatchdog = null
+    },
     resetAudioOnly() {
       this.clearQualityTimer()
       this.qualityClass = null
@@ -1974,8 +2392,13 @@ export default {
       if (!this.room || !this.screenShareSupported) return
       const next = !this.screenShareEnabled
       try {
-        await this.room.localParticipant.setScreenShareEnabled(next, { audio: true })
+        const publication = await this.room.localParticipant.setScreenShareEnabled(next, {
+          audio: true,
+        })
         this.screenShareEnabled = next
+        this.screenShareSurface = next
+          ? publication?.track?.mediaStreamTrack?.getSettings?.().displaySurface || null
+          : null
         this.refreshTiles()
       } catch (err) {
         this.screenShareEnabled = !!this.room.localParticipant.isScreenShareEnabled
@@ -2034,6 +2457,8 @@ export default {
       }
     },
     async cleanup() {
+      // Before the disconnect: a check must not resubscribe on a room going away.
+      this.stopAudioWatchdog()
       // First, before the disconnect below is awaited: nothing may ask for the call's chat
       // any more once the call is being left.
       this.cancelCallChatRetry()
@@ -2176,8 +2601,9 @@ export default {
   right: 0;
   width: 355px;
   height: 280px;
-  border-top-left-radius: var(--border-radius-base);
-  border-top-right-radius: var(--border-radius-base);
+  /*  Rounded all round: it floats above the footer, not on the window's lower edge, and */
+  /*  the rounded tile inside showed the window's square corner behind it. */
+  border-radius: var(--border-radius-base);
   overflow: hidden;
 }
 
@@ -2369,7 +2795,7 @@ export default {
   gap: var(--space-x-small);
   /*  No padding above and below: the tabs reach the row's lower edge, where the */
   /*  underline of the active one belongs. The buttons bring the row's height. */
-  min-height: 44px;
+  min-height: 36px;
   /*  The tabs start at the sidebar's edge, as in the floating chat window; the close */
   /*  button at the row's end keeps its space to the edge. */
   padding: 0 var(--space-small) 0 0;
@@ -2449,7 +2875,8 @@ export default {
   position: relative;
   display: flex;
   gap: var(--space-x-small);
-  padding: var(--space-x-small) var(--space-small);
+  /*  Little space above and below the buttons: the height goes to the videos. */
+  padding: var(--space-xx-small) var(--space-small);
   background: var(--background-color-soft);
   border-top: 1px solid var(--color-neutral-85);
   flex-wrap: wrap;
@@ -2483,6 +2910,311 @@ export default {
   /*  the window's top edge and the control bar: 280px minus the bar. */
   bottom: calc(100% + var(--space-xxx-small));
   max-height: 232px;
+}
+
+/*  Desktop, call maximized (barsManual): the bars stand around the videos, solid, and move */
+/*  away together when asked to (.video-call--bars-collapsed) — up and down, the videos and */
+/*  the chat beside them growing into their place. Header and control bar go by their */
+/*  heights (44px, 45px); hidden once gone, so the keyboard does not land on them. */
+/*  The call's header and control bar stand above and below the videos only; the chat */
+/*  beside them reaches from the page's header to its footer, and from edge to edge of the */
+/*  window once those are gone. A grid of three rows for the videos' column, the chat */
+/*  spanning them; the body gives up its box, so the videos and the chat are its cells. */
+.video-call--bars-manual {
+  overflow: hidden;
+  transition: padding 0.3s ease;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  /*  The body's dark ground, which it no longer paints itself. */
+  background: var(--color-neutral-10);
+}
+
+.video-call--bars-manual .video-call__body {
+  display: contents;
+}
+
+.video-call--bars-manual > *,
+.video-call--bars-manual .video-call__body > * {
+  grid-row: 2;
+  grid-column: 1;
+}
+
+.video-call--bars-manual .video-call__header {
+  grid-row: 1;
+}
+
+.video-call--bars-manual .video-call__controls {
+  grid-row: 3;
+}
+
+.video-call--bars-manual .video-call__sidebar {
+  grid-row: 1 / -1;
+  grid-column: 2;
+  width: 360px;
+  max-width: 40vw;
+}
+
+.video-call--bars-manual .video-call__header,
+.video-call--bars-manual .video-call__controls {
+  transition:
+    margin 0.3s ease,
+    visibility 0s;
+}
+
+.video-call--bars-collapsed {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.video-call--bars-collapsed .video-call__header,
+.video-call--bars-collapsed .video-call__controls {
+  visibility: hidden;
+  transition:
+    margin 0.3s ease,
+    visibility 0s 0.3s;
+}
+
+.video-call--bars-collapsed .video-call__header {
+  margin-top: -44px;
+}
+
+.video-call--bars-collapsed .video-call__controls {
+  margin-bottom: -45px;
+}
+
+.video-call--bars-collapsed .video-call__stage {
+  position: relative;
+}
+
+.video-call__show-bars {
+  position: absolute;
+  top: var(--space-x-small);
+  right: var(--space-x-small);
+  z-index: 5;
+  display: flex;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .video-call--bars-manual,
+  .video-call--bars-manual .video-call__header,
+  .video-call--bars-manual .video-call__controls {
+    transition: none;
+  }
+}
+
+/*  Phone, call maximized (barsOverlay): the call fills the window, the page's header and */
+/*  footer lie on it, and so do the call's own header and control bar — over the videos */
+/*  only, not over the chat beside them. All four are see-through and move out of the way */
+/*  while the mouse rests (.video-call--bars-hidden); the videos keep their size meanwhile. */
+/*  One grid cell for the videos and everything lying on them, one for the chat. The body */
+/*  gives up its box, so that the call's header and control bar share the videos' cell. */
+.video-call--bars-overlay {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr);
+  padding-top: 0;
+  padding-bottom: 0;
+  background: var(--color-neutral-10);
+  /*  How far the bars reach into the videos, for what is to stay clear of them: the page's */
+  /*  header and footer, and the call's header (44px) and control bar (45px). */
+  --video-call-bars-top: calc(var(--header-height) + 44px);
+  --video-call-bars-bottom: calc(var(--footer-height) + 45px);
+}
+
+.video-call--bars-hidden {
+  --video-call-bars-top: 0px;
+  --video-call-bars-bottom: 0px;
+}
+
+.video-call--bars-overlay .video-call__body {
+  display: contents;
+}
+
+.video-call--bars-overlay > *,
+.video-call--bars-overlay .video-call__body > * {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.video-call--bars-overlay .video-call__header,
+.video-call--bars-overlay .video-call__controls {
+  z-index: 4;
+  backdrop-filter: blur(var(--video-call-bar-blur));
+  transition: transform 0.3s ease;
+}
+
+.video-call--bars-overlay .video-call__header {
+  align-self: start;
+  margin-top: var(--header-height);
+  background: color-mix(
+    in srgb,
+    var(--video-call-bar-header-color) var(--video-call-bar-opacity),
+    transparent
+  );
+}
+
+.video-call--bars-overlay .video-call__controls {
+  align-self: end;
+  margin-bottom: var(--footer-height);
+  background: color-mix(
+    in srgb,
+    var(--video-call-bar-controls-color) var(--video-call-bar-opacity),
+    transparent
+  );
+}
+
+.video-call--bars-hidden .video-call__header {
+  transform: translateY(calc(-100% - var(--header-height)));
+}
+
+.video-call--bars-hidden .video-call__controls {
+  transform: translateY(calc(100% + var(--footer-height)));
+}
+
+.video-call--bars-overlay .video-call__speakers {
+  top: calc(var(--video-call-bars-top) + var(--space-x-small));
+  transition: top 0.3s ease;
+}
+
+.video-call--bars-overlay .video-call__notices {
+  bottom: calc(var(--video-call-bars-bottom) + var(--space-x-small));
+  transition: bottom 0.3s ease;
+}
+
+/*  The tabs stand beside the call's header here: as high as it, line included (RoomHeader */
+/*  compact: 28px avatar, 8px above and below), so both end on one level. */
+.video-call--bars-manual .video-call__sidebar > .video-call__chat-tabs,
+.video-call--bars-overlay .video-call__sidebar > .video-call__chat-tabs {
+  box-sizing: border-box;
+  min-height: calc(28px + 2 * var(--space-x-small));
+}
+
+/*  The chat reaches from the page's header to its footer, and from edge to edge of the */
+/*  window once they are gone. */
+.video-call--bars-overlay .video-call__sidebar {
+  grid-column: 2;
+  width: 360px;
+  max-width: 40vw;
+  box-sizing: border-box;
+  padding-top: var(--header-height);
+  padding-bottom: var(--footer-height);
+  transition: padding 0.3s ease;
+}
+
+.video-call--bars-hidden .video-call__sidebar {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .video-call--bars-overlay .video-call__header,
+  .video-call--bars-overlay .video-call__controls,
+  .video-call--bars-overlay .video-call__speakers,
+  .video-call--bars-overlay .video-call__notices,
+  .video-call--bars-overlay .video-call__sidebar {
+    transition: none;
+  }
+}
+
+/*  The parked window: the videos fill it, and its header and control bar lie on them, */
+/*  see-through like the maximized call's, while the mouse is on the window or the device */
+/*  settings are open (.video-call--bars-held), or the keyboard moves in it. Otherwise only */
+/*  the number of participants stays, in a corner. */
+.video-call--parked-bars {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  /*  The body's dark ground, which it no longer paints itself: no light corner shows */
+  /*  around the rounded tiles. */
+  background: var(--color-neutral-10);
+}
+
+.video-call--parked-bars .video-call__body {
+  display: contents;
+}
+
+.video-call--parked-bars > *,
+.video-call--parked-bars .video-call__body > * {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.video-call--parked-bars .video-call__header,
+.video-call--parked-bars .video-call__controls {
+  z-index: 4;
+  backdrop-filter: blur(var(--video-call-bar-blur));
+  transition: transform 0.3s ease;
+}
+
+/*  Fullscreen: the page's header and footer are away for good, so the call's own bars */
+/*  lie at the very top and bottom, and the chat beside the videos is as high as the */
+/*  screen. */
+.video-call--fullscreen {
+  --header-height: 0px;
+  --footer-height: 0px;
+}
+
+/*  Chromium draws the blur behind a bar sliding in this small window a step ahead of the */
+/*  bar, as a line running in front of the header's lower edge. Without the blur there is */
+/*  none; they stay see-through. */
+.video-call--chromium.video-call--parked-bars .video-call__header,
+.video-call--chromium.video-call--parked-bars .video-call__controls {
+  backdrop-filter: none;
+}
+
+.video-call--parked-bars .video-call__header {
+  align-self: start;
+  background: color-mix(
+    in srgb,
+    var(--video-call-bar-header-color) var(--video-call-bar-opacity),
+    transparent
+  );
+}
+
+.video-call--parked-bars .video-call__controls {
+  align-self: end;
+  background: color-mix(
+    in srgb,
+    var(--video-call-bar-controls-color) var(--video-call-bar-opacity),
+    transparent
+  );
+}
+
+.video-call--parked-bars:not(:has(:focus-visible), .video-call--bars-held) .video-call__header {
+  transform: translateY(-100%);
+}
+
+.video-call--parked-bars:not(:has(:focus-visible), .video-call--bars-held) .video-call__controls {
+  transform: translateY(100%);
+}
+
+.video-call__parked-count {
+  z-index: 3;
+  align-self: start;
+  justify-self: start;
+  margin: var(--space-x-small);
+  background: var(--color-primary);
+  color: var(--color-primary-inverse);
+  padding: 2px var(--space-x-small);
+  border-radius: var(--border-radius-rounded);
+  font-size: var(--font-size-small);
+  min-width: 28px;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+.video-call--parked-bars:is(:has(:focus-visible), .video-call--bars-held)
+  .video-call__parked-count {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .video-call--parked-bars .video-call__header,
+  .video-call--parked-bars .video-call__controls,
+  .video-call__parked-count {
+    transition: none;
+  }
 }
 
 @media (--vp-mobile) {

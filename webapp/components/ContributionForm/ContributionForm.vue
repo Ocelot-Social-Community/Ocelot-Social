@@ -213,11 +213,15 @@
           <os-validation-hint
             v-if="categoriesActive"
             :count="formData.categoryIds.length"
-            :max="3"
+            :min="branding.category.min"
+            :max="branding.category.max"
             :variant="visibleErrors && visibleErrors.categoryIds ? 'error' : null"
             :text="
               visibleErrors && visibleErrors.categoryIds
-                ? $t('common.validations.categories')
+                ? $t('common.validations.categories', {
+                    min: branding.category.min,
+                    max: branding.category.max,
+                  })
                 : null
             "
           />
@@ -266,6 +270,7 @@
 </template>
 <script>
 import { OsButton, OsCard, OsIcon, OsValidationHint } from '@ocelot-social/ui'
+import { branding } from '@ocelot-social/branding'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import Editor from '~/components/Editor/Editor'
@@ -339,6 +344,7 @@ export default {
     const formData = this.externalFormData || this.buildInitialFormData()
     return {
       links,
+      branding,
       formData,
       loading: false,
       // eventLocationName and the hero image are set directly rather than
@@ -414,8 +420,18 @@ export default {
           type: 'array',
           required: this.categoriesActive,
           validator: (_, value = []) => {
-            if (this.categoriesActive && (value.length === 0 || value.length > 3)) {
-              return [new Error(this.$t('common.validations.categories'))]
+            if (
+              this.categoriesActive &&
+              (value.length < branding.category.min || value.length > branding.category.max)
+            ) {
+              return [
+                new Error(
+                  this.$t('common.validations.categories', {
+                    min: branding.category.min,
+                    max: branding.category.max,
+                  }),
+                ),
+              ]
             }
             return []
           },

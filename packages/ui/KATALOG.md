@@ -15,7 +15,7 @@ Phase 4: Tier 1        ██████████ 100% (OsButton, OsIcon, Os
 Phase 4: Tier A → HTML ██████████ 100% (10 ds-* Wrapper → Plain HTML) ✅
 Phase 4: Tier B        ██████████ 100% (ds-chip→OsBadge✅, ds-tag→OsBadge✅, ds-grid✅, ds-number→OsNumber✅, ds-radio→HTML✅)
 Phase 4: Tier B        ██████████ 100% (Chip→OsBadge, Tag→OsBadge, Grid→HTML, Number→OsNumber, Radio→HTML, Table→HTML) ✅
-Phase 4: Tier 2+       ██████████ 100% (OsModal✅, ds-form✅, OcelotInput✅, OcelotSelect✅, OsMenu/OsMenuItem✅) | 0 ds-* Tags verbleibend ✅
+Phase 4: Tier 2+       ██████████ 100% (OsModal✅, OsConfirmDialog✅, ds-form✅, OcelotInput✅, OcelotSelect✅, OsMenu/OsMenuItem✅) | 0 ds-* Tags verbleibend ✅
 ```
 
 ### Statistiken
@@ -29,7 +29,7 @@ Phase 4: Tier 2+       ██████████ 100% (OsModal✅, ds-form�
 | ✅ → OsBadge | Chip (20 Nutzungen → OsBadge), Tag (3 → OsBadge shape="square") |
 | ✅ → OsNumber | Number (5 Nutzungen → OsNumber, CountTo.vue gelöscht, vue-count-to entfernt) |
 | ✅ → Plain HTML | Radio (1 Datei → native `<input type="radio">` in ReportModal) |
-| ✅ → OsModal | Modal (7 Nutzungen → OsModal, Focus-Trap, Scroll-Lock, A11y) |
+| ✅ → OsModal | Modal (7 Nutzungen → OsModal, Focus-Trap, Scroll-Lock, A11y); Confirm-Dialoge → OsConfirmDialog (auf OsModal) |
 | ✅ ds-input → OcelotInput | Input (23 Dateien → OcelotInput Webapp-Komponente, lokale Imports, formValidation-kompatibel) |
 | ✅ ds-form entkoppelt | Form-Validierung → formValidation Mixin (async-validator), vuelidate entfernt |
 | ✅ ds-select → OcelotSelect | Select (3 Dateien → OcelotSelect Webapp-Komponente, lokale Imports, click-outside inline) |
@@ -178,7 +178,7 @@ Die Maintenance-App ist jetzt ein eigenständiges Nuxt 4-Projekt unter `maintena
 | 21 | CommentForm | ⬜ Ausstehend | Input | Form | |
 | 22 | CommentList | ⬜ Ausstehend | Display | List | |
 | 23 | ComponentSlider | ⬜ Ausstehend | Layout | | |
-| 24 | ConfirmModal | ⬜ Ausstehend | Feedback | Modal | 🔄 Modal-Familie |
+| 24 | ConfirmModal | ✅ Migriert | Feedback | Modal | 🔄 Modal-Familie, übersetzender Adapter um OsConfirmDialog ($t + Callbacks bleiben in Webapp) |
 | 25 | ContentMenu | ⬜ Ausstehend | Navigation | Menu | |
 | 26 | ContentViewer | ⬜ Ausstehend | Display | | |
 | 27 | ContextMenu | ⬜ Ausstehend | Navigation | Menu | |
@@ -195,8 +195,8 @@ Die Maintenance-App ist jetzt ein eigenständiges Nuxt 4-Projekt unter `maintena
 |---|------------|--------|-----------|-------------------|---------|
 | 35 | DateTimeRange | ⬜ Ausstehend | Input | | |
 | 36 | DeleteData | ⬜ Ausstehend | Feature | | |
-| 37 | DeleteUserModal | ✅ Migriert | Feedback | Modal | 🔄 Modal-Familie, Buttons → OsButton |
-| 38 | DisableModal | ✅ Migriert | Feedback | Modal | 🔄 Modal-Familie, Buttons → OsButton |
+| 37 | ~~DeleteUserModal~~ | ✅ Gelöscht | Feedback | Modal | 🔄 Modal-Familie → ConfirmModal (inline modalData) |
+| 38 | ~~DisableModal~~ | ✅ Gelöscht | Feedback | Modal | 🔄 Modal-Familie → ConfirmModal (inline modalData) |
 | 39 | DonationInfo | ✅ Migriert | Display | | Button → OsButton |
 | 40 | Dropdown | ⬜ Ausstehend | Input | Select | |
 | 41 | DropdownFilter | ⬜ Ausstehend | Filter | Select | |
@@ -262,7 +262,7 @@ Die Maintenance-App ist jetzt ein eigenständiges Nuxt 4-Projekt unter `maintena
 | 89 | MenuBar | ⬜ Ausstehend | Navigation | Menu | |
 | 90 | MenuBarButton | ✅ Migriert | Button | Button | 🔄 Button-Familie, nutzt OsButton |
 | 91 | MenuLegend | ⬜ Ausstehend | Navigation | | |
-| 92 | Modal | ⬜ Ausstehend | Feedback | Modal | 🔗 DUPLIKAT |
+| 92 | ~~Modal~~ | ✅ Gelöscht | Feedback | Modal | Modal-Router + Vuex Modal Store entfernt, Modals inline (v-if) |
 | 93 | MySomethingList | ✅ Migriert | Display | List | Buttons → OsButton |
 | 94 | NotificationMenu | ✅ Migriert | Navigation | Menu | Buttons → OsButton |
 | 95 | NotificationsTable | ⬜ Ausstehend | Display | Table | |
@@ -286,9 +286,9 @@ Die Maintenance-App ist jetzt ein eigenständiges Nuxt 4-Projekt unter `maintena
 | 109 | RegistrationSlideNonce | ⬜ Ausstehend | Feature | | Auth |
 | 110 | RegistrationSlideNoPublic | ⬜ Ausstehend | Feature | | Auth |
 | 111 | RegistrationSlider | ⬜ Ausstehend | Feature | | Auth |
-| 112 | ReleaseModal | ✅ Migriert | Feedback | Modal | 🔄 Modal-Familie, Buttons → OsButton |
+| 112 | ~~ReleaseModal~~ | ✅ Gelöscht | Feedback | Modal | 🔄 Modal-Familie → ConfirmModal (inline modalData) |
 | 113 | ReportList | ⬜ Ausstehend | Display | List | |
-| 114 | ReportModal | ⬜ Ausstehend | Feedback | Modal | 🔄 Modal-Familie |
+| 114 | ReportModal | ✅ Migriert | Feedback | Modal | 🔄 Modal-Familie, nutzt OsModal `size="lg"`; Report-Logik bleibt in Webapp |
 | 115 | ReportRow | ✅ Migriert | Display | | More Details → OsButton |
 | 116 | ReportsTable | ⬜ Ausstehend | Display | Table | |
 | 117 | Request | ⬜ Ausstehend | Feature | | |
@@ -361,11 +361,11 @@ Die Maintenance-App ist jetzt ein eigenständiges Nuxt 4-Projekt unter `maintena
 |------------|--------|---------|
 | ~~Modal (Styleguide)~~ | ✅ Ersetzt | → OsModal |
 | ~~Modal (Webapp)~~ | ✅ Ersetzt | → OsModal |
-| ConfirmModal | ✅ Nutzt OsModal | Generischer Confirm-Dialog mit Callbacks |
+| ConfirmModal | ✅ Nutzt OsConfirmDialog | Übersetzender Adapter: modalData-API, $t, Callbacks |
 | ~~DeleteUserModal~~ | ✅ Gelöscht | → ConfirmModal |
 | ~~DisableModal~~ | ✅ Gelöscht | → ConfirmModal |
 | ~~ReleaseModal~~ | ✅ Gelöscht | → ConfirmModal |
-| ReportModal | ✅ Nutzt OsModal | Feature-spezifisch |
+| ReportModal | ✅ Nutzt OsModal (`size="lg"`) | Feature-spezifisch |
 
 ### Menu-Familie (zur Konsolidierung)
 | Komponente | Beschreibung | Ziel |
@@ -439,6 +439,7 @@ Die Maintenance-App ist jetzt ein eigenständiges Nuxt 4-Projekt unter `maintena
 | 2026-03-23 | Claude | **ds-input → OcelotInput** | 23 Dateien migriert, Webapp-Komponente mit lokalen Imports (tree-shakeable), FormItem/Label/Error vereint |
 | 2026-03-23 | Claude | **ds-select → OcelotSelect** | 3 Dateien migriert, Webapp-Komponente, DsSelect+inputMixin+multiinputMixin vereint, Form-Kopplung entfernt, DsChip→OsBadge, DsSpinner→OsSpinner, click-outside inline |
 | 2026-03-23 | Claude | **ds-menu → OsMenu/OsMenuItem** | packages/ui Komponenten mit h() Render, vue-demi, provide/inject, dropdown Prop, eigene CSS in index.css. 17 Nutzungen in 11 Dateien migriert. Vite-Build: ui.css in style.css integriert. Action-Menüs nutzen `<a>` statt router-link. 0 ds-* Tags verbleibend in Webapp. |
+| 2026-10-15 | Claude | **OsConfirmDialog (#10283)** | packages/ui OsConfirmDialog (i18n-frei) auf OsModal; ConfirmModal → Adapter, ReportModal → `size="lg"`. Status-Widerspruch korrigiert: ConfirmModal/ReportModal/Modal standen in den Tabellen als ausstehend, DeleteUserModal/DisableModal/ReleaseModal als migriert statt gelöscht |
 
 ---
 
@@ -719,9 +720,9 @@ interface OsButtonProps {
 
 | Modal | Status | Notizen |
 |-------|--------|---------|
-| **ConfirmModal** | ✅ Nutzt OsModal | Generischer Confirm-Dialog mit Callbacks, Success-Animation |
+| **ConfirmModal** | ✅ Nutzt OsConfirmDialog | Generischer Confirm-Dialog mit Callbacks; Erfolg meldet der Toast des Aufrufers (keine Success-Animation mehr) |
 | ~~**DisableModal**~~ | ✅ Gelöscht | → ConfirmModal (inline modalData) |
-| **ReportModal** | ✅ Nutzt OsModal | Report-Logik mit Radio-Auswahl |
+| **ReportModal** | ✅ Nutzt OsModal | Report-Logik mit Radio-Auswahl, `size="lg"` |
 | ~~**DeleteUserModal**~~ | ✅ Gelöscht | → ConfirmModal (inline modalData) |
 | ~~**ReleaseModal**~~ | ✅ Gelöscht | → ConfirmModal (inline modalData) |
 
@@ -993,6 +994,7 @@ interface OsDropdownProps {
 | # | Komponente | Dateien | Abhängigkeiten | Status |
 |---|------------|---------|----------------|--------|
 | 5 | **OsModal** | 7 | OsButton | ✅ |
+| 5a | **OsConfirmDialog** | 1 (ConfirmModal-Adapter, 18 Aufrufer) | OsModal, OsButton, OsIcon | ✅ |
 | 6 | **OsDropdown** | — | OsButton | ⬜ |
 | 7 | **OsAvatar** | — | - | ⬜ |
 | 8 | **OsInput** | 23 | ds-form Kopplung aufgelöst (formValidation Mixin) | ⬜ |

@@ -508,6 +508,8 @@
     "POST_PIN_FEATURE_DISABLED": "Het vastpinnen van berichten is niet ingeschakeld.",
     "POST_PIN_LIMIT_REACHED": "Het maximale aantal vastgepinde berichten is bereikt. Maak eerst een ander bericht los.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Er bestaat al een bericht met deze slug.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Te weinig onderwerpen geselecteerd (minimaal {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Te veel onderwerpen geselecteerd (maximaal {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "De bevestigingscode is ongeldig.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Deze gebruikersnaam is al in gebruik.",
     "REPORT_TARGET_IS_OWN": "Je kunt jezelf en je eigen inhoud niet melden.",
@@ -604,7 +606,7 @@
     "previousLocation": "Vorige locatie: {location}",
     "scrollToLocationMap": "Naar de kaart scrollen",
     "validations": {
-      "categories": "Selecteer tussen één en drie onderwerpen.",
+      "categories": "Selecteer tussen {min} en {max} onderwerpen.",
       "contentNotEmpty": "Voer inhoud in.",
       "email": "Voer een geldig e-mailadres in.",
       "eventLocationNameLength": "Het adres moet tussen {min} en {max} tekens lang zijn.",
@@ -1010,15 +1012,15 @@
       "title": "Mijn groep bewerken"
     },
     "elevation": {
-      "actingAsMember": "Je handelt hier als {role}.",
-      "actingAsNonMember": "Je bent geen lid van deze groep.",
       "activeTitle": "Beheerderstoegang is actief.",
       "activeUntil": "Hij eindigt om {time}, of wanneer je hem beëindigt.",
       "end": "Beheerderstoegang beëindigen",
-      "offerBody": "Daarnaast heb je netwerkrechten over de groep. De inhoud lezen of iets wijzigen vraagt om deze bevestiging, en die wordt bij de groep vastgelegd.",
-      "offerBodyOwner": "Met je netwerkrechten kun je ook de andere eigenaren van deze groep terugzetten of verwijderen. Dat vraagt om deze bevestiging, en die wordt bij de groep vastgelegd.",
-      "reasonPlaceholder": "Waar gaat het om?",
-      "start": "Beheerderstoegang gebruiken"
+      "offerBody": "Je huidige rol in deze groep: “{role}”. Geef een reden op waarom je deze groep wilt beheren (wordt vastgelegd).",
+      "offerBodyNoneMember": "Je bent geen lid van de groep. Geef een reden op waarom je deze groep wilt beheren (wordt vastgelegd).",
+      "offerBodyOwner": "Je huidige rol in deze groep: “{role}”. Met je netwerkrechten kun je ook de andere eigenaren van deze groep terugzetten of verwijderen. Geef een reden op waarom je deze groep wilt beheren (wordt vastgelegd).",
+      "reasonPlaceholder": "Reden voor je actie",
+      "start": "Groep beheren",
+      "title": "Je hebt het recht om deze groep te beheren als een supereigenaar."
     },
     "errors": {
       "userAlreadyMember": "Gebruiker “{name}” is al lid!"
@@ -1932,15 +1934,30 @@
     "connecting": "Verbinden…",
     "connectionLost": "Verbinding verbroken: {name}",
     "connectionPoor": "Zwakke verbinding: {name}",
+    "controls": {
+      "camera": "Camera",
+      "chat": "Chat",
+      "leave": "Ophangen",
+      "microphone": "Microfoon",
+      "screen": "Scherm",
+      "startSharing": "Je scherm, een venster of een tabblad delen",
+      "stopSharing": "{surface}: niet meer delen",
+      "surface": {
+        "browser": "Tabblad",
+        "monitor": "Scherm",
+        "window": "Venster"
+      },
+      "turnOff": "{device}: uitschakelen",
+      "turnOn": "{device}: inschakelen"
+    },
     "deviceSettings": {
       "button": "Apparaten",
       "speakerError": "De luidspreker kon niet worden gewisseld.",
       "title": "Apparaatinstellingen"
     },
     "dialogLabel": "Groepsvideogesprek",
-    "disableCamera": "Camera uitschakelen",
     "enableAudio": "Geluid inschakelen",
-    "enableCamera": "Camera inschakelen",
+    "enterFullscreen": "Volledig scherm",
     "errorBackToPrejoin": "Instellingen wijzigen",
     "errorRetry": "Opnieuw proberen",
     "errors": {
@@ -1963,18 +1980,19 @@
         "noDevice": "Geen scherm beschikbaar om te delen."
       }
     },
+    "exitFullscreen": "Volledig scherm verlaten",
     "gotoGroup": "Naar groep “{name}”",
     "groupVideoCallButton": {
       "label": "Groepsvideo",
       "tooltip": "Videogesprek in groep “{name}”"
     },
+    "hideBars": "Balken verbergen",
     "leave": "Gesprek verlaten",
     "maximize": "Maximaliseren",
     "micMuted": "Microfoon uit",
     "micNoSignal": "Je microfoon levert geen geluid — anderen horen je niet.",
     "micUnmuted": "Microfoon aan",
     "minimize": "Minimaliseren",
-    "muteMic": "Microfoon dempen",
     "openChat": "Chat openen",
     "prejoin": {
       "camera": "Camera",
@@ -2022,12 +2040,10 @@
     "restartMic": "Microfoon opnieuw starten",
     "screenShare": "Scherm",
     "screenShareEnded": "Schermdelen beëindigd",
+    "showBars": "Balken tonen",
     "showVideos": "Video's tonen",
     "spotlightExit": "Spotlight verlaten",
-    "startScreenShare": "Scherm delen",
-    "stopScreenShare": "Stoppen met delen",
     "title": "Groepsvideogesprek",
-    "unmuteMic": "Microfoon inschakelen",
     "you": "jij",
     "youAreSharingScreen": "Je deelt je scherm"
   }
