@@ -185,11 +185,13 @@
                 :placeholder="$t('post.viewEvent.eventLocationName')"
                 :disabled="locationSelectDisabled"
                 @input="onEventLocationSelectInput"
+                @unpicked="locationUnpicked = $event"
               />
               <os-validation-hint
-                v-if="!locationSelectDisabled && visibleErrors && visibleErrors.eventLocationName"
+                v-if="!locationSelectDisabled && locationErrorText"
+                data-test="event-location-hint"
                 variant="error"
-                :text="$t('post.viewEvent.eventLocationRequired')"
+                :text="locationErrorText"
               />
             </div>
             <location-picker-map
@@ -211,11 +213,15 @@
           <os-validation-hint
             v-if="categoriesActive"
             :count="formData.categoryIds.length"
-            :max="3"
+            :min="branding.category.min"
+            :max="branding.category.max"
             :variant="visibleErrors && visibleErrors.categoryIds ? 'error' : null"
             :text="
               visibleErrors && visibleErrors.categoryIds
-                ? $t('common.validations.categories')
+                ? $t('common.validations.categories', {
+                    min: branding.category.min,
+                    max: branding.category.max,
+                  })
                 : null
             "
           />
@@ -263,8 +269,8 @@
   </div>
 </template>
 <script>
-import { branding } from '@ocelot-social/branding'
 import { OsButton, OsCard, OsIcon, OsValidationHint } from '@ocelot-social/ui'
+import { branding } from '@ocelot-social/branding'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import Editor from '~/components/Editor/Editor'
@@ -283,6 +289,7 @@ import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
 import LocationPickerMap from '~/components/Map/LocationPickerMap'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
+import { locationCoordinates, locationName } from '~/utils/locationPayload'
 
 export default {
   mixins: [GetCategories, formValidation],
@@ -337,6 +344,7 @@ export default {
     const formData = this.externalFormData || this.buildInitialFormData()
     return {
       links,
+      branding,
       formData,
       loading: false,
       // eventLocationName and the hero image are set directly rather than
@@ -344,6 +352,8 @@ export default {
       // equivalent for them — same reasoning as GroupForm.vue's own
       // locationChangedByUser (see hasUnsavedChanges below).
       locationChangedByUser: false,
+      // LocationSelect holds typed text no place was picked for (its 'unpicked' event).
+      locationUnpicked: false,
       imageChangedByUser: false,
       // The type as of the last successful save — starts as the
       // contribution's own saved value, refreshed after each further save
@@ -421,8 +431,18 @@ export default {
           type: 'array',
           required: this.categoriesActive,
           validator: (_, value = []) => {
-            if (this.categoriesActive && (value.length === 0 || value.length > 3)) {
-              return [new Error(this.$t('common.validations.categories'))]
+            if (
+              this.categoriesActive &&
+              (value.length < branding.category.min || value.length > branding.category.max)
+            ) {
+              return [
+                new Error(
+                  this.$t('common.validations.categories', {
+                    min: branding.category.min,
+                    max: branding.category.max,
+                  }),
+                ),
+              ]
             }
             return []
           },
@@ -483,6 +503,11 @@ export default {
                 ),
               ]
             }
+            // Typed but never picked: the server takes an event's place only with the coordinates
+            // it was picked with (#7239) — a search result or a pin on the map.
+            if (!locationCoordinates(value)) {
+              return [new Error(this.$t('common.validations.eventLocationNotPicked'))]
+            }
             return []
           },
         },
@@ -498,25 +523,19 @@ export default {
     eventInput() {
       if (this.postType === 'Event') {
         const locationValue = this.formData.eventLocationName
-        // LocationSelect and LocationPickerMap both already resolve lat/lng
-        // (via reverse/forward geocoding) alongside the label when a search
-        // result or map pin is picked — a plain string here means the field
-        // still holds unresolved/typed text, no coordinates to send yet.
-        const hasCoordinates =
-          typeof locationValue === 'object' &&
-          locationValue !== null &&
-          typeof locationValue.lat === 'number' &&
-          typeof locationValue.lng === 'number'
+        // The coordinates a search result or map pin was picked with (utils/locationPayload.js);
+        // the validator above keeps typed text from getting this far.
+        const coordinates = locationCoordinates(locationValue)
         return {
           eventStart: new Date(this.formData.eventStart).toISOString(),
           eventVenue: this.formData.eventVenue,
           eventEnd: this.formData.eventEnd ? new Date(this.formData.eventEnd).toISOString() : null,
           eventIsOnline: this.formData.eventIsOnline,
           eventLocationName: !this.formData.eventIsOnline
-            ? (locationValue?.value ?? locationValue) || null
+            ? locationName(locationValue) || null
             : null,
-          lat: !this.formData.eventIsOnline && hasCoordinates ? locationValue.lat : null,
-          lng: !this.formData.eventIsOnline && hasCoordinates ? locationValue.lng : null,
+          lat: !this.formData.eventIsOnline ? (coordinates?.lat ?? null) : null,
+          lng: !this.formData.eventIsOnline ? (coordinates?.lng ?? null) : null,
         }
       }
       return undefined
@@ -532,6 +551,16 @@ export default {
             min: this.formSchema.title.min,
             max: this.formSchema.title.max,
           })
+    },
+    // The validator's own message (length, a place held without coordinates), except for an empty
+    // field, which keeps explaining when an address is needed at all. Nothing while LocationSelect
+    // holds typed text it explains itself: to the form that field is empty, to the user it is not.
+    locationErrorText() {
+      const error = this.visibleErrors?.eventLocationName
+      if (!error || this.locationUnpicked) return null
+      return locationName(this.formData.eventLocationName).trim()
+        ? error
+        : this.$t('post.viewEvent.eventLocationRequired')
     },
     venueErrorText() {
       if (!this.visibleErrors?.eventVenue) return null

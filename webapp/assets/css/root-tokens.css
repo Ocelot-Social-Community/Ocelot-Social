@@ -298,12 +298,22 @@
  * @tokens Z-Index
  */
 
+  /* Layering, top to bottom. Use a token for anything that must stack over page content. */
+  /* modal: dialogs and the global tooltip/popover stack */
   --z-index-modal: 9999;
+  /* overlay: the chat module, a minimized call, the pre-join dialog, backdrops */
   --z-index-overlay: 9000;
+  /* dropdown: menus opened from the page */
   --z-index-dropdown: 8888;
+  /* page-submenu: page chrome — header, footer and their submenus. Above a maximized call. */
   --z-index-page-submenu: 2500;
+  /* call-maximized: a maximized video call, one below the page chrome and above the page content */
+  --z-index-call-maximized: calc(var(--z-index-page-submenu) - 1);
+  /* sticky-float: floating page elements, e.g. the feed's new-post button */
   --z-index-sticky-float: 150;
+  /* sticky: sticky page elements */
   --z-index-sticky: 100;
+  /* surface: lowest layer above the page flow */
   --z-index-surface: 1;
   /**
  * @tokens Media Query
@@ -388,6 +398,14 @@
   --chat-message-checkmark: var(--text-color-soft);
   --chat-room-color-counter-badge: var(--text-color-inverse);
   --chat-room-background-counter-badge: var(--color-danger);
+  /* The hint floating above a chat's messages (Chat.vue renderHint). Dark like the app's
+     tooltips, which carry the same text on the chat's tab: their background, text colour and
+     shadow (tooltip.css), and a hover for its close button that stays on the dark side. */
+  --chat-hint-background: var(--background-color-inverse-soft);
+  --chat-hint-color: var(--text-color-inverse);
+  --chat-hint-icon-color: var(--text-color-inverse);
+  --chat-hint-shadow: var(--box-shadow-large);
+  --chat-hint-close-hover-background: rgba(255, 255, 255, 0.15);
   /* The room name next to its icon (Chat.vue .room-name-with-icon). Was referenced without ever being
      declared and without a fallback, so `color` resolved to nothing and the browser dropped the whole
      declaration — the name rendered in the inherited colour. Same family and same value as
@@ -418,4 +436,21 @@
   --color-map-marker-user: rgb(51, 195, 119);
   --color-map-marker-group: rgb(248, 77, 77);
   --color-map-marker-event: rgb(119, 83, 235);
+  /**
+ * @tokens Video Call Bars
+ */
+
+  /* The bars lying see-through on a video call — on a phone, in the parked window (and in
+     fullscreen): the page's header and footer, the call's header and control bar (VideoCall.vue,
+     layouts/default.vue). On a desktop the maximized call's bars are solid. How much of their own
+     colour they keep — the rest lets the videos through — and how much the videos behind them
+     are blurred. 100% and 0px make them solid. */
+  --video-call-bar-opacity: 75%;
+  --video-call-bar-blur: 8px;
+  /* The colour each of them is glass of; by default the one it has away from the call. A dark one
+     wants a light text, which these bars do not bring along. */
+  --video-call-bar-page-header-color: var(--color-header-background);
+  --video-call-bar-page-footer-color: var(--color-footer-background);
+  --video-call-bar-header-color: var(--color-header-background);
+  --video-call-bar-controls-color: var(--background-color-soft);
 }

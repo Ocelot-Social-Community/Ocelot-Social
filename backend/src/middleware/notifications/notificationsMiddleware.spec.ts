@@ -51,9 +51,11 @@ const { default: RemoveUserFromGroup } =
   await import('@graphql/queries/groups/RemoveUserFromGroup.gql')
 const { default: CreateGroupRoom } = await import('@graphql/queries/messaging/CreateGroupRoom.gql')
 const { default: CreateMessage } = await import('@graphql/queries/messaging/CreateMessage.gql')
+const { joinCallSession } = await import('@src/livekit/callSession')
 const { default: markAsRead } = await import('@graphql/queries/notifications/markAsRead.gql')
 const { default: notifications } = await import('@graphql/queries/notifications/notifications.gql')
 const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
+const { default: toggleObservePost } = await import('@graphql/queries/posts/toggleObservePost.gql')
 const { default: UpdatePost } = await import('@graphql/queries/posts/UpdatePost.gql')
 const { createApolloTestSetup } = await import('@root/test/helpers')
 
@@ -868,7 +870,8 @@ describe('notifications', () => {
             postAuthor = notifiedUser
           })
 
-          it('sends only one notification with reason commented_on_post, no notification with reason mentioned_in_comment', async () => {
+          // Mentioned AND observing their post: told once, and the mention outranks the comment.
+          it('sends only one notification with reason mentioned_in_comment, no notification with reason commented_on_post', async () => {
             await createCommentOnPostAction()
             const expected = {
               data: {
@@ -877,7 +880,7 @@ describe('notifications', () => {
                     id: expect.any(String),
                     read: false,
                     createdAt: expect.any(String),
-                    reason: 'commented_on_post',
+                    reason: 'mentioned_in_comment',
                     from: {
                       __typename: 'Comment',
                       id: 'c47',
@@ -898,6 +901,39 @@ describe('notifications', () => {
                 },
               }),
             ).resolves.toMatchObject({ ...expected, errors: undefined })
+          })
+
+          // Having stopped observing their post, the mention is all that reaches the author.
+          it('sends the author who no longer observes the post a notification with reason mentioned_in_comment', async () => {
+            await createPostAction()
+            authenticatedUser = await notifiedUser.toJson()
+            await mutate({ mutation: toggleObservePost, variables: { id: 'p47', value: false } })
+            authenticatedUser = await commentAuthor.toJson()
+            await mutate({
+              mutation: CreateComment,
+              variables: { id: 'c47', postId: 'p47', content: commentContent },
+            })
+            authenticatedUser = await notifiedUser.toJson()
+
+            await expect(
+              query({
+                query: notifications,
+                variables: {
+                  orderBy: 'updatedAt_desc',
+                  read: false,
+                },
+              }),
+            ).resolves.toMatchObject({
+              data: {
+                notifications: [
+                  {
+                    reason: 'mentioned_in_comment',
+                    from: { __typename: 'Comment', id: 'c47' },
+                  },
+                ],
+              },
+              errors: undefined,
+            })
           })
         })
 
@@ -1155,6 +1191,36 @@ describe('notifications', () => {
       })
     })
 
+    describe('if the chatReceiver has no e-mail address', () => {
+      it('publishes subscriptions but sends no email', async () => {
+        await database.write({
+          query: `MATCH (:User { id: $id })-[:PRIMARY_EMAIL]->(email:EmailAddress)
+                  DETACH DELETE email`,
+          variables: { id: 'chatReceiver' },
+        })
+
+        await mutate({
+          mutation: CreateMessage,
+          variables: {
+            roomId,
+            content: 'Some nice message to chatReceiver',
+          },
+        })
+
+        expect(pubsubSpy).toHaveBeenCalledWith('ROOM_UPDATED', {
+          roomUpdated: expect.objectContaining({ id: expect.any(String) }),
+          userId: 'chatReceiver',
+        })
+        expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {
+          chatMessageAdded: expect.objectContaining({
+            content: 'Some nice message to chatReceiver',
+          }),
+          userId: 'chatReceiver',
+        })
+        expect(sendChatMessageMailMock).not.toHaveBeenCalled()
+      })
+    })
+
     describe('if the chatReceiver has blocked chatSender', () => {
       it('publishes no subscriptions and sends no email', async () => {
         isUserOnlineMock = vi.fn().mockReturnValue(false)
@@ -1310,6 +1376,46 @@ describe('notifications', () => {
             senderUser: expect.objectContaining({ id: 'chatSender' }),
             recipientUser: expect.objectContaining({ id: 'chatReceiver' }),
           })
+        })
+      })
+
+      // The chat only the participants of one video call share. It is talk among those in
+      // the call; a mail would chase everybody who has left it.
+      describe('conference chat of a video call', () => {
+        let callRoomId
+
+        beforeEach(async () => {
+          const join = async (userId: string) =>
+            joinCallSession(database.driver, {
+              groupId: 'chat-group',
+              userId,
+              livekitRoom: 'group-chat-group',
+              livekitSid: 'RM_1',
+              presentUserIds: ['chatSender', 'chatReceiver'],
+            })
+          callRoomId = await join('chatSender')
+          await join('chatReceiver')
+        })
+
+        it('publishes subscriptions but sends no email, even to an offline participant', async () => {
+          isUserOnlineMock = vi.fn().mockReturnValue(false)
+
+          await mutate({
+            mutation: CreateMessage,
+            variables: {
+              roomId: callRoomId,
+              content: 'Some message in the call',
+            },
+          })
+
+          expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {
+            chatMessageAdded: expect.objectContaining({
+              content: 'Some message in the call',
+              senderId: 'chatSender',
+            }),
+            userId: 'chatReceiver',
+          })
+          expect(sendChatMessageMailMock).not.toHaveBeenCalled()
         })
       })
     })

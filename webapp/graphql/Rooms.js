@@ -52,6 +52,8 @@ export const roomQuery = () => gql`
       roomName
       avatar
       isGroupRoom
+      isCallRoom
+      isWritable
       lastMessageAt
       createdAt
       unreadCount

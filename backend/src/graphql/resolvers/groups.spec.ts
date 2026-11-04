@@ -457,6 +457,20 @@ describe('in mode', () => {
             })
           })
 
+          describe('an unknown one', () => {
+            it('throws error: "At least one of the categories does not exist."', async () => {
+              const { errors } = await mutate({
+                mutation: CreateGroup,
+                variables: { ...variables, categoryIds: ['cat9', 'no-such-category'] },
+              })
+
+              expect(errors?.[0]).toHaveProperty(
+                'message',
+                'At least one of the categories does not exist.',
+              )
+            })
+          })
+
           describe('but no categories exist in the database (empty category DB)', () => {
             beforeEach(async () => {
               const session = database.driver.session()
@@ -3855,6 +3869,52 @@ describe('in mode', () => {
                   expect(errors?.[0]).toHaveProperty('message', 'Too many categories (at most 3).')
                 })
               })
+
+              describe('an unknown one', () => {
+                it('throws error: "At least one of the categories does not exist."', async () => {
+                  const { errors } = await mutate({
+                    mutation: UpdateGroup,
+                    variables: { id: 'my-group', categoryIds: ['no-such-category'] },
+                  })
+
+                  expect(errors?.[0]).toHaveProperty(
+                    'message',
+                    'At least one of the categories does not exist.',
+                  )
+                })
+              })
+
+              // As for CreateGroup: on an empty category DB there is nothing to choose, and a
+              // group must still be savable — the frontend sends an empty multi-select as [].
+              describe('but no categories exist in the database (empty category DB)', () => {
+                beforeEach(async () => {
+                  const session = database.driver.session()
+                  try {
+                    await session.run('MATCH (category:Category) DETACH DELETE category')
+                  } finally {
+                    await session.close()
+                  }
+                })
+
+                it('updates the group with "categoryIds: []" instead of throwing "Too few categories."', async () => {
+                  await expect(
+                    mutate({
+                      mutation: UpdateGroup,
+                      variables: { id: 'my-group', name: 'The New Group Name', categoryIds: [] },
+                    }),
+                  ).resolves.toMatchObject({
+                    data: {
+                      UpdateGroup: {
+                        id: 'my-group',
+                        name: 'The New Group Name',
+                        categories: [],
+                        myRole: 'owner',
+                      },
+                    },
+                    errors: undefined,
+                  })
+                })
+              })
             })
 
             describe('showMembers', () => {
@@ -4507,6 +4567,7 @@ describe('in mode', () => {
         await mutate({
           mutation: CreatePost,
           variables: {
+            categoryIds: ['cat9'],
             id: 'post-in-group-1',
             title: 'First Post',
             content: 'Content of first post',
@@ -4517,6 +4578,7 @@ describe('in mode', () => {
         await mutate({
           mutation: CreatePost,
           variables: {
+            categoryIds: ['cat9'],
             id: 'post-in-group-2',
             title: 'Second Post',
             content: 'Content of second post',

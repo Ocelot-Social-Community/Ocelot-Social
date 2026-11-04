@@ -1,24 +1,27 @@
 <script lang="ts">
-  import {
-    computed,
-    defineComponent,
-    getCurrentInstance,
-    h,
-    isVue2,
-    onBeforeUnmount,
-    onMounted,
-    ref,
-    watch,
-  } from 'vue-demi'
+  import { computed, defineComponent, getCurrentInstance, h, isVue2, ref, watch } from 'vue-demi'
 
   import OsButton from '#src/components/OsButton/OsButton.vue'
   import { IconCheck, IconClose } from '#src/components/OsIcon'
   import { cn } from '#src/utils'
+  import { renderCloseButton } from '#src/utils/closeButton'
+  import { trapFocus, useBodyScrollLock, useDialogFocus, useEscapeKey } from '#src/utils/dialog'
+  import { elementData } from '#src/utils/elementData'
 
   import { modalPanelVariants } from './modal.variants'
 
+  import type { ModalSize } from './modal.variants'
+  import type { PropType } from 'vue-demi'
+
   /**
    * Modal dialog component with backdrop, focus trap, and body scroll lock.
+   *
+   * Focus moves into the dialog on open (to the element marked with `data-autofocus`,
+   * otherwise to the panel itself), stays trapped inside while open, and returns to the
+   * previously focused element on close.
+   *
+   * All user-visible strings are props; the English defaults are only a fallback, the
+   * library ships no translations.
    *
    * Supports two modes:
    * - **Custom footer** via the `footer` scoped slot (receives `{ confirm, cancel }`)
@@ -54,6 +57,16 @@
         type: String,
         default: 'Cancel',
       },
+      /** Accessible label of the close button */
+      closeLabel: {
+        type: String,
+        default: 'Close',
+      },
+      /** Maximum panel width: sm (400px), md (500px), lg (700px) */
+      size: {
+        type: String as PropType<ModalSize>,
+        default: 'md',
+      },
       /** Label for the built-in confirm button */
       confirmLabel: {
         type: String,
@@ -62,11 +75,10 @@
     },
     emits: ['update:open', 'confirm', 'cancel', 'close', 'opened'],
     setup(props, { slots, attrs, emit }) {
-      const panelClasses = computed(() => modalPanelVariants())
+      const panelClasses = computed(() => modalPanelVariants({ size: props.size }))
 
       const modalRef = ref<HTMLElement | null>(null)
       const isScrolled = ref(false)
-      let previousOverflow = ''
       const titleId = `os-modal-title-${Math.random().toString(36).slice(2, 7)}`
 
       /* v8 ignore start -- Vue 2 only */
@@ -114,76 +126,27 @@
         close(type)
       }
 
-      // --- Body scroll lock ---
+      // --- Body scroll lock, ESC key ---
+      useBodyScrollLock(() => props.open)
+      useDialogFocus(() => props.open, modalRef)
+      useEscapeKey(
+        () => props.open,
+        () => cancel('backdrop'),
+      )
       watch(
         () => props.open,
         (show) => {
-          /* v8 ignore start -- SSR guard */
-          if (typeof document === 'undefined') {
-            return
-          }
-          /* v8 ignore stop */
           if (show) {
-            previousOverflow = document.body.style.overflow
-            document.body.style.overflow = 'hidden'
             emit('opened')
-          } else {
-            document.body.style.overflow = previousOverflow
           }
         },
         { immediate: true },
       )
 
-      // --- ESC key handler ---
-      function onKeydown(e: KeyboardEvent) {
-        if (props.open && e.key === 'Escape') {
-          cancel('backdrop')
-        }
-      }
-
-      onMounted(() => {
-        document.addEventListener('keydown', onKeydown)
-      })
-
-      onBeforeUnmount(() => {
-        document.removeEventListener('keydown', onKeydown)
-        /* v8 ignore start -- cleanup guard */
-        if (typeof document !== 'undefined') {
-          document.body.style.overflow = previousOverflow
-        }
-        /* v8 ignore stop */
-      })
-
       // --- Focus trap ---
-      /* v8 ignore start -- focus wrapping requires real browser (tested in visual tests) */
       function onFocusTrap(e: KeyboardEvent) {
-        if (e.key !== 'Tab' || !modalRef.value) {
-          return
-        }
-
-        const focusable = modalRef.value.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        )
-        if (focusable.length === 0) {
-          return
-        }
-
-        const first = focusable[0]
-        const last = focusable[focusable.length - 1]
-
-        if (e.shiftKey) {
-          if (document.activeElement === first) {
-            e.preventDefault()
-            last.focus()
-          }
-        } else {
-          if (document.activeElement === last) {
-            e.preventDefault()
-            first.focus()
-          }
-        }
+        trapFocus(modalRef.value, e)
       }
-      /* v8 ignore stop */
 
       return () => {
         if (!props.open) {
@@ -203,23 +166,14 @@
           return h('div', { class: cn('os-modal-wrapper', (closedAttrClass as string) || '') })
         }
 
-        // --- Close button (native <button> for Vue 2/3 compatibility) ---
-        const closeBtn = h(
-          'button',
-          {
-            class:
-              'os-modal__close absolute top-3 right-3 flex items-center justify-center w-[26px] h-[26px] rounded-full bg-transparent border-0 cursor-pointer p-0 hover:bg-[var(--color-default-hover)] text-[var(--color-default-contrast)]',
-            type: 'button',
-            'aria-label': 'Close',
-            'data-testid': 'os-modal-close',
-            ...eventProps({ click: () => cancel('close') }),
-          },
-          [
-            h('span', { class: 'w-4 h-4 fill-current inline-flex', 'aria-hidden': 'true' }, [
-              IconClose(createElement, isVue2),
-            ]),
-          ],
-        )
+        // --- Close button ---
+        const closeBtn = renderCloseButton({
+          class: 'os-modal__close absolute top-3 right-3',
+          label: props.closeLabel,
+          testId: 'os-modal-close',
+          onClick: () => cancel('close'),
+          createElement,
+        })
 
         // --- Header ---
         const headerChildren: ReturnType<typeof h>[] = []
@@ -227,7 +181,10 @@
           headerChildren.push(
             h(
               'h2',
-              { class: 'os-modal__title text-[1.5rem] font-semibold m-0', id: titleId },
+              elementData({
+                class: 'os-modal__title text-[1.5rem] font-semibold m-0',
+                id: titleId,
+              }),
               props.title,
             ),
           )
@@ -253,11 +210,11 @@
         // --- Content ---
         const content = h(
           'div',
-          {
+          elementData({
             class: 'os-modal__content px-6 pt-4 pb-6 overflow-y-auto max-h-[50vh]',
             tabindex: '0',
             ...eventProps({ scroll: onContentScroll as (...args: unknown[]) => void }),
-          },
+          }),
           slots.default?.(),
         )
 
@@ -336,10 +293,13 @@
         )
 
         // --- Backdrop (click-to-close is handled on the overlay wrapper below) ---
-        const backdrop = h('div', {
-          class: 'os-modal__backdrop fixed inset-0 bg-black/70 z-[9998]',
-          'data-testid': 'os-modal-backdrop',
-        })
+        const backdrop = h(
+          'div',
+          elementData({
+            class: 'os-modal__backdrop fixed inset-0 bg-black/70 z-[9998]',
+            'data-testid': 'os-modal-backdrop',
+          }),
+        )
 
         // --- Panel (stops click propagation so overlay click only fires on backdrop area) ---
         const panelProps: Record<string, unknown> = {
@@ -347,6 +307,8 @@
           role: 'dialog',
           'aria-modal': 'true',
           'data-testid': 'os-modal-panel',
+          // Focusable by script only: the fallback target when nothing inside asks for focus
+          tabindex: '-1',
           ...eventProps({
             keydown: onFocusTrap as (...args: unknown[]) => void,
             click: (e: unknown) => (e as Event).stopPropagation(),
@@ -359,7 +321,7 @@
           panelProps['aria-label'] = props.ariaLabel
         }
 
-        const panel = h('div', panelProps, [header, content, footer])
+        const panel = h('div', elementData(panelProps), [header, content, footer])
 
         // --- Overlay: captures clicks outside the panel to close ---
         const overlayProps: Record<string, unknown> = {

@@ -61,7 +61,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # On master, a commit the merge queue already tested here reports no changes: every job
+      # On a branch, a commit the merge queue already tested here reports no changes: every job
       # below is then skipped (which counts as passed), instead of running the same tree twice.
       - name: Already verified by the merge queue?
         id: queue

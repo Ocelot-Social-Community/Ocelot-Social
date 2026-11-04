@@ -300,21 +300,6 @@ export default {
     proxy: true,
   },
   proxy: {
-    '/.well-known/webfinger': {
-      target: CONFIG.GRAPHQL_URI,
-      toProxy: true, // cloudflare needs that
-      headers: {
-        Accept: 'application/json',
-      },
-    },
-    '/activitypub': {
-      // make this configurable (nuxt-dotenv)
-      target: CONFIG.GRAPHQL_URI,
-      toProxy: true, // cloudflare needs that
-      headers: {
-        Accept: 'application/json',
-      },
-    },
     '/api': {
       // make this configurable (nuxt-dotenv)
       target: CONFIG.GRAPHQL_URI,

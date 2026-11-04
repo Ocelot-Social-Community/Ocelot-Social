@@ -73,6 +73,22 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'The name must be at least {min} characters long.',
   },
+  USER_PROFILE_NAME_TOO_LONG: {
+    type: 'BAD_USER_INPUT',
+    text: 'The name must be at most {max} characters long.',
+  },
+  USER_PROFILE_SLUG_TOO_SHORT: {
+    type: 'BAD_USER_INPUT',
+    text: 'The slug must be at least {min} characters long.',
+  },
+  USER_PROFILE_SLUG_TOO_LONG: {
+    type: 'BAD_USER_INPUT',
+    text: 'The slug must be at most {max} characters long.',
+  },
+  USER_PROFILE_SLUG_INVALID_CHARACTERS: {
+    type: 'BAD_USER_INPUT',
+    text: 'The slug may only contain lowercase letters (a–z), numbers (0–9), underscores and hyphens.',
+  },
   BADGE_SELECTION_BADGE_NOT_REWARDED: {
     type: 'BAD_USER_INPUT',
     text: 'You cannot set badges not rewarded to you.',
@@ -100,6 +116,10 @@ const definitions = {
   GROUP_SAVE_TOO_MANY_CATEGORIES: {
     type: 'BAD_USER_INPUT',
     text: 'Too many categories (at most {max}).',
+  },
+  GROUP_SAVE_CATEGORY_UNKNOWN: {
+    type: 'BAD_USER_INPUT',
+    text: 'At least one of the categories does not exist.',
   },
   GROUP_MEMBERSHIP_USER_NOT_A_MEMBER: {
     type: 'BAD_USER_INPUT',
@@ -186,6 +206,12 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'The comment must be at least {min} characters long.',
   },
+  // #7239: a place typed but not picked was searched, and Mapbox's top result stored — "7112 Duvin"
+  // in Switzerland became a road in Ohio. An event's place is taken only as picked.
+  POST_EVENT_LOCATION_NOT_PICKED: {
+    type: 'BAD_USER_INPUT',
+    text: 'Pick the event location from the search results or on the map.',
+  },
   POST_EVENT_LOCATION_COORDINATES_INCOMPLETE: {
     type: 'BAD_USER_INPUT',
     text: 'Event location requires both lat and lng, or neither.',
@@ -231,6 +257,18 @@ const definitions = {
   POST_SAVE_SLUG_ALREADY_TAKEN: {
     type: 'BAD_USER_INPUT',
     text: 'Post with this slug already exists.',
+  },
+  POST_SAVE_TOO_FEW_CATEGORIES: {
+    type: 'BAD_USER_INPUT',
+    text: 'Too few categories (at least {min}).',
+  },
+  POST_SAVE_TOO_MANY_CATEGORIES: {
+    type: 'BAD_USER_INPUT',
+    text: 'Too many categories (at most {max}).',
+  },
+  POST_SAVE_CATEGORY_UNKNOWN: {
+    type: 'BAD_USER_INPUT',
+    text: 'At least one of the categories does not exist.',
   },
   // Limits from branding.post (titleLengthMin/titleLengthMax), counted on the trimmed title.
   POST_SAVE_TITLE_LENGTH_INVALID: {
@@ -388,9 +426,17 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'Message must have content or files.',
   },
+  CHAT_CALL_ROOM_CLOSED: {
+    type: 'FORBIDDEN',
+    text: 'This video call is over. Its chat can still be read, but no longer written to.',
+  },
   CHAT_ROOM_PARTNER_IS_SELF: {
     type: 'BAD_USER_INPUT',
     text: 'You cannot create a chat with yourself.',
+  },
+  VIDEO_CALL_CHAT_NOT_IN_CALL: {
+    type: 'FORBIDDEN',
+    text: 'The chat of a video call is open to those taking part in it. Join the call first.',
   },
   VIDEO_CALL_START_NOT_PERMITTED: {
     type: 'FORBIDDEN',

@@ -431,6 +431,7 @@
     "API_KEY_DOES_NOT_EXIST": "L'API Key est introuvable.",
     "API_KEYS_FEATURE_DISABLED": "Les API Keys ne sont pas activées sur ce réseau.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Tu ne peux sélectionner que des badges qui t'ont été attribués.",
+    "CHAT_CALL_ROOM_CLOSED": "Cet appel vidéo est terminé. Son chat peut encore être lu, mais plus aucun message ne peut y être écrit.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "Le chat de groupe n'a pas pu être créé.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Le message doit contenir un texte ou un fichier.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Tu ne peux pas démarrer un chat avec toi-même.",
@@ -464,6 +465,7 @@
     "GROUP_ROLE_REASSIGN_TARGET_INVALID": "Déplace les membres vers un autre rôle.",
     "GROUP_ROLE_SYSTEM_NOT_DELETABLE": "Un rôle système ne peut pas être supprimé.",
     "GROUP_ROLE_SYSTEM_NOT_RENAMEABLE": "Un rôle système garde sa clé ; modifie plutôt son nom affiché.",
+    "GROUP_SAVE_CATEGORY_UNKNOWN": "Au moins un des sujets n'existe pas.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "La description doit comporter au moins {min} caractères.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Un groupe que les personnes extérieures ne peuvent pas trouver ne peut pas non plus leur montrer ses membres.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Ce nom unique de groupe est déjà pris.",
@@ -499,14 +501,18 @@
     "POST_EVENT_LOCATION_COORDINATES_INCOMPLETE": "Il manque une coordonnée pour le lieu de l'événement.",
     "POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE": "La latitude du lieu de l'événement n'est pas valide.",
     "POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE": "La longitude du lieu de l'événement n'est pas valide.",
+    "POST_EVENT_LOCATION_NOT_PICKED": "Veuillez choisir le lieu dans les résultats de recherche ou le placer sur la carte.",
     "POST_EVENT_START_DATE_INVALID": "La date de début n'est pas une date valide.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "La date de début doit être au format ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "La description du lieu doit comporter entre {min} et {max} caractères.",
     "POST_EVENT_VENUE_REQUIRED": "Ajoute une description du lieu.",
     "POST_PIN_FEATURE_DISABLED": "L'épinglage de posts n'est pas activé.",
     "POST_PIN_LIMIT_REACHED": "Le nombre maximum de posts épinglés est atteint. Désépingle d'abord un autre post.",
+    "POST_SAVE_CATEGORY_UNKNOWN": "Au moins un des sujets n'existe pas.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Un post avec ce slug existe déjà.",
     "POST_SAVE_TITLE_LENGTH_INVALID": "Le titre du post doit comporter entre {min} et {max} caractères.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Trop peu de sujets sélectionnés (au moins {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Trop de sujets sélectionnés (au plus {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Le code de confirmation n'est pas valide.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Ce nom d'utilisateur est déjà pris.",
     "REPORT_TARGET_IS_OWN": "Tu ne peux signaler ni toi-même ni ton propre contenu.",
@@ -531,17 +537,31 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Tu ne peux faire cela qu'avec des utilisateurs dont le rôle accorde moins de pouvoirs que le tien.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Tu n'as pas le droit de rechercher dans l'administration des utilisateurs.",
     "USER_DOES_NOT_EXIST": "L'utilisateur est introuvable.",
+    "USER_PROFILE_NAME_TOO_LONG": "Le nom ne doit pas dépasser {max} caractères.",
     "USER_PROFILE_NAME_TOO_SHORT": "Le nom doit comporter au moins {min} caractères.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Les caractères autorisés ne sont que les lettres minuscules (a–z), les chiffres (0–9), les traits de soulignement et les traits d'union.",
+    "USER_PROFILE_SLUG_TOO_LONG": "Le nom d'utilisateur ne doit pas dépasser {max} caractères.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "Le nom d'utilisateur doit comporter au moins {min} caractères.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Cet utilisateur n'est pas bloqué.",
+    "VIDEO_CALL_CHAT_NOT_IN_CALL": "Le chat d'un appel vidéo est réservé à ses participants. Rejoins d'abord l'appel.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Aucune adhésion active à ce groupe n'a été trouvée pour l'appel vidéo.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Tu n'as pas le droit de démarrer un appel vidéo dans ce groupe."
   },
   "chat": {
     "addRoomHeadline": "Rechercher un utilisateur pour un nouveau chat",
+    "callRoomEmpty": "Pas encore de messages. Ce chat n'est visible que par les participants de cet appel vidéo.",
+    "callRoomName": "Appel · {name}",
     "cancelSelectMessage": "Annuler",
     "closeChat": "Fermer le chat",
     "conversationStarted": "Conversation commencée le :",
     "expandChat": "Agrandir le chat",
+    "export": {
+      "attachment": "Pièce jointe",
+      "callStarted": "Début de l'appel : {date}",
+      "savedAt": "Enregistré : {date}",
+      "title": "Chat de l'appel vidéo dans « {name} »"
+    },
+    "exportChat": "Télécharger le chat en fichier texte",
     "groupChatButton": {
       "label": "Chat de groupe",
       "tooltip": "Discuter avec le groupe « {name} »"
@@ -589,15 +609,17 @@
     "previousLocation": "Emplacement précédent : {location}",
     "scrollToLocationMap": "Faire défiler jusqu’à la carte",
     "validations": {
-      "categories": "Veuillez sélectionner entre un et trois sujets.",
+      "categories": "Veuillez sélectionner entre {min} et {max} sujets.",
       "contentNotEmpty": "Veuillez saisir du contenu.",
       "email": "Veuillez saisir une adresse e-mail valide.",
       "eventLocationNameLength": "L'adresse doit comporter entre {min} et {max} caractères.",
       "eventLocationNameNotEmpty": "Veuillez saisir une adresse.",
+      "eventLocationNotPicked": "Veuillez choisir le lieu dans les résultats de recherche ou le placer sur la carte.",
       "eventVenueLength": "La description du lieu doit comporter entre {min} et {max} caractères.",
       "eventVenueNotEmpty": "Veuillez saisir une description du lieu.",
       "followableUrl": "doit être une adresse web ou e-mail valide",
       "formHasErrors": "Veuillez remplir tous les champs obligatoires.",
+      "locationNotPicked": "Veuillez choisir le lieu parmi les suggestions.",
       "nameLength": "Le nom doit comporter entre {min} et {max} caractères.",
       "titleLength": "Le titre doit comporter entre {min} et {max} caractères.",
       "titleNotEmpty": "Veuillez saisir un titre."
@@ -607,10 +629,6 @@
     "step": "Étape {current} sur {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd/MM/yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "La modification de votre mot de passe a échoué. Peut-être que le code de sécurité n'était pas correct ?",
@@ -818,6 +836,20 @@
       "title": "Désactiver l'utilisateur"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (bloqué par toi)",
+      "count": "{count} connectés",
+      "flag": "Appels vidéo en cours : {count}",
+      "join": "Rejoindre",
+      "joined": "Tu participes à cet appel",
+      "participants": "Participants",
+      "title": "Appels vidéo en cours"
+    },
+    "close": "Fermer la barre latérale",
+    "label": "Barre latérale",
+    "open": "Ouvrir la barre latérale – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} de {total} € collectés",
     "donate-now": "Faites un don"
@@ -983,15 +1015,15 @@
       "title": "Modifier mon groupe"
     },
     "elevation": {
-      "actingAsMember": "Ici, tu agis en tant que {role}.",
-      "actingAsNonMember": "Tu n'es pas membre de ce groupe.",
       "activeTitle": "L'accès administrateur est actif.",
       "activeUntil": "Il se termine à {time}, ou quand tu y mets fin.",
       "end": "Terminer l'accès administrateur",
-      "offerBody": "Tu disposes en plus de droits réseau sur lui. Lire son contenu ou modifier quoi que ce soit demande cette confirmation, qui est consignée auprès du groupe.",
-      "offerBodyOwner": "Tes droits réseau te permettent aussi de rétrograder ou de retirer les autres propriétaires de ce groupe. Cela demande cette confirmation, qui est consignée auprès du groupe.",
-      "reasonPlaceholder": "De quoi s'agit-il ?",
-      "start": "Utiliser l'accès administrateur"
+      "offerBody": "Ton rôle actuel dans ce groupe : « {role} ». Indique pourquoi tu veux gérer ce groupe (cela sera consigné).",
+      "offerBodyNoneMember": "Tu n'es pas membre du groupe. Indique pourquoi tu veux gérer ce groupe (cela sera consigné).",
+      "offerBodyOwner": "Ton rôle actuel dans ce groupe : « {role} ». Tes droits réseau te permettent aussi de rétrograder ou de retirer les autres propriétaires de ce groupe. Indique pourquoi tu veux gérer ce groupe (cela sera consigné).",
+      "reasonPlaceholder": "Motif de ton action",
+      "start": "Gérer le groupe",
+      "title": "Tu as le droit de gérer ce groupe comme un super-propriétaire."
     },
     "errors": {
       "userAlreadyMember": "L'utilisateur « {name} » est déjà membre !"
@@ -999,6 +1031,7 @@
     "foundation": "Fondation",
     "general": "Général",
     "goal": "Objectif du groupe",
+    "goalPlaceholder": "p. ex. Créer un jardin ouvert à tout le quartier",
     "group": "Groupe",
     "groupCreated": "Le groupe a été créé !",
     "in": "dans",
@@ -1042,6 +1075,7 @@
     "muted": "Groupe en sourdine",
     "myGroups": "Mes groupes",
     "name": "Nom du groupe",
+    "namePlaceholder": "Jardin partagé Belleville",
     "removeMember": "Retirer le membre",
     "removeMemberButton": "Retirer",
     "removeMemberConfirmText": "Retirer l'utilisateur « {name} » du groupe ?",
@@ -1121,6 +1155,7 @@
       "usual": "Membre"
     },
     "save": "Créer un nouveau groupe",
+    "slugPlaceholder": "jardin-partage-belleville",
     "teaser": {
       "notReadable": "Vous ne pouvez pas encore ouvrir ce groupe — votre demande est en attente",
       "openGroup": "Ouvrir le groupe",
@@ -1685,6 +1720,7 @@
       "unblocked": "{name} est à nouveau débloqué"
     },
     "data": {
+      "cityPlaceholder": "p. ex. Paris",
       "givenName": "Ton prénom",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "À propos de vous",
@@ -1853,7 +1889,8 @@
       "nameNotEmpty": "Veuillez entrer ton nom.",
       "slug": {
         "alreadyTaken": "Ce nom d'utilisateur est déjà pris.",
-        "regex": "Les caractères autorisés ne sont que les lettres minuscules, les chiffres, les traits de soulignement et les traits d'union."
+        "length": "Le nom d'utilisateur doit comporter entre {min} et {max} caractères.",
+        "regex": "Les caractères autorisés ne sont que les lettres minuscules (a–z), les chiffres (0–9), les traits de soulignement et les traits d'union."
       }
     }
   },
@@ -1889,19 +1926,41 @@
     "activeSpeakers": "Intervenants actifs",
     "audioBlocked": "Votre navigateur bloque le son de cet appel.",
     "audioOnly": "Connexion faible — les vidéos sont en pause pour que vous continuiez à entendre tout le monde.",
+    "chatTabs": {
+      "call": "Appel",
+      "callHint": "Visible uniquement par les participants de cet appel vidéo (sans notifications)",
+      "group": "Groupe",
+      "groupHint": "Visible par tous les membres du groupe (avec notifications)",
+      "label": "Choisir le chat"
+    },
     "closeChat": "Fermer le chat",
     "connecting": "Connexion…",
     "connectionLost": "Connexion perdue : {name}",
     "connectionPoor": "Connexion faible : {name}",
+    "controls": {
+      "camera": "Caméra",
+      "chat": "Chat",
+      "leave": "Raccrocher",
+      "microphone": "Microphone",
+      "screen": "Écran",
+      "startSharing": "Partager l'écran, une fenêtre ou un onglet",
+      "stopSharing": "{surface} : ne plus partager",
+      "surface": {
+        "browser": "Onglet",
+        "monitor": "Écran",
+        "window": "Fenêtre"
+      },
+      "turnOff": "{device} : désactiver",
+      "turnOn": "{device} : activer"
+    },
     "deviceSettings": {
       "button": "Appareils",
       "speakerError": "Impossible de changer de haut-parleur.",
       "title": "Réglages des appareils"
     },
     "dialogLabel": "Appel vidéo de groupe",
-    "disableCamera": "Désactiver la caméra",
     "enableAudio": "Activer le son",
-    "enableCamera": "Activer la caméra",
+    "enterFullscreen": "Plein écran",
     "errorBackToPrejoin": "Modifier les paramètres",
     "errorRetry": "Réessayer",
     "errors": {
@@ -1924,18 +1983,19 @@
         "noDevice": "Aucun écran disponible à partager."
       }
     },
+    "exitFullscreen": "Quitter le plein écran",
     "gotoGroup": "Aller au groupe « {name} »",
     "groupVideoCallButton": {
       "label": "Vidéo de groupe",
       "tooltip": "Appel vidéo dans le groupe « {name} »"
     },
+    "hideBars": "Masquer les barres",
     "leave": "Quitter l'appel",
     "maximize": "Agrandir",
     "micMuted": "Microphone désactivé",
     "micNoSignal": "Votre microphone ne transmet aucun son — les autres ne vous entendent pas.",
     "micUnmuted": "Microphone activé",
     "minimize": "Réduire",
-    "muteMic": "Couper le microphone",
     "openChat": "Ouvrir le chat",
     "prejoin": {
       "camera": "Caméra",
@@ -1983,12 +2043,10 @@
     "restartMic": "Redémarrer le microphone",
     "screenShare": "Écran",
     "screenShareEnded": "Partage d'écran terminé",
+    "showBars": "Afficher les barres",
     "showVideos": "Afficher les vidéos",
     "spotlightExit": "Quitter le focus",
-    "startScreenShare": "Partager l'écran",
-    "stopScreenShare": "Arrêter le partage",
     "title": "Appel vidéo de groupe",
-    "unmuteMic": "Réactiver le microphone",
     "you": "vous",
     "youAreSharingScreen": "Vous partagez votre écran"
   }

@@ -40,6 +40,20 @@ vi.mock('@src/graphql/resolvers/videoCalls', () => ({
     roomName?.startsWith('group-') ? roomName.slice('group-'.length) : null,
 }))
 
+// Ending the call session is the database's business (callSession.spec.ts); here it only
+// has to be asked for, and must not reach a real database.
+const mockEndCallSession = vi.fn<(...args: unknown[]) => Promise<void>>()
+const mockEndOfMissingRoom = vi.fn<(...args: unknown[]) => Promise<boolean>>()
+vi.mock('@src/livekit/callSession', () => ({
+  __esModule: true,
+  endCallSession: async (...args: unknown[]) => mockEndCallSession(...args),
+  endCallSessionsOfMissingRoom: async (...args: unknown[]) => mockEndOfMissingRoom(...args),
+}))
+vi.mock('@src/db/neo4j', () => ({
+  __esModule: true,
+  getDriver: () => 'driver',
+}))
+
 const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
 // vi.mock factories are hoisted above the const/let declarations they
 // reference, so `default: mockLogger` / `default: mockConfig` would read a
@@ -64,6 +78,8 @@ vi.mock('@src/config', () => ({
 // Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
 // registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { registerLiveKitWebhook } = await import('./webhook')
+// The real one: what the webhook hands to the poller is read back from it.
+const { takeToldRooms } = await import('./toldRooms')
 
 type CapturedHandler = (req: any, res: any) => void
 
@@ -120,6 +136,10 @@ beforeEach(() => {
   mockWebhookReceiverCtor.mockReset()
   mockPublish.mockReset().mockResolvedValue(undefined)
   mockGetCount.mockReset().mockResolvedValue(0)
+  mockEndCallSession.mockReset().mockResolvedValue(undefined)
+  // Settled at once, unless a test says otherwise.
+  mockEndOfMissingRoom.mockReset().mockResolvedValue(true)
+  takeToldRooms()
   mockLogger.info.mockReset()
   mockLogger.warn.mockReset()
   mockLogger.error.mockReset()
@@ -281,6 +301,112 @@ describe('registerLiveKitWebhook', () => {
         count: 0,
       })
       expect(res.status).toHaveBeenCalledWith(204)
+    })
+
+    it('ends the call session of a finished room by the sid of that room', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished', sid: 'RM_finished' },
+      })
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect(mockEndCallSession).toHaveBeenCalledWith('driver', 'RM_finished')
+      expect(mockEndOfMissingRoom).not.toHaveBeenCalled()
+    })
+
+    it('falls back to the room name when the event carries no sid', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished' },
+      })
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect(mockEndOfMissingRoom).toHaveBeenCalledWith('driver', 'group-finished')
+      expect(mockEndCallSession).not.toHaveBeenCalled()
+    })
+
+    it('leaves a session spared by name to the poller', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished' },
+      })
+      mockEndOfMissingRoom.mockResolvedValueOnce(false)
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect([...takeToldRooms()]).toEqual(['group-finished'])
+    })
+
+    it('does not bother the poller when the session is settled, by name or by sid', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished' },
+      })
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished', sid: 'RM_finished' },
+      })
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect([...takeToldRooms()]).toEqual([])
+    })
+
+    it('leaves the call session alone while the room is still there', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'participant_left',
+        room: { name: 'group-running', sid: 'RM_running' },
+      })
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect(mockEndCallSession).not.toHaveBeenCalled()
+      expect(mockEndOfMissingRoom).not.toHaveBeenCalled()
+    })
+
+    it('logs but still acknowledges when ending the call session fails', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished', sid: 'RM_finished' },
+      })
+      mockEndCallSession.mockRejectedValueOnce(new Error('database down'))
+      const res = makeRes()
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), res)
+      await flushPromises()
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to end the call session'),
+        expect.any(Error),
+      )
+      expect(res.status).toHaveBeenCalledWith(204)
+    })
+
+    it('leaves a session it failed to end to the poller, by sid', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished', sid: 'RM_finished' },
+      })
+      mockEndCallSession.mockRejectedValueOnce(new Error('database down'))
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect([...takeToldRooms()]).toEqual(['group-finished'])
+    })
+
+    it('leaves a session it failed to end to the poller, by name', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished' },
+      })
+      mockEndOfMissingRoom.mockRejectedValueOnce(new Error('database down'))
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect([...takeToldRooms()]).toEqual(['group-finished'])
     })
 
     it('ignores unrelated event names', async () => {

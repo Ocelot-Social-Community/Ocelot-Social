@@ -86,4 +86,76 @@ describe(uniqueSlug, () => {
       )
     })
   })
+
+  // A user's slug is held to the brand's length bounds, and one derived from the name has to fit
+  // them as well — a name within its own bounds does not make a slug within these.
+  describe('with length bounds', () => {
+    const bounds = { minLength: 3, maxLength: 10 }
+
+    it('leaves a slug inside the bounds as it is', async () => {
+      const isUnique = vi.fn<IsUnique>().mockResolvedValue(true)
+
+      await expect(uniqueSlug('Hello', isUnique, bounds)).resolves.toBe('hello')
+    })
+
+    it('cuts a slug the transliteration made longer than the name', async () => {
+      const isUnique = vi.fn<IsUnique>().mockResolvedValue(true)
+
+      // 7 characters of name, 14 of slug
+      await expect(uniqueSlug('ÄÖÜäöüß', isUnique, bounds)).resolves.toBe('aeoeueaeoe')
+    })
+
+    it('makes room for the uniqueness suffix instead of growing past the maximum', async () => {
+      const isUnique = vi.fn<IsUnique>().mockResolvedValueOnce(false).mockResolvedValue(true)
+
+      await expect(uniqueSlug('Abcdefghijkl', isUnique, bounds)).resolves.toBe('abcdefgh-1')
+    })
+
+    it('does not end the cut on a hyphen, which the suffix would double', async () => {
+      const isUnique = vi.fn<IsUnique>().mockResolvedValue(true)
+
+      // cut at 10 → 'abcdefghi-' → 'abcdefghi'
+      await expect(uniqueSlug('abcdefghi jkl', isUnique, bounds)).resolves.toBe('abcdefghi')
+    })
+
+    it('pads a slug shorter than the minimum with a numbered suffix', async () => {
+      const isUnique = vi.fn<IsUnique>().mockResolvedValue(true)
+
+      // the emoji is stripped, 'x' alone is too short
+      await expect(uniqueSlug('x 😀', isUnique, bounds)).resolves.toBe('x-1')
+    })
+
+    it('zero-pads the suffix when the number alone does not reach the minimum', async () => {
+      const isUnique = vi.fn<IsUnique>().mockResolvedValueOnce(false).mockResolvedValue(true)
+
+      await expect(uniqueSlug('x 😀', isUnique, { minLength: 5, maxLength: 10 })).resolves.toBe(
+        'x-002',
+      )
+    })
+
+    it('fails instead of producing a slug without a name part, or one over the maximum', async () => {
+      const isUnique = vi.fn<IsUnique>().mockResolvedValue(false)
+
+      // 'ab' is taken, and a maximum of 2 leaves no room for 'a-1'
+      await expect(uniqueSlug('ab', isUnique, { minLength: 1, maxLength: 2 })).rejects.toThrow(
+        'No unique slug for "ab" fits 2 characters',
+      )
+      expect(isUnique.mock.calls).toEqual([['ab']])
+    })
+
+    it('counts on until a candidate is free, every one of them within the bounds', async () => {
+      const taken = new Set([
+        'abcdefghij',
+        ...Array.from({ length: 9 }, (_, i) => `abcdefgh-${String(i + 1)}`),
+      ])
+      const isUnique = vi.fn<IsUnique>(async (slug) => Promise.resolve(!taken.has(slug)))
+
+      await expect(uniqueSlug('Abcdefghijkl', isUnique, bounds)).resolves.toBe('abcdefg-10')
+
+      for (const [slug] of isUnique.mock.calls) {
+        expect(slug.length).toBeGreaterThanOrEqual(bounds.minLength)
+        expect(slug.length).toBeLessThanOrEqual(bounds.maxLength)
+      }
+    })
+  })
 })

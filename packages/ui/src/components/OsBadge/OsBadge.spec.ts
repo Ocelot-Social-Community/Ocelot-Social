@@ -122,6 +122,47 @@ describe('osBadge', () => {
     })
   })
 
+  describe('count prop', () => {
+    it('shows the number instead of the slot', () => {
+      const wrapper = mount(OsBadge, {
+        props: { count: 7 },
+        slots: { default: 'Badge text' },
+      })
+
+      expect(wrapper.text()).toBe('7')
+    })
+
+    it('shows 0 as well — whether to show the badge at all is up to its user', () => {
+      const wrapper = mount(OsBadge, { props: { count: 0 } })
+
+      expect(wrapper.text()).toBe('0')
+    })
+
+    it('caps at 99+', () => {
+      expect(mount(OsBadge, { props: { count: 99 } }).text()).toBe('99')
+      expect(mount(OsBadge, { props: { count: 100 } }).text()).toBe('99+')
+    })
+
+    it('is round around one digit, its padding and height winning over the size', () => {
+      const wrapper = mount(OsBadge, { props: { count: 3, size: 'md' } })
+
+      expect(wrapper.classes()).toStrictEqual(
+        expect.arrayContaining(['min-w-[1.7em]', 'h-[1.7em]', 'px-[0.45em]', 'py-0']),
+      )
+      expect(wrapper.classes()).toContain('shrink-0')
+      expect(wrapper.classes()).not.toContain('px-[1em]')
+      expect(wrapper.classes()).not.toContain('py-[0.15em]')
+    })
+
+    it('is a pill for words without it', () => {
+      const wrapper = mount(OsBadge, { slots: { default: 'Badge text' } })
+
+      expect(wrapper.classes()).not.toContain('min-w-[1.7em]')
+      expect(wrapper.classes()).not.toContain('shrink-0')
+      expect(wrapper.classes()).toContain('px-[0.8em]')
+    })
+  })
+
   describe('aria attributes', () => {
     it('has no role or aria-live by default', () => {
       const wrapper = mount(OsBadge)

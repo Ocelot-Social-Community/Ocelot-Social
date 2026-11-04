@@ -516,6 +516,18 @@ describe(createOrUpdateLocations, () => {
     fetchSpy.mockResolvedValue(mockJsonResponse(body))
   }
 
+  // The name path moved to resolveLocationInput (events take their place only by coordinates):
+  // looked up by its exact name, then stored and attached the same way.
+  const attachByName = async (session: Session, nodeLabel: string, nodeId: string, name: string) =>
+    (
+      await resolveLocationInput(
+        { locationName: name },
+        locationContext(),
+        ['place', 'country'],
+        nodeLabel,
+      )
+    ).attach(session, nodeLabel, nodeId)
+
   // createLocation writes one property per supported locale and the driver REFUSES a query whose
   // parameters are undefined — so a fixture that omits a single `text_*` fails on the write rather
   // than on what the test is about. Filled uniformly here; none of these cases is about
@@ -569,9 +581,7 @@ describe(createOrUpdateLocations, () => {
     respondWith({ features: [] })
 
     await expect(
-      withSession(async (session) =>
-        createOrUpdateLocations('User', 'located-user', 'Absurdistan', session, locationContext()),
-      ),
+      withSession(async (session) => attachByName(session, 'User', 'located-user', 'Absurdistan')),
     ).rejects.toThrow('The locationName is invalid.')
   })
 
@@ -582,9 +592,7 @@ describe(createOrUpdateLocations, () => {
     respondWith({ features: [{ id: 'place.no-type', place_name: 'Typeless' }] })
 
     await expect(
-      withSession(async (session) =>
-        createOrUpdateLocations('User', 'located-user', 'Typeless', session, locationContext()),
-      ),
+      withSession(async (session) => attachByName(session, 'User', 'located-user', 'Typeless')),
     ).rejects.toThrow('The locationName is invalid.')
   })
 
@@ -611,13 +619,7 @@ describe(createOrUpdateLocations, () => {
       })
 
       await withSession(async (session) => {
-        await createOrUpdateLocations(
-          'User',
-          'located-user',
-          'Berlin, New Jersey, United States',
-          session,
-          locationContext(),
-        )
+        await attachByName(session, 'User', 'located-user', 'Berlin, New Jersey, United States')
       })
 
       const { records } = await database.query({
@@ -635,7 +637,7 @@ describe(createOrUpdateLocations, () => {
       })
 
       await withSession(async (session) => {
-        await createOrUpdateLocations('User', 'located-user', 'Germany', session, locationContext())
+        await attachByName(session, 'User', 'located-user', 'Germany')
       })
 
       const { records } = await database.query({
@@ -664,13 +666,7 @@ describe(createOrUpdateLocations, () => {
       })
 
       await withSession(async (session) => {
-        await createOrUpdateLocations(
-          'User',
-          'located-user',
-          'Greenwich',
-          session,
-          locationContext(),
-        )
+        await attachByName(session, 'User', 'located-user', 'Greenwich')
       })
 
       const { records } = await database.query({

@@ -16,6 +16,8 @@
     }
   },
   "separate-pull-requests": true,
+  "label": "autorelease: pending (ui)",
+  "release-label": "autorelease: tagged (ui)",
   "pull-request-title-pattern": "chore(package/${component}): release ${version}",
   "include-v-in-tag": true,
   "changelog-sections": [

@@ -431,6 +431,7 @@
     "API_KEY_DOES_NOT_EXIST": "API Key не найден.",
     "API_KEYS_FEATURE_DISABLED": "API Keys не включены в этой сети.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "Ты можешь выбрать только те награды, которые были тебе присуждены.",
+    "CHAT_CALL_ROOM_CLOSED": "Этот видеозвонок завершён. Его чат можно читать, но писать в него больше нельзя.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "Не удалось создать групповой чат.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Сообщение должно содержать текст или файл.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Ты не можешь начать чат с самим собой.",
@@ -464,6 +465,7 @@
     "GROUP_ROLE_REASSIGN_TARGET_INVALID": "Перемести участников в другую роль.",
     "GROUP_ROLE_SYSTEM_NOT_DELETABLE": "Системную роль нельзя удалить.",
     "GROUP_ROLE_SYSTEM_NOT_RENAMEABLE": "Системная роль сохраняет свой ключ; измени вместо этого её отображаемое имя.",
+    "GROUP_SAVE_CATEGORY_UNKNOWN": "Как минимум одной из тем не существует.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "Описание должно содержать не менее {min} символов.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Группа, которую посторонние не могут найти, не может и показать им своих участников.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Это уникальное имя группы уже занято.",
@@ -499,14 +501,18 @@
     "POST_EVENT_LOCATION_COORDINATES_INCOMPLETE": "Для места мероприятия не хватает координаты.",
     "POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE": "Широта места мероприятия недействительна.",
     "POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE": "Долгота места мероприятия недействительна.",
+    "POST_EVENT_LOCATION_NOT_PICKED": "Выберите место из результатов поиска или отметьте его на карте.",
     "POST_EVENT_START_DATE_INVALID": "Дата начала не является допустимой датой.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "Дата начала должна быть в формате ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "Описание места должно содержать от {min} до {max} символов.",
     "POST_EVENT_VENUE_REQUIRED": "Пожалуйста, добавь описание места.",
     "POST_PIN_FEATURE_DISABLED": "Закрепление постов не включено.",
     "POST_PIN_LIMIT_REACHED": "Достигнуто максимальное количество закреплённых постов. Сначала открепи другой пост.",
+    "POST_SAVE_CATEGORY_UNKNOWN": "Как минимум одной из тем не существует.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Пост с таким slug уже существует.",
     "POST_SAVE_TITLE_LENGTH_INVALID": "Заголовок поста должен содержать от {min} до {max} символов.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Выбрано слишком мало тем (минимум {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Выбрано слишком много тем (максимум {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Код подтверждения недействителен.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Это имя пользователя уже занято.",
     "REPORT_TARGET_IS_OWN": "Ты не можешь пожаловаться ни на себя, ни на свой собственный контент.",
@@ -531,17 +537,31 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Ты можешь сделать это только с пользователями, чья роль даёт меньше полномочий, чем твоя.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Ты не можешь искать в управлении пользователями.",
     "USER_DOES_NOT_EXIST": "Пользователь не найден.",
+    "USER_PROFILE_NAME_TOO_LONG": "Имя должно содержать не более {max} символов.",
     "USER_PROFILE_NAME_TOO_SHORT": "Имя должно содержать не менее {min} символов.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Допускаются только строчные буквы (a–z), цифры (0–9), подчеркивания или дефисы.",
+    "USER_PROFILE_SLUG_TOO_LONG": "Имя пользователя должно содержать не более {max} символов.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "Имя пользователя должно содержать не менее {min} символов.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Этот пользователь не заблокирован.",
+    "VIDEO_CALL_CHAT_NOT_IN_CALL": "Чат видеозвонка открыт только его участникам. Сначала присоединись к звонку.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Для видеозвонка не найдено активное участие в этой группе.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Ты не можешь начать видеозвонок в этой группе."
   },
   "chat": {
     "addRoomHeadline": "Поиск пользователя для нового чата",
+    "callRoomEmpty": "Сообщений пока нет. Этот чат виден только участникам этого видеозвонка.",
+    "callRoomName": "Звонок · {name}",
     "cancelSelectMessage": "Отмена",
     "closeChat": "Закрыть чат",
     "conversationStarted": "Беседа начата:",
     "expandChat": "Развернуть чат",
+    "export": {
+      "attachment": "Вложение",
+      "callStarted": "Начало звонка: {date}",
+      "savedAt": "Сохранено: {date}",
+      "title": "Чат видеозвонка в «{name}»"
+    },
+    "exportChat": "Скачать чат как текстовый файл",
     "groupChatButton": {
       "label": "Групповой чат",
       "tooltip": "Чат с группой «{name}»"
@@ -589,15 +609,17 @@
     "previousLocation": "Предыдущее местоположение: {location}",
     "scrollToLocationMap": "Прокрутить к карте",
     "validations": {
-      "categories": "Пожалуйста, выберите от одной до трёх тем.",
+      "categories": "Пожалуйста, выберите от {min} до {max} тем.",
       "contentNotEmpty": "Пожалуйста, введите содержимое.",
       "email": "Пожалуйста, введите корректный адрес электронной почты.",
       "eventLocationNameLength": "Адрес должен содержать от {min} до {max} символов.",
       "eventLocationNameNotEmpty": "Пожалуйста, введите адрес.",
+      "eventLocationNotPicked": "Выберите место из результатов поиска или отметьте его на карте.",
       "eventVenueLength": "Описание места должно содержать от {min} до {max} символов.",
       "eventVenueNotEmpty": "Пожалуйста, введите описание места.",
       "followableUrl": "должен быть корректный веб-адрес или адрес электронной почты",
       "formHasErrors": "Пожалуйста, заполните все обязательные поля.",
+      "locationNotPicked": "Выберите место из подсказок.",
       "nameLength": "Должно содержать от {min} до {max} символов.",
       "titleLength": "Заголовок должен содержать от {min} до {max} символов.",
       "titleNotEmpty": "Пожалуйста, введите заголовок."
@@ -607,10 +629,6 @@
     "step": "Шаг {current} из {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd.MM.yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Смена пароля не удалась. Может быть, код безопасности был неправильным?",
@@ -818,6 +836,20 @@
       "title": "Отключить пользователя"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (заблокирован вами)",
+      "count": "Подключено: {count}",
+      "flag": "Идущие видеозвонки: {count}",
+      "join": "Присоединиться",
+      "joined": "Вы в этом звонке",
+      "participants": "Участники",
+      "title": "Идущие видеозвонки"
+    },
+    "close": "Закрыть боковую панель",
+    "label": "Боковая панель",
+    "open": "Открыть боковую панель – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} из {total} € собрано",
     "donate-now": "Пожертвуйте сейчас"
@@ -983,15 +1015,15 @@
       "title": "Редактировать группу"
     },
     "elevation": {
-      "actingAsMember": "Здесь вы действуете как {role}.",
-      "actingAsNonMember": "Вы не состоите в этой группе.",
       "activeTitle": "Доступ администратора активен.",
       "activeUntil": "Он закончится в {time} или когда вы его завершите.",
       "end": "Завершить доступ администратора",
-      "offerBody": "Кроме того, у вас есть сетевые права на неё. Для чтения её содержимого и любых изменений нужно это подтверждение, и оно фиксируется у группы.",
-      "offerBodyOwner": "Сетевые права также позволяют вам понизить или удалить других владельцев этой группы. Для этого нужно это подтверждение, и оно фиксируется у группы.",
-      "reasonPlaceholder": "О чём речь?",
-      "start": "Использовать доступ администратора"
+      "offerBody": "Ваша текущая роль в этой группе: «{role}». Укажите причину, по которой вы хотите управлять этой группой (она будет зафиксирована).",
+      "offerBodyNoneMember": "Вы не состоите в группе. Укажите причину, по которой вы хотите управлять этой группой (она будет зафиксирована).",
+      "offerBodyOwner": "Ваша текущая роль в этой группе: «{role}». Сетевые права также позволяют вам понизить или удалить других владельцев этой группы. Укажите причину, по которой вы хотите управлять этой группой (она будет зафиксирована).",
+      "reasonPlaceholder": "Причина вашего действия",
+      "start": "Управлять группой",
+      "title": "Вы вправе управлять этой группой как супервладелец."
     },
     "errors": {
       "userAlreadyMember": "Пользователь «{name}» уже является участником!"
@@ -999,6 +1031,7 @@
     "foundation": "Основание",
     "general": "Общее",
     "goal": "Цель группы",
+    "goalPlaceholder": "напр. Разбить сад, открытый для всего района",
     "group": "Группа",
     "groupCreated": "Группа создана!",
     "in": "в",
@@ -1042,6 +1075,7 @@
     "muted": "Группа отключена",
     "myGroups": "Мои группы",
     "name": "Название группы",
+    "namePlaceholder": "Общественный сад на Арбате",
     "removeMember": "Удалить участника",
     "removeMemberButton": "Удалить",
     "removeMemberConfirmText": "Удалить пользователя «{name}» из группы?",
@@ -1121,6 +1155,7 @@
       "usual": "Участник"
     },
     "save": "Создать новую группу",
+    "slugPlaceholder": "obshchestvennyj-sad-arbat",
     "teaser": {
       "notReadable": "Эту группу пока нельзя открыть — ваша заявка ещё рассматривается",
       "openGroup": "Открыть группу",
@@ -1685,6 +1720,7 @@
       "unblocked": "{name} - снова разблокирован"
     },
     "data": {
+      "cityPlaceholder": "напр. Москва",
       "givenName": "Твоё имя",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "О себе",
@@ -1853,7 +1889,8 @@
       "nameNotEmpty": "Пожалуйста, введи своё имя.",
       "slug": {
         "alreadyTaken": "Это имя пользователя уже занято.",
-        "regex": "Допускаются только строчные буквы, цифры, подчеркивания или дефисы."
+        "length": "Имя пользователя должно содержать от {min} до {max} символов.",
+        "regex": "Допускаются только строчные буквы (a–z), цифры (0–9), подчеркивания или дефисы."
       }
     }
   },
@@ -1889,19 +1926,41 @@
     "activeSpeakers": "Активные говорящие",
     "audioBlocked": "Ваш браузер блокирует звук этого звонка.",
     "audioOnly": "Слабое соединение — видео приостановлено, чтобы вы продолжали всех слышать.",
+    "chatTabs": {
+      "call": "Звонок",
+      "callHint": "Виден только участникам этого видеозвонка (без уведомлений)",
+      "group": "Группа",
+      "groupHint": "Виден всем участникам группы (с уведомлениями)",
+      "label": "Выбрать чат"
+    },
     "closeChat": "Закрыть чат",
     "connecting": "Подключение…",
     "connectionLost": "Соединение потеряно: {name}",
     "connectionPoor": "Слабое соединение: {name}",
+    "controls": {
+      "camera": "Камера",
+      "chat": "Чат",
+      "leave": "Завершить",
+      "microphone": "Микрофон",
+      "screen": "Экран",
+      "startSharing": "Показать экран, окно или вкладку",
+      "stopSharing": "{surface}: прекратить показ",
+      "surface": {
+        "browser": "Вкладка",
+        "monitor": "Экран",
+        "window": "Окно"
+      },
+      "turnOff": "{device}: выключить",
+      "turnOn": "{device}: включить"
+    },
     "deviceSettings": {
       "button": "Устройства",
       "speakerError": "Не удалось переключить динамик.",
       "title": "Настройки устройств"
     },
     "dialogLabel": "Групповой видеозвонок",
-    "disableCamera": "Выключить камеру",
     "enableAudio": "Включить звук",
-    "enableCamera": "Включить камеру",
+    "enterFullscreen": "Во весь экран",
     "errorBackToPrejoin": "Изменить настройки",
     "errorRetry": "Повторить",
     "errors": {
@@ -1924,18 +1983,19 @@
         "noDevice": "Нет доступного экрана для показа."
       }
     },
+    "exitFullscreen": "Выйти из полноэкранного режима",
     "gotoGroup": "Перейти к группе «{name}»",
     "groupVideoCallButton": {
       "label": "Видео группы",
       "tooltip": "Видеозвонок в группе «{name}»"
     },
+    "hideBars": "Скрыть панели",
     "leave": "Покинуть звонок",
     "maximize": "Развернуть",
     "micMuted": "Микрофон выключен",
     "micNoSignal": "Ваш микрофон не передаёт звук — другие вас не слышат.",
     "micUnmuted": "Микрофон включён",
     "minimize": "Свернуть",
-    "muteMic": "Выключить микрофон",
     "openChat": "Открыть чат",
     "prejoin": {
       "camera": "Камера",
@@ -1983,12 +2043,10 @@
     "restartMic": "Перезапустить микрофон",
     "screenShare": "Экран",
     "screenShareEnded": "Показ экрана завершён",
+    "showBars": "Показать панели",
     "showVideos": "Показать видео",
     "spotlightExit": "Выйти из режима спотлайта",
-    "startScreenShare": "Показать экран",
-    "stopScreenShare": "Прекратить показ",
     "title": "Групповой видеозвонок",
-    "unmuteMic": "Включить микрофон",
     "you": "вы",
     "youAreSharingScreen": "Вы показываете свой экран"
   }

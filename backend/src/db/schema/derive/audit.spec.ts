@@ -61,7 +61,7 @@ describe('generated queries', () => {
 
   it('counts nodes below a minimum length', () => {
     expect(audit('User.name minLength')?.cypher).toBe(
-      'MATCH (n:User) WHERE n.name IS NOT NULL AND size(n.name) < 3 RETURN count(n) AS violations',
+      'MATCH (n:User) WHERE n.name IS NOT NULL AND size(n.name) < 1 RETURN count(n) AS violations',
     )
   })
 

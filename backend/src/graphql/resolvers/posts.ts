@@ -9,8 +9,10 @@ import { v4 as uuid } from 'uuid'
 
 import { Errors } from '@graphql/errorRegistry'
 import { AppError, UserInputError } from '@graphql/errors'
+import { branding } from '@src/branding'
 
 import { runBatch } from './helpers/batch'
+import { categoriesExist, unknownCategoryIds } from './helpers/categoriesExist'
 import cypherFields, { unwrap } from './helpers/cypherField'
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
@@ -317,6 +319,28 @@ export default {
       const { image: imageInput } = params
 
       const { locationName, coordinates } = validateEventParams(params)
+      // As for groups: the minimum only while there is a category to choose from.
+      if (
+        policy.get('categoriesActive') &&
+        (!categoryIds || categoryIds.length < branding.category.min) &&
+        (await categoriesExist(context))
+      ) {
+        throw new AppError(Errors.POST_SAVE_TOO_FEW_CATEGORIES, { min: branding.category.min })
+      }
+      if (
+        policy.get('categoriesActive') &&
+        categoryIds &&
+        categoryIds.length > branding.category.max
+      ) {
+        throw new AppError(Errors.POST_SAVE_TOO_MANY_CATEGORIES, { max: branding.category.max })
+      }
+      if (
+        policy.get('categoriesActive') &&
+        categoryIds?.length &&
+        (await unknownCategoryIds(context, categoryIds)).length
+      ) {
+        throw new AppError(Errors.POST_SAVE_CATEGORY_UNKNOWN)
+      }
 
       delete params.categoryIds
       delete params.image
@@ -359,8 +383,8 @@ export default {
             SET obs.active = true
             SET obs.createdAt = toString(datetime())
             SET obs.updatedAt = toString(datetime())
-            ${categoriesCypher}
             ${groupCypher}
+            ${categoriesCypher}
             RETURN post {.*, postType: [l IN labels(post) WHERE NOT l = 'Post'] }
           `,
           { userId: user.id, categoryIds, groupId, params, apiKeyId: user.apiKeyId || null },
@@ -399,6 +423,19 @@ export default {
       const { image: imageInput } = params
 
       const { locationName, coordinates } = validateEventParams(params)
+      // Only when categories are sent: an update without them leaves them as they are.
+      if (policy.get('categoriesActive') && categoryIds) {
+        if (categoryIds.length < branding.category.min && (await categoriesExist(context))) {
+          throw new AppError(Errors.POST_SAVE_TOO_FEW_CATEGORIES, { min: branding.category.min })
+        }
+        if (categoryIds.length > branding.category.max) {
+          throw new AppError(Errors.POST_SAVE_TOO_MANY_CATEGORIES, { max: branding.category.max })
+        }
+        // Checked before the old categories are removed: they would go, and nothing come.
+        if (categoryIds.length && (await unknownCategoryIds(context, categoryIds)).length) {
+          throw new AppError(Errors.POST_SAVE_CATEGORY_UNKNOWN)
+        }
+      }
 
       delete params.categoryIds
       delete params.image

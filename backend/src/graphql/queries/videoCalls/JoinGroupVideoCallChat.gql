@@ -1,0 +1,3 @@
+mutation JoinGroupVideoCallChat($groupId: ID!) {
+  joinGroupVideoCallChat(groupId: $groupId)
+}

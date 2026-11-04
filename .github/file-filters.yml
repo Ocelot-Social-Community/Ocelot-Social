@@ -37,6 +37,7 @@ maintenance: &maintenance
   - 'webapp/locales/**/*'
 
 backend: &backend
+  - '.github/actions/docker-hub-mirror/**'
   - '.github/workflows/test-backend.yml'
   - 'backend/**/*'
   - 'neo4j/**/*'
