@@ -34,7 +34,7 @@
           class="chat-modul__header"
           compact
           :profile="callGroupProfile"
-          :title="videoCallGroupName || ''"
+          :title="callGroupProfile.name"
           :to="callGroupRoute"
           show-group-icon
         >

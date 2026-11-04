@@ -962,6 +962,9 @@ export default {
           variables,
           fetchPolicy: 'no-cache',
         })
+        // Another room may have been opened while this one was asked for: its messages
+        // must not end up there.
+        if (this.selectedRoom?.id !== room.id) return
 
         this.mergeMessages(Message)
 
@@ -985,6 +988,7 @@ export default {
           this.renderHint()
         })
       } catch (error) {
+        if (this.selectedRoom?.id !== room.id) return
         this.messages = []
         this.$toastBackendError(error)
       }
