@@ -1010,15 +1010,15 @@
       "title": "Modifier mon groupe"
     },
     "elevation": {
-      "actingAsMember": "Ici, tu agis en tant que {role}.",
-      "actingAsNonMember": "Tu n'es pas membre de ce groupe.",
       "activeTitle": "L'accès administrateur est actif.",
       "activeUntil": "Il se termine à {time}, ou quand tu y mets fin.",
       "end": "Terminer l'accès administrateur",
-      "offerBody": "Tu disposes en plus de droits réseau sur lui. Lire son contenu ou modifier quoi que ce soit demande cette confirmation, qui est consignée auprès du groupe.",
-      "offerBodyOwner": "Tes droits réseau te permettent aussi de rétrograder ou de retirer les autres propriétaires de ce groupe. Cela demande cette confirmation, qui est consignée auprès du groupe.",
-      "reasonPlaceholder": "De quoi s'agit-il ?",
-      "start": "Utiliser l'accès administrateur"
+      "offerBody": "Ton rôle actuel dans ce groupe : « {role} ». Indique pourquoi tu veux gérer ce groupe (cela sera consigné).",
+      "offerBodyNoneMember": "Tu n'es pas membre du groupe. Indique pourquoi tu veux gérer ce groupe (cela sera consigné).",
+      "offerBodyOwner": "Ton rôle actuel dans ce groupe : « {role} ». Tes droits réseau te permettent aussi de rétrograder ou de retirer les autres propriétaires de ce groupe. Indique pourquoi tu veux gérer ce groupe (cela sera consigné).",
+      "reasonPlaceholder": "Motif de ton action",
+      "start": "Gérer le groupe",
+      "title": "Tu as le droit de gérer ce groupe comme un super-propriétaire."
     },
     "errors": {
       "userAlreadyMember": "L'utilisateur « {name} » est déjà membre !"

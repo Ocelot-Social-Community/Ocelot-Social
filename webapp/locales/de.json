@@ -1010,15 +1010,15 @@
       "title": "Meine Gruppe ändern"
     },
     "elevation": {
-      "actingAsMember": "Du handelst hier als {role}.",
-      "actingAsNonMember": "Du bist kein Mitglied dieser Gruppe.",
       "activeTitle": "Administratorzugriff ist aktiv.",
       "activeUntil": "Er endet um {time} oder wenn du ihn beendest.",
       "end": "Administratorzugriff beenden",
-      "offerBody": "Zusätzlich hältst du Netzwerkrechte über sie. Ihre Inhalte zu lesen oder etwas zu ändern braucht diese Bestätigung, und sie wird bei der Gruppe vermerkt.",
-      "offerBodyOwner": "Über deine Netzwerkrechte kannst du auch die anderen Inhaber dieser Gruppe zurückstufen oder entfernen. Das braucht diese Bestätigung, und sie wird bei der Gruppe vermerkt.",
-      "reasonPlaceholder": "Worum geht es?",
-      "start": "Administratorzugriff nutzen"
+      "offerBody": "Deine aktuelle Rolle in dieser Gruppe: „{role}“. Gib einen Grund an, warum du diese Gruppe verwalten möchtest (wird vermerkt).",
+      "offerBodyNoneMember": "Du bist kein Mitglied der Gruppe. Gib einen Grund an, warum du diese Gruppe verwalten möchtest (wird vermerkt).",
+      "offerBodyOwner": "Deine aktuelle Rolle in dieser Gruppe: „{role}“. Über deine Netzwerkrechte kannst du auch die anderen Inhaber dieser Gruppe zurückstufen oder entfernen. Gib einen Grund an, warum du diese Gruppe verwalten möchtest (wird vermerkt).",
+      "reasonPlaceholder": "Grund deiner Aktion",
+      "start": "Gruppe verwalten",
+      "title": "Du bist berechtigt, diese Gruppe wie ein Super-Inhaber zu verwalten."
     },
     "errors": {
       "userAlreadyMember": "Nutzer „{name}“ ist bereits Mitglied!"
