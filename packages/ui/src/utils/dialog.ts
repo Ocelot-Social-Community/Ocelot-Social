@@ -1,4 +1,6 @@
-import { onBeforeUnmount, onMounted, watch } from 'vue-demi'
+import { nextTick, onBeforeUnmount, onMounted, watch } from 'vue-demi'
+
+import type { Ref } from 'vue-demi'
 
 /**
  * Behaviour shared by the modal surfaces (OsModal, OsDrawer): what keeps the user inside an
@@ -86,4 +88,55 @@ export function useEscapeKey(isOpen: () => boolean, onEscape: () => void): void 
   onBeforeUnmount(() => {
     document.removeEventListener('keydown', onKeydown)
   })
+}
+
+/**
+ * Moves the focus into the dialog when it opens — to the element inside marked `data-autofocus`
+ * if it takes the focus, else to `panel` itself, which needs `tabindex="-1"` for that — and gives it
+ * back to where it was when the dialog closes, or unmounts while open. Only where it can still
+ * go: that element may have left the page meanwhile.
+ */
+export function useDialogFocus(isOpen: () => boolean, panel: Ref<HTMLElement | null>): void {
+  let returnFocusTo: HTMLElement | null = null
+
+  const giveBack = () => {
+    const target = returnFocusTo
+    returnFocusTo = null
+    if (target?.isConnected) {
+      target.focus()
+    }
+  }
+
+  watch(
+    isOpen,
+    async (open, wasOpen) => {
+      /* v8 ignore start -- SSR guard: immediate, so this runs in setup() on the server too */
+      if (typeof document === 'undefined') {
+        return
+      }
+      /* v8 ignore stop */
+      if (open) {
+        returnFocusTo = document.activeElement as HTMLElement | null
+        // The panel is rendered by then. Closed again meanwhile (by an `opened` handler, say), the
+        // focus has been given back already — a drawer's panel is still visible while it slides
+        // out and would take it.
+        await nextTick()
+        if (!isOpen()) {
+          return
+        }
+        const target = panel.value?.querySelector<HTMLElement>('[data-autofocus]')
+        target?.focus()
+        // Checked, not predicted: an element may refuse the focus for many reasons (disabled itself
+        // — a confirm button opened while loading — or inside a disabled fieldset, inert, hidden).
+        if (document.activeElement !== target) {
+          panel.value?.focus()
+        }
+      } else if (wasOpen) {
+        giveBack()
+      }
+    },
+    { immediate: true },
+  )
+
+  onBeforeUnmount(giveBack)
 }
