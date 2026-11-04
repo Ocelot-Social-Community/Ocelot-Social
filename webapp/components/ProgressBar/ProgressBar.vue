@@ -1,11 +1,14 @@
 <template>
   <div class="progress-bar-component">
     <div class="progress-bar">
-      <div class="progress-bar__goal"></div>
-      <div
-        :class="['progress-bar__progress', progressBarColorClass]"
-        :style="progressBarWidth"
-      ></div>
+      <!-- The fill sits inside the goal, which clips it to its rounded shape; the border is drawn
+           on the overlay above both, so a fill in another colour cannot cover it. -->
+      <div class="progress-bar__goal">
+        <div
+          :class="['progress-bar__progress', progressBarColorClass]"
+          :style="progressBarWidth"
+        ></div>
+      </div>
       <div class="progress-bar__border" style="width: 100%">
         <span v-if="label" class="progress-bar__label">{{ label }}</span>
       </div>
@@ -65,18 +68,18 @@ export default {
 .progress-bar__goal {
   position: relative;
   height: 26px; /*  styleguide-button-size */
-  border: 1px solid var(--color-primary);
+  overflow: hidden;
   background: repeating-linear-gradient(120deg, var(--color-neutral-80), var(--color-neutral-70));
   border-radius: var(--border-radius-base);
 }
 
+/* No radius of its own: the goal clips it, so it ends square instead of in a notch. */
 .progress-bar__progress {
   position: absolute;
   top: 0px;
   left: 0px;
-  height: 26px; /*  styleguide-button-size */
+  height: 100%;
   max-width: 100%;
-  border-radius: var(--border-radius-base);
 
   &.color-uni {
     background: var(--color-donation-bar);
@@ -100,6 +103,8 @@ export default {
   left: 0px;
   height: 26px; /*  styleguide-button-size */
   max-width: 100%;
+  /* On top of the fill, so it stays whole whatever colour the fill has (--color-donation-bar). */
+  border: 1px solid var(--color-primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
