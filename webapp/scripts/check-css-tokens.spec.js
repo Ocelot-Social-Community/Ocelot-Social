@@ -183,6 +183,26 @@ describe('checkSource — z-index', () => {
     expect(check('.a { z-index: 3 !important; }').errors).toEqual([])
   })
 
+  it('allows a negative number at any depth — it sits below everything, so it is local', () => {
+    expect(check('.a { z-index: -100; }', 100).errors).toEqual([])
+    expect(check('.a { z-index: -5000; }', 100).errors).toEqual([])
+  })
+
+  it('flags a token that is not declared, when it knows the declared ones', () => {
+    const known = new Set(['z-index-modal'])
+    const run = (css) => checkSource(style(css), {}, 'A.vue', 100, known).errors
+    expect(run('.a { z-index: var(--z-index-modal); }')).toEqual([])
+    expect(run('.a { z-index: var(--z-index-typo); }')).toEqual([
+      'A.vue: z-index: var(--z-index-typo) — --z-index-typo is not a declared token',
+    ])
+  })
+
+  it('flags a number from the limit up beside a token, but allows a small offset', () => {
+    expect(check('.a { z-index: calc(var(--z-index-sticky) + 5000); }', 100).errors).toHaveLength(1)
+    expect(check('.a { z-index: calc(var(--z-index-modal) - 2); }', 100).errors).toEqual([])
+    expect(check('.a { z-index: calc(var(--z-index-overlay) + 1); }', 100).errors).toEqual([])
+  })
+
   it('allows the keywords', () => {
     expect(check('.a { z-index: auto; }').errors).toEqual([])
   })

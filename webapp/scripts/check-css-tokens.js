@@ -143,17 +143,31 @@ const Z_KEYWORD = /^(auto|inherit|initial|unset|revert)$/
 
 /**
  * Rule 3 for one `z-index` value. Records what it saw in `zUsages` (for the report) and returns the
- * finding, or null when the value is fine.
+ * finding, or null when the value is fine. `knownTokens` is the set of declared `z-index-*` names; a
+ * token outside it is a typo, which the browser would drop silently. Without the set the names are
+ * taken as they come.
  */
-function checkZIndex(value, rel, localLimit, zUsages) {
+function checkZIndex(value, rel, localLimit, zUsages, knownTokens = null) {
   const bare = value.replace(/\s*!important\s*$/, '').trim()
   const tokens = [...bare.matchAll(Z_TOKEN)].map(([, name]) => name)
   if (tokens.length) {
+    const unknown = knownTokens && tokens.find((name) => !knownTokens.has(name))
+    if (unknown) return `${rel}: z-index: ${bare} — --${unknown} is not a declared token`
     for (const token of tokens) zUsages.push({ rel, token })
+    // A number beside a token (`calc(var(--z-index-sticky) + 5000)`) is a page-level level in
+    // disguise. Small offsets (`- 1`, `+ 1`) stay fine.
+    const numbers = bare.replace(/var\([^)]*\)/g, '').match(/\d+/g) || []
+    if (numbers.some((n) => Number(n) >= localLimit)) {
+      return (
+        `${rel}: z-index: ${bare} — a number from ${localLimit} up next to a token is a level ` +
+        `of its own; give it a token`
+      )
+    }
     return null
   }
   if (Z_KEYWORD.test(bare)) return null
-  if (/^-?\d+$/.test(bare) && Math.abs(Number(bare)) < localLimit) {
+  // Negative values sit below everything, so they are always local — no absolute value here.
+  if (/^-?\d+$/.test(bare) && Number(bare) < localLimit) {
     zUsages.push({ rel, local: Number(bare) })
     return null
   }
@@ -167,7 +181,7 @@ function checkZIndex(value, rel, localLimit, zUsages) {
  * All rules, over one file's source. `untokenised` counts literals that have no token to suggest;
  * `zUsages` lists every z-index level the file uses, for the report.
  */
-function checkSource(src, byRgb, rel, localLimit = DEFAULT_LOCAL_Z_LIMIT) {
+function checkSource(src, byRgb, rel, localLimit = DEFAULT_LOCAL_Z_LIMIT, zTokens = null) {
   const errors = []
   const zUsages = []
   let untokenised = 0
@@ -175,7 +189,7 @@ function checkSource(src, byRgb, rel, localLimit = DEFAULT_LOCAL_Z_LIMIT) {
     for (const { prop, value } of declarations(body)) {
       if (prop.startsWith('white-space')) continue
       if (prop === 'z-index') {
-        const finding = checkZIndex(value, rel, localLimit, zUsages)
+        const finding = checkZIndex(value, rel, localLimit, zUsages, zTokens)
         if (finding) errors.push(finding)
         continue
       }
@@ -230,12 +244,19 @@ function main() {
   const tokens = readTokens()
   const byRgb = indexByRgb(tokens)
   const localLimit = localZLimit(tokens)
+  const zTokens = new Set(Object.keys(tokens).filter((name) => name.startsWith('z-index-')))
   const errors = []
   const zUsages = []
   let untokenised = 0
 
   for (const file of walk(ROOT)) {
-    const result = checkSource(readFileSync(file, 'utf8'), byRgb, relative(ROOT, file), localLimit)
+    const result = checkSource(
+      readFileSync(file, 'utf8'),
+      byRgb,
+      relative(ROOT, file),
+      localLimit,
+      zTokens,
+    )
     errors.push(...result.errors)
     zUsages.push(...result.zUsages)
     untokenised += result.untokenised
@@ -246,7 +267,7 @@ function main() {
   for (const file of readdirSync(TOKEN_DIR).filter((f) => f.endsWith('.css'))) {
     if (file === 'root-tokens.css') continue
     const src = `<style>${readFileSync(join(TOKEN_DIR, file), 'utf8')}</style>`
-    const result = checkSource(src, byRgb, `assets/css/${file}`, localLimit)
+    const result = checkSource(src, byRgb, `assets/css/${file}`, localLimit, zTokens)
     errors.push(...result.errors.filter((e) => e.includes(' z-index: ')))
     zUsages.push(...result.zUsages)
   }
