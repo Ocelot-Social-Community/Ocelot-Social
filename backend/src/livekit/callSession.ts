@@ -82,9 +82,8 @@ export const joinCallSession = async (
           OPTIONAL MATCH (session:VideoCallSession)-[:CALL_IN]->(group)
             WHERE session.endedAt IS NULL
           OPTIONAL MATCH (room:Room)-[:ROOM_FOR]->(session)
-          // The group is returned so that a group that is gone yields no row at all.
-          RETURN group.id AS groupId,
-                 session.id AS id,
+          // The group is surely there, its lock held: a row even without any session.
+          RETURN session.id AS id,
                  session.livekitSid = $livekitSid AND size([
                    (member:User)-[:CHATS_IN]->(room)
                      WHERE member.id IN $presentUserIds | member
@@ -95,9 +94,6 @@ export const joinCallSession = async (
         `,
         { groupId, livekitSid, presentUserIds },
       )
-      if (open.records.length === 0) {
-        return null
-      }
       const sessions = open.records
         .map((record) => ({
           id: record.get('id') as string | null,
