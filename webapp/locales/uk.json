@@ -465,6 +465,7 @@
     "GROUP_ROLE_REASSIGN_TARGET_INVALID": "Перемісти учасників до іншої ролі.",
     "GROUP_ROLE_SYSTEM_NOT_DELETABLE": "Системну роль не можна видалити.",
     "GROUP_ROLE_SYSTEM_NOT_RENAMEABLE": "Системна роль зберігає свій ключ; натомість зміни її видиму назву.",
+    "GROUP_SAVE_CATEGORY_UNKNOWN": "Щонайменше однієї з тем не існує.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "Опис має містити щонайменше {min} символів.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Група, яку сторонні не можуть знайти, не може й показати їм своїх учасників.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Ця унікальна назва групи вже зайнята.",
@@ -500,13 +501,17 @@
     "POST_EVENT_LOCATION_COORDINATES_INCOMPLETE": "Для місця події бракує координати.",
     "POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE": "Широта місця події недійсна.",
     "POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE": "Довгота місця події недійсна.",
+    "POST_EVENT_LOCATION_NOT_PICKED": "Виберіть місце з результатів пошуку або позначте його на мапі.",
     "POST_EVENT_START_DATE_INVALID": "Дата початку не є дійсною датою.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "Дата початку має бути у форматі ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "Опис місця повинен містити від {min} до {max} символів.",
     "POST_EVENT_VENUE_REQUIRED": "Будь ласка, додай опис місця.",
     "POST_PIN_FEATURE_DISABLED": "Закріплення дописів не увімкнено.",
     "POST_PIN_LIMIT_REACHED": "Досягнуто максимальної кількості закріплених дописів. Спочатку відкріпи інший допис.",
+    "POST_SAVE_CATEGORY_UNKNOWN": "Щонайменше однієї з тем не існує.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Допис із таким slug уже існує.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Вибрано замало тем (щонайменше {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Вибрано забагато тем (щонайбільше {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Код підтвердження недійсний.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Це ім’я користувача вже зайняте.",
     "REPORT_TARGET_IS_OWN": "Ти не можеш поскаржитися ні на себе, ні на свій власний вміст.",
@@ -531,7 +536,11 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Ти можеш зробити це лише з користувачами, чия роль надає менше повноважень, ніж твоя.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Ти не можеш шукати в адмініструванні користувачів.",
     "USER_DOES_NOT_EXIST": "Користувача не знайдено.",
+    "USER_PROFILE_NAME_TOO_LONG": "Ім’я має містити не більше {max} символів.",
     "USER_PROFILE_NAME_TOO_SHORT": "Ім’я має містити щонайменше {min} символів.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Дозволені лише малі літери (a–z), цифри (0–9), підкреслення та дефіси.",
+    "USER_PROFILE_SLUG_TOO_LONG": "Ім’я користувача має містити не більше {max} символів.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "Ім’я користувача має містити щонайменше {min} символів.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Цей користувач не заблокований.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "Чат відеовиклику відкритий лише для його учасників. Спершу приєднайся до виклику.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Для відеовиклику не знайдено активного членства в цій групі.",
@@ -599,15 +608,17 @@
     "previousLocation": "Попереднє місцезнаходження: {location}",
     "scrollToLocationMap": "Прокрутити до карти",
     "validations": {
-      "categories": "Будь ласка, оберіть від однієї до трьох тем.",
+      "categories": "Будь ласка, оберіть від {min} до {max} тем.",
       "contentNotEmpty": "Будь ласка, введіть вміст.",
       "email": "Будь ласка, введіть дійсну електронну адресу.",
       "eventLocationNameLength": "Адреса повинна містити від {min} до {max} символів.",
       "eventLocationNameNotEmpty": "Будь ласка, введіть адресу.",
+      "eventLocationNotPicked": "Виберіть місце з результатів пошуку або позначте його на мапі.",
       "eventVenueLength": "Опис місця повинен містити від {min} до {max} символів.",
       "eventVenueNotEmpty": "Будь ласка, введіть опис місця.",
       "followableUrl": "має бути дійсною веб-адресою або адресою електронної пошти",
       "formHasErrors": "Будь ласка, заповніть усі обов'язкові поля.",
+      "locationNotPicked": "Виберіть місце з підказок.",
       "nameLength": "Повинно містити від {min} до {max} символів.",
       "titleLength": "Заголовок повинен містити від {min} до {max} символів.",
       "titleNotEmpty": "Будь ласка, введіть заголовок."
@@ -617,10 +628,6 @@
     "step": "Крок {current} з {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd.MM.yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Зміна пароля не вдалася. Можливо, код безпеки був неправильним?",
@@ -828,6 +835,20 @@
       "title": "Деактивувати користувача"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (заблоковано вами)",
+      "count": "Підключено: {count}",
+      "flag": "Поточні відеодзвінки: {count}",
+      "join": "Приєднатися",
+      "joined": "Ви в цьому дзвінку",
+      "participants": "Учасники",
+      "title": "Поточні відеодзвінки"
+    },
+    "close": "Закрити бічну панель",
+    "label": "Бічна панель",
+    "open": "Відкрити бічну панель – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} з {total} € зібрано",
     "donate-now": "Пожертвувати зараз"
@@ -993,15 +1014,15 @@
       "title": "Редагувати мою групу"
     },
     "elevation": {
-      "actingAsMember": "Тут ви дієте як {role}.",
-      "actingAsNonMember": "Ви не є учасником цієї групи.",
       "activeTitle": "Доступ адміністратора активний.",
       "activeUntil": "Він завершиться о {time} або коли ви його припините.",
       "end": "Припинити доступ адміністратора",
-      "offerBody": "Крім того, у вас є мережеві права на неї. Для читання її вмісту та будь-яких змін потрібне це підтвердження, і воно фіксується у групи.",
-      "offerBodyOwner": "Мережеві права також дозволяють вам понизити або видалити інших власників цієї групи. Для цього потрібне це підтвердження, і воно фіксується у групи.",
-      "reasonPlaceholder": "Про що йдеться?",
-      "start": "Скористатися доступом адміністратора"
+      "offerBody": "Ваша поточна роль у цій групі: «{role}». Вкажіть причину, з якої ви хочете керувати цією групою (її буде зафіксовано).",
+      "offerBodyNoneMember": "Ви не є учасником групи. Вкажіть причину, з якої ви хочете керувати цією групою (її буде зафіксовано).",
+      "offerBodyOwner": "Ваша поточна роль у цій групі: «{role}». Мережеві права також дозволяють вам понизити або видалити інших власників цієї групи. Вкажіть причину, з якої ви хочете керувати цією групою (її буде зафіксовано).",
+      "reasonPlaceholder": "Причина вашої дії",
+      "start": "Керувати групою",
+      "title": "Ви маєте право керувати цією групою як супервласник."
     },
     "errors": {
       "userAlreadyMember": "Користувач «{name}» вже є учасником!"
@@ -1009,6 +1030,7 @@
     "foundation": "Заснування",
     "general": "Загальне",
     "goal": "Мета групи",
+    "goalPlaceholder": "напр. Створити сад, відкритий для всього району",
     "group": "Група",
     "groupCreated": "Групу створено!",
     "in": "в",
@@ -1052,6 +1074,7 @@
     "muted": "Сповіщення групи вимкнено",
     "myGroups": "Мої групи",
     "name": "Назва групи",
+    "namePlaceholder": "Громадський сад на Подолі",
     "removeMember": "Видалити учасника",
     "removeMemberButton": "Видалити",
     "removeMemberConfirmText": "Видалити користувача «{name}» з групи?",
@@ -1131,6 +1154,7 @@
       "usual": "Учасник"
     },
     "save": "Створити нову групу",
+    "slugPlaceholder": "hromadskyi-sad-podil",
     "teaser": {
       "notReadable": "Цю групу поки не можна відкрити — ваш запит ще розглядається",
       "openGroup": "Відкрити групу",
@@ -1695,6 +1719,7 @@
       "unblocked": "{name} знову розблоковано"
     },
     "data": {
+      "cityPlaceholder": "напр. Київ",
       "givenName": "Ваше ім'я",
       "givenNamePlaceholder": "Іван",
       "labelBio": "Про вас",
@@ -1863,7 +1888,8 @@
       "nameNotEmpty": "Будь ласка, введіть ваше ім'я.",
       "slug": {
         "alreadyTaken": "Це ім'я користувача вже зайнято.",
-        "regex": "Дозволені лише малі літери, цифри, підкреслення та дефіси."
+        "length": "Ім’я користувача має містити від {min} до {max} символів.",
+        "regex": "Дозволені лише малі літери (a–z), цифри (0–9), підкреслення та дефіси."
       }
     }
   },

@@ -361,8 +361,8 @@
         "user_disable": "Nutzerkonten sperren und wieder freigeben — nur von Nutzern mit weniger Befugnissen als den eigenen.",
         "user_email_readAny": "E-Mail-Adresse beliebiger Nutzer lesen.",
         "user_invite": "Persönliche Einladungscodes erzeugen.",
-        "videoCall_create_open": "Einen Video-Call in einer Gruppe starten, die jeder betreten kann — die also auffindbar ist und ohne Freigabe beigetreten werden kann.",
-        "videoCall_create_restricted": "Einen Video-Call in einer Gruppe starten, die man nicht einfach betreten kann: Der Beitritt braucht eine Freigabe oder Einladung, oder die Gruppe ist unsichtbar."
+        "videoCall_create_open": "Einen Videoanruf in einer Gruppe starten, die jeder betreten kann — die also auffindbar ist und ohne Freigabe beigetreten werden kann.",
+        "videoCall_create_restricted": "Einen Videoanruf in einer Gruppe starten, die man nicht einfach betreten kann: Der Beitritt braucht eine Freigabe oder Einladung, oder die Gruppe ist unsichtbar."
       },
       "permNotHeld": "Dieses Recht hast du selbst nicht, darum kannst du es nicht vergeben.",
       "permUnavailable": "Funktion nicht konfiguriert – das Recht hat keine Wirkung.",
@@ -465,6 +465,7 @@
     "GROUP_ROLE_REASSIGN_TARGET_INVALID": "Verschiebe die Mitglieder in eine andere Rolle.",
     "GROUP_ROLE_SYSTEM_NOT_DELETABLE": "Eine Systemrolle kann nicht gelöscht werden.",
     "GROUP_ROLE_SYSTEM_NOT_RENAMEABLE": "Eine Systemrolle behält ihren Schlüssel; ändere stattdessen ihren Anzeigenamen.",
+    "GROUP_SAVE_CATEGORY_UNKNOWN": "Mindestens ein Thema gibt es nicht.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "Die Beschreibung muss mindestens {min} Zeichen lang sein.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Eine Gruppe, die Außenstehende nicht finden können, kann ihnen auch ihre Mitglieder nicht zeigen.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Dieser eindeutige Gruppenname ist bereits vergeben.",
@@ -500,13 +501,17 @@
     "POST_EVENT_LOCATION_COORDINATES_INCOMPLETE": "Für den Ort der Veranstaltung fehlt eine Koordinate.",
     "POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE": "Der Breitengrad des Veranstaltungsorts ist ungültig.",
     "POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE": "Der Längengrad des Veranstaltungsorts ist ungültig.",
+    "POST_EVENT_LOCATION_NOT_PICKED": "Bitte wähle den Ort aus den Suchergebnissen oder setze ihn auf der Karte.",
     "POST_EVENT_START_DATE_INVALID": "Das Startdatum ist kein gültiges Datum.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "Das Startdatum muss im ISO-Format angegeben werden.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "Die Ortsbeschreibung muss zwischen {min} und {max} Zeichen lang sein.",
     "POST_EVENT_VENUE_REQUIRED": "Bitte gib eine Ortsbeschreibung an.",
     "POST_PIN_FEATURE_DISABLED": "Das Anheften von Beiträgen ist nicht aktiviert.",
     "POST_PIN_LIMIT_REACHED": "Die maximale Anzahl angehefteter Beiträge ist erreicht. Löse zuerst einen anderen Beitrag.",
+    "POST_SAVE_CATEGORY_UNKNOWN": "Mindestens ein Thema gibt es nicht.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Es gibt bereits einen Beitrag mit diesem Slug.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Es sind zu wenige Themen ausgewählt (mindestens {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Es sind zu viele Themen ausgewählt (höchstens {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Der Bestätigungscode ist ungültig.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Dieser Nutzername ist bereits vergeben.",
     "REPORT_TARGET_IS_OWN": "Du kannst weder dich selbst noch deine eigenen Inhalte melden.",
@@ -531,7 +536,11 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Das kannst du nur bei Nutzern tun, deren Rolle weniger Befugnisse gewährt als deine.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Du darfst die Nutzerverwaltung nicht durchsuchen.",
     "USER_DOES_NOT_EXIST": "Der Nutzer wurde nicht gefunden.",
+    "USER_PROFILE_NAME_TOO_LONG": "Der Name darf höchstens {max} Zeichen lang sein.",
     "USER_PROFILE_NAME_TOO_SHORT": "Der Name muss mindestens {min} Zeichen lang sein.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Es sind nur Kleinbuchstaben (a–z), Zahlen (0–9), Unterstriche oder Bindestriche erlaubt.",
+    "USER_PROFILE_SLUG_TOO_LONG": "Der Nutzername darf höchstens {max} Zeichen lang sein.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "Der Nutzername muss mindestens {min} Zeichen lang sein.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Dieser Nutzer ist nicht blockiert.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "Der Chat eines Videoanrufs steht nur dessen Teilnehmern offen. Tritt dem Anruf zuerst bei.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Für den Videoanruf wurde keine aktive Mitgliedschaft in dieser Gruppe gefunden.",
@@ -599,15 +608,17 @@
     "previousLocation": "Vorheriger Ort: {location}",
     "scrollToLocationMap": "Zur Karte scrollen",
     "validations": {
-      "categories": "Bitte ein bis drei Themen auswählen.",
+      "categories": "Bitte {min} bis {max} Themen auswählen.",
       "contentNotEmpty": "Bitte einen Inhalt eingeben.",
       "email": "Bitte eine gültige E-Mail-Adresse eingeben.",
       "eventLocationNameLength": "Die Adresse muss zwischen {min} und {max} Zeichen lang sein.",
       "eventLocationNameNotEmpty": "Bitte eine Adresse eingeben.",
+      "eventLocationNotPicked": "Bitte wähle den Ort aus den Suchergebnissen oder setze ihn auf der Karte.",
       "eventVenueLength": "Die Ortsbeschreibung muss zwischen {min} und {max} Zeichen lang sein.",
       "eventVenueNotEmpty": "Bitte eine Ortsbeschreibung eingeben.",
       "followableUrl": "muss eine gültige Web- oder E-Mail-Adresse sein",
       "formHasErrors": "Bitte alle Pflichtfelder ausfüllen.",
+      "locationNotPicked": "Bitte wähle den Ort aus den Vorschlägen aus.",
       "nameLength": "Der Name muss zwischen {min} und {max} Zeichen lang sein.",
       "titleLength": "Der Titel muss zwischen {min} und {max} Zeichen lang sein.",
       "titleNotEmpty": "Bitte einen Titel eingeben."
@@ -617,10 +628,6 @@
     "step": "Schritt {current} von {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd.MM.yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Passwort Änderung fehlgeschlagen. Möglicherweise falscher Sicherheitscode?",
@@ -828,6 +835,20 @@
       "title": "Nutzer sperren"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (von dir blockiert)",
+      "count": "{count} verbunden",
+      "flag": "Laufende Videoanrufe: {count}",
+      "join": "Beitreten",
+      "joined": "Du bist dabei",
+      "participants": "Teilnehmer",
+      "title": "Laufende Videoanrufe"
+    },
+    "close": "Seitenleiste schließen",
+    "label": "Seitenleiste",
+    "open": "Seitenleiste öffnen – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} von {total} € erreicht",
     "donate-now": "Jetzt spenden"
@@ -993,15 +1014,15 @@
       "title": "Meine Gruppe ändern"
     },
     "elevation": {
-      "actingAsMember": "Du handelst hier als {role}.",
-      "actingAsNonMember": "Du bist kein Mitglied dieser Gruppe.",
       "activeTitle": "Administratorzugriff ist aktiv.",
       "activeUntil": "Er endet um {time} oder wenn du ihn beendest.",
       "end": "Administratorzugriff beenden",
-      "offerBody": "Zusätzlich hältst du Netzwerkrechte über sie. Ihre Inhalte zu lesen oder etwas zu ändern braucht diese Bestätigung, und sie wird bei der Gruppe vermerkt.",
-      "offerBodyOwner": "Über deine Netzwerkrechte kannst du auch die anderen Inhaber dieser Gruppe zurückstufen oder entfernen. Das braucht diese Bestätigung, und sie wird bei der Gruppe vermerkt.",
-      "reasonPlaceholder": "Worum geht es?",
-      "start": "Administratorzugriff nutzen"
+      "offerBody": "Deine aktuelle Rolle in dieser Gruppe: „{role}“. Gib einen Grund an, warum du diese Gruppe verwalten möchtest (wird vermerkt).",
+      "offerBodyNoneMember": "Du bist kein Mitglied der Gruppe. Gib einen Grund an, warum du diese Gruppe verwalten möchtest (wird vermerkt).",
+      "offerBodyOwner": "Deine aktuelle Rolle in dieser Gruppe: „{role}“. Über deine Netzwerkrechte kannst du auch die anderen Inhaber dieser Gruppe zurückstufen oder entfernen. Gib einen Grund an, warum du diese Gruppe verwalten möchtest (wird vermerkt).",
+      "reasonPlaceholder": "Grund deiner Aktion",
+      "start": "Gruppe verwalten",
+      "title": "Du bist berechtigt, diese Gruppe wie ein Super-Inhaber zu verwalten."
     },
     "errors": {
       "userAlreadyMember": "Nutzer „{name}“ ist bereits Mitglied!"
@@ -1009,6 +1030,7 @@
     "foundation": "Gründung",
     "general": "Allgemein",
     "goal": "Ziel der Gruppe",
+    "goalPlaceholder": "z.B. Einen Garten für alle im Kiez anlegen",
     "group": "Gruppe",
     "groupCreated": "Die Gruppe wurde angelegt!",
     "in": "in",
@@ -1052,6 +1074,7 @@
     "muted": "Gruppe stummgeschaltet",
     "myGroups": "Meine Gruppen",
     "name": "Gruppenname",
+    "namePlaceholder": "Gemeinschaftsgarten Kreuzberg",
     "removeMember": "Mitglied aus der Gruppe entfernen?",
     "removeMemberButton": "Entfernen",
     "removeMemberConfirmText": "Nutzer „{name}“ aus der Gruppe entfernen?",
@@ -1096,8 +1119,8 @@
         "group_read": "Das Profil der Gruppe über das immer Öffentliche hinaus sehen.",
         "group_role_manage": "Die Rollen der Gruppe und ihre Rechte bearbeiten.",
         "group_settings_manage": "Die Einstellungen der Gruppe ändern: Name, Beschreibung, Bild, Ort und Kategorien.",
-        "group_videoCall_create": "Einen Video-Call in der Gruppe starten.",
-        "group_videoCall_join": "An einem laufenden Video-Call der Gruppe teilnehmen."
+        "group_videoCall_create": "Einen Videoanruf in der Gruppe starten.",
+        "group_videoCall_join": "An einem laufenden Videoanruf der Gruppe teilnehmen."
       },
       "resultingType": "Mit diesen Rechten ist die Gruppe:",
       "saved": "Rechte gespeichert",
@@ -1131,6 +1154,7 @@
       "usual": "Mitglied"
     },
     "save": "Neue Gruppe anlegen",
+    "slugPlaceholder": "gemeinschaftsgarten-kreuzberg",
     "teaser": {
       "notReadable": "Diese Gruppe kannst du noch nicht öffnen — deine Anfrage läuft noch",
       "openGroup": "Gruppe öffnen",
@@ -1695,6 +1719,7 @@
       "unblocked": "{name} ist wieder entsperrt"
     },
     "data": {
+      "cityPlaceholder": "z.B. Berlin",
       "givenName": "Dein Vorname",
       "givenNamePlaceholder": "Petra",
       "labelBio": "Über dich",
@@ -1863,7 +1888,8 @@
       "nameNotEmpty": "Bitte gib deinen Namen an.",
       "slug": {
         "alreadyTaken": "Dieser Nutzername ist schon vergeben.",
-        "regex": "Es sind nur Kleinbuchstaben, Zahlen, Unterstriche oder Bindestriche erlaubt."
+        "length": "Der Nutzername muss zwischen {min} und {max} Zeichen lang sein.",
+        "regex": "Es sind nur Kleinbuchstaben (a–z), Zahlen (0–9), Unterstriche oder Bindestriche erlaubt."
       }
     }
   },
@@ -1974,8 +2000,8 @@
       "cameraOn": "Kamera: An",
       "cameraStarting": "Kamera wird gestartet…",
       "cancel": "Abbrechen",
-      "description": "Du trittst gleich der Videokonferenz dieser Gruppe bei. Prüfe Kamera, Mikrofon und Lautsprecher, bevor du dem Anruf beitrittst.",
-      "headerTitle": "{name} – Video-Konferenz betreten",
+      "description": "Du trittst gleich dem Videoanruf dieser Gruppe bei. Prüfe Kamera, Mikrofon und Lautsprecher, bevor du beitrittst.",
+      "headerTitle": "{name} – Videoanruf beitreten",
       "hintBoth": "Du trittst ohne Kamera und Mikrofon bei — du wirst nur zuhören und zuschauen.",
       "hintCamera": "Du trittst ohne Kamera bei — andere können dich hören, aber nicht sehen.",
       "hintMic": "Du trittst ohne Mikrofon bei — andere können dich sehen, aber nicht hören.",

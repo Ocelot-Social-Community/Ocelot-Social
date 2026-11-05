@@ -49,8 +49,9 @@ module.exports = defineConfig({
   expect: {
     toHaveScreenshot: {
       // Baselines are rendered on Linux (docker-compose.visual.yml) — same platform as CI.
-      // 0.1 % gives a tiny buffer for sub-pixel antialiasing while catching real regressions.
-      maxDiffPixelRatio: 0.001,
+      // No pixel may differ: a ratio scales with the image, and 0.1 % of a form let a whole missing
+      // placeholder pass unnoticed (#10549). The per-pixel colour `threshold` (default 0.2) stays.
+      maxDiffPixels: 0,
     },
   },
 

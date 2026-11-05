@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import Vuex from 'vuex'
 import VTooltip from 'v-tooltip'
 import { mount, createLocalVue } from '@vue/test-utils'
@@ -36,6 +37,8 @@ jest.mock('livekit-client', () => {
   const Track = {
     Source: { Microphone: 'microphone', Camera: 'camera', ScreenShare: 'screen_share' },
   }
+  const ParticipantEvent = { LocalTrackCpuConstrained: 'localTrackCpuConstrained' }
+  const VideoQuality = { LOW: 0, MEDIUM: 1, HIGH: 2 }
   const DisconnectReason = { CLIENT_INITIATED: 'CLIENT_INITIATED' }
   class Room {
     constructor(opts) {
@@ -56,6 +59,11 @@ jest.mock('livekit-client', () => {
         ),
         setScreenShareEnabled: jest.fn().mockResolvedValue(),
         getTrackPublication: jest.fn(),
+        handlers: {},
+        on(evt, cb) {
+          this.handlers[evt] = cb
+          return this
+        },
       }
       // Tests flip the static to start a room whose audio is already blocked.
       this.canPlaybackAudio = Room.initialCanPlaybackAudio
@@ -73,8 +81,26 @@ jest.mock('livekit-client', () => {
   }
   Room.initialCanPlaybackAudio = true
   Room.deviceErrors = {}
-  return { __esModule: true, Room, RoomEvent, Track, TrackEvent, DisconnectReason }
+  return {
+    __esModule: true,
+    Room,
+    RoomEvent,
+    ParticipantEvent,
+    Track,
+    TrackEvent,
+    VideoQuality,
+    DisconnectReason,
+  }
 })
+
+// The watchdog has its own spec; here it only matters when it runs.
+jest.mock('./audioWatchdog', () => ({
+  createAudioWatchdog: jest.fn((opts) => ({
+    opts,
+    start: jest.fn(),
+    stop: jest.fn(),
+  })),
+}))
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
@@ -1502,6 +1528,40 @@ describe('VideoCall', () => {
       })
     })
 
+    describe('one speaker missing for one listener', () => {
+      it('is watched for as soon as the call runs', async () => {
+        const { wrapper, room } = await connected()
+        const watchdog = wrapper.vm.audioWatchdog
+        expect(watchdog.opts.room).toBe(room)
+        expect(watchdog.start).toHaveBeenCalled()
+      })
+
+      it('is not watched for while reconnecting', async () => {
+        const { wrapper, room } = await connected()
+        const { isPaused } = wrapper.vm.audioWatchdog.opts
+        expect(isPaused()).toBe(false)
+        room.handlers.Reconnecting()
+        expect(isPaused()).toBe(true)
+      })
+
+      it('is no longer watched for once the call is over', async () => {
+        const { wrapper } = await connected()
+        const watchdog = wrapper.vm.audioWatchdog
+        await wrapper.vm.cleanup()
+        expect(watchdog.stop).toHaveBeenCalled()
+        expect(wrapper.vm.audioWatchdog).toBeNull()
+      })
+
+      it('is watched for by the new room only after a retry', async () => {
+        const { wrapper } = await connected()
+        const first = wrapper.vm.audioWatchdog
+        await wrapper.vm.retryConnect()
+        expect(first.stop).toHaveBeenCalled()
+        expect(wrapper.vm.audioWatchdog).not.toBe(first)
+        expect(wrapper.vm.audioWatchdog.opts.room).toBe(wrapper.vm.room)
+      })
+    })
+
     // #10353: a branding switch waits for the call; the call says so.
     describe('a reload waiting for the call to end', () => {
       it('is shown as a notice for as long as it waits', async () => {
@@ -2873,6 +2933,154 @@ describe('VideoCall', () => {
     })
   })
 
+  describe('cpu relief', () => {
+    const remoteVideo = (source) => ({ source, setVideoQuality: jest.fn() })
+
+    const connected = async () => {
+      const built = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
+      built.wrapper.vm.$apollo = {
+        mutate: jest
+          .fn()
+          .mockResolvedValue({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } }),
+      }
+      await built.wrapper.vm.connect()
+      const room = built.wrapper.vm.room
+      const camera = remoteVideo('camera')
+      const screen = remoteVideo('screen_share')
+      room.remoteParticipants.set('bob', {
+        identity: 'bob',
+        audioTrackPublications: new Map(),
+        videoTrackPublications: new Map([
+          ['c', camera],
+          ['s', screen],
+        ]),
+      })
+      const ownCamera = { prioritizePerformance: jest.fn().mockResolvedValue() }
+      room.localParticipant.getTrackPublication.mockImplementation((source) =>
+        source === 'camera' ? { track: ownCamera } : undefined,
+      )
+      const constrained = () => room.localParticipant.handlers.localTrackCpuConstrained()
+      return { ...built, room, camera, screen, ownCamera, constrained }
+    }
+
+    let warn
+    beforeEach(() => {
+      warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    })
+
+    afterEach(() => {
+      warn.mockRestore()
+    })
+
+    it('leaves the video alone as long as the CPU keeps up', async () => {
+      const { wrapper, camera, ownCamera } = await connected()
+      expect(wrapper.vm.cpuConstrained).toBe(false)
+      expect(camera.setVideoQuality).not.toHaveBeenCalled()
+      expect(ownCamera.prioritizePerformance).not.toHaveBeenCalled()
+    })
+
+    it('lets the cameras give way once the CPU holds our video back', async () => {
+      const { wrapper, camera, screen, ownCamera, constrained } = await connected()
+      constrained()
+      expect(wrapper.vm.cpuConstrained).toBe(true)
+      expect(ownCamera.prioritizePerformance).toHaveBeenCalledTimes(1)
+      expect(camera.setVideoQuality).toHaveBeenCalledWith(0)
+      // Screen shares stay readable.
+      expect(screen.setVideoQuality).not.toHaveBeenCalled()
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('CPU constrained'))
+    })
+
+    it('acts only once per call', async () => {
+      const { camera, ownCamera, constrained } = await connected()
+      constrained()
+      constrained()
+      expect(ownCamera.prioritizePerformance).toHaveBeenCalledTimes(1)
+      expect(camera.setVideoQuality).toHaveBeenCalledTimes(1)
+    })
+
+    it('lowers cameras subscribed afterwards as well, but no screen shares', async () => {
+      const { room, constrained } = await connected()
+      constrained()
+      const later = remoteVideo('camera')
+      const laterScreen = remoteVideo('screen_share')
+      room.handlers.TrackSubscribed({}, later)
+      room.handlers.TrackSubscribed({}, laterScreen)
+      expect(later.setVideoQuality).toHaveBeenCalledWith(0)
+      expect(laterScreen.setVideoQuality).not.toHaveBeenCalled()
+    })
+
+    it('does not lower what is subscribed while the CPU keeps up', async () => {
+      const { room } = await connected()
+      const later = remoteVideo('camera')
+      room.handlers.TrackSubscribed({}, later)
+      expect(later.setVideoQuality).not.toHaveBeenCalled()
+    })
+
+    it('relieves our own camera when it is switched on only later', async () => {
+      const { room, ownCamera, constrained } = await connected()
+      room.localParticipant.getTrackPublication.mockReturnValue(undefined)
+      constrained()
+      room.localParticipant.getTrackPublication.mockReturnValue({ track: ownCamera })
+      room.handlers.LocalTrackPublished({ source: 'screen_share' })
+      expect(ownCamera.prioritizePerformance).not.toHaveBeenCalled()
+      room.handlers.LocalTrackPublished({ source: 'camera' })
+      expect(ownCamera.prioritizePerformance).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not relieve a camera switched on while the CPU keeps up', async () => {
+      const { room, ownCamera } = await connected()
+      room.handlers.LocalTrackPublished({ source: 'camera' })
+      expect(ownCamera.prioritizePerformance).not.toHaveBeenCalled()
+    })
+
+    it('copes with a camera that is not being sent', async () => {
+      const { ownCamera, camera, constrained } = await connected()
+      ownCamera.prioritizePerformance.mockRejectedValue(new Error('sender not found'))
+      constrained()
+      await flushPromises()
+      expect(camera.setVideoQuality).toHaveBeenCalled()
+    })
+
+    it('copes with a camera track that cannot be relieved', async () => {
+      const { room, camera, constrained } = await connected()
+      room.localParticipant.getTrackPublication.mockReturnValue({ track: {} })
+      constrained()
+      expect(camera.setVideoQuality).toHaveBeenCalled()
+    })
+
+    it('ignores a late event of a room already replaced', async () => {
+      const { wrapper, room, camera, ownCamera, constrained } = await connected()
+      await wrapper.vm.connect()
+      expect(wrapper.vm.room).not.toBe(room)
+      constrained()
+      expect(wrapper.vm.cpuConstrained).toBe(false)
+      expect(ownCamera.prioritizePerformance).not.toHaveBeenCalled()
+      expect(camera.setVideoQuality).not.toHaveBeenCalled()
+    })
+
+    it('resets the CPU state only once the next room takes over', async () => {
+      const { wrapper, constrained } = await connected()
+      let join
+      wrapper.vm.$apollo.mutate.mockReturnValue(
+        new Promise((resolve) => {
+          join = resolve
+        }),
+      )
+      const connecting = wrapper.vm.connect()
+      constrained()
+      join({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } })
+      await connecting
+      expect(wrapper.vm.cpuConstrained).toBe(false)
+    })
+
+    it('starts the next call unconstrained', async () => {
+      const { wrapper, constrained } = await connected()
+      constrained()
+      await wrapper.vm.connect()
+      expect(wrapper.vm.cpuConstrained).toBe(false)
+    })
+  })
+
   describe('refreshTiles (full tile build)', () => {
     it('builds local + remote tiles and sanitises avatar metadata', () => {
       const { wrapper } = factory({ show: false })
@@ -2918,6 +3126,64 @@ describe('VideoCall', () => {
       expect(tiles.find((t) => t.identity === 'r1').profile.avatar.url).toBe('https://x.org/a.png')
       expect(tiles.find((t) => t.identity === 'r3').profile.avatar).toBeNull()
       expect(tiles.find((t) => t.identity === 'r4').profile.avatar).toBeNull()
+    })
+  })
+
+  describe('refreshTiles (screen share audio)', () => {
+    const Track = {
+      Source: {
+        Microphone: 'microphone',
+        Camera: 'camera',
+        ScreenShare: 'screen_share',
+        ScreenShareAudio: 'screen_share_audio',
+      },
+    }
+    const sharing = (identity, audioPubs) => ({
+      identity,
+      name: identity,
+      isCameraEnabled: false,
+      isScreenShareEnabled: true,
+      metadata: null,
+      audioTrackPublications: new Map(audioPubs.map((pub, i) => [`${identity}-a${i}`, pub])),
+      videoTrackPublications: new Map([['s', { source: 'screen_share', track: { id: 'st' } }]]),
+    })
+    const tilesFor = (local, ...remotes) => {
+      const { wrapper } = factory({ show: false })
+      wrapper.vm.Track = Track
+      wrapper.vm.room = {
+        localParticipant: local,
+        remoteParticipants: new Map(remotes.map((p) => [p.identity, p])),
+      }
+      wrapper.vm.refreshTiles()
+      return wrapper.vm.tiles
+    }
+    const mic = { source: 'microphone', track: { id: 'mic' } }
+    const shareAudio = { source: 'screen_share_audio', track: { id: 'share-audio' } }
+    const local = sharing('me', [])
+
+    it("plays a remote share's sound from its screen tile, the voice from the main tile", () => {
+      // The screen audio published before the microphone.
+      const tiles = tilesFor(local, sharing('bob', [shareAudio, mic]))
+      const bob = tiles.filter((t) => t.identity === 'bob')
+      expect(bob.find((t) => t.isScreen).audioTrack).toBe(shareAudio.track)
+      expect(bob.find((t) => !t.isScreen).audioTrack).toBe(mic.track)
+    })
+
+    it('tells the two apart when the microphone was published first', () => {
+      const tiles = tilesFor(local, sharing('bob', [mic, shareAudio]))
+      const bob = tiles.filter((t) => t.identity === 'bob')
+      expect(bob.find((t) => t.isScreen).audioTrack).toBe(shareAudio.track)
+      expect(bob.find((t) => !t.isScreen).audioTrack).toBe(mic.track)
+    })
+
+    it('leaves the screen tile silent when the share carries no sound', () => {
+      const tiles = tilesFor(local, sharing('bob', [mic]))
+      expect(tiles.find((t) => t.identity === 'bob' && t.isScreen).audioTrack).toBeNull()
+    })
+
+    it('does not play our own share back to us', () => {
+      const tiles = tilesFor(sharing('me', [shareAudio]))
+      expect(tiles.find((t) => t.isLocal && t.isScreen).audioTrack).toBeNull()
     })
   })
 
@@ -3421,6 +3687,39 @@ describe('VideoCall', () => {
           expect(wrapper.vm.spotlightKey).toBe('anna')
         })
 
+        it('hear a tap through the document', () => {
+          // The call is not attached to the document, so a stage of its own is.
+          const attachedStage = document.createElement('div')
+          attachedStage.className = 'video-call__stage'
+          document.body.appendChild(attachedStage)
+          const touch = () => {
+            const event = new Event('pointerdown', { bubbles: true })
+            Object.defineProperty(event, 'pointerType', { value: 'touch' })
+            attachedStage.dispatchEvent(event)
+          }
+          touch()
+          expect(wrapper.vm.barsHidden).toBe(true)
+          touch()
+          expect(wrapper.vm.barsHidden).toBe(false)
+          attachedStage.remove()
+        })
+
+        it('come back at a key pressed right after a tap', () => {
+          tap(stage)
+          expect(wrapper.vm.barsHidden).toBe(true)
+          document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true }))
+          expect(wrapper.vm.barsHidden).toBe(false)
+        })
+
+        it('spotlight a tile clicked with the mouse after a tap beside the tiles', () => {
+          jest.advanceTimersByTime(4000)
+          tap(stage)
+          expect(wrapper.vm.barsHidden).toBe(false)
+          wrapper.vm.onBarActivity({ type: 'pointerdown', pointerType: 'mouse', target: tile })
+          wrapper.vm.onTileSelect({ key: 'anna' })
+          expect(wrapper.vm.spotlightKey).toBe('anna')
+        })
+
         it('ignore the mouse events the browser makes up after a tap', () => {
           tap(stage)
           move()
@@ -3536,6 +3835,19 @@ describe('VideoCall', () => {
     })
 
     it('ends when the call is parked', async () => {
+      // Reactive, so that parking the call reaches the store's getter.
+      const state = Vue.observable({ show: true, minimized: false })
+      const { wrapper } = factory(state)
+      await wrapper.setData({ phase: 'in-call' })
+      await wrapper.vm.toggleFullscreen()
+      state.minimized = true
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.isMaximized).toBe(false)
+      expect(document.exitFullscreen).toHaveBeenCalled()
+      expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+
+    it('ends when the call is connecting anew', async () => {
       const { wrapper } = await maximizedCall()
       await wrapper.vm.toggleFullscreen()
       await wrapper.setData({ phase: 'connecting' })
@@ -3562,6 +3874,31 @@ describe('VideoCall', () => {
       await entering
       expect(document.exitFullscreen).toHaveBeenCalled()
       expect(wrapper.vm.inFullscreen).toBe(false)
+    })
+
+    it('ends again when the call was gone from the page while the browser was still entering it', async () => {
+      const { wrapper } = await maximizedCall()
+      let enter
+      document.documentElement.requestFullscreen = jest.fn(
+        () =>
+          new Promise((resolve) => {
+            enter = () => {
+              fullscreenElement = document.documentElement
+              fullscreenChanged()
+              resolve()
+            }
+          }),
+      )
+      // A call being left: the media server has yet to confirm the disconnect, so leaving
+      // has not reset the call's phase when the browser reports fullscreen.
+      wrapper.vm.room = { localParticipant: null, disconnect: () => new Promise(() => {}) }
+      const entering = wrapper.vm.toggleFullscreen()
+      wrapper.destroy()
+      expect(document.exitFullscreen).not.toHaveBeenCalled()
+      enter()
+      await entering
+      expect(document.exitFullscreen).toHaveBeenCalled()
+      expect(fullscreenElement).toBe(null)
     })
 
     it('neither takes nor ends the fullscreen of something else on the page', async () => {
@@ -3659,6 +3996,19 @@ describe('VideoCall', () => {
       expect(VideoCall.methods.controlTooltip.call(phone, 'Headset: turn off')).toBe('')
     })
 
+    it('names a control by its visible label too, while it shows one', () => {
+      const name = (iconOnly, label, action) =>
+        VideoCall.methods.controlName.call({ iconOnly }, label, action)
+      expect(name(false, 'Microphone', 'Headset: turn off')).toBe('Microphone, Headset: turn off')
+      // Not twice where the action has it already.
+      expect(name(false, 'Microphone', 'Microphone: turn off')).toBe('Microphone: turn off')
+      expect(name(false, 'Screen', 'Share your screen, a window or a tab')).toBe(
+        'Share your screen, a window or a tab',
+      )
+      // Without a label to see, the action alone.
+      expect(name(true, 'Microphone', 'Headset: turn off')).toBe('Headset: turn off')
+    })
+
     it('drops the labels in the parked window, and offers them as tooltips', () => {
       const parkedWindow = { parked: true, isMobile: false, phase: 'in-call' }
       expect(computed.iconOnly.call(parkedWindow)).toBe(true)
@@ -3687,6 +4037,40 @@ describe('VideoCall', () => {
       expect(crowded(500, 0)).toBe(false)
       expect(crowded(0, 640)).toBe(false)
       expect(crowded(500, 640, true)).toBe(false)
+    })
+
+    describe('measureControls', () => {
+      let getComputedStyleSpy
+
+      afterEach(() => {
+        getComputedStyleSpy?.mockRestore()
+      })
+
+      it('measures the control bar and what its labeled buttons need in one row', async () => {
+        const { wrapper } = factory({ show: true, minimized: false })
+        await wrapper.setData({ phase: 'in-call', windowWidth: 1200 })
+        const bar = wrapper.find('.video-call__controls').element
+        const items = Array.from(bar.children)
+        items.forEach((item) => Object.defineProperty(item, 'offsetWidth', { value: 100 }))
+        const width = (value) =>
+          Object.defineProperty(bar, 'clientWidth', { value, configurable: true })
+        getComputedStyleSpy = jest
+          .spyOn(window, 'getComputedStyle')
+          .mockReturnValue({ columnGap: '8px', paddingLeft: '10px', paddingRight: '10px' })
+        const needed = items.length * 100 + 8 * (items.length - 1) + 20
+
+        width(needed - 1)
+        wrapper.vm.measureControls()
+        expect(wrapper.vm.controlsWidth).toBe(needed - 1)
+        expect(wrapper.vm.labeledControlsWidth).toBe(needed)
+        expect(wrapper.vm.iconOnly).toBe(true)
+
+        width(needed + 100)
+        wrapper.vm.measureControls()
+        expect(wrapper.vm.controlsWidth).toBe(needed + 100)
+        expect(wrapper.vm.iconOnly).toBe(false)
+        wrapper.destroy()
+      })
     })
 
     it('never parks the call on a phone', () => {
@@ -3768,6 +4152,8 @@ describe('VideoCall', () => {
       setChatRoomId: jest.fn(),
       joinCallChat: jest.fn(),
       callChatRetryTimer: null,
+      callChatAsks: 0,
+      loadConferenceUnread: jest.fn(),
       cancelCallChatRetry: VideoCall.methods.cancelCallChatRetry,
       ...overrides,
     })
@@ -3783,6 +4169,14 @@ describe('VideoCall', () => {
       await VideoCall.methods.joinCallChat.call(ctx, room)
       expect(ctx.$apollo.mutate.mock.calls[0][0].variables).toEqual({ groupId: 'g1' })
       expect(ctx.setChatRoomId).toHaveBeenCalledWith('room-1')
+      expect(ctx.loadConferenceUnread).toHaveBeenCalledWith('room-1')
+    })
+
+    it('asks for nothing unread where the server gives no chat', async () => {
+      const ctx = context(jest.fn().mockResolvedValue({ data: { joinGroupVideoCallChat: null } }))
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      expect(ctx.setChatRoomId).toHaveBeenCalledWith(null)
+      expect(ctx.loadConferenceUnread).not.toHaveBeenCalled()
     })
 
     it('drops an answer for a call that has been left meanwhile', async () => {
@@ -3792,6 +4186,24 @@ describe('VideoCall', () => {
       )
       await VideoCall.methods.joinCallChat.call(ctx, room)
       expect(ctx.setChatRoomId).not.toHaveBeenCalled()
+    })
+
+    it('drops an older answer that arrives after a newer one', async () => {
+      let answerFirst
+      const mutate = jest
+        .fn()
+        .mockReturnValueOnce(
+          new Promise((resolve) => {
+            answerFirst = () => resolve({ data: { joinGroupVideoCallChat: 'room-old' } })
+          }),
+        )
+        .mockResolvedValueOnce({ data: { joinGroupVideoCallChat: 'room-new' } })
+      const ctx = context(mutate)
+      const first = VideoCall.methods.joinCallChat.call(ctx, room)
+      await VideoCall.methods.joinCallChat.call(ctx, room)
+      answerFirst()
+      await first
+      expect(ctx.setChatRoomId.mock.calls).toEqual([['room-new']])
     })
 
     it('asks again after a failure, and gives up after the last attempt', async () => {
@@ -3897,6 +4309,8 @@ describe('VideoCall', () => {
       const context = (overrides = {}) => ({
         chatRoomId: 'room-1',
         groupChatRoomId: 'group-room',
+        conferenceUnreadPushes: 0,
+        groupChatUnreadPushes: 0,
         setConferenceUnread: jest.fn(),
         setGroupChatUnread: jest.fn(),
         loadGroupChatUnread: jest.fn(),
@@ -3909,6 +4323,8 @@ describe('VideoCall', () => {
         update(ctx, { id: 'room-1', unreadCount: 2 })
         expect(ctx.setConferenceUnread).toHaveBeenCalledWith(2)
         expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+        expect(ctx.conferenceUnreadPushes).toBe(1)
+        expect(ctx.groupChatUnreadPushes).toBe(0)
       })
 
       it('counts the chat of the group by its room', () => {
@@ -3916,6 +4332,8 @@ describe('VideoCall', () => {
         update(ctx, { id: 'group-room', unreadCount: 5 })
         expect(ctx.setGroupChatUnread).toHaveBeenCalledWith(5)
         expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
+        expect(ctx.groupChatUnreadPushes).toBe(1)
+        expect(ctx.conferenceUnreadPushes).toBe(0)
       })
 
       it('leaves every other room alone', () => {
@@ -3939,6 +4357,7 @@ describe('VideoCall', () => {
         groupId: 'g1',
         phase: 'in-call',
         groupChatRoomId: null,
+        groupChatUnreadPushes: 0,
         $apollo: { query },
         setGroupChatUnread: jest.fn(),
         ...overrides,
@@ -3972,10 +4391,68 @@ describe('VideoCall', () => {
         expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
       })
 
+      it('gives way to a count pushed while it was asking', async () => {
+        const ctx = context(
+          jest.fn(async () => {
+            ctx.groupChatUnreadPushes++
+            return { data: { Room: [{ id: 'group-room', unreadCount: 4 }] } }
+          }),
+          { groupChatRoomId: 'group-room' },
+        )
+        await load(ctx)
+        expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+      })
+
       it('goes without a count when the request fails', async () => {
         const ctx = context(jest.fn().mockRejectedValue(new Error('offline')))
         await expect(load(ctx)).resolves.toBeUndefined()
         expect(ctx.setGroupChatUnread).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('loading what is unread in the conference chat', () => {
+      const context = (query, overrides = {}) => ({
+        chatRoomId: 'call-room',
+        conferenceUnreadPushes: 0,
+        $apollo: { query },
+        setConferenceUnread: jest.fn(),
+        ...overrides,
+      })
+      const load = (ctx) => VideoCall.methods.loadConferenceUnread.call(ctx, 'call-room')
+
+      it('takes what is unread in the room', async () => {
+        const ctx = context(
+          jest.fn().mockResolvedValue({ data: { Room: [{ id: 'call-room', unreadCount: 3 }] } }),
+        )
+        await load(ctx)
+        expect(ctx.$apollo.query.mock.calls[0][0].variables).toEqual({ id: 'call-room' })
+        expect(ctx.setConferenceUnread).toHaveBeenCalledWith(3)
+      })
+
+      it("drops an answer for a chat that is no longer the call's", async () => {
+        const ctx = context(
+          jest.fn().mockResolvedValue({ data: { Room: [{ id: 'call-room', unreadCount: 3 }] } }),
+          { chatRoomId: 'another-room' },
+        )
+        await load(ctx)
+        expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
+      })
+
+      it('gives way to a count pushed while it was asking', async () => {
+        const ctx = context(
+          jest.fn(async () => {
+            ctx.conferenceUnreadPushes++
+            return { data: { Room: [{ id: 'call-room', unreadCount: 3 }] } }
+          }),
+        )
+        await load(ctx)
+        expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
+      })
+
+      it('goes without a count when the request fails', async () => {
+        const ctx = context(jest.fn().mockRejectedValue(new Error('offline')))
+        await expect(load(ctx)).resolves.toBeUndefined()
+        expect(ctx.setConferenceUnread).not.toHaveBeenCalled()
       })
     })
 

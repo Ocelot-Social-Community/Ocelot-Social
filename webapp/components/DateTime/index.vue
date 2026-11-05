@@ -3,9 +3,8 @@
 </template>
 
 <script>
-import { getDateFnsLocale } from '~/locales'
-import format from 'date-fns/format'
-import formatRelative from 'date-fns/formatRelative'
+import { getLocaleIso } from '~/locales'
+import { formatAbsolute, formatRelative } from '~/utils/dateFormat'
 import { branding } from '@ocelot-social/branding'
 
 export default {
@@ -18,15 +17,10 @@ export default {
   },
   computed: {
     dateTimeString() {
-      if (branding.dateTime.relativeDateTime) {
-        return formatRelative(new Date(this.dateTime), new Date(), {
-          locale: getDateFnsLocale(this),
-        })
-      } else {
-        return format(new Date(this.dateTime), branding.dateTime.absoluteDateTimeFormat, {
-          locale: getDateFnsLocale(this),
-        })
-      }
+      const locale = getLocaleIso(this)
+      return branding.dateTime.relativeDateTime
+        ? formatRelative(this.dateTime, new Date(), branding.dateTime, locale)
+        : formatAbsolute(this.dateTime, branding.dateTime, locale)
     },
   },
 }

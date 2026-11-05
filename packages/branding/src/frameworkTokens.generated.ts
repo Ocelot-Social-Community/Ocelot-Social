@@ -216,6 +216,7 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'video-call-bar-opacity': '75%',
   'video-call-bar-page-footer-color': 'var(--color-footer-background)',
   'video-call-bar-page-header-color': 'var(--color-header-background)',
+  'z-index-call-maximized': 'calc(var(--z-index-page-submenu) - 1)',
   'z-index-dropdown': '8888',
   'z-index-modal': '9999',
   'z-index-overlay': '9000',

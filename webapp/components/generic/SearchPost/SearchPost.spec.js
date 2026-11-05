@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import SearchPost from './SearchPost.vue'
 
 const localVue = global.localVue
-localVue.filter('dateTime', (d) => d)
+localVue.filter('date', (d) => d)
 
 describe('SearchPost.vue', () => {
   let mocks, wrapper, propsData, counts

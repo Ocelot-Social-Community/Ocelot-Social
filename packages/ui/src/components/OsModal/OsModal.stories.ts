@@ -1,9 +1,10 @@
-import { computed } from 'vue'
+import { ref } from 'vue'
 
 import OsButton from '#src/components/OsButton/OsButton.vue'
 
 import OsModal from './OsModal.vue'
 
+import type { ModalSize } from './modal.variants'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 const meta: Meta<typeof OsModal> = {
@@ -16,45 +17,63 @@ export default meta
 type Story = StoryObj<typeof OsModal>
 
 interface PlaygroundArgs {
-  open: boolean
   title: string
+  size: ModalSize
   cancelLabel: string
   confirmLabel: string
+  closeLabel: string
   content: string
 }
 
 export const Playground: StoryObj<PlaygroundArgs> = {
   argTypes: {
-    open: { control: 'boolean' },
     title: { control: 'text' },
+    size: { control: 'select', options: ['sm', 'md', 'lg'] },
     cancelLabel: { control: 'text' },
     confirmLabel: { control: 'text' },
+    closeLabel: { control: 'text' },
     content: { control: 'text' },
   },
   args: {
-    open: true,
     title: 'Modal Title',
+    size: 'md',
     cancelLabel: 'Cancel',
     confirmLabel: 'Confirm',
+    closeLabel: 'Close',
     content: 'This is the modal body content.',
   },
+  // Opened from a button and bound with v-model, like it is used: Escape, the backdrop and both
+  // buttons close it, and it starts closed so the docs page it is rendered on stays usable.
   render: (args) => ({
-    components: { OsModal },
+    components: { OsModal, OsButton },
     setup() {
-      const modalProps = computed(() => ({
-        open: args.open,
-        title: args.title,
-        cancelLabel: args.cancelLabel,
-        confirmLabel: args.confirmLabel,
-      }))
-      const content = computed(() => args.content)
-      return { modalProps, content }
+      const open = ref(false)
+      return { args, open }
     },
-    template: `<OsModal v-bind="modalProps">{{ content }}</OsModal>`,
+    template: `
+      <div>
+        <OsButton variant="primary" @click="open = true">Open modal</OsButton>
+        <OsModal
+          v-model:open="open"
+          :title="args.title"
+          :size="args.size"
+          :cancel-label="args.cancelLabel"
+          :confirm-label="args.confirmLabel"
+          :close-label="args.closeLabel"
+        >{{ args.content }}</OsModal>
+      </div>
+    `,
   }),
 }
 
+// An open modal covers the page it is rendered on. On the autodocs page the stories render
+// inline by default, and an open modal would lay its backdrop, focus trap and scroll lock over
+// the docs themselves — and, with nobody listening to update:open, stay there. So the open
+// stories get an iframe of their own there, high enough for the modal they show.
+const ownFrame = (iframeHeight: number) => ({ docs: { story: { inline: false, iframeHeight } } })
+
 export const DefaultSize: Story = {
+  parameters: ownFrame(360),
   render: () => ({
     components: { OsModal },
     template: `
@@ -68,7 +87,55 @@ export const DefaultSize: Story = {
   }),
 }
 
+export const SmallSize: Story = {
+  parameters: ownFrame(320),
+  render: () => ({
+    components: { OsModal },
+    template: `
+      <div data-testid="small-size">
+        <OsModal :open="true" size="sm" title="Small Modal">
+          <p>A small modal (max-width: 400px) for short questions.</p>
+        </OsModal>
+      </div>
+    `,
+  }),
+}
+
+export const LargeSize: Story = {
+  parameters: ownFrame(320),
+  render: () => ({
+    components: { OsModal },
+    template: `
+      <div data-testid="large-size">
+        <OsModal :open="true" size="lg" title="Large Modal">
+          <p>A large modal (max-width: 700px) for forms with more room, such as a report dialog.</p>
+        </OsModal>
+      </div>
+    `,
+  }),
+}
+
+// Starts closed, so it needs no frame of its own on the docs page.
+export const WithTrigger: Story = {
+  render: () => ({
+    components: { OsModal, OsButton },
+    setup() {
+      const open = ref(false)
+      return { open }
+    },
+    template: `
+      <div data-testid="with-trigger">
+        <OsButton data-testid="open-modal" @click="open = true">Open modal</OsButton>
+        <OsModal v-model:open="open" title="Opened from a button">
+          <p>Focus moves into the dialog and returns to the button when it closes.</p>
+        </OsModal>
+      </div>
+    `,
+  }),
+}
+
 export const CustomFooter: Story = {
+  parameters: ownFrame(320),
   render: () => ({
     components: { OsModal, OsButton },
     template: `
@@ -86,6 +153,8 @@ export const CustomFooter: Story = {
 }
 
 export const ScrollableContent: Story = {
+  // The content area is capped at half the viewport, so this frame shows it scrolling.
+  parameters: ownFrame(520),
   render: () => ({
     components: { OsModal },
     template: `

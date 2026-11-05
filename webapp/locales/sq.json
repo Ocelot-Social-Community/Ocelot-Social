@@ -465,6 +465,7 @@
     "GROUP_ROLE_REASSIGN_TARGET_INVALID": "Zhvendosi anëtarët në një rol tjetër.",
     "GROUP_ROLE_SYSTEM_NOT_DELETABLE": "Një rol i sistemit nuk mund të fshihet.",
     "GROUP_ROLE_SYSTEM_NOT_RENAMEABLE": "Një rol i sistemit e mban çelësin e tij; ndrysho më mirë emrin e shfaqur.",
+    "GROUP_SAVE_CATEGORY_UNKNOWN": "Të paktën një nga temat nuk ekziston.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "Përshkrimi duhet të ketë të paktën {min} karaktere.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Një grup që të jashtmit nuk mund ta gjejnë, nuk mund t'u tregojë as anëtarët e tij.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Ky emër unik i grupit është i zënë tashmë.",
@@ -500,13 +501,17 @@
     "POST_EVENT_LOCATION_COORDINATES_INCOMPLETE": "Mungon një koordinatë për vendndodhjen e eventit.",
     "POST_EVENT_LOCATION_LATITUDE_OUT_OF_RANGE": "Gjerësia gjeografike e vendndodhjes së eventit është e pavlefshme.",
     "POST_EVENT_LOCATION_LONGITUDE_OUT_OF_RANGE": "Gjatësia gjeografike e vendndodhjes së eventit është e pavlefshme.",
+    "POST_EVENT_LOCATION_NOT_PICKED": "Zgjidhni vendin nga rezultatet e kërkimit ose vendoseni në hartë.",
     "POST_EVENT_START_DATE_INVALID": "Data e fillimit nuk është një datë e vlefshme.",
     "POST_EVENT_START_DATE_NOT_ISO_FORMAT": "Data e fillimit duhet të jetë në formatin ISO.",
     "POST_EVENT_VENUE_LENGTH_INVALID": "Përshkrimi i vendit duhet të ketë midis {min} dhe {max} karaktere.",
     "POST_EVENT_VENUE_REQUIRED": "Shto një përshkrim të vendndodhjes.",
     "POST_PIN_FEATURE_DISABLED": "Ngulja e postimeve nuk është aktivizuar.",
     "POST_PIN_LIMIT_REACHED": "Është arritur numri maksimal i postimeve të ngulura. Hiq fillimisht një postim tjetër të ngulur.",
+    "POST_SAVE_CATEGORY_UNKNOWN": "Të paktën një nga temat nuk ekziston.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Ekziston tashmë një postim me këtë slug.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Janë zgjedhur shumë pak tema (të paktën {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Janë zgjedhur shumë tema (më së shumti {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Kodi i konfirmimit është i pavlefshëm.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Ky emër përdoruesi është i zënë tashmë.",
     "REPORT_TARGET_IS_OWN": "Nuk mund të raportosh as veten, as përmbajtjen tënde.",
@@ -531,7 +536,11 @@
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Këtë mund ta bësh vetëm me përdorues, roli i të cilëve jep më pak autoritet se yti.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Nuk mund të kërkosh në administrimin e përdoruesve.",
     "USER_DOES_NOT_EXIST": "Përdoruesi nuk u gjet.",
+    "USER_PROFILE_NAME_TOO_LONG": "Emri duhet të ketë jo më shumë se {max} karaktere.",
     "USER_PROFILE_NAME_TOO_SHORT": "Emri duhet të ketë të paktën {min} karaktere.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Karakteret e lejuara janë vetëm shkronja të vogla (a–z), numra (0–9), nënviza dhe viza.",
+    "USER_PROFILE_SLUG_TOO_LONG": "Emri i përdoruesit duhet të ketë jo më shumë se {max} karaktere.",
+    "USER_PROFILE_SLUG_TOO_SHORT": "Emri i përdoruesit duhet të ketë të paktën {min} karaktere.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Ky përdorues nuk është i bllokuar.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "Biseda e një telefonate me video është e hapur vetëm për pjesëmarrësit e saj. Bashkohu fillimisht në telefonatë.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Për telefonatën me video nuk u gjet asnjë anëtarësim aktiv në këtë grup.",
@@ -599,15 +608,17 @@
     "previousLocation": "Vendndodhja e mëparshme: {location}",
     "scrollToLocationMap": "Rrëshqit te harta",
     "validations": {
-      "categories": "Ju lutem zgjidhni midis një dhe tre temave.",
+      "categories": "Ju lutem zgjidhni midis {min} dhe {max} temave.",
       "contentNotEmpty": "Ju lutem shkruani përmbajtje.",
       "email": "Ju lutem shkruani një adresë e-mail të vlefshme.",
       "eventLocationNameLength": "Adresa duhet të ketë midis {min} dhe {max} karaktere.",
       "eventLocationNameNotEmpty": "Ju lutem shkruani një adresë.",
+      "eventLocationNotPicked": "Zgjidhni vendin nga rezultatet e kërkimit ose vendoseni në hartë.",
       "eventVenueLength": "Përshkrimi i vendit duhet të ketë midis {min} dhe {max} karaktere.",
       "eventVenueNotEmpty": "Ju lutem shkruani një përshkrim të vendit.",
       "followableUrl": "duhet të jetë një adresë uebi ose e-mail e vlefshme",
       "formHasErrors": "Ju lutem plotësoni të gjitha fushat e detyrueshme.",
+      "locationNotPicked": "Zgjidhe vendin nga sugjerimet.",
       "nameLength": "Emri duhet të ketë midis {min} dhe {max} karaktere.",
       "titleLength": "Titulli duhet të ketë midis {min} dhe {max} karaktere.",
       "titleNotEmpty": "Ju lutem shkruani një titull."
@@ -617,10 +628,6 @@
     "step": "Hapi {current} nga {total}"
   },
   "components": {
-    "dateTimeRange": {
-      "hourMinute": "HH:mm",
-      "yearMonthDay": "dd.MM.yyyy"
-    },
     "password-reset": {
       "change-password": {
         "error": "Ndryshimi i fjalëkalimit dështoi. Ndoshta kodi i sigurisë nuk ishte i saktë?",
@@ -828,6 +835,20 @@
       "title": "Çaktivizo përdoruesin"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (i bllokuar nga ti)",
+      "count": "{count} të lidhur",
+      "flag": "Thirrje video në vazhdim: {count}",
+      "join": "Bashkohu",
+      "joined": "Je në këtë thirrje",
+      "participants": "Pjesëmarrësit",
+      "title": "Thirrje video në vazhdim"
+    },
+    "close": "Mbyll shiritin anësor",
+    "label": "Shiriti anësor",
+    "open": "Hap shiritin anësor – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} nga {total} € të mbledhura",
     "donate-now": "Dhuro tani"
@@ -993,15 +1014,15 @@
       "title": "Ndrysho grupin tim"
     },
     "elevation": {
-      "actingAsMember": "Këtu vepron si {role}.",
-      "actingAsNonMember": "Nuk je anëtar i këtij grupi.",
       "activeTitle": "Qasja si administrator është aktive.",
       "activeUntil": "Përfundon në {time}, ose kur ta mbyllësh ti.",
       "end": "Mbyll qasjen si administrator",
-      "offerBody": "Përveç kësaj ke të drejta rrjeti mbi të. Leximi i përmbajtjes ose çdo ndryshim kërkon këtë konfirmim, i cili regjistrohet te grupi.",
-      "offerBodyOwner": "Të drejtat e rrjetit të lejojnë gjithashtu të ulësh ose të heqësh pronarët e tjerë të këtij grupi. Kjo kërkon këtë konfirmim, i cili regjistrohet te grupi.",
-      "reasonPlaceholder": "Për çfarë bëhet fjalë?",
-      "start": "Përdor qasjen si administrator"
+      "offerBody": "Roli yt aktual në këtë grup: «{role}». Jep një arsye pse dëshiron ta administrosh këtë grup (do të regjistrohet).",
+      "offerBodyNoneMember": "Nuk je anëtar i grupit. Jep një arsye pse dëshiron ta administrosh këtë grup (do të regjistrohet).",
+      "offerBodyOwner": "Roli yt aktual në këtë grup: «{role}». Të drejtat e rrjetit të lejojnë gjithashtu të ulësh ose të heqësh pronarët e tjerë të këtij grupi. Jep një arsye pse dëshiron ta administrosh këtë grup (do të regjistrohet).",
+      "reasonPlaceholder": "Arsyeja e veprimit tënd",
+      "start": "Administro grupin",
+      "title": "Ke të drejtë ta administrosh këtë grup si super pronar."
     },
     "errors": {
       "userAlreadyMember": "Përdoruesi „{name}“ është tashmë anëtar!"
@@ -1009,6 +1030,7 @@
     "foundation": "Themelimi",
     "general": "Përgjithshme",
     "goal": "Qëllimi i grupit",
+    "goalPlaceholder": "p.sh. Të krijojmë një kopsht të hapur për gjithë lagjen",
     "group": "Grup",
     "groupCreated": "Grupi u krijua!",
     "in": "në",
@@ -1052,6 +1074,7 @@
     "muted": "Grupi u hesht",
     "myGroups": "Grupet e mia",
     "name": "Emri i grupit",
+    "namePlaceholder": "Kopshti i Lagjes Blloku",
     "removeMember": "Hiq anëtarin",
     "removeMemberButton": "Hiq",
     "removeMemberConfirmText": "Hiq përdoruesin „{name}“ nga grupi?",
@@ -1131,6 +1154,7 @@
       "usual": "Anëtar"
     },
     "save": "Krijo grup të ri",
+    "slugPlaceholder": "kopshti-i-lagjes-blloku",
     "teaser": {
       "notReadable": "Këtë grup nuk mund ta hapësh ende — kërkesa jote është në pritje",
       "openGroup": "Hap grupin",
@@ -1695,6 +1719,7 @@
       "unblocked": "{name} u zhbllokua përsëri"
     },
     "data": {
+      "cityPlaceholder": "p.sh. Tiranë",
       "givenName": "Emri yt",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "Rreth teje",
@@ -1863,7 +1888,8 @@
       "nameNotEmpty": "Ju lutem fut emrin tënd.",
       "slug": {
         "alreadyTaken": "Ky emër përdoruesi është tashmë i zënë.",
-        "regex": "Karakteret e lejuara janë vetëm shkronja të vogla, numra, nënviza dhe viza."
+        "length": "Emri i përdoruesit duhet të ketë midis {min} dhe {max} karaktere.",
+        "regex": "Karakteret e lejuara janë vetëm shkronja të vogla (a–z), numra (0–9), nënviza dhe viza."
       }
     }
   },

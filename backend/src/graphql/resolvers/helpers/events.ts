@@ -13,11 +13,10 @@ const EVENT_VENUE_MAX_LENGTH = 100
 
 export const validateEventParams = (params) => {
   let locationName: string | null | undefined
-  // Only set alongside a truthy locationName, and only when the client sent
-  // both as numbers (e.g. from a dropped map pin) — createOrUpdateLocations()
-  // reverse-geocodes these instead of forward-geocoding locationName's text
-  // when present, so the saved location matches the exact point picked
-  // rather than a text-search approximation of it.
+  // Set alongside every locationName: the coordinates the place was picked with (a search result
+  // or a dropped map pin), which createOrUpdateLocations() reverse-geocodes, so the saved location
+  // is the point picked. A name without them was typed but never picked, and is refused — searched
+  // as text it became whatever Mapbox ranked first (#7239).
   let coordinates: { lat: number; lng: number } | null = null
   if (params.postType && params.postType === 'Event') {
     const { eventInput } = params
@@ -50,10 +49,11 @@ export const validateEventParams = (params) => {
       if (hasLat !== hasLng) {
         throw new AppError(Errors.POST_EVENT_LOCATION_COORDINATES_INCOMPLETE)
       }
-      if (hasLat && hasLng) {
-        validateEventCoordinates(eventInput.lat, eventInput.lng)
-        coordinates = { lat: eventInput.lat, lng: eventInput.lng }
+      if (!hasLat) {
+        throw new AppError(Errors.POST_EVENT_LOCATION_NOT_PICKED)
       }
+      validateEventCoordinates(eventInput.lat, eventInput.lng)
+      coordinates = { lat: eventInput.lat, lng: eventInput.lng }
     } else {
       params.eventLocationName = null
       locationName = null

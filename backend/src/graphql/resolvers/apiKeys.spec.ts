@@ -15,6 +15,8 @@ import myApiKeys from '@graphql/queries/apiKeys/myApiKeys.gql'
 import revokeApiKey from '@graphql/queries/apiKeys/revokeApiKey.gql'
 import updateApiKey from '@graphql/queries/apiKeys/updateApiKey.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { serverPubsub } from '@src/context'
+import { listenForPrincipalChanges, principalEpoch } from '@src/context/principalEpoch'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -34,8 +36,13 @@ let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
+// Counts what the resolvers publish on the pubsub their context carries, as index.ts does in
+// production: a revoked key must make its owner's open subscriptions read them again.
+let principalListener: number
+
 beforeAll(async () => {
   await cleanDatabase()
+  principalListener = await listenForPrincipalChanges(serverPubsub)
   const apolloSetup = await createApolloTestSetup({ context })
   query = apolloSetup.query
   mutate = apolloSetup.mutate
@@ -44,6 +51,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
+  serverPubsub.unsubscribe(principalListener)
   await cleanDatabase()
   void server.stop()
   void database.driver.close()
@@ -349,6 +357,14 @@ describe('revokeApiKey', () => {
     expect(data.revokeApiKey).toBe(false)
   })
 
+  it("moves the owner's principal epoch, once", async () => {
+    const before = principalEpoch('u4')
+    await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
+    await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
+
+    expect(principalEpoch('u4')).toBe(before + 1)
+  })
+
   it('preserves original disabledAt on double revoke', async () => {
     await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
     const { data: before } = await query({ query: myApiKeys })
@@ -423,6 +439,15 @@ describe('admin operations', () => {
 
       expect(data.adminRevokeApiKey).toBe(false)
     })
+
+    it("moves the key owner's principal epoch, once", async () => {
+      authenticatedUser = await adminUser.toJson()
+      const before = principalEpoch('u-regular')
+      await mutate({ mutation: adminRevokeApiKey, variables: { id: keyId } })
+      await mutate({ mutation: adminRevokeApiKey, variables: { id: keyId } })
+
+      expect(principalEpoch('u-regular')).toBe(before + 1)
+    })
   })
 
   describe('adminRevokeUserApiKeys', () => {
@@ -460,6 +485,17 @@ describe('admin operations', () => {
       })
 
       expect(data.adminRevokeUserApiKeys).toBe(0)
+    })
+
+    it("moves the user's principal epoch only when a key was revoked", async () => {
+      authenticatedUser = await adminUser.toJson()
+      const regularBefore = principalEpoch('u-regular')
+      const adminBefore = principalEpoch('u-admin')
+      await mutate({ mutation: adminRevokeUserApiKeys, variables: { userId: 'u-regular' } })
+      await mutate({ mutation: adminRevokeUserApiKeys, variables: { userId: 'u-admin' } })
+
+      expect(principalEpoch('u-regular')).toBe(regularBefore + 1)
+      expect(principalEpoch('u-admin')).toBe(adminBefore)
     })
   })
 

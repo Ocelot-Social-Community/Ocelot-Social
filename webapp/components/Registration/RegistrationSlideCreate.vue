@@ -42,14 +42,27 @@
             model="surName"
             :label="$t('settings.data.surName')"
             :placeholder="$t('settings.data.surNamePlaceholder')"
+            @blur="touchField('surName')"
           />
         </div>
         <ocelot-input
           v-else
           id="name"
           model="name"
+          hide-error
           :label="$t('settings.data.labelName')"
           :placeholder="$t('settings.data.namePlaceholder')"
+          @blur="touchField('name')"
+        />
+        <!-- Counts the name as it is submitted: given and surname joined by one space. Only once
+             the name is out of bounds, so a valid form keeps its layout. -->
+        <os-validation-hint
+          v-if="nameErrorText"
+          :count="nameLength"
+          :min="branding.user.nameLengthMin"
+          :max="branding.user.nameLengthMax"
+          variant="error"
+          :text="nameErrorText"
         />
         <div class="password-wrapper">
           <ocelot-input
@@ -144,6 +157,7 @@
 
 <script>
 import { branding } from '@ocelot-social/branding'
+import { OsValidationHint } from '@ocelot-social/ui'
 import links from '~/constants/links'
 import { SignupVerificationMutation } from '~/graphql/Registration.js'
 import { locationName, locationPayload } from '~/utils/locationPayload'
@@ -171,6 +185,7 @@ export default {
     SweetalertIcon,
     LocationSelect,
     OcelotInput,
+    OsValidationHint,
   },
   props: {
     sliderData: { type: Object, required: true },
@@ -178,6 +193,7 @@ export default {
   data() {
     const passwordForm = PasswordForm({ translate: this.$t })
     return {
+      branding,
       links,
       supportEmail: this.$env.SUPPORT_EMAIL,
       formData: {
@@ -200,7 +216,12 @@ export default {
         name: {
           type: 'string',
           required: this.$policy.get('askForRealName') !== true,
-          min: 3,
+          // Measured trimmed, like the counter, validInput and the backend: otherwise surrounding
+          // spaces mark a valid name invalid (OcelotInput's red frame), or an invalid one valid.
+          // async-validator transforms a copy, so the input keeps what the user typed.
+          transform: (value) => (typeof value === 'string' ? value.trim() : value),
+          min: branding.user.nameLengthMin,
+          max: branding.user.nameLengthMax,
         },
         ...passwordForm.formSchema,
       },
@@ -252,11 +273,28 @@ export default {
     askForRealName() {
       return this.$policy.get('askForRealName') === true
     },
+    // The length the backend checks: the submitted name, trimmed.
+    nameLength() {
+      return this.buildName(this.formData).trim().length
+    },
+    nameInBounds() {
+      const { nameLengthMin, nameLengthMax } = branding.user
+      return this.nameLength >= nameLengthMin && this.nameLength <= nameLengthMax
+    },
+    nameErrorText() {
+      const field = this.askForRealName ? 'surName' : 'name'
+      if (!this.touchedFields[field] || this.nameInBounds) return null
+      return this.$t('common.validations.nameLength', {
+        min: branding.user.nameLengthMin,
+        max: branding.user.nameLengthMax,
+      })
+    },
     validInput() {
       return (
         (this.askForRealName
           ? this.formData.givenName.length >= 2 && this.formData.surName.length >= 2
-          : this.formData.name.length >= 3) &&
+          : true) &&
+        this.nameInBounds &&
         this.formData.password.length >= 1 &&
         this.formData.password === this.formData.passwordConfirmation &&
         this.termsAndConditionsConfirmed &&

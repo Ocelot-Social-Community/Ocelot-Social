@@ -256,6 +256,8 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+    // How often another room has been opened; see fetchMessages.
+    this.roomSwitches = 0
   },
   watch: {
     groupId(newGroupId) {
@@ -920,11 +922,13 @@ export default {
         }
       }
       if (this.selectedRoom?.id !== room.id) {
+        this.roomSwitches++
         this.messages = []
         this.oldestLoadedIndexId = null
         this.unseenMessageIds = new Set()
         this.selectedRoom = room
       }
+      const switches = this.roomSwitches
       // We disabled `textarea-auto-focus` on vue-advanced-chat to prevent the
       // library from stealing focus from the room filter when filter-driven
       // room-list updates cause its internal `roomId` watcher to fire. Restore
@@ -962,6 +966,10 @@ export default {
           variables,
           fetchPolicy: 'no-cache',
         })
+        // Another room may have been opened while this one was asked for: its messages
+        // must not end up there. Counted, not compared by id: after a way there and back the
+        // room is the same again, but its messages have been asked for anew.
+        if (this.roomSwitches !== switches) return
 
         this.mergeMessages(Message)
 
@@ -985,6 +993,7 @@ export default {
           this.renderHint()
         })
       } catch (error) {
+        if (this.roomSwitches !== switches) return
         this.messages = []
         this.$toastBackendError(error)
       }

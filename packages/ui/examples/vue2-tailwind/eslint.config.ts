@@ -6,16 +6,6 @@ export default [
   ...vitest,
   { ignores: ['dist/', 'node_modules/'] },
   {
-    rules: {
-      'n/file-extension-in-import': [
-        'error',
-        'never',
-        { '.vue': 'always', '.json': 'always', '.css': 'always' },
-      ],
-      'import-x/no-unassigned-import': ['error', { allow: ['**/*.css'] }],
-    },
-  },
-  {
     files: ['**/*.json'],
     rules: {
       '@typescript-eslint/no-unused-expressions': 'off',

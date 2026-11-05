@@ -44,6 +44,7 @@ export default (i18n) => {
           ...locationOnUser
           ...badges
           blocked
+          isBlocked
         }
         comments(orderBy: createdAt_asc) {
           ...comment

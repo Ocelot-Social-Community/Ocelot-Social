@@ -350,7 +350,7 @@
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="micAction"
+          :aria-label="controlName(micLabel, micAction)"
           :loading="devicesStarting.audioinput > 0"
           @click="toggleMic"
         >
@@ -367,7 +367,7 @@
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="cameraAction"
+          :aria-label="controlName(cameraLabel, cameraAction)"
           :loading="devicesStarting.videoinput > 0"
           @click="toggleCamera"
         >
@@ -385,7 +385,7 @@
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="screenShareAction"
+          :aria-label="controlName(screenShareLabel, screenShareAction)"
           @click="toggleScreenShare"
         >
           <template #icon>
@@ -439,7 +439,7 @@
           appearance="outline"
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="chatAction"
+          :aria-label="controlName(chatLabel, chatAction)"
           @click="toggleChat"
         >
           <template #icon>
@@ -456,7 +456,7 @@
           :size="parked ? 'sm' : 'md'"
           :circle="iconOnly"
           class="video-call__leave"
-          :aria-label="leaveAction"
+          :aria-label="controlName(leaveLabel, leaveAction)"
           @click="leave"
         >
           <template #icon>
@@ -487,6 +487,7 @@ import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 import DeviceSettings from './DeviceSettings.vue'
 import { saveDevicePreference } from './devicePreferences'
+import { createAudioWatchdog } from './audioWatchdog'
 
 // How long a participant keeps the speaking treatment after LiveKit drops them
 // from the active-speaker list. LiveKit reports raw audio activity, so it lets
@@ -526,7 +527,7 @@ const BARS_EDGE_PX = 50
 // What brings the bars back. Focus too, for whoever moves through the controls by keyboard.
 const BARS_ACTIVITY_EVENTS = ['mousemove', 'pointerdown', 'keydown', 'wheel', 'focusin']
 // A tap is followed by the mouse events and the focus the browser makes up for it; they
-// come within this time and are no activity of their own.
+// come within this time and are no activity of their own. A key pressed is none of them.
 const TOUCH_ECHO_MS = 800
 
 // Cameras publish 16:9, so the grid aims for cells of that shape: the closer a
@@ -599,6 +600,9 @@ export default {
       // videos back, so we stop deciding for them until the next call.
       audioOnly: false,
       audioOnlyDismissed: false,
+      // Our machine cannot keep up with encoding and decoding video. Holds for
+      // the rest of the call, like in LiveKit's own app.
+      cpuConstrained: false,
       showDeviceSettings: false,
       // What the browser lists, to put a name to the devices in use.
       knownDevices: [],
@@ -1123,11 +1127,19 @@ export default {
     this.observedStage = null
     this.qualityTimer = null
     this.qualityClass = null
+    this.audioWatchdog = null
     this.leaving = false
+    this.unmounting = false
     this.deviceSwitches = this.newDeviceSwitches()
     this.callChatsSub = null
     this.groupChatRoomId = null
     this.callChatRetryTimer = null
+    // How often the conference chat has been asked for; see joinCallChat.
+    this.callChatAsks = 0
+    // How many unread counts have been pushed for each chat; a query for the count that is
+    // overtaken by a push gives way to it (loadConferenceUnread, loadGroupChatUnread).
+    this.conferenceUnreadPushes = 0
+    this.groupChatUnreadPushes = 0
   },
   mounted() {
     this.isChromium = typeof navigator !== 'undefined' && !!navigator.userAgentData
@@ -1145,6 +1157,7 @@ export default {
   },
   beforeDestroy() {
     document.removeEventListener('fullscreenchange', this.onFullscreenChange)
+    this.unmounting = true
     this.exitFullscreen()
     this.watchBarActivity(false)
     this.setPageBars('normal')
@@ -1176,9 +1189,10 @@ export default {
           return
         }
         await document.documentElement.requestFullscreen()
-        // The browser takes a moment. Parked or left meanwhile, the call has no use for it
-        // any more — and the watcher that ends it found nothing to end yet.
-        if (!this.showFullscreenButton) this.exitFullscreen()
+        // The browser takes a moment. Parked, left or gone from the page meanwhile, the call
+        // has no use for it any more — and the watcher or beforeDestroy that ends it found
+        // nothing to end yet. Once gone, showFullscreenButton keeps its last value.
+        if (this.unmounting || !this.showFullscreenButton) this.exitFullscreen()
       } catch {
         // Refused by the browser (no user gesture, a policy): the call stays as it is.
       }
@@ -1211,6 +1225,7 @@ export default {
         clearTimeout(this.barsTimer)
         this.barsTimer = null
         this.barsHidden = false
+        this.swallowTileSelect = false
       }
     },
     onBarActivity(event) {
@@ -1218,7 +1233,9 @@ export default {
         this.onBarTouch(event)
         return
       }
-      if (Date.now() - this.lastTouchAt < TOUCH_ECHO_MS) return
+      // A click with the mouse or a pen is the user's own: a tile it lands on is selected.
+      if (event.type === 'pointerdown') this.swallowTileSelect = false
+      if (event.type !== 'keydown' && Date.now() - this.lastTouchAt < TOUCH_ECHO_MS) return
       // Reading and writing in the chat beside the videos is no reason to put the bars
       // back on them; going for the page's header or footer at the window's edge is.
       const inChat = event.target?.closest?.('.video-call__sidebar')
@@ -1410,16 +1427,24 @@ export default {
     // button then opens the group's chat, as it did before there was another.
     async joinCallChat(room, attempt = 1) {
       const groupId = this.groupId
+      // Only the latest question counts. A reconnect asks again while the first answer may
+      // still be on its way, and the server may have opened a new session in between: the
+      // older answer would put the chat of a session that is over back in place.
+      const ask = ++this.callChatAsks
       try {
         const { data } = await this.$apollo.mutate({
           mutation: joinGroupVideoCallChatMutation(),
           variables: { groupId },
         })
         // The call may have been left, or swapped for another, in the meantime.
-        if (this.room !== room || this.groupId !== groupId) return
-        this.setChatRoomId((data && data.joinGroupVideoCallChat) || null)
+        if (this.room !== room || this.groupId !== groupId || ask !== this.callChatAsks) return
+        const chatRoomId = (data && data.joinGroupVideoCallChat) || null
+        this.setChatRoomId(chatRoomId)
+        // Updates only tell of what is written from now on; what came before — while the
+        // page was reloaded, say — is asked for once.
+        if (chatRoomId) this.loadConferenceUnread(chatRoomId)
       } catch (_e) {
-        if (this.room !== room || this.groupId !== groupId) return
+        if (this.room !== room || this.groupId !== groupId || ask !== this.callChatAsks) return
         // The media server can take a moment to list a participant it just let in.
         if (attempt < CALL_CHAT_JOIN_ATTEMPTS) {
           // Kept, so leaving the call can call it off (see cleanup): hanging up takes a
@@ -1462,8 +1487,10 @@ export default {
     onCallChatUpdated(room) {
       if (!room) return
       if (this.chatRoomId && room.id === this.chatRoomId) {
+        this.conferenceUnreadPushes++
         this.setConferenceUnread(room.unreadCount)
       } else if (this.groupChatRoomId && room.id === this.groupChatRoomId) {
+        this.groupChatUnreadPushes++
         this.setGroupChatUnread(room.unreadCount)
       } else if (!this.groupChatRoomId) {
         // The group's chat room is not known yet. It may not have existed when the call
@@ -1475,6 +1502,7 @@ export default {
     // group, as it need not exist; updates then arrive by its id.
     async loadGroupChatUnread() {
       const groupId = this.groupId
+      const pushes = this.groupChatUnreadPushes
       try {
         const { data } = await this.$apollo.query({
           query: roomUnreadQuery(),
@@ -1483,11 +1511,33 @@ export default {
         })
         // The call may have been left, or swapped for another, in the meantime.
         if (this.groupId !== groupId || this.phase !== 'in-call') return
+        // A push for the chat came in meanwhile: it is newer than what the query read.
+        if (this.groupChatUnreadPushes !== pushes) return
         const room = data && data.Room && data.Room[0]
         this.groupChatRoomId = room ? room.id : null
         this.setGroupChatUnread(room ? room.unreadCount : 0)
       } catch (_e) {
         /* the tab simply goes without a count */
+      }
+    },
+    // What is unread in the call's conference chat when it is joined; updates follow by
+    // its id (onCallChatUpdated).
+    async loadConferenceUnread(roomId) {
+      const pushes = this.conferenceUnreadPushes
+      try {
+        const { data } = await this.$apollo.query({
+          query: roomUnreadQuery(),
+          variables: { id: roomId },
+          fetchPolicy: 'network-only',
+        })
+        // The call may have been left, or its chat swapped for another, in the meantime.
+        if (this.chatRoomId !== roomId) return
+        // A push for the chat came in meanwhile: it is newer than what the query read.
+        if (this.conferenceUnreadPushes !== pushes) return
+        const room = data && data.Room && data.Room[0]
+        if (room) this.setConferenceUnread(room.unreadCount)
+      } catch (_e) {
+        /* the tab simply goes without a count until the next message */
       }
     },
     tileAvatarSize(tile) {
@@ -1533,6 +1583,14 @@ export default {
     controlTooltip(action) {
       if (this.isMobile || !action) return ''
       return { content: action, html: false }
+    },
+    // The name a screen reader gives a control: what a click on it does. While the button
+    // spells out its label, the name has to hold that word too, so the control can be called
+    // by it by voice (WCAG 2.5.3, label in name): put in front where the action lacks it, as
+    // "Headset: turn off" does next to "Microphone".
+    controlName(label, action) {
+      if (this.iconOnly || action.toLowerCase().includes(label.toLowerCase())) return action
+      return `${label}, ${action}`
     },
     iconOnlyTooltip(label) {
       // v-tooltip renders nothing for an empty string — exactly what we want
@@ -1610,6 +1668,7 @@ export default {
       // tears that down without cleanup(), so let go of it here for every way in.
       this.micRestart = null
       this.micSilenceProbe = null
+      this.stopAudioWatchdog()
       this.resetAudioOnly()
       await this.leaveRoom()
       try {
@@ -1617,7 +1676,15 @@ export default {
         const payload = await this.takeJoinPayload(this.groupId)
 
         const livekit = await import('livekit-client')
-        const { Room, RoomEvent, Track, TrackEvent, DisconnectReason } = livekit
+        const {
+          Room,
+          RoomEvent,
+          ParticipantEvent,
+          Track,
+          TrackEvent,
+          VideoQuality,
+          DisconnectReason,
+        } = livekit
         this.Track = Track
 
         const room = new Room({
@@ -1630,15 +1697,39 @@ export default {
           // default without a word.
           ...(this.speakerDeviceId ? { audioOutput: { deviceId: this.speakerDeviceId } } : {}),
         })
+        // Reset only now: until the line below, this.room is still the previous
+        // room, and its late CPU event would pass the room check in the listener.
+        this.cpuConstrained = false
         this.room = room
 
         const onAny = () => this.refreshTiles()
         room.on(RoomEvent.ParticipantConnected, onAny)
         room.on(RoomEvent.ParticipantDisconnected, onAny)
-        room.on(RoomEvent.TrackSubscribed, () => {
+        room.on(RoomEvent.TrackSubscribed, (_track, pub) => {
           // Subscribed before the unsubscribe of audio-only mode took hold.
           if (this.audioOnly) this.applyAudioOnly()
+          if (this.cpuConstrained) this.lowerCameraQuality(pub, VideoQuality)
           onAny()
+        })
+        // Encoding and decoding video can eat the CPU to the point where the
+        // audio stutters as well. Once the browser reports that our own video is
+        // held back by the CPU, the cameras give way: ours is sent small and at
+        // 15 fps, everyone else's arrives in the lowest layer. Screen shares
+        // keep their quality — they are what the call is about, and unreadable
+        // when small.
+        room.localParticipant.on(ParticipantEvent.LocalTrackCpuConstrained, () => {
+          // A late event of a room already replaced must not throttle the new call.
+          if (this.room !== room || this.cpuConstrained) return
+          // A deliberate diagnosis: the only trace of why the videos got coarse.
+          // eslint-disable-next-line no-console
+          console.warn('[video-call] CPU constrained, lowering the video quality of the cameras')
+          this.cpuConstrained = true
+          this.relieveOwnCamera()
+          for (const participant of room.remoteParticipants.values()) {
+            for (const pub of participant.videoTrackPublications.values()) {
+              this.lowerCameraQuality(pub, VideoQuality)
+            }
+          }
         })
         // A camera published while we are in audio-only mode would otherwise
         // be auto-subscribed and eat the bandwidth we just freed.
@@ -1676,6 +1767,10 @@ export default {
         })
         room.on(RoomEvent.LocalTrackPublished, (pub) => {
           this.screenShareEnabled = !!room.localParticipant.isScreenShareEnabled
+          // A camera switched on only now gets the same relief.
+          if (this.cpuConstrained && pub && pub.source === Track.Source.Camera) {
+            this.relieveOwnCamera()
+          }
           if (pub && pub.source === Track.Source.Microphone && pub.track) {
             this.watchMicTrack(pub.track, TrackEvent)
           }
@@ -1766,6 +1861,15 @@ export default {
         this.refreshTiles()
         this.audioBlocked = !room.canPlaybackAudio
         this.phase = 'in-call'
+        // One listener can lose one speaker's audio while everyone else still
+        // hears them — repair that subscription instead of waiting it out.
+        this.audioWatchdog = createAudioWatchdog({
+          room,
+          Track,
+          // A reconnect re-subscribes everything anyway.
+          isPaused: () => this.reconnecting,
+        })
+        this.audioWatchdog.start()
         this.joinCallChat(room)
         this.watchCallChats(true)
         this.loadGroupChatUnread()
@@ -1802,9 +1906,9 @@ export default {
       const Track = this.Track
       if (!room) return
       const tiles = []
-      const collectAudio = (participant) => {
+      const collectAudio = (participant, source) => {
         for (const pub of participant.audioTrackPublications.values()) {
-          if (!Track || pub.source === Track.Source.Microphone) return pub.track || null
+          if (!Track || pub.source === source) return pub.track || null
         }
         return null
       }
@@ -1861,7 +1965,7 @@ export default {
         return null
       }
       const collect = (participant, isLocal) => {
-        const audioTrack = collectAudio(participant)
+        const audioTrack = collectAudio(participant, Track && Track.Source.Microphone)
         const profile = profileFor(participant, isLocal)
         const micEnabled = !!participant.isMicrophoneEnabled
         // Use the participant-level getters (isCameraEnabled / isScreenShareEnabled)
@@ -1901,7 +2005,11 @@ export default {
             name: participant.name || participant.identity,
             profile,
             videoTrack: screenPub.track,
-            audioTrack: null,
+            // The sound of the shared tab or screen plays from this tile, as long
+            // as the share runs. Whether there is any is the sharer's choice in
+            // the browser's share dialog; browsers that cannot capture it publish
+            // none. Our own we would only hear twice.
+            audioTrack: isLocal ? null : collectAudio(participant, Track.Source.ScreenShareAudio),
             isLocal,
             isScreen: true,
           })
@@ -2204,6 +2312,22 @@ export default {
       this.audioOnlyDismissed = true
       this.setAudioOnly(false)
     },
+    stopAudioWatchdog() {
+      if (this.audioWatchdog) this.audioWatchdog.stop()
+      this.audioWatchdog = null
+    },
+    relieveOwnCamera() {
+      const pub = this.room.localParticipant.getTrackPublication(this.Track.Source.Camera)
+      const track = pub && pub.track
+      if (!track || typeof track.prioritizePerformance !== 'function') return
+      // Rejects when the track is not being sent (yet) — nothing to relieve then.
+      track.prioritizePerformance().catch(() => {})
+    },
+    lowerCameraQuality(pub, VideoQuality) {
+      if (pub && pub.source === this.Track.Source.Camera && pub.setVideoQuality) {
+        pub.setVideoQuality(VideoQuality.LOW)
+      }
+    },
     resetAudioOnly() {
       this.clearQualityTimer()
       this.qualityClass = null
@@ -2404,6 +2528,8 @@ export default {
       }
     },
     async cleanup() {
+      // Before the disconnect: a check must not resubscribe on a room going away.
+      this.stopAudioWatchdog()
       // First, before the disconnect below is awaited: nothing may ask for the call's chat
       // any more once the call is being left.
       this.cancelCallChatRetry()
@@ -2516,9 +2642,10 @@ export default {
 
 .video-call--maximized {
   /*  Match the map page's layering pattern (see pages/map.vue): cover the full */
-  /*  viewport (top: 0, bottom: 0) and sit at var(--z-index-surface) so the page */
-  /*  header (.main-navigation, z-index: var(--z-index-page-submenu) = 2500) and the */
-  /*  sticky footer (.ds-footer, z-index: 10) both stack on top — their own */
+  /*  viewport (top: 0, bottom: 0) and sit at var(--z-index-call-maximized), one below */
+  /*  var(--z-index-page-submenu). The page's own floating elements (the feed's "+" button, */
+  /*  z-index 150) stay beneath the call, while the page header (.main-navigation) and the */
+  /*  sticky footer (.ds-footer), both at var(--z-index-page-submenu) = 2500, stack on top — their own */
   /*  box-shadows then naturally fall onto the call surface from above and */
   /*  below. Padding (not offset) keeps the call's internal header and */
   /*  controls below the page header / above the page footer. */
@@ -2530,7 +2657,7 @@ export default {
   left: 0;
   padding-top: var(--header-height);
   padding-bottom: var(--footer-height);
-  z-index: var(--z-index-surface);
+  z-index: var(--z-index-call-maximized);
   /*  The base .video-call rule paints a var(--box-shadow-large) around the panel. */
   /*  When the panel covers the full viewport that shadow has nowhere to land */
   /*  — and worse, the panel's own shadow competes with the header/footer */

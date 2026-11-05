@@ -28,7 +28,9 @@ export {
   type BadgeVariants,
 } from './OsBadge'
 export { OsNumber, numberVariants, type NumberVariants } from './OsNumber'
-export { OsModal, modalPanelVariants } from './OsModal'
+export { OsModal, modalPanelVariants, type ModalPanelVariants, type ModalSize } from './OsModal'
+export { OsConfirmDialog, type ConfirmDialogVariant } from './OsConfirmDialog'
+export { OsDrawer, drawerPanelVariants, type DrawerSide, type DrawerVariants } from './OsDrawer'
 export { OsMenu, OsMenuItem, menuItemVariants, type MenuItemVariants } from './OsMenu'
 export { OsValidationHint } from './OsValidationHint'
 export { OsToggleGroup, type ToggleGroupActivation, type ToggleGroupOption } from './OsToggleGroup'
