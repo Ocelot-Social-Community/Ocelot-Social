@@ -1312,6 +1312,7 @@
     "pageTitle": "Mapa",
     "styles": {
       "dark": "Escuro",
+      "navigation-night": "Noite",
       "outdoors": "Ao ar livre",
       "satellite": "Satélite",
       "streets": "Ruas",

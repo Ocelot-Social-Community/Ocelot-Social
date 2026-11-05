@@ -1312,6 +1312,7 @@
     "pageTitle": "Landkarte",
     "styles": {
       "dark": "Dunkel",
+      "navigation-night": "Nacht",
       "outdoors": "Landschaft",
       "satellite": "Satellit",
       "streets": "Straßen",

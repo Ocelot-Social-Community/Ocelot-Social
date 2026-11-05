@@ -1312,6 +1312,7 @@
     "pageTitle": "Карта",
     "styles": {
       "dark": "Темна",
+      "navigation-night": "Ніч",
       "outdoors": "На відкритому повітрі",
       "satellite": "Супутник",
       "streets": "Вулиці",
