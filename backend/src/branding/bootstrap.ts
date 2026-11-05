@@ -19,8 +19,15 @@ import {
   readDefaultMarker,
   searchPath,
 } from '@ocelot-social/branding/dist/discover.js'
+import { config as loadEnvFile } from 'dotenv'
 
 import { overlayBrandRuntimeFiles } from './overlayRuntimeFiles'
+
+// Load the env file HERE, not only in config/index.ts: this module runs before config is imported,
+// so without it a brand pinned in backend/.env would be read as unset and `npm run dev` would run on
+// the framework defaults. dotenv never overrides a variable that is already set, so a container's
+// own environment keeps precedence. quiet: as in config/index.ts.
+loadEnvFile({ quiet: true })
 
 // No env needed: unset falls back to the conventional archive locations (deployment/configurations,
 // in the image and in a repo checkout — see discover.DEFAULT_ROOTS). Setting the var replaces them.
