@@ -186,6 +186,8 @@ const options = {
   SUPPORT_URL: env.SUPPORT_LINK || SOFTWARE_DEFAULTS.SUPPORT_LINK,
   APPLICATION_NAME: branding.metadata.applicationName,
   ORGANIZATION_URL: env.ORGANIZATION_LINK || SOFTWARE_DEFAULTS.ORGANIZATION_LINK,
+  // `||`: an empty value would make every geocoding request a relative URL.
+  MAPBOX_API_URL: env.MAPBOX_API_URL || SOFTWARE_DEFAULTS.MAPBOX_API_URL,
   // publicRegistration, inviteRegistration, categoriesActive and apiKeysEnabled
   // are network-policy keys now — the backend reads them from the policy
   // (ENV-seeded), not from CONFIG. See backend/src/policy.

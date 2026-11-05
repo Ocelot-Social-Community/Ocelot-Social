@@ -494,6 +494,23 @@ describe('LiveKit', () => {
   })
 })
 
+describe('Mapbox API URL', () => {
+  it('points the geocoding requests where MAPBOX_API_URL says', async () => {
+    const { default: CONFIG } = await loadConfig({ MAPBOX_API_URL: 'http://mapbox:8080' })
+
+    expect(CONFIG.MAPBOX_API_URL).toBe('http://mapbox:8080')
+  })
+
+  // `||`: an empty value would turn every geocoding request into a relative URL.
+  it('falls back to Mapbox itself for an empty or absent MAPBOX_API_URL', async () => {
+    const { default: empty } = await loadConfig({ MAPBOX_API_URL: '' })
+    const { default: absent } = await loadConfig({ MAPBOX_API_URL: undefined })
+
+    expect(empty.MAPBOX_API_URL).toBe('https://api.mapbox.com')
+    expect(absent.MAPBOX_API_URL).toBe('https://api.mapbox.com')
+  })
+})
+
 describe('contact identity and language', () => {
   // Note the env var names differ from the CONFIG keys (SUPPORT_LINK → SUPPORT_URL): reading the
   // wrong one would leave the deployment showing the ocelot baseline with nothing to explain it.
