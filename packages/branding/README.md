@@ -81,6 +81,19 @@ The breaking axis is the **major** version once ≥ 1.0.0, and the **minor** whi
 | `npm run schema:snapshot` | Regenerate the schema‑shape lock after an intentional schema change   |
 | `npm run check`       | build → lint → typecheck → test:coverage → validate                       |
 
+## Changing the framework tokens
+
+Every custom property the framework declares (`webapp/assets/css/root-tokens.css`,
+`ocelot-ui-variables.css`) is something a brand may set — the admin lists them. Taking one away turns
+every brand's value for it into a silent no-op, so it is a decision, never a side effect of a refactor.
+
+- **Adding** a token needs no step of its own: `npm run tokens:snapshot` adds it to
+  `scripts/public-tokens.snapshot.json`, the list of names that have been public.
+- **Renaming** one: keep the old name in the stylesheet as an alias of the new one
+  (`--old: var(--new)`) until the brands have moved over.
+- **Removing** one: list it in `src/removedTokens.ts` with what to set instead. Without that entry the
+  `public token lock` test fails, and a brand that still sets it gets a warning when it is built.
+
 ## Changing the schema
 
 The schema **shape** (the set of config leaf paths + their types + the bucket partition) is locked by a

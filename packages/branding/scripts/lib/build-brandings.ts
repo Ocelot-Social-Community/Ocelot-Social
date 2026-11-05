@@ -13,6 +13,7 @@ import { BUCKET_NAMES, extractBucket, instanceFile, splitConfig } from '../../di
 import { brandingDefaults } from '../../dist/defaults.js'
 import { FRAMEWORK_TOKENS } from '../../dist/frameworkTokens.js'
 import { deepMerge } from '../../dist/internal.js'
+import { REMOVED_TOKENS } from '../../dist/removedTokens.js'
 import { writeTarGz } from '../../dist/tar.js'
 import { SCHEMA_VERSION } from '../../dist/version.js'
 import { catalogAvailable, computeCatalog } from '../theme-catalog.ts'
@@ -343,6 +344,20 @@ function editDistance(a: string, b: string): number {
 }
 
 /**
+ * Warn on a declared custom property the framework has taken away on purpose (src/removedTokens.ts):
+ * the brand's value no longer does anything. The warning names what to set instead.
+ */
+export function removedTokenWarnings(
+  declared: Record<string, string>,
+  id: string,
+  removed: Readonly<Record<string, string>> = REMOVED_TOKENS,
+): string[] {
+  return Object.keys(declared)
+    .filter((key) => key in removed)
+    .map((key) => `  ! ${id}: --${key} is no longer a framework token — ${removed[key]}`)
+}
+
+/**
  * Warn on a declared custom property that is a near-miss of a known theme token (likely a typo → a
  * silent no-op at runtime). The set is intentionally OPEN — a brand may define custom `--vars` for its CSS
  * — so only CLOSE matches are flagged (edit distance ≤ 2, similar length), never every unknown key.
@@ -652,6 +667,7 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   // Theme authored as CSS: the brand's stylesheets are the single source. Only the PWA colour is
   // lifted out of them into the config; the declarations themselves stay in the files.
   const declaredTokens = loadThemeFromStylesheets(dir, id, config, warnings)
+  warnings.push(...removedTokenWarnings(declaredTokens, id))
   warnThemeTokenTypos(declaredTokens, id, warnings)
   resolveOgImage(dir, id, config, warnings)
   // Before namespacing: this READS a brand-relative path off disk and WRITES the measured size back
