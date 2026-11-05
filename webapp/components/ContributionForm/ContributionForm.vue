@@ -55,7 +55,7 @@
             @blur="dirtyFields.title && touchField('title')"
           />
           <os-validation-hint
-            :count="formData.title.length"
+            :count="formData.title.trim().length"
             :min="formSchema.title.min"
             :max="formSchema.title.max"
             :variant="visibleErrors && visibleErrors.title ? 'error' : null"

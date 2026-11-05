@@ -138,6 +138,13 @@ describe('ContributionForm.vue', () => {
         expect(wrapper.find('.os-validation-hint').text()).toContain('0 / 3–100')
       })
 
+      // The validator and the backend both measure the trimmed title, so the hint does too: " x "
+      // must not read "3 / 3–100" while it is rejected as too short.
+      it('counts the title without its surrounding spaces', async () => {
+        await wrapper.find('.ds-input').setValue(' x ')
+        expect(wrapper.find('.os-validation-hint').text()).toContain('1 / 3–100')
+      })
+
       describe('with a brand that overrides the title length', () => {
         beforeEach(() => {
           setBranding(defineBranding({ post: { titleLengthMin: 5, titleLengthMax: 20 } }))
