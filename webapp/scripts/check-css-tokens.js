@@ -85,9 +85,20 @@ const TOKEN_FILES = [
   'assets/css/ocelot-ui-variables.css',
 ]
 
+const SKIPPED_DIRS = [
+  'node_modules',
+  'coverage',
+  'dist',
+  'storybook-static',
+  'playwright-report',
+  'test-results',
+]
+
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir)) {
-    if (entry === 'node_modules' || entry === '.nuxt' || entry === 'coverage' || entry === 'dist') {
+    // Build output and tool state are not source: what lint finds in a bundle depends on whether
+    // someone ran a build (storybook-static, a Playwright report), not on the code.
+    if (SKIPPED_DIRS.includes(entry) || entry.startsWith('.')) {
       continue
     }
     const full = join(dir, entry)
@@ -108,6 +119,10 @@ function indexByRgb(tokens) {
   }
   return byRgb
 }
+
+/** `url("data:image/svg+xml,…")`, quoted or bare — the whole call, to its own closing quote or `)`. */
+const SVG_DATA_URL =
+  /url\(\s*(?:(["'])data:image\/svg\+xml[\s\S]*?\1|data:image\/svg\+xml[^)]*)\s*\)/g
 
 const COLOUR = /(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?\b|rgba?\([^)]*\)|\bwhite\b|\bblack\b)/g
 
@@ -270,7 +285,9 @@ function checkSource(src, byRgb, rel, localLimit = DEFAULT_LOCAL_Z_LIMIT, zToken
       }
 
       if (prop.startsWith('--')) continue // declaring a token is allowed to use a literal
-      for (const [raw] of value.matchAll(COLOUR)) {
+      // An SVG data: URI is its own document: a colour in it cannot be a var(), and checkDataUris says so
+      // once. Left in the value it would also be suggested a token here, advice that would break the icon.
+      for (const [raw] of value.replace(SVG_DATA_URL, '').matchAll(COLOUR)) {
         const rgb = toRgb(raw)
         if (!rgb) continue
         if (byRgb[rgb]) errors.push(`${rel}: ${raw} — use var(--${byRgb[rgb]}) instead`)

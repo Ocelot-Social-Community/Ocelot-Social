@@ -29,12 +29,18 @@
   border-color: var(--border-color-softer);
 }
 
-:root .mx-calendar-content .cell:hover,
-:root .mx-calendar-week-mode .mx-date-row:hover,
-:root .mx-time-column .mx-time-item:hover,
-:root .mx-time-option:hover {
+:root .mx-calendar-content .cell:not(.active):hover,
+:root .mx-calendar-week-mode .mx-date-row:not(.mx-active-week):hover,
+:root .mx-time-column .mx-time-item:not(.active):hover,
+:root .mx-time-option:not(.active):hover {
   color: var(--text-color-soft);
   background-color: var(--background-color-hover);
+}
+
+/* A cell inside the active week stays part of its row: the cell rule above must not paint over it. */
+:root .mx-calendar-week-mode .mx-date-row.mx-active-week .cell:hover {
+  color: inherit;
+  background-color: transparent;
 }
 
 :root .mx-calendar-content .cell.in-range,

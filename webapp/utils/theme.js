@@ -6,10 +6,13 @@ export const THEMES = ['system', 'light', 'dark']
 export const normalizeTheme = (value) => (THEMES.includes(value) ? value : 'system')
 
 export const themeFromCookieHeader = (header) => {
-  const match = String(header || '').match(new RegExp(`(?:^|;\\s*)${THEME_COOKIE}=([^;]*)`))
+  // As the client's cookie parser reads it: spaces around the name and the `=`, and a value in quotes.
+  const match = String(header || '').match(
+    new RegExp(`(?:^|;)\\s*${THEME_COOKIE}\\s*=\\s*(?:"([^";]*)"|([^;]*?))\\s*(?:;|$)`),
+  )
   // The header comes from outside: a value that cannot be decoded is not a theme either.
   try {
-    return normalizeTheme(match && decodeURIComponent(match[1]))
+    return normalizeTheme(match && decodeURIComponent(match[1] !== undefined ? match[1] : match[2]))
   } catch (_e) {
     return normalizeTheme(null)
   }

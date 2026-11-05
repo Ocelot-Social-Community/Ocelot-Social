@@ -26,6 +26,13 @@ describe('theme', () => {
     expect(themeFromCookieHeader('ocelot-theme=light')).toBe('light')
   })
 
+  it('reads the cookie as the client does: spaces around the name and the =, a quoted value', () => {
+    expect(themeFromCookieHeader('ocelot-theme = dark')).toBe('dark')
+    expect(themeFromCookieHeader('ocelot-theme="dark"')).toBe('dark')
+    expect(themeFromCookieHeader('a=1;  ocelot-theme=dark ;b=2')).toBe('dark')
+    expect(themeFromCookieHeader('xocelot-theme=dark')).toBe('system')
+  })
+
   it('falls to system for no cookie or an unknown value', () => {
     expect(themeFromCookieHeader(undefined)).toBe('system')
     expect(themeFromCookieHeader('ocelot-theme=purple')).toBe('system')

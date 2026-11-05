@@ -193,6 +193,23 @@ describe('checkSource', () => {
       expect(errors).toEqual([`A.vue: ${fill} in a data: URI — ${reason}`])
     })
 
+    it('reports a colour in a data: URI once, and does not suggest a token for it', () => {
+      // `#fff` is the value of a token, so the plain colour check would answer `use var(--…)` as well.
+      const white = { '255,255,255': 'background-color-base' }
+      const { errors } = checkSource(style(`.a { background: ${uri('#fff')}; }`), white, 'A.vue')
+      expect(errors).toEqual([`A.vue: #fff in a data: URI — ${reason}`])
+    })
+
+    it('still checks the rest of the value around a data: URI', () => {
+      const white = { '255,255,255': 'background-color-base' }
+      const { errors } = checkSource(
+        style(`.a { background: ${uri('%234b4554')} #fff; }`),
+        white,
+        'A.vue',
+      )
+      expect(errors).toContain('A.vue: #fff — use var(--background-color-base) instead')
+    })
+
     it('flags one in a JS string outside url()', () => {
       const src = `const icon = 'data:image/svg+xml,<svg><circle fill="#000"/></svg>'`
       expect(checkSource(src, byRgb, 'utils/icon.js').errors).toEqual([
@@ -253,6 +270,18 @@ describe('findProblems', () => {
     expect(findProblems(root).errors).toEqual([
       'components/Chat/palette.js: var(--color-neutral-30) — use a role token (background/text/border) instead',
     ])
+  })
+
+  it('leaves out build output and hidden directories — what they hold depends on a build', () => {
+    const bad = "export default { c: 'var(--color-neutral-30)' }"
+    const root = tree({
+      'storybook-static/main.js': bad,
+      'playwright-report/index.js': bad,
+      'test-results/a.js': bad,
+      '.cache/b.js': bad,
+      'components/ok.js': 'export default {}',
+    })
+    expect(findProblems(root).errors).toEqual([])
   })
 
   it('reads global .css files', () => {
