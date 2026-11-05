@@ -107,3 +107,81 @@ ul.os-menu-item-submenu {
   list-style: none;
 }
 
+
+/*
+ * OsTooltip / v-os-tooltip — the tooltip lives under <body>, created by script, so its look is
+ * plain CSS rather than utility classes. Each colour reads a per-use override (--os-tooltip-*),
+ * then the brand's token (--color-tooltip-*), then a literal, so it works without any branding.
+ */
+.os-tooltip {
+  --os-tooltip-arrow-size: 5px; /* half the arrow's base; ARROW_SIZE in tooltip.ts */
+  --os-tooltip-arrow-color: var(--os-tooltip-background, var(--color-tooltip-background, rgb(40, 37, 45)));
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--os-tooltip-z-index, 9997);
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 60ms, visibility 60ms;
+}
+
+.os-tooltip--visible {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.os-tooltip-inner {
+  box-sizing: border-box;
+  max-height: 73.5vh; /* fully visible on a phone, no scrolling on a wide screen */
+  overflow: auto;
+  padding: var(--space-x-small, 8px) var(--space-small, 16px);
+  border-radius: var(--os-tooltip-radius, var(--border-radius-base, 4px));
+  background: var(--os-tooltip-background, var(--color-tooltip-background, rgb(40, 37, 45)));
+  color: var(--os-tooltip-color, var(--color-tooltip-text, rgb(250, 249, 250)));
+  box-shadow: var(--os-tooltip-shadow, var(--box-shadow-large, 0 10px 20px 0 rgba(0, 0, 0, 0.11), 0 3px 10px 0 rgba(0, 0, 0, 0.08)));
+  overflow-wrap: break-word;
+}
+
+.os-tooltip--multiline .os-tooltip-inner {
+  white-space: pre-line;
+  text-align: left;
+}
+
+.os-tooltip--narrow .os-tooltip-inner {
+  max-width: 15em;
+}
+
+/* A border triangle; Floating UI sets its offset along the edge, the side sets the rest. */
+.os-tooltip-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: var(--os-tooltip-arrow-size) solid transparent;
+}
+
+.os-tooltip[data-placement^='top'] .os-tooltip-arrow {
+  border-top-color: var(--os-tooltip-arrow-color);
+  border-bottom-width: 0;
+  bottom: calc(-1 * var(--os-tooltip-arrow-size));
+}
+
+.os-tooltip[data-placement^='bottom'] .os-tooltip-arrow {
+  top: calc(-1 * var(--os-tooltip-arrow-size));
+  border-bottom-color: var(--os-tooltip-arrow-color);
+  border-top-width: 0;
+}
+
+.os-tooltip[data-placement^='left'] .os-tooltip-arrow {
+  right: calc(-1 * var(--os-tooltip-arrow-size));
+  border-left-color: var(--os-tooltip-arrow-color);
+  border-right-width: 0;
+}
+
+.os-tooltip[data-placement^='right'] .os-tooltip-arrow {
+  left: calc(-1 * var(--os-tooltip-arrow-size));
+  border-right-color: var(--os-tooltip-arrow-color);
+  border-left-width: 0;
+}

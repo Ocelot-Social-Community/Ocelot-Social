@@ -51,13 +51,13 @@ export default defineConfig({
       },
     },
     rollupOptions: {
-      // clsx/tailwind-merge are real `dependencies` (not bundled-only), so
+      // clsx/tailwind-merge/@floating-ui/dom are real `dependencies` (not bundled-only), so
       // consuming apps always get their own copy transitively. Bundling a
       // second, independently-minified copy of them into dist here risks a
       // Rollup "Identifier has already been declared" error in any app that
       // also depends on them directly and ends up merging both copies into
       // the same chunk (hit by the maintenance app, which does).
-      external: ['vue', 'vue-demi', 'tailwindcss', 'clsx', 'tailwind-merge'],
+      external: ['vue', 'vue-demi', 'tailwindcss', 'clsx', 'tailwind-merge', '@floating-ui/dom'],
       output: [
         {
           format: 'es',
