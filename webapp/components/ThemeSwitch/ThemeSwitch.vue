@@ -48,6 +48,8 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import { THEME_COOKIE, THEMES, applyTheme, normalizeTheme } from '~/utils/theme'
 
 const ICONS = { system: 'themeSystem', light: 'themeLight', dark: 'themeDark' }
+// On the root, not in a module: a module's state would be shared by every request on the server.
+const CHANGED = 'ocelot-theme-changed'
 
 export default {
   name: 'ThemeSwitch',
@@ -73,7 +75,18 @@ export default {
       return labels[this.theme]
     },
   },
+  mounted() {
+    // The desktop bar and the mobile menu each hold a switch, both alive at once: one changing the
+    // theme tells the other, or it would go on showing the old one after a switch of the layout.
+    this.$root.$on(CHANGED, this.follow)
+  },
+  beforeDestroy() {
+    this.$root.$off(CHANGED, this.follow)
+  },
   methods: {
+    follow(theme) {
+      this.theme = theme
+    },
     // system → light → dark → system
     next() {
       this.theme = THEMES[(THEMES.indexOf(this.theme) + 1) % THEMES.length]
@@ -83,6 +96,7 @@ export default {
         sameSite: 'lax',
       })
       applyTheme(this.theme)
+      this.$root.$emit(CHANGED, this.theme)
     },
   },
 }

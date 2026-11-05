@@ -75,4 +75,43 @@ describe('ThemeSwitch', () => {
       expect(factory('light').wrapper.find('button.os').exists()).toBe(true)
     })
   })
+
+  describe('two switches in one page', () => {
+    const pair = () => {
+      const $cookies = { get: jest.fn(() => 'light'), set: jest.fn() }
+      const Parent = {
+        components: { ThemeSwitch },
+        template: '<div><theme-switch ref="a" /><theme-switch ref="b" row /></div>',
+      }
+      const wrapper = mount(Parent, {
+        mocks: { $t: (k) => k, $cookies },
+        directives: { tooltip: {} },
+        stubs: {
+          OsButton: {
+            template:
+              '<button class="os" @click="$emit(\'click\', $event)"><slot name="icon" /></button>',
+          },
+        },
+      })
+      return wrapper
+    }
+
+    it('shows the theme the other one set', async () => {
+      const wrapper = pair()
+      await wrapper.find('button.os').trigger('click')
+      expect(wrapper.vm.$refs.a.theme).toBe('dark')
+      expect(wrapper.vm.$refs.b.theme).toBe('dark')
+      await wrapper.find('[role="button"]').trigger('click')
+      expect(wrapper.vm.$refs.a.theme).toBe('system')
+      expect(wrapper.vm.$refs.b.theme).toBe('system')
+    })
+
+    it('stops listening once it is gone', () => {
+      const wrapper = pair()
+      const b = wrapper.vm.$refs.b
+      const off = jest.spyOn(wrapper.vm.$root, '$off')
+      b.$destroy()
+      expect(off).toHaveBeenCalledWith('ocelot-theme-changed', b.follow)
+    })
+  })
 })
