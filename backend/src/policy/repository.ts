@@ -32,9 +32,11 @@ export async function readAllSettings(
       out[key] = JSON.parse(rawValue)
       // eslint-disable-next-line no-catch-all/no-catch-all -- JSON.parse throws SyntaxError only
     } catch {
-      // Skip malformed JSON; bootstrap reseeds the key. There used to be an `instanceof
-      // SyntaxError` rethrow here for "anything unexpected" — JSON.parse has no other failure
-      // mode, so that arm could not run.
+      // Malformed JSON has no value, but the key stays: a row that cannot be read is not a row
+      // that is gone. Bootstrap reseeds it, resync keeps what it has. There used to be an
+      // `instanceof SyntaxError` rethrow here for "anything unexpected" — JSON.parse has no other
+      // failure mode, so that arm could not run.
+      out[key] = undefined
     }
   }
   return out
@@ -73,8 +75,11 @@ export async function writeSetting(
   actor: string,
 ): Promise<void> {
   await db.write({
-    query: `MERGE (s:Setting {namespace: $namespace, key: $key})
-            SET s.id = $id,
+    // MERGE on `id`, the property the constraint is on: only that makes two instances seeding the
+    // same key at the same moment wait for each other instead of colliding.
+    query: `MERGE (s:Setting {id: $id})
+            SET s.namespace = $namespace,
+                s.key = $key,
                 s.value = $value,
                 s.updatedAt = toString(datetime()),
                 s.updatedBy = $actor`,

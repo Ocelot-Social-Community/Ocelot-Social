@@ -47,6 +47,66 @@ test.describe('OsModal keyboard accessibility', () => {
     await page.keyboard.press('Tab') // confirm
     await expect(confirmBtn).toBeFocused()
   })
+
+  test('focus moves to the panel on open', async ({ page }) => {
+    await page.goto(`${STORY_URL}--default-size&viewMode=story`)
+    const panel = page.locator('[data-testid="os-modal-panel"]')
+    await panel.waitFor()
+
+    await expect(panel).toBeFocused()
+  })
+
+  test('Tab and Shift+Tab stay inside the dialog', async ({ page }) => {
+    await page.goto(`${STORY_URL}--default-size&viewMode=story`)
+    const panel = page.locator('[data-testid="os-modal-panel"]')
+    await expect(panel).toBeFocused()
+
+    const closeBtn = page.locator('[data-testid="os-modal-close"]')
+    const confirmBtn = page.locator('[data-testid="os-modal-confirm"]')
+
+    // Shift+Tab from the panel wraps to the last element instead of leaving the dialog
+    await page.keyboard.press('Shift+Tab')
+    await expect(confirmBtn).toBeFocused()
+    // Tab from the last element wraps to the first
+    await page.keyboard.press('Tab')
+    await expect(closeBtn).toBeFocused()
+    // Shift+Tab from the first element wraps to the last
+    await page.keyboard.press('Shift+Tab')
+    await expect(confirmBtn).toBeFocused()
+  })
+
+  test('Escape closes the dialog and returns focus to the trigger', async ({ page }) => {
+    await page.goto(`${STORY_URL}--with-trigger&viewMode=story`)
+    const trigger = page.locator('[data-testid="open-modal"]')
+    await trigger.waitFor()
+
+    await page.keyboard.press('Tab')
+    await expect(trigger).toBeFocused()
+    await page.keyboard.press('Enter')
+
+    const panel = page.locator('[data-testid="os-modal-panel"]')
+    await expect(panel).toBeFocused()
+    await checkA11y(page)
+
+    await page.keyboard.press('Escape')
+    await expect(panel).toHaveCount(0)
+    await expect(trigger).toBeFocused()
+  })
+
+  test('the close button returns focus to the trigger', async ({ page }) => {
+    await page.goto(`${STORY_URL}--with-trigger&viewMode=story`)
+    const trigger = page.locator('[data-testid="open-modal"]')
+    await trigger.click()
+
+    const closeBtn = page.locator('[data-testid="os-modal-close"]')
+    await expect(closeBtn).toHaveAccessibleName('Close')
+    await page.keyboard.press('Tab')
+    await expect(closeBtn).toBeFocused()
+    await page.keyboard.press('Enter')
+
+    await expect(page.locator('[data-testid="os-modal-panel"]')).toHaveCount(0)
+    await expect(trigger).toBeFocused()
+  })
 })
 
 test.describe('OsModal visual regression', () => {
@@ -57,6 +117,28 @@ test.describe('OsModal visual regression', () => {
     await waitForReady(page)
 
     await expect(panel).toHaveScreenshot('default-size.png')
+
+    await checkA11y(page)
+  })
+
+  test('small size', async ({ page }) => {
+    await page.goto(`${STORY_URL}--small-size&viewMode=story`)
+    const panel = page.locator('[data-testid="os-modal-panel"]')
+    await panel.waitFor()
+    await waitForReady(page)
+
+    await expect(panel).toHaveScreenshot('small-size.png')
+
+    await checkA11y(page)
+  })
+
+  test('large size', async ({ page }) => {
+    await page.goto(`${STORY_URL}--large-size&viewMode=story`)
+    const panel = page.locator('[data-testid="os-modal-panel"]')
+    await panel.waitFor()
+    await waitForReady(page)
+
+    await expect(panel).toHaveScreenshot('large-size.png')
 
     await checkA11y(page)
   })

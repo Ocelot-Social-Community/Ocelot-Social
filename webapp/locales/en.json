@@ -431,6 +431,7 @@
     "API_KEY_DOES_NOT_EXIST": "The API key could not be found.",
     "API_KEYS_FEATURE_DISABLED": "API keys are not enabled on this network.",
     "BADGE_SELECTION_BADGE_NOT_REWARDED": "You can only select badges that have been awarded to you.",
+    "CHAT_CALL_ROOM_CLOSED": "This video call is over. Its chat can still be read, but no longer written to.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "The group chat could not be created.",
     "CHAT_MESSAGE_CONTENT_MISSING": "The message needs a text or a file.",
     "CHAT_ROOM_PARTNER_IS_SELF": "You cannot start a chat with yourself.",
@@ -464,6 +465,7 @@
     "GROUP_ROLE_REASSIGN_TARGET_INVALID": "Move the members to a different role.",
     "GROUP_ROLE_SYSTEM_NOT_DELETABLE": "A system role cannot be deleted.",
     "GROUP_ROLE_SYSTEM_NOT_RENAMEABLE": "A system role keeps its key; change its display name instead.",
+    "GROUP_SAVE_CATEGORY_UNKNOWN": "At least one of the categories does not exist.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "The description must be at least {min} characters long.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "A group that outsiders cannot find cannot show them its members either.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "This unique group name is already taken.",
@@ -506,7 +508,10 @@
     "POST_EVENT_VENUE_REQUIRED": "Please enter a venue description.",
     "POST_PIN_FEATURE_DISABLED": "Pinning posts is not enabled.",
     "POST_PIN_LIMIT_REACHED": "The maximum number of pinned posts has been reached. Unpin another post first.",
+    "POST_SAVE_CATEGORY_UNKNOWN": "At least one of the categories does not exist.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "A post with this slug already exists.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Too few topics selected (at least {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Too many topics selected (at most {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "The confirmation code is invalid.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "This username is already taken.",
     "REPORT_TARGET_IS_OWN": "You cannot report yourself or your own content.",
@@ -533,18 +538,29 @@
     "USER_DOES_NOT_EXIST": "The user could not be found.",
     "USER_PROFILE_NAME_TOO_LONG": "The name must be at most {max} characters long.",
     "USER_PROFILE_NAME_TOO_SHORT": "The name must be at least {min} characters long.",
+    "USER_PROFILE_SLUG_INVALID_CHARACTERS": "Allowed characters are only lowercase letters (a–z), numbers (0–9), underscores and hyphens.",
     "USER_PROFILE_SLUG_TOO_LONG": "The user name must be at most {max} characters long.",
     "USER_PROFILE_SLUG_TOO_SHORT": "The user name must be at least {min} characters long.",
     "USER_UNBLOCK_USER_NOT_BLOCKED": "This user is not blocked.",
+    "VIDEO_CALL_CHAT_NOT_IN_CALL": "The chat of a video call is open to those taking part in it. Join the call first.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "No active membership in this group was found for the video call.",
     "VIDEO_CALL_START_NOT_PERMITTED": "You may not start a video call in this group."
   },
   "chat": {
     "addRoomHeadline": "Search User for new Chat",
+    "callRoomEmpty": "No messages yet. This chat is visible only to the participants of this video call.",
+    "callRoomName": "Call · {name}",
     "cancelSelectMessage": "Cancel",
     "closeChat": "Close chat",
     "conversationStarted": "Conversation started on:",
     "expandChat": "Expand chat",
+    "export": {
+      "attachment": "Attachment",
+      "callStarted": "Call started: {date}",
+      "savedAt": "Saved: {date}",
+      "title": "Chat of the video call in “{name}”"
+    },
+    "exportChat": "Download chat as text file",
     "groupChatButton": {
       "label": "Group Chat",
       "tooltip": "Chat with group “{name}”"
@@ -592,7 +608,7 @@
     "previousLocation": "Previous location: {location}",
     "scrollToLocationMap": "Scroll to map",
     "validations": {
-      "categories": "Please select between one and three topics.",
+      "categories": "Please select between {min} and {max} topics.",
       "contentNotEmpty": "Please enter some content.",
       "email": "Please enter a valid e-mail address.",
       "eventLocationNameLength": "The address must be between {min} and {max} characters long.",
@@ -819,6 +835,20 @@
       "title": "Disable User"
     }
   },
+  "dock": {
+    "activeVideoCalls": {
+      "blocked": "{name} (blocked by you)",
+      "count": "{count} connected",
+      "flag": "Running video calls: {count}",
+      "join": "Join",
+      "joined": "You are in this call",
+      "participants": "Participants",
+      "title": "Running video calls"
+    },
+    "close": "Close sidebar",
+    "label": "Sidebar",
+    "open": "Open sidebar – {content}"
+  },
   "donations": {
     "amount-of-total": "{amount} of {total} € collected",
     "donate-now": "Donate now"
@@ -984,15 +1014,15 @@
       "title": "Edit My Group"
     },
     "elevation": {
-      "actingAsMember": "You are acting here as {role}.",
-      "actingAsNonMember": "You are not a member of this group.",
       "activeTitle": "Administrator access is active.",
       "activeUntil": "It ends at {time}, or when you end it.",
       "end": "End administrator access",
-      "offerBody": "You also hold network rights over it. Reading its content or changing anything asks for this, and the request is recorded with the group.",
-      "offerBodyOwner": "Your network rights also let you demote or remove the other owners of this group. That asks for this, and the request is recorded with the group.",
-      "reasonPlaceholder": "What are you doing?",
-      "start": "Use administrator access"
+      "offerBody": "Your current role in this group: “{role}”. Give a reason why you want to manage this group (it is recorded).",
+      "offerBodyNoneMember": "You are not a member of the group. Give a reason why you want to manage this group (it is recorded).",
+      "offerBodyOwner": "Your current role in this group: “{role}”. Your network rights also let you demote or remove the other owners of this group. Give a reason why you want to manage this group (it is recorded).",
+      "reasonPlaceholder": "Reason for your action",
+      "start": "Manage group",
+      "title": "You are entitled to manage this group like a super owner."
     },
     "errors": {
       "userAlreadyMember": "User “{name}” is already a member!"
@@ -1859,7 +1889,7 @@
       "slug": {
         "alreadyTaken": "This user name is already taken.",
         "length": "The user name must be between {min} and {max} characters.",
-        "regex": "Allowed characters are only lowercase letters, numbers, underscores and hyphens."
+        "regex": "Allowed characters are only lowercase letters (a–z), numbers (0–9), underscores and hyphens."
       }
     }
   },
@@ -1900,19 +1930,41 @@
     "activeSpeakers": "Active speakers",
     "audioBlocked": "Your browser is blocking the sound of this call.",
     "audioOnly": "Weak connection — videos are paused so you can keep hearing everyone.",
+    "chatTabs": {
+      "call": "Call",
+      "callHint": "Visible only to the participants of this video call (without notifications)",
+      "group": "Group",
+      "groupHint": "Visible to all members of the group (with notifications)",
+      "label": "Choose chat"
+    },
     "closeChat": "Close chat",
     "connecting": "Connecting…",
     "connectionLost": "Connection lost: {name}",
     "connectionPoor": "Weak connection: {name}",
+    "controls": {
+      "camera": "Camera",
+      "chat": "Chat",
+      "leave": "Leave",
+      "microphone": "Microphone",
+      "screen": "Screen",
+      "startSharing": "Share your screen, a window or a tab",
+      "stopSharing": "{surface}: stop sharing",
+      "surface": {
+        "browser": "Tab",
+        "monitor": "Screen",
+        "window": "Window"
+      },
+      "turnOff": "{device}: turn off",
+      "turnOn": "{device}: turn on"
+    },
     "deviceSettings": {
       "button": "Devices",
       "speakerError": "Could not switch the speaker.",
       "title": "Device settings"
     },
     "dialogLabel": "Group video call",
-    "disableCamera": "Turn camera off",
     "enableAudio": "Enable sound",
-    "enableCamera": "Turn camera on",
+    "enterFullscreen": "Fullscreen",
     "errorBackToPrejoin": "Change settings",
     "errorRetry": "Retry",
     "errors": {
@@ -1935,18 +1987,19 @@
         "noDevice": "No screen available to share."
       }
     },
+    "exitFullscreen": "Exit fullscreen",
     "gotoGroup": "Go to group “{name}”",
     "groupVideoCallButton": {
       "label": "Group Video",
       "tooltip": "Video call in group “{name}”"
     },
+    "hideBars": "Hide the bars",
     "leave": "Leave call",
     "maximize": "Maximize",
     "micMuted": "Microphone off",
     "micNoSignal": "Your microphone isn't delivering any sound — others can't hear you.",
     "micUnmuted": "Microphone on",
     "minimize": "Minimize",
-    "muteMic": "Mute microphone",
     "openChat": "Open chat",
     "prejoin": {
       "camera": "Camera",
@@ -1994,12 +2047,10 @@
     "restartMic": "Restart microphone",
     "screenShare": "Screen",
     "screenShareEnded": "Screen sharing ended",
+    "showBars": "Show the bars",
     "showVideos": "Show videos",
     "spotlightExit": "Exit spotlight",
-    "startScreenShare": "Share screen",
-    "stopScreenShare": "Stop sharing",
     "title": "Group video call",
-    "unmuteMic": "Unmute microphone",
     "you": "you",
     "youAreSharingScreen": "You are sharing your screen"
   }

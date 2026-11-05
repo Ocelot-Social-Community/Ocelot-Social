@@ -7,7 +7,10 @@
 //
 // Deliberately NOT a process-wide cache the way the network roles have one: those are a
 // handful of global objects, whereas group roles scale with the number of groups. A read per
-// request against an indexed lookup is the cheaper trade — and it cannot go stale.
+// request against an indexed lookup is the cheaper trade — and it cannot go stale. A
+// subscription is the one long-lived "request": its context rebuilds this scope whenever it
+// reads the viewer again (see context/subscription.ts), so there the memo lasts one refresh
+// window, not the life of the socket.
 import { visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { GROUPS_ENABLED_GATE } from '@src/groupPermission'
 
@@ -153,6 +156,10 @@ const GROUP_OF_POST_QUERY = `
   RETURN g.id AS groupId
 `
 
+// The group's own chat only. The conference chat of a video call is deliberately not traced
+// to the call's group (ROOM_FOR → VideoCallSession → CALL_IN): whoever is in the call may
+// write in it, whatever their role says about the group's chat; it is the CHATS_IN edge,
+// set on joining the call, that decides (see livekit/callSession.ts).
 const GROUP_OF_ROOM_QUERY = `
   MATCH (:Room {id: $roomId})-[:ROOM_FOR]->(g:Group)
   RETURN g.id AS groupId

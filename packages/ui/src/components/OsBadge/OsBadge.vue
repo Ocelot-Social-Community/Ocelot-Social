@@ -11,9 +11,10 @@
 
   /**
    * Non-interactive label for metadata display (e.g. group info) and
-   * form counters (e.g. character count with validation state).
+   * form counters (e.g. character count with validation state), or — with `count` — a
+   * number such as unread messages, drawn round.
    *
-   * @slot default - Badge content (text, icons)
+   * @slot default - Badge content (text, icons); not shown when `count` is set
    */
   export default defineComponent({
     name: 'OsBadge',
@@ -48,6 +49,15 @@
         type: String as PropType<BadgeShape>,
         default: undefined,
       },
+      /**
+       * A number to show instead of the slot, e.g. unread messages. The badge is then as
+       * wide as it is high around one digit and grows sideways with more; above 99 it
+       * shows `99+`, as OsCounterIcon does.
+       */
+      count: {
+        type: Number,
+        default: undefined,
+      },
     },
     setup(props, { slots, attrs }) {
       /* v8 ignore start -- Vue 2 only */
@@ -55,10 +65,18 @@
       /* v8 ignore stop */
 
       return () => {
-        const children = slots.default?.()
+        const isCount = typeof props.count === 'number'
+        const children = isCount
+          ? [(props.count as number) <= 99 ? String(props.count) : '99+']
+          : slots.default?.()
         const badgeClass = cn(
           'os-badge',
-          badgeVariants({ variant: props.variant, size: props.size, shape: props.shape }),
+          badgeVariants({
+            variant: props.variant,
+            size: props.size,
+            shape: props.shape,
+            count: isCount,
+          }),
         )
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */

@@ -85,11 +85,11 @@
         class="video-tile__connection"
         :class="{ 'video-tile__connection--lost': tile.connectionQuality === 'lost' }"
         role="img"
-        :title="weakConnectionLabel"
+        v-tooltip="{ content: weakConnectionLabel, placement: 'top', html: false }"
         :aria-label="weakConnectionLabel"
         data-test="video-tile-weak-connection"
       >
-        <os-icon :icon="icons.warning" />
+        <os-icon :icon="icons.warning" class="video-tile__connection-icon" />
       </span>
       <span v-if="tile.isLocal" class="video-tile__local-tag">({{ $t('videoCall.you') }})</span>
       <span v-if="tile.isScreen" class="video-tile__screen-tag">
@@ -542,7 +542,17 @@ export default {
 
 .video-tile__connection {
   display: inline-flex;
+  margin-left: var(--space-xxx-small);
+  vertical-align: middle;
   color: var(--color-warning);
+  /* The label lets clicks through to the tile; the warning alone takes the */
+  /* pointer back so hovering it can show what it means. */
+  pointer-events: auto;
+}
+
+.video-tile__connection-icon {
+  width: 12px;
+  height: 12px;
 }
 
 .video-tile__connection--lost {

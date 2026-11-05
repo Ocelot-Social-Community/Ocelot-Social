@@ -507,7 +507,14 @@ export default {
               this.categoriesActive &&
               (value.length < branding.category.min || value.length > branding.category.max)
             ) {
-              return [new Error(this.$t('common.validations.categories'))]
+              return [
+                new Error(
+                  this.$t('common.validations.categories', {
+                    min: branding.category.min,
+                    max: branding.category.max,
+                  }),
+                ),
+              ]
             }
             return []
           },

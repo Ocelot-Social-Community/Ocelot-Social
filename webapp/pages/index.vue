@@ -120,7 +120,9 @@
       </div>
     </div>
     <!-- content grid -->
+    <!-- data-dock-anchor: the dock lines its content up with the first card of the grid -->
     <masonry-grid
+      data-dock-anchor=".os-card"
       :single-column="singleColumn"
       :class="[
         !showDonations ? 'grid-margin-top' : '',

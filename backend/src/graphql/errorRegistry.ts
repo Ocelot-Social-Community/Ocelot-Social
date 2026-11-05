@@ -85,6 +85,10 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'The slug must be at most {max} characters long.',
   },
+  USER_PROFILE_SLUG_INVALID_CHARACTERS: {
+    type: 'BAD_USER_INPUT',
+    text: 'The slug may only contain lowercase letters (a–z), numbers (0–9), underscores and hyphens.',
+  },
   BADGE_SELECTION_BADGE_NOT_REWARDED: {
     type: 'BAD_USER_INPUT',
     text: 'You cannot set badges not rewarded to you.',
@@ -112,6 +116,10 @@ const definitions = {
   GROUP_SAVE_TOO_MANY_CATEGORIES: {
     type: 'BAD_USER_INPUT',
     text: 'Too many categories (at most {max}).',
+  },
+  GROUP_SAVE_CATEGORY_UNKNOWN: {
+    type: 'BAD_USER_INPUT',
+    text: 'At least one of the categories does not exist.',
   },
   GROUP_MEMBERSHIP_USER_NOT_A_MEMBER: {
     type: 'BAD_USER_INPUT',
@@ -249,6 +257,18 @@ const definitions = {
   POST_SAVE_SLUG_ALREADY_TAKEN: {
     type: 'BAD_USER_INPUT',
     text: 'Post with this slug already exists.',
+  },
+  POST_SAVE_TOO_FEW_CATEGORIES: {
+    type: 'BAD_USER_INPUT',
+    text: 'Too few categories (at least {min}).',
+  },
+  POST_SAVE_TOO_MANY_CATEGORIES: {
+    type: 'BAD_USER_INPUT',
+    text: 'Too many categories (at most {max}).',
+  },
+  POST_SAVE_CATEGORY_UNKNOWN: {
+    type: 'BAD_USER_INPUT',
+    text: 'At least one of the categories does not exist.',
   },
   // locations
   // A query selected Location.distanceToMe without the location's id.
@@ -401,9 +421,17 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'Message must have content or files.',
   },
+  CHAT_CALL_ROOM_CLOSED: {
+    type: 'FORBIDDEN',
+    text: 'This video call is over. Its chat can still be read, but no longer written to.',
+  },
   CHAT_ROOM_PARTNER_IS_SELF: {
     type: 'BAD_USER_INPUT',
     text: 'You cannot create a chat with yourself.',
+  },
+  VIDEO_CALL_CHAT_NOT_IN_CALL: {
+    type: 'FORBIDDEN',
+    text: 'The chat of a video call is open to those taking part in it. Join the call first.',
   },
   VIDEO_CALL_START_NOT_PERMITTED: {
     type: 'FORBIDDEN',

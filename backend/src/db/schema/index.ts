@@ -23,6 +23,7 @@ import { SocialMedia } from './entities/SocialMedia'
 import { Tag } from './entities/Tag'
 import { UnverifiedEmailAddress } from './entities/UnverifiedEmailAddress'
 import { User } from './entities/User'
+import { VideoCallSession } from './entities/VideoCallSession'
 import { relationships } from './relationships'
 
 import type { EntityDefinition } from './types'
@@ -77,6 +78,7 @@ export const entities: readonly EntityDefinition[] = [
   Tag,
   UnverifiedEmailAddress,
   User,
+  VideoCallSession,
 ]
 
 export { relationships }
@@ -104,6 +106,7 @@ export {
   Tag,
   UnverifiedEmailAddress,
   User,
+  VideoCallSession,
 }
 
 /** Every label the database may carry, primary and secondary. */

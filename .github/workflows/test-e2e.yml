@@ -81,6 +81,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: Docker Hub through a mirror
+        uses: ./.github/actions/docker-hub-mirror
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
         # Base images from Docker Hub through Google's mirror of it first: a 503 from Docker Hub
@@ -127,6 +130,7 @@ jobs:
           docker pull cgr.dev/chainguard/minio:latest
           docker pull cgr.dev/chainguard/minio-client:latest-dev
           docker pull maildev/maildev:latest
+          docker pull redis:8.2-alpine
 
       # Compressed on the way out: `docker save` writes UNCOMPRESSED layer tars, and every byte here is
       # paid 40 times over on the matrix side. zstd rather than gzip -1 — smaller AND faster on both
@@ -140,6 +144,7 @@ jobs:
           docker save "cgr.dev/chainguard/minio:latest" | zstd -T0 -3 > /tmp/minio.tar.zst
           docker save "cgr.dev/chainguard/minio-client:latest-dev" | zstd -T0 -3 > /tmp/minio-mc.tar.zst
           docker save "maildev/maildev:latest" | zstd -T0 -3 > /tmp/mailserver.tar.zst
+          docker save "redis:8.2-alpine" | zstd -T0 -3 > /tmp/redis.tar.zst
 
       # ARTIFACT, not cache. These are run-scoped hand-offs between jobs, which is what artifacts are
       # for; `actions/cache` with a `run_id` key can never hit on a later run, yet it occupies the
@@ -166,6 +171,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Docker Hub through a mirror
+        uses: ./.github/actions/docker-hub-mirror
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
@@ -397,7 +405,7 @@ jobs:
 
       - name: Boot up test system | docker compose
         run: |
-          for image in neo4j backend minio minio-mc mailserver webapp; do
+          for image in neo4j backend minio minio-mc mailserver redis webapp; do
             zstd -dc "/tmp/${image}.tar.zst" | docker load
           done
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp

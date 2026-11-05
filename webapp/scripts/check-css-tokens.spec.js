@@ -7,6 +7,8 @@ const {
   checkSource,
   checkNeutral,
   findProblems,
+  localZLimit,
+  formatZIndexReport,
 } = require('./check-css-tokens')
 const { mkdtempSync, mkdirSync, writeFileSync } = require('fs')
 const { tmpdir } = require('os')
@@ -266,5 +268,166 @@ describe('findProblems', () => {
       'components/A.spec.js': "expect('var(--color-neutral-30)')",
     })
     expect(findProblems(root).errors).toEqual([])
+  })
+})
+
+describe('checkSource — z-index', () => {
+  const check = (css, limit) => checkSource(style(css), {}, 'A.vue', limit)
+
+  it('allows a token, also inside a calc()', () => {
+    expect(check('.a { z-index: var(--z-index-modal); }').errors).toEqual([])
+    expect(check('.a { z-index: calc(var(--z-index-modal) - 2); }').errors).toEqual([])
+  })
+
+  it('allows a local number below the limit, negative ones too', () => {
+    expect(check('.a { z-index: 3; }').errors).toEqual([])
+    expect(check('.a { z-index: -1; }').errors).toEqual([])
+    expect(check('.a { z-index: 99; }', 100).errors).toEqual([])
+  })
+
+  it('flags a raw number from the limit up', () => {
+    expect(check('.a { z-index: 100; }', 100).errors).toEqual([
+      'A.vue: z-index: 100 — use a var(--z-index-*) token; only plain numbers below 100 are local',
+    ])
+    expect(check('.a { z-index: 9999 !important; }').errors).toHaveLength(1)
+  })
+
+  it('flags a raw number that hides in a calc() or another unit', () => {
+    expect(check('.a { z-index: calc(150 + 1); }').errors).toHaveLength(1)
+    expect(check('.a { z-index: 150px; }').errors).toHaveLength(1)
+  })
+
+  it('allows a local number with !important', () => {
+    expect(check('.a { z-index: 3 !important; }').errors).toEqual([])
+  })
+
+  it('allows a negative number at any depth — it sits below everything, so it is local', () => {
+    expect(check('.a { z-index: -100; }', 100).errors).toEqual([])
+    expect(check('.a { z-index: -5000; }', 100).errors).toEqual([])
+  })
+
+  it('flags a token that is not declared, when it knows the declared ones', () => {
+    const known = new Set(['z-index-modal'])
+    const run = (css) => checkSource(style(css), {}, 'A.vue', 100, known).errors
+    expect(run('.a { z-index: var(--z-index-modal); }')).toEqual([])
+    expect(run('.a { z-index: var(--z-index-typo); }')).toEqual([
+      'A.vue: z-index: var(--z-index-typo) — --z-index-typo is not a declared token',
+    ])
+  })
+
+  it('flags a number from the limit up beside a token, but allows a small offset', () => {
+    expect(check('.a { z-index: calc(var(--z-index-sticky) + 5000); }', 100).errors).toHaveLength(1)
+    expect(check('.a { z-index: calc(var(--z-index-modal) - 2); }', 100).errors).toEqual([])
+    expect(check('.a { z-index: calc(var(--z-index-overlay) + 1); }', 100).errors).toEqual([])
+  })
+
+  it('rejects a fallback or another variable beside a token', () => {
+    expect(check('.a { z-index: var(--z-index-sticky, 9999); }', 100).errors).toHaveLength(1)
+    expect(check('.a { z-index: var(--z-index-sticky, -5000); }', 100).errors).toHaveLength(1)
+    expect(
+      check('.a { z-index: calc(var(--z-index-sticky) + var(--foo)); }', 100).errors,
+    ).toHaveLength(1)
+  })
+
+  it('allows only one token with at most one small offset', () => {
+    const sum = 'calc(var(--z-index-sticky) + var(--z-index-sticky))'
+    expect(check(`.a { z-index: ${sum}; }`, 100).errors).toHaveLength(1)
+    expect(check('.a { z-index: calc(var(--z-index-sticky) * 50); }', 100).errors).toHaveLength(1)
+    expect(check('.a { z-index: calc(var(--z-index-sticky) + 2px); }', 100).errors).toHaveLength(1)
+    expect(check('.a { z-index: calc(var(--z-index-sticky) - 2); }', 100).errors).toEqual([])
+  })
+
+  it('needs spaces around the operator in calc()', () => {
+    expect(check('.a { z-index: calc(var(--z-index-sticky)+2); }', 100).errors).toHaveLength(1)
+    expect(check('.a { z-index: calc(var(--z-index-sticky) +2); }', 100).errors).toHaveLength(1)
+    expect(check('.a { z-index: calc(var(--z-index-sticky) + 2); }', 100).errors).toEqual([])
+  })
+
+  it('checks the property name case-insensitively', () => {
+    expect(check('.a { Z-INDEX: 9999; }', 100).errors).toHaveLength(1)
+    expect(check('.a { Z-Index: 3; }', 100).errors).toEqual([])
+  })
+
+  it('reports an SCSS variable beside a token', () => {
+    const { errors } = check('.a { z-index: calc(var(--z-index-sticky) + $offset); }', 100)
+    expect(errors).toContain(
+      'A.vue: $offset — SCSS variable in a plain CSS block, resolves to nothing',
+    )
+  })
+
+  it('allows the keywords', () => {
+    expect(check('.a { z-index: auto; }').errors).toEqual([])
+  })
+
+  it('leaves scss blocks alone', () => {
+    const src = style('.a { z-index: 5000; }', ' lang="scss"')
+    expect(checkSource(src, {}, 'A.vue').errors).toEqual([])
+  })
+
+  it('records the tokens and the local numbers a file uses', () => {
+    const { zUsages } = check('.a { z-index: var(--z-index-modal); } .b { z-index: 2; }')
+    expect(zUsages).toEqual([
+      { rel: 'A.vue', token: 'z-index-modal' },
+      { rel: 'A.vue', local: 2 },
+    ])
+  })
+})
+
+describe('localZLimit', () => {
+  it('is the lowest page-level token, --z-index-sticky', () => {
+    expect(localZLimit({ 'z-index-sticky': '100' })).toBe(100)
+  })
+
+  it('falls back when the token is missing or not a number', () => {
+    expect(localZLimit({})).toBe(100)
+    expect(localZLimit({ 'z-index-sticky': 'calc(1 + 1)' })).toBe(100)
+  })
+
+  it('matches the real scale', () => {
+    expect(localZLimit(readTokens())).toBe(100)
+  })
+})
+
+describe('formatZIndexReport', () => {
+  const tokens = {
+    'z-index-modal': '9999',
+    'z-index-page-submenu': '2500',
+    'z-index-call-maximized': 'calc(var(--z-index-page-submenu) - 1)',
+    'z-index-surface': '1',
+    'color-primary': '#17b53f',
+  }
+  const usages = [
+    { rel: 'b/Modal.vue', token: 'z-index-modal' },
+    { rel: 'a/Call.vue', token: 'z-index-call-maximized' },
+    { rel: 'a/Tile.vue', local: 3 },
+    { rel: 'a/Call.vue', local: 3 },
+  ]
+  const report = formatZIndexReport(tokens, usages)
+
+  it('sorts a token with the value 0 below the others', () => {
+    const zero = formatZIndexReport({ ...tokens, 'z-index-zero': '0' }, usages)
+    expect(zero.indexOf('--z-index-zero')).toBeGreaterThan(zero.indexOf('--z-index-surface'))
+  })
+
+  it('lists the tokens highest first, resolving a calc() level by its number', () => {
+    const order = ['--z-index-modal', '--z-index-page-submenu', '--z-index-call-maximized']
+    const at = order.map((name) => report.indexOf(name))
+    expect(at).toEqual([...at].sort((x, y) => x - y))
+    expect(report.indexOf('--z-index-call-maximized')).toBeLessThan(
+      report.indexOf('--z-index-surface'),
+    )
+  })
+
+  it('names the files of a token and marks an unused one', () => {
+    expect(report).toContain('b/Modal.vue')
+    expect(report).toMatch(/--z-index-page-submenu\n\s+\(unused\)/)
+  })
+
+  it('groups the local numbers with their files, sorted', () => {
+    expect(report).toMatch(/\n {2}3\n {6}a\/Call\.vue\n {6}a\/Tile\.vue/)
+  })
+
+  it('leaves out tokens that are not z-index levels', () => {
+    expect(report).not.toContain('color-primary')
   })
 })
