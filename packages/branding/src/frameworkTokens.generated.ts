@@ -43,6 +43,7 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'border-size-base': '1px',
   'border-size-large': '3px',
   'box-shadow-base': '0px 12px 26px -4px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.45))',
+  'box-shadow-card': '0px 12px 26px -4px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3))',
   'box-shadow-large':
     '0 10px 20px 0 light-dark(rgba(0, 0, 0, 0.11), rgba(0, 0, 0, 0.5)), 0 3px 10px 0 light-dark(rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.4))',
   'box-shadow-x-large':

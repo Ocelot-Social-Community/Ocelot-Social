@@ -298,6 +298,9 @@
     0 10px 20px 0 light-dark(rgba(0, 0, 0, 0.11), rgba(0, 0, 0, 0.5)),
     0 3px 10px 0 light-dark(rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.4));
   --box-shadow-base: 0px 12px 26px -4px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.45));
+  /* The cards: the base shadow's geometry, but quieter in the dark theme, where many of them side by side
+     make the stronger one restless (OsCard). */
+  --box-shadow-card: 0px 12px 26px -4px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
   /* The colour alone, for shadows that carry their own geometry. */
   --shadow-color: light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
   --shadow-color-strong: light-dark(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
