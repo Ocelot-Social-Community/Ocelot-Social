@@ -459,13 +459,16 @@ export default {
      */
     postcss: {
       // light-dark() goes to the browser as written (Chrome 123, Firefox 120, Safari 17.5): preset-env's
-      // polyfill switches on prefers-color-scheme only and would ignore <html data-theme>.
+      // polyfill switches on prefers-color-scheme only and would ignore <html data-theme>. An older
+      // browser gets the light theme from postcss/light-dark-fallback.js instead.
       preset: { features: { 'light-dark-function': false } },
       postcssOptions: {
         plugins: {
           '@csstools/postcss-global-data': {
             files: ['./assets/css/breakpoints.css'],
           },
+          // The light halves of the light-dark() pairs for browsers that lack it (see the file).
+          [path.join(__dirname, 'postcss/light-dark-fallback.js')]: {},
         },
       },
     },
