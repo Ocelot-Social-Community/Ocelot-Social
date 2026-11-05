@@ -434,6 +434,10 @@
   --chat-hint-icon-color: var(--tooltip-color);
   --chat-hint-shadow: var(--box-shadow-large);
   --chat-hint-close-hover-background: rgba(255, 255, 255, 0.15);
+  /* The bars of the chat and of the call — their headers, the call's control bar, the chat's footer. One
+     step off the content in the light theme; in the dark one the page's own bars are that same step, so
+     these take the content's ground instead and stand off the page's. */
+  --window-bar-background: light-dark(var(--background-color-soft), var(--background-color-base));
   /* The room name next to its icon (Chat.vue .room-name-with-icon). Was referenced without ever being
      declared and without a fallback, so `color` resolved to nothing and the browser dropped the whole
      declaration — the name rendered in the inherited colour. Same family and same value as
@@ -528,6 +532,6 @@
      wants a light text, which these bars do not bring along. */
   --video-call-bar-page-header-color: var(--color-header-background);
   --video-call-bar-page-footer-color: var(--color-footer-background);
-  --video-call-bar-header-color: var(--background-color-base);
-  --video-call-bar-controls-color: var(--background-color-soft);
+  --video-call-bar-header-color: var(--window-bar-background);
+  --video-call-bar-controls-color: var(--window-bar-background);
 }

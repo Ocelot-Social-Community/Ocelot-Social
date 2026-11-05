@@ -2700,11 +2700,11 @@ export default {
 
 /*  The header itself — avatar, title, where its buttons go — is RoomHeader's. What is */
 /*  the call's own are the things put into it. */
-/*  Its ground is the tab bar's (the base background), not the page header's: in the dark theme the */
-/*  two would be the same dark and the call's header would not stand off the page's. RoomHeader */
-/*  paints with --color-header-background, so it is set here for the header and what it holds. */
+/*  Its ground is the chat's bar, not the page header's: in the dark theme the page's would be the */
+/*  same dark and the call's header would not stand off it. RoomHeader paints with */
+/*  --color-header-background, so it is set here for the header and what it holds. */
 .video-call__header {
-  --color-header-background: var(--background-color-base);
+  --color-header-background: var(--window-bar-background);
 }
 
 .video-call__count {
@@ -2947,7 +2947,7 @@ export default {
   gap: var(--space-x-small);
   /*  Little space above and below the buttons: the height goes to the videos. */
   padding: var(--space-xx-small) var(--space-small);
-  background: var(--background-color-soft);
+  background: var(--window-bar-background);
   border-top: 1px solid var(--border-color-softest);
   flex-wrap: wrap;
   justify-content: center;

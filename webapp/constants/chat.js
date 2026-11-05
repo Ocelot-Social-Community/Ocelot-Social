@@ -21,13 +21,13 @@ const STYLE = {
   },
 
   header: {
-    background: 'var(--background-color-soft)',
+    background: 'var(--window-bar-background)',
     colorRoomName: 'var(--text-color-base)',
     colorRoomInfo: 'var(--text-color-soft)',
   },
 
   footer: {
-    background: 'var(--background-color-soft)',
+    background: 'var(--window-bar-background)',
     borderStyleInput: '1px solid var(--chat-border-color)',
     borderInputSelected: 'var(--chat-accent)',
     backgroundReply: 'var(--background-color-soft)',
