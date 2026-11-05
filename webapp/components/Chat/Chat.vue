@@ -1550,7 +1550,7 @@ export default {
 }
 
 .room-name-with-icon {
-  color: var(--text-color-base);
+  color: var(--chat-room-color-username);
   font-weight: 500;
 }
 

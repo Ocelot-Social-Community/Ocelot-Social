@@ -434,6 +434,20 @@
   --chat-message-bg-me: light-dark(var(--color-primary-light), rgb(30, 70, 40));
   --chat-sidemenu-background-active: light-dark(var(--color-primary-light), rgb(30, 70, 40));
   --chat-new-message-color: rgb(10, 161, 255);
+  /* The chat's own names for roles that already carry a light and a dark value, so a brand can
+     recolour just the chat (checkmarks, the unread counter, the message text, the icons) without
+     touching the app. Each is an alias: it follows the theme unless a brand sets it. */
+  --chat-message-checkmark: var(--text-color-soft);
+  --chat-message-checkmark-seen: var(--text-color-secondary);
+  --chat-room-color-counter-badge: var(--text-color-inverse);
+  --chat-room-background-counter-badge: var(--color-danger);
+  --chat-message-color: var(--text-color-base);
+  --chat-message-timestamp: var(--text-color-soft);
+  --chat-icon-add: var(--color-primary);
+  --chat-icon-send: var(--color-primary);
+  --chat-icon-emoji: var(--color-primary);
+  /* The room name next to its icon (Chat.vue .room-name-with-icon): the message colour it pairs with. */
+  --chat-room-color-username: var(--text-color-base);
   /* The hint floating above a chat's messages (Chat.vue renderHint). Dark like the app's
      tooltips, which carry the same text on the chat's tab: their background and text colour
      (so it follows them into the dark theme), their shadow (tooltip.css), and a hover for its
