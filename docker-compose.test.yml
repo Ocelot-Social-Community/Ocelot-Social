@@ -105,7 +105,7 @@ services:
 
   # Only ever a message bus here, so nothing is written to disk.
   redis:
-    image: redis:8.2-alpine
+    image: redis:8.10-alpine
     command: redis-server --requirepass redis-test-password --save "" --appendonly no
 
   mailserver:
