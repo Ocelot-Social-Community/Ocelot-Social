@@ -27,6 +27,7 @@ test('validateBranding collects ALL invariant violations, not just the first', (
       slugLengthMin: 60,
       slugLengthMax: 50,
     },
+    post: { titleLengthMin: 120, titleLengthMax: 100 },
     registration: { ...brandingDefaults.registration, nonceLength: 0 },
     comment: { ...brandingDefaults.comment, truncateToLength: 5000, maxUntruncatedLength: 1200 },
     category: { min: 5, max: 3 },
@@ -39,6 +40,9 @@ test('validateBranding collects ALL invariant violations, not just the first', (
   )
   assert.ok(v.some((x) => x.includes('group.descriptionCollapsedLines must be ≥ 1')))
   assert.ok(v.some((x) => x.includes('user.nameLengthMin (60) must be ≤ user.nameLengthMax (50)')))
+  assert.ok(
+    v.some((x) => x.includes('post.titleLengthMin (120) must be ≤ post.titleLengthMax (100)')),
+  )
   assert.ok(v.some((x) => x.includes('user.slugLengthMin (60) must be ≤ user.slugLengthMax (50)')))
   assert.ok(v.some((x) => x.includes('registration.nonceLength must be ≥ 1')))
   assert.ok(
@@ -63,6 +67,17 @@ test('defineBranding THROWS on an invalid user name length override, same as gro
   assert.throws(
     () => defineBranding({ user: { nameLengthMin: 100 } }), // 100 > default max 50
     /invalid branding config[\s\S]*nameLengthMin \(100\) must be ≤ user\.nameLengthMax \(50\)/,
+  )
+})
+
+test('defineBranding THROWS on an invalid post title length override', () => {
+  assert.throws(
+    () => defineBranding({ post: { titleLengthMin: 200 } }), // 200 > default max 100
+    /invalid branding config[\s\S]*titleLengthMin \(200\) must be ≤ post\.titleLengthMax \(100\)/,
+  )
+  assert.throws(
+    () => defineBranding({ post: { titleLengthMin: 0 } }),
+    /invalid branding config[\s\S]*post\.titleLengthMin must be ≥ 1 \(got 0\)/,
   )
 })
 
@@ -95,6 +110,7 @@ test('defineBranding THROWS on a user name minimum of 0', () => {
 test('defineBranding accepts valid overrides and the vanilla (empty) config', () => {
   assert.doesNotThrow(() => defineBranding({}))
   assert.doesNotThrow(() => defineBranding({ group: { nameLengthMax: 80 } }))
+  assert.doesNotThrow(() => defineBranding({ post: { titleLengthMin: 1, titleLengthMax: 200 } }))
   assert.doesNotThrow(() => defineBranding({ user: { nameLengthMax: 80 } }))
   assert.doesNotThrow(() => defineBranding({ user: { slugLengthMin: 1, slugLengthMax: 8 } }))
   assert.doesNotThrow(() => defineBranding({ category: { min: 0, max: 0 } })) // min ≤ max, both ≥ 0

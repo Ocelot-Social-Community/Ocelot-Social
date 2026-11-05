@@ -510,6 +510,7 @@
     "POST_PIN_LIMIT_REACHED": "Die maximale Anzahl angehefteter Beiträge ist erreicht. Löse zuerst einen anderen Beitrag.",
     "POST_SAVE_CATEGORY_UNKNOWN": "Mindestens ein Thema gibt es nicht.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Es gibt bereits einen Beitrag mit diesem Slug.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "Der Titel des Beitrags muss zwischen {min} und {max} Zeichen lang sein.",
     "POST_SAVE_TOO_FEW_CATEGORIES": "Es sind zu wenige Themen ausgewählt (mindestens {min}).",
     "POST_SAVE_TOO_MANY_CATEGORIES": "Es sind zu viele Themen ausgewählt (höchstens {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Der Bestätigungscode ist ungültig.",

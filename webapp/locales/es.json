@@ -510,6 +510,7 @@
     "POST_PIN_LIMIT_REACHED": "Se ha alcanzado el número máximo de contribuciones ancladas. Desancla primero otra contribución.",
     "POST_SAVE_CATEGORY_UNKNOWN": "Al menos uno de los temas no existe.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Ya existe una contribución con este slug.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "El título de la contribución debe tener entre {min} y {max} caracteres.",
     "POST_SAVE_TOO_FEW_CATEGORIES": "Hay muy pocos temas seleccionados (al menos {min}).",
     "POST_SAVE_TOO_MANY_CATEGORIES": "Hay demasiados temas seleccionados (como máximo {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "El código de confirmación no es válido.",

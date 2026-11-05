@@ -510,6 +510,7 @@
     "POST_PIN_LIMIT_REACHED": "È stato raggiunto il numero massimo di pubblicazioni fissate. Rimuovi prima un'altra pubblicazione fissata.",
     "POST_SAVE_CATEGORY_UNKNOWN": "Almeno uno degli argomenti non esiste.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Esiste già una pubblicazione con questo slug.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "Il titolo della pubblicazione deve essere compreso tra {min} e {max} caratteri.",
     "POST_SAVE_TOO_FEW_CATEGORIES": "Sono stati selezionati troppo pochi argomenti (almeno {min}).",
     "POST_SAVE_TOO_MANY_CATEGORIES": "Sono stati selezionati troppi argomenti (al massimo {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Il codice di conferma non è valido.",
