@@ -450,6 +450,10 @@
   --video-surface: var(--color-neutral-10);
   --video-surface-deep: var(--color-neutral-0);
   --video-text-soft: var(--color-neutral-70);
+  /* Text on what lies over a video: the black plates (names, speaker chips, "microphone starting") and the
+     dark video surfaces (status, notices). Both stay dark in both themes, so the text stays light in both —
+     --text-color-inverse turns dark. */
+  --video-on-media-color: var(--color-neutral-95);
   --text-color-muted: light-dark(var(--color-neutral-50), rgb(160, 153, 172));
   --text-color-on-primary: var(--color-neutral-100);
   --shadow-ink: var(--color-neutral-0);

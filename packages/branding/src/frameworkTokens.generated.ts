@@ -273,6 +273,7 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'video-call-bar-opacity': '75%',
   'video-call-bar-page-footer-color': 'var(--color-footer-background)',
   'video-call-bar-page-header-color': 'var(--color-header-background)',
+  'video-on-media-color': 'var(--color-neutral-95)',
   'video-surface': 'var(--color-neutral-10)',
   'video-surface-deep': 'var(--color-neutral-0)',
   'video-text-soft': 'var(--color-neutral-70)',

@@ -2798,7 +2798,7 @@ export default {
 
 .video-call__speaker-chip {
   background: rgba(0, 0, 0, 0.65);
-  color: var(--text-color-inverse);
+  color: var(--video-on-media-color);
   padding: 2px var(--space-x-small);
   border-radius: var(--border-radius-rounded);
   font-size: var(--font-size-small);
@@ -2887,7 +2887,7 @@ export default {
   justify-content: center;
   padding: var(--space-small);
   text-align: center;
-  color: var(--text-color-inverse);
+  color: var(--video-on-media-color);
 }
 
 /*  Overlay like the speaker chips, but at the bottom: the body is a row */
@@ -2913,7 +2913,7 @@ export default {
   padding: var(--space-xx-small) var(--space-small);
   border-radius: var(--border-radius-base);
   text-align: center;
-  color: var(--text-color-inverse);
+  color: var(--video-on-media-color);
   background: var(--video-surface);
 }
 

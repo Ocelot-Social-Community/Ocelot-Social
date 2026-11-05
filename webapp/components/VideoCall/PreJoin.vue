@@ -710,7 +710,7 @@ export default {
   padding: var(--space-xx-small) var(--space-small);
   border-radius: var(--border-radius-base);
   background: rgba(0, 0, 0, 0.65);
-  color: var(--text-color-inverse);
+  color: var(--video-on-media-color);
   font-size: var(--font-size-small);
 }
 
