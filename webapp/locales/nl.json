@@ -510,6 +510,7 @@
     "POST_PIN_LIMIT_REACHED": "Het maximale aantal vastgepinde berichten is bereikt. Maak eerst een ander bericht los.",
     "POST_SAVE_CATEGORY_UNKNOWN": "Ten minste één van de onderwerpen bestaat niet.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Er bestaat al een bericht met deze slug.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "De titel van het bericht moet tussen {min} en {max} tekens lang zijn.",
     "POST_SAVE_TOO_FEW_CATEGORIES": "Te weinig onderwerpen geselecteerd (minimaal {min}).",
     "POST_SAVE_TOO_MANY_CATEGORIES": "Te veel onderwerpen geselecteerd (maximaal {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "De bevestigingscode is ongeldig.",

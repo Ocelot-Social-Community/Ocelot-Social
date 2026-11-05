@@ -510,6 +510,7 @@
     "POST_PIN_LIMIT_REACHED": "Достигнуто максимальное количество закреплённых постов. Сначала открепи другой пост.",
     "POST_SAVE_CATEGORY_UNKNOWN": "Как минимум одной из тем не существует.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Пост с таким slug уже существует.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "Заголовок поста должен содержать от {min} до {max} символов.",
     "POST_SAVE_TOO_FEW_CATEGORIES": "Выбрано слишком мало тем (минимум {min}).",
     "POST_SAVE_TOO_MANY_CATEGORIES": "Выбрано слишком много тем (максимум {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Код подтверждения недействителен.",

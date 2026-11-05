@@ -510,6 +510,7 @@
     "POST_PIN_LIMIT_REACHED": "The maximum number of pinned posts has been reached. Unpin another post first.",
     "POST_SAVE_CATEGORY_UNKNOWN": "At least one of the categories does not exist.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "A post with this slug already exists.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "The post title must be between {min} and {max} characters long.",
     "POST_SAVE_TOO_FEW_CATEGORIES": "Too few topics selected (at least {min}).",
     "POST_SAVE_TOO_MANY_CATEGORIES": "Too many topics selected (at most {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "The confirmation code is invalid.",

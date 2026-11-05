@@ -21,7 +21,11 @@ export const Post = defineEntity({
     id: { type: 'string' },
     activityId: { type: ['string', 'null'] },
     objectId: { type: ['string', 'null'] },
-    title: { type: 'string', minLength: 3 },
+    // Only a floor. The brandable bounds live in branding.post.titleLengthMin/-Max and are enforced
+    // by the validation middleware on CreatePost/UpdatePost; a fixed 3 here would make the audit
+    // flag every title a brand with a lower minimum allowed. Must not exceed the branding's
+    // POST_TITLE_LENGTH_FLOOR, which schema.spec.ts asserts.
+    title: { type: 'string', minLength: 1 },
     slug: { type: ['string', 'null'] },
     content: { type: 'string', minLength: 3 },
     deleted: { type: 'boolean' },

@@ -53,6 +53,19 @@ const validateUpdateComment: IMiddlewareResolver = async (resolve, root, args, c
   return resolve(root, args, context, info)
 }
 
+// Same limits as the contribution form in the webapp (ContributionForm.vue), both read from
+// branding.post. `title` is non-null on CreatePost and UpdatePost, so it is always a string here.
+// The trimmed title is what is checked AND what is passed on: stored untrimmed, a title padded with
+// spaces would pass the check and still be saved longer than the brand's maximum.
+const validatePostTitle: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+  const { titleLengthMin: min, titleLengthMax: max } = branding.post
+  const title = args.title.trim()
+  if (title.length < min || title.length > max) {
+    throw new AppError(Errors.POST_SAVE_TITLE_LENGTH_INVALID, { min, max })
+  }
+  return resolve(root, { ...args, title }, context, info)
+}
+
 const validateReport: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const { resourceId } = args
   const { user, driver } = context
@@ -223,6 +236,8 @@ export default {
   Mutation: {
     CreateComment: validateCreateComment,
     UpdateComment: validateUpdateComment,
+    CreatePost: validatePostTitle,
+    UpdatePost: validatePostTitle,
     SignupVerification: validateSignupVerification,
     UpdateUser: validateUpdateUser,
     fileReport: validateReport,

@@ -510,6 +510,7 @@
     "POST_PIN_LIMIT_REACHED": "Është arritur numri maksimal i postimeve të ngulura. Hiq fillimisht një postim tjetër të ngulur.",
     "POST_SAVE_CATEGORY_UNKNOWN": "Të paktën një nga temat nuk ekziston.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Ekziston tashmë një postim me këtë slug.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "Titulli i postimit duhet të ketë midis {min} dhe {max} karaktere.",
     "POST_SAVE_TOO_FEW_CATEGORIES": "Janë zgjedhur shumë pak tema (të paktën {min}).",
     "POST_SAVE_TOO_MANY_CATEGORIES": "Janë zgjedhur shumë tema (më së shumti {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Kodi i konfirmimit është i pavlefshëm.",
