@@ -2869,6 +2869,7 @@ export default {
   /*  The tabs start at the sidebar's edge, as in the floating chat window; the close */
   /*  button at the row's end keeps its space to the edge. */
   padding: 0 var(--space-small) 0 0;
+  background: var(--window-bar-background);
   border-bottom: 1px solid var(--border-color-softest);
 }
 

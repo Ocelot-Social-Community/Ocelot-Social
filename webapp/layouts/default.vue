@@ -423,7 +423,7 @@ export default {
   height: 36px;
   /*  The tabs reach from edge to edge of the window, their underline with them. */
   padding: 0;
-  background: var(--background-color-base);
+  background: var(--window-bar-background);
   border-bottom: 1px solid var(--border-color-softest);
 }
 
