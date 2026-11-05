@@ -501,6 +501,13 @@ describe('Mapbox API URL', () => {
     expect(CONFIG.MAPBOX_API_URL).toBe('http://mapbox:8080')
   })
 
+  // The geocoding paths are appended to it; `http://mapbox:8080/` would make them `//geocoding/…`.
+  it('drops trailing slashes from MAPBOX_API_URL', async () => {
+    const { default: CONFIG } = await loadConfig({ MAPBOX_API_URL: 'http://mapbox:8080//' })
+
+    expect(CONFIG.MAPBOX_API_URL).toBe('http://mapbox:8080')
+  })
+
   // `||`: an empty value would turn every geocoding request into a relative URL.
   it('falls back to Mapbox itself for an empty or absent MAPBOX_API_URL', async () => {
     const { default: empty } = await loadConfig({ MAPBOX_API_URL: '' })

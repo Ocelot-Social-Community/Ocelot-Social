@@ -191,7 +191,17 @@ export const startMapboxStub = async ({
       reply(401, { message: 'Not Authorized - No Token' })
       return
     }
-    const query = decodeURIComponent(route[1])
+    let query: string
+    try {
+      query = decodeURIComponent(route[1])
+    } catch (error) {
+      if (!(error instanceof URIError)) {
+        throw error
+      }
+      // A malformed escape (`%ZZ`) is the client's mistake; it must not take the service down.
+      reply(400, { message: 'Invalid path encoding' })
+      return
+    }
     const { ids, body } = geocode(query, url.searchParams)
     if (log) {
       // eslint-disable-next-line no-console -- the service's request log, read when a test misses

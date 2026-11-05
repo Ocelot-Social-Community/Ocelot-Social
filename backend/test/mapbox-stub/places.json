@@ -244,6 +244,126 @@
       "context": ["region.20004", "country.10003"]
     },
     {
+      "id": "place.40006",
+      "types": ["place"],
+      "names": {
+        "en": "Stralsund",
+        "ru": "Штральзунд"
+      },
+      "center": [13.089, 54.3091],
+      "radiusKm": 8,
+      "rank": 3,
+      "context": ["country.10001"]
+    },
+    {
+      "id": "place.40007",
+      "types": ["place"],
+      "names": {
+        "en": "Nisdorf"
+      },
+      "center": [12.9333, 54.3833],
+      "radiusKm": 3,
+      "rank": 1,
+      "context": ["country.10001"]
+    },
+    {
+      "id": "place.40008",
+      "types": ["place"],
+      "names": {
+        "en": "Zingst",
+        "ru": "Цингст"
+      },
+      "center": [12.6886, 54.4357],
+      "radiusKm": 5,
+      "rank": 1,
+      "context": ["country.10001"]
+    },
+    {
+      "id": "place.40009",
+      "types": ["place"],
+      "names": {
+        "en": "Dresden",
+        "fr": "Dresde",
+        "it": "Dresda",
+        "es": "Dresde",
+        "pl": "Drezno",
+        "ru": "Дрезден",
+        "sq": "Dresdeni"
+      },
+      "center": [13.7373, 51.0504],
+      "radiusKm": 15,
+      "rank": 8,
+      "context": ["country.10001"]
+    },
+    {
+      "id": "place.40010",
+      "types": ["place"],
+      "names": {
+        "en": "Rullstorf"
+      },
+      "center": [10.5333, 53.2833],
+      "radiusKm": 3,
+      "rank": 1,
+      "context": ["country.10001"]
+    },
+    {
+      "id": "region.20006",
+      "types": ["region"],
+      "names": {
+        "en": "North Cyprus",
+        "de": "Nordzypern",
+        "fr": "Chypre du Nord",
+        "nl": "Noord-Cyprus",
+        "it": "Cipro del Nord",
+        "es": "Chipre del Norte",
+        "pt": "Chipre do Norte",
+        "pl": "Cypr Północny",
+        "ru": "Северный Кипр",
+        "sq": "Qiproja e Veriut"
+      },
+      "center": [33.6, 35.25],
+      "radiusKm": 70,
+      "rank": 50,
+      "context": []
+    },
+    {
+      "id": "place.40011",
+      "types": ["place"],
+      "names": {
+        "en": "Niederdorla"
+      },
+      "center": [10.4486, 51.1607],
+      "radiusKm": 4,
+      "rank": 1,
+      "context": ["country.10001"]
+    },
+    {
+      "id": "place.40012",
+      "types": ["place"],
+      "names": {
+        "en": "Bahretal"
+      },
+      "center": [13.89, 50.87],
+      "radiusKm": 6,
+      "rank": 1,
+      "context": ["country.10001"]
+    },
+    {
+      "id": "place.40013",
+      "types": ["place"],
+      "names": {
+        "en": "Stuttgart",
+        "it": "Stoccarda",
+        "pl": "Stuttgart",
+        "ru": "Штутгарт",
+        "sq": "Shtutgarti"
+      },
+      "center": [9.1829, 48.7758],
+      "radiusKm": 12,
+      "rank": 8,
+      "context": ["country.10001"]
+    },
+    {
       "id": "address.50001",
       "types": ["address"],
       "names": {
