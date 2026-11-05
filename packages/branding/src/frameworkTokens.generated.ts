@@ -42,9 +42,11 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'border-radius-x-large': '5px',
   'border-size-base': '1px',
   'border-size-large': '3px',
-  'box-shadow-base': '0px 12px 26px -4px rgba(0, 0, 0, 0.1)',
-  'box-shadow-large': '0 10px 20px 0 rgba(0, 0, 0, 0.11), 0 3px 10px 0 rgba(0, 0, 0, 0.08)',
-  'box-shadow-x-large': '0 15px 30px 0 rgba(0, 0, 0, 0.11), 0 5px 15px 0 rgba(0, 0, 0, 0.08)',
+  'box-shadow-base': '0px 12px 26px -4px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.45))',
+  'box-shadow-large':
+    '0 10px 20px 0 light-dark(rgba(0, 0, 0, 0.11), rgba(0, 0, 0, 0.5)), 0 3px 10px 0 light-dark(rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.4))',
+  'box-shadow-x-large':
+    '0 15px 30px 0 light-dark(rgba(0, 0, 0, 0.11), rgba(0, 0, 0, 0.5)), 0 5px 15px 0 light-dark(rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.4))',
   'chat-accent': 'light-dark(#1976d2, rgb(100, 170, 240))',
   'chat-accent-contrast': 'light-dark(#fff, rgb(24, 23, 27))',
   'chat-audio-color': 'light-dark(#455247, rgb(178, 172, 188))',
@@ -267,7 +269,7 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'tooltip-color': 'light-dark(var(--text-color-inverse), rgb(232, 230, 236))',
   'video-call-bar-blur': '8px',
   'video-call-bar-controls-color': 'var(--background-color-soft)',
-  'video-call-bar-header-color': 'var(--color-header-background)',
+  'video-call-bar-header-color': 'var(--background-color-base)',
   'video-call-bar-opacity': '75%',
   'video-call-bar-page-footer-color': 'var(--color-footer-background)',
   'video-call-bar-page-header-color': 'var(--color-header-background)',

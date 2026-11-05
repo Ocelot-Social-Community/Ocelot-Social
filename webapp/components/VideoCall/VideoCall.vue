@@ -2700,6 +2700,13 @@ export default {
 
 /*  The header itself — avatar, title, where its buttons go — is RoomHeader's. What is */
 /*  the call's own are the things put into it. */
+/*  Its ground is the tab bar's (the base background), not the page header's: in the dark theme the */
+/*  two would be the same dark and the call's header would not stand off the page's. RoomHeader */
+/*  paints with --color-header-background, so it is set here for the header and what it holds. */
+.video-call__header {
+  --color-header-background: var(--background-color-base);
+}
+
 .video-call__count {
   background: var(--color-primary);
   color: var(--color-primary-inverse);

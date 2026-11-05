@@ -386,6 +386,7 @@ export default {
 
 .chat-modul {
   background-color: var(--chat-module-background);
+  box-shadow: var(--box-shadow-large);
   width: 355px;
   position: fixed;
   bottom: 45px;
