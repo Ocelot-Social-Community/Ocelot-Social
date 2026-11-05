@@ -1,5 +1,32 @@
 <template>
+  <!-- The mobile menu's row: icon, the current theme in words, the whole row a button — like its
+       neighbours (HeaderMenu .mobile-nav-item). -->
+  <div
+    v-if="row"
+    class="theme-switch theme-switch--row mobile-nav-item"
+    data-test="theme-switch"
+    role="button"
+    tabindex="0"
+    @click.prevent="next"
+    @keydown.enter.prevent="next"
+    @keydown.space.prevent="next"
+  >
+    <os-button
+      variant="primary"
+      appearance="ghost"
+      circle
+      tabindex="-1"
+      aria-hidden="true"
+      class="mobile-nav-icon-button mobile-icon-col"
+    >
+      <template #icon>
+        <os-icon :icon="icon" />
+      </template>
+    </os-button>
+    <span>{{ label }}</span>
+  </div>
   <os-button
+    v-else
     class="theme-switch"
     data-test="theme-switch"
     variant="primary"
@@ -25,6 +52,10 @@ const ICONS = { system: 'themeSystem', light: 'themeLight', dark: 'themeDark' }
 export default {
   name: 'ThemeSwitch',
   components: { OsButton, OsIcon },
+  props: {
+    // A menu row with the theme in words, instead of the round icon button.
+    row: { type: Boolean, default: false },
+  },
   data() {
     return { theme: normalizeTheme(this.$cookies && this.$cookies.get(THEME_COOKIE)) }
   },

@@ -415,7 +415,7 @@
           </div>
 
           <div v-if="hasThemeChoice" class="mobile-theme-section">
-            <theme-switch class="mobile-theme-switch" />
+            <theme-switch row class="mobile-theme-switch" />
           </div>
 
           <!-- Locale switch collapsible (only when open) -->
@@ -1217,7 +1217,11 @@ export default {
   }
 
   .mobile-theme-section {
-    padding: 2px var(--space-small);
+    padding: 2px 0;
+
+    > .mobile-nav-item {
+      cursor: pointer;
+    }
   }
 
   .mobile-locale-section {

@@ -2,9 +2,10 @@ import { mount } from '@vue/test-utils'
 import ThemeSwitch from './ThemeSwitch.vue'
 import { iconRegistry } from '~/utils/iconRegistry'
 
-const factory = (cookie) => {
+const factory = (cookie, propsData = {}) => {
   const $cookies = { get: jest.fn(() => cookie), set: jest.fn() }
   const wrapper = mount(ThemeSwitch, {
+    propsData,
     mocks: { $t: (k) => k, $cookies },
     directives: { tooltip: {} },
     stubs: {
@@ -45,5 +46,33 @@ describe('ThemeSwitch', () => {
       'system',
       expect.objectContaining({ path: '/' }),
     )
+  })
+
+  describe('as a menu row', () => {
+    it('shows the theme in words, and the whole row switches it', async () => {
+      const { wrapper, $cookies } = factory('light', { row: true })
+      expect(wrapper.find('[role="button"]').text()).toBe('themeSwitch.light')
+      await wrapper.find('[role="button"]').trigger('click')
+      expect(wrapper.vm.theme).toBe('dark')
+      expect(wrapper.find('[role="button"]').text()).toBe('themeSwitch.dark')
+      expect($cookies.set).toHaveBeenCalledWith(
+        'ocelot-theme',
+        'dark',
+        expect.objectContaining({ path: '/' }),
+      )
+    })
+
+    it('switches by keyboard, too', async () => {
+      const { wrapper } = factory('light', { row: true })
+      await wrapper.find('[role="button"]').trigger('keydown.enter')
+      expect(wrapper.vm.theme).toBe('dark')
+      await wrapper.find('[role="button"]').trigger('keydown.space')
+      expect(wrapper.vm.theme).toBe('system')
+    })
+
+    it('is only the round icon button without the prop', () => {
+      expect(factory('light').wrapper.find('[role="button"]').exists()).toBe(false)
+      expect(factory('light').wrapper.find('button.os').exists()).toBe(true)
+    })
   })
 })
