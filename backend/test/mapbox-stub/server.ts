@@ -22,7 +22,7 @@ type Point = [number, number]
 
 interface Place {
   id: string
-  type: string
+  types: string[]
   names: Map<string, string>
   center: Point
   radiusKm: number
@@ -87,7 +87,7 @@ const localized = (
 const toFeature = (place: Place, languages: string[]) => ({
   id: place.id,
   type: 'Feature',
-  place_type: [place.type],
+  place_type: place.types,
   relevance: 1,
   properties: {},
   ...localized(languages, 'text', (language) => nameOf(place, language)),
@@ -139,7 +139,9 @@ const reverse = (point: Point, candidates: Place[]): Place[] =>
 
 export const geocode = (query: string, params: URLSearchParams) => {
   const types = params.get('types')?.split(',').filter(Boolean)
-  const candidates = types?.length ? places.filter((place) => types.includes(place.type)) : places
+  const candidates = types?.length
+    ? places.filter((place) => place.types.some((type) => types.includes(type)))
+    : places
   const languages = (params.get('language')?.split(',') ?? ['en']).map((language) =>
     LOCALES.includes(language) ? language : 'en',
   )

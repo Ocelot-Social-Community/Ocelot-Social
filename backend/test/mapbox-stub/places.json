@@ -5,7 +5,8 @@
     "names, coordinates rounded public knowledge; ids are made up except where a spec pins a real one",
     "(place.23259194, country.8738). Missing translations fall back to `en`.",
     "",
-    "  type      Mapbox place type; forward searches filter on it, reverse lookups ask for one",
+    "  types     Mapbox place types (place_type); a city-state such as Hamburg or Berlin is both a region",
+    "            and a place, as Mapbox has it. Forward searches and reverse lookups filter on them",
     "  center    [lng, lat], as Mapbox has it",
     "  radiusKm  how far from `center` a reverse lookup still lands on the place",
     "  rank      ordering of forward results, highest first (Mapbox's own prominence)",
@@ -15,7 +16,7 @@
   "places": [
     {
       "id": "country.10001",
-      "type": "country",
+      "types": ["country"],
       "names": {
         "en": "Germany",
         "de": "Deutschland",
@@ -35,7 +36,7 @@
     },
     {
       "id": "country.10002",
-      "type": "country",
+      "types": ["country"],
       "names": {
         "en": "France",
         "de": "Frankreich",
@@ -55,7 +56,7 @@
     },
     {
       "id": "country.10003",
-      "type": "country",
+      "types": ["country"],
       "names": {
         "en": "United States",
         "de": "Vereinigte Staaten",
@@ -75,7 +76,7 @@
     },
     {
       "id": "country.8738",
-      "type": "country",
+      "types": ["country"],
       "names": {
         "en": "Switzerland",
         "de": "Schweiz",
@@ -95,7 +96,7 @@
     },
     {
       "id": "region.20001",
-      "type": "region",
+      "types": ["region"],
       "names": {
         "en": "Saxony-Anhalt",
         "de": "Sachsen-Anhalt",
@@ -115,7 +116,7 @@
     },
     {
       "id": "region.20002",
-      "type": "region",
+      "types": ["region"],
       "names": {
         "en": "Brandenburg",
         "ru": "Бранденбург"
@@ -127,7 +128,7 @@
     },
     {
       "id": "region.20004",
-      "type": "region",
+      "types": ["region"],
       "names": {
         "en": "New Jersey",
         "ru": "Нью-Джерси"
@@ -139,7 +140,7 @@
     },
     {
       "id": "region.20005",
-      "type": "region",
+      "types": ["region"],
       "names": {
         "en": "Texas",
         "ru": "Техас"
@@ -151,7 +152,7 @@
     },
     {
       "id": "district.30001",
-      "type": "district",
+      "types": ["district"],
       "names": {
         "en": "Havelland District",
         "de": "Kreis Havelland"
@@ -163,7 +164,7 @@
     },
     {
       "id": "place.23259194",
-      "type": "place",
+      "types": ["place"],
       "names": {
         "en": "Friesack"
       },
@@ -174,7 +175,7 @@
     },
     {
       "id": "place.40001",
-      "type": "place",
+      "types": ["region", "place"],
       "names": {
         "en": "Hamburg",
         "fr": "Hambourg",
@@ -190,7 +191,7 @@
     },
     {
       "id": "place.40002",
-      "type": "place",
+      "types": ["region", "place"],
       "names": {
         "en": "Berlin",
         "it": "Berlino",
@@ -206,7 +207,7 @@
     },
     {
       "id": "place.40003",
-      "type": "place",
+      "types": ["place"],
       "names": {
         "en": "Paris",
         "it": "Parigi",
@@ -222,7 +223,7 @@
     },
     {
       "id": "place.40004",
-      "type": "place",
+      "types": ["place"],
       "names": {
         "en": "Paris"
       },
@@ -233,7 +234,7 @@
     },
     {
       "id": "place.40005",
-      "type": "place",
+      "types": ["place"],
       "names": {
         "en": "Hamburg"
       },
@@ -244,7 +245,7 @@
     },
     {
       "id": "address.50001",
-      "type": "address",
+      "types": ["address"],
       "names": {
         "en": "Plan"
       },
