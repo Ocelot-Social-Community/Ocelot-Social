@@ -387,6 +387,12 @@
   --color-donation-bar: var(--color-primary);
 
   --color-donation-bar-light: var(--color-primary-light);
+  /* The label lies half on the filled green, half on the grey: in the dark theme its light text needs a
+     dark halo to read on the green. None in the light theme, where the text is dark. */
+  --donation-bar-label-shadow:
+    0 0 2px light-dark(transparent, rgb(0, 0, 0)), 0 0 4px light-dark(transparent, rgb(0, 0, 0)),
+    0 0 8px light-dark(transparent, rgba(0, 0, 0, 0.9)),
+    0 0 14px light-dark(transparent, rgba(0, 0, 0, 0.7));
   /**
  * @tokens Toast Color
  */

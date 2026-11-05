@@ -178,6 +178,8 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'color-warning-inverse': 'rgb(253, 247, 241)',
   'color-yellow': 'rgb(245, 196, 0)',
   'container-max-width-x-large': '1200px',
+  'donation-bar-label-shadow':
+    '0 0 2px light-dark(transparent, rgb(0, 0, 0)), 0 0 4px light-dark(transparent, rgb(0, 0, 0)), 0 0 8px light-dark(transparent, rgba(0, 0, 0, 0.9)), 0 0 14px light-dark(transparent, rgba(0, 0, 0, 0.7))',
   'duration-base': '0.5s',
   'duration-short': '0.08s',
   'ease-out': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',

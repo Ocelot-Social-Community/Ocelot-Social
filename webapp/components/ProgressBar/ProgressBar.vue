@@ -112,6 +112,7 @@ export default {
 
 .progress-bar__label {
   position: relative;
+  text-shadow: var(--donation-bar-label-shadow);
 
   @media (max-width: 350px) {
     font-size: var(--font-size-small);
