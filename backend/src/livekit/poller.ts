@@ -18,6 +18,7 @@ import { serverPubsub } from '@src/context'
 import { getDriver } from '@src/db/neo4j'
 import { groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
 import { endCallSessionsOfMissingRoom } from '@src/livekit/callSession'
+import { settleAndPublishModeration } from '@src/livekit/moderationService'
 import { markRoomTold, takeToldRooms } from '@src/livekit/toldRooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
@@ -117,6 +118,11 @@ const pollOnce = async () => {
           }
         }
         await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count })
+        // Somebody came or went. If it was the last moderator, the call needs another one —
+        // nothing else notices a moderator who closed the tab (see moderationService.ts).
+        if (count > 0) {
+          await settleAndPublishModeration({ driver: getDriver(), config: CONFIG }, groupId)
+        }
         // Only once it is out: a count noted before a publish that failed would look published
         // to the next poll, which would then keep quiet about it. What is noted is the LIST's
         // count, which the next poll compares with — a list still lagging behind the

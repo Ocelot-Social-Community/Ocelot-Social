@@ -1,0 +1,3 @@
+mutation SetVideoCallFloor($groupId: ID!, $userId: ID!, $floor: Boolean!) {
+  setVideoCallFloor(groupId: $groupId, userId: $userId, floor: $floor)
+}

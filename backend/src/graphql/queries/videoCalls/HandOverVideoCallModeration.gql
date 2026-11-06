@@ -1,0 +1,3 @@
+mutation HandOverVideoCallModeration($groupId: ID!, $toUserId: ID, $everyone: Boolean) {
+  handOverVideoCallModeration(groupId: $groupId, toUserId: $toUserId, everyone: $everyone)
+}

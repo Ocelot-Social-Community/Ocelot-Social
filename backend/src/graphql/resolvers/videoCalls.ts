@@ -7,32 +7,32 @@
 import { randomBytes } from 'node:crypto'
 
 import { withFilter } from 'graphql-subscriptions'
-import { AccessToken, RoomServiceClient, TwirpError } from 'livekit-server-sdk'
+import { AccessToken, TwirpError } from 'livekit-server-sdk'
 
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@constants/subscriptions'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
 import { isActiveMembership, visibilityOf } from '@graphql/resolvers/helpers/groupAccessCypher'
 import { joinCallSession } from '@src/livekit/callSession'
+import { readModeration } from '@src/livekit/moderation'
+import { settleAndPublishModeration } from '@src/livekit/moderationService'
+import {
+  groupIdFromRoomName,
+  liveKitConfigOf,
+  roomNameForGroup,
+  roomServiceFor,
+  userIdOf,
+} from '@src/livekit/rooms'
 import { noteCountTold } from '@src/livekit/toldRooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
 import type { Context } from '@src/context'
+import type { LiveKitConfig } from '@src/livekit/rooms'
 import type { Driver } from 'neo4j-driver'
 
-const ROOM_PREFIX = 'group-'
-
-export const roomNameForGroup = (groupId: string) => `${ROOM_PREFIX}${groupId}`
-export const groupIdFromRoomName = (roomName: string | null | undefined): string | null =>
-  roomName?.startsWith(ROOM_PREFIX) ? roomName.slice(ROOM_PREFIX.length) : null
-
-const httpUrlFor = (livekitUrl: string) =>
-  livekitUrl.startsWith('wss://')
-    ? livekitUrl.replace(/^wss:\/\//, 'https://')
-    : livekitUrl.startsWith('ws://')
-      ? livekitUrl.replace(/^ws:\/\//, 'http://')
-      : livekitUrl
+// Where the poller and the webhook have always found them.
+export { groupIdFromRoomName, roomNameForGroup } from '@src/livekit/rooms'
 
 // Returns the group's type if the user has an active (non-pending) membership; throws
 // VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND otherwise. Only the SUBSCRIPTION filter still asks
@@ -95,21 +95,31 @@ export const assertGroupMembershipCached = async (
   }
 }
 
-const getUserAvatarUrl = async (driver: Driver, userId: string): Promise<string | null> => {
+// What the other participants are shown of a user: the avatar for their tile, the slug for the
+// link to their profile in the call's list of participants.
+const getUserCallProfile = async (
+  driver: Driver,
+  userId: string,
+): Promise<{ avatarUrl: string | null; slug: string }> => {
   const session = driver.session()
   try {
     const result = await session.readTransaction(async (tx) =>
       tx.run(
         `
-          MATCH (u:User { id: $userId })-[:AVATAR_IMAGE]->(img:Image)
-          RETURN img.url AS url
+          MATCH (u:User { id: $userId })
+          OPTIONAL MATCH (u)-[:AVATAR_IMAGE]->(img:Image)
+          RETURN img.url AS url, u.slug AS slug
           LIMIT 1
         `,
         { userId },
       ),
     )
-    const url = result.records[0]?.get('url') as string | undefined
-    return url || null
+    // Always a row: the user is the one asking.
+    const record = result.records[0]
+    return {
+      avatarUrl: (record.get('url') as string | null) || null,
+      slug: record.get('slug') as string,
+    }
   } finally {
     await session.close()
   }
@@ -125,30 +135,6 @@ const LIVEKIT_API_TIMEOUT_MS = 4000
 // refresh arrives; two hours used to let a copied token outlive both decisions.
 const JOIN_TOKEN_TTL = '10m'
 
-interface LiveKitConfig {
-  LIVEKIT_URL: string
-  LIVEKIT_API_KEY: string
-  LIVEKIT_API_SECRET: string
-}
-
-// The LiveKit part of the server config, when it is complete. The videoConference policy
-// requires it (requiresEnv), so with the feature on this is never null.
-const liveKitConfigOf = ({
-  LIVEKIT_URL,
-  LIVEKIT_API_KEY,
-  LIVEKIT_API_SECRET,
-}: Partial<Record<keyof LiveKitConfig, string>>): LiveKitConfig | null =>
-  LIVEKIT_URL && LIVEKIT_API_KEY && LIVEKIT_API_SECRET
-    ? { LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET }
-    : null
-
-const roomServiceFor = (config: LiveKitConfig) =>
-  new RoomServiceClient(
-    httpUrlFor(config.LIVEKIT_URL),
-    config.LIVEKIT_API_KEY,
-    config.LIVEKIT_API_SECRET,
-  )
-
 export interface RoomParticipants {
   /** LiveKit connections, i.e. tabs and devices — two people sharing an account count twice. */
   count: number
@@ -157,22 +143,6 @@ export interface RoomParticipants {
    * connections, like the count: it may be two people sharing an account.
    */
   userIds: string[]
-}
-
-// The user behind a connection: the join token puts it into the metadata, and the identity is
-// `<userId>#<suffix>` (see joinGroupVideoCall) for a participant whose metadata is unreadable.
-const userIdOf = (participant: { identity?: string; metadata?: string }): string | null => {
-  try {
-    const { userId } = JSON.parse(participant.metadata ?? '') as { userId?: unknown }
-    if (typeof userId === 'string' && userId) {
-      return userId
-    }
-    // eslint-disable-next-line no-catch-all/no-catch-all
-  } catch {
-    // fall through to the identity
-  }
-  const [userId] = (participant.identity ?? '').split('#')
-  return userId || null
 }
 
 export const getRoomParticipants = async (
@@ -489,13 +459,18 @@ export default {
       if (!call?.userIds.has(context.user.id)) {
         throw new AppError(Errors.VIDEO_CALL_CHAT_NOT_IN_CALL)
       }
-      return joinCallSession(context.driver, {
+      const chatRoomId = await joinCallSession(context.driver, {
         groupId: params.groupId,
         userId: context.user.id,
         livekitRoom: roomName,
         livekitSid: call.sid,
         presentUserIds: [...call.userIds],
       })
+      // The session is where the moderation lives: whoever opened it moderates, whoever
+      // started the call gets it back on returning. Every participant learns of it from the
+      // room's metadata.
+      await settleAndPublishModeration(context, params.groupId)
+      return chatRoomId
     },
     joinGroupVideoCall: async (_root, params: { groupId: string }, context) => {
       const roomName = roomNameForGroup(params.groupId)
@@ -512,12 +487,19 @@ export default {
         if (!authorization?.has('group.videoCall.create')) {
           throw new AppError(Errors.VIDEO_CALL_START_NOT_PERMITTED)
         }
+      } else {
+        // Removed from the running call: not again while it lasts. The next call is a new
+        // session and lets them in; keeping somebody out for good is leaving the group.
+        const moderation = await readModeration(context.driver, params.groupId)
+        if (moderation?.removedIds.includes(context.user.id)) {
+          throw new AppError(Errors.VIDEO_CALL_REMOVED_FROM_CALL)
+        }
       }
       // LiveKit treats `identity` as a unique key in a room; two connections
       // with the same identity kick each other out. Append a random suffix
       // so the same user can be present from multiple tabs / devices.
       const identity = `${String(context.user.id)}#${randomBytes(4).toString('hex')}`
-      const avatarUrl = await getUserAvatarUrl(context.driver, context.user.id)
+      const { avatarUrl, slug } = await getUserCallProfile(context.driver, context.user.id)
       const at = new AccessToken(
         context.config.LIVEKIT_API_KEY,
         context.config.LIVEKIT_API_SECRET,
@@ -531,6 +513,7 @@ export default {
           metadata: JSON.stringify({
             userId: context.user.id,
             avatarUrl,
+            slug,
           }),
         },
       )

@@ -1,0 +1,3 @@
+mutation SetVideoCallModerator($groupId: ID!, $userId: ID!, $moderator: Boolean!) {
+  setVideoCallModerator(groupId: $groupId, userId: $userId, moderator: $moderator)
+}

@@ -1,0 +1,3 @@
+query VideoCallModerationSuccessor($groupId: ID!) {
+  videoCallModerationSuccessor(groupId: $groupId)
+}

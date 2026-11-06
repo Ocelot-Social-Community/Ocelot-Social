@@ -50,10 +50,13 @@ describe('default.vue', () => {
         'videoCall/phase': () => 'idle',
         'videoCall/chatRoomId': () => null,
         'videoCall/pageBars': (state) => state.pageBars,
+        'videoCall/participantsOpen': () => false,
+        'videoCall/participantsView': () => null,
       },
       mutations: {
         'chat/SET_OPEN_CHAT': jest.fn(),
         'videoCall/SET_ENABLED': jest.fn(),
+        'videoCall/SET_PARTICIPANTS_OPEN': jest.fn(),
       },
     })
   })
@@ -188,6 +191,71 @@ describe('default.vue', () => {
         ).toBe(false)
         expect(shows({ showVideoCall: false })).toBe(false)
         expect(shows({ videoCallPhase: 'prejoin' })).toBe(false)
+      })
+    })
+
+    describe('participants of the parked call in the floating window', () => {
+      const view = {
+        people: [{ userId: 'u1' }],
+        moderation: {},
+        mayTakeOver: false,
+        locallyMuted: {},
+      }
+      const inWindow = (overrides = {}) =>
+        Default.computed.participantsInWindow.call({
+          showVideoCall: true,
+          videoCallMinimized: true,
+          isMobile: false,
+          videoCallPhase: 'in-call',
+          participantsOpen: true,
+          participantsView: view,
+          ...overrides,
+        })
+
+      it('are shown beside the parked call while the list is open', () => {
+        expect(inWindow()).toBe(true)
+      })
+
+      it('are not shown in the maximized call, on a phone, outside a call or with the list closed', () => {
+        expect(inWindow({ videoCallMinimized: false })).toBe(false)
+        expect(inWindow({ isMobile: true })).toBe(false)
+        expect(inWindow({ videoCallPhase: 'connecting' })).toBe(false)
+        expect(inWindow({ participantsOpen: false })).toBe(false)
+        expect(inWindow({ participantsView: null })).toBe(false)
+      })
+
+      it('keep the tabs offered without a chat of the call open', () => {
+        expect(
+          Default.computed.showCallChatTabs.call({
+            showVideoCall: true,
+            videoCallPhase: 'in-call',
+            videoCallChatRoomId: null,
+            callChatTab: null,
+            participantsInWindow: true,
+          }),
+        ).toBe(true)
+      })
+
+      it('are as high as the chat they stand for', () => {
+        expect(Default.computed.participantsHeight.call({})).toBe('calc(100dvh - 500px)')
+      })
+
+      it('hand what is done for oneself to the call, and close with the window', () => {
+        const spotlightPerson = jest.fn()
+        Default.methods.callAction.call(
+          { $refs: { videoCall: { spotlightPerson } } },
+          'spotlightPerson',
+          'u1',
+        )
+        expect(spotlightPerson).toHaveBeenCalledWith('u1')
+        expect(() =>
+          Default.methods.callAction.call({ $refs: {} }, 'spotlightPerson'),
+        ).not.toThrow()
+        const setParticipantsOpen = jest.fn()
+        const showChat = jest.fn()
+        Default.methods.closeSingleRoom.call({ setParticipantsOpen, showChat })
+        expect(setParticipantsOpen).toHaveBeenCalledWith(false)
+        expect(showChat).toHaveBeenCalled()
       })
     })
 

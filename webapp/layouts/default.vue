@@ -20,7 +20,7 @@
     <page-footer class="desktop-footer" />
     <div id="overlay" />
     <div
-      v-if="getShowChat.showChat && !isMobile && !chatRenderedElsewhere"
+      v-if="(getShowChat.showChat && !isMobile && !chatRenderedElsewhere) || participantsInWindow"
       :class="['chat-modul', { 'chat-modul--with-video': showVideoCall && videoCallMinimized }]"
     >
       <!--
@@ -40,7 +40,7 @@
         >
           <!-- No larger view for the call's conference chat: it is reached from the call only. -->
           <os-button
-            v-if="callChatTab === 'group'"
+            v-if="callChatTab === 'group' && !participantsInWindow"
             data-test="chat-modul-expand"
             as="nuxt-link"
             :to="{ name: 'chat', query: { groupId: videoCallGroupId } }"
@@ -71,13 +71,35 @@
         <div class="chat-modul__tabs">
           <call-chat-tabs
             exportable
+            with-participants
+            :participant-count="participantsView ? participantsView.people.length : 0"
             :exporting="chatExporting"
             :exportEmpty="chatEmpty"
             @export="exportChat"
           />
         </div>
       </template>
-      <client-only>
+      <!--
+        The list of the call's participants, as in the call's own sidebar; what is done there for
+        oneself (show somebody large, mute somebody for oneself, switch something off) is the
+        call's doing.
+      -->
+      <div
+        v-if="participantsInWindow"
+        class="chat-modul__participants"
+        :style="{ height: participantsHeight }"
+      >
+        <call-participants
+          :people="participantsView.people"
+          :moderation="participantsView.moderation"
+          :may-take-over="participantsView.mayTakeOver"
+          :locally-muted="participantsView.locallyMuted"
+          @spotlight="callAction('spotlightPerson', $event)"
+          @local-mute="(userId, muted) => callAction('muteForMe', userId, muted)"
+          @switch-off="callAction('syncSwitchedOff', $event)"
+        />
+      </div>
+      <client-only v-else>
         <chat
           ref="chat"
           :key="getShowChat.roomId || getShowChat.groupId || getShowChat.chatUserId"
@@ -97,7 +119,7 @@
     <client-only>
       <dock side="left" />
       <dock side="right" />
-      <video-call v-if="showVideoCall" />
+      <video-call v-if="showVideoCall" ref="videoCall" />
     </client-only>
   </div>
 </template>
@@ -113,6 +135,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import Chat from '~/components/Chat/Chat.vue'
 import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import CallChatTabs from '~/components/VideoCall/CallChatTabs.vue'
+import CallParticipants from '~/components/VideoCall/CallParticipants.vue'
 import { activeCallChatTab } from '~/components/VideoCall/callChat'
 import Dock from '~/components/Dock/Dock.vue'
 import VideoCall from '~/components/VideoCall/VideoCall.vue'
@@ -132,6 +155,7 @@ export default {
     PageFooter,
     Chat,
     CallChatTabs,
+    CallParticipants,
     RoomHeader,
     OsButton,
     OsIcon,
@@ -164,7 +188,25 @@ export default {
       videoCallPhase: 'videoCall/phase',
       videoCallChatRoomId: 'videoCall/chatRoomId',
       videoCallPageBars: 'videoCall/pageBars',
+      participantsOpen: 'videoCall/participantsOpen',
+      participantsView: 'videoCall/participantsView',
     }),
+    // The participants of the parked call, shown in this window: there is no sidebar while the
+    // call is parked. Without a chat open as well — the list keeps the window open by itself.
+    participantsInWindow() {
+      return (
+        this.showVideoCall &&
+        this.videoCallMinimized &&
+        !this.isMobile &&
+        this.videoCallPhase === 'in-call' &&
+        this.participantsOpen &&
+        !!this.participantsView
+      )
+    },
+    // As high as the chat it stands for (Chat.vue's chatHeight beside a parked call).
+    participantsHeight() {
+      return `calc(100dvh - ${420 + CALL_CHAT_TABS_HEIGHT + CALL_CHAT_HEADER_HEIGHT}px)`
+    },
     chatLivesInVideoSidebar() {
       // Move the chat into the call's sidebar **only when the chat is for the
       // very same group as the video call** — or is the call's own conference
@@ -197,8 +239,7 @@ export default {
       return (
         this.showVideoCall &&
         this.videoCallPhase === 'in-call' &&
-        !!this.videoCallChatRoomId &&
-        this.callChatTab !== null
+        ((!!this.videoCallChatRoomId && this.callChatTab !== null) || !!this.participantsInWindow)
       )
     },
     // The hint above the messages, for the two chats of a running call only: the same as
@@ -261,9 +302,16 @@ export default {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
       setVideoCallEnabled: 'videoCall/SET_ENABLED',
+      setParticipantsOpen: 'videoCall/SET_PARTICIPANTS_OPEN',
     }),
     closeSingleRoom() {
+      this.setParticipantsOpen(false)
       this.showChat({ showChat: false, chatUserId: null, groupId: null })
+    },
+    // What the list asks of the call itself; the call is mounted while there is a list.
+    callAction(method, ...args) {
+      const call = this.$refs.videoCall
+      if (call) call[method](...args)
     },
     // The export is the chat's own doing; only its button sits in the header drawn here.
     async exportChat() {
@@ -418,6 +466,12 @@ export default {
   padding: 0;
   background: var(--background-color-base);
   border-bottom: 1px solid var(--color-neutral-85);
+}
+
+.chat-modul__participants {
+  display: flex;
+  flex-direction: column;
+  background: var(--background-color-base);
 }
 
 .chat-modul--with-video {

@@ -1272,6 +1272,11 @@ type Mutation {
   generatePersonalInviteCode(comment: String = null, expiresAt: String = null): InviteCode!
 
   """
+  Hand the moderation of the group's running call on before leaving it: to the user named, or to everybody, or — with neither — to whom it would go anyway (videoCallModerationSuccessor). Requires being a moderator named as such. Returns true.
+  """
+  handOverVideoCallModeration(everyone: Boolean, groupId: ID!, toUserId: ID): Boolean!
+
+  """
   Invalidate one of your invite codes so it can no longer be redeemed. Requires authentication.
   """
   invalidateInviteCode(code: String!): InviteCode
@@ -1302,6 +1307,16 @@ type Mutation {
 
   """Mark a post's teaser as viewed by the current user. Public."""
   markTeaserAsViewed(id: ID!): Post
+
+  """
+  Mute, switch off the camera of, end the screen share of, or remove somebody in the group's running call. Requires moderating the call; removing also needs to rank high enough in the group, and never reaches the group's owner. Returns true.
+  """
+  moderateVideoCallParticipant(action: VideoCallModerationAction!, groupId: ID!, userId: ID!): Boolean!
+
+  """
+  Mute everybody in the group's running call except those named, and give exactly the users named in floorUserIds the floor (they are spared as well). Requires moderating the call. Returns how many people were muted.
+  """
+  muteAllInVideoCall(exceptUserIds: [ID!]!, floorUserIds: [ID!]!, groupId: ID!): Int!
 
   """
   Mute a group so its posts no longer appear in the current user's feed. Requires membership.
@@ -1436,8 +1451,28 @@ type Mutation {
   """
   setVerificationBadge(badgeId: ID!, userId: ID!): User
 
+  """
+  Let everybody in the group's running call moderate it, or only its moderators again. Any moderator may switch it on; switching it off takes a moderator named as such, or a holder of group.videoCall.moderate. Returns true.
+  """
+  setVideoCallEveryoneModerates(enabled: Boolean!, groupId: ID!): Boolean!
+
+  """
+  Give somebody in the group's running call the floor, or take it back. Requires moderating the call. Returns true.
+  """
+  setVideoCallFloor(floor: Boolean!, groupId: ID!, userId: ID!): Boolean!
+
+  """
+  Make somebody in the group's running call a moderator, or not. Any moderator may make another; taking it from somebody else needs to outrank them in the group, and one who had it taken gets it back only from a holder of group.videoCall.moderate. Anybody may give up their own. Returns true.
+  """
+  setVideoCallModerator(groupId: ID!, moderator: Boolean!, userId: ID!): Boolean!
+
   """Shout (endorse) the given post or comment. Requires authentication."""
   shout(id: ID!, type: ShoutTypeEnum!): Boolean!
+
+  """
+  Become a moderator of the group's running call. Requires group.videoCall.moderate. Returns true.
+  """
+  takeOverVideoCallModeration(groupId: ID!): Boolean!
 
   """
   Start or stop observing a post (to receive notifications about its comments). Requires authentication.
@@ -2175,6 +2210,16 @@ type Query {
   videoCallConfig: VideoCallConfig!
 
   """
+  What the current user may do to that participant of the group's running call beyond the light acts. Requires taking part in the call.
+  """
+  videoCallModerationRights(groupId: ID!, userId: ID!): VideoCallModerationRights!
+
+  """
+  Whom the moderation of the group's running call goes to if the current user hands it on without naming anybody: who has the highest rights in the group, then who has been in the call longest. Null if nobody else is in the call.
+  """
+  videoCallModerationSuccessor(groupId: ID!): ID
+
+  """
   Current number of participants in a group's video call. Requires authentication.
   """
   videoCallParticipantCount(groupId: ID!): Int!
@@ -2708,6 +2753,28 @@ type VideoCallJoinPayload {
 
   """WebSocket URL of the media server."""
   url: String!
+}
+
+"""
+What a moderator can do to somebody in a video call. Muting, switching off the camera and ending a screen share are light: the person can undo them at once, so a moderator may do them to anybody. Removing is not, and follows the group's ranks.
+"""
+enum VideoCallModerationAction {
+  DISABLE_CAMERA
+  MUTE_MICROPHONE
+  REMOVE
+  STOP_SCREEN_SHARE
+}
+
+"""
+Which of the heavier acts of moderation the current user may take against one participant of a call, as the group's ranks allow.
+"""
+type VideoCallModerationRights {
+  """Whether they may remove the participant from the call."""
+  remove: Boolean!
+
+  """Whether they may take the participant's moderation away."""
+  revokeModeration: Boolean!
+  userId: ID!
 }
 
 """Live participant count for a group's video call."""

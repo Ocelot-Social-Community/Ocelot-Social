@@ -1,0 +1,3 @@
+mutation SetVideoCallEveryoneModerates($groupId: ID!, $enabled: Boolean!) {
+  setVideoCallEveryoneModerates(groupId: $groupId, enabled: $enabled)
+}
