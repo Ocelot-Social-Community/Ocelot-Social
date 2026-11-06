@@ -284,6 +284,8 @@ export default {
       muting: false,
       spared: [],
       floor: [],
+      // Those ticked only because they were given the floor here: taking it back unticks them.
+      sparedForFloor: [],
     }
   },
   created() {
@@ -590,19 +592,28 @@ export default {
         ? []
         : this.people.filter((person) => person.speaking && !person.isMe).map((p) => p.userId)
       this.spared = [this.meId, ...this.floor, ...speaking].filter(Boolean)
+      this.sparedForFloor = []
       this.muting = true
     },
     stopMuting() {
       this.muting = false
     },
-    // Giving the floor spares; taking it back leaves the tick for the moderator to clear.
+    // Giving the floor spares; taking it back unticks again whoever was ticked only by giving
+    // it, and leaves a tick set before.
     toggleFloor(userId) {
       if (this.floor.includes(userId)) {
         this.floor = this.floor.filter((id) => id !== userId)
+        if (this.sparedForFloor.includes(userId)) {
+          this.spared = this.spared.filter((id) => id !== userId)
+          this.sparedForFloor = this.sparedForFloor.filter((id) => id !== userId)
+        }
         return
       }
       this.floor = [...this.floor, userId]
-      if (!this.spared.includes(userId)) this.spared = [...this.spared, userId]
+      if (!this.spared.includes(userId)) {
+        this.spared = [...this.spared, userId]
+        this.sparedForFloor = [...this.sparedForFloor, userId]
+      }
     },
     async muteAll() {
       const done = await this.mutate(muteAllInVideoCallMutation(), {

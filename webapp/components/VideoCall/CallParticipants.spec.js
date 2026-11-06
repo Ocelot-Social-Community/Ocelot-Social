@@ -398,10 +398,16 @@ describe('CallParticipants', () => {
       expect(wrapper.vm.spared).toContain('bob')
       expect(wrapper.vm.floor).toEqual(['speaker', 'bob'])
       expect(wrapper.vm.floorUnchanged).toBe(false)
-      // Taking it back leaves the tick for the moderator to clear.
+      // Taking it back unticks whoever was ticked only by giving it …
       wrapper.vm.toggleFloor('bob')
       expect(wrapper.vm.floor).toEqual(['speaker'])
-      expect(wrapper.vm.spared).toContain('bob')
+      expect(wrapper.vm.spared).not.toContain('bob')
+      // … and leaves a tick that was set before.
+      wrapper.vm.toggleFloor('me')
+      wrapper.vm.toggleFloor('me')
+      expect(wrapper.vm.spared).toContain('me')
+      wrapper.vm.toggleFloor('speaker')
+      expect(wrapper.vm.spared).toContain('speaker')
     })
   })
 
