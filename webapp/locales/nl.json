@@ -1970,7 +1970,7 @@
         "unavailable": "Microfoon niet beschikbaar."
       },
       "reason": {
-        "busy": "Een andere toepassing gebruikt het — sluit die en probeer het opnieuw.",
+        "busy": "Een andere toepassing gebruikt het apparaat — sluit die en probeer het opnieuw.",
         "denied": "Sta toegang toe in je browser (slotje in de adresbalk) en probeer het opnieuw.",
         "generic": "Probeer het opnieuw.",
         "noDevice": "Geen apparaat gevonden — sluit er een aan en probeer het opnieuw."

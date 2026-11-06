@@ -1970,7 +1970,7 @@
         "unavailable": "Mikrofon niedostępny."
       },
       "reason": {
-        "busy": "Inna aplikacja go używa — zamknij ją i spróbuj ponownie.",
+        "busy": "Inna aplikacja używa urządzenia — zamknij ją i spróbuj ponownie.",
         "denied": "Zezwól na dostęp w przeglądarce (ikona kłódki w pasku adresu) i spróbuj ponownie.",
         "generic": "Spróbuj ponownie.",
         "noDevice": "Nie znaleziono urządzenia — podłącz je i spróbuj ponownie."

@@ -1970,7 +1970,7 @@
         "unavailable": "Mikrofoni nuk është i disponueshëm."
       },
       "reason": {
-        "busy": "Një aplikacion tjetër po e përdor — mbylle dhe provo përsëri.",
+        "busy": "Një aplikacion tjetër po e përdor pajisjen — mbylle dhe provo përsëri.",
         "denied": "Lejo qasjen në shfletues (ikona e drynit në shiritin e adresës) dhe provo përsëri.",
         "generic": "Provo përsëri.",
         "noDevice": "Nuk u gjet asnjë pajisje — lidh një dhe provo përsëri."

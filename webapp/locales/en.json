@@ -1970,7 +1970,7 @@
         "unavailable": "Microphone not available."
       },
       "reason": {
-        "busy": "Another application is using it — close that one and try again.",
+        "busy": "Another application is using the device — close it and try again.",
         "denied": "Allow access in your browser (lock icon in the address bar), then try again.",
         "generic": "Please try again.",
         "noDevice": "No device found — connect one and try again."
