@@ -1528,6 +1528,29 @@ describe('PreJoin — a device that does not start', () => {
     })
   })
 
+  it("keeps the camera's message when the microphone is changed afterwards", async () => {
+    const busy = Object.assign(new Error(), { name: 'NotReadableError' })
+    const wrapper = await start('video', busy)
+    await wrapper.vm.onMicChange('another-mic')
+    await flushPromises()
+    expect(wrapper.vm.cameraActive).toBe(false)
+    expect(wrapper.vm.permissionError).toBe(
+      'videoCall.errors.camera.unavailable videoCall.errors.reason.busy',
+    )
+  })
+
+  it("drops only the microphone's message when the microphone starts after all", async () => {
+    const wrapper = await start('video', Object.assign(new Error(), { name: 'NotReadableError' }))
+    wrapper.vm.deviceFailed('audio', Object.assign(new Error(), { name: 'NotFoundError' }))
+    // Switched on again, the microphone starts this time.
+    await wrapper.vm.toggleMicActive()
+    await flushPromises()
+    expect(wrapper.vm.micActive).toBe(true)
+    expect(wrapper.vm.permissionError).toBe(
+      'videoCall.errors.camera.unavailable videoCall.errors.reason.busy',
+    )
+  })
+
   it('switches both back on when the retry finds them', async () => {
     const devices = media('video', Object.assign(new Error(), { name: 'NotReadableError' }))
     const { wrapper } = mountWith(devices)

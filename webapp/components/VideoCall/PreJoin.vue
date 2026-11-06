@@ -150,9 +150,9 @@ export default {
       // the empty preview reads as a failed attempt.
       cameraStarting: false,
       micStarting: false,
-      // Off because the device did not start, not because the user chose so —
-      // a retry switches it back on.
-      failed: { video: false, audio: false },
+      // Why a device did not start: off for that, not because the user chose so —
+      // a retry switches it back on. Kept per device, so news of one leaves the other's.
+      failed: { video: null, audio: null },
       permissionError: null,
       stream: null,
     }
@@ -377,7 +377,7 @@ export default {
         // place.
         if (kind === 'camera') this.cameraActive = true
         if (kind === 'microphone') this.micActive = true
-        this.permissionError = null
+        this.clearFailure(trackKind)
         await this.acquireStream(trackKind)
         await this.enumerate()
       } else if (newState === 'denied') {
@@ -395,15 +395,22 @@ export default {
     // Every device that does not start, for whatever reason, goes to off and says why.
     deviceFailed(kind, err) {
       this[kind === 'video' ? 'cameraActive' : 'micActive'] = false
-      this.failed[kind] = true
-      const message = deviceErrorMessage(this.$t, kind === 'video' ? 'camera' : 'mic', err)
-      this.permissionError = [this.permissionError, message].filter(Boolean).join(' ')
+      this.failed[kind] = deviceErrorMessage(this.$t, kind === 'video' ? 'camera' : 'mic', err)
+      this.showFailures()
+    },
+    clearFailure(kind) {
+      this.failed[kind] = null
+      this.showFailures()
+    },
+    showFailures() {
+      this.permissionError =
+        [this.failed.video, this.failed.audio].filter(Boolean).join(' ') || null
     },
     async retry() {
-      this.permissionError = null
       if (this.failed.video) this.cameraActive = true
       if (this.failed.audio) this.micActive = true
-      this.failed = { video: false, audio: false }
+      this.failed = { video: null, audio: null }
+      this.showFailures()
       await this.acquireStream()
       await this.refreshPermissionStatus()
       if (this.cameraStatus === 'denied') this.cameraActive = false
@@ -499,9 +506,10 @@ export default {
         const complete = shown.length === 0 && !kinds.some(overtaken)
         this.stream = complete ? stream : new MediaStream([...shown, ...fresh])
       }
-      this.permissionError = null
-      for (const kind of ['video', 'audio']) {
+      // Only what was asked for here: the other device keeps what it had to say.
+      for (const kind of kinds) {
         if (failures[kind]) this.deviceFailed(kind, failures[kind])
+        else this.clearFailure(kind)
       }
       this.$nextTick(() => {
         const v = this.$refs.previewEl
@@ -562,8 +570,7 @@ export default {
       if (this.micStatus === 'denied' || this.micStatus === 'unsupported') return
       const next = !this.micActive
       this.micActive = next
-      this.failed.audio = false
-      this.permissionError = null
+      this.clearFailure('audio')
       await this.acquireStream('audio')
       if (next) await this.refreshPermissionStatus()
       if (this.micStatus === 'denied') this.micActive = false
@@ -572,8 +579,7 @@ export default {
       if (this.cameraStatus === 'denied' || this.cameraStatus === 'unsupported') return
       const next = !this.cameraActive
       this.cameraActive = next
-      this.failed.video = false
-      this.permissionError = null
+      this.clearFailure('video')
       await this.acquireStream('video')
       if (next) await this.refreshPermissionStatus()
       if (this.cameraStatus === 'denied') this.cameraActive = false
