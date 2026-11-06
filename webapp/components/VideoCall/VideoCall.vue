@@ -2487,9 +2487,9 @@ export default {
       }
     },
     async retryConnect() {
-      // Tear down whatever half-initialized room may exist from the failed
-      // attempt so listeners and tracks from the previous try don't leak.
-      await this.leaveRoom()
+      // connect() leaves the half-initialized room of the failed attempt itself, and only
+      // once it has counted itself: a click before that would let an earlier click, still
+      // waiting for that room to go, take over from a later one.
       this.tiles = []
       this.activeSpeakerIds = []
       this.spotlightKey = null

@@ -1150,30 +1150,12 @@ describe('VideoCall', () => {
   })
 
   describe('retryConnect', () => {
-    it('disconnects the existing room and calls connect', async () => {
+    it('clears the error and joins anew', async () => {
       const { wrapper } = factory({ show: true })
-      const disconnect = jest.fn().mockResolvedValue()
-      wrapper.setData({ room: { disconnect }, error: 'boom' })
+      wrapper.setData({ error: 'boom' })
       wrapper.vm.connect = jest.fn().mockResolvedValue()
       await wrapper.vm.retryConnect()
-      expect(disconnect).toHaveBeenCalled()
-      expect(wrapper.vm.room).toBeNull()
       expect(wrapper.vm.error).toBeNull()
-      expect(wrapper.vm.connect).toHaveBeenCalled()
-    })
-
-    it('swallows disconnect errors', async () => {
-      const { wrapper } = factory({ show: true })
-      const disconnect = jest.fn().mockRejectedValue(new Error('boom'))
-      wrapper.setData({ room: { disconnect } })
-      wrapper.vm.connect = jest.fn().mockResolvedValue()
-      await expect(wrapper.vm.retryConnect()).resolves.toBeUndefined()
-    })
-
-    it('works when no room is set', async () => {
-      const { wrapper } = factory({ show: true })
-      wrapper.vm.connect = jest.fn().mockResolvedValue()
-      await wrapper.vm.retryConnect()
       expect(wrapper.vm.connect).toHaveBeenCalled()
     })
   })
@@ -4596,6 +4578,17 @@ describe('VideoCall — a join whose device fails', () => {
     expect(toast).toHaveBeenCalledWith(kind, expect.objectContaining({ name: 'NotFoundError' }))
   })
 
+  it('drops the room even when leaving it fails, and says so in the console', async () => {
+    const { wrapper } = factory({ show: true })
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    const err = new Error('boom')
+    wrapper.setData({ room: { disconnect: jest.fn().mockRejectedValue(err) } })
+    await expect(wrapper.vm.leaveRoom()).resolves.toBeUndefined()
+    expect(wrapper.vm.room).toBeNull()
+    expect(warn).toHaveBeenCalledWith('VideoCall: leaving the room failed', err)
+    warn.mockRestore()
+  })
+
   it('backToPrejoin leaves the room the failed attempt had joined', async () => {
     const { wrapper } = factory({ show: true })
     const disconnect = jest.fn().mockResolvedValue()
@@ -4614,6 +4607,28 @@ describe('VideoCall — a join whose device fails', () => {
     await wrapper.vm.connect()
     expect(disconnect).toHaveBeenCalled()
     expect(wrapper.vm.room.disconnect).not.toBe(disconnect)
+    expect(wrapper.vm.phase).toBe('in-call')
+  })
+
+  it('keeps the room of the later of two clicks on retry', async () => {
+    const { Room } = await import('livekit-client')
+    Room.instances = []
+    const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+    withApollo(wrapper)
+    let gone
+    const disconnect = jest.fn(() => new Promise((resolve) => (gone = resolve)))
+    wrapper.setData({ room: { disconnect }, error: 'boom', phase: 'error' })
+    // The first click still waits for the failed room to go when the second one comes.
+    const first = wrapper.vm.retryConnect()
+    const second = wrapper.vm.retryConnect()
+    await second
+    const joined = wrapper.vm.room
+    gone()
+    await first
+    await flushPromises()
+    expect(Room.instances).toEqual([joined])
+    expect(joined.disconnect).not.toHaveBeenCalled()
+    expect(wrapper.vm.room).toBe(joined)
     expect(wrapper.vm.phase).toBe('in-call')
   })
 
