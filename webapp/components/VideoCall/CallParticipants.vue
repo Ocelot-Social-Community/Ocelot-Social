@@ -562,7 +562,7 @@ export default {
       }
       if (person.isMe && this.isNamedModerator(person.userId)) {
         actions.push(
-          entry('resign', this.$t('videoCall.participants.resign'), this.icons.shield, () =>
+          entry('resign', this.$t('videoCall.participants.resign'), this.icons.shieldSlash, () =>
             this.setModerator(person, false),
           ),
         )
@@ -598,7 +598,7 @@ export default {
             entry(
               'screen',
               this.$t('videoCall.participants.stopSharing'),
-              this.icons.desktop,
+              this.icons.desktopSlash,
               switchOff('screen', 'STOP_SCREEN_SHARE'),
             ),
           )
@@ -607,8 +607,11 @@ export default {
       if (!this.isModerator) return actions
       actions.push(
         this.hasFloor(person.userId)
-          ? entry('floor', this.$t('videoCall.participants.takeFloor'), this.icons.comment, () =>
-              this.setFloor(person, false),
+          ? entry(
+              'floor',
+              this.$t('videoCall.participants.takeFloor'),
+              this.icons.commentSlash,
+              () => this.setFloor(person, false),
             )
           : entry('floor', this.$t('videoCall.participants.giveFloor'), this.icons.comment, () =>
               this.setFloor(person, true),
@@ -627,7 +630,7 @@ export default {
           entry(
             'revoke',
             this.$t('videoCall.participants.revokeModerator'),
-            this.icons.shield,
+            this.icons.shieldSlash,
             () => this.setModerator(person, false),
           ),
         )
