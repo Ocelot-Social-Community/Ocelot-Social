@@ -2706,6 +2706,9 @@ export default {
     transform: none;
     width: 100%;
     height: 100%;
+    /*  The desktop's bounds would leave a strip of the page below. */
+    min-height: 0;
+    max-height: none;
     border-radius: 0;
   }
 }
