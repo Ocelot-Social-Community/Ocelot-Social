@@ -19,6 +19,9 @@ import { ISO_DATE_TIME } from './patterns'
  * under the same sid (see joinCallSession).
  *
  * `endedAt` is null while the call runs. A session that is over keeps its chat, read-only.
+ *
+ * `everyoneModerates` is set once a moderator lets everybody in the call moderate it; absent
+ * means only the moderators do (see livekit/moderation.ts).
  */
 export const VideoCallSession = defineEntity({
   label: 'VideoCallSession',
@@ -28,6 +31,7 @@ export const VideoCallSession = defineEntity({
     livekitSid: { type: 'string' },
     createdAt: { type: 'string', pattern: ISO_DATE_TIME },
     endedAt: { type: ['string', 'null'], pattern: ISO_DATE_TIME },
+    everyoneModerates: { type: 'boolean' },
   },
   required: ['id', 'livekitRoom', 'livekitSid', 'createdAt'],
   unique: ['id'],

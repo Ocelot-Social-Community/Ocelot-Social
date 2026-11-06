@@ -442,6 +442,31 @@ const definitions = {
     type: 'FORBIDDEN',
     text: 'You may not start a video call in this group.',
   },
+  // moderating a video call (livekit/moderation.ts)
+  VIDEO_CALL_REMOVED_FROM_CALL: {
+    type: 'FORBIDDEN',
+    text: 'You were removed from this video call. You can join the next one.',
+  },
+  VIDEO_CALL_MODERATION_NOT_IN_CALL: {
+    type: 'FORBIDDEN',
+    text: 'Only those taking part in the video call can moderate it.',
+  },
+  VIDEO_CALL_MODERATION_NOT_MODERATOR: {
+    type: 'FORBIDDEN',
+    text: 'Only a moderator of the video call can do this.',
+  },
+  VIDEO_CALL_MODERATION_OUTRANKED: {
+    type: 'FORBIDDEN',
+    text: 'You do not rank high enough in the group to do this to them.',
+  },
+  VIDEO_CALL_MODERATION_OWNER: {
+    type: 'FORBIDDEN',
+    text: 'The owner of the group cannot be removed from its video call.',
+  },
+  VIDEO_CALL_MODERATION_PARTICIPANT_NOT_IN_CALL: {
+    type: 'BAD_USER_INPUT',
+    text: 'They are not in the video call.',
+  },
 } as const satisfies Record<string, ErrorDefinition>
 
 export type ErrorName = keyof typeof definitions

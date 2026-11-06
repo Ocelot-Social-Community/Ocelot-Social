@@ -31,6 +31,7 @@ export type GroupPermissionKey =
   | 'group.chat.participate'
   | 'group.videoCall.create'
   | 'group.videoCall.join'
+  | 'group.videoCall.moderate'
 
 // Grouping for the group's rights UI. Open string (the JSON is the source of
 // truth); the known groups today are 'visibility' | 'content' | 'moderation'
@@ -39,7 +40,7 @@ export type GroupPermissionGroup = string
 
 // Additional runtime feature gates, on top of the `groupsEnabled` policy that gates
 // EVERY group permission. That one is applied in code (see ./gates.ts) rather than
-// repeated in all nineteen entries: a catalog-wide truth cannot drift when it has only
+// repeated in all twenty entries: a catalog-wide truth cannot drift when it has only
 // one place. Every value here must be a valid (boolean) PolicyKey; the union is the
 // compile-time mirror of the catalog's `gatedBy` values, drift-guarded in
 // ./schema.spec.ts.

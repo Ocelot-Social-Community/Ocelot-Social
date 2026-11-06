@@ -85,6 +85,11 @@
       "group": "communication",
       "gatedBy": "videoConference",
       "description": "Join a video call already running in the group."
+    },
+    "group.videoCall.moderate": {
+      "group": "communication",
+      "gatedBy": "videoConference",
+      "description": "Take over the moderation of any video call in the group, and give it back to somebody it was taken from. Whoever starts a call moderates it without this right; this is the right to step in."
     }
   }
 }

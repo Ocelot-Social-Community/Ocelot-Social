@@ -654,6 +654,8 @@ describe('joinGroupVideoCall', () => {
       expect(JSON.parse(lastAccessTokenOptions().metadata)).toEqual({
         userId: 'bare-1',
         avatarUrl: null,
+        // For the link to their profile in the call's list of participants.
+        slug: expect.any(String),
       })
     })
 

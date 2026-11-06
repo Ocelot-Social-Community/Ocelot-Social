@@ -826,6 +826,18 @@ export default shield(
       UnreadRooms: isAuthenticated,
       videoCallConfig: allow,
       videoCallParticipantCount: and(isAuthenticated, hasGroupPermission('group.videoCall.join')),
+      // Taking part in the call is checked in the resolvers (livekit/moderation.ts): only the
+      // media server knows who is in it.
+      videoCallModerationRights: and(
+        groupsEnabled,
+        isAuthenticated,
+        hasGroupPermission('group.videoCall.join'),
+      ),
+      videoCallModerationSuccessor: and(
+        groupsEnabled,
+        isAuthenticated,
+        hasGroupPermission('group.videoCall.join'),
+      ),
       // Which calls are listed is decided per group in the resolver, on the same right.
       activeVideoCalls: isAuthenticated,
       PostsPinnedCounts: hasPermission('post.pin'),
@@ -1020,6 +1032,44 @@ export default shield(
         groupsEnabled,
         isAuthenticated,
         hasGroupPermission('group.videoCall.join'),
+      ),
+      // Whether the caller moderates the call, and ranks high enough for what they ask, is the
+      // call's business and decided in the resolvers (videoCallModeration.ts).
+      moderateVideoCallParticipant: and(
+        groupsEnabled,
+        isAuthenticated,
+        hasGroupPermission('group.videoCall.join'),
+      ),
+      muteAllInVideoCall: and(
+        groupsEnabled,
+        isAuthenticated,
+        hasGroupPermission('group.videoCall.join'),
+      ),
+      setVideoCallModerator: and(
+        groupsEnabled,
+        isAuthenticated,
+        hasGroupPermission('group.videoCall.join'),
+      ),
+      setVideoCallEveryoneModerates: and(
+        groupsEnabled,
+        isAuthenticated,
+        hasGroupPermission('group.videoCall.join'),
+      ),
+      setVideoCallFloor: and(
+        groupsEnabled,
+        isAuthenticated,
+        hasGroupPermission('group.videoCall.join'),
+      ),
+      handOverVideoCallModeration: and(
+        groupsEnabled,
+        isAuthenticated,
+        hasGroupPermission('group.videoCall.join'),
+      ),
+      takeOverVideoCallModeration: and(
+        groupsEnabled,
+        isAuthenticated,
+        hasGroupPermission('group.videoCall.join'),
+        hasGroupPermission('group.videoCall.moderate'),
       ),
       MarkMessagesAsSeen: and(
         isAuthenticated,
