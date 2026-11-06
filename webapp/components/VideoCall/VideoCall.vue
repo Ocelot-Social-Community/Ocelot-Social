@@ -472,6 +472,7 @@
 </template>
 
 <script>
+import { deviceErrorMessage } from './deviceError'
 import { mapGetters, mapMutations } from 'vuex'
 import { OsButton, OsCounterIcon, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
@@ -1122,6 +1123,8 @@ export default {
     this.speakerHoldTimer = null
     this.micRestart = null
     this.micSilenceProbe = null
+    // How often a join has begun; see connect().
+    this.connectAttempts = 0
     this.stageObserver = null
     this.observedStage = null
     this.qualityTimer = null
@@ -1669,6 +1672,14 @@ export default {
       this.micSilenceProbe = null
       this.stopAudioWatchdog()
       this.resetAudioOnly()
+      // A join begun while this one runs (a second click on retry) takes over. This one
+      // then leaves the room it may have joined, or nothing points at it any more and it
+      // stays in the call as a second self.
+      const attempt = ++this.connectAttempts
+      const overtaken = () => attempt !== this.connectAttempts
+      let room = null
+      await this.leaveRoom()
+      if (overtaken()) return
       try {
         if (!this.groupId) throw new Error('Missing group id')
         const payload = await this.takeJoinPayload(this.groupId)
@@ -1683,9 +1694,10 @@ export default {
           VideoQuality,
           DisconnectReason,
         } = livekit
+        if (overtaken()) return
         this.Track = Track
 
-        const room = new Room({
+        room = new Room({
           adaptiveStream: true,
           dynacast: true,
           videoCaptureDefaults: this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : {},
@@ -1841,12 +1853,23 @@ export default {
           peerConnectionTimeout: 5000,
           maxRetries: 0,
         })
-        if (this.micEnabled) {
-          await room.localParticipant.setMicrophoneEnabled(true)
+        if (overtaken()) return await this.leaveRoom(room)
+        // We are in the room now. A device that does not start must not
+        // turn that into a failed join: the error block would sit on top of
+        // a live session, and joining again from there adds a second self.
+        for (const [kind, flag, enable] of [
+          ['mic', 'micEnabled', 'setMicrophoneEnabled'],
+          ['camera', 'cameraEnabled', 'setCameraEnabled'],
+        ]) {
+          if (!this[flag]) continue
+          try {
+            await room.localParticipant[enable](true)
+          } catch (err) {
+            this[flag] = false
+            this.showDeviceErrorToast(kind, err)
+          }
         }
-        if (this.cameraEnabled) {
-          await room.localParticipant.setCameraEnabled(true)
-        }
+        if (overtaken()) return await this.leaveRoom(room)
         this.refreshTiles()
         this.audioBlocked = !room.canPlaybackAudio
         this.phase = 'in-call'
@@ -1864,6 +1887,8 @@ export default {
         this.loadGroupChatUnread()
         this.refreshKnownDevices()
       } catch (err) {
+        // The join that took over shows its own outcome.
+        if (overtaken()) return await this.leaveRoom(room)
         const message = this.$backendError(err)
         // The user navigated away while the handshake was still running, so
         // the window is parked in the corner. Since isMaximized treats every
@@ -2010,20 +2035,8 @@ export default {
       this.setParticipantCount(new Set(tiles.map((t) => t.identity)).size)
     },
     showDeviceErrorToast(kind, err) {
-      const name = err && err.name
-      let key
-      if (name === 'NotAllowedError' || name === 'SecurityError') {
-        key = 'denied'
-      } else if (name === 'NotFoundError' || name === 'OverconstrainedError') {
-        key = 'noDevice'
-      } else if (name === 'NotReadableError') {
-        key = 'busy'
-      } else {
-        key = 'generic'
-      }
-      const message = this.$t(`videoCall.errors.${kind}.${key}`)
       if (this.$toast && typeof this.$toast.error === 'function') {
-        this.$toast.error(message)
+        this.$toast.error(deviceErrorMessage(this.$t, kind, err))
       }
     },
     toggleDeviceSettings() {
@@ -2474,25 +2487,34 @@ export default {
       }
     },
     async retryConnect() {
-      // Tear down whatever half-initialized room may exist from the failed
-      // attempt so listeners and tracks from the previous try don't leak.
-      if (this.room) {
-        try {
-          await this.room.disconnect()
-        } catch (_e) {
-          /* ignore */
-        }
-        this.room = null
-      }
+      // connect() leaves the half-initialized room of the failed attempt itself, and only
+      // once it has counted itself: a click before that would let an earlier click, still
+      // waiting for that room to go, take over from a later one.
       this.tiles = []
       this.activeSpeakerIds = []
       this.spotlightKey = null
       this.error = null
       await this.connect()
     },
-    backToPrejoin() {
+    async backToPrejoin() {
       this.error = null
       this.phase = 'prejoin'
+      // A failed attempt may have joined the room before it failed.
+      await this.leaveRoom()
+    },
+    // Only one room per window: whoever joins anew leaves the old one first,
+    // or LiveKit keeps it as a second participant of our own.
+    // Leaves the room on show, or the given one, which may be on show or not.
+    async leaveRoom(room = this.room) {
+      if (!room) return
+      if (this.room === room) this.room = null
+      try {
+        await room.disconnect()
+      } catch (err) {
+        // The room is dropped either way; say so instead of failing in silence.
+        // eslint-disable-next-line no-console
+        console.warn('VideoCall: leaving the room failed', err)
+      }
     },
     async leave() {
       // Capture before close() clears the store.
@@ -2677,7 +2699,11 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   width: min(900px, calc(100vw - var(--space-base) * 2));
-  height: min(560px, calc(100vh - var(--space-large) * 2));
+  /*  Grows with its content — a hint or an error below the devices adds a line — */
+  /*  as long as the screen has room; only beyond that the content scrolls. */
+  height: auto;
+  min-height: min(560px, calc(100vh - var(--space-large) * 2));
+  max-height: calc(100vh - var(--space-large) * 2);
   border-radius: var(--border-radius-base);
   overflow: hidden;
   /*  calc(), not Sass '+': the tokens are var() now and Sass cannot add those. */
@@ -2694,6 +2720,9 @@ export default {
     transform: none;
     width: 100%;
     height: 100%;
+    /*  The desktop's bounds would leave a strip of the page below. */
+    min-height: 0;
+    max-height: none;
     border-radius: 0;
   }
 }

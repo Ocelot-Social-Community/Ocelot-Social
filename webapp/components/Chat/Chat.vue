@@ -258,6 +258,8 @@ export default {
     this.icons = iconRegistry
     // How often another room has been opened; see fetchMessages.
     this.roomSwitches = 0
+    // Conference chats a message arrived for while not in the list; see chatMessageAdded.
+    this.callRoomIds = new Set()
   },
   watch: {
     groupId(newGroupId) {
@@ -1004,6 +1006,8 @@ export default {
       let roomIndex = this.rooms.findIndex((r) => r.id === msg.room.id)
       let freshlyFetched = false
       if (roomIndex === -1) {
+        // A room stays a conference chat, so it is asked for once, not on every message.
+        if (this.callRoomIds.has(msg.room.id)) return
         // Room not in list yet — fetch it specifically
         try {
           const {
@@ -1016,7 +1020,10 @@ export default {
           // The conference chat of a video call is no conversation of its own: it is
           // shown where the call opens it (and is then in the list already), never
           // because a message happens to arrive for it.
-          if (Room?.length && Room[0].isCallRoom) return
+          if (Room?.length && Room[0].isCallRoom) {
+            this.callRoomIds.add(msg.room.id)
+            return
+          }
           if (Room?.length) {
             const newRoom = this.fixRoomObject(Room[0])
             if (!this._externalRoomIds) this._externalRoomIds = new Set()
