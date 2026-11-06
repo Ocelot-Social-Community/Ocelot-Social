@@ -42,6 +42,7 @@ jest.mock('livekit-client', () => {
   const DisconnectReason = { CLIENT_INITIATED: 'CLIENT_INITIATED' }
   class Room {
     constructor(opts) {
+      Room.instances.push(this)
       this.opts = opts
       this.handlers = {}
       this.localParticipant = {
@@ -81,6 +82,8 @@ jest.mock('livekit-client', () => {
   }
   Room.initialCanPlaybackAudio = true
   Room.deviceErrors = {}
+  // Every room made, so a test can tell whether one was left behind.
+  Room.instances = []
   return {
     __esModule: true,
     Room,
@@ -4611,6 +4614,25 @@ describe('VideoCall — a join whose device fails', () => {
     await wrapper.vm.connect()
     expect(disconnect).toHaveBeenCalled()
     expect(wrapper.vm.room.disconnect).not.toBe(disconnect)
+    expect(wrapper.vm.phase).toBe('in-call')
+  })
+
+  it('leaves no second room behind when a join begins while another one runs', async () => {
+    const { Room } = await import('livekit-client')
+    Room.instances = []
+    const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+    withApollo(wrapper)
+    // Retry clicked twice: the first join still waits for the failed room to go.
+    let gone
+    const disconnect = jest.fn(() => new Promise((resolve) => (gone = resolve)))
+    wrapper.setData({ room: { disconnect } })
+    const first = wrapper.vm.connect()
+    const second = wrapper.vm.connect()
+    gone()
+    await Promise.all([first, second])
+    await flushPromises()
+    const stayed = Room.instances.filter((room) => !room.disconnect.mock.calls.length)
+    expect(stayed).toEqual([wrapper.vm.room])
     expect(wrapper.vm.phase).toBe('in-call')
   })
 })

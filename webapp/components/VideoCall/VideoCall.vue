@@ -1123,6 +1123,8 @@ export default {
     this.speakerHoldTimer = null
     this.micRestart = null
     this.micSilenceProbe = null
+    // How often a join has begun; see connect().
+    this.connectAttempts = 0
     this.stageObserver = null
     this.observedStage = null
     this.qualityTimer = null
@@ -1670,7 +1672,14 @@ export default {
       this.micSilenceProbe = null
       this.stopAudioWatchdog()
       this.resetAudioOnly()
+      // A join begun while this one runs (a second click on retry) takes over. This one
+      // then leaves the room it may have joined, or nothing points at it any more and it
+      // stays in the call as a second self.
+      const attempt = ++this.connectAttempts
+      const overtaken = () => attempt !== this.connectAttempts
+      let room = null
       await this.leaveRoom()
+      if (overtaken()) return
       try {
         if (!this.groupId) throw new Error('Missing group id')
         const payload = await this.takeJoinPayload(this.groupId)
@@ -1685,9 +1694,10 @@ export default {
           VideoQuality,
           DisconnectReason,
         } = livekit
+        if (overtaken()) return
         this.Track = Track
 
-        const room = new Room({
+        room = new Room({
           adaptiveStream: true,
           dynacast: true,
           videoCaptureDefaults: this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : {},
@@ -1843,6 +1853,7 @@ export default {
           peerConnectionTimeout: 5000,
           maxRetries: 0,
         })
+        if (overtaken()) return await this.leaveRoom(room)
         // We are in the room now. A device that does not start must not
         // turn that into a failed join: the error block would sit on top of
         // a live session, and joining again from there adds a second self.
@@ -1858,6 +1869,7 @@ export default {
             this.showDeviceErrorToast(kind, err)
           }
         }
+        if (overtaken()) return await this.leaveRoom(room)
         this.refreshTiles()
         this.audioBlocked = !room.canPlaybackAudio
         this.phase = 'in-call'
@@ -1875,6 +1887,8 @@ export default {
         this.loadGroupChatUnread()
         this.refreshKnownDevices()
       } catch (err) {
+        // The join that took over shows its own outcome.
+        if (overtaken()) return await this.leaveRoom(room)
         const message = this.$backendError(err)
         // The user navigated away while the handshake was still running, so
         // the window is parked in the corner. Since isMaximized treats every
@@ -2490,10 +2504,10 @@ export default {
     },
     // Only one room per window: whoever joins anew leaves the old one first,
     // or LiveKit keeps it as a second participant of our own.
-    async leaveRoom() {
-      const room = this.room
+    // Leaves the room on show, or the given one, which may be on show or not.
+    async leaveRoom(room = this.room) {
       if (!room) return
-      this.room = null
+      if (this.room === room) this.room = null
       try {
         await room.disconnect()
       } catch (err) {
