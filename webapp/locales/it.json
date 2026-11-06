@@ -2031,7 +2031,6 @@
     "openChat": "Apri chat",
     "participants": {
       "actionsFor": "Azioni per {name}",
-      "alreadyMuted": "già silenziato",
       "cameraOff": "fotocamera spenta",
       "cameraOffAction": "Spegni fotocamera",
       "cameraOn": "fotocamera accesa",
@@ -2061,7 +2060,6 @@
       "search": "Cerca per nome",
       "sharing": "condivide lo schermo",
       "showLarge": "Mostra in grande",
-      "speaking": "sta parlando",
       "stopSharing": "Termina la condivisione dello schermo",
       "takeFloor": "Togli la parola",
       "takeOver": "Assumi la moderazione",

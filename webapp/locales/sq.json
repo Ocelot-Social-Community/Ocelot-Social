@@ -2031,7 +2031,6 @@
     "openChat": "Hap bisedën",
     "participants": {
       "actionsFor": "Veprime për {name}",
-      "alreadyMuted": "tashmë i heshtur",
       "cameraOff": "kamera fikur",
       "cameraOffAction": "Fik kamerën",
       "cameraOn": "kamera ndezur",
@@ -2061,7 +2060,6 @@
       "search": "Kërko sipas emrit",
       "sharing": "ndan ekranin",
       "showLarge": "Shfaq të madh",
-      "speaking": "po flet",
       "stopSharing": "Përfundo ndarjen e ekranit",
       "takeFloor": "Merre fjalën",
       "takeOver": "Merr moderimin",

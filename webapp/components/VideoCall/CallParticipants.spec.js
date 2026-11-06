@@ -77,16 +77,23 @@ describe('CallParticipants', () => {
       expect(wrapper.vm.shown.map((p) => p.userId)).toEqual(['loud', 'me', 'mod', 'anna', 'zoe'])
     })
 
-    it('marks moderators, those with the floor, oneself and several devices', () => {
+    it('marks moderators, those with the floor, oneself and several devices, on one line', () => {
       wrapper = Wrapper({
-        people: [person('me', { isMe: true }), person('bob', { devices: 2 })],
-        moderation: { moderators: ['bob'], everyone: false, speakers: ['bob'] },
+        people: [person('me', { isMe: true }), person('bob', { devices: 2 }), person('anna')],
+        moderation: { moderators: ['me', 'bob'], everyone: false, speakers: ['bob'] },
       })
-      const bob = wrapper.find('[data-test="call-participant-bob"]')
-      expect(bob.find('[data-test="call-participant-moderator"]').exists()).toBe(true)
-      expect(bob.find('[data-test="call-participant-floor"]').exists()).toBe(true)
-      expect(bob.text()).toContain('videoCall.participants.devices {"count":2}')
-      expect(wrapper.find('[data-test="call-participant-me"]').text()).toContain('videoCall.you')
+      const line = (userId) =>
+        wrapper.find(`[data-test="call-participant-badges-${userId}"]`).text()
+      expect(line('bob')).toBe(
+        'videoCall.participants.moderator – videoCall.participants.hasFloor – videoCall.participants.devices {"count":2}',
+      )
+      expect(line('me')).toBe('videoCall.you: videoCall.participants.moderator')
+      expect(wrapper.find('[data-test="call-participant-badges-anna"]').exists()).toBe(false)
+    })
+
+    it('says "you" alone when nothing else sets one apart', () => {
+      wrapper = Wrapper()
+      expect(wrapper.vm.badgeLine(person('me', { isMe: true }))).toBe('videoCall.you')
     })
 
     it('tells a screen reader what each one has on', () => {
@@ -133,11 +140,21 @@ describe('CallParticipants', () => {
       expect(wrapper.emitted('local-mute')[1]).toEqual(['anna', false])
     })
 
-    it('offers no profile without a slug, and no muting of oneself', () => {
+    it('offers no profile without a slug, and no muting of oneself for oneself', () => {
       wrapper = Wrapper()
-      expect(names(wrapper.vm.actionsFor(person('me', { isMe: true, slug: null })))).toEqual([
-        'spotlight',
-      ])
+      expect(
+        names(wrapper.vm.actionsFor(person('me', { isMe: true, slug: null, micOn: false }))),
+      ).toEqual(['spotlight'])
+    })
+
+    it("switches off one's own microphone, camera and share right here, not through the server", () => {
+      wrapper = Wrapper()
+      const me = person('me', { isMe: true, cameraOn: true, screenSharing: true })
+      const actions = wrapper.vm.actionsFor(me)
+      expect(names(actions)).toEqual(['spotlight', 'profile', 'mute', 'camera', 'screen'])
+      actions.slice(2).forEach((action) => action.callback())
+      expect(wrapper.emitted('switch-off')).toEqual([['mic'], ['camera'], ['screen']])
+      expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
     })
 
     it('asks nothing of the server when the menu opens for one who does not moderate', async () => {
@@ -248,6 +265,7 @@ describe('CallParticipants', () => {
       const me = person('me', { isMe: true, micOn: false })
       const actions = wrapper.vm.actionsFor(me)
       expect(names(actions)).toEqual(['spotlight', 'profile', 'resign', 'floor'])
+      expect(wrapper.emitted('switch-off')).toBeUndefined()
       actions.find((action) => action.name === 'resign').callback()
       await flushPromises()
       expect(mocks.$apollo.mutate.mock.calls[0][0].variables).toEqual({
@@ -289,6 +307,24 @@ describe('CallParticipants', () => {
         floorUserIds: [],
       })
       expect(wrapper.vm.dialog).toBeNull()
+      expect(wrapper.emitted('switch-off')).toBeUndefined()
+    })
+
+    it('switches off the own microphone too when oneself is not spared', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      wrapper.vm.openMuteAll()
+      wrapper.vm.spared = []
+      await wrapper.vm.muteAll()
+      expect(wrapper.emitted('switch-off')).toEqual([['mic']])
+    })
+
+    it('keeps the question open when the server refuses', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      mocks.$apollo.mutate.mockRejectedValueOnce(new Error('no'))
+      wrapper.vm.openMuteAll()
+      await wrapper.vm.muteAll()
+      expect(wrapper.vm.dialog).toBe('muteAll')
+      expect(wrapper.emitted('switch-off')).toBeUndefined()
     })
 
     it('spares those with the floor instead of whoever speaks, and gives it on the way', async () => {

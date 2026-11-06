@@ -2031,7 +2031,6 @@
     "openChat": "Chat openen",
     "participants": {
       "actionsFor": "Acties voor {name}",
-      "alreadyMuted": "al gedempt",
       "cameraOff": "camera uit",
       "cameraOffAction": "Camera uitzetten",
       "cameraOn": "camera aan",
@@ -2061,7 +2060,6 @@
       "search": "Zoeken op naam",
       "sharing": "deelt het scherm",
       "showLarge": "Groot tonen",
-      "speaking": "spreekt",
       "stopSharing": "Scherm delen beëindigen",
       "takeFloor": "Het woord ontnemen",
       "takeOver": "Moderatie overnemen",

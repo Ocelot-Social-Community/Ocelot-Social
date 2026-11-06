@@ -70,27 +70,13 @@
         </span>
         <span class="call-participants__who">
           <span class="call-participants__name">{{ person.name }}</span>
-          <span class="call-participants__badges">
-            <span v-if="person.isMe" class="call-participants__badge">
-              {{ $t('videoCall.you') }}
-            </span>
-            <span
-              v-if="isNamedModerator(person.userId)"
-              class="call-participants__badge call-participants__badge--moderator"
-              data-test="call-participant-moderator"
-            >
-              {{ $t('videoCall.participants.moderator') }}
-            </span>
-            <span
-              v-if="hasFloor(person.userId)"
-              class="call-participants__badge call-participants__badge--floor"
-              data-test="call-participant-floor"
-            >
-              {{ $t('videoCall.participants.hasFloor') }}
-            </span>
-            <span v-if="person.devices > 1" class="call-participants__badge">
-              {{ $t('videoCall.participants.devices', { count: person.devices }) }}
-            </span>
+          <!-- What sets them apart, on one line: "You: Moderator – Has the floor". -->
+          <span
+            v-if="badgeLine(person)"
+            class="call-participants__badges"
+            :data-test="'call-participant-badges-' + person.userId"
+          >
+            {{ badgeLine(person) }}
           </span>
         </span>
         <span class="call-participants__state" aria-hidden="true">
@@ -180,12 +166,17 @@
                 :data-test="'mute-all-spare-' + person.userId"
               />
               <span>{{ person.isMe ? $t('videoCall.you') : person.name }}</span>
-              <span v-if="person.speaking" class="call-participants__hint">
-                ({{ $t('videoCall.participants.speaking') }})
-              </span>
-              <span v-else-if="!person.micOn" class="call-participants__hint">
-                ({{ $t('videoCall.participants.alreadyMuted') }})
-              </span>
+              <os-icon
+                :icon="person.micOn ? icons.microphone : icons.microphoneSlash"
+                :class="[
+                  'call-participants__mic',
+                  {
+                    'call-participants__off': !person.micOn,
+                    'call-participants__mic--speaking': person.speaking,
+                  },
+                ]"
+                :aria-label="stateLabel(person)"
+              />
             </label>
             <button
               type="button"
@@ -286,7 +277,7 @@ export default {
     // The people muted for the viewer alone, by userId.
     locallyMuted: { type: Object, default: () => ({}) },
   },
-  emits: ['spotlight', 'local-mute'],
+  emits: ['spotlight', 'local-mute', 'switch-off'],
   data() {
     return {
       search: '',
@@ -364,6 +355,16 @@ export default {
     hasFloor(userId) {
       return this.moderation.speakers.includes(userId)
     },
+    badgeLine(person) {
+      const marks = [
+        this.isNamedModerator(person.userId) && this.$t('videoCall.participants.moderator'),
+        this.hasFloor(person.userId) && this.$t('videoCall.participants.hasFloor'),
+        person.devices > 1 && this.$t('videoCall.participants.devices', { count: person.devices }),
+      ].filter(Boolean)
+      const you = this.$t('videoCall.you')
+      if (!person.isMe) return marks.join(' – ')
+      return marks.length ? `${you}: ${marks.join(' – ')}` : you
+    },
     stateLabel(person) {
       return [
         person.micOn
@@ -432,34 +433,45 @@ export default {
           ),
         )
       }
+      // One's own microphone, camera and screen share are one's own to switch off — here as on
+      // the control bar, whose buttons follow (switch-off). Somebody else's are the moderation's,
+      // and go through the server.
+      const own = person.isMe
+      if (own || this.isModerator) {
+        const switchOff = (kind, action) =>
+          own ? () => this.$emit('switch-off', kind) : () => this.moderate(person, action)
+        if (person.micOn) {
+          actions.push(
+            entry(
+              'mute',
+              this.$t('videoCall.participants.muteMicrophone'),
+              this.icons.microphoneSlash,
+              switchOff('mic', 'MUTE_MICROPHONE'),
+            ),
+          )
+        }
+        if (person.cameraOn) {
+          actions.push(
+            entry(
+              'camera',
+              this.$t('videoCall.participants.cameraOffAction'),
+              this.icons.videoCameraSlash,
+              switchOff('camera', 'DISABLE_CAMERA'),
+            ),
+          )
+        }
+        if (person.screenSharing) {
+          actions.push(
+            entry(
+              'screen',
+              this.$t('videoCall.participants.stopSharing'),
+              this.icons.desktop,
+              switchOff('screen', 'STOP_SCREEN_SHARE'),
+            ),
+          )
+        }
+      }
       if (!this.isModerator) return actions
-      if (person.micOn) {
-        actions.push(
-          entry(
-            'mute',
-            this.$t('videoCall.participants.muteMicrophone'),
-            this.icons.microphoneSlash,
-            () => this.moderate(person, 'MUTE_MICROPHONE'),
-          ),
-        )
-      }
-      if (person.cameraOn) {
-        actions.push(
-          entry(
-            'camera',
-            this.$t('videoCall.participants.cameraOffAction'),
-            this.icons.videoCameraSlash,
-            () => this.moderate(person, 'DISABLE_CAMERA'),
-          ),
-        )
-      }
-      if (person.screenSharing) {
-        actions.push(
-          entry('screen', this.$t('videoCall.participants.stopSharing'), this.icons.desktop, () =>
-            this.moderate(person, 'STOP_SCREEN_SHARE'),
-          ),
-        )
-      }
       actions.push(
         this.hasFloor(person.userId)
           ? entry(
@@ -566,7 +578,12 @@ export default {
         exceptUserIds: this.spared,
         floorUserIds: this.floor,
       })
-      if (done) this.closeDialog()
+      if (!done) return
+      // Muted along with the others: the own button follows, as nobody tells us about ourselves.
+      if (!this.spared.includes(this.meId) && !this.floor.includes(this.meId)) {
+        this.$emit('switch-off', 'mic')
+      }
+      this.closeDialog()
     },
     closeDialog() {
       this.dialog = null
@@ -646,17 +663,11 @@ export default {
   white-space: nowrap;
 }
 .call-participants__badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xx-small);
-}
-.call-participants__badge {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: var(--font-size-x-small);
   color: var(--text-color-soft);
-}
-.call-participants__badge--moderator,
-.call-participants__badge--floor {
-  color: var(--color-primary);
 }
 .call-participants__state {
   flex: 0 0 auto;
@@ -714,9 +725,12 @@ export default {
   gap: var(--space-xx-small);
   min-width: 0;
 }
-.call-participants__hint {
+.call-participants__mic {
+  flex: 0 0 auto;
   color: var(--text-color-soft);
-  font-size: var(--font-size-small);
+}
+.call-participants__mic--speaking {
+  color: var(--color-primary);
 }
 .call-participants__floor {
   display: inline-flex;

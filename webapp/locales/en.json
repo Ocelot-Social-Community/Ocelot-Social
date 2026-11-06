@@ -2031,7 +2031,6 @@
     "openChat": "Open chat",
     "participants": {
       "actionsFor": "What can be done about {name}",
-      "alreadyMuted": "muted already",
       "cameraOff": "camera off",
       "cameraOffAction": "Switch camera off",
       "cameraOn": "camera on",
@@ -2061,7 +2060,6 @@
       "search": "Search by name",
       "sharing": "sharing the screen",
       "showLarge": "Show large",
-      "speaking": "speaking",
       "stopSharing": "End screen share",
       "takeFloor": "Take the floor back",
       "takeOver": "Take over the moderation",

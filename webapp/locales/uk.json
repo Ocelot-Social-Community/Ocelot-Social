@@ -2031,7 +2031,6 @@
     "openChat": "Відкрити чат",
     "participants": {
       "actionsFor": "Дії: {name}",
-      "alreadyMuted": "мікрофон уже вимкнено",
       "cameraOff": "камеру вимкнено",
       "cameraOffAction": "Вимкнути камеру",
       "cameraOn": "камеру увімкнено",
@@ -2061,7 +2060,6 @@
       "search": "Пошук за ім’ям",
       "sharing": "показує екран",
       "showLarge": "Показати великим",
-      "speaking": "говорить",
       "stopSharing": "Зупинити показ екрана",
       "takeFloor": "Позбавити слова",
       "takeOver": "Взяти модерацію на себе",

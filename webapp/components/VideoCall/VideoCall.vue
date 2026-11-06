@@ -347,6 +347,7 @@
               :locally-muted="locallyMuted"
               @spotlight="spotlightPerson"
               @local-mute="muteForMe"
+              @switch-off="syncSwitchedOff"
             />
             <client-only v-else>
               <chat
