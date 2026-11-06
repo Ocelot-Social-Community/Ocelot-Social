@@ -1,7 +1,7 @@
 // The committed framework-token snapshot. Its whole job is to be READABLE where the webapp is not, so
 // what needs guarding is that it still matches the webapp — in the checkouts that have one.
 import assert from 'node:assert/strict'
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { after, describe, test } from 'node:test'
@@ -74,8 +74,11 @@ describe('framework tokens snapshot', () => {
       const dir = mkdtempSync(join(tmpdir(), 'ocelot-tokens-'))
       dirs.push(dir)
       const out = join(dir, 'tokens.ts')
+      // Its own public-token list: the committed one is not for a test to rewrite.
+      const publicOut = join(dir, 'public-tokens.snapshot.json')
+      writeFileSync(publicOut, JSON.stringify({ tokens: [] }))
 
-      assert.equal(writeFrameworkTokens(out), out)
+      assert.equal(writeFrameworkTokens(out, publicOut), out)
       assert.equal(readFileSync(out, 'utf8'), renderFrameworkTokens(computeCatalog()))
     })
   }
