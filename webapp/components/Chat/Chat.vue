@@ -1,6 +1,5 @@
 <template>
   <vue-advanced-chat
-    :theme="theme"
     :current-user-id="currentUser.id"
     :room-id="activeRoomId"
     :template-actions="EMPTY_ACTIONS"
@@ -175,10 +174,6 @@ export default {
   name: 'Chat',
   components: { OsButton, OsIcon, AvatarImage, RoomTitleLink },
   props: {
-    theme: {
-      type: String,
-      default: 'light',
-    },
     singleRoom: {
       type: Boolean,
       default: false,
@@ -370,7 +365,7 @@ export default {
       return '100%'
     },
     computedChatStyle() {
-      return chatStyle.STYLE.light
+      return chatStyle.STYLE
     },
     isSafari() {
       return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
@@ -562,6 +557,8 @@ export default {
       if (typeof shadowRoot.appendChild !== 'function') return
       const style = document.createElement('style')
       style.textContent = `
+        /* The library colours the links in a message #0d579c, unreadable on a dark ground. */
+        .vac-card-window a { color: var(--chat-tag-color); }
         .vac-player-bar { min-width: 0; }
         .vac-player-progress { width: auto; flex: 1 1 auto; min-width: 0; }
         .vac-room-header .vac-info-wrapper { flex: 1 1 0; min-width: 0; width: auto; }
@@ -727,9 +724,17 @@ export default {
         : { name: senderId }
     },
 
+    // A data URI is its own document — var() does not reach into it, so the colours are resolved
+    // here. Without a document (server render) the light values stand.
     initialsAvatarUrl(name) {
       const initials = (name || '?').match(/\b\w/g)?.join('').substring(0, 2).toUpperCase() || '?'
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><circle cx="28" cy="28" r="28" fill="rgb(25,122,49)"/><text x="50%25" y="50%25" dominant-baseline="central" text-anchor="middle" fill="white" font-family="sans-serif" font-size="22" font-weight="500">${initials}</text></svg>`
+      const token = (prop, fallback) =>
+        (typeof document !== 'undefined' &&
+          getComputedStyle(document.documentElement).getPropertyValue(prop).trim()) ||
+        fallback
+      const fill = encodeURIComponent(token('--color-primary-dark', 'rgb(25,122,49)'))
+      const text = encodeURIComponent(token('--text-color-primary-inverse', 'white'))
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><circle cx="28" cy="28" r="28" fill="${fill}"/><text x="50%25" y="50%25" dominant-baseline="central" text-anchor="middle" fill="${text}" font-family="sans-serif" font-size="22" font-weight="500">${initials}</text></svg>`
       return `data:image/svg+xml,${svg}`
     },
 

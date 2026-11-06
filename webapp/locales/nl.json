@@ -1313,6 +1313,7 @@
     "pageTitle": "Kaart",
     "styles": {
       "dark": "Donker",
+      "navigation-night": "Nacht",
       "outdoors": "Buiten",
       "satellite": "Satelliet",
       "streets": "Straten",
@@ -1915,6 +1916,11 @@
     "newTermsAndConditions": "Nieuwe algemene voorwaarden",
     "termsAndConditionsNewConfirm": "Ik heb de nieuwe algemene voorwaarden gelezen en ga ermee akkoord.",
     "termsAndConditionsNewConfirmText": "Lees nu de nieuwe gebruiksvoorwaarden!"
+  },
+  "themeSwitch": {
+    "dark": "Thema: donker",
+    "light": "Thema: licht",
+    "system": "Thema: zoals het systeem"
   },
   "user-avatar": {
     "popover": {

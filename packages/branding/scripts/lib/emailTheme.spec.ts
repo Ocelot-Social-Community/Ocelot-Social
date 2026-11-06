@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict'
 import { describe, test } from 'node:test'
 
-import { buildEmailBrandingCss, EMAIL_THEME, resolveTokens } from './emailTheme.ts'
+import { buildEmailBrandingCss, EMAIL_THEME, lightOf, resolveTokens } from './emailTheme.ts'
 
 describe('resolveTokens', () => {
   test('passes literal values through untouched', () => {
@@ -331,4 +331,20 @@ describe('buildEmailBrandingCss', () => {
       assert.ok(styled.has(selector), selector)
     }
   })
+})
+
+test('lightOf keeps the light half of light-dark(), commas inside it included', () => {
+  assert.equal(lightOf('light-dark(rgb(1, 2, 3), rgb(4, 5, 6))'), 'rgb(1, 2, 3)')
+  assert.equal(
+    lightOf('0 1px light-dark(red, blue), 0 2px light-dark(#fff, #000)'),
+    '0 1px red, 0 2px #fff',
+  )
+  assert.equal(lightOf('rgb(1, 2, 3)'), 'rgb(1, 2, 3)')
+  assert.equal(lightOf('light-dark(red'), 'light-dark(red')
+  assert.equal(lightOf('light-dark(red)'), 'light-dark(red)')
+})
+
+test('resolveTokens flattens a light-dark() token to its light value, references inside it too', () => {
+  const out = resolveTokens({ a: 'rgb(1, 2, 3)', b: 'light-dark(var(--a), rgb(9, 9, 9))' })
+  assert.equal(out.b, 'rgb(1, 2, 3)')
 })

@@ -145,7 +145,7 @@ export default {
   padding: var(--space-small);
   background: var(--background-color-soft);
   color: var(--text-color-base);
-  border: 1px solid var(--color-neutral-85);
+  border: 1px solid var(--border-color-softest);
   border-radius: var(--border-radius-base);
   box-shadow: var(--box-shadow-large);
   /*  Scrolls down when the parked window is too low for it, never sideways: */

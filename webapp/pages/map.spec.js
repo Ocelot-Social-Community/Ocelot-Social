@@ -318,9 +318,15 @@ describe('map', () => {
         expect(wrapper.vm.mapZoom).toBe(10)
       })
 
-      it('availableStyles has 4 styles with titles', () => {
+      it('availableStyles has 5 styles with titles', () => {
         const styles = wrapper.vm.availableStyles
-        expect(Object.keys(styles)).toEqual(['outdoors', 'streets', 'satellite', 'dark'])
+        expect(Object.keys(styles)).toEqual([
+          'outdoors',
+          'navigation-night',
+          'streets',
+          'satellite',
+          'dark',
+        ])
         expect(styles.outdoors.title).toBe('map.styles.outdoors')
       })
 
@@ -692,9 +698,9 @@ describe('map', () => {
           expect(toggle.querySelector('svg')).toBeTruthy()
         })
 
-        it('has a popover with 4 style buttons', () => {
+        it('has a popover with 5 style buttons', () => {
           const buttons = container.querySelectorAll('.map-style-popover-btn')
-          expect(buttons.length).toBe(4)
+          expect(buttons.length).toBe(5)
         })
 
         it('marks active style', () => {
@@ -724,16 +730,32 @@ describe('map', () => {
           expect(popover.classList.contains('map-style-popover--open')).toBe(false)
         })
 
+        it('moves the active mark along when the theme switches the tiles', async () => {
+          const buttons = container.querySelectorAll('.map-style-popover-btn')
+          wrapper.vm.dark = true
+          await wrapper.vm.$nextTick()
+          // v-mapbox's watcher on mapOptions.style does the map.setStyle — no call of our own.
+          expect(wrapper.vm.mapOptions.style).toBe(
+            wrapper.vm.availableStyles['navigation-night'].url,
+          )
+          expect(mapSetStyleMock).not.toHaveBeenCalled()
+          expect(buttons[1].classList.contains('map-style-popover-btn--active')).toBe(true)
+          expect(buttons[1].getAttribute('aria-selected')).toBe('true')
+          expect(buttons[0].classList.contains('map-style-popover-btn--active')).toBe(false)
+          expect(buttons[0].getAttribute('aria-selected')).toBe('false')
+        })
+
         it('clicking style button sets correct style and closes popover', () => {
           const buttons = container.querySelectorAll('.map-style-popover-btn')
           const popover = container.querySelector('.map-style-popover')
           popover.classList.add('map-style-popover--open')
-          // Click "streets" button (index 1)
-          buttons[1].click()
-          expect(mapSetStyleMock).toHaveBeenCalledWith(wrapper.vm.availableStyles.streets.url)
+          // Click "streets" button (index 2)
+          buttons[2].click()
+          expect(mapSetStyleMock).not.toHaveBeenCalled()
+          expect(wrapper.vm.mapOptions.style).toBe(wrapper.vm.availableStyles.streets.url)
           expect(wrapper.vm.activeStyle).toBe(wrapper.vm.availableStyles.streets.url)
           expect(popover.classList.contains('map-style-popover--open')).toBe(false)
-          expect(buttons[1].classList.contains('map-style-popover-btn--active')).toBe(true)
+          expect(buttons[2].classList.contains('map-style-popover-btn--active')).toBe(true)
           // Previous active button should no longer be active
           expect(buttons[0].classList.contains('map-style-popover-btn--active')).toBe(false)
         })
@@ -1319,9 +1341,10 @@ describe('map', () => {
       })
 
       describe('setStyle', () => {
-        it('sets map style and activeStyle', () => {
+        it('sets activeStyle, which the map follows through mapOptions.style', () => {
           wrapper.vm.setStyle('mapbox://styles/mapbox/dark-v10')
-          expect(mapSetStyleMock).toHaveBeenCalledWith('mapbox://styles/mapbox/dark-v10')
+          expect(mapSetStyleMock).not.toHaveBeenCalled()
+          expect(wrapper.vm.mapOptions.style).toBe('mapbox://styles/mapbox/dark-v10')
           expect(wrapper.vm.activeStyle).toBe('mapbox://styles/mapbox/dark-v10')
         })
       })

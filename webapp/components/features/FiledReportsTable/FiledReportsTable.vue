@@ -67,7 +67,7 @@ export default {
 <style>
 .nested-table {
   padding: var(--space-small);
-  border-top: var(--border-size-base) solid var(--color-neutral-60);
-  border-bottom: var(--border-size-base) solid var(--color-neutral-60);
+  border-top: var(--border-size-base) solid var(--border-color-base);
+  border-bottom: var(--border-size-base) solid var(--border-color-base);
 }
 </style>

@@ -1313,6 +1313,7 @@
     "pageTitle": "Map",
     "styles": {
       "dark": "Dark",
+      "navigation-night": "Night",
       "outdoors": "Outdoors",
       "satellite": "Satellite",
       "streets": "Streets",
@@ -1915,6 +1916,11 @@
     "newTermsAndConditions": "New Terms and Conditions",
     "termsAndConditionsNewConfirm": "I have read and agree to the new terms of conditions.",
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!"
+  },
+  "themeSwitch": {
+    "dark": "Theme: dark",
+    "light": "Theme: light",
+    "system": "Theme: follow system"
   },
   "user-avatar": {
     "popover": {

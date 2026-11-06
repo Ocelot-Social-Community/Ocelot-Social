@@ -1,6 +1,7 @@
 import Vuex from 'vuex'
 import { shallowMount } from '@vue/test-utils'
 import HeaderMenu from './HeaderMenu.vue'
+import { defineBranding, setBranding } from '@ocelot-social/branding'
 
 const localVue = global.localVue
 
@@ -103,6 +104,17 @@ describe('HeaderMenu', () => {
       expect(wrapper.vm.inviteRegistration).toBe(true)
       expect(wrapper.vm.SHOW_GROUP_BUTTON_IN_HEADER).toBe(true)
       expect(wrapper.vm.SHOW_CONTENT_FILTER_HEADER_MENU).toBe(true)
+    })
+
+    it('hasThemeChoice: the switch only where the brand has both colour schemes', () => {
+      expect(Wrapper().vm.hasThemeChoice).toBe(true) // vanilla
+      setBranding(defineBranding({ theme: { colorScheme: 'light' } }))
+      expect(Wrapper().vm.hasThemeChoice).toBe(false)
+      setBranding(defineBranding({ theme: { colorScheme: 'dark' } }))
+      expect(Wrapper().vm.hasThemeChoice).toBe(false)
+      setBranding(defineBranding({ theme: { colorScheme: 'light dark' } }))
+      expect(Wrapper().vm.hasThemeChoice).toBe(true)
+      setBranding(undefined)
     })
 
     it('showFilterMenuDropdown is true only on the index route', () => {

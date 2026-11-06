@@ -66,7 +66,11 @@ export default {
   position: relative;
   height: 26px; /*  styleguide-button-size */
   border: 1px solid var(--color-primary);
-  background: repeating-linear-gradient(120deg, var(--color-neutral-80), var(--color-neutral-70));
+  background: repeating-linear-gradient(
+    120deg,
+    var(--background-color-muted),
+    var(--border-color-soft)
+  );
   border-radius: var(--border-radius-base);
 }
 
@@ -108,6 +112,7 @@ export default {
 
 .progress-bar__label {
   position: relative;
+  text-shadow: var(--donation-bar-label-shadow);
 
   @media (max-width: 350px) {
     font-size: var(--font-size-small);

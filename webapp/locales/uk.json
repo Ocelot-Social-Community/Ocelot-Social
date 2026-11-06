@@ -1313,6 +1313,7 @@
     "pageTitle": "Карта",
     "styles": {
       "dark": "Темна",
+      "navigation-night": "Ніч",
       "outdoors": "На відкритому повітрі",
       "satellite": "Супутник",
       "streets": "Вулиці",
@@ -1915,6 +1916,11 @@
     "newTermsAndConditions": "Нові умови використання",
     "termsAndConditionsNewConfirm": "Я прочитав(-ла) та погоджуюся з новими умовами використання.",
     "termsAndConditionsNewConfirmText": "Будь ласка, ознайомтеся з новими умовами використання зараз!"
+  },
+  "themeSwitch": {
+    "dark": "Тема: темна",
+    "light": "Тема: світла",
+    "system": "Тема: як у системі"
   },
   "user-avatar": {
     "popover": {

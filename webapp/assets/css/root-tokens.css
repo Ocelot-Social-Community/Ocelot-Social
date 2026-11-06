@@ -63,11 +63,11 @@
  * @presenter Color
  */
 
-  --text-color-base: var(--color-neutral-20);
-  --text-color-soft: var(--color-neutral-40);
-  --text-color-softer: var(--color-neutral-60);
-  --text-color-disabled: var(--color-neutral-60);
-  --text-color-inverse: var(--color-neutral-95);
+  --text-color-base: light-dark(var(--color-neutral-20), rgb(212, 208, 218));
+  --text-color-soft: light-dark(var(--color-neutral-40), rgb(178, 172, 188));
+  --text-color-softer: light-dark(var(--color-neutral-60), rgb(140, 133, 152));
+  --text-color-disabled: light-dark(var(--color-neutral-60), rgb(110, 104, 120));
+  --text-color-inverse: light-dark(var(--color-neutral-95), rgb(24, 23, 27));
   --text-color-link: var(--color-primary);
   --text-color-link-active: var(--color-primary-highlight);
   --text-color-primary: var(--color-primary);
@@ -78,30 +78,46 @@
   --text-color-warning: var(--color-warning);
   --text-color-danger: var(--color-danger);
   --text-color-danger-inverse: var(--color-danger-inverse);
+  /* Icon and control text on light surfaces (map controls) — darker than --text-color-base. */
+  --text-color-strong: light-dark(rgb(51, 51, 51), rgb(240, 238, 243));
   /**
  * @tokens Color Background
  * @presenter Color
  */
 
-  --background-color-base: var(--color-neutral-100);
-  --background-color-soft: var(--color-neutral-95);
-  --background-color-softer: var(--color-neutral-90);
-  --background-color-softer-active: var(--color-neutral-95);
-  --background-color-softest: var(--color-neutral-85);
-  --background-color-inverse: var(--color-neutral-0);
-  --background-color-inverse-soft: var(--color-neutral-10);
-  --background-color-disabled: var(--color-neutral-90);
+  --background-color-base: light-dark(var(--color-neutral-100), rgb(24, 23, 27));
+  --background-color-soft: light-dark(var(--color-neutral-95), rgb(30, 29, 34));
+  --background-color-softer: light-dark(var(--color-neutral-90), rgb(38, 36, 43));
+  --background-color-softer-active: light-dark(var(--color-neutral-95), rgb(30, 29, 34));
+  --background-color-softest: light-dark(var(--color-neutral-85), rgb(48, 46, 54));
+  --background-color-inverse: light-dark(var(--color-neutral-0), rgb(240, 239, 242));
+  --background-color-inverse-soft: light-dark(var(--color-neutral-10), rgb(220, 218, 225));
+  --background-color-disabled: light-dark(var(--color-neutral-90), rgb(38, 36, 43));
   --background-color-primary: var(--color-primary);
   --background-color-primary-inverse: var(--color-primary-inverse);
   --background-color-warning: var(--color-warning);
+  /* State layers laid over whatever surface is below — hover, pressed, selected. */
+  --background-color-hover: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.06));
+  --background-color-pressed: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.12));
+  --background-color-selected: light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.1));
+  /* A filled surface one step below --background-color-softest, and the hover of a softer surface. */
+  --background-color-muted: light-dark(var(--color-neutral-80), rgb(58, 55, 64));
+  --background-color-softer-hover: light-dark(rgb(224, 224, 224), rgb(60, 57, 66));
+  /* Dims the page under an open menu. */
+  --background-color-overlay: light-dark(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.5));
+  /* See-through panels over a map. */
+  --background-color-translucent: light-dark(rgba(255, 255, 255, 0.75), rgba(24, 23, 27, 0.75));
+  --background-color-translucent-soft: light-dark(rgba(255, 255, 255, 0.5), rgba(24, 23, 27, 0.5));
   /**
  * @tokens Color Border
  * @presenter Color
  */
 
-  --border-color-base: var(--color-neutral-60);
-  --border-color-soft: var(--color-neutral-70);
-  --border-color-softer: var(--color-neutral-80);
+  --border-color-base: light-dark(var(--color-neutral-60), rgb(95, 90, 104));
+  --border-color-soft: light-dark(var(--color-neutral-70), rgb(75, 71, 83));
+  --border-color-softer: light-dark(var(--color-neutral-80), rgb(58, 55, 64));
+  --border-color-softest: light-dark(var(--color-neutral-85), rgb(48, 46, 54));
+  --border-color-strong: light-dark(var(--color-neutral-20), rgb(178, 172, 188));
   --border-color-active: var(--color-primary);
   --border-color-danger: var(--color-danger);
   /**
@@ -274,9 +290,24 @@
  * @presenter Shadow
  */
 
-  --box-shadow-x-large: 0 15px 30px 0 rgba(0, 0, 0, 0.11), 0 5px 15px 0 rgba(0, 0, 0, 0.08);
-  --box-shadow-large: 0 10px 20px 0 rgba(0, 0, 0, 0.11), 0 3px 10px 0 rgba(0, 0, 0, 0.08);
-  --box-shadow-base: 0px 12px 26px -4px rgba(0, 0, 0, 0.1);
+  /* Dark values are stronger: 10% black is invisible on a near-black ground. */
+  --box-shadow-x-large:
+    0 15px 30px 0 light-dark(rgba(0, 0, 0, 0.11), rgba(0, 0, 0, 0.5)),
+    0 5px 15px 0 light-dark(rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.4));
+  --box-shadow-large:
+    0 10px 20px 0 light-dark(rgba(0, 0, 0, 0.11), rgba(0, 0, 0, 0.5)),
+    0 3px 10px 0 light-dark(rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.4));
+  --box-shadow-base: 0px 12px 26px -4px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.45));
+  /* The cards: the base shadow's geometry, but quieter in the dark theme, where many of them side by side
+     make the stronger one restless (OsCard). */
+  --box-shadow-card: 0px 12px 26px -4px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
+  /* The colour alone, for shadows that carry their own geometry. */
+  --shadow-color: light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
+  --shadow-color-strong: light-dark(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
+  --shadow-color-raised: light-dark(rgb(189, 189, 189), rgba(0, 0, 0, 0.6));
+  --scrollbar-thumb-color: light-dark(rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0.25));
+  /* Fill of the monochrome logo SVG. */
+  --color-logo: light-dark(rgb(0, 0, 0), rgb(232, 230, 236));
   /**
  * @tokens Effects
  */
@@ -334,13 +365,13 @@
   /* Brand knobs whose framework default used to live in an SCSS var() fallback. That fallback
      disappeared when the tokens became plain var(--x) references, so the default is declared
      here — one visible source instead of a value hidden in a fallback. */
-  --color-header-background: var(--color-neutral-100);
+  --color-header-background: light-dark(var(--color-neutral-100), rgb(30, 29, 34));
 
   /**
  * @tokens Footer Color
  */
 
-  --color-footer-background: var(--color-neutral-100);
+  --color-footer-background: light-dark(var(--color-neutral-100), rgb(30, 29, 34));
   --color-footer-link: var(--color-primary);
   /**
  * @tokens Locale Menu Color
@@ -356,6 +387,12 @@
   --color-donation-bar: var(--color-primary);
 
   --color-donation-bar-light: var(--color-primary-light);
+  /* The label lies half on the filled green, half on the grey: in the dark theme its light text needs a
+     dark halo to read on the green. None in the light theme, where the text is dark. */
+  --donation-bar-label-shadow:
+    0 0 2px light-dark(transparent, rgb(0, 0, 0)), 0 0 4px light-dark(transparent, rgb(0, 0, 0)),
+    0 0 8px light-dark(transparent, rgba(0, 0, 0, 0.9)),
+    0 0 14px light-dark(transparent, rgba(0, 0, 0, 0.7));
   /**
  * @tokens Toast Color
  */
@@ -394,51 +431,119 @@
   /* Brand knobs whose framework default used to live in an SCSS var() fallback. That fallback
      disappeared when the tokens became plain var(--x) references, so the default is declared
      here — one visible source instead of a value hidden in a fallback. */
-  --chat-message-bg-me: var(--color-primary-light);
-  --chat-sidemenu-background-active: var(--color-primary-light);
+  --chat-message-bg-me: light-dark(var(--color-primary-light), rgb(30, 70, 40));
+  --chat-sidemenu-background-active: light-dark(var(--color-primary-light), rgb(30, 70, 40));
   --chat-new-message-color: rgb(10, 161, 255);
-  --chat-message-checkmark-seen: var(--text-color-secondary);
+  /* The chat's own names for roles that already carry a light and a dark value, so a brand can
+     recolour just the chat (checkmarks, the unread counter, the message text, the icons) without
+     touching the app. Each is an alias: it follows the theme unless a brand sets it. */
   --chat-message-checkmark: var(--text-color-soft);
+  --chat-message-checkmark-seen: var(--text-color-secondary);
   --chat-room-color-counter-badge: var(--text-color-inverse);
   --chat-room-background-counter-badge: var(--color-danger);
-  /* The hint floating above a chat's messages (Chat.vue renderHint). Dark like the app's
-     tooltips, which carry the same text on the chat's tab: their background, text colour and
-     shadow (tooltip.css), and a hover for its close button that stays on the dark side. */
-  --chat-hint-background: var(--background-color-inverse-soft);
-  --chat-hint-color: var(--text-color-inverse);
-  --chat-hint-icon-color: var(--text-color-inverse);
-  --chat-hint-shadow: var(--box-shadow-large);
-  --chat-hint-close-hover-background: rgba(255, 255, 255, 0.15);
-  /* The room name next to its icon (Chat.vue .room-name-with-icon). Was referenced without ever being
-     declared and without a fallback, so `color` resolved to nothing and the browser dropped the whole
-     declaration — the name rendered in the inherited colour. Same family and same value as
-     --chat-message-color, which is what it visually pairs with. */
-  --chat-room-color-username: var(--text-color-base);
-
   --chat-message-color: var(--text-color-base);
-  --chat-message-bg-others: var(--color-neutral-80);
-  --chat-sidemenu-bg: var(--color-neutral-100);
-  /* The hover partner of --chat-sidemenu-bg. Carried over as a literal because the SCSS side had it
-     as one too ($chat-sidemenu-background-over); it is a token rather than a value inlined in
-     constants/chatTokens.js so a brand can actually reach it, like every other chat token. */
-  --chat-sidemenu-background-over: #f6f6f6;
   --chat-message-timestamp: var(--text-color-soft);
   --chat-icon-add: var(--color-primary);
   --chat-icon-send: var(--color-primary);
   --chat-icon-emoji: var(--color-primary);
+  /* The room name next to its icon (Chat.vue .room-name-with-icon): the message colour it pairs with. */
+  --chat-room-color-username: var(--text-color-base);
+  /* The hint floating above a chat's messages (Chat.vue renderHint). Dark like the app's
+     tooltips, which carry the same text on the chat's tab: their background and text colour
+     (so it follows them into the dark theme), their shadow (tooltip.css), and a hover for its
+     close button that stays on the dark side. */
+  --chat-hint-background: var(--tooltip-background);
+  --chat-hint-color: var(--tooltip-color);
+  --chat-hint-icon-color: var(--tooltip-color);
+  --chat-hint-shadow: var(--box-shadow-large);
+  --chat-hint-close-hover-background: rgba(255, 255, 255, 0.15);
+  /* The bars of the chat and of the call — their headers, the call's control bar, the chat's footer. One
+     step off the content in the light theme; in the dark one the page's own bars are that same step, so
+     these take the content's ground instead and stand off the page's. */
+  --window-bar-background: light-dark(var(--background-color-soft), var(--background-color-base));
+  /* The room name next to its icon (Chat.vue .room-name-with-icon). Was referenced without ever being
+     declared and without a fallback, so `color` resolved to nothing and the browser dropped the whole
+     declaration — the name rendered in the inherited colour. Same family and same value as
+     --text-color-base (the message colour), which is what it visually pairs with. */
+  /* The docked chat window (layouts/default.vue .chat-modul) and its close link. */
+  --chat-module-background: light-dark(rgb(233, 228, 228), rgb(38, 36, 43));
+  --chat-module-close-color: light-dark(blue, rgb(120, 170, 255));
+  --chat-message-bg-others: light-dark(var(--color-neutral-80), rgb(48, 46, 54));
+  /* Roles that read a neutral step on purpose and look the same in both themes. */
+  --video-surface: var(--color-neutral-10);
+  --video-surface-deep: var(--color-neutral-0);
+  --video-text-soft: var(--color-neutral-70);
+  /* Text on what lies over a video: the black plates (names, speaker chips, "microphone starting") and the
+     dark video surfaces (status, notices). Both stay dark in both themes, so the text stays light in both —
+     --text-color-inverse turns dark. */
+  --video-on-media-color: var(--color-neutral-95);
+  --text-color-muted: light-dark(var(--color-neutral-50), rgb(160, 153, 172));
+  --text-color-on-primary: var(--color-neutral-100);
+  --shadow-ink: var(--color-neutral-0);
+  /* Tooltips (tooltip.css): inverse in light, so they stand off the page; dark in dark too. */
+  --tooltip-background: light-dark(var(--background-color-inverse-soft), rgb(58, 55, 64));
+  --tooltip-color: light-dark(var(--text-color-inverse), rgb(232, 230, 236));
+  --chat-sidemenu-bg: light-dark(var(--color-neutral-100), rgb(30, 29, 34));
+  /* The hover partner of --chat-sidemenu-bg. Carried over as a literal because the SCSS side had it
+     as one too ($chat-sidemenu-background-over); it is a token rather than a value inlined in
+     constants/chatTokens.js so a brand can actually reach it, like every other chat token. */
+  --chat-sidemenu-background-over: light-dark(#f6f6f6, rgb(38, 36, 43));
+  /* vue-advanced-chat's own palette, one token per literal it shipped with (constants/chat.js).
+     Names must never equal one of the library's own --chat-* variables: it sets those on its root
+     from these values, and a var() naming itself is a cycle the browser throws away. */
+  --chat-accent: light-dark(#1976d2, rgb(100, 170, 240));
+  --chat-accent-contrast: light-dark(#fff, rgb(24, 23, 27));
+  --chat-border-color: light-dark(#e1e4e8, rgb(58, 55, 64));
+  --chat-search-border-color: light-dark(#e1e5e8, rgb(58, 55, 64));
+  --chat-hover-background: light-dark(#f6f6f6, rgb(38, 36, 43));
+  --chat-text-strong: light-dark(#0a0a0a, rgb(232, 230, 236));
+  --chat-text-muted: light-dark(#9ca6af, rgb(140, 133, 152));
+  --chat-text-subtle: light-dark(#757e85, rgb(160, 153, 172));
+  --chat-deleted-background: light-dark(#dadfe2, rgb(48, 46, 54));
+  --chat-selected-background: light-dark(#c2dcf2, rgb(40, 60, 90));
+  --chat-notice-background: light-dark(#e5effa, rgb(38, 44, 58));
+  --chat-notice-color: light-dark(#505a62, rgb(178, 172, 188));
+  --chat-shade-strong: light-dark(rgba(0, 0, 0, 0.15), rgba(255, 255, 255, 0.15));
+  --chat-shade: light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.08));
+  --chat-reply-color: light-dark(#6e6e6e, rgb(178, 172, 188));
+  --chat-tag-color: light-dark(#0d579c, rgb(110, 170, 235));
+  --chat-image-background: light-dark(#ddd, rgb(48, 46, 54));
+  --chat-reaction-background: light-dark(#eee, rgb(48, 46, 54));
+  --chat-reaction-border-hover: light-dark(#ddd, rgb(75, 71, 83));
+  --chat-reaction-me-background: light-dark(#cfecf5, rgb(30, 60, 75));
+  --chat-reaction-me-border: light-dark(#3b98b8, rgb(59, 152, 184));
+  --chat-reaction-me-color: light-dark(#0b59b3, rgb(140, 190, 240));
+  --chat-record-color: #eb4034;
+  --chat-audio-color: light-dark(#455247, rgb(178, 172, 188));
+  --chat-code-background: light-dark(rgba(239, 239, 239, 0.7), rgba(255, 255, 255, 0.08));
+  --chat-code-border: light-dark(rgba(212, 212, 212, 0.9), rgba(255, 255, 255, 0.15));
+  --chat-code-color: light-dark(#e01e5a, rgb(240, 110, 150));
+  --chat-room-message-color: light-dark(#67717a, rgb(178, 172, 188));
+  --chat-room-timestamp-color: light-dark(#a2aeb8, rgb(140, 133, 152));
+  --chat-online-color: #4caf50;
+  --chat-on-media-color: #fff;
+  --chat-icon-strong: light-dark(#000, rgb(232, 230, 236));
+  --chat-icon-soft: light-dark(#9e9e9e, rgb(140, 133, 152));
+  --chat-icon-faint: light-dark(rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.35));
+  --chat-icon-backdrop: light-dark(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45));
+  --chat-confirm-color: #1ba65b;
   /**
  * @tokens Map Marker Color
  * @presenter Color
  */
 
-  /* Same colors as pages/map.vue's marker legend (markers.types). Not yet consumed there itself —
-     that page still keys its GeoJSON icons by hardcoded hex — but defined here as the single source
-     so other map/location UI (e.g. LocationPickerMap's pin) can share it, and so it stays overridable
-     by a brand like every other token here. */
+  /* The single source of the marker colours: pages/map.vue's legend reads them, LocationPickerMap's
+     pin resolves them. The GeoJSON icons on pages/map.vue are still PNGs in these colours. */
   --color-map-marker-current-user: rgb(247, 150, 64);
   --color-map-marker-user: rgb(51, 195, 119);
   --color-map-marker-group: rgb(248, 77, 77);
   --color-map-marker-event: rgb(119, 83, 235);
+  /* Under the tiles while they load, and the controls drawn over the map (mapbox-gl's own and ours). */
+  /* mapbox-gl ships its control icons as dark SVG data URIs — only a filter can lighten them. */
+  /* Read by packages/ui OsLocationMap, which ships its own literal fallbacks. */
+  --map-background: light-dark(rgb(229, 229, 229), rgb(38, 36, 43));
+  --map-control-background: var(--background-color-base);
+  --map-control-icon-filter: none;
   /**
  * @tokens Video Call Bars
  */
@@ -454,6 +559,6 @@
      wants a light text, which these bars do not bring along. */
   --video-call-bar-page-header-color: var(--color-header-background);
   --video-call-bar-page-footer-color: var(--color-footer-background);
-  --video-call-bar-header-color: var(--color-header-background);
-  --video-call-bar-controls-color: var(--background-color-soft);
+  --video-call-bar-header-color: var(--window-bar-background);
+  --video-call-bar-controls-color: var(--window-bar-background);
 }

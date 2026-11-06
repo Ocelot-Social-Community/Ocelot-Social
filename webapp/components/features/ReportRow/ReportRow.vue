@@ -207,7 +207,7 @@ export default {
 <style>
 .report-row {
   &:nth-child(2n + 1) {
-    background-color: var(--color-neutral-95);
+    background-color: var(--background-color-soft);
   }
 
   .title {

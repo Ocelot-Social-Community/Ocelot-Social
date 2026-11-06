@@ -1313,6 +1313,7 @@
     "pageTitle": "Harta",
     "styles": {
       "dark": "E errët",
+      "navigation-night": "Natë",
       "outdoors": "Jashtë",
       "satellite": "Satelit",
       "streets": "Rrugë",
@@ -1915,6 +1916,11 @@
     "newTermsAndConditions": "Kushte dhe rregulla të reja",
     "termsAndConditionsNewConfirm": "Kam lexuar dhe pranoj kushtet dhe rregullat e reja.",
     "termsAndConditionsNewConfirmText": "Ju lutem lexoni tani kushtet e reja të përdorimit!"
+  },
+  "themeSwitch": {
+    "dark": "Tema: e errët",
+    "light": "Tema: e çelët",
+    "system": "Tema: si sistemi"
   },
   "user-avatar": {
     "popover": {

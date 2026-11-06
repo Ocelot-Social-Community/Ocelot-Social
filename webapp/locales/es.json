@@ -1313,6 +1313,7 @@
     "pageTitle": "Mapa",
     "styles": {
       "dark": "Oscuro",
+      "navigation-night": "Noche",
       "outdoors": "Exterior",
       "satellite": "Satélite",
       "streets": "Calles",
@@ -1915,6 +1916,11 @@
     "newTermsAndConditions": "Nuevos términos de uso",
     "termsAndConditionsNewConfirm": "He leído y acepto los nuevos términos de uso.",
     "termsAndConditionsNewConfirmText": "¡Por favor, lea los nuevos términos de uso ahora!"
+  },
+  "themeSwitch": {
+    "dark": "Tema: oscuro",
+    "light": "Tema: claro",
+    "system": "Tema: como el sistema"
   },
   "user-avatar": {
     "popover": {

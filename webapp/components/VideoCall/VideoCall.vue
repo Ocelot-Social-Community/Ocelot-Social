@@ -2700,6 +2700,13 @@ export default {
 
 /*  The header itself — avatar, title, where its buttons go — is RoomHeader's. What is */
 /*  the call's own are the things put into it. */
+/*  Its ground is the chat's bar, not the page header's: in the dark theme the page's would be the */
+/*  same dark and the call's header would not stand off it. RoomHeader paints with */
+/*  --color-header-background, so it is set here for the header and what it holds. */
+.video-call__header {
+  --color-header-background: var(--window-bar-background);
+}
+
 .video-call__count {
   background: var(--color-primary);
   color: var(--color-primary-inverse);
@@ -2726,7 +2733,7 @@ export default {
   flex: 1;
   display: flex;
   overflow: hidden;
-  background: var(--color-neutral-10);
+  background: var(--video-surface);
   position: relative;
   min-height: 0;
 }
@@ -2791,7 +2798,7 @@ export default {
 
 .video-call__speaker-chip {
   background: rgba(0, 0, 0, 0.65);
-  color: var(--text-color-inverse);
+  color: var(--video-on-media-color);
   padding: 2px var(--space-x-small);
   border-radius: var(--border-radius-rounded);
   font-size: var(--font-size-small);
@@ -2812,7 +2819,7 @@ export default {
   display: flex;
   flex-direction: column;
   background: var(--background-color-base);
-  border-left: 1px solid var(--color-neutral-85);
+  border-left: 1px solid var(--border-color-softest);
   overflow: hidden;
 }
 
@@ -2839,7 +2846,7 @@ export default {
   max-width: none;
   min-height: 0;
   border-left: 0;
-  border-top: 1px solid var(--color-neutral-85);
+  border-top: 1px solid var(--border-color-softest);
 }
 
 /*  The notices sit at the bottom of the body, which is the chat here: keep them */
@@ -2862,7 +2869,8 @@ export default {
   /*  The tabs start at the sidebar's edge, as in the floating chat window; the close */
   /*  button at the row's end keeps its space to the edge. */
   padding: 0 var(--space-small) 0 0;
-  border-bottom: 1px solid var(--color-neutral-85);
+  background: var(--window-bar-background);
+  border-bottom: 1px solid var(--border-color-softest);
 }
 
 .video-call__chat-actions {
@@ -2880,7 +2888,7 @@ export default {
   justify-content: center;
   padding: var(--space-small);
   text-align: center;
-  color: var(--text-color-inverse);
+  color: var(--video-on-media-color);
 }
 
 /*  Overlay like the speaker chips, but at the bottom: the body is a row */
@@ -2906,8 +2914,8 @@ export default {
   padding: var(--space-xx-small) var(--space-small);
   border-radius: var(--border-radius-base);
   text-align: center;
-  color: var(--text-color-inverse);
-  background: var(--color-neutral-10);
+  color: var(--video-on-media-color);
+  background: var(--video-surface);
 }
 
 .video-call__notice--warning {
@@ -2940,8 +2948,8 @@ export default {
   gap: var(--space-x-small);
   /*  Little space above and below the buttons: the height goes to the videos. */
   padding: var(--space-xx-small) var(--space-small);
-  background: var(--background-color-soft);
-  border-top: 1px solid var(--color-neutral-85);
+  background: var(--window-bar-background);
+  border-top: 1px solid var(--border-color-softest);
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -2990,7 +2998,7 @@ export default {
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto minmax(0, 1fr) auto;
   /*  The body's dark ground, which it no longer paints itself. */
-  background: var(--color-neutral-10);
+  background: var(--video-surface);
 }
 
 .video-call--bars-manual .video-call__body {
@@ -3078,7 +3086,7 @@ export default {
   grid-template-rows: minmax(0, 1fr);
   padding-top: 0;
   padding-bottom: 0;
-  background: var(--color-neutral-10);
+  background: var(--video-surface);
   /*  How far the bars reach into the videos, for what is to stay clear of them: the page's */
   /*  header and footer, and the call's header (44px) and control bar (45px). */
   --video-call-bars-top: calc(var(--header-height) + 44px);
@@ -3190,7 +3198,7 @@ export default {
   grid-template-rows: minmax(0, 1fr);
   /*  The body's dark ground, which it no longer paints itself: no light corner shows */
   /*  around the rounded tiles. */
-  background: var(--color-neutral-10);
+  background: var(--video-surface);
 }
 
 .video-call--parked-bars .video-call__body {

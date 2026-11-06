@@ -128,7 +128,7 @@ export default {
 
 <style>
 .add-group-member {
-  background-color: var(--color-neutral-100);
+  background-color: var(--background-color-base);
   padding: var(--space-base);
 }
 </style>

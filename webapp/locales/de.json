@@ -1313,6 +1313,7 @@
     "pageTitle": "Landkarte",
     "styles": {
       "dark": "Dunkel",
+      "navigation-night": "Nacht",
       "outdoors": "Landschaft",
       "satellite": "Satellit",
       "streets": "Straßen",
@@ -1915,6 +1916,11 @@
     "newTermsAndConditions": "Neue Nutzungsbedingungen",
     "termsAndConditionsNewConfirm": "Ich habe die neuen Nutzungsbedingungen durchgelesen und stimme zu.",
     "termsAndConditionsNewConfirmText": "Bitte lies Dir die neuen Nutzungsbedingungen jetzt durch!"
+  },
+  "themeSwitch": {
+    "dark": "Design: dunkel",
+    "light": "Design: hell",
+    "system": "Design: wie das System"
   },
   "user-avatar": {
     "popover": {

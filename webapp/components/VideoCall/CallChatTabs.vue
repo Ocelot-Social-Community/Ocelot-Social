@@ -201,7 +201,7 @@ export default {
 }
 
 .call-chat-tabs__cell:hover {
-  border-bottom-color: var(--color-neutral-70);
+  border-bottom-color: var(--border-color-soft);
 }
 
 .call-chat-tabs__cell--active,

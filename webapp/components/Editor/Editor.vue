@@ -533,7 +533,7 @@ li > p {
 
   &:focus-within {
     border-color: var(--color-primary);
-    background-color: var(--color-neutral-100);
+    background-color: var(--background-color-base);
   }
 }
 
