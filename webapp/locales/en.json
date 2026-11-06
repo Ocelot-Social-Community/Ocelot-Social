@@ -1990,6 +1990,7 @@
       "tooltip": "Video call in group “{name}”"
     },
     "hideBars": "Hide the bars",
+    "hideNotices": "Hide notices",
     "leave": "Leave call",
     "maximize": "Maximize",
     "micMuted": "Microphone off",
@@ -2044,6 +2045,7 @@
     "screenShare": "Screen",
     "screenShareEnded": "Screen sharing ended",
     "showBars": "Show the bars",
+    "showNotices": "Show notices",
     "showVideos": "Show videos",
     "spotlightExit": "Exit spotlight",
     "title": "Group video call",

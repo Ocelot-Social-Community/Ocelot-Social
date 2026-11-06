@@ -1990,6 +1990,7 @@
       "tooltip": "Appel vidéo dans le groupe « {name} »"
     },
     "hideBars": "Masquer les barres",
+    "hideNotices": "Masquer les avis",
     "leave": "Quitter l'appel",
     "maximize": "Agrandir",
     "micMuted": "Microphone désactivé",
@@ -2044,6 +2045,7 @@
     "screenShare": "Écran",
     "screenShareEnded": "Partage d'écran terminé",
     "showBars": "Afficher les barres",
+    "showNotices": "Afficher les avis",
     "showVideos": "Afficher les vidéos",
     "spotlightExit": "Quitter le focus",
     "title": "Appel vidéo de groupe",

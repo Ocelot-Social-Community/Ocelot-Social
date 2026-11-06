@@ -2859,6 +2859,10 @@ describe('VideoCall', () => {
       room.handlers.ConnectionQualityChanged('poor', room.localParticipant)
       jest.advanceTimersByTime(5_000)
       await wrapper.vm.$nextTick()
+      // On the videos, in the stage that anchors it — not over the control bar.
+      expect(wrapper.find('.video-call__stage [data-test="video-call-audio-only"]').exists()).toBe(
+        true,
+      )
       await wrapper.find('[data-test="video-call-show-videos"]').trigger('click')
       expect(wrapper.vm.audioOnly).toBe(false)
       expect(camera.setSubscribed).toHaveBeenLastCalledWith(true)
@@ -3668,6 +3672,16 @@ describe('VideoCall', () => {
           expect(wrapper.vm.spotlightKey).toBeNull()
         })
 
+        it('stay at a tap on a notice lying on the videos', () => {
+          const notice = document.createElement('div')
+          notice.className = 'video-call__notices'
+          const button = document.createElement('button')
+          notice.appendChild(button)
+          stage.appendChild(notice)
+          tap(button)
+          expect(wrapper.vm.barsHidden).toBe(false)
+        })
+
         it('stay at a tap on a tile, which is spotlighted as ever', () => {
           tap(tile)
           expect(wrapper.vm.barsHidden).toBe(false)
@@ -3958,6 +3972,78 @@ describe('VideoCall', () => {
       await wrapper.setData({ phase: 'in-call' })
       expect(wrapper.find('.video-call').classes()).not.toContain('video-call--parked-bars')
       expect(wrapper.find('[data-test="video-call-parked-count"]').exists()).toBe(false)
+    })
+  })
+
+  describe('notices of the parked window', () => {
+    const call = async ({ minimized = true, ...data } = {}) => {
+      const built = factory({ show: true, minimized })
+      await built.wrapper.setData({ phase: 'in-call', ...data })
+      return built
+    }
+    const notices = (wrapper) => wrapper.find('[data-test="video-call-notices"]')
+    const toggle = (wrapper) => wrapper.find('[data-test="video-call-notices-toggle"]')
+    const marker = (wrapper) => wrapper.find('[data-test="video-call-parked-notices"]')
+
+    it('are folded behind a button in the header, and still there to be announced', async () => {
+      const { wrapper } = await call({ reconnecting: true })
+      expect(notices(wrapper).classes()).toContain('video-call__notices--collapsed')
+      expect(wrapper.find('[data-test="video-call-reconnecting"]').exists()).toBe(true)
+      expect(toggle(wrapper).attributes()).toMatchObject({
+        'aria-expanded': 'false',
+        'aria-controls': 'video-call-notices',
+        'aria-label': 'videoCall.showNotices',
+        variant: 'warning',
+      })
+      expect(notices(wrapper).attributes('id')).toBe('video-call-notices')
+    })
+
+    it('unfold and fold again with the button', async () => {
+      const { wrapper } = await call({ reconnecting: true })
+      await toggle(wrapper).trigger('click')
+      expect(notices(wrapper).classes()).not.toContain('video-call__notices--collapsed')
+      expect(toggle(wrapper).attributes()).toMatchObject({
+        'aria-expanded': 'true',
+        'aria-label': 'videoCall.hideNotices',
+      })
+      await toggle(wrapper).trigger('click')
+      expect(notices(wrapper).classes()).toContain('video-call__notices--collapsed')
+    })
+
+    it('leave a mark beside the count while folded, for the header is away', async () => {
+      const { wrapper } = await call({ reconnecting: true })
+      expect(marker(wrapper).exists()).toBe(true)
+      await toggle(wrapper).trigger('click')
+      expect(marker(wrapper).exists()).toBe(false)
+    })
+
+    it('unfold by themselves for a warning, each time one comes up', async () => {
+      const { wrapper } = await call({ reconnecting: true })
+      await wrapper.setData({ micProblem: true })
+      expect(notices(wrapper).classes()).not.toContain('video-call__notices--collapsed')
+      await toggle(wrapper).trigger('click')
+      await wrapper.setData({ audioBlocked: true })
+      expect(notices(wrapper).classes()).toContain('video-call__notices--collapsed')
+      await wrapper.setData({ micProblem: false, audioBlocked: false })
+      await wrapper.setData({ audioBlocked: true })
+      expect(notices(wrapper).classes()).not.toContain('video-call__notices--collapsed')
+    })
+
+    it('start folded again once there was nothing to say', async () => {
+      const { wrapper } = await call({ reconnecting: true })
+      await toggle(wrapper).trigger('click')
+      await wrapper.setData({ reconnecting: false })
+      expect(notices(wrapper).exists()).toBe(false)
+      expect(toggle(wrapper).exists()).toBe(false)
+      await wrapper.setData({ audioOnly: true })
+      expect(notices(wrapper).classes()).toContain('video-call__notices--collapsed')
+    })
+
+    it('are not folded in the maximized call, which has room for them', async () => {
+      const { wrapper } = await call({ minimized: false, reconnecting: true })
+      expect(notices(wrapper).classes()).not.toContain('video-call__notices--collapsed')
+      expect(toggle(wrapper).exists()).toBe(false)
+      expect(marker(wrapper).exists()).toBe(false)
     })
   })
 
