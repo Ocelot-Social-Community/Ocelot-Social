@@ -27,6 +27,7 @@ services:
       - minio-mc
       - mailserver
       - redis
+      - mapbox
     build:
       target: test
     environment:
@@ -52,6 +53,8 @@ services:
       - LIVEKIT_URL=wss://livekit.example.test
       - LIVEKIT_API_KEY=test-key
       - LIVEKIT_API_SECRET=test-secret
+      # Geocoding against the stub below, not against Mapbox (see the service).
+      - MAPBOX_API_URL=http://mapbox:8080
     volumes:
       - ./coverage:/app/coverage
       # Two backend tests read the webapp's SOURCES to check the client against the schema:
@@ -83,6 +86,7 @@ services:
       - REDIS_DOMAIN=redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=redis-test-password
+      - MAPBOX_API_URL=http://mapbox:8080
 
   maintenance:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
@@ -107,6 +111,18 @@ services:
   redis:
     image: redis:8.10-alpine
     command: redis-server --requirepass redis-test-password --save "" --appendonly no
+
+  # A stand-in for Mapbox's geocoding API, answering from a fixed list of places
+  # (backend/test/mapbox-stub). Every location the end-to-end tests search, pick or save and every
+  # one `db:seed` writes used to be a real request, billed to the token's account on every run.
+  # The backend's own image is not used: the stub has no dependencies, only Node, which runs the
+  # TypeScript file as it is.
+  mapbox:
+    image: node:26.12.1-alpine
+    working_dir: /stub
+    command: node server.ts
+    volumes:
+      - ./backend/test/mapbox-stub:/stub:ro
 
   mailserver:
     image: maildev/maildev:3.0.0

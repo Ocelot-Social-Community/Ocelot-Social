@@ -136,7 +136,7 @@ const reverseGeocodeCoordinates = async (
 ): Promise<any> => {
   for (const type of types) {
     const response: any = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json` +
+      `${context.config.MAPBOX_API_URL}/geocoding/v5/mapbox.places/${lng},${lat}.json` +
         `?access_token=${context.config.MAPBOX_TOKEN}&types=${type}&limit=1&language=${locales.join(',')}`,
       {
         signal: AbortSignal.timeout(REQUEST_TIMEOUT),
@@ -223,7 +223,7 @@ const geocodeLocationName = async (
   // Coordinates are only a `proximity` bias here, disambiguating same-named places.
   const proximity = coordinates ? `${coordinates.lng},${coordinates.lat}` : null
   const response: any = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+    `${context.config.MAPBOX_API_URL}/geocoding/v5/mapbox.places/${encodeURIComponent(
       locationName,
     )}.json?access_token=${
       context.config.MAPBOX_TOKEN
@@ -408,16 +408,16 @@ const REVERSE_GEOCODE_TYPE_PRIORITY = [
 const COORDINATE_PATTERN = /^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/
 
 const buildMapboxUrl = (
+  { MAPBOX_API_URL, MAPBOX_TOKEN }: Context['config'],
   place: string,
   lang: string,
   types: string,
   limit: number,
   proximity: string | undefined,
-  accessToken: string,
 ) => {
   let url =
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(place)}.json` +
-    `?access_token=${accessToken}&types=${types}&language=${encodeURIComponent(lang)}&limit=${limit}`
+    `${MAPBOX_API_URL}/geocoding/v5/mapbox.places/${encodeURIComponent(place)}.json` +
+    `?access_token=${MAPBOX_TOKEN}&types=${types}&language=${encodeURIComponent(lang)}&limit=${limit}`
   if (proximity) {
     url += `&proximity=${encodeURIComponent(proximity)}`
   }
@@ -446,7 +446,6 @@ export const queryLocations = async ({ place, lang, types, proximity }, context:
       .map((t) => t.trim())
       .filter((t) => ALLOWED_LOCATION_TYPES.includes(t)) ?? []
   const locationTypes = requestedTypes.join(',') || DEFAULT_LOCATION_TYPES
-  const accessToken = context.config.MAPBOX_TOKEN
 
   // Mapbox's reverse-geocoding (a "lng,lat" search string) only accepts a
   // single `types` value combined with `limit=1` — passing multiple types
@@ -470,7 +469,7 @@ export const queryLocations = async ({ place, lang, types, proximity }, context:
     )
     for (const type of reverseTypes) {
       const features = await fetchMapboxFeatures(
-        buildMapboxUrl(trimmedPlace, lang, type, 1, proximity, accessToken),
+        buildMapboxUrl(context.config, trimmedPlace, lang, type, 1, proximity),
       )
       if (features.length) {
         return features
@@ -479,7 +478,9 @@ export const queryLocations = async ({ place, lang, types, proximity }, context:
     return []
   }
 
-  return fetchMapboxFeatures(buildMapboxUrl(place, lang, locationTypes, 10, proximity, accessToken))
+  return fetchMapboxFeatures(
+    buildMapboxUrl(context.config, place, lang, locationTypes, 10, proximity),
+  )
 }
 
 /**
