@@ -4930,6 +4930,27 @@ describe('VideoCall — the people in the call and their moderation', () => {
       expect(leave).toHaveBeenCalled()
     })
 
+    it('offers the suggestion first in the menu, then everybody else by name', () => {
+      const { handoverOptions } = VideoCall.computed
+      const candidates = [
+        { userId: 'c', name: 'Carl' },
+        { userId: 'b', name: 'Bea' },
+        { userId: 'a', name: 'Anna' },
+      ]
+      const ids = (suggested) =>
+        handoverOptions
+          .call({ handover: { suggested }, handoverCandidates: candidates })
+          .map((person) => person.userId)
+      expect(ids('c')).toEqual(['c', 'a', 'b'])
+      expect(ids(null)).toEqual(['a', 'b', 'c'])
+      expect(
+        handoverOptions.call({
+          handover: null,
+          handoverCandidates: [{ userId: 'x' }, { userId: 'y' }],
+        }),
+      ).toHaveLength(2)
+    })
+
     it('picks the first of the others without a suggestion, and hands on to everybody', async () => {
       const { wrapper, $apollo } = inCall(
         { moderators: ['u1'], everyone: false, speakers: [] },
@@ -4937,6 +4958,11 @@ describe('VideoCall — the people in the call and their moderation', () => {
       )
       await wrapper.vm.requestLeave()
       expect(wrapper.vm.handover.choice).toBe('bob')
+      // Chosen freely from the menu.
+      const options = wrapper.findAll('[data-test="handover-select"] option')
+      expect(options.at(0).attributes('value')).toBe('everyone')
+      await wrapper.find('[data-test="handover-select"]').setValue('everyone')
+      expect(wrapper.vm.handover.choice).toBe('everyone')
       await wrapper.vm.leaveAfterHandover('everyone')
       expect($apollo.mutate.mock.calls[0][0].variables).toEqual({
         groupId: null,

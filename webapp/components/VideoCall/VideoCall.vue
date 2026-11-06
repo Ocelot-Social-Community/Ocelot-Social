@@ -534,35 +534,32 @@
         <div class="video-call__handover-box">
           <h3 class="video-call__handover-title">{{ $t('videoCall.handover.title') }}</h3>
           <p class="video-call__handover-text">{{ $t('videoCall.handover.text') }}</p>
-          <ul class="video-call__handover-choices">
-            <li v-for="person in handoverCandidates" :key="person.userId">
-              <label>
-                <input
-                  v-model="handover.choice"
-                  type="radio"
-                  name="handover"
-                  :value="person.userId"
-                  :data-test="'handover-to-' + person.userId"
-                />
-                {{ person.name }}
-                <span v-if="person.userId === handover.suggested" class="video-call__handover-hint">
-                  ({{ $t('videoCall.handover.suggested') }})
-                </span>
-              </label>
-            </li>
-            <li>
-              <label>
-                <input
-                  v-model="handover.choice"
-                  type="radio"
-                  name="handover"
-                  value="everyone"
-                  data-test="handover-everyone"
-                />
-                {{ $t('videoCall.participants.everyoneModerates') }}
-              </label>
-            </li>
-          </ul>
+          <!--
+            Everybody at once, or anybody in the call; of them the suggestion comes first and is
+            marked.
+          -->
+          <select
+            v-model="handover.choice"
+            class="video-call__handover-select"
+            :aria-label="$t('videoCall.handover.title')"
+            data-test="handover-select"
+          >
+            <option value="everyone" data-test="handover-everyone">
+              {{ $t('videoCall.participants.everyoneModerates') }}
+            </option>
+            <option
+              v-for="person in handoverOptions"
+              :key="person.userId"
+              :value="person.userId"
+              :data-test="'handover-to-' + person.userId"
+            >
+              {{
+                person.userId === handover.suggested
+                  ? `${person.name} (${$t('videoCall.handover.suggested')})`
+                  : person.name
+              }}
+            </option>
+          </select>
           <div class="video-call__handover-actions">
             <os-button appearance="outline" variant="primary" @click="handover = null">
               {{ $t('actions.cancel') }}
@@ -886,6 +883,15 @@ export default {
     // Whom the moderation may be handed to: everybody else in the call.
     handoverCandidates() {
       return this.people.filter((person) => !person.isMe)
+    },
+    // The same for the menu: the suggestion first, then everybody else by name.
+    handoverOptions() {
+      const suggested = this.handover && this.handover.suggested
+      return [...this.handoverCandidates].sort(
+        (a, b) =>
+          (b.userId === suggested) - (a.userId === suggested) ||
+          (a.name || '').localeCompare(b.name || ''),
+      )
     },
     sidebarStyle() {
       if (this.mobileChatOpen) {
@@ -3446,19 +3452,16 @@ export default {
   color: var(--text-color-soft);
 }
 
-.video-call__handover-choices {
+.video-call__handover-select {
+  width: 100%;
   margin: 0 0 var(--space-small);
-  padding: 0;
-  list-style: none;
-}
-
-.video-call__handover-choices li {
-  padding: var(--space-xxx-small) 0;
-}
-
-.video-call__handover-hint {
-  color: var(--text-color-soft);
-  font-size: var(--font-size-small);
+  padding: var(--space-xx-small) var(--space-x-small);
+  border: 1px solid var(--color-neutral-70);
+  border-radius: var(--border-radius-base);
+  background: var(--background-color-base);
+  color: var(--text-color-base);
+  font-family: var(--font-family-text);
+  font-size: var(--font-size-base);
 }
 
 .video-call__handover-actions {
