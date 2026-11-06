@@ -900,7 +900,11 @@ export default {
       if (this.mobileChatOpen) {
         return this.sidebarHeight ? { flex: `0 0 ${this.sidebarHeight}px` } : null
       }
-      return this.sidebarWidth ? { flex: `0 0 ${this.sidebarWidth}px` } : null
+      if (!this.sidebarWidth) return null
+      // The maximized call lays the sidebar out in a grid, where its width counts, not its flex;
+      // the cap there is the body's half too (clampSidebarSize).
+      const width = `${this.sidebarWidth}px`
+      return { flex: `0 0 ${width}`, width, maxWidth: 'none' }
     },
     // On a phone there is no room for the chat beside the videos: it goes below,
     // and the stage shrinks to one small tile, the person speaking.
@@ -1895,8 +1899,11 @@ export default {
     // the videos; on a phone, below them, room for the message field and a few messages, and
     // never so high that not even the small tile is left.
     clampSidebarSize(size) {
+      // The maximized call takes its body out of the box tree (display: contents), which then
+      // measures nothing: the call itself is as wide there.
       const body = this.$el && this.$el.querySelector('.video-call__body')
-      const rect = body ? body.getBoundingClientRect() : { width: 1000, height: 800 }
+      let rect = body ? body.getBoundingClientRect() : { width: 1000, height: 800 }
+      if (body && !rect.width && !rect.height) rect = this.$el.getBoundingClientRect()
       if (this.mobileChatOpen) {
         return Math.round(Math.min(Math.max(size, 200), Math.max(rect.height - 110, 200)))
       }

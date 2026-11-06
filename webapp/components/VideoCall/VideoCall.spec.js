@@ -5061,7 +5061,11 @@ describe('VideoCall — the people in the call and their moderation', () => {
       const { wrapper } = factory({ show: true })
       expect(wrapper.vm.sidebarWidth).toBe(420)
       expect(wrapper.vm.sidebarHeight).toBeNull()
-      expect(wrapper.vm.sidebarStyle).toEqual({ flex: '0 0 420px' })
+      expect(wrapper.vm.sidebarStyle).toEqual({
+        flex: '0 0 420px',
+        width: '420px',
+        maxWidth: 'none',
+      })
     })
 
     it('is pulled within its bounds and remembered', () => {
@@ -5127,6 +5131,23 @@ describe('VideoCall — the people in the call and their moderation', () => {
       wrapper.vm.resetSidebarSize()
       expect(wrapper.vm.sidebarHeight).toBeNull()
       expect(wrapper.vm.sidebarStyle).toBeNull()
+    })
+
+    it('measures the call itself where its body has no box of its own (maximized)', () => {
+      const { wrapper } = factory({ show: true })
+      const own = wrapper.vm.$el.querySelector.bind(wrapper.vm.$el)
+      jest
+        .spyOn(wrapper.vm.$el, 'querySelector')
+        .mockImplementation((selector) =>
+          selector === '.video-call__body'
+            ? { getBoundingClientRect: () => ({ width: 0, height: 0 }) }
+            : own(selector),
+        )
+      jest
+        .spyOn(wrapper.vm.$el, 'getBoundingClientRect')
+        .mockReturnValue({ width: 1600, height: 900 })
+      expect(wrapper.vm.clampSidebarSize(600)).toBe(600)
+      expect(wrapper.vm.clampSidebarSize(10000)).toBe(800)
     })
 
     it('measures nothing without the elements', () => {
