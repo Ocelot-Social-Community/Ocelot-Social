@@ -121,9 +121,35 @@
         </span>
         <!--
           A moderator switches a microphone, a camera or a screen share that is on off with a click
-          on it, and gives or takes the floor with the speech bubble.
+          on it, and gives or takes the floor with the speech bubble, which everybody else sees only
+          on whoever has the floor. The bubble comes first, so that the devices stay in line.
         -->
         <span class="call-participants__state">
+          <button
+            v-if="isModerator && !muting"
+            type="button"
+            :class="[
+              'call-participants__switch',
+              'call-participants__give-floor',
+              { 'call-participants__give-floor--on': hasFloor(person.userId) },
+            ]"
+            v-tooltip="floorLabel(person)"
+            :aria-label="floorLabel(person)"
+            :aria-pressed="hasFloor(person.userId) ? 'true' : 'false'"
+            :disabled="busy"
+            :data-test="'call-participant-floor-toggle-' + person.userId"
+            @click="setFloor(person, !hasFloor(person.userId))"
+          >
+            <os-icon :icon="icons.comment" />
+          </button>
+          <!-- Everybody else sees the bubble only on whoever has the floor. -->
+          <os-icon
+            v-else-if="!isModerator && hasFloor(person.userId)"
+            :icon="icons.comment"
+            class="call-participants__give-floor--on"
+            aria-hidden="true"
+            :data-test="'call-participant-has-floor-' + person.userId"
+          />
           <template v-for="device in devicesOf(person)">
             <button
               v-if="device.switchOff"
@@ -147,23 +173,6 @@
             />
           </template>
           <os-icon v-if="locallyMuted[person.userId]" :icon="icons.volumeOff" aria-hidden="true" />
-          <button
-            v-if="isModerator && !muting"
-            type="button"
-            :class="[
-              'call-participants__switch',
-              'call-participants__give-floor',
-              { 'call-participants__give-floor--on': hasFloor(person.userId) },
-            ]"
-            v-tooltip="floorLabel(person)"
-            :aria-label="floorLabel(person)"
-            :aria-pressed="hasFloor(person.userId) ? 'true' : 'false'"
-            :disabled="busy"
-            :data-test="'call-participant-floor-toggle-' + person.userId"
-            @click="setFloor(person, !hasFloor(person.userId))"
-          >
-            <os-icon :icon="icons.comment" />
-          </button>
         </span>
         <span class="call-participants__sr-only">{{ stateLabel(person) }}</span>
         <button
@@ -177,7 +186,7 @@
           :data-test="'mute-all-floor-' + person.userId"
           @click="toggleFloor(person.userId)"
         >
-          <os-icon :icon="icons.microphone" />
+          <os-icon :icon="icons.comment" />
           {{
             floor.includes(person.userId)
               ? $t('videoCall.participants.hasFloor')

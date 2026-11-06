@@ -376,6 +376,16 @@ describe('CallParticipants', () => {
       ])
     })
 
+    it('shows whoever does not moderate only the bubble of whoever has the floor', () => {
+      wrapper = Wrapper({
+        people: [person('bob'), person('anna')],
+        moderation: { moderators: ['mod'], everyone: false, speakers: ['bob'] },
+      })
+      expect(wrapper.find('[data-test="call-participant-floor-toggle-bob"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="call-participant-has-floor-bob"]').exists()).toBe(true)
+      expect(wrapper.find('[data-test="call-participant-has-floor-anna"]').exists()).toBe(false)
+    })
+
     it('shows the floor toggle neither to whoever does not moderate nor while muting', async () => {
       wrapper = Wrapper({ people: [person('bob')] })
       expect(wrapper.find('[data-test="call-participant-floor-toggle-bob"]').exists()).toBe(false)
