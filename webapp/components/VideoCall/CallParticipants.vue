@@ -119,17 +119,32 @@
             </template>
           </span>
         </span>
-        <span class="call-participants__state" aria-hidden="true">
-          <os-icon
-            :icon="person.micOn ? icons.microphone : icons.microphoneSlash"
-            :class="{ 'call-participants__off': !person.micOn }"
-          />
-          <os-icon
-            :icon="person.cameraOn ? icons.videoCamera : icons.videoCameraSlash"
-            :class="{ 'call-participants__off': !person.cameraOn }"
-          />
-          <os-icon v-if="person.screenSharing" :icon="icons.desktop" />
-          <os-icon v-if="locallyMuted[person.userId]" :icon="icons.volumeOff" />
+        <!-- A moderator switches a microphone or a camera that is on off with a click on it. -->
+        <span class="call-participants__state">
+          <template v-for="device in devicesOf(person)">
+            <button
+              v-if="device.switchOff"
+              :key="device.kind"
+              type="button"
+              class="call-participants__switch"
+              :title="device.label"
+              :aria-label="device.label"
+              :disabled="busy"
+              :data-test="'call-participant-switch-' + device.kind + '-' + person.userId"
+              @click="device.switchOff"
+            >
+              <os-icon :icon="device.icon" />
+            </button>
+            <os-icon
+              v-else
+              :key="device.kind"
+              :icon="device.icon"
+              :class="{ 'call-participants__off': !device.on }"
+              aria-hidden="true"
+            />
+          </template>
+          <os-icon v-if="person.screenSharing" :icon="icons.desktop" aria-hidden="true" />
+          <os-icon v-if="locallyMuted[person.userId]" :icon="icons.volumeOff" aria-hidden="true" />
         </span>
         <span class="call-participants__sr-only">{{ stateLabel(person) }}</span>
         <button
@@ -426,6 +441,41 @@ export default {
         // Without an answer the heavier entries stay away; the light ones need none.
       }
     },
+    // Microphone and camera as the row shows them; for a moderator, one that is on can be switched
+    // off right there, as from the menu.
+    devicesOf(person) {
+      const device = (kind, on, icon, iconOff, label, action) => ({
+        kind,
+        on,
+        icon: on ? icon : iconOff,
+        label,
+        switchOff: on && this.isModerator ? this.switchOff(person, kind, action) : null,
+      })
+      return [
+        device(
+          'mic',
+          person.micOn,
+          this.icons.microphone,
+          this.icons.microphoneSlash,
+          this.$t('videoCall.participants.muteMicrophone'),
+          'MUTE_MICROPHONE',
+        ),
+        device(
+          'camera',
+          person.cameraOn,
+          this.icons.videoCamera,
+          this.icons.videoCameraSlash,
+          this.$t('videoCall.participants.cameraOffAction'),
+          'DISABLE_CAMERA',
+        ),
+      ]
+    },
+    // One's own goes off right here, for everybody; somebody else's is asked of the server.
+    switchOff(person, kind, action) {
+      return person.isMe
+        ? () => this.$emit('switch-off', kind)
+        : () => this.moderate(person, action)
+    },
     actionsFor(person) {
       const entry = (name, label, icon, callback) => ({ name, label, icon, callback })
       const actions = [
@@ -468,8 +518,7 @@ export default {
       // and go through the server.
       const own = person.isMe
       if (own || this.isModerator) {
-        const switchOff = (kind, action) =>
-          own ? () => this.$emit('switch-off', kind) : () => this.moderate(person, action)
+        const switchOff = (kind, action) => this.switchOff(person, kind, action)
         if (person.micOn) {
           actions.push(
             entry(
@@ -719,6 +768,21 @@ export default {
   display: inline-flex;
   gap: var(--space-xx-small);
   color: var(--text-color-soft);
+}
+.call-participants__switch {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.call-participants__switch:hover,
+.call-participants__switch:focus-visible {
+  color: var(--color-danger);
+}
+.call-participants__switch:disabled {
+  cursor: default;
 }
 .call-participants__off {
   color: var(--color-danger);

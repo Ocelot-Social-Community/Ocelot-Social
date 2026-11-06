@@ -309,6 +309,41 @@ describe('CallParticipants', () => {
     })
   })
 
+  describe('switching off right in the row', () => {
+    it('lets a moderator switch off a microphone or a camera that is on with a click on it', async () => {
+      wrapper = Wrapper({
+        people: [person('me', { isMe: true }), person('bob', { cameraOn: true })],
+        moderation: moderatedByMe,
+      })
+      await wrapper.find('[data-test="call-participant-switch-mic-bob"]').trigger('click')
+      await flushPromises()
+      expect(mocks.$apollo.mutate.mock.calls[0][0].variables).toEqual({
+        groupId: 'g1',
+        userId: 'bob',
+        action: 'MUTE_MICROPHONE',
+      })
+      await wrapper.find('[data-test="call-participant-switch-camera-bob"]').trigger('click')
+      await flushPromises()
+      expect(mocks.$apollo.mutate.mock.calls[1][0].variables.action).toBe('DISABLE_CAMERA')
+      // One's own goes off right here.
+      await wrapper.find('[data-test="call-participant-switch-mic-me"]').trigger('click')
+      expect(wrapper.emitted('switch-off')).toEqual([['mic']])
+    })
+
+    it('offers nothing to switch off what is off already, or to whoever does not moderate', () => {
+      wrapper = Wrapper({
+        people: [person('bob', { micOn: false, cameraOn: false }), person('anna')],
+        moderation: moderatedByMe,
+      })
+      expect(wrapper.find('[data-test="call-participant-switch-mic-bob"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="call-participant-switch-camera-bob"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="call-participant-switch-mic-anna"]').exists()).toBe(true)
+      wrapper.destroy()
+      wrapper = Wrapper({ people: [person('anna')] })
+      expect(wrapper.find('[data-test="call-participant-switch-mic-anna"]').exists()).toBe(false)
+    })
+  })
+
   describe('muting everybody', () => {
     it('spares oneself and whoever speaks, and mutes the rest', async () => {
       wrapper = Wrapper({
