@@ -76,7 +76,7 @@ The breaking axis is the **major** version once ≥ 1.0.0, and the **minor** whi
 | `npm run lint`            | ESLint (shared `eslint-config-it4c`), zero warnings                 |
 | `npm run typecheck`       | `tsc --noEmit` over `src/` + `scripts/`                             |
 | `npm run test`            | `node --test` (TypeScript via native type‑stripping)                |
-| `npm run test:coverage`   | tests with a coverage gate (lines/functions ≥ 95, branches ≥ 82)    |
+| `npm run test:coverage`   | tests with a coverage gate (lines/functions 100, branches ≥ 90)     |
 | `npm run validate`        | `publint` + `are-the-types-wrong` (published‑package correctness)   |
 | `npm run schema:snapshot` | Regenerate the schema‑shape lock after an intentional schema change |
 | `npm run check`           | build → lint → typecheck → test:coverage → validate                 |

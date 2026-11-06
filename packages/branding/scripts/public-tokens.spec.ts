@@ -20,7 +20,7 @@ const listed: string[] = (
 
 describe('public token lock', () => {
   test('every token that has been public is still declared', () => {
-    const gone = listed.filter((name) => !(name in FRAMEWORK_TOKENS))
+    const gone = listed.filter((name) => !Object.hasOwn(FRAMEWORK_TOKENS, name))
     assert.deepEqual(
       gone,
       [],
