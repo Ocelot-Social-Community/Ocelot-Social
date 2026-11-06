@@ -58,6 +58,48 @@ export function mergePublicTokens(known: readonly string[], current: Iterable<st
   return [...new Set([...known, ...current])].sort((a, b) => (a < b ? -1 : 1))
 }
 
+/** Whether a value reads `var(--name` as a reference of its own: `var(--name)` or `var(--name, …)`. */
+function redirectsTo(value: string, name: string): boolean {
+  const squeezed = value.replace(/\s+/g, '')
+  return squeezed.includes(`var(--${name},`) || squeezed.includes(`var(--${name})`)
+}
+
+/**
+ * What is wrong with the removedTokens list, as sentences. A token listed there is really gone and was
+ * public; one with a `use` has a successor that falls back to it — without that fallback the rename
+ * would be a plain removal, and a brand's value for the old name would reach nobody.
+ */
+export function removedTokenProblems(
+  removed: Readonly<Record<string, { use?: string; note?: string }>>,
+  framework: Readonly<Record<string, string>>,
+  listed: readonly string[],
+): string[] {
+  const problems: string[] = []
+  for (const [name, { use, note }] of Object.entries(removed)) {
+    if (Object.hasOwn(framework, name)) {
+      problems.push(`--${name} is declared again: drop it from removedTokens`)
+    }
+    if (!listed.includes(name)) {
+      problems.push(`--${name} was never a public token: drop it from removedTokens`)
+    }
+    if (!use && !note) {
+      problems.push(`--${name} says neither what replaced it (use) nor what to do (note)`)
+    }
+    if (use) {
+      const value = Object.hasOwn(framework, use) ? framework[use] : undefined
+      if (value === undefined) {
+        problems.push(`--${name}: its successor --${use} is not a framework token`)
+      } else if (!redirectsTo(value, name)) {
+        problems.push(
+          `--${name}: its successor --${use} must fall back to it, as \`--${use}: var(--${name}, <default>)\` — ` +
+            'otherwise a brand that still sets the old name reaches nobody',
+        )
+      }
+    }
+  }
+  return problems
+}
+
 /** Rewrite the generated module from the webapp's stylesheets. Only meaningful in this repository. */
 export function writeFrameworkTokens(outPath?: string, publicPath?: string): string {
   const out = outPath ?? fileURLToPath(SNAPSHOT)

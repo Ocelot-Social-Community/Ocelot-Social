@@ -25,6 +25,7 @@ import { loadConfig } from './load-config.ts'
 
 import type { ArchiveInstanceEntry } from '../../dist/buckets.js'
 import type { BrandingConfig } from '../../dist/index.js'
+import type { RemovedToken } from '../../dist/removedTokens.js'
 
 interface TarEntry {
   name: string
@@ -350,11 +351,19 @@ function editDistance(a: string, b: string): number {
 export function removedTokenWarnings(
   declared: Record<string, string>,
   id: string,
-  removed: Readonly<Record<string, string>> = REMOVED_TOKENS,
+  removed: Readonly<Record<string, RemovedToken>> = REMOVED_TOKENS,
 ): string[] {
   return Object.keys(declared)
     .filter((key) => Object.hasOwn(removed, key))
-    .map((key) => `  ! ${id}: --${key} is no longer a framework token — ${removed[key]}`)
+    .map((key) => {
+      const { use, note } = removed[key]
+      // A renamed token still works through its fallback; say so, so the brand knows it is not urgent
+      // but will not last.
+      const advice = [use && `set --${use} instead (this value still reaches it for now)`, note]
+        .filter(Boolean)
+        .join('; ')
+      return `  ! ${id}: --${key} is no longer a framework token — ${advice}`
+    })
 }
 
 /**

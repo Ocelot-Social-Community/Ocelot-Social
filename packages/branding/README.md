@@ -39,14 +39,14 @@ The archive is a **library of bucket instances** (`manifest.json` + sparse `frag
 
 ## Consuming the resolved config (backend / webapp)
 
-`branding` is a **named** export that resolves at *access* time — read a value inside a function/component and it reflects the runtime‑injected brand (or the framework defaults when none is injected):
+`branding` is a **named** export that resolves at _access_ time — read a value inside a function/component and it reflects the runtime‑injected brand (or the framework defaults when none is injected):
 
 ```ts
 import { branding, getBranding, setBranding } from '@ocelot-social/branding'
 
-branding.group.nameLengthMax          // resolves now, honours a runtime-injected brand
-setBranding(config)                   // a bootstrap injects a brand before the app reads values
-setBranding(undefined)                // reset to the framework defaults
+branding.group.nameLengthMax // resolves now, honours a runtime-injected brand
+setBranding(config) // a bootstrap injects a brand before the app reads values
+setBranding(undefined) // reset to the framework defaults
 ```
 
 Server‑only helpers (they use `node:fs`/`node:zlib`, so import them under a `process.server` guard, **not** from the index — keeps them out of the client bundle):
@@ -70,16 +70,16 @@ The breaking axis is the **major** version once ≥ 1.0.0, and the **minor** whi
 
 ## Scripts
 
-| Script                | What it does                                                              |
-| --------------------- | ------------------------------------------------------------------------- |
-| `npm run build`       | Compile `src/` → CommonJS `dist/` (+ `.d.ts`, + the CJS marker)           |
-| `npm run lint`        | ESLint (shared `eslint-config-it4c`), zero warnings                        |
-| `npm run typecheck`   | `tsc --noEmit` over `src/` + `scripts/`                                    |
-| `npm run test`        | `node --test` (TypeScript via native type‑stripping)                      |
-| `npm run test:coverage` | tests with a coverage gate (lines/functions ≥ 95, branches ≥ 82)        |
-| `npm run validate`    | `publint` + `are-the-types-wrong` (published‑package correctness)         |
-| `npm run schema:snapshot` | Regenerate the schema‑shape lock after an intentional schema change   |
-| `npm run check`       | build → lint → typecheck → test:coverage → validate                       |
+| Script                    | What it does                                                        |
+| ------------------------- | ------------------------------------------------------------------- |
+| `npm run build`           | Compile `src/` → CommonJS `dist/` (+ `.d.ts`, + the CJS marker)     |
+| `npm run lint`            | ESLint (shared `eslint-config-it4c`), zero warnings                 |
+| `npm run typecheck`       | `tsc --noEmit` over `src/` + `scripts/`                             |
+| `npm run test`            | `node --test` (TypeScript via native type‑stripping)                |
+| `npm run test:coverage`   | tests with a coverage gate (lines/functions ≥ 95, branches ≥ 82)    |
+| `npm run validate`        | `publint` + `are-the-types-wrong` (published‑package correctness)   |
+| `npm run schema:snapshot` | Regenerate the schema‑shape lock after an intentional schema change |
+| `npm run check`           | build → lint → typecheck → test:coverage → validate                 |
 
 ## Changing the framework tokens
 
@@ -89,11 +89,15 @@ every brand's value for it into a silent no-op, so it is a decision, never a sid
 
 - **Adding** a token needs no step of its own: `npm run tokens:snapshot` adds it to
   `scripts/public-tokens.snapshot.json`, the list of names that have been public.
-- **Renaming** one: keep the old name in the stylesheet as an alias of the new one
-  (`--old: var(--new)`) until the brands have moved over. A brand has to set `--new`: a value set for
-  `--old` does not reach the consumers of `--new`.
-- **Removing** one: list it in `src/removedTokens.ts` with what to set instead. Without that entry the
-  `public token lock` test fails, and a brand that still sets it gets a warning when it is built.
+- **Renaming** one: the components read the new name, which falls back to the old one —
+  `--new: var(--old, <the default>)` — so a brand that still sets `--old` keeps working. Nothing
+  declares `--old` any more, so list it in `src/removedTokens.ts` as `'old': { use: 'new' }`: the
+  `public token lock` test checks that the fallback is there, and a brand that still sets `--old` gets
+  a warning when it is built. Drop the fallback and the entry together once the brands have moved over.
+  (The other direction, `--old: var(--new)`, would not do: a value set for `--old` would reach nobody.)
+- **Removing** one: list it in `src/removedTokens.ts` with a `note` saying what to do instead. Without
+  that entry the `public token lock` test fails, and a brand that still sets it gets a warning when it
+  is built.
 
 ## Changing the schema
 
@@ -105,13 +109,13 @@ change is intentional:
 1. Title the PR `feat(package/branding):` / `fix(package/branding):` so release-please bumps
    `SCHEMA_VERSION` (the archive‑compatibility axis surfaced via `checkSchemaCompat`). `SCHEMA_VERSION`
    (`src/version.ts`) is bumped in lock‑step with `package.json` by release-please (`extra-files`) — in
-   its own release PR, *after* yours is merged. Step 1 is therefore **not** enforced by the lock test:
+   its own release PR, _after_ yours is merged. Step 1 is therefore **not** enforced by the lock test:
    at the time it runs the version is unchanged by construction, and the test cannot see the diff that
    would tell it a shape change is in flight. Only step 2 is mechanically checked.
 2. Run `npm run schema:snapshot` and commit the updated snapshot (its diff shows exactly which paths
    changed — useful for review).
 
-A default *value* change (e.g. `group.nameLengthMax` 50 → 60) is **not** a shape change and does not
+A default _value_ change (e.g. `group.nameLengthMax` 50 → 60) is **not** a shape change and does not
 trip the lock: old and new archives stay structurally compatible.
 
 ## License
