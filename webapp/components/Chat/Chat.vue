@@ -557,6 +557,8 @@ export default {
       if (typeof shadowRoot.appendChild !== 'function') return
       const style = document.createElement('style')
       style.textContent = `
+        /* The library colours the links in a message #0d579c, unreadable on a dark ground. */
+        .vac-card-window a { color: var(--chat-tag-color); }
         .vac-player-bar { min-width: 0; }
         .vac-player-progress { width: auto; flex: 1 1 auto; min-width: 0; }
         .vac-room-header .vac-info-wrapper { flex: 1 1 0; min-width: 0; width: auto; }

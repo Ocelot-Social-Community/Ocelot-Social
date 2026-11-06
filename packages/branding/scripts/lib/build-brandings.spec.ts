@@ -895,3 +895,9 @@ test('singleSchemeColours: a brand with both schemes is warned about one-colour 
   ])
   assert.deepEqual(singleSchemeColours('b', 'light', declared), [])
 })
+
+test('singleSchemeColours: a named colour counts as one colour too', () => {
+  assert.deepEqual(singleSchemeColours('b', 'light dark', { 'color-header-background': 'White' }), [
+    '  ! b: --color-header-background is one colour for both schemes — declare it as light-dark(light, dark)',
+  ])
+})

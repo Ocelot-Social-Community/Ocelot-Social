@@ -164,7 +164,7 @@ function styleBodies(src) {
 
 /** A neutral step read directly — the scale names values, not roles. */
 function checkNeutral(text, rel) {
-  return [...text.matchAll(/var\(--color-neutral-(\d+)\)/g)].map(
+  return [...text.matchAll(/var\(\s*--color-neutral-(\d+)\s*[,)]/g)].map(
     ([, step]) =>
       `${rel}: var(--color-neutral-${step}) — use a role token (background/text/border) instead`,
   )

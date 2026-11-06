@@ -734,9 +734,11 @@ describe('map', () => {
           const buttons = container.querySelectorAll('.map-style-popover-btn')
           wrapper.vm.dark = true
           await wrapper.vm.$nextTick()
-          expect(mapSetStyleMock).toHaveBeenCalledWith(
+          // v-mapbox's watcher on mapOptions.style does the map.setStyle — no call of our own.
+          expect(wrapper.vm.mapOptions.style).toBe(
             wrapper.vm.availableStyles['navigation-night'].url,
           )
+          expect(mapSetStyleMock).not.toHaveBeenCalled()
           expect(buttons[1].classList.contains('map-style-popover-btn--active')).toBe(true)
           expect(buttons[1].getAttribute('aria-selected')).toBe('true')
           expect(buttons[0].classList.contains('map-style-popover-btn--active')).toBe(false)
@@ -749,7 +751,8 @@ describe('map', () => {
           popover.classList.add('map-style-popover--open')
           // Click "streets" button (index 2)
           buttons[2].click()
-          expect(mapSetStyleMock).toHaveBeenCalledWith(wrapper.vm.availableStyles.streets.url)
+          expect(mapSetStyleMock).not.toHaveBeenCalled()
+          expect(wrapper.vm.mapOptions.style).toBe(wrapper.vm.availableStyles.streets.url)
           expect(wrapper.vm.activeStyle).toBe(wrapper.vm.availableStyles.streets.url)
           expect(popover.classList.contains('map-style-popover--open')).toBe(false)
           expect(buttons[2].classList.contains('map-style-popover-btn--active')).toBe(true)
@@ -1338,9 +1341,10 @@ describe('map', () => {
       })
 
       describe('setStyle', () => {
-        it('sets map style and activeStyle', () => {
+        it('sets activeStyle, which the map follows through mapOptions.style', () => {
           wrapper.vm.setStyle('mapbox://styles/mapbox/dark-v10')
-          expect(mapSetStyleMock).toHaveBeenCalledWith('mapbox://styles/mapbox/dark-v10')
+          expect(mapSetStyleMock).not.toHaveBeenCalled()
+          expect(wrapper.vm.mapOptions.style).toBe('mapbox://styles/mapbox/dark-v10')
           expect(wrapper.vm.activeStyle).toBe('mapbox://styles/mapbox/dark-v10')
         })
       })

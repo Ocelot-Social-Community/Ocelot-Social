@@ -137,6 +137,11 @@ describe('checkSource', () => {
     ])
   })
 
+  it('flags a neutral step with a fallback or a space after the bracket', () => {
+    expect(checkNeutral('a { color: var(--color-neutral-50, #fff); }', 'A.vue')).toHaveLength(1)
+    expect(checkNeutral('a { color: var( --color-neutral-50 ); }', 'A.vue')).toHaveLength(1)
+  })
+
   it('flags every direct neutral step in one declaration', () => {
     const { errors } = checkSource(
       style('.a { box-shadow: 0 0 var(--color-neutral-50), 0 0 var(--color-neutral-90); }'),

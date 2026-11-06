@@ -1018,10 +1018,10 @@ export default {
       })
     },
     // The theme changed: new default tiles, unless the user picked a style himself.
-    // style.load (onMapLoad) re-adds the markers.
+    // mapOptions.style changes with it and v-mapbox's watcher calls map.setStyle — once; a second
+    // call of our own would race it. style.load (onMapLoad) re-adds the markers.
     followThemeStyle() {
       if (this.map && !this.activeStyle) {
-        this.map.setStyle(this.defaultStyleUrl)
         this.markActiveStyle(this.defaultStyleUrl)
       }
     },
@@ -1034,8 +1034,9 @@ export default {
         btn.setAttribute('aria-selected', String(active))
       })
     },
+    // Sets the style the map shows: mapOptions.style follows activeStyle, v-mapbox's watcher
+    // does the map.setStyle.
     setStyle(url) {
-      this.map.setStyle(url)
       this.activeStyle = url
       this.markActiveStyle(url)
     },

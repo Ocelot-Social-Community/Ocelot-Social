@@ -223,6 +223,33 @@ const LEGACY_LOCALE_DIRS = new Set(['tmp', 'html'])
  * then holds in light and dark alike — a white header in the middle of a dark page. A `light-dark()`
  * pair, or a var() onto a framework token (which carries its own pair), is what such a brand means.
  */
+const NAMED_COLOURS = new Set([
+  'white',
+  'black',
+  'red',
+  'green',
+  'blue',
+  'yellow',
+  'orange',
+  'purple',
+  'pink',
+  'brown',
+  'gray',
+  'grey',
+  'silver',
+  'gold',
+  'navy',
+  'teal',
+  'cyan',
+  'magenta',
+  'lime',
+  'maroon',
+  'olive',
+  'aqua',
+  'fuchsia',
+  'transparent',
+])
+
 export function singleSchemeColours(
   id: string,
   colorScheme: string,
@@ -232,7 +259,11 @@ export function singleSchemeColours(
     return []
   }
   return Object.entries(declared)
-    .filter(([, value]) => /^(#|rgba?\(|hsla?\(|oklch\(|color-mix\()/i.test(value.trim()))
+    .filter(
+      ([, value]) =>
+        /^(#|rgba?\(|hsla?\(|oklch\(|color-mix\()/i.test(value.trim()) ||
+        NAMED_COLOURS.has(value.trim().toLowerCase()),
+    )
     .map(
       ([name]) =>
         `  ! ${id}: --${name} is one colour for both schemes — declare it as light-dark(light, dark)`,

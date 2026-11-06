@@ -28,6 +28,16 @@
   color-scheme: dark;
 }
 
+/* No light-dark(): postcss/light-dark-fallback.js gives such a browser the light tokens, so the native
+   controls (scrollbars, inputs) have to stay light as well, whatever the system or the cookie says. */
+@supports not (color: light-dark(red, blue)) {
+  :root,
+  :root[data-theme='light'],
+  :root[data-theme='dark'] {
+    color-scheme: light;
+  }
+}
+
 /* Not a colour, so light-dark() cannot carry it: the map controls' icons are images. */
 :root[data-theme='dark'] {
   --map-control-icon-filter: invert(0.88);

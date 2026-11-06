@@ -29,10 +29,10 @@
   border-color: var(--border-color-softer);
 }
 
-:root .mx-calendar-content .cell:not(.active):hover,
+:root .mx-calendar-content .cell:not(.active):not(.disabled):hover,
 :root .mx-calendar-week-mode .mx-date-row:not(.mx-active-week):hover,
-:root .mx-time-column .mx-time-item:not(.active):hover,
-:root .mx-time-option:not(.active):hover {
+:root .mx-time-column .mx-time-item:not(.active):not(.disabled):hover,
+:root .mx-time-option:not(.active):not(.disabled):hover {
   color: var(--text-color-soft);
   background-color: var(--background-color-hover);
 }
