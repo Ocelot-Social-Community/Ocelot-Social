@@ -50,7 +50,7 @@
     "@aws-sdk/lib-storage": "^3.1161.0",
     "@graphql-tools/load-files": "^8.0.7",
     "@graphql-tools/merge": "^10.0.8",
-    "@graphql-tools/schema": "^11.0.7",
+    "@graphql-tools/schema": "^11.0.8",
     "@ocelot-social/branding": "file:../packages/branding",
     "@sentry/node": "^11.10.0",
     "@types/mime-types": "^3.0.1",
