@@ -139,74 +139,6 @@
           {{ $t('videoCall.connecting') }}
         </div>
         <template v-else>
-          <!--
-            Problems the call cannot fix on its own. They show in the parked
-            window too: a blocked speaker or a silent microphone matters there
-            just as much.
-          -->
-          <div
-            v-if="audioBlocked || micProblem || reconnecting || audioOnly || reloadPending"
-            class="video-call__notices"
-            role="status"
-          >
-            <!--
-              An admin switched the branding; applying it takes a reload, which waits for this
-              call to end (#10353). Said here for as long as it waits, so that the reload after
-              hanging up comes as no surprise.
-            -->
-            <div
-              v-if="reloadPending"
-              class="video-call__notice"
-              data-test="video-call-reload-pending"
-            >
-              {{ $t('videoCall.reloadPending') }}
-            </div>
-            <div v-if="reconnecting" class="video-call__notice" data-test="video-call-reconnecting">
-              {{ $t('videoCall.reconnecting') }}
-            </div>
-            <div
-              v-if="audioBlocked"
-              class="video-call__notice video-call__notice--warning"
-              data-test="video-call-audio-blocked"
-            >
-              <span>{{ $t('videoCall.audioBlocked') }}</span>
-              <os-button
-                data-test="video-call-enable-audio"
-                variant="primary"
-                size="sm"
-                @click="enableAudio"
-              >
-                {{ $t('videoCall.enableAudio') }}
-              </os-button>
-            </div>
-            <div
-              v-if="micProblem"
-              class="video-call__notice video-call__notice--warning"
-              data-test="video-call-mic-problem"
-            >
-              <span>{{ $t('videoCall.micNoSignal') }}</span>
-              <os-button
-                data-test="video-call-restart-mic"
-                variant="primary"
-                size="sm"
-                @click="restartMic"
-              >
-                {{ $t('videoCall.restartMic') }}
-              </os-button>
-            </div>
-            <div v-if="audioOnly" class="video-call__notice" data-test="video-call-audio-only">
-              <span>{{ $t('videoCall.audioOnly') }}</span>
-              <os-button
-                data-test="video-call-show-videos"
-                variant="primary"
-                appearance="outline"
-                size="sm"
-                @click="showVideos"
-              >
-                {{ $t('videoCall.showVideos') }}
-              </os-button>
-            </div>
-          </div>
           <div
             v-if="isMaximized && !mobileChatOpen && activeSpeakers.length"
             class="video-call__speakers"
@@ -249,6 +181,81 @@
                   <os-icon :icon="icons.compressVertical" />
                 </template>
               </os-button>
+            </div>
+            <!--
+              Problems the call cannot fix on its own. They show in the parked
+              window too: a blocked speaker or a silent microphone matters there
+              just as much. Inside the stage, which anchors them: placed from the
+              body instead, which gives up its box in the maximized layouts, they
+              went by the whole call — over the control bar, centred across the
+              chat as well, their buttons behind the page's footer.
+            -->
+            <div
+              v-if="audioBlocked || micProblem || reconnecting || audioOnly || reloadPending"
+              class="video-call__notices"
+              role="status"
+            >
+              <!--
+                An admin switched the branding; applying it takes a reload, which waits for this
+                call to end (#10353). Said here for as long as it waits, so that the reload after
+                hanging up comes as no surprise.
+              -->
+              <div
+                v-if="reloadPending"
+                class="video-call__notice"
+                data-test="video-call-reload-pending"
+              >
+                {{ $t('videoCall.reloadPending') }}
+              </div>
+              <div
+                v-if="reconnecting"
+                class="video-call__notice"
+                data-test="video-call-reconnecting"
+              >
+                {{ $t('videoCall.reconnecting') }}
+              </div>
+              <div
+                v-if="audioBlocked"
+                class="video-call__notice video-call__notice--warning"
+                data-test="video-call-audio-blocked"
+              >
+                <span>{{ $t('videoCall.audioBlocked') }}</span>
+                <os-button
+                  data-test="video-call-enable-audio"
+                  variant="primary"
+                  size="sm"
+                  @click="enableAudio"
+                >
+                  {{ $t('videoCall.enableAudio') }}
+                </os-button>
+              </div>
+              <div
+                v-if="micProblem"
+                class="video-call__notice video-call__notice--warning"
+                data-test="video-call-mic-problem"
+              >
+                <span>{{ $t('videoCall.micNoSignal') }}</span>
+                <os-button
+                  data-test="video-call-restart-mic"
+                  variant="primary"
+                  size="sm"
+                  @click="restartMic"
+                >
+                  {{ $t('videoCall.restartMic') }}
+                </os-button>
+              </div>
+              <div v-if="audioOnly" class="video-call__notice" data-test="video-call-audio-only">
+                <span>{{ $t('videoCall.audioOnly') }}</span>
+                <os-button
+                  data-test="video-call-show-videos"
+                  variant="primary"
+                  appearance="outline"
+                  size="sm"
+                  @click="showVideos"
+                >
+                  {{ $t('videoCall.showVideos') }}
+                </os-button>
+              </div>
             </div>
             <!--
             All tiles are always mounted so every participant's audio track stays
@@ -1247,7 +1254,8 @@ export default {
     },
     // On a touch screen a tap on the videos switches the bars: back when they are gone —
     // without spotlighting the tile it landed on — and away when they are there, unless
-    // the tap is on a tile, which spotlights it as ever. Other taps keep them a while.
+    // the tap is on a tile, which spotlights it as ever, or on a notice lying on the
+    // videos, whose buttons are to act alone. Other taps keep them a while.
     onBarTouch(event) {
       this.lastTouchAt = Date.now()
       this.swallowTileSelect = false
@@ -1256,7 +1264,7 @@ export default {
         this.barsHidden = false
         this.swallowTileSelect = !!onStage
         this.scheduleBarsHide()
-      } else if (onStage && !event.target.closest('.video-tile')) {
+      } else if (onStage && !event.target.closest('.video-tile, .video-call__notices')) {
         clearTimeout(this.barsTimer)
         this.barsHidden = true
       } else {
@@ -2735,6 +2743,8 @@ export default {
   flex: 1;
   min-width: 0;
   min-height: 0;
+  /*  Anchors the notices and the button that brings the bars back. */
+  position: relative;
 }
 
 .video-call__grid {
@@ -3044,10 +3054,6 @@ export default {
 
 .video-call--bars-collapsed .video-call__controls {
   margin-bottom: -45px;
-}
-
-.video-call--bars-collapsed .video-call__stage {
-  position: relative;
 }
 
 .video-call__show-bars {

@@ -2859,6 +2859,10 @@ describe('VideoCall', () => {
       room.handlers.ConnectionQualityChanged('poor', room.localParticipant)
       jest.advanceTimersByTime(5_000)
       await wrapper.vm.$nextTick()
+      // On the videos, in the stage that anchors it — not over the control bar.
+      expect(wrapper.find('.video-call__stage [data-test="video-call-audio-only"]').exists()).toBe(
+        true,
+      )
       await wrapper.find('[data-test="video-call-show-videos"]').trigger('click')
       expect(wrapper.vm.audioOnly).toBe(false)
       expect(camera.setSubscribed).toHaveBeenLastCalledWith(true)
@@ -3666,6 +3670,16 @@ describe('VideoCall', () => {
           expect(wrapper.vm.barsHidden).toBe(false)
           wrapper.vm.onTileSelect({ key: 'anna' })
           expect(wrapper.vm.spotlightKey).toBeNull()
+        })
+
+        it('stay at a tap on a notice lying on the videos', () => {
+          const notice = document.createElement('div')
+          notice.className = 'video-call__notices'
+          const button = document.createElement('button')
+          notice.appendChild(button)
+          stage.appendChild(notice)
+          tap(button)
+          expect(wrapper.vm.barsHidden).toBe(false)
         })
 
         it('stay at a tap on a tile, which is spotlighted as ever', () => {
