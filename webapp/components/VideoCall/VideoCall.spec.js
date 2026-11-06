@@ -2812,8 +2812,6 @@ describe('VideoCall', () => {
   })
 
   describe('dtx (pauses in speech)', () => {
-    const STORAGE_KEY = 'ocelot-video-call-devices'
-
     const connected = async (state = {}) => {
       const built = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', ...state })
       built.wrapper.vm.$apollo = {
@@ -2832,10 +2830,6 @@ describe('VideoCall', () => {
       return track
     }
 
-    beforeEach(() => {
-      localStorage.clear()
-    })
-
     it('leaves the pauses in by default', async () => {
       const { wrapper, room } = await connected()
       expect(room.opts.publishDefaults).toEqual({ dtx: false })
@@ -2847,10 +2841,22 @@ describe('VideoCall', () => {
       expect(room.opts.publishDefaults).toEqual({ dtx: true })
     })
 
-    it("lets the user's own choice win over the network's default", async () => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ dtx: false }))
-      const { room } = await connected({ policy: { videoCallDtx: true } })
-      expect(room.opts.publishDefaults).toEqual({ dtx: false })
+    it("starts every call on the network's default, whatever was chosen in the last one", async () => {
+      const { wrapper, room } = await connected({ policy: { videoCallDtx: true } })
+      await wrapper.vm.setDtx(false)
+      expect(wrapper.vm.dtx).toBe(false)
+      await wrapper.vm.connect()
+      expect(wrapper.vm.dtx).toBe(true)
+      expect(wrapper.vm.room.opts.publishDefaults).toEqual({ dtx: true })
+      expect(wrapper.vm.room).not.toBe(room)
+    })
+
+    it('stores nothing in the browser', async () => {
+      const setItem = jest.spyOn(Storage.prototype, 'setItem')
+      const { wrapper } = await connected()
+      await wrapper.vm.setDtx(true)
+      expect(setItem).not.toHaveBeenCalled()
+      setItem.mockRestore()
     })
 
     it('publishes the microphone anew when the user changes it during the call', async () => {
@@ -2869,7 +2875,6 @@ describe('VideoCall', () => {
       expect(wrapper.vm.dtx).toBe(true)
       expect(wrapper.vm.dtxApplying).toBe(false)
       expect(wrapper.vm.micEnabled).toBe(true)
-      expect(JSON.parse(localStorage.getItem(STORAGE_KEY))).toEqual({ dtx: true })
     })
 
     it('keeps a muted microphone muted', async () => {
@@ -2891,7 +2896,6 @@ describe('VideoCall', () => {
       const { wrapper } = factory({ show: false })
       await wrapper.vm.setDtx(true)
       expect(wrapper.vm.dtx).toBe(true)
-      expect(JSON.parse(localStorage.getItem(STORAGE_KEY))).toEqual({ dtx: true })
     })
 
     it('reports a microphone that could not be published again', async () => {

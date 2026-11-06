@@ -2,8 +2,6 @@ import {
   findPreferredDevice,
   loadDevicePreferences,
   saveDevicePreference,
-  loadDtxPreference,
-  saveDtxPreference,
 } from './devicePreferences'
 
 const STORAGE_KEY = 'ocelot-video-call-devices'
@@ -25,35 +23,6 @@ describe('devicePreferences', () => {
       expect(loadDevicePreferences()).toEqual({})
       localStorage.setItem(STORAGE_KEY, 'null')
       expect(loadDevicePreferences()).toEqual({})
-    })
-  })
-
-  describe('dtx preference', () => {
-    it('is unset as long as the user never chose', () => {
-      expect(loadDtxPreference()).toBeNull()
-    })
-
-    it('remembers either choice next to the devices', () => {
-      saveDevicePreference('audioinput', { deviceId: 'mic-1', label: 'Mic' })
-      saveDtxPreference(true)
-      expect(loadDtxPreference()).toBe(true)
-      saveDtxPreference(false)
-      expect(loadDtxPreference()).toBe(false)
-      expect(loadDevicePreferences().audioinput).toEqual({ deviceId: 'mic-1', label: 'Mic' })
-    })
-
-    it('ignores a stored value that is not a choice', () => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ dtx: 'yes' }))
-      expect(loadDtxPreference()).toBeNull()
-    })
-
-    it('copes with a browser that refuses to store', () => {
-      const setItem = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-        throw new Error('quota')
-      })
-      expect(() => saveDtxPreference(true)).not.toThrow()
-      setItem.mockRestore()
-      expect(loadDtxPreference()).toBeNull()
     })
   })
 

@@ -406,7 +406,7 @@ import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 import DeviceSettings from './DeviceSettings.vue'
-import { saveDevicePreference, loadDtxPreference, saveDtxPreference } from './devicePreferences'
+import { saveDevicePreference } from './devicePreferences'
 
 // How long a participant keeps the speaking treatment after LiveKit drops them
 // from the active-speaker list. LiveKit reports raw audio activity, so it lets
@@ -491,8 +491,10 @@ export default {
       // Our microphone is published but delivers nothing: the OS took the device
       // away (LiveKit then pauses the upstream) or it only yields digital silence.
       micProblem: false,
-      // The user's own choice on leaving out pauses in speech (Opus DTX), or
-      // null to follow the network's default.
+      // The user's own choice on leaving out pauses in speech (Opus DTX) for
+      // this call, or null to follow the network's default. Never stored: every
+      // call starts on the network's default, so an admin's change reaches
+      // everyone and a choice made against one bad connection does not linger.
       dtxPreference: null,
       dtxApplying: false,
       reconnecting: false,
@@ -1244,7 +1246,7 @@ export default {
       this.micRestart = null
       this.micSilenceProbe = null
       this.dtxApplying = false
-      this.dtxPreference = loadDtxPreference()
+      this.dtxPreference = null
       this.resetAudioOnly()
       try {
         if (!this.groupId) throw new Error('Missing group id')
@@ -1928,7 +1930,6 @@ export default {
     },
     async setDtx(on) {
       this.dtxPreference = on
-      saveDtxPreference(on)
       const room = this.room
       const Track = this.Track
       if (!room || !Track) return

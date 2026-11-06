@@ -24,24 +24,6 @@ export function saveDevicePreference(kind, device) {
   }
 }
 
-// Whether the microphone leaves out pauses in speech (Opus DTX). Stored only
-// once the user changed it, so whoever never did keeps following the network's
-// default — also when an admin changes that later.
-export function loadDtxPreference() {
-  const { dtx } = loadDevicePreferences()
-  return typeof dtx === 'boolean' ? dtx : null
-}
-
-export function saveDtxPreference(on) {
-  const preferences = loadDevicePreferences()
-  preferences.dtx = !!on
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences))
-  } catch {
-    // localStorage not available
-  }
-}
-
 export function findPreferredDevice(devices, preference) {
   if (!preference) return null
   // Safari hands out new device ids with every session, so the id alone would

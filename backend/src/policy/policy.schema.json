@@ -143,7 +143,7 @@
       "default": false,
       "visibility": ["authenticated"],
       "category": "video",
-      "description": "Network default for Opus DTX (discontinuous transmission) on the microphone in video calls: while someone is silent, their microphone sends almost no packets. Saves bandwidth, but a nearly idle audio path leaves more room for one listener losing one speaker (see #10787); off by default, as in LiveKit's own meet app. Each user can override it for their own microphone in the call's device settings. Read by the call client of every logged-in user, so visible to 'authenticated'."
+      "description": "Network default for Opus DTX (discontinuous transmission) on the microphone in video calls: while someone is silent, their microphone sends almost no packets. Saves bandwidth, but a nearly idle audio path leaves more room for one listener losing one speaker (see #10787); off by default, as in LiveKit's own meet app. Each user can override it for their own microphone in the call's device settings, for that call only: nothing is stored, every call starts on this default. Read by the call client of every logged-in user, so visible to 'authenticated'."
     },
     "apiKeysMaxPerUser": {
       "type": "integer",
