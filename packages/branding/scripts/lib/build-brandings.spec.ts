@@ -377,6 +377,8 @@ test('removedTokenWarnings names a removed token a brand still sets, and what to
   )
   assert.deepEqual(removedTokenWarnings({ 'color-primary': 'blue' }, 'acme', removed), [])
   assert.deepEqual(removedTokenWarnings({ 'chat-old': 'red' }, 'acme'), []) // nothing removed yet
+  // Names every object has (constructor, toString) are not removed tokens.
+  assert.deepEqual(removedTokenWarnings({ constructor: 'x', toString: 'y' }, 'acme', removed), [])
 })
 
 test('MODULAR locales/<code>/<feature>.json files merge into the locale; legacy dirs ignored', async () => {

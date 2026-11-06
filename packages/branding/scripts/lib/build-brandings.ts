@@ -353,7 +353,7 @@ export function removedTokenWarnings(
   removed: Readonly<Record<string, string>> = REMOVED_TOKENS,
 ): string[] {
   return Object.keys(declared)
-    .filter((key) => key in removed)
+    .filter((key) => Object.hasOwn(removed, key))
     .map((key) => `  ! ${id}: --${key} is no longer a framework token — ${removed[key]}`)
 }
 

@@ -90,7 +90,8 @@ every brand's value for it into a silent no-op, so it is a decision, never a sid
 - **Adding** a token needs no step of its own: `npm run tokens:snapshot` adds it to
   `scripts/public-tokens.snapshot.json`, the list of names that have been public.
 - **Renaming** one: keep the old name in the stylesheet as an alias of the new one
-  (`--old: var(--new)`) until the brands have moved over.
+  (`--old: var(--new)`) until the brands have moved over. A brand has to set `--new`: a value set for
+  `--old` does not reach the consumers of `--new`.
 - **Removing** one: list it in `src/removedTokens.ts` with what to set instead. Without that entry the
   `public token lock` test fails, and a brand that still sets it gets a warning when it is built.
 
