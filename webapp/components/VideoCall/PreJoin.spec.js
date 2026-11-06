@@ -1484,7 +1484,12 @@ describe('PreJoin — a device that does not start', () => {
       Object.assign(new Error(), { name: 'NotReadableError' }),
       'videoCall.errors.reason.busy',
     ],
-    ['broken', new Error('Starting videoinput failed'), 'Starting videoinput failed'],
+    [
+      'broken',
+      Object.assign(new Error('Starting videoinput failed'), { name: 'AbortError' }),
+      'videoCall.errors.reason.busy',
+    ],
+    ['failing for no known reason', new Error('boom'), 'videoCall.errors.reason.generic'],
   ]
   const start = async (failing, err, { micActive = true } = {}) => {
     const { wrapper } = mountWith(media(failing, err))

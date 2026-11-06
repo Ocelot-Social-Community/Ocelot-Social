@@ -6,12 +6,16 @@ const REASONS = {
   NotFoundError: 'noDevice',
   OverconstrainedError: 'noDevice',
   NotReadableError: 'busy',
+  // Firefox's word for a device that is there but does not start ("Starting videoinput failed").
+  AbortError: 'busy',
 }
 
 export const deviceErrorMessage = ($t, kind, err) => {
   const key = REASONS[err && err.name]
-  const reason = key
-    ? $t(`videoCall.errors.reason.${key}`)
-    : (err && err.message) || $t('videoCall.errors.reason.generic')
-  return `${$t(`videoCall.errors.${kind}.unavailable`)} ${reason}`
+  if (!key && err) {
+    // The browser's own text is neither translated nor meant for the user, but worth keeping.
+    // eslint-disable-next-line no-console
+    console.warn(`VideoCall: ${kind} did not start`, err)
+  }
+  return `${$t(`videoCall.errors.${kind}.unavailable`)} ${$t(`videoCall.errors.reason.${key || 'generic'}`)}`
 }
