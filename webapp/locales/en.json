@@ -2042,6 +2042,7 @@
       "giveFloor": "Give the floor",
       "hasFloor": "Has the floor",
       "label": "People in the call",
+      "leadModerator": "Lead moderator",
       "makeModerator": "Make moderator",
       "micOff": "microphone off",
       "micOn": "microphone on",

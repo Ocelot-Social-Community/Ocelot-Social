@@ -2042,6 +2042,7 @@
       "giveFloor": "Donner la parole",
       "hasFloor": "A la parole",
       "label": "Participants de l’appel",
+      "leadModerator": "Modération principale",
       "makeModerator": "Nommer modérateur",
       "micOff": "micro coupé",
       "micOn": "micro activé",

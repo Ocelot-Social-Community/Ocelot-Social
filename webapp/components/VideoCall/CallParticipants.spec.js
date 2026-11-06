@@ -103,6 +103,18 @@ describe('CallParticipants', () => {
       expect(wrapper.find('[data-test="call-participant-badges-anna"]').exists()).toBe(false)
     })
 
+    it('marks everybody as moderating while everybody moderates, those named as leading', () => {
+      wrapper = Wrapper({
+        people: [person('me', { isMe: true }), person('bob'), person('anna')],
+        moderation: { moderators: ['bob'], everyone: true, speakers: [] },
+      })
+      expect(wrapper.vm.badgeLine(person('me', { isMe: true }))).toBe(
+        'videoCall.you: videoCall.participants.moderator',
+      )
+      expect(wrapper.vm.badgeLine(person('bob'))).toBe('videoCall.participants.leadModerator')
+      expect(wrapper.vm.badgeLine(person('anna'))).toBe('videoCall.participants.moderator')
+    })
+
     it('says "you" alone when nothing else sets one apart', () => {
       wrapper = Wrapper()
       expect(wrapper.vm.badgeLine(person('me', { isMe: true }))).toBe('videoCall.you')
