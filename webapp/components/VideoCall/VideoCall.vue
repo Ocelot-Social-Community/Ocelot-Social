@@ -193,69 +193,63 @@
             <div
               v-if="audioBlocked || micProblem || reconnecting || audioOnly || reloadPending"
               class="video-call__notices"
-              role="status"
             >
               <!--
                 An admin switched the branding; applying it takes a reload, which waits for this
                 call to end (#10353). Said here for as long as it waits, so that the reload after
                 hanging up comes as no surprise.
               -->
-              <div
+              <call-notice
                 v-if="reloadPending"
-                class="video-call__notice"
                 data-test="video-call-reload-pending"
-              >
-                {{ $t('videoCall.reloadPending') }}
-              </div>
-              <div
+                :message="$t('videoCall.reloadPending')"
+              />
+              <call-notice
                 v-if="reconnecting"
-                class="video-call__notice"
                 data-test="video-call-reconnecting"
-              >
-                {{ $t('videoCall.reconnecting') }}
-              </div>
-              <div
+                :message="$t('videoCall.reconnecting')"
+              />
+              <call-notice
                 v-if="audioBlocked"
-                class="video-call__notice video-call__notice--warning"
                 data-test="video-call-audio-blocked"
-              >
-                <span>{{ $t('videoCall.audioBlocked') }}</span>
-                <os-button
-                  data-test="video-call-enable-audio"
-                  variant="primary"
-                  size="sm"
-                  @click="enableAudio"
-                >
-                  {{ $t('videoCall.enableAudio') }}
-                </os-button>
-              </div>
-              <div
+                tone="warning"
+                :message="$t('videoCall.audioBlocked')"
+                :actions="[
+                  {
+                    key: 'enable',
+                    label: $t('videoCall.enableAudio'),
+                    dataTest: 'video-call-enable-audio',
+                  },
+                ]"
+                @action="enableAudio"
+              />
+              <call-notice
                 v-if="micProblem"
-                class="video-call__notice video-call__notice--warning"
                 data-test="video-call-mic-problem"
-              >
-                <span>{{ $t('videoCall.micNoSignal') }}</span>
-                <os-button
-                  data-test="video-call-restart-mic"
-                  variant="primary"
-                  size="sm"
-                  @click="restartMic"
-                >
-                  {{ $t('videoCall.restartMic') }}
-                </os-button>
-              </div>
-              <div v-if="audioOnly" class="video-call__notice" data-test="video-call-audio-only">
-                <span>{{ $t('videoCall.audioOnly') }}</span>
-                <os-button
-                  data-test="video-call-show-videos"
-                  variant="primary"
-                  appearance="outline"
-                  size="sm"
-                  @click="showVideos"
-                >
-                  {{ $t('videoCall.showVideos') }}
-                </os-button>
-              </div>
+                tone="warning"
+                :message="$t('videoCall.micNoSignal')"
+                :actions="[
+                  {
+                    key: 'restart',
+                    label: $t('videoCall.restartMic'),
+                    dataTest: 'video-call-restart-mic',
+                  },
+                ]"
+                @action="restartMic"
+              />
+              <call-notice
+                v-if="audioOnly"
+                data-test="video-call-audio-only"
+                :message="$t('videoCall.audioOnly')"
+                :actions="[
+                  {
+                    key: 'show',
+                    label: $t('videoCall.showVideos'),
+                    dataTest: 'video-call-show-videos',
+                  },
+                ]"
+                @action="showVideos"
+              />
             </div>
             <!--
             All tiles are always mounted so every participant's audio track stays
@@ -492,6 +486,7 @@ import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 import DeviceSettings from './DeviceSettings.vue'
+import CallNotice from './CallNotice.vue'
 import { saveDevicePreference } from './devicePreferences'
 import { createAudioWatchdog } from './audioWatchdog'
 
@@ -567,6 +562,7 @@ export default {
     VideoTile,
     PreJoin,
     DeviceSettings,
+    CallNotice,
     OsButton,
     OsCounterIcon,
     OsIcon,
@@ -2905,24 +2901,6 @@ export default {
   gap: var(--space-xx-small);
   max-width: calc(100% - var(--space-base));
   z-index: 3;
-}
-
-.video-call__notice {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-x-small);
-  padding: var(--space-xx-small) var(--space-small);
-  border-radius: var(--border-radius-base);
-  text-align: center;
-  color: var(--text-color-inverse);
-  background: var(--color-neutral-10);
-}
-
-.video-call__notice--warning {
-  color: var(--color-warning-inverse);
-  background: var(--color-warning);
 }
 
 .video-call__error {
