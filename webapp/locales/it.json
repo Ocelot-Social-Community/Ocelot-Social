@@ -1953,12 +1953,15 @@
       "turnOff": "{device}: disattiva",
       "turnOn": "{device}: attiva"
     },
+    "cpuRelief": "Il tuo dispositivo è sovraccarico: le videocamere funzionano a qualità ridotta perché l'audio resti chiaro.",
+    "cpuStrained": "Il tuo dispositivo fatica con i video. Una qualità più bassa mantiene l'audio chiaro.",
     "deviceSettings": {
       "button": "Dispositivi",
       "speakerError": "Impossibile cambiare l'altoparlante.",
       "title": "Impostazioni dei dispositivi"
     },
     "dialogLabel": "Videochiamata di gruppo",
+    "dismissNotice": "Nascondi",
     "enableAudio": "Attiva audio",
     "enterFullscreen": "Schermo intero",
     "errorBackToPrejoin": "Modifica impostazioni",
@@ -1992,6 +1995,7 @@
     "hideBars": "Nascondi le barre",
     "hideNotices": "Nascondi avvisi",
     "leave": "Lascia la chiamata",
+    "lowerQuality": "Riduci qualità",
     "maximize": "Ingrandisci",
     "micMuted": "Microfono spento",
     "micNoSignal": "Il tuo microfono non trasmette alcun suono: gli altri non ti sentono.",
@@ -2042,6 +2046,7 @@
     "reconnecting": "Connessione persa — riconnessione…",
     "reloadPending": "La piattaforma ha un nuovo design. Verrà applicato non appena lascerai la chiamata.",
     "restartMic": "Riavvia microfono",
+    "restoreQuality": "Ripristina qualità",
     "screenShare": "Schermo",
     "screenShareEnded": "Condivisione schermo terminata",
     "showBars": "Mostra le barre",

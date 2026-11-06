@@ -1953,12 +1953,15 @@
       "turnOff": "{device}: fik",
       "turnOn": "{device}: ndiz"
     },
+    "cpuRelief": "Pajisja juaj është e mbingarkuar — kamerat punojnë me cilësi më të ulët që zëri të mbetet i qartë.",
+    "cpuStrained": "Pajisja juaj nuk po i përballon videot. Një cilësi më e ulët e mban zërin të qartë.",
     "deviceSettings": {
       "button": "Pajisjet",
       "speakerError": "Altoparlanti nuk mund të ndërrohej.",
       "title": "Cilësimet e pajisjeve"
     },
     "dialogLabel": "Telefonatë me video në grup",
+    "dismissNotice": "Fshih",
     "enableAudio": "Aktivizo zërin",
     "enterFullscreen": "Ekran i plotë",
     "errorBackToPrejoin": "Ndrysho cilësimet",
@@ -1992,6 +1995,7 @@
     "hideBars": "Fshih shiritat",
     "hideNotices": "Fshih njoftimet",
     "leave": "Largohu nga telefonata",
+    "lowerQuality": "Ul cilësinë",
     "maximize": "Maksimizo",
     "micMuted": "Mikrofoni fikur",
     "micNoSignal": "Mikrofoni juaj nuk po jep zë — të tjerët nuk ju dëgjojnë.",
@@ -2042,6 +2046,7 @@
     "reconnecting": "Lidhja u humb — po rilidhet…",
     "reloadPending": "Platforma ka një dizajn të ri. Do të zbatohet sapo të largoheni nga thirrja.",
     "restartMic": "Rinis mikrofonin",
+    "restoreQuality": "Rikthe cilësinë",
     "screenShare": "Ekrani",
     "screenShareEnded": "Ndarja e ekranit përfundoi",
     "showBars": "Shfaq shiritat",
