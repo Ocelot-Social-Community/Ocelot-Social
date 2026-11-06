@@ -122,9 +122,22 @@
         <!--
           A moderator switches a microphone, a camera or a screen share that is on off with a click
           on it, and gives or takes the floor with the speech bubble, which everybody else sees only
-          on whoever has the floor. The bubble comes first, so that the devices stay in line.
+          on whoever has the floor. What is not always there comes first, so that the devices stay
+          in line: whether one muted somebody for oneself, the bubble, a screen share.
         -->
         <span class="call-participants__state">
+          <!-- Muted for oneself alone: a click lets one hear them again. -->
+          <button
+            v-if="locallyMuted[person.userId]"
+            v-tooltip="$t('videoCall.participants.unmuteForMe')"
+            type="button"
+            class="call-participants__switch call-participants__unmute"
+            :aria-label="$t('videoCall.participants.unmuteForMe')"
+            :data-test="'call-participant-unmute-for-me-' + person.userId"
+            @click="$emit('local-mute', person.userId, false)"
+          >
+            <os-icon :icon="icons.volumeOff" />
+          </button>
           <button
             v-if="isModerator && !muting"
             type="button"
@@ -172,7 +185,6 @@
               aria-hidden="true"
             />
           </template>
-          <os-icon v-if="locallyMuted[person.userId]" :icon="icons.volumeOff" aria-hidden="true" />
         </span>
         <span class="call-participants__sr-only">{{ stateLabel(person) }}</span>
         <button
@@ -480,6 +492,15 @@ export default {
         switchOff: on && this.isModerator ? this.switchOff(person, kind, action) : null,
       })
       return [
+        person.screenSharing &&
+          device(
+            'screen',
+            true,
+            this.icons.desktop,
+            this.icons.desktop,
+            this.$t('videoCall.participants.stopSharing'),
+            'STOP_SCREEN_SHARE',
+          ),
         device(
           'mic',
           person.micOn,
@@ -496,15 +517,6 @@ export default {
           this.$t('videoCall.participants.cameraOffAction'),
           'DISABLE_CAMERA',
         ),
-        person.screenSharing &&
-          device(
-            'screen',
-            true,
-            this.icons.desktop,
-            this.icons.desktop,
-            this.$t('videoCall.participants.stopSharing'),
-            'STOP_SCREEN_SHARE',
-          ),
       ].filter(Boolean)
     },
     floorLabel(person) {
@@ -595,13 +607,10 @@ export default {
       if (!this.isModerator) return actions
       actions.push(
         this.hasFloor(person.userId)
-          ? entry(
-              'floor',
-              this.$t('videoCall.participants.takeFloor'),
-              this.icons.microphoneSlash,
-              () => this.setFloor(person, false),
+          ? entry('floor', this.$t('videoCall.participants.takeFloor'), this.icons.comment, () =>
+              this.setFloor(person, false),
             )
-          : entry('floor', this.$t('videoCall.participants.giveFloor'), this.icons.microphone, () =>
+          : entry('floor', this.$t('videoCall.participants.giveFloor'), this.icons.comment, () =>
               this.setFloor(person, true),
             ),
       )
@@ -825,6 +834,10 @@ export default {
 .call-participants__switch:hover,
 .call-participants__switch:focus-visible {
   color: var(--color-danger);
+}
+.call-participants__unmute:hover,
+.call-participants__unmute:focus-visible {
+  color: var(--color-primary);
 }
 .call-participants__give-floor--on {
   color: var(--color-primary);

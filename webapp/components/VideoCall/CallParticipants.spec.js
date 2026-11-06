@@ -351,6 +351,11 @@ describe('CallParticipants', () => {
         moderation: moderatedByMe,
       })
       expect(wrapper.find('[data-test="call-participant-switch-screen-anna"]').exists()).toBe(false)
+      // Before the microphone, as it is not always there.
+      const screen = wrapper.find('[data-test="call-participant-switch-screen-bob"]').element
+      expect(screen.nextElementSibling).toBe(
+        wrapper.find('[data-test="call-participant-switch-mic-bob"]').element,
+      )
       await wrapper.find('[data-test="call-participant-switch-screen-bob"]').trigger('click')
       await flushPromises()
       expect(mocks.$apollo.mutate.mock.calls[0][0].variables.action).toBe('STOP_SCREEN_SHARE')
@@ -394,6 +399,17 @@ describe('CallParticipants', () => {
       wrapper.vm.openMuteAll()
       await wrapper.vm.$nextTick()
       expect(wrapper.find('[data-test="call-participant-floor-toggle-bob"]').exists()).toBe(false)
+    })
+  })
+
+  describe('muted for oneself', () => {
+    it('shows it first in the row, and lets one hear them again with a click', async () => {
+      wrapper = Wrapper({ people: [person('bob'), person('anna')], locallyMuted: { bob: true } })
+      expect(wrapper.find('[data-test="call-participant-unmute-for-me-anna"]').exists()).toBe(false)
+      const unmute = wrapper.find('[data-test="call-participant-unmute-for-me-bob"]')
+      expect(unmute.element.parentElement.firstElementChild).toBe(unmute.element)
+      await unmute.trigger('click')
+      expect(wrapper.emitted('local-mute')).toEqual([['bob', false]])
     })
   })
 
