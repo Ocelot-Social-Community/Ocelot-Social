@@ -1990,6 +1990,7 @@
       "tooltip": "Videogesprek in groep “{name}”"
     },
     "hideBars": "Balken verbergen",
+    "hideNotices": "Meldingen verbergen",
     "leave": "Gesprek verlaten",
     "maximize": "Maximaliseren",
     "micMuted": "Microfoon uit",
@@ -2044,6 +2045,7 @@
     "screenShare": "Scherm",
     "screenShareEnded": "Schermdelen beëindigd",
     "showBars": "Balken tonen",
+    "showNotices": "Meldingen tonen",
     "showVideos": "Video's tonen",
     "spotlightExit": "Spotlight verlaten",
     "title": "Groepsvideogesprek",

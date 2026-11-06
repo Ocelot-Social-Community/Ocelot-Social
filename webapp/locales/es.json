@@ -1990,6 +1990,7 @@
       "tooltip": "Videollamada en el grupo «{name}»"
     },
     "hideBars": "Ocultar las barras",
+    "hideNotices": "Ocultar avisos",
     "leave": "Salir de la llamada",
     "maximize": "Maximizar",
     "micMuted": "Micrófono apagado",
@@ -2044,6 +2045,7 @@
     "screenShare": "Pantalla",
     "screenShareEnded": "Uso compartido de pantalla finalizado",
     "showBars": "Mostrar las barras",
+    "showNotices": "Mostrar avisos",
     "showVideos": "Mostrar vídeos",
     "spotlightExit": "Salir del foco",
     "title": "Videollamada de grupo",

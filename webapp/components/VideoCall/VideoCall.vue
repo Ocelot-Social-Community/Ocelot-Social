@@ -114,6 +114,18 @@
       >
         {{ uniqueParticipantCount }}
       </span>
+      <!--
+        Folded notices wait in the corner below on the right, where the control bar's button
+        to unfold them is while it shows.
+      -->
+      <span
+        v-if="parked && hasNotices && !noticesOpen"
+        class="video-call__parked-notices"
+        data-test="video-call-parked-notices"
+        aria-hidden="true"
+      >
+        <os-icon :icon="icons.warning" />
+      </span>
 
       <pre-join v-if="phase === 'prejoin'" @join="onPreJoinReady" @cancel="leave" />
 
@@ -183,16 +195,21 @@
               </os-button>
             </div>
             <!--
-              Problems the call cannot fix on its own. They show in the parked
-              window too: a blocked speaker or a silent microphone matters there
-              just as much. Inside the stage, which anchors them: placed from the
-              body instead, which gives up its box in the maximized layouts, they
-              went by the whole call — over the control bar, centred across the
-              chat as well, their buttons behind the page's footer.
+              Problems the call cannot fix on its own. Inside the stage, which anchors
+              them: placed from the body instead, which gives up its box in the maximized
+              layouts, they went by the whole call — over the control bar, centred across
+              the chat as well, their buttons behind the page's footer. In the parked window
+              they are folded behind a button in the header (noticesCollapsed), but still
+              announced: folded means out of sight, not out of the accessibility tree.
             -->
             <div
-              v-if="audioBlocked || micProblem || reconnecting || audioOnly || reloadPending"
-              class="video-call__notices"
+              v-if="hasNotices"
+              id="video-call-notices"
+              :class="[
+                'video-call__notices',
+                { 'video-call__notices--collapsed': noticesCollapsed },
+              ]"
+              data-test="video-call-notices"
             >
               <!--
                 An admin switched the branding; applying it takes a reload, which waits for this
@@ -467,6 +484,31 @@
             {{ leaveLabel }}
           </template>
         </os-button>
+        <!--
+          In the parked window the notices would cover its small picture: they wait behind
+          this button, in the bar's corner below on the right. A warning sign in the warning
+          colour, whatever they say: a bell or the like did not tell that something is to be
+          read. In a wrapper of its own: OsButton's root carries no scoped-style attribute,
+          so a position set on it would not apply.
+        -->
+        <div v-if="parked && hasNotices" class="video-call__notices-toggle">
+          <os-button
+            v-tooltip="noticesToggleLabel"
+            data-test="video-call-notices-toggle"
+            variant="warning"
+            appearance="filled"
+            size="sm"
+            circle
+            :aria-label="noticesToggleLabel"
+            :aria-expanded="noticesOpen ? 'true' : 'false'"
+            aria-controls="video-call-notices"
+            @click="noticesOpen = !noticesOpen"
+          >
+            <template #icon>
+              <os-icon :icon="icons.warning" />
+            </template>
+          </os-button>
+        </div>
       </div>
     </div>
   </div>
@@ -630,6 +672,8 @@ export default {
       // The mouse is on the call's window: in the parked one that shows its bars. Not
       // :hover, which Safari does not set on it.
       pointerOnParked: false,
+      // The notices are unfolded in the parked window (see noticesCollapsed).
+      noticesOpen: false,
       // Only Chromium-based browsers (Chrome, Edge, Opera, …) know navigator.userAgentData.
       // Set once mounted: the server renders no browser.
       isChromium: false,
@@ -887,6 +931,25 @@ export default {
       // always maximized.
       return this.phase === 'in-call' && this.minimized && !this.isMobile
     },
+    hasNotices() {
+      return !!(
+        this.audioBlocked ||
+        this.micProblem ||
+        this.reconnecting ||
+        this.audioOnly ||
+        this.reloadPending
+      )
+    },
+    // What stands in the user's way, as opposed to what only informs.
+    hasWarningNotice() {
+      return !!(this.audioBlocked || this.micProblem)
+    },
+    noticesCollapsed() {
+      return this.parked && !this.noticesOpen
+    },
+    noticesToggleLabel() {
+      return this.noticesOpen ? this.$t('videoCall.hideNotices') : this.$t('videoCall.showNotices')
+    },
     iconOnly() {
       // Buttons without their label where there is no room for it: in the parked
       // window, on a phone, where six spelled-out controls fill half the
@@ -1010,6 +1073,16 @@ export default {
     },
   },
   watch: {
+    // A warning unfolds the notices, each time one comes up: without sound or with a silent
+    // microphone, the call does not work, and the user is to learn that without looking for
+    // it. What only informs waits behind the button.
+    hasWarningNotice(warning, before) {
+      if (warning && !before) this.noticesOpen = true
+    },
+    // Once there is nothing to say, the next notice starts folded again.
+    hasNotices(any) {
+      if (!any) this.noticesOpen = false
+    },
     // Once, when it arrives; the notice above stays for as long as it waits.
     reloadPending(pending) {
       if (pending) this.$toast.info(this.$t('videoCall.reloadPending'))
@@ -3251,15 +3324,78 @@ export default {
   transition: opacity 0.3s ease;
 }
 
+/*  The control bar's button to unfold them, as it looks there (a small filled button: 26px, */
+/*  0.8px border, its icon 1.2em of 12px), at its distance from the right edge. A little */
+/*  higher than it, off the window's lower edge, where it would stick to the corner. */
+.video-call__parked-notices {
+  z-index: 3;
+  align-self: end;
+  justify-self: end;
+  margin: 0 var(--space-x-small) var(--space-x-small) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  border: 0.8px solid var(--color-warning);
+  border-radius: var(--border-radius-rounded);
+  font-size: 12px;
+  color: var(--color-warning-contrast);
+  background: var(--color-warning);
+  transition: opacity 0.3s ease;
+}
+
+/*  The parked window's bar centres its buttons; this one keeps to its corner. */
+.video-call__notices-toggle {
+  position: absolute;
+  top: 50%;
+  right: var(--space-x-small);
+  transform: translateY(-50%);
+  display: flex;
+}
+
 .video-call--parked-bars:is(:has(:focus-visible), .video-call--bars-held)
-  .video-call__parked-count {
+  :is(.video-call__parked-count, .video-call__parked-notices) {
   opacity: 0;
+}
+
+/*  The parked window's notices, unfolded: in the corner of the button that unfolds them, */
+/*  above the control bar while it shows (control bar of small buttons 31px, compact header */
+/*  44px). Scrolling rather than running under the bars when the picture cannot hold them. */
+.video-call--parked-bars .video-call__notices {
+  bottom: var(--space-x-small);
+  max-height: calc(100% - 2 * var(--space-x-small));
+  overflow-y: auto;
+  transition:
+    bottom 0.3s ease,
+    max-height 0.3s ease;
+}
+
+.video-call--parked-bars:is(:has(:focus-visible), .video-call--bars-held) .video-call__notices {
+  bottom: calc(31px + var(--space-x-small));
+  max-height: calc(100% - 44px - 31px - 2 * var(--space-x-small));
+}
+
+/*  Folded: out of sight, yet still in the accessibility tree, so that a warning is */
+/*  announced all the same. Reached by the keyboard, they unfold for as long as it is in */
+/*  them: an action is not to be focused unseen. */
+.video-call__notices--collapsed:not(:focus-within) {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .video-call--parked-bars .video-call__header,
   .video-call--parked-bars .video-call__controls,
-  .video-call__parked-count {
+  .video-call--parked-bars .video-call__notices,
+  .video-call__parked-count,
+  .video-call__parked-notices {
     transition: none;
   }
 }
