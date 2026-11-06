@@ -46,6 +46,17 @@ describe('Dropdown.vue', () => {
     })
   })
 
+  describe('open-change', () => {
+    it('tells when the menu opens and closes', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.toggleMenu()
+      await wrapper.vm.$nextTick()
+      wrapper.vm.toggleMenu()
+      await wrapper.vm.$nextTick()
+      expect(wrapper.emitted('open-change')).toEqual([[true], [false]])
+    })
+  })
+
   describe('toggleMenu', () => {
     it('opens when currently closed', () => {
       wrapper = Wrapper()

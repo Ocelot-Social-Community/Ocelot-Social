@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import flushPromises from 'flush-promises'
+import Dropdown from '~/components/Dropdown'
 import CallParticipants, { SEARCH_FROM } from './CallParticipants.vue'
 
 const localVue = global.localVue
@@ -410,6 +411,30 @@ describe('CallParticipants', () => {
       expect(unmute.element.parentElement.firstElementChild).toBe(unmute.element)
       await unmute.trigger('click')
       expect(wrapper.emitted('local-mute')).toEqual([['bob', false]])
+    })
+  })
+
+  describe('while a menu is open', () => {
+    it('keeps the order, puts whoever joins last and lets it go again when the menu closes', async () => {
+      wrapper = Wrapper({ people: [person('anna'), person('bob')] })
+      const order = () => wrapper.vm.ordered.map((p) => p.userId)
+      wrapper.vm.holdOrder(true)
+      await wrapper.setProps({
+        people: [
+          person('anna'),
+          person('bob', { speaking: true }),
+          person('carl', { speaking: true }),
+        ],
+      })
+      expect(order()).toEqual(['anna', 'bob', 'carl'])
+      wrapper.vm.holdOrder(false)
+      expect(order()).toEqual(['bob', 'carl', 'anna'])
+    })
+
+    it('holds it when a row menu opens', async () => {
+      wrapper = Wrapper({ people: [person('anna'), person('bob')] })
+      await wrapper.findComponent(Dropdown).vm.$emit('open-change', true)
+      expect(wrapper.vm.heldOrder).toEqual(['anna', 'bob'])
     })
   })
 

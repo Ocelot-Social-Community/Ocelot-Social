@@ -205,7 +205,13 @@
               : $t('videoCall.participants.giveFloor')
           }}
         </button>
-        <dropdown v-else class="call-participants__menu" placement="bottom-end" offset="5">
+        <dropdown
+          v-else
+          class="call-participants__menu"
+          placement="bottom-end"
+          offset="5"
+          @open-change="holdOrder"
+        >
           <template #default="{ toggleMenu }">
             <os-button
               :data-test="'call-participant-menu-' + person.userId"
@@ -335,6 +341,8 @@ export default {
       rights: {},
       dialog: null,
       removing: null,
+      // The order of the rows as it was when a menu opened, by userId; null while none is open.
+      heldOrder: null,
       // Whether "mute all" is being chosen, right in the list.
       muting: false,
       spared: [],
@@ -376,9 +384,16 @@ export default {
         if (this.isNamedModerator(person.userId)) return 2
         return 3
       }
-      return [...this.people].sort(
+      const live = [...this.people].sort(
         (a, b) => rank(a) - rank(b) || (a.name || '').localeCompare(b.name || ''),
       )
+      if (!this.heldOrder) return live
+      // While a menu is open nobody moves; whoever joins meanwhile comes last.
+      const place = (person) => {
+        const index = this.heldOrder.indexOf(person.userId)
+        return index === -1 ? Infinity : index
+      }
+      return live.sort((a, b) => place(a) - place(b))
     },
     shown() {
       const needle = this.search.trim().toLowerCase()
@@ -465,6 +480,9 @@ export default {
     },
     // The heavier rights are the server's to tell: they depend on the ranks in the group. Asked
     // when the menu opens, so the menu offers what will be allowed.
+    holdOrder(open) {
+      this.heldOrder = open ? this.ordered.map((person) => person.userId) : null
+    },
     async openMenu(person, toggleMenu) {
       toggleMenu()
       if (person.isMe || !this.isModerator) return

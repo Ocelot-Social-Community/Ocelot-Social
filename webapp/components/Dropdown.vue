@@ -60,6 +60,8 @@ export default {
   watch: {
     isPopoverOpen: {
       handler(isOpen) {
+        // For whoever needs to hold still while the menu is open.
+        this.$emit('open-change', isOpen)
         if (typeof document === 'undefined') return
         if (isOpen) {
           document.body.classList.add('dropdown-open')
