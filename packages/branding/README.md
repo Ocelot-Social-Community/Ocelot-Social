@@ -89,15 +89,12 @@ every brand's value for it into a silent no-op, so it is a decision, never a sid
 
 - **Adding** a token needs no step of its own: `npm run tokens:snapshot` adds it to
   `scripts/public-tokens.snapshot.json`, the list of names that have been public.
-- **Renaming** one: the components read the new name, which falls back to the old one —
-  `--new: var(--old, <the default>)` — so a brand that still sets `--old` keeps working. Nothing
-  declares `--old` any more, so list it in `src/removedTokens.ts` as `'old': { use: 'new' }`: the
-  `public token lock` test checks that the fallback is there, and a brand that still sets `--old` gets
-  a warning when it is built. Drop the fallback and the entry together once the brands have moved over.
-  (The other direction, `--old: var(--new)`, would not do: a value set for `--old` would reach nobody.)
-- **Removing** one: list it in `src/removedTokens.ts` with a `note` saying what to do instead. Without
-  that entry the `public token lock` test fails, and a brand that still sets it gets a warning when it
-  is built.
+- **Renaming or removing** one breaks the brands that set it, so it is a deliberate step: the
+  `public token lock` test fails until the old name is deleted from
+  `scripts/public-tokens.snapshot.json` in the same PR, which makes the break visible in the diff. A
+  rename is a breaking change without an alias — name the new token in the release notes. (An alias
+  such as `--old: var(--new)` does not help: `--old` stays a valid name, while a value set for it
+  reaches nobody.)
 
 ## Changing the schema
 

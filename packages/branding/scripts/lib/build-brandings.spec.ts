@@ -18,7 +18,6 @@ import {
   findConfig,
   outSpecifyRoot,
   publishBrandArchive,
-  removedTokenWarnings,
 } from './build-brandings.ts'
 
 const roots = []
@@ -367,30 +366,6 @@ test('buildBrandArchive warns on a likely theme token typo in the CSS, not on cu
   const w = (await buildBrandArchive(dir)).warnings.join('\n')
   assert.match(w, /--color-primry is not a known theme token — did you mean --color-primary/)
   assert.doesNotMatch(w, /my-brand-var/) // intentional custom var → no warning
-})
-
-test('removedTokenWarnings names a removed token a brand still sets, and what to set instead', () => {
-  const removed = {
-    'chat-old': { use: 'chat-new' },
-    'chat-gone': { note: 'use the page background' },
-    'chat-both': { use: 'chat-new', note: 'renamed with the chat' },
-  }
-  assert.deepEqual(
-    removedTokenWarnings({ 'chat-old': 'red', 'color-primary': 'blue' }, 'acme', removed),
-    [
-      '  ! acme: --chat-old is no longer a framework token — set --chat-new instead (this value still reaches it for now)',
-    ],
-  )
-  assert.deepEqual(removedTokenWarnings({ 'chat-gone': 'red' }, 'acme', removed), [
-    '  ! acme: --chat-gone is no longer a framework token — use the page background',
-  ])
-  assert.deepEqual(removedTokenWarnings({ 'chat-both': 'red' }, 'acme', removed), [
-    '  ! acme: --chat-both is no longer a framework token — set --chat-new instead (this value still reaches it for now); renamed with the chat',
-  ])
-  assert.deepEqual(removedTokenWarnings({ 'color-primary': 'blue' }, 'acme', removed), [])
-  assert.deepEqual(removedTokenWarnings({ 'chat-old': 'red' }, 'acme'), []) // nothing removed yet
-  // Names every object has (constructor, toString) are not removed tokens.
-  assert.deepEqual(removedTokenWarnings({ constructor: 'x', toString: 'y' }, 'acme', removed), [])
 })
 
 test('MODULAR locales/<code>/<feature>.json files merge into the locale; legacy dirs ignored', async () => {
