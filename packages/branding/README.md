@@ -90,10 +90,12 @@ every brand's value for it into a silent no-op, so it is a decision, never a sid
 - **Adding** a token needs no step of its own: `npm run tokens:snapshot` adds it to
   `scripts/public-tokens.snapshot.json`, the list of names that have been public.
 - **Renaming or removing** one breaks the brands that set it, so it is a deliberate step. The
-  `public token lock` test only sees a declaration disappear: once the old name is gone from the
-  stylesheets it fails until the name is deleted from `scripts/public-tokens.snapshot.json` in the same
-  PR, which makes the break visible in the diff. A rename is a breaking change without an alias — name
-  the new token in the release notes.
+  `public token lock` test only sees a declaration disappear. The steps: remove the old name from the
+  stylesheets, run `npm run tokens:snapshot` (it regenerates `src/frameworkTokens.generated.ts`, which
+  the test reads — commit it), then delete the name from `scripts/public-tokens.snapshot.json` (the
+  command only ever adds). Until the name is deleted there the test fails, which makes the break
+  visible in the diff. A rename is a breaking change without an alias — name the new token in the
+  release notes.
 - **An alias does not count as a rename.** With `--old: var(--new)` left in the stylesheet `--old` is
   still declared, so the test stays green, yet a value a brand sets for `--old` reaches nobody. To
   break on purpose, remove the old name from the stylesheets and from the snapshot.
