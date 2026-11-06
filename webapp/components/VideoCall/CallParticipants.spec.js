@@ -358,10 +358,19 @@ describe('CallParticipants', () => {
       await wrapper.find('[data-test="call-participants-mute-all"]').trigger('click')
       expect(wrapper.vm.spared).toEqual(['me', 'loud'])
       expect(wrapper.vm.muteCount).toBe(1)
-      // Chosen right in the list: a tick per row, the floor in place of the menu.
+      // Chosen right in the list: ticked is who is muted, the floor in place of the menu.
       expect(wrapper.find('[data-test="call-participants-mute-all"]').exists()).toBe(false)
-      expect(wrapper.find('[data-test="mute-all-spare-loud"]').element.checked).toBe(true)
-      expect(wrapper.find('[data-test="mute-all-spare-bob"]').element.checked).toBe(false)
+      expect(wrapper.find('[data-test="mute-all-pick-loud"]').element.checked).toBe(false)
+      expect(wrapper.find('[data-test="mute-all-pick-bob"]').element.checked).toBe(true)
+      // Unticked and ticked again by hand.
+      const bob = wrapper.find('[data-test="mute-all-pick-bob"]')
+      bob.element.checked = false
+      await bob.trigger('change')
+      expect(wrapper.vm.spared).toEqual(['me', 'loud', 'bob'])
+      expect(wrapper.vm.muteCount).toBe(0)
+      bob.element.checked = true
+      await bob.trigger('change')
+      expect(wrapper.vm.spared).toEqual(['me', 'loud'])
       expect(wrapper.find('[data-test="mute-all-floor-bob"]').exists()).toBe(true)
       expect(wrapper.find('[data-test="call-participant-menu-bob"]').exists()).toBe(false)
       await wrapper.find('[data-test="mute-all-confirm"]').trigger('click')
@@ -372,7 +381,7 @@ describe('CallParticipants', () => {
         floorUserIds: [],
       })
       expect(wrapper.vm.muting).toBe(false)
-      expect(wrapper.find('[data-test="mute-all-spare-bob"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="mute-all-pick-bob"]').exists()).toBe(false)
       expect(wrapper.find('[data-test="call-participant-menu-bob"]').exists()).toBe(true)
       expect(wrapper.emitted('switch-off')).toBeUndefined()
     })

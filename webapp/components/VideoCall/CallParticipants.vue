@@ -12,7 +12,7 @@
     <div v-if="isModerator || mayTakeOver || searchable" class="call-participants__toolbar">
       <div v-if="muting" class="call-participants__muting" data-test="call-participants-muting">
         <h3 class="call-participants__muting-title">
-          {{ $t('videoCall.participants.muteAllExcept') }}
+          {{ $t('videoCall.participants.muteWhom') }}
         </h3>
         <div class="call-participants__muting-actions">
           <os-button
@@ -197,15 +197,15 @@
             </os-menu>
           </template>
         </dropdown>
-        <!-- Ticked: spared by "mute all". -->
+        <!-- Ticked: muted by "mute all"; whoever is not ticked is spared. -->
         <input
           v-if="muting"
-          v-model="spared"
           type="checkbox"
-          class="call-participants__spare"
-          :value="person.userId"
-          :aria-label="$t('videoCall.participants.spare', { name: person.name })"
-          :data-test="'mute-all-spare-' + person.userId"
+          class="call-participants__pick"
+          :checked="!spared.includes(person.userId)"
+          :aria-label="$t('videoCall.participants.muteName', { name: person.name })"
+          :data-test="'mute-all-pick-' + person.userId"
+          @change="spare(person.userId, !$event.target.checked)"
         />
       </li>
     </ul>
@@ -647,6 +647,9 @@ export default {
     stopMuting() {
       this.muting = false
     },
+    spare(userId, spared) {
+      this.spared = spared ? [...this.spared, userId] : this.spared.filter((id) => id !== userId)
+    },
     // Giving the floor spares; taking it back unticks again whoever was ticked only by giving
     // it, and leaves a tick set before.
     toggleFloor(userId) {
@@ -844,7 +847,7 @@ export default {
   flex-wrap: wrap;
   gap: var(--space-x-small);
 }
-.call-participants__spare {
+.call-participants__pick {
   flex: 0 0 auto;
 }
 .call-participants__floor {
