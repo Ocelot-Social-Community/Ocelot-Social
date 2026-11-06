@@ -2020,6 +2020,7 @@
       "everyone": "{name} deixa todos moderarem a chamada.",
       "everyoneOff": "{name} encerrou a moderação por todos.",
       "floor": "{name} deu a palavra a você.",
+      "floorMicOff": "{name} deu a palavra a você. Ligue seu microfone para que possam ouvir você.",
       "microphoneMuted": "{name} silenciou seu microfone.",
       "moderatorAppointed": "{name} tornou você moderador desta chamada.",
       "moderatorAutomatic": "Agora você modera esta chamada.",
@@ -2028,6 +2029,7 @@
       "removedPlain": "Você foi removido da chamada.",
       "revoked": "{name} retirou sua moderação.",
       "screenShareStopped": "{name} encerrou seu compartilhamento de tela.",
+      "switchMicOn": "Ligar microfone",
       "takenOver": "{name} assumiu a moderação."
     },
     "openChat": "Abrir chat",

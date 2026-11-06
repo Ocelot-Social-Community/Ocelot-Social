@@ -588,6 +588,7 @@
 </template>
 
 <script>
+import escapeHtml from 'lodash/escape'
 import { mapGetters, mapMutations } from 'vuex'
 import { OsButton, OsCounterIcon, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
@@ -643,6 +644,8 @@ const WEAK_QUALITIES = ['poor', 'lost']
 const MIC_SILENCE_RECHECKS = 5
 const MIC_SILENCE_RECHECK_MS = 400
 const STRONG_QUALITIES = ['excellent', 'good']
+// How long the request to switch the microphone on stays, given the floor with it off.
+const FLOOR_TOAST_TIMEOUT = 15000
 
 // The call's header and control bar on a desktop with the call maximized, and the page's
 // header and footer with them: how long the mouse has to rest before they move out of the
@@ -1714,7 +1717,8 @@ export default {
         return
       }
       if (!notice || typeof notice.type !== 'string') return
-      const by = notice.by || ''
+      // iziToast puts its message in as HTML: a name must not bring any along.
+      const by = escapeHtml(notice.by || '')
       // Each key spelled out, so the check for unused translations sees it used.
       const messages = {
         microphoneMuted: () => this.$t('videoCall.moderation.microphoneMuted', { name: by }),
@@ -1744,7 +1748,30 @@ export default {
         this.tellRemoved(message())
         return
       }
+      if (notice.type === 'floor' && !this.micEnabled) {
+        this.askForMicrophone(by)
+        return
+      }
       if (this.$toast && typeof this.$toast.info === 'function') this.$toast.info(message())
+    },
+    // Given the floor with the microphone off: asked to switch it on, with a button that does.
+    // The toast stays a while longer than others, as it asks for something.
+    askForMicrophone(by) {
+      if (!this.$toast || typeof this.$toast.info !== 'function') return
+      const label = escapeHtml(this.$t('videoCall.moderation.switchMicOn'))
+      this.$toast.info(this.$t('videoCall.moderation.floorMicOff', { name: by }), '', {
+        timeout: FLOOR_TOAST_TIMEOUT,
+        buttons: [
+          [
+            `<button type="button">${label}</button>`,
+            (instance, toast) => {
+              instance.hide({}, toast, 'button')
+              if (!this.micEnabled) this.toggleMic()
+            },
+            true,
+          ],
+        ],
+      })
     },
     async syncSwitchedOff(kind) {
       const local = this.room && this.room.localParticipant

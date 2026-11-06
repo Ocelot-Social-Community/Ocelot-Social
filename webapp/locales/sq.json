@@ -2020,6 +2020,7 @@
       "everyone": "{name} i lejon tani të gjithë ta moderojnë thirrjen.",
       "everyoneOff": "{name} e përfundoi moderimin nga të gjithë.",
       "floor": "{name} të dha fjalën.",
+      "floorMicOff": "{name} të dha fjalën. Ndize mikrofonin që të dëgjohesh.",
       "microphoneMuted": "{name} të heshti mikrofonin.",
       "moderatorAppointed": "{name} të bëri moderator të kësaj thirrjeje.",
       "moderatorAutomatic": "Tani e moderon ti këtë thirrje.",
@@ -2028,6 +2029,7 @@
       "removedPlain": "U hoqe nga thirrja.",
       "revoked": "{name} të hoqi moderimin.",
       "screenShareStopped": "{name} të përfundoi ndarjen e ekranit.",
+      "switchMicOn": "Ndiz mikrofonin",
       "takenOver": "{name} mori moderimin."
     },
     "openChat": "Hap bisedën",

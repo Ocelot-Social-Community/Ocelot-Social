@@ -2020,6 +2020,7 @@
       "everyone": "{name} laat nu iedereen het gesprek modereren.",
       "everyoneOff": "{name} heeft beëindigd dat iedereen het gesprek modereert.",
       "floor": "{name} heeft je het woord gegeven.",
+      "floorMicOff": "{name} heeft je het woord gegeven. Zet je microfoon aan zodat je te horen bent.",
       "microphoneMuted": "{name} heeft je microfoon gedempt.",
       "moderatorAppointed": "{name} heeft je moderator van dit gesprek gemaakt.",
       "moderatorAutomatic": "Je modereert dit gesprek nu.",
@@ -2028,6 +2029,7 @@
       "removedPlain": "Je bent uit het gesprek verwijderd.",
       "revoked": "{name} heeft je de moderatie ontnomen.",
       "screenShareStopped": "{name} heeft je scherm delen beëindigd.",
+      "switchMicOn": "Microfoon aanzetten",
       "takenOver": "{name} heeft de moderatie overgenomen."
     },
     "openChat": "Chat openen",

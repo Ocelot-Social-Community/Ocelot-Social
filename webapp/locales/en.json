@@ -2020,6 +2020,7 @@
       "everyone": "{name} lets everybody moderate the call.",
       "everyoneOff": "{name} has ended that everybody moderates the call.",
       "floor": "{name} has given you the floor.",
+      "floorMicOff": "{name} has given you the floor. Switch your microphone on so that you can be heard.",
       "microphoneMuted": "{name} has muted your microphone.",
       "moderatorAppointed": "{name} has made you a moderator of this call.",
       "moderatorAutomatic": "You moderate this call now.",
@@ -2028,6 +2029,7 @@
       "removedPlain": "You were removed from the call.",
       "revoked": "{name} has taken your moderation away.",
       "screenShareStopped": "{name} has ended your screen share.",
+      "switchMicOn": "Switch microphone on",
       "takenOver": "{name} has taken over the moderation."
     },
     "openChat": "Open chat",

@@ -4744,6 +4744,49 @@ describe('VideoCall — the people in the call and their moderation', () => {
       expect(wrapper.vm.$toast.info).toHaveBeenCalledWith(message)
     })
 
+    it('asks whoever is given the floor with the microphone off to switch it on', async () => {
+      const { wrapper, local } = setup()
+      wrapper.setData({ micEnabled: false })
+      jest.spyOn(wrapper.vm, 'refreshMicMeter').mockImplementation(() => {})
+      jest.spyOn(wrapper.vm, 'refreshKnownDevices').mockImplementation(() => {})
+      wrapper.vm.onModerationNotice(encode({ type: 'floor', by: 'Anna <b>' }))
+      const [message, title, options] = wrapper.vm.$toast.info.mock.calls[0]
+      expect(message).toBe('videoCall.moderation.floorMicOff:{"name":"Anna &lt;b&gt;"}')
+      expect(title).toBe('')
+      expect(options.timeout).toBeGreaterThan(5000)
+      const [html, onClick] = options.buttons[0]
+      expect(html).toBe('<button type="button">videoCall.moderation.switchMicOn</button>')
+      const instance = { hide: jest.fn() }
+      onClick(instance, 'toast')
+      await flushPromises()
+      expect(instance.hide).toHaveBeenCalledWith({}, 'toast', 'button')
+      expect(local.setMicrophoneEnabled).toHaveBeenCalledWith(true)
+      expect(wrapper.vm.micEnabled).toBe(true)
+      // Switched on meanwhile: the button only closes the toast.
+      onClick(instance, 'toast')
+      await flushPromises()
+      expect(local.setMicrophoneEnabled).toHaveBeenCalledTimes(1)
+    })
+
+    it('lets no name bring HTML into a toast', () => {
+      const { wrapper } = setup()
+      wrapper.vm.onModerationNotice(
+        encode({ type: 'cameraOff', by: '<img src=x onerror=alert(1)>' }),
+      )
+      expect(wrapper.vm.$toast.info).toHaveBeenCalledWith(
+        'videoCall.moderation.cameraOff:{"name":"&lt;img src=x onerror=alert(1)&gt;"}',
+      )
+    })
+
+    it('asks nothing of whoever cannot be shown a toast', () => {
+      const { wrapper } = setup()
+      wrapper.setData({ micEnabled: false })
+      wrapper.vm.$toast = null
+      expect(() =>
+        wrapper.vm.onModerationNotice(encode({ type: 'floor', by: 'Anna' })),
+      ).not.toThrow()
+    })
+
     it('switches off what was switched off for us, so the buttons say so', async () => {
       const { wrapper, local } = setup()
       wrapper.setData({ micEnabled: true, cameraEnabled: true, screenShareEnabled: true })
