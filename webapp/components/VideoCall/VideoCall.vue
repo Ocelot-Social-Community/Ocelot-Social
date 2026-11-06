@@ -34,13 +34,18 @@
         :aria-label="$t('videoCall.gotoGroup', { name: groupName || $t('videoCall.title') })"
         @title-click="onGroupLinkClick"
       >
-        <span
+        <!-- A shortcut to the list of participants; the control bar has its own button. -->
+        <button
           v-if="phase === 'in-call'"
+          v-tooltip="$t('videoCall.participants.open')"
+          type="button"
           class="video-call__count"
           data-test="video-call-participants"
+          :aria-label="$t('videoCall.participants.open')"
+          @click="openParticipants"
         >
           {{ uniqueParticipantCount }}
-        </span>
+        </button>
         <div class="video-call__header-actions">
           <os-button
             v-if="showFullscreenButton"
@@ -93,7 +98,7 @@
             size="sm"
             circle
             :aria-label="closeLabel"
-            @click="leave"
+            @click="requestLeave"
           >
             <template #icon>
               <os-icon :icon="icons.close" />
@@ -278,8 +283,25 @@
           <aside
             v-if="showChatSidebar"
             class="video-call__sidebar"
+            :style="sidebarStyle"
             :aria-label="$t('videoCall.openChat')"
           >
+            <!--
+              Pulled to make the sidebar wider or narrower — or, with the chat below the videos
+              on a phone, higher or lower. Remembered per layout on this device.
+            -->
+            <div
+              class="video-call__sidebar-resizer"
+              role="separator"
+              tabindex="0"
+              data-test="video-call-sidebar-resizer"
+              :aria-orientation="mobileChatOpen ? 'horizontal' : 'vertical'"
+              :aria-label="$t('videoCall.resizeSidebar')"
+              :aria-valuenow="mobileChatOpen ? sidebarHeight : sidebarWidth"
+              @pointerdown="startSidebarResize"
+              @dblclick="resetSidebarSize"
+              @keydown="onSidebarResizeKey"
+            />
             <!--
               Two chats in a call: the conference chat only its participants share,
               and the group's own, which reaches every member. The choice is offered
@@ -293,7 +315,8 @@
             -->
             <div class="video-call__chat-tabs">
               <call-chat-tabs
-                v-if="chatRoomId"
+                with-participants
+                :participant-count="uniqueParticipantCount"
                 exportable
                 :exporting="chatExporting"
                 :exportEmpty="callChatEmpty"
@@ -316,7 +339,16 @@
                 </os-button>
               </div>
             </div>
-            <client-only>
+            <call-participants
+              v-if="participantsOpen"
+              :people="people"
+              :moderation="moderation"
+              :may-take-over="mayTakeOverModeration"
+              :locally-muted="locallyMuted"
+              @spotlight="spotlightPerson"
+              @local-mute="muteForMe"
+            />
+            <client-only v-else>
               <chat
                 ref="inCallChat"
                 :key="activeChatTab"
@@ -450,6 +482,23 @@
           </template>
         </os-button>
         <os-button
+          v-tooltip="controlTooltip(participantsAction)"
+          data-test="video-call-participants-toggle"
+          :variant="participantsShown ? 'primary' : 'default'"
+          appearance="outline"
+          :size="parked ? 'sm' : 'md'"
+          :circle="iconOnly"
+          :aria-label="controlName(participantsLabel, participantsAction)"
+          @click="toggleParticipants"
+        >
+          <template #icon>
+            <os-icon :icon="icons.users" />
+          </template>
+          <template v-if="!iconOnly">
+            {{ participantsLabel }}
+          </template>
+        </os-button>
+        <os-button
           v-tooltip="controlTooltip(leaveAction)"
           variant="danger"
           appearance="filled"
@@ -457,7 +506,7 @@
           :circle="iconOnly"
           class="video-call__leave"
           :aria-label="controlName(leaveLabel, leaveAction)"
-          @click="leave"
+          @click="requestLeave"
         >
           <template #icon>
             <os-icon :icon="icons.phone" />
@@ -466,6 +515,75 @@
             {{ leaveLabel }}
           </template>
         </os-button>
+      </div>
+
+      <!--
+        The last moderator hangs up while others stay: who moderates from now on. Skipped, the
+        server decides by the same rule the suggestion follows.
+      -->
+      <div
+        v-if="handover"
+        class="video-call__handover"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="$t('videoCall.handover.title')"
+        data-test="video-call-handover"
+        @keydown.esc="handover = null"
+      >
+        <div class="video-call__handover-box">
+          <h3 class="video-call__handover-title">{{ $t('videoCall.handover.title') }}</h3>
+          <p class="video-call__handover-text">{{ $t('videoCall.handover.text') }}</p>
+          <ul class="video-call__handover-choices">
+            <li v-for="person in handoverCandidates" :key="person.userId">
+              <label>
+                <input
+                  v-model="handover.choice"
+                  type="radio"
+                  name="handover"
+                  :value="person.userId"
+                  :data-test="'handover-to-' + person.userId"
+                />
+                {{ person.name }}
+                <span v-if="person.userId === handover.suggested" class="video-call__handover-hint">
+                  ({{ $t('videoCall.handover.suggested') }})
+                </span>
+              </label>
+            </li>
+            <li>
+              <label>
+                <input
+                  v-model="handover.choice"
+                  type="radio"
+                  name="handover"
+                  value="everyone"
+                  data-test="handover-everyone"
+                />
+                {{ $t('videoCall.participants.everyoneModerates') }}
+              </label>
+            </li>
+          </ul>
+          <div class="video-call__handover-actions">
+            <os-button appearance="outline" variant="primary" @click="handover = null">
+              {{ $t('actions.cancel') }}
+            </os-button>
+            <os-button
+              appearance="outline"
+              variant="danger"
+              data-test="handover-skip"
+              @click="leaveAfterHandover(null)"
+            >
+              {{ $t('videoCall.handover.skip') }}
+            </os-button>
+            <os-button
+              variant="danger"
+              data-test="handover-confirm"
+              :loading="handover.busy"
+              @click="leaveAfterHandover(handover.choice)"
+            >
+              {{ $t('videoCall.handover.confirm') }}
+            </os-button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -476,15 +594,25 @@ import { mapGetters, mapMutations } from 'vuex'
 import { OsButton, OsCounterIcon, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import mobile from '~/mixins/mobile'
-import { joinGroupVideoCallMutation, joinGroupVideoCallChatMutation } from '~/graphql/VideoCalls'
+import {
+  handOverVideoCallModerationMutation,
+  joinGroupVideoCallMutation,
+  joinGroupVideoCallChatMutation,
+  videoCallGroupPermissionsQuery,
+  videoCallModerationSuccessorQuery,
+} from '~/graphql/VideoCalls'
 import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import Chat from '~/components/Chat/Chat.vue'
 import CallChatTabs from '~/components/VideoCall/CallChatTabs.vue'
+import CallParticipants from '~/components/VideoCall/CallParticipants.vue'
 import { activeCallChatTab, callChatTarget } from '~/components/VideoCall/callChat'
 import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 import DeviceSettings from './DeviceSettings.vue'
+
+// The narrowest the sidebar beside the videos may be pulled: its three tabs still fit.
+const SIDEBAR_MIN_WIDTH = 280
 import { saveDevicePreference } from './devicePreferences'
 import { createAudioWatchdog } from './audioWatchdog'
 
@@ -564,6 +692,7 @@ export default {
     OsCounterIcon,
     OsIcon,
     CallChatTabs,
+    CallParticipants,
     Chat,
     RoomHeader,
   },
@@ -637,6 +766,19 @@ export default {
       // had their labels (see controlsCrowded).
       controlsWidth: 0,
       labeledControlsWidth: 0,
+      // Who moderates the call, who has the floor, and whether everybody moderates: the
+      // server's word, from the room's metadata (backend: livekit/moderation.ts).
+      moderation: { moderators: [], everyone: false, speakers: [] },
+      // Whether the viewer may step into the moderation (group.videoCall.moderate).
+      mayTakeOverModeration: false,
+      // The people muted for the viewer alone: userId -> true.
+      locallyMuted: {},
+      // The question who moderates on, while the last moderator hangs up.
+      handover: null,
+      // How wide the sidebar is beside the videos, and how high below them on a phone. Null
+      // until the user pulls it: the stylesheet's size then.
+      sidebarWidth: null,
+      sidebarHeight: null,
     }
   },
   computed: {
@@ -651,6 +793,7 @@ export default {
       conferenceUnread: 'videoCall/conferenceUnread',
       groupChatUnread: 'videoCall/groupChatUnread',
       lastChatTab: 'videoCall/lastChatTab',
+      participantsOpen: 'videoCall/participantsOpen',
       reloadPending: 'videoCall/reloadPending',
       getShowChat: 'chat/showChat',
       currentUser: 'auth/user',
@@ -675,7 +818,70 @@ export default {
       // chat continues to live in the chat-modul (layouts/default.vue). On a
       // phone the call is always maximized and the chat takes the place below
       // a single small tile (see mobileChatOpen).
-      return this.phase === 'in-call' && this.chatOpenForThisCall && !this.parked
+      return (
+        this.phase === 'in-call' &&
+        (this.chatOpenForThisCall || this.participantsOpen) &&
+        !this.parked
+      )
+    },
+    // Whether the sidebar shows the participants rather than a chat.
+    participantsShown() {
+      return this.showChatSidebar && this.participantsOpen
+    },
+    participantsLabel() {
+      return this.$t('videoCall.controls.participants')
+    },
+    participantsAction() {
+      return this.participantsShown
+        ? this.$t('videoCall.participants.close')
+        : this.$t('videoCall.participants.open')
+    },
+    // The people in the call, one entry each however many devices they are in it with. Built
+    // from the tiles, which hold what LiveKit tells about every connection.
+    people() {
+      const byUser = new Map()
+      for (const tile of this.tiles) {
+        const userId = (tile.profile && tile.profile.id) || tile.identity
+        let person = byUser.get(userId)
+        if (!person) {
+          person = {
+            userId,
+            name: tile.name,
+            slug: tile.profile && tile.profile.slug,
+            profile: tile.profile,
+            isMe: !!tile.isLocal,
+            micOn: false,
+            cameraOn: false,
+            screenSharing: false,
+            speaking: false,
+            identities: new Set(),
+          }
+          byUser.set(userId, person)
+        }
+        if (tile.isLocal) person.isMe = true
+        person.identities.add(tile.identity)
+        if (tile.isScreen) {
+          person.screenSharing = true
+        } else {
+          person.micOn = person.micOn || !!tile.micEnabled
+          person.cameraOn = person.cameraOn || !!tile.videoTrack
+        }
+        if (this.activeSpeakerSet.has(tile.identity)) person.speaking = true
+      }
+      return [...byUser.values()].map(({ identities, ...person }) => ({
+        ...person,
+        devices: identities.size,
+      }))
+    },
+    // Whom the moderation may be handed to: everybody else in the call.
+    handoverCandidates() {
+      return this.people.filter((person) => !person.isMe)
+    },
+    sidebarStyle() {
+      if (this.mobileChatOpen) {
+        return this.sidebarHeight ? { flex: `0 0 ${this.sidebarHeight}px` } : null
+      }
+      return this.sidebarWidth ? { flex: `0 0 ${this.sidebarWidth}px` } : null
     },
     // On a phone there is no room for the chat beside the videos: it goes below,
     // and the stage shrinks to one small tile, the person speaking.
@@ -1139,8 +1345,12 @@ export default {
     // overtaken by a push gives way to it (loadConferenceUnread, loadGroupChatUnread).
     this.conferenceUnreadPushes = 0
     this.groupChatUnreadPushes = 0
+    // A notice of being removed has been shown; the disconnect that follows says it no more.
+    this.removalTold = false
+    this.sidebarDrag = null
   },
   mounted() {
+    this.restoreSidebarSize()
     this.isChromium = typeof navigator !== 'undefined' && !!navigator.userAgentData
     this.canFullscreen = !!document.fullscreenEnabled
     document.addEventListener('fullscreenchange', this.onFullscreenChange)
@@ -1162,6 +1372,7 @@ export default {
     this.setPageBars('normal')
     this.disconnectStageObserver()
     this.closeDeviceSettings()
+    this.stopSidebarResize()
     this.cleanup()
     this.watchCallChats(false)
   },
@@ -1175,6 +1386,7 @@ export default {
       setConferenceUnread: 'videoCall/SET_CONFERENCE_UNREAD',
       setGroupChatUnread: 'videoCall/SET_GROUP_CHAT_UNREAD',
       setLastChatTab: 'videoCall/SET_LAST_CHAT_TAB',
+      setParticipantsOpen: 'videoCall/SET_PARTICIPANTS_OPEN',
       setPageBars: 'videoCall/SET_PAGE_BARS',
       setShowChat: 'chat/SET_OPEN_CHAT',
     }),
@@ -1386,6 +1598,12 @@ export default {
       }
     },
     toggleChat() {
+      if (this.participantsShown) {
+        // The sidebar is open on the participants: the button brings the chat there.
+        this.setParticipantsOpen(false)
+        if (!this.chatOpenForThisCall) this.selectChatTab(this.lastChatTab)
+        return
+      }
       if (this.chatOpenForThisCall) {
         this.setShowChat({ showChat: false, chatUserId: null, groupId: null })
         return
@@ -1399,7 +1617,299 @@ export default {
       // way no navigation is needed.
     },
     closeInCallChat() {
+      this.setParticipantsOpen(false)
       this.setShowChat({ showChat: false, chatUserId: null, groupId: null })
+    },
+    toggleParticipants() {
+      if (this.participantsShown) {
+        this.closeInCallChat()
+        return
+      }
+      this.openParticipants()
+    },
+    openParticipants() {
+      this.setParticipantsOpen(true)
+      // In the parked window there is no sidebar: the list needs the call maximized.
+      if (this.minimized && !this.isMobile) this.toggleMinimize()
+    },
+    // Shows that person large, as a click on their tile does.
+    spotlightPerson(userId) {
+      const tile = this.tiles.find(
+        (candidate) =>
+          !candidate.isScreen &&
+          ((candidate.profile && candidate.profile.id) || candidate.identity) === userId,
+      )
+      if (tile) this.spotlightKey = tile.key
+    },
+    // Mutes a person for the viewer alone, on every device they are in the call with.
+    muteForMe(userId, muted) {
+      this.locallyMuted = { ...this.locallyMuted, [userId]: muted }
+      if (!muted) delete this.locallyMuted[userId]
+      this.applyLocalVolumes()
+    },
+    applyLocalVolumes() {
+      const room = this.room
+      if (!room) return
+      for (const participant of room.remoteParticipants.values()) {
+        const userId = this.userIdOfParticipant(participant)
+        if (typeof participant.setVolume === 'function') {
+          participant.setVolume(this.locallyMuted[userId] ? 0 : 1)
+        }
+      }
+    },
+    userIdOfParticipant(participant) {
+      try {
+        const meta = JSON.parse(participant.metadata || '')
+        if (meta && meta.userId) return meta.userId
+      } catch (_e) {
+        /* fall through to the identity */
+      }
+      return participant.identity
+    },
+    // What the server keeps in the room's metadata (backend: moderationMetadata).
+    applyRoomMetadata(metadata) {
+      let moderation = null
+      try {
+        moderation = JSON.parse(metadata || '{}').moderation || null
+      } catch (_e) {
+        /* not ours, or not yet: nobody moderates as far as we know */
+      }
+      this.moderation = {
+        moderators: Array.isArray(moderation && moderation.moderators) ? moderation.moderators : [],
+        everyone: !!(moderation && moderation.everyone),
+        speakers: Array.isArray(moderation && moderation.speakers) ? moderation.speakers : [],
+      }
+    },
+    // A notice from the server about what the moderation did to us (backend: notify).
+    onModerationNotice(payload) {
+      let notice
+      try {
+        notice = JSON.parse(new TextDecoder().decode(payload))
+      } catch (_e) {
+        return
+      }
+      if (!notice || typeof notice.type !== 'string') return
+      const by = notice.by || ''
+      // Each key spelled out, so the check for unused translations sees it used.
+      const messages = {
+        microphoneMuted: () => this.$t('videoCall.moderation.microphoneMuted', { name: by }),
+        cameraOff: () => this.$t('videoCall.moderation.cameraOff', { name: by }),
+        screenShareStopped: () => this.$t('videoCall.moderation.screenShareStopped', { name: by }),
+        removed: () => this.$t('videoCall.moderation.removed', { name: by }),
+        moderationTakenOver: () => this.$t('videoCall.moderation.takenOver', { name: by }),
+        moderationRevoked: () => this.$t('videoCall.moderation.revoked', { name: by }),
+        everyoneModerates: () => this.$t('videoCall.moderation.everyone', { name: by }),
+        everyoneModeratesOff: () => this.$t('videoCall.moderation.everyoneOff', { name: by }),
+        floor: () => this.$t('videoCall.moderation.floor', { name: by }),
+        moderator: () =>
+          notice.reason === 'automatic'
+            ? this.$t('videoCall.moderation.moderatorAutomatic')
+            : notice.reason === 'handedOver'
+              ? this.$t('videoCall.moderation.moderatorHandedOver', { name: by })
+              : this.$t('videoCall.moderation.moderatorAppointed', { name: by }),
+      }
+      const message = messages[notice.type]
+      if (!message) return
+      // What was switched off for us is off: the buttons say so, and switching it on again is
+      // ours to do.
+      if (notice.type === 'microphoneMuted') this.syncSwitchedOff('mic')
+      if (notice.type === 'cameraOff') this.syncSwitchedOff('camera')
+      if (notice.type === 'screenShareStopped') this.syncSwitchedOff('screen')
+      if (notice.type === 'removed') {
+        this.tellRemoved(message())
+        return
+      }
+      if (this.$toast && typeof this.$toast.info === 'function') this.$toast.info(message())
+    },
+    async syncSwitchedOff(kind) {
+      const local = this.room && this.room.localParticipant
+      try {
+        if (kind === 'mic') {
+          this.micEnabled = false
+          if (local) await local.setMicrophoneEnabled(false)
+        } else if (kind === 'camera') {
+          this.cameraEnabled = false
+          if (local) await local.setCameraEnabled(false)
+        } else {
+          this.screenShareEnabled = false
+          this.screenShareSurface = null
+          if (local) await local.setScreenShareEnabled(false)
+        }
+      } catch (_e) {
+        /* the server has muted it already; the button is right either way */
+      }
+      this.refreshTiles()
+    },
+    tellRemoved(message) {
+      if (this.removalTold) return
+      this.removalTold = true
+      const text = message || this.$t('videoCall.moderation.removedPlain')
+      if (this.$toast && typeof this.$toast.error === 'function') this.$toast.error(text)
+    },
+    // Whether the viewer may step into the moderation: asked of the group once per call.
+    async loadModerationPermission() {
+      this.mayTakeOverModeration = false
+      if (!this.groupId) return
+      try {
+        const {
+          data: { Group },
+        } = await this.$apollo.query({
+          query: videoCallGroupPermissionsQuery(),
+          variables: { id: this.groupId },
+          fetchPolicy: 'no-cache',
+        })
+        const permissions = (Group && Group[0] && Group[0].myGroupPermissions) || []
+        this.mayTakeOverModeration = permissions.includes('group.videoCall.moderate')
+      } catch (_e) {
+        /* without the answer the list does not offer it */
+      }
+    },
+    // Hanging up as the last moderator while others stay asks who moderates on.
+    async requestLeave() {
+      const me = this.currentUser && this.currentUser.id
+      const lastModerator =
+        this.phase === 'in-call' &&
+        !this.moderation.everyone &&
+        this.moderation.moderators.includes(me) &&
+        !this.people.some(
+          (person) => !person.isMe && this.moderation.moderators.includes(person.userId),
+        )
+      if (!lastModerator || this.handoverCandidates.length === 0) {
+        await this.leave()
+        return
+      }
+      let suggested = null
+      try {
+        const {
+          data: { videoCallModerationSuccessor },
+        } = await this.$apollo.query({
+          query: videoCallModerationSuccessorQuery(),
+          variables: { groupId: this.groupId },
+          fetchPolicy: 'no-cache',
+        })
+        suggested = videoCallModerationSuccessor
+      } catch (_e) {
+        /* no suggestion: the first of the others is picked */
+      }
+      const fallback = this.handoverCandidates[0].userId
+      this.handover = {
+        suggested,
+        choice: suggested || fallback,
+        busy: false,
+      }
+    },
+    async leaveAfterHandover(choice) {
+      if (!this.handover) return
+      this.handover.busy = true
+      try {
+        await this.$apollo.mutate({
+          mutation: handOverVideoCallModerationMutation(),
+          variables: {
+            groupId: this.groupId,
+            toUserId: choice && choice !== 'everyone' ? choice : null,
+            everyone: choice === 'everyone',
+          },
+        })
+      } catch (_e) {
+        // Leaving is what was asked for; the server hands the moderation on by itself then.
+      }
+      this.handover = null
+      await this.leave()
+    },
+    // --- The sidebar's size ---------------------------------------------------------------
+    sidebarStorageKey() {
+      return this.mobileChatOpen ? 'videoCall.sidebarHeight' : 'videoCall.sidebarWidth'
+    },
+    restoreSidebarSize() {
+      try {
+        const width = Number(window.localStorage.getItem('videoCall.sidebarWidth'))
+        const height = Number(window.localStorage.getItem('videoCall.sidebarHeight'))
+        this.sidebarWidth = width > 0 ? width : null
+        this.sidebarHeight = height > 0 ? height : null
+      } catch (_e) {
+        /* no storage: the stylesheet's size */
+      }
+    },
+    saveSidebarSize() {
+      try {
+        const value = this.mobileChatOpen ? this.sidebarHeight : this.sidebarWidth
+        if (value) window.localStorage.setItem(this.sidebarStorageKey(), String(value))
+        else window.localStorage.removeItem(this.sidebarStorageKey())
+      } catch (_e) {
+        /* remembered for this call only */
+      }
+    },
+    // What the sidebar may measure: wide enough for its tabs and at most half the body beside
+    // the videos; on a phone, below them, room for the message field and a few messages, and
+    // never so high that not even the small tile is left.
+    clampSidebarSize(size) {
+      const body = this.$el && this.$el.querySelector('.video-call__body')
+      const rect = body ? body.getBoundingClientRect() : { width: 1000, height: 800 }
+      if (this.mobileChatOpen) {
+        return Math.round(Math.min(Math.max(size, 200), Math.max(rect.height - 110, 200)))
+      }
+      return Math.round(
+        Math.min(Math.max(size, SIDEBAR_MIN_WIDTH), Math.max(rect.width / 2, SIDEBAR_MIN_WIDTH)),
+      )
+    },
+    currentSidebarSize() {
+      const sidebar = this.$el && this.$el.querySelector('.video-call__sidebar')
+      if (!sidebar) return this.mobileChatOpen ? 320 : 360
+      const rect = sidebar.getBoundingClientRect()
+      return this.mobileChatOpen ? rect.height : rect.width
+    },
+    setSidebarSize(size) {
+      if (this.mobileChatOpen) this.sidebarHeight = this.clampSidebarSize(size)
+      else this.sidebarWidth = this.clampSidebarSize(size)
+    },
+    startSidebarResize(event) {
+      if (event.button !== undefined && event.button !== 0) return
+      event.preventDefault()
+      const sidebar = this.$el.querySelector('.video-call__sidebar')
+      const rect = sidebar.getBoundingClientRect()
+      // The sidebar's far edge stays put; the near one follows the pointer.
+      this.sidebarDrag = { right: rect.right, bottom: rect.bottom }
+      if (event.target && event.target.setPointerCapture && event.pointerId !== undefined) {
+        try {
+          event.target.setPointerCapture(event.pointerId)
+        } catch (_e) {
+          /* captured or not, the window listeners below follow the pointer */
+        }
+      }
+      window.addEventListener('pointermove', this.onSidebarResize)
+      window.addEventListener('pointerup', this.stopSidebarResize)
+      window.addEventListener('pointercancel', this.stopSidebarResize)
+    },
+    onSidebarResize(event) {
+      if (!this.sidebarDrag) return
+      this.setSidebarSize(
+        this.mobileChatOpen
+          ? this.sidebarDrag.bottom - event.clientY
+          : this.sidebarDrag.right - event.clientX,
+      )
+    },
+    stopSidebarResize() {
+      window.removeEventListener('pointermove', this.onSidebarResize)
+      window.removeEventListener('pointerup', this.stopSidebarResize)
+      window.removeEventListener('pointercancel', this.stopSidebarResize)
+      if (!this.sidebarDrag) return
+      this.sidebarDrag = null
+      this.saveSidebarSize()
+    },
+    onSidebarResizeKey(event) {
+      // Towards the videos makes the sidebar bigger: left beside them, up below them.
+      const grow = this.mobileChatOpen ? 'ArrowUp' : 'ArrowLeft'
+      const shrink = this.mobileChatOpen ? 'ArrowDown' : 'ArrowRight'
+      if (event.key !== grow && event.key !== shrink) return
+      event.preventDefault()
+      const step = event.shiftKey ? 64 : 16
+      this.setSidebarSize(this.currentSidebarSize() + (event.key === grow ? step : -step))
+      this.saveSidebarSize()
+    },
+    resetSidebarSize() {
+      if (this.mobileChatOpen) this.sidebarHeight = null
+      else this.sidebarWidth = null
+      this.saveSidebarSize()
     },
     // The export is the chat's own doing (it knows the room and fetches every message);
     // only its button sits here, in the tab row.
@@ -1660,6 +2170,11 @@ export default {
       this.phase = 'connecting'
       this.error = null
       this.tiles = []
+      // Each call starts without moderation known, nobody muted for us, nothing told.
+      this.moderation = { moderators: [], everyone: false, speakers: [] }
+      this.locallyMuted = {}
+      this.removalTold = false
+      this.handover = null
       this.audioBlocked = false
       this.micProblem = false
       this.reconnecting = false
@@ -1683,6 +2198,7 @@ export default {
           VideoQuality,
           DisconnectReason,
         } = livekit
+        this.DisconnectReason = DisconnectReason
         this.Track = Track
 
         const room = new Room({
@@ -1789,7 +2305,19 @@ export default {
         // would clobber the retry/leave flow.
         room.on(RoomEvent.Disconnected, (reason) => {
           if (reason === DisconnectReason.CLIENT_INITIATED) return
+          // Removed by a moderator: said, unless the notice before it already did.
+          if (reason === DisconnectReason.PARTICIPANT_REMOVED) this.tellRemoved()
           this.leave()
+        })
+        // The moderation, as the server keeps it, arrives with the room and every change.
+        this.applyRoomMetadata(room.metadata)
+        room.on(RoomEvent.RoomMetadataChanged, (metadata) => {
+          if (this.room === room) this.applyRoomMetadata(metadata)
+        })
+        // What the moderation did to us comes from the server, not from a participant.
+        room.on(RoomEvent.DataReceived, (payload, participant, _kind, topic) => {
+          if (this.room !== room || participant || topic !== 'moderation') return
+          this.onModerationNotice(payload)
         })
 
         // LiveKit plays remote audio through the <audio> elements the tiles
@@ -1860,6 +2388,7 @@ export default {
         })
         this.audioWatchdog.start()
         this.joinCallChat(room)
+        this.loadModerationPermission()
         this.watchCallChats(true)
         this.loadGroupChatUnread()
         this.refreshKnownDevices()
@@ -1905,6 +2434,7 @@ export default {
         if (isLocal && this.currentUser) {
           return {
             id: this.currentUser.id,
+            slug: this.currentUser.slug,
             name: this.currentUser.name,
             avatar: this.currentUser.avatar,
           }
@@ -1937,6 +2467,7 @@ export default {
         }
         return {
           id: (meta && meta.userId) || participant.identity,
+          slug: meta && typeof meta.slug === 'string' ? meta.slug : null,
           name: participant.name || participant.identity,
           // ResponsiveImage (used by AvatarImage) expects url + responsive
           // variants. We only have one URL from the metadata — reuse it for
@@ -2007,6 +2538,8 @@ export default {
       collect(room.localParticipant, true)
       for (const p of room.remoteParticipants.values()) collect(p, false)
       this.tiles = tiles
+      // Somebody muted for the viewer may have come in on another device.
+      if (Object.keys(this.locallyMuted).length) this.applyLocalVolumes()
       this.setParticipantCount(new Set(tiles.map((t) => t.identity)).size)
     },
     showDeviceErrorToast(kind, err) {
@@ -2704,10 +3237,13 @@ export default {
   background: var(--color-primary);
   color: var(--color-primary-inverse);
   padding: 2px var(--space-x-small);
+  border: 0;
   border-radius: var(--border-radius-rounded);
+  font: inherit;
   font-size: var(--font-size-small);
   min-width: 28px;
   text-align: center;
+  cursor: pointer;
 }
 
 .video-call__header-actions {
@@ -2814,6 +3350,100 @@ export default {
   background: var(--background-color-base);
   border-left: 1px solid var(--color-neutral-85);
   overflow: hidden;
+  /*  The resizer is placed on its edge. */
+  position: relative;
+}
+
+/*  A pulled width is the user's: only the half of the body caps it (clampSidebarSize). */
+.video-call__sidebar[style] {
+  max-width: none;
+}
+
+/*  A strip along the sidebar's edge towards the videos, wider than it looks so it is easy */
+/*  to catch. Out of the flow: the sidebar's children fill it as before. */
+.video-call__sidebar > .video-call__sidebar-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 8px;
+  flex: none;
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 1;
+}
+
+.video-call__sidebar-resizer:hover,
+.video-call__sidebar-resizer:focus-visible {
+  background: var(--color-primary);
+  opacity: 0.4;
+  outline: none;
+}
+
+/*  Below the videos on a phone: the strip lies along the top edge, a finger's height. */
+.video-call__body--chat-below .video-call__sidebar > .video-call__sidebar-resizer {
+  right: 0;
+  bottom: auto;
+  width: auto;
+  height: 22px;
+  margin-top: -11px;
+  cursor: row-resize;
+}
+
+/*  The question who moderates on, over the whole call. */
+.video-call__handover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-small);
+  /*  As dim as the backdrop behind the device setup. */
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
+
+.video-call__handover-box {
+  max-width: 420px;
+  width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  padding: var(--space-base);
+  border-radius: var(--border-radius-base);
+  background: var(--background-color-base);
+  color: var(--text-color-base);
+}
+
+.video-call__handover-title {
+  margin: 0 0 var(--space-x-small);
+  font-size: var(--font-size-large);
+}
+
+.video-call__handover-text {
+  margin: 0 0 var(--space-small);
+  color: var(--text-color-soft);
+}
+
+.video-call__handover-choices {
+  margin: 0 0 var(--space-small);
+  padding: 0;
+  list-style: none;
+}
+
+.video-call__handover-choices li {
+  padding: var(--space-xxx-small) 0;
+}
+
+.video-call__handover-hint {
+  color: var(--text-color-soft);
+  font-size: var(--font-size-small);
+}
+
+.video-call__handover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-x-small);
 }
 
 .video-call__sidebar > * {
@@ -2840,6 +3470,14 @@ export default {
   min-height: 0;
   border-left: 0;
   border-top: 1px solid var(--color-neutral-85);
+  /*  The strip along its top edge reaches over it. */
+  overflow: visible;
+}
+
+/*  A pulled height leaves the rest to the videos, which then grow instead. */
+.video-call__body--chat-below:has(.video-call__sidebar[style]) .video-call__stage {
+  flex: 1 1 0;
+  height: auto;
 }
 
 /*  The notices sit at the bottom of the body, which is the chat here: keep them */

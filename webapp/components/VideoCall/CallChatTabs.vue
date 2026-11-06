@@ -29,10 +29,13 @@
         @keydown.right.prevent="step(1)"
       >
         <span class="call-chat-tabs__label">{{ tab.label }}</span>
-        <!-- Unread messages, as the red count the app shows on its icons. -->
+        <!--
+          Unread messages, as the red count the app shows on its icons; how many are in the
+          call, in the calm colour.
+        -->
         <os-badge
           v-if="tab.count > 0"
-          variant="danger"
+          :variant="tab.neutral ? 'default' : 'danger'"
           :count="tab.count"
           :data-test="'call-chat-tab-count-' + tab.value"
         />
@@ -103,6 +106,11 @@ export default {
     exportable: { type: Boolean, default: false },
     // Whether a download asked for is still under way.
     exporting: { type: Boolean, default: false },
+    // Whether the participants of the call are a third tab: in the call's own sidebar, not in
+    // the floating chat window beside the parked call, which only ever holds a chat.
+    withParticipants: { type: Boolean, default: false },
+    // How many people are in the call, for that tab.
+    participantCount: { type: Number, default: 0 },
     // Whether the conference chat is known to hold no message: its download says so, and can
     // still be had.
     exportEmpty: { type: Boolean, default: false },
@@ -118,8 +126,10 @@ export default {
       unread: 'videoCall/conferenceUnread',
       groupUnread: 'videoCall/groupChatUnread',
       chat: 'chat/showChat',
+      participantsOpen: 'videoCall/participantsOpen',
     }),
     active() {
+      if (this.withParticipants && this.participantsOpen) return 'participants'
       return activeCallChatTab(this.chat, this)
     },
     // The entries of the conference chat's menu. One so far; others, such as who may write,
@@ -142,28 +152,51 @@ export default {
     },
     tabs() {
       return [
-        {
-          value: 'call',
-          label: this.$t('videoCall.chatTabs.call'),
-          // Held to a narrow tooltip, the hint wraps by itself. The same text is the note
-          // above the chat's messages, where it wraps to the chat's width.
-          hint: this.$t('videoCall.chatTabs.callHint'),
-          count: this.unread,
-        },
+        // Beside the participants, the conference chat's tab waits for the chat: before the
+        // server has confirmed the participation it would open the group's chat a second time.
+        ...(this.withParticipants && !this.chatRoomId
+          ? []
+          : [
+              {
+                value: 'call',
+                label: this.$t('videoCall.chatTabs.call'),
+                // Held to a narrow tooltip, the hint wraps by itself. The same text is the note
+                // above the chat's messages, where it wraps to the chat's width.
+                hint: this.$t('videoCall.chatTabs.callHint'),
+                count: this.unread,
+              },
+            ]),
         {
           value: 'group',
           label: this.$t('videoCall.chatTabs.group'),
           hint: this.$t('videoCall.chatTabs.groupHint'),
           count: this.groupUnread,
         },
+        ...(this.withParticipants
+          ? [
+              {
+                value: 'participants',
+                label: this.$t('videoCall.chatTabs.participants'),
+                hint: this.$t('videoCall.chatTabs.participantsHint'),
+                count: this.participantCount,
+                neutral: true,
+              },
+            ]
+          : []),
       ]
     },
   },
   methods: {
     ...mapMutations({
       openChat: 'chat/SET_OPEN_CHAT',
+      setParticipantsOpen: 'videoCall/SET_PARTICIPANTS_OPEN',
     }),
     select(tab) {
+      if (tab === 'participants') {
+        this.setParticipantsOpen(true)
+        return
+      }
+      this.setParticipantsOpen(false)
       this.openChat(callChatTarget(tab, this))
     },
     runAction(action, toggleMenu) {

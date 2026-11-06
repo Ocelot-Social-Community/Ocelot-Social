@@ -4,6 +4,11 @@ import VTooltip from 'v-tooltip'
 import { mount, createLocalVue } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import VideoCall from './VideoCall.vue'
+import { TextDecoder, TextEncoder } from 'util'
+
+// LiveKit hands data messages over as bytes; jsdom knows no codec for them.
+global.TextEncoder = global.TextEncoder || TextEncoder
+global.TextDecoder = global.TextDecoder || TextDecoder
 
 // connect() does `await import('livekit-client')` — mock it with a fake Room that
 // records its event handlers (so tests can fire them) and resolves connect/disconnect.
@@ -28,6 +33,8 @@ jest.mock('livekit-client', () => {
     ActiveDeviceChanged: 'ActiveDeviceChanged',
     TrackPublished: 'TrackPublished',
     ConnectionQualityChanged: 'ConnectionQualityChanged',
+    RoomMetadataChanged: 'RoomMetadataChanged',
+    DataReceived: 'DataReceived',
   }
   const TrackEvent = {
     UpstreamPaused: 'upstreamPaused',
@@ -39,7 +46,10 @@ jest.mock('livekit-client', () => {
   }
   const ParticipantEvent = { LocalTrackCpuConstrained: 'localTrackCpuConstrained' }
   const VideoQuality = { LOW: 0, MEDIUM: 1, HIGH: 2 }
-  const DisconnectReason = { CLIENT_INITIATED: 'CLIENT_INITIATED' }
+  const DisconnectReason = {
+    CLIENT_INITIATED: 'CLIENT_INITIATED',
+    PARTICIPANT_REMOVED: 'PARTICIPANT_REMOVED',
+  }
   class Room {
     constructor(opts) {
       this.opts = opts
@@ -62,6 +72,7 @@ jest.mock('livekit-client', () => {
       }
       // Tests flip the static to start a room whose audio is already blocked.
       this.canPlaybackAudio = Room.initialCanPlaybackAudio
+      this.metadata = Room.initialMetadata
       this.startAudio = jest.fn().mockResolvedValue()
       this.remoteParticipants = new Map()
       this.connect = jest.fn().mockResolvedValue()
@@ -75,6 +86,7 @@ jest.mock('livekit-client', () => {
     }
   }
   Room.initialCanPlaybackAudio = true
+  Room.initialMetadata = ''
   return {
     __esModule: true,
     Room,
@@ -129,6 +141,9 @@ const buildStore = (state = {}) => {
   const setChatRoomId = jest.fn()
   const setConferenceUnread = jest.fn()
   const setLastChatTab = jest.fn()
+  const setParticipantsOpen = jest.fn((_state, open) => {
+    state.participantsOpen = open
+  })
   const setPageBars = jest.fn()
   return {
     store: new Vuex.Store({
@@ -143,6 +158,7 @@ const buildStore = (state = {}) => {
         'videoCall/conferenceUnread': () => state.conferenceUnread ?? 0,
         'videoCall/groupChatUnread': () => state.groupChatUnread ?? 0,
         'videoCall/lastChatTab': () => state.lastChatTab ?? 'call',
+        'videoCall/participantsOpen': () => state.participantsOpen ?? false,
         'videoCall/reloadPending': () => state.reloadPending ?? false,
         'chat/showChat': () => state.chat ?? { showChat: false, chatUserId: null, groupId: null },
         'auth/user': () => state.user ?? { id: 'u1', name: 'Alice', avatar: { url: 'a.png' } },
@@ -156,6 +172,7 @@ const buildStore = (state = {}) => {
         'videoCall/SET_CONFERENCE_UNREAD': setConferenceUnread,
         'videoCall/SET_GROUP_CHAT_UNREAD': jest.fn(),
         'videoCall/SET_LAST_CHAT_TAB': setLastChatTab,
+        'videoCall/SET_PARTICIPANTS_OPEN': setParticipantsOpen,
         'videoCall/SET_PAGE_BARS': setPageBars,
         'chat/SET_OPEN_CHAT': showChat,
       },
@@ -166,6 +183,7 @@ const buildStore = (state = {}) => {
     showChat,
     setChatRoomId,
     setLastChatTab,
+    setParticipantsOpen,
     setPageBars,
   }
 }
@@ -407,9 +425,11 @@ describe('VideoCall', () => {
       })
     })
 
-    it('closeInCallChat clears the open chat', () => {
+    it('closeInCallChat clears the open chat and the participants', () => {
       const setShowChat = jest.fn()
-      VideoCall.methods.closeInCallChat.call({ setShowChat })
+      const setParticipantsOpen = jest.fn()
+      VideoCall.methods.closeInCallChat.call({ setShowChat, setParticipantsOpen })
+      expect(setParticipantsOpen).toHaveBeenCalledWith(false)
       expect(setShowChat).toHaveBeenCalledWith({
         showChat: false,
         chatUserId: null,
@@ -4544,6 +4564,497 @@ describe('VideoCall', () => {
       expect(factory({ show: true, routeName: 'groups-id-slug' }).wrapper.vm.onCallRoute).toBe(
         false,
       )
+    })
+  })
+})
+
+describe('VideoCall — the people in the call and their moderation', () => {
+  const encode = (notice) => new TextEncoder().encode(JSON.stringify(notice))
+  const tile = (identity, userId, overrides = {}) => ({
+    key: `${identity}/main`,
+    identity,
+    name: userId,
+    profile: { id: userId, slug: `${userId}-slug` },
+    isLocal: false,
+    isScreen: false,
+    micEnabled: true,
+    videoTrack: null,
+    ...overrides,
+  })
+  const moderationOf = (moderation) => JSON.stringify({ moderation })
+  const withApollo = (wrapper, overrides = {}) => {
+    wrapper.vm.$apollo = {
+      query: jest.fn().mockResolvedValue({ data: {} }),
+      mutate: jest.fn().mockResolvedValue({ data: {} }),
+      ...overrides,
+    }
+    return wrapper.vm.$apollo
+  }
+  const joining = (wrapper, permissions = []) => {
+    wrapper.vm.$apollo = {
+      query: jest.fn().mockResolvedValue({
+        data: { Group: [{ id: 'g1', myGroupPermissions: permissions }] },
+      }),
+      mutate: jest
+        .fn()
+        .mockResolvedValue({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } }),
+      subscribe: jest.fn(() => ({ subscribe: () => ({ unsubscribe: jest.fn() }) })),
+    }
+  }
+
+  describe('people', () => {
+    it('makes one entry of every person, however many devices they are in it with', () => {
+      const { wrapper } = factory({ show: true })
+      wrapper.setData({
+        tiles: [
+          tile('me#1', 'u1', { isLocal: true, micEnabled: false }),
+          tile('bob#1', 'bob', { micEnabled: false }),
+          tile('bob#2', 'bob', { videoTrack: {} }),
+          { ...tile('bob#2', 'bob'), key: 'bob#2/screen', isScreen: true },
+        ],
+        activeSpeakerIds: ['bob#2'],
+      })
+      expect(wrapper.vm.people).toEqual([
+        expect.objectContaining({ userId: 'u1', isMe: true, micOn: false, devices: 1 }),
+        expect.objectContaining({
+          userId: 'bob',
+          slug: 'bob-slug',
+          micOn: true,
+          cameraOn: true,
+          screenSharing: true,
+          speaking: true,
+          devices: 2,
+        }),
+      ])
+      expect(wrapper.vm.handoverCandidates.map((p) => p.userId)).toEqual(['bob'])
+    })
+  })
+
+  describe('the moderation from the room', () => {
+    it('reads who moderates, whether everybody does, and who has the floor', () => {
+      const { wrapper } = factory({ show: true })
+      wrapper.vm.applyRoomMetadata(
+        moderationOf({ moderators: ['a'], everyone: true, speakers: ['b'] }),
+      )
+      expect(wrapper.vm.moderation).toEqual({ moderators: ['a'], everyone: true, speakers: ['b'] })
+    })
+
+    it('knows of nobody moderating without readable metadata', () => {
+      const { wrapper } = factory({ show: true })
+      for (const metadata of ['not json', '', moderationOf({ moderators: 'x' })]) {
+        wrapper.vm.applyRoomMetadata(metadata)
+        expect(wrapper.vm.moderation).toEqual({ moderators: [], everyone: false, speakers: [] })
+      }
+    })
+
+    it('follows the room from the join on, and takes notices from the server only', async () => {
+      const { Room } = await import('livekit-client')
+      Room.initialMetadata = moderationOf({ moderators: ['u1'], everyone: false, speakers: [] })
+      const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+      joining(wrapper, ['group.videoCall.moderate'])
+      await wrapper.vm.connect()
+      await flushPromises()
+      Room.initialMetadata = ''
+      const room = wrapper.vm.room
+      expect(wrapper.vm.moderation.moderators).toEqual(['u1'])
+      expect(wrapper.vm.mayTakeOverModeration).toBe(true)
+      room.handlers.RoomMetadataChanged(
+        moderationOf({ moderators: [], everyone: true, speakers: [] }),
+      )
+      expect(wrapper.vm.moderation.everyone).toBe(true)
+      const notice = jest.spyOn(wrapper.vm, 'onModerationNotice').mockImplementation(() => {})
+      room.handlers.DataReceived(encode({ type: 'floor' }), { identity: 'bob#1' }, 0, 'moderation')
+      room.handlers.DataReceived(encode({ type: 'floor' }), undefined, 0, 'chat')
+      expect(notice).not.toHaveBeenCalled()
+      room.handlers.DataReceived(encode({ type: 'floor' }), undefined, 0, 'moderation')
+      expect(notice).toHaveBeenCalledTimes(1)
+      // A room left behind tells nothing any more.
+      wrapper.vm.room = null
+      room.handlers.RoomMetadataChanged(moderationOf({ moderators: ['x'] }))
+      room.handlers.DataReceived(encode({ type: 'floor' }), undefined, 0, 'moderation')
+      expect(wrapper.vm.moderation.everyone).toBe(true)
+      expect(notice).toHaveBeenCalledTimes(1)
+    })
+
+    it('says so and leaves when a moderator removed us', async () => {
+      const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+      joining(wrapper)
+      wrapper.vm.$toast = { error: jest.fn(), info: jest.fn() }
+      await wrapper.vm.connect()
+      await flushPromises()
+      expect(wrapper.vm.mayTakeOverModeration).toBe(false)
+      const leave = jest.spyOn(wrapper.vm, 'leave').mockResolvedValue()
+      wrapper.vm.room.handlers.Disconnected('PARTICIPANT_REMOVED')
+      expect(wrapper.vm.$toast.error).toHaveBeenCalledWith('videoCall.moderation.removedPlain')
+      expect(leave).toHaveBeenCalled()
+    })
+
+    it('offers no take-over when the group cannot be asked, or there is none', async () => {
+      const { wrapper } = factory({ show: true, groupId: 'g1' })
+      wrapper.vm.$apollo = { query: jest.fn().mockRejectedValue(new Error('offline')) }
+      await wrapper.vm.loadModerationPermission()
+      expect(wrapper.vm.mayTakeOverModeration).toBe(false)
+      const { wrapper: groupless } = factory({ show: true })
+      await groupless.vm.loadModerationPermission()
+      expect(groupless.vm.mayTakeOverModeration).toBe(false)
+    })
+  })
+
+  describe('notices of the moderation', () => {
+    const setup = () => {
+      const { wrapper } = factory({ show: true })
+      wrapper.vm.$toast = { info: jest.fn(), error: jest.fn() }
+      const local = {
+        setMicrophoneEnabled: jest.fn().mockResolvedValue(),
+        setCameraEnabled: jest.fn().mockResolvedValue(),
+        setScreenShareEnabled: jest.fn().mockResolvedValue(),
+      }
+      wrapper.vm.room = { localParticipant: local, remoteParticipants: new Map() }
+      jest.spyOn(wrapper.vm, 'refreshTiles').mockImplementation(() => {})
+      return { wrapper, local }
+    }
+
+    it.each([
+      ['microphoneMuted', 'videoCall.moderation.microphoneMuted'],
+      ['cameraOff', 'videoCall.moderation.cameraOff'],
+      ['screenShareStopped', 'videoCall.moderation.screenShareStopped'],
+      ['moderationTakenOver', 'videoCall.moderation.takenOver'],
+      ['moderationRevoked', 'videoCall.moderation.revoked'],
+      ['everyoneModerates', 'videoCall.moderation.everyone'],
+      ['everyoneModeratesOff', 'videoCall.moderation.everyoneOff'],
+      ['floor', 'videoCall.moderation.floor'],
+    ])('tells of %s, naming who did it', (type, key) => {
+      const { wrapper } = setup()
+      wrapper.vm.onModerationNotice(encode({ type, by: 'Anna' }))
+      expect(wrapper.vm.$toast.info).toHaveBeenCalledWith(`${key}:{"name":"Anna"}`)
+    })
+
+    it.each([
+      ['automatic', 'videoCall.moderation.moderatorAutomatic'],
+      ['handedOver', 'videoCall.moderation.moderatorHandedOver:{"name":"Anna"}'],
+      ['appointed', 'videoCall.moderation.moderatorAppointed:{"name":"Anna"}'],
+    ])('tells of being made a moderator (%s)', (reason, message) => {
+      const { wrapper } = setup()
+      wrapper.vm.onModerationNotice(encode({ type: 'moderator', reason, by: 'Anna' }))
+      expect(wrapper.vm.$toast.info).toHaveBeenCalledWith(message)
+    })
+
+    it('switches off what was switched off for us, so the buttons say so', async () => {
+      const { wrapper, local } = setup()
+      wrapper.setData({ micEnabled: true, cameraEnabled: true, screenShareEnabled: true })
+      wrapper.vm.onModerationNotice(encode({ type: 'microphoneMuted' }))
+      wrapper.vm.onModerationNotice(encode({ type: 'cameraOff' }))
+      wrapper.vm.onModerationNotice(encode({ type: 'screenShareStopped' }))
+      await flushPromises()
+      expect(wrapper.vm.micEnabled).toBe(false)
+      expect(wrapper.vm.cameraEnabled).toBe(false)
+      expect(wrapper.vm.screenShareEnabled).toBe(false)
+      expect(local.setMicrophoneEnabled).toHaveBeenCalledWith(false)
+      expect(local.setCameraEnabled).toHaveBeenCalledWith(false)
+      expect(local.setScreenShareEnabled).toHaveBeenCalledWith(false)
+    })
+
+    it('keeps the buttons right when the room will not take it', async () => {
+      const { wrapper, local } = setup()
+      local.setMicrophoneEnabled.mockRejectedValue(new Error('gone'))
+      await wrapper.vm.syncSwitchedOff('mic')
+      expect(wrapper.vm.micEnabled).toBe(false)
+      wrapper.vm.room = null
+      await wrapper.vm.syncSwitchedOff('camera')
+      await wrapper.vm.syncSwitchedOff('screen')
+      expect(wrapper.vm.cameraEnabled).toBe(false)
+    })
+
+    it('tells of a removal once, with or without a name', () => {
+      const { wrapper } = setup()
+      wrapper.vm.onModerationNotice(encode({ type: 'removed', by: 'Anna' }))
+      wrapper.vm.tellRemoved()
+      expect(wrapper.vm.$toast.error).toHaveBeenCalledTimes(1)
+      expect(wrapper.vm.$toast.error).toHaveBeenCalledWith(
+        'videoCall.moderation.removed:{"name":"Anna"}',
+      )
+    })
+
+    it('ignores what it cannot read or does not know', () => {
+      const { wrapper } = setup()
+      wrapper.vm.onModerationNotice(new TextEncoder().encode('nonsense'))
+      wrapper.vm.onModerationNotice(encode({ type: 42 }))
+      wrapper.vm.onModerationNotice(encode({ type: 'somethingNew' }))
+      expect(wrapper.vm.$toast.info).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('the sidebar on the participants', () => {
+    it('opens the participants, maximizing a parked call', () => {
+      const { wrapper, setParticipantsOpen, setMinimized } = factory({
+        show: true,
+        minimized: true,
+      })
+      wrapper.setData({ phase: 'in-call' })
+      expect(wrapper.vm.participantsAction).toBe('videoCall.participants.open')
+      wrapper.vm.toggleParticipants()
+      expect(setParticipantsOpen).toHaveBeenLastCalledWith(expect.anything(), true)
+      expect(setMinimized).toHaveBeenCalled()
+    })
+
+    it('closes the participants when they are on screen', () => {
+      const { wrapper, setParticipantsOpen, showChat } = factory({
+        show: true,
+        participantsOpen: true,
+      })
+      wrapper.setData({ phase: 'in-call' })
+      expect(wrapper.vm.participantsShown).toBe(true)
+      expect(wrapper.vm.participantsAction).toBe('videoCall.participants.close')
+      wrapper.vm.toggleParticipants()
+      expect(setParticipantsOpen).toHaveBeenLastCalledWith(expect.anything(), false)
+      expect(showChat).toHaveBeenCalled()
+    })
+
+    it('brings the chat in place of the participants on the chat button', () => {
+      const { wrapper, setParticipantsOpen, showChat } = factory({
+        show: true,
+        participantsOpen: true,
+      })
+      wrapper.setData({ phase: 'in-call' })
+      wrapper.vm.toggleChat()
+      expect(setParticipantsOpen).toHaveBeenLastCalledWith(expect.anything(), false)
+      expect(showChat).toHaveBeenCalled()
+    })
+
+    it('opens the list from the count in the header', async () => {
+      const { wrapper, setParticipantsOpen } = factory({ show: true })
+      wrapper.setData({ phase: 'in-call' })
+      await wrapper.vm.$nextTick()
+      await wrapper.find('[data-test="video-call-participants"]').trigger('click')
+      expect(setParticipantsOpen).toHaveBeenCalledWith(expect.anything(), true)
+    })
+
+    it('shows somebody large', () => {
+      const { wrapper } = factory({ show: true })
+      wrapper.setData({ tiles: [tile('bob#1', 'bob')] })
+      wrapper.vm.spotlightPerson('bob')
+      expect(wrapper.vm.spotlightKey).toBe('bob#1/main')
+      wrapper.vm.spotlightPerson('nobody')
+      expect(wrapper.vm.spotlightKey).toBe('bob#1/main')
+    })
+
+    it('mutes somebody for us alone, on every device, and lets us hear them again', () => {
+      const { wrapper } = factory({ show: true })
+      const setVolume = jest.fn()
+      const other = jest.fn()
+      wrapper.vm.room = {
+        remoteParticipants: new Map([
+          ['bob#1', { identity: 'bob#1', metadata: JSON.stringify({ userId: 'bob' }), setVolume }],
+          ['bob#2', { identity: 'bob#2', metadata: 'broken', setVolume: other }],
+          ['old', { identity: 'old' }],
+        ]),
+      }
+      wrapper.vm.muteForMe('bob', true)
+      expect(setVolume).toHaveBeenLastCalledWith(0)
+      expect(other).toHaveBeenLastCalledWith(1)
+      wrapper.vm.muteForMe('bob', false)
+      expect(wrapper.vm.locallyMuted).toEqual({})
+      expect(setVolume).toHaveBeenLastCalledWith(1)
+      wrapper.vm.room = null
+      expect(() => wrapper.vm.applyLocalVolumes()).not.toThrow()
+    })
+  })
+
+  describe('hanging up as the last moderator', () => {
+    const inCall = (moderation, apollo = {}) => {
+      const { wrapper } = factory({ show: true, user: { id: 'u1', name: 'Me' } })
+      wrapper.setData({
+        phase: 'in-call',
+        tiles: [tile('u1#1', 'u1', { isLocal: true }), tile('bob#1', 'bob')],
+        moderation,
+      })
+      const leave = jest.spyOn(wrapper.vm, 'leave').mockResolvedValue()
+      const $apollo = withApollo(wrapper, apollo)
+      return { wrapper, leave, $apollo }
+    }
+
+    it('just leaves when somebody else moderates, or everybody does, or nobody', async () => {
+      for (const moderation of [
+        { moderators: ['u1', 'bob'], everyone: false, speakers: [] },
+        { moderators: ['u1'], everyone: true, speakers: [] },
+        { moderators: [], everyone: false, speakers: [] },
+      ]) {
+        const { wrapper, leave } = inCall(moderation)
+        await wrapper.vm.requestLeave()
+        expect(leave).toHaveBeenCalled()
+        expect(wrapper.vm.handover).toBeNull()
+      }
+    })
+
+    it('asks who moderates on, with the suggestion of the server picked', async () => {
+      const { wrapper, leave, $apollo } = inCall(
+        { moderators: ['u1'], everyone: false, speakers: [] },
+        { query: jest.fn().mockResolvedValue({ data: { videoCallModerationSuccessor: 'bob' } }) },
+      )
+      await wrapper.vm.requestLeave()
+      expect(leave).not.toHaveBeenCalled()
+      expect(wrapper.vm.handover).toEqual({ suggested: 'bob', choice: 'bob', busy: false })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('[data-test="video-call-handover"]').exists()).toBe(true)
+      await wrapper.vm.leaveAfterHandover('bob')
+      expect($apollo.mutate.mock.calls[0][0].variables).toEqual({
+        groupId: null,
+        toUserId: 'bob',
+        everyone: false,
+      })
+      expect(leave).toHaveBeenCalled()
+    })
+
+    it('picks the first of the others without a suggestion, and hands on to everybody', async () => {
+      const { wrapper, $apollo } = inCall(
+        { moderators: ['u1'], everyone: false, speakers: [] },
+        { query: jest.fn().mockRejectedValue(new Error('offline')) },
+      )
+      await wrapper.vm.requestLeave()
+      expect(wrapper.vm.handover.choice).toBe('bob')
+      await wrapper.vm.leaveAfterHandover('everyone')
+      expect($apollo.mutate.mock.calls[0][0].variables).toEqual({
+        groupId: null,
+        toUserId: null,
+        everyone: true,
+      })
+    })
+
+    it('leaves all the same when the server cannot be told, or when skipped', async () => {
+      const { wrapper, leave } = inCall(
+        { moderators: ['u1'], everyone: false, speakers: [] },
+        { mutate: jest.fn().mockRejectedValue(new Error('offline')) },
+      )
+      await wrapper.vm.requestLeave()
+      await wrapper.vm.leaveAfterHandover(null)
+      expect(leave).toHaveBeenCalled()
+      expect(wrapper.vm.handover).toBeNull()
+      // Nothing to hand on once the question is gone.
+      await wrapper.vm.leaveAfterHandover('bob')
+      expect(leave).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('the size of the sidebar', () => {
+    // The body and the sidebar, measured as on a screen; anything else as rendered.
+    const measured = (wrapper, found = true) => {
+      const own = wrapper.vm.$el.querySelector.bind(wrapper.vm.$el)
+      jest.spyOn(wrapper.vm.$el, 'querySelector').mockImplementation((selector) => {
+        if (selector !== '.video-call__body' && selector !== '.video-call__sidebar') {
+          return own(selector)
+        }
+        if (!found) return null
+        return {
+          getBoundingClientRect: () =>
+            selector === '.video-call__body'
+              ? { width: 1000, height: 800 }
+              : { width: 360, height: 300, right: 1000, bottom: 800 },
+        }
+      })
+    }
+    const sized = () => {
+      const { wrapper } = factory({ show: true })
+      measured(wrapper)
+      return wrapper
+    }
+
+    afterEach(() => {
+      window.localStorage.clear()
+    })
+
+    it('starts at what was remembered, and at the stylesheet without it', () => {
+      window.localStorage.setItem('videoCall.sidebarWidth', '420')
+      const { wrapper } = factory({ show: true })
+      expect(wrapper.vm.sidebarWidth).toBe(420)
+      expect(wrapper.vm.sidebarHeight).toBeNull()
+      expect(wrapper.vm.sidebarStyle).toEqual({ flex: '0 0 420px' })
+    })
+
+    it('is pulled within its bounds and remembered', () => {
+      const wrapper = sized()
+      const target = { setPointerCapture: jest.fn() }
+      wrapper.vm.startSidebarResize({ button: 0, pointerId: 1, target, preventDefault: jest.fn() })
+      expect(target.setPointerCapture).toHaveBeenCalledWith(1)
+      wrapper.vm.onSidebarResize({ clientX: 500 })
+      expect(wrapper.vm.sidebarWidth).toBe(500)
+      wrapper.vm.onSidebarResize({ clientX: 100 })
+      expect(wrapper.vm.sidebarWidth).toBe(500)
+      wrapper.vm.onSidebarResize({ clientX: 950 })
+      expect(wrapper.vm.sidebarWidth).toBe(280)
+      wrapper.vm.stopSidebarResize()
+      expect(window.localStorage.getItem('videoCall.sidebarWidth')).toBe('280')
+      // Moves after letting go change nothing.
+      wrapper.vm.onSidebarResize({ clientX: 500 })
+      expect(wrapper.vm.sidebarWidth).toBe(280)
+      wrapper.vm.stopSidebarResize()
+    })
+
+    it('ignores another button than the main one, and a capture that fails', () => {
+      const wrapper = sized()
+      wrapper.vm.startSidebarResize({ button: 2, preventDefault: jest.fn() })
+      expect(wrapper.vm.sidebarDrag).toBeNull()
+      const target = {
+        setPointerCapture: () => {
+          throw new Error('no')
+        },
+      }
+      wrapper.vm.startSidebarResize({ button: 0, pointerId: 1, target, preventDefault: jest.fn() })
+      expect(wrapper.vm.sidebarDrag).not.toBeNull()
+      wrapper.vm.stopSidebarResize()
+    })
+
+    it('follows the arrow keys, further with shift, and resets on a double click', () => {
+      const wrapper = sized()
+      const key = (k, shiftKey = false) => ({ key: k, shiftKey, preventDefault: jest.fn() })
+      wrapper.vm.onSidebarResizeKey(key('ArrowLeft'))
+      expect(wrapper.vm.sidebarWidth).toBe(376)
+      wrapper.vm.onSidebarResizeKey(key('ArrowRight', true))
+      expect(wrapper.vm.sidebarWidth).toBe(296)
+      wrapper.vm.onSidebarResizeKey(key('Enter'))
+      expect(wrapper.vm.sidebarWidth).toBe(296)
+      wrapper.vm.resetSidebarSize()
+      expect(wrapper.vm.sidebarWidth).toBeNull()
+      expect(window.localStorage.getItem('videoCall.sidebarWidth')).toBeNull()
+    })
+
+    it('below the videos on a phone, is pulled in its height', () => {
+      const wrapper = sized()
+      Object.defineProperty(wrapper.vm, 'mobileChatOpen', { get: () => true })
+      expect(wrapper.vm.sidebarStorageKey()).toBe('videoCall.sidebarHeight')
+      wrapper.vm.startSidebarResize({ preventDefault: jest.fn(), target: {} })
+      wrapper.vm.onSidebarResize({ clientY: 400 })
+      expect(wrapper.vm.sidebarHeight).toBe(400)
+      wrapper.vm.onSidebarResize({ clientY: 750 })
+      expect(wrapper.vm.sidebarHeight).toBe(200)
+      expect(wrapper.vm.sidebarStyle).toEqual({ flex: '0 0 200px' })
+      wrapper.vm.stopSidebarResize()
+      wrapper.vm.onSidebarResizeKey({ key: 'ArrowUp', shiftKey: false, preventDefault: jest.fn() })
+      expect(wrapper.vm.sidebarHeight).toBe(316)
+      wrapper.vm.resetSidebarSize()
+      expect(wrapper.vm.sidebarHeight).toBeNull()
+      expect(wrapper.vm.sidebarStyle).toBeNull()
+    })
+
+    it('measures nothing without the elements', () => {
+      const { wrapper } = factory({ show: true })
+      measured(wrapper, false)
+      expect(wrapper.vm.currentSidebarSize()).toBe(360)
+      expect(wrapper.vm.clampSidebarSize(10000)).toBe(500)
+    })
+
+    it('carries on without storage', () => {
+      const { wrapper } = factory({ show: true })
+      const getItem = jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+        throw new Error('blocked')
+      })
+      const setItem = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        throw new Error('blocked')
+      })
+      wrapper.vm.restoreSidebarSize()
+      wrapper.vm.sidebarWidth = 300
+      expect(() => wrapper.vm.saveSidebarSize()).not.toThrow()
+      getItem.mockRestore()
+      setItem.mockRestore()
     })
   })
 })

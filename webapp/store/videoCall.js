@@ -20,6 +20,9 @@ export const state = () => {
     // Which of the call's two chats was looked at last: 'call' or 'group'. Kept across
     // closing the chat and across calls, so the chat button opens where one left off.
     lastChatTab: 'call',
+    // Whether the call's sidebar shows its participants rather than one of its chats. The
+    // third tab beside the two chats; the chat store knows nothing of it.
+    participantsOpen: false,
     // 'idle' | 'prejoin' | 'connecting' | 'in-call' — mirrors VideoCall's local
     // phase so the layout can decide where the chat lives.
     phase: 'idle',
@@ -63,6 +66,7 @@ export const mutations = {
     state.chatRoomId = null
     state.conferenceUnread = 0
     state.groupChatUnread = 0
+    state.participantsOpen = false
   },
   // Update group info post-hoc (e.g. after fetching by ID for a direct URL).
   SET_GROUP_INFO(state, { groupId, groupName, groupSlug, groupAvatar }) {
@@ -84,6 +88,7 @@ export const mutations = {
     state.chatRoomId = null
     state.conferenceUnread = 0
     state.groupChatUnread = 0
+    state.participantsOpen = false
   },
   SET_MINIMIZED(state, minimized) {
     state.minimized = !!minimized
@@ -105,6 +110,9 @@ export const mutations = {
   },
   SET_GROUP_CHAT_UNREAD(state, count) {
     state.groupChatUnread = Number(count) || 0
+  },
+  SET_PARTICIPANTS_OPEN(state, open) {
+    state.participantsOpen = !!open
   },
   SET_LAST_CHAT_TAB(state, tab) {
     state.lastChatTab = tab === 'group' ? 'group' : 'call'
@@ -155,6 +163,9 @@ export const getters = {
   },
   lastChatTab(state) {
     return state.lastChatTab
+  },
+  participantsOpen(state) {
+    return state.participantsOpen
   },
   phase(state) {
     return state.phase
