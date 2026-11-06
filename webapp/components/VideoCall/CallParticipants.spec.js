@@ -344,6 +344,49 @@ describe('CallParticipants', () => {
     })
   })
 
+  describe('the screen share and the floor right in the row', () => {
+    it('lets a moderator end a screen share with a click on it', async () => {
+      wrapper = Wrapper({
+        people: [person('bob', { screenSharing: true }), person('anna')],
+        moderation: moderatedByMe,
+      })
+      expect(wrapper.find('[data-test="call-participant-switch-screen-anna"]').exists()).toBe(false)
+      await wrapper.find('[data-test="call-participant-switch-screen-bob"]').trigger('click')
+      await flushPromises()
+      expect(mocks.$apollo.mutate.mock.calls[0][0].variables.action).toBe('STOP_SCREEN_SHARE')
+    })
+
+    it('lets a moderator give and take the floor with a click', async () => {
+      wrapper = Wrapper({
+        people: [person('bob'), person('anna')],
+        moderation: { moderators: ['me'], everyone: false, speakers: ['bob'] },
+      })
+      const bob = wrapper.find('[data-test="call-participant-floor-toggle-bob"]')
+      const anna = wrapper.find('[data-test="call-participant-floor-toggle-anna"]')
+      expect(bob.attributes('aria-pressed')).toBe('true')
+      expect(bob.attributes('aria-label')).toBe('videoCall.participants.takeFloor')
+      expect(anna.attributes('aria-label')).toBe('videoCall.participants.giveFloor')
+      await bob.trigger('click')
+      await flushPromises()
+      await anna.trigger('click')
+      await flushPromises()
+      expect(mocks.$apollo.mutate.mock.calls.map((call) => call[0].variables)).toEqual([
+        { groupId: 'g1', userId: 'bob', floor: false },
+        { groupId: 'g1', userId: 'anna', floor: true },
+      ])
+    })
+
+    it('shows the floor toggle neither to whoever does not moderate nor while muting', async () => {
+      wrapper = Wrapper({ people: [person('bob')] })
+      expect(wrapper.find('[data-test="call-participant-floor-toggle-bob"]').exists()).toBe(false)
+      wrapper.destroy()
+      wrapper = Wrapper({ people: [person('bob')], moderation: moderatedByMe })
+      wrapper.vm.openMuteAll()
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('[data-test="call-participant-floor-toggle-bob"]').exists()).toBe(false)
+    })
+  })
+
   describe('muting everybody', () => {
     it('spares oneself and whoever speaks, and mutes the rest', async () => {
       wrapper = Wrapper({

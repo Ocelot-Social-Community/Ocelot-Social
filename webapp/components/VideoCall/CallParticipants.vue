@@ -119,7 +119,10 @@
             </template>
           </span>
         </span>
-        <!-- A moderator switches a microphone or a camera that is on off with a click on it. -->
+        <!--
+          A moderator switches a microphone, a camera or a screen share that is on off with a click
+          on it, and gives or takes the floor with the speech bubble.
+        -->
         <span class="call-participants__state">
           <template v-for="device in devicesOf(person)">
             <button
@@ -127,7 +130,7 @@
               :key="device.kind"
               type="button"
               class="call-participants__switch"
-              :title="device.label"
+              v-tooltip="device.label"
               :aria-label="device.label"
               :disabled="busy"
               :data-test="'call-participant-switch-' + device.kind + '-' + person.userId"
@@ -143,8 +146,24 @@
               aria-hidden="true"
             />
           </template>
-          <os-icon v-if="person.screenSharing" :icon="icons.desktop" aria-hidden="true" />
           <os-icon v-if="locallyMuted[person.userId]" :icon="icons.volumeOff" aria-hidden="true" />
+          <button
+            v-if="isModerator && !muting"
+            type="button"
+            :class="[
+              'call-participants__switch',
+              'call-participants__give-floor',
+              { 'call-participants__give-floor--on': hasFloor(person.userId) },
+            ]"
+            v-tooltip="floorLabel(person)"
+            :aria-label="floorLabel(person)"
+            :aria-pressed="hasFloor(person.userId) ? 'true' : 'false'"
+            :disabled="busy"
+            :data-test="'call-participant-floor-toggle-' + person.userId"
+            @click="setFloor(person, !hasFloor(person.userId))"
+          >
+            <os-icon :icon="icons.comment" />
+          </button>
         </span>
         <span class="call-participants__sr-only">{{ stateLabel(person) }}</span>
         <button
@@ -441,8 +460,8 @@ export default {
         // Without an answer the heavier entries stay away; the light ones need none.
       }
     },
-    // Microphone and camera as the row shows them; for a moderator, one that is on can be switched
-    // off right there, as from the menu.
+    // Microphone, camera and a running screen share as the row shows them; for a moderator, one
+    // that is on can be switched off right there, as from the menu.
     devicesOf(person) {
       const device = (kind, on, icon, iconOff, label, action) => ({
         kind,
@@ -468,7 +487,21 @@ export default {
           this.$t('videoCall.participants.cameraOffAction'),
           'DISABLE_CAMERA',
         ),
-      ]
+        person.screenSharing &&
+          device(
+            'screen',
+            true,
+            this.icons.desktop,
+            this.icons.desktop,
+            this.$t('videoCall.participants.stopSharing'),
+            'STOP_SCREEN_SHARE',
+          ),
+      ].filter(Boolean)
+    },
+    floorLabel(person) {
+      return this.hasFloor(person.userId)
+        ? this.$t('videoCall.participants.takeFloor')
+        : this.$t('videoCall.participants.giveFloor')
     },
     // One's own goes off right here, for everybody; somebody else's is asked of the server.
     switchOff(person, kind, action) {
@@ -783,6 +816,13 @@ export default {
 .call-participants__switch:hover,
 .call-participants__switch:focus-visible {
   color: var(--color-danger);
+}
+.call-participants__give-floor--on {
+  color: var(--color-primary);
+}
+.call-participants__give-floor:hover,
+.call-participants__give-floor:focus-visible {
+  color: var(--color-primary);
 }
 .call-participants__switch:disabled {
   cursor: default;
