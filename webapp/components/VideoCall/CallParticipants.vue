@@ -96,16 +96,6 @@
         :class="['call-participants__row', { 'call-participants__row--speaking': person.speaking }]"
         :data-test="'call-participant-' + person.userId"
       >
-        <!-- Ticked: spared by "mute all". -->
-        <input
-          v-if="muting"
-          v-model="spared"
-          type="checkbox"
-          class="call-participants__spare"
-          :value="person.userId"
-          :aria-label="$t('videoCall.participants.spare', { name: person.name })"
-          :data-test="'mute-all-spare-' + person.userId"
-        />
         <span class="call-participants__avatar">
           <avatar-image :profile="person.profile" size="small" loading="eager" />
         </span>
@@ -192,6 +182,16 @@
             </os-menu>
           </template>
         </dropdown>
+        <!-- Ticked: spared by "mute all". -->
+        <input
+          v-if="muting"
+          v-model="spared"
+          type="checkbox"
+          class="call-participants__spare"
+          :value="person.userId"
+          :aria-label="$t('videoCall.participants.spare', { name: person.name })"
+          :data-test="'mute-all-spare-' + person.userId"
+        />
       </li>
     </ul>
 
