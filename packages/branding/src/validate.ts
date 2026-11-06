@@ -4,8 +4,9 @@
 // config that type-checks but is nonsensical (e.g. nameLengthMin > nameLengthMax). Pure (no node deps).
 //
 // Only build-time (defineBranding): the runtime composes from already-validated fragments, and each
-// invariant lives inside ONE bucket domain (group/category/comment → behavior), so cross-brand
-// composition cannot violate them — no need (and it would be wrong) to re-validate + throw at runtime.
+// invariant lives inside ONE bucket domain (group/user/post/category/comment → behavior), so
+// cross-brand composition cannot violate them — no need (and it would be wrong) to re-validate +
+// throw at runtime.
 import type { BrandingConfig } from './schema.js'
 
 /**
@@ -15,6 +16,14 @@ import type { BrandingConfig } from './schema.js'
  * nothing to show next to their posts.
  */
 export const USER_NAME_LENGTH_FLOOR = 1
+
+/**
+ * The shortest post title any brand may require. Exported because the backend relies on it: its DB
+ * schema declares `Post.title` no stricter than this (asserted in `db/schema/schema.spec.ts`), so
+ * the audit never flags a title that a valid brand allowed. 1, not 0: an empty title leaves nothing
+ * to show for a post.
+ */
+export const POST_TITLE_LENGTH_FLOOR = 1
 
 /** The shortest slug any brand may require: an empty one would leave the profile URL without its last segment. */
 export const USER_SLUG_LENGTH_FLOOR = 1
@@ -48,7 +57,7 @@ export function validateBranding(config: BrandingConfig): string[] {
     }
   }
 
-  const { group, user, registration, comment, category, badges, metadata, dateTime } = config
+  const { group, user, post, registration, comment, category, badges, metadata, dateTime } = config
 
   atLeast('group.nameLengthMin', group.nameLengthMin, 0)
   atMost('group.nameLengthMin', group.nameLengthMin, 'group.nameLengthMax', group.nameLengthMax)
@@ -62,6 +71,9 @@ export function validateBranding(config: BrandingConfig): string[] {
   atLeast('user.slugLengthMin', user.slugLengthMin, USER_SLUG_LENGTH_FLOOR)
   atLeast('user.slugLengthMax', user.slugLengthMax, USER_SLUG_LENGTH_MAX_FLOOR)
   atMost('user.slugLengthMin', user.slugLengthMin, 'user.slugLengthMax', user.slugLengthMax)
+
+  atLeast('post.titleLengthMin', post.titleLengthMin, POST_TITLE_LENGTH_FLOOR)
+  atMost('post.titleLengthMin', post.titleLengthMin, 'post.titleLengthMax', post.titleLengthMax)
 
   atLeast('registration.nonceLength', registration.nonceLength, 1)
   atLeast('registration.inviteCodeLength', registration.inviteCodeLength, 1)

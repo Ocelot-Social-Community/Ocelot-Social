@@ -37,8 +37,11 @@ maintenance: &maintenance
   - 'webapp/locales/**/*'
 
 backend: &backend
+  - '.github/actions/docker-hub-mirror/**'
   - '.github/workflows/test-backend.yml'
   - 'backend/**/*'
+  # The backend tests run on the images this file names — a Dependabot bump of redis lands only there.
+  - 'docker-compose.test.yml'
   - 'neo4j/**/*'
   - 'package.json'
   # backend consumes @ocelot-social/branding (file: dep) → a branding change can break it

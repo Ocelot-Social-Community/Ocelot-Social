@@ -467,6 +467,7 @@
     "GROUP_ROLE_REASSIGN_TARGET_INVALID": "Déplace les membres vers un autre rôle.",
     "GROUP_ROLE_SYSTEM_NOT_DELETABLE": "Un rôle système ne peut pas être supprimé.",
     "GROUP_ROLE_SYSTEM_NOT_RENAMEABLE": "Un rôle système garde sa clé ; modifie plutôt son nom affiché.",
+    "GROUP_SAVE_CATEGORY_UNKNOWN": "Au moins un des sujets n'existe pas.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "La description doit comporter au moins {min} caractères.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Un groupe que les personnes extérieures ne peuvent pas trouver ne peut pas non plus leur montrer ses membres.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Ce nom unique de groupe est déjà pris.",
@@ -509,7 +510,11 @@
     "POST_EVENT_VENUE_REQUIRED": "Ajoute une description du lieu.",
     "POST_PIN_FEATURE_DISABLED": "L'épinglage de posts n'est pas activé.",
     "POST_PIN_LIMIT_REACHED": "Le nombre maximum de posts épinglés est atteint. Désépingle d'abord un autre post.",
+    "POST_SAVE_CATEGORY_UNKNOWN": "Au moins un des sujets n'existe pas.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Un post avec ce slug existe déjà.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "Le titre du post doit comporter entre {min} et {max} caractères.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Trop peu de sujets sélectionnés (au moins {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Trop de sujets sélectionnés (au plus {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Le code de confirmation n'est pas valide.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Ce nom d'utilisateur est déjà pris.",
     "REPORT_TARGET_IS_OWN": "Tu ne peux signaler ni toi-même ni ton propre contenu.",
@@ -606,7 +611,7 @@
     "previousLocation": "Emplacement précédent : {location}",
     "scrollToLocationMap": "Faire défiler jusqu’à la carte",
     "validations": {
-      "categories": "Veuillez sélectionner entre un et trois sujets.",
+      "categories": "Veuillez sélectionner entre {min} et {max} sujets.",
       "contentNotEmpty": "Veuillez saisir du contenu.",
       "email": "Veuillez saisir une adresse e-mail valide.",
       "eventLocationNameLength": "L'adresse doit comporter entre {min} et {max} caractères.",
@@ -1012,15 +1017,15 @@
       "title": "Modifier mon groupe"
     },
     "elevation": {
-      "actingAsMember": "Ici, tu agis en tant que {role}.",
-      "actingAsNonMember": "Tu n'es pas membre de ce groupe.",
       "activeTitle": "L'accès administrateur est actif.",
       "activeUntil": "Il se termine à {time}, ou quand tu y mets fin.",
       "end": "Terminer l'accès administrateur",
-      "offerBody": "Tu disposes en plus de droits réseau sur lui. Lire son contenu ou modifier quoi que ce soit demande cette confirmation, qui est consignée auprès du groupe.",
-      "offerBodyOwner": "Tes droits réseau te permettent aussi de rétrograder ou de retirer les autres propriétaires de ce groupe. Cela demande cette confirmation, qui est consignée auprès du groupe.",
-      "reasonPlaceholder": "De quoi s'agit-il ?",
-      "start": "Utiliser l'accès administrateur"
+      "offerBody": "Ton rôle actuel dans ce groupe : « {role} ». Indique pourquoi tu veux gérer ce groupe (cela sera consigné).",
+      "offerBodyNoneMember": "Tu n'es pas membre du groupe. Indique pourquoi tu veux gérer ce groupe (cela sera consigné).",
+      "offerBodyOwner": "Ton rôle actuel dans ce groupe : « {role} ». Tes droits réseau te permettent aussi de rétrograder ou de retirer les autres propriétaires de ce groupe. Indique pourquoi tu veux gérer ce groupe (cela sera consigné).",
+      "reasonPlaceholder": "Motif de ton action",
+      "start": "Gérer le groupe",
+      "title": "Tu as le droit de gérer ce groupe comme un super-propriétaire."
     },
     "errors": {
       "userAlreadyMember": "L'utilisateur « {name} » est déjà membre !"
@@ -1934,6 +1939,22 @@
     "connecting": "Connexion…",
     "connectionLost": "Connexion perdue : {name}",
     "connectionPoor": "Connexion faible : {name}",
+    "controls": {
+      "camera": "Caméra",
+      "chat": "Chat",
+      "leave": "Raccrocher",
+      "microphone": "Microphone",
+      "screen": "Écran",
+      "startSharing": "Partager l'écran, une fenêtre ou un onglet",
+      "stopSharing": "{surface} : ne plus partager",
+      "surface": {
+        "browser": "Onglet",
+        "monitor": "Écran",
+        "window": "Fenêtre"
+      },
+      "turnOff": "{device} : désactiver",
+      "turnOn": "{device} : activer"
+    },
     "deviceSettings": {
       "button": "Appareils",
       "dtx": "Ne pas transmettre les pauses de parole",
@@ -1942,9 +1963,8 @@
       "title": "Réglages des appareils"
     },
     "dialogLabel": "Appel vidéo de groupe",
-    "disableCamera": "Désactiver la caméra",
     "enableAudio": "Activer le son",
-    "enableCamera": "Activer la caméra",
+    "enterFullscreen": "Plein écran",
     "errorBackToPrejoin": "Modifier les paramètres",
     "errorRetry": "Réessayer",
     "errors": {
@@ -1967,18 +1987,19 @@
         "noDevice": "Aucun écran disponible à partager."
       }
     },
+    "exitFullscreen": "Quitter le plein écran",
     "gotoGroup": "Aller au groupe « {name} »",
     "groupVideoCallButton": {
       "label": "Vidéo de groupe",
       "tooltip": "Appel vidéo dans le groupe « {name} »"
     },
+    "hideBars": "Masquer les barres",
     "leave": "Quitter l'appel",
     "maximize": "Agrandir",
     "micMuted": "Microphone désactivé",
     "micNoSignal": "Votre microphone ne transmet aucun son — les autres ne vous entendent pas.",
     "micUnmuted": "Microphone activé",
     "minimize": "Réduire",
-    "muteMic": "Couper le microphone",
     "openChat": "Ouvrir le chat",
     "prejoin": {
       "camera": "Caméra",
@@ -2026,12 +2047,10 @@
     "restartMic": "Redémarrer le microphone",
     "screenShare": "Écran",
     "screenShareEnded": "Partage d'écran terminé",
+    "showBars": "Afficher les barres",
     "showVideos": "Afficher les vidéos",
     "spotlightExit": "Quitter le focus",
-    "startScreenShare": "Partager l'écran",
-    "stopScreenShare": "Arrêter le partage",
     "title": "Appel vidéo de groupe",
-    "unmuteMic": "Réactiver le microphone",
     "you": "vous",
     "youAreSharingScreen": "Vous partagez votre écran"
   }

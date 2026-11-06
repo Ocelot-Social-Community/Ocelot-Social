@@ -467,6 +467,7 @@
     "GROUP_ROLE_REASSIGN_TARGET_INVALID": "Zhvendosi anëtarët në një rol tjetër.",
     "GROUP_ROLE_SYSTEM_NOT_DELETABLE": "Një rol i sistemit nuk mund të fshihet.",
     "GROUP_ROLE_SYSTEM_NOT_RENAMEABLE": "Një rol i sistemit e mban çelësin e tij; ndrysho më mirë emrin e shfaqur.",
+    "GROUP_SAVE_CATEGORY_UNKNOWN": "Të paktën një nga temat nuk ekziston.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "Përshkrimi duhet të ketë të paktën {min} karaktere.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Një grup që të jashtmit nuk mund ta gjejnë, nuk mund t'u tregojë as anëtarët e tij.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Ky emër unik i grupit është i zënë tashmë.",
@@ -509,7 +510,11 @@
     "POST_EVENT_VENUE_REQUIRED": "Shto një përshkrim të vendndodhjes.",
     "POST_PIN_FEATURE_DISABLED": "Ngulja e postimeve nuk është aktivizuar.",
     "POST_PIN_LIMIT_REACHED": "Është arritur numri maksimal i postimeve të ngulura. Hiq fillimisht një postim tjetër të ngulur.",
+    "POST_SAVE_CATEGORY_UNKNOWN": "Të paktën një nga temat nuk ekziston.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Ekziston tashmë një postim me këtë slug.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "Titulli i postimit duhet të ketë midis {min} dhe {max} karaktere.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Janë zgjedhur shumë pak tema (të paktën {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Janë zgjedhur shumë tema (më së shumti {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Kodi i konfirmimit është i pavlefshëm.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Ky emër përdoruesi është i zënë tashmë.",
     "REPORT_TARGET_IS_OWN": "Nuk mund të raportosh as veten, as përmbajtjen tënde.",
@@ -606,7 +611,7 @@
     "previousLocation": "Vendndodhja e mëparshme: {location}",
     "scrollToLocationMap": "Rrëshqit te harta",
     "validations": {
-      "categories": "Ju lutem zgjidhni midis një dhe tre temave.",
+      "categories": "Ju lutem zgjidhni midis {min} dhe {max} temave.",
       "contentNotEmpty": "Ju lutem shkruani përmbajtje.",
       "email": "Ju lutem shkruani një adresë e-mail të vlefshme.",
       "eventLocationNameLength": "Adresa duhet të ketë midis {min} dhe {max} karaktere.",
@@ -1012,15 +1017,15 @@
       "title": "Ndrysho grupin tim"
     },
     "elevation": {
-      "actingAsMember": "Këtu vepron si {role}.",
-      "actingAsNonMember": "Nuk je anëtar i këtij grupi.",
       "activeTitle": "Qasja si administrator është aktive.",
       "activeUntil": "Përfundon në {time}, ose kur ta mbyllësh ti.",
       "end": "Mbyll qasjen si administrator",
-      "offerBody": "Përveç kësaj ke të drejta rrjeti mbi të. Leximi i përmbajtjes ose çdo ndryshim kërkon këtë konfirmim, i cili regjistrohet te grupi.",
-      "offerBodyOwner": "Të drejtat e rrjetit të lejojnë gjithashtu të ulësh ose të heqësh pronarët e tjerë të këtij grupi. Kjo kërkon këtë konfirmim, i cili regjistrohet te grupi.",
-      "reasonPlaceholder": "Për çfarë bëhet fjalë?",
-      "start": "Përdor qasjen si administrator"
+      "offerBody": "Roli yt aktual në këtë grup: «{role}». Jep një arsye pse dëshiron ta administrosh këtë grup (do të regjistrohet).",
+      "offerBodyNoneMember": "Nuk je anëtar i grupit. Jep një arsye pse dëshiron ta administrosh këtë grup (do të regjistrohet).",
+      "offerBodyOwner": "Roli yt aktual në këtë grup: «{role}». Të drejtat e rrjetit të lejojnë gjithashtu të ulësh ose të heqësh pronarët e tjerë të këtij grupi. Jep një arsye pse dëshiron ta administrosh këtë grup (do të regjistrohet).",
+      "reasonPlaceholder": "Arsyeja e veprimit tënd",
+      "start": "Administro grupin",
+      "title": "Ke të drejtë ta administrosh këtë grup si super pronar."
     },
     "errors": {
       "userAlreadyMember": "Përdoruesi „{name}“ është tashmë anëtar!"
@@ -1934,6 +1939,22 @@
     "connecting": "Po lidhet…",
     "connectionLost": "Lidhja u humb: {name}",
     "connectionPoor": "Lidhje e dobët: {name}",
+    "controls": {
+      "camera": "Kamera",
+      "chat": "Bisedë",
+      "leave": "Largohu",
+      "microphone": "Mikrofoni",
+      "screen": "Ekrani",
+      "startSharing": "Ndaj ekranin, një dritare ose një skedë",
+      "stopSharing": "{surface}: ndalo ndarjen",
+      "surface": {
+        "browser": "Skeda",
+        "monitor": "Ekrani",
+        "window": "Dritarja"
+      },
+      "turnOff": "{device}: fik",
+      "turnOn": "{device}: ndiz"
+    },
     "deviceSettings": {
       "button": "Pajisjet",
       "dtx": "Mos i transmeto pauzat në të folur",
@@ -1942,9 +1963,8 @@
       "title": "Cilësimet e pajisjeve"
     },
     "dialogLabel": "Telefonatë me video në grup",
-    "disableCamera": "Fik kamerën",
     "enableAudio": "Aktivizo zërin",
-    "enableCamera": "Ndiz kamerën",
+    "enterFullscreen": "Ekran i plotë",
     "errorBackToPrejoin": "Ndrysho cilësimet",
     "errorRetry": "Riprovo",
     "errors": {
@@ -1967,18 +1987,19 @@
         "noDevice": "Nuk ka ekran të disponueshëm për t'u ndarë."
       }
     },
+    "exitFullscreen": "Dil nga ekrani i plotë",
     "gotoGroup": "Shko te grupi „{name}“",
     "groupVideoCallButton": {
       "label": "Video grupi",
       "tooltip": "Telefonatë me video në grupin „{name}“"
     },
+    "hideBars": "Fshih shiritat",
     "leave": "Largohu nga telefonata",
     "maximize": "Maksimizo",
     "micMuted": "Mikrofoni fikur",
     "micNoSignal": "Mikrofoni juaj nuk po jep zë — të tjerët nuk ju dëgjojnë.",
     "micUnmuted": "Mikrofoni ndezur",
     "minimize": "Minimizo",
-    "muteMic": "Heshtëzo mikrofonin",
     "openChat": "Hap bisedën",
     "prejoin": {
       "camera": "Kamera",
@@ -2026,12 +2047,10 @@
     "restartMic": "Rinis mikrofonin",
     "screenShare": "Ekrani",
     "screenShareEnded": "Ndarja e ekranit përfundoi",
+    "showBars": "Shfaq shiritat",
     "showVideos": "Shfaq videot",
     "spotlightExit": "Dil nga spotlight",
-    "startScreenShare": "Ndaj ekranin",
-    "stopScreenShare": "Ndalo ndarjen",
     "title": "Telefonatë me video në grup",
-    "unmuteMic": "Aktivizo mikrofonin",
     "you": "ti",
     "youAreSharingScreen": "Po ndan ekranin tënd"
   }

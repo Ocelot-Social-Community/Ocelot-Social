@@ -467,6 +467,7 @@
     "GROUP_ROLE_REASSIGN_TARGET_INVALID": "Mova os membros para outra função.",
     "GROUP_ROLE_SYSTEM_NOT_DELETABLE": "Uma função do sistema não pode ser eliminada.",
     "GROUP_ROLE_SYSTEM_NOT_RENAMEABLE": "Uma função do sistema mantém sua chave; altere o nome visível em vez disso.",
+    "GROUP_SAVE_CATEGORY_UNKNOWN": "Pelo menos um dos tópicos não existe.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "A descrição deve ter pelo menos {min} caracteres.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Um grupo que pessoas de fora não conseguem encontrar também não pode mostrar seus membros a elas.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Este nome único de grupo já está em uso.",
@@ -509,7 +510,11 @@
     "POST_EVENT_VENUE_REQUIRED": "Adicione uma descrição do local.",
     "POST_PIN_FEATURE_DISABLED": "A fixação de publicações não está ativada.",
     "POST_PIN_LIMIT_REACHED": "O número máximo de publicações fixadas foi atingido. Desfixe outra publicação primeiro.",
+    "POST_SAVE_CATEGORY_UNKNOWN": "Pelo menos um dos tópicos não existe.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Já existe uma publicação com este slug.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "O título da publicação deve ter entre {min} e {max} caracteres.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Poucos tópicos selecionados (pelo menos {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Tópicos demais selecionados (no máximo {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "O código de confirmação é inválido.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Este nome de usuário já está em uso.",
     "REPORT_TARGET_IS_OWN": "Você não pode denunciar a si mesmo nem seu próprio conteúdo.",
@@ -606,7 +611,7 @@
     "previousLocation": "Localização anterior: {location}",
     "scrollToLocationMap": "Rolar até o mapa",
     "validations": {
-      "categories": "Por favor, selecione entre um e três tópicos.",
+      "categories": "Por favor, selecione entre {min} e {max} tópicos.",
       "contentNotEmpty": "Por favor, insira algum conteúdo.",
       "email": "Por favor, insira um endereço de e-mail válido.",
       "eventLocationNameLength": "O endereço deve ter entre {min} e {max} caracteres.",
@@ -1012,15 +1017,15 @@
       "title": "Editar meu grupo"
     },
     "elevation": {
-      "actingAsMember": "Aqui ages como {role}.",
-      "actingAsNonMember": "Não és membro deste grupo.",
       "activeTitle": "O acesso de administrador está ativo.",
       "activeUntil": "Termina às {time}, ou quando o encerrares.",
       "end": "Encerrar o acesso de administrador",
-      "offerBody": "Além disso tens direitos de rede sobre ele. Ler o seu conteúdo ou alterar algo pede esta confirmação, que fica registada junto do grupo.",
-      "offerBodyOwner": "Os teus direitos de rede também te permitem despromover ou remover os outros proprietários deste grupo. Isso pede esta confirmação, que fica registada junto do grupo.",
-      "reasonPlaceholder": "Do que se trata?",
-      "start": "Usar acesso de administrador"
+      "offerBody": "O teu papel atual neste grupo: «{role}». Indica o motivo pelo qual queres gerir este grupo (fica registado).",
+      "offerBodyNoneMember": "Não és membro do grupo. Indica o motivo pelo qual queres gerir este grupo (fica registado).",
+      "offerBodyOwner": "O teu papel atual neste grupo: «{role}». Os teus direitos de rede também te permitem despromover ou remover os outros proprietários deste grupo. Indica o motivo pelo qual queres gerir este grupo (fica registado).",
+      "reasonPlaceholder": "Motivo da tua ação",
+      "start": "Gerir grupo",
+      "title": "Tens o direito de gerir este grupo como um superproprietário."
     },
     "errors": {
       "userAlreadyMember": "O usuário “{name}” já é membro!"
@@ -1934,6 +1939,22 @@
     "connecting": "Conectando…",
     "connectionLost": "Conexão perdida: {name}",
     "connectionPoor": "Conexão fraca: {name}",
+    "controls": {
+      "camera": "Câmera",
+      "chat": "Chat",
+      "leave": "Desligar",
+      "microphone": "Microfone",
+      "screen": "Tela",
+      "startSharing": "Compartilhar a tela, uma janela ou uma aba",
+      "stopSharing": "{surface}: parar de compartilhar",
+      "surface": {
+        "browser": "Aba",
+        "monitor": "Tela",
+        "window": "Janela"
+      },
+      "turnOff": "{device}: desligar",
+      "turnOn": "{device}: ligar"
+    },
     "deviceSettings": {
       "button": "Dispositivos",
       "dtx": "Não transmitir as pausas na fala",
@@ -1942,9 +1963,8 @@
       "title": "Configurações dos dispositivos"
     },
     "dialogLabel": "Videochamada de grupo",
-    "disableCamera": "Desligar a câmera",
     "enableAudio": "Ativar som",
-    "enableCamera": "Ligar a câmera",
+    "enterFullscreen": "Tela cheia",
     "errorBackToPrejoin": "Alterar configurações",
     "errorRetry": "Tentar novamente",
     "errors": {
@@ -1967,18 +1987,19 @@
         "noDevice": "Nenhuma tela disponível para compartilhar."
       }
     },
+    "exitFullscreen": "Sair da tela cheia",
     "gotoGroup": "Ir para o grupo “{name}”",
     "groupVideoCallButton": {
       "label": "Vídeo de grupo",
       "tooltip": "Videochamada no grupo “{name}”"
     },
+    "hideBars": "Ocultar as barras",
     "leave": "Sair da chamada",
     "maximize": "Maximizar",
     "micMuted": "Microfone desligado",
     "micNoSignal": "Seu microfone não está transmitindo som — os outros não ouvem você.",
     "micUnmuted": "Microfone ligado",
     "minimize": "Minimizar",
-    "muteMic": "Silenciar microfone",
     "openChat": "Abrir chat",
     "prejoin": {
       "camera": "Câmera",
@@ -2026,12 +2047,10 @@
     "restartMic": "Reiniciar microfone",
     "screenShare": "Tela",
     "screenShareEnded": "Compartilhamento de tela encerrado",
+    "showBars": "Mostrar as barras",
     "showVideos": "Mostrar vídeos",
     "spotlightExit": "Sair do destaque",
-    "startScreenShare": "Compartilhar tela",
-    "stopScreenShare": "Parar compartilhamento",
     "title": "Videochamada de grupo",
-    "unmuteMic": "Reativar microfone",
     "you": "você",
     "youAreSharingScreen": "Você está compartilhando sua tela"
   }

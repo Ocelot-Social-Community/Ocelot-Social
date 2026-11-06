@@ -36,6 +36,7 @@ import {
 } from '@src/groupRole/repository'
 import { removeUserFromGroupCallRooms } from '@src/livekit/callSession'
 
+import { categoriesExist, unknownCategoryIds } from './helpers/categoriesExist'
 import {
   isActiveMembership,
   nonMemberReadsGroup,
@@ -54,23 +55,6 @@ import type { Context } from '@src/context'
 // coarser than an event's exact pin (see NEIGHBORHOOD_REVERSE_GEOCODE_TYPES'
 // own doc comment for the full reasoning).
 const GROUP_REVERSE_GEOCODE_TYPES = NEIGHBORHOOD_REVERSE_GEOCODE_TYPES
-
-// Whether any Category nodes exist. Keeps CreateGroup and UpdateGroup graceful: the
-// "categories required" rule only applies when the policy is on AND there is at least one
-// category to choose from (mirrors the frontend gating in getCategoriesMixin).
-const categoriesExist = async (context: Context): Promise<boolean> => {
-  const session = context.driver.session()
-  try {
-    return await session.readTransaction(async (txc) => {
-      const result = await txc.run(
-        'MATCH (category:Category) RETURN count(category) > 0 AS hasCategories',
-      )
-      return Boolean(result.records[0]?.get('hasCategories'))
-    })
-  } finally {
-    await session.close()
-  }
-}
 
 // One generated cypher-field resolver, as the overrides below need to call it.
 type GroupFieldResolver = (
@@ -381,6 +365,13 @@ export default {
         throw new AppError(Errors.GROUP_SAVE_TOO_MANY_CATEGORIES, { max: branding.category.max })
       }
       if (
+        policy.get('categoriesActive') &&
+        categoryIds?.length &&
+        (await unknownCategoryIds(context, categoryIds)).length
+      ) {
+        throw new AppError(Errors.GROUP_SAVE_CATEGORY_UNKNOWN)
+      }
+      if (
         params.description === undefined ||
         params.description === null ||
         removeHtmlTags(params.description).length < branding.group.descriptionMinLength
@@ -498,6 +489,9 @@ export default {
         }
         if (categoryIds.length > branding.category.max) {
           throw new AppError(Errors.GROUP_SAVE_TOO_MANY_CATEGORIES, { max: branding.category.max })
+        }
+        if (categoryIds.length && (await unknownCategoryIds(context, categoryIds)).length) {
+          throw new AppError(Errors.GROUP_SAVE_CATEGORY_UNKNOWN)
         }
       }
       if (

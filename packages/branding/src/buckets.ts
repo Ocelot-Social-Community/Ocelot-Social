@@ -147,11 +147,12 @@ export const BUCKET_PATHS: Record<BucketName, string[]> = {
   legal: ['termsAndConditions', 'assets.html', 'links.pages'],
   // Menus and footer ordering / landing target.
   navigation: ['headerMenu', 'links.landingPage', 'links.footerOrder'],
-  // Framework UX / validation rules (group limits, user name limits, comment lengths, category
-  // counts, registration code lengths, date formatting, badge cap).
+  // Framework UX / validation rules (group limits, user name limits, post title limits, comment
+  // lengths, category counts, registration code lengths, date formatting, badge cap).
   behavior: [
     'group',
     'user',
+    'post',
     'comment',
     'dateTime',
     'badges',

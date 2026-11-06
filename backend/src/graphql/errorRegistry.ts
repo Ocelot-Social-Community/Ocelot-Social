@@ -117,6 +117,10 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'Too many categories (at most {max}).',
   },
+  GROUP_SAVE_CATEGORY_UNKNOWN: {
+    type: 'BAD_USER_INPUT',
+    text: 'At least one of the categories does not exist.',
+  },
   GROUP_MEMBERSHIP_USER_NOT_A_MEMBER: {
     type: 'BAD_USER_INPUT',
     text: 'User is not a member of this group.',
@@ -253,6 +257,23 @@ const definitions = {
   POST_SAVE_SLUG_ALREADY_TAKEN: {
     type: 'BAD_USER_INPUT',
     text: 'Post with this slug already exists.',
+  },
+  POST_SAVE_TOO_FEW_CATEGORIES: {
+    type: 'BAD_USER_INPUT',
+    text: 'Too few categories (at least {min}).',
+  },
+  POST_SAVE_TOO_MANY_CATEGORIES: {
+    type: 'BAD_USER_INPUT',
+    text: 'Too many categories (at most {max}).',
+  },
+  POST_SAVE_CATEGORY_UNKNOWN: {
+    type: 'BAD_USER_INPUT',
+    text: 'At least one of the categories does not exist.',
+  },
+  // Limits from branding.post (titleLengthMin/titleLengthMax), counted on the trimmed title.
+  POST_SAVE_TITLE_LENGTH_INVALID: {
+    type: 'BAD_USER_INPUT',
+    text: 'The post title must be between {min} and {max} characters long.',
   },
   // locations
   // A query selected Location.distanceToMe without the location's id.

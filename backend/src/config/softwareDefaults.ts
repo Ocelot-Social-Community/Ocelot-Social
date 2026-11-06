@@ -42,6 +42,10 @@ export const SOFTWARE_DEFAULTS = {
   // No middlewares disabled by default — the empty list displays as '' (String([])).
   DISABLED_MIDDLEWARES: [] as readonly string[],
   LANGUAGE_DEFAULT: 'en',
+  // --- Maps ---
+  // Where the geocoding requests go. Only ever changed to point tests at a stand-in
+  // (backend/test/mapbox-stub), so that they bill nobody's Mapbox account.
+  MAPBOX_API_URL: 'https://api.mapbox.com',
   // --- Contact / organisation (per-deployment identity) ---
   // Scalar identity values a deployment overrides via env (surfaced read-only in the admin
   // env tab, NOT policy-overridable). The env var name is SUPPORT_LINK / ORGANIZATION_LINK;

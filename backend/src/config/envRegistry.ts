@@ -171,6 +171,12 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
 
   // --- Maps ---------------------------------------------------------------
   { name: 'MAPBOX_TOKEN', secret: true, category: 'maps', softwareDefault: null },
+  {
+    name: 'MAPBOX_API_URL',
+    secret: false,
+    category: 'maps',
+    softwareDefault: SOFTWARE_DEFAULTS.MAPBOX_API_URL,
+  },
 
   // --- Video (LiveKit) — hard-required by the videoConference policy -------
   { name: 'LIVEKIT_URL', secret: false, category: 'video', softwareDefault: null },

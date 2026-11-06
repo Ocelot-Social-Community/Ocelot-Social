@@ -669,6 +669,72 @@ describe('Chat.vue', () => {
       await wrapper.vm.fetchMessages({ room })
       expect(wrapper.vm.unseenMessageIds.has('unseen-1')).toBe(true)
     })
+
+    it('drops the messages of a room that was left while they were asked for', async () => {
+      const first = mockRoom({ id: 'r-first', roomId: 'r-first' })
+      const second = mockRoom({ id: 'r-second', roomId: 'r-second' })
+      let answerFirst
+      mocks.$apollo.query
+        .mockReturnValueOnce(
+          new Promise((resolve) => {
+            answerFirst = () =>
+              resolve({ data: { Message: [mockMessage({ id: 'from-first', indexId: 0 })] } })
+          }),
+        )
+        .mockResolvedValueOnce({
+          data: { Message: [mockMessage({ id: 'from-second', indexId: 0 })] },
+        })
+      const loadingFirst = wrapper.vm.fetchMessages({ room: first })
+      await wrapper.vm.fetchMessages({ room: second })
+      answerFirst()
+      await loadingFirst
+      expect(wrapper.vm.selectedRoom.id).toBe('r-second')
+      expect(wrapper.vm.messages).toHaveLength(1)
+      expect(wrapper.vm.messages[0].id).toBe('from-second')
+    })
+
+    it('leaves the room opened since alone when the request for a left one fails', async () => {
+      const first = mockRoom({ id: 'r-first', roomId: 'r-first' })
+      const second = mockRoom({ id: 'r-second', roomId: 'r-second' })
+      let failFirst
+      mocks.$apollo.query
+        .mockReturnValueOnce(
+          new Promise((_resolve, reject) => {
+            failFirst = () => reject(new Error('offline'))
+          }),
+        )
+        .mockResolvedValueOnce({
+          data: { Message: [mockMessage({ id: 'from-second', indexId: 0 })] },
+        })
+      const loadingFirst = wrapper.vm.fetchMessages({ room: first })
+      await wrapper.vm.fetchMessages({ room: second })
+      failFirst()
+      await loadingFirst
+      expect(wrapper.vm.messages).toHaveLength(1)
+    })
+
+    it('leaves a room opened again alone when the earlier request for it fails', async () => {
+      const first = mockRoom({ id: 'r-first', roomId: 'r-first' })
+      const second = mockRoom({ id: 'r-second', roomId: 'r-second' })
+      let failFirst
+      mocks.$apollo.query
+        .mockReturnValueOnce(
+          new Promise((_resolve, reject) => {
+            failFirst = () => reject(new Error('offline'))
+          }),
+        )
+        .mockResolvedValueOnce({ data: { Message: [] } })
+        .mockResolvedValueOnce({
+          data: { Message: [mockMessage({ id: 'from-first', indexId: 0 })] },
+        })
+      const loadingFirst = wrapper.vm.fetchMessages({ room: first })
+      await wrapper.vm.fetchMessages({ room: second })
+      await wrapper.vm.fetchMessages({ room: first })
+      failFirst()
+      await loadingFirst
+      expect(wrapper.vm.selectedRoom.id).toBe('r-first')
+      expect(wrapper.vm.messages).toHaveLength(1)
+    })
   })
 
   describe('sendMessage', () => {
@@ -1705,19 +1771,38 @@ describe('Chat.vue', () => {
       })
     })
 
-    describe('room header', () => {
-      const injectedStyles = (propsData) => {
-        wrapper = Wrapper(propsData)
-        const appended = []
-        Object.defineProperty(wrapper.vm.$el, 'shadowRoot', {
-          configurable: true,
-          value: { appendChild: (style) => appended.push(style.textContent) },
-        })
-        wrapper.vm._shadowStylesInjected = false
-        wrapper.vm.injectShadowStyles()
-        return appended.join('')
-      }
+    const injectedStyles = (propsData) => {
+      wrapper = Wrapper(propsData)
+      const appended = []
+      Object.defineProperty(wrapper.vm.$el, 'shadowRoot', {
+        configurable: true,
+        value: { appendChild: (style) => appended.push(style.textContent) },
+      })
+      wrapper.vm._shadowStylesInjected = false
+      wrapper.vm.injectShadowStyles()
+      return appended.join('')
+    }
 
+    describe('input row', () => {
+      it("keeps the library's space around the input in the chat page", () => {
+        expect(injectedStyles({})).not.toContain('.vac-box-footer')
+      })
+
+      it('has less space above and below the input in a chat on its own', () => {
+        expect(injectedStyles({ singleRoom: true })).toContain(
+          '.vac-box-footer { padding-top: 4px !important; padding-bottom: 4px !important; }',
+        )
+      })
+
+      it("has an input as high as the call's buttons in a chat on its own", () => {
+        expect(injectedStyles({ singleRoom: true })).toContain(
+          '.vac-textarea { padding-top: 7px !important; padding-bottom: 7px !important; line-height: 20px !important; }',
+        )
+        expect(injectedStyles({})).not.toContain('.vac-textarea')
+      })
+    })
+
+    describe('room header', () => {
       it('is shown by default', () => {
         expect(injectedStyles({})).not.toContain('display: none')
       })

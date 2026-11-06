@@ -467,6 +467,7 @@
     "GROUP_ROLE_REASSIGN_TARGET_INVALID": "Sposta i membri in un altro ruolo.",
     "GROUP_ROLE_SYSTEM_NOT_DELETABLE": "Un ruolo di sistema non può essere eliminato.",
     "GROUP_ROLE_SYSTEM_NOT_RENAMEABLE": "Un ruolo di sistema mantiene la sua chiave; modifica invece il nome visualizzato.",
+    "GROUP_SAVE_CATEGORY_UNKNOWN": "Almeno uno degli argomenti non esiste.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "La descrizione deve contenere almeno {min} caratteri.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Un gruppo che gli esterni non possono trovare non può nemmeno mostrare loro i suoi membri.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Questo nome unico del gruppo è già in uso.",
@@ -509,7 +510,11 @@
     "POST_EVENT_VENUE_REQUIRED": "Aggiungi una descrizione del luogo.",
     "POST_PIN_FEATURE_DISABLED": "Fissare le pubblicazioni non è attivato.",
     "POST_PIN_LIMIT_REACHED": "È stato raggiunto il numero massimo di pubblicazioni fissate. Rimuovi prima un'altra pubblicazione fissata.",
+    "POST_SAVE_CATEGORY_UNKNOWN": "Almeno uno degli argomenti non esiste.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Esiste già una pubblicazione con questo slug.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "Il titolo della pubblicazione deve essere compreso tra {min} e {max} caratteri.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Sono stati selezionati troppo pochi argomenti (almeno {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Sono stati selezionati troppi argomenti (al massimo {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Il codice di conferma non è valido.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Questo nome utente è già in uso.",
     "REPORT_TARGET_IS_OWN": "Non puoi segnalare né te stesso né i tuoi contenuti.",
@@ -606,7 +611,7 @@
     "previousLocation": "Posizione precedente: {location}",
     "scrollToLocationMap": "Scorri fino alla mappa",
     "validations": {
-      "categories": "Selezionare tra uno e tre argomenti.",
+      "categories": "Selezionare tra {min} e {max} argomenti.",
       "contentNotEmpty": "Inserire del contenuto.",
       "email": "Inserire un indirizzo e-mail valido.",
       "eventLocationNameLength": "L'indirizzo deve essere compreso tra {min} e {max} caratteri.",
@@ -1012,15 +1017,15 @@
       "title": "Modifica il mio gruppo"
     },
     "elevation": {
-      "actingAsMember": "Qui agisci come {role}.",
-      "actingAsNonMember": "Non sei iscritto a questo gruppo.",
       "activeTitle": "L'accesso da amministratore è attivo.",
       "activeUntil": "Termina alle {time}, o quando lo chiudi tu.",
       "end": "Termina l'accesso da amministratore",
-      "offerBody": "In più hai diritti di rete su di esso. Per leggerne i contenuti o modificare qualcosa serve questa conferma, che resta registrata presso il gruppo.",
-      "offerBodyOwner": "I tuoi diritti di rete ti permettono anche di declassare o rimuovere gli altri proprietari di questo gruppo. Per farlo serve questa conferma, che resta registrata presso il gruppo.",
-      "reasonPlaceholder": "Di cosa si tratta?",
-      "start": "Usa l'accesso da amministratore"
+      "offerBody": "Il tuo ruolo attuale in questo gruppo: «{role}». Indica il motivo per cui vuoi gestire questo gruppo (verrà registrato).",
+      "offerBodyNoneMember": "Non sei iscritto al gruppo. Indica il motivo per cui vuoi gestire questo gruppo (verrà registrato).",
+      "offerBodyOwner": "Il tuo ruolo attuale in questo gruppo: «{role}». I tuoi diritti di rete ti permettono anche di declassare o rimuovere gli altri proprietari di questo gruppo. Indica il motivo per cui vuoi gestire questo gruppo (verrà registrato).",
+      "reasonPlaceholder": "Motivo della tua azione",
+      "start": "Gestisci gruppo",
+      "title": "Hai il diritto di gestire questo gruppo come un super proprietario."
     },
     "errors": {
       "userAlreadyMember": "L'utente «{name}» è già membro!"
@@ -1934,6 +1939,22 @@
     "connecting": "Connessione in corso…",
     "connectionLost": "Connessione persa: {name}",
     "connectionPoor": "Connessione debole: {name}",
+    "controls": {
+      "camera": "Fotocamera",
+      "chat": "Chat",
+      "leave": "Riaggancia",
+      "microphone": "Microfono",
+      "screen": "Schermo",
+      "startSharing": "Condividi lo schermo, una finestra o una scheda",
+      "stopSharing": "{surface}: smetti di condividere",
+      "surface": {
+        "browser": "Scheda",
+        "monitor": "Schermo",
+        "window": "Finestra"
+      },
+      "turnOff": "{device}: disattiva",
+      "turnOn": "{device}: attiva"
+    },
     "deviceSettings": {
       "button": "Dispositivi",
       "dtx": "Non trasmettere le pause nel parlato",
@@ -1942,9 +1963,8 @@
       "title": "Impostazioni dei dispositivi"
     },
     "dialogLabel": "Videochiamata di gruppo",
-    "disableCamera": "Disattiva la fotocamera",
     "enableAudio": "Attiva audio",
-    "enableCamera": "Attiva la fotocamera",
+    "enterFullscreen": "Schermo intero",
     "errorBackToPrejoin": "Modifica impostazioni",
     "errorRetry": "Riprova",
     "errors": {
@@ -1967,18 +1987,19 @@
         "noDevice": "Nessuno schermo disponibile da condividere."
       }
     },
+    "exitFullscreen": "Esci da schermo intero",
     "gotoGroup": "Vai al gruppo «{name}»",
     "groupVideoCallButton": {
       "label": "Video del gruppo",
       "tooltip": "Videochiamata nel gruppo «{name}»"
     },
+    "hideBars": "Nascondi le barre",
     "leave": "Lascia la chiamata",
     "maximize": "Ingrandisci",
     "micMuted": "Microfono spento",
     "micNoSignal": "Il tuo microfono non trasmette alcun suono: gli altri non ti sentono.",
     "micUnmuted": "Microfono acceso",
     "minimize": "Riduci",
-    "muteMic": "Disattiva microfono",
     "openChat": "Apri chat",
     "prejoin": {
       "camera": "Fotocamera",
@@ -2026,12 +2047,10 @@
     "restartMic": "Riavvia microfono",
     "screenShare": "Schermo",
     "screenShareEnded": "Condivisione schermo terminata",
+    "showBars": "Mostra le barre",
     "showVideos": "Mostra video",
     "spotlightExit": "Esci dallo spotlight",
-    "startScreenShare": "Condividi schermo",
-    "stopScreenShare": "Interrompi condivisione",
     "title": "Videochiamata di gruppo",
-    "unmuteMic": "Riattiva microfono",
     "you": "tu",
     "youAreSharingScreen": "Stai condividendo il tuo schermo"
   }

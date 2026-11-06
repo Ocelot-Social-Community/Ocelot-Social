@@ -61,24 +61,29 @@ export const joinCallSession = async (
       // participants asking at the same moment would otherwise both find none and both create
       // one. Writing to the group takes its write lock, which is held until the transaction
       // ends; the property is removed again at once, so nothing of it is stored. A statement of
-      // its own, so the lock is surely held before anything below is read.
-      await transaction.run(
+      // its own, so the lock is surely held before anything below is read. A user or group
+      // that is not there gets nothing, not even a session opened for nobody.
+      const locked = await transaction.run(
         `
           MATCH (group:Group { id: $groupId })
+          MATCH (:User { id: $userId })
           SET group.callSessionLock = true
           REMOVE group.callSessionLock
+          RETURN group.id AS groupId
         `,
-        { groupId },
+        { groupId, userId },
       )
+      if (locked.records.length === 0) {
+        return null
+      }
       const open = await transaction.run(
         `
           MATCH (group:Group { id: $groupId })
           OPTIONAL MATCH (session:VideoCallSession)-[:CALL_IN]->(group)
             WHERE session.endedAt IS NULL
           OPTIONAL MATCH (room:Room)-[:ROOM_FOR]->(session)
-          // The group is returned so that a group that is gone yields no row at all.
-          RETURN group.id AS groupId,
-                 session.id AS id,
+          // The group is surely there, its lock held: a row even without any session.
+          RETURN session.id AS id,
                  session.livekitSid = $livekitSid AND size([
                    (member:User)-[:CHATS_IN]->(room)
                      WHERE member.id IN $presentUserIds | member
@@ -89,9 +94,6 @@ export const joinCallSession = async (
         `,
         { groupId, livekitSid, presentUserIds },
       )
-      if (open.records.length === 0) {
-        return null
-      }
       const sessions = open.records
         .map((record) => ({
           id: record.get('id') as string | null,
@@ -139,6 +141,7 @@ export const joinCallSession = async (
         `,
         { sessionId, userId },
       )
+      /* v8 ignore next -- unreachable: the lock above has found the user, and a session always has its room */
       return (joined.records[0]?.get('roomId') as string | undefined) ?? null
     })
   } finally {

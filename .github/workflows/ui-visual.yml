@@ -3,8 +3,11 @@ name: UI Visual
 on:
   push:
     branches: [master]
+  # Every base branch, not only master: a pull request stacked on another one is retargeted to
+  # master when that one merges, and the retargeting fires no event these runs start on. Its
+  # required checks have to exist on the head commit by then, or it waits for them forever. What
+  # reaches master is checked again against master itself, in the merge queue (merge_group).
   pull_request:
-    branches: [master]
   # The merge queue runs the required checks on its temporary gh-readonly-queue/master/* branch.
   merge_group:
 

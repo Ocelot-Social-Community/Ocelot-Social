@@ -467,6 +467,7 @@
     "GROUP_ROLE_REASSIGN_TARGET_INVALID": "Verschiebe die Mitglieder in eine andere Rolle.",
     "GROUP_ROLE_SYSTEM_NOT_DELETABLE": "Eine Systemrolle kann nicht gelöscht werden.",
     "GROUP_ROLE_SYSTEM_NOT_RENAMEABLE": "Eine Systemrolle behält ihren Schlüssel; ändere stattdessen ihren Anzeigenamen.",
+    "GROUP_SAVE_CATEGORY_UNKNOWN": "Mindestens ein Thema gibt es nicht.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "Die Beschreibung muss mindestens {min} Zeichen lang sein.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Eine Gruppe, die Außenstehende nicht finden können, kann ihnen auch ihre Mitglieder nicht zeigen.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Dieser eindeutige Gruppenname ist bereits vergeben.",
@@ -509,7 +510,11 @@
     "POST_EVENT_VENUE_REQUIRED": "Bitte gib eine Ortsbeschreibung an.",
     "POST_PIN_FEATURE_DISABLED": "Das Anheften von Beiträgen ist nicht aktiviert.",
     "POST_PIN_LIMIT_REACHED": "Die maximale Anzahl angehefteter Beiträge ist erreicht. Löse zuerst einen anderen Beitrag.",
+    "POST_SAVE_CATEGORY_UNKNOWN": "Mindestens ein Thema gibt es nicht.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Es gibt bereits einen Beitrag mit diesem Slug.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "Der Titel des Beitrags muss zwischen {min} und {max} Zeichen lang sein.",
+    "POST_SAVE_TOO_FEW_CATEGORIES": "Es sind zu wenige Themen ausgewählt (mindestens {min}).",
+    "POST_SAVE_TOO_MANY_CATEGORIES": "Es sind zu viele Themen ausgewählt (höchstens {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Der Bestätigungscode ist ungültig.",
     "REGISTRATION_USER_SLUG_ALREADY_TAKEN": "Dieser Nutzername ist bereits vergeben.",
     "REPORT_TARGET_IS_OWN": "Du kannst weder dich selbst noch deine eigenen Inhalte melden.",
@@ -606,7 +611,7 @@
     "previousLocation": "Vorheriger Ort: {location}",
     "scrollToLocationMap": "Zur Karte scrollen",
     "validations": {
-      "categories": "Bitte ein bis drei Themen auswählen.",
+      "categories": "Bitte {min} bis {max} Themen auswählen.",
       "contentNotEmpty": "Bitte einen Inhalt eingeben.",
       "email": "Bitte eine gültige E-Mail-Adresse eingeben.",
       "eventLocationNameLength": "Die Adresse muss zwischen {min} und {max} Zeichen lang sein.",
@@ -1012,15 +1017,15 @@
       "title": "Meine Gruppe ändern"
     },
     "elevation": {
-      "actingAsMember": "Du handelst hier als {role}.",
-      "actingAsNonMember": "Du bist kein Mitglied dieser Gruppe.",
       "activeTitle": "Administratorzugriff ist aktiv.",
       "activeUntil": "Er endet um {time} oder wenn du ihn beendest.",
       "end": "Administratorzugriff beenden",
-      "offerBody": "Zusätzlich hältst du Netzwerkrechte über sie. Ihre Inhalte zu lesen oder etwas zu ändern braucht diese Bestätigung, und sie wird bei der Gruppe vermerkt.",
-      "offerBodyOwner": "Über deine Netzwerkrechte kannst du auch die anderen Inhaber dieser Gruppe zurückstufen oder entfernen. Das braucht diese Bestätigung, und sie wird bei der Gruppe vermerkt.",
-      "reasonPlaceholder": "Worum geht es?",
-      "start": "Administratorzugriff nutzen"
+      "offerBody": "Deine aktuelle Rolle in dieser Gruppe: „{role}“. Gib einen Grund an, warum du diese Gruppe verwalten möchtest (wird vermerkt).",
+      "offerBodyNoneMember": "Du bist kein Mitglied der Gruppe. Gib einen Grund an, warum du diese Gruppe verwalten möchtest (wird vermerkt).",
+      "offerBodyOwner": "Deine aktuelle Rolle in dieser Gruppe: „{role}“. Über deine Netzwerkrechte kannst du auch die anderen Inhaber dieser Gruppe zurückstufen oder entfernen. Gib einen Grund an, warum du diese Gruppe verwalten möchtest (wird vermerkt).",
+      "reasonPlaceholder": "Grund deiner Aktion",
+      "start": "Gruppe verwalten",
+      "title": "Du bist berechtigt, diese Gruppe wie ein Super-Inhaber zu verwalten."
     },
     "errors": {
       "userAlreadyMember": "Nutzer „{name}“ ist bereits Mitglied!"
@@ -1934,6 +1939,22 @@
     "connecting": "Verbinde…",
     "connectionLost": "Verbindung verloren: {name}",
     "connectionPoor": "Schwache Verbindung: {name}",
+    "controls": {
+      "camera": "Kamera",
+      "chat": "Chat",
+      "leave": "Auflegen",
+      "microphone": "Mikrofon",
+      "screen": "Bildschirm",
+      "startSharing": "Bildschirm, Fenster oder Tab teilen",
+      "stopSharing": "{surface}: nicht mehr teilen",
+      "surface": {
+        "browser": "Tab",
+        "monitor": "Bildschirm",
+        "window": "Fenster"
+      },
+      "turnOff": "{device}: ausschalten",
+      "turnOn": "{device}: einschalten"
+    },
     "deviceSettings": {
       "button": "Geräte",
       "dtx": "Sprechpausen nicht übertragen",
@@ -1942,9 +1963,8 @@
       "title": "Geräte-Einstellungen"
     },
     "dialogLabel": "Gruppen-Videoanruf",
-    "disableCamera": "Kamera ausschalten",
     "enableAudio": "Ton aktivieren",
-    "enableCamera": "Kamera einschalten",
+    "enterFullscreen": "Vollbild",
     "errorBackToPrejoin": "Einstellungen ändern",
     "errorRetry": "Erneut versuchen",
     "errors": {
@@ -1967,18 +1987,19 @@
         "noDevice": "Kein Bildschirm zum Teilen gefunden."
       }
     },
+    "exitFullscreen": "Vollbild beenden",
     "gotoGroup": "Zur Gruppe „{name}“",
     "groupVideoCallButton": {
       "label": "Gruppen-Video",
       "tooltip": "Videoanruf in der Gruppe „{name}“"
     },
+    "hideBars": "Leisten ausblenden",
     "leave": "Anruf verlassen",
     "maximize": "Maximieren",
     "micMuted": "Mikrofon aus",
     "micNoSignal": "Dein Mikrofon liefert keinen Ton – die anderen hören dich nicht.",
     "micUnmuted": "Mikrofon an",
     "minimize": "Minimieren",
-    "muteMic": "Mikrofon stummschalten",
     "openChat": "Chat öffnen",
     "prejoin": {
       "camera": "Kamera",
@@ -2026,12 +2047,10 @@
     "restartMic": "Mikrofon neu starten",
     "screenShare": "Bildschirm",
     "screenShareEnded": "Bildschirmfreigabe beendet",
+    "showBars": "Leisten einblenden",
     "showVideos": "Videos anzeigen",
     "spotlightExit": "Spotlight beenden",
-    "startScreenShare": "Bildschirm teilen",
-    "stopScreenShare": "Teilen beenden",
     "title": "Gruppen-Videoanruf",
-    "unmuteMic": "Stummschaltung aufheben",
     "you": "du",
     "youAreSharingScreen": "Du teilst gerade Deinen Bildschirm"
   }

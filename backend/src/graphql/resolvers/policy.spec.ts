@@ -94,6 +94,7 @@ describe('Query.policy', () => {
         inviteLinkLimit: null,
         inviteCodesPersonalPerUser: null,
         inviteCodesGroupPerUser: null,
+        videoCallDtx: null,
         // admin-only key → null for an anonymous viewer
         videoConference: null,
       })
