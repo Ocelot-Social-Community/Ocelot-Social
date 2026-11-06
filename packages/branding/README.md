@@ -94,8 +94,9 @@ every brand's value for it into a silent no-op, so it is a decision, never a sid
   stylesheets, run `npm run tokens:snapshot` (it regenerates `src/frameworkTokens.generated.ts`, which
   the test reads — commit it), then delete the name from `scripts/public-tokens.snapshot.json` (the
   command only ever adds). Until the name is deleted there the test fails, which makes the break
-  visible in the diff. A rename is a breaking change without an alias — name the new token in the
-  release notes.
+  visible in the diff. A rename or a removal is a breaking change: give the squash commit a
+  `BREAKING CHANGE:` footer, so the version moves on its breaking axis. In the release notes name the
+  old token and, if there is one, the new one.
 - **An alias does not count as a rename.** With `--old: var(--new)` left in the stylesheet `--old` is
   still declared, so the test stays green, yet a value a brand sets for `--old` reaches nobody. To
   break on purpose, remove the old name from the stylesheets and from the snapshot.
