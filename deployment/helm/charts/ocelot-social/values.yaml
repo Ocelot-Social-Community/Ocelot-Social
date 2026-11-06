@@ -74,6 +74,15 @@ backend:
 webapp:
   image:
     repository: ghcr.io/ocelot-social-community/ocelot-social/webapp
+  # The webapp is stateless (session in the cookie, live data via the backend's websocket), so it
+  # scales freely. Two replicas keep it reachable while a node is drained — upgrades, reboots —
+  # because a PodDisruptionBudget then lets only one go at a time. With 1 there is no budget and
+  # every drain of its node is a short outage (503). Each replica costs its full memory request.
+  replicas: 2
+  # Turn off on a cluster without a second schedulable node: the replacement of the first evicted
+  # replica stays Pending there, the budget then refuses the second eviction and the drain hangs —
+  # an upgrade that never finishes is worse than the short 503. Only rendered for more than 1 replica.
+  podDisruptionBudget: true
   # Rendered into the webapp ConfigMap VERBATIM (see templates/webapp/configmap.yml), so every value
   # has to be a QUOTED STRING: a ConfigMap's `data` is map[string]string, and an unquoted `true` or
   # `730` arrives as a YAML bool/int — the API server then rejects the whole manifest. The values shown
