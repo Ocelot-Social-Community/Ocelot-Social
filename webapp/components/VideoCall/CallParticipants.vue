@@ -76,7 +76,16 @@
             class="call-participants__badges"
             :data-test="'call-participant-badges-' + person.userId"
           >
-            {{ badgeLine(person) }}
+            <template v-for="(mark, index) in badges(person)">
+              <!-- v-text: no white space may come between a mark and what follows it. -->
+              <span v-if="index > 0" :key="'sep-' + index" v-text="mark.after" />
+              <span
+                :key="mark.key"
+                :class="{ 'call-participants__mark--role': mark.role }"
+                :data-test="'call-participant-' + mark.key"
+                v-text="mark.text"
+              />
+            </template>
           </span>
         </span>
         <span class="call-participants__state" aria-hidden="true">
@@ -198,12 +207,13 @@
           </li>
         </ul>
         <div class="call-participants__dialog-actions">
-          <os-button appearance="outline" variant="primary" @click="closeDialog">
+          <os-button appearance="outline" variant="primary" size="sm" @click="closeDialog">
             {{ $t('actions.cancel') }}
           </os-button>
           <os-button
             data-test="mute-all-confirm"
             variant="danger"
+            size="sm"
             :loading="busy"
             :disabled="muteCount === 0 && floorUnchanged"
             @click="muteAll"
@@ -355,15 +365,36 @@ export default {
     hasFloor(userId) {
       return this.moderation.speakers.includes(userId)
     },
-    badgeLine(person) {
+    // What sets somebody apart, in order; the roles in the call stand out in colour. Each knows
+    // what goes before it: ": " after "you", " – " between the others.
+    badges(person) {
       const marks = [
-        this.isNamedModerator(person.userId) && this.$t('videoCall.participants.moderator'),
-        this.hasFloor(person.userId) && this.$t('videoCall.participants.hasFloor'),
-        person.devices > 1 && this.$t('videoCall.participants.devices', { count: person.devices }),
+        person.isMe && { key: 'you', text: this.$t('videoCall.you') },
+        this.isNamedModerator(person.userId) && {
+          key: 'moderator',
+          text: this.$t('videoCall.participants.moderator'),
+          role: true,
+        },
+        this.hasFloor(person.userId) && {
+          key: 'floor',
+          text: this.$t('videoCall.participants.hasFloor'),
+          role: true,
+        },
+        person.devices > 1 && {
+          key: 'devices',
+          text: this.$t('videoCall.participants.devices', { count: person.devices }),
+        },
       ].filter(Boolean)
-      const you = this.$t('videoCall.you')
-      if (!person.isMe) return marks.join(' – ')
-      return marks.length ? `${you}: ${marks.join(' – ')}` : you
+      return marks.map((mark, index) => ({
+        ...mark,
+        after: index === 1 && marks[0].key === 'you' ? ': ' : ' – ',
+      }))
+    },
+    // The same, as one line of text: what a screen reader and the tests read.
+    badgeLine(person) {
+      return this.badges(person)
+        .map((mark, index) => (index > 0 ? mark.after : '') + mark.text)
+        .join('')
     },
     stateLabel(person) {
       return [
@@ -661,6 +692,9 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.call-participants__mark--role {
+  color: var(--color-primary);
 }
 .call-participants__badges {
   overflow: hidden;

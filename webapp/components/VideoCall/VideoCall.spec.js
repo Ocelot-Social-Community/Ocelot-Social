@@ -72,10 +72,14 @@ jest.mock('livekit-client', () => {
       }
       // Tests flip the static to start a room whose audio is already blocked.
       this.canPlaybackAudio = Room.initialCanPlaybackAudio
-      this.metadata = Room.initialMetadata
+      // As LiveKit: the room's metadata arrives with the join, not before.
+      this.metadata = ''
       this.startAudio = jest.fn().mockResolvedValue()
       this.remoteParticipants = new Map()
-      this.connect = jest.fn().mockResolvedValue()
+      this.connect = jest.fn(() => {
+        this.metadata = Room.initialMetadata
+        return Promise.resolve()
+      })
       this.disconnect = jest.fn().mockResolvedValue()
       this.switchActiveDevice = jest.fn().mockResolvedValue(true)
     }
@@ -173,6 +177,7 @@ const buildStore = (state = {}) => {
         'videoCall/SET_GROUP_CHAT_UNREAD': jest.fn(),
         'videoCall/SET_LAST_CHAT_TAB': setLastChatTab,
         'videoCall/SET_PARTICIPANTS_OPEN': setParticipantsOpen,
+        'videoCall/SET_PARTICIPANTS_VIEW': jest.fn(),
         'videoCall/SET_PAGE_BARS': setPageBars,
         'chat/SET_OPEN_CHAT': showChat,
       },
@@ -4827,6 +4832,26 @@ describe('VideoCall — the people in the call and their moderation', () => {
       await wrapper.vm.$nextTick()
       await wrapper.find('[data-test="video-call-participants"]').trigger('click')
       expect(setParticipantsOpen).toHaveBeenCalledWith(expect.anything(), true)
+    })
+
+    it('hands what the list shows to the store, for the window beside the parked call', () => {
+      const { wrapper, store } = factory({ show: true })
+      const commit = jest.spyOn(store, 'commit')
+      wrapper.setData({ mayTakeOverModeration: true })
+      return wrapper.vm.$nextTick().then(() => {
+        expect(commit).toHaveBeenCalledWith(
+          'videoCall/SET_PARTICIPANTS_VIEW',
+          expect.objectContaining({ mayTakeOver: true, people: [] }),
+        )
+      })
+    })
+
+    it('brings a parked call up to show somebody large', () => {
+      const { wrapper, setMinimized } = factory({ show: true, minimized: true })
+      wrapper.setData({ phase: 'in-call', tiles: [tile('bob#1', 'bob')] })
+      wrapper.vm.spotlightPerson('bob')
+      expect(setMinimized).toHaveBeenCalled()
+      expect(wrapper.vm.spotlightKey).toBe('bob#1/main')
     })
 
     it('shows somebody large', () => {

@@ -82,8 +82,20 @@ describe('CallParticipants', () => {
         people: [person('me', { isMe: true }), person('bob', { devices: 2 }), person('anna')],
         moderation: { moderators: ['me', 'bob'], everyone: false, speakers: ['bob'] },
       })
+      // As the browser shows it: runs of white space between the marks fall into one.
       const line = (userId) =>
-        wrapper.find(`[data-test="call-participant-badges-${userId}"]`).text()
+        wrapper.find(`[data-test="call-participant-badges-${userId}"]`).text().replace(/\s+/g, ' ')
+      // The roles in the call stand out.
+      const bob = wrapper.find('[data-test="call-participant-bob"]')
+      expect(bob.find('[data-test="call-participant-moderator"]').classes()).toContain(
+        'call-participants__mark--role',
+      )
+      expect(bob.find('[data-test="call-participant-floor"]').classes()).toContain(
+        'call-participants__mark--role',
+      )
+      expect(bob.find('[data-test="call-participant-devices"]').classes()).not.toContain(
+        'call-participants__mark--role',
+      )
       expect(line('bob')).toBe(
         'videoCall.participants.moderator – videoCall.participants.hasFloor – videoCall.participants.devices {"count":2}',
       )

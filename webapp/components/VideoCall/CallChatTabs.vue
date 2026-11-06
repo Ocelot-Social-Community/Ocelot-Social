@@ -16,10 +16,11 @@
     >
       <button
         ref="tabs"
-        v-tooltip="{ content: tab.hint, placement: 'bottom', classes: 'tooltip--narrow' }"
+        v-tooltip="{ content: tab.tooltip, placement: 'bottom', classes: 'tooltip--narrow' }"
         type="button"
         role="tab"
         class="call-chat-tabs__tab"
+        :aria-label="tab.title"
         :aria-selected="tab.value === active ? 'true' : 'false'"
         :aria-description="tab.hint"
         :tabindex="tab.value === focusable ? 0 : -1"
@@ -28,6 +29,8 @@
         @keydown.left.prevent="step(-1)"
         @keydown.right.prevent="step(1)"
       >
+        <!-- What kind of tab it is, at a glance: one of the two chats, or the people. -->
+        <os-icon :icon="tab.icon" class="call-chat-tabs__icon" />
         <span class="call-chat-tabs__label">{{ tab.label }}</span>
         <!--
           Unread messages, as the red count the app shows on its icons; how many are in the
@@ -150,8 +153,31 @@ export default {
     focusable() {
       return this.active || this.tabs[0].value
     },
+    // Short on the tab, with a symbol for its kind; spelled out in the tooltip, before what it
+    // is for.
     tabs() {
+      return this.tabList.map((tab) => ({
+        ...tab,
+        tooltip: `${tab.title} – ${tab.hint}`,
+      }))
+    },
+    tabList() {
       return [
+        // The people first: from the call itself, over its own chat, to the chat of the whole
+        // group.
+        ...(this.withParticipants
+          ? [
+              {
+                value: 'participants',
+                label: this.$t('videoCall.chatTabs.participants'),
+                title: this.$t('videoCall.chatTabs.participants'),
+                icon: this.icons.users,
+                hint: this.$t('videoCall.chatTabs.participantsHint'),
+                count: this.participantCount,
+                neutral: true,
+              },
+            ]
+          : []),
         // Beside the participants, the conference chat's tab waits for the chat: before the
         // server has confirmed the participation it would open the group's chat a second time.
         ...(this.withParticipants && !this.chatRoomId
@@ -160,6 +186,8 @@ export default {
               {
                 value: 'call',
                 label: this.$t('videoCall.chatTabs.call'),
+                title: this.$t('videoCall.chatTabs.callTitle'),
+                icon: this.icons.chatBubble,
                 // Held to a narrow tooltip, the hint wraps by itself. The same text is the note
                 // above the chat's messages, where it wraps to the chat's width.
                 hint: this.$t('videoCall.chatTabs.callHint'),
@@ -169,20 +197,11 @@ export default {
         {
           value: 'group',
           label: this.$t('videoCall.chatTabs.group'),
+          title: this.$t('videoCall.chatTabs.groupTitle'),
+          icon: this.icons.chatBubble,
           hint: this.$t('videoCall.chatTabs.groupHint'),
           count: this.groupUnread,
         },
-        ...(this.withParticipants
-          ? [
-              {
-                value: 'participants',
-                label: this.$t('videoCall.chatTabs.participants'),
-                hint: this.$t('videoCall.chatTabs.participantsHint'),
-                count: this.participantCount,
-                neutral: true,
-              },
-            ]
-          : []),
       ]
     },
   },
@@ -269,6 +288,9 @@ export default {
 
 /*  The label gives way when the row gets narrow; the count beside it does not (OsBadge's */
 /*  `count` never shrinks). */
+.call-chat-tabs__icon {
+  flex: 0 0 auto;
+}
 .call-chat-tabs__label {
   min-width: 0;
   white-space: nowrap;

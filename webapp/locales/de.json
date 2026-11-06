@@ -1936,8 +1936,10 @@
     "chatTabs": {
       "call": "Anruf",
       "callHint": "Nur für die Teilnehmer dieses Videoanrufs sichtbar (ohne Benachrichtigung)",
+      "callTitle": "Anrufchat",
       "group": "Gruppe",
       "groupHint": "Für alle Mitglieder der Gruppe sichtbar (mit Benachrichtigung)",
+      "groupTitle": "Gruppenchat",
       "label": "Chat auswählen",
       "participants": "Teilnehmer",
       "participantsHint": "Wer im Anruf ist, und was sich dazu tun lässt"

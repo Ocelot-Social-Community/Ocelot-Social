@@ -874,6 +874,15 @@ export default {
         devices: identities.size,
       }))
     },
+    // What the participant list shows, for the floating window beside the parked call too.
+    participantsView() {
+      return {
+        people: this.people,
+        moderation: this.moderation,
+        mayTakeOver: this.mayTakeOverModeration,
+        locallyMuted: this.locallyMuted,
+      }
+    },
     // Whom the moderation may be handed to: everybody else in the call.
     handoverCandidates() {
       return this.people.filter((person) => !person.isMe)
@@ -1214,6 +1223,12 @@ export default {
     },
   },
   watch: {
+    participantsView: {
+      handler(view) {
+        this.setParticipantsView(view)
+      },
+      immediate: true,
+    },
     // Once, when it arrives; the notice above stays for as long as it waits.
     reloadPending(pending) {
       if (pending) this.$toast.info(this.$t('videoCall.reloadPending'))
@@ -1388,6 +1403,7 @@ export default {
       setGroupChatUnread: 'videoCall/SET_GROUP_CHAT_UNREAD',
       setLastChatTab: 'videoCall/SET_LAST_CHAT_TAB',
       setParticipantsOpen: 'videoCall/SET_PARTICIPANTS_OPEN',
+      setParticipantsView: 'videoCall/SET_PARTICIPANTS_VIEW',
       setPageBars: 'videoCall/SET_PAGE_BARS',
       setShowChat: 'chat/SET_OPEN_CHAT',
     }),
@@ -1633,8 +1649,10 @@ export default {
       // In the parked window there is no sidebar: the list needs the call maximized.
       if (this.minimized && !this.isMobile) this.toggleMinimize()
     },
-    // Shows that person large, as a click on their tile does.
+    // Shows that person large, as a click on their tile does — in the call brought up from the
+    // corner, where it was parked.
     spotlightPerson(userId) {
+      if (this.minimized && !this.isMobile) this.toggleMinimize()
       const tile = this.tiles.find(
         (candidate) =>
           !candidate.isScreen &&
@@ -2310,8 +2328,8 @@ export default {
           if (reason === DisconnectReason.PARTICIPANT_REMOVED) this.tellRemoved()
           this.leave()
         })
-        // The moderation, as the server keeps it, arrives with the room and every change.
-        this.applyRoomMetadata(room.metadata)
+        // The moderation, as the server keeps it, changes with the room's metadata. What it is
+        // already is read once connected, below: before that the room has no metadata yet.
         room.on(RoomEvent.RoomMetadataChanged, (metadata) => {
           if (this.room === room) this.applyRoomMetadata(metadata)
         })
@@ -2370,6 +2388,9 @@ export default {
           peerConnectionTimeout: 5000,
           maxRetries: 0,
         })
+        // Joining a call that runs already, or coming back to it: nothing may change after
+        // this, so what the room says now is all there is to go by.
+        this.applyRoomMetadata(room.metadata)
         if (this.micEnabled) {
           await room.localParticipant.setMicrophoneEnabled(true)
         }

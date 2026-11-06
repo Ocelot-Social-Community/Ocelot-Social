@@ -1936,8 +1936,10 @@
     "chatTabs": {
       "call": "Telefonata",
       "callHint": "E dukshme vetëm për pjesëmarrësit e kësaj telefonate me video (pa njoftime)",
+      "callTitle": "Biseda e thirrjes",
       "group": "Grupi",
       "groupHint": "E dukshme për të gjithë anëtarët e grupit (me njoftime)",
+      "groupTitle": "Biseda e grupit",
       "label": "Zgjidh bisedën",
       "participants": "Pjesëmarrësit",
       "participantsHint": "Kush është në thirrje dhe çfarë mund të bëhet"

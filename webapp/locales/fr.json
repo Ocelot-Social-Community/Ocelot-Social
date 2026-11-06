@@ -1936,8 +1936,10 @@
     "chatTabs": {
       "call": "Appel",
       "callHint": "Visible uniquement par les participants de cet appel vidéo (sans notifications)",
+      "callTitle": "Chat de l’appel",
       "group": "Groupe",
       "groupHint": "Visible par tous les membres du groupe (avec notifications)",
+      "groupTitle": "Chat du groupe",
       "label": "Choisir le chat",
       "participants": "Participants",
       "participantsHint": "Qui est dans l’appel, et ce qu’on peut faire"

@@ -202,8 +202,9 @@ describe('CallChatTabs', () => {
   })
 
   describe('the participants beside the chats', () => {
-    it('are a third tab in the call, with how many are in it', () => {
+    it('are the first tab in the call, with how many are in it', () => {
       wrapper = Wrapper({}, { withParticipants: true, participantCount: 4 })
+      expect(wrapper.vm.tabs.map(({ value }) => value)).toEqual(['participants', 'call', 'group'])
       expect(tab(wrapper, 'participants').exists()).toBe(true)
       expect(wrapper.find('[data-test="call-chat-tab-count-participants"]').exists()).toBe(true)
     })
@@ -227,6 +228,25 @@ describe('CallChatTabs', () => {
     it('are the active tab while open', () => {
       wrapper = Wrapper({ participantsOpen: true }, { withParticipants: true })
       expect(tab(wrapper, 'participants').attributes('aria-selected')).toBe('true')
+    })
+
+    it('say their full name first in the tooltip, and to a screen reader', () => {
+      wrapper = Wrapper({}, { withParticipants: true })
+      expect(wrapper.vm.tabs.map(({ title, tooltip }) => [title, tooltip])).toEqual([
+        [
+          'videoCall.chatTabs.participants',
+          'videoCall.chatTabs.participants – videoCall.chatTabs.participantsHint',
+        ],
+        [
+          'videoCall.chatTabs.callTitle',
+          'videoCall.chatTabs.callTitle – videoCall.chatTabs.callHint',
+        ],
+        [
+          'videoCall.chatTabs.groupTitle',
+          'videoCall.chatTabs.groupTitle – videoCall.chatTabs.groupHint',
+        ],
+      ])
+      expect(tab(wrapper, 'group').attributes('aria-label')).toBe('videoCall.chatTabs.groupTitle')
     })
 
     it('hold the conference chat back until the server has confirmed it', () => {

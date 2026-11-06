@@ -23,6 +23,10 @@ export const state = () => {
     // Whether the call's sidebar shows its participants rather than one of its chats. The
     // third tab beside the two chats; the chat store knows nothing of it.
     participantsOpen: false,
+    // What the participant list shows, as the call keeps it: { people, moderation,
+    // mayTakeOver, locallyMuted }. Here for the floating window beside the parked call, which
+    // shows the list without being the call.
+    participantsView: null,
     // 'idle' | 'prejoin' | 'connecting' | 'in-call' — mirrors VideoCall's local
     // phase so the layout can decide where the chat lives.
     phase: 'idle',
@@ -67,6 +71,7 @@ export const mutations = {
     state.conferenceUnread = 0
     state.groupChatUnread = 0
     state.participantsOpen = false
+    state.participantsView = null
   },
   // Update group info post-hoc (e.g. after fetching by ID for a direct URL).
   SET_GROUP_INFO(state, { groupId, groupName, groupSlug, groupAvatar }) {
@@ -89,6 +94,7 @@ export const mutations = {
     state.conferenceUnread = 0
     state.groupChatUnread = 0
     state.participantsOpen = false
+    state.participantsView = null
   },
   SET_MINIMIZED(state, minimized) {
     state.minimized = !!minimized
@@ -110,6 +116,9 @@ export const mutations = {
   },
   SET_GROUP_CHAT_UNREAD(state, count) {
     state.groupChatUnread = Number(count) || 0
+  },
+  SET_PARTICIPANTS_VIEW(state, view) {
+    state.participantsView = view || null
   },
   SET_PARTICIPANTS_OPEN(state, open) {
     state.participantsOpen = !!open
@@ -166,6 +175,9 @@ export const getters = {
   },
   participantsOpen(state) {
     return state.participantsOpen
+  },
+  participantsView(state) {
+    return state.participantsView
   },
   phase(state) {
     return state.phase
