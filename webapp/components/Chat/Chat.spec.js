@@ -1710,6 +1710,19 @@ describe('Chat.vue', () => {
       expect(wrapper.vm.rooms).toEqual([])
     })
 
+    it('asks for such a conference chat only once, not on every message', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      wrapper.vm.rooms = []
+      mocks.$apollo.query.mockClear()
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [callRoom()] } })
+      const message = { data: { chatMessageAdded: mockMessage({ room: { id: 'call-room' } }) } }
+      await wrapper.vm.chatMessageAdded(message)
+      await wrapper.vm.chatMessageAdded(message)
+      expect(mocks.$apollo.query).toHaveBeenCalledTimes(1)
+      expect(wrapper.vm.rooms).toEqual([])
+    })
+
     describe('"no messages" text of a room opened on its own', () => {
       // The library holds the text back while the rooms are loading.
       it('is not held back for the chat of a group', async () => {
