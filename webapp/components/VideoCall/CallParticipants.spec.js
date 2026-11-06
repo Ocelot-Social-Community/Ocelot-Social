@@ -323,6 +323,12 @@ describe('CallParticipants', () => {
       await wrapper.find('[data-test="call-participants-mute-all"]').trigger('click')
       expect(wrapper.vm.spared).toEqual(['me', 'loud'])
       expect(wrapper.vm.muteCount).toBe(1)
+      // Chosen right in the list: a tick per row, the floor in place of the menu.
+      expect(wrapper.find('[data-test="call-participants-mute-all"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="mute-all-spare-loud"]').element.checked).toBe(true)
+      expect(wrapper.find('[data-test="mute-all-spare-bob"]').element.checked).toBe(false)
+      expect(wrapper.find('[data-test="mute-all-floor-bob"]').exists()).toBe(true)
+      expect(wrapper.find('[data-test="call-participant-menu-bob"]').exists()).toBe(false)
       await wrapper.find('[data-test="mute-all-confirm"]').trigger('click')
       await flushPromises()
       expect(mocks.$apollo.mutate.mock.calls[0][0].variables).toEqual({
@@ -330,8 +336,32 @@ describe('CallParticipants', () => {
         exceptUserIds: ['me', 'loud'],
         floorUserIds: [],
       })
-      expect(wrapper.vm.dialog).toBeNull()
+      expect(wrapper.vm.muting).toBe(false)
+      expect(wrapper.find('[data-test="mute-all-spare-bob"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="call-participant-menu-bob"]').exists()).toBe(true)
       expect(wrapper.emitted('switch-off')).toBeUndefined()
+    })
+
+    it('goes back to the list as it was when cancelled, by button or by Escape', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      wrapper.vm.openMuteAll()
+      await wrapper.vm.$nextTick()
+      await wrapper.find('[data-test="mute-all-cancel"]').trigger('click')
+      expect(wrapper.vm.muting).toBe(false)
+      expect(wrapper.find('[data-test="call-participants-mute-all"]').exists()).toBe(true)
+      wrapper.vm.openMuteAll()
+      await wrapper.find('section').trigger('keydown.esc')
+      expect(wrapper.vm.muting).toBe(false)
+      expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+    })
+
+    it('ends the choice when one no longer moderates', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      wrapper.vm.openMuteAll()
+      await wrapper.setProps({ moderation: { moderators: [], everyone: true, speakers: [] } })
+      expect(wrapper.vm.muting).toBe(true)
+      await wrapper.setProps({ moderation: { moderators: ['bob'], everyone: false, speakers: [] } })
+      expect(wrapper.vm.muting).toBe(false)
     })
 
     it('switches off the own microphone too when oneself is not spared', async () => {
@@ -347,7 +377,7 @@ describe('CallParticipants', () => {
       mocks.$apollo.mutate.mockRejectedValueOnce(new Error('no'))
       wrapper.vm.openMuteAll()
       await wrapper.vm.muteAll()
-      expect(wrapper.vm.dialog).toBe('muteAll')
+      expect(wrapper.vm.muting).toBe(true)
       expect(wrapper.emitted('switch-off')).toBeUndefined()
     })
 

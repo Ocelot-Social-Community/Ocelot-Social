@@ -1,10 +1,41 @@
 <template>
-  <section class="call-participants" :aria-label="$t('videoCall.participants.label')">
+  <section
+    class="call-participants"
+    :aria-label="$t('videoCall.participants.label')"
+    @keydown.esc="muting && stopMuting()"
+  >
     <!--
       What concerns the whole call: the moderation's own controls, and the search once the list
-      is long. Somebody who may step into the moderation is offered that instead.
+      is long. Somebody who may step into the moderation is offered that instead. While "mute
+      all" is being chosen, its question and answers take the controls' place, above the search.
     -->
     <div v-if="isModerator || mayTakeOver || searchable" class="call-participants__toolbar">
+      <div v-if="muting" class="call-participants__muting" data-test="call-participants-muting">
+        <h3 class="call-participants__muting-title">
+          {{ $t('videoCall.participants.muteAllExcept') }}
+        </h3>
+        <div class="call-participants__muting-actions">
+          <os-button
+            data-test="mute-all-cancel"
+            appearance="outline"
+            variant="primary"
+            size="sm"
+            @click="stopMuting"
+          >
+            {{ $t('actions.cancel') }}
+          </os-button>
+          <os-button
+            data-test="mute-all-confirm"
+            variant="danger"
+            size="sm"
+            :loading="busy"
+            :disabled="muteCount === 0 && floorUnchanged"
+            @click="muteAll"
+          >
+            {{ $t('videoCall.participants.muteCount', { count: muteCount }) }}
+          </os-button>
+        </div>
+      </div>
       <input
         v-if="searchable"
         v-model="search"
@@ -14,7 +45,7 @@
         :placeholder="$t('videoCall.participants.search')"
         :aria-label="$t('videoCall.participants.search')"
       />
-      <div class="call-participants__toolbar-actions">
+      <div v-if="!muting" class="call-participants__toolbar-actions">
         <os-button
           v-if="isModerator"
           data-test="call-participants-mute-all"
@@ -65,6 +96,16 @@
         :class="['call-participants__row', { 'call-participants__row--speaking': person.speaking }]"
         :data-test="'call-participant-' + person.userId"
       >
+        <!-- Ticked: spared by "mute all". -->
+        <input
+          v-if="muting"
+          v-model="spared"
+          type="checkbox"
+          class="call-participants__spare"
+          :value="person.userId"
+          :aria-label="$t('videoCall.participants.spare', { name: person.name })"
+          :data-test="'mute-all-spare-' + person.userId"
+        />
         <span class="call-participants__avatar">
           <avatar-image :profile="person.profile" size="small" loading="eager" />
         </span>
@@ -101,7 +142,25 @@
           <os-icon v-if="locallyMuted[person.userId]" :icon="icons.volumeOff" />
         </span>
         <span class="call-participants__sr-only">{{ stateLabel(person) }}</span>
-        <dropdown class="call-participants__menu" placement="bottom-end" offset="5">
+        <button
+          v-if="muting"
+          type="button"
+          :class="[
+            'call-participants__floor',
+            { 'call-participants__floor--on': floor.includes(person.userId) },
+          ]"
+          :aria-pressed="floor.includes(person.userId) ? 'true' : 'false'"
+          :data-test="'mute-all-floor-' + person.userId"
+          @click="toggleFloor(person.userId)"
+        >
+          <os-icon :icon="icons.microphone" />
+          {{
+            floor.includes(person.userId)
+              ? $t('videoCall.participants.hasFloor')
+              : $t('videoCall.participants.giveFloor')
+          }}
+        </button>
+        <dropdown v-else class="call-participants__menu" placement="bottom-end" offset="5">
           <template #default="{ toggleMenu }">
             <os-button
               :data-test="'call-participant-menu-' + person.userId"
@@ -137,112 +196,37 @@
     </ul>
 
     <!--
-      The two questions a moderator is asked before acting on more than a click's worth: whom
-      "mute all" spares (and who gets the floor with it), and whether somebody is really to be
-      removed. Over the list, inside the sidebar, so the call stays in view.
+      The question before removing somebody, over the list, inside the sidebar, so the call stays
+      in view.
     -->
     <div
-      v-if="dialog"
+      v-if="dialog === 'remove' && removing"
       class="call-participants__dialog"
       role="dialog"
       aria-modal="true"
-      :aria-label="
-        dialog === 'muteAll'
-          ? $t('videoCall.participants.muteAll')
-          : $t('videoCall.participants.remove')
-      "
+      :aria-label="$t('videoCall.participants.remove')"
       data-test="call-participants-dialog"
       @keydown.esc="closeDialog"
     >
-      <template v-if="dialog === 'muteAll'">
-        <h3 class="call-participants__dialog-title">
-          {{ $t('videoCall.participants.muteAllExcept') }}
-        </h3>
-        <ul class="call-participants__choices">
-          <li
-            v-for="person in ordered"
-            :key="person.userId"
-            :class="[
-              'call-participants__choice',
-              { 'call-participants__choice--muted': !person.micOn },
-            ]"
-          >
-            <label class="call-participants__choice-label">
-              <input
-                v-model="spared"
-                type="checkbox"
-                :value="person.userId"
-                :data-test="'mute-all-spare-' + person.userId"
-              />
-              <span>{{ person.isMe ? $t('videoCall.you') : person.name }}</span>
-              <os-icon
-                :icon="person.micOn ? icons.microphone : icons.microphoneSlash"
-                :class="[
-                  'call-participants__mic',
-                  {
-                    'call-participants__off': !person.micOn,
-                    'call-participants__mic--speaking': person.speaking,
-                  },
-                ]"
-                :aria-label="stateLabel(person)"
-              />
-            </label>
-            <button
-              type="button"
-              :class="[
-                'call-participants__floor',
-                { 'call-participants__floor--on': floor.includes(person.userId) },
-              ]"
-              :aria-pressed="floor.includes(person.userId) ? 'true' : 'false'"
-              :data-test="'mute-all-floor-' + person.userId"
-              @click="toggleFloor(person.userId)"
-            >
-              <os-icon :icon="icons.microphone" />
-              {{
-                floor.includes(person.userId)
-                  ? $t('videoCall.participants.hasFloor')
-                  : $t('videoCall.participants.giveFloor')
-              }}
-            </button>
-          </li>
-        </ul>
-        <div class="call-participants__dialog-actions">
-          <os-button appearance="outline" variant="primary" size="sm" @click="closeDialog">
-            {{ $t('actions.cancel') }}
-          </os-button>
-          <os-button
-            data-test="mute-all-confirm"
-            variant="danger"
-            size="sm"
-            :loading="busy"
-            :disabled="muteCount === 0 && floorUnchanged"
-            @click="muteAll"
-          >
-            {{ $t('videoCall.participants.muteCount', { count: muteCount }) }}
-          </os-button>
-        </div>
-      </template>
-      <template v-else-if="dialog === 'remove' && removing">
-        <h3 class="call-participants__dialog-title">
-          {{ $t('videoCall.participants.removeQuestion', { name: removing.name }) }}
-        </h3>
-        <p class="call-participants__dialog-text">
-          {{ $t('videoCall.participants.removeExplanation') }}
-        </p>
-        <div class="call-participants__dialog-actions">
-          <os-button appearance="outline" variant="primary" @click="closeDialog">
-            {{ $t('actions.cancel') }}
-          </os-button>
-          <os-button
-            data-test="remove-confirm"
-            variant="danger"
-            :loading="busy"
-            @click="remove(removing)"
-          >
-            {{ $t('videoCall.participants.remove') }}
-          </os-button>
-        </div>
-      </template>
+      <h3 class="call-participants__dialog-title">
+        {{ $t('videoCall.participants.removeQuestion', { name: removing.name }) }}
+      </h3>
+      <p class="call-participants__dialog-text">
+        {{ $t('videoCall.participants.removeExplanation') }}
+      </p>
+      <div class="call-participants__dialog-actions">
+        <os-button appearance="outline" variant="primary" @click="closeDialog">
+          {{ $t('actions.cancel') }}
+        </os-button>
+        <os-button
+          data-test="remove-confirm"
+          variant="danger"
+          :loading="busy"
+          @click="remove(removing)"
+        >
+          {{ $t('videoCall.participants.remove') }}
+        </os-button>
+      </div>
     </div>
   </section>
 </template>
@@ -296,6 +280,8 @@ export default {
       rights: {},
       dialog: null,
       removing: null,
+      // Whether "mute all" is being chosen, right in the list.
+      muting: false,
       spared: [],
       floor: [],
     }
@@ -356,6 +342,12 @@ export default {
       const before = [...this.moderation.speakers].sort()
       const after = [...this.floor].sort()
       return before.length === after.length && before.every((id, i) => id === after[i])
+    },
+  },
+  watch: {
+    // Whoever no longer moderates has nothing left to choose.
+    isModerator(moderating) {
+      if (!moderating) this.stopMuting()
     },
   },
   methods: {
@@ -598,7 +590,10 @@ export default {
         ? []
         : this.people.filter((person) => person.speaking && !person.isMe).map((p) => p.userId)
       this.spared = [this.meId, ...this.floor, ...speaking].filter(Boolean)
-      this.dialog = 'muteAll'
+      this.muting = true
+    },
+    stopMuting() {
+      this.muting = false
     },
     // Giving the floor spares; taking it back leaves the tick for the moderator to clear.
     toggleFloor(userId) {
@@ -619,7 +614,7 @@ export default {
       if (!this.spared.includes(this.meId) && !this.floor.includes(this.meId)) {
         this.$emit('switch-off', 'mic')
       }
-      this.closeDialog()
+      this.stopMuting()
     },
     closeDialog() {
       this.dialog = null
@@ -743,34 +738,6 @@ export default {
   margin: 0;
   color: var(--text-color-soft);
 }
-.call-participants__choices {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.call-participants__choice {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-x-small);
-  padding: var(--space-xx-small) 0;
-}
-.call-participants__choice--muted {
-  color: var(--text-color-soft);
-}
-.call-participants__choice-label {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xx-small);
-  min-width: 0;
-}
-.call-participants__mic {
-  flex: 0 0 auto;
-  color: var(--text-color-soft);
-}
-.call-participants__mic--speaking {
-  color: var(--color-primary);
-}
 .call-participants__floor {
   display: inline-flex;
   align-items: center;
@@ -786,6 +753,27 @@ export default {
 .call-participants__floor--on {
   border-color: var(--color-primary);
   color: var(--color-primary);
+}
+.call-participants__muting {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-x-small);
+}
+.call-participants__muting-title {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: bold;
+}
+.call-participants__muting-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-x-small);
+}
+.call-participants__spare {
+  flex: 0 0 auto;
+}
+.call-participants__floor {
+  flex: 0 0 auto;
 }
 .call-participants__dialog-actions {
   display: flex;
