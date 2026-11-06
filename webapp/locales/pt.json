@@ -1955,6 +1955,8 @@
       "turnOff": "{device}: desligar",
       "turnOn": "{device}: ligar"
     },
+    "cpuRelief": "Seu dispositivo está sobrecarregado — as câmeras funcionam com qualidade reduzida para o som continuar claro.",
+    "cpuStrained": "Seu dispositivo não está dando conta dos vídeos. Uma qualidade mais baixa mantém o som claro.",
     "deviceSettings": {
       "button": "Dispositivos",
       "dtx": "Não transmitir as pausas na fala",
@@ -1964,6 +1966,7 @@
       "title": "Configurações dos dispositivos"
     },
     "dialogLabel": "Videochamada de grupo",
+    "dismissNotice": "Ocultar",
     "enableAudio": "Ativar som",
     "enterFullscreen": "Tela cheia",
     "errorBackToPrejoin": "Alterar configurações",
@@ -1997,6 +2000,7 @@
     "hideBars": "Ocultar as barras",
     "hideNotices": "Ocultar avisos",
     "leave": "Sair da chamada",
+    "lowerQuality": "Baixar qualidade",
     "maximize": "Maximizar",
     "micMuted": "Microfone desligado",
     "micNoSignal": "Seu microfone não está transmitindo som — os outros não ouvem você.",
@@ -2047,6 +2051,7 @@
     "reconnecting": "Conexão perdida — reconectando…",
     "reloadPending": "A plataforma tem um novo design. Ele será aplicado assim que você sair da chamada.",
     "restartMic": "Reiniciar microfone",
+    "restoreQuality": "Restaurar qualidade",
     "screenShare": "Tela",
     "screenShareEnded": "Compartilhamento de tela encerrado",
     "showBars": "Mostrar as barras",

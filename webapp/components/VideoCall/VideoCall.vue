@@ -282,6 +282,43 @@
                   ]"
                   @action="showVideos"
                 />
+                <!--
+                  Why the cameras got coarse, and the way back. Nothing tells us when the CPU has
+                  room again — the relief itself takes away the load it was measured by — so taking
+                  it back is the user's call, not a guess of ours that could flip back and forth.
+                -->
+                <call-notice
+                  v-if="cpuConstrained"
+                  data-test="video-call-cpu-relief"
+                  :message="$t('videoCall.cpuRelief')"
+                  :actions="[
+                    {
+                      key: 'restore',
+                      label: $t('videoCall.restoreQuality'),
+                      dataTest: 'video-call-restore-quality',
+                      disabled: restoringQuality,
+                    },
+                  ]"
+                  @action="restoreVideoQuality"
+                />
+                <call-notice
+                  v-else-if="cpuStrained"
+                  data-test="video-call-cpu-strained"
+                  :message="$t('videoCall.cpuStrained')"
+                  :actions="[
+                    {
+                      key: 'lower',
+                      label: $t('videoCall.lowerQuality'),
+                      dataTest: 'video-call-lower-quality',
+                    },
+                    {
+                      key: 'dismiss',
+                      label: $t('videoCall.dismissNotice'),
+                      dataTest: 'video-call-dismiss-cpu',
+                    },
+                  ]"
+                  @action="onCpuStrainedAction"
+                />
               </div>
             </div>
             <!--
@@ -647,6 +684,7 @@ export default {
       micDeviceId: null,
       speakerDeviceId: null,
       Track: null,
+      VideoQuality: null,
       activeSpeakerIds: [],
       spotlightKey: null,
       stageWidth: 0,
@@ -673,9 +711,15 @@ export default {
       // videos back, so we stop deciding for them until the next call.
       audioOnly: false,
       audioOnlyDismissed: false,
-      // Our machine cannot keep up with encoding and decoding video. Holds for
-      // the rest of the call, like in LiveKit's own app.
+      // Our machine cannot keep up with encoding and decoding video, and the
+      // cameras give way. Holds until the user takes it back.
       cpuConstrained: false,
+      // The user took the relief back: for the rest of the call a CPU limit
+      // only offers it again (cpuStrained), it does not decide for them.
+      cpuReliefDeclined: false,
+      cpuStrained: false,
+      // Our camera is being started anew with its full quality.
+      restoringQuality: false,
       showDeviceSettings: false,
       // What the browser lists, to put a name to the devices in use.
       knownDevices: [],
@@ -974,6 +1018,8 @@ export default {
         this.micProblem ||
         this.reconnecting ||
         this.audioOnly ||
+        this.cpuConstrained ||
+        this.cpuStrained ||
         this.reloadPending
       )
     },
@@ -1805,6 +1851,7 @@ export default {
           DisconnectReason,
         } = livekit
         this.Track = Track
+        this.VideoQuality = VideoQuality
 
         const room = new Room({
           adaptiveStream: true,
@@ -1820,6 +1867,9 @@ export default {
         // Reset only now: until the line below, this.room is still the previous
         // room, and its late CPU event would pass the room check in the listener.
         this.cpuConstrained = false
+        this.cpuReliefDeclined = false
+        this.cpuStrained = false
+        this.restoringQuality = false
         this.room = room
 
         const onAny = () => this.refreshTiles()
@@ -1828,7 +1878,10 @@ export default {
         room.on(RoomEvent.TrackSubscribed, (_track, pub) => {
           // Subscribed before the unsubscribe of audio-only mode took hold.
           if (this.audioOnly) this.applyAudioOnly()
-          if (this.cpuConstrained) this.lowerCameraQuality(pub, VideoQuality)
+          if (this.cpuConstrained) this.capCameraQuality(pub, VideoQuality.LOW)
+          // Was lowered before the user took the relief back — audio-only mode
+          // had it unsubscribed then, out of reach.
+          else if (this.cpuReliefDeclined) this.capCameraQuality(pub, VideoQuality.HIGH)
           onAny()
         })
         // Encoding and decoding video can eat the CPU to the point where the
@@ -1842,14 +1895,13 @@ export default {
           if (this.room !== room || this.cpuConstrained) return
           // A deliberate diagnosis: the only trace of why the videos got coarse.
           // eslint-disable-next-line no-console
-          console.warn('[video-call] CPU constrained, lowering the video quality of the cameras')
-          this.cpuConstrained = true
-          this.relieveOwnCamera()
-          for (const participant of room.remoteParticipants.values()) {
-            for (const pub of participant.videoTrackPublications.values()) {
-              this.lowerCameraQuality(pub, VideoQuality)
-            }
-          }
+          console.warn(
+            this.cpuReliefDeclined
+              ? '[video-call] CPU constrained again, offering to lower the video quality'
+              : '[video-call] CPU constrained, lowering the video quality of the cameras',
+          )
+          if (this.cpuReliefDeclined) this.cpuStrained = true
+          else this.relieveCpu()
         })
         // A camera published while we are in audio-only mode would otherwise
         // be auto-subscribed and eat the bandwidth we just freed.
@@ -2443,6 +2495,65 @@ export default {
       if (this.audioWatchdog) this.audioWatchdog.stop()
       this.audioWatchdog = null
     },
+    relieveCpu() {
+      const room = this.room
+      if (!room) return
+      this.cpuConstrained = true
+      this.cpuReliefDeclined = false
+      this.cpuStrained = false
+      this.relieveOwnCamera()
+      for (const participant of room.remoteParticipants.values()) {
+        for (const pub of participant.videoTrackPublications.values()) {
+          this.capCameraQuality(pub, this.VideoQuality.LOW)
+        }
+      }
+    },
+    onCpuStrainedAction(key) {
+      if (key === 'lower') this.relieveCpu()
+      else this.cpuStrained = false
+    },
+    async restoreVideoQuality() {
+      const room = this.room
+      const Track = this.Track
+      if (!room || !Track || this.restoringQuality) return
+      this.cpuConstrained = false
+      this.cpuReliefDeclined = true
+      // Only a cap: adaptiveStream keeps sizing each camera to its tile.
+      for (const participant of room.remoteParticipants.values()) {
+        for (const pub of participant.videoTrackPublications.values()) {
+          this.capCameraQuality(pub, this.VideoQuality.HIGH)
+        }
+      }
+      const pub = room.localParticipant.getTrackPublication(Track.Source.Camera)
+      const track = pub && pub.track
+      if (!track) return
+      // LiveKit has no way back from prioritizePerformance(): the track keeps
+      // its performance mode for good, and with it dynacast and the encoder
+      // adjustments stay off — publishing the same track anew changes nothing.
+      // So the relieved track goes, and a fresh one takes its place. A camera
+      // switched off right now gets its fresh track when it is switched on.
+      const restart = this.cameraEnabled
+      this.restoringQuality = true
+      if (restart) this.deviceStarts('videoinput')
+      try {
+        await room.localParticipant.unpublishTrack(track, true)
+        if (restart && this.room === room) {
+          await room.localParticipant.setCameraEnabled(
+            true,
+            this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : undefined,
+          )
+        }
+      } catch (err) {
+        if (this.room === room) this.showDeviceErrorToast('camera', err)
+      } finally {
+        if (restart) this.deviceStarted('videoinput')
+        if (this.room === room) {
+          this.restoringQuality = false
+          this.cameraEnabled = !!room.localParticipant.isCameraEnabled
+          this.refreshTiles()
+        }
+      }
+    },
     relieveOwnCamera() {
       const pub = this.room.localParticipant.getTrackPublication(this.Track.Source.Camera)
       const track = pub && pub.track
@@ -2450,9 +2561,16 @@ export default {
       // Rejects when the track is not being sent (yet) — nothing to relieve then.
       track.prioritizePerformance().catch(() => {})
     },
-    lowerCameraQuality(pub, VideoQuality) {
-      if (pub && pub.source === this.Track.Source.Camera && pub.setVideoQuality) {
-        pub.setVideoQuality(VideoQuality.LOW)
+    capCameraQuality(pub, quality) {
+      // Not for a camera unsubscribed by audio-only mode: LiveKit refuses it,
+      // and TrackSubscribed applies the cap once it is back.
+      if (
+        pub &&
+        pub.source === this.Track.Source.Camera &&
+        pub.isDesired !== false &&
+        pub.setVideoQuality
+      ) {
+        pub.setVideoQuality(quality)
       }
     },
     resetAudioOnly() {
