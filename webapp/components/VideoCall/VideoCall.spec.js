@@ -3071,6 +3071,193 @@ describe('VideoCall', () => {
       await wrapper.vm.connect()
       expect(wrapper.vm.cpuConstrained).toBe(false)
     })
+
+    it('leaves a camera unsubscribed by audio-only mode to its resubscription', async () => {
+      const { camera, constrained } = await connected()
+      camera.isDesired = false
+      constrained()
+      expect(camera.setVideoQuality).not.toHaveBeenCalled()
+    })
+
+    describe('taking the relief back', () => {
+      const withOwnCamera = (room, { enabled }) => {
+        const freshCamera = { prioritizePerformance: jest.fn().mockResolvedValue() }
+        room.localParticipant.unpublishTrack = jest.fn().mockResolvedValue()
+        room.localParticipant.isCameraEnabled = enabled
+        return freshCamera
+      }
+
+      it('says why the cameras got coarse and offers the way back, on the videos', async () => {
+        const { wrapper, constrained } = await connected()
+        expect(wrapper.find('[data-test="video-call-cpu-relief"]').exists()).toBe(false)
+        constrained()
+        await wrapper.vm.$nextTick()
+        // In the stage, which anchors it — not over the control bar.
+        expect(
+          wrapper.find('.video-call__stage [data-test="video-call-cpu-relief"]').exists(),
+        ).toBe(true)
+        expect(wrapper.find('[data-test="video-call-cpu-relief"]').text()).toContain(
+          'videoCall.cpuRelief',
+        )
+        expect(wrapper.find('[data-test="video-call-restore-quality"]').exists()).toBe(true)
+      })
+
+      it('lifts the cap of every camera and starts our own one anew', async () => {
+        const { wrapper, room, camera, screen, ownCamera, constrained } = await connected()
+        constrained()
+        withOwnCamera(room, { enabled: true })
+        wrapper.setData({ cameraEnabled: true, cameraDeviceId: 'cam-1' })
+        const restoring = wrapper.vm.restoreVideoQuality()
+        expect(wrapper.vm.restoringQuality).toBe(true)
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(1)
+        await restoring
+        expect(camera.setVideoQuality).toHaveBeenLastCalledWith(2)
+        expect(screen.setVideoQuality).not.toHaveBeenCalled()
+        // A fresh track: the relieved one stays in performance mode for good.
+        expect(room.localParticipant.unpublishTrack).toHaveBeenCalledWith(ownCamera, true)
+        expect(room.localParticipant.setCameraEnabled).toHaveBeenLastCalledWith(true, {
+          deviceId: 'cam-1',
+        })
+        expect(ownCamera.prioritizePerformance).toHaveBeenCalledTimes(1)
+        expect(wrapper.vm.cpuConstrained).toBe(false)
+        expect(wrapper.vm.restoringQuality).toBe(false)
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+        expect(wrapper.vm.cameraEnabled).toBe(true)
+      })
+
+      it('restarts the camera on the default device when none was picked', async () => {
+        const { wrapper, room, constrained } = await connected()
+        constrained()
+        withOwnCamera(room, { enabled: true })
+        wrapper.setData({ cameraEnabled: true, cameraDeviceId: null })
+        await wrapper.vm.restoreVideoQuality()
+        expect(room.localParticipant.setCameraEnabled).toHaveBeenLastCalledWith(true, undefined)
+      })
+
+      it('leaves a camera switched off off, its fresh track comes when it is switched on', async () => {
+        const { wrapper, room, ownCamera, constrained } = await connected()
+        constrained()
+        withOwnCamera(room, { enabled: false })
+        wrapper.setData({ cameraEnabled: false })
+        room.localParticipant.setCameraEnabled.mockClear()
+        await wrapper.vm.restoreVideoQuality()
+        expect(room.localParticipant.unpublishTrack).toHaveBeenCalledWith(ownCamera, true)
+        expect(room.localParticipant.setCameraEnabled).not.toHaveBeenCalled()
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+        expect(wrapper.vm.cameraEnabled).toBe(false)
+      })
+
+      it('only lifts the remote caps when we send no camera', async () => {
+        const { wrapper, room, camera, constrained } = await connected()
+        constrained()
+        room.localParticipant.getTrackPublication.mockReturnValue(undefined)
+        room.localParticipant.unpublishTrack = jest.fn()
+        await wrapper.vm.restoreVideoQuality()
+        expect(camera.setVideoQuality).toHaveBeenLastCalledWith(2)
+        expect(room.localParticipant.unpublishTrack).not.toHaveBeenCalled()
+        expect(wrapper.vm.restoringQuality).toBe(false)
+      })
+
+      it('says so when the camera does not come back', async () => {
+        const { wrapper, room, constrained } = await connected()
+        constrained()
+        withOwnCamera(room, { enabled: false })
+        wrapper.setData({ cameraEnabled: true })
+        room.localParticipant.setCameraEnabled.mockRejectedValue(new Error('denied'))
+        const toast = jest.spyOn(wrapper.vm, 'showDeviceErrorToast').mockImplementation(() => {})
+        await wrapper.vm.restoreVideoQuality()
+        expect(toast).toHaveBeenCalledWith('camera', expect.any(Error))
+        expect(wrapper.vm.cameraEnabled).toBe(false)
+        expect(wrapper.vm.restoringQuality).toBe(false)
+      })
+
+      it('does nothing twice at once, nor outside a call', async () => {
+        const { wrapper, room, constrained } = await connected()
+        constrained()
+        withOwnCamera(room, { enabled: true })
+        wrapper.setData({ restoringQuality: true })
+        await wrapper.vm.restoreVideoQuality()
+        expect(room.localParticipant.unpublishTrack).not.toHaveBeenCalled()
+        const idle = factory({ show: false }).wrapper
+        await idle.vm.restoreVideoQuality()
+        idle.vm.relieveCpu()
+        expect(idle.vm.cpuConstrained).toBe(false)
+      })
+
+      it('leaves a call that was left meanwhile alone', async () => {
+        const { wrapper, room, constrained } = await connected()
+        constrained()
+        withOwnCamera(room, { enabled: true })
+        wrapper.setData({ cameraEnabled: true })
+        room.localParticipant.unpublishTrack.mockImplementation(async () => {
+          wrapper.vm.room = null
+          throw new Error('gone')
+        })
+        room.localParticipant.setCameraEnabled.mockClear()
+        const toast = jest.spyOn(wrapper.vm, 'showDeviceErrorToast').mockImplementation(() => {})
+        await wrapper.vm.restoreVideoQuality()
+        expect(room.localParticipant.setCameraEnabled).not.toHaveBeenCalled()
+        expect(toast).not.toHaveBeenCalled()
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+      })
+
+      it('lifts the cap of a camera subscribed again only afterwards', async () => {
+        const { wrapper, room, constrained } = await connected()
+        constrained()
+        room.localParticipant.getTrackPublication.mockReturnValue(undefined)
+        await wrapper.vm.restoreVideoQuality()
+        const later = remoteVideo('camera')
+        room.handlers.TrackSubscribed({}, later)
+        expect(later.setVideoQuality).toHaveBeenCalledWith(2)
+      })
+
+      it('afterwards only offers the relief again, and applies it on request', async () => {
+        const { wrapper, room, camera, ownCamera, constrained } = await connected()
+        constrained()
+        room.localParticipant.getTrackPublication.mockReturnValue(undefined)
+        await wrapper.vm.restoreVideoQuality()
+        camera.setVideoQuality.mockClear()
+        constrained()
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.cpuConstrained).toBe(false)
+        expect(camera.setVideoQuality).not.toHaveBeenCalled()
+        expect(warn).toHaveBeenLastCalledWith(expect.stringContaining('offering'))
+        expect(wrapper.find('[data-test="video-call-cpu-strained"]').exists()).toBe(true)
+
+        room.localParticipant.getTrackPublication.mockReturnValue({ track: ownCamera })
+        await wrapper.find('[data-test="video-call-lower-quality"]').trigger('click')
+        expect(wrapper.vm.cpuConstrained).toBe(true)
+        expect(wrapper.vm.cpuStrained).toBe(false)
+        expect(camera.setVideoQuality).toHaveBeenCalledWith(0)
+        expect(ownCamera.prioritizePerformance).toHaveBeenCalledTimes(2)
+        expect(wrapper.find('[data-test="video-call-cpu-relief"]').exists()).toBe(true)
+      })
+
+      it('lets the offer be dismissed', async () => {
+        const { wrapper, room, constrained } = await connected()
+        constrained()
+        room.localParticipant.getTrackPublication.mockReturnValue(undefined)
+        await wrapper.vm.$nextTick()
+        await wrapper.find('[data-test="video-call-restore-quality"]').trigger('click')
+        await flushPromises()
+        constrained()
+        await wrapper.vm.$nextTick()
+        await wrapper.find('[data-test="video-call-dismiss-cpu"]').trigger('click')
+        expect(wrapper.vm.cpuStrained).toBe(false)
+        expect(wrapper.find('[data-test="video-call-cpu-strained"]').exists()).toBe(false)
+      })
+
+      it('starts the next call deciding for the user again', async () => {
+        const { wrapper, room, constrained } = await connected()
+        constrained()
+        room.localParticipant.getTrackPublication.mockReturnValue(undefined)
+        await wrapper.vm.restoreVideoQuality()
+        constrained()
+        await wrapper.vm.connect()
+        expect(wrapper.vm.cpuReliefDeclined).toBe(false)
+        expect(wrapper.vm.cpuStrained).toBe(false)
+      })
+    })
   })
 
   describe('refreshTiles (full tile build)', () => {

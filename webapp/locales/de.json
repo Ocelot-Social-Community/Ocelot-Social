@@ -1953,12 +1953,15 @@
       "turnOff": "{device}: ausschalten",
       "turnOn": "{device}: einschalten"
     },
+    "cpuRelief": "Dein Gerät ist ausgelastet – die Kameras laufen in geringerer Qualität, damit der Ton klar bleibt.",
+    "cpuStrained": "Dein Gerät kommt mit den Videos nicht hinterher. Eine geringere Qualität hält den Ton klar.",
     "deviceSettings": {
       "button": "Geräte",
       "speakerError": "Der Lautsprecher konnte nicht gewechselt werden.",
       "title": "Geräte-Einstellungen"
     },
     "dialogLabel": "Gruppen-Videoanruf",
+    "dismissNotice": "Ausblenden",
     "enableAudio": "Ton aktivieren",
     "enterFullscreen": "Vollbild",
     "errorBackToPrejoin": "Einstellungen ändern",
@@ -1992,6 +1995,7 @@
     "hideBars": "Leisten ausblenden",
     "hideNotices": "Hinweise ausblenden",
     "leave": "Anruf verlassen",
+    "lowerQuality": "Qualität senken",
     "maximize": "Maximieren",
     "micMuted": "Mikrofon aus",
     "micNoSignal": "Dein Mikrofon liefert keinen Ton – die anderen hören dich nicht.",
@@ -2042,6 +2046,7 @@
     "reconnecting": "Verbindung unterbrochen – verbinde neu…",
     "reloadPending": "Die Plattform hat ein neues Design. Es wird übernommen, sobald du den Anruf verlässt.",
     "restartMic": "Mikrofon neu starten",
+    "restoreQuality": "Qualität wiederherstellen",
     "screenShare": "Bildschirm",
     "screenShareEnded": "Bildschirmfreigabe beendet",
     "showBars": "Leisten einblenden",
