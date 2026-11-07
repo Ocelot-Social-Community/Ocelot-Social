@@ -3105,6 +3105,17 @@ describe('VideoCall', () => {
       expect(room.opts.publishDefaults).toEqual({ dtx: true })
     })
 
+    it('keeps the default the call started with, a changed network default waits for the next', async () => {
+      const policy = Vue.observable({ videoCallDtx: true })
+      const { wrapper, room } = await connected({ policy })
+      policy.videoCallDtx = false
+      expect(wrapper.vm.dtx).toBe(true)
+      expect(room.opts.publishDefaults).toEqual({ dtx: true })
+      await wrapper.vm.connect()
+      expect(wrapper.vm.dtx).toBe(false)
+      expect(wrapper.vm.room.opts.publishDefaults).toEqual({ dtx: false })
+    })
+
     it("starts every call on the network's default, whatever was chosen in the last one", async () => {
       const { wrapper, room } = await connected({ policy: { videoCallDtx: true } })
       await wrapper.vm.setDtx(false)
@@ -3259,22 +3270,6 @@ describe('VideoCall', () => {
         expect(room.switchActiveDevice).toHaveBeenCalledWith('audioinput', 'mic-2')
       })
 
-      it('takes a second choice only once the first one is published', async () => {
-        const { wrapper, room, track, done, release } = await switching()
-        const second = wrapper.vm.setDtx(false)
-        await flushPromises()
-        expect(room.localParticipant.unpublishTrack).toHaveBeenCalledTimes(1)
-        release()
-        await done
-        await second
-        expect(room.localParticipant.publishTrack).toHaveBeenLastCalledWith(track, {
-          source: 'microphone',
-          dtx: false,
-        })
-        expect(wrapper.vm.dtx).toBe(false)
-        expect(room.options.publishDefaults.dtx).toBe(false)
-      })
-
       it('stops the unpublished track when the call is left, which no publication would', async () => {
         const { wrapper, room, track, done, release } = await switching()
         const toast = jest.spyOn(wrapper.vm, 'showDeviceErrorToast').mockImplementation(() => {})
@@ -3305,21 +3300,6 @@ describe('VideoCall', () => {
         await done
         await flushPromises()
         expect(wrapper.vm.micEnabled).toBe(true)
-      })
-
-      it('takes the last of several choices made meanwhile', async () => {
-        const { wrapper, room, track, done, release } = await switching()
-        const second = wrapper.vm.setDtx(false)
-        const third = wrapper.vm.setDtx(true)
-        await flushPromises()
-        release()
-        await Promise.all([done, second, third])
-        expect(room.localParticipant.publishTrack).toHaveBeenLastCalledWith(track, {
-          source: 'microphone',
-          dtx: true,
-        })
-        expect(wrapper.vm.dtx).toBe(true)
-        expect(room.options.publishDefaults.dtx).toBe(true)
       })
 
       it('does not move it in a call that was left meanwhile', async () => {

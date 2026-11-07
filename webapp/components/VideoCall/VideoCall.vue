@@ -601,6 +601,10 @@ export default {
       // call starts on the network's default, so an admin's change reaches
       // everyone and a choice made against one bad connection does not linger.
       dtxPreference: null,
+      // The network's default as the call started with it. Read once per call: the microphone
+      // was published with it, and a policy changed meanwhile reaches the next call — shown
+      // here at once, it would claim a setting the microphone does not have.
+      dtxDefault: false,
       dtxApplying: false,
       reconnecting: false,
       // Remote cameras are unsubscribed because our connection is weak — the
@@ -655,7 +659,7 @@ export default {
     // own meet app keeps it off as well.
     dtx() {
       if (this.dtxPreference !== null) return this.dtxPreference
-      return !!(this.$policy && this.$policy.get('videoCallDtx'))
+      return this.dtxDefault
     },
     ...mapGetters({
       show: 'videoCall/showVideoCall',
@@ -1690,6 +1694,7 @@ export default {
       this.stopAudioWatchdog()
       this.dtxApplying = false
       this.dtxPreference = null
+      this.dtxDefault = !!(this.$policy && this.$policy.get('videoCallDtx'))
       this.dtxSwitch = null
       this.resetAudioOnly()
       try {
@@ -2442,11 +2447,9 @@ export default {
         if (this.room === room) this.showDeviceErrorToast('mic', err)
       }
     },
+    // Called by the device settings' checkbox alone, which is disabled while a switch runs
+    // (dtxApplying): one switch at a time.
     async setDtx(on) {
-      // One switch at a time: a second one meanwhile would find the microphone unpublished,
-      // take its choice for done and leave the running switch to publish the first one. In a
-      // loop: of several waiting, the first to go on starts a switch the others wait for again.
-      while (this.dtxSwitch) await this.dtxSwitch
       const before = this.dtx
       this.dtxPreference = on
       const room = this.room
