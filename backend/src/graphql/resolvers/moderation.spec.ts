@@ -8,6 +8,7 @@ import { describe, beforeAll, afterAll, beforeEach, afterEach, it, expect } from
 import Factory, { cleanDatabase } from '@db/factories'
 import review from '@graphql/queries/moderation/review.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { principalChangesDelivered } from '@root/test/principalChanges'
 import { serverPubsub } from '@src/context'
 import { listenForPrincipalChanges, principalEpoch } from '@src/context/principalEpoch'
 
@@ -418,8 +419,10 @@ describe('moderate resources', () => {
         })
 
         it("moves the reviewed user's principal epoch", async () => {
+          await principalChangesDelivered(serverPubsub)
           const before = principalEpoch('user-id')
           await mutate({ mutation: review, variables: disableVariables })
+          await principalChangesDelivered(serverPubsub)
 
           expect(principalEpoch('user-id')).toBe(before + 1)
         })

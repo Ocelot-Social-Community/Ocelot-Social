@@ -18,6 +18,7 @@ import DELETE_USER from '@graphql/queries/users/DeleteUser.gql'
 import DISABLE_USER from '@graphql/queries/users/disableUser.gql'
 import OUTRANKED from '@graphql/queries/users/UserOutrankedByCurrentUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { principalChangesDelivered } from '@root/test/principalChanges'
 import { serverPubsub } from '@src/context'
 import { listenForPrincipalChanges, principalEpoch } from '@src/context/principalEpoch'
 import { DEFAULT_ROLES } from '@src/role'
@@ -127,13 +128,12 @@ describe('act-on hierarchy', () => {
 
     it("moves the disabled user's principal epoch", async () => {
       await as('the-moderator')
+      await principalChangesDelivered(serverPubsub)
       const before = principalEpoch('plain-user')
       await mutate({ mutation: DISABLE_USER, variables: { id: 'plain-user', disable: true } })
+      await principalChangesDelivered(serverPubsub)
 
-      // The count moves when the event comes back, and over Redis that is not at once.
-      await vi.waitFor(() => {
-        expect(principalEpoch('plain-user')).toBe(before + 1)
-      })
+      expect(principalEpoch('plain-user')).toBe(before + 1)
     })
 
     it('lets a moderator re-enable a plain user', async () => {

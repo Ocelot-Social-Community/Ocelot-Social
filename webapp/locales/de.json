@@ -278,6 +278,7 @@
         "showContentFilterMasonryGrid": "Zeigt den Inhaltsfilter im Masonry-Raster (Newsfeed).",
         "showGroupButtonInHeader": "Zeigt den Gruppen-Button im Header.",
         "socialMediaEnabled": "Aktiviert die Social-Media-Links-Funktion: Links werden auf Profilen angezeigt und in den Nutzereinstellungen verwaltet.",
+        "videoCallDtx": "Voreinstellung für Videoanrufe: Solange jemand schweigt, sendet sein Mikrofon kaum Daten. Spart Bandbreite, kann aber einzelne Teilnehmer für einzelne Zuhörer unhörbar machen. Jeder Nutzer kann das für sein eigenes Mikrofon in den Geräte-Einstellungen eines Anrufs ändern.",
         "videoConference": "Videokonferenzen (LiveKit) aktivieren. Der Laufzeit-Schalter für die Videoanruf-Berechtigungen. Erfordert die LiveKit-Umgebungsvariablen; ohne sie bleibt er aus und ausgegraut."
       },
       "envLink": "Zur Umgebung",
@@ -301,6 +302,7 @@
         "showContentFilterMasonryGrid": "Inhaltsfilter im Raster",
         "showGroupButtonInHeader": "Gruppen-Button im Header",
         "socialMediaEnabled": "Social Media",
+        "videoCallDtx": "Sprechpausen-Unterdrückung in Anrufen",
         "videoConference": "Videokonferenzen"
       },
       "lastUpdated": "Zuletzt geändert: {timestamp} von {actor}",
@@ -1955,6 +1957,9 @@
     },
     "deviceSettings": {
       "button": "Geräte",
+      "dtx": "Sprechpausen nicht übertragen",
+      "dtxFailed": "Die Sprechpausen ließen sich nicht umstellen – dein Mikrofon läuft weiter wie zuvor.",
+      "dtxHint": "Spart Daten, solange du schweigst. Hören dich andere manchmal nicht, schalte es aus.",
       "speakerError": "Der Lautsprecher konnte nicht gewechselt werden.",
       "title": "Geräte-Einstellungen"
     },

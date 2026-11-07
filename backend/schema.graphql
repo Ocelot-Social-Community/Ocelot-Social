@@ -1691,6 +1691,7 @@ enum PolicyKey {
   showContentFilterMasonryGrid
   showGroupButtonInHeader
   socialMediaEnabled
+  videoCallDtx
   videoConference
 }
 
