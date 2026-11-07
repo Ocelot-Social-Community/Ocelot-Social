@@ -3162,18 +3162,96 @@ describe('VideoCall', () => {
       expect(wrapper.vm.dtx).toBe(true)
     })
 
-    it('reports a microphone that could not be published again', async () => {
-      const { wrapper, room } = await connected()
-      withMic(room)
-      room.localParticipant.isMicrophoneEnabled = false
-      room.localParticipant.publishTrack.mockRejectedValue(
-        Object.assign(new Error('denied'), { name: 'NotAllowedError' }),
-      )
-      const toast = jest.spyOn(wrapper.vm, 'showDeviceErrorToast').mockImplementation(() => {})
-      await wrapper.vm.setDtx(true)
-      expect(toast).toHaveBeenCalledWith('mic', expect.any(Error))
-      expect(wrapper.vm.micEnabled).toBe(false)
-      expect(wrapper.vm.dtxApplying).toBe(false)
+    describe('when the microphone cannot be published with the new choice', () => {
+      const failing = async () => {
+        const built = await connected()
+        const track = withMic(built.room, { on: jest.fn(), stop: jest.fn() })
+        const toast = jest
+          .spyOn(built.wrapper.vm, 'showDeviceErrorToast')
+          .mockImplementation(() => {})
+        built.wrapper.vm.$toast = { error: jest.fn() }
+        return { ...built, track, toast }
+      }
+
+      it('publishes it again as it was, and takes the choice back', async () => {
+        const { wrapper, room, track, toast } = await failing()
+        room.localParticipant.publishTrack.mockRejectedValueOnce(new Error('signal lost'))
+        await wrapper.vm.setDtx(true)
+        expect(room.localParticipant.publishTrack).toHaveBeenLastCalledWith(track, {
+          source: 'microphone',
+          dtx: false,
+        })
+        expect(wrapper.vm.dtx).toBe(false)
+        expect(room.options.publishDefaults.dtx).toBe(false)
+        expect(wrapper.vm.$toast.error).toHaveBeenCalledWith('videoCall.deviceSettings.dtxFailed')
+        expect(track.stop).not.toHaveBeenCalled()
+        expect(toast).not.toHaveBeenCalled()
+        expect(wrapper.vm.dtxApplying).toBe(false)
+      })
+
+      it('says nothing without a toast plugin, the microphone back all the same', async () => {
+        const { wrapper, room } = await failing()
+        wrapper.vm.$toast = undefined
+        room.localParticipant.publishTrack.mockRejectedValueOnce(new Error('signal lost'))
+        await wrapper.vm.setDtx(true)
+        expect(room.localParticipant.publishTrack).toHaveBeenCalledTimes(2)
+        expect(wrapper.vm.dtx).toBe(false)
+      })
+
+      it('stops the track that cannot go out at all, rather than leave it captured', async () => {
+        const { wrapper, room, track, toast } = await failing()
+        room.localParticipant.isMicrophoneEnabled = false
+        room.localParticipant.publishTrack.mockRejectedValue(
+          Object.assign(new Error('denied'), { name: 'NotAllowedError' }),
+        )
+        await wrapper.vm.setDtx(true)
+        expect(track.stop).toHaveBeenCalled()
+        expect(toast).toHaveBeenCalledWith(
+          'mic',
+          expect.objectContaining({ name: 'NotAllowedError' }),
+        )
+        expect(wrapper.vm.dtx).toBe(false)
+        expect(wrapper.vm.micEnabled).toBe(false)
+        expect(wrapper.vm.dtxApplying).toBe(false)
+      })
+
+      it('leaves a call that was left meanwhile alone', async () => {
+        const { wrapper, room, track, toast } = await failing()
+        room.localParticipant.publishTrack.mockImplementationOnce(async () => {
+          wrapper.vm.room = null
+          throw new Error('gone')
+        })
+        await wrapper.vm.setDtx(true)
+        expect(room.localParticipant.publishTrack).toHaveBeenCalledTimes(1)
+        expect(track.stop).not.toHaveBeenCalled()
+        expect(toast).not.toHaveBeenCalled()
+      })
+
+      it('keeps quiet when the call was left while it went out again', async () => {
+        const { wrapper, room, track, toast } = await failing()
+        room.localParticipant.publishTrack
+          .mockRejectedValueOnce(new Error('signal lost'))
+          .mockImplementationOnce(async () => {
+            wrapper.vm.room = null
+          })
+        await wrapper.vm.setDtx(true)
+        expect(wrapper.vm.$toast.error).not.toHaveBeenCalled()
+        expect(track.stop).not.toHaveBeenCalled()
+        expect(toast).not.toHaveBeenCalled()
+      })
+
+      it('does not report a failure for a call that was left while it was stopped', async () => {
+        const { wrapper, room, track, toast } = await failing()
+        room.localParticipant.publishTrack
+          .mockRejectedValueOnce(new Error('signal lost'))
+          .mockImplementationOnce(async () => {
+            wrapper.vm.room = null
+            throw new Error('gone')
+          })
+        await wrapper.vm.setDtx(true)
+        expect(track.stop).toHaveBeenCalled()
+        expect(toast).not.toHaveBeenCalled()
+      })
     })
 
     it('leaves a call that was left meanwhile alone', async () => {

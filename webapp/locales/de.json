@@ -1958,6 +1958,7 @@
     "deviceSettings": {
       "button": "Geräte",
       "dtx": "Sprechpausen nicht übertragen",
+      "dtxFailed": "Die Sprechpausen ließen sich nicht umstellen – dein Mikrofon läuft weiter wie zuvor.",
       "dtxHint": "Spart Daten, solange du schweigst. Hören dich andere manchmal nicht, schalte es aus.",
       "speakerError": "Der Lautsprecher konnte nicht gewechselt werden.",
       "title": "Geräte-Einstellungen"

@@ -1958,6 +1958,7 @@
     "deviceSettings": {
       "button": "Appareils",
       "dtx": "Ne pas transmettre les pauses de parole",
+      "dtxFailed": "Le réglage des pauses de parole n’a pas pu être modifié – ton micro continue comme avant.",
       "dtxHint": "Économise des données tant que tu te tais. Si les autres ne t’entendent parfois pas, désactive-le.",
       "speakerError": "Impossible de changer de haut-parleur.",
       "title": "Réglages des appareils"

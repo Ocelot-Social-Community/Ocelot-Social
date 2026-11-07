@@ -1958,6 +1958,7 @@
     "deviceSettings": {
       "button": "Dispositivos",
       "dtx": "Não transmitir as pausas na fala",
+      "dtxFailed": "Não foi possível mudar a definição das pausas na fala – o teu microfone continua como antes.",
       "dtxHint": "Poupa dados enquanto estás em silêncio. Se às vezes os outros não te ouvem, desativa-o.",
       "speakerError": "Não foi possível trocar o alto-falante.",
       "title": "Configurações dos dispositivos"

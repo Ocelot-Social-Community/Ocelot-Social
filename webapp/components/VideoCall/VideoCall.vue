@@ -2437,6 +2437,7 @@ export default {
       }
     },
     async setDtx(on) {
+      const before = this.dtx
       this.dtxPreference = on
       const room = this.room
       const Track = this.Track
@@ -2450,13 +2451,17 @@ export default {
       // published anew. The same track, unstopped: capture, mute state and our
       // listeners stay as they are.
       this.dtxApplying = true
+      const publish = (dtx) =>
+        room.localParticipant.publishTrack(track, { source: Track.Source.Microphone, dtx })
       try {
         await room.localParticipant.unpublishTrack(track, false)
         if (this.room !== room) return
-        await room.localParticipant.publishTrack(track, {
-          source: Track.Source.Microphone,
-          dtx: on,
-        })
+        try {
+          await publish(on)
+        } catch (err) {
+          if (this.room !== room) return
+          await this.restoreDtx(room, track, publish, before, err)
+        }
       } catch (err) {
         if (this.room === room) this.showDeviceErrorToast('mic', err)
       } finally {
@@ -2465,6 +2470,25 @@ export default {
           // A failed publish leaves the microphone off — say so on the button.
           this.micEnabled = !!room.localParticipant.isMicrophoneEnabled
         }
+      }
+    },
+    // The microphone could not be published with the new choice. Asked for a setting, the user
+    // is not to lose their voice over it: the same track goes out again as it was, the choice
+    // back where it was. Failing that, the track is stopped rather than left captured and
+    // unheard — an open capture keeps a Bluetooth headset in its call mode, among others —
+    // and the microphone shows as off, to be switched on again.
+    async restoreDtx(room, track, publish, before, err) {
+      this.dtxPreference = before
+      room.options.publishDefaults.dtx = before
+      try {
+        await publish(before)
+        if (this.room !== room) return
+        if (this.$toast && typeof this.$toast.error === 'function') {
+          this.$toast.error(this.$t('videoCall.deviceSettings.dtxFailed'))
+        }
+      } catch {
+        track.stop()
+        if (this.room === room) this.showDeviceErrorToast('mic', err)
       }
     },
     async toggleMic() {
