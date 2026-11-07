@@ -1690,6 +1690,7 @@ export default {
       this.stopAudioWatchdog()
       this.dtxApplying = false
       this.dtxPreference = null
+      this.dtxSwitch = null
       this.resetAudioOnly()
       try {
         if (!this.groupId) throw new Error('Missing group id')
@@ -2128,6 +2129,10 @@ export default {
         // The call ended, or a newer pick came in, while this one was waiting
         // its turn: there is nothing left for it to start.
         if (this.room !== room || ticket !== switching.latest) return
+        if (kind === 'audioinput' && this.dtxSwitch) {
+          await this.dtxSwitch
+          if (this.room !== room || ticket !== switching.latest) return
+        }
         // false: the capture was restarted, but not on the device asked for.
         if ((await room.switchActiveDevice(kind, deviceId)) === false) {
           throw new Error('Device not switched')
@@ -2412,6 +2417,7 @@ export default {
       return this.micRestart
     },
     async doRestartMic() {
+      if (this.dtxSwitch) await this.dtxSwitch
       const room = this.room
       const Track = this.Track
       if (!room || !Track) return
@@ -2451,6 +2457,15 @@ export default {
       // published anew. The same track, unstopped: capture, mute state and our
       // listeners stay as they are.
       this.dtxApplying = true
+      // Meanwhile the microphone has no publication. Switched on, restarted or moved to another
+      // device, LiveKit would find none — and open a second capture, or act on nothing: those
+      // wait for this. Muting acts on the track itself (see toggleMic).
+      let settle
+      const dtxSwitch = new Promise((resolve) => {
+        settle = resolve
+      })
+      this.dtxSwitch = dtxSwitch
+      this.dtxTrack = track
       const publish = (dtx) =>
         room.localParticipant.publishTrack(track, { source: Track.Source.Microphone, dtx })
       try {
@@ -2465,13 +2480,17 @@ export default {
       } catch (err) {
         if (this.room === room) this.showDeviceErrorToast('mic', err)
       } finally {
+        if (this.dtxSwitch === dtxSwitch) this.dtxSwitch = null
+        settle()
         if (this.room === room) {
           this.dtxApplying = false
-          // A failed publish leaves the microphone off — say so on the button.
+          // A failed publish leaves the microphone off, and one muted meanwhile went out
+          // muted — say so on the button.
           this.micEnabled = !!room.localParticipant.isMicrophoneEnabled
         }
       }
     },
+
     // The microphone could not be published with the new choice. Asked for a setting, the user
     // is not to lose their voice over it: the same track goes out again as it was, the choice
     // back where it was. Failing that, the track is stopped rather than left captured and
@@ -2494,8 +2513,22 @@ export default {
     async toggleMic() {
       if (!this.room) return
       const next = !this.micEnabled
+      // Muting while a dtx switch has the microphone unpublished: LiveKit would find nothing to
+      // mute and the track go out again open. Muted on the track itself, at once, it goes out
+      // muted.
+      if (!next && this.dtxSwitch) {
+        await this.dtxTrack.mute()
+        this.micEnabled = false
+        this.micProblem = false
+        this.refreshMicMeter()
+        return
+      }
       if (next) this.deviceStarts('audioinput')
       try {
+        if (this.dtxSwitch) {
+          await this.dtxSwitch
+          if (!this.room) return
+        }
         await this.room.localParticipant.setMicrophoneEnabled(next)
         this.micEnabled = next
         // A muted microphone is silent on purpose.

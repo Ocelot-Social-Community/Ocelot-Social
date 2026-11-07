@@ -3162,6 +3162,101 @@ describe('VideoCall', () => {
       expect(wrapper.vm.dtx).toBe(true)
     })
 
+    describe('while the microphone is being published anew', () => {
+      // Holds the switch between taking the microphone off and publishing it again.
+      const switching = async (micEnabled = true) => {
+        const built = await connected()
+        const track = withMic(built.room, {
+          on: jest.fn(),
+          mute: jest.fn().mockResolvedValue(),
+          restartTrack: jest.fn().mockResolvedValue(),
+        })
+        await built.wrapper.setData({ micEnabled })
+        // Joining switched the microphone on; only what happens from here on counts.
+        built.room.localParticipant.setMicrophoneEnabled.mockClear()
+        let release
+        built.room.localParticipant.unpublishTrack.mockImplementationOnce(
+          () =>
+            new Promise((resolve) => {
+              release = resolve
+            }),
+        )
+        const done = built.wrapper.vm.setDtx(true)
+        await flushPromises()
+        return { ...built, track, done, release: () => release() }
+      }
+
+      it('mutes at once, on the track itself, which then goes out muted', async () => {
+        const { wrapper, room, track, done, release } = await switching()
+        room.localParticipant.isMicrophoneEnabled = false
+        await wrapper.vm.toggleMic()
+        expect(track.mute).toHaveBeenCalled()
+        expect(wrapper.vm.micEnabled).toBe(false)
+        expect(room.localParticipant.setMicrophoneEnabled).not.toHaveBeenCalled()
+        release()
+        await done
+        expect(room.localParticipant.publishTrack).toHaveBeenCalledWith(track, expect.anything())
+        expect(wrapper.vm.micEnabled).toBe(false)
+      })
+
+      it('switches it on only once it is published again, without a second capture', async () => {
+        const { wrapper, room, done, release } = await switching(false)
+        const toggled = wrapper.vm.toggleMic()
+        await flushPromises()
+        expect(room.localParticipant.setMicrophoneEnabled).not.toHaveBeenCalled()
+        release()
+        await done
+        await toggled
+        expect(room.localParticipant.setMicrophoneEnabled).toHaveBeenCalledTimes(1)
+        expect(room.localParticipant.setMicrophoneEnabled).toHaveBeenCalledWith(true)
+      })
+
+      it('does not switch it on in a call that was left meanwhile', async () => {
+        const { wrapper, room, done, release } = await switching(false)
+        const toggled = wrapper.vm.toggleMic()
+        await flushPromises()
+        wrapper.vm.room = null
+        release()
+        await done
+        await toggled
+        expect(room.localParticipant.setMicrophoneEnabled).not.toHaveBeenCalled()
+      })
+
+      it('restarts it only once it is published again', async () => {
+        const { wrapper, track, done, release } = await switching()
+        jest.spyOn(wrapper.vm, 'micStaysSilent').mockResolvedValue(false)
+        const restarted = wrapper.vm.restartMic()
+        await flushPromises()
+        expect(track.restartTrack).not.toHaveBeenCalled()
+        release()
+        await done
+        await restarted
+        expect(track.restartTrack).toHaveBeenCalled()
+      })
+
+      it('moves it to another device only once it is published again', async () => {
+        const { wrapper, room, done, release } = await switching()
+        const moved = wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2', label: 'B' })
+        await flushPromises()
+        expect(room.switchActiveDevice).not.toHaveBeenCalled()
+        release()
+        await done
+        await moved
+        expect(room.switchActiveDevice).toHaveBeenCalledWith('audioinput', 'mic-2')
+      })
+
+      it('does not move it in a call that was left meanwhile', async () => {
+        const { wrapper, room, done, release } = await switching()
+        const moved = wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2', label: 'B' })
+        await flushPromises()
+        wrapper.vm.room = null
+        release()
+        await done
+        await moved
+        expect(room.switchActiveDevice).not.toHaveBeenCalled()
+      })
+    })
+
     describe('when the microphone cannot be published with the new choice', () => {
       const failing = async () => {
         const built = await connected()
