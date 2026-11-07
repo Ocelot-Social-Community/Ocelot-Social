@@ -2422,8 +2422,12 @@ export default {
       return this.micRestart
     },
     async doRestartMic() {
-      if (this.dtxSwitch) await this.dtxSwitch
       const room = this.room
+      if (this.dtxSwitch) {
+        await this.dtxSwitch
+        // Left, or left and joined anew, meanwhile: this was asked of that call.
+        if (this.room !== room) return
+      }
       const Track = this.Track
       if (!room || !Track) return
       const pub = room.localParticipant.getTrackPublication(Track.Source.Microphone)

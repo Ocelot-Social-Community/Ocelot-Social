@@ -3259,6 +3259,22 @@ describe('VideoCall', () => {
         expect(track.restartTrack).toHaveBeenCalled()
       })
 
+      it('does not restart the microphone of a call joined meanwhile', async () => {
+        const { wrapper, track, done, release } = await switching()
+        const restarted = wrapper.vm.restartMic()
+        await flushPromises()
+        // The next call, its microphone published.
+        const theirs = { on: jest.fn(), restartTrack: jest.fn().mockResolvedValue() }
+        wrapper.vm.room = {
+          localParticipant: { getTrackPublication: () => ({ track: theirs }) },
+        }
+        release()
+        await done
+        await restarted
+        expect(theirs.restartTrack).not.toHaveBeenCalled()
+        expect(track.restartTrack).not.toHaveBeenCalled()
+      })
+
       it('moves it to another device only once it is published again', async () => {
         const { wrapper, room, done, release } = await switching()
         const moved = wrapper.vm.switchDevice({ kind: 'audioinput', deviceId: 'mic-2', label: 'B' })
