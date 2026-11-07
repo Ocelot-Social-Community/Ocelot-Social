@@ -3263,6 +3263,9 @@ describe('VideoCall', () => {
         const { wrapper, track, done, release } = await switching()
         const restarted = wrapper.vm.restartMic()
         await flushPromises()
+        // Still waiting for the switch, not given up already: the case this is about.
+        expect(wrapper.vm.micRestart).not.toBeNull()
+        expect(track.restartTrack).not.toHaveBeenCalled()
         // The next call, its microphone published.
         const theirs = { on: jest.fn(), restartTrack: jest.fn().mockResolvedValue() }
         wrapper.vm.room = {
