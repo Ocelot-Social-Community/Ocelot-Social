@@ -3175,13 +3175,26 @@ describe('VideoCall', () => {
         await built.wrapper.setData({ micEnabled })
         // Joining switched the microphone on; only what happens from here on counts.
         built.room.localParticipant.setMicrophoneEnabled.mockClear()
-        let release
-        built.room.localParticipant.unpublishTrack.mockImplementationOnce(
-          () =>
-            new Promise((resolve) => {
-              release = resolve
-            }),
+        // As LiveKit has it: between unpublishing and publishing again, there is no
+        // publication of the microphone to be found.
+        const lp = built.room.localParticipant
+        let published = true
+        lp.getTrackPublication.mockImplementation((source) =>
+          source === 'microphone' && published ? { track } : undefined,
         )
+        lp.unpublishTrack.mockImplementation(async () => {
+          published = false
+        })
+        lp.publishTrack.mockImplementation(async () => {
+          published = true
+        })
+        let release
+        lp.unpublishTrack.mockImplementationOnce(() => {
+          published = false
+          return new Promise((resolve) => {
+            release = resolve
+          })
+        })
         const done = built.wrapper.vm.setDtx(true)
         await flushPromises()
         return { ...built, track, done, release: () => release() }
@@ -3263,14 +3276,19 @@ describe('VideoCall', () => {
       })
 
       it('stops the unpublished track when the call is left, which no publication would', async () => {
-        const { wrapper, track, release } = await switching()
+        const { wrapper, room, track, done, release } = await switching()
+        const toast = jest.spyOn(wrapper.vm, 'showDeviceErrorToast').mockImplementation(() => {})
         await wrapper.vm.cleanup()
         expect(track.stop).toHaveBeenCalled()
         release()
+        await done
+        await flushPromises()
+        expect(room.localParticipant.publishTrack).not.toHaveBeenCalled()
+        expect(toast).not.toHaveBeenCalled()
       })
 
       it('leaves the button of a call left while muting alone', async () => {
-        const { wrapper, track, release } = await switching()
+        const { wrapper, track, done, release } = await switching()
         let muted
         track.mute.mockImplementationOnce(
           () =>
@@ -3283,8 +3301,25 @@ describe('VideoCall', () => {
         wrapper.vm.micEnabled = true
         muted()
         await toggled
-        expect(wrapper.vm.micEnabled).toBe(true)
         release()
+        await done
+        await flushPromises()
+        expect(wrapper.vm.micEnabled).toBe(true)
+      })
+
+      it('takes the last of several choices made meanwhile', async () => {
+        const { wrapper, room, track, done, release } = await switching()
+        const second = wrapper.vm.setDtx(false)
+        const third = wrapper.vm.setDtx(true)
+        await flushPromises()
+        release()
+        await Promise.all([done, second, third])
+        expect(room.localParticipant.publishTrack).toHaveBeenLastCalledWith(track, {
+          source: 'microphone',
+          dtx: true,
+        })
+        expect(wrapper.vm.dtx).toBe(true)
+        expect(room.options.publishDefaults.dtx).toBe(true)
       })
 
       it('does not move it in a call that was left meanwhile', async () => {

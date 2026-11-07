@@ -2444,8 +2444,9 @@ export default {
     },
     async setDtx(on) {
       // One switch at a time: a second one meanwhile would find the microphone unpublished,
-      // take its choice for done and leave the running switch to publish the first one.
-      if (this.dtxSwitch) await this.dtxSwitch
+      // take its choice for done and leave the running switch to publish the first one. In a
+      // loop: of several waiting, the first to go on starts a switch the others wait for again.
+      while (this.dtxSwitch) await this.dtxSwitch
       const before = this.dtx
       this.dtxPreference = on
       const room = this.room
@@ -2531,8 +2532,10 @@ export default {
       if (next) this.deviceStarts('audioinput')
       try {
         if (this.dtxSwitch) {
+          const room = this.room
           await this.dtxSwitch
-          if (!this.room) return
+          // Left, or left and joined anew, meanwhile: this was asked of that call.
+          if (this.room !== room) return
         }
         await this.room.localParticipant.setMicrophoneEnabled(next)
         this.micEnabled = next
