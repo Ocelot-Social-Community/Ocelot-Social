@@ -3,11 +3,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { describe, beforeAll, afterAll, beforeEach, afterEach, it, expect, vi } from 'vitest'
+import { describe, beforeAll, afterAll, beforeEach, afterEach, it, expect } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import review from '@graphql/queries/moderation/review.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { principalChangesDelivered } from '@root/test/principalChanges'
 import { serverPubsub } from '@src/context'
 import { listenForPrincipalChanges, principalEpoch } from '@src/context/principalEpoch'
 
@@ -418,13 +419,12 @@ describe('moderate resources', () => {
         })
 
         it("moves the reviewed user's principal epoch", async () => {
+          await principalChangesDelivered(serverPubsub)
           const before = principalEpoch('user-id')
           await mutate({ mutation: review, variables: disableVariables })
+          await principalChangesDelivered(serverPubsub)
 
-          // The count moves when the event comes back, and over Redis that is not at once.
-          await vi.waitFor(() => {
-            expect(principalEpoch('user-id')).toBe(before + 1)
-          })
+          expect(principalEpoch('user-id')).toBe(before + 1)
         })
 
         it('returns .reviewed', async () => {

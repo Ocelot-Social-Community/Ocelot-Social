@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { setTimeout } from 'node:timers/promises'
 
-import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect, vi } from 'vitest'
+import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect } from 'vitest'
 
 import { assignRoleEdge, cleanDatabase } from '@db/factories'
 import adminRevokeApiKey from '@graphql/queries/apiKeys/adminRevokeApiKey.gql'
@@ -15,12 +15,9 @@ import myApiKeys from '@graphql/queries/apiKeys/myApiKeys.gql'
 import revokeApiKey from '@graphql/queries/apiKeys/revokeApiKey.gql'
 import updateApiKey from '@graphql/queries/apiKeys/updateApiKey.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { principalChangesDelivered } from '@root/test/principalChanges'
 import { serverPubsub } from '@src/context'
-import {
-  listenForPrincipalChanges,
-  principalEpoch,
-  publishPrincipalChanged,
-} from '@src/context/principalEpoch'
+import { listenForPrincipalChanges, principalEpoch } from '@src/context/principalEpoch'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -43,19 +40,6 @@ let server: ApolloTestSetup['server']
 // Counts what the resolvers publish on the pubsub their context carries, as index.ts does in
 // production: a revoked key must make its owner's open subscriptions read them again.
 let principalListener: number
-
-// The epoch moves when the published event comes back — over Redis a round trip after the
-// mutation has answered. A marker published after it on the same pubsub comes back after it
-// too, so once the marker is in, everything the mutations published is: what has not moved
-// by then never will.
-let markers = 0
-const principalChangesDelivered = async () => {
-  const marker = `delivered-${String(++markers)}`
-  publishPrincipalChanged(serverPubsub, marker)
-  await vi.waitFor(() => {
-    expect(principalEpoch(marker)).toBe(1)
-  })
-}
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -375,10 +359,11 @@ describe('revokeApiKey', () => {
   })
 
   it("moves the owner's principal epoch, once", async () => {
+    await principalChangesDelivered(serverPubsub)
     const before = principalEpoch('u4')
     await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
     await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
-    await principalChangesDelivered()
+    await principalChangesDelivered(serverPubsub)
 
     expect(principalEpoch('u4')).toBe(before + 1)
   })
@@ -460,10 +445,11 @@ describe('admin operations', () => {
 
     it("moves the key owner's principal epoch, once", async () => {
       authenticatedUser = await adminUser.toJson()
+      await principalChangesDelivered(serverPubsub)
       const before = principalEpoch('u-regular')
       await mutate({ mutation: adminRevokeApiKey, variables: { id: keyId } })
       await mutate({ mutation: adminRevokeApiKey, variables: { id: keyId } })
-      await principalChangesDelivered()
+      await principalChangesDelivered(serverPubsub)
 
       expect(principalEpoch('u-regular')).toBe(before + 1)
     })
@@ -508,11 +494,12 @@ describe('admin operations', () => {
 
     it("moves the user's principal epoch only when a key was revoked", async () => {
       authenticatedUser = await adminUser.toJson()
+      await principalChangesDelivered(serverPubsub)
       const regularBefore = principalEpoch('u-regular')
       const adminBefore = principalEpoch('u-admin')
       await mutate({ mutation: adminRevokeUserApiKeys, variables: { userId: 'u-regular' } })
       await mutate({ mutation: adminRevokeUserApiKeys, variables: { userId: 'u-admin' } })
-      await principalChangesDelivered()
+      await principalChangesDelivered(serverPubsub)
 
       expect(principalEpoch('u-regular')).toBe(regularBefore + 1)
       expect(principalEpoch('u-admin')).toBe(adminBefore)

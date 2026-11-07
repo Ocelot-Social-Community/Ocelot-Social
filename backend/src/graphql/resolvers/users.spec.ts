@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect, vi } from 'vitest'
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
 
 import { categories } from '@constants/categories'
 import { listenForPrincipalChanges, principalEpoch } from '@context/principalEpoch'
@@ -22,6 +22,7 @@ import UserEmailNotificationSettings from '@graphql/queries/users/UserEmailNotif
 import UserFollowedBy from '@graphql/queries/users/UserFollowedBy.gql'
 import UserFollowing from '@graphql/queries/users/UserFollowing.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { principalChangesDelivered } from '@root/test/principalChanges'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -635,13 +636,12 @@ describe('Delete a User as admin', () => {
         })
 
         it("moves the deleted user's principal epoch", async () => {
+          await principalChangesDelivered(pubsub)
           const before = principalEpoch('u343')
           await mutate({ mutation: DeleteUser, variables })
+          await principalChangesDelivered(pubsub)
 
-          // The count moves when the event comes back, and over Redis that is not at once.
-          await vi.waitFor(() => {
-            expect(principalEpoch('u343')).toBe(before + 1)
-          })
+          expect(principalEpoch('u343')).toBe(before + 1)
         })
 
         it("deletes account, but doesn't delete posts or comments by default", async () => {
