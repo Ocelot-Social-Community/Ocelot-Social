@@ -3170,6 +3170,7 @@ describe('VideoCall', () => {
           on: jest.fn(),
           mute: jest.fn().mockResolvedValue(),
           restartTrack: jest.fn().mockResolvedValue(),
+          stop: jest.fn(),
         })
         await built.wrapper.setData({ micEnabled })
         // Joining switched the microphone on; only what happens from here on counts.
@@ -3243,6 +3244,47 @@ describe('VideoCall', () => {
         await done
         await moved
         expect(room.switchActiveDevice).toHaveBeenCalledWith('audioinput', 'mic-2')
+      })
+
+      it('takes a second choice only once the first one is published', async () => {
+        const { wrapper, room, track, done, release } = await switching()
+        const second = wrapper.vm.setDtx(false)
+        await flushPromises()
+        expect(room.localParticipant.unpublishTrack).toHaveBeenCalledTimes(1)
+        release()
+        await done
+        await second
+        expect(room.localParticipant.publishTrack).toHaveBeenLastCalledWith(track, {
+          source: 'microphone',
+          dtx: false,
+        })
+        expect(wrapper.vm.dtx).toBe(false)
+        expect(room.options.publishDefaults.dtx).toBe(false)
+      })
+
+      it('stops the unpublished track when the call is left, which no publication would', async () => {
+        const { wrapper, track, release } = await switching()
+        await wrapper.vm.cleanup()
+        expect(track.stop).toHaveBeenCalled()
+        release()
+      })
+
+      it('leaves the button of a call left while muting alone', async () => {
+        const { wrapper, track, release } = await switching()
+        let muted
+        track.mute.mockImplementationOnce(
+          () =>
+            new Promise((resolve) => {
+              muted = resolve
+            }),
+        )
+        const toggled = wrapper.vm.toggleMic()
+        wrapper.vm.room = null
+        wrapper.vm.micEnabled = true
+        muted()
+        await toggled
+        expect(wrapper.vm.micEnabled).toBe(true)
+        release()
       })
 
       it('does not move it in a call that was left meanwhile', async () => {

@@ -50,7 +50,7 @@ let principalListener: number
 // by then never will.
 let markers = 0
 const principalChangesDelivered = async () => {
-  const marker = `delivered-${++markers}`
+  const marker = `delivered-${String(++markers)}`
   publishPrincipalChanged(serverPubsub, marker)
   await vi.waitFor(() => {
     expect(principalEpoch(marker)).toBe(1)

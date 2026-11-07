@@ -2443,6 +2443,9 @@ export default {
       }
     },
     async setDtx(on) {
+      // One switch at a time: a second one meanwhile would find the microphone unpublished,
+      // take its choice for done and leave the running switch to publish the first one.
+      if (this.dtxSwitch) await this.dtxSwitch
       const before = this.dtx
       this.dtxPreference = on
       const room = this.room
@@ -2517,7 +2520,9 @@ export default {
       // mute and the track go out again open. Muted on the track itself, at once, it goes out
       // muted.
       if (!next && this.dtxSwitch) {
+        const room = this.room
         await this.dtxTrack.mute()
+        if (this.room !== room) return
         this.micEnabled = false
         this.micProblem = false
         this.refreshMicMeter()
@@ -2652,8 +2657,11 @@ export default {
               ...(lp.audioTrackPublications?.values?.() ?? []),
               ...(lp.videoTrackPublications?.values?.() ?? []),
             ]
-            for (const pub of pubs) {
-              const track = pub && pub.track
+            const tracks = pubs.map((pub) => pub && pub.track)
+            // A dtx switch holds the microphone unpublished for a moment: in no publication,
+            // and running.
+            if (this.dtxSwitch) tracks.push(this.dtxTrack)
+            for (const track of tracks) {
               if (!track) continue
               try {
                 track.stop()
