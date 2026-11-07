@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { describe, beforeAll, afterAll, beforeEach, afterEach, it, expect } from 'vitest'
+import { describe, beforeAll, afterAll, beforeEach, afterEach, it, expect, vi } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import review from '@graphql/queries/moderation/review.gql'
@@ -421,7 +421,10 @@ describe('moderate resources', () => {
           const before = principalEpoch('user-id')
           await mutate({ mutation: review, variables: disableVariables })
 
-          expect(principalEpoch('user-id')).toBe(before + 1)
+          // The count moves when the event comes back, and over Redis that is not at once.
+          await vi.waitFor(() => {
+            expect(principalEpoch('user-id')).toBe(before + 1)
+          })
         })
 
         it('returns .reviewed', async () => {

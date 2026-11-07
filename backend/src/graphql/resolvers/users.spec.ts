@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect, vi } from 'vitest'
 
 import { categories } from '@constants/categories'
 import { listenForPrincipalChanges, principalEpoch } from '@context/principalEpoch'
@@ -638,7 +638,10 @@ describe('Delete a User as admin', () => {
           const before = principalEpoch('u343')
           await mutate({ mutation: DeleteUser, variables })
 
-          expect(principalEpoch('u343')).toBe(before + 1)
+          // The count moves when the event comes back, and over Redis that is not at once.
+          await vi.waitFor(() => {
+            expect(principalEpoch('u343')).toBe(before + 1)
+          })
         })
 
         it("deletes account, but doesn't delete posts or comments by default", async () => {
