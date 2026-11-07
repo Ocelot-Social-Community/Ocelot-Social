@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.2.5](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.2.4...branding-v0.2.5) (2026-11-07)
+
+
+### Features
+
+* **other:** conference chat shared only by the participants of a video call ([#10494](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10494)) ([61c7907](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/61c79079ad44d3aa5a2ae41cd4da56b085c9130b))
+* **other:** video call shall have much more space ([#10540](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10540)) ([d2dd10d](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/d2dd10d4f1774f47888e247d1951c59d3dceedb6))
+* **package/branding:** a framework token is taken away on purpose, or not at all ([#10839](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10839)) ([727e9d6](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/727e9d6055631ae5372b64f81c10ffc2cfe0ec72))
+* **package/branding:** post title length limits configurable per brand ([#10611](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10611)) ([aa6b288](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/aa6b288e4955f7f357eff20e2512fb1c7e2eb075))
+
+
+### Bug Fixes
+
+* **webapp:** a maximized video call stacks above the page's floating elements ([#10691](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10691)) ([2bd6811](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/2bd6811d37e127b2f5c6162bda0e2184bcf9c5ef))
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump @types/node from 26.6.5 to 26.6.6 in /packages/branding ([#10851](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10851)) ([c792558](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/c792558734977a8d1ddb84133c9b3be9b44e1635))
+* **deps-dev:** bump eslint from 10.12.0 to 10.13.0 in /packages/branding ([#10703](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10703)) ([f972a88](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/f972a88a2b37813e7dee16325881ed375f335122))
+* **deps-dev:** bump eslint from 10.13.0 to 10.14.0 in /packages/branding ([#10821](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10821)) ([0c0f838](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/0c0f8380746ba9c92e814abd2a8b4312de3eb969))
+* **deps-dev:** bump typescript-eslint from 8.71.2 to 8.72.0 in /packages/branding ([#10710](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10710)) ([6c31927](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/6c319275024e27f47469e02d8b2172d2f00b8102))
+* **deps-dev:** bump typescript-eslint from 8.72.0 to 8.72.1 in /packages/branding ([#10768](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10768)) ([b318f31](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/b318f314adc1dd22ec66a4b6989fe174123c74a8))
+* **deps:** bump postcss from 8.5.30 to 8.5.31 in /packages/branding ([#10704](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10704)) ([ac0735f](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/ac0735f462fddf4b8e05fe3e480880685097b517))
+* **deps:** bump postcss from 8.5.31 to 8.5.32 in /packages/branding ([#10765](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10765)) ([4055eae](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/4055eaeae416309500998f49ff060c0c4d624b5a))
+* **deps:** bump tslib from 2.8.1 to 2.9.1 in /packages/branding ([#10809](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10809)) ([1c2f9f8](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/1c2f9f8b5317075a785b9878f594e89d49d7e908))
+
 ## [0.2.4](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.2.3...branding-v0.2.4) (2026-10-20)
 
 
