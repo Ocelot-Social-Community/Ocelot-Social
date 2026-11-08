@@ -399,6 +399,24 @@ describe('map', () => {
         expect(mapOnMock).toHaveBeenCalledWith('style.load', expect.any(Function))
       })
 
+      describe('the style changed while the map was loading', () => {
+        beforeEach(() => {
+          mapSetStyleMock.mockClear()
+        })
+
+        it('keeps the style when nothing changed', () => {
+          wrapper.vm.onMapLoad({ map: mapMock })
+          expect(mapSetStyleMock).not.toHaveBeenCalled()
+        })
+
+        it('brings the map to the style wanted by then', async () => {
+          await wrapper.setData({ activeStyle: 'mapbox://styles/mapbox/dark-v10' })
+          mapSetStyleMock.mockClear()
+          wrapper.vm.onMapLoad({ map: mapMock })
+          expect(mapSetStyleMock).toHaveBeenCalledWith('mapbox://styles/mapbox/dark-v10')
+        })
+      })
+
       it('registers mouseenter event on markers layer', () => {
         expect(mapOnMock).toHaveBeenCalledWith('mouseenter', 'markers', expect.any(Function))
       })

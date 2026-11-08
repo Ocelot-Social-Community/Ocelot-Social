@@ -55,7 +55,7 @@ const STYLE = {
   message: {
     background: 'var(--chat-message-bg-others)',
     backgroundMe: 'var(--chat-message-bg-me)',
-    color: 'var(--chat-message-color)',
+    color: 'var(--chat-message-text-color)',
     colorStarted: 'var(--chat-text-muted)',
     backgroundDeleted: 'var(--chat-deleted-background)',
     backgroundSelected: 'var(--chat-selected-background)',

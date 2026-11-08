@@ -76,6 +76,7 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'chat-message-checkmark': 'var(--text-color-soft)',
   'chat-message-checkmark-seen': 'var(--text-color-secondary)',
   'chat-message-color': 'var(--text-color-base)',
+  'chat-message-text-color': 'var(--chat-message-color)',
   'chat-message-timestamp': 'var(--text-color-soft)',
   'chat-module-background': 'light-dark(rgb(233, 228, 228), rgb(38, 36, 43))',
   'chat-module-close-color': 'light-dark(blue, rgb(120, 170, 255))',

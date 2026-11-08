@@ -276,6 +276,9 @@ export default {
     // Pending "stop showing this popup's scrollbar again" timer (see
     // markPopupScrolling()) — cleared in beforeDestroy() below.
     this.popupScrollTimer = null
+    // The style the map is built with (v-mapbox reads mapStyle once, at its mount); onMapLoad
+    // compares it with the style wanted by then.
+    this.initialMapStyle = this.mapOptions.style
   },
   async mounted() {
     this.offThemeChange = onThemeChange(() => {
@@ -569,6 +572,13 @@ export default {
         this.markers.isGeoJSON = false
         this.loadMarkersIconsAndAddMarkers()
       })
+
+      // The theme (or a pick) changed while the map was still loading: v-mapbox's watcher called
+      // setStyle before there was a loaded map, so the change is lost. Bring the map to the style
+      // wanted now; style.load above rebuilds the markers.
+      if (this.mapOptions.style !== this.initialMapStyle) {
+        this.map.setStyle(this.mapOptions.style)
+      }
 
       // add search field for locations
       this.geocoderCollapsed = window.innerWidth <= 810

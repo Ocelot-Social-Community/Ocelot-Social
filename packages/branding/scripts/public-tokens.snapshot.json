@@ -65,6 +65,7 @@
     "chat-message-checkmark",
     "chat-message-checkmark-seen",
     "chat-message-color",
+    "chat-message-text-color",
     "chat-message-timestamp",
     "chat-module-background",
     "chat-module-close-color",
