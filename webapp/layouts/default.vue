@@ -401,18 +401,6 @@ export default {
   }
 }
 
-/*  When a minimized video call is anchored above the footer, lift the chat */
-/*  above the video so both fit without overlap. Minimized video sits at */
-/*  bottom: 45px (matching the chat's footer offset) and is 280px tall. */
-/*  The inner chat content keeps its own height; whatever extends above the */
-/*  viewport gets clipped by the browser, leaving the message input and the */
-/*  latest messages visible — which is what the user interacts with. */
-/*  The chat's header is the chat library's bar (--window-bar-background) everywhere else, so it */
-/*  is here too. RoomHeader paints with --color-header-background. */
-.chat-modul__header {
-  --color-header-background: var(--window-bar-background);
-}
-
 /*  The tabs between the two chats of a running call, below the room's header. Their */
 /*  height is fixed, as the chat below is told how much room the two take */
 /*  (CALL_CHAT_TABS_HEIGHT; the header's is RoomHeader's compact one, CALL_CHAT_HEADER_HEIGHT). */
@@ -427,6 +415,12 @@ export default {
   border-bottom: 1px solid var(--border-color-softest);
 }
 
+/*  When a minimized video call is anchored above the footer, lift the chat */
+/*  above the video so both fit without overlap. Minimized video sits at */
+/*  bottom: 45px (matching the chat's footer offset) and is 280px tall. */
+/*  The inner chat content keeps its own height; whatever extends above the */
+/*  viewport gets clipped by the browser, leaving the message input and the */
+/*  latest messages visible — which is what the user interacts with. */
 .chat-modul--with-video {
   bottom: 333px; /*  45 (video bottom) + 280 (video height) + 8 (gap) */
 }

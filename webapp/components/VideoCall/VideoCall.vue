@@ -2922,15 +2922,6 @@ export default {
   }
 }
 
-/*  The header itself — avatar, title, where its buttons go — is RoomHeader's. What is */
-/*  the call's own are the things put into it. */
-/*  Its ground is the chat's bar, not the page header's: in the dark theme the page's would be the */
-/*  same dark and the call's header would not stand off it. RoomHeader paints with */
-/*  --color-header-background, so it is set here for the header and what it holds. */
-.video-call__header {
-  --color-header-background: var(--window-bar-background);
-}
-
 .video-call__count {
   background: var(--color-primary);
   color: var(--color-primary-inverse);

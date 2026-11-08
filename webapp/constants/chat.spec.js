@@ -9,6 +9,10 @@ describe('chat style', () => {
     expect(chat.STYLE.message.color).toBe('var(--chat-message-text-color)')
   })
 
+  it('paints the chat header with the token of the other room headers', () => {
+    expect(chat.STYLE.header.background).toBe('var(--room-header-background)')
+  })
+
   it('defines that name from the brand-facing token', () => {
     const css = readFileSync(resolve(__dirname, '../assets/css/root-tokens.css'), 'utf8')
     expect(css).toMatch(/--chat-message-text-color:\s*var\(--chat-message-color\);/)

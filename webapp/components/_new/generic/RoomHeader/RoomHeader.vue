@@ -53,7 +53,10 @@ export default {
   /*  above and below, although the avatar shown is the small one. */
   height: calc(var(--size-avatar-base) + 2 * var(--space-x-small));
   padding: 0 var(--space-small);
-  background: var(--color-header-background);
+  /*  Its ground is the chat's bar (--window-bar-background), not the page header's: in the dark */
+  /*  theme the page's would be the same dark and this header would not stand off it. A brand sets */
+  /*  --room-header-background for these headers; no component redefines it. */
+  background: var(--room-header-background);
   border-bottom: 1px solid var(--border-color-softest);
   color: var(--text-color-base);
 }

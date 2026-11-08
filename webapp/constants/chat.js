@@ -21,7 +21,8 @@ const STYLE = {
   },
 
   header: {
-    background: 'var(--window-bar-background)',
+    // The room's header, as in the chat module and in a call (RoomHeader).
+    background: 'var(--room-header-background)',
     colorRoomName: 'var(--text-color-base)',
     colorRoomInfo: 'var(--text-color-soft)',
   },
