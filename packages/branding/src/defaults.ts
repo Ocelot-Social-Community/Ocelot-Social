@@ -19,6 +19,8 @@ export const brandingDefaults: BrandingConfig = {
     // Vanilla declares its palette in the webapp's own stylesheets; a brand that overrides nothing
     // adds nothing here (consumers fall back to FRAMEWORK_TOKENS).
     tokens: {},
+    // A brand has the one look it always had; vanilla offers both (index.ts → vanilla).
+    colorScheme: 'light',
   },
   group: {
     nameLengthMin: 3,

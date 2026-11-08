@@ -18,6 +18,7 @@ import {
   findConfig,
   outSpecifyRoot,
   publishBrandArchive,
+  singleSchemeColours,
 } from './build-brandings.ts'
 
 const roots = []
@@ -880,4 +881,57 @@ describe('metadata.ogImage', () => {
       assert.equal(await ogWarnings(missing), '') // reported once, as "referenced asset not found"
     })
   })
+})
+
+test('singleSchemeColours: a brand with both schemes is warned about one-colour literals only', () => {
+  const declared = {
+    'color-header-background': '#fff',
+    'color-primary': 'light-dark(rgb(1, 2, 3), rgb(4, 5, 6))',
+    'text-color-link': 'var(--color-primary)',
+    'font-family-text': 'Overpass, sans-serif',
+  }
+  assert.deepEqual(singleSchemeColours('b', 'light dark', declared), [
+    '  ! b: --color-header-background is one colour for both schemes — declare it as light-dark(light, dark)',
+  ])
+  assert.deepEqual(singleSchemeColours('b', 'light', declared), [])
+})
+
+test('singleSchemeColours: every CSS named colour and the newer colour functions count too', () => {
+  for (const value of [
+    'whitesmoke',
+    'hwb(0 0% 0%)',
+    'lab(50% 0 0)',
+    'lch(50% 0 0)',
+    'color(srgb 1 0 0)',
+  ]) {
+    assert.equal(
+      singleSchemeColours('b', 'light dark', { 'color-header-background': value }).length,
+      1,
+      value,
+    )
+  }
+  assert.deepEqual(
+    singleSchemeColours('b', 'light dark', { 'color-header-background': 'inherit' }),
+    [],
+  )
+})
+
+test('a light-dark() pair is not reported because a media rule overrides it with a literal', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({ theme: { colorScheme: 'light dark' }, assets: { css: ['assets/theme.css'] } })\n`,
+    assets: {
+      'theme.css':
+        ':root { --color-header-background: light-dark(#fff, #111) }\n' +
+        '@media (prefers-color-scheme: dark) { :root { --color-header-background: #111 } }\n',
+    },
+  })
+
+  const built = await buildBrandArchive(dir)
+  assert.doesNotMatch(built.warnings.join('\n'), /one colour for both schemes/)
+})
+
+test('singleSchemeColours: a named colour counts as one colour too', () => {
+  assert.deepEqual(singleSchemeColours('b', 'light dark', { 'color-header-background': 'White' }), [
+    '  ! b: --color-header-background is one colour for both schemes — declare it as light-dark(light, dark)',
+  ])
 })

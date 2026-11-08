@@ -15,6 +15,25 @@
 // stores them in `theme.tokens`, which is how a value gets out of CSS and into a manifest or a mail.
 import { FRAMEWORK_TOKENS } from './frameworkTokens.js'
 
+import type { BrandingConfig, ColorScheme } from './schema.js'
+
+/** The colour schemes a brand may declare (`theme.colorScheme`). */
+export const COLOR_SCHEMES: readonly ColorScheme[] = ['light', 'dark', 'light dark']
+
+/** Vanilla — no brand at all — has both schemes; every brand defaults to light (defaults.ts). */
+export const VANILLA_COLOR_SCHEME: ColorScheme = 'light dark'
+
+/**
+ * The schemes of a serialised config, `undefined` meaning vanilla. An archive built before the field
+ * existed carries none and is a brand: light, as it always was.
+ */
+export function colorSchemeOf(config?: { theme?: Partial<BrandingConfig['theme']> }): ColorScheme {
+  if (!config) {
+    return VANILLA_COLOR_SCHEME
+  }
+  return config.theme?.colorScheme ?? 'light'
+}
+
 /**
  * The framework's own primary colour — the value a brand that sets no `color-primary` falls back to.
  *

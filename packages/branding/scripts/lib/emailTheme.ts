@@ -227,6 +227,84 @@ function cyclicTokens(raw: Record<string, string>): Set<string> {
  * blue when `--a` is unresolvable, which is what a browser does too — the fallback is only forfeited by
  * the tokens inside the cycle.
  */
+/**
+ * `light-dark(a, b)` reduced to `a`. A mail, a manifest or a meta tag has no `color-scheme` to choose
+ * by, and most mail clients drop the whole declaration as unknown syntax — the light value stands, as
+ * it always did there. Arguments are split at the top-level comma, so `light-dark(rgb(1, 2, 3), …)`
+ * keeps its own commas.
+ */
+export function lightOf(value: string): string {
+  for (let at = lightDarkAt(value); at !== -1; at = lightDarkAt(value)) {
+    const start = at + 'light-dark('.length
+    let depth = 0
+    let comma = -1
+    let commas = 0
+    let end = -1
+    let quote = ''
+    for (let i = start; i < value.length && end === -1; i++) {
+      const c = value[i]
+      if (quote) {
+        if (c === '\\') {
+          i++
+        } else if (c === quote) {
+          quote = ''
+        }
+      } else if (c === '"' || c === "'") {
+        quote = c
+      } else if (c === '(') {
+        depth++
+      } else if (c === ')') {
+        if (depth === 0) {
+          end = i
+        } else {
+          depth--
+        }
+      } else if (c === ',' && depth === 0) {
+        commas++
+        if (comma === -1) {
+          comma = i
+        }
+      }
+    }
+    // Only a well-formed `light-dark(a, b)` — exactly two, non-empty arguments — is reduced. Anything
+    // else (`light-dark(red`, `light-dark(, blue)`, `light-dark(red, )`, `light-dark(red, blue, green)`)
+    // is left as it stands, which resolveTokens then refuses.
+    if (
+      end === -1 ||
+      commas !== 1 ||
+      value.slice(start, comma).trim() === '' ||
+      value.slice(comma + 1, end).trim() === ''
+    ) {
+      return value
+    }
+    value = value.slice(0, at) + value.slice(start, comma).trim() + value.slice(end + 1)
+  }
+  return value
+}
+
+/**
+ * Where a `light-dark(` stands outside a quoted string, or -1. A font called `'light-dark('` is a
+ * name, not a function.
+ */
+export function lightDarkAt(value: string): number {
+  let quote = ''
+  for (let i = 0; i < value.length; i++) {
+    const c = value[i]
+    if (quote) {
+      if (c === '\\') {
+        i++
+      } else if (c === quote) {
+        quote = ''
+      }
+    } else if (c === '"' || c === "'") {
+      quote = c
+    } else if (value.startsWith('light-dark(', i)) {
+      return i
+    }
+  }
+  return -1
+}
+
 export function resolveTokens(raw: Record<string, string>): Record<string, string> {
   // Phase 1 — the graph. Every token on a cycle is invalid before a single value is looked at, which
   // is also what makes phase 2 terminate: with the cycles already short-circuited, what is left to
@@ -277,6 +355,15 @@ export function resolveTokens(raw: Record<string, string>): Record<string, strin
     // the dependency graph.
     if (out !== null && referencesIn(out).length > 0) {
       out = null
+    }
+    if (out !== null) {
+      out = lightOf(out)
+      // A light-dark() that lightOf could not read (one argument, never closed) stays in the value:
+      // as stored it is a declaration a mail client discards, so the token is unresolvable and the
+      // consumer falls back to its default.
+      if (lightDarkAt(out) !== -1) {
+        out = null
+      }
     }
     if (out !== null) {
       resolved[name] = out.trim().replace(/\s+/g, ' ')
