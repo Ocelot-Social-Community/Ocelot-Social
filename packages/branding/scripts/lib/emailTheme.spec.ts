@@ -4,7 +4,13 @@
 import assert from 'node:assert/strict'
 import { describe, test } from 'node:test'
 
-import { buildEmailBrandingCss, EMAIL_THEME, lightOf, resolveTokens } from './emailTheme.ts'
+import {
+  buildEmailBrandingCss,
+  EMAIL_THEME,
+  lightDarkAt,
+  lightOf,
+  resolveTokens,
+} from './emailTheme.ts'
 
 describe('resolveTokens', () => {
   test('passes literal values through untouched', () => {
@@ -340,6 +346,17 @@ test('resolveTokens drops a token whose light-dark() cannot be read, instead of 
   })
   assert.equal(resolved.ok, 'red')
   assert.equal(Object.hasOwn(resolved, 'broken'), false)
+})
+
+test('light-dark( inside a quoted string is a name, not a function', () => {
+  assert.equal(lightDarkAt(`'light-dark(', sans-serif`), -1)
+  assert.equal(lightDarkAt(`"a \\" light-dark(" light-dark(red, blue)`), 19)
+  assert.equal(lightOf(`'light-dark(', sans-serif`), `'light-dark(', sans-serif`)
+  assert.equal(lightOf('light-dark("a,b", c)'), '"a,b"')
+  assert.equal(
+    resolveTokens({ 'font-family-text': `'light-dark(', sans-serif` })['font-family-text'],
+    `'light-dark(', sans-serif`,
+  )
 })
 
 test('lightOf keeps the light half of light-dark(), commas inside it included', () => {

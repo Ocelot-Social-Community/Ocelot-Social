@@ -234,14 +234,23 @@ function cyclicTokens(raw: Record<string, string>): Set<string> {
  * keeps its own commas.
  */
 export function lightOf(value: string): string {
-  for (let at = value.indexOf('light-dark('); at !== -1; at = value.indexOf('light-dark(')) {
+  for (let at = lightDarkAt(value); at !== -1; at = lightDarkAt(value)) {
     const start = at + 'light-dark('.length
     let depth = 0
     let comma = -1
     let end = -1
+    let quote = ''
     for (let i = start; i < value.length && end === -1; i++) {
       const c = value[i]
-      if (c === '(') {
+      if (quote) {
+        if (c === '\\') {
+          i++
+        } else if (c === quote) {
+          quote = ''
+        }
+      } else if (c === '"' || c === "'") {
+        quote = c
+      } else if (c === '(') {
         depth++
       } else if (c === ')') {
         if (depth === 0) {
@@ -259,6 +268,29 @@ export function lightOf(value: string): string {
     value = value.slice(0, at) + value.slice(start, comma).trim() + value.slice(end + 1)
   }
   return value
+}
+
+/**
+ * Where a `light-dark(` stands outside a quoted string, or -1. A font called `'light-dark('` is a
+ * name, not a function.
+ */
+export function lightDarkAt(value: string): number {
+  let quote = ''
+  for (let i = 0; i < value.length; i++) {
+    const c = value[i]
+    if (quote) {
+      if (c === '\\') {
+        i++
+      } else if (c === quote) {
+        quote = ''
+      }
+    } else if (c === '"' || c === "'") {
+      quote = c
+    } else if (value.startsWith('light-dark(', i)) {
+      return i
+    }
+  }
+  return -1
 }
 
 export function resolveTokens(raw: Record<string, string>): Record<string, string> {
@@ -317,7 +349,7 @@ export function resolveTokens(raw: Record<string, string>): Record<string, strin
       // A light-dark() that lightOf could not read (one argument, never closed) stays in the value:
       // as stored it is a declaration a mail client discards, so the token is unresolvable and the
       // consumer falls back to its default.
-      if (out.includes('light-dark(')) {
+      if (lightDarkAt(out) !== -1) {
         out = null
       }
     }
