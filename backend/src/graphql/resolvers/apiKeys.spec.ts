@@ -15,6 +15,7 @@ import myApiKeys from '@graphql/queries/apiKeys/myApiKeys.gql'
 import revokeApiKey from '@graphql/queries/apiKeys/revokeApiKey.gql'
 import updateApiKey from '@graphql/queries/apiKeys/updateApiKey.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { principalChangesDelivered } from '@root/test/principalChanges'
 import { serverPubsub } from '@src/context'
 import { listenForPrincipalChanges, principalEpoch } from '@src/context/principalEpoch'
 
@@ -358,9 +359,11 @@ describe('revokeApiKey', () => {
   })
 
   it("moves the owner's principal epoch, once", async () => {
+    await principalChangesDelivered(serverPubsub)
     const before = principalEpoch('u4')
     await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
     await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
+    await principalChangesDelivered(serverPubsub)
 
     expect(principalEpoch('u4')).toBe(before + 1)
   })
@@ -442,9 +445,11 @@ describe('admin operations', () => {
 
     it("moves the key owner's principal epoch, once", async () => {
       authenticatedUser = await adminUser.toJson()
+      await principalChangesDelivered(serverPubsub)
       const before = principalEpoch('u-regular')
       await mutate({ mutation: adminRevokeApiKey, variables: { id: keyId } })
       await mutate({ mutation: adminRevokeApiKey, variables: { id: keyId } })
+      await principalChangesDelivered(serverPubsub)
 
       expect(principalEpoch('u-regular')).toBe(before + 1)
     })
@@ -489,10 +494,12 @@ describe('admin operations', () => {
 
     it("moves the user's principal epoch only when a key was revoked", async () => {
       authenticatedUser = await adminUser.toJson()
+      await principalChangesDelivered(serverPubsub)
       const regularBefore = principalEpoch('u-regular')
       const adminBefore = principalEpoch('u-admin')
       await mutate({ mutation: adminRevokeUserApiKeys, variables: { userId: 'u-regular' } })
       await mutate({ mutation: adminRevokeUserApiKeys, variables: { userId: 'u-admin' } })
+      await principalChangesDelivered(serverPubsub)
 
       expect(principalEpoch('u-regular')).toBe(regularBefore + 1)
       expect(principalEpoch('u-admin')).toBe(adminBefore)

@@ -272,6 +272,7 @@ describe('PolicyService', () => {
       'showContentFilterMasonryGrid',
       'showGroupButtonInHeader',
       'socialMediaEnabled',
+      'videoCallDtx',
       'videoConference',
     ]
 

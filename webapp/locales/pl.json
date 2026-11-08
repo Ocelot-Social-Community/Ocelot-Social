@@ -278,6 +278,7 @@
         "showContentFilterMasonryGrid": "Pokazuje filtr treści w siatce masonry (aktualności).",
         "showGroupButtonInHeader": "Pokazuje przycisk grup w nagłówku.",
         "socialMediaEnabled": "Włącza funkcję linków do mediów społecznościowych: linki są wyświetlane w profilach i zarządzane w ustawieniach użytkownika.",
+        "videoCallDtx": "Ustawienie domyślne dla połączeń wideo: dopóki ktoś milczy, jego mikrofon prawie nie wysyła danych. Oszczędza przepustowość, ale może sprawić, że pojedynczy uczestnicy będą niesłyszalni dla pojedynczych słuchaczy. Każdy użytkownik może to zmienić dla własnego mikrofonu w ustawieniach urządzeń podczas połączenia.",
         "videoConference": "Włącza wideokonferencje (LiveKit). Przełącznik czasu wykonania dla uprawnień połączeń wideo. Wymaga zmiennych środowiskowych LiveKit; bez nich pozostaje wyłączone i wyszarzone."
       },
       "envLink": "Zobacz środowisko",
@@ -301,6 +302,7 @@
         "showContentFilterMasonryGrid": "Filtr treści w siatce",
         "showGroupButtonInHeader": "Przycisk grup w nagłówku",
         "socialMediaEnabled": "Media społecznościowe",
+        "videoCallDtx": "Tłumienie ciszy w rozmowach",
         "videoConference": "Wideokonferencje"
       },
       "lastUpdated": "Ostatnia zmiana: {timestamp} przez {actor}",
@@ -1961,6 +1963,9 @@
     },
     "deviceSettings": {
       "button": "Urządzenia",
+      "dtx": "Nie przesyłaj przerw w mowie",
+      "dtxFailed": "Nie udało się zmienić ustawienia przerw w mowie – twój mikrofon działa dalej jak wcześniej.",
+      "dtxHint": "Oszczędza dane, gdy milczysz. Jeśli inni czasem cię nie słyszą, wyłącz to.",
       "speakerError": "Nie udało się przełączyć głośnika.",
       "title": "Ustawienia urządzeń"
     },
@@ -1996,6 +2001,7 @@
       "tooltip": "Rozmowa wideo w grupie „{name}”"
     },
     "hideBars": "Ukryj paski",
+    "hideNotices": "Ukryj komunikaty",
     "leave": "Opuść rozmowę",
     "maximize": "Maksymalizuj",
     "micMuted": "Mikrofon wyłączony",
@@ -2050,6 +2056,7 @@
     "screenShare": "Ekran",
     "screenShareEnded": "Zakończono udostępnianie ekranu",
     "showBars": "Pokaż paski",
+    "showNotices": "Pokaż komunikaty",
     "showVideos": "Pokaż wideo",
     "spotlightExit": "Wyjdź z trybu spotlight",
     "title": "Rozmowa wideo grupowa",

@@ -278,6 +278,7 @@
         "showContentFilterMasonryGrid": "Show the content filter in the masonry grid (newsfeed).",
         "showGroupButtonInHeader": "Show the groups button in the header.",
         "socialMediaEnabled": "Enable the social-media links feature: links are shown on profiles and managed in user settings.",
+        "videoCallDtx": "Default for video calls: while someone is silent, their microphone sends hardly any data. Saves bandwidth, but can make single participants inaudible to single listeners. Every user can change it for their own microphone in the device settings of a call.",
         "videoConference": "Enable video conferencing (LiveKit). The runtime switch for the video-call permissions. Requires the LiveKit environment variables; without them it stays off and greyed out."
       },
       "envLink": "View environment",
@@ -301,6 +302,7 @@
         "showContentFilterMasonryGrid": "Content filter in grid",
         "showGroupButtonInHeader": "Groups button in header",
         "socialMediaEnabled": "Social media",
+        "videoCallDtx": "Silence suppression in calls",
         "videoConference": "Video conferencing"
       },
       "lastUpdated": "Last changed: {timestamp} by {actor}",
@@ -1961,6 +1963,9 @@
     },
     "deviceSettings": {
       "button": "Devices",
+      "dtx": "Don't transmit pauses in speech",
+      "dtxFailed": "The speech pauses setting could not be changed – your microphone carries on as before.",
+      "dtxHint": "Saves data while you are silent. If others sometimes cannot hear you, switch it off.",
       "speakerError": "Could not switch the speaker.",
       "title": "Device settings"
     },
@@ -1996,6 +2001,7 @@
       "tooltip": "Video call in group “{name}”"
     },
     "hideBars": "Hide the bars",
+    "hideNotices": "Hide notices",
     "leave": "Leave call",
     "maximize": "Maximize",
     "micMuted": "Microphone off",
@@ -2050,6 +2056,7 @@
     "screenShare": "Screen",
     "screenShareEnded": "Screen sharing ended",
     "showBars": "Show the bars",
+    "showNotices": "Show notices",
     "showVideos": "Show videos",
     "spotlightExit": "Exit spotlight",
     "title": "Group video call",

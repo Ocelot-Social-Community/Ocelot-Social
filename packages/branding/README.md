@@ -39,14 +39,14 @@ The archive is a **library of bucket instances** (`manifest.json` + sparse `frag
 
 ## Consuming the resolved config (backend / webapp)
 
-`branding` is a **named** export that resolves at *access* time — read a value inside a function/component and it reflects the runtime‑injected brand (or the framework defaults when none is injected):
+`branding` is a **named** export that resolves at _access_ time — read a value inside a function/component and it reflects the runtime‑injected brand (or the framework defaults when none is injected):
 
 ```ts
 import { branding, getBranding, setBranding } from '@ocelot-social/branding'
 
-branding.group.nameLengthMax          // resolves now, honours a runtime-injected brand
-setBranding(config)                   // a bootstrap injects a brand before the app reads values
-setBranding(undefined)                // reset to the framework defaults
+branding.group.nameLengthMax // resolves now, honours a runtime-injected brand
+setBranding(config) // a bootstrap injects a brand before the app reads values
+setBranding(undefined) // reset to the framework defaults
 ```
 
 Server‑only helpers (they use `node:fs`/`node:zlib`, so import them under a `process.server` guard, **not** from the index — keeps them out of the client bundle):
@@ -70,16 +70,36 @@ The breaking axis is the **major** version once ≥ 1.0.0, and the **minor** whi
 
 ## Scripts
 
-| Script                | What it does                                                              |
-| --------------------- | ------------------------------------------------------------------------- |
-| `npm run build`       | Compile `src/` → CommonJS `dist/` (+ `.d.ts`, + the CJS marker)           |
-| `npm run lint`        | ESLint (shared `eslint-config-it4c`), zero warnings                        |
-| `npm run typecheck`   | `tsc --noEmit` over `src/` + `scripts/`                                    |
-| `npm run test`        | `node --test` (TypeScript via native type‑stripping)                      |
-| `npm run test:coverage` | tests with a coverage gate (lines/functions ≥ 95, branches ≥ 82)        |
-| `npm run validate`    | `publint` + `are-the-types-wrong` (published‑package correctness)         |
-| `npm run schema:snapshot` | Regenerate the schema‑shape lock after an intentional schema change   |
-| `npm run check`       | build → lint → typecheck → test:coverage → validate                       |
+| Script                    | What it does                                                        |
+| ------------------------- | ------------------------------------------------------------------- |
+| `npm run build`           | Compile `src/` → CommonJS `dist/` (+ `.d.ts`, + the CJS marker)     |
+| `npm run lint`            | ESLint (shared `eslint-config-it4c`), zero warnings                 |
+| `npm run typecheck`       | `tsc --noEmit` over `src/` + `scripts/`                             |
+| `npm run test`            | `node --test` (TypeScript via native type‑stripping)                |
+| `npm run test:coverage`   | tests with a coverage gate (lines/functions 100, branches ≥ 90)     |
+| `npm run validate`        | `publint` + `are-the-types-wrong` (published‑package correctness)   |
+| `npm run schema:snapshot` | Regenerate the schema‑shape lock after an intentional schema change |
+| `npm run check`           | build → lint → typecheck → test:coverage → validate                 |
+
+## Changing the framework tokens
+
+Every custom property the framework declares (`webapp/assets/css/root-tokens.css`,
+`ocelot-ui-variables.css`) is something a brand may set — the admin lists them. Taking one away turns
+every brand's value for it into a silent no-op, so it is a decision, never a side effect of a refactor.
+
+- **Adding** a token needs no step of its own: `npm run tokens:snapshot` adds it to
+  `scripts/public-tokens.snapshot.json`, the list of names that have been public.
+- **Renaming or removing** one breaks the brands that set it, so it is a deliberate step. The
+  `public token lock` test only sees a declaration disappear. The steps: remove the old name from the
+  stylesheets, run `npm run tokens:snapshot` (it regenerates `src/frameworkTokens.generated.ts`, which
+  the test reads — commit it), then delete the name from `scripts/public-tokens.snapshot.json` (the
+  command only ever adds). Until the name is deleted there the test fails, which makes the break
+  visible in the diff. A rename or a removal is a breaking change: give the squash commit a
+  `BREAKING CHANGE:` footer, so the version moves on its breaking axis. In the release notes name the
+  old token and, if there is one, the new one.
+- **An alias does not count as a rename.** With `--old: var(--new)` left in the stylesheet `--old` is
+  still declared, so the test stays green, yet a value a brand sets for `--old` reaches nobody. To
+  break on purpose, remove the old name from the stylesheets and from the snapshot.
 
 ## Changing the schema
 
@@ -91,13 +111,13 @@ change is intentional:
 1. Title the PR `feat(package/branding):` / `fix(package/branding):` so release-please bumps
    `SCHEMA_VERSION` (the archive‑compatibility axis surfaced via `checkSchemaCompat`). `SCHEMA_VERSION`
    (`src/version.ts`) is bumped in lock‑step with `package.json` by release-please (`extra-files`) — in
-   its own release PR, *after* yours is merged. Step 1 is therefore **not** enforced by the lock test:
+   its own release PR, _after_ yours is merged. Step 1 is therefore **not** enforced by the lock test:
    at the time it runs the version is unchanged by construction, and the test cannot see the diff that
    would tell it a shape change is in flight. Only step 2 is mechanically checked.
 2. Run `npm run schema:snapshot` and commit the updated snapshot (its diff shows exactly which paths
    changed — useful for review).
 
-A default *value* change (e.g. `group.nameLengthMax` 50 → 60) is **not** a shape change and does not
+A default _value_ change (e.g. `group.nameLengthMax` 50 → 60) is **not** a shape change and does not
 trip the lock: old and new archives stay structurally compatible.
 
 ## License

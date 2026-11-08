@@ -278,6 +278,7 @@
         "showContentFilterMasonryGrid": "Shfaq filtrin e përmbajtjes në rrjetën masonry (lajme).",
         "showGroupButtonInHeader": "Shfaq butonin e grupeve në krye.",
         "socialMediaEnabled": "Aktivizon funksionin e lidhjeve të mediave sociale: lidhjet shfaqen në profile dhe menaxhohen te cilësimet e përdoruesit.",
+        "videoCallDtx": "Parazgjedhja për telefonatat me video: për sa kohë dikush hesht, mikrofoni i tij nuk dërgon pothuajse asnjë të dhënë. Kursen gjerësinë e brezit, por mund t’i bëjë pjesëmarrës të veçantë të padëgjueshëm për dëgjues të veçantë. Çdo përdorues mund ta ndryshojë për mikrofonin e vet te cilësimet e pajisjeve të një telefonate.",
         "videoConference": "Aktivizon videokonferencën (LiveKit). Çelësi në kohën e ekzekutimit për lejet e telefonatave me video. Kërkon variablat e mjedisit të LiveKit; pa to mbetet i fikur dhe i zbehur."
       },
       "envLink": "Shiko mjedisin",
@@ -301,6 +302,7 @@
         "showContentFilterMasonryGrid": "Filtri i përmbajtjes në rrjetë",
         "showGroupButtonInHeader": "Butoni i grupeve në krye",
         "socialMediaEnabled": "Media sociale",
+        "videoCallDtx": "Shtypja e heshtjes në telefonata",
         "videoConference": "Videokonferencë"
       },
       "lastUpdated": "Ndryshuar së fundi: {timestamp} nga {actor}",
@@ -1961,6 +1963,9 @@
     },
     "deviceSettings": {
       "button": "Pajisjet",
+      "dtx": "Mos i transmeto pauzat në të folur",
+      "dtxFailed": "Cilësimi i pauzave në të folur nuk mund të ndryshohej – mikrofoni yt vazhdon si më parë.",
+      "dtxHint": "Kursen të dhëna për sa kohë hesht. Nëse të tjerët ndonjëherë nuk të dëgjojnë, fike.",
       "speakerError": "Altoparlanti nuk mund të ndërrohej.",
       "title": "Cilësimet e pajisjeve"
     },
@@ -1996,6 +2001,7 @@
       "tooltip": "Telefonatë me video në grupin „{name}“"
     },
     "hideBars": "Fshih shiritat",
+    "hideNotices": "Fshih njoftimet",
     "leave": "Largohu nga telefonata",
     "maximize": "Maksimizo",
     "micMuted": "Mikrofoni fikur",
@@ -2050,6 +2056,7 @@
     "screenShare": "Ekrani",
     "screenShareEnded": "Ndarja e ekranit përfundoi",
     "showBars": "Shfaq shiritat",
+    "showNotices": "Shfaq njoftimet",
     "showVideos": "Shfaq videot",
     "spotlightExit": "Dil nga spotlight",
     "title": "Telefonatë me video në grup",

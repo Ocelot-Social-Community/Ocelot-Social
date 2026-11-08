@@ -557,9 +557,10 @@ describe('in mode', () => {
             )
           })
 
-          // Against the real geocoder, like the cases around it. The name is the German one the
-          // form shows to a German user; Mapbox's multi-language answer calls the district
-          // "Havelland District", so matching by name refused the group (LOCATION_NAME_NO_EXACT_MATCH).
+          // Against the Mapbox stub, like the cases around it (test/mapbox-stub/places.json holds
+          // Friesack the way Mapbox has it). The name is the German one the form shows to a German
+          // user; Mapbox's multi-language answer calls the district "Havelland District", so
+          // matching by name refused the group (LOCATION_NAME_NO_EXACT_MATCH).
           describe('picked by its Mapbox id', () => {
             const friesack = {
               locationName: 'Friesack, Kreis Havelland, Brandenburg, Deutschland',

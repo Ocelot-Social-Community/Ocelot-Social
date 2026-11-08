@@ -125,16 +125,18 @@ jobs:
             type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend-test
 
-      # maildev and redis by service name, not by tag: compose resolves the tag from
-      # docker-compose.test.yml, the one place Dependabot bumps them. Compose reads the services'
-      # env files even to pull, hence the copies — the same the test jobs make.
+      # maildev, redis and the Mapbox stub's node by service name, not by tag: compose resolves the
+      # tag from docker-compose.test.yml, the one place Dependabot bumps them. Compose reads the
+      # services' env files even to pull, hence the copies — the same the test jobs make. Every
+      # image the test jobs start comes from here, pulled once through the mirror: the test jobs
+      # have none, and an image missing here is pulled from Docker Hub by each of them.
       - name: Pull third-party images
         run: |
           cp webapp/.env.template webapp/.env
           cp backend/.env.test_e2e backend/.env
           docker pull cgr.dev/chainguard/minio:latest
           docker pull cgr.dev/chainguard/minio-client:latest-dev
-          docker compose -f docker-compose.yml -f docker-compose.test.yml pull mailserver redis
+          docker compose -f docker-compose.yml -f docker-compose.test.yml pull mailserver redis mapbox
 
       # Compressed on the way out: `docker save` writes UNCOMPRESSED layer tars, and every byte here is
       # paid 40 times over on the matrix side. zstd rather than gzip -1 — smaller AND faster on both
@@ -150,6 +152,7 @@ jobs:
           docker save "cgr.dev/chainguard/minio-client:latest-dev" | zstd -T0 -3 > /tmp/minio-mc.tar.zst
           docker save "$(compose config --images mailserver)" | zstd -T0 -3 > /tmp/mailserver.tar.zst
           docker save "$(compose config --images redis)" | zstd -T0 -3 > /tmp/redis.tar.zst
+          docker save "$(compose config --images mapbox)" | zstd -T0 -3 > /tmp/mapbox.tar.zst
 
       # ARTIFACT, not cache. These are run-scoped hand-offs between jobs, which is what artifacts are
       # for; `actions/cache` with a `run_id` key can never hit on a later run, yet it occupies the
@@ -410,7 +413,7 @@ jobs:
 
       - name: Boot up test system | docker compose
         run: |
-          for image in neo4j backend minio minio-mc mailserver redis webapp; do
+          for image in neo4j backend minio minio-mc mailserver redis mapbox webapp; do
             zstd -dc "/tmp/${image}.tar.zst" | docker load
           done
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp

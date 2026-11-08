@@ -22,6 +22,7 @@ import UserEmailNotificationSettings from '@graphql/queries/users/UserEmailNotif
 import UserFollowedBy from '@graphql/queries/users/UserFollowedBy.gql'
 import UserFollowing from '@graphql/queries/users/UserFollowing.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { principalChangesDelivered } from '@root/test/principalChanges'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -635,8 +636,10 @@ describe('Delete a User as admin', () => {
         })
 
         it("moves the deleted user's principal epoch", async () => {
+          await principalChangesDelivered(pubsub)
           const before = principalEpoch('u343')
           await mutate({ mutation: DeleteUser, variables })
+          await principalChangesDelivered(pubsub)
 
           expect(principalEpoch('u343')).toBe(before + 1)
         })

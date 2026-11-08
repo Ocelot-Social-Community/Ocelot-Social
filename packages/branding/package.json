@@ -31,15 +31,15 @@
     "test": "npm run build && node --test \"src/**/*.spec.ts\" \"scripts/**/*.spec.ts\"",
     "test:coverage": "npm run build && node --test --experimental-test-coverage --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=90 --test-coverage-exclude='dist/**' --test-coverage-exclude='**/*.spec.ts' \"src/**/*.spec.ts\" \"scripts/**/*.spec.ts\"",
     "check": "npm run build && npm run lint && npm run typecheck && npm run test:coverage && npm run validate",
-    "build:dev-brandings": "node scripts/build-dev-brandings.ts",
+    "build:dev-brandings": "npm run build && node scripts/build-dev-brandings.ts",
     "schema:snapshot": "npm run build && node scripts/schema-snapshot.run.ts",
     "tokens:snapshot": "node scripts/framework-tokens.run.ts",
     "prepack": "npm run build"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.3",
-    "@types/node": "^26.6.5",
-    "eslint": "^10.13.0",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.14.0",
     "eslint-config-it4c": "^0.14.1",
     "publint": "^0.3.25",
     "typescript": "^5.6.0",
@@ -48,6 +48,6 @@
   "dependencies": {
     "nanotar": "^0.3.0",
     "postcss": "^8.5.32",
-    "tslib": "^2.8.1"
+    "tslib": "^2.9.1"
   }
 }

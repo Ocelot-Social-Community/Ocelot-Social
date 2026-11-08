@@ -114,6 +114,18 @@
       >
         {{ uniqueParticipantCount }}
       </span>
+      <!--
+        Folded notices wait in the corner below on the right, where the control bar's button
+        to unfold them is while it shows.
+      -->
+      <span
+        v-if="parked && hasNotices && !noticesOpen"
+        class="video-call__parked-notices"
+        data-test="video-call-parked-notices"
+        aria-hidden="true"
+      >
+        <os-icon :icon="icons.warning" />
+      </span>
 
       <pre-join v-if="phase === 'prejoin'" @join="onPreJoinReady" @cancel="leave" />
 
@@ -139,74 +151,6 @@
           {{ $t('videoCall.connecting') }}
         </div>
         <template v-else>
-          <!--
-            Problems the call cannot fix on its own. They show in the parked
-            window too: a blocked speaker or a silent microphone matters there
-            just as much.
-          -->
-          <div
-            v-if="audioBlocked || micProblem || reconnecting || audioOnly || reloadPending"
-            class="video-call__notices"
-            role="status"
-          >
-            <!--
-              An admin switched the branding; applying it takes a reload, which waits for this
-              call to end (#10353). Said here for as long as it waits, so that the reload after
-              hanging up comes as no surprise.
-            -->
-            <div
-              v-if="reloadPending"
-              class="video-call__notice"
-              data-test="video-call-reload-pending"
-            >
-              {{ $t('videoCall.reloadPending') }}
-            </div>
-            <div v-if="reconnecting" class="video-call__notice" data-test="video-call-reconnecting">
-              {{ $t('videoCall.reconnecting') }}
-            </div>
-            <div
-              v-if="audioBlocked"
-              class="video-call__notice video-call__notice--warning"
-              data-test="video-call-audio-blocked"
-            >
-              <span>{{ $t('videoCall.audioBlocked') }}</span>
-              <os-button
-                data-test="video-call-enable-audio"
-                variant="primary"
-                size="sm"
-                @click="enableAudio"
-              >
-                {{ $t('videoCall.enableAudio') }}
-              </os-button>
-            </div>
-            <div
-              v-if="micProblem"
-              class="video-call__notice video-call__notice--warning"
-              data-test="video-call-mic-problem"
-            >
-              <span>{{ $t('videoCall.micNoSignal') }}</span>
-              <os-button
-                data-test="video-call-restart-mic"
-                variant="primary"
-                size="sm"
-                @click="restartMic"
-              >
-                {{ $t('videoCall.restartMic') }}
-              </os-button>
-            </div>
-            <div v-if="audioOnly" class="video-call__notice" data-test="video-call-audio-only">
-              <span>{{ $t('videoCall.audioOnly') }}</span>
-              <os-button
-                data-test="video-call-show-videos"
-                variant="primary"
-                appearance="outline"
-                size="sm"
-                @click="showVideos"
-              >
-                {{ $t('videoCall.showVideos') }}
-              </os-button>
-            </div>
-          </div>
           <div
             v-if="isMaximized && !mobileChatOpen && activeSpeakers.length"
             class="video-call__speakers"
@@ -249,6 +193,96 @@
                   <os-icon :icon="icons.compressVertical" />
                 </template>
               </os-button>
+            </div>
+            <!--
+              Problems the call cannot fix on its own. Inside the stage, which anchors
+              them: placed from the body instead, which gives up its box in the maximized
+              layouts, they went by the whole call — over the control bar, centred across
+              the chat as well, their buttons behind the page's footer. In the parked window
+              they are folded behind a button in the header (noticesCollapsed), but still
+              announced: folded means out of sight, not out of the accessibility tree.
+
+              Announced from two live regions that are there before they have anything to
+              say: a region inserted along with its message is passed over by some screen
+              readers. One for what stands in the user's way, said at once (role="alert"),
+              on top; one for what only informs, waiting its turn (role="status").
+            -->
+            <div
+              id="video-call-notices"
+              :class="[
+                'video-call__notices',
+                { 'video-call__notices--collapsed': noticesCollapsed },
+              ]"
+              data-test="video-call-notices"
+            >
+              <div
+                class="video-call__notices-region"
+                role="alert"
+                data-test="video-call-notices-alert"
+              >
+                <call-notice
+                  v-if="audioBlocked"
+                  data-test="video-call-audio-blocked"
+                  tone="warning"
+                  :message="$t('videoCall.audioBlocked')"
+                  :actions="[
+                    {
+                      key: 'enable',
+                      label: $t('videoCall.enableAudio'),
+                      dataTest: 'video-call-enable-audio',
+                    },
+                  ]"
+                  @action="enableAudio"
+                />
+                <call-notice
+                  v-if="micProblem"
+                  data-test="video-call-mic-problem"
+                  tone="warning"
+                  :message="$t('videoCall.micNoSignal')"
+                  :actions="[
+                    {
+                      key: 'restart',
+                      label: $t('videoCall.restartMic'),
+                      dataTest: 'video-call-restart-mic',
+                    },
+                  ]"
+                  @action="restartMic"
+                />
+              </div>
+              <div
+                class="video-call__notices-region"
+                role="status"
+                data-test="video-call-notices-status"
+              >
+                <!--
+                  An admin switched the branding; applying it takes a reload, which waits for
+                  this call to end (#10353). Said here for as long as it waits, so that the
+                  reload after hanging up comes as no surprise.
+                -->
+                <call-notice
+                  v-if="reloadPending"
+                  data-test="video-call-reload-pending"
+                  :message="$t('videoCall.reloadPending')"
+                />
+                <call-notice
+                  v-if="reconnecting"
+                  data-test="video-call-reconnecting"
+                  :message="$t('videoCall.reconnecting')"
+                />
+                <call-notice
+                  v-if="audioOnly"
+                  data-test="video-call-audio-only"
+                  :message="$t('videoCall.audioOnly')"
+                  :actions="[
+                    {
+                      key: 'show',
+                      label: $t('videoCall.showVideos'),
+                      dataTest: 'video-call-show-videos',
+                    },
+                  ]"
+                  @action="showVideos"
+                />
+              </div>
             </div>
             <!--
             All tiles are always mounted so every participant's audio track stays
@@ -429,7 +463,10 @@
             :meter-stream="micMeterStream"
             :camera-starting="devicesStarting.videoinput > 0"
             :mic-starting="devicesStarting.audioinput > 0"
+            :dtx="dtx"
+            :dtx-applying="dtxApplying"
             @switch="switchDevice"
+            @dtx-change="setDtx"
             @close="closeDeviceSettings({ restoreFocus: true })"
           />
         </div>
@@ -466,6 +503,31 @@
             {{ leaveLabel }}
           </template>
         </os-button>
+        <!--
+          In the parked window the notices would cover its small picture: they wait behind
+          this button, in the bar's corner below on the right. A warning sign in the warning
+          colour, whatever they say: a bell or the like did not tell that something is to be
+          read. In a wrapper of its own: OsButton's root carries no scoped-style attribute,
+          so a position set on it would not apply.
+        -->
+        <div v-if="parked && hasNotices" class="video-call__notices-toggle">
+          <os-button
+            v-tooltip="noticesToggleLabel"
+            data-test="video-call-notices-toggle"
+            variant="warning"
+            appearance="filled"
+            size="sm"
+            circle
+            :aria-label="noticesToggleLabel"
+            :aria-expanded="noticesOpen ? 'true' : 'false'"
+            aria-controls="video-call-notices"
+            @click="noticesOpen = !noticesOpen"
+          >
+            <template #icon>
+              <os-icon :icon="icons.warning" />
+            </template>
+          </os-button>
+        </div>
       </div>
     </div>
   </div>
@@ -485,6 +547,7 @@ import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 import DeviceSettings from './DeviceSettings.vue'
+import CallNotice from './CallNotice.vue'
 import { saveDevicePreference } from './devicePreferences'
 import { createAudioWatchdog } from './audioWatchdog'
 
@@ -560,6 +623,7 @@ export default {
     VideoTile,
     PreJoin,
     DeviceSettings,
+    CallNotice,
     OsButton,
     OsCounterIcon,
     OsIcon,
@@ -593,6 +657,16 @@ export default {
       // Our microphone is published but delivers nothing: the OS took the device
       // away (LiveKit then pauses the upstream) or it only yields digital silence.
       micProblem: false,
+      // The user's own choice on leaving out pauses in speech (Opus DTX) for
+      // this call, or null to follow the network's default. Never stored: every
+      // call starts on the network's default, so an admin's change reaches
+      // everyone and a choice made against one bad connection does not linger.
+      dtxPreference: null,
+      // The network's default as the call started with it. Read once per call: the microphone
+      // was published with it, and a policy changed meanwhile reaches the next call — shown
+      // here at once, it would claim a setting the microphone does not have.
+      dtxDefault: false,
+      dtxApplying: false,
       reconnecting: false,
       // Remote cameras are unsubscribed because our connection is weak — the
       // sound gets the bandwidth. audioOnlyDismissed: the user asked for the
@@ -627,6 +701,8 @@ export default {
       // The mouse is on the call's window: in the parked one that shows its bars. Not
       // :hover, which Safari does not set on it.
       pointerOnParked: false,
+      // The notices are unfolded in the parked window (see noticesCollapsed).
+      noticesOpen: false,
       // Only Chromium-based browsers (Chrome, Edge, Opera, …) know navigator.userAgentData.
       // Set once mounted: the server renders no browser.
       isChromium: false,
@@ -640,6 +716,14 @@ export default {
     }
   },
   computed: {
+    // Opus DTX: while we are silent, our microphone sends hardly any packets.
+    // Off unless the network or the user turns it on — a nearly idle audio
+    // path leaves more room for one listener losing us (#10787), and LiveKit's
+    // own meet app keeps it off as well.
+    dtx() {
+      if (this.dtxPreference !== null) return this.dtxPreference
+      return this.dtxDefault
+    },
     ...mapGetters({
       show: 'videoCall/showVideoCall',
       minimized: 'videoCall/minimized',
@@ -884,6 +968,25 @@ export default {
       // always maximized.
       return this.phase === 'in-call' && this.minimized && !this.isMobile
     },
+    hasNotices() {
+      return !!(
+        this.audioBlocked ||
+        this.micProblem ||
+        this.reconnecting ||
+        this.audioOnly ||
+        this.reloadPending
+      )
+    },
+    // What stands in the user's way, as opposed to what only informs.
+    hasWarningNotice() {
+      return !!(this.audioBlocked || this.micProblem)
+    },
+    noticesCollapsed() {
+      return this.parked && !this.noticesOpen
+    },
+    noticesToggleLabel() {
+      return this.noticesOpen ? this.$t('videoCall.hideNotices') : this.$t('videoCall.showNotices')
+    },
     iconOnly() {
       // Buttons without their label where there is no room for it: in the parked
       // window, on a phone, where six spelled-out controls fill half the
@@ -1007,6 +1110,16 @@ export default {
     },
   },
   watch: {
+    // A warning unfolds the notices, each time one comes up: without sound or with a silent
+    // microphone, the call does not work, and the user is to learn that without looking for
+    // it. What only informs waits behind the button.
+    hasWarningNotice(warning, before) {
+      if (warning && !before) this.noticesOpen = true
+    },
+    // Once there is nothing to say, the next notice starts folded again.
+    hasNotices(any) {
+      if (!any) this.noticesOpen = false
+    },
     // Once, when it arrives; the notice above stays for as long as it waits.
     reloadPending(pending) {
       if (pending) this.$toast.info(this.$t('videoCall.reloadPending'))
@@ -1122,6 +1235,9 @@ export default {
     this.speakerHoldTimer = null
     this.micRestart = null
     this.micSilenceProbe = null
+    // Tracks whose events we listen to — publishing a track anew must not
+    // double the listeners.
+    this.watchedMicTracks = new WeakSet()
     this.stageObserver = null
     this.observedStage = null
     this.qualityTimer = null
@@ -1247,7 +1363,8 @@ export default {
     },
     // On a touch screen a tap on the videos switches the bars: back when they are gone —
     // without spotlighting the tile it landed on — and away when they are there, unless
-    // the tap is on a tile, which spotlights it as ever. Other taps keep them a while.
+    // the tap is on a tile, which spotlights it as ever, or on a notice lying on the
+    // videos, whose buttons are to act alone. Other taps keep them a while.
     onBarTouch(event) {
       this.lastTouchAt = Date.now()
       this.swallowTileSelect = false
@@ -1256,7 +1373,7 @@ export default {
         this.barsHidden = false
         this.swallowTileSelect = !!onStage
         this.scheduleBarsHide()
-      } else if (onStage && !event.target.closest('.video-tile')) {
+      } else if (onStage && !event.target.closest('.video-tile, .video-call__notices')) {
         clearTimeout(this.barsTimer)
         this.barsHidden = true
       } else {
@@ -1668,6 +1785,10 @@ export default {
       this.micRestart = null
       this.micSilenceProbe = null
       this.stopAudioWatchdog()
+      this.dtxApplying = false
+      this.dtxPreference = null
+      this.dtxDefault = !!(this.$policy && this.$policy.get('videoCallDtx'))
+      this.dtxSwitch = null
       this.resetAudioOnly()
       try {
         if (!this.groupId) throw new Error('Missing group id')
@@ -1690,6 +1811,7 @@ export default {
           dynacast: true,
           videoCaptureDefaults: this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : {},
           audioCaptureDefaults: this.micDeviceId ? { deviceId: this.micDeviceId } : {},
+          publishDefaults: { dtx: this.dtx },
           // LiveKit picks the speaker anew whenever a device comes or goes.
           // Unless it knows ours, that puts everyone back on the system
           // default without a word.
@@ -2105,6 +2227,10 @@ export default {
         // The call ended, or a newer pick came in, while this one was waiting
         // its turn: there is nothing left for it to start.
         if (this.room !== room || ticket !== switching.latest) return
+        if (kind === 'audioinput' && this.dtxSwitch) {
+          await this.dtxSwitch
+          if (this.room !== room || ticket !== switching.latest) return
+        }
         // false: the capture was restarted, but not on the device asked for.
         if ((await room.switchActiveDevice(kind, deviceId)) === false) {
           throw new Error('Device not switched')
@@ -2336,6 +2462,8 @@ export default {
       this.audioOnlyDismissed = false
     },
     watchMicTrack(track, TrackEvent) {
+      if (this.watchedMicTracks.has(track)) return
+      this.watchedMicTracks.add(track)
       // When the OS takes the microphone away (another app, a Bluetooth profile
       // switch, macOS muting the capture) the MediaStreamTrack fires `mute`
       // and LiveKit stops sending after a few seconds — while the participant
@@ -2388,6 +2516,11 @@ export default {
     },
     async doRestartMic() {
       const room = this.room
+      if (this.dtxSwitch) {
+        await this.dtxSwitch
+        // Left, or left and joined anew, meanwhile: this was asked of that call.
+        if (this.room !== room) return
+      }
       const Track = this.Track
       if (!room || !Track) return
       const pub = room.localParticipant.getTrackPublication(Track.Source.Microphone)
@@ -2411,11 +2544,99 @@ export default {
         if (this.room === room) this.showDeviceErrorToast('mic', err)
       }
     },
+    // Called by the device settings' checkbox alone, which is disabled while a switch runs
+    // (dtxApplying): one switch at a time.
+    async setDtx(on) {
+      const before = this.dtx
+      this.dtxPreference = on
+      const room = this.room
+      const Track = this.Track
+      if (!room || !Track) return
+      // Every later publish of the microphone follows the room's defaults.
+      room.options.publishDefaults.dtx = on
+      const pub = room.localParticipant.getTrackPublication(Track.Source.Microphone)
+      const track = pub && pub.track
+      if (!track) return
+      // DTX is agreed on when a track is published, so the microphone has to be
+      // published anew. The same track, unstopped: capture, mute state and our
+      // listeners stay as they are.
+      this.dtxApplying = true
+      // Meanwhile the microphone has no publication. Switched on, restarted or moved to another
+      // device, LiveKit would find none — and open a second capture, or act on nothing: those
+      // wait for this. Muting acts on the track itself (see toggleMic).
+      let settle
+      const dtxSwitch = new Promise((resolve) => {
+        settle = resolve
+      })
+      this.dtxSwitch = dtxSwitch
+      this.dtxTrack = track
+      const publish = (dtx) =>
+        room.localParticipant.publishTrack(track, { source: Track.Source.Microphone, dtx })
+      try {
+        await room.localParticipant.unpublishTrack(track, false)
+        if (this.room !== room) return
+        try {
+          await publish(on)
+        } catch (err) {
+          if (this.room !== room) return
+          await this.restoreDtx(room, track, publish, before, err)
+        }
+      } catch (err) {
+        if (this.room === room) this.showDeviceErrorToast('mic', err)
+      } finally {
+        if (this.dtxSwitch === dtxSwitch) this.dtxSwitch = null
+        settle()
+        if (this.room === room) {
+          this.dtxApplying = false
+          // A failed publish leaves the microphone off, and one muted meanwhile went out
+          // muted — say so on the button.
+          this.micEnabled = !!room.localParticipant.isMicrophoneEnabled
+        }
+      }
+    },
+
+    // The microphone could not be published with the new choice. Asked for a setting, the user
+    // is not to lose their voice over it: the same track goes out again as it was, the choice
+    // back where it was. Failing that, the track is stopped rather than left captured and
+    // unheard — an open capture keeps a Bluetooth headset in its call mode, among others —
+    // and the microphone shows as off, to be switched on again.
+    async restoreDtx(room, track, publish, before, err) {
+      this.dtxPreference = before
+      room.options.publishDefaults.dtx = before
+      try {
+        await publish(before)
+        if (this.room !== room) return
+        if (this.$toast && typeof this.$toast.error === 'function') {
+          this.$toast.error(this.$t('videoCall.deviceSettings.dtxFailed'))
+        }
+      } catch {
+        track.stop()
+        if (this.room === room) this.showDeviceErrorToast('mic', err)
+      }
+    },
     async toggleMic() {
       if (!this.room) return
       const next = !this.micEnabled
+      // Muting while a dtx switch has the microphone unpublished: LiveKit would find nothing to
+      // mute and the track go out again open. Muted on the track itself, at once, it goes out
+      // muted.
+      if (!next && this.dtxSwitch) {
+        const room = this.room
+        await this.dtxTrack.mute()
+        if (this.room !== room) return
+        this.micEnabled = false
+        this.micProblem = false
+        this.refreshMicMeter()
+        return
+      }
       if (next) this.deviceStarts('audioinput')
       try {
+        if (this.dtxSwitch) {
+          const room = this.room
+          await this.dtxSwitch
+          // Left, or left and joined anew, meanwhile: this was asked of that call.
+          if (this.room !== room) return
+        }
         await this.room.localParticipant.setMicrophoneEnabled(next)
         this.micEnabled = next
         // A muted microphone is silent on purpose.
@@ -2539,8 +2760,11 @@ export default {
               ...(lp.audioTrackPublications?.values?.() ?? []),
               ...(lp.videoTrackPublications?.values?.() ?? []),
             ]
-            for (const pub of pubs) {
-              const track = pub && pub.track
+            const tracks = pubs.map((pub) => pub && pub.track)
+            // A dtx switch holds the microphone unpublished for a moment: in no publication,
+            // and running.
+            if (this.dtxSwitch) tracks.push(this.dtxTrack)
+            for (const track of tracks) {
               if (!track) continue
               try {
                 track.stop()
@@ -2742,6 +2966,8 @@ export default {
   flex: 1;
   min-width: 0;
   min-height: 0;
+  /*  Anchors the notices and the button that brings the bars back. */
+  position: relative;
 }
 
 .video-call__grid {
@@ -2898,29 +3124,20 @@ export default {
   bottom: var(--space-x-small);
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xx-small);
   max-width: calc(100% - var(--space-base));
   z-index: 3;
 }
 
-.video-call__notice {
+/*  Each region is there all the time, an empty one without a box of its own. The gap */
+/*  between them only where both have something to say. */
+.video-call__notices-region {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-x-small);
-  padding: var(--space-xx-small) var(--space-small);
-  border-radius: var(--border-radius-base);
-  text-align: center;
-  color: var(--video-on-media-color);
-  background: var(--video-surface);
+  flex-direction: column;
+  gap: var(--space-xx-small);
 }
 
-.video-call__notice--warning {
-  color: var(--color-warning-inverse);
-  background: var(--color-warning);
+.video-call__notices-region:not(:empty) + .video-call__notices-region:not(:empty) {
+  margin-top: var(--space-xx-small);
 }
 
 .video-call__error {
@@ -3052,10 +3269,6 @@ export default {
 
 .video-call--bars-collapsed .video-call__controls {
   margin-bottom: -45px;
-}
-
-.video-call--bars-collapsed .video-call__stage {
-  position: relative;
 }
 
 .video-call__show-bars {
@@ -3275,15 +3488,78 @@ export default {
   transition: opacity 0.3s ease;
 }
 
+/*  The control bar's button to unfold them, as it looks there (a small filled button: 26px, */
+/*  0.8px border, its icon 1.2em of 12px), at its distance from the right edge. A little */
+/*  higher than it, off the window's lower edge, where it would stick to the corner. */
+.video-call__parked-notices {
+  z-index: 3;
+  align-self: end;
+  justify-self: end;
+  margin: 0 var(--space-x-small) var(--space-x-small) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  border: 0.8px solid var(--color-warning);
+  border-radius: var(--border-radius-rounded);
+  font-size: 12px;
+  color: var(--color-warning-contrast);
+  background: var(--color-warning);
+  transition: opacity 0.3s ease;
+}
+
+/*  The parked window's bar centres its buttons; this one keeps to its corner. */
+.video-call__notices-toggle {
+  position: absolute;
+  top: 50%;
+  right: var(--space-x-small);
+  transform: translateY(-50%);
+  display: flex;
+}
+
 .video-call--parked-bars:is(:has(:focus-visible), .video-call--bars-held)
-  .video-call__parked-count {
+  :is(.video-call__parked-count, .video-call__parked-notices) {
   opacity: 0;
+}
+
+/*  The parked window's notices, unfolded: in the corner of the button that unfolds them, */
+/*  above the control bar while it shows (control bar of small buttons 31px, compact header */
+/*  44px). Scrolling rather than running under the bars when the picture cannot hold them. */
+.video-call--parked-bars .video-call__notices {
+  bottom: var(--space-x-small);
+  max-height: calc(100% - 2 * var(--space-x-small));
+  overflow-y: auto;
+  transition:
+    bottom 0.3s ease,
+    max-height 0.3s ease;
+}
+
+.video-call--parked-bars:is(:has(:focus-visible), .video-call--bars-held) .video-call__notices {
+  bottom: calc(31px + var(--space-x-small));
+  max-height: calc(100% - 44px - 31px - 2 * var(--space-x-small));
+}
+
+/*  Folded: out of sight, yet still in the accessibility tree, so that a warning is */
+/*  announced all the same. Reached by the keyboard, they unfold for as long as it is in */
+/*  them: an action is not to be focused unseen. */
+.video-call__notices--collapsed:not(:focus-within) {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .video-call--parked-bars .video-call__header,
   .video-call--parked-bars .video-call__controls,
-  .video-call__parked-count {
+  .video-call--parked-bars .video-call__notices,
+  .video-call__parked-count,
+  .video-call__parked-notices {
     transition: none;
   }
 }

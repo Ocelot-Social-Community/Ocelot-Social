@@ -3,7 +3,7 @@ apiVersion: apps/v1
 metadata:
   name:  {{ .Release.Name }}-webapp
 spec:
-  replicas: 1
+  replicas: {{ .Values.webapp.replicas }}
   selector:
     matchLabels:
       app: {{ .Release.Name }}-webapp
@@ -18,6 +18,17 @@ spec:
         app: {{ .Release.Name }}-webapp
     spec:
       restartPolicy: Always
+      {{- if gt (int .Values.webapp.replicas) 1 }}
+      # Soft spread: replicas on one node would all go down with that node. ScheduleAnyway keeps a
+      # small cluster schedulable — the PDB covers drains either way.
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: {{ .Release.Name }}-webapp
+      {{- end }}
       {{- include "imagePullSecrets" . | indent 6 }}
       containers:
       - name: {{ .Release.Name }}-webapp
