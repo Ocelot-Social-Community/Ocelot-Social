@@ -1995,6 +1995,7 @@
       "tooltip": "Telefonatë me video në grupin „{name}“"
     },
     "hideBars": "Fshih shiritat",
+    "hideNotices": "Fshih njoftimet",
     "leave": "Largohu nga telefonata",
     "maximize": "Maksimizo",
     "micMuted": "Mikrofoni fikur",
@@ -2049,6 +2050,7 @@
     "screenShare": "Ekrani",
     "screenShareEnded": "Ndarja e ekranit përfundoi",
     "showBars": "Shfaq shiritat",
+    "showNotices": "Shfaq njoftimet",
     "showVideos": "Shfaq videot",
     "spotlightExit": "Dil nga spotlight",
     "title": "Telefonatë me video në grup",

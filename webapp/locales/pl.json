@@ -1995,6 +1995,7 @@
       "tooltip": "Rozmowa wideo w grupie „{name}”"
     },
     "hideBars": "Ukryj paski",
+    "hideNotices": "Ukryj komunikaty",
     "leave": "Opuść rozmowę",
     "maximize": "Maksymalizuj",
     "micMuted": "Mikrofon wyłączony",
@@ -2049,6 +2050,7 @@
     "screenShare": "Ekran",
     "screenShareEnded": "Zakończono udostępnianie ekranu",
     "showBars": "Pokaż paski",
+    "showNotices": "Pokaż komunikaty",
     "showVideos": "Pokaż wideo",
     "spotlightExit": "Wyjdź z trybu spotlight",
     "title": "Rozmowa wideo grupowa",

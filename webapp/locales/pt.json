@@ -1995,6 +1995,7 @@
       "tooltip": "Videochamada no grupo “{name}”"
     },
     "hideBars": "Ocultar as barras",
+    "hideNotices": "Ocultar avisos",
     "leave": "Sair da chamada",
     "maximize": "Maximizar",
     "micMuted": "Microfone desligado",
@@ -2049,6 +2050,7 @@
     "screenShare": "Tela",
     "screenShareEnded": "Compartilhamento de tela encerrado",
     "showBars": "Mostrar as barras",
+    "showNotices": "Mostrar avisos",
     "showVideos": "Mostrar vídeos",
     "spotlightExit": "Sair do destaque",
     "title": "Videochamada de grupo",

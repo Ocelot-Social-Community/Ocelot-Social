@@ -1995,6 +1995,7 @@
       "tooltip": "Videoanruf in der Gruppe „{name}“"
     },
     "hideBars": "Leisten ausblenden",
+    "hideNotices": "Hinweise ausblenden",
     "leave": "Anruf verlassen",
     "maximize": "Maximieren",
     "micMuted": "Mikrofon aus",
@@ -2049,6 +2050,7 @@
     "screenShare": "Bildschirm",
     "screenShareEnded": "Bildschirmfreigabe beendet",
     "showBars": "Leisten einblenden",
+    "showNotices": "Hinweise anzeigen",
     "showVideos": "Videos anzeigen",
     "spotlightExit": "Spotlight beenden",
     "title": "Gruppen-Videoanruf",
