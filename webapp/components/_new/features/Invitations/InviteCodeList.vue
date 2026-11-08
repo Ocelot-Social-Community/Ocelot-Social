@@ -234,7 +234,7 @@ export default {
   align-items: baseline;
   gap: var(--space-x-small);
   padding: var(--space-x-small) 0;
-  border-bottom: 1px dotted var(--color-neutral-80);
+  border-bottom: 1px dotted var(--border-color-softer);
   color: var(--text-color-soft);
 }
 

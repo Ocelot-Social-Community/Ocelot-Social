@@ -507,8 +507,8 @@ export default {
   background: var(--background-color-inverse);
   color: var(--text-color-inverse);
   border-radius: var(--border-radius-base);
-  /*  color-mix, not rgba(): var(--color-neutral-0) is a var() and Sass cannot decompose one. */
-  box-shadow: 0 2px 10px color-mix(in srgb, var(--color-neutral-0) 25%, transparent);
+  /*  color-mix, not rgba(): var(--shadow-ink) is a var() and Sass cannot decompose one. */
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--shadow-ink) 25%, transparent);
   /*  Undo the header/cell text styling for a plain, readable tooltip. */
   white-space: normal;
   overflow-wrap: anywhere;

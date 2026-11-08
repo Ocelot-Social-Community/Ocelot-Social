@@ -85,7 +85,7 @@ export default {
 
 .size-small {
   font-size: 0.8rem;
-  color: var(--color-neutral-40);
+  color: var(--text-color-soft);
   margin-bottom: 12px;
 
   > .distance {

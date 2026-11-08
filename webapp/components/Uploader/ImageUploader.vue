@@ -198,7 +198,7 @@ export default {
   }
 
   &:only-child {
-    background-color: var(--color-neutral-85);
+    background-color: var(--background-color-softest);
   }
 
   &:disabled {
@@ -260,8 +260,8 @@ export default {
       position: absolute;
       padding: var(--space-small);
       border-radius: 100%;
-      border: var(--border-size-base) dashed var(--color-neutral-20);
-      background-color: var(--color-neutral-95);
+      border: var(--border-size-base) dashed var(--border-color-strong);
+      background-color: var(--background-color-soft);
       font-size: var(--size-icon-large);
       opacity: var(--opacity-soft);
     }

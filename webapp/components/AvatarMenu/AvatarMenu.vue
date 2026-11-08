@@ -177,8 +177,8 @@ export default {
   padding-top: var(--space-x-small);
   padding-bottom: var(--space-x-small);
   hr {
-    color: var(--color-neutral-90);
-    background-color: var(--color-neutral-90);
+    color: var(--background-color-softer);
+    background-color: var(--background-color-softer);
   }
   .logout-link {
     color: var(--text-color-danger);

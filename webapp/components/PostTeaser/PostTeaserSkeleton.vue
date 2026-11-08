@@ -45,7 +45,7 @@ export default {
 }
 
 .post-teaser-skeleton {
-  background: var(--color-neutral-100);
+  background: var(--background-color-base);
   border-radius: var(--border-radius-base);
   box-shadow: var(--box-shadow-base);
   overflow: hidden;

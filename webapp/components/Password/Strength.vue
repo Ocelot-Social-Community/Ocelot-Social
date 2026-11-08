@@ -56,7 +56,7 @@ export default {
 .password-strength-meter {
   position: relative;
   height: 3px;
-  background: var(--color-neutral-85);
+  background: var(--background-color-softest);
   margin: 10px auto 6px;
   border-radius: 3px;
 
@@ -66,7 +66,7 @@ export default {
     height: inherit;
     background: transparent;
     display: block;
-    border-color: var(--color-neutral-100);
+    border-color: var(--background-color-base);
     border-style: solid;
     border-width: 0 6px 0 6px;
     box-sizing: border-box;

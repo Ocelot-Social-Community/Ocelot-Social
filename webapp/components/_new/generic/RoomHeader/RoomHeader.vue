@@ -54,7 +54,7 @@ export default {
   height: calc(var(--size-avatar-base) + 2 * var(--space-x-small));
   padding: 0 var(--space-small);
   background: var(--color-header-background);
-  border-bottom: 1px solid var(--color-neutral-85);
+  border-bottom: 1px solid var(--border-color-softest);
   color: var(--text-color-base);
 }
 
