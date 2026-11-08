@@ -1315,6 +1315,7 @@
     "pageTitle": "Kaart",
     "styles": {
       "dark": "Donker",
+      "navigation-night": "Nacht",
       "outdoors": "Buiten",
       "satellite": "Satelliet",
       "streets": "Straten",

@@ -1315,6 +1315,7 @@
     "pageTitle": "Карта",
     "styles": {
       "dark": "Тёмная",
+      "navigation-night": "Ночь",
       "outdoors": "Природа",
       "satellite": "Спутник",
       "streets": "Улицы",

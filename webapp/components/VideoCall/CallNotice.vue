@@ -68,8 +68,8 @@ export default {
   padding: var(--space-xx-small) var(--space-small);
   border-radius: var(--border-radius-base);
   text-align: center;
-  color: var(--text-color-inverse);
-  background: var(--color-neutral-10);
+  color: var(--video-on-media-color);
+  background: var(--video-surface);
 }
 
 /*  A warning keeps the dark ground and light text of every notice: white on the warning */

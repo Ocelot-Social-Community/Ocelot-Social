@@ -345,7 +345,7 @@ export default {
   /*  active-speaker chips), where a tie is decided by DOM order — and the tiles */
   /*  come last, so the frame would paint over the chips. */
   isolation: isolate;
-  background: var(--color-neutral-0);
+  background: var(--video-surface-deep);
   overflow: hidden;
   display: flex;
   /*  Fill the flex/grid parent so a single tile occupies the full body in the */
@@ -366,7 +366,7 @@ export default {
 }
 
 .video-tile--screen {
-  background: var(--color-neutral-10);
+  background: var(--video-surface);
 
   video {
     object-fit: contain;
@@ -435,7 +435,7 @@ export default {
   align-items: center;
   justify-content: center;
   gap: var(--space-x-small);
-  color: var(--text-color-inverse);
+  color: var(--video-on-media-color);
   pointer-events: none;
   padding: var(--space-small);
 
@@ -447,8 +447,8 @@ export default {
 }
 
 .video-tile__fallback--own-screen {
-  background: var(--color-neutral-10);
-  color: var(--color-neutral-70);
+  background: var(--video-surface);
+  color: var(--video-text-soft);
 }
 
 .video-tile__fallback-icon {
@@ -472,7 +472,7 @@ export default {
   gap: var(--space-x-small);
   padding: var(--space-small);
   background: rgba(0, 0, 0, 0.55);
-  color: var(--text-color-inverse);
+  color: var(--video-on-media-color);
   text-align: center;
   pointer-events: none;
   animation: video-tile-starting 150ms ease both;
@@ -493,7 +493,7 @@ export default {
   padding: 2px var(--space-x-small);
   border-radius: var(--border-radius-base);
   background: rgba(0, 0, 0, 0.6);
-  color: var(--text-color-inverse);
+  color: var(--video-on-media-color);
   font-family: var(--font-family-text);
   font-size: var(--font-size-small);
   white-space: nowrap;
@@ -516,7 +516,7 @@ export default {
   bottom: var(--space-xxx-small);
   left: var(--space-xxx-small);
   background: rgba(0, 0, 0, 0.6);
-  color: var(--text-color-inverse);
+  color: var(--video-on-media-color);
   padding: 2px var(--space-x-small);
   border-radius: var(--border-radius-base);
   font-family: var(--font-family-text);

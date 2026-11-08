@@ -442,6 +442,10 @@
   --chat-room-color-counter-badge: var(--text-color-inverse);
   --chat-room-background-counter-badge: var(--color-danger);
   --chat-message-color: var(--text-color-base);
+  /* What constants/chat.js hands to the chat library. The library writes its own
+     --chat-message-color onto its element; a value of var(--chat-message-color) there would read
+     itself and be dropped. This alias is resolved here, where a brand's value stands. */
+  --chat-message-text-color: var(--chat-message-color);
   --chat-message-timestamp: var(--text-color-soft);
   --chat-icon-add: var(--color-primary);
   --chat-icon-send: var(--color-primary);
