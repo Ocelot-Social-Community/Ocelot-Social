@@ -15,7 +15,7 @@ export default {
 .search-heading.ds-heading {
   margin: calc(-1 * var(--space-x-small));
   padding: var(--space-x-small);
-  background-color: var(--color-neutral-100);
+  background-color: var(--background-color-base);
   font-weight: var(--text-weight-bold);
   cursor: default;
 }

@@ -1,0 +1,64 @@
+/**
+ * vue2-datepicker's popup chrome, read from the semantic role tokens.
+ *
+ * The library ships literal whites and greys (vue2-datepicker/index.css), so the event form's
+ * calendar stayed white in the dark theme.
+ * Global on purpose: the popup is appended to <body>, outside the component's scope.
+ * `:root` lifts each rule above the library's own, which ContributionForm imports after this file.
+ */
+
+:root .mx-datepicker-main,
+:root .mx-time {
+  color: var(--text-color-soft);
+  background-color: var(--background-color-soft);
+  border-color: var(--border-color-softer);
+}
+
+:root .mx-datepicker-header,
+:root .mx-datepicker-footer,
+:root .mx-time-header,
+:root .mx-time-column,
+:root .mx-time + .mx-time,
+:root .mx-calendar + .mx-calendar,
+:root .mx-datepicker-sidebar + .mx-datepicker-content {
+  border-color: var(--border-color-softer);
+}
+
+:root .mx-btn {
+  color: var(--text-color-soft);
+  border-color: var(--border-color-softer);
+}
+
+:root .mx-calendar-content .cell:not(.active):not(.disabled):hover,
+:root .mx-calendar-week-mode .mx-date-row:not(.mx-active-week):hover,
+:root .mx-time-column .mx-time-item:not(.active):not(.disabled):hover,
+:root .mx-time-option:not(.active):not(.disabled):hover {
+  color: var(--text-color-soft);
+  background-color: var(--background-color-hover);
+}
+
+/* A cell inside the active week stays part of its row: the cell rule above must not paint over it. */
+:root .mx-calendar-week-mode .mx-date-row.mx-active-week .cell:hover {
+  color: inherit;
+  background-color: transparent;
+}
+
+:root .mx-calendar-content .cell.in-range,
+:root .mx-calendar-content .cell.hover-in-range,
+:root .mx-calendar-week-mode .mx-date-row.mx-active-week {
+  color: var(--text-color-soft);
+  background-color: var(--background-color-selected);
+}
+
+:root .mx-table-date .cell.not-current-month,
+:root .mx-btn:disabled,
+:root .mx-btn.disabled {
+  color: var(--text-color-disabled);
+}
+
+:root .mx-calendar-content .cell.disabled,
+:root .mx-time-column .mx-time-item.disabled,
+:root .mx-time-option.disabled {
+  color: var(--text-color-disabled);
+  background-color: var(--background-color-disabled);
+}

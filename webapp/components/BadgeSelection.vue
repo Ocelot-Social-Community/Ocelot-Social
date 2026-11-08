@@ -124,14 +124,14 @@ export default {
     &:last-child {
       margin-bottom: 0;
     }
-    background-color: #f5f5f5;
+    background-color: var(--background-color-softer);
     transition: all 0.2s ease;
     width: 100%;
     text-align: left;
     cursor: pointer;
 
     &:hover {
-      background-color: #e0e0e0;
+      background-color: var(--background-color-softer-hover);
     }
 
     &.dragging {
@@ -162,7 +162,7 @@ export default {
 
       .badge-description {
         font-size: 14px;
-        color: #666;
+        color: var(--text-color-soft);
       }
     }
   }

@@ -11,7 +11,7 @@ export const modalPanelVariants = cva(
   [
     'os-modal',
     'relative',
-    'bg-white rounded-lg shadow-xl',
+    'bg-[var(--background-color-base,white)] rounded-lg shadow-xl',
     'flex flex-col',
     'w-[90vw]',
     // The panel itself receives focus on open when nothing inside asks for it
