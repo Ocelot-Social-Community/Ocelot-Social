@@ -108,7 +108,7 @@ export default {
             // the opening "@" would re-open a list that was closed long ago.
             items: () => [],
             onEnter: (props) => this.openSuggestionList(props, MENTION),
-            onChange: this.updateSuggestionList,
+            onChange: (props) => this.updateSuggestionList(props, MENTION),
             onExit: this.closeSuggestionList,
             onKeyDown: this.navigateSuggestionList,
             onFilter: () => [],
@@ -122,7 +122,7 @@ export default {
             // Loaded like the mentions, see above.
             items: () => [],
             onEnter: (props) => this.openSuggestionList(props, HASHTAG),
-            onChange: this.updateSuggestionList,
+            onChange: (props) => this.updateSuggestionList(props, HASHTAG),
             onExit: this.closeSuggestionList,
             onKeyDown: this.navigateSuggestionList,
             onFilter: () => [],
@@ -290,11 +290,17 @@ export default {
       this._suggestionOpening = true
       this.loadSuggestions()
       this.showSuggestionMenu(view)
-      this.insertMentionOrHashtag = command
+      this.insertMentionOrHashtag = command || this.insertMentionOrHashtag
     },
-    updateSuggestionList({ query, range, view }) {
-      // No list was opened for it — see isBeingTyped.
-      if (!this.suggestionType) return
+    updateSuggestionList(props, suggestionType) {
+      const { query, range, view } = props
+      // Closing the link popup returns focus to the same active mention/hashtag match.
+      // The plugin emits onChange (not onEnter) when typing resumes, so reopen the Vue list.
+      if (!this.suggestionType) {
+        if (!this.isBeingTyped({ range, view })) return
+        this.openSuggestionList(props, suggestionType)
+        return
+      }
       this.query = this.sanitizeQuery(query)
       this.suggestionRange = range
       this.navigatedItemIndex = 0

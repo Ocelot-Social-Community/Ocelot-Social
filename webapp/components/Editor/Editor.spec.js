@@ -791,6 +791,7 @@ describe('Editor.vue', () => {
     })
 
     it('closes an active mention suggestion before opening the link input', async () => {
+      propsData.value = ''
       propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
       wrapper = Wrapper()
       await Vue.nextTick()
@@ -811,6 +812,19 @@ describe('Editor.vue', () => {
       expect(wrapper.vm.isLinkInputActive).toBe(true)
       expect(wrapper.vm.$refs.contextMenu.menu.reference).toBe(linkButton())
       expect(wrapper.vm.navigateSuggestionList({ event: { keyCode: 13 } })).toBe(false)
+
+      // Return to the editor and continue the active mention. The plugin calls onChange,
+      // not onEnter, for the same match; its suggestions must be restored.
+      pressKey(linkInput(), 'Escape', {})
+      await settle()
+      view.dispatch(view.state.tr.insertText('p'))
+      await settle()
+      await flushPromises()
+
+      expect(wrapper.vm.isLinkInputActive).toBe(false)
+      expect(wrapper.vm.suggestionType).toBe('mention')
+      expect(wrapper.vm.filteredItems).toEqual([peter])
+      expect(propsData.mentionSuggestions).toHaveBeenLastCalledWith('p')
     })
 
     it('still opens the link input from the toolbar link button', async () => {
