@@ -1060,7 +1060,9 @@ export default {
                 'img/mapbox/marker-icons/' + marker.icon.mapName,
                 (error, image) => {
                   if (error) throw error
-                  this.map.addImage(marker.icon.id, image)
+                  // Two runs can overlap (the first load and the one after a style change in the
+                  // meantime); the second finds the image there and leaves it.
+                  if (!this.map.hasImage(marker.icon.id)) this.map.addImage(marker.icon.id, image)
                   resolve()
                 },
               )

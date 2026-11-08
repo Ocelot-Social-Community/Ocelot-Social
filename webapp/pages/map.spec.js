@@ -74,6 +74,7 @@ const mapSetFilterMock = jest.fn()
 const mapSetDataMock = jest.fn()
 const mapGetSourceMock = jest.fn(() => ({ setData: mapSetDataMock }))
 const mapAddImageMock = jest.fn()
+const mapHasImageMock = jest.fn(() => false)
 const mapSetStyleMock = jest.fn()
 const mapSetLayoutPropertyMock = jest.fn()
 const mapFlyToMock = jest.fn()
@@ -104,6 +105,7 @@ const mapMock = {
   setFilter: mapSetFilterMock,
   getSource: mapGetSourceMock,
   addImage: mapAddImageMock,
+  hasImage: mapHasImageMock,
   loadImage: mapLoadImageMock,
   setStyle: mapSetStyleMock,
   setLayoutProperty: mapSetLayoutPropertyMock,
@@ -1336,6 +1338,14 @@ describe('map', () => {
           expect(mapAddImageMock).toHaveBeenCalledTimes(4)
           expect(mapAddImageMock).toHaveBeenCalledWith('marker-orange', 'image-data')
           expect(mapAddImageMock).toHaveBeenCalledWith('marker-green', 'image-data')
+        })
+
+        it('does not add an image twice when two runs overlap', () => {
+          mapAddImageMock.mockClear()
+          mapHasImageMock.mockReturnValue(true)
+          wrapper.vm.loadMarkersIconsAndAddMarkers()
+          mapHasImageMock.mockReturnValue(false)
+          expect(mapAddImageMock).not.toHaveBeenCalled()
         })
 
         it('sets isImagesLoaded to true', () => {
