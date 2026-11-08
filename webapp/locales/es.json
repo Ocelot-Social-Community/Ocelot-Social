@@ -1315,6 +1315,7 @@
     "pageTitle": "Mapa",
     "styles": {
       "dark": "Oscuro",
+      "navigation-night": "Noche",
       "outdoors": "Exterior",
       "satellite": "Satélite",
       "streets": "Calles",

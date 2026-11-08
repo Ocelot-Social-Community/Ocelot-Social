@@ -1315,6 +1315,7 @@
     "pageTitle": "Harta",
     "styles": {
       "dark": "E errët",
+      "navigation-night": "Natë",
       "outdoors": "Jashtë",
       "satellite": "Satelit",
       "streets": "Rrugë",

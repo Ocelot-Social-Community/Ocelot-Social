@@ -654,7 +654,7 @@ export default {
 .prejoin__preview {
   position: relative;
   flex: 1 1 60%;
-  background: var(--color-neutral-10);
+  background: var(--video-surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -676,7 +676,7 @@ export default {
   align-items: center;
   justify-content: center;
   gap: var(--space-small);
-  color: var(--color-neutral-70);
+  color: var(--video-text-soft);
   padding: var(--space-small);
   text-align: center;
   pointer-events: none;
@@ -710,7 +710,7 @@ export default {
   padding: var(--space-xx-small) var(--space-small);
   border-radius: var(--border-radius-base);
   background: rgba(0, 0, 0, 0.65);
-  color: var(--text-color-inverse);
+  color: var(--video-on-media-color);
   font-size: var(--font-size-small);
 }
 
@@ -726,7 +726,7 @@ export default {
   flex-direction: column;
   gap: var(--space-small);
   background: var(--background-color-soft);
-  border-left: 1px solid var(--color-neutral-85);
+  border-left: 1px solid var(--border-color-softest);
 }
 
 .prejoin__title {
@@ -750,8 +750,8 @@ export default {
   flex-wrap: wrap;
   justify-content: center;
   padding: var(--space-x-small) 0;
-  border-top: 1px solid var(--color-neutral-85);
-  border-bottom: 1px solid var(--color-neutral-85);
+  border-top: 1px solid var(--border-color-softest);
+  border-bottom: 1px solid var(--border-color-softest);
 }
 
 .prejoin__hint {
@@ -799,7 +799,7 @@ export default {
     max-width: none;
     flex: 1 1 auto;
     border-left: none;
-    border-top: 1px solid var(--color-neutral-85);
+    border-top: 1px solid var(--border-color-softest);
   }
 }
 </style>

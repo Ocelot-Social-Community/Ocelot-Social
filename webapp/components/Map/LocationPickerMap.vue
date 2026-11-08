@@ -31,16 +31,12 @@ import mapboxgl from 'mapbox-gl'
 import { OsLocationMap } from '@ocelot-social/ui/ocelot'
 import Empty from '~/components/Empty/Empty'
 import { queryLocations } from '~/graphql/location'
+import { isDarkTheme, onThemeChange } from '~/utils/theme'
+import { MAP_STYLES, defaultMapStyleUrl, mapStyleLabel } from '~/constants/mapStyles'
 
 // Default for the "types" prop — precise enough for an event's exact pin.
 // Callers wanting coarser results (e.g. groups) pass their own "types" prop.
 const REVERSE_GEOCODE_TYPES = 'address,poi,place'
-
-// Must exactly match the "outdoors" entry's URL in the `styles` computed
-// below — the style-switcher marks a style "active" by string-comparing
-// this value against each entry's url, so a mismatch (e.g. a missing/extra
-// query param) leaves none of them highlighted until the user clicks one.
-const OUTDOORS_STYLE_URL = 'mapbox://styles/mapbox/outdoors-v12?optimize=true'
 
 // Mirrors the matching --color-map-marker-* custom properties in
 // root-tokens.css, used only if they can't be read yet (e.g. before the
@@ -148,6 +144,7 @@ export default {
     return {
       isEmpty,
       mapboxgl,
+      dark: false,
       defaultCenter: [10.452764, 51.165707], // center of Germany
       // Bumped on every onPinChange call so a slow, stale reverse-geocoding
       // response (from an earlier drag) can't overwrite what a later one
@@ -165,6 +162,15 @@ export default {
       pinRevision: 0,
     }
   },
+  mounted() {
+    this.dark = isDarkTheme()
+    this.offThemeChange = onThemeChange(() => {
+      this.dark = isDarkTheme()
+    })
+  },
+  beforeDestroy() {
+    if (this.offThemeChange) this.offThemeChange()
+  },
   computed: {
     lat() {
       return this.hasCoordinates ? this.location.lat : null
@@ -180,8 +186,9 @@ export default {
         typeof this.location.lng === 'number'
       )
     },
+    // A dark page opens on the dark tiles.
     defaultStyleUrl() {
-      return OUTDOORS_STYLE_URL
+      return defaultMapStyleUrl(this.dark)
     },
     // Same color as the matching markers on pages/map.vue — read from the
     // shared CSS token (markerColorToken, root-tokens.css) at runtime rather
@@ -198,28 +205,7 @@ export default {
       return value || fallback
     },
     styles() {
-      return [
-        {
-          id: 'outdoors',
-          url: OUTDOORS_STYLE_URL,
-          label: this.$t('map.styles.outdoors'),
-        },
-        {
-          id: 'streets',
-          url: 'mapbox://styles/mapbox/streets-v11?optimize=true',
-          label: this.$t('map.styles.streets'),
-        },
-        {
-          id: 'satellite',
-          url: 'mapbox://styles/mapbox/satellite-streets-v11?optimize=true',
-          label: this.$t('map.styles.satellite'),
-        },
-        {
-          id: 'dark',
-          url: 'mapbox://styles/mapbox/dark-v10?optimize=true',
-          label: this.$t('map.styles.dark'),
-        },
-      ]
+      return MAP_STYLES.map((style) => ({ ...style, label: mapStyleLabel(this.$t, style.id) }))
     },
   },
   methods: {

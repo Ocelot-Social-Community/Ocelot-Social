@@ -249,6 +249,21 @@
       let marker: any = null
       let debounceTimer: ReturnType<typeof setTimeout> | null = null
       let resizeObserver: ResizeObserver | null = null
+      // Once the user picks a style in the switcher, a changed mapStyle prop no longer overrides it.
+      let stylePicked = false
+      // This instance's own switcher popover (lives in <body>, several maps can be open at once).
+      let stylePopover: HTMLElement | null = null
+
+      // The switcher marks the style the map shows — on a pick and on a theme switch alike.
+      function markActiveStyle(url: string | undefined) {
+        stylePopover
+          ?.querySelectorAll<HTMLElement>('.os-location-map-style-popover-btn')
+          .forEach((btn) => {
+            const active = btn.dataset.url === url
+            btn.classList.toggle('os-location-map-style-popover-btn--active', active)
+            btn.setAttribute('aria-selected', String(active))
+          })
+      }
 
       const hasPin = computed(() => typeof props.lat === 'number' && typeof props.lng === 'number')
 
@@ -431,7 +446,7 @@
             toggle.innerHTML =
               '<svg viewBox="0 0 20 30.5" width="16" height="24" aria-hidden="true">' +
               '<path d="M19.25,10.4a13.0663,13.0663,0,0,1-1.4607,5.2235,41.5281,41.5281,0,0,1-3.2459,5.5483c-1.1829,1.7369-2.3662,3.2784-3.2541,4.3859-.4438.5536-.8135.9984-1.0721,1.3046-.0844.1-.157.1852-.2164.2545-.06-.07-.1325-.1564-.2173-.2578-.2587-.3088-.6284-.7571-1.0723-1.3147-.8879-1.1154-2.0714-2.6664-3.2543-4.41a42.2677,42.2677,0,0,1-3.2463-5.5535A12.978,12.978,0,0,1,.75,10.4,9.4659,9.4659,0,0,1,10,.75,9.4659,9.4659,0,0,1,19.25,10.4Z" fill="currentColor"/>' +
-              '<path d="M13.55,10A3.55,3.55,0,1,1,10,6.45,3.5484,3.5484,0,0,1,13.55,10Z" fill="#fff"/>' +
+              '<path d="M13.55,10A3.55,3.55,0,1,1,10,6.45,3.5484,3.5484,0,0,1,13.55,10Z" style="fill: var(--map-control-background, #fff)"/>' +
               '</svg>'
             toggle.addEventListener('click', (e) => {
               e.stopPropagation()
@@ -607,24 +622,19 @@
               btn.textContent = style.label
               btn.className = 'os-location-map-style-popover-btn'
               btn.setAttribute('role', 'option')
-              if (props.mapStyle === style.url) {
-                btn.classList.add('os-location-map-style-popover-btn--active')
-                btn.setAttribute('aria-selected', 'true')
-              }
+              btn.dataset.url = style.url
               btn.addEventListener('click', (e) => {
                 e.stopPropagation()
+                stylePicked = true
                 map.setStyle(style.url)
-                popoverEl.querySelectorAll('.os-location-map-style-popover-btn').forEach((b) => {
-                  b.classList.remove('os-location-map-style-popover-btn--active')
-                  b.setAttribute('aria-selected', 'false')
-                })
-                btn.classList.add('os-location-map-style-popover-btn--active')
-                btn.setAttribute('aria-selected', 'true')
+                markActiveStyle(style.url)
                 closePopover()
               })
               popoverEl.appendChild(btn)
             })
             document.body.appendChild(popoverEl)
+            stylePopover = popoverEl
+            markActiveStyle(props.mapStyle)
 
             // Listens on the whole document (not just the map) since the
             // popover itself now lives outside the map's DOM subtree — a
@@ -738,6 +748,18 @@
         }
         /* v8 ignore stop */
       })
+
+      // The page's theme can change while the map is open (light/dark tiles).
+      watch(
+        () => props.mapStyle,
+        (url) => {
+          // map is set synchronously in onMounted, the watcher only fires after that.
+          if (!stylePicked) {
+            map.setStyle(url)
+            markActiveStyle(url)
+          }
+        },
+      )
 
       onBeforeUnmount(() => {
         if (debounceTimer) {
@@ -932,7 +954,7 @@
     width: 100%;
     height: 100%;
     min-height: 200px;
-    background: #e5e5e5;
+    background: var(--map-background, #e5e5e5);
     border-radius: 4px;
     /* No overflow:hidden here — it would clip overlaid UI that intentionally
        extends past the map bounds, e.g. the style-switcher popover below. */
@@ -956,9 +978,9 @@
     right: 46px;
     z-index: 1;
     max-width: 320px;
-    background: white;
+    background: var(--map-control-background, white);
     border-radius: 4px;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 0 2px var(--shadow-color, rgba(0, 0, 0, 0.1));
   }
 
   .os-location-map__search-toggle {
@@ -974,14 +996,14 @@
     padding: 0;
     border: none;
     border-radius: 4px;
-    background: white;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    background: var(--map-control-background, white);
+    box-shadow: 0 0 0 2px var(--shadow-color, rgba(0, 0, 0, 0.1));
     cursor: pointer;
-    color: #333;
+    color: var(--text-color-strong, #333);
   }
 
   .os-location-map__search-toggle:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--background-color-hover, rgba(0, 0, 0, 0.05));
   }
 
   .os-location-map__search-input {
@@ -1019,7 +1041,7 @@
     padding: 4px 0;
     max-height: 220px;
     overflow-y: auto;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border-color-softest, #eee);
   }
 
   .os-location-map__search-result {
@@ -1034,7 +1056,7 @@
   }
 
   .os-location-map__search-result:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--background-color-hover, rgba(0, 0, 0, 0.05));
   }
 
   .os-location-map__search-result:focus-visible {
@@ -1042,72 +1064,18 @@
     outline-offset: -2px;
   }
 
-  .os-location-map-picker {
-    background: white;
-    border-radius: 4px;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
-  }
-
-  .os-location-map-picker-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 29px;
-    height: 29px;
-    padding: 0;
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: #333;
-  }
-
-  .os-location-map-picker-toggle:hover {
-    background: rgba(0, 0, 0, 0.05);
-  }
-
-  .os-location-map-picker-toggle--active {
-    background: rgba(0, 0, 0, 0.1);
-    /* Deliberately not --color-primary — that's the app's brand accent
-       (green in this app), which reads as a totally different, unrelated
-       signal here. This is the shared "map tool" accent blue, its own
-       overridable custom property (also used by the view-on-map button
-       below). */
-    color: var(--os-location-map-accent-color, rgb(0, 142, 230));
-  }
-
-  .os-location-map-view-on-map {
-    background: white;
-    border-radius: 4px;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
-  }
-
-  .os-location-map-view-on-map-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 29px;
-    height: 29px;
-    padding: 0;
-    border: none;
-    background: none;
-    cursor: pointer;
-    /* Neutral, same as the picker toggle's own resting state — this button
-       has no armed/active state of its own (it's a one-shot action, not a
-       toggle), so it shouldn't wear the "tool is active" accent color. */
-    color: #333;
-  }
-
-  .os-location-map-view-on-map-toggle:hover {
-    background: rgba(0, 0, 0, 0.05);
-  }
-
+  /* The three tool controls (pick location, view on map, style switcher) share one chrome. */
+  .os-location-map-picker,
+  .os-location-map-view-on-map,
   .os-location-map-style-switcher {
-    position: relative;
-    background: white;
+    background: var(--map-control-background, white);
     border-radius: 4px;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 0 2px var(--shadow-color, rgba(0, 0, 0, 0.1));
   }
 
+  /* view-on-map stays neutral too: a one-shot action has no armed state, so no accent. */
+  .os-location-map-picker-toggle,
+  .os-location-map-view-on-map-toggle,
   .os-location-map-style-switcher-toggle {
     display: flex;
     align-items: center;
@@ -1118,20 +1086,36 @@
     border: none;
     background: none;
     cursor: pointer;
-    color: #333;
+    color: var(--text-color-strong, #333);
   }
 
+  .os-location-map-picker-toggle:hover,
+  .os-location-map-view-on-map-toggle:hover,
   .os-location-map-style-switcher-toggle:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--background-color-hover, rgba(0, 0, 0, 0.05));
+  }
+
+  .os-location-map-picker-toggle--active {
+    background: var(--background-color-pressed, rgba(0, 0, 0, 0.1));
+    /* Deliberately not --color-primary — that's the app's brand accent
+       (green in this app), which reads as a totally different, unrelated
+       signal here. This is the shared "map tool" accent blue, its own
+       overridable custom property (also used by the view-on-map button
+       below). */
+    color: var(--os-location-map-accent-color, rgb(0, 142, 230));
+  }
+
+  .os-location-map-style-switcher {
+    position: relative;
   }
 
   .os-location-map-style-popover {
     display: none;
     /* top/left/transform are set inline in JS from the toggle's own rect. */
     position: fixed;
-    background: white;
+    background: var(--map-control-background, white);
     border-radius: 4px;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 4px var(--shadow-color-strong, rgba(0, 0, 0, 0.3));
     white-space: nowrap;
     overflow: hidden;
     z-index: 10000;
@@ -1153,15 +1137,15 @@
   }
 
   .os-location-map-style-popover-btn:not(:last-child) {
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color-softest, #eee);
   }
 
   .os-location-map-style-popover-btn:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--background-color-hover, rgba(0, 0, 0, 0.05));
   }
 
   .os-location-map-style-popover-btn--active {
     font-weight: bold;
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--background-color-selected, rgba(0, 0, 0, 0.08));
   }
 </style>

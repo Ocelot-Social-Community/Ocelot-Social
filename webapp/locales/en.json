@@ -1315,6 +1315,7 @@
     "pageTitle": "Map",
     "styles": {
       "dark": "Dark",
+      "navigation-night": "Night",
       "outdoors": "Outdoors",
       "satellite": "Satellite",
       "streets": "Streets",

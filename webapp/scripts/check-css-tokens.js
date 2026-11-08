@@ -2,7 +2,7 @@
 /* eslint-disable no-console -- a CLI reporter: stdout/stderr IS its output channel. The sibling
    scripts in this folder silence the same rule per call; once per file says the same thing. */
 /**
- * Guards the design-token system against the three ways it silently erodes.
+ * Guards the design-token system against the four ways it silently erodes.
  *
  * 1. A colour literal written where a token holds the SAME colour. It looks right in vanilla and is
  *    wrong for every brand — `#17b53f` in TabNavigation.vue was exactly this: the vanilla value of
@@ -16,13 +16,16 @@
  *    integer below the lowest page-level token (--z-index-sticky) is an ordering inside one component's
  *    own stacking context and stays a number; anything from there up is page-level and takes a token.
  *
+ * 4. A step of the neutral scale read directly by a component. The scale names values, not roles —
+ *    the same step was background in one place and text in another, so no theme could remap it.
+ *
  * A deliberate non-goal: colours that have NO token yet (transparencies, one-off greys). Those need a
  * new token first, which is a design decision — the check reports them as a count and moves on.
  *
  * `--z-index-report` prints the z-index levels instead: each token with the files that use it, and the
  * local numbers with theirs. It is read off the code, so unlike a list kept by hand it cannot go stale.
  *
- * Not stylelint: this is three rules over .vue <style> blocks, and stylelint would mean a second lint
+ * Not stylelint: this is four rules over .vue <style> blocks, and stylelint would mean a second lint
  * toolchain plus a config to keep in sync with the token file. Same reasoning as
  * packages/ui/scripts/check-completeness.ts.
  */
@@ -30,13 +33,13 @@ const { readFileSync, readdirSync, statSync } = require('fs')
 const { join, relative } = require('path')
 
 const ROOT = join(__dirname, '..')
-const TOKEN_DIR = join(ROOT, 'assets/css')
 
 /** Every `--token: value` pair declared in assets/css, comments stripped. */
-function readTokens() {
+function readTokens(root = ROOT) {
+  const tokenDir = join(root, 'assets/css')
   const tokens = {}
-  for (const file of readdirSync(TOKEN_DIR).filter((f) => f.endsWith('.css'))) {
-    const src = readFileSync(join(TOKEN_DIR, file), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+  for (const file of readdirSync(tokenDir).filter((f) => f.endsWith('.css'))) {
+    const src = readFileSync(join(tokenDir, file), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
     for (const [, name, value] of src.matchAll(/^\s*--([a-z0-9-]+)\s*:\s*([^;]+);/gm)) {
       tokens[name] = value.trim().replace(/\s+/g, ' ')
     }
@@ -68,14 +71,39 @@ function toRgb(raw) {
   return rgb ? `${rgb[1]},${rgb[2]},${rgb[3]}` : null
 }
 
+/** What a colour can hide in: components, global stylesheets, and JS handing values to libraries. */
+const SOURCE = /\.(vue|js|ts|css)$/
+
+/**
+ * Where the neutral scale is allowed to be read: the files that BUILD the roles on it. Everywhere
+ * else a step is a value standing in for a role — in a <style>, a template's inline style, or a JS
+ * string handed to a library (the chat palette was the last one, in constants/ only by accident).
+ */
+const TOKEN_FILES = [
+  'assets/css/root-tokens.css',
+  'assets/css/theme-dark.css',
+  'assets/css/ocelot-ui-variables.css',
+]
+
+const SKIPPED_DIRS = [
+  'node_modules',
+  'coverage',
+  'dist',
+  'storybook-static',
+  'playwright-report',
+  'test-results',
+]
+
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir)) {
-    if (entry === 'node_modules' || entry === '.nuxt' || entry === 'coverage' || entry === 'dist') {
+    // Build output and tool state are not source: what lint finds in a bundle depends on whether
+    // someone ran a build (storybook-static, a Playwright report), not on the code.
+    if (SKIPPED_DIRS.includes(entry) || entry.startsWith('.')) {
       continue
     }
     const full = join(dir, entry)
     if (statSync(full).isDirectory()) walk(full, out)
-    else if (entry.endsWith('.vue')) out.push(full)
+    else if (SOURCE.test(entry) && !/\.(spec|test)\.[jt]s$/.test(entry)) out.push(full)
   }
   return out
 }
@@ -91,6 +119,10 @@ function indexByRgb(tokens) {
   }
   return byRgb
 }
+
+/** `url("data:image/svg+xml,…")`, quoted or bare — the whole call, to its own closing quote or `)`. */
+const SVG_DATA_URL =
+  /url\(\s*(?:(["'])data:image\/svg\+xml[\s\S]*?\1|data:image\/svg\+xml[^)]*)\s*\)/g
 
 const COLOUR = /(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?\b|rgba?\([^)]*\)|\bwhite\b|\bblack\b)/g
 
@@ -127,6 +159,14 @@ const SCSS_BLOCK = /<style[^>]*\blang=(?:"s[ac]ss"|'s[ac]ss'|s[ac]ss(?=[\s/>]|$)
 function styleBodies(src) {
   return (src.match(/<style[^>]*>[\s\S]*?<\/style>/g) || []).filter(
     (block) => !SCSS_BLOCK.test(block),
+  )
+}
+
+/** A neutral step read directly — the scale names values, not roles. */
+function checkNeutral(text, rel) {
+  return [...text.matchAll(/var\(\s*--color-neutral-(\d+)\s*[,)]/g)].map(
+    ([, step]) =>
+      `${rel}: var(--color-neutral-${step}) — use a role token (background/text/border) instead`,
   )
 }
 
@@ -197,14 +237,41 @@ function checkZIndex(value, rel, localLimit, zUsages, knownTokens = null) {
 }
 
 /**
- * All rules, over one file's source. `untokenised` counts literals that have no token to suggest;
+ * The colours an SVG `data:` URI spells out — `%23`-encoded or raw hex, `rgb()`. A data URI is its own
+ * document: no custom property, no theme reaches into it, so a fill there stays the same in light and
+ * dark (the AreaMenu chevron was `%234b4554`, dark grey on a dark select). Colours spliced in at runtime
+ * (`${fill}`) are the cure, not the problem, and are not matched.
+ */
+function checkDataUris(src, rel) {
+  const errors = []
+  for (const match of src.matchAll(/data:image\/svg\+xml[,;]/g)) {
+    // The URI runs to the delimiter that opened it — the quote before `data:`, or `)` for a bare url().
+    const opener = src[match.index - 1]
+    const closer = { '"': '"', "'": "'", '`': '`', '(': ')' }[opener]
+    const end = closer ? src.indexOf(closer, match.index) : -1
+    const uri = src.slice(match.index, end === -1 ? undefined : end)
+    for (const [raw] of uri.matchAll(/(?:%23|#)[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)/g)) {
+      errors.push(
+        `${rel}: ${raw.replace(/^%23/, '#')} in a data: URI — a data: URI is its own document, no theme reaches it`,
+      )
+    }
+  }
+  return errors
+}
+
+/**
+ * All rules, over one file's source. `rel` decides how it is read: a .css file is one style body, a
+ * .vue file contributes its plain-CSS <style> blocks, JS has none. The neutral and data-URI rules read
+ * the WHOLE file — a colour in a script or an inline style is read by the browser all the same.
+ * `untokenised` counts literals that have no token to suggest;
  * `zUsages` lists every z-index level the file uses, for the report.
  */
 function checkSource(src, byRgb, rel, localLimit = DEFAULT_LOCAL_Z_LIMIT, zTokens = null) {
   const errors = []
   const zUsages = []
   let untokenised = 0
-  for (const body of styleBodies(src)) {
+  const bodies = rel.endsWith('.css') ? [src] : rel.endsWith('.vue') ? styleBodies(src) : []
+  for (const body of bodies) {
     for (const { prop, value } of declarations(body)) {
       if (prop.startsWith('white-space')) continue
       for (const [, name] of value.matchAll(/\$([a-z][a-z0-9-]*)/gi)) {
@@ -218,7 +285,9 @@ function checkSource(src, byRgb, rel, localLimit = DEFAULT_LOCAL_Z_LIMIT, zToken
       }
 
       if (prop.startsWith('--')) continue // declaring a token is allowed to use a literal
-      for (const [raw] of value.matchAll(COLOUR)) {
+      // An SVG data: URI is its own document: a colour in it cannot be a var(), and checkDataUris says so
+      // once. Left in the value it would also be suggested a token here, advice that would break the icon.
+      for (const [raw] of value.replace(SVG_DATA_URL, '').matchAll(COLOUR)) {
         const rgb = toRgb(raw)
         if (!rgb) continue
         if (byRgb[rgb]) errors.push(`${rel}: ${raw} — use var(--${byRgb[rgb]}) instead`)
@@ -226,6 +295,8 @@ function checkSource(src, byRgb, rel, localLimit = DEFAULT_LOCAL_Z_LIMIT, zToken
       }
     }
   }
+  if (!TOKEN_FILES.includes(rel)) errors.push(...checkNeutral(src, rel))
+  errors.push(...checkDataUris(src, rel))
   return { errors, untokenised, zUsages }
 }
 
@@ -260,8 +331,12 @@ function formatZIndexReport(tokens, zUsages) {
   return lines.join('\n')
 }
 
-function main() {
-  const tokens = readTokens()
+/**
+ * Every problem under `root` — the whole check, without the reporting. The global stylesheets are
+ * walked like everything else, so their z-indexes are held to rule 3 too.
+ */
+function findProblems(root) {
+  const tokens = readTokens(root)
   const byRgb = indexByRgb(tokens)
   const localLimit = localZLimit(tokens)
   const zTokens = new Set(Object.keys(tokens).filter((name) => name.startsWith('z-index-')))
@@ -269,11 +344,11 @@ function main() {
   const zUsages = []
   let untokenised = 0
 
-  for (const file of walk(ROOT)) {
+  for (const file of walk(root)) {
     const result = checkSource(
       readFileSync(file, 'utf8'),
       byRgb,
-      relative(ROOT, file),
+      relative(root, file),
       localLimit,
       zTokens,
     )
@@ -281,16 +356,11 @@ function main() {
     zUsages.push(...result.zUsages)
     untokenised += result.untokenised
   }
+  return { errors, untokenised, zUsages, tokens }
+}
 
-  // The global stylesheets hold z-indexes too (the dropdown level is only used there). Rule 3 only:
-  // their colours are not this script's business, so the other findings are dropped.
-  for (const file of readdirSync(TOKEN_DIR).filter((f) => f.endsWith('.css'))) {
-    if (file === 'root-tokens.css') continue
-    const src = `<style>${readFileSync(join(TOKEN_DIR, file), 'utf8')}</style>`
-    const result = checkSource(src, byRgb, `assets/css/${file}`, localLimit, zTokens)
-    errors.push(...result.errors.filter((e) => e.includes(' z-index: ')))
-    zUsages.push(...result.zUsages)
-  }
+function main() {
+  const { errors, untokenised, zUsages, tokens } = findProblems(ROOT)
 
   if (process.argv.includes('--z-index-report')) {
     console.log(formatZIndexReport(tokens, zUsages))
@@ -322,6 +392,9 @@ module.exports = {
   declarations,
   styleBodies,
   checkSource,
+  checkNeutral,
+  checkDataUris,
   localZLimit,
   formatZIndexReport,
+  findProblems,
 }
