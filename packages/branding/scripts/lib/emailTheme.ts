@@ -238,6 +238,7 @@ export function lightOf(value: string): string {
     const start = at + 'light-dark('.length
     let depth = 0
     let comma = -1
+    let commas = 0
     let end = -1
     let quote = ''
     for (let i = start; i < value.length && end === -1; i++) {
@@ -258,15 +259,19 @@ export function lightOf(value: string): string {
         } else {
           depth--
         }
-      } else if (c === ',' && depth === 0 && comma === -1) {
-        comma = i
+      } else if (c === ',' && depth === 0) {
+        commas++
+        if (comma === -1) {
+          comma = i
+        }
       }
     }
-    // No closing paren, no second argument, or an empty half (`light-dark(, blue)`, `light-dark(red, )`):
-    // not something to reduce — left as it stands, which resolveTokens then refuses.
+    // Only a well-formed `light-dark(a, b)` — exactly two, non-empty arguments — is reduced. Anything
+    // else (`light-dark(red`, `light-dark(, blue)`, `light-dark(red, )`, `light-dark(red, blue, green)`)
+    // is left as it stands, which resolveTokens then refuses.
     if (
       end === -1 ||
-      comma === -1 ||
+      commas !== 1 ||
       value.slice(start, comma).trim() === '' ||
       value.slice(comma + 1, end).trim() === ''
     ) {

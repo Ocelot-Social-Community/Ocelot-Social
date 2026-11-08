@@ -348,9 +348,14 @@ test('resolveTokens drops a token whose light-dark() cannot be read, instead of 
   assert.equal(Object.hasOwn(resolved, 'broken'), false)
 })
 
-test('a light-dark() with an empty half is left alone, and its token dropped', () => {
+test('a light-dark() that is not exactly two non-empty arguments is left alone, and its token dropped', () => {
   assert.equal(lightOf('light-dark(, blue)'), 'light-dark(, blue)')
   assert.equal(lightOf('light-dark(red, )'), 'light-dark(red, )')
+  assert.equal(lightOf('light-dark(red, blue, green)'), 'light-dark(red, blue, green)')
+  assert.equal(
+    lightOf('light-dark(rgb(1, 2, 3), blue, green)'),
+    'light-dark(rgb(1, 2, 3), blue, green)',
+  )
   assert.equal(
     Object.hasOwn(resolveTokens({ 'text-color-base': 'light-dark(, blue)' }), 'text-color-base'),
     false,
