@@ -1023,10 +1023,6 @@ export default {
         this.reloadPending
       )
     },
-    // What stands in the user's way, as opposed to what only informs.
-    hasWarningNotice() {
-      return !!(this.audioBlocked || this.micProblem)
-    },
     noticesCollapsed() {
       return this.parked && !this.noticesOpen
     },
@@ -1158,9 +1154,13 @@ export default {
   watch: {
     // A warning unfolds the notices, each time one comes up: without sound or with a silent
     // microphone, the call does not work, and the user is to learn that without looking for
-    // it. What only informs waits behind the button.
-    hasWarningNotice(warning, before) {
-      if (warning && !before) this.noticesOpen = true
+    // it. Each warning for itself — one the user folded away does not hide the next. What
+    // only informs waits behind the button.
+    audioBlocked(blocked) {
+      if (blocked) this.noticesOpen = true
+    },
+    micProblem(problem) {
+      if (problem) this.noticesOpen = true
     },
     // Once there is nothing to say, the next notice starts folded again.
     hasNotices(any) {

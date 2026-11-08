@@ -3120,6 +3120,9 @@ describe('VideoCall', () => {
         await restoring
         expect(camera.setVideoQuality).toHaveBeenLastCalledWith(2)
         expect(screen.setVideoQuality).not.toHaveBeenCalled()
+        // HIGH is only a cap: LiveKit still sizes each camera to its tile, which takes the
+        // room's adaptive stream — without it, every tile would get the full layer.
+        expect(room.opts).toMatchObject({ adaptiveStream: true })
         // A fresh track: the relieved one stays in performance mode for good.
         expect(room.localParticipant.unpublishTrack).toHaveBeenCalledWith(ownCamera, true)
         expect(room.localParticipant.setCameraEnabled).toHaveBeenLastCalledWith(true, {
@@ -4616,9 +4619,16 @@ describe('VideoCall', () => {
       await wrapper.setData({ micProblem: true })
       expect(notices(wrapper).classes()).not.toContain('video-call__notices--collapsed')
       await toggle(wrapper).trigger('click')
-      await wrapper.setData({ audioBlocked: true })
       expect(notices(wrapper).classes()).toContain('video-call__notices--collapsed')
-      await wrapper.setData({ micProblem: false, audioBlocked: false })
+      await wrapper.setData({ micProblem: false })
+      await wrapper.setData({ micProblem: true })
+      expect(notices(wrapper).classes()).not.toContain('video-call__notices--collapsed')
+    })
+
+    it('unfold for a new warning while one the user folded away stays', async () => {
+      const { wrapper } = await call({ micProblem: true })
+      await toggle(wrapper).trigger('click')
+      expect(notices(wrapper).classes()).toContain('video-call__notices--collapsed')
       await wrapper.setData({ audioBlocked: true })
       expect(notices(wrapper).classes()).not.toContain('video-call__notices--collapsed')
     })
@@ -4652,6 +4662,11 @@ describe('VideoCall', () => {
       expect(alert().find('[data-test="video-call-mic-problem"]').exists()).toBe(true)
       // What stands in the user's way, on top.
       expect(notices(wrapper).element.firstElementChild).toBe(alertEl)
+      // Coarse cameras only inform.
+      await wrapper.setData({ cpuConstrained: true })
+      expect(status().find('[data-test="video-call-cpu-relief"]').exists()).toBe(true)
+      await wrapper.setData({ cpuConstrained: false, cpuStrained: true })
+      expect(status().find('[data-test="video-call-cpu-strained"]').exists()).toBe(true)
     })
 
     it('are not folded in the maximized call, which has room for them', async () => {
