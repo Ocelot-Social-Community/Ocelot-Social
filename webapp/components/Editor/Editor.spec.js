@@ -790,6 +790,29 @@ describe('Editor.vue', () => {
       })
     })
 
+    it('closes an active mention suggestion before opening the link input', async () => {
+      propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
+      wrapper = Wrapper()
+      await Vue.nextTick()
+
+      const { view } = wrapper.vm.editor
+      view.dispatch(view.state.tr.insertText('@'))
+      await settle()
+      await flushPromises()
+      expect(wrapper.vm.suggestionType).toBe('mention')
+
+      const shortcut = pressKey(editorElement(), 'k', { ctrlKey: true })
+      await settle()
+
+      expect(shortcut.defaultPrevented).toBe(true)
+      expect(wrapper.vm.suggestionType).toBe('')
+      expect(wrapper.vm.suggestionRange).toBeNull()
+      expect(wrapper.vm.filteredItems).toEqual([])
+      expect(wrapper.vm.isLinkInputActive).toBe(true)
+      expect(wrapper.vm.$refs.contextMenu.menu.reference).toBe(linkButton())
+      expect(wrapper.vm.navigateSuggestionList({ event: { keyCode: 13 } })).toBe(false)
+    })
+
     it('still opens the link input from the toolbar link button', async () => {
       await wrapper.find('button[aria-label="editor.legend.link"]').trigger('click')
       await settle()

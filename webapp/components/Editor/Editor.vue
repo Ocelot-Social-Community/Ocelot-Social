@@ -474,6 +474,9 @@ export default {
     },
     // Ctrl+K / Cmd+K: the same link input as the toolbar's link button, anchored to that button.
     toggleLinkInputByShortcut() {
+      if (this.suggestionType) {
+        this.closeSuggestionList()
+      }
       this.toggleLinkInput(
         this.editor.getMarkAttrs('link'),
         this.$refs.menuBar.$refs.linkButton.$el,

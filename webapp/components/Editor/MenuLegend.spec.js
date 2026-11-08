@@ -27,8 +27,21 @@ describe('MenuLegend.vue', () => {
       .find('.tool-shortcut')
       .text()
 
-  it('shows the link shortcut', () => {
-    expect(shortcutFor('editor.legend.link')).toBe('ctrl + k')
+  it.each([
+    ['Win32', 'ctrl + k'],
+    ['MacIntel', 'cmd + k'],
+  ])('shows %s link shortcut as %s', (platform, shortcut) => {
+    const platformSpy = jest.spyOn(window.navigator, 'platform', 'get').mockReturnValue(platform)
+    try {
+      wrapper = mount(MenuLegend, {
+        mocks: { $t: (key) => key },
+        localVue,
+        stubs: { Dropdown },
+      })
+      expect(shortcutFor('editor.legend.link')).toBe(shortcut)
+    } finally {
+      platformSpy.mockRestore()
+    }
   })
 
   it('still shows the bold shortcut', () => {
