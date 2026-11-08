@@ -314,6 +314,14 @@ export function resolveTokens(raw: Record<string, string>): Record<string, strin
     }
     if (out !== null) {
       out = lightOf(out)
+      // A light-dark() that lightOf could not read (one argument, never closed) stays in the value:
+      // as stored it is a declaration a mail client discards, so the token is unresolvable and the
+      // consumer falls back to its default.
+      if (out.includes('light-dark(')) {
+        out = null
+      }
+    }
+    if (out !== null) {
       resolved[name] = out.trim().replace(/\s+/g, ' ')
     }
     return out

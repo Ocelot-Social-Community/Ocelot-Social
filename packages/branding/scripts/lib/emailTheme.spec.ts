@@ -333,6 +333,15 @@ describe('buildEmailBrandingCss', () => {
   })
 })
 
+test('resolveTokens drops a token whose light-dark() cannot be read, instead of storing a half-rewritten value', () => {
+  const resolved = resolveTokens({
+    ok: 'light-dark(red, blue)',
+    broken: 'light-dark(red, blue) light-dark(#fff)',
+  })
+  assert.equal(resolved.ok, 'red')
+  assert.equal(Object.hasOwn(resolved, 'broken'), false)
+})
+
 test('lightOf keeps the light half of light-dark(), commas inside it included', () => {
   assert.equal(lightOf('light-dark(rgb(1, 2, 3), rgb(4, 5, 6))'), 'rgb(1, 2, 3)')
   assert.equal(
