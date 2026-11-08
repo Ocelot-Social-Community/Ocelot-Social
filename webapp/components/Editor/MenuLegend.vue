@@ -58,9 +58,7 @@ export default {
   computed: {
     legendItems() {
       const linkShortcut =
-        typeof navigator !== 'undefined' && /Mac/i.test(navigator.platform)
-          ? 'cmd + k'
-          : 'ctrl + k'
+        typeof navigator !== 'undefined' && /Mac/i.test(navigator.platform) ? 'cmd + k' : 'ctrl + k'
       return [
         { iconName: this.icons.bold, name: `editor.legend.bold`, shortcut: 'ctrl + b' },
         { iconName: this.icons.italic, name: `editor.legend.italic`, shortcut: 'ctrl + i' },
