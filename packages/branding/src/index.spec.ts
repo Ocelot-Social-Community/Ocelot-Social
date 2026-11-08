@@ -13,8 +13,14 @@ beforeEach(() => {
   setBranding(undefined)
 })
 
+// Vanilla = the framework defaults, except that it offers both colour schemes where a brand has one.
+const vanilla = {
+  ...brandingDefaults,
+  theme: { ...brandingDefaults.theme, colorScheme: 'light dark' },
+}
+
 test('getBranding returns the framework defaults when nothing is injected', () => {
-  assert.deepEqual(getBranding(), brandingDefaults)
+  assert.deepEqual(getBranding(), vanilla)
 })
 
 test('setBranding injects a config that getBranding then returns (same reference)', () => {
@@ -27,7 +33,7 @@ test('setBranding injects a config that getBranding then returns (same reference
 test('setBranding(undefined) resets to the framework defaults', () => {
   setBranding(defineBranding({ group: { nameLengthMax: 99 } }))
   setBranding(undefined)
-  assert.deepEqual(getBranding(), brandingDefaults)
+  assert.deepEqual(getBranding(), vanilla)
 })
 
 test('the `branding` proxy reflects the CURRENT injected config on each access (live)', () => {
