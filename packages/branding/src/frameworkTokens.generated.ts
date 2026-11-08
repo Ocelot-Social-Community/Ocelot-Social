@@ -232,6 +232,7 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'opacity-soft': '0.7',
   'os-action-button-bg': 'var(--color-secondary-inverse)',
   'os-action-button-color': 'var(--color-primary-dark)',
+  'room-header-background': 'var(--window-bar-background)',
   'scrollbar-thumb-color': 'light-dark(rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0.25))',
   'shadow-color': 'light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5))',
   'shadow-color-raised': 'light-dark(rgb(189, 189, 189), rgba(0, 0, 0, 0.6))',
