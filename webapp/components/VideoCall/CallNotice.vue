@@ -1,8 +1,5 @@
 <template>
-  <div
-    :class="['call-notice', `call-notice--${tone}`]"
-    :role="tone === 'warning' ? 'alert' : 'status'"
-  >
+  <div :class="['call-notice', `call-notice--${tone}`]">
     <os-icon v-if="tone === 'warning'" :icon="icons.warning" class="call-notice__icon" />
     <span>
       {{ message }}
@@ -35,8 +32,9 @@
 <script>
 // One notice of the call, lying on its videos: a sentence, and what the user can do about it
 // as links within it. A warning is something that stands in the user's way (no sound, a silent
-// microphone) and is announced at once (role="alert"); anything else waits its turn
-// (role="status").
+// microphone); anything else only informs. How urgently it is announced is up to the live
+// region it is placed in, which has to be there before the notice: one inserted along with
+// its message is passed over by some screen readers.
 import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 

@@ -8,18 +8,18 @@ const factory = (propsData) =>
   })
 
 describe('CallNotice', () => {
-  it('says what is the matter, waiting its turn', () => {
+  it('says what is the matter, and leaves announcing it to the live region it is placed in', () => {
     const wrapper = factory({ message: 'Connection lost' })
     expect(wrapper.text()).toBe('Connection lost')
-    expect(wrapper.attributes('role')).toBe('status')
+    expect(wrapper.attributes('role')).toBeUndefined()
     expect(wrapper.classes()).toContain('call-notice--info')
     expect(wrapper.findAll('button')).toHaveLength(0)
     expect(wrapper.find('.stub-icon').exists()).toBe(false)
   })
 
-  it('announces a warning at once', () => {
+  it('marks a warning as one', () => {
     const wrapper = factory({ message: 'No sound', tone: 'warning' })
-    expect(wrapper.attributes('role')).toBe('alert')
+    expect(wrapper.attributes('role')).toBeUndefined()
     expect(wrapper.classes()).toContain('call-notice--warning')
     // Said by an icon, not by the colour alone.
     const icon = wrapper.findComponent({ name: 'OsIcon' })

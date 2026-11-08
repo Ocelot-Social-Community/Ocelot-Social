@@ -201,9 +201,13 @@
               the chat as well, their buttons behind the page's footer. In the parked window
               they are folded behind a button in the header (noticesCollapsed), but still
               announced: folded means out of sight, not out of the accessibility tree.
+
+              Announced from two live regions that are there before they have anything to
+              say: a region inserted along with its message is passed over by some screen
+              readers. One for what stands in the user's way, said at once (role="alert"),
+              on top; one for what only informs, waiting its turn (role="status").
             -->
             <div
-              v-if="hasNotices"
               id="video-call-notices"
               :class="[
                 'video-call__notices',
@@ -211,62 +215,74 @@
               ]"
               data-test="video-call-notices"
             >
-              <!--
-                An admin switched the branding; applying it takes a reload, which waits for this
-                call to end (#10353). Said here for as long as it waits, so that the reload after
-                hanging up comes as no surprise.
-              -->
-              <call-notice
-                v-if="reloadPending"
-                data-test="video-call-reload-pending"
-                :message="$t('videoCall.reloadPending')"
-              />
-              <call-notice
-                v-if="reconnecting"
-                data-test="video-call-reconnecting"
-                :message="$t('videoCall.reconnecting')"
-              />
-              <call-notice
-                v-if="audioBlocked"
-                data-test="video-call-audio-blocked"
-                tone="warning"
-                :message="$t('videoCall.audioBlocked')"
-                :actions="[
-                  {
-                    key: 'enable',
-                    label: $t('videoCall.enableAudio'),
-                    dataTest: 'video-call-enable-audio',
-                  },
-                ]"
-                @action="enableAudio"
-              />
-              <call-notice
-                v-if="micProblem"
-                data-test="video-call-mic-problem"
-                tone="warning"
-                :message="$t('videoCall.micNoSignal')"
-                :actions="[
-                  {
-                    key: 'restart',
-                    label: $t('videoCall.restartMic'),
-                    dataTest: 'video-call-restart-mic',
-                  },
-                ]"
-                @action="restartMic"
-              />
-              <call-notice
-                v-if="audioOnly"
-                data-test="video-call-audio-only"
-                :message="$t('videoCall.audioOnly')"
-                :actions="[
-                  {
-                    key: 'show',
-                    label: $t('videoCall.showVideos'),
-                    dataTest: 'video-call-show-videos',
-                  },
-                ]"
-                @action="showVideos"
-              />
+              <div
+                class="video-call__notices-region"
+                role="alert"
+                data-test="video-call-notices-alert"
+              >
+                <call-notice
+                  v-if="audioBlocked"
+                  data-test="video-call-audio-blocked"
+                  tone="warning"
+                  :message="$t('videoCall.audioBlocked')"
+                  :actions="[
+                    {
+                      key: 'enable',
+                      label: $t('videoCall.enableAudio'),
+                      dataTest: 'video-call-enable-audio',
+                    },
+                  ]"
+                  @action="enableAudio"
+                />
+                <call-notice
+                  v-if="micProblem"
+                  data-test="video-call-mic-problem"
+                  tone="warning"
+                  :message="$t('videoCall.micNoSignal')"
+                  :actions="[
+                    {
+                      key: 'restart',
+                      label: $t('videoCall.restartMic'),
+                      dataTest: 'video-call-restart-mic',
+                    },
+                  ]"
+                  @action="restartMic"
+                />
+              </div>
+              <div
+                class="video-call__notices-region"
+                role="status"
+                data-test="video-call-notices-status"
+              >
+                <!--
+                  An admin switched the branding; applying it takes a reload, which waits for
+                  this call to end (#10353). Said here for as long as it waits, so that the
+                  reload after hanging up comes as no surprise.
+                -->
+                <call-notice
+                  v-if="reloadPending"
+                  data-test="video-call-reload-pending"
+                  :message="$t('videoCall.reloadPending')"
+                />
+                <call-notice
+                  v-if="reconnecting"
+                  data-test="video-call-reconnecting"
+                  :message="$t('videoCall.reconnecting')"
+                />
+                <call-notice
+                  v-if="audioOnly"
+                  data-test="video-call-audio-only"
+                  :message="$t('videoCall.audioOnly')"
+                  :actions="[
+                    {
+                      key: 'show',
+                      label: $t('videoCall.showVideos'),
+                      dataTest: 'video-call-show-videos',
+                    },
+                  ]"
+                  @action="showVideos"
+                />
+              </div>
             </div>
             <!--
             All tiles are always mounted so every participant's audio track stays
@@ -2969,11 +2985,20 @@ export default {
   bottom: var(--space-x-small);
   left: 50%;
   transform: translateX(-50%);
+  max-width: calc(100% - var(--space-base));
+  z-index: 3;
+}
+
+/*  Each region is there all the time, an empty one without a box of its own. The gap */
+/*  between them only where both have something to say. */
+.video-call__notices-region {
   display: flex;
   flex-direction: column;
   gap: var(--space-xx-small);
-  max-width: calc(100% - var(--space-base));
-  z-index: 3;
+}
+
+.video-call__notices-region:not(:empty) + .video-call__notices-region:not(:empty) {
+  margin-top: var(--space-xx-small);
 }
 
 .video-call__error {

@@ -4,6 +4,7 @@ import VTooltip from 'v-tooltip'
 import { mount, createLocalVue } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import VideoCall from './VideoCall.vue'
+import CallNotice from './CallNotice.vue'
 
 // connect() does `await import('livekit-client')` — mock it with a fake Room that
 // records its event handlers (so tests can fire them) and resolves connect/disconnect.
@@ -3672,14 +3673,18 @@ describe('VideoCall', () => {
           expect(wrapper.vm.spotlightKey).toBeNull()
         })
 
-        it('stay at a tap on a notice lying on the videos', () => {
-          const notice = document.createElement('div')
-          notice.className = 'video-call__notices'
-          const button = document.createElement('button')
-          notice.appendChild(button)
-          stage.appendChild(notice)
-          tap(button)
-          expect(wrapper.vm.barsHidden).toBe(false)
+        it('stay at a tap on a notice lying on the videos, on its text, sign or action', async () => {
+          await wrapper.setData({ audioBlocked: true })
+          const notice = wrapper.find('[data-test="video-call-audio-blocked"]')
+          const targets = [
+            notice.find('span').element,
+            notice.find('.stub-osicon').element,
+            notice.find('[data-test="video-call-enable-audio"]').element,
+          ]
+          targets.forEach((target) => {
+            tap(target)
+            expect(wrapper.vm.barsHidden).toBe(false)
+          })
         })
 
         it('stay at a tap on a tile, which is spotlighted as ever', () => {
@@ -4033,10 +4038,31 @@ describe('VideoCall', () => {
       const { wrapper } = await call({ reconnecting: true })
       await toggle(wrapper).trigger('click')
       await wrapper.setData({ reconnecting: false })
-      expect(notices(wrapper).exists()).toBe(false)
+      expect(notices(wrapper).findAllComponents(CallNotice)).toHaveLength(0)
       expect(toggle(wrapper).exists()).toBe(false)
       await wrapper.setData({ audioOnly: true })
       expect(notices(wrapper).classes()).toContain('video-call__notices--collapsed')
+    })
+
+    it('are announced from live regions that are there before they have anything to say', async () => {
+      const { wrapper } = await call({ minimized: false })
+      const alert = () => wrapper.find('[data-test="video-call-notices-alert"]')
+      const status = () => wrapper.find('[data-test="video-call-notices-status"]')
+      const [alertEl, statusEl] = [alert().element, status().element]
+      expect(alert().attributes('role')).toBe('alert')
+      expect(status().attributes('role')).toBe('status')
+      expect(alert().findAllComponents(CallNotice)).toHaveLength(0)
+      expect(status().findAllComponents(CallNotice)).toHaveLength(0)
+      // A notice already shows when the connection drops: the drop is said into the same
+      // region, not by one inserted along with it.
+      await wrapper.setData({ audioOnly: true })
+      await wrapper.setData({ reconnecting: true, micProblem: true })
+      expect(status().element).toBe(statusEl)
+      expect(alert().element).toBe(alertEl)
+      expect(status().find('[data-test="video-call-reconnecting"]').exists()).toBe(true)
+      expect(alert().find('[data-test="video-call-mic-problem"]').exists()).toBe(true)
+      // What stands in the user's way, on top.
+      expect(notices(wrapper).element.firstElementChild).toBe(alertEl)
     })
 
     it('are not folded in the maximized call, which has room for them', async () => {
