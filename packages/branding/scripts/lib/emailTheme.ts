@@ -262,7 +262,9 @@ export function lightOf(value: string): string {
         comma = i
       }
     }
-    if (end === -1 || comma === -1) {
+    // No closing paren, no second argument, or an empty light half (`light-dark(, blue)`): not
+    // something to reduce — left as it stands, which resolveTokens then refuses.
+    if (end === -1 || comma === -1 || value.slice(start, comma).trim() === '') {
       return value
     }
     value = value.slice(0, at) + value.slice(start, comma).trim() + value.slice(end + 1)
