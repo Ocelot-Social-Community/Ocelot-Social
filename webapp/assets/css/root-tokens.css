@@ -448,7 +448,7 @@
      layouts/default.vue). On a desktop the maximized call's bars are solid. How much of their own
      colour they keep — the rest lets the videos through — and how much the videos behind them
      are blurred. 100% and 0px make them solid. */
-  --video-call-bar-opacity: 75%;
+  --video-call-bar-opacity: 90%;
   --video-call-bar-blur: 8px;
   /* The colour each of them is glass of; by default the one it has away from the call. A dark one
      wants a light text, which these bars do not bring along. */
