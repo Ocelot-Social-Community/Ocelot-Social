@@ -1961,6 +1961,8 @@
       "turnOff": "{device} : désactiver",
       "turnOn": "{device} : activer"
     },
+    "cpuRelief": "Votre appareil est surchargé — les caméras passent en qualité réduite pour que le son reste clair.",
+    "cpuStrained": "Votre appareil peine à suivre les vidéos. Une qualité réduite garde le son clair.",
     "deviceSettings": {
       "button": "Appareils",
       "dtx": "Ne pas transmettre les pauses de parole",
@@ -1970,6 +1972,7 @@
       "title": "Réglages des appareils"
     },
     "dialogLabel": "Appel vidéo de groupe",
+    "dismissNotice": "Masquer",
     "enableAudio": "Activer le son",
     "enterFullscreen": "Plein écran",
     "errorBackToPrejoin": "Modifier les paramètres",
@@ -2003,6 +2006,7 @@
     "hideBars": "Masquer les barres",
     "hideNotices": "Masquer les avis",
     "leave": "Quitter l'appel",
+    "lowerQuality": "Réduire la qualité",
     "maximize": "Agrandir",
     "micMuted": "Microphone désactivé",
     "micNoSignal": "Votre microphone ne transmet aucun son — les autres ne vous entendent pas.",
@@ -2053,6 +2057,7 @@
     "reconnecting": "Connexion perdue — reconnexion…",
     "reloadPending": "La plateforme a un nouveau design. Il sera appliqué dès que vous quitterez l’appel.",
     "restartMic": "Redémarrer le microphone",
+    "restoreQuality": "Rétablir la qualité",
     "screenShare": "Écran",
     "screenShareEnded": "Partage d'écran terminé",
     "showBars": "Afficher les barres",

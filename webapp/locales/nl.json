@@ -1961,6 +1961,8 @@
       "turnOff": "{device}: uitschakelen",
       "turnOn": "{device}: inschakelen"
     },
+    "cpuRelief": "Je apparaat is overbelast – de camera's draaien op lagere kwaliteit zodat het geluid helder blijft.",
+    "cpuStrained": "Je apparaat kan de video's niet bijhouden. Een lagere kwaliteit houdt het geluid helder.",
     "deviceSettings": {
       "button": "Apparaten",
       "dtx": "Spreekpauzes niet verzenden",
@@ -1970,6 +1972,7 @@
       "title": "Apparaatinstellingen"
     },
     "dialogLabel": "Groepsvideogesprek",
+    "dismissNotice": "Verbergen",
     "enableAudio": "Geluid inschakelen",
     "enterFullscreen": "Volledig scherm",
     "errorBackToPrejoin": "Instellingen wijzigen",
@@ -2003,6 +2006,7 @@
     "hideBars": "Balken verbergen",
     "hideNotices": "Meldingen verbergen",
     "leave": "Gesprek verlaten",
+    "lowerQuality": "Kwaliteit verlagen",
     "maximize": "Maximaliseren",
     "micMuted": "Microfoon uit",
     "micNoSignal": "Je microfoon levert geen geluid — anderen horen je niet.",
@@ -2053,6 +2057,7 @@
     "reconnecting": "Verbinding verbroken — opnieuw verbinden…",
     "reloadPending": "Het platform heeft een nieuw ontwerp. Het wordt toegepast zodra je het gesprek verlaat.",
     "restartMic": "Microfoon opnieuw starten",
+    "restoreQuality": "Kwaliteit herstellen",
     "screenShare": "Scherm",
     "screenShareEnded": "Schermdelen beëindigd",
     "showBars": "Balken tonen",

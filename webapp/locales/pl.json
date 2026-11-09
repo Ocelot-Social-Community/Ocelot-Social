@@ -1961,6 +1961,8 @@
       "turnOff": "{device}: wyłącz",
       "turnOn": "{device}: włącz"
     },
+    "cpuRelief": "Twoje urządzenie jest przeciążone – kamery działają w niższej jakości, aby dźwięk pozostał wyraźny.",
+    "cpuStrained": "Twoje urządzenie nie nadąża z obrazem. Niższa jakość utrzyma wyraźny dźwięk.",
     "deviceSettings": {
       "button": "Urządzenia",
       "dtx": "Nie przesyłaj przerw w mowie",
@@ -1970,6 +1972,7 @@
       "title": "Ustawienia urządzeń"
     },
     "dialogLabel": "Rozmowa wideo grupowa",
+    "dismissNotice": "Ukryj",
     "enableAudio": "Włącz dźwięk",
     "enterFullscreen": "Pełny ekran",
     "errorBackToPrejoin": "Zmień ustawienia",
@@ -2003,6 +2006,7 @@
     "hideBars": "Ukryj paski",
     "hideNotices": "Ukryj komunikaty",
     "leave": "Opuść rozmowę",
+    "lowerQuality": "Obniż jakość",
     "maximize": "Maksymalizuj",
     "micMuted": "Mikrofon wyłączony",
     "micNoSignal": "Twój mikrofon nie przesyła dźwięku — inni cię nie słyszą.",
@@ -2053,6 +2057,7 @@
     "reconnecting": "Utracono połączenie — ponowne łączenie…",
     "reloadPending": "Platforma ma nowy wygląd. Zostanie zastosowany, gdy tylko opuścisz rozmowę.",
     "restartMic": "Uruchom ponownie mikrofon",
+    "restoreQuality": "Przywróć jakość",
     "screenShare": "Ekran",
     "screenShareEnded": "Zakończono udostępnianie ekranu",
     "showBars": "Pokaż paski",

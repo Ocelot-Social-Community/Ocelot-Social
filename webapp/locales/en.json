@@ -1961,6 +1961,8 @@
       "turnOff": "{device}: turn off",
       "turnOn": "{device}: turn on"
     },
+    "cpuRelief": "Your device is struggling — the cameras run at a lower quality so the sound stays clear.",
+    "cpuStrained": "Your device is struggling with the videos. A lower quality keeps the sound clear.",
     "deviceSettings": {
       "button": "Devices",
       "dtx": "Don't transmit pauses in speech",
@@ -1970,6 +1972,7 @@
       "title": "Device settings"
     },
     "dialogLabel": "Group video call",
+    "dismissNotice": "Dismiss",
     "enableAudio": "Enable sound",
     "enterFullscreen": "Fullscreen",
     "errorBackToPrejoin": "Change settings",
@@ -2003,6 +2006,7 @@
     "hideBars": "Hide the bars",
     "hideNotices": "Hide notices",
     "leave": "Leave call",
+    "lowerQuality": "Lower quality",
     "maximize": "Maximize",
     "micMuted": "Microphone off",
     "micNoSignal": "Your microphone isn't delivering any sound — others can't hear you.",
@@ -2053,6 +2057,7 @@
     "reconnecting": "Connection lost — reconnecting…",
     "reloadPending": "The platform has a new design. It will be applied once you leave the call.",
     "restartMic": "Restart microphone",
+    "restoreQuality": "Restore quality",
     "screenShare": "Screen",
     "screenShareEnded": "Screen sharing ended",
     "showBars": "Show the bars",
