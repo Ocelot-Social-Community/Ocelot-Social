@@ -5,6 +5,7 @@ import { mount, createLocalVue } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import VideoCall from './VideoCall.vue'
 import CallNotice from './CallNotice.vue'
+import { createAudioWatchdog } from './audioWatchdog'
 
 // connect() does `await import('livekit-client')` — mock it with a fake Room that
 // records its event handlers (so tests can fire them) and resolves connect/disconnect.
@@ -71,6 +72,8 @@ jest.mock('livekit-client', () => {
       this.connect = jest.fn().mockResolvedValue()
       this.disconnect = jest.fn().mockResolvedValue()
       this.switchActiveDevice = jest.fn().mockResolvedValue(true)
+      // Lets a test reach the room connect() builds before it is connected.
+      if (Room.created) Room.created(this)
     }
 
     on(evt, cb) {
@@ -193,6 +196,18 @@ const factory = (state = {}) => {
     stubs,
   })
   return { wrapper, ...built }
+}
+
+// Starts hanging up and keeps the room's disconnect from finishing: the window in which
+// cleanup() is under way and this.room still is the room going away.
+const hangUpPending = (wrapper, room) => {
+  room.disconnect.mockReturnValue(new Promise(() => {}))
+  wrapper.vm.cleanup()
+}
+
+const capture = () => {
+  const mediaStreamTrack = { stop: jest.fn() }
+  return { stop: jest.fn(), mediaStreamTrack }
 }
 
 describe('VideoCall', () => {
@@ -1184,6 +1199,50 @@ describe('VideoCall', () => {
       },
     })
 
+    describe('hung up while a device comes on', () => {
+      beforeEach(() => {
+        Object.defineProperty(global.navigator, 'mediaDevices', {
+          value: { getDisplayMedia: jest.fn() },
+          configurable: true,
+        })
+      })
+      afterEach(() => {
+        delete global.navigator.mediaDevices
+      })
+
+      const cases = [
+        ['toggleMic', 'setMicrophoneEnabled', 'micEnabled', 'mic'],
+        ['toggleCamera', 'setCameraEnabled', 'cameraEnabled', 'camera'],
+        ['toggleScreenShare', 'setScreenShareEnabled', 'screenShareEnabled', 'screen'],
+      ]
+
+      it.each(cases)('%s leaves the state to the next call', async (toggle, set, field) => {
+        const { wrapper } = factory({ show: true })
+        const room = buildRoom()
+        wrapper.setData({ room, micEnabled: false, cameraEnabled: false })
+        room.localParticipant[set] = jest.fn(async () => {
+          wrapper.vm.closingRoom = room
+        })
+        const before = wrapper.vm[field]
+        await wrapper.vm[toggle]()
+        expect(wrapper.vm[field]).toBe(before)
+      })
+
+      it.each(cases)('%s says nothing of a failure', async (toggle, set, field) => {
+        const { wrapper } = factory({ show: true })
+        const room = buildRoom()
+        wrapper.setData({ room, micEnabled: false, cameraEnabled: false })
+        room.localParticipant[set] = jest.fn(async () => {
+          // cleanup() is through: the room is gone.
+          wrapper.vm.room = null
+          throw new Error('cannot publish track when not connected')
+        })
+        const toast = jest.spyOn(wrapper.vm, 'showDeviceErrorToast').mockImplementation(() => {})
+        await expect(wrapper.vm[toggle]()).resolves.toBeUndefined()
+        expect(toast).not.toHaveBeenCalled()
+      })
+    })
+
     it('toggleMic is a no-op when no room', async () => {
       const { wrapper } = factory({ show: true })
       await expect(wrapper.vm.toggleMic()).resolves.toBeUndefined()
@@ -1406,6 +1465,42 @@ describe('VideoCall', () => {
       expect(leave).not.toHaveBeenCalled()
       room.handlers.Disconnected('SERVER_SHUTDOWN')
       expect(leave).toHaveBeenCalled()
+    })
+
+    describe('hung up while the devices come up', () => {
+      let Room
+      beforeEach(async () => {
+        ;({ Room } = await import('livekit-client'))
+      })
+      afterEach(() => {
+        Room.created = null
+      })
+
+      it('does not go into the call', async () => {
+        const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+        withApollo(wrapper)
+        Room.created = (room) =>
+          room.localParticipant.setMicrophoneEnabled.mockImplementation(async () =>
+            hangUpPending(wrapper, room),
+          )
+        createAudioWatchdog.mockClear()
+        await wrapper.vm.connect()
+        expect(wrapper.vm.phase).not.toBe('in-call')
+        expect(createAudioWatchdog).not.toHaveBeenCalled()
+      })
+
+      it('reports no failure for the call it no longer is', async () => {
+        const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+        withApollo(wrapper)
+        Room.created = (room) =>
+          room.localParticipant.setMicrophoneEnabled.mockImplementation(async () => {
+            hangUpPending(wrapper, room)
+            throw new Error('cannot publish track when not connected')
+          })
+        await wrapper.vm.connect()
+        expect(wrapper.vm.phase).not.toBe('error')
+        expect(wrapper.vm.error).toBe(null)
+      })
     })
 
     it('enters the error phase without a group id', async () => {
@@ -1773,6 +1868,22 @@ describe('VideoCall', () => {
         wrapper.setData({ micProblem: true, micEnabled: false })
         await wrapper.vm.restartMic()
         expect(wrapper.vm.micProblem).toBe(false)
+      })
+
+      it('stops a fresh capture of a call hung up while it restarted', async () => {
+        const { wrapper, room } = await connected()
+        const fresh = capture()
+        const track = fakeMicTrack({
+          ...fresh,
+          // LiveKit opens a new capture even on a track already stopped.
+          restartTrack: jest.fn(async () => hangUpPending(wrapper, room)),
+        })
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        wrapper.setData({ micProblem: true })
+        await wrapper.vm.restartMic()
+        expect(track.stop).toHaveBeenCalled()
+        expect(fresh.mediaStreamTrack.stop).toHaveBeenCalled()
+        expect(track.checkForSilence).not.toHaveBeenCalled()
       })
 
       it('runs one restart at a time, sharing it with callers who ask meanwhile', async () => {
@@ -2416,6 +2527,61 @@ describe('VideoCall', () => {
         pending.finish()
         await switching
         expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+      })
+    })
+
+    describe('hung up while a device switches', () => {
+      it.each([
+        ['videoinput', 'camera'],
+        ['audioinput', 'microphone'],
+      ])('stops the %s capture it opened, and remembers nothing', async (kind, source) => {
+        const { wrapper, room } = await connected()
+        const track = capture()
+        room.localParticipant.getTrackPublication.mockImplementation((s) =>
+          s === source ? { track } : undefined,
+        )
+        localStorage.removeItem(STORAGE_KEY)
+        room.switchActiveDevice.mockImplementationOnce(async () => {
+          hangUpPending(wrapper, room)
+          return true
+        })
+        await wrapper.vm.switchDevice({ kind, deviceId: 'new-1' })
+        expect(track.stop).toHaveBeenCalled()
+        expect(localStorage.getItem(STORAGE_KEY)).toBe(null)
+      })
+
+      it('stops the capture of the device it went back to', async () => {
+        const { wrapper, room } = await connected()
+        const track = capture()
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        wrapper.setData({ cameraDeviceId: 'cam-1' })
+        const toast = jest.spyOn(wrapper.vm, 'showSwitchErrorToast').mockImplementation(() => {})
+        room.switchActiveDevice
+          .mockResolvedValueOnce(false)
+          .mockImplementationOnce(async () => hangUpPending(wrapper, room))
+        await wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-1')
+        expect(toast).toHaveBeenCalled()
+        expect(track.stop).toHaveBeenCalled()
+      })
+
+      it('does not start a switch still waiting its turn', async () => {
+        const { wrapper, room } = await connected()
+        let finish
+        room.switchActiveDevice.mockImplementationOnce(
+          () =>
+            new Promise((resolve) => {
+              finish = resolve
+            }),
+        )
+        const first = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        await flushPromises()
+        // The latest pick, so nothing but the hang-up holds it back.
+        const second = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-3' })
+        hangUpPending(wrapper, room)
+        finish(true)
+        await Promise.all([first, second])
+        expect(room.switchActiveDevice).toHaveBeenCalledTimes(1)
       })
     })
 
@@ -3304,7 +3470,7 @@ describe('VideoCall', () => {
         // Hanging up begins while the relieved camera is still being taken down — and the
         // room stays ours until its disconnect is through.
         room.localParticipant.unpublishTrack.mockImplementation(async () => {
-          wrapper.vm.leaving = true
+          hangUpPending(wrapper, room)
         })
         room.localParticipant.setCameraEnabled.mockClear()
         await wrapper.vm.restoreVideoQuality()

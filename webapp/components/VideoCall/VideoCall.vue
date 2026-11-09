@@ -604,6 +604,25 @@ const PREFETCHED_TOKEN_MAX_AGE_MS = 60000
 const CALL_CHAT_JOIN_ATTEMPTS = 3
 const CALL_CHAT_JOIN_RETRY_MS = 2000
 
+// Stops a local capture for good. Some LiveKit versions keep the underlying
+// MediaStreamTrack around even after track.stop(), so that one is stopped too.
+function stopCapture(track) {
+  if (!track) return
+  try {
+    track.stop()
+  } catch (_e) {
+    /* noop */
+  }
+  const mediaTrack = track.mediaStreamTrack
+  if (mediaTrack && typeof mediaTrack.stop === 'function') {
+    try {
+      mediaTrack.stop()
+    } catch (_e) {
+      /* noop */
+    }
+  }
+}
+
 // LiveKit rates every participant's connection several times a minute. Videos
 // are paused once ours stays weak this long, and come back only after it has
 // been fine for clearly longer, so a flaky line doesn't make them flicker.
@@ -1291,6 +1310,8 @@ export default {
     this.audioWatchdog = null
     this.leaving = false
     this.unmounting = false
+    // The room cleanup() is taking down: this.room stays it until the disconnect is through.
+    this.closingRoom = null
     this.deviceSwitches = this.newDeviceSwitches()
     this.callChatsSub = null
     this.groupChatRoomId = null
@@ -1836,6 +1857,7 @@ export default {
       this.dtxDefault = !!(this.$policy && this.$policy.get('videoCallDtx'))
       this.dtxSwitch = null
       this.resetAudioOnly()
+      let room = null
       try {
         if (!this.groupId) throw new Error('Missing group id')
         const payload = await this.takeJoinPayload(this.groupId)
@@ -1853,7 +1875,7 @@ export default {
         this.Track = Track
         this.VideoQuality = VideoQuality
 
-        const room = new Room({
+        room = new Room({
           adaptiveStream: true,
           dynacast: true,
           videoCaptureDefaults: this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : {},
@@ -2021,6 +2043,8 @@ export default {
         if (this.cameraEnabled) {
           await room.localParticipant.setCameraEnabled(true)
         }
+        // Hung up while the devices were coming up: there is no call left to be in.
+        if (!this.isLive(room)) return
         this.refreshTiles()
         this.audioBlocked = !room.canPlaybackAudio
         this.phase = 'in-call'
@@ -2038,6 +2062,8 @@ export default {
         this.loadGroupChatUnread()
         this.refreshKnownDevices()
       } catch (err) {
+        // Hung up meanwhile, or given up for a new attempt: not this call's to report.
+        if (room && !this.isLive(room)) return
         const message = this.$backendError(err)
         // The user navigated away while the handshake was still running, so
         // the window is parked in the corner. Since isMaximized treats every
@@ -2278,17 +2304,18 @@ export default {
         await turn
         // The call ended, or a newer pick came in, while this one was waiting
         // its turn: there is nothing left for it to start.
-        if (this.room !== room || ticket !== switching.latest) return
+        if (!this.isLive(room) || ticket !== switching.latest) return
         if (kind === 'audioinput' && this.dtxSwitch) {
           await this.dtxSwitch
-          if (this.room !== room || ticket !== switching.latest) return
+          if (!this.isLive(room) || ticket !== switching.latest) return
         }
+        const captures = this.capturesOf(room, kind)
         // false: the capture was restarted, but not on the device asked for.
-        if ((await room.switchActiveDevice(kind, deviceId)) === false) {
-          throw new Error('Device not switched')
-        }
+        const switched = await room.switchActiveDevice(kind, deviceId)
+        if (this.releaseIfLeft(room, captures)) return
+        if (switched === false) throw new Error('Device not switched')
       } catch (err) {
-        if (this.room !== room) return
+        if (!this.isLive(room)) return
         this.showSwitchErrorToast(kind, err)
         // Overtaken by a newer pick: the selection and LiveKit are that one's
         // business now. Taking them back here would undo it.
@@ -2298,8 +2325,10 @@ export default {
         // LiveKit stops the running capture before it opens the new one, so a
         // refused switch leaves none — go back to the one that worked.
         if (settled) {
+          const captures = this.capturesOf(room, kind)
           try {
             await room.switchActiveDevice(kind, settled)
+            this.releaseIfLeft(room, captures)
           } catch (_e) {
             /* the toast above already says the device is in trouble */
           }
@@ -2310,7 +2339,6 @@ export default {
         this.deviceStarted(kind)
         done()
       }
-      if (this.room !== room) return
       switching.settled = deviceId
       saveDevicePreference(kind, { deviceId, label })
       if (kind === 'videoinput') this.refreshTiles()
@@ -2330,6 +2358,27 @@ export default {
       // Not below zero: the call may have ended, and been cleaned up, while
       // the device was still on its way.
       this.devicesStarting[kind] = Math.max(0, this.devicesStarting[kind] - 1)
+    },
+    // The call's room, and not on its way out: cleanup() keeps this.room until the
+    // disconnect is through, and a device started meanwhile would outlive the call.
+    isLive(room) {
+      return !!room && this.room === room && this.closingRoom !== room
+    },
+    // The tracks a device switch of this kind restarts.
+    capturesOf(room, kind) {
+      const source = { audioinput: 'Microphone', videoinput: 'Camera' }[kind]
+      if (!source) return []
+      const pub = room.localParticipant.getTrackPublication(this.Track.Source[source])
+      const tracks = [pub && pub.track]
+      if (kind === 'audioinput' && this.dtxSwitch) tracks.push(this.dtxTrack)
+      return tracks
+    },
+    // LiveKit opens a fresh capture on restarting a track, also one cleanup() has
+    // stopped — and once the room is gone nobody stops that one but us.
+    releaseIfLeft(room, tracks) {
+      if (this.isLive(room)) return false
+      tracks.forEach(stopCapture)
+      return true
     },
     isOwnCameraTile(tile) {
       return tile.isLocal && !tile.isScreen
@@ -2536,9 +2585,8 @@ export default {
       if (restart) this.deviceStarts('videoinput')
       try {
         await room.localParticipant.unpublishTrack(track, true)
-        // Hung up meanwhile: the room is still this one while it disconnects, and
-        // a camera started now would come on after the call has ended.
-        if (restart && this.room === room && !this.leaving) {
+        // Hung up meanwhile: a camera started now would come on after the call has ended.
+        if (restart && this.isLive(room)) {
           await room.localParticipant.setCameraEnabled(
             true,
             this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : undefined,
@@ -2648,7 +2696,7 @@ export default {
       if (this.dtxSwitch) {
         await this.dtxSwitch
         // Left, or left and joined anew, meanwhile: this was asked of that call.
-        if (this.room !== room) return
+        if (!this.isLive(room)) return
       }
       const Track = this.Track
       if (!room || !Track) return
@@ -2660,6 +2708,8 @@ export default {
         // same publication; LiveKit resumes a paused upstream on its own, keeps
         // a muted track disabled and stops a track that was stopped meanwhile.
         await track.restartTrack()
+        // A fresh capture of a call that ended meanwhile: nobody else would stop it.
+        if (this.releaseIfLeft(room, [track])) return
         // The new capture can be just as silent as the old one — only drop the
         // warning once it is shown to deliver a signal.
         const silent = await this.micStaysSilent(track)
@@ -2758,15 +2808,17 @@ export default {
         this.refreshMicMeter()
         return
       }
+      const room = this.room
       if (next) this.deviceStarts('audioinput')
       try {
         if (this.dtxSwitch) {
-          const room = this.room
           await this.dtxSwitch
           // Left, or left and joined anew, meanwhile: this was asked of that call.
-          if (this.room !== room) return
+          if (!this.isLive(room)) return
         }
-        await this.room.localParticipant.setMicrophoneEnabled(next)
+        await room.localParticipant.setMicrophoneEnabled(next)
+        // Hung up meanwhile: LiveKit takes care of the capture, the state is the next call's.
+        if (!this.isLive(room)) return
         this.micEnabled = next
         // A muted microphone is silent on purpose.
         if (!next) this.micProblem = false
@@ -2778,7 +2830,8 @@ export default {
         // Re-sync from LiveKit — a partial failure (track published, then
         // permission revoked) can leave the real state out of sync with what
         // we'd otherwise leave in `this.micEnabled`.
-        this.micEnabled = !!this.room.localParticipant.isMicrophoneEnabled
+        if (!this.isLive(room)) return
+        this.micEnabled = !!room.localParticipant.isMicrophoneEnabled
         this.showDeviceErrorToast('mic', err)
       } finally {
         if (next) this.deviceStarted('audioinput')
@@ -2786,15 +2839,18 @@ export default {
     },
     async toggleCamera() {
       if (!this.room) return
+      const room = this.room
       const next = !this.cameraEnabled
       if (next) this.deviceStarts('videoinput')
       try {
-        await this.room.localParticipant.setCameraEnabled(next)
+        await room.localParticipant.setCameraEnabled(next)
+        if (!this.isLive(room)) return
         this.cameraEnabled = next
         this.refreshTiles()
         if (next) this.refreshKnownDevices()
       } catch (err) {
-        this.cameraEnabled = !!this.room.localParticipant.isCameraEnabled
+        if (!this.isLive(room)) return
+        this.cameraEnabled = !!room.localParticipant.isCameraEnabled
         this.refreshTiles()
         this.showDeviceErrorToast('camera', err)
       } finally {
@@ -2803,18 +2859,21 @@ export default {
     },
     async toggleScreenShare() {
       if (!this.room || !this.screenShareSupported) return
+      const room = this.room
       const next = !this.screenShareEnabled
       try {
-        const publication = await this.room.localParticipant.setScreenShareEnabled(next, {
+        const publication = await room.localParticipant.setScreenShareEnabled(next, {
           audio: true,
         })
+        if (!this.isLive(room)) return
         this.screenShareEnabled = next
         this.screenShareSurface = next
           ? publication?.track?.mediaStreamTrack?.getSettings?.().displaySurface || null
           : null
         this.refreshTiles()
       } catch (err) {
-        this.screenShareEnabled = !!this.room.localParticipant.isScreenShareEnabled
+        if (!this.isLive(room)) return
+        this.screenShareEnabled = !!room.localParticipant.isScreenShareEnabled
         this.refreshTiles()
         // NotAllowedError on screen-share usually means the user dismissed the
         // OS picker — that's not worth a toast. Surface anything else.
@@ -2875,6 +2934,7 @@ export default {
       // First, before the disconnect below is awaited: nothing may ask for the call's chat
       // any more once the call is being left.
       this.cancelCallChatRetry()
+      this.closingRoom = this.room
       if (this.room) {
         // Belt-and-braces: stop every local track ourselves before asking
         // LiveKit to disconnect. LiveKit's room.disconnect(stopTracks=true)
@@ -2893,24 +2953,7 @@ export default {
             // A dtx switch holds the microphone unpublished for a moment: in no publication,
             // and running.
             if (this.dtxSwitch) tracks.push(this.dtxTrack)
-            for (const track of tracks) {
-              if (!track) continue
-              try {
-                track.stop()
-              } catch (_e) {
-                /* noop */
-              }
-              // Some LiveKit versions keep the underlying MediaStreamTrack
-              // around even after track.stop(); stop it directly too.
-              const mediaTrack = track.mediaStreamTrack
-              if (mediaTrack && typeof mediaTrack.stop === 'function') {
-                try {
-                  mediaTrack.stop()
-                } catch (_e) {
-                  /* noop */
-                }
-              }
-            }
+            tracks.forEach(stopCapture)
           }
         } catch (_e) {
           /* noop */
@@ -2922,6 +2965,7 @@ export default {
         }
         this.room = null
       }
+      this.closingRoom = null
       if (this.speakerHoldTimer) {
         clearTimeout(this.speakerHoldTimer)
         this.speakerHoldTimer = null
