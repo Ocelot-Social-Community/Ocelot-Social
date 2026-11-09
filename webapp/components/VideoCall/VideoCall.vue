@@ -1355,6 +1355,9 @@ export default {
     this.closingRoom = null
     // Settles once a renewal of our camera (renewOwnCamera) is through.
     this.cameraRenewal = null
+    // The user switched the camera off, and LiveKit has yet to say it is done — until then
+    // cameraEnabled still says on. Taking long while a reconnect holds a publish back.
+    this.cameraOffPending = false
     // Counts the ways into and out of a call; a connect() whose number is no longer the
     // current one was given up while it waited — for its token, say.
     this.connectAttempt = 0
@@ -2733,8 +2736,8 @@ export default {
       // adjustments stay off — publishing the same track anew changes nothing.
       // So the track goes, and a fresh one takes its place, captured by the
       // room's defaults as they are now. A camera switched off right now gets
-      // its fresh track when it is switched on.
-      const restart = this.cameraEnabled
+      // its fresh track when it is switched on — and so does one being switched off.
+      const restart = this.cameraEnabled && !this.cameraOffPending
       this.renewingCamera = true
       if (restart) this.deviceStarts('videoinput')
       let renewed
@@ -2750,7 +2753,8 @@ export default {
         if (!this.isLive(room)) return
         await room.localParticipant.unpublishTrack(track, true)
         // Hung up meanwhile: a camera started now would come on after the call has ended.
-        if (restart && this.isLive(room)) {
+        // Switched off meanwhile: it stays off.
+        if (restart && !this.cameraOffPending && this.isLive(room)) {
           await room.localParticipant.setCameraEnabled(
             true,
             this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : undefined,
@@ -3008,6 +3012,7 @@ export default {
       const room = this.room
       const next = !this.cameraEnabled
       if (next) this.deviceStarts('videoinput')
+      else this.cameraOffPending = true
       try {
         await room.localParticipant.setCameraEnabled(next)
         if (!this.isLive(room)) return
@@ -3021,6 +3026,7 @@ export default {
         this.showDeviceErrorToast('camera', err)
       } finally {
         if (next) this.deviceStarted('videoinput')
+        else this.cameraOffPending = false
       }
     },
     async toggleScreenShare() {

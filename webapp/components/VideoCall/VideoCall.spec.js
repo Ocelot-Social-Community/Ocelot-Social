@@ -3497,12 +3497,18 @@ describe('VideoCall', () => {
       it('starts our camera anew only once a camera switch asked for before is through', async () => {
         const { wrapper, room } = await connected()
         wrapper.setData({ cameraEnabled: true })
-        let switched
-        room.switchActiveDevice.mockReturnValueOnce(
-          new Promise((resolve) => {
-            switched = resolve
-          }),
-        )
+        let switched, switchedAgain
+        room.switchActiveDevice
+          .mockReturnValueOnce(
+            new Promise((resolve) => {
+              switched = resolve
+            }),
+          )
+          .mockReturnValueOnce(
+            new Promise((resolve) => {
+              switchedAgain = resolve
+            }),
+          )
         const switching = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
         // Under way with LiveKit, so not overtaken by the next pick.
         await flushPromises()
@@ -3515,8 +3521,12 @@ describe('VideoCall', () => {
         // Two captures of a camera still starting could lock each other out.
         expect(room.localParticipant.unpublishTrack).not.toHaveBeenCalled()
         switched(true)
-        await Promise.all([switching, queued, renewing])
+        await flushPromises()
+        // The second switch is under way now — the renewal waits for it as well.
         expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-3')
+        expect(room.localParticipant.unpublishTrack).not.toHaveBeenCalled()
+        switchedAgain(true)
+        await Promise.all([switching, queued, renewing])
         expect(room.localParticipant.unpublishTrack).toHaveBeenCalledTimes(1)
         // The fresh camera starts on the latest pick.
         expect(room.localParticipant.setCameraEnabled).toHaveBeenCalledWith(true, {
@@ -3540,6 +3550,68 @@ describe('VideoCall', () => {
         switched(true)
         await Promise.all([switching, renewing])
         expect(room.localParticipant.unpublishTrack).not.toHaveBeenCalled()
+      })
+
+      it('keeps a camera off that is being switched off when the renewal begins', async () => {
+        const { wrapper, room, ownCamera } = await connected()
+        wrapper.setData({ cameraEnabled: true })
+        let off
+        room.localParticipant.setCameraEnabled.mockReturnValueOnce(
+          new Promise((resolve) => {
+            off = resolve
+          }),
+        )
+        // LiveKit holds the switching off back — a reconnect delaying a publish, say.
+        const toggling = wrapper.vm.toggleCamera()
+        expect(wrapper.vm.cameraEnabled).toBe(true)
+        let unpublished
+        room.localParticipant.unpublishTrack.mockReturnValue(
+          new Promise((resolve) => {
+            unpublished = resolve
+          }),
+        )
+        const renewing = wrapper.vm.setSendQuality('low')
+        await flushPromises()
+        // No "camera starting" for a camera on its way off.
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+        unpublished()
+        await renewing
+        expect(room.localParticipant.unpublishTrack).toHaveBeenCalledWith(ownCamera, true)
+        expect(room.localParticipant.setCameraEnabled).toHaveBeenCalledTimes(1)
+        expect(room.localParticipant.setCameraEnabled).toHaveBeenCalledWith(false)
+        off()
+        await toggling
+        expect(wrapper.vm.cameraEnabled).toBe(false)
+        expect(wrapper.vm.cameraOffPending).toBe(false)
+      })
+
+      it('keeps a camera off that is switched off while the renewal is under way', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: true })
+        let unpublished
+        room.localParticipant.unpublishTrack.mockReturnValue(
+          new Promise((resolve) => {
+            unpublished = resolve
+          }),
+        )
+        room.localParticipant.setCameraEnabled.mockImplementation(() => new Promise(() => {}))
+        const renewing = wrapper.vm.setSendQuality('low')
+        await flushPromises()
+        wrapper.vm.toggleCamera()
+        unpublished()
+        await renewing
+        const switchedOn = room.localParticipant.setCameraEnabled.mock.calls.filter(([on]) => on)
+        expect(switchedOn).toEqual([])
+      })
+
+      it("switches a camera on with its button on the room's capture defaults alone", async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: false })
+        await wrapper.vm.setSendQuality('medium')
+        await wrapper.vm.toggleCamera()
+        // No options of its own, which would override the chosen capture.
+        expect(room.localParticipant.setCameraEnabled).toHaveBeenLastCalledWith(true)
+        expect(room.options.videoCaptureDefaults.resolution).toEqual({ width: 640, height: 360 })
       })
 
       it('drops a camera switch that waited for the renewal of a call left meanwhile', async () => {
