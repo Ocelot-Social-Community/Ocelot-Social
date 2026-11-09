@@ -1968,6 +1968,15 @@
       "dtx": "Mos i transmeto pauzat në të folur",
       "dtxFailed": "Cilësimi i pauzave në të folur nuk mund të ndryshohej – mikrofoni yt vazhdon si më parë.",
       "dtxHint": "Kursen të dhëna për sa kohë hesht. Nëse të tjerët ndonjëherë nuk të dëgjojnë, fike.",
+      "quality": {
+        "audio": "Pa video (vetëm zë)",
+        "auto": "Automatike",
+        "high": "E lartë",
+        "low": "E ulët",
+        "medium": "Mesatare"
+      },
+      "receiveQuality": "Cilësia e videove që marr",
+      "sendQuality": "Cilësia e videos sime",
       "speakerError": "Altoparlanti nuk mund të ndërrohej.",
       "title": "Cilësimet e pajisjeve"
     },

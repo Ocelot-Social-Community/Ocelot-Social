@@ -1968,6 +1968,15 @@
       "dtx": "Nie przesyłaj przerw w mowie",
       "dtxFailed": "Nie udało się zmienić ustawienia przerw w mowie – twój mikrofon działa dalej jak wcześniej.",
       "dtxHint": "Oszczędza dane, gdy milczysz. Jeśli inni czasem cię nie słyszą, wyłącz to.",
+      "quality": {
+        "audio": "Bez wideo (tylko dźwięk)",
+        "auto": "Automatyczna",
+        "high": "Wysoka",
+        "low": "Niska",
+        "medium": "Średnia"
+      },
+      "receiveQuality": "Jakość odbieranych wideo",
+      "sendQuality": "Jakość mojego wideo",
       "speakerError": "Nie udało się przełączyć głośnika.",
       "title": "Ustawienia urządzeń"
     },

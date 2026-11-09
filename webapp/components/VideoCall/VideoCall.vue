@@ -296,7 +296,7 @@
                       key: 'restore',
                       label: $t('videoCall.restoreQuality'),
                       dataTest: 'video-call-restore-quality',
-                      disabled: restoringQuality,
+                      disabled: renewingCamera,
                     },
                   ]"
                   @action="restoreVideoQuality"
@@ -502,8 +502,13 @@
             :mic-starting="devicesStarting.audioinput > 0"
             :dtx="dtx"
             :dtx-applying="dtxApplying"
+            :send-quality="sendQuality"
+            :receive-quality="receiveQuality"
+            :camera-renewing="renewingCamera"
             @switch="switchDevice"
             @dtx-change="setDtx"
+            @send-quality-change="setSendQuality"
+            @receive-quality-change="setReceiveQuality"
             @close="closeDeviceSettings({ restoreFocus: true })"
           />
         </div>
@@ -585,7 +590,11 @@ import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 import DeviceSettings from './DeviceSettings.vue'
 import CallNotice from './CallNotice.vue'
-import { saveDevicePreference } from './devicePreferences'
+import {
+  loadQualityPreference,
+  saveDevicePreference,
+  saveQualityPreference,
+} from './devicePreferences'
 import { createAudioWatchdog } from './audioWatchdog'
 
 // How long a participant keeps the speaking treatment after LiveKit drops them
@@ -629,6 +638,15 @@ function stopCapture(track) {
 const WEAK_CONNECTION_MS = 5000
 const RECOVERED_CONNECTION_MS = 20000
 const WEAK_QUALITIES = ['poor', 'lost']
+// What our camera captures for each send quality the user can choose. 'auto' and
+// 'high' capture alike, LiveKit's default; 'high' only keeps the CPU relief off.
+// The capture, not a cap on the layers: dynacast sets those anew whenever the
+// server reports who watches which, and a smaller picture eases the encoder too.
+const SEND_RESOLUTIONS = {
+  high: { width: 1280, height: 720 },
+  medium: { width: 640, height: 360 },
+  low: { width: 320, height: 180 },
+}
 // A capture that was just opened may deliver nothing but silence for a moment
 // — Firefox takes noticeably longer than LiveKit's single check 200 ms after
 // the start allows for. Only silence that lasts through this many further
@@ -737,8 +755,15 @@ export default {
       // only offers it again (cpuStrained), it does not decide for them.
       cpuReliefDeclined: false,
       cpuStrained: false,
-      // Our camera is being started anew with its full quality.
-      restoringQuality: false,
+      // The user accepted our offer to lower the quality, past a choice of their own.
+      reliefForced: false,
+      // A cap was put on the remote cameras in this call; until then there is none to lift.
+      receiveCapped: false,
+      // The video quality the user asked for, sent and received (see devicePreferences).
+      sendQuality: 'auto',
+      receiveQuality: 'auto',
+      // Our camera is being started anew — with its full quality, or another capture.
+      renewingCamera: false,
       showDeviceSettings: false,
       // What the browser lists, to put a name to the devices in use.
       knownDevices: [],
@@ -783,6 +808,18 @@ export default {
     // Off unless the network or the user turns it on — a nearly idle audio
     // path leaves more room for one listener losing us (#10787), and LiveKit's
     // own meet app keeps it off as well.
+    // The CPU relief reaches what the user left to the call — or everything, once they
+    // asked for it themselves.
+    sendRelieved() {
+      return this.cpuConstrained && (this.reliefForced || this.sendQuality === 'auto')
+    },
+    receiveRelieved() {
+      return this.cpuConstrained && (this.reliefForced || this.receiveQuality === 'auto')
+    },
+    // The remote cameras are off: our connection is weak, or the user wants sound only.
+    videosOff() {
+      return this.audioOnly || this.receiveQuality === 'audio'
+    },
     dtx() {
       if (this.dtxPreference !== null) return this.dtxPreference
       return this.dtxDefault
@@ -1298,6 +1335,8 @@ export default {
     // who keeps talking never jumps around the chip row.
     this.speakerSeenAt = new Map()
     this.speakerHoldTimer = null
+    this.sendQuality = loadQualityPreference('send')
+    this.receiveQuality = loadQualityPreference('receive')
     this.micRestart = null
     this.micSilenceProbe = null
     // Tracks whose events we listen to — publishing a track anew must not
@@ -1886,7 +1925,12 @@ export default {
         room = new Room({
           adaptiveStream: true,
           dynacast: true,
-          videoCaptureDefaults: this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : {},
+          videoCaptureDefaults: {
+            ...(this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : {}),
+            ...(SEND_RESOLUTIONS[this.sendQuality]
+              ? { resolution: SEND_RESOLUTIONS[this.sendQuality] }
+              : {}),
+          },
           audioCaptureDefaults: this.micDeviceId ? { deviceId: this.micDeviceId } : {},
           publishDefaults: { dtx: this.dtx },
           // LiveKit picks the speaker anew whenever a device comes or goes.
@@ -1899,7 +1943,9 @@ export default {
         this.cpuConstrained = false
         this.cpuReliefDeclined = false
         this.cpuStrained = false
-        this.restoringQuality = false
+        this.reliefForced = false
+        this.receiveCapped = false
+        this.renewingCamera = false
         this.room = room
 
         const onAny = () => this.refreshTiles()
@@ -1907,11 +1953,9 @@ export default {
         room.on(RoomEvent.ParticipantDisconnected, onAny)
         room.on(RoomEvent.TrackSubscribed, (_track, pub) => {
           // Subscribed before the unsubscribe of audio-only mode took hold.
-          if (this.audioOnly) this.applyAudioOnly()
-          if (this.cpuConstrained) this.capCameraQuality(pub, VideoQuality.LOW)
-          // Was lowered before the user took the relief back — audio-only mode
-          // had it unsubscribed then, out of reach.
-          else if (this.cpuReliefDeclined) this.uncapCameraQuality(pub)
+          if (this.videosOff) this.applyAudioOnly()
+          // Also one whose cap changed while audio-only mode had it unsubscribed, out of reach.
+          this.applyReceiveCap(pub)
           onAny()
         })
         // Encoding and decoding video can eat the CPU to the point where the
@@ -1930,13 +1974,15 @@ export default {
               ? '[video-call] CPU constrained again, offering to lower the video quality'
               : '[video-call] CPU constrained, lowering the video quality of the cameras',
           )
-          if (this.cpuReliefDeclined) this.cpuStrained = true
+          // Nothing left to the call that the relief could lower: the user decides.
+          const allChosen = this.sendQuality !== 'auto' && this.receiveQuality !== 'auto'
+          if (this.cpuReliefDeclined || allChosen) this.cpuStrained = true
           else this.relieveCpu()
         })
         // A camera published while we are in audio-only mode would otherwise
         // be auto-subscribed and eat the bandwidth we just freed.
         room.on(RoomEvent.TrackPublished, () => {
-          if (this.audioOnly) this.applyAudioOnly()
+          if (this.videosOff) this.applyAudioOnly()
         })
         // Every tile shows a warning while its owner's connection is weak, our
         // own included — which tells at a glance whose line is the problem.
@@ -1970,7 +2016,7 @@ export default {
         room.on(RoomEvent.LocalTrackPublished, (pub) => {
           this.screenShareEnabled = !!room.localParticipant.isScreenShareEnabled
           // A camera switched on only now gets the same relief.
-          if (this.cpuConstrained && pub && pub.source === Track.Source.Camera) {
+          if (this.sendRelieved && pub && pub.source === Track.Source.Camera) {
             this.relieveOwnCamera()
           }
           if (pub && pub.source === Track.Source.Microphone && pub.track) {
@@ -2510,7 +2556,8 @@ export default {
       if (qualityClass === this.qualityClass) return
       this.qualityClass = qualityClass
       this.clearQualityTimer()
-      if (WEAK_QUALITIES.includes(quality) && !this.audioOnly && !this.audioOnlyDismissed) {
+      // The user's own choice of sound only leaves nothing for a weak line to switch off.
+      if (WEAK_QUALITIES.includes(quality) && !this.videosOff && !this.audioOnlyDismissed) {
         this.qualityTimer = setTimeout(() => this.setAudioOnly(true), WEAK_CONNECTION_MS)
       } else if (STRONG_QUALITIES.includes(quality) && this.audioOnly) {
         this.qualityTimer = setTimeout(() => this.setAudioOnly(false), RECOVERED_CONNECTION_MS)
@@ -2537,7 +2584,7 @@ export default {
       // setSubscribed() signals the server on every call, changed or not, and
       // this runs on each published/subscribed track — so only touch the ones
       // whose wish actually differs, sparing a weak line the chatter.
-      const wanted = !this.audioOnly
+      const wanted = !this.videosOff
       for (const participant of room.remoteParticipants.values()) {
         for (const pub of participant.videoTrackPublications.values()) {
           if (pub.source === Track.Source.Camera && pub.isDesired !== wanted) {
@@ -2556,44 +2603,99 @@ export default {
       if (this.audioWatchdog) this.audioWatchdog.stop()
       this.audioWatchdog = null
     },
-    relieveCpu() {
+    // forced: asked for by the user, so it lowers their own choices as well.
+    relieveCpu(forced = false) {
       const room = this.room
       if (!room) return
       this.cpuConstrained = true
+      this.reliefForced = forced
       this.cpuReliefDeclined = false
       this.cpuStrained = false
-      this.relieveOwnCamera()
-      for (const participant of room.remoteParticipants.values()) {
+      if (this.sendRelieved) this.relieveOwnCamera()
+      this.applyReceiveCaps()
+    },
+    onCpuStrainedAction(key) {
+      if (key === 'lower') this.relieveCpu(true)
+      else this.cpuStrained = false
+    },
+    // The lowest of what the relief and the user's choice ask for, or null for none.
+    receiveCap() {
+      const { LOW, MEDIUM, HIGH } = this.VideoQuality
+      const caps = []
+      if (this.receiveRelieved) caps.push(LOW)
+      const chosen = { high: HIGH, medium: MEDIUM, low: LOW }[this.receiveQuality]
+      if (chosen !== undefined) caps.push(chosen)
+      return caps.length ? Math.min(...caps) : null
+    },
+    applyReceiveCap(pub) {
+      const cap = this.receiveCap()
+      if (cap === null) {
+        if (this.receiveCapped) this.uncapCameraQuality(pub)
+        return
+      }
+      this.receiveCapped = true
+      if (cap === this.VideoQuality.HIGH) this.uncapCameraQuality(pub)
+      else this.capCameraQuality(pub, cap)
+    },
+    applyReceiveCaps() {
+      for (const participant of this.room.remoteParticipants.values()) {
         for (const pub of participant.videoTrackPublications.values()) {
-          this.capCameraQuality(pub, this.VideoQuality.LOW)
+          this.applyReceiveCap(pub)
         }
       }
     },
-    onCpuStrainedAction(key) {
-      if (key === 'lower') this.relieveCpu()
-      else this.cpuStrained = false
+    setReceiveQuality(quality) {
+      if (quality === this.receiveQuality) return
+      const wereOff = this.videosOff
+      this.receiveQuality = quality
+      saveQualityPreference('receive', quality)
+      // The user's choice, not a weak line: the automatic mode and its notice give way.
+      if (quality === 'audio') this.resetAudioOnly()
+      if (!this.room || !this.Track) return
+      if (this.videosOff !== wereOff) this.applyAudioOnly()
+      this.applyReceiveCaps()
+    },
+    async setSendQuality(quality) {
+      if (quality === this.sendQuality || this.renewingCamera) return
+      this.sendQuality = quality
+      saveQualityPreference('send', quality)
+      const room = this.room
+      if (!room || !this.Track) return
+      const defaults = { ...room.options.videoCaptureDefaults }
+      if (SEND_RESOLUTIONS[quality]) defaults.resolution = SEND_RESOLUTIONS[quality]
+      else delete defaults.resolution
+      // Every camera started from now on captures so — the fresh one below included.
+      room.options.videoCaptureDefaults = defaults
+      // Captured anew: only a fresh track has the layers of its new size known to the
+      // server — and it is let off a relief the new choice no longer allows. One the relief
+      // still reaches gets it again once published (LocalTrackPublished).
+      await this.renewOwnCamera(room)
     },
     async restoreVideoQuality() {
       const room = this.room
       const Track = this.Track
-      if (!room || !Track || this.restoringQuality) return
+      if (!room || !Track || this.renewingCamera) return
+      const wasRelieved = this.sendRelieved
       this.cpuConstrained = false
+      this.reliefForced = false
       this.cpuReliefDeclined = true
-      for (const participant of room.remoteParticipants.values()) {
-        for (const pub of participant.videoTrackPublications.values()) {
-          this.uncapCameraQuality(pub)
-        }
-      }
+      // Back to the user's own choice, if they made one.
+      this.applyReceiveCaps()
+      if (wasRelieved) await this.renewOwnCamera(room)
+    },
+    async renewOwnCamera(room) {
+      const Track = this.Track
       const pub = room.localParticipant.getTrackPublication(Track.Source.Camera)
       const track = pub && pub.track
       if (!track) return
       // LiveKit has no way back from prioritizePerformance(): the track keeps
       // its performance mode for good, and with it dynacast and the encoder
       // adjustments stay off — publishing the same track anew changes nothing.
-      // So the relieved track goes, and a fresh one takes its place. A camera
-      // switched off right now gets its fresh track when it is switched on.
+      // So the track goes, and a fresh one takes its place, captured by the
+      // room's defaults as they are now. A camera switched off right now gets
+      // its fresh track when it is switched on.
       const restart = this.cameraEnabled
-      this.restoringQuality = true
+      this.renewingCamera = true
       if (restart) this.deviceStarts('videoinput')
       try {
         await room.localParticipant.unpublishTrack(track, true)
@@ -2609,7 +2711,7 @@ export default {
       } finally {
         if (restart) this.deviceStarted('videoinput')
         if (this.isLive(room)) {
-          this.restoringQuality = false
+          this.renewingCamera = false
           this.cameraEnabled = !!room.localParticipant.isCameraEnabled
           this.refreshTiles()
         }
