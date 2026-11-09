@@ -338,6 +338,7 @@
               :camera-starting="isOwnCameraTile(tile) && devicesStarting.videoinput > 0"
               :mic-starting="isOwnCameraTile(tile) && devicesStarting.audioinput > 0"
               :avatar-size="tileAvatarSize(tile)"
+              :quality-limit="qualityLimitOf(tile)"
               :clickable="isMaximized && !mobileChatOpen"
               :class="{
                 'video-tile--hidden': singleTile && soloTile && tile.key !== soloTile.key,
@@ -638,6 +639,9 @@ const WEAK_QUALITIES = ['poor', 'lost']
 // 'high' capture alike, LiveKit's default; 'high' only keeps the CPU relief off.
 // The capture, not a cap on the layers: dynacast sets those anew whenever the
 // server reports who watches which, and a smaller picture eases the encoder too.
+// How often what our camera actually sends is read, for the badge on our own tile. One call
+// on one track — little next to the encoding itself.
+const SENDER_STATS_MS = 3000
 const SEND_RESOLUTIONS = {
   high: { width: 1280, height: 720 },
   medium: { width: 640, height: 360 },
@@ -764,6 +768,9 @@ export default {
       receiveQuality: 'auto',
       // Our camera is being started anew — with its full quality, or another capture.
       renewingCamera: false,
+      // What our camera sends, as WebRTC reports it: { height, fps, limitedBy } — limitedBy
+      // being 'cpu', 'bandwidth' or null. Null while it sends nothing.
+      sentVideo: null,
       showDeviceSettings: false,
       // What the browser lists, to put a name to the devices in use.
       knownDevices: [],
@@ -1351,6 +1358,7 @@ export default {
     this.closingRoom = null
     // Settles once a renewal of our camera (renewOwnCamera) is through.
     this.cameraRenewal = null
+    this.senderStatsTimer = null
     // The user switched the camera off, and LiveKit has yet to say it is done — until then
     // cameraEnabled still says on. Taking long while a reconnect holds a publish back.
     this.cameraOffPending = false
@@ -2121,6 +2129,7 @@ export default {
           isPaused: () => this.reconnecting,
         })
         this.audioWatchdog.start()
+        this.startSenderStats()
         this.joinCallChat(room)
         this.watchCallChats(true)
         this.loadGroupChatUnread()
@@ -2786,6 +2795,70 @@ export default {
         pub.setVideoQuality(quality)
       }
     },
+    startSenderStats() {
+      this.stopSenderStats()
+      this.senderStatsTimer = setInterval(() => this.readSenderStats(), SENDER_STATS_MS)
+    },
+    stopSenderStats() {
+      if (this.senderStatsTimer) clearInterval(this.senderStatsTimer)
+      this.senderStatsTimer = null
+      this.sentVideo = null
+    },
+    async readSenderStats() {
+      const room = this.room
+      const Track = this.Track
+      if (!room || !Track) return
+      const pub = room.localParticipant.getTrackPublication(Track.Source.Camera)
+      const track = pub && pub.track
+      if (!this.cameraEnabled || !track || typeof track.getSenderStats !== 'function') {
+        this.sentVideo = null
+        return
+      }
+      let stats
+      try {
+        stats = await track.getSenderStats()
+      } catch {
+        return
+      }
+      if (!this.isLive(room)) return
+      // One entry per simulcast layer; the largest one going out is what the others get at best.
+      // A layer paused because nobody watches it is no limit — WebRTC names none for it.
+      const sending = (stats || []).filter((layer) => layer.frameHeight > 0)
+      if (!sending.length) {
+        this.sentVideo = null
+        return
+      }
+      const top = sending.reduce((a, b) => (b.frameHeight > a.frameHeight ? b : a))
+      const limitedBy =
+        sending
+          .map((layer) => layer.qualityLimitationReason)
+          .find((reason) => reason === 'cpu' || reason === 'bandwidth') || null
+      this.sentVideo = {
+        height: top.frameHeight,
+        fps: Math.round(top.framesPerSecond || 0),
+        limitedBy,
+      }
+    },
+    // Why a camera's video is lower than it could be, for the badge on its tile — or null. Only
+    // what holds it back on purpose or for want: adaptive stream sizing a camera to its tile is
+    // no limit. Screen shares are never lowered.
+    qualityLimitOf(tile) {
+      if (tile.isScreen) return null
+      if (tile.isLocal) {
+        const chosen = this.sendQuality === 'medium' || this.sendQuality === 'low'
+        const reason =
+          (this.sendRelieved && 'cpu') ||
+          (this.sentVideo && this.sentVideo.limitedBy) ||
+          (chosen && 'choice') ||
+          null
+        if (!reason) return null
+        const sent = this.sentVideo
+        return { reason, height: sent ? sent.height : null, fps: sent ? sent.fps : null }
+      }
+      const cap = this.VideoQuality ? this.receiveCap() : null
+      if (cap === null || cap === this.VideoQuality.HIGH) return null
+      return { reason: this.receiveRelieved ? 'cpu' : 'choice' }
+    },
     uncapCameraQuality(pub) {
       // LiveKit cannot drop a cap, only raise it — to the top layer the camera
       // is sent in, so adaptiveStream keeps sizing it to its tile. That is HIGH
@@ -3100,6 +3173,7 @@ export default {
       this.receiveQuality = 'auto'
       // Before the disconnect: a check must not resubscribe on a room going away.
       this.stopAudioWatchdog()
+      this.stopSenderStats()
       // First, before the disconnect below is awaited: nothing may ask for the call's chat
       // any more once the call is being left.
       this.cancelCallChatRetry()

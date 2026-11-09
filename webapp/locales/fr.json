@@ -2063,6 +2063,13 @@
       "unnamedSpeaker": "Haut-parleur",
       "unsupportedBrowser": "Votre navigateur ne prend pas en charge l'audio/vidéo."
     },
+    "qualityLimit": {
+      "ownBandwidth": "Ta vidéo est envoyée en qualité réduite : ta connexion ne permet pas plus.",
+      "ownChoice": "Ta vidéo est envoyée en qualité réduite, comme choisi dans les réglages des appareils.",
+      "ownCpu": "Ta vidéo est envoyée en qualité réduite : ton appareil est surchargé.",
+      "remoteChoice": "La vidéo de {name} arrive en qualité réduite, comme choisi dans les réglages des appareils.",
+      "remoteCpu": "La vidéo de {name} arrive en qualité réduite : ton appareil est surchargé."
+    },
     "reconnecting": "Connexion perdue — reconnexion…",
     "reloadPending": "La plateforme a un nouveau design. Il sera appliqué dès que vous quitterez l’appel.",
     "restartMic": "Redémarrer le microphone",

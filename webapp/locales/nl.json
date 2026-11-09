@@ -2063,6 +2063,13 @@
       "unnamedSpeaker": "Luidspreker",
       "unsupportedBrowser": "Je browser ondersteunt geen audio/video."
     },
+    "qualityLimit": {
+      "ownBandwidth": "Je video wordt in lagere kwaliteit verzonden: je verbinding laat niet meer toe.",
+      "ownChoice": "Je video wordt in lagere kwaliteit verzonden, zoals gekozen in de apparaatinstellingen.",
+      "ownCpu": "Je video wordt in lagere kwaliteit verzonden: je apparaat is overbelast.",
+      "remoteChoice": "De video van {name} komt in lagere kwaliteit binnen, zoals gekozen in de apparaatinstellingen.",
+      "remoteCpu": "De video van {name} komt in lagere kwaliteit binnen: je apparaat is overbelast."
+    },
     "reconnecting": "Verbinding verbroken — opnieuw verbinden…",
     "reloadPending": "Het platform heeft een nieuw ontwerp. Het wordt toegepast zodra je het gesprek verlaat.",
     "restartMic": "Microfoon opnieuw starten",

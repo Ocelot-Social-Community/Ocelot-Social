@@ -2063,6 +2063,13 @@
       "unnamedSpeaker": "Altavoz",
       "unsupportedBrowser": "Tu navegador no admite audio/vídeo."
     },
+    "qualityLimit": {
+      "ownBandwidth": "Tu vídeo se envía con menor calidad: tu conexión no da para más.",
+      "ownChoice": "Tu vídeo se envía con menor calidad, como elegiste en los ajustes de dispositivos.",
+      "ownCpu": "Tu vídeo se envía con menor calidad: tu dispositivo está sobrecargado.",
+      "remoteChoice": "El vídeo de {name} llega con menor calidad, como elegiste en los ajustes de dispositivos.",
+      "remoteCpu": "El vídeo de {name} llega con menor calidad: tu dispositivo está sobrecargado."
+    },
     "reconnecting": "Conexión perdida: reconectando…",
     "reloadPending": "La plataforma tiene un nuevo diseño. Se aplicará en cuanto salgas de la llamada.",
     "restartMic": "Reiniciar micrófono",

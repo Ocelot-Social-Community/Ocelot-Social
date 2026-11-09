@@ -2063,6 +2063,13 @@
       "unnamedSpeaker": "Głośnik",
       "unsupportedBrowser": "Twoja przeglądarka nie obsługuje audio/wideo."
     },
+    "qualityLimit": {
+      "ownBandwidth": "Twoje wideo jest wysyłane w niższej jakości: połączenie nie pozwala na więcej.",
+      "ownChoice": "Twoje wideo jest wysyłane w niższej jakości, zgodnie z wyborem w ustawieniach urządzeń.",
+      "ownCpu": "Twoje wideo jest wysyłane w niższej jakości: urządzenie jest przeciążone.",
+      "remoteChoice": "Wideo od {name} dociera w niższej jakości, zgodnie z wyborem w ustawieniach urządzeń.",
+      "remoteCpu": "Wideo od {name} dociera w niższej jakości: urządzenie jest przeciążone."
+    },
     "reconnecting": "Utracono połączenie — ponowne łączenie…",
     "reloadPending": "Platforma ma nowy wygląd. Zostanie zastosowany, gdy tylko opuścisz rozmowę.",
     "restartMic": "Uruchom ponownie mikrofon",

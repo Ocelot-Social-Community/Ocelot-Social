@@ -133,7 +133,9 @@ const stubs = {
       'cameraRenewing',
     ],
   }),
-  VideoTile: Stub('VideoTile', { props: ['tile', 'cameraStarting', 'micStarting'] }),
+  VideoTile: Stub('VideoTile', {
+    props: ['tile', 'cameraStarting', 'micStarting', 'qualityLimit'],
+  }),
   Chat: Stub('Chat'),
   ClientOnly: Stub('ClientOnly'),
 }
@@ -3753,6 +3755,176 @@ describe('VideoCall', () => {
         await idle.vm.setSendQuality('high')
         await idle.vm.setSendQuality('high')
         expect(idle.vm.sendQuality).toBe('high')
+      })
+    })
+
+    describe('shown on the tiles', () => {
+      const own = { key: 'me', isLocal: true, isScreen: false }
+      const other = { key: 'bob', isLocal: false, isScreen: false, name: 'Bob' }
+      const sending = (room, stats) => {
+        const track = {
+          prioritizePerformance: jest.fn().mockResolvedValue(),
+          getSenderStats: jest.fn().mockResolvedValue(stats),
+        }
+        room.localParticipant.getTrackPublication.mockImplementation((source) =>
+          source === 'camera' ? { track } : undefined,
+        )
+        return track
+      }
+
+      it('marks nothing while nothing is held back, screen shares never', async () => {
+        const { wrapper } = await connected()
+        expect(wrapper.vm.qualityLimitOf(own)).toBe(null)
+        expect(wrapper.vm.qualityLimitOf(other)).toBe(null)
+        await wrapper.vm.setSendQuality('low')
+        wrapper.vm.setReceiveQuality('low')
+        expect(wrapper.vm.qualityLimitOf({ ...own, isScreen: true })).toBe(null)
+        expect(wrapper.vm.qualityLimitOf({ ...other, isScreen: true })).toBe(null)
+      })
+
+      it('says what our camera sends, read from WebRTC every few seconds', async () => {
+        jest.useFakeTimers()
+        try {
+          const { wrapper, room } = await connected({ send: 'medium' })
+          wrapper.setData({ cameraEnabled: true })
+          const track = sending(room, [
+            // A layer paused because nobody watches it: no limit.
+            { frameHeight: 0, qualityLimitationReason: 'none' },
+            { frameHeight: 180, framesPerSecond: 29.6, qualityLimitationReason: 'none' },
+            { frameHeight: 360, framesPerSecond: 29.6, qualityLimitationReason: 'none' },
+          ])
+          expect(wrapper.vm.qualityLimitOf(own)).toEqual({
+            reason: 'choice',
+            height: null,
+            fps: null,
+          })
+          jest.advanceTimersByTime(3000)
+          await flushPromises()
+          expect(track.getSenderStats).toHaveBeenCalledTimes(1)
+          expect(wrapper.vm.qualityLimitOf(own)).toEqual({
+            reason: 'choice',
+            height: 360,
+            fps: 30,
+          })
+        } finally {
+          jest.useRealTimers()
+        }
+      })
+
+      it("names what WebRTC holds it back by, before the user's own choice", async () => {
+        const { wrapper, room } = await connected({ send: 'low' })
+        wrapper.setData({ cameraEnabled: true })
+        sending(room, [
+          { frameHeight: 180, framesPerSecond: 12, qualityLimitationReason: 'bandwidth' },
+        ])
+        await wrapper.vm.readSenderStats()
+        expect(wrapper.vm.qualityLimitOf(own)).toMatchObject({ reason: 'bandwidth', height: 180 })
+        await wrapper.vm.setSendQuality('auto')
+        // Held back by the line alone, with nothing chosen.
+        expect(wrapper.vm.qualityLimitOf(own)).toMatchObject({ reason: 'bandwidth' })
+      })
+
+      it('takes the largest layer, whatever its place, and a frame rate not yet known as 0', async () => {
+        const { wrapper, room } = await connected({ send: 'low' })
+        wrapper.setData({ cameraEnabled: true })
+        sending(room, [
+          { frameHeight: 360, qualityLimitationReason: 'none' },
+          { frameHeight: 180, framesPerSecond: 30, qualityLimitationReason: 'none' },
+        ])
+        await wrapper.vm.readSenderStats()
+        expect(wrapper.vm.sentVideo).toEqual({ height: 360, fps: 0, limitedBy: null })
+      })
+
+      it('names the relief once it reaches our camera', async () => {
+        const { wrapper, room, constrained } = await connected()
+        wrapper.setData({ cameraEnabled: true })
+        sending(room, [{ frameHeight: 360, framesPerSecond: 15, qualityLimitationReason: 'cpu' }])
+        constrained()
+        await wrapper.vm.readSenderStats()
+        expect(wrapper.vm.qualityLimitOf(own)).toEqual({ reason: 'cpu', height: 360, fps: 15 })
+      })
+
+      it('knows of nothing sent while our camera is off, sends nothing, or cannot tell', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: false })
+        const track = sending(room, [{ frameHeight: 360, qualityLimitationReason: 'cpu' }])
+        await wrapper.vm.readSenderStats()
+        expect(track.getSenderStats).not.toHaveBeenCalled()
+        expect(wrapper.vm.sentVideo).toBe(null)
+        wrapper.setData({ cameraEnabled: true })
+        sending(room, [{ frameHeight: 0 }])
+        await wrapper.vm.readSenderStats()
+        expect(wrapper.vm.sentVideo).toBe(null)
+        sending(room, undefined)
+        await wrapper.vm.readSenderStats()
+        expect(wrapper.vm.sentVideo).toBe(null)
+        room.localParticipant.getTrackPublication.mockReturnValue({ track: {} })
+        await wrapper.vm.readSenderStats()
+        expect(wrapper.vm.sentVideo).toBe(null)
+      })
+
+      it('keeps what it knew when WebRTC fails to say, and drops an answer for a call left', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: true })
+        sending(room, [{ frameHeight: 360, framesPerSecond: 30, qualityLimitationReason: 'none' }])
+        await wrapper.vm.readSenderStats()
+        const known = wrapper.vm.sentVideo
+        const failing = sending(room, [])
+        failing.getSenderStats.mockRejectedValue(new Error('closed'))
+        await wrapper.vm.readSenderStats()
+        expect(wrapper.vm.sentVideo).toBe(known)
+        let answer
+        failing.getSenderStats.mockReturnValue(
+          new Promise((resolve) => {
+            answer = resolve
+          }),
+        )
+        const reading = wrapper.vm.readSenderStats()
+        hangUpPending(wrapper, room)
+        answer([{ frameHeight: 180, qualityLimitationReason: 'bandwidth' }])
+        await reading
+        expect(wrapper.vm.sentVideo).toBe(null)
+        const idle = factory({ show: false }).wrapper
+        await expect(idle.vm.readSenderStats()).resolves.toBeUndefined()
+      })
+
+      it('stops reading once the call is left', async () => {
+        jest.useFakeTimers()
+        try {
+          const { wrapper, room } = await connected()
+          wrapper.setData({ cameraEnabled: true })
+          const track = sending(room, [{ frameHeight: 360, qualityLimitationReason: 'none' }])
+          await wrapper.vm.cleanup()
+          jest.advanceTimersByTime(30_000)
+          expect(track.getSenderStats).not.toHaveBeenCalled()
+        } finally {
+          jest.useRealTimers()
+        }
+      })
+
+      it('marks the videos of others as held back by the choice or the relief', async () => {
+        const { wrapper, constrained } = await connected({ receive: 'medium' })
+        expect(wrapper.vm.qualityLimitOf(other)).toEqual({ reason: 'choice' })
+        wrapper.vm.setReceiveQuality('auto')
+        expect(wrapper.vm.qualityLimitOf(other)).toBe(null)
+        constrained()
+        expect(wrapper.vm.qualityLimitOf(other)).toEqual({ reason: 'cpu' })
+        // High is no limit: each camera is sized to its tile as ever.
+        wrapper.vm.setReceiveQuality('high')
+        expect(wrapper.vm.qualityLimitOf(other)).toBe(null)
+      })
+
+      it('hands each tile its limit', async () => {
+        const { wrapper } = await connected({ receive: 'low' })
+        wrapper.setData({ tiles: [other] })
+        await wrapper.vm.$nextTick()
+        const tile = wrapper.findComponent({ name: 'VideoTile' })
+        expect(tile.props('qualityLimit')).toEqual({ reason: 'choice' })
+      })
+
+      it('knows of no limit before the call has a client library', () => {
+        const { wrapper } = factory({ show: false })
+        expect(wrapper.vm.qualityLimitOf(other)).toBe(null)
       })
     })
 

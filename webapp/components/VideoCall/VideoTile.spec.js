@@ -210,6 +210,69 @@ describe('VideoTile', () => {
     })
   })
 
+  describe('quality limit', () => {
+    const badge = (wrapper) => wrapper.find('[data-test="video-tile-quality-limit"]')
+    const withVideo = (overrides) => buildTile({ videoTrack: buildTrack(), ...overrides })
+
+    it('shows nothing while the video is not held back, or there is none', () => {
+      expect(badge(factory({ tile: withVideo() })).exists()).toBe(false)
+      const noVideo = factory({ tile: buildTile(), qualityLimit: { reason: 'choice' } })
+      expect(badge(noVideo).exists()).toBe(false)
+    })
+
+    it('says on our own tile what goes out, and why', () => {
+      const wrapper = factory({
+        tile: withVideo({ isLocal: true }),
+        qualityLimit: { reason: 'cpu', height: 360, fps: 15 },
+      })
+      expect(badge(wrapper).text()).toBe('360p · 15 fps')
+      expect(badge(wrapper).attributes()).toMatchObject({
+        role: 'img',
+        'aria-label': '360p · 15 fps: videoCall.qualityLimit.ownCpu',
+      })
+    })
+
+    it.each([
+      ['cpu', 'videoCall.qualityLimit.ownCpu'],
+      ['bandwidth', 'videoCall.qualityLimit.ownBandwidth'],
+      ['choice', 'videoCall.qualityLimit.ownChoice'],
+    ])('names %s as the reason on our own tile', (reason, label) => {
+      const wrapper = factory({
+        tile: withVideo({ isLocal: true }),
+        qualityLimit: { reason, height: 180, fps: 0 },
+      })
+      // A frame rate not yet known is left out.
+      expect(badge(wrapper).text()).toBe('180p')
+      expect(badge(wrapper).attributes('aria-label')).toBe(`180p: ${label}`)
+    })
+
+    it('falls back to the sign on our own tile while nothing was measured yet', () => {
+      const wrapper = factory({
+        tile: withVideo({ isLocal: true }),
+        qualityLimit: { reason: 'choice', height: null, fps: null },
+      })
+      expect(badge(wrapper).find('.osicon').exists()).toBe(true)
+      expect(badge(wrapper).attributes('aria-label')).toBe('videoCall.qualityLimit.ownChoice')
+    })
+
+    it.each([
+      ['cpu', 'videoCall.qualityLimit.remoteCpu'],
+      ['choice', 'videoCall.qualityLimit.remoteChoice'],
+    ])('only signs on the tiles of others, naming %s', (reason, label) => {
+      const wrapper = factory({ tile: withVideo(), qualityLimit: { reason } })
+      expect(badge(wrapper).find('.osicon').exists()).toBe(true)
+      expect(badge(wrapper).text()).toBe('')
+      expect(badge(wrapper).attributes('aria-label')).toBe(label)
+    })
+
+    it('shows nothing for a reason it does not know', () => {
+      const own = factory({ tile: withVideo({ isLocal: true }), qualityLimit: { reason: 'x' } })
+      const other = factory({ tile: withVideo(), qualityLimit: { reason: 'bandwidth' } })
+      expect(badge(own).exists()).toBe(false)
+      expect(badge(other).exists()).toBe(false)
+    })
+  })
+
   describe('clickability', () => {
     it('emits select when clicked and clickable', async () => {
       const wrapper = factory({ clickable: true })
