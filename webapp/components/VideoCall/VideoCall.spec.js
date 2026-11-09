@@ -3604,6 +3604,27 @@ describe('VideoCall', () => {
         expect(switchedOn).toEqual([])
       })
 
+      it('keeps a camera off that was switched off completely while the renewal ran', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: true })
+        let unpublished
+        room.localParticipant.unpublishTrack.mockReturnValue(
+          new Promise((resolve) => {
+            unpublished = resolve
+          }),
+        )
+        const renewing = wrapper.vm.setSendQuality('low')
+        await flushPromises()
+        // Done before the old track is gone: nothing marks it as on its way any more.
+        await wrapper.vm.toggleCamera()
+        expect(wrapper.vm.cameraOffPending).toBe(false)
+        unpublished()
+        await renewing
+        const switchedOn = room.localParticipant.setCameraEnabled.mock.calls.filter(([on]) => on)
+        expect(switchedOn).toEqual([])
+        expect(wrapper.vm.cameraEnabled).toBe(false)
+      })
+
       it("switches a camera on with its button on the room's capture defaults alone", async () => {
         const { wrapper, room } = await connected()
         wrapper.setData({ cameraEnabled: false })

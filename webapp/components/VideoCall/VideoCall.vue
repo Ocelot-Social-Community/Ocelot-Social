@@ -2753,8 +2753,8 @@ export default {
         if (!this.isLive(room)) return
         await room.localParticipant.unpublishTrack(track, true)
         // Hung up meanwhile: a camera started now would come on after the call has ended.
-        // Switched off meanwhile: it stays off.
-        if (restart && !this.cameraOffPending && this.isLive(room)) {
+        // Switched off meanwhile — still on its way, or done already: it stays off.
+        if (restart && this.cameraEnabled && !this.cameraOffPending && this.isLive(room)) {
           await room.localParticipant.setCameraEnabled(
             true,
             this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : undefined,
