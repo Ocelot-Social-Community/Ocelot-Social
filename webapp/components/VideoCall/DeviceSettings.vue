@@ -255,7 +255,7 @@ export default {
 .device-settings__row select {
   background: var(--background-color-base);
   color: var(--text-color-base);
-  border: 1px solid var(--color-neutral-70);
+  border: 1px solid var(--border-color-soft);
   padding: var(--space-xx-small) var(--space-x-small);
   border-radius: var(--border-radius-base);
   width: 100%;
