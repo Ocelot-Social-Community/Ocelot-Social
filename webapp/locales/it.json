@@ -1969,7 +1969,7 @@
       "dtxFailed": "Non è stato possibile cambiare l’impostazione delle pause nel parlato: il tuo microfono continua come prima.",
       "dtxHint": "Risparmia dati mentre taci. Se a volte gli altri non ti sentono, disattivalo.",
       "quality": {
-        "audio": "Nessun video (solo audio)",
+        "audio": "Nessuna videocamera (le condivisioni dello schermo restano)",
         "auto": "Automatica",
         "high": "Alta",
         "low": "Bassa",

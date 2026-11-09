@@ -1969,7 +1969,7 @@
       "dtxFailed": "No se pudo cambiar el ajuste de las pausas al hablar: tu micrófono sigue como antes.",
       "dtxHint": "Ahorra datos mientras callas. Si a veces los demás no te oyen, desactívalo.",
       "quality": {
-        "audio": "Sin vídeo (solo sonido)",
+        "audio": "Sin cámaras (las pantallas compartidas siguen)",
         "auto": "Automática",
         "high": "Alta",
         "low": "Baja",

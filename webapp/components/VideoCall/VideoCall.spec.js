@@ -3476,6 +3476,31 @@ describe('VideoCall', () => {
         await wrapper.find('[data-test="video-call-lower-quality"]').trigger('click')
         expect(ownCamera.prioritizePerformance).toHaveBeenCalled()
         expect(camera.setVideoQuality).toHaveBeenLastCalledWith(0)
+        // Said as it is: offered, not lowered.
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining('offering'))
+      })
+
+      it('lets a new choice for one direction off the relief the user accepted', async () => {
+        const { wrapper, room, camera, constrained } = await connected({
+          send: 'high',
+          receive: 'high',
+        })
+        constrained()
+        wrapper.vm.onCpuStrainedAction('lower')
+        expect(camera.setVideoQuality).toHaveBeenLastCalledWith(0)
+        wrapper.vm.setReceiveQuality('medium')
+        expect(camera.setVideoQuality).toHaveBeenLastCalledWith(1)
+        // The other direction stays relieved: a fresh camera of ours gets it again.
+        const fresh = { prioritizePerformance: jest.fn().mockResolvedValue() }
+        room.localParticipant.getTrackPublication.mockReturnValue({ track: fresh })
+        room.handlers.LocalTrackPublished({ source: 'camera', track: fresh })
+        expect(fresh.prioritizePerformance).toHaveBeenCalled()
+        await wrapper.vm.setSendQuality('low')
+        const fresher = { prioritizePerformance: jest.fn().mockResolvedValue() }
+        room.localParticipant.getTrackPublication.mockReturnValue({ track: fresher })
+        room.handlers.LocalTrackPublished({ source: 'camera', track: fresher })
+        expect(fresher.prioritizePerformance).not.toHaveBeenCalled()
+        expect(camera.setVideoQuality).toHaveBeenLastCalledWith(1)
       })
 
       it('gives way on the videos received once the user chooses for them', async () => {

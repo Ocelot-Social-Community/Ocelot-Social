@@ -1969,7 +1969,7 @@
       "dtxFailed": "De instelling voor spreekpauzes kon niet worden gewijzigd – je microfoon werkt verder zoals voorheen.",
       "dtxHint": "Bespaart gegevens zolang je zwijgt. Horen anderen je soms niet, zet het dan uit.",
       "quality": {
-        "audio": "Geen video (alleen geluid)",
+        "audio": "Geen camera's (schermdelingen blijven)",
         "auto": "Automatisch",
         "high": "Hoog",
         "low": "Laag",

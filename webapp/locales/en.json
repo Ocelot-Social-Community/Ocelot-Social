@@ -1969,7 +1969,7 @@
       "dtxFailed": "The speech pauses setting could not be changed – your microphone carries on as before.",
       "dtxHint": "Saves data while you are silent. If others sometimes cannot hear you, switch it off.",
       "quality": {
-        "audio": "No video (sound only)",
+        "audio": "No cameras (screen shares stay)",
         "auto": "Automatic",
         "high": "High",
         "low": "Low",

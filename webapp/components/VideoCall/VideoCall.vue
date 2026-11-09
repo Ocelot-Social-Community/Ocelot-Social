@@ -755,8 +755,10 @@ export default {
       // only offers it again (cpuStrained), it does not decide for them.
       cpuReliefDeclined: false,
       cpuStrained: false,
-      // The user accepted our offer to lower the quality, past a choice of their own.
-      reliefForced: false,
+      // The user accepted our offer to lower the quality, past a choice of their own — per
+      // direction, as a new choice for one of them lets that one off again.
+      sendReliefForced: false,
+      receiveReliefForced: false,
       // A cap was put on the remote cameras in this call; until then there is none to lift.
       receiveCapped: false,
       // The video quality the user asked for, sent and received (see devicePreferences).
@@ -811,10 +813,10 @@ export default {
     // The CPU relief reaches what the user left to the call — or everything, once they
     // asked for it themselves.
     sendRelieved() {
-      return this.cpuConstrained && (this.reliefForced || this.sendQuality === 'auto')
+      return this.cpuConstrained && (this.sendReliefForced || this.sendQuality === 'auto')
     },
     receiveRelieved() {
-      return this.cpuConstrained && (this.reliefForced || this.receiveQuality === 'auto')
+      return this.cpuConstrained && (this.receiveReliefForced || this.receiveQuality === 'auto')
     },
     // The remote cameras are off: our connection is weak, or the user wants sound only.
     videosOff() {
@@ -1943,7 +1945,8 @@ export default {
         this.cpuConstrained = false
         this.cpuReliefDeclined = false
         this.cpuStrained = false
-        this.reliefForced = false
+        this.sendReliefForced = false
+        this.receiveReliefForced = false
         this.receiveCapped = false
         this.renewingCamera = false
         this.room = room
@@ -1967,16 +1970,19 @@ export default {
         room.localParticipant.on(ParticipantEvent.LocalTrackCpuConstrained, () => {
           // A late event of a room already replaced must not throttle the new call.
           if (this.room !== room || this.cpuConstrained) return
+          // Taken back before, or nothing left to the call that the relief could lower:
+          // the user decides.
+          const offer =
+            this.cpuReliefDeclined ||
+            (this.sendQuality !== 'auto' && this.receiveQuality !== 'auto')
           // A deliberate diagnosis: the only trace of why the videos got coarse.
           // eslint-disable-next-line no-console
           console.warn(
-            this.cpuReliefDeclined
-              ? '[video-call] CPU constrained again, offering to lower the video quality'
+            offer
+              ? '[video-call] CPU constrained, offering to lower the video quality'
               : '[video-call] CPU constrained, lowering the video quality of the cameras',
           )
-          // Nothing left to the call that the relief could lower: the user decides.
-          const allChosen = this.sendQuality !== 'auto' && this.receiveQuality !== 'auto'
-          if (this.cpuReliefDeclined || allChosen) this.cpuStrained = true
+          if (offer) this.cpuStrained = true
           else this.relieveCpu()
         })
         // A camera published while we are in audio-only mode would otherwise
@@ -2608,7 +2614,8 @@ export default {
       const room = this.room
       if (!room) return
       this.cpuConstrained = true
-      this.reliefForced = forced
+      this.sendReliefForced = forced
+      this.receiveReliefForced = forced
       this.cpuReliefDeclined = false
       this.cpuStrained = false
       if (this.sendRelieved) this.relieveOwnCamera()
@@ -2648,6 +2655,8 @@ export default {
       if (quality === this.receiveQuality) return
       const wereOff = this.videosOff
       this.receiveQuality = quality
+      // A choice made now outweighs the relief the user accepted before.
+      this.receiveReliefForced = false
       saveQualityPreference('receive', quality)
       // The user's choice, not a weak line: the automatic mode and its notice give way.
       if (quality === 'audio') this.resetAudioOnly()
@@ -2658,6 +2667,7 @@ export default {
     async setSendQuality(quality) {
       if (quality === this.sendQuality || this.renewingCamera) return
       this.sendQuality = quality
+      this.sendReliefForced = false
       saveQualityPreference('send', quality)
       const room = this.room
       if (!room || !this.Track) return
@@ -2677,7 +2687,8 @@ export default {
       if (!room || !Track || this.renewingCamera) return
       const wasRelieved = this.sendRelieved
       this.cpuConstrained = false
-      this.reliefForced = false
+      this.sendReliefForced = false
+      this.receiveReliefForced = false
       this.cpuReliefDeclined = true
       // Back to the user's own choice, if they made one.
       this.applyReceiveCaps()

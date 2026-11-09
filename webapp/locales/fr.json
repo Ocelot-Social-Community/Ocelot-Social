@@ -1969,7 +1969,7 @@
       "dtxFailed": "Le réglage des pauses de parole n’a pas pu être modifié – ton micro continue comme avant.",
       "dtxHint": "Économise des données tant que tu te tais. Si les autres ne t’entendent parfois pas, désactive-le.",
       "quality": {
-        "audio": "Pas de vidéo (son seul)",
+        "audio": "Pas de caméras (les partages d’écran restent)",
         "auto": "Automatique",
         "high": "Haute",
         "low": "Basse",

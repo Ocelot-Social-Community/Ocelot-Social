@@ -1969,7 +1969,7 @@
       "dtxFailed": "Die Sprechpausen ließen sich nicht umstellen – dein Mikrofon läuft weiter wie zuvor.",
       "dtxHint": "Spart Daten, solange du schweigst. Hören dich andere manchmal nicht, schalte es aus.",
       "quality": {
-        "audio": "Kein Video (nur Ton)",
+        "audio": "Keine Kameras (Bildschirmfreigaben bleiben)",
         "auto": "Automatisch",
         "high": "Hoch",
         "low": "Niedrig",

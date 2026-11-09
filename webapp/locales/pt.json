@@ -1969,7 +1969,7 @@
       "dtxFailed": "Não foi possível mudar a definição das pausas na fala – o teu microfone continua como antes.",
       "dtxHint": "Poupa dados enquanto estás em silêncio. Se às vezes os outros não te ouvem, desativa-o.",
       "quality": {
-        "audio": "Sem vídeo (só som)",
+        "audio": "Sem câmeras (o compartilhamento de tela continua)",
         "auto": "Automática",
         "high": "Alta",
         "low": "Baixa",

@@ -1969,7 +1969,7 @@
       "dtxFailed": "Nie udało się zmienić ustawienia przerw w mowie – twój mikrofon działa dalej jak wcześniej.",
       "dtxHint": "Oszczędza dane, gdy milczysz. Jeśli inni czasem cię nie słyszą, wyłącz to.",
       "quality": {
-        "audio": "Bez wideo (tylko dźwięk)",
+        "audio": "Bez kamer (udostępniane ekrany zostają)",
         "auto": "Automatyczna",
         "high": "Wysoka",
         "low": "Niska",
