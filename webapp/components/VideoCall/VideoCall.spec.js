@@ -1489,6 +1489,21 @@ describe('VideoCall', () => {
         expect(createAudioWatchdog).not.toHaveBeenCalled()
       })
 
+      it('starts neither microphone nor camera once hung up while connecting', async () => {
+        const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+        withApollo(wrapper)
+        wrapper.setData({ micEnabled: true, cameraEnabled: true })
+        let created
+        Room.created = (room) => {
+          created = room
+          room.connect.mockImplementation(async () => hangUpPending(wrapper, room))
+        }
+        await wrapper.vm.connect()
+        expect(created.localParticipant.setMicrophoneEnabled).not.toHaveBeenCalled()
+        expect(created.localParticipant.setCameraEnabled).not.toHaveBeenCalled()
+        expect(wrapper.vm.phase).not.toBe('in-call')
+      })
+
       it('does not start the camera once hung up while the microphone came on', async () => {
         const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
         withApollo(wrapper)
@@ -1555,6 +1570,21 @@ describe('VideoCall', () => {
         expect(Room.created).not.toHaveBeenCalled()
         expect(wrapper.vm.room).toBe(null)
         expect(wrapper.vm.phase).toBe('idle')
+      })
+
+      it('joins no room either while hanging up still navigates away', async () => {
+        const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
+        const token = pendingToken(wrapper)
+        Room.created = jest.fn()
+        wrapper.vm.$route.name = 'call-id-slug'
+        // leave() hangs up only once the navigation is through — it is not, yet.
+        wrapper.vm.$router.replace.mockReturnValue(new Promise(() => {}))
+        const connecting = wrapper.vm.connect()
+        await flushPromises()
+        wrapper.vm.leave()
+        token.answer()
+        await connecting
+        expect(Room.created).not.toHaveBeenCalled()
       })
 
       it('reports no failure of the token once closed', async () => {

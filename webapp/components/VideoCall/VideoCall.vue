@@ -1877,8 +1877,9 @@ export default {
           DisconnectReason,
         } = livekit
         // Closed while the token or the client library was on its way: cleanup() found no
-        // room to take down then, so nothing may join one now.
-        if (attempt !== this.connectAttempt) return
+        // room to take down then, so nothing may join one now. Nor while hanging up still
+        // navigates away, before its cleanup() has begun.
+        if (attempt !== this.connectAttempt || this.leaving) return
         this.Track = Track
         this.VideoQuality = VideoQuality
 
@@ -2044,6 +2045,8 @@ export default {
           peerConnectionTimeout: 5000,
           maxRetries: 0,
         })
+        // Hung up while connecting: no microphone, no camera — cleanup() takes the room down.
+        if (!this.isLive(room)) return
         if (this.micEnabled) {
           await room.localParticipant.setMicrophoneEnabled(true)
         }
