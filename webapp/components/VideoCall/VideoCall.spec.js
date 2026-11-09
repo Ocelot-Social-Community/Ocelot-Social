@@ -3494,6 +3494,54 @@ describe('VideoCall', () => {
         expect(wrapper.vm.cameraRenewal).toBe(null)
       })
 
+      it('starts our camera anew only once a camera switch asked for before is through', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: true })
+        let switched
+        room.switchActiveDevice.mockReturnValueOnce(
+          new Promise((resolve) => {
+            switched = resolve
+          }),
+        )
+        const switching = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        // Under way with LiveKit, so not overtaken by the next pick.
+        await flushPromises()
+        // Queued behind the first, still waiting its turn when the renewal begins: had it
+        // looked for a renewal only on its turn, each would wait for the other for good.
+        const queued = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-3' })
+        await flushPromises()
+        const renewing = wrapper.vm.setSendQuality('low')
+        await flushPromises()
+        // Two captures of a camera still starting could lock each other out.
+        expect(room.localParticipant.unpublishTrack).not.toHaveBeenCalled()
+        switched(true)
+        await Promise.all([switching, queued, renewing])
+        expect(room.switchActiveDevice).toHaveBeenLastCalledWith('videoinput', 'cam-3')
+        expect(room.localParticipant.unpublishTrack).toHaveBeenCalledTimes(1)
+        // The fresh camera starts on the latest pick.
+        expect(room.localParticipant.setCameraEnabled).toHaveBeenCalledWith(true, {
+          deviceId: 'cam-3',
+        })
+      })
+
+      it('starts no camera anew after waiting for a switch in a call left meanwhile', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: true })
+        let switched
+        room.switchActiveDevice.mockReturnValueOnce(
+          new Promise((resolve) => {
+            switched = resolve
+          }),
+        )
+        const switching = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        await flushPromises()
+        const renewing = wrapper.vm.setSendQuality('low')
+        hangUpPending(wrapper, room)
+        switched(true)
+        await Promise.all([switching, renewing])
+        expect(room.localParticipant.unpublishTrack).not.toHaveBeenCalled()
+      })
+
       it('drops a camera switch that waited for the renewal of a call left meanwhile', async () => {
         const { wrapper, room } = await connected()
         wrapper.setData({ cameraEnabled: true })
@@ -3573,6 +3621,10 @@ describe('VideoCall', () => {
           room.options.videoCaptureDefaults = mocked.options.videoCaptureDefaults
           await room.localParticipant.createTracks({ video: { deviceId: 'cam-1' } })
           expect(getUserMedia.mock.calls[0][0].video).toMatchObject(size)
+          // Switched on with its button, the camera comes with no options of its own
+          // (toggleCamera): the room's defaults alone decide.
+          await room.localParticipant.createTracks({ video: true })
+          expect(getUserMedia.mock.calls[1][0].video).toMatchObject(size)
         })
 
         it('leaves the size to LiveKit on auto', async () => {

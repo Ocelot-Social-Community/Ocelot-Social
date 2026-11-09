@@ -2348,6 +2348,9 @@ export default {
       // not the selection as it is right now, which may be an earlier pick
       // that has yet to prove itself.
       const switching = this.deviceSwitches[kind]
+      // A renewal of our camera begun before this pick goes first (see below). Taken now:
+      // a renewal begun later waits for this switch instead, and neither for the other.
+      const renewal = kind === 'videoinput' ? this.cameraRenewal : null
       const ticket = ++switching.latest
       if (switching.inFlight === 0) switching.settled = this[field]
       switching.inFlight++
@@ -2376,8 +2379,8 @@ export default {
         }
         // A camera being started anew could be published after the switch, on the device
         // it was started with: the switch waits for it and then moves the fresh one.
-        if (kind === 'videoinput' && this.cameraRenewal) {
-          await this.cameraRenewal
+        if (renewal) {
+          await renewal
           if (!this.isLive(room) || ticket !== switching.latest) return
         }
         const captures = this.capturesOf(room, kind)
@@ -2739,7 +2742,12 @@ export default {
         renewed = resolve
       })
       this.cameraRenewal = renewal
+      // Camera switches asked for before go first: a second capture of a device still
+      // starting can lock the switch out of it. Later ones wait for this renewal.
+      const switched = this.deviceSwitches.videoinput.queue
       try {
+        await switched
+        if (!this.isLive(room)) return
         await room.localParticipant.unpublishTrack(track, true)
         // Hung up meanwhile: a camera started now would come on after the call has ended.
         if (restart && this.isLive(room)) {
