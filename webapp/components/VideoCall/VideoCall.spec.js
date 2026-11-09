@@ -3334,25 +3334,28 @@ describe('VideoCall', () => {
           room.localParticipant.getTrackPublication.mockReturnValue(undefined)
           constrained()
           await wrapper.vm.restoreVideoQuality()
-          return sent[sent.length - 1]
+          return { settings: sent[sent.length - 1], cap: pub.videoQuality }
         }
 
         it('sizes a simulcast camera to its tile again', async () => {
-          const settings = await restoredWith([
+          const { settings, cap } = await restoredWith([
             [0, 320, 180],
             [1, 640, 360],
             [2, 1280, 720],
           ])
           expect(settings).toMatchObject({ width: 400, height: 225 })
+          expect(cap).toBe(2)
         })
 
         it('sizes a camera without a HIGH layer to its tile too, not to its largest layer', async () => {
           // SVC sent in two spatial layers.
-          const settings = await restoredWith([
+          const { settings, cap } = await restoredWith([
             [0, 640, 360],
             [1, 1280, 720],
           ])
           expect(settings).toMatchObject({ width: 400, height: 225 })
+          // Lifted, not left at LOW — whose layer here is larger than the tile as well.
+          expect(cap).toBe(1)
         })
       })
 
@@ -3477,6 +3480,19 @@ describe('VideoCall', () => {
         expect(wrapper.vm.room).toBe(room)
         expect(room.localParticipant.setCameraEnabled).not.toHaveBeenCalled()
         expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+      })
+
+      it('starts no camera when the window is torn down meanwhile, without hanging up', async () => {
+        const { wrapper, room, constrained } = await connected()
+        constrained()
+        withOwnCamera(room, { enabled: true })
+        wrapper.setData({ cameraEnabled: true })
+        room.disconnect.mockReturnValue(new Promise(() => {}))
+        room.localParticipant.unpublishTrack.mockImplementation(async () => wrapper.destroy())
+        room.localParticipant.setCameraEnabled.mockClear()
+        await wrapper.vm.restoreVideoQuality()
+        expect(wrapper.vm.leaving).toBe(false)
+        expect(room.localParticipant.setCameraEnabled).not.toHaveBeenCalled()
       })
 
       it('lifts the cap of a camera subscribed again only afterwards', async () => {
