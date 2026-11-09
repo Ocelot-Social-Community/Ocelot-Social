@@ -3135,6 +3135,91 @@ describe('VideoCall', () => {
         expect(wrapper.vm.cameraEnabled).toBe(true)
       })
 
+      describe('with the SDK sizing a real camera', () => {
+        // LiveKit's own publication, so what reaches the server is what LiveKit makes of
+        // our caps and of the tile's size — not merely which call we made.
+        const sdkCamera = (layers) => {
+          const { TextEncoder, TextDecoder } = require('util')
+          Object.assign(global, { TextEncoder, TextDecoder })
+          const { RemoteTrackPublication } = jest.requireActual('livekit-client')
+          const protocol = jest.requireActual('@livekit/protocol')
+          const info = new protocol.TrackInfo({
+            sid: 'TR_cam',
+            type: protocol.TrackType.VIDEO,
+            source: protocol.TrackSource.CAMERA,
+            layers: layers.map(
+              ([quality, width, height]) => new protocol.VideoLayer({ quality, width, height }),
+            ),
+          })
+          const pub = new RemoteTrackPublication('video', info, true)
+          const sent = []
+          pub.on('updateSettings', ({ width, height, quality }) =>
+            sent.push({ width, height, quality }),
+          )
+          // What adaptiveStream reports for the tile the camera is shown in.
+          pub.handleVideoDimensionsChange({ width: 400, height: 225 })
+          return { pub, sent }
+        }
+
+        const restoredWith = async (layers) => {
+          const { wrapper, room, constrained } = await connected()
+          const { pub, sent } = sdkCamera(layers)
+          room.remoteParticipants.get('bob').videoTrackPublications.set('c', pub)
+          room.localParticipant.getTrackPublication.mockReturnValue(undefined)
+          constrained()
+          await wrapper.vm.restoreVideoQuality()
+          return sent[sent.length - 1]
+        }
+
+        it('sizes a simulcast camera to its tile again', async () => {
+          const settings = await restoredWith([
+            [0, 320, 180],
+            [1, 640, 360],
+            [2, 1280, 720],
+          ])
+          expect(settings).toMatchObject({ width: 400, height: 225 })
+        })
+
+        it('sizes a camera without a HIGH layer to its tile too, not to its largest layer', async () => {
+          // SVC sent in two spatial layers.
+          const settings = await restoredWith([
+            [0, 640, 360],
+            [1, 1280, 720],
+          ])
+          expect(settings).toMatchObject({ width: 400, height: 225 })
+        })
+      })
+
+      it('caps a camera with no layers known at HIGH', async () => {
+        const { wrapper, room, camera, constrained } = await connected()
+        camera.trackInfo = { layers: [] }
+        room.localParticipant.getTrackPublication.mockReturnValue(undefined)
+        constrained()
+        await wrapper.vm.restoreVideoQuality()
+        expect(camera.setVideoQuality).toHaveBeenLastCalledWith(2)
+      })
+
+      it('starts the fresh camera only once the relieved one is gone', async () => {
+        const { wrapper, room, constrained } = await connected()
+        constrained()
+        withOwnCamera(room, { enabled: true })
+        wrapper.setData({ cameraEnabled: true })
+        let unpublished
+        room.localParticipant.unpublishTrack.mockReturnValue(
+          new Promise((resolve) => {
+            unpublished = resolve
+          }),
+        )
+        room.localParticipant.setCameraEnabled.mockClear()
+        const restoring = wrapper.vm.restoreVideoQuality()
+        await flushPromises()
+        // Published while the old one still is, LiveKit would take the new one down with it.
+        expect(room.localParticipant.setCameraEnabled).not.toHaveBeenCalled()
+        unpublished()
+        await restoring
+        expect(room.localParticipant.setCameraEnabled).toHaveBeenCalledTimes(1)
+      })
+
       it('restarts the camera on the default device when none was picked', async () => {
         const { wrapper, room, constrained } = await connected()
         constrained()
@@ -3208,6 +3293,23 @@ describe('VideoCall', () => {
         await wrapper.vm.restoreVideoQuality()
         expect(room.localParticipant.setCameraEnabled).not.toHaveBeenCalled()
         expect(toast).not.toHaveBeenCalled()
+        expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
+      })
+
+      it('starts no camera when the call is hung up meanwhile', async () => {
+        const { wrapper, room, constrained } = await connected()
+        constrained()
+        withOwnCamera(room, { enabled: true })
+        wrapper.setData({ cameraEnabled: true })
+        // Hanging up begins while the relieved camera is still being taken down — and the
+        // room stays ours until its disconnect is through.
+        room.localParticipant.unpublishTrack.mockImplementation(async () => {
+          wrapper.vm.leaving = true
+        })
+        room.localParticipant.setCameraEnabled.mockClear()
+        await wrapper.vm.restoreVideoQuality()
+        expect(wrapper.vm.room).toBe(room)
+        expect(room.localParticipant.setCameraEnabled).not.toHaveBeenCalled()
         expect(wrapper.vm.devicesStarting.videoinput).toBe(0)
       })
 
@@ -4613,6 +4715,18 @@ describe('VideoCall', () => {
       await toggle(wrapper).trigger('click')
       expect(marker(wrapper).exists()).toBe(false)
     })
+
+    it.each(['cpuConstrained', 'cpuStrained'])(
+      'are folded and marked for the coarse cameras alone too (%s)',
+      async (flag) => {
+        const { wrapper } = await call({ [flag]: true })
+        // Only informing, they do not unfold by themselves — so the way to them must be there.
+        expect(notices(wrapper).classes()).toContain('video-call__notices--collapsed')
+        expect(marker(wrapper).exists()).toBe(true)
+        await toggle(wrapper).trigger('click')
+        expect(notices(wrapper).classes()).not.toContain('video-call__notices--collapsed')
+      },
+    )
 
     it('unfold by themselves for a warning, each time one comes up', async () => {
       const { wrapper } = await call({ reconnecting: true })

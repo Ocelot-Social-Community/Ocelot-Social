@@ -1881,7 +1881,7 @@ export default {
           if (this.cpuConstrained) this.capCameraQuality(pub, VideoQuality.LOW)
           // Was lowered before the user took the relief back — audio-only mode
           // had it unsubscribed then, out of reach.
-          else if (this.cpuReliefDeclined) this.capCameraQuality(pub, VideoQuality.HIGH)
+          else if (this.cpuReliefDeclined) this.uncapCameraQuality(pub)
           onAny()
         })
         // Encoding and decoding video can eat the CPU to the point where the
@@ -2518,10 +2518,9 @@ export default {
       if (!room || !Track || this.restoringQuality) return
       this.cpuConstrained = false
       this.cpuReliefDeclined = true
-      // Only a cap: adaptiveStream keeps sizing each camera to its tile.
       for (const participant of room.remoteParticipants.values()) {
         for (const pub of participant.videoTrackPublications.values()) {
-          this.capCameraQuality(pub, this.VideoQuality.HIGH)
+          this.uncapCameraQuality(pub)
         }
       }
       const pub = room.localParticipant.getTrackPublication(Track.Source.Camera)
@@ -2537,7 +2536,9 @@ export default {
       if (restart) this.deviceStarts('videoinput')
       try {
         await room.localParticipant.unpublishTrack(track, true)
-        if (restart && this.room === room) {
+        // Hung up meanwhile: the room is still this one while it disconnects, and
+        // a camera started now would come on after the call has ended.
+        if (restart && this.room === room && !this.leaving) {
           await room.localParticipant.setCameraEnabled(
             true,
             this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : undefined,
@@ -2572,6 +2573,16 @@ export default {
       ) {
         pub.setVideoQuality(quality)
       }
+    },
+    uncapCameraQuality(pub) {
+      // LiveKit cannot drop a cap, only raise it — to the top layer the camera
+      // is sent in, so adaptiveStream keeps sizing it to its tile. That is HIGH
+      // only when there is a HIGH layer: an SVC camera sent in two layers has
+      // none, and a cap of HIGH would then ask for the largest layer outright.
+      const { LOW, HIGH } = this.VideoQuality
+      const layers = (pub && pub.trackInfo && pub.trackInfo.layers) || []
+      const sent = layers.map((layer) => layer.quality).filter((q) => q >= LOW && q <= HIGH)
+      this.capCameraQuality(pub, sent.length ? Math.max(...sent) : HIGH)
     },
     resetAudioOnly() {
       this.clearQualityTimer()
