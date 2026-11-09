@@ -1353,6 +1353,8 @@ export default {
     this.unmounting = false
     // The room cleanup() is taking down: this.room stays it until the disconnect is through.
     this.closingRoom = null
+    // Settles once a renewal of our camera (renewOwnCamera) is through.
+    this.cameraRenewal = null
     // Counts the ways into and out of a call; a connect() whose number is no longer the
     // current one was given up while it waited — for its token, say.
     this.connectAttempt = 0
@@ -2126,7 +2128,7 @@ export default {
         this.refreshKnownDevices()
       } catch (err) {
         // Hung up meanwhile, or given up for a new attempt: not this call's to report.
-        if (attempt !== this.connectAttempt || (room && !this.isLive(room))) return
+        if (this.leaving || attempt !== this.connectAttempt || (room && !this.isLive(room))) return
         const message = this.$backendError(err)
         // The user navigated away while the handshake was still running, so
         // the window is parked in the corner. Since isMaximized treats every
@@ -2370,6 +2372,12 @@ export default {
         if (!this.isLive(room) || ticket !== switching.latest) return
         if (kind === 'audioinput' && this.dtxSwitch) {
           await this.dtxSwitch
+          if (!this.isLive(room) || ticket !== switching.latest) return
+        }
+        // A camera being started anew could be published after the switch, on the device
+        // it was started with: the switch waits for it and then moves the fresh one.
+        if (kind === 'videoinput' && this.cameraRenewal) {
+          await this.cameraRenewal
           if (!this.isLive(room) || ticket !== switching.latest) return
         }
         const captures = this.capturesOf(room, kind)
@@ -2657,17 +2665,35 @@ export default {
       this.receiveQuality = quality
       // A choice made now outweighs the relief the user accepted before.
       this.receiveReliefForced = false
+      this.settleRelief()
       saveQualityPreference('receive', quality)
-      // The user's choice, not a weak line: the automatic mode and its notice give way.
-      if (quality === 'audio') this.resetAudioOnly()
+      // The user's choice, not a weak line: the automatic mode and its notice give way. What
+      // the line is like stays known (qualityClass), for when the cameras come back.
+      if (quality === 'audio') {
+        this.clearQualityTimer()
+        this.audioOnly = false
+      }
       if (!this.room || !this.Track) return
       if (this.videosOff !== wereOff) this.applyAudioOnly()
+      // Back from sound only onto a line that is still weak: LiveKit reports only changes,
+      // so the grace period starts now, not with a report that may never come.
+      if (wereOff && !this.videosOff && this.qualityClass === 'weak' && !this.audioOnlyDismissed) {
+        this.qualityTimer = setTimeout(() => this.setAudioOnly(true), WEAK_CONNECTION_MS)
+      }
       this.applyReceiveCaps()
+    },
+    // Both directions chosen anew past the relief: nothing is relieved any more, so its
+    // notice goes, and a later CPU limit offers it again.
+    settleRelief() {
+      if (this.cpuConstrained && !this.sendRelieved && !this.receiveRelieved) {
+        this.cpuConstrained = false
+      }
     },
     async setSendQuality(quality) {
       if (quality === this.sendQuality || this.renewingCamera) return
       this.sendQuality = quality
       this.sendReliefForced = false
+      this.settleRelief()
       saveQualityPreference('send', quality)
       const room = this.room
       if (!room || !this.Track) return
@@ -2708,6 +2734,11 @@ export default {
       const restart = this.cameraEnabled
       this.renewingCamera = true
       if (restart) this.deviceStarts('videoinput')
+      let renewed
+      const renewal = new Promise((resolve) => {
+        renewed = resolve
+      })
+      this.cameraRenewal = renewal
       try {
         await room.localParticipant.unpublishTrack(track, true)
         // Hung up meanwhile: a camera started now would come on after the call has ended.
@@ -2721,6 +2752,8 @@ export default {
         if (this.isLive(room)) this.showDeviceErrorToast('camera', err)
       } finally {
         if (restart) this.deviceStarted('videoinput')
+        if (this.cameraRenewal === renewal) this.cameraRenewal = null
+        renewed()
         if (this.isLive(room)) {
           this.renewingCamera = false
           this.cameraEnabled = !!room.localParticipant.isCameraEnabled

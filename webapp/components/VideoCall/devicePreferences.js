@@ -13,7 +13,8 @@ const QUALITIES = { send: SEND_QUALITIES, receive: RECEIVE_QUALITIES }
 export function loadDevicePreferences() {
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY))
-    return stored && typeof stored === 'object' ? stored : {}
+    // An array is an object too, but what is set on it by name JSON leaves out.
+    return stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {}
   } catch {
     // localStorage not available, or its content is not ours
     return {}

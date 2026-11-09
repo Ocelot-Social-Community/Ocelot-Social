@@ -1580,6 +1580,20 @@ describe('VideoCall', () => {
         expect(wrapper.vm.phase).toBe('idle')
       })
 
+      it('shows no failure of a token while hanging up still navigates away', async () => {
+        const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+        const token = pendingToken(wrapper)
+        wrapper.vm.$route.name = 'call-id-slug'
+        wrapper.vm.$router.replace.mockReturnValue(new Promise(() => {}))
+        const connecting = wrapper.vm.connect()
+        await flushPromises()
+        wrapper.vm.leave()
+        token.refuse()
+        await connecting
+        expect(wrapper.vm.phase).not.toBe('error')
+        expect(wrapper.vm.error).toBe(null)
+      })
+
       it('joins no room either while hanging up still navigates away', async () => {
         const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
         const token = pendingToken(wrapper)
@@ -3385,6 +3399,43 @@ describe('VideoCall', () => {
         expect(camera.setSubscribed).not.toHaveBeenCalled()
       })
 
+      it('gives a line still weak its grace period once the cameras come back', async () => {
+        jest.useFakeTimers()
+        try {
+          const { wrapper } = await connected()
+          // Weak before and during sound only: LiveKit says so once, not again.
+          wrapper.vm.onLocalConnectionQuality('poor')
+          wrapper.vm.setReceiveQuality('audio')
+          wrapper.vm.setReceiveQuality('auto')
+          expect(wrapper.vm.audioOnly).toBe(false)
+          jest.advanceTimersByTime(5000)
+          expect(wrapper.vm.audioOnly).toBe(true)
+        } finally {
+          jest.useRealTimers()
+        }
+      })
+
+      it('starts no grace period on a line that is fine, nor once the user declined it', async () => {
+        jest.useFakeTimers()
+        try {
+          const { wrapper } = await connected()
+          wrapper.vm.onLocalConnectionQuality('good')
+          wrapper.vm.setReceiveQuality('audio')
+          wrapper.vm.setReceiveQuality('auto')
+          jest.advanceTimersByTime(60_000)
+          expect(wrapper.vm.audioOnly).toBe(false)
+          wrapper.vm.onLocalConnectionQuality('poor')
+          jest.advanceTimersByTime(5000)
+          wrapper.vm.showVideos()
+          wrapper.vm.setReceiveQuality('audio')
+          wrapper.vm.setReceiveQuality('auto')
+          jest.advanceTimersByTime(60_000)
+          expect(wrapper.vm.audioOnly).toBe(false)
+        } finally {
+          jest.useRealTimers()
+        }
+      })
+
       it('is only remembered outside a call', async () => {
         const { wrapper } = factory({ show: false })
         wrapper.vm.setReceiveQuality('low')
@@ -3421,6 +3472,118 @@ describe('VideoCall', () => {
         await wrapper.vm.setSendQuality('low')
         expect(room.localParticipant.unpublishTrack).toHaveBeenCalledWith(ownCamera, true)
         expect(room.localParticipant.setCameraEnabled).not.toHaveBeenCalled()
+      })
+
+      it('has a camera switch wait for the camera being started anew', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: true })
+        let unpublished
+        room.localParticipant.unpublishTrack.mockReturnValue(
+          new Promise((resolve) => {
+            unpublished = resolve
+          }),
+        )
+        const renewing = wrapper.vm.setSendQuality('low')
+        const switching = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        await flushPromises()
+        expect(room.switchActiveDevice).not.toHaveBeenCalled()
+        unpublished()
+        await Promise.all([renewing, switching])
+        // Moved once the fresh camera is out — not before, on the one going away.
+        expect(room.switchActiveDevice).toHaveBeenCalledWith('videoinput', 'cam-2')
+        expect(wrapper.vm.cameraRenewal).toBe(null)
+      })
+
+      it('drops a camera switch that waited for the renewal of a call left meanwhile', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: true })
+        let unpublished
+        room.localParticipant.unpublishTrack.mockReturnValue(
+          new Promise((resolve) => {
+            unpublished = resolve
+          }),
+        )
+        const renewing = wrapper.vm.setSendQuality('low')
+        const switching = wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2' })
+        await flushPromises()
+        hangUpPending(wrapper, room)
+        unpublished()
+        await Promise.all([renewing, switching])
+        expect(room.switchActiveDevice).not.toHaveBeenCalled()
+      })
+
+      describe('as LiveKit asks the browser for it', () => {
+        // LiveKit's own room merges our capture defaults into what it asks getUserMedia for,
+        // the way it does for the fresh camera of renewOwnCamera().
+        let mediaDevices, MediaStreamBefore
+        beforeEach(() => {
+          mediaDevices = Object.getOwnPropertyDescriptor(global.navigator, 'mediaDevices')
+          MediaStreamBefore = global.MediaStream
+        })
+        afterEach(() => {
+          if (mediaDevices) Object.defineProperty(global.navigator, 'mediaDevices', mediaDevices)
+          else delete global.navigator.mediaDevices
+          global.MediaStream = MediaStreamBefore
+        })
+
+        const askedFor = async (options) => {
+          const { TextEncoder, TextDecoder } = require('util')
+          Object.assign(global, { TextEncoder, TextDecoder })
+          const { Room: LiveKitRoom } = jest.requireActual('livekit-client')
+          const track = {
+            kind: 'video',
+            id: 't1',
+            label: 'cam',
+            enabled: true,
+            readyState: 'live',
+            getSettings: () => ({ deviceId: 'cam-1' }),
+            getConstraints: () => ({}),
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            stop: jest.fn(),
+          }
+          const getUserMedia = jest.fn(async () => ({
+            getTracks: () => [track],
+            getVideoTracks: () => [track],
+            getAudioTracks: () => [],
+          }))
+          Object.defineProperty(global.navigator, 'mediaDevices', {
+            value: {
+              getUserMedia,
+              enumerateDevices: jest.fn(async () => []),
+              addEventListener: jest.fn(),
+              removeEventListener: jest.fn(),
+            },
+            configurable: true,
+          })
+          global.MediaStream = function (tracks) {
+            this.getTracks = () => tracks || []
+          }
+          const room = new LiveKitRoom(options)
+          return { room, getUserMedia }
+        }
+
+        it.each([
+          ['medium', { width: 640, height: 360 }],
+          ['low', { width: 320, height: 180 }],
+        ])('captures %s as chosen', async (quality, size) => {
+          const { wrapper, room: mocked } = await connected()
+          await wrapper.vm.setSendQuality(quality)
+          const { room, getUserMedia } = await askedFor(mocked.opts)
+          room.options.videoCaptureDefaults = mocked.options.videoCaptureDefaults
+          await room.localParticipant.createTracks({ video: { deviceId: 'cam-1' } })
+          expect(getUserMedia.mock.calls[0][0].video).toMatchObject(size)
+        })
+
+        it('leaves the size to LiveKit on auto', async () => {
+          const { wrapper, room: mocked } = await connected({ send: 'low' })
+          await wrapper.vm.setSendQuality('auto')
+          const { room, getUserMedia } = await askedFor(mocked.opts)
+          room.options.videoCaptureDefaults = mocked.options.videoCaptureDefaults
+          await room.localParticipant.createTracks({ video: { deviceId: 'cam-1' } })
+          // LiveKit's own default, 720p.
+          expect(getUserMedia.mock.calls[0][0].video).toMatchObject({ width: 1280, height: 720 })
+        })
       })
 
       it('waits for a camera being started anew, and is only remembered outside a call', async () => {
@@ -3501,6 +3664,20 @@ describe('VideoCall', () => {
         room.handlers.LocalTrackPublished({ source: 'camera', track: fresher })
         expect(fresher.prioritizePerformance).not.toHaveBeenCalled()
         expect(camera.setVideoQuality).toHaveBeenLastCalledWith(1)
+      })
+
+      it('takes its notice away once both directions were chosen anew, and offers itself later', async () => {
+        const { wrapper, constrained } = await connected({ send: 'high', receive: 'high' })
+        constrained()
+        wrapper.vm.onCpuStrainedAction('lower')
+        wrapper.vm.setReceiveQuality('medium')
+        expect(wrapper.vm.cpuConstrained).toBe(true)
+        await wrapper.vm.setSendQuality('medium')
+        expect(wrapper.vm.cpuConstrained).toBe(false)
+        await wrapper.vm.$nextTick()
+        expect(wrapper.find('[data-test="video-call-cpu-relief"]').exists()).toBe(false)
+        constrained()
+        expect(wrapper.vm.cpuStrained).toBe(true)
       })
 
       it('gives way on the videos received once the user chooses for them', async () => {
