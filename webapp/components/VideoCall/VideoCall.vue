@@ -1312,6 +1312,9 @@ export default {
     this.unmounting = false
     // The room cleanup() is taking down: this.room stays it until the disconnect is through.
     this.closingRoom = null
+    // Counts the ways into and out of a call; a connect() whose number is no longer the
+    // current one was given up while it waited — for its token, say.
+    this.connectAttempt = 0
     this.deviceSwitches = this.newDeviceSwitches()
     this.callChatsSub = null
     this.groupChatRoomId = null
@@ -1857,6 +1860,7 @@ export default {
       this.dtxDefault = !!(this.$policy && this.$policy.get('videoCallDtx'))
       this.dtxSwitch = null
       this.resetAudioOnly()
+      const attempt = ++this.connectAttempt
       let room = null
       try {
         if (!this.groupId) throw new Error('Missing group id')
@@ -1872,6 +1876,9 @@ export default {
           VideoQuality,
           DisconnectReason,
         } = livekit
+        // Closed while the token or the client library was on its way: cleanup() found no
+        // room to take down then, so nothing may join one now.
+        if (attempt !== this.connectAttempt) return
         this.Track = Track
         this.VideoQuality = VideoQuality
 
@@ -2040,6 +2047,7 @@ export default {
         if (this.micEnabled) {
           await room.localParticipant.setMicrophoneEnabled(true)
         }
+        if (!this.isLive(room)) return
         if (this.cameraEnabled) {
           await room.localParticipant.setCameraEnabled(true)
         }
@@ -2063,7 +2071,7 @@ export default {
         this.refreshKnownDevices()
       } catch (err) {
         // Hung up meanwhile, or given up for a new attempt: not this call's to report.
-        if (room && !this.isLive(room)) return
+        if (attempt !== this.connectAttempt || (room && !this.isLive(room))) return
         const message = this.$backendError(err)
         // The user navigated away while the handshake was still running, so
         // the window is parked in the corner. Since isMaximized treats every
@@ -2361,8 +2369,9 @@ export default {
     },
     // The call's room, and not on its way out: cleanup() keeps this.room until the
     // disconnect is through, and a device started meanwhile would outlive the call.
+    // leave() navigates away before its cleanup() begins.
     isLive(room) {
-      return !!room && this.room === room && this.closingRoom !== room
+      return !!room && this.room === room && this.closingRoom !== room && !this.leaving
     },
     // The tracks a device switch of this kind restarts.
     capturesOf(room, kind) {
@@ -2593,10 +2602,10 @@ export default {
           )
         }
       } catch (err) {
-        if (this.room === room) this.showDeviceErrorToast('camera', err)
+        if (this.isLive(room)) this.showDeviceErrorToast('camera', err)
       } finally {
         if (restart) this.deviceStarted('videoinput')
-        if (this.room === room) {
+        if (this.isLive(room)) {
           this.restoringQuality = false
           this.cameraEnabled = !!room.localParticipant.isCameraEnabled
           this.refreshTiles()
@@ -2934,6 +2943,8 @@ export default {
       // First, before the disconnect below is awaited: nothing may ask for the call's chat
       // any more once the call is being left.
       this.cancelCallChatRetry()
+      // A connect() still waiting for its token must not join once this is through.
+      this.connectAttempt++
       this.closingRoom = this.room
       if (this.room) {
         // Belt-and-braces: stop every local track ourselves before asking

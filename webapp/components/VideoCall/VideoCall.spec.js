@@ -1489,6 +1489,21 @@ describe('VideoCall', () => {
         expect(createAudioWatchdog).not.toHaveBeenCalled()
       })
 
+      it('does not start the camera once hung up while the microphone came on', async () => {
+        const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+        withApollo(wrapper)
+        wrapper.setData({ micEnabled: true, cameraEnabled: true })
+        let created
+        Room.created = (room) => {
+          created = room
+          room.localParticipant.setMicrophoneEnabled.mockImplementation(async () =>
+            hangUpPending(wrapper, room),
+          )
+        }
+        await wrapper.vm.connect()
+        expect(created.localParticipant.setCameraEnabled).not.toHaveBeenCalled()
+      })
+
       it('reports no failure for the call it no longer is', async () => {
         const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
         withApollo(wrapper)
@@ -1500,6 +1515,73 @@ describe('VideoCall', () => {
         await wrapper.vm.connect()
         expect(wrapper.vm.phase).not.toBe('error')
         expect(wrapper.vm.error).toBe(null)
+      })
+    })
+
+    describe('closed while the token is on its way', () => {
+      let Room
+      beforeEach(async () => {
+        ;({ Room } = await import('livekit-client'))
+      })
+      afterEach(() => {
+        Room.created = null
+      })
+
+      const pendingToken = (wrapper) => {
+        let answer, refuse
+        wrapper.vm.$apollo = {
+          mutate: jest.fn(
+            () =>
+              new Promise((resolve, reject) => {
+                answer = () =>
+                  resolve({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 't' } } })
+                refuse = () => reject(new Error('network'))
+              }),
+          ),
+        }
+        return { answer: () => answer(), refuse: () => refuse() }
+      }
+
+      it('joins no room, so no one gets to see or hear us without a call window', async () => {
+        const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+        const token = pendingToken(wrapper)
+        Room.created = jest.fn()
+        const connecting = wrapper.vm.connect()
+        await flushPromises()
+        // There is no room yet for cleanup() to take down.
+        await wrapper.vm.cleanup()
+        token.answer()
+        await connecting
+        expect(Room.created).not.toHaveBeenCalled()
+        expect(wrapper.vm.room).toBe(null)
+        expect(wrapper.vm.phase).toBe('idle')
+      })
+
+      it('reports no failure of the token once closed', async () => {
+        const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+        const token = pendingToken(wrapper)
+        const connecting = wrapper.vm.connect()
+        await flushPromises()
+        await wrapper.vm.cleanup()
+        token.refuse()
+        await connecting
+        expect(wrapper.vm.phase).toBe('idle')
+        expect(wrapper.vm.error).toBe(null)
+      })
+
+      it('lets a retry that came after it go ahead', async () => {
+        const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+        const token = pendingToken(wrapper)
+        const first = wrapper.vm.connect()
+        await flushPromises()
+        withApollo(wrapper)
+        await wrapper.vm.connect()
+        const room = wrapper.vm.room
+        token.answer()
+        await first
+        // The first, overtaken attempt neither replaced the room nor reported anything.
+        expect(wrapper.vm.room).toBe(room)
+        expect(wrapper.vm.phase).toBe('in-call')
       })
     })
 
@@ -3493,6 +3575,37 @@ describe('VideoCall', () => {
         await wrapper.vm.restoreVideoQuality()
         expect(wrapper.vm.leaving).toBe(false)
         expect(room.localParticipant.setCameraEnabled).not.toHaveBeenCalled()
+      })
+
+      it('starts no camera while leaving still navigates away from the call', async () => {
+        const { wrapper, room, constrained } = await connected()
+        constrained()
+        withOwnCamera(room, { enabled: true })
+        wrapper.setData({ cameraEnabled: true })
+        wrapper.vm.$route.name = 'call-id-slug'
+        // leave() hangs up only once the navigation is through — it is not, yet.
+        wrapper.vm.$router.replace.mockReturnValue(new Promise(() => {}))
+        room.localParticipant.unpublishTrack.mockImplementation(async () => {
+          wrapper.vm.leave()
+        })
+        room.localParticipant.setCameraEnabled.mockClear()
+        await wrapper.vm.restoreVideoQuality()
+        expect(room.disconnect).not.toHaveBeenCalled()
+        expect(room.localParticipant.setCameraEnabled).not.toHaveBeenCalled()
+      })
+
+      it('says nothing of a camera failing while the call is hung up', async () => {
+        const { wrapper, room, constrained } = await connected()
+        constrained()
+        withOwnCamera(room, { enabled: true })
+        wrapper.setData({ cameraEnabled: true })
+        room.localParticipant.setCameraEnabled.mockImplementation(async () => {
+          hangUpPending(wrapper, room)
+          throw new Error('cannot publish track when not connected')
+        })
+        const toast = jest.spyOn(wrapper.vm, 'showDeviceErrorToast').mockImplementation(() => {})
+        await wrapper.vm.restoreVideoQuality()
+        expect(toast).not.toHaveBeenCalled()
       })
 
       it('lifts the cap of a camera subscribed again only afterwards', async () => {
