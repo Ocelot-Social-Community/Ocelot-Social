@@ -3888,6 +3888,65 @@ describe('VideoCall', () => {
         expect(wrapper.vm.sentVideo).toBe(null)
       })
 
+      it('takes the reason of the layer it shows, not of another one', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: true })
+        const track = sending(room, [
+          { frameHeight: 180, framesPerSecond: 30, qualityLimitationReason: 'bandwidth' },
+          { frameHeight: 360, framesPerSecond: 30, qualityLimitationReason: 'none' },
+        ])
+        await wrapper.vm.readSenderStats()
+        expect(wrapper.vm.sentVideo).toEqual({ height: 360, fps: 30, limitedBy: null })
+        track.getSenderStats.mockResolvedValue([
+          { frameHeight: 180, framesPerSecond: 30, qualityLimitationReason: 'none' },
+          { frameHeight: 360, framesPerSecond: 15, qualityLimitationReason: 'cpu' },
+        ])
+        await wrapper.vm.readSenderStats()
+        expect(wrapper.vm.sentVideo).toEqual({ height: 360, fps: 15, limitedBy: 'cpu' })
+      })
+
+      it('keeps the object while nothing changes, so the call is not rendered anew', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: true })
+        const track = sending(room, [
+          { frameHeight: 360, framesPerSecond: 30, qualityLimitationReason: 'none' },
+        ])
+        await wrapper.vm.readSenderStats()
+        const known = wrapper.vm.sentVideo
+        await wrapper.vm.readSenderStats()
+        expect(wrapper.vm.sentVideo).toBe(known)
+        track.getSenderStats.mockResolvedValue([
+          { frameHeight: 360, framesPerSecond: 24, qualityLimitationReason: 'none' },
+        ])
+        await wrapper.vm.readSenderStats()
+        expect(wrapper.vm.sentVideo).toEqual({ height: 360, fps: 24, limitedBy: null })
+      })
+
+      it('reads one at a time, and drops an answer about a camera renewed meanwhile', async () => {
+        const { wrapper, room } = await connected()
+        wrapper.setData({ cameraEnabled: true })
+        const old = sending(room, [])
+        let answer
+        old.getSenderStats.mockReturnValue(
+          new Promise((resolve) => {
+            answer = resolve
+          }),
+        )
+        const reading = wrapper.vm.readSenderStats()
+        // The next tick comes while the first is still out: it waits for none, it is left out.
+        await wrapper.vm.readSenderStats()
+        expect(old.getSenderStats).toHaveBeenCalledTimes(1)
+        const fresh = sending(room, [
+          { frameHeight: 180, framesPerSecond: 30, qualityLimitationReason: 'none' },
+        ])
+        answer([{ frameHeight: 720, framesPerSecond: 30, qualityLimitationReason: 'none' }])
+        await reading
+        expect(wrapper.vm.sentVideo).toBe(null)
+        await wrapper.vm.readSenderStats()
+        expect(fresh.getSenderStats).toHaveBeenCalledTimes(1)
+        expect(wrapper.vm.sentVideo).toEqual({ height: 180, fps: 30, limitedBy: null })
+      })
+
       describe('while nobody watches our camera', () => {
         const paused = (room, { stats, encodings, settings }) => {
           const track = sending(room, stats)

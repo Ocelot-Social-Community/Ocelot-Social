@@ -1343,6 +1343,8 @@ export default {
     this.speakerSeenAt = new Map()
     this.speakerHoldTimer = null
     this.micRestart = null
+    // A reading of our camera's sender stats is under way (readSenderStats).
+    this.senderStatsReading = false
     this.micSilenceProbe = null
     // Tracks whose events we listen to — publishing a track anew must not
     // double the listeners.
@@ -2809,14 +2811,28 @@ export default {
       this.senderStatsTimer = null
       this.sentVideo = null
     },
+    // One reading at a time: under the very load the badge is for, one can outlast the interval,
+    // and an older answer arriving last would undo a newer one.
     async readSenderStats() {
+      if (this.senderStatsReading) return
+      this.senderStatsReading = true
+      try {
+        await this.measureSentVideo()
+      } finally {
+        this.senderStatsReading = false
+      }
+    },
+    async measureSentVideo() {
       const room = this.room
       const Track = this.Track
       if (!room || !Track) return
-      const pub = room.localParticipant.getTrackPublication(Track.Source.Camera)
-      const track = pub && pub.track
+      const ownCamera = () => {
+        const pub = room.localParticipant.getTrackPublication(Track.Source.Camera)
+        return pub && pub.track
+      }
+      const track = ownCamera()
       if (!this.cameraEnabled || !track || typeof track.getSenderStats !== 'function') {
-        this.sentVideo = null
+        this.setSentVideo(null)
         return
       }
       let stats
@@ -2826,6 +2842,8 @@ export default {
         return
       }
       if (!this.isLive(room)) return
+      // A camera renewed meanwhile is a new track: the answer is about the one before.
+      if (ownCamera() !== track) return
       // One entry per simulcast layer; the largest one going out is what the others get at best.
       // A layer paused because nobody watches it (dynacast) is no limit, and its stats keep the
       // size of its last frame — the sender's own settings tell whether it is still on.
@@ -2837,19 +2855,30 @@ export default {
       )
       if (!sending.length) {
         // Nothing goes out right now: what would, as the sender is set up.
-        this.sentVideo = this.configuredVideo(track, encodings)
+        this.setSentVideo(this.configuredVideo(track, encodings))
         return
       }
+      // The reason, too, of the layer whose size the badge shows — not of another one.
       const top = sending.reduce((a, b) => (b.frameHeight > a.frameHeight ? b : a))
-      const limitedBy =
-        sending
-          .map((layer) => layer.qualityLimitationReason)
-          .find((reason) => reason === 'cpu' || reason === 'bandwidth') || null
-      this.sentVideo = {
+      const reason = top.qualityLimitationReason
+      this.setSentVideo({
         height: top.frameHeight,
         fps: Math.round(top.framesPerSecond || 0),
-        limitedBy,
-      }
+        limitedBy: reason === 'cpu' || reason === 'bandwidth' ? reason : null,
+      })
+    },
+    // Unchanged values keep the object: every new one renders the call and all its tiles anew,
+    // every 3 s for as long as the call lasts.
+    setSentVideo(next) {
+      const prev = this.sentVideo
+      const same =
+        prev === next ||
+        (!!prev &&
+          !!next &&
+          prev.height === next.height &&
+          prev.fps === next.fps &&
+          prev.limitedBy === next.limitedBy)
+      if (!same) this.sentVideo = next
     },
     senderEncodings(track) {
       try {
