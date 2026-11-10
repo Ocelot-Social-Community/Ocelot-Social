@@ -1129,6 +1129,13 @@
         "group_videoCall_join": "Dołączenie do trwającej rozmowy wideo w grupie."
       },
       "resultingType": "Z tymi uprawnieniami grupa jest:",
+      "roleManageWarning": {
+        "both": "Rola <strong>{roles}</strong> będzie mogła edytować role grupy: kto ją ma, może kształtować każdą rolę oprócz roli właściciela, odbierać prawa innym rolom i zmieniać to, co widzą osoby spoza grupy. Przydzielaj tę rolę tylko członkom, którym powierzyłbyś zarządzanie grupą. <strong>{own}</strong>, Twoja własna rola, nie będzie już mogła edytować ról grupy. Cofnąć to może tylko właściciel.",
+        "confirm": "Zapisz mimo to",
+        "grant": "Rola <strong>{roles}</strong> będzie mogła edytować role grupy: kto ją ma, może kształtować każdą rolę oprócz roli właściciela, odbierać prawa innym rolom i zmieniać to, co widzą osoby spoza grupy. Przydzielaj tę rolę tylko członkom, którym powierzyłbyś zarządzanie grupą.",
+        "lockout": "<strong>{own}</strong>, Twoja własna rola, nie będzie już mogła edytować ról grupy. Cofnąć to może tylko właściciel.",
+        "title": "Zmienić, kto zarządza rolami?"
+      },
       "saved": "Uprawnienia zapisane",
       "saveFirst": "Najpierw zapisz lub odrzuć — są niezapisane zmiany.",
       "simple": {

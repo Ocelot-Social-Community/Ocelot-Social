@@ -165,6 +165,7 @@ export default [
             '/^group\\.(invite-links|members)$/',
             '/^group\\.leaveModal\\./',
             '/^group\\.rights\\.(confirmApplyTemplate|confirmApplyTemplateDiscards|mootJoin|mootLeave)$/',
+            '/^group\\.rights\\.roleManageWarning\\./',
             '/^invite-codes\\.delete-modal\\./',
             '/^moderation\\.reports\\.decideModal\\.(cancel|submit)$/',
             '/^report\\.reason\\.category\\.invalid$/',

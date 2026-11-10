@@ -1129,6 +1129,13 @@
         "group_videoCall_join": "Deelnemen aan een lopend videogesprek van de groep."
       },
       "resultingType": "Met deze rechten is de groep:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> mag daarna de rollen van de groep bewerken: wie deze rol heeft, kan elke rol behalve die van de eigenaar inrichten, andere rollen rechten afnemen en wijzigen wat niet-leden zien. Geef de rol alleen aan leden aan wie je het beheer van de groep zou toevertrouwen. <strong>{own}</strong>, je eigen rol, mag daarna de rollen van de groep niet meer bewerken. Alleen een eigenaar kan dat terugdraaien.",
+        "confirm": "Toch opslaan",
+        "grant": "<strong>{roles}</strong> mag daarna de rollen van de groep bewerken: wie deze rol heeft, kan elke rol behalve die van de eigenaar inrichten, andere rollen rechten afnemen en wijzigen wat niet-leden zien. Geef de rol alleen aan leden aan wie je het beheer van de groep zou toevertrouwen.",
+        "lockout": "<strong>{own}</strong>, je eigen rol, mag daarna de rollen van de groep niet meer bewerken. Alleen een eigenaar kan dat terugdraaien.",
+        "title": "Wijzigen wie de rollen beheert?"
+      },
       "saved": "Rechten opgeslagen",
       "saveFirst": "Eerst opslaan of verwerpen — er zijn niet-opgeslagen wijzigingen.",
       "simple": {

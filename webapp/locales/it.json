@@ -1129,6 +1129,13 @@
         "group_videoCall_join": "Partecipare a una videochiamata in corso nel gruppo."
       },
       "resultingType": "Con questi permessi il gruppo è:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> potrà poi modificare i ruoli del gruppo: chi ha questo ruolo può modellare ogni ruolo tranne quello del proprietario, togliere diritti agli altri ruoli e cambiare ciò che vedono i non membri. Assegna il ruolo solo a membri a cui affideresti la gestione del gruppo. <strong>{own}</strong>, il tuo stesso ruolo, non potrà più modificare i ruoli del gruppo. Solo un proprietario potrà annullarlo.",
+        "confirm": "Salva comunque",
+        "grant": "<strong>{roles}</strong> potrà poi modificare i ruoli del gruppo: chi ha questo ruolo può modellare ogni ruolo tranne quello del proprietario, togliere diritti agli altri ruoli e cambiare ciò che vedono i non membri. Assegna il ruolo solo a membri a cui affideresti la gestione del gruppo.",
+        "lockout": "<strong>{own}</strong>, il tuo stesso ruolo, non potrà più modificare i ruoli del gruppo. Solo un proprietario potrà annullarlo.",
+        "title": "Cambiare chi gestisce i ruoli?"
+      },
       "saved": "Permessi salvati",
       "saveFirst": "Prima salva o annulla: ci sono modifiche non salvate.",
       "simple": {
