@@ -279,7 +279,7 @@ describe('GroupMember', () => {
         beforeEach(() => {
           wrapper
             .find('div.os-modal-wrapper')
-            .find('[data-testid="os-modal-cancel"]')
+            .find('[data-testid="os-confirm-dialog-cancel"]')
             .trigger('click')
         })
 
@@ -292,7 +292,7 @@ describe('GroupMember', () => {
         beforeEach(() => {
           wrapper
             .find('div.os-modal-wrapper')
-            .find('[data-testid="os-modal-confirm"]')
+            .find('[data-testid="os-confirm-dialog-confirm"]')
             .trigger('click')
         })
 
@@ -310,7 +310,7 @@ describe('GroupMember', () => {
           jest.clearAllMocks()
           wrapper
             .find('div.os-modal-wrapper')
-            .find('[data-testid="os-modal-confirm"]')
+            .find('[data-testid="os-confirm-dialog-confirm"]')
             .trigger('click')
         })
 
