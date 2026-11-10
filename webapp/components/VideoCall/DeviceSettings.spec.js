@@ -161,6 +161,15 @@ describe('DeviceSettings', () => {
       expect(receive(wrapper).element.value).toBe('audio')
     })
 
+    it('takes only a choice on offer, sound only only for what is received', () => {
+      const { sendQuality, receiveQuality } = DeviceSettings.props
+      expect(['auto', 'high', 'medium', 'low'].every(sendQuality.validator)).toBe(true)
+      expect(sendQuality.validator('audio')).toBe(false)
+      expect(sendQuality.validator('med')).toBe(false)
+      expect(receiveQuality.validator('audio')).toBe(true)
+      expect(receiveQuality.validator('med')).toBe(false)
+    })
+
     it('asks the call to change it', async () => {
       const { wrapper } = await mountWith()
       await send(wrapper).setValue('medium')

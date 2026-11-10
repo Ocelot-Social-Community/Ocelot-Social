@@ -2063,6 +2063,16 @@
       "unnamedSpeaker": "Altoparlanti",
       "unsupportedBrowser": "Shfletuesi yt nuk mbështet audio/video."
     },
+    "qualityLimit": {
+      "cameraHidden": "Kamera e fshehur",
+      "ownBandwidth": "Videoja jote dërgohet me cilësi më të ulët: lidhja jote nuk lejon më shumë.",
+      "ownChoice": "Videoja jote dërgohet me cilësi më të ulët, siç zgjodhe te cilësimet e pajisjeve.",
+      "ownCpu": "Videoja jote dërgohet me cilësi më të ulët: pajisja jote është e mbingarkuar.",
+      "remoteChoice": "Videoja e {name} vjen me cilësi më të ulët, siç zgjodhe te cilësimet e pajisjeve.",
+      "remoteCpu": "Videoja e {name} vjen me cilësi më të ulët: pajisja jote është e mbingarkuar.",
+      "remoteHiddenBandwidth": "Kamera e {name} është e fshehur: lidhja jote është shumë e dobët.",
+      "remoteHiddenChoice": "Kamera e {name} është e fshehur, siç e zgjodhe te cilësimet e pajisjeve."
+    },
     "reconnecting": "Lidhja u humb — po rilidhet…",
     "reloadPending": "Platforma ka një dizajn të ri. Do të zbatohet sapo të largoheni nga thirrja.",
     "restartMic": "Rinis mikrofonin",

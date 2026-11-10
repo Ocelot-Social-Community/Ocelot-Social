@@ -2063,6 +2063,16 @@
       "unnamedSpeaker": "Speaker",
       "unsupportedBrowser": "Your browser does not support audio/video."
     },
+    "qualityLimit": {
+      "cameraHidden": "Camera hidden",
+      "ownBandwidth": "Your video goes out in lower quality: your connection is limited.",
+      "ownChoice": "Your video goes out in lower quality, as you chose in the device settings.",
+      "ownCpu": "Your video goes out in lower quality: your device is busy.",
+      "remoteChoice": "{name}'s video arrives in lower quality, as you chose in the device settings.",
+      "remoteCpu": "{name}'s video arrives in lower quality: your device is busy.",
+      "remoteHiddenBandwidth": "{name}'s camera is hidden: your connection is too weak.",
+      "remoteHiddenChoice": "{name}'s camera is hidden, as you chose in the device settings."
+    },
     "reconnecting": "Connection lost — reconnecting…",
     "reloadPending": "The platform has a new design. It will be applied once you leave the call.",
     "restartMic": "Restart microphone",

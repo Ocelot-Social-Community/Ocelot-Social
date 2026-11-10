@@ -338,6 +338,7 @@
               :camera-starting="isOwnCameraTile(tile) && devicesStarting.videoinput > 0"
               :mic-starting="isOwnCameraTile(tile) && devicesStarting.audioinput > 0"
               :avatar-size="tileAvatarSize(tile)"
+              :quality-limit="qualityLimitOf(tile)"
               :clickable="isMaximized && !mobileChatOpen"
               :class="{
                 'video-tile--hidden': singleTile && soloTile && tile.key !== soloTile.key,
@@ -638,6 +639,9 @@ const WEAK_QUALITIES = ['poor', 'lost']
 // 'high' capture alike, LiveKit's default; 'high' only keeps the CPU relief off.
 // The capture, not a cap on the layers: dynacast sets those anew whenever the
 // server reports who watches which, and a smaller picture eases the encoder too.
+// How often what our camera actually sends is read, for the badge on our own tile. One call
+// on one track — little next to the encoding itself.
+const SENDER_STATS_MS = 3000
 const SEND_RESOLUTIONS = {
   high: { width: 1280, height: 720 },
   medium: { width: 640, height: 360 },
@@ -764,6 +768,9 @@ export default {
       receiveQuality: 'auto',
       // Our camera is being started anew — with its full quality, or another capture.
       renewingCamera: false,
+      // What our camera sends, as WebRTC reports it: { height, fps, limitedBy } — limitedBy
+      // being 'cpu', 'bandwidth' or null. Null while it sends nothing.
+      sentVideo: null,
       showDeviceSettings: false,
       // What the browser lists, to put a name to the devices in use.
       knownDevices: [],
@@ -1336,6 +1343,8 @@ export default {
     this.speakerSeenAt = new Map()
     this.speakerHoldTimer = null
     this.micRestart = null
+    // A reading of our camera's sender stats is under way (readSenderStats).
+    this.senderStatsReading = false
     this.micSilenceProbe = null
     // Tracks whose events we listen to — publishing a track anew must not
     // double the listeners.
@@ -1351,6 +1360,7 @@ export default {
     this.closingRoom = null
     // Settles once a renewal of our camera (renewOwnCamera) is through.
     this.cameraRenewal = null
+    this.senderStatsTimer = null
     // The user switched the camera off, and LiveKit has yet to say it is done — until then
     // cameraEnabled still says on. Taking long while a reconnect holds a publish back.
     this.cameraOffPending = false
@@ -2121,6 +2131,7 @@ export default {
           isPaused: () => this.reconnecting,
         })
         this.audioWatchdog.start()
+        this.startSenderStats()
         this.joinCallChat(room)
         this.watchCallChats(true)
         this.loadGroupChatUnread()
@@ -2229,6 +2240,9 @@ export default {
           Track && participant.isCameraEnabled
             ? findVideoPub(participant, Track.Source.Camera)
             : null
+        // Unsubscribed by us (see applyAudioOnly): LiveKit keeps the track until the server
+        // confirms, which on a weak line takes long — the tile would stay black meanwhile.
+        const cameraShown = !!cameraPub && cameraPub.isDesired !== false
         const screenPub =
           Track && participant.isScreenShareEnabled
             ? findVideoPub(participant, Track.Source.ScreenShare)
@@ -2244,12 +2258,14 @@ export default {
           identity: participant.identity,
           name: participant.name || participant.identity,
           profile,
-          videoTrack: cameraPub ? cameraPub.track : null,
+          videoTrack: cameraShown ? cameraPub.track : null,
           audioTrack,
           isLocal,
           isScreen: false,
           micEnabled,
           connectionQuality: participant.connectionQuality || 'unknown',
+          // On at the other end, but not received here: unsubscribed by us (see applyAudioOnly).
+          cameraHidden: !isLocal && !!participant.isCameraEnabled && !cameraShown,
         })
         if (screenPub) {
           tiles.push({
@@ -2786,6 +2802,135 @@ export default {
         pub.setVideoQuality(quality)
       }
     },
+    startSenderStats() {
+      this.stopSenderStats()
+      this.senderStatsTimer = setInterval(() => this.readSenderStats(), SENDER_STATS_MS)
+    },
+    stopSenderStats() {
+      if (this.senderStatsTimer) clearInterval(this.senderStatsTimer)
+      this.senderStatsTimer = null
+      this.sentVideo = null
+    },
+    // One reading at a time: under the very load the badge is for, one can outlast the interval,
+    // and an older answer arriving last would undo a newer one.
+    async readSenderStats() {
+      if (this.senderStatsReading) return
+      this.senderStatsReading = true
+      try {
+        await this.measureSentVideo()
+      } finally {
+        this.senderStatsReading = false
+      }
+    },
+    async measureSentVideo() {
+      const room = this.room
+      const Track = this.Track
+      if (!room || !Track) return
+      const ownCamera = () => {
+        const pub = room.localParticipant.getTrackPublication(Track.Source.Camera)
+        return pub && pub.track
+      }
+      const track = ownCamera()
+      if (!this.cameraEnabled || !track || typeof track.getSenderStats !== 'function') {
+        this.setSentVideo(null)
+        return
+      }
+      let stats
+      try {
+        stats = await track.getSenderStats()
+      } catch {
+        return
+      }
+      if (!this.isLive(room)) return
+      // A camera renewed meanwhile is a new track: the answer is about the one before.
+      if (ownCamera() !== track) return
+      // One entry per simulcast layer; the largest one going out is what the others get at best.
+      // A layer paused because nobody watches it (dynacast) is no limit, and its stats keep the
+      // size of its last frame — the sender's own settings tell whether it is still on.
+      const encodings = this.senderEncodings(track)
+      const encodingOf = (layer) =>
+        encodings.length === 1 ? encodings[0] : encodings.find((e) => e.rid && e.rid === layer.rid)
+      const sending = (stats || []).filter(
+        (layer) => layer.frameHeight > 0 && (encodingOf(layer) || {}).active !== false,
+      )
+      if (!sending.length) {
+        // Nothing goes out right now: what would, as the sender is set up.
+        this.setSentVideo(this.configuredVideo(track, encodings))
+        return
+      }
+      // The reason, too, of the layer whose size the badge shows — not of another one.
+      const top = sending.reduce((a, b) => (b.frameHeight > a.frameHeight ? b : a))
+      const reason = top.qualityLimitationReason
+      this.setSentVideo({
+        height: top.frameHeight,
+        fps: Math.round(top.framesPerSecond || 0),
+        limitedBy: reason === 'cpu' || reason === 'bandwidth' ? reason : null,
+      })
+    },
+    // Unchanged values keep the object: every new one renders the call and all its tiles anew,
+    // every 3 s for as long as the call lasts.
+    setSentVideo(next) {
+      const prev = this.sentVideo
+      const same =
+        prev === next ||
+        (!!prev &&
+          !!next &&
+          prev.height === next.height &&
+          prev.fps === next.fps &&
+          prev.limitedBy === next.limitedBy)
+      if (!same) this.sentVideo = next
+    },
+    senderEncodings(track) {
+      try {
+        const sender = track.sender
+        return (sender && sender.getParameters && sender.getParameters().encodings) || []
+      } catch {
+        return []
+      }
+    },
+    // What our camera sends once someone watches it: what it captures, scaled down and capped in
+    // frame rate by its largest layer. A layer switched off for good, like the ones the CPU
+    // relief leaves aside, has a frame rate of 0; one only paused keeps its own.
+    configuredVideo(track, encodings) {
+      const media = track.mediaStreamTrack
+      const settings = (media && media.getSettings && media.getSettings()) || {}
+      if (!settings.height) return null
+      const scaleOf = (encoding) => encoding.scaleResolutionDownBy || 1
+      const top = encodings
+        .filter((encoding) => encoding.maxFramerate !== 0)
+        .reduce((a, b) => (a && scaleOf(a) <= scaleOf(b) ? a : b), null)
+      const fps = Math.min(settings.frameRate || Infinity, (top && top.maxFramerate) || Infinity)
+      return {
+        height: Math.round(settings.height / (top ? scaleOf(top) : 1)),
+        fps: Number.isFinite(fps) ? Math.round(fps) : 0,
+        limitedBy: null,
+      }
+    },
+    // Why a camera's video is lower than it could be, for the badge on its tile — or null. Only
+    // what holds it back on purpose or for want: adaptive stream sizing a camera to its tile is
+    // no limit. Screen shares are never lowered.
+    qualityLimitOf(tile) {
+      if (tile.isScreen) return null
+      if (tile.isLocal) {
+        const chosen = this.sendQuality === 'medium' || this.sendQuality === 'low'
+        const reason =
+          (this.sendRelieved && 'cpu') ||
+          (this.sentVideo && this.sentVideo.limitedBy) ||
+          (chosen && 'choice') ||
+          null
+        if (!reason) return null
+        const sent = this.sentVideo
+        return { reason, height: sent ? sent.height : null, fps: sent ? sent.fps : null }
+      }
+      // A camera we do not receive at all, by choice or for a weak line, looks like one switched
+      // off at the other end — unless the tile says otherwise.
+      if (tile.cameraHidden && this.videosOff) {
+        return { reason: this.receiveQuality === 'audio' ? 'choice' : 'bandwidth', hidden: true }
+      }
+      const cap = this.VideoQuality ? this.receiveCap() : null
+      if (cap === null || cap === this.VideoQuality.HIGH) return null
+      return { reason: this.receiveRelieved ? 'cpu' : 'choice' }
+    },
     uncapCameraQuality(pub) {
       // LiveKit cannot drop a cap, only raise it — to the top layer the camera
       // is sent in, so adaptiveStream keeps sizing it to its tile. That is HIGH
@@ -3100,6 +3245,7 @@ export default {
       this.receiveQuality = 'auto'
       // Before the disconnect: a check must not resubscribe on a room going away.
       this.stopAudioWatchdog()
+      this.stopSenderStats()
       // First, before the disconnect below is awaited: nothing may ask for the call's chat
       // any more once the call is being left.
       this.cancelCallChatRetry()

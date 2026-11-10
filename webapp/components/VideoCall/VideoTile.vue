@@ -41,6 +41,13 @@
       <span v-if="tile.isLocal && avatarSize !== 'small'" class="video-tile__fallback-text">
         {{ $t('videoCall.prejoin.cameraDisabled') }}
       </span>
+      <span
+        v-else-if="cameraHidden && avatarSize !== 'small'"
+        class="video-tile__fallback-text"
+        data-test="video-tile-camera-hidden"
+      >
+        {{ $t('videoCall.qualityLimit.cameraHidden') }}
+      </span>
     </div>
     <!--
       A camera or microphone of one's own that is on its way — it can take
@@ -91,6 +98,27 @@
       >
         <os-icon :icon="icons.warning" class="video-tile__connection-icon" />
       </span>
+      <!--
+        Only while the video is held back: a badge on every tile would be noise. Our own camera
+        says what it sends, as we can change that; the others only that theirs arrives lower.
+      -->
+      <span
+        v-if="(hasVideo || cameraHidden) && qualityLimitLabel"
+        class="video-tile__quality"
+        role="img"
+        v-tooltip="{ content: qualityLimitLabel, placement: 'top', html: false }"
+        :aria-label="
+          qualityLimitSize ? `${qualityLimitSize}: ${qualityLimitLabel}` : qualityLimitLabel
+        "
+        data-test="video-tile-quality-limit"
+      >
+        <!-- The sign always: it marks the numbers as held back, not as what the camera can. -->
+        <os-icon
+          :icon="cameraHidden ? icons.eyeSlash : icons.levelDown"
+          class="video-tile__quality-icon"
+        />
+        <template v-if="qualityLimitSize">{{ qualityLimitSize }}</template>
+      </span>
       <span v-if="tile.isLocal" class="video-tile__local-tag">({{ $t('videoCall.you') }})</span>
       <span v-if="tile.isScreen" class="video-tile__screen-tag">
         — {{ $t('videoCall.screenShare') }}
@@ -139,6 +167,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    // Why this camera's video is lower than it could be (VideoCall's qualityLimitOf): reason
+    // 'cpu', 'bandwidth' or 'choice', and for our own camera what it sends (height, fps).
+    // hidden: a camera on at the other end that we do not receive at all.
+    qualityLimit: {
+      type: Object,
+      default: null,
+    },
     avatarSize: {
       // Forwarded to AvatarImage. 'small' renders the round avatar at the
       // round 40-ish px size, 'large' at the much larger one. Pass 'small'
@@ -175,6 +210,45 @@ export default {
           return this.$t('videoCall.connectionPoor', params)
         case 'lost':
           return this.$t('videoCall.connectionLost', params)
+        default:
+          return null
+      }
+    },
+    qualityLimitSize() {
+      const limit = this.qualityLimit
+      if (!limit || !this.tile.isLocal || !limit.height) return null
+      return limit.fps ? `${limit.height}p · ${limit.fps} fps` : `${limit.height}p`
+    },
+    // A camera on at the other end that we do not receive (VideoCall's qualityLimitOf).
+    cameraHidden() {
+      return !!(this.qualityLimit && this.qualityLimit.hidden)
+    },
+    qualityLimitLabel() {
+      const limit = this.qualityLimit
+      if (!limit) return null
+      if (this.tile.isLocal) {
+        switch (limit.reason) {
+          case 'cpu':
+            return this.$t('videoCall.qualityLimit.ownCpu')
+          case 'bandwidth':
+            return this.$t('videoCall.qualityLimit.ownBandwidth')
+          case 'choice':
+            return this.$t('videoCall.qualityLimit.ownChoice')
+          default:
+            return null
+        }
+      }
+      const params = { name: this.tile.name }
+      if (limit.hidden) {
+        return limit.reason === 'bandwidth'
+          ? this.$t('videoCall.qualityLimit.remoteHiddenBandwidth', params)
+          : this.$t('videoCall.qualityLimit.remoteHiddenChoice', params)
+      }
+      switch (limit.reason) {
+        case 'cpu':
+          return this.$t('videoCall.qualityLimit.remoteCpu', params)
+        case 'choice':
+          return this.$t('videoCall.qualityLimit.remoteChoice', params)
         default:
           return null
       }
@@ -538,6 +612,26 @@ export default {
 
 .video-tile__mic-status--muted {
   color: var(--color-danger);
+}
+
+.video-tile__quality {
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--space-xxx-small);
+  vertical-align: middle;
+  font-size: var(--font-size-x-small);
+  gap: var(--space-xxx-small);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0.85;
+  /* Like the connection warning: the label lets clicks through, the badge takes the pointer */
+  /* back so hovering it can say why. */
+  pointer-events: auto;
+}
+
+.video-tile__quality-icon {
+  width: 12px;
+  height: 12px;
 }
 
 .video-tile__connection {
