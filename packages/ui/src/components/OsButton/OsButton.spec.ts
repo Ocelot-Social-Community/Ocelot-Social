@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { defineComponent, h, markRaw } from 'vue-demi'
+import { Comment, Text, defineComponent, h, markRaw } from 'vue-demi'
 
 import OsButton from './OsButton.vue'
 
@@ -433,6 +433,35 @@ describe('osButton', () => {
 
       expect(contentSpan.classes()).toContain('gap-1')
       expect(contentSpan.classes()).not.toContain('gap-2')
+    })
+  })
+
+  // A slot whose `v-if` is false still hands back a comment, and the line breaks around it a blank
+  // text node. Neither may count as content: the wrapper and the gap would render around nothing.
+  describe('slots that show nothing', () => {
+    const empty = () => [h(Comment, 'v-if'), h(Text, '\n  '), h(Comment, 'v-if')]
+
+    it('renders no suffix wrapper for a suffix slot that shows nothing', () => {
+      const wrapper = mount(OsButton, { slots: { default: 'Role', suffix: empty } })
+
+      expect(wrapper.find('.os-button__suffix').exists()).toBe(false)
+      expect(wrapper.find('.gap-1, .gap-2').exists()).toBe(false)
+    })
+
+    it('renders no icon wrapper for an icon slot that shows nothing', () => {
+      const wrapper = mount(OsButton, { slots: { default: 'Save', icon: empty } })
+
+      expect(wrapper.find('.os-button__icon').exists()).toBe(false)
+    })
+
+    it('treats a default slot that shows nothing as no text', () => {
+      const wrapper = mount(OsButton, {
+        slots: { default: empty, icon: () => h('svg') },
+      })
+
+      // Icon only: no gap after the icon, and the icon keeps both negative margins.
+      expect(wrapper.find('.gap-1, .gap-2').exists()).toBe(false)
+      expect(wrapper.find('.os-button__icon').classes()).toContain('-mr-1')
     })
   })
 
